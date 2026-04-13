@@ -666,6 +666,26 @@ export function useRequestPasswordReset() {
   })
 }
 
+const CHANGE_PASSWORD = `
+  mutation ChangePassword($oldPassword: String!, $newPassword: String!) {
+    changePassword(oldPassword: $oldPassword, newPassword: $newPassword)
+  }
+`
+
+export function useChangePassword() {
+  return useMutation({
+    mutationFn: (vars: { oldPassword: String; newPassword: String }) => 
+      graphqlMutate<{ changePassword: boolean }>(CHANGE_PASSWORD, vars as Record<string, unknown>).then(d => d.changePassword),
+    onSuccess: () => {
+      toast.success('Password changed successfully')
+    },
+    onError: (error) => {
+      toast.error('Failed to change password', { description: error.message })
+    }
+  })
+}
+
+
 export function useCreateUser() {
   const queryClient = useQueryClient()
   return useMutation({

@@ -660,6 +660,9 @@ const typeDefs = `#graphql
 
     """Request a password reset link (checks if email exists)"""
     requestPasswordReset(email: String!): Boolean!
+
+    """Change logged-in user's password"""
+    changePassword(oldPassword: String!, newPassword: String!): Boolean!
   }
 `
 

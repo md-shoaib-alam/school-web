@@ -1633,6 +1633,41 @@ export const resolvers = {
         throw new Error('Failed to request password reset');
       }
     },
+    changePassword: async (_: unknown, { oldPassword, newPassword }: any, context: any) => {
+      const { user } = checkAuth(context);
+      
+      const dbUser = await db.user.findUnique({
+        where: { id: user.id }
+      });
+
+      if (!dbUser) throw new Error('User not found');
+
+      // Verify old password
+      const isValid = await bcrypt.compare(oldPassword, dbUser.password);
+      if (!isValid) throw new Error('Invalid current password');
+
+      // Hash new password
+      const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+      // Update password
+      await db.user.update({
+        where: { id: user.id },
+        data: { password: hashedPassword }
+      });
+
+      // Log the action
+      await db.auditLog.create({
+        data: {
+          userId: user.id,
+          tenantId: user.tenantId,
+          action: 'CHANGE_PASSWORD',
+          resource: 'user',
+          details: JSON.stringify({ userId: user.id }),
+        }
+      });
+
+      return true;
+    },
   },
 
   // ── Type Resolvers ───────────────────────────────────────────────────────

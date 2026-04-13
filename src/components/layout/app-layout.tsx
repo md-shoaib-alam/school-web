@@ -62,9 +62,11 @@ import {
   UserPlus,
   Shield,
   TicketCheck,
+  KeyRound,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { hasPermission, isRootAdmin } from "@/lib/permissions";
+import { ChangePasswordModal } from "@/components/modals/change-password-modal";
 
 interface NavItem {
   key: string;
@@ -668,6 +670,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
   } = useAppStore();
   const pathname = usePathname();
   const router = useRouter();
+  const [isChangePasswordOpen, setIsChangePasswordOpen] = useState(false);
 
   // Determine current screen from pathname
   const parts = pathname.split("/").filter(Boolean);
@@ -892,25 +895,70 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
                 {currentUser.customRole?.name || roleLabels[currentUser.role]}
               </Badge>
             </div>
-            <Button
-              variant="ghost"
-              size="icon"
-              className={cn(
-                "h-8 w-8 hover:text-red-500",
-                isSuperAdmin
-                  ? "text-rose-300 hover:bg-rose-800/60"
-                  : "text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800",
-              )}
-              onClick={() => {
-                logout();
-                router.push("/");
-              }}
-            >
-              <LogOut className="h-4 w-4" />
-            </Button>
+
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className={cn(
+                    "h-8 w-8",
+                    isSuperAdmin
+                      ? "text-rose-300 hover:bg-rose-800/60 hover:text-white"
+                      : "text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800",
+                  )}
+                >
+                  <Settings className="h-4 w-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-56">
+                <div className="flex items-center gap-2 p-2">
+                  <Avatar className="h-8 w-8">
+                    <AvatarFallback
+                      className={cn(
+                        "text-white text-[10px] font-semibold",
+                        roleColors[currentUser.role],
+                      )}
+                    >
+                      {initials}
+                    </AvatarFallback>
+                  </Avatar>
+                  <div className="flex flex-col space-y-0.5">
+                    <p className="text-sm font-medium">{currentUser.name}</p>
+                    <p className="text-xs text-muted-foreground truncate">
+                      {currentUser.email}
+                    </p>
+                  </div>
+                </div>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem 
+                  className="cursor-pointer gap-2"
+                  onClick={() => setIsChangePasswordOpen(true)}
+                >
+                  <KeyRound className="h-4 w-4 text-orange-500" />
+                  Change Password
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem
+                  className="cursor-pointer gap-2 text-red-600 focus:text-red-600 focus:bg-red-50 dark:focus:bg-red-900/20"
+                  onClick={() => {
+                    logout();
+                    router.push("/");
+                  }}
+                >
+                  <LogOut className="h-4 w-4" />
+                  Logout
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
         </div>
       </aside>
+
+      <ChangePasswordModal 
+        open={isChangePasswordOpen} 
+        onOpenChange={setIsChangePasswordOpen} 
+      />
 
       {/* Main Content */}
       <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
