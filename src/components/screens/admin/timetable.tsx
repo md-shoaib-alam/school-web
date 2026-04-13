@@ -739,6 +739,10 @@ export function AdminTimetable() {
   }, []);
 
   const handleDaysConfigSave = useCallback(async () => {
+    if (!canEdit) {
+      toast({ title: 'Permission Denied', description: 'You do not have permission to modify school settings.', variant: 'destructive' });
+      return;
+    }
     setDaysConfigSaving(true);
     const tenantId = useAppStore.getState().currentTenantId;
     if (!tenantId) {
@@ -860,16 +864,18 @@ export function AdminTimetable() {
             </Select>
           )}
 
-          {/* Working Days Config Button — visible for ALL users */}
-          <Button
-            variant="outline"
-            onClick={openDaysConfig}
-            className="shrink-0"
-          >
-            <Settings className="h-4 w-4 sm:mr-1.5" />
-            <span className="hidden sm:inline">Working Days</span>
-            <span className="sm:hidden">Days</span>
-          </Button>
+          {/* Working Days Config Button — only if user can edit */}
+          {canEdit && (
+            <Button
+              variant="outline"
+              onClick={openDaysConfig}
+              className="shrink-0"
+            >
+              <Settings className="h-4 w-4 sm:mr-1.5" />
+              <span className="hidden sm:inline">Working Days</span>
+              <span className="sm:hidden">Days</span>
+            </Button>
+          )}
 
           {/* Manage Timetable Button — only if user can create */}
           {selectedClass && canCreate && (
