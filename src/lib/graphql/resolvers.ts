@@ -279,6 +279,33 @@ export const resolvers = {
         const tenants = await db.tenant.findMany({
           where,
           orderBy: { createdAt: 'desc' },
+          select: {
+            id: true,
+            name: true,
+            slug: true,
+            email: true,
+            phone: true,
+            address: true,
+            website: true,
+            plan: true,
+            status: true,
+            maxStudents: true,
+            maxTeachers: true,
+            maxParents: true,
+            maxClasses: true,
+            startDate: true,
+            endDate: true,
+            createdAt: true,
+            _count: {
+              select: {
+                users: true,
+                classes: true,
+                subscriptions: true,
+                notices: true,
+                events: true
+              }
+            }
+          }
         });
 
         const tenantIds = tenants.map(t => t.id);
@@ -347,8 +374,15 @@ export const resolvers = {
         const [users, total, roleCounts] = await Promise.all([
           db.user.findMany({
             where,
-            include: {
-              tenant: { select: { id: true, name: true, slug: true, plan: true, status: true, startDate: true, createdAt: true, updatedAt: true } },
+            select: {
+              id: true,
+              name: true,
+              email: true,
+              role: true,
+              phone: true,
+              isActive: true,
+              createdAt: true,
+              tenant: { select: { id: true, name: true, slug: true } },
             },
             orderBy: { createdAt: 'desc' },
             skip: (page - 1) * limit,
@@ -679,7 +713,15 @@ export const resolvers = {
       const { tenantId } = checkAuth(context);
       const notices = await db.notice.findMany({
         where: { tenantId },
-        include: { author: true },
+        select: {
+          id: true,
+          title: true,
+          content: true,
+          priority: true,
+          targetRole: true,
+          createdAt: true,
+          author: { select: { id: true, name: true } },
+        },
         orderBy: { createdAt: 'desc' }
       });
       return notices.map(n => ({
