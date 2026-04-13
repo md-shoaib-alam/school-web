@@ -241,7 +241,7 @@ const NOTICES = `
 
 const FEES = `
   query Fees {
-    fees { id studentName type amount status dueDate paidAmount }
+    fees { id studentName studentId className type amount status dueDate paidAmount }
   }
 `
 

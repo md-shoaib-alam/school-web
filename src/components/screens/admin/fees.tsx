@@ -73,11 +73,15 @@ export function AdminFees() {
   const queryClient = useQueryClient();
   const { data: fees = [], isLoading: feesLoading } = useFees();
   const { data: students = [], isLoading: studentsLoading } = useStudents();
+  const { data: classes = [], isLoading: classesLoading } = useClasses();
   
-  const loading = feesLoading || studentsLoading;
+  const loading = feesLoading || studentsLoading || classesLoading;
+  const [selectedClass, setSelectedClass] = useState<string | null>(null);
   const [statusFilter, setStatusFilter] = useState('all');
   const [typeFilter, setTypeFilter] = useState('all');
   const [search, setSearch] = useState('');
+
+  const isSelectionMade = selectedClass !== null;
 
   const refetchFees = () => queryClient.invalidateQueries({ queryKey: ['fees'] });
 
@@ -232,8 +236,69 @@ export function AdminFees() {
         </div>
       )}
 
-      {/* Summary Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div>
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Fees Management</h2>
+          <p className="text-gray-500 dark:text-gray-400">Track and manage student payments</p>
+        </div>
+        <div className="flex items-center gap-3">
+          {canCreate && (
+            <Button onClick={() => setAddOpen(true)} className="bg-emerald-600 hover:bg-emerald-700">
+              <Plus className="h-4 w-4 mr-2" />
+              Collect Fee
+            </Button>
+          )}
+        </div>
+      </div>
+
+      {/* Class Selection Filter (The Gatekeeper) */}
+      <Card className="border-blue-500/20 bg-blue-500/5 dark:bg-blue-500/10">
+        <CardContent className="p-4 py-6">
+          <div className="flex flex-col md:flex-row items-center justify-center gap-6">
+            <div className="text-center md:text-left space-y-1">
+              <h3 className="text-lg font-semibold flex items-center justify-center md:justify-start gap-2">
+                <School className="h-5 w-5 text-blue-600" />
+                Select a Class
+              </h3>
+              <p className="text-sm text-gray-500 italic">Filter financial records by class or view everything at once.</p>
+            </div>
+            <div className="flex items-center gap-2 w-full md:w-auto min-w-[300px]">
+              <Select value={selectedClass || undefined} onValueChange={setSelectedClass}>
+                <SelectTrigger className="bg-white dark:bg-gray-950 border-blue-200 h-12 text-lg">
+                  <SelectValue placeholder="Chose Class for Fees..." />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all" className="font-bold text-blue-600">
+                    <span className="flex items-center gap-2">
+                       <CreditCard className="h-4 w-4" />
+                       View All School Fees
+                    </span>
+                  </SelectItem>
+                  {classes.map((cls: any) => (
+                    <SelectItem key={cls.id} value={cls.id}>
+                      {cls.name} - {cls.section}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {!isSelectionMade ? (
+        <div className="py-20 flex flex-col items-center justify-center text-center space-y-4 border-2 border-dashed border-gray-200 dark:border-gray-800 rounded-3xl bg-gray-50/30">
+          <div className="p-4 bg-white dark:bg-gray-950 shadow-sm rounded-full">
+            <DollarSign className="h-12 w-12 text-blue-300" />
+          </div>
+          <div className="max-w-xs">
+            <h4 className="text-lg font-medium text-gray-900 dark:text-white italic">Financial data is ready!</h4>
+            <p className="text-sm text-gray-500">Pick a class from the menu above to start managing their payments and schedules.</p>
+          </div>
+        </div>
+      ) : (
+        <>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         {summaryCards.map((card) => (
           <Card key={card.label} className="hover:shadow-md transition-shadow">
             <CardContent className="p-4 flex items-center gap-4">

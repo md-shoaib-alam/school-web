@@ -697,12 +697,14 @@ export const resolvers = {
       const { tenantId } = checkAuth(context);
       const fees = await db.fee.findMany({
         where: { student: { user: { tenantId } } },
-        include: { student: { include: { user: true } } },
+        include: { student: { include: { user: true, class: true } } },
         orderBy: { dueDate: 'desc' }
       });
       return fees.map(f => ({
         id: f.id,
         studentName: f.student?.user?.name || 'Unknown',
+        studentId: f.studentId,
+        className: f.student?.class?.name ? `${f.student.class.name}-${f.student.class.section}` : 'N/A',
         type: f.type,
         amount: f.amount || 0,
         status: f.status,
