@@ -2,28 +2,22 @@ import { db } from '@/lib/db';
 import { NextRequest, NextResponse } from 'next/server';
 import { resolveTenantId } from '@/lib/resolve-tenant';
 
-// GET /api/roles/users?roleId=xxx&tenantId=xxx
-// Returns users (teachers + staff) assigned to a specific custom role
+// GET /api/roles/users?roleId=xxx
+// Returns staff assigned to a specific custom role
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
     const roleId = searchParams.get('roleId');
-    const tenantId = searchParams.get('tenantId');
 
-    if (!roleId || !tenantId) {
-      return NextResponse.json({ error: 'roleId and tenantId are required' }, { status: 400 });
+    if (!roleId) {
+      return NextResponse.json({ error: 'roleId is required' }, { status: 400 });
     }
 
-    const resolvedId = await resolveTenantId(tenantId);
-    if (!resolvedId) {
-      return NextResponse.json({ error: 'Tenant not found' }, { status: 404 });
-    }
-
+    // No need to resolve tenant — roleId is already scoped to a tenant
     const users = await db.user.findMany({
       where: {
-        tenantId: resolvedId,
         customRoleId: roleId,
-        role: { in: ['teacher', 'staff'] },
+        role: 'staff',
       },
       select: {
         id: true,
@@ -43,34 +37,18 @@ export async function GET(request: NextRequest) {
 }
 
 // PATCH /api/roles/users — Assign or unassign a role from a user
-// Body: { userId: string, roleId: string | null, tenantId: string }
+// Body: { userId: string, roleId: string | null }
 export async function PATCH(request: NextRequest) {
   try {
     const body = await request.json();
-    const { userId, roleId, tenantId: rawTenantId } = body;
+    const { userId, roleId } = body;
 
     if (!userId) {
       return NextResponse.json({ error: 'userId is required' }, { status: 400 });
     }
 
-    const user = await db.user.findUnique({ where: { id: userId } });
-    if (!user) {
-      return NextResponse.json({ error: 'User not found' }, { status: 404 });
-    }
-
-    // If assigning a role, validate it exists
-    if (roleId) {
-      const resolvedId = rawTenantId ? await resolveTenantId(rawTenantId) : user.tenantId;
-      if (resolvedId) {
-        const role = await db.customRole.findFirst({
-          where: { id: roleId, tenantId: resolvedId },
-        });
-        if (!role) {
-          return NextResponse.json({ error: 'Role not found in this school' }, { status: 404 });
-        }
-      }
-    }
-
+    // Single query — Prisma will throw if userId doesn't exist (P2025)
+    // or if roleId references a non-existent customRole (foreign key constraint)
     const updated = await db.user.update({
       where: { id: userId },
       data: { customRoleId: roleId || null },
@@ -84,18 +62,23 @@ export async function PATCH(request: NextRequest) {
     });
 
     return NextResponse.json({ success: true, user: updated });
-  } catch (error) {
+  } catch (error: any) {
     console.error('PATCH /api/roles/users error:', error);
+    if (error?.code === 'P2025') {
+      return NextResponse.json({ error: 'User not found' }, { status: 404 });
+    }
+    if (error?.code === 'P2003') {
+      return NextResponse.json({ error: 'Role not found' }, { status: 404 });
+    }
     return NextResponse.json({ error: 'Failed to update user role' }, { status: 500 });
   }
 }
 
-// GET /api/roles/users?tenantId=xxx&available=true
-// Returns users (teachers + staff) NOT assigned to any custom role
+// POST /api/roles/users — Returns available staff (teachers + staff) with NO custom role assigned
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { tenantId: rawTenantId, excludeRoleId } = body;
+    const { tenantId: rawTenantId } = body;
 
     if (!rawTenantId) {
       return NextResponse.json({ error: 'tenantId is required' }, { status: 400 });
@@ -103,15 +86,16 @@ export async function POST(request: NextRequest) {
 
     const resolvedId = await resolveTenantId(rawTenantId);
     if (!resolvedId) {
+      console.error('POST /api/roles/users: Could not resolve tenantId:', rawTenantId);
       return NextResponse.json({ error: 'Tenant not found' }, { status: 404 });
     }
 
-    // Get all users (teachers + staff) who don't have THIS role assigned
+    // Return only staff/teachers with NO custom role assigned (customRoleId is null)
     const users = await db.user.findMany({
       where: {
         tenantId: resolvedId,
-        role: { in: ['teacher', 'staff'] },
-        ...(excludeRoleId ? { customRoleId: { not: excludeRoleId } } : { customRoleId: null }),
+        role: 'staff',
+        customRoleId: null,
       },
       select: {
         id: true,
@@ -120,9 +104,6 @@ export async function POST(request: NextRequest) {
         role: true,
         isActive: true,
         customRoleId: true,
-        customRole: {
-          select: { id: true, name: true, color: true },
-        },
       },
       orderBy: { name: 'asc' },
     });
@@ -133,3 +114,4 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Failed to fetch available users' }, { status: 500 });
   }
 }
+
