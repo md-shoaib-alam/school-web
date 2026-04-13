@@ -20,7 +20,7 @@ import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
 import {
-  DollarSign, TrendingUp, AlertTriangle, CheckCircle2, Search, Clock, CreditCard, Plus, Pencil, Trash2, Eye,
+  DollarSign, TrendingUp, AlertTriangle, CheckCircle2, Search, Clock, CreditCard, Plus, Pencil, Trash2, Eye, School,
 } from 'lucide-react';
 import type { FeeRecord } from '@/lib/types';
 import { toast } from 'sonner';
