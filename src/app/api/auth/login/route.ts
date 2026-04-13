@@ -93,6 +93,7 @@ export async function POST(request: Request) {
         role: user.role,
         avatar: user.avatar,
         tenantId: user.tenant?.id || null,
+        tenantSlug: user.tenant?.slug || null,
         tenantName: user.tenant?.name || null,
         phone: user.phone,
         customRole: user.customRole ? {

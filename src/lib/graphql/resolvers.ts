@@ -412,15 +412,27 @@ export const resolvers = {
     },
 
     // ── Admin Dashboard ─────────────────────────────────────────────────
-    adminDashboard: async (_: unknown, { tenantId }: { tenantId: string }) => {
+    adminDashboard: async (_: unknown, args: { tenantId?: string }, context: any) => {
       try {
-        // Resolve tenant: try ID first, then slug
-        let tenant = await db.tenant.findUnique({ where: { id: tenantId } })
-        if (!tenant) {
-          tenant = await db.tenant.findFirst({ where: { slug: tenantId.replace(/^tenant-/, '') } })
+        let tenantId = args.tenantId;
+        
+        // 1. Resolve tenant: try argument first
+        let tenant: any = null;
+        if (tenantId) {
+          tenant = await db.tenant.findUnique({ where: { id: tenantId } });
+          if (!tenant) {
+            tenant = await db.tenant.findFirst({ where: { slug: tenantId.replace(/^tenant-/, '') } });
+          }
         }
+
+        // 2. Fallback to session if no tenant found via argument
+        if (!tenant && context?.session?.user?.tenantId) {
+          tenantId = context.session.user.tenantId;
+          tenant = await db.tenant.findUnique({ where: { id: tenantId! } });
+        }
+
         if (!tenant) {
-          throw new Error('Tenant not found')
+          throw new Error('Tenant not found. Please ensure you are logged in to a school.');
         }
         const resolvedTenantId = tenant.id
         const tenantWhere = { tenantId: resolvedTenantId }
@@ -718,26 +730,35 @@ export const resolvers = {
     },
 
     // ── Teacher Dashboard ───────────────────────────────────────────────
-    teacherDashboard: async (_: unknown, { teacherName }: { teacherName: string }) => {
+    teacherDashboard: async (_: unknown, { teacherName }: { teacherName?: string }, context: any) => {
       try {
         // Today's day name and date
         const today = new Date().toLocaleString('default', { weekday: 'long' }).toLowerCase()
         const todayDate = new Date().toISOString().split('T')[0]
 
-        // ⚡ Wave 1: Resolve teacher (Required to get teacherId for subsequent parallel queries)
-        let teacherUser = await db.user.findFirst({
-          where: { name: teacherName, role: 'teacher' },
+        // Wave 1: Resolve teacher
+        let effectiveName = teacherName;
+        if (!effectiveName && context?.session?.user) {
+          effectiveName = context.session.user.name;
+        }
+
+        if (!effectiveName) {
+           throw new Error('Teacher name or session required');
+        }
+
+        let teacherUser: any = await db.user.findFirst({
+          where: { name: effectiveName, role: 'teacher' },
           include: { teacher: true },
         })
         if (!teacherUser || !teacherUser.teacher) {
-          const cleanName = teacherName.replace(/^(Mrs\.?|Mr\.?|Dr\.?|Ms\.?)\s+/i, '').trim()
+          const cleanName = effectiveName.replace(/^(Mrs\.?|Mr\.?|Dr\.?|Ms\.?)\s+/i, '').trim()
           teacherUser = await db.user.findFirst({
             where: { name: { contains: cleanName }, role: 'teacher' },
             include: { teacher: true },
           })
         }
         if (!teacherUser || !teacherUser.teacher) {
-          throw new Error(`Teacher not found: ${teacherName}`)
+          throw new Error(`Teacher not found: ${effectiveName}`)
         }
         const teacherId = teacherUser.teacher.id
 
@@ -981,11 +1002,20 @@ export const resolvers = {
     },
 
     // ── Parent Dashboard ────────────────────────────────────────────────
-    parentDashboard: async (_: unknown, { parentName }: { parentName: string }) => {
+    parentDashboard: async (_: unknown, { parentName }: { parentName?: string }, context: any) => {
       try {
+        let effectiveName = parentName;
+        if (!effectiveName && context?.session?.user) {
+          effectiveName = context.session.user.name;
+        }
+
+        if (!effectiveName) {
+           throw new Error('Parent name or session required');
+        }
+
         // Find parent user by name (exact match first, then contains)
-        let parentUser = await db.user.findFirst({
-          where: { name: parentName, role: 'parent' },
+        let parentUser: any = await db.user.findFirst({
+          where: { name: effectiveName, role: 'parent' },
           include: { parent: true },
         })
         if (!parentUser || !parentUser.parent) {

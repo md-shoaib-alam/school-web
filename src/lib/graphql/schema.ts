@@ -582,16 +582,16 @@ const typeDefs = `#graphql
     auditLogs(action: String, page: Int, limit: Int): AuditLogsResponse!
 
     """School admin dashboard data"""
-    adminDashboard(tenantId: String!): AdminDashboard!
+    adminDashboard(tenantId: String): AdminDashboard!
 
     """Teacher dashboard data"""
-    teacherDashboard(teacherName: String!): TeacherDashboard!
+    teacherDashboard(teacherName: String): TeacherDashboard!
 
     """Student dashboard data"""
     studentDashboard(studentEmail: String): StudentDashboard!
 
     """Parent dashboard data"""
-    parentDashboard(parentName: String!): ParentDashboard!
+    parentDashboard(parentName: String): ParentDashboard!
 
     """Detailed tenant data including all related records"""
     tenantDetail(tenantId: String!): TenantDetail!

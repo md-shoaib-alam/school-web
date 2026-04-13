@@ -217,8 +217,10 @@ function isValidScreen(role: UserRole, screen: string): boolean {
 }
 
 function buildUrl(tenantId: string | null, screen: string): string {
-  if (!tenantId) return screen === 'dashboard' ? '/' : `/${screen}`;
-  return screen === 'dashboard' ? `/${tenantId}` : `/${tenantId}/${screen}`;
+  const state = useAppStore.getState();
+  const identifier = state.currentTenantSlug || tenantId;
+  if (!identifier) return screen === 'dashboard' ? '/' : `/${screen}`;
+  return screen === 'dashboard' ? `/${identifier}` : `/${identifier}/${screen}`;
 }
 
 // ── Store ──

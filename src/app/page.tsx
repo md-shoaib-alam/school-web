@@ -289,11 +289,13 @@ export default function Home() {
 
   // Ensure URL matches current state after login
   useEffect(() => {
-    if (isLoggedIn && currentUser && currentTenantId) {
+    if (isLoggedIn && currentUser) {
       const parts = window.location.pathname.split('/').filter(Boolean);
-      const expectedPrefix = currentTenantId;
+      const expectedPrefix = currentUser.tenantSlug || currentUser.tenantId || currentTenantId;
 
-      // If URL doesn't start with tenant ID, redirect to correct URL
+      if (!expectedPrefix) return;
+
+      // If URL doesn't start with slug/ID, redirect to correct URL
       if (parts.length > 0 && parts[0] !== expectedPrefix) {
         const url = currentScreen === 'dashboard'
           ? `/${expectedPrefix}`

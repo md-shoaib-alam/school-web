@@ -3,6 +3,8 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { useAppStore } from '@/store/use-app-store';
+import { useAdminDashboard } from '@/lib/graphql/hooks';
+import { Skeleton } from '@/components/ui/skeleton';
 import {
   Users, Bell, Calendar, Clock, FileText, ClipboardList,
   GraduationCap, TrendingUp, CheckCircle2, AlertCircle,
@@ -13,32 +15,51 @@ export function StaffDashboard() {
   const { currentUser, currentTenantName, setCurrentScreen } = useAppStore();
   const customRoleName = currentUser?.customRole?.name;
 
-  const stats = [
-    { label: 'Total Students', value: '1,248', icon: <GraduationCap className="h-5 w-5" />, color: 'bg-violet-100 text-violet-600 dark:bg-violet-950/40 dark:text-violet-400' },
-    { label: 'Active Classes', value: '42', icon: <School className="h-5 w-5" />, color: 'bg-emerald-100 text-emerald-600 dark:bg-emerald-950/40 dark:text-emerald-400' },
-    { label: 'Pending Notices', value: '7', icon: <Bell className="h-5 w-5" />, color: 'bg-amber-100 text-amber-600 dark:bg-amber-950/40 dark:text-amber-400' },
-    { label: 'Attendance Rate', value: '94.2%', icon: <TrendingUp className="h-5 w-5" />, color: 'bg-blue-100 text-blue-600 dark:bg-blue-950/40 dark:text-blue-400' },
-  ];
+  const { data, isLoading } = useAdminDashboard(currentUser?.tenantId || '');
 
-  const recentActivity = [
-    { id: 1, title: 'Notice posted: "Mid-Term Exam Schedule"', time: '10 min ago', type: 'notice' as const },
-    { id: 2, title: 'Student attendance marked for Class 10-A', time: '1 hour ago', type: 'attendance' as const },
-    { id: 3, title: 'Fee payment received from Aarav Verma', time: '2 hours ago', type: 'fee' as const },
-    { id: 4, title: 'Timetable updated for Science department', time: '3 hours ago', type: 'timetable' as const },
-    { id: 5, title: 'New student enrolled: Priya Patel', time: 'Yesterday', type: 'enrollment' as const },
+  if (isLoading) {
+    return (
+      <div className="space-y-6">
+        <div className="h-20 w-1/3 bg-gray-100 animate-pulse rounded-lg" />
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          {[1, 2, 3, 4].map(i => <div key={i} className="h-24 bg-gray-100 animate-pulse rounded-xl" />)}
+        </div>
+      </div>
+    );
+  }
+
+  const stats = [
+    { 
+      label: 'Total Students', 
+      value: data?.totalStudents.toLocaleString() || '0', 
+      icon: <GraduationCap className="h-5 w-5" />, 
+      color: 'bg-violet-100 text-violet-600 dark:bg-violet-950/40 dark:text-violet-400' 
+    },
+    { 
+      label: 'Active Classes', 
+      value: data?.totalClasses.toLocaleString() || '0', 
+      icon: <School className="h-5 w-5" />, 
+      color: 'bg-emerald-100 text-emerald-600 dark:bg-emerald-950/40 dark:text-emerald-400' 
+    },
+    { 
+      label: 'Total Teachers', 
+      value: data?.totalTeachers.toLocaleString() || '0', 
+      icon: <Users className="h-5 w-5" />, 
+      color: 'bg-blue-100 text-blue-600 dark:bg-blue-950/40 dark:text-blue-400' 
+    },
+    { 
+      label: 'Attendance Rate', 
+      value: `${data?.attendanceRate || 0}%`, 
+      icon: <TrendingUp className="h-5 w-5" />, 
+      color: 'bg-amber-100 text-amber-600 dark:bg-amber-950/40 dark:text-amber-400' 
+    },
   ];
 
   const quickActions = [
     { label: 'View Notices', icon: <Bell className="h-5 w-5" />, screen: 'notices', color: 'bg-amber-500 hover:bg-amber-600' },
     { label: 'Calendar', icon: <Calendar className="h-5 w-5" />, screen: 'calendar', color: 'bg-blue-500 hover:bg-blue-600' },
     { label: 'Timetable', icon: <Clock className="h-5 w-5" />, screen: 'timetable', color: 'bg-emerald-500 hover:bg-emerald-600' },
-    { label: 'Assignments', icon: <FileText className="h-5 w-5" />, screen: 'assignments', color: 'bg-violet-500 hover:bg-violet-600' },
-  ];
-
-  const upcomingEvents = [
-    { id: 1, title: 'Staff Meeting', date: 'Tomorrow, 10:00 AM', color: 'bg-blue-500' },
-    { id: 2, title: 'Parent-Teacher Meeting', date: 'Mar 20, 2:00 PM', color: 'bg-emerald-500' },
-    { id: 3, title: 'Annual Day Preparation', date: 'Mar 22, 9:00 AM', color: 'bg-rose-500' },
+    { label: 'Classes', icon: <School className="h-5 w-5" />, screen: 'classes', color: 'bg-violet-500 hover:bg-violet-600' },
   ];
 
   return (
@@ -113,55 +134,66 @@ export function StaffDashboard() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Recent Activity */}
+        {/* Recent Notices */}
         <Card>
           <CardHeader>
             <CardTitle className="text-lg flex items-center gap-2">
               <ClipboardList className="h-5 w-5 text-gray-400 dark:text-gray-500" />
-              Recent Activity
+              Recent Broadcasts
             </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="space-y-3">
-              {recentActivity.map((activity) => (
-                <div key={activity.id} className="flex items-start gap-3 py-2 border-b border-gray-50 dark:border-gray-800/50 last:border-0">
-                  <div className="mt-0.5 shrink-0">
-                    {activity.type === 'notice' && <Bell className="h-4 w-4 text-amber-500" />}
-                    {activity.type === 'attendance' && <CheckCircle2 className="h-4 w-4 text-emerald-500" />}
-                    {activity.type === 'fee' && <TrendingUp className="h-4 w-4 text-blue-500" />}
-                    {activity.type === 'timetable' && <Clock className="h-4 w-4 text-violet-500" />}
-                    {activity.type === 'enrollment' && <Users className="h-4 w-4 text-rose-500" />}
+              {(data?.recentNotices || []).length > 0 ? (
+                data?.recentNotices.map((activity) => (
+                  <div key={activity.id} className="flex items-start gap-3 py-2 border-b border-gray-50 dark:border-gray-800/50 last:border-0">
+                    <div className="mt-0.5 shrink-0">
+                      <Bell className="h-4 w-4 text-amber-500" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-semibold text-gray-700 dark:text-gray-300 line-clamp-1">{activity.title}</p>
+                      <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">{activity.content.substring(0, 60)}...</p>
+                    </div>
                   </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm text-gray-700 dark:text-gray-300 line-clamp-1">{activity.title}</p>
-                    <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">{activity.time}</p>
-                  </div>
-                </div>
-              ))}
+                ))
+              ) : (
+                <p className="text-sm text-gray-400 italic">No recent notices found.</p>
+              )}
             </div>
           </CardContent>
         </Card>
 
-        {/* Upcoming Events */}
+        {/* System Overview */}
         <Card>
           <CardHeader>
             <CardTitle className="text-lg flex items-center gap-2">
-              <Calendar className="h-5 w-5 text-gray-400 dark:text-gray-500" />
-              Upcoming Events
+              <AlertCircle className="h-5 w-5 text-gray-400 dark:text-gray-500" />
+              School Composition
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="space-y-3">
-              {upcomingEvents.map((event) => (
-                <div key={event.id} className="flex items-center gap-3 py-2 border-b border-gray-50 dark:border-gray-800/50 last:border-0">
-                  <div className={`w-1.5 h-10 rounded-full ${event.color} shrink-0`} />
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-gray-700 dark:text-gray-300">{event.title}</p>
-                    <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">{event.date}</p>
-                  </div>
-                  <AlertCircle className="h-4 w-4 text-gray-300 dark:text-gray-600 shrink-0" />
+            <div className="space-y-4">
+              <div className="flex items-center justify-between p-3 rounded-lg bg-gray-50 dark:bg-gray-900">
+                <div className="flex items-center gap-3">
+                  <Users className="h-4 w-4 text-emerald-500" />
+                  <span className="text-sm font-medium">Students Enrolled</span>
                 </div>
-              ))}
+                <span className="text-sm font-bold text-emerald-600">{data?.totalStudents}</span>
+              </div>
+              <div className="flex items-center justify-between p-3 rounded-lg bg-gray-50 dark:bg-gray-900">
+                <div className="flex items-center gap-3">
+                  <School className="h-4 w-4 text-blue-500" />
+                  <span className="text-sm font-medium">Registered Classes</span>
+                </div>
+                <span className="text-sm font-bold text-blue-600">{data?.totalClasses}</span>
+              </div>
+              <div className="flex items-center justify-between p-3 rounded-lg bg-gray-50 dark:bg-gray-900">
+                <div className="flex items-center gap-3">
+                  <TrendingUp className="h-4 w-4 text-violet-500" />
+                  <span className="text-sm font-medium">Monthly Attendance</span>
+                </div>
+                <span className="text-sm font-bold text-violet-600">{data?.attendanceRate}%</span>
+              </div>
             </div>
           </CardContent>
         </Card>
