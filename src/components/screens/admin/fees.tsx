@@ -623,6 +623,8 @@ export function AdminFees() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+        </>
+      )}
     </div>
   );
 }

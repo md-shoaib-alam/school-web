@@ -368,7 +368,7 @@ export function AdminRoles() {
                   {permCount > 0 && (
                     <div className="mt-3 flex flex-wrap gap-1">
                       {Object.entries(perms).map(([mod, actions]) =>
-                        (actions as string[]).map((action: string) => (
+                        Array.isArray(actions) && (actions as string[]).map((action: string) => (
                           <Badge key={`${mod}-${action}`} variant="secondary" className="text-[10px] px-1.5 py-0" style={{ borderColor: role.color + '40', backgroundColor: role.color + '10', color: role.color }}>
                             {PERMISSION_MODULES.find(m => m.key === mod)?.label} · {ACTION_LABELS[action]}
                           </Badge>

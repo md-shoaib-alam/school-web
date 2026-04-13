@@ -77,9 +77,8 @@ const roleScreens: Record<UserRole, Set<string>> = {
     'platform-analytics', 'feature-flags', 'roles', 'staff', 'settings', 'manage-admins',
   ]),
   admin: new Set([
-    'dashboard', 'students', 'teachers', 'parents', 'classes', 'subjects',
-    'attendance', 'fees', 'notices', 'timetable', 'calendar', 'reports',
-    'subscriptions', 'roles', 'staff', 'tickets', 'school-settings',
+    'dashboard', 'students', 'teachers', 'parents', 'classes', 'subjects', 'attendance', 
+    'fees', 'grades', 'notices', 'timetable', 'calendar', 'reports', 'subscriptions', 'roles', 'staff', 'school-settings', 'tickets'
   ]),
   teacher: new Set([
     'dashboard', 'my-classes', 'take-attendance', 'grade-management',
@@ -134,7 +133,6 @@ function ScreenRouter({ screen }: { screen: string }) {
       case 'notices': return <AdminNotices />;
       case 'timetable': return <AdminTimetable />;
       case 'calendar': return <AdminCalendar />;
-      case 'reports': return <AdminReports />;
       case 'subscriptions': return <AdminSubscriptions />;
       case 'roles': return <AdminRoles />;
       case 'staff': return <AdminStaff />;
