@@ -73,6 +73,7 @@ export default function TenantScreenDispatcher() {
       case 'staff': return <AdminStaff />;
       case 'school-settings': return <AdminSchoolSettings />;
       case 'tickets': return <AdminTickets />;
+      case 'grades': return <TeacherGrades />;
     }
   }
 
