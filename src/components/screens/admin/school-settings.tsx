@@ -1,34 +1,34 @@
-'use client';
+"use client";
 
-import { useState, useEffect, useCallback } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Checkbox } from '@/components/ui/checkbox';
-import { Label } from '@/components/ui/label';
-import { Badge } from '@/components/ui/badge';
-import { Separator } from '@/components/ui/separator';
-import { Loader2, Settings, Info, Save, CheckCircle2 } from 'lucide-react';
-import { toast } from 'sonner';
-import { useAppStore } from '@/store/use-app-store';
+import { useState, useEffect, useCallback } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Label } from "@/components/ui/label";
+import { Badge } from "@/components/ui/badge";
+import { Separator } from "@/components/ui/separator";
+import { Loader2, Settings, Info, Save, CheckCircle2 } from "lucide-react";
+import { toast } from "sonner";
+import { useAppStore } from "@/store/use-app-store";
 
 const ALL_DAYS = [
-  { key: 'monday', label: 'Monday', short: 'Mon', icon: '📅' },
-  { key: 'tuesday', label: 'Tuesday', short: 'Tue', icon: '📝' },
-  { key: 'wednesday', label: 'Wednesday', short: 'Wed', icon: '📚' },
-  { key: 'thursday', label: 'Thursday', short: 'Thu', icon: '✏️' },
-  { key: 'friday', label: 'Friday', short: 'Fri', icon: '🎉' },
-  { key: 'saturday', label: 'Saturday', short: 'Sat', icon: '📖' },
-  { key: 'sunday', label: 'Sunday', short: 'Sun', icon: '🏫' },
+  { key: "monday", label: "Monday", short: "Mon", icon: "📅" },
+  { key: "tuesday", label: "Tuesday", short: "Tue", icon: "📝" },
+  { key: "wednesday", label: "Wednesday", short: "Wed", icon: "📚" },
+  { key: "thursday", label: "Thursday", short: "Thu", icon: "✏️" },
+  { key: "friday", label: "Friday", short: "Fri", icon: "🎉" },
+  { key: "saturday", label: "Saturday", short: "Sat", icon: "📖" },
+  { key: "sunday", label: "Sunday", short: "Sun", icon: "🏫" },
 ] as const;
 
-type DayKey = (typeof ALL_DAYS)[number]['key'];
+type DayKey = (typeof ALL_DAYS)[number]["key"];
 
 const DEFAULT_WORKING_DAYS: DayKey[] = [
-  'monday',
-  'tuesday',
-  'wednesday',
-  'thursday',
-  'friday',
+  "monday",
+  "tuesday",
+  "wednesday",
+  "thursday",
+  "friday",
 ];
 
 interface TenantSettings {
@@ -42,27 +42,25 @@ export function AdminSchoolSettings() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [workingDays, setWorkingDays] = useState<Set<DayKey>>(
-    new Set(DEFAULT_WORKING_DAYS)
+    new Set(DEFAULT_WORKING_DAYS),
   );
   const [hasChanges, setHasChanges] = useState(false);
   const [initialSettings, setInitialSettings] = useState<TenantSettings | null>(
-    null
+    null,
   );
 
   const fetchSettings = useCallback(async () => {
     if (!currentTenantId) return;
     setLoading(true);
     try {
-      const res = await fetch('/api/tenant-settings');
+      const res = await fetch("/api/tenant-settings");
       if (!res.ok) throw new Error();
       const data: TenantSettings = await res.json();
       setInitialSettings(data);
 
       if (data.workingDays && Array.isArray(data.workingDays)) {
         const validDays = data.workingDays.filter((d: string) =>
-          (ALL_DAYS as readonly { key: string }[]).some(
-            (day) => day.key === d
-          )
+          (ALL_DAYS as readonly { key: string }[]).some((day) => day.key === d),
         ) as DayKey[];
         if (validDays.length > 0) {
           setWorkingDays(new Set(validDays));
@@ -70,7 +68,7 @@ export function AdminSchoolSettings() {
       }
     } catch {
       // Use defaults if fetch fails
-      toast.error('Failed to load settings. Using default configuration.');
+      toast.error("Failed to load settings. Using default configuration.");
     } finally {
       setLoading(false);
     }
@@ -86,7 +84,7 @@ export function AdminSchoolSettings() {
       if (next.has(dayKey)) {
         // Prevent deselecting if it's the last day
         if (next.size <= 1) {
-          toast.error('At least one working day must be selected.');
+          toast.error("At least one working day must be selected.");
           return prev;
         }
         next.delete(dayKey);
@@ -101,7 +99,7 @@ export function AdminSchoolSettings() {
   const handleSave = async () => {
     if (!currentTenantId) return;
     if (workingDays.size === 0) {
-      toast.error('At least one working day must be selected.');
+      toast.error("At least one working day must be selected.");
       return;
     }
 
@@ -112,25 +110,25 @@ export function AdminSchoolSettings() {
         workingDays: Array.from(workingDays),
       };
 
-      const res = await fetch('/api/tenant-settings', {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
+      const res = await fetch("/api/tenant-settings", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ settings }),
       });
 
       if (!res.ok) {
         const err = await res.json().catch(() => ({}));
-        throw new Error(err.error || 'Failed to save settings');
+        throw new Error(err.error || "Failed to save settings");
       }
 
       setHasChanges(false);
       setInitialSettings((prev) =>
-        prev ? { ...prev, workingDays: Array.from(workingDays) } : prev
+        prev ? { ...prev, workingDays: Array.from(workingDays) } : prev,
       );
-      toast.success('School settings saved successfully.');
+      toast.success("School settings saved successfully.");
     } catch (err) {
       toast.error(
-        err instanceof Error ? err.message : 'Failed to save settings'
+        err instanceof Error ? err.message : "Failed to save settings",
       );
     } finally {
       setSaving(false);
@@ -180,7 +178,8 @@ export function AdminSchoolSettings() {
               </p>
               <p className="text-sm text-emerald-700 dark:text-emerald-400">
                 Working days determine which days appear in the timetable.
-                Schools in different regions may have different weekly schedules.
+                Schools in different regions may have different weekly
+                schedules.
               </p>
             </div>
           </div>
@@ -206,7 +205,7 @@ export function AdminSchoolSettings() {
               variant="outline"
               className="border-emerald-200 dark:border-emerald-700 text-emerald-700 dark:text-emerald-400"
             >
-              {selectedCount} day{selectedCount !== 1 ? 's' : ''} selected
+              {selectedCount} day{selectedCount !== 1 ? "s" : ""} selected
             </Badge>
           </div>
         </CardHeader>
@@ -216,8 +215,7 @@ export function AdminSchoolSettings() {
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7 gap-3">
             {ALL_DAYS.map((day) => {
               const isSelected = workingDays.has(day.key);
-              const isLastSelected =
-                isSelected && workingDays.size <= 1;
+              const isLastSelected = isSelected && workingDays.size <= 1;
 
               return (
                 <div
@@ -226,11 +224,11 @@ export function AdminSchoolSettings() {
                     relative flex flex-col items-center gap-2 p-4 rounded-xl border-2 transition-all duration-200 cursor-pointer
                     ${
                       isSelected
-                        ? 'border-emerald-500 dark:border-emerald-400 bg-emerald-50 dark:bg-emerald-900/20 shadow-sm'
-                        : 'border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 hover:border-gray-300 dark:hover:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-800/50'
+                        ? "border-emerald-500 dark:border-emerald-400 bg-emerald-50 dark:bg-emerald-900/20 shadow-sm"
+                        : "border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 hover:border-gray-300 dark:hover:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-800/50"
                     }
-                    ${isLastSelected ? 'opacity-100' : ''}
-                    ${!isSelected && isLastSelected ? 'opacity-50 pointer-events-none' : ''}
+                    ${isLastSelected ? "opacity-100" : ""}
+                    ${!isSelected && isLastSelected ? "opacity-50 pointer-events-none" : ""}
                   `}
                   onClick={() => toggleDay(day.key)}
                 >
@@ -240,7 +238,11 @@ export function AdminSchoolSettings() {
                       checked={isSelected}
                       onCheckedChange={() => toggleDay(day.key)}
                       disabled={isLastSelected && isSelected}
-                      className={isSelected ? 'data-[state=checked]:bg-emerald-600 data-[state=checked]:border-emerald-600' : ''}
+                      className={
+                        isSelected
+                          ? "data-[state=checked]:bg-emerald-600 data-[state=checked]:border-emerald-600"
+                          : ""
+                      }
                     />
                   </div>
 
@@ -252,8 +254,8 @@ export function AdminSchoolSettings() {
                     <p
                       className={`text-sm font-semibold leading-tight ${
                         isSelected
-                          ? 'text-emerald-700 dark:text-emerald-300'
-                          : 'text-gray-600 dark:text-gray-400'
+                          ? "text-emerald-700 dark:text-emerald-300"
+                          : "text-gray-600 dark:text-gray-400"
                       }`}
                     >
                       {day.label}
@@ -261,8 +263,8 @@ export function AdminSchoolSettings() {
                     <p
                       className={`text-xs mt-0.5 ${
                         isSelected
-                          ? 'text-emerald-500 dark:text-emerald-500'
-                          : 'text-gray-400 dark:text-gray-500'
+                          ? "text-emerald-500 dark:text-emerald-500"
+                          : "text-gray-400 dark:text-gray-500"
                       }`}
                     >
                       {day.short}
@@ -290,7 +292,13 @@ export function AdminSchoolSettings() {
                 type="button"
                 onClick={() => {
                   setWorkingDays(
-                    new Set(['monday', 'tuesday', 'wednesday', 'thursday', 'friday'] as DayKey[])
+                    new Set([
+                      "monday",
+                      "tuesday",
+                      "wednesday",
+                      "thursday",
+                      "friday",
+                    ] as DayKey[]),
                   );
                   setHasChanges(true);
                 }}
@@ -302,7 +310,14 @@ export function AdminSchoolSettings() {
                 type="button"
                 onClick={() => {
                   setWorkingDays(
-                    new Set(['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'] as DayKey[])
+                    new Set([
+                      "monday",
+                      "tuesday",
+                      "wednesday",
+                      "thursday",
+                      "friday",
+                      "saturday",
+                    ] as DayKey[]),
                   );
                   setHasChanges(true);
                 }}
@@ -314,7 +329,13 @@ export function AdminSchoolSettings() {
                 type="button"
                 onClick={() => {
                   setWorkingDays(
-                    new Set(['sunday', 'monday', 'tuesday', 'wednesday', 'thursday'] as DayKey[])
+                    new Set([
+                      "sunday",
+                      "monday",
+                      "tuesday",
+                      "wednesday",
+                      "thursday",
+                    ] as DayKey[]),
                   );
                   setHasChanges(true);
                 }}
@@ -332,9 +353,7 @@ export function AdminSchoolSettings() {
             <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400">
               <CheckCircle2
                 className={`h-4 w-4 ${
-                  hasChanges
-                    ? 'text-amber-500'
-                    : 'text-emerald-500'
+                  hasChanges ? "text-amber-500" : "text-emerald-500"
                 }`}
               />
               {hasChanges ? (

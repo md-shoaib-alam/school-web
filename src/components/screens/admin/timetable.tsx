@@ -1,21 +1,18 @@
-'use client';
+"use client";
 
-import { useState, useEffect, useMemo, useCallback } from 'react';
-import {
-  Card,
-  CardContent,
-} from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Skeleton } from '@/components/ui/skeleton';
-import { Input } from '@/components/ui/input';
+import { useState, useEffect, useMemo, useCallback } from "react";
+import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Input } from "@/components/ui/input";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
+} from "@/components/ui/select";
 import {
   Dialog,
   DialogContent,
@@ -23,8 +20,8 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from '@/components/ui/dialog';
-import { ScrollArea } from '@/components/ui/scroll-area';
+} from "@/components/ui/dialog";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import {
   Clock,
   BookOpen,
@@ -43,61 +40,69 @@ import {
   Eye,
   Settings,
   Check,
-} from 'lucide-react';
-import { useToast } from '@/hooks/use-toast';
-import { useModulePermissions } from '@/hooks/use-permissions';
-import { useAppStore } from '@/store/use-app-store';
-import type { ClassInfo, TimetableSlot } from '@/lib/types';
+} from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
+import { useModulePermissions } from "@/hooks/use-permissions";
+import { useAppStore } from "@/store/use-app-store";
+import type { ClassInfo, TimetableSlot } from "@/lib/types";
 
 // ---------------------------------------------------------------------------
 // Constants
 // ---------------------------------------------------------------------------
 
-type ViewMode = 'grid' | 'list' | 'day';
+type ViewMode = "grid" | "list" | "day";
 
 // Default working days (Mon-Fri) — can be overridden by tenant settings
-const DEFAULT_DAYS = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday'];
+const DEFAULT_DAYS = ["monday", "tuesday", "wednesday", "thursday", "friday"];
 
-const ALL_DAYS = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
+const ALL_DAYS = [
+  "monday",
+  "tuesday",
+  "wednesday",
+  "thursday",
+  "friday",
+  "saturday",
+  "sunday",
+];
 
 const DAY_LABELS: Record<string, string> = {
-  monday: 'Mon',
-  tuesday: 'Tue',
-  wednesday: 'Wed',
-  thursday: 'Thu',
-  friday: 'Fri',
-  saturday: 'Sat',
-  sunday: 'Sun',
+  monday: "Mon",
+  tuesday: "Tue",
+  wednesday: "Wed",
+  thursday: "Thu",
+  friday: "Fri",
+  saturday: "Sat",
+  sunday: "Sun",
 };
 
 const DAY_FULL_LABELS: Record<string, string> = {
-  monday: 'Monday',
-  tuesday: 'Tuesday',
-  wednesday: 'Wednesday',
-  thursday: 'Thursday',
-  friday: 'Friday',
-  saturday: 'Saturday',
-  sunday: 'Sunday',
+  monday: "Monday",
+  tuesday: "Tuesday",
+  wednesday: "Wednesday",
+  thursday: "Thursday",
+  friday: "Friday",
+  saturday: "Saturday",
+  sunday: "Sunday",
 };
 
 const SUBJECT_COLORS = [
-  'bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300 border-emerald-200 dark:border-emerald-700',
-  'bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 border-blue-200 dark:border-blue-700',
-  'bg-violet-50 dark:bg-violet-900/30 text-violet-700 dark:text-violet-300 border-violet-200 dark:border-violet-700',
-  'bg-amber-50 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300 border-amber-200 dark:border-amber-700',
-  'bg-rose-50 dark:bg-rose-900/30 text-rose-700 dark:text-rose-300 border-rose-200 dark:border-rose-700',
-  'bg-cyan-50 dark:bg-cyan-900/30 text-cyan-700 dark:text-cyan-300 border-cyan-200 dark:border-cyan-700',
-  'bg-pink-50 dark:bg-pink-900/30 text-pink-700 dark:text-pink-300 border-pink-200 dark:border-pink-700',
+  "bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300 border-emerald-200 dark:border-emerald-700",
+  "bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 border-blue-200 dark:border-blue-700",
+  "bg-violet-50 dark:bg-violet-900/30 text-violet-700 dark:text-violet-300 border-violet-200 dark:border-violet-700",
+  "bg-amber-50 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300 border-amber-200 dark:border-amber-700",
+  "bg-rose-50 dark:bg-rose-900/30 text-rose-700 dark:text-rose-300 border-rose-200 dark:border-rose-700",
+  "bg-cyan-50 dark:bg-cyan-900/30 text-cyan-700 dark:text-cyan-300 border-cyan-200 dark:border-cyan-700",
+  "bg-pink-50 dark:bg-pink-900/30 text-pink-700 dark:text-pink-300 border-pink-200 dark:border-pink-700",
 ];
 
 const SUBJECT_DOT_COLORS = [
-  'bg-emerald-500',
-  'bg-blue-500',
-  'bg-violet-500',
-  'bg-amber-500',
-  'bg-rose-500',
-  'bg-cyan-500',
-  'bg-pink-500',
+  "bg-emerald-500",
+  "bg-blue-500",
+  "bg-violet-500",
+  "bg-amber-500",
+  "bg-rose-500",
+  "bg-cyan-500",
+  "bg-pink-500",
 ];
 
 // ---------------------------------------------------------------------------
@@ -114,15 +119,23 @@ function getSubjectColorIndex(
 
 function getCurrentDayIndex(days: string[]): number {
   const jsDay = new Date().getDay(); // 0 = Sunday, 1 = Monday ...
-  const dayMap: Record<number, string> = { 0: 'sunday', 1: 'monday', 2: 'tuesday', 3: 'wednesday', 4: 'thursday', 5: 'friday', 6: 'saturday' };
+  const dayMap: Record<number, string> = {
+    0: "sunday",
+    1: "monday",
+    2: "tuesday",
+    3: "wednesday",
+    4: "thursday",
+    5: "friday",
+    6: "saturday",
+  };
   const todayKey = dayMap[jsDay];
   return days.indexOf(todayKey);
 }
 
 function isCurrentPeriod(start: string, end: string): boolean {
   const now = new Date();
-  const [startH, startM] = start.split(':').map(Number);
-  const [endH, endM] = end.split(':').map(Number);
+  const [startH, startM] = start.split(":").map(Number);
+  const [endH, endM] = end.split(":").map(Number);
   const startMin = startH * 60 + (startM ?? 0);
   const endMin = endH * 60 + (endM ?? 0);
   const nowMin = now.getHours() * 60 + now.getMinutes();
@@ -130,10 +143,10 @@ function isCurrentPeriod(start: string, end: string): boolean {
 }
 
 function formatTime(time: string): string {
-  const [h, m] = time.split(':');
-  const hour = parseInt(h ?? '0', 10);
-  const min = m ?? '00';
-  const ampm = hour >= 12 ? 'PM' : 'AM';
+  const [h, m] = time.split(":");
+  const hour = parseInt(h ?? "0", 10);
+  const min = m ?? "00";
+  const ampm = hour >= 12 ? "PM" : "AM";
   const displayHour = hour % 12 === 0 ? 12 : hour % 12;
   return `${displayHour}:${min} ${ampm}`;
 }
@@ -141,7 +154,7 @@ function formatTime(time: string): string {
 function subjectBadge(
   subject: string,
   uniqueSubjects: string[],
-  size: 'sm' | 'md',
+  size: "sm" | "md",
 ): string {
   const idx = getSubjectColorIndex(uniqueSubjects, subject);
   return SUBJECT_COLORS[idx % SUBJECT_COLORS.length];
@@ -172,9 +185,9 @@ interface FormSlot {
 export function AdminTimetable() {
   const [classes, setClasses] = useState<ClassInfo[]>([]);
   const [slots, setSlots] = useState<TimetableSlot[]>([]);
-  const [selectedClass, setSelectedClass] = useState<string>('');
-  const [viewMode, setViewMode] = useState<ViewMode>('grid');
-  const [selectedDay, setSelectedDay] = useState<string>('monday');
+  const [selectedClass, setSelectedClass] = useState<string>("");
+  const [viewMode, setViewMode] = useState<ViewMode>("grid");
+  const [selectedDay, setSelectedDay] = useState<string>("monday");
   const [loadingClasses, setLoadingClasses] = useState(true);
   const [loadingTimetable, setLoadingTimetable] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -184,7 +197,7 @@ export function AdminTimetable() {
 
   // Create timetable dialog state — day tabs with per-day period lists
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
-  const [activeTab, setActiveTab] = useState<string>('monday');
+  const [activeTab, setActiveTab] = useState<string>("monday");
   const [daySlots, setDaySlots] = useState<Record<string, FormSlot[]>>({
     monday: [],
     tuesday: [],
@@ -195,7 +208,13 @@ export function AdminTimetable() {
     sunday: [],
   });
   const [availableSubjects, setAvailableSubjects] = useState<
-    { id: string; name: string; code: string; className: string; teacherName?: string }[]
+    {
+      id: string;
+      name: string;
+      code: string;
+      className: string;
+      teacherName?: string;
+    }[]
   >([]);
   const [availableTeachers, setAvailableTeachers] = useState<
     { id: string; name: string; email: string }[]
@@ -206,41 +225,43 @@ export function AdminTimetable() {
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [editingSlot, setEditingSlot] = useState<TimetableSlot | null>(null);
   const [editForm, setEditForm] = useState({
-    subjectId: '',
-    teacherId: '',
-    startTime: '',
-    endTime: '',
-    day: '',
+    subjectId: "",
+    teacherId: "",
+    startTime: "",
+    endTime: "",
+    day: "",
   });
   const [editSaving, setEditSaving] = useState(false);
 
   // Working Days config dialog state
   const [daysConfigOpen, setDaysConfigOpen] = useState(false);
   const [daysConfigSaving, setDaysConfigSaving] = useState(false);
-  const [daysConfigDraft, setDaysConfigDraft] = useState<string[]>([...workingDays]);
+  const [daysConfigDraft, setDaysConfigDraft] = useState<string[]>([
+    ...workingDays,
+  ]);
 
   // Copy from feature
-  const [copySourceDay, setCopySourceDay] = useState<string>('monday');
+  const [copySourceDay, setCopySourceDay] = useState<string>("monday");
 
   const { toast } = useToast();
   const currentClass = classes.find((c) => c.id === selectedClass);
 
   // ── Permission checks ──
-  const { canCreate, canEdit, canDelete } = useModulePermissions('timetable');
+  const { canCreate, canEdit, canDelete } = useModulePermissions("timetable");
 
   // Fetch classes on mount
   useEffect(() => {
     async function fetchClasses() {
       try {
-        const res = await fetch('/api/classes');
-        if (!res.ok) throw new Error('Failed to fetch classes');
+        const res = await fetch("/api/classes");
+        if (!res.ok) throw new Error("Failed to fetch classes");
         const data = await res.json();
         setClasses(data);
         if (data.length > 0) {
           setSelectedClass(data[0].id);
         }
       } catch (err) {
-        setError(err instanceof Error ? err.message : 'Unknown error');
+        setError(err instanceof Error ? err.message : "Unknown error");
       } finally {
         setLoadingClasses(false);
       }
@@ -257,7 +278,10 @@ export function AdminTimetable() {
         const res = await fetch(`/api/tenant-settings?tenantId=${tenantId}`);
         if (res.ok) {
           const data = await res.json();
-          if (data.settings?.workingDays && Array.isArray(data.settings.workingDays)) {
+          if (
+            data.settings?.workingDays &&
+            Array.isArray(data.settings.workingDays)
+          ) {
             setWorkingDays(data.settings.workingDays);
           }
         }
@@ -274,11 +298,11 @@ export function AdminTimetable() {
     setError(null);
     try {
       const res = await fetch(`/api/timetable?classId=${classId}`);
-      if (!res.ok) throw new Error('Failed to fetch timetable');
+      if (!res.ok) throw new Error("Failed to fetch timetable");
       const data = await res.json();
       setSlots(data);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Unknown error');
+      setError(err instanceof Error ? err.message : "Unknown error");
     } finally {
       setLoadingTimetable(false);
     }
@@ -290,31 +314,47 @@ export function AdminTimetable() {
   }, [selectedClass, fetchTimetable]);
 
   // Delete handler
-  const handleDeleteSlot = useCallback(async (slotId: string) => {
-    try {
-      const res = await fetch(`/api/timetable?id=${slotId}`, { method: 'DELETE' });
-      if (res.ok) {
-        toast({ title: 'Slot Deleted', description: 'Timetable entry removed.', variant: 'default' });
-        if (selectedClass) fetchTimetable(selectedClass);
+  const handleDeleteSlot = useCallback(
+    async (slotId: string) => {
+      try {
+        const res = await fetch(`/api/timetable?id=${slotId}`, {
+          method: "DELETE",
+        });
+        if (res.ok) {
+          toast({
+            title: "Slot Deleted",
+            description: "Timetable entry removed.",
+            variant: "default",
+          });
+          if (selectedClass) fetchTimetable(selectedClass);
+        }
+      } catch {
+        toast({
+          title: "Error",
+          description: "Failed to delete slot.",
+          variant: "destructive",
+        });
       }
-    } catch {
-      toast({ title: 'Error', description: 'Failed to delete slot.', variant: 'destructive' });
-    }
-  }, [selectedClass, fetchTimetable, toast]);
+    },
+    [selectedClass, fetchTimetable, toast],
+  );
 
   // Edit slot handler - opens edit dialog and pre-fills form
-  const handleEditSlot = useCallback((slot: TimetableSlot) => {
-    if (!canEdit) return;
-    setEditingSlot(slot);
-    setEditForm({
-      subjectId: slot.subjectId,
-      teacherId: slot.teacherId,
-      startTime: slot.startTime,
-      endTime: slot.endTime,
-      day: slot.day,
-    });
-    setEditDialogOpen(true);
-  }, [canEdit]);
+  const handleEditSlot = useCallback(
+    (slot: TimetableSlot) => {
+      if (!canEdit) return;
+      setEditingSlot(slot);
+      setEditForm({
+        subjectId: slot.subjectId,
+        teacherId: slot.teacherId,
+        startTime: slot.startTime,
+        endTime: slot.endTime,
+        day: slot.day,
+      });
+      setEditDialogOpen(true);
+    },
+    [canEdit],
+  );
 
   // Edit save handler - PUTs the updated data
   const handleEditSave = useCallback(async () => {
@@ -322,9 +362,9 @@ export function AdminTimetable() {
     setEditSaving(true);
 
     try {
-      const res = await fetch('/api/timetable', {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
+      const res = await fetch("/api/timetable", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           id: editingSlot.id,
           subjectId: editForm.subjectId,
@@ -334,20 +374,21 @@ export function AdminTimetable() {
           day: editForm.day,
         }),
       });
-      if (!res.ok) throw new Error('Failed to update slot');
+      if (!res.ok) throw new Error("Failed to update slot");
 
       toast({
-        title: 'Slot Updated',
-        description: 'Timetable entry has been updated successfully.',
+        title: "Slot Updated",
+        description: "Timetable entry has been updated successfully.",
       });
       setEditDialogOpen(false);
       setEditingSlot(null);
       if (selectedClass) fetchTimetable(selectedClass);
     } catch (err) {
       toast({
-        title: 'Failed to update',
-        description: err instanceof Error ? err.message : 'An unexpected error occurred.',
-        variant: 'destructive',
+        title: "Failed to update",
+        description:
+          err instanceof Error ? err.message : "An unexpected error occurred.",
+        variant: "destructive",
       });
     } finally {
       setEditSaving(false);
@@ -421,7 +462,8 @@ export function AdminTimetable() {
     const daySlotsList: TimetableSlot[][] = [];
     for (const { start, end } of timeSlots) {
       const found = slots.filter(
-        (s) => s.day === selectedDay && s.startTime === start && s.endTime === end,
+        (s) =>
+          s.day === selectedDay && s.startTime === start && s.endTime === end,
       );
       daySlotsList.push(found);
     }
@@ -448,7 +490,9 @@ export function AdminTimetable() {
   }, [daySlots]);
 
   const currentDayIndex = getCurrentDayIndex(workingDays);
-  const effectiveDay = selectedDay || (currentDayIndex >= 0 ? workingDays[currentDayIndex] : workingDays[0]);
+  const effectiveDay =
+    selectedDay ||
+    (currentDayIndex >= 0 ? workingDays[currentDayIndex] : workingDays[0]);
 
   // Fetch subjects & teachers when the dialog opens
   useEffect(() => {
@@ -456,8 +500,8 @@ export function AdminTimetable() {
     async function fetchFormData() {
       try {
         const [subjectRes, teacherRes] = await Promise.all([
-          fetch('/api/subjects'),
-          fetch('/api/teachers'),
+          fetch("/api/subjects"),
+          fetch("/api/teachers"),
         ]);
         if (subjectRes.ok) {
           const subjectData = await subjectRes.json();
@@ -474,7 +518,11 @@ export function AdminTimetable() {
           setAvailableTeachers(teacherData);
         }
       } catch {
-        toast({ title: 'Error', description: 'Failed to load subjects or teachers.', variant: 'destructive' });
+        toast({
+          title: "Error",
+          description: "Failed to load subjects or teachers.",
+          variant: "destructive",
+        });
       }
     }
     fetchFormData();
@@ -513,7 +561,9 @@ export function AdminTimetable() {
           }
           // Sort each day's periods by start time
           for (const day of ALL_DAYS) {
-            initial[day]?.sort((a, b) => a.startTime.localeCompare(b.startTime));
+            initial[day]?.sort((a, b) =>
+              a.startTime.localeCompare(b.startTime),
+            );
           }
           setDaySlots(initial);
         } else {
@@ -548,10 +598,10 @@ export function AdminTimetable() {
     const newSlot: FormSlot = {
       id: crypto.randomUUID(),
       day: activeTab,
-      subjectId: '',
-      teacherId: '',
-      startTime: '08:00',
-      endTime: '08:45',
+      subjectId: "",
+      teacherId: "",
+      startTime: "08:00",
+      endTime: "08:45",
     };
     setDaySlots((prev) => ({
       ...prev,
@@ -566,9 +616,13 @@ export function AdminTimetable() {
     }));
   }
 
-  function updatePeriod(periodId: string, field: keyof FormSlot, value: string) {
+  function updatePeriod(
+    periodId: string,
+    field: keyof FormSlot,
+    value: string,
+  ) {
     // If changing the day field, move the period to the target day
-    if (field === 'day' && value !== activeTab) {
+    if (field === "day" && value !== activeTab) {
       setDaySlots((prev) => {
         const currentList = prev[activeTab] ?? [];
         const period = currentList.find((s) => s.id === periodId);
@@ -595,9 +649,9 @@ export function AdminTimetable() {
     const sourcePeriods = daySlots[sourceDay] ?? [];
     if (sourcePeriods.length === 0) {
       toast({
-        title: 'Nothing to copy',
+        title: "Nothing to copy",
         description: `No periods found on ${DAY_FULL_LABELS[sourceDay]}.`,
-        variant: 'destructive',
+        variant: "destructive",
       });
       return;
     }
@@ -617,7 +671,7 @@ export function AdminTimetable() {
     }));
 
     toast({
-      title: 'Periods Copied',
+      title: "Periods Copied",
       description: `Copied ${copied.length} period(s) from ${DAY_FULL_LABELS[sourceDay]} to ${DAY_FULL_LABELS[targetDay]}.`,
     });
   }
@@ -627,9 +681,9 @@ export function AdminTimetable() {
     const sourcePeriods = daySlots[sourceDay] ?? [];
     if (sourcePeriods.length === 0) {
       toast({
-        title: 'Nothing to copy',
+        title: "Nothing to copy",
         description: `No periods found on ${DAY_FULL_LABELS[sourceDay]}.`,
-        variant: 'destructive',
+        variant: "destructive",
       });
       return;
     }
@@ -650,7 +704,7 @@ export function AdminTimetable() {
     setDaySlots(updated);
 
     toast({
-      title: 'Copied to All Days',
+      title: "Copied to All Days",
       description: `Copied ${sourcePeriods.length} period(s) from ${DAY_FULL_LABELS[sourceDay]} to all other days.`,
     });
   }
@@ -658,7 +712,7 @@ export function AdminTimetable() {
   // Delete all timetable slots for the selected class
   async function deleteTimetableForClass() {
     for (const slot of slots) {
-      await fetch(`/api/timetable?id=${slot.id}`, { method: 'DELETE' });
+      await fetch(`/api/timetable?id=${slot.id}`, { method: "DELETE" });
     }
   }
 
@@ -675,7 +729,11 @@ export function AdminTimetable() {
     );
 
     if (validSlots.length === 0) {
-      toast({ title: 'No slots to save', description: 'Please add at least one period before saving.', variant: 'destructive' });
+      toast({
+        title: "No slots to save",
+        description: "Please add at least one period before saving.",
+        variant: "destructive",
+      });
       setSaving(false);
       return;
     }
@@ -692,25 +750,26 @@ export function AdminTimetable() {
     try {
       await deleteTimetableForClass();
 
-      const res = await fetch('/api/timetable', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      const res = await fetch("/api/timetable", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ slots: allSlots }),
       });
-      if (!res.ok) throw new Error('Failed to save timetable');
+      if (!res.ok) throw new Error("Failed to save timetable");
       const data = await res.json();
 
       toast({
-        title: 'Timetable saved',
-        description: `Successfully saved ${data.created ?? allSlots.length} slots${data.errors ? ` (${data.errors} errors)` : ''}.`,
+        title: "Timetable saved",
+        description: `Successfully saved ${data.created ?? allSlots.length} slots${data.errors ? ` (${data.errors} errors)` : ""}.`,
       });
       setCreateDialogOpen(false);
       fetchTimetable(selectedClass);
     } catch (err) {
       toast({
-        title: 'Failed to save',
-        description: err instanceof Error ? err.message : 'An unexpected error occurred.',
-        variant: 'destructive',
+        title: "Failed to save",
+        description:
+          err instanceof Error ? err.message : "An unexpected error occurred.",
+        variant: "destructive",
       });
     } finally {
       setSaving(false);
@@ -740,31 +799,46 @@ export function AdminTimetable() {
 
   const handleDaysConfigSave = useCallback(async () => {
     if (!canEdit) {
-      toast({ title: 'Permission Denied', description: 'You do not have permission to modify school settings.', variant: 'destructive' });
+      toast({
+        title: "Permission Denied",
+        description: "You do not have permission to modify school settings.",
+        variant: "destructive",
+      });
       return;
     }
     setDaysConfigSaving(true);
     const tenantId = useAppStore.getState().currentTenantId;
     if (!tenantId) {
-      toast({ title: 'Error', description: 'Tenant ID not found.', variant: 'destructive' });
+      toast({
+        title: "Error",
+        description: "Tenant ID not found.",
+        variant: "destructive",
+      });
       setDaysConfigSaving(false);
       return;
     }
     try {
-      const res = await fetch('/api/tenant-settings', {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ tenantId, settings: { workingDays: daysConfigDraft } }),
+      const res = await fetch("/api/tenant-settings", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          tenantId,
+          settings: { workingDays: daysConfigDraft },
+        }),
       });
-      if (!res.ok) throw new Error('Failed to save working days');
+      if (!res.ok) throw new Error("Failed to save working days");
       setWorkingDays(daysConfigDraft);
       setDaysConfigOpen(false);
-      toast({ title: 'Working Days Updated', description: `School schedule set to ${daysConfigDraft.length} working days.` });
+      toast({
+        title: "Working Days Updated",
+        description: `School schedule set to ${daysConfigDraft.length} working days.`,
+      });
     } catch (err) {
       toast({
-        title: 'Failed to save',
-        description: err instanceof Error ? err.message : 'An unexpected error occurred.',
-        variant: 'destructive',
+        title: "Failed to save",
+        description:
+          err instanceof Error ? err.message : "An unexpected error occurred.",
+        variant: "destructive",
       });
     } finally {
       setDaysConfigSaving(false);
@@ -774,7 +848,9 @@ export function AdminTimetable() {
   // Sync selectedDay with today when it's invalid
   useEffect(() => {
     if (!selectedDay || !workingDays.includes(selectedDay)) {
-      setSelectedDay(currentDayIndex >= 0 ? workingDays[currentDayIndex] : workingDays[0]);
+      setSelectedDay(
+        currentDayIndex >= 0 ? workingDays[currentDayIndex] : workingDays[0],
+      );
     }
   }, [selectedDay, currentDayIndex, workingDays]);
 
@@ -809,7 +885,7 @@ export function AdminTimetable() {
             <p className="text-sm text-muted-foreground">
               {currentClass
                 ? `${currentClass.name}-${currentClass.section}`
-                : 'Select a class to view timetable'}
+                : "Select a class to view timetable"}
             </p>
           </div>
         </div>
@@ -819,27 +895,39 @@ export function AdminTimetable() {
           <div className="inline-flex items-center rounded-lg border bg-muted/40 p-0.5">
             <Button
               size="sm"
-              variant={viewMode === 'grid' ? 'default' : 'ghost'}
-              className={viewMode === 'grid' ? 'bg-emerald-600 hover:bg-emerald-700 text-white shadow-xs' : 'text-muted-foreground hover:text-foreground'}
-              onClick={() => setViewMode('grid')}
+              variant={viewMode === "grid" ? "default" : "ghost"}
+              className={
+                viewMode === "grid"
+                  ? "bg-emerald-600 hover:bg-emerald-700 text-white shadow-xs"
+                  : "text-muted-foreground hover:text-foreground"
+              }
+              onClick={() => setViewMode("grid")}
             >
               <LayoutGrid className="h-4 w-4" />
               <span className="hidden sm:inline">Grid</span>
             </Button>
             <Button
               size="sm"
-              variant={viewMode === 'list' ? 'default' : 'ghost'}
-              className={viewMode === 'list' ? 'bg-emerald-600 hover:bg-emerald-700 text-white shadow-xs' : 'text-muted-foreground hover:text-foreground'}
-              onClick={() => setViewMode('list')}
+              variant={viewMode === "list" ? "default" : "ghost"}
+              className={
+                viewMode === "list"
+                  ? "bg-emerald-600 hover:bg-emerald-700 text-white shadow-xs"
+                  : "text-muted-foreground hover:text-foreground"
+              }
+              onClick={() => setViewMode("list")}
             >
               <List className="h-4 w-4" />
               <span className="hidden sm:inline">List</span>
             </Button>
             <Button
               size="sm"
-              variant={viewMode === 'day' ? 'default' : 'ghost'}
-              className={viewMode === 'day' ? 'bg-emerald-600 hover:bg-emerald-700 text-white shadow-xs' : 'text-muted-foreground hover:text-foreground'}
-              onClick={() => setViewMode('day')}
+              variant={viewMode === "day" ? "default" : "ghost"}
+              className={
+                viewMode === "day"
+                  ? "bg-emerald-600 hover:bg-emerald-700 text-white shadow-xs"
+                  : "text-muted-foreground hover:text-foreground"
+              }
+              onClick={() => setViewMode("day")}
             >
               <CalendarDays className="h-4 w-4" />
               <span className="hidden sm:inline">Day</span>
@@ -899,11 +987,11 @@ export function AdminTimetable() {
             return (
               <Badge
                 key={day}
-                variant={isWorking ? 'outline' : 'secondary'}
+                variant={isWorking ? "outline" : "secondary"}
                 className={`text-[11px] px-2 py-0.5 font-medium transition-colors ${
                   isWorking
-                    ? 'border-emerald-300 bg-emerald-50 text-emerald-700 dark:text-emerald-400 dark:border-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400'
-                    : 'border-gray-200 bg-gray-50 text-gray-500 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-500'
+                    ? "border-emerald-300 bg-emerald-50 text-emerald-700 dark:text-emerald-400 dark:border-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400"
+                    : "border-gray-200 bg-gray-50 text-gray-500 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-500"
                 }`}
               >
                 {isWorking ? DAY_LABELS[day] : `${DAY_LABELS[day]} Holiday`}
@@ -917,7 +1005,9 @@ export function AdminTimetable() {
       {!canCreate && !canEdit && !canDelete && (
         <div className="flex items-center gap-2 rounded-lg border border-amber-200 dark:border-amber-800 bg-amber-50 dark:bg-amber-900/20 px-3 py-2">
           <Eye className="h-4 w-4 text-amber-600 dark:text-amber-400 shrink-0" />
-          <span className="text-xs text-amber-700 dark:text-amber-400 font-medium">Read-only mode — you have view permission only for this module.</span>
+          <span className="text-xs text-amber-700 dark:text-amber-400 font-medium">
+            Read-only mode — you have view permission only for this module.
+          </span>
         </div>
       )}
 
@@ -930,7 +1020,8 @@ export function AdminTimetable() {
               Working Days &amp; Holidays
             </DialogTitle>
             <DialogDescription>
-              Select which days your school is open. Unselected days will be treated as holidays.
+              Select which days your school is open. Unselected days will be
+              treated as holidays.
             </DialogDescription>
           </DialogHeader>
 
@@ -945,23 +1036,31 @@ export function AdminTimetable() {
                   type="button"
                   disabled={isLastOne}
                   onClick={() => toggleDayInDraft(day)}
-                  title={isLastOne ? 'At least one day must be selected' : `Toggle ${DAY_FULL_LABELS[day]}`}
+                  title={
+                    isLastOne
+                      ? "At least one day must be selected"
+                      : `Toggle ${DAY_FULL_LABELS[day]}`
+                  }
                   className={`relative flex flex-col items-center gap-1.5 rounded-xl border-2 p-3 transition-all text-center ${
                     isSelected
-                      ? 'border-emerald-500 bg-emerald-50 dark:border-emerald-600 dark:bg-emerald-950/40 hover:border-emerald-600 dark:hover:border-emerald-500 cursor-pointer'
-                      : 'border-gray-200 bg-gray-50 dark:border-gray-700 dark:bg-gray-900 hover:border-gray-300 dark:hover:border-gray-600 cursor-pointer'
-                  } ${isLastOne ? 'opacity-60 cursor-not-allowed' : ''}`}
+                      ? "border-emerald-500 bg-emerald-50 dark:border-emerald-600 dark:bg-emerald-950/40 hover:border-emerald-600 dark:hover:border-emerald-500 cursor-pointer"
+                      : "border-gray-200 bg-gray-50 dark:border-gray-700 dark:bg-gray-900 hover:border-gray-300 dark:hover:border-gray-600 cursor-pointer"
+                  } ${isLastOne ? "opacity-60 cursor-not-allowed" : ""}`}
                 >
                   {isSelected && (
                     <div className="absolute top-1.5 right-1.5 h-4 w-4 rounded-full bg-emerald-500 dark:bg-emerald-600 flex items-center justify-center">
                       <Check className="h-2.5 w-2.5 text-white" />
                     </div>
                   )}
-                  <span className={`text-xs font-semibold leading-none ${isSelected ? 'text-emerald-700 dark:text-emerald-400 dark:text-emerald-400 dark:text-emerald-400' : 'text-gray-500 dark:text-gray-400'}`}>
+                  <span
+                    className={`text-xs font-semibold leading-none ${isSelected ? "text-emerald-700 dark:text-emerald-400 dark:text-emerald-400 dark:text-emerald-400" : "text-gray-500 dark:text-gray-400"}`}
+                  >
                     {DAY_LABELS[day]}
                   </span>
                   {!isSelected && (
-                    <span className="text-[10px] text-gray-400 dark:text-gray-500 font-medium">Holiday</span>
+                    <span className="text-[10px] text-gray-400 dark:text-gray-500 font-medium">
+                      Holiday
+                    </span>
                   )}
                 </button>
               );
@@ -970,16 +1069,19 @@ export function AdminTimetable() {
 
           {/* Quick presets */}
           <div className="space-y-2 py-2">
-            <p className="text-xs font-medium text-muted-foreground">Quick Presets</p>
+            <p className="text-xs font-medium text-muted-foreground">
+              Quick Presets
+            </p>
             <div className="flex flex-wrap gap-2">
               <Button
                 type="button"
                 variant="outline"
                 size="sm"
                 className={`text-xs h-8 ${
-                  JSON.stringify(daysConfigDraft) === JSON.stringify(DEFAULT_DAYS)
-                    ? 'border-emerald-500 bg-emerald-50 text-emerald-700 dark:text-emerald-400 dark:border-emerald-600 dark:bg-emerald-950/40 dark:text-emerald-400'
-                    : ''
+                  JSON.stringify(daysConfigDraft) ===
+                  JSON.stringify(DEFAULT_DAYS)
+                    ? "border-emerald-500 bg-emerald-50 text-emerald-700 dark:text-emerald-400 dark:border-emerald-600 dark:bg-emerald-950/40 dark:text-emerald-400"
+                    : ""
                 }`}
                 onClick={() => applyPreset(DEFAULT_DAYS)}
               >
@@ -990,11 +1092,28 @@ export function AdminTimetable() {
                 variant="outline"
                 size="sm"
                 className={`text-xs h-8 ${
-                  JSON.stringify(daysConfigDraft) === JSON.stringify(['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'])
-                    ? 'border-emerald-500 bg-emerald-50 text-emerald-700 dark:text-emerald-400 dark:border-emerald-600 dark:bg-emerald-950/40 dark:text-emerald-400'
-                    : ''
+                  JSON.stringify(daysConfigDraft) ===
+                  JSON.stringify([
+                    "monday",
+                    "tuesday",
+                    "wednesday",
+                    "thursday",
+                    "friday",
+                    "saturday",
+                  ])
+                    ? "border-emerald-500 bg-emerald-50 text-emerald-700 dark:text-emerald-400 dark:border-emerald-600 dark:bg-emerald-950/40 dark:text-emerald-400"
+                    : ""
                 }`}
-                onClick={() => applyPreset(['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'])}
+                onClick={() =>
+                  applyPreset([
+                    "monday",
+                    "tuesday",
+                    "wednesday",
+                    "thursday",
+                    "friday",
+                    "saturday",
+                  ])
+                }
               >
                 Mon-Sat (6-day week)
               </Button>
@@ -1003,11 +1122,26 @@ export function AdminTimetable() {
                 variant="outline"
                 size="sm"
                 className={`text-xs h-8 ${
-                  JSON.stringify(daysConfigDraft) === JSON.stringify(['sunday', 'monday', 'tuesday', 'wednesday', 'thursday'])
-                    ? 'border-emerald-500 bg-emerald-50 text-emerald-700 dark:text-emerald-400 dark:border-emerald-600 dark:bg-emerald-950/40 dark:text-emerald-400'
-                    : ''
+                  JSON.stringify(daysConfigDraft) ===
+                  JSON.stringify([
+                    "sunday",
+                    "monday",
+                    "tuesday",
+                    "wednesday",
+                    "thursday",
+                  ])
+                    ? "border-emerald-500 bg-emerald-50 text-emerald-700 dark:text-emerald-400 dark:border-emerald-600 dark:bg-emerald-950/40 dark:text-emerald-400"
+                    : ""
                 }`}
-                onClick={() => applyPreset(['sunday', 'monday', 'tuesday', 'wednesday', 'thursday'])}
+                onClick={() =>
+                  applyPreset([
+                    "sunday",
+                    "monday",
+                    "tuesday",
+                    "wednesday",
+                    "thursday",
+                  ])
+                }
               >
                 Sun-Thu (Middle East)
               </Button>
@@ -1017,8 +1151,8 @@ export function AdminTimetable() {
                 size="sm"
                 className={`text-xs h-8 ${
                   JSON.stringify(daysConfigDraft) === JSON.stringify(ALL_DAYS)
-                    ? 'border-emerald-500 bg-emerald-50 text-emerald-700 dark:text-emerald-400 dark:border-emerald-600 dark:bg-emerald-950/40 dark:text-emerald-400'
-                    : ''
+                    ? "border-emerald-500 bg-emerald-50 text-emerald-700 dark:text-emerald-400 dark:border-emerald-600 dark:bg-emerald-950/40 dark:text-emerald-400"
+                    : ""
                 }`}
                 onClick={() => applyPreset(ALL_DAYS)}
               >
@@ -1042,8 +1176,12 @@ export function AdminTimetable() {
               disabled={daysConfigSaving}
               className="bg-emerald-600 hover:bg-emerald-700 text-white"
             >
-              {daysConfigSaving && <Loader2 className="h-4 w-4 mr-1.5 animate-spin" />}
-              {daysConfigSaving ? 'Saving...' : `Save ${daysConfigDraft.length} Working Days`}
+              {daysConfigSaving && (
+                <Loader2 className="h-4 w-4 mr-1.5 animate-spin" />
+              )}
+              {daysConfigSaving
+                ? "Saving..."
+                : `Save ${daysConfigDraft.length} Working Days`}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -1065,10 +1203,14 @@ export function AdminTimetable() {
 
             <div className="space-y-4 py-2">
               <div className="space-y-1.5">
-                <label className="text-sm font-medium text-foreground">Subject</label>
+                <label className="text-sm font-medium text-foreground">
+                  Subject
+                </label>
                 <Select
                   value={editForm.subjectId}
-                  onValueChange={(v) => setEditForm((prev) => ({ ...prev, subjectId: v }))}
+                  onValueChange={(v) =>
+                    setEditForm((prev) => ({ ...prev, subjectId: v }))
+                  }
                 >
                   <SelectTrigger className="h-10">
                     <SelectValue placeholder="Select subject" />
@@ -1076,7 +1218,7 @@ export function AdminTimetable() {
                   <SelectContent>
                     {availableSubjects.map((s) => (
                       <SelectItem key={s.id} value={s.id}>
-                        {s.name} {s.code ? `(${s.code})` : ''}
+                        {s.name} {s.code ? `(${s.code})` : ""}
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -1084,10 +1226,14 @@ export function AdminTimetable() {
               </div>
 
               <div className="space-y-1.5">
-                <label className="text-sm font-medium text-foreground">Teacher</label>
+                <label className="text-sm font-medium text-foreground">
+                  Teacher
+                </label>
                 <Select
                   value={editForm.teacherId}
-                  onValueChange={(v) => setEditForm((prev) => ({ ...prev, teacherId: v }))}
+                  onValueChange={(v) =>
+                    setEditForm((prev) => ({ ...prev, teacherId: v }))
+                  }
                 >
                   <SelectTrigger className="h-10">
                     <SelectValue placeholder="Select teacher" />
@@ -1103,10 +1249,14 @@ export function AdminTimetable() {
               </div>
 
               <div className="space-y-1.5">
-                <label className="text-sm font-medium text-foreground">Day</label>
+                <label className="text-sm font-medium text-foreground">
+                  Day
+                </label>
                 <Select
                   value={editForm.day}
-                  onValueChange={(v) => setEditForm((prev) => ({ ...prev, day: v }))}
+                  onValueChange={(v) =>
+                    setEditForm((prev) => ({ ...prev, day: v }))
+                  }
                 >
                   <SelectTrigger className="h-10">
                     <SelectValue placeholder="Select day" />
@@ -1123,20 +1273,34 @@ export function AdminTimetable() {
 
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-1.5">
-                  <label className="text-sm font-medium text-foreground">Start Time</label>
+                  <label className="text-sm font-medium text-foreground">
+                    Start Time
+                  </label>
                   <Input
                     type="time"
                     value={editForm.startTime}
-                    onChange={(e) => setEditForm((prev) => ({ ...prev, startTime: e.target.value }))}
+                    onChange={(e) =>
+                      setEditForm((prev) => ({
+                        ...prev,
+                        startTime: e.target.value,
+                      }))
+                    }
                     className="h-10"
                   />
                 </div>
                 <div className="space-y-1.5">
-                  <label className="text-sm font-medium text-foreground">End Time</label>
+                  <label className="text-sm font-medium text-foreground">
+                    End Time
+                  </label>
                   <Input
                     type="time"
                     value={editForm.endTime}
-                    onChange={(e) => setEditForm((prev) => ({ ...prev, endTime: e.target.value }))}
+                    onChange={(e) =>
+                      setEditForm((prev) => ({
+                        ...prev,
+                        endTime: e.target.value,
+                      }))
+                    }
                     className="h-10"
                   />
                 </div>
@@ -1153,11 +1317,20 @@ export function AdminTimetable() {
               </Button>
               <Button
                 onClick={handleEditSave}
-                disabled={editSaving || !editForm.subjectId || !editForm.teacherId || !editForm.day || !editForm.startTime || !editForm.endTime}
+                disabled={
+                  editSaving ||
+                  !editForm.subjectId ||
+                  !editForm.teacherId ||
+                  !editForm.day ||
+                  !editForm.startTime ||
+                  !editForm.endTime
+                }
                 className="bg-emerald-600 hover:bg-emerald-700 text-white"
               >
-                {editSaving && <Loader2 className="h-4 w-4 mr-1.5 animate-spin" />}
-                {editSaving ? 'Saving...' : 'Save Changes'}
+                {editSaving && (
+                  <Loader2 className="h-4 w-4 mr-1.5 animate-spin" />
+                )}
+                {editSaving ? "Saving..." : "Save Changes"}
               </Button>
             </DialogFooter>
           </DialogContent>
@@ -1175,18 +1348,25 @@ export function AdminTimetable() {
             <DialogDescription>
               {totalPeriodCount > 0 ? (
                 <>
-                  <span className="font-medium text-foreground">{totalPeriodCount}</span> total periods for{' '}
                   <span className="font-medium text-foreground">
-                    {currentClass ? `${currentClass.name}-${currentClass.section}` : ''}
-                  </span>{' '}
+                    {totalPeriodCount}
+                  </span>{" "}
+                  total periods for{" "}
+                  <span className="font-medium text-foreground">
+                    {currentClass
+                      ? `${currentClass.name}-${currentClass.section}`
+                      : ""}
+                  </span>{" "}
                   — add, edit, or remove periods across all days.
                 </>
               ) : (
                 <>
-                  Add time slots for{' '}
+                  Add time slots for{" "}
                   <span className="font-medium text-foreground">
-                    {currentClass ? `${currentClass.name}-${currentClass.section}` : ''}
-                  </span>{' '}
+                    {currentClass
+                      ? `${currentClass.name}-${currentClass.section}`
+                      : ""}
+                  </span>{" "}
                   — select day, subject, teacher, and timing for each period.
                 </>
               )}
@@ -1196,7 +1376,9 @@ export function AdminTimetable() {
           {/* Copy from day feature */}
           <div className="flex flex-wrap items-center gap-2 rounded-lg border bg-muted/30 p-3">
             <Copy className="h-4 w-4 text-muted-foreground shrink-0" />
-            <span className="text-sm font-medium text-muted-foreground whitespace-nowrap">Duplicate from:</span>
+            <span className="text-sm font-medium text-muted-foreground whitespace-nowrap">
+              Duplicate from:
+            </span>
             <Select value={copySourceDay} onValueChange={setCopySourceDay}>
               <SelectTrigger className="h-8 text-sm w-32">
                 <SelectValue />
@@ -1204,18 +1386,27 @@ export function AdminTimetable() {
               <SelectContent>
                 {workingDays.map((day) => (
                   <SelectItem key={day} value={day}>
-                    {DAY_FULL_LABELS[day]} {periodsByDay[day] > 0 ? `(${periodsByDay[day]})` : ''}
+                    {DAY_FULL_LABELS[day]}{" "}
+                    {periodsByDay[day] > 0 ? `(${periodsByDay[day]})` : ""}
                   </SelectItem>
                 ))}
               </SelectContent>
             </Select>
-            <Button variant="outline" size="sm" className="text-xs h-8"
-              onClick={() => handleCopyToDay(copySourceDay, activeTab)}>
+            <Button
+              variant="outline"
+              size="sm"
+              className="text-xs h-8"
+              onClick={() => handleCopyToDay(copySourceDay, activeTab)}
+            >
               <Copy className="h-3 w-3 mr-1" />
               Copy to {DAY_LABELS[activeTab]}
             </Button>
-            <Button variant="outline" size="sm" className="text-xs h-8"
-              onClick={() => handleCopyToAllDays(copySourceDay)}>
+            <Button
+              variant="outline"
+              size="sm"
+              className="text-xs h-8"
+              onClick={() => handleCopyToAllDays(copySourceDay)}
+            >
               <Copy className="h-3 w-3 mr-1" />
               Copy to All Days
             </Button>
@@ -1232,8 +1423,8 @@ export function AdminTimetable() {
                   onClick={() => setActiveTab(day)}
                   className={`relative flex-1 px-3 py-2 text-sm font-medium transition-colors text-center border-b-2 -mb-px ${
                     isActive
-                      ? 'border-emerald-600 text-emerald-700 dark:text-emerald-400'
-                      : 'border-transparent text-muted-foreground hover:text-foreground'
+                      ? "border-emerald-600 text-emerald-700 dark:text-emerald-400"
+                      : "border-transparent text-muted-foreground hover:text-foreground"
                   }`}
                 >
                   <span className="text-xs sm:text-sm">{DAY_LABELS[day]}</span>
@@ -1253,8 +1444,12 @@ export function AdminTimetable() {
               {currentTabPeriods.length === 0 ? (
                 <div className="text-center py-10 text-muted-foreground">
                   <BookOpen className="h-10 w-10 mx-auto mb-2 opacity-25" />
-                  <p className="text-sm font-medium">No periods on {DAY_FULL_LABELS[activeTab]}</p>
-                  <p className="text-xs mt-1">Click &quot;Add Period&quot; below to get started.</p>
+                  <p className="text-sm font-medium">
+                    No periods on {DAY_FULL_LABELS[activeTab]}
+                  </p>
+                  <p className="text-xs mt-1">
+                    Click &quot;Add Period&quot; below to get started.
+                  </p>
                 </div>
               ) : (
                 currentTabPeriods.map((period, idx) => (
@@ -1287,7 +1482,9 @@ export function AdminTimetable() {
                         </label>
                         <Select
                           value={period.day}
-                          onValueChange={(v) => updatePeriod(period.id, 'day', v)}
+                          onValueChange={(v) =>
+                            updatePeriod(period.id, "day", v)
+                          }
                         >
                           <SelectTrigger className="h-8 text-xs">
                             <SelectValue placeholder="Day" />
@@ -1309,7 +1506,9 @@ export function AdminTimetable() {
                         </label>
                         <Select
                           value={period.subjectId}
-                          onValueChange={(v) => updatePeriod(period.id, 'subjectId', v)}
+                          onValueChange={(v) =>
+                            updatePeriod(period.id, "subjectId", v)
+                          }
                         >
                           <SelectTrigger className="h-8 text-xs">
                             <SelectValue placeholder="Subject" />
@@ -1331,7 +1530,9 @@ export function AdminTimetable() {
                         </label>
                         <Select
                           value={period.teacherId}
-                          onValueChange={(v) => updatePeriod(period.id, 'teacherId', v)}
+                          onValueChange={(v) =>
+                            updatePeriod(period.id, "teacherId", v)
+                          }
                         >
                           <SelectTrigger className="h-8 text-xs">
                             <SelectValue placeholder="Teacher" />
@@ -1354,7 +1555,9 @@ export function AdminTimetable() {
                         <Input
                           type="time"
                           value={period.startTime}
-                          onChange={(e) => updatePeriod(period.id, 'startTime', e.target.value)}
+                          onChange={(e) =>
+                            updatePeriod(period.id, "startTime", e.target.value)
+                          }
                           className="h-8 text-xs"
                         />
                       </div>
@@ -1367,7 +1570,9 @@ export function AdminTimetable() {
                         <Input
                           type="time"
                           value={period.endTime}
-                          onChange={(e) => updatePeriod(period.id, 'endTime', e.target.value)}
+                          onChange={(e) =>
+                            updatePeriod(period.id, "endTime", e.target.value)
+                          }
                           className="h-8 text-xs"
                         />
                       </div>
@@ -1403,7 +1608,9 @@ export function AdminTimetable() {
               className="bg-emerald-600 hover:bg-emerald-700 text-white"
             >
               {saving && <Loader2 className="h-4 w-4 mr-1.5 animate-spin" />}
-              {saving ? 'Saving...' : `Save ${workingDays.reduce((sum, d) => sum + (daySlots[d]?.length ?? 0), 0)} Periods`}
+              {saving
+                ? "Saving..."
+                : `Save ${workingDays.reduce((sum, d) => sum + (daySlots[d]?.length ?? 0), 0)} Periods`}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -1415,7 +1622,7 @@ export function AdminTimetable() {
           {uniqueSubjects.map((subject) => (
             <div
               key={subject}
-              className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-0.5 text-xs font-medium ${subjectBadge(subject, uniqueSubjects, 'sm')}`}
+              className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-0.5 text-xs font-medium ${subjectBadge(subject, uniqueSubjects, "sm")}`}
             >
               <BookOpen className="h-3 w-3" />
               {subject}
@@ -1435,11 +1642,11 @@ export function AdminTimetable() {
               <p className="font-medium">No timetable entries found</p>
               <p className="text-sm mt-1">
                 {selectedClass
-                  ? 'This class does not have a timetable configured yet.'
-                  : 'Please select a class to view its timetable.'}
+                  ? "This class does not have a timetable configured yet."
+                  : "Please select a class to view its timetable."}
               </p>
             </div>
-          ) : viewMode === 'grid' ? (
+          ) : viewMode === "grid" ? (
             <GridView
               timeSlots={timeSlots}
               gridData={gridData}
@@ -1451,7 +1658,7 @@ export function AdminTimetable() {
               canEdit={canEdit}
               canDelete={canDelete}
             />
-          ) : viewMode === 'list' ? (
+          ) : viewMode === "list" ? (
             <ListView
               slotsByDay={slotsByDay}
               uniqueSubjects={uniqueSubjects}
@@ -1528,8 +1735,8 @@ function GridView({
                   key={day}
                   className={`py-3 px-2 text-center font-medium ${
                     idx === currentDayIndex
-                      ? 'bg-emerald-50 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-400'
-                      : 'text-muted-foreground'
+                      ? "bg-emerald-50 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-400"
+                      : "text-muted-foreground"
                   }`}
                 >
                   {DAY_LABELS[day]}
@@ -1544,7 +1751,7 @@ function GridView({
             {timeSlots.map(({ start, end }, slotIdx) => (
               <tr
                 key={`${start}-${end}`}
-                className={slotIdx % 2 === 0 ? 'bg-background' : 'bg-muted/10'}
+                className={slotIdx % 2 === 0 ? "bg-background" : "bg-muted/10"}
               >
                 <td className="py-3 px-4 align-top">
                   <div className="flex items-center gap-2">
@@ -1553,7 +1760,9 @@ function GridView({
                     </div>
                     <div>
                       <p className="text-xs font-medium">{formatTime(start)}</p>
-                      <p className="text-xs text-muted-foreground">{formatTime(end)}</p>
+                      <p className="text-xs text-muted-foreground">
+                        {formatTime(end)}
+                      </p>
                     </div>
                   </div>
                 </td>
@@ -1565,7 +1774,9 @@ function GridView({
                     <td
                       key={day}
                       className={`py-2 px-1.5 align-top ${
-                        dayIdx === currentDayIndex ? 'bg-emerald-50/40 dark:bg-emerald-900/20' : ''
+                        dayIdx === currentDayIndex
+                          ? "bg-emerald-50/40 dark:bg-emerald-900/20"
+                          : ""
                       }`}
                     >
                       {cellSlots && cellSlots.length > 0 ? (
@@ -1573,7 +1784,7 @@ function GridView({
                           {cellSlots.map((slot) => (
                             <div className="relative group" key={slot.id}>
                               <div
-                                className={`rounded-lg border px-3 py-2.5 transition-all hover:shadow-sm ${subjectBadge(slot.subjectName, uniqueSubjects, 'md')}`}
+                                className={`rounded-lg border px-3 py-2.5 transition-all hover:shadow-sm ${subjectBadge(slot.subjectName, uniqueSubjects, "md")}`}
                               >
                                 <p className="font-semibold text-sm leading-tight">
                                   {slot.subjectName}
@@ -1628,14 +1839,14 @@ function GridView({
         {workingDays.map((day, dayIdx) => (
           <div
             key={day}
-            className={`p-4 ${dayIdx === currentDayIndex ? 'bg-emerald-50/50 dark:bg-emerald-900/10' : ''}`}
+            className={`p-4 ${dayIdx === currentDayIndex ? "bg-emerald-50/50 dark:bg-emerald-900/10" : ""}`}
           >
             <div className="flex items-center gap-2 mb-3">
               <h3
                 className={`font-semibold text-sm ${
                   dayIdx === currentDayIndex
-                    ? 'text-emerald-700 dark:text-emerald-400 dark:text-emerald-400'
-                    : 'text-foreground'
+                    ? "text-emerald-700 dark:text-emerald-400 dark:text-emerald-400"
+                    : "text-foreground"
                 }`}
               >
                 {DAY_FULL_LABELS[day]}
@@ -1654,16 +1865,21 @@ function GridView({
                 return (
                   <div key={key} className="flex items-start gap-3">
                     <div className="shrink-0 w-16 text-xs text-muted-foreground pt-2">
-                      <span className="font-medium">{formatTime(start).replace(' ', '')}</span>
+                      <span className="font-medium">
+                        {formatTime(start).replace(" ", "")}
+                      </span>
                       <span className="mx-0.5">-</span>
-                      <span>{formatTime(end).replace(' ', '')}</span>
+                      <span>{formatTime(end).replace(" ", "")}</span>
                     </div>
                     {cellSlots && cellSlots.length > 0 ? (
                       <div className="flex-1 space-y-1">
                         {cellSlots.map((slot) => (
-                          <div className="flex items-center gap-2" key={slot.id}>
+                          <div
+                            className="flex items-center gap-2"
+                            key={slot.id}
+                          >
                             <div
-                              className={`flex-1 rounded-lg border px-3 py-2 ${subjectBadge(slot.subjectName, uniqueSubjects, 'sm')}`}
+                              className={`flex-1 rounded-lg border px-3 py-2 ${subjectBadge(slot.subjectName, uniqueSubjects, "sm")}`}
                             >
                               <p className="font-semibold text-xs leading-tight">
                                 {slot.subjectName}
@@ -1751,11 +1967,11 @@ function ListView({
         return (
           <div
             key={day}
-            className={`py-4 px-4 sm:px-6 ${isToday ? 'bg-emerald-50/50 dark:bg-emerald-900/10' : ''}`}
+            className={`py-4 px-4 sm:px-6 ${isToday ? "bg-emerald-50/50 dark:bg-emerald-900/10" : ""}`}
           >
             <div className="flex items-center gap-3 mb-3">
               <h3
-                className={`text-sm font-semibold ${isToday ? 'text-emerald-700 dark:text-emerald-400 dark:text-emerald-400' : 'text-foreground'}`}
+                className={`text-sm font-semibold ${isToday ? "text-emerald-700 dark:text-emerald-400 dark:text-emerald-400" : "text-foreground"}`}
               >
                 {DAY_FULL_LABELS[day]}
               </h3>
@@ -1764,8 +1980,12 @@ function ListView({
                   Today
                 </Badge>
               )}
-              <Badge variant="outline" className="text-[10px] px-1.5 py-0 text-muted-foreground">
-                {daySlotsList.length} {daySlotsList.length === 1 ? 'period' : 'periods'}
+              <Badge
+                variant="outline"
+                className="text-[10px] px-1.5 py-0 text-muted-foreground"
+              >
+                {daySlotsList.length}{" "}
+                {daySlotsList.length === 1 ? "period" : "periods"}
               </Badge>
             </div>
 
@@ -1779,15 +1999,17 @@ function ListView({
                     key={slot.id}
                     className={`group flex items-center gap-3 rounded-lg px-3 py-2.5 transition-colors ${
                       isCurrent
-                        ? 'bg-emerald-100/60 dark:bg-emerald-900/30 border border-emerald-200 dark:border-emerald-800'
-                        : 'hover:bg-muted/40'
+                        ? "bg-emerald-100/60 dark:bg-emerald-900/30 border border-emerald-200 dark:border-emerald-800"
+                        : "hover:bg-muted/40"
                     }`}
                   >
                     <div className="shrink-0 w-24 sm:w-28">
                       <span className="text-xs font-medium text-muted-foreground">
                         {formatTime(slot.startTime)}
                       </span>
-                      <span className="text-xs text-muted-foreground mx-1">-</span>
+                      <span className="text-xs text-muted-foreground mx-1">
+                        -
+                      </span>
                       <span className="text-xs font-medium text-muted-foreground">
                         {formatTime(slot.endTime)}
                       </span>
@@ -1795,14 +2017,14 @@ function ListView({
 
                     <div className="shrink-0">
                       <Circle
-                        className={`h-2 w-2 fill-current ${isCurrent ? 'text-emerald-500' : 'text-transparent'}`}
+                        className={`h-2 w-2 fill-current ${isCurrent ? "text-emerald-500" : "text-transparent"}`}
                       />
                     </div>
 
                     <ChevronRight className="h-3.5 w-3.5 shrink-0 text-muted-foreground/40" />
 
                     <div
-                      className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-0.5 text-xs font-medium shrink-0 ${subjectBadge(slot.subjectName, uniqueSubjects, 'sm')}`}
+                      className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-0.5 text-xs font-medium shrink-0 ${subjectBadge(slot.subjectName, uniqueSubjects, "sm")}`}
                     >
                       <span
                         className={`h-1.5 w-1.5 rounded-full ${subjectDot(slot.subjectName, uniqueSubjects)}`}
@@ -1901,11 +2123,11 @@ function DayView({
             <Button
               key={day}
               size="sm"
-              variant={isActive ? 'default' : 'outline'}
+              variant={isActive ? "default" : "outline"}
               className={
                 isActive
-                  ? 'bg-emerald-600 hover:bg-emerald-700 text-white shadow-xs shrink-0'
-                  : 'shrink-0 text-muted-foreground hover:text-foreground'
+                  ? "bg-emerald-600 hover:bg-emerald-700 text-white shadow-xs shrink-0"
+                  : "shrink-0 text-muted-foreground hover:text-foreground"
               }
               onClick={() => onSelectDay(day)}
             >
@@ -1933,7 +2155,7 @@ function DayView({
           )}
           {hasAnySlot && (
             <span className="text-xs text-muted-foreground ml-auto">
-              {selectedDaySlots.filter((group) => group.length > 0).length} of{' '}
+              {selectedDaySlots.filter((group) => group.length > 0).length} of{" "}
               {timeSlots.length} periods
             </span>
           )}
@@ -1959,7 +2181,10 @@ function DayView({
                 const hasSlots = slotGroup.length > 0;
                 const isCurrent =
                   isToday && hasSlots
-                    ? isCurrentPeriod(slotGroup[0].startTime, slotGroup[0].endTime)
+                    ? isCurrentPeriod(
+                        slotGroup[0].startTime,
+                        slotGroup[0].endTime,
+                      )
                     : false;
 
                 return (
@@ -1968,10 +2193,10 @@ function DayView({
                       <div
                         className={`h-2.5 w-2.5 rounded-full border-2 ${
                           isCurrent
-                            ? 'bg-emerald-500 border-emerald-300 dark:border-emerald-600 ring-4 ring-emerald-100 dark:ring-emerald-900/40'
+                            ? "bg-emerald-500 border-emerald-300 dark:border-emerald-600 ring-4 ring-emerald-100 dark:ring-emerald-900/40"
                             : hasSlots
-                              ? 'bg-background border-emerald-400'
-                              : 'bg-background border-muted-foreground/30'
+                              ? "bg-background border-emerald-400"
+                              : "bg-background border-muted-foreground/30"
                         }`}
                       />
                     </div>
@@ -1984,7 +2209,10 @@ function DayView({
                           </Badge>
                         )}
                         {slotGroup.map((slot) => (
-                          <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2" key={slot.id}>
+                          <div
+                            className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2"
+                            key={slot.id}
+                          >
                             <div className="flex-1 min-w-0">
                               <p className="text-lg font-semibold leading-tight">
                                 {slot.subjectName}
@@ -1998,11 +2226,12 @@ function DayView({
                             </div>
                             <div className="flex items-center gap-2">
                               <div
-                                className={`shrink-0 rounded-lg border px-3 py-1.5 text-xs font-medium ${subjectBadge(slot.subjectName, uniqueSubjects, 'sm')}`}
+                                className={`shrink-0 rounded-lg border px-3 py-1.5 text-xs font-medium ${subjectBadge(slot.subjectName, uniqueSubjects, "sm")}`}
                               >
                                 <div className="flex items-center gap-1.5">
                                   <Clock className="h-3 w-3" />
-                                  {formatTime(slot.startTime)} - {formatTime(slot.endTime)}
+                                  {formatTime(slot.startTime)} -{" "}
+                                  {formatTime(slot.endTime)}
                                 </div>
                               </div>
                               {showActions && (
@@ -2037,7 +2266,7 @@ function DayView({
                           Free Period
                         </p>
                         <p className="text-xs text-muted-foreground/40 mt-0.5">
-                          {formatTime(timeSlots[idx].start)} -{' '}
+                          {formatTime(timeSlots[idx].start)} -{" "}
                           {formatTime(timeSlots[idx].end)}
                         </p>
                       </div>
@@ -2058,7 +2287,7 @@ function DayView({
 // ---------------------------------------------------------------------------
 
 function TimetableSkeleton({ viewMode }: { viewMode: ViewMode }) {
-  if (viewMode === 'grid') {
+  if (viewMode === "grid") {
     return (
       <div className="p-6 space-y-4">
         <div className="flex gap-2">
@@ -2079,7 +2308,7 @@ function TimetableSkeleton({ viewMode }: { viewMode: ViewMode }) {
     );
   }
 
-  if (viewMode === 'list') {
+  if (viewMode === "list") {
     return (
       <div className="p-6 space-y-6">
         {[...Array(3)].map((_, groupIdx) => (

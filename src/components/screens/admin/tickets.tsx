@@ -1,87 +1,129 @@
-'use client';
+"use client";
 
-import { useState, useEffect, useCallback } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Skeleton } from '@/components/ui/skeleton';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
-import { Separator } from '@/components/ui/separator';
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { useState, useEffect, useCallback } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Separator } from "@/components/ui/separator";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import {
-  Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter,
-} from '@/components/ui/dialog';
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from "@/components/ui/dialog";
 import {
-  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
-} from '@/components/ui/select';
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import {
-  Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription,
-} from '@/components/ui/sheet';
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetDescription,
+} from "@/components/ui/sheet";
 import {
-  Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
-} from '@/components/ui/table';
-import { ScrollArea } from '@/components/ui/scroll-area';
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
-  Tabs, TabsList, TabsTrigger,
-} from '@/components/ui/tabs';
-import {
-  Ticket, Plus, Search, Eye, Send, MessageSquare,
-  AlertCircle, Clock, CheckCircle2, XCircle, Loader2,
-  CircleDot, UserCircle, Tag,
-} from 'lucide-react';
-import { toast } from 'sonner';
-import { useAppStore } from '@/store/use-app-store';
+  Ticket,
+  Plus,
+  Search,
+  Eye,
+  Send,
+  MessageSquare,
+  AlertCircle,
+  Clock,
+  CheckCircle2,
+  XCircle,
+  Loader2,
+  CircleDot,
+  UserCircle,
+  Tag,
+} from "lucide-react";
+import { toast } from "sonner";
+import { useAppStore } from "@/store/use-app-store";
 
 // ── Constants ──
 const TICKET_CATEGORIES = [
-  { value: 'general', label: 'General' },
-  { value: 'billing', label: 'Billing' },
-  { value: 'technical', label: 'Technical' },
-  { value: 'academics', label: 'Academics' },
-  { value: 'feature_request', label: 'Feature Request' },
-  { value: 'complaint', label: 'Complaint' },
-  { value: 'other', label: 'Other' },
+  { value: "general", label: "General" },
+  { value: "billing", label: "Billing" },
+  { value: "technical", label: "Technical" },
+  { value: "academics", label: "Academics" },
+  { value: "feature_request", label: "Feature Request" },
+  { value: "complaint", label: "Complaint" },
+  { value: "other", label: "Other" },
 ];
 
-const TICKET_STATUSES = ['open', 'in_progress', 'on_hold', 'resolved', 'closed'] as const;
+const TICKET_STATUSES = [
+  "open",
+  "in_progress",
+  "on_hold",
+  "resolved",
+  "closed",
+] as const;
 const STATUS_LABELS: Record<string, string> = {
-  open: 'Open',
-  in_progress: 'In Progress',
-  on_hold: 'On Hold',
-  resolved: 'Resolved',
-  closed: 'Closed',
+  open: "Open",
+  in_progress: "In Progress",
+  on_hold: "On Hold",
+  resolved: "Resolved",
+  closed: "Closed",
 };
 const PRIORITY_LABELS: Record<string, string> = {
-  low: 'Low',
-  medium: 'Medium',
-  high: 'High',
-  urgent: 'Urgent',
+  low: "Low",
+  medium: "Medium",
+  high: "High",
+  urgent: "Urgent",
 };
 
 const STATUS_COLORS: Record<string, string> = {
-  open: 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 border-blue-200 dark:border-blue-800',
-  in_progress: 'bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 border-amber-200 dark:border-amber-800',
-  on_hold: 'bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-400 border-purple-200 dark:border-purple-800',
-  resolved: 'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800',
-  closed: 'bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400 dark:text-gray-500 border-gray-200 dark:border-gray-700',
+  open: "bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 border-blue-200 dark:border-blue-800",
+  in_progress:
+    "bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 border-amber-200 dark:border-amber-800",
+  on_hold:
+    "bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-400 border-purple-200 dark:border-purple-800",
+  resolved:
+    "bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800",
+  closed:
+    "bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400 dark:text-gray-500 border-gray-200 dark:border-gray-700",
 };
 
 const PRIORITY_COLORS: Record<string, string> = {
-  low: 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 border-green-200 dark:border-green-800',
-  medium: 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-400 border-yellow-200 dark:border-yellow-800',
-  high: 'bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-400 border-orange-200 dark:border-orange-800',
-  urgent: 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 border-red-200 dark:border-red-800',
+  low: "bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 border-green-200 dark:border-green-800",
+  medium:
+    "bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-400 border-yellow-200 dark:border-yellow-800",
+  high: "bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-400 border-orange-200 dark:border-orange-800",
+  urgent:
+    "bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 border-red-200 dark:border-red-800",
 };
 
 const ROLE_COLORS: Record<string, string> = {
-  admin: 'bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-400',
-  teacher: 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400',
-  student: 'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400',
-  parent: 'bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400',
-  staff: 'bg-rose-100 dark:bg-rose-900/30 text-rose-700 dark:text-rose-400',
-  super_admin: 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400',
+  admin:
+    "bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-400",
+  teacher: "bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400",
+  student:
+    "bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400",
+  parent:
+    "bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400",
+  staff: "bg-rose-100 dark:bg-rose-900/30 text-rose-700 dark:text-rose-400",
+  super_admin: "bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400",
 };
 
 // ── Types ──
@@ -128,7 +170,7 @@ interface TicketItem {
   };
 }
 
-interface TicketDetail extends Omit<TicketItem, '_count'> {
+interface TicketDetail extends Omit<TicketItem, "_count"> {
   messages: TicketMessage[];
 }
 
@@ -147,36 +189,36 @@ interface CreateFormData {
 }
 
 const emptyCreateForm: CreateFormData = {
-  title: '',
-  description: '',
-  priority: 'medium',
-  category: 'general',
+  title: "",
+  description: "",
+  priority: "medium",
+  category: "general",
 };
 
 // ── Helpers ──
 function getInitials(name: string): string {
   return name
-    .split(' ')
+    .split(" ")
     .map((w) => w[0])
-    .join('')
+    .join("")
     .toUpperCase()
     .slice(0, 2);
 }
 
 function formatDate(dateStr: string): string {
-  return new Date(dateStr).toLocaleDateString('en-US', {
-    month: 'short',
-    day: 'numeric',
-    year: 'numeric',
+  return new Date(dateStr).toLocaleDateString("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
   });
 }
 
 function formatDateTime(dateStr: string): string {
-  return new Date(dateStr).toLocaleString('en-US', {
-    month: 'short',
-    day: 'numeric',
-    hour: 'numeric',
-    minute: '2-digit',
+  return new Date(dateStr).toLocaleString("en-US", {
+    month: "short",
+    day: "numeric",
+    hour: "numeric",
+    minute: "2-digit",
     hour12: true,
   });
 }
@@ -195,29 +237,33 @@ export function AdminTickets() {
   const [loading, setLoading] = useState(true);
 
   // Filter states
-  const [statusFilter, setStatusFilter] = useState<string>('all');
-  const [searchQuery, setSearchQuery] = useState('');
-  const [priorityFilter, setPriorityFilter] = useState('all');
-  const [categoryFilter, setCategoryFilter] = useState('all');
+  const [statusFilter, setStatusFilter] = useState<string>("all");
+  const [searchQuery, setSearchQuery] = useState("");
+  const [priorityFilter, setPriorityFilter] = useState("all");
+  const [categoryFilter, setCategoryFilter] = useState("all");
 
   // Create dialog
   const [createOpen, setCreateOpen] = useState(false);
-  const [createForm, setCreateForm] = useState<CreateFormData>({ ...emptyCreateForm });
+  const [createForm, setCreateForm] = useState<CreateFormData>({
+    ...emptyCreateForm,
+  });
   const [creating, setCreating] = useState(false);
 
   // Detail sheet
   const [detailOpen, setDetailOpen] = useState(false);
-  const [selectedTicket, setSelectedTicket] = useState<TicketDetail | null>(null);
+  const [selectedTicket, setSelectedTicket] = useState<TicketDetail | null>(
+    null,
+  );
   const [detailLoading, setDetailLoading] = useState(false);
 
   // Reply
-  const [replyMessage, setReplyMessage] = useState('');
+  const [replyMessage, setReplyMessage] = useState("");
   const [sendingReply, setSendingReply] = useState(false);
 
   // Admin edit (in detail sheet)
-  const [editStatus, setEditStatus] = useState<string>('');
-  const [editPriority, setEditPriority] = useState<string>('');
-  const [editAssignee, setEditAssignee] = useState<string>('unassigned');
+  const [editStatus, setEditStatus] = useState<string>("");
+  const [editPriority, setEditPriority] = useState<string>("");
+  const [editAssignee, setEditAssignee] = useState<string>("unassigned");
   const [updatingTicket, setUpdatingTicket] = useState(false);
 
   // ── Fetch tickets ──
@@ -225,16 +271,16 @@ export function AdminTickets() {
     if (!currentTenantId) return;
     try {
       const params = new URLSearchParams({ tenantId: currentTenantId });
-      if (statusFilter !== 'all') params.set('status', statusFilter);
-      if (priorityFilter !== 'all') params.set('priority', priorityFilter);
-      if (categoryFilter !== 'all') params.set('category', categoryFilter);
+      if (statusFilter !== "all") params.set("status", statusFilter);
+      if (priorityFilter !== "all") params.set("priority", priorityFilter);
+      if (categoryFilter !== "all") params.set("category", categoryFilter);
       const res = await fetch(`/api/tickets?${params.toString()}`);
       if (res.ok) {
         const data = await res.json();
         setTickets(Array.isArray(data) ? data : []);
       }
     } catch {
-      toast.error('Failed to fetch tickets');
+      toast.error("Failed to fetch tickets");
     } finally {
       setLoading(false);
     }
@@ -270,24 +316,24 @@ export function AdminTickets() {
 
   // ── Stats ──
   const stats = {
-    open: tickets.filter((t) => t.status === 'open').length,
-    in_progress: tickets.filter((t) => t.status === 'in_progress').length,
-    resolved: tickets.filter((t) => t.status === 'resolved').length,
-    closed: tickets.filter((t) => t.status === 'closed').length,
+    open: tickets.filter((t) => t.status === "open").length,
+    in_progress: tickets.filter((t) => t.status === "in_progress").length,
+    resolved: tickets.filter((t) => t.status === "resolved").length,
+    closed: tickets.filter((t) => t.status === "closed").length,
   };
 
   // ── Create ticket ──
   const handleCreate = async () => {
     if (!createForm.title.trim() || !createForm.description.trim()) {
-      toast.error('Title and description are required');
+      toast.error("Title and description are required");
       return;
     }
     if (!currentUser) return;
     setCreating(true);
     try {
-      const res = await fetch('/api/tickets', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      const res = await fetch("/api/tickets", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           tenantId: currentTenantId,
           title: createForm.title.trim(),
@@ -298,16 +344,16 @@ export function AdminTickets() {
         }),
       });
       if (res.ok) {
-        toast.success('Ticket created successfully');
+        toast.success("Ticket created successfully");
         setCreateOpen(false);
         setCreateForm({ ...emptyCreateForm });
         await fetchTickets();
       } else {
         const data = await res.json();
-        toast.error(data.error || 'Failed to create ticket');
+        toast.error(data.error || "Failed to create ticket");
       }
     } catch {
-      toast.error('Error creating ticket');
+      toast.error("Error creating ticket");
     } finally {
       setCreating(false);
     }
@@ -317,7 +363,7 @@ export function AdminTickets() {
   const openTicketDetail = async (ticketId: string) => {
     setDetailOpen(true);
     setDetailLoading(true);
-    setReplyMessage('');
+    setReplyMessage("");
     try {
       const res = await fetch(`/api/tickets/${ticketId}`);
       if (res.ok) {
@@ -325,13 +371,13 @@ export function AdminTickets() {
         setSelectedTicket(data);
         setEditStatus(data.status);
         setEditPriority(data.priority);
-        setEditAssignee(data.assignedTo || 'unassigned');
+        setEditAssignee(data.assignedTo || "unassigned");
       } else {
-        toast.error('Failed to load ticket details');
+        toast.error("Failed to load ticket details");
         setDetailOpen(false);
       }
     } catch {
-      toast.error('Error loading ticket');
+      toast.error("Error loading ticket");
       setDetailOpen(false);
     } finally {
       setDetailLoading(false);
@@ -344,27 +390,27 @@ export function AdminTickets() {
     setSendingReply(true);
     try {
       const res = await fetch(`/api/tickets/${selectedTicket.id}/messages`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           userId: currentUser.id,
           message: replyMessage.trim(),
         }),
       });
       if (res.ok) {
-        setReplyMessage('');
+        setReplyMessage("");
         // Refresh detail
         const detailRes = await fetch(`/api/tickets/${selectedTicket.id}`);
         if (detailRes.ok) {
           setSelectedTicket(await detailRes.json());
         }
         fetchTickets();
-        toast.success('Reply sent');
+        toast.success("Reply sent");
       } else {
-        toast.error('Failed to send reply');
+        toast.error("Failed to send reply");
       }
     } catch {
-      toast.error('Error sending reply');
+      toast.error("Error sending reply");
     } finally {
       setSendingReply(false);
     }
@@ -377,9 +423,11 @@ export function AdminTickets() {
     try {
       const updateData: Record<string, unknown> = {};
       if (editStatus !== selectedTicket.status) updateData.status = editStatus;
-      if (editPriority !== selectedTicket.priority) updateData.priority = editPriority;
-      const assigneeVal = editAssignee === 'unassigned' ? null : editAssignee;
-      if (assigneeVal !== selectedTicket.assignedTo) updateData.assignedTo = assigneeVal;
+      if (editPriority !== selectedTicket.priority)
+        updateData.priority = editPriority;
+      const assigneeVal = editAssignee === "unassigned" ? null : editAssignee;
+      if (assigneeVal !== selectedTicket.assignedTo)
+        updateData.assignedTo = assigneeVal;
 
       if (Object.keys(updateData).length === 0) {
         setUpdatingTicket(false);
@@ -387,12 +435,12 @@ export function AdminTickets() {
       }
 
       const res = await fetch(`/api/tickets/${selectedTicket.id}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(updateData),
       });
       if (res.ok) {
-        toast.success('Ticket updated');
+        toast.success("Ticket updated");
         // Refresh detail
         const detailRes = await fetch(`/api/tickets/${selectedTicket.id}`);
         if (detailRes.ok) {
@@ -400,15 +448,15 @@ export function AdminTickets() {
           setSelectedTicket(data);
           setEditStatus(data.status);
           setEditPriority(data.priority);
-          setEditAssignee(data.assignedTo || 'unassigned');
+          setEditAssignee(data.assignedTo || "unassigned");
         }
         fetchTickets();
       } else {
         const data = await res.json();
-        toast.error(data.error || 'Failed to update ticket');
+        toast.error(data.error || "Failed to update ticket");
       }
     } catch {
-      toast.error('Error updating ticket');
+      toast.error("Error updating ticket");
     } finally {
       setUpdatingTicket(false);
     }
@@ -420,12 +468,17 @@ export function AdminTickets() {
       <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
         <div className="flex items-center gap-3">
           <div>
-            <h2 className="text-xl font-bold text-gray-900 dark:text-gray-100">Support Tickets</h2>
+            <h2 className="text-xl font-bold text-gray-900 dark:text-gray-100">
+              Support Tickets
+            </h2>
             <p className="text-sm text-gray-500 dark:text-gray-400 dark:text-gray-500 mt-0.5">
               {tickets.length} total tickets
             </p>
           </div>
-          <Badge variant="secondary" className="bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 text-xs font-medium">
+          <Badge
+            variant="secondary"
+            className="bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 text-xs font-medium"
+          >
             {tickets.length}
           </Badge>
         </div>
@@ -447,8 +500,12 @@ export function AdminTickets() {
           <CardContent className="p-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-xs font-medium text-gray-500 dark:text-gray-400 dark:text-gray-500 uppercase tracking-wide">Open</p>
-                <p className="text-2xl font-bold text-gray-900 dark:text-gray-100 mt-1">{stats.open}</p>
+                <p className="text-xs font-medium text-gray-500 dark:text-gray-400 dark:text-gray-500 uppercase tracking-wide">
+                  Open
+                </p>
+                <p className="text-2xl font-bold text-gray-900 dark:text-gray-100 mt-1">
+                  {stats.open}
+                </p>
               </div>
               <div className="h-10 w-10 rounded-lg bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
                 <AlertCircle className="h-5 w-5 text-blue-600 dark:text-blue-400" />
@@ -460,8 +517,12 @@ export function AdminTickets() {
           <CardContent className="p-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-xs font-medium text-gray-500 dark:text-gray-400 dark:text-gray-500 uppercase tracking-wide">In Progress</p>
-                <p className="text-2xl font-bold text-gray-900 dark:text-gray-100 mt-1">{stats.in_progress}</p>
+                <p className="text-xs font-medium text-gray-500 dark:text-gray-400 dark:text-gray-500 uppercase tracking-wide">
+                  In Progress
+                </p>
+                <p className="text-2xl font-bold text-gray-900 dark:text-gray-100 mt-1">
+                  {stats.in_progress}
+                </p>
               </div>
               <div className="h-10 w-10 rounded-lg bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center">
                 <Clock className="h-5 w-5 text-amber-600 dark:text-amber-400" />
@@ -473,8 +534,12 @@ export function AdminTickets() {
           <CardContent className="p-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-xs font-medium text-gray-500 dark:text-gray-400 dark:text-gray-500 uppercase tracking-wide">Resolved</p>
-                <p className="text-2xl font-bold text-gray-900 dark:text-gray-100 mt-1">{stats.resolved}</p>
+                <p className="text-xs font-medium text-gray-500 dark:text-gray-400 dark:text-gray-500 uppercase tracking-wide">
+                  Resolved
+                </p>
+                <p className="text-2xl font-bold text-gray-900 dark:text-gray-100 mt-1">
+                  {stats.resolved}
+                </p>
               </div>
               <div className="h-10 w-10 rounded-lg bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center">
                 <CheckCircle2 className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
@@ -486,8 +551,12 @@ export function AdminTickets() {
           <CardContent className="p-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-xs font-medium text-gray-500 dark:text-gray-400 dark:text-gray-500 uppercase tracking-wide">Closed</p>
-                <p className="text-2xl font-bold text-gray-900 dark:text-gray-100 mt-1">{stats.closed}</p>
+                <p className="text-xs font-medium text-gray-500 dark:text-gray-400 dark:text-gray-500 uppercase tracking-wide">
+                  Closed
+                </p>
+                <p className="text-2xl font-bold text-gray-900 dark:text-gray-100 mt-1">
+                  {stats.closed}
+                </p>
               </div>
               <div className="h-10 w-10 rounded-lg bg-gray-100 dark:bg-gray-800 flex items-center justify-center">
                 <XCircle className="h-5 w-5 text-gray-500 dark:text-gray-400 dark:text-gray-500" />
@@ -577,16 +646,24 @@ export function AdminTickets() {
                       <TableHead className="w-44">Created By</TableHead>
                       <TableHead className="w-36">Assignee</TableHead>
                       <TableHead className="w-28">Status</TableHead>
-                      <TableHead className="w-24 text-center">Messages</TableHead>
+                      <TableHead className="w-24 text-center">
+                        Messages
+                      </TableHead>
                       <TableHead className="w-28">Created</TableHead>
                       <TableHead className="w-20">Actions</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
                     {filteredTickets.map((ticket) => (
-                      <TableRow key={ticket.id} className="hover:bg-gray-50/50 dark:hover:bg-gray-900/50">
+                      <TableRow
+                        key={ticket.id}
+                        className="hover:bg-gray-50/50 dark:hover:bg-gray-900/50"
+                      >
                         <TableCell>
-                          <Badge variant="outline" className="text-[10px] font-mono">
+                          <Badge
+                            variant="outline"
+                            className="text-[10px] font-mono"
+                          >
                             {ticket.id.slice(-6).toUpperCase()}
                           </Badge>
                         </TableCell>
@@ -600,7 +677,8 @@ export function AdminTickets() {
                             variant="outline"
                             className={`text-[10px] font-medium ${PRIORITY_COLORS[ticket.priority] || PRIORITY_COLORS.medium}`}
                           >
-                            {PRIORITY_LABELS[ticket.priority] || ticket.priority}
+                            {PRIORITY_LABELS[ticket.priority] ||
+                              ticket.priority}
                           </Badge>
                         </TableCell>
                         <TableCell>
@@ -612,17 +690,19 @@ export function AdminTickets() {
                           <div className="flex items-center gap-2">
                             <Avatar className="h-6 w-6">
                               <AvatarFallback className="text-[10px] bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400">
-                                {ticket.creator ? getInitials(ticket.creator.name) : '??'}
+                                {ticket.creator
+                                  ? getInitials(ticket.creator.name)
+                                  : "??"}
                               </AvatarFallback>
                             </Avatar>
                             <div className="min-w-0">
                               <p className="text-sm font-medium text-gray-900 dark:text-gray-100 truncate">
-                                {ticket.creator?.name || 'Unknown'}
+                                {ticket.creator?.name || "Unknown"}
                               </p>
                               {ticket.creator?.role && (
                                 <Badge
                                   variant="outline"
-                                  className={`text-[9px] px-1.5 py-0 ${ROLE_COLORS[ticket.creator.role] || ''}`}
+                                  className={`text-[9px] px-1.5 py-0 ${ROLE_COLORS[ticket.creator.role] || ""}`}
                                 >
                                   {ticket.creator.role}
                                 </Badge>
@@ -643,13 +723,15 @@ export function AdminTickets() {
                               </span>
                             </div>
                           ) : (
-                            <span className="text-sm text-gray-400 dark:text-gray-500">Unassigned</span>
+                            <span className="text-sm text-gray-400 dark:text-gray-500">
+                              Unassigned
+                            </span>
                           )}
                         </TableCell>
                         <TableCell>
                           <Badge
                             variant="outline"
-                            className={`text-[10px] font-medium ${STATUS_COLORS[ticket.status] || ''}`}
+                            className={`text-[10px] font-medium ${STATUS_COLORS[ticket.status] || ""}`}
                           >
                             {STATUS_LABELS[ticket.status] || ticket.status}
                           </Badge>
@@ -692,17 +774,19 @@ export function AdminTickets() {
                   >
                     <div className="flex items-start justify-between gap-2">
                       <div className="min-w-0 flex-1">
-                        <p className="font-medium text-gray-900 dark:text-gray-100 truncate">{ticket.title}</p>
+                        <p className="font-medium text-gray-900 dark:text-gray-100 truncate">
+                          {ticket.title}
+                        </p>
                         <div className="flex items-center gap-2 mt-1">
                           <Badge
                             variant="outline"
-                            className={`text-[10px] font-medium ${PRIORITY_COLORS[ticket.priority] || ''}`}
+                            className={`text-[10px] font-medium ${PRIORITY_COLORS[ticket.priority] || ""}`}
                           >
                             {PRIORITY_LABELS[ticket.priority]}
                           </Badge>
                           <Badge
                             variant="outline"
-                            className={`text-[10px] font-medium ${STATUS_COLORS[ticket.status] || ''}`}
+                            className={`text-[10px] font-medium ${STATUS_COLORS[ticket.status] || ""}`}
                           >
                             {STATUS_LABELS[ticket.status]}
                           </Badge>
@@ -720,7 +804,7 @@ export function AdminTickets() {
                       <div className="flex items-center gap-3">
                         <span className="flex items-center gap-1">
                           <UserCircle className="h-3 w-3" />
-                          {ticket.creator?.name || 'Unknown'}
+                          {ticket.creator?.name || "Unknown"}
                         </span>
                         <span className="flex items-center gap-1">
                           <Tag className="h-3 w-3" />
@@ -762,7 +846,9 @@ export function AdminTickets() {
               <Input
                 id="create-title"
                 value={createForm.title}
-                onChange={(e) => setCreateForm({ ...createForm, title: e.target.value })}
+                onChange={(e) =>
+                  setCreateForm({ ...createForm, title: e.target.value })
+                }
                 placeholder="Brief summary of the issue"
               />
             </div>
@@ -771,7 +857,9 @@ export function AdminTickets() {
               <Textarea
                 id="create-desc"
                 value={createForm.description}
-                onChange={(e) => setCreateForm({ ...createForm, description: e.target.value })}
+                onChange={(e) =>
+                  setCreateForm({ ...createForm, description: e.target.value })
+                }
                 placeholder="Describe the issue in detail..."
                 rows={4}
               />
@@ -781,7 +869,9 @@ export function AdminTickets() {
                 <Label>Priority</Label>
                 <Select
                   value={createForm.priority}
-                  onValueChange={(v) => setCreateForm({ ...createForm, priority: v })}
+                  onValueChange={(v) =>
+                    setCreateForm({ ...createForm, priority: v })
+                  }
                 >
                   <SelectTrigger>
                     <SelectValue />
@@ -798,7 +888,9 @@ export function AdminTickets() {
                 <Label>Category</Label>
                 <Select
                   value={createForm.category}
-                  onValueChange={(v) => setCreateForm({ ...createForm, category: v })}
+                  onValueChange={(v) =>
+                    setCreateForm({ ...createForm, category: v })
+                  }
                 >
                   <SelectTrigger>
                     <SelectValue />
@@ -821,9 +913,13 @@ export function AdminTickets() {
             <Button
               className="bg-emerald-600 hover:bg-emerald-700 text-white"
               onClick={handleCreate}
-              disabled={creating || !createForm.title.trim() || !createForm.description.trim()}
+              disabled={
+                creating ||
+                !createForm.title.trim() ||
+                !createForm.description.trim()
+              }
             >
-              {creating ? 'Creating...' : 'Create Ticket'}
+              {creating ? "Creating..." : "Create Ticket"}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -837,7 +933,7 @@ export function AdminTickets() {
             <SheetDescription>
               {selectedTicket
                 ? `#${selectedTicket.id.slice(-6).toUpperCase()} - ${formatDate(selectedTicket.createdAt)}`
-                : ''}
+                : ""}
             </SheetDescription>
           </SheetHeader>
 
@@ -861,17 +957,20 @@ export function AdminTickets() {
                 <div className="flex flex-wrap gap-2">
                   <Badge
                     variant="outline"
-                    className={`text-[10px] font-medium ${STATUS_COLORS[selectedTicket.status] || ''}`}
+                    className={`text-[10px] font-medium ${STATUS_COLORS[selectedTicket.status] || ""}`}
                   >
                     {STATUS_LABELS[selectedTicket.status]}
                   </Badge>
                   <Badge
                     variant="outline"
-                    className={`text-[10px] font-medium ${PRIORITY_COLORS[selectedTicket.priority] || ''}`}
+                    className={`text-[10px] font-medium ${PRIORITY_COLORS[selectedTicket.priority] || ""}`}
                   >
                     {PRIORITY_LABELS[selectedTicket.priority]}
                   </Badge>
-                  <Badge variant="outline" className="text-[10px] font-medium bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 dark:text-gray-500">
+                  <Badge
+                    variant="outline"
+                    className="text-[10px] font-medium bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 dark:text-gray-500"
+                  >
                     {getCategoryLabel(selectedTicket.category)}
                   </Badge>
                 </div>
@@ -900,7 +999,10 @@ export function AdminTickets() {
                     </div>
                     <div className="grid gap-1.5">
                       <Label className="text-xs">Priority</Label>
-                      <Select value={editPriority} onValueChange={setEditPriority}>
+                      <Select
+                        value={editPriority}
+                        onValueChange={setEditPriority}
+                      >
                         <SelectTrigger className="h-8 text-xs">
                           <SelectValue />
                         </SelectTrigger>
@@ -914,7 +1016,10 @@ export function AdminTickets() {
                     </div>
                     <div className="grid gap-1.5">
                       <Label className="text-xs">Assignee</Label>
-                      <Select value={editAssignee} onValueChange={setEditAssignee}>
+                      <Select
+                        value={editAssignee}
+                        onValueChange={setEditAssignee}
+                      >
                         <SelectTrigger className="h-8 text-xs">
                           <SelectValue />
                         </SelectTrigger>
@@ -947,16 +1052,20 @@ export function AdminTickets() {
               <div className="flex-1 overflow-hidden flex flex-col min-h-0">
                 <div className="px-4 py-2 border-b bg-gray-50/50 dark:bg-gray-900/50">
                   <span className="text-xs font-medium text-gray-500 dark:text-gray-400 dark:text-gray-500">
-                    Conversation ({selectedTicket.messages?.length || 0} messages)
+                    Conversation ({selectedTicket.messages?.length || 0}{" "}
+                    messages)
                   </span>
                 </div>
                 <ScrollArea className="flex-1">
                   <div className="p-4 space-y-4">
-                    {(!selectedTicket.messages || selectedTicket.messages.length === 0) && (
+                    {(!selectedTicket.messages ||
+                      selectedTicket.messages.length === 0) && (
                       <div className="text-center py-8 text-gray-400 dark:text-gray-500">
                         <MessageSquare className="h-8 w-8 mx-auto mb-2 opacity-40" />
                         <p className="text-sm">No messages yet</p>
-                        <p className="text-xs">Start the conversation with a reply</p>
+                        <p className="text-xs">
+                          Start the conversation with a reply
+                        </p>
                       </div>
                     )}
                     {selectedTicket.messages?.map((msg) => (
@@ -964,22 +1073,23 @@ export function AdminTickets() {
                         <Avatar className="h-8 w-8 shrink-0 mt-0.5">
                           <AvatarFallback
                             className={`text-[10px] ${
-                              ROLE_COLORS[msg.author?.role || 'student'] || 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 dark:text-gray-500'
+                              ROLE_COLORS[msg.author?.role || "student"] ||
+                              "bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 dark:text-gray-500"
                             }`}
                           >
-                            {msg.author ? getInitials(msg.author.name) : '??'}
+                            {msg.author ? getInitials(msg.author.name) : "??"}
                           </AvatarFallback>
                         </Avatar>
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-2 flex-wrap">
                             <span className="text-sm font-medium text-gray-900 dark:text-gray-100">
-                              {msg.author?.name || 'Unknown'}
+                              {msg.author?.name || "Unknown"}
                             </span>
                             {msg.author?.role && (
                               <Badge
                                 variant="outline"
                                 className={`text-[9px] px-1.5 py-0 ${
-                                  ROLE_COLORS[msg.author.role] || ''
+                                  ROLE_COLORS[msg.author.role] || ""
                                 }`}
                               >
                                 {msg.author.role}
@@ -999,7 +1109,7 @@ export function AdminTickets() {
                 </ScrollArea>
 
                 {/* Reply Input */}
-                {selectedTicket.status !== 'closed' && (
+                {selectedTicket.status !== "closed" && (
                   <div className="p-4 border-t bg-white dark:bg-gray-900">
                     <div className="flex gap-2">
                       <Textarea
@@ -1009,7 +1119,7 @@ export function AdminTickets() {
                         className="min-h-[60px] max-h-[120px] resize-none text-sm"
                         rows={2}
                         onKeyDown={(e) => {
-                          if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) {
+                          if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) {
                             handleReply();
                           }
                         }}
@@ -1036,7 +1146,7 @@ export function AdminTickets() {
                   </div>
                 )}
 
-                {selectedTicket.status === 'closed' && (
+                {selectedTicket.status === "closed" && (
                   <div className="p-4 border-t bg-gray-50 dark:bg-gray-900">
                     <p className="text-sm text-gray-500 dark:text-gray-400 dark:text-gray-500 text-center">
                       This ticket is closed. No further replies can be sent.

@@ -1,32 +1,66 @@
-'use client';
+"use client";
 
-import { useState, useEffect, useCallback } from 'react';
-import { Card, CardContent } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Skeleton } from '@/components/ui/skeleton';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
-import { Label } from '@/components/ui/label';
-import { Checkbox } from '@/components/ui/checkbox';
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { useState, useEffect, useCallback } from "react";
+import { Card, CardContent } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import {
-  Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
-} from '@/components/ui/table';
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import {
-  Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter,
-} from '@/components/ui/dialog';
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from "@/components/ui/dialog";
 import {
-  AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogTitle,
-  AlertDialogDescription, AlertDialogFooter, AlertDialogTrigger, AlertDialogAction, AlertDialogCancel,
-} from '@/components/ui/alert-dialog';
+  AlertDialog,
+  AlertDialogContent,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogTrigger,
+  AlertDialogAction,
+  AlertDialogCancel,
+} from "@/components/ui/alert-dialog";
 import {
-  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
-} from '@/components/ui/select';
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import {
-  Users, Plus, Search, Pencil, Trash2, Loader2, Phone, Mail, Shield, UserCircle, Eye, EyeOff, Lock, KeyRound,
-} from 'lucide-react';
-import { toast } from 'sonner';
-import { useAppStore } from '@/store/use-app-store';
+  Users,
+  Plus,
+  Search,
+  Pencil,
+  Trash2,
+  Loader2,
+  Phone,
+  Mail,
+  Shield,
+  UserCircle,
+  Eye,
+  EyeOff,
+  Lock,
+  KeyRound,
+} from "lucide-react";
+import { toast } from "sonner";
+import { useAppStore } from "@/store/use-app-store";
 
 // --- Types ---
 
@@ -45,7 +79,7 @@ interface StaffMember {
   phone: string | null;
   address: string | null;
   isActive: boolean;
-  customRole: Pick<CustomRole, 'id' | 'name' | 'color' | 'permissions'> | null;
+  customRole: Pick<CustomRole, "id" | "name" | "color" | "permissions"> | null;
   createdAt: string;
 }
 
@@ -60,12 +94,12 @@ interface StaffFormData {
 }
 
 const emptyFormData: StaffFormData = {
-  name: '',
-  email: '',
-  password: '',
-  phone: '',
-  address: '',
-  customRoleId: '',
+  name: "",
+  email: "",
+  password: "",
+  phone: "",
+  address: "",
+  customRoleId: "",
   isActive: true,
 };
 
@@ -73,9 +107,9 @@ const emptyFormData: StaffFormData = {
 
 function getInitials(name: string): string {
   return name
-    .split(' ')
+    .split(" ")
     .map((n) => n[0])
-    .join('')
+    .join("")
     .slice(0, 2)
     .toUpperCase();
 }
@@ -83,7 +117,7 @@ function getInitials(name: string): string {
 /** Build a Tailwind background class from a hex color string */
 function hexToBgClass(hex: string): string {
   // Fallback: try to parse the hex and use a generic approach via inline style
-  return '';
+  return "";
 }
 
 function roleBadgeStyle(color: string): React.CSSProperties {
@@ -92,14 +126,14 @@ function roleBadgeStyle(color: string): React.CSSProperties {
     color: color,
     borderColor: `${color}40`,
     borderWidth: 1,
-    borderStyle: 'solid',
+    borderStyle: "solid",
   };
 }
 
 function avatarStyle(color: string): React.CSSProperties {
   return {
     backgroundColor: color,
-    color: '#fff',
+    color: "#fff",
   };
 }
 
@@ -112,7 +146,7 @@ export function AdminStaff() {
   const [staff, setStaff] = useState<StaffMember[]>([]);
   const [roles, setRoles] = useState<CustomRole[]>([]);
   const [loading, setLoading] = useState(true);
-  const [search, setSearch] = useState('');
+  const [search, setSearch] = useState("");
 
   // Dialog state
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -137,12 +171,14 @@ export function AdminStaff() {
   const fetchStaff = useCallback(async () => {
     if (!currentTenantId) return;
     try {
-      const res = await fetch(`/api/staff?tenantId=${encodeURIComponent(currentTenantId)}`);
-      if (!res.ok) throw new Error('Failed to fetch staff');
+      const res = await fetch(
+        `/api/staff?tenantId=${encodeURIComponent(currentTenantId)}`,
+      );
+      if (!res.ok) throw new Error("Failed to fetch staff");
       const json = await res.json();
       setStaff(json);
     } catch {
-      console.error('Error fetching staff');
+      console.error("Error fetching staff");
     } finally {
       setLoading(false);
     }
@@ -151,12 +187,14 @@ export function AdminStaff() {
   const fetchRoles = useCallback(async () => {
     if (!currentTenantId) return;
     try {
-      const res = await fetch(`/api/roles?tenantId=${encodeURIComponent(currentTenantId)}`);
-      if (!res.ok) throw new Error('Failed to fetch roles');
+      const res = await fetch(
+        `/api/roles?tenantId=${encodeURIComponent(currentTenantId)}`,
+      );
+      if (!res.ok) throw new Error("Failed to fetch roles");
       const json = await res.json();
       setRoles(json);
     } catch {
-      console.error('Error fetching roles');
+      console.error("Error fetching roles");
     }
   }, [currentTenantId]);
 
@@ -173,12 +211,11 @@ export function AdminStaff() {
       s.name.toLowerCase().includes(search.toLowerCase()) ||
       s.email.toLowerCase().includes(search.toLowerCase()) ||
       (s.phone && s.phone.toLowerCase().includes(search.toLowerCase())) ||
-      (s.customRole && s.customRole.name.toLowerCase().includes(search.toLowerCase()))
+      (s.customRole &&
+        s.customRole.name.toLowerCase().includes(search.toLowerCase())),
   );
 
   // --- Handlers ---
-
-
 
   const handleOpenEdit = (member: StaffMember) => {
     setShowPassword(false);
@@ -186,10 +223,10 @@ export function AdminStaff() {
     setFormData({
       name: member.name,
       email: member.email,
-      password: '',
-      phone: member.phone || '',
-      address: member.address || '',
-      customRoleId: member.customRole?.id || '',
+      password: "",
+      phone: member.phone || "",
+      address: member.address || "",
+      customRoleId: member.customRole?.id || "",
       isActive: member.isActive,
     });
     setDialogOpen(true);
@@ -197,15 +234,15 @@ export function AdminStaff() {
 
   const handleSubmit = async () => {
     if (!currentTenantId) {
-      toast.error('No tenant selected. Please select a school first.');
+      toast.error("No tenant selected. Please select a school first.");
       return;
     }
 
     setSubmitting(true);
     try {
       const isEdit = !!editingStaff;
-      const url = '/api/staff';
-      const method = isEdit ? 'PUT' : 'POST';
+      const url = "/api/staff";
+      const method = isEdit ? "PUT" : "POST";
 
       const body = isEdit
         ? {
@@ -221,7 +258,7 @@ export function AdminStaff() {
             tenantId: currentTenantId,
             name: formData.name,
             email: formData.email,
-            password: formData.password || 'sigel2024',
+            password: formData.password || "sigel2024",
             phone: formData.phone,
             address: formData.address,
             customRoleId: formData.customRoleId || null,
@@ -230,22 +267,31 @@ export function AdminStaff() {
 
       const res = await fetch(url, {
         method,
-        headers: { 'Content-Type': 'application/json' },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(body),
       });
 
       if (!res.ok) {
         const errData = await res.json().catch(() => null);
-        throw new Error(errData?.error || `Failed to ${isEdit ? 'update' : 'add'} staff member`);
+        throw new Error(
+          errData?.error ||
+            `Failed to ${isEdit ? "update" : "add"} staff member`,
+        );
       }
 
-      toast.success(`Staff member ${isEdit ? 'updated' : 'added'} successfully`);
+      toast.success(
+        `Staff member ${isEdit ? "updated" : "added"} successfully`,
+      );
       setDialogOpen(false);
       setEditingStaff(null);
       setFormData(emptyFormData);
       fetchStaff();
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : `Failed to ${editingStaff ? 'update' : 'add'} staff member`);
+      toast.error(
+        err instanceof Error
+          ? err.message
+          : `Failed to ${editingStaff ? "update" : "add"} staff member`,
+      );
     } finally {
       setSubmitting(false);
     }
@@ -253,20 +299,26 @@ export function AdminStaff() {
 
   const handleDelete = async (id: string) => {
     try {
-      const res = await fetch(`/api/staff?id=${id}`, { method: 'DELETE' });
+      const res = await fetch(`/api/staff?id=${id}`, { method: "DELETE" });
       if (!res.ok) {
         const errData = await res.json().catch(() => null);
-        throw new Error(errData?.error || 'Failed to delete staff member');
+        throw new Error(errData?.error || "Failed to delete staff member");
       }
-      toast.success('Staff member deleted successfully');
+      toast.success("Staff member deleted successfully");
       setStaff((prev) => prev.filter((s) => s.id !== id));
       setDeletingId(null);
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : 'Failed to delete staff member');
+      toast.error(
+        err instanceof Error ? err.message : "Failed to delete staff member",
+      );
     }
   };
 
-  const isFormValid = formData.name.trim() !== '' && (!editingStaff ? formData.email.trim() !== '' && formData.password.trim().length >= 6 : true);
+  const isFormValid =
+    formData.name.trim() !== "" &&
+    (!editingStaff
+      ? formData.email.trim() !== "" && formData.password.trim().length >= 6
+      : true);
 
   // --- Render ---
 
@@ -308,7 +360,7 @@ export function AdminStaff() {
               <p className="text-sm mt-1">
                 {staff.length === 0
                   ? 'Click "Add Staff" to create your first staff member.'
-                  : 'No staff match your search criteria.'}
+                  : "No staff match your search criteria."}
               </p>
             </div>
           ) : (
@@ -317,20 +369,29 @@ export function AdminStaff() {
                 <TableHeader>
                   <TableRow className="bg-muted/50">
                     <TableHead className="min-w-[220px]">Name</TableHead>
-                    <TableHead className="hidden sm:table-cell">Email</TableHead>
-                    <TableHead className="hidden md:table-cell">Phone</TableHead>
+                    <TableHead className="hidden sm:table-cell">
+                      Email
+                    </TableHead>
+                    <TableHead className="hidden md:table-cell">
+                      Phone
+                    </TableHead>
                     <TableHead className="hidden lg:table-cell">Role</TableHead>
                     <TableHead>Status</TableHead>
-                    <TableHead className="w-[100px] text-right">Actions</TableHead>
+                    <TableHead className="w-[100px] text-right">
+                      Actions
+                    </TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {filtered.map((member) => {
                     const initials = getInitials(member.name);
-                    const roleColor = member.customRole?.color || '#6b7280';
+                    const roleColor = member.customRole?.color || "#6b7280";
 
                     return (
-                      <TableRow key={member.id} className="hover:bg-emerald-50/50 dark:hover:bg-emerald-900/20 transition-colors">
+                      <TableRow
+                        key={member.id}
+                        className="hover:bg-emerald-50/50 dark:hover:bg-emerald-900/20 transition-colors"
+                      >
                         {/* Name column */}
                         <TableCell>
                           <div className="flex items-center gap-3">
@@ -344,7 +405,9 @@ export function AdminStaff() {
                             </Avatar>
                             <div className="min-w-0 flex-1">
                               <div className="flex items-center gap-2 flex-wrap">
-                                <p className="font-medium text-sm truncate">{member.name}</p>
+                                <p className="font-medium text-sm truncate">
+                                  {member.name}
+                                </p>
                                 {member.customRole && (
                                   <span
                                     className="inline-flex items-center rounded-md px-1.5 py-0.5 text-[10px] font-semibold leading-tight"
@@ -366,7 +429,9 @@ export function AdminStaff() {
                         <TableCell className="hidden sm:table-cell">
                           <div className="flex items-center gap-1.5 min-w-0">
                             <Mail className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
-                            <span className="text-sm truncate">{member.email}</span>
+                            <span className="text-sm truncate">
+                              {member.email}
+                            </span>
                           </div>
                         </TableCell>
 
@@ -374,7 +439,9 @@ export function AdminStaff() {
                         <TableCell className="hidden md:table-cell">
                           <div className="flex items-center gap-1.5 min-w-0">
                             <Phone className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
-                            <span className="text-sm truncate">{member.phone || '—'}</span>
+                            <span className="text-sm truncate">
+                              {member.phone || "—"}
+                            </span>
                           </div>
                         </TableCell>
 
@@ -400,14 +467,16 @@ export function AdminStaff() {
                         {/* Status */}
                         <TableCell>
                           <Badge
-                            variant={member.isActive ? 'default' : 'destructive'}
+                            variant={
+                              member.isActive ? "default" : "destructive"
+                            }
                             className={
                               member.isActive
-                                ? 'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800 hover:bg-emerald-100 dark:hover:bg-emerald-900/30'
-                                : 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 border border-red-200 dark:border-red-800 hover:bg-red-100 dark:hover:bg-red-900/30'
+                                ? "bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800 hover:bg-emerald-100 dark:hover:bg-emerald-900/30"
+                                : "bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 border border-red-200 dark:border-red-800 hover:bg-red-100 dark:hover:bg-red-900/30"
                             }
                           >
-                            {member.isActive ? 'Active' : 'Inactive'}
+                            {member.isActive ? "Active" : "Inactive"}
                           </Badge>
                         </TableCell>
 
@@ -440,14 +509,19 @@ export function AdminStaff() {
                               </AlertDialogTrigger>
                               <AlertDialogContent>
                                 <AlertDialogHeader>
-                                  <AlertDialogTitle>Delete Staff Member</AlertDialogTitle>
+                                  <AlertDialogTitle>
+                                    Delete Staff Member
+                                  </AlertDialogTitle>
                                   <AlertDialogDescription>
-                                    Are you sure you want to delete{' '}
-                                    <strong>{member.name}</strong>? This action cannot be undone.
+                                    Are you sure you want to delete{" "}
+                                    <strong>{member.name}</strong>? This action
+                                    cannot be undone.
                                   </AlertDialogDescription>
                                 </AlertDialogHeader>
                                 <AlertDialogFooter>
-                                  <AlertDialogCancel onClick={() => setDeletingId(null)}>
+                                  <AlertDialogCancel
+                                    onClick={() => setDeletingId(null)}
+                                  >
                                     Cancel
                                   </AlertDialogCancel>
                                   <AlertDialogAction
@@ -473,11 +547,15 @@ export function AdminStaff() {
           {!loading && filtered.length > 0 && (
             <div className="px-4 py-3 border-t">
               <p className="text-sm text-muted-foreground">
-                Showing{' '}
-                <span className="font-medium text-foreground">{filtered.length}</span>{' '}
-                of{' '}
-                <span className="font-medium text-foreground">{staff.length}</span>{' '}
-                staff member{staff.length !== 1 ? 's' : ''}
+                Showing{" "}
+                <span className="font-medium text-foreground">
+                  {filtered.length}
+                </span>{" "}
+                of{" "}
+                <span className="font-medium text-foreground">
+                  {staff.length}
+                </span>{" "}
+                staff member{staff.length !== 1 ? "s" : ""}
               </p>
             </div>
           )}
@@ -498,12 +576,12 @@ export function AdminStaff() {
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle>
-              {editingStaff ? 'Edit Staff Member' : 'Add New Staff Member'}
+              {editingStaff ? "Edit Staff Member" : "Add New Staff Member"}
             </DialogTitle>
             <DialogDescription>
               {editingStaff
-                ? 'Update the staff member details below.'
-                : 'Fill in the details to create a new staff member.'}
+                ? "Update the staff member details below."
+                : "Fill in the details to create a new staff member."}
             </DialogDescription>
           </DialogHeader>
           <div className="grid gap-4 py-2">
@@ -513,7 +591,9 @@ export function AdminStaff() {
               <Input
                 id="staff-name"
                 value={formData.name}
-                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, name: e.target.value })
+                }
                 placeholder="John Doe"
               />
             </div>
@@ -526,7 +606,9 @@ export function AdminStaff() {
                   id="staff-email"
                   type="email"
                   value={formData.email}
-                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                  onChange={(e) =>
+                    setFormData({ ...formData, email: e.target.value })
+                  }
                   placeholder="john.doe@school.com"
                 />
               </div>
@@ -535,8 +617,10 @@ export function AdminStaff() {
             {/* Password */}
             <div className="grid gap-2">
               <Label htmlFor="staff-password">
-                {editingStaff ? 'New Password' : 'Password'}
-                {!editingStaff && <span className="text-red-500 ml-0.5">*</span>}
+                {editingStaff ? "New Password" : "Password"}
+                {!editingStaff && (
+                  <span className="text-red-500 ml-0.5">*</span>
+                )}
                 {editingStaff && (
                   <span className="text-muted-foreground font-normal text-xs ml-2">
                     (leave blank to keep current)
@@ -547,10 +631,16 @@ export function AdminStaff() {
                 <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 <Input
                   id="staff-password"
-                  type={showPassword ? 'text' : 'password'}
+                  type={showPassword ? "text" : "password"}
                   value={formData.password}
-                  onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                  placeholder={editingStaff ? 'Leave blank to keep current password' : 'Set login password'}
+                  onChange={(e) =>
+                    setFormData({ ...formData, password: e.target.value })
+                  }
+                  placeholder={
+                    editingStaff
+                      ? "Leave blank to keep current password"
+                      : "Set login password"
+                  }
                   className="pl-10 pr-10"
                 />
                 <button
@@ -558,12 +648,20 @@ export function AdminStaff() {
                   onClick={() => setShowPassword(!showPassword)}
                   className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
                 >
-                  {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                  {showPassword ? (
+                    <EyeOff className="h-4 w-4" />
+                  ) : (
+                    <Eye className="h-4 w-4" />
+                  )}
                 </button>
               </div>
-              {!editingStaff && formData.password && formData.password.length < 6 && (
-                <p className="text-xs text-amber-600 dark:text-amber-400">Password must be at least 6 characters</p>
-              )}
+              {!editingStaff &&
+                formData.password &&
+                formData.password.length < 6 && (
+                  <p className="text-xs text-amber-600 dark:text-amber-400">
+                    Password must be at least 6 characters
+                  </p>
+                )}
             </div>
 
             {/* Phone */}
@@ -572,7 +670,9 @@ export function AdminStaff() {
               <Input
                 id="staff-phone"
                 value={formData.phone}
-                onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, phone: e.target.value })
+                }
                 placeholder="+1 234 567 890"
               />
             </div>
@@ -580,12 +680,17 @@ export function AdminStaff() {
             {/* Address (optional) */}
             <div className="grid gap-2">
               <Label htmlFor="staff-address">
-                Address <span className="text-muted-foreground font-normal">(optional)</span>
+                Address{" "}
+                <span className="text-muted-foreground font-normal">
+                  (optional)
+                </span>
               </Label>
               <Input
                 id="staff-address"
                 value={formData.address}
-                onChange={(e) => setFormData({ ...formData, address: e.target.value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, address: e.target.value })
+                }
                 placeholder="123 Main St, City"
               />
             </div>
@@ -594,9 +699,12 @@ export function AdminStaff() {
             <div className="grid gap-2">
               <Label htmlFor="staff-role">Role</Label>
               <Select
-                value={formData.customRoleId || '__none__'}
+                value={formData.customRoleId || "__none__"}
                 onValueChange={(v) =>
-                  setFormData({ ...formData, customRoleId: v === '__none__' ? '' : v })
+                  setFormData({
+                    ...formData,
+                    customRoleId: v === "__none__" ? "" : v,
+                  })
                 }
               >
                 <SelectTrigger className="w-full">
@@ -628,7 +736,10 @@ export function AdminStaff() {
                   setFormData({ ...formData, isActive: checked === true })
                 }
               />
-              <Label htmlFor="staff-active" className="cursor-pointer select-none">
+              <Label
+                htmlFor="staff-active"
+                className="cursor-pointer select-none"
+              >
                 Active
               </Label>
             </div>
@@ -645,12 +756,12 @@ export function AdminStaff() {
               {submitting ? (
                 <>
                   <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                  {editingStaff ? 'Updating...' : 'Adding...'}
+                  {editingStaff ? "Updating..." : "Adding..."}
                 </>
               ) : editingStaff ? (
-                'Update Staff'
+                "Update Staff"
               ) : (
-                'Add Staff'
+                "Add Staff"
               )}
             </Button>
           </DialogFooter>

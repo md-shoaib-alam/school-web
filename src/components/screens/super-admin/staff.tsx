@@ -1,33 +1,67 @@
-'use client';
+"use client";
 
-import { useState, useEffect, useCallback } from 'react';
-import { Card, CardContent } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Skeleton } from '@/components/ui/skeleton';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
-import { Label } from '@/components/ui/label';
-import { Checkbox } from '@/components/ui/checkbox';
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { useState, useEffect, useCallback } from "react";
+import { Card, CardContent } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import {
-  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
-} from '@/components/ui/select';
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import {
-  Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
-} from '@/components/ui/table';
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import {
-  Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter,
-} from '@/components/ui/dialog';
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from "@/components/ui/dialog";
 import {
-  AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogTitle,
-  AlertDialogDescription, AlertDialogFooter, AlertDialogTrigger, AlertDialogAction, AlertDialogCancel,
-} from '@/components/ui/alert-dialog';
+  AlertDialog,
+  AlertDialogContent,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogTrigger,
+  AlertDialogAction,
+  AlertDialogCancel,
+} from "@/components/ui/alert-dialog";
 import {
-  Users, Plus, Search, Pencil, Trash2, Loader2, Phone, Mail, Shield, UserCircle, Eye, EyeOff, Lock, ShieldAlert,
-} from 'lucide-react';
-import { toast } from 'sonner';
-import { useAppStore } from '@/store/use-app-store';
-import { hasPermission } from '@/lib/permissions';
+  Users,
+  Plus,
+  Search,
+  Pencil,
+  Trash2,
+  Loader2,
+  Phone,
+  Mail,
+  Shield,
+  UserCircle,
+  Eye,
+  EyeOff,
+  Lock,
+  ShieldAlert,
+} from "lucide-react";
+import { toast } from "sonner";
+import { useAppStore } from "@/store/use-app-store";
+import { hasPermission } from "@/lib/permissions";
 
 // --- Types ---
 
@@ -46,7 +80,7 @@ interface StaffRecord {
   avatar: string | null;
   isActive: boolean;
   platformRoleId: string | null;
-  platformRole: Pick<PlatformRole, 'id' | 'name' | 'color'> | null;
+  platformRole: Pick<PlatformRole, "id" | "name" | "color"> | null;
   createdAt: string;
 }
 
@@ -60,18 +94,23 @@ interface StaffFormData {
 }
 
 const emptyFormData: StaffFormData = {
-  name: '',
-  email: '',
-  password: '',
-  phone: '',
-  platformRoleId: 'none',
+  name: "",
+  email: "",
+  password: "",
+  phone: "",
+  platformRoleId: "none",
   isActive: true,
 };
 
 // --- Helpers ---
 
 function getInitials(name: string): string {
-  return name.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase();
+  return name
+    .split(" ")
+    .map((n) => n[0])
+    .join("")
+    .slice(0, 2)
+    .toUpperCase();
 }
 
 function roleBadgeStyle(color: string): React.CSSProperties {
@@ -80,12 +119,12 @@ function roleBadgeStyle(color: string): React.CSSProperties {
     color: color,
     borderColor: `${color}40`,
     borderWidth: 1,
-    borderStyle: 'solid',
+    borderStyle: "solid",
   };
 }
 
 function avatarStyle(color: string): React.CSSProperties {
-  return { backgroundColor: color, color: '#fff' };
+  return { backgroundColor: color, color: "#fff" };
 }
 
 // --- Component ---
@@ -96,7 +135,7 @@ export function SuperAdminStaff() {
   const [staffList, setStaffList] = useState<StaffRecord[]>([]);
   const [roles, setRoles] = useState<PlatformRole[]>([]);
   const [loading, setLoading] = useState(true);
-  const [search, setSearch] = useState('');
+  const [search, setSearch] = useState("");
 
   // Dialog state
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -109,20 +148,20 @@ export function SuperAdminStaff() {
   const [deletingId, setDeletingId] = useState<string | null>(null);
 
   // Permission checks
-  const canCreate = hasPermission(currentUser, 'staff', 'create');
-  const canEdit = hasPermission(currentUser, 'staff', 'edit');
-  const canDelete = hasPermission(currentUser, 'staff', 'delete');
+  const canCreate = hasPermission(currentUser, "staff", "create");
+  const canEdit = hasPermission(currentUser, "staff", "edit");
+  const canDelete = hasPermission(currentUser, "staff", "delete");
 
   // --- Fetch data ---
 
   const fetchStaff = useCallback(async () => {
     try {
-      const res = await fetch('/api/super-admins?type=staff');
-      if (!res.ok) throw new Error('Failed to fetch');
+      const res = await fetch("/api/super-admins?type=staff");
+      if (!res.ok) throw new Error("Failed to fetch");
       const json = await res.json();
       setStaffList(json);
     } catch {
-      console.error('Error fetching staff');
+      console.error("Error fetching staff");
     } finally {
       setLoading(false);
     }
@@ -130,12 +169,16 @@ export function SuperAdminStaff() {
 
   const fetchRoles = useCallback(async () => {
     try {
-      const res = await fetch('/api/platform/roles');
+      const res = await fetch("/api/platform/roles");
       if (res.ok) {
         const json = await res.json();
-        setRoles(json.map((r: { id: string; name: string; color: string }) => ({
-          id: r.id, name: r.name, color: r.color,
-        })));
+        setRoles(
+          json.map((r: { id: string; name: string; color: string }) => ({
+            id: r.id,
+            name: r.name,
+            color: r.color,
+          })),
+        );
       }
     } catch {
       // Non-critical
@@ -155,14 +198,15 @@ export function SuperAdminStaff() {
       s.name.toLowerCase().includes(search.toLowerCase()) ||
       s.email.toLowerCase().includes(search.toLowerCase()) ||
       (s.phone && s.phone.toLowerCase().includes(search.toLowerCase())) ||
-      (s.platformRole && s.platformRole.name.toLowerCase().includes(search.toLowerCase()))
+      (s.platformRole &&
+        s.platformRole.name.toLowerCase().includes(search.toLowerCase())),
   );
 
   // --- Handlers ---
 
   const handleOpenAdd = () => {
     if (!canCreate) {
-      toast.error('You don\'t have permission to create staff');
+      toast.error("You don't have permission to create staff");
       return;
     }
     setEditingStaff(null);
@@ -173,7 +217,7 @@ export function SuperAdminStaff() {
 
   const handleOpenEdit = (member: StaffRecord) => {
     if (!canEdit) {
-      toast.error('You don\'t have permission to edit staff');
+      toast.error("You don't have permission to edit staff");
       return;
     }
     setShowPassword(false);
@@ -181,9 +225,9 @@ export function SuperAdminStaff() {
     setFormData({
       name: member.name,
       email: member.email,
-      password: '',
-      phone: member.phone || '',
-      platformRoleId: member.platformRoleId || 'none',
+      password: "",
+      phone: member.phone || "",
+      platformRoleId: member.platformRoleId || "none",
       isActive: member.isActive,
     });
     setDialogOpen(true);
@@ -195,40 +239,46 @@ export function SuperAdminStaff() {
       const isEdit = !!editingStaff;
 
       if (isEdit) {
-        const res = await fetch('/api/super-admins', {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
+        const res = await fetch("/api/super-admins", {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             id: editingStaff.id,
             name: formData.name,
             ...(formData.password ? { password: formData.password } : {}),
             phone: formData.phone,
-            platformRoleId: formData.platformRoleId === 'none' ? null : formData.platformRoleId,
+            platformRoleId:
+              formData.platformRoleId === "none"
+                ? null
+                : formData.platformRoleId,
             isActive: formData.isActive,
           }),
         });
         if (!res.ok) {
           const err = await res.json().catch(() => null);
-          throw new Error(err?.error || 'Failed to update staff');
+          throw new Error(err?.error || "Failed to update staff");
         }
-        toast.success('Staff member updated successfully');
+        toast.success("Staff member updated successfully");
       } else {
-        const res = await fetch('/api/super-admins', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+        const res = await fetch("/api/super-admins", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             name: formData.name,
             email: formData.email,
             password: formData.password,
             phone: formData.phone || null,
-            platformRoleId: formData.platformRoleId === 'none' ? null : formData.platformRoleId,
+            platformRoleId:
+              formData.platformRoleId === "none"
+                ? null
+                : formData.platformRoleId,
           }),
         });
         if (!res.ok) {
           const err = await res.json().catch(() => null);
-          throw new Error(err?.error || 'Failed to add staff');
+          throw new Error(err?.error || "Failed to add staff");
         }
-        toast.success('Staff member added successfully');
+        toast.success("Staff member added successfully");
       }
 
       setDialogOpen(false);
@@ -236,7 +286,7 @@ export function SuperAdminStaff() {
       setFormData(emptyFormData);
       fetchStaff();
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : 'Operation failed');
+      toast.error(err instanceof Error ? err.message : "Operation failed");
     } finally {
       setSubmitting(false);
     }
@@ -244,21 +294,28 @@ export function SuperAdminStaff() {
 
   const handleDelete = async (id: string) => {
     try {
-      const res = await fetch(`/api/super-admins?id=${id}`, { method: 'DELETE' });
+      const res = await fetch(`/api/super-admins?id=${id}`, {
+        method: "DELETE",
+      });
       if (!res.ok) {
         const err = await res.json().catch(() => null);
-        throw new Error(err?.error || 'Failed to delete staff');
+        throw new Error(err?.error || "Failed to delete staff");
       }
-      toast.success('Staff member deleted successfully');
-      setStaffList(prev => prev.filter(s => s.id !== id));
+      toast.success("Staff member deleted successfully");
+      setStaffList((prev) => prev.filter((s) => s.id !== id));
       setDeletingId(null);
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : 'Failed to delete staff');
+      toast.error(
+        err instanceof Error ? err.message : "Failed to delete staff",
+      );
     }
   };
 
-  const isFormValid = formData.name.trim() !== '' &&
-    (!editingStaff ? formData.email.trim() !== '' && formData.password.trim().length >= 6 : true);
+  const isFormValid =
+    formData.name.trim() !== "" &&
+    (!editingStaff
+      ? formData.email.trim() !== "" && formData.password.trim().length >= 6
+      : true);
 
   // --- Render ---
 
@@ -267,9 +324,12 @@ export function SuperAdminStaff() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
         <div>
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Staff Management</h2>
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
+            Staff Management
+          </h2>
           <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-            Create platform staff accounts with restricted role-based permissions
+            Create platform staff accounts with restricted role-based
+            permissions
           </p>
         </div>
         <div className="flex gap-3 items-center w-full sm:w-auto">
@@ -299,10 +359,13 @@ export function SuperAdminStaff() {
         <div className="flex items-start gap-3">
           <Shield className="h-5 w-5 text-rose-600 dark:text-rose-400 shrink-0 mt-0.5" />
           <div className="text-sm">
-            <p className="font-medium text-rose-800 dark:text-rose-300">Platform Staff Accounts</p>
+            <p className="font-medium text-rose-800 dark:text-rose-300">
+              Platform Staff Accounts
+            </p>
             <p className="text-rose-700/80 dark:text-rose-400/80 mt-0.5">
-              Staff members have restricted access based on their assigned platform role. They can log in via the &quot;Email Login&quot; tab.
-              The root platform owner is not shown here.
+              Staff members have restricted access based on their assigned
+              platform role. They can log in via the &quot;Email Login&quot;
+              tab. The root platform owner is not shown here.
             </p>
           </div>
         </div>
@@ -324,7 +387,7 @@ export function SuperAdminStaff() {
               <p className="text-sm mt-1">
                 {staffList.length === 0
                   ? 'Click "Add Staff" to create your first staff member.'
-                  : 'No staff match your search criteria.'}
+                  : "No staff match your search criteria."}
               </p>
             </div>
           ) : (
@@ -333,22 +396,33 @@ export function SuperAdminStaff() {
                 <TableHeader>
                   <TableRow className="bg-muted/50">
                     <TableHead className="min-w-[220px]">Name</TableHead>
-                    <TableHead className="hidden sm:table-cell">Email</TableHead>
-                    <TableHead className="hidden md:table-cell">Phone</TableHead>
-                    <TableHead className="hidden lg:table-cell">Assigned Role</TableHead>
+                    <TableHead className="hidden sm:table-cell">
+                      Email
+                    </TableHead>
+                    <TableHead className="hidden md:table-cell">
+                      Phone
+                    </TableHead>
+                    <TableHead className="hidden lg:table-cell">
+                      Assigned Role
+                    </TableHead>
                     <TableHead>Status</TableHead>
                     {(canEdit || canDelete) && (
-                      <TableHead className="w-[100px] text-right">Actions</TableHead>
+                      <TableHead className="w-[100px] text-right">
+                        Actions
+                      </TableHead>
                     )}
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {filtered.map((member) => {
                     const initials = getInitials(member.name);
-                    const roleColor = member.platformRole?.color || '#6b7280';
+                    const roleColor = member.platformRole?.color || "#6b7280";
 
                     return (
-                      <TableRow key={member.id} className="hover:bg-rose-50/50 dark:hover:bg-rose-900/10 transition-colors">
+                      <TableRow
+                        key={member.id}
+                        className="hover:bg-rose-50/50 dark:hover:bg-rose-900/10 transition-colors"
+                      >
                         {/* Name column */}
                         <TableCell>
                           <div className="flex items-center gap-3">
@@ -362,7 +436,9 @@ export function SuperAdminStaff() {
                             </Avatar>
                             <div className="min-w-0 flex-1">
                               <div className="flex items-center gap-2 flex-wrap">
-                                <p className="font-medium text-sm truncate">{member.name}</p>
+                                <p className="font-medium text-sm truncate">
+                                  {member.name}
+                                </p>
                                 {member.platformRole && (
                                   <span
                                     className="inline-flex items-center rounded-md px-1.5 py-0.5 text-[10px] font-semibold leading-tight"
@@ -372,7 +448,9 @@ export function SuperAdminStaff() {
                                   </span>
                                 )}
                               </div>
-                              <p className="text-xs text-muted-foreground truncate sm:hidden">{member.email}</p>
+                              <p className="text-xs text-muted-foreground truncate sm:hidden">
+                                {member.email}
+                              </p>
                             </div>
                           </div>
                         </TableCell>
@@ -381,7 +459,9 @@ export function SuperAdminStaff() {
                         <TableCell className="hidden sm:table-cell">
                           <div className="flex items-center gap-1.5 min-w-0">
                             <Mail className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
-                            <span className="text-sm truncate">{member.email}</span>
+                            <span className="text-sm truncate">
+                              {member.email}
+                            </span>
                           </div>
                         </TableCell>
 
@@ -389,7 +469,9 @@ export function SuperAdminStaff() {
                         <TableCell className="hidden md:table-cell">
                           <div className="flex items-center gap-1.5 min-w-0">
                             <Phone className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
-                            <span className="text-sm truncate">{member.phone || '—'}</span>
+                            <span className="text-sm truncate">
+                              {member.phone || "—"}
+                            </span>
                           </div>
                         </TableCell>
 
@@ -415,14 +497,16 @@ export function SuperAdminStaff() {
                         {/* Status */}
                         <TableCell>
                           <Badge
-                            variant={member.isActive ? 'default' : 'destructive'}
+                            variant={
+                              member.isActive ? "default" : "destructive"
+                            }
                             className={
                               member.isActive
-                                ? 'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800 hover:bg-emerald-100 dark:hover:bg-emerald-900/30'
-                                : 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 border border-red-200 dark:border-red-800 hover:bg-red-100 dark:hover:bg-red-900/30'
+                                ? "bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800 hover:bg-emerald-100 dark:hover:bg-emerald-900/30"
+                                : "bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 border border-red-200 dark:border-red-800 hover:bg-red-100 dark:hover:bg-red-900/30"
                             }
                           >
-                            {member.isActive ? 'Active' : 'Inactive'}
+                            {member.isActive ? "Active" : "Inactive"}
                           </Badge>
                         </TableCell>
 
@@ -443,7 +527,9 @@ export function SuperAdminStaff() {
                               {canDelete && (
                                 <AlertDialog
                                   open={deletingId === member.id}
-                                  onOpenChange={(open) => { if (!open) setDeletingId(null); }}
+                                  onOpenChange={(open) => {
+                                    if (!open) setDeletingId(null);
+                                  }}
                                 >
                                   <AlertDialogTrigger asChild>
                                     <Button
@@ -457,13 +543,21 @@ export function SuperAdminStaff() {
                                   </AlertDialogTrigger>
                                   <AlertDialogContent>
                                     <AlertDialogHeader>
-                                      <AlertDialogTitle>Delete Staff Member</AlertDialogTitle>
+                                      <AlertDialogTitle>
+                                        Delete Staff Member
+                                      </AlertDialogTitle>
                                       <AlertDialogDescription>
-                                        Are you sure you want to delete <strong>{member.name}</strong>? This action cannot be undone.
+                                        Are you sure you want to delete{" "}
+                                        <strong>{member.name}</strong>? This
+                                        action cannot be undone.
                                       </AlertDialogDescription>
                                     </AlertDialogHeader>
                                     <AlertDialogFooter>
-                                      <AlertDialogCancel onClick={() => setDeletingId(null)}>Cancel</AlertDialogCancel>
+                                      <AlertDialogCancel
+                                        onClick={() => setDeletingId(null)}
+                                      >
+                                        Cancel
+                                      </AlertDialogCancel>
                                       <AlertDialogAction
                                         className="bg-red-600 hover:bg-red-700 text-white"
                                         onClick={() => handleDelete(member.id)}
@@ -489,11 +583,15 @@ export function SuperAdminStaff() {
           {!loading && filtered.length > 0 && (
             <div className="px-4 py-3 border-t">
               <p className="text-sm text-muted-foreground">
-                Showing{' '}
-                <span className="font-medium text-foreground">{filtered.length}</span>{' '}
-                of{' '}
-                <span className="font-medium text-foreground">{staffList.length}</span>{' '}
-                staff member{staffList.length !== 1 ? 's' : ''}
+                Showing{" "}
+                <span className="font-medium text-foreground">
+                  {filtered.length}
+                </span>{" "}
+                of{" "}
+                <span className="font-medium text-foreground">
+                  {staffList.length}
+                </span>{" "}
+                staff member{staffList.length !== 1 ? "s" : ""}
               </p>
             </div>
           )}
@@ -515,12 +613,12 @@ export function SuperAdminStaff() {
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <Shield className="h-5 w-5 text-rose-600 dark:text-rose-400" />
-              {editingStaff ? 'Edit Staff Member' : 'Add New Staff Member'}
+              {editingStaff ? "Edit Staff Member" : "Add New Staff Member"}
             </DialogTitle>
             <DialogDescription>
               {editingStaff
-                ? 'Update staff details and role assignment below.'
-                : 'Create a new platform staff account and assign a role.'}
+                ? "Update staff details and role assignment below."
+                : "Create a new platform staff account and assign a role."}
             </DialogDescription>
           </DialogHeader>
 
@@ -531,7 +629,9 @@ export function SuperAdminStaff() {
               <Input
                 id="sa-staff-name"
                 value={formData.name}
-                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, name: e.target.value })
+                }
                 placeholder="John Doe"
               />
             </div>
@@ -544,7 +644,9 @@ export function SuperAdminStaff() {
                   id="sa-staff-email"
                   type="email"
                   value={formData.email}
-                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                  onChange={(e) =>
+                    setFormData({ ...formData, email: e.target.value })
+                  }
                   placeholder="john.doe@schoolsaas.com"
                 />
               </div>
@@ -553,20 +655,30 @@ export function SuperAdminStaff() {
             {/* Password */}
             <div className="grid gap-2">
               <Label htmlFor="sa-staff-password">
-                {editingStaff ? 'New Password' : 'Password'}
-                {!editingStaff && <span className="text-red-500 ml-0.5">*</span>}
+                {editingStaff ? "New Password" : "Password"}
+                {!editingStaff && (
+                  <span className="text-red-500 ml-0.5">*</span>
+                )}
                 {editingStaff && (
-                  <span className="text-muted-foreground font-normal text-xs ml-2">(leave blank to keep current)</span>
+                  <span className="text-muted-foreground font-normal text-xs ml-2">
+                    (leave blank to keep current)
+                  </span>
                 )}
               </Label>
               <div className="relative">
                 <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 <Input
                   id="sa-staff-password"
-                  type={showPassword ? 'text' : 'password'}
+                  type={showPassword ? "text" : "password"}
                   value={formData.password}
-                  onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                  placeholder={editingStaff ? 'Leave blank to keep current password' : 'Set login password (min 6 chars)'}
+                  onChange={(e) =>
+                    setFormData({ ...formData, password: e.target.value })
+                  }
+                  placeholder={
+                    editingStaff
+                      ? "Leave blank to keep current password"
+                      : "Set login password (min 6 chars)"
+                  }
                   className="pl-10 pr-10"
                 />
                 <button
@@ -574,12 +686,20 @@ export function SuperAdminStaff() {
                   onClick={() => setShowPassword(!showPassword)}
                   className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
                 >
-                  {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                  {showPassword ? (
+                    <EyeOff className="h-4 w-4" />
+                  ) : (
+                    <Eye className="h-4 w-4" />
+                  )}
                 </button>
               </div>
-              {!editingStaff && formData.password && formData.password.length < 6 && (
-                <p className="text-xs text-amber-600 dark:text-amber-400">Password must be at least 6 characters</p>
-              )}
+              {!editingStaff &&
+                formData.password &&
+                formData.password.length < 6 && (
+                  <p className="text-xs text-amber-600 dark:text-amber-400">
+                    Password must be at least 6 characters
+                  </p>
+                )}
             </div>
 
             {/* Phone */}
@@ -588,20 +708,27 @@ export function SuperAdminStaff() {
               <Input
                 id="sa-staff-phone"
                 value={formData.phone}
-                onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, phone: e.target.value })
+                }
                 placeholder="+1 234 567 890"
               />
             </div>
 
             {/* Platform Role dropdown */}
             <div className="grid gap-2">
-              <Label htmlFor="sa-staff-role" className="flex items-center gap-1.5">
+              <Label
+                htmlFor="sa-staff-role"
+                className="flex items-center gap-1.5"
+              >
                 <Shield className="h-3.5 w-3.5 text-rose-500 dark:text-rose-400" />
                 Platform Role
               </Label>
               <Select
                 value={formData.platformRoleId}
-                onValueChange={(v) => setFormData({ ...formData, platformRoleId: v })}
+                onValueChange={(v) =>
+                  setFormData({ ...formData, platformRoleId: v })
+                }
               >
                 <SelectTrigger className="w-full">
                   <SelectValue placeholder="Select a role" />
@@ -621,7 +748,8 @@ export function SuperAdminStaff() {
                 </SelectContent>
               </Select>
               <p className="text-xs text-muted-foreground">
-                Assign a platform role to control this staff member&apos;s permissions.
+                Assign a platform role to control this staff member&apos;s
+                permissions.
               </p>
             </div>
 
@@ -631,9 +759,14 @@ export function SuperAdminStaff() {
                 <Checkbox
                   id="sa-staff-active"
                   checked={formData.isActive}
-                  onCheckedChange={(checked) => setFormData({ ...formData, isActive: checked === true })}
+                  onCheckedChange={(checked) =>
+                    setFormData({ ...formData, isActive: checked === true })
+                  }
                 />
-                <Label htmlFor="sa-staff-active" className="cursor-pointer select-none">
+                <Label
+                  htmlFor="sa-staff-active"
+                  className="cursor-pointer select-none"
+                >
                   Active
                 </Label>
               </div>
@@ -641,7 +774,9 @@ export function SuperAdminStaff() {
           </div>
 
           <DialogFooter>
-            <Button variant="outline" onClick={() => setDialogOpen(false)}>Cancel</Button>
+            <Button variant="outline" onClick={() => setDialogOpen(false)}>
+              Cancel
+            </Button>
             <Button
               className="bg-rose-600 hover:bg-rose-700 text-white"
               onClick={handleSubmit}
@@ -650,12 +785,12 @@ export function SuperAdminStaff() {
               {submitting ? (
                 <>
                   <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                  {editingStaff ? 'Updating...' : 'Adding...'}
+                  {editingStaff ? "Updating..." : "Adding..."}
                 </>
               ) : editingStaff ? (
-                'Update Staff'
+                "Update Staff"
               ) : (
-                'Add Staff'
+                "Add Staff"
               )}
             </Button>
           </DialogFooter>

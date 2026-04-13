@@ -1,12 +1,27 @@
-'use client';
+"use client";
 
-import { useState, useEffect, useMemo } from 'react';
-import { Card, CardContent } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Skeleton } from '@/components/ui/skeleton';
-import { LayoutGrid, List, CalendarDays, Clock, BookOpen, User, GraduationCap, Coffee } from 'lucide-react';
+import { useState, useEffect, useMemo } from "react";
+import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Skeleton } from "@/components/ui/skeleton";
+import {
+  LayoutGrid,
+  List,
+  CalendarDays,
+  Clock,
+  BookOpen,
+  User,
+  GraduationCap,
+  Coffee,
+} from "lucide-react";
 
 // ---------------------------------------------------------------------------
 // Types
@@ -30,38 +45,38 @@ interface ClassInfo {
   classTeacher: string;
 }
 
-type ViewMode = 'grid' | 'list' | 'day';
+type ViewMode = "grid" | "list" | "day";
 
 // ---------------------------------------------------------------------------
 // Constants
 // ---------------------------------------------------------------------------
 
-const DAYS = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday'];
+const DAYS = ["monday", "tuesday", "wednesday", "thursday", "friday"];
 
 const DAY_LABELS: Record<string, string> = {
-  monday: 'Monday',
-  tuesday: 'Tuesday',
-  wednesday: 'Wednesday',
-  thursday: 'Thursday',
-  friday: 'Friday',
+  monday: "Monday",
+  tuesday: "Tuesday",
+  wednesday: "Wednesday",
+  thursday: "Thursday",
+  friday: "Friday",
 };
 
 const SHORT_DAY_LABELS: Record<string, string> = {
-  monday: 'Mon',
-  tuesday: 'Tue',
-  wednesday: 'Wed',
-  thursday: 'Thu',
-  friday: 'Fri',
+  monday: "Mon",
+  tuesday: "Tue",
+  wednesday: "Wed",
+  thursday: "Thu",
+  friday: "Fri",
 };
 
 const SUBJECT_COLORS = [
-  'bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800',
-  'bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 border-blue-200 dark:border-blue-800',
-  'bg-violet-50 dark:bg-violet-900/30 text-violet-700 dark:text-violet-300 border-violet-200 dark:border-violet-800',
-  'bg-amber-50 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300 border-amber-200 dark:border-amber-800',
-  'bg-rose-50 dark:bg-rose-900/30 text-rose-700 dark:text-rose-300 border-rose-200 dark:border-rose-800',
-  'bg-cyan-50 dark:bg-cyan-900/30 text-cyan-700 dark:text-cyan-300 border-cyan-200 dark:border-cyan-800',
-  'bg-pink-50 dark:bg-pink-900/30 text-pink-700 dark:text-pink-300 border-pink-200 dark:border-pink-800',
+  "bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800",
+  "bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 border-blue-200 dark:border-blue-800",
+  "bg-violet-50 dark:bg-violet-900/30 text-violet-700 dark:text-violet-300 border-violet-200 dark:border-violet-800",
+  "bg-amber-50 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300 border-amber-200 dark:border-amber-800",
+  "bg-rose-50 dark:bg-rose-900/30 text-rose-700 dark:text-rose-300 border-rose-200 dark:border-rose-800",
+  "bg-cyan-50 dark:bg-cyan-900/30 text-cyan-700 dark:text-cyan-300 border-cyan-200 dark:border-cyan-800",
+  "bg-pink-50 dark:bg-pink-900/30 text-pink-700 dark:text-pink-300 border-pink-200 dark:border-pink-800",
 ];
 
 // ---------------------------------------------------------------------------
@@ -74,7 +89,7 @@ function toDayIndex(jsDay: number): number {
 }
 
 function timeToMinutes(time: string): number {
-  const [h, m] = time.split(':').map(Number);
+  const [h, m] = time.split(":").map(Number);
   return h * 60 + m;
 }
 
@@ -88,11 +103,17 @@ function isBetween(start: string, end: string): boolean {
 // Sub-components
 // ---------------------------------------------------------------------------
 
-function ViewToggle({ mode, onChange }: { mode: ViewMode; onChange: (m: ViewMode) => void }) {
+function ViewToggle({
+  mode,
+  onChange,
+}: {
+  mode: ViewMode;
+  onChange: (m: ViewMode) => void;
+}) {
   const views: { key: ViewMode; icon: typeof LayoutGrid; label: string }[] = [
-    { key: 'grid', icon: LayoutGrid, label: 'Grid' },
-    { key: 'list', icon: List, label: 'List' },
-    { key: 'day', icon: CalendarDays, label: 'Day' },
+    { key: "grid", icon: LayoutGrid, label: "Grid" },
+    { key: "list", icon: List, label: "List" },
+    { key: "day", icon: CalendarDays, label: "Day" },
   ];
 
   return (
@@ -101,12 +122,12 @@ function ViewToggle({ mode, onChange }: { mode: ViewMode; onChange: (m: ViewMode
         <Button
           key={key}
           size="sm"
-          variant={mode === key ? 'default' : 'ghost'}
+          variant={mode === key ? "default" : "ghost"}
           onClick={() => onChange(key)}
           className={
             mode === key
-              ? 'bg-emerald-600 text-white shadow-sm hover:bg-emerald-700'
-              : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:bg-white dark:hover:bg-gray-800'
+              ? "bg-emerald-600 text-white shadow-sm hover:bg-emerald-700"
+              : "text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:bg-white dark:hover:bg-gray-800"
           }
         >
           <Icon className="h-4 w-4" />
@@ -123,14 +144,14 @@ function ViewToggle({ mode, onChange }: { mode: ViewMode; onChange: (m: ViewMode
 
 export function TeacherTimetable() {
   const [classes, setClasses] = useState<ClassInfo[]>([]);
-  const [selectedClass, setSelectedClass] = useState('');
+  const [selectedClass, setSelectedClass] = useState("");
   const [timetable, setTimetable] = useState<TimetableSlot[]>([]);
   const [loading, setLoading] = useState(true);
-  const [viewMode, setViewMode] = useState<ViewMode>('grid');
-  const [selectedDay, setSelectedDay] = useState('');
+  const [viewMode, setViewMode] = useState<ViewMode>("grid");
+  const [selectedDay, setSelectedDay] = useState("");
 
   useEffect(() => {
-    fetch('/api/classes')
+    fetch("/api/classes")
       .then((r) => r.json())
       .then((data: ClassInfo[]) => {
         setClasses(data);
@@ -161,8 +182,8 @@ export function TeacherTimetable() {
     const set = new Set<string>();
     timetable.forEach((t) => set.add(`${t.startTime}-${t.endTime}`));
     return [...set].sort((a, b) => {
-      const aStart = a.split('-')[0];
-      const bStart = b.split('-')[0];
+      const aStart = a.split("-")[0];
+      const bStart = b.split("-")[0];
       return timeToMinutes(aStart) - timeToMinutes(bStart);
     });
   }, [timetable]);
@@ -174,7 +195,9 @@ export function TeacherTimetable() {
       if (map[t.day]) map[t.day].push(t);
     });
     DAYS.forEach((d) => {
-      map[d].sort((a, b) => timeToMinutes(a.startTime) - timeToMinutes(b.startTime));
+      map[d].sort(
+        (a, b) => timeToMinutes(a.startTime) - timeToMinutes(b.startTime),
+      );
     });
     return map;
   }, [timetable]);
@@ -190,7 +213,7 @@ export function TeacherTimetable() {
   };
 
   const getSlot = (day: string, timeSlot: string) => {
-    const [start, end] = timeSlot.split('-');
+    const [start, end] = timeSlot.split("-");
     return timetable.find(
       (t) => t.day === day && t.startTime === start && t.endTime === end,
     );
@@ -198,11 +221,24 @@ export function TeacherTimetable() {
 
   const dayViewSlots = useMemo(() => {
     return allTimeSlots.map((ts) => {
-      const [start, end] = ts.split('-');
+      const [start, end] = ts.split("-");
       const slot = timetable.find(
-        (t) => t.day === selectedDayKey && t.startTime === start && t.endTime === end,
+        (t) =>
+          t.day === selectedDayKey &&
+          t.startTime === start &&
+          t.endTime === end,
       );
-      return slot ?? { id: `free-${ts}`, day: selectedDayKey, startTime: start, endTime: end, subjectName: '', teacherName: '', className: '' };
+      return (
+        slot ?? {
+          id: `free-${ts}`,
+          day: selectedDayKey,
+          startTime: start,
+          endTime: end,
+          subjectName: "",
+          teacherName: "",
+          className: "",
+        }
+      );
     });
   }, [allTimeSlots, selectedDayKey, timetable]);
 
@@ -237,14 +273,14 @@ export function TeacherTimetable() {
 
       {loading ? (
         <LoadingSkeleton />
-      ) : viewMode === 'grid' ? (
+      ) : viewMode === "grid" ? (
         <GridView
           timeSlots={allTimeSlots}
           getSlot={getSlot}
           getColor={getColor}
           currentDayKey={currentDayKey}
         />
-      ) : viewMode === 'list' ? (
+      ) : viewMode === "list" ? (
         <ListView
           slotsByDay={slotsByDay}
           getColor={getColor}
@@ -283,8 +319,12 @@ function PageHeader({
   return (
     <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
       <div>
-        <h2 className="text-xl font-bold text-gray-900 dark:text-gray-100">My Timetable</h2>
-        <p className="text-sm text-gray-500 dark:text-gray-400">Weekly class schedule</p>
+        <h2 className="text-xl font-bold text-gray-900 dark:text-gray-100">
+          My Timetable
+        </h2>
+        <p className="text-sm text-gray-500 dark:text-gray-400">
+          Weekly class schedule
+        </p>
       </div>
       <div className="flex items-center gap-3">
         <Select value={selectedClass} onValueChange={onClassChange}>
@@ -335,8 +375,8 @@ function GridView({
                     key={day}
                     className={`p-3 text-center text-xs font-semibold border-r border-gray-100 dark:border-gray-700 last:border-r-0 ${
                       day === currentDayKey
-                        ? 'text-emerald-700 dark:text-emerald-400 bg-emerald-50/60 dark:bg-emerald-900/20'
-                        : 'text-gray-500 dark:text-gray-400'
+                        ? "text-emerald-700 dark:text-emerald-400 bg-emerald-50/60 dark:bg-emerald-900/20"
+                        : "text-gray-500 dark:text-gray-400"
                     }`}
                   >
                     {DAY_LABELS[day]}
@@ -349,7 +389,14 @@ function GridView({
             </thead>
             <tbody>
               {timeSlots.map((ts, idx) => (
-                <tr key={ts} className={idx % 2 === 0 ? 'bg-white dark:bg-gray-950' : 'bg-gray-50/50 dark:bg-gray-900/30'}>
+                <tr
+                  key={ts}
+                  className={
+                    idx % 2 === 0
+                      ? "bg-white dark:bg-gray-950"
+                      : "bg-gray-50/50 dark:bg-gray-900/30"
+                  }
+                >
                   <td className="p-3 text-xs text-gray-500 dark:text-gray-400 border-r border-gray-100 dark:border-gray-700 font-medium">
                     <div className="flex items-center gap-1.5">
                       <Clock className="h-3 w-3" />
@@ -360,20 +407,26 @@ function GridView({
                     const slot = getSlot(day, ts);
                     const isToday = day === currentDayKey;
                     const inProgress =
-                      slot && isToday && isBetween(slot.startTime, slot.endTime);
+                      slot &&
+                      isToday &&
+                      isBetween(slot.startTime, slot.endTime);
                     return (
                       <td
                         key={day}
                         className={`p-1.5 border-r border-gray-100 dark:border-gray-700 last:border-r-0 ${
-                          isToday ? 'bg-emerald-50/20 dark:bg-emerald-900/10' : ''
+                          isToday
+                            ? "bg-emerald-50/20 dark:bg-emerald-900/10"
+                            : ""
                         }`}
                       >
                         {slot ? (
                           <div
-                            className={`relative rounded-lg p-2.5 border transition-shadow ${
-                              getColor(slot.subjectName)
-                            } ${inProgress ? 'ring-2 ring-emerald-400 dark:ring-emerald-500 shadow-md' : ''} ${
-                              isToday ? 'ring-1 ring-emerald-200 dark:ring-emerald-800' : ''
+                            className={`relative rounded-lg p-2.5 border transition-shadow ${getColor(
+                              slot.subjectName,
+                            )} ${inProgress ? "ring-2 ring-emerald-400 dark:ring-emerald-500 shadow-md" : ""} ${
+                              isToday
+                                ? "ring-1 ring-emerald-200 dark:ring-emerald-800"
+                                : ""
                             }`}
                           >
                             {inProgress && (
@@ -389,7 +442,9 @@ function GridView({
                             </p>
                           </div>
                         ) : (
-                          <div className="p-2.5 text-xs text-gray-300 dark:text-gray-600 text-center">—</div>
+                          <div className="p-2.5 text-xs text-gray-300 dark:text-gray-600 text-center">
+                            —
+                          </div>
                         )}
                       </td>
                     );
@@ -430,18 +485,22 @@ function ListView({
           <div
             className={`px-4 py-2.5 flex items-center gap-2 border-b ${
               day === currentDayKey
-                ? 'bg-emerald-50 dark:bg-emerald-900/20 border-emerald-200 dark:border-emerald-800'
-                : 'bg-gray-50 dark:bg-gray-800/50 border-gray-100 dark:border-gray-700'
+                ? "bg-emerald-50 dark:bg-emerald-900/20 border-emerald-200 dark:border-emerald-800"
+                : "bg-gray-50 dark:bg-gray-800/50 border-gray-100 dark:border-gray-700"
             }`}
           >
             <CalendarDays
               className={`h-4 w-4 ${
-                day === currentDayKey ? 'text-emerald-600 dark:text-emerald-400' : 'text-gray-400 dark:text-gray-500'
+                day === currentDayKey
+                  ? "text-emerald-600 dark:text-emerald-400"
+                  : "text-gray-400 dark:text-gray-500"
               }`}
             />
             <span
               className={`text-sm font-semibold ${
-                day === currentDayKey ? 'text-emerald-700 dark:text-emerald-400' : 'text-gray-700 dark:text-gray-300'
+                day === currentDayKey
+                  ? "text-emerald-700 dark:text-emerald-400"
+                  : "text-gray-700 dark:text-gray-300"
               }`}
             >
               {DAY_LABELS[day]}
@@ -452,21 +511,23 @@ function ListView({
               </Badge>
             )}
             <span className="text-xs text-gray-400 dark:text-gray-500 ml-auto">
-              {slotsByDay[day].length} class{slotsByDay[day].length !== 1 ? 'es' : ''}
+              {slotsByDay[day].length} class
+              {slotsByDay[day].length !== 1 ? "es" : ""}
             </span>
           </div>
 
           <CardContent className="p-2">
             {slotsByDay[day].map((slot) => {
               const inProgress =
-                day === currentDayKey && isBetween(slot.startTime, slot.endTime);
+                day === currentDayKey &&
+                isBetween(slot.startTime, slot.endTime);
               return (
                 <div
                   key={slot.id}
                   className={`flex items-center gap-3 rounded-lg px-3 py-2.5 transition-colors ${
                     inProgress
-                      ? 'bg-emerald-50 dark:bg-emerald-900/20 ring-1 ring-emerald-200 dark:ring-emerald-800'
-                      : 'hover:bg-gray-50 dark:hover:bg-gray-800/50'
+                      ? "bg-emerald-50 dark:bg-emerald-900/20 ring-1 ring-emerald-200 dark:ring-emerald-800"
+                      : "hover:bg-gray-50 dark:hover:bg-gray-800/50"
                   }`}
                 >
                   <div className="flex-shrink-0 w-24 flex items-center gap-1.5 text-xs text-gray-500 dark:text-gray-400 font-medium">
@@ -517,9 +578,9 @@ interface FreeSlot {
   day: string;
   startTime: string;
   endTime: string;
-  subjectName: '';
-  teacherName: '';
-  className: '';
+  subjectName: "";
+  teacherName: "";
+  className: "";
 }
 
 function DayView({
@@ -545,16 +606,16 @@ function DayView({
             <Button
               key={day}
               size="sm"
-              variant={isActive ? 'default' : 'outline'}
+              variant={isActive ? "default" : "outline"}
               onClick={() => onSelectDay(day)}
               className={
                 isActive
                   ? isToday
-                    ? 'bg-emerald-600 text-white hover:bg-emerald-700 shadow-sm'
-                    : 'bg-gray-800 dark:bg-gray-700 text-white hover:bg-gray-900 dark:hover:bg-gray-600 shadow-sm'
+                    ? "bg-emerald-600 text-white hover:bg-emerald-700 shadow-sm"
+                    : "bg-gray-800 dark:bg-gray-700 text-white hover:bg-gray-900 dark:hover:bg-gray-600 shadow-sm"
                   : isToday
-                    ? 'border-emerald-300 dark:border-emerald-800 text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-900/20 hover:bg-emerald-100 dark:hover:bg-emerald-900/30'
-                    : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'
+                    ? "border-emerald-300 dark:border-emerald-800 text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-900/20 hover:bg-emerald-100 dark:hover:bg-emerald-900/30"
+                    : "text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300"
               }
             >
               <span className="font-medium">{SHORT_DAY_LABELS[day]}</span>
@@ -564,14 +625,16 @@ function DayView({
       </div>
 
       <div className="flex items-center gap-2">
-        <h3 className="text-lg font-bold text-gray-900 dark:text-gray-100">{DAY_LABELS[dayKey]}</h3>
+        <h3 className="text-lg font-bold text-gray-900 dark:text-gray-100">
+          {DAY_LABELS[dayKey]}
+        </h3>
         {dayKey === currentDayKey && (
           <Badge className="bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800 text-xs">
             Today
           </Badge>
         )}
         <span className="text-sm text-gray-400 dark:text-gray-500 ml-auto">
-          {dayViewSlots.filter((s) => s.subjectName).length} of{' '}
+          {dayViewSlots.filter((s) => s.subjectName).length} of{" "}
           {dayViewSlots.length} periods
         </span>
       </div>
@@ -596,7 +659,9 @@ function DayView({
                   <CardContent className="p-4 flex items-center gap-3">
                     <Coffee className="h-5 w-5 text-gray-300 dark:text-gray-600" />
                     <div>
-                      <p className="text-sm font-medium text-gray-400 dark:text-gray-500">Free Period</p>
+                      <p className="text-sm font-medium text-gray-400 dark:text-gray-500">
+                        Free Period
+                      </p>
                       <p className="text-xs text-gray-300 dark:text-gray-600">
                         {slot.startTime} - {slot.endTime}
                       </p>
@@ -613,16 +678,16 @@ function DayView({
                 <div
                   className={`w-2.5 h-2.5 rounded-full border-2 border-white dark:border-gray-900 shadow-sm hidden sm:block ${
                     inProgress
-                      ? 'bg-emerald-500 animate-pulse'
-                      : 'bg-gray-400 dark:bg-gray-600'
+                      ? "bg-emerald-500 animate-pulse"
+                      : "bg-gray-400 dark:bg-gray-600"
                   }`}
                 />
               </div>
               <Card
                 className={`flex-1 rounded-xl shadow-sm transition-all ${
                   inProgress
-                    ? 'ring-2 ring-emerald-400 dark:ring-emerald-500 shadow-emerald-100 dark:shadow-emerald-900/30 border-emerald-200 dark:border-emerald-800'
-                    : 'hover:shadow-md'
+                    ? "ring-2 ring-emerald-400 dark:ring-emerald-500 shadow-emerald-100 dark:shadow-emerald-900/30 border-emerald-200 dark:border-emerald-800"
+                    : "hover:shadow-md"
                 }`}
               >
                 <CardContent className="p-4">
@@ -660,8 +725,8 @@ function DayView({
                     </div>
                   </div>
                 </CardContent>
-                </Card>
-              </div>
+              </Card>
+            </div>
           );
         })}
       </div>
@@ -691,8 +756,12 @@ function EmptyState() {
   return (
     <div className="text-center py-16 text-gray-400 dark:text-gray-500">
       <BookOpen className="h-12 w-12 mx-auto mb-4 opacity-50" />
-      <p className="text-lg font-medium text-gray-500 dark:text-gray-400">No timetable available</p>
-      <p className="text-sm mt-1">Timetable will appear once classes are assigned</p>
+      <p className="text-lg font-medium text-gray-500 dark:text-gray-400">
+        No timetable available
+      </p>
+      <p className="text-sm mt-1">
+        Timetable will appear once classes are assigned
+      </p>
     </div>
   );
 }

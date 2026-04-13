@@ -1,52 +1,89 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { Card, CardContent } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Skeleton } from '@/components/ui/skeleton';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
-import { Label } from '@/components/ui/label';
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { useState } from "react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { Card, CardContent } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import {
-  Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter,
-} from '@/components/ui/dialog';
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from "@/components/ui/dialog";
 import {
-  AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogTitle,
-  AlertDialogDescription, AlertDialogFooter, AlertDialogTrigger, AlertDialogAction, AlertDialogCancel,
-} from '@/components/ui/alert-dialog';
+  AlertDialog,
+  AlertDialogContent,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogTrigger,
+  AlertDialogAction,
+  AlertDialogCancel,
+} from "@/components/ui/alert-dialog";
 import {
-  Users, Search, Mail, GraduationCap, BookOpen, Award, Briefcase, Plus, Pencil, Trash2, Loader2, Eye,
-} from 'lucide-react';
-import { toast } from 'sonner';
-import type { TeacherInfo } from '@/lib/types';
-import { useModulePermissions } from '@/hooks/use-permissions';
-import { useTeachers } from '@/lib/graphql/hooks';
+  Users,
+  Search,
+  Mail,
+  GraduationCap,
+  BookOpen,
+  Award,
+  Briefcase,
+  Plus,
+  Pencil,
+  Trash2,
+  Loader2,
+  Eye,
+} from "lucide-react";
+import { toast } from "sonner";
+import type { TeacherInfo } from "@/lib/types";
+import { useModulePermissions } from "@/hooks/use-permissions";
+import { useTeachers } from "@/lib/graphql/hooks";
 
 const avatarColors = [
-  'bg-emerald-500', 'bg-teal-500', 'bg-cyan-500', 'bg-blue-500',
-  'bg-violet-500', 'bg-purple-500', 'bg-rose-500', 'bg-amber-500',
-  'bg-orange-500', 'bg-lime-500',
+  "bg-emerald-500",
+  "bg-teal-500",
+  "bg-cyan-500",
+  "bg-blue-500",
+  "bg-violet-500",
+  "bg-purple-500",
+  "bg-rose-500",
+  "bg-amber-500",
+  "bg-orange-500",
+  "bg-lime-500",
 ];
 
 const emptyFormData = {
-  name: '', email: '', phone: '', qualification: '', experience: '',
+  name: "",
+  email: "",
+  phone: "",
+  qualification: "",
+  experience: "",
 };
 
 export function AdminTeachers() {
-  const { canCreate, canEdit, canDelete } = useModulePermissions('teachers');
+  const { canCreate, canEdit, canDelete } = useModulePermissions("teachers");
   const queryClient = useQueryClient();
-  const [search, setSearch] = useState('');
+  const [search, setSearch] = useState("");
 
   // ⚡ TanStack Query with GraphQL Group-wise hooks
   const { data: teachers = [], isLoading: loading } = useTeachers();
 
-  const refetchTeachers = () => queryClient.invalidateQueries({ queryKey: ['teachers'] });
+  const refetchTeachers = () =>
+    queryClient.invalidateQueries({ queryKey: ["teachers"] });
 
   // Dialog state
   const [dialogOpen, setDialogOpen] = useState(false);
-  const [editingTeacher, setEditingTeacher] = useState<TeacherInfo | null>(null);
+  const [editingTeacher, setEditingTeacher] = useState<TeacherInfo | null>(
+    null,
+  );
   const [formData, setFormData] = useState(emptyFormData);
   const [submitting, setSubmitting] = useState(false);
 
@@ -57,7 +94,7 @@ export function AdminTeachers() {
     (t) =>
       t.name.toLowerCase().includes(search.toLowerCase()) ||
       t.email.toLowerCase().includes(search.toLowerCase()) ||
-      t.subjects.some((s) => s.toLowerCase().includes(search.toLowerCase()))
+      t.subjects.some((s) => s.toLowerCase().includes(search.toLowerCase())),
   );
 
   const handleOpenAdd = () => {
@@ -71,9 +108,9 @@ export function AdminTeachers() {
     setFormData({
       name: teacher.name,
       email: teacher.email,
-      phone: teacher.phone || '',
-      qualification: teacher.qualification || '',
-      experience: teacher.experience || '',
+      phone: teacher.phone || "",
+      qualification: teacher.qualification || "",
+      experience: teacher.experience || "",
     });
     setDialogOpen(true);
   };
@@ -82,27 +119,28 @@ export function AdminTeachers() {
     setSubmitting(true);
     try {
       const isEdit = !!editingTeacher;
-      const url = '/api/teachers';
-      const method = isEdit ? 'PUT' : 'POST';
-      const body = isEdit
-        ? { id: editingTeacher.id, ...formData }
-        : formData;
+      const url = "/api/teachers";
+      const method = isEdit ? "PUT" : "POST";
+      const body = isEdit ? { id: editingTeacher.id, ...formData } : formData;
 
       const res = await fetch(url, {
         method,
-        headers: { 'Content-Type': 'application/json' },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(body),
       });
 
-      if (!res.ok) throw new Error(`Failed to ${isEdit ? 'update' : 'add'} teacher`);
+      if (!res.ok)
+        throw new Error(`Failed to ${isEdit ? "update" : "add"} teacher`);
 
-      toast.success(`Teacher ${isEdit ? 'updated' : 'added'} successfully`);
+      toast.success(`Teacher ${isEdit ? "updated" : "added"} successfully`);
       setDialogOpen(false);
       setEditingTeacher(null);
       setFormData(emptyFormData);
       refetchTeachers();
     } catch {
-      toast.error(`Failed to ${editingTeacher ? 'update' : 'add'} teacher. Please try again.`);
+      toast.error(
+        `Failed to ${editingTeacher ? "update" : "add"} teacher. Please try again.`,
+      );
     } finally {
       setSubmitting(false);
     }
@@ -110,17 +148,18 @@ export function AdminTeachers() {
 
   const handleDelete = async (id: string) => {
     try {
-      const res = await fetch(`/api/teachers?id=${id}`, { method: 'DELETE' });
-      if (!res.ok) throw new Error('Failed to delete teacher');
-      toast.success('Teacher deleted successfully');
+      const res = await fetch(`/api/teachers?id=${id}`, { method: "DELETE" });
+      if (!res.ok) throw new Error("Failed to delete teacher");
+      toast.success("Teacher deleted successfully");
       refetchTeachers();
       setDeletingId(null);
     } catch {
-      toast.error('Failed to delete teacher. Please try again.');
+      toast.error("Failed to delete teacher. Please try again.");
     }
   };
 
-  const isFormValid = formData.name.trim() !== '' && formData.email.trim() !== '';
+  const isFormValid =
+    formData.name.trim() !== "" && formData.email.trim() !== "";
 
   return (
     <div className="space-y-6">
@@ -128,7 +167,9 @@ export function AdminTeachers() {
       {!canCreate && !canEdit && !canDelete && (
         <div className="flex items-center gap-2 rounded-lg border border-amber-200 dark:border-amber-800 bg-amber-50 dark:bg-amber-900/30 px-3 py-2">
           <Eye className="h-4 w-4 text-amber-600 dark:text-amber-400 shrink-0" />
-          <span className="text-xs text-amber-700 dark:text-amber-300 font-medium">Read-only mode — you have view permission only for this module.</span>
+          <span className="text-xs text-amber-700 dark:text-amber-300 font-medium">
+            Read-only mode — you have view permission only for this module.
+          </span>
         </div>
       )}
 
@@ -144,13 +185,13 @@ export function AdminTeachers() {
           />
         </div>
         {canCreate && (
-        <Button
-          className="bg-emerald-600 hover:bg-emerald-700 text-white shrink-0"
-          onClick={handleOpenAdd}
-        >
-          <Plus className="h-4 w-4 mr-2" />
-          Add Teacher
-        </Button>
+          <Button
+            className="bg-emerald-600 hover:bg-emerald-700 text-white shrink-0"
+            onClick={handleOpenAdd}
+          >
+            <Plus className="h-4 w-4 mr-2" />
+            Add Teacher
+          </Button>
         )}
       </div>
 
@@ -188,9 +229,9 @@ export function AdminTeachers() {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {filtered.map((teacher, index) => {
             const initials = teacher.name
-              .split(' ')
+              .split(" ")
               .map((n) => n[0])
-              .join('')
+              .join("")
               .slice(0, 2)
               .toUpperCase();
             const color = avatarColors[index % avatarColors.length];
@@ -204,7 +245,9 @@ export function AdminTeachers() {
                   {/* Header */}
                   <div className="flex items-start gap-4">
                     <Avatar className="h-14 w-14 shrink-0 ring-2 ring-white dark:ring-gray-800 shadow-sm">
-                      <AvatarFallback className={`${color} text-white text-sm font-bold`}>
+                      <AvatarFallback
+                        className={`${color} text-white text-sm font-bold`}
+                      >
                         {initials}
                       </AvatarFallback>
                     </Avatar>
@@ -217,55 +260,70 @@ export function AdminTeachers() {
                         <span className="truncate">{teacher.email}</span>
                       </div>
                       {teacher.phone && (
-                        <p className="text-sm text-muted-foreground mt-0.5">{teacher.phone}</p>
+                        <p className="text-sm text-muted-foreground mt-0.5">
+                          {teacher.phone}
+                        </p>
                       )}
                     </div>
 
                     {/* Action buttons */}
                     {(canEdit || canDelete) && (
-                    <div className="flex items-center gap-1 shrink-0">
-                      {canEdit && (
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="h-8 w-8 text-muted-foreground hover:text-emerald-600"
-                        onClick={() => handleOpenEdit(teacher)}
-                      >
-                        <Pencil className="h-4 w-4" />
-                      </Button>
-                      )}
-                      {canDelete && (
-                      <AlertDialog open={deletingId === teacher.id} onOpenChange={(open) => { if (!open) setDeletingId(null); }}>
-                        <AlertDialogTrigger asChild>
+                      <div className="flex items-center gap-1 shrink-0">
+                        {canEdit && (
                           <Button
                             variant="ghost"
                             size="icon"
-                            className="h-8 w-8 text-muted-foreground hover:text-red-600"
-                            onClick={() => setDeletingId(teacher.id)}
+                            className="h-8 w-8 text-muted-foreground hover:text-emerald-600"
+                            onClick={() => handleOpenEdit(teacher)}
                           >
-                            <Trash2 className="h-4 w-4" />
+                            <Pencil className="h-4 w-4" />
                           </Button>
-                        </AlertDialogTrigger>
-                        <AlertDialogContent>
-                          <AlertDialogHeader>
-                            <AlertDialogTitle>Delete Teacher</AlertDialogTitle>
-                            <AlertDialogDescription>
-                              Are you sure you want to delete <strong>{teacher.name}</strong>? This action cannot be undone.
-                            </AlertDialogDescription>
-                          </AlertDialogHeader>
-                          <AlertDialogFooter>
-                            <AlertDialogCancel onClick={() => setDeletingId(null)}>Cancel</AlertDialogCancel>
-                            <AlertDialogAction
-                              className="bg-red-600 hover:bg-red-700 text-white"
-                              onClick={() => handleDelete(teacher.id)}
-                            >
-                              Delete
-                            </AlertDialogAction>
-                          </AlertDialogFooter>
-                        </AlertDialogContent>
-                      </AlertDialog>
-                      )}
-                    </div>
+                        )}
+                        {canDelete && (
+                          <AlertDialog
+                            open={deletingId === teacher.id}
+                            onOpenChange={(open) => {
+                              if (!open) setDeletingId(null);
+                            }}
+                          >
+                            <AlertDialogTrigger asChild>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="h-8 w-8 text-muted-foreground hover:text-red-600"
+                                onClick={() => setDeletingId(teacher.id)}
+                              >
+                                <Trash2 className="h-4 w-4" />
+                              </Button>
+                            </AlertDialogTrigger>
+                            <AlertDialogContent>
+                              <AlertDialogHeader>
+                                <AlertDialogTitle>
+                                  Delete Teacher
+                                </AlertDialogTitle>
+                                <AlertDialogDescription>
+                                  Are you sure you want to delete{" "}
+                                  <strong>{teacher.name}</strong>? This action
+                                  cannot be undone.
+                                </AlertDialogDescription>
+                              </AlertDialogHeader>
+                              <AlertDialogFooter>
+                                <AlertDialogCancel
+                                  onClick={() => setDeletingId(null)}
+                                >
+                                  Cancel
+                                </AlertDialogCancel>
+                                <AlertDialogAction
+                                  className="bg-red-600 hover:bg-red-700 text-white"
+                                  onClick={() => handleDelete(teacher.id)}
+                                >
+                                  Delete
+                                </AlertDialogAction>
+                              </AlertDialogFooter>
+                            </AlertDialogContent>
+                          </AlertDialog>
+                        )}
+                      </div>
                     )}
                   </div>
 
@@ -275,11 +333,17 @@ export function AdminTeachers() {
                     <div className="flex items-start gap-2">
                       <BookOpen className="h-4 w-4 text-muted-foreground mt-0.5 shrink-0" />
                       <div className="flex flex-wrap gap-1.5">
-                        {Array.from(new Set(teacher.subjects as string[])).map((subject, idx) => (
-                          <Badge key={`${subject}-${idx}`} variant="secondary" className="text-xs font-normal bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800">
-                            {subject}
-                          </Badge>
-                        ))}
+                        {Array.from(new Set(teacher.subjects as string[])).map(
+                          (subject, idx) => (
+                            <Badge
+                              key={`${subject}-${idx}`}
+                              variant="secondary"
+                              className="text-xs font-normal bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800"
+                            >
+                              {subject}
+                            </Badge>
+                          ),
+                        )}
                       </div>
                     </div>
 
@@ -287,11 +351,17 @@ export function AdminTeachers() {
                     <div className="flex items-start gap-2">
                       <GraduationCap className="h-4 w-4 text-muted-foreground mt-0.5 shrink-0" />
                       <div className="flex flex-wrap gap-1.5">
-                        {Array.from(new Set(teacher.classes as string[])).map((cls) => (
-                          <Badge key={cls} variant="outline" className="text-xs font-normal">
-                            {cls}
-                          </Badge>
-                        ))}
+                        {Array.from(new Set(teacher.classes as string[])).map(
+                          (cls) => (
+                            <Badge
+                              key={cls}
+                              variant="outline"
+                              className="text-xs font-normal"
+                            >
+                              {cls}
+                            </Badge>
+                          ),
+                        )}
                       </div>
                     </div>
 
@@ -326,12 +396,25 @@ export function AdminTeachers() {
       )}
 
       {/* Add/Edit Teacher Dialog */}
-      <Dialog open={dialogOpen} onOpenChange={(open) => { setDialogOpen(open); if (!open) { setEditingTeacher(null); setFormData(emptyFormData); } }}>
+      <Dialog
+        open={dialogOpen}
+        onOpenChange={(open) => {
+          setDialogOpen(open);
+          if (!open) {
+            setEditingTeacher(null);
+            setFormData(emptyFormData);
+          }
+        }}
+      >
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
-            <DialogTitle>{editingTeacher ? 'Edit Teacher' : 'Add New Teacher'}</DialogTitle>
+            <DialogTitle>
+              {editingTeacher ? "Edit Teacher" : "Add New Teacher"}
+            </DialogTitle>
             <DialogDescription>
-              {editingTeacher ? 'Update the teacher details below' : 'Fill in the teacher details below'}
+              {editingTeacher
+                ? "Update the teacher details below"
+                : "Fill in the teacher details below"}
             </DialogDescription>
           </DialogHeader>
           <div className="grid gap-4 py-2">
@@ -340,7 +423,9 @@ export function AdminTeachers() {
               <Input
                 id="teacher-name"
                 value={formData.name}
-                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, name: e.target.value })
+                }
                 placeholder="Dr. Jane Smith"
               />
             </div>
@@ -350,7 +435,9 @@ export function AdminTeachers() {
                 id="teacher-email"
                 type="email"
                 value={formData.email}
-                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, email: e.target.value })
+                }
                 placeholder="jane.smith@school.com"
               />
             </div>
@@ -359,7 +446,9 @@ export function AdminTeachers() {
               <Input
                 id="teacher-phone"
                 value={formData.phone}
-                onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, phone: e.target.value })
+                }
                 placeholder="+1 234 567 890"
               />
             </div>
@@ -369,7 +458,9 @@ export function AdminTeachers() {
                 <Input
                   id="teacher-qualification"
                   value={formData.qualification}
-                  onChange={(e) => setFormData({ ...formData, qualification: e.target.value })}
+                  onChange={(e) =>
+                    setFormData({ ...formData, qualification: e.target.value })
+                  }
                   placeholder="Ph.D., M.Ed."
                 />
               </div>
@@ -378,14 +469,18 @@ export function AdminTeachers() {
                 <Input
                   id="teacher-experience"
                   value={formData.experience}
-                  onChange={(e) => setFormData({ ...formData, experience: e.target.value })}
+                  onChange={(e) =>
+                    setFormData({ ...formData, experience: e.target.value })
+                  }
                   placeholder="e.g., 5 years"
                 />
               </div>
             </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setDialogOpen(false)}>Cancel</Button>
+            <Button variant="outline" onClick={() => setDialogOpen(false)}>
+              Cancel
+            </Button>
             <Button
               className="bg-emerald-600 hover:bg-emerald-700 text-white"
               onClick={handleSubmit}
@@ -394,10 +489,12 @@ export function AdminTeachers() {
               {submitting ? (
                 <>
                   <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                  {editingTeacher ? 'Updating...' : 'Adding...'}
+                  {editingTeacher ? "Updating..." : "Adding..."}
                 </>
+              ) : editingTeacher ? (
+                "Update Teacher"
               ) : (
-                editingTeacher ? 'Update Teacher' : 'Add Teacher'
+                "Add Teacher"
               )}
             </Button>
           </DialogFooter>

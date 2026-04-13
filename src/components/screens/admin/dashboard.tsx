@@ -1,50 +1,95 @@
-'use client';
+"use client";
 
-import { useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Skeleton } from '@/components/ui/skeleton';
-import { Badge } from '@/components/ui/badge';
+import { useEffect } from "react";
 import {
-  Users, GraduationCap, School, TrendingUp, DollarSign,
-  Calendar, Megaphone, ArrowUpRight, ArrowDownRight, Heart,
-  CreditCard, BookOpen, Clock, CheckCircle2, AlertTriangle,
-  UserCheck, BarChart3, Activity
-} from 'lucide-react';
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Badge } from "@/components/ui/badge";
 import {
-  BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip,
-  ResponsiveContainer, PieChart, Pie, Cell, Legend
-} from 'recharts';
-import { ChartContainer, ChartTooltip, ChartTooltipContent, ChartLegend, ChartLegendContent } from '@/components/ui/chart';
-import type { ChartConfig } from '@/components/ui/chart';
-import { useAppStore } from '@/store/use-app-store';
-import { useAdminDashboard } from '@/lib/graphql/hooks';
-import { toast } from 'sonner';
+  Users,
+  GraduationCap,
+  School,
+  TrendingUp,
+  DollarSign,
+  Calendar,
+  Megaphone,
+  ArrowUpRight,
+  ArrowDownRight,
+  Heart,
+  CreditCard,
+  BookOpen,
+  Clock,
+  CheckCircle2,
+  AlertTriangle,
+  UserCheck,
+  BarChart3,
+  Activity,
+} from "lucide-react";
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+  PieChart,
+  Pie,
+  Cell,
+  Legend,
+} from "recharts";
+import {
+  ChartContainer,
+  ChartTooltip,
+  ChartTooltipContent,
+  ChartLegend,
+  ChartLegendContent,
+} from "@/components/ui/chart";
+import type { ChartConfig } from "@/components/ui/chart";
+import { useAppStore } from "@/store/use-app-store";
+import { useAdminDashboard } from "@/lib/graphql/hooks";
+import { toast } from "sonner";
 
 const attendanceChartConfig = {
-  rate: { label: 'Attendance Rate (%)', color: '#10b981' },
+  rate: { label: "Attendance Rate (%)", color: "#10b981" },
 } satisfies ChartConfig;
 
 const feeChartConfig = {
-  collected: { label: 'Collected', color: '#10b981' },
-  pending: { label: 'Pending', color: '#f59e0b' },
+  collected: { label: "Collected", color: "#10b981" },
+  pending: { label: "Pending", color: "#f59e0b" },
 } satisfies ChartConfig;
 
 const pieChartConfig = {
-  students: { label: 'Students', color: '#10b981' },
+  students: { label: "Students", color: "#10b981" },
 } satisfies ChartConfig;
 
-const COLORS = ['#10b981', '#059669', '#047857', '#065f46', '#34d399', '#6ee7b7', '#a7f3d0', '#d1fae5'];
+const COLORS = [
+  "#10b981",
+  "#059669",
+  "#047857",
+  "#065f46",
+  "#34d399",
+  "#6ee7b7",
+  "#a7f3d0",
+  "#d1fae5",
+];
 
 const priorityColors: Record<string, string> = {
-  normal: 'bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300',
-  important: 'bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400',
-  urgent: 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400',
+  normal: "bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300",
+  important:
+    "bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400",
+  urgent: "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400",
 };
 
 const priorityBorders: Record<string, string> = {
-  normal: 'border-l-gray-400 dark:border-l-gray-500',
-  important: 'border-l-orange-500',
-  urgent: 'border-l-red-500',
+  normal: "border-l-gray-400 dark:border-l-gray-500",
+  important: "border-l-orange-500",
+  urgent: "border-l-red-500",
 };
 
 function StatCardSkeleton() {
@@ -66,12 +111,12 @@ function StatCardSkeleton() {
 export function AdminDashboard() {
   const { currentUser, currentTenantId } = useAppStore();
   const { data, isLoading, isError, error, refetch } = useAdminDashboard(
-    currentTenantId || 'tenant_default'
+    currentTenantId || "tenant_default",
   );
 
   useEffect(() => {
     if (isError) {
-      toast.error('Failed to load dashboard', { description: error?.message });
+      toast.error("Failed to load dashboard", { description: error?.message });
     }
   }, [isError, error]);
 
@@ -80,14 +125,19 @@ export function AdminDashboard() {
       <Card className="border-red-200 dark:border-red-800 bg-red-50 dark:bg-red-900/30">
         <CardContent className="p-6 text-center text-red-600 dark:text-red-400">
           <p className="font-medium">Failed to load dashboard</p>
-          <p className="text-sm mt-1">{error?.message || 'Unknown error'}</p>
+          <p className="text-sm mt-1">{error?.message || "Unknown error"}</p>
         </CardContent>
       </Card>
     );
   }
 
   const today = new Date();
-  const greeting = today.getHours() < 12 ? 'Good Morning' : today.getHours() < 17 ? 'Good Afternoon' : 'Good Evening';
+  const greeting =
+    today.getHours() < 12
+      ? "Good Morning"
+      : today.getHours() < 17
+        ? "Good Afternoon"
+        : "Good Evening";
 
   return (
     <div className="space-y-6">
@@ -101,15 +151,22 @@ export function AdminDashboard() {
               <School className="h-7 w-7" />
             </div>
             <div>
-              <h2 className="text-2xl font-bold tracking-tight">{greeting}, {currentUser?.name || 'Admin'}!</h2>
-              <p className="text-teal-100 text-sm">Here&apos;s what&apos;s happening at Sigel School today</p>
+              <h2 className="text-2xl font-bold tracking-tight">
+                {greeting}, {currentUser?.name || "Admin"}!
+              </h2>
+              <p className="text-teal-100 text-sm">
+                Here&apos;s what&apos;s happening at Sigel School today
+              </p>
             </div>
           </div>
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-4">
             {isLoading ? (
               <>
                 {[...Array(4)].map((_, i) => (
-                  <div key={i} className="bg-white/10 backdrop-blur-sm rounded-xl px-4 py-3">
+                  <div
+                    key={i}
+                    className="bg-white/10 backdrop-blur-sm rounded-xl px-4 py-3"
+                  >
                     <Skeleton className="h-3 w-20 bg-white/20" />
                     <Skeleton className="h-7 w-12 bg-white/20 mt-1" />
                   </div>
@@ -118,28 +175,36 @@ export function AdminDashboard() {
             ) : (
               <>
                 <div className="bg-white/10 backdrop-blur-sm rounded-xl px-4 py-3">
-                  <p className="text-teal-100 text-xs font-medium">Total Students</p>
+                  <p className="text-teal-100 text-xs font-medium">
+                    Total Students
+                  </p>
                   <p className="text-2xl font-bold flex items-center gap-1">
                     <GraduationCap className="h-5 w-5 text-teal-200" />
                     {data?.totalStudents ?? 0}
                   </p>
                 </div>
                 <div className="bg-white/10 backdrop-blur-sm rounded-xl px-4 py-3">
-                  <p className="text-teal-100 text-xs font-medium">Total Teachers</p>
+                  <p className="text-teal-100 text-xs font-medium">
+                    Total Teachers
+                  </p>
                   <p className="text-2xl font-bold flex items-center gap-1">
                     <Users className="h-5 w-5 text-teal-200" />
                     {data?.totalTeachers ?? 0}
                   </p>
                 </div>
                 <div className="bg-white/10 backdrop-blur-sm rounded-xl px-4 py-3">
-                  <p className="text-teal-100 text-xs font-medium">Attendance Rate</p>
+                  <p className="text-teal-100 text-xs font-medium">
+                    Attendance Rate
+                  </p>
                   <p className="text-2xl font-bold flex items-center gap-1">
                     <Activity className="h-5 w-5 text-teal-200" />
                     {data?.attendanceRate ?? 0}%
                   </p>
                 </div>
                 <div className="bg-white/10 backdrop-blur-sm rounded-xl px-4 py-3">
-                  <p className="text-teal-100 text-xs font-medium">Upcoming Events</p>
+                  <p className="text-teal-100 text-xs font-medium">
+                    Upcoming Events
+                  </p>
                   <p className="text-2xl font-bold flex items-center gap-1">
                     <Calendar className="h-5 w-5 text-teal-200" />
                     {data?.upcomingEvents ?? 0}
@@ -174,8 +239,12 @@ export function AdminDashboard() {
                       <Heart className="h-5 w-5" />
                     </div>
                     <div>
-                      <p className="text-xs text-muted-foreground">Total Parents</p>
-                      <p className="text-2xl font-bold">{data?.totalParents ?? 0}</p>
+                      <p className="text-xs text-muted-foreground">
+                        Total Parents
+                      </p>
+                      <p className="text-2xl font-bold">
+                        {data?.totalParents ?? 0}
+                      </p>
                     </div>
                   </div>
                   <p className="text-xs text-emerald-600 mt-2 flex items-center gap-1">
@@ -190,12 +259,17 @@ export function AdminDashboard() {
                       <School className="h-5 w-5" />
                     </div>
                     <div>
-                      <p className="text-xs text-muted-foreground">Total Classes</p>
-                      <p className="text-2xl font-bold">{data?.totalClasses ?? 0}</p>
+                      <p className="text-xs text-muted-foreground">
+                        Total Classes
+                      </p>
+                      <p className="text-2xl font-bold">
+                        {data?.totalClasses ?? 0}
+                      </p>
                     </div>
                   </div>
                   <p className="text-xs text-muted-foreground mt-2 flex items-center gap-1">
-                    <BookOpen className="h-3 w-3" /> {data?.totalStudents ?? 0} students enrolled
+                    <BookOpen className="h-3 w-3" /> {data?.totalStudents ?? 0}{" "}
+                    students enrolled
                   </p>
                 </CardContent>
               </Card>
@@ -206,12 +280,17 @@ export function AdminDashboard() {
                       <DollarSign className="h-5 w-5" />
                     </div>
                     <div>
-                      <p className="text-xs text-muted-foreground">Fee Revenue</p>
-                      <p className="text-2xl font-bold">${(data?.totalRevenue ?? 0).toLocaleString()}</p>
+                      <p className="text-xs text-muted-foreground">
+                        Fee Revenue
+                      </p>
+                      <p className="text-2xl font-bold">
+                        ${(data?.totalRevenue ?? 0).toLocaleString()}
+                      </p>
                     </div>
                   </div>
                   <p className="text-xs text-amber-600 mt-2 flex items-center gap-1">
-                    <AlertTriangle className="h-3 w-3" /> ${(data?.pendingFees ?? 0).toLocaleString()} pending
+                    <AlertTriangle className="h-3 w-3" /> $
+                    {(data?.pendingFees ?? 0).toLocaleString()} pending
                   </p>
                 </CardContent>
               </Card>
@@ -222,8 +301,12 @@ export function AdminDashboard() {
                       <UserCheck className="h-5 w-5" />
                     </div>
                     <div>
-                      <p className="text-xs text-muted-foreground">Attendance Today</p>
-                      <p className="text-2xl font-bold">{data?.attendanceRate ?? 0}%</p>
+                      <p className="text-xs text-muted-foreground">
+                        Attendance Today
+                      </p>
+                      <p className="text-2xl font-bold">
+                        {data?.attendanceRate ?? 0}%
+                      </p>
                     </div>
                   </div>
                   <p className="text-xs text-red-500 mt-2 flex items-center gap-1">
@@ -245,19 +328,40 @@ export function AdminDashboard() {
               <Activity className="h-4 w-4 text-teal-600" />
               Monthly Attendance Trend
             </CardTitle>
-            <CardDescription>Student attendance rate over the last 6 months</CardDescription>
+            <CardDescription>
+              Student attendance rate over the last 6 months
+            </CardDescription>
           </CardHeader>
           <CardContent>
             {isLoading ? (
               <Skeleton className="h-[280px] w-full" />
             ) : (
-              <ChartContainer config={attendanceChartConfig} className="h-[280px] w-full">
+              <ChartContainer
+                config={attendanceChartConfig}
+                className="h-[280px] w-full"
+              >
                 <BarChart data={data?.monthlyAttendance ?? []}>
                   <CartesianGrid strokeDasharray="3 3" vertical={false} />
-                  <XAxis dataKey="month" tickLine={false} axisLine={false} fontSize={12} />
-                  <YAxis domain={[0, 100]} tickLine={false} axisLine={false} fontSize={12} unit="%" />
+                  <XAxis
+                    dataKey="month"
+                    tickLine={false}
+                    axisLine={false}
+                    fontSize={12}
+                  />
+                  <YAxis
+                    domain={[0, 100]}
+                    tickLine={false}
+                    axisLine={false}
+                    fontSize={12}
+                    unit="%"
+                  />
                   <ChartTooltip content={<ChartTooltipContent />} />
-                  <Bar dataKey="rate" fill="var(--color-rate)" radius={[6, 6, 0, 0]} maxBarSize={48} />
+                  <Bar
+                    dataKey="rate"
+                    fill="var(--color-rate)"
+                    radius={[6, 6, 0, 0]}
+                    maxBarSize={48}
+                  />
                 </BarChart>
               </ChartContainer>
             )}
@@ -277,7 +381,10 @@ export function AdminDashboard() {
             {isLoading ? (
               <Skeleton className="h-[280px] w-full" />
             ) : (
-              <ChartContainer config={pieChartConfig} className="h-[280px] w-full">
+              <ChartContainer
+                config={pieChartConfig}
+                className="h-[280px] w-full"
+              >
                 <PieChart>
                   <Pie
                     data={data?.classDistribution ?? []}
@@ -288,12 +395,17 @@ export function AdminDashboard() {
                     paddingAngle={2}
                     dataKey="students"
                     nameKey="name"
-                    label={({ name, percent }) => `${name.split('-')[0]} ${(percent * 100).toFixed(0)}%`}
+                    label={({ name, percent }) =>
+                      `${name.split("-")[0]} ${(percent * 100).toFixed(0)}%`
+                    }
                     labelLine={false}
                     fontSize={10}
                   >
                     {(data?.classDistribution ?? []).map((_, index) => (
-                      <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                      <Cell
+                        key={`cell-${index}`}
+                        fill={COLORS[index % COLORS.length]}
+                      />
                     ))}
                   </Pie>
                   <ChartTooltip content={<ChartTooltipContent />} />
@@ -319,15 +431,44 @@ export function AdminDashboard() {
             {isLoading ? (
               <Skeleton className="h-[280px] w-full" />
             ) : (
-              <ChartContainer config={feeChartConfig} className="h-[280px] w-full">
+              <ChartContainer
+                config={feeChartConfig}
+                className="h-[280px] w-full"
+              >
                 <BarChart data={data?.feeByType ?? []} layout="vertical">
                   <CartesianGrid strokeDasharray="3 3" horizontal={false} />
-                  <XAxis type="number" tickLine={false} axisLine={false} fontSize={12} tickFormatter={(v) => `$${(v / 1000).toFixed(0)}k`} />
-                  <YAxis type="category" dataKey="type" tickLine={false} axisLine={false} fontSize={12} width={70} tickFormatter={(v) => v.charAt(0).toUpperCase() + v.slice(1)} />
+                  <XAxis
+                    type="number"
+                    tickLine={false}
+                    axisLine={false}
+                    fontSize={12}
+                    tickFormatter={(v) => `$${(v / 1000).toFixed(0)}k`}
+                  />
+                  <YAxis
+                    type="category"
+                    dataKey="type"
+                    tickLine={false}
+                    axisLine={false}
+                    fontSize={12}
+                    width={70}
+                    tickFormatter={(v) =>
+                      v.charAt(0).toUpperCase() + v.slice(1)
+                    }
+                  />
                   <ChartTooltip content={<ChartTooltipContent />} />
                   <ChartLegend content={<ChartLegendContent />} />
-                  <Bar dataKey="collected" fill="var(--color-collected)" radius={[0, 4, 4, 0]} maxBarSize={20} />
-                  <Bar dataKey="pending" fill="var(--color-pending)" radius={[0, 4, 4, 0]} maxBarSize={20} />
+                  <Bar
+                    dataKey="collected"
+                    fill="var(--color-collected)"
+                    radius={[0, 4, 4, 0]}
+                    maxBarSize={20}
+                  />
+                  <Bar
+                    dataKey="pending"
+                    fill="var(--color-pending)"
+                    radius={[0, 4, 4, 0]}
+                    maxBarSize={20}
+                  />
                 </BarChart>
               </ChartContainer>
             )}
@@ -353,7 +494,9 @@ export function AdminDashboard() {
             ) : (
               <div className="space-y-3 max-h-[320px] overflow-y-auto pr-1">
                 {(data?.recentNotices ?? []).length === 0 ? (
-                  <p className="text-sm text-muted-foreground text-center py-8">No notices yet</p>
+                  <p className="text-sm text-muted-foreground text-center py-8">
+                    No notices yet
+                  </p>
                 ) : (
                   (data?.recentNotices ?? []).map((notice) => (
                     <div
@@ -362,17 +505,25 @@ export function AdminDashboard() {
                     >
                       <div className="flex items-start justify-between gap-2">
                         <div className="min-w-0 flex-1">
-                          <p className="text-sm font-medium truncate">{notice.title}</p>
-                          <p className="text-xs text-muted-foreground mt-0.5 line-clamp-1">{notice.content}</p>
+                          <p className="text-sm font-medium truncate">
+                            {notice.title}
+                          </p>
+                          <p className="text-xs text-muted-foreground mt-0.5 line-clamp-1">
+                            {notice.content}
+                          </p>
                         </div>
-                        <Badge className={`text-[10px] shrink-0 ${priorityColors[notice.priority] || priorityColors.normal}`}>
+                        <Badge
+                          className={`text-[10px] shrink-0 ${priorityColors[notice.priority] || priorityColors.normal}`}
+                        >
                           {notice.priority}
                         </Badge>
                       </div>
                       <div className="flex items-center gap-2 mt-2 text-[11px] text-muted-foreground">
                         <span>{notice.authorName}</span>
                         <span>•</span>
-                        <span>{new Date(notice.createdAt).toLocaleDateString()}</span>
+                        <span>
+                          {new Date(notice.createdAt).toLocaleDateString()}
+                        </span>
                       </div>
                     </div>
                   ))

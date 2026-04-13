@@ -1,26 +1,26 @@
-'use client';
+"use client";
 
-import { useEffect, useState, useCallback } from 'react';
-import { useAppStore } from '@/store/use-app-store';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Skeleton } from '@/components/ui/skeleton';
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { BookOpen, GraduationCap, User, Hash, ArrowRight } from 'lucide-react';
-import type { StudentInfo, SubjectInfo } from '@/lib/types';
+import { useEffect, useState, useCallback } from "react";
+import { useAppStore } from "@/store/use-app-store";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { BookOpen, GraduationCap, User, Hash, ArrowRight } from "lucide-react";
+import type { StudentInfo, SubjectInfo } from "@/lib/types";
 
 const subjectColors = [
-  'from-violet-500 to-purple-600',
-  'from-pink-500 to-rose-600',
-  'from-blue-500 to-indigo-600',
-  'from-emerald-500 to-teal-600',
-  'from-amber-500 to-orange-600',
-  'from-cyan-500 to-sky-600',
-  'from-fuchsia-500 to-pink-600',
-  'from-lime-500 to-green-600',
+  "from-violet-500 to-purple-600",
+  "from-pink-500 to-rose-600",
+  "from-blue-500 to-indigo-600",
+  "from-emerald-500 to-teal-600",
+  "from-amber-500 to-orange-600",
+  "from-cyan-500 to-sky-600",
+  "from-fuchsia-500 to-pink-600",
+  "from-lime-500 to-green-600",
 ];
 
-const subjectIconNames = ['BookOpen', 'GraduationCap', 'Hash', 'User'] as const;
+const subjectIconNames = ["BookOpen", "GraduationCap", "Hash", "User"] as const;
 
 export function StudentClasses() {
   const { currentUser } = useAppStore();
@@ -28,14 +28,15 @@ export function StudentClasses() {
   const [students, setStudents] = useState<StudentInfo[]>([]);
   const [subjects, setSubjects] = useState<SubjectInfo[]>([]);
 
-  const student = students.find(s => s.email === currentUser?.email) || students[0] || null;
+  const student =
+    students.find((s) => s.email === currentUser?.email) || students[0] || null;
 
   const fetchData = useCallback(async () => {
     setLoading(true);
     try {
       const [studentsRes, subjectsRes] = await Promise.all([
-        fetch('/api/students'),
-        fetch('/api/subjects'),
+        fetch("/api/students"),
+        fetch("/api/subjects"),
       ]);
       const [studentsData, subjectsData] = await Promise.all([
         studentsRes.json(),
@@ -50,13 +51,15 @@ export function StudentClasses() {
     }
   }, []);
 
-  useEffect(() => { fetchData(); }, [fetchData]);
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
 
   const mySubjects = student
-    ? subjects.filter(s => s.className === student.className)
+    ? subjects.filter((s) => s.className === student.className)
     : [];
 
-  const firstName = currentUser?.name?.split(' ')[0] || 'Student';
+  const firstName = currentUser?.name?.split(" ")[0] || "Student";
 
   if (loading) return <ClassesSkeleton />;
 
@@ -65,13 +68,19 @@ export function StudentClasses() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h2 className="text-xl font-bold text-gray-900 dark:text-gray-100">My Classes</h2>
+          <h2 className="text-xl font-bold text-gray-900 dark:text-gray-100">
+            My Classes
+          </h2>
           <p className="text-sm text-gray-500 dark:text-gray-400 mt-0.5">
-            {mySubjects.length} subjects enrolled in {student?.className || 'your class'}
+            {mySubjects.length} subjects enrolled in{" "}
+            {student?.className || "your class"}
           </p>
         </div>
         {student && (
-          <Badge variant="secondary" className="text-sm px-3 py-1 bg-violet-50 dark:bg-violet-900/20 text-violet-700 dark:text-violet-400 border-violet-200 dark:border-violet-800">
+          <Badge
+            variant="secondary"
+            className="text-sm px-3 py-1 bg-violet-50 dark:bg-violet-900/20 text-violet-700 dark:text-violet-400 border-violet-200 dark:border-violet-800"
+          >
             <GraduationCap className="h-3.5 w-3.5 mr-1.5" />
             {student.className} • Roll {student.rollNumber}
           </Badge>
@@ -86,13 +95,21 @@ export function StudentClasses() {
               <GraduationCap className="h-6 w-6" />
             </div>
             <div className="flex-1">
-              <h3 className="font-semibold text-gray-900 dark:text-gray-100">Welcome, {firstName}!</h3>
-              <p className="text-sm text-gray-500 dark:text-gray-400">Class {student.className} • {mySubjects.length} Subjects</p>
+              <h3 className="font-semibold text-gray-900 dark:text-gray-100">
+                Welcome, {firstName}!
+              </h3>
+              <p className="text-sm text-gray-500 dark:text-gray-400">
+                Class {student.className} • {mySubjects.length} Subjects
+              </p>
             </div>
             <div className="hidden sm:flex items-center gap-6 text-center">
               <div>
-                <p className="text-lg font-bold text-violet-600 dark:text-violet-400">{mySubjects.length}</p>
-                <p className="text-[10px] text-gray-500 dark:text-gray-400 uppercase tracking-wide">Subjects</p>
+                <p className="text-lg font-bold text-violet-600 dark:text-violet-400">
+                  {mySubjects.length}
+                </p>
+                <p className="text-[10px] text-gray-500 dark:text-gray-400 uppercase tracking-wide">
+                  Subjects
+                </p>
               </div>
             </div>
           </div>
@@ -104,8 +121,12 @@ export function StudentClasses() {
         <Card className="rounded-xl shadow-sm">
           <CardContent className="py-16 text-center">
             <BookOpen className="h-12 w-12 mx-auto text-gray-300 dark:text-gray-600 mb-3" />
-            <p className="text-gray-500 dark:text-gray-400 font-medium">No subjects found</p>
-            <p className="text-sm text-gray-400 dark:text-gray-500 mt-1">Your class subjects will appear here</p>
+            <p className="text-gray-500 dark:text-gray-400 font-medium">
+              No subjects found
+            </p>
+            <p className="text-sm text-gray-400 dark:text-gray-500 mt-1">
+              Your class subjects will appear here
+            </p>
           </CardContent>
         </Card>
       ) : (
@@ -116,19 +137,28 @@ export function StudentClasses() {
               className="group relative rounded-xl border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-sm hover:shadow-md transition-all duration-200 overflow-hidden hover:border-violet-200 dark:border-violet-800 dark:hover:border-violet-800"
             >
               {/* Color Accent */}
-              <div className={`h-1.5 bg-gradient-to-r ${subjectColors[i % subjectColors.length]}`} />
+              <div
+                className={`h-1.5 bg-gradient-to-r ${subjectColors[i % subjectColors.length]}`}
+              />
 
               <div className="p-5">
                 <div className="flex items-start justify-between mb-4">
-                  <div className={`p-2.5 rounded-lg bg-gradient-to-br ${subjectColors[i % subjectColors.length]} text-white shadow-sm`}>
+                  <div
+                    className={`p-2.5 rounded-lg bg-gradient-to-br ${subjectColors[i % subjectColors.length]} text-white shadow-sm`}
+                  >
                     <BookOpen className="h-5 w-5" />
                   </div>
-                  <Badge variant="outline" className="text-[10px] font-mono text-gray-500 dark:text-gray-400 border-gray-200 dark:border-gray-700">
+                  <Badge
+                    variant="outline"
+                    className="text-[10px] font-mono text-gray-500 dark:text-gray-400 border-gray-200 dark:border-gray-700"
+                  >
                     {subject.code}
                   </Badge>
                 </div>
 
-                <h3 className="font-semibold text-gray-900 dark:text-gray-100 text-sm mb-3 line-clamp-1">{subject.name}</h3>
+                <h3 className="font-semibold text-gray-900 dark:text-gray-100 text-sm mb-3 line-clamp-1">
+                  {subject.name}
+                </h3>
 
                 <div className="space-y-2">
                   <div className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">

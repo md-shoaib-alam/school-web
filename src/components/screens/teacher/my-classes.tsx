@@ -1,19 +1,36 @@
-'use client';
+"use client";
 
-import { useEffect, useState } from 'react';
-import { Card, CardContent } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Skeleton } from '@/components/ui/skeleton';
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { ScrollArea } from '@/components/ui/scroll-area';
+import { useEffect, useState } from "react";
+import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import {
-  Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription
-} from '@/components/ui/dialog';
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from "@/components/ui/dialog";
 import {
-  Table, TableBody, TableCell, TableHead, TableHeader, TableRow
-} from '@/components/ui/table';
-import { School, Users, BookOpen, ChevronRight, X, Mail, Phone } from 'lucide-react';
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import {
+  School,
+  Users,
+  BookOpen,
+  ChevronRight,
+  X,
+  Mail,
+  Phone,
+} from "lucide-react";
 
 interface ClassInfo {
   id: string;
@@ -60,15 +77,15 @@ export function TeacherClasses() {
     setLoading(true);
     try {
       const [classesRes, subjectsRes] = await Promise.all([
-        fetch('/api/classes'),
-        fetch('/api/subjects'),
+        fetch("/api/classes"),
+        fetch("/api/subjects"),
       ]);
       const classData = await classesRes.json();
       const subjectData = await subjectsRes.json();
       setClasses(classData);
       setSubjects(subjectData);
     } catch (error) {
-      console.error('Error fetching classes:', error);
+      console.error("Error fetching classes:", error);
     } finally {
       setLoading(false);
     }
@@ -83,22 +100,29 @@ export function TeacherClasses() {
       const data = await res.json();
       setStudents(data);
     } catch (error) {
-      console.error('Error fetching students:', error);
+      console.error("Error fetching students:", error);
     } finally {
       setStudentsLoading(false);
     }
   };
 
   const getClassSubjects = (className: string) => {
-    return subjects.filter(s => s.className === className);
+    return subjects.filter((s) => s.className === className);
   };
 
   const getInitials = (name: string) => {
-    return name.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase();
+    return name
+      .split(" ")
+      .map((n) => n[0])
+      .join("")
+      .slice(0, 2)
+      .toUpperCase();
   };
 
   const getGenderColor = (gender: string) => {
-    return gender === 'male' ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300' : 'bg-pink-100 dark:bg-pink-900/30 text-pink-700 dark:text-pink-300';
+    return gender === "male"
+      ? "bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300"
+      : "bg-pink-100 dark:bg-pink-900/30 text-pink-700 dark:text-pink-300";
   };
 
   if (loading) {
@@ -120,9 +144,12 @@ export function TeacherClasses() {
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100">My Classes</h2>
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
+          My Classes
+        </h2>
         <p className="text-gray-500 dark:text-gray-400 mt-1">
-          {classes.length} classes assigned to you. Click on a class to view student details.
+          {classes.length} classes assigned to you. Click on a class to view
+          student details.
         </p>
       </div>
 
@@ -142,8 +169,12 @@ export function TeacherClasses() {
                       <School className="h-6 w-6 text-blue-500 dark:text-blue-400" />
                     </div>
                     <div>
-                      <h3 className="font-semibold text-gray-900 dark:text-gray-100">{cls.name}</h3>
-                      <p className="text-sm text-gray-400 dark:text-gray-500">Section {cls.section}</p>
+                      <h3 className="font-semibold text-gray-900 dark:text-gray-100">
+                        {cls.name}
+                      </h3>
+                      <p className="text-sm text-gray-400 dark:text-gray-500">
+                        Section {cls.section}
+                      </p>
                     </div>
                   </div>
                   <ChevronRight className="h-5 w-5 text-gray-300 dark:text-gray-600 group-hover:text-blue-400 dark:group-hover:text-blue-400 transition-colors" />
@@ -153,12 +184,16 @@ export function TeacherClasses() {
                   <div className="flex items-center gap-1.5 text-sm text-gray-600 dark:text-gray-400">
                     <Users className="h-3.5 w-3.5 text-blue-500 dark:text-blue-400" />
                     <span className="font-medium">{cls.studentCount}</span>
-                    <span className="text-gray-400 dark:text-gray-500">Students</span>
+                    <span className="text-gray-400 dark:text-gray-500">
+                      Students
+                    </span>
                   </div>
                   <div className="flex items-center gap-1.5 text-sm text-gray-600 dark:text-gray-400">
                     <BookOpen className="h-3.5 w-3.5 text-blue-500 dark:text-blue-400" />
                     <span className="font-medium">{classSubjects.length}</span>
-                    <span className="text-gray-400 dark:text-gray-500">Subjects</span>
+                    <span className="text-gray-400 dark:text-gray-500">
+                      Subjects
+                    </span>
                   </div>
                 </div>
 
@@ -173,12 +208,17 @@ export function TeacherClasses() {
                     </Badge>
                   ))}
                   {classSubjects.length > 4 && (
-                    <Badge variant="secondary" className="text-[10px] bg-gray-50 dark:bg-gray-800 text-gray-500 dark:text-gray-400 px-2 py-0.5">
+                    <Badge
+                      variant="secondary"
+                      className="text-[10px] bg-gray-50 dark:bg-gray-800 text-gray-500 dark:text-gray-400 px-2 py-0.5"
+                    >
                       +{classSubjects.length - 4} more
                     </Badge>
                   )}
                   {classSubjects.length === 0 && (
-                    <span className="text-xs text-gray-400 dark:text-gray-500">No subjects assigned</span>
+                    <span className="text-xs text-gray-400 dark:text-gray-500">
+                      No subjects assigned
+                    </span>
                   )}
                 </div>
               </CardContent>
@@ -190,8 +230,12 @@ export function TeacherClasses() {
       {classes.length === 0 && (
         <div className="text-center py-16">
           <School className="h-12 w-12 text-gray-300 dark:text-gray-700 mx-auto mb-4" />
-          <h3 className="text-lg font-medium text-gray-500 dark:text-gray-400">No Classes Found</h3>
-          <p className="text-sm text-gray-400 dark:text-gray-500 mt-1">No classes are currently assigned to you.</p>
+          <h3 className="text-lg font-medium text-gray-500 dark:text-gray-400">
+            No Classes Found
+          </h3>
+          <p className="text-sm text-gray-400 dark:text-gray-500 mt-1">
+            No classes are currently assigned to you.
+          </p>
         </div>
       )}
 
@@ -226,17 +270,32 @@ export function TeacherClasses() {
                 <Table>
                   <TableHeader>
                     <TableRow className="bg-gray-50/80 dark:bg-gray-800/50 hover:bg-gray-50/80 dark:hover:bg-gray-800/50">
-                      <TableHead className="text-xs font-semibold text-gray-500 dark:text-gray-400 w-[50px]">#</TableHead>
-                      <TableHead className="text-xs font-semibold text-gray-500 dark:text-gray-400">Student</TableHead>
-                      <TableHead className="text-xs font-semibold text-gray-500 dark:text-gray-400 hidden sm:table-cell">Roll No</TableHead>
-                      <TableHead className="text-xs font-semibold text-gray-500 dark:text-gray-400 hidden md:table-cell">Gender</TableHead>
-                      <TableHead className="text-xs font-semibold text-gray-500 dark:text-gray-400 hidden md:table-cell">Parent</TableHead>
+                      <TableHead className="text-xs font-semibold text-gray-500 dark:text-gray-400 w-[50px]">
+                        #
+                      </TableHead>
+                      <TableHead className="text-xs font-semibold text-gray-500 dark:text-gray-400">
+                        Student
+                      </TableHead>
+                      <TableHead className="text-xs font-semibold text-gray-500 dark:text-gray-400 hidden sm:table-cell">
+                        Roll No
+                      </TableHead>
+                      <TableHead className="text-xs font-semibold text-gray-500 dark:text-gray-400 hidden md:table-cell">
+                        Gender
+                      </TableHead>
+                      <TableHead className="text-xs font-semibold text-gray-500 dark:text-gray-400 hidden md:table-cell">
+                        Parent
+                      </TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
                     {students.map((student, index) => (
-                      <TableRow key={student.id} className="hover:bg-blue-50/30 dark:hover:bg-blue-900/10 transition-colors">
-                        <TableCell className="text-sm text-gray-400 dark:text-gray-500 font-mono">{index + 1}</TableCell>
+                      <TableRow
+                        key={student.id}
+                        className="hover:bg-blue-50/30 dark:hover:bg-blue-900/10 transition-colors"
+                      >
+                        <TableCell className="text-sm text-gray-400 dark:text-gray-500 font-mono">
+                          {index + 1}
+                        </TableCell>
                         <TableCell>
                           <div className="flex items-center gap-3">
                             <Avatar className="h-8 w-8">
@@ -245,8 +304,12 @@ export function TeacherClasses() {
                               </AvatarFallback>
                             </Avatar>
                             <div>
-                              <p className="text-sm font-medium text-gray-800 dark:text-gray-200">{student.name}</p>
-                              <p className="text-xs text-gray-400 dark:text-gray-500 sm:hidden">{student.rollNumber}</p>
+                              <p className="text-sm font-medium text-gray-800 dark:text-gray-200">
+                                {student.name}
+                              </p>
+                              <p className="text-xs text-gray-400 dark:text-gray-500 sm:hidden">
+                                {student.rollNumber}
+                              </p>
                             </div>
                           </div>
                         </TableCell>
@@ -254,12 +317,15 @@ export function TeacherClasses() {
                           {student.rollNumber}
                         </TableCell>
                         <TableCell className="hidden md:table-cell">
-                          <Badge variant="secondary" className={`text-[10px] px-2 py-0.5 ${getGenderColor(student.gender)}`}>
+                          <Badge
+                            variant="secondary"
+                            className={`text-[10px] px-2 py-0.5 ${getGenderColor(student.gender)}`}
+                          >
                             {student.gender}
                           </Badge>
                         </TableCell>
                         <TableCell className="text-sm text-gray-500 dark:text-gray-400 hidden md:table-cell">
-                          {student.parentName || '—'}
+                          {student.parentName || "—"}
                         </TableCell>
                       </TableRow>
                     ))}
@@ -269,7 +335,9 @@ export function TeacherClasses() {
             ) : (
               <div className="text-center py-12">
                 <Users className="h-10 w-10 text-gray-300 dark:text-gray-700 mx-auto mb-3" />
-                <p className="text-gray-400 dark:text-gray-500 text-sm">No students in this class yet</p>
+                <p className="text-gray-400 dark:text-gray-500 text-sm">
+                  No students in this class yet
+                </p>
               </div>
             )}
           </div>

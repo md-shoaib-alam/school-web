@@ -1,15 +1,25 @@
-'use client';
+"use client";
 
-import { useEffect, useState, useCallback, useMemo } from 'react';
-import { useAppStore } from '@/store/use-app-store';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Skeleton } from '@/components/ui/skeleton';
-import { ScrollArea } from '@/components/ui/scroll-area';
-import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
-import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer } from 'recharts';
-import { UserCheck, Calendar, CheckCircle2, XCircle, Clock } from 'lucide-react';
-import type { StudentInfo } from '@/lib/types';
+import { useEffect, useState, useCallback, useMemo } from "react";
+import { useAppStore } from "@/store/use-app-store";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Skeleton } from "@/components/ui/skeleton";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import {
+  ChartContainer,
+  ChartTooltip,
+  ChartTooltipContent,
+} from "@/components/ui/chart";
+import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer } from "recharts";
+import {
+  UserCheck,
+  Calendar,
+  CheckCircle2,
+  XCircle,
+  Clock,
+} from "lucide-react";
+import type { StudentInfo } from "@/lib/types";
 
 interface AttendanceRecord {
   id: string;
@@ -26,12 +36,22 @@ interface MonthlyData {
 }
 
 const chartConfig = {
-  rate: { label: 'Attendance %', color: '#8b5cf6' },
+  rate: { label: "Attendance %", color: "#8b5cf6" },
 };
 
 const MONTH_NAMES = [
-  'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-  'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',
+  "Jan",
+  "Feb",
+  "Mar",
+  "Apr",
+  "May",
+  "Jun",
+  "Jul",
+  "Aug",
+  "Sep",
+  "Oct",
+  "Nov",
+  "Dec",
 ];
 
 export function StudentAttendance() {
@@ -41,33 +61,40 @@ export function StudentAttendance() {
   const [attendanceData, setAttendanceData] = useState<AttendanceRecord[]>([]);
 
   const student = useMemo(
-    () => students.find(s => s.email === currentUser?.email) || students[0] || null,
+    () =>
+      students.find((s) => s.email === currentUser?.email) ||
+      students[0] ||
+      null,
     [students, currentUser?.email],
   );
 
-  const studentId = student?.id || '';
-  const classId = student?.classId || '';
+  const studentId = student?.id || "";
+  const classId = student?.classId || "";
 
   const fetchData = useCallback(async () => {
     setLoading(true);
     try {
       const [studentsRes] = await Promise.all([
-        fetch('/api/students').then(r => r.json()),
+        fetch("/api/students").then((r) => r.json()),
       ]);
       setStudents(studentsRes);
 
       // Use the matched student's classId, or first student's classId
-      const matchedStudent = studentsRes.find(
-        (s: StudentInfo) => s.email === currentUser?.email,
-      ) || studentsRes[0];
+      const matchedStudent =
+        studentsRes.find((s: StudentInfo) => s.email === currentUser?.email) ||
+        studentsRes[0];
       if (!matchedStudent) {
         setLoading(false);
         return;
       }
 
-      const attRes = await fetch(`/api/attendance?classId=${matchedStudent.classId}`);
+      const attRes = await fetch(
+        `/api/attendance?classId=${matchedStudent.classId}`,
+      );
       const attData: AttendanceRecord[] = await attRes.json();
-      setAttendanceData(attData.filter(a => a.studentId === matchedStudent.id));
+      setAttendanceData(
+        attData.filter((a) => a.studentId === matchedStudent.id),
+      );
     } catch (e) {
       console.error(e);
     } finally {
@@ -81,9 +108,9 @@ export function StudentAttendance() {
 
   // Computed: attendance stats
   const stats = useMemo(() => {
-    const present = attendanceData.filter(a => a.status === 'present').length;
-    const absent = attendanceData.filter(a => a.status === 'absent').length;
-    const late = attendanceData.filter(a => a.status === 'late').length;
+    const present = attendanceData.filter((a) => a.status === "present").length;
+    const absent = attendanceData.filter((a) => a.status === "absent").length;
+    const late = attendanceData.filter((a) => a.status === "late").length;
     const total = attendanceData.length;
     const rate = total > 0 ? Math.round(((present + late) / total) * 100) : 0;
     return { present, absent, late, total, rate };
@@ -100,17 +127,18 @@ export function StudentAttendance() {
       const month = d.getMonth();
       const label = `${MONTH_NAMES[month]}`;
 
-      const monthRecords = attendanceData.filter(a => {
+      const monthRecords = attendanceData.filter((a) => {
         const date = new Date(a.date);
         return date.getFullYear() === year && date.getMonth() === month;
       });
 
       const presentCount = monthRecords.filter(
-        a => a.status === 'present' || a.status === 'late',
+        (a) => a.status === "present" || a.status === "late",
       ).length;
-      const rate = monthRecords.length > 0
-        ? Math.round((presentCount / monthRecords.length) * 100)
-        : 0;
+      const rate =
+        monthRecords.length > 0
+          ? Math.round((presentCount / monthRecords.length) * 100)
+          : 0;
 
       months.push({ month: label, rate });
     }
@@ -120,19 +148,23 @@ export function StudentAttendance() {
 
   // Last 30 days grid
   const last30Days = useMemo(() => {
-    const days: { date: Date; status: 'present' | 'absent' | 'late' | 'none'; dayOfWeek: number }[] = [];
+    const days: {
+      date: Date;
+      status: "present" | "absent" | "late" | "none";
+      dayOfWeek: number;
+    }[] = [];
     const today = new Date();
 
     for (let i = 29; i >= 0; i--) {
       const d = new Date(today);
       d.setDate(today.getDate() - i);
-      const dateStr = d.toISOString().split('T')[0];
+      const dateStr = d.toISOString().split("T")[0];
       const dayOfWeek = d.getDay();
-      const record = attendanceData.find(a => a.date === dateStr);
+      const record = attendanceData.find((a) => a.date === dateStr);
 
-      let status: 'present' | 'absent' | 'late' | 'none' = 'none';
+      let status: "present" | "absent" | "late" | "none" = "none";
       if (record) {
-        status = record.status as 'present' | 'absent' | 'late';
+        status = record.status as "present" | "absent" | "late";
       }
       // If no record and it's a weekend, keep as 'none'
       // If no record and weekday, also keep as 'none' (could be future or unrecorded)
@@ -150,10 +182,14 @@ export function StudentAttendance() {
 
   const statusColor = (status: string) => {
     switch (status) {
-      case 'present': return 'bg-emerald-400';
-      case 'absent': return 'bg-red-400';
-      case 'late': return 'bg-amber-400';
-      default: return 'bg-gray-200 dark:bg-gray-700';
+      case "present":
+        return "bg-emerald-400";
+      case "absent":
+        return "bg-red-400";
+      case "late":
+        return "bg-amber-400";
+      default:
+        return "bg-gray-200 dark:bg-gray-700";
     }
   };
 
@@ -163,7 +199,9 @@ export function StudentAttendance() {
     <div className="space-y-6">
       {/* Header */}
       <div>
-        <h2 className="text-xl font-bold text-gray-900 dark:text-gray-100">My Attendance</h2>
+        <h2 className="text-xl font-bold text-gray-900 dark:text-gray-100">
+          My Attendance
+        </h2>
         <p className="text-sm text-gray-500 dark:text-gray-400 dark:text-gray-500 mt-0.5">
           Track your daily attendance and monthly trends
         </p>
@@ -177,15 +215,25 @@ export function StudentAttendance() {
             <div className="relative w-44 h-44">
               <svg className="w-full h-full -rotate-90" viewBox="0 0 160 160">
                 <circle
-                  cx="80" cy="80" r={circleRadius}
+                  cx="80"
+                  cy="80"
+                  r={circleRadius}
                   fill="none"
                   stroke="#f3f4f6"
                   strokeWidth="10"
                 />
                 <circle
-                  cx="80" cy="80" r={circleRadius}
+                  cx="80"
+                  cy="80"
+                  r={circleRadius}
                   fill="none"
-                  stroke={stats.rate >= 85 ? '#8b5cf6' : stats.rate >= 75 ? '#f59e0b' : '#ef4444'}
+                  stroke={
+                    stats.rate >= 85
+                      ? "#8b5cf6"
+                      : stats.rate >= 75
+                        ? "#f59e0b"
+                        : "#ef4444"
+                  }
                   strokeWidth="10"
                   strokeLinecap="round"
                   strokeDasharray={circumference}
@@ -194,15 +242,19 @@ export function StudentAttendance() {
                 />
               </svg>
               <div className="absolute inset-0 flex flex-col items-center justify-center">
-                <span className="text-3xl font-bold text-gray-900 dark:text-gray-100">{stats.rate}%</span>
-                <span className="text-xs text-gray-500 dark:text-gray-400 dark:text-gray-500">Attendance</span>
+                <span className="text-3xl font-bold text-gray-900 dark:text-gray-100">
+                  {stats.rate}%
+                </span>
+                <span className="text-xs text-gray-500 dark:text-gray-400 dark:text-gray-500">
+                  Attendance
+                </span>
               </div>
             </div>
             <p className="text-sm font-medium text-gray-600 dark:text-gray-400 dark:text-gray-500 mt-4">
-              {student ? student.name : 'Student'}
+              {student ? student.name : "Student"}
             </p>
             <p className="text-xs text-gray-400 dark:text-gray-500">
-              {student?.className || 'Class'} &middot; {stats.total} total days
+              {student?.className || "Class"} &middot; {stats.total} total days
             </p>
           </CardContent>
         </Card>
@@ -222,11 +274,18 @@ export function StudentAttendance() {
                   <CheckCircle2 className="h-5 w-5 text-emerald-600" />
                 </div>
                 <div>
-                  <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">{stats.present}</p>
-                  <p className="text-xs text-gray-500 dark:text-gray-400 dark:text-gray-500">Present Days</p>
+                  <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">
+                    {stats.present}
+                  </p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400 dark:text-gray-500">
+                    Present Days
+                  </p>
                 </div>
                 <Badge className="bg-emerald-500 text-white text-[10px] ml-auto shrink-0">
-                  {stats.total > 0 ? Math.round((stats.present / stats.total) * 100) : 0}%
+                  {stats.total > 0
+                    ? Math.round((stats.present / stats.total) * 100)
+                    : 0}
+                  %
                 </Badge>
               </div>
 
@@ -235,11 +294,18 @@ export function StudentAttendance() {
                   <XCircle className="h-5 w-5 text-red-600" />
                 </div>
                 <div>
-                  <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">{stats.absent}</p>
-                  <p className="text-xs text-gray-500 dark:text-gray-400 dark:text-gray-500">Absent Days</p>
+                  <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">
+                    {stats.absent}
+                  </p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400 dark:text-gray-500">
+                    Absent Days
+                  </p>
                 </div>
                 <Badge className="bg-red-500 text-white text-[10px] ml-auto shrink-0">
-                  {stats.total > 0 ? Math.round((stats.absent / stats.total) * 100) : 0}%
+                  {stats.total > 0
+                    ? Math.round((stats.absent / stats.total) * 100)
+                    : 0}
+                  %
                 </Badge>
               </div>
 
@@ -248,11 +314,18 @@ export function StudentAttendance() {
                   <Clock className="h-5 w-5 text-amber-600" />
                 </div>
                 <div>
-                  <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">{stats.late}</p>
-                  <p className="text-xs text-gray-500 dark:text-gray-400 dark:text-gray-500">Late Days</p>
+                  <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">
+                    {stats.late}
+                  </p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400 dark:text-gray-500">
+                    Late Days
+                  </p>
                 </div>
                 <Badge className="bg-amber-500 text-white text-[10px] ml-auto shrink-0">
-                  {stats.total > 0 ? Math.round((stats.late / stats.total) * 100) : 0}%
+                  {stats.total > 0
+                    ? Math.round((stats.late / stats.total) * 100)
+                    : 0}
+                  %
                 </Badge>
               </div>
             </div>
@@ -261,19 +334,27 @@ export function StudentAttendance() {
             <div className="flex items-center gap-4 mt-5 pt-4 border-t border-gray-100">
               <div className="flex items-center gap-1.5">
                 <div className="w-3 h-3 rounded-sm bg-emerald-400" />
-                <span className="text-xs text-gray-500 dark:text-gray-400 dark:text-gray-500">Present</span>
+                <span className="text-xs text-gray-500 dark:text-gray-400 dark:text-gray-500">
+                  Present
+                </span>
               </div>
               <div className="flex items-center gap-1.5">
                 <div className="w-3 h-3 rounded-sm bg-red-400" />
-                <span className="text-xs text-gray-500 dark:text-gray-400 dark:text-gray-500">Absent</span>
+                <span className="text-xs text-gray-500 dark:text-gray-400 dark:text-gray-500">
+                  Absent
+                </span>
               </div>
               <div className="flex items-center gap-1.5">
                 <div className="w-3 h-3 rounded-sm bg-amber-400" />
-                <span className="text-xs text-gray-500 dark:text-gray-400 dark:text-gray-500">Late</span>
+                <span className="text-xs text-gray-500 dark:text-gray-400 dark:text-gray-500">
+                  Late
+                </span>
               </div>
               <div className="flex items-center gap-1.5">
                 <div className="w-3 h-3 rounded-sm bg-gray-200 dark:bg-gray-700" />
-                <span className="text-xs text-gray-500 dark:text-gray-400 dark:text-gray-500">No Data</span>
+                <span className="text-xs text-gray-500 dark:text-gray-400 dark:text-gray-500">
+                  No Data
+                </span>
               </div>
             </div>
           </CardContent>
@@ -289,7 +370,7 @@ export function StudentAttendance() {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          {monthlyData.some(m => m.rate > 0) ? (
+          {monthlyData.some((m) => m.rate > 0) ? (
             <ChartContainer config={chartConfig} className="h-[260px] w-full">
               <BarChart data={monthlyData} margin={{ left: -10, right: 10 }}>
                 <XAxis
@@ -306,7 +387,16 @@ export function StudentAttendance() {
                   tickFormatter={(v: string | number) => `${Number(v)}%`}
                 />
                 <ChartTooltip
-                  content={<ChartTooltipContent formatter={((v: string | number) => [`${v}%`, 'Attendance']) as never} />}
+                  content={
+                    <ChartTooltipContent
+                      formatter={
+                        ((v: string | number) => [
+                          `${v}%`,
+                          "Attendance",
+                        ]) as never
+                      }
+                    />
+                  }
                 />
                 <Bar
                   dataKey="rate"
@@ -343,7 +433,7 @@ export function StudentAttendance() {
         <CardContent>
           <div className="grid grid-cols-7 gap-1.5 sm:gap-2">
             {/* Day labels */}
-            {['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'].map(d => (
+            {["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"].map((d) => (
               <div
                 key={d}
                 className="text-center text-[10px] sm:text-xs font-medium text-gray-400 dark:text-gray-500 py-1"
@@ -353,9 +443,11 @@ export function StudentAttendance() {
             ))}
 
             {/* Pad to align first day */}
-            {Array.from({ length: last30Days[0]?.dayOfWeek ?? 0 }).map((_, i) => (
-              <div key={`pad-${i}`} className="aspect-square" />
-            ))}
+            {Array.from({ length: last30Days[0]?.dayOfWeek ?? 0 }).map(
+              (_, i) => (
+                <div key={`pad-${i}`} className="aspect-square" />
+              ),
+            )}
 
             {/* Day squares */}
             {last30Days.map(({ date, status }, idx) => {
@@ -370,12 +462,20 @@ export function StudentAttendance() {
                     relative aspect-square rounded-lg flex items-center justify-center
                     text-[10px] sm:text-xs font-medium transition-all
                     ${statusColor(status)}
-                    ${isToday ? 'ring-2 ring-violet-500 ring-offset-1' : ''}
-                    ${isWeekend && status === 'none' ? 'opacity-40' : ''}
+                    ${isToday ? "ring-2 ring-violet-500 ring-offset-1" : ""}
+                    ${isWeekend && status === "none" ? "opacity-40" : ""}
                   `}
-                  title={`${date.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}: ${status === 'none' ? 'No data' : status.charAt(0).toUpperCase() + status.slice(1)}`}
+                  title={`${date.toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" })}: ${status === "none" ? "No data" : status.charAt(0).toUpperCase() + status.slice(1)}`}
                 >
-                  <span className={status === 'none' && !isWeekend ? 'text-gray-400 dark:text-gray-500' : isWeekend && status === 'none' ? 'text-gray-300' : 'text-white'}>
+                  <span
+                    className={
+                      status === "none" && !isWeekend
+                        ? "text-gray-400 dark:text-gray-500"
+                        : isWeekend && status === "none"
+                          ? "text-gray-300"
+                          : "text-white"
+                    }
+                  >
                     {dayNum}
                   </span>
                 </div>

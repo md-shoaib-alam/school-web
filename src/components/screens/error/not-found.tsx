@@ -1,14 +1,20 @@
-'use client';
+"use client";
 
-import { useAppStore } from '@/store/use-app-store';
-import { Button } from '@/components/ui/button';
-import { GraduationCap, Home, ArrowLeft, RefreshCw, LogOut } from 'lucide-react';
+import { useAppStore } from "@/store/use-app-store";
+import { Button } from "@/components/ui/button";
+import {
+  GraduationCap,
+  Home,
+  ArrowLeft,
+  RefreshCw,
+  LogOut,
+} from "lucide-react";
 
 export function NotFoundScreen() {
   const { setCurrentScreen, logout } = useAppStore();
 
   const goHome = () => {
-    setCurrentScreen('dashboard');
+    setCurrentScreen("dashboard");
   };
 
   const goBack = () => {
@@ -69,7 +75,8 @@ export function NotFoundScreen() {
 
         {/* Description */}
         <p className="text-gray-500 dark:text-gray-400 mt-3 text-base leading-relaxed animate-[fade-up_0.6s_ease-out_0.65s_forwards] opacity-0">
-          Oops! The page you&apos;re looking for doesn&apos;t exist or has been moved.
+          Oops! The page you&apos;re looking for doesn&apos;t exist or has been
+          moved.
           <br />
           Let&apos;s get you back on track!
         </p>

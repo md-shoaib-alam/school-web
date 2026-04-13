@@ -1,14 +1,14 @@
-'use client';
+"use client";
 
-import { useState, useEffect, useMemo, useCallback } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Skeleton } from '@/components/ui/skeleton';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
-import { Switch } from '@/components/ui/switch';
+import { useState, useEffect, useMemo, useCallback } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Switch } from "@/components/ui/switch";
 import {
   Dialog,
   DialogContent,
@@ -16,14 +16,14 @@ import {
   DialogTitle,
   DialogDescription,
   DialogFooter,
-} from '@/components/ui/dialog';
+} from "@/components/ui/dialog";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
+} from "@/components/ui/select";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -34,9 +34,9 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
   AlertDialogTrigger,
-} from '@/components/ui/alert-dialog';
-import { ScrollArea } from '@/components/ui/scroll-area';
-import { Separator } from '@/components/ui/separator';
+} from "@/components/ui/alert-dialog";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Separator } from "@/components/ui/separator";
 import {
   ChevronLeft,
   ChevronRight,
@@ -49,55 +49,73 @@ import {
   X,
   Loader2,
   Eye,
-} from 'lucide-react';
-import { useToast } from '@/hooks/use-toast';
-import { useAppStore } from '@/store/use-app-store';
-import { useModulePermissions } from '@/hooks/use-permissions';
+} from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
+import { useAppStore } from "@/store/use-app-store";
+import { useModulePermissions } from "@/hooks/use-permissions";
 
 // ---------------------------------------------------------------------------
 // Constants
 // ---------------------------------------------------------------------------
 
 const EVENT_TYPE_COLORS: Record<string, string> = {
-  exam: '#ef4444',
-  holiday: '#10b981',
-  event: '#3b82f6',
-  meeting: '#f97316',
-  sports: '#8b5cf6',
-  cultural: '#ec4899',
-  deadline: '#f59e0b',
-  other: '#6b7280',
-  general: '#10b981',
+  exam: "#ef4444",
+  holiday: "#10b981",
+  event: "#3b82f6",
+  meeting: "#f97316",
+  sports: "#8b5cf6",
+  cultural: "#ec4899",
+  deadline: "#f59e0b",
+  other: "#6b7280",
+  general: "#10b981",
 };
 
 const EVENT_TYPE_LABELS: Record<string, string> = {
-  exam: 'Exam',
-  holiday: 'Holiday',
-  event: 'Event',
-  meeting: 'Meeting',
-  sports: 'Sports',
-  cultural: 'Cultural',
-  deadline: 'Deadline',
-  other: 'Other',
-  general: 'General',
+  exam: "Exam",
+  holiday: "Holiday",
+  event: "Event",
+  meeting: "Meeting",
+  sports: "Sports",
+  cultural: "Cultural",
+  deadline: "Deadline",
+  other: "Other",
+  general: "General",
 };
 
 const TARGET_ROLE_LABELS: Record<string, string> = {
-  all: 'Everyone',
-  admin: 'Admins',
-  teacher: 'Teachers',
-  student: 'Students',
-  parent: 'Parents',
+  all: "Everyone",
+  admin: "Admins",
+  teacher: "Teachers",
+  student: "Students",
+  parent: "Parents",
 };
 
-const WEEKDAY_LABELS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+const WEEKDAY_LABELS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 const MONTH_NAMES = [
-  'January', 'February', 'March', 'April', 'May', 'June',
-  'July', 'August', 'September', 'October', 'November', 'December',
+  "January",
+  "February",
+  "March",
+  "April",
+  "May",
+  "June",
+  "July",
+  "August",
+  "September",
+  "October",
+  "November",
+  "December",
 ];
 
 const ALL_EVENT_TYPES = [
-  'exam', 'holiday', 'event', 'meeting', 'sports', 'cultural', 'deadline', 'other', 'general',
+  "exam",
+  "holiday",
+  "event",
+  "meeting",
+  "sports",
+  "cultural",
+  "deadline",
+  "other",
+  "general",
 ];
 
 // ---------------------------------------------------------------------------
@@ -131,15 +149,15 @@ interface EventFormData {
 }
 
 const EMPTY_FORM: EventFormData = {
-  title: '',
-  description: '',
-  date: '',
-  endDate: '',
-  type: 'event',
-  targetRole: 'all',
-  color: '#3b82f6',
+  title: "",
+  description: "",
+  date: "",
+  endDate: "",
+  type: "event",
+  targetRole: "all",
+  color: "#3b82f6",
   allDay: true,
-  location: '',
+  location: "",
 };
 
 // ---------------------------------------------------------------------------
@@ -155,8 +173,8 @@ function getFirstDayOfWeek(year: number, month: number): number {
 }
 
 function isSameDay(d1: string | Date, d2: string | Date): boolean {
-  const a = typeof d1 === 'string' ? d1 : formatDateISO(d1);
-  const b = typeof d2 === 'string' ? d2 : formatDateISO(d2);
+  const a = typeof d1 === "string" ? d1 : formatDateISO(d1);
+  const b = typeof d2 === "string" ? d2 : formatDateISO(d2);
   return a === b;
 }
 
@@ -166,18 +184,18 @@ function isToday(dateStr: string): boolean {
 
 function formatDateISO(d: Date): string {
   const y = d.getFullYear();
-  const m = String(d.getMonth() + 1).padStart(2, '0');
-  const day = String(d.getDate()).padStart(2, '0');
+  const m = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
   return `${y}-${m}-${day}`;
 }
 
 function formatDisplayDate(dateStr: string): string {
-  const d = new Date(dateStr + 'T00:00:00');
-  return d.toLocaleDateString('en-US', {
-    weekday: 'long',
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
+  const d = new Date(dateStr + "T00:00:00");
+  return d.toLocaleDateString("en-US", {
+    weekday: "long",
+    year: "numeric",
+    month: "long",
+    day: "numeric",
   });
 }
 
@@ -193,7 +211,7 @@ function eventFallsOnDate(ev: CalendarEvent, dayStr: string): boolean {
 // ---------------------------------------------------------------------------
 
 export function AdminCalendar() {
-  const { canCreate, canEdit, canDelete } = useModulePermissions('calendar');
+  const { canCreate, canEdit, canDelete } = useModulePermissions("calendar");
   const { toast } = useToast();
   const currentTenantId = useAppStore((s) => s.currentTenantId);
 
@@ -201,10 +219,12 @@ export function AdminCalendar() {
   const today = useMemo(() => new Date(), []);
   const [currentYear, setCurrentYear] = useState(today.getFullYear());
   const [currentMonth, setCurrentMonth] = useState(today.getMonth());
-  const [selectedDate, setSelectedDate] = useState<string | null>(formatDateISO(today));
+  const [selectedDate, setSelectedDate] = useState<string | null>(
+    formatDateISO(today),
+  );
   const [events, setEvents] = useState<CalendarEvent[]>([]);
   const [loading, setLoading] = useState(true);
-  const [typeFilter, setTypeFilter] = useState<string>('all');
+  const [typeFilter, setTypeFilter] = useState<string>("all");
 
   // Dialog state
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -215,7 +235,7 @@ export function AdminCalendar() {
 
   // --- Derived data ---
   const monthKey = useMemo(
-    () => `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}`,
+    () => `${currentYear}-${String(currentMonth + 1).padStart(2, "0")}`,
     [currentYear, currentMonth],
   );
 
@@ -241,12 +261,14 @@ export function AdminCalendar() {
       const day = prevMonthDays - i;
       const m = currentMonth === 0 ? 11 : currentMonth - 1;
       const y = currentMonth === 0 ? currentYear - 1 : currentYear;
-      cells.push(`${y}-${String(m + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`);
+      cells.push(
+        `${y}-${String(m + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`,
+      );
     }
     // Current month days
     for (let d = 1; d <= daysInMonth; d++) {
       cells.push(
-        `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`,
+        `${currentYear}-${String(currentMonth + 1).padStart(2, "0")}-${String(d).padStart(2, "0")}`,
       );
     }
     // Next month padding (fill to 42)
@@ -254,14 +276,16 @@ export function AdminCalendar() {
     for (let d = 1; d <= remaining; d++) {
       const m = currentMonth === 11 ? 0 : currentMonth + 1;
       const y = currentMonth === 11 ? currentYear + 1 : currentYear;
-      cells.push(`${y}-${String(m + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`);
+      cells.push(
+        `${y}-${String(m + 1).padStart(2, "0")}-${String(d).padStart(2, "0")}`,
+      );
     }
     return cells;
   }, [currentYear, currentMonth, daysInMonth, firstDayOfWeek]);
 
   /** Filtered events for the current view */
   const filteredEvents = useMemo(() => {
-    if (typeFilter === 'all') return events;
+    if (typeFilter === "all") return events;
     return events.filter((ev) => ev.type === typeFilter);
   }, [events, typeFilter]);
 
@@ -284,7 +308,7 @@ export function AdminCalendar() {
         existing.push(ev);
         map.set(cursor, existing);
         // Increment cursor by one day
-        const d = new Date(cursor + 'T00:00:00');
+        const d = new Date(cursor + "T00:00:00");
         d.setDate(d.getDate() + 1);
         cursor = formatDateISO(d);
       }
@@ -301,16 +325,20 @@ export function AdminCalendar() {
     }
     setLoading(true);
     try {
-      const res = await fetch(`/api/events?tenantId=${encodeURIComponent(currentTenantId)}&month=${monthKey}`);
-      if (!res.ok) throw new Error('Failed to fetch events');
+      const res = await fetch(
+        `/api/events?tenantId=${encodeURIComponent(currentTenantId)}&month=${monthKey}`,
+      );
+      if (!res.ok) throw new Error("Failed to fetch events");
       const json = await res.json();
-      const data: CalendarEvent[] = Array.isArray(json) ? json : (json.data ?? []);
+      const data: CalendarEvent[] = Array.isArray(json)
+        ? json
+        : (json.data ?? []);
       setEvents(data);
     } catch {
       toast({
-        title: 'Error',
-        description: 'Failed to load calendar events. Please try again.',
-        variant: 'destructive',
+        title: "Error",
+        description: "Failed to load calendar events. Please try again.",
+        variant: "destructive",
       });
     } finally {
       setLoading(false);
@@ -363,14 +391,14 @@ export function AdminCalendar() {
     setEditingEvent(ev);
     setForm({
       title: ev.title,
-      description: ev.description || '',
+      description: ev.description || "",
       date: ev.date,
-      endDate: ev.endDate || '',
+      endDate: ev.endDate || "",
       type: ev.type,
       targetRole: ev.targetRole,
       color: ev.color,
       allDay: ev.allDay,
-      location: ev.location || '',
+      location: ev.location || "",
     });
     setDialogOpen(true);
   }, []);
@@ -390,10 +418,10 @@ export function AdminCalendar() {
 
   const handleTypeChange = useCallback(
     (value: string) => {
-      updateForm('type', value);
+      updateForm("type", value);
       // Auto-assign color when type changes (only if user hasn't customized)
       if (EVENT_TYPE_COLORS[value]) {
-        updateForm('color', EVENT_TYPE_COLORS[value]);
+        updateForm("color", EVENT_TYPE_COLORS[value]);
       }
     },
     [updateForm],
@@ -402,26 +430,42 @@ export function AdminCalendar() {
   // --- Submit (create / edit) ---
   const handleSubmit = useCallback(async () => {
     if (!form.title.trim()) {
-      toast({ title: 'Validation Error', description: 'Event title is required.', variant: 'destructive' });
+      toast({
+        title: "Validation Error",
+        description: "Event title is required.",
+        variant: "destructive",
+      });
       return;
     }
     if (!form.date) {
-      toast({ title: 'Validation Error', description: 'Event start date is required.', variant: 'destructive' });
+      toast({
+        title: "Validation Error",
+        description: "Event start date is required.",
+        variant: "destructive",
+      });
       return;
     }
     if (form.endDate && form.endDate < form.date) {
-      toast({ title: 'Validation Error', description: 'End date cannot be before start date.', variant: 'destructive' });
+      toast({
+        title: "Validation Error",
+        description: "End date cannot be before start date.",
+        variant: "destructive",
+      });
       return;
     }
 
     if (!currentTenantId) {
-      toast({ title: 'Error', description: 'No school selected. Please log in again.', variant: 'destructive' });
+      toast({
+        title: "Error",
+        description: "No school selected. Please log in again.",
+        variant: "destructive",
+      });
       return;
     }
     setSubmitting(true);
     try {
-      const url = editingEvent ? '/api/events' : '/api/events';
-      const method = editingEvent ? 'PUT' : 'POST';
+      const url = editingEvent ? "/api/events" : "/api/events";
+      const method = editingEvent ? "PUT" : "POST";
       const body: Record<string, unknown> = {
         tenantId: currentTenantId,
         title: form.title.trim(),
@@ -440,14 +484,14 @@ export function AdminCalendar() {
 
       const res = await fetch(url, {
         method,
-        headers: { 'Content-Type': 'application/json' },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(body),
       });
 
-      if (!res.ok) throw new Error('Failed to save event');
+      if (!res.ok) throw new Error("Failed to save event");
 
       toast({
-        title: editingEvent ? 'Event Updated' : 'Event Created',
+        title: editingEvent ? "Event Updated" : "Event Created",
         description: editingEvent
           ? `"${form.title}" has been updated.`
           : `"${form.title}" has been added to the calendar.`,
@@ -457,9 +501,11 @@ export function AdminCalendar() {
       await fetchEvents();
     } catch {
       toast({
-        title: 'Error',
-        description: editingEvent ? 'Failed to update event. Please try again.' : 'Failed to create event. Please try again.',
-        variant: 'destructive',
+        title: "Error",
+        description: editingEvent
+          ? "Failed to update event. Please try again."
+          : "Failed to create event. Please try again.",
+        variant: "destructive",
       });
     } finally {
       setSubmitting(false);
@@ -470,21 +516,31 @@ export function AdminCalendar() {
   const handleDelete = useCallback(
     async (id: string) => {
       if (!currentTenantId) {
-        toast({ title: 'Error', description: 'No school selected.', variant: 'destructive' });
+        toast({
+          title: "Error",
+          description: "No school selected.",
+          variant: "destructive",
+        });
         return;
       }
       setDeleting(true);
       try {
-        const res = await fetch(`/api/events?id=${encodeURIComponent(id)}&tenantId=${encodeURIComponent(currentTenantId)}`, { method: 'DELETE' });
-        if (!res.ok) throw new Error('Failed to delete event');
+        const res = await fetch(
+          `/api/events?id=${encodeURIComponent(id)}&tenantId=${encodeURIComponent(currentTenantId)}`,
+          { method: "DELETE" },
+        );
+        if (!res.ok) throw new Error("Failed to delete event");
 
-        toast({ title: 'Event Deleted', description: 'The event has been removed.' });
+        toast({
+          title: "Event Deleted",
+          description: "The event has been removed.",
+        });
         setEvents((prev) => prev.filter((ev) => ev.id !== id));
       } catch {
         toast({
-          title: 'Error',
-          description: 'Failed to delete event. Please try again.',
-          variant: 'destructive',
+          title: "Error",
+          description: "Failed to delete event. Please try again.",
+          variant: "destructive",
         });
       } finally {
         setDeleting(false);
@@ -496,7 +552,7 @@ export function AdminCalendar() {
   // --- Render helpers ---
   const getTypeBadgeStyle = useCallback((type: string, color: string) => {
     // Use the event's custom color or fall back to type default
-    const c = color || EVENT_TYPE_COLORS[type] || '#6b7280';
+    const c = color || EVENT_TYPE_COLORS[type] || "#6b7280";
     return {
       backgroundColor: `${c}18`,
       color: c,
@@ -506,7 +562,7 @@ export function AdminCalendar() {
 
   const isCurrentMonthDay = useCallback(
     (dateStr: string) => {
-      const d = new Date(dateStr + 'T00:00:00');
+      const d = new Date(dateStr + "T00:00:00");
       return d.getMonth() === currentMonth && d.getFullYear() === currentYear;
     },
     [currentMonth, currentYear],
@@ -522,7 +578,9 @@ export function AdminCalendar() {
       {!canCreate && !canEdit && !canDelete && (
         <div className="flex items-center gap-2 rounded-lg border border-amber-200 dark:border-amber-800 bg-amber-50 dark:bg-amber-900/30 px-3 py-2">
           <Eye className="h-4 w-4 text-amber-600 dark:text-amber-400 shrink-0" />
-          <span className="text-xs text-amber-700 dark:text-amber-300 font-medium">Read-only mode — you have view permission only for this module.</span>
+          <span className="text-xs text-amber-700 dark:text-amber-300 font-medium">
+            Read-only mode — you have view permission only for this module.
+          </span>
         </div>
       )}
 
@@ -530,13 +588,30 @@ export function AdminCalendar() {
       <div className="flex flex-col lg:flex-row gap-4 items-start lg:items-center justify-between">
         {/* Left: Month navigation */}
         <div className="flex items-center gap-2">
-          <Button variant="outline" size="icon" className="h-9 w-9 shrink-0" onClick={goToPrevMonth} aria-label="Previous month">
+          <Button
+            variant="outline"
+            size="icon"
+            className="h-9 w-9 shrink-0"
+            onClick={goToPrevMonth}
+            aria-label="Previous month"
+          >
             <ChevronLeft className="h-4 w-4" />
           </Button>
-          <Button variant="outline" size="sm" className="h-9 px-3" onClick={goToToday}>
+          <Button
+            variant="outline"
+            size="sm"
+            className="h-9 px-3"
+            onClick={goToToday}
+          >
             Today
           </Button>
-          <Button variant="outline" size="icon" className="h-9 w-9 shrink-0" onClick={goToNextMonth} aria-label="Next month">
+          <Button
+            variant="outline"
+            size="icon"
+            className="h-9 w-9 shrink-0"
+            onClick={goToNextMonth}
+            aria-label="Next month"
+          >
             <ChevronRight className="h-4 w-4" />
           </Button>
           <h2 className="ml-2 text-lg sm:text-xl font-semibold text-gray-900 dark:text-gray-100 whitespace-nowrap">
@@ -566,14 +641,14 @@ export function AdminCalendar() {
             </SelectContent>
           </Select>
           {canCreate && (
-          <Button
-            className="bg-emerald-600 hover:bg-emerald-700 text-white shrink-0 h-9"
-            onClick={openCreateDialog}
-          >
-            <Plus className="h-4 w-4 mr-2" />
-            <span className="hidden sm:inline">Add Event</span>
-            <span className="sm:hidden">Add</span>
-          </Button>
+            <Button
+              className="bg-emerald-600 hover:bg-emerald-700 text-white shrink-0 h-9"
+              onClick={openCreateDialog}
+            >
+              <Plus className="h-4 w-4 mr-2" />
+              <span className="hidden sm:inline">Add Event</span>
+              <span className="sm:hidden">Add</span>
+            </Button>
           )}
         </div>
       </div>
@@ -599,7 +674,10 @@ export function AdminCalendar() {
             {loading ? (
               <div className="grid grid-cols-7 gap-px bg-border rounded-lg overflow-hidden">
                 {Array.from({ length: 42 }).map((_, i) => (
-                  <div key={i} className="bg-background p-1.5 sm:p-2 min-h-[72px] sm:min-h-[90px]">
+                  <div
+                    key={i}
+                    className="bg-background p-1.5 sm:p-2 min-h-[72px] sm:min-h-[90px]"
+                  >
                     <Skeleton className="h-4 w-6 mb-1" />
                     <Skeleton className="h-2 w-10 rounded-full" />
                   </div>
@@ -609,10 +687,13 @@ export function AdminCalendar() {
               /* Calendar cells */
               <div className="grid grid-cols-7 gap-px bg-border rounded-lg overflow-hidden">
                 {calendarCells.map((dateStr, idx) => {
-                  if (!dateStr) return <div key={`empty-${idx}`} className="bg-background" />;
+                  if (!dateStr)
+                    return (
+                      <div key={`empty-${idx}`} className="bg-background" />
+                    );
 
                   const dayEvents = eventsByDate.get(dateStr) || [];
-                  const dayNum = parseInt(dateStr.split('-')[2], 10);
+                  const dayNum = parseInt(dateStr.split("-")[2], 10);
                   const todayHighlight = isToday(dateStr);
                   const isSelected = selectedDate === dateStr;
                   const inCurrentMonth = isCurrentMonthDay(dateStr);
@@ -627,19 +708,19 @@ export function AdminCalendar() {
                         relative bg-background p-1 sm:p-2 min-h-[60px] sm:min-h-[90px]
                         text-left transition-colors hover:bg-gray-50 dark:hover:bg-gray-800 focus:outline-none
                         focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-inset
-                        ${!inCurrentMonth ? 'bg-gray-50/60 dark:bg-gray-800/60' : ''}
-                        ${isSelected ? 'ring-2 ring-emerald-500 ring-inset bg-emerald-50/40 dark:bg-emerald-900/20' : ''}
+                        ${!inCurrentMonth ? "bg-gray-50/60 dark:bg-gray-800/60" : ""}
+                        ${isSelected ? "ring-2 ring-emerald-500 ring-inset bg-emerald-50/40 dark:bg-emerald-900/20" : ""}
                       `}
-                      aria-label={`${MONTH_NAMES[currentMonth]} ${dayNum}, ${currentYear}. ${dayEvents.length} event${dayEvents.length !== 1 ? 's' : ''}`}
+                      aria-label={`${MONTH_NAMES[currentMonth]} ${dayNum}, ${currentYear}. ${dayEvents.length} event${dayEvents.length !== 1 ? "s" : ""}`}
                     >
                       {/* Day number */}
                       <span
                         className={`
                           inline-flex items-center justify-center
                           text-xs sm:text-sm font-medium
-                          ${todayHighlight ? 'bg-emerald-600 text-white rounded-full w-6 h-6 sm:w-7 sm:h-7' : ''}
-                          ${!todayHighlight && !inCurrentMonth ? 'text-muted-foreground/50' : ''}
-                          ${!todayHighlight && inCurrentMonth ? 'text-gray-900 dark:text-gray-100' : ''}
+                          ${todayHighlight ? "bg-emerald-600 text-white rounded-full w-6 h-6 sm:w-7 sm:h-7" : ""}
+                          ${!todayHighlight && !inCurrentMonth ? "text-muted-foreground/50" : ""}
+                          ${!todayHighlight && inCurrentMonth ? "text-gray-900 dark:text-gray-100" : ""}
                         `}
                       >
                         {dayNum}
@@ -653,8 +734,11 @@ export function AdminCalendar() {
                               key={ev.id}
                               className="hidden sm:flex items-center truncate text-[10px] sm:text-xs font-medium px-1 py-0.5 rounded-sm leading-tight"
                               style={{
-                                backgroundColor: `${ev.color || EVENT_TYPE_COLORS[ev.type] || '#6b7280'}18`,
-                                color: ev.color || EVENT_TYPE_COLORS[ev.type] || '#6b7280',
+                                backgroundColor: `${ev.color || EVENT_TYPE_COLORS[ev.type] || "#6b7280"}18`,
+                                color:
+                                  ev.color ||
+                                  EVENT_TYPE_COLORS[ev.type] ||
+                                  "#6b7280",
                               }}
                             >
                               <span className="truncate">{ev.title}</span>
@@ -666,7 +750,10 @@ export function AdminCalendar() {
                               key={ev.id}
                               className="sm:hidden inline-block w-1.5 h-1.5 rounded-full mr-0.5"
                               style={{
-                                backgroundColor: ev.color || EVENT_TYPE_COLORS[ev.type] || '#6b7280',
+                                backgroundColor:
+                                  ev.color ||
+                                  EVENT_TYPE_COLORS[ev.type] ||
+                                  "#6b7280",
                               }}
                             />
                           ))}
@@ -713,7 +800,9 @@ export function AdminCalendar() {
               <div className="text-center py-10 text-muted-foreground">
                 <CalendarDays className="h-10 w-10 mx-auto mb-3 opacity-30" />
                 <p className="text-sm font-medium">No date selected</p>
-                <p className="text-xs mt-1">Click a day on the calendar to view events</p>
+                <p className="text-xs mt-1">
+                  Click a day on the calendar to view events
+                </p>
               </div>
             ) : loading ? (
               <div className="space-y-3">
@@ -729,16 +818,18 @@ export function AdminCalendar() {
               <div className="text-center py-10 text-muted-foreground">
                 <CalendarDays className="h-10 w-10 mx-auto mb-3 opacity-30" />
                 <p className="text-sm font-medium">No events</p>
-                <p className="text-xs mt-1 mb-4">No events scheduled for this day</p>
+                <p className="text-xs mt-1 mb-4">
+                  No events scheduled for this day
+                </p>
                 {canCreate && (
-                <Button
-                  size="sm"
-                  className="bg-emerald-600 hover:bg-emerald-700 text-white"
-                  onClick={openCreateDialog}
-                >
-                  <Plus className="h-3.5 w-3.5 mr-1.5" />
-                  Add Event
-                </Button>
+                  <Button
+                    size="sm"
+                    className="bg-emerald-600 hover:bg-emerald-700 text-white"
+                    onClick={openCreateDialog}
+                  >
+                    <Plus className="h-3.5 w-3.5 mr-1.5" />
+                    Add Event
+                  </Button>
                 )}
               </div>
             ) : (
@@ -749,7 +840,8 @@ export function AdminCalendar() {
                     {formatDisplayDate(selectedDate)}
                   </p>
                   <p className="text-sm text-muted-foreground mt-0.5">
-                    {selectedDayEvents.length} event{selectedDayEvents.length !== 1 ? 's' : ''}
+                    {selectedDayEvents.length} event
+                    {selectedDayEvents.length !== 1 ? "s" : ""}
                   </p>
                 </div>
 
@@ -760,63 +852,71 @@ export function AdminCalendar() {
                         key={ev.id}
                         className="group p-3 rounded-lg border hover:shadow-sm transition-shadow"
                         style={{
-                          borderLeftWidth: '3px',
-                          borderLeftColor: ev.color || EVENT_TYPE_COLORS[ev.type] || '#6b7280',
+                          borderLeftWidth: "3px",
+                          borderLeftColor:
+                            ev.color || EVENT_TYPE_COLORS[ev.type] || "#6b7280",
                         }}
                       >
                         {/* Title row */}
                         <div className="flex items-start justify-between gap-2">
                           <div className="min-w-0 flex-1">
-                            <p className="text-sm font-semibold text-gray-900 dark:text-gray-100 truncate">{ev.title}</p>
+                            <p className="text-sm font-semibold text-gray-900 dark:text-gray-100 truncate">
+                              {ev.title}
+                            </p>
                           </div>
                           {/* Action buttons */}
                           {(canEdit || canDelete) && (
-                          <div className="flex items-center gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity shrink-0">
-                            {canEdit && (
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              className="h-7 w-7 text-emerald-500 hover:text-emerald-700 hover:bg-emerald-50 dark:hover:bg-emerald-900/30"
-                              onClick={() => openEditDialog(ev)}
-                              aria-label="Edit event"
-                            >
-                              <Pencil className="h-3.5 w-3.5" />
-                            </Button>
-                            )}
-                            {canDelete && (
-                            <AlertDialog>
-                              <AlertDialogTrigger asChild>
+                            <div className="flex items-center gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity shrink-0">
+                              {canEdit && (
                                 <Button
                                   variant="ghost"
                                   size="icon"
-                                  className="h-7 w-7 text-red-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/30"
-                                  aria-label="Delete event"
+                                  className="h-7 w-7 text-emerald-500 hover:text-emerald-700 hover:bg-emerald-50 dark:hover:bg-emerald-900/30"
+                                  onClick={() => openEditDialog(ev)}
+                                  aria-label="Edit event"
                                 >
-                                  <Trash2 className="h-3.5 w-3.5" />
+                                  <Pencil className="h-3.5 w-3.5" />
                                 </Button>
-                              </AlertDialogTrigger>
-                              <AlertDialogContent>
-                                <AlertDialogHeader>
-                                  <AlertDialogTitle>Delete Event</AlertDialogTitle>
-                                  <AlertDialogDescription>
-                                    Are you sure you want to delete &quot;{ev.title}&quot;? This action cannot be
-                                    undone.
-                                  </AlertDialogDescription>
-                                </AlertDialogHeader>
-                                <AlertDialogFooter>
-                                  <AlertDialogCancel>Cancel</AlertDialogCancel>
-                                  <AlertDialogAction
-                                    onClick={() => handleDelete(ev.id)}
-                                    disabled={deleting}
-                                    className="bg-red-600 hover:bg-red-700"
-                                  >
-                                    {deleting ? 'Deleting...' : 'Delete'}
-                                  </AlertDialogAction>
-                                </AlertDialogFooter>
-                              </AlertDialogContent>
-                            </AlertDialog>
-                            )}
-                          </div>
+                              )}
+                              {canDelete && (
+                                <AlertDialog>
+                                  <AlertDialogTrigger asChild>
+                                    <Button
+                                      variant="ghost"
+                                      size="icon"
+                                      className="h-7 w-7 text-red-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/30"
+                                      aria-label="Delete event"
+                                    >
+                                      <Trash2 className="h-3.5 w-3.5" />
+                                    </Button>
+                                  </AlertDialogTrigger>
+                                  <AlertDialogContent>
+                                    <AlertDialogHeader>
+                                      <AlertDialogTitle>
+                                        Delete Event
+                                      </AlertDialogTitle>
+                                      <AlertDialogDescription>
+                                        Are you sure you want to delete &quot;
+                                        {ev.title}&quot;? This action cannot be
+                                        undone.
+                                      </AlertDialogDescription>
+                                    </AlertDialogHeader>
+                                    <AlertDialogFooter>
+                                      <AlertDialogCancel>
+                                        Cancel
+                                      </AlertDialogCancel>
+                                      <AlertDialogAction
+                                        onClick={() => handleDelete(ev.id)}
+                                        disabled={deleting}
+                                        className="bg-red-600 hover:bg-red-700"
+                                      >
+                                        {deleting ? "Deleting..." : "Delete"}
+                                      </AlertDialogAction>
+                                    </AlertDialogFooter>
+                                  </AlertDialogContent>
+                                </AlertDialog>
+                              )}
+                            </div>
                           )}
                         </div>
 
@@ -829,11 +929,17 @@ export function AdminCalendar() {
                           >
                             {EVENT_TYPE_LABELS[ev.type] || ev.type}
                           </Badge>
-                          <Badge variant="outline" className="text-[10px] font-medium px-1.5 py-0 bg-gray-50 dark:bg-gray-800 text-gray-600 dark:text-gray-400 border-gray-200 dark:border-gray-700">
+                          <Badge
+                            variant="outline"
+                            className="text-[10px] font-medium px-1.5 py-0 bg-gray-50 dark:bg-gray-800 text-gray-600 dark:text-gray-400 border-gray-200 dark:border-gray-700"
+                          >
                             {TARGET_ROLE_LABELS[ev.targetRole] || ev.targetRole}
                           </Badge>
                           {ev.allDay && (
-                            <Badge variant="outline" className="text-[10px] font-medium px-1.5 py-0 bg-gray-50 dark:bg-gray-800 text-gray-600 dark:text-gray-400 border-gray-200 dark:border-gray-700">
+                            <Badge
+                              variant="outline"
+                              className="text-[10px] font-medium px-1.5 py-0 bg-gray-50 dark:bg-gray-800 text-gray-600 dark:text-gray-400 border-gray-200 dark:border-gray-700"
+                            >
                               All Day
                             </Badge>
                           )}
@@ -852,9 +958,19 @@ export function AdminCalendar() {
                           {ev.endDate && ev.endDate !== ev.date && (
                             <span className="flex items-center gap-1">
                               <Clock className="h-3 w-3" />
-                              {new Date(ev.date + 'T00:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
-                              {' – '}
-                              {new Date(ev.endDate + 'T00:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                              {new Date(
+                                ev.date + "T00:00:00",
+                              ).toLocaleDateString("en-US", {
+                                month: "short",
+                                day: "numeric",
+                              })}
+                              {" – "}
+                              {new Date(
+                                ev.endDate + "T00:00:00",
+                              ).toLocaleDateString("en-US", {
+                                month: "short",
+                                day: "numeric",
+                              })}
                             </span>
                           )}
                           {ev.location && (
@@ -876,15 +992,17 @@ export function AdminCalendar() {
 
       {/* Type legend */}
       <div className="flex flex-wrap items-center gap-3 px-1">
-        <span className="text-xs text-muted-foreground font-medium">Event Types:</span>
+        <span className="text-xs text-muted-foreground font-medium">
+          Event Types:
+        </span>
         {ALL_EVENT_TYPES.map((t) => (
           <button
             key={t}
             type="button"
-            onClick={() => setTypeFilter(typeFilter === t ? 'all' : t)}
+            onClick={() => setTypeFilter(typeFilter === t ? "all" : t)}
             className={`
               flex items-center gap-1.5 text-xs px-2 py-1 rounded-full transition-colors
-              ${typeFilter === t ? 'bg-gray-100 dark:bg-gray-800 font-semibold' : 'hover:bg-gray-50 dark:hover:bg-gray-800 text-muted-foreground'}
+              ${typeFilter === t ? "bg-gray-100 dark:bg-gray-800 font-semibold" : "hover:bg-gray-50 dark:hover:bg-gray-800 text-muted-foreground"}
             `}
           >
             <span
@@ -899,14 +1017,22 @@ export function AdminCalendar() {
       {/* ================================================================== */}
       {/* Create / Edit Event Dialog                                          */}
       {/* ================================================================== */}
-      <Dialog open={dialogOpen} onOpenChange={(open) => { if (!open) closeDialog(); else setDialogOpen(true); }}>
+      <Dialog
+        open={dialogOpen}
+        onOpenChange={(open) => {
+          if (!open) closeDialog();
+          else setDialogOpen(true);
+        }}
+      >
         <DialogContent className="sm:max-w-lg max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>{editingEvent ? 'Edit Event' : 'Create Event'}</DialogTitle>
+            <DialogTitle>
+              {editingEvent ? "Edit Event" : "Create Event"}
+            </DialogTitle>
             <DialogDescription>
               {editingEvent
-                ? 'Update the event details below.'
-                : 'Add a new event to the school calendar.'}
+                ? "Update the event details below."
+                : "Add a new event to the school calendar."}
             </DialogDescription>
           </DialogHeader>
 
@@ -917,7 +1043,7 @@ export function AdminCalendar() {
               <Input
                 id="event-title"
                 value={form.title}
-                onChange={(e) => updateForm('title', e.target.value)}
+                onChange={(e) => updateForm("title", e.target.value)}
                 placeholder="Event title"
               />
             </div>
@@ -928,7 +1054,7 @@ export function AdminCalendar() {
               <Textarea
                 id="event-desc"
                 value={form.description}
-                onChange={(e) => updateForm('description', e.target.value)}
+                onChange={(e) => updateForm("description", e.target.value)}
                 placeholder="Event description (optional)"
                 rows={3}
               />
@@ -942,7 +1068,7 @@ export function AdminCalendar() {
                   id="event-date"
                   type="date"
                   value={form.date}
-                  onChange={(e) => updateForm('date', e.target.value)}
+                  onChange={(e) => updateForm("date", e.target.value)}
                 />
               </div>
               <div className="grid gap-2">
@@ -951,7 +1077,7 @@ export function AdminCalendar() {
                   id="event-enddate"
                   type="date"
                   value={form.endDate}
-                  onChange={(e) => updateForm('endDate', e.target.value)}
+                  onChange={(e) => updateForm("endDate", e.target.value)}
                   min={form.date}
                 />
               </div>
@@ -982,7 +1108,10 @@ export function AdminCalendar() {
               </div>
               <div className="grid gap-2">
                 <Label>Target Audience</Label>
-                <Select value={form.targetRole} onValueChange={(v) => updateForm('targetRole', v)}>
+                <Select
+                  value={form.targetRole}
+                  onValueChange={(v) => updateForm("targetRole", v)}
+                >
                   <SelectTrigger>
                     <SelectValue />
                   </SelectTrigger>
@@ -1007,13 +1136,13 @@ export function AdminCalendar() {
                       type="color"
                       id="event-color"
                       value={form.color}
-                      onChange={(e) => updateForm('color', e.target.value)}
+                      onChange={(e) => updateForm("color", e.target.value)}
                       className="w-9 h-9 rounded-md border cursor-pointer p-0.5"
                     />
                   </div>
                   <Input
                     value={form.color}
-                    onChange={(e) => updateForm('color', e.target.value)}
+                    onChange={(e) => updateForm("color", e.target.value)}
                     placeholder="#000000"
                     className="flex-1 font-mono text-xs"
                     maxLength={7}
@@ -1030,7 +1159,7 @@ export function AdminCalendar() {
                           className="w-5 h-5 rounded-full border border-gray-200 dark:border-gray-700 hover:scale-110 transition-transform"
                           style={{ backgroundColor: c }}
                           title={EVENT_TYPE_LABELS[type]}
-                          onClick={() => updateForm('color', c)}
+                          onClick={() => updateForm("color", c)}
                           aria-label={`Set color to ${EVENT_TYPE_LABELS[type]}`}
                         />
                       ))}
@@ -1042,7 +1171,7 @@ export function AdminCalendar() {
                 <Input
                   id="event-location"
                   value={form.location}
-                  onChange={(e) => updateForm('location', e.target.value)}
+                  onChange={(e) => updateForm("location", e.target.value)}
                   placeholder="Event location (optional)"
                 />
               </div>
@@ -1053,7 +1182,7 @@ export function AdminCalendar() {
               <Switch
                 id="event-allday"
                 checked={form.allDay}
-                onCheckedChange={(checked) => updateForm('allDay', checked)}
+                onCheckedChange={(checked) => updateForm("allDay", checked)}
               />
               <Label htmlFor="event-allday" className="text-sm">
                 All Day Event
@@ -1062,7 +1191,11 @@ export function AdminCalendar() {
           </div>
 
           <DialogFooter className="gap-2 sm:gap-0">
-            <Button variant="outline" onClick={closeDialog} disabled={submitting}>
+            <Button
+              variant="outline"
+              onClick={closeDialog}
+              disabled={submitting}
+            >
               Cancel
             </Button>
             <Button
@@ -1071,7 +1204,7 @@ export function AdminCalendar() {
               disabled={submitting || !form.title.trim() || !form.date}
             >
               {submitting && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
-              {editingEvent ? 'Save Changes' : 'Create Event'}
+              {editingEvent ? "Save Changes" : "Create Event"}
             </Button>
           </DialogFooter>
         </DialogContent>

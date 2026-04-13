@@ -1,30 +1,58 @@
-'use client';
+"use client";
 
-import { useState, useEffect, useCallback } from 'react';
-import { Card, CardContent } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Skeleton } from '@/components/ui/skeleton';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
-import { Label } from '@/components/ui/label';
-import { Checkbox } from '@/components/ui/checkbox';
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { useState, useEffect, useCallback } from "react";
+import { Card, CardContent } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 // Select is available but not used in Manage Admins (no role assignment for full-access admins)
 import {
-  Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
-} from '@/components/ui/table';
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import {
-  Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter,
-} from '@/components/ui/dialog';
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from "@/components/ui/dialog";
 import {
-  AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogTitle,
-  AlertDialogDescription, AlertDialogFooter, AlertDialogTrigger, AlertDialogAction, AlertDialogCancel,
-} from '@/components/ui/alert-dialog';
+  AlertDialog,
+  AlertDialogContent,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogTrigger,
+  AlertDialogAction,
+  AlertDialogCancel,
+} from "@/components/ui/alert-dialog";
 import {
-  ShieldCheck, Plus, Search, Pencil, Trash2, Loader2, Mail, Eye, EyeOff, Lock, Clock, LockKeyhole,
-} from 'lucide-react';
-import { toast } from 'sonner';
-import { useAppStore } from '@/store/use-app-store';
+  ShieldCheck,
+  Plus,
+  Search,
+  Pencil,
+  Trash2,
+  Loader2,
+  Mail,
+  Eye,
+  EyeOff,
+  Lock,
+  Clock,
+  LockKeyhole,
+} from "lucide-react";
+import { toast } from "sonner";
+import { useAppStore } from "@/store/use-app-store";
 
 // --- Types ---
 
@@ -54,21 +82,28 @@ interface FormData {
 }
 
 const emptyFormData: FormData = {
-  name: '',
-  email: '',
-  password: '',
+  name: "",
+  email: "",
+  password: "",
   isActive: true,
 };
 
 // --- Helpers ---
 
 function getInitials(name: string): string {
-  return name.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase();
+  return name
+    .split(" ")
+    .map((n) => n[0])
+    .join("")
+    .slice(0, 2)
+    .toUpperCase();
 }
 
 function formatDate(dateStr: string): string {
-  return new Date(dateStr).toLocaleDateString('en-US', {
-    year: 'numeric', month: 'short', day: 'numeric',
+  return new Date(dateStr).toLocaleDateString("en-US", {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
   });
 }
 
@@ -78,7 +113,7 @@ export function SuperAdminManage() {
   const { currentUser } = useAppStore();
   const [admins, setAdmins] = useState<AdminRecord[]>([]);
   const [loading, setLoading] = useState(true);
-  const [search, setSearch] = useState('');
+  const [search, setSearch] = useState("");
 
   // Dialog state
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -97,24 +132,27 @@ export function SuperAdminManage() {
 
   const fetchAdmins = useCallback(async () => {
     try {
-      const res = await fetch('/api/super-admins?type=admins');
-      if (!res.ok) throw new Error('Failed to fetch');
+      const res = await fetch("/api/super-admins?type=admins");
+      if (!res.ok) throw new Error("Failed to fetch");
       const json = await res.json();
       setAdmins(json);
     } catch {
-      console.error('Error fetching super admins');
+      console.error("Error fetching super admins");
     } finally {
       setLoading(false);
     }
   }, []);
 
-  useEffect(() => { fetchAdmins(); }, [fetchAdmins]);
+  useEffect(() => {
+    fetchAdmins();
+  }, [fetchAdmins]);
 
   // --- Filtering ---
 
-  const filtered = admins.filter(a =>
-    a.name.toLowerCase().includes(search.toLowerCase()) ||
-    a.email.toLowerCase().includes(search.toLowerCase())
+  const filtered = admins.filter(
+    (a) =>
+      a.name.toLowerCase().includes(search.toLowerCase()) ||
+      a.email.toLowerCase().includes(search.toLowerCase()),
   );
 
   // --- Handlers ---
@@ -128,14 +166,14 @@ export function SuperAdminManage() {
 
   const handleOpenEdit = (admin: AdminRecord) => {
     if (admin.id === rootAdminId) {
-      toast.error('Cannot edit the root platform owner');
+      toast.error("Cannot edit the root platform owner");
       return;
     }
     setEditingAdmin(admin);
     setFormData({
       name: admin.name,
       email: admin.email,
-      password: '',
+      password: "",
       isActive: admin.isActive,
     });
     setShowPassword(false);
@@ -146,7 +184,7 @@ export function SuperAdminManage() {
     setSubmitting(true);
     try {
       const isEdit = !!editingAdmin;
-      const method = isEdit ? 'PUT' : 'POST';
+      const method = isEdit ? "PUT" : "POST";
 
       const body = isEdit
         ? {
@@ -161,22 +199,26 @@ export function SuperAdminManage() {
             password: formData.password,
           };
 
-      const res = await fetch('/api/super-admins', {
+      const res = await fetch("/api/super-admins", {
         method,
-        headers: { 'Content-Type': 'application/json' },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(body),
       });
 
       if (!res.ok) {
         const err = await res.json().catch(() => null);
-        throw new Error(err?.error || `Failed to ${isEdit ? 'update' : 'create'} super admin`);
+        throw new Error(
+          err?.error || `Failed to ${isEdit ? "update" : "create"} super admin`,
+        );
       }
 
-      toast.success(`Super admin ${isEdit ? 'updated' : 'created'} successfully`);
+      toast.success(
+        `Super admin ${isEdit ? "updated" : "created"} successfully`,
+      );
       setDialogOpen(false);
       fetchAdmins();
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : 'Operation failed');
+      toast.error(err instanceof Error ? err.message : "Operation failed");
     } finally {
       setSubmitting(false);
     }
@@ -184,21 +226,26 @@ export function SuperAdminManage() {
 
   const handleDelete = async (id: string) => {
     try {
-      const res = await fetch(`/api/super-admins?id=${id}`, { method: 'DELETE' });
+      const res = await fetch(`/api/super-admins?id=${id}`, {
+        method: "DELETE",
+      });
       if (!res.ok) {
         const err = await res.json().catch(() => null);
-        throw new Error(err?.error || 'Failed to delete');
+        throw new Error(err?.error || "Failed to delete");
       }
-      toast.success('Super admin deleted successfully');
-      setAdmins(prev => prev.filter(a => a.id !== id));
+      toast.success("Super admin deleted successfully");
+      setAdmins((prev) => prev.filter((a) => a.id !== id));
       setDeletingId(null);
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : 'Failed to delete');
+      toast.error(err instanceof Error ? err.message : "Failed to delete");
     }
   };
 
-  const isFormValid = formData.name.trim() !== '' &&
-    (!editingAdmin ? formData.email.trim() !== '' && formData.password.trim().length >= 6 : true);
+  const isFormValid =
+    formData.name.trim() !== "" &&
+    (!editingAdmin
+      ? formData.email.trim() !== "" && formData.password.trim().length >= 6
+      : true);
 
   // --- Render ---
 
@@ -207,7 +254,9 @@ export function SuperAdminManage() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
         <div>
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Manage Admins</h2>
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
+            Manage Admins
+          </h2>
           <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
             Create and manage platform super administrator accounts
           </p>
@@ -237,9 +286,13 @@ export function SuperAdminManage() {
         <div className="flex items-start gap-3">
           <ShieldCheck className="h-5 w-5 text-rose-600 dark:text-rose-400 shrink-0 mt-0.5" />
           <div className="text-sm">
-            <p className="font-medium text-rose-800 dark:text-rose-300">Platform Admin Accounts</p>
+            <p className="font-medium text-rose-800 dark:text-rose-300">
+              Platform Admin Accounts
+            </p>
             <p className="text-rose-700/80 dark:text-rose-400/80 mt-0.5">
-              Super admins have full access to all schools, billing, and platform settings. The root platform owner is protected and cannot be modified.
+              Super admins have full access to all schools, billing, and
+              platform settings. The root platform owner is protected and cannot
+              be modified.
             </p>
           </div>
         </div>
@@ -260,8 +313,8 @@ export function SuperAdminManage() {
               <p className="font-medium text-base">No super admin accounts</p>
               <p className="text-sm mt-1">
                 {admins.length === 0
-                  ? 'Create your first super admin account to get started.'
-                  : 'No admins match your search criteria.'}
+                  ? "Create your first super admin account to get started."
+                  : "No admins match your search criteria."}
               </p>
             </div>
           ) : (
@@ -270,17 +323,26 @@ export function SuperAdminManage() {
                 <TableHeader>
                   <TableRow className="bg-muted/50">
                     <TableHead className="min-w-[250px]">Name</TableHead>
-                    <TableHead className="hidden sm:table-cell">Email</TableHead>
+                    <TableHead className="hidden sm:table-cell">
+                      Email
+                    </TableHead>
                     <TableHead>Status</TableHead>
-                    <TableHead className="hidden md:table-cell">Created</TableHead>
-                    <TableHead className="w-[100px] text-right">Actions</TableHead>
+                    <TableHead className="hidden md:table-cell">
+                      Created
+                    </TableHead>
+                    <TableHead className="w-[100px] text-right">
+                      Actions
+                    </TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {filtered.map((admin) => {
                     const isRoot = admin.id === rootAdminId;
                     return (
-                      <TableRow key={admin.id} className="hover:bg-rose-50/50 dark:hover:bg-rose-900/10 transition-colors">
+                      <TableRow
+                        key={admin.id}
+                        className="hover:bg-rose-50/50 dark:hover:bg-rose-900/10 transition-colors"
+                      >
                         <TableCell>
                           <div className="flex items-center gap-3">
                             <Avatar className="h-9 w-9 shrink-0 ring-2 ring-white dark:ring-gray-700 shadow-sm">
@@ -290,7 +352,9 @@ export function SuperAdminManage() {
                             </Avatar>
                             <div className="min-w-0 flex-1">
                               <div className="flex items-center gap-2 flex-wrap">
-                                <p className="font-medium text-sm truncate">{admin.name}</p>
+                                <p className="font-medium text-sm truncate">
+                                  {admin.name}
+                                </p>
                                 {isRoot && (
                                   <Badge className="bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 border border-amber-200 dark:border-amber-800 hover:bg-amber-100 dark:hover:bg-amber-900/30 text-[10px] gap-1 px-1.5 py-0">
                                     <LockKeyhole className="h-3 w-3" />
@@ -298,26 +362,30 @@ export function SuperAdminManage() {
                                   </Badge>
                                 )}
                               </div>
-                              <p className="text-xs text-muted-foreground truncate sm:hidden">{admin.email}</p>
+                              <p className="text-xs text-muted-foreground truncate sm:hidden">
+                                {admin.email}
+                              </p>
                             </div>
                           </div>
                         </TableCell>
                         <TableCell className="hidden sm:table-cell">
                           <div className="flex items-center gap-1.5 min-w-0">
                             <Mail className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
-                            <span className="text-sm truncate">{admin.email}</span>
+                            <span className="text-sm truncate">
+                              {admin.email}
+                            </span>
                           </div>
                         </TableCell>
                         <TableCell>
                           <Badge
-                            variant={admin.isActive ? 'default' : 'destructive'}
+                            variant={admin.isActive ? "default" : "destructive"}
                             className={
                               admin.isActive
-                                ? 'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800 hover:bg-emerald-100 dark:hover:bg-emerald-900/30'
-                                : 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 border border-red-200 dark:border-red-800 hover:bg-red-100 dark:hover:bg-red-900/30'
+                                ? "bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800 hover:bg-emerald-100 dark:hover:bg-emerald-900/30"
+                                : "bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 border border-red-200 dark:border-red-800 hover:bg-red-100 dark:hover:bg-red-900/30"
                             }
                           >
-                            {admin.isActive ? 'Active' : 'Inactive'}
+                            {admin.isActive ? "Active" : "Inactive"}
                           </Badge>
                         </TableCell>
                         <TableCell className="hidden md:table-cell">
@@ -330,10 +398,20 @@ export function SuperAdminManage() {
                           {isRoot ? (
                             <Tooltip text="Root owner cannot be modified">
                               <div className="flex items-center justify-end gap-1 opacity-40">
-                                <Button variant="ghost" size="icon" className="h-8 w-8" disabled>
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  className="h-8 w-8"
+                                  disabled
+                                >
                                   <Pencil className="h-4 w-4" />
                                 </Button>
-                                <Button variant="ghost" size="icon" className="h-8 w-8" disabled>
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  className="h-8 w-8"
+                                  disabled
+                                >
                                   <Trash2 className="h-4 w-4" />
                                 </Button>
                               </div>
@@ -350,7 +428,9 @@ export function SuperAdminManage() {
                               </Button>
                               <AlertDialog
                                 open={deletingId === admin.id}
-                                onOpenChange={(open) => { if (!open) setDeletingId(null); }}
+                                onOpenChange={(open) => {
+                                  if (!open) setDeletingId(null);
+                                }}
                               >
                                 <AlertDialogTrigger asChild>
                                   <Button
@@ -364,13 +444,21 @@ export function SuperAdminManage() {
                                 </AlertDialogTrigger>
                                 <AlertDialogContent>
                                   <AlertDialogHeader>
-                                    <AlertDialogTitle>Delete Super Admin</AlertDialogTitle>
+                                    <AlertDialogTitle>
+                                      Delete Super Admin
+                                    </AlertDialogTitle>
                                     <AlertDialogDescription>
-                                      Are you sure you want to delete <strong>{admin.name}</strong>? This action cannot be undone.
+                                      Are you sure you want to delete{" "}
+                                      <strong>{admin.name}</strong>? This action
+                                      cannot be undone.
                                     </AlertDialogDescription>
                                   </AlertDialogHeader>
                                   <AlertDialogFooter>
-                                    <AlertDialogCancel onClick={() => setDeletingId(null)}>Cancel</AlertDialogCancel>
+                                    <AlertDialogCancel
+                                      onClick={() => setDeletingId(null)}
+                                    >
+                                      Cancel
+                                    </AlertDialogCancel>
                                     <AlertDialogAction
                                       className="bg-red-600 hover:bg-red-700 text-white"
                                       onClick={() => handleDelete(admin.id)}
@@ -395,8 +483,15 @@ export function SuperAdminManage() {
           {!loading && filtered.length > 0 && (
             <div className="px-4 py-3 border-t">
               <p className="text-sm text-muted-foreground">
-                Showing <span className="font-medium text-foreground">{filtered.length}</span> of{' '}
-                <span className="font-medium text-foreground">{admins.length}</span> super admin{admins.length !== 1 ? 's' : ''}
+                Showing{" "}
+                <span className="font-medium text-foreground">
+                  {filtered.length}
+                </span>{" "}
+                of{" "}
+                <span className="font-medium text-foreground">
+                  {admins.length}
+                </span>{" "}
+                super admin{admins.length !== 1 ? "s" : ""}
               </p>
             </div>
           )}
@@ -408,19 +503,23 @@ export function SuperAdminManage() {
         open={dialogOpen}
         onOpenChange={(open) => {
           setDialogOpen(open);
-          if (!open) { setEditingAdmin(null); setFormData(emptyFormData); setShowPassword(false); }
+          if (!open) {
+            setEditingAdmin(null);
+            setFormData(emptyFormData);
+            setShowPassword(false);
+          }
         }}
       >
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <ShieldCheck className="h-5 w-5 text-rose-600 dark:text-rose-400" />
-              {editingAdmin ? 'Edit Super Admin' : 'Add New Super Admin'}
+              {editingAdmin ? "Edit Super Admin" : "Add New Super Admin"}
             </DialogTitle>
             <DialogDescription>
               {editingAdmin
-                ? 'Update the super admin details below.'
-                : 'Create a new platform super administrator with full access.'}
+                ? "Update the super admin details below."
+                : "Create a new platform super administrator with full access."}
             </DialogDescription>
           </DialogHeader>
 
@@ -431,7 +530,9 @@ export function SuperAdminManage() {
               <Input
                 id="sa-name"
                 value={formData.name}
-                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, name: e.target.value })
+                }
                 placeholder="James Wilson"
               />
             </div>
@@ -444,7 +545,9 @@ export function SuperAdminManage() {
                   id="sa-email"
                   type="email"
                   value={formData.email}
-                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                  onChange={(e) =>
+                    setFormData({ ...formData, email: e.target.value })
+                  }
                   placeholder="admin@schoolsaas.com"
                 />
               </div>
@@ -453,20 +556,30 @@ export function SuperAdminManage() {
             {/* Password */}
             <div className="grid gap-2">
               <Label htmlFor="sa-password">
-                {editingAdmin ? 'New Password' : 'Password'}
-                {!editingAdmin && <span className="text-red-500 ml-0.5">*</span>}
+                {editingAdmin ? "New Password" : "Password"}
+                {!editingAdmin && (
+                  <span className="text-red-500 ml-0.5">*</span>
+                )}
                 {editingAdmin && (
-                  <span className="text-muted-foreground font-normal text-xs ml-2">(leave blank to keep current)</span>
+                  <span className="text-muted-foreground font-normal text-xs ml-2">
+                    (leave blank to keep current)
+                  </span>
                 )}
               </Label>
               <div className="relative">
                 <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 <Input
                   id="sa-password"
-                  type={showPassword ? 'text' : 'password'}
+                  type={showPassword ? "text" : "password"}
                   value={formData.password}
-                  onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                  placeholder={editingAdmin ? 'Leave blank to keep current password' : 'Set login password'}
+                  onChange={(e) =>
+                    setFormData({ ...formData, password: e.target.value })
+                  }
+                  placeholder={
+                    editingAdmin
+                      ? "Leave blank to keep current password"
+                      : "Set login password"
+                  }
                   className="pl-10 pr-10"
                 />
                 <button
@@ -474,12 +587,20 @@ export function SuperAdminManage() {
                   onClick={() => setShowPassword(!showPassword)}
                   className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
                 >
-                  {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                  {showPassword ? (
+                    <EyeOff className="h-4 w-4" />
+                  ) : (
+                    <Eye className="h-4 w-4" />
+                  )}
                 </button>
               </div>
-              {!editingAdmin && formData.password && formData.password.length < 6 && (
-                <p className="text-xs text-amber-600 dark:text-amber-400">Password must be at least 6 characters</p>
-              )}
+              {!editingAdmin &&
+                formData.password &&
+                formData.password.length < 6 && (
+                  <p className="text-xs text-amber-600 dark:text-amber-400">
+                    Password must be at least 6 characters
+                  </p>
+                )}
             </div>
 
             {/* Active toggle */}
@@ -488,9 +609,14 @@ export function SuperAdminManage() {
                 <Checkbox
                   id="sa-active"
                   checked={formData.isActive}
-                  onCheckedChange={(checked) => setFormData({ ...formData, isActive: checked === true })}
+                  onCheckedChange={(checked) =>
+                    setFormData({ ...formData, isActive: checked === true })
+                  }
                 />
-                <Label htmlFor="sa-active" className="cursor-pointer select-none">
+                <Label
+                  htmlFor="sa-active"
+                  className="cursor-pointer select-none"
+                >
                   Active
                 </Label>
               </div>
@@ -498,7 +624,9 @@ export function SuperAdminManage() {
           </div>
 
           <DialogFooter>
-            <Button variant="outline" onClick={() => setDialogOpen(false)}>Cancel</Button>
+            <Button variant="outline" onClick={() => setDialogOpen(false)}>
+              Cancel
+            </Button>
             <Button
               className="bg-rose-600 hover:bg-rose-700 text-white"
               onClick={handleSubmit}
@@ -507,12 +635,12 @@ export function SuperAdminManage() {
               {submitting ? (
                 <>
                   <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                  {editingAdmin ? 'Updating...' : 'Creating...'}
+                  {editingAdmin ? "Updating..." : "Creating..."}
                 </>
               ) : editingAdmin ? (
-                'Update Super Admin'
+                "Update Super Admin"
               ) : (
-                'Create Super Admin'
+                "Create Super Admin"
               )}
             </Button>
           </DialogFooter>
@@ -523,7 +651,13 @@ export function SuperAdminManage() {
 }
 
 // Simple tooltip wrapper
-function Tooltip({ text, children }: { text: string; children: React.ReactNode }) {
+function Tooltip({
+  text,
+  children,
+}: {
+  text: string;
+  children: React.ReactNode;
+}) {
   return (
     <div className="relative group">
       {children}

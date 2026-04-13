@@ -1,25 +1,74 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Skeleton } from '@/components/ui/skeleton';
-import { Progress } from '@/components/ui/progress';
+import { useState, useEffect } from "react";
 import {
-  LineChart, Line, AreaChart, Area, BarChart, Bar, PieChart, Pie, Cell,
-  XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend,
-} from 'recharts';
-import { ChartContainer, ChartTooltip, ChartTooltipContent, ChartLegend, ChartLegendContent } from '@/components/ui/chart';
-import type { ChartConfig } from '@/components/ui/chart';
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Progress } from "@/components/ui/progress";
 import {
-  TrendingUp, DollarSign, Users, Activity, Server, Clock, Zap, Globe,
-  ArrowUpRight, ArrowDownRight, BarChart3, PieChart as PieChartIcon,
-  UserCheck, Wifi,
-} from 'lucide-react';
+  LineChart,
+  Line,
+  AreaChart,
+  Area,
+  BarChart,
+  Bar,
+  PieChart,
+  Pie,
+  Cell,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+  Legend,
+} from "recharts";
+import {
+  ChartContainer,
+  ChartTooltip,
+  ChartTooltipContent,
+  ChartLegend,
+  ChartLegendContent,
+} from "@/components/ui/chart";
+import type { ChartConfig } from "@/components/ui/chart";
+import {
+  TrendingUp,
+  DollarSign,
+  Users,
+  Activity,
+  Server,
+  Clock,
+  Zap,
+  Globe,
+  ArrowUpRight,
+  ArrowDownRight,
+  BarChart3,
+  PieChart as PieChartIcon,
+  UserCheck,
+  Wifi,
+} from "lucide-react";
 
 // ── Simulated data ──────────────────────────────────────────────
 
 function generateTenantGrowth() {
-  const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  const months = [
+    "Jan",
+    "Feb",
+    "Mar",
+    "Apr",
+    "May",
+    "Jun",
+    "Jul",
+    "Aug",
+    "Sep",
+    "Oct",
+    "Nov",
+    "Dec",
+  ];
   let cumulative = 12;
   return months.map((month) => {
     cumulative += Math.floor(Math.random() * 4) + 2;
@@ -28,8 +77,24 @@ function generateTenantGrowth() {
 }
 
 function generateUserGrowth() {
-  const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-  let students = 1200, teachers = 180, parents = 900, admins = 45;
+  const months = [
+    "Jan",
+    "Feb",
+    "Mar",
+    "Apr",
+    "May",
+    "Jun",
+    "Jul",
+    "Aug",
+    "Sep",
+    "Oct",
+    "Nov",
+    "Dec",
+  ];
+  let students = 1200,
+    teachers = 180,
+    parents = 900,
+    admins = 45;
   return months.map((month) => {
     students += Math.floor(Math.random() * 200) + 80;
     teachers += Math.floor(Math.random() * 30) + 10;
@@ -41,60 +106,80 @@ function generateUserGrowth() {
 
 function generateRevenueBreakdown() {
   const schools = [
-    'Greenfield Academy', 'Sunrise International', 'Heritage School',
-    'Modern Public School', 'St. Mary\'s Convent', 'Oakridge Academy',
-    'Riverdale School', 'Evergreen High', 'Bluebell School', 'Maple Grove',
+    "Greenfield Academy",
+    "Sunrise International",
+    "Heritage School",
+    "Modern Public School",
+    "St. Mary's Convent",
+    "Oakridge Academy",
+    "Riverdale School",
+    "Evergreen High",
+    "Bluebell School",
+    "Maple Grove",
   ];
-  return schools.map((name) => ({
-    name,
-    revenue: Math.floor(Math.random() * 15000) + 5000,
-  })).sort((a, b) => b.revenue - a.revenue);
+  return schools
+    .map((name) => ({
+      name,
+      revenue: Math.floor(Math.random() * 15000) + 5000,
+    }))
+    .sort((a, b) => b.revenue - a.revenue);
 }
 
 const geographicData = [
-  { country: 'India', percentage: 85, color: 'bg-rose-500' },
-  { country: 'USA', percentage: 10, color: 'bg-blue-500' },
-  { country: 'UK', percentage: 5, color: 'bg-amber-500' },
+  { country: "India", percentage: 85, color: "bg-rose-500" },
+  { country: "USA", percentage: 10, color: "bg-blue-500" },
+  { country: "UK", percentage: 5, color: "bg-amber-500" },
 ];
 
 const featureUsageData = [
-  { feature: 'Attendance', usage: 94 },
-  { feature: 'Grades', usage: 87 },
-  { feature: 'Fees', usage: 82 },
-  { feature: 'Subscriptions', usage: 76 },
-  { feature: 'Timetable', usage: 71 },
-  { feature: 'Assignments', usage: 65 },
-  { feature: 'Notices', usage: 58 },
-  { feature: 'Reports', usage: 52 },
-  { feature: 'Parent Portal', usage: 45 },
-  { feature: 'Bus Tracking', usage: 32 },
+  { feature: "Attendance", usage: 94 },
+  { feature: "Grades", usage: 87 },
+  { feature: "Fees", usage: 82 },
+  { feature: "Subscriptions", usage: 76 },
+  { feature: "Timetable", usage: 71 },
+  { feature: "Assignments", usage: 65 },
+  { feature: "Notices", usage: 58 },
+  { feature: "Reports", usage: 52 },
+  { feature: "Parent Portal", usage: 45 },
+  { feature: "Bus Tracking", usage: 32 },
 ];
 
 // ── Chart configs ──────────────────────────────────────────────
 
 const tenantGrowthConfig = {
-  tenants: { label: 'Total Tenants', color: '#f43f5e' },
+  tenants: { label: "Total Tenants", color: "#f43f5e" },
 } satisfies ChartConfig;
 
 const userGrowthConfig = {
-  students: { label: 'Students', color: '#10b981' },
-  teachers: { label: 'Teachers', color: '#3b82f6' },
-  parents: { label: 'Parents', color: '#f59e0b' },
-  admins: { label: 'Admins', color: '#8b5cf6' },
+  students: { label: "Students", color: "#10b981" },
+  teachers: { label: "Teachers", color: "#3b82f6" },
+  parents: { label: "Parents", color: "#f59e0b" },
+  admins: { label: "Admins", color: "#8b5cf6" },
 } satisfies ChartConfig;
 
 const revenueConfig = {
-  revenue: { label: 'Revenue ($)', color: '#f43f5e' },
+  revenue: { label: "Revenue ($)", color: "#f43f5e" },
 } satisfies ChartConfig;
 
 const pieConfig = {
-  revenue: { label: 'Revenue' },
+  revenue: { label: "Revenue" },
 } satisfies ChartConfig;
 
-const PIE_COLORS = ['#f43f5e', '#10b981', '#3b82f6', '#f59e0b', '#8b5cf6', '#ec4899', '#06b6d4', '#84cc16', '#f97316', '#6366f1'];
+const PIE_COLORS = [
+  "#f43f5e",
+  "#10b981",
+  "#3b82f6",
+  "#f59e0b",
+  "#8b5cf6",
+  "#ec4899",
+  "#06b6d4",
+  "#84cc16",
+  "#f97316",
+  "#6366f1",
+];
 
 const featureUsageConfig = {
-  usage: { label: 'Usage (%)', color: '#10b981' },
+  usage: { label: "Usage (%)", color: "#10b981" },
 } satisfies ChartConfig;
 
 // ── Skeleton components ────────────────────────────────────────
@@ -128,7 +213,7 @@ export function SuperAdminAnalytics() {
   useEffect(() => {
     async function fetchData() {
       try {
-        const res = await fetch('/api/platform');
+        const res = await fetch("/api/platform");
         if (res.ok) {
           const json = await res.json();
           setPlatformData(json);
@@ -179,15 +264,21 @@ export function SuperAdminAnalytics() {
       {/* Key Metrics Row */}
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
         {loading ? (
-          Array.from({ length: 5 }).map((_, i) => <MetricCardSkeleton key={i} />)
+          Array.from({ length: 5 }).map((_, i) => (
+            <MetricCardSkeleton key={i} />
+          ))
         ) : (
           <>
             <Card className="hover:shadow-md transition-shadow">
               <CardContent className="p-5">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-xs text-muted-foreground font-medium">MRR</p>
-                    <p className="text-2xl font-bold mt-1">${metrics.mrr.toLocaleString()}</p>
+                    <p className="text-xs text-muted-foreground font-medium">
+                      MRR
+                    </p>
+                    <p className="text-2xl font-bold mt-1">
+                      ${metrics.mrr.toLocaleString()}
+                    </p>
                   </div>
                   <div className="h-11 w-11 rounded-xl bg-rose-100 dark:bg-rose-900/30 text-rose-600 flex items-center justify-center">
                     <DollarSign className="h-5 w-5" />
@@ -203,8 +294,12 @@ export function SuperAdminAnalytics() {
               <CardContent className="p-5">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-xs text-muted-foreground font-medium">ARR</p>
-                    <p className="text-2xl font-bold mt-1">${metrics.arr.toLocaleString()}</p>
+                    <p className="text-xs text-muted-foreground font-medium">
+                      ARR
+                    </p>
+                    <p className="text-2xl font-bold mt-1">
+                      ${metrics.arr.toLocaleString()}
+                    </p>
                   </div>
                   <div className="h-11 w-11 rounded-xl bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 flex items-center justify-center">
                     <TrendingUp className="h-5 w-5" />
@@ -220,8 +315,12 @@ export function SuperAdminAnalytics() {
               <CardContent className="p-5">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-xs text-muted-foreground font-medium">LTV</p>
-                    <p className="text-2xl font-bold mt-1">${metrics.ltv.toLocaleString()}</p>
+                    <p className="text-xs text-muted-foreground font-medium">
+                      LTV
+                    </p>
+                    <p className="text-2xl font-bold mt-1">
+                      ${metrics.ltv.toLocaleString()}
+                    </p>
                   </div>
                   <div className="h-11 w-11 rounded-xl bg-blue-100 dark:bg-blue-900/30 text-blue-600 flex items-center justify-center">
                     <Users className="h-5 w-5" />
@@ -237,8 +336,12 @@ export function SuperAdminAnalytics() {
               <CardContent className="p-5">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-xs text-muted-foreground font-medium">Churn Rate</p>
-                    <p className="text-2xl font-bold mt-1">{metrics.churnRate}%</p>
+                    <p className="text-xs text-muted-foreground font-medium">
+                      Churn Rate
+                    </p>
+                    <p className="text-2xl font-bold mt-1">
+                      {metrics.churnRate}%
+                    </p>
                   </div>
                   <div className="h-11 w-11 rounded-xl bg-amber-100 dark:bg-amber-900/30 text-amber-600 flex items-center justify-center">
                     <Activity className="h-5 w-5" />
@@ -254,8 +357,12 @@ export function SuperAdminAnalytics() {
               <CardContent className="p-5">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-xs text-muted-foreground font-medium">CAC</p>
-                    <p className="text-2xl font-bold mt-1">${metrics.cac.toLocaleString()}</p>
+                    <p className="text-xs text-muted-foreground font-medium">
+                      CAC
+                    </p>
+                    <p className="text-2xl font-bold mt-1">
+                      ${metrics.cac.toLocaleString()}
+                    </p>
                   </div>
                   <div className="h-11 w-11 rounded-xl bg-violet-100 dark:bg-violet-900/30 text-violet-600 flex items-center justify-center">
                     <Zap className="h-5 w-5" />
@@ -279,16 +386,26 @@ export function SuperAdminAnalytics() {
               <TrendingUp className="h-4 w-4 text-rose-500" />
               Tenant Growth
             </CardTitle>
-            <CardDescription>Cumulative tenant count over 12 months</CardDescription>
+            <CardDescription>
+              Cumulative tenant count over 12 months
+            </CardDescription>
           </CardHeader>
           <CardContent>
             {loading ? (
               <ChartSkeleton />
             ) : (
-              <ChartContainer config={tenantGrowthConfig} className="h-[300px] w-full">
+              <ChartContainer
+                config={tenantGrowthConfig}
+                className="h-[300px] w-full"
+              >
                 <LineChart data={tenantGrowth}>
                   <CartesianGrid strokeDasharray="3 3" vertical={false} />
-                  <XAxis dataKey="month" tickLine={false} axisLine={false} fontSize={12} />
+                  <XAxis
+                    dataKey="month"
+                    tickLine={false}
+                    axisLine={false}
+                    fontSize={12}
+                  />
                   <YAxis tickLine={false} axisLine={false} fontSize={12} />
                   <ChartTooltip content={<ChartTooltipContent />} />
                   <Line
@@ -296,7 +413,7 @@ export function SuperAdminAnalytics() {
                     dataKey="tenants"
                     stroke="var(--color-tenants)"
                     strokeWidth={2.5}
-                    dot={{ r: 3, fill: 'var(--color-tenants)' }}
+                    dot={{ r: 3, fill: "var(--color-tenants)" }}
                     activeDot={{ r: 6 }}
                   />
                 </LineChart>
@@ -318,11 +435,26 @@ export function SuperAdminAnalytics() {
             {loading ? (
               <ChartSkeleton />
             ) : (
-              <ChartContainer config={userGrowthConfig} className="h-[300px] w-full">
+              <ChartContainer
+                config={userGrowthConfig}
+                className="h-[300px] w-full"
+              >
                 <AreaChart data={userGrowth}>
                   <CartesianGrid strokeDasharray="3 3" vertical={false} />
-                  <XAxis dataKey="month" tickLine={false} axisLine={false} fontSize={12} />
-                  <YAxis tickLine={false} axisLine={false} fontSize={12} tickFormatter={(v) => v >= 1000 ? `${(v / 1000).toFixed(1)}k` : v} />
+                  <XAxis
+                    dataKey="month"
+                    tickLine={false}
+                    axisLine={false}
+                    fontSize={12}
+                  />
+                  <YAxis
+                    tickLine={false}
+                    axisLine={false}
+                    fontSize={12}
+                    tickFormatter={(v) =>
+                      v >= 1000 ? `${(v / 1000).toFixed(1)}k` : v
+                    }
+                  />
                   <ChartTooltip content={<ChartTooltipContent />} />
                   <ChartLegend content={<ChartLegendContent />} />
                   <Area
@@ -377,16 +509,27 @@ export function SuperAdminAnalytics() {
               <DollarSign className="h-4 w-4 text-rose-500" />
               Revenue by Tenant (Top 10)
             </CardTitle>
-            <CardDescription>Monthly recurring revenue distribution</CardDescription>
+            <CardDescription>
+              Monthly recurring revenue distribution
+            </CardDescription>
           </CardHeader>
           <CardContent>
             {loading ? (
               <ChartSkeleton />
             ) : (
-              <ChartContainer config={revenueConfig} className="h-[300px] w-full">
+              <ChartContainer
+                config={revenueConfig}
+                className="h-[300px] w-full"
+              >
                 <BarChart data={revenueBreakdown} layout="vertical">
                   <CartesianGrid strokeDasharray="3 3" horizontal={false} />
-                  <XAxis type="number" tickLine={false} axisLine={false} fontSize={12} tickFormatter={(v) => `$${(v / 1000).toFixed(0)}k`} />
+                  <XAxis
+                    type="number"
+                    tickLine={false}
+                    axisLine={false}
+                    fontSize={12}
+                    tickFormatter={(v) => `$${(v / 1000).toFixed(0)}k`}
+                  />
                   <YAxis
                     type="category"
                     dataKey="name"
@@ -394,12 +537,17 @@ export function SuperAdminAnalytics() {
                     axisLine={false}
                     fontSize={11}
                     width={120}
-                    tickFormatter={(v: string) => v.length > 18 ? v.slice(0, 18) + '...' : v}
+                    tickFormatter={(v: string) =>
+                      v.length > 18 ? v.slice(0, 18) + "..." : v
+                    }
                   />
                   <ChartTooltip content={<ChartTooltipContent />} />
                   <Bar dataKey="revenue" radius={[0, 4, 4, 0]} maxBarSize={24}>
                     {revenueBreakdown.map((_, index) => (
-                      <Cell key={`cell-${index}`} fill={PIE_COLORS[index % PIE_COLORS.length]} />
+                      <Cell
+                        key={`cell-${index}`}
+                        fill={PIE_COLORS[index % PIE_COLORS.length]}
+                      />
                     ))}
                   </Bar>
                 </BarChart>
@@ -454,11 +602,17 @@ export function SuperAdminAnalytics() {
                       nameKey="country"
                     >
                       {geographicData.map((_, index) => (
-                        <Cell key={`geo-${index}`} fill={PIE_COLORS[index % PIE_COLORS.length]} />
+                        <Cell
+                          key={`geo-${index}`}
+                          fill={PIE_COLORS[index % PIE_COLORS.length]}
+                        />
                       ))}
                     </Pie>
                     <Tooltip
-                      formatter={(value: number, name: string) => [`${value}%`, name]}
+                      formatter={(value: number, name: string) => [
+                        `${value}%`,
+                        name,
+                      ]}
                     />
                   </PieChart>
                 </ChartContainer>
@@ -477,23 +631,48 @@ export function SuperAdminAnalytics() {
               <Zap className="h-4 w-4 text-amber-500" />
               Feature Usage
             </CardTitle>
-            <CardDescription>Most used platform features across all tenants</CardDescription>
+            <CardDescription>
+              Most used platform features across all tenants
+            </CardDescription>
           </CardHeader>
           <CardContent>
             {loading ? (
               <ChartSkeleton />
             ) : (
-              <ChartContainer config={featureUsageConfig} className="h-[340px] w-full">
+              <ChartContainer
+                config={featureUsageConfig}
+                className="h-[340px] w-full"
+              >
                 <BarChart data={featureUsageData} layout="vertical">
                   <CartesianGrid strokeDasharray="3 3" horizontal={false} />
-                  <XAxis type="number" domain={[0, 100]} tickLine={false} axisLine={false} fontSize={12} unit="%" />
-                  <YAxis type="category" dataKey="feature" tickLine={false} axisLine={false} fontSize={12} width={100} />
+                  <XAxis
+                    type="number"
+                    domain={[0, 100]}
+                    tickLine={false}
+                    axisLine={false}
+                    fontSize={12}
+                    unit="%"
+                  />
+                  <YAxis
+                    type="category"
+                    dataKey="feature"
+                    tickLine={false}
+                    axisLine={false}
+                    fontSize={12}
+                    width={100}
+                  />
                   <ChartTooltip content={<ChartTooltipContent />} />
                   <Bar dataKey="usage" radius={[0, 4, 4, 0]} maxBarSize={20}>
                     {featureUsageData.map((_, index) => (
                       <Cell
                         key={`feature-${index}`}
-                        fill={index < 3 ? '#10b981' : index < 6 ? '#3b82f6' : '#f59e0b'}
+                        fill={
+                          index < 3
+                            ? "#10b981"
+                            : index < 6
+                              ? "#3b82f6"
+                              : "#f59e0b"
+                        }
                       />
                     ))}
                   </Bar>
@@ -510,7 +689,9 @@ export function SuperAdminAnalytics() {
               <Server className="h-4 w-4 text-emerald-500" />
               Performance Metrics
             </CardTitle>
-            <CardDescription>Real-time platform health indicators</CardDescription>
+            <CardDescription>
+              Real-time platform health indicators
+            </CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
             {/* Server Uptime */}
@@ -521,18 +702,25 @@ export function SuperAdminAnalytics() {
                     <Wifi className="h-5 w-5" />
                   </div>
                   <div>
-                    <p className="text-sm font-semibold text-emerald-900">Server Uptime</p>
+                    <p className="text-sm font-semibold text-emerald-900">
+                      Server Uptime
+                    </p>
                     <p className="text-xs text-emerald-600">Last 30 days</p>
                   </div>
                 </div>
                 <div className="text-right">
-                  <p className="text-2xl font-bold text-emerald-700 dark:text-emerald-400">{serverUptime}%</p>
+                  <p className="text-2xl font-bold text-emerald-700 dark:text-emerald-400">
+                    {serverUptime}%
+                  </p>
                   <p className="text-xs text-emerald-500 flex items-center gap-1 justify-end">
                     <ArrowUpRight className="h-3 w-3" /> 99.7% last month
                   </p>
                 </div>
               </div>
-              <Progress value={serverUptime} className="h-2 bg-emerald-100 dark:bg-emerald-900/30 [&>div]:bg-emerald-500" />
+              <Progress
+                value={serverUptime}
+                className="h-2 bg-emerald-100 dark:bg-emerald-900/30 [&>div]:bg-emerald-500"
+              />
             </div>
 
             {/* Avg Response Time */}
@@ -543,18 +731,25 @@ export function SuperAdminAnalytics() {
                     <Clock className="h-5 w-5" />
                   </div>
                   <div>
-                    <p className="text-sm font-semibold text-blue-900">Avg Response Time</p>
+                    <p className="text-sm font-semibold text-blue-900">
+                      Avg Response Time
+                    </p>
                     <p className="text-xs text-blue-600">API requests</p>
                   </div>
                 </div>
                 <div className="text-right">
-                  <p className="text-2xl font-bold text-blue-700 dark:text-blue-400">{avgResponseTime}ms</p>
+                  <p className="text-2xl font-bold text-blue-700 dark:text-blue-400">
+                    {avgResponseTime}ms
+                  </p>
                   <p className="text-xs text-emerald-600 flex items-center gap-1 justify-end">
                     <ArrowDownRight className="h-3 w-3" /> -12ms from last week
                   </p>
                 </div>
               </div>
-              <Progress value={82} className="h-2 bg-blue-100 dark:bg-blue-900/30 [&>div]:bg-blue-500" />
+              <Progress
+                value={82}
+                className="h-2 bg-blue-100 dark:bg-blue-900/30 [&>div]:bg-blue-500"
+              />
             </div>
 
             {/* Active Users Today */}
@@ -565,18 +760,25 @@ export function SuperAdminAnalytics() {
                     <UserCheck className="h-5 w-5" />
                   </div>
                   <div>
-                    <p className="text-sm font-semibold text-rose-900">Active Users Today</p>
+                    <p className="text-sm font-semibold text-rose-900">
+                      Active Users Today
+                    </p>
                     <p className="text-xs text-rose-600">Across all tenants</p>
                   </div>
                 </div>
                 <div className="text-right">
-                  <p className="text-2xl font-bold text-rose-700 dark:text-rose-400">{activeUsers.toLocaleString()}</p>
+                  <p className="text-2xl font-bold text-rose-700 dark:text-rose-400">
+                    {activeUsers.toLocaleString()}
+                  </p>
                   <p className="text-xs text-emerald-600 flex items-center gap-1 justify-end">
                     <ArrowUpRight className="h-3 w-3" /> +18% from yesterday
                   </p>
                 </div>
               </div>
-              <Progress value={68} className="h-2 bg-rose-100 dark:bg-rose-900/30 [&>div]:bg-rose-500" />
+              <Progress
+                value={68}
+                className="h-2 bg-rose-100 dark:bg-rose-900/30 [&>div]:bg-rose-500"
+              />
             </div>
 
             {/* Platform Stats Summary */}
@@ -585,11 +787,13 @@ export function SuperAdminAnalytics() {
                 <p className="text-lg font-bold text-foreground">
                   {platformData?.tenants?.total || 42}
                 </p>
-                <p className="text-[11px] text-muted-foreground">Total Tenants</p>
+                <p className="text-[11px] text-muted-foreground">
+                  Total Tenants
+                </p>
               </div>
               <div className="text-center p-3 rounded-lg bg-muted/50">
                 <p className="text-lg font-bold text-foreground">
-                  {platformData?.users?.total?.toLocaleString() || '3.4k'}
+                  {platformData?.users?.total?.toLocaleString() || "3.4k"}
                 </p>
                 <p className="text-[11px] text-muted-foreground">Total Users</p>
               </div>
@@ -597,7 +801,9 @@ export function SuperAdminAnalytics() {
                 <p className="text-lg font-bold text-foreground">
                   {platformData?.classes || 186}
                 </p>
-                <p className="text-[11px] text-muted-foreground">Active Classes</p>
+                <p className="text-[11px] text-muted-foreground">
+                  Active Classes
+                </p>
               </div>
             </div>
           </CardContent>

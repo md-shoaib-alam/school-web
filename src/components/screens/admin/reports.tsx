@@ -1,44 +1,69 @@
-'use client';
+"use client";
 
-import { useState, useEffect, useMemo } from 'react';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Badge } from '@/components/ui/badge';
-import { Skeleton } from '@/components/ui/skeleton';
+import { useState, useEffect, useMemo } from "react";
 import {
-  Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
-} from '@/components/ui/table';
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Badge } from "@/components/ui/badge";
+import { Skeleton } from "@/components/ui/skeleton";
 import {
-  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
-} from '@/components/ui/select';
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import {
-  BarChart, Bar, XAxis, YAxis, CartesianGrid,
-} from 'recharts';
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid } from "recharts";
 import {
-  ChartContainer, ChartTooltip, ChartTooltipContent,
-} from '@/components/ui/chart';
-import type { ChartConfig } from '@/components/ui/chart';
+  ChartContainer,
+  ChartTooltip,
+  ChartTooltipContent,
+} from "@/components/ui/chart";
+import type { ChartConfig } from "@/components/ui/chart";
 import {
-  BarChart3, GraduationCap, DollarSign, AlertTriangle, TrendingUp, Eye,
-} from 'lucide-react';
-import type { ClassInfo, AttendanceRecord, GradeRecord, FeeRecord } from '@/lib/types';
-import { useModulePermissions } from '@/hooks/use-permissions';
+  BarChart3,
+  GraduationCap,
+  DollarSign,
+  AlertTriangle,
+  TrendingUp,
+  Eye,
+} from "lucide-react";
+import type {
+  ClassInfo,
+  AttendanceRecord,
+  GradeRecord,
+  FeeRecord,
+} from "@/lib/types";
+import { useModulePermissions } from "@/hooks/use-permissions";
 
 // ─── Chart Configs ──────────────────────────────────────────────────────────
 
 const attendanceChartConfig = {
-  present: { label: 'Present', color: '#10b981' },
-  absent: { label: 'Absent', color: '#ef4444' },
-  late: { label: 'Late', color: '#f59e0b' },
+  present: { label: "Present", color: "#10b981" },
+  absent: { label: "Absent", color: "#ef4444" },
+  late: { label: "Late", color: "#f59e0b" },
 } satisfies ChartConfig;
 
 const gradeChartConfig = {
-  count: { label: 'Students', color: '#8b5cf6' },
+  count: { label: "Students", color: "#8b5cf6" },
 } satisfies ChartConfig;
 
 const feeBreakdownConfig = {
-  collected: { label: 'Collected', color: '#10b981' },
-  pending: { label: 'Pending', color: '#f59e0b' },
+  collected: { label: "Collected", color: "#10b981" },
+  pending: { label: "Pending", color: "#f59e0b" },
 } satisfies ChartConfig;
 
 // ─── Skeleton Components ────────────────────────────────────────────────────
@@ -95,18 +120,18 @@ interface DailyAttendance {
 function AttendanceReport() {
   const [classes, setClasses] = useState<ClassInfo[]>([]);
   const [records, setRecords] = useState<AttendanceRecord[]>([]);
-  const [selectedClass, setSelectedClass] = useState<string>('all');
+  const [selectedClass, setSelectedClass] = useState<string>("all");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     async function fetchClasses() {
       try {
-        const res = await fetch('/api/classes');
-        if (!res.ok) throw new Error('Failed to fetch classes');
+        const res = await fetch("/api/classes");
+        if (!res.ok) throw new Error("Failed to fetch classes");
         setClasses(await res.json());
       } catch {
-        console.error('Error fetching classes');
+        console.error("Error fetching classes");
       }
     }
     fetchClasses();
@@ -117,12 +142,12 @@ function AttendanceReport() {
       setLoading(true);
       try {
         const params = new URLSearchParams();
-        if (selectedClass !== 'all') params.set('classId', selectedClass);
+        if (selectedClass !== "all") params.set("classId", selectedClass);
         const res = await fetch(`/api/attendance?${params.toString()}`);
-        if (!res.ok) throw new Error('Failed to fetch attendance');
+        if (!res.ok) throw new Error("Failed to fetch attendance");
         setRecords(await res.json());
       } catch (err) {
-        setError(err instanceof Error ? err.message : 'Unknown error');
+        setError(err instanceof Error ? err.message : "Unknown error");
       } finally {
         setLoading(false);
       }
@@ -131,9 +156,9 @@ function AttendanceReport() {
   }, [selectedClass]);
 
   const summary: AttendanceSummary = useMemo(() => {
-    const present = records.filter((r) => r.status === 'present').length;
-    const absent = records.filter((r) => r.status === 'absent').length;
-    const late = records.filter((r) => r.status === 'late').length;
+    const present = records.filter((r) => r.status === "present").length;
+    const absent = records.filter((r) => r.status === "absent").length;
+    const late = records.filter((r) => r.status === "late").length;
     const total = records.length || 1;
     return {
       present,
@@ -147,16 +172,19 @@ function AttendanceReport() {
   }, [records]);
 
   const dailyData: DailyAttendance[] = useMemo(() => {
-    const dateMap = new Map<string, { present: number; absent: number; late: number }>();
+    const dateMap = new Map<
+      string,
+      { present: number; absent: number; late: number }
+    >();
     for (const r of records) {
-      const d = new Date(r.date).toLocaleDateString('en-US', {
-        month: 'short',
-        day: 'numeric',
+      const d = new Date(r.date).toLocaleDateString("en-US", {
+        month: "short",
+        day: "numeric",
       });
       const entry = dateMap.get(d) || { present: 0, absent: 0, late: 0 };
-      if (r.status === 'present') entry.present++;
-      else if (r.status === 'absent') entry.absent++;
-      else if (r.status === 'late') entry.late++;
+      if (r.status === "present") entry.present++;
+      else if (r.status === "absent") entry.absent++;
+      else if (r.status === "late") entry.late++;
       dateMap.set(d, entry);
     }
     return Array.from(dateMap.entries())
@@ -166,28 +194,30 @@ function AttendanceReport() {
 
   const summaryCards = [
     {
-      label: 'Present',
+      label: "Present",
       value: summary.present,
       pct: summary.presentPct,
       icon: <TrendingUp className="h-5 w-5 text-emerald-600" />,
-      color: 'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400',
-      border: 'border-emerald-200 dark:border-emerald-800',
+      color:
+        "bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400",
+      border: "border-emerald-200 dark:border-emerald-800",
     },
     {
-      label: 'Absent',
+      label: "Absent",
       value: summary.absent,
       pct: summary.absentPct,
       icon: <AlertTriangle className="h-5 w-5 text-red-600" />,
-      color: 'bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400',
-      border: 'border-red-200 dark:border-red-800',
+      color: "bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400",
+      border: "border-red-200 dark:border-red-800",
     },
     {
-      label: 'Late',
+      label: "Late",
       value: summary.late,
       pct: summary.latePct,
       icon: <AlertTriangle className="h-5 w-5 text-amber-600" />,
-      color: 'bg-amber-100 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400',
-      border: 'border-amber-200 dark:border-amber-800',
+      color:
+        "bg-amber-100 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400",
+      border: "border-amber-200 dark:border-amber-800",
     },
   ];
 
@@ -239,9 +269,13 @@ function AttendanceReport() {
               <CardContent className="p-4">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-xs text-muted-foreground">{card.label}</p>
+                    <p className="text-xs text-muted-foreground">
+                      {card.label}
+                    </p>
                     <p className="text-2xl font-bold mt-1">{card.value}</p>
-                    <p className="text-xs text-muted-foreground mt-0.5">{card.pct}%</p>
+                    <p className="text-xs text-muted-foreground mt-0.5">
+                      {card.pct}%
+                    </p>
                   </div>
                   <div
                     className={`h-10 w-10 rounded-xl flex items-center justify-center ${card.color}`}
@@ -258,8 +292,12 @@ function AttendanceReport() {
       {/* Daily attendance bar chart */}
       <Card>
         <CardHeader>
-          <CardTitle className="text-base">Daily Attendance (Last 7 Days)</CardTitle>
-          <CardDescription>Present, absent, and late counts per day</CardDescription>
+          <CardTitle className="text-base">
+            Daily Attendance (Last 7 Days)
+          </CardTitle>
+          <CardDescription>
+            Present, absent, and late counts per day
+          </CardDescription>
         </CardHeader>
         <CardContent>
           {loading ? (
@@ -267,18 +305,43 @@ function AttendanceReport() {
           ) : dailyData.length === 0 ? (
             <div className="text-center py-12 text-muted-foreground">
               <BarChart3 className="h-10 w-10 mx-auto mb-2 opacity-30" />
-              <p className="text-sm">No attendance data available for the selected period</p>
+              <p className="text-sm">
+                No attendance data available for the selected period
+              </p>
             </div>
           ) : (
-            <ChartContainer config={attendanceChartConfig} className="h-[300px] w-full">
+            <ChartContainer
+              config={attendanceChartConfig}
+              className="h-[300px] w-full"
+            >
               <BarChart data={dailyData}>
                 <CartesianGrid strokeDasharray="3 3" vertical={false} />
-                <XAxis dataKey="date" tickLine={false} axisLine={false} fontSize={12} />
+                <XAxis
+                  dataKey="date"
+                  tickLine={false}
+                  axisLine={false}
+                  fontSize={12}
+                />
                 <YAxis tickLine={false} axisLine={false} fontSize={12} />
                 <ChartTooltip content={<ChartTooltipContent />} />
-                <Bar dataKey="present" fill="var(--color-present)" radius={[4, 4, 0, 0]} maxBarSize={28} />
-                <Bar dataKey="absent" fill="var(--color-absent)" radius={[4, 4, 0, 0]} maxBarSize={28} />
-                <Bar dataKey="late" fill="var(--color-late)" radius={[4, 4, 0, 0]} maxBarSize={28} />
+                <Bar
+                  dataKey="present"
+                  fill="var(--color-present)"
+                  radius={[4, 4, 0, 0]}
+                  maxBarSize={28}
+                />
+                <Bar
+                  dataKey="absent"
+                  fill="var(--color-absent)"
+                  radius={[4, 4, 0, 0]}
+                  maxBarSize={28}
+                />
+                <Bar
+                  dataKey="late"
+                  fill="var(--color-late)"
+                  radius={[4, 4, 0, 0]}
+                  maxBarSize={28}
+                />
               </BarChart>
             </ChartContainer>
           )}
@@ -306,11 +369,11 @@ function AcademicReport() {
   useEffect(() => {
     async function fetchGrades() {
       try {
-        const res = await fetch('/api/grades');
-        if (!res.ok) throw new Error('Failed to fetch grades');
+        const res = await fetch("/api/grades");
+        if (!res.ok) throw new Error("Failed to fetch grades");
         setGrades(await res.json());
       } catch (err) {
-        setError(err instanceof Error ? err.message : 'Unknown error');
+        setError(err instanceof Error ? err.message : "Unknown error");
       } finally {
         setLoading(false);
       }
@@ -319,7 +382,7 @@ function AcademicReport() {
   }, []);
 
   const gradeDistribution = useMemo(() => {
-    const order = ['A+', 'A', 'B+', 'B', 'C', 'D'];
+    const order = ["A+", "A", "B+", "B", "C", "D"];
     const counts: Record<string, number> = {};
     for (const g of order) counts[g] = 0;
     for (const r of grades) {
@@ -347,9 +410,9 @@ function AcademicReport() {
       subjectMap.set(r.subjectName, entry);
     }
     const gradeRank: Record<string, number> = {
-      'A+': 6,
+      "A+": 6,
       A: 5,
-      'B+': 4,
+      "B+": 4,
       B: 3,
       C: 2,
       D: 1,
@@ -361,23 +424,27 @@ function AcademicReport() {
         maxMarks: Math.round(data.totalMax / data.count),
         studentCount: data.count,
         highestGrade:
-          data.grades.sort((a, b) => (gradeRank[b] ?? 0) - (gradeRank[a] ?? 0))[0] || 'N/A',
+          data.grades.sort(
+            (a, b) => (gradeRank[b] ?? 0) - (gradeRank[a] ?? 0),
+          )[0] || "N/A",
       }))
       .sort((a, b) => b.averageMarks - a.averageMarks);
   }, [grades]);
 
   const getPerformanceColor = (avg: number, max: number) => {
     const pct = (avg / max) * 100;
-    if (pct >= 80) return 'text-emerald-600 dark:text-emerald-400';
-    if (pct >= 60) return 'text-amber-600 dark:text-amber-400';
-    return 'text-red-600 dark:text-red-400';
+    if (pct >= 80) return "text-emerald-600 dark:text-emerald-400";
+    if (pct >= 60) return "text-amber-600 dark:text-amber-400";
+    return "text-red-600 dark:text-red-400";
   };
 
   const getPerformanceBadge = (avg: number, max: number) => {
     const pct = (avg / max) * 100;
-    if (pct >= 80) return 'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400';
-    if (pct >= 60) return 'bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400';
-    return 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400';
+    if (pct >= 80)
+      return "bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400";
+    if (pct >= 60)
+      return "bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400";
+    return "bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400";
   };
 
   if (error) {
@@ -398,7 +465,9 @@ function AcademicReport() {
       <Card>
         <CardHeader>
           <CardTitle className="text-base">Grade Distribution</CardTitle>
-          <CardDescription>Number of students by grade across all subjects</CardDescription>
+          <CardDescription>
+            Number of students by grade across all subjects
+          </CardDescription>
         </CardHeader>
         <CardContent>
           {loading ? (
@@ -409,13 +478,31 @@ function AcademicReport() {
               <p className="text-sm">No grade data available</p>
             </div>
           ) : (
-            <ChartContainer config={gradeChartConfig} className="h-[300px] w-full">
+            <ChartContainer
+              config={gradeChartConfig}
+              className="h-[300px] w-full"
+            >
               <BarChart data={gradeDistribution}>
                 <CartesianGrid strokeDasharray="3 3" vertical={false} />
-                <XAxis dataKey="grade" tickLine={false} axisLine={false} fontSize={12} />
-                <YAxis tickLine={false} axisLine={false} fontSize={12} allowDecimals={false} />
+                <XAxis
+                  dataKey="grade"
+                  tickLine={false}
+                  axisLine={false}
+                  fontSize={12}
+                />
+                <YAxis
+                  tickLine={false}
+                  axisLine={false}
+                  fontSize={12}
+                  allowDecimals={false}
+                />
                 <ChartTooltip content={<ChartTooltipContent />} />
-                <Bar dataKey="count" fill="var(--color-count)" radius={[6, 6, 0, 0]} maxBarSize={52} />
+                <Bar
+                  dataKey="count"
+                  fill="var(--color-count)"
+                  radius={[6, 6, 0, 0]}
+                  maxBarSize={52}
+                />
               </BarChart>
             </ChartContainer>
           )}
@@ -425,7 +512,9 @@ function AcademicReport() {
       {/* Subject-wise Average Performance */}
       <Card>
         <CardHeader>
-          <CardTitle className="text-base">Subject-wise Average Performance</CardTitle>
+          <CardTitle className="text-base">
+            Subject-wise Average Performance
+          </CardTitle>
           <CardDescription>
             Average marks, student count, and highest grade per subject
           </CardDescription>
@@ -444,9 +533,13 @@ function AcademicReport() {
                 <TableHeader>
                   <TableRow>
                     <TableHead>Subject</TableHead>
-                    <TableHead className="text-center hidden sm:table-cell">Students</TableHead>
+                    <TableHead className="text-center hidden sm:table-cell">
+                      Students
+                    </TableHead>
                     <TableHead className="text-center">Avg. Marks</TableHead>
-                    <TableHead className="text-center hidden sm:table-cell">Max Marks</TableHead>
+                    <TableHead className="text-center hidden sm:table-cell">
+                      Max Marks
+                    </TableHead>
                     <TableHead className="text-center">Highest Grade</TableHead>
                   </TableRow>
                 </TableHeader>
@@ -470,7 +563,10 @@ function AcademicReport() {
                         >
                           {row.averageMarks}
                         </span>
-                        <span className="text-xs text-muted-foreground"> / {row.maxMarks}</span>
+                        <span className="text-xs text-muted-foreground">
+                          {" "}
+                          / {row.maxMarks}
+                        </span>
                       </TableCell>
                       <TableCell className="text-center hidden sm:table-cell">
                         {row.maxMarks}
@@ -517,11 +613,11 @@ function FeeReport() {
   useEffect(() => {
     async function fetchFees() {
       try {
-        const res = await fetch('/api/fees');
-        if (!res.ok) throw new Error('Failed to fetch fees');
+        const res = await fetch("/api/fees");
+        if (!res.ok) throw new Error("Failed to fetch fees");
         setFees(await res.json());
       } catch (err) {
-        setError(err instanceof Error ? err.message : 'Unknown error');
+        setError(err instanceof Error ? err.message : "Unknown error");
       } finally {
         setLoading(false);
       }
@@ -549,44 +645,47 @@ function FeeReport() {
     }
     return Array.from(typeMap.entries())
       .map(([type, data]) => ({ type, ...data }))
-      .sort((a, b) => (b.collected + b.pending) - (a.collected + a.pending));
+      .sort((a, b) => b.collected + b.pending - (a.collected + a.pending));
   }, [fees]);
 
   const overdueStudents = useMemo(() => {
-    const today = new Date().toISOString().split('T')[0];
+    const today = new Date().toISOString().split("T")[0];
     return fees
-      .filter((f) => f.status !== 'paid' && f.dueDate < today)
+      .filter((f) => f.status !== "paid" && f.dueDate < today)
       .sort((a, b) => a.dueDate.localeCompare(b.dueDate));
   }, [fees]);
 
   const collectionPct =
     summary.totalFees > 0
       ? ((summary.collected / summary.totalFees) * 100).toFixed(1)
-      : '0';
+      : "0";
 
   const summaryCards = [
     {
-      label: 'Total Fees',
+      label: "Total Fees",
       value: `$${summary.totalFees.toLocaleString()}`,
       icon: <DollarSign className="h-5 w-5 text-violet-600" />,
-      color: 'bg-violet-100 dark:bg-violet-900/30 text-violet-600 dark:text-violet-400',
-      border: 'border-violet-200 dark:border-violet-800',
+      color:
+        "bg-violet-100 dark:bg-violet-900/30 text-violet-600 dark:text-violet-400",
+      border: "border-violet-200 dark:border-violet-800",
       sub: `${fees.length} records`,
     },
     {
-      label: 'Collected',
+      label: "Collected",
       value: `$${summary.collected.toLocaleString()}`,
       icon: <DollarSign className="h-5 w-5 text-emerald-600" />,
-      color: 'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400',
-      border: 'border-emerald-200 dark:border-emerald-800',
+      color:
+        "bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400",
+      border: "border-emerald-200 dark:border-emerald-800",
       sub: `${collectionPct}% collection rate`,
     },
     {
-      label: 'Pending',
+      label: "Pending",
       value: `$${summary.pending.toLocaleString()}`,
       icon: <AlertTriangle className="h-5 w-5 text-amber-600" />,
-      color: 'bg-amber-100 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400',
-      border: 'border-amber-200 dark:border-amber-800',
+      color:
+        "bg-amber-100 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400",
+      border: "border-amber-200 dark:border-amber-800",
       sub: `${overdueStudents.length} overdue`,
     },
   ];
@@ -619,9 +718,13 @@ function FeeReport() {
               <CardContent className="p-4">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-xs text-muted-foreground">{card.label}</p>
+                    <p className="text-xs text-muted-foreground">
+                      {card.label}
+                    </p>
                     <p className="text-2xl font-bold mt-1">{card.value}</p>
-                    <p className="text-xs text-muted-foreground mt-0.5">{card.sub}</p>
+                    <p className="text-xs text-muted-foreground mt-0.5">
+                      {card.sub}
+                    </p>
                   </div>
                   <div
                     className={`h-10 w-10 rounded-xl flex items-center justify-center ${card.color}`}
@@ -639,7 +742,9 @@ function FeeReport() {
       <Card>
         <CardHeader>
           <CardTitle className="text-base">Fee Breakdown by Type</CardTitle>
-          <CardDescription>Collected vs pending amounts grouped by fee type</CardDescription>
+          <CardDescription>
+            Collected vs pending amounts grouped by fee type
+          </CardDescription>
         </CardHeader>
         <CardContent>
           {loading ? (
@@ -650,7 +755,10 @@ function FeeReport() {
               <p className="text-sm">No fee data available</p>
             </div>
           ) : (
-            <ChartContainer config={feeBreakdownConfig} className="h-[300px] w-full">
+            <ChartContainer
+              config={feeBreakdownConfig}
+              className="h-[300px] w-full"
+            >
               <BarChart data={typeBreakdown}>
                 <CartesianGrid strokeDasharray="3 3" vertical={false} />
                 <XAxis
@@ -712,11 +820,17 @@ function FeeReport() {
                 <TableHeader>
                   <TableRow>
                     <TableHead>Student</TableHead>
-                    <TableHead className="hidden sm:table-cell">Fee Type</TableHead>
+                    <TableHead className="hidden sm:table-cell">
+                      Fee Type
+                    </TableHead>
                     <TableHead className="text-right">Amount</TableHead>
-                    <TableHead className="text-right hidden sm:table-cell">Paid</TableHead>
+                    <TableHead className="text-right hidden sm:table-cell">
+                      Paid
+                    </TableHead>
                     <TableHead className="text-right">Balance</TableHead>
-                    <TableHead className="hidden md:table-cell">Due Date</TableHead>
+                    <TableHead className="hidden md:table-cell">
+                      Due Date
+                    </TableHead>
                     <TableHead className="text-center">Status</TableHead>
                   </TableRow>
                 </TableHeader>
@@ -724,7 +838,7 @@ function FeeReport() {
                   {overdueStudents.map((fee) => {
                     const balance = fee.amount - fee.paidAmount;
                     const isOverdue =
-                      fee.dueDate < new Date().toISOString().split('T')[0];
+                      fee.dueDate < new Date().toISOString().split("T")[0];
 
                     return (
                       <TableRow key={fee.id}>
@@ -732,9 +846,9 @@ function FeeReport() {
                           <div className="flex items-center gap-2">
                             <div className="h-7 w-7 rounded-full bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 flex items-center justify-center text-xs font-semibold">
                               {fee.studentName
-                                .split(' ')
+                                .split(" ")
                                 .map((n) => n[0])
-                                .join('')
+                                .join("")
                                 .slice(0, 2)
                                 .toUpperCase()}
                             </div>
@@ -791,14 +905,16 @@ function FeeReport() {
 // ─── Main Export ────────────────────────────────────────────────────────────
 
 export function AdminReports() {
-  const { canCreate, canEdit, canDelete } = useModulePermissions('reports');
+  const { canCreate, canEdit, canDelete } = useModulePermissions("reports");
   return (
     <div className="space-y-6">
       {/* Read-only banner */}
       {!canCreate && !canEdit && !canDelete && (
         <div className="flex items-center gap-2 rounded-lg border border-amber-200 dark:border-amber-800 bg-amber-50 dark:bg-amber-900/30 px-3 py-2">
           <Eye className="h-4 w-4 text-amber-600 dark:text-amber-400 shrink-0" />
-          <span className="text-xs text-amber-700 dark:text-amber-300 font-medium">Read-only mode — you have view permission only for this module.</span>
+          <span className="text-xs text-amber-700 dark:text-amber-300 font-medium">
+            Read-only mode — you have view permission only for this module.
+          </span>
         </div>
       )}
 

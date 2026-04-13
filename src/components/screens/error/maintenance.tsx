@@ -1,8 +1,8 @@
-'use client';
+"use client";
 
-import { Button } from '@/components/ui/button';
-import { useAppStore } from '@/store/use-app-store';
-import { Wrench, RefreshCw, LogOut, Building2 } from 'lucide-react';
+import { Button } from "@/components/ui/button";
+import { useAppStore } from "@/store/use-app-store";
+import { Wrench, RefreshCw, LogOut, Building2 } from "lucide-react";
 
 export function MaintenanceScreen() {
   const { logout, currentTenantName } = useAppStore();
@@ -66,7 +66,8 @@ export function MaintenanceScreen() {
 
         {/* Description */}
         <p className="text-gray-500 dark:text-gray-400 mt-4 text-base leading-relaxed animate-[fade-up_0.6s_ease-out_0.55s_forwards] opacity-0 max-w-md mx-auto">
-          Our platform is currently undergoing scheduled maintenance to bring you improvements.
+          Our platform is currently undergoing scheduled maintenance to bring
+          you improvements.
           <br />
           We&apos;ll be back shortly. Thank you for your patience!
         </p>
@@ -100,7 +101,8 @@ export function MaintenanceScreen() {
 
         {/* Bottom text */}
         <p className="text-xs text-gray-400 dark:text-gray-600 mt-10 animate-[fade-in_0.5s_ease_1s_forwards] opacity-0">
-          SchoolSaaS — If this persists, please contact your school administrator.
+          SchoolSaaS — If this persists, please contact your school
+          administrator.
         </p>
       </div>
 

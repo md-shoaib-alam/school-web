@@ -1,21 +1,21 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { Card, CardContent } from '@/components/ui/card';
-import { Switch } from '@/components/ui/switch';
-import { Slider } from '@/components/ui/slider';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
+import { useState } from "react";
+import { Card, CardContent } from "@/components/ui/card";
+import { Switch } from "@/components/ui/switch";
+import { Slider } from "@/components/ui/slider";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
+} from "@/components/ui/select";
 import {
   Dialog,
   DialogContent,
@@ -24,11 +24,27 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from '@/components/ui/dialog';
+} from "@/components/ui/dialog";
 import {
-  ToggleLeft, ToggleRight, Blocks, Plus, Edit, Zap, Star, Rocket, Eye, EyeOff,
-  Check, X, Power, PowerOff, Shield, FlaskConical, Gem, Crown,
-} from 'lucide-react';
+  ToggleLeft,
+  ToggleRight,
+  Blocks,
+  Plus,
+  Edit,
+  Zap,
+  Star,
+  Rocket,
+  Eye,
+  EyeOff,
+  Check,
+  X,
+  Power,
+  PowerOff,
+  Shield,
+  FlaskConical,
+  Gem,
+  Crown,
+} from "lucide-react";
 
 // ── Types ──────────────────────────────────────────────────────
 
@@ -39,113 +55,123 @@ interface FeatureFlag {
   enabled: boolean;
   rolloutPercentage: number;
   targetedPlans: string[];
-  category: 'core' | 'premium' | 'enterprise' | 'beta';
+  category: "core" | "premium" | "enterprise" | "beta";
   icon: React.ElementType;
 }
 
-type Plan = 'All' | 'Basic' | 'Standard+' | 'Premium+' | 'Enterprise';
+type Plan = "All" | "Basic" | "Standard+" | "Premium+" | "Enterprise";
 
 // ── Initial Data ───────────────────────────────────────────────
 
 const initialFlags: FeatureFlag[] = [
   {
-    id: 'ai-grading',
-    name: 'AI-Powered Grading',
-    description: 'Automated essay and assignment grading using machine learning models with teacher review.',
+    id: "ai-grading",
+    name: "AI-Powered Grading",
+    description:
+      "Automated essay and assignment grading using machine learning models with teacher review.",
     enabled: true,
     rolloutPercentage: 100,
-    targetedPlans: ['Premium+'],
-    category: 'premium',
+    targetedPlans: ["Premium+"],
+    category: "premium",
     icon: Zap,
   },
   {
-    id: 'bus-tracking',
-    name: 'Live Bus Tracking',
-    description: 'Real-time GPS tracking of school buses with parent notifications for arrivals and delays.',
+    id: "bus-tracking",
+    name: "Live Bus Tracking",
+    description:
+      "Real-time GPS tracking of school buses with parent notifications for arrivals and delays.",
     enabled: true,
     rolloutPercentage: 100,
-    targetedPlans: ['Standard+'],
-    category: 'core',
+    targetedPlans: ["Standard+"],
+    category: "core",
     icon: Eye,
   },
   {
-    id: 'video-conferencing',
-    name: 'Video Conferencing',
-    description: 'Built-in video calling for virtual classes, parent-teacher meetings, and staff collaboration.',
+    id: "video-conferencing",
+    name: "Video Conferencing",
+    description:
+      "Built-in video calling for virtual classes, parent-teacher meetings, and staff collaboration.",
     enabled: false,
     rolloutPercentage: 0,
-    targetedPlans: ['All'],
-    category: 'beta',
+    targetedPlans: ["All"],
+    category: "beta",
     icon: EyeOff,
   },
   {
-    id: 'advanced-analytics',
-    name: 'Advanced Analytics',
-    description: 'Deep-dive analytics dashboards with custom reports, cohort analysis, and predictive insights.',
+    id: "advanced-analytics",
+    name: "Advanced Analytics",
+    description:
+      "Deep-dive analytics dashboards with custom reports, cohort analysis, and predictive insights.",
     enabled: true,
     rolloutPercentage: 80,
-    targetedPlans: ['Premium+'],
-    category: 'premium',
+    targetedPlans: ["Premium+"],
+    category: "premium",
     icon: Rocket,
   },
   {
-    id: 'multi-language',
-    name: 'Multi-Language Support',
-    description: 'Platform interface available in 12+ languages with automatic locale detection.',
+    id: "multi-language",
+    name: "Multi-Language Support",
+    description:
+      "Platform interface available in 12+ languages with automatic locale detection.",
     enabled: true,
     rolloutPercentage: 100,
-    targetedPlans: ['All'],
-    category: 'core',
+    targetedPlans: ["All"],
+    category: "core",
     icon: Blocks,
   },
   {
-    id: 'parent-app',
-    name: 'Parent Mobile App',
-    description: 'Dedicated mobile app for parents with push notifications, fee payments, and real-time updates.',
+    id: "parent-app",
+    name: "Parent Mobile App",
+    description:
+      "Dedicated mobile app for parents with push notifications, fee payments, and real-time updates.",
     enabled: true,
     rolloutPercentage: 60,
-    targetedPlans: ['Standard+'],
-    category: 'core',
+    targetedPlans: ["Standard+"],
+    category: "core",
     icon: Star,
   },
   {
-    id: 'online-exam',
-    name: 'Online Exam System',
-    description: 'Conduct secure online exams with plagiarism detection, time limits, and auto-grading.',
+    id: "online-exam",
+    name: "Online Exam System",
+    description:
+      "Conduct secure online exams with plagiarism detection, time limits, and auto-grading.",
     enabled: true,
     rolloutPercentage: 50,
-    targetedPlans: ['Premium+'],
-    category: 'premium',
+    targetedPlans: ["Premium+"],
+    category: "premium",
     icon: Edit,
   },
   {
-    id: 'fee-reminder',
-    name: 'Fee Auto-Reminder',
-    description: 'Automated SMS, email, and push notification reminders for upcoming and overdue fee payments.',
+    id: "fee-reminder",
+    name: "Fee Auto-Reminder",
+    description:
+      "Automated SMS, email, and push notification reminders for upcoming and overdue fee payments.",
     enabled: true,
     rolloutPercentage: 100,
-    targetedPlans: ['All'],
-    category: 'core',
+    targetedPlans: ["All"],
+    category: "core",
     icon: ToggleRight,
   },
   {
-    id: 'custom-reports',
-    name: 'Custom Report Builder',
-    description: 'Drag-and-drop report builder for creating custom academic and administrative reports.',
+    id: "custom-reports",
+    name: "Custom Report Builder",
+    description:
+      "Drag-and-drop report builder for creating custom academic and administrative reports.",
     enabled: false,
     rolloutPercentage: 0,
-    targetedPlans: ['Enterprise'],
-    category: 'enterprise',
+    targetedPlans: ["Enterprise"],
+    category: "enterprise",
     icon: Edit,
   },
   {
-    id: 'api-access',
-    name: 'API Access',
-    description: 'Full REST API access with OAuth2 authentication for third-party integrations.',
+    id: "api-access",
+    name: "API Access",
+    description:
+      "Full REST API access with OAuth2 authentication for third-party integrations.",
     enabled: true,
     rolloutPercentage: 30,
-    targetedPlans: ['Enterprise'],
-    category: 'enterprise',
+    targetedPlans: ["Enterprise"],
+    category: "enterprise",
     icon: Shield,
   },
 ];
@@ -153,11 +179,15 @@ const initialFlags: FeatureFlag[] = [
 // ── Helpers ────────────────────────────────────────────────────
 
 const planBadgeColors: Record<string, string> = {
-  'All': 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 border-gray-200 dark:border-gray-700',
-  'Basic': 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-700',
-  'Standard+': 'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 border-emerald-200 dark:border-emerald-700',
-  'Premium+': 'bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 border-amber-200 dark:border-amber-700',
-  'Enterprise': 'bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-400 border-purple-200 dark:border-purple-700',
+  All: "bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 border-gray-200 dark:border-gray-700",
+  Basic:
+    "bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-700",
+  "Standard+":
+    "bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 border-emerald-200 dark:border-emerald-700",
+  "Premium+":
+    "bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 border-amber-200 dark:border-amber-700",
+  Enterprise:
+    "bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-400 border-purple-200 dark:border-purple-700",
 };
 
 const categoryIcons: Record<string, React.ElementType> = {
@@ -168,27 +198,29 @@ const categoryIcons: Record<string, React.ElementType> = {
 };
 
 const categoryColors: Record<string, string> = {
-  core: 'text-emerald-600 bg-emerald-50 dark:bg-emerald-900/30',
-  premium: 'text-amber-600 bg-amber-50 dark:bg-amber-900/30',
-  enterprise: 'text-purple-600 bg-purple-50 dark:bg-purple-900/30',
-  beta: 'text-rose-600 bg-rose-50 dark:bg-rose-900/30',
+  core: "text-emerald-600 bg-emerald-50 dark:bg-emerald-900/30",
+  premium: "text-amber-600 bg-amber-50 dark:bg-amber-900/30",
+  enterprise: "text-purple-600 bg-purple-50 dark:bg-purple-900/30",
+  beta: "text-rose-600 bg-rose-50 dark:bg-rose-900/30",
 };
 
 // ── New Flag Dialog ────────────────────────────────────────────
 
 function NewFlagDialog({ onAdd }: { onAdd: (flag: FeatureFlag) => void }) {
   const [open, setOpen] = useState(false);
-  const [name, setName] = useState('');
-  const [description, setDescription] = useState('');
-  const [category, setCategory] = useState<'core' | 'premium' | 'enterprise' | 'beta'>('core');
-  const [plan, setPlan] = useState('All');
+  const [name, setName] = useState("");
+  const [description, setDescription] = useState("");
+  const [category, setCategory] = useState<
+    "core" | "premium" | "enterprise" | "beta"
+  >("core");
+  const [plan, setPlan] = useState("All");
 
   const handleCreate = () => {
     if (!name.trim()) return;
     const newFlag: FeatureFlag = {
-      id: name.toLowerCase().replace(/\s+/g, '-') + '-' + Date.now(),
+      id: name.toLowerCase().replace(/\s+/g, "-") + "-" + Date.now(),
       name: name.trim(),
-      description: description.trim() || 'No description provided.',
+      description: description.trim() || "No description provided.",
       enabled: false,
       rolloutPercentage: 0,
       targetedPlans: [plan as Plan],
@@ -196,10 +228,10 @@ function NewFlagDialog({ onAdd }: { onAdd: (flag: FeatureFlag) => void }) {
       icon: categoryIcons[category] || Blocks,
     };
     onAdd(newFlag);
-    setName('');
-    setDescription('');
-    setCategory('core');
-    setPlan('All');
+    setName("");
+    setDescription("");
+    setCategory("core");
+    setPlan("All");
     setOpen(false);
   };
 
@@ -246,7 +278,10 @@ function NewFlagDialog({ onAdd }: { onAdd: (flag: FeatureFlag) => void }) {
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label>Category</Label>
-              <Select value={category} onValueChange={(v) => setCategory(v as FeatureFlag['category'])}>
+              <Select
+                value={category}
+                onValueChange={(v) => setCategory(v as FeatureFlag["category"])}
+              >
                 <SelectTrigger className="w-full">
                   <SelectValue />
                 </SelectTrigger>
@@ -281,7 +316,11 @@ function NewFlagDialog({ onAdd }: { onAdd: (flag: FeatureFlag) => void }) {
           <Button variant="outline" onClick={() => setOpen(false)}>
             Cancel
           </Button>
-          <Button onClick={handleCreate} disabled={!name.trim()} className="gap-2">
+          <Button
+            onClick={handleCreate}
+            disabled={!name.trim()}
+            className="gap-2"
+          >
             <Plus className="h-4 w-4" />
             Create Flag
           </Button>
@@ -308,8 +347,8 @@ function FeatureFlagCard({
     <Card
       className={`relative overflow-hidden border-l-4 transition-all duration-200 hover:shadow-md ${
         flag.enabled
-          ? 'border-l-emerald-500 bg-white dark:bg-gray-900'
-          : 'border-l-gray-300 bg-gray-50 dark:bg-gray-900/50'
+          ? "border-l-emerald-500 bg-white dark:bg-gray-900"
+          : "border-l-gray-300 bg-gray-50 dark:bg-gray-900/50"
       }`}
     >
       <CardContent className="p-5">
@@ -318,14 +357,20 @@ function FeatureFlagCard({
           <div className="flex items-start gap-3 min-w-0 flex-1">
             <div
               className={`h-10 w-10 rounded-lg flex items-center justify-center shrink-0 ${
-                flag.enabled ? 'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600' : 'bg-gray-100 dark:bg-gray-800 text-gray-400 dark:text-gray-500'
+                flag.enabled
+                  ? "bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600"
+                  : "bg-gray-100 dark:bg-gray-800 text-gray-400 dark:text-gray-500"
               }`}
             >
               <IconComp className="h-5 w-5" />
             </div>
             <div className="min-w-0 flex-1">
-              <h3 className="text-sm font-semibold text-foreground truncate">{flag.name}</h3>
-              <p className="text-xs text-muted-foreground mt-0.5 line-clamp-2">{flag.description}</p>
+              <h3 className="text-sm font-semibold text-foreground truncate">
+                {flag.name}
+              </h3>
+              <p className="text-xs text-muted-foreground mt-0.5 line-clamp-2">
+                {flag.description}
+              </p>
             </div>
           </div>
           <Switch
@@ -341,21 +386,25 @@ function FeatureFlagCard({
             variant="outline"
             className={`text-[10px] font-semibold px-2 py-0 ${
               flag.enabled
-                ? 'bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 border-emerald-200 dark:border-emerald-700'
-                : 'bg-gray-50 dark:bg-gray-900 text-gray-500 dark:text-gray-400 border-gray-200 dark:border-gray-700'
+                ? "bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 border-emerald-200 dark:border-emerald-700"
+                : "bg-gray-50 dark:bg-gray-900 text-gray-500 dark:text-gray-400 border-gray-200 dark:border-gray-700"
             }`}
           >
             {flag.enabled ? (
-              <><ToggleRight className="h-3 w-3 mr-1" /> Enabled</>
+              <>
+                <ToggleRight className="h-3 w-3 mr-1" /> Enabled
+              </>
             ) : (
-              <><ToggleLeft className="h-3 w-3 mr-1" /> Disabled</>
+              <>
+                <ToggleLeft className="h-3 w-3 mr-1" /> Disabled
+              </>
             )}
           </Badge>
           {flag.targetedPlans.map((plan) => (
             <Badge
               key={plan}
               variant="outline"
-              className={`text-[10px] px-2 py-0 ${planBadgeColors[plan] || planBadgeColors['All']}`}
+              className={`text-[10px] px-2 py-0 ${planBadgeColors[plan] || planBadgeColors["All"]}`}
             >
               {plan}
             </Badge>
@@ -366,9 +415,13 @@ function FeatureFlagCard({
         <div className="mt-4 space-y-2">
           <div className="flex items-center justify-between">
             <Label className="text-xs text-muted-foreground">Rollout</Label>
-            <span className={`text-xs font-bold tabular-nums ${
-              flag.enabled ? 'text-emerald-600' : 'text-gray-400 dark:text-gray-500'
-            }`}>
+            <span
+              className={`text-xs font-bold tabular-nums ${
+                flag.enabled
+                  ? "text-emerald-600"
+                  : "text-gray-400 dark:text-gray-500"
+              }`}
+            >
               {flag.rolloutPercentage}%
             </span>
           </div>
@@ -378,7 +431,7 @@ function FeatureFlagCard({
             disabled={!flag.enabled}
             max={100}
             step={5}
-            className={`w-full ${flag.enabled ? '[&_[data-slot=slider-range]]:bg-emerald-500' : '[&_[data-slot=slider-range]]:bg-gray-300 dark:bg-gray-600'}`}
+            className={`w-full ${flag.enabled ? "[&_[data-slot=slider-range]]:bg-emerald-500" : "[&_[data-slot=slider-range]]:bg-gray-300 dark:bg-gray-600"}`}
           />
           <div className="flex items-center justify-between text-[10px] text-muted-foreground">
             <span>0%</span>
@@ -411,7 +464,9 @@ function CategoryPanel({
   onBulkDisable: (category: string) => void;
 }) {
   const CategoryIcon = categoryIcons[category] || Blocks;
-  const colorClass = categoryColors[category] || 'text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-gray-900';
+  const colorClass =
+    categoryColors[category] ||
+    "text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-gray-900";
   const enabledCount = flags.filter((f) => f.enabled).length;
 
   return (
@@ -419,7 +474,9 @@ function CategoryPanel({
       {/* Category Header with Bulk Actions */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <div className={`h-8 w-8 rounded-lg flex items-center justify-center ${colorClass}`}>
+          <div
+            className={`h-8 w-8 rounded-lg flex items-center justify-center ${colorClass}`}
+          >
             <CategoryIcon className="h-4 w-4" />
           </div>
           <div>
@@ -456,7 +513,9 @@ function CategoryPanel({
         <Card className="border-dashed">
           <CardContent className="p-8 text-center">
             <Blocks className="h-8 w-8 text-muted-foreground/40 mx-auto" />
-            <p className="text-sm text-muted-foreground mt-2">No feature flags in this category</p>
+            <p className="text-sm text-muted-foreground mt-2">
+              No feature flags in this category
+            </p>
           </CardContent>
         </Card>
       ) : (
@@ -488,31 +547,43 @@ export function SuperAdminFeatureFlags() {
         return {
           ...f,
           enabled,
-          rolloutPercentage: enabled ? (f.rolloutPercentage === 0 ? 10 : f.rolloutPercentage) : 0,
+          rolloutPercentage: enabled
+            ? f.rolloutPercentage === 0
+              ? 10
+              : f.rolloutPercentage
+            : 0,
         };
-      })
+      }),
     );
   };
 
   const handleRolloutChange = (id: string, value: number) => {
     setFlags((prev) =>
-      prev.map((f) => (f.id === id ? { ...f, rolloutPercentage: value } : f))
+      prev.map((f) => (f.id === id ? { ...f, rolloutPercentage: value } : f)),
     );
   };
 
   const handleBulkEnable = (category: string) => {
     setFlags((prev) =>
       prev.map((f) =>
-        f.category === category ? { ...f, enabled: true, rolloutPercentage: f.rolloutPercentage || 100 } : f
-      )
+        f.category === category
+          ? {
+              ...f,
+              enabled: true,
+              rolloutPercentage: f.rolloutPercentage || 100,
+            }
+          : f,
+      ),
     );
   };
 
   const handleBulkDisable = (category: string) => {
     setFlags((prev) =>
       prev.map((f) =>
-        f.category === category ? { ...f, enabled: false, rolloutPercentage: 0 } : f
-      )
+        f.category === category
+          ? { ...f, enabled: false, rolloutPercentage: 0 }
+          : f,
+      ),
     );
   };
 
@@ -520,7 +591,8 @@ export function SuperAdminFeatureFlags() {
     setFlags((prev) => [...prev, flag]);
   };
 
-  const getFlagsByCategory = (cat: string) => flags.filter((f) => f.category === cat);
+  const getFlagsByCategory = (cat: string) =>
+    flags.filter((f) => f.category === cat);
 
   const totalEnabled = flags.filter((f) => f.enabled).length;
   const totalCount = flags.length;
@@ -550,7 +622,9 @@ export function SuperAdminFeatureFlags() {
                 <Check className="h-4 w-4" />
               </div>
               <div>
-                <p className="text-sm font-bold text-emerald-700 dark:text-emerald-400">{totalEnabled}</p>
+                <p className="text-sm font-bold text-emerald-700 dark:text-emerald-400">
+                  {totalEnabled}
+                </p>
                 <p className="text-[11px] text-muted-foreground">Enabled</p>
               </div>
             </div>
@@ -560,7 +634,9 @@ export function SuperAdminFeatureFlags() {
                 <X className="h-4 w-4" />
               </div>
               <div>
-                <p className="text-sm font-bold text-gray-600 dark:text-gray-400">{totalCount - totalEnabled}</p>
+                <p className="text-sm font-bold text-gray-600 dark:text-gray-400">
+                  {totalCount - totalEnabled}
+                </p>
                 <p className="text-[11px] text-muted-foreground">Disabled</p>
               </div>
             </div>
@@ -570,7 +646,9 @@ export function SuperAdminFeatureFlags() {
                 <Blocks className="h-4 w-4" />
               </div>
               <div>
-                <p className="text-sm font-bold text-rose-700 dark:text-rose-400">{totalCount}</p>
+                <p className="text-sm font-bold text-rose-700 dark:text-rose-400">
+                  {totalCount}
+                </p>
                 <p className="text-[11px] text-muted-foreground">Total Flags</p>
               </div>
             </div>
@@ -595,36 +673,51 @@ export function SuperAdminFeatureFlags() {
           <TabsTrigger value="core" className="gap-1.5 text-xs sm:text-sm">
             <Blocks className="h-3.5 w-3.5" />
             Core
-            <Badge variant="secondary" className="ml-1 h-5 min-w-[20px] text-[10px] px-1.5">
-              {getFlagsByCategory('core').length}
+            <Badge
+              variant="secondary"
+              className="ml-1 h-5 min-w-[20px] text-[10px] px-1.5"
+            >
+              {getFlagsByCategory("core").length}
             </Badge>
           </TabsTrigger>
           <TabsTrigger value="premium" className="gap-1.5 text-xs sm:text-sm">
             <Crown className="h-3.5 w-3.5" />
             Premium
-            <Badge variant="secondary" className="ml-1 h-5 min-w-[20px] text-[10px] px-1.5">
-              {getFlagsByCategory('premium').length}
+            <Badge
+              variant="secondary"
+              className="ml-1 h-5 min-w-[20px] text-[10px] px-1.5"
+            >
+              {getFlagsByCategory("premium").length}
             </Badge>
           </TabsTrigger>
-          <TabsTrigger value="enterprise" className="gap-1.5 text-xs sm:text-sm">
+          <TabsTrigger
+            value="enterprise"
+            className="gap-1.5 text-xs sm:text-sm"
+          >
             <Gem className="h-3.5 w-3.5" />
             Enterprise
-            <Badge variant="secondary" className="ml-1 h-5 min-w-[20px] text-[10px] px-1.5">
-              {getFlagsByCategory('enterprise').length}
+            <Badge
+              variant="secondary"
+              className="ml-1 h-5 min-w-[20px] text-[10px] px-1.5"
+            >
+              {getFlagsByCategory("enterprise").length}
             </Badge>
           </TabsTrigger>
           <TabsTrigger value="beta" className="gap-1.5 text-xs sm:text-sm">
             <FlaskConical className="h-3.5 w-3.5" />
             Beta
-            <Badge variant="secondary" className="ml-1 h-5 min-w-[20px] text-[10px] px-1.5">
-              {getFlagsByCategory('beta').length}
+            <Badge
+              variant="secondary"
+              className="ml-1 h-5 min-w-[20px] text-[10px] px-1.5"
+            >
+              {getFlagsByCategory("beta").length}
             </Badge>
           </TabsTrigger>
         </TabsList>
 
         <TabsContent value="core">
           <CategoryPanel
-            flags={getFlagsByCategory('core')}
+            flags={getFlagsByCategory("core")}
             category="core"
             onToggle={handleToggle}
             onRolloutChange={handleRolloutChange}
@@ -635,7 +728,7 @@ export function SuperAdminFeatureFlags() {
 
         <TabsContent value="premium">
           <CategoryPanel
-            flags={getFlagsByCategory('premium')}
+            flags={getFlagsByCategory("premium")}
             category="premium"
             onToggle={handleToggle}
             onRolloutChange={handleRolloutChange}
@@ -646,7 +739,7 @@ export function SuperAdminFeatureFlags() {
 
         <TabsContent value="enterprise">
           <CategoryPanel
-            flags={getFlagsByCategory('enterprise')}
+            flags={getFlagsByCategory("enterprise")}
             category="enterprise"
             onToggle={handleToggle}
             onRolloutChange={handleRolloutChange}
@@ -657,7 +750,7 @@ export function SuperAdminFeatureFlags() {
 
         <TabsContent value="beta">
           <CategoryPanel
-            flags={getFlagsByCategory('beta')}
+            flags={getFlagsByCategory("beta")}
             category="beta"
             onToggle={handleToggle}
             onRolloutChange={handleRolloutChange}

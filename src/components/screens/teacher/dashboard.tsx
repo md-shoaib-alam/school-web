@@ -1,18 +1,27 @@
-'use client';
+"use client";
 
-import { useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Skeleton } from '@/components/ui/skeleton';
-import { useAppStore } from '@/store/use-app-store';
-import { useTeacherDashboard } from '@/lib/graphql/hooks';
-import { toast } from 'sonner';
+import { useEffect } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Skeleton } from "@/components/ui/skeleton";
+import { useAppStore } from "@/store/use-app-store";
+import { useTeacherDashboard } from "@/lib/graphql/hooks";
+import { toast } from "sonner";
 import {
-  School, Users, FileText, UserCheck, Clock, ArrowRight,
-  BookOpen, ClipboardList, CalendarDays, TrendingUp,
-  CheckCircle2, AlertCircle
-} from 'lucide-react';
+  School,
+  Users,
+  FileText,
+  UserCheck,
+  Clock,
+  ArrowRight,
+  BookOpen,
+  ClipboardList,
+  CalendarDays,
+  TrendingUp,
+  CheckCircle2,
+  AlertCircle,
+} from "lucide-react";
 
 export function TeacherDashboard() {
   const { currentUser, setCurrentScreen } = useAppStore();
@@ -21,12 +30,12 @@ export function TeacherDashboard() {
     setCurrentScreen(screen);
   };
   const { data, isLoading, isError, error } = useTeacherDashboard(
-    currentUser?.name || ''
+    currentUser?.name || "",
   );
 
   useEffect(() => {
     if (isError) {
-      toast.error('Failed to load dashboard', { description: error?.message });
+      toast.error("Failed to load dashboard", { description: error?.message });
     }
   }, [isError, error]);
 
@@ -40,21 +49,22 @@ export function TeacherDashboard() {
 
   const getGreeting = () => {
     const hour = new Date().getHours();
-    if (hour < 12) return 'Good Morning';
-    if (hour < 17) return 'Good Afternoon';
-    return 'Good Evening';
+    if (hour < 12) return "Good Morning";
+    if (hour < 17) return "Good Afternoon";
+    return "Good Evening";
   };
 
   const formatTime = (time: string) => {
-    const [hours, minutes] = time.split(':');
+    const [hours, minutes] = time.split(":");
     const h = parseInt(hours);
-    const ampm = h >= 12 ? 'PM' : 'AM';
+    const ampm = h >= 12 ? "PM" : "AM";
     return `${h % 12 || 12}:${minutes} ${ampm}`;
   };
 
   const formatDate = (dateStr: string) => {
-    return new Date(dateStr).toLocaleDateString('en-US', {
-      month: 'short', day: 'numeric'
+    return new Date(dateStr).toLocaleDateString("en-US", {
+      month: "short",
+      day: "numeric",
     });
   };
 
@@ -80,42 +90,59 @@ export function TeacherDashboard() {
 
   const stats = [
     {
-      title: 'My Classes',
+      title: "My Classes",
       value: classes.length,
       icon: <School className="h-5 w-5" />,
-      color: 'text-blue-600 dark:text-blue-400',
-      bg: 'bg-blue-50 dark:bg-blue-900/30',
+      color: "text-blue-600 dark:text-blue-400",
+      bg: "bg-blue-50 dark:bg-blue-900/30",
     },
     {
-      title: 'Total Students',
+      title: "Total Students",
       value: totalStudents,
       icon: <Users className="h-5 w-5" />,
-      color: 'text-emerald-600 dark:text-emerald-400',
-      bg: 'bg-emerald-50 dark:bg-emerald-900/30',
+      color: "text-emerald-600 dark:text-emerald-400",
+      bg: "bg-emerald-50 dark:bg-emerald-900/30",
     },
     {
-      title: 'Pending Assignments',
+      title: "Pending Assignments",
       value: pendingAssignments,
       icon: <FileText className="h-5 w-5" />,
-      color: 'text-amber-600 dark:text-amber-400',
-      bg: 'bg-amber-50 dark:bg-amber-900/30',
+      color: "text-amber-600 dark:text-amber-400",
+      bg: "bg-amber-50 dark:bg-amber-900/30",
     },
     {
       title: "Today's Attendance",
-      value: todayAttendance.total > 0
-        ? `${Math.round((todayAttendance.present / todayAttendance.total) * 100)}%`
-        : 'N/A',
+      value:
+        todayAttendance.total > 0
+          ? `${Math.round((todayAttendance.present / todayAttendance.total) * 100)}%`
+          : "N/A",
       icon: <UserCheck className="h-5 w-5" />,
-      color: 'text-violet-600 dark:text-violet-400',
-      bg: 'bg-violet-50 dark:bg-violet-900/30',
+      color: "text-violet-600 dark:text-violet-400",
+      bg: "bg-violet-50 dark:bg-violet-900/30",
     },
   ];
 
   const quickActions = [
-    { label: 'Take Attendance', icon: <UserCheck className="h-4 w-4" />, screen: 'take-attendance' },
-    { label: 'Manage Grades', icon: <ClipboardList className="h-4 w-4" />, screen: 'grade-management' },
-    { label: 'Create Assignment', icon: <FileText className="h-4 w-4" />, screen: 'assignments' },
-    { label: 'View Timetable', icon: <CalendarDays className="h-4 w-4" />, screen: 'timetable' },
+    {
+      label: "Take Attendance",
+      icon: <UserCheck className="h-4 w-4" />,
+      screen: "take-attendance",
+    },
+    {
+      label: "Manage Grades",
+      icon: <ClipboardList className="h-4 w-4" />,
+      screen: "grade-management",
+    },
+    {
+      label: "Create Assignment",
+      icon: <FileText className="h-4 w-4" />,
+      screen: "assignments",
+    },
+    {
+      label: "View Timetable",
+      icon: <CalendarDays className="h-4 w-4" />,
+      screen: "timetable",
+    },
   ];
 
   return (
@@ -123,7 +150,7 @@ export function TeacherDashboard() {
       {/* Greeting */}
       <div>
         <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
-          {getGreeting()}, {currentUser?.name || 'Mr. John Smith'} 👋
+          {getGreeting()}, {currentUser?.name || "Mr. John Smith"} 👋
         </h2>
         <p className="text-gray-500 dark:text-gray-400 mt-1">
           Here&apos;s an overview of your classes and activities today.
@@ -133,12 +160,19 @@ export function TeacherDashboard() {
       {/* Stats Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {stats.map((stat) => (
-          <Card key={stat.title} className="rounded-xl shadow-sm border-0 hover:shadow-md transition-shadow">
+          <Card
+            key={stat.title}
+            className="rounded-xl shadow-sm border-0 hover:shadow-md transition-shadow"
+          >
             <CardContent className="p-5">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-gray-500 dark:text-gray-400 font-medium">{stat.title}</p>
-                  <p className="text-2xl font-bold text-gray-900 dark:text-gray-100 mt-1">{stat.value}</p>
+                  <p className="text-sm text-gray-500 dark:text-gray-400 font-medium">
+                    {stat.title}
+                  </p>
+                  <p className="text-2xl font-bold text-gray-900 dark:text-gray-100 mt-1">
+                    {stat.value}
+                  </p>
                 </div>
                 <div className={`p-3 rounded-xl ${stat.bg}`}>
                   <span className={stat.color}>{stat.icon}</span>
@@ -158,7 +192,10 @@ export function TeacherDashboard() {
                 <Clock className="h-4 w-4 text-blue-500" />
                 Today&apos;s Schedule
               </CardTitle>
-              <Badge variant="secondary" className="bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 text-xs">
+              <Badge
+                variant="secondary"
+                className="bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 text-xs"
+              >
                 {todaySchedule.length} classes
               </Badge>
             </div>
@@ -167,8 +204,12 @@ export function TeacherDashboard() {
             {todaySchedule.length === 0 ? (
               <div className="text-center py-8">
                 <CalendarDays className="h-10 w-10 text-gray-300 dark:text-gray-600 mx-auto mb-3" />
-                <p className="text-gray-400 dark:text-gray-500 text-sm">No classes scheduled for today</p>
-                <p className="text-gray-300 dark:text-gray-600 text-xs mt-1">Enjoy your day off!</p>
+                <p className="text-gray-400 dark:text-gray-500 text-sm">
+                  No classes scheduled for today
+                </p>
+                <p className="text-gray-300 dark:text-gray-600 text-xs mt-1">
+                  Enjoy your day off!
+                </p>
               </div>
             ) : (
               <div className="space-y-2">
@@ -187,8 +228,12 @@ export function TeacherDashboard() {
                     </div>
                     <div className="w-px h-8 bg-gray-200 dark:bg-gray-700" />
                     <div className="flex-1">
-                      <p className="text-sm font-medium text-gray-800 dark:text-gray-200">{entry.subjectName}</p>
-                      <p className="text-xs text-gray-400 dark:text-gray-500">{entry.className}</p>
+                      <p className="text-sm font-medium text-gray-800 dark:text-gray-200">
+                        {entry.subjectName}
+                      </p>
+                      <p className="text-xs text-gray-400 dark:text-gray-500">
+                        {entry.className}
+                      </p>
                     </div>
                     <Badge
                       variant="outline"
@@ -240,7 +285,10 @@ export function TeacherDashboard() {
                 <BookOpen className="h-4 w-4 text-blue-500" />
                 My Subjects
               </CardTitle>
-              <Badge variant="secondary" className="bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 text-xs">
+              <Badge
+                variant="secondary"
+                className="bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 text-xs"
+              >
                 {subjects.length} subjects
               </Badge>
             </div>
@@ -257,8 +305,12 @@ export function TeacherDashboard() {
                       <BookOpen className="h-4 w-4 text-blue-500" />
                     </div>
                     <div>
-                      <p className="text-sm font-medium text-gray-800 dark:text-gray-200">{subject.name}</p>
-                      <p className="text-xs text-gray-400 dark:text-gray-500">{subject.className} • {subject.code}</p>
+                      <p className="text-sm font-medium text-gray-800 dark:text-gray-200">
+                        {subject.name}
+                      </p>
+                      <p className="text-xs text-gray-400 dark:text-gray-500">
+                        {subject.className} • {subject.code}
+                      </p>
                     </div>
                   </div>
                 </div>
@@ -266,7 +318,9 @@ export function TeacherDashboard() {
               {subjects.length === 0 && (
                 <div className="text-center py-6">
                   <BookOpen className="h-8 w-8 text-gray-300 dark:text-gray-600 mx-auto mb-2" />
-                  <p className="text-gray-400 dark:text-gray-500 text-sm">No subjects assigned</p>
+                  <p className="text-gray-400 dark:text-gray-500 text-sm">
+                    No subjects assigned
+                  </p>
                 </div>
               )}
             </div>
@@ -285,7 +339,7 @@ export function TeacherDashboard() {
                 variant="ghost"
                 size="sm"
                 className="text-blue-500 dark:text-blue-400 text-xs hover:bg-blue-50 dark:hover:bg-blue-900/20"
-                onClick={() => navigateTo('assignments')}
+                onClick={() => navigateTo("assignments")}
               >
                 View All <ArrowRight className="h-3 w-3 ml-1" />
               </Button>
@@ -295,9 +349,13 @@ export function TeacherDashboard() {
             <div className="space-y-2">
               {assignments.slice(0, 5).map((assignment) => {
                 const isOverdue = new Date(assignment.dueDate) < new Date();
-                const progressPct = assignment.totalStudents > 0
-                  ? Math.round((assignment.submissions / assignment.totalStudents) * 100)
-                  : 0;
+                const progressPct =
+                  assignment.totalStudents > 0
+                    ? Math.round(
+                        (assignment.submissions / assignment.totalStudents) *
+                          100,
+                      )
+                    : 0;
                 return (
                   <div
                     key={assignment.id}
@@ -311,25 +369,40 @@ export function TeacherDashboard() {
                         variant="outline"
                         className={`text-[10px] ${
                           isOverdue
-                            ? 'border-red-200 dark:border-red-800 text-red-500 dark:text-red-400 bg-red-50/50 dark:bg-red-900/20'
-                            : 'border-blue-200 dark:border-blue-800 text-blue-500 dark:text-blue-400 bg-blue-50/50 dark:bg-blue-900/20'
+                            ? "border-red-200 dark:border-red-800 text-red-500 dark:text-red-400 bg-red-50/50 dark:bg-red-900/20"
+                            : "border-blue-200 dark:border-blue-800 text-blue-500 dark:text-blue-400 bg-blue-50/50 dark:bg-blue-900/20"
                         }`}
                       >
                         {isOverdue ? (
-                          <><AlertCircle className="h-2.5 w-2.5 mr-0.5" /> Overdue</>
+                          <>
+                            <AlertCircle className="h-2.5 w-2.5 mr-0.5" />{" "}
+                            Overdue
+                          </>
                         ) : (
-                          <><CheckCircle2 className="h-2.5 w-2.5 mr-0.5" /> Due {formatDate(assignment.dueDate)}</>
+                          <>
+                            <CheckCircle2 className="h-2.5 w-2.5 mr-0.5" /> Due{" "}
+                            {formatDate(assignment.dueDate)}
+                          </>
                         )}
                       </Badge>
                     </div>
                     <div className="flex items-center justify-between text-xs text-gray-400 dark:text-gray-500 mb-2">
-                      <span>{assignment.subjectName} • {assignment.className}</span>
-                      <span>{assignment.submissions}/{assignment.totalStudents} submitted</span>
+                      <span>
+                        {assignment.subjectName} • {assignment.className}
+                      </span>
+                      <span>
+                        {assignment.submissions}/{assignment.totalStudents}{" "}
+                        submitted
+                      </span>
                     </div>
                     <div className="w-full bg-gray-100 dark:bg-gray-800 rounded-full h-1.5">
                       <div
                         className={`h-1.5 rounded-full transition-all ${
-                          progressPct === 100 ? 'bg-emerald-500' : isOverdue ? 'bg-red-400' : 'bg-blue-500'
+                          progressPct === 100
+                            ? "bg-emerald-500"
+                            : isOverdue
+                              ? "bg-red-400"
+                              : "bg-blue-500"
                         }`}
                         style={{ width: `${progressPct}%` }}
                       />
@@ -340,7 +413,9 @@ export function TeacherDashboard() {
               {assignments.length === 0 && (
                 <div className="text-center py-6">
                   <FileText className="h-8 w-8 text-gray-300 dark:text-gray-600 mx-auto mb-2" />
-                  <p className="text-gray-400 dark:text-gray-500 text-sm">No assignments created yet</p>
+                  <p className="text-gray-400 dark:text-gray-500 text-sm">
+                    No assignments created yet
+                  </p>
                 </div>
               )}
             </div>
@@ -360,7 +435,7 @@ export function TeacherDashboard() {
               variant="ghost"
               size="sm"
               className="text-blue-500 dark:text-blue-400 text-xs hover:bg-blue-50 dark:hover:bg-blue-900/20"
-              onClick={() => navigateTo('my-classes')}
+              onClick={() => navigateTo("my-classes")}
             >
               View All <ArrowRight className="h-3 w-3 ml-1" />
             </Button>
@@ -372,15 +447,19 @@ export function TeacherDashboard() {
               <div
                 key={cls.id}
                 className="p-4 rounded-xl border border-gray-100 dark:border-gray-800 hover:border-blue-200 dark:hover:border-blue-800 hover:shadow-sm transition-all cursor-pointer"
-                onClick={() => navigateTo('my-classes')}
+                onClick={() => navigateTo("my-classes")}
               >
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 rounded-xl bg-blue-50 dark:bg-blue-900/30 flex items-center justify-center">
                     <School className="h-5 w-5 text-blue-500" />
                   </div>
                   <div>
-                    <p className="text-sm font-semibold text-gray-800 dark:text-gray-200">{cls.name}</p>
-                    <p className="text-xs text-gray-400 dark:text-gray-500">Section {cls.section}</p>
+                    <p className="text-sm font-semibold text-gray-800 dark:text-gray-200">
+                      {cls.name}
+                    </p>
+                    <p className="text-xs text-gray-400 dark:text-gray-500">
+                      Section {cls.section}
+                    </p>
                   </div>
                 </div>
                 <div className="mt-3 flex items-center justify-between">

@@ -1,12 +1,12 @@
-'use client';
+"use client";
 
-import { useEffect, useState, useCallback, useMemo } from 'react';
-import { useAppStore } from '@/store/use-app-store';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Skeleton } from '@/components/ui/skeleton';
-import { ScrollArea } from '@/components/ui/scroll-area';
+import { useEffect, useState, useCallback, useMemo } from "react";
+import { useAppStore } from "@/store/use-app-store";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import {
   Clock,
   BookOpen,
@@ -17,65 +17,65 @@ import {
   MapPin,
   User,
   Timer,
-} from 'lucide-react';
-import type { StudentInfo, TimetableSlot } from '@/lib/types';
+} from "lucide-react";
+import type { StudentInfo, TimetableSlot } from "@/lib/types";
 
 /* ─── Constants ─── */
 
-type ViewMode = 'grid' | 'list' | 'day';
+type ViewMode = "grid" | "list" | "day";
 
 const SUBJECT_COLORS = [
-  'bg-violet-50 dark:bg-violet-900/30 text-violet-700 dark:text-violet-300 border-violet-200 dark:border-violet-700',
-  'bg-pink-50 dark:bg-pink-900/30 text-pink-700 dark:text-pink-300 border-pink-200 dark:border-pink-700',
-  'bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 border-blue-200 dark:border-blue-700',
-  'bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300 border-emerald-200 dark:border-emerald-700',
-  'bg-amber-50 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300 border-amber-200 dark:border-amber-700',
-  'bg-cyan-50 dark:bg-cyan-900/30 text-cyan-700 dark:text-cyan-300 border-cyan-200 dark:border-cyan-700',
-  'bg-rose-50 dark:bg-rose-900/30 text-rose-700 dark:text-rose-300 border-rose-200 dark:border-rose-700',
+  "bg-violet-50 dark:bg-violet-900/30 text-violet-700 dark:text-violet-300 border-violet-200 dark:border-violet-700",
+  "bg-pink-50 dark:bg-pink-900/30 text-pink-700 dark:text-pink-300 border-pink-200 dark:border-pink-700",
+  "bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 border-blue-200 dark:border-blue-700",
+  "bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300 border-emerald-200 dark:border-emerald-700",
+  "bg-amber-50 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300 border-amber-200 dark:border-amber-700",
+  "bg-cyan-50 dark:bg-cyan-900/30 text-cyan-700 dark:text-cyan-300 border-cyan-200 dark:border-cyan-700",
+  "bg-rose-50 dark:bg-rose-900/30 text-rose-700 dark:text-rose-300 border-rose-200 dark:border-rose-700",
 ];
 
-const DAYS = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday'] as const;
+const DAYS = ["monday", "tuesday", "wednesday", "thursday", "friday"] as const;
 
 const DAY_LABELS: Record<string, string> = {
-  monday: 'Mon',
-  tuesday: 'Tue',
-  wednesday: 'Wed',
-  thursday: 'Thu',
-  friday: 'Fri',
+  monday: "Mon",
+  tuesday: "Tue",
+  wednesday: "Wed",
+  thursday: "Thu",
+  friday: "Fri",
 };
 
 const DAY_FULL_LABELS: Record<string, string> = {
-  monday: 'Monday',
-  tuesday: 'Tuesday',
-  wednesday: 'Wednesday',
-  thursday: 'Thursday',
-  friday: 'Friday',
+  monday: "Monday",
+  tuesday: "Tuesday",
+  wednesday: "Wednesday",
+  thursday: "Thursday",
+  friday: "Friday",
 };
 
 const JS_DAY_TO_KEY: Record<number, string> = {
-  1: 'monday',
-  2: 'tuesday',
-  3: 'wednesday',
-  4: 'thursday',
-  5: 'friday',
+  1: "monday",
+  2: "tuesday",
+  3: "wednesday",
+  4: "thursday",
+  5: "friday",
 };
 
 /* ─── Helpers ─── */
 
 function formatTime(time: string): string {
-  const [h, m] = time.split(':').map(Number);
-  const ampm = h >= 12 ? 'PM' : 'AM';
+  const [h, m] = time.split(":").map(Number);
+  const ampm = h >= 12 ? "PM" : "AM";
   const hour = h % 12 || 12;
-  return `${hour}:${String(m).padStart(2, '0')} ${ampm}`;
+  return `${hour}:${String(m).padStart(2, "0")} ${ampm}`;
 }
 
 function getNow(): { timeStr: string; dayKey: string } {
   const now = new Date();
-  const h = String(now.getHours()).padStart(2, '0');
-  const m = String(now.getMinutes()).padStart(2, '0');
+  const h = String(now.getHours()).padStart(2, "0");
+  const m = String(now.getMinutes()).padStart(2, "0");
   return {
     timeStr: `${h}:${m}`,
-    dayKey: JS_DAY_TO_KEY[now.getDay()] || '',
+    dayKey: JS_DAY_TO_KEY[now.getDay()] || "",
   };
 }
 
@@ -84,21 +84,26 @@ function getNow(): { timeStr: string; dayKey: string } {
 export function StudentTimetable() {
   const { currentUser } = useAppStore();
 
-  const [viewMode, setViewMode] = useState<ViewMode>('grid');
-  const [selectedDay, setSelectedDay] = useState(() => getNow().dayKey || 'monday');
+  const [viewMode, setViewMode] = useState<ViewMode>("grid");
+  const [selectedDay, setSelectedDay] = useState(
+    () => getNow().dayKey || "monday",
+  );
   const [loading, setLoading] = useState(true);
   const [students, setStudents] = useState<StudentInfo[]>([]);
   const [timetable, setTimetable] = useState<TimetableSlot[]>([]);
 
   const student = useMemo(
-    () => students.find((s) => s.email === currentUser?.email) || students[0] || null,
+    () =>
+      students.find((s) => s.email === currentUser?.email) ||
+      students[0] ||
+      null,
     [students, currentUser?.email],
   );
 
   const fetchData = useCallback(async () => {
     setLoading(true);
     try {
-      const studentsRes = await fetch('/api/students').then((r) => r.json());
+      const studentsRes = await fetch("/api/students").then((r) => r.json());
       setStudents(studentsRes);
 
       const matchedStudent =
@@ -110,7 +115,9 @@ export function StudentTimetable() {
         return;
       }
 
-      const ttRes = await fetch(`/api/timetable?classId=${matchedStudent.classId}`);
+      const ttRes = await fetch(
+        `/api/timetable?classId=${matchedStudent.classId}`,
+      );
       const ttData = await ttRes.json();
       setTimetable(ttData);
     } catch (e) {
@@ -162,7 +169,10 @@ export function StudentTimetable() {
     return map;
   }, [timetable]);
 
-  const todaySlots = useMemo(() => timetable.filter((t) => t.day === todayKey), [timetable, todayKey]);
+  const todaySlots = useMemo(
+    () => timetable.filter((t) => t.day === todayKey),
+    [timetable, todayKey],
+  );
 
   const selectedDaySlots = useMemo(
     () =>
@@ -173,7 +183,8 @@ export function StudentTimetable() {
   );
 
   const isCurrentSlot = useCallback(
-    (start: string, end: string) => currentTimeStr >= start && currentTimeStr <= end,
+    (start: string, end: string) =>
+      currentTimeStr >= start && currentTimeStr <= end,
     [currentTimeStr],
   );
 
@@ -195,7 +206,9 @@ export function StudentTimetable() {
       {/* Header + View Toggle */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h2 className="text-xl font-bold text-gray-900 dark:text-gray-100">My Timetable</h2>
+          <h2 className="text-xl font-bold text-gray-900 dark:text-gray-100">
+            My Timetable
+          </h2>
           <p className="text-sm text-gray-500 dark:text-gray-400 dark:text-gray-500 dark:text-gray-400 mt-0.5">
             Weekly class schedule and time slots
           </p>
@@ -204,12 +217,12 @@ export function StudentTimetable() {
         <div className="flex items-center gap-1 rounded-lg border border-gray-200 dark:border-gray-700 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 p-1">
           <Button
             size="sm"
-            variant={viewMode === 'grid' ? 'default' : 'ghost'}
-            onClick={() => setViewMode('grid')}
+            variant={viewMode === "grid" ? "default" : "ghost"}
+            onClick={() => setViewMode("grid")}
             className={
-              viewMode === 'grid'
-                ? 'bg-violet-600 text-white hover:bg-violet-700 shadow-sm'
-                : 'text-gray-500 dark:text-gray-400 dark:text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'
+              viewMode === "grid"
+                ? "bg-violet-600 text-white hover:bg-violet-700 shadow-sm"
+                : "text-gray-500 dark:text-gray-400 dark:text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300"
             }
           >
             <LayoutGrid className="h-4 w-4 mr-1.5" />
@@ -217,12 +230,12 @@ export function StudentTimetable() {
           </Button>
           <Button
             size="sm"
-            variant={viewMode === 'list' ? 'default' : 'ghost'}
-            onClick={() => setViewMode('list')}
+            variant={viewMode === "list" ? "default" : "ghost"}
+            onClick={() => setViewMode("list")}
             className={
-              viewMode === 'list'
-                ? 'bg-violet-600 text-white hover:bg-violet-700 shadow-sm'
-                : 'text-gray-500 dark:text-gray-400 dark:text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'
+              viewMode === "list"
+                ? "bg-violet-600 text-white hover:bg-violet-700 shadow-sm"
+                : "text-gray-500 dark:text-gray-400 dark:text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300"
             }
           >
             <List className="h-4 w-4 mr-1.5" />
@@ -230,12 +243,12 @@ export function StudentTimetable() {
           </Button>
           <Button
             size="sm"
-            variant={viewMode === 'day' ? 'default' : 'ghost'}
-            onClick={() => setViewMode('day')}
+            variant={viewMode === "day" ? "default" : "ghost"}
+            onClick={() => setViewMode("day")}
             className={
-              viewMode === 'day'
-                ? 'bg-violet-600 text-white hover:bg-violet-700 shadow-sm'
-                : 'text-gray-500 dark:text-gray-400 dark:text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'
+              viewMode === "day"
+                ? "bg-violet-600 text-white hover:bg-violet-700 shadow-sm"
+                : "text-gray-500 dark:text-gray-400 dark:text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300"
             }
           >
             <CalendarDays className="h-4 w-4 mr-1.5" />
@@ -253,13 +266,13 @@ export function StudentTimetable() {
             </div>
             <div>
               <p className="text-sm font-medium text-gray-900 dark:text-gray-100">
-                {todayKey ? DAY_FULL_LABELS[todayKey] : 'Weekend'}
+                {todayKey ? DAY_FULL_LABELS[todayKey] : "Weekend"}
               </p>
               <p className="text-xs text-gray-500 dark:text-gray-400 dark:text-gray-500 dark:text-gray-400">
-                {new Date().toLocaleDateString('en-US', {
-                  month: 'long',
-                  day: 'numeric',
-                  year: 'numeric',
+                {new Date().toLocaleDateString("en-US", {
+                  month: "long",
+                  day: "numeric",
+                  year: "numeric",
                 })}
               </p>
             </div>
@@ -272,8 +285,12 @@ export function StudentTimetable() {
               <BookOpen className="h-5 w-5" />
             </div>
             <div>
-              <p className="text-sm font-medium text-gray-900 dark:text-gray-100">{todaySlots.length} Classes</p>
-              <p className="text-xs text-gray-500 dark:text-gray-400 dark:text-gray-500 dark:text-gray-400">Scheduled for today</p>
+              <p className="text-sm font-medium text-gray-900 dark:text-gray-100">
+                {todaySlots.length} Classes
+              </p>
+              <p className="text-xs text-gray-500 dark:text-gray-400 dark:text-gray-500 dark:text-gray-400">
+                Scheduled for today
+              </p>
             </div>
           </CardContent>
         </Card>
@@ -288,15 +305,15 @@ export function StudentTimetable() {
                 {nextPeriod
                   ? `Next: ${nextPeriod.subjectName}`
                   : todaySlots.length > 0
-                    ? 'No more classes'
-                    : 'No classes today'}
+                    ? "No more classes"
+                    : "No classes today"}
               </p>
               <p className="text-xs text-gray-500 dark:text-gray-400 dark:text-gray-500 dark:text-gray-400">
                 {nextPeriod
                   ? `At ${formatTime(nextPeriod.startTime)}`
                   : todaySlots.length > 0
-                    ? 'All done for today'
-                    : 'Enjoy your day off'}
+                    ? "All done for today"
+                    : "Enjoy your day off"}
               </p>
             </div>
           </CardContent>
@@ -308,14 +325,18 @@ export function StudentTimetable() {
         <Card className="rounded-xl shadow-sm">
           <CardContent className="py-16 text-center">
             <BookOpen className="h-12 w-12 mx-auto mb-3 text-gray-300" />
-            <p className="text-sm font-medium text-gray-500 dark:text-gray-400 dark:text-gray-500 dark:text-gray-400">No timetable configured</p>
-            <p className="text-xs text-gray-400 dark:text-gray-500 dark:text-gray-400 mt-1">Contact your school administrator</p>
+            <p className="text-sm font-medium text-gray-500 dark:text-gray-400 dark:text-gray-500 dark:text-gray-400">
+              No timetable configured
+            </p>
+            <p className="text-xs text-gray-400 dark:text-gray-500 dark:text-gray-400 mt-1">
+              Contact your school administrator
+            </p>
           </CardContent>
         </Card>
       ) : (
         <>
           {/* ─── Grid View ─── */}
-          {viewMode === 'grid' && (
+          {viewMode === "grid" && (
             <Card className="rounded-xl shadow-sm">
               <CardHeader className="pb-3">
                 <div className="flex items-center justify-between">
@@ -341,8 +362,8 @@ export function StudentTimetable() {
                           key={day}
                           className={`text-center text-xs font-semibold py-2 rounded-lg ${
                             day === todayKey
-                              ? 'bg-violet-100 dark:bg-violet-900/30 text-violet-700'
-                              : 'text-gray-600 dark:text-gray-400'
+                              ? "bg-violet-100 dark:bg-violet-900/30 text-violet-700"
+                              : "text-gray-600 dark:text-gray-400"
                           }`}
                         >
                           {DAY_LABELS[day]}
@@ -373,8 +394,14 @@ export function StudentTimetable() {
                           const cellSlot = slotLookup[`${day}-${slot.start}`];
                           const isToday = day === todayKey;
                           const isCurrent =
-                            isToday && cellSlot && isCurrentSlot(cellSlot.startTime, cellSlot.endTime);
-                          const isPast = isToday && cellSlot && isSlotPast(cellSlot.startTime) && !isCurrent;
+                            isToday &&
+                            cellSlot &&
+                            isCurrentSlot(cellSlot.startTime, cellSlot.endTime);
+                          const isPast =
+                            isToday &&
+                            cellSlot &&
+                            isSlotPast(cellSlot.startTime) &&
+                            !isCurrent;
 
                           return (
                             <div
@@ -382,13 +409,13 @@ export function StudentTimetable() {
                               className={`rounded-lg border px-2 py-2 min-h-[60px] transition-all ${
                                 cellSlot
                                   ? subjectColorMap[cellSlot.subjectName] ||
-                                    'bg-gray-50 dark:bg-gray-800/50 border-gray-200 dark:border-gray-700 dark:border-gray-700'
-                                  : 'bg-gray-50/50 dark:bg-gray-800/50 border-gray-100 dark:border-gray-800 border-dashed'
-                              } ${isToday && !cellSlot ? 'bg-violet-50/30 border-violet-100' : ''} ${
+                                    "bg-gray-50 dark:bg-gray-800/50 border-gray-200 dark:border-gray-700 dark:border-gray-700"
+                                  : "bg-gray-50/50 dark:bg-gray-800/50 border-gray-100 dark:border-gray-800 border-dashed"
+                              } ${isToday && !cellSlot ? "bg-violet-50/30 border-violet-100" : ""} ${
                                 isCurrent
-                                  ? 'ring-2 ring-violet-500 ring-offset-1 shadow-md scale-[1.02]'
-                                  : ''
-                              } ${isPast ? 'opacity-60' : ''}`}
+                                  ? "ring-2 ring-violet-500 ring-offset-1 shadow-md scale-[1.02]"
+                                  : ""
+                              } ${isPast ? "opacity-60" : ""}`}
                             >
                               {cellSlot ? (
                                 <div className="flex flex-col gap-0.5">
@@ -406,7 +433,9 @@ export function StudentTimetable() {
                                 </div>
                               ) : (
                                 <div className="h-full flex items-center justify-center">
-                                  <span className="text-[10px] text-gray-300">—</span>
+                                  <span className="text-[10px] text-gray-300">
+                                    —
+                                  </span>
                                 </div>
                               )}
                             </div>
@@ -421,7 +450,7 @@ export function StudentTimetable() {
           )}
 
           {/* ─── List View ─── */}
-          {viewMode === 'list' && (
+          {viewMode === "list" && (
             <Card className="rounded-xl shadow-sm">
               <CardHeader className="pb-3">
                 <div className="flex items-center justify-between">
@@ -455,11 +484,13 @@ export function StudentTimetable() {
                             <div
                               className={`px-3 py-1 rounded-full text-xs font-bold ${
                                 isToday
-                                  ? 'bg-violet-600 text-white'
-                                  : 'bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400 dark:text-gray-500 dark:text-gray-400'
+                                  ? "bg-violet-600 text-white"
+                                  : "bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400 dark:text-gray-500 dark:text-gray-400"
                               }`}
                             >
-                              {isToday ? `Today — ${DAY_FULL_LABELS[day]}` : DAY_FULL_LABELS[day]}
+                              {isToday
+                                ? `Today — ${DAY_FULL_LABELS[day]}`
+                                : DAY_FULL_LABELS[day]}
                             </div>
                             {isToday && (
                               <Badge className="bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 text-[10px] hover:bg-emerald-100 dark:hover:bg-emerald-900/30">
@@ -472,20 +503,25 @@ export function StudentTimetable() {
                           {/* Day Entries */}
                           <div className="space-y-2 ml-2">
                             {daySlots.map((slot) => {
-                              const isCurrent = isToday && isCurrentSlot(slot.startTime, slot.endTime);
-                              const isPast = isToday && isSlotPast(slot.startTime) && !isCurrent;
+                              const isCurrent =
+                                isToday &&
+                                isCurrentSlot(slot.startTime, slot.endTime);
+                              const isPast =
+                                isToday &&
+                                isSlotPast(slot.startTime) &&
+                                !isCurrent;
                               const colorClass =
                                 subjectColorMap[slot.subjectName] ||
-                                'bg-gray-50 dark:bg-gray-800/50 text-gray-700 dark:text-gray-300 border-gray-200 dark:border-gray-700 dark:border-gray-700';
+                                "bg-gray-50 dark:bg-gray-800/50 text-gray-700 dark:text-gray-300 border-gray-200 dark:border-gray-700 dark:border-gray-700";
 
                               return (
                                 <div
                                   key={slot.id}
                                   className={`flex items-center gap-3 p-3 rounded-lg border transition-all ${
                                     isCurrent
-                                      ? 'border-violet-300 bg-violet-50/50 shadow-sm'
+                                      ? "border-violet-300 bg-violet-50/50 shadow-sm"
                                       : `${colorClass} border`
-                                  } ${isPast ? 'opacity-60' : ''}`}
+                                  } ${isPast ? "opacity-60" : ""}`}
                                 >
                                   {/* Now indicator */}
                                   {isCurrent && (
@@ -498,11 +534,14 @@ export function StudentTimetable() {
                                   {/* Time */}
                                   <div
                                     className={`min-w-[100px] ${
-                                      isCurrent ? 'text-violet-700 dark:text-violet-400' : 'text-gray-600 dark:text-gray-400'
+                                      isCurrent
+                                        ? "text-violet-700 dark:text-violet-400"
+                                        : "text-gray-600 dark:text-gray-400"
                                     }`}
                                   >
                                     <p className="text-xs font-semibold">
-                                      {formatTime(slot.startTime)} – {formatTime(slot.endTime)}
+                                      {formatTime(slot.startTime)} –{" "}
+                                      {formatTime(slot.endTime)}
                                     </p>
                                   </div>
 
@@ -512,7 +551,7 @@ export function StudentTimetable() {
                                       <span
                                         className={`inline-flex items-center px-2 py-0.5 rounded-md text-xs font-semibold border ${
                                           subjectColorMap[slot.subjectName] ||
-                                          'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 border-gray-200 dark:border-gray-700 dark:border-gray-700'
+                                          "bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 border-gray-200 dark:border-gray-700 dark:border-gray-700"
                                         }`}
                                       >
                                         {slot.subjectName}
@@ -541,7 +580,7 @@ export function StudentTimetable() {
           )}
 
           {/* ─── Day View ─── */}
-          {viewMode === 'day' && (
+          {viewMode === "day" && (
             <div className="space-y-4">
               {/* Day Selector Pills */}
               <div className="flex items-center gap-2 overflow-x-auto pb-1">
@@ -556,14 +595,14 @@ export function StudentTimetable() {
                     <Button
                       key={day}
                       size="sm"
-                      variant={isSelected ? 'default' : 'outline'}
+                      variant={isSelected ? "default" : "outline"}
                       onClick={() => setSelectedDay(day)}
                       className={`rounded-full px-4 shrink-0 ${
                         isSelected
-                          ? 'bg-violet-600 text-white hover:bg-violet-700 shadow-sm'
+                          ? "bg-violet-600 text-white hover:bg-violet-700 shadow-sm"
                           : isToday
-                            ? 'border-violet-300 dark:border-violet-700 text-violet-600 dark:text-violet-400 hover:bg-violet-50 dark:hover:bg-violet-900/20'
-                            : 'text-gray-500 dark:text-gray-400'
+                            ? "border-violet-300 dark:border-violet-700 text-violet-600 dark:text-violet-400 hover:bg-violet-50 dark:hover:bg-violet-900/20"
+                            : "text-gray-500 dark:text-gray-400"
                       }`}
                     >
                       {DAY_LABELS[day]}
@@ -595,19 +634,31 @@ export function StudentTimetable() {
                     {selectedDaySlots.length > 0 && (
                       <div className="text-right">
                         <p className="text-xs text-gray-500 dark:text-gray-400">
-                          {formatTime(selectedDaySlots[0].startTime)} –{' '}
-                          {formatTime(selectedDaySlots[selectedDaySlots.length - 1].endTime)}
+                          {formatTime(selectedDaySlots[0].startTime)} –{" "}
+                          {formatTime(
+                            selectedDaySlots[selectedDaySlots.length - 1]
+                              .endTime,
+                          )}
                         </p>
                         <p className="text-[11px] text-gray-400 dark:text-gray-500 dark:text-gray-400">
                           {(() => {
-                            const totalMin = selectedDaySlots.reduce((acc, s) => {
-                              const [sh, sm] = s.startTime.split(':').map(Number);
-                              const [eh, em] = s.endTime.split(':').map(Number);
-                              return acc + (eh * 60 + em) - (sh * 60 + sm);
-                            }, 0);
+                            const totalMin = selectedDaySlots.reduce(
+                              (acc, s) => {
+                                const [sh, sm] = s.startTime
+                                  .split(":")
+                                  .map(Number);
+                                const [eh, em] = s.endTime
+                                  .split(":")
+                                  .map(Number);
+                                return acc + (eh * 60 + em) - (sh * 60 + sm);
+                              },
+                              0,
+                            );
                             const hrs = Math.floor(totalMin / 60);
                             const mins = totalMin % 60;
-                            return hrs > 0 ? `${hrs}h ${mins}m total` : `${mins}m total`;
+                            return hrs > 0
+                              ? `${hrs}h ${mins}m total`
+                              : `${mins}m total`;
                           })()}
                         </p>
                       </div>
@@ -638,7 +689,10 @@ export function StudentTimetable() {
                   if (!slot) {
                     // Free Period
                     return (
-                      <div key={`${selectedDay}-${ts.start}`} className="relative">
+                      <div
+                        key={`${selectedDay}-${ts.start}`}
+                        className="relative"
+                      >
                         <Card className="rounded-xl border-dashed border-gray-200 dark:border-gray-700 dark:border-gray-700 bg-gray-50/50 dark:bg-gray-900/50">
                           <CardContent className="p-4 flex items-center gap-4">
                             <div className="hidden sm:flex flex-col items-center z-10">
@@ -650,7 +704,9 @@ export function StudentTimetable() {
                               </div>
                               <div className="flex items-center gap-2 text-gray-400 dark:text-gray-500 dark:text-gray-400">
                                 <Clock className="h-3.5 w-3.5" />
-                                <span className="text-xs font-medium">Free Period</span>
+                                <span className="text-xs font-medium">
+                                  Free Period
+                                </span>
                               </div>
                             </div>
                           </CardContent>
@@ -661,17 +717,17 @@ export function StudentTimetable() {
 
                   const colorClass =
                     subjectColorMap[slot.subjectName] ||
-                    'bg-gray-50 dark:bg-gray-800/50 text-gray-700 dark:text-gray-300 border-gray-200 dark:border-gray-700 dark:border-gray-700';
+                    "bg-gray-50 dark:bg-gray-800/50 text-gray-700 dark:text-gray-300 border-gray-200 dark:border-gray-700 dark:border-gray-700";
 
                   return (
                     <div key={slot.id} className="relative">
                       <Card
                         className={`rounded-xl border transition-all ${
                           isCurrentSlotActive
-                            ? 'border-violet-300 shadow-lg shadow-violet-100'
+                            ? "border-violet-300 shadow-lg shadow-violet-100"
                             : isPastSlot
-                              ? 'opacity-60'
-                              : 'border-gray-200 dark:border-gray-700'
+                              ? "opacity-60"
+                              : "border-gray-200 dark:border-gray-700"
                         }`}
                       >
                         <CardContent className="p-4">
@@ -686,8 +742,8 @@ export function StudentTimetable() {
                                 <div
                                   className={`w-5 h-5 rounded-full border-2 ${
                                     isPastSlot
-                                      ? 'border-gray-300 dark:border-gray-600 dark:border-gray-600 bg-gray-200 dark:bg-gray-700 dark:bg-gray-700'
-                                      : 'border-violet-400 bg-white dark:bg-gray-900'
+                                      ? "border-gray-300 dark:border-gray-600 dark:border-gray-600 bg-gray-200 dark:bg-gray-700 dark:bg-gray-700"
+                                      : "border-violet-400 bg-white dark:bg-gray-900"
                                   }`}
                                 />
                               )}
@@ -699,7 +755,7 @@ export function StudentTimetable() {
                                 <div className="flex-1 min-w-0">
                                   <div className="flex items-center gap-2 flex-wrap">
                                     <h4
-                                      className={`text-sm font-bold truncate ${colorClass.split(' ')[1] || 'text-gray-900 dark:text-gray-100'}`}
+                                      className={`text-sm font-bold truncate ${colorClass.split(" ")[1] || "text-gray-900 dark:text-gray-100"}`}
                                     >
                                       {slot.subjectName}
                                     </h4>
@@ -715,7 +771,8 @@ export function StudentTimetable() {
                               <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1.5 text-xs text-gray-500 dark:text-gray-400">
                                 <span className="flex items-center gap-1">
                                   <Clock className="h-3.5 w-3.5" />
-                                  {formatTime(slot.startTime)} – {formatTime(slot.endTime)}
+                                  {formatTime(slot.startTime)} –{" "}
+                                  {formatTime(slot.endTime)}
                                 </span>
                                 <span className="flex items-center gap-1">
                                   <User className="h-3.5 w-3.5" />
@@ -733,10 +790,16 @@ export function StudentTimetable() {
                                     <Timer className="h-3.5 w-3.5 text-violet-500" />
                                     <span className="text-xs text-violet-600 font-medium">
                                       {(() => {
-                                        const [eh, em] = slot.endTime.split(':').map(Number);
-                                        const [ch, cm] = currentTimeStr.split(':').map(Number);
-                                        const remaining = eh * 60 + em - (ch * 60 + cm);
-                                        if (remaining <= 0) return 'Ending soon';
+                                        const [eh, em] = slot.endTime
+                                          .split(":")
+                                          .map(Number);
+                                        const [ch, cm] = currentTimeStr
+                                          .split(":")
+                                          .map(Number);
+                                        const remaining =
+                                          eh * 60 + em - (ch * 60 + cm);
+                                        if (remaining <= 0)
+                                          return "Ending soon";
                                         const rh = Math.floor(remaining / 60);
                                         const rm = remaining % 60;
                                         return rh > 0
@@ -750,13 +813,27 @@ export function StudentTimetable() {
                                       className="h-full rounded-full bg-violet-500 transition-all"
                                       style={{
                                         width: `${(() => {
-                                          const [sh, sm] = slot.startTime.split(':').map(Number);
-                                          const [eh, em] = slot.endTime.split(':').map(Number);
-                                          const [ch, cm] = currentTimeStr.split(':').map(Number);
-                                          const total = (eh * 60 + em) - (sh * 60 + sm);
-                                          const elapsed = (ch * 60 + cm) - (sh * 60 + sm);
+                                          const [sh, sm] = slot.startTime
+                                            .split(":")
+                                            .map(Number);
+                                          const [eh, em] = slot.endTime
+                                            .split(":")
+                                            .map(Number);
+                                          const [ch, cm] = currentTimeStr
+                                            .split(":")
+                                            .map(Number);
+                                          const total =
+                                            eh * 60 + em - (sh * 60 + sm);
+                                          const elapsed =
+                                            ch * 60 + cm - (sh * 60 + sm);
                                           if (total <= 0) return 100;
-                                          return Math.min(100, Math.max(0, (elapsed / total) * 100));
+                                          return Math.min(
+                                            100,
+                                            Math.max(
+                                              0,
+                                              (elapsed / total) * 100,
+                                            ),
+                                          );
                                         })()}%`,
                                       }}
                                     />
@@ -770,9 +847,9 @@ export function StudentTimetable() {
                               <div
                                 className={`w-8 h-8 rounded-lg flex items-center justify-center text-xs font-bold ${
                                   isCurrentSlotActive
-                                    ? 'bg-violet-600 text-white'
+                                    ? "bg-violet-600 text-white"
                                     : isPastSlot
-                                      ? 'bg-gray-100 dark:bg-gray-800 text-gray-400 dark:text-gray-500 dark:text-gray-400'
+                                      ? "bg-gray-100 dark:bg-gray-800 text-gray-400 dark:text-gray-500 dark:text-gray-400"
                                       : colorClass
                                 }`}
                               >
@@ -790,7 +867,7 @@ export function StudentTimetable() {
           )}
 
           {/* Subject Legend (Grid and List views) */}
-          {viewMode !== 'day' && Object.keys(subjectColorMap).length > 0 && (
+          {viewMode !== "day" && Object.keys(subjectColorMap).length > 0 && (
             <Card className="rounded-xl shadow-sm">
               <CardHeader className="pb-3">
                 <CardTitle className="text-base flex items-center gap-2">
@@ -800,15 +877,17 @@ export function StudentTimetable() {
               </CardHeader>
               <CardContent>
                 <div className="flex flex-wrap gap-2">
-                  {Object.entries(subjectColorMap).map(([subject, colorClass]) => (
-                    <div
-                      key={subject}
-                      className={`inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border text-xs font-medium ${colorClass}`}
-                    >
-                      <div className="w-2 h-2 rounded-full bg-current opacity-60" />
-                      {subject}
-                    </div>
-                  ))}
+                  {Object.entries(subjectColorMap).map(
+                    ([subject, colorClass]) => (
+                      <div
+                        key={subject}
+                        className={`inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border text-xs font-medium ${colorClass}`}
+                      >
+                        <div className="w-2 h-2 rounded-full bg-current opacity-60" />
+                        {subject}
+                      </div>
+                    ),
+                  )}
                 </div>
               </CardContent>
             </Card>

@@ -1,25 +1,50 @@
-'use client';
+"use client";
 
-import { useState, useEffect, useMemo, useRef, useCallback } from 'react';
-import { useQueryClient } from '@tanstack/react-query';
-import { toast } from 'sonner';
-import { Card, CardContent } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Badge } from '@/components/ui/badge';
-import { Skeleton } from '@/components/ui/skeleton';
-import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
+import { useState, useEffect, useMemo, useRef, useCallback } from "react";
+import { useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
+import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import {
-  Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
-} from '@/components/ui/table';
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import {
-  ArrowLeft, Download, Upload, Search, Users, GraduationCap, UserCheck,
-  School, DollarSign, Calendar, Bell, ClipboardCheck, Loader2,
-  ChevronLeft, ChevronRight, Building2, CheckCircle2, XCircle,
-  Activity, Ban, CreditCard, BookOpen, Clock, UserCircle,
-} from 'lucide-react';
-import { format } from 'date-fns';
-import { useTenantDetail } from '@/lib/graphql/hooks';
+  ArrowLeft,
+  Download,
+  Upload,
+  Search,
+  Users,
+  GraduationCap,
+  UserCheck,
+  School,
+  DollarSign,
+  Calendar,
+  Bell,
+  ClipboardCheck,
+  Loader2,
+  ChevronLeft,
+  ChevronRight,
+  Building2,
+  CheckCircle2,
+  XCircle,
+  Activity,
+  Ban,
+  CreditCard,
+  BookOpen,
+  Clock,
+  UserCircle,
+} from "lucide-react";
+import { format } from "date-fns";
+import { useTenantDetail } from "@/lib/graphql/hooks";
 
 // ── Types ──
 
@@ -31,7 +56,14 @@ interface SchoolDetailProps {
   onBack: () => void;
 }
 
-type TabType = 'students' | 'teachers' | 'parents' | 'classes' | 'fees' | 'attendance' | 'notices';
+type TabType =
+  | "students"
+  | "teachers"
+  | "parents"
+  | "classes"
+  | "fees"
+  | "attendance"
+  | "notices";
 
 interface TenantInfo {
   id: string;
@@ -144,48 +176,129 @@ interface TenantDetailData {
 
 const ITEMS_PER_PAGE = 20;
 
-const planColors: Record<string, { bg: string; text: string; border: string }> = {
-  basic: { bg: 'bg-gray-100 dark:bg-gray-800', text: 'text-gray-700 dark:text-gray-300', border: 'border-gray-200 dark:border-gray-700' },
-  standard: { bg: 'bg-blue-100 dark:bg-blue-900/30', text: 'text-blue-700 dark:text-blue-400', border: 'border-blue-200 dark:border-blue-700' },
-  premium: { bg: 'bg-purple-100 dark:bg-purple-900/30', text: 'text-purple-700 dark:text-purple-400', border: 'border-purple-200 dark:border-purple-700' },
-  enterprise: { bg: 'bg-amber-100 dark:bg-amber-900/30', text: 'text-amber-700 dark:text-amber-400', border: 'border-amber-200 dark:border-amber-700' },
-};
+const planColors: Record<string, { bg: string; text: string; border: string }> =
+  {
+    basic: {
+      bg: "bg-gray-100 dark:bg-gray-800",
+      text: "text-gray-700 dark:text-gray-300",
+      border: "border-gray-200 dark:border-gray-700",
+    },
+    standard: {
+      bg: "bg-blue-100 dark:bg-blue-900/30",
+      text: "text-blue-700 dark:text-blue-400",
+      border: "border-blue-200 dark:border-blue-700",
+    },
+    premium: {
+      bg: "bg-purple-100 dark:bg-purple-900/30",
+      text: "text-purple-700 dark:text-purple-400",
+      border: "border-purple-200 dark:border-purple-700",
+    },
+    enterprise: {
+      bg: "bg-amber-100 dark:bg-amber-900/30",
+      text: "text-amber-700 dark:text-amber-400",
+      border: "border-amber-200 dark:border-amber-700",
+    },
+  };
 
-const statusColors: Record<string, { bg: string; text: string; icon: React.ReactNode }> = {
-  active: { bg: 'bg-emerald-100 dark:bg-emerald-900/30', text: 'text-emerald-700 dark:text-emerald-400', icon: <CheckCircle2 className="h-3 w-3" /> },
-  trial: { bg: 'bg-blue-100 dark:bg-blue-900/30', text: 'text-blue-700 dark:text-blue-400', icon: <Activity className="h-3 w-3" /> },
-  suspended: { bg: 'bg-red-100 dark:bg-red-900/30', text: 'text-red-700 dark:text-red-400', icon: <Ban className="h-3 w-3" /> },
-  inactive: { bg: 'bg-gray-100 dark:bg-gray-800', text: 'text-gray-600 dark:text-gray-400', icon: <XCircle className="h-3 w-3" /> },
+const statusColors: Record<
+  string,
+  { bg: string; text: string; icon: React.ReactNode }
+> = {
+  active: {
+    bg: "bg-emerald-100 dark:bg-emerald-900/30",
+    text: "text-emerald-700 dark:text-emerald-400",
+    icon: <CheckCircle2 className="h-3 w-3" />,
+  },
+  trial: {
+    bg: "bg-blue-100 dark:bg-blue-900/30",
+    text: "text-blue-700 dark:text-blue-400",
+    icon: <Activity className="h-3 w-3" />,
+  },
+  suspended: {
+    bg: "bg-red-100 dark:bg-red-900/30",
+    text: "text-red-700 dark:text-red-400",
+    icon: <Ban className="h-3 w-3" />,
+  },
+  inactive: {
+    bg: "bg-gray-100 dark:bg-gray-800",
+    text: "text-gray-600 dark:text-gray-400",
+    icon: <XCircle className="h-3 w-3" />,
+  },
 };
 
 const priorityColors: Record<string, { bg: string; text: string }> = {
-  high: { bg: 'bg-red-100 dark:bg-red-900/30', text: 'text-red-700 dark:text-red-400' },
-  medium: { bg: 'bg-amber-100 dark:bg-amber-900/30', text: 'text-amber-700 dark:text-amber-400' },
-  low: { bg: 'bg-gray-100 dark:bg-gray-800', text: 'text-gray-600 dark:text-gray-400' },
+  high: {
+    bg: "bg-red-100 dark:bg-red-900/30",
+    text: "text-red-700 dark:text-red-400",
+  },
+  medium: {
+    bg: "bg-amber-100 dark:bg-amber-900/30",
+    text: "text-amber-700 dark:text-amber-400",
+  },
+  low: {
+    bg: "bg-gray-100 dark:bg-gray-800",
+    text: "text-gray-600 dark:text-gray-400",
+  },
 };
 
 const feeStatusColors: Record<string, { bg: string; text: string }> = {
-  paid: { bg: 'bg-emerald-100 dark:bg-emerald-900/30', text: 'text-emerald-700 dark:text-emerald-400' },
-  pending: { bg: 'bg-amber-100 dark:bg-amber-900/30', text: 'text-amber-700 dark:text-amber-400' },
-  overdue: { bg: 'bg-red-100 dark:bg-red-900/30', text: 'text-red-700 dark:text-red-400' },
-  partial: { bg: 'bg-blue-100 dark:bg-blue-900/30', text: 'text-blue-700 dark:text-blue-400' },
+  paid: {
+    bg: "bg-emerald-100 dark:bg-emerald-900/30",
+    text: "text-emerald-700 dark:text-emerald-400",
+  },
+  pending: {
+    bg: "bg-amber-100 dark:bg-amber-900/30",
+    text: "text-amber-700 dark:text-amber-400",
+  },
+  overdue: {
+    bg: "bg-red-100 dark:bg-red-900/30",
+    text: "text-red-700 dark:text-red-400",
+  },
+  partial: {
+    bg: "bg-blue-100 dark:bg-blue-900/30",
+    text: "text-blue-700 dark:text-blue-400",
+  },
 };
 
 const attendanceStatusColors: Record<string, { bg: string; text: string }> = {
-  present: { bg: 'bg-emerald-100 dark:bg-emerald-900/30', text: 'text-emerald-700 dark:text-emerald-400' },
-  absent: { bg: 'bg-red-100 dark:bg-red-900/30', text: 'text-red-700 dark:text-red-400' },
-  late: { bg: 'bg-amber-100 dark:bg-amber-900/30', text: 'text-amber-700 dark:text-amber-400' },
-  excused: { bg: 'bg-blue-100 dark:bg-blue-900/30', text: 'text-blue-700 dark:text-blue-400' },
+  present: {
+    bg: "bg-emerald-100 dark:bg-emerald-900/30",
+    text: "text-emerald-700 dark:text-emerald-400",
+  },
+  absent: {
+    bg: "bg-red-100 dark:bg-red-900/30",
+    text: "text-red-700 dark:text-red-400",
+  },
+  late: {
+    bg: "bg-amber-100 dark:bg-amber-900/30",
+    text: "text-amber-700 dark:text-amber-400",
+  },
+  excused: {
+    bg: "bg-blue-100 dark:bg-blue-900/30",
+    text: "text-blue-700 dark:text-blue-400",
+  },
 };
 
 const TAB_CONFIG: { value: TabType; label: string; icon: React.ReactNode }[] = [
-  { value: 'students', label: 'Students', icon: <GraduationCap className="h-4 w-4" /> },
-  { value: 'teachers', label: 'Teachers', icon: <Users className="h-4 w-4" /> },
-  { value: 'parents', label: 'Parents', icon: <UserCheck className="h-4 w-4" /> },
-  { value: 'classes', label: 'Classes', icon: <School className="h-4 w-4" /> },
-  { value: 'fees', label: 'Fees', icon: <DollarSign className="h-4 w-4" /> },
-  { value: 'attendance', label: 'Attendance', icon: <ClipboardCheck className="h-4 w-4" /> },
-  { value: 'notices', label: 'Notices', icon: <Bell className="h-4 w-4" /> },
+  {
+    value: "students",
+    label: "Students",
+    icon: <GraduationCap className="h-4 w-4" />,
+  },
+  { value: "teachers", label: "Teachers", icon: <Users className="h-4 w-4" /> },
+  {
+    value: "parents",
+    label: "Parents",
+    icon: <UserCheck className="h-4 w-4" />,
+  },
+  { value: "classes", label: "Classes", icon: <School className="h-4 w-4" /> },
+  { value: "fees", label: "Fees", icon: <DollarSign className="h-4 w-4" /> },
+  {
+    value: "attendance",
+    label: "Attendance",
+    icon: <ClipboardCheck className="h-4 w-4" />,
+  },
+  { value: "notices", label: "Notices", icon: <Bell className="h-4 w-4" /> },
 ];
 
 const TENANT_DETAIL_QUERY = `
@@ -205,10 +318,16 @@ const TENANT_DETAIL_QUERY = `
 
 // ── Component ──
 
-export function SchoolDetail({ tenantId, tenantName, tenantSlug, tenantPlan, onBack }: SchoolDetailProps) {
+export function SchoolDetail({
+  tenantId,
+  tenantName,
+  tenantSlug,
+  tenantPlan,
+  onBack,
+}: SchoolDetailProps) {
   const queryClient = useQueryClient();
-  const [activeTab, setActiveTab] = useState<TabType>('students');
-  const [search, setSearch] = useState('');
+  const [activeTab, setActiveTab] = useState<TabType>("students");
+  const [search, setSearch] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [exporting, setExporting] = useState(false);
   const [importing, setImporting] = useState(false);
@@ -217,19 +336,26 @@ export function SchoolDetail({ tenantId, tenantName, tenantSlug, tenantPlan, onB
   // ── Data Fetching via TanStack Query ──
   const { data, isLoading: loading } = useTenantDetail(tenantId);
 
-
   // ── Tab data accessors ──
   const tabData = useMemo(() => {
     if (!data) return [];
     switch (activeTab) {
-      case 'students': return data.students;
-      case 'teachers': return data.teachers;
-      case 'parents': return data.parents;
-      case 'classes': return data.classes;
-      case 'fees': return data.fees;
-      case 'attendance': return data.attendance;
-      case 'notices': return data.notices;
-      default: return [];
+      case "students":
+        return data.students;
+      case "teachers":
+        return data.teachers;
+      case "parents":
+        return data.parents;
+      case "classes":
+        return data.classes;
+      case "fees":
+        return data.fees;
+      case "attendance":
+        return data.attendance;
+      case "notices":
+        return data.notices;
+      default:
+        return [];
     }
   }, [data, activeTab]);
 
@@ -238,25 +364,30 @@ export function SchoolDetail({ tenantId, tenantName, tenantSlug, tenantPlan, onB
     if (!search.trim()) return tabData;
     const q = search.toLowerCase();
     return tabData.filter((item) => {
-      return Object.values(item as unknown as Record<string, unknown>).some((val) => {
-        if (val == null) return false;
-        return String(val).toLowerCase().includes(q);
-      });
+      return Object.values(item as unknown as Record<string, unknown>).some(
+        (val) => {
+          if (val == null) return false;
+          return String(val).toLowerCase().includes(q);
+        },
+      );
     });
   }, [tabData, search]);
 
-  const totalPages = Math.max(1, Math.ceil(filteredData.length / ITEMS_PER_PAGE));
+  const totalPages = Math.max(
+    1,
+    Math.ceil(filteredData.length / ITEMS_PER_PAGE),
+  );
   const paginatedData = useMemo(() => {
     return filteredData.slice(
       (currentPage - 1) * ITEMS_PER_PAGE,
-      currentPage * ITEMS_PER_PAGE
+      currentPage * ITEMS_PER_PAGE,
     );
   }, [filteredData, currentPage]);
 
   // Reset page when tab or search changes
   const handleTabChange = (tab: string) => {
     setActiveTab(tab as TabType);
-    setSearch('');
+    setSearch("");
     setCurrentPage(1);
   };
 
@@ -269,22 +400,24 @@ export function SchoolDetail({ tenantId, tenantName, tenantSlug, tenantPlan, onB
   async function handleExport(dataType: string) {
     setExporting(true);
     try {
-      const res = await fetch('/api/export', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      const res = await fetch("/api/export", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ tenantId, dataType }),
       });
-      if (!res.ok) throw new Error('Export failed');
+      if (!res.ok) throw new Error("Export failed");
       const blob = await res.blob();
       const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
+      const a = document.createElement("a");
       a.href = url;
       a.download = `${tenantSlug}_${dataType}.csv`;
       a.click();
       URL.revokeObjectURL(url);
       toast.success(`${dataType} exported successfully`);
     } catch {
-      toast.error('Export failed', { description: 'Could not generate the export file.' });
+      toast.error("Export failed", {
+        description: "Could not generate the export file.",
+      });
     } finally {
       setExporting(false);
     }
@@ -297,42 +430,50 @@ export function SchoolDetail({ tenantId, tenantName, tenantSlug, tenantPlan, onB
     setImporting(true);
     try {
       const formData = new FormData();
-      formData.append('file', file);
-      formData.append('tenantId', tenantId);
-      formData.append('dataType', activeTab);
+      formData.append("file", file);
+      formData.append("tenantId", tenantId);
+      formData.append("dataType", activeTab);
 
-      const res = await fetch('/api/import', {
-        method: 'POST',
+      const res = await fetch("/api/import", {
+        method: "POST",
         body: formData,
       });
       const result = await res.json();
       if (result.success) {
         toast.success(`Imported ${result.imported} ${activeTab}`, {
-          description: result.errors > 0 ? `${result.errors} errors occurred` : undefined,
+          description:
+            result.errors > 0 ? `${result.errors} errors occurred` : undefined,
         });
-        queryClient.invalidateQueries({ queryKey: ['tenant', 'detail', tenantId] });
+        queryClient.invalidateQueries({
+          queryKey: ["tenant", "detail", tenantId],
+        });
       } else {
-        toast.error(result.error || 'Import failed', {
-          description: 'Please check your CSV file format.',
+        toast.error(result.error || "Import failed", {
+          description: "Please check your CSV file format.",
         });
       }
     } catch {
-      toast.error('Import failed', { description: 'Could not process the file.' });
+      toast.error("Import failed", {
+        description: "Could not process the file.",
+      });
     } finally {
       setImporting(false);
-      if (importInputRef.current) importInputRef.current.value = '';
+      if (importInputRef.current) importInputRef.current.value = "";
     }
   }
 
   // ── Pagination range helper ──
-  function getPaginationRange(current: number, total: number): (number | 'ellipsis')[] {
+  function getPaginationRange(
+    current: number,
+    total: number,
+  ): (number | "ellipsis")[] {
     if (total <= 5) return Array.from({ length: total }, (_, i) => i + 1);
-    const pages: (number | 'ellipsis')[] = [1];
-    if (current > 3) pages.push('ellipsis');
+    const pages: (number | "ellipsis")[] = [1];
+    if (current > 3) pages.push("ellipsis");
     const start = Math.max(2, current - 1);
     const end = Math.min(total - 1, current + 1);
     for (let i = start; i <= end; i++) pages.push(i);
-    if (current < total - 2) pages.push('ellipsis');
+    if (current < total - 2) pages.push("ellipsis");
     pages.push(total);
     return pages;
   }
@@ -340,13 +481,17 @@ export function SchoolDetail({ tenantId, tenantName, tenantSlug, tenantPlan, onB
   // ── Render Helpers ──
 
   const tenant = data?.tenant;
-  const statusConfig = statusColors[tenant?.status || ''] || statusColors.inactive;
-  const planConfig = planColors[tenant?.plan || ''] || planColors.basic;
+  const statusConfig =
+    statusColors[tenant?.status || ""] || statusColors.inactive;
+  const planConfig = planColors[tenant?.plan || ""] || planColors.basic;
 
   function renderStatusBadge(status: string) {
     const colors = statusColors[status] || statusColors.inactive;
     return (
-      <Badge variant="outline" className={`${colors.bg} ${colors.text} border-transparent capitalize font-medium text-xs flex items-center gap-1 w-fit`}>
+      <Badge
+        variant="outline"
+        className={`${colors.bg} ${colors.text} border-transparent capitalize font-medium text-xs flex items-center gap-1 w-fit`}
+      >
         {colors.icon}
         {status}
       </Badge>
@@ -421,17 +566,27 @@ export function SchoolDetail({ tenantId, tenantName, tenantSlug, tenantPlan, onB
             <Building2 className="h-6 w-6" />
           </div>
           <div className="min-w-0">
-            <h1 className="text-xl font-bold truncate">{tenant?.name || tenantName}</h1>
-            <p className="text-sm text-muted-foreground font-mono">@{tenant?.slug || tenantSlug}</p>
+            <h1 className="text-xl font-bold truncate">
+              {tenant?.name || tenantName}
+            </h1>
+            <p className="text-sm text-muted-foreground font-mono">
+              @{tenant?.slug || tenantSlug}
+            </p>
           </div>
         </div>
         <div className="flex items-center gap-2 flex-wrap">
-          <Badge variant="outline" className={`${planConfig.bg} ${planConfig.text} ${planConfig.border} border capitalize font-medium text-xs`}>
+          <Badge
+            variant="outline"
+            className={`${planConfig.bg} ${planConfig.text} ${planConfig.border} border capitalize font-medium text-xs`}
+          >
             {tenant?.plan || tenantPlan}
           </Badge>
-          <Badge variant="outline" className={`${statusConfig.bg} ${statusConfig.text} border-transparent capitalize font-medium text-xs flex items-center gap-1 w-fit`}>
+          <Badge
+            variant="outline"
+            className={`${statusConfig.bg} ${statusConfig.text} border-transparent capitalize font-medium text-xs flex items-center gap-1 w-fit`}
+          >
             {statusConfig.icon}
-            {tenant?.status || 'unknown'}
+            {tenant?.status || "unknown"}
           </Badge>
         </div>
       </div>
@@ -558,7 +713,9 @@ export function SchoolDetail({ tenantId, tenantName, tenantSlug, tenantPlan, onB
                     <div className="h-12 w-12 mx-auto mb-3 rounded-xl bg-muted/50 flex items-center justify-center text-muted-foreground/50">
                       {tab.icon}
                     </div>
-                    <h3 className="text-lg font-semibold text-muted-foreground">No {tab.label.toLowerCase()} found</h3>
+                    <h3 className="text-lg font-semibold text-muted-foreground">
+                      No {tab.label.toLowerCase()} found
+                    </h3>
                     <p className="text-sm text-muted-foreground mt-1">
                       {search
                         ? `No results matching "${search}".`
@@ -577,8 +734,17 @@ export function SchoolDetail({ tenantId, tenantName, tenantSlug, tenantPlan, onB
                           </TableHeader>
                           <TableBody>
                             {paginatedData.map((item, idx: number) => (
-                              <TableRow key={(item as unknown as Record<string, unknown>).id as string || idx} className="hover:bg-rose-50 dark:bg-rose-900/30/30 transition-colors">
-                                {renderTableCells(activeTab, item as unknown as Record<string, unknown>)}
+                              <TableRow
+                                key={
+                                  ((item as unknown as Record<string, unknown>)
+                                    .id as string) || idx
+                                }
+                                className="hover:bg-rose-50 dark:bg-rose-900/30/30 transition-colors"
+                              >
+                                {renderTableCells(
+                                  activeTab,
+                                  item as unknown as Record<string, unknown>,
+                                )}
                               </TableRow>
                             ))}
                           </TableBody>
@@ -589,16 +755,21 @@ export function SchoolDetail({ tenantId, tenantName, tenantSlug, tenantPlan, onB
                     {/* Pagination */}
                     <div className="flex flex-col sm:flex-row items-center justify-between gap-3 mt-4">
                       <p className="text-sm text-muted-foreground">
-                        Showing{' '}
+                        Showing{" "}
                         <span className="font-medium">
                           {(currentPage - 1) * ITEMS_PER_PAGE + 1}
-                        </span>
-                        {' '}to{' '}
+                        </span>{" "}
+                        to{" "}
                         <span className="font-medium">
-                          {Math.min(currentPage * ITEMS_PER_PAGE, filteredData.length)}
-                        </span>
-                        {' '}of{' '}
-                        <span className="font-medium">{filteredData.length}</span>{' '}
+                          {Math.min(
+                            currentPage * ITEMS_PER_PAGE,
+                            filteredData.length,
+                          )}
+                        </span>{" "}
+                        of{" "}
+                        <span className="font-medium">
+                          {filteredData.length}
+                        </span>{" "}
                         {activeTab}
                       </p>
                       <div className="flex items-center gap-1">
@@ -611,20 +782,28 @@ export function SchoolDetail({ tenantId, tenantName, tenantSlug, tenantPlan, onB
                         >
                           <ChevronLeft className="h-4 w-4" />
                         </Button>
-                        {getPaginationRange(currentPage, totalPages).map((page, idx) =>
-                          page === 'ellipsis' ? (
-                            <span key={`ellipsis-${idx}`} className="px-1 text-muted-foreground text-sm">...</span>
-                          ) : (
-                            <Button
-                              key={page}
-                              variant={currentPage === page ? 'default' : 'outline'}
-                              size="icon"
-                              className={`h-8 w-8 ${currentPage === page ? 'bg-rose-600 hover:bg-rose-700 text-white' : ''}`}
-                              onClick={() => setCurrentPage(page)}
-                            >
-                              {page}
-                            </Button>
-                          )
+                        {getPaginationRange(currentPage, totalPages).map(
+                          (page, idx) =>
+                            page === "ellipsis" ? (
+                              <span
+                                key={`ellipsis-${idx}`}
+                                className="px-1 text-muted-foreground text-sm"
+                              >
+                                ...
+                              </span>
+                            ) : (
+                              <Button
+                                key={page}
+                                variant={
+                                  currentPage === page ? "default" : "outline"
+                                }
+                                size="icon"
+                                className={`h-8 w-8 ${currentPage === page ? "bg-rose-600 hover:bg-rose-700 text-white" : ""}`}
+                                onClick={() => setCurrentPage(page)}
+                              >
+                                {page}
+                              </Button>
+                            ),
                         )}
                         <Button
                           variant="outline"
@@ -652,27 +831,68 @@ export function SchoolDetail({ tenantId, tenantName, tenantSlug, tenantPlan, onB
 
 function renderTableHeaders(tab: TabType) {
   const headers: Record<TabType, string[]> = {
-    students: ['Name', 'Email', 'Phone', 'Class', 'Roll No', 'Gender', 'DOB', 'Status'],
-    teachers: ['Name', 'Email', 'Phone', 'Qualification', 'Experience', 'Status'],
-    parents: ['Name', 'Email', 'Phone', 'Occupation', 'Status'],
-    classes: ['Name', 'Section', 'Grade', 'Capacity', 'Students', 'Actions'],
-    fees: ['Student', 'Type', 'Amount', 'Status', 'Due Date', 'Paid'],
-    attendance: ['Student', 'Date', 'Status', 'Class'],
-    notices: ['Title', 'Author', 'Priority', 'Target', 'Date'],
+    students: [
+      "Name",
+      "Email",
+      "Phone",
+      "Class",
+      "Roll No",
+      "Gender",
+      "DOB",
+      "Status",
+    ],
+    teachers: [
+      "Name",
+      "Email",
+      "Phone",
+      "Qualification",
+      "Experience",
+      "Status",
+    ],
+    parents: ["Name", "Email", "Phone", "Occupation", "Status"],
+    classes: ["Name", "Section", "Grade", "Capacity", "Students", "Actions"],
+    fees: ["Student", "Type", "Amount", "Status", "Due Date", "Paid"],
+    attendance: ["Student", "Date", "Status", "Class"],
+    notices: ["Title", "Author", "Priority", "Target", "Date"],
   };
 
   const responsiveHide: Record<TabType, Record<number, string>> = {
-    students: { 1: 'hidden md:table-cell', 2: 'hidden lg:table-cell', 3: 'hidden md:table-cell', 4: 'hidden md:table-cell', 5: 'hidden lg:table-cell', 6: 'hidden lg:table-cell' },
-    teachers: { 1: 'hidden md:table-cell', 2: 'hidden lg:table-cell', 3: 'hidden md:table-cell', 4: 'hidden lg:table-cell' },
-    parents: { 1: 'hidden md:table-cell', 2: 'hidden lg:table-cell', 3: 'hidden md:table-cell' },
-    classes: { 1: 'hidden md:table-cell', 2: 'hidden md:table-cell', 3: 'hidden md:table-cell' },
-    fees: { 1: 'hidden md:table-cell', 2: 'hidden sm:table-cell', 3: 'hidden sm:table-cell', 4: 'hidden md:table-cell' },
-    attendance: { 2: 'hidden sm:table-cell', 3: 'hidden sm:table-cell' },
-    notices: { 3: 'hidden md:table-cell', 4: 'hidden md:table-cell' },
+    students: {
+      1: "hidden md:table-cell",
+      2: "hidden lg:table-cell",
+      3: "hidden md:table-cell",
+      4: "hidden md:table-cell",
+      5: "hidden lg:table-cell",
+      6: "hidden lg:table-cell",
+    },
+    teachers: {
+      1: "hidden md:table-cell",
+      2: "hidden lg:table-cell",
+      3: "hidden md:table-cell",
+      4: "hidden lg:table-cell",
+    },
+    parents: {
+      1: "hidden md:table-cell",
+      2: "hidden lg:table-cell",
+      3: "hidden md:table-cell",
+    },
+    classes: {
+      1: "hidden md:table-cell",
+      2: "hidden md:table-cell",
+      3: "hidden md:table-cell",
+    },
+    fees: {
+      1: "hidden md:table-cell",
+      2: "hidden sm:table-cell",
+      3: "hidden sm:table-cell",
+      4: "hidden md:table-cell",
+    },
+    attendance: { 2: "hidden sm:table-cell", 3: "hidden sm:table-cell" },
+    notices: { 3: "hidden md:table-cell", 4: "hidden md:table-cell" },
   };
 
   return (headers[tab] || []).map((h, i) => (
-    <TableHead key={h} className={responsiveHide[tab]?.[i] || ''}>
+    <TableHead key={h} className={responsiveHide[tab]?.[i] || ""}>
       {h}
     </TableHead>
   ));
@@ -682,78 +902,120 @@ function renderTableHeaders(tab: TabType) {
 
 function renderTableCells(tab: TabType, item: Record<string, unknown>) {
   switch (tab) {
-    case 'students':
+    case "students":
       return (
         <>
           <TableCell>
             <div className="flex items-center gap-2 min-w-0">
               <div className="h-8 w-8 rounded-full bg-rose-100 dark:bg-rose-900/30 text-rose-700 dark:text-rose-400 flex items-center justify-center shrink-0 text-xs font-semibold">
-                {(item.name as string)?.charAt(0)?.toUpperCase() || '?'}
+                {(item.name as string)?.charAt(0)?.toUpperCase() || "?"}
               </div>
-              <span className="font-medium text-sm truncate">{item.name as string}</span>
+              <span className="font-medium text-sm truncate">
+                {item.name as string}
+              </span>
             </div>
           </TableCell>
-          <TableCell className="hidden md:table-cell text-sm text-muted-foreground">{item.email as string}</TableCell>
-          <TableCell className="hidden lg:table-cell text-sm">{item.phone as string || '—'}</TableCell>
-          <TableCell className="hidden md:table-cell text-sm">{item.className as string || '—'}</TableCell>
-          <TableCell className="hidden md:table-cell text-sm font-mono">{item.rollNumber as string || '—'}</TableCell>
+          <TableCell className="hidden md:table-cell text-sm text-muted-foreground">
+            {item.email as string}
+          </TableCell>
+          <TableCell className="hidden lg:table-cell text-sm">
+            {(item.phone as string) || "—"}
+          </TableCell>
+          <TableCell className="hidden md:table-cell text-sm">
+            {(item.className as string) || "—"}
+          </TableCell>
+          <TableCell className="hidden md:table-cell text-sm font-mono">
+            {(item.rollNumber as string) || "—"}
+          </TableCell>
           <TableCell className="hidden lg:table-cell">
-            <Badge variant="secondary" className="text-xs capitalize">{item.gender as string || '—'}</Badge>
+            <Badge variant="secondary" className="text-xs capitalize">
+              {(item.gender as string) || "—"}
+            </Badge>
           </TableCell>
           <TableCell className="hidden lg:table-cell text-sm text-muted-foreground">
-            {item.dateOfBirth ? format(new Date(item.dateOfBirth as string), 'MMM d, yyyy') : '—'}
+            {item.dateOfBirth
+              ? format(new Date(item.dateOfBirth as string), "MMM d, yyyy")
+              : "—"}
           </TableCell>
           <TableCell>{renderStatusBadge(item.status as string)}</TableCell>
         </>
       );
 
-    case 'teachers':
+    case "teachers":
       return (
         <>
           <TableCell>
             <div className="flex items-center gap-2 min-w-0">
               <div className="h-8 w-8 rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 flex items-center justify-center shrink-0 text-xs font-semibold">
-                {(item.name as string)?.charAt(0)?.toUpperCase() || '?'}
+                {(item.name as string)?.charAt(0)?.toUpperCase() || "?"}
               </div>
-              <span className="font-medium text-sm truncate">{item.name as string}</span>
+              <span className="font-medium text-sm truncate">
+                {item.name as string}
+              </span>
             </div>
           </TableCell>
-          <TableCell className="hidden md:table-cell text-sm text-muted-foreground">{item.email as string}</TableCell>
-          <TableCell className="hidden lg:table-cell text-sm">{item.phone as string || '—'}</TableCell>
-          <TableCell className="hidden md:table-cell text-sm">{item.qualification as string || '—'}</TableCell>
-          <TableCell className="hidden lg:table-cell text-sm">{item.experience as string || '—'}</TableCell>
+          <TableCell className="hidden md:table-cell text-sm text-muted-foreground">
+            {item.email as string}
+          </TableCell>
+          <TableCell className="hidden lg:table-cell text-sm">
+            {(item.phone as string) || "—"}
+          </TableCell>
+          <TableCell className="hidden md:table-cell text-sm">
+            {(item.qualification as string) || "—"}
+          </TableCell>
+          <TableCell className="hidden lg:table-cell text-sm">
+            {(item.experience as string) || "—"}
+          </TableCell>
           <TableCell>{renderStatusBadge(item.status as string)}</TableCell>
         </>
       );
 
-    case 'parents':
+    case "parents":
       return (
         <>
           <TableCell>
             <div className="flex items-center gap-2 min-w-0">
               <div className="h-8 w-8 rounded-full bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 flex items-center justify-center shrink-0 text-xs font-semibold">
-                {(item.name as string)?.charAt(0)?.toUpperCase() || '?'}
+                {(item.name as string)?.charAt(0)?.toUpperCase() || "?"}
               </div>
-              <span className="font-medium text-sm truncate">{item.name as string}</span>
+              <span className="font-medium text-sm truncate">
+                {item.name as string}
+              </span>
             </div>
           </TableCell>
-          <TableCell className="hidden md:table-cell text-sm text-muted-foreground">{item.email as string}</TableCell>
-          <TableCell className="hidden lg:table-cell text-sm">{item.phone as string || '—'}</TableCell>
-          <TableCell className="hidden md:table-cell text-sm">{item.occupation as string || '—'}</TableCell>
+          <TableCell className="hidden md:table-cell text-sm text-muted-foreground">
+            {item.email as string}
+          </TableCell>
+          <TableCell className="hidden lg:table-cell text-sm">
+            {(item.phone as string) || "—"}
+          </TableCell>
+          <TableCell className="hidden md:table-cell text-sm">
+            {(item.occupation as string) || "—"}
+          </TableCell>
           <TableCell>{renderStatusBadge(item.status as string)}</TableCell>
         </>
       );
 
-    case 'classes':
+    case "classes":
       return (
         <>
-          <TableCell className="font-medium text-sm">{item.name as string}</TableCell>
-          <TableCell className="hidden md:table-cell text-sm">{item.section as string || '—'}</TableCell>
-          <TableCell className="hidden md:table-cell text-sm">{item.grade as string || '—'}</TableCell>
-          <TableCell className="hidden md:table-cell text-sm">{item.capacity as number || 0}</TableCell>
+          <TableCell className="font-medium text-sm">
+            {item.name as string}
+          </TableCell>
+          <TableCell className="hidden md:table-cell text-sm">
+            {(item.section as string) || "—"}
+          </TableCell>
+          <TableCell className="hidden md:table-cell text-sm">
+            {(item.grade as string) || "—"}
+          </TableCell>
+          <TableCell className="hidden md:table-cell text-sm">
+            {(item.capacity as number) || 0}
+          </TableCell>
           <TableCell className="hidden md:table-cell">
             <div className="flex items-center gap-2">
-              <span className="text-sm font-medium">{item.studentCount as number || 0}</span>
+              <span className="text-sm font-medium">
+                {(item.studentCount as number) || 0}
+              </span>
               <div className="w-16 h-1.5 bg-muted rounded-full overflow-hidden">
                 <div
                   className="h-full bg-rose-500 rounded-full transition-all"
@@ -773,71 +1035,105 @@ function renderTableCells(tab: TabType, item: Record<string, unknown>) {
         </>
       );
 
-    case 'fees': {
+    case "fees": {
       const feeStatus = item.status as string;
       const feeColors = feeStatusColors[feeStatus] || feeStatusColors.pending;
       return (
         <>
-          <TableCell className="font-medium text-sm">{item.studentName as string}</TableCell>
-          <TableCell className="hidden md:table-cell text-sm">{item.type as string}</TableCell>
-          <TableCell className="hidden sm:table-cell text-sm font-semibold">${(item.amount as number || 0).toLocaleString()}</TableCell>
+          <TableCell className="font-medium text-sm">
+            {item.studentName as string}
+          </TableCell>
+          <TableCell className="hidden md:table-cell text-sm">
+            {item.type as string}
+          </TableCell>
+          <TableCell className="hidden sm:table-cell text-sm font-semibold">
+            ${((item.amount as number) || 0).toLocaleString()}
+          </TableCell>
           <TableCell className="hidden sm:table-cell">
-            <Badge variant="outline" className={`${feeColors.bg} ${feeColors.text} border capitalize font-medium text-xs`}>
+            <Badge
+              variant="outline"
+              className={`${feeColors.bg} ${feeColors.text} border capitalize font-medium text-xs`}
+            >
               {feeStatus}
             </Badge>
           </TableCell>
           <TableCell className="hidden md:table-cell text-sm text-muted-foreground">
-            {item.dueDate ? format(new Date(item.dueDate as string), 'MMM d, yyyy') : '—'}
+            {item.dueDate
+              ? format(new Date(item.dueDate as string), "MMM d, yyyy")
+              : "—"}
           </TableCell>
-          <TableCell className="text-sm font-medium text-emerald-600">${(item.paidAmount as number || 0).toLocaleString()}</TableCell>
+          <TableCell className="text-sm font-medium text-emerald-600">
+            ${((item.paidAmount as number) || 0).toLocaleString()}
+          </TableCell>
         </>
       );
     }
 
-    case 'attendance': {
+    case "attendance": {
       const attStatus = item.status as string;
-      const attColors = attendanceStatusColors[attStatus] || attendanceStatusColors.present;
+      const attColors =
+        attendanceStatusColors[attStatus] || attendanceStatusColors.present;
       return (
         <>
-          <TableCell className="font-medium text-sm">{item.studentName as string}</TableCell>
+          <TableCell className="font-medium text-sm">
+            {item.studentName as string}
+          </TableCell>
           <TableCell className="text-sm text-muted-foreground">
-            {item.date ? format(new Date(item.date as string), 'MMM d, yyyy') : '—'}
+            {item.date
+              ? format(new Date(item.date as string), "MMM d, yyyy")
+              : "—"}
           </TableCell>
           <TableCell className="hidden sm:table-cell">
-            <Badge variant="outline" className={`${attColors.bg} ${attColors.text} border capitalize font-medium text-xs`}>
+            <Badge
+              variant="outline"
+              className={`${attColors.bg} ${attColors.text} border capitalize font-medium text-xs`}
+            >
               {attStatus}
             </Badge>
           </TableCell>
-          <TableCell className="hidden sm:table-cell text-sm">{item.className as string || '—'}</TableCell>
+          <TableCell className="hidden sm:table-cell text-sm">
+            {(item.className as string) || "—"}
+          </TableCell>
         </>
       );
     }
 
-    case 'notices': {
+    case "notices": {
       const prio = item.priority as string;
       const prioColors = priorityColors[prio] || priorityColors.low;
       return (
         <>
           <TableCell>
             <div className="min-w-0">
-              <p className="font-medium text-sm truncate">{item.title as string}</p>
+              <p className="font-medium text-sm truncate">
+                {item.title as string}
+              </p>
               <p className="text-xs text-muted-foreground truncate mt-0.5 max-w-xs">
-                {(item.content as string)?.substring(0, 80) || ''}
-                {(item.content as string)?.length > 80 ? '...' : ''}
+                {(item.content as string)?.substring(0, 80) || ""}
+                {(item.content as string)?.length > 80 ? "..." : ""}
               </p>
             </div>
           </TableCell>
-          <TableCell className="text-sm">{item.authorName as string || '—'}</TableCell>
+          <TableCell className="text-sm">
+            {(item.authorName as string) || "—"}
+          </TableCell>
           <TableCell className="hidden md:table-cell">
-            <Badge variant="outline" className={`${prioColors.bg} ${prioColors.text} border capitalize font-medium text-xs`}>
+            <Badge
+              variant="outline"
+              className={`${prioColors.bg} ${prioColors.text} border capitalize font-medium text-xs`}
+            >
               {prio}
             </Badge>
           </TableCell>
           <TableCell className="hidden md:table-cell">
-            <Badge variant="secondary" className="text-xs capitalize">{item.targetRole as string || 'all'}</Badge>
+            <Badge variant="secondary" className="text-xs capitalize">
+              {(item.targetRole as string) || "all"}
+            </Badge>
           </TableCell>
           <TableCell className="text-sm text-muted-foreground">
-            {item.createdAt ? format(new Date(item.createdAt as string), 'MMM d, yyyy') : '—'}
+            {item.createdAt
+              ? format(new Date(item.createdAt as string), "MMM d, yyyy")
+              : "—"}
           </TableCell>
         </>
       );
@@ -853,7 +1149,10 @@ function renderTableCells(tab: TabType, item: Record<string, unknown>) {
 function renderStatusBadge(status: string) {
   const colors = statusColors[status] || statusColors.inactive;
   return (
-    <Badge variant="outline" className={`${colors.bg} ${colors.text} border-transparent capitalize font-medium text-xs flex items-center gap-1 w-fit`}>
+    <Badge
+      variant="outline"
+      className={`${colors.bg} ${colors.text} border-transparent capitalize font-medium text-xs flex items-center gap-1 w-fit`}
+    >
       {colors.icon}
       {status}
     </Badge>
@@ -863,7 +1162,13 @@ function renderStatusBadge(status: string) {
 // ── Helper: MiniStat Card ──
 
 function MiniStat({
-  icon, label, value, sub, isCurrency, iconBg, iconColor,
+  icon,
+  label,
+  value,
+  sub,
+  isCurrency,
+  iconBg,
+  iconColor,
 }: {
   icon: React.ReactNode;
   label: string;
@@ -876,7 +1181,9 @@ function MiniStat({
   return (
     <Card className="py-4">
       <CardContent className="flex items-center gap-3">
-        <div className={`h-10 w-10 rounded-xl ${iconBg} ${iconColor} flex items-center justify-center shrink-0`}>
+        <div
+          className={`h-10 w-10 rounded-xl ${iconBg} ${iconColor} flex items-center justify-center shrink-0`}
+        >
           {icon}
         </div>
         <div className="min-w-0">
