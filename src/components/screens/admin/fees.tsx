@@ -26,7 +26,7 @@ import type { FeeRecord } from '@/lib/types';
 import { toast } from 'sonner';
 import { useModulePermissions } from '@/hooks/use-permissions';
 import { useQueryClient } from '@tanstack/react-query';
-import { useFees, useStudents } from '@/lib/graphql/hooks';
+import { useFees, useStudents, useClasses } from '@/lib/graphql/hooks';
 
 const statusConfig: Record<string, { bg: string; icon: React.ReactNode }> = {
   paid: {
