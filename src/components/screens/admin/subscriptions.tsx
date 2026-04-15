@@ -1,5 +1,7 @@
 "use client";
 
+
+import { apiFetch } from "@/lib/api";
 import { useState, useEffect, useMemo, useCallback } from "react";
 import {
   Card,
@@ -310,7 +312,7 @@ export function AdminSubscriptions() {
   // ── Data Fetching ──
   const fetchSubscriptions = useCallback(async () => {
     try {
-      const res = await fetch("/api/subscriptions?view=admin");
+      const res = await apiFetch("/api/subscriptions?view=admin");
       if (!res.ok) throw new Error("Failed to fetch");
       const data = await res.json();
       setSubscriptions(data.subscriptions);
@@ -324,7 +326,7 @@ export function AdminSubscriptions() {
 
   const fetchParents = useCallback(async () => {
     try {
-      const res = await fetch("/api/parents");
+      const res = await apiFetch("/api/parents");
       if (!res.ok) return;
       const data = await res.json();
       setParents(
@@ -482,7 +484,7 @@ export function AdminSubscriptions() {
   // ── Handlers ──
   const handleCancel = async (sub: SubscriptionRecord) => {
     try {
-      const res = await fetch("/api/subscriptions", {
+      const res = await apiFetch("/api/subscriptions", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ action: "cancel", subscriptionId: sub.id }),
@@ -512,7 +514,7 @@ export function AdminSubscriptions() {
     if (!deleteDialog) return;
     setDeleting(true);
     try {
-      await fetch(`/api/subscriptions?id=${deleteDialog.id}`, {
+      await apiFetch(`/api/subscriptions?id=${deleteDialog.id}`, {
         method: "DELETE",
       });
       setSubscriptions((prev) => prev.filter((s) => s.id !== deleteDialog.id));
@@ -542,7 +544,7 @@ export function AdminSubscriptions() {
     try {
       const newEnd = new Date();
       newEnd.setFullYear(newEnd.getFullYear() + 1);
-      const res = await fetch("/api/subscriptions", {
+      const res = await apiFetch("/api/subscriptions", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -569,7 +571,7 @@ export function AdminSubscriptions() {
     }
     setProcessing(true);
     try {
-      const res = await fetch("/api/subscriptions", {
+      const res = await apiFetch("/api/subscriptions", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -601,7 +603,7 @@ export function AdminSubscriptions() {
     if (!editDialog) return;
     setProcessing(true);
     try {
-      const res = await fetch("/api/subscriptions", {
+      const res = await apiFetch("/api/subscriptions", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -628,7 +630,7 @@ export function AdminSubscriptions() {
     }
     setProcessing(true);
     try {
-      const res = await fetch("/api/subscriptions", {
+      const res = await apiFetch("/api/subscriptions", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

@@ -1,5 +1,7 @@
 "use client";
 
+
+import { apiFetch } from "@/lib/api";
 import { useState, useEffect, useMemo, useCallback } from "react";
 import { useAppStore } from "@/store/use-app-store";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -62,7 +64,7 @@ export function ParentTimetable() {
 
   const fetchChildren = useCallback(async () => {
     try {
-      const res = await fetch("/api/students");
+      const res = await apiFetch("/api/students");
       const data = await res.json();
       const parentKids = Array.isArray(data)
         ? data.filter((s: StudentInfo) => s.parentName === currentUser?.name)
@@ -80,7 +82,7 @@ export function ParentTimetable() {
   const fetchTimetable = useCallback(async (classId: string) => {
     if (!classId) return;
     try {
-      const res = await fetch(`/api/timetable?classId=${classId}`);
+      const res = await apiFetch(`/api/timetable?classId=${classId}`);
       const data = await res.json();
       setTimetable(Array.isArray(data) ? data : []);
     } catch {

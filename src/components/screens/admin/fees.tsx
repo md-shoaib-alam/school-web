@@ -1,5 +1,7 @@
 "use client";
 
+
+import { apiFetch } from "@/lib/api";
 import { useState, useEffect } from "react";
 import {
   Card,
@@ -66,6 +68,7 @@ import { toast } from "sonner";
 import { useModulePermissions } from "@/hooks/use-permissions";
 import { useQueryClient } from "@tanstack/react-query";
 import { useFees, useStudents, useClasses } from "@/lib/graphql/hooks";
+import { useAppStore } from "@/store/use-app-store";
 
 const statusConfig: Record<string, { bg: string; icon: React.ReactNode }> = {
   paid: {
@@ -108,11 +111,12 @@ const emptyFeeForm: FeeFormData = {
 };
 
 export function AdminFees() {
+  const { currentTenantId } = useAppStore();
   const { canCreate, canEdit, canDelete } = useModulePermissions("fees");
   const queryClient = useQueryClient();
-  const { data: fees = [], isLoading: feesLoading } = useFees();
-  const { data: students = [], isLoading: studentsLoading } = useStudents();
-  const { data: classes = [], isLoading: classesLoading } = useClasses();
+  const { data: fees = [], isLoading: feesLoading } = useFees(currentTenantId || undefined);
+  const { data: students = [], isLoading: studentsLoading } = useStudents(currentTenantId || undefined);
+  const { data: classes = [], isLoading: classesLoading } = useClasses(currentTenantId || undefined);
 
   const loading = feesLoading || studentsLoading || classesLoading;
   const [selectedClass, setSelectedClass] = useState<string | null>(null);
@@ -123,7 +127,7 @@ export function AdminFees() {
   const isSelectionMade = selectedClass !== null;
 
   const refetchFees = () =>
-    queryClient.invalidateQueries({ queryKey: ["fees"] });
+    queryClient.invalidateQueries({ queryKey: ["fees", currentTenantId] });
 
   // Add fee dialog
   const [addOpen, setAddOpen] = useState(false);
@@ -191,7 +195,7 @@ export function AdminFees() {
     }
     setAdding(true);
     try {
-      const res = await fetch("/api/fees", {
+      const res = await apiFetch("/api/fees", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -236,7 +240,7 @@ export function AdminFees() {
     if (!editingFee) return;
     setSaving(true);
     try {
-      const res = await fetch("/api/fees", {
+      const res = await apiFetch("/api/fees", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -262,7 +266,7 @@ export function AdminFees() {
   const handleDelete = async (id: string) => {
     setDeleting(true);
     try {
-      const res = await fetch(`/api/fees?id=${id}`, { method: "DELETE" });
+      const res = await apiFetch(`/api/fees?id=${id}`, { method: "DELETE" });
       if (res.ok) {
         toast.success("Fee deleted successfully!");
         refetchFees();

@@ -1,5 +1,7 @@
 "use client";
 
+
+import { apiFetch } from "@/lib/api";
 import { useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -48,16 +50,18 @@ import { toast } from "sonner";
 import type { ClassInfo } from "@/lib/types";
 import { useModulePermissions } from "@/hooks/use-permissions";
 import { useClasses } from "@/lib/graphql/hooks";
+import { useAppStore } from "@/store/use-app-store";
 
 export function AdminClasses() {
+  const { currentTenantId } = useAppStore();
   const { canCreate, canEdit, canDelete } = useModulePermissions("classes");
   const queryClient = useQueryClient();
 
   // ⚡ TanStack Query with GraphQL Group-wise hooks
-  const { data: classes = [], isLoading: loading } = useClasses();
+  const { data: classes = [], isLoading: loading } = useClasses(currentTenantId || undefined);
 
   const refetchClasses = () =>
-    queryClient.invalidateQueries({ queryKey: ["classes"] });
+    queryClient.invalidateQueries({ queryKey: ["classes", currentTenantId] });
 
   // Add class dialog
   const [addDialogOpen, setAddDialogOpen] = useState(false);
@@ -88,7 +92,7 @@ export function AdminClasses() {
   const handleAddClass = async () => {
     setSubmitting(true);
     try {
-      const res = await fetch("/api/classes", {
+      const res = await apiFetch("/api/classes", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -111,7 +115,7 @@ export function AdminClasses() {
   const handleEditClass = async () => {
     setEditing(true);
     try {
-      const res = await fetch("/api/classes", {
+      const res = await apiFetch("/api/classes", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -145,7 +149,7 @@ export function AdminClasses() {
     if (!deleteTarget) return;
     setDeleting(true);
     try {
-      const res = await fetch(`/api/classes?id=${deleteTarget.id}`, {
+      const res = await apiFetch(`/api/classes?id=${deleteTarget.id}`, {
         method: "DELETE",
       });
       if (!res.ok) throw new Error("Failed to delete class");

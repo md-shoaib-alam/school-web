@@ -1,5 +1,7 @@
 "use client";
 
+
+import { apiFetch } from "@/lib/api";
 import { useEffect, useState, useCallback, useMemo } from "react";
 import { useAppStore } from "@/store/use-app-store";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -63,7 +65,7 @@ export function StudentAssignments() {
   const fetchData = useCallback(async () => {
     setLoading(true);
     try {
-      const studentsRes = await fetch("/api/students").then((r) => r.json());
+      const studentsRes = await apiFetch("/api/students").then((r) => r.json());
       setStudents(studentsRes);
 
       const matchedStudent =
@@ -176,7 +178,7 @@ export function StudentAssignments() {
     if (!student) return;
     setSubmittingId(assignment.id);
     try {
-      const res = await fetch("/api/submissions", {
+      const res = await apiFetch("/api/submissions", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

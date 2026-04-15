@@ -1,5 +1,7 @@
 "use client";
 
+
+import { apiFetch } from "@/lib/api";
 import { useState, useEffect, useMemo, useRef, useCallback } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
@@ -400,7 +402,7 @@ export function SchoolDetail({
   async function handleExport(dataType: string) {
     setExporting(true);
     try {
-      const res = await fetch("/api/export", {
+      const res = await apiFetch("/api/export", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ tenantId, dataType }),
@@ -434,7 +436,7 @@ export function SchoolDetail({
       formData.append("tenantId", tenantId);
       formData.append("dataType", activeTab);
 
-      const res = await fetch("/api/import", {
+      const res = await apiFetch("/api/import", {
         method: "POST",
         body: formData,
       });

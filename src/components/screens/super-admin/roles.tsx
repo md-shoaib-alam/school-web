@@ -1,5 +1,7 @@
 "use client";
 
+
+import { apiFetch } from "@/lib/api";
 import { useState, useEffect, useCallback, Fragment } from "react";
 import {
   Card,
@@ -256,7 +258,7 @@ export function SuperAdminRoles() {
   // Fetch roles
   const fetchRoles = useCallback(async () => {
     try {
-      const res = await fetch("/api/platform/roles");
+      const res = await apiFetch("/api/platform/roles");
       if (!res.ok) throw new Error();
       const data = await res.json();
       setRoles(data);
@@ -316,7 +318,7 @@ export function SuperAdminRoles() {
     setSaving(true);
     try {
       if (editingRole) {
-        const res = await fetch("/api/platform/roles", {
+        const res = await apiFetch("/api/platform/roles", {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
@@ -333,7 +335,7 @@ export function SuperAdminRoles() {
         }
         toast.success(`Platform role "${name}" updated successfully`);
       } else {
-        const res = await fetch("/api/platform/roles", {
+        const res = await apiFetch("/api/platform/roles", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ name, description, color, permissions }),
@@ -356,7 +358,7 @@ export function SuperAdminRoles() {
   const handleDelete = async (id: string) => {
     try {
       // Check if users are assigned
-      const usersRes = await fetch(`/api/platform/roles/users?roleId=${id}`);
+      const usersRes = await apiFetch(`/api/platform/roles/users?roleId=${id}`);
       const usersData = await usersRes.json();
       if (Array.isArray(usersData) && usersData.length > 0) {
         toast.error(
@@ -365,7 +367,7 @@ export function SuperAdminRoles() {
         return;
       }
 
-      const res = await fetch(`/api/platform/roles?id=${id}`, {
+      const res = await apiFetch(`/api/platform/roles?id=${id}`, {
         method: "DELETE",
       });
       if (!res.ok) {
@@ -391,8 +393,8 @@ export function SuperAdminRoles() {
 
     try {
       const [assignedRes, availableRes] = await Promise.all([
-        fetch(`/api/platform/roles/users?roleId=${role.id}`),
-        fetch("/api/platform/roles/users", {
+        apiFetch(`/api/platform/roles/users?roleId=${role.id}`),
+        apiFetch("/api/platform/roles/users", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ excludeRoleId: role.id }),
@@ -418,7 +420,7 @@ export function SuperAdminRoles() {
     if (!assigningRole) return;
     setAssignSaving(true);
     try {
-      const res = await fetch("/api/platform/roles/users", {
+      const res = await apiFetch("/api/platform/roles/users", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -449,7 +451,7 @@ export function SuperAdminRoles() {
     if (!assigningRole) return;
     setAssignSaving(true);
     try {
-      const res = await fetch("/api/platform/roles/users", {
+      const res = await apiFetch("/api/platform/roles/users", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

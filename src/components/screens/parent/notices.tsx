@@ -1,5 +1,7 @@
 "use client";
 
+
+import { apiFetch } from "@/lib/api";
 import { useState, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -71,7 +73,7 @@ export function ParentNotices() {
   useEffect(() => {
     async function fetchNotices() {
       try {
-        const res = await fetch("/api/notices");
+        const res = await apiFetch("/api/notices");
         if (!res.ok) throw new Error("Failed to fetch notices");
         const data = await res.json();
         const filtered = data.filter(

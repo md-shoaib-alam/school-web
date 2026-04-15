@@ -1,5 +1,7 @@
 "use client";
 
+
+import { apiFetch } from "@/lib/api";
 import { useState, useEffect, useCallback } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -274,7 +276,7 @@ export function AdminTickets() {
       if (statusFilter !== "all") params.set("status", statusFilter);
       if (priorityFilter !== "all") params.set("priority", priorityFilter);
       if (categoryFilter !== "all") params.set("category", categoryFilter);
-      const res = await fetch(`/api/tickets?${params.toString()}`);
+      const res = await apiFetch(`/api/tickets?${params.toString()}`);
       if (res.ok) {
         const data = await res.json();
         setTickets(Array.isArray(data) ? data : []);
@@ -290,7 +292,7 @@ export function AdminTickets() {
   const fetchStaff = useCallback(async () => {
     if (!currentTenantId) return;
     try {
-      const res = await fetch(`/api/staff?tenantId=${currentTenantId}`);
+      const res = await apiFetch(`/api/staff?tenantId=${currentTenantId}`);
       if (res.ok) {
         const data = await res.json();
         setStaffList(Array.isArray(data) ? data : []);
@@ -331,7 +333,7 @@ export function AdminTickets() {
     if (!currentUser) return;
     setCreating(true);
     try {
-      const res = await fetch("/api/tickets", {
+      const res = await apiFetch("/api/tickets", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -365,7 +367,7 @@ export function AdminTickets() {
     setDetailLoading(true);
     setReplyMessage("");
     try {
-      const res = await fetch(`/api/tickets/${ticketId}`);
+      const res = await apiFetch(`/api/tickets/${ticketId}`);
       if (res.ok) {
         const data = await res.json();
         setSelectedTicket(data);
@@ -389,7 +391,7 @@ export function AdminTickets() {
     if (!replyMessage.trim() || !selectedTicket || !currentUser) return;
     setSendingReply(true);
     try {
-      const res = await fetch(`/api/tickets/${selectedTicket.id}/messages`, {
+      const res = await apiFetch(`/api/tickets/${selectedTicket.id}/messages`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -400,7 +402,7 @@ export function AdminTickets() {
       if (res.ok) {
         setReplyMessage("");
         // Refresh detail
-        const detailRes = await fetch(`/api/tickets/${selectedTicket.id}`);
+        const detailRes = await apiFetch(`/api/tickets/${selectedTicket.id}`);
         if (detailRes.ok) {
           setSelectedTicket(await detailRes.json());
         }
@@ -434,7 +436,7 @@ export function AdminTickets() {
         return;
       }
 
-      const res = await fetch(`/api/tickets/${selectedTicket.id}`, {
+      const res = await apiFetch(`/api/tickets/${selectedTicket.id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(updateData),
@@ -442,7 +444,7 @@ export function AdminTickets() {
       if (res.ok) {
         toast.success("Ticket updated");
         // Refresh detail
-        const detailRes = await fetch(`/api/tickets/${selectedTicket.id}`);
+        const detailRes = await apiFetch(`/api/tickets/${selectedTicket.id}`);
         if (detailRes.ok) {
           const data = await detailRes.json();
           setSelectedTicket(data);

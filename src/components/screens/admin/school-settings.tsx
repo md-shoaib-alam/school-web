@@ -1,5 +1,7 @@
 "use client";
 
+
+import { apiFetch } from "@/lib/api";
 import { useState, useEffect, useCallback } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -53,7 +55,7 @@ export function AdminSchoolSettings() {
     if (!currentTenantId) return;
     setLoading(true);
     try {
-      const res = await fetch("/api/tenant-settings");
+      const res = await apiFetch("/api/tenant-settings");
       if (!res.ok) throw new Error();
       const data: TenantSettings = await res.json();
       setInitialSettings(data);
@@ -110,7 +112,7 @@ export function AdminSchoolSettings() {
         workingDays: Array.from(workingDays),
       };
 
-      const res = await fetch("/api/tenant-settings", {
+      const res = await apiFetch("/api/tenant-settings", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ settings }),

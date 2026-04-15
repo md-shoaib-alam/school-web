@@ -1,5 +1,7 @@
 "use client";
 
+
+import { apiFetch } from "@/lib/api";
 import { useEffect, useState, useCallback, useMemo } from "react";
 import { useAppStore } from "@/store/use-app-store";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -103,7 +105,7 @@ export function StudentTimetable() {
   const fetchData = useCallback(async () => {
     setLoading(true);
     try {
-      const studentsRes = await fetch("/api/students").then((r) => r.json());
+      const studentsRes = await apiFetch("/api/students").then((r) => r.json());
       setStudents(studentsRes);
 
       const matchedStudent =

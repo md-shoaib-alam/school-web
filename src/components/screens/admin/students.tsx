@@ -1,5 +1,7 @@
 "use client";
 
+
+import { apiFetch } from "@/lib/api";
 import { useState, useRef } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -135,6 +137,7 @@ function PaginationPages({
 }
 
 export function AdminStudents() {
+  const { currentTenantId } = useAppStore();
   const { canCreate, canEdit, canDelete } = useModulePermissions("students");
   const queryClient = useQueryClient();
   const [search, setSearch] = useState("");
@@ -142,14 +145,14 @@ export function AdminStudents() {
   const [currentPage, setCurrentPage] = useState(1);
 
   // ⚡ TanStack Query with GraphQL Group-wise hooks
-  const { data: students = [], isLoading: studentsLoading } = useStudents();
-  const { data: classes = [] } = useClasses();
+  const { data: students = [], isLoading: studentsLoading } = useStudents(currentTenantId || undefined);
+  const { data: classes = [] } = useClasses(currentTenantId || undefined);
 
   const loading = studentsLoading;
 
   // Helper to invalidate after mutations
   const refetchStudents = () =>
-    queryClient.invalidateQueries({ queryKey: ["students"] });
+    queryClient.invalidateQueries({ queryKey: ["students", currentTenantId] });
 
   // Add student dialog
   const [addDialogOpen, setAddDialogOpen] = useState(false);
@@ -184,7 +187,6 @@ export function AdminStudents() {
   const [deletingId, setDeletingId] = useState<string | null>(null);
 
   // Import state
-  const { currentTenantId } = useAppStore();
   const { toast } = useToast();
   const [importDialogOpen, setImportDialogOpen] = useState(false);
   const [importFile, setImportFile] = useState<File | null>(null);
@@ -216,7 +218,7 @@ export function AdminStudents() {
   const handleAddStudent = async () => {
     setSubmitting(true);
     try {
-      const res = await fetch("/api/students", {
+      const res = await apiFetch("/api/students", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
@@ -258,7 +260,7 @@ export function AdminStudents() {
     if (!editingStudent) return;
     setEditSubmitting(true);
     try {
-      const res = await fetch("/api/students", {
+      const res = await apiFetch("/api/students", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ id: editingStudent.id, ...editFormData }),
@@ -284,7 +286,7 @@ export function AdminStudents() {
 
   const handleDelete = async (id: string) => {
     try {
-      const res = await fetch(`/api/students?id=${id}`, { method: "DELETE" });
+      const res = await apiFetch(`/api/students?id=${id}`, { method: "DELETE" });
       if (!res.ok) throw new Error("Failed to delete student");
       refetchStudents();
     } catch {
@@ -327,7 +329,7 @@ export function AdminStudents() {
       formData.append("file", importFile);
       formData.append("tenantId", currentTenantId);
       formData.append("dataType", "students");
-      const res = await fetch("/api/import", {
+      const res = await apiFetch("/api/import", {
         method: "POST",
         body: formData,
       });
@@ -503,7 +505,8 @@ export function AdminStudents() {
                           className="text-center py-12 text-muted-foreground"
                         >
                           <GraduationCap className="h-10 w-10 mx-auto mb-2 opacity-30" />
-                          <p>No students found</p>
+                          <p className="text-sm font-medium">No students or users found</p>
+                          <p className="text-xs mt-1 opacity-70">Register new students to see them here.</p>
                         </TableCell>
                       </TableRow>
                     ) : (

@@ -1,5 +1,7 @@
 "use client";
 
+
+import { apiFetch } from "@/lib/api";
 import { useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Card, CardContent } from "@/components/ui/card";
@@ -46,6 +48,7 @@ import { toast } from "sonner";
 import type { TeacherInfo } from "@/lib/types";
 import { useModulePermissions } from "@/hooks/use-permissions";
 import { useTeachers } from "@/lib/graphql/hooks";
+import { useAppStore } from "@/store/use-app-store";
 
 const avatarColors = [
   "bg-emerald-500",
@@ -69,15 +72,16 @@ const emptyFormData = {
 };
 
 export function AdminTeachers() {
+  const { currentTenantId } = useAppStore();
   const { canCreate, canEdit, canDelete } = useModulePermissions("teachers");
   const queryClient = useQueryClient();
   const [search, setSearch] = useState("");
 
   // ⚡ TanStack Query with GraphQL Group-wise hooks
-  const { data: teachers = [], isLoading: loading } = useTeachers();
+  const { data: teachers = [], isLoading: loading } = useTeachers(currentTenantId || undefined);
 
   const refetchTeachers = () =>
-    queryClient.invalidateQueries({ queryKey: ["teachers"] });
+    queryClient.invalidateQueries({ queryKey: ["teachers", currentTenantId] });
 
   // Dialog state
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -148,7 +152,7 @@ export function AdminTeachers() {
 
   const handleDelete = async (id: string) => {
     try {
-      const res = await fetch(`/api/teachers?id=${id}`, { method: "DELETE" });
+      const res = await apiFetch(`/api/teachers?id=${id}`, { method: "DELETE" });
       if (!res.ok) throw new Error("Failed to delete teacher");
       toast.success("Teacher deleted successfully");
       refetchTeachers();
@@ -219,10 +223,23 @@ export function AdminTeachers() {
         </div>
       ) : filtered.length === 0 ? (
         <Card>
-          <CardContent className="py-16 text-center text-muted-foreground">
-            <Users className="h-12 w-12 mx-auto mb-3 opacity-30" />
-            <p className="font-medium">No teachers found</p>
-            <p className="text-sm">Try adjusting your search criteria</p>
+          <CardContent className="py-20 text-center text-muted-foreground bg-gray-50/30 dark:bg-gray-900/10">
+            <Users className="h-12 w-12 mx-auto mb-4 opacity-30 text-emerald-600" />
+            <p className="text-lg font-semibold text-gray-900 dark:text-gray-100 italic">
+              No teachers or users found
+            </p>
+            <p className="text-sm mt-1 max-w-xs mx-auto">
+              Ready to start? Add your first teacher or staff member to manage classes and subjects.
+            </p>
+            {canCreate && (
+              <Button
+                variant="outline"
+                className="mt-6 border-emerald-300 text-emerald-700 hover:bg-emerald-50 dark:hover:bg-emerald-900/20"
+                onClick={handleOpenAdd}
+              >
+                <Plus className="h-4 w-4 mr-2" /> Add First Teacher
+              </Button>
+            )}
           </CardContent>
         </Card>
       ) : (

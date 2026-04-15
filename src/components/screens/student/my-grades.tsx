@@ -1,5 +1,7 @@
 "use client";
 
+
+import { apiFetch } from "@/lib/api";
 import { useEffect, useState, useCallback, useMemo } from "react";
 import { useAppStore } from "@/store/use-app-store";
 import {
@@ -62,8 +64,8 @@ export function StudentGrades() {
     setLoading(true);
     try {
       const [studentsRes, gradesRes] = await Promise.all([
-        fetch("/api/students"),
-        fetch(`/api/grades?studentId=${student?.id || ""}`),
+        apiFetch("/api/students"),
+        apiFetch(`/api/grades?studentId=${student?.id || ""}`),
       ]);
       const [studentsData] = await Promise.all([studentsRes.json()]);
       const gradesData = await gradesRes.json();
@@ -74,7 +76,7 @@ export function StudentGrades() {
         setGrades(
           studentsData.length > 0
             ? await (
-                await fetch(`/api/grades?studentId=${studentsData[0].id}`)
+                await apiFetch(`/api/grades?studentId=${studentsData[0].id}`)
               ).json()
             : [],
         );
@@ -95,7 +97,7 @@ export function StudentGrades() {
   // Re-fetch grades when we get studentId
   useEffect(() => {
     if (!studentId || grades.length > 0) return;
-    fetch(`/api/grades?studentId=${studentId}`)
+    apiFetch(`/api/grades?studentId=${studentId}`)
       .then((r) => r.json())
       .then(setGrades)
       .catch(() => {});

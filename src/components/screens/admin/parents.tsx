@@ -1,5 +1,7 @@
 "use client";
 
+
+import { apiFetch } from "@/lib/api";
 import { useState, useEffect } from "react";
 import {
   Card,
@@ -63,6 +65,7 @@ import {
 import { toast } from "sonner";
 import { useParents, useStudents, useClasses } from "@/lib/graphql/hooks";
 import { useQueryClient } from "@tanstack/react-query";
+import { useAppStore } from "@/store/use-app-store";
 
 interface ChildInfo {
   id: string;
@@ -105,19 +108,20 @@ const AVATAR_COLORS = [
 ];
 
 export function AdminParents() {
+  const { currentTenantId } = useAppStore();
   const queryClient = useQueryClient();
   const [search, setSearch] = useState("");
 
   // ⚡ TanStack Query with GraphQL Group-wise hooks
-  const { data: parents = [], isLoading: parentsLoading } = useParents();
-  const { data: students = [], isLoading: studentsLoading } = useStudents();
-  const { data: classData = [], isLoading: classesLoading } = useClasses();
+  const { data: parents = [], isLoading: parentsLoading } = useParents(currentTenantId || undefined);
+  const { data: students = [], isLoading: studentsLoading } = useStudents(currentTenantId || undefined);
+  const { data: classData = [], isLoading: classesLoading } = useClasses(currentTenantId || undefined);
 
   const loading = parentsLoading || studentsLoading || classesLoading;
   const classes = classData as any[]; // Map to avoid type error if needed
 
   const refetchParents = () =>
-    queryClient.invalidateQueries({ queryKey: ["parents"] });
+    queryClient.invalidateQueries({ queryKey: ["parents", currentTenantId] });
 
   // Create dialog
   const [createOpen, setCreateOpen] = useState(false);
@@ -183,7 +187,7 @@ export function AdminParents() {
     }
     setCreating(true);
     try {
-      const res = await fetch("/api/parents", {
+      const res = await apiFetch("/api/parents", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ action: "create", ...createForm }),
@@ -206,7 +210,7 @@ export function AdminParents() {
     if (!selectedParent) return;
     setLinking(true);
     try {
-      const res = await fetch("/api/parents", {
+      const res = await apiFetch("/api/parents", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -220,7 +224,7 @@ export function AdminParents() {
         refetchParents();
         // Optimistically update local selectedParent state manually or just let component re-render
         // with the fresh query. To preserve local selection correctly during closing:
-        const updatedParents = await fetch("/api/parents").then((r) =>
+        const updatedParents = await apiFetch("/api/parents").then((r) =>
           r.json(),
         ); // we can use invalidateQueries but here keeping local consistency
         setSelectedParent(
@@ -238,7 +242,7 @@ export function AdminParents() {
     if (!selectedParent) return;
     setLinking(true);
     try {
-      const res = await fetch("/api/parents", {
+      const res = await apiFetch("/api/parents", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -251,7 +255,7 @@ export function AdminParents() {
       if (res.ok) {
         toast.success("Child unlinked");
         refetchParents();
-        const updatedParents = await fetch("/api/parents").then((r) =>
+        const updatedParents = await apiFetch("/api/parents").then((r) =>
           r.json(),
         );
         setSelectedParent(
@@ -283,7 +287,7 @@ export function AdminParents() {
     }
     setEditing(true);
     try {
-      const res = await fetch("/api/parents", {
+      const res = await apiFetch("/api/parents", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ id: editingParent.id, ...editForm }),
@@ -303,7 +307,7 @@ export function AdminParents() {
 
   const handleDelete = async (id: string) => {
     try {
-      const res = await fetch(`/api/parents?id=${id}`, { method: "DELETE" });
+      const res = await apiFetch(`/api/parents?id=${id}`, { method: "DELETE" });
       if (res.ok) {
         toast.success("Parent deleted");
         refetchParents();

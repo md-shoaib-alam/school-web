@@ -1,5 +1,7 @@
 "use client";
 
+
+import { apiFetch } from "@/lib/api";
 import { useState, useEffect, useMemo } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -151,7 +153,7 @@ export function TeacherTimetable() {
   const [selectedDay, setSelectedDay] = useState("");
 
   useEffect(() => {
-    fetch("/api/classes")
+    apiFetch("/api/classes")
       .then((r) => r.json())
       .then((data: ClassInfo[]) => {
         setClasses(data);
@@ -162,7 +164,7 @@ export function TeacherTimetable() {
 
   useEffect(() => {
     if (!selectedClass) return;
-    fetch(`/api/timetable?classId=${selectedClass}`)
+    apiFetch(`/api/timetable?classId=${selectedClass}`)
       .then((r) => r.json())
       .then((data: TimetableSlot[]) => {
         setTimetable(data);

@@ -1,5 +1,7 @@
 "use client";
 
+
+import { apiFetch } from "@/lib/api";
 import { useState, useEffect } from "react";
 import {
   Card,
@@ -144,7 +146,7 @@ export function AdminNotices() {
     }
     setSubmitting(true);
     try {
-      const res = await fetch("/api/notices", {
+      const res = await apiFetch("/api/notices", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(form),
@@ -182,7 +184,7 @@ export function AdminNotices() {
     }
     setEditing(true);
     try {
-      const res = await fetch("/api/notices", {
+      const res = await apiFetch("/api/notices", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ id: editingNotice.id, ...editForm }),
@@ -204,7 +206,7 @@ export function AdminNotices() {
   const handleDelete = async (id: string) => {
     setDeleting(true);
     try {
-      const res = await fetch(`/api/notices?id=${id}`, { method: "DELETE" });
+      const res = await apiFetch(`/api/notices?id=${id}`, { method: "DELETE" });
       if (res.ok) {
         toast.success("Notice deleted successfully!");
         refetchNotices();

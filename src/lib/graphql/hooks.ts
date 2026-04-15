@@ -3,12 +3,38 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
+// ── Generic GraphQL Hooks ──
+
+export function useGraphQLQuery<T>(
+  key: any[],
+  query: string,
+  variables?: Record<string, unknown>,
+  options?: any
+) {
+  return useQuery<T, Error>({
+    queryKey: key,
+    queryFn: () => graphqlQuery<T>(query, variables),
+    ...options,
+  })
+}
+
+export function useGraphQLMutation<T, V>(
+  mutation: string,
+  options?: any
+) {
+  return useMutation<T, Error, V>({
+    mutationFn: (variables: V) => graphqlMutate<T>(mutation, variables as any),
+    ...options,
+  })
+}
+
 // ── GraphQL Query Helper ──
 // Direct fetch to /api/graphql endpoint — no Apollo Client needed.
 // Uses HTTP keepalive for connection pooling.
 // TanStack Query handles caching, background refetch, deduplication.
 
-const GRAPHQL_ENDPOINT = '/api/graphql'
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api'
+const GRAPHQL_ENDPOINT = `${API_BASE}/graphql`
 
 async function graphqlQuery<TData>(query: string, variables?: Record<string, unknown>): Promise<TData> {
   const token = typeof window !== 'undefined' ? localStorage.getItem('school_token') : null;
@@ -354,26 +380,26 @@ export function useAuditLogs(filters?: { action?: string; page?: number; limit?:
 
 // ── School Admin Hooks ──
 
-export function useSubjects() {
+export function useSubjects(tenantId?: string) {
   return useQuery({
-    queryKey: queryKeys.subjects,
-    queryFn: () => graphqlQuery<{ subjects: any[] }>(SUBJECTS).then(d => d.subjects),
+    queryKey: [...queryKeys.subjects, tenantId],
+    queryFn: () => graphqlQuery<{ subjects: any[] }>(SUBJECTS, { tenantId }).then(d => d.subjects),
     staleTime: 5 * 60 * 1000,
   })
 }
 
-export function useClassesMin() {
+export function useClassesMin(tenantId?: string) {
   return useQuery({
-    queryKey: queryKeys.classes,
-    queryFn: () => graphqlQuery<{ classes: any[] }>(CLASSES).then(d => d.classes),
+    queryKey: [...queryKeys.classes, tenantId],
+    queryFn: () => graphqlQuery<{ classes: any[] }>(CLASSES, { tenantId }).then(d => d.classes),
     staleTime: 5 * 60 * 1000,
   })
 }
 
-export function useTeachersMin() {
+export function useTeachersMin(tenantId?: string) {
   return useQuery({
-    queryKey: queryKeys.teachers,
-    queryFn: () => graphqlQuery<{ teachers: any[] }>(TEACHERS).then(d => d.teachers),
+    queryKey: [...queryKeys.teachers, tenantId],
+    queryFn: () => graphqlQuery<{ teachers: any[] }>(TEACHERS, { tenantId }).then(d => d.teachers),
     staleTime: 5 * 60 * 1000,
   })
 }
@@ -440,11 +466,11 @@ export function useTeacherDashboard(teacherName: string) {
 
 // ── Group-Wise Hooks (Replacement for REST endpoints) ──
 
-export function useClasses() {
+export function useClasses(tenantId?: string) {
   return useQuery({
-    queryKey: queryKeys.classes,
+    queryKey: [...queryKeys.classes, tenantId],
     queryFn: async () => {
-      const data = await graphqlQuery<{ classes: any[] }>(CLASSES)
+      const data = await graphqlQuery<{ classes: any[] }>(CLASSES, { tenantId })
       return data.classes || []
     },
     staleTime: 5 * 60 * 1000,
@@ -452,11 +478,11 @@ export function useClasses() {
   })
 }
 
-export function useTeachers() {
+export function useTeachers(tenantId?: string) {
   return useQuery({
-    queryKey: queryKeys.teachers,
+    queryKey: [...queryKeys.teachers, tenantId],
     queryFn: async () => {
-      const data = await graphqlQuery<{ teachers: any[] }>(TEACHERS)
+      const data = await graphqlQuery<{ teachers: any[] }>(TEACHERS, { tenantId })
       return data.teachers || []
     },
     staleTime: 5 * 60 * 1000,
@@ -464,11 +490,11 @@ export function useTeachers() {
   })
 }
 
-export function useStudents() {
+export function useStudents(tenantId?: string) {
   return useQuery({
-    queryKey: queryKeys.students,
+    queryKey: [...queryKeys.students, tenantId],
     queryFn: async () => {
-      const data = await graphqlQuery<{ students: any[] }>(STUDENTS)
+      const data = await graphqlQuery<{ students: any[] }>(STUDENTS, { tenantId })
       return data.students || []
     },
     staleTime: 5 * 60 * 1000,
@@ -476,11 +502,11 @@ export function useStudents() {
   })
 }
 
-export function useParents() {
+export function useParents(tenantId?: string) {
   return useQuery({
-    queryKey: queryKeys.parents,
+    queryKey: [...queryKeys.parents, tenantId],
     queryFn: async () => {
-      const data = await graphqlQuery<{ parents: any[] }>(PARENTS)
+      const data = await graphqlQuery<{ parents: any[] }>(PARENTS, { tenantId })
       return data.parents || []
     },
     staleTime: 5 * 60 * 1000,
@@ -488,11 +514,11 @@ export function useParents() {
   })
 }
 
-export function useNotices() {
+export function useNotices(tenantId?: string) {
   return useQuery({
-    queryKey: queryKeys.notices,
+    queryKey: [...queryKeys.notices, tenantId],
     queryFn: async () => {
-      const data = await graphqlQuery<{ notices: any[] }>(NOTICES)
+      const data = await graphqlQuery<{ notices: any[] }>(NOTICES, { tenantId })
       return data.notices || []
     },
     staleTime: 5 * 60 * 1000,
@@ -500,11 +526,11 @@ export function useNotices() {
   })
 }
 
-export function useFees() {
+export function useFees(tenantId?: string) {
   return useQuery({
-    queryKey: queryKeys.fees,
+    queryKey: [...queryKeys.fees, tenantId],
     queryFn: async () => {
-      const data = await graphqlQuery<{ fees: any[] }>(FEES)
+      const data = await graphqlQuery<{ fees: any[] }>(FEES, { tenantId })
       return data.fees || []
     },
     staleTime: 5 * 60 * 1000,
@@ -512,11 +538,11 @@ export function useFees() {
   })
 }
 
-export function useAttendance() {
+export function useAttendance(tenantId?: string) {
   return useQuery({
-    queryKey: queryKeys.attendance,
+    queryKey: [...queryKeys.attendance, tenantId],
     queryFn: async () => {
-      const data = await graphqlQuery<{ attendance: any[] }>(ATTENDANCE)
+      const data = await graphqlQuery<{ attendance: any[] }>(ATTENDANCE, { tenantId })
       return data.attendance || []
     },
     staleTime: 5 * 60 * 1000,

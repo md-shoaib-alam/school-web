@@ -56,6 +56,7 @@ import {
   useUpdateSubject,
   useDeleteSubject,
 } from "@/lib/graphql/hooks";
+import { useAppStore } from "@/store/use-app-store";
 
 interface SubjectInfo {
   id: string;
@@ -70,12 +71,13 @@ interface SubjectInfo {
 const emptyForm = { name: "", code: "", classId: "", teacherId: "" };
 
 export function AdminSubjects() {
+  const { currentTenantId } = useAppStore();
   const { canCreate, canEdit, canDelete } = useModulePermissions("subjects");
 
   // TanStack Queries
-  const { data: subjects = [], isLoading: subjectsLoading } = useSubjects();
-  const { data: classes = [], isLoading: classesLoading } = useClassesMin();
-  const { data: teachers = [], isLoading: teachersLoading } = useTeachersMin();
+  const { data: subjects = [], isLoading: subjectsLoading } = useSubjects(currentTenantId || undefined);
+  const { data: classes = [], isLoading: classesLoading } = useClassesMin(currentTenantId || undefined);
+  const { data: teachers = [], isLoading: teachersLoading } = useTeachersMin(currentTenantId || undefined);
 
   const [search, setSearch] = useState("");
   const [createOpen, setCreateOpen] = useState(false);

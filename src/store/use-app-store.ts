@@ -257,6 +257,7 @@ export const useAppStore = create<AppState>((set, get) => ({
       try {
         localStorage.removeItem(STORAGE_KEYS.USER);
         localStorage.removeItem(STORAGE_KEYS.LAST_SCREEN);
+        localStorage.removeItem('school_token');
       } catch { /* ignore */ }
     }
     invalidateCache();
@@ -275,7 +276,11 @@ export const useAppStore = create<AppState>((set, get) => ({
     const state = get();
     if (!state.isLoggedIn || !state.currentUser) return;
     try {
-      const res = await fetch(`/api/auth/me?userId=${encodeURIComponent(state.currentUser.id)}`);
+      const apiBase = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api';
+      const token = typeof window !== 'undefined' ? localStorage.getItem('school_token') : null;
+      const res = await fetch(`${apiBase}/auth/me?userId=${encodeURIComponent(state.currentUser.id)}`, {
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
+      });
       if (res.ok) {
         const userData = await res.json();
         const updatedUser: AppUser = {

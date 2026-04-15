@@ -1,5 +1,7 @@
 "use client";
 
+
+import { apiFetch } from "@/lib/api";
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -60,7 +62,7 @@ export function TeacherGrades() {
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
-    Promise.all([fetch("/api/classes"), fetch("/api/subjects")])
+    Promise.all([apiFetch("/api/classes"), apiFetch("/api/subjects")])
       .then(([cRes, sRes]) => Promise.all([cRes.json(), sRes.json()]))
       .then(([cData, sData]) => {
         setClasses(cData);
@@ -71,7 +73,7 @@ export function TeacherGrades() {
 
   useEffect(() => {
     if (!selectedClass) return;
-    fetch(`/api/students?classId=${selectedClass}`)
+    apiFetch(`/api/students?classId=${selectedClass}`)
       .then((r) => r.json())
       .then((data) => {
         setStudents(data);
@@ -113,7 +115,7 @@ export function TeacherGrades() {
       for (const student of students) {
         const m = marks[student.id];
         if (m && parseFloat(m) > 0) {
-          await fetch("/api/grades", {
+          await apiFetch("/api/grades", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({

@@ -1,5 +1,7 @@
 "use client";
 
+
+import { apiFetch } from "@/lib/api";
 import { useState, useEffect, useCallback } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -156,7 +158,7 @@ export function SuperAdminStaff() {
 
   const fetchStaff = useCallback(async () => {
     try {
-      const res = await fetch("/api/super-admins?type=staff");
+      const res = await apiFetch("/api/super-admins?type=staff");
       if (!res.ok) throw new Error("Failed to fetch");
       const json = await res.json();
       setStaffList(json);
@@ -169,7 +171,7 @@ export function SuperAdminStaff() {
 
   const fetchRoles = useCallback(async () => {
     try {
-      const res = await fetch("/api/platform/roles");
+      const res = await apiFetch("/api/platform/roles");
       if (res.ok) {
         const json = await res.json();
         setRoles(
@@ -239,7 +241,7 @@ export function SuperAdminStaff() {
       const isEdit = !!editingStaff;
 
       if (isEdit) {
-        const res = await fetch("/api/super-admins", {
+        const res = await apiFetch("/api/super-admins", {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
@@ -260,7 +262,7 @@ export function SuperAdminStaff() {
         }
         toast.success("Staff member updated successfully");
       } else {
-        const res = await fetch("/api/super-admins", {
+        const res = await apiFetch("/api/super-admins", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
@@ -294,7 +296,7 @@ export function SuperAdminStaff() {
 
   const handleDelete = async (id: string) => {
     try {
-      const res = await fetch(`/api/super-admins?id=${id}`, {
+      const res = await apiFetch(`/api/super-admins?id=${id}`, {
         method: "DELETE",
       });
       if (!res.ok) {

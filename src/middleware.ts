@@ -1,41 +1,23 @@
-import { withAuth } from "next-auth/middleware";
 import { NextResponse } from "next/server";
+import type { NextRequest } from "next/server";
 
-export default withAuth(
-  function middleware(req) {
-    const token = req.nextauth.token;
-    const isAuth = !!token;
-    const isAuthPage = req.nextUrl.pathname.startsWith("/login") || req.nextUrl.pathname.startsWith("/reset-password");
-
-    if (isAuthPage) {
-      if (isAuth) {
-        return NextResponse.redirect(new URL("/", req.url));
-      }
-      return null;
-    }
-
-    if (!isAuth) {
-      let from = req.nextUrl.pathname;
-      if (req.nextUrl.search) {
-        from += req.nextUrl.search;
-      }
-      return NextResponse.redirect(
-        new URL(`/login?from=${encodeURIComponent(from)}`, req.url)
-      );
-    }
-  },
-  {
-    callbacks: {
-      async authorized() {
-        // This is a workaround to make withAuth run on every request
-        return true;
-      },
-    },
-  }
-);
+/**
+ * Lightweight middleware — no NextAuth, no server-side session.
+ * Auth is handled client-side via localStorage token + Zustand store.
+ * 
+ * This middleware only handles:
+ * 1. Redirecting static asset / public paths (no-op)
+ * 2. Ensuring API proxy-free routing (no /api routes exist anymore)
+ */
+export function middleware(request: NextRequest) {
+  // Let everything pass through — auth is now client-side
+  // The AppShell component checks the Zustand store and redirects to /login if not authenticated
+  return NextResponse.next();
+}
 
 export const config = {
   matcher: [
-    "/((?!api|_next/static|_next/image|favicon.ico|images|logo.png).*)",
+    // Skip static files and images
+    "/((?!_next/static|_next/image|favicon.ico|images|logo.png).*)",
   ],
 };

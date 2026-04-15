@@ -1,6 +1,9 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+
+import { apiFetch } from "@/lib/api";
+import { useState, useEffect, useCallback, useMemo } from "react";
+import { useGraphQLQuery, useGraphQLMutation } from "@/lib/graphql/hooks";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -69,7 +72,7 @@ interface CustomRole {
   name: string;
   color: string;
   permissions: Record<string, unknown>;
-  _count?: { users: number };
+  userCount?: number;
 }
 
 interface StaffMember {
@@ -139,14 +142,88 @@ function avatarStyle(color: string): React.CSSProperties {
 
 // --- Component ---
 
+const GET_STAFF = `
+  query GetStaff($tenantId: String) {
+    staff(tenantId: $tenantId) {
+      id
+      name
+      email
+      phone
+      address
+      isActive
+      customRole {
+        id
+        name
+        color
+      }
+      createdAt
+    }
+  }
+`;
+
+const GET_ROLES = `
+  query GetRoles($tenantId: String) {
+    customRoles(tenantId: $tenantId) {
+      id
+      name
+      color
+    }
+  }
+`;
+
+const CREATE_USER = `
+  mutation CreateStaff($data: CreateUserInput!) {
+    createUser(data: $data) {
+      id
+      name
+    }
+  }
+`;
+
+const TOGGLE_STATUS = `
+  mutation ToggleStaff($id: ID!, $isActive: Boolean!) {
+    toggleUserStatus(id: $id, isActive: $isActive) {
+      id
+      isActive
+    }
+  }
+`;
+
+const ASSIGN_ROLE = `
+  mutation AssignStaffRole($userId: ID!, $roleId: ID, $tenantId: String) {
+    assignRoleToUser(userId: $userId, roleId: $roleId, tenantId: $tenantId)
+  }
+`;
+
 export function AdminStaff() {
   const { currentTenantId } = useAppStore();
-
-  // Data state
-  const [staff, setStaff] = useState<StaffMember[]>([]);
-  const [roles, setRoles] = useState<CustomRole[]>([]);
-  const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
+
+  // --- GraphQL Queries ---
+  const { 
+    data: staffData, 
+    isLoading: loadingStaff, 
+    refetch: refetchStaff 
+  } = useGraphQLQuery<{ staff: StaffMember[] }>(
+    ["staff", currentTenantId], 
+    GET_STAFF, 
+    { tenantId: currentTenantId }
+  );
+
+  const { data: rolesData } = useGraphQLQuery<{ customRoles: CustomRole[] }>(
+    ["custom-roles", currentTenantId], 
+    GET_ROLES, 
+    { tenantId: currentTenantId }
+  );
+
+  const staff = staffData?.staff || [];
+  const roles = rolesData?.customRoles || [];
+  const loading = loadingStaff;
+
+  // --- Mutations ---
+  const { mutateAsync: createUser } = useGraphQLMutation(CREATE_USER);
+  const { mutateAsync: toggleStatus } = useGraphQLMutation(TOGGLE_STATUS);
+  const { mutateAsync: assignRole } = useGraphQLMutation(ASSIGN_ROLE);
 
   // Dialog state
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -154,68 +231,26 @@ export function AdminStaff() {
   const [editingStaff, setEditingStaff] = useState<StaffMember | null>(null);
   const [formData, setFormData] = useState<StaffFormData>(emptyFormData);
   const [submitting, setSubmitting] = useState(false);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
 
-  // Reset show password on dialog open/close
+  // Filtered list (memoized for speed)
+  const filtered = useMemo(() => {
+    return staff.filter(
+      (s) =>
+        s.name.toLowerCase().includes(search.toLowerCase()) ||
+        s.email.toLowerCase().includes(search.toLowerCase()) ||
+        (s.phone && s.phone.toLowerCase().includes(search.toLowerCase())) ||
+        (s.customRole &&
+          s.customRole.name.toLowerCase().includes(search.toLowerCase())),
+    );
+  }, [staff, search]);
+
   const handleOpenAdd = () => {
     setEditingStaff(null);
     setFormData(emptyFormData);
     setShowPassword(false);
     setDialogOpen(true);
   };
-
-  // Delete state
-  const [deletingId, setDeletingId] = useState<string | null>(null);
-
-  // --- Fetch data ---
-
-  const fetchStaff = useCallback(async () => {
-    if (!currentTenantId) return;
-    try {
-      const res = await fetch(
-        `/api/staff?tenantId=${encodeURIComponent(currentTenantId)}`,
-      );
-      if (!res.ok) throw new Error("Failed to fetch staff");
-      const json = await res.json();
-      setStaff(json);
-    } catch {
-      console.error("Error fetching staff");
-    } finally {
-      setLoading(false);
-    }
-  }, [currentTenantId]);
-
-  const fetchRoles = useCallback(async () => {
-    if (!currentTenantId) return;
-    try {
-      const res = await fetch(
-        `/api/roles?tenantId=${encodeURIComponent(currentTenantId)}`,
-      );
-      if (!res.ok) throw new Error("Failed to fetch roles");
-      const json = await res.json();
-      setRoles(json);
-    } catch {
-      console.error("Error fetching roles");
-    }
-  }, [currentTenantId]);
-
-  useEffect(() => {
-    setLoading(true);
-    fetchStaff();
-    fetchRoles();
-  }, [fetchStaff, fetchRoles]);
-
-  // --- Filtering ---
-
-  const filtered = staff.filter(
-    (s) =>
-      s.name.toLowerCase().includes(search.toLowerCase()) ||
-      s.email.toLowerCase().includes(search.toLowerCase()) ||
-      (s.phone && s.phone.toLowerCase().includes(search.toLowerCase())) ||
-      (s.customRole &&
-        s.customRole.name.toLowerCase().includes(search.toLowerCase())),
-  );
-
-  // --- Handlers ---
 
   const handleOpenEdit = (member: StaffMember) => {
     setShowPassword(false);
@@ -240,58 +275,34 @@ export function AdminStaff() {
 
     setSubmitting(true);
     try {
-      const isEdit = !!editingStaff;
-      const url = "/api/staff";
-      const method = isEdit ? "PUT" : "POST";
-
-      const body = isEdit
-        ? {
-            id: editingStaff.id,
-            name: formData.name,
-            ...(formData.password ? { password: formData.password } : {}),
-            phone: formData.phone,
-            address: formData.address,
-            customRoleId: formData.customRoleId || null,
-            isActive: formData.isActive,
-          }
-        : {
-            tenantId: currentTenantId,
+      if (editingStaff) {
+        // Toggle status if changed
+        if (formData.isActive !== editingStaff.isActive) {
+          await toggleStatus({ id: editingStaff.id, isActive: formData.isActive });
+        }
+        // Assign role if changed
+        if (formData.customRoleId !== (editingStaff.customRole?.id || "")) {
+          await assignRole({ userId: editingStaff.id, roleId: formData.customRoleId, tenantId: currentTenantId });
+        }
+        toast.success("Staff member updated successfully");
+      } else {
+        // Create new
+        await createUser({
+          data: {
             name: formData.name,
             email: formData.email,
             password: formData.password || "sigel2024",
-            phone: formData.phone,
-            address: formData.address,
-            customRoleId: formData.customRoleId || null,
-            isActive: formData.isActive,
-          };
-
-      const res = await fetch(url, {
-        method,
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(body),
-      });
-
-      if (!res.ok) {
-        const errData = await res.json().catch(() => null);
-        throw new Error(
-          errData?.error ||
-            `Failed to ${isEdit ? "update" : "add"} staff member`,
-        );
+            role: "staff",
+            tenantId: currentTenantId,
+          }
+        });
+        toast.success("Staff member added successfully");
       }
-
-      toast.success(
-        `Staff member ${isEdit ? "updated" : "added"} successfully`,
-      );
+      
       setDialogOpen(false);
-      setEditingStaff(null);
-      setFormData(emptyFormData);
-      fetchStaff();
-    } catch (err) {
-      toast.error(
-        err instanceof Error
-          ? err.message
-          : `Failed to ${editingStaff ? "update" : "add"} staff member`,
-      );
+      refetchStaff();
+    } catch (err: any) {
+      toast.error(err.message || "Operation failed");
     } finally {
       setSubmitting(false);
     }
@@ -299,18 +310,13 @@ export function AdminStaff() {
 
   const handleDelete = async (id: string) => {
     try {
-      const res = await fetch(`/api/staff?id=${id}`, { method: "DELETE" });
-      if (!res.ok) {
-        const errData = await res.json().catch(() => null);
-        throw new Error(errData?.error || "Failed to delete staff member");
-      }
-      toast.success("Staff member deleted successfully");
-      setStaff((prev) => prev.filter((s) => s.id !== id));
+      toast.info("Deactivating staff member...");
+      await toggleStatus({ id, isActive: false });
+      toast.success("Staff member deactivated");
       setDeletingId(null);
-    } catch (err) {
-      toast.error(
-        err instanceof Error ? err.message : "Failed to delete staff member",
-      );
+      refetchStaff();
+    } catch (err: any) {
+      toast.error(err.message || "Failed to deactivate");
     }
   };
 

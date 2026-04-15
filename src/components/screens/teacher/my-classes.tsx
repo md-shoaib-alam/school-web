@@ -1,5 +1,7 @@
 "use client";
 
+
+import { apiFetch } from "@/lib/api";
 import { useEffect, useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -77,8 +79,8 @@ export function TeacherClasses() {
     setLoading(true);
     try {
       const [classesRes, subjectsRes] = await Promise.all([
-        fetch("/api/classes"),
-        fetch("/api/subjects"),
+        apiFetch("/api/classes"),
+        apiFetch("/api/subjects"),
       ]);
       const classData = await classesRes.json();
       const subjectData = await subjectsRes.json();
@@ -96,7 +98,7 @@ export function TeacherClasses() {
     setDialogOpen(true);
     setStudentsLoading(true);
     try {
-      const res = await fetch(`/api/students?classId=${cls.id}`);
+      const res = await apiFetch(`/api/students?classId=${cls.id}`);
       const data = await res.json();
       setStudents(data);
     } catch (error) {

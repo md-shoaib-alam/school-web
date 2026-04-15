@@ -1,5 +1,7 @@
 "use client";
 
+
+import { apiFetch } from "@/lib/api";
 import { useEffect, useState, useCallback } from "react";
 import { useAppStore } from "@/store/use-app-store";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -35,8 +37,8 @@ export function StudentClasses() {
     setLoading(true);
     try {
       const [studentsRes, subjectsRes] = await Promise.all([
-        fetch("/api/students"),
-        fetch("/api/subjects"),
+        apiFetch("/api/students"),
+        apiFetch("/api/subjects"),
       ]);
       const [studentsData, subjectsData] = await Promise.all([
         studentsRes.json(),

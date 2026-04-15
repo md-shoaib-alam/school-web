@@ -1,5 +1,7 @@
 "use client";
 
+
+import { apiFetch } from "@/lib/api";
 import { useState, useEffect, useCallback } from "react";
 import {
   Card,
@@ -198,7 +200,7 @@ export function ParentSubscription() {
 
   const fetchSubscriptions = useCallback(async (pid: string) => {
     try {
-      const res = await fetch(`/api/subscriptions?parentId=${pid}`);
+      const res = await apiFetch(`/api/subscriptions?parentId=${pid}`);
       if (!res.ok) throw new Error("Failed to fetch subscriptions");
       const data = await res.json();
       setActiveSubscription(data.activeSubscription || null);
@@ -215,7 +217,7 @@ export function ParentSubscription() {
         return;
       }
       try {
-        const parentsRes = await fetch("/api/parents");
+        const parentsRes = await apiFetch("/api/parents");
         if (!parentsRes.ok) throw new Error("Failed to fetch parents");
         const parents = await parentsRes.json();
         const matched = parents.find(
@@ -251,7 +253,7 @@ export function ParentSubscription() {
     if (!purchasingPlan || !parentId) return;
     setProcessing(true);
     try {
-      const res = await fetch("/api/subscriptions", {
+      const res = await apiFetch("/api/subscriptions", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -281,7 +283,7 @@ export function ParentSubscription() {
 
   const handleCancelSubscription = async (subscriptionId: string) => {
     try {
-      const res = await fetch("/api/subscriptions", {
+      const res = await apiFetch("/api/subscriptions", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ action: "cancel", subscriptionId }),
@@ -298,7 +300,7 @@ export function ParentSubscription() {
     if (!parentId) return;
     setAddonLoading(addon.id);
     try {
-      const res = await fetch("/api/subscriptions", {
+      const res = await apiFetch("/api/subscriptions", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

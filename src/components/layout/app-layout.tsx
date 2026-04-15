@@ -826,7 +826,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
                 key={item.key}
                 variant="ghost"
                 className={cn(
-                  "w-full justify-start gap-3 h-10 px-3 font-normal",
+                  "w-full justify-start gap-3 h-10 px-3 font-normal cursor-pointer",
                   resolvedScreen === item.key
                     ? isSuperAdmin
                       ? "bg-rose-800/60 text-white font-medium"

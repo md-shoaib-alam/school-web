@@ -1,5 +1,7 @@
 "use client";
 
+
+import { apiFetch } from "@/lib/api";
 import { useState, useEffect, useMemo } from "react";
 import { useAppStore } from "@/store/use-app-store";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -59,7 +61,7 @@ export function StudentFees() {
   useEffect(() => {
     async function fetchData() {
       try {
-        const studentsRes = await fetch("/api/students");
+        const studentsRes = await apiFetch("/api/students");
         const studentsData = await studentsRes.json();
         setStudents(studentsData);
 

@@ -1,5 +1,7 @@
 "use client";
 
+
+import { apiFetch } from "@/lib/api";
 import { useEffect, useState } from "react";
 import { useAppStore } from "@/store/use-app-store";
 import { useStudentDashboard } from "@/lib/graphql/hooks";
@@ -53,7 +55,7 @@ export function StudentDashboard() {
 
   useEffect(() => {
     if (currentUser?.email) {
-      fetch("/api/students")
+      apiFetch("/api/students")
         .then((r) => r.json())
         .then((students: any[]) => {
           const s =

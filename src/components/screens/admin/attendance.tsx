@@ -40,6 +40,7 @@ import {
 import type { AttendanceRecord, ClassInfo } from "@/lib/types";
 import { useModulePermissions } from "@/hooks/use-permissions";
 import { useAttendance, useClasses } from "@/lib/graphql/hooks";
+import { useAppStore } from "@/store/use-app-store";
 
 const statusConfig: Record<
   string,
@@ -66,9 +67,10 @@ const statusConfig: Record<
 };
 
 export function AdminAttendance() {
+  const { currentTenantId } = useAppStore();
   const { canCreate, canEdit, canDelete } = useModulePermissions("attendance");
-  const { data: rawRecords = [], isLoading: recordsLoading } = useAttendance();
-  const { data: classData = [], isLoading: classesLoading } = useClasses();
+  const { data: rawRecords = [], isLoading: recordsLoading } = useAttendance(currentTenantId || undefined);
+  const { data: classData = [], isLoading: classesLoading } = useClasses(currentTenantId || undefined);
 
   const loading = recordsLoading || classesLoading;
   const classes = classData as ClassInfo[];

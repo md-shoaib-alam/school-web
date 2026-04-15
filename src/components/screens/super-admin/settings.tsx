@@ -1,5 +1,7 @@
 "use client";
 
+
+import { apiFetch } from "@/lib/api";
 import { useState, useEffect } from "react";
 import {
   Card,
@@ -220,7 +222,7 @@ export function SuperAdminSettings() {
   useEffect(() => {
     const fetchMaintenance = async () => {
       try {
-        const res = await fetch("/api/platform-settings?key=maintenance_mode");
+        const res = await apiFetch("/api/platform-settings?key=maintenance_mode");
         if (res.ok) {
           const data = await res.json();
           if (data.value !== null) {
@@ -246,7 +248,7 @@ export function SuperAdminSettings() {
   const handleMaintenanceToggle = async (enabled: boolean) => {
     setSavingMaintenance(true);
     try {
-      const res = await fetch("/api/platform-settings", {
+      const res = await apiFetch("/api/platform-settings", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -276,7 +278,7 @@ export function SuperAdminSettings() {
 
   const handleSaveMaintenanceMessage = async () => {
     try {
-      const res = await fetch("/api/platform-settings", {
+      const res = await apiFetch("/api/platform-settings", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -297,7 +299,7 @@ export function SuperAdminSettings() {
   const handleCheckPerformance = async () => {
     setChecking(true);
     try {
-      const res = await fetch("/api/performance");
+      const res = await apiFetch("/api/performance");
       if (!res.ok) throw new Error("Performance check failed");
       const data = await res.json();
       if (data.status === "error") throw new Error(data.message);

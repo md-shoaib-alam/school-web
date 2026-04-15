@@ -1,5 +1,7 @@
 "use client";
 
+
+import { apiFetch } from "@/lib/api";
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -43,7 +45,7 @@ export function TeacherNotices() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch("/api/notices")
+    apiFetch("/api/notices")
       .then((res) => res.json())
       .then((data: Notice[]) => {
         const filtered = Array.isArray(data)

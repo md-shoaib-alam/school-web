@@ -1,5 +1,7 @@
 "use client";
 
+
+import { apiFetch } from "@/lib/api";
 import { useState, useEffect } from "react";
 import {
   Card,
@@ -92,7 +94,7 @@ export function TeacherAssignments() {
   const [gradeForm, setGradeForm] = useState({ grade: "", feedback: "" });
 
   useEffect(() => {
-    Promise.all([fetch("/api/assignments"), fetch("/api/subjects")])
+    Promise.all([apiFetch("/api/assignments"), apiFetch("/api/subjects")])
       .then(([aRes, sRes]) => Promise.all([aRes.json(), sRes.json()]))
       .then(([aData, sData]) => {
         setAssignments(aData);
@@ -107,7 +109,7 @@ export function TeacherAssignments() {
       return;
     }
     try {
-      const res = await fetch("/api/assignments", {
+      const res = await apiFetch("/api/assignments", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -120,7 +122,7 @@ export function TeacherAssignments() {
         toast.success("Assignment created successfully!");
         setDialogOpen(false);
         setForm({ title: "", description: "", subjectId: "", dueDate: "" });
-        const data = await fetch("/api/assignments").then((r) => r.json());
+        const data = await apiFetch("/api/assignments").then((r) => r.json());
         setAssignments(data);
       }
     } catch {
@@ -134,7 +136,7 @@ export function TeacherAssignments() {
     setSubLoading(true);
     setGradeForm({ grade: "", feedback: "" });
     try {
-      const res = await fetch(`/api/submissions?assignmentId=${assignment.id}`);
+      const res = await apiFetch(`/api/submissions?assignmentId=${assignment.id}`);
       if (res.ok) {
         const json = await res.json();
         setSubmissions(json.data || []);
@@ -154,7 +156,7 @@ export function TeacherAssignments() {
     }
     setGradingId(submissionId);
     try {
-      const res = await fetch("/api/submissions", {
+      const res = await apiFetch("/api/submissions", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

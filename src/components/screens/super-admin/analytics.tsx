@@ -1,5 +1,7 @@
 "use client";
 
+
+import { apiFetch } from "@/lib/api";
 import { useState, useEffect } from "react";
 import {
   Card,
@@ -213,7 +215,7 @@ export function SuperAdminAnalytics() {
   useEffect(() => {
     async function fetchData() {
       try {
-        const res = await fetch("/api/platform");
+        const res = await apiFetch("/api/platform");
         if (res.ok) {
           const json = await res.json();
           setPlatformData(json);

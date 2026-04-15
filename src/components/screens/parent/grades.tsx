@@ -1,5 +1,7 @@
 "use client";
 
+
+import { apiFetch } from "@/lib/api";
 import { useEffect, useState } from "react";
 import { useAppStore } from "@/store/use-app-store";
 import {
@@ -60,8 +62,8 @@ export function ParentGrades() {
     async function fetchData() {
       try {
         const [studentsRes, gradesRes] = await Promise.all([
-          fetch("/api/students"),
-          fetch("/api/grades"),
+          apiFetch("/api/students"),
+          apiFetch("/api/grades"),
         ]);
         const studentsData = await studentsRes.json();
         const gradesData = await gradesRes.json();

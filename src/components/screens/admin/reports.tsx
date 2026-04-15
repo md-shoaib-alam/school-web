@@ -1,5 +1,7 @@
 "use client";
 
+
+import { apiFetch } from "@/lib/api";
 import { useState, useEffect, useMemo } from "react";
 import {
   Card,
@@ -127,7 +129,7 @@ function AttendanceReport() {
   useEffect(() => {
     async function fetchClasses() {
       try {
-        const res = await fetch("/api/classes");
+        const res = await apiFetch("/api/classes");
         if (!res.ok) throw new Error("Failed to fetch classes");
         setClasses(await res.json());
       } catch {
@@ -143,7 +145,7 @@ function AttendanceReport() {
       try {
         const params = new URLSearchParams();
         if (selectedClass !== "all") params.set("classId", selectedClass);
-        const res = await fetch(`/api/attendance?${params.toString()}`);
+        const res = await apiFetch(`/api/attendance?${params.toString()}`);
         if (!res.ok) throw new Error("Failed to fetch attendance");
         setRecords(await res.json());
       } catch (err) {
@@ -369,7 +371,7 @@ function AcademicReport() {
   useEffect(() => {
     async function fetchGrades() {
       try {
-        const res = await fetch("/api/grades");
+        const res = await apiFetch("/api/grades");
         if (!res.ok) throw new Error("Failed to fetch grades");
         setGrades(await res.json());
       } catch (err) {
@@ -613,7 +615,7 @@ function FeeReport() {
   useEffect(() => {
     async function fetchFees() {
       try {
-        const res = await fetch("/api/fees");
+        const res = await apiFetch("/api/fees");
         if (!res.ok) throw new Error("Failed to fetch fees");
         setFees(await res.json());
       } catch (err) {

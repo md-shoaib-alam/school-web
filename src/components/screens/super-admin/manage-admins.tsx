@@ -1,5 +1,7 @@
 "use client";
 
+
+import { apiFetch } from "@/lib/api";
 import { useState, useEffect, useCallback } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -132,7 +134,7 @@ export function SuperAdminManage() {
 
   const fetchAdmins = useCallback(async () => {
     try {
-      const res = await fetch("/api/super-admins?type=admins");
+      const res = await apiFetch("/api/super-admins?type=admins");
       if (!res.ok) throw new Error("Failed to fetch");
       const json = await res.json();
       setAdmins(json);
@@ -199,7 +201,7 @@ export function SuperAdminManage() {
             password: formData.password,
           };
 
-      const res = await fetch("/api/super-admins", {
+      const res = await apiFetch("/api/super-admins", {
         method,
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(body),
@@ -226,7 +228,7 @@ export function SuperAdminManage() {
 
   const handleDelete = async (id: string) => {
     try {
-      const res = await fetch(`/api/super-admins?id=${id}`, {
+      const res = await apiFetch(`/api/super-admins?id=${id}`, {
         method: "DELETE",
       });
       if (!res.ok) {

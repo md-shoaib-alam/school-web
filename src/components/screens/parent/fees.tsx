@@ -1,5 +1,7 @@
 "use client";
 
+
+import { apiFetch } from "@/lib/api";
 import { useState, useEffect, useMemo } from "react";
 import { useAppStore } from "@/store/use-app-store";
 import {
@@ -69,7 +71,7 @@ export function ParentFees() {
   useEffect(() => {
     async function fetchData() {
       try {
-        const studentsRes = await fetch("/api/students");
+        const studentsRes = await apiFetch("/api/students");
         const studentsData = await studentsRes.json();
 
         const parentStudents = studentsData.filter(
@@ -98,7 +100,7 @@ export function ParentFees() {
     if (!activeTab || loading) return;
     async function fetchFees() {
       try {
-        const res = await fetch(`/api/fees?studentId=${activeTab}`);
+        const res = await apiFetch(`/api/fees?studentId=${activeTab}`);
         if (res.ok) setAllFees(await res.json());
       } catch (error) {
         console.error("Failed to fetch fees:", error);
@@ -115,7 +117,7 @@ export function ParentFees() {
     async function fetchAllFees() {
       try {
         const promises = allStudentIds.map((id) =>
-          fetch(`/api/fees?studentId=${id}`),
+          apiFetch(`/api/fees?studentId=${id}`),
         );
         const responses = await Promise.all(promises);
         const results = await Promise.all(

@@ -1,5 +1,7 @@
 "use client";
 
+
+import { apiFetch } from "@/lib/api";
 import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -69,7 +71,7 @@ export function TeacherAttendance() {
   const fetchClasses = async () => {
     setLoading(true);
     try {
-      const res = await fetch("/api/classes");
+      const res = await apiFetch("/api/classes");
       const data = await res.json();
       setClasses(data);
       if (data.length > 0) {
@@ -92,7 +94,7 @@ export function TeacherAttendance() {
     setStudentsLoading(true);
     setSaved(false);
     try {
-      const res = await fetch(`/api/students?classId=${selectedClassId}`);
+      const res = await apiFetch(`/api/students?classId=${selectedClassId}`);
       const data = await res.json();
       setStudents(data);
 
@@ -131,7 +133,7 @@ export function TeacherAttendance() {
     if (!selectedClassId) return;
     setSaving(true);
     try {
-      const res = await fetch("/api/attendance", {
+      const res = await apiFetch("/api/attendance", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

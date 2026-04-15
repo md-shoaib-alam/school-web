@@ -1,5 +1,7 @@
 "use client";
 
+
+import { apiFetch } from "@/lib/api";
 import { useState, useEffect, useCallback } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -233,7 +235,7 @@ export function StudentTickets() {
         tenantId: currentTenantId,
         createdBy: currentUser.id,
       });
-      const res = await fetch(`/api/tickets?${params.toString()}`);
+      const res = await apiFetch(`/api/tickets?${params.toString()}`);
       if (res.ok) {
         const data = await res.json();
         setTickets(Array.isArray(data) ? data : []);
@@ -263,7 +265,7 @@ export function StudentTickets() {
     if (!currentUser) return;
     setCreating(true);
     try {
-      const res = await fetch("/api/tickets", {
+      const res = await apiFetch("/api/tickets", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -297,7 +299,7 @@ export function StudentTickets() {
     setDetailLoading(true);
     setReplyMessage("");
     try {
-      const res = await fetch(`/api/tickets/${ticketId}`);
+      const res = await apiFetch(`/api/tickets/${ticketId}`);
       if (res.ok) {
         setSelectedTicket(await res.json());
       } else {
@@ -317,7 +319,7 @@ export function StudentTickets() {
     if (!replyMessage.trim() || !selectedTicket || !currentUser) return;
     setSendingReply(true);
     try {
-      const res = await fetch(`/api/tickets/${selectedTicket.id}/messages`, {
+      const res = await apiFetch(`/api/tickets/${selectedTicket.id}/messages`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -328,7 +330,7 @@ export function StudentTickets() {
       if (res.ok) {
         setReplyMessage("");
         // Refresh detail
-        const detailRes = await fetch(`/api/tickets/${selectedTicket.id}`);
+        const detailRes = await apiFetch(`/api/tickets/${selectedTicket.id}`);
         if (detailRes.ok) {
           setSelectedTicket(await detailRes.json());
         }

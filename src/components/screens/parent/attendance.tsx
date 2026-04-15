@@ -1,5 +1,7 @@
 "use client";
 
+
+import { apiFetch } from "@/lib/api";
 import { useState, useEffect, useMemo } from "react";
 import { useAppStore } from "@/store/use-app-store";
 import {
@@ -123,8 +125,8 @@ export function ParentAttendance() {
     async function fetchData() {
       try {
         const [studentsRes, attendanceRes] = await Promise.all([
-          fetch("/api/students"),
-          fetch("/api/attendance"),
+          apiFetch("/api/students"),
+          apiFetch("/api/attendance"),
         ]);
         const studentsData = await studentsRes.json();
         const attendanceData = await attendanceRes.json();

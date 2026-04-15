@@ -1,6 +1,9 @@
 "use client";
 
-import { useState, useEffect, useCallback, Fragment } from "react";
+
+import { apiFetch } from "@/lib/api";
+import { useState, useEffect, useCallback, Fragment, useMemo } from "react";
+import { useGraphQLQuery, useGraphQLMutation } from "@/lib/graphql/hooks";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -50,7 +53,8 @@ interface RoleRecord {
   description: string | null;
   color: string;
   permissions: string;
-  _count: { users: number };
+  userCount: number;
+  createdAt: string;
 }
 
 interface UserRecord {
@@ -100,21 +104,108 @@ const COLOR_PRESETS = [
   "#f97316",
 ];
 
+// ... (rest of imports same)
+
+const GET_ROLES = `
+  query GetRoles($tenantId: String) {
+    customRoles(tenantId: $tenantId) {
+      id
+      name
+      description
+      color
+      permissions
+      userCount
+      createdAt
+    }
+  }
+`;
+
+const GET_STAFF = `
+  query GetStaff($tenantId: String) {
+    staff(tenantId: $tenantId) {
+      id
+      name
+      email
+      role
+      isActive
+      customRole {
+        id
+        name
+      }
+    }
+  }
+`;
+
+const CREATE_ROLE = `
+  mutation CreateRole($tenantId: String, $name: String!, $description: String, $color: String, $permissions: JSON) {
+    createCustomRole(tenantId: $tenantId, name: $name, description: $description, color: $color, permissions: $permissions) {
+      id
+      name
+    }
+  }
+`;
+
+const UPDATE_ROLE = `
+  mutation UpdateRole($id: ID!, $name: String, $description: String, $color: String, $permissions: JSON) {
+    updateCustomRole(id: $id, name: $name, description: $description, color: $color, permissions: $permissions) {
+      id
+    }
+  }
+`;
+
+const DELETE_ROLE = `
+  mutation DeleteRole($id: ID!) {
+    deleteCustomRole(id: $id)
+  }
+`;
+
+const ASSIGN_ROLE = `
+  mutation AssignRole($userId: ID!, $roleId: ID, $tenantId: String) {
+    assignRoleToUser(userId: $userId, roleId: $roleId, tenantId: $tenantId)
+  }
+`;
+
 export function AdminRoles() {
   const { currentTenantId } = useAppStore();
-  const [roles, setRoles] = useState<RoleRecord[]>([]);
-  const [loading, setLoading] = useState(true);
+  
+  // --- Queries ---
+  const { 
+    data: rolesData, 
+    isLoading: loading, 
+    refetch: fetchRoles 
+  } = useGraphQLQuery<{ customRoles: RoleRecord[] }>(
+    ["custom-roles-page", currentTenantId],
+    GET_ROLES,
+    { tenantId: currentTenantId }
+  );
+
+  const { 
+    data: staffData, 
+    refetch: refetchStaff,
+    isLoading: assignLoading
+  } = useGraphQLQuery<{ staff: UserRecord[] }>(
+    ["all-staff", currentTenantId],
+    GET_STAFF,
+    { tenantId: currentTenantId }
+  );
+
+  const roles = rolesData?.customRoles || [];
+  const allStaff = staffData?.staff || [];
+
+  // --- Mutations ---
+  const { mutateAsync: createRole } = useGraphQLMutation(CREATE_ROLE);
+  const { mutateAsync: updateRole } = useGraphQLMutation(UPDATE_ROLE);
+  const { mutateAsync: deleteRole } = useGraphQLMutation(DELETE_ROLE);
+  const { mutateAsync: assignRoleMut } = useGraphQLMutation(ASSIGN_ROLE);
+
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingRole, setEditingRole] = useState<RoleRecord | null>(null);
   const [saving, setSaving] = useState(false);
 
   // Assign dialog state
   const [assignOpen, setAssignOpen] = useState(false);
-  const [assignRole, setAssignRole] = useState<RoleRecord | null>(null);
-  const [assignedUsers, setAssignedUsers] = useState<UserRecord[]>([]);
-  const [availableUsers, setAvailableUsers] = useState<UserRecord[]>([]);
-  const [assignLoading, setAssignLoading] = useState(false);
-  const [assigning, setAssigning] = useState<string | null>(null);
+  const [activeRole, setActiveRole] = useState<RoleRecord | null>(null);
+  const [assigningLoading, setAssigningLoading] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
 
   // Form state
@@ -123,23 +214,13 @@ export function AdminRoles() {
   const [color, setColor] = useState("#6366f1");
   const [permissions, setPermissions] = useState<Record<string, string[]>>({});
 
-  const fetchRoles = useCallback(async () => {
-    if (!currentTenantId) return;
-    try {
-      const res = await fetch(`/api/roles?tenantId=${currentTenantId}`);
-      if (!res.ok) throw new Error();
-      const data = await res.json();
-      setRoles(data);
-    } catch {
-      toast.error("Failed to load roles");
-    } finally {
-      setLoading(false);
-    }
-  }, [currentTenantId]);
-
-  useEffect(() => {
-    fetchRoles();
-  }, [fetchRoles]);
+  // Computed lists for assignment
+  const { assignedUsers, availableUsers } = useMemo(() => {
+    if (!activeRole) return { assignedUsers: [], availableUsers: [] };
+    const assigned = allStaff.filter(u => u.customRole?.id === activeRole.id);
+    const available = allStaff.filter(u => u.customRole?.id !== activeRole.id);
+    return { assignedUsers: assigned, availableUsers: available };
+  }, [allStaff, activeRole]);
 
   const openCreateDialog = () => {
     setEditingRole(null);
@@ -154,98 +235,45 @@ export function AdminRoles() {
     setEditingRole(role);
     setName(role.name);
     setDescription(role.description || "");
-    setColor(role.color);
-    setPermissions(JSON.parse(role.permissions || "{}"));
+    setColor(role.color || "#6366f1");
+    let perms = {};
+    if (typeof role.permissions === 'string') {
+      try {
+        if (role.permissions !== "[object Object]") {
+          perms = JSON.parse(role.permissions || "{}");
+        }
+      } catch (e) {
+        console.error("Malformed permissions JSON:", e);
+      }
+    } else {
+      perms = role.permissions || {};
+    }
+    setPermissions(perms);
     setDialogOpen(true);
   };
 
-  const openAssignDialog = async (role: RoleRecord) => {
-    setAssignRole(role);
+  const openAssignDialog = (role: RoleRecord) => {
+    setActiveRole(role);
     setAssignOpen(true);
-    setAssignedUsers([]);
-    setAvailableUsers([]);
     setSearchQuery("");
-    setAssignLoading(true);
-    try {
-      const [assignedRes, availableRes] = await Promise.all([
-        fetch(`/api/roles/users?roleId=${role.id}&tenantId=${currentTenantId}`),
-        fetch("/api/roles/users", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            tenantId: currentTenantId,
-            excludeRoleId: role.id,
-          }),
-        }),
-      ]);
-      if (!assignedRes.ok || !availableRes.ok) throw new Error();
-      setAssignedUsers(await assignedRes.json());
-      setAvailableUsers(await availableRes.json());
-    } catch {
-      toast.error("Failed to load users");
-    } finally {
-      setAssignLoading(false);
-    }
   };
 
-  const handleAssign = async (userId: string) => {
-    if (!assignRole || !currentTenantId) return;
-    setAssigning(userId);
-    try {
-      const res = await fetch("/api/roles/users", {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          userId,
-          roleId: assignRole.id,
-          tenantId: currentTenantId,
-        }),
-      });
-      if (!res.ok) throw new Error();
-      // Move user from available to assigned
-      const user = availableUsers.find((u) => u.id === userId);
-      if (user) {
-        setAvailableUsers((prev) => prev.filter((u) => u.id !== userId));
-        setAssignedUsers((prev) => [
-          ...prev,
-          { ...user, customRoleId: assignRole.id },
-        ]);
-      }
-      toast.success("Role assigned successfully");
-      fetchRoles();
-    } catch {
-      toast.error("Failed to assign role");
-    } finally {
-      setAssigning(null);
-    }
-  };
-
-  const handleUnassign = async (userId: string) => {
+  const handleAssignChange = async (userId: string, targetRoleId: string | null) => {
     if (!currentTenantId) return;
-    setAssigning(userId);
+    setAssigningLoading(userId);
     try {
-      const res = await fetch("/api/roles/users", {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          userId,
-          roleId: null,
-          tenantId: currentTenantId,
-        }),
+      await assignRoleMut({
+        userId,
+        roleId: targetRoleId,
+        tenantId: currentTenantId,
       });
-      if (!res.ok) throw new Error();
-      // Move user from assigned to available
-      const user = assignedUsers.find((u) => u.id === userId);
-      if (user) {
-        setAssignedUsers((prev) => prev.filter((u) => u.id !== userId));
-        setAvailableUsers((prev) => [...prev, { ...user, customRoleId: null }]);
-      }
-      toast.success("Role removed successfully");
+      toast.success(targetRoleId ? "Role assigned" : "Role removed");
+      refetchStaff();
       fetchRoles();
-    } catch {
-      toast.error("Failed to remove role");
+    } catch (err: any) {
+      toast.error(err.message || "Assignment failed");
     } finally {
-      setAssigning(null);
+      setAssigningLoading(null);
     }
   };
 
@@ -267,57 +295,40 @@ export function AdminRoles() {
     setSaving(true);
     try {
       if (editingRole) {
-        const res = await fetch("/api/roles", {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            id: editingRole.id,
-            name,
-            description,
-            color,
-            permissions,
-          }),
+        await updateRole({
+          id: editingRole.id,
+          name,
+          description,
+          color,
+          permissions,
         });
-        if (!res.ok) throw new Error();
-        toast.success(`Role "${name}" updated successfully`);
+        toast.success(`Role updated successfully`);
       } else {
-        const res = await fetch("/api/roles", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            tenantId: currentTenantId,
-            name,
-            description,
-            color,
-            permissions,
-          }),
+        await createRole({
+          tenantId: currentTenantId,
+          name,
+          description,
+          color,
+          permissions,
         });
-        if (!res.ok) {
-          const err = await res.json().catch(() => ({}));
-          throw new Error(err.error || "Failed to create role");
-        }
-        toast.success(`Role "${name}" created successfully`);
+        toast.success(`Role created successfully`);
       }
       setDialogOpen(false);
       fetchRoles();
-    } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Failed to save role");
+    } catch (err: any) {
+      toast.error(err.message || "Failed to save role");
     } finally {
       setSaving(false);
     }
   };
 
-  const handleDelete = async (id: string) => {
+  const handleToggleDelete = async (id: string) => {
     try {
-      const res = await fetch(`/api/roles?id=${id}`, { method: "DELETE" });
-      if (!res.ok) {
-        const err = await res.json().catch(() => ({}));
-        throw new Error(err.error || "Failed to delete role");
-      }
+      await deleteRole({ id });
       toast.success("Role deleted successfully");
       fetchRoles();
-    } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Failed to delete role");
+    } catch (err: any) {
+      toast.error(err.message || "Failed to delete role");
     }
   };
 
@@ -381,7 +392,18 @@ export function AdminRoles() {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {roles.map((role) => {
-            const perms = JSON.parse(role.permissions || "{}");
+            let perms = {};
+            if (typeof role.permissions === 'string') {
+              try {
+                if (role.permissions !== "[object Object]") {
+                  perms = JSON.parse(role.permissions || "{}");
+                }
+              } catch (e) {
+                console.error("Malformed permissions JSON:", e);
+              }
+            } else {
+              perms = role.permissions || {};
+            }
             const permCount = Object.values(perms).flat().length;
 
             return (
@@ -438,8 +460,8 @@ export function AdminRoles() {
                             <AlertDialogDescription>
                               Are you sure you want to delete &quot;{role.name}
                               &quot;?{" "}
-                              {role._count.users > 0
-                                ? `${role._count.users} staff member(s) will lose this role.`
+                              {role.userCount > 0
+                                ? `${role.userCount} staff member(s) will lose this role.`
                                 : "This action cannot be undone."}
                             </AlertDialogDescription>
                           </AlertDialogHeader>
@@ -447,7 +469,7 @@ export function AdminRoles() {
                             <AlertDialogCancel>Cancel</AlertDialogCancel>
                             <AlertDialogAction
                               className="bg-red-600 hover:bg-red-700"
-                              onClick={() => handleDelete(role.id)}
+                              onClick={() => handleToggleDelete(role.id)}
                             >
                               Delete
                             </AlertDialogAction>
@@ -464,7 +486,7 @@ export function AdminRoles() {
                       className="flex items-center gap-1 hover:text-blue-600 dark:hover:text-blue-400 transition-colors cursor-pointer"
                     >
                       <Users className="h-3 w-3" />
-                      <span>{role._count.users} staff</span>
+                      <span>{role.userCount} staff</span>
                     </button>
                     <div className="flex items-center gap-1">
                       <Shield className="h-3 w-3" />
@@ -681,7 +703,7 @@ export function AdminRoles() {
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <UserPlus className="h-5 w-5 text-blue-600" />
-              Manage Staff — {assignRole?.name}
+              Manage Staff — {activeRole?.name}
             </DialogTitle>
             <DialogDescription>
               Assign or remove this role from teachers and staff members
@@ -714,7 +736,7 @@ export function AdminRoles() {
                         >
                           <div
                             className="w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-bold"
-                            style={{ backgroundColor: assignRole?.color }}
+                            style={{ backgroundColor: activeRole?.color }}
                           >
                             {user.name.charAt(0).toUpperCase()}
                           </div>
@@ -736,10 +758,10 @@ export function AdminRoles() {
                             variant="ghost"
                             size="icon"
                             className="h-7 w-7 shrink-0 hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-900/30"
-                            onClick={() => handleUnassign(user.id)}
-                            disabled={assigning === user.id}
+                            onClick={() => handleAssignChange(user.id, null)}
+                            disabled={assigningLoading === user.id}
                           >
-                            {assigning === user.id ? (
+                            {assigningLoading === user.id ? (
                               <Loader2 className="h-3.5 w-3.5 animate-spin" />
                             ) : (
                               <UserMinus className="h-3.5 w-3.5" />
@@ -824,10 +846,10 @@ export function AdminRoles() {
                             <Button
                               size="sm"
                               className="h-7 text-xs bg-blue-600 hover:bg-blue-700 text-white shrink-0"
-                              onClick={() => handleAssign(user.id)}
-                              disabled={assigning === user.id}
+                              onClick={() => handleAssignChange(user.id, activeRole?.id || null)}
+                              disabled={assigningLoading === user.id}
                             >
-                              {assigning === user.id ? (
+                              {assigningLoading === user.id ? (
                                 <Loader2 className="h-3.5 w-3.5 animate-spin mr-1" />
                               ) : (
                                 <UserPlus className="h-3 w-3 mr-1" />

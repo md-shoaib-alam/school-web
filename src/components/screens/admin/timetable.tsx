@@ -1,5 +1,7 @@
 "use client";
 
+
+import { apiFetch } from "@/lib/api";
 import { useState, useEffect, useMemo, useCallback } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -253,7 +255,7 @@ export function AdminTimetable() {
   useEffect(() => {
     async function fetchClasses() {
       try {
-        const res = await fetch("/api/classes");
+        const res = await apiFetch("/api/classes");
         if (!res.ok) throw new Error("Failed to fetch classes");
         const data = await res.json();
         setClasses(data);
@@ -275,7 +277,7 @@ export function AdminTimetable() {
       const tenantId = useAppStore.getState().currentTenantId;
       if (!tenantId) return;
       try {
-        const res = await fetch(`/api/tenant-settings?tenantId=${tenantId}`);
+        const res = await apiFetch(`/api/tenant-settings?tenantId=${tenantId}`);
         if (res.ok) {
           const data = await res.json();
           if (
@@ -297,7 +299,7 @@ export function AdminTimetable() {
     setLoadingTimetable(true);
     setError(null);
     try {
-      const res = await fetch(`/api/timetable?classId=${classId}`);
+      const res = await apiFetch(`/api/timetable?classId=${classId}`);
       if (!res.ok) throw new Error("Failed to fetch timetable");
       const data = await res.json();
       setSlots(data);
@@ -317,7 +319,7 @@ export function AdminTimetable() {
   const handleDeleteSlot = useCallback(
     async (slotId: string) => {
       try {
-        const res = await fetch(`/api/timetable?id=${slotId}`, {
+        const res = await apiFetch(`/api/timetable?id=${slotId}`, {
           method: "DELETE",
         });
         if (res.ok) {
@@ -362,7 +364,7 @@ export function AdminTimetable() {
     setEditSaving(true);
 
     try {
-      const res = await fetch("/api/timetable", {
+      const res = await apiFetch("/api/timetable", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -500,8 +502,8 @@ export function AdminTimetable() {
     async function fetchFormData() {
       try {
         const [subjectRes, teacherRes] = await Promise.all([
-          fetch("/api/subjects"),
-          fetch("/api/teachers"),
+          apiFetch("/api/subjects"),
+          apiFetch("/api/teachers"),
         ]);
         if (subjectRes.ok) {
           const subjectData = await subjectRes.json();
@@ -534,7 +536,7 @@ export function AdminTimetable() {
 
     async function loadExistingTimetable() {
       try {
-        const res = await fetch(`/api/timetable?classId=${selectedClass}`);
+        const res = await apiFetch(`/api/timetable?classId=${selectedClass}`);
         if (res.ok) {
           const data = await res.json();
           const initial: Record<string, FormSlot[]> = {
@@ -712,7 +714,7 @@ export function AdminTimetable() {
   // Delete all timetable slots for the selected class
   async function deleteTimetableForClass() {
     for (const slot of slots) {
-      await fetch(`/api/timetable?id=${slot.id}`, { method: "DELETE" });
+      await apiFetch(`/api/timetable?id=${slot.id}`, { method: "DELETE" });
     }
   }
 
@@ -750,7 +752,7 @@ export function AdminTimetable() {
     try {
       await deleteTimetableForClass();
 
-      const res = await fetch("/api/timetable", {
+      const res = await apiFetch("/api/timetable", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ slots: allSlots }),
@@ -818,7 +820,7 @@ export function AdminTimetable() {
       return;
     }
     try {
-      const res = await fetch("/api/tenant-settings", {
+      const res = await apiFetch("/api/tenant-settings", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
