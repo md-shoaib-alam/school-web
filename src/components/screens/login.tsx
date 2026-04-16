@@ -5,14 +5,6 @@ import { useState } from "react";
 import { useTheme } from "next-themes";
 import { useAppStore, type UserRole } from "@/store/use-app-store";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
   Building2,
@@ -23,34 +15,17 @@ import {
   Mail,
   Lock,
   Loader2,
-  School,
+  ArrowRight,
+  Phone,
 } from "lucide-react";
 import { toast } from "sonner";
 import { loginWithElysia } from "@/lib/api";
 
-function ThemeToggleLogin() {
-  const { theme, setTheme } = useTheme();
-
-  return (
-    <Button
-      variant="ghost"
-      size="icon"
-      className="absolute top-4 right-4 h-10 w-10 rounded-full hover:bg-white/20 dark:hover:bg-black/20 text-gray-600 dark:text-gray-300 z-10"
-      onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-      aria-label="Toggle theme"
-      suppressHydrationWarning
-    >
-      <Moon className="h-5 w-5 block dark:hidden" />
-      <Sun className="h-5 w-5 hidden dark:block" />
-    </Button>
-  );
-}
-
 export function LoginScreen() {
   const router = useRouter();
-  const { login, setCurrentScreen } = useAppStore();
+  const { theme, setTheme } = useTheme();
+  const { login } = useAppStore();
 
-  // Login state
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -65,16 +40,11 @@ export function LoginScreen() {
 
     setLoading(true);
     try {
-      // Direct login via Elysia backend — no NextAuth needed
       const data = await loginWithElysia(email.trim(), password.trim());
-
       const userData = data.user;
       const token = data.token;
 
-      // Save token for GraphQL & mobile-ready Auth
-      if (token) {
-        localStorage.setItem("school_token", token);
-      }
+      if (token) localStorage.setItem("school_token", token);
 
       login({
         id: userData.id,
@@ -88,14 +58,12 @@ export function LoginScreen() {
         customRole: userData.customRole || null,
       });
 
-      // Navigate using the proper Next.js router
       const dashboardUrl = userData.tenantSlug 
         ? `/${userData.tenantSlug}` 
         : userData.tenantId 
           ? `/${userData.tenantId}` 
           : "/";
       router.push(dashboardUrl);
-
       toast.success(`Welcome back, ${userData.name}!`);
     } catch (err: any) {
       toast.error(err.message || "Invalid email or password");
@@ -104,141 +72,145 @@ export function LoginScreen() {
     }
   };
 
-  return (
-    <div
-      className="min-h-screen flex items-center justify-center p-4 relative bg-gradient-to-br from-slate-50 via-white to-rose-50 dark:from-gray-950 dark:via-gray-900 dark:to-rose-950"
-      suppressHydrationWarning
-    >
-      <ThemeToggleLogin />
+  const heroImageSrc = "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=2160&q=80";
 
-      <div className="w-full max-w-md">
-        {/* Logo & Title */}
-        <div className="text-center mb-8 animate-in fade-in slide-in-from-top-4 duration-700">
-          <div className="inline-flex items-center justify-center w-20 h-20 rounded-2xl text-white mb-4 shadow-lg bg-gradient-to-br from-rose-600 to-rose-700 shadow-rose-200 dark:shadow-rose-900/40">
-            <Building2 className="h-10 w-10" />
-          </div>
-          <h1 className="text-4xl font-extrabold tracking-tight text-gray-900 dark:text-white">
-            SchoolSaaS
-          </h1>
-          <p className="text-lg mt-2 text-gray-500 dark:text-gray-400">
-            Multi-Tenant School Management Platform
-          </p>
-          <div className="flex items-center justify-center gap-2 mt-3">
-            <span className="inline-flex items-center gap-1 text-xs font-semibold bg-rose-50 text-rose-700 border border-rose-200 dark:bg-rose-950/50 dark:text-rose-300 dark:border-rose-800/50 px-3 py-1 rounded-full">
-              SaaS Platform
-            </span>
-            <span className="inline-flex items-center gap-1 text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200 dark:bg-emerald-950/50 dark:text-emerald-300 dark:border-emerald-800/50 px-3 py-1 rounded-full">
-              Multi-School
-            </span>
+  return (
+    <div className="h-[100dvh] flex flex-col md:flex-row font-sans w-full overflow-hidden bg-background text-foreground transition-all duration-500 p-4 md:p-6">
+      
+      {/* Theme Toggle */}
+      <Button
+        variant="ghost"
+        size="icon"
+        className="absolute top-10 right-10 h-10 w-10 md:h-11 md:w-11 rounded-xl bg-muted hover:bg-muted/80 z-50 group border border-border"
+        onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+        aria-label="Toggle theme"
+      >
+        <Moon className="h-4 w-4 block dark:hidden transition-transform group-hover:rotate-12" />
+        <Sun className="h-4 w-4 hidden dark:block transition-transform group-hover:rotate-90" />
+      </Button>
+
+      {/* Left Column: Hero Image (Curved Corners / Image Left) */}
+      <section className="hidden md:block flex-[1.1] lg:flex-[1.3] relative h-full">
+         <div 
+          className="w-full h-full bg-cover bg-center rounded-[2.5rem] overflow-hidden border border-border/40 shadow-xl" 
+          style={{ backgroundImage: `url(${heroImageSrc})` }}
+        >
+          <div className="absolute inset-0 bg-rose-600/5 dark:bg-black/30" />
+          
+          <div className="absolute inset-0 flex flex-col justify-end p-10 bg-gradient-to-t from-black/60 via-transparent to-transparent">
+             <div className="max-w-md">
+                <div className="p-2.5 bg-rose-600 rounded-xl w-fit mb-4 shadow-lg">
+                    <Building2 className="w-6 h-6 text-white" />
+                </div>
+                <h2 className="text-3xl font-extrabold text-white tracking-tight leading-tight">
+                  Modern School Hub.
+                </h2>
+                <p className="text-rose-100/80 mt-2 text-base font-medium">
+                   Access your central management portal.
+                </p>
+             </div>
           </div>
         </div>
+      </section>
 
-        <Card className="shadow-2xl border-0 bg-white/80 backdrop-blur-xl dark:bg-gray-900/80 dark:border dark:border-white/10 animate-in fade-in slide-in-from-bottom-6 duration-700 delay-200">
-          <CardHeader className="text-center pb-2">
-            <div className="mx-auto w-14 h-14 rounded-2xl bg-indigo-500/10 flex items-center justify-center mb-4 border border-indigo-500/20">
-              <Mail className="h-7 w-7 text-indigo-600 dark:text-indigo-400" />
+      {/* Right Column: Login Form (Medium Size / Static) */}
+      <section className="flex-1 flex items-center justify-center p-6 lg:p-12 overflow-y-auto">
+        <div className="w-full max-w-[440px]">
+          <div className="flex flex-col gap-10">
+            
+            <div className="space-y-2 text-center md:text-left">
+              <h1 className="text-5xl font-black tracking-tighter text-foreground leading-tight">
+                Welcome
+              </h1>
+              <p className="text-muted-foreground font-medium text-base whitespace-nowrap overflow-hidden text-ellipsis">
+                Access your account and continue your journey with us
+              </p>
             </div>
-            <CardTitle className="text-2xl font-bold text-gray-900 dark:text-white">
-              Login to your account
-            </CardTitle>
-            <CardDescription className="text-gray-500 dark:text-gray-400">
-              Enter your credentials to access your dashboard
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="pt-4">
-            <form onSubmit={handleLogin} className="space-y-5">
-              <div className="space-y-2">
-                <Label
-                  htmlFor="login-email"
-                  className="text-sm font-semibold pl-1 text-gray-700 dark:text-gray-300"
-                >
+
+            <form onSubmit={handleLogin} className="space-y-6">
+              <div className="space-y-3">
+                <Label htmlFor="login-email" className="text-sm font-bold text-foreground/80 pl-0.5 uppercase tracking-widest text-[11px]">
                   Email or Mobile Number
                 </Label>
                 <div className="relative group">
-                  <div className="absolute left-3.5 top-1/2 -translate-y-1/2 flex items-center gap-1 text-gray-400 group-focus-within:text-rose-500 transition-colors">
-                    <Mail className="h-4 w-4" />
-                    <span className="text-xs">/</span>
-                    <School className="h-4 w-4" />
+                  <div className="absolute left-4 top-1/2 -translate-y-1/2 flex items-center text-muted-foreground group-focus-within:text-rose-600 transition-colors">
+                    <Mail className="w-5 h-5" />
+                    <span className="mx-2 text-border select-none opacity-40">|</span>
+                    <Phone className="w-5 h-5" />
                   </div>
-                  <Input
+                  <input 
                     id="login-email"
-                    type="text"
-                    placeholder="Email or Mobile"
+                    type="text" 
+                    placeholder="e.g. name@school.com or +123" 
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    className="bg-gray-50/50 dark:bg-gray-950/50 dark:border-gray-800 dark:text-gray-100 pl-16 h-12 rounded-xl focus:ring-rose-500/20 focus:border-rose-500 transition-all"
-                    autoComplete="username"
-                    required
+                    className="w-full bg-muted/40 border border-border h-14 pl-24 pr-4 rounded-xl focus:outline-none focus:ring-1 focus:ring-rose-500/30 focus:border-rose-500 transition-all font-semibold text-[13px]"
+                    required 
                   />
                 </div>
               </div>
 
-              <div className="space-y-2">
-                <div className="flex items-center justify-between px-1">
-                  <Label
-                    htmlFor="login-password"
-                    className="text-sm font-semibold text-gray-700 dark:text-gray-300"
-                  >
-                    Password
-                  </Label>
-                  <button
-                    type="button"
-                    onClick={() => (window.location.href = "/reset-password")}
-                    className="text-xs font-bold text-rose-500 hover:text-rose-600 dark:text-rose-400 dark:hover:text-rose-300 transition-colors"
-                  >
-                    Forgot password?
-                  </button>
-                </div>
+              <div className="space-y-3">
+                <Label htmlFor="login-password" title="Password" className="text-sm font-bold text-foreground/80 pl-0.5 uppercase tracking-widest text-[11px]" />
                 <div className="relative group">
-                  <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400 group-focus-within:text-rose-500 transition-colors" />
-                  <Input
+                  <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground group-focus-within:text-rose-600 transition-colors" />
+                  <input 
                     id="login-password"
-                    type={showPassword ? "text" : "password"}
-                    placeholder="••••••••"
+                    type={showPassword ? 'text' : 'password'}
+                    placeholder="Enter your password" 
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className="bg-gray-50/50 dark:bg-gray-950/50 dark:border-gray-800 dark:text-gray-100 pl-11 pr-11 h-12 rounded-xl focus:ring-rose-500/20 focus:border-rose-500 transition-all"
-                    autoComplete="current-password"
-                    required
+                    className="w-full bg-muted/40 border border-border h-14 pl-12 pr-12 rounded-xl focus:outline-none focus:ring-1 focus:ring-rose-500/30 focus:border-rose-500 transition-all font-semibold text-[13px]"
+                    required 
                   />
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-rose-500 transition-colors"
+                  <button 
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-rose-600 transition-colors"
                   >
-                    {showPassword ? (
-                      <EyeOff className="h-4 w-4" />
-                    ) : (
-                      <Eye className="h-4 w-4" />
-                    )}
+                    {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                   </button>
                 </div>
               </div>
 
-              <Button
-                type="submit"
+              <div className="flex items-center justify-between px-0.5 text-xs font-bold">
+                 <label className="flex items-center gap-2 cursor-pointer group">
+                  <input type="checkbox" className="h-5 w-5 rounded border-border bg-muted checked:bg-rose-600 transition-all cursor-pointer" />
+                  <span className="text-muted-foreground group-hover:text-foreground">Keep me signed in</span>
+                </label>
+                <button
+                    type="button"
+                    onClick={() => router.push("/reset-password")}
+                    className="text-rose-600 hover:text-rose-700 transition-colors text-right font-black"
+                  >
+                    Reset password
+                  </button>
+              </div>
+
+              <Button 
+                type="submit" 
                 disabled={loading}
-                className="w-full bg-slate-900 hover:bg-slate-800 dark:bg-rose-600 dark:hover:bg-rose-700 text-white h-12 text-base font-bold rounded-xl shadow-lg shadow-rose-500/10 transition-all active:scale-[0.98]"
+                className="w-full h-14 bg-rose-600 hover:bg-rose-700 text-white font-black text-lg rounded-xl shadow-md shadow-rose-500/10 flex items-center justify-center gap-2 transition-all active:scale-[0.98]"
               >
-                {loading ? (
-                  <>
-                    <Loader2 className="h-5 w-5 mr-2 animate-spin" />
-                    Authenticating...
-                  </>
-                ) : (
-                  "Sign In"
+                {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : (
+                    <>
+                        Sign In
+                    </>
                 )}
               </Button>
-
             </form>
-          </CardContent>
-        </Card>
 
-        <p className="text-center text-xs mt-8 text-gray-400 dark:text-gray-600 font-medium">
-          &copy; {new Date().getFullYear()} SchoolSaaS Platform. Secure
-          Multi-Tenant Architecture.
-        </p>
-      </div>
+            <div className="pt-8 text-center border-t border-border/50">
+               <p className="text-sm text-muted-foreground font-medium">
+                    Don't have an account? <span className="text-rose-600 font-bold cursor-pointer hover:underline underline-offset-4 decoration-2">Contact your school administrator.</span>
+                </p>
+                <p className="mt-8 text-[9px] font-bold text-[#888888] uppercase tracking-[0.2em] opacity-60">
+                   &copy; {new Date().getFullYear()} SchoolSaaS Infrastructure
+                </p>
+            </div>
+          </div>
+        </div>
+      </section>
     </div>
   );
 }

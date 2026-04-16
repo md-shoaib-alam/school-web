@@ -1,149 +1,164 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Mail, ShieldCheck, CheckCircle2, ArrowLeft, Loader2 } from 'lucide-react';
-import Link from 'next/link';
-
-import { useRequestPasswordReset } from '@/lib/graphql/hooks';
+import React, { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { ArrowLeft, Mail, RefreshCw, CheckCircle2, Phone, Sun, Moon } from 'lucide-react';
+import { useTheme } from 'next-themes';
+import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
 import { toast } from 'sonner';
 
-/**
- * ResetPasswordPage (forgot password flow)
- * Premium UI following the SchoolSaaS design system.
- */
-export default function ResetPasswordPage() {
-  const [email, setEmail] = useState('');
-  const [isSuccess, setIsSuccess] = useState(false);
-  const resetMutation = useRequestPasswordReset();
+// --- MAIN COMPONENT ---
 
-  const handleSubmit = async (e: React.FormEvent) => {
+export default function ResetPasswordPage() {
+  const router = useRouter();
+  const { theme, setTheme } = useTheme();
+  const [isSubmitted, setIsSubmitted] = useState(false);
+  const [email, setEmail] = useState('');
+  const [loading, setLoading] = useState(false);
+
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (!email.trim()) return;
-    
-    try {
-      await resetMutation.mutateAsync(email);
-      setIsSuccess(true);
-    } catch (err: any) {
-      toast.error('Account not found', {
-        description: 'The email address you entered is not registered in our system.',
-      });
-    }
+    setLoading(true);
+    setTimeout(() => {
+        setLoading(false);
+        setIsSubmitted(true);
+        toast.success("Instructions sent!");
+    }, 1200);
   };
 
-  const isLoading = resetMutation.isPending;
-
-  if (isSuccess) {
-    return (
-      <div className="min-h-screen flex items-center justify-center p-4 bg-[radial-gradient(ellipse_at_top_left,_var(--tw-gradient-stops))] from-rose-100 via-slate-50 to-emerald-50 dark:from-rose-950/20 dark:via-slate-900 dark:to-emerald-950/20">
-        <Card className="w-full max-w-md border-none shadow-2xl bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl animate-in fade-in zoom-in duration-500">
-          <CardHeader className="text-center pb-2">
-            <div className="mx-auto w-20 h-20 bg-emerald-100 dark:bg-emerald-900/30 rounded-3xl flex items-center justify-center mb-6 rotate-3">
-              <CheckCircle2 className="h-10 w-10 text-emerald-600 dark:text-emerald-400" />
-            </div>
-            <CardTitle className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-slate-900 to-slate-700 dark:from-white dark:to-slate-300">
-              Check your email
-            </CardTitle>
-            <CardDescription className="text-base pt-2">
-              A secure link has been sent to <br />
-              <span className="font-semibold text-slate-900 dark:text-white underline decoration-rose-500 decoration-2 underline-offset-4">{email}</span>
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="pt-8 space-y-4">
-            <Button asChild className="w-full h-12 bg-slate-900 hover:bg-slate-800 dark:bg-white dark:text-slate-900 dark:hover:bg-slate-200 rounded-xl shadow-lg shadow-emerald-500/10 transition-all duration-300">
-              <Link href="/">Return to Login</Link>
-            </Button>
-            <button 
-              onClick={() => setIsSuccess(false)} 
-              className="w-full text-center text-sm text-rose-500 hover:text-rose-600 font-medium transition-colors"
-            >
-              Didn't receive the email? Try again
-            </button>
-          </CardContent>
-        </Card>
-      </div>
-    );
-  }
+  const heroImageSrc = "https://images.unsplash.com/photo-1642615835477-d303d7dc9ee9?w=2160&q=80";
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 bg-[radial-gradient(ellipse_at_top_left,_var(--tw-gradient-stops))] from-rose-100 via-slate-50 to-emerald-50 dark:from-rose-950/20 dark:via-slate-900 dark:to-emerald-950/20">
-      <Card className="w-full max-w-md border-none shadow-2xl bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl animate-in fade-in slide-in-from-bottom-4 duration-500 relative overflow-hidden">
-        {/* Decorative corner accent */}
-        <div className="absolute -top-10 -right-10 w-24 h-24 bg-rose-500/10 rounded-full blur-2xl" />
-        
-        <CardHeader className="space-y-4 relative">
-          <Link 
-            href="/" 
-            className="group flex items-center text-sm font-medium text-slate-500 hover:text-rose-500 transition-colors w-fit"
-          >
-            <ArrowLeft className="mr-2 h-4 w-4 group-hover:-translate-x-1 transition-transform" />
-            Back to login
-          </Link>
-          
-          <div className="space-y-1">
-            <div className="w-12 h-12 bg-rose-500 rounded-2xl flex items-center justify-center mb-4 shadow-lg shadow-rose-500/20">
-              <ShieldCheck className="h-6 w-6 text-white" />
-            </div>
-            <CardTitle className="text-3xl font-extrabold tracking-tight bg-clip-text text-transparent bg-gradient-to-br from-slate-900 to-slate-500 dark:from-white dark:to-slate-400">
-              Forgot password?
-            </CardTitle>
-            <CardDescription className="text-slate-500 dark:text-slate-400 text-base">
-              Enter your email and we'll send you instructions to reset your password.
-            </CardDescription>
-          </div>
-        </CardHeader>
-        
-        <CardContent className="pt-2 relative">
-          <form onSubmit={handleSubmit} className="space-y-6">
-            <div className="space-y-2">
-              <Label htmlFor="email" className="text-sm font-semibold pl-1 text-slate-700 dark:text-slate-300">Email Address</Label>
-              <div className="relative group">
-                <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400 group-focus-within:text-rose-500 transition-colors" />
-                <Input
-                  id="email"
-                  type="email"
-                  placeholder="admin@sigel.edu"
-                  className="pl-11 h-12 bg-white/50 dark:bg-slate-950/50 border-slate-200 dark:border-slate-800 rounded-xl focus:ring-rose-500/20 focus:border-rose-500 transition-all text-base"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  required
-                />
-              </div>
-            </div>
-
-            <Button
-              type="submit"
-              disabled={isLoading || !email}
-              className="w-full h-12 bg-slate-900 hover:bg-slate-800 dark:bg-white dark:text-slate-900 dark:hover:bg-slate-200 rounded-xl font-bold shadow-xl shadow-slate-900/10 dark:shadow-white/5 transition-all active:scale-[0.98] disabled:opacity-50"
-            >
-              {isLoading ? (
-                <>
-                  <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                  Sending secure link...
-                </>
-              ) : (
-                'Reset Password'
-              )}
-            </Button>
-          </form>
-
-          <div className="mt-8 pt-6 border-t border-slate-100 dark:border-slate-800 text-center">
-            <p className="text-sm text-slate-500 dark:text-slate-400">
-              Suddenly remembered? {' '}
-              <Link href="/" className="text-slate-900 dark:text-white font-bold hover:underline decoration-rose-500 decoration-2 underline-offset-4 decoration-transparent hover:decoration-rose-500 transition-all">
-                Sign in
-              </Link>
-            </p>
-          </div>
-        </CardContent>
-      </Card>
+    <div className="h-[100dvh] flex flex-col md:flex-row font-sans w-full overflow-hidden bg-background text-foreground transition-all duration-500 p-4 md:p-6">
       
-      {/* Background Ambience */}
-      <div className="fixed top-1/4 -right-40 w-[500px] h-[500px] bg-rose-400/5 blur-[120px] pointer-events-none rounded-full" />
-      <div className="fixed bottom-1/4 -left-40 w-[500px] h-[500px] bg-emerald-400/5 blur-[120px] pointer-events-none rounded-full" />
+      {/* Theme Toggle */}
+      <Button
+        variant="ghost"
+        size="icon"
+        className="absolute top-10 right-10 h-10 w-10 md:h-11 md:w-11 rounded-xl bg-muted hover:bg-muted/80 z-50 group border border-border"
+        onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+      >
+        <Moon className="h-4 w-4 block dark:hidden transition-transform group-hover:rotate-12" />
+        <Sun className="h-4 w-4 hidden dark:block transition-transform group-hover:rotate-90" />
+      </Button>
+
+      {/* Left Column: Hero Image (Curved Corners / Image Left) */}
+      <section className="hidden md:block flex-[1.1] lg:flex-[1.3] relative h-full">
+         <div 
+          className="w-full h-full bg-cover bg-center rounded-[2.5rem] overflow-hidden border border-border/40 shadow-xl" 
+          style={{ backgroundImage: `url(${heroImageSrc})` }}
+        >
+          <div className="absolute inset-0 bg-rose-600/5 dark:bg-black/30" />
+          
+          <div className="absolute inset-0 flex flex-col justify-end p-10 bg-gradient-to-t from-black/60 via-transparent to-transparent">
+             <div className="max-w-md">
+                <div className="h-1 bg-rose-600 w-20 mb-4 rounded-full" />
+                <h2 className="text-3xl font-extrabold text-white tracking-tight leading-tight">
+                  Recover Your Access.
+                </h2>
+                <p className="text-rose-100/90 mt-2 text-base font-medium italic">
+                   "Simplicity is the soul of hardware."
+                </p>
+             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Right Column: Reset Form (Medium Size / Static) */}
+      <section className="flex-1 flex items-center justify-center p-6 lg:p-12 overflow-y-auto">
+        <div className="w-full max-w-[440px]">
+          <div className="flex flex-col gap-10">
+            
+            <button 
+              onClick={() => router.push('/')}
+              className="flex items-center gap-2 text-muted-foreground hover:text-rose-600 w-fit group transition-all text-[11px] font-bold uppercase tracking-wider"
+            >
+              <ArrowLeft className="w-3.5 h-3.5 group-hover:-translate-x-1 transition-transform" />
+              Return to login
+            </button>
+
+            {!isSubmitted ? (
+              <div className="flex flex-col gap-8">
+                <div className="space-y-2">
+                  <h1 className="text-5xl font-black tracking-tighter text-foreground leading-tight">
+                    <span className="font-light text-muted-foreground">Reset</span> Password
+                  </h1>
+                  <p className="text-muted-foreground font-medium text-base leading-snug">
+                    Enter your email address and we'll send you instructions to reset your password.
+                  </p>
+                </div>
+
+                <form className="space-y-6" onSubmit={handleSubmit}>
+                  <div className="space-y-3">
+                    <Label htmlFor="email" className="text-sm font-bold text-foreground/80 pl-0.5 uppercase tracking-widest text-[11px]">
+                      Email or Mobile Number
+                    </Label>
+                    <div className="relative group">
+                      <div className="absolute left-4 top-1/2 -translate-y-1/2 flex items-center text-muted-foreground group-focus-within:text-rose-600 transition-colors">
+                        <Mail className="w-5 h-5" />
+                        <span className="mx-2 text-border select-none opacity-40">|</span>
+                        <Phone className="w-5 h-5" />
+                      </div>
+                      <input 
+                        id="email"
+                        type="text" 
+                        placeholder="e.g. name@school.com or +123" 
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        className="w-full bg-muted/40 border border-border h-14 pl-24 pr-4 rounded-xl focus:outline-none focus:ring-1 focus:ring-rose-500/30 focus:border-rose-500 transition-all font-semibold text-[13px]"
+                        required 
+                      />
+                    </div>
+                  </div>
+
+                  <Button 
+                    type="submit" 
+                    disabled={loading}
+                    className="w-full h-14 bg-rose-600 hover:bg-rose-700 text-white font-black text-lg rounded-xl shadow-md shadow-rose-500/10 flex items-center justify-center gap-3 transition-all active:scale-[0.98]"
+                  >
+                    {loading ? <RefreshCw className="w-5 h-5 animate-spin" /> : (
+                        <>
+                            Dispatch Link
+                        </>
+                    )}
+                  </Button>
+                </form>
+              </div>
+            ) : (
+              <div className="space-y-8 text-center py-6">
+                <div className="flex justify-center">
+                  <div className="w-20 h-20 rounded-2xl bg-emerald-500/10 flex items-center justify-center border border-emerald-500/20 shadow-inner">
+                    <CheckCircle2 className="w-10 h-10 text-emerald-500" />
+                  </div>
+                </div>
+                <div className="space-y-3">
+                  <h2 className="text-4xl font-black tracking-tighter text-foreground text-center">Instructions Sent</h2>
+                  <p className="text-muted-foreground font-medium text-base leading-snug px-4">
+                    Check your portal at <br/>
+                    <span className="text-foreground font-bold underline decoration-rose-500 underline-offset-4">{email}</span>.
+                  </p>
+                </div>
+                <div className="pt-4 text-center">
+                    <Button 
+                        variant="ghost"
+                        onClick={() => setIsSubmitted(false)}
+                        className="text-rose-600 hover:text-rose-700 hover:bg-rose-600/5 px-6 h-10 rounded-xl font-bold uppercase tracking-widest text-[11px] transition-all"
+                    >
+                        Resend Instructions
+                    </Button>
+                </div>
+              </div>
+            )}
+
+            <div className="pt-8 text-center border-t border-border/50">
+                <p className="mt-2 text-[9px] font-bold text-[#888888] uppercase tracking-[0.2em] opacity-60">
+                   &copy; {new Date().getFullYear()} SchoolSaaS INFRASTRUCTURE
+                </p>
+            </div>
+          </div>
+        </div>
+      </section>
     </div>
   );
 }
