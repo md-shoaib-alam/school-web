@@ -5,6 +5,8 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { persistQueryClient } from "@tanstack/react-query-persist-client";
 import { createSyncStoragePersister } from "@tanstack/query-sync-storage-persister";
 import { ThemeProvider } from "next-themes";
+import { GooeyToaster } from "goey-toast";
+import "goey-toast/styles.css";
 
 export function Providers({ children }: { children: React.ReactNode }) {
   const [queryClient] = useState(
@@ -52,6 +54,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
     >
       <QueryClientProvider client={queryClient}>
         {children}
+        <GooeyToaster richColors position="top-center" closeButton />
       </QueryClientProvider>
     </ThemeProvider>
   );

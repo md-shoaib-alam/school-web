@@ -7,7 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useAppStore } from "@/store/use-app-store";
 import { useTeacherDashboard } from "@/lib/graphql/hooks";
-import { toast } from "sonner";
+import { goeyToast as toast } from "goey-toast";
 import {
   School,
   Users,

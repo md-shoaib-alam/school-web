@@ -204,6 +204,46 @@ const STUDENT_DASHBOARD = `
   }
 `
 
+const DASHBOARD_SUMMARY = `
+  query DashboardSummary($tenantId: String!) {
+    dashboardSummary(tenantId: $tenantId) {
+      totalStudents totalTeachers totalClasses totalParents attendanceRate upcomingEvents
+    }
+  }
+`
+
+const DASHBOARD_ATTENDANCE = `
+  query DashboardAttendance($tenantId: String!) {
+    dashboardAttendance(tenantId: $tenantId) { month rate }
+  }
+`
+
+const DASHBOARD_ACADEMIC = `
+  query DashboardAcademic($tenantId: String!) {
+    dashboardAcademic(tenantId: $tenantId) {
+      classDistribution { name students }
+      gradeDistribution { grade count }
+    }
+  }
+`
+
+const DASHBOARD_FINANCIAL = `
+  query DashboardFinancial($tenantId: String!) {
+    dashboardFinancial(tenantId: $tenantId) {
+      totalRevenue pendingFees
+      feeByType { type collected pending }
+    }
+  }
+`
+
+const DASHBOARD_NOTICES = `
+  query DashboardNotices($tenantId: String!) {
+    dashboardNotices(tenantId: $tenantId) {
+      id title content authorName priority createdAt targetRole
+    }
+  }
+`
+
 const PARENT_DASHBOARD = `
   query ParentDashboard($parentName: String!) {
     parentDashboard(parentName: $parentName) {
@@ -380,7 +420,6 @@ export const queryKeys = {
   tenants: (filters?: Record<string, unknown>) => ['tenants', filters] as const,
   users: (filters?: Record<string, unknown>) => ['users', filters] as const,
   auditLogs: (filters?: Record<string, unknown>) => ['auditLogs', filters] as const,
-  adminDashboard: (tenantId: string) => ['admin', 'dashboard', tenantId] as const,
   teacherDashboard: (name: string) => ['teacher', 'dashboard', name] as const,
   studentDashboard: (email?: string) => ['student', 'dashboard', email] as const,
   parentDashboard: (name: string) => ['parent', 'dashboard', name] as const,
@@ -395,6 +434,11 @@ export const queryKeys = {
   attendance: ['attendance'] as const,
   staff: ['staff'] as const,
   subscriptions: ['subscriptions'] as const,
+  dashboardSummary: (tenantId: string) => ['admin', 'dashboard', 'summary', tenantId] as const,
+  dashboardAttendance: (tenantId: string) => ['admin', 'dashboard', 'attendance', tenantId] as const,
+  dashboardAcademic: (tenantId: string) => ['admin', 'dashboard', 'academic', tenantId] as const,
+  dashboardFinancial: (tenantId: string) => ['admin', 'dashboard', 'financial', tenantId] as const,
+  dashboardNotices: (tenantId: string) => ['admin', 'dashboard', 'notices', tenantId] as const,
 }
 
 // ── Super Admin Hooks ──
@@ -502,13 +546,47 @@ export function useDeleteSubject() {
   })
 }
 
-export function useAdminDashboard(tenantId: string) {
+export function useDashboardSummary(tenantId: string) {
   return useQuery({
-    queryKey: queryKeys.adminDashboard(tenantId),
-    queryFn: () => graphqlQuery<{ adminDashboard: AdminDashboardData }>(ADMIN_DASHBOARD, { tenantId })
-      .then(d => d.adminDashboard),
-    staleTime: 2 * 60 * 1000, // 2 minutes
-    refetchInterval: 5 * 60 * 1000,
+    queryKey: queryKeys.dashboardSummary(tenantId),
+    queryFn: () => graphqlQuery<{ dashboardSummary: any }>(DASHBOARD_SUMMARY, { tenantId }).then(d => d.dashboardSummary),
+    staleTime: 2 * 60 * 1000,
+    enabled: !!tenantId,
+  })
+}
+
+export function useDashboardAttendance(tenantId: string) {
+  return useQuery({
+    queryKey: queryKeys.dashboardAttendance(tenantId),
+    queryFn: () => graphqlQuery<{ dashboardAttendance: any[] }>(DASHBOARD_ATTENDANCE, { tenantId }).then(d => d.dashboardAttendance),
+    staleTime: 5 * 60 * 1000,
+    enabled: !!tenantId,
+  })
+}
+
+export function useDashboardAcademic(tenantId: string) {
+  return useQuery({
+    queryKey: queryKeys.dashboardAcademic(tenantId),
+    queryFn: () => graphqlQuery<{ dashboardAcademic: any }>(DASHBOARD_ACADEMIC, { tenantId }).then(d => d.dashboardAcademic),
+    staleTime: 5 * 60 * 1000,
+    enabled: !!tenantId,
+  })
+}
+
+export function useDashboardFinancial(tenantId: string) {
+  return useQuery({
+    queryKey: queryKeys.dashboardFinancial(tenantId),
+    queryFn: () => graphqlQuery<{ dashboardFinancial: any }>(DASHBOARD_FINANCIAL, { tenantId }).then(d => d.dashboardFinancial),
+    staleTime: 5 * 60 * 1000,
+    enabled: !!tenantId,
+  })
+}
+
+export function useDashboardNotices(tenantId: string) {
+  return useQuery({
+    queryKey: queryKeys.dashboardNotices(tenantId),
+    queryFn: () => graphqlQuery<{ dashboardNotices: any[] }>(DASHBOARD_NOTICES, { tenantId }).then(d => d.dashboardNotices),
+    staleTime: 2 * 60 * 1000,
     enabled: !!tenantId,
   })
 }

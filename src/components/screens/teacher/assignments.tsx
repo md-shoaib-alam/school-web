@@ -44,7 +44,7 @@ import {
   Star,
   MessageSquare,
 } from "lucide-react";
-import { toast } from "sonner";
+import { goeyToast as toast } from "goey-toast";
 
 interface Assignment {
   id: string;

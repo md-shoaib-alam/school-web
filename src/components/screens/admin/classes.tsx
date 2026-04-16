@@ -46,7 +46,7 @@ import {
   Loader2,
   Eye,
 } from "lucide-react";
-import { toast } from "sonner";
+import { goeyToast as toast } from "goey-toast";
 import type { ClassInfo } from "@/lib/types";
 import { useModulePermissions } from "@/hooks/use-permissions";
 import { useClasses, useTeachersMin } from "@/lib/graphql/hooks";
@@ -94,8 +94,7 @@ export function AdminClasses() {
   const [deleting, setDeleting] = useState(false);
 
   const handleAddClass = async () => {
-    setSubmitting(true);
-    try {
+    const promise = (async () => {
       const res = await apiFetch("/api/classes", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -104,21 +103,34 @@ export function AdminClasses() {
           capacity: parseInt(formData.capacity),
         }),
       });
-      if (!res.ok) throw new Error("Failed to add class");
-      toast.success("Class created successfully!");
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.error || "Failed to add class");
+      }
+      return res.json();
+    })();
+
+    toast.promise(promise, {
+      loading: "Creating new class...",
+      success: "Class created successfully!",
+      error: (err: any) => err.message,
+    });
+
+    setSubmitting(true);
+    try {
+      await promise;
       setAddDialogOpen(false);
       setFormData({ name: "", section: "", grade: "", capacity: "40" });
       await refetchClasses();
-    } catch {
-      toast.error("Failed to create class");
+    } catch (err) {
+      // Error handled by toast.promise
     } finally {
       setSubmitting(false);
     }
   };
 
   const handleEditClass = async () => {
-    setEditing(true);
-    try {
+    const promise = (async () => {
       const res = await apiFetch("/api/classes", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
@@ -127,12 +139,26 @@ export function AdminClasses() {
           capacity: parseInt(editData.capacity),
         }),
       });
-      if (!res.ok) throw new Error("Failed to update class");
-      toast.success("Class updated successfully!");
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.error || "Failed to update class");
+      }
+      return res.json();
+    })();
+
+    toast.promise(promise, {
+      loading: "Updating class details...",
+      success: "Class updated successfully!",
+      error: (err: any) => err.message,
+    });
+
+    setEditing(true);
+    try {
+      await promise;
       setEditDialogOpen(false);
       await refetchClasses();
-    } catch {
-      toast.error("Failed to update class");
+    } catch (err) {
+      // Error handled by toast.promise
     } finally {
       setEditing(false);
     }
@@ -151,18 +177,32 @@ export function AdminClasses() {
 
   const handleDeleteClass = async () => {
     if (!deleteTarget) return;
-    setDeleting(true);
-    try {
+
+    const promise = (async () => {
       const res = await apiFetch(`/api/classes?id=${deleteTarget.id}`, {
         method: "DELETE",
       });
-      if (!res.ok) throw new Error("Failed to delete class");
-      toast.success("Class deleted successfully!");
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.error || "Failed to delete class");
+      }
+      return res.json();
+    })();
+
+    toast.promise(promise, {
+      loading: "Deleting class...",
+      success: "Class deleted successfully",
+      error: (err: any) => err.message,
+    });
+
+    setDeleting(true);
+    try {
+      await promise;
       setDeleteDialogOpen(false);
       setDeleteTarget(null);
       await refetchClasses();
-    } catch {
-      toast.error("Failed to delete class");
+    } catch (err) {
+      // Error handled by toast.promise
     } finally {
       setDeleting(false);
     }

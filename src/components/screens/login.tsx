@@ -18,7 +18,7 @@ import {
   ArrowRight,
   Phone,
 } from "lucide-react";
-import { toast } from "sonner";
+import { goeyToast as toast } from "goey-toast";
 import { loginWithElysia } from "@/lib/api";
 
 export function LoginScreen() {
@@ -40,30 +40,37 @@ export function LoginScreen() {
 
     setLoading(true);
     try {
+      // Direct login via Elysia backend — no NextAuth needed
       const data = await loginWithElysia(email.trim(), password.trim());
+
       const userData = data.user;
       const token = data.token;
 
-      if (token) localStorage.setItem("school_token", token);
+      // Save token for GraphQL & mobile-ready Auth
+      if (token) {
+        localStorage.setItem("school_token", token);
+      }
 
-      login({
-        id: userData.id,
-        name: userData.name,
-        email: userData.email,
-        role: userData.role as UserRole,
-        avatar: userData.avatar,
-        tenantId: userData.tenantId,
-        tenantSlug: userData.tenantSlug,
-        tenantName: userData.tenantName,
-        customRole: userData.customRole || null,
-      });
+        login({
+          id: userData.id,
+          name: userData.name,
+          email: userData.email,
+          role: userData.role as UserRole,
+          avatar: userData.avatar,
+          tenantId: userData.tenantId,
+          tenantSlug: userData.tenantSlug,
+          tenantName: userData.tenantName,
+          customRole: userData.customRole || null,
+        });
 
+      // Navigate using the proper Next.js router
       const dashboardUrl = userData.tenantSlug 
         ? `/${userData.tenantSlug}` 
         : userData.tenantId 
           ? `/${userData.tenantId}` 
           : "/";
       router.push(dashboardUrl);
+
       toast.success(`Welcome back, ${userData.name}!`);
     } catch (err: any) {
       toast.error(err.message || "Invalid email or password");

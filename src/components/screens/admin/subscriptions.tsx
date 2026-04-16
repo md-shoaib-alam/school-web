@@ -118,7 +118,7 @@ import {
   ChartTooltipContent,
 } from "@/components/ui/chart";
 import type { ChartConfig } from "@/components/ui/chart";
-import { toast } from "sonner";
+import { goeyToast as toast } from "goey-toast";
 
 // ── Types ──
 interface SubscriptionRecord {

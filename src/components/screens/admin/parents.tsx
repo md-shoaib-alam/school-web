@@ -62,7 +62,7 @@ import {
   ChevronRight,
   Pencil,
 } from "lucide-react";
-import { toast } from "sonner";
+import { goeyToast as toast } from "goey-toast";
 import { useParents, useStudents, useClasses } from "@/lib/graphql/hooks";
 import { useQueryClient } from "@tanstack/react-query";
 import { useAppStore } from "@/store/use-app-store";

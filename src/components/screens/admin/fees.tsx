@@ -64,7 +64,7 @@ import {
   School,
 } from "lucide-react";
 import type { FeeRecord } from "@/lib/types";
-import { toast } from "sonner";
+import { goeyToast as toast } from "goey-toast";
 import { useModulePermissions } from "@/hooks/use-permissions";
 import { useQueryClient } from "@tanstack/react-query";
 import { useFees, useStudents, useClasses } from "@/lib/graphql/hooks";

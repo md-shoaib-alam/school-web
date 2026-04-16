@@ -4,7 +4,7 @@
 import { apiFetch } from "@/lib/api";
 import { useState, useEffect, useMemo, useRef, useCallback } from "react";
 import { useQueryClient } from "@tanstack/react-query";
-import { toast } from "sonner";
+import { goeyToast as toast } from "goey-toast";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";

@@ -3,7 +3,7 @@
 import { useEffect } from "react";
 import { useAppStore } from "@/store/use-app-store";
 import { useParentDashboard } from "@/lib/graphql/hooks";
-import { toast } from "sonner";
+import { goeyToast as toast } from "goey-toast";
 import {
   Card,
   CardContent,
