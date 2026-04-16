@@ -122,7 +122,11 @@ function truncateJson(jsonStr: string, maxLen: number = 60): string {
 }
 
 function formatTimestamp(dateStr: string): string {
-  const date = new Date(dateStr);
+  if (!dateStr) return "—";
+  const num = Number(dateStr);
+  const date = !isNaN(num) && dateStr.length > 10 ? new Date(num) : new Date(dateStr);
+
+  if (isNaN(date.getTime())) return dateStr;
   return date.toLocaleString("en-US", {
     month: "short",
     day: "numeric",
@@ -357,7 +361,7 @@ export function SuperAdminAuditLogs() {
                         return (
                           <TableRow
                             key={log.id}
-                            className="hover:bg-gray-50 dark:hover:bg-gray-800 dark:bg-gray-900/50 transition-colors"
+                            className="hover:bg-teal-50/50 dark:hover:bg-teal-900/40 transition-colors"
                           >
                             <TableCell className="text-xs text-muted-foreground font-mono whitespace-nowrap">
                               {formatTimestamp(log.createdAt)}
