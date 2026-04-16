@@ -64,6 +64,7 @@ import {
   Shield,
   TicketCheck,
   KeyRound,
+  CalendarDays,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { hasPermission, isRootAdmin } from "@/lib/permissions";
@@ -213,6 +214,12 @@ const navItems: Record<UserRole, NavItem[]> = {
       permModule: "students",
     },
     {
+      key: "leaves",
+      label: "Leave Management",
+      icon: <CalendarDays className="h-4 w-4" />,
+      permModule: "staff",
+    },
+    {
       key: "roles",
       label: "Roles & Permissions",
       icon: <Shield className="h-4 w-4" />,
@@ -260,6 +267,11 @@ const navItems: Record<UserRole, NavItem[]> = {
       icon: <FileText className="h-4 w-4" />,
     },
     {
+      key: "leaves",
+      label: "My Leaves",
+      icon: <CalendarDays className="h-4 w-4" />,
+    },
+    {
       key: "timetable",
       label: "Timetable",
       icon: <Clock className="h-4 w-4" />,
@@ -301,6 +313,11 @@ const navItems: Record<UserRole, NavItem[]> = {
       key: "assignments",
       label: "Assignments",
       icon: <FileText className="h-4 w-4" />,
+    },
+    {
+      key: "leaves",
+      label: "My Leaves",
+      icon: <CalendarDays className="h-4 w-4" />,
     },
     {
       key: "timetable",

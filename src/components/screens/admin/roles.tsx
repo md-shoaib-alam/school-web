@@ -81,6 +81,7 @@ const PERMISSION_MODULES = [
   { key: "timetable", label: "Timetable", icon: "📅" },
   { key: "calendar", label: "Calendar", icon: "📆" },
   { key: "reports", label: "Reports", icon: "📊" },
+  { key: "leaves", label: "Leaves", icon: "📅" },
   { key: "subscriptions", label: "Subscriptions", icon: "💳" },
 ];
 

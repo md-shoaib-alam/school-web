@@ -4,7 +4,6 @@ import { useState, useEffect } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { persistQueryClient } from "@tanstack/react-query-persist-client";
 import { createSyncStoragePersister } from "@tanstack/query-sync-storage-persister";
-import { ThemeProvider } from "next-themes";
 import { GooeyToaster } from "goey-toast";
 import "goey-toast/styles.css";
 
@@ -44,18 +43,9 @@ export function Providers({ children }: { children: React.ReactNode }) {
   }, [queryClient]);
 
   return (
-    <ThemeProvider
-      attribute="class"
-      defaultTheme="light"
-      storageKey="schoolsaas-theme"
-      enableSystem={false}
-      disableTransitionOnChange
-      enableColorScheme={false}
-    >
-      <QueryClientProvider client={queryClient}>
-        {children}
-        <GooeyToaster richColors position="top-center" closeButton duration={2000} />
-      </QueryClientProvider>
-    </ThemeProvider>
+    <QueryClientProvider client={queryClient}>
+      {children}
+      <GooeyToaster richColors position="top-center" closeButton duration={2000} />
+    </QueryClientProvider>
   );
 }
