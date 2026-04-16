@@ -84,6 +84,7 @@ export function AdminSubjects() {
   const teachers = teachersData?.teachers || [];
 
   const [search, setSearch] = useState("");
+  const [classFilter, setClassFilter] = useState("all");
   const [createOpen, setCreateOpen] = useState(false);
   const [form, setForm] = useState({ ...emptyForm });
 
@@ -98,14 +99,18 @@ export function AdminSubjects() {
 
   const loading = subjectsLoading || classesLoading || teachersLoading;
 
-  const filtered = subjects.filter(
-    (s: any) =>
+  const filtered = subjects.filter((s: any) => {
+    const matchesSearch =
       s.name.toLowerCase().includes(search.toLowerCase()) ||
       s.code.toLowerCase().includes(search.toLowerCase()) ||
       s.className.toLowerCase().includes(search.toLowerCase()) ||
       (s.teacherName &&
-        s.teacherName.toLowerCase().includes(search.toLowerCase())),
-  );
+        s.teacherName.toLowerCase().includes(search.toLowerCase()));
+
+    const matchesClass = classFilter === "all" || s.classId === classFilter;
+
+    return matchesSearch && matchesClass;
+  });
 
   const handleCreate = async () => {
     if (!form.name || !form.code || !form.classId) {
@@ -282,15 +287,30 @@ export function AdminSubjects() {
         </Dialog>
       </div>
 
-      {/* Search */}
-      <div className="relative max-w-sm">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-        <Input
-          placeholder="Search subjects..."
-          className="pl-9"
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-        />
+      {/* Search & Filters */}
+      <div className="flex flex-col sm:flex-row gap-3 items-center">
+        <div className="relative w-full sm:max-w-sm">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <Input
+            placeholder="Search subjects..."
+            className="pl-9"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+          />
+        </div>
+        <Select value={classFilter} onValueChange={setClassFilter}>
+          <SelectTrigger className="w-full sm:w-[200px]">
+            <SelectValue placeholder="All Classes" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All Classes</SelectItem>
+            {(classes || []).map((c: any) => (
+              <SelectItem key={c.id} value={c.id}>
+                {c.name} - {c.section}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
       </div>
 
       {/* Table */}
