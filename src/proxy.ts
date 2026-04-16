@@ -9,7 +9,7 @@ import type { NextRequest } from "next/server";
  * 1. Redirecting static asset / public paths (no-op)
  * 2. Ensuring API proxy-free routing (no /api routes exist anymore)
  */
-export function middleware(request: NextRequest) {
+export function proxy(request: NextRequest) {
   // Let everything pass through — auth is now client-side
   // The AppShell component checks the Zustand store and redirects to /login if not authenticated
   return NextResponse.next();

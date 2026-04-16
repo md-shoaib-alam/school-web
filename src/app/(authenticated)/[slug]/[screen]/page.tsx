@@ -2,47 +2,59 @@
 
 import { useParams } from 'next/navigation';
 import { useAppStore } from '@/store/use-app-store';
-import { AdminStudents } from '@/components/screens/admin/students';
-import { AdminTeachers } from '@/components/screens/admin/teachers';
-import { AdminParents } from '@/components/screens/admin/parents';
-import { AdminClasses } from '@/components/screens/admin/classes';
-import { AdminSubjects } from '@/components/screens/admin/subjects';
-import { AdminAttendance } from '@/components/screens/admin/attendance';
-import { AdminFees } from '@/components/screens/admin/fees';
-import { AdminNotices } from '@/components/screens/admin/notices';
-import { AdminTimetable } from '@/components/screens/admin/timetable';
-import { AdminCalendar } from '@/components/screens/admin/calendar';
-import { AdminReports } from '@/components/screens/admin/reports';
-import { AdminSubscriptions } from '@/components/screens/admin/subscriptions';
-import { AdminRoles } from '@/components/screens/admin/roles';
-import { AdminStaff } from '@/components/screens/admin/staff';
-import { AdminTickets } from '@/components/screens/admin/tickets';
-import { AdminSchoolSettings } from '@/components/screens/admin/school-settings';
-import { TeacherClasses } from '@/components/screens/teacher/my-classes';
-import { TeacherAttendance } from '@/components/screens/teacher/take-attendance';
-import { TeacherGrades } from '@/components/screens/teacher/grade-management';
-import { TeacherAssignments } from '@/components/screens/teacher/assignments';
-import { TeacherTimetable } from '@/components/screens/teacher/timetable';
-import { TeacherCalendar } from '@/components/screens/teacher/calendar';
-import { TeacherNotices } from '@/components/screens/teacher/notices';
-import { StudentClasses } from '@/components/screens/student/my-classes';
-import { StudentGrades } from '@/components/screens/student/my-grades';
-import { StudentAttendance } from '@/components/screens/student/my-attendance';
-import { StudentAssignments } from '@/components/screens/student/assignments';
-import { StudentTimetable } from '@/components/screens/student/timetable';
-import { StudentCalendar } from '@/components/screens/student/calendar';
-import { StudentNotices } from '@/components/screens/student/notices';
-import { StudentFees } from '@/components/screens/student/fees';
-import { StudentTickets } from '@/components/screens/student/tickets';
-import { ParentChildren } from '@/components/screens/parent/children';
-import { ParentGrades } from '@/components/screens/parent/grades';
-import { ParentAttendance } from '@/components/screens/parent/attendance';
-import { ParentFees } from '@/components/screens/parent/fees';
-import { ParentNotices } from '@/components/screens/parent/notices';
-import { ParentSubscription } from '@/components/screens/parent/subscription';
-import { ParentCalendar } from '@/components/screens/parent/calendar';
-import { ParentTimetable } from '@/components/screens/parent/timetable';
-import { NotFoundScreen } from '@/components/screens/error/not-found';
+import dynamic from 'next/dynamic';
+
+const LoadingScreen = () => (
+  <div className="flex h-full items-center justify-center p-8">
+    <div className="animate-spin h-8 w-8 border-4 border-rose-500 border-t-transparent rounded-full" />
+  </div>
+);
+
+const AdminStudents = dynamic(() => import('@/components/screens/admin/students').then(m => m.AdminStudents), { loading: LoadingScreen });
+const AdminTeachers = dynamic(() => import('@/components/screens/admin/teachers').then(m => m.AdminTeachers), { loading: LoadingScreen });
+const AdminParents = dynamic(() => import('@/components/screens/admin/parents').then(m => m.AdminParents), { loading: LoadingScreen });
+const AdminClasses = dynamic(() => import('@/components/screens/admin/classes').then(m => m.AdminClasses), { loading: LoadingScreen });
+const AdminSubjects = dynamic(() => import('@/components/screens/admin/subjects').then(m => m.AdminSubjects), { loading: LoadingScreen });
+const AdminAttendance = dynamic(() => import('@/components/screens/admin/attendance').then(m => m.AdminAttendance), { loading: LoadingScreen });
+const AdminFees = dynamic(() => import('@/components/screens/admin/fees').then(m => m.AdminFees), { loading: LoadingScreen });
+const AdminNotices = dynamic(() => import('@/components/screens/admin/notices').then(m => m.AdminNotices), { loading: LoadingScreen });
+const AdminTimetable = dynamic(() => import('@/components/screens/admin/timetable').then(m => m.AdminTimetable), { loading: LoadingScreen });
+const AdminCalendar = dynamic(() => import('@/components/screens/admin/calendar').then(m => m.AdminCalendar), { loading: LoadingScreen });
+const AdminReports = dynamic(() => import('@/components/screens/admin/reports').then(m => m.AdminReports), { loading: LoadingScreen });
+const AdminSubscriptions = dynamic(() => import('@/components/screens/admin/subscriptions').then(m => m.AdminSubscriptions), { loading: LoadingScreen });
+const AdminRoles = dynamic(() => import('@/components/screens/admin/roles').then(m => m.AdminRoles), { loading: LoadingScreen });
+const AdminStaff = dynamic(() => import('@/components/screens/admin/staff').then(m => m.AdminStaff), { loading: LoadingScreen });
+const AdminTickets = dynamic(() => import('@/components/screens/admin/tickets').then(m => m.AdminTickets), { loading: LoadingScreen });
+const AdminSchoolSettings = dynamic(() => import('@/components/screens/admin/school-settings').then(m => m.AdminSchoolSettings), { loading: LoadingScreen });
+
+const TeacherClasses = dynamic(() => import('@/components/screens/teacher/my-classes').then(m => m.TeacherClasses), { loading: LoadingScreen });
+const TeacherAttendance = dynamic(() => import('@/components/screens/teacher/take-attendance').then(m => m.TeacherAttendance), { loading: LoadingScreen });
+const TeacherGrades = dynamic(() => import('@/components/screens/teacher/grade-management').then(m => m.TeacherGrades), { loading: LoadingScreen });
+const TeacherAssignments = dynamic(() => import('@/components/screens/teacher/assignments').then(m => m.TeacherAssignments), { loading: LoadingScreen });
+const TeacherTimetable = dynamic(() => import('@/components/screens/teacher/timetable').then(m => m.TeacherTimetable), { loading: LoadingScreen });
+const TeacherCalendar = dynamic(() => import('@/components/screens/teacher/calendar').then(m => m.TeacherCalendar), { loading: LoadingScreen });
+const TeacherNotices = dynamic(() => import('@/components/screens/teacher/notices').then(m => m.TeacherNotices), { loading: LoadingScreen });
+
+const StudentClasses = dynamic(() => import('@/components/screens/student/my-classes').then(m => m.StudentClasses), { loading: LoadingScreen });
+const StudentGrades = dynamic(() => import('@/components/screens/student/my-grades').then(m => m.StudentGrades), { loading: LoadingScreen });
+const StudentAttendance = dynamic(() => import('@/components/screens/student/my-attendance').then(m => m.StudentAttendance), { loading: LoadingScreen });
+const StudentAssignments = dynamic(() => import('@/components/screens/student/assignments').then(m => m.StudentAssignments), { loading: LoadingScreen });
+const StudentTimetable = dynamic(() => import('@/components/screens/student/timetable').then(m => m.StudentTimetable), { loading: LoadingScreen });
+const StudentCalendar = dynamic(() => import('@/components/screens/student/calendar').then(m => m.StudentCalendar), { loading: LoadingScreen });
+const StudentNotices = dynamic(() => import('@/components/screens/student/notices').then(m => m.StudentNotices), { loading: LoadingScreen });
+const StudentFees = dynamic(() => import('@/components/screens/student/fees').then(m => m.StudentFees), { loading: LoadingScreen });
+const StudentTickets = dynamic(() => import('@/components/screens/student/tickets').then(m => m.StudentTickets), { loading: LoadingScreen });
+
+const ParentChildren = dynamic(() => import('@/components/screens/parent/children').then(m => m.ParentChildren), { loading: LoadingScreen });
+const ParentGrades = dynamic(() => import('@/components/screens/parent/grades').then(m => m.ParentGrades), { loading: LoadingScreen });
+const ParentAttendance = dynamic(() => import('@/components/screens/parent/attendance').then(m => m.ParentAttendance), { loading: LoadingScreen });
+const ParentFees = dynamic(() => import('@/components/screens/parent/fees').then(m => m.ParentFees), { loading: LoadingScreen });
+const ParentNotices = dynamic(() => import('@/components/screens/parent/notices').then(m => m.ParentNotices), { loading: LoadingScreen });
+const ParentSubscription = dynamic(() => import('@/components/screens/parent/subscription').then(m => m.ParentSubscription), { loading: LoadingScreen });
+const ParentCalendar = dynamic(() => import('@/components/screens/parent/calendar').then(m => m.ParentCalendar), { loading: LoadingScreen });
+const ParentTimetable = dynamic(() => import('@/components/screens/parent/timetable').then(m => m.ParentTimetable), { loading: LoadingScreen });
+
+const NotFoundScreen = dynamic(() => import('@/components/screens/error/not-found').then(m => m.NotFoundScreen));
 
 export default function TenantScreenDispatcher() {
   const { slug, screen } = useParams();
