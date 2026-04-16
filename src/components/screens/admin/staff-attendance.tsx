@@ -1,0 +1,331 @@
+"use client";
+
+import { useState, useMemo, useEffect } from "react";
+import { 
+  Card, 
+  CardContent, 
+  CardHeader, 
+  CardTitle 
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
+import { Skeleton } from "@/components/ui/skeleton";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import {
+  UserCheck,
+  UserX,
+  Clock,
+  Search,
+  CheckCircle2,
+  Users,
+  CalendarDays,
+  Save,
+  RotateCcw,
+  GraduationCap,
+  Briefcase,
+} from "lucide-react";
+import { 
+  useStaffAttendance, 
+  useMarkBulkStaffAttendance 
+} from "@/lib/graphql/hooks";
+import { useAppStore } from "@/store/use-app-store";
+import { format } from "date-fns";
+import { goeyToast as toast } from "goey-toast";
+
+type AttendanceStatus = "present" | "absent" | "late";
+
+const getStatusBg = (status: string) => {
+  switch (status) {
+    case "present": return "bg-emerald-50 dark:bg-emerald-900/20 border-emerald-200 dark:border-emerald-800";
+    case "absent": return "bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800";
+    case "late": return "bg-amber-50 dark:bg-amber-900/20 border-amber-200 dark:border-amber-800";
+    default: return "";
+  }
+};
+
+const getStatusIcon = (status: string) => {
+  switch (status) {
+    case "present": return <UserCheck className="h-3.5 w-3.5" />;
+    case "absent": return <UserX className="h-3.5 w-3.5" />;
+    case "late": return <Clock className="h-3.5 w-3.5" />;
+    default: return null;
+  }
+};
+
+export function StaffAttendance() {
+  const { currentTenantId } = useAppStore();
+  const [activeTab, setActiveTab] = useState("teacher");
+  const [selectedDate, setSelectedDate] = useState(format(new Date(), "yyyy-MM-dd"));
+  const [searchQuery, setSearchQuery] = useState("");
+  const [pendingChanges, setPendingChanges] = useState<Record<string, string>>({});
+
+  const { data: attendanceData, isLoading: queryLoading } = useStaffAttendance({
+    tenantId: currentTenantId || undefined,
+    role: activeTab, // Filter by active tab role
+    date: selectedDate,
+  });
+
+  const { mutate: bulkMark, isPending: isSaving } = useMarkBulkStaffAttendance();
+
+  useEffect(() => {
+    setPendingChanges({});
+  }, [selectedDate, activeTab]);
+
+  const handleStatusChange = (userId: string, status: AttendanceStatus) => {
+    setPendingChanges(prev => ({ ...prev, [userId]: status }));
+  };
+
+  const markAll = (status: AttendanceStatus) => {
+    const newChanges = { ...pendingChanges };
+    records.forEach(r => {
+      const id = r.id.includes('not-marked-') ? r.id.replace('not-marked-', '') : r.id;
+      newChanges[id] = status;
+    });
+    setPendingChanges(newChanges);
+    toast.success(`Marked all ${activeTab === 'teacher' ? 'Teachers' : 'Staff'} as ${status} locally.`);
+  };
+
+  const handleSave = () => {
+    const data = Object.entries(pendingChanges).map(([userId, status]) => ({
+      userId, 
+      date: selectedDate, 
+      status, 
+      checkIn: status === "present" ? "09:00 AM" : undefined
+    }));
+    if (data.length) {
+      bulkMark(data, { onSuccess: () => setPendingChanges({}) });
+    }
+  };
+
+  const records = attendanceData?.records || [];
+  const stats = useMemo(() => {
+    let p = 0, a = 0, l = 0;
+    records.forEach(r => {
+      const id = r.id.includes('not-marked-') ? r.id.replace('not-marked-', '') : r.id;
+      const s = pendingChanges[id] || r.status;
+      if (s === 'present') p++; else if (s === 'absent') a++; else if (s === 'late') l++;
+    });
+    return { p, a, l, total: records.length };
+  }, [records, pendingChanges]);
+
+  const filtered = records.filter(r => r.staffName.toLowerCase().includes(searchQuery.toLowerCase()));
+  const hasChanges = Object.keys(pendingChanges).length > 0;
+
+  const getInitials = (name: string) => {
+    return name.split(" ").map(n => n[0]).join("").slice(0, 2).toUpperCase();
+  };
+
+  return (
+    <div className="space-y-6">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div>
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
+            Professional Attendance
+          </h2>
+          <p className="text-gray-500 dark:text-gray-400 mt-1">
+            Separate logs for Teachers and Admin Staff members.
+          </p>
+        </div>
+        <div className="flex items-center gap-3">
+          <Input
+            type="date"
+            value={selectedDate}
+            onChange={(e) => setSelectedDate(e.target.value)}
+            className="rounded-xl dark:[color-scheme:dark] w-full sm:w-[180px]"
+          />
+        </div>
+      </div>
+
+      <Tabs defaultValue="teacher" value={activeTab} onValueChange={setActiveTab} className="w-full">
+        <TabsList className="grid w-full grid-cols-2 max-w-md bg-gray-100 dark:bg-gray-900 p-1 rounded-2xl h-12">
+          <TabsTrigger value="teacher" className="rounded-xl data-[state=active]:bg-white dark:data-[state=active]:bg-gray-800 data-[state=active]:shadow-sm font-bold flex items-center gap-2">
+            <GraduationCap className="h-4 w-4" />
+            Teachers
+          </TabsTrigger>
+          <TabsTrigger value="staff" className="rounded-xl data-[state=active]:bg-white dark:data-[state=active]:bg-gray-800 data-[state=active]:shadow-sm font-bold flex items-center gap-2">
+            <Briefcase className="h-4 w-4" />
+            Admin Staff
+          </TabsTrigger>
+        </TabsList>
+
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-6">
+          <Card className="rounded-xl shadow-sm border-0">
+            <CardContent className="p-4 flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-blue-50 dark:bg-blue-900/30 flex items-center justify-center">
+                <Users className="h-5 w-5 text-blue-500 dark:text-blue-400" />
+              </div>
+              <div>
+                <p className="text-xs text-gray-400 dark:text-gray-500 font-medium">Total</p>
+                <p className="text-xl font-bold text-gray-900 dark:text-gray-100">{stats.total}</p>
+              </div>
+            </CardContent>
+          </Card>
+          <Card className="rounded-xl shadow-sm border-0">
+            <CardContent className="p-4 flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-emerald-50 dark:bg-emerald-900/30 flex items-center justify-center">
+                <UserCheck className="h-5 w-5 text-emerald-500 dark:text-emerald-400" />
+              </div>
+              <div>
+                <p className="text-xs text-gray-400 dark:text-gray-500 font-medium">Present</p>
+                <p className="text-xl font-bold text-emerald-600 dark:text-emerald-400">{stats.p}</p>
+              </div>
+            </CardContent>
+          </Card>
+          <Card className="rounded-xl shadow-sm border-0">
+            <CardContent className="p-4 flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-red-50 dark:bg-red-900/30 flex items-center justify-center">
+                <UserX className="h-5 w-5 text-red-500 dark:text-red-400" />
+              </div>
+              <div>
+                <p className="text-xs text-gray-400 dark:text-gray-500 font-medium">Absent</p>
+                <p className="text-xl font-bold text-red-600 dark:text-red-400">{stats.a}</p>
+              </div>
+            </CardContent>
+          </Card>
+          <Card className="rounded-xl shadow-sm border-0">
+            <CardContent className="p-4 flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-amber-50 dark:bg-amber-900/30 flex items-center justify-center">
+                <Clock className="h-5 w-5 text-amber-500 dark:text-amber-400" />
+              </div>
+              <div>
+                <p className="text-xs text-gray-400 dark:text-gray-500 font-medium">Late</p>
+                <p className="text-xl font-bold text-amber-600 dark:text-amber-400">{stats.l}</p>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        <TabsContent value={activeTab} className="mt-6 border-0 p-0 focus-visible:ring-0">
+          <Card className="rounded-xl shadow-sm border-0 bg-white dark:bg-gray-900">
+            <CardHeader className="pb-3 px-4">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <CardTitle className="text-base font-semibold flex items-center gap-2">
+                  <CalendarDays className="h-4 w-4 text-blue-500" />
+                  {activeTab === 'teacher' ? 'Teachers List' : 'Staff List'}
+                  <Badge variant="secondary" className="text-xs bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400">
+                    {records.length} total
+                  </Badge>
+                </CardTitle>
+                <div className="flex items-center gap-2">
+                  <span className="text-xs text-gray-400 dark:text-gray-500 mr-1">Quick Actions:</span>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="text-xs h-7 border-emerald-200 dark:border-emerald-800 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-900/30"
+                    onClick={() => markAll("present")}
+                  >
+                    All Present
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="text-xs h-7 border-red-200 dark:border-red-800 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/30"
+                    onClick={() => markAll("absent")}
+                  >
+                    All Absent
+                  </Button>
+                </div>
+              </div>
+            </CardHeader>
+            <CardContent className="p-4 pt-0">
+              <div className="relative group max-w-sm mb-4">
+                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                 <Input 
+                   placeholder={`Search ${activeTab === 'teacher' ? 'teachers' : 'staff'}...`} 
+                   value={searchQuery}
+                   onChange={(e) => setSearchQuery(e.target.value)}
+                   className="pl-9 rounded-xl"
+                 />
+              </div>
+
+              <ScrollArea className="max-h-[500px]">
+                <div className="space-y-2">
+                  {queryLoading ? (
+                     Array(5).fill(0).map((_, i) => (
+                       <Skeleton key={i} className="h-16 rounded-xl" />
+                     ))
+                  ) : filtered.length === 0 ? (
+                    <div className="text-center py-16">
+                      <p className="text-gray-400 text-sm italic">No records found for {activeTab}.</p>
+                    </div>
+                  ) : (
+                    filtered.map((staff, index) => {
+                      const id = staff.id.includes('not-marked-') ? staff.id.replace('not-marked-', '') : staff.id;
+                      const mod = !!pendingChanges[id];
+                      const cur = (pendingChanges[id] || staff.status) as AttendanceStatus;
+                      return (
+                        <div
+                          key={staff.id}
+                          className={`flex flex-col sm:flex-row items-start sm:items-center gap-3 p-3 rounded-xl border transition-all ${getStatusBg(cur)}`}
+                        >
+                          <div className="flex items-center gap-3 w-full sm:w-auto">
+                            <span className="text-xs text-gray-400 dark:text-gray-500 font-mono w-6 text-center">
+                              {index + 1}
+                            </span>
+                            <Avatar className="h-8 w-8 flex-shrink-0">
+                              <AvatarFallback className="text-[10px] font-semibold bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400">
+                                {getInitials(staff.staffName)}
+                              </AvatarFallback>
+                            </Avatar>
+                            <div className="flex-1 min-w-0">
+                              <p className="text-sm font-medium text-gray-800 dark:text-gray-200 truncate capitalize">
+                                {staff.staffName}
+                              </p>
+                              <p className="text-xs text-gray-400 dark:text-gray-500">
+                                {staff.role}
+                              </p>
+                            </div>
+                          </div>
+
+                          <div className="flex items-center gap-1.5 w-full sm:w-auto mt-2 sm:mt-0 sm:ml-auto">
+                            {(["present", "absent", "late"] as AttendanceStatus[]).map((status) => (
+                              <button
+                                key={status}
+                                onClick={() => handleStatusChange(id, status)}
+                                className={`flex flex-1 sm:flex-none items-center justify-center gap-1 px-3 py-1.5 rounded-lg text-xs font-medium transition-all border ${
+                                  cur === status
+                                    ? `${getStatusBg(status)} ${status === "present" ? "bg-emerald-500 dark:bg-emerald-500 text-white" : status === "absent" ? "bg-red-500 dark:bg-red-500 text-white" : "bg-amber-500 dark:bg-amber-500 text-white"} border-transparent shadow-sm ring-1 ring-white/10`
+                                    : "border-gray-200 dark:border-gray-700 text-gray-400 dark:text-gray-500 hover:border-gray-300 dark:hover:border-gray-600 bg-white dark:bg-gray-950"
+                                }`}
+                              >
+                                {getStatusIcon(status)}
+                                <span className="sm:inline capitalize">{status}</span>
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+                      );
+                    })
+                  )}
+                </div>
+              </ScrollArea>
+            </CardContent>
+          </Card>
+        </TabsContent>
+      </Tabs>
+
+      <div className="flex items-center justify-between bg-white dark:bg-gray-950 p-4 px-6 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-800">
+         <div className="flex items-center gap-3">
+            {hasChanges ? (
+              <div className="flex items-center gap-3">
+                 <div className="h-2 w-2 bg-indigo-500 rounded-full animate-ping" />
+                 <span className="text-xs font-bold text-indigo-500 uppercase tracking-widest">{Object.keys(pendingChanges).length} Pending in {activeTab === 'teacher' ? 'Teachers' : 'Staff'}</span>
+              </div>
+            ) : (
+              <span className="text-xs font-bold text-gray-400 uppercase tracking-widest italic">No unsaved changes</span>
+            )}
+         </div>
+         <Button
+            onClick={handleSave}
+            disabled={isSaving || !hasChanges}
+            className="bg-blue-600 hover:bg-blue-700 text-white rounded-xl px-10 h-12 shadow-lg shadow-blue-500/20 font-bold"
+          >
+            {isSaving ? "Syncing..." : <span className="flex items-center gap-2 tracking-wide"><Save className="h-4 w-4" /> Save {activeTab} Attendance</span>}
+          </Button>
+      </div>
+    </div>
+  );
+}

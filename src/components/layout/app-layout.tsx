@@ -180,6 +180,11 @@ const navItems: Record<UserRole, NavItem[]> = {
       icon: <UserCheck className="h-4 w-4" />,
     },
     {
+      key: "staff-attendance",
+      label: "Staff Attendance",
+      icon: <ClipboardList className="h-4 w-4" />,
+    },
+    {
       key: "fees",
       label: "Fee Management",
       icon: <DollarSign className="h-4 w-4" />,
@@ -375,6 +380,12 @@ const navItems: Record<UserRole, NavItem[]> = {
       key: "attendance",
       label: "Attendance",
       icon: <UserCheck className="h-4 w-4" />,
+      permModule: "attendance",
+    },
+    {
+      key: "staff-attendance",
+      label: "Staff Attendance",
+      icon: <ClipboardList className="h-4 w-4" />,
       permModule: "attendance",
     },
     {

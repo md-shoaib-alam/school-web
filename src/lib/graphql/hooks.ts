@@ -27,7 +27,8 @@ export {
   useSubjects, useClassesMin, useTeachersMin, useClasses, useTeachers, 
   useStudents, useParents, useNotices, useFees, useAttendance, useStaff, 
   useCustomRoles, useCreateSubject, useUpdateSubject, useDeleteSubject,
-  useCreateCustomRole, useUpdateCustomRole, useDeleteCustomRole, useAssignRoleToUser
+  useCreateCustomRole, useUpdateCustomRole, useDeleteCustomRole, useAssignRoleToUser,
+  useStaffAttendance, useMarkStaffAttendance, useMarkBulkStaffAttendance
 } from './hooks/academic.hooks'
 
 // Dashboard Hooks

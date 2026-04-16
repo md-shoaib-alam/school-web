@@ -5,11 +5,12 @@ import { queryKeys } from '../keys'
 import { 
   SUBJECTS, CLASSES, TEACHERS, STUDENTS, PARENTS, NOTICES, FEES, ATTENDANCE, STAFF, CUSTOM_ROLES,
   CREATE_SUBJECT, UPDATE_SUBJECT, DELETE_SUBJECT,
-  CREATE_CUSTOM_ROLE, UPDATE_CUSTOM_ROLE, DELETE_CUSTOM_ROLE, ASSIGN_ROLE_TO_USER
+  CREATE_CUSTOM_ROLE, UPDATE_CUSTOM_ROLE, DELETE_CUSTOM_ROLE, ASSIGN_ROLE_TO_USER,
+  STAFF_ATTENDANCE, MARK_STAFF_ATTENDANCE, MARK_BULK_STAFF_ATTENDANCE
 } from '../queries'
 import { 
   SubjectsResponse, ClassesResponse, TeachersResponse, StudentsResponse, ParentsResponse, 
-  NoticesResponse, FeesResponse, AttendanceResponse, StaffResponse
+  NoticesResponse, FeesResponse, AttendanceResponse, StaffResponse, StaffAttendanceResponse
 } from '../types'
 
 export function useSubjects(tenantId?: string, page?: number, limit?: number) {
@@ -226,5 +227,37 @@ export function useAssignRoleToUser() {
       queryClient.invalidateQueries({ queryKey: ['users'] })
     },
     onError: (error) => toast.error('Error assigning role', { description: error.message }),
+  })
+}
+
+export function useStaffAttendance(vars: { tenantId?: string, role?: string, date?: string, page?: number, limit?: number }) {
+  return useQuery({
+    queryKey: ['staff-attendance', vars],
+    queryFn: () => graphqlQuery<{ staffAttendance: StaffAttendanceResponse }>(STAFF_ATTENDANCE, vars).then(d => d.staffAttendance),
+    staleTime: 2 * 60 * 1000,
+  })
+}
+
+export function useMarkStaffAttendance() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (data: any) => graphqlMutate<{ markStaffAttendance: boolean }>(MARK_STAFF_ATTENDANCE, { data }),
+    onSuccess: () => {
+      toast.success('Attendance updated')
+      queryClient.invalidateQueries({ queryKey: ['staff-attendance'] })
+    },
+    onError: (error) => toast.error('Error updating attendance', { description: error.message }),
+  })
+}
+
+export function useMarkBulkStaffAttendance() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (data: any[]) => graphqlMutate<{ markBulkStaffAttendance: boolean }>(MARK_BULK_STAFF_ATTENDANCE, { data }),
+    onSuccess: () => {
+      toast.success('Attendance updated successfully')
+      queryClient.invalidateQueries({ queryKey: ['staff-attendance'] })
+    },
+    onError: (error) => toast.error('Error updating attendance', { description: error.message }),
   })
 }

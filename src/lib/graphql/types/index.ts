@@ -206,3 +206,21 @@ export interface StaffResponse {
   page: number
   totalPages: number
 }
+
+export interface StaffAttendanceRecord {
+  id: string
+  staffName: string
+  role: string
+  date: string
+  status: string
+  checkIn?: string
+  checkOut?: string
+  remarks?: string
+}
+
+export interface StaffAttendanceResponse {
+  records: StaffAttendanceRecord[]
+  total: number
+  page: number
+  totalPages: number
+}

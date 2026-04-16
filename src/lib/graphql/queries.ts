@@ -361,3 +361,24 @@ export const ASSIGN_ROLE_TO_USER = `
     assignRoleToUser(userId: $userId, roleId: $roleId, tenantId: $tenantId)
   }
 `
+
+export const STAFF_ATTENDANCE = `
+  query StaffAttendance($tenantId: String, $role: String, $date: String, $page: Int, $limit: Int) {
+    staffAttendance(tenantId: $tenantId, role: $role, date: $date, page: $page, limit: $limit) {
+      records { id staffName role date status checkIn checkOut remarks }
+      total page totalPages
+    }
+  }
+`
+
+export const MARK_STAFF_ATTENDANCE = `
+  mutation MarkStaffAttendance($data: StaffAttendanceInput!) {
+    markStaffAttendance(data: $data)
+  }
+`
+
+export const MARK_BULK_STAFF_ATTENDANCE = `
+  mutation MarkBulkStaffAttendance($data: [StaffAttendanceInput!]!) {
+    markBulkStaffAttendance(data: $data)
+  }
+`
