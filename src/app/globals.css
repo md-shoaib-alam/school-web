@@ -1,6 +1,29 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 
+/* Modern Sidebar Variables */
+@layer base {
+  :root {
+    --bg-sidebar: #ffffff;
+    --bg-sidebar-hover: #f3f4f6;
+    --bg-sidebar-card: #ffffff;
+    --sidebar-border: #e5e7eb;
+    --sidebar-text-main: #111827;
+    --sidebar-text-muted: #6b7280;
+    --accent-glow: rgba(16, 185, 129, 0.2);
+  }
+
+  .dark {
+    --bg-sidebar: #0a0a0a;
+    --bg-sidebar-hover: #171717;
+    --bg-sidebar-card: #171717;
+    --sidebar-border: #262626;
+    --sidebar-text-main: #f5f5f5;
+    --sidebar-text-muted: #737373;
+    --accent-glow: rgba(16, 185, 129, 0.3);
+  }
+}
+
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
@@ -41,6 +64,15 @@
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 4px);
+
+  /* Sidebar Design Token Mappings */
+  --color-bg-sidebar: var(--bg-sidebar);
+  --color-bg-hover: var(--bg-sidebar-hover);
+  --color-bg-card: var(--bg-sidebar-card);
+  --color-border: var(--sidebar-border);
+  --color-text-main: var(--sidebar-text-main);
+  --color-text-muted: var(--sidebar-text-muted);
+  --color-accent-glow: var(--accent-glow);
 }
 
 :root {
@@ -124,21 +156,14 @@
 
 /* Sidebar scrollbar styles */
 .sidebar-scrollbar::-webkit-scrollbar {
-  width: 4px;
+  display: none;
 }
 
-.sidebar-scrollbar::-webkit-scrollbar-track {
-  background: transparent;
+.sidebar-scrollbar {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
 }
 
-.sidebar-scrollbar::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.15);
-  border-radius: 2px;
-}
-
-.sidebar-scrollbar::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.3);
-}
 
 /* Dark mode sidebar scrollbar */
 .dark .sidebar-scrollbar::-webkit-scrollbar-thumb {
@@ -173,4 +198,31 @@
 
 .dark .overflow-y-auto::-webkit-scrollbar-thumb:hover {
   background: rgba(255, 255, 255, 0.2);
+}
+
+@keyframes slideIn {
+  from { opacity: 0; transform: translateX(-10px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.animate-slide-in {
+  animation: slideIn 0.3s ease-out forwards;
+}
+
+.animate-slide-up {
+  animation: slideUp 0.3s ease-out forwards;
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.3s ease-out forwards;
 }
