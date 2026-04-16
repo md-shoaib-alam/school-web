@@ -77,7 +77,7 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
-import { toast } from "sonner";
+import { goeyToast as toast } from "goey-toast";
 import { cn } from "@/lib/utils";
 import {
   useParents,

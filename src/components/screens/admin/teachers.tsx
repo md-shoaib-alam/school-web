@@ -44,7 +44,7 @@ import {
   Loader2,
   Eye,
 } from "lucide-react";
-import { toast } from "sonner";
+import { goeyToast as toast } from "goey-toast";
 import type { TeacherInfo } from "@/lib/types";
 import { useModulePermissions } from "@/hooks/use-permissions";
 import { useTeachers } from "@/lib/graphql/hooks";

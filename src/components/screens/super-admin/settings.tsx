@@ -58,7 +58,7 @@ import {
   Layers,
   RefreshCw,
 } from "lucide-react";
-import { toast } from "sonner";
+import { goeyToast as toast } from "goey-toast";
 import { Skeleton } from "@/components/ui/skeleton";
 
 interface PlanConfig {

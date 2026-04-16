@@ -53,7 +53,7 @@ import {
 import type { ChartConfig } from "@/components/ui/chart";
 import { useAppStore } from "@/store/use-app-store";
 import { useAdminDashboard } from "@/lib/graphql/hooks";
-import { toast } from "sonner";
+import { goeyToast as toast } from "goey-toast";
 
 const attendanceChartConfig = {
   rate: { label: "Attendance Rate (%)", color: "#10b981" },

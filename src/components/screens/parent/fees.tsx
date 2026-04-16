@@ -30,7 +30,7 @@ import {
   AlertTriangle,
   Clock,
 } from "lucide-react";
-import { toast } from "sonner";
+import { goeyToast as toast } from "goey-toast";
 import type { StudentInfo, FeeRecord } from "@/lib/types";
 
 const statusConfig: Record<

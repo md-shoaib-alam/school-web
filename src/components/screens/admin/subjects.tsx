@@ -46,7 +46,7 @@ import {
   Loader2,
   Eye,
 } from "lucide-react";
-import { toast } from "sonner";
+import { goeyToast as toast } from "goey-toast";
 import { useModulePermissions } from "@/hooks/use-permissions";
 import {
   useSubjects,
@@ -117,15 +117,25 @@ export function AdminSubjects() {
       toast.error("Please fill in all required fields");
       return;
     }
-    createMutation.mutate(
-      { ...form, teacherId: form.teacherId || null },
-      {
-        onSuccess: () => {
-          setCreateOpen(false);
-          setForm({ ...emptyForm });
-        },
-      },
-    );
+
+    const promise = createMutation.mutateAsync({ 
+      ...form, 
+      teacherId: form.teacherId || null 
+    });
+
+    toast.promise(promise, {
+      loading: "Creating subject...",
+      success: "Subject created successfully!",
+      error: (err: any) => err.message || "Failed to create subject",
+    });
+
+    try {
+      await promise;
+      setCreateOpen(false);
+      setForm({ ...emptyForm });
+    } catch (err) {
+      // Error handled by toast.promise
+    }
   };
 
   const handleEdit = async () => {
@@ -134,15 +144,24 @@ export function AdminSubjects() {
       return;
     }
     const { id, ...data } = editForm;
-    updateMutation.mutate(
-      { id, data: { ...data, teacherId: data.teacherId || null } },
-      {
-        onSuccess: () => {
-          setEditOpen(false);
-          setEditForm({ id: "", ...emptyForm });
-        },
-      },
-    );
+    const promise = updateMutation.mutateAsync({ 
+      id, 
+      data: { ...data, teacherId: data.teacherId || null } 
+    });
+
+    toast.promise(promise, {
+      loading: "Updating subject...",
+      success: "Subject updated successfully!",
+      error: (err: any) => err.message || "Failed to update subject",
+    });
+
+    try {
+      await promise;
+      setEditOpen(false);
+      setEditForm({ id: "", ...emptyForm });
+    } catch (err) {
+      // Error handled by toast.promise
+    }
   };
 
   const openEditDialog = (subject: SubjectInfo) => {
@@ -158,7 +177,19 @@ export function AdminSubjects() {
 
   const handleDelete = async (id: string) => {
     if (confirm("Are you sure you want to delete this subject?")) {
-      deleteMutation.mutate(id);
+      const promise = deleteMutation.mutateAsync(id);
+      
+      toast.promise(promise, {
+        loading: "Deleting subject...",
+        success: "Subject deleted successfully",
+        error: (err: any) => err.message || "Failed to delete subject",
+      });
+
+      try {
+        await promise;
+      } catch (err) {
+        // Error handled by toast.promise
+      }
     }
   };
 
