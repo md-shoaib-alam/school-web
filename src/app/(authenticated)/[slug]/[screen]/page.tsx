@@ -26,6 +26,7 @@ const AdminRoles = dynamic(() => import('@/components/screens/admin/roles').then
 const AdminStaff = dynamic(() => import('@/components/screens/admin/staff').then(m => m.AdminStaff), { loading: LoadingScreen });
 const AdminTickets = dynamic(() => import('@/components/screens/admin/tickets').then(m => m.AdminTickets), { loading: LoadingScreen });
 const AdminSchoolSettings = dynamic(() => import('@/components/screens/admin/school-settings').then(m => m.AdminSchoolSettings), { loading: LoadingScreen });
+const AdminPromotions = dynamic(() => import('@/components/screens/admin/promotions').then(m => m.AdminPromotions), { loading: LoadingScreen });
 
 const TeacherClasses = dynamic(() => import('@/components/screens/teacher/my-classes').then(m => m.TeacherClasses), { loading: LoadingScreen });
 const TeacherAttendance = dynamic(() => import('@/components/screens/teacher/take-attendance').then(m => m.TeacherAttendance), { loading: LoadingScreen });
@@ -85,6 +86,7 @@ export default function TenantScreenDispatcher() {
       case 'staff': return <AdminStaff />;
       case 'school-settings': return <AdminSchoolSettings />;
       case 'tickets': return <AdminTickets />;
+      case 'promotions': return <AdminPromotions />;
       case 'grades': return <TeacherGrades />;
     }
   }

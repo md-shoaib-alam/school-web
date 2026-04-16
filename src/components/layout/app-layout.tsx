@@ -162,6 +162,7 @@ const navItems: Record<UserRole, NavItem[]> = {
     { key: "teachers", label: "Teachers", icon: <Users className="h-4 w-4" /> },
     { key: "parents", label: "Parents", icon: <Heart className="h-4 w-4" /> },
     { key: "classes", label: "Classes", icon: <School className="h-4 w-4" /> },
+    { key: "promotions", label: "Class Promotion", icon: <GraduationCap className="h-4 w-4" /> },
     {
       key: "subjects",
       label: "Subjects",
