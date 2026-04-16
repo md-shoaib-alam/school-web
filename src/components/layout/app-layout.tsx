@@ -47,6 +47,7 @@ import {
   Crown,
   Building2,
   ShieldCheck,
+  Award,
   Activity,
   Database,
   Globe,
@@ -204,6 +205,12 @@ const navItems: Record<UserRole, NavItem[]> = {
       key: "reports",
       label: "Reports",
       icon: <BarChart3 className="h-4 w-4" />,
+    },
+    {
+      key: "certificates",
+      label: "Certificates",
+      icon: <Award className="h-4 w-4" />,
+      permModule: "students",
     },
     {
       key: "roles",
@@ -435,6 +442,12 @@ const navItems: Record<UserRole, NavItem[]> = {
       label: "Reports",
       icon: <BarChart3 className="h-4 w-4" />,
       permModule: "reports",
+    },
+    {
+      key: "certificates",
+      label: "Certificates",
+      icon: <Award className="h-4 w-4" />,
+      permModule: "students",
     },
     {
       key: "tickets",

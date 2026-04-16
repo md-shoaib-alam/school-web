@@ -76,6 +76,7 @@ const PERMISSION_MODULES = [
   { key: "attendance", label: "Attendance", icon: "📋" },
   { key: "fees", label: "Fees", icon: "💰" },
   { key: "grades", label: "Grades", icon: "📝" },
+  { key: "certificates", label: "Certificates", icon: "📜" },
   { key: "notices", label: "Notices", icon: "📢" },
   { key: "timetable", label: "Timetable", icon: "📅" },
   { key: "calendar", label: "Calendar", icon: "📆" },
