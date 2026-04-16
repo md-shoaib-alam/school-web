@@ -573,65 +573,65 @@ export function AdminCalendar() {
   // =========================================================================
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 animate-in fade-in duration-500">
       {/* Read-only banner */}
       {!canCreate && !canEdit && !canDelete && (
-        <div className="flex items-center gap-2 rounded-lg border border-amber-200 dark:border-amber-800 bg-amber-50 dark:bg-amber-900/30 px-3 py-2">
-          <Eye className="h-4 w-4 text-amber-600 dark:text-amber-400 shrink-0" />
-          <span className="text-xs text-amber-700 dark:text-amber-300 font-medium">
+        <div className="flex items-center gap-3 rounded-xl border border-amber-200/50 dark:border-amber-800/30 bg-amber-50/50 dark:bg-amber-900/10 backdrop-blur-sm px-4 py-3">
+          <Eye className="h-5 w-5 text-amber-600 dark:text-amber-400 shrink-0" />
+          <span className="text-sm text-amber-700 dark:text-amber-300 font-medium">
             Read-only mode — you have view permission only for this module.
           </span>
         </div>
       )}
 
       {/* Header: Navigation + Filters + Add Button */}
-      <div className="flex flex-col lg:flex-row gap-4 items-start lg:items-center justify-between">
+      <div className="flex flex-col lg:flex-row gap-5 items-start lg:items-center justify-between bg-white/40 dark:bg-gray-900/40 p-1.5 rounded-2xl border border-white/20 dark:border-gray-800/20 backdrop-blur-md shadow-sm">
         {/* Left: Month navigation */}
-        <div className="flex items-center gap-2">
-          <Button
-            variant="outline"
-            size="icon"
-            className="h-9 w-9 shrink-0"
-            onClick={goToPrevMonth}
-            aria-label="Previous month"
-          >
-            <ChevronLeft className="h-4 w-4" />
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            className="h-9 px-3"
-            onClick={goToToday}
-          >
-            Today
-          </Button>
-          <Button
-            variant="outline"
-            size="icon"
-            className="h-9 w-9 shrink-0"
-            onClick={goToNextMonth}
-            aria-label="Next month"
-          >
-            <ChevronRight className="h-4 w-4" />
-          </Button>
-          <h2 className="ml-2 text-lg sm:text-xl font-semibold text-gray-900 dark:text-gray-100 whitespace-nowrap">
+        <div className="flex items-center gap-3 px-2">
+          <div className="flex items-center gap-1.5 bg-gray-100/50 dark:bg-gray-800/50 p-1 rounded-xl border border-gray-200/50 dark:border-gray-700/50">
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-8 w-8 rounded-lg hover:bg-white dark:hover:bg-gray-700 shadow-none focus-visible:ring-0"
+              onClick={goToPrevMonth}
+            >
+              <ChevronLeft className="h-4 w-4" />
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-8 px-3 text-xs font-semibold rounded-lg hover:bg-white dark:hover:bg-gray-700 shadow-none focus-visible:ring-0"
+              onClick={goToToday}
+            >
+              Today
+            </Button>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-8 w-8 rounded-lg hover:bg-white dark:hover:bg-gray-700 shadow-none focus-visible:ring-0"
+              onClick={goToNextMonth}
+            >
+              <ChevronRight className="h-4 w-4" />
+            </Button>
+          </div>
+          <h2 className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-gray-900 via-gray-700 to-gray-900 dark:from-white dark:via-gray-300 dark:to-white">
             {MONTH_NAMES[currentMonth]} {currentYear}
           </h2>
         </div>
 
         {/* Center + Right: Filter + Add */}
-        <div className="flex items-center gap-3 w-full lg:w-auto">
+        <div className="flex items-center gap-3 w-full lg:w-auto px-2 pb-1 lg:pb-0">
           <Select value={typeFilter} onValueChange={setTypeFilter}>
-            <SelectTrigger className="w-full sm:w-44 h-9">
+            <SelectTrigger className="w-full sm:w-44 h-10 rounded-xl border-gray-200/50 dark:border-gray-700/50 bg-white/50 dark:bg-gray-800/50 shadow-none focus:ring-emerald-500/20">
               <SelectValue placeholder="Filter by type" />
             </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Types</SelectItem>
+            <SelectContent className="rounded-xl">
+              <SelectItem value="all">All Event Types</SelectItem>
               {ALL_EVENT_TYPES.map((t) => (
                 <SelectItem key={t} value={t}>
                   <span className="flex items-center gap-2">
                     <span
-                      className="inline-block w-2.5 h-2.5 rounded-full shrink-0"
+                      className="inline-block w-2.5 h-2.5 rounded-full shrink-0 shadow-sm"
                       style={{ backgroundColor: EVENT_TYPE_COLORS[t] }}
                     />
                     {EVENT_TYPE_LABELS[t]}
@@ -642,28 +642,27 @@ export function AdminCalendar() {
           </Select>
           {canCreate && (
             <Button
-              className="bg-emerald-600 hover:bg-emerald-700 text-white shrink-0 h-9"
+              className="bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl h-10 px-5 shadow-lg shadow-emerald-500/20 transition-all hover:scale-[1.02] active:scale-[0.98]"
               onClick={openCreateDialog}
             >
               <Plus className="h-4 w-4 mr-2" />
-              <span className="hidden sm:inline">Add Event</span>
-              <span className="sm:hidden">Add</span>
+              <span>Add Event</span>
             </Button>
           )}
         </div>
       </div>
 
       {/* Main layout: Calendar grid + Side panel */}
-      <div className="flex flex-col lg:flex-row gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         {/* Calendar grid */}
-        <Card className="flex-1 min-w-0">
-          <CardContent className="p-2 sm:p-4">
+        <Card className="lg:col-span-8 overflow-hidden rounded-2xl border-gray-200/50 dark:border-gray-800/50 bg-white/80 dark:bg-gray-900/80 shadow-xl shadow-gray-200/20 dark:shadow-none">
+          <CardContent className="p-0 sm:p-0">
             {/* Weekday headers */}
-            <div className="grid grid-cols-7 mb-1">
+            <div className="grid grid-cols-7 border-b border-gray-100 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-950/30">
               {WEEKDAY_LABELS.map((day) => (
                 <div
                   key={day}
-                  className="py-2 text-center text-xs font-semibold text-muted-foreground uppercase tracking-wider"
+                  className="py-3 text-center text-[11px] font-bold text-gray-500 dark:text-gray-400 uppercase tracking-widest"
                 >
                   {day}
                 </div>
@@ -672,32 +671,29 @@ export function AdminCalendar() {
 
             {/* Loading skeleton */}
             {loading ? (
-              <div className="grid grid-cols-7 gap-px bg-border rounded-lg overflow-hidden">
+              <div className="grid grid-cols-7 gap-px bg-gray-100 dark:bg-gray-800">
                 {Array.from({ length: 42 }).map((_, i) => (
                   <div
                     key={i}
-                    className="bg-background p-1.5 sm:p-2 min-h-[72px] sm:min-h-[90px]"
+                    className="bg-white dark:bg-gray-900 p-3 min-h-[90px] sm:min-h-[110px]"
                   >
-                    <Skeleton className="h-4 w-6 mb-1" />
-                    <Skeleton className="h-2 w-10 rounded-full" />
+                    <Skeleton className="h-4 w-6 mb-2 rounded-md" />
+                    <Skeleton className="h-2 w-full mb-1 rounded-full" />
                   </div>
                 ))}
               </div>
             ) : (
               /* Calendar cells */
-              <div className="grid grid-cols-7 gap-px bg-border rounded-lg overflow-hidden">
+              <div className="grid grid-cols-7 gap-px bg-gray-100 dark:bg-gray-800">
                 {calendarCells.map((dateStr, idx) => {
-                  if (!dateStr)
-                    return (
-                      <div key={`empty-${idx}`} className="bg-background" />
-                    );
+                  if (!dateStr) return <div key={`empty-${idx}`} className="bg-white dark:bg-gray-900" />;
 
                   const dayEvents = eventsByDate.get(dateStr) || [];
                   const dayNum = parseInt(dateStr.split("-")[2], 10);
                   const todayHighlight = isToday(dateStr);
                   const isSelected = selectedDate === dateStr;
                   const inCurrentMonth = isCurrentMonthDay(dateStr);
-                  const maxDots = 3;
+                  const maxDots = 2;
 
                   return (
                     <button
@@ -705,22 +701,20 @@ export function AdminCalendar() {
                       type="button"
                       onClick={() => setSelectedDate(dateStr)}
                       className={`
-                        relative bg-background p-1 sm:p-2 min-h-[60px] sm:min-h-[90px]
-                        text-left transition-colors hover:bg-gray-50 dark:hover:bg-gray-800 focus:outline-none
+                        group relative bg-white dark:bg-gray-900 p-1.5 sm:p-3 min-h-[70px] sm:min-h-[110px]
+                        text-left transition-all hover:z-10 hover:bg-emerald-50/30 dark:hover:bg-emerald-900/10 focus:outline-none
                         focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-inset
-                        ${!inCurrentMonth ? "bg-gray-50/60 dark:bg-gray-800/60" : ""}
-                        ${isSelected ? "ring-2 ring-emerald-500 ring-inset bg-emerald-50/40 dark:bg-emerald-900/20" : ""}
+                        ${!inCurrentMonth ? "bg-gray-50/40 dark:bg-gray-800/20 opacity-50" : ""}
+                        ${isSelected ? "bg-emerald-50/50 dark:bg-emerald-950/40 ring-2 ring-emerald-500 ring-inset" : ""}
                       `}
-                      aria-label={`${MONTH_NAMES[currentMonth]} ${dayNum}, ${currentYear}. ${dayEvents.length} event${dayEvents.length !== 1 ? "s" : ""}`}
                     >
                       {/* Day number */}
                       <span
                         className={`
                           inline-flex items-center justify-center
-                          text-xs sm:text-sm font-medium
-                          ${todayHighlight ? "bg-emerald-600 text-white rounded-full w-6 h-6 sm:w-7 sm:h-7" : ""}
-                          ${!todayHighlight && !inCurrentMonth ? "text-muted-foreground/50" : ""}
-                          ${!todayHighlight && inCurrentMonth ? "text-gray-900 dark:text-gray-100" : ""}
+                          text-xs sm:text-sm font-bold transition-all
+                          ${todayHighlight ? "bg-emerald-600 text-white rounded-lg w-6 h-6 sm:w-8 sm:h-8 shadow-md shadow-emerald-500/20" : "text-gray-900 dark:text-gray-100"}
+                          ${!todayHighlight && !inCurrentMonth ? "text-gray-400 dark:text-gray-600" : ""}
                         `}
                       >
                         {dayNum}
@@ -728,38 +722,33 @@ export function AdminCalendar() {
 
                       {/* Event indicators */}
                       {dayEvents.length > 0 && (
-                        <div className="mt-0.5 sm:mt-1 space-y-0.5">
+                        <div className="mt-2 space-y-1">
                           {dayEvents.slice(0, maxDots).map((ev) => (
                             <div
                               key={ev.id}
-                              className="hidden sm:flex items-center truncate text-[10px] sm:text-xs font-medium px-1 py-0.5 rounded-sm leading-tight"
+                              className="hidden sm:flex items-center gap-1.5 truncate text-[10px] font-bold px-1.5 py-0.5 rounded-md border border-transparent hover:border-current/20"
                               style={{
-                                backgroundColor: `${ev.color || EVENT_TYPE_COLORS[ev.type] || "#6b7280"}18`,
-                                color:
-                                  ev.color ||
-                                  EVENT_TYPE_COLORS[ev.type] ||
-                                  "#6b7280",
+                                backgroundColor: `${ev.color || EVENT_TYPE_COLORS[ev.type] || "#6b7280"}15`,
+                                color: ev.color || EVENT_TYPE_COLORS[ev.type] || "#6b7280",
                               }}
                             >
+                              <span className="w-1.5 h-1.5 rounded-full shrink-0" style={{ backgroundColor: ev.color || EVENT_TYPE_COLORS[ev.type] }} />
                               <span className="truncate">{ev.title}</span>
                             </div>
                           ))}
                           {/* Mobile: colored dots only */}
-                          {dayEvents.slice(0, maxDots + 1).map((ev, i) => (
-                            <span
-                              key={ev.id}
-                              className="sm:hidden inline-block w-1.5 h-1.5 rounded-full mr-0.5"
-                              style={{
-                                backgroundColor:
-                                  ev.color ||
-                                  EVENT_TYPE_COLORS[ev.type] ||
-                                  "#6b7280",
-                              }}
-                            />
-                          ))}
-                          {/* "+N more" indicator */}
+                          <div className="flex sm:hidden flex-wrap gap-1 mt-1">
+                            {dayEvents.slice(0, 4).map((ev) => (
+                              <span
+                                key={ev.id}
+                                className="w-1.5 h-1.5 rounded-full"
+                                style={{ backgroundColor: ev.color || EVENT_TYPE_COLORS[ev.type] }}
+                              />
+                            ))}
+                          </div>
+                          {/* "N more" indicator */}
                           {dayEvents.length > maxDots && (
-                            <span className="hidden sm:block text-[10px] text-muted-foreground pl-1 truncate">
+                            <span className="hidden sm:block text-[9px] font-bold text-gray-400 dark:text-gray-500 pl-1 uppercase tracking-tighter">
                               +{dayEvents.length - maxDots} more
                             </span>
                           )}
@@ -774,331 +763,243 @@ export function AdminCalendar() {
         </Card>
 
         {/* Side panel: selected day events */}
-        <Card className="w-full lg:w-80 xl:w-96 shrink-0">
-          <CardHeader className="pb-3">
-            <div className="flex items-center justify-between">
-              <CardTitle className="text-base font-semibold flex items-center gap-2">
-                <CalendarDays className="h-4 w-4 text-emerald-600" />
-                Events
-              </CardTitle>
-              {selectedDate && (
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="h-7 w-7 text-muted-foreground hover:text-foreground"
-                  onClick={() => setSelectedDate(null)}
-                  aria-label="Close panel"
-                >
-                  <X className="h-4 w-4" />
-                </Button>
-              )}
-            </div>
-          </CardHeader>
-          <Separator />
-          <CardContent className="pt-4">
-            {!selectedDate ? (
-              <div className="text-center py-10 text-muted-foreground">
-                <CalendarDays className="h-10 w-10 mx-auto mb-3 opacity-30" />
-                <p className="text-sm font-medium">No date selected</p>
-                <p className="text-xs mt-1">
-                  Click a day on the calendar to view events
-                </p>
-              </div>
-            ) : loading ? (
-              <div className="space-y-3">
-                <Skeleton className="h-5 w-40" />
-                {[...Array(3)].map((_, i) => (
-                  <div key={i} className="space-y-2 p-3 rounded-lg border">
-                    <Skeleton className="h-4 w-3/4" />
-                    <Skeleton className="h-3 w-1/2" />
+        <div className="lg:col-span-4 space-y-6">
+          <Card className="rounded-2xl border-gray-200/50 dark:border-gray-800/50 bg-white/80 dark:bg-gray-900/80 shadow-xl shadow-gray-200/20 dark:shadow-none overflow-hidden h-fit">
+            <CardHeader className="p-5 border-b border-gray-100/50 dark:border-gray-800/50 bg-gray-50/50 dark:bg-gray-950/30">
+              <div className="flex items-center justify-between">
+                <CardTitle className="text-sm font-bold flex items-center gap-2.5 text-gray-900 dark:text-gray-100">
+                  <div className="p-1.5 rounded-lg bg-emerald-500/10">
+                    <CalendarDays className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
                   </div>
-                ))}
-              </div>
-            ) : selectedDayEvents.length === 0 ? (
-              <div className="text-center py-10 text-muted-foreground">
-                <CalendarDays className="h-10 w-10 mx-auto mb-3 opacity-30" />
-                <p className="text-sm font-medium">No events</p>
-                <p className="text-xs mt-1 mb-4">
-                  No events scheduled for this day
-                </p>
-                {canCreate && (
+                  Daily Agenda
+                </CardTitle>
+                {selectedDate && (
                   <Button
-                    size="sm"
-                    className="bg-emerald-600 hover:bg-emerald-700 text-white"
-                    onClick={openCreateDialog}
+                    variant="ghost"
+                    size="icon"
+                    className="h-8 w-8 rounded-lg text-gray-400 hover:text-gray-600 dark:hover:text-gray-200"
+                    onClick={() => setSelectedDate(null)}
                   >
-                    <Plus className="h-3.5 w-3.5 mr-1.5" />
-                    Add Event
+                    <X className="h-4 w-4" />
                   </Button>
                 )}
               </div>
-            ) : (
-              <div className="space-y-4">
-                {/* Selected date header */}
-                <div>
-                  <p className="text-xs text-muted-foreground uppercase tracking-wider font-medium">
-                    {formatDisplayDate(selectedDate)}
-                  </p>
-                  <p className="text-sm text-muted-foreground mt-0.5">
-                    {selectedDayEvents.length} event
-                    {selectedDayEvents.length !== 1 ? "s" : ""}
+            </CardHeader>
+
+            <CardContent className="p-0">
+              {!selectedDate ? (
+                <div className="flex flex-col items-center justify-center py-16 px-6 text-center">
+                  <div className="w-16 h-16 rounded-full bg-gray-50 dark:bg-gray-800 flex items-center justify-center mb-4 transition-transform group-hover:scale-110">
+                    <CalendarDays className="h-8 w-8 text-gray-300 dark:text-gray-600" />
+                  </div>
+                  <h3 className="text-sm font-bold text-gray-900 dark:text-gray-100">Select a Date</h3>
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-2 max-w-[200px] mx-auto">
+                    Click any day on the calendar to view its scheduled events and activities.
                   </p>
                 </div>
+              ) : loading ? (
+                <div className="p-5 space-y-4">
+                  <Skeleton className="h-4 w-32 rounded-lg" />
+                  {[...Array(2)].map((_, i) => (
+                    <div key={i} className="space-y-3 p-4 rounded-xl border border-gray-100 dark:border-gray-800">
+                      <Skeleton className="h-4 w-2/3" />
+                      <div className="flex gap-2">
+                        <Skeleton className="h-5 w-16" />
+                        <Skeleton className="h-5 w-16" />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : selectedDayEvents.length === 0 ? (
+                <div className="flex flex-col items-center justify-center py-16 px-6 text-center">
+                  <div className="w-16 h-16 rounded-full bg-gray-50 dark:bg-gray-800 flex items-center justify-center mb-4">
+                    <CalendarDays className="h-8 w-8 text-gray-300 dark:text-gray-600" />
+                  </div>
+                  <h3 className="text-sm font-bold text-gray-900 dark:text-gray-100">Clean Slate</h3>
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-2 mb-6">
+                    Nothing scheduled for {formatDisplayDate(selectedDate)}.
+                  </p>
+                  {canCreate && (
+                    <Button
+                      size="sm"
+                      className="bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg shadow-lg shadow-emerald-500/10"
+                      onClick={openCreateDialog}
+                    >
+                      <Plus className="h-4 w-4 mr-1.5" />
+                      Create Event
+                    </Button>
+                  )}
+                </div>
+              ) : (
+                <div className="p-4 space-y-4">
+                  {/* Selected date header */}
+                  <div className="px-1 flex items-center justify-between">
+                    <div>
+                      <p className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-widest">
+                        {formatDisplayDate(selectedDate).split(',')[0]}
+                      </p>
+                      <h4 className="text-sm font-black text-gray-900 dark:text-gray-100">
+                        {formatDisplayDate(selectedDate).split(',').slice(1).join(',')}
+                      </h4>
+                    </div>
+                    <Badge variant="secondary" className="rounded-lg font-bold text-[10px]">
+                      {selectedDayEvents.length} Items
+                    </Badge>
+                  </div>
 
-                <ScrollArea className="max-h-[420px] pr-1">
-                  <div className="space-y-2">
-                    {selectedDayEvents.map((ev) => (
-                      <div
-                        key={ev.id}
-                        className="group p-3 rounded-lg border hover:shadow-sm transition-shadow"
-                        style={{
-                          borderLeftWidth: "3px",
-                          borderLeftColor:
-                            ev.color || EVENT_TYPE_COLORS[ev.type] || "#6b7280",
-                        }}
-                      >
-                        {/* Title row */}
-                        <div className="flex items-start justify-between gap-2">
-                          <div className="min-w-0 flex-1">
-                            <p className="text-sm font-semibold text-gray-900 dark:text-gray-100 truncate">
-                              {ev.title}
-                            </p>
-                          </div>
-                          {/* Action buttons */}
-                          {(canEdit || canDelete) && (
-                            <div className="flex items-center gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity shrink-0">
-                              {canEdit && (
-                                <Button
-                                  variant="ghost"
-                                  size="icon"
-                                  className="h-7 w-7 text-emerald-500 hover:text-emerald-700 hover:bg-emerald-50 dark:hover:bg-emerald-900/30"
-                                  onClick={() => openEditDialog(ev)}
-                                  aria-label="Edit event"
+                  <ScrollArea className="max-h-[500px] pr-2">
+                    <div className="space-y-3">
+                      {selectedDayEvents.map((ev) => (
+                        <div
+                          key={ev.id}
+                          className="group relative bg-white dark:bg-gray-900 p-4 rounded-xl border border-gray-100 dark:border-gray-800 hover:border-emerald-500/30 hover:shadow-lg hover:shadow-emerald-500/5 transition-all duration-300"
+                        >
+                          {/* Colored bar */}
+                          <div
+                            className="absolute left-0 top-4 bottom-4 w-1 rounded-r-full"
+                            style={{ backgroundColor: ev.color || EVENT_TYPE_COLORS[ev.type] }}
+                          />
+
+                          <div className="flex items-start justify-between gap-3">
+                            <div className="flex-1 min-w-0">
+                              <h5 className="text-sm font-bold text-gray-900 dark:text-gray-100 leading-snug">
+                                {ev.title}
+                              </h5>
+                              <div className="flex flex-wrap items-center gap-2 mt-2">
+                                <Badge
+                                  className="text-[9px] font-bold px-2 py-0.5 rounded-md border-none"
+                                  style={getTypeBadgeStyle(ev.type, ev.color)}
                                 >
-                                  <Pencil className="h-3.5 w-3.5" />
-                                </Button>
-                              )}
-                              {canDelete && (
-                                <AlertDialog>
-                                  <AlertDialogTrigger asChild>
-                                    <Button
-                                      variant="ghost"
-                                      size="icon"
-                                      className="h-7 w-7 text-red-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/30"
-                                      aria-label="Delete event"
-                                    >
-                                      <Trash2 className="h-3.5 w-3.5" />
-                                    </Button>
-                                  </AlertDialogTrigger>
-                                  <AlertDialogContent>
-                                    <AlertDialogHeader>
-                                      <AlertDialogTitle>
-                                        Delete Event
-                                      </AlertDialogTitle>
-                                      <AlertDialogDescription>
-                                        Are you sure you want to delete &quot;
-                                        {ev.title}&quot;? This action cannot be
-                                        undone.
-                                      </AlertDialogDescription>
-                                    </AlertDialogHeader>
-                                    <AlertDialogFooter>
-                                      <AlertDialogCancel>
-                                        Cancel
-                                      </AlertDialogCancel>
-                                      <AlertDialogAction
-                                        onClick={() => handleDelete(ev.id)}
-                                        disabled={deleting}
-                                        className="bg-red-600 hover:bg-red-700"
-                                      >
-                                        {deleting ? "Deleting..." : "Delete"}
-                                      </AlertDialogAction>
-                                    </AlertDialogFooter>
-                                  </AlertDialogContent>
-                                </AlertDialog>
-                              )}
+                                  {EVENT_TYPE_LABELS[ev.type] || ev.type}
+                                </Badge>
+                                <span className="text-[10px] font-medium text-gray-500 flex items-center gap-1">
+                                  <Clock className="h-3 w-3" />
+                                  {ev.allDay ? "All Day" : "Scheduled"}
+                                </span>
+                              </div>
+                            </div>
+
+                            {/* Actions */}
+                            {(canEdit || canDelete) && (
+                              <div className="hidden group-hover:flex items-center gap-1">
+                                {canEdit && (
+                                  <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    className="h-7 w-7 rounded-lg hover:bg-emerald-50 dark:hover:bg-emerald-900/40 text-emerald-600"
+                                    onClick={() => openEditDialog(ev)}
+                                  >
+                                    <Pencil className="h-3.5 w-3.5" />
+                                  </Button>
+                                )}
+                              </div>
+                            )}
+                          </div>
+
+                          {ev.description && (
+                            <p className="mt-2.5 text-xs text-gray-500 dark:text-gray-400 line-clamp-3 leading-relaxed">
+                              {ev.description}
+                            </p>
+                          )}
+
+                          {ev.location && (
+                            <div className="mt-3 pt-3 border-t border-gray-50 dark:border-gray-800 flex items-center gap-2 text-[10px] text-gray-500 font-medium">
+                              <MapPin className="h-3 w-3 text-emerald-500" />
+                              {ev.location}
                             </div>
                           )}
                         </div>
+                      ))}
+                    </div>
+                  </ScrollArea>
+                </div>
+              )}
+            </CardContent>
+          </Card>
 
-                        {/* Type badge */}
-                        <div className="mt-1.5 flex flex-wrap items-center gap-1.5">
-                          <Badge
-                            variant="outline"
-                            className="text-[10px] font-medium px-1.5 py-0"
-                            style={getTypeBadgeStyle(ev.type, ev.color)}
-                          >
-                            {EVENT_TYPE_LABELS[ev.type] || ev.type}
-                          </Badge>
-                          <Badge
-                            variant="outline"
-                            className="text-[10px] font-medium px-1.5 py-0 bg-gray-50 dark:bg-gray-800 text-gray-600 dark:text-gray-400 border-gray-200 dark:border-gray-700"
-                          >
-                            {TARGET_ROLE_LABELS[ev.targetRole] || ev.targetRole}
-                          </Badge>
-                          {ev.allDay && (
-                            <Badge
-                              variant="outline"
-                              className="text-[10px] font-medium px-1.5 py-0 bg-gray-50 dark:bg-gray-800 text-gray-600 dark:text-gray-400 border-gray-200 dark:border-gray-700"
-                            >
-                              All Day
-                            </Badge>
-                          )}
-                        </div>
-
-                        {/* Description */}
-                        {ev.description && (
-                          <p className="mt-1.5 text-xs text-muted-foreground line-clamp-2 leading-relaxed">
-                            {ev.description}
-                          </p>
-                        )}
-
-                        {/* Meta info */}
-                        <div className="mt-2 flex flex-wrap items-center gap-3 text-[11px] text-muted-foreground">
-                          {/* Date range display */}
-                          {ev.endDate && ev.endDate !== ev.date && (
-                            <span className="flex items-center gap-1">
-                              <Clock className="h-3 w-3" />
-                              {new Date(
-                                ev.date + "T00:00:00",
-                              ).toLocaleDateString("en-US", {
-                                month: "short",
-                                day: "numeric",
-                              })}
-                              {" – "}
-                              {new Date(
-                                ev.endDate + "T00:00:00",
-                              ).toLocaleDateString("en-US", {
-                                month: "short",
-                                day: "numeric",
-                              })}
-                            </span>
-                          )}
-                          {ev.location && (
-                            <span className="flex items-center gap-1 truncate">
-                              <MapPin className="h-3 w-3 shrink-0" />
-                              {ev.location}
-                            </span>
-                          )}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </ScrollArea>
-              </div>
-            )}
-          </CardContent>
-        </Card>
+          {/* Type Key Legend */}
+          <Card className="rounded-2xl border-gray-200/50 dark:border-gray-800/50 bg-white/40 dark:bg-gray-900/40 backdrop-blur-sm p-4">
+            <h4 className="text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-3">Legend</h4>
+            <div className="grid grid-cols-2 gap-2">
+              {ALL_EVENT_TYPES.slice(0, 8).map((t) => (
+                <div key={t} className="flex items-center gap-2 text-[11px] font-bold text-gray-600 dark:text-gray-300">
+                  <span className="w-2 h-2 rounded-full shadow-sm" style={{ backgroundColor: EVENT_TYPE_COLORS[t] }} />
+                  {EVENT_TYPE_LABELS[t]}
+                </div>
+              ))}
+            </div>
+          </Card>
+        </div>
       </div>
 
-      {/* Type legend */}
-      <div className="flex flex-wrap items-center gap-3 px-1">
-        <span className="text-xs text-muted-foreground font-medium">
-          Event Types:
-        </span>
-        {ALL_EVENT_TYPES.map((t) => (
-          <button
-            key={t}
-            type="button"
-            onClick={() => setTypeFilter(typeFilter === t ? "all" : t)}
-            className={`
-              flex items-center gap-1.5 text-xs px-2 py-1 rounded-full transition-colors
-              ${typeFilter === t ? "bg-gray-100 dark:bg-gray-800 font-semibold" : "hover:bg-gray-50 dark:hover:bg-gray-800 text-muted-foreground"}
-            `}
-          >
-            <span
-              className="w-2.5 h-2.5 rounded-full shrink-0"
-              style={{ backgroundColor: EVENT_TYPE_COLORS[t] }}
-            />
-            {EVENT_TYPE_LABELS[t]}
-          </button>
-        ))}
-      </div>
 
       {/* ================================================================== */}
       {/* Create / Edit Event Dialog                                          */}
       {/* ================================================================== */}
-      <Dialog
-        open={dialogOpen}
-        onOpenChange={(open) => {
-          if (!open) closeDialog();
-          else setDialogOpen(true);
-        }}
-      >
-        <DialogContent className="sm:max-w-lg max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle>
-              {editingEvent ? "Edit Event" : "Create Event"}
+      <Dialog open={dialogOpen} onOpenChange={(open) => !open && closeDialog()}>
+        <DialogContent className="sm:max-w-lg rounded-3xl border-none shadow-2xl bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl animate-in zoom-in-95 duration-300">
+          <DialogHeader className="space-y-1.5 pt-2">
+            <DialogTitle className="text-xl font-black text-gray-900 dark:text-gray-100">
+              {editingEvent ? "Update Event" : "Create New Event"}
             </DialogTitle>
-            <DialogDescription>
-              {editingEvent
-                ? "Update the event details below."
-                : "Add a new event to the school calendar."}
+            <DialogDescription className="text-xs font-medium text-gray-500">
+              {editingEvent ? "Modify the schedule details for this activity." : "Schedule a new activity or important date for the school community."}
             </DialogDescription>
           </DialogHeader>
 
-          <div className="grid gap-4 py-2">
-            {/* Title */}
-            <div className="grid gap-2">
-              <Label htmlFor="event-title">Title *</Label>
+          <div className="grid gap-6 py-4">
+            {/* Title Section */}
+            <div className="space-y-2.5">
+              <Label className="text-[10px] font-black uppercase tracking-[0.1em] text-gray-400 dark:text-gray-500 flex items-center gap-1.5 ml-1">
+                <div className="w-1 h-1 rounded-full bg-emerald-500" />
+                Event Title
+              </Label>
               <Input
-                id="event-title"
                 value={form.title}
                 onChange={(e) => updateForm("title", e.target.value)}
-                placeholder="Event title"
+                placeholder="e.g. Annual Sports Meet 2024"
+                className="rounded-xl border-gray-100 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-950/50 focus:ring-emerald-500/20 h-11 text-sm font-medium"
               />
             </div>
 
-            {/* Description */}
-            <div className="grid gap-2">
-              <Label htmlFor="event-desc">Description</Label>
-              <Textarea
-                id="event-desc"
-                value={form.description}
-                onChange={(e) => updateForm("description", e.target.value)}
-                placeholder="Event description (optional)"
-                rows={3}
-              />
-            </div>
-
-            {/* Date row */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div className="grid gap-2">
-                <Label htmlFor="event-date">Start Date *</Label>
-                <Input
-                  id="event-date"
-                  type="date"
-                  value={form.date}
-                  onChange={(e) => updateForm("date", e.target.value)}
-                />
+            {/* Date Selection */}
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2.5">
+                <Label className="text-[10px] font-black uppercase tracking-[0.1em] text-gray-400 dark:text-gray-500 ml-1">Start Date</Label>
+                <div className="relative group">
+                  <Input
+                    type="date"
+                    value={form.date}
+                    onChange={(e) => updateForm("date", e.target.value)}
+                    className="rounded-xl bg-gray-50/50 dark:bg-gray-950/50 h-11 text-sm pl-4"
+                  />
+                </div>
               </div>
-              <div className="grid gap-2">
-                <Label htmlFor="event-enddate">End Date</Label>
+              <div className="space-y-2.5">
+                <Label className="text-[10px] font-black uppercase tracking-[0.1em] text-gray-400 dark:text-gray-500 ml-1">End Date (Optional)</Label>
                 <Input
-                  id="event-enddate"
                   type="date"
                   value={form.endDate}
                   onChange={(e) => updateForm("endDate", e.target.value)}
+                  className="rounded-xl bg-gray-50/50 dark:bg-gray-950/50 h-11 text-sm pl-4"
                   min={form.date}
                 />
               </div>
             </div>
 
-            {/* Type + Target Role */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div className="grid gap-2">
-                <Label>Event Type</Label>
+            {/* Classification */}
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2.5">
+                <Label className="text-[10px] font-black uppercase tracking-[0.1em] text-gray-400 dark:text-gray-500 ml-1">Category</Label>
                 <Select value={form.type} onValueChange={handleTypeChange}>
-                  <SelectTrigger>
+                  <SelectTrigger className="rounded-xl bg-gray-50/50 dark:bg-gray-950/50 h-11 border-gray-100 dark:border-gray-800 shadow-none">
                     <SelectValue />
                   </SelectTrigger>
-                  <SelectContent>
+                  <SelectContent className="rounded-xl border-none shadow-2xl">
                     {ALL_EVENT_TYPES.map((t) => (
-                      <SelectItem key={t} value={t}>
-                        <span className="flex items-center gap-2">
-                          <span
-                            className="inline-block w-2.5 h-2.5 rounded-full shrink-0"
-                            style={{ backgroundColor: EVENT_TYPE_COLORS[t] }}
-                          />
+                      <SelectItem key={t} value={t} className="rounded-lg my-0.5">
+                        <span className="flex items-center gap-2 font-medium py-1">
+                          <span className="w-2 h-2 rounded-full shadow-sm" style={{ backgroundColor: EVENT_TYPE_COLORS[t] }} />
                           {EVENT_TYPE_LABELS[t]}
                         </span>
                       </SelectItem>
@@ -1106,18 +1007,15 @@ export function AdminCalendar() {
                   </SelectContent>
                 </Select>
               </div>
-              <div className="grid gap-2">
-                <Label>Target Audience</Label>
-                <Select
-                  value={form.targetRole}
-                  onValueChange={(v) => updateForm("targetRole", v)}
-                >
-                  <SelectTrigger>
+              <div className="space-y-2.5">
+                <Label className="text-[10px] font-black uppercase tracking-[0.1em] text-gray-400 dark:text-gray-500 ml-1">Share With</Label>
+                <Select value={form.targetRole} onValueChange={(v) => updateForm("targetRole", v)}>
+                  <SelectTrigger className="rounded-xl bg-gray-50/50 dark:bg-gray-950/50 h-11 border-gray-100 dark:border-gray-800">
                     <SelectValue />
                   </SelectTrigger>
-                  <SelectContent>
+                  <SelectContent className="rounded-xl">
                     <SelectItem value="all">Everyone</SelectItem>
-                    <SelectItem value="admin">Admins</SelectItem>
+                    <SelectItem value="admin">Admins Only</SelectItem>
                     <SelectItem value="teacher">Teachers</SelectItem>
                     <SelectItem value="student">Students</SelectItem>
                     <SelectItem value="parent">Parents</SelectItem>
@@ -1126,85 +1024,54 @@ export function AdminCalendar() {
               </div>
             </div>
 
-            {/* Color + Location */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div className="grid gap-2">
-                <Label htmlFor="event-color">Color</Label>
-                <div className="flex items-center gap-2">
-                  <div className="relative">
-                    <input
-                      type="color"
-                      id="event-color"
-                      value={form.color}
-                      onChange={(e) => updateForm("color", e.target.value)}
-                      className="w-9 h-9 rounded-md border cursor-pointer p-0.5"
-                    />
-                  </div>
-                  <Input
-                    value={form.color}
-                    onChange={(e) => updateForm("color", e.target.value)}
-                    placeholder="#000000"
-                    className="flex-1 font-mono text-xs"
-                    maxLength={7}
-                  />
-                  {/* Quick color presets */}
-                  <div className="flex flex-wrap gap-1">
-                    {Object.entries(EVENT_TYPE_COLORS)
-                      .filter(([, c]) => c !== form.color)
-                      .slice(0, 4)
-                      .map(([type, c]) => (
-                        <button
-                          key={type}
-                          type="button"
-                          className="w-5 h-5 rounded-full border border-gray-200 dark:border-gray-700 hover:scale-110 transition-transform"
-                          style={{ backgroundColor: c }}
-                          title={EVENT_TYPE_LABELS[type]}
-                          onClick={() => updateForm("color", c)}
-                          aria-label={`Set color to ${EVENT_TYPE_LABELS[type]}`}
-                        />
-                      ))}
-                  </div>
-                </div>
-              </div>
-              <div className="grid gap-2">
-                <Label htmlFor="event-location">Location</Label>
+            {/* Location & Details */}
+            <div className="space-y-2.5">
+              <Label className="text-[10px] font-black uppercase tracking-[0.1em] text-gray-400 dark:text-gray-500 ml-1">Location / Platform</Label>
+              <div className="relative">
+                <MapPin className="absolute left-3.5 top-3.5 h-4 w-4 text-gray-400" />
                 <Input
-                  id="event-location"
                   value={form.location}
                   onChange={(e) => updateForm("location", e.target.value)}
-                  placeholder="Event location (optional)"
+                  placeholder="e.g. Main Auditorium or Zoom"
+                  className="rounded-xl bg-gray-50/50 dark:bg-gray-950/50 h-11 pl-10 text-sm font-medium"
                 />
               </div>
             </div>
 
-            {/* All Day toggle */}
-            <div className="flex items-center gap-3">
+            <div className="space-y-2.5">
+              <Label className="text-[10px] font-black uppercase tracking-[0.1em] text-gray-400 dark:text-gray-500 ml-1">Detailed Description</Label>
+              <Textarea
+                value={form.description}
+                onChange={(e) => updateForm("description", e.target.value)}
+                placeholder="Write a few lines about what participants should expect..."
+                className="rounded-xl bg-gray-50/50 dark:bg-gray-950/50 min-h-[100px] text-sm py-3 px-4 leading-relaxed"
+              />
+            </div>
+            
+            <div className="flex items-center gap-3 bg-emerald-500/5 p-3 rounded-xl border border-emerald-500/10">
               <Switch
                 id="event-allday"
                 checked={form.allDay}
                 onCheckedChange={(checked) => updateForm("allDay", checked)}
+                className="data-[state=checked]:bg-emerald-600"
               />
-              <Label htmlFor="event-allday" className="text-sm">
-                All Day Event
+              <Label htmlFor="event-allday" className="text-xs font-bold text-emerald-800 dark:text-emerald-400">
+                Mark as all-day event
               </Label>
             </div>
           </div>
 
-          <DialogFooter className="gap-2 sm:gap-0">
-            <Button
-              variant="outline"
-              onClick={closeDialog}
-              disabled={submitting}
-            >
-              Cancel
+          <DialogFooter className="bg-gray-50/50 dark:bg-gray-950/30 -mx-6 -mb-6 px-6 py-4 mt-2">
+            <Button variant="ghost" onClick={closeDialog} className="rounded-xl font-bold text-gray-500 hover:text-gray-900 dark:hover:text-gray-100">
+              Discard
             </Button>
             <Button
-              className="bg-emerald-600 hover:bg-emerald-700 text-white"
+              className="bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-bold px-8 shadow-lg shadow-emerald-500/20 h-11 transition-all active:scale-95"
               onClick={handleSubmit}
               disabled={submitting || !form.title.trim() || !form.date}
             >
-              {submitting && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
-              {editingEvent ? "Save Changes" : "Create Event"}
+              {submitting ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
+              {editingEvent ? "Sync Changes" : "Create Schedule"}
             </Button>
           </DialogFooter>
         </DialogContent>

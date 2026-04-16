@@ -301,6 +301,27 @@ export function AdminFees() {
           </p>
         </div>
         <div className="flex items-center gap-3">
+          <Select
+            value={selectedClass || undefined}
+            onValueChange={setSelectedClass}
+          >
+            <SelectTrigger className="w-[200px] h-10 bg-white dark:bg-gray-950 border-gray-200">
+              <SelectValue placeholder="Select Class" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all" className="font-bold text-blue-600">
+                <span className="flex items-center gap-2">
+                  <CreditCard className="h-4 w-4" />
+                  All School Fees
+                </span>
+              </SelectItem>
+              {classes.map((cls: any) => (
+                <SelectItem key={cls.id} value={cls.id}>
+                  {cls.name} - {cls.section}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
           {canCreate && (
             <Button
               onClick={() => setAddOpen(true)}
@@ -312,46 +333,6 @@ export function AdminFees() {
           )}
         </div>
       </div>
-
-      {/* Class Selection Filter (The Gatekeeper) */}
-      <Card className="border-blue-500/20 bg-blue-500/5 dark:bg-blue-500/10">
-        <CardContent className="p-4 py-6">
-          <div className="flex flex-col md:flex-row items-center justify-center gap-6">
-            <div className="text-center md:text-left space-y-1">
-              <h3 className="text-lg font-semibold flex items-center justify-center md:justify-start gap-2">
-                <School className="h-5 w-5 text-blue-600" />
-                Select a Class
-              </h3>
-              <p className="text-sm text-gray-500 italic">
-                Filter financial records by class or view everything at once.
-              </p>
-            </div>
-            <div className="flex items-center gap-2 w-full md:w-auto min-w-[300px]">
-              <Select
-                value={selectedClass || undefined}
-                onValueChange={setSelectedClass}
-              >
-                <SelectTrigger className="bg-white dark:bg-gray-950 border-blue-200 h-12 text-lg">
-                  <SelectValue placeholder="Chose Class for Fees..." />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all" className="font-bold text-blue-600">
-                    <span className="flex items-center gap-2">
-                      <CreditCard className="h-4 w-4" />
-                      View All School Fees
-                    </span>
-                  </SelectItem>
-                  {classes.map((cls: any) => (
-                    <SelectItem key={cls.id} value={cls.id}>
-                      {cls.name} - {cls.section}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
 
       {!isSelectionMade ? (
         <div className="py-20 flex flex-col items-center justify-center text-center space-y-4 border-2 border-dashed border-gray-200 dark:border-gray-800 rounded-3xl bg-gray-50/30">
