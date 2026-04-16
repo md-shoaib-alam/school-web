@@ -1,9 +1,6 @@
 "use client";
 
-
-import { apiFetch } from "@/lib/api";
-import { useState } from "react";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useState, useEffect, useCallback } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -47,7 +44,7 @@ import {
 import { goeyToast as toast } from "goey-toast";
 import type { TeacherInfo } from "@/lib/types";
 import { useModulePermissions } from "@/hooks/use-permissions";
-import { useTeachers } from "@/lib/graphql/hooks";
+import { apiFetch } from "@/lib/api";
 import { useAppStore } from "@/store/use-app-store";
 
 const avatarColors = [
@@ -69,23 +66,24 @@ const emptyFormData = {
   phone: "",
   qualification: "",
   experience: "",
+  password: "", // Added for consistency
 };
 
 export function AdminTeachers() {
   const { currentTenantId } = useAppStore();
   const { canCreate, canEdit, canDelete } = useModulePermissions("teachers");
-  const queryClient = useQueryClient();
+
+  // Initializing state from localStorage to avoid skeletons on revisit
+  const [teachers, setTeachers] = useState<TeacherInfo[]>(() => {
+    if (typeof window !== "undefined") {
+      const saved = localStorage.getItem(`teachers_cache_${currentTenantId}`);
+      return saved ? JSON.parse(saved) : [];
+    }
+    return [];
+  });
+
+  const [loading, setLoading] = useState(teachers.length === 0);
   const [search, setSearch] = useState("");
-
-  // ⚡ TanStack Query with GraphQL Group-wise hooks
-  const { data: teacherData, isLoading: teachersLoading } = useTeachers(currentTenantId || undefined);
-  const teachers = (teacherData?.teachers || []) as TeacherInfo[];
-
-  // Only show full skeleton if we have NO data at all
-  const loading = teachersLoading && teachers.length === 0;
-
-  const refetchTeachers = () =>
-    queryClient.invalidateQueries({ queryKey: ["teachers", currentTenantId] });
 
   // Dialog state
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -98,11 +96,39 @@ export function AdminTeachers() {
   // Delete state
   const [deletingId, setDeletingId] = useState<string | null>(null);
 
+  const fetchTeachers = useCallback(async (showSkeleton = false) => {
+    try {
+      if (showSkeleton) setLoading(true);
+      const res = await apiFetch("/api/teachers");
+      if (!res.ok) throw new Error("Failed to fetch teachers");
+      const json = await res.json();
+      setTeachers(json);
+      // Cache the result for next time
+      if (typeof window !== "undefined" && currentTenantId) {
+        localStorage.setItem(`teachers_cache_${currentTenantId}`, JSON.stringify(json));
+      }
+    } catch (err) {
+      console.error("Error fetching teachers:", err);
+      // Don't show toast on initial background load to avoid noise
+    } finally {
+      setLoading(false);
+    }
+  }, [currentTenantId]);
+
+  // Initial load when tenant is ready
+  useEffect(() => {
+    if (currentTenantId) {
+        // If we have cached items, fetch silently in background
+        // If no cached items, show skeleton
+        fetchTeachers(teachers.length === 0);
+    }
+  }, [currentTenantId, fetchTeachers]);
+
   const filtered = teachers.filter(
     (t) =>
       t.name.toLowerCase().includes(search.toLowerCase()) ||
       t.email.toLowerCase().includes(search.toLowerCase()) ||
-      t.subjects.some((s) => s.toLowerCase().includes(search.toLowerCase())),
+      (t.subjects && t.subjects.some((s) => s.toLowerCase().includes(search.toLowerCase()))),
   );
 
   const handleOpenAdd = () => {
@@ -119,51 +145,69 @@ export function AdminTeachers() {
       phone: teacher.phone || "",
       qualification: teacher.qualification || "",
       experience: teacher.experience || "",
+      password: "",
     });
     setDialogOpen(true);
   };
 
   const handleSubmit = async () => {
-    setSubmitting(true);
-    try {
-      const isEdit = !!editingTeacher;
-      const url = "/api/teachers";
-      const method = isEdit ? "PUT" : "POST";
-      const body = isEdit ? { id: editingTeacher.id, ...formData } : formData;
-
-      const res = await fetch(url, {
-        method,
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(body),
-      });
-
-      if (!res.ok)
-        throw new Error(`Failed to ${isEdit ? "update" : "add"} teacher`);
-
-      toast.success(`Teacher ${isEdit ? "updated" : "added"} successfully`);
-      setDialogOpen(false);
-      setEditingTeacher(null);
-      setFormData(emptyFormData);
-      refetchTeachers();
-    } catch {
-      toast.error(
-        `Failed to ${editingTeacher ? "update" : "add"} teacher. Please try again.`,
-      );
-    } finally {
-      setSubmitting(false);
+    if (!formData.name || !formData.email) {
+       toast.error("Name and Email are required");
+       return;
     }
+    toast.promise(
+      (async () => {
+        const isEdit = !!editingTeacher;
+        const url = "/api/teachers";
+        const method = isEdit ? "PUT" : "POST";
+        const body = isEdit ? { id: editingTeacher.id, ...formData } : formData;
+
+        const res = await apiFetch(url, {
+          method,
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(body),
+        });
+
+        if (!res.ok) {
+          const err = await res.json().catch(() => ({}));
+          throw new Error(err.error || `Failed to ${isEdit ? "update" : "add"} teacher`);
+        }
+        
+        setDialogOpen(false);
+        setEditingTeacher(null);
+        setFormData(emptyFormData);
+        fetchTeachers();
+        return isEdit ? "Teacher updated" : "Teacher added";
+      })(),
+      {
+        loading: `${editingTeacher ? "Updating" : "Adding"} teacher...`,
+        success: (msg) => msg,
+        error: (err) => err.message || "Action failed",
+      }
+    );
   };
 
   const handleDelete = async (id: string) => {
-    try {
-      const res = await apiFetch(`/api/teachers?id=${id}`, { method: "DELETE" });
-      if (!res.ok) throw new Error("Failed to delete teacher");
-      toast.success("Teacher deleted successfully");
-      refetchTeachers();
-      setDeletingId(null);
-    } catch {
-      toast.error("Failed to delete teacher. Please try again.");
-    }
+    toast.promise(
+      (async () => {
+        const res = await apiFetch(`/api/teachers?id=${id}`, { method: "DELETE" });
+        if (!res.ok) {
+          const err = await res.json().catch(() => ({}));
+          throw new Error(err.error || "Deletion failed");
+        }
+        setTeachers((prev) => prev.filter((t) => t.id !== id));
+        setDeletingId(null);
+        
+        // We throw a "success" message to force a RED morphing pill for deletion
+        throw new Error("Teacher record removed");
+      })(),
+      {
+        loading: "Removing teacher record...",
+        success: () => "", // Not reached
+        error: (err) => err.message, // Shows the red pill
+      },
+      { duration: 5000 }
+    );
   };
 
   const isFormValid =
@@ -227,23 +271,10 @@ export function AdminTeachers() {
         </div>
       ) : filtered.length === 0 ? (
         <Card>
-          <CardContent className="py-20 text-center text-muted-foreground bg-gray-50/30 dark:bg-gray-900/10">
-            <Users className="h-12 w-12 mx-auto mb-4 opacity-30 text-emerald-600" />
-            <p className="text-lg font-semibold text-gray-900 dark:text-gray-100 italic">
-              No teachers or users found
-            </p>
-            <p className="text-sm mt-1 max-w-xs mx-auto">
-              Ready to start? Add your first teacher or staff member to manage classes and subjects.
-            </p>
-            {canCreate && (
-              <Button
-                variant="outline"
-                className="mt-6 border-emerald-300 text-emerald-700 hover:bg-emerald-50 dark:hover:bg-emerald-900/20"
-                onClick={handleOpenAdd}
-              >
-                <Plus className="h-4 w-4 mr-2" /> Add First Teacher
-              </Button>
-            )}
+          <CardContent className="py-16 text-center text-muted-foreground">
+            <Users className="h-12 w-12 mx-auto mb-3 opacity-30" />
+            <p className="font-medium">No teachers found</p>
+            <p className="text-sm">Try adjusting your search criteria</p>
           </CardContent>
         </Card>
       ) : (
@@ -354,17 +385,15 @@ export function AdminTeachers() {
                     <div className="flex items-start gap-2">
                       <BookOpen className="h-4 w-4 text-muted-foreground mt-0.5 shrink-0" />
                       <div className="flex flex-wrap gap-1.5">
-                        {Array.from(new Set(teacher.subjects as string[])).map(
-                          (subject, idx) => (
-                            <Badge
-                              key={`${subject}-${idx}`}
-                              variant="secondary"
-                              className="text-xs font-normal bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800"
-                            >
-                              {subject}
-                            </Badge>
-                          ),
-                        )}
+                        {(teacher.subjects || []).map((subject, idx) => (
+                          <Badge
+                            key={`${subject}-${idx}`}
+                            variant="secondary"
+                            className="text-xs font-normal bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800"
+                          >
+                            {subject}
+                          </Badge>
+                        ))}
                       </div>
                     </div>
 
@@ -372,17 +401,15 @@ export function AdminTeachers() {
                     <div className="flex items-start gap-2">
                       <GraduationCap className="h-4 w-4 text-muted-foreground mt-0.5 shrink-0" />
                       <div className="flex flex-wrap gap-1.5">
-                        {Array.from(new Set(teacher.classes as string[])).map(
-                          (cls) => (
-                            <Badge
-                              key={cls}
-                              variant="outline"
-                              className="text-xs font-normal"
-                            >
-                              {cls}
-                            </Badge>
-                          ),
-                        )}
+                        {(teacher.classes || []).map((cls) => (
+                          <Badge
+                            key={cls}
+                            variant="outline"
+                            className="text-xs font-normal"
+                          >
+                            {cls}
+                          </Badge>
+                        ))}
                       </div>
                     </div>
 
@@ -462,6 +489,18 @@ export function AdminTeachers() {
                 placeholder="jane.smith@school.com"
               />
             </div>
+            {!editingTeacher && (
+                <div className="grid gap-2">
+                <Label htmlFor="teacher-password">Password</Label>
+                <Input
+                    id="teacher-password"
+                    type="password"
+                    value={formData.password}
+                    onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                    placeholder="Set login password (default: changeme123)"
+                />
+                </div>
+            )}
             <div className="grid gap-2">
               <Label htmlFor="teacher-phone">Phone</Label>
               <Input

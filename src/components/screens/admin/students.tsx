@@ -1,9 +1,6 @@
 "use client";
 
-
-import { apiFetch } from "@/lib/api";
-import { useState, useRef } from "react";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -64,8 +61,8 @@ import {
 import type { StudentInfo, ClassInfo } from "@/lib/types";
 import { useModulePermissions } from "@/hooks/use-permissions";
 import { useAppStore } from "@/store/use-app-store";
-import { useToast } from "@/hooks/use-toast";
-import { useStudents, useClasses } from "@/lib/graphql/hooks";
+import { goeyToast as toast } from "goey-toast";
+import { apiFetch } from "@/lib/api";
 
 const ITEMS_PER_PAGE = 10;
 
@@ -137,32 +134,20 @@ function PaginationPages({
 }
 
 export function AdminStudents() {
-  const { currentTenantId } = useAppStore();
   const { canCreate, canEdit, canDelete } = useModulePermissions("students");
-  const queryClient = useQueryClient();
+  const [students, setStudents] = useState<StudentInfo[]>([]);
+  const [classes, setClasses] = useState<ClassInfo[]>([]);
+  const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [classFilter, setClassFilter] = useState("all");
   const [currentPage, setCurrentPage] = useState(1);
-
-  // ⚡ TanStack Query with GraphQL Group-wise hooks
-  const { data: studentData, isLoading: studentsLoading, isFetching: studentsFetching } = useStudents(currentTenantId || undefined);
-  const { data: classesData } = useClasses(currentTenantId || undefined);
-
-  const students = (studentData?.students || []) as StudentInfo[];
-  const classes = (classesData?.classes || []) as ClassInfo[];
-
-  // Only show full skeleton if we have NO data at all
-  const loading = studentsLoading && students.length === 0;
-
-  // Helper to invalidate after mutations
-  const refetchStudents = () =>
-    queryClient.invalidateQueries({ queryKey: ["students", currentTenantId] });
 
   // Add student dialog
   const [addDialogOpen, setAddDialogOpen] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
     email: "",
+    password: "", // User's code was missing this, backend needs it
     phone: "",
     rollNumber: "",
     classId: "",
@@ -191,7 +176,8 @@ export function AdminStudents() {
   const [deletingId, setDeletingId] = useState<string | null>(null);
 
   // Import state
-  const { toast } = useToast();
+  const { currentTenantId } = useAppStore();
+  // removed useToast line
   const [importDialogOpen, setImportDialogOpen] = useState(false);
   const [importFile, setImportFile] = useState<File | null>(null);
   const [importing, setImporting] = useState(false);
@@ -203,6 +189,41 @@ export function AdminStudents() {
   } | null>(null);
   const [dragOver, setDragOver] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const fetchStudents = useCallback(async () => {
+    try {
+      setLoading(true);
+      const res = await apiFetch("/api/students");
+      if (!res.ok) throw new Error("Failed to fetch students");
+      const json = await res.json();
+      setStudents(json);
+    } catch (err) {
+      console.error("Error fetching students:", err);
+      toast({
+        title: "Connection error",
+        description: "Failed to load student data from the server.",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
+  }, [toast]);
+
+  const fetchClasses = useCallback(async () => {
+    try {
+      const res = await apiFetch("/api/classes");
+      if (!res.ok) throw new Error("Failed to fetch classes");
+      const json = await res.json();
+      setClasses(json);
+    } catch {
+      console.error("Error fetching classes");
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchStudents();
+    fetchClasses();
+  }, [fetchStudents, fetchClasses]);
 
   // Filter students
   const filtered = students.filter((s) => {
@@ -218,32 +239,43 @@ export function AdminStudents() {
     (currentPage - 1) * ITEMS_PER_PAGE,
     currentPage * ITEMS_PER_PAGE,
   );
-
   const handleAddStudent = async () => {
-    setSubmitting(true);
-    try {
-      const res = await apiFetch("/api/students", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
-      });
-      if (!res.ok) throw new Error("Failed to add student");
-      setAddDialogOpen(false);
-      setFormData({
-        name: "",
-        email: "",
-        phone: "",
-        rollNumber: "",
-        classId: "",
-        gender: "male",
-        dateOfBirth: "",
-      });
-      refetchStudents();
-    } catch {
-      console.error("Error adding student");
-    } finally {
-      setSubmitting(false);
+    if (!formData.name || !formData.email || !formData.classId) {
+      toast.error("Please fill all required fields");
+      return;
     }
+
+    toast.promise(
+      (async () => {
+        const res = await apiFetch("/api/students", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(formData),
+        });
+        if (!res.ok) {
+          const err = await res.json().catch(() => ({}));
+          throw new Error(err.error || "Failed to add student");
+        }
+        setAddDialogOpen(false);
+        setFormData({
+          name: "",
+          email: "",
+          password: "",
+          phone: "",
+          rollNumber: "",
+          classId: "",
+          gender: "male",
+          dateOfBirth: "",
+        });
+        fetchStudents();
+        return "Student registered successfully";
+      })(),
+      {
+        loading: "Registering new student...",
+        success: (msg) => msg,
+        error: (err) => err.message,
+      }
+    );
   };
 
   const handleOpenEdit = (student: StudentInfo) => {
@@ -259,43 +291,50 @@ export function AdminStudents() {
     });
     setEditDialogOpen(true);
   };
-
   const handleEditStudent = async () => {
     if (!editingStudent) return;
-    setEditSubmitting(true);
-    try {
-      const res = await apiFetch("/api/students", {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id: editingStudent.id, ...editFormData }),
-      });
-      if (!res.ok) throw new Error("Failed to update student");
-      toast({
-        title: "Student updated",
-        description: `${editFormData.name}'s information has been updated successfully.`,
-      });
-      setEditDialogOpen(false);
-      setEditingStudent(null);
-      refetchStudents();
-    } catch {
-      toast({
-        title: "Update failed",
-        description: "Failed to update student. Please try again.",
-        variant: "destructive",
-      });
-    } finally {
-      setEditSubmitting(false);
-    }
+
+    toast.promise(
+      (async () => {
+        const res = await apiFetch("/api/students", {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ id: editingStudent!.id, ...editFormData }),
+        });
+        if (!res.ok) throw new Error("Failed to update student");
+        setEditDialogOpen(false);
+        setEditingStudent(null);
+        fetchStudents();
+        return "Student details updated";
+      })(),
+      {
+        loading: "Updating student details...",
+        success: (msg) => msg,
+        error: "Failed to update student",
+      }
+    );
   };
 
   const handleDelete = async (id: string) => {
-    try {
-      const res = await apiFetch(`/api/students?id=${id}`, { method: "DELETE" });
-      if (!res.ok) throw new Error("Failed to delete student");
-      refetchStudents();
-    } catch {
-      console.error("Error deleting student");
-    }
+    toast.promise(
+      (async () => {
+        const res = await apiFetch(`/api/students?id=${id}`, { method: "DELETE" });
+        if (!res.ok) {
+           const err = await res.json().catch(() => ({}));
+           throw new Error(err.error || "Failed to delete student");
+        }
+        setStudents((prev) => prev.filter((s) => s.id !== id));
+        
+        // Force red pill morph
+        throw new Error("Student records removed");
+      })(),
+      {
+        loading: "Deleting student records...",
+        success: () => "",
+        error: (err) => err.message,
+      },
+      { duration: 5000 }
+    );
   };
 
   const downloadSampleCSV = () => {
@@ -345,7 +384,7 @@ export function AdminStudents() {
           title: "Import successful",
           description: `Successfully imported ${data.imported} of ${data.total} students.`,
         });
-        refetchStudents();
+        fetchStudents();
       } else {
         toast({
           title: "Import completed with errors",
@@ -509,8 +548,7 @@ export function AdminStudents() {
                           className="text-center py-12 text-muted-foreground"
                         >
                           <GraduationCap className="h-10 w-10 mx-auto mb-2 opacity-30" />
-                          <p className="text-sm font-medium">No students or users found</p>
-                          <p className="text-xs mt-1 opacity-70">Register new students to see them here.</p>
+                          <p>No students found</p>
                         </TableCell>
                       </TableRow>
                     ) : (
@@ -796,10 +834,7 @@ export function AdminStudents() {
             )}
           </div>
           <DialogFooter>
-            <Button
-              variant="outline"
-              onClick={() => setImportDialogOpen(false)}
-            >
+            <Button variant="outline" onClick={() => setImportDialogOpen(false)}>
               Cancel
             </Button>
             <Button
@@ -1021,14 +1056,26 @@ export function AdminStudents() {
                 />
               </div>
             </div>
+            {/* Password Field (Added for consistency with backend requirements) */}
+            <div className="grid gap-2">
+                <Label htmlFor="password">Login Password</Label>
+                <Input
+                  id="password"
+                  type="password"
+                  value={formData.password}
+                  onChange={(e) =>
+                    setFormData({ ...formData, password: e.target.value })
+                  }
+                  placeholder="Set student login password"
+                />
+                <p className="text-[10px] text-muted-foreground">Default: changeme123</p>
+            </div>
             <div className="grid grid-cols-2 gap-4">
               <div className="grid gap-2">
                 <Label htmlFor="classId">Class</Label>
                 <Select
                   value={formData.classId}
-                  onValueChange={(v) =>
-                    setFormData({ ...formData, classId: v })
-                  }
+                  onValueChange={(v) => setFormData({ ...formData, classId: v })}
                 >
                   <SelectTrigger>
                     <SelectValue placeholder="Select class" />
@@ -1098,7 +1145,14 @@ export function AdminStudents() {
                 !formData.rollNumber
               }
             >
-              {submitting ? "Adding..." : "Add Student"}
+              {submitting ? (
+                <>
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  Adding...
+                </>
+              ) : (
+                "Add Student"
+              )}
             </Button>
           </DialogFooter>
         </DialogContent>

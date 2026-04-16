@@ -71,7 +71,7 @@ export function StudentFees() {
           ) || studentsData[0];
 
         if (matchedStudent) {
-          const feesRes = await fetch(
+          const feesRes = await apiFetch(
             `/api/fees?studentId=${matchedStudent.id}`,
           );
           if (feesRes.ok) setFees(await feesRes.json());

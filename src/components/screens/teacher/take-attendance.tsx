@@ -98,7 +98,7 @@ export function TeacherAttendance() {
       const data = await res.json();
       setStudents(data);
 
-      const attRes = await fetch(
+      const attRes = await apiFetch(
         `/api/attendance?classId=${selectedClassId}&date=${date}`,
       );
       const attData = await attRes.json();

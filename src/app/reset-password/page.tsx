@@ -9,7 +9,7 @@ import { Mail, ShieldCheck, CheckCircle2, ArrowLeft, Loader2 } from 'lucide-reac
 import Link from 'next/link';
 
 import { useRequestPasswordReset } from '@/lib/graphql/hooks';
-import { toast } from 'sonner';
+import { goeyToast as toast } from 'goey-toast';
 
 /**
  * ResetPasswordPage (forgot password flow)

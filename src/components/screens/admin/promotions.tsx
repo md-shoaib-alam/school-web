@@ -1,8 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { api } from "@/lib/api";
+import { useState, useEffect, useMemo, useCallback } from "react";
 import { 
   Card, 
   CardContent, 
@@ -23,7 +21,6 @@ import {
   CheckCircle2, 
   Loader2, 
   Users, 
-  AlertTriangle, 
   CalendarDays,
   Search,
   School,
@@ -32,14 +29,14 @@ import {
   AlertCircle
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { useClasses, useStudents } from "@/lib/graphql/hooks";
-import type { ClassInfo } from "@/lib/types";
+import type { ClassInfo, StudentInfo } from "@/lib/types";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Input } from "@/components/ui/input";
+import { apiFetch } from "@/lib/api";
 
 export function AdminPromotions() {
   const { currentTenantId } = useAppStore();
-  const queryClient = useQueryClient();
+  // removed useToast hook line
 
   const currentYear = new Date().getFullYear();
   const yearOptions = [
@@ -54,34 +51,98 @@ export function AdminPromotions() {
   const [selectedStudents, setSelectedStudents] = useState<string[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
 
-  const { data: classData, isLoading: classesLoading } = useClasses(currentTenantId || undefined);
-  const classes = (classData?.classes || []) as ClassInfo[];
+  const [classes, setClasses] = useState<ClassInfo[]>([]);
+  const [classesLoading, setClassesLoading] = useState(true);
 
-  const { data: studentsData, isLoading: studentsLoading } = useStudents(
-    currentTenantId || undefined,
-    fromClassId,
-    1,
-    500 // Increase limit for promotions to avoid missing students
-  );
-  const students = studentsData?.students || [];
+  const [students, setStudents] = useState<StudentInfo[]>([]);
+  const [studentsLoading, setStudentsLoading] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
 
-  const promotionMutation = useMutation({
-    mutationFn: (data: {
-      sourceClassId: string;
-      targetClassId: string;
-      studentIds: string[];
-      targetYear: string;
-    }) => api.post("/promotions", data),
-    onSuccess: (res: any) => {
-      toast.success(`Promoted ${res.promoted || selectedStudents.length} students successfully.`);
-      setSelectedStudents([]);
-      queryClient.invalidateQueries({ queryKey: ["students"] });
-      setFromClassId("");
-    },
-    onError: (err: any) => {
-      toast.error(err.message || "Promotion failed.");
-    },
-  });
+  // Load classes on mount
+  const fetchClasses = useCallback(async () => {
+    try {
+      setClassesLoading(true);
+      const res = await apiFetch("/api/classes");
+      if (!res.ok) throw new Error("Failed to fetch classes");
+      const json = await res.json();
+      setClasses(json);
+    } catch (err) {
+      console.error("Error fetching classes:", err);
+    } finally {
+      setClassesLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchClasses();
+  }, [fetchClasses]);
+
+  // Load students when fromClassId changes - INSTANT FETCH
+  const fetchStudentsForClass = useCallback(async (classId: string) => {
+    if (!classId) {
+      setStudents([]);
+      return;
+    }
+    try {
+      setStudentsLoading(true);
+      // Direct API call to bypass any TanStack caching issues
+      const res = await apiFetch(`/api/students?classId=${classId}`);
+      if (!res.ok) throw new Error("Failed to fetch students");
+      const json = await res.json();
+      setStudents(json);
+      setSelectedStudents([]); // Reset selection when class changes
+    } catch (err) {
+      console.error("Error fetching students:", err);
+      toast.error("Error", {
+        description: "Failed to load students for the selected class."
+      });
+    } finally {
+      setStudentsLoading(false);
+    }
+  }, []);
+
+  // Trigger fetch when fromClassId changes
+  useEffect(() => {
+    if (fromClassId) {
+       fetchStudentsForClass(fromClassId);
+    } else {
+       setStudents([]);
+    }
+  }, [fromClassId, fetchStudentsForClass]);
+  const handlePromote = async () => {
+    if (!fromClassId || !toClassId || selectedStudents.length === 0) return;
+
+    toast.promise(
+      (async () => {
+        const res = await apiFetch("/api/promotions", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            sourceClassId: fromClassId,
+            targetClassId: toClassId,
+            studentIds: selectedStudents,
+            targetYear,
+          })
+        });
+
+        if (!res.ok) {
+          const err = await res.json().catch(() => ({}));
+          throw new Error(err.error || "Promotion failed");
+        }
+
+        const data = await res.json();
+        setSelectedStudents([]);
+        setFromClassId(""); // Reset to force clear view
+        setStudents([]);
+        return `Successfully promoted ${data.promoted || selectedStudents.length} students`;
+      })(),
+      {
+        loading: "Processing student promotions...",
+        success: (msg) => msg,
+        error: (err) => err.message,
+      }
+    );
+  };
 
   const toggleStudent = (id: string) => {
     setSelectedStudents((prev) =>
@@ -90,25 +151,18 @@ export function AdminPromotions() {
   };
 
   const markAll = () => {
-    if (selectedStudents.length === students.length) {
+    if (selectedStudents.length === students.length && students.length > 0) {
       setSelectedStudents([]);
     } else {
       setSelectedStudents(students.map((s: any) => s.id));
     }
   };
 
-  const handlePromote = () => {
-    if (!fromClassId || !toClassId || selectedStudents.length === 0) return;
-    promotionMutation.mutate({
-      sourceClassId: fromClassId,
-      targetClassId: toClassId,
-      studentIds: selectedStudents,
-      targetYear,
-    });
-  };
-
   const filteredStudents = useMemo(() => {
-    return students.filter((s: any) => s.name.toLowerCase().includes(searchQuery.toLowerCase()));
+    return students.filter((s: any) => 
+      s.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (s.rollNumber && s.rollNumber.toLowerCase().includes(searchQuery.toLowerCase()))
+    );
   }, [students, searchQuery]);
 
   const getInitials = (name: string) => {
@@ -142,13 +196,25 @@ export function AdminPromotions() {
         {[
           { label: "Eligible", val: students.length, color: "blue", icon: Users },
           { label: "Selected", val: selectedStudents.length, color: "emerald", icon: CheckCircle2 },
-          { label: "Remaining", val: students.length - selectedStudents.length, color: "gray", icon: GraduationCap },
+          { label: "Remaining", val: Math.max(0, students.length - selectedStudents.length), color: "gray", icon: GraduationCap },
           { label: "Target Year", val: targetYear, color: "amber", icon: CalendarDays },
         ].map((item, i) => (
-          <Card key={i} className="rounded-xl shadow-sm border-0">
+          <Card key={i} className="rounded-xl shadow-sm border-0 overflow-hidden">
             <CardContent className="p-4 flex items-center gap-3">
-              <div className={`w-10 h-10 rounded-xl bg-${item.color}-50 dark:bg-${item.color}-900/30 flex items-center justify-center`}>
-                <item.icon className={`h-5 w-5 text-${item.color}-500 dark:text-${item.color}-400`} />
+              <div className={cn(
+                "w-10 h-10 rounded-xl flex items-center justify-center",
+                item.color === "blue" && "bg-blue-50 dark:bg-blue-900/30",
+                item.color === "emerald" && "bg-emerald-50 dark:bg-emerald-900/30",
+                item.color === "gray" && "bg-gray-50 dark:bg-gray-800/30",
+                item.color === "amber" && "bg-amber-50 dark:bg-amber-900/30"
+              )}>
+                <item.icon className={cn(
+                  "h-5 w-5",
+                  item.color === "blue" && "text-blue-500",
+                  item.color === "emerald" && "text-emerald-500",
+                  item.color === "gray" && "text-gray-500",
+                  item.color === "amber" && "text-amber-500"
+                )} />
               </div>
               <div>
                 <p className="text-xs text-gray-400 dark:text-gray-500 font-medium">{item.label}</p>
@@ -210,10 +276,10 @@ export function AdminPromotions() {
 
                 <Button
                    onClick={handlePromote}
-                   disabled={promotionMutation.isPending || selectedStudents.length === 0 || !toClassId}
+                   disabled={submitting || selectedStudents.length === 0 || !toClassId}
                    className="w-full bg-blue-600 hover:bg-blue-700 text-white rounded-xl h-12 shadow-lg shadow-blue-500/20 font-bold gap-2 mt-2"
                 >
-                   {promotionMutation.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
+                   {submitting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
                    Promote {selectedStudents.length || ''} Students
                 </Button>
               </CardContent>
@@ -237,7 +303,7 @@ export function AdminPromotions() {
                        onClick={markAll}
                        className="text-xs h-7 border-blue-100 dark:border-blue-800 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/10 rounded-lg"
                     >
-                       {selectedStudents.length === students.length ? "Deselect All" : "Select All Students"}
+                       {selectedStudents.length === students.length && students.length > 0 ? "Deselect All" : "Select All Students"}
                     </Button>
                  </div>
               </CardHeader>
@@ -254,16 +320,16 @@ export function AdminPromotions() {
 
                  <ScrollArea className="h-[450px] pr-4">
                     <div className="space-y-2">
-                       {studentsLoading && students.length === 0 ? (
+                       {studentsLoading ? (
                           Array(5).fill(0).map((_, i) => <Skeleton key={i} className="h-14 w-full rounded-xl" />)
                        ) : !fromClassId ? (
-                         <div className="text-center py-20 bg-gray-50/50 dark:bg-gray-950/50 rounded-xl border border-dashed border-gray-100 dark:border-gray-800">
-                            <p className="text-gray-400 text-sm font-medium">Select a source class to view students.</p>
-                         </div>
+                          <div className="text-center py-20 bg-gray-50/50 dark:bg-gray-950/50 rounded-xl border border-dashed border-gray-100 dark:border-gray-800">
+                             <p className="text-gray-400 text-sm font-medium">Select a source class to view students.</p>
+                          </div>
                        ) : filteredStudents.length === 0 ? (
-                         <div className="text-center py-20">
-                            <p className="text-gray-400 text-sm font-medium">No students match your search.</p>
-                         </div>
+                          <div className="text-center py-20">
+                             <p className="text-gray-400 text-sm font-medium">No students found in this class.</p>
+                          </div>
                        ) : (
                           filteredStudents.map((s: any) => {
                              const isSelected = selectedStudents.includes(s.id);
@@ -304,43 +370,6 @@ export function AdminPromotions() {
               </CardContent>
            </Card>
         </div>
-      </div>
-
-      <div className="sticky bottom-6 flex flex-col sm:flex-row items-center justify-between bg-white/80 dark:bg-gray-900/80 backdrop-blur-md p-4 px-6 rounded-2xl shadow-2xl border border-white/20 dark:border-gray-800/50 gap-4 z-50">
-          <div className="flex items-center gap-4">
-             {selectedStudents.length > 0 ? (
-               <div className="flex items-center gap-4">
-                  <div className="h-2 w-2 bg-blue-500 rounded-full animate-ping" />
-                  <span className="text-sm font-bold text-blue-500 uppercase tracking-widest">{selectedStudents.length} Students Selected</span>
-                  <Button variant="ghost" size="sm" onClick={() => setSelectedStudents([])} className="text-xs text-gray-400 hover:text-rose-500 h-auto p-0 font-bold uppercase gap-1.5 flex items-center">
-                    <RotateCcw className="h-3.5 w-3.5" /> Reset
-                  </Button>
-               </div>
-             ) : (
-               <span className="text-xs font-bold text-gray-400 uppercase tracking-widest italic">No students selected for promotion</span>
-             )}
-          </div>
-          <div className="flex items-center gap-3 w-full sm:w-auto">
-            <Button
-              variant="outline"
-              onClick={() => {
-                setFromClassId("");
-                setToClassId("");
-                setSelectedStudents([]);
-              }}
-              className="rounded-xl px-6 h-11 font-bold border-gray-100 dark:border-gray-800"
-            >
-              Clear All
-            </Button>
-            <Button
-              onClick={handlePromote}
-              disabled={promotionMutation.isPending || selectedStudents.length === 0 || !toClassId}
-              className="flex-1 sm:flex-none bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl px-10 h-11 shadow-lg shadow-emerald-500/20 font-bold gap-2"
-            >
-              {promotionMutation.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <CheckCircle2 className="h-4 w-4" />}
-              Execute Promotion
-            </Button>
-          </div>
       </div>
     </div>
   );

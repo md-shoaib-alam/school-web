@@ -229,7 +229,7 @@ export function SuperAdminSettings() {
             setMaintenanceMode(data.value === "true");
           }
         }
-        const msgRes = await fetch(
+        const msgRes = await apiFetch(
           "/api/platform-settings?key=maintenance_message",
         );
         if (msgRes.ok) {

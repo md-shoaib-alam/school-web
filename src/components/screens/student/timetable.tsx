@@ -117,7 +117,7 @@ export function StudentTimetable() {
         return;
       }
 
-      const ttRes = await fetch(
+      const ttRes = await apiFetch(
         `/api/timetable?classId=${matchedStudent.classId}`,
       );
       const ttData = await ttRes.json();

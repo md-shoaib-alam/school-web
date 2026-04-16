@@ -122,8 +122,10 @@ export async function apiFetch(path: string, init?: RequestInit): Promise<Respon
   // Strip leading /api to normalize — the API_BASE already has /api
   const cleanPath = path.startsWith('/api') ? path.slice(4) : path;
   const token = getToken();
+  const tenantId = typeof window !== 'undefined' ? localStorage.getItem('schoolsaas_tenant_id') : null;
   const headers: Record<string, string> = {
     ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    ...(tenantId ? { 'x-tenant-id': tenantId } : {}),
   };
   // Preserve Content-Type if set by caller, otherwise add JSON
   if (init?.headers) {

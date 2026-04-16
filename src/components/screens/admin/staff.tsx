@@ -291,6 +291,9 @@ export function AdminStaff() {
             name: formData.name,
             email: formData.email,
             password: formData.password || "sigel2024",
+            phone: formData.phone,
+            address: formData.address,
+            customRoleId: formData.customRoleId,
             role: "staff",
             tenantId: currentTenantId,
           }

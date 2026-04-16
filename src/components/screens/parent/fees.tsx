@@ -82,7 +82,7 @@ export function ParentFees() {
         setStudents(parentStudents);
         if (parentStudents.length > 0) {
           setActiveTab(parentStudents[0].id);
-          const feesRes = await fetch(
+          const feesRes = await apiFetch(
             `/api/fees?studentId=${parentStudents[0].id}`,
           );
           if (feesRes.ok) setAllFees(await feesRes.json());

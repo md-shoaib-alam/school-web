@@ -533,12 +533,27 @@ export function AdminFees() {
                                       <Button
                                         size="sm"
                                         className="h-7 text-xs bg-emerald-600 hover:bg-emerald-700 text-white"
-                                        onClick={() => {
-                                          // For immediate optimistic visual, we'll let invalidateQueries handle it
-                                          toast.success(
-                                            `Payment recorded for ${fee.studentName}`,
-                                          );
-                                          refetchFees();
+                                        onClick={async () => {
+                                          try {
+                                            const res = await apiFetch("/api/fees", {
+                                              method: "PUT",
+                                              headers: { "Content-Type": "application/json" },
+                                              body: JSON.stringify({
+                                                id: fee.id,
+                                                status: "paid",
+                                                paidAmount: fee.amount,
+                                                paidDate: new Date().toISOString(),
+                                              }),
+                                            });
+                                            if (res.ok) {
+                                              toast.success(`Payment recorded for ${fee.studentName}`);
+                                              refetchFees();
+                                            } else {
+                                              toast.error("Failed to record payment");
+                                            }
+                                          } catch {
+                                            toast.error("Error recording payment");
+                                          }
                                         }}
                                       >
                                         <CreditCard className="h-3 w-3 mr-1" />{" "}

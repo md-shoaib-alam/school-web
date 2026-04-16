@@ -208,7 +208,9 @@ export function useDeleteCustomRole() {
   return useMutation({
     mutationFn: (id: string) => graphqlMutate<{ deleteCustomRole: boolean }>(DELETE_CUSTOM_ROLE, { id }),
     onSuccess: () => {
-      toast.success('Custom role deleted')
+      toast.error('Role deleted permanently', {
+        description: 'The custom role and its permissions have been removed.'
+      })
       queryClient.invalidateQueries({ queryKey: ['custom-roles'] })
     },
     onError: (error) => toast.error('Error deleting role', { description: error.message }),

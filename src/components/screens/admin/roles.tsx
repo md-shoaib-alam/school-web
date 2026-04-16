@@ -3,7 +3,7 @@
 
 import { apiFetch } from "@/lib/api";
 import { useState, useEffect, useCallback, Fragment, useMemo } from "react";
-import { useGraphQLQuery, useGraphQLMutation, useAssignRoleToUser } from "@/lib/graphql/hooks";
+import { useGraphQLQuery, useGraphQLMutation, useAssignRoleToUser, useStaff, useCustomRoles, useCreateCustomRole, useUpdateCustomRole, useDeleteCustomRole } from "@/lib/graphql/hooks";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -106,60 +106,7 @@ const COLOR_PRESETS = [
 
 // ... (rest of imports same)
 
-const GET_ROLES = `
-  query GetRoles($tenantId: String) {
-    customRoles(tenantId: $tenantId) {
-      id
-      name
-      description
-      color
-      permissions
-      userCount
-      createdAt
-    }
-  }
-`;
-
-const GET_STAFF = `
-  query GetStaff($tenantId: String, $role: String) {
-    staff(tenantId: $tenantId, role: $role) {
-      staff {
-        id
-        name
-        email
-        role
-        isActive
-        customRole {
-          id
-          name
-        }
-      }
-    }
-  }
-`;
-
-const CREATE_ROLE = `
-  mutation CreateRole($tenantId: String, $name: String!, $description: String, $color: String, $permissions: JSON) {
-    createCustomRole(tenantId: $tenantId, name: $name, description: $description, color: $color, permissions: $permissions) {
-      id
-      name
-    }
-  }
-`;
-
-const UPDATE_ROLE = `
-  mutation UpdateRole($id: ID!, $name: String, $description: String, $color: String, $permissions: JSON) {
-    updateCustomRole(id: $id, name: $name, description: $description, color: $color, permissions: $permissions) {
-      id
-    }
-  }
-`;
-
-const DELETE_ROLE = `
-  mutation DeleteRole($id: ID!) {
-    deleteCustomRole(id: $id)
-  }
-`;
+// Using centralized hooks from @/lib/graphql/hooks
 
 // Using standardized useAssignRoleToUser hook
 
@@ -168,32 +115,23 @@ export function AdminRoles() {
   
   // --- Queries ---
   const { 
-    data: rolesData, 
+    data: roles = [], 
     isLoading: loading, 
     refetch: fetchRoles 
-  } = useGraphQLQuery<{ customRoles: RoleRecord[] }>(
-    ["custom-roles-page", currentTenantId],
-    GET_ROLES,
-    { tenantId: currentTenantId }
-  );
+  } = useCustomRoles(currentTenantId || "");
 
   const { 
-    data: staffData, 
+    data: staffResponse, 
     refetch: refetchStaff,
     isLoading: assignLoading
-  } = useGraphQLQuery<{ staff: { staff: UserRecord[] } }>(
-    ["all-staff", currentTenantId],
-    GET_STAFF,
-    { tenantId: currentTenantId, role: "staff" }
-  );
+  } = useStaff(currentTenantId || "", "staff");
 
-  const roles = rolesData?.customRoles || [];
-  const allStaff = staffData?.staff?.staff || [];
+  const allStaff = staffResponse?.staff || [];
 
   // --- Mutations ---
-  const { mutateAsync: createRole } = useGraphQLMutation(CREATE_ROLE);
-  const { mutateAsync: updateRole } = useGraphQLMutation(UPDATE_ROLE);
-  const { mutateAsync: deleteRole } = useGraphQLMutation(DELETE_ROLE);
+  const { mutateAsync: createRole } = useCreateCustomRole();
+  const { mutateAsync: updateRole } = useUpdateCustomRole();
+  const { mutateAsync: deleteRole } = useDeleteCustomRole();
   const { mutateAsync: assignRoleMut } = useAssignRoleToUser();
 
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -299,7 +237,8 @@ export function AdminRoles() {
           color,
           permissions,
         });
-        toast.success(`Role updated successfully`);
+        // Toast handled by hook
+
       } else {
         await createRole({
           tenantId: currentTenantId,
@@ -308,7 +247,8 @@ export function AdminRoles() {
           color,
           permissions,
         });
-        toast.success(`Role created successfully`);
+        // Toast handled by hook
+
       }
       setDialogOpen(false);
       fetchRoles();
@@ -322,7 +262,8 @@ export function AdminRoles() {
   const handleToggleDelete = async (id: string) => {
     try {
       await deleteRole({ id });
-      toast.success("Role deleted successfully");
+      // Toast handled by hook
+
       fetchRoles();
     } catch (err: any) {
       toast.error(err.message || "Failed to delete role");

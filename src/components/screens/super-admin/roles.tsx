@@ -394,11 +394,7 @@ export function SuperAdminRoles() {
     try {
       const [assignedRes, availableRes] = await Promise.all([
         apiFetch(`/api/platform/roles/users?roleId=${role.id}`),
-        apiFetch("/api/platform/roles/users", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ excludeRoleId: role.id }),
-        }),
+        apiFetch(`/api/platform/roles/available-users?excludeRoleId=${role.id}`),
       ]);
 
       if (!assignedRes.ok || !availableRes.ok)

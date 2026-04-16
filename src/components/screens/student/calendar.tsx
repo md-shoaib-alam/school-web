@@ -14,6 +14,7 @@ import {
   Clock,
 } from "lucide-react";
 import { useAppStore } from "@/store/use-app-store";
+import { apiFetch } from "@/lib/api";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -139,7 +140,7 @@ export function StudentCalendar() {
   useEffect(() => {
     if (!currentTenantId) return;
     const monthStr = `${currentYear}-${String(currentMonth + 1).padStart(2, "0")}`;
-    fetch(
+    apiFetch(
       `/api/events?tenantId=${encodeURIComponent(currentTenantId)}&month=${monthStr}`,
     )
       .then((res) => res.json())

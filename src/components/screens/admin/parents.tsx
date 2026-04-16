@@ -1,8 +1,6 @@
 "use client";
 
-
-import { apiFetch } from "@/lib/api";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import {
   Card,
   CardContent,
@@ -61,10 +59,10 @@ import {
   Plus,
   ChevronRight,
   Pencil,
+  Loader2,
 } from "lucide-react";
 import { goeyToast as toast } from "goey-toast";
-import { useParents, useStudents, useClasses } from "@/lib/graphql/hooks";
-import { useQueryClient } from "@tanstack/react-query";
+import { apiFetch } from "@/lib/api";
 import { useAppStore } from "@/store/use-app-store";
 
 interface ChildInfo {
@@ -109,23 +107,22 @@ const AVATAR_COLORS = [
 
 export function AdminParents() {
   const { currentTenantId } = useAppStore();
-  const queryClient = useQueryClient();
+
+  const [parents, setParents] = useState<ParentInfo[]>(() => {
+    if (typeof window !== "undefined") {
+      const saved = localStorage.getItem(`parents_cache_${currentTenantId}`);
+      return saved ? JSON.parse(saved) : [];
+    }
+    return [];
+  });
+
+  const [students, setStudents] = useState<StudentInfo[]>([]);
+  const [classes, setClasses] = useState<
+    { id: string; name: string; section: string }[]
+  >([]);
+
+  const [loading, setLoading] = useState(parents.length === 0);
   const [search, setSearch] = useState("");
-
-  // ⚡ TanStack Query with GraphQL Group-wise hooks
-  const { data: parentsData, isLoading: parentsLoading } = useParents(currentTenantId || undefined);
-  const { data: studentsData, isLoading: studentsLoading } = useStudents(currentTenantId || undefined);
-  const { data: classDataResponse, isLoading: classesLoading } = useClasses(currentTenantId || undefined);
-
-  const parents = parentsData?.parents || [];
-  const students = studentsData?.students || [];
-  const classes = classDataResponse?.classes || [];
-
-  // Only show full skeleton if we have NO data at all
-  const loading = (parentsLoading && parents.length === 0) || (classesLoading && classes.length === 0);
-
-  const refetchParents = () =>
-    queryClient.invalidateQueries({ queryKey: ["parents", currentTenantId] });
 
   // Create dialog
   const [createOpen, setCreateOpen] = useState(false);
@@ -134,6 +131,7 @@ export function AdminParents() {
     email: "",
     phone: "",
     occupation: "",
+    password: "", // Added consistency
   });
   const [creating, setCreating] = useState(false);
 
@@ -154,24 +152,58 @@ export function AdminParents() {
   });
   const [editing, setEditing] = useState(false);
 
+  const fetchData = useCallback(async (showSkeleton = false) => {
+    try {
+      if (showSkeleton) setLoading(true);
+      const [resParents, resStudents, resClasses] = await Promise.all([
+        apiFetch("/api/parents"),
+        apiFetch("/api/students"),
+        apiFetch("/api/classes"),
+      ]);
+
+      if (!resParents.ok || !resStudents.ok || !resClasses.ok) 
+        throw new Error("Failed to load some data");
+
+      const [parentsData, studentsData, classesData] = await Promise.all([
+        resParents.json(),
+        resStudents.json(),
+        resClasses.json(),
+      ]);
+
+      setParents(parentsData);
+      setStudents(studentsData);
+      setClasses(classesData);
+
+      if (typeof window !== "undefined" && currentTenantId) {
+        localStorage.setItem(`parents_cache_${currentTenantId}`, JSON.stringify(parentsData));
+      }
+    } catch (err) {
+      console.error("Error fetching parent data:", err);
+    } finally {
+      setLoading(false);
+    }
+  }, [currentTenantId]);
+
+  useEffect(() => {
+    if (currentTenantId) {
+        fetchData(parents.length === 0);
+    }
+  }, [currentTenantId, fetchData]);
+
   const filtered = parents.filter(
     (p) =>
       p.name.toLowerCase().includes(search.toLowerCase()) ||
       p.email.toLowerCase().includes(search.toLowerCase()) ||
-      p.children.some((c) =>
-        c.name.toLowerCase().includes(search.toLowerCase()),
-      ),
+      p.children.some((c) => c.name.toLowerCase().includes(search.toLowerCase())),
   );
 
-  const filteredStudents = selectedClass
+  const filteredStudents = selectedClass && selectedClass !== 'all'
     ? students.filter(
         (s) =>
           s.classId === selectedClass &&
           !selectedParent?.children.some((c) => c.id === s.id),
       )
-    : students.filter(
-        (s) => !selectedParent?.children.some((c) => c.id === s.id),
-      );
+    : students.filter((s) => !selectedParent?.children.some((c) => c.id === s.id));
 
   const getInitials = (name: string) =>
     name
@@ -189,88 +221,98 @@ export function AdminParents() {
       toast.error("Name and email are required");
       return;
     }
-    setCreating(true);
-    try {
-      const res = await apiFetch("/api/parents", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ action: "create", ...createForm }),
-      });
-      if (res.ok) {
-        toast.success("Parent created successfully!");
+    toast.promise(
+      (async () => {
+        const res = await apiFetch("/api/parents", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ action: "create", ...createForm }),
+        });
+        if (!res.ok) {
+          const err = await res.json().catch(() => ({}));
+          throw new Error(err.error || "Failed to create parent");
+        }
         setCreateOpen(false);
-        setCreateForm({ name: "", email: "", phone: "", occupation: "" });
-        refetchParents();
-      } else {
-        toast.error("Failed to create parent");
+        setCreateForm({ name: "", email: "", phone: "", occupation: "", password: "" });
+        fetchData();
+        return "Parent account created";
+      })(),
+      {
+        loading: "Creating parent account...",
+        success: (msg) => msg,
+        error: (err) => err.message,
       }
-    } catch {
-      toast.error("Error creating parent");
-    }
-    setCreating(false);
+    );
   };
 
   const handleLinkChild = async (studentId: string) => {
     if (!selectedParent) return;
-    setLinking(true);
-    try {
-      const res = await apiFetch("/api/parents", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          action: "link-child",
-          parentId: selectedParent.id,
-          studentId,
-        }),
-      });
-      if (res.ok) {
-        toast.success("Child linked successfully!");
-        refetchParents();
-        // Optimistically update local selectedParent state manually or just let component re-render
-        // with the fresh query. To preserve local selection correctly during closing:
-        const updatedParents = await apiFetch("/api/parents").then((r) =>
-          r.json(),
-        ); // we can use invalidateQueries but here keeping local consistency
+    toast.promise(
+      (async () => {
+        const res = await apiFetch("/api/parents", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            action: "link",
+            parentId: selectedParent.id,
+            studentId,
+          }),
+        });
+        if (!res.ok) {
+          const err = await res.json().catch(() => ({}));
+          throw new Error(err.error || "Linking failed");
+        }
+        // Refresh everything to keep in sync
+        const freshParentsRes = await apiFetch("/api/parents");
+        const freshParents = await freshParentsRes.json();
+        setParents(freshParents);
         setSelectedParent(
-          updatedParents.find((p: ParentInfo) => p.id === selectedParent.id) ||
-            null,
+          freshParents.find((p: ParentInfo) => p.id === selectedParent.id) || null,
         );
-      }
-    } catch {
-      toast.error("Failed to link child");
-    }
-    setLinking(false);
+        return "Student linked successfully";
+      })(),
+      {
+        loading: "Linking child to parent...",
+        success: (msg) => msg, // Green success for established link
+        error: (err) => err.message,
+      },
+      { duration: 5000 }
+    );
   };
 
-  const handleUnlinkChild = async (studentId: string) => {
-    if (!selectedParent) return;
-    setLinking(true);
-    try {
-      const res = await apiFetch("/api/parents", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          action: "link-child",
-          parentId: selectedParent.id,
-          studentId,
-          unlink: true,
-        }),
-      });
-      if (res.ok) {
-        toast.success("Child unlinked");
-        refetchParents();
-        const updatedParents = await apiFetch("/api/parents").then((r) =>
-          r.json(),
-        );
-        setSelectedParent(
-          updatedParents.find((p: ParentInfo) => p.id === selectedParent.id) ||
-            null,
-        );
-      }
-    } catch {
-      toast.error("Failed to unlink child");
-    }
-    setLinking(false);
+  const handleUnlinkChild = async (parentId: string, studentId: string) => {
+    toast.promise(
+      (async () => {
+        const res = await apiFetch("/api/parents", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            action: "unlink",
+            parentId,
+            studentId,
+          }),
+        });
+        if (!res.ok) {
+          const err = await res.json().catch(() => ({}));
+          throw new Error(err.error || "Unlinking failed");
+        }
+        const freshParentsRes = await apiFetch("/api/parents");
+        const freshParents = await freshParentsRes.json();
+        setParents(freshParents);
+        if (selectedParent && selectedParent.id === parentId) {
+          setSelectedParent(freshParents.find((p: ParentInfo) => p.id === parentId) || null);
+        }
+        
+        // Force red pill morph
+        throw new Error("Child record unlinked");
+      })(),
+      {
+        loading: "Unlinking child...",
+        success: () => "",
+        error: (err) => err.message,
+      },
+      { duration: 5000 }
+    );
   };
 
   const handleEdit = (parent: ParentInfo) => {
@@ -289,55 +331,64 @@ export function AdminParents() {
       toast.error("Name and email are required");
       return;
     }
-    setEditing(true);
-    try {
-      const res = await apiFetch("/api/parents", {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id: editingParent.id, ...editForm }),
-      });
-      if (res.ok) {
-        toast.success("Parent updated successfully!");
+    toast.promise(
+      (async () => {
+        const res = await apiFetch("/api/parents", {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ id: editingParent.id, ...editForm }),
+        });
+        if (!res.ok) {
+          const err = await res.json().catch(() => ({}));
+          throw new Error(err.error || "Update failed");
+        }
         setEditOpen(false);
-        refetchParents();
-      } else {
-        toast.error("Failed to update parent");
+        fetchData();
+        return "Parent details updated";
+      })(),
+      {
+        loading: "Saving changes...",
+        success: (msg) => msg,
+        error: (err) => err.message,
       }
-    } catch {
-      toast.error("Error updating parent");
-    }
-    setEditing(false);
+    );
   };
 
   const handleDelete = async (id: string) => {
-    try {
-      const res = await apiFetch(`/api/parents?id=${id}`, { method: "DELETE" });
-      if (res.ok) {
-        toast.success("Parent deleted");
-        refetchParents();
-      }
-    } catch {
-      toast.error("Failed to delete");
-    }
+    toast.promise(
+      (async () => {
+        const res = await apiFetch(`/api/parents?id=${id}`, { method: "DELETE" });
+        if (!res.ok) {
+          const err = await res.json().catch(() => ({}));
+          throw new Error(err.error || "Deletion failed");
+        }
+        setParents(parents.filter((p) => p.id !== id));
+        
+        // Force red pill morph
+        throw new Error("Parent record removed");
+      })(),
+      {
+        loading: "Removing parent record...",
+        success: () => "",
+        error: (err) => err.message,
+      },
+      { duration: 5000 }
+    );
   };
 
-  if (loading) {
-    return (
-      <div className="space-y-6">
-        <div className="flex justify-between">
-          <Skeleton className="h-8 w-48" />
-          <Skeleton className="h-10 w-36" />
-        </div>
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-          {[...Array(4)].map((_, i) => (
-            <Skeleton key={i} className="h-52 rounded-xl" />
-          ))}
-        </div>
+  return (loading && parents.length === 0) ? (
+    <div className="space-y-6">
+      <div className="flex justify-between">
+        <Skeleton className="h-8 w-48" />
+        <Skeleton className="h-10 w-36" />
       </div>
-    );
-  }
-
-  return (
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        {[...Array(4)].map((_, i) => (
+          <Skeleton key={i} className="h-52 rounded-xl" />
+        ))}
+      </div>
+    </div>
+  ) : (
     <div className="space-y-6">
       {/* Header */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
@@ -384,6 +435,18 @@ export function AdminParents() {
                     setCreateForm({ ...createForm, email: e.target.value })
                   }
                   placeholder="parent@sigel.edu"
+                  className="mt-1.5"
+                />
+              </div>
+              <div>
+                <Label>Login Password</Label>
+                <Input
+                  type="password"
+                  value={createForm.password}
+                  onChange={(e) =>
+                    setCreateForm({ ...createForm, password: e.target.value })
+                  }
+                  placeholder="Set login password (default: changeme123)"
                   className="mt-1.5"
                 />
               </div>
@@ -537,8 +600,8 @@ export function AdminParents() {
               <div className="space-y-2">
                 <div className="flex items-center justify-between mb-2">
                   <span className="text-xs font-medium text-gray-500 dark:text-gray-400 flex items-center gap-1">
-                    <Baby className="h-3 w-3" /> Children (
-                    {parent.children.length})
+                    <Baby className="h-3 w-3" /> Children ({parent.children.length}
+                    )
                   </span>
                   <Button
                     variant="ghost"
@@ -597,7 +660,7 @@ export function AdminParents() {
                           variant="ghost"
                           size="icon"
                           className="h-6 w-6 text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/30 shrink-0"
-                          onClick={() => handleUnlinkChild(child.id)}
+                          onClick={() => handleUnlinkChild(parent.id, child.id)}
                           disabled={linking}
                           title="Unlink"
                         >
@@ -687,7 +750,7 @@ export function AdminParents() {
 
       {/* Link Child Dialog */}
       <Dialog open={linkOpen} onOpenChange={setLinkOpen}>
-        <DialogContent className="max-w-lg">
+        <DialogContent className="max-w-lg overflow-hidden flex flex-col h-[80vh]">
           <DialogHeader>
             <DialogTitle>Link Child to {selectedParent?.name}</DialogTitle>
             <DialogDescription>
@@ -696,98 +759,107 @@ export function AdminParents() {
             </DialogDescription>
           </DialogHeader>
 
-          {/* Already linked children */}
-          {selectedParent && selectedParent.children.length > 0 && (
-            <div className="space-y-2">
-              <Label className="text-xs text-gray-500 dark:text-gray-400">
-                Currently Linked
-              </Label>
-              <div className="flex flex-wrap gap-2">
-                {selectedParent.children.map((child) => (
-                  <Badge
-                    key={child.id}
-                    variant="secondary"
-                    className="bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800 gap-1 pr-1"
-                  >
-                    {child.name}
-                    <button
-                      onClick={() => handleUnlinkChild(child.id)}
-                      className="h-4 w-4 rounded-full hover:bg-emerald-200 dark:hover:bg-emerald-800 flex items-center justify-center"
-                      disabled={linking}
-                    >
-                      <X className="h-3 w-3" />
-                    </button>
-                  </Badge>
-                ))}
+          <ScrollArea className="flex-1 pr-4">
+            <div className="space-y-6 py-2">
+              {/* Already linked children */}
+              {selectedParent && selectedParent.children.length > 0 && (
+                <div className="space-y-2">
+                  <Label className="text-xs text-gray-500 dark:text-gray-400">
+                    Currently Linked
+                  </Label>
+                  <div className="flex flex-wrap gap-2">
+                    {selectedParent.children.map((child) => (
+                      <Badge
+                        key={child.id}
+                        variant="secondary"
+                        className="bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800 gap-1 pr-1"
+                      >
+                        {child.name}
+                        <button
+                          onClick={() => handleUnlinkChild(selectedParent.id, child.id)}
+                          className="h-4 w-4 rounded-full hover:bg-emerald-200 dark:hover:bg-emerald-800 flex items-center justify-center transition-colors"
+                          disabled={linking}
+                        >
+                          <X className="h-3 w-3" />
+                        </button>
+                      </Badge>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              <Separator />
+
+              {/* Class filter */}
+              <div>
+                <Label className="text-xs text-gray-500 dark:text-gray-400 mb-1.5 block">
+                  Filter by Class
+                </Label>
+                <Select value={selectedClass} onValueChange={setSelectedClass}>
+                  <SelectTrigger className="h-9">
+                    <SelectValue placeholder="All Classes" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Classes</SelectItem>
+                    {classes.map((c) => (
+                      <SelectItem key={c.id} value={c.id}>
+                        {c.name} - {c.section}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* Available students list */}
+              <div>
+                <Label className="text-xs text-gray-500 dark:text-gray-400 mb-2 block font-semibold">
+                  Available Students
+                </Label>
+                {filteredStudents.length === 0 ? (
+                  <div className="text-center py-10 bg-gray-50 dark:bg-gray-900/20 rounded-xl border border-dashed border-gray-200 dark:border-gray-800">
+                    <p className="text-gray-400 dark:text-gray-500 text-sm">
+                      No unlinked students found
+                    </p>
+                    <p className="text-[10px] mt-1 text-gray-400">
+                      Try changing class filter or add new students
+                    </p>
+                  </div>
+                ) : (
+                  <div className="space-y-1.5">
+                    {filteredStudents.map((student) => (
+                      <div
+                        key={student.id}
+                        className="flex items-center justify-between p-3 rounded-xl border border-gray-100 dark:border-gray-800 hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:border-blue-200 dark:hover:border-blue-800/50 transition-all group"
+                      >
+                        <div className="flex items-center gap-3">
+                          <div className="h-8 w-8 rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform">
+                             <GraduationCap className="h-4 w-4" />
+                          </div>
+                          <div>
+                            <p className="text-sm font-bold text-gray-800 dark:text-gray-200">
+                              {student.name}
+                            </p>
+                            <p className="text-[10px] text-gray-500 dark:text-gray-400 font-medium">
+                              {student.className} • Roll {student.rollNumber}
+                            </p>
+                          </div>
+                        </div>
+                        <Button
+                          size="sm"
+                          className="h-8 text-xs bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-lg shadow-sm"
+                          onClick={() => handleLinkChild(student.id)}
+                          disabled={linking}
+                        >
+                          {linking ? <Loader2 className="h-3 w-3 animate-spin"/> : <Link2 className="h-3.5 w-3.5 mr-1" />}
+                          Link
+                        </Button>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
             </div>
-          )}
-
-          <Separator />
-
-          {/* Class filter */}
-          <div>
-            <Label className="text-xs text-gray-500 dark:text-gray-400 mb-1.5 block">
-              Filter by Class
-            </Label>
-            <Select value={selectedClass} onValueChange={setSelectedClass}>
-              <SelectTrigger className="h-9">
-                <SelectValue placeholder="All Classes" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Classes</SelectItem>
-                {classes.map((c) => (
-                  <SelectItem key={c.id} value={c.id}>
-                    {c.name} - {c.section}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-
-          {/* Available students list */}
-          <div className="max-h-64 overflow-y-auto">
-            <Label className="text-xs text-gray-500 dark:text-gray-400 mb-2 block">
-              Available Students
-            </Label>
-            {filteredStudents.length === 0 ? (
-              <div className="text-center py-6 text-gray-400 dark:text-gray-500 text-sm">
-                <p>No unlinked students found</p>
-                <p className="text-xs mt-1">
-                  All students may already be linked
-                </p>
-              </div>
-            ) : (
-              <div className="space-y-1.5">
-                {filteredStudents.map((student) => (
-                  <div
-                    key={student.id}
-                    className="flex items-center justify-between p-2.5 rounded-lg border border-gray-100 dark:border-gray-800 hover:bg-blue-50 dark:hover:bg-blue-900/30 hover:border-blue-200 dark:hover:border-blue-800 transition-colors"
-                  >
-                    <div className="flex items-center gap-2.5">
-                      <GraduationCap className="h-4 w-4 text-blue-500 dark:text-blue-400" />
-                      <div>
-                        <p className="text-sm font-medium text-gray-800 dark:text-gray-200">
-                          {student.name}
-                        </p>
-                        <p className="text-[10px] text-gray-400 dark:text-gray-500">
-                          {student.className} • Roll {student.rollNumber}
-                        </p>
-                      </div>
-                    </div>
-                    <Button
-                      size="sm"
-                      className="h-7 text-xs bg-blue-600 hover:bg-blue-700 text-white"
-                      onClick={() => handleLinkChild(student.id)}
-                      disabled={linking}
-                    >
-                      <Link2 className="h-3 w-3 mr-1" /> Link
-                    </Button>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
+          </ScrollArea>
         </DialogContent>
       </Dialog>
     </div>

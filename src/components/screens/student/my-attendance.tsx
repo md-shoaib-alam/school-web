@@ -90,7 +90,7 @@ export function StudentAttendance() {
         return;
       }
 
-      const attRes = await fetch(
+      const attRes = await apiFetch(
         `/api/attendance?classId=${matchedStudent.classId}`,
       );
       const attData: AttendanceRecord[] = await attRes.json();

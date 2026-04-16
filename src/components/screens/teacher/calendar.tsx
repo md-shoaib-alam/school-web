@@ -1,5 +1,6 @@
 "use client";
 
+import { apiFetch } from "@/lib/api";
 import { useState, useEffect, useMemo } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -130,7 +131,7 @@ export function TeacherCalendar() {
   useEffect(() => {
     if (!currentTenantId) return;
     const monthStr = `${currentYear}-${String(currentMonth + 1).padStart(2, "0")}`;
-    fetch(
+    apiFetch(
       `/api/events?tenantId=${encodeURIComponent(currentTenantId)}&month=${monthStr}`,
     )
       .then((res) => res.json())

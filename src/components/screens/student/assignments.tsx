@@ -77,7 +77,7 @@ export function StudentAssignments() {
         return;
       }
 
-      const assignmentsRes = await fetch(
+      const assignmentsRes = await apiFetch(
         `/api/assignments?classId=${matchedStudent.classId}`,
       );
       const assignmentsData = await assignmentsRes.json();
@@ -85,7 +85,7 @@ export function StudentAssignments() {
 
       // Fetch real submissions for this student
       try {
-        const subRes = await fetch(
+        const subRes = await apiFetch(
           `/api/submissions?studentId=${matchedStudent.id}`,
         );
         if (subRes.ok) {
@@ -193,7 +193,7 @@ export function StudentAssignments() {
         });
         // Refresh submissions
         try {
-          const subRes = await fetch(
+          const subRes = await apiFetch(
             `/api/submissions?studentId=${student.id}`,
           );
           if (subRes.ok) {
