@@ -307,23 +307,23 @@ export function StaffAttendance() {
         </TabsContent>
       </Tabs>
 
-      <div className="flex items-center justify-between bg-white dark:bg-gray-950 p-4 px-6 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-800">
-         <div className="flex items-center gap-3">
+      <div className="flex flex-col sm:flex-row items-center justify-between bg-white dark:bg-gray-950 p-4 px-6 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-800 gap-4">
+         <div className="flex items-center gap-3 w-full sm:w-auto">
             {hasChanges ? (
               <div className="flex items-center gap-3">
                  <div className="h-2 w-2 bg-indigo-500 rounded-full animate-ping" />
                  <span className="text-xs font-bold text-indigo-500 uppercase tracking-widest">{Object.keys(pendingChanges).length} Pending in {activeTab === 'teacher' ? 'Teachers' : 'Staff'}</span>
               </div>
             ) : (
-              <span className="text-xs font-bold text-gray-400 uppercase tracking-widest italic">No unsaved changes</span>
+              <span className="text-xs font-bold text-gray-400 uppercase tracking-widest italic hidden sm:inline">No unsaved changes</span>
             )}
          </div>
          <Button
             onClick={handleSave}
             disabled={isSaving || !hasChanges}
-            className="bg-blue-600 hover:bg-blue-700 text-white rounded-xl px-10 h-12 shadow-lg shadow-blue-500/20 font-bold"
+            className="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white rounded-xl px-10 h-12 shadow-lg shadow-blue-500/20 font-bold"
           >
-            {isSaving ? "Syncing..." : <span className="flex items-center gap-2 tracking-wide"><Save className="h-4 w-4" /> Save {activeTab} Attendance</span>}
+            {isSaving ? "Syncing..." : <span className="flex items-center justify-center gap-2 tracking-wide"><Save className="h-4 w-4" /> Save {activeTab} Attendance</span>}
           </Button>
       </div>
     </div>
