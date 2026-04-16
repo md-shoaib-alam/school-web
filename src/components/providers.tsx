@@ -54,7 +54,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
     >
       <QueryClientProvider client={queryClient}>
         {children}
-        <GooeyToaster richColors position="top-center" closeButton />
+        <GooeyToaster richColors position="top-center" closeButton duration={2000} />
       </QueryClientProvider>
     </ThemeProvider>
   );

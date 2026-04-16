@@ -3,7 +3,7 @@
 
 import { apiFetch } from "@/lib/api";
 import { useState, useEffect, useCallback, useMemo } from "react";
-import { useGraphQLQuery, useGraphQLMutation } from "@/lib/graphql/hooks";
+import { useGraphQLQuery, useGraphQLMutation, useAssignRoleToUser } from "@/lib/graphql/hooks";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -80,10 +80,11 @@ interface StaffMember {
   id: string;
   name: string;
   email: string;
+  role: string;
   phone: string | null;
   address: string | null;
   isActive: boolean;
-  customRole: Pick<CustomRole, "id" | "name" | "color" | "permissions"> | null;
+  customRole: Pick<CustomRole, "id" | "name" | "color"> | null;
   createdAt: string;
 }
 
@@ -143,24 +144,7 @@ function avatarStyle(color: string): React.CSSProperties {
 
 // --- Component ---
 
-const GET_STAFF = `
-  query GetStaff($tenantId: String) {
-    staff(tenantId: $tenantId) {
-      id
-      name
-      email
-      phone
-      address
-      isActive
-      customRole {
-        id
-        name
-        color
-      }
-      createdAt
-    }
-  }
-`;
+// No local query needed here, using central useStaff hook
 
 const GET_ROLES = `
   query GetRoles($tenantId: String) {
@@ -189,10 +173,20 @@ const TOGGLE_STATUS = `
     }
   }
 `;
+const UPDATE_USER = `
+  mutation UpdateUser($id: ID!, $data: UpdateUserInput!) {
+    updateUser(id: $id, data: $data) {
+      id
+      name
+    }
+  }
+`;
 
-const ASSIGN_ROLE = `
-  mutation AssignStaffRole($userId: ID!, $roleId: ID, $tenantId: String) {
-    assignRoleToUser(userId: $userId, roleId: $roleId, tenantId: $tenantId)
+// Using standardized useAssignRoleToUser hook
+
+const DELETE_USER = `
+  mutation DeleteUser($id: ID!) {
+    deleteUser(id: $id)
   }
 `;
 
@@ -200,8 +194,8 @@ export function AdminStaff() {
   const { currentTenantId } = useAppStore();
   const [search, setSearch] = useState("");
 
-  // --- TanStack Queries (Updated to use standardized hooks) ---
-  const { data: staffData, isLoading: loadingStaff, refetch: refetchStaff } = useStaff(currentTenantId || undefined);
+  // --- TanStack Queries ---
+  const { data: staffData, isLoading: loadingStaff, refetch: refetchStaff } = useStaff(currentTenantId || undefined, "staff");
   const { data: roles = [] } = useCustomRoles(currentTenantId || undefined);
 
   const staff = staffData?.staff || [];
@@ -210,7 +204,9 @@ export function AdminStaff() {
   // --- Mutations ---
   const { mutateAsync: createUser } = useGraphQLMutation(CREATE_USER);
   const { mutateAsync: toggleStatus } = useGraphQLMutation(TOGGLE_STATUS);
-  const { mutateAsync: assignRole } = useGraphQLMutation(ASSIGN_ROLE);
+  const { mutateAsync: assignRoleMut } = useAssignRoleToUser();
+  const { mutateAsync: updateUserMut } = useGraphQLMutation(UPDATE_USER);
+  const { mutateAsync: deleteUserMut } = useGraphQLMutation(DELETE_USER);
 
   // Dialog state
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -263,15 +259,31 @@ export function AdminStaff() {
     setSubmitting(true);
     try {
       if (editingStaff) {
+        console.log("Updating staff member:", editingStaff.id);
+        
+        // Update user info if changed
+        const updateData: any = {};
+        if (formData.name !== editingStaff.name) updateData.name = formData.name;
+        if (formData.email !== editingStaff.email) updateData.email = formData.email;
+        if (formData.phone !== editingStaff.phone) updateData.phone = formData.phone;
+        if (formData.address !== editingStaff.address) updateData.address = formData.address;
+        if (formData.password) updateData.password = formData.password;
+
+        if (Object.keys(updateData).length > 0) {
+          console.log("Saving user info changes:", updateData);
+          await updateUserMut({ id: editingStaff.id, data: updateData });
+        }
+
         // Toggle status if changed
         if (formData.isActive !== editingStaff.isActive) {
+          console.log("Toggling status to:", formData.isActive);
           await toggleStatus({ id: editingStaff.id, isActive: formData.isActive });
         }
         // Assign role if changed
         if (formData.customRoleId !== (editingStaff.customRole?.id || "")) {
-          await assignRole({ userId: editingStaff.id, roleId: formData.customRoleId, tenantId: currentTenantId });
+          console.log("Assigning role:", formData.customRoleId);
+          await assignRoleMut({ userId: editingStaff.id, roleId: formData.customRoleId, tenantId: currentTenantId });
         }
-        toast.success("Staff member updated successfully");
       } else {
         // Create new
         await createUser({
@@ -289,6 +301,7 @@ export function AdminStaff() {
       setDialogOpen(false);
       refetchStaff();
     } catch (err: any) {
+      console.error("Error submitting staff form:", err);
       toast.error(err.message || "Operation failed");
     } finally {
       setSubmitting(false);
@@ -297,13 +310,14 @@ export function AdminStaff() {
 
   const handleDelete = async (id: string) => {
     try {
-      toast.info("Deactivating staff member...");
-      await toggleStatus({ id, isActive: false });
-      toast.success("Staff member deactivated");
+      toast.info("Deleting staff member...");
+      await deleteUserMut({ id });
+      toast.success("Staff member deleted successfully");
       setDeletingId(null);
       refetchStaff();
     } catch (err: any) {
-      toast.error(err.message || "Failed to deactivate");
+      console.error("Delete staff error:", err);
+      toast.error(err.message || "Failed to delete");
     }
   };
 
@@ -450,10 +464,13 @@ export function AdminStaff() {
                               {member.customRole.name}
                             </Badge>
                           ) : (
-                            <span className="text-sm text-muted-foreground flex items-center gap-1">
+                            <Badge
+                              variant="outline"
+                              className="font-normal text-xs gap-1.5 capitalize bg-gray-50 text-gray-600 border-gray-200"
+                            >
                               <UserCircle className="h-3.5 w-3.5" />
-                              No Role
-                            </span>
+                              {member.role || "No Role"}
+                            </Badge>
                           )}
                         </TableCell>
 

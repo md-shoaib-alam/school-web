@@ -3,7 +3,7 @@
 
 import { apiFetch } from "@/lib/api";
 import { useState, useEffect, useCallback, Fragment, useMemo } from "react";
-import { useGraphQLQuery, useGraphQLMutation } from "@/lib/graphql/hooks";
+import { useGraphQLQuery, useGraphQLMutation, useAssignRoleToUser } from "@/lib/graphql/hooks";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -121,16 +121,18 @@ const GET_ROLES = `
 `;
 
 const GET_STAFF = `
-  query GetStaff($tenantId: String) {
-    staff(tenantId: $tenantId) {
-      id
-      name
-      email
-      role
-      isActive
-      customRole {
+  query GetStaff($tenantId: String, $role: String) {
+    staff(tenantId: $tenantId, role: $role) {
+      staff {
         id
         name
+        email
+        role
+        isActive
+        customRole {
+          id
+          name
+        }
       }
     }
   }
@@ -159,11 +161,7 @@ const DELETE_ROLE = `
   }
 `;
 
-const ASSIGN_ROLE = `
-  mutation AssignRole($userId: ID!, $roleId: ID, $tenantId: String) {
-    assignRoleToUser(userId: $userId, roleId: $roleId, tenantId: $tenantId)
-  }
-`;
+// Using standardized useAssignRoleToUser hook
 
 export function AdminRoles() {
   const { currentTenantId } = useAppStore();
@@ -183,20 +181,20 @@ export function AdminRoles() {
     data: staffData, 
     refetch: refetchStaff,
     isLoading: assignLoading
-  } = useGraphQLQuery<{ staff: UserRecord[] }>(
+  } = useGraphQLQuery<{ staff: { staff: UserRecord[] } }>(
     ["all-staff", currentTenantId],
     GET_STAFF,
-    { tenantId: currentTenantId }
+    { tenantId: currentTenantId, role: "staff" }
   );
 
   const roles = rolesData?.customRoles || [];
-  const allStaff = staffData?.staff || [];
+  const allStaff = staffData?.staff?.staff || [];
 
   // --- Mutations ---
   const { mutateAsync: createRole } = useGraphQLMutation(CREATE_ROLE);
   const { mutateAsync: updateRole } = useGraphQLMutation(UPDATE_ROLE);
   const { mutateAsync: deleteRole } = useGraphQLMutation(DELETE_ROLE);
-  const { mutateAsync: assignRoleMut } = useGraphQLMutation(ASSIGN_ROLE);
+  const { mutateAsync: assignRoleMut } = useAssignRoleToUser();
 
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingRole, setEditingRole] = useState<RoleRecord | null>(null);
@@ -267,7 +265,6 @@ export function AdminRoles() {
         roleId: targetRoleId,
         tenantId: currentTenantId,
       });
-      toast.success(targetRoleId ? "Role assigned" : "Role removed");
       refetchStaff();
       fetchRoles();
     } catch (err: any) {
