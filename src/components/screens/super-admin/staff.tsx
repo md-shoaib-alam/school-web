@@ -346,7 +346,7 @@ export function SuperAdminStaff() {
           </div>
           {canCreate && (
             <Button
-              className="bg-rose-600 hover:bg-rose-700 text-white shrink-0"
+              className="bg-teal-600 hover:bg-teal-700 text-white shrink-0"
               onClick={handleOpenAdd}
             >
               <Plus className="h-4 w-4 mr-2" />
@@ -357,14 +357,14 @@ export function SuperAdminStaff() {
       </div>
 
       {/* Info Card */}
-      <div className="rounded-lg border border-rose-200 bg-rose-50 dark:bg-rose-950/20 dark:border-rose-800/30 p-4">
+      <div className="rounded-lg border border-teal-200 bg-teal-50 dark:bg-teal-950/20 dark:border-teal-800/30 p-4">
         <div className="flex items-start gap-3">
-          <Shield className="h-5 w-5 text-rose-600 dark:text-rose-400 shrink-0 mt-0.5" />
+          <Shield className="h-5 w-5 text-teal-600 dark:text-teal-400 shrink-0 mt-0.5" />
           <div className="text-sm">
-            <p className="font-medium text-rose-800 dark:text-rose-300">
+            <p className="font-medium text-teal-800 dark:text-teal-300">
               Platform Staff Accounts
             </p>
-            <p className="text-rose-700/80 dark:text-rose-400/80 mt-0.5">
+            <p className="text-teal-700/80 dark:text-teal-400/80 mt-0.5">
               Staff members have restricted access based on their assigned
               platform role. They can log in via the &quot;Email Login&quot;
               tab. The root platform owner is not shown here.
@@ -423,7 +423,7 @@ export function SuperAdminStaff() {
                     return (
                       <TableRow
                         key={member.id}
-                        className="hover:bg-rose-50/50 dark:hover:bg-rose-900/10 transition-colors"
+                        className="hover:bg-teal-50/50 dark:hover:bg-teal-900/10 transition-colors"
                       >
                         {/* Name column */}
                         <TableCell>
@@ -520,7 +520,7 @@ export function SuperAdminStaff() {
                                 <Button
                                   variant="ghost"
                                   size="icon"
-                                  className="h-8 w-8 text-muted-foreground hover:text-rose-600"
+                                  className="h-8 w-8 text-muted-foreground hover:text-teal-600"
                                   onClick={() => handleOpenEdit(member)}
                                 >
                                   <Pencil className="h-4 w-4" />
@@ -614,7 +614,7 @@ export function SuperAdminStaff() {
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
-              <Shield className="h-5 w-5 text-rose-600 dark:text-rose-400" />
+              <Shield className="h-5 w-5 text-teal-600 dark:text-teal-400" />
               {editingStaff ? "Edit Staff Member" : "Add New Staff Member"}
             </DialogTitle>
             <DialogDescription>
@@ -723,7 +723,7 @@ export function SuperAdminStaff() {
                 htmlFor="sa-staff-role"
                 className="flex items-center gap-1.5"
               >
-                <Shield className="h-3.5 w-3.5 text-rose-500 dark:text-rose-400" />
+                <Shield className="h-3.5 w-3.5 text-teal-500 dark:text-teal-400" />
                 Platform Role
               </Label>
               <Select
@@ -780,7 +780,7 @@ export function SuperAdminStaff() {
               Cancel
             </Button>
             <Button
-              className="bg-rose-600 hover:bg-rose-700 text-white"
+              className="bg-teal-600 hover:bg-teal-700 text-white"
               onClick={handleSubmit}
               disabled={submitting || !isFormValid}
             >

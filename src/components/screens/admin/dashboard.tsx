@@ -111,7 +111,7 @@ function StatCardSkeleton() {
 export function AdminDashboard() {
   const { currentUser, currentTenantId } = useAppStore();
   const { data, isLoading, isError, error, refetch } = useAdminDashboard(
-    currentTenantId || "tenant_default",
+    currentTenantId || currentUser?.tenantId || "default",
   );
 
   useEffect(() => {

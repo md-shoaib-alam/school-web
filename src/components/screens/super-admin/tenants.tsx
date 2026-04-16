@@ -408,12 +408,12 @@ const TenantCard = memo(function TenantCard({
   onAddAdmin: (tenant: Tenant) => void;
 }) {
   return (
-    <Card className="group hover:shadow-lg transition-all duration-300 border-rose-100/50 dark:border-rose-900/20">
+    <Card className="group hover:shadow-lg transition-all duration-300 border-teal-100/50 dark:border-teal-900/20">
       <CardContent className="p-5 space-y-4">
         {/* Header content... (kept same) */}
         <div className="flex items-start justify-between gap-2">
           <div className="flex items-center gap-3 min-w-0">
-            <div className="h-12 w-12 rounded-xl bg-gradient-to-br from-rose-50 to-rose-100 dark:from-rose-950/40 dark:to-rose-900/40 text-rose-700 dark:text-rose-400 flex items-center justify-center shrink-0 border border-rose-200/50 dark:border-rose-800/30">
+            <div className="h-12 w-12 rounded-xl bg-gradient-to-br from-teal-50 to-teal-100 dark:from-teal-950/40 dark:to-teal-900/40 text-teal-700 dark:text-teal-400 flex items-center justify-center shrink-0 border border-teal-200/50 dark:border-teal-800/30">
               <Building2 className="h-6 w-6" />
             </div>
             <div className="min-w-0">
@@ -429,7 +429,7 @@ const TenantCard = memo(function TenantCard({
               <Button
                 variant="ghost"
                 size="icon"
-                className="h-8 w-8 shrink-0 hover:bg-rose-50 dark:hover:bg-rose-950/50"
+                className="h-8 w-8 shrink-0 hover:bg-teal-50 dark:hover:bg-teal-950/50"
               >
                 <MoreVertical className="h-4 w-4" />
               </Button>
@@ -485,7 +485,7 @@ const TenantCard = memo(function TenantCard({
 
         <div className="grid grid-cols-3 gap-2 py-1">
           <div className="text-center py-2 px-1 rounded-xl bg-muted/40 border border-muted-foreground/5">
-            <GraduationCap className="h-4 w-4 mx-auto text-rose-500 mb-1" />
+            <GraduationCap className="h-4 w-4 mx-auto text-teal-500 mb-1" />
             <p className="text-sm font-bold leading-tight">
               {tenant.studentCount}
             </p>
@@ -519,7 +519,7 @@ const TenantCard = memo(function TenantCard({
             <Button
               variant="outline"
               size="sm"
-              className="flex-1 h-9 rounded-lg hover:bg-rose-50 dark:hover:bg-rose-950/30"
+              className="flex-1 h-9 rounded-lg hover:bg-teal-50 dark:hover:bg-teal-950/30"
               onClick={onView}
             >
               View Details
@@ -563,7 +563,7 @@ export function SuperAdminTenants() {
     plan: planFilter !== "all" ? planFilter : undefined,
     search: search || undefined,
   });
-  const tenants = (tenantsData ?? []) as Tenant[];
+  const tenants = (tenantsData?.tenants ?? []) as Tenant[];
 
   const createTenant = useCreateTenant();
   const updateTenant = useUpdateTenant();
@@ -764,8 +764,8 @@ export function SuperAdminTenants() {
           title="Total Schools"
           value={stats.total}
           icon={<Building2 className="h-5 w-5" />}
-          iconBg="bg-rose-100 dark:bg-rose-900/30"
-          iconColor="text-rose-600"
+          iconBg="bg-teal-100 dark:bg-teal-900/30"
+          iconColor="text-teal-600"
           trend={null}
         />
         <StatCard
@@ -883,7 +883,7 @@ export function SuperAdminTenants() {
             </Button>
           </div>
           <Button
-            className="bg-rose-600 hover:bg-rose-700 text-white"
+            className="bg-teal-600 hover:bg-teal-700 text-white"
             onClick={handleOpenAddDialog}
           >
             <Plus className="h-4 w-4 mr-2" />
@@ -942,7 +942,7 @@ export function SuperAdminTenants() {
             </p>
             {!search && planFilter === "all" && statusFilter === "all" && (
               <Button
-                className="mt-4 bg-rose-600 hover:bg-rose-700 text-white"
+                className="mt-4 bg-teal-600 hover:bg-teal-700 text-white"
                 onClick={handleOpenAddDialog}
               >
                 <Plus className="h-4 w-4 mr-2" />
@@ -1009,11 +1009,11 @@ export function SuperAdminTenants() {
                   {paginatedTenants.map((tenant) => (
                     <TableRow
                       key={tenant.id}
-                      className="hover:bg-rose-50 dark:bg-rose-900/30/30 transition-colors"
+                      className="hover:bg-teal-50 dark:bg-teal-900/30/30 transition-colors"
                     >
                       <TableCell>
                         <div className="flex items-center gap-3">
-                          <div className="h-10 w-10 rounded-xl bg-rose-100 dark:bg-rose-900/30 text-rose-700 dark:text-rose-400 flex items-center justify-center shrink-0">
+                          <div className="h-10 w-10 rounded-xl bg-teal-100 dark:bg-teal-900/30 text-teal-700 dark:text-teal-400 flex items-center justify-center shrink-0">
                             <Building2 className="h-5 w-5" />
                           </div>
                           <div className="min-w-0">
@@ -1180,7 +1180,7 @@ export function SuperAdminTenants() {
                       key={page}
                       variant={currentPage === page ? "default" : "outline"}
                       size="icon"
-                      className={`h-8 w-8 ${currentPage === page ? "bg-rose-600 hover:bg-rose-700 text-white" : ""}`}
+                      className={`h-8 w-8 ${currentPage === page ? "bg-teal-600 hover:bg-teal-700 text-white" : ""}`}
                       onClick={() => setCurrentPage(page)}
                     >
                       {page}
@@ -1195,7 +1195,7 @@ export function SuperAdminTenants() {
                         currentPage === totalPages ? "default" : "outline"
                       }
                       size="icon"
-                      className={`h-8 w-8 ${currentPage === totalPages ? "bg-rose-600 hover:bg-rose-700 text-white" : ""}`}
+                      className={`h-8 w-8 ${currentPage === totalPages ? "bg-teal-600 hover:bg-teal-700 text-white" : ""}`}
                       onClick={() => setCurrentPage(totalPages)}
                     >
                       {totalPages}
@@ -1249,7 +1249,7 @@ export function SuperAdminTenants() {
                   key={page}
                   variant={currentPage === page ? "default" : "outline"}
                   size="icon"
-                  className={`h-8 w-8 ${currentPage === page ? "bg-rose-600 hover:bg-rose-700 text-white" : ""}`}
+                  className={`h-8 w-8 ${currentPage === page ? "bg-teal-600 hover:bg-teal-700 text-white" : ""}`}
                   onClick={() => setCurrentPage(page)}
                 >
                   {page}
@@ -1262,7 +1262,7 @@ export function SuperAdminTenants() {
                 <Button
                   variant={currentPage === totalPages ? "default" : "outline"}
                   size="icon"
-                  className={`h-8 w-8 ${currentPage === totalPages ? "bg-rose-600 hover:bg-rose-700 text-white" : ""}`}
+                  className={`h-8 w-8 ${currentPage === totalPages ? "bg-teal-600 hover:bg-teal-700 text-white" : ""}`}
                   onClick={() => setCurrentPage(totalPages)}
                 >
                   {totalPages}
@@ -1311,7 +1311,7 @@ export function SuperAdminTenants() {
                 <Label htmlFor="tenant-slug">Slug *</Label>
                 <button
                   type="button"
-                  className="text-xs text-rose-600 hover:underline"
+                  className="text-xs text-teal-600 hover:underline"
                   onClick={() => setAutoSlug(!autoSlug)}
                 >
                   {autoSlug ? "Manual edit" : "Auto-generate"}
@@ -1545,7 +1545,7 @@ export function SuperAdminTenants() {
               Cancel
             </Button>
             <Button
-              className="bg-rose-600 hover:bg-rose-700 text-white"
+              className="bg-teal-600 hover:bg-teal-700 text-white"
               onClick={handleSubmit}
               disabled={
                 submitting || !formData.name.trim() || !formData.slug.trim()
@@ -1568,7 +1568,7 @@ export function SuperAdminTenants() {
             <>
               <DialogHeader>
                 <div className="flex items-center gap-3">
-                  <div className="h-12 w-12 rounded-xl bg-rose-100 dark:bg-rose-900/30 text-rose-700 dark:text-rose-400 flex items-center justify-center">
+                  <div className="h-12 w-12 rounded-xl bg-teal-100 dark:bg-teal-900/30 text-teal-700 dark:text-teal-400 flex items-center justify-center">
                     <Building2 className="h-6 w-6" />
                   </div>
                   <div>
@@ -1628,7 +1628,7 @@ export function SuperAdminTenants() {
                       label="Students"
                       current={viewingTenant.studentCount}
                       max={viewingTenant.maxStudents}
-                      color="bg-rose-100 dark:bg-rose-900/30 text-rose-700 dark:text-rose-400"
+                      color="bg-teal-100 dark:bg-teal-900/30 text-teal-700 dark:text-teal-400"
                     />
                     <UsageStat
                       icon={<Users className="h-4 w-4" />}
@@ -1741,7 +1741,7 @@ export function SuperAdminTenants() {
                   Close
                 </Button>
                 <Button
-                  className="bg-rose-600 hover:bg-rose-700 text-white"
+                  className="bg-teal-600 hover:bg-teal-700 text-white"
                   onClick={() => {
                     setDetailDialogOpen(false);
                     handleOpenEditDialog(viewingTenant);

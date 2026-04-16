@@ -104,8 +104,8 @@ const ROLE_CONFIG: Record<
   { color: string; bg: string; icon: React.ReactNode; label: string }
 > = {
   super_admin: {
-    color: "text-rose-700 dark:text-rose-400",
-    bg: "bg-rose-100 dark:bg-rose-900/30 border-rose-200 dark:border-rose-700",
+    color: "text-teal-700 dark:text-teal-400",
+    bg: "bg-teal-100 dark:bg-teal-900/30 border-teal-200 dark:border-teal-700",
     icon: <Shield className="h-3.5 w-3.5" />,
     label: "Super Admin",
   },
@@ -315,7 +315,7 @@ export function SuperAdminUsers() {
         </div>
         <Badge
           variant="outline"
-          className="w-fit gap-1.5 border-rose-200 dark:border-rose-700 text-rose-700 dark:text-rose-400 bg-rose-50 dark:bg-rose-900/30 text-xs px-3 py-1"
+          className="w-fit gap-1.5 border-teal-200 dark:border-teal-700 text-teal-700 dark:text-teal-400 bg-teal-50 dark:bg-teal-900/30 text-xs px-3 py-1"
         >
           <Shield className="h-3.5 w-3.5" />
           Cross-Tenant View
@@ -506,14 +506,14 @@ export function SuperAdminUsers() {
                         return (
                           <TableRow
                             key={user.id}
-                            className="cursor-pointer transition-colors hover:bg-rose-50 dark:bg-rose-900/30/40"
+                            className="cursor-pointer transition-colors hover:bg-teal-50 dark:bg-teal-900/30/40"
                             onClick={() => openUserDetail(user)}
                           >
                             {/* Name */}
                             <TableCell>
                               <div className="flex items-center gap-3">
                                 <div
-                                  className={`h-8 w-8 rounded-full flex items-center justify-center text-xs font-semibold shrink-0 text-white ${user.role === "super_admin" ? "bg-rose-500" : user.role === "admin" ? "bg-emerald-500" : user.role === "teacher" ? "bg-blue-500" : user.role === "student" ? "bg-violet-500" : "bg-amber-500"}`}
+                                  className={`h-8 w-8 rounded-full flex items-center justify-center text-xs font-semibold shrink-0 text-white ${user.role === "super_admin" ? "bg-teal-500" : user.role === "admin" ? "bg-emerald-500" : user.role === "teacher" ? "bg-blue-500" : user.role === "student" ? "bg-violet-500" : "bg-amber-500"}`}
                                 >
                                   {initials}
                                 </div>
@@ -591,7 +591,7 @@ export function SuperAdminUsers() {
                               <Button
                                 variant="ghost"
                                 size="icon"
-                                className="h-8 w-8 text-muted-foreground hover:text-rose-600 hover:bg-rose-50 dark:bg-rose-900/30"
+                                className="h-8 w-8 text-muted-foreground hover:text-teal-600 hover:bg-teal-50 dark:bg-teal-900/30"
                                 onClick={(e) => {
                                   e.stopPropagation();
                                   openUserDetail(user);
@@ -651,7 +651,7 @@ export function SuperAdminUsers() {
                           size="icon"
                           className={`h-8 w-8 text-xs ${
                             currentPage === page
-                              ? "bg-rose-600 hover:bg-rose-700 text-white"
+                              ? "bg-teal-600 hover:bg-teal-700 text-white"
                               : ""
                           }`}
                           onClick={() => setCurrentPage(page)}
@@ -689,7 +689,7 @@ export function SuperAdminUsers() {
               <div
                 className={`p-6 pb-4 ${
                   selectedUser.role === "super_admin"
-                    ? "bg-gradient-to-r from-rose-600 to-rose-500"
+                    ? "bg-gradient-to-r from-teal-600 to-teal-500"
                     : selectedUser.role === "admin"
                       ? "bg-gradient-to-r from-emerald-600 to-emerald-500"
                       : selectedUser.role === "teacher"
@@ -812,7 +812,7 @@ export function SuperAdminUsers() {
                   <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
                     Administrative Actions
                   </h3>
-                  <div className="p-4 rounded-lg border border-rose-100 dark:border-rose-900/30 bg-rose-50/30 dark:bg-rose-950/20">
+                  <div className="p-4 rounded-lg border border-teal-100 dark:border-teal-900/30 bg-teal-50/30 dark:bg-teal-950/20">
                     <p className="text-sm font-medium mb-1">
                       Account Status Control
                     </p>
@@ -856,7 +856,7 @@ export function SuperAdminUsers() {
                           : "Activate Account"}
                     </Button>
                     {selectedUser.role === "super_admin" && (
-                      <p className="text-[10px] text-rose-500 mt-2 text-center">
+                      <p className="text-[10px] text-teal-500 mt-2 text-center">
                         Super Admin accounts cannot be disabled here.
                       </p>
                     )}

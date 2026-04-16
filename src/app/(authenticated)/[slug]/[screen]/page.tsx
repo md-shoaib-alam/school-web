@@ -81,7 +81,6 @@ export default function TenantScreenDispatcher() {
       case 'timetable': return <AdminTimetable />;
       case 'calendar': return <AdminCalendar />;
       case 'reports': return <AdminReports />;
-      case 'subscriptions': return <AdminSubscriptions />;
       case 'roles': return <AdminRoles />;
       case 'staff': return <AdminStaff />;
       case 'school-settings': return <AdminSchoolSettings />;

@@ -147,8 +147,8 @@ const ACTION_LABELS: Record<string, string> = {
 };
 
 const COLOR_PRESETS = [
-  "#e11d48",
-  "#f43f5e",
+  "#059669",
+  "#10b981",
   "#f59e0b",
   "#10b981",
   "#06b6d4",
@@ -241,7 +241,7 @@ export function SuperAdminRoles() {
   // Form state
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
-  const [color, setColor] = useState("#e11d48");
+  const [color, setColor] = useState("#059669");
   const [permissions, setPermissions] = useState<Record<string, string[]>>({});
 
   // User assignment dialog state
@@ -285,7 +285,7 @@ export function SuperAdminRoles() {
     } else {
       setName("");
       setDescription("");
-      setColor("#e11d48");
+      setColor("#059669");
       setPermissions({});
     }
     setDialogOpen(true);
@@ -494,7 +494,7 @@ export function SuperAdminRoles() {
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
-        <Loader2 className="h-8 w-8 animate-spin text-rose-500" />
+        <Loader2 className="h-8 w-8 animate-spin text-teal-500" />
         <span className="ml-3 text-gray-500 dark:text-gray-400">
           Loading platform roles...
         </span>
@@ -505,19 +505,19 @@ export function SuperAdminRoles() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="rounded-2xl bg-gradient-to-r from-rose-950 via-rose-900 to-rose-800 p-6 text-white shadow-lg relative overflow-hidden">
+      <div className="rounded-2xl bg-gradient-to-r from-teal-950 via-teal-900 to-teal-800 p-6 text-white shadow-lg relative overflow-hidden">
         <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/3" />
-        <div className="absolute bottom-0 left-1/4 w-40 h-40 bg-rose-600/10 rounded-full translate-y-1/2" />
+        <div className="absolute bottom-0 left-1/4 w-40 h-40 bg-teal-600/10 rounded-full translate-y-1/2" />
         <div className="relative z-10 flex items-center justify-between flex-wrap gap-4">
           <div className="flex items-center gap-4">
             <div className="h-14 w-14 rounded-2xl bg-white/15 flex items-center justify-center backdrop-blur-sm border border-white/20">
-              <Shield className="h-7 w-7 text-rose-200" />
+              <Shield className="h-7 w-7 text-teal-200" />
             </div>
             <div>
               <h2 className="text-2xl font-bold tracking-tight">
                 Platform Roles & Permissions
               </h2>
-              <p className="text-rose-200 text-sm mt-0.5">
+              <p className="text-teal-200 text-sm mt-0.5">
                 Define granular access control and assign roles to platform
                 staff
               </p>
@@ -536,7 +536,7 @@ export function SuperAdminRoles() {
       <Card>
         <CardHeader>
           <CardTitle className="text-base flex items-center gap-2">
-            <Blocks className="h-4 w-4 text-rose-500" />
+            <Blocks className="h-4 w-4 text-teal-500" />
             Role Templates
           </CardTitle>
           <CardDescription>
@@ -552,7 +552,7 @@ export function SuperAdminRoles() {
                 <button
                   key={template.name}
                   onClick={() => openCreateDialog(template)}
-                  className="flex flex-col gap-2 p-4 rounded-xl border-2 border-dashed border-gray-200 dark:border-gray-700 hover:border-rose-300 dark:hover:border-rose-700 hover:bg-rose-50/50 dark:hover:bg-rose-900/10 transition-all text-left group"
+                  className="flex flex-col gap-2 p-4 rounded-xl border-2 border-dashed border-gray-200 dark:border-gray-700 hover:border-teal-300 dark:hover:border-teal-700 hover:bg-teal-50/50 dark:hover:bg-teal-900/10 transition-all text-left group"
                 >
                   <div className="flex items-center gap-2">
                     <div
@@ -623,7 +623,7 @@ export function SuperAdminRoles() {
                       <Button
                         variant="ghost"
                         size="icon"
-                        className="h-8 w-8 hover:bg-rose-50 hover:text-rose-600 dark:hover:bg-rose-900/30"
+                        className="h-8 w-8 hover:bg-teal-50 hover:text-teal-600 dark:hover:bg-teal-900/30"
                         onClick={() => openAssignDialog(role)}
                         title="Assign Users"
                       >
@@ -632,7 +632,7 @@ export function SuperAdminRoles() {
                       <Button
                         variant="ghost"
                         size="icon"
-                        className="h-8 w-8 hover:bg-rose-50 hover:text-rose-600 dark:hover:bg-rose-900/30"
+                        className="h-8 w-8 hover:bg-teal-50 hover:text-teal-600 dark:hover:bg-teal-900/30"
                         onClick={() => openEditDialog(role)}
                         title="Edit Role"
                       >
@@ -723,7 +723,7 @@ export function SuperAdminRoles() {
                   {userCount > 0 && (
                     <div className="pt-2 border-t border-gray-100 dark:border-gray-800">
                       <button
-                        className="flex items-center gap-2 text-xs text-rose-600 dark:text-rose-400 hover:underline w-full text-left"
+                        className="flex items-center gap-2 text-xs text-teal-600 dark:text-teal-400 hover:underline w-full text-left"
                         onClick={() => openAssignDialog(role)}
                       >
                         <Users className="h-3 w-3" />
@@ -744,7 +744,7 @@ export function SuperAdminRoles() {
         <DialogContent className="sm:max-w-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
-              <Shield className="h-5 w-5 text-rose-600" />
+              <Shield className="h-5 w-5 text-teal-600" />
               {editingRole
                 ? `Edit "${editingRole.name}"`
                 : "Create New Platform Role"}
@@ -909,7 +909,7 @@ export function SuperAdminRoles() {
             <Button
               onClick={handleSave}
               disabled={saving || !name.trim()}
-              className="bg-rose-600 hover:bg-rose-700 text-white"
+              className="bg-teal-600 hover:bg-teal-700 text-white"
             >
               {saving ? (
                 <Loader2 className="h-4 w-4 mr-2 animate-spin" />
@@ -925,7 +925,7 @@ export function SuperAdminRoles() {
         <DialogContent className="sm:max-w-lg max-h-[85vh] overflow-hidden flex flex-col">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
-              <UserPlus className="h-5 w-5 text-rose-600" />
+              <UserPlus className="h-5 w-5 text-teal-600" />
               Assign Users to &quot;{assigningRole?.name}&quot;
             </DialogTitle>
             <DialogDescription>
@@ -936,7 +936,7 @@ export function SuperAdminRoles() {
 
           {assignLoading ? (
             <div className="flex-1 flex items-center justify-center py-12">
-              <Loader2 className="h-6 w-6 animate-spin text-rose-500" />
+              <Loader2 className="h-6 w-6 animate-spin text-teal-500" />
               <span className="ml-2 text-sm text-gray-500 dark:text-gray-400">
                 Loading users...
               </span>
@@ -947,7 +947,7 @@ export function SuperAdminRoles() {
               <div>
                 <div className="flex items-center justify-between mb-2">
                   <Label className="text-sm font-semibold flex items-center gap-1.5">
-                    <Users className="h-3.5 w-3.5 text-rose-500" />
+                    <Users className="h-3.5 w-3.5 text-teal-500" />
                     Assigned Users ({assignedUsers.length})
                   </Label>
                 </div>
@@ -962,11 +962,11 @@ export function SuperAdminRoles() {
                     {assignedUsers.map((user) => (
                       <div
                         key={user.id}
-                        className="flex items-center justify-between gap-3 p-2.5 rounded-lg bg-rose-50 dark:bg-rose-950/20 border border-rose-200 dark:border-rose-900/40"
+                        className="flex items-center justify-between gap-3 p-2.5 rounded-lg bg-teal-50 dark:bg-teal-950/20 border border-teal-200 dark:border-teal-900/40"
                       >
                         <div className="flex items-center gap-3 min-w-0">
                           <Avatar className="h-8 w-8 shrink-0">
-                            <AvatarFallback className="bg-rose-500 text-white text-xs">
+                            <AvatarFallback className="bg-teal-500 text-white text-xs">
                               {getInitials(user.name)}
                             </AvatarFallback>
                           </Avatar>

@@ -187,13 +187,18 @@ function getInitialTenantInfo(): { id: string | null; slug: string | null; name:
 }
 
 // ── URL parsing ──
+const RESERVED_PLATFORM_KEYWORDS = [
+  'login', 'api', 'admin', 'super-admin', 'dashboard', 'tenants', 
+  'billing', 'users', 'audit-logs', 'analytics', 'platform-analytics', 
+  'feature-flags', 'roles', 'staff', 'settings', 'manage-admins', 'subscriptions'
+];
+
 function parseScreenFromPath(pathname: string): string {
   const parts = pathname.split('/').filter(Boolean);
   if (parts.length === 0) return 'dashboard';
   
   // If first part is a reserved keyword, it's a screen
-  const reserved = ['login', 'api', 'admin', 'super-admin'];
-  if (reserved.includes(parts[0])) return parts[0];
+  if (RESERVED_PLATFORM_KEYWORDS.includes(parts[0])) return parts[0];
   
   // If first part is NOT reserved, it's a tenant. Screen is the second part.
   if (parts.length >= 2) return parts[1] || 'dashboard';
@@ -206,8 +211,7 @@ function parseTenantFromPath(pathname: string): string | null {
   const parts = pathname.split('/').filter(Boolean);
   if (parts.length === 0) return null;
   // If the first part is a reserved platform keyword, it's not a tenant ID
-  const reserved = ['login', 'api', 'admin', 'super-admin'];
-  if (reserved.includes(parts[0])) return null;
+  if (RESERVED_PLATFORM_KEYWORDS.includes(parts[0])) return null;
   // Any other first part is treated as a tenant identifier
   return parts[0];
 }

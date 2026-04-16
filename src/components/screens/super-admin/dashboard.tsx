@@ -69,29 +69,29 @@ import { usePlatformStats } from "@/lib/graphql/hooks";
 // ── Chart Configs ──────────────────────────────────────────────────────────────
 
 const userChartConfig: ChartConfig = {
-  students: { label: "Students", color: "#e11d48" },
-  teachers: { label: "Teachers", color: "#f43f5e" },
-  parents: { label: "Parents", color: "#fb7185" },
-  admins: { label: "Admins", color: "#fda4af" },
+  students: { label: "Students", color: "#059669" },
+  teachers: { label: "Teachers", color: "#10b981" },
+  parents: { label: "Parents", color: "#34d399" },
+  admins: { label: "Admins", color: "#6ee7b7" },
 };
 
 const growthChartConfig: ChartConfig = {
-  newTenants: { label: "New Schools", color: "#e11d48" },
-  newUsers: { label: "New Users", color: "#f43f5e" },
-  revenue: { label: "Revenue ($)", color: "#be123c" },
+  newTenants: { label: "New Schools", color: "#059669" },
+  newUsers: { label: "New Users", color: "#10b981" },
+  revenue: { label: "Revenue ($)", color: "#047857" },
 };
 
 const planChartConfig: ChartConfig = {
-  count: { label: "Schools", color: "#e11d48" },
+  count: { label: "Schools", color: "#059669" },
 };
 
 // ── Constants ──────────────────────────────────────────────────────────────────
 
-const USER_CHART_COLORS = ["#e11d48", "#f43f5e", "#fb7185", "#fda4af"];
+const USER_CHART_COLORS = ["#059669", "#10b981", "#34d399", "#6ee7b7"];
 
 const PLAN_COLORS: Record<string, string> = {
   basic: "#94a3b8",
-  standard: "#e11d48",
+  standard: "#059669",
   premium: "#f59e0b",
   enterprise: "#7c3aed",
 };
@@ -191,22 +191,22 @@ export function SuperAdminDashboard() {
   return (
     <div className="space-y-6">
       {/* ── Hero Banner ──────────────────────────────────────────────────── */}
-      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-rose-950 via-rose-900 to-rose-800 p-6 lg:p-8 text-white shadow-lg">
+      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-teal-950 via-teal-900 to-teal-800 p-6 lg:p-8 text-white shadow-lg">
         {/* Decorative elements */}
-        <div className="absolute top-0 right-0 w-80 h-80 bg-rose-700/20 rounded-full -translate-y-1/2 translate-x-1/4" />
-        <div className="absolute bottom-0 left-1/4 w-56 h-56 bg-rose-600/10 rounded-full translate-y-1/2" />
+        <div className="absolute top-0 right-0 w-80 h-80 bg-teal-700/20 rounded-full -translate-y-1/2 translate-x-1/4" />
+        <div className="absolute bottom-0 left-1/4 w-56 h-56 bg-teal-600/10 rounded-full translate-y-1/2" />
         <div className="absolute top-1/2 right-1/4 w-32 h-32 bg-white dark:bg-gray-900/5 rounded-full" />
 
         <div className="relative z-10">
           <div className="flex items-center gap-4 mb-4">
             <div className="h-14 w-14 rounded-2xl bg-white dark:bg-gray-900/15 flex items-center justify-center backdrop-blur-sm border border-white/20">
-              <ShieldCheck className="h-7 w-7 text-rose-200" />
+              <ShieldCheck className="h-7 w-7 text-teal-200" />
             </div>
             <div>
               <h2 className="text-2xl lg:text-3xl font-bold tracking-tight">
                 Platform Command Center
               </h2>
-              <p className="text-rose-200 text-sm mt-0.5">
+              <p className="text-teal-200 text-sm mt-0.5">
                 Multi-tenant SaaS overview and analytics
               </p>
             </div>
@@ -227,41 +227,41 @@ export function SuperAdminDashboard() {
             ) : (
               <>
                 <div className="bg-white dark:bg-gray-900/10 backdrop-blur-sm rounded-xl px-4 py-3">
-                  <p className="text-rose-200 text-xs font-medium">Schools</p>
+                  <p className="text-teal-200 text-xs font-medium">Schools</p>
                   <p className="text-2xl font-bold flex items-center gap-1">
-                    <Building2 className="h-5 w-5 text-rose-300" />
+                    <Building2 className="h-5 w-5 text-teal-300" />
                     {data?.tenants.total ?? 0}
                   </p>
                 </div>
                 <div className="bg-white dark:bg-gray-900/10 backdrop-blur-sm rounded-xl px-4 py-3">
-                  <p className="text-rose-200 text-xs font-medium">
+                  <p className="text-teal-200 text-xs font-medium">
                     Total Users
                   </p>
                   <p className="text-2xl font-bold flex items-center gap-1">
-                    <Users className="h-5 w-5 text-rose-300" />
+                    <Users className="h-5 w-5 text-teal-300" />
                     {data?.users.total ?? 0}
                   </p>
                 </div>
                 <div className="bg-white dark:bg-gray-900/10 backdrop-blur-sm rounded-xl px-4 py-3">
-                  <p className="text-rose-200 text-xs font-medium">Revenue</p>
+                  <p className="text-teal-200 text-xs font-medium">Revenue</p>
                   <p className="text-2xl font-bold flex items-center gap-1">
-                    <DollarSign className="h-5 w-5 text-rose-300" />$
+                    <DollarSign className="h-5 w-5 text-teal-300" />$
                     {(data?.revenue.total ?? 0).toLocaleString()}
                   </p>
                 </div>
                 <div className="bg-white dark:bg-gray-900/10 backdrop-blur-sm rounded-xl px-4 py-3">
-                  <p className="text-rose-200 text-xs font-medium">
+                  <p className="text-teal-200 text-xs font-medium">
                     Subscriptions
                   </p>
                   <p className="text-2xl font-bold flex items-center gap-1">
-                    <CreditCard className="h-5 w-5 text-rose-300" />
+                    <CreditCard className="h-5 w-5 text-teal-300" />
                     {data?.subscriptions.active ?? 0}
                   </p>
                 </div>
                 <div className="bg-white dark:bg-gray-900/10 backdrop-blur-sm rounded-xl px-4 py-3 hidden sm:block">
-                  <p className="text-rose-200 text-xs font-medium">Classes</p>
+                  <p className="text-teal-200 text-xs font-medium">Classes</p>
                   <p className="text-2xl font-bold flex items-center gap-1">
-                    <GraduationCap className="h-5 w-5 text-rose-300" />
+                    <GraduationCap className="h-5 w-5 text-teal-300" />
                     {data?.classes ?? 0}
                   </p>
                 </div>
@@ -277,7 +277,7 @@ export function SuperAdminDashboard() {
         <Card>
           <CardHeader>
             <CardTitle className="text-base flex items-center gap-2">
-              <Building2 className="h-4 w-4 text-rose-600" />
+              <Building2 className="h-4 w-4 text-teal-600" />
               Tenant Status
             </CardTitle>
             <CardDescription>
@@ -418,7 +418,7 @@ export function SuperAdminDashboard() {
         <Card>
           <CardHeader>
             <CardTitle className="text-base flex items-center gap-2">
-              <Users className="h-4 w-4 text-rose-600" />
+              <Users className="h-4 w-4 text-teal-600" />
               User Distribution
             </CardTitle>
             <CardDescription>
@@ -498,7 +498,7 @@ export function SuperAdminDashboard() {
         <Card>
           <CardHeader>
             <CardTitle className="text-base flex items-center gap-2">
-              <Zap className="h-4 w-4 text-rose-600" />
+              <Zap className="h-4 w-4 text-teal-600" />
               Quick Actions
             </CardTitle>
             <CardDescription>Common admin operations</CardDescription>
@@ -506,7 +506,7 @@ export function SuperAdminDashboard() {
           <CardContent>
             <div className="space-y-3">
               <Button
-                className="w-full justify-start gap-3 h-12 bg-rose-600 hover:bg-rose-700 text-white rounded-xl"
+                className="w-full justify-start gap-3 h-12 bg-teal-600 hover:bg-teal-700 text-white rounded-xl"
                 onClick={() =>
                   window.dispatchEvent(
                     new CustomEvent("super-admin-navigate", {
@@ -515,12 +515,12 @@ export function SuperAdminDashboard() {
                   )
                 }
               >
-                <div className="h-9 w-9 rounded-lg bg-rose-500/30 flex items-center justify-center">
+                <div className="h-9 w-9 rounded-lg bg-teal-500/30 flex items-center justify-center">
                   <Plus className="h-4 w-4" />
                 </div>
                 <div className="text-left">
                   <p className="font-medium text-sm">Add New School</p>
-                  <p className="text-[11px] text-rose-200">
+                  <p className="text-[11px] text-teal-200">
                     Register a new tenant
                   </p>
                 </div>
@@ -627,7 +627,7 @@ export function SuperAdminDashboard() {
       <Card>
         <CardHeader>
           <CardTitle className="text-base flex items-center gap-2">
-            <TrendingUp className="h-4 w-4 text-rose-600" />
+            <TrendingUp className="h-4 w-4 text-teal-600" />
             Monthly Growth Trends
           </CardTitle>
           <CardDescription>
@@ -768,8 +768,8 @@ export function SuperAdminDashboard() {
                       </TableCell>
                       <TableCell>
                         <div className="flex items-center gap-2">
-                          <div className="h-8 w-8 rounded-lg bg-rose-100 dark:bg-rose-900/30 flex items-center justify-center">
-                            <Building2 className="h-4 w-4 text-rose-600" />
+                          <div className="h-8 w-8 rounded-lg bg-teal-100 dark:bg-teal-900/30 flex items-center justify-center">
+                            <Building2 className="h-4 w-4 text-teal-600" />
                           </div>
                           <div>
                             <p className="font-medium text-sm">{tenant.name}</p>
@@ -787,7 +787,7 @@ export function SuperAdminDashboard() {
                               : tenant.plan === "enterprise"
                                 ? "bg-violet-100 dark:bg-violet-900/30 text-violet-700 dark:text-violet-400"
                                 : tenant.plan === "standard"
-                                  ? "bg-rose-100 dark:bg-rose-900/30 text-rose-700 dark:text-rose-400"
+                                  ? "bg-teal-100 dark:bg-teal-900/30 text-teal-700 dark:text-teal-400"
                                   : "bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300"
                           }`}
                         >
@@ -832,7 +832,7 @@ export function SuperAdminDashboard() {
         <Card className="lg:col-span-2">
           <CardHeader>
             <CardTitle className="text-base flex items-center gap-2">
-              <CreditCard className="h-4 w-4 text-rose-600" />
+              <CreditCard className="h-4 w-4 text-teal-600" />
               Plan Distribution
             </CardTitle>
             <CardDescription>Tenants by subscription plan</CardDescription>
@@ -908,7 +908,7 @@ export function SuperAdminDashboard() {
           <div className="flex items-center justify-between">
             <div>
               <CardTitle className="text-base flex items-center gap-2">
-                <Activity className="h-4 w-4 text-rose-600" />
+                <Activity className="h-4 w-4 text-teal-600" />
                 Recent Activity
               </CardTitle>
               <CardDescription>Latest platform audit logs</CardDescription>

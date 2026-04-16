@@ -128,7 +128,7 @@ function generateRevenueBreakdown() {
 }
 
 const geographicData = [
-  { country: "India", percentage: 85, color: "bg-rose-500" },
+  { country: "India", percentage: 85, color: "bg-teal-500" },
   { country: "USA", percentage: 10, color: "bg-blue-500" },
   { country: "UK", percentage: 5, color: "bg-amber-500" },
 ];
@@ -149,7 +149,7 @@ const featureUsageData = [
 // ── Chart configs ──────────────────────────────────────────────
 
 const tenantGrowthConfig = {
-  tenants: { label: "Total Tenants", color: "#f43f5e" },
+  tenants: { label: "Total Tenants", color: "#10b981" },
 } satisfies ChartConfig;
 
 const userGrowthConfig = {
@@ -160,7 +160,7 @@ const userGrowthConfig = {
 } satisfies ChartConfig;
 
 const revenueConfig = {
-  revenue: { label: "Revenue ($)", color: "#f43f5e" },
+  revenue: { label: "Revenue ($)", color: "#10b981" },
 } satisfies ChartConfig;
 
 const pieConfig = {
@@ -168,7 +168,7 @@ const pieConfig = {
 } satisfies ChartConfig;
 
 const PIE_COLORS = [
-  "#f43f5e",
+  "#10b981",
   "#10b981",
   "#3b82f6",
   "#f59e0b",
@@ -255,7 +255,7 @@ export function SuperAdminAnalytics() {
       {/* Page Header */}
       <div>
         <h1 className="text-2xl font-bold tracking-tight flex items-center gap-2">
-          <BarChart3 className="h-6 w-6 text-rose-500" />
+          <BarChart3 className="h-6 w-6 text-teal-500" />
           Platform Analytics
         </h1>
         <p className="text-muted-foreground text-sm mt-1">
@@ -282,7 +282,7 @@ export function SuperAdminAnalytics() {
                       ${metrics.mrr.toLocaleString()}
                     </p>
                   </div>
-                  <div className="h-11 w-11 rounded-xl bg-rose-100 dark:bg-rose-900/30 text-rose-600 flex items-center justify-center">
+                  <div className="h-11 w-11 rounded-xl bg-teal-100 dark:bg-teal-900/30 text-teal-600 flex items-center justify-center">
                     <DollarSign className="h-5 w-5" />
                   </div>
                 </div>
@@ -385,7 +385,7 @@ export function SuperAdminAnalytics() {
         <Card>
           <CardHeader>
             <CardTitle className="text-base flex items-center gap-2">
-              <TrendingUp className="h-4 w-4 text-rose-500" />
+              <TrendingUp className="h-4 w-4 text-teal-500" />
               Tenant Growth
             </CardTitle>
             <CardDescription>
@@ -508,7 +508,7 @@ export function SuperAdminAnalytics() {
         <Card>
           <CardHeader>
             <CardTitle className="text-base flex items-center gap-2">
-              <DollarSign className="h-4 w-4 text-rose-500" />
+              <DollarSign className="h-4 w-4 text-teal-500" />
               Revenue by Tenant (Top 10)
             </CardTitle>
             <CardDescription>
@@ -755,21 +755,21 @@ export function SuperAdminAnalytics() {
             </div>
 
             {/* Active Users Today */}
-            <div className="space-y-3 p-4 rounded-xl bg-rose-50 dark:bg-rose-900/30 border border-rose-100 dark:border-rose-800">
+            <div className="space-y-3 p-4 rounded-xl bg-teal-50 dark:bg-teal-900/30 border border-teal-100 dark:border-teal-800">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <div className="h-10 w-10 rounded-lg bg-rose-100 dark:bg-rose-900/30 text-rose-600 flex items-center justify-center">
+                  <div className="h-10 w-10 rounded-lg bg-teal-100 dark:bg-teal-900/30 text-teal-600 flex items-center justify-center">
                     <UserCheck className="h-5 w-5" />
                   </div>
                   <div>
-                    <p className="text-sm font-semibold text-rose-900">
+                    <p className="text-sm font-semibold text-teal-900">
                       Active Users Today
                     </p>
-                    <p className="text-xs text-rose-600">Across all tenants</p>
+                    <p className="text-xs text-teal-600">Across all tenants</p>
                   </div>
                 </div>
                 <div className="text-right">
-                  <p className="text-2xl font-bold text-rose-700 dark:text-rose-400">
+                  <p className="text-2xl font-bold text-teal-700 dark:text-teal-400">
                     {activeUsers.toLocaleString()}
                   </p>
                   <p className="text-xs text-emerald-600 flex items-center gap-1 justify-end">
@@ -779,7 +779,7 @@ export function SuperAdminAnalytics() {
               </div>
               <Progress
                 value={68}
-                className="h-2 bg-rose-100 dark:bg-rose-900/30 [&>div]:bg-rose-500"
+                className="h-2 bg-teal-100 dark:bg-teal-900/30 [&>div]:bg-teal-500"
               />
             </div>
 

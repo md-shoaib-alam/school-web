@@ -243,15 +243,18 @@ export default function Home() {
   useEffect(() => {
     if (mounted && isLoggedIn && currentUser) {
       const parts = window.location.pathname.split('/').filter(Boolean);
+      const isSuperAdmin = currentUser.role === 'super_admin';
       const expectedPrefix = currentUser.tenantSlug || currentUser.tenantId || currentTenantId;
-
-      if (!expectedPrefix) return;
 
       // Only redirect if we are literally at the root "/"
       if (parts.length === 0) {
-        const url = currentScreen === 'dashboard'
-          ? `/${expectedPrefix}`
-          : `/${expectedPrefix}/${currentScreen}`;
+        if (!expectedPrefix && !isSuperAdmin) return;
+
+        const url = !expectedPrefix 
+          ? `/${currentScreen}`
+          : currentScreen === 'dashboard'
+            ? `/${expectedPrefix}`
+            : `/${expectedPrefix}/${currentScreen}`;
         
         router.replace(url);
       }

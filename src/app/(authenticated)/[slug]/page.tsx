@@ -11,6 +11,7 @@ const LoadingScreen = () => (
 );
 
 const AdminDashboard = dynamic(() => import('@/components/screens/admin/dashboard').then(m => m.AdminDashboard), { loading: LoadingScreen });
+const SuperAdminDashboard = dynamic(() => import('@/components/screens/super-admin/dashboard').then(m => m.SuperAdminDashboard), { loading: LoadingScreen });
 const SuperAdminTenants = dynamic(() => import('@/components/screens/super-admin/tenants').then(m => m.SuperAdminTenants), { loading: LoadingScreen });
 const SuperAdminBilling = dynamic(() => import('@/components/screens/super-admin/billing').then(m => m.SuperAdminBilling), { loading: LoadingScreen });
 const SuperAdminUsers = dynamic(() => import('@/components/screens/super-admin/users').then(m => m.SuperAdminUsers), { loading: LoadingScreen });
@@ -21,6 +22,7 @@ const SuperAdminSettings = dynamic(() => import('@/components/screens/super-admi
 const SuperAdminRoles = dynamic(() => import('@/components/screens/super-admin/roles').then(m => m.SuperAdminRoles), { loading: LoadingScreen });
 const SuperAdminManage = dynamic(() => import('@/components/screens/super-admin/manage-admins').then(m => m.SuperAdminManage), { loading: LoadingScreen });
 const SuperAdminStaff = dynamic(() => import('@/components/screens/super-admin/staff').then(m => m.SuperAdminStaff), { loading: LoadingScreen });
+const SuperAdminSubscriptions = dynamic(() => import('@/components/screens/super-admin/subscriptions').then(m => m.SuperAdminSubscriptions), { loading: LoadingScreen });
 
 const TeacherDashboard = dynamic(() => import('@/components/screens/teacher/dashboard').then(m => m.TeacherDashboard), { loading: LoadingScreen });
 const StudentDashboard = dynamic(() => import('@/components/screens/student/dashboard').then(m => m.StudentDashboard), { loading: LoadingScreen });
@@ -37,6 +39,7 @@ export default function GenericSlugDispatcher() {
   // 1. Check if it's a Platform Screen (Super Admin only)
   if (currentUser.role === 'super_admin') {
     switch (slug) {
+      case 'dashboard': return <SuperAdminDashboard />;
       case 'tenants': return <SuperAdminTenants />;
       case 'billing': return <SuperAdminBilling />;
       case 'users': return <SuperAdminUsers />;
@@ -47,6 +50,7 @@ export default function GenericSlugDispatcher() {
       case 'staff': return <SuperAdminStaff />;
       case 'settings': return <SuperAdminSettings />;
       case 'manage-admins': return <SuperAdminManage />;
+      case 'subscriptions': return <SuperAdminSubscriptions />;
     }
   }
 

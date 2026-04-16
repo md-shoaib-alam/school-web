@@ -201,7 +201,7 @@ const categoryColors: Record<string, string> = {
   core: "text-emerald-600 bg-emerald-50 dark:bg-emerald-900/30",
   premium: "text-amber-600 bg-amber-50 dark:bg-amber-900/30",
   enterprise: "text-purple-600 bg-purple-50 dark:bg-purple-900/30",
-  beta: "text-rose-600 bg-rose-50 dark:bg-rose-900/30",
+  beta: "text-teal-600 bg-teal-50 dark:bg-teal-900/30",
 };
 
 // ── New Flag Dialog ────────────────────────────────────────────
@@ -246,7 +246,7 @@ function NewFlagDialog({ onAdd }: { onAdd: (flag: FeatureFlag) => void }) {
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
-            <Blocks className="h-5 w-5 text-rose-500" />
+            <Blocks className="h-5 w-5 text-teal-500" />
             Create Feature Flag
           </DialogTitle>
           <DialogDescription>
@@ -603,7 +603,7 @@ export function SuperAdminFeatureFlags() {
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold tracking-tight flex items-center gap-2">
-            <Blocks className="h-6 w-6 text-rose-500" />
+            <Blocks className="h-6 w-6 text-teal-500" />
             Feature Flags
           </h1>
           <p className="text-muted-foreground text-sm mt-1">
@@ -642,11 +642,11 @@ export function SuperAdminFeatureFlags() {
             </div>
             <div className="h-8 w-px bg-border" />
             <div className="flex items-center gap-2">
-              <div className="h-8 w-8 rounded-lg bg-rose-100 dark:bg-rose-900/30 text-rose-600 flex items-center justify-center">
+              <div className="h-8 w-8 rounded-lg bg-teal-100 dark:bg-teal-900/30 text-teal-600 flex items-center justify-center">
                 <Blocks className="h-4 w-4" />
               </div>
               <div>
-                <p className="text-sm font-bold text-rose-700 dark:text-rose-400">
+                <p className="text-sm font-bold text-teal-700 dark:text-teal-400">
                   {totalCount}
                 </p>
                 <p className="text-[11px] text-muted-foreground">Total Flags</p>

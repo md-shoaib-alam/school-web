@@ -142,6 +142,12 @@ const navItems: Record<UserRole, NavItem[]> = {
       rootOnly: true,
     },
     {
+      key: "subscriptions",
+      label: "User Subscriptions",
+      icon: <Crown className="h-4 w-4" />,
+      permModule: "billing",
+    },
+    {
       key: "settings",
       label: "Settings",
       icon: <Settings className="h-4 w-4" />,
@@ -193,11 +199,6 @@ const navItems: Record<UserRole, NavItem[]> = {
       key: "reports",
       label: "Reports",
       icon: <BarChart3 className="h-4 w-4" />,
-    },
-    {
-      key: "subscriptions",
-      label: "Subscriptions",
-      icon: <Crown className="h-4 w-4" />,
     },
     {
       key: "roles",
@@ -433,7 +434,7 @@ const navItems: Record<UserRole, NavItem[]> = {
 };
 
 const roleColors: Record<UserRole, string> = {
-  super_admin: "bg-rose-500",
+  super_admin: "bg-teal-500",
   admin: "bg-emerald-500",
   teacher: "bg-blue-500",
   student: "bg-violet-500",
@@ -758,7 +759,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
         className={cn(
           "fixed lg:static inset-y-0 left-0 z-50 w-72 flex flex-col transition-transform duration-300 lg:translate-x-0 lg:h-dvh border-r overflow-hidden",
           isSuperAdmin
-            ? "bg-gradient-to-b from-rose-950 to-rose-900 border-rose-800/50"
+            ? "bg-gradient-to-b from-teal-950 to-teal-900 border-teal-800/50"
             : "bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-800",
           sidebarOpen ? "translate-x-0" : "-translate-x-full",
         )}
@@ -768,7 +769,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
           className={cn(
             "p-4 flex items-center justify-between border-b",
             isSuperAdmin
-              ? "border-rose-800/50"
+              ? "border-teal-800/50"
               : "border-gray-100 dark:border-gray-800",
           )}
         >
@@ -776,7 +777,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
             <div
               className={cn(
                 "w-10 h-10 rounded-xl flex items-center justify-center text-white shadow-md",
-                isSuperAdmin ? "bg-rose-600" : "bg-emerald-600",
+                isSuperAdmin ? "bg-teal-600" : "bg-emerald-600",
               )}
             >
               <Building2 className="h-5 w-5" />

@@ -189,7 +189,7 @@ export function SuperAdminAuditLogs() {
             <Card className="hover:shadow-md transition-shadow">
               <CardContent className="p-4">
                 <div className="flex items-center gap-2 mb-1">
-                  <FileText className="h-4 w-4 text-rose-500" />
+                  <FileText className="h-4 w-4 text-teal-500" />
                   <p className="text-xs text-muted-foreground font-medium">
                     Total Logs
                   </p>
@@ -229,7 +229,7 @@ export function SuperAdminAuditLogs() {
         <Card>
           <CardHeader className="pb-3">
             <CardTitle className="text-sm flex items-center gap-2">
-              <ShieldCheck className="h-4 w-4 text-rose-500" />
+              <ShieldCheck className="h-4 w-4 text-teal-500" />
               Action Type Distribution
             </CardTitle>
           </CardHeader>
@@ -260,7 +260,7 @@ export function SuperAdminAuditLogs() {
       <Card>
         <CardHeader>
           <CardTitle className="text-base flex items-center gap-2">
-            <ScrollText className="h-5 w-5 text-rose-500" />
+            <ScrollText className="h-5 w-5 text-teal-500" />
             Audit Log Entries
           </CardTitle>
           <CardDescription>
@@ -451,7 +451,7 @@ export function SuperAdminAuditLogs() {
                           key={pageNum}
                           variant={page === pageNum ? "default" : "outline"}
                           size="icon"
-                          className={`h-8 w-8 ${page === pageNum ? "bg-rose-600 hover:bg-rose-700 text-white" : ""}`}
+                          className={`h-8 w-8 ${page === pageNum ? "bg-teal-600 hover:bg-teal-700 text-white" : ""}`}
                           onClick={() => handlePageChange(pageNum)}
                         >
                           {pageNum}

@@ -144,7 +144,7 @@ const defaultPlans: PlanConfig[] = [
       "24/7 Phone Support",
       "Dedicated Account Manager",
     ],
-    color: "text-rose-600 bg-rose-100 dark:bg-rose-900/30",
+    color: "text-teal-600 bg-teal-100 dark:bg-teal-900/30",
     icon: <Crown className="h-4 w-4" />,
   },
 ];
@@ -332,7 +332,7 @@ export function SuperAdminSettings() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="rounded-2xl bg-gradient-to-r from-rose-600 via-rose-500 to-pink-600 p-6 text-white shadow-lg">
+      <div className="rounded-2xl bg-gradient-to-r from-teal-600 via-teal-500 to-pink-600 p-6 text-white shadow-lg">
         <div className="absolute top-0 right-0 w-64 h-64 bg-white dark:bg-gray-900/5 rounded-full -translate-y-1/2 translate-x-1/3" />
         <div className="relative z-10 flex items-center gap-4">
           <div className="h-14 w-14 rounded-2xl bg-white dark:bg-gray-900/20 flex items-center justify-center backdrop-blur-sm">
@@ -342,7 +342,7 @@ export function SuperAdminSettings() {
             <h2 className="text-2xl font-bold tracking-tight">
               Platform Settings
             </h2>
-            <p className="text-rose-100 text-sm">
+            <p className="text-teal-100 text-sm">
               Configure global platform preferences, plans, and security
             </p>
           </div>
@@ -378,7 +378,7 @@ export function SuperAdminSettings() {
           <Card>
             <CardHeader>
               <CardTitle className="text-base flex items-center gap-2">
-                <Globe className="h-5 w-5 text-rose-500" />
+                <Globe className="h-5 w-5 text-teal-500" />
                 General Settings
               </CardTitle>
               <CardDescription>
@@ -541,7 +541,7 @@ export function SuperAdminSettings() {
           <Card>
             <CardHeader>
               <CardTitle className="text-base flex items-center gap-2">
-                <CreditCard className="h-5 w-5 text-rose-500" />
+                <CreditCard className="h-5 w-5 text-teal-500" />
                 Plan Configuration
               </CardTitle>
               <CardDescription>
@@ -660,10 +660,10 @@ export function SuperAdminSettings() {
               </div>
 
               {editingPlan && (
-                <div className="mt-4 p-4 rounded-lg border border-rose-200 dark:border-rose-700 bg-rose-50 dark:bg-rose-900/30/50">
+                <div className="mt-4 p-4 rounded-lg border border-teal-200 dark:border-teal-700 bg-teal-50 dark:bg-teal-900/30/50">
                   <div className="flex items-center gap-2 mb-2">
-                    <Edit className="h-4 w-4 text-rose-600" />
-                    <p className="text-sm font-medium text-rose-700 dark:text-rose-400">
+                    <Edit className="h-4 w-4 text-teal-600" />
+                    <p className="text-sm font-medium text-teal-700 dark:text-teal-400">
                       Editing {editingPlan} plan — full plan editor coming soon
                     </p>
                   </div>
@@ -682,7 +682,7 @@ export function SuperAdminSettings() {
           <Card>
             <CardHeader>
               <CardTitle className="text-base flex items-center gap-2">
-                <Bell className="h-5 w-5 text-rose-500" />
+                <Bell className="h-5 w-5 text-teal-500" />
                 Notification Settings
               </CardTitle>
               <CardDescription>
@@ -760,7 +760,7 @@ export function SuperAdminSettings() {
           <Card>
             <CardHeader>
               <CardTitle className="text-base flex items-center gap-2">
-                <Shield className="h-5 w-5 text-rose-500" />
+                <Shield className="h-5 w-5 text-teal-500" />
                 Security Settings
               </CardTitle>
               <CardDescription>
@@ -869,7 +869,7 @@ export function SuperAdminSettings() {
           <Card>
             <CardHeader>
               <CardTitle className="text-base flex items-center gap-2">
-                <Server className="h-5 w-5 text-rose-500" />
+                <Server className="h-5 w-5 text-teal-500" />
                 API Configuration
               </CardTitle>
               <CardDescription>
@@ -899,7 +899,7 @@ export function SuperAdminSettings() {
                   <div className="flex items-center gap-3 h-9">
                     <Badge
                       variant="outline"
-                      className="font-mono text-sm px-3 py-1 border-rose-200 dark:border-rose-700 bg-rose-50 dark:bg-rose-900/30 text-rose-700 dark:text-rose-400"
+                      className="font-mono text-sm px-3 py-1 border-teal-200 dark:border-teal-700 bg-teal-50 dark:bg-teal-900/30 text-teal-700 dark:text-teal-400"
                     >
                       v2.4.1
                     </Badge>
@@ -965,7 +965,7 @@ export function SuperAdminSettings() {
       <Card>
         <CardHeader>
           <CardTitle className="text-base flex items-center gap-2">
-            <Activity className="h-5 w-5 text-rose-500" />
+            <Activity className="h-5 w-5 text-teal-500" />
             System Performance & Resources
           </CardTitle>
           <CardDescription>
@@ -1104,7 +1104,7 @@ export function SuperAdminSettings() {
                 {/* Server Uptime */}
                 <div className="rounded-xl border bg-card p-4 shadow-sm">
                   <div className="flex items-center gap-2 mb-1">
-                    <Cpu className="h-4 w-4 text-rose-500" />
+                    <Cpu className="h-4 w-4 text-teal-500" />
                     <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
                       Uptime
                     </span>
@@ -1234,7 +1234,7 @@ export function SuperAdminSettings() {
 
       {/* Save Button - sticky at bottom */}
       <div className="sticky bottom-4 z-10">
-        <Card className="shadow-lg border-rose-200 dark:border-rose-700 bg-white dark:bg-gray-900">
+        <Card className="shadow-lg border-teal-200 dark:border-teal-700 bg-white dark:bg-gray-900">
           <CardContent className="p-4 flex items-center justify-between">
             <div className="text-sm text-muted-foreground">
               <span className="hidden sm:inline">
@@ -1245,7 +1245,7 @@ export function SuperAdminSettings() {
             </div>
             <Button
               onClick={handleSave}
-              className="bg-rose-600 hover:bg-rose-700 text-white gap-2"
+              className="bg-teal-600 hover:bg-teal-700 text-white gap-2"
             >
               <Save className="h-4 w-4" />
               Save Settings

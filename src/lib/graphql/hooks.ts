@@ -269,8 +269,26 @@ const STUDENTS = `
 const PARENTS = `
   query Parents($tenantId: String, $page: Int, $limit: Int) {
     parents(tenantId: $tenantId, page: $page, limit: $limit) {
-      parents { id name email phone occupation status children { id name email rollNumber className gender classId } }
+      parents { 
+        id name email phone occupation status 
+        children { id name email rollNumber className gender classId } 
+        subscription { id planName planId amount period status transactionId startDate endDate autoRenew }
+      }
       total page totalPages
+    }
+  }
+`
+
+const SUBSCRIPTIONS = `
+  query Subscriptions($tenantId: String, $status: String, $search: String, $page: Int, $limit: Int) {
+    subscriptions(tenantId: $tenantId, status: $status, search: $search, page: $page, limit: $limit) {
+      subscriptions { 
+        id planName planId amount period status transactionId startDate endDate autoRenew
+        parent { user { name email } students { user { name } } }
+        tenant { name }
+      }
+      total page totalPages
+      stats { activeSubscriptions totalSubscriptions totalRevenue }
     }
   }
 `
@@ -376,6 +394,7 @@ export const queryKeys = {
   fees: ['fees'] as const,
   attendance: ['attendance'] as const,
   staff: ['staff'] as const,
+  subscriptions: ['subscriptions'] as const,
 }
 
 // ── Super Admin Hooks ──
@@ -554,6 +573,17 @@ export function useParents(tenantId?: string, page?: number, limit?: number) {
     },
     staleTime: 5 * 60 * 1000,
     gcTime: 15 * 60 * 1000,
+  })
+}
+
+export function useSubscriptions(vars: { tenantId?: string; status?: string; search?: string; page?: number; limit?: number }) {
+  return useQuery({
+    queryKey: [...queryKeys.subscriptions, vars],
+    queryFn: async () => {
+      const data = await graphqlQuery<{ subscriptions: SubscriptionsResponse }>(SUBSCRIPTIONS, vars)
+      return data.subscriptions
+    },
+    staleTime: 5 * 60 * 1000,
   })
 }
 
@@ -830,6 +860,14 @@ export interface AuditLogsResponse {
   logs: { id: string; action: string; resource: string; details: string; createdAt: string; tenant: { id: string; name: string } | null }[]
   total: number; page: number; totalPages: number
   actionTypes: { action: string; count: number }[]
+}
+
+export interface SubscriptionsResponse {
+  subscriptions: any[]
+  total: number
+  page: number
+  totalPages: number
+  stats: { activeSubscriptions: number; totalSubscriptions: number; totalRevenue: number } | null
 }
 
 export interface TenantInput {
