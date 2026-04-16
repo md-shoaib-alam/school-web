@@ -1074,10 +1074,10 @@ export function AdminSubscriptions() {
                     key={name}
                     className={`p-2 rounded-lg border text-center ${cfg.bg} ${cfg.border}`}
                   >
-                    <p className="text-xs font-semibold capitalize">
-                      {cfg.text.replace("text-", "").replace("-700", "")}
+                    <p className={`text-xs font-semibold capitalize ${cfg.text}`}>
+                      {name}
                     </p>
-                    <p className="text-lg font-bold">
+                    <p className={`text-lg font-bold ${cfg.text}`}>
                       {stats?.planBreakdown?.[name] || 0}
                     </p>
                   </div>

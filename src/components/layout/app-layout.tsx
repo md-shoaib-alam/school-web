@@ -978,12 +978,6 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
               {items.find((i) => i.key === resolvedScreen)?.label ||
                 "Dashboard"}
             </h1>
-            {/* Breadcrumb showing current path with tenant context */}
-            {resolvedScreen !== "dashboard" && (
-              <span className="hidden sm:inline text-sm text-gray-400 dark:text-gray-500 font-normal">
-                /{resolvedScreen.replace(/-/g, " ")}
-              </span>
-            )}
             {isSuperAdmin && (
               <Badge className="bg-rose-100 dark:bg-rose-900/30 text-rose-700 dark:text-rose-400 border-rose-200 dark:border-rose-800 text-[10px]">
                 <ShieldCheck className="h-3 w-3 mr-1" />

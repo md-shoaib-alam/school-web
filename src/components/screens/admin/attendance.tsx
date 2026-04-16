@@ -70,10 +70,10 @@ export function AdminAttendance() {
   const { currentTenantId } = useAppStore();
   const { canCreate, canEdit, canDelete } = useModulePermissions("attendance");
   const { data: attendanceData, isLoading: recordsLoading } = useAttendance(currentTenantId || undefined);
-  const { data: classData = [], isLoading: classesLoading } = useClasses(currentTenantId || undefined);
+  const { data: classData, isLoading: classesLoading } = useClasses(currentTenantId || undefined);
 
   const loading = recordsLoading || classesLoading;
-  const classes = classData as ClassInfo[];
+  const classes = (classData?.classes || []) as ClassInfo[];
 
   const [selectedDate, setSelectedDate] = useState(
     new Date().toISOString().split("T")[0],
