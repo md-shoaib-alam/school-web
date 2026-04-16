@@ -67,7 +67,7 @@ interface PlatformUser {
   id: string;
   name: string;
   email: string;
-  role: "super_admin" | "admin" | "teacher" | "student" | "parent";
+  role: "super_admin" | "admin" | "teacher" | "student" | "parent" | "staff";
   phone: string | null;
   isActive: boolean;
   createdAt: string;
@@ -95,6 +95,7 @@ const ROLES = [
   { value: "super_admin", label: "Super Admin" },
   { value: "admin", label: "Admin" },
   { value: "teacher", label: "Teacher" },
+  { value: "staff", label: "Staff" },
   { value: "student", label: "Student" },
   { value: "parent", label: "Parent" },
 ] as const;
@@ -132,6 +133,12 @@ const ROLE_CONFIG: Record<
     bg: "bg-amber-100 dark:bg-amber-900/30 border-amber-200 dark:border-amber-700",
     icon: <Heart className="h-3.5 w-3.5" />,
     label: "Parent",
+  },
+  staff: {
+    color: "text-indigo-700 dark:text-indigo-400",
+    bg: "bg-indigo-100 dark:bg-indigo-900/30 border-indigo-200 dark:border-indigo-700",
+    icon: <UserCog className="h-3.5 w-3.5" />,
+    label: "Staff",
   },
 };
 
@@ -173,6 +180,15 @@ const STAT_CARDS = [
     border: "border-amber-200 dark:border-amber-700",
   },
   {
+    key: "staff",
+    label: "Staff",
+    icon: UserCog,
+    color: "text-indigo-700 dark:text-indigo-400",
+    bg: "bg-indigo-50 dark:bg-indigo-900/30",
+    iconBg: "bg-indigo-200 text-indigo-700 dark:text-indigo-400",
+    border: "border-indigo-200 dark:border-indigo-700",
+  },
+  {
     key: "admin",
     label: "Admins",
     icon: Shield,
@@ -189,7 +205,7 @@ const PAGE_SIZE = 20;
 
 export function SuperAdminUsers() {
   const [search, setSearch] = useState("");
-  const [roleFilter, setRoleFilter] = useState("all");
+  const [roleFilter, setRoleFilter] = useState("admin");
   const [tenantFilter, setTenantFilter] = useState("all");
   const [currentPage, setCurrentPage] = useState(1);
 
@@ -262,16 +278,32 @@ export function SuperAdminUsers() {
   };
 
   // Format date
-  const formatDate = (dateStr: string) => {
-    try {
-      return new Date(dateStr).toLocaleDateString("en-US", {
-        year: "numeric",
-        month: "short",
-        day: "numeric",
-      });
-    } catch {
-      return dateStr;
-    }
+  const formatDate = (dateValue: string | null | undefined) => {
+    if (!dateValue) return "—";
+    const num = Number(dateValue);
+    const d = !isNaN(num) && dateValue.length > 10 ? new Date(num) : new Date(dateValue);
+    
+    if (isNaN(d.getTime())) return dateValue;
+    return d.toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+    });
+  };
+
+  const formatDateTime = (dateValue: string | null | undefined) => {
+    if (!dateValue) return "—";
+    const num = Number(dateValue);
+    const d = !isNaN(num) && dateValue.length > 10 ? new Date(num) : new Date(dateValue);
+    
+    if (isNaN(d.getTime())) return dateValue;
+    return d.toLocaleString("en-US", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
   };
 
   // Pagination helpers
@@ -323,7 +355,7 @@ export function SuperAdminUsers() {
       </div>
 
       {/* Stats Row */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 lg:gap-4">
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 lg:gap-4">
         {STAT_CARDS.map((stat) => {
           const count = getCount(stat.key);
           const percentage =
@@ -506,14 +538,14 @@ export function SuperAdminUsers() {
                         return (
                           <TableRow
                             key={user.id}
-                            className="cursor-pointer transition-colors hover:bg-teal-50 dark:bg-teal-900/30/40"
+                            className="cursor-pointer transition-colors hover:bg-teal-50 dark:hover:bg-teal-900/40"
                             onClick={() => openUserDetail(user)}
                           >
                             {/* Name */}
                             <TableCell>
                               <div className="flex items-center gap-3">
                                 <div
-                                  className={`h-8 w-8 rounded-full flex items-center justify-center text-xs font-semibold shrink-0 text-white ${user.role === "super_admin" ? "bg-teal-500" : user.role === "admin" ? "bg-emerald-500" : user.role === "teacher" ? "bg-blue-500" : user.role === "student" ? "bg-violet-500" : "bg-amber-500"}`}
+                                  className={`h-8 w-8 rounded-full flex items-center justify-center text-xs font-semibold shrink-0 text-white ${user.role === "super_admin" ? "bg-teal-500" : user.role === "admin" ? "bg-emerald-500" : user.role === "teacher" ? "bg-blue-500" : user.role === "student" ? "bg-violet-500" : user.role === "staff" ? "bg-indigo-500" : "bg-amber-500"}`}
                                 >
                                   {initials}
                                 </div>
@@ -798,7 +830,7 @@ export function SuperAdminUsers() {
                           Account Created
                         </p>
                         <p className="text-sm font-medium text-gray-900 dark:text-gray-100">
-                          {formatDate(selectedUser.createdAt)}
+                          {formatDateTime(selectedUser.createdAt)}
                         </p>
                       </div>
                     </div>
