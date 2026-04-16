@@ -1,7 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { persistQueryClient } from "@tanstack/react-query-persist-client";
+import { createSyncStoragePersister } from "@tanstack/query-sync-storage-persister";
 import { ThemeProvider } from "next-themes";
 
 export function Providers({ children }: { children: React.ReactNode }) {
@@ -11,7 +13,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
         defaultOptions: {
           queries: {
             staleTime: 5 * 60 * 1000, // 5 minutes
-            gcTime: 30 * 60 * 1000, // 30 minutes
+            gcTime: 30 * 60 * 1000, // 30 minutes (for persistence)
             retry: 2,
             refetchOnWindowFocus: false,
           },
@@ -21,6 +23,23 @@ export function Providers({ children }: { children: React.ReactNode }) {
         },
       }),
   );
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+
+    const persister = createSyncStoragePersister({
+      storage: window.localStorage,
+      key: "SCHOOL_SAAS_OFFLINE_CACHE",
+    });
+
+    const [unsubscribe] = persistQueryClient({
+      queryClient,
+      persister,
+      maxAge: 30 * 60 * 1000, // 30 minutes
+    });
+
+    return unsubscribe;
+  }, [queryClient]);
 
   return (
     <ThemeProvider
