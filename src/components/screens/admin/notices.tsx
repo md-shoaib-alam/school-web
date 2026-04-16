@@ -108,7 +108,8 @@ const emptyForm: NoticeFormData = {
 export function AdminNotices() {
   const { canCreate, canEdit, canDelete } = useModulePermissions("notices");
   const queryClient = useQueryClient();
-  const { data: notices = [], isLoading: loading } = useNotices();
+  const { data: noticesData, isLoading: loading } = useNotices();
+  const notices = noticesData?.notices || [];
 
   const [search, setSearch] = useState("");
   const [priorityFilter, setPriorityFilter] = useState("all");

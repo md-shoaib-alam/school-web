@@ -114,9 +114,13 @@ export function AdminFees() {
   const { currentTenantId } = useAppStore();
   const { canCreate, canEdit, canDelete } = useModulePermissions("fees");
   const queryClient = useQueryClient();
-  const { data: fees = [], isLoading: feesLoading } = useFees(currentTenantId || undefined);
-  const { data: students = [], isLoading: studentsLoading } = useStudents(currentTenantId || undefined);
-  const { data: classes = [], isLoading: classesLoading } = useClasses(currentTenantId || undefined);
+  const { data: feesData, isLoading: feesLoading } = useFees(currentTenantId || undefined);
+  const { data: studentsData, isLoading: studentsLoading } = useStudents(currentTenantId || undefined);
+  const { data: classesData, isLoading: classesLoading } = useClasses(currentTenantId || undefined);
+
+  const fees = feesData?.fees || [];
+  const students = studentsData?.students || [];
+  const classes = classesData?.classes || [];
 
   const loading = feesLoading || studentsLoading || classesLoading;
   const [selectedClass, setSelectedClass] = useState<string | null>(null);

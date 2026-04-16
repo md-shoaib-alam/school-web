@@ -78,7 +78,8 @@ export function AdminTeachers() {
   const [search, setSearch] = useState("");
 
   // ⚡ TanStack Query with GraphQL Group-wise hooks
-  const { data: teachers = [], isLoading: loading } = useTeachers(currentTenantId || undefined);
+  const { data: teacherData, isLoading: loading } = useTeachers(currentTenantId || undefined);
+  const teachers = (teacherData?.teachers || []) as TeacherInfo[];
 
   const refetchTeachers = () =>
     queryClient.invalidateQueries({ queryKey: ["teachers", currentTenantId] });

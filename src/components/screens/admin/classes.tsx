@@ -49,7 +49,7 @@ import {
 import { toast } from "sonner";
 import type { ClassInfo } from "@/lib/types";
 import { useModulePermissions } from "@/hooks/use-permissions";
-import { useClasses } from "@/lib/graphql/hooks";
+import { useClasses, useTeachersMin } from "@/lib/graphql/hooks";
 import { useAppStore } from "@/store/use-app-store";
 
 export function AdminClasses() {
@@ -58,7 +58,11 @@ export function AdminClasses() {
   const queryClient = useQueryClient();
 
   // ⚡ TanStack Query with GraphQL Group-wise hooks
-  const { data: classes = [], isLoading: loading } = useClasses(currentTenantId || undefined);
+  const { data: classesData, isLoading: loading } = useClasses(currentTenantId || undefined);
+  const { data: teachersData } = useTeachersMin(currentTenantId || undefined);
+
+  const classes = classesData?.classes || [];
+  const teachers = teachersData?.teachers || [];
 
   const refetchClasses = () =>
     queryClient.invalidateQueries({ queryKey: ["classes", currentTenantId] });

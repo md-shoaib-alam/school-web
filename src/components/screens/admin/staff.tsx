@@ -64,6 +64,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { useAppStore } from "@/store/use-app-store";
+import { useStaff, useCustomRoles } from "@/lib/graphql/hooks";
 
 // --- Types ---
 
@@ -199,25 +200,11 @@ export function AdminStaff() {
   const { currentTenantId } = useAppStore();
   const [search, setSearch] = useState("");
 
-  // --- GraphQL Queries ---
-  const { 
-    data: staffData, 
-    isLoading: loadingStaff, 
-    refetch: refetchStaff 
-  } = useGraphQLQuery<{ staff: StaffMember[] }>(
-    ["staff", currentTenantId], 
-    GET_STAFF, 
-    { tenantId: currentTenantId }
-  );
-
-  const { data: rolesData } = useGraphQLQuery<{ customRoles: CustomRole[] }>(
-    ["custom-roles", currentTenantId], 
-    GET_ROLES, 
-    { tenantId: currentTenantId }
-  );
+  // --- TanStack Queries (Updated to use standardized hooks) ---
+  const { data: staffData, isLoading: loadingStaff, refetch: refetchStaff } = useStaff(currentTenantId || undefined);
+  const { data: roles = [] } = useCustomRoles(currentTenantId || undefined);
 
   const staff = staffData?.staff || [];
-  const roles = rolesData?.customRoles || [];
   const loading = loadingStaff;
 
   // --- Mutations ---

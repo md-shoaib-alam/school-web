@@ -113,12 +113,15 @@ export function AdminParents() {
   const [search, setSearch] = useState("");
 
   // ⚡ TanStack Query with GraphQL Group-wise hooks
-  const { data: parents = [], isLoading: parentsLoading } = useParents(currentTenantId || undefined);
-  const { data: students = [], isLoading: studentsLoading } = useStudents(currentTenantId || undefined);
-  const { data: classData = [], isLoading: classesLoading } = useClasses(currentTenantId || undefined);
+  const { data: parentsData, isLoading: parentsLoading } = useParents(currentTenantId || undefined);
+  const { data: studentsData, isLoading: studentsLoading } = useStudents(currentTenantId || undefined);
+  const { data: classDataResponse, isLoading: classesLoading } = useClasses(currentTenantId || undefined);
+
+  const parents = parentsData?.parents || [];
+  const students = studentsData?.students || [];
+  const classes = classDataResponse?.classes || [];
 
   const loading = parentsLoading || studentsLoading || classesLoading;
-  const classes = classData as any[]; // Map to avoid type error if needed
 
   const refetchParents = () =>
     queryClient.invalidateQueries({ queryKey: ["parents", currentTenantId] });

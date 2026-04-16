@@ -69,7 +69,7 @@ const statusConfig: Record<
 export function AdminAttendance() {
   const { currentTenantId } = useAppStore();
   const { canCreate, canEdit, canDelete } = useModulePermissions("attendance");
-  const { data: rawRecords = [], isLoading: recordsLoading } = useAttendance(currentTenantId || undefined);
+  const { data: attendanceData, isLoading: recordsLoading } = useAttendance(currentTenantId || undefined);
   const { data: classData = [], isLoading: classesLoading } = useClasses(currentTenantId || undefined);
 
   const loading = recordsLoading || classesLoading;
@@ -82,6 +82,7 @@ export function AdminAttendance() {
 
   const isSelectionMade = selectedClass !== null;
 
+  const rawRecords = (attendanceData?.records || []) as AttendanceRecord[];
   const records = rawRecords.filter((r) => {
     const matchDate = !selectedDate || r.date.startsWith(selectedDate);
     const matchClass =

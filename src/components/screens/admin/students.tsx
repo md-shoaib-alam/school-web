@@ -145,8 +145,11 @@ export function AdminStudents() {
   const [currentPage, setCurrentPage] = useState(1);
 
   // ⚡ TanStack Query with GraphQL Group-wise hooks
-  const { data: students = [], isLoading: studentsLoading } = useStudents(currentTenantId || undefined);
-  const { data: classes = [] } = useClasses(currentTenantId || undefined);
+  const { data: studentData, isLoading: studentsLoading } = useStudents(currentTenantId || undefined);
+  const { data: classesData } = useClasses(currentTenantId || undefined);
+
+  const students = (studentData?.students || []) as StudentInfo[];
+  const classes = (classesData?.classes || []) as ClassInfo[];
 
   const loading = studentsLoading;
 

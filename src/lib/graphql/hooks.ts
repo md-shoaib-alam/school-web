@@ -112,9 +112,10 @@ const BILLING_DATA = `
 `
 
 const TENANTS = `
-  query Tenants($status: String, $plan: String, $search: String) {
-    tenants(status: $status, plan: $plan, search: $search) {
+  query Tenants($status: String, $plan: String, $search: String, $page: Int, $limit: Int) {
+    tenants(status: $status, plan: $plan, search: $search, page: $page, limit: $limit) {
       tenants { id name slug email phone address website plan status maxStudents maxTeachers maxParents maxClasses startDate endDate createdAt studentCount teacherCount parentCount adminCount activeSubscriptions totalRevenue _count { users classes subscriptions notices events } }
+      total page totalPages
     }
   }
 `
@@ -230,50 +231,91 @@ const TENANT_DETAIL = `
 `
 
 const SUBJECTS = `
-  query Subjects {
-    subjects { id name code classId teacherId className teacherName }
+  query Subjects($tenantId: String, $page: Int, $limit: Int) {
+    subjects(tenantId: $tenantId, page: $page, limit: $limit) {
+      subjects { id name code classId teacherId className teacherName }
+      total page totalPages
+    }
   }
 `
 
 const CLASSES = `
-  query Classes {
-    classes { id name section grade capacity studentCount classTeacher }
+  query Classes($tenantId: String, $page: Int, $limit: Int) {
+    classes(tenantId: $tenantId, page: $page, limit: $limit) {
+      classes { id name section grade capacity studentCount classTeacher }
+      total page totalPages
+    }
   }
 `
 
 const TEACHERS = `
-  query Teachers {
-    teachers { id name email phone qualification experience status subjects classes joiningDate }
+  query Teachers($tenantId: String, $page: Int, $limit: Int) {
+    teachers(tenantId: $tenantId, page: $page, limit: $limit) {
+      teachers { id name email phone qualification experience status subjects classes joiningDate }
+      total page totalPages
+    }
   }
 `
 
 const STUDENTS = `
-  query Students {
-    students { id name email phone rollNumber className gender dateOfBirth status classId parentId parentName admissionDate }
+  query Students($tenantId: String, $page: Int, $limit: Int) {
+    students(tenantId: $tenantId, page: $page, limit: $limit) {
+      students { id name email phone rollNumber className gender dateOfBirth status classId parentId parentName admissionDate }
+      total page totalPages
+    }
   }
 `
 
 const PARENTS = `
-  query Parents {
-    parents { id name email phone occupation status children { id name email rollNumber className gender classId } }
+  query Parents($tenantId: String, $page: Int, $limit: Int) {
+    parents(tenantId: $tenantId, page: $page, limit: $limit) {
+      parents { id name email phone occupation status children { id name email rollNumber className gender classId } }
+      total page totalPages
+    }
   }
 `
 
 const NOTICES = `
-  query Notices {
-    notices { id title content authorName priority targetRole createdAt }
+  query Notices($tenantId: String, $page: Int, $limit: Int) {
+    notices(tenantId: $tenantId, page: $page, limit: $limit) {
+      notices { id title content authorName priority targetRole createdAt }
+      total page totalPages
+    }
   }
 `
 
 const FEES = `
-  query Fees {
-    fees { id studentName studentId className type amount status dueDate paidAmount }
+  query Fees($tenantId: String, $page: Int, $limit: Int) {
+    fees(tenantId: $tenantId, page: $page, limit: $limit) {
+      fees { id studentName studentId className type amount status dueDate paidAmount }
+      total page totalPages
+    }
   }
 `
 
 const ATTENDANCE = `
-  query Attendance {
-    attendance { id studentName date status className }
+  query Attendance($tenantId: String!, $page: Int, $limit: Int) {
+    attendance(tenantId: $tenantId, page: $page, limit: $limit) {
+      records { id studentName date status className }
+      total page totalPages
+    }
+  }
+`
+
+const CUSTOM_ROLES = `
+  query CustomRoles($tenantId: String) {
+    customRoles(tenantId: $tenantId) {
+      id name color permissions createdAt
+    }
+  }
+`
+
+const STAFF = `
+  query Staff($tenantId: String, $page: Int, $limit: Int) {
+    staff(tenantId: $tenantId, page: $page, limit: $limit) {
+      staff { id name email role isActive createdAt customRole { id name permissions createdAt } }
+      total page totalPages
+    }
   }
 `
 
@@ -317,7 +359,7 @@ const CREATE_USER = `
 export const queryKeys = {
   platformStats: ['platform', 'stats'] as const,
   billing: ['platform', 'billing'] as const,
-  tenants: (filters?: Record<string, string>) => ['tenants', filters] as const,
+  tenants: (filters?: Record<string, unknown>) => ['tenants', filters] as const,
   users: (filters?: Record<string, unknown>) => ['users', filters] as const,
   auditLogs: (filters?: Record<string, unknown>) => ['auditLogs', filters] as const,
   adminDashboard: (tenantId: string) => ['admin', 'dashboard', tenantId] as const,
@@ -333,6 +375,7 @@ export const queryKeys = {
   notices: ['notices'] as const,
   fees: ['fees'] as const,
   attendance: ['attendance'] as const,
+  staff: ['staff'] as const,
 }
 
 // ── Super Admin Hooks ──
@@ -354,10 +397,10 @@ export function useBillingData() {
   })
 }
 
-export function useTenants(filters?: { status?: string; plan?: string; search?: string }) {
+export function useTenants(filters?: { status?: string; plan?: string; search?: string; page?: number; limit?: number }) {
   return useQuery({
     queryKey: queryKeys.tenants(filters),
-    queryFn: () => graphqlQuery<{ tenants: { tenants: TenantWithStats[] } }>(TENANTS, filters as Record<string, unknown>).then(d => d.tenants.tenants),
+    queryFn: () => graphqlQuery<{ tenants: TenantsResponse }>(TENANTS, filters as Record<string, unknown>).then(d => d.tenants),
     staleTime: 5 * 60 * 1000,
   })
 }
@@ -380,26 +423,26 @@ export function useAuditLogs(filters?: { action?: string; page?: number; limit?:
 
 // ── School Admin Hooks ──
 
-export function useSubjects(tenantId?: string) {
+export function useSubjects(tenantId?: string, page?: number, limit?: number) {
   return useQuery({
-    queryKey: [...queryKeys.subjects, tenantId],
-    queryFn: () => graphqlQuery<{ subjects: any[] }>(SUBJECTS, { tenantId }).then(d => d.subjects),
+    queryKey: [...queryKeys.subjects, tenantId, page, limit],
+    queryFn: () => graphqlQuery<{ subjects: SubjectsResponse }>(SUBJECTS, { tenantId, page, limit }).then(d => d.subjects),
     staleTime: 5 * 60 * 1000,
   })
 }
 
-export function useClassesMin(tenantId?: string) {
+export function useClassesMin(tenantId?: string, page?: number, limit?: number) {
   return useQuery({
-    queryKey: [...queryKeys.classes, tenantId],
-    queryFn: () => graphqlQuery<{ classes: any[] }>(CLASSES, { tenantId }).then(d => d.classes),
+    queryKey: [...queryKeys.classes, tenantId, page, limit],
+    queryFn: () => graphqlQuery<{ classes: ClassesResponse }>(CLASSES, { tenantId, page, limit }).then(d => d.classes),
     staleTime: 5 * 60 * 1000,
   })
 }
 
-export function useTeachersMin(tenantId?: string) {
+export function useTeachersMin(tenantId?: string, page?: number, limit?: number) {
   return useQuery({
-    queryKey: [...queryKeys.teachers, tenantId],
-    queryFn: () => graphqlQuery<{ teachers: any[] }>(TEACHERS, { tenantId }).then(d => d.teachers),
+    queryKey: [...queryKeys.teachers, tenantId, page, limit],
+    queryFn: () => graphqlQuery<{ teachers: TeachersResponse }>(TEACHERS, { tenantId, page, limit }).then(d => d.teachers),
     staleTime: 5 * 60 * 1000,
   })
 }
@@ -466,87 +509,108 @@ export function useTeacherDashboard(teacherName: string) {
 
 // ── Group-Wise Hooks (Replacement for REST endpoints) ──
 
-export function useClasses(tenantId?: string) {
+export function useClasses(tenantId?: string, page?: number, limit?: number) {
   return useQuery({
-    queryKey: [...queryKeys.classes, tenantId],
+    queryKey: [...queryKeys.classes, tenantId, page, limit],
     queryFn: async () => {
-      const data = await graphqlQuery<{ classes: any[] }>(CLASSES, { tenantId })
-      return data.classes || []
+      const data = await graphqlQuery<{ classes: ClassesResponse }>(CLASSES, { tenantId, page, limit })
+      return data.classes
     },
     staleTime: 5 * 60 * 1000,
     gcTime: 15 * 60 * 1000,
   })
 }
 
-export function useTeachers(tenantId?: string) {
+export function useTeachers(tenantId?: string, page?: number, limit?: number) {
   return useQuery({
-    queryKey: [...queryKeys.teachers, tenantId],
+    queryKey: [...queryKeys.teachers, tenantId, page, limit],
     queryFn: async () => {
-      const data = await graphqlQuery<{ teachers: any[] }>(TEACHERS, { tenantId })
-      return data.teachers || []
+      const data = await graphqlQuery<{ teachers: TeachersResponse }>(TEACHERS, { tenantId, page, limit })
+      return data.teachers
     },
     staleTime: 5 * 60 * 1000,
     gcTime: 15 * 60 * 1000,
   })
 }
 
-export function useStudents(tenantId?: string) {
+export function useStudents(tenantId?: string, page?: number, limit?: number) {
   return useQuery({
-    queryKey: [...queryKeys.students, tenantId],
+    queryKey: [...queryKeys.students, tenantId, page, limit],
     queryFn: async () => {
-      const data = await graphqlQuery<{ students: any[] }>(STUDENTS, { tenantId })
-      return data.students || []
+      const data = await graphqlQuery<{ students: StudentsResponse }>(STUDENTS, { tenantId, page, limit })
+      return data.students
     },
     staleTime: 5 * 60 * 1000,
     gcTime: 15 * 60 * 1000,
   })
 }
 
-export function useParents(tenantId?: string) {
+export function useParents(tenantId?: string, page?: number, limit?: number) {
   return useQuery({
-    queryKey: [...queryKeys.parents, tenantId],
+    queryKey: [...queryKeys.parents, tenantId, page, limit],
     queryFn: async () => {
-      const data = await graphqlQuery<{ parents: any[] }>(PARENTS, { tenantId })
-      return data.parents || []
+      const data = await graphqlQuery<{ parents: ParentsResponse }>(PARENTS, { tenantId, page, limit })
+      return data.parents
     },
     staleTime: 5 * 60 * 1000,
     gcTime: 15 * 60 * 1000,
   })
 }
 
-export function useNotices(tenantId?: string) {
+export function useNotices(tenantId?: string, page?: number, limit?: number) {
   return useQuery({
-    queryKey: [...queryKeys.notices, tenantId],
+    queryKey: [...queryKeys.notices, tenantId, page, limit],
     queryFn: async () => {
-      const data = await graphqlQuery<{ notices: any[] }>(NOTICES, { tenantId })
-      return data.notices || []
+      const data = await graphqlQuery<{ notices: NoticesResponse }>(NOTICES, { tenantId, page, limit })
+      return data.notices
     },
     staleTime: 5 * 60 * 1000,
     gcTime: 15 * 60 * 1000,
   })
 }
 
-export function useFees(tenantId?: string) {
+export function useFees(tenantId?: string, page?: number, limit?: number) {
   return useQuery({
-    queryKey: [...queryKeys.fees, tenantId],
+    queryKey: [...queryKeys.fees, tenantId, page, limit],
     queryFn: async () => {
-      const data = await graphqlQuery<{ fees: any[] }>(FEES, { tenantId })
-      return data.fees || []
+      const data = await graphqlQuery<{ fees: FeesResponse }>(FEES, { tenantId, page, limit })
+      return data.fees
     },
     staleTime: 5 * 60 * 1000,
     gcTime: 15 * 60 * 1000,
   })
 }
 
-export function useAttendance(tenantId?: string) {
+export function useAttendance(tenantId?: string, page?: number, limit?: number) {
   return useQuery({
-    queryKey: [...queryKeys.attendance, tenantId],
+    queryKey: [...queryKeys.attendance, tenantId, page, limit],
     queryFn: async () => {
-      const data = await graphqlQuery<{ attendance: any[] }>(ATTENDANCE, { tenantId })
-      return data.attendance || []
+      const data = await graphqlQuery<{ attendance: AttendanceResponse }>(ATTENDANCE, { tenantId, page, limit })
+      return data.attendance
     },
     staleTime: 5 * 60 * 1000,
     gcTime: 15 * 60 * 1000,
+  })
+}
+
+export function useStaff(tenantId?: string, page?: number, limit?: number) {
+  return useQuery({
+    queryKey: [...queryKeys.staff, tenantId, page, limit],
+    queryFn: async () => {
+      const data = await graphqlQuery<{ staff: StaffResponse }>(STAFF, { tenantId, page, limit })
+      return data.staff
+    },
+    staleTime: 5 * 60 * 1000,
+    gcTime: 15 * 60 * 1000,
+  })
+}
+
+export function useCustomRoles(tenantId?: string) {
+  return useQuery({
+    queryKey: ['custom-roles', tenantId],
+    queryFn: () => graphqlQuery<{ customRoles: any[] }>(CUSTOM_ROLES, { tenantId }).then(d => d.customRoles),
+    staleTime: 10 * 60 * 1000,
+    enabled: !!tenantId,
   })
 }
 
@@ -857,4 +921,74 @@ export interface TenantDetailData {
   attendance: {
     id: string; studentName: string; date: string; status: string; className: string
   }[]
+}
+
+export interface TenantsResponse {
+  tenants: TenantWithStats[]
+  total: number
+  page: number
+  totalPages: number
+}
+
+export interface SubjectsResponse {
+  subjects: any[]
+  total: number
+  page: number
+  totalPages: number
+}
+
+export interface ClassesResponse {
+  classes: any[]
+  total: number
+  page: number
+  totalPages: number
+}
+
+export interface TeachersResponse {
+  teachers: any[]
+  total: number
+  page: number
+  totalPages: number
+}
+
+export interface StudentsResponse {
+  students: any[]
+  total: number
+  page: number
+  totalPages: number
+}
+
+export interface ParentsResponse {
+  parents: any[]
+  total: number
+  page: number
+  totalPages: number
+}
+
+export interface NoticesResponse {
+  notices: any[]
+  total: number
+  page: number
+  totalPages: number
+}
+
+export interface FeesResponse {
+  fees: any[]
+  total: number
+  page: number
+  totalPages: number
+}
+
+export interface AttendanceResponse {
+  records: any[]
+  total: number
+  page: number
+  totalPages: number
+}
+
+export interface StaffResponse {
+  staff: any[]
+  total: number
+  page: number
+  totalPages: number
 }

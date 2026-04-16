@@ -75,9 +75,13 @@ export function AdminSubjects() {
   const { canCreate, canEdit, canDelete } = useModulePermissions("subjects");
 
   // TanStack Queries
-  const { data: subjects = [], isLoading: subjectsLoading } = useSubjects(currentTenantId || undefined);
-  const { data: classes = [], isLoading: classesLoading } = useClassesMin(currentTenantId || undefined);
-  const { data: teachers = [], isLoading: teachersLoading } = useTeachersMin(currentTenantId || undefined);
+  const { data: subjectsData, isLoading: subjectsLoading } = useSubjects(currentTenantId || undefined);
+  const { data: classesData, isLoading: classesLoading } = useClassesMin(currentTenantId || undefined);
+  const { data: teachersData, isLoading: teachersLoading } = useTeachersMin(currentTenantId || undefined);
+
+  const subjects = subjectsData?.subjects || [];
+  const classes = classesData?.classes || [];
+  const teachers = teachersData?.teachers || [];
 
   const [search, setSearch] = useState("");
   const [createOpen, setCreateOpen] = useState(false);
