@@ -3,6 +3,8 @@
 import { useState, useRef } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useReactToPrint } from 'react-to-print';
+import { useGraphQLClasses, useGraphQLStudents } from '@/hooks/use-graphql';
+import { useAppStore } from '@/store/use-app-store';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -48,6 +50,7 @@ const CERT_TYPE_COLORS: Record<string, string> = {
 
 export function AdminCertificates() {
   const queryClient = useQueryClient();
+  const { currentTenant } = useAppStore();
   const [generateOpen, setGenerateOpen] = useState(false);
   const [selectedClassId, setSelectedClassId] = useState<string>('');
   const [viewCert, setViewCert] = useState<CertificateRecord | null>(null);
@@ -66,26 +69,17 @@ export function AdminCertificates() {
     notes: '' 
   });
 
-  // ── Queries (TanStack) ──
+  // ── Queries (Optimized GraphQL) ──
 
   const { data: certificates = [], isLoading: certsLoading } = useQuery({
     queryKey: ['certificates'],
     queryFn: async () => (await apiFetch('/api/certificates')).json(),
   });
 
-  const { data: classes = [] } = useQuery({
-    queryKey: ['classes'],
-    queryFn: async () => (await apiFetch('/api/classes')).json(),
-    staleTime: 10 * 60 * 1000,
-  });
+  const { data: classes = [] } = useGraphQLClasses(currentTenant?.id);
+  const { data: students = [], isFetching: studentsLoading } = useGraphQLStudents(currentTenant?.id, selectedClassId);
 
-  const { data: students = [], isFetching: studentsLoading } = useQuery({
-    queryKey: ['students', selectedClassId],
-    queryFn: async () => (await apiFetch(`/api/students?classId=${selectedClassId}`)).json(),
-    enabled: !!selectedClassId,
-  });
-
-  // ── Mutations (TanStack) ──
+  // ── Mutations ──
 
   const generateMutation = useMutation({
     mutationFn: async (payload: any) => {
@@ -189,7 +183,7 @@ export function AdminCertificates() {
 
             <Select value={form.studentId} onValueChange={v => setForm({...form, studentId: v})} disabled={!selectedClassId || studentsLoading}>
               <SelectTrigger>{studentsLoading ? <Loader2 className="h-4 w-4 animate-spin mx-auto" /> : <SelectValue placeholder="Select Student" />}</SelectTrigger>
-              <SelectContent>{students.map((s: any) => <SelectItem key={s.id} value={s.id}>{s.name}</SelectItem>)}</SelectContent>
+              <SelectContent>{students.map((s: any) => <SelectItem key={s.id} value={s.id}>{s.user?.name || 'Unknown'}</SelectItem>)}</SelectContent>
             </Select>
 
             <Select value={form.certificateType} onValueChange={v => setForm({...form, certificateType: v})}>
@@ -213,15 +207,15 @@ export function AdminCertificates() {
       </Dialog>
 
       <Dialog open={!!viewCert} onOpenChange={v => !v && setViewCert(null)}>
-        <DialogContent className="sm:max-w-4xl p-0 overflow-hidden no-print">
+        <DialogContent className="sm:max-w-4xl p-0 overflow-hidden no-print text-slate-900">
           <VisuallyHidden.Root>
             <DialogHeader>
               <DialogTitle>Certificate Preview</DialogTitle>
             </DialogHeader>
           </VisuallyHidden.Root>
-          <div className="p-4 pr-12 border-b flex justify-between items-center bg-white">
-            <h3 className="font-bold">Preview</h3>
-            <Button onClick={() => handlePrint()} className="bg-amber-600"><Printer className="h-4 w-4 mr-2" /> Print PDF</Button>
+          <div className="p-4 pr-16 border-b flex justify-between items-center bg-white">
+            <h3 className="font-bold text-slate-900">Preview</h3>
+            <Button onClick={() => handlePrint()} className="bg-amber-600 hover:bg-amber-700 text-white"><Printer className="h-4 w-4 mr-2" /> Print PDF</Button>
           </div>
           <div className="max-h-[70vh] overflow-y-auto p-8 bg-gray-100">
             <div ref={contentRef}>
