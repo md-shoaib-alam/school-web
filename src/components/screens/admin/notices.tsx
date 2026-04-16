@@ -108,8 +108,9 @@ const emptyForm: NoticeFormData = {
 export function AdminNotices() {
   const { canCreate, canEdit, canDelete } = useModulePermissions("notices");
   const queryClient = useQueryClient();
-  const { data: noticesData, isLoading: loading } = useNotices();
+  const { data: noticesData, isLoading: noticesLoading } = useNotices();
   const notices = noticesData?.notices || [];
+  const loading = noticesLoading && notices.length === 0;
 
   const [search, setSearch] = useState("");
   const [priorityFilter, setPriorityFilter] = useState("all");
@@ -309,7 +310,7 @@ export function AdminNotices() {
                     <div className="flex-1 min-w-0">
                       <div className="flex flex-wrap items-center gap-2 mb-2">
                         <h3 className="font-semibold text-gray-900 dark:text-gray-100">
-                          {notice.title}
+                          {noticesLoading && notices.length === 0 ? <Skeleton className="h-5 w-48" /> : notice.title}
                         </h3>
                         <Badge
                           variant="outline"

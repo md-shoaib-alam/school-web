@@ -97,7 +97,8 @@ export function AdminSubjects() {
   const updateMutation = useUpdateSubject();
   const deleteMutation = useDeleteSubject();
 
-  const loading = subjectsLoading || classesLoading || teachersLoading;
+  // Only show full skeleton if we have NO data at all
+  const loading = (subjectsLoading && subjects.length === 0) || (classesLoading && classes.length === 0);
 
   const filtered = subjects.filter((s: any) => {
     const matchesSearch =

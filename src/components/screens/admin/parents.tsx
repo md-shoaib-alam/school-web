@@ -121,7 +121,8 @@ export function AdminParents() {
   const students = studentsData?.students || [];
   const classes = classDataResponse?.classes || [];
 
-  const loading = parentsLoading || studentsLoading || classesLoading;
+  // Only show full skeleton if we have NO data at all
+  const loading = (parentsLoading && parents.length === 0) || (classesLoading && classes.length === 0);
 
   const refetchParents = () =>
     queryClient.invalidateQueries({ queryKey: ["parents", currentTenantId] });

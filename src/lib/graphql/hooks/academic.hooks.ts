@@ -17,7 +17,8 @@ export function useSubjects(tenantId?: string, page?: number, limit?: number) {
   return useQuery({
     queryKey: [...queryKeys.subjects, tenantId, page, limit],
     queryFn: () => graphqlQuery<{ subjects: SubjectsResponse }>(SUBJECTS, { tenantId, page, limit }).then(d => d.subjects),
-    staleTime: 5 * 60 * 1000,
+    staleTime: 60 * 1000,
+    gcTime: 60 * 60 * 1000,
   })
 }
 
@@ -25,7 +26,7 @@ export function useClassesMin(tenantId?: string, page?: number, limit?: number) 
   return useQuery({
     queryKey: [...queryKeys.classes, tenantId, page, limit],
     queryFn: () => graphqlQuery<{ classes: ClassesResponse }>(CLASSES, { tenantId, page, limit }).then(d => d.classes),
-    staleTime: 5 * 60 * 1000,
+    staleTime: 60 * 1000,
   })
 }
 
@@ -33,7 +34,7 @@ export function useTeachersMin(tenantId?: string, page?: number, limit?: number)
   return useQuery({
     queryKey: [...queryKeys.teachers, tenantId, page, limit],
     queryFn: () => graphqlQuery<{ teachers: TeachersResponse }>(TEACHERS, { tenantId, page, limit }).then(d => d.teachers),
-    staleTime: 5 * 60 * 1000,
+    staleTime: 60 * 1000,
   })
 }
 
@@ -44,8 +45,8 @@ export function useClasses(tenantId?: string, page?: number, limit?: number) {
       const data = await graphqlQuery<{ classes: ClassesResponse }>(CLASSES, { tenantId, page, limit })
       return data.classes
     },
-    staleTime: 5 * 60 * 1000,
-    gcTime: 15 * 60 * 1000,
+    staleTime: 60 * 1000,
+    gcTime: 60 * 60 * 1000,
   })
 }
 
@@ -56,19 +57,19 @@ export function useTeachers(tenantId?: string, page?: number, limit?: number) {
       const data = await graphqlQuery<{ teachers: TeachersResponse }>(TEACHERS, { tenantId, page, limit })
       return data.teachers
     },
-    staleTime: 5 * 60 * 1000,
-    gcTime: 15 * 60 * 1000,
+    staleTime: 60 * 1000,
+    gcTime: 60 * 60 * 1000,
   })
 }
 
-export function useStudents(tenantId?: string, page?: number, limit?: number) {
+export function useStudents(tenantId?: string, classId?: string, page?: number, limit?: number) {
   return useQuery({
-    queryKey: [...queryKeys.students, tenantId, page, limit],
+    queryKey: [...queryKeys.students, tenantId, classId, page, limit],
     queryFn: async () => {
-      const data = await graphqlQuery<{ students: StudentsResponse }>(STUDENTS, { tenantId, page, limit })
+      const data = await graphqlQuery<{ students: StudentsResponse }>(STUDENTS, { tenantId, classId, page, limit })
       return data.students
     },
-    staleTime: 5 * 60 * 1000,
+    staleTime: 60 * 1000,
     gcTime: 15 * 60 * 1000,
   })
 }
@@ -80,7 +81,7 @@ export function useParents(tenantId?: string, page?: number, limit?: number) {
       const data = await graphqlQuery<{ parents: ParentsResponse }>(PARENTS, { tenantId, page, limit })
       return data.parents
     },
-    staleTime: 5 * 60 * 1000,
+    staleTime: 60 * 1000,
     gcTime: 15 * 60 * 1000,
   })
 }
@@ -92,7 +93,7 @@ export function useNotices(tenantId?: string, page?: number, limit?: number) {
       const data = await graphqlQuery<{ notices: NoticesResponse }>(NOTICES, { tenantId, page, limit })
       return data.notices
     },
-    staleTime: 5 * 60 * 1000,
+    staleTime: 60 * 1000,
     gcTime: 15 * 60 * 1000,
   })
 }
@@ -104,7 +105,7 @@ export function useFees(tenantId?: string, page?: number, limit?: number) {
       const data = await graphqlQuery<{ fees: FeesResponse }>(FEES, { tenantId, page, limit })
       return data.fees
     },
-    staleTime: 5 * 60 * 1000,
+    staleTime: 60 * 1000,
     gcTime: 15 * 60 * 1000,
   })
 }
@@ -116,7 +117,7 @@ export function useAttendance(tenantId?: string, page?: number, limit?: number) 
       const data = await graphqlQuery<{ attendance: AttendanceResponse }>(ATTENDANCE, { tenantId, page, limit })
       return data.attendance
     },
-    staleTime: 5 * 60 * 1000,
+    staleTime: 60 * 1000,
     gcTime: 15 * 60 * 1000,
   })
 }
@@ -128,7 +129,7 @@ export function useStaff(tenantId?: string, role?: string, page?: number, limit?
       const data = await graphqlQuery<{ staff: StaffResponse }>(STAFF, { tenantId, role, page, limit })
       return data.staff
     },
-    staleTime: 5 * 60 * 1000,
+    staleTime: 60 * 1000,
     gcTime: 15 * 60 * 1000,
   })
 }
@@ -234,7 +235,7 @@ export function useStaffAttendance(vars: { tenantId?: string, role?: string, dat
   return useQuery({
     queryKey: ['staff-attendance', vars],
     queryFn: () => graphqlQuery<{ staffAttendance: StaffAttendanceResponse }>(STAFF_ATTENDANCE, vars).then(d => d.staffAttendance),
-    staleTime: 2 * 60 * 1000,
+    staleTime: 60 * 1000,
   })
 }
 

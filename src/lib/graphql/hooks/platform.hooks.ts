@@ -33,7 +33,7 @@ export function useTenants(filters?: { status?: string; plan?: string; search?: 
   return useQuery({
     queryKey: queryKeys.tenants(filters),
     queryFn: () => graphqlQuery<{ tenants: TenantsResponse }>(TENANTS, filters as Record<string, unknown>).then(d => d.tenants),
-    staleTime: 5 * 60 * 1000,
+    staleTime: 60 * 1000,
   })
 }
 
@@ -41,7 +41,7 @@ export function useUsers(filters?: { role?: string; tenantId?: string; search?: 
   return useQuery({
     queryKey: queryKeys.users(filters),
     queryFn: () => graphqlQuery<{ users: UsersResponse }>(USERS, filters as Record<string, unknown>).then(d => d.users),
-    staleTime: 5 * 60 * 1000,
+    staleTime: 60 * 1000,
   })
 }
 
@@ -49,7 +49,7 @@ export function useAuditLogs(filters?: { action?: string; page?: number; limit?:
   return useQuery({
     queryKey: queryKeys.auditLogs(filters),
     queryFn: () => graphqlQuery<{ auditLogs: AuditLogsResponse }>(AUDIT_LOGS, filters as Record<string, unknown>).then(d => d.auditLogs),
-    staleTime: 5 * 60 * 1000,
+    staleTime: 60 * 1000,
   })
 }
 
@@ -60,7 +60,7 @@ export function useSubscriptions(vars: { tenantId?: string; status?: string; sea
       const data = await graphqlQuery<{ subscriptions: SubscriptionsResponse }>(SUBSCRIPTIONS, vars)
       return data.subscriptions
     },
-    staleTime: 5 * 60 * 1000,
+    staleTime: 60 * 1000,
   })
 }
 
@@ -69,7 +69,7 @@ export function useTenantDetail(tenantId: string) {
     queryKey: queryKeys.tenantDetail(tenantId),
     queryFn: () => graphqlQuery<{ tenantDetail: TenantDetailData }>(TENANT_DETAIL, { tenantId })
       .then(d => d.tenantDetail),
-    staleTime: 5 * 60 * 1000,
+    staleTime: 60 * 1000,
     enabled: !!tenantId,
   })
 }

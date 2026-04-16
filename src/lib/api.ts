@@ -18,9 +18,11 @@ function getToken(): string | null {
 
 function authHeaders(): Record<string, string> {
   const token = getToken();
+  const tenantId = typeof window !== 'undefined' ? localStorage.getItem('schoolsaas_tenant_id') : null;
   return {
     'Content-Type': 'application/json',
     ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    ...(tenantId ? { 'x-tenant-id': tenantId } : {}),
   };
 }
 

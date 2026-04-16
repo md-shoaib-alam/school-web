@@ -81,8 +81,7 @@ export function StaffAttendance() {
   const markAll = (status: AttendanceStatus) => {
     const newChanges = { ...pendingChanges };
     records.forEach(r => {
-      const id = r.id.includes('not-marked-') ? r.id.replace('not-marked-', '') : r.id;
-      newChanges[id] = status;
+      newChanges[r.id] = status;
     });
     setPendingChanges(newChanges);
     toast.success(`Marked all ${activeTab === 'teacher' ? 'Teachers' : 'Staff'} as ${status} locally.`);
@@ -104,8 +103,7 @@ export function StaffAttendance() {
   const stats = useMemo(() => {
     let p = 0, a = 0, l = 0;
     records.forEach(r => {
-      const id = r.id.includes('not-marked-') ? r.id.replace('not-marked-', '') : r.id;
-      const s = pendingChanges[id] || r.status;
+      const s = pendingChanges[r.id] || r.status;
       if (s === 'present') p++; else if (s === 'absent') a++; else if (s === 'late') l++;
     });
     return { p, a, l, total: records.length };
@@ -253,9 +251,8 @@ export function StaffAttendance() {
                     </div>
                   ) : (
                     filtered.map((staff, index) => {
-                      const id = staff.id.includes('not-marked-') ? staff.id.replace('not-marked-', '') : staff.id;
-                      const mod = !!pendingChanges[id];
-                      const cur = (pendingChanges[id] || staff.status) as AttendanceStatus;
+                      const mod = !!pendingChanges[staff.id];
+                      const cur = (pendingChanges[staff.id] || staff.status) as AttendanceStatus;
                       return (
                         <div
                           key={staff.id}
@@ -284,7 +281,7 @@ export function StaffAttendance() {
                             {(["present", "absent", "late"] as AttendanceStatus[]).map((status) => (
                               <button
                                 key={status}
-                                onClick={() => handleStatusChange(id, status)}
+                                onClick={() => handleStatusChange(staff.id, status)}
                                 className={`flex flex-1 sm:flex-none items-center justify-center gap-1 px-3 py-1.5 rounded-lg text-xs font-medium transition-all border ${
                                   cur === status
                                     ? `${getStatusBg(status)} ${status === "present" ? "bg-emerald-500 dark:bg-emerald-500 text-white" : status === "absent" ? "bg-red-500 dark:bg-red-500 text-white" : "bg-amber-500 dark:bg-amber-500 text-white"} border-transparent shadow-sm ring-1 ring-white/10`
@@ -307,7 +304,7 @@ export function StaffAttendance() {
         </TabsContent>
       </Tabs>
 
-      <div className="flex flex-col sm:flex-row items-center justify-between bg-white dark:bg-gray-950 p-4 px-6 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-800 gap-4">
+      <div className="sticky bottom-6 flex flex-col sm:flex-row items-center justify-between bg-white/80 dark:bg-gray-950/80 backdrop-blur-md p-4 px-6 rounded-2xl shadow-2xl border border-gray-100/20 dark:border-gray-800/50 gap-4 z-50">
          <div className="flex items-center gap-3 w-full sm:w-auto">
             {hasChanges ? (
               <div className="flex items-center gap-3">

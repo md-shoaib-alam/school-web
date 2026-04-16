@@ -32,7 +32,7 @@ import {
   AlertCircle
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { useClasses } from "@/lib/graphql/hooks";
+import { useClasses, useStudents } from "@/lib/graphql/hooks";
 import type { ClassInfo } from "@/lib/types";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Input } from "@/components/ui/input";
@@ -57,11 +57,13 @@ export function AdminPromotions() {
   const { data: classData, isLoading: classesLoading } = useClasses(currentTenantId || undefined);
   const classes = (classData?.classes || []) as ClassInfo[];
 
-  const { data: students = [], isLoading: studentsLoading } = useQuery({
-    queryKey: ["students", "promotion", fromClassId],
-    queryFn: () => api.get(`/students?classId=${fromClassId}`),
-    enabled: !!fromClassId,
-  });
+  const { data: studentsData, isLoading: studentsLoading } = useStudents(
+    currentTenantId || undefined,
+    fromClassId,
+    1,
+    500 // Increase limit for promotions to avoid missing students
+  );
+  const students = studentsData?.students || [];
 
   const promotionMutation = useMutation({
     mutationFn: (data: {
@@ -150,9 +152,9 @@ export function AdminPromotions() {
               </div>
               <div>
                 <p className="text-xs text-gray-400 dark:text-gray-500 font-medium">{item.label}</p>
-                <p className="text-xl font-bold text-gray-900 dark:text-white">
+                <div className="text-xl font-bold text-gray-900 dark:text-white">
                    {studentsLoading ? <Skeleton className="h-6 w-8 mt-1" /> : item.val}
-                </p>
+                </div>
               </div>
             </CardContent>
           </Card>
@@ -205,7 +207,16 @@ export function AdminPromotions() {
                       Student enrollment will be updated permanently to the new class and academic year.
                    </p>
                 </div>
-             </CardContent>
+
+                <Button
+                   onClick={handlePromote}
+                   disabled={promotionMutation.isPending || selectedStudents.length === 0 || !toClassId}
+                   className="w-full bg-blue-600 hover:bg-blue-700 text-white rounded-xl h-12 shadow-lg shadow-blue-500/20 font-bold gap-2 mt-2"
+                >
+                   {promotionMutation.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
+                   Promote {selectedStudents.length || ''} Students
+                </Button>
+              </CardContent>
            </Card>
         </div>
 
@@ -243,7 +254,7 @@ export function AdminPromotions() {
 
                  <ScrollArea className="h-[450px] pr-4">
                     <div className="space-y-2">
-                       {studentsLoading ? (
+                       {studentsLoading && students.length === 0 ? (
                           Array(5).fill(0).map((_, i) => <Skeleton key={i} className="h-14 w-full rounded-xl" />)
                        ) : !fromClassId ? (
                          <div className="text-center py-20 bg-gray-50/50 dark:bg-gray-950/50 rounded-xl border border-dashed border-gray-100 dark:border-gray-800">
@@ -295,24 +306,41 @@ export function AdminPromotions() {
         </div>
       </div>
 
-      <div className="flex items-center justify-between bg-white dark:bg-gray-900 p-4 px-6 rounded-xl shadow-sm border border-gray-50 dark:border-gray-800">
+      <div className="sticky bottom-6 flex flex-col sm:flex-row items-center justify-between bg-white/80 dark:bg-gray-900/80 backdrop-blur-md p-4 px-6 rounded-2xl shadow-2xl border border-white/20 dark:border-gray-800/50 gap-4 z-50">
           <div className="flex items-center gap-4">
-             {selectedStudents.length > 0 && (
+             {selectedStudents.length > 0 ? (
                <div className="flex items-center gap-4">
-                  <span className="text-xs font-bold text-blue-500 uppercase tracking-widest">{selectedStudents.length} Students Selected</span>
+                  <div className="h-2 w-2 bg-blue-500 rounded-full animate-ping" />
+                  <span className="text-sm font-bold text-blue-500 uppercase tracking-widest">{selectedStudents.length} Students Selected</span>
                   <Button variant="ghost" size="sm" onClick={() => setSelectedStudents([])} className="text-xs text-gray-400 hover:text-rose-500 h-auto p-0 font-bold uppercase gap-1.5 flex items-center">
-                    <RotateCcw className="h-3.5 w-3.5" /> Reset Selection
+                    <RotateCcw className="h-3.5 w-3.5" /> Reset
                   </Button>
                </div>
+             ) : (
+               <span className="text-xs font-bold text-gray-400 uppercase tracking-widest italic">No students selected for promotion</span>
              )}
           </div>
-          <Button
-            onClick={handlePromote}
-            disabled={promotionMutation.isPending || selectedStudents.length === 0}
-            className="bg-blue-600 hover:bg-blue-700 text-white rounded-xl px-10 h-11 shadow-lg shadow-blue-500/20 font-bold gap-2"
-          >
-            {promotionMutation.isPending ? "Promoting..." : <><Save className="h-4 w-4" /> Finalize Promotion</>}
-          </Button>
+          <div className="flex items-center gap-3 w-full sm:w-auto">
+            <Button
+              variant="outline"
+              onClick={() => {
+                setFromClassId("");
+                setToClassId("");
+                setSelectedStudents([]);
+              }}
+              className="rounded-xl px-6 h-11 font-bold border-gray-100 dark:border-gray-800"
+            >
+              Clear All
+            </Button>
+            <Button
+              onClick={handlePromote}
+              disabled={promotionMutation.isPending || selectedStudents.length === 0 || !toClassId}
+              className="flex-1 sm:flex-none bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl px-10 h-11 shadow-lg shadow-emerald-500/20 font-bold gap-2"
+            >
+              {promotionMutation.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <CheckCircle2 className="h-4 w-4" />}
+              Execute Promotion
+            </Button>
+          </div>
       </div>
     </div>
   );

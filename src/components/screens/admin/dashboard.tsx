@@ -125,6 +125,9 @@ export function AdminDashboard() {
   const financial = useDashboardFinancial(tenantId);
   const notices = useDashboardNotices(tenantId);
 
+  // Only show full skeleton if we have NO data at all
+  const loading = (summary.isLoading && !summary.data) || (attendance.isLoading && !attendance.data);
+
   useEffect(() => {
     const error = summary.error || attendance.error || academic.error || financial.error || notices.error;
     if (error) {
@@ -161,7 +164,7 @@ export function AdminDashboard() {
             </div>
           </div>
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-4">
-            {summary.isLoading ? (
+            {summary.isLoading && !summary.data ? (
               <>
                 {[...Array(4)].map((_, i) => (
                   <div key={i} className="bg-white/10 backdrop-blur-sm rounded-xl px-4 py-3">
@@ -208,7 +211,7 @@ export function AdminDashboard() {
 
       {/* Overview Stats Row */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        {summary.isLoading ? (
+        {summary.isLoading && !summary.data ? (
           <>
             <StatCardSkeleton />
             <StatCardSkeleton />
@@ -283,7 +286,7 @@ export function AdminDashboard() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            {attendance.isLoading ? (
+            {attendance.isLoading && !attendance.data ? (
               <Skeleton className="h-[280px] w-full" />
             ) : (
               <ChartContainer config={attendanceChartConfig} className="h-[280px] w-full">
@@ -307,7 +310,7 @@ export function AdminDashboard() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            {academic.isLoading ? (
+            {academic.isLoading && !academic.data ? (
               <Skeleton className="h-[300px] w-full" />
             ) : (
               <ChartContainer config={pieChartConfig} className="h-[300px] w-full">

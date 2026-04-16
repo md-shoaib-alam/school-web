@@ -58,11 +58,14 @@ export function AdminClasses() {
   const queryClient = useQueryClient();
 
   // ⚡ TanStack Query with GraphQL Group-wise hooks
-  const { data: classesData, isLoading: loading } = useClasses(currentTenantId || undefined);
+  const { data: classesData, isLoading: classesLoading } = useClasses(currentTenantId || undefined);
   const { data: teachersData } = useTeachersMin(currentTenantId || undefined);
 
   const classes = classesData?.classes || [];
   const teachers = teachersData?.teachers || [];
+
+  // Only show full skeleton if we have NO data at all
+  const loading = classesLoading && classes.length === 0;
 
   const refetchClasses = () =>
     queryClient.invalidateQueries({ queryKey: ["classes", currentTenantId] });
