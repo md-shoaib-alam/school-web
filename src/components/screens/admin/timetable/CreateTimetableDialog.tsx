@@ -1,0 +1,397 @@
+"use client";
+
+import { BookOpen, Calendar, Clock, Copy, Loader2, Plus, Trash2 } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { DAY_LABELS, DAY_FULL_LABELS } from "./constants";
+import type { AvailableSubject, AvailableTeacher, FormSlot } from "./types";
+import { useState } from "react";
+
+interface CreateTimetableDialogProps {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  currentClass: { name: string; section: string } | undefined;
+  workingDays: string[];
+  daySlots: Record<string, FormSlot[]>;
+  setDaySlots: (slots: any) => void;
+  availableSubjects: AvailableSubject[];
+  availableTeachers: AvailableTeacher[];
+  onSave: () => void;
+  saving: boolean;
+  onCopyToDay: (source: string, target: string) => void;
+  onCopyToAllDays: (source: string) => void;
+}
+
+export function CreateTimetableDialog({
+  open,
+  onOpenChange,
+  currentClass,
+  workingDays,
+  daySlots,
+  setDaySlots,
+  availableSubjects,
+  availableTeachers,
+  onSave,
+  saving,
+  onCopyToDay,
+  onCopyToAllDays,
+}: CreateTimetableDialogProps) {
+  const [activeTab, setActiveTab] = useState<string>(workingDays[0] || "monday");
+  const [copySourceDay, setCopySourceDay] = useState<string>(workingDays[0] || "monday");
+
+  const currentTabPeriods = daySlots[activeTab] ?? [];
+  const totalPeriodCount = Object.values(daySlots).reduce(
+    (acc, list) => acc + (list?.length ?? 0),
+    0,
+  );
+
+  const periodsByDay = Object.fromEntries(
+    workingDays.map((d) => [d, daySlots[d]?.length ?? 0]),
+  );
+
+  const addPeriod = () => {
+    const newSlot: FormSlot = {
+      id: crypto.randomUUID(),
+      day: activeTab,
+      subjectId: "",
+      teacherId: "",
+      startTime: "08:00",
+      endTime: "08:45",
+    };
+    setDaySlots((prev: any) => ({
+      ...prev,
+      [activeTab]: [...(prev[activeTab] ?? []), newSlot],
+    }));
+  };
+
+  const removePeriod = (periodId: string) => {
+    setDaySlots((prev: any) => ({
+      ...prev,
+      [activeTab]: (prev[activeTab] ?? []).filter((s: FormSlot) => s.id !== periodId),
+    }));
+  };
+
+  const updatePeriod = (
+    periodId: string,
+    field: keyof FormSlot,
+    value: string,
+  ) => {
+    if (field === "day" && value !== activeTab) {
+      setDaySlots((prev: any) => {
+        const currentList = prev[activeTab] ?? [];
+        const period = currentList.find((s: FormSlot) => s.id === periodId);
+        if (!period) return prev;
+        const updated = { ...period, [field]: value };
+        return {
+          ...prev,
+          [activeTab]: currentList.filter((s: FormSlot) => s.id !== periodId),
+          [value]: [...(prev[value] ?? []), updated],
+        };
+      });
+      return;
+    }
+    setDaySlots((prev: any) => ({
+      ...prev,
+      [activeTab]: (prev[activeTab] ?? []).map((s: FormSlot) =>
+        s.id === periodId ? { ...s, [field]: value } : s,
+      ),
+    }));
+  };
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="sm:max-w-3xl max-h-[85vh] flex flex-col overflow-hidden">
+        <DialogHeader>
+          <DialogTitle className="flex items-center gap-2">
+            <Calendar className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
+            Manage Timetable
+          </DialogTitle>
+          <DialogDescription>
+            {totalPeriodCount > 0 ? (
+              <>
+                <span className="font-medium text-foreground">
+                  {totalPeriodCount}
+                </span>{" "}
+                total periods for{" "}
+                <span className="font-medium text-foreground">
+                  {currentClass
+                    ? `${currentClass.name}-${currentClass.section}`
+                    : ""}
+                </span>{" "}
+                — add, edit, or remove periods across all days.
+              </>
+            ) : (
+              <>
+                Add time slots for{" "}
+                <span className="font-medium text-foreground">
+                  {currentClass
+                    ? `${currentClass.name}-${currentClass.section}`
+                    : ""}
+                </span>{" "}
+                — select day, subject, teacher, and timing for each period.
+              </>
+            )}
+          </DialogDescription>
+        </DialogHeader>
+
+        {/* Copy from day feature */}
+        <div className="flex flex-wrap items-center gap-2 rounded-lg border bg-muted/30 p-3">
+          <Copy className="h-4 w-4 text-muted-foreground shrink-0" />
+          <span className="text-sm font-medium text-muted-foreground whitespace-nowrap">
+            Duplicate from:
+          </span>
+          <Select value={copySourceDay} onValueChange={setCopySourceDay}>
+            <SelectTrigger className="h-8 text-sm w-32">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {workingDays.map((day) => (
+                <SelectItem key={day} value={day}>
+                  {DAY_FULL_LABELS[day]}{" "}
+                  {periodsByDay[day] > 0 ? `(${periodsByDay[day]})` : ""}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          <Button
+            variant="outline"
+            size="sm"
+            className="text-xs h-8"
+            onClick={() => onCopyToDay(copySourceDay, activeTab)}
+          >
+            <Copy className="h-3 w-3 mr-1" />
+            Copy to {DAY_LABELS[activeTab]}
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            className="text-xs h-8"
+            onClick={() => onCopyToAllDays(copySourceDay)}
+          >
+            <Copy className="h-3 w-3 mr-1" />
+            Copy to All Days
+          </Button>
+        </div>
+
+        {/* Day Tabs */}
+        <div className="flex items-center border-b pb-0 shrink-0">
+          {workingDays.map((day) => {
+            const count = daySlots[day]?.length ?? 0;
+            const isActive = day === activeTab;
+            return (
+              <button
+                key={day}
+                onClick={() => setActiveTab(day)}
+                className={`relative flex-1 px-3 py-2 text-sm font-medium transition-colors text-center border-b-2 -mb-px ${
+                  isActive
+                    ? "border-emerald-600 text-emerald-700 dark:text-emerald-400"
+                    : "border-transparent text-muted-foreground hover:text-foreground"
+                }`}
+              >
+                <span className="text-xs sm:text-sm">{DAY_LABELS[day]}</span>
+                {count > 0 && (
+                  <Badge className="ml-1 h-4 min-w-4 px-1 text-[10px] bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800 hover:bg-emerald-100 dark:hover:bg-emerald-900/30">
+                    {count}
+                  </Badge>
+                )}
+              </button>
+            );
+          })}
+        </div>
+
+        {/* Scrollable period list for active tab */}
+        <ScrollArea className="flex-1 min-h-0 max-h-[45vh] -mx-6 px-6">
+          <div className="py-3 space-y-2">
+            {currentTabPeriods.length === 0 ? (
+              <div className="text-center py-10 text-muted-foreground">
+                <BookOpen className="h-10 w-10 mx-auto mb-2 opacity-25" />
+                <p className="text-sm font-medium">
+                  No periods on {DAY_FULL_LABELS[activeTab]}
+                </p>
+                <p className="text-xs mt-1">
+                  Click &quot;Add Period&quot; below to get started.
+                </p>
+              </div>
+            ) : (
+              currentTabPeriods.map((period, idx) => (
+                <div
+                  key={period.id}
+                  className="rounded-lg border bg-muted/20 p-3"
+                >
+                  {/* Period Header */}
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-xs font-semibold text-muted-foreground flex items-center gap-1.5">
+                      <Clock className="h-3 w-3" />
+                      Period {idx + 1}
+                    </span>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="h-7 w-7 p-0 text-muted-foreground hover:text-red-600"
+                      onClick={() => removePeriod(period.id)}
+                    >
+                      <Trash2 className="h-3.5 w-3.5" />
+                    </Button>
+                  </div>
+
+                  {/* Fields row */}
+                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                    {/* Day */}
+                    <div className="space-y-1">
+                      <label className="text-[11px] font-medium text-muted-foreground">
+                        Day
+                      </label>
+                      <Select
+                        value={period.day}
+                        onValueChange={(v) =>
+                          updatePeriod(period.id, "day", v)
+                        }
+                      >
+                        <SelectTrigger className="h-8 text-xs">
+                          <SelectValue placeholder="Day" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {workingDays.map((day) => (
+                            <SelectItem key={day} value={day}>
+                              {DAY_FULL_LABELS[day]}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    {/* Subject */}
+                    <div className="space-y-1">
+                      <label className="text-[11px] font-medium text-muted-foreground">
+                        Subject
+                      </label>
+                      <Select
+                        value={period.subjectId}
+                        onValueChange={(v) =>
+                          updatePeriod(period.id, "subjectId", v)
+                        }
+                      >
+                        <SelectTrigger className="h-8 text-xs">
+                          <SelectValue placeholder="Subject" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {availableSubjects.map((s) => (
+                            <SelectItem key={s.id} value={s.id}>
+                              {s.name}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    {/* Teacher */}
+                    <div className="space-y-1">
+                      <label className="text-[11px] font-medium text-muted-foreground">
+                        Teacher
+                      </label>
+                      <Select
+                        value={period.teacherId}
+                        onValueChange={(v) =>
+                          updatePeriod(period.id, "teacherId", v)
+                        }
+                      >
+                        <SelectTrigger className="h-8 text-xs">
+                          <SelectValue placeholder="Teacher" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {availableTeachers.map((t) => (
+                            <SelectItem key={t.id} value={t.id}>
+                              {t.name}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    {/* Start Time */}
+                    <div className="space-y-1">
+                      <label className="text-[11px] font-medium text-muted-foreground">
+                        Start
+                      </label>
+                      <Input
+                        type="time"
+                        value={period.startTime}
+                        onChange={(e) =>
+                          updatePeriod(period.id, "startTime", e.target.value)
+                        }
+                        className="h-8 text-xs"
+                      />
+                    </div>
+
+                    {/* End Time */}
+                    <div className="space-y-1">
+                      <label className="text-[11px] font-medium text-muted-foreground">
+                        End
+                      </label>
+                      <Input
+                        type="time"
+                        value={period.endTime}
+                        onChange={(e) =>
+                          updatePeriod(period.id, "endTime", e.target.value)
+                        }
+                        className="h-8 text-xs"
+                      />
+                    </div>
+                  </div>
+                </div>
+              ))
+            )}
+
+            {/* Add Period Button */}
+            <Button
+              variant="outline"
+              className="w-full border-dashed text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-900/20 hover:text-emerald-700 dark:text-emerald-400"
+              onClick={addPeriod}
+            >
+              <Plus className="h-4 w-4 mr-1.5" />
+              Add Period to {DAY_LABELS[activeTab]}
+            </Button>
+          </div>
+        </ScrollArea>
+
+        {/* Footer */}
+        <DialogFooter className="pt-4 border-t gap-2 sm:gap-0 shrink-0">
+          <Button
+            variant="outline"
+            onClick={() => onOpenChange(false)}
+            disabled={saving}
+          >
+            Cancel
+          </Button>
+          <Button
+            onClick={onSave}
+            disabled={saving}
+            className="bg-emerald-600 hover:bg-emerald-700 text-white"
+          >
+            {saving && <Loader2 className="h-4 w-4 mr-1.5 animate-spin" />}
+            {saving
+              ? "Saving..."
+              : `Save ${workingDays.reduce((sum, d) => sum + (daySlots[d]?.length ?? 0), 0)} Periods`}
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+}
