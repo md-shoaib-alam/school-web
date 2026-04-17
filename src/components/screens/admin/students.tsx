@@ -165,12 +165,14 @@ export function AdminStudents() {
            throw new Error(err.error || "Failed to delete student");
         }
         setStudents((prev) => prev.filter((s) => s.id !== id));
-        return "Student records removed";
+        
+        // Force a RED morphing pill for deletion
+        throw new Error("Student record removed");
       })(),
       {
         loading: "Deleting student records...",
-        success: (msg) => msg,
-        error: (err: any) => err.message,
+        success: () => "", // Not reached
+        error: (err: any) => err.message, // Shows the red pill
       }
     );
   };

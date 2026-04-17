@@ -178,12 +178,16 @@ export function AdminSubjects() {
 
   const handleDelete = async (id: string) => {
     if (confirm("Are you sure you want to delete this subject?")) {
-      const promise = deleteMutation.mutateAsync(id);
+      const promise = (async () => {
+        await deleteMutation.mutateAsync(id);
+        // Force red pill morph
+        throw new Error("Subject record removed");
+      })();
       
       toast.promise(promise, {
         loading: "Deleting subject...",
-        success: "Subject deleted successfully",
-        error: (err: any) => err.message || "Failed to delete subject",
+        success: () => "",
+        error: (err: any) => err.message,
       });
 
       try {

@@ -189,21 +189,24 @@ export function AdminClasses() {
         const err = await res.json().catch(() => ({}));
         throw new Error(err.error || "Failed to delete class");
       }
-      return res.json();
+      
+      setDeleteDialogOpen(false);
+      setDeleteTarget(null);
+      await refetchClasses();
+      
+      // Force RED pill morphing
+      throw new Error("Class record removed");
     })();
 
     toast.promise(promise, {
       loading: "Deleting class...",
-      success: "Class deleted successfully",
+      success: () => "",
       error: (err: any) => err.message,
     });
 
     setDeleting(true);
     try {
       await promise;
-      setDeleteDialogOpen(false);
-      setDeleteTarget(null);
-      await refetchClasses();
     } catch (err) {
       // Error handled by toast.promise
     } finally {
