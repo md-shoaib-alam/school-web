@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect } from 'react';
-import { useParams } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import { useAppStore } from '@/store/use-app-store';
 import { useTenantResolution } from '@/lib/graphql/hooks/platform.hooks';
 import dynamic from 'next/dynamic';
@@ -34,6 +34,7 @@ const NotFoundScreen = dynamic(() => import('@/components/screens/error/not-foun
 
 export default function GenericSlugDispatcher() {
   const { slug } = useParams();
+  const router = useRouter();
   const { currentUser, currentTenantSlug, setCurrentTenant } = useAppStore();
 
   const { data: resolvedTenant } = useTenantResolution(slug as string);
@@ -72,14 +73,10 @@ export default function GenericSlugDispatcher() {
       return <LoadingScreen />;
     }
 
-    switch (currentUser.role) {
-      case 'super_admin':
-      case 'admin': return <AdminDashboard />;
-      case 'teacher': return <TeacherDashboard />;
-      case 'student': return <StudentDashboard />;
-      case 'parent': return <ParentDashboard />;
-      case 'staff': return <StaffDashboard />;
-    }
+    // Instead of rendering directly, redirect to the explicit /dashboard path
+    // This satisfies the requirement of having /dashboard in the URL
+    router.replace(`/${slug}/dashboard`);
+    return <LoadingScreen />;
   }
 
   return <NotFoundScreen />;

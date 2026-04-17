@@ -126,11 +126,21 @@ export function AdminDashboard() {
   }, [error]);
 
   // Map the unified data for the existing UI components
-  const summary = { data: dashboardData?.summary, isLoading };
-  const attendance = { data: dashboardData?.attendanceTrend, isLoading };
+  const summary = { 
+    data: dashboardData ? {
+      totalStudents: dashboardData.totalStudents,
+      totalTeachers: dashboardData.totalTeachers,
+      totalParents: dashboardData.totalParents,
+      totalClasses: dashboardData.totalClasses,
+      attendanceRate: dashboardData.attendanceRate,
+      upcomingEvents: dashboardData.upcomingEvents,
+    } : undefined, 
+    isLoading 
+  };
+  const attendance = { data: dashboardData?.monthlyAttendance, isLoading };
   const academic = { data: { classDistribution: dashboardData?.classDistribution }, isLoading };
   const financial = { data: { totalRevenue: dashboardData?.totalRevenue, feeByType: dashboardData?.feeByType }, isLoading };
-  const notices = { data: dashboardData?.notices, isLoading };
+  const notices = { data: dashboardData?.recentNotices, isLoading };
 
   // Only show full skeleton if we have NO data at all
   const loading = isLoading && !dashboardData;

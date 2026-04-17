@@ -76,14 +76,13 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
   const navigateTo = (screen: string) => {
     setSidebarOpen(false);
     const tenantIdentifier = currentTenantSlug || currentTenantId;
-    const url = !tenantIdentifier
-      ? screen === "dashboard"
-        ? "/"
-        : `/${screen}`
-      : screen === "dashboard"
-        ? `/${tenantIdentifier}`
-        : `/${tenantIdentifier}/${screen}`;
-    router.push(url);
+    
+    // Always use the full /[tenant]/[screen] pattern, except for root platform dashboard
+    if (!tenantIdentifier) {
+      router.push(screen === "dashboard" ? "/" : `/${screen}`);
+    } else {
+      router.push(`/${tenantIdentifier}/${screen}`);
+    }
   };
 
   return (
