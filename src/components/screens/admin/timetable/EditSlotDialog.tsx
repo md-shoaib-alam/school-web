@@ -30,6 +30,7 @@ interface EditSlotDialogProps {
     startTime: string;
     endTime: string;
     day: string;
+    label: string;
   };
   setForm: (form: any) => void;
   onSave: () => void;
@@ -64,13 +65,13 @@ export function EditSlotDialog({
         </DialogHeader>
 
         <div className="space-y-4 py-2">
-          {form.label !== undefined ? (
+          {form.label !== undefined && form.label !== null ? (
             <div className="space-y-1.5">
               <label className="text-sm font-medium text-foreground">
                 Break Label
               </label>
               <Input
-                value={form.label}
+                value={form.label ?? ""}
                 onChange={(e) =>
                   setForm((prev: any) => ({ ...prev, label: e.target.value }))
                 }
@@ -85,7 +86,7 @@ export function EditSlotDialog({
                   Subject
                 </label>
                 <Select
-                  value={form.subjectId}
+                  value={form.subjectId ?? ""}
                   onValueChange={(v) =>
                     setForm((prev: any) => ({ ...prev, subjectId: v }))
                   }
@@ -108,7 +109,7 @@ export function EditSlotDialog({
                   Teacher
                 </label>
                 <Select
-                  value={form.teacherId}
+                  value={form.teacherId ?? ""}
                   onValueChange={(v) =>
                     setForm((prev: any) => ({ ...prev, teacherId: v }))
                   }
@@ -133,7 +134,7 @@ export function EditSlotDialog({
               Day
             </label>
             <Select
-              value={form.day}
+              value={form.day ?? ""}
               onValueChange={(v) =>
                 setForm((prev: any) => ({ ...prev, day: v }))
               }
@@ -158,7 +159,7 @@ export function EditSlotDialog({
               </label>
               <Input
                 type="time"
-                value={form.startTime}
+                value={form.startTime ?? ""}
                 onChange={(e) =>
                   setForm((prev: any) => ({
                     ...prev,
@@ -174,7 +175,7 @@ export function EditSlotDialog({
               </label>
               <Input
                 type="time"
-                value={form.endTime}
+                value={form.endTime ?? ""}
                 onChange={(e) =>
                   setForm((prev: any) => ({
                     ...prev,

@@ -274,12 +274,12 @@ export function CreateTimetableDialog({
                     </Button>
                   </div>
 
-                  {period.label !== undefined ? (
+                  {period.label !== undefined && period.label !== null ? (
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                        <div className="space-y-1">
                           <label className="text-[10px] font-bold uppercase text-muted-foreground">Label</label>
                           <Input 
-                            value={period.label} 
+                            value={period.label ?? ""} 
                             onChange={(e) => updatePeriod(period.id, "label", e.target.value)} 
                             placeholder="Lunch Break, Assembly, etc."
                             className="h-9 text-xs"
@@ -288,11 +288,11 @@ export function CreateTimetableDialog({
                        <div className="grid grid-cols-2 gap-2">
                           <div className="space-y-1">
                              <label className="text-[10px] font-bold uppercase text-muted-foreground">Start</label>
-                             <Input type="time" value={period.startTime} onChange={(e) => updatePeriod(period.id, "startTime", e.target.value)} className="h-9 text-xs" />
+                             <Input type="time" value={period.startTime ?? ""} onChange={(e) => updatePeriod(period.id, "startTime", e.target.value)} className="h-9 text-xs" />
                           </div>
                           <div className="space-y-1">
                              <label className="text-[10px] font-bold uppercase text-muted-foreground">End</label>
-                             <Input type="time" value={period.endTime} onChange={(e) => updatePeriod(period.id, "endTime", e.target.value)} className="h-9 text-xs" />
+                             <Input type="time" value={period.endTime ?? ""} onChange={(e) => updatePeriod(period.id, "endTime", e.target.value)} className="h-9 text-xs" />
                           </div>
                        </div>
                     </div>
@@ -300,28 +300,28 @@ export function CreateTimetableDialog({
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                       <div className="space-y-1">
                         <label className="text-[10px] font-bold uppercase text-muted-foreground">Subject</label>
-                        <Select value={period.subjectId} onValueChange={(v) => updatePeriod(period.id, "subjectId", v)}>
+                        <Select value={period.subjectId ?? ""} onValueChange={(v) => updatePeriod(period.id, "subjectId", v)}>
                           <SelectTrigger className="h-9 text-xs"><SelectValue placeholder="Subject" /></SelectTrigger>
                           <SelectContent>{availableSubjects.map((s) => <SelectItem key={s.id} value={s.id}>{s.name}</SelectItem>)}</SelectContent>
                         </Select>
                       </div>
                       <div className="space-y-1">
                         <label className="text-[10px] font-bold uppercase text-muted-foreground">Teacher</label>
-                        <Select value={period.teacherId} onValueChange={(v) => updatePeriod(period.id, "teacherId", v)}>
+                        <Select value={period.teacherId ?? ""} onValueChange={(v) => updatePeriod(period.id, "teacherId", v)}>
                           <SelectTrigger className="h-9 text-xs"><SelectValue placeholder="Teacher" /></SelectTrigger>
                           <SelectContent>{availableTeachers.map((t) => <SelectItem key={t.id} value={t.id}>{t.name}</SelectItem>)}</SelectContent>
                         </Select>
                       </div>
-                      <div className="grid grid-cols-2 gap-2">
-                         <div className="space-y-1">
-                            <label className="text-[10px] font-bold uppercase text-muted-foreground">Start</label>
-                            <Input type="time" value={period.startTime} onChange={(e) => updatePeriod(period.id, "startTime", e.target.value)} className="h-9 text-xs" />
-                         </div>
-                         <div className="space-y-1">
-                            <label className="text-[10px] font-bold uppercase text-muted-foreground">End</label>
-                            <Input type="time" value={period.endTime} onChange={(e) => updatePeriod(period.id, "endTime", e.target.value)} className="h-9 text-xs" />
-                         </div>
-                      </div>
+                          <div className="grid grid-cols-2 gap-2">
+                             <div className="space-y-1">
+                                <label className="text-[10px] font-bold uppercase text-muted-foreground">Start</label>
+                                <Input type="time" value={period.startTime ?? ""} onChange={(e) => updatePeriod(period.id, "startTime", e.target.value)} className="h-9 text-xs" />
+                             </div>
+                             <div className="space-y-1">
+                                <label className="text-[10px] font-bold uppercase text-muted-foreground">End</label>
+                                <Input type="time" value={period.endTime ?? ""} onChange={(e) => updatePeriod(period.id, "endTime", e.target.value)} className="h-9 text-xs" />
+                             </div>
+                          </div>
                     </div>
                   )}
                 </div>
