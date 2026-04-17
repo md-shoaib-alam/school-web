@@ -22,7 +22,7 @@ import {
   AlertDialogCancel,
 } from "@/components/ui/alert-dialog";
 import { GraduationCap, Pencil, Trash2 } from "lucide-react";
-import type { StudentInfo } from "@/lib/types";
+import type { StudentInfo } from "./types";
 
 interface StudentTableProps {
   students: StudentInfo[];

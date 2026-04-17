@@ -1,106 +1,101 @@
 "use client";
 
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import {
   AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
   AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
+  AlertDialogDescription,
+  AlertDialogFooter,
   AlertDialogTrigger,
+  AlertDialogAction,
+  AlertDialogCancel,
 } from "@/components/ui/alert-dialog";
-import {
-  Award,
-  BookOpen,
-  Briefcase,
-  GraduationCap,
-  Mail,
-  Pencil,
-  Trash2,
-} from "lucide-react";
-import type { TeacherInfo } from "./types";
-
-const avatarColors = [
-  "bg-emerald-500",
-  "bg-teal-500",
-  "bg-cyan-500",
-  "bg-blue-500",
-  "bg-violet-500",
-  "bg-purple-500",
-  "bg-rose-500",
-  "bg-amber-500",
-  "bg-orange-500",
-  "bg-lime-500",
-];
+import { Mail, GraduationCap, BookOpen, Award, Briefcase, Pencil, Trash2 } from "lucide-react";
+import { TeacherInfo, avatarColors } from "./types";
 
 interface TeacherCardProps {
   teacher: TeacherInfo;
+  index: number;
   canEdit: boolean;
   canDelete: boolean;
+  deletingId: string | null;
+  setDeletingId: (id: string | null) => void;
   onEdit: (teacher: TeacherInfo) => void;
   onDelete: (id: string) => void;
-  index: number;
 }
 
 export function TeacherCard({
   teacher,
+  index,
   canEdit,
   canDelete,
+  deletingId,
+  setDeletingId,
   onEdit,
   onDelete,
-  index,
 }: TeacherCardProps) {
-  const avatarColor = avatarColors[index % avatarColors.length];
   const initials = teacher.name
     .split(" ")
     .map((n) => n[0])
     .join("")
+    .slice(0, 2)
     .toUpperCase();
+  const color = avatarColors[index % avatarColors.length];
 
   return (
-    <Card className="overflow-hidden border-none shadow-sm hover:shadow-md transition-all duration-300 group bg-white dark:bg-gray-900">
+    <Card className="hover:shadow-md transition-all duration-200 hover:-translate-y-0.5 group">
       <CardContent className="p-6">
-        <div className="flex items-start justify-between">
-          <div className="flex items-center gap-4">
-            <Avatar className={`h-14 w-14 rounded-2xl ${avatarColor} text-white font-bold text-xl shadow-inner`}>
-              <AvatarFallback className="bg-transparent">{initials}</AvatarFallback>
-            </Avatar>
-            <div className="min-w-0">
-              <h3 className="font-bold text-gray-900 dark:text-gray-100 truncate text-lg group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">
-                {teacher.name}
-              </h3>
-              <div className="flex items-center gap-1.5 text-gray-500 dark:text-gray-400 text-sm mt-0.5">
-                <Mail className="h-3.5 w-3.5" />
-                <span className="truncate">{teacher.email}</span>
-              </div>
+        {/* Header */}
+        <div className="flex items-start gap-4">
+          <Avatar className="h-14 w-14 shrink-0 ring-2 ring-white dark:ring-gray-800 shadow-sm">
+            <AvatarFallback className={`${color} text-white text-sm font-bold`}>
+              {initials}
+            </AvatarFallback>
+          </Avatar>
+          <div className="min-w-0 flex-1">
+            <h3 className="font-semibold text-gray-900 dark:text-gray-100 truncate group-hover:text-emerald-700 dark:group-hover:text-emerald-400 transition-colors">
+              {teacher.name}
+            </h3>
+            <div className="flex items-center gap-1.5 text-sm text-muted-foreground mt-0.5">
+              <Mail className="h-3 w-3 shrink-0" />
+              <span className="truncate">{teacher.email}</span>
             </div>
+            {teacher.phone && (
+              <p className="text-sm text-muted-foreground mt-0.5">{teacher.phone}</p>
+            )}
           </div>
 
+          {/* Action buttons */}
           {(canEdit || canDelete) && (
-            <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+            <div className="flex items-center gap-1 shrink-0">
               {canEdit && (
                 <Button
                   variant="ghost"
                   size="icon"
-                  className="h-8 w-8 text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50 dark:hover:bg-emerald-900/20"
+                  className="h-8 w-8 text-muted-foreground hover:text-emerald-600"
                   onClick={() => onEdit(teacher)}
                 >
                   <Pencil className="h-4 w-4" />
                 </Button>
               )}
               {canDelete && (
-                <AlertDialog>
+                <AlertDialog
+                  open={deletingId === teacher.id}
+                  onOpenChange={(open) => {
+                    if (!open) setDeletingId(null);
+                  }}
+                >
                   <AlertDialogTrigger asChild>
                     <Button
                       variant="ghost"
                       size="icon"
-                      className="h-8 w-8 text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900/20"
+                      className="h-8 w-8 text-muted-foreground hover:text-red-600"
+                      onClick={() => setDeletingId(teacher.id)}
                     >
                       <Trash2 className="h-4 w-4" />
                     </Button>
@@ -109,11 +104,14 @@ export function TeacherCard({
                     <AlertDialogHeader>
                       <AlertDialogTitle>Delete Teacher</AlertDialogTitle>
                       <AlertDialogDescription>
-                        Are you sure you want to delete <strong>{teacher.name}</strong>? This action cannot be undone.
+                        Are you sure you want to delete <strong>{teacher.name}</strong>? This action
+                        cannot be undone.
                       </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
-                      <AlertDialogCancel>Cancel</AlertDialogCancel>
+                      <AlertDialogCancel onClick={() => setDeletingId(null)}>
+                        Cancel
+                      </AlertDialogCancel>
                       <AlertDialogAction
                         className="bg-red-600 hover:bg-red-700 text-white"
                         onClick={() => onDelete(teacher.id)}
@@ -128,57 +126,46 @@ export function TeacherCard({
           )}
         </div>
 
+        {/* Info */}
         <div className="mt-5 space-y-3">
           {/* Subjects */}
           <div className="flex items-start gap-2">
-            <BookOpen className="h-4 w-4 text-gray-400 mt-0.5 shrink-0" />
+            <BookOpen className="h-4 w-4 text-muted-foreground mt-0.5 shrink-0" />
             <div className="flex flex-wrap gap-1.5">
-              {(teacher.subjects || []).length > 0 ? (
-                (teacher.subjects || []).map((subject, idx) => (
-                  <Badge
-                    key={`${subject}-${idx}`}
-                    variant="secondary"
-                    className="text-xs font-normal bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800"
-                  >
-                    {subject}
-                  </Badge>
-                ))
-              ) : (
-                <span className="text-xs text-gray-400 italic">No subjects</span>
-              )}
+              {(teacher.subjects || []).map((subject, idx) => (
+                <Badge
+                  key={`${subject}-${idx}`}
+                  variant="secondary"
+                  className="text-xs font-normal bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800"
+                >
+                  {subject}
+                </Badge>
+              ))}
             </div>
           </div>
 
           {/* Classes */}
           <div className="flex items-start gap-2">
-            <GraduationCap className="h-4 w-4 text-gray-400 mt-0.5 shrink-0" />
+            <GraduationCap className="h-4 w-4 text-muted-foreground mt-0.5 shrink-0" />
             <div className="flex flex-wrap gap-1.5">
-              {(teacher.classes || []).length > 0 ? (
-                (teacher.classes || []).map((cls) => (
-                  <Badge
-                    key={cls}
-                    variant="outline"
-                    className="text-xs font-normal"
-                  >
-                    {cls}
-                  </Badge>
-                ))
-              ) : (
-                <span className="text-xs text-gray-400 italic">No classes</span>
-              )}
+              {(teacher.classes || []).map((cls) => (
+                <Badge key={cls} variant="outline" className="text-xs font-normal">
+                  {cls}
+                </Badge>
+              ))}
             </div>
           </div>
 
           {/* Experience & Qualification */}
-          <div className="flex items-center gap-4 pt-3 mt-4 border-t border-gray-100 dark:border-gray-800">
+          <div className="flex items-center gap-4 pt-2 border-t dark:border-gray-700">
             {teacher.experience && (
-              <div className="flex items-center gap-1.5 text-sm text-gray-500 dark:text-gray-400">
+              <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
                 <Briefcase className="h-3.5 w-3.5" />
                 <span>{teacher.experience} exp</span>
               </div>
             )}
             {teacher.qualification && (
-              <div className="flex items-center gap-1.5 text-sm text-gray-500 dark:text-gray-400">
+              <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
                 <Award className="h-3.5 w-3.5" />
                 <span>{teacher.qualification}</span>
               </div>

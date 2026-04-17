@@ -11,17 +11,18 @@ import {
   DialogDescription,
   DialogFooter,
 } from "@/components/ui/dialog";
-import { Loader2, Users } from "lucide-react";
-import type { TeacherInfo, TeacherFormData } from "./types";
+import { Loader2 } from "lucide-react";
+import type { TeacherInfo } from "./types";
 
 interface TeacherDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   editingTeacher: TeacherInfo | null;
-  formData: TeacherFormData;
-  setFormData: (data: TeacherFormData) => void;
+  formData: any;
+  setFormData: (data: any) => void;
   submitting: boolean;
   onSubmit: () => void;
+  isFormValid: boolean;
 }
 
 export function TeacherDialog({
@@ -32,92 +33,100 @@ export function TeacherDialog({
   setFormData,
   submitting,
   onSubmit,
+  isFormValid,
 }: TeacherDialogProps) {
-  const title = editingTeacher ? "Edit Teacher" : "Add New Teacher";
-
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[500px]">
+      <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
-            <Users className="h-5 w-5 text-emerald-600" />
-            {title}
-          </DialogTitle>
+          <DialogTitle>{editingTeacher ? "Edit Teacher" : "Add New Teacher"}</DialogTitle>
           <DialogDescription>
             {editingTeacher
-              ? "Update teacher profile and information."
-              : "Register a new teacher to the platform."}
+              ? "Update the teacher details below"
+              : "Fill in the teacher details below"}
           </DialogDescription>
         </DialogHeader>
-
-        <div className="space-y-4 py-4">
+        <div className="grid gap-4 py-2">
+          <div className="grid gap-2">
+            <Label htmlFor="teacher-name">Full Name</Label>
+            <Input
+              id="teacher-name"
+              value={formData.name}
+              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+              placeholder="Dr. Jane Smith"
+            />
+          </div>
+          <div className="grid gap-2">
+            <Label htmlFor="teacher-email">Email</Label>
+            <Input
+              id="teacher-email"
+              type="email"
+              value={formData.email}
+              onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+              placeholder="jane.smith@school.com"
+            />
+          </div>
+          {!editingTeacher && (
+            <div className="grid gap-2">
+              <Label htmlFor="teacher-password">Password</Label>
+              <Input
+                id="teacher-password"
+                type="password"
+                value={formData.password}
+                onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                placeholder="Set login password (default: changeme123)"
+              />
+            </div>
+          )}
+          <div className="grid gap-2">
+            <Label htmlFor="teacher-phone">Phone</Label>
+            <Input
+              id="teacher-phone"
+              value={formData.phone}
+              onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+              placeholder="+1 234 567 890"
+            />
+          </div>
           <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2 col-span-2">
-              <Label>Full Name *</Label>
+            <div className="grid gap-2">
+              <Label htmlFor="teacher-qualification">Qualification</Label>
               <Input
-                placeholder="e.g. Dr. Sarah Wilson"
-                value={formData.name}
-                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-              />
-            </div>
-            <div className="space-y-2 col-span-2">
-              <Label>Email Address *</Label>
-              <Input
-                type="email"
-                placeholder="sarah.w@school.com"
-                value={formData.email}
-                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-              />
-            </div>
-            <div className="space-y-2">
-              <Label>Phone Number</Label>
-              <Input
-                placeholder="+1 234 567 890"
-                value={formData.phone}
-                onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-              />
-            </div>
-            <div className="space-y-2">
-              <Label>Qualification</Label>
-              <Input
-                placeholder="e.g. M.Sc, B.Ed"
+                id="teacher-qualification"
                 value={formData.qualification}
                 onChange={(e) => setFormData({ ...formData, qualification: e.target.value })}
+                placeholder="Ph.D., M.Ed."
               />
             </div>
-            <div className="space-y-2">
-              <Label>Experience</Label>
+            <div className="grid gap-2">
+              <Label htmlFor="teacher-experience">Experience</Label>
               <Input
-                placeholder="e.g. 5 Years"
+                id="teacher-experience"
                 value={formData.experience}
                 onChange={(e) => setFormData({ ...formData, experience: e.target.value })}
+                placeholder="e.g., 5 years"
               />
             </div>
-            {!editingTeacher && (
-              <div className="space-y-2">
-                <Label>Password *</Label>
-                <Input
-                  type="password"
-                  placeholder="Set initial password"
-                  value={formData.password}
-                  onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                />
-              </div>
-            )}
           </div>
         </div>
-
         <DialogFooter>
-          <Button variant="outline" onClick={() => onOpenChange(false)} disabled={submitting}>
+          <Button variant="outline" onClick={() => onOpenChange(false)}>
             Cancel
           </Button>
           <Button
-            className="bg-emerald-600 hover:bg-emerald-700 text-white shadow-sm"
+            className="bg-emerald-600 hover:bg-emerald-700 text-white"
             onClick={onSubmit}
-            disabled={submitting}
+            disabled={submitting || !isFormValid}
           >
-            {submitting && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
-            {editingTeacher ? "Save Changes" : "Create Teacher"}
+            {submitting ? (
+              <>
+                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                {editingTeacher ? "Updating..." : "Adding..."}
+              </>
+            ) : editingTeacher ? (
+              "Update Teacher"
+            ) : (
+              "Add Teacher"
+            )}
           </Button>
         </DialogFooter>
       </DialogContent>

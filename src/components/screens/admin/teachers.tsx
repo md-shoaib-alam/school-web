@@ -1,69 +1,93 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Plus, Search, Users, RotateCcw } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Users, Search, Plus, Eye } from "lucide-react";
 import { goeyToast as toast } from "goey-toast";
-import { apiFetch } from "@/lib/api";
 import { useModulePermissions } from "@/hooks/use-permissions";
+import { apiFetch } from "@/lib/api";
 import { useAppStore } from "@/store/use-app-store";
 
 // Sub-components
 import { TeacherCard } from "./teachers/TeacherCard";
 import { TeacherDialog } from "./teachers/TeacherDialog";
 import { TeacherSkeleton } from "./teachers/TeacherSkeleton";
+import type { TeacherInfo } from "./teachers/types";
 
-// Types
-import type { TeacherInfo, TeacherFormData } from "./teachers/types";
-
-const emptyFormData: TeacherFormData = {
+const emptyFormData = {
   name: "",
   email: "",
   phone: "",
   qualification: "",
   experience: "",
-  password: "",
+  password: "", // Added for consistency
 };
 
 export function AdminTeachers() {
   const { currentTenantId } = useAppStore();
   const { canCreate, canEdit, canDelete } = useModulePermissions("teachers");
 
-  // Data states
-  const [teachers, setTeachers] = useState<TeacherInfo[]>([]);
-  const [loading, setLoading] = useState(true);
+  // Initializing state from localStorage to avoid skeletons on revisit
+  const [teachers, setTeachers] = useState<TeacherInfo[]>(() => {
+    if (typeof window !== "undefined") {
+      const saved = localStorage.getItem(`teachers_cache_${currentTenantId}`);
+      return saved ? JSON.parse(saved) : [];
+    }
+    return [];
+  });
+
+  const [loading, setLoading] = useState(teachers.length === 0);
   const [search, setSearch] = useState("");
 
   // Dialog state
   const [dialogOpen, setDialogOpen] = useState(false);
-  const [editingTeacher, setEditingTeacher] = useState<TeacherInfo | null>(null);
-  const [formData, setFormData] = useState<TeacherFormData>(emptyFormData);
+  const [editingTeacher, setEditingTeacher] = useState<TeacherInfo | null>(
+    null,
+  );
+  const [formData, setFormData] = useState(emptyFormData);
   const [submitting, setSubmitting] = useState(false);
 
-  const fetchTeachers = useCallback(async (showSkeleton = true) => {
-    if (!currentTenantId) return;
-    if (showSkeleton) setLoading(true);
+  // Delete state
+  const [deletingId, setDeletingId] = useState<string | null>(null);
+
+  const fetchTeachers = useCallback(async (showSkeleton = false) => {
     try {
-      const res = await apiFetch(`/api/teachers?tenantId=${currentTenantId}`);
-      if (res.ok) {
-        const data = await res.json();
-        setTeachers(data || []);
+      if (showSkeleton) setLoading(true);
+      const res = await apiFetch("/api/teachers");
+      if (!res.ok) throw new Error("Failed to fetch teachers");
+      const json = await res.json();
+      setTeachers(json);
+      // Cache the result for next time
+      if (typeof window !== "undefined" && currentTenantId) {
+        localStorage.setItem(`teachers_cache_${currentTenantId}`, JSON.stringify(json));
       }
     } catch (err) {
-      toast.error("Failed to load teachers");
+      console.error("Error fetching teachers:", err);
+      // Don't show toast on initial background load to avoid noise
     } finally {
       setLoading(false);
     }
   }, [currentTenantId]);
 
+  // Initial load when tenant is ready
   useEffect(() => {
-    fetchTeachers();
-  }, [fetchTeachers]);
+    if (currentTenantId) {
+        // If we have cached items, fetch silently in background
+        // If no cached items, show skeleton
+        fetchTeachers(teachers.length === 0);
+    }
+  }, [currentTenantId, fetchTeachers]);
 
-  // --- Handlers ---
+  const filtered = teachers.filter(
+    (t) =>
+      t.name.toLowerCase().includes(search.toLowerCase()) ||
+      t.email.toLowerCase().includes(search.toLowerCase()) ||
+      (t.subjects && t.subjects.some((s) => s.toLowerCase().includes(search.toLowerCase()))),
+  );
 
-  const handleOpenCreate = () => {
+  const handleOpenAdd = () => {
     setEditingTeacher(null);
     setFormData(emptyFormData);
     setDialogOpen(true);
@@ -84,137 +108,118 @@ export function AdminTeachers() {
 
   const handleSubmit = async () => {
     if (!formData.name || !formData.email) {
-      toast.error("Name and Email are required");
-      return;
+       toast.error("Name and Email are required");
+       return;
     }
+    toast.promise(
+      (async () => {
+        setSubmitting(true);
+        try {
+          const isEdit = !!editingTeacher;
+          const url = "/api/teachers";
+          const method = isEdit ? "PUT" : "POST";
+          const body = isEdit ? { id: editingTeacher.id, ...formData } : formData;
 
-    setSubmitting(true);
-    try {
-      const url = "/api/teachers";
-      const method = editingTeacher ? "PUT" : "POST";
-      const payload = {
-        ...formData,
-        tenantId: currentTenantId,
-        id: editingTeacher?.id,
-      };
+          const res = await apiFetch(url, {
+            method,
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(body),
+          });
 
-      const res = await apiFetch(url, {
-        method,
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
-
-      if (res.ok) {
-        toast.success(editingTeacher ? "Teacher updated successfully" : "Teacher added successfully");
-        setDialogOpen(false);
-        fetchTeachers(false);
-      } else {
-        const error = await res.json();
-        toast.error(error.message || "Failed to save teacher");
+          if (!res.ok) {
+            const err = await res.json().catch(() => ({}));
+            throw new Error(err.error || `Failed to ${isEdit ? "update" : "add"} teacher`);
+          }
+          
+          setDialogOpen(false);
+          setEditingTeacher(null);
+          setFormData(emptyFormData);
+          fetchTeachers();
+          return isEdit ? "Teacher updated" : "Teacher added";
+        } finally {
+          setSubmitting(false);
+        }
+      })(),
+      {
+        loading: `${editingTeacher ? "Updating" : "Adding"} teacher...`,
+        success: (msg) => msg,
+        error: (err: any) => err.message || "Action failed",
       }
-    } catch (err) {
-      toast.error("An error occurred");
-    } finally {
-      setSubmitting(false);
-    }
+    );
   };
 
   const handleDelete = async (id: string) => {
-    try {
-      const res = await apiFetch(`/api/teachers?id=${id}&tenantId=${currentTenantId}`, {
-        method: "DELETE",
-      });
-      if (res.ok) {
-        toast.success("Teacher deleted successfully");
-        fetchTeachers(false);
-      } else {
-        toast.error("Failed to delete teacher");
+    toast.promise(
+      (async () => {
+        const res = await apiFetch(`/api/teachers?id=${id}`, { method: "DELETE" });
+        if (!res.ok) {
+          const err = await res.json().catch(() => ({}));
+          throw new Error(err.error || "Deletion failed");
+        }
+        setTeachers((prev) => prev.filter((t) => t.id !== id));
+        setDeletingId(null);
+        
+        // We throw a "success" message to force a RED morphing pill for deletion
+        throw new Error("Teacher record removed");
+      })(),
+      {
+        loading: "Removing teacher record...",
+        success: () => "", // Not reached
+        error: (err: any) => err.message, // Shows the red pill
       }
-    } catch (err) {
-      toast.error("An error occurred during deletion");
-    }
+    );
   };
 
-  // --- Derived ---
-  const filtered = teachers.filter(
-    (t) =>
-      t.name.toLowerCase().includes(search.toLowerCase()) ||
-      t.email.toLowerCase().includes(search.toLowerCase()) ||
-      t.subjects?.some((s) => s.toLowerCase().includes(search.toLowerCase()))
-  );
+  const isFormValid =
+    formData.name.trim() !== "" && formData.email.trim() !== "";
 
   return (
     <div className="space-y-6">
-      {/* Header */}
+      {/* Read-only banner */}
+      {!canCreate && !canEdit && !canDelete && (
+        <div className="flex items-center gap-2 rounded-lg border border-amber-200 dark:border-amber-800 bg-amber-50 dark:bg-amber-900/30 px-3 py-2">
+          <Eye className="h-4 w-4 text-amber-600 dark:text-amber-400 shrink-0" />
+          <span className="text-xs text-amber-700 dark:text-amber-300 font-medium">
+            Read-only mode — you have view permission only for this module.
+          </span>
+        </div>
+      )}
+
+      {/* Header with search and add button */}
       <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
-        <div className="flex items-center gap-3">
-          <div className="h-12 w-12 rounded-2xl bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center text-blue-600 dark:text-blue-400">
-            <Users className="h-6 w-6" />
-          </div>
-          <div>
-            <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Teachers</h2>
-            <p className="text-sm text-gray-500 dark:text-gray-400">
-              Manage school faculty and teaching staff
-            </p>
-          </div>
+        <div className="relative max-w-sm flex-1">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <Input
+            placeholder="Search teachers..."
+            className="pl-9"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+          />
         </div>
-
-        <div className="flex items-center gap-2">
+        {canCreate && (
           <Button
-            variant="outline"
-            size="icon"
-            onClick={() => fetchTeachers(true)}
-            title="Refresh"
-            className="h-10 w-10"
+            className="bg-emerald-600 hover:bg-emerald-700 text-white shrink-0"
+            onClick={handleOpenAdd}
           >
-            <RotateCcw className="h-4 w-4" />
+            <Plus className="h-4 w-4 mr-2" />
+            Add Teacher
           </Button>
-          {canCreate && (
-            <Button
-              className="bg-emerald-600 hover:bg-emerald-700 text-white shadow-sm"
-              onClick={handleOpenCreate}
-            >
-              <Plus className="h-4 w-4 mr-2" />
-              Add Teacher
-            </Button>
-          )}
-        </div>
+        )}
       </div>
 
-      {/* Search */}
-      <div className="relative max-w-md">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
-        <Input
-          placeholder="Search by name, email or subject..."
-          className="pl-9 h-11 bg-white dark:bg-gray-900 border-none shadow-sm focus-visible:ring-emerald-500"
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-        />
-      </div>
-
-      {/* Content */}
+      {/* Teacher Grid */}
       {loading ? (
         <TeacherSkeleton />
       ) : filtered.length === 0 ? (
-        <div className="py-20 text-center bg-white dark:bg-gray-900 rounded-3xl border-2 border-dashed border-gray-100 dark:border-gray-800">
-          <Users className="h-12 w-12 mx-auto text-gray-300 dark:text-gray-700 mb-4" />
-          <p className="text-lg font-medium text-gray-900 dark:text-gray-100">No teachers found</p>
-          <p className="text-sm text-gray-500 mt-1">
-            {search ? "Try adjusting your search query." : "Start by adding your first teacher."}
-          </p>
-          {!search && canCreate && (
-            <Button
-              variant="outline"
-              className="mt-4 border-emerald-200 text-emerald-600 hover:bg-emerald-50"
-              onClick={handleOpenCreate}
-            >
-              <Plus className="h-4 w-4 mr-2" />
-              Add Teacher
-            </Button>
-          )}
-        </div>
+        <Card>
+          <CardContent className="py-16 text-center text-muted-foreground">
+            <Users className="h-12 w-12 mx-auto mb-3 opacity-30" />
+            <p className="font-medium">No teachers found</p>
+            <p className="text-sm">Try adjusting your search criteria</p>
+          </CardContent>
+        </Card>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {filtered.map((teacher, index) => (
             <TeacherCard
               key={teacher.id}
@@ -222,6 +227,8 @@ export function AdminTeachers() {
               index={index}
               canEdit={canEdit}
               canDelete={canDelete}
+              deletingId={deletingId}
+              setDeletingId={setDeletingId}
               onEdit={handleOpenEdit}
               onDelete={handleDelete}
             />
@@ -229,20 +236,29 @@ export function AdminTeachers() {
         </div>
       )}
 
+      {/* Showing count */}
       {!loading && filtered.length > 0 && (
-        <p className="text-sm text-gray-500 dark:text-gray-400 text-center">
+        <p className="text-sm text-muted-foreground text-center">
           Showing {filtered.length} of {teachers.length} teachers
         </p>
       )}
 
+      {/* Add/Edit Teacher Dialog */}
       <TeacherDialog
         open={dialogOpen}
-        onOpenChange={setDialogOpen}
+        onOpenChange={(open) => {
+          setDialogOpen(open);
+          if (!open) {
+            setEditingTeacher(null);
+            setFormData(emptyFormData);
+          }
+        }}
         editingTeacher={editingTeacher}
         formData={formData}
         setFormData={setFormData}
         submitting={submitting}
         onSubmit={handleSubmit}
+        isFormValid={isFormValid}
       />
     </div>
   );

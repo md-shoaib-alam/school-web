@@ -2,20 +2,22 @@ export interface TeacherInfo {
   id: string;
   name: string;
   email: string;
-  phone: string | null;
-  qualification: string | null;
-  experience: string | null;
+  phone?: string;
+  qualification?: string;
+  experience?: string;
   subjects?: string[];
   classes?: string[];
-  isActive: boolean;
-  createdAt: string;
 }
 
-export interface TeacherFormData {
-  name: string;
-  email: string;
-  phone: string;
-  qualification: string;
-  experience: string;
-  password?: string;
-}
+export const avatarColors = [
+  "bg-emerald-500",
+  "bg-teal-500",
+  "bg-cyan-500",
+  "bg-blue-500",
+  "bg-violet-500",
+  "bg-purple-500",
+  "bg-rose-500",
+  "bg-amber-500",
+  "bg-orange-500",
+  "bg-lime-500",
+];

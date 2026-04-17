@@ -1,19 +1,8 @@
 "use client";
 
-import { useState, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Checkbox } from "@/components/ui/checkbox";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-  DialogFooter,
-} from "@/components/ui/dialog";
 import {
   Select,
   SelectContent,
@@ -21,21 +10,27 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { Loader2, GraduationCap, Zap, Users, AlertTriangle, ArrowRight } from "lucide-react";
-import { PromotionFormData, ClassOption, StudentOption, getCurrentAcademicYear, PromotionRecord } from "./types";
-
-/* ── Individual Promotion Dialog ── */
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from "@/components/ui/dialog";
+import { Loader2, Zap, AlertTriangle, GraduationCap } from "lucide-react";
+import { ClassOption, StudentOption, PromotionFormData, PromotionRecord } from "./types";
+import { isLastClass } from "./utils";
 
 interface NewPromotionDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   form: PromotionFormData;
   setForm: (form: PromotionFormData) => void;
-  classes: ClassOption[];
   students: StudentOption[];
+  classes: ClassOption[];
   submitting: boolean;
-  onSubmit: () => void;
+  handleCreatePromotion: () => void;
+  handleStudentChange: (studentId: string) => void;
 }
 
 export function NewPromotionDialog({
@@ -43,338 +38,349 @@ export function NewPromotionDialog({
   onOpenChange,
   form,
   setForm,
-  classes,
   students,
+  classes,
   submitting,
-  onSubmit,
+  handleCreatePromotion,
+  handleStudentChange,
 }: NewPromotionDialogProps) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[425px]">
+      <DialogContent className="sm:max-w-lg">
         <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
-            <Zap className="h-5 w-5 text-emerald-600" />
-            Individual Student Promotion
-          </DialogTitle>
+          <DialogTitle>New Promotion</DialogTitle>
           <DialogDescription>
-            Request a promotion for a specific student to a higher class.
+            Create a promotion request for a single student. The student will be
+            moved to the target class once approved.
           </DialogDescription>
         </DialogHeader>
-
-        <div className="grid gap-4 py-4">
-          <div className="space-y-2">
-            <Label>Target Student *</Label>
-            <Select value={form.studentId} onValueChange={(v) => {
-              const s = students.find(x => x.id === v);
-              setForm({ ...form, studentId: v, fromClassId: s?.classId || '' });
-            }}>
+        <div className="grid gap-4 py-2">
+          <div className="grid gap-2">
+            <label className="text-sm font-medium">Student *</label>
+            <Select value={form.studentId} onValueChange={handleStudentChange}>
               <SelectTrigger>
                 <SelectValue placeholder="Select student" />
               </SelectTrigger>
               <SelectContent>
-                {students.map(s => (
-                  <SelectItem key={s.id} value={s.id}>{s.name} ({s.className})</SelectItem>
+                {students.map((s) => (
+                  <SelectItem key={s.id} value={s.id}>
+                    {s.name} — Roll #{s.rollNumber} ({s.className})
+                  </SelectItem>
                 ))}
               </SelectContent>
             </Select>
           </div>
-
           <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label>Promote To *</Label>
-              <Select value={form.toClassId} onValueChange={(v) => setForm({ ...form, toClassId: v })}>
+            <div className="grid gap-2">
+              <label className="text-sm font-medium">From Class *</label>
+              <Select
+                value={form.fromClassId}
+                onValueChange={(v) => setForm({ ...form, fromClassId: v })}
+                disabled
+              >
                 <SelectTrigger>
-                  <SelectValue placeholder="Target class" />
+                  <SelectValue placeholder="Auto-filled" />
                 </SelectTrigger>
                 <SelectContent>
-                  {classes.map(c => (
-                    <SelectItem key={c.id} value={c.id}>{c.name}-{c.section}</SelectItem>
+                  {classes.map((c) => (
+                    <SelectItem key={c.id} value={c.id}>
+                      {c.name}-{c.section}
+                    </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
             </div>
-            <div className="space-y-2">
-              <Label>Academic Year *</Label>
-              <Input
-                placeholder="e.g. 2024-2025"
-                value={form.academicYear}
-                onChange={(e) => setForm({ ...form, academicYear: e.target.value })}
-              />
+            <div className="grid gap-2">
+              <label className="text-sm font-medium">To Class *</label>
+              <Select
+                value={form.toClassId}
+                onValueChange={(v) => setForm({ ...form, toClassId: v })}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select class" />
+                </SelectTrigger>
+                <SelectContent>
+                  {classes
+                    .filter((c) => c.id !== form.fromClassId)
+                    .map((c) => (
+                      <SelectItem key={c.id} value={c.id}>
+                        {c.name}-{c.section} (Grade {c.grade})
+                      </SelectItem>
+                    ))}
+                </SelectContent>
+              </Select>
             </div>
           </div>
-
-          <div className="space-y-2">
-            <Label>Remarks (Optional)</Label>
+          <div className="grid gap-2">
+            <label className="text-sm font-medium">Academic Year *</label>
+            <Input
+              placeholder="e.g. 2025-2026"
+              value={form.academicYear}
+              onChange={(e) =>
+                setForm({ ...form, academicYear: e.target.value })
+              }
+            />
+          </div>
+          <div className="grid gap-2">
+            <label className="text-sm font-medium">Remarks</label>
             <Textarea
-              placeholder="Reason for promotion..."
+              placeholder="Optional remarks..."
               value={form.remarks}
               onChange={(e) => setForm({ ...form, remarks: e.target.value })}
+              rows={3}
             />
           </div>
         </div>
-
-        <DialogFooter>
-          <Button variant="outline" onClick={() => onOpenChange(false)} disabled={submitting}>Cancel</Button>
+        <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
+          <Button variant="outline" onClick={() => onOpenChange(false)}>
+            Cancel
+          </Button>
           <Button
             className="bg-emerald-600 hover:bg-emerald-700 text-white"
-            onClick={onSubmit}
-            disabled={submitting}
+            onClick={handleCreatePromotion}
+            disabled={
+              submitting ||
+              !form.studentId ||
+              !form.fromClassId ||
+              !form.toClassId ||
+              !form.academicYear
+            }
           >
-            {submitting ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : 'Request Promotion'}
+            {submitting ? (
+              <>
+                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                Submitting...
+              </>
+            ) : (
+              "Submit Promotion"
+            )}
           </Button>
-        </DialogFooter>
+        </div>
       </DialogContent>
     </Dialog>
   );
 }
 
-/* ── Bulk Promotion Dialog ── */
-
 interface BulkPromotionDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   classes: ClassOption[];
-  onBulkPromote: (fromClassId: string, toClassId: string, academicYear: string, remarks: string) => void;
-  submitting: boolean;
+  bulkFromClass: string;
+  handleBulkFromClassChange: (classId: string) => void;
+  bulkToClass: string;
+  setBulkToClass: (classId: string) => void;
+  bulkAcademicYear: string;
+  setBulkAcademicYear: (year: string) => void;
+  bulkRemarks: string;
+  setBulkRemarks: (remarks: string) => void;
+  bulkPreview: StudentOption[];
+  handleBulkPromote: () => void;
+  bulkSubmitting: boolean;
 }
 
 export function BulkPromotionDialog({
   open,
   onOpenChange,
   classes,
-  onBulkPromote,
-  submitting,
+  bulkFromClass,
+  handleBulkFromClassChange,
+  bulkToClass,
+  setBulkToClass,
+  bulkAcademicYear,
+  setBulkAcademicYear,
+  bulkRemarks,
+  setBulkRemarks,
+  bulkPreview,
+  handleBulkPromote,
+  bulkSubmitting,
 }: BulkPromotionDialogProps) {
-  const [fromClass, setFromClass] = useState('');
-  const [toClass, setToClass] = useState('');
-  const [academicYear, setAcademicYear] = useState(getCurrentAcademicYear());
-  const [remarks, setRemarks] = useState('');
-
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[425px]">
+      <DialogContent className="sm:max-w-lg">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
-            <Users className="h-5 w-5 text-emerald-600" />
-            Bulk Class Promotion
+            <Zap className="h-5 w-5 text-amber-500" />
+            Bulk Promotion
           </DialogTitle>
           <DialogDescription>
-            Promote all eligible students from one class to another.
+            All students in the selected class will be promoted to the next
+            class in one go.
           </DialogDescription>
         </DialogHeader>
-
-        <div className="grid gap-4 py-4">
+        <div className="grid gap-4 py-2">
           <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label>Source Class *</Label>
-              <Select value={fromClass} onValueChange={setFromClass}>
-                <SelectTrigger><SelectValue placeholder="From" /></SelectTrigger>
+            <div className="grid gap-2">
+              <label className="text-sm font-medium">From Class *</label>
+              <Select
+                value={bulkFromClass}
+                onValueChange={handleBulkFromClassChange}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Current class" />
+                </SelectTrigger>
                 <SelectContent>
-                  {classes.map(c => <SelectItem key={c.id} value={c.id}>{c.name}-{c.section}</SelectItem>)}
+                  {classes
+                    .sort(
+                      (a, b) =>
+                        (parseInt(a.grade) || 0) - (parseInt(b.grade) || 0),
+                    )
+                    .map((c) => (
+                      <SelectItem key={c.id} value={c.id}>
+                        {c.name}-{c.section} (Grade {c.grade})
+                      </SelectItem>
+                    ))}
                 </SelectContent>
               </Select>
             </div>
-            <div className="space-y-2">
-              <Label>Target Class *</Label>
-              <Select value={toClass} onValueChange={setToClass}>
-                <SelectTrigger><SelectValue placeholder="To" /></SelectTrigger>
+            <div className="grid gap-2">
+              <label className="text-sm font-medium">To Class *</label>
+              <Select value={bulkToClass} onValueChange={setBulkToClass}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Auto-detected" />
+                </SelectTrigger>
                 <SelectContent>
-                  {classes.map(c => <SelectItem key={c.id} value={c.id}>{c.name}-{c.section}</SelectItem>)}
+                  {classes
+                    .filter((c) => c.id !== bulkFromClass)
+                    .sort(
+                      (a, b) =>
+                        (parseInt(a.grade) || 0) - (parseInt(b.grade) || 0),
+                    )
+                    .map((c) => (
+                      <SelectItem key={c.id} value={c.id}>
+                        {c.name}-{c.section} (Grade {c.grade})
+                      </SelectItem>
+                    ))}
                 </SelectContent>
               </Select>
             </div>
           </div>
-          <div className="space-y-2">
-            <Label>Academic Year *</Label>
-            <Input value={academicYear} onChange={(e) => setAcademicYear(e.target.value)} />
+          <div className="grid gap-2">
+            <label className="text-sm font-medium">Academic Year *</label>
+            <Input
+              value={bulkAcademicYear}
+              onChange={(e) => setBulkAcademicYear(e.target.value)}
+            />
           </div>
-          <div className="space-y-2">
-            <Label>Promotion Notes</Label>
-            <Textarea value={remarks} onChange={(e) => setRemarks(e.target.value)} placeholder="e.g. End of term promotion" />
+          <div className="grid gap-2">
+            <label className="text-sm font-medium">Remarks</label>
+            <Textarea
+              value={bulkRemarks}
+              onChange={(e) => setBulkRemarks(e.target.value)}
+              placeholder="Optional..."
+              rows={2}
+            />
           </div>
+          {bulkFromClass && isLastClass(bulkFromClass, classes) && (
+            <div className="flex items-center gap-2 text-sm text-violet-600 dark:text-violet-400 bg-violet-50 dark:bg-violet-900/20 rounded-lg px-3 py-2 border border-violet-200 dark:border-violet-800">
+              <GraduationCap className="h-4 w-4 shrink-0" />
+              <span>
+                This is the highest class. Consider using{" "}
+                <strong>Graduate</strong> instead.
+              </span>
+            </div>
+          )}
+          {bulkPreview.length > 0 && (
+            <p className="text-sm text-muted-foreground">
+              {bulkPreview.length} student(s) will be promoted
+            </p>
+          )}
         </div>
-
-        <DialogFooter>
-          <Button variant="outline" onClick={() => onOpenChange(false)}>Cancel</Button>
-          <Button
-            className="bg-emerald-600 hover:bg-emerald-700 text-white"
-            onClick={() => onBulkPromote(fromClass, toClass, academicYear, remarks)}
-            disabled={submitting || !fromClass || !toClass}
-          >
-            {submitting ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : 'Promote Whole Class'}
+        <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
+          <Button variant="outline" onClick={() => onOpenChange(false)}>
+            Cancel
           </Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
-  );
-}
-
-/* ── Graduation Dialog ── */
-
-interface GraduationDialogProps {
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
-  classes: ClassOption[];
-  students: StudentOption[];
-  onGraduate: (classId: string, studentIds: string[], academicYear: string, remarks: string) => void;
-  submitting: boolean;
-}
-
-export function GraduationDialog({
-  open,
-  onOpenChange,
-  classes,
-  students,
-  onGraduate,
-  submitting,
-}: GraduationDialogProps) {
-  const [classId, setClassId] = useState('');
-  const [academicYear, setAcademicYear] = useState(getCurrentAcademicYear());
-  const [remarks, setRemarks] = useState('');
-  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
-
-  const filteredStudents = useMemo(() => students.filter(s => s.classId === classId), [students, classId]);
-
-  const toggleAll = () => {
-    if (selectedIds.size === filteredStudents.length) setSelectedIds(new Set());
-    else setSelectedIds(new Set(filteredStudents.map(s => s.id)));
-  };
-
-  const toggleOne = (id: string) => {
-    const next = new Set(selectedIds);
-    if (next.has(id)) next.delete(id);
-    else next.add(id);
-    setSelectedIds(next);
-  };
-
-  return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[550px] max-h-[90vh] flex flex-col p-0 overflow-hidden">
-        <DialogHeader className="p-6 pb-2">
-          <DialogTitle className="flex items-center gap-2">
-            <GraduationCap className="h-6 w-6 text-violet-600" />
-            Mass Graduation
-          </DialogTitle>
-          <DialogDescription>
-            Graduate students from the final grade and remove them from active rolls.
-          </DialogDescription>
-        </DialogHeader>
-
-        <ScrollArea className="flex-1 p-6 pt-2">
-          <div className="space-y-6">
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label>Select Graduation Class *</Label>
-                <Select value={classId} onValueChange={(v) => { setClassId(v); setSelectedIds(new Set()); }}>
-                  <SelectTrigger><SelectValue placeholder="Final Class" /></SelectTrigger>
-                  <SelectContent>
-                    {classes.map(c => <SelectItem key={c.id} value={c.id}>{c.name}-{c.section}</SelectItem>)}
-                  </SelectContent>
-                </Select>
-              </div>
-              <div className="space-y-2">
-                <Label>Academic Year *</Label>
-                <Input value={academicYear} onChange={(e) => setAcademicYear(e.target.value)} />
-              </div>
-            </div>
-
-            {classId && (
-              <div className="space-y-3">
-                <div className="flex items-center justify-between">
-                  <Label className="text-xs font-bold uppercase tracking-widest text-gray-500">
-                    Students to Graduate ({selectedIds.size})
-                  </Label>
-                  <Button variant="ghost" size="sm" className="h-7 text-[10px]" onClick={toggleAll}>
-                    {selectedIds.size === filteredStudents.length ? 'Deselect All' : 'Select All'}
-                  </Button>
-                </div>
-                <div className="border rounded-lg divide-y bg-gray-50/50 dark:bg-gray-900/50">
-                  {filteredStudents.length > 0 ? (
-                    filteredStudents.map(s => (
-                      <div key={s.id} className="p-3 flex items-center gap-3">
-                        <Checkbox checked={selectedIds.has(s.id)} onCheckedChange={() => toggleOne(s.id)} />
-                        <div className="flex-1 min-w-0">
-                          <p className="text-sm font-medium truncate">{s.name}</p>
-                          <p className="text-[10px] text-gray-500">Roll: {s.rollNumber}</p>
-                        </div>
-                      </div>
-                    ))
-                  ) : (
-                    <div className="p-8 text-center text-xs text-gray-500">No students found in this class</div>
-                  )}
-                </div>
-              </div>
+          <Button
+            className="bg-amber-600 hover:bg-amber-700 text-white"
+            onClick={handleBulkPromote}
+            disabled={
+              bulkSubmitting ||
+              !bulkFromClass ||
+              !bulkToClass ||
+              !bulkAcademicYear ||
+              bulkPreview.length === 0
+            }
+          >
+            {bulkSubmitting ? (
+              <>
+                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                Creating...
+              </>
+            ) : (
+              `Promote ${bulkPreview.length} Students`
             )}
-
-            <div className="space-y-2">
-              <Label>Graduation Remarks</Label>
-              <Textarea value={remarks} onChange={(e) => setRemarks(e.target.value)} placeholder="e.g. Completed Grade 12" />
-            </div>
-          </div>
-        </ScrollArea>
-
-        <DialogFooter className="p-6 border-t bg-gray-50/50 dark:bg-gray-900/50">
-          <Button variant="outline" onClick={() => onOpenChange(false)}>Cancel</Button>
-          <Button
-            className="bg-violet-600 hover:bg-violet-700 text-white"
-            onClick={() => onGraduate(classId, Array.from(selectedIds), academicYear, remarks)}
-            disabled={submitting || selectedIds.size === 0}
-          >
-            {submitting ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : `Graduate ${selectedIds.size} Students`}
           </Button>
-        </DialogFooter>
+        </div>
       </DialogContent>
     </Dialog>
   );
 }
 
-/* ── Reject Confirmation Dialog ── */
-
-interface RejectDialogProps {
+interface RejectPromotionDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  promotion: PromotionRecord | null;
-  remarks: string;
-  setRemarks: (r: string) => void;
-  onReject: () => void;
-  submitting: boolean;
+  rejectingPromotion: PromotionRecord | null;
+  rejectRemarks: string;
+  setRejectRemarks: (remarks: string) => void;
+  handleReject: () => void;
+  rejecting: boolean;
 }
 
-export function RejectDialog({
+export function RejectPromotionDialog({
   open,
   onOpenChange,
-  promotion,
-  remarks,
-  setRemarks,
-  onReject,
-  submitting,
-}: RejectDialogProps) {
+  rejectingPromotion,
+  rejectRemarks,
+  setRejectRemarks,
+  handleReject,
+  rejecting,
+}: RejectPromotionDialogProps) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[425px]">
+      <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle className="flex items-center gap-2 text-red-600">
-            <AlertTriangle className="h-5 w-5" />
-            Reject Promotion Request
+          <DialogTitle className="flex items-center gap-2">
+            <AlertTriangle className="h-5 w-5 text-red-500" />
+            Reject Promotion
           </DialogTitle>
           <DialogDescription>
-            Are you sure you want to reject the promotion for <strong>{promotion?.studentName}</strong>?
+            Are you sure you want to reject the promotion for{" "}
+            <span className="font-semibold text-foreground">
+              {rejectingPromotion?.studentName}
+            </span>{" "}
+            from {rejectingPromotion?.fromClassName} to{" "}
+            {rejectingPromotion?.toClassName}?
           </DialogDescription>
         </DialogHeader>
-        <div className="py-4 space-y-2">
-          <Label>Reason for Rejection *</Label>
+        <div className="grid gap-2 py-2">
+          <label className="text-sm font-medium">
+            Reason for rejection (optional)
+          </label>
           <Textarea
-            placeholder="Please provide a reason..."
-            value={remarks}
-            onChange={(e) => setRemarks(e.target.value)}
+            placeholder="Provide reason..."
+            value={rejectRemarks}
+            onChange={(e) => setRejectRemarks(e.target.value)}
+            rows={3}
           />
         </div>
-        <DialogFooter>
-          <Button variant="outline" onClick={() => onOpenChange(false)}>Cancel</Button>
-          <Button className="bg-red-600 hover:bg-red-700 text-white" onClick={onReject} disabled={submitting || !remarks}>
-            {submitting ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : 'Confirm Reject'}
+        <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
+          <Button variant="outline" onClick={() => onOpenChange(false)}>
+            Cancel
           </Button>
-        </DialogFooter>
+          <Button
+            className="bg-red-600 hover:bg-red-700 text-white"
+            onClick={handleReject}
+            disabled={rejecting}
+          >
+            {rejecting ? (
+              <>
+                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                Rejecting...
+              </>
+            ) : (
+              "Confirm Reject"
+            )}
+          </Button>
+        </div>
       </DialogContent>
     </Dialog>
   );

@@ -1,9 +1,8 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import {
   Select,
   SelectContent,
@@ -11,102 +10,115 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Plus, Search, GraduationCap, Zap, Users, RotateCcw } from "lucide-react";
+import {
+  ArrowRight,
+  CheckCircle2,
+  Clock,
+  Plus,
+  Users,
+  GraduationCap,
+  Zap,
+} from "lucide-react";
 import { goeyToast as toast } from "goey-toast";
 import { apiFetch } from "@/lib/api";
 
-// Sub-components
-import { PromotionTable } from "./promotions/PromotionTable";
-import { PromotionSkeleton } from "./promotions/PromotionSkeleton";
-import {
-  NewPromotionDialog,
-  BulkPromotionDialog,
-  GraduationDialog,
-  RejectDialog,
-} from "./promotions/PromotionDialogs";
-
-// Types
 import {
   PromotionRecord,
   ClassOption,
   StudentOption,
   PromotionFormData,
-  getCurrentAcademicYear,
+  emptyForm,
 } from "./promotions/types";
-
-const emptyForm: PromotionFormData = {
-  studentId: "",
-  fromClassId: "",
-  toClassId: "",
-  academicYear: "",
-  remarks: "",
-};
+import { getCurrentAcademicYear, getNextClass } from "./promotions/utils";
+import { PromotionsTable } from "./promotions/PromotionsTable";
+import { BulkPromoteTab } from "./promotions/BulkPromoteTab";
+import { GraduatedTab } from "./promotions/GraduatedTab";
+import {
+  NewPromotionDialog,
+  BulkPromotionDialog,
+  RejectPromotionDialog,
+} from "./promotions/PromotionDialogs";
 
 export function AdminPromotions() {
-  const [activeTab, setActiveTab] = useState<"individual" | "bulk" | "graduated">("individual");
+  const [activeTab, setActiveTab] = useState<
+    "individual" | "bulk" | "graduated"
+  >("individual");
 
-  // Data states
+  // Data
   const [promotions, setPromotions] = useState<PromotionRecord[]>([]);
   const [graduations, setGraduations] = useState<PromotionRecord[]>([]);
   const [classes, setClasses] = useState<ClassOption[]>([]);
   const [students, setStudents] = useState<StudentOption[]>([]);
   const [loading, setLoading] = useState(true);
 
-  // Filter states
+  // Filters
   const [academicYearFilter, setAcademicYearFilter] = useState("all");
   const [classFilter, setClassFilter] = useState("all");
   const [statusFilter, setStatusFilter] = useState("all");
-  const [search, setSearch] = useState("");
 
-  // Dialog states
+  // Individual promotion dialog
   const [dialogOpen, setDialogOpen] = useState(false);
-  const [form, setForm] = useState<PromotionFormData>({ ...emptyForm, academicYear: getCurrentAcademicYear() });
+  const [form, setForm] = useState<PromotionFormData>({ ...emptyForm });
   const [submitting, setSubmitting] = useState(false);
 
+  // Bulk promote dialog
   const [bulkDialogOpen, setBulkDialogOpen] = useState(false);
+  const [bulkFromClass, setBulkFromClass] = useState("");
+  const [bulkToClass, setBulkToClass] = useState("");
+  const [bulkAcademicYear, setBulkAcademicYear] = useState(
+    getCurrentAcademicYear(),
+  );
+  const [bulkRemarks, setBulkRemarks] = useState("");
   const [bulkSubmitting, setBulkSubmitting] = useState(false);
 
-  const [gradDialogOpen, setGradDialogOpen] = useState(false);
+  // Graduation dialog
+  const [gradClassId, setGradClassId] = useState("");
+  const [gradAcademicYear, setGradAcademicYear] = useState(
+    getCurrentAcademicYear(),
+  );
+  const [gradRemarks, setGradRemarks] = useState("");
+  const [gradSelectedIds, setGradSelectedIds] = useState<Set<string>>(
+    new Set(),
+  );
   const [gradSubmitting, setGradSubmitting] = useState(false);
 
+  // Reject confirmation dialog
   const [rejectDialogOpen, setRejectDialogOpen] = useState(false);
-  const [rejectingPromotion, setRejectingPromotion] = useState<PromotionRecord | null>(null);
+  const [rejectingPromotion, setRejectingPromotion] =
+    useState<PromotionRecord | null>(null);
   const [rejectRemarks, setRejectRemarks] = useState("");
   const [rejecting, setRejecting] = useState(false);
 
+  // Approving state
   const [approvingId, setApprovingId] = useState<string | null>(null);
 
-  // --- Fetching ---
+  /* ---- Fetch helpers ---- */
 
-  const fetchPromotions = useCallback(async (showLoading = false) => {
-    if (showLoading) setLoading(true);
+  const fetchPromotions = useCallback(async () => {
     try {
       const params = new URLSearchParams({ type: "promotion" });
-      if (academicYearFilter !== "all") params.set("academicYear", academicYearFilter);
-      if (classFilter !== "all") params.set("classId", classFilter);
-      if (statusFilter !== "all") params.set("status", statusFilter);
-
+      if (academicYearFilter && academicYearFilter !== "all")
+        params.set("academicYear", academicYearFilter);
+      if (classFilter && classFilter !== "all")
+        params.set("classId", classFilter);
+      if (statusFilter && statusFilter !== "all")
+        params.set("status", statusFilter);
       const res = await apiFetch(`/api/promotions?${params.toString()}`);
       if (res.ok) setPromotions(await res.json());
-    } catch (err) {
-      toast.error("Failed to load promotions");
-    } finally {
-      if (showLoading) setLoading(false);
+    } catch {
+      /* silent */
     }
   }, [academicYearFilter, classFilter, statusFilter]);
 
-  const fetchGraduations = useCallback(async (showLoading = false) => {
-    if (showLoading) setLoading(true);
+  const fetchGraduations = useCallback(async () => {
     try {
       const params = new URLSearchParams({ type: "graduation" });
-      if (academicYearFilter !== "all") params.set("academicYear", academicYearFilter);
-
+      if (academicYearFilter && academicYearFilter !== "all")
+        params.set("academicYear", academicYearFilter);
       const res = await apiFetch(`/api/promotions?${params.toString()}`);
       if (res.ok) setGraduations(await res.json());
-    } catch (err) {
-      toast.error("Failed to load graduations");
-    } finally {
-      if (showLoading) setLoading(false);
+    } catch {
+      /* silent */
     }
   }, [academicYearFilter]);
 
@@ -114,123 +126,321 @@ export function AdminPromotions() {
     try {
       const [classesRes, studentsRes] = await Promise.all([
         apiFetch("/api/classes"),
-        apiFetch("/api/students?limit=1000"),
+        apiFetch("/api/students"),
       ]);
       if (classesRes.ok) setClasses(await classesRes.json());
       if (studentsRes.ok) {
         const data = await studentsRes.json();
         setStudents(
-          (data.items || []).map((s: any) => ({
-            id: s.id,
-            name: s.name,
-            rollNumber: s.rollNumber || "N/A",
-            className: s.class ? `${s.class.name}-${s.class.section}` : "Unassigned",
-            classId: s.classId,
-          }))
+          data.map(
+            (s: {
+              id: string;
+              name: string;
+              rollNumber: string;
+              className: string;
+              classId: string;
+              status?: string;
+            }) => ({
+              id: s.id,
+              name: s.name,
+              rollNumber: s.rollNumber,
+              className: s.className,
+              classId: s.classId,
+            }),
+          ),
         );
       }
-    } catch (err) {
-      console.error("Failed to fetch classes/students:", err);
+    } catch {
+      /* silent */
     }
   }, []);
 
+  // Fetch graduations: include in init and on tab change
   useEffect(() => {
-    setLoading(true);
-    Promise.all([fetchPromotions(), fetchGraduations(), fetchClassesAndStudents()]).finally(() => setLoading(false));
+    async function init() {
+      setLoading(true);
+      await Promise.all([
+        fetchPromotions(),
+        fetchGraduations(),
+        fetchClassesAndStudents(),
+      ]);
+      setLoading(false);
+    }
+    init();
   }, [fetchPromotions, fetchGraduations, fetchClassesAndStudents]);
 
-  // --- Handlers ---
+  /* ---- Derived data ---- */
 
-  const handleSubmitPromotion = async () => {
-    if (!form.studentId || !form.toClassId || !form.academicYear) {
-      toast.error("Please fill in required fields");
+  const academicYears = Array.from(
+    new Set([
+      ...promotions.map((p) => p.academicYear),
+      ...graduations.map((g) => g.academicYear),
+    ]),
+  ).sort();
+
+  const summary = {
+    total: promotions.length,
+    pending: promotions.filter((p) => p.status === "pending").length,
+    approved: promotions.filter((p) => p.status === "approved").length,
+    graduated: graduations.length,
+  };
+
+  /* ---- Handlers ---- */
+
+  // Individual promotion
+  const handleStudentChange = (studentId: string) => {
+    const student = students.find((s) => s.id === studentId);
+    if (student) {
+      setForm({
+        ...form,
+        studentId,
+        fromClassId: student.classId,
+        toClassId: "",
+      });
+    }
+  };
+
+  const handleCreatePromotion = async () => {
+    if (
+      !form.studentId ||
+      !form.fromClassId ||
+      !form.toClassId ||
+      !form.academicYear
+    ) {
+      toast.error("Validation Error", {
+        description: "Please fill all required fields",
+      });
       return;
     }
+
     setSubmitting(true);
-    try {
+    const promise = (async () => {
       const res = await apiFetch("/api/promotions", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(form),
+        body: JSON.stringify({
+          studentId: form.studentId,
+          fromClassId: form.fromClassId,
+          toClassId: form.toClassId,
+          academicYear: form.academicYear,
+          remarks: form.remarks || undefined,
+        }),
       });
-      if (res.ok) {
-        toast.success("Promotion request created");
-        setDialogOpen(false);
-        fetchPromotions();
-      } else {
-        const err = await res.json();
-        toast.error(err.message || "Failed to create promotion");
+
+      if (!res.ok) {
+        const data = await res.json();
+        throw new Error(data.error || "Failed to create promotion");
       }
-    } catch (err) {
-      toast.error("An error occurred");
-    } finally {
-      setSubmitting(false);
+
+      setDialogOpen(false);
+      setForm({ ...emptyForm });
+      await fetchPromotions();
+    })();
+
+    toast.promise(promise, {
+      loading: "Creating promotion request...",
+      success: "Promotion request created successfully",
+      error: (err: any) => err.message || "Error creating promotion",
+    });
+
+    try {
+      await promise;
+    } catch {
+      /* handled by toast */
     }
+    setSubmitting(false);
   };
 
-  const handleBulkPromote = async (fromClass: string, toClass: string, year: string, remarks: string) => {
+  // Bulk promote preview
+  const openBulkDialog = () => {
+    setBulkFromClass("");
+    setBulkToClass("");
+    setBulkAcademicYear(getCurrentAcademicYear());
+    setBulkRemarks("");
+    setBulkDialogOpen(true);
+  };
+
+  // Compute bulk preview as derived state
+  const bulkPreview = bulkFromClass
+    ? students.filter((s) => s.classId === bulkFromClass)
+    : [];
+
+  // Handle bulk from class change with auto-detect
+  const handleBulkFromClassChange = (classId: string) => {
+    setBulkFromClass(classId);
+    const autoTo = classId ? getNextClass(classId, classes) : null;
+    setBulkToClass(autoTo ? autoTo.id : "");
+  };
+
+  const handleBulkPromote = async () => {
+    if (!bulkFromClass || !bulkToClass || !bulkAcademicYear) {
+      toast.error("Validation Error", {
+        description: "Please fill all required fields",
+      });
+      return;
+    }
+    if (bulkPreview.length === 0) {
+      toast.error("Validation Error", {
+        description: "No students found in the selected class",
+      });
+      return;
+    }
+
     setBulkSubmitting(true);
-    try {
-      const res = await apiFetch("/api/promotions/bulk", {
+    const promise = (async () => {
+      const res = await apiFetch("/api/promotions", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ fromClassId: fromClass, toClassId: toClass, academicYear: year, remarks }),
+        body: JSON.stringify({
+          bulk: true,
+          fromClassId: bulkFromClass,
+          toClassId: bulkToClass,
+          academicYear: bulkAcademicYear,
+          remarks: bulkRemarks || undefined,
+        }),
       });
-      if (res.ok) {
-        toast.success("Bulk promotion processed successfully");
-        setBulkDialogOpen(false);
-        fetchPromotions();
-      } else {
-        toast.error("Bulk promotion failed");
+
+      if (!res.ok) {
+        const data = await res.json();
+        throw new Error(data.error || "Bulk promotion failed");
       }
-    } catch (err) {
-      toast.error("An error occurred");
-    } finally {
-      setBulkSubmitting(false);
+
+      const data = await res.json();
+      setBulkDialogOpen(false);
+      await Promise.all([fetchPromotions(), fetchClassesAndStudents()]);
+      return data;
+    })();
+
+    toast.promise(promise, {
+      loading: "Bulk promoting students...",
+      success: (data: any) =>
+        `${data.created} promotion(s) created successfully`,
+      error: (err: any) => err.message || "Error during bulk promotion",
+    });
+
+    try {
+      await promise;
+    } catch {
+      /* handled by toast */
     }
+    setBulkSubmitting(false);
   };
 
-  const handleGraduate = async (classId: string, studentIds: string[], year: string, remarks: string) => {
+  // Graduation
+  const openGradDialog = () => {
+    setGradClassId("");
+    setGradAcademicYear(getCurrentAcademicYear());
+    setGradRemarks("");
+    setGradSelectedIds(new Set());
+    setActiveTab("graduated");
+  };
+
+  // Compute grad preview as derived state
+  const gradPreview = gradClassId
+    ? students.filter((s) => s.classId === gradClassId)
+    : [];
+
+  // Handle grad class change — select all by default
+  const handleGradClassChange = (classId: string) => {
+    setGradClassId(classId);
+    const previewStudents = classId
+      ? students.filter((s) => s.classId === classId)
+      : [];
+    setGradSelectedIds(new Set(previewStudents.map((s) => s.id)));
+  };
+
+  const toggleGradStudent = (id: string) => {
+    setGradSelectedIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  };
+
+  const handleGraduate = async () => {
+    if (!gradClassId || !gradAcademicYear) {
+      toast.error("Validation Error", {
+        description: "Please fill all required fields",
+      });
+      return;
+    }
+    if (gradSelectedIds.size === 0) {
+      toast.error("Validation Error", {
+        description: "No students selected for graduation",
+      });
+      return;
+    }
+
     setGradSubmitting(true);
-    try {
-      const res = await apiFetch("/api/promotions/graduate", {
+    const promise = (async () => {
+      const body: Record<string, unknown> = {
+        graduation: true,
+        fromClassId: gradClassId,
+        academicYear: gradAcademicYear,
+        remarks: gradRemarks || undefined,
+        studentIds: Array.from(gradSelectedIds),
+      };
+      const res = await apiFetch("/api/promotions", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ classId, studentIds, academicYear: year, remarks }),
+        body: JSON.stringify(body),
       });
-      if (res.ok) {
-        toast.success("Graduation processed successfully");
-        setGradDialogOpen(false);
-        fetchGraduations();
-      } else {
-        toast.error("Graduation failed");
+
+      if (!res.ok) {
+        const data = await res.json();
+        throw new Error(data.error || "Graduation failed");
       }
-    } catch (err) {
-      toast.error("An error occurred");
-    } finally {
-      setGradSubmitting(false);
+
+      await Promise.all([fetchClassesAndStudents(), fetchGraduations()]);
+    })();
+
+    toast.promise(promise, {
+      loading: "Graduating students...",
+      success: "Students graduated successfully",
+      error: (err: any) => err.message || "Error during graduation",
+    });
+
+    try {
+      await promise;
+    } catch {
+      /* handled by toast */
     }
+    setGradSubmitting(false);
   };
 
-  const handleApprove = async (id: string) => {
-    setApprovingId(id);
-    try {
+  // Approve / Reject
+  const handleApprove = async (promotion: PromotionRecord) => {
+    setApprovingId(promotion.id);
+    const promise = (async () => {
       const res = await apiFetch("/api/promotions", {
         method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id, status: "approved" }),
+        body: JSON.stringify({ id: promotion.id, status: "approved" }),
       });
-      if (res.ok) {
-        toast.success("Promotion approved and student moved");
-        fetchPromotions();
-      } else {
-        toast.error("Approval failed");
+
+      if (!res.ok) {
+        const data = await res.json();
+        throw new Error(data.error || "Failed to approve promotion");
       }
-    } catch (err) {
-      toast.error("An error occurred");
-    } finally {
-      setApprovingId(null);
+
+      await Promise.all([fetchPromotions(), fetchClassesAndStudents()]);
+    })();
+
+    toast.promise(promise, {
+      loading: `Approving promotion for ${promotion.studentName}...`,
+      success: "Promotion approved successfully",
+      error: (err: any) => err.message || "Error approving promotion",
+    });
+
+    try {
+      await promise;
+    } catch {
+      /* handled by toast */
     }
+    setApprovingId(null);
+  };
+
+  const openRejectDialog = (promotion: PromotionRecord) => {
+    setRejectingPromotion(promotion);
+    setRejectRemarks("");
+    setRejectDialogOpen(true);
   };
 
   const handleReject = async () => {
@@ -239,188 +449,304 @@ export function AdminPromotions() {
     try {
       const res = await apiFetch("/api/promotions", {
         method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id: rejectingPromotion.id, status: "rejected", remarks: rejectRemarks }),
+        body: JSON.stringify({
+          id: rejectingPromotion.id,
+          status: "rejected",
+          remarks: rejectRemarks || undefined,
+        }),
       });
       if (res.ok) {
-        toast.success("Promotion rejected");
+        toast.success("Rejected", {
+          description: `Promotion for ${rejectingPromotion.studentName} rejected`,
+        });
         setRejectDialogOpen(false);
-        fetchPromotions();
+        setRejectingPromotion(null);
+        await fetchPromotions();
       } else {
-        toast.error("Rejection failed");
+        const data = await res.json();
+        toast.error("Error", {
+          description: data.error || "Failed to reject promotion",
+        });
       }
-    } catch (err) {
-      toast.error("An error occurred");
-    } finally {
-      setRejecting(false);
+    } catch {
+      toast.error("System Error", {
+        description: "Error rejecting promotion",
+      });
     }
+    setRejecting(false);
   };
 
-  // --- Derived ---
-  const filteredPromotions = promotions.filter(p =>
-    p.studentName.toLowerCase().includes(search.toLowerCase()) ||
-    p.fromClassName.toLowerCase().includes(search.toLowerCase()) ||
-    p.toClassName.toLowerCase().includes(search.toLowerCase())
-  );
+  /* ---- Render ---- */
 
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
-        <div className="flex items-center gap-3">
-          <div className="h-12 w-12 rounded-2xl bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center text-emerald-600 dark:text-emerald-400">
-            <Zap className="h-6 w-6" />
-          </div>
-          <div>
-            <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Student Promotions</h2>
-            <p className="text-sm text-gray-500 dark:text-gray-400">Manage academic progression and graduations</p>
-          </div>
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-bold tracking-tight">
+            Student Promotion
+          </h1>
+          <p className="text-sm text-muted-foreground mt-1">
+            Promote students to next class, bulk promote a whole class, or
+            graduate pass-out students.
+          </p>
         </div>
-
-        <div className="flex items-center gap-2">
-          <Button variant="outline" size="icon" onClick={() => { fetchPromotions(true); fetchGraduations(true); }} className="h-10 w-10">
-            <RotateCcw className="h-4 w-4" />
+        <div className="flex gap-2 shrink-0 flex-wrap">
+          <Button
+            variant="outline"
+            className="gap-2 border-violet-300 text-violet-700 hover:bg-violet-50 dark:border-violet-800 dark:text-violet-400 dark:hover:bg-violet-900/30"
+            onClick={openGradDialog}
+          >
+            <GraduationCap className="h-4 w-4" />
+            <span className="hidden sm:inline">Graduate</span>
           </Button>
-          <Button className="bg-emerald-600 hover:bg-emerald-700 text-white" onClick={() => setDialogOpen(true)}>
-            <Plus className="h-4 w-4 mr-2" /> Promote Student
+          <Button
+            className="gap-2 bg-amber-600 hover:bg-amber-700 text-white"
+            onClick={openBulkDialog}
+          >
+            <Zap className="h-4 w-4" />
+            <span className="hidden sm:inline">Bulk Promote</span>
           </Button>
-          <Button variant="secondary" onClick={() => setBulkDialogOpen(true)}>
-            <Users className="h-4 w-4 mr-2" /> Bulk Promote
-          </Button>
-          <Button variant="outline" className="text-violet-600 border-violet-200" onClick={() => setGradDialogOpen(true)}>
-            <GraduationCap className="h-4 w-4 mr-2" /> Mass Graduation
+          <Button
+            className="bg-emerald-600 hover:bg-emerald-700 text-white"
+            onClick={() => {
+              setForm({ ...emptyForm, academicYear: getCurrentAcademicYear() });
+              setDialogOpen(true);
+            }}
+          >
+            <Plus className="h-4 w-4" />
+            <span className="hidden sm:inline">New Promotion</span>
           </Button>
         </div>
       </div>
 
-      {/* Tabs & Search */}
-      <div className="flex flex-col md:flex-row gap-4 items-center justify-between">
-        <div className="flex p-1 bg-gray-100 dark:bg-gray-800 rounded-xl">
-          <button
-            onClick={() => setActiveTab('individual')}
-            className={`px-4 py-2 text-sm font-medium rounded-lg transition-all ${activeTab === 'individual' ? 'bg-white dark:bg-gray-900 shadow-sm text-emerald-600' : 'text-gray-500 hover:text-gray-700'}`}
+      {/* Summary Cards */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        {[
+          {
+            label: "Total Promotions",
+            value: summary.total,
+            icon: <Users className="h-5 w-5" />,
+            color:
+              "bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400",
+            border: "border-blue-200 dark:border-blue-800",
+          },
+          {
+            label: "Pending Review",
+            value: summary.pending,
+            icon: <Clock className="h-5 w-5" />,
+            color:
+              "bg-amber-100 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400",
+            border: "border-amber-200 dark:border-amber-800",
+          },
+          {
+            label: "Approved",
+            value: summary.approved,
+            icon: <CheckCircle2 className="h-5 w-5" />,
+            color:
+              "bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400",
+            border: "border-emerald-200 dark:border-emerald-800",
+          },
+          {
+            label: "Graduated",
+            value: summary.graduated,
+            icon: <GraduationCap className="h-5 w-5" />,
+            color:
+              "bg-violet-100 dark:bg-violet-900/30 text-violet-600 dark:text-violet-400",
+            border: "border-violet-200 dark:border-violet-800",
+          },
+        ].map((card) => (
+          <Card
+            key={card.label}
+            className={`hover:shadow-md transition-shadow border ${card.border}`}
           >
-            Promotions
-          </button>
-          <button
-            onClick={() => setActiveTab('graduated')}
-            className={`px-4 py-2 text-sm font-medium rounded-lg transition-all ${activeTab === 'graduated' ? 'bg-white dark:bg-gray-900 shadow-sm text-emerald-600' : 'text-gray-500 hover:text-gray-700'}`}
-          >
-            Graduations
-          </button>
-        </div>
-
-        <div className="relative w-full md:w-80">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
-          <Input
-            placeholder="Search by student or class..."
-            className="pl-9 bg-white dark:bg-gray-900"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-          />
-        </div>
+            <CardContent className="p-4 flex items-center gap-4">
+              <div
+                className={`h-12 w-12 rounded-xl flex items-center justify-center shrink-0 ${card.color}`}
+              >
+                {card.icon}
+              </div>
+              <div className="min-w-0">
+                <p className="text-xs text-muted-foreground truncate">
+                  {card.label}
+                </p>
+                <p className="text-2xl font-bold">{card.value}</p>
+              </div>
+            </CardContent>
+          </Card>
+        ))}
       </div>
 
-      {/* Filters */}
-      <Card className="border-none shadow-sm bg-gray-50/50 dark:bg-gray-900/20">
-        <CardContent className="p-4 flex flex-wrap gap-4">
-          <div className="space-y-1.5 flex-1 min-w-[200px]">
-            <Select value={academicYearFilter} onValueChange={setAcademicYearFilter}>
-              <SelectTrigger className="bg-white dark:bg-gray-900"><SelectValue placeholder="Academic Year" /></SelectTrigger>
+      {/* Tabs */}
+      <div className="flex gap-1 bg-muted/80 p-1 rounded-lg w-fit">
+        {[
+          {
+            key: "individual" as const,
+            label: "Promotions",
+            icon: <ArrowRight className="h-4 w-4" />,
+          },
+          {
+            key: "bulk" as const,
+            label: "Bulk Promote",
+            icon: <Zap className="h-4 w-4" />,
+          },
+          {
+            key: "graduated" as const,
+            label: "Graduated",
+            icon: <GraduationCap className="h-4 w-4" />,
+          },
+        ].map((tab) => (
+          <button
+            key={tab.key}
+            onClick={() => setActiveTab(tab.key)}
+            className={`
+              flex items-center gap-1.5 px-4 py-2 rounded-md text-sm font-medium transition-all
+              ${
+                activeTab === tab.key
+                  ? "bg-background text-foreground shadow-sm"
+                  : "text-muted-foreground hover:text-foreground"
+              }
+            `}
+          >
+            {tab.icon}
+            {tab.label}
+          </button>
+        ))}
+      </div>
+
+      {/* ═══════ INDIVIDUAL PROMOTIONS TAB ═══════ */}
+      {activeTab === "individual" && (
+        <>
+          {/* Filter Bar */}
+          <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center">
+            <Select
+              value={academicYearFilter}
+              onValueChange={setAcademicYearFilter}
+            >
+              <SelectTrigger className="w-full sm:w-44">
+                <SelectValue placeholder="Academic Year" />
+              </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">All Years</SelectItem>
-                <SelectItem value="2023-2024">2023-2024</SelectItem>
-                <SelectItem value="2024-2025">2024-2025</SelectItem>
-                <SelectItem value="2025-2026">2025-2026</SelectItem>
+                {academicYears.map((y) => (
+                  <SelectItem key={y} value={y}>
+                    {y}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <Select value={classFilter} onValueChange={setClassFilter}>
+              <SelectTrigger className="w-full sm:w-44">
+                <SelectValue placeholder="Class" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Classes</SelectItem>
+                {classes.map((c) => (
+                  <SelectItem key={c.id} value={c.id}>
+                    {c.name}-{c.section} (Grade {c.grade})
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <Select value={statusFilter} onValueChange={setStatusFilter}>
+              <SelectTrigger className="w-full sm:w-40">
+                <SelectValue placeholder="Status" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Status</SelectItem>
+                <SelectItem value="pending">Pending</SelectItem>
+                <SelectItem value="approved">Approved</SelectItem>
+                <SelectItem value="rejected">Rejected</SelectItem>
               </SelectContent>
             </Select>
           </div>
-          {activeTab === 'individual' && (
-            <>
-              <div className="space-y-1.5 flex-1 min-w-[200px]">
-                <Select value={classFilter} onValueChange={setClassFilter}>
-                  <SelectTrigger className="bg-white dark:bg-gray-900"><SelectValue placeholder="Source Class" /></SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">All Classes</SelectItem>
-                    {classes.map(c => <SelectItem key={c.id} value={c.id}>{c.name}-{c.section}</SelectItem>)}
-                  </SelectContent>
-                </Select>
-              </div>
-              <div className="space-y-1.5 flex-1 min-w-[200px]">
-                <Select value={statusFilter} onValueChange={setStatusFilter}>
-                  <SelectTrigger className="bg-white dark:bg-gray-900"><SelectValue placeholder="Status" /></SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">All Status</SelectItem>
-                    <SelectItem value="approved">Approved</SelectItem>
-                    <SelectItem value="pending">Pending</SelectItem>
-                    <SelectItem value="rejected">Rejected</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-            </>
-          )}
-        </CardContent>
-      </Card>
 
-      {/* Main Content */}
-      <Card className="border-none shadow-sm overflow-hidden min-h-[400px]">
-        <CardContent className="p-0">
-          {loading ? (
-            <div className="p-6"><PromotionSkeleton /></div>
-          ) : activeTab === 'individual' ? (
-            <PromotionTable
-              records={filteredPromotions}
-              onApprove={handleApprove}
-              onReject={(r) => { setRejectingPromotion(r); setRejectRemarks(""); setRejectDialogOpen(true); }}
-              approvingId={approvingId}
-              type="promotion"
-            />
-          ) : (
-            <PromotionTable
-              records={graduations}
-              type="graduation"
-            />
-          )}
-        </CardContent>
-      </Card>
+          <PromotionsTable
+            promotions={promotions}
+            loading={loading}
+            approvingId={approvingId}
+            handleApprove={handleApprove}
+            openRejectDialog={openRejectDialog}
+          />
+        </>
+      )}
 
-      {/* Dialogs */}
+      {/* ═══════ BULK PROMOTE TAB ═══════ */}
+      {activeTab === "bulk" && (
+        <BulkPromoteTab
+          classes={classes}
+          bulkFromClass={bulkFromClass}
+          handleBulkFromClassChange={handleBulkFromClassChange}
+          bulkToClass={bulkToClass}
+          setBulkToClass={setBulkToClass}
+          bulkAcademicYear={bulkAcademicYear}
+          setBulkAcademicYear={setBulkAcademicYear}
+          bulkRemarks={bulkRemarks}
+          setBulkRemarks={setBulkRemarks}
+          bulkPreview={bulkPreview}
+          handleBulkPromote={handleBulkPromote}
+          bulkSubmitting={bulkSubmitting}
+        />
+      )}
+
+      {/* ═══════ GRADUATED TAB ═══════ */}
+      {activeTab === "graduated" && (
+        <GraduatedTab
+          classes={classes}
+          gradClassId={gradClassId}
+          handleGradClassChange={handleGradClassChange}
+          gradAcademicYear={gradAcademicYear}
+          setGradAcademicYear={setGradAcademicYear}
+          gradRemarks={gradRemarks}
+          setGradRemarks={setGradRemarks}
+          gradPreview={gradPreview}
+          gradSelectedIds={gradSelectedIds}
+          setGradSelectedIds={setGradSelectedIds}
+          toggleGradStudent={toggleGradStudent}
+          handleGraduate={handleGraduate}
+          gradSubmitting={gradSubmitting}
+          graduations={graduations}
+        />
+      )}
+
+      {/* ═══════ DIALOGS ═══════ */}
       <NewPromotionDialog
         open={dialogOpen}
         onOpenChange={setDialogOpen}
         form={form}
         setForm={setForm}
-        classes={classes}
         students={students}
+        classes={classes}
         submitting={submitting}
-        onSubmit={handleSubmitPromotion}
+        handleCreatePromotion={handleCreatePromotion}
+        handleStudentChange={handleStudentChange}
       />
 
       <BulkPromotionDialog
         open={bulkDialogOpen}
         onOpenChange={setBulkDialogOpen}
         classes={classes}
-        onBulkPromote={handleBulkPromote}
-        submitting={bulkSubmitting}
+        bulkFromClass={bulkFromClass}
+        handleBulkFromClassChange={handleBulkFromClassChange}
+        bulkToClass={bulkToClass}
+        setBulkToClass={setBulkToClass}
+        bulkAcademicYear={bulkAcademicYear}
+        setBulkAcademicYear={setBulkAcademicYear}
+        bulkRemarks={bulkRemarks}
+        setBulkRemarks={setBulkRemarks}
+        bulkPreview={bulkPreview}
+        handleBulkPromote={handleBulkPromote}
+        bulkSubmitting={bulkSubmitting}
       />
 
-      <GraduationDialog
-        open={gradDialogOpen}
-        onOpenChange={setGradDialogOpen}
-        classes={classes}
-        students={students}
-        onGraduate={handleGraduate}
-        submitting={gradSubmitting}
-      />
-
-      <RejectDialog
+      <RejectPromotionDialog
         open={rejectDialogOpen}
         onOpenChange={setRejectDialogOpen}
-        promotion={rejectingPromotion}
-        remarks={rejectRemarks}
-        setRemarks={setRejectRemarks}
-        onReject={handleReject}
-        submitting={rejecting}
+        rejectingPromotion={rejectingPromotion}
+        rejectRemarks={rejectRemarks}
+        setRejectRemarks={setRejectRemarks}
+        handleReject={handleReject}
+        rejecting={rejecting}
       />
     </div>
   );
