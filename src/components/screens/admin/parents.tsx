@@ -1,864 +1,316 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Badge } from "@/components/ui/badge";
-import { Skeleton } from "@/components/ui/skeleton";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-  DialogFooter,
-  DialogTrigger,
-} from "@/components/ui/dialog";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Separator } from "@/components/ui/separator";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import {
-  Users,
-  UserPlus,
-  Link2,
-  Unlink,
-  Trash2,
-  Search,
-  GraduationCap,
-  Phone,
-  Mail,
-  Briefcase,
-  Baby,
-  X,
-  Plus,
-  ChevronRight,
-  Pencil,
-  Loader2,
-} from "lucide-react";
+import { Heart, Plus, Search, RotateCcw } from "lucide-react";
 import { goeyToast as toast } from "goey-toast";
 import { apiFetch } from "@/lib/api";
 import { useAppStore } from "@/store/use-app-store";
 
-interface ChildInfo {
-  id: string;
-  name: string;
-  email: string;
-  rollNumber: string;
-  className: string;
-  classId: string;
-  gender: string;
-  dateOfBirth?: string;
-}
+// Sub-components
+import { ParentCard } from "./parents/ParentCard";
+import { ParentDialog } from "./parents/ParentDialog";
+import { ParentSkeleton } from "./parents/ParentSkeleton";
 
-interface ParentInfo {
-  id: string;
-  userId: string;
-  name: string;
-  email: string;
-  phone?: string;
-  occupation?: string;
-  children: ChildInfo[];
-}
+// Types
+import type { ParentInfo, StudentInfo, ParentFormData } from "./parents/types";
 
-interface StudentInfo {
-  id: string;
-  name: string;
-  rollNumber: string;
-  className: string;
-  classId: string;
-}
-
-const AVATAR_COLORS = [
-  "bg-amber-500",
-  "bg-rose-500",
-  "bg-cyan-500",
-  "bg-lime-500",
-  "bg-fuchsia-500",
-  "bg-teal-500",
-  "bg-orange-500",
-  "bg-indigo-500",
-];
+const emptyFormData: ParentFormData = {
+  name: "",
+  email: "",
+  phone: "",
+  occupation: "",
+  password: "",
+};
 
 export function AdminParents() {
   const { currentTenantId } = useAppStore();
 
-  const [parents, setParents] = useState<ParentInfo[]>(() => {
-    if (typeof window !== "undefined") {
-      const saved = localStorage.getItem(`parents_cache_${currentTenantId}`);
-      return saved ? JSON.parse(saved) : [];
-    }
-    return [];
-  });
-
-  const [students, setStudents] = useState<StudentInfo[]>([]);
-  const [classes, setClasses] = useState<
-    { id: string; name: string; section: string }[]
-  >([]);
-
-  const [loading, setLoading] = useState(parents.length === 0);
+  // Data states
+  const [parents, setParents] = useState<ParentInfo[]>([]);
+  const [allStudents, setAllStudents] = useState<StudentInfo[]>([]);
+  const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
 
-  // Create dialog
-  const [createOpen, setCreateOpen] = useState(false);
-  const [createForm, setCreateForm] = useState({
-    name: "",
-    email: "",
-    phone: "",
-    occupation: "",
-    password: "", // Added consistency
-  });
-  const [creating, setCreating] = useState(false);
-
-  // Link child dialog
-  const [linkOpen, setLinkOpen] = useState(false);
-  const [selectedParent, setSelectedParent] = useState<ParentInfo | null>(null);
-  const [selectedClass, setSelectedClass] = useState("");
+  // Dialog state
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [editingParent, setEditingParent] = useState<ParentInfo | null>(null);
+  const [formData, setFormData] = useState<ParentFormData>(emptyFormData);
+  const [submitting, setSubmitting] = useState(false);
   const [linking, setLinking] = useState(false);
 
-  // Edit dialog
-  const [editOpen, setEditOpen] = useState(false);
-  const [editingParent, setEditingParent] = useState<ParentInfo | null>(null);
-  const [editForm, setEditForm] = useState({
-    name: "",
-    email: "",
-    phone: "",
-    occupation: "",
-  });
-  const [editing, setEditing] = useState(false);
-
-  const fetchData = useCallback(async (showSkeleton = false) => {
+  const fetchParents = useCallback(async (showSkeleton = true) => {
+    if (!currentTenantId) return;
+    if (showSkeleton) setLoading(true);
     try {
-      if (showSkeleton) setLoading(true);
-      const [resParents, resStudents, resClasses] = await Promise.all([
-        apiFetch("/api/parents"),
-        apiFetch("/api/students"),
-        apiFetch("/api/classes"),
-      ]);
-
-      if (!resParents.ok || !resStudents.ok || !resClasses.ok) 
-        throw new Error("Failed to load some data");
-
-      const [parentsData, studentsData, classesData] = await Promise.all([
-        resParents.json(),
-        resStudents.json(),
-        resClasses.json(),
-      ]);
-
-      setParents(parentsData);
-      setStudents(studentsData);
-      setClasses(classesData);
-
-      if (typeof window !== "undefined" && currentTenantId) {
-        localStorage.setItem(`parents_cache_${currentTenantId}`, JSON.stringify(parentsData));
+      const res = await apiFetch(`/api/parents?tenantId=${currentTenantId}`);
+      if (res.ok) {
+        const data = await res.json();
+        setParents(data || []);
       }
     } catch (err) {
-      console.error("Error fetching parent data:", err);
+      toast.error("Failed to load parents");
     } finally {
       setLoading(false);
     }
   }, [currentTenantId]);
 
-  useEffect(() => {
-    if (currentTenantId) {
-        fetchData(parents.length === 0);
-    }
-  }, [currentTenantId, fetchData]);
-
-  const filtered = parents.filter(
-    (p) =>
-      p.name.toLowerCase().includes(search.toLowerCase()) ||
-      p.email.toLowerCase().includes(search.toLowerCase()) ||
-      p.children.some((c) => c.name.toLowerCase().includes(search.toLowerCase())),
-  );
-
-  const filteredStudents = selectedClass && selectedClass !== 'all'
-    ? students.filter(
-        (s) =>
-          s.classId === selectedClass &&
-          !selectedParent?.children.some((c) => c.id === s.id),
-      )
-    : students.filter((s) => !selectedParent?.children.some((c) => c.id === s.id));
-
-  const getInitials = (name: string) =>
-    name
-      .split(" ")
-      .map((n) => n[0])
-      .join("")
-      .slice(0, 2)
-      .toUpperCase();
-
-  const getAvatarColor = (name: string) =>
-    AVATAR_COLORS[name.length % AVATAR_COLORS.length];
-
-  const handleCreate = async () => {
-    if (!createForm.name || !createForm.email) {
-      toast.error("Name and email are required");
-      return;
-    }
-    toast.promise(
-      (async () => {
-        const res = await apiFetch("/api/parents", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ action: "create", ...createForm }),
-        });
-        if (!res.ok) {
-          const err = await res.json().catch(() => ({}));
-          throw new Error(err.error || "Failed to create parent");
-        }
-        setCreateOpen(false);
-        setCreateForm({ name: "", email: "", phone: "", occupation: "", password: "" });
-        fetchData();
-        return "Parent account created";
-      })(),
-      {
-        loading: "Creating parent account...",
-        success: (msg) => msg,
-        error: (err: any) => err.message,
-      }
-    );
-  };
-
-  const handleLinkChild = async (studentId: string) => {
-    if (!selectedParent) return;
-    toast.promise(
-      (async () => {
-        const res = await apiFetch("/api/parents", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            action: "link",
-            parentId: selectedParent.id,
-            studentId,
-          }),
-        });
-        if (!res.ok) {
-          const err = await res.json().catch(() => ({}));
-          throw new Error(err.error || "Linking failed");
-        }
-        // Refresh everything to keep in sync
-        const freshParentsRes = await apiFetch("/api/parents");
-        const freshParents = await freshParentsRes.json();
-        setParents(freshParents);
-        setSelectedParent(
-          freshParents.find((p: ParentInfo) => p.id === selectedParent.id) || null,
+  const fetchAllStudents = useCallback(async () => {
+    if (!currentTenantId) return;
+    try {
+      const res = await apiFetch(`/api/students?tenantId=${currentTenantId}&limit=1000`);
+      if (res.ok) {
+        const data = await res.json();
+        setAllStudents(
+          (data.items || []).map((s: any) => ({
+            id: s.id,
+            name: s.name,
+            rollNumber: s.rollNumber || "N/A",
+            className: s.class ? `${s.class.name}-${s.class.section}` : "Unassigned",
+            classId: s.classId,
+          }))
         );
-        return "Student linked successfully";
-      })(),
-      {
-        loading: "Linking child to parent...",
-        success: (msg: any) => msg, 
-        error: (err: any) => err.message
       }
-    );
+    } catch (err) {
+      console.error("Failed to fetch students for linking:", err);
+    }
+  }, [currentTenantId]);
+
+  useEffect(() => {
+    fetchParents();
+    fetchAllStudents();
+  }, [fetchParents, fetchAllStudents]);
+
+  // --- Handlers ---
+
+  const handleOpenCreate = () => {
+    setEditingParent(null);
+    setFormData(emptyFormData);
+    setDialogOpen(true);
   };
 
-  const handleUnlinkChild = async (parentId: string, studentId: string) => {
-    toast.promise(
-      (async () => {
-        const res = await apiFetch("/api/parents", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            action: "unlink",
-            parentId,
-            studentId,
-          }),
-        });
-        if (!res.ok) {
-          const err = await res.json().catch(() => ({}));
-          throw new Error(err.error || "Unlinking failed");
-        }
-        const freshParentsRes = await apiFetch("/api/parents");
-        const freshParents = await freshParentsRes.json();
-        setParents(freshParents);
-        if (selectedParent && selectedParent.id === parentId) {
-          setSelectedParent(freshParents.find((p: ParentInfo) => p.id === parentId) || null);
-        }
-        
-        // Force red pill morph
-        throw new Error("Child record unlinked");
-      })(),
-      {
-        loading: "Unlinking child...",
-        success: () => "",
-        error: (err: any) => err.message
-      }
-    );
-  };
-
-  const handleEdit = (parent: ParentInfo) => {
+  const handleOpenEdit = (parent: ParentInfo) => {
     setEditingParent(parent);
-    setEditForm({
+    setFormData({
       name: parent.name,
       email: parent.email,
       phone: parent.phone || "",
       occupation: parent.occupation || "",
+      password: "",
     });
-    setEditOpen(true);
+    setDialogOpen(true);
   };
 
-  const handleEditSave = async () => {
-    if (!editingParent || !editForm.name || !editForm.email) {
-      toast.error("Name and email are required");
+  const handleSubmit = async () => {
+    if (!formData.name || !formData.email) {
+      toast.error("Name and Email are required");
       return;
     }
-    toast.promise(
-      (async () => {
-        const res = await apiFetch("/api/parents", {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ id: editingParent.id, ...editForm }),
-        });
-        if (!res.ok) {
-          const err = await res.json().catch(() => ({}));
-          throw new Error(err.error || "Update failed");
-        }
-        setEditOpen(false);
-        fetchData();
-        return "Parent details updated";
-      })(),
-      {
-        loading: "Saving changes...",
-        success: (msg) => msg,
-        error: (err: any) => err.message,
+
+    setSubmitting(true);
+    try {
+      const url = "/api/parents";
+      const method = editingParent ? "PUT" : "POST";
+      const payload = {
+        ...formData,
+        tenantId: currentTenantId,
+        id: editingParent?.id,
+      };
+
+      const res = await apiFetch(url, {
+        method,
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+
+      if (res.ok) {
+        toast.success(editingParent ? "Profile updated" : "Account created");
+        setDialogOpen(false);
+        fetchParents(false);
+      } else {
+        const error = await res.json();
+        toast.error(error.message || "Failed to save parent");
       }
-    );
+    } catch (err) {
+      toast.error("An error occurred");
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   const handleDelete = async (id: string) => {
-    toast.promise(
-      (async () => {
-        const res = await apiFetch(`/api/parents?id=${id}`, { method: "DELETE" });
-        if (!res.ok) {
-          const err = await res.json().catch(() => ({}));
-          throw new Error(err.error || "Deletion failed");
-        }
-        setParents(parents.filter((p) => p.id !== id));
-        
-        // Force red pill morph
-        throw new Error("Parent record removed");
-      })(),
-      {
-        loading: "Removing parent record...",
-        success: () => "",
-        error: (err: any) => err.message
+    try {
+      const res = await apiFetch(`/api/parents?id=${id}&tenantId=${currentTenantId}`, {
+        method: "DELETE",
+      });
+      if (res.ok) {
+        toast.success("Account deleted successfully");
+        fetchParents(false);
+      } else {
+        toast.error("Failed to delete account");
       }
-    );
+    } catch (err) {
+      toast.error("An error occurred");
+    }
   };
 
-  return (loading && parents.length === 0) ? (
-    <div className="space-y-6">
-      <div className="flex justify-between">
-        <Skeleton className="h-8 w-48" />
-        <Skeleton className="h-10 w-36" />
-      </div>
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        {[...Array(4)].map((_, i) => (
-          <Skeleton key={i} className="h-52 rounded-xl" />
-        ))}
-      </div>
-    </div>
-  ) : (
+  const handleLinkChild = async (parentId: string, studentId: string) => {
+    setLinking(true);
+    try {
+      const res = await apiFetch("/api/parents/link", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ parentId, studentId, tenantId: currentTenantId }),
+      });
+
+      if (res.ok) {
+        toast.success("Child linked successfully");
+        fetchParents(false);
+        // Update local editing parent to reflect change
+        if (editingParent && editingParent.id === parentId) {
+          const student = allStudents.find((s) => s.id === studentId);
+          if (student) {
+            setEditingParent({
+              ...editingParent,
+              children: [
+                ...editingParent.children,
+                {
+                  id: student.id,
+                  name: student.name,
+                  email: "", // Not returned by link
+                  rollNumber: student.rollNumber,
+                  className: student.className,
+                  classId: student.classId || "",
+                  gender: "",
+                },
+              ],
+            });
+          }
+        }
+      } else {
+        toast.error("Failed to link child");
+      }
+    } catch (err) {
+      toast.error("An error occurred");
+    } finally {
+      setLinking(false);
+    }
+  };
+
+  const handleUnlinkChild = async (parentId: string, studentId: string) => {
+    try {
+      const res = await apiFetch("/api/parents/unlink", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ parentId, studentId, tenantId: currentTenantId }),
+      });
+
+      if (res.ok) {
+        toast.success("Child unlinked successfully");
+        fetchParents(false);
+      } else {
+        toast.error("Failed to unlink child");
+      }
+    } catch (err) {
+      toast.error("An error occurred");
+    }
+  };
+
+  // --- Derived ---
+  const filtered = parents.filter(
+    (p) =>
+      p.name.toLowerCase().includes(search.toLowerCase()) ||
+      p.email.toLowerCase().includes(search.toLowerCase()) ||
+      p.children.some((c) => c.name.toLowerCase().includes(search.toLowerCase()))
+  );
+
+  return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-        <div>
-          <h2 className="text-xl font-bold text-gray-900 dark:text-gray-100">
-            Parents
-          </h2>
-          <p className="text-sm text-gray-500 dark:text-gray-400 mt-0.5">
-            {parents.length} parents registered •{" "}
-            {parents.reduce((s, p) => s + p.children.length, 0)} children linked
-          </p>
+      <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
+        <div className="flex items-center gap-3">
+          <div className="h-12 w-12 rounded-2xl bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center text-amber-600 dark:text-amber-400">
+            <Heart className="h-6 w-6" />
+          </div>
+          <div>
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Parent Accounts</h2>
+            <p className="text-sm text-gray-500 dark:text-gray-400">
+              Manage parent profiles and link them to students
+            </p>
+          </div>
         </div>
-        <Dialog open={createOpen} onOpenChange={setCreateOpen}>
-          <DialogTrigger asChild>
-            <Button className="bg-emerald-600 hover:bg-emerald-700 text-white">
-              <UserPlus className="h-4 w-4 mr-2" /> Add Parent
-            </Button>
-          </DialogTrigger>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>Add New Parent</DialogTitle>
-              <DialogDescription>
-                Create a new parent account in the system
-              </DialogDescription>
-            </DialogHeader>
-            <div className="space-y-4 pt-2">
-              <div>
-                <Label>Full Name *</Label>
-                <Input
-                  value={createForm.name}
-                  onChange={(e) =>
-                    setCreateForm({ ...createForm, name: e.target.value })
-                  }
-                  placeholder="e.g. Robert Anderson"
-                  className="mt-1.5"
-                />
-              </div>
-              <div>
-                <Label>Email *</Label>
-                <Input
-                  type="email"
-                  value={createForm.email}
-                  onChange={(e) =>
-                    setCreateForm({ ...createForm, email: e.target.value })
-                  }
-                  placeholder="parent@sigel.edu"
-                  className="mt-1.5"
-                />
-              </div>
-              <div>
-                <Label>Login Password</Label>
-                <Input
-                  type="password"
-                  value={createForm.password}
-                  onChange={(e) =>
-                    setCreateForm({ ...createForm, password: e.target.value })
-                  }
-                  placeholder="Set login password (default: changeme123)"
-                  className="mt-1.5"
-                />
-              </div>
-              <div>
-                <Label>Phone</Label>
-                <Input
-                  value={createForm.phone}
-                  onChange={(e) =>
-                    setCreateForm({ ...createForm, phone: e.target.value })
-                  }
-                  placeholder="555-0201"
-                  className="mt-1.5"
-                />
-              </div>
-              <div>
-                <Label>Occupation</Label>
-                <Input
-                  value={createForm.occupation}
-                  onChange={(e) =>
-                    setCreateForm({ ...createForm, occupation: e.target.value })
-                  }
-                  placeholder="e.g. Engineer"
-                  className="mt-1.5"
-                />
-              </div>
-              <Button
-                onClick={handleCreate}
-                disabled={creating}
-                className="w-full bg-emerald-600 hover:bg-emerald-700 text-white"
-              >
-                {creating ? "Creating..." : "Create Parent"}
-              </Button>
-            </div>
-          </DialogContent>
-        </Dialog>
+
+        <div className="flex items-center gap-2">
+          <Button
+            variant="outline"
+            size="icon"
+            onClick={() => fetchParents(true)}
+            className="h-10 w-10"
+          >
+            <RotateCcw className="h-4 w-4" />
+          </Button>
+          <Button
+            className="bg-amber-600 hover:bg-amber-700 text-white shadow-sm"
+            onClick={handleOpenCreate}
+          >
+            <Plus className="h-4 w-4 mr-2" />
+            Add Parent
+          </Button>
+        </div>
       </div>
 
       {/* Search */}
       <div className="relative max-w-md">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 dark:text-gray-500" />
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
         <Input
-          placeholder="Search parents or children..."
-          className="pl-9"
+          placeholder="Search by parent or child name..."
+          className="pl-9 h-11 bg-white dark:bg-gray-900 border-none shadow-sm focus-visible:ring-amber-500"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
         />
       </div>
 
-      {/* Parent Cards */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        {filtered.map((parent) => (
-          <Card
-            key={parent.id}
-            className="rounded-xl shadow-sm hover:shadow-md transition-shadow"
-          >
-            <CardContent className="p-5">
-              {/* Parent Header */}
-              <div className="flex items-start justify-between mb-4">
-                <div className="flex items-center gap-3">
-                  <Avatar className="h-11 w-11">
-                    <AvatarFallback
-                      className={`${getAvatarColor(parent.name)} text-white text-sm font-semibold`}
-                    >
-                      {getInitials(parent.name)}
-                    </AvatarFallback>
-                  </Avatar>
-                  <div>
-                    <h3 className="font-semibold text-gray-900 dark:text-gray-100 text-sm">
-                      {parent.name}
-                    </h3>
-                    <div className="flex items-center gap-1.5 mt-0.5">
-                      <Mail className="h-3 w-3 text-gray-400 dark:text-gray-500" />
-                      <span className="text-xs text-gray-500 dark:text-gray-400">
-                        {parent.email}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-                <div className="flex items-center gap-1">
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="h-8 w-8 text-emerald-500 hover:text-emerald-700 hover:bg-emerald-50 dark:hover:bg-emerald-900/30"
-                    onClick={() => handleEdit(parent)}
-                    title="Edit"
-                  >
-                    <Pencil className="h-4 w-4" />
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="h-8 w-8 text-blue-500 hover:text-blue-700 hover:bg-blue-50 dark:hover:bg-blue-900/30"
-                    onClick={() => {
-                      setSelectedParent(parent);
-                      setLinkOpen(true);
-                      setSelectedClass("");
-                    }}
-                    title="Link Child"
-                  >
-                    <Link2 className="h-4 w-4" />
-                  </Button>
-                  <AlertDialog>
-                    <AlertDialogTrigger asChild>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="h-8 w-8 text-red-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/30"
-                        title="Delete"
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                    </AlertDialogTrigger>
-                    <AlertDialogContent>
-                      <AlertDialogHeader>
-                        <AlertDialogTitle>Delete Parent</AlertDialogTitle>
-                        <AlertDialogDescription>
-                          Are you sure you want to delete {parent.name}? Their
-                          children will be unlinked but not deleted.
-                        </AlertDialogDescription>
-                      </AlertDialogHeader>
-                      <AlertDialogFooter>
-                        <AlertDialogCancel>Cancel</AlertDialogCancel>
-                        <AlertDialogAction
-                          onClick={() => handleDelete(parent.id)}
-                          className="bg-red-600 hover:bg-red-700"
-                        >
-                          Delete
-                        </AlertDialogAction>
-                      </AlertDialogFooter>
-                    </AlertDialogContent>
-                  </AlertDialog>
-                </div>
-              </div>
-
-              {/* Parent Details */}
-              <div className="flex items-center gap-4 text-xs text-gray-500 dark:text-gray-400 mb-4">
-                {parent.phone && (
-                  <span className="flex items-center gap-1">
-                    <Phone className="h-3 w-3" /> {parent.phone}
-                  </span>
-                )}
-                {parent.occupation && (
-                  <span className="flex items-center gap-1">
-                    <Briefcase className="h-3 w-3" /> {parent.occupation}
-                  </span>
-                )}
-              </div>
-
-              {/* Children */}
-              <Separator className="mb-3" />
-              <div className="space-y-2">
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-xs font-medium text-gray-500 dark:text-gray-400 flex items-center gap-1">
-                    <Baby className="h-3 w-3" /> Children ({parent.children.length}
-                    )
-                  </span>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="h-6 text-[11px] text-blue-600 hover:text-blue-700 hover:bg-blue-50 dark:hover:bg-blue-900/30 px-2"
-                    onClick={() => {
-                      setSelectedParent(parent);
-                      setLinkOpen(true);
-                      setSelectedClass("");
-                    }}
-                  >
-                    <Plus className="h-3 w-3 mr-1" /> Link Child
-                  </Button>
-                </div>
-
-                {parent.children.length === 0 ? (
-                  <div className="text-center py-6 bg-gray-50 dark:bg-gray-800/50 rounded-lg">
-                    <GraduationCap className="h-8 w-8 mx-auto text-gray-300 dark:text-gray-600 mb-2" />
-                    <p className="text-xs text-gray-400 dark:text-gray-500">
-                      No children linked yet
-                    </p>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className="mt-2 h-7 text-xs text-blue-600 dark:text-blue-400 border-blue-200 dark:border-blue-800 hover:bg-blue-50 dark:hover:bg-blue-900/30"
-                      onClick={() => {
-                        setSelectedParent(parent);
-                        setLinkOpen(true);
-                        setSelectedClass("");
-                      }}
-                    >
-                      <Link2 className="h-3 w-3 mr-1" /> Link a Child
-                    </Button>
-                  </div>
-                ) : (
-                  <div className="space-y-1.5">
-                    {parent.children.map((child) => (
-                      <div
-                        key={child.id}
-                        className="flex items-center justify-between bg-gray-50 dark:bg-gray-800/50 rounded-lg px-3 py-2"
-                      >
-                        <div className="flex items-center gap-2.5 min-w-0">
-                          <div className="h-7 w-7 rounded-full bg-violet-100 dark:bg-violet-900/30 text-violet-600 dark:text-violet-400 flex items-center justify-center text-[10px] font-bold shrink-0">
-                            {child.gender === "male" ? "👦" : "👧"}
-                          </div>
-                          <div className="min-w-0">
-                            <p className="text-xs font-medium text-gray-800 dark:text-gray-200 truncate">
-                              {child.name}
-                            </p>
-                            <p className="text-[10px] text-gray-400 dark:text-gray-500">
-                              {child.className} • Roll {child.rollNumber}
-                            </p>
-                          </div>
-                        </div>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="h-6 w-6 text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/30 shrink-0"
-                          onClick={() => handleUnlinkChild(parent.id, child.id)}
-                          disabled={linking}
-                          title="Unlink"
-                        >
-                          <Unlink className="h-3 w-3" />
-                        </Button>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
-
-      {filtered.length === 0 && (
-        <div className="text-center py-16 text-gray-400 dark:text-gray-500">
-          <Users className="h-12 w-12 mx-auto mb-4 opacity-50" />
-          <p className="text-lg">No parents found</p>
-          <p className="text-sm mt-1">Add a parent or adjust your search</p>
+      {/* Content */}
+      {loading ? (
+        <ParentSkeleton />
+      ) : filtered.length === 0 ? (
+        <div className="py-20 text-center bg-white dark:bg-gray-900 rounded-3xl border-2 border-dashed border-gray-100 dark:border-gray-800">
+          <Heart className="h-12 w-12 mx-auto text-gray-300 dark:text-gray-700 mb-4" />
+          <p className="text-lg font-medium text-gray-900 dark:text-gray-100">No parent accounts found</p>
+          <p className="text-sm text-gray-500 mt-1">
+            {search ? "Try adjusting your search query." : "Start by registering a parent."}
+          </p>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {filtered.map((parent, index) => (
+            <ParentCard
+              key={parent.id}
+              parent={parent}
+              index={index}
+              canEdit={true}
+              canDelete={true}
+              onEdit={handleOpenEdit}
+              onDelete={handleDelete}
+              onUnlink={handleUnlinkChild}
+            />
+          ))}
         </div>
       )}
 
-      {/* Edit Parent Dialog */}
-      <Dialog open={editOpen} onOpenChange={setEditOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Edit Parent</DialogTitle>
-            <DialogDescription>Update parent information</DialogDescription>
-          </DialogHeader>
-          <div className="space-y-4 pt-2">
-            <div>
-              <Label>Full Name *</Label>
-              <Input
-                value={editForm.name}
-                onChange={(e) =>
-                  setEditForm({ ...editForm, name: e.target.value })
-                }
-                placeholder="e.g. Robert Anderson"
-                className="mt-1.5"
-              />
-            </div>
-            <div>
-              <Label>Email *</Label>
-              <Input
-                type="email"
-                value={editForm.email}
-                onChange={(e) =>
-                  setEditForm({ ...editForm, email: e.target.value })
-                }
-                placeholder="parent@sigel.edu"
-                className="mt-1.5"
-              />
-            </div>
-            <div>
-              <Label>Phone</Label>
-              <Input
-                value={editForm.phone}
-                onChange={(e) =>
-                  setEditForm({ ...editForm, phone: e.target.value })
-                }
-                placeholder="555-0201"
-                className="mt-1.5"
-              />
-            </div>
-            <div>
-              <Label>Occupation</Label>
-              <Input
-                value={editForm.occupation}
-                onChange={(e) =>
-                  setEditForm({ ...editForm, occupation: e.target.value })
-                }
-                placeholder="e.g. Engineer"
-                className="mt-1.5"
-              />
-            </div>
-            <Button
-              onClick={handleEditSave}
-              disabled={editing}
-              className="w-full bg-emerald-600 hover:bg-emerald-700 text-white"
-            >
-              {editing ? "Saving..." : "Save Changes"}
-            </Button>
-          </div>
-        </DialogContent>
-      </Dialog>
-
-      {/* Link Child Dialog */}
-      <Dialog open={linkOpen} onOpenChange={setLinkOpen}>
-        <DialogContent className="max-w-lg overflow-hidden flex flex-col h-[80vh]">
-          <DialogHeader>
-            <DialogTitle>Link Child to {selectedParent?.name}</DialogTitle>
-            <DialogDescription>
-              Select a student to link as a child. {selectedParent?.name}{" "}
-              currently has {selectedParent?.children.length} children.
-            </DialogDescription>
-          </DialogHeader>
-
-          <ScrollArea className="flex-1 pr-4">
-            <div className="space-y-6 py-2">
-              {/* Already linked children */}
-              {selectedParent && selectedParent.children.length > 0 && (
-                <div className="space-y-2">
-                  <Label className="text-xs text-gray-500 dark:text-gray-400">
-                    Currently Linked
-                  </Label>
-                  <div className="flex flex-wrap gap-2">
-                    {selectedParent.children.map((child) => (
-                      <Badge
-                        key={child.id}
-                        variant="secondary"
-                        className="bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800 gap-1 pr-1"
-                      >
-                        {child.name}
-                        <button
-                          onClick={() => handleUnlinkChild(selectedParent.id, child.id)}
-                          className="h-4 w-4 rounded-full hover:bg-emerald-200 dark:hover:bg-emerald-800 flex items-center justify-center transition-colors"
-                          disabled={linking}
-                        >
-                          <X className="h-3 w-3" />
-                        </button>
-                      </Badge>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              <Separator />
-
-              {/* Class filter */}
-              <div>
-                <Label className="text-xs text-gray-500 dark:text-gray-400 mb-1.5 block">
-                  Filter by Class
-                </Label>
-                <Select value={selectedClass} onValueChange={setSelectedClass}>
-                  <SelectTrigger className="h-9">
-                    <SelectValue placeholder="All Classes" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">All Classes</SelectItem>
-                    {classes.map((c) => (
-                      <SelectItem key={c.id} value={c.id}>
-                        {c.name} - {c.section}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-
-              {/* Available students list */}
-              <div>
-                <Label className="text-xs text-gray-500 dark:text-gray-400 mb-2 block font-semibold">
-                  Available Students
-                </Label>
-                {filteredStudents.length === 0 ? (
-                  <div className="text-center py-10 bg-gray-50 dark:bg-gray-900/20 rounded-xl border border-dashed border-gray-200 dark:border-gray-800">
-                    <p className="text-gray-400 dark:text-gray-500 text-sm">
-                      No unlinked students found
-                    </p>
-                    <p className="text-[10px] mt-1 text-gray-400">
-                      Try changing class filter or add new students
-                    </p>
-                  </div>
-                ) : (
-                  <div className="space-y-1.5">
-                    {filteredStudents.map((student) => (
-                      <div
-                        key={student.id}
-                        className="flex items-center justify-between p-3 rounded-xl border border-gray-100 dark:border-gray-800 hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:border-blue-200 dark:hover:border-blue-800/50 transition-all group"
-                      >
-                        <div className="flex items-center gap-3">
-                          <div className="h-8 w-8 rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform">
-                             <GraduationCap className="h-4 w-4" />
-                          </div>
-                          <div>
-                            <p className="text-sm font-bold text-gray-800 dark:text-gray-200">
-                              {student.name}
-                            </p>
-                            <p className="text-[10px] text-gray-500 dark:text-gray-400 font-medium">
-                              {student.className} • Roll {student.rollNumber}
-                            </p>
-                          </div>
-                        </div>
-                        <Button
-                          size="sm"
-                          className="h-8 text-xs bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-lg shadow-sm"
-                          onClick={() => handleLinkChild(student.id)}
-                          disabled={linking}
-                        >
-                          {linking ? <Loader2 className="h-3 w-3 animate-spin"/> : <Link2 className="h-3.5 w-3.5 mr-1" />}
-                          Link
-                        </Button>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-            </div>
-          </ScrollArea>
-        </DialogContent>
-      </Dialog>
+      <ParentDialog
+        open={dialogOpen}
+        onOpenChange={setDialogOpen}
+        editingParent={editingParent}
+        formData={formData}
+        setFormData={setFormData}
+        submitting={submitting}
+        onSubmit={handleSubmit}
+        allStudents={allStudents}
+        onLinkChild={handleLinkChild}
+        linking={linking}
+      />
     </div>
   );
 }

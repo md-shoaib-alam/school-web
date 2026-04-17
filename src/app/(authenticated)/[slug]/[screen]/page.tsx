@@ -21,7 +21,6 @@ const AdminNotices = dynamic(() => import('@/components/screens/admin/notices').
 const AdminTimetable = dynamic(() => import('@/components/screens/admin/timetable').then(m => m.AdminTimetable), { loading: LoadingScreen });
 const AdminCalendar = dynamic(() => import('@/components/screens/admin/calendar').then(m => m.AdminCalendar), { loading: LoadingScreen });
 const AdminReports = dynamic(() => import('@/components/screens/admin/reports').then(m => m.AdminReports), { loading: LoadingScreen });
-const AdminSubscriptions = dynamic(() => import('@/components/screens/admin/subscriptions').then(m => m.AdminSubscriptions), { loading: LoadingScreen });
 const AdminRoles = dynamic(() => import('@/components/screens/admin/roles').then(m => m.AdminRoles), { loading: LoadingScreen });
 const AdminStaff = dynamic(() => import('@/components/screens/admin/staff').then(m => m.AdminStaff), { loading: LoadingScreen });
 const AdminTickets = dynamic(() => import('@/components/screens/admin/tickets').then(m => m.AdminTickets), { loading: LoadingScreen });

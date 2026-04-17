@@ -1,28 +1,9 @@
 "use client";
 
-
-import { apiFetch } from "@/lib/api";
-import { useState, useEffect } from "react";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-} from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Skeleton } from "@/components/ui/skeleton";
+import { useState, useEffect, useCallback, useMemo } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import {
   Select,
   SelectContent,
@@ -30,369 +11,264 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-  DialogFooter,
-} from "@/components/ui/dialog";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
-import {
-  DollarSign,
-  TrendingUp,
-  AlertTriangle,
-  CheckCircle2,
-  Search,
-  Clock,
-  CreditCard,
-  Plus,
-  Pencil,
-  Trash2,
-  Eye,
-  School,
-} from "lucide-react";
-import type { FeeRecord } from "@/lib/types";
+import { Plus, Search, DollarSign, RotateCcw } from "lucide-react";
 import { goeyToast as toast } from "goey-toast";
+import { apiFetch } from "@/lib/api";
 import { useModulePermissions } from "@/hooks/use-permissions";
-import { useQueryClient } from "@tanstack/react-query";
 import { useFees, useStudents, useClasses } from "@/lib/graphql/hooks";
 import { useAppStore } from "@/store/use-app-store";
+import { useQueryClient } from "@tanstack/react-query";
 
-const statusConfig: Record<string, { bg: string; icon: React.ReactNode }> = {
-  paid: {
-    bg: "bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800",
-    icon: <CheckCircle2 className="h-3.5 w-3.5" />,
-  },
-  pending: {
-    bg: "bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 border-amber-200 dark:border-amber-800",
-    icon: <Clock className="h-3.5 w-3.5" />,
-  },
-  overdue: {
-    bg: "bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 border-red-200 dark:border-red-800",
-    icon: <AlertTriangle className="h-3.5 w-3.5" />,
-  },
-};
+// Sub-components
+import { FeeTable } from "./fees/FeeTable";
+import { FeeStats } from "./fees/FeeStats";
+import { FeeDialog } from "./fees/FeeDialog";
+import { FeeSkeleton } from "./fees/FeeSkeleton";
 
-interface StudentOption {
-  id: string;
-  name: string;
-}
+// Types
+import type { FeeRecord, FeeFormData, StudentOption } from "./fees/types";
 
-interface FeeFormData {
-  studentId: string;
-  amount: string;
-  type: string;
-  status: string;
-  dueDate: string;
-  paidAmount: string;
-  paidDate: string;
-}
-
-const emptyFeeForm: FeeFormData = {
+const emptyFormData: FeeFormData = {
   studentId: "",
   amount: "",
   type: "tuition",
   status: "pending",
-  dueDate: "",
-  paidAmount: "0",
+  dueDate: new Date().toISOString().split("T")[0],
+  paidAmount: "",
   paidDate: "",
+  remark: "",
 };
 
 export function AdminFees() {
   const { currentTenantId } = useAppStore();
   const { canCreate, canEdit, canDelete } = useModulePermissions("fees");
   const queryClient = useQueryClient();
-  const { data: feesData, isLoading: feesLoading } = useFees(currentTenantId || undefined);
-  const { data: studentsData, isLoading: studentsLoading } = useStudents(currentTenantId || undefined);
-  const { data: classesData, isLoading: classesLoading } = useClasses(currentTenantId || undefined);
 
-  const fees = feesData?.fees || [];
-  const students = studentsData?.students || [];
-  const classes = classesData?.classes || [];
+  // Queries
+  const { data: feesData, isLoading: loadingFees } = useFees(currentTenantId || undefined);
+  const { data: studentsData } = useStudents(currentTenantId || undefined, undefined, 1, 1000);
+  const { data: classesData } = useClasses(currentTenantId || undefined);
 
-  const loading = feesLoading || studentsLoading || classesLoading;
-  const [selectedClass, setSelectedClass] = useState<string | null>(null);
-  const [statusFilter, setStatusFilter] = useState("all");
-  const [typeFilter, setTypeFilter] = useState("all");
+  // Filter states
   const [search, setSearch] = useState("");
+  const [statusFilter, setStatusFilter] = useState("all");
+  const [classFilter, setClassFilter] = useState("all");
 
-  const isSelectionMade = selectedClass !== null;
+  // Dialog states
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [dialogMode, setDialogMode] = useState<"create" | "edit" | "view">("create");
+  const [selectedRecord, setSelectedRecord] = useState<FeeRecord | null>(null);
+  const [formData, setFormData] = useState<FeeFormData>(emptyFormData);
+  const [submitting, setSubmitting] = useState(false);
 
-  const refetchFees = () =>
-    queryClient.invalidateQueries({ queryKey: ["fees", currentTenantId] });
+  // --- Helpers ---
 
-  // Add fee dialog
-  const [addOpen, setAddOpen] = useState(false);
-  const [addForm, setAddForm] = useState<FeeFormData>({ ...emptyFeeForm });
-  const [adding, setAdding] = useState(false);
+  const invalidate = () => {
+    queryClient.invalidateQueries({ queryKey: ["fees"] });
+  };
 
-  // Edit fee dialog
-  const [editOpen, setEditOpen] = useState(false);
-  const [editingFee, setEditingFee] = useState<FeeRecord | null>(null);
-  const [editForm, setEditForm] = useState<FeeFormData>({ ...emptyFeeForm });
-  const [saving, setSaving] = useState(false);
+  // --- Handlers ---
 
-  // Delete
-  const [deleting, setDeleting] = useState(false);
+  const handleOpenCreate = () => {
+    setDialogMode("create");
+    setSelectedRecord(null);
+    setFormData(emptyFormData);
+    setDialogOpen(true);
+  };
 
-  const filtered = fees.filter((f) => {
-    const matchStatus = statusFilter === "all" || f.status === statusFilter;
-    const matchType = typeFilter === "all" || f.type === typeFilter;
-    const matchSearch = f.studentName
-      .toLowerCase()
-      .includes(search.toLowerCase());
-    return matchStatus && matchType && matchSearch;
-  });
+  const handleOpenEdit = (record: FeeRecord) => {
+    setDialogMode("edit");
+    setSelectedRecord(record);
+    setFormData({
+      studentId: record.studentId,
+      amount: record.amount.toString(),
+      type: record.type,
+      status: record.status,
+      dueDate: record.dueDate.split("T")[0],
+      paidAmount: record.paidAmount?.toString() || "",
+      paidDate: record.paidDate?.split("T")[0] || "",
+      remark: record.remark || "",
+    });
+    setDialogOpen(true);
+  };
 
-  // Summary
-  const totalCollected = fees
-    .filter((f) => f.status === "paid")
-    .reduce((sum, f) => sum + f.paidAmount, 0);
-  const totalPending = fees
-    .filter((f) => f.status === "pending")
-    .reduce((sum, f) => sum + (f.amount - f.paidAmount), 0);
-  const totalOverdue = fees
-    .filter((f) => f.status === "overdue")
-    .reduce((sum, f) => sum + (f.amount - f.paidAmount), 0);
+  const handleOpenView = (record: FeeRecord) => {
+    setDialogMode("view");
+    setSelectedRecord(record);
+    setFormData({
+      studentId: record.studentId,
+      amount: record.amount.toString(),
+      type: record.type,
+      status: record.status,
+      dueDate: record.dueDate.split("T")[0],
+      paidAmount: record.paidAmount?.toString() || "",
+      paidDate: record.paidDate?.split("T")[0] || "",
+      remark: record.remark || "",
+    });
+    setDialogOpen(true);
+  };
 
-  const summaryCards = [
-    {
-      label: "Total Collected",
-      amount: totalCollected,
-      icon: <CheckCircle2 className="h-5 w-5 text-emerald-600" />,
-      color:
-        "bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400",
-    },
-    {
-      label: "Pending",
-      amount: totalPending,
-      icon: <Clock className="h-5 w-5 text-amber-600 dark:text-amber-400" />,
-      color:
-        "bg-amber-100 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400",
-    },
-    {
-      label: "Overdue",
-      amount: totalOverdue,
-      icon: (
-        <AlertTriangle className="h-5 w-5 text-red-600 dark:text-red-400" />
-      ),
-      color: "bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400",
-    },
-  ];
-
-  const handleAdd = async () => {
-    if (!addForm.studentId || !addForm.amount || !addForm.dueDate) {
-      toast.error("Student, amount, and due date are required");
+  const handleSubmit = async () => {
+    if (!formData.studentId || !formData.amount || !formData.dueDate) {
+      toast.error("Please fill in required fields");
       return;
     }
-    setAdding(true);
-    try {
-      const res = await apiFetch("/api/fees", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          studentId: addForm.studentId,
-          amount: Number(addForm.amount),
-          type: addForm.type,
-          status: addForm.status,
-          dueDate: addForm.dueDate,
-          paidAmount: Number(addForm.paidAmount) || 0,
-        }),
-      });
-      if (res.ok) {
-        toast.success("Fee created successfully!");
-        setAddOpen(false);
-        setAddForm({ ...emptyFeeForm });
-        refetchFees();
-      } else {
-        toast.error("Failed to create fee");
-      }
-    } catch {
-      toast.error("Error creating fee");
-    }
-    setAdding(false);
-  };
 
-  const handleEdit = (fee: FeeRecord) => {
-    setEditingFee(fee);
-    setEditForm({
-      studentId: "",
-      amount: String(fee.amount),
-      type: fee.type,
-      status: fee.status,
-      dueDate: fee.dueDate.split("T")[0],
-      paidAmount: String(fee.paidAmount),
-      paidDate:
-        fee.status === "paid" ? new Date().toISOString().split("T")[0] : "",
-    });
-    setEditOpen(true);
-  };
-
-  const handleEditSave = async () => {
-    if (!editingFee) return;
-    setSaving(true);
+    setSubmitting(true);
     try {
-      const res = await apiFetch("/api/fees", {
-        method: "PUT",
+      const url = "/api/fees";
+      const method = dialogMode === "create" ? "POST" : "PUT";
+      const payload = {
+        ...formData,
+        amount: parseFloat(formData.amount),
+        paidAmount: formData.paidAmount ? parseFloat(formData.paidAmount) : 0,
+        tenantId: currentTenantId,
+        id: selectedRecord?.id,
+      };
+
+      const res = await apiFetch(url, {
+        method,
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          id: editingFee.id,
-          status: editForm.status,
-          paidAmount: Number(editForm.paidAmount),
-          paidDate: editForm.paidDate || new Date().toISOString(),
-        }),
+        body: JSON.stringify(payload),
       });
+
       if (res.ok) {
-        toast.success("Fee updated successfully!");
-        setEditOpen(false);
-        refetchFees();
+        toast.success(dialogMode === "create" ? "Record created" : "Record updated");
+        setDialogOpen(false);
+        invalidate();
       } else {
-        toast.error("Failed to update fee");
+        const err = await res.json();
+        toast.error(err.message || "Failed to save record");
       }
-    } catch {
-      toast.error("Error updating fee");
+    } catch (err) {
+      toast.error("An error occurred");
+    } finally {
+      setSubmitting(false);
     }
-    setSaving(false);
   };
 
   const handleDelete = async (id: string) => {
-    setDeleting(true);
     try {
-      const res = await apiFetch(`/api/fees?id=${id}`, { method: "DELETE" });
+      const res = await apiFetch(`/api/fees?id=${id}&tenantId=${currentTenantId}`, {
+        method: "DELETE",
+      });
       if (res.ok) {
-        toast.success("Fee deleted successfully!");
-        refetchFees();
+        toast.success("Record deleted");
+        invalidate();
       } else {
-        toast.error("Failed to delete fee");
+        toast.error("Failed to delete");
       }
-    } catch {
-      toast.error("Error deleting fee");
+    } catch (err) {
+      toast.error("An error occurred");
     }
-    setDeleting(false);
   };
+
+  // --- Derived ---
+
+  const records = useMemo(() => {
+    let filtered = (feesData?.fees || []) as FeeRecord[];
+
+    if (search) {
+      const s = search.toLowerCase();
+      filtered = filtered.filter(
+        (r) =>
+          r.student?.name.toLowerCase().includes(s) ||
+          r.type.toLowerCase().includes(s) ||
+          r.transactionId?.toLowerCase().includes(s)
+      );
+    }
+
+    if (statusFilter !== "all") {
+      filtered = filtered.filter((r) => r.status === statusFilter);
+    }
+
+    if (classFilter !== "all") {
+      filtered = filtered.filter((r) => r.student?.class?.name === classFilter);
+    }
+
+    return filtered;
+  }, [feesData, search, statusFilter, classFilter]);
+
+  const stats = useMemo(() => {
+    const all = (feesData?.fees || []) as FeeRecord[];
+    const total = all.reduce((acc, r) => acc + r.amount, 0);
+    const paid = all.reduce((acc, r) => acc + (r.paidAmount || 0), 0);
+    const pending = total - paid;
+    const rate = total > 0 ? Math.round((paid / total) * 100) : 0;
+
+    return { total, pending, rate };
+  }, [feesData]);
+
+  const studentOptions = useMemo(() => {
+    return (studentsData?.students || []).map((s: any) => ({
+      id: s.id,
+      name: s.name,
+    }));
+  }, [studentsData]);
+
+  if (loadingFees) {
+    return <FeeSkeleton />;
+  }
 
   return (
     <div className="space-y-6">
-      {/* Read-only banner */}
-      {!canCreate && !canEdit && !canDelete && (
-        <div className="flex items-center gap-2 rounded-lg border border-amber-200 dark:border-amber-800 bg-amber-50 dark:bg-amber-900/30 px-3 py-2">
-          <Eye className="h-4 w-4 text-amber-600 dark:text-amber-400 shrink-0" />
-          <span className="text-xs text-amber-700 dark:text-amber-300 font-medium">
-            Read-only mode — you have view permission only for this module.
-          </span>
-        </div>
-      )}
-
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div>
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
-            Fees Management
-          </h2>
-          <p className="text-gray-500 dark:text-gray-400">
-            Track and manage student payments
-          </p>
-        </div>
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
         <div className="flex items-center gap-3">
-          <Select
-            value={selectedClass || undefined}
-            onValueChange={setSelectedClass}
+          <div className="h-12 w-12 rounded-2xl bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center text-emerald-600 dark:text-emerald-400">
+            <DollarSign className="h-6 w-6" />
+          </div>
+          <div>
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Fee Management</h2>
+            <p className="text-sm text-gray-500 dark:text-gray-400">
+              Track student payments and school revenue
+            </p>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-2">
+          <Button
+            variant="outline"
+            size="icon"
+            onClick={() => invalidate()}
+            className="h-10 w-10"
           >
-            <SelectTrigger className="w-[200px] h-10 bg-white dark:bg-gray-950 border-gray-200">
-              <SelectValue placeholder="Select Class" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all" className="font-bold text-blue-600">
-                <span className="flex items-center gap-2">
-                  <CreditCard className="h-4 w-4" />
-                  All School Fees
-                </span>
-              </SelectItem>
-              {classes.map((cls: any) => (
-                <SelectItem key={cls.id} value={cls.id}>
-                  {cls.name} - {cls.section}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+            <RotateCcw className="h-4 w-4" />
+          </Button>
           {canCreate && (
             <Button
-              onClick={() => setAddOpen(true)}
-              className="bg-emerald-600 hover:bg-emerald-700"
+              className="bg-emerald-600 hover:bg-emerald-700 text-white shadow-sm"
+              onClick={handleOpenCreate}
             >
               <Plus className="h-4 w-4 mr-2" />
-              Collect Fee
+              Create Fee Record
             </Button>
           )}
         </div>
       </div>
 
-      {!isSelectionMade ? (
-        <div className="py-20 flex flex-col items-center justify-center text-center space-y-4 border-2 border-dashed border-gray-200 dark:border-gray-800 rounded-3xl bg-gray-50/30">
-          <div className="p-4 bg-white dark:bg-gray-950 shadow-sm rounded-full">
-            <DollarSign className="h-12 w-12 text-blue-300" />
-          </div>
-          <div className="max-w-xs">
-            <h4 className="text-lg font-medium text-gray-900 dark:text-white italic">
-              Financial data is ready!
-            </h4>
-            <p className="text-sm text-gray-500">
-              Pick a class from the menu above to start managing their payments
-              and schedules.
-            </p>
-          </div>
-        </div>
-      ) : (
-        <>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            {summaryCards.map((card) => (
-              <Card
-                key={card.label}
-                className="hover:shadow-md transition-shadow"
-              >
-                <CardContent className="p-4 flex items-center gap-4">
-                  <div
-                    className={`h-12 w-12 rounded-xl flex items-center justify-center ${card.color}`}
-                  >
-                    {card.icon}
-                  </div>
-                  <div>
-                    <p className="text-xs text-muted-foreground">
-                      {card.label}
-                    </p>
-                    <p className="text-2xl font-bold">
-                      ${card.amount.toLocaleString()}
-                    </p>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
+      {/* Stats */}
+      <FeeStats
+        totalRevenue={stats.total}
+        pendingAmount={stats.pending}
+        collectionRate={stats.rate}
+      />
 
-          {/* Filters + Add Button */}
-          <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center">
-            <div className="relative flex-1 max-w-sm">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <Input
-                placeholder="Search student..."
-                className="pl-9"
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-              />
-            </div>
+      {/* Filters */}
+      <Card className="border-none shadow-sm bg-gray-50/50 dark:bg-gray-900/20">
+        <CardContent className="p-4 flex flex-col md:flex-row gap-4">
+          <div className="relative flex-1">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+            <Input
+              placeholder="Search by student name or transaction ID..."
+              className="pl-9 bg-white dark:bg-gray-900"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+            />
+          </div>
+          <div className="flex items-center gap-2">
             <Select value={statusFilter} onValueChange={setStatusFilter}>
-              <SelectTrigger className="w-full sm:w-40">
+              <SelectTrigger className="w-[140px] bg-white dark:bg-gray-900">
                 <SelectValue placeholder="Status" />
               </SelectTrigger>
               <SelectContent>
@@ -402,393 +278,53 @@ export function AdminFees() {
                 <SelectItem value="overdue">Overdue</SelectItem>
               </SelectContent>
             </Select>
-            <Select value={typeFilter} onValueChange={setTypeFilter}>
-              <SelectTrigger className="w-full sm:w-40">
-                <SelectValue placeholder="Type" />
+            <Select value={classFilter} onValueChange={setClassFilter}>
+              <SelectTrigger className="w-[140px] bg-white dark:bg-gray-900">
+                <SelectValue placeholder="All Classes" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">All Types</SelectItem>
-                <SelectItem value="tuition">Tuition</SelectItem>
-                <SelectItem value="exam">Exam</SelectItem>
-                <SelectItem value="library">Library</SelectItem>
-                <SelectItem value="transport">Transport</SelectItem>
+                <SelectItem value="all">All Classes</SelectItem>
+                {classesData?.classes?.map((c: any) => (
+                  <SelectItem key={c.id} value={c.name}>
+                    {c.name}-{c.section}
+                  </SelectItem>
+                ))}
               </SelectContent>
             </Select>
-            {canCreate && (
-              <Button
-                className="bg-emerald-600 hover:bg-emerald-700 text-white shrink-0"
-                onClick={() => {
-                  setAddForm({ ...emptyFeeForm });
-                  setAddOpen(true);
-                }}
-              >
-                <Plus className="h-4 w-4 mr-2" />
-                Add Fee
-              </Button>
-            )}
           </div>
+        </CardContent>
+      </Card>
 
-          {/* Fee Table */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-base">Fee Records</CardTitle>
-              <CardDescription>{filtered.length} records found</CardDescription>
-            </CardHeader>
-            <CardContent className="p-0">
-              {loading ? (
-                <div className="p-6 space-y-3">
-                  {[...Array(6)].map((_, i) => (
-                    <Skeleton key={i} className="h-12 w-full" />
-                  ))}
-                </div>
-              ) : (
-                <div className="overflow-x-auto">
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead>Student</TableHead>
-                        <TableHead>Type</TableHead>
-                        <TableHead className="hidden sm:table-cell">
-                          Amount
-                        </TableHead>
-                        <TableHead className="hidden md:table-cell">
-                          Due Date
-                        </TableHead>
-                        <TableHead className="hidden md:table-cell">
-                          Paid
-                        </TableHead>
-                        <TableHead className="w-28 text-center">
-                          Status
-                        </TableHead>
-                        <TableHead className="w-36 text-center">
-                          {(canEdit || canDelete) && "Actions"}
-                        </TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {filtered.length === 0 ? (
-                        <TableRow>
-                          <TableCell
-                            colSpan={7}
-                            className="text-center py-12 text-muted-foreground"
-                          >
-                            <DollarSign className="h-10 w-10 mx-auto mb-2 opacity-30" />
-                            <p>No fee records found</p>
-                          </TableCell>
-                        </TableRow>
-                      ) : (
-                        filtered.map((fee) => {
-                          const config =
-                            statusConfig[fee.status] || statusConfig.pending;
-                          return (
-                            <TableRow
-                              key={fee.id}
-                              className="hover:bg-emerald-50/50 dark:hover:bg-emerald-900/20 transition-colors"
-                            >
-                              <TableCell>
-                                <div className="flex items-center gap-3">
-                                  <div className="h-8 w-8 rounded-full bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 flex items-center justify-center text-xs font-semibold">
-                                    {fee.studentName
-                                      .split(" ")
-                                      .map((n) => n[0])
-                                      .join("")
-                                      .slice(0, 2)
-                                      .toUpperCase()}
-                                  </div>
-                                  <span className="font-medium text-sm">
-                                    {fee.studentName}
-                                  </span>
-                                </div>
-                              </TableCell>
-                              <TableCell>
-                                <Badge
-                                  variant="outline"
-                                  className="font-normal capitalize"
-                                >
-                                  {fee.type}
-                                </Badge>
-                              </TableCell>
-                              <TableCell className="hidden sm:table-cell text-sm font-medium">
-                                ${fee.amount.toLocaleString()}
-                              </TableCell>
-                              <TableCell className="hidden md:table-cell text-sm text-muted-foreground">
-                                {new Date(fee.dueDate).toLocaleDateString()}
-                              </TableCell>
-                              <TableCell className="hidden md:table-cell text-sm text-emerald-600 font-medium">
-                                ${fee.paidAmount.toLocaleString()}
-                              </TableCell>
-                              <TableCell className="text-center">
-                                <Badge
-                                  variant="outline"
-                                  className={`${config.bg} font-medium capitalize`}
-                                >
-                                  {config.icon}
-                                  <span className="ml-1">{fee.status}</span>
-                                </Badge>
-                              </TableCell>
-                              <TableCell className="text-center">
-                                {(canEdit || canDelete) && (
-                                  <div className="flex items-center justify-center gap-1">
-                                    {canEdit && fee.status !== "paid" && (
-                                      <Button
-                                        size="sm"
-                                        className="h-7 text-xs bg-emerald-600 hover:bg-emerald-700 text-white"
-                                        onClick={async () => {
-                                          try {
-                                            const res = await apiFetch("/api/fees", {
-                                              method: "PUT",
-                                              headers: { "Content-Type": "application/json" },
-                                              body: JSON.stringify({
-                                                id: fee.id,
-                                                status: "paid",
-                                                paidAmount: fee.amount,
-                                                paidDate: new Date().toISOString(),
-                                              }),
-                                            });
-                                            if (res.ok) {
-                                              toast.success(`Payment recorded for ${fee.studentName}`);
-                                              refetchFees();
-                                            } else {
-                                              toast.error("Failed to record payment");
-                                            }
-                                          } catch {
-                                            toast.error("Error recording payment");
-                                          }
-                                        }}
-                                      >
-                                        <CreditCard className="h-3 w-3 mr-1" />{" "}
-                                        Pay
-                                      </Button>
-                                    )}
-                                    {canEdit && (
-                                      <Button
-                                        variant="ghost"
-                                        size="icon"
-                                        className="h-7 w-7 text-emerald-500 hover:text-emerald-700 hover:bg-emerald-50 dark:hover:bg-emerald-900/30"
-                                        onClick={() => handleEdit(fee)}
-                                        title="Edit"
-                                      >
-                                        <Pencil className="h-3.5 w-3.5" />
-                                      </Button>
-                                    )}
-                                    {canDelete && (
-                                      <AlertDialog>
-                                        <AlertDialogTrigger asChild>
-                                          <Button
-                                            variant="ghost"
-                                            size="icon"
-                                            className="h-7 w-7 text-red-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/30"
-                                            title="Delete"
-                                          >
-                                            <Trash2 className="h-3.5 w-3.5" />
-                                          </Button>
-                                        </AlertDialogTrigger>
-                                        <AlertDialogContent>
-                                          <AlertDialogHeader>
-                                            <AlertDialogTitle>
-                                              Delete Fee Record
-                                            </AlertDialogTitle>
-                                            <AlertDialogDescription>
-                                              Are you sure you want to delete
-                                              the fee record for{" "}
-                                              {fee.studentName}? This action
-                                              cannot be undone.
-                                            </AlertDialogDescription>
-                                          </AlertDialogHeader>
-                                          <AlertDialogFooter>
-                                            <AlertDialogCancel>
-                                              Cancel
-                                            </AlertDialogCancel>
-                                            <AlertDialogAction
-                                              onClick={() =>
-                                                handleDelete(fee.id)
-                                              }
-                                              disabled={deleting}
-                                              className="bg-red-600 hover:bg-red-700"
-                                            >
-                                              {deleting
-                                                ? "Deleting..."
-                                                : "Delete"}
-                                            </AlertDialogAction>
-                                          </AlertDialogFooter>
-                                        </AlertDialogContent>
-                                      </AlertDialog>
-                                    )}
-                                  </div>
-                                )}
-                              </TableCell>
-                            </TableRow>
-                          );
-                        })
-                      )}
-                    </TableBody>
-                  </Table>
-                </div>
-              )}
-            </CardContent>
-          </Card>
+      {/* Records Table */}
+      <Card className="border-none shadow-sm overflow-hidden">
+        <CardHeader className="border-b bg-gray-50/50 dark:bg-gray-900/20 px-6 py-4">
+          <CardTitle className="text-sm font-bold uppercase tracking-widest text-gray-500">
+            Recent Fee Records
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="p-0">
+          <FeeTable
+            records={records}
+            canEdit={canEdit}
+            canDelete={canDelete}
+            onEdit={handleOpenEdit}
+            onDelete={handleDelete}
+            onView={handleOpenView}
+          />
+        </CardContent>
+      </Card>
 
-          {/* Add Fee Dialog */}
-          <Dialog open={addOpen} onOpenChange={setAddOpen}>
-            <DialogContent className="sm:max-w-lg">
-              <DialogHeader>
-                <DialogTitle>Add Fee</DialogTitle>
-                <DialogDescription>
-                  Create a new fee record for a student
-                </DialogDescription>
-              </DialogHeader>
-              <div className="grid gap-4 py-2">
-                <div className="grid gap-2">
-                  <Label>Student *</Label>
-                  <Select
-                    value={addForm.studentId}
-                    onValueChange={(v) =>
-                      setAddForm({ ...addForm, studentId: v })
-                    }
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select student" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {students.map((s) => (
-                        <SelectItem key={s.id} value={s.id}>
-                          {s.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="grid gap-2">
-                    <Label>Type *</Label>
-                    <Select
-                      value={addForm.type}
-                      onValueChange={(v) => setAddForm({ ...addForm, type: v })}
-                    >
-                      <SelectTrigger>
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="tuition">Tuition</SelectItem>
-                        <SelectItem value="exam">Exam</SelectItem>
-                        <SelectItem value="library">Library</SelectItem>
-                        <SelectItem value="transport">Transport</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div className="grid gap-2">
-                    <Label>Amount ($) *</Label>
-                    <Input
-                      type="number"
-                      min="0"
-                      value={addForm.amount}
-                      onChange={(e) =>
-                        setAddForm({ ...addForm, amount: e.target.value })
-                      }
-                      placeholder="0.00"
-                    />
-                  </div>
-                </div>
-                <div className="grid gap-2">
-                  <Label>Due Date *</Label>
-                  <Input
-                    type="date"
-                    value={addForm.dueDate}
-                    onChange={(e) =>
-                      setAddForm({ ...addForm, dueDate: e.target.value })
-                    }
-                  />
-                </div>
-              </div>
-              <DialogFooter>
-                <Button variant="outline" onClick={() => setAddOpen(false)}>
-                  Cancel
-                </Button>
-                <Button
-                  className="bg-emerald-600 hover:bg-emerald-700 text-white"
-                  onClick={handleAdd}
-                  disabled={
-                    adding ||
-                    !addForm.studentId ||
-                    !addForm.amount ||
-                    !addForm.dueDate
-                  }
-                >
-                  {adding ? "Adding..." : "Add Fee"}
-                </Button>
-              </DialogFooter>
-            </DialogContent>
-          </Dialog>
-
-          {/* Edit Fee Dialog */}
-          <Dialog open={editOpen} onOpenChange={setEditOpen}>
-            <DialogContent className="sm:max-w-lg">
-              <DialogHeader>
-                <DialogTitle>Edit Fee</DialogTitle>
-                <DialogDescription>
-                  Update fee record for {editingFee?.studentName}
-                </DialogDescription>
-              </DialogHeader>
-              <div className="grid gap-4 py-2">
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="grid gap-2">
-                    <Label>Status</Label>
-                    <Select
-                      value={editForm.status}
-                      onValueChange={(v) =>
-                        setEditForm({ ...editForm, status: v })
-                      }
-                    >
-                      <SelectTrigger>
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="pending">Pending</SelectItem>
-                        <SelectItem value="paid">Paid</SelectItem>
-                        <SelectItem value="overdue">Overdue</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div className="grid gap-2">
-                    <Label>Paid Amount ($)</Label>
-                    <Input
-                      type="number"
-                      min="0"
-                      value={editForm.paidAmount}
-                      onChange={(e) =>
-                        setEditForm({ ...editForm, paidAmount: e.target.value })
-                      }
-                      placeholder="0.00"
-                    />
-                  </div>
-                </div>
-                <div className="grid gap-2">
-                  <Label>Paid Date</Label>
-                  <Input
-                    type="date"
-                    value={editForm.paidDate}
-                    onChange={(e) =>
-                      setEditForm({ ...editForm, paidDate: e.target.value })
-                    }
-                  />
-                </div>
-              </div>
-              <DialogFooter>
-                <Button variant="outline" onClick={() => setEditOpen(false)}>
-                  Cancel
-                </Button>
-                <Button
-                  className="bg-emerald-600 hover:bg-emerald-700 text-white"
-                  onClick={handleEditSave}
-                  disabled={saving}
-                >
-                  {saving ? "Saving..." : "Save Changes"}
-                </Button>
-              </DialogFooter>
-            </DialogContent>
-          </Dialog>
-        </>
-      )}
+      <FeeDialog
+        open={dialogOpen}
+        onOpenChange={setDialogOpen}
+        mode={dialogMode}
+        record={selectedRecord}
+        students={studentOptions}
+        formData={formData}
+        setFormData={setFormData}
+        submitting={submitting}
+        onSubmit={handleSubmit}
+      />
     </div>
   );
 }

@@ -18,7 +18,6 @@ import { AdminNotices } from '@/components/screens/admin/notices';
 import { AdminTimetable } from '@/components/screens/admin/timetable';
 import { AdminCalendar } from '@/components/screens/admin/calendar';
 import { AdminReports } from '@/components/screens/admin/reports';
-import { AdminSubscriptions } from '@/components/screens/admin/subscriptions';
 import { AdminRoles } from '@/components/screens/admin/roles';
 import { AdminStaff } from '@/components/screens/admin/staff';
 import { AdminTickets } from '@/components/screens/admin/tickets';
@@ -79,7 +78,7 @@ const roleScreens: Record<UserRole, Set<string>> = {
   ]),
   admin: new Set([
     'dashboard', 'students', 'teachers', 'parents', 'classes', 'subjects', 'attendance', 
-    'fees', 'grades', 'notices', 'timetable', 'calendar', 'reports', 'subscriptions', 'roles', 'staff', 'school-settings', 'tickets'
+    'fees', 'grades', 'notices', 'timetable', 'calendar', 'reports', 'roles', 'staff', 'school-settings', 'tickets'
   ]),
   teacher: new Set([
     'dashboard', 'my-classes', 'take-attendance', 'grade-management',
@@ -134,7 +133,6 @@ function ScreenRouter({ screen }: { screen: string }) {
       case 'notices': return <AdminNotices />;
       case 'timetable': return <AdminTimetable />;
       case 'calendar': return <AdminCalendar />;
-      case 'subscriptions': return <AdminSubscriptions />;
       case 'roles': return <AdminRoles />;
       case 'staff': return <AdminStaff />;
       case 'school-settings': return <AdminSchoolSettings />;

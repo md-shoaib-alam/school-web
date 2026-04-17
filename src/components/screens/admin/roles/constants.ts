@@ -15,7 +15,6 @@ export const PERMISSION_MODULES: PermissionModule[] = [
   { key: "calendar", label: "Calendar", icon: "📆" },
   { key: "reports", label: "Reports", icon: "📊" },
   { key: "leaves", label: "Leaves", icon: "📅" },
-  { key: "subscriptions", label: "Subscriptions", icon: "💳" },
 ];
 
 export const PERMISSION_ACTIONS = ["view", "create", "edit", "delete"] as const;
