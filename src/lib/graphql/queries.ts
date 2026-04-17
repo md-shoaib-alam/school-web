@@ -7,7 +7,7 @@ export const PLATFORM_STATS = `
       subscriptions { total active }
       revenue { active total }
       planDistribution { plan count }
-      recentLogs { id action resource details createdAt tenant { id name } }
+      activityLogs { id action resource details createdAt tenant { id name } user { name email } }
       monthlyData { month newTenants newUsers revenue }
       topTenants { id name slug plan status studentCount teacherCount revenue _count { users classes } }
     }

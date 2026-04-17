@@ -5,9 +5,9 @@ export interface PlatformStatsData {
   subscriptions: { total: number; active: number }
   revenue: { active: number; total: number }
   planDistribution: { plan: string; count: number }[]
-  recentLogs: { id: string; action: string; resource: string; details: string; createdAt: string; tenant?: { id: string; name: string } | null }[]
+  activityLogs: { id: string; action: string; resource: string; details: string; createdAt: string; tenant?: { id: string; name: string } | null; user: { name: string; email: string } }[]
   monthlyData: { month: string; newTenants: number; newUsers: number; revenue: number }[]
-  topTenants: { id: string; name: string; slug: string; plan: string; status: string; studentCount: number; teacherCount: number; revenue: number; _count: { users: number; classes: number } }[]
+  topTenants: { id: string; name: string; slug: string; plan: string; status: string; studentCount: number; teacherCount: number; totalRevenue: number; _count: { users: number; classes: number } }[]
 }
 
 export interface BillingDataResponse {

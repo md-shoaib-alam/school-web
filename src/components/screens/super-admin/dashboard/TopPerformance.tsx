@@ -99,7 +99,7 @@ export function TopPerformance({ loading, data }: TopPerformanceProps) {
                       <TableCell className="text-right">
                         <div className="flex items-center justify-end font-black text-sm text-emerald-600">
                           <IndianRupee className="h-3.5 w-3.5 mr-0.5" />
-                          {tenant.totalRevenue.toLocaleString()}
+                          { (tenant.totalRevenue || 0).toLocaleString() }
                         </div>
                       </TableCell>
                     </TableRow>

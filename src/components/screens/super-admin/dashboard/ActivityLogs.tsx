@@ -81,7 +81,7 @@ export function ActivityLogs({ loading, data }: ActivityLogsProps) {
                   </TableRow>
                 ))
               ) : (
-                data?.activityLogs.map((log) => (
+                (data?.activityLogs || []).map((log) => (
                   <TableRow key={log.id} className="hover:bg-gray-50/50 dark:hover:bg-gray-900/30 transition-colors border-b last:border-none">
                     <TableCell className="pl-6 py-4">
                       <Badge variant="outline" className={`gap-1.5 font-black text-[9px] h-6 uppercase tracking-widest px-2 border-none ${ACTION_COLORS[log.action] || 'bg-gray-100'}`}>
