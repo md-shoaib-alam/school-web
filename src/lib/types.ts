@@ -90,6 +90,7 @@ export interface AssignmentInfo {
 
 export interface FeeRecord {
   id: string;
+  studentId: string;
   studentName: string;
   amount: number;
   type: string;

@@ -6,24 +6,31 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 interface PaginationProps {
   currentPage: number;
   totalPages: number;
+  totalItems: number;
+  itemsPerPage: number;
   onPageChange: (page: number) => void;
 }
 
-export function Pagination({
+// Smart pagination with sliding window from user's code
+function PaginationPages({
   currentPage,
   totalPages,
   onPageChange,
-}: PaginationProps) {
+}: {
+  currentPage: number;
+  totalPages: number;
+  onPageChange: (page: number) => void;
+}) {
   if (totalPages <= 1) return null;
 
   const getPageNumbers = (): (number | "ellipsis")[] => {
-    if (totalPages <= 5) {
+    if (totalPages <= 7) {
       return Array.from({ length: totalPages }, (_, i) => i + 1);
     }
 
     const pages: (number | "ellipsis")[] = [1];
 
-    if (currentPage > 2) {
+    if (currentPage > 3) {
       pages.push("ellipsis");
     }
 
@@ -34,7 +41,7 @@ export function Pagination({
       pages.push(i);
     }
 
-    if (currentPage < totalPages - 1) {
+    if (currentPage < totalPages - 2) {
       pages.push("ellipsis");
     }
 
@@ -43,50 +50,78 @@ export function Pagination({
   };
 
   return (
-    <div className="flex items-center justify-between px-4 py-4 border-t bg-gray-50/50 dark:bg-gray-900/50">
-      <p className="text-sm text-gray-500 dark:text-gray-400">
-        Page <span className="font-medium text-gray-900 dark:text-gray-100">{currentPage}</span> of{" "}
-        <span className="font-medium text-gray-900 dark:text-gray-100">{totalPages}</span>
+    <div className="flex items-center gap-1">
+      {getPageNumbers().map((page, idx) => {
+        if (page === "ellipsis") {
+          return (
+            <span
+              key={`ellipsis-${idx}`}
+              className="px-1.5 text-muted-foreground text-sm select-none"
+            >
+              ...
+            </span>
+          );
+        }
+        return (
+          <Button
+            key={page}
+            variant={currentPage === page ? "default" : "outline"}
+            size="icon"
+            className={`h-8 w-8 text-sm ${currentPage === page ? "bg-emerald-600 hover:bg-emerald-700 text-white" : ""}`}
+            onClick={() => onPageChange(page)}
+          >
+            {page}
+          </Button>
+        );
+      })}
+    </div>
+  );
+}
+
+export function Pagination({
+  currentPage,
+  totalPages,
+  totalItems,
+  itemsPerPage,
+  onPageChange,
+}: PaginationProps) {
+  if (totalItems === 0) return null;
+
+  return (
+    <div className="flex flex-col sm:flex-row items-center justify-between px-4 py-3 border-t gap-3">
+      <p className="text-sm text-muted-foreground">
+        Showing{" "}
+        <span className="font-medium">
+          {Math.min((currentPage - 1) * itemsPerPage + 1, totalItems)}
+        </span>
+        {" to "}
+        <span className="font-medium">
+          {Math.min(currentPage * itemsPerPage, totalItems)}
+        </span>
+        {" of "}
+        <span className="font-medium">{totalItems}</span> students
       </p>
       <div className="flex items-center gap-1">
         <Button
           variant="outline"
-          size="sm"
+          size="icon"
+          className="h-8 w-8"
+          disabled={currentPage <= 1}
           onClick={() => onPageChange(currentPage - 1)}
-          disabled={currentPage === 1}
-          className="h-8 w-8 p-0"
         >
           <ChevronLeft className="h-4 w-4" />
         </Button>
-        <div className="flex items-center gap-1">
-          {getPageNumbers().map((page, i) =>
-            page === "ellipsis" ? (
-              <span key={`ellipsis-${i}`} className="px-2 text-gray-400">
-                ...
-              </span>
-            ) : (
-              <Button
-                key={page}
-                variant={currentPage === page ? "default" : "outline"}
-                size="sm"
-                onClick={() => onPageChange(page)}
-                className={`h-8 w-8 p-0 ${
-                  currentPage === page
-                    ? "bg-emerald-600 hover:bg-emerald-700 text-white border-emerald-600"
-                    : ""
-                }`}
-              >
-                {page}
-              </Button>
-            ),
-          )}
-        </div>
+        <PaginationPages
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPageChange={onPageChange}
+        />
         <Button
           variant="outline"
-          size="sm"
+          size="icon"
+          className="h-8 w-8"
+          disabled={currentPage >= totalPages}
           onClick={() => onPageChange(currentPage + 1)}
-          disabled={currentPage === totalPages}
-          className="h-8 w-8 p-0"
         >
           <ChevronRight className="h-4 w-4" />
         </Button>

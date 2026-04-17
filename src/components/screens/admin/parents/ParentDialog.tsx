@@ -3,13 +3,15 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Badge } from "@/components/ui/badge";
+import { Separator } from "@/components/ui/separator";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
   DialogDescription,
-  DialogFooter,
 } from "@/components/ui/dialog";
 import {
   Select,
@@ -18,201 +20,309 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { Badge } from "@/components/ui/badge";
-import { Loader2, UserPlus, Link2, X, Search, GraduationCap } from "lucide-react";
-import { useState, useMemo } from "react";
-import type { ParentInfo, StudentInfo, ParentFormData } from "./types";
+import { X, GraduationCap, Link2, Loader2 } from "lucide-react";
+import { ParentInfo, StudentInfo } from "./types";
 
-interface ParentDialogProps {
+interface EditParentDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  editingParent: ParentInfo | null;
-  formData: ParentFormData;
-  setFormData: (data: ParentFormData) => void;
-  submitting: boolean;
-  onSubmit: () => void;
-  allStudents: StudentInfo[];
-  onLinkChild: (parentId: string, childId: string) => void;
-  linking: boolean;
+  editForm: any;
+  setEditForm: (form: any) => void;
+  onSave: () => void;
+  editing: boolean;
 }
 
-export function ParentDialog({
+export function EditParentDialog({
   open,
   onOpenChange,
-  editingParent,
-  formData,
-  setFormData,
-  submitting,
-  onSubmit,
-  allStudents,
-  onLinkChild,
-  linking,
-}: ParentDialogProps) {
-  const [studentSearch, setStudentSearch] = useState("");
-  const title = editingParent ? "Edit Parent Profile" : "Add New Parent";
-
-  const filteredStudents = useMemo(() => {
-    if (!studentSearch) return [];
-    return allStudents
-      .filter(
-        (s) =>
-          s.name.toLowerCase().includes(studentSearch.toLowerCase()) ||
-          s.rollNumber.toLowerCase().includes(studentSearch.toLowerCase())
-      )
-      .slice(0, 5);
-  }, [allStudents, studentSearch]);
-
+  editForm,
+  setEditForm,
+  onSave,
+  editing,
+}: EditParentDialogProps) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[500px] max-h-[90vh] flex flex-col p-0 overflow-hidden">
-        <DialogHeader className="p-6 pb-2">
-          <DialogTitle className="flex items-center gap-2">
-            <UserPlus className="h-5 w-5 text-amber-600" />
-            {title}
-          </DialogTitle>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Edit Parent</DialogTitle>
+          <DialogDescription>Update parent information</DialogDescription>
+        </DialogHeader>
+        <div className="space-y-4 pt-2">
+          <div>
+            <Label>Full Name *</Label>
+            <Input
+              value={editForm.name}
+              onChange={(e) => setEditForm({ ...editForm, name: e.target.value })}
+              placeholder="e.g. Robert Anderson"
+              className="mt-1.5"
+            />
+          </div>
+          <div>
+            <Label>Email *</Label>
+            <Input
+              type="email"
+              value={editForm.email}
+              onChange={(e) => setEditForm({ ...editForm, email: e.target.value })}
+              placeholder="parent@sigel.edu"
+              className="mt-1.5"
+            />
+          </div>
+          <div>
+            <Label>Phone</Label>
+            <Input
+              value={editForm.phone}
+              onChange={(e) => setEditForm({ ...editForm, phone: e.target.value })}
+              placeholder="555-0201"
+              className="mt-1.5"
+            />
+          </div>
+          <div>
+            <Label>Occupation</Label>
+            <Input
+              value={editForm.occupation}
+              onChange={(e) => setEditForm({ ...editForm, occupation: e.target.value })}
+              placeholder="e.g. Engineer"
+              className="mt-1.5"
+            />
+          </div>
+          <Button
+            onClick={onSave}
+            disabled={editing}
+            className="w-full bg-emerald-600 hover:bg-emerald-700 text-white"
+          >
+            {editing ? "Saving..." : "Save Changes"}
+          </Button>
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+interface CreateParentDialogProps {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  createForm: any;
+  setCreateForm: (form: any) => void;
+  onCreate: () => void;
+  creating: boolean;
+}
+
+export function CreateParentDialog({
+  open,
+  onOpenChange,
+  createForm,
+  setCreateForm,
+  onCreate,
+  creating,
+}: CreateParentDialogProps) {
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Add New Parent</DialogTitle>
           <DialogDescription>
-            {editingParent
-              ? "Update parent account details and manage linked children."
-              : "Create a new parent account to link with students."}
+            Create a new parent account in the system
+          </DialogDescription>
+        </DialogHeader>
+        <div className="space-y-4 pt-2">
+          <div>
+            <Label>Full Name *</Label>
+            <Input
+              value={createForm.name}
+              onChange={(e) => setCreateForm({ ...createForm, name: e.target.value })}
+              placeholder="e.g. Robert Anderson"
+              className="mt-1.5"
+            />
+          </div>
+          <div>
+            <Label>Email *</Label>
+            <Input
+              type="email"
+              value={createForm.email}
+              onChange={(e) => setCreateForm({ ...createForm, email: e.target.value })}
+              placeholder="parent@sigel.edu"
+              className="mt-1.5"
+            />
+          </div>
+          <div>
+            <Label>Login Password</Label>
+            <Input
+              type="password"
+              value={createForm.password}
+              onChange={(e) => setCreateForm({ ...createForm, password: e.target.value })}
+              placeholder="Set login password (default: changeme123)"
+              className="mt-1.5"
+            />
+          </div>
+          <div>
+            <Label>Phone</Label>
+            <Input
+              value={createForm.phone}
+              onChange={(e) => setCreateForm({ ...createForm, phone: e.target.value })}
+              placeholder="555-0201"
+              className="mt-1.5"
+            />
+          </div>
+          <div>
+            <Label>Occupation</Label>
+            <Input
+              value={createForm.occupation}
+              onChange={(e) => setCreateForm({ ...createForm, occupation: e.target.value })}
+              placeholder="e.g. Engineer"
+              className="mt-1.5"
+            />
+          </div>
+          <Button
+            onClick={onCreate}
+            disabled={creating}
+            className="w-full bg-emerald-600 hover:bg-emerald-700 text-white"
+          >
+            {creating ? "Creating..." : "Create Parent"}
+          </Button>
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+interface LinkChildDialogProps {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  selectedParent: ParentInfo | null;
+  selectedClass: string;
+  setSelectedClass: (cls: string) => void;
+  classes: { id: string; name: string; section: string }[];
+  filteredStudents: StudentInfo[];
+  linking: boolean;
+  onLinkChild: (studentId: string) => void;
+  onUnlinkChild: (parentId: string, studentId: string) => void;
+}
+
+export function LinkChildDialog({
+  open,
+  onOpenChange,
+  selectedParent,
+  selectedClass,
+  setSelectedClass,
+  classes,
+  filteredStudents,
+  linking,
+  onLinkChild,
+  onUnlinkChild,
+}: LinkChildDialogProps) {
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="max-w-lg overflow-hidden flex flex-col h-[80vh]">
+        <DialogHeader>
+          <DialogTitle>Link Child to {selectedParent?.name}</DialogTitle>
+          <DialogDescription>
+            Select a student to link as a child. {selectedParent?.name} currently
+            has {selectedParent?.children.length} children.
           </DialogDescription>
         </DialogHeader>
 
-        <ScrollArea className="flex-1 p-6 pt-2">
-          <div className="space-y-6">
-            <div className="space-y-4">
+        <ScrollArea className="flex-1 pr-4">
+          <div className="space-y-6 py-2">
+            {selectedParent && selectedParent.children.length > 0 && (
               <div className="space-y-2">
-                <Label>Parent Full Name *</Label>
-                <Input
-                  placeholder="e.g. Michael Smith"
-                  value={formData.name}
-                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                />
-              </div>
-              <div className="space-y-2">
-                <Label>Email Address *</Label>
-                <Input
-                  type="email"
-                  placeholder="m.smith@example.com"
-                  value={formData.email}
-                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                />
-              </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label>Phone Number</Label>
-                  <Input
-                    placeholder="+1 234 567 890"
-                    value={formData.phone}
-                    onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label>Occupation</Label>
-                  <Input
-                    placeholder="e.g. Engineer"
-                    value={formData.occupation}
-                    onChange={(e) => setFormData({ ...formData, occupation: e.target.value })}
-                  />
+                <Label className="text-xs text-gray-500 dark:text-gray-400">
+                  Currently Linked
+                </Label>
+                <div className="flex flex-wrap gap-2">
+                  {selectedParent.children.map((child) => (
+                    <Badge
+                      key={child.id}
+                      variant="secondary"
+                      className="bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800 gap-1 pr-1"
+                    >
+                      {child.name}
+                      <button
+                        onClick={() => onUnlinkChild(selectedParent.id, child.id)}
+                        className="h-4 w-4 rounded-full hover:bg-emerald-200 dark:hover:bg-emerald-800 flex items-center justify-center transition-colors"
+                        disabled={linking}
+                      >
+                        <X className="h-3 w-3" />
+                      </button>
+                    </Badge>
+                  ))}
                 </div>
               </div>
-              {!editingParent && (
-                <div className="space-y-2">
-                  <Label>Password *</Label>
-                  <Input
-                    type="password"
-                    placeholder="Set login password"
-                    value={formData.password}
-                    onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                  />
+            )}
+
+            <Separator />
+
+            <div>
+              <Label className="text-xs text-gray-500 dark:text-gray-400 mb-1.5 block">
+                Filter by Class
+              </Label>
+              <Select value={selectedClass} onValueChange={setSelectedClass}>
+                <SelectTrigger className="h-9">
+                  <SelectValue placeholder="All Classes" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Classes</SelectItem>
+                  {classes.map((c) => (
+                    <SelectItem key={c.id} value={c.id}>
+                      {c.name} - {c.section}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div>
+              <Label className="text-xs text-gray-500 dark:text-gray-400 mb-2 block font-semibold">
+                Available Students
+              </Label>
+              {filteredStudents.length === 0 ? (
+                <div className="text-center py-10 bg-gray-50 dark:bg-gray-900/20 rounded-xl border border-dashed border-gray-200 dark:border-gray-800">
+                  <p className="text-gray-400 dark:text-gray-500 text-sm">
+                    No unlinked students found
+                  </p>
+                  <p className="text-[10px] mt-1 text-gray-400">
+                    Try changing class filter or add new students
+                  </p>
+                </div>
+              ) : (
+                <div className="space-y-1.5">
+                  {filteredStudents.map((student) => (
+                    <div
+                      key={student.id}
+                      className="flex items-center justify-between p-3 rounded-xl border border-gray-100 dark:border-gray-800 hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:border-blue-200 dark:hover:border-blue-800/50 transition-all group"
+                    >
+                      <div className="flex items-center gap-3">
+                        <div className="h-8 w-8 rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform">
+                          <GraduationCap className="h-4 w-4" />
+                        </div>
+                        <div>
+                          <p className="text-sm font-bold text-gray-800 dark:text-gray-200">
+                            {student.name}
+                          </p>
+                          <p className="text-[10px] text-gray-500 dark:text-gray-400 font-medium">
+                            {student.className} • Roll {student.rollNumber}
+                          </p>
+                        </div>
+                      </div>
+                      <Button
+                        size="sm"
+                        className="h-8 text-xs bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-lg shadow-sm"
+                        onClick={() => onLinkChild(student.id)}
+                        disabled={linking}
+                      >
+                        {linking ? (
+                          <Loader2 className="h-3 w-3 animate-spin" />
+                        ) : (
+                          <Link2 className="h-3.5 w-3.5 mr-1" />
+                        )}
+                        Link
+                      </Button>
+                    </div>
+                  ))}
                 </div>
               )}
             </div>
-
-            {editingParent && (
-              <div className="pt-6 border-t border-gray-100 dark:border-gray-800 space-y-4">
-                <div className="flex items-center justify-between">
-                  <Label className="text-xs font-bold text-gray-400 uppercase tracking-widest">
-                    Link New Child
-                  </Label>
-                </div>
-
-                <div className="relative">
-                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
-                  <Input
-                    placeholder="Search students by name or roll no..."
-                    className="pl-9"
-                    value={studentSearch}
-                    onChange={(e) => setStudentSearch(e.target.value)}
-                  />
-                </div>
-
-                {studentSearch && (
-                  <div className="bg-gray-50 dark:bg-gray-950 border border-gray-100 dark:border-gray-800 rounded-lg overflow-hidden divide-y divide-gray-100 dark:divide-gray-800">
-                    {filteredStudents.length > 0 ? (
-                      filteredStudents.map((student) => (
-                        <div
-                          key={student.id}
-                          className="p-3 flex items-center justify-between hover:bg-gray-100 dark:hover:bg-gray-900 transition-colors"
-                        >
-                          <div className="flex items-center gap-3">
-                            <div className="h-8 w-8 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center text-blue-600 dark:text-blue-400">
-                              <GraduationCap className="h-4 w-4" />
-                            </div>
-                            <div>
-                              <p className="text-sm font-medium">{student.name}</p>
-                              <p className="text-[10px] text-gray-500">
-                                Roll: {student.rollNumber} • {student.className}
-                              </p>
-                            </div>
-                          </div>
-                          <Button
-                            size="sm"
-                            variant="ghost"
-                            className="h-8 text-blue-600 hover:text-blue-700 hover:bg-blue-50"
-                            disabled={linking || editingParent.children.some((c) => c.id === student.id)}
-                            onClick={() => {
-                              onLinkChild(editingParent.id, student.id);
-                              setStudentSearch("");
-                            }}
-                          >
-                            {linking ? (
-                              <Loader2 className="h-3 w-3 animate-spin" />
-                            ) : editingParent.children.some((c) => c.id === student.id) ? (
-                              "Linked"
-                            ) : (
-                              <>
-                                <Link2 className="h-3 w-3 mr-1" /> Link
-                              </>
-                            )}
-                          </Button>
-                        </div>
-                      ))
-                    ) : (
-                      <div className="p-4 text-center text-xs text-gray-500 italic">
-                        No matching students found
-                      </div>
-                    )}
-                  </div>
-                )}
-              </div>
-            )}
           </div>
         </ScrollArea>
-
-        <DialogFooter className="p-6 border-t bg-gray-50/50 dark:bg-gray-900/50">
-          <Button variant="outline" onClick={() => onOpenChange(false)} disabled={submitting}>
-            Cancel
-          </Button>
-          <Button
-            className="bg-amber-600 hover:bg-amber-700 text-white shadow-sm"
-            onClick={onSubmit}
-            disabled={submitting}
-          >
-            {submitting && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
-            {editingParent ? "Save Changes" : "Create Account"}
-          </Button>
-        </DialogFooter>
       </DialogContent>
     </Dialog>
   );

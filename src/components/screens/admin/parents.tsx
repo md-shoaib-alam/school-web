@@ -3,313 +3,405 @@
 import { useState, useEffect, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Heart, Plus, Search, RotateCcw } from "lucide-react";
+import { Search, Users, UserPlus } from "lucide-react";
 import { goeyToast as toast } from "goey-toast";
 import { apiFetch } from "@/lib/api";
 import { useAppStore } from "@/store/use-app-store";
 
-// Sub-components
 import { ParentCard } from "./parents/ParentCard";
-import { ParentDialog } from "./parents/ParentDialog";
+import {
+  CreateParentDialog,
+  EditParentDialog,
+  LinkChildDialog,
+} from "./parents/ParentDialog";
 import { ParentSkeleton } from "./parents/ParentSkeleton";
-
-// Types
-import type { ParentInfo, StudentInfo, ParentFormData } from "./parents/types";
-
-const emptyFormData: ParentFormData = {
-  name: "",
-  email: "",
-  phone: "",
-  occupation: "",
-  password: "",
-};
+import { ParentInfo, StudentInfo } from "./parents/types";
 
 export function AdminParents() {
   const { currentTenantId } = useAppStore();
 
-  // Data states
-  const [parents, setParents] = useState<ParentInfo[]>([]);
-  const [allStudents, setAllStudents] = useState<StudentInfo[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [parents, setParents] = useState<ParentInfo[]>(() => {
+    if (typeof window !== "undefined") {
+      const saved = localStorage.getItem(`parents_cache_${currentTenantId}`);
+      return saved ? JSON.parse(saved) : [];
+    }
+    return [];
+  });
+
+  const [students, setStudents] = useState<StudentInfo[]>([]);
+  const [classes, setClasses] = useState<
+    { id: string; name: string; section: string }[]
+  >([]);
+
+  const [loading, setLoading] = useState(parents.length === 0);
   const [search, setSearch] = useState("");
 
-  // Dialog state
-  const [dialogOpen, setDialogOpen] = useState(false);
-  const [editingParent, setEditingParent] = useState<ParentInfo | null>(null);
-  const [formData, setFormData] = useState<ParentFormData>(emptyFormData);
-  const [submitting, setSubmitting] = useState(false);
+  // Create dialog
+  const [createOpen, setCreateOpen] = useState(false);
+  const [createForm, setCreateForm] = useState({
+    name: "",
+    email: "",
+    phone: "",
+    occupation: "",
+    password: "", // Added consistency
+  });
+  const [creating, setCreating] = useState(false);
+
+  // Link child dialog
+  const [linkOpen, setLinkOpen] = useState(false);
+  const [selectedParent, setSelectedParent] = useState<ParentInfo | null>(null);
+  const [selectedClass, setSelectedClass] = useState("");
   const [linking, setLinking] = useState(false);
 
-  const fetchParents = useCallback(async (showSkeleton = true) => {
-    if (!currentTenantId) return;
-    if (showSkeleton) setLoading(true);
-    try {
-      const res = await apiFetch(`/api/parents?tenantId=${currentTenantId}`);
-      if (res.ok) {
-        const data = await res.json();
-        setParents(data || []);
-      }
-    } catch (err) {
-      toast.error("Failed to load parents");
-    } finally {
-      setLoading(false);
-    }
-  }, [currentTenantId]);
+  // Edit dialog
+  const [editOpen, setEditOpen] = useState(false);
+  const [editingParent, setEditingParent] = useState<ParentInfo | null>(null);
+  const [editForm, setEditForm] = useState({
+    name: "",
+    email: "",
+    phone: "",
+    occupation: "",
+  });
+  const [editing, setEditing] = useState(false);
 
-  const fetchAllStudents = useCallback(async () => {
-    if (!currentTenantId) return;
-    try {
-      const res = await apiFetch(`/api/students?tenantId=${currentTenantId}&limit=1000`);
-      if (res.ok) {
-        const data = await res.json();
-        setAllStudents(
-          (data.items || []).map((s: any) => ({
-            id: s.id,
-            name: s.name,
-            rollNumber: s.rollNumber || "N/A",
-            className: s.class ? `${s.class.name}-${s.class.section}` : "Unassigned",
-            classId: s.classId,
-          }))
-        );
+  const fetchData = useCallback(
+    async (showSkeleton = false) => {
+      try {
+        if (showSkeleton) setLoading(true);
+        const [resParents, resStudents, resClasses] = await Promise.all([
+          apiFetch("/api/parents"),
+          apiFetch("/api/students"),
+          apiFetch("/api/classes"),
+        ]);
+
+        if (!resParents.ok || !resStudents.ok || !resClasses.ok)
+          throw new Error("Failed to load some data");
+
+        const [parentsData, studentsData, classesData] = await Promise.all([
+          resParents.json(),
+          resStudents.json(),
+          resClasses.json(),
+        ]);
+
+        setParents(parentsData);
+        setStudents(studentsData);
+        setClasses(classesData);
+
+        if (typeof window !== "undefined" && currentTenantId) {
+          localStorage.setItem(
+            `parents_cache_${currentTenantId}`,
+            JSON.stringify(parentsData),
+          );
+        }
+      } catch (err) {
+        console.error("Error fetching parent data:", err);
+      } finally {
+        setLoading(false);
       }
-    } catch (err) {
-      console.error("Failed to fetch students for linking:", err);
-    }
-  }, [currentTenantId]);
+    },
+    [currentTenantId],
+  );
 
   useEffect(() => {
-    fetchParents();
-    fetchAllStudents();
-  }, [fetchParents, fetchAllStudents]);
-
-  // --- Handlers ---
-
-  const handleOpenCreate = () => {
-    setEditingParent(null);
-    setFormData(emptyFormData);
-    setDialogOpen(true);
-  };
-
-  const handleOpenEdit = (parent: ParentInfo) => {
-    setEditingParent(parent);
-    setFormData({
-      name: parent.name,
-      email: parent.email,
-      phone: parent.phone || "",
-      occupation: parent.occupation || "",
-      password: "",
-    });
-    setDialogOpen(true);
-  };
-
-  const handleSubmit = async () => {
-    if (!formData.name || !formData.email) {
-      toast.error("Name and Email are required");
-      return;
+    if (currentTenantId) {
+      fetchData(parents.length === 0);
     }
+  }, [currentTenantId, fetchData]);
 
-    setSubmitting(true);
-    try {
-      const url = "/api/parents";
-      const method = editingParent ? "PUT" : "POST";
-      const payload = {
-        ...formData,
-        tenantId: currentTenantId,
-        id: editingParent?.id,
-      };
-
-      const res = await apiFetch(url, {
-        method,
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
-
-      if (res.ok) {
-        toast.success(editingParent ? "Profile updated" : "Account created");
-        setDialogOpen(false);
-        fetchParents(false);
-      } else {
-        const error = await res.json();
-        toast.error(error.message || "Failed to save parent");
-      }
-    } catch (err) {
-      toast.error("An error occurred");
-    } finally {
-      setSubmitting(false);
-    }
-  };
-
-  const handleDelete = async (id: string) => {
-    try {
-      const res = await apiFetch(`/api/parents?id=${id}&tenantId=${currentTenantId}`, {
-        method: "DELETE",
-      });
-      if (res.ok) {
-        toast.success("Account deleted successfully");
-        fetchParents(false);
-      } else {
-        toast.error("Failed to delete account");
-      }
-    } catch (err) {
-      toast.error("An error occurred");
-    }
-  };
-
-  const handleLinkChild = async (parentId: string, studentId: string) => {
-    setLinking(true);
-    try {
-      const res = await apiFetch("/api/parents/link", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ parentId, studentId, tenantId: currentTenantId }),
-      });
-
-      if (res.ok) {
-        toast.success("Child linked successfully");
-        fetchParents(false);
-        // Update local editing parent to reflect change
-        if (editingParent && editingParent.id === parentId) {
-          const student = allStudents.find((s) => s.id === studentId);
-          if (student) {
-            setEditingParent({
-              ...editingParent,
-              children: [
-                ...editingParent.children,
-                {
-                  id: student.id,
-                  name: student.name,
-                  email: "", // Not returned by link
-                  rollNumber: student.rollNumber,
-                  className: student.className,
-                  classId: student.classId || "",
-                  gender: "",
-                },
-              ],
-            });
-          }
-        }
-      } else {
-        toast.error("Failed to link child");
-      }
-    } catch (err) {
-      toast.error("An error occurred");
-    } finally {
-      setLinking(false);
-    }
-  };
-
-  const handleUnlinkChild = async (parentId: string, studentId: string) => {
-    try {
-      const res = await apiFetch("/api/parents/unlink", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ parentId, studentId, tenantId: currentTenantId }),
-      });
-
-      if (res.ok) {
-        toast.success("Child unlinked successfully");
-        fetchParents(false);
-      } else {
-        toast.error("Failed to unlink child");
-      }
-    } catch (err) {
-      toast.error("An error occurred");
-    }
-  };
-
-  // --- Derived ---
   const filtered = parents.filter(
     (p) =>
       p.name.toLowerCase().includes(search.toLowerCase()) ||
       p.email.toLowerCase().includes(search.toLowerCase()) ||
-      p.children.some((c) => c.name.toLowerCase().includes(search.toLowerCase()))
+      p.children.some((c) =>
+        c.name.toLowerCase().includes(search.toLowerCase()),
+      ),
   );
 
-  return (
+  const filteredStudents =
+    selectedClass && selectedClass !== "all"
+      ? students.filter(
+          (s) =>
+            s.classId === selectedClass &&
+            !selectedParent?.children.some((c) => c.id === s.id),
+        )
+      : students.filter(
+          (s) => !selectedParent?.children.some((c) => c.id === s.id),
+        );
+
+  const handleCreate = async () => {
+    if (!createForm.name || !createForm.email) {
+      toast.error("Name and email are required");
+      return;
+    }
+    toast.promise(
+      (async () => {
+        setCreating(true);
+        try {
+          const res = await apiFetch("/api/parents", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ action: "create", ...createForm }),
+          });
+          if (!res.ok) {
+            const err = await res.json().catch(() => ({}));
+            throw new Error(err.error || "Failed to create parent");
+          }
+          setCreateOpen(false);
+          setCreateForm({
+            name: "",
+            email: "",
+            phone: "",
+            occupation: "",
+            password: "",
+          });
+          fetchData();
+          return "Parent account created";
+        } finally {
+          setCreating(false);
+        }
+      })(),
+      {
+        loading: "Creating parent account...",
+        success: (msg) => msg,
+        error: (err: any) => err.message,
+      },
+    );
+  };
+
+  const handleLinkChild = async (studentId: string) => {
+    if (!selectedParent) return;
+    toast.promise(
+      (async () => {
+        setLinking(true);
+        try {
+          const res = await apiFetch("/api/parents", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              action: "link",
+              parentId: selectedParent.id,
+              studentId,
+            }),
+          });
+          if (!res.ok) {
+            const err = await res.json().catch(() => ({}));
+            throw new Error(err.error || "Linking failed");
+          }
+          // Refresh everything to keep in sync
+          const freshParentsRes = await apiFetch("/api/parents");
+          const freshParents = await freshParentsRes.json();
+          setParents(freshParents);
+          setSelectedParent(
+            freshParents.find((p: ParentInfo) => p.id === selectedParent.id) ||
+              null,
+          );
+          return "Student linked successfully";
+        } finally {
+          setLinking(false);
+        }
+      })(),
+      {
+        loading: "Linking child to parent...",
+        success: (msg: any) => msg,
+        error: (err: any) => err.message,
+      },
+    );
+  };
+
+  const handleUnlinkChild = async (parentId: string, studentId: string) => {
+    toast.promise(
+      (async () => {
+        const res = await apiFetch("/api/parents", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            action: "unlink",
+            parentId,
+            studentId,
+          }),
+        });
+        if (!res.ok) {
+          const err = await res.json().catch(() => ({}));
+          throw new Error(err.error || "Unlinking failed");
+        }
+        const freshParentsRes = await apiFetch("/api/parents");
+        const freshParents = await freshParentsRes.json();
+        setParents(freshParents);
+        if (selectedParent && selectedParent.id === parentId) {
+          setSelectedParent(
+            freshParents.find((p: ParentInfo) => p.id === parentId) || null,
+          );
+        }
+
+        // Force red pill morph
+        throw new Error("Child record unlinked");
+      })(),
+      {
+        loading: "Unlinking child...",
+        success: () => "",
+        error: (err: any) => err.message,
+      },
+    );
+  };
+
+  const handleEdit = (parent: ParentInfo) => {
+    setEditingParent(parent);
+    setEditForm({
+      name: parent.name,
+      email: parent.email,
+      phone: parent.phone || "",
+      occupation: parent.occupation || "",
+    });
+    setEditOpen(true);
+  };
+
+  const handleEditSave = async () => {
+    if (!editingParent || !editForm.name || !editForm.email) {
+      toast.error("Name and email are required");
+      return;
+    }
+    toast.promise(
+      (async () => {
+        setEditing(true);
+        try {
+          const res = await apiFetch("/api/parents", {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ id: editingParent.id, ...editForm }),
+          });
+          if (!res.ok) {
+            const err = await res.json().catch(() => ({}));
+            throw new Error(err.error || "Update failed");
+          }
+          setEditOpen(false);
+          fetchData();
+          return "Parent details updated";
+        } finally {
+          setEditing(false);
+        }
+      })(),
+      {
+        loading: "Saving changes...",
+        success: (msg) => msg,
+        error: (err: any) => err.message,
+      },
+    );
+  };
+
+  const handleDelete = async (id: string) => {
+    toast.promise(
+      (async () => {
+        const res = await apiFetch(`/api/parents?id=${id}`, {
+          method: "DELETE",
+        });
+        if (!res.ok) {
+          const err = await res.json().catch(() => ({}));
+          throw new Error(err.error || "Deletion failed");
+        }
+        setParents(parents.filter((p) => p.id !== id));
+
+        // Force red pill morph
+        throw new Error("Parent record removed");
+      })(),
+      {
+        loading: "Removing parent record...",
+        success: () => "",
+        error: (err: any) => err.message,
+      },
+    );
+  };
+
+  return loading && parents.length === 0 ? (
+    <ParentSkeleton />
+  ) : (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
-        <div className="flex items-center gap-3">
-          <div className="h-12 w-12 rounded-2xl bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center text-amber-600 dark:text-amber-400">
-            <Heart className="h-6 w-6" />
-          </div>
-          <div>
-            <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Parent Accounts</h2>
-            <p className="text-sm text-gray-500 dark:text-gray-400">
-              Manage parent profiles and link them to students
-            </p>
-          </div>
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <div>
+          <h2 className="text-xl font-bold text-gray-900 dark:text-gray-100">
+            Parents
+          </h2>
+          <p className="text-sm text-gray-500 dark:text-gray-400 mt-0.5">
+            {parents.length} parents registered •{" "}
+            {parents.reduce((s, p) => s + p.children.length, 0)} children linked
+          </p>
         </div>
-
-        <div className="flex items-center gap-2">
-          <Button
-            variant="outline"
-            size="icon"
-            onClick={() => fetchParents(true)}
-            className="h-10 w-10"
-          >
-            <RotateCcw className="h-4 w-4" />
-          </Button>
-          <Button
-            className="bg-amber-600 hover:bg-amber-700 text-white shadow-sm"
-            onClick={handleOpenCreate}
-          >
-            <Plus className="h-4 w-4 mr-2" />
-            Add Parent
-          </Button>
-        </div>
+        <Button
+          className="bg-emerald-600 hover:bg-emerald-700 text-white"
+          onClick={() => setCreateOpen(true)}
+        >
+          <UserPlus className="h-4 w-4 mr-2" /> Add Parent
+        </Button>
       </div>
 
       {/* Search */}
       <div className="relative max-w-md">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 dark:text-gray-500" />
         <Input
-          placeholder="Search by parent or child name..."
-          className="pl-9 h-11 bg-white dark:bg-gray-900 border-none shadow-sm focus-visible:ring-amber-500"
+          placeholder="Search parents or children..."
+          className="pl-9"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
         />
       </div>
 
-      {/* Content */}
-      {loading ? (
-        <ParentSkeleton />
-      ) : filtered.length === 0 ? (
-        <div className="py-20 text-center bg-white dark:bg-gray-900 rounded-3xl border-2 border-dashed border-gray-100 dark:border-gray-800">
-          <Heart className="h-12 w-12 mx-auto text-gray-300 dark:text-gray-700 mb-4" />
-          <p className="text-lg font-medium text-gray-900 dark:text-gray-100">No parent accounts found</p>
-          <p className="text-sm text-gray-500 mt-1">
-            {search ? "Try adjusting your search query." : "Start by registering a parent."}
-          </p>
-        </div>
-      ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filtered.map((parent, index) => (
-            <ParentCard
-              key={parent.id}
-              parent={parent}
-              index={index}
-              canEdit={true}
-              canDelete={true}
-              onEdit={handleOpenEdit}
-              onDelete={handleDelete}
-              onUnlink={handleUnlinkChild}
-            />
-          ))}
+      {/* Parent Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+        {filtered.map((parent) => (
+          <ParentCard
+            key={parent.id}
+            parent={parent}
+            linking={linking}
+            onEdit={handleEdit}
+            onDelete={handleDelete}
+            onLinkOpen={(p) => {
+              setSelectedParent(p);
+              setLinkOpen(true);
+              setSelectedClass("");
+            }}
+            onUnlinkChild={handleUnlinkChild}
+          />
+        ))}
+      </div>
+
+      {filtered.length === 0 && (
+        <div className="text-center py-16 text-gray-400 dark:text-gray-500">
+          <Users className="h-12 w-12 mx-auto mb-4 opacity-50" />
+          <p className="text-lg">No parents found</p>
+          <p className="text-sm mt-1">Add a parent or adjust your search</p>
         </div>
       )}
 
-      <ParentDialog
-        open={dialogOpen}
-        onOpenChange={setDialogOpen}
-        editingParent={editingParent}
-        formData={formData}
-        setFormData={setFormData}
-        submitting={submitting}
-        onSubmit={handleSubmit}
-        allStudents={allStudents}
-        onLinkChild={handleLinkChild}
+      {/* Dialogs */}
+      <CreateParentDialog
+        open={createOpen}
+        onOpenChange={setCreateOpen}
+        createForm={createForm}
+        setCreateForm={setCreateForm}
+        onCreate={handleCreate}
+        creating={creating}
+      />
+
+      <EditParentDialog
+        open={editOpen}
+        onOpenChange={setEditOpen}
+        editForm={editForm}
+        setEditForm={setEditForm}
+        onSave={handleEditSave}
+        editing={editing}
+      />
+
+      <LinkChildDialog
+        open={linkOpen}
+        onOpenChange={setLinkOpen}
+        selectedParent={selectedParent}
+        selectedClass={selectedClass}
+        setSelectedClass={setSelectedClass}
+        classes={classes}
+        filteredStudents={filteredStudents}
         linking={linking}
+        onLinkChild={handleLinkChild}
+        onUnlinkChild={handleUnlinkChild}
       />
     </div>
   );

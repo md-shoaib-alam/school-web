@@ -72,7 +72,7 @@ export function parseTenantFromPath(pathname: string): string | null {
 
 export const validScreens: Record<UserRole, string[]> = {
   super_admin: ['dashboard', 'tenants', 'billing', 'users', 'audit-logs', 'platform-analytics', 'feature-flags', 'roles', 'staff', 'settings', 'manage-admins'],
-  admin: ['dashboard', 'students', 'teachers', 'parents', 'classes', 'subjects', 'attendance', 'fees', 'notices', 'timetable', 'calendar', 'reports', 'subscriptions', 'roles', 'staff', 'tickets', 'school-settings'],
+  admin: ['dashboard', 'students', 'teachers', 'parents', 'classes', 'subjects', 'attendance', 'fees', 'notices', 'timetable', 'calendar', 'reports', 'roles', 'staff', 'tickets', 'school-settings'],
   teacher: ['dashboard', 'my-classes', 'take-attendance', 'grade-management', 'assignments', 'timetable', 'notices', 'calendar', 'tickets'],
   student: ['dashboard', 'my-classes', 'my-grades', 'my-attendance', 'assignments', 'timetable', 'notices', 'fees', 'calendar', 'tickets'],
   parent: ['dashboard', 'children', 'grades', 'attendance', 'fees', 'notices', 'timetable', 'subscription', 'calendar', 'tickets'],

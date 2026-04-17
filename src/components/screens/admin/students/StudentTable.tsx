@@ -12,17 +12,17 @@ import {
 } from "@/components/ui/table";
 import {
   AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
   AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
+  AlertDialogDescription,
+  AlertDialogFooter,
   AlertDialogTrigger,
+  AlertDialogAction,
+  AlertDialogCancel,
 } from "@/components/ui/alert-dialog";
-import { Eye, Pencil, Phone, Trash2 } from "lucide-react";
-import type { StudentInfo } from "./types";
+import { GraduationCap, Pencil, Trash2 } from "lucide-react";
+import type { StudentInfo } from "@/lib/types";
 
 interface StudentTableProps {
   students: StudentInfo[];
@@ -30,7 +30,6 @@ interface StudentTableProps {
   canDelete: boolean;
   onEdit: (student: StudentInfo) => void;
   onDelete: (id: string) => void;
-  onView: (student: StudentInfo) => void;
 }
 
 export function StudentTable({
@@ -39,118 +38,139 @@ export function StudentTable({
   canDelete,
   onEdit,
   onDelete,
-  onView,
 }: StudentTableProps) {
   return (
-    <div className="border rounded-md overflow-hidden">
+    <div className="overflow-x-auto">
       <Table>
-        <TableHeader className="bg-gray-50 dark:bg-gray-900/50">
+        <TableHeader>
           <TableRow>
-            <TableHead className="font-semibold">Student</TableHead>
-            <TableHead className="font-semibold">Class</TableHead>
-            <TableHead className="font-semibold">Roll No.</TableHead>
-            <TableHead className="font-semibold">Guardian</TableHead>
-            <TableHead className="text-right font-semibold">Actions</TableHead>
+            <TableHead className="w-16">Roll No</TableHead>
+            <TableHead>Name</TableHead>
+            <TableHead className="hidden md:table-cell">
+              Class
+            </TableHead>
+            <TableHead className="hidden sm:table-cell">
+              Gender
+            </TableHead>
+            <TableHead className="hidden lg:table-cell">
+              Parent
+            </TableHead>
+            <TableHead className="hidden lg:table-cell">
+              Phone
+            </TableHead>
+            {(canEdit || canDelete) && (
+              <TableHead className="w-24 text-right">
+                Actions
+              </TableHead>
+            )}
           </TableRow>
         </TableHeader>
         <TableBody>
           {students.length === 0 ? (
             <TableRow>
-              <TableCell colSpan={5} className="h-32 text-center text-gray-500">
-                No students found.
+              <TableCell
+                colSpan={canEdit || canDelete ? 7 : 6}
+                className="text-center py-12 text-muted-foreground"
+              >
+                <GraduationCap className="h-10 w-10 mx-auto mb-2 opacity-30" />
+                <p>No students found</p>
               </TableCell>
             </TableRow>
           ) : (
             students.map((student) => (
-              <TableRow key={student.id} className="hover:bg-gray-50/50 dark:hover:bg-gray-900/20">
+              <TableRow
+                key={student.id}
+                className="hover:bg-emerald-50/50 dark:hover:bg-emerald-900/20 transition-colors"
+              >
+                <TableCell className="font-mono text-sm">
+                  {student.rollNumber}
+                </TableCell>
                 <TableCell>
-                  <div className="flex flex-col">
-                    <span className="font-medium text-gray-900 dark:text-gray-100">
-                      {student.name}
-                    </span>
-                    <span className="text-xs text-gray-500">
-                      {student.admissionNumber || "N/A"}
-                    </span>
+                  <div className="flex items-center gap-3">
+                    <div className="h-8 w-8 rounded-full bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 flex items-center justify-center text-xs font-semibold shrink-0">
+                      {student.name
+                        .split(" ")
+                        .map((n) => n[0])
+                        .join("")
+                        .slice(0, 2)
+                        .toUpperCase()}
+                    </div>
+                    <div className="min-w-0">
+                      <p className="font-medium text-sm truncate">
+                        {student.name}
+                      </p>
+                      <p className="text-xs text-muted-foreground truncate md:hidden">
+                        {student.className}
+                      </p>
+                    </div>
                   </div>
                 </TableCell>
-                <TableCell>
-                  {student.class ? (
-                    <Badge variant="secondary" className="font-normal">
-                      {student.class.name}-{student.class.section}
-                    </Badge>
-                  ) : (
-                    <span className="text-xs text-gray-400 italic">Unassigned</span>
-                  )}
+                <TableCell className="hidden md:table-cell">
+                  <Badge variant="secondary" className="font-normal">
+                    {student.className}
+                  </Badge>
                 </TableCell>
-                <TableCell className="text-sm">
-                  {student.rollNumber || "—"}
+                <TableCell className="hidden sm:table-cell capitalize">
+                  {student.gender}
                 </TableCell>
-                <TableCell>
-                  <div className="flex flex-col">
-                    <span className="text-sm text-gray-700 dark:text-gray-300">
-                      {student.guardianName || "—"}
-                    </span>
-                    {student.guardianPhone && (
-                      <span className="text-[10px] text-gray-500 flex items-center gap-1">
-                        <Phone className="h-2.5 w-2.5" />
-                        {student.guardianPhone}
-                      </span>
-                    )}
-                  </div>
+                <TableCell className="hidden lg:table-cell text-sm">
+                  {student.parentName || "—"}
                 </TableCell>
-                <TableCell className="text-right">
-                  <div className="flex justify-end gap-1">
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="h-8 w-8 text-blue-600 hover:text-blue-700 hover:bg-blue-50 dark:hover:bg-blue-900/20"
-                      onClick={() => onView(student)}
-                    >
-                      <Eye className="h-4 w-4" />
-                    </Button>
-                    {canEdit && (
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="h-8 w-8 text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50 dark:hover:bg-emerald-900/20"
-                        onClick={() => onEdit(student)}
-                      >
-                        <Pencil className="h-4 w-4" />
-                      </Button>
-                    )}
-                    {canDelete && (
-                      <AlertDialog>
-                        <AlertDialogTrigger asChild>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            className="h-8 w-8 text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900/20"
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
-                        </AlertDialogTrigger>
-                        <AlertDialogContent>
-                          <AlertDialogHeader>
-                            <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-                            <AlertDialogDescription>
-                              This action cannot be undone. This will permanently delete the student
-                              record for <strong>{student.name}</strong>.
-                            </AlertDialogDescription>
-                          </AlertDialogHeader>
-                          <AlertDialogFooter>
-                            <AlertDialogCancel>Cancel</AlertDialogCancel>
-                            <AlertDialogAction
-                              onClick={() => onDelete(student.id)}
-                              className="bg-red-600 hover:bg-red-700"
+                <TableCell className="hidden lg:table-cell text-sm">
+                  {student.phone || "—"}
+                </TableCell>
+                {(canEdit || canDelete) && (
+                  <TableCell className="text-right">
+                    <div className="flex items-center justify-end gap-1">
+                      {canEdit && (
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-8 w-8 text-muted-foreground hover:text-emerald-600"
+                          onClick={() => onEdit(student)}
+                        >
+                          <Pencil className="h-4 w-4" />
+                        </Button>
+                      )}
+                      {canDelete && (
+                        <AlertDialog>
+                          <AlertDialogTrigger asChild>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-8 w-8 text-muted-foreground hover:text-red-600"
                             >
-                              Delete
-                            </AlertDialogAction>
-                          </AlertDialogFooter>
-                        </AlertDialogContent>
-                      </AlertDialog>
-                    )}
-                  </div>
-                </TableCell>
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          </AlertDialogTrigger>
+                          <AlertDialogContent>
+                            <AlertDialogHeader>
+                              <AlertDialogTitle>
+                                Delete Student
+                              </AlertDialogTitle>
+                              <AlertDialogDescription>
+                                Are you sure you want to delete{" "}
+                                <strong>{student.name}</strong>? This
+                                action cannot be undone.
+                              </AlertDialogDescription>
+                            </AlertDialogHeader>
+                            <AlertDialogFooter>
+                              <AlertDialogCancel>
+                                Cancel
+                              </AlertDialogCancel>
+                              <AlertDialogAction
+                                className="bg-red-600 hover:bg-red-700 text-white"
+                                onClick={() => onDelete(student.id)}
+                              >
+                                Delete
+                              </AlertDialogAction>
+                            </AlertDialogFooter>
+                          </AlertDialogContent>
+                        </AlertDialog>
+                      )}
+                    </div>
+                  </TableCell>
+                )}
               </TableRow>
             ))
           )}
