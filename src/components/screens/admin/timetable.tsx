@@ -43,7 +43,7 @@ import {
   Settings,
   Check,
 } from "lucide-react";
-import { useToast } from "@/hooks/use-toast";
+import { goeyToast as toast } from "goey-toast";
 import { useModulePermissions } from "@/hooks/use-permissions";
 import { useAppStore } from "@/store/use-app-store";
 import type { ClassInfo, TimetableSlot } from "@/lib/types";
@@ -245,7 +245,7 @@ export function AdminTimetable() {
   // Copy from feature
   const [copySourceDay, setCopySourceDay] = useState<string>("monday");
 
-  const { toast } = useToast();
+
   const currentClass = classes.find((c) => c.id === selectedClass);
 
   // ── Permission checks ──
@@ -323,19 +323,11 @@ export function AdminTimetable() {
           method: "DELETE",
         });
         if (res.ok) {
-          toast({
-            title: "Slot Deleted",
-            description: "Timetable entry removed.",
-            variant: "default",
-          });
+          toast.success("Timetable entry removed.");
           if (selectedClass) fetchTimetable(selectedClass);
         }
       } catch {
-        toast({
-          title: "Error",
-          description: "Failed to delete slot.",
-          variant: "destructive",
-        });
+        toast.error("Failed to delete slot.");
       }
     },
     [selectedClass, fetchTimetable, toast],
@@ -378,20 +370,12 @@ export function AdminTimetable() {
       });
       if (!res.ok) throw new Error("Failed to update slot");
 
-      toast({
-        title: "Slot Updated",
-        description: "Timetable entry has been updated successfully.",
-      });
+      toast.success("Timetable entry has been updated successfully.");
       setEditDialogOpen(false);
       setEditingSlot(null);
       if (selectedClass) fetchTimetable(selectedClass);
     } catch (err) {
-      toast({
-        title: "Failed to update",
-        description:
-          err instanceof Error ? err.message : "An unexpected error occurred.",
-        variant: "destructive",
-      });
+      toast.error(err instanceof Error ? err.message : "An unexpected error occurred.");
     } finally {
       setEditSaving(false);
     }
@@ -520,11 +504,7 @@ export function AdminTimetable() {
           setAvailableTeachers(teacherData);
         }
       } catch {
-        toast({
-          title: "Error",
-          description: "Failed to load subjects or teachers.",
-          variant: "destructive",
-        });
+        toast.error("Failed to load subjects or teachers.");
       }
     }
     fetchFormData();
@@ -650,11 +630,7 @@ export function AdminTimetable() {
   function handleCopyToDay(sourceDay: string, targetDay: string) {
     const sourcePeriods = daySlots[sourceDay] ?? [];
     if (sourcePeriods.length === 0) {
-      toast({
-        title: "Nothing to copy",
-        description: `No periods found on ${DAY_FULL_LABELS[sourceDay]}.`,
-        variant: "destructive",
-      });
+      toast.error(`No periods found on ${DAY_FULL_LABELS[sourceDay]}.`);
       return;
     }
 
@@ -672,21 +648,14 @@ export function AdminTimetable() {
       [targetDay]: [...(prev[targetDay] ?? []), ...copied],
     }));
 
-    toast({
-      title: "Periods Copied",
-      description: `Copied ${copied.length} period(s) from ${DAY_FULL_LABELS[sourceDay]} to ${DAY_FULL_LABELS[targetDay]}.`,
-    });
+    toast.success(`Copied ${copied.length} period(s) from ${DAY_FULL_LABELS[sourceDay]} to ${DAY_FULL_LABELS[targetDay]}.`);
   }
 
   // Copy all periods from a source day to all other days
   function handleCopyToAllDays(sourceDay: string) {
     const sourcePeriods = daySlots[sourceDay] ?? [];
     if (sourcePeriods.length === 0) {
-      toast({
-        title: "Nothing to copy",
-        description: `No periods found on ${DAY_FULL_LABELS[sourceDay]}.`,
-        variant: "destructive",
-      });
+      toast.error(`No periods found on ${DAY_FULL_LABELS[sourceDay]}.`);
       return;
     }
 
@@ -705,10 +674,7 @@ export function AdminTimetable() {
     }
     setDaySlots(updated);
 
-    toast({
-      title: "Copied to All Days",
-      description: `Copied ${sourcePeriods.length} period(s) from ${DAY_FULL_LABELS[sourceDay]} to all other days.`,
-    });
+    toast.success(`Copied ${sourcePeriods.length} period(s) from ${DAY_FULL_LABELS[sourceDay]} to all other days.`);
   }
 
   // Delete all timetable slots for the selected class
@@ -731,11 +697,7 @@ export function AdminTimetable() {
     );
 
     if (validSlots.length === 0) {
-      toast({
-        title: "No slots to save",
-        description: "Please add at least one period before saving.",
-        variant: "destructive",
-      });
+      toast.error("Please add at least one period before saving.");
       setSaving(false);
       return;
     }
@@ -760,19 +722,11 @@ export function AdminTimetable() {
       if (!res.ok) throw new Error("Failed to save timetable");
       const data = await res.json();
 
-      toast({
-        title: "Timetable saved",
-        description: `Successfully saved ${data.created ?? allSlots.length} slots${data.errors ? ` (${data.errors} errors)` : ""}.`,
-      });
+      toast.success(`Successfully saved ${data.created ?? allSlots.length} slots${data.errors ? ` (${data.errors} errors)` : ""}.`);
       setCreateDialogOpen(false);
       fetchTimetable(selectedClass);
     } catch (err) {
-      toast({
-        title: "Failed to save",
-        description:
-          err instanceof Error ? err.message : "An unexpected error occurred.",
-        variant: "destructive",
-      });
+      toast.error(err instanceof Error ? err.message : "An unexpected error occurred.");
     } finally {
       setSaving(false);
     }
@@ -801,21 +755,13 @@ export function AdminTimetable() {
 
   const handleDaysConfigSave = useCallback(async () => {
     if (!canEdit) {
-      toast({
-        title: "Permission Denied",
-        description: "You do not have permission to modify school settings.",
-        variant: "destructive",
-      });
+      toast.error("You do not have permission to modify school settings.");
       return;
     }
     setDaysConfigSaving(true);
     const tenantId = useAppStore.getState().currentTenantId;
     if (!tenantId) {
-      toast({
-        title: "Error",
-        description: "Tenant ID not found.",
-        variant: "destructive",
-      });
+      toast.error("Tenant ID not found.");
       setDaysConfigSaving(false);
       return;
     }
@@ -831,17 +777,9 @@ export function AdminTimetable() {
       if (!res.ok) throw new Error("Failed to save working days");
       setWorkingDays(daysConfigDraft);
       setDaysConfigOpen(false);
-      toast({
-        title: "Working Days Updated",
-        description: `School schedule set to ${daysConfigDraft.length} working days.`,
-      });
+      toast.success(`School schedule set to ${daysConfigDraft.length} working days.`);
     } catch (err) {
-      toast({
-        title: "Failed to save",
-        description:
-          err instanceof Error ? err.message : "An unexpected error occurred.",
-        variant: "destructive",
-      });
+      toast.error(err instanceof Error ? err.message : "An unexpected error occurred.");
     } finally {
       setDaysConfigSaving(false);
     }

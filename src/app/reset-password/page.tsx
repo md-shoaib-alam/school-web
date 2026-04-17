@@ -28,9 +28,7 @@ export default function ResetPasswordPage() {
       await resetMutation.mutateAsync(email);
       setIsSuccess(true);
     } catch (err: any) {
-      toast.error('Account not found', {
-        description: 'The email address you entered is not registered in our system.',
-      });
+      toast.error('The email address you entered is not registered in our system.');
     }
   };
 

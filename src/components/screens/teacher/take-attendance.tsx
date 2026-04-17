@@ -27,7 +27,7 @@ import {
   Users,
   CalendarDays,
 } from "lucide-react";
-import { useToast } from "@/hooks/use-toast";
+import { goeyToast as toast } from "goey-toast";
 
 interface ClassInfo {
   id: string;
@@ -53,7 +53,7 @@ interface AttendanceRecord {
 }
 
 export function TeacherAttendance() {
-  const { toast } = useToast();
+
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [classes, setClasses] = useState<ClassInfo[]>([]);
@@ -144,18 +144,10 @@ export function TeacherAttendance() {
       });
       if (res.ok) {
         setSaved(true);
-        toast({
-          title: "Attendance Saved",
-          description: `Attendance for ${date} has been recorded successfully.`,
-          variant: "default",
-        });
+        toast.success(`Attendance for ${date} has been recorded successfully.`);
       }
     } catch (error) {
-      toast({
-        title: "Error",
-        description: "Failed to save attendance. Please try again.",
-        variant: "destructive",
-      });
+      toast.error("Failed to save attendance. Please try again.");
     } finally {
       setSaving(false);
     }
