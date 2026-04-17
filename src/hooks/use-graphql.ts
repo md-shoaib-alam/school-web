@@ -47,9 +47,7 @@ export const STUDENTS_QUERY = `
     students(tenantId: $tenantId, classId: $classId) {
       students {
         id
-        user {
-          name
-        }
+        name
       }
     }
   }

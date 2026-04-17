@@ -106,16 +106,19 @@ export function AdminCalendar() {
     const payload = { ...form, tenantId: currentTenantId, id: editingEvent?.id };
     
     if (editingEvent) {
-      await updateMutation.mutateAsync(payload);
+      const { tenantId: _, ...updateData } = payload;
+      await updateMutation.mutateAsync(updateData);
     } else {
-      await createMutation.mutateAsync(payload);
+      // Remove id and tenantId as they are not allowed in EventInput
+      const { id: _, tenantId: __, ...cleanData } = payload;
+      await createMutation.mutateAsync(cleanData);
     }
     closeDialog();
   };
 
   const handleConfirmDelete = async () => {
     if (!eventToDelete || !currentTenantId) return;
-    await deleteMutation.mutateAsync({ id: eventToDelete, tenantId: currentTenantId });
+    await deleteMutation.mutateAsync({ id: eventToDelete });
     setDeleteConfirmOpen(false);
     setEventToDelete(null);
   };

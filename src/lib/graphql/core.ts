@@ -16,7 +16,11 @@ export async function graphqlQuery<TData>(query: string, variables?: Record<stri
   })
   if (!res.ok) {
     const errorBody = await res.text();
-    console.error('GraphQL Query Error:', { query, variables, status: res.status, errorBody });
+    console.error(`[GraphQL Query Error] Status: ${res.status}`, { 
+      query: query.substring(0, 100) + '...', 
+      variables, 
+      errorBody 
+    });
     throw new Error(`GraphQL error: ${res.status}`);
   }
   const json = await res.json()
@@ -39,7 +43,11 @@ export async function graphqlMutate<TData>(mutation: string, variables?: Record<
   })
   if (!res.ok) {
     const errorBody = await res.text();
-    console.error('GraphQL Mutation Error:', { mutation, variables, status: res.status, errorBody });
+    console.error(`[GraphQL Mutation Error] Status: ${res.status}`, { 
+      mutation: mutation.substring(0, 100) + '...', 
+      variables, 
+      errorBody 
+    });
     throw new Error(`GraphQL error: ${res.status}`);
   }
   const json = await res.json()

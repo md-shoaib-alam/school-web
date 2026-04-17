@@ -19,6 +19,7 @@ import {
 } from '@/components/ui/table';
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter,
+  DialogDescription,
 } from '@/components/ui/dialog';
 import * as VisuallyHidden from '@radix-ui/react-visually-hidden';
 import {
@@ -50,7 +51,7 @@ const CERT_TYPE_COLORS: Record<string, string> = {
 
 export function AdminCertificates() {
   const queryClient = useQueryClient();
-  const { currentTenant } = useAppStore();
+  const { currentTenantId } = useAppStore();
   const [generateOpen, setGenerateOpen] = useState(false);
   const [selectedClassId, setSelectedClassId] = useState<string>('');
   const [viewCert, setViewCert] = useState<CertificateRecord | null>(null);
@@ -71,13 +72,22 @@ export function AdminCertificates() {
 
   // ── Queries (Optimized GraphQL) ──
 
-  const { data: certificates = [], isLoading: certsLoading } = useQuery({
+  const { data: certificatesData, isLoading: certsLoading, error: certsError } = useQuery({
     queryKey: ['certificates'],
-    queryFn: async () => (await apiFetch('/api/certificates')).json(),
+    queryFn: async () => {
+      const res = await apiFetch('/api/certificates');
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({ error: 'Unknown error' }));
+        throw new Error(err.error || 'Failed to fetch certificates');
+      }
+      return res.json();
+    },
   });
 
-  const { data: classes = [] } = useGraphQLClasses(currentTenant?.id);
-  const { data: students = [], isFetching: studentsLoading } = useGraphQLStudents(currentTenant?.id, selectedClassId);
+  const certificates = Array.isArray(certificatesData) ? certificatesData : [];
+
+  const { data: classes = [] } = useGraphQLClasses(currentTenantId || undefined);
+  const { data: students = [], isFetching: studentsLoading } = useGraphQLStudents(currentTenantId || undefined, selectedClassId);
 
   // ── Mutations ──
 
@@ -142,7 +152,23 @@ export function AdminCertificates() {
 
       <Card className="no-print">
         <CardContent className="p-0">
-          {certsLoading ? <Skeleton className="h-64 w-full" /> : (
+          {certsLoading ? (
+            <div className="p-4 space-y-4">
+              <div className="flex justify-between items-center mb-4">
+                <Skeleton className="h-8 w-32" />
+                <Skeleton className="h-8 w-24" />
+              </div>
+              {[...Array(5)].map((_, i) => (
+                <div key={i} className="flex items-center gap-4 border-b pb-4">
+                  <Skeleton className="h-10 w-24" />
+                  <Skeleton className="h-10 flex-1" />
+                  <Skeleton className="h-10 w-32" />
+                  <Skeleton className="h-10 w-20" />
+                  <Skeleton className="h-10 w-16 ml-auto" />
+                </div>
+              ))}
+            </div>
+          ) : (
             <Table>
               <TableHeader>
                 <TableRow>
@@ -174,6 +200,12 @@ export function AdminCertificates() {
 
       <Dialog open={generateOpen} onOpenChange={setGenerateOpen}>
         <DialogContent className="no-print">
+          <VisuallyHidden.Root>
+            <DialogHeader>
+              <DialogTitle>New Certificate</DialogTitle>
+              <DialogDescription>Form to generate a new certificate for a student.</DialogDescription>
+            </DialogHeader>
+          </VisuallyHidden.Root>
           <DialogHeader><DialogTitle>New Certificate</DialogTitle></DialogHeader>
           <div className="space-y-4 py-4">
             <Select value={selectedClassId} onValueChange={setSelectedClassId}>
@@ -183,7 +215,7 @@ export function AdminCertificates() {
 
             <Select value={form.studentId} onValueChange={v => setForm({...form, studentId: v})} disabled={!selectedClassId || studentsLoading}>
               <SelectTrigger>{studentsLoading ? <Loader2 className="h-4 w-4 animate-spin mx-auto" /> : <SelectValue placeholder="Select Student" />}</SelectTrigger>
-              <SelectContent>{students.map((s: any) => <SelectItem key={s.id} value={s.id}>{s.user?.name || 'Unknown'}</SelectItem>)}</SelectContent>
+              <SelectContent>{students.map((s: any) => <SelectItem key={s.id} value={s.id}>{s.name || 'Unknown'}</SelectItem>)}</SelectContent>
             </Select>
 
             <Select value={form.certificateType} onValueChange={v => setForm({...form, certificateType: v})}>
@@ -211,6 +243,7 @@ export function AdminCertificates() {
           <VisuallyHidden.Root>
             <DialogHeader>
               <DialogTitle>Certificate Preview</DialogTitle>
+              <DialogDescription>Full preview of the student certificate before printing.</DialogDescription>
             </DialogHeader>
           </VisuallyHidden.Root>
           <div className="p-4 pr-16 border-b flex justify-between items-center bg-white">
@@ -227,6 +260,12 @@ export function AdminCertificates() {
 
       <Dialog open={!!revokeCert} onOpenChange={v => !v && setRevokeCert(null)}>
         <DialogContent>
+           <VisuallyHidden.Root>
+             <DialogHeader>
+               <DialogTitle>Revoke Certificate</DialogTitle>
+               <DialogDescription>Confirmation dialog to revoke an issued certificate.</DialogDescription>
+             </DialogHeader>
+           </VisuallyHidden.Root>
            <DialogHeader><DialogTitle className="text-red-600">Revoke Certificate</DialogTitle></DialogHeader>
            <p className="py-4 text-sm">Are you sure you want to revoke <strong>{revokeCert?.certificateNo}</strong>?</p>
            <DialogFooter>

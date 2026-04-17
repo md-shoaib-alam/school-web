@@ -119,8 +119,14 @@ export async function loginWithElysia(email: string, password: string) {
  *   AFTER:  apiFetch("/api/students", { method: "POST", ... })
  */
 export async function apiFetch(path: string, init?: RequestInit): Promise<Response> {
-  // Strip leading /api to normalize — the API_BASE already has /api
-  const cleanPath = path.startsWith('/api') ? path.slice(4) : path;
+  // Normalize path: strip leading /api and ensure it starts with /
+  let cleanPath = path.startsWith('/api') ? path.slice(4) : path;
+  if (!cleanPath.startsWith('/')) cleanPath = '/' + cleanPath;
+  
+  // Normalize API_BASE: remove trailing slash if present
+  const normalizedBase = API_BASE.endsWith('/') ? API_BASE.slice(0, -1) : API_BASE;
+  const url = `${normalizedBase}${cleanPath}`;
+
   const token = getToken();
   const tenantId = typeof window !== 'undefined' ? localStorage.getItem('schoolsaas_tenant_id') : null;
   const headers: Record<string, string> = {
@@ -134,9 +140,13 @@ export async function apiFetch(path: string, init?: RequestInit): Promise<Respon
   } else if (init?.body && typeof init.body === 'string') {
     headers['Content-Type'] = 'application/json';
   }
-  return fetch(`${API_BASE}${cleanPath}`, {
+
+  return fetch(url, {
     ...init,
     headers,
+  }).catch(err => {
+    console.error(`Fetch failed for ${url}:`, err);
+    throw err;
   });
 }
 
