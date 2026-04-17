@@ -96,7 +96,7 @@ export function AdminPromotions() {
 
   const fetchPromotions = useCallback(async () => {
     try {
-      const params = new URLSearchParams({ type: "promotion" });
+      const params = new URLSearchParams({ type: "promotion", limit: "50" });
       if (academicYearFilter && academicYearFilter !== "all")
         params.set("academicYear", academicYearFilter);
       if (classFilter && classFilter !== "all")
@@ -104,7 +104,10 @@ export function AdminPromotions() {
       if (statusFilter && statusFilter !== "all")
         params.set("status", statusFilter);
       const res = await apiFetch(`/api/promotions?${params.toString()}`);
-      if (res.ok) setPromotions(await res.json());
+      if (res.ok) {
+        const json = await res.json();
+        setPromotions(json.items || []);
+      }
     } catch {
       /* silent */
     }
@@ -112,11 +115,14 @@ export function AdminPromotions() {
 
   const fetchGraduations = useCallback(async () => {
     try {
-      const params = new URLSearchParams({ type: "graduation" });
+      const params = new URLSearchParams({ type: "graduation", limit: "50" });
       if (academicYearFilter && academicYearFilter !== "all")
         params.set("academicYear", academicYearFilter);
       const res = await apiFetch(`/api/promotions?${params.toString()}`);
-      if (res.ok) setGraduations(await res.json());
+      if (res.ok) {
+        const json = await res.json();
+        setGraduations(json.items || []);
+      }
     } catch {
       /* silent */
     }
@@ -125,14 +131,15 @@ export function AdminPromotions() {
   const fetchClassesAndStudents = useCallback(async () => {
     try {
       const [classesRes, studentsRes] = await Promise.all([
-        apiFetch("/api/classes"),
-        apiFetch("/api/students"),
+        apiFetch("/api/classes?mode=min"),
+        apiFetch("/api/students?limit=1000&status=active"), // Higher limit for promotion lists
       ]);
       if (classesRes.ok) setClasses(await classesRes.json());
       if (studentsRes.ok) {
-        const data = await studentsRes.json();
+        const json = await studentsRes.json();
+        const studentItems = json.items || [];
         setStudents(
-          data.map(
+          studentItems.map(
             (s: {
               id: string;
               name: string;

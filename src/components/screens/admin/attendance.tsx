@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Card,
   CardContent,
@@ -37,9 +37,10 @@ import {
   School,
   Filter,
 } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
+import { apiFetch } from "@/lib/api";
 import type { AttendanceRecord, ClassInfo } from "@/lib/types";
 import { useModulePermissions } from "@/hooks/use-permissions";
-import { useAttendance, useClasses } from "@/lib/graphql/hooks";
 import { useAppStore } from "@/store/use-app-store";
 
 const statusConfig: Record<
@@ -69,16 +70,44 @@ const statusConfig: Record<
 export function AdminAttendance() {
   const { currentTenantId } = useAppStore();
   const { canCreate, canEdit, canDelete } = useModulePermissions("attendance");
-  const { data: attendanceData, isLoading: recordsLoading } = useAttendance(currentTenantId || undefined);
-  const { data: classData, isLoading: classesLoading } = useClasses(currentTenantId || undefined);
-
-  const loading = recordsLoading || classesLoading;
-  const classes = (classData?.classes || []) as ClassInfo[];
-
   const [selectedDate, setSelectedDate] = useState(
     new Date().toISOString().split("T")[0],
   );
   const [selectedClass, setSelectedClass] = useState<string | null>(null);
+  const [search, setSearch] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
+
+  // --- Debouncing Search ---
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearch(search);
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [search]);
+
+  const { data: attendanceData, isLoading: recordsLoading } = useQuery({
+    queryKey: ['attendance', selectedDate, selectedClass],
+    queryFn: async () => {
+      const params = new URLSearchParams({ date: selectedDate });
+      if (selectedClass && selectedClass !== 'all') params.set('classId', selectedClass);
+      const res = await apiFetch(`/api/attendance?${params.toString()}`);
+      if (!res.ok) return { records: [] };
+      const items = await res.json();
+      return { records: items };
+    },
+    enabled: !!selectedClass
+  });
+
+  const { data: classes = [], isLoading: classesLoading } = useQuery({
+    queryKey: ['classes', 'min'],
+    queryFn: async () => {
+      const res = await apiFetch('/api/classes?mode=min');
+      if (!res.ok) return [];
+      return res.json();
+    }
+  });
+
+  const loading = recordsLoading || classesLoading;
 
   const isSelectionMade = selectedClass !== null;
 
@@ -91,7 +120,11 @@ export function AdminAttendance() {
         "-" +
         classes.find((c) => c.id === selectedClass)?.section ===
         r.className;
-    return matchDate && matchClass;
+    
+    const matchSearch = !debouncedSearch || 
+      r.studentName.toLowerCase().includes(debouncedSearch.toLowerCase());
+
+    return matchDate && matchClass && matchSearch;
   });
 
   // Summary stats
@@ -263,7 +296,12 @@ export function AdminAttendance() {
               </div>
               <div className="relative w-64">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
-                <Input placeholder="Search students..." className="pl-9" />
+                <Input 
+                  placeholder="Search students..." 
+                  className="pl-9" 
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                />
               </div>
             </CardHeader>
             <CardContent className="p-0">

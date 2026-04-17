@@ -40,6 +40,19 @@ export function AdminTeachers() {
 
   const [loading, setLoading] = useState(teachers.length === 0);
   const [search, setSearch] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalItems, setTotalItems] = useState(0);
+
+  // --- Debouncing Search ---
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearch(search);
+      setCurrentPage(1); // Reset to page 1 when search changes
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [search]);
 
   // Dialog state
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -55,37 +68,38 @@ export function AdminTeachers() {
   const fetchTeachers = useCallback(async (showSkeleton = false) => {
     try {
       if (showSkeleton) setLoading(true);
-      const res = await apiFetch("/api/teachers");
+      const queryParams = new URLSearchParams({
+        page: String(currentPage),
+        limit: '12', // 12 per page for grid layout
+        ...(debouncedSearch ? { search: debouncedSearch } : {}),
+      });
+
+      const res = await apiFetch(`/api/teachers?${queryParams.toString()}`);
       if (!res.ok) throw new Error("Failed to fetch teachers");
       const json = await res.json();
-      setTeachers(json);
+      
+      const teacherItems = json.items || [];
+      setTeachers(teacherItems);
+      setTotalPages(json.totalPages || 1);
+      setTotalItems(json.total || 0);
+
       // Cache the result for next time
       if (typeof window !== "undefined" && currentTenantId) {
-        localStorage.setItem(`teachers_cache_${currentTenantId}`, JSON.stringify(json));
+        localStorage.setItem(`teachers_cache_${currentTenantId}`, JSON.stringify(teacherItems));
       }
     } catch (err) {
       console.error("Error fetching teachers:", err);
-      // Don't show toast on initial background load to avoid noise
     } finally {
       setLoading(false);
     }
-  }, [currentTenantId]);
+  }, [currentTenantId, currentPage, debouncedSearch]);
 
   // Initial load when tenant is ready
   useEffect(() => {
     if (currentTenantId) {
-        // If we have cached items, fetch silently in background
-        // If no cached items, show skeleton
         fetchTeachers(teachers.length === 0);
     }
   }, [currentTenantId, fetchTeachers]);
-
-  const filtered = teachers.filter(
-    (t) =>
-      t.name.toLowerCase().includes(search.toLowerCase()) ||
-      t.email.toLowerCase().includes(search.toLowerCase()) ||
-      (t.subjects && t.subjects.some((s) => s.toLowerCase().includes(search.toLowerCase()))),
-  );
 
   const handleOpenAdd = () => {
     setEditingTeacher(null);
@@ -156,7 +170,8 @@ export function AdminTeachers() {
           const err = await res.json().catch(() => ({}));
           throw new Error(err.error || "Deletion failed");
         }
-        setTeachers((prev) => prev.filter((t) => t.id !== id));
+        
+        fetchTeachers();
         setDeletingId(null);
         
         // We throw a "success" message to force a RED morphing pill for deletion
@@ -193,7 +208,10 @@ export function AdminTeachers() {
             placeholder="Search teachers..."
             className="pl-9"
             value={search}
-            onChange={(e) => setSearch(e.target.value)}
+            onChange={(e) => {
+              setSearch(e.target.value);
+              setCurrentPage(1);
+            }}
           />
         </div>
         {canCreate && (
@@ -210,7 +228,7 @@ export function AdminTeachers() {
       {/* Teacher Grid */}
       {loading ? (
         <TeacherSkeleton />
-      ) : filtered.length === 0 ? (
+      ) : teachers.length === 0 ? (
         <Card>
           <CardContent className="py-16 text-center text-muted-foreground">
             <Users className="h-12 w-12 mx-auto mb-3 opacity-30" />
@@ -219,28 +237,61 @@ export function AdminTeachers() {
           </CardContent>
         </Card>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {filtered.map((teacher, index) => (
-            <TeacherCard
-              key={teacher.id}
-              teacher={teacher}
-              index={index}
-              canEdit={canEdit}
-              canDelete={canDelete}
-              deletingId={deletingId}
-              setDeletingId={setDeletingId}
-              onEdit={handleOpenEdit}
-              onDelete={handleDelete}
-            />
-          ))}
-        </div>
-      )}
+        <>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {teachers.map((teacher, index) => (
+              <TeacherCard
+                key={teacher.id}
+                teacher={teacher}
+                index={index}
+                canEdit={canEdit}
+                canDelete={canDelete}
+                deletingId={deletingId}
+                setDeletingId={setDeletingId}
+                onEdit={handleOpenEdit}
+                onDelete={handleDelete}
+              />
+            ))}
+          </div>
 
-      {/* Showing count */}
-      {!loading && filtered.length > 0 && (
-        <p className="text-sm text-muted-foreground text-center">
-          Showing {filtered.length} of {teachers.length} teachers
-        </p>
+          {/* Pagination Controls */}
+          <div className="flex flex-col sm:flex-row gap-4 items-center justify-between py-4 border-t border-border/50">
+            <p className="text-sm text-muted-foreground order-2 sm:order-1">
+              Showing <span className="font-medium text-foreground">{teachers.length}</span> of <span className="font-medium text-foreground">{totalItems}</span> teachers
+            </p>
+            <div className="flex items-center gap-2 order-1 sm:order-2">
+              <Button
+                variant="outline"
+                size="sm"
+                disabled={currentPage === 1}
+                onClick={() => setCurrentPage(prev => prev - 1)}
+              >
+                Previous
+              </Button>
+              <div className="flex items-center gap-1 mx-2">
+                {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
+                  <Button
+                    key={p}
+                    variant={currentPage === p ? "default" : "ghost"}
+                    size="sm"
+                    className="h-8 w-8 p-0"
+                    onClick={() => setCurrentPage(p)}
+                  >
+                    {p}
+                  </Button>
+                ))}
+              </div>
+              <Button
+                variant="outline"
+                size="sm"
+                disabled={currentPage === totalPages}
+                onClick={() => setCurrentPage(prev => prev + 1)}
+              >
+                Next
+              </Button>
+            </div>
+          </div>
+        </>
       )}
 
       {/* Add/Edit Teacher Dialog */}

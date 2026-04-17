@@ -3,7 +3,6 @@
 import { useState, useRef } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useReactToPrint } from 'react-to-print';
-import { useGraphQLClasses, useGraphQLStudents } from '@/hooks/use-graphql';
 import { useAppStore } from '@/store/use-app-store';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -70,24 +69,39 @@ export function AdminCertificates() {
     notes: '' 
   });
 
-  // ── Queries (Optimized GraphQL) ──
+  // ── Queries (Optimized REST mode=min) ──
 
-  const { data: certificatesData, isLoading: certsLoading, error: certsError } = useQuery({
-    queryKey: ['certificates'],
+  const { data: certificatesData, isLoading: certsLoading } = useQuery({
+    queryKey: ['certificates', 'history'],
     queryFn: async () => {
-      const res = await apiFetch('/api/certificates');
-      if (!res.ok) {
-        const err = await res.json().catch(() => ({ error: 'Unknown error' }));
-        throw new Error(err.error || 'Failed to fetch certificates');
-      }
+      const res = await apiFetch('/api/certificates?limit=50');
+      if (!res.ok) throw new Error('Failed to fetch certificates');
       return res.json();
     },
   });
 
-  const certificates = Array.isArray(certificatesData) ? certificatesData : [];
+  const certificates = certificatesData?.items || [];
 
-  const { data: classes = [] } = useGraphQLClasses(currentTenantId || undefined);
-  const { data: students = [], isFetching: studentsLoading } = useGraphQLStudents(currentTenantId || undefined, selectedClassId);
+  const { data: classes = [] } = useQuery({
+    queryKey: ['classes', 'min'],
+    queryFn: async () => {
+      const res = await apiFetch('/api/classes?mode=min');
+      if (!res.ok) return [];
+      return res.json();
+    },
+  });
+
+  const { data: students = [], isFetching: studentsLoading } = useQuery({
+    queryKey: ['students', 'min', selectedClassId],
+    queryFn: async () => {
+      if (!selectedClassId) return [];
+      const res = await apiFetch(`/api/students?classId=${selectedClassId}&mode=min&limit=1000`);
+      if (!res.ok) return [];
+      const json = await res.json();
+      return json.items || [];
+    },
+    enabled: !!selectedClassId,
+  });
 
   // ── Mutations ──
 

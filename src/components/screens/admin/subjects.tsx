@@ -47,15 +47,9 @@ import {
   Eye,
 } from "lucide-react";
 import { goeyToast as toast } from "goey-toast";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { apiFetch } from "@/lib/api";
 import { useModulePermissions } from "@/hooks/use-permissions";
-import {
-  useSubjects,
-  useClassesMin,
-  useTeachersMin,
-  useCreateSubject,
-  useUpdateSubject,
-  useDeleteSubject,
-} from "@/lib/graphql/hooks";
 import { useAppStore } from "@/store/use-app-store";
 
 interface SubjectInfo {
@@ -73,15 +67,35 @@ const emptyForm = { name: "", code: "", classId: "", teacherId: "" };
 export function AdminSubjects() {
   const { currentTenantId } = useAppStore();
   const { canCreate, canEdit, canDelete } = useModulePermissions("subjects");
+  const queryClient = useQueryClient();
 
   // TanStack Queries
-  const { data: subjectsData, isLoading: subjectsLoading } = useSubjects(currentTenantId || undefined);
-  const { data: classesData, isLoading: classesLoading } = useClassesMin(currentTenantId || undefined);
-  const { data: teachersData, isLoading: teachersLoading } = useTeachersMin(currentTenantId || undefined);
+  const { data: subjects = [], isLoading: subjectsLoading } = useQuery({
+    queryKey: ["subjects", currentTenantId],
+    queryFn: async () => {
+      const res = await apiFetch("/api/subjects");
+      if (!res.ok) return [];
+      return res.json();
+    }
+  });
 
-  const subjects = subjectsData?.subjects || [];
-  const classes = classesData?.classes || [];
-  const teachers = teachersData?.teachers || [];
+  const { data: classes = [], isLoading: classesLoading } = useQuery({
+    queryKey: ["classes", "min"],
+    queryFn: async () => {
+      const res = await apiFetch("/api/classes?mode=min");
+      if (!res.ok) return [];
+      return res.json();
+    }
+  });
+
+  const { data: teachers = [], isLoading: teachersLoading } = useQuery({
+    queryKey: ["teachers", "min"],
+    queryFn: async () => {
+      const res = await apiFetch("/api/teachers?mode=min");
+      if (!res.ok) return [];
+      return res.json();
+    }
+  });
 
   const [search, setSearch] = useState("");
   const [classFilter, setClassFilter] = useState("all");
@@ -93,14 +107,56 @@ export function AdminSubjects() {
   const [editForm, setEditForm] = useState({ id: "", ...emptyForm });
 
   // TanStack Mutations
-  const createMutation = useCreateSubject();
-  const updateMutation = useUpdateSubject();
-  const deleteMutation = useDeleteSubject();
+  const createMutation = useMutation({
+    mutationFn: async (data: any) => {
+      const res = await apiFetch("/api/subjects", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      });
+      if (!res.ok) throw new Error("Failed to create subject");
+      return res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["subjects"] });
+    }
+  });
+
+  const updateMutation = useMutation({
+    mutationFn: async (data: any) => {
+      const res = await apiFetch("/api/subjects", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      });
+      if (!res.ok) throw new Error("Failed to update subject");
+      return res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["subjects"] });
+    }
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: async (id: string) => {
+      const res = await apiFetch(`/api/subjects?id=${id}`, {
+        method: "DELETE",
+      });
+      if (!res.ok) {
+        const err = await res.json();
+        throw new Error(err.error || "Failed to delete subject");
+      }
+      return res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["subjects"] });
+    }
+  });
 
   // Only show full skeleton if we have NO data at all
   const loading = (subjectsLoading && subjects.length === 0) || (classesLoading && classes.length === 0);
 
-  const filtered = subjects.filter((s: any) => {
+  const filtered = (subjects as SubjectInfo[]).filter((s: SubjectInfo) => {
     const matchesSearch =
       s.name.toLowerCase().includes(search.toLowerCase()) ||
       s.code.toLowerCase().includes(search.toLowerCase()) ||

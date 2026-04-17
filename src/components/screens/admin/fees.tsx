@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback, useMemo } from "react";
+import { useState, useCallback, useMemo, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -15,9 +15,8 @@ import { Plus, Search, DollarSign, RotateCcw } from "lucide-react";
 import { goeyToast as toast } from "goey-toast";
 import { apiFetch } from "@/lib/api";
 import { useModulePermissions } from "@/hooks/use-permissions";
-import { useFees, useStudents, useClasses } from "@/lib/graphql/hooks";
 import { useAppStore } from "@/store/use-app-store";
-import { useQueryClient } from "@tanstack/react-query";
+import { useQueryClient, useQuery } from "@tanstack/react-query";
 
 // Sub-components
 import { FeeTable } from "./fees/FeeTable";
@@ -44,15 +43,39 @@ export function AdminFees() {
   const { canCreate, canEdit, canDelete } = useModulePermissions("fees");
   const queryClient = useQueryClient();
 
-  // Queries
-  const { data: feesData, isLoading: loadingFees } = useFees(currentTenantId || undefined);
-  const { data: studentsData } = useStudents(currentTenantId || undefined, undefined, 1, 1000);
-  const { data: classesData } = useClasses(currentTenantId || undefined);
-
-  // Filter states
   const [search, setSearch] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [classFilter, setClassFilter] = useState("all");
+
+  // --- Debouncing Search ---
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearch(search);
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [search]);
+
+  // Unified Query
+  const { data: unifiedData, isLoading: loadingFees } = useQuery({
+    queryKey: ["fees", "unified", debouncedSearch, statusFilter, classFilter],
+    queryFn: async () => {
+      const params = new URLSearchParams({ 
+        mode: "unified",
+        search: debouncedSearch,
+        status: statusFilter,
+        classId: classFilter === "all" ? "" : classFilter // Pass classId for selection
+      });
+      const res = await apiFetch(`/api/fees?${params.toString()}`);
+      if (!res.ok) throw new Error("Failed to fetch fees");
+      return res.json();
+    },
+  });
+
+  const records = unifiedData?.items || [];
+  const stats = unifiedData?.stats || { total: 0, pending: 0, rate: 0 };
+  const studentOptions = unifiedData?.students || [];
+  const classes = unifiedData?.classes || [];
 
   // Dialog states
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -163,48 +186,7 @@ export function AdminFees() {
     }
   };
 
-  // --- Derived ---
 
-  const records = useMemo(() => {
-    let filtered = (feesData?.fees || []) as FeeRecord[];
-
-    if (search) {
-      const s = search.toLowerCase();
-      filtered = filtered.filter(
-        (r) =>
-          r.student?.name.toLowerCase().includes(s) ||
-          r.type.toLowerCase().includes(s) ||
-          r.transactionId?.toLowerCase().includes(s)
-      );
-    }
-
-    if (statusFilter !== "all") {
-      filtered = filtered.filter((r) => r.status === statusFilter);
-    }
-
-    if (classFilter !== "all") {
-      filtered = filtered.filter((r) => r.student?.class?.name === classFilter);
-    }
-
-    return filtered;
-  }, [feesData, search, statusFilter, classFilter]);
-
-  const stats = useMemo(() => {
-    const all = (feesData?.fees || []) as FeeRecord[];
-    const total = all.reduce((acc, r) => acc + r.amount, 0);
-    const paid = all.reduce((acc, r) => acc + (r.paidAmount || 0), 0);
-    const pending = total - paid;
-    const rate = total > 0 ? Math.round((paid / total) * 100) : 0;
-
-    return { total, pending, rate };
-  }, [feesData]);
-
-  const studentOptions = useMemo(() => {
-    return (studentsData?.students || []).map((s: any) => ({
-      id: s.id,
-      name: s.name,
-    }));
-  }, [studentsData]);
 
   if (loadingFees) {
     return <FeeSkeleton />;
@@ -284,9 +266,9 @@ export function AdminFees() {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">All Classes</SelectItem>
-                {classesData?.classes?.map((c: any) => (
-                  <SelectItem key={c.id} value={c.name}>
-                    {c.name}-{c.section}
+                {classes.map((c: any) => (
+                  <SelectItem key={c.id} value={c.id}>
+                    {c.name}
                   </SelectItem>
                 ))}
               </SelectContent>

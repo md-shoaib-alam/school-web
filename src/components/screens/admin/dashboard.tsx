@@ -51,13 +51,8 @@ import {
 } from "@/components/ui/chart";
 import type { ChartConfig } from "@/components/ui/chart";
 import { useAppStore } from "@/store/use-app-store";
-import {
-  useDashboardSummary,
-  useDashboardAttendance,
-  useDashboardAcademic,
-  useDashboardFinancial,
-  useDashboardNotices,
-} from "@/lib/graphql/hooks";
+import { useQuery } from "@tanstack/react-query";
+import { api } from "@/lib/api";
 import { goeyToast as toast } from "goey-toast";
 
 const attendanceChartConfig = {
@@ -117,22 +112,28 @@ export function AdminDashboard() {
   const { currentUser, currentTenantId } = useAppStore();
   const tenantId = currentTenantId || currentUser?.tenantId || "default";
 
-  // Granular hooks for progressive loading
-  const summary = useDashboardSummary(tenantId);
-  const attendance = useDashboardAttendance(tenantId);
-  const academic = useDashboardAcademic(tenantId);
-  const financial = useDashboardFinancial(tenantId);
-  const notices = useDashboardNotices(tenantId);
-
-  // Only show full skeleton if we have NO data at all
-  const loading = (summary.isLoading && !summary.data) || (attendance.isLoading && !attendance.data);
+  // Optimized: Single network request for everything!
+  const { data: dashboardData, isLoading, error } = useQuery({
+    queryKey: ['admin-dashboard', tenantId],
+    queryFn: () => api.get('/dashboard'),
+    staleTime: 60 * 1000, // Cache for 1 minute
+  });
 
   useEffect(() => {
-    const error = summary.error || attendance.error || academic.error || financial.error || notices.error;
     if (error) {
-      toast.error("Some dashboard data failed to load", { description: error.message });
+      toast.error("Dashboard data failed to load", { description: (error as any).message });
     }
-  }, [summary.error, attendance.error, academic.error, financial.error, notices.error]);
+  }, [error]);
+
+  // Map the unified data for the existing UI components
+  const summary = { data: dashboardData?.summary, isLoading };
+  const attendance = { data: dashboardData?.attendanceTrend, isLoading };
+  const academic = { data: { classDistribution: dashboardData?.classDistribution }, isLoading };
+  const financial = { data: { totalRevenue: dashboardData?.totalRevenue, feeByType: dashboardData?.feeByType }, isLoading };
+  const notices = { data: dashboardData?.notices, isLoading };
+
+  // Only show full skeleton if we have NO data at all
+  const loading = isLoading && !dashboardData;
 
   const today = new Date();
   const greeting =

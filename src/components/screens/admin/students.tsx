@@ -46,11 +46,14 @@ export function AdminStudents() {
 
   // Data states
   const [students, setStudents] = useState<StudentInfo[]>([]);
+  const [totalItems, setTotalItems] = useState(0);
+  const [totalPages, setTotalPages] = useState(1);
   const [classes, setClasses] = useState<ClassInfo[]>([]);
   const [loading, setLoading] = useState(true);
 
-  // Filter & Search states (Client-side filtering as per user code)
+  // Filter & Search states
   const [search, setSearch] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
   const [classFilter, setClassFilter] = useState("all");
   const [currentPage, setCurrentPage] = useState(1);
 
@@ -61,26 +64,46 @@ export function AdminStudents() {
   const [formData, setFormData] = useState<StudentFormData>(emptyFormData);
   const [submitting, setSubmitting] = useState(false);
 
+  // --- Debouncing Search ---
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearch(search);
+      setCurrentPage(1); // Reset to page 1 when search changes
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [search]);
+
   // --- Fetching ---
 
   const fetchStudents = useCallback(async () => {
     try {
       setLoading(true);
-      const res = await apiFetch("/api/students");
+      const queryParams = new URLSearchParams({
+        page: String(currentPage),
+        limit: String(ITEMS_PER_PAGE),
+        ...(debouncedSearch ? { search: debouncedSearch } : {}),
+        ...(classFilter !== "all" ? { classId: classFilter } : {}),
+      });
+
+      const res = await apiFetch(`/api/students?${queryParams.toString()}`);
       if (!res.ok) throw new Error("Failed to fetch students");
       const json = await res.json();
-      setStudents(json);
+      
+      // Handle the new paginated structure
+      setStudents(json.items || []);
+      setTotalItems(json.total || 0);
+      setTotalPages(json.totalPages || 1);
     } catch (err) {
       console.error("Error fetching students:", err);
       toast.error("Failed to load student data from the server.");
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [currentPage, debouncedSearch, classFilter]);
 
   const fetchClasses = useCallback(async () => {
     try {
-      const res = await apiFetch("/api/classes");
+      const res = await apiFetch("/api/classes?mode=min");
       if (!res.ok) throw new Error("Failed to fetch classes");
       const json = await res.json();
       setClasses(json);
@@ -91,8 +114,11 @@ export function AdminStudents() {
 
   useEffect(() => {
     fetchStudents();
+  }, [fetchStudents]);
+
+  useEffect(() => {
     fetchClasses();
-  }, [fetchStudents, fetchClasses]);
+  }, [fetchClasses]);
 
   // --- Handlers ---
 
@@ -164,7 +190,9 @@ export function AdminStudents() {
            const err = await res.json().catch(() => ({}));
            throw new Error(err.error || "Failed to delete student");
         }
-        setStudents((prev) => prev.filter((s) => s.id !== id));
+        
+        // Refresh from server to keep pagination in sync
+        fetchStudents();
         
         // Force a RED morphing pill for deletion
         throw new Error("Student record removed");
@@ -177,21 +205,9 @@ export function AdminStudents() {
     );
   };
 
-  // --- Filter Logic (Client-side) ---
+  // --- No longer using client-side filtered/paginated variables ---
+  // We use `students` directly as it's now the paginated slice from the server.
 
-  const filtered = students.filter((s) => {
-    const matchSearch =
-      s.name.toLowerCase().includes(search.toLowerCase()) ||
-      s.rollNumber.toLowerCase().includes(search.toLowerCase());
-    const matchClass = classFilter === "all" || s.classId === classFilter;
-    return matchSearch && matchClass;
-  });
-
-  const totalPages = Math.max(1, Math.ceil(filtered.length / ITEMS_PER_PAGE));
-  const paginated = filtered.slice(
-    (currentPage - 1) * ITEMS_PER_PAGE,
-    currentPage * ITEMS_PER_PAGE,
-  );
 
   return (
     <div className="space-y-6">
@@ -269,7 +285,7 @@ export function AdminStudents() {
           ) : (
             <>
               <StudentTable
-                students={paginated}
+                students={students}
                 canEdit={canEdit}
                 canDelete={canDelete}
                 onEdit={handleOpenEdit}
@@ -278,7 +294,7 @@ export function AdminStudents() {
               <Pagination
                 currentPage={currentPage}
                 totalPages={totalPages}
-                totalItems={filtered.length}
+                totalItems={totalItems}
                 itemsPerPage={ITEMS_PER_PAGE}
                 onPageChange={setCurrentPage}
               />

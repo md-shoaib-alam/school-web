@@ -1,40 +1,16 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { graphqlQuery, graphqlMutate } from "@/lib/graphql/core";
+import { apiFetch } from "@/lib/api";
 import { CalendarEvent } from "./types";
 import { goeyToast as toast } from "goey-toast";
-
-const GET_EVENTS = `#graphql
-  query GetEvents($tenantId: String, $month: String) {
-    calendarEvents(tenantId: $tenantId, month: $month) {
-      id title description date endDate type targetRole color allDay
-    }
-  }
-`;
-
-const CREATE_EVENT = `#graphql
-  mutation CreateEvent($data: EventInput!) {
-    createEvent(data: $data) { id }
-  }
-`;
-
-const UPDATE_EVENT = `#graphql
-  mutation UpdateEvent($id: ID!, $data: EventInput!) {
-    updateEvent(id: $id, data: $data) { id }
-  }
-`;
-
-const DELETE_EVENT = `#graphql
-  mutation DeleteEvent($id: ID!) {
-    deleteEvent(id: $id)
-  }
-`;
 
 export function useCalendarEvents(tenantId: string | null, monthKey: string) {
   return useQuery({
     queryKey: ["calendar-events", tenantId, monthKey],
     queryFn: async () => {
-      const res = await graphqlQuery<{ calendarEvents: CalendarEvent[] }>(GET_EVENTS, { tenantId, month: monthKey });
-      return res.calendarEvents || [];
+      const res = await apiFetch(`/api/events?month=${monthKey}`);
+      if (!res.ok) return [];
+      const json = await res.json();
+      return json.data || [];
     },
     enabled: !!tenantId,
     staleTime: 5 * 60 * 1000, 
@@ -44,7 +20,15 @@ export function useCalendarEvents(tenantId: string | null, monthKey: string) {
 export function useCreateEvent() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (data: any) => graphqlMutate(CREATE_EVENT, { data }),
+    mutationFn: async (data: any) => {
+      const res = await apiFetch("/api/events", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      });
+      if (!res.ok) throw new Error("Failed to create event");
+      return res.json();
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["calendar-events"] });
       toast.success("Event Created");
@@ -56,7 +40,15 @@ export function useCreateEvent() {
 export function useUpdateEvent() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: ({ id, ...data }: any) => graphqlMutate(UPDATE_EVENT, { id, data }),
+    mutationFn: async ({ id, ...data }: any) => {
+      const res = await apiFetch("/api/events", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id, ...data }),
+      });
+      if (!res.ok) throw new Error("Failed to update event");
+      return res.json();
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["calendar-events"] });
       toast.info("Event Updated");
@@ -68,7 +60,13 @@ export function useUpdateEvent() {
 export function useDeleteEvent() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: ({ id }: { id: string }) => graphqlMutate(DELETE_EVENT, { id }),
+    mutationFn: async ({ id }: { id: string }) => {
+      const res = await apiFetch(`/api/events?id=${id}`, {
+        method: "DELETE",
+      });
+      if (!res.ok) throw new Error("Failed to delete event");
+      return res.json();
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["calendar-events"] });
       toast.error("Event Deleted");

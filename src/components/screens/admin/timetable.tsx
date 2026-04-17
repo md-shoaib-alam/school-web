@@ -91,15 +91,15 @@ export function AdminTimetable() {
   const { data: classes = [], isLoading: isLoadingClasses } = useQuery<
     ClassInfo[]
   >({
-    queryKey: ["classes", currentTenantId],
+    queryKey: ["classes", currentTenantId, "min"],
     queryFn: async () => {
-      const res = await apiFetch("/api/classes");
+      const res = await apiFetch("/api/classes?mode=min");
       if (!res.ok) throw new Error("Failed to fetch classes");
       const data = await res.json();
       if (data.length > 0 && !selectedClass) setSelectedClass(data[0].id);
       return data;
     },
-    staleTime: 5 * 60 * 1000, // 5 minutes cache
+    staleTime: 5 * 60 * 1000,
   });
 
   const { data: workingDays = DEFAULT_DAYS } = useQuery<string[]>({
@@ -131,29 +131,30 @@ export function AdminTimetable() {
   });
 
   const { data: availableSubjects = [] } = useQuery({
-    queryKey: ["subjects", currentTenantId, selectedClass],
+    queryKey: ["subjects", currentTenantId, "min"],
     queryFn: async () => {
-      const res = await apiFetch("/api/subjects");
-      if (!res.ok) return [];
-      const subjectData = await res.json();
-      const currentClass = classes.find((c) => c.id === selectedClass);
-      const filtered = currentClass
-        ? subjectData.filter((s: any) => s.className === currentClass.name)
-        : subjectData;
-      return filtered.length > 0 ? filtered : subjectData;
-    },
-    enabled: createDialogOpen || editDialogOpen,
-  });
-
-  const { data: availableTeachers = [] } = useQuery({
-    queryKey: ["teachers", currentTenantId],
-    queryFn: async () => {
-      const res = await apiFetch("/api/teachers"); // Using correct teacher endpoint
+      const res = await apiFetch("/api/subjects?mode=min");
       if (!res.ok) return [];
       return await res.json();
     },
     enabled: createDialogOpen || editDialogOpen,
   });
+
+  const { data: availableTeachers = [] } = useQuery({
+    queryKey: ["teachers", currentTenantId, "min"],
+    queryFn: async () => {
+      const res = await apiFetch("/api/teachers?mode=min");
+      if (!res.ok) return [];
+      return await res.json();
+    },
+    enabled: createDialogOpen || editDialogOpen,
+  });
+
+  // Filter subjects for the current class in memory (very fast since data is minified)
+  const filteredSubjects = useMemo(() => {
+    if (!selectedClass) return availableSubjects;
+    return availableSubjects.filter((s: any) => s.classId === selectedClass);
+  }, [availableSubjects, selectedClass]);
 
   // ── Mutations ──
 
@@ -568,7 +569,7 @@ export function AdminTimetable() {
         setForm={setEditForm}
         onSave={handleEditSave}
         saving={editSaving}
-        availableSubjects={availableSubjects}
+        availableSubjects={filteredSubjects}
         availableTeachers={availableTeachers}
         workingDays={workingDays}
       />
@@ -580,7 +581,7 @@ export function AdminTimetable() {
         workingDays={workingDays}
         daySlots={daySlots}
         setDaySlots={setDaySlots}
-        availableSubjects={availableSubjects}
+        availableSubjects={filteredSubjects}
         availableTeachers={availableTeachers}
         onSave={handleBulkSave}
         saving={saving}
