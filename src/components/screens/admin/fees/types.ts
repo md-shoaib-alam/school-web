@@ -34,6 +34,7 @@ export interface FeeFormData {
 export interface StudentOption {
   id: string;
   name: string;
+  classId: string | null;
 }
 
 export interface ClassOption {

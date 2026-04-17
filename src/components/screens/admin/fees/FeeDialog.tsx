@@ -1,5 +1,6 @@
 "use client";
 
+import { useState, useMemo, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -18,8 +19,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Loader2, DollarSign } from "lucide-react";
-import type { FeeRecord, FeeFormData, StudentOption } from "./types";
+import { Loader2, DollarSign, School } from "lucide-react";
+import type { FeeRecord, FeeFormData, StudentOption, ClassOption } from "./types";
 
 interface FeeDialogProps {
   open: boolean;
@@ -27,6 +28,7 @@ interface FeeDialogProps {
   mode: "create" | "edit" | "view";
   record: FeeRecord | null;
   students: StudentOption[];
+  classes: ClassOption[];
   formData: FeeFormData;
   setFormData: (data: FeeFormData) => void;
   submitting: boolean;
@@ -48,6 +50,7 @@ export function FeeDialog({
   mode,
   record,
   students,
+  classes,
   formData,
   setFormData,
   submitting,
@@ -55,6 +58,29 @@ export function FeeDialog({
 }: FeeDialogProps) {
   const isView = mode === "view";
   const title = mode === "create" ? "Create Fee Record" : mode === "edit" ? "Edit Fee Record" : "Fee Details";
+
+  const [selectedClassId, setSelectedClassId] = useState<string>("all");
+
+  // Filter students based on selected class
+  const filteredStudents = useMemo(() => {
+    if (!students || students.length === 0) return [];
+    if (!selectedClassId || selectedClassId === "all") return students;
+    
+    return students.filter(s => {
+      if (!s.classId) return false;
+      // Use clean string comparison
+      const sId = String(s.classId).toLowerCase().trim();
+      const targetId = String(selectedClassId).toLowerCase().trim();
+      return sId === targetId;
+    });
+  }, [students, selectedClassId]);
+
+  // Reset class filter when dialog opens/closes
+  useEffect(() => {
+    if (!open) {
+      setSelectedClassId("all");
+    }
+  }, [open]);
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -71,6 +97,31 @@ export function FeeDialog({
 
         <div className="space-y-4 py-4">
           <div className="grid grid-cols-2 gap-4">
+            {mode === "create" && (
+              <div className="space-y-2 col-span-2">
+                <Label className="flex items-center gap-2">
+                  <School className="h-4 w-4 text-muted-foreground" />
+                  Select Class (to filter students)
+                </Label>
+                <Select
+                  value={selectedClassId}
+                  onValueChange={setSelectedClassId}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="All Classes" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Classes</SelectItem>
+                    {classes.map((c) => (
+                      <SelectItem key={c.id} value={c.id}>
+                        {c.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
+
             <div className="space-y-2 col-span-2">
               <Label>Student *</Label>
               <Select
@@ -79,10 +130,10 @@ export function FeeDialog({
                 onValueChange={(v) => setFormData({ ...formData, studentId: v })}
               >
                 <SelectTrigger>
-                  <SelectValue placeholder="Select Student" />
+                  <SelectValue placeholder={filteredStudents.length === 0 ? "No students in this class" : "Select Student"} />
                 </SelectTrigger>
                 <SelectContent>
-                  {students.map((s) => (
+                  {filteredStudents.map((s) => (
                     <SelectItem key={s.id} value={s.id}>
                       {s.name}
                     </SelectItem>
@@ -107,6 +158,12 @@ export function FeeDialog({
                       {t.label}
                     </SelectItem>
                   ))}
+                  {/* Fallback for custom types not in the list */}
+                  {formData.type && !feeTypes.find(t => t.value === formData.type) && (
+                    <SelectItem value={formData.type}>
+                      {formData.type.charAt(0).toUpperCase() + formData.type.slice(1).replace(/_/g, " ")}
+                    </SelectItem>
+                  )}
                 </SelectContent>
               </Select>
             </div>

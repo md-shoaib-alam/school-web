@@ -72,10 +72,12 @@ export function SuperAdminSubscriptions() {
     limit,
   });
 
+  // FIXED: Correct parameters for useParents and increased limit for dropdown
   const { data: parentsData, isLoading: loadingParents } = useParents(
     selectedTenant === "all" ? undefined : selectedTenant,
+    undefined, // search
     page,
-    limit,
+    1000, // Large limit for dropdown and parent list
   );
 
   const loading = loadingSubs || (selectedTenant !== "all" && loadingParents);

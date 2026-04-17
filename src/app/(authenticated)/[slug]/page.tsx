@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { useAppStore } from '@/store/use-app-store';
 import { useTenantResolution } from '@/lib/graphql/hooks/platform.hooks';
@@ -36,16 +36,31 @@ export default function GenericSlugDispatcher() {
   const { slug } = useParams();
   const router = useRouter();
   const { currentUser, currentTenantSlug, setCurrentTenant } = useAppStore();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const { data: resolvedTenant } = useTenantResolution(slug as string);
 
   useEffect(() => {
-    if (resolvedTenant && resolvedTenant.slug !== currentTenantSlug) {
+    if (mounted && resolvedTenant && resolvedTenant.slug !== currentTenantSlug) {
       setCurrentTenant(resolvedTenant.id, resolvedTenant.name, resolvedTenant.slug);
     }
-  }, [resolvedTenant, currentTenantSlug, setCurrentTenant]);
+  }, [mounted, resolvedTenant, currentTenantSlug, setCurrentTenant]);
 
-  if (!currentUser) return null;
+  // 2. Check if it's a Tenant Dashboard (matches slug or tenantId, or user is super_admin)
+  const isTenantMatch = currentUser?.tenantId === slug || currentUser?.tenantSlug === slug;
+  const isTenantContext = isTenantMatch || (currentUser?.role === 'super_admin' && !!resolvedTenant);
+
+  useEffect(() => {
+    if (mounted && isTenantContext) {
+      router.replace(`/${slug}/dashboard`);
+    }
+  }, [mounted, isTenantContext, slug, router]);
+
+  if (!mounted || !currentUser) return <LoadingScreen />;
 
   // 1. Check if it's a Platform Screen (Super Admin only)
   if (currentUser.role === 'super_admin') {
@@ -65,17 +80,7 @@ export default function GenericSlugDispatcher() {
     }
   }
 
-  // 2. Check if it's a Tenant Dashboard (matches slug or tenantId, or user is super_admin)
-  const isTenantMatch = currentUser.tenantId === slug || currentUser.tenantSlug === slug;
-  if (isTenantMatch || currentUser.role === 'super_admin') {
-    // For Super Admin visiting a tenant slug, wait for resolution to avoid fetching with wrong context
-    if (currentUser.role === 'super_admin' && !isTenantMatch && !resolvedTenant) {
-      return <LoadingScreen />;
-    }
-
-    // Instead of rendering directly, redirect to the explicit /dashboard path
-    // This satisfies the requirement of having /dashboard in the URL
-    router.replace(`/${slug}/dashboard`);
+  if (isTenantContext) {
     return <LoadingScreen />;
   }
 

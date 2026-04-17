@@ -56,15 +56,19 @@ export function AdminFees() {
     return () => clearTimeout(timer);
   }, [search]);
 
-  // Unified Query
-  const { data: unifiedData, isLoading: loadingFees } = useQuery({
-    queryKey: ["fees", "unified", debouncedSearch, statusFilter, classFilter],
+  // 1. Fetch main fee records
+  const { data: unifiedData, isLoading: loadingFees } = useQuery<{
+    items: FeeRecord[];
+    total: number;
+    totalPages: number;
+    stats: { total: number; pending: number; rate: number };
+  }>({
+    queryKey: ["fees", "list-v2", debouncedSearch, statusFilter, classFilter],
     queryFn: async () => {
       const params = new URLSearchParams({ 
-        mode: "unified",
         search: debouncedSearch,
         status: statusFilter,
-        classId: classFilter === "all" ? "" : classFilter // Pass classId for selection
+        classId: classFilter === "all" ? "" : classFilter
       });
       const res = await apiFetch(`/api/fees?${params.toString()}`);
       if (!res.ok) throw new Error("Failed to fetch fees");
@@ -72,10 +76,32 @@ export function AdminFees() {
     },
   });
 
+  // 2. Fetch classes for filters and dialog (mode=min)
+  const { data: classes = [] } = useQuery<any[]>({
+    queryKey: ["classes", "min"],
+    queryFn: async () => {
+      const res = await apiFetch("/api/classes?mode=min");
+      if (!res.ok) return [];
+      const data = await res.json();
+      return data.map((c: any) => ({ id: c.id, name: `${c.name}-${c.section}` }));
+    },
+    staleTime: 5 * 60 * 1000,
+  });
+
+  // 3. Fetch students for dialog (mode=min)
+  const { data: studentOptions = [] } = useQuery<StudentOption[]>({
+    queryKey: ["students", "min"],
+    queryFn: async () => {
+      const res = await apiFetch("/api/students?mode=min&limit=2000");
+      if (!res.ok) return [];
+      const data = await res.json();
+      return data.items || [];
+    },
+    staleTime: 5 * 60 * 1000,
+  });
+
   const records = unifiedData?.items || [];
   const stats = unifiedData?.stats || { total: 0, pending: 0, rate: 0 };
-  const studentOptions = unifiedData?.students || [];
-  const classes = unifiedData?.classes || [];
 
   // Dialog states
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -105,7 +131,7 @@ export function AdminFees() {
     setFormData({
       studentId: record.studentId,
       amount: record.amount.toString(),
-      type: record.type,
+      type: record.type.toLowerCase(),
       status: record.status,
       dueDate: record.dueDate.split("T")[0],
       paidAmount: record.paidAmount?.toString() || "",
@@ -121,7 +147,7 @@ export function AdminFees() {
     setFormData({
       studentId: record.studentId,
       amount: record.amount.toString(),
-      type: record.type,
+      type: record.type.toLowerCase(),
       status: record.status,
       dueDate: record.dueDate.split("T")[0],
       paidAmount: record.paidAmount?.toString() || "",
@@ -302,6 +328,7 @@ export function AdminFees() {
         mode={dialogMode}
         record={selectedRecord}
         students={studentOptions}
+        classes={classes}
         formData={formData}
         setFormData={setFormData}
         submitting={submitting}
