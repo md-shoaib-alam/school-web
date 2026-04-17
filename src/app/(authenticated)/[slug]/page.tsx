@@ -1,7 +1,9 @@
 'use client';
 
+import { useEffect } from 'react';
 import { useParams } from 'next/navigation';
 import { useAppStore } from '@/store/use-app-store';
+import { useTenantResolution } from '@/lib/graphql/hooks/platform.hooks';
 import dynamic from 'next/dynamic';
 
 const LoadingScreen = () => (
@@ -32,7 +34,15 @@ const NotFoundScreen = dynamic(() => import('@/components/screens/error/not-foun
 
 export default function GenericSlugDispatcher() {
   const { slug } = useParams();
-  const { currentUser } = useAppStore();
+  const { currentUser, currentTenantSlug, setCurrentTenant } = useAppStore();
+
+  const { data: resolvedTenant } = useTenantResolution(slug as string);
+
+  useEffect(() => {
+    if (resolvedTenant && resolvedTenant.slug !== currentTenantSlug) {
+      setCurrentTenant(resolvedTenant.id, resolvedTenant.name, resolvedTenant.slug);
+    }
+  }, [resolvedTenant, currentTenantSlug, setCurrentTenant]);
 
   if (!currentUser) return null;
 
@@ -57,6 +67,11 @@ export default function GenericSlugDispatcher() {
   // 2. Check if it's a Tenant Dashboard (matches slug or tenantId, or user is super_admin)
   const isTenantMatch = currentUser.tenantId === slug || currentUser.tenantSlug === slug;
   if (isTenantMatch || currentUser.role === 'super_admin') {
+    // For Super Admin visiting a tenant slug, wait for resolution to avoid fetching with wrong context
+    if (currentUser.role === 'super_admin' && !isTenantMatch && !resolvedTenant) {
+      return <LoadingScreen />;
+    }
+
     switch (currentUser.role) {
       case 'super_admin':
       case 'admin': return <AdminDashboard />;

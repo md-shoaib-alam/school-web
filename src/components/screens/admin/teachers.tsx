@@ -9,6 +9,9 @@ import { goeyToast as toast } from "goey-toast";
 import { useModulePermissions } from "@/hooks/use-permissions";
 import { apiFetch } from "@/lib/api";
 import { useAppStore } from "@/store/use-app-store";
+import { useTeachers } from "@/lib/graphql/hooks/academic.hooks";
+import { useQueryClient } from "@tanstack/react-query";
+import { queryKeys } from "@/lib/graphql/keys";
 
 // Sub-components
 import { TeacherCard } from "./teachers/TeacherCard";
@@ -29,77 +32,44 @@ export function AdminTeachers() {
   const { currentTenantId } = useAppStore();
   const { canCreate, canEdit, canDelete } = useModulePermissions("teachers");
 
-  // Initializing state from localStorage to avoid skeletons on revisit
-  const [teachers, setTeachers] = useState<TeacherInfo[]>(() => {
-    if (typeof window !== "undefined") {
-      const saved = localStorage.getItem(`teachers_cache_${currentTenantId}`);
-      return saved ? JSON.parse(saved) : [];
-    }
-    return [];
-  });
-
-  const [loading, setLoading] = useState(teachers.length === 0);
+  // Filter & Search states
   const [search, setSearch] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
-  const [totalItems, setTotalItems] = useState(0);
 
-  // --- Debouncing Search ---
+  const queryClient = useQueryClient();
+
+  // Queries
+  const { 
+    data: teachersData, 
+    isLoading: loading 
+  } = useTeachers(
+    currentTenantId || undefined, 
+    debouncedSearch || undefined,
+    currentPage, 
+    12 // ITEMS_PER_PAGE
+  );
+
+  const teachers = teachersData?.teachers || [];
+  const totalItems = teachersData?.total || 0;
+  const totalPages = teachersData?.totalPages || 1;
+
   useEffect(() => {
     const timer = setTimeout(() => {
       setDebouncedSearch(search);
-      setCurrentPage(1); // Reset to page 1 when search changes
+      setCurrentPage(1); 
     }, 300);
     return () => clearTimeout(timer);
   }, [search]);
 
   // Dialog state
   const [dialogOpen, setDialogOpen] = useState(false);
-  const [editingTeacher, setEditingTeacher] = useState<TeacherInfo | null>(
-    null,
-  );
+  const [editingTeacher, setEditingTeacher] = useState<TeacherInfo | null>(null);
   const [formData, setFormData] = useState(emptyFormData);
   const [submitting, setSubmitting] = useState(false);
 
   // Delete state
   const [deletingId, setDeletingId] = useState<string | null>(null);
-
-  const fetchTeachers = useCallback(async (showSkeleton = false) => {
-    try {
-      if (showSkeleton) setLoading(true);
-      const queryParams = new URLSearchParams({
-        page: String(currentPage),
-        limit: '12', // 12 per page for grid layout
-        ...(debouncedSearch ? { search: debouncedSearch } : {}),
-      });
-
-      const res = await apiFetch(`/api/teachers?${queryParams.toString()}`);
-      if (!res.ok) throw new Error("Failed to fetch teachers");
-      const json = await res.json();
-      
-      const teacherItems = json.items || [];
-      setTeachers(teacherItems);
-      setTotalPages(json.totalPages || 1);
-      setTotalItems(json.total || 0);
-
-      // Cache the result for next time
-      if (typeof window !== "undefined" && currentTenantId) {
-        localStorage.setItem(`teachers_cache_${currentTenantId}`, JSON.stringify(teacherItems));
-      }
-    } catch (err) {
-      console.error("Error fetching teachers:", err);
-    } finally {
-      setLoading(false);
-    }
-  }, [currentTenantId, currentPage, debouncedSearch]);
-
-  // Initial load when tenant is ready
-  useEffect(() => {
-    if (currentTenantId) {
-        fetchTeachers(teachers.length === 0);
-    }
-  }, [currentTenantId, fetchTeachers]);
 
   const handleOpenAdd = () => {
     setEditingTeacher(null);
@@ -148,7 +118,7 @@ export function AdminTeachers() {
           setDialogOpen(false);
           setEditingTeacher(null);
           setFormData(emptyFormData);
-          fetchTeachers();
+          queryClient.invalidateQueries({ queryKey: queryKeys.teachers });
           return isEdit ? "Teacher updated" : "Teacher added";
         } finally {
           setSubmitting(false);
@@ -171,7 +141,7 @@ export function AdminTeachers() {
           throw new Error(err.error || "Deletion failed");
         }
         
-        fetchTeachers();
+        queryClient.invalidateQueries({ queryKey: queryKeys.teachers });
         setDeletingId(null);
         
         // We throw a "success" message to force a RED morphing pill for deletion

@@ -1,8 +1,9 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { usePathname, useRouter } from "next/navigation";
+import { useParams, usePathname, useRouter } from "next/navigation";
 import { useAppStore } from "@/store/use-app-store";
+import { useTenantResolution } from "@/lib/graphql/hooks/platform.hooks";
 import { hasPermission, isRootAdmin } from "@/lib/permissions";
 import { ChangePasswordModal } from "@/components/modals/change-password-modal";
 import { Sidebar } from "./sidebar";
@@ -10,10 +11,12 @@ import { Header } from "./header";
 import { navItems } from "./nav-config";
 
 export function AppLayout({ children }: { children: React.ReactNode }) {
+  const { slug } = useParams();
   const {
     currentUser,
     currentTenantId,
     currentTenantSlug,
+    setCurrentTenant,
     sidebarOpen,
     setSidebarOpen,
     refreshPermissions,
@@ -22,6 +25,15 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
   const [isChangePasswordOpen, setIsChangePasswordOpen] = useState(false);
+
+  // Sync tenant context from slug
+  const { data: resolvedTenant } = useTenantResolution(slug as string);
+
+  useEffect(() => {
+    if (resolvedTenant && resolvedTenant.slug !== currentTenantSlug) {
+      setCurrentTenant(resolvedTenant.id, resolvedTenant.name, resolvedTenant.slug);
+    }
+  }, [resolvedTenant, currentTenantSlug, setCurrentTenant]);
 
   // Refresh permissions from DB on mount
   useEffect(() => {
@@ -36,11 +48,9 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
   if (parts.length >= 2) {
     resolvedScreen = parts[1];
   } else if (parts.length === 1) {
-    if (currentUser?.tenantId === parts[0]) {
-      resolvedScreen = "dashboard";
-    } else {
-      resolvedScreen = parts[0];
-    }
+    const p = parts[0];
+    const isTenantRoot = p === currentUser?.tenantId || p === currentTenantSlug || p === currentUser?.tenantSlug;
+    resolvedScreen = isTenantRoot ? "dashboard" : p;
   }
 
   const isSuperAdmin = currentUser.role === "super_admin";

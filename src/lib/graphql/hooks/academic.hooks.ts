@@ -50,11 +50,11 @@ export function useClasses(tenantId?: string, page?: number, limit?: number) {
   })
 }
 
-export function useTeachers(tenantId?: string, page?: number, limit?: number) {
+export function useTeachers(tenantId?: string, search?: string, page?: number, limit?: number) {
   return useQuery({
-    queryKey: [...queryKeys.teachers, tenantId, page, limit],
+    queryKey: [...queryKeys.teachers, tenantId, search, page, limit],
     queryFn: async () => {
-      const data = await graphqlQuery<{ teachers: TeachersResponse }>(TEACHERS, { tenantId, page, limit })
+      const data = await graphqlQuery<{ teachers: TeachersResponse }>(TEACHERS, { tenantId, search, page, limit })
       return data.teachers
     },
     staleTime: 60 * 1000,
@@ -62,11 +62,11 @@ export function useTeachers(tenantId?: string, page?: number, limit?: number) {
   })
 }
 
-export function useStudents(tenantId?: string, classId?: string, page?: number, limit?: number) {
+export function useStudents(tenantId?: string, classId?: string, search?: string, page?: number, limit?: number) {
   return useQuery({
-    queryKey: [...queryKeys.students, tenantId, classId, page, limit],
+    queryKey: [...queryKeys.students, tenantId, classId, search, page, limit],
     queryFn: async () => {
-      const data = await graphqlQuery<{ students: StudentsResponse }>(STUDENTS, { tenantId, classId, page, limit })
+      const data = await graphqlQuery<{ students: StudentsResponse }>(STUDENTS, { tenantId, classId, search, page, limit })
       return data.students
     },
     staleTime: 60 * 1000,
@@ -74,17 +74,17 @@ export function useStudents(tenantId?: string, classId?: string, page?: number, 
   })
 }
 
-export function useParents(tenantId?: string, page?: number, limit?: number) {
+export function useParents(tenantId?: string, search?: string, page?: number, limit?: number) {
   return useQuery({
-    queryKey: [...queryKeys.parents, tenantId, page, limit],
+    queryKey: [...queryKeys.parents, tenantId, search, page, limit],
     queryFn: async () => {
-      const data = await graphqlQuery<{ parents: ParentsResponse }>(PARENTS, { tenantId, page, limit })
+      const data = await graphqlQuery<{ parents: ParentsResponse }>(PARENTS, { tenantId, search, page, limit })
       return data.parents
     },
     staleTime: 60 * 1000,
-    gcTime: 15 * 60 * 1000,
   })
 }
+
 
 export function useNotices(tenantId?: string, page?: number, limit?: number) {
   return useQuery({

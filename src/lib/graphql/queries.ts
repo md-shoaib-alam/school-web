@@ -204,8 +204,8 @@ export const CLASSES = `
 `
 
 export const TEACHERS = `
-  query Teachers($tenantId: String, $page: Int, $limit: Int) {
-    teachers(tenantId: $tenantId, page: $page, limit: $limit) {
+  query Teachers($tenantId: String, $search: String, $page: Int, $limit: Int) {
+    teachers(tenantId: $tenantId, search: $search, page: $page, limit: $limit) {
       teachers { id name email phone qualification experience status subjects classes joiningDate }
       total page totalPages
     }
@@ -222,8 +222,8 @@ export const STUDENTS = `
 `
 
 export const PARENTS = `
-  query Parents($tenantId: String, $page: Int, $limit: Int) {
-    parents(tenantId: $tenantId, page: $page, limit: $limit) {
+  query Parents($tenantId: String, $search: String, $page: Int, $limit: Int) {
+    parents(tenantId: $tenantId, search: $search, page: $page, limit: $limit) {
       parents { 
         id userId name email phone occupation status 
         children { id name email rollNumber className gender classId } 

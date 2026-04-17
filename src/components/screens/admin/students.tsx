@@ -16,6 +16,9 @@ import { goeyToast as toast } from "goey-toast";
 import { apiFetch } from "@/lib/api";
 import { useModulePermissions } from "@/hooks/use-permissions";
 import { useAppStore } from "@/store/use-app-store";
+import { useStudents, useClassesMin } from "@/lib/graphql/hooks/academic.hooks";
+import { useQueryClient } from "@tanstack/react-query";
+import { queryKeys } from "@/lib/graphql/keys";
 
 // Sub-components
 import { StudentTable } from "./students/StudentTable";
@@ -44,18 +47,33 @@ export function AdminStudents() {
   const { currentTenantId } = useAppStore();
   const { canCreate, canEdit, canDelete } = useModulePermissions("students");
 
-  // Data states
-  const [students, setStudents] = useState<StudentInfo[]>([]);
-  const [totalItems, setTotalItems] = useState(0);
-  const [totalPages, setTotalPages] = useState(1);
-  const [classes, setClasses] = useState<ClassInfo[]>([]);
-  const [loading, setLoading] = useState(true);
-
   // Filter & Search states
   const [search, setSearch] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const [classFilter, setClassFilter] = useState("all");
   const [currentPage, setCurrentPage] = useState(1);
+
+  const queryClient = useQueryClient();
+
+  // Queries
+  const { 
+    data: studentData, 
+    isLoading: loadingStudents 
+  } = useStudents(
+    currentTenantId || undefined, 
+    classFilter === "all" ? undefined : classFilter,
+    debouncedSearch || undefined,
+    currentPage, 
+    ITEMS_PER_PAGE
+  );
+
+  const { data: classesData } = useClassesMin(currentTenantId || undefined);
+
+  const students = studentData?.students || [];
+  const totalItems = studentData?.total || 0;
+  const totalPages = studentData?.totalPages || 1;
+  const classes = classesData?.classes || [];
+  const loading = loadingStudents;
 
   // Dialog states
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -64,61 +82,13 @@ export function AdminStudents() {
   const [formData, setFormData] = useState<StudentFormData>(emptyFormData);
   const [submitting, setSubmitting] = useState(false);
 
-  // --- Debouncing Search ---
   useEffect(() => {
     const timer = setTimeout(() => {
       setDebouncedSearch(search);
-      setCurrentPage(1); // Reset to page 1 when search changes
+      setCurrentPage(1); 
     }, 300);
     return () => clearTimeout(timer);
   }, [search]);
-
-  // --- Fetching ---
-
-  const fetchStudents = useCallback(async () => {
-    try {
-      setLoading(true);
-      const queryParams = new URLSearchParams({
-        page: String(currentPage),
-        limit: String(ITEMS_PER_PAGE),
-        ...(debouncedSearch ? { search: debouncedSearch } : {}),
-        ...(classFilter !== "all" ? { classId: classFilter } : {}),
-      });
-
-      const res = await apiFetch(`/api/students?${queryParams.toString()}`);
-      if (!res.ok) throw new Error("Failed to fetch students");
-      const json = await res.json();
-      
-      // Handle the new paginated structure
-      setStudents(json.items || []);
-      setTotalItems(json.total || 0);
-      setTotalPages(json.totalPages || 1);
-    } catch (err) {
-      console.error("Error fetching students:", err);
-      toast.error("Failed to load student data from the server.");
-    } finally {
-      setLoading(false);
-    }
-  }, [currentPage, debouncedSearch, classFilter]);
-
-  const fetchClasses = useCallback(async () => {
-    try {
-      const res = await apiFetch("/api/classes?mode=min");
-      if (!res.ok) throw new Error("Failed to fetch classes");
-      const json = await res.json();
-      setClasses(json);
-    } catch {
-      console.error("Error fetching classes");
-    }
-  }, []);
-
-  useEffect(() => {
-    fetchStudents();
-  }, [fetchStudents]);
-
-  useEffect(() => {
-    fetchClasses();
-  }, [fetchClasses]);
 
   // --- Handlers ---
 
@@ -168,7 +138,7 @@ export function AdminStudents() {
           }
 
           setDialogOpen(false);
-          fetchStudents();
+          queryClient.invalidateQueries({ queryKey: queryKeys.students });
           return isCreate ? "Student registered successfully" : "Student details updated";
         } finally {
           setSubmitting(false);
@@ -191,8 +161,8 @@ export function AdminStudents() {
            throw new Error(err.error || "Failed to delete student");
         }
         
-        // Refresh from server to keep pagination in sync
-        fetchStudents();
+        // Refresh from server
+        queryClient.invalidateQueries({ queryKey: queryKeys.students });
         
         // Force a RED morphing pill for deletion
         throw new Error("Student record removed");
@@ -252,7 +222,7 @@ export function AdminStudents() {
             <ImportExportButtons 
               canCreate={canCreate} 
               tenantId={currentTenantId || ""} 
-              onImportSuccess={fetchStudents} 
+              onImportSuccess={() => queryClient.invalidateQueries({ queryKey: queryKeys.students })} 
             />
             {canCreate && (
               <Button

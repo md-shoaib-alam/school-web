@@ -10,6 +10,11 @@ const LoadingScreen = () => (
   </div>
 );
 
+const TeacherDashboard = dynamic(() => import('@/components/screens/teacher/dashboard').then(m => m.TeacherDashboard), { loading: LoadingScreen });
+const StudentDashboard = dynamic(() => import('@/components/screens/student/dashboard').then(m => m.StudentDashboard), { loading: LoadingScreen });
+const ParentDashboard = dynamic(() => import('@/components/screens/parent/dashboard').then(m => m.ParentDashboard), { loading: LoadingScreen });
+const StaffDashboard = dynamic(() => import('@/components/screens/staff/dashboard').then(m => m.StaffDashboard), { loading: LoadingScreen });
+const AdminDashboard = dynamic(() => import('@/components/screens/admin/dashboard').then(m => m.AdminDashboard), { loading: LoadingScreen });
 const AdminStudents = dynamic(() => import('@/components/screens/admin/students').then(m => m.AdminStudents), { loading: LoadingScreen });
 const AdminTeachers = dynamic(() => import('@/components/screens/admin/teachers').then(m => m.AdminTeachers), { loading: LoadingScreen });
 const AdminParents = dynamic(() => import('@/components/screens/admin/parents').then(m => m.AdminParents), { loading: LoadingScreen });
@@ -70,8 +75,9 @@ export default function TenantScreenDispatcher() {
     return <NotFoundScreen />;
   }
   
-  if (currentUser.role === 'admin' || currentUser.role === 'staff') {
+  if (currentUser.role === 'super_admin' || currentUser.role === 'admin' || currentUser.role === 'staff') {
     switch (screen) {
+      case 'dashboard': return currentUser.role === 'staff' ? <StaffDashboard /> : <AdminDashboard />;
       case 'students': return <AdminStudents />;
       case 'teachers': return <AdminTeachers />;
       case 'parents': return <AdminParents />;
@@ -97,6 +103,7 @@ export default function TenantScreenDispatcher() {
 
   if (currentUser.role === 'teacher') {
     switch (screen) {
+      case 'dashboard': return <TeacherDashboard />;
       case 'my-classes': return <TeacherClasses />;
       case 'take-attendance': return <TeacherAttendance />;
       case 'grade-management': return <TeacherGrades />;
@@ -110,6 +117,7 @@ export default function TenantScreenDispatcher() {
 
   if (currentUser.role === 'student') {
     switch (screen) {
+      case 'dashboard': return <StudentDashboard />;
       case 'my-classes': return <StudentClasses />;
       case 'my-grades': return <StudentGrades />;
       case 'my-attendance': return <StudentAttendance />;
@@ -124,6 +132,7 @@ export default function TenantScreenDispatcher() {
 
   if (currentUser.role === 'parent') {
     switch (screen) {
+      case 'dashboard': return <ParentDashboard />;
       case 'children': return <ParentChildren />;
       case 'grades': return <ParentGrades />;
       case 'attendance': return <ParentAttendance />;

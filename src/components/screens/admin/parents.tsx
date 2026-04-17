@@ -7,6 +7,13 @@ import { Search, Users, UserPlus } from "lucide-react";
 import { goeyToast as toast } from "goey-toast";
 import { apiFetch } from "@/lib/api";
 import { useAppStore } from "@/store/use-app-store";
+import {
+  useParents,
+  useStudents,
+  useClassesMin,
+} from "@/lib/graphql/hooks/academic.hooks";
+import { useQueryClient } from "@tanstack/react-query";
+import { queryKeys } from "@/lib/graphql/keys";
 
 import { ParentCard } from "./parents/ParentCard";
 import {
@@ -19,22 +26,38 @@ import { ParentInfo, StudentInfo } from "./parents/types";
 
 export function AdminParents() {
   const { currentTenantId } = useAppStore();
+  const queryClient = useQueryClient();
 
-  const [parents, setParents] = useState<ParentInfo[]>(() => {
-    if (typeof window !== "undefined") {
-      const saved = localStorage.getItem(`parents_cache_${currentTenantId}`);
-      return saved ? JSON.parse(saved) : [];
-    }
-    return [];
-  });
-
-  const [students, setStudents] = useState<StudentInfo[]>([]);
-  const [classes, setClasses] = useState<
-    { id: string; name: string; section: string }[]
-  >([]);
-
-  const [loading, setLoading] = useState(parents.length === 0);
+  // Filter & Search states
   const [search, setSearch] = useState("");
+
+  // Queries
+  const { 
+    data: parentsData, 
+    isLoading: loadingParents 
+  } = useParents(currentTenantId || undefined, search || undefined);
+
+  const { data: classesData } = useClassesMin(currentTenantId || undefined);
+
+  // Link child dialog states
+  const [linkOpen, setLinkOpen] = useState(false);
+  const [selectedParent, setSelectedParent] = useState<ParentInfo | null>(null);
+  const [selectedClass, setSelectedClass] = useState("all");
+  const [linking, setLinking] = useState(false);
+
+  // Students for linking (filtered by class if selected)
+  const { data: studentData, isLoading: loadingStudents } = useStudents(
+    currentTenantId || undefined,
+    selectedClass === "all" ? undefined : selectedClass,
+    undefined, // no search here for now, or use search?
+    1,
+    100 // Get a good batch for linking
+  );
+
+  const parents = parentsData?.parents || [];
+  const students = studentData?.students || [];
+  const classes = classesData?.classes || [];
+  const loading = loadingParents;
 
   // Create dialog
   const [createOpen, setCreateOpen] = useState(false);
@@ -43,15 +66,9 @@ export function AdminParents() {
     email: "",
     phone: "",
     occupation: "",
-    password: "", // Added consistency
+    password: "", 
   });
   const [creating, setCreating] = useState(false);
-
-  // Link child dialog
-  const [linkOpen, setLinkOpen] = useState(false);
-  const [selectedParent, setSelectedParent] = useState<ParentInfo | null>(null);
-  const [selectedClass, setSelectedClass] = useState("");
-  const [linking, setLinking] = useState(false);
 
   // Edit dialog
   const [editOpen, setEditOpen] = useState(false);
@@ -64,69 +81,13 @@ export function AdminParents() {
   });
   const [editing, setEditing] = useState(false);
 
-  const fetchData = useCallback(
-    async (showSkeleton = false) => {
-      try {
-        if (showSkeleton) setLoading(true);
-        const [resParents, resStudents, resClasses] = await Promise.all([
-          apiFetch("/api/parents"),
-          apiFetch("/api/students"),
-          apiFetch("/api/classes"),
-        ]);
 
-        if (!resParents.ok || !resStudents.ok || !resClasses.ok)
-          throw new Error("Failed to load some data");
+  const filtered = parents; // GraphQL handle search now? Wait, no, let's keep frontend search for now if needed, or use useParents search
+  // Actually, I'll use the search prop in useParents above.
 
-        const [parentsData, studentsData, classesData] = await Promise.all([
-          resParents.json(),
-          resStudents.json(),
-          resClasses.json(),
-        ]);
-
-        setParents(parentsData);
-        setStudents(studentsData);
-        setClasses(classesData);
-
-        if (typeof window !== "undefined" && currentTenantId) {
-          localStorage.setItem(
-            `parents_cache_${currentTenantId}`,
-            JSON.stringify(parentsData),
-          );
-        }
-      } catch (err) {
-        console.error("Error fetching parent data:", err);
-      } finally {
-        setLoading(false);
-      }
-    },
-    [currentTenantId],
+  const filteredStudents = students.filter(
+    (s) => !selectedParent?.children.some((c) => c.id === s.id)
   );
-
-  useEffect(() => {
-    if (currentTenantId) {
-      fetchData(parents.length === 0);
-    }
-  }, [currentTenantId, fetchData]);
-
-  const filtered = parents.filter(
-    (p) =>
-      p.name.toLowerCase().includes(search.toLowerCase()) ||
-      p.email.toLowerCase().includes(search.toLowerCase()) ||
-      p.children.some((c) =>
-        c.name.toLowerCase().includes(search.toLowerCase()),
-      ),
-  );
-
-  const filteredStudents =
-    selectedClass && selectedClass !== "all"
-      ? students.filter(
-          (s) =>
-            s.classId === selectedClass &&
-            !selectedParent?.children.some((c) => c.id === s.id),
-        )
-      : students.filter(
-          (s) => !selectedParent?.children.some((c) => c.id === s.id),
-        );
 
   const handleCreate = async () => {
     if (!createForm.name || !createForm.email) {
@@ -154,7 +115,7 @@ export function AdminParents() {
             occupation: "",
             password: "",
           });
-          fetchData();
+          queryClient.invalidateQueries({ queryKey: queryKeys.parents });
           return "Parent account created";
         } finally {
           setCreating(false);
@@ -187,14 +148,7 @@ export function AdminParents() {
             const err = await res.json().catch(() => ({}));
             throw new Error(err.error || "Linking failed");
           }
-          // Refresh everything to keep in sync
-          const freshParentsRes = await apiFetch("/api/parents");
-          const freshParents = await freshParentsRes.json();
-          setParents(freshParents);
-          setSelectedParent(
-            freshParents.find((p: ParentInfo) => p.id === selectedParent.id) ||
-              null,
-          );
+          queryClient.invalidateQueries({ queryKey: queryKeys.parents });
           return "Student linked successfully";
         } finally {
           setLinking(false);
@@ -224,14 +178,7 @@ export function AdminParents() {
           const err = await res.json().catch(() => ({}));
           throw new Error(err.error || "Unlinking failed");
         }
-        const freshParentsRes = await apiFetch("/api/parents");
-        const freshParents = await freshParentsRes.json();
-        setParents(freshParents);
-        if (selectedParent && selectedParent.id === parentId) {
-          setSelectedParent(
-            freshParents.find((p: ParentInfo) => p.id === parentId) || null,
-          );
-        }
+        queryClient.invalidateQueries({ queryKey: queryKeys.parents });
 
         // Force red pill morph
         throw new Error("Child record unlinked");
@@ -274,7 +221,7 @@ export function AdminParents() {
             throw new Error(err.error || "Update failed");
           }
           setEditOpen(false);
-          fetchData();
+          queryClient.invalidateQueries({ queryKey: queryKeys.parents });
           return "Parent details updated";
         } finally {
           setEditing(false);
@@ -298,7 +245,7 @@ export function AdminParents() {
           const err = await res.json().catch(() => ({}));
           throw new Error(err.error || "Deletion failed");
         }
-        setParents(parents.filter((p) => p.id !== id));
+        queryClient.invalidateQueries({ queryKey: queryKeys.parents });
 
         // Force red pill morph
         throw new Error("Parent record removed");

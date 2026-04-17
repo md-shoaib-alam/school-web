@@ -128,14 +128,14 @@ export function Sidebar({
               key={item.key}
               variant="ghost"
               className={cn(
-                "w-full justify-start gap-3 h-10 px-3 font-normal cursor-pointer",
+                "w-full justify-start gap-3 h-10 px-3 font-normal cursor-pointer transition-all",
                 resolvedScreen === item.key
                   ? isSuperAdmin
                     ? "bg-rose-800/60 text-white font-medium"
                     : "bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 hover:bg-emerald-100 dark:hover:bg-emerald-900/50 font-medium"
                   : isSuperAdmin
                     ? "text-rose-200 hover:text-white hover:bg-rose-800/40"
-                    : "text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800",
+                    : "text-gray-600 dark:text-gray-400 hover:bg-emerald-50/50 dark:hover:bg-emerald-900/20 hover:text-emerald-600 dark:hover:text-emerald-400",
               )}
               onClick={() => navigateTo(item.key)}
             >

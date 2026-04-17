@@ -2,6 +2,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { goeyToast as toast } from 'goey-toast'
 import { graphqlQuery, graphqlMutate } from '../core'
 import { queryKeys } from '../keys'
+import { api } from '@/lib/api'
 import { 
   PLATFORM_STATS, BILLING_DATA, TENANTS, USERS, AUDIT_LOGS, 
   CREATE_TENANT, UPDATE_TENANT, DELETE_TENANT, TOGGLE_TENANT_STATUS, SUBSCRIPTIONS,
@@ -11,6 +12,15 @@ import {
   PlatformStatsData, BillingDataResponse, TenantsResponse, UsersResponse, 
   AuditLogsResponse, TenantInput, TenantBasic, SubscriptionsResponse, TenantDetailData
 } from '../types'
+
+export function useTenantResolution(slug?: string) {
+  return useQuery({
+    queryKey: ['tenant-resolution', slug],
+    queryFn: () => api.get(`/tenants/resolve/${slug}`),
+    enabled: !!slug && !['dashboard', 'tenants', 'billing', 'users', 'audit-logs', 'platform-analytics', 'settings'].includes(slug),
+    staleTime: Infinity,
+  })
+}
 
 export function usePlatformStats() {
   return useQuery({
