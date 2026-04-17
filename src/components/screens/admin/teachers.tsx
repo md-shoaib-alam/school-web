@@ -182,7 +182,7 @@ export function AdminTeachers() {
       {
         loading: `${editingTeacher ? "Updating" : "Adding"} teacher...`,
         success: (msg) => msg,
-        error: (err) => err.message || "Action failed",
+        error: (err: any) => err.message || "Action failed",
       }
     );
   };
@@ -204,9 +204,8 @@ export function AdminTeachers() {
       {
         loading: "Removing teacher record...",
         success: () => "", // Not reached
-        error: (err) => err.message, // Shows the red pill
-      },
-      { duration: 5000 }
+        error: (err: any) => err.message, // Shows the red pill
+      }
     );
   };
 

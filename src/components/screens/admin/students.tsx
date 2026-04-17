@@ -199,11 +199,7 @@ export function AdminStudents() {
       setStudents(json);
     } catch (err) {
       console.error("Error fetching students:", err);
-      toast({
-        title: "Connection error",
-        description: "Failed to load student data from the server.",
-        variant: "destructive",
-      });
+      toast.error("Failed to load student data from the server.");
     } finally {
       setLoading(false);
     }
@@ -273,7 +269,7 @@ export function AdminStudents() {
       {
         loading: "Registering new student...",
         success: (msg) => msg,
-        error: (err) => err.message,
+        error: (err: any) => err.message,
       }
     );
   };
@@ -331,9 +327,8 @@ export function AdminStudents() {
       {
         loading: "Deleting student records...",
         success: () => "",
-        error: (err) => err.message,
-      },
-      { duration: 5000 }
+        error: (err: any) => err.message,
+      }
     );
   };
 
@@ -358,11 +353,7 @@ export function AdminStudents() {
 
   const handleImport = async () => {
     if (!importFile || !currentTenantId) {
-      toast({
-        title: "Missing information",
-        description: "Please select a file and ensure a tenant is selected.",
-        variant: "destructive",
-      });
+      toast.error("Please select a file and ensure a tenant is selected.");
       return;
     }
     setImporting(true);
@@ -380,25 +371,14 @@ export function AdminStudents() {
       const data = await res.json();
       setImportResult(data);
       if (data.success) {
-        toast({
-          title: "Import successful",
-          description: `Successfully imported ${data.imported} of ${data.total} students.`,
-        });
+        toast.success(`Successfully imported ${data.imported} of ${data.total} students.`);
         fetchStudents();
       } else {
-        toast({
-          title: "Import completed with errors",
-          description: `${data.errors} of ${data.total} records had errors.`,
-          variant: "destructive",
-        });
+        toast.error(`${data.errors} of ${data.total} records had errors.`);
       }
     } catch {
       setImportResult({ success: false, imported: 0, errors: 0, total: 0 });
-      toast({
-        title: "Import failed",
-        description: "An error occurred while importing students.",
-        variant: "destructive",
-      });
+      toast.error("An error occurred while importing students.");
     } finally {
       setImporting(false);
     }
@@ -412,11 +392,7 @@ export function AdminStudents() {
       setImportFile(file);
       setImportResult(null);
     } else {
-      toast({
-        title: "Invalid file",
-        description: "Please upload a CSV file.",
-        variant: "destructive",
-      });
+      toast.error("Please upload a CSV file.");
     }
   };
 

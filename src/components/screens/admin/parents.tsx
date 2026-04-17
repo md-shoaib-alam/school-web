@@ -240,7 +240,7 @@ export function AdminParents() {
       {
         loading: "Creating parent account...",
         success: (msg) => msg,
-        error: (err) => err.message,
+        error: (err: any) => err.message,
       }
     );
   };
@@ -273,10 +273,9 @@ export function AdminParents() {
       })(),
       {
         loading: "Linking child to parent...",
-        success: (msg) => msg, // Green success for established link
-        error: (err) => err.message,
-      },
-      { duration: 5000 }
+        success: (msg: any) => msg, 
+        error: (err: any) => err.message
+      }
     );
   };
 
@@ -309,9 +308,8 @@ export function AdminParents() {
       {
         loading: "Unlinking child...",
         success: () => "",
-        error: (err) => err.message,
-      },
-      { duration: 5000 }
+        error: (err: any) => err.message
+      }
     );
   };
 
@@ -349,7 +347,7 @@ export function AdminParents() {
       {
         loading: "Saving changes...",
         success: (msg) => msg,
-        error: (err) => err.message,
+        error: (err: any) => err.message,
       }
     );
   };
@@ -370,9 +368,8 @@ export function AdminParents() {
       {
         loading: "Removing parent record...",
         success: () => "",
-        error: (err) => err.message,
-      },
-      { duration: 5000 }
+        error: (err: any) => err.message
+      }
     );
   };
 

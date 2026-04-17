@@ -186,9 +186,12 @@ function AdminManagerView() {
         </Card>
       </Tabs>
 
-      <Dialog open={dialog.open} onValueChange={(v: boolean) => setDialog(p => ({...p, open: v}))}>
+      <Dialog open={dialog.open} onOpenChange={(v: boolean) => setDialog(p => ({...p, open: v}))}>
         <DialogContent>
-           <DialogHeader><DialogTitle>{dialog.action === 'approve' ? 'Approve' : 'Reject'} Request</DialogTitle></DialogHeader>
+           <DialogHeader>
+             <DialogTitle>{dialog.action === 'approve' ? 'Approve' : 'Reject'} Request</DialogTitle>
+             <DialogDescription>Process this leave application and add optional remarks.</DialogDescription>
+           </DialogHeader>
            <div className="py-4 space-y-4">
               <p className="text-sm">You are about to {dialog.action} the leave for <strong>{dialog.leave?.userName}</strong>.</p>
               <Textarea placeholder="Add remarks..." value={dialog.remarks} onChange={e => setDialog(p => ({...p, remarks: e.target.value}))} />
@@ -268,11 +271,20 @@ function StaffSelfServiceView() {
       </Card>
       <Dialog open={applyOpen} onOpenChange={setApplyOpen}>
         <DialogContent>
-          <DialogHeader><DialogTitle>New Application</DialogTitle></DialogHeader>
+          <DialogHeader>
+            <DialogTitle>New Application</DialogTitle>
+            <DialogDescription>Apply for a new leave by selecting type and dates.</DialogDescription>
+          </DialogHeader>
           <div className="space-y-4 py-4">
              <div className="grid grid-cols-2 gap-4">
-                <Input type="date" label="Start" value={form.startDate} onChange={e => setForm({...form, startDate: e.target.value})} />
-                <Input type="date" label="End" value={form.endDate} onChange={e => setForm({...form, endDate: e.target.value})} />
+                <div className="space-y-1">
+                  <label className="text-xs font-medium">Start Date</label>
+                  <Input type="date" value={form.startDate} onChange={e => setForm({...form, startDate: e.target.value})} />
+                </div>
+                <div className="space-y-1">
+                  <label className="text-xs font-medium">End Date</label>
+                  <Input type="date" value={form.endDate} onChange={e => setForm({...form, endDate: e.target.value})} />
+                </div>
              </div>
              <Select value={form.leaveType} onValueChange={v => setForm({...form, leaveType: v})}>
                 <SelectTrigger><SelectValue /></SelectTrigger>

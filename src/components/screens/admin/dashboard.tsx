@@ -14,7 +14,6 @@ import {
   Users,
   GraduationCap,
   School,
-  TrendingUp,
   DollarSign,
   Calendar,
   Megaphone,

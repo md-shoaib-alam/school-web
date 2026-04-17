@@ -263,7 +263,7 @@ export function AdminRoles() {
 
   const handleToggleDelete = async (id: string) => {
     try {
-      await deleteRole({ id });
+      await deleteRole(id);
       // Toast handled by hook
 
       fetchRoles();
