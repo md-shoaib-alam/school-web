@@ -5,14 +5,15 @@ export type ViewMode = "grid" | "list" | "day";
 export interface FormSlot {
   id: string;
   day: string;
-  subjectId: string;
-  teacherId: string;
+  subjectId?: string;
+  teacherId?: string;
   startTime: string;
   endTime: string;
+  label?: string; // e.g. "Lunch Break"
 }
 
 export interface TimetableSlot extends BaseTimetableSlot {
-  // Add any extra fields if needed
+  label?: string;
 }
 
 export interface AvailableSubject {

@@ -1,6 +1,6 @@
 "use client";
 
-import { ChevronRight, Circle, Pencil, Trash2 } from "lucide-react";
+import { ChevronRight, Circle, Clock, Pencil, Trash2 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { DAY_FULL_LABELS } from "./constants";
 import { formatTime, getSubjectBadgeClass, getSubjectDotClass, isCurrentPeriod } from "./helpers";
@@ -96,18 +96,29 @@ export function ListView({
 
                     <ChevronRight className="h-3.5 w-3.5 shrink-0 text-muted-foreground/40" />
 
-                    <div
-                      className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-0.5 text-xs font-medium shrink-0 ${getSubjectBadgeClass(slot.subjectName, uniqueSubjects)}`}
-                    >
-                      <span
-                        className={`h-1.5 w-1.5 rounded-full ${getSubjectDotClass(slot.subjectName, uniqueSubjects)}`}
-                      />
-                      {slot.subjectName}
-                    </div>
+                    {slot.label ? (
+                      <div className="inline-flex items-center gap-1.5 rounded-full border px-2.5 py-0.5 text-xs font-medium shrink-0 bg-amber-100 text-amber-700 border-amber-200 dark:bg-amber-900/30 dark:text-amber-400 dark:border-amber-800">
+                         <Clock className="h-3 w-3" />
+                         {slot.label}
+                      </div>
+                    ) : (
+                      <div
+                        className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-0.5 text-xs font-medium shrink-0 ${getSubjectBadgeClass(slot.subjectName, uniqueSubjects)}`}
+                      >
+                        <span
+                          className={`h-1.5 w-1.5 rounded-full ${getSubjectDotClass(slot.subjectName, uniqueSubjects)}`}
+                        />
+                        {slot.subjectName}
+                      </div>
+                    )}
 
                     <div className="hidden sm:flex items-center gap-2 ml-auto text-xs text-muted-foreground">
-                      <span>{slot.teacherName}</span>
-                      <span className="text-muted-foreground/40">|</span>
+                      {slot.teacherName && (
+                        <>
+                          <span>{slot.teacherName}</span>
+                          <span className="text-muted-foreground/40">|</span>
+                        </>
+                      )}
                       <span>{slot.className}</span>
                     </div>
 

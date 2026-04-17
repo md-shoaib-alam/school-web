@@ -1,10 +1,10 @@
 "use client";
 
 import { apiFetch } from "@/lib/api";
-import { useState, useEffect, useMemo, useCallback } from "react";
+import { useState, useMemo, useCallback } from "react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
   Select,
@@ -20,7 +20,6 @@ import {
   CalendarDays,
   Plus,
   Settings,
-  Eye,
 } from "lucide-react";
 import { goeyToast as toast } from "goey-toast";
 import { useModulePermissions } from "@/hooks/use-permissions";
@@ -50,30 +49,21 @@ import type {
   ViewMode, 
   TimetableSlot, 
   FormSlot, 
-  AvailableSubject, 
-  AvailableTeacher 
 } from "./timetable/types";
 
 export function AdminTimetable() {
-  const [classes, setClasses] = useState<ClassInfo[]>([]);
-  const [slots, setSlots] = useState<TimetableSlot[]>([]);
+  const queryClient = useQueryClient();
+  const { currentTenantId } = useAppStore();
+  
   const [selectedClass, setSelectedClass] = useState<string>("");
   const [viewMode, setViewMode] = useState<ViewMode>("grid");
   const [selectedDay, setSelectedDay] = useState<string>("monday");
-  const [loadingClasses, setLoadingClasses] = useState(true);
-  const [loadingTimetable, setLoadingTimetable] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-
-  // Working days from tenant settings
-  const [workingDays, setWorkingDays] = useState<string[]>(DEFAULT_DAYS);
 
   // Create timetable dialog state
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
   const [daySlots, setDaySlots] = useState<Record<string, FormSlot[]>>({
     monday: [], tuesday: [], wednesday: [], thursday: [], friday: [], saturday: [], sunday: []
   });
-  const [availableSubjects, setAvailableSubjects] = useState<AvailableSubject[]>([]);
-  const [availableTeachers, setAvailableTeachers] = useState<AvailableTeacher[]>([]);
   const [saving, setSaving] = useState(false);
 
   // Edit dialog state
@@ -91,127 +81,145 @@ export function AdminTimetable() {
   // Working Days config dialog state
   const [daysConfigOpen, setDaysConfigOpen] = useState(false);
   const [daysConfigSaving, setDaysConfigSaving] = useState(false);
-  const [daysConfigDraft, setDaysConfigDraft] = useState<string[]>(workingDays);
+  const [daysConfigDraft, setDaysConfigDraft] = useState<string[]>([]);
 
-  const currentClass = classes.find((c) => c.id === selectedClass);
   const { canCreate, canEdit, canDelete } = useModulePermissions("timetable");
 
-  // ── Data Fetching ──
+  // ── Queries (TanStack Query for Caching) ──
 
-  useEffect(() => {
-    async function fetchClasses() {
-      try {
-        const res = await apiFetch("/api/classes");
-        if (!res.ok) throw new Error("Failed to fetch classes");
-        const data = await res.json();
-        setClasses(data);
-        if (data.length > 0) setSelectedClass(data[0].id);
-      } catch (err) {
-        setError(err instanceof Error ? err.message : "Unknown error");
-      } finally {
-        setLoadingClasses(false);
-      }
-    }
-    fetchClasses();
-  }, []);
-
-  useEffect(() => {
-    const fetchWorkingDays = async () => {
-      const tenantId = useAppStore.getState().currentTenantId;
-      if (!tenantId) return;
-      try {
-        const res = await apiFetch(`/api/tenant-settings?tenantId=${tenantId}`);
-        if (res.ok) {
-          const data = await res.json();
-          if (data.settings?.workingDays) setWorkingDays(data.settings.workingDays);
-        }
-      } catch {}
-    };
-    fetchWorkingDays();
-  }, []);
-
-  const fetchTimetable = useCallback(async (classId: string) => {
-    setLoadingTimetable(true);
-    setError(null);
-    try {
-      const res = await apiFetch(`/api/timetable?classId=${classId}`);
-      if (!res.ok) throw new Error("Failed to fetch timetable");
+  const { data: classes = [], isLoading: isLoadingClasses } = useQuery<ClassInfo[]>({
+    queryKey: ["classes", currentTenantId],
+    queryFn: async () => {
+      const res = await apiFetch("/api/classes");
+      if (!res.ok) throw new Error("Failed to fetch classes");
       const data = await res.json();
-      setSlots(data);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Unknown error");
-    } finally {
-      setLoadingTimetable(false);
-    }
-  }, []);
+      if (data.length > 0 && !selectedClass) setSelectedClass(data[0].id);
+      return data;
+    },
+    staleTime: 5 * 60 * 1000, // 5 minutes cache
+  });
 
-  useEffect(() => {
-    if (selectedClass) fetchTimetable(selectedClass);
-  }, [selectedClass, fetchTimetable]);
-
-  // Load form data (subjects/teachers)
-  useEffect(() => {
-    if (!createDialogOpen && !editDialogOpen) return;
-    async function fetchFormData() {
-      try {
-        const [subjectRes, teacherRes] = await Promise.all([
-          apiFetch("/api/subjects"),
-          apiFetch("/api/staff?role=teacher"),
-        ]);
-        if (subjectRes.ok) {
-          const subjectData = await subjectRes.json();
-          const filtered = currentClass
-            ? subjectData.filter((s: any) => s.className === currentClass.name)
-            : subjectData;
-          setAvailableSubjects(filtered.length > 0 ? filtered : subjectData);
-        }
-        if (teacherRes.ok) setAvailableTeachers(await teacherRes.json());
-      } catch {
-        toast.error("Failed to load subjects or teachers.");
+  const { data: workingDays = DEFAULT_DAYS } = useQuery<string[]>({
+    queryKey: ["working-days", currentTenantId],
+    queryFn: async () => {
+      const res = await apiFetch(`/api/tenant-settings?tenantId=${currentTenantId}`);
+      if (res.ok) {
+        const data = await res.json();
+        return data.workingDays || DEFAULT_DAYS;
       }
-    }
-    fetchFormData();
-  }, [createDialogOpen, editDialogOpen, selectedClass, currentClass]);
+      return DEFAULT_DAYS;
+    },
+    enabled: !!currentTenantId,
+  });
 
-  // Load existing timetable into daySlots when managing
-  useEffect(() => {
-    if (!createDialogOpen || !selectedClass) return;
-    async function loadExistingTimetable() {
-      try {
-        const res = await apiFetch(`/api/timetable?classId=${selectedClass}`);
-        if (res.ok) {
-          const data = await res.json();
-          const initial: Record<string, FormSlot[]> = {
-            monday: [], tuesday: [], wednesday: [], thursday: [], friday: [], saturday: [], sunday: []
-          };
-          data.forEach((slot: any) => {
-            if (initial[slot.day]) initial[slot.day].push({ ...slot });
-          });
-          ALL_DAYS.forEach(day => {
-            initial[day]?.sort((a, b) => a.startTime.localeCompare(b.startTime));
-          });
-          setDaySlots(initial);
-        }
-      } catch {}
-    }
-    loadExistingTimetable();
-  }, [createDialogOpen, selectedClass]);
+  const { data: slots = [], isLoading: isLoadingTimetable } = useQuery<TimetableSlot[]>({
+    queryKey: ["timetable", selectedClass],
+    queryFn: async () => {
+      if (!selectedClass) return [];
+      const res = await apiFetch(`/api/timetable?classId=${selectedClass}`);
+      if (!res.ok) throw new Error("Failed to fetch timetable");
+      return await res.json();
+    },
+    enabled: !!selectedClass,
+  });
+
+  const { data: availableSubjects = [] } = useQuery({
+    queryKey: ["subjects", currentTenantId, selectedClass],
+    queryFn: async () => {
+      const res = await apiFetch("/api/subjects");
+      if (!res.ok) return [];
+      const subjectData = await res.json();
+      const currentClass = classes.find(c => c.id === selectedClass);
+      const filtered = currentClass
+        ? subjectData.filter((s: any) => s.className === currentClass.name)
+        : subjectData;
+      return filtered.length > 0 ? filtered : subjectData;
+    },
+    enabled: createDialogOpen || editDialogOpen,
+  });
+
+  const { data: availableTeachers = [] } = useQuery({
+    queryKey: ["teachers", currentTenantId],
+    queryFn: async () => {
+      const res = await apiFetch("/api/teachers"); // Using correct teacher endpoint
+      if (!res.ok) return [];
+      return await res.json();
+    },
+    enabled: createDialogOpen || editDialogOpen,
+  });
+
+  // ── Mutations ──
+
+  const bulkSaveMutation = useMutation({
+    mutationFn: async (validSlots: any[]) => {
+      // Clear existing for this class first
+      for (const slot of slots) {
+        await apiFetch(`/api/timetable?id=${slot.id}`, { method: "DELETE" });
+      }
+
+      const res = await apiFetch("/api/timetable", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          slots: validSlots.map(p => ({
+            classId: selectedClass,
+            ...p
+          }))
+        }),
+      });
+      if (!res.ok) throw new Error("Failed to save");
+      return res.json();
+    },
+    onSuccess: () => {
+      toast.success("Timetable updated");
+      queryClient.invalidateQueries({ queryKey: ["timetable", selectedClass] });
+      setCreateDialogOpen(false);
+    },
+    onError: () => toast.error("Failed to save timetable"),
+    onSettled: () => setSaving(false),
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: async (id: string) => {
+      const res = await apiFetch(`/api/timetable?id=${id}`, { method: "DELETE" });
+      if (!res.ok) throw new Error("Delete failed");
+    },
+    onSuccess: () => {
+      toast.success("Slot deleted");
+      queryClient.invalidateQueries({ queryKey: ["timetable", selectedClass] });
+    },
+    onError: () => toast.error("Failed to delete slot")
+  });
 
   // ── Handlers ──
 
-  const handleDeleteSlot = async (id: string) => {
-    if (!window.confirm("Are you sure you want to delete this slot?")) return;
-    try {
-      const res = await apiFetch(`/api/timetable?id=${id}`, { method: "DELETE" });
-      if (res.ok) {
-        toast.success("Slot deleted");
-        fetchTimetable(selectedClass);
-      } else {
-        toast.error("Failed to delete slot");
-      }
-    } catch {
-      toast.error("Error deleting slot");
+  const handleOpenManage = useCallback(async () => {
+    // Fill daySlots from existing data
+    const initial: Record<string, FormSlot[]> = {
+      monday: [], tuesday: [], wednesday: [], thursday: [], friday: [], saturday: [], sunday: []
+    };
+    slots.forEach((slot: any) => {
+      if (initial[slot.day]) initial[slot.day].push({ ...slot });
+    });
+    ALL_DAYS.forEach(day => {
+      initial[day]?.sort((a, b) => a.startTime.localeCompare(b.startTime));
+    });
+    setDaySlots(initial);
+    setCreateDialogOpen(true);
+  }, [slots]);
+
+  const handleBulkSave = () => {
+    if (!selectedClass) return;
+    setSaving(true);
+    const allFlatSlots = workingDays.flatMap(day => (daySlots[day] ?? []));
+    const validSlots = allFlatSlots.filter(p => (p.subjectId && p.teacherId) || p.label);
+
+    if (validSlots.length === 0) {
+      toast.error("Please add at least one valid period.");
+      setSaving(false);
+      return;
     }
+    bulkSaveMutation.mutate(validSlots);
   };
 
   const handleEditSlot = (slot: TimetableSlot) => {
@@ -222,6 +230,7 @@ export function AdminTimetable() {
       startTime: slot.startTime,
       endTime: slot.endTime,
       day: slot.day,
+      label: (slot as any).label,
     });
     setEditDialogOpen(true);
   };
@@ -238,103 +247,36 @@ export function AdminTimetable() {
       if (res.ok) {
         toast.success("Slot updated");
         setEditDialogOpen(false);
-        fetchTimetable(selectedClass);
+        queryClient.invalidateQueries({ queryKey: ["timetable", selectedClass] });
       } else {
         toast.error("Failed to update slot");
       }
-    } catch {
-      toast.error("Error updating slot");
     } finally {
       setEditSaving(false);
     }
   };
 
-  const handleBulkSave = async () => {
-    if (!selectedClass) return;
-    setSaving(true);
-    const allFlatSlots = workingDays.flatMap(day => (daySlots[day] ?? []));
-    const validSlots = allFlatSlots.filter(p => p.subjectId && p.teacherId && p.startTime && p.endTime);
-
-    if (validSlots.length === 0) {
-      toast.error("Please add at least one valid period.");
-      setSaving(false);
-      return;
-    }
-
-    try {
-      // Clear existing for this class first (as per original logic)
-      for (const slot of slots) {
-        await apiFetch(`/api/timetable?id=${slot.id}`, { method: "DELETE" });
-      }
-
-      const res = await apiFetch("/api/timetable", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          slots: validSlots.map(p => ({
-            classId: selectedClass,
-            ...p
-          }))
-        }),
-      });
-      if (res.ok) {
-        toast.success("Timetable saved successfully");
-        setCreateDialogOpen(false);
-        fetchTimetable(selectedClass);
-      } else {
-        throw new Error("Failed to save");
-      }
-    } catch (err) {
-      toast.error("Failed to save timetable");
-    } finally {
-      setSaving(false);
-    }
-  };
-
   const handleWorkingDaysSave = async () => {
     setDaysConfigSaving(true);
-    const tenantId = useAppStore.getState().currentTenantId;
     try {
       const res = await apiFetch("/api/tenant-settings", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ tenantId, settings: { workingDays: daysConfigDraft } }),
+        body: JSON.stringify({ tenantId: currentTenantId, settings: { workingDays: daysConfigDraft } }),
       });
       if (res.ok) {
-        setWorkingDays(daysConfigDraft);
+        queryClient.invalidateQueries({ queryKey: ["working-days", currentTenantId] });
         setDaysConfigOpen(false);
         toast.success("Working days updated");
       }
-    } catch {
-      toast.error("Failed to update working days");
     } finally {
       setDaysConfigSaving(false);
     }
   };
 
-  const handleCopyToDay = (sourceDay: string, targetDay: string) => {
-    const sourcePeriods = daySlots[sourceDay] ?? [];
-    if (sourcePeriods.length === 0) return;
-    const copied = sourcePeriods.map(slot => ({ ...slot, id: crypto.randomUUID(), day: targetDay }));
-    setDaySlots(prev => ({ ...prev, [targetDay]: [...(prev[targetDay] ?? []), ...copied] }));
-    toast.success(`Copied to ${DAY_LABELS[targetDay]}`);
-  };
+  const currentClass = useMemo(() => classes.find((c) => c.id === selectedClass), [classes, selectedClass]);
 
-  const handleCopyToAllDays = (sourceDay: string) => {
-    const sourcePeriods = daySlots[sourceDay] ?? [];
-    if (sourcePeriods.length === 0) return;
-    const updated = { ...daySlots };
-    workingDays.forEach(day => {
-      if (day === sourceDay) return;
-      const copied = sourcePeriods.map(slot => ({ ...slot, id: crypto.randomUUID(), day }));
-      updated[day] = [...(updated[day] ?? []), ...copied];
-    });
-    setDaySlots(updated);
-    toast.success("Copied to all days");
-  };
-
-  // ── Derived State ──
-
+  // ── Layout Derived State ──
   const uniqueSubjects = useMemo(() => Array.from(new Set(slots.map(s => s.subjectName))), [slots]);
   const currentDayIndex = useMemo(() => getCurrentDayIndex(workingDays), [workingDays]);
   
@@ -374,21 +316,8 @@ export function AdminTimetable() {
     });
   }, [effectiveDay, timeSlots, gridData]);
 
-  if (error) {
-    return (
-      <Card className="border-red-200 bg-red-50">
-        <CardContent className="p-6 text-center text-red-600">
-          <Calendar className="h-10 w-10 mx-auto mb-2 opacity-50" />
-          <p className="font-medium">Failed to load timetable</p>
-          <p className="text-sm mt-1">{error}</p>
-        </CardContent>
-      </Card>
-    );
-  }
-
   return (
     <div className="space-y-6">
-      {/* Header & Controls */}
       <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
         <div className="flex items-center gap-3">
           <div className="h-10 w-10 rounded-xl bg-emerald-100 text-emerald-600 flex items-center justify-center">
@@ -416,7 +345,7 @@ export function AdminTimetable() {
           </div>
 
           <Select value={selectedClass} onValueChange={setSelectedClass}>
-            <SelectTrigger className="w-full sm:w-56">
+            <SelectTrigger className="w-full sm:w-56 text-sm">
               <SelectValue placeholder="Select class" />
             </SelectTrigger>
             <SelectContent>
@@ -425,27 +354,30 @@ export function AdminTimetable() {
           </Select>
 
           {canEdit && (
-            <Button variant="outline" onClick={() => { setDaysConfigDraft([...workingDays]); setDaysConfigOpen(true); }}>
+            <Button variant="outline" size="sm" onClick={() => { setDaysConfigDraft([...workingDays]); setDaysConfigOpen(true); }}>
               <Settings className="h-4 w-4 sm:mr-1.5" /><span className="hidden sm:inline">Settings</span>
             </Button>
           )}
 
           {selectedClass && canCreate && (
-            <Button onClick={() => setCreateDialogOpen(true)} className="bg-emerald-600 text-white hover:bg-emerald-700">
+            <Button size="sm" onClick={handleOpenManage} className="bg-emerald-600 text-white hover:bg-emerald-700">
               <Plus className="h-4 w-4 mr-1.5" />Manage
             </Button>
           )}
         </div>
       </div>
 
-      <Card>
+      <Card className="border-none shadow-sm shadow-emerald-600/5 overflow-hidden">
         <CardContent className="p-0">
-          {loadingTimetable ? (
+          {(isLoadingTimetable || isLoadingClasses) ? (
             <TimetableSkeleton viewMode={viewMode} />
           ) : slots.length === 0 ? (
-            <div className="text-center py-16 text-muted-foreground">
-              <Calendar className="h-12 w-12 mx-auto mb-3 opacity-30" />
-              <p>No timetable found.</p>
+            <div className="text-center py-24 text-muted-foreground bg-muted/5">
+              <div className="h-16 w-16 bg-muted/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                 <Calendar className="h-8 w-8 opacity-20" />
+              </div>
+              <p className="font-medium">No timetable records found</p>
+              <p className="text-xs max-w-[200px] mx-auto mt-1 opacity-60">Please add periods using the &quot;Manage&quot; button above.</p>
             </div>
           ) : viewMode === "grid" ? (
             <GridView
@@ -454,7 +386,7 @@ export function AdminTimetable() {
               uniqueSubjects={uniqueSubjects}
               workingDays={workingDays}
               currentDayIndex={currentDayIndex}
-              onDeleteSlot={handleDeleteSlot}
+              onDeleteSlot={(id) => deleteMutation.mutate(id)}
               onEditSlot={handleEditSlot}
               canEdit={canEdit}
               canDelete={canDelete}
@@ -465,7 +397,7 @@ export function AdminTimetable() {
               uniqueSubjects={uniqueSubjects}
               workingDays={workingDays}
               currentDayIndex={currentDayIndex}
-              onDeleteSlot={handleDeleteSlot}
+              onDeleteSlot={(id) => deleteMutation.mutate(id)}
               onEditSlot={handleEditSlot}
               canEdit={canEdit}
               canDelete={canDelete}
@@ -479,7 +411,7 @@ export function AdminTimetable() {
               workingDays={workingDays}
               currentDayIndex={currentDayIndex}
               onSelectDay={setSelectedDay}
-              onDeleteSlot={handleDeleteSlot}
+              onDeleteSlot={(id) => deleteMutation.mutate(id)}
               onEditSlot={handleEditSlot}
               canEdit={canEdit}
               canDelete={canDelete}
@@ -520,8 +452,25 @@ export function AdminTimetable() {
         availableTeachers={availableTeachers}
         onSave={handleBulkSave}
         saving={saving}
-        onCopyToDay={handleCopyToDay}
-        onCopyToAllDays={handleCopyToAllDays}
+        onCopyToDay={(src, tar) => {
+            const sourcePeriods = daySlots[src] ?? [];
+            if (sourcePeriods.length === 0) return;
+            const copied = sourcePeriods.map(slot => ({ ...slot, id: crypto.randomUUID(), day: tar }));
+            setDaySlots(prev => ({ ...prev, [tar]: [...(prev[tar] ?? []), ...copied] }));
+            toast.success(`Copied to ${DAY_LABELS[tar]}`);
+        }}
+        onCopyToAllDays={(src) => {
+            const sourcePeriods = daySlots[src] ?? [];
+            if (sourcePeriods.length === 0) return;
+            const updated = { ...daySlots };
+            workingDays.forEach(day => {
+              if (day === src) return;
+              const copied = sourcePeriods.map(slot => ({ ...slot, id: crypto.randomUUID(), day }));
+              updated[day] = [...(updated[day] ?? []), ...copied];
+            });
+            setDaySlots(updated);
+            toast.success("Copied to all days");
+        }}
       />
     </div>
   );

@@ -67,13 +67,61 @@ export function CreateTimetableDialog({
   );
 
   const addPeriod = () => {
+    const lastPeriod = currentTabPeriods[currentTabPeriods.length - 1];
+    let startTime = "08:00";
+    let endTime = "08:45";
+
+    if (lastPeriod && lastPeriod.endTime) {
+      startTime = lastPeriod.endTime;
+      try {
+        const [h, m] = lastPeriod.endTime.split(":").map(Number);
+        const date = new Date();
+        date.setHours(h);
+        date.setMinutes(m + 45);
+        endTime = `${String(date.getHours()).padStart(2, "0")}:${String(date.getMinutes()).padStart(2, "0")}`;
+      } catch {
+        endTime = "09:30";
+      }
+    }
+
     const newSlot: FormSlot = {
       id: crypto.randomUUID(),
       day: activeTab,
       subjectId: "",
       teacherId: "",
-      startTime: "08:00",
-      endTime: "08:45",
+      startTime,
+      endTime,
+    };
+    setDaySlots((prev: any) => ({
+      ...prev,
+      [activeTab]: [...(prev[activeTab] ?? []), newSlot],
+    }));
+  };
+
+  const addBreak = () => {
+    const lastPeriod = currentTabPeriods[currentTabPeriods.length - 1];
+    let startTime = "11:00";
+    let endTime = "11:30";
+
+    if (lastPeriod && lastPeriod.endTime) {
+      startTime = lastPeriod.endTime;
+      try {
+        const [h, m] = lastPeriod.endTime.split(":").map(Number);
+        const date = new Date();
+        date.setHours(h);
+        date.setMinutes(m + 30);
+        endTime = `${String(date.getHours()).padStart(2, "0")}:${String(date.getMinutes()).padStart(2, "0")}`;
+      } catch {
+        endTime = "11:30";
+      }
+    }
+
+    const newSlot: FormSlot = {
+      id: crypto.randomUUID(),
+      day: activeTab,
+      startTime,
+      endTime,
+      label: "Lunch Break",
     };
     setDaySlots((prev: any) => ({
       ...prev,
@@ -215,60 +263,101 @@ export function CreateTimetableDialog({
               </div>
             ) : (
               currentTabPeriods.map((period, idx) => (
-                <div key={period.id} className="rounded-lg border bg-muted/20 p-4">
+                <div key={period.id} className={`rounded-lg border p-4 ${period.label ? "bg-amber-50/30 border-amber-100 dark:bg-amber-900/10 dark:border-amber-900/30" : "bg-muted/20"}`}>
                   <div className="flex items-center justify-between mb-3">
-                    <span className="text-xs font-semibold text-muted-foreground flex items-center gap-1.5 uppercase tracking-wide">
-                      <Clock className="h-3 w-3" /> Period {idx + 1}
+                    <span className={`text-[10px] font-bold uppercase tracking-wider flex items-center gap-1.5 ${period.label ? "text-amber-600 dark:text-amber-400" : "text-muted-foreground"}`}>
+                      {period.label ? <Clock className="h-3 w-3" /> : <BookOpen className="h-3 w-3" />}
+                      {period.label ? "BREAK / EVENT" : `Period ${idx + 1}`}
                     </span>
                     <Button variant="ghost" size="sm" className="h-7 w-7 p-0 text-muted-foreground hover:text-red-600" onClick={() => removePeriod(period.id)}>
                       <Trash2 className="h-4 w-4" />
                     </Button>
                   </div>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                    <div className="space-y-1">
-                      <label className="text-[10px] font-bold uppercase text-muted-foreground">Subject</label>
-                      <Select value={period.subjectId} onValueChange={(v) => updatePeriod(period.id, "subjectId", v)}>
-                        <SelectTrigger className="h-9 text-xs"><SelectValue placeholder="Subject" /></SelectTrigger>
-                        <SelectContent>{availableSubjects.map((s) => <SelectItem key={s.id} value={s.id}>{s.name}</SelectItem>)}</SelectContent>
-                      </Select>
-                    </div>
-                    <div className="space-y-1">
-                      <label className="text-[10px] font-bold uppercase text-muted-foreground">Teacher</label>
-                      <Select value={period.teacherId} onValueChange={(v) => updatePeriod(period.id, "teacherId", v)}>
-                        <SelectTrigger className="h-9 text-xs"><SelectValue placeholder="Teacher" /></SelectTrigger>
-                        <SelectContent>{availableTeachers.map((t) => <SelectItem key={t.id} value={t.id}>{t.name}</SelectItem>)}</SelectContent>
-                      </Select>
-                    </div>
-                    <div className="grid grid-cols-2 gap-2">
+                  {period.label !== undefined ? (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                        <div className="space-y-1">
-                          <label className="text-[10px] font-bold uppercase text-muted-foreground">Start</label>
-                          <Input type="time" value={period.startTime} onChange={(e) => updatePeriod(period.id, "startTime", e.target.value)} className="h-9 text-xs" />
+                          <label className="text-[10px] font-bold uppercase text-muted-foreground">Label</label>
+                          <Input 
+                            value={period.label} 
+                            onChange={(e) => updatePeriod(period.id, "label", e.target.value)} 
+                            placeholder="Lunch Break, Assembly, etc."
+                            className="h-9 text-xs"
+                          />
                        </div>
-                       <div className="space-y-1">
-                          <label className="text-[10px] font-bold uppercase text-muted-foreground">End</label>
-                          <Input type="time" value={period.endTime} onChange={(e) => updatePeriod(period.id, "endTime", e.target.value)} className="h-9 text-xs" />
+                       <div className="grid grid-cols-2 gap-2">
+                          <div className="space-y-1">
+                             <label className="text-[10px] font-bold uppercase text-muted-foreground">Start</label>
+                             <Input type="time" value={period.startTime} onChange={(e) => updatePeriod(period.id, "startTime", e.target.value)} className="h-9 text-xs" />
+                          </div>
+                          <div className="space-y-1">
+                             <label className="text-[10px] font-bold uppercase text-muted-foreground">End</label>
+                             <Input type="time" value={period.endTime} onChange={(e) => updatePeriod(period.id, "endTime", e.target.value)} className="h-9 text-xs" />
+                          </div>
                        </div>
                     </div>
-                  </div>
+                  ) : (
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                      <div className="space-y-1">
+                        <label className="text-[10px] font-bold uppercase text-muted-foreground">Subject</label>
+                        <Select value={period.subjectId} onValueChange={(v) => updatePeriod(period.id, "subjectId", v)}>
+                          <SelectTrigger className="h-9 text-xs"><SelectValue placeholder="Subject" /></SelectTrigger>
+                          <SelectContent>{availableSubjects.map((s) => <SelectItem key={s.id} value={s.id}>{s.name}</SelectItem>)}</SelectContent>
+                        </Select>
+                      </div>
+                      <div className="space-y-1">
+                        <label className="text-[10px] font-bold uppercase text-muted-foreground">Teacher</label>
+                        <Select value={period.teacherId} onValueChange={(v) => updatePeriod(period.id, "teacherId", v)}>
+                          <SelectTrigger className="h-9 text-xs"><SelectValue placeholder="Teacher" /></SelectTrigger>
+                          <SelectContent>{availableTeachers.map((t) => <SelectItem key={t.id} value={t.id}>{t.name}</SelectItem>)}</SelectContent>
+                        </Select>
+                      </div>
+                      <div className="grid grid-cols-2 gap-2">
+                         <div className="space-y-1">
+                            <label className="text-[10px] font-bold uppercase text-muted-foreground">Start</label>
+                            <Input type="time" value={period.startTime} onChange={(e) => updatePeriod(period.id, "startTime", e.target.value)} className="h-9 text-xs" />
+                         </div>
+                         <div className="space-y-1">
+                            <label className="text-[10px] font-bold uppercase text-muted-foreground">End</label>
+                            <Input type="time" value={period.endTime} onChange={(e) => updatePeriod(period.id, "endTime", e.target.value)} className="h-9 text-xs" />
+                         </div>
+                      </div>
+                    </div>
+                  )}
                 </div>
               ))
             )}
 
-            <Button
-              variant="outline"
-              className="w-full h-10 border-dashed border-2 hover:bg-emerald-50 dark:hover:bg-emerald-900/10 text-emerald-600 dark:text-emerald-400"
-              onClick={() => {
-                addPeriod();
-                setTimeout(() => {
-                  const items = document.querySelectorAll(".overflow-y-auto");
-                  const container = items[items.length - 1];
-                  if (container) container.scrollTo({ top: container.scrollHeight, behavior: "smooth" });
-                }, 50);
-              }}
-            >
-              <Plus className="h-4 w-4 mr-1.5" /> Add Period to {DAY_LABELS[activeTab]}
-            </Button>
+            <div className="grid grid-cols-2 gap-3 shrink-0">
+              <Button
+                variant="outline"
+                className="h-12 border-dashed border-2 hover:bg-emerald-50 dark:hover:bg-emerald-900/10 text-emerald-600 dark:text-emerald-400"
+                onClick={() => {
+                  addPeriod();
+                  setTimeout(() => {
+                    const items = document.querySelectorAll(".overflow-y-auto");
+                    const container = items[items.length - 1];
+                    if (container) container.scrollTo({ top: container.scrollHeight, behavior: "smooth" });
+                  }, 50);
+                }}
+              >
+                <Plus className="h-4 w-4 mr-1.5" /> Add Period
+              </Button>
+              <Button
+                variant="outline"
+                className="h-12 border-dashed border-2 hover:bg-amber-50 dark:hover:bg-amber-900/10 text-amber-600 dark:text-amber-400"
+                onClick={() => {
+                  addBreak();
+                  setTimeout(() => {
+                    const items = document.querySelectorAll(".overflow-y-auto");
+                    const container = items[items.length - 1];
+                    if (container) container.scrollTo({ top: container.scrollHeight, behavior: "smooth" });
+                  }, 50);
+                }}
+              >
+                <Plus className="h-4 w-4 mr-1.5" /> Add Break
+              </Button>
+            </div>
           </div>
         </div>
 

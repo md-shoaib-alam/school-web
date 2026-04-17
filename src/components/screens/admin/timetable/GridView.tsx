@@ -101,11 +101,13 @@ export function GridView({
                                 className={`rounded-lg border px-3 py-2.5 transition-all hover:shadow-sm ${getSubjectBadgeClass(slot.subjectName, uniqueSubjects)}`}
                               >
                                 <p className="font-semibold text-sm leading-tight">
-                                  {slot.subjectName}
+                                  {slot.label || slot.subjectName}
                                 </p>
-                                <p className="text-xs mt-1 opacity-80">
-                                  {slot.teacherName}
-                                </p>
+                                {slot.teacherName && (
+                                  <p className="text-xs mt-1 opacity-80">
+                                    {slot.teacherName}
+                                  </p>
+                                )}
                               </div>
                               {showActions && (
                                 <div className="absolute -top-1.5 -right-1.5 flex items-center gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity">
@@ -196,11 +198,13 @@ export function GridView({
                               className={`flex-1 rounded-lg border px-3 py-2 ${getSubjectBadgeClass(slot.subjectName, uniqueSubjects)}`}
                             >
                               <p className="font-semibold text-xs leading-tight">
-                                {slot.subjectName}
+                                {slot.label || slot.subjectName}
                               </p>
-                              <p className="text-[11px] mt-0.5 opacity-80">
-                                {slot.teacherName}
-                              </p>
+                              {slot.teacherName && (
+                                <p className="text-[11px] mt-0.5 opacity-80">
+                                  {slot.teacherName}
+                                </p>
+                              )}
                             </div>
                             {showActions && (
                               <>

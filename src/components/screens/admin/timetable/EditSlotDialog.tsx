@@ -64,51 +64,69 @@ export function EditSlotDialog({
         </DialogHeader>
 
         <div className="space-y-4 py-2">
-          <div className="space-y-1.5">
-            <label className="text-sm font-medium text-foreground">
-              Subject
-            </label>
-            <Select
-              value={form.subjectId}
-              onValueChange={(v) =>
-                setForm((prev: any) => ({ ...prev, subjectId: v }))
-              }
-            >
-              <SelectTrigger className="h-10">
-                <SelectValue placeholder="Select subject" />
-              </SelectTrigger>
-              <SelectContent>
-                {availableSubjects.map((s) => (
-                  <SelectItem key={s.id} value={s.id}>
-                    {s.name} {s.code ? `(${s.code})` : ""}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
+          {form.label !== undefined ? (
+            <div className="space-y-1.5">
+              <label className="text-sm font-medium text-foreground">
+                Break Label
+              </label>
+              <Input
+                value={form.label}
+                onChange={(e) =>
+                  setForm((prev: any) => ({ ...prev, label: e.target.value }))
+                }
+                placeholder="e.g. Lunch Break"
+                className="h-10"
+              />
+            </div>
+          ) : (
+            <>
+              <div className="space-y-1.5">
+                <label className="text-sm font-medium text-foreground">
+                  Subject
+                </label>
+                <Select
+                  value={form.subjectId}
+                  onValueChange={(v) =>
+                    setForm((prev: any) => ({ ...prev, subjectId: v }))
+                  }
+                >
+                  <SelectTrigger className="h-10">
+                    <SelectValue placeholder="Select subject" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {availableSubjects.map((s) => (
+                      <SelectItem key={s.id} value={s.id}>
+                        {s.name} {s.code ? `(${s.code})` : ""}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
 
-          <div className="space-y-1.5">
-            <label className="text-sm font-medium text-foreground">
-              Teacher
-            </label>
-            <Select
-              value={form.teacherId}
-              onValueChange={(v) =>
-                setForm((prev: any) => ({ ...prev, teacherId: v }))
-              }
-            >
-              <SelectTrigger className="h-10">
-                <SelectValue placeholder="Select teacher" />
-              </SelectTrigger>
-              <SelectContent>
-                {availableTeachers.map((t) => (
-                  <SelectItem key={t.id} value={t.id}>
-                    {t.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
+              <div className="space-y-1.5">
+                <label className="text-sm font-medium text-foreground">
+                  Teacher
+                </label>
+                <Select
+                  value={form.teacherId}
+                  onValueChange={(v) =>
+                    setForm((prev: any) => ({ ...prev, teacherId: v }))
+                  }
+                >
+                  <SelectTrigger className="h-10">
+                    <SelectValue placeholder="Select teacher" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {availableTeachers.map((t) => (
+                      <SelectItem key={t.id} value={t.id}>
+                        {t.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </>
+          )}
 
           <div className="space-y-1.5">
             <label className="text-sm font-medium text-foreground">
@@ -181,8 +199,7 @@ export function EditSlotDialog({
             onClick={onSave}
             disabled={
               saving ||
-              !form.subjectId ||
-              !form.teacherId ||
+              (!form.label && (!form.subjectId || !form.teacherId)) ||
               !form.day ||
               !form.startTime ||
               !form.endTime

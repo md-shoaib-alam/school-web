@@ -142,26 +142,30 @@ export function DayView({
                             key={slot.id}
                           >
                             <div className="flex-1 min-w-0">
-                              <p className="text-lg font-semibold leading-tight">
-                                {slot.subjectName}
-                              </p>
-                              <p className="text-sm text-muted-foreground mt-1">
-                                {slot.teacherName}
-                              </p>
-                              <p className="text-xs text-muted-foreground mt-0.5">
-                                {slot.className}
-                              </p>
+                               <p className={`text-lg font-semibold leading-tight ${slot.label ? "text-amber-600 dark:text-amber-400" : ""}`}>
+                                 {slot.label || slot.subjectName}
+                               </p>
+                               {!slot.label && (
+                                 <>
+                                   <p className="text-sm text-muted-foreground mt-1">
+                                     {slot.teacherName}
+                                   </p>
+                                   <p className="text-xs text-muted-foreground mt-0.5">
+                                     {slot.className}
+                                   </p>
+                                 </>
+                               )}
                             </div>
                             <div className="flex items-center gap-2">
-                              <div
-                                className={`shrink-0 rounded-lg border px-3 py-1.5 text-xs font-medium ${getSubjectBadgeClass(slot.subjectName, uniqueSubjects)}`}
-                              >
-                                <div className="flex items-center gap-1.5">
-                                  <Clock className="h-3 w-3" />
-                                  {formatTime(slot.startTime)} -{" "}
-                                  {formatTime(slot.endTime)}
-                                </div>
-                              </div>
+                               <div
+                                 className={`shrink-0 rounded-lg border px-3 py-1.5 text-xs font-medium ${slot.label ? "bg-amber-100 text-amber-700 border-amber-200 dark:bg-amber-900/30 dark:text-amber-400 dark:border-amber-800" : getSubjectBadgeClass(slot.subjectName, uniqueSubjects)}`}
+                               >
+                                 <div className="flex items-center gap-1.5">
+                                   <Clock className="h-3 w-3" />
+                                   {formatTime(slot.startTime)} -{" "}
+                                   {formatTime(slot.endTime)}
+                                 </div>
+                               </div>
                               {showActions && (
                                 <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-all">
                                   {canEdit && (
