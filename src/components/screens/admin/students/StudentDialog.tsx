@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -18,7 +19,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Loader2 } from "lucide-react";
+import { Switch } from "@/components/ui/switch";
+import { Loader2, Bus } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
+import { apiFetch } from "@/lib/api";
 import type { StudentInfo, ClassInfo, StudentFormData } from "./types";
 
 interface StudentDialogProps {
@@ -44,9 +48,19 @@ export function StudentDialog({
 }: StudentDialogProps) {
   const isCreate = mode === "create";
 
+  // Fetch transport routes for the dropdown (min data)
+  const { data: routes = [] } = useQuery({
+    queryKey: ['transport-routes-min'],
+    enabled: open,
+    queryFn: async () => {
+      const res = await apiFetch('/api/transport-routes?mode=min');
+      return res.json();
+    }
+  });
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="sm:max-w-md max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>{isCreate ? "Add New Student" : "Edit Student"}</DialogTitle>
           <DialogDescription>
@@ -95,22 +109,6 @@ export function StudentDialog({
               />
             </div>
           </div>
-
-          {isCreate && (
-            <div className="grid gap-2">
-              <Label htmlFor="password">Login Password</Label>
-              <Input
-                id="password"
-                type="password"
-                value={formData.password}
-                onChange={(e) =>
-                  setFormData({ ...formData, password: e.target.value })
-                }
-                placeholder="Set student login password"
-              />
-              <p className="text-[10px] text-muted-foreground">Default: changeme123</p>
-            </div>
-          )}
 
           <div className="grid grid-cols-2 gap-4">
             <div className="grid gap-2">
@@ -178,8 +176,55 @@ export function StudentDialog({
               />
             </div>
           </div>
+
+          {/* Transport Section */}
+          <div className="space-y-4 pt-2 border-t mt-2">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Bus className="h-4 w-4 text-emerald-600" />
+                <Label htmlFor="transport" className="text-sm font-semibold">Transport Service</Label>
+              </div>
+              <Switch 
+                id="transport" 
+                checked={formData.transportEnabled} 
+                onCheckedChange={(checked) => setFormData({ ...formData, transportEnabled: checked })}
+              />
+            </div>
+
+            {formData.transportEnabled && (
+              <div className="animate-in slide-in-from-top-2 duration-200 space-y-4 pl-6 border-l-2 border-emerald-100">
+                <div className="grid gap-2">
+                  <Label htmlFor="routeId">Route *</Label>
+                  <Select
+                    value={formData.routeId}
+                    onValueChange={(v) => setFormData({ ...formData, routeId: v })}
+                  >
+                    <SelectTrigger id="routeId">
+                      <SelectValue placeholder="Select a route" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {routes.map((r: any) => (
+                        <SelectItem key={r.id} value={r.id}>
+                          {r.name} (₹{r.fee})
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="grid gap-2">
+                  <Label htmlFor="pickupPoint">Pickup Point *</Label>
+                  <Input
+                    id="pickupPoint"
+                    value={formData.pickupPoint}
+                    onChange={(e) => setFormData({ ...formData, pickupPoint: e.target.value })}
+                    placeholder="e.g., Park Street Stop"
+                  />
+                </div>
+              </div>
+            )}
+          </div>
         </div>
-        <DialogFooter>
+        <DialogFooter className="mt-6">
           <Button variant="outline" onClick={() => onOpenChange(false)}>
             Cancel
           </Button>
@@ -191,7 +236,8 @@ export function StudentDialog({
               !formData.name ||
               !formData.email ||
               !formData.classId ||
-              !formData.rollNumber
+              !formData.rollNumber ||
+              (formData.transportEnabled && (!formData.routeId || !formData.pickupPoint))
             }
           >
             {submitting ? (

@@ -1,339 +1,78 @@
 "use client";
 
-import { useState, useCallback, useMemo, useEffect } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Plus, Search, IndianRupee, RotateCcw } from "lucide-react";
-import { goeyToast as toast } from "goey-toast";
-import { apiFetch } from "@/lib/api";
-import { useModulePermissions } from "@/hooks/use-permissions";
-import { useAppStore } from "@/store/use-app-store";
-import { useQueryClient, useQuery } from "@tanstack/react-query";
+import { Eye } from 'lucide-react';
+import { useModulePermissions } from '@/hooks/use-permissions';
+import { useAppStore } from '@/store/use-app-store';
 
-// Sub-components
-import { FeeTable } from "./fees/FeeTable";
-import { FeeStats } from "./fees/FeeStats";
-import { FeeDialog } from "./fees/FeeDialog";
-import { FeeSkeleton } from "./fees/FeeSkeleton";
+// Modular Tab Components
+import { SetFeesTab } from './fees/SetFeesTab';
+import { FeeCategoriesTab } from './fees/FeeCategoriesTab';
+import { ConcessionsTab } from './fees/ConcessionsTab';
+import { MakePaymentTab } from './fees/MakePaymentTab';
+import { CheckReceiptTab } from './fees/CheckReceiptTab';
+import { FeeStatusTab } from './fees/FeeStatusTab';
+import { CheckPaymentsTab } from './fees/CheckPaymentsTab';
+import { TransportFeeTab } from './fees/TransportFeeTab';
 
-// Types
-import type { FeeRecord, FeeFormData, StudentOption } from "./fees/types";
-
-const emptyFormData: FeeFormData = {
-  studentId: "",
-  amount: "",
-  type: "tuition",
-  status: "pending",
-  dueDate: new Date().toISOString().split("T")[0],
-  paidAmount: "",
-  paidDate: "",
-  remark: "",
-};
+import { useParams } from 'next/navigation';
 
 export function AdminFees() {
-  const { currentTenantId } = useAppStore();
-  const { canCreate, canEdit, canDelete } = useModulePermissions("fees");
-  const queryClient = useQueryClient();
-
-  const [search, setSearch] = useState("");
-  const [debouncedSearch, setDebouncedSearch] = useState("");
-  const [statusFilter, setStatusFilter] = useState("all");
-  const [classFilter, setClassFilter] = useState("all");
-
-  // --- Debouncing Search ---
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setDebouncedSearch(search);
-    }, 300);
-    return () => clearTimeout(timer);
-  }, [search]);
-
-  // 1. Fetch main fee records
-  const { data: unifiedData, isLoading: loadingFees } = useQuery<{
-    items: FeeRecord[];
-    total: number;
-    totalPages: number;
-    stats: { total: number; pending: number; rate: number };
-  }>({
-    queryKey: ["fees", "list-v2", debouncedSearch, statusFilter, classFilter],
-    queryFn: async () => {
-      const params = new URLSearchParams({ 
-        search: debouncedSearch,
-        status: statusFilter,
-        classId: classFilter === "all" ? "" : classFilter
-      });
-      const res = await apiFetch(`/api/fees?${params.toString()}`);
-      if (!res.ok) throw new Error("Failed to fetch fees");
-      return res.json();
-    },
-  });
-
-  // 2. Fetch classes for filters and dialog (mode=min)
-  const { data: classes = [] } = useQuery<any[]>({
-    queryKey: ["classes", "min"],
-    queryFn: async () => {
-      const res = await apiFetch("/api/classes?mode=min");
-      if (!res.ok) return [];
-      const data = await res.json();
-      return data.map((c: any) => ({ id: c.id, name: `${c.name}-${c.section}` }));
-    },
-    staleTime: 5 * 60 * 1000,
-  });
-
-  // 3. Fetch students for dialog (mode=min)
-  const { data: studentOptions = [] } = useQuery<StudentOption[]>({
-    queryKey: ["students", "min"],
-    queryFn: async () => {
-      const res = await apiFetch("/api/students?mode=min&limit=2000");
-      if (!res.ok) return [];
-      const data = await res.json();
-      return data.items || [];
-    },
-    staleTime: 5 * 60 * 1000,
-  });
-
-  const records = unifiedData?.items || [];
-  const stats = unifiedData?.stats || { total: 0, pending: 0, rate: 0 };
-
-  // Dialog states
-  const [dialogOpen, setDialogOpen] = useState(false);
-  const [dialogMode, setDialogMode] = useState<"create" | "edit" | "view">("create");
-  const [selectedRecord, setSelectedRecord] = useState<FeeRecord | null>(null);
-  const [formData, setFormData] = useState<FeeFormData>(emptyFormData);
-  const [submitting, setSubmitting] = useState(false);
-
-  // --- Helpers ---
-
-  const invalidate = () => {
-    queryClient.invalidateQueries({ queryKey: ["fees"] });
-  };
-
-  // --- Handlers ---
-
-  const handleOpenCreate = () => {
-    setDialogMode("create");
-    setSelectedRecord(null);
-    setFormData(emptyFormData);
-    setDialogOpen(true);
-  };
-
-  const handleOpenEdit = (record: FeeRecord) => {
-    setDialogMode("edit");
-    setSelectedRecord(record);
-    setFormData({
-      studentId: record.studentId,
-      amount: record.amount.toString(),
-      type: record.type.toLowerCase(),
-      status: record.status,
-      dueDate: record.dueDate.split("T")[0],
-      paidAmount: record.paidAmount?.toString() || "",
-      paidDate: record.paidDate?.split("T")[0] || "",
-      remark: record.remark || "",
-    });
-    setDialogOpen(true);
-  };
-
-  const handleOpenView = (record: FeeRecord) => {
-    setDialogMode("view");
-    setSelectedRecord(record);
-    setFormData({
-      studentId: record.studentId,
-      amount: record.amount.toString(),
-      type: record.type.toLowerCase(),
-      status: record.status,
-      dueDate: record.dueDate.split("T")[0],
-      paidAmount: record.paidAmount?.toString() || "",
-      paidDate: record.paidDate?.split("T")[0] || "",
-      remark: record.remark || "",
-    });
-    setDialogOpen(true);
-  };
-
-  const handleSubmit = async () => {
-    if (!formData.studentId || !formData.amount || !formData.dueDate) {
-      toast.error("Please fill in required fields");
-      return;
-    }
-
-    setSubmitting(true);
-    try {
-      const url = "/api/fees";
-      const method = dialogMode === "create" ? "POST" : "PUT";
-      const payload = {
-        ...formData,
-        amount: parseFloat(formData.amount),
-        paidAmount: formData.paidAmount ? parseFloat(formData.paidAmount) : 0,
-        tenantId: currentTenantId,
-        id: selectedRecord?.id,
-      };
-
-      const res = await apiFetch(url, {
-        method,
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
-
-      if (res.ok) {
-        toast.success(dialogMode === "create" ? "Record created" : "Record updated");
-        setDialogOpen(false);
-        invalidate();
-      } else {
-        const err = await res.json();
-        toast.error(err.message || "Failed to save record");
-      }
-    } catch (err) {
-      toast.error("An error occurred");
-    } finally {
-      setSubmitting(false);
-    }
-  };
-
-  const handleDelete = async (id: string) => {
-    try {
-      const res = await apiFetch(`/api/fees?id=${id}&tenantId=${currentTenantId}`, {
-        method: "DELETE",
-      });
-      if (res.ok) {
-        toast.success("Record deleted");
-        invalidate();
-      } else {
-        toast.error("Failed to delete");
-      }
-    } catch (err) {
-      toast.error("An error occurred");
-    }
-  };
-
-
-
-  if (loadingFees) {
-    return <FeeSkeleton />;
-  }
+  const { canCreate, canEdit, canDelete } = useModulePermissions('fees');
+  const { currentSubScreen } = useAppStore();
+  const { screen } = useParams();
+  
+  // Sync tab with URL screen or internal store state
+  let activeTab = 'set-fees';
+  
+  if (screen === 'fee-categories') activeTab = 'categories';
+  else if (screen === 'fee-concessions') activeTab = 'concessions';
+  else if (screen === 'make-payment') activeTab = 'payment';
+  else if (screen === 'check-receipt') activeTab = 'receipts';
+  else if (screen === 'fee-status') activeTab = 'status';
+  else if (screen === 'check-payments') activeTab = 'check-payments';
+  else if (screen === 'transport-fee') activeTab = 'transport-fee';
+  else if (screen === 'fees') activeTab = 'set-fees';
+  else activeTab = currentSubScreen || 'set-fees';
 
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
-        <div className="flex items-center gap-3">
-          <div className="h-12 w-12 rounded-2xl bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center text-emerald-600 dark:text-emerald-400">
-            <IndianRupee className="h-6 w-6" />
-          </div>
-          <div>
-            <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Fee Management</h2>
-            <p className="text-sm text-gray-500 dark:text-gray-400">
-              Track student payments and school revenue
-            </p>
-          </div>
+      {/* Read-only banner */}
+      {!canCreate && !canEdit && !canDelete && (
+        <div className="flex items-center gap-2 rounded-lg border border-amber-200 dark:border-amber-800 bg-amber-50 dark:bg-amber-900/30 px-3 py-2">
+          <Eye className="h-4 w-4 text-amber-600 dark:text-amber-400 shrink-0" />
+          <span className="text-xs text-amber-700 dark:text-amber-300 font-medium">
+            Read-only mode — you have view permission only for this module.
+          </span>
         </div>
+      )}
 
-        <div className="flex items-center gap-2">
-          <Button
-            variant="outline"
-            size="icon"
-            onClick={() => invalidate()}
-            className="h-10 w-10"
-          >
-            <RotateCcw className="h-4 w-4" />
-          </Button>
-          {canCreate && (
-            <Button
-              className="bg-emerald-600 hover:bg-emerald-700 text-white shadow-sm"
-              onClick={handleOpenCreate}
-            >
-              <Plus className="h-4 w-4 mr-2" />
-              Create Fee Record
-            </Button>
-          )}
-        </div>
+      {/* Render active tab content — sidebar handles navigation */}
+      <div className="animate-in fade-in slide-in-from-bottom-2 duration-300">
+        {activeTab === 'set-fees' && (
+          <SetFeesTab canCreate={canCreate} canEdit={canEdit} canDelete={canDelete} />
+        )}
+        {activeTab === 'categories' && (
+          <FeeCategoriesTab canCreate={canCreate} canEdit={canEdit} canDelete={canDelete} />
+        )}
+        {activeTab === 'concessions' && (
+          <ConcessionsTab canCreate={canCreate} canEdit={canEdit} canDelete={canDelete} />
+        )}
+        {activeTab === 'payment' && (
+          <MakePaymentTab canCreate={canCreate} />
+        )}
+        {activeTab === 'receipts' && (
+          <CheckReceiptTab canEdit={canEdit} canDelete={canDelete} />
+        )}
+        {activeTab === 'status' && (
+          <FeeStatusTab />
+        )}
+        {activeTab === 'check-payments' && (
+          <CheckPaymentsTab />
+        )}
+        {activeTab === 'transport-fee' && (
+          <TransportFeeTab />
+        )}
       </div>
-
-      {/* Stats */}
-      <FeeStats
-        totalRevenue={stats.total}
-        pendingAmount={stats.pending}
-        collectionRate={stats.rate}
-      />
-
-      {/* Filters */}
-      <Card className="border-none shadow-sm bg-gray-50/50 dark:bg-gray-900/20">
-        <CardContent className="p-4 flex flex-col md:flex-row gap-4">
-          <div className="relative flex-1">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
-            <Input
-              placeholder="Search by student name or transaction ID..."
-              className="pl-9 bg-white dark:bg-gray-900"
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-            />
-          </div>
-          <div className="flex items-center gap-2">
-            <Select value={statusFilter} onValueChange={setStatusFilter}>
-              <SelectTrigger className="w-[140px] bg-white dark:bg-gray-900">
-                <SelectValue placeholder="Status" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Status</SelectItem>
-                <SelectItem value="paid">Paid</SelectItem>
-                <SelectItem value="pending">Pending</SelectItem>
-                <SelectItem value="overdue">Overdue</SelectItem>
-              </SelectContent>
-            </Select>
-            <Select value={classFilter} onValueChange={setClassFilter}>
-              <SelectTrigger className="w-[140px] bg-white dark:bg-gray-900">
-                <SelectValue placeholder="All Classes" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Classes</SelectItem>
-                {classes.map((c: any) => (
-                  <SelectItem key={c.id} value={c.id}>
-                    {c.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Records Table */}
-      <Card className="border-none shadow-sm overflow-hidden">
-        <CardHeader className="border-b bg-gray-50/50 dark:bg-gray-900/20 px-6 py-4">
-          <CardTitle className="text-sm font-bold uppercase tracking-widest text-gray-500">
-            Recent Fee Records
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="p-0">
-          <FeeTable
-            records={records}
-            canEdit={canEdit}
-            canDelete={canDelete}
-            onEdit={handleOpenEdit}
-            onDelete={handleDelete}
-            onView={handleOpenView}
-          />
-        </CardContent>
-      </Card>
-
-      <FeeDialog
-        open={dialogOpen}
-        onOpenChange={setDialogOpen}
-        mode={dialogMode}
-        record={selectedRecord}
-        students={studentOptions}
-        classes={classes}
-        formData={formData}
-        setFormData={setFormData}
-        submitting={submitting}
-        onSubmit={handleSubmit}
-      />
     </div>
   );
 }

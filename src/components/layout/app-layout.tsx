@@ -9,6 +9,14 @@ import { ChangePasswordModal } from "@/components/modals/change-password-modal";
 import { Sidebar } from "./sidebar";
 import { Header } from "./header";
 import { navItems } from "./nav-config";
+import { useIsFetching } from "@tanstack/react-query";
+
+function LoadingProgress() {
+  const isFetching = useIsFetching();
+  if (isFetching === 0) return null;
+  return <div className="loading-progress-bar" />;
+}
+
 
 export function AppLayout({ children }: { children: React.ReactNode }) {
   const { slug } = useParams();
@@ -87,7 +95,9 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="h-dvh flex overflow-hidden bg-gray-50 dark:bg-gray-950">
+      <LoadingProgress />
       {/* Mobile overlay */}
+
       {sidebarOpen && (
         <div
           className="fixed inset-0 bg-black/50 z-40 lg:hidden"

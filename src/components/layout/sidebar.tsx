@@ -17,11 +17,14 @@ import {
   Settings,
   KeyRound,
   LogOut,
+  ChevronDown,
+  ChevronRight,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { isRootAdmin } from "@/lib/permissions";
 import { useRouter } from "next/navigation";
 import { navItems, roleColors, roleLabels, type NavItem } from "./nav-config";
+import { useState } from "react";
 
 interface SidebarProps {
   items: NavItem[];
@@ -44,8 +47,23 @@ export function Sidebar({
     logout,
   } = useAppStore();
   const router = useRouter();
+  
+  // State for expanded accordions
+  const [expandedKeys, setExpandedKeys] = useState<string[]>(() => {
+    // Auto-expand if a child is active
+    const activeParent = items.find(item => 
+      item.children?.some(child => child.key === resolvedScreen)
+    );
+    return activeParent ? [activeParent.key] : [];
+  });
 
   if (!currentUser) return null;
+
+  const toggleExpand = (key: string) => {
+    setExpandedKeys(prev => 
+      prev.includes(key) ? prev.filter(k => k !== key) : [...prev, key]
+    );
+  };
 
   const isSuperAdmin = currentUser.role === "super_admin";
   const initials = currentUser.name
@@ -123,34 +141,70 @@ export function Sidebar({
       {/* Navigation */}
       <nav className="flex-1 overflow-y-auto py-3 px-3 sidebar-scrollbar overscroll-contain">
         <div className="space-y-1">
-          {items.map((item) => (
-            <Button
-              key={item.key}
-              variant="ghost"
-              className={cn(
-                "w-full justify-start gap-3 h-10 px-3 font-normal cursor-pointer transition-all",
-                resolvedScreen === item.key
-                  ? isSuperAdmin
-                    ? "bg-rose-800/60 text-white font-medium"
-                    : "bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 hover:bg-emerald-100 dark:hover:bg-emerald-900/50 font-medium"
-                  : isSuperAdmin
-                    ? "text-rose-200 hover:text-white hover:bg-rose-800/40"
-                    : "text-gray-600 dark:text-gray-400 hover:bg-emerald-50/50 dark:hover:bg-emerald-900/20 hover:text-emerald-600 dark:hover:text-emerald-400",
-              )}
-              onClick={() => navigateTo(item.key)}
-            >
-              {item.icon}
-              {item.label}
-              {item.badge && (
-                <Badge
-                  variant="secondary"
-                  className="ml-auto text-[10px] h-5 px-1.5"
+          {items.map((item) => {
+            const hasChildren = item.children && item.children.length > 0;
+            const isExpanded = expandedKeys.includes(item.key);
+            const isChildActive = item.children?.some(c => c.key === resolvedScreen);
+            const isActive = resolvedScreen === item.key || isChildActive;
+
+            return (
+              <div key={item.key} className="space-y-1">
+                <Button
+                  variant="ghost"
+                  className={cn(
+                    "w-full justify-start gap-3 h-10 px-3 font-normal cursor-pointer transition-all",
+                    isActive && !hasChildren
+                      ? isSuperAdmin
+                        ? "bg-rose-800/60 text-white font-medium"
+                        : "bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 hover:bg-emerald-100 dark:hover:bg-emerald-900/50 font-medium"
+                      : isSuperAdmin
+                        ? "text-rose-200 hover:text-white hover:bg-rose-800/40"
+                        : "text-gray-600 dark:text-gray-400 hover:bg-emerald-50/50 dark:hover:bg-emerald-900/20 hover:text-emerald-600 dark:hover:text-emerald-400",
+                    isActive && hasChildren && "text-emerald-700 dark:text-emerald-400"
+                  )}
+                  onClick={() => {
+                    if (hasChildren) {
+                      toggleExpand(item.key);
+                    } else {
+                      navigateTo(item.key);
+                    }
+                  }}
                 >
-                  {item.badge}
-                </Badge>
-              )}
-            </Button>
-          ))}
+                  {item.icon}
+                  <span className="flex-1 text-left">{item.label}</span>
+                  {hasChildren ? (
+                    isExpanded ? <ChevronDown className="h-4 w-4 opacity-50" /> : <ChevronRight className="h-4 w-4 opacity-50" />
+                  ) : item.badge && (
+                    <Badge variant="secondary" className="ml-auto text-[10px] h-5 px-1.5">
+                      {item.badge}
+                    </Badge>
+                  )}
+                </Button>
+
+                {/* Sub Items (Accordion) */}
+                {hasChildren && isExpanded && (
+                  <div className="ml-4 pl-4 border-l border-gray-100 dark:border-gray-800 space-y-1 mt-1 animate-in slide-in-from-top-1 duration-200">
+                    {item.children?.map((child) => (
+                      <Button
+                        key={child.key}
+                        variant="ghost"
+                        className={cn(
+                          "w-full justify-start gap-3 h-9 px-3 font-normal cursor-pointer transition-all text-sm",
+                          resolvedScreen === child.key
+                            ? "bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 font-medium"
+                            : "text-gray-500 hover:text-emerald-600 dark:hover:text-emerald-400 hover:bg-emerald-50/30"
+                        )}
+                        onClick={() => navigateTo(child.key)}
+                      >
+                        {child.icon}
+                        {child.label}
+                      </Button>
+                    ))}
+                  </div>
+                )}
+              </div>
+            );
+          })}
         </div>
       </nav>
 

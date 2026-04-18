@@ -9,6 +9,13 @@ export interface StudentInfo {
   gender: string;
   dateOfBirth: string | null;
   parentName?: string;
+  transport?: {
+    id: string;
+    routeId: string;
+    pickupPoint: string | null;
+    status: string;
+    startDate: string;
+  } | null;
 }
 
 export interface ClassInfo {
@@ -27,4 +34,7 @@ export interface StudentFormData {
   gender: string;
   dateOfBirth: string;
   password?: string;
+  transportEnabled?: boolean;
+  routeId?: string;
+  pickupPoint?: string;
 }

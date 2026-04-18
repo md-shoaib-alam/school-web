@@ -84,7 +84,15 @@ export default function TenantScreenDispatcher() {
       case 'classes': return <AdminClasses />;
       case 'subjects': return <AdminSubjects />;
       case 'attendance': return <AdminAttendance />;
-      case 'fees': return <AdminFees />;
+      case 'fees':
+      case 'fee-categories':
+      case 'fee-concessions':
+      case 'make-payment':
+      case 'check-receipt':
+      case 'fee-status':
+      case 'check-payments':
+      case 'transport-fee':
+        return <AdminFees />;
       case 'notices': return <AdminNotices />;
       case 'timetable': return <AdminTimetable />;
       case 'calendar': return <AdminCalendar />;

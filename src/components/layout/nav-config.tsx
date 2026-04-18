@@ -28,6 +28,14 @@ import {
   CalendarDays,
   TicketCheck,
   Heart,
+  Layers,
+  Tag,
+  Percent,
+  Banknote,
+  FileCheck,
+  UserSearch,
+  History,
+  Bus,
 } from "lucide-react";
 import { type UserRole } from "@/store/use-app-store";
 
@@ -38,6 +46,11 @@ export interface NavItem {
   badge?: string;
   permModule?: string | null;
   rootOnly?: boolean;
+  children?: {
+    key: string;
+    label: string;
+    icon: React.ReactNode;
+  }[];
 }
 
 export const navItems: Record<UserRole, NavItem[]> = {
@@ -138,19 +151,28 @@ export const navItems: Record<UserRole, NavItem[]> = {
       icon: <BookOpen className="h-4 w-4" />,
     },
     {
-      key: "attendance",
+      key: "attendance-group",
       label: "Attendance",
       icon: <UserCheck className="h-4 w-4" />,
-    },
-    {
-      key: "staff-attendance",
-      label: "Staff Attendance",
-      icon: <ClipboardList className="h-4 w-4" />,
+      children: [
+        { key: "attendance", label: "Student Attendance", icon: <Users className="h-4 w-4" /> },
+        { key: "staff-attendance", label: "Staff Attendance", icon: <ClipboardList className="h-4 w-4" /> },
+      ]
     },
     {
       key: "fees",
       label: "Fee Management",
       icon: <IndianRupee className="h-4 w-4" />,
+      children: [
+        { key: "fees", label: "Set Fees", icon: <Layers className="h-4 w-4" /> },
+        { key: "fee-categories", label: "Fee Categories", icon: <Tag className="h-4 w-4" /> },
+        { key: "fee-concessions", label: "Add Concession", icon: <Percent className="h-4 w-4" /> },
+        { key: "make-payment", label: "Make Payment", icon: <Banknote className="h-4 w-4" /> },
+        { key: "check-receipt", label: "Check Receipt", icon: <FileCheck className="h-4 w-4" /> },
+        { key: "fee-status", label: "Fee Status", icon: <UserSearch className="h-4 w-4" /> },
+        { key: "check-payments", label: "Check Payments", icon: <History className="h-4 w-4" /> },
+        { key: "transport-fee", label: "Transport Fee", icon: <Bus className="h-4 w-4" /> },
+      ]
     },
     { key: "notices", label: "Notices", icon: <Bell className="h-4 w-4" /> },
     {

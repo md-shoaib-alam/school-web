@@ -54,6 +54,7 @@ const initialUser = getInitialUser();
 export const useAppStore = create<AppState>((set, get) => ({
   ...initialUser,
   currentScreen: getInitialScreen(initialUser.currentUser),
+  currentSubScreen: null,
   sidebarOpen: getInitialSidebar(),
   currentTenantId: (typeof window !== 'undefined' ? parseTenantFromPath(window.location.pathname) : null) || getInitialTenantInfo().id || initialUser.currentUser?.tenantId || null,
   currentTenantSlug: getInitialTenantInfo().slug || initialUser.currentUser?.tenantSlug || null,
@@ -133,7 +134,11 @@ export const useAppStore = create<AppState>((set, get) => ({
       window.history.pushState({}, '', url);
       try { localStorage.setItem(STORAGE_KEYS.LAST_SCREEN, screen); } catch { /* ignore */ }
     }
-    set({ currentScreen: screen });
+    set({ currentScreen: screen, currentSubScreen: null }); // Reset sub-screen when changing main screen
+  },
+
+  setCurrentSubScreen: (subScreen) => {
+    set({ currentSubScreen: subScreen });
   },
 
   setSidebarOpen: (open) => {

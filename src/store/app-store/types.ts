@@ -37,6 +37,9 @@ export interface AppState {
   currentScreen: string;
   setCurrentScreen: (screen: string) => void;
 
+  currentSubScreen: string | null;
+  setCurrentSubScreen: (subScreen: string | null) => void;
+
   sidebarOpen: boolean;
   setSidebarOpen: (open: boolean) => void;
   toggleSidebar: () => void;

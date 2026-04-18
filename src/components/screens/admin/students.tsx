@@ -41,6 +41,9 @@ const emptyFormData: StudentFormData = {
   classId: "",
   gender: "male",
   dateOfBirth: "",
+  transportEnabled: false,
+  routeId: "",
+  pickupPoint: "",
 };
 
 export function AdminStudents() {
@@ -109,6 +112,9 @@ export function AdminStudents() {
       classId: student.classId || "",
       gender: student.gender || "male",
       dateOfBirth: student.dateOfBirth || "",
+      transportEnabled: !!student.transport,
+      routeId: student.transport?.routeId || "",
+      pickupPoint: student.transport?.pickupPoint || "",
     });
     setDialogOpen(true);
   };

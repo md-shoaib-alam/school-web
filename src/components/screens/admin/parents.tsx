@@ -5,14 +5,14 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Search, Users, UserPlus } from "lucide-react";
 import { goeyToast as toast } from "goey-toast";
-import { apiFetch } from "@/lib/api";
+import api from "@/lib/axios";
 import { useAppStore } from "@/store/use-app-store";
 import {
   useParents,
   useStudents,
   useClassesMin,
 } from "@/lib/graphql/hooks/academic.hooks";
-import { useQueryClient } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { queryKeys } from "@/lib/graphql/keys";
 
 import { ParentCard } from "./parents/ParentCard";
@@ -45,17 +45,19 @@ export function AdminParents() {
   const [selectedClass, setSelectedClass] = useState("all");
   const [linking, setLinking] = useState(false);
 
-  // Students for linking (filtered by class if selected)
-  const { data: studentData, isLoading: loadingStudents } = useStudents(
-    currentTenantId || undefined,
-    selectedClass === "all" ? undefined : selectedClass,
-    undefined, // no search here for now, or use search?
-    1,
-    100 // Get a good batch for linking
-  );
+  // Students for linking (filtered by class if selected) - Using optimized min-data REST API
+  const { data: studentData, isLoading: loadingStudents } = useQuery<{ items: StudentInfo[] }>({
+    queryKey: ['students-min', selectedClass],
+    queryFn: () => {
+      const params: any = { mode: 'min', limit: '1000' };
+      if (selectedClass && selectedClass !== 'all') params.classId = selectedClass;
+      return api.get('/students', { params }) as any;
+    }
+  });
+
 
   const parents = parentsData?.parents || [];
-  const students = studentData?.students || [];
+  const students = studentData?.items || [];
   const classes = classesData?.classes || [];
   const loading = loadingParents;
 
@@ -98,22 +100,10 @@ export function AdminParents() {
       (async () => {
         setCreating(true);
         try {
-          const res = await apiFetch("/api/parents", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ action: "create", ...createForm }),
-          });
-          if (!res.ok) {
-            const err = await res.json().catch(() => ({}));
-            throw new Error(err.error || "Failed to create parent");
-          }
+          await api.post("/parents", { action: "create", ...createForm });
           setCreateOpen(false);
           setCreateForm({
-            name: "",
-            email: "",
-            phone: "",
-            occupation: "",
-            password: "",
+            name: "", email: "", phone: "", occupation: "", password: "",
           });
           queryClient.invalidateQueries({ queryKey: queryKeys.parents });
           return "Parent account created";
@@ -135,19 +125,11 @@ export function AdminParents() {
       (async () => {
         setLinking(true);
         try {
-          const res = await apiFetch("/api/parents", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              action: "link",
-              parentId: selectedParent.id,
-              studentId,
-            }),
+          await api.post("/parents", {
+            action: "link",
+            parentId: selectedParent.id,
+            studentId,
           });
-          if (!res.ok) {
-            const err = await res.json().catch(() => ({}));
-            throw new Error(err.error || "Linking failed");
-          }
           queryClient.invalidateQueries({ queryKey: queryKeys.parents });
           return "Student linked successfully";
         } finally {
@@ -165,19 +147,11 @@ export function AdminParents() {
   const handleUnlinkChild = async (parentId: string, studentId: string) => {
     toast.promise(
       (async () => {
-        const res = await apiFetch("/api/parents", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            action: "unlink",
-            parentId,
-            studentId,
-          }),
+        await api.post("/parents", {
+          action: "unlink",
+          parentId,
+          studentId,
         });
-        if (!res.ok) {
-          const err = await res.json().catch(() => ({}));
-          throw new Error(err.error || "Unlinking failed");
-        }
         queryClient.invalidateQueries({ queryKey: queryKeys.parents });
 
         // Force red pill morph
@@ -211,15 +185,7 @@ export function AdminParents() {
       (async () => {
         setEditing(true);
         try {
-          const res = await apiFetch("/api/parents", {
-            method: "PUT",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ id: editingParent.id, ...editForm }),
-          });
-          if (!res.ok) {
-            const err = await res.json().catch(() => ({}));
-            throw new Error(err.error || "Update failed");
-          }
+          await api.put("/parents", { id: editingParent.id, ...editForm });
           setEditOpen(false);
           queryClient.invalidateQueries({ queryKey: queryKeys.parents });
           return "Parent details updated";
@@ -238,13 +204,7 @@ export function AdminParents() {
   const handleDelete = async (id: string) => {
     toast.promise(
       (async () => {
-        const res = await apiFetch(`/api/parents?id=${id}`, {
-          method: "DELETE",
-        });
-        if (!res.ok) {
-          const err = await res.json().catch(() => ({}));
-          throw new Error(err.error || "Deletion failed");
-        }
+        await api.delete(`/parents?id=${id}`);
         queryClient.invalidateQueries({ queryKey: queryKeys.parents });
 
         // Force red pill morph

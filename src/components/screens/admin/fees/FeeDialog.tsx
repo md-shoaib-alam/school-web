@@ -20,13 +20,13 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Loader2, IndianRupee, School } from "lucide-react";
-import type { FeeRecord, FeeFormData, StudentOption, ClassOption } from "./types";
+import type { FeeItem, FeeFormData, StudentOption, ClassOption } from "./types";
 
 interface FeeDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   mode: "create" | "edit" | "view";
-  record: FeeRecord | null;
+  record: FeeItem | null;
   students: StudentOption[];
   classes: ClassOption[];
   formData: FeeFormData;
