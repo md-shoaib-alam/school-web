@@ -252,13 +252,13 @@ export function AdminAttendance() {
                       <p className="text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">
                         {card.label}
                       </p>
-                      <p className="text-2xl font-bold mt-1 text-gray-900 dark:text-white">
+                      <div className="text-2xl font-bold mt-1 text-gray-900 dark:text-white">
                         {loading ? (
                           <Skeleton className="h-8 w-12" />
                         ) : (
                           card.count
                         )}
-                      </p>
+                      </div>
                     </div>
                     <div className={`p-2.5 rounded-xl ${card.color}`}>
                       {card.icon}

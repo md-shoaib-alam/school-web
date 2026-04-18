@@ -203,7 +203,8 @@ export function AdminSubjects() {
     const { id, ...data } = editForm;
     const promise = updateMutation.mutateAsync({ 
       id, 
-      data: { ...data, teacherId: data.teacherId || null } 
+      ...data, 
+      teacherId: data.teacherId || null 
     });
 
     toast.promise(promise, {
@@ -299,12 +300,15 @@ export function AdminSubjects() {
         <Label>Teacher (optional)</Label>
         <Select
           value={value.teacherId}
-          onValueChange={(v) => onChange({ ...value, teacherId: v })}
+          onValueChange={(v) => onChange({ ...value, teacherId: v === "none" ? "" : v })}
         >
           <SelectTrigger className="mt-1.5">
             <SelectValue placeholder="Select teacher" />
           </SelectTrigger>
           <SelectContent>
+            <SelectItem value="none" className="text-muted-foreground italic font-semibold">
+              None (Unassigned)
+            </SelectItem>
             {(teachers || []).map((t) => (
               <SelectItem key={t.id} value={t.id}>
                 {t.name}
