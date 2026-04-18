@@ -1,7 +1,7 @@
 "use client";
 
 import { Card, CardContent } from "@/components/ui/card";
-import { DollarSign, TrendingUp, AlertTriangle } from "lucide-react";
+import { IndianRupee, TrendingUp, AlertTriangle } from "lucide-react";
 
 interface FeeStatsProps {
   totalRevenue: number;
@@ -20,14 +20,14 @@ export function FeeStats({
         <CardContent className="p-6">
           <div className="flex items-center gap-4">
             <div className="h-12 w-12 rounded-2xl bg-emerald-500 text-white flex items-center justify-center shadow-lg shadow-emerald-200 dark:shadow-none">
-              <DollarSign className="h-6 w-6" />
+              <IndianRupee className="h-6 w-6" />
             </div>
             <div>
               <p className="text-xs font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-widest">
                 Total Revenue
               </p>
               <h3 className="text-2xl font-black text-gray-900 dark:text-gray-100">
-                ${totalRevenue.toLocaleString()}
+                ₹{totalRevenue.toLocaleString()}
               </h3>
             </div>
           </div>
@@ -45,7 +45,7 @@ export function FeeStats({
                 Outstanding
               </p>
               <h3 className="text-2xl font-black text-gray-900 dark:text-gray-100">
-                ${pendingAmount.toLocaleString()}
+                ₹{pendingAmount.toLocaleString()}
               </h3>
             </div>
           </div>

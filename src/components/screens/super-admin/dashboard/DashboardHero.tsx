@@ -3,7 +3,7 @@ import {
   ShieldCheck, 
   Building2, 
   Users, 
-  DollarSign, 
+  IndianRupee, 
   CreditCard, 
   GraduationCap 
 } from "lucide-react";
@@ -60,7 +60,7 @@ export function DashboardHero({ loading, data }: DashboardHeroProps) {
               <div className="bg-white/5 backdrop-blur-md rounded-2xl px-5 py-4 border border-white/10 hover:bg-white/10 transition-colors group">
                 <p className="text-teal-200 text-[10px] font-black uppercase tracking-widest mb-1">Revenue</p>
                 <p className="text-2xl font-black flex items-center gap-1">
-                  <DollarSign className="h-5 w-5 text-teal-400 group-hover:scale-110 transition-transform" />
+                  <IndianRupee className="h-5 w-5 text-teal-400 group-hover:scale-110 transition-transform" />
                   {(data?.revenue.total ?? 0).toLocaleString()}
                 </p>
               </div>

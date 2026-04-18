@@ -5,7 +5,7 @@ import {
   GraduationCap,
   BookOpen,
   ClipboardList,
-  DollarSign,
+  IndianRupee,
   Bell,
   Calendar,
   Clock,
@@ -150,7 +150,7 @@ export const navItems: Record<UserRole, NavItem[]> = {
     {
       key: "fees",
       label: "Fee Management",
-      icon: <DollarSign className="h-4 w-4" />,
+      icon: <IndianRupee className="h-4 w-4" />,
     },
     { key: "notices", label: "Notices", icon: <Bell className="h-4 w-4" /> },
     {
@@ -376,7 +376,7 @@ export const navItems: Record<UserRole, NavItem[]> = {
     {
       key: "fees",
       label: "Fee Management",
-      icon: <DollarSign className="h-4 w-4" />,
+      icon: <IndianRupee className="h-4 w-4" />,
       permModule: "fees",
     },
     {

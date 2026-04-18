@@ -1,7 +1,7 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { 
-  DollarSign, 
+  IndianRupee, 
   TrendingUp, 
   Users, 
   Activity, 
@@ -55,10 +55,10 @@ export function AnalyticsStats({ loading, metrics }: AnalyticsStatsProps) {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-xs text-muted-foreground font-medium uppercase tracking-wider">MRR</p>
-              <p className="text-2xl font-bold mt-1">${metrics.mrr.toLocaleString()}</p>
+              <p className="text-2xl font-bold mt-1">₹{metrics.mrr.toLocaleString()}</p>
             </div>
             <div className="h-11 w-11 rounded-xl bg-teal-100 dark:bg-teal-900/30 text-teal-600 flex items-center justify-center">
-              <DollarSign className="h-5 w-5" />
+              <IndianRupee className="h-5 w-5" />
             </div>
           </div>
           <p className="text-xs text-emerald-600 mt-2 flex items-center gap-1">
@@ -72,7 +72,7 @@ export function AnalyticsStats({ loading, metrics }: AnalyticsStatsProps) {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-xs text-muted-foreground font-medium uppercase tracking-wider">ARR</p>
-              <p className="text-2xl font-bold mt-1">${metrics.arr.toLocaleString()}</p>
+              <p className="text-2xl font-bold mt-1">₹{metrics.arr.toLocaleString()}</p>
             </div>
             <div className="h-11 w-11 rounded-xl bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 flex items-center justify-center">
               <TrendingUp className="h-5 w-5" />
@@ -89,7 +89,7 @@ export function AnalyticsStats({ loading, metrics }: AnalyticsStatsProps) {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-xs text-muted-foreground font-medium uppercase tracking-wider">LTV</p>
-              <p className="text-2xl font-bold mt-1">${metrics.ltv.toLocaleString()}</p>
+              <p className="text-2xl font-bold mt-1">₹{metrics.ltv.toLocaleString()}</p>
             </div>
             <div className="h-11 w-11 rounded-xl bg-blue-100 dark:bg-blue-900/30 text-blue-600 flex items-center justify-center">
               <Users className="h-5 w-5" />
@@ -123,7 +123,7 @@ export function AnalyticsStats({ loading, metrics }: AnalyticsStatsProps) {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-xs text-muted-foreground font-medium uppercase tracking-wider">CAC</p>
-              <p className="text-2xl font-bold mt-1">${metrics.cac.toLocaleString()}</p>
+              <p className="text-2xl font-bold mt-1">₹{metrics.cac.toLocaleString()}</p>
             </div>
             <div className="h-11 w-11 rounded-xl bg-violet-100 dark:bg-violet-900/30 text-violet-600 flex items-center justify-center">
               <Zap className="h-5 w-5" />

@@ -19,7 +19,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Loader2, DollarSign, School } from "lucide-react";
+import { Loader2, IndianRupee, School } from "lucide-react";
 import type { FeeRecord, FeeFormData, StudentOption, ClassOption } from "./types";
 
 interface FeeDialogProps {
@@ -87,7 +87,7 @@ export function FeeDialog({
       <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2 text-emerald-600">
-            <DollarSign className="h-5 w-5" />
+            <IndianRupee className="h-5 w-5" />
             {title}
           </DialogTitle>
           <DialogDescription>

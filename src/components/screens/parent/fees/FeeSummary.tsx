@@ -1,7 +1,7 @@
 "use client";
 
 import { Card, CardContent } from "@/components/ui/card";
-import { DollarSign, CheckCircle2, Clock, AlertTriangle } from "lucide-react";
+import { IndianRupee, CheckCircle2, Clock, AlertTriangle } from "lucide-react";
 
 interface FeeSummaryProps {
   total: number;
@@ -17,7 +17,7 @@ export function FeeSummary({ total, paid, pending, overdue }: FeeSummaryProps) {
         <CardContent className="p-4 text-left">
           <div className="flex items-center gap-3">
             <div className="h-10 w-10 rounded-xl bg-gray-100 dark:bg-gray-800 flex items-center justify-center">
-              <DollarSign className="h-5 w-5 text-gray-600 dark:text-gray-400" />
+              <IndianRupee className="h-5 w-5 text-gray-600 dark:text-gray-400" />
             </div>
             <div>
               <p className="text-xs text-muted-foreground">Total Fees</p>

@@ -15,7 +15,7 @@ import {
   Clock, 
   AlertTriangle, 
   Plus, 
-  DollarSign, 
+  IndianRupee, 
   FileDown, 
   UserCog, 
   ClipboardList, 
@@ -171,7 +171,7 @@ export function StatusCards({ loading, data, onNavigate }: StatusCardsProps) {
             onClick={() => onNavigate("tenants")}
           />
           <ActionButton 
-            icon={<DollarSign className="h-4 w-4" />} 
+            icon={<IndianRupee className="h-4 w-4" />} 
             label="View Billing" 
             sub="Revenue & invoices" 
             color="bg-violet-600"

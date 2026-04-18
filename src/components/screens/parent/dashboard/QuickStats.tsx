@@ -1,7 +1,7 @@
 "use client";
 
 import { Card, CardContent } from "@/components/ui/card";
-import { Users, Bell, DollarSign } from "lucide-react";
+import { Users, Bell, IndianRupee } from "lucide-react";
 
 interface QuickStatsProps {
   childrenCount: number;
@@ -37,7 +37,7 @@ export function QuickStats({ childrenCount, noticeCount, pendingFees }: QuickSta
       <Card className="rounded-xl shadow-sm shadow-none">
         <CardContent className="p-4 flex items-center gap-4">
           <div className="p-3 rounded-xl bg-red-50 dark:bg-red-900/30">
-            <DollarSign className="h-5 w-5 text-red-600" />
+            <IndianRupee className="h-5 w-5 text-red-600" />
           </div>
           <div className="text-left">
             <p className="text-sm text-muted-foreground">Pending Fees</p>

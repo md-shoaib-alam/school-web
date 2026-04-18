@@ -2,7 +2,6 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { 
-  DollarSign, 
   TrendingUp, 
   Receipt, 
   Building2, 
@@ -65,7 +64,7 @@ export function MetricCards({
         <CardContent className="p-5">
           <div className="flex items-center justify-between mb-3">
             <div className="h-10 w-10 rounded-xl bg-emerald-50 dark:bg-emerald-900/30 text-emerald-600 flex items-center justify-center group-hover:scale-110 transition-transform">
-              <DollarSign className="h-5 w-5" />
+              <IndianRupee className="h-5 w-5" />
             </div>
             <Badge variant="outline" className="text-emerald-700 dark:text-emerald-400 border-emerald-200 dark:border-emerald-700 bg-emerald-50 dark:bg-emerald-900/30 text-[10px]">
               <ArrowUpRight className="h-3 w-3 mr-0.5" /> Active

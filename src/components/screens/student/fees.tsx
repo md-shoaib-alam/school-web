@@ -16,7 +16,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import {
-  DollarSign,
+  IndianRupee,
   CreditCard,
   CheckCircle2,
   AlertTriangle,
@@ -129,7 +129,7 @@ export function StudentFees() {
           <CardContent className="p-4">
             <div className="flex items-center gap-3">
               <div className="h-10 w-10 rounded-xl bg-violet-100 dark:bg-violet-900/30 flex items-center justify-center">
-                <DollarSign className="h-5 w-5 text-violet-600 dark:text-violet-400" />
+                <IndianRupee className="h-5 w-5 text-violet-600 dark:text-violet-400" />
               </div>
               <div>
                 <p className="text-xs text-muted-foreground">Total Fees</p>
@@ -194,7 +194,7 @@ export function StudentFees() {
       <Card className="rounded-xl shadow-sm">
         <CardHeader>
           <CardTitle className="text-base flex items-center gap-2">
-            <DollarSign className="h-4 w-4 text-violet-500" />
+            <IndianRupee className="h-4 w-4 text-violet-500" />
             Fee Records
           </CardTitle>
         </CardHeader>
@@ -219,7 +219,7 @@ export function StudentFees() {
                       colSpan={5}
                       className="text-center py-12 text-muted-foreground"
                     >
-                      <DollarSign className="h-10 w-10 mx-auto mb-2 opacity-30" />
+                      <IndianRupee className="h-10 w-10 mx-auto mb-2 opacity-30" />
                       <p>No fee records found</p>
                     </TableCell>
                   </TableRow>

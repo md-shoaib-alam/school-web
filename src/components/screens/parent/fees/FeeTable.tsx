@@ -11,7 +11,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { DollarSign } from "lucide-react";
+import { IndianRupee } from "lucide-react";
 import { STATUS_CONFIG, TYPE_ICONS } from "./constants";
 import type { FeeRecord } from "@/lib/types";
 
@@ -45,7 +45,7 @@ export function FeeTable({ studentName, fees, onPay }: FeeTableProps) {
               {fees.length === 0 ? (
                 <TableRow>
                   <TableCell colSpan={6} className="text-center py-12 text-muted-foreground">
-                    <DollarSign className="h-10 w-10 mx-auto mb-2 opacity-30" />
+                    <IndianRupee className="h-10 w-10 mx-auto mb-2 opacity-30" />
                     <p>No fee records found</p>
                   </TableCell>
                 </TableRow>

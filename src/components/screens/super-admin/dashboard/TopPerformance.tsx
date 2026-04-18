@@ -28,7 +28,7 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart";
-import { Crown, Building2, BarChart3, Users, DollarSign, IndianRupee } from "lucide-react";
+import { Crown, Building2, BarChart3, Users, IndianRupee } from "lucide-react";
 import { DashboardData, planChartConfig, PLAN_COLORS } from "./types";
 
 interface TopPerformanceProps {

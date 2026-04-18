@@ -8,7 +8,6 @@ import {
   Users, 
   UserCheck, 
   School, 
-  DollarSign,
   IndianRupee
 } from "lucide-react";
 import { TenantInfo, planColors, statusColors } from "./types";
@@ -150,7 +149,7 @@ export function DetailHeader({
           iconColor="text-purple-600"
         />
         <MiniStat
-          icon={<DollarSign className="h-5 w-5" />}
+          icon={<IndianRupee className="h-5 w-5" />}
           label="Revenue"
           value={tenant?.totalRevenue ?? 0}
           isCurrency

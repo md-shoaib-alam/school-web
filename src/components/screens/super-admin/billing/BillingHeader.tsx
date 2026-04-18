@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { DollarSign, Activity, IndianRupee, ArrowUpRight, ArrowDownRight } from "lucide-react";
+import { Activity, IndianRupee, ArrowUpRight, ArrowDownRight } from "lucide-react";
 
 interface BillingHeaderProps {
   loading: boolean;
@@ -32,7 +32,7 @@ export function BillingHeader({
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
           <div className="flex items-center gap-4">
             <div className="h-14 w-14 rounded-2xl bg-white/20 flex items-center justify-center backdrop-blur-md border border-white/30 shadow-inner">
-              <DollarSign className="h-7 w-7" />
+              <IndianRupee className="h-7 w-7" />
             </div>
             <div>
               <h2 className="text-2xl font-bold tracking-tight">Billing & Revenue</h2>

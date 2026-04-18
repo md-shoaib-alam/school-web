@@ -146,7 +146,7 @@ const UsageStat = memo(
           )}
         </div>
         <p className="text-lg font-bold">
-          {isCurrency ? `$${current.toLocaleString()}` : current}
+          {isCurrency ? `₹${current.toLocaleString()}` : current}
           {max !== null && (
             <span className="text-xs font-normal text-muted-foreground">
               /{max}

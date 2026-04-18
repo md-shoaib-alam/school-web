@@ -19,7 +19,7 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart";
-import { DollarSign, AlertTriangle, Eye } from "lucide-react";
+import { IndianRupee, AlertTriangle, Eye } from "lucide-react";
 import { FeeRecord } from "@/lib/types";
 import { FeeSummary, FeeTypeBreakdown, feeBreakdownConfig } from "./types";
 import { SummaryCardSkeleton, ChartSkeleton, TableSkeleton } from "./SummaryComponents";
@@ -82,8 +82,8 @@ export function FeeReport() {
   const summaryCards = [
     {
       label: "Total Fees",
-      value: `$${summary.totalFees.toLocaleString()}`,
-      icon: <DollarSign className="h-5 w-5 text-violet-600" />,
+      value: `₹${summary.totalFees.toLocaleString()}`,
+      icon: <IndianRupee className="h-5 w-5 text-violet-600" />,
       color:
         "bg-violet-100 dark:bg-violet-900/30 text-violet-600 dark:text-violet-400",
       border: "border-violet-200 dark:border-violet-800",
@@ -91,8 +91,8 @@ export function FeeReport() {
     },
     {
       label: "Collected",
-      value: `$${summary.collected.toLocaleString()}`,
-      icon: <DollarSign className="h-5 w-5 text-emerald-600" />,
+      value: `₹${summary.collected.toLocaleString()}`,
+      icon: <IndianRupee className="h-5 w-5 text-emerald-600" />,
       color:
         "bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400",
       border: "border-emerald-200 dark:border-emerald-800",
@@ -100,7 +100,7 @@ export function FeeReport() {
     },
     {
       label: "Pending",
-      value: `$${summary.pending.toLocaleString()}`,
+      value: `₹${summary.pending.toLocaleString()}`,
       icon: <AlertTriangle className="h-5 w-5 text-amber-600" />,
       color:
         "bg-amber-100 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400",
@@ -113,7 +113,7 @@ export function FeeReport() {
     return (
       <Card className="border-red-200 dark:border-red-800 bg-red-50 dark:bg-red-900/30">
         <CardContent className="p-6 text-center text-red-600 dark:text-red-400">
-          <DollarSign className="h-8 w-8 mx-auto mb-2 opacity-50" />
+          <IndianRupee className="h-8 w-8 mx-auto mb-2 opacity-50" />
           <p className="font-medium">Failed to load fee report</p>
           <p className="text-sm mt-1">{error}</p>
         </CardContent>
@@ -168,7 +168,7 @@ export function FeeReport() {
             <ChartSkeleton />
           ) : typeBreakdown.length === 0 ? (
             <div className="text-center py-12 text-muted-foreground">
-              <DollarSign className="h-10 w-10 mx-auto mb-2 opacity-30" />
+              <IndianRupee className="h-10 w-10 mx-auto mb-2 opacity-30" />
               <p className="text-sm">No fee data available</p>
             </div>
           ) : (
@@ -191,7 +191,7 @@ export function FeeReport() {
                   tickLine={false}
                   axisLine={false}
                   fontSize={12}
-                  tickFormatter={(v: number) => `$${(v / 1000).toFixed(0)}k`}
+                  tickFormatter={(v: number) => `₹${(v / 1000).toFixed(0)}k`}
                 />
                 <ChartTooltip content={<ChartTooltipContent />} />
                 <Bar
@@ -252,7 +252,7 @@ export function FeeReport() {
                         {f.dueDate}
                       </TableCell>
                       <TableCell className="text-right font-bold">
-                        ${(f.amount - f.paidAmount).toLocaleString()}
+                        ₹{(f.amount - f.paidAmount).toLocaleString()}
                       </TableCell>
                       <TableCell className="text-right">
                         <Button variant="ghost" size="icon" className="h-8 w-8 p-0">

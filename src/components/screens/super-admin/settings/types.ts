@@ -16,8 +16,8 @@ export interface PlanConfig {
 export const defaultPlans: PlanConfig[] = [
   {
     name: "Basic",
-    monthlyPrice: "$29",
-    yearlyPrice: "$290",
+    monthlyPrice: "₹2,400",
+    yearlyPrice: "₹24,000",
     maxStudents: 100,
     maxTeachers: 10,
     maxClasses: 10,
@@ -32,8 +32,8 @@ export const defaultPlans: PlanConfig[] = [
   },
   {
     name: "Standard",
-    monthlyPrice: "$79",
-    yearlyPrice: "$790",
+    monthlyPrice: "₹6,500",
+    yearlyPrice: "₹65,000",
     maxStudents: 500,
     maxTeachers: 30,
     maxClasses: 30,
@@ -50,8 +50,8 @@ export const defaultPlans: PlanConfig[] = [
   },
   {
     name: "Premium",
-    monthlyPrice: "$149",
-    yearlyPrice: "$1,490",
+    monthlyPrice: "₹12,500",
+    yearlyPrice: "₹1,25,000",
     maxStudents: 2000,
     maxTeachers: 100,
     maxClasses: 100,
@@ -69,8 +69,8 @@ export const defaultPlans: PlanConfig[] = [
   },
   {
     name: "Enterprise",
-    monthlyPrice: "$299",
-    yearlyPrice: "$2,990",
+    monthlyPrice: "₹25,000",
+    yearlyPrice: "₹2,50,000",
     maxStudents: -1,
     maxTeachers: -1,
     maxClasses: -1,

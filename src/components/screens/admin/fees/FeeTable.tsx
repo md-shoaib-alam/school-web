@@ -113,11 +113,11 @@ export function FeeTable({
                 <TableCell>
                   <div className="flex flex-col">
                     <span className="text-sm font-bold text-gray-900 dark:text-gray-100">
-                      ${record.amount.toLocaleString()}
+                      ₹{record.amount.toLocaleString()}
                     </span>
                     {record.paidAmount > 0 && (
                       <span className="text-[10px] text-emerald-600 font-medium">
-                        Paid: ${record.paidAmount.toLocaleString()}
+                        Paid: ₹{record.paidAmount.toLocaleString()}
                       </span>
                     )}
                   </div>

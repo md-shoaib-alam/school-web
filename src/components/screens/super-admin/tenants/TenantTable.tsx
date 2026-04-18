@@ -372,7 +372,7 @@ export function TenantTable({
                 </TableCell>
                 <TableCell>
                   <span className="font-bold text-sm text-emerald-600">
-                    ${tenant.totalRevenue.toLocaleString()}
+                    ₹{tenant.totalRevenue.toLocaleString()}
                   </span>
                 </TableCell>
                 <TableCell>

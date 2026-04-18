@@ -4,7 +4,7 @@ import {
   Sparkles, 
   Zap, 
   Crown,
-  DollarSign,
+  IndianRupee,
   TrendingUp,
   Users,
   Activity,
@@ -76,7 +76,7 @@ export const userGrowthConfig = {
 } satisfies ChartConfig;
 
 export const revenueConfig = {
-  revenue: { label: "Revenue ($)", color: "#10b981" },
+  revenue: { label: "Revenue (₹)", color: "#10b981" },
 } satisfies ChartConfig;
 
 export const PIE_COLORS = ["#10b981", "#3b82f6", "#f59e0b", "#8b5cf6", "#ec4899", "#06b6d4", "#84cc16", "#f97316", "#6366f1", "#475569"];

@@ -4,7 +4,7 @@ import {
   Users, 
   UserCheck, 
   School, 
-  DollarSign, 
+  IndianRupee,
   ClipboardCheck, 
   Bell,
   CheckCircle2,
@@ -128,7 +128,7 @@ export const TAB_CONFIG: { value: TabType; label: string; icon: React.ReactNode 
   { value: "teachers", label: "Teachers", icon: React.createElement(Users, { className: "h-4 w-4" }) },
   { value: "parents", label: "Parents", icon: React.createElement(UserCheck, { className: "h-4 w-4" }) },
   { value: "classes", label: "Classes", icon: React.createElement(School, { className: "h-4 w-4" }) },
-  { value: "fees", label: "Fees", icon: React.createElement(DollarSign, { className: "h-4 w-4" }) },
+  { value: "fees", label: "Fees", icon: React.createElement(IndianRupee, { className: "h-4 w-4" }) },
   { value: "attendance", label: "Attendance", icon: React.createElement(ClipboardCheck, { className: "h-4 w-4" }) },
   { value: "notices", label: "Notices", icon: React.createElement(Bell, { className: "h-4 w-4" }) },
 ];

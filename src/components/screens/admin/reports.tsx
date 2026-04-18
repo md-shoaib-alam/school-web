@@ -2,7 +2,7 @@
 
 import { Card, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { BarChart3, GraduationCap, DollarSign, TrendingUp } from "lucide-react";
+import { BarChart3, GraduationCap, IndianRupee, TrendingUp } from "lucide-react";
 
 // Sub-components
 import { AttendanceReport } from "./reports/AttendanceReport";
@@ -51,7 +51,7 @@ export function AdminReports() {
               value="fees"
               className="rounded-lg px-6 py-2.5 data-[state=active]:bg-white dark:data-[state=active]:bg-gray-950 data-[state=active]:text-emerald-600 data-[state=active]:shadow-sm transition-all"
             >
-              <DollarSign className="h-4 w-4 mr-2" />
+              <IndianRupee className="h-4 w-4 mr-2" />
               Finances
             </TabsTrigger>
           </TabsList>

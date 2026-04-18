@@ -14,7 +14,7 @@ import {
   Users,
   GraduationCap,
   School,
-  DollarSign,
+  IndianRupee,
   Calendar,
   Megaphone,
   ArrowUpRight,
@@ -260,11 +260,11 @@ export function AdminDashboard() {
               <CardContent className="p-5">
                 <div className="flex items-center gap-3">
                   <div className="h-11 w-11 rounded-xl bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 flex items-center justify-center">
-                    <DollarSign className="h-5 w-5" />
+                    <IndianRupee className="h-5 w-5" />
                   </div>
                   <div>
                     <p className="text-xs text-muted-foreground">Fee Revenue</p>
-                    <p className="text-2xl font-bold">${(financial.data?.totalRevenue ?? 0).toLocaleString()}</p>
+                    <p className="text-2xl font-bold">₹{(financial.data?.totalRevenue ?? 0).toLocaleString()}</p>
                   </div>
                 </div>
               </CardContent>
@@ -349,7 +349,7 @@ export function AdminDashboard() {
         <Card>
           <CardHeader>
             <CardTitle className="text-base flex items-center gap-2">
-              <DollarSign className="h-4 w-4 text-emerald-600" />
+              <IndianRupee className="h-4 w-4 text-emerald-600" />
               Fee Collection
             </CardTitle>
           </CardHeader>
@@ -360,7 +360,7 @@ export function AdminDashboard() {
               <ChartContainer config={feeChartConfig} className="h-[280px] w-full">
                 <BarChart data={financial.data?.feeByType ?? []} layout="vertical">
                   <CartesianGrid strokeDasharray="3 3" horizontal={false} />
-                  <XAxis type="number" tickLine={false} axisLine={false} fontSize={12} tickFormatter={(v) => `$${(v / 1000).toFixed(0)}k`} />
+                  <XAxis type="number" tickLine={false} axisLine={false} fontSize={12} tickFormatter={(v) => `₹${(v / 1000).toFixed(0)}k`} />
                   <YAxis type="category" dataKey="type" tickLine={false} axisLine={false} fontSize={12} width={70} tickFormatter={(v) => v.charAt(0).toUpperCase() + v.slice(1)} />
                   <ChartTooltip content={<ChartTooltipContent />} />
                   <Bar dataKey="collected" fill="var(--color-collected)" radius={[0, 4, 4, 0]} maxBarSize={20} />

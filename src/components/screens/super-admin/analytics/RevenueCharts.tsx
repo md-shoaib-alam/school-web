@@ -23,7 +23,7 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart";
-import { DollarSign, Globe } from "lucide-react";
+import { IndianRupee, Globe } from "lucide-react";
 import { revenueConfig, PIE_COLORS, geographicData } from "./utils";
 
 interface RevenueChartsProps {
@@ -42,7 +42,7 @@ export function RevenueCharts({ loading, revenueBreakdown }: RevenueChartsProps)
       <Card>
         <CardHeader className="pb-2">
           <CardTitle className="text-base font-bold flex items-center gap-2">
-            <DollarSign className="h-4 w-4 text-teal-500" />
+            <IndianRupee className="h-4 w-4 text-teal-500" />
             Revenue by Tenant (Top 10)
           </CardTitle>
           <CardDescription>
@@ -64,7 +64,7 @@ export function RevenueCharts({ loading, revenueBreakdown }: RevenueChartsProps)
                   tickLine={false}
                   axisLine={false}
                   fontSize={12}
-                  tickFormatter={(v) => `$${(v / 1000).toFixed(0)}k`}
+                  tickFormatter={(v) => `₹${(v / 1000).toFixed(0)}k`}
                 />
                 <YAxis
                   type="category"

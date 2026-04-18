@@ -74,7 +74,7 @@ export function GrowthCharts({ loading, data }: GrowthChartsProps) {
                 tickLine={false}
                 axisLine={false}
                 fontSize={11}
-                tickFormatter={(v) => `$${(v / 1000).toFixed(0)}k`}
+                tickFormatter={(v) => `₹${(v / 1000).toFixed(0)}k`}
                 tick={{ fill: "#94a3b8", fontWeight: 600 }}
               />
               <ChartTooltip 
@@ -82,7 +82,7 @@ export function GrowthCharts({ loading, data }: GrowthChartsProps) {
                   <ChartTooltipContent 
                     className="rounded-xl border-none shadow-xl"
                     formatter={(value, name) => {
-                      if (name === 'revenue') return [`$${Number(value).toLocaleString()}`, 'Revenue'];
+                      if (name === 'revenue') return [`₹${Number(value).toLocaleString()}`, 'Revenue'];
                       return [value, name === 'newTenants' ? 'New Schools' : 'New Users'];
                     }}
                   />

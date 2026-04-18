@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Bell, ClipboardList, DollarSign, Calendar, UserCheck } from "lucide-react";
+import { Bell, ClipboardList, IndianRupee, Calendar, UserCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
@@ -23,7 +23,7 @@ const MOCK_NOTIFICATIONS = [
     desc: "Pending fees due by March 31.",
     time: "1 hour ago",
     read: false,
-    icon: <DollarSign className="h-4 w-4 text-amber-500" />,
+    icon: <IndianRupee className="h-4 w-4 text-amber-500" />,
   },
   {
     id: 3,
