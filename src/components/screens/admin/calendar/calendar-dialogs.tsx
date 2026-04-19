@@ -9,6 +9,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { Loader2 } from "lucide-react";
+import { DatePicker } from "@/components/ui/date-picker";
 import { CalendarEvent, EventFormData, ALL_EVENT_TYPES, EVENT_TYPE_COLORS, EVENT_TYPE_LABELS, TARGET_ROLE_LABELS } from "./types";
 
 interface CalendarDialogsProps {
@@ -64,47 +65,56 @@ export function CalendarDialogs({
               />
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label className="text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">Start Date</Label>
-                <Input type="date" value={form.date} onChange={(e) => updateForm("date", e.target.value)} className="h-10 text-sm" />
-              </div>
-              <div className="space-y-2">
-                <Label className="text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">End Date</Label>
-                <Input type="date" value={form.endDate} onChange={(e) => updateForm("endDate", e.target.value)} className="h-10 text-sm" min={form.date} />
-              </div>
-            </div>
+             <div className="grid grid-cols-2 gap-4">
+               <div className="space-y-2">
+                 <Label className="text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">Start Date</Label>
+                 <DatePicker 
+                   date={form.date ? new Date(form.date + "T00:00:00") : undefined} 
+                   onChange={(d) => updateForm("date", d?.toISOString().split('T')[0] || '')}
+                   className="h-10 text-sm w-full"
+                 />
+               </div>
+               <div className="space-y-2">
+                 <Label className="text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">End Date</Label>
+                 <DatePicker 
+                   date={form.endDate ? new Date(form.endDate + "T00:00:00") : undefined} 
+                   onChange={(d) => updateForm("endDate", d?.toISOString().split('T')[0] || '')}
+                   className="h-10 text-sm w-full"
+                   placeholder="Optional"
+                 />
+               </div>
+             </div>
 
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label className="text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">Category</Label>
-                <Select value={form.type} onValueChange={handleTypeChange}>
-                  <SelectTrigger className="h-10 text-sm uppercase font-bold">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {ALL_EVENT_TYPES.map((t) => (
-                      <SelectItem key={t} value={t} className="text-xs uppercase font-bold">
-                        {EVENT_TYPE_LABELS[t]}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-              <div className="space-y-2">
-                <Label className="text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">Visible To</Label>
-                <Select value={form.targetRole} onValueChange={(v) => updateForm("targetRole", v)}>
-                  <SelectTrigger className="h-10 text-sm uppercase font-bold">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {Object.entries(TARGET_ROLE_LABELS).map(([val, lbl]) => (
-                      <SelectItem key={val} value={val} className="text-xs uppercase font-bold">{lbl}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
+             <div className="grid grid-cols-2 gap-4">
+               <div className="space-y-2">
+                 <Label className="text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">Category</Label>
+                 <Select value={form.type} onValueChange={handleTypeChange}>
+                   <SelectTrigger className="h-10 text-sm uppercase font-normal">
+                     <SelectValue />
+                   </SelectTrigger>
+                   <SelectContent>
+                     {ALL_EVENT_TYPES.map((t) => (
+                       <SelectItem key={t} value={t} className="text-xs uppercase font-normal">
+                         {EVENT_TYPE_LABELS[t]}
+                       </SelectItem>
+                     ))}
+                   </SelectContent>
+                 </Select>
+               </div>
+               <div className="space-y-2">
+                 <Label className="text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">Visible To</Label>
+                 <Select value={form.targetRole} onValueChange={(v) => updateForm("targetRole", v)}>
+                   <SelectTrigger className="h-10 text-sm uppercase font-normal">
+                     <SelectValue />
+                   </SelectTrigger>
+                   <SelectContent>
+                     {Object.entries(TARGET_ROLE_LABELS).map(([val, lbl]) => (
+                       <SelectItem key={val} value={val} className="text-xs uppercase font-normal">{lbl}</SelectItem>
+                     ))}
+                   </SelectContent>
+                 </Select>
+               </div>
+             </div>
 
             <div className="space-y-2">
               <Label className="text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">Location</Label>

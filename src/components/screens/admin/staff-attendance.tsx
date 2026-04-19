@@ -79,29 +79,29 @@ export function StaffAttendance() {
     queryKey: ["staff-attendance", activeTab, selectedDate],
     queryFn: async () => {
       console.log(`[FRONTEND] Fetching attendance for ${activeTab} on ${selectedDate}`);
-      // Parallel fetching for sub-second performance
-      const [staffRes, attendanceRes] = await Promise.all([
-        api.get<any[]>(`/staff?role=${activeTab}`),
+      
+      const [staffList, attendanceList] = await Promise.all([
+        api.get<any[]>(`/staff?role=${activeTab}&mode=min`),
         api.get<any[]>(`/staff-attendance?date=${selectedDate}`),
       ]);
 
-      const staffList = staffRes.data || [];
-      const attendance = attendanceRes.data || [];
+      const staff = Array.isArray(staffList) ? staffList : (staffList as any).data || [];
+      const attendance = Array.isArray(attendanceList) ? attendanceList : (attendanceList as any).data || [];
       
-      console.log(`[FRONTEND] Received ${staffList.length} staff members`);
+      console.log(`[FRONTEND] Received ${staff.length} staff members`);
 
       const attendanceMap = new Map(
         attendance.map((a: any) => [a.userId, a]),
       );
 
-      return staffList.map((u: any) => ({
+      return staff.map((u: any) => ({
         id: u.id,
         staffName: u.name,
         role: u.customRole?.name || u.role,
         status: (attendanceMap.get(u.id) as any)?.status || "absent",
       }));
     },
-    enabled: mounted && !!currentTenantId,
+    enabled: !!currentTenantId,
     refetchOnWindowFocus: true,
   });
 
@@ -195,7 +195,7 @@ export function StaffAttendance() {
                 setSelectedDate(`${yyyy}-${mm}-${dd}`);
               }
             }}
-            className="rounded-xl dark:[color-scheme:dark] w-full sm:w-[180px]"
+            className="rounded-xl dark:[color-scheme:dark] w-fit"
           />
         </div>
       </div>

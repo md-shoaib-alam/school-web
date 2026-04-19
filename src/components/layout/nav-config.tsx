@@ -36,6 +36,7 @@ import {
   UserSearch,
   History,
   Bus,
+  IdCard,
 } from "lucide-react";
 import { type UserRole } from "@/store/use-app-store";
 
@@ -146,6 +147,7 @@ export const navItems: Record<UserRole, NavItem[]> = {
     { key: "classes", label: "Classes", icon: <School className="h-4 w-4" /> },
     { key: "promotions", label: "Class Promotion", icon: <GraduationCap className="h-4 w-4" /> },
     { key: "exams", label: "Exams", icon: <ClipboardList className="h-4 w-4" /> },
+    { key: "admit-cards", label: "Admit Cards", icon: <IdCard className="h-4 w-4" /> },
     {
       key: "subjects",
       label: "Subjects",
@@ -407,6 +409,12 @@ export const navItems: Record<UserRole, NavItem[]> = {
       label: "Grades",
       icon: <ClipboardList className="h-4 w-4" />,
       permModule: "grades",
+    },
+    {
+      key: "admit-cards",
+      label: "Admit Cards",
+      icon: <IdCard className="h-4 w-4" />,
+      permModule: "exams",
     },
     {
       key: "notices",
