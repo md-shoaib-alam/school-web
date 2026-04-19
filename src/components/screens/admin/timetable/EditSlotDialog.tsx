@@ -20,6 +20,7 @@ import {
 } from "@/components/ui/select";
 import { DAY_FULL_LABELS } from "./constants";
 import type { AvailableSubject, AvailableTeacher } from "./types";
+import { TimePicker } from "@/components/ui/time-picker";
 
 interface EditSlotDialogProps {
   open: boolean;
@@ -157,32 +158,28 @@ export function EditSlotDialog({
               <label className="text-sm font-medium text-foreground">
                 Start Time
               </label>
-              <Input
-                type="time"
+              <TimePicker
                 value={form.startTime ?? ""}
-                onChange={(e) =>
+                onChange={(v) =>
                   setForm((prev: any) => ({
                     ...prev,
-                    startTime: e.target.value,
+                    startTime: v,
                   }))
                 }
-                className="h-10"
               />
             </div>
             <div className="space-y-1.5">
               <label className="text-sm font-medium text-foreground">
                 End Time
               </label>
-              <Input
-                type="time"
+              <TimePicker
                 value={form.endTime ?? ""}
-                onChange={(e) =>
+                onChange={(v) =>
                   setForm((prev: any) => ({
                     ...prev,
-                    endTime: e.target.value,
+                    endTime: v,
                   }))
                 }
-                className="h-10"
               />
             </div>
           </div>

@@ -23,6 +23,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { DAY_LABELS, DAY_FULL_LABELS } from "./constants";
 import type { AvailableSubject, AvailableTeacher, FormSlot } from "./types";
 import { useState } from "react";
+import { TimePicker } from "@/components/ui/time-picker";
 
 interface CreateTimetableDialogProps {
   open: boolean;
@@ -288,11 +289,11 @@ export function CreateTimetableDialog({
                        <div className="grid grid-cols-2 gap-2">
                           <div className="space-y-1">
                              <label className="text-[10px] font-bold uppercase text-muted-foreground">Start</label>
-                             <Input type="time" value={period.startTime ?? ""} onChange={(e) => updatePeriod(period.id, "startTime", e.target.value)} className="h-9 text-xs" />
+                             <TimePicker value={period.startTime ?? ""} onChange={(v) => updatePeriod(period.id, "startTime", v)} className="h-9 text-xs [&_button]:h-9 [&_button]:text-[10px]" />
                           </div>
                           <div className="space-y-1">
                              <label className="text-[10px] font-bold uppercase text-muted-foreground">End</label>
-                             <Input type="time" value={period.endTime ?? ""} onChange={(e) => updatePeriod(period.id, "endTime", e.target.value)} className="h-9 text-xs" />
+                             <TimePicker value={period.endTime ?? ""} onChange={(v) => updatePeriod(period.id, "endTime", v)} className="h-9 text-xs [&_button]:h-9 [&_button]:text-[10px]" />
                           </div>
                        </div>
                     </div>
@@ -315,11 +316,11 @@ export function CreateTimetableDialog({
                           <div className="grid grid-cols-2 gap-2">
                              <div className="space-y-1">
                                 <label className="text-[10px] font-bold uppercase text-muted-foreground">Start</label>
-                                <Input type="time" value={period.startTime ?? ""} onChange={(e) => updatePeriod(period.id, "startTime", e.target.value)} className="h-9 text-xs" />
+                                <TimePicker value={period.startTime ?? ""} onChange={(v) => updatePeriod(period.id, "startTime", v)} className="h-9 text-xs [&_button]:h-9 [&_button]:text-[10px]" />
                              </div>
                              <div className="space-y-1">
                                 <label className="text-[10px] font-bold uppercase text-muted-foreground">End</label>
-                                <Input type="time" value={period.endTime ?? ""} onChange={(e) => updatePeriod(period.id, "endTime", e.target.value)} className="h-9 text-xs" />
+                                <TimePicker value={period.endTime ?? ""} onChange={(v) => updatePeriod(period.id, "endTime", v)} className="h-9 text-xs [&_button]:h-9 [&_button]:text-[10px]" />
                              </div>
                           </div>
                     </div>

@@ -42,6 +42,8 @@ import { apiFetch } from "@/lib/api";
 import type { AttendanceRecord, ClassInfo } from "@/lib/types";
 import { useModulePermissions } from "@/hooks/use-permissions";
 import { useAppStore } from "@/store/use-app-store";
+import { DatePicker } from "@/components/ui/date-picker";
+import { parseISO } from "date-fns";
 
 const statusConfig: Record<
   string,
@@ -208,11 +210,17 @@ export function AdminAttendance() {
               ))}
             </SelectContent>
           </Select>
-          <Input
-            type="date"
-            value={selectedDate}
-            onChange={(e) => setSelectedDate(e.target.value)}
-            className="w-[160px]"
+          <DatePicker
+            date={selectedDate ? parseISO(selectedDate) : undefined}
+            onChange={(d) => {
+              if (d) {
+                const yyyy = d.getFullYear();
+                const mm = String(d.getMonth() + 1).padStart(2, '0');
+                const dd = String(d.getDate()).padStart(2, '0');
+                setSelectedDate(`${yyyy}-${mm}-${dd}`);
+              }
+            }}
+            className="w-[180px]"
           />
           <Button variant="outline" className="hidden md:flex">
             <Eye className="h-4 w-4 mr-2" />

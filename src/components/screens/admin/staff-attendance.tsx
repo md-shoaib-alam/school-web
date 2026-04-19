@@ -25,8 +25,9 @@ import {
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import api from "@/lib/axios";
 import { useAppStore } from "@/store/use-app-store";
-import { format } from "date-fns";
+import { format, parseISO } from "date-fns";
 import { goeyToast as toast } from "goey-toast";
+import { DatePicker } from "@/components/ui/date-picker";
 
 type AttendanceStatus = "present" | "absent" | "late";
 
@@ -79,18 +80,21 @@ export function StaffAttendance() {
     queryFn: async () => {
       console.log(`[FRONTEND] Fetching attendance for ${activeTab} on ${selectedDate}`);
       // Parallel fetching for sub-second performance
-      const [staffList, attendance] = await Promise.all([
+      const [staffRes, attendanceRes] = await Promise.all([
         api.get<any[]>(`/staff?role=${activeTab}`),
         api.get<any[]>(`/staff-attendance?date=${selectedDate}`),
       ]);
+
+      const staffList = staffRes.data || [];
+      const attendance = attendanceRes.data || [];
       
-      console.log(`[FRONTEND] Received ${staffList?.length || 0} staff members`);
+      console.log(`[FRONTEND] Received ${staffList.length} staff members`);
 
       const attendanceMap = new Map(
-        ((attendance as any) || []).map((a: any) => [a.userId, a]),
+        attendance.map((a: any) => [a.userId, a]),
       );
 
-      return ((staffList as any) || []).map((u: any) => ({
+      return staffList.map((u: any) => ({
         id: u.id,
         staffName: u.name,
         role: u.customRole?.name || u.role,
@@ -181,10 +185,16 @@ export function StaffAttendance() {
           </p>
         </div>
         <div className="flex items-center gap-3">
-          <Input
-            type="date"
-            value={selectedDate}
-            onChange={(e) => setSelectedDate(e.target.value)}
+          <DatePicker
+            date={selectedDate ? parseISO(selectedDate) : undefined}
+            onChange={(d) => {
+              if (d) {
+                const yyyy = d.getFullYear();
+                const mm = String(d.getMonth() + 1).padStart(2, '0');
+                const dd = String(d.getDate()).padStart(2, '0');
+                setSelectedDate(`${yyyy}-${mm}-${dd}`);
+              }
+            }}
             className="rounded-xl dark:[color-scheme:dark] w-full sm:w-[180px]"
           />
         </div>
