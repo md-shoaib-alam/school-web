@@ -129,160 +129,137 @@ function AdmitCardVisual({ card }: { card: AdmitCard }) {
   const schoolPhone = card.school?.phone || '';
 
   return (
-    <div className="w-[700px] bg-white rounded-lg shadow-lg border border-gray-200 overflow-hidden print:shadow-none print:border-gray-400 print:rounded-none">
-      {/* ── Header ── */}
-      <div className="bg-gradient-to-r from-slate-800 via-slate-700 to-slate-800 text-white px-6 py-3">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="h-11 w-11 rounded-full bg-white/15 flex items-center justify-center border-2 border-white/20">
-              <GraduationCap className="h-6 w-6 text-amber-300" />
+    <div className="w-[100%] max-w-[750px] mx-auto bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden print:shadow-none print:border-gray-400 print:rounded-none h-[13.8cm] flex flex-col justify-between">
+      <div>
+        {/* ── Header ── */}
+        <div className="bg-gradient-to-r from-slate-800 via-slate-700 to-slate-800 text-white px-5 py-2">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <div className="h-9 w-9 rounded-full bg-white/15 flex items-center justify-center border-2 border-white/20">
+                <GraduationCap className="h-5 w-5 text-amber-300" />
+              </div>
+              <div>
+                <h2 className="text-sm font-bold tracking-wide leading-tight">{schoolName.toUpperCase()}</h2>
+                <p className="text-[9px] text-slate-300 truncate max-w-[300px]">{schoolAddress}</p>
+              </div>
             </div>
-            <div>
-              <h2 className="text-lg font-bold tracking-wide leading-tight">{schoolName.toUpperCase()}</h2>
-              <p className="text-[11px] text-slate-300">{schoolAddress}</p>
-              {schoolPhone && <p className="text-[10px] text-slate-400 flex items-center gap-1 mt-0.5"><Phone className="h-2.5 w-2.5" />{schoolPhone}</p>}
-            </div>
-          </div>
-          <div className="text-right">
-            <p className="text-[10px] uppercase tracking-[0.2em] text-slate-400 font-medium">Examination</p>
-            <p className="text-xl font-bold text-amber-300 leading-tight">ADMIT CARD</p>
-            <p className="text-[10px] text-slate-400 font-mono">{card.cardNumber}</p>
-          </div>
-        </div>
-      </div>
-
-      {/* ── Academic Year Banner ── */}
-      <div className="bg-amber-500/10 border-b-2 border-amber-400/30 px-6 py-1.5 flex items-center justify-between">
-        <p className="text-xs font-semibold text-amber-700 dark:text-amber-500">
-          <School className="h-3 w-3 inline mr-1" />
-          Class: {card.class.grade} — {card.class.name} (Section {card.class.section})
-        </p>
-        <p className="text-xs text-muted-foreground flex items-center gap-1">
-          <Calendar className="h-3 w-3" />
-          Academic Year 2024-2025
-        </p>
-      </div>
-
-      {/* ── Student Info Section ── */}
-      <div className="px-6 py-3">
-        <div className="flex gap-4">
-          {/* Photo */}
-          <div className="shrink-0">
-            <div className="h-24 w-20 rounded-lg border-2 border-dashed border-gray-300 bg-gray-50 flex flex-col items-center justify-center">
-              <span className="text-2xl font-bold text-gray-400">{card.student.initials}</span>
-              <span className="text-[8px] text-gray-400 mt-0.5">PHOTO</span>
-            </div>
-          </div>
-
-          {/* Student Details */}
-          <div className="flex-1 grid grid-cols-2 gap-x-4 gap-y-1.5 text-sm">
-            <div>
-              <p className="text-[10px] text-gray-400 uppercase tracking-wider font-medium">Student Name</p>
-              <p className="font-bold text-gray-900 text-base">{card.student.name}</p>
-            </div>
-            <div>
-              <p className="text-[10px] text-gray-400 uppercase tracking-wider font-medium">Roll Number</p>
-              <p className="font-bold text-gray-900 text-base">{card.student.rollNumber}</p>
-            </div>
-            <div>
-              <p className="text-[10px] text-gray-400 uppercase tracking-wider font-medium">Father&apos;s / Guardian&apos;s Name</p>
-              <p className="font-medium text-gray-800">{card.student.parentName || '—'}</p>
-            </div>
-            <div>
-              <p className="text-[10px] text-gray-400 uppercase tracking-wider font-medium">Date of Birth</p>
-              <p className="font-medium text-gray-800">{formatDate(card.student.dateOfBirth || '')}</p>
+            <div className="text-right">
+              <p className="text-[8px] uppercase tracking-[0.2em] text-slate-400 font-medium">Examination</p>
+              <p className="text-lg font-bold text-amber-300 leading-tight">ADMIT CARD</p>
+              <p className="text-[9px] text-slate-400 font-mono">{card.cardNumber}</p>
             </div>
           </div>
         </div>
-      </div>
 
-      <div className="px-6">
-        <div className="h-px bg-gray-200" />
-      </div>
-
-      {/* ── Exam Schedule Table ── */}
-      <div className="px-6 py-3">
-        <h3 className="text-xs font-bold uppercase tracking-wider text-gray-500 mb-2 flex items-center gap-1.5">
-          <ClipboardList className="h-3.5 w-3.5" />
-          Examination Schedule
-        </h3>
-        <table className="w-full text-xs">
-          <thead>
-            <tr className="bg-slate-100 dark:bg-slate-800 rounded">
-              <th className="text-left py-1.5 px-2 font-semibold text-gray-600 rounded-tl-md">Date</th>
-              <th className="text-left py-1.5 px-2 font-semibold text-gray-600">Day</th>
-              <th className="text-left py-1.5 px-2 font-semibold text-gray-600">Subject</th>
-              <th className="text-center py-1.5 px-2 font-semibold text-gray-600">Time</th>
-              <th className="text-center py-1.5 px-2 font-semibold text-gray-600">Max Marks</th>
-              <th className="text-right py-1.5 px-2 font-semibold text-gray-600 rounded-tr-md">Pass Marks</th>
-            </tr>
-          </thead>
-          <tbody>
-            {card.exams.map((exam, idx) => {
-              const dayName = exam.date ? new Date(exam.date + 'T00:00:00').toLocaleDateString('en-IN', { weekday: 'short' }) : '';
-              return (
-                <tr key={exam.id} className={idx % 2 === 0 ? 'bg-white' : 'bg-gray-50/50'}>
-                  <td className="py-1.5 px-2 font-medium text-gray-800">
-                    {formatDate(exam.date)}
-                  </td>
-                  <td className="py-1.5 px-2 text-gray-500">
-                    {dayName}
-                  </td>
-                  <td className="py-1.5 px-2">
-                    <span className="font-semibold text-gray-800">{exam.subjectName}</span>
-                    <span className="text-gray-400 ml-1">({exam.subjectCode})</span>
-                  </td>
-                  <td className="py-1.5 px-2 text-center text-gray-700 font-mono">
-                    {formatTime(exam.startTime)} — {formatTime(exam.endTime)}
-                  </td>
-                  <td className="py-1.5 px-2 text-center font-bold text-gray-800">{exam.totalMarks}</td>
-                  <td className="py-1.5 px-2 text-right font-medium text-gray-600">{exam.passingMarks}</td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
-      </div>
-
-      {/* ── Instructions ── */}
-      <div className="px-6 py-2">
-        <div className="bg-amber-50 dark:bg-amber-900/10 rounded-lg p-3 border border-amber-200/50">
-          <h4 className="text-[10px] font-bold uppercase tracking-wider text-amber-700 dark:text-amber-500 mb-1.5">Instructions</h4>
-          <ul className="text-[10px] text-gray-600 dark:text-gray-400 space-y-0.5">
-            <li className="flex items-start gap-1"><span className="text-amber-500 font-bold">1.</span> Students must carry this admit card to the examination hall.</li>
-            <li className="flex items-start gap-1"><span className="text-amber-500 font-bold">2.</span> Report 15 minutes before the exam starts.</li>
-            <li className="flex items-start gap-1"><span className="text-amber-500 font-bold">3.</span> Carry your own pen, pencil, eraser, and other required stationery.</li>
-            <li className="flex items-start gap-1"><span className="text-amber-500 font-bold">4.</span> Mobile phones, calculators, and electronic devices are not allowed.</li>
-            <li className="flex items-start gap-1"><span className="text-amber-500 font-bold">5.</span> Any form of malpractice will result in disqualification.</li>
-          </ul>
+        {/* ── Academic Year Banner ── */}
+        <div className="bg-amber-500/5 border-b border-amber-400/20 px-5 py-1 flex items-center justify-between">
+          <p className="text-[10px] font-semibold text-amber-700 dark:text-amber-500">
+            <School className="h-2.5 w-2.5 inline mr-1" />
+            Class: {card.class.grade} — {card.class.name} ({card.class.section})
+          </p>
+          <p className="text-[10px] text-muted-foreground flex items-center gap-1">
+            <Calendar className="h-2.5 w-2.5" />
+            Session 2024-25
+          </p>
         </div>
-      </div>
 
-      {/* ── Signatures ── */}
-      <div className="px-6 pb-4 pt-2">
-        <div className="flex items-end justify-between gap-6">
-          <div className="text-center flex-1">
-            <div className="border-t-2 border-gray-300 pt-1 mt-10">
-              <p className="text-[10px] text-gray-500 font-medium">Class Teacher</p>
+        {/* ── Student Info Section ── */}
+        <div className="px-5 py-2">
+          <div className="flex gap-4">
+            <div className="shrink-0">
+              <div className="h-20 w-16 rounded border-2 border-dashed border-gray-300 bg-gray-50 flex flex-col items-center justify-center">
+                <span className="text-xl font-bold text-gray-300">{card.student.initials}</span>
+                <span className="text-[7px] text-gray-300 mt-0.5">PHOTO</span>
+              </div>
             </div>
-          </div>
-          <div className="text-center flex-1">
-            <div className="border-t-2 border-gray-300 pt-1 mt-10">
-              <p className="text-[10px] text-gray-500 font-medium">Parent / Guardian</p>
-            </div>
-          </div>
-          <div className="text-center flex-1">
-            <div className="border-t-2 border-gray-800 pt-1 mt-10">
-              <p className="text-[10px] text-gray-800 font-bold">Principal</p>
+
+            <div className="flex-1 grid grid-cols-2 gap-x-4 gap-y-1 text-xs">
+              <div>
+                <p className="text-[9px] text-gray-400 uppercase font-medium">Student Name</p>
+                <p className="font-bold text-gray-900 truncate">{card.student.name}</p>
+              </div>
+              <div>
+                <p className="text-[9px] text-gray-400 uppercase font-medium">Roll Number</p>
+                <p className="font-bold text-gray-900">{card.student.rollNumber}</p>
+              </div>
+              <div>
+                <p className="text-[9px] text-gray-400 uppercase font-medium">Guardian Name</p>
+                <p className="font-medium text-gray-800 truncate">{card.student.parentName || '—'}</p>
+              </div>
+              <div>
+                <p className="text-[9px] text-gray-400 uppercase font-medium">Class</p>
+                <p className="font-bold text-gray-900">{card.class.grade} - {card.class.name}</p>
+              </div>
+              <div>
+                <p className="text-[9px] text-gray-400 uppercase font-medium">D.O.B</p>
+                <p className="font-medium text-gray-800">{formatDate(card.student.dateOfBirth || '')}</p>
+              </div>
+              <div>
+                <p className="text-[9px] text-gray-400 uppercase font-medium">Section</p>
+                <p className="font-medium text-gray-800">{card.class.section}</p>
+              </div>
             </div>
           </div>
         </div>
+
+        {/* ── Exam Schedule Table ── */}
+        <div className="px-5 py-1">
+          <table className="w-full text-[10px]">
+            <thead>
+              <tr className="bg-slate-50 border-y border-slate-200">
+                <th className="text-left py-1 px-1.5 font-bold text-slate-700">Date/Day</th>
+                <th className="text-left py-1 px-1.5 font-bold text-slate-700">Subject</th>
+                <th className="text-center py-1 px-1.5 font-bold text-slate-700">Time</th>
+                <th className="text-right py-1 px-1.5 font-bold text-slate-700">Total/Pass</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-slate-100">
+              {card.exams.map((exam) => {
+                const dayName = exam.date ? new Date(exam.date + 'T00:00:00').toLocaleDateString('en-IN', { weekday: 'short' }) : '';
+                return (
+                  <tr key={exam.id}>
+                    <td className="py-1 px-1.5 font-medium text-slate-800">
+                      {formatDate(exam.date)} <span className="text-[8px] text-slate-400 ml-0.5">{dayName}</span>
+                    </td>
+                    <td className="py-1 px-1.5">
+                      <span className="font-bold text-slate-800">{exam.subjectName}</span>
+                      <span className="text-[8px] text-slate-400 ml-1">({exam.subjectCode})</span>
+                    </td>
+                    <td className="py-1 px-1.5 text-center font-mono text-slate-600">
+                      {formatTime(exam.startTime)} - {formatTime(exam.endTime)}
+                    </td>
+                    <td className="py-1 px-1.5 text-right font-medium text-slate-800">
+                      {exam.totalMarks} / {exam.passingMarks}
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
       </div>
 
-      {/* ── Footer ── */}
-      <div className="bg-gray-100 px-6 py-1.5 flex items-center justify-between text-[9px] text-gray-400">
-        <span>Generated: {new Date(card.generatedAt).toLocaleString('en-IN')}</span>
-        <span className="font-mono">{card.cardNumber}</span>
+      <div>
+        {/* ── Footer / Signatures ── */}
+        <div className="px-5 py-2 border-t border-dashed border-gray-200">
+          <div className="flex items-end justify-between gap-4">
+            <div className="text-center border-t border-gray-300 pt-0.5 mt-4 flex-1">
+              <p className="text-[8px] text-gray-500">Teacher</p>
+            </div>
+            <div className="text-center border-t border-gray-300 pt-0.5 mt-4 flex-1">
+              <p className="text-[8px] text-gray-500">Parent</p>
+            </div>
+            <div className="text-center border-t-2 border-slate-800 pt-0.5 mt-4 flex-1">
+              <p className="text-[9px] text-slate-800 font-bold">Principal</p>
+            </div>
+          </div>
+        </div>
+
+        {/* ── Bottom Strip ── */}
+        <div className="bg-gray-50 px-5 py-1 flex items-center justify-between text-[8px] text-gray-400">
+          <span>Printed: {new Date().toLocaleDateString('en-IN')}</span>
+          <span className="font-mono">{card.cardNumber}</span>
+        </div>
       </div>
     </div>
   );
@@ -447,12 +424,18 @@ export function AdminAdmitCards() {
 
       {/* Hidden Batch Print Container */}
       <div className="hidden">
-        <div ref={allCardsRef} className="p-8">
-          {admitCards.map((card, idx) => (
-            <div key={card.cardNumber} className={idx > 0 ? 'mt-8 pt-8 border-t-2 border-dashed border-gray-300 break-before-page' : ''}>
-              <AdmitCardVisual card={card} />
-            </div>
-          ))}
+        <div ref={allCardsRef} className="print:block p-0">
+          <div className="grid grid-cols-1 gap-0">
+            {admitCards.map((card, idx) => (
+              <div 
+                key={card.cardNumber} 
+                className={`flex items-center justify-center h-[14.85cm] ${idx % 2 === 1 ? 'border-t-2 border-dashed border-gray-300' : ''}`}
+                style={{ breakAfter: idx % 2 === 1 ? 'always' : 'auto' }}
+              >
+                <AdmitCardVisual card={card} />
+              </div>
+            ))}
+          </div>
         </div>
       </div>
 
@@ -711,6 +694,9 @@ export function AdminAdmitCards() {
               <FileText className="h-5 w-5 text-amber-600" />
               Admit Card — {viewCard?.student.name}
             </DialogTitle>
+            <DialogDescription className="sr-only">
+              View and print student admit cards.
+            </DialogDescription>
           </DialogHeader>
           {viewCard && (
             <div className="flex flex-col items-center gap-4">
