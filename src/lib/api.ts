@@ -1,13 +1,8 @@
 /**
  * Centralized API client — all requests go to ElysiaJS backend.
- *
- * Usage:
- *   import { api } from '@/lib/api'
- *   const data = await api.get('/students')
- *   const data = await api.post('/students', body)
- *   const data = await api.put('/students', body)
- *   const data = await api.del('/students?id=xxx')
  */
+
+import { triggerGlobalRefresh } from './query-client';
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api';
 
@@ -54,7 +49,9 @@ export const api = {
       body: body ? JSON.stringify(body) : undefined,
       keepalive: true,
     });
-    return handleResponse(res);
+    const result = await handleResponse(res);
+    triggerGlobalRefresh(path); // Intelligent refresh
+    return result;
   },
 
   put: async <T = any>(path: string, body?: unknown): Promise<T> => {
@@ -64,7 +61,9 @@ export const api = {
       body: body ? JSON.stringify(body) : undefined,
       keepalive: true,
     });
-    return handleResponse(res);
+    const result = await handleResponse(res);
+    triggerGlobalRefresh(path); // Intelligent refresh
+    return result;
   },
 
   patch: async <T = any>(path: string, body?: unknown): Promise<T> => {
@@ -74,7 +73,9 @@ export const api = {
       body: body ? JSON.stringify(body) : undefined,
       keepalive: true,
     });
-    return handleResponse(res);
+    const result = await handleResponse(res);
+    triggerGlobalRefresh(path); // Intelligent refresh
+    return result;
   },
 
   del: async <T = any>(path: string): Promise<T> => {
@@ -83,7 +84,9 @@ export const api = {
       headers: authHeaders(),
       keepalive: true,
     });
-    return handleResponse(res);
+    const result = await handleResponse(res);
+    triggerGlobalRefresh(path); // Intelligent refresh
+    return result;
   },
 
   /** Raw fetch for FormData uploads etc. */
@@ -96,7 +99,11 @@ export const api = {
         ...(init.headers || {}),
       },
     });
-    return handleResponse(res);
+    const result = await handleResponse(res);
+    if (init.method && ['POST', 'PUT', 'DELETE', 'PATCH'].includes(init.method.toUpperCase())) {
+      triggerGlobalRefresh(path);
+    }
+    return result;
   },
 };
 
@@ -112,18 +119,11 @@ export async function loginWithElysia(email: string, password: string) {
 
 /**
  * Drop-in replacement for fetch("/api/...").
- * Auto-prepends Elysia base URL and adds Bearer token.
- *
- * Migration:
- *   BEFORE: fetch("/api/students", { method: "POST", ... })
- *   AFTER:  apiFetch("/api/students", { method: "POST", ... })
  */
 export async function apiFetch(path: string, init?: RequestInit): Promise<Response> {
-  // Normalize path: strip leading /api and ensure it starts with /
   let cleanPath = path.startsWith('/api') ? path.slice(4) : path;
   if (!cleanPath.startsWith('/')) cleanPath = '/' + cleanPath;
   
-  // Normalize API_BASE: remove trailing slash if present
   const normalizedBase = API_BASE.endsWith('/') ? API_BASE.slice(0, -1) : API_BASE;
   const url = `${normalizedBase}${cleanPath}`;
 
@@ -133,7 +133,7 @@ export async function apiFetch(path: string, init?: RequestInit): Promise<Respon
     ...(token ? { Authorization: `Bearer ${token}` } : {}),
     ...(tenantId ? { 'x-tenant-id': tenantId } : {}),
   };
-  // Preserve Content-Type if set by caller, otherwise add JSON
+  
   if (init?.headers) {
     const initHeaders = init.headers as Record<string, string>;
     Object.assign(headers, initHeaders);
@@ -144,11 +144,15 @@ export async function apiFetch(path: string, init?: RequestInit): Promise<Respon
   return fetch(url, {
     ...init,
     headers,
+  }).then(async (res) => {
+    if (res.ok && init?.method && ['POST', 'PUT', 'DELETE', 'PATCH'].includes(init.method.toUpperCase())) {
+      triggerGlobalRefresh(path); // Intelligent refresh
+    }
+    return res;
   }).catch(err => {
     console.error(`Fetch failed for ${url}:`, err);
     throw err;
   });
 }
 
-/** Exported base URL for any files that need it */
 export { API_BASE };

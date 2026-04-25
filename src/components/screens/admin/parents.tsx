@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Search, Users, UserPlus } from "lucide-react";
@@ -46,17 +46,40 @@ export function AdminParents() {
   const [linking, setLinking] = useState(false);
 
   // Students for linking (filtered by class if selected) - Using optimized min-data REST API
-  const { data: studentData, isLoading: loadingStudents } = useQuery<{ items: StudentInfo[] }>({
+  const { 
+    data: studentData, 
+    isLoading: loadingStudents,
+    isFetching: fetchingStudents
+  } = useQuery({
     queryKey: ['students-min', selectedClass],
-    queryFn: () => {
-      const params: any = { mode: 'min', limit: '1000' };
-      if (selectedClass && selectedClass !== 'all') params.classId = selectedClass;
-      return api.get('/students', { params }) as any;
-    }
+    queryFn: async () => {
+      try {
+        const params: any = { mode: 'min', limit: '1000' };
+        if (selectedClass && selectedClass !== 'all') params.classId = selectedClass;
+        const res = await api.get('/students', { params });
+        // axios interceptor returns response.data directly
+        const data = res as any;
+        return (data?.items ? data : { items: [] }) as { items: StudentInfo[] };
+      } catch (err) {
+        console.error("Failed to fetch students for linking:", err);
+        return { items: [] } as { items: StudentInfo[] };
+      }
+    },
+    enabled: linkOpen,
+    staleTime: 30 * 60 * 1000,
+    gcTime: 60 * 60 * 1000,
+    refetchOnWindowFocus: false,
+    refetchOnMount: true
   });
 
 
-  const parents = parentsData?.parents || [];
+  const parents = useMemo(() => {
+    const list = parentsData?.parents || [];
+    return [...list].sort((a, b) => 
+      a.name.localeCompare(b.name, undefined, { numeric: true, sensitivity: 'base' })
+    );
+  }, [parentsData]);
+
   const students = studentData?.items || [];
   const classes = classesData?.classes || [];
   const loading = loadingParents;
@@ -87,9 +110,11 @@ export function AdminParents() {
   const filtered = parents; // GraphQL handle search now? Wait, no, let's keep frontend search for now if needed, or use useParents search
   // Actually, I'll use the search prop in useParents above.
 
-  const filteredStudents = students.filter(
-    (s) => !selectedParent?.children.some((c) => c.id === s.id)
-  );
+  const filteredStudents = useMemo(() => {
+    return students.filter(
+      (s) => !s.parentId && !selectedParent?.children.some((c) => c.id === s.id)
+    );
+  }, [students, selectedParent]);
 
   const handleCreate = async () => {
     if (!createForm.name || !createForm.email) {
@@ -130,7 +155,9 @@ export function AdminParents() {
             parentId: selectedParent.id,
             studentId,
           });
+          // Invalidate both parents and students-min cache to get fresh data
           queryClient.invalidateQueries({ queryKey: queryKeys.parents });
+          queryClient.invalidateQueries({ queryKey: ['students-min'] });
           return "Student linked successfully";
         } finally {
           setLinking(false);
@@ -152,7 +179,9 @@ export function AdminParents() {
           parentId,
           studentId,
         });
+        // Invalidate both parents and students-min cache to get fresh data
         queryClient.invalidateQueries({ queryKey: queryKeys.parents });
+        queryClient.invalidateQueries({ queryKey: ['students-min'] });
 
         // Force red pill morph
         throw new Error("Child record unlinked");
@@ -181,12 +210,24 @@ export function AdminParents() {
       toast.error("Name and email are required");
       return;
     }
+
+    // OPTIMISTIC UPDATE: Update the UI instantly
+    const updatedParent = { ...editingParent, ...editForm };
+    queryClient.setQueriesData({ queryKey: queryKeys.parents }, (old: any) => {
+      if (!old || !old.parents) return old;
+      return {
+        ...old,
+        parents: old.parents.map((p: any) => p.id === editingParent.id ? updatedParent : p)
+      };
+    });
+
     toast.promise(
       (async () => {
         setEditing(true);
         try {
           await api.put("/parents", { id: editingParent.id, ...editForm });
           setEditOpen(false);
+          // Refresh from server to ensure total accuracy
           queryClient.invalidateQueries({ queryKey: queryKeys.parents });
           return "Parent details updated";
         } finally {
@@ -264,7 +305,7 @@ export function AdminParents() {
             onLinkOpen={(p) => {
               setSelectedParent(p);
               setLinkOpen(true);
-              setSelectedClass("");
+              setSelectedClass("all");
             }}
             onUnlinkChild={handleUnlinkChild}
           />
@@ -307,6 +348,7 @@ export function AdminParents() {
         classes={classes}
         filteredStudents={filteredStudents}
         linking={linking}
+        loading={loadingStudents || fetchingStudents} // Show spinner on initial load AND class changes!
         onLinkChild={handleLinkChild}
         onUnlinkChild={handleUnlinkChild}
       />

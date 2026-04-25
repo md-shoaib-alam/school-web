@@ -52,7 +52,9 @@ export function EditParentDialog({
             <Label>Full Name *</Label>
             <Input
               value={editForm.name}
-              onChange={(e) => setEditForm({ ...editForm, name: e.target.value })}
+              onChange={(e) =>
+                setEditForm({ ...editForm, name: e.target.value })
+              }
               placeholder="e.g. Robert Anderson"
               className="mt-1.5"
             />
@@ -62,7 +64,9 @@ export function EditParentDialog({
             <Input
               type="email"
               value={editForm.email}
-              onChange={(e) => setEditForm({ ...editForm, email: e.target.value })}
+              onChange={(e) =>
+                setEditForm({ ...editForm, email: e.target.value })
+              }
               placeholder="parent@sigel.edu"
               className="mt-1.5"
             />
@@ -71,7 +75,9 @@ export function EditParentDialog({
             <Label>Phone</Label>
             <Input
               value={editForm.phone}
-              onChange={(e) => setEditForm({ ...editForm, phone: e.target.value })}
+              onChange={(e) =>
+                setEditForm({ ...editForm, phone: e.target.value })
+              }
               placeholder="555-0201"
               className="mt-1.5"
             />
@@ -80,7 +86,9 @@ export function EditParentDialog({
             <Label>Occupation</Label>
             <Input
               value={editForm.occupation}
-              onChange={(e) => setEditForm({ ...editForm, occupation: e.target.value })}
+              onChange={(e) =>
+                setEditForm({ ...editForm, occupation: e.target.value })
+              }
               placeholder="e.g. Engineer"
               className="mt-1.5"
             />
@@ -129,7 +137,9 @@ export function CreateParentDialog({
             <Label>Full Name *</Label>
             <Input
               value={createForm.name}
-              onChange={(e) => setCreateForm({ ...createForm, name: e.target.value })}
+              onChange={(e) =>
+                setCreateForm({ ...createForm, name: e.target.value })
+              }
               placeholder="e.g. Robert Anderson"
               className="mt-1.5"
             />
@@ -139,7 +149,9 @@ export function CreateParentDialog({
             <Input
               type="email"
               value={createForm.email}
-              onChange={(e) => setCreateForm({ ...createForm, email: e.target.value })}
+              onChange={(e) =>
+                setCreateForm({ ...createForm, email: e.target.value })
+              }
               placeholder="parent@sigel.edu"
               className="mt-1.5"
             />
@@ -149,7 +161,9 @@ export function CreateParentDialog({
             <Input
               type="password"
               value={createForm.password}
-              onChange={(e) => setCreateForm({ ...createForm, password: e.target.value })}
+              onChange={(e) =>
+                setCreateForm({ ...createForm, password: e.target.value })
+              }
               placeholder="Set login password (default: changeme123)"
               className="mt-1.5"
             />
@@ -158,7 +172,9 @@ export function CreateParentDialog({
             <Label>Phone</Label>
             <Input
               value={createForm.phone}
-              onChange={(e) => setCreateForm({ ...createForm, phone: e.target.value })}
+              onChange={(e) =>
+                setCreateForm({ ...createForm, phone: e.target.value })
+              }
               placeholder="555-0201"
               className="mt-1.5"
             />
@@ -167,7 +183,9 @@ export function CreateParentDialog({
             <Label>Occupation</Label>
             <Input
               value={createForm.occupation}
-              onChange={(e) => setCreateForm({ ...createForm, occupation: e.target.value })}
+              onChange={(e) =>
+                setCreateForm({ ...createForm, occupation: e.target.value })
+              }
               placeholder="e.g. Engineer"
               className="mt-1.5"
             />
@@ -194,6 +212,7 @@ interface LinkChildDialogProps {
   classes: { id: string; name: string; section: string }[];
   filteredStudents: StudentInfo[];
   linking: boolean;
+  loading?: boolean; // New prop
   onLinkChild: (studentId: string) => void;
   onUnlinkChild: (parentId: string, studentId: string) => void;
 }
@@ -207,6 +226,7 @@ export function LinkChildDialog({
   classes,
   filteredStudents,
   linking,
+  loading = false, // Default to false
   onLinkChild,
   onUnlinkChild,
 }: LinkChildDialogProps) {
@@ -216,8 +236,8 @@ export function LinkChildDialog({
         <DialogHeader>
           <DialogTitle>Link Child to {selectedParent?.name}</DialogTitle>
           <DialogDescription>
-            Select a student to link as a child. {selectedParent?.name} currently
-            has {selectedParent?.children.length} children.
+            Select a student to link as a child. {selectedParent?.name}{" "}
+            currently has {selectedParent?.children.length} children.
           </DialogDescription>
         </DialogHeader>
 
@@ -237,7 +257,9 @@ export function LinkChildDialog({
                     >
                       {child.name}
                       <button
-                        onClick={() => onUnlinkChild(selectedParent.id, child.id)}
+                        onClick={() =>
+                          onUnlinkChild(selectedParent.id, child.id)
+                        }
                         className="h-4 w-4 rounded-full hover:bg-emerald-200 dark:hover:bg-emerald-800 flex items-center justify-center transition-colors"
                         disabled={linking}
                       >
@@ -274,7 +296,12 @@ export function LinkChildDialog({
               <Label className="text-xs text-gray-500 dark:text-gray-400 mb-2 block font-semibold">
                 Available Students
               </Label>
-              {filteredStudents.length === 0 ? (
+              {loading ? (
+                <div className="text-center py-10">
+                  <Loader2 className="h-8 w-8 animate-spin mx-auto text-blue-500 mb-2" />
+                  <p className="text-sm text-gray-500">Searching for students...</p>
+                </div>
+              ) : filteredStudents.length === 0 ? (
                 <div className="text-center py-10 bg-gray-50 dark:bg-gray-900/20 rounded-xl border border-dashed border-gray-200 dark:border-gray-800">
                   <p className="text-gray-400 dark:text-gray-500 text-sm">
                     No unlinked students found
@@ -284,7 +311,7 @@ export function LinkChildDialog({
                   </p>
                 </div>
               ) : (
-                <div className="space-y-1.5">
+                <div className="space-y-1.5 max-h-96 overflow-y-auto pr-2">
                   {filteredStudents.map((student) => (
                     <div
                       key={student.id}

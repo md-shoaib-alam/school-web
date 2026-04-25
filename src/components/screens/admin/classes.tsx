@@ -2,7 +2,7 @@
 
 
 import { apiFetch } from "@/lib/api";
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -62,7 +62,12 @@ export function AdminClasses() {
   const { data: classesData, isLoading: classesLoading } = useClasses(currentTenantId || undefined);
   const { data: teachersData } = useTeachersMin(currentTenantId || undefined);
 
-  const classes = classesData?.classes || [];
+  const classes = useMemo(() => {
+    const list = classesData?.classes || [];
+    return [...list].sort((a, b) => 
+      a.name.localeCompare(b.name, undefined, { numeric: true, sensitivity: 'base' })
+    );
+  }, [classesData]);
   const teachers = teachersData?.teachers || [];
 
   // Only show full skeleton if we have NO data at all
@@ -134,14 +139,27 @@ export function AdminClasses() {
   };
 
   const handleEditClass = async () => {
+    const updatedClassData = {
+      ...editData,
+      capacity: parseInt(editData.capacity),
+    };
+
+    // OPTIMISTIC UPDATE: Update the UI instantly
+    queryClient.setQueryData(["classes", currentTenantId], (old: any) => {
+      if (!old || !old.classes) return old;
+      return {
+        ...old,
+        classes: old.classes.map((cls: any) => 
+          cls.id === editData.id ? { ...cls, ...updatedClassData } : cls
+        )
+      };
+    });
+
     const promise = (async () => {
       const res = await apiFetch("/api/classes", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          ...editData,
-          capacity: parseInt(editData.capacity),
-        }),
+        body: JSON.stringify(updatedClassData),
       });
       if (!res.ok) {
         const err = await res.json().catch(() => ({}));
@@ -162,7 +180,7 @@ export function AdminClasses() {
       setEditDialogOpen(false);
       await refetchClasses();
     } catch (err) {
-      // Error handled by toast.promise
+      // On error, the invalidation in refetchClasses will fix the UI
     } finally {
       setEditing(false);
     }
