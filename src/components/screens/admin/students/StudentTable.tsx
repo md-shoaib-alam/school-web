@@ -10,6 +10,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { motion, AnimatePresence } from "framer-motion";
 import {
   AlertDialog,
   AlertDialogContent,
@@ -66,22 +67,27 @@ export function StudentTable({
           </TableRow>
         </TableHeader>
         <TableBody>
-          {students.length === 0 ? (
-            <TableRow>
-              <TableCell
-                colSpan={canEdit || canDelete ? 7 : 6}
-                className="text-center py-12 text-muted-foreground"
-              >
-                <GraduationCap className="h-10 w-10 mx-auto mb-2 opacity-30" />
-                <p>No students found</p>
-              </TableCell>
-            </TableRow>
-          ) : (
-            students.map((student) => (
-              <TableRow
-                key={student.id}
-                className="hover:bg-emerald-50/50 dark:hover:bg-emerald-900/20 transition-colors"
-              >
+          <AnimatePresence mode="popLayout">
+            {students.length === 0 ? (
+              <TableRow>
+                <TableCell
+                  colSpan={canEdit || canDelete ? 7 : 6}
+                  className="text-center py-12 text-muted-foreground"
+                >
+                  <GraduationCap className="h-10 w-10 mx-auto mb-2 opacity-30" />
+                  <p>No students found</p>
+                </TableCell>
+              </TableRow>
+            ) : (
+              students.map((student) => (
+                <motion.tr
+                  key={student.id}
+                  layout
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, x: -20, transition: { duration: 0.2 } }}
+                  className="hover:bg-emerald-50/50 dark:hover:bg-emerald-900/20 transition-colors border-b last:border-none group/row"
+                >
                 <TableCell className="font-mono text-sm">
                   {student.rollNumber}
                 </TableCell>
@@ -171,9 +177,10 @@ export function StudentTable({
                     </div>
                   </TableCell>
                 )}
-              </TableRow>
-            ))
-          )}
+                </motion.tr>
+              ))
+            )}
+          </AnimatePresence>
         </TableBody>
       </Table>
     </div>

@@ -21,8 +21,12 @@ import {
   Eye,
   Activity,
   UserRound,
+  Copy,
+  Check,
 } from "lucide-react";
 import { PlatformUser, ROLE_CONFIG, PAGE_SIZE } from "./types";
+import { useState } from "react";
+import { AnimatePresence, motion } from "framer-motion";
 
 interface UserTableProps {
   loading: boolean;
@@ -45,6 +49,14 @@ export function UserTable({
   onUserClick,
   formatDate,
 }: UserTableProps) {
+  const [copiedId, setCopiedId] = useState<string | null>(null);
+
+  const handleCopy = (e: React.MouseEvent, email: string, id: string) => {
+    e.stopPropagation();
+    navigator.clipboard.writeText(email);
+    setCopiedId(id);
+    setTimeout(() => setCopiedId(null), 2000);
+  };
   
   const startItem = totalCount === 0 ? 0 : (currentPage - 1) * PAGE_SIZE + 1;
   const endItem = Math.min(currentPage * PAGE_SIZE, totalCount);
@@ -130,8 +142,9 @@ export function UserTable({
               </TableRow>
             </TableHeader>
             <TableBody>
+            <AnimatePresence mode="popLayout">
               {users.length === 0 ? (
-                <TableRow>
+                <TableRow key="empty">
                   <TableCell colSpan={7} className="text-center py-24 text-muted-foreground">
                     <Users className="h-16 w-16 mx-auto mb-6 opacity-10" />
                     <p className="text-xl font-black text-gray-900 dark:text-gray-100">No users found</p>
@@ -143,9 +156,13 @@ export function UserTable({
                   const roleConf = ROLE_CONFIG[user.role as keyof typeof ROLE_CONFIG] ?? ROLE_CONFIG.student;
                   const initials = (user.name || "").split(" ").map((n) => n?.[0] || "").join("").slice(0, 2).toUpperCase();
                   return (
-                    <TableRow
+                    <motion.tr
                       key={user.id}
-                      className="cursor-pointer transition-colors hover:bg-teal-50/30 dark:hover:bg-teal-900/10 border-b last:border-none"
+                      layout
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, x: -20, transition: { duration: 0.2 } }}
+                      className="cursor-pointer transition-colors hover:bg-teal-50/30 dark:hover:bg-teal-900/10 border-b last:border-none group/row"
                       onClick={() => onUserClick(user)}
                     >
                       <TableCell className="pl-6 py-4">
@@ -165,8 +182,22 @@ export function UserTable({
                           </div>
                         </div>
                       </TableCell>
-                      <TableCell className="hidden sm:table-cell py-4">
-                        <span className="text-xs font-bold text-muted-foreground truncate block max-w-[220px]">{user.email}</span>
+                      <TableCell className="hidden sm:table-cell py-4 group/row">
+                        <div className="flex items-center gap-2">
+                          <span className="text-xs font-bold text-muted-foreground truncate block max-w-[200px]">{user.email}</span>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className={`h-6 w-6 rounded-md shrink-0 transition-all hover:bg-teal-50 dark:hover:bg-teal-900/30 ${copiedId === user.id ? 'bg-emerald-50 dark:bg-emerald-900/20' : ''}`}
+                            onClick={(e) => handleCopy(e, user.email, user.id)}
+                          >
+                            {copiedId === user.id ? (
+                              <Check className="h-3 w-3 text-emerald-600" />
+                            ) : (
+                              <Copy className="h-3 w-3 text-muted-foreground" />
+                            )}
+                          </Button>
+                        </div>
                       </TableCell>
                       <TableCell className="py-4">
                         <Badge variant="outline" className={`gap-1.5 text-[9px] font-black uppercase tracking-widest px-2.5 h-6 border-transparent ${roleConf.bg} ${roleConf.color}`}>
@@ -210,11 +241,12 @@ export function UserTable({
                           <Eye className="h-4 w-4" />
                         </Button>
                       </TableCell>
-                    </TableRow>
+                    </motion.tr>
                   );
                 })
               )}
-            </TableBody>
+            </AnimatePresence>
+          </TableBody>
           </Table>
         </div>
 

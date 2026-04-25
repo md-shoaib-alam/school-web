@@ -5,6 +5,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Users, Search, Plus, Eye } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 import { goeyToast as toast } from "goey-toast";
 import { useModulePermissions } from "@/hooks/use-permissions";
 import { apiFetch } from "@/lib/api";
@@ -209,19 +210,28 @@ export function AdminTeachers() {
       ) : (
         <>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {teachers.map((teacher, index) => (
-              <TeacherCard
-                key={teacher.id}
-                teacher={teacher}
-                index={index}
-                canEdit={canEdit}
-                canDelete={canDelete}
-                deletingId={deletingId}
-                setDeletingId={setDeletingId}
-                onEdit={handleOpenEdit}
-                onDelete={handleDelete}
-              />
-            ))}
+            <AnimatePresence mode="popLayout">
+              {teachers.map((teacher, index) => (
+                <motion.div
+                  key={teacher.id}
+                  layout
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.8, transition: { duration: 0.2 } }}
+                >
+                  <TeacherCard
+                    teacher={teacher}
+                    index={index}
+                    canEdit={canEdit}
+                    canDelete={canDelete}
+                    deletingId={deletingId}
+                    setDeletingId={setDeletingId}
+                    onEdit={handleOpenEdit}
+                    onDelete={handleDelete}
+                  />
+                </motion.div>
+              ))}
+            </AnimatePresence>
           </div>
 
           {/* Pagination Controls */}

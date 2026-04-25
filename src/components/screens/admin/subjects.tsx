@@ -38,6 +38,17 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import { motion, AnimatePresence } from "framer-motion";
+import {
   BookOpen,
   Search,
   Plus,
@@ -105,6 +116,10 @@ export function AdminSubjects() {
   // Edit state
   const [editOpen, setEditOpen] = useState(false);
   const [editForm, setEditForm] = useState({ id: "", ...emptyForm });
+
+  // Delete state
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [deleteTarget, setDeleteTarget] = useState<SubjectInfo | null>(null);
 
   // TanStack Mutations
   const createMutation = useMutation({
@@ -233,25 +248,27 @@ export function AdminSubjects() {
     setEditOpen(true);
   };
 
-  const handleDelete = async (id: string) => {
-    if (confirm("Are you sure you want to delete this subject?")) {
-      const promise = (async () => {
-        await deleteMutation.mutateAsync(id);
-        // Force red pill morph
-        throw new Error("Subject record removed");
-      })();
-      
-      toast.promise(promise, {
-        loading: "Deleting subject...",
-        success: () => "",
-        error: (err: any) => err.message,
-      });
+  const handleDelete = async () => {
+    if (!deleteTarget) return;
 
-      try {
-        await promise;
-      } catch (err) {
-        // Error handled by toast.promise
-      }
+    const promise = (async () => {
+      await deleteMutation.mutateAsync(deleteTarget.id);
+      setDeleteDialogOpen(false);
+      setDeleteTarget(null);
+      // Force red pill morph
+      throw new Error("Subject record removed");
+    })();
+    
+    toast.promise(promise, {
+      loading: "Deleting subject...",
+      success: () => "",
+      error: (err: any) => err.message,
+    });
+
+    try {
+      await promise;
+    } catch (err) {
+      // Error handled by toast.promise
     }
   };
 
@@ -442,22 +459,27 @@ export function AdminSubjects() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {filtered.length === 0 ? (
-                    <TableRow>
-                      <TableCell
-                        colSpan={6}
-                        className="text-center py-12 text-muted-foreground"
-                      >
-                        <BookOpen className="h-10 w-10 mx-auto mb-2 opacity-30" />
-                        <p>No subjects found</p>
-                      </TableCell>
-                    </TableRow>
-                  ) : (
-                    filtered.map((subject) => (
-                      <TableRow
-                        key={subject.id}
-                        className="hover:bg-emerald-50/50 dark:hover:bg-emerald-900/20 transition-colors"
-                      >
+                  <AnimatePresence mode="popLayout">
+                    {filtered.length === 0 ? (
+                      <TableRow key="empty">
+                        <TableCell
+                          colSpan={6}
+                          className="text-center py-12 text-muted-foreground"
+                        >
+                          <BookOpen className="h-10 w-10 mx-auto mb-2 opacity-30" />
+                          <p>No subjects found</p>
+                        </TableCell>
+                      </TableRow>
+                    ) : (
+                      filtered.map((subject) => (
+                        <motion.tr
+                          key={subject.id}
+                          layout
+                          initial={{ opacity: 0, y: 10 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          exit={{ opacity: 0, x: -20, transition: { duration: 0.2 } }}
+                          className="hover:bg-emerald-50/50 dark:hover:bg-emerald-900/20 transition-colors border-b last:border-none"
+                        >
                         <TableCell>
                           <div className="flex items-center gap-3">
                             <div className="h-8 w-8 rounded-lg bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 flex items-center justify-center shrink-0">
@@ -523,21 +545,25 @@ export function AdminSubjects() {
                                 </Button>
                               )}
                               {canDelete && (
-                                <Button
-                                  variant="ghost"
-                                  size="icon"
-                                  className="h-8 w-8 text-red-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/30"
-                                  onClick={() => handleDelete(subject.id)}
-                                >
-                                  <Trash2 className="h-4 w-4" />
-                                </Button>
+                                  <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    className="h-8 w-8 text-red-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/30"
+                                    onClick={() => {
+                                      setDeleteTarget(subject);
+                                      setDeleteDialogOpen(true);
+                                    }}
+                                  >
+                                    <Trash2 className="h-4 w-4" />
+                                  </Button>
                               )}
                             </div>
                           )}
                         </TableCell>
-                      </TableRow>
-                    ))
-                  )}
+                        </motion.tr>
+                      ))
+                    )}
+                  </AnimatePresence>
                 </TableBody>
               </Table>
             </div>
@@ -578,6 +604,29 @@ export function AdminSubjects() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Delete Confirmation Dialog */}
+      <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Subject</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to delete{" "}
+              <strong>{deleteTarget?.name}</strong> ({deleteTarget?.code})? 
+              This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              className="bg-red-600 hover:bg-red-700 text-white"
+              onClick={handleDelete}
+            >
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

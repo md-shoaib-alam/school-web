@@ -19,9 +19,11 @@ import {
   UserCog,
   Shield,
   Loader2,
+  Copy,
+  Check,
 } from "lucide-react";
 import { PlatformUser, ROLE_CONFIG } from "./types";
-import React from "react";
+import React, { useState } from "react";
 
 interface UserDetailSheetProps {
   open: boolean;
@@ -108,7 +110,12 @@ export function UserDetailSheet({
               <h3 className="text-[10px] font-black uppercase tracking-widest text-muted-foreground mb-4">Core Information</h3>
               
               <InfoRow icon={<UserRound />} label="Full Name" value={user.name} />
-              <InfoRow icon={<Mail />} label="Email Address" value={user.email} />
+              <InfoRow 
+                icon={<Mail />} 
+                label="Email Address" 
+                value={user.email} 
+                canCopy={true}
+              />
               <InfoRow icon={<Phone />} label="Phone Number" value={user.phone || "Not provided"} />
               <InfoRow icon={<UserCog />} label="System Role" value={roleConf.label} />
             </div>
@@ -155,16 +162,41 @@ export function UserDetailSheet({
   );
 }
 
-function InfoRow({ icon, label, value }: any) {
+function InfoRow({ icon, label, value, canCopy }: any) {
+  const [copied, setCopied] = useState(false);
+
+  const handleCopy = () => {
+    navigator.clipboard.writeText(value);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
   return (
-    <div className="flex items-start gap-4 p-4 rounded-2xl hover:bg-gray-50/50 dark:hover:bg-gray-900/50 transition-colors">
-      <div className="h-8 w-8 rounded-lg bg-gray-100 dark:bg-gray-900 flex items-center justify-center shrink-0">
-        {React.cloneElement(icon, { className: "h-4 w-4 text-muted-foreground" })}
+    <div className="flex items-start justify-between group gap-4 p-4 rounded-2xl hover:bg-gray-50/50 dark:hover:bg-gray-900/50 transition-colors">
+      <div className="flex items-start gap-4 min-w-0">
+        <div className="h-8 w-8 rounded-lg bg-gray-100 dark:bg-gray-900 flex items-center justify-center shrink-0">
+          {React.cloneElement(icon, { className: "h-4 w-4 text-muted-foreground" })}
+        </div>
+        <div className="min-w-0">
+          <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground mb-0.5">{label}</p>
+          <p className="text-sm font-bold text-gray-900 dark:text-gray-100 truncate">{value}</p>
+        </div>
       </div>
-      <div className="min-w-0">
-        <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground mb-0.5">{label}</p>
-        <p className="text-sm font-bold text-gray-900 dark:text-gray-100 truncate">{value}</p>
-      </div>
+      
+      {canCopy && (
+        <Button
+          variant="ghost"
+          size="icon"
+          className={`h-8 w-8 rounded-lg shrink-0 transition-all hover:bg-gray-100 dark:hover:bg-gray-900 ${copied ? 'bg-emerald-50 dark:bg-emerald-900/20' : ''}`}
+          onClick={handleCopy}
+        >
+          {copied ? (
+            <Check className="h-3.5 w-3.5 text-emerald-600" />
+          ) : (
+            <Copy className="h-3.5 w-3.5 text-muted-foreground" />
+          )}
+        </Button>
+      )}
     </div>
   );
 }

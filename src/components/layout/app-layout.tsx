@@ -85,6 +85,19 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
     setSidebarOpen(false);
     const tenantIdentifier = currentTenantSlug || currentTenantId;
     
+    // For Super Admins, platform routes should always be at the top level (e.g. /users, /feature-flags)
+    // We only use the prefix if they are explicitly visiting a school's specific screen.
+    const isPlatformRoute = [
+      "dashboard", "tenants", "billing", "users", "audit-logs", 
+      "platform-analytics", "feature-flags", "roles", "staff", 
+      "manage-admins", "subscriptions", "settings"
+    ].includes(screen);
+
+    if (isSuperAdmin && isPlatformRoute) {
+      router.push(screen === "dashboard" ? "/" : `/${screen}`);
+      return;
+    }
+
     // Always use the full /[tenant]/[screen] pattern, except for root platform dashboard
     if (!tenantIdentifier) {
       router.push(screen === "dashboard" ? "/" : `/${screen}`);

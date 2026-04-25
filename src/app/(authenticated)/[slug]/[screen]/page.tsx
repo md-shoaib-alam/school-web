@@ -15,6 +15,7 @@ const StudentDashboard = dynamic(() => import('@/components/screens/student/dash
 const ParentDashboard = dynamic(() => import('@/components/screens/parent/dashboard').then(m => m.ParentDashboard), { loading: LoadingScreen });
 const StaffDashboard = dynamic(() => import('@/components/screens/staff/dashboard').then(m => m.StaffDashboard), { loading: LoadingScreen });
 const AdminDashboard = dynamic(() => import('@/components/screens/admin/dashboard').then(m => m.AdminDashboard), { loading: LoadingScreen });
+const SuperAdminDashboard = dynamic(() => import('@/components/screens/super-admin/dashboard').then(m => m.SuperAdminDashboard), { loading: LoadingScreen });
 const AdminStudents = dynamic(() => import('@/components/screens/admin/students').then(m => m.AdminStudents), { loading: LoadingScreen });
 const AdminTeachers = dynamic(() => import('@/components/screens/admin/teachers').then(m => m.AdminTeachers), { loading: LoadingScreen });
 const AdminParents = dynamic(() => import('@/components/screens/admin/parents').then(m => m.AdminParents), { loading: LoadingScreen });
@@ -79,7 +80,9 @@ export default function TenantScreenDispatcher() {
   
   if (currentUser.role === 'super_admin' || currentUser.role === 'admin' || currentUser.role === 'staff') {
     switch (screen) {
-      case 'dashboard': return currentUser.role === 'staff' ? <StaffDashboard /> : <AdminDashboard />;
+      case 'dashboard': 
+        if (currentUser.role === 'super_admin' && slug === 'tenants') return <SuperAdminDashboard />;
+        return currentUser.role === 'staff' ? <StaffDashboard /> : <AdminDashboard />;
       case 'students': return <AdminStudents />;
       case 'teachers': return <AdminTeachers />;
       case 'parents': return <AdminParents />;

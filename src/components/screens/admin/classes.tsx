@@ -46,6 +46,7 @@ import {
   Loader2,
   Eye,
 } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 import { goeyToast as toast } from "goey-toast";
 import type { ClassInfo } from "@/lib/types";
 import { useModulePermissions } from "@/hooks/use-permissions";
@@ -390,108 +391,115 @@ export function AdminClasses() {
         </Card>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-          {classes.map((cls) => {
-            const percentage =
-              cls.capacity > 0
-                ? Math.round((cls.studentCount / cls.capacity) * 100)
-                : 0;
-            const colorClass =
-              gradeColors[cls.grade] ||
-              "bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 border-gray-200 dark:border-gray-700";
+          <AnimatePresence mode="popLayout">
+            {classes.map((cls) => {
+              const percentage =
+                cls.capacity > 0
+                  ? Math.round((cls.studentCount / cls.capacity) * 100)
+                  : 0;
+              const colorClass =
+                gradeColors[cls.grade] ||
+                "bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 border-gray-200 dark:border-gray-700";
 
-            return (
-              <Card
-                key={cls.id}
-                className="hover:shadow-md transition-all duration-200 hover:-translate-y-0.5 relative"
-              >
-                <CardContent className="p-6">
-                  {/* Action buttons - top right */}
-                  {(canEdit || canDelete) && (
-                    <div className="absolute top-3 right-3 flex items-center gap-1">
-                      {canEdit && (
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="h-7 w-7 text-muted-foreground hover:text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-900/30"
-                          onClick={() => openEditDialog(cls)}
-                        >
-                          <Pencil className="h-3.5 w-3.5" />
-                        </Button>
+              return (
+                <motion.div
+                  key={cls.id}
+                  layout
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.8, transition: { duration: 0.2 } }}
+                >
+                  <Card className="hover:shadow-md transition-all duration-200 hover:-translate-y-0.5 relative">
+                    <CardContent className="p-6">
+                      {/* Action buttons - top right */}
+                      {(canEdit || canDelete) && (
+                        <div className="absolute top-3 right-3 flex items-center gap-1">
+                          {canEdit && (
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-7 w-7 text-muted-foreground hover:text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-900/30"
+                              onClick={() => openEditDialog(cls)}
+                            >
+                              <Pencil className="h-3.5 w-3.5" />
+                            </Button>
+                          )}
+                          {canDelete && (
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-7 w-7 text-muted-foreground hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/30"
+                              onClick={() => {
+                                setDeleteTarget(cls);
+                                setDeleteDialogOpen(true);
+                              }}
+                            >
+                              <Trash2 className="h-3.5 w-3.5" />
+                            </Button>
+                          )}
+                        </div>
                       )}
-                      {canDelete && (
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="h-7 w-7 text-muted-foreground hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/30"
-                          onClick={() => {
-                            setDeleteTarget(cls);
-                            setDeleteDialogOpen(true);
-                          }}
+
+                      {/* Class name and grade badge */}
+                      <div className="flex items-start justify-between mb-4 pr-16">
+                        <div>
+                          <h3 className="text-lg font-bold text-gray-900 dark:text-gray-100">
+                            {cls.name}
+                          </h3>
+                          <p className="text-sm text-muted-foreground">
+                            Section {cls.section}
+                          </p>
+                        </div>
+                        <Badge
+                          variant="outline"
+                          className={`text-xs ${colorClass}`}
                         >
-                          <Trash2 className="h-3.5 w-3.5" />
-                        </Button>
-                      )}
-                    </div>
-                  )}
-
-                  {/* Class name and grade badge */}
-                  <div className="flex items-start justify-between mb-4 pr-16">
-                    <div>
-                      <h3 className="text-lg font-bold text-gray-900 dark:text-gray-100">
-                        {cls.name}
-                      </h3>
-                      <p className="text-sm text-muted-foreground">
-                        Section {cls.section}
-                      </p>
-                    </div>
-                    <Badge
-                      variant="outline"
-                      className={`text-xs ${colorClass}`}
-                    >
-                      Grade {cls.grade}
-                    </Badge>
-                  </div>
-
-                  {/* Stats */}
-                  <div className="grid grid-cols-2 gap-3 mb-4">
-                    <div className="flex items-center gap-2 text-sm">
-                      <Users className="h-4 w-4 text-emerald-500" />
-                      <div>
-                        <span className="font-semibold">
-                          {cls.studentCount}
-                        </span>
-                        <span className="text-muted-foreground">
-                          /{cls.capacity}
-                        </span>
+                          Grade {cls.grade}
+                        </Badge>
                       </div>
-                    </div>
-                    <div className="flex items-center gap-2 text-sm">
-                      <UserCheck className="h-4 w-4 text-blue-500" />
-                      <span className="text-muted-foreground truncate">
-                        {cls.classTeacher}
-                      </span>
-                    </div>
-                  </div>
 
-                  {/* Progress bar */}
-                  <div className="space-y-1.5">
-                    <div className="flex items-center justify-between text-xs">
-                      <span className="text-muted-foreground">Capacity</span>
-                      <span
-                        className={`font-medium ${percentage >= 90 ? "text-red-600 dark:text-red-400" : "text-emerald-600 dark:text-emerald-400"}`}
-                      >
-                        {percentage}%
-                      </span>
-                    </div>
-                    <Progress
-                      value={percentage}
-                      className={`h-2 ${getProgressColor(percentage)}`}
-                    />
-                  </div>
-                </CardContent>
-              </Card>
-            );
-          })}
+                      {/* Stats */}
+                      <div className="grid grid-cols-2 gap-3 mb-4">
+                        <div className="flex items-center gap-2 text-sm">
+                          <Users className="h-4 w-4 text-emerald-500" />
+                          <div>
+                            <span className="font-semibold">
+                              {cls.studentCount}
+                            </span>
+                            <span className="text-muted-foreground">
+                              /{cls.capacity}
+                            </span>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-2 text-sm">
+                          <UserCheck className="h-4 w-4 text-blue-500" />
+                          <span className="text-muted-foreground truncate">
+                            {cls.classTeacher}
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* Progress bar */}
+                      <div className="space-y-1.5">
+                        <div className="flex items-center justify-between text-xs">
+                          <span className="text-muted-foreground">Capacity</span>
+                          <span
+                            className={`font-medium ${percentage >= 90 ? "text-red-600 dark:text-red-400" : "text-emerald-600 dark:text-emerald-400"}`}
+                          >
+                            {percentage}%
+                          </span>
+                        </div>
+                        <Progress
+                          value={percentage}
+                          className={`h-2 ${getProgressColor(percentage)}`}
+                        />
+                      </div>
+                    </CardContent>
+                  </Card>
+                </motion.div>
+              );
+            })}
+          </AnimatePresence>
         </div>
       )}
 
