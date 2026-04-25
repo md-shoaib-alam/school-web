@@ -123,6 +123,7 @@ export function AdminTeachers() {
           setEditingTeacher(null);
           setFormData(emptyFormData);
           queryClient.invalidateQueries({ queryKey: queryKeys.teachers });
+          queryClient.invalidateQueries({ queryKey: ['admin-dashboard', currentTenantId] });
           return isEdit ? "Teacher updated" : "Teacher added";
         } finally {
           setSubmitting(false);
@@ -146,8 +147,8 @@ export function AdminTeachers() {
           const err = await res.json().catch(() => ({}));
           throw new Error(err.error || "Deletion failed");
         }
-
         queryClient.invalidateQueries({ queryKey: queryKeys.teachers });
+        queryClient.invalidateQueries({ queryKey: ['admin-dashboard', currentTenantId] });
         setDeletingId(null);
 
         // We throw a "success" message to force a RED morphing pill for deletion

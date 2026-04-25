@@ -141,7 +141,9 @@ export function AdminStudents() {
           }
 
           setDialogOpen(false);
+          // Invalidate both students and dashboard to show fresh data everywhere
           queryClient.invalidateQueries({ queryKey: queryKeys.students });
+          queryClient.invalidateQueries({ queryKey: ['admin-dashboard', currentTenantId] });
           return isCreate ? "Student registered successfully" : "Student details updated";
         } finally {
           setSubmitting(false);
@@ -166,6 +168,7 @@ export function AdminStudents() {
         
         // Refresh from server
         queryClient.invalidateQueries({ queryKey: queryKeys.students });
+        queryClient.invalidateQueries({ queryKey: ['admin-dashboard', currentTenantId] });
         
         // Force a RED morphing pill for deletion
         throw new Error("Student record removed");
