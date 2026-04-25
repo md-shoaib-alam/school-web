@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { QueryClient, QueryClientProvider, MutationCache } from "@tanstack/react-query";
 import { persistQueryClient } from "@tanstack/react-query-persist-client";
 import { createSyncStoragePersister } from "@tanstack/query-sync-storage-persister";
 import { GooeyToaster } from "goey-toast";
@@ -11,6 +11,17 @@ export function Providers({ children }: { children: React.ReactNode }) {
   const [queryClient] = useState(
     () =>
       new QueryClient({
+        mutationCache: new MutationCache({
+          onSuccess: (_data, _variables, _context, mutation) => {
+            // Automatically invalidate the dashboard whenever ANY change happens
+            queryClient.invalidateQueries({ queryKey: ['admin-dashboard'] });
+            
+            // If the mutation has a meta property with a custom key to invalidate, do that too
+            if (mutation.meta?.invalidates) {
+              queryClient.invalidateQueries({ queryKey: mutation.meta.invalidates as any[] });
+            }
+          },
+        }),
         defaultOptions: {
           queries: {
             staleTime: 5 * 60 * 1000, // 5 minutes
