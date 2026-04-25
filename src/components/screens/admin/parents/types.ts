@@ -25,6 +25,7 @@ export interface StudentInfo {
   rollNumber: string;
   className: string;
   classId: string;
+  parentId?: string | null;
 }
 
 export const AVATAR_COLORS = [

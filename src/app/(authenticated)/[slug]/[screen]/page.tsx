@@ -74,7 +74,16 @@ export default function TenantScreenDispatcher() {
   if (!currentUser) return null;
 
   // Verify that the slug matches the user's tenant (security check)
+  console.log('[TenantScreenDispatcher]', {
+    slug,
+    screen,
+    tenantId: currentUser?.tenantId,
+    tenantSlug: currentUser?.tenantSlug,
+    role: currentUser?.role
+  });
+
   if (currentUser.role !== 'super_admin' && currentUser.tenantId !== slug && currentUser.tenantSlug !== slug) {
+    console.log('[TenantScreenDispatcher] SHOWING 404 - slug mismatch');
     return <NotFoundScreen />;
   }
   

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -72,7 +72,12 @@ export function AdminStudents() {
 
   const { data: classesData } = useClassesMin(currentTenantId || undefined);
 
-  const students = studentData?.students || [];
+  const students = useMemo(() => {
+    const list = studentData?.students || [];
+    return [...list].sort((a, b) => 
+      a.name.localeCompare(b.name, undefined, { numeric: true, sensitivity: 'base' })
+    );
+  }, [studentData]);
   const totalItems = studentData?.total || 0;
   const totalPages = studentData?.totalPages || 1;
   const classes = classesData?.classes || [];
@@ -122,6 +127,18 @@ export function AdminStudents() {
   const handleSubmit = async () => {
     const isCreate = dialogMode === "create";
     
+    // OPTIMISTIC UPDATE: Update the UI instantly if editing
+    if (!isCreate && editingStudent) {
+      const updatedStudent = { ...editingStudent, ...formData };
+      queryClient.setQueriesData({ queryKey: queryKeys.students }, (old: any) => {
+        if (!old || !old.students) return old;
+        return {
+          ...old,
+          students: old.students.map((s: any) => s.id === editingStudent.id ? updatedStudent : s)
+        };
+      });
+    }
+
     toast.promise(
       (async () => {
         setSubmitting(true);
@@ -144,6 +161,7 @@ export function AdminStudents() {
           }
 
           setDialogOpen(false);
+          // Refresh from server to ensure total accuracy
           queryClient.invalidateQueries({ queryKey: queryKeys.students });
           return isCreate ? "Student registered successfully" : "Student details updated";
         } finally {

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -48,7 +48,12 @@ export function AdminTeachers() {
     12, // ITEMS_PER_PAGE
   );
 
-  const teachers = teachersData?.teachers || [];
+  const teachers = useMemo(() => {
+    const list = teachersData?.teachers || [];
+    return [...list].sort((a, b) => 
+      a.name.localeCompare(b.name, undefined, { numeric: true, sensitivity: 'base' })
+    );
+  }, [teachersData]);
   const totalItems = teachersData?.total || 0;
   const totalPages = teachersData?.totalPages || 1;
 
@@ -95,11 +100,25 @@ export function AdminTeachers() {
       toast.error("Name and Email are required");
       return;
     }
+
+    const isEdit = !!editingTeacher;
+
+    // OPTIMISTIC UPDATE: Update the UI instantly if editing
+    if (isEdit && editingTeacher) {
+      const updatedTeacher = { ...editingTeacher, ...formData };
+      queryClient.setQueriesData({ queryKey: queryKeys.teachers }, (old: any) => {
+        if (!old || !old.teachers) return old;
+        return {
+          ...old,
+          teachers: old.teachers.map((t: any) => t.id === editingTeacher.id ? updatedTeacher : t)
+        };
+      });
+    }
+
     toast.promise(
       (async () => {
         setSubmitting(true);
         try {
-          const isEdit = !!editingTeacher;
           const url = "/api/teachers";
           const method = isEdit ? "PUT" : "POST";
           const body = isEdit

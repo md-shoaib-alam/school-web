@@ -87,7 +87,7 @@ export function AdminSubjects() {
       const res = await apiFetch("/api/subjects");
       if (!res.ok) return [];
       return res.json();
-    }
+    },
   });
 
   const { data: classes = [], isLoading: classesLoading } = useQuery({
@@ -96,7 +96,7 @@ export function AdminSubjects() {
       const res = await apiFetch("/api/classes?mode=min");
       if (!res.ok) return [];
       return res.json();
-    }
+    },
   });
 
   const { data: teachers = [], isLoading: teachersLoading } = useQuery({
@@ -105,7 +105,7 @@ export function AdminSubjects() {
       const res = await apiFetch("/api/teachers?mode=min");
       if (!res.ok) return [];
       return res.json();
-    }
+    },
   });
 
   const [search, setSearch] = useState("");
@@ -134,7 +134,7 @@ export function AdminSubjects() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["subjects"] });
-    }
+    },
   });
 
   const updateMutation = useMutation({
@@ -149,7 +149,7 @@ export function AdminSubjects() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["subjects"] });
-    }
+    },
   });
 
   const deleteMutation = useMutation({
@@ -165,11 +165,13 @@ export function AdminSubjects() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["subjects"] });
-    }
+    },
   });
 
   // Only show full skeleton if we have NO data at all
-  const loading = (subjectsLoading && subjects.length === 0) || (classesLoading && classes.length === 0);
+  const loading =
+    (subjectsLoading && subjects.length === 0) ||
+    (classesLoading && classes.length === 0);
 
   const filtered = (subjects as SubjectInfo[]).filter((s: SubjectInfo) => {
     const matchesSearch =
@@ -190,9 +192,9 @@ export function AdminSubjects() {
       return;
     }
 
-    const promise = createMutation.mutateAsync({ 
-      ...form, 
-      teacherId: form.teacherId || null 
+    const promise = createMutation.mutateAsync({
+      ...form,
+      teacherId: form.teacherId || null,
     });
 
     toast.promise(promise, {
@@ -216,10 +218,29 @@ export function AdminSubjects() {
       return;
     }
     const { id, ...data } = editForm;
-    const promise = updateMutation.mutateAsync({ 
-      id, 
-      ...data, 
-      teacherId: data.teacherId || null 
+
+    // OPTIMISTIC UPDATE: Update the UI instantly
+    const selectedClass = classes.find((c) => c.id === data.classId);
+    const selectedTeacher = teachers.find((t) => t.id === data.teacherId);
+
+    const updatedSubject = {
+      id,
+      ...data,
+      className: selectedClass
+        ? `${selectedClass.name} - ${selectedClass.section}`
+        : "",
+      teacherName: selectedTeacher ? selectedTeacher.name : "Not Assigned",
+    };
+
+    queryClient.setQueryData(["subjects", currentTenantId], (old: any) => {
+      if (!old) return old;
+      return old.map((s: any) => (s.id === id ? updatedSubject : s));
+    });
+
+    const promise = updateMutation.mutateAsync({
+      id,
+      ...data,
+      teacherId: data.teacherId || null,
     });
 
     toast.promise(promise, {
@@ -233,7 +254,7 @@ export function AdminSubjects() {
       setEditOpen(false);
       setEditForm({ id: "", ...emptyForm });
     } catch (err) {
-      // Error handled by toast.promise
+      // On error, the invalidation in onSuccess will fix the UI
     }
   };
 
@@ -258,7 +279,7 @@ export function AdminSubjects() {
       // Force red pill morph
       throw new Error("Subject record removed");
     })();
-    
+
     toast.promise(promise, {
       loading: "Deleting subject...",
       success: () => "",
@@ -317,13 +338,18 @@ export function AdminSubjects() {
         <Label>Teacher (optional)</Label>
         <Select
           value={value.teacherId}
-          onValueChange={(v) => onChange({ ...value, teacherId: v === "none" ? "" : v })}
+          onValueChange={(v) =>
+            onChange({ ...value, teacherId: v === "none" ? "" : v })
+          }
         >
           <SelectTrigger className="mt-1.5">
             <SelectValue placeholder="Select teacher" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="none" className="text-muted-foreground italic font-semibold">
+            <SelectItem
+              value="none"
+              className="text-muted-foreground italic font-semibold"
+            >
               None (Unassigned)
             </SelectItem>
             {(teachers || []).map((t) => (
@@ -477,74 +503,78 @@ export function AdminSubjects() {
                           layout
                           initial={{ opacity: 0, y: 10 }}
                           animate={{ opacity: 1, y: 0 }}
-                          exit={{ opacity: 0, x: -20, transition: { duration: 0.2 } }}
+                          exit={{
+                            opacity: 0,
+                            x: -20,
+                            transition: { duration: 0.2 },
+                          }}
                           className="hover:bg-emerald-50/50 dark:hover:bg-emerald-900/20 transition-colors border-b last:border-none"
                         >
-                        <TableCell>
-                          <div className="flex items-center gap-3">
-                            <div className="h-8 w-8 rounded-lg bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 flex items-center justify-center shrink-0">
-                              <BookOpen className="h-4 w-4" />
-                            </div>
-                            <span className="font-medium text-sm">
-                              {subject.name}
-                            </span>
-                          </div>
-                        </TableCell>
-                        <TableCell>
-                          <code className="px-2 py-0.5 rounded bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 text-xs font-mono">
-                            {subject.code}
-                          </code>
-                        </TableCell>
-                        <TableCell className="hidden sm:table-cell">
-                          <Badge variant="outline" className="font-normal">
-                            {subject.className}
-                          </Badge>
-                        </TableCell>
-                        <TableCell className="hidden md:table-cell text-sm">
-                          {subject.teacherName &&
-                          subject.teacherName !== "Not Assigned" ? (
-                            <div className="flex items-center gap-2">
-                              <div className="h-6 w-6 rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 flex items-center justify-center text-[10px] font-bold">
-                                {subject.teacherName
-                                  .split(" ")
-                                  .map((n) => n[0])
-                                  .join("")
-                                  .slice(0, 2)}
+                          <TableCell>
+                            <div className="flex items-center gap-3">
+                              <div className="h-8 w-8 rounded-lg bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 flex items-center justify-center shrink-0">
+                                <BookOpen className="h-4 w-4" />
                               </div>
-                              {subject.teacherName}
+                              <span className="font-medium text-sm">
+                                {subject.name}
+                              </span>
                             </div>
-                          ) : (
-                            <span className="text-muted-foreground">
-                              Not Assigned
-                            </span>
-                          )}
-                        </TableCell>
-                        <TableCell className="text-center">
-                          {subject.teacherName &&
-                          subject.teacherName !== "Not Assigned" ? (
-                            <Badge className="bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800 text-[10px]">
-                              Active
+                          </TableCell>
+                          <TableCell>
+                            <code className="px-2 py-0.5 rounded bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 text-xs font-mono">
+                              {subject.code}
+                            </code>
+                          </TableCell>
+                          <TableCell className="hidden sm:table-cell">
+                            <Badge variant="outline" className="font-normal">
+                              {subject.className}
                             </Badge>
-                          ) : (
-                            <Badge className="bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 border-amber-200 dark:border-amber-800 text-[10px]">
-                              Unassigned
-                            </Badge>
-                          )}
-                        </TableCell>
-                        <TableCell>
-                          {(canEdit || canDelete) && (
-                            <div className="flex items-center justify-center gap-1">
-                              {canEdit && (
-                                <Button
-                                  variant="ghost"
-                                  size="icon"
-                                  className="h-8 w-8 text-muted-foreground hover:text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-900/30"
-                                  onClick={() => openEditDialog(subject)}
-                                >
-                                  <Pencil className="h-4 w-4" />
-                                </Button>
-                              )}
-                              {canDelete && (
+                          </TableCell>
+                          <TableCell className="hidden md:table-cell text-sm">
+                            {subject.teacherName &&
+                            subject.teacherName !== "Not Assigned" ? (
+                              <div className="flex items-center gap-2">
+                                <div className="h-6 w-6 rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 flex items-center justify-center text-[10px] font-bold">
+                                  {subject.teacherName
+                                    .split(" ")
+                                    .map((n) => n[0])
+                                    .join("")
+                                    .slice(0, 2)}
+                                </div>
+                                {subject.teacherName}
+                              </div>
+                            ) : (
+                              <span className="text-muted-foreground">
+                                Not Assigned
+                              </span>
+                            )}
+                          </TableCell>
+                          <TableCell className="text-center">
+                            {subject.teacherName &&
+                            subject.teacherName !== "Not Assigned" ? (
+                              <Badge className="bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800 text-[10px]">
+                                Active
+                              </Badge>
+                            ) : (
+                              <Badge className="bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 border-amber-200 dark:border-amber-800 text-[10px]">
+                                Unassigned
+                              </Badge>
+                            )}
+                          </TableCell>
+                          <TableCell>
+                            {(canEdit || canDelete) && (
+                              <div className="flex items-center justify-center gap-1">
+                                {canEdit && (
+                                  <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    className="h-8 w-8 text-muted-foreground hover:text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-900/30"
+                                    onClick={() => openEditDialog(subject)}
+                                  >
+                                    <Pencil className="h-4 w-4" />
+                                  </Button>
+                                )}
+                                {canDelete && (
                                   <Button
                                     variant="ghost"
                                     size="icon"
@@ -556,10 +586,10 @@ export function AdminSubjects() {
                                   >
                                     <Trash2 className="h-4 w-4" />
                                   </Button>
-                              )}
-                            </div>
-                          )}
-                        </TableCell>
+                                )}
+                              </div>
+                            )}
+                          </TableCell>
                         </motion.tr>
                       ))
                     )}
@@ -612,8 +642,8 @@ export function AdminSubjects() {
             <AlertDialogTitle>Delete Subject</AlertDialogTitle>
             <AlertDialogDescription>
               Are you sure you want to delete{" "}
-              <strong>{deleteTarget?.name}</strong> ({deleteTarget?.code})? 
-              This action cannot be undone.
+              <strong>{deleteTarget?.name}</strong> ({deleteTarget?.code})? This
+              action cannot be undone.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

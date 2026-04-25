@@ -5,6 +5,8 @@ import {
   useGraphQLMutation,
   useAssignRoleToUser,
 } from "@/lib/graphql/hooks";
+import { useQueryClient } from "@tanstack/react-query";
+import { queryKeys } from "@/lib/graphql/keys";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -66,6 +68,7 @@ const DELETE_USER = `
 export function AdminStaff() {
   const { currentTenantId } = useAppStore();
   const { canCreate, canEdit, canDelete } = useModulePermissions("staff");
+  const queryClient = useQueryClient();
   const [search, setSearch] = useState("");
 
   // --- Queries ---
@@ -124,6 +127,21 @@ export function AdminStaff() {
     setSubmitting(true);
     try {
       if (editingMember) {
+        // OPTIMISTIC UPDATE: Update the UI instantly
+        const updatedStaff = { 
+          ...editingMember, 
+          ...formData,
+          customRole: roles.find(r => r.id === formData.customRoleId) || editingMember.customRole
+        };
+        
+        queryClient.setQueryData(["staff", currentTenantId, "staff"], (old: any) => {
+          if (!old || !old.staff) return old;
+          return {
+            ...old,
+            staff: old.staff.map((m: any) => m.id === editingMember.id ? updatedStaff : m)
+          };
+        });
+
         // Update user
         await updateUser({
           id: editingMember.id,
@@ -190,13 +208,19 @@ export function AdminStaff() {
 
   // --- Derived ---
   const staff = useMemo(() => {
-    const list = (staffResponse?.staff || []) as StaffMember[];
+    let list = (staffResponse?.staff || []) as StaffMember[];
+    
+    // 🔡 Sort alphabetically (Natural Sort: 1, 2, 10)
+    list = [...list].sort((a, b) => 
+      a.name.localeCompare(b.name, undefined, { numeric: true, sensitivity: 'base' })
+    );
+
     if (!search) return list;
     const s = search.toLowerCase();
     return list.filter(m => 
       m.name.toLowerCase().includes(s) || 
       m.email.toLowerCase().includes(s) ||
-      m.customRole?.name.toLowerCase().includes(s)
+      (m.customRole?.name || "").toLowerCase().includes(s)
     );
   }, [staffResponse, search]);
 

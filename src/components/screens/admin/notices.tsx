@@ -1,7 +1,7 @@
 "use client";
 
 import { apiFetch } from "@/lib/api";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import {
   Card,
   CardContent,
@@ -131,14 +131,16 @@ export function AdminNotices() {
   // Delete
   const [deleting, setDeleting] = useState(false);
 
-  const filtered = notices.filter((n) => {
-    const matchSearch =
-      n.title.toLowerCase().includes(search.toLowerCase()) ||
-      n.content.toLowerCase().includes(search.toLowerCase());
-    const matchPriority =
-      priorityFilter === "all" || n.priority === priorityFilter;
-    return matchSearch && matchPriority;
-  });
+  const filtered = useMemo(() => {
+    return notices.filter((n) => {
+      const matchSearch =
+        n.title.toLowerCase().includes(search.toLowerCase()) ||
+        n.content.toLowerCase().includes(search.toLowerCase());
+      const matchPriority =
+        priorityFilter === "all" || n.priority === priorityFilter;
+      return matchSearch && matchPriority;
+    });
+  }, [notices, search, priorityFilter]);
 
   const handleCreate = async () => {
     if (!form.title || !form.content) {
@@ -183,6 +185,17 @@ export function AdminNotices() {
       toast.error("Title and content are required");
       return;
     }
+
+    // OPTIMISTIC UPDATE: Update the UI instantly
+    const updatedNotice = { ...editingNotice, ...editForm };
+    queryClient.setQueryData(["notices"], (old: any) => {
+      if (!old || !old.notices) return old;
+      return {
+        ...old,
+        notices: old.notices.map((n: any) => n.id === editingNotice.id ? updatedNotice : n)
+      };
+    });
+
     setEditing(true);
     try {
       const res = await apiFetch("/api/notices", {
@@ -193,7 +206,8 @@ export function AdminNotices() {
       if (res.ok) {
         toast.success("Notice updated successfully!");
         setEditOpen(false);
-        refetchNotices();
+        // Refresh from server to ensure total accuracy
+        queryClient.invalidateQueries({ queryKey: ["notices"] });
       } else {
         toast.error("Failed to update notice");
       }
