@@ -82,6 +82,7 @@ export function useParents(tenantId?: string, search?: string, page?: number, li
       return data.parents
     },
     staleTime: 60 * 1000,
+    gcTime: 15 * 60 * 1000,
   })
 }
 

@@ -30,7 +30,7 @@ import { ImportExportButtons } from "./students/ImportExportButtons";
 // Types
 import type { StudentInfo, ClassInfo, StudentFormData } from "./students/types";
 
-const ITEMS_PER_PAGE = 10;
+const ITEMS_PER_PAGE = 15;
 
 const emptyFormData: StudentFormData = {
   name: "",

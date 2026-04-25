@@ -24,7 +24,10 @@ export function StaffDashboard() {
   const { currentUser, currentTenantName, setCurrentScreen } = useAppStore();
   const customRoleName = currentUser?.customRole?.name;
 
-  const { data, isLoading } = useAdminDashboard(currentUser?.tenantId || "");
+  const { data, isPending, fetchStatus } = useAdminDashboard(currentUser?.tenantId || "");
+
+  // In React Query v5, when enabled:false, isPending=true but fetchStatus='idle'
+  const isLoading = isPending && fetchStatus === 'fetching';
 
   if (isLoading) {
     return (

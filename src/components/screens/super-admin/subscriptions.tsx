@@ -17,19 +17,29 @@ import { SubscriptionFilters } from "./subscriptions/SubscriptionFilters";
 import { SubscriptionTable } from "./subscriptions/SubscriptionTable";
 import { SubscriptionDialogs } from "./subscriptions/SubscriptionDialogs";
 import { SubscriptionRecord } from "./subscriptions/types";
+const ITEMS_PER_PAGE = 25;
 
 export function SuperAdminSubscriptions() {
   const [selectedTenant, setSelectedTenant] = useState<string>("all");
   const [search, setSearch] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [page, setPage] = useState(1);
-  const limit = 10;
   const queryClient = useQueryClient();
+
+  // Debounce search
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearch(search);
+      setPage(1);
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [search]);
 
   // Reset page when filters change
   useEffect(() => {
     setPage(1);
-  }, [selectedTenant, statusFilter, search]);
+  }, [selectedTenant, statusFilter]);
 
   // Dialog states
   const [deleteDialog, setDeleteDialog] = useState<SubscriptionRecord | null>(null);
@@ -64,20 +74,20 @@ export function SuperAdminSubscriptions() {
   const { data: tenantsData } = useTenants({ page: 1, limit: 100 });
   const tenants = tenantsData?.tenants || [];
 
-  const { data: subsData, isLoading: loadingSubs } = useSubscriptions({
-    tenantId: selectedTenant === "all" ? undefined : selectedTenant,
-    status: statusFilter === "all" ? undefined : statusFilter,
-    search: search || undefined,
+  const { data: subsData, isLoading: loadingSubs } = useSubscriptions(
+    selectedTenant === "all" ? undefined : selectedTenant,
+    statusFilter === "all" ? undefined : statusFilter,
+    debouncedSearch || undefined,
     page,
-    limit,
-  });
+    ITEMS_PER_PAGE
+  );
 
   // FIXED: Correct parameters for useParents and increased limit for dropdown
   const { data: parentsData, isLoading: loadingParents } = useParents(
     selectedTenant === "all" ? undefined : selectedTenant,
     undefined, // search
     page,
-    1000, // Large limit for dropdown and parent list
+    ITEMS_PER_PAGE, // Use the same limit here
   );
 
   const loading = loadingSubs || (selectedTenant !== "all" && loadingParents);
@@ -123,17 +133,25 @@ export function SuperAdminSubscriptions() {
   // -- Handlers --
   const handleDelete = async () => {
     if (!deleteDialog) return;
-    setDeleting(true);
-    try {
-      await apiFetch(`/api/subscriptions?id=${deleteDialog.id}`, { method: "DELETE" });
-      toast.success("Subscription deleted");
-      invalidate();
-      setDeleteDialog(null);
-    } catch {
-      toast.error("Failed to delete");
-    } finally {
-      setDeleting(false);
-    }
+    toast.promise(
+      (async () => {
+        setDeleting(true);
+        try {
+          const res = await apiFetch(`/api/subscriptions?id=${deleteDialog.id}`, { method: "DELETE" });
+          if (!res.ok) throw new Error("Failed to delete subscription");
+          invalidate();
+          setDeleteDialog(null);
+          return "Subscription deleted successfully";
+        } finally {
+          setDeleting(false);
+        }
+      })(),
+      {
+        loading: "Deleting subscription...",
+        success: (msg) => msg,
+        error: (err: any) => err.message,
+      }
+    );
   };
 
   const handleCreate = async () => {
@@ -141,45 +159,60 @@ export function SuperAdminSubscriptions() {
       toast.error("Please select a parent");
       return;
     }
-    setProcessing(true);
-    try {
-      const res = await apiFetch("/api/subscriptions", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ action: "admin-create", ...createForm }),
-      });
-      if (!res.ok) throw new Error();
-      toast.success("Subscription created");
-      invalidate();
-      setCreateDialogOpen(false);
-    } catch {
-      toast.error("Failed to create");
-    } finally {
-      setProcessing(false);
-    }
+    toast.promise(
+      (async () => {
+        setProcessing(true);
+        try {
+          const res = await apiFetch("/api/subscriptions", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ action: "admin-create", ...createForm }),
+          });
+          if (!res.ok) throw new Error("Failed to create subscription");
+          invalidate();
+          setCreateDialogOpen(false);
+          return "Subscription created successfully";
+        } finally {
+          setProcessing(false);
+        }
+      })(),
+      {
+        loading: "Creating subscription...",
+        success: (msg) => msg,
+        error: (err: any) => err.message,
+      }
+    );
   };
 
   const handleEdit = async () => {
     if (!editDialogOpen) return;
-    setProcessing(true);
-    try {
-      await apiFetch("/api/subscriptions", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          action: "admin-update",
-          subscriptionId: editDialogOpen.id,
-          ...editForm,
-        }),
-      });
-      toast.success("Subscription updated");
-      invalidate();
-      setEditDialogOpen(null);
-    } catch {
-      toast.error("Failed to update");
-    } finally {
-      setProcessing(false);
-    }
+    toast.promise(
+      (async () => {
+        setProcessing(true);
+        try {
+          const res = await apiFetch("/api/subscriptions", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              action: "admin-update",
+              subscriptionId: editDialogOpen.id,
+              ...editForm,
+            }),
+          });
+          if (!res.ok) throw new Error("Failed to update subscription");
+          invalidate();
+          setEditDialogOpen(null);
+          return "Subscription updated successfully";
+        } finally {
+          setProcessing(false);
+        }
+      })(),
+      {
+        loading: "Updating subscription...",
+        success: (msg) => msg,
+        error: (err: any) => err.message,
+      }
+    );
   };
 
   const handleExtend = async () => {
@@ -187,25 +220,33 @@ export function SuperAdminSubscriptions() {
       toast.error("Enter valid days");
       return;
     }
-    setProcessing(true);
-    try {
-      await apiFetch("/api/subscriptions", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          action: "admin-extend",
-          subscriptionId: extendDialogOpen.id,
-          days: Number(extendDays),
-        }),
-      });
-      toast.success(`Extended by ${extendDays} days`);
-      invalidate();
-      setExtendDialogOpen(null);
-    } catch {
-      toast.error("Failed to extend");
-    } finally {
-      setProcessing(false);
-    }
+    toast.promise(
+      (async () => {
+        setProcessing(true);
+        try {
+          const res = await apiFetch("/api/subscriptions", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              action: "admin-extend",
+              subscriptionId: extendDialogOpen.id,
+              days: Number(extendDays),
+            }),
+          });
+          if (!res.ok) throw new Error("Failed to extend subscription");
+          invalidate();
+          setExtendDialogOpen(null);
+          return `Extended by ${extendDays} days successfully`;
+        } finally {
+          setProcessing(false);
+        }
+      })(),
+      {
+        loading: `Extending subscription by ${extendDays} days...`,
+        success: (msg) => msg,
+        error: (err: any) => err.message,
+      }
+    );
   };
 
   const openEditDialog = (sub: SubscriptionRecord) => {
@@ -244,6 +285,7 @@ export function SuperAdminSubscriptions() {
         loading={loading}
         selectedTenant={selectedTenant}
         page={page}
+        limit={ITEMS_PER_PAGE}
         totalPages={totalPages}
         totalEntries={totalEntries}
         onPageChange={setPage}

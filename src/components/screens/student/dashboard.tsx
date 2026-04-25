@@ -36,9 +36,12 @@ import {
 
 export function StudentDashboard() {
   const { currentUser } = useAppStore();
-  const { data, isLoading, isError, error } = useStudentDashboard(
+  const { data, isPending, fetchStatus, isError, error } = useStudentDashboard(
     currentUser?.email,
   );
+
+  // In React Query v5, when enabled:false, isPending=true but fetchStatus='idle'
+  const isActuallyLoading = isPending && fetchStatus === 'fetching';
 
   useEffect(() => {
     if (isError) {
@@ -109,7 +112,7 @@ export function StudentDashboard() {
     return "Good evening";
   };
 
-  if (isLoading) return <DashboardSkeleton />;
+  if (isActuallyLoading) return <DashboardSkeleton />;
 
   return (
     <div className="space-y-6">

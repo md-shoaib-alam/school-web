@@ -29,9 +29,12 @@ export function TeacherDashboard() {
   const navigateTo = (screen: string) => {
     setCurrentScreen(screen);
   };
-  const { data, isLoading, isError, error } = useTeacherDashboard(
+  const { data, isLoading, isPending, fetchStatus, isError, error } = useTeacherDashboard(
     currentUser?.name || "",
   );
+
+  // In React Query v5, when enabled:false, isPending=true but fetchStatus='idle'
+  const isActuallyLoading = isPending && fetchStatus === 'fetching';
 
   useEffect(() => {
     if (isError) {
@@ -68,7 +71,7 @@ export function TeacherDashboard() {
     });
   };
 
-  if (isLoading) {
+  if (isActuallyLoading) {
     return (
       <div className="space-y-6">
         <div>

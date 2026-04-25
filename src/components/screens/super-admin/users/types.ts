@@ -100,4 +100,4 @@ export const STAT_CARDS = [
   { key: "admin", label: "Admins", icon: Shield, color: "text-emerald-700 dark:text-emerald-400", bg: "bg-emerald-50 dark:bg-emerald-900/30", iconBg: "bg-emerald-200 text-emerald-700 dark:text-emerald-400", border: "border-emerald-200 dark:border-emerald-700" },
 ] as const;
 
-export const PAGE_SIZE = 20;
+export const PAGE_SIZE = 50;

@@ -63,14 +63,15 @@ export function useAuditLogs(filters?: { action?: string; page?: number; limit?:
   })
 }
 
-export function useSubscriptions(vars: { tenantId?: string; status?: string; search?: string; page?: number; limit?: number }) {
+export function useSubscriptions(tenantId?: string, status?: string, search?: string, page?: number, limit?: number) {
   return useQuery({
-    queryKey: [...queryKeys.subscriptions, vars],
+    queryKey: [...queryKeys.subscriptions, tenantId, status, search, page, limit],
     queryFn: async () => {
-      const data = await graphqlQuery<{ subscriptions: SubscriptionsResponse }>(SUBSCRIPTIONS, vars)
+      const data = await graphqlQuery<{ subscriptions: SubscriptionsResponse }>(SUBSCRIPTIONS, { tenantId, status, search, page, limit })
       return data.subscriptions
     },
-    staleTime: 60 * 1000,
+    staleTime: 5 * 60 * 1000,
+    gcTime: 15 * 60 * 1000,
   })
 }
 

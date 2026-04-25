@@ -14,7 +14,9 @@ export function useAdminDashboard(tenantId: string) {
     queryKey: ['admin', 'dashboard', tenantId],
     queryFn: () => graphqlQuery<{ adminDashboard: AdminDashboardData }>(ADMIN_DASHBOARD, { tenantId }).then(d => d.adminDashboard),
     staleTime: 60 * 1000,
-    enabled: !!tenantId,
+    enabled: !!tenantId && tenantId.trim().length > 0,
+    retry: 2,
+    retryDelay: (attempt) => Math.min(1000 * 2 ** attempt, 10000),
   })
 }
 
@@ -70,7 +72,9 @@ export function useTeacherDashboard(teacherName: string) {
       .then(d => d.teacherDashboard),
     staleTime: 60 * 1000,
     refetchInterval: 5 * 60 * 1000,
-    enabled: !!teacherName,
+    enabled: !!teacherName && teacherName.trim().length > 0,
+    retry: 2,
+    retryDelay: (attempt) => Math.min(1000 * 2 ** attempt, 10000),
   })
 }
 
@@ -80,7 +84,9 @@ export function useStudentDashboard(studentEmail?: string) {
     queryFn: () => graphqlQuery<{ studentDashboard: StudentDashboardData }>(STUDENT_DASHBOARD, { studentEmail })
       .then(d => d.studentDashboard),
     staleTime: 60 * 1000,
-    enabled: !!studentEmail,
+    enabled: !!studentEmail && studentEmail.trim().length > 0,
+    retry: 2,
+    retryDelay: (attempt) => Math.min(1000 * 2 ** attempt, 10000),
   })
 }
 
@@ -90,6 +96,8 @@ export function useParentDashboard(parentName: string) {
     queryFn: () => graphqlQuery<{ parentDashboard: ParentDashboardData }>(PARENT_DASHBOARD, { parentName })
       .then(d => d.parentDashboard),
     staleTime: 60 * 1000,
-    enabled: !!parentName,
+    enabled: !!parentName && parentName.trim().length > 0,
+    retry: 2,
+    retryDelay: (attempt) => Math.min(1000 * 2 ** attempt, 10000),
   })
 }

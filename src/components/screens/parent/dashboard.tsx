@@ -14,9 +14,12 @@ import { DashboardSkeleton } from "./dashboard/DashboardSkeleton";
 
 export function ParentDashboard() {
   const { currentUser } = useAppStore();
-  const { data, isLoading, isError, error } = useParentDashboard(
+  const { data, isPending, fetchStatus, isError, error } = useParentDashboard(
     currentUser?.name || "",
   );
+
+  // In React Query v5, when enabled:false, isPending=true but fetchStatus='idle'
+  const isActuallyLoading = isPending && fetchStatus === 'fetching';
 
   useEffect(() => {
     if (isError) {
@@ -24,7 +27,7 @@ export function ParentDashboard() {
     }
   }, [isError, error]);
 
-  if (isLoading) return <DashboardSkeleton />;
+  if (isActuallyLoading) return <DashboardSkeleton />;
 
   // Data from GraphQL hook
   const childrenData = data?.children ?? [];

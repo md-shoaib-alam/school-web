@@ -41,14 +41,11 @@ export function AdminTeachers() {
   const queryClient = useQueryClient();
 
   // Queries
-  const { 
-    data: teachersData, 
-    isLoading: loading 
-  } = useTeachers(
-    currentTenantId || undefined, 
+  const { data: teachersData, isLoading: loading } = useTeachers(
+    currentTenantId || undefined,
     debouncedSearch || undefined,
-    currentPage, 
-    12 // ITEMS_PER_PAGE
+    currentPage,
+    12, // ITEMS_PER_PAGE
   );
 
   const teachers = teachersData?.teachers || [];
@@ -58,14 +55,16 @@ export function AdminTeachers() {
   useEffect(() => {
     const timer = setTimeout(() => {
       setDebouncedSearch(search);
-      setCurrentPage(1); 
+      setCurrentPage(1);
     }, 300);
     return () => clearTimeout(timer);
   }, [search]);
 
   // Dialog state
   const [dialogOpen, setDialogOpen] = useState(false);
-  const [editingTeacher, setEditingTeacher] = useState<TeacherInfo | null>(null);
+  const [editingTeacher, setEditingTeacher] = useState<TeacherInfo | null>(
+    null,
+  );
   const [formData, setFormData] = useState(emptyFormData);
   const [submitting, setSubmitting] = useState(false);
 
@@ -93,8 +92,8 @@ export function AdminTeachers() {
 
   const handleSubmit = async () => {
     if (!formData.name || !formData.email) {
-       toast.error("Name and Email are required");
-       return;
+      toast.error("Name and Email are required");
+      return;
     }
     toast.promise(
       (async () => {
@@ -103,7 +102,9 @@ export function AdminTeachers() {
           const isEdit = !!editingTeacher;
           const url = "/api/teachers";
           const method = isEdit ? "PUT" : "POST";
-          const body = isEdit ? { id: editingTeacher.id, ...formData } : formData;
+          const body = isEdit
+            ? { id: editingTeacher.id, ...formData }
+            : formData;
 
           const res = await apiFetch(url, {
             method,
@@ -113,9 +114,11 @@ export function AdminTeachers() {
 
           if (!res.ok) {
             const err = await res.json().catch(() => ({}));
-            throw new Error(err.error || `Failed to ${isEdit ? "update" : "add"} teacher`);
+            throw new Error(
+              err.error || `Failed to ${isEdit ? "update" : "add"} teacher`,
+            );
           }
-          
+
           setDialogOpen(false);
           setEditingTeacher(null);
           setFormData(emptyFormData);
@@ -129,22 +132,24 @@ export function AdminTeachers() {
         loading: `${editingTeacher ? "Updating" : "Adding"} teacher...`,
         success: (msg) => msg,
         error: (err: any) => err.message || "Action failed",
-      }
+      },
     );
   };
 
   const handleDelete = async (id: string) => {
     toast.promise(
       (async () => {
-        const res = await apiFetch(`/api/teachers?id=${id}`, { method: "DELETE" });
+        const res = await apiFetch(`/api/teachers?id=${id}`, {
+          method: "DELETE",
+        });
         if (!res.ok) {
           const err = await res.json().catch(() => ({}));
           throw new Error(err.error || "Deletion failed");
         }
-        
+
         queryClient.invalidateQueries({ queryKey: queryKeys.teachers });
         setDeletingId(null);
-        
+
         // We throw a "success" message to force a RED morphing pill for deletion
         throw new Error("Teacher record removed");
       })(),
@@ -152,7 +157,7 @@ export function AdminTeachers() {
         loading: "Removing teacher record...",
         success: () => "", // Not reached
         error: (err: any) => err.message, // Shows the red pill
-      }
+      },
     );
   };
 
@@ -217,7 +222,11 @@ export function AdminTeachers() {
                   layout
                   initial={{ opacity: 0, scale: 0.9 }}
                   animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.8, transition: { duration: 0.2 } }}
+                  exit={{
+                    opacity: 0,
+                    scale: 0.8,
+                    transition: { duration: 0.2 },
+                  }}
                 >
                   <TeacherCard
                     teacher={teacher}
@@ -237,35 +246,43 @@ export function AdminTeachers() {
           {/* Pagination Controls */}
           <div className="flex flex-col sm:flex-row gap-4 items-center justify-between py-4 border-t border-border/50">
             <p className="text-sm text-muted-foreground order-2 sm:order-1">
-              Showing <span className="font-medium text-foreground">{teachers.length}</span> of <span className="font-medium text-foreground">{totalItems}</span> teachers
+              Showing{" "}
+              <span className="font-medium text-foreground">
+                {teachers.length}
+              </span>{" "}
+              of{" "}
+              <span className="font-medium text-foreground">{totalItems}</span>{" "}
+              teachers
             </p>
             <div className="flex items-center gap-2 order-1 sm:order-2">
               <Button
                 variant="outline"
                 size="sm"
                 disabled={currentPage === 1}
-                onClick={() => setCurrentPage(prev => prev - 1)}
+                onClick={() => setCurrentPage((prev) => prev - 1)}
               >
                 Previous
               </Button>
               <div className="flex items-center gap-1 mx-2">
-                {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
-                  <Button
-                    key={p}
-                    variant={currentPage === p ? "default" : "ghost"}
-                    size="sm"
-                    className="h-8 w-8 p-0"
-                    onClick={() => setCurrentPage(p)}
-                  >
-                    {p}
-                  </Button>
-                ))}
+                {Array.from({ length: totalPages }, (_, i) => i + 1).map(
+                  (p) => (
+                    <Button
+                      key={p}
+                      variant={currentPage === p ? "default" : "ghost"}
+                      size="sm"
+                      className="h-8 w-8 p-0"
+                      onClick={() => setCurrentPage(p)}
+                    >
+                      {p}
+                    </Button>
+                  ),
+                )}
               </div>
               <Button
                 variant="outline"
                 size="sm"
                 disabled={currentPage === totalPages}
-                onClick={() => setCurrentPage(prev => prev + 1)}
+                onClick={() => setCurrentPage((prev) => prev + 1)}
               >
                 Next
               </Button>

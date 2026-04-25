@@ -110,14 +110,21 @@ function StatCardSkeleton() {
 
 export function AdminDashboard() {
   const { currentUser, currentTenantId } = useAppStore();
-  const tenantId = currentTenantId || currentUser?.tenantId || "default";
+  const tenantId = currentTenantId || currentUser?.tenantId;
 
   // Optimized: Single network request for everything!
-  const { data: dashboardData, isLoading, error } = useQuery({
+  const { data: dashboardData, isPending, fetchStatus, error } = useQuery({
     queryKey: ['admin-dashboard', tenantId],
     queryFn: () => api.get('/dashboard'),
     staleTime: 60 * 1000, // Cache for 1 minute
+    enabled: !!tenantId,
+    retry: 2,
+    retryDelay: (attempt) => Math.min(1000 * 2 ** attempt, 10000),
   });
+
+  // In React Query v5, when enabled:false, isPending=true but fetchStatus='idle'
+  const isLoading = isPending && fetchStatus === 'fetching';
+  const isError = error !== null;
 
   useEffect(() => {
     if (error) {

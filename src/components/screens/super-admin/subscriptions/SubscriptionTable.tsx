@@ -20,6 +20,13 @@ import {
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
 import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
   MoreVertical,
   Pencil,
   Trash2,
@@ -42,6 +49,7 @@ interface SubscriptionTableProps {
   loading: boolean;
   selectedTenant: string;
   page: number;
+  limit: number;
   totalPages: number;
   totalEntries: number;
   onPageChange: (page: number) => void;
@@ -56,6 +64,7 @@ export function SubscriptionTable({
   loading,
   selectedTenant,
   page,
+  limit,
   totalPages,
   totalEntries,
   onPageChange,
@@ -97,7 +106,8 @@ export function SubscriptionTable({
                     <div>
                       <p className="font-bold text-lg">No Results Found</p>
                       <p className="text-muted-foreground text-sm max-w-xs mx-auto">
-                        We couldn't find any subscriptions matching your filters.
+                        We couldn't find any subscriptions matching your
+                        filters.
                       </p>
                     </div>
                   </div>
@@ -133,15 +143,17 @@ export function SubscriptionTable({
                             {parent?.user?.email || parent?.email}
                           </p>
                           <div className="flex flex-wrap gap-1 mt-1">
-                            {(parent?.students || parent?.children || []).map((s: any) => (
-                              <Badge
-                                key={s.id}
-                                variant="outline"
-                                className="text-[10px] py-0 h-4 bg-white dark:bg-gray-950"
-                              >
-                                {s.name || s.user?.name}
-                              </Badge>
-                            ))}
+                            {(parent?.students || parent?.children || []).map(
+                              (s: any) => (
+                                <Badge
+                                  key={s.id}
+                                  variant="outline"
+                                  className="text-[10px] py-0 h-4 bg-white dark:bg-gray-950"
+                                >
+                                  {s.name || s.user?.name}
+                                </Badge>
+                              ),
+                            )}
                           </div>
                         </div>
                       </div>
@@ -239,14 +251,10 @@ export function SubscriptionTable({
                               Subscription Actions
                             </DropdownMenuLabel>
                             <DropdownMenuSeparator />
-                            <DropdownMenuItem
-                              onClick={() => onEdit(sub)}
-                            >
+                            <DropdownMenuItem onClick={() => onEdit(sub)}>
                               <Pencil className="h-4 w-4 mr-2" /> Edit Details
                             </DropdownMenuItem>
-                            <DropdownMenuItem
-                              onClick={() => onExtend(sub)}
-                            >
+                            <DropdownMenuItem onClick={() => onExtend(sub)}>
                               <CalendarClock className="h-4 w-4 mr-2" /> Extend
                               Validity
                             </DropdownMenuItem>
@@ -278,64 +286,95 @@ export function SubscriptionTable({
           </TableBody>
         </Table>
       </div>
-
       {!loading && totalPages > 1 && (
-        <div className="flex items-center justify-between px-6 py-4 bg-gray-50/50 dark:bg-gray-900/20 border-t">
-          <p className="text-sm text-muted-foreground">
-            Showing page{" "}
-            <span className="font-semibold text-gray-900 dark:text-gray-100">
-              {page}
-            </span>{" "}
-            of{" "}
-            <span className="font-semibold text-gray-900 dark:text-gray-100">
-              {totalPages}
-            </span>
-            <span className="ml-1 text-xs">
-              ({totalEntries} total entries)
-            </span>
-          </p>
-          <div className="flex items-center gap-2">
+        <div className="flex flex-col sm:flex-row items-center justify-between px-6 py-4 bg-gray-50/50 dark:bg-gray-900/20 border-t gap-4">
+          <div className="flex items-center gap-4 order-2 sm:order-1">
+            <p className="text-sm text-muted-foreground">
+              Showing{" "}
+              <span className="font-semibold text-teal-600 dark:text-teal-400">
+                {(page - 1) * limit + 1}
+              </span>{" "}
+              to{" "}
+              <span className="font-semibold text-teal-600 dark:text-teal-400">
+                {Math.min(page * limit, totalEntries)}
+              </span>{" "}
+              of{" "}
+              <span className="font-semibold text-gray-900 dark:text-gray-100">
+                {totalEntries}
+              </span>{" "}
+              entries
+            </p>
+
+            <div className="flex items-center gap-2">
+              <span className="text-xs text-muted-foreground whitespace-nowrap">
+                Rows per page: 25
+              </span>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-1 order-1 sm:order-2">
             <Button
               variant="outline"
               size="sm"
               onClick={() => onPageChange(page - 1)}
               disabled={page === 1}
-              className="h-8 gap-1 pr-3"
+              className="h-8 w-8 p-0"
             >
-              <ChevronLeft className="h-4 w-4" /> Previous
+              <ChevronLeft className="h-4 w-4" />
             </Button>
-            <div className="flex items-center gap-1 mx-2">
-              {[...Array(Math.min(5, totalPages))].map((_, i) => {
-                let pageNum = page;
-                if (totalPages <= 5) pageNum = i + 1;
-                else if (page <= 3) pageNum = i + 1;
-                else if (page >= totalPages - 2) pageNum = totalPages - 4 + i;
-                else pageNum = page - 2 + i;
 
-                return (
-                  <Button
-                    key={pageNum}
-                    variant={page === pageNum ? "default" : "ghost"}
-                    size="sm"
-                    className={cn(
-                      "h-8 w-8 p-0",
-                      page === pageNum && "bg-teal-600 hover:bg-teal-700",
-                    )}
-                    onClick={() => onPageChange(pageNum)}
-                  >
-                    {pageNum}
-                  </Button>
-                );
-              })}
+            <div className="flex items-center gap-1 mx-1">
+              {Array.from({ length: totalPages }, (_, i) => i + 1).map(
+                (pageNum) => {
+                  // Show first, last, and a window around current page
+                  if (
+                    pageNum === 1 ||
+                    pageNum === totalPages ||
+                    (pageNum >= page - 1 && pageNum <= page + 1)
+                  ) {
+                    return (
+                      <Button
+                        key={pageNum}
+                        variant={page === pageNum ? "default" : "outline"}
+                        size="sm"
+                        className={cn(
+                          "h-8 w-8 p-0 text-xs",
+                          page === pageNum
+                            ? "bg-teal-600 hover:bg-teal-700 shadow-sm"
+                            : "hover:bg-teal-50",
+                        )}
+                        onClick={() => onPageChange(pageNum)}
+                      >
+                        {pageNum}
+                      </Button>
+                    );
+                  }
+
+                  // Show ellipsis
+                  if (pageNum === 2 || pageNum === totalPages - 1) {
+                    return (
+                      <span
+                        key={pageNum}
+                        className="px-1 text-muted-foreground text-xs"
+                      >
+                        ...
+                      </span>
+                    );
+                  }
+
+                  return null;
+                },
+              )}
             </div>
+
             <Button
               variant="outline"
               size="sm"
               onClick={() => onPageChange(page + 1)}
               disabled={page === totalPages}
-              className="h-8 gap-1 pl-3"
+              className="h-8 w-8 p-0"
             >
-              Next <ChevronRight className="h-4 w-4" />
+              <ChevronRight className="h-4 w-4" />
             </Button>
           </div>
         </div>

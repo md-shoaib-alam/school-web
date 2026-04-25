@@ -1,6 +1,11 @@
-"use client";
-
 import { Button } from "@/components/ui/button";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
 interface PaginationProps {
@@ -9,6 +14,7 @@ interface PaginationProps {
   totalItems: number;
   itemsPerPage: number;
   onPageChange: (page: number) => void;
+  onLimitChange?: (limit: number) => void;
 }
 
 // Smart pagination with sliding window from user's code
@@ -84,23 +90,46 @@ export function Pagination({
   totalItems,
   itemsPerPage,
   onPageChange,
+  onLimitChange,
 }: PaginationProps) {
   if (totalItems === 0) return null;
 
   return (
     <div className="flex flex-col sm:flex-row items-center justify-between px-4 py-3 border-t gap-3">
-      <p className="text-sm text-muted-foreground">
-        Showing{" "}
-        <span className="font-medium">
-          {Math.min((currentPage - 1) * itemsPerPage + 1, totalItems)}
-        </span>
-        {" to "}
-        <span className="font-medium">
-          {Math.min(currentPage * itemsPerPage, totalItems)}
-        </span>
-        {" of "}
-        <span className="font-medium">{totalItems}</span> students
-      </p>
+      <div className="flex flex-wrap items-center gap-4">
+        <p className="text-sm text-muted-foreground">
+          Showing{" "}
+          <span className="font-medium text-emerald-600 dark:text-emerald-400">
+            {Math.min((currentPage - 1) * itemsPerPage + 1, totalItems)}
+          </span>
+          {" to "}
+          <span className="font-medium text-emerald-600 dark:text-emerald-400">
+            {Math.min(currentPage * itemsPerPage, totalItems)}
+          </span>
+          {" of "}
+          <span className="font-medium text-foreground">{totalItems}</span> entries
+        </p>
+
+        {onLimitChange && (
+          <div className="flex items-center gap-2">
+            <span className="text-xs text-muted-foreground whitespace-nowrap">Rows per page:</span>
+            <Select
+              value={itemsPerPage.toString()}
+              onValueChange={(v) => onLimitChange(parseInt(v))}
+            >
+              <SelectTrigger className="h-8 w-[70px] bg-transparent border-gray-200 dark:border-gray-800 text-xs">
+                <SelectValue placeholder={itemsPerPage.toString()} />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="25">25</SelectItem>
+                <SelectItem value="50">50</SelectItem>
+                <SelectItem value="100">100</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        )}
+      </div>
+
       <div className="flex items-center gap-1">
         <Button
           variant="outline"
