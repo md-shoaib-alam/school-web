@@ -3,18 +3,50 @@
 import { Eye } from 'lucide-react';
 import { useModulePermissions } from '@/hooks/use-permissions';
 import { useAppStore } from '@/store/use-app-store';
-
-// Modular Tab Components
-import { SetFeesTab } from './fees/SetFeesTab';
-import { FeeCategoriesTab } from './fees/FeeCategoriesTab';
-import { ConcessionsTab } from './fees/ConcessionsTab';
-import { MakePaymentTab } from './fees/MakePaymentTab';
-import { CheckReceiptTab } from './fees/CheckReceiptTab';
-import { FeeStatusTab } from './fees/FeeStatusTab';
-import { CheckPaymentsTab } from './fees/CheckPaymentsTab';
-import { TransportFeeTab } from './fees/TransportFeeTab';
-
 import { useParams } from 'next/navigation';
+import dynamic from 'next/dynamic';
+import { Skeleton } from '@/components/ui/skeleton';
+
+// Dynamic loading for "Low Stack" performance optimization
+const SetFeesTab = dynamic(() => import('./fees/SetFeesTab').then(m => m.SetFeesTab), {
+  loading: () => <TabLoadingSkeleton />
+});
+const FeeCategoriesTab = dynamic(() => import('./fees/FeeCategoriesTab').then(m => m.FeeCategoriesTab), {
+  loading: () => <TabLoadingSkeleton />
+});
+const ConcessionsTab = dynamic(() => import('./fees/ConcessionsTab').then(m => m.ConcessionsTab), {
+  loading: () => <TabLoadingSkeleton />
+});
+const MakePaymentTab = dynamic(() => import('./fees/MakePaymentTab').then(m => m.MakePaymentTab), {
+  loading: () => <TabLoadingSkeleton />
+});
+const CheckReceiptTab = dynamic(() => import('./fees/CheckReceiptTab').then(m => m.CheckReceiptTab), {
+  loading: () => <TabLoadingSkeleton />
+});
+const FeeStatusTab = dynamic(() => import('./fees/FeeStatusTab').then(m => m.FeeStatusTab), {
+  loading: () => <TabLoadingSkeleton />
+});
+const CheckPaymentsTab = dynamic(() => import('./fees/CheckPaymentsTab').then(m => m.CheckPaymentsTab), {
+  loading: () => <TabLoadingSkeleton />
+});
+const TransportFeeTab = dynamic(() => import('./fees/TransportFeeTab').then(m => m.TransportFeeTab), {
+  loading: () => <TabLoadingSkeleton />
+});
+
+function TabLoadingSkeleton() {
+  return (
+    <div className="space-y-4 animate-in fade-in duration-500">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        {[...Array(3)].map((_, i) => <Skeleton key={i} className="h-24 w-full rounded-xl" />)}
+      </div>
+      <div className="flex gap-3">
+        <Skeleton className="h-10 w-44 rounded-md" />
+        <Skeleton className="h-10 w-44 rounded-md" />
+      </div>
+      <Skeleton className="h-[400px] w-full rounded-xl" />
+    </div>
+  );
+}
 
 export function AdminFees() {
   const { canCreate, canEdit, canDelete } = useModulePermissions('fees');

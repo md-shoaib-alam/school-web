@@ -25,13 +25,8 @@ import { goeyToast as toast } from 'goey-toast';
 import { cn } from '@/lib/utils';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import api from '@/lib/axios';
-import { 
-  useFeeCategories, 
-  useFeeStructures, 
-  useCreateFeeStructure,
-  useFeeAssignment,
-  useExecuteFeeAssign
-} from '@/hooks/use-fees';
+import { useFeeCategories, useFeeStructures, useCreateFeeStructure, useFeeAssignment, useExecuteFeeAssign } from '@/hooks/use-fees';
+import { useDebounce } from '@/hooks/use-debounce';
 import type { FeeStructure, FeeCategory, ClassOption } from './types';
 
 interface SetFeesTabProps {
@@ -60,6 +55,7 @@ export function SetFeesTab({ canCreate, canEdit, canDelete }: SetFeesTabProps) {
   const [assignSaving, setAssignSaving] = useState(false);
   const [selectedStudents, setSelectedStudents] = useState<Set<string>>(new Set());
   const [searchStudent, setSearchStudent] = useState('');
+  const debouncedSearch = useDebounce(searchStudent, 300);
 
   const { data: structures = [], isLoading: loadingStructures } = useFeeStructures();
   const { data: categories = [], isLoading: loadingCategories } = useFeeCategories();
@@ -448,11 +444,11 @@ export function SetFeesTab({ canCreate, canEdit, canDelete }: SetFeesTabProps) {
                 <Input placeholder="Search students..." className="pl-9 h-9" value={searchStudent} onChange={e => setSearchStudent(e.target.value)} />
               </div>
               <div className="border rounded-lg max-h-72 overflow-y-auto">
-                {assignData.students.filter(s => !searchStudent || s.name.toLowerCase().includes(searchStudent.toLowerCase()) || s.rollNumber.toLowerCase().includes(searchStudent.toLowerCase())).length === 0 ? (
+                {assignData.students.filter(s => !debouncedSearch || s.name.toLowerCase().includes(debouncedSearch.toLowerCase()) || s.rollNumber.toLowerCase().includes(debouncedSearch.toLowerCase())).length === 0 ? (
                   <div className="py-8 text-center text-muted-foreground text-sm">No students found</div>
                 ) : (
                   assignData.students
-                    .filter(s => !searchStudent || s.name.toLowerCase().includes(searchStudent.toLowerCase()) || s.rollNumber.toLowerCase().includes(searchStudent.toLowerCase()))
+                    .filter(s => !debouncedSearch || s.name.toLowerCase().includes(debouncedSearch.toLowerCase()) || s.rollNumber.toLowerCase().includes(debouncedSearch.toLowerCase()))
                     .map(student => (
                     <div
                       key={student.id}

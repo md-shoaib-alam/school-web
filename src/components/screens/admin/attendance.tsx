@@ -44,6 +44,7 @@ import { useModulePermissions } from "@/hooks/use-permissions";
 import { useAppStore } from "@/store/use-app-store";
 import { DatePicker } from "@/components/ui/date-picker";
 import { parseISO } from "date-fns";
+import { useDebounce } from "@/hooks/use-debounce";
 
 const statusConfig: Record<
   string,
@@ -77,15 +78,7 @@ export function AdminAttendance() {
   );
   const [selectedClass, setSelectedClass] = useState<string | null>(null);
   const [search, setSearch] = useState("");
-  const [debouncedSearch, setDebouncedSearch] = useState("");
-
-  // --- Debouncing Search ---
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setDebouncedSearch(search);
-    }, 300);
-    return () => clearTimeout(timer);
-  }, [search]);
+  const debouncedSearch = useDebounce(search, 300);
 
   const { data: attendanceData, isLoading: recordsLoading } = useQuery({
     queryKey: ['attendance', selectedDate, selectedClass],

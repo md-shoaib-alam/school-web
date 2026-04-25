@@ -19,6 +19,7 @@ import { useAppStore } from "@/store/use-app-store";
 import { useStudents, useClassesMin } from "@/lib/graphql/hooks/academic.hooks";
 import { useQueryClient } from "@tanstack/react-query";
 import { queryKeys } from "@/lib/graphql/keys";
+import { useDebounce } from "@/hooks/use-debounce";
 
 // Sub-components
 import { StudentTable } from "./students/StudentTable";
@@ -52,7 +53,7 @@ export function AdminStudents() {
 
   // Filter & Search states
   const [search, setSearch] = useState("");
-  const [debouncedSearch, setDebouncedSearch] = useState("");
+  const debouncedSearch = useDebounce(search, 300);
   const [classFilter, setClassFilter] = useState("all");
   const [currentPage, setCurrentPage] = useState(1);
 
@@ -86,12 +87,8 @@ export function AdminStudents() {
   const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setDebouncedSearch(search);
-      setCurrentPage(1); 
-    }, 300);
-    return () => clearTimeout(timer);
-  }, [search]);
+    setCurrentPage(1);
+  }, [debouncedSearch]);
 
   // --- Handlers ---
 

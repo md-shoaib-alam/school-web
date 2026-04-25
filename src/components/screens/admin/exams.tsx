@@ -12,15 +12,17 @@ import { api, apiFetch } from '@/lib/api';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 
+import dynamic from 'next/dynamic';
+import { Skeleton } from '@/components/ui/skeleton';
+import { Badge } from '@/components/ui/badge';
+import { useDebounce } from '@/hooks/use-debounce';
+
 // Sub-components
-import { ExamTable } from './exams/ExamTable';
-import { ResultsView } from './exams/ResultsView';
 import { ExamDialogs } from './exams/ExamDialogs';
 import { 
   ExamRecord, ExamFormData, StudentResultRow, 
   ClassOption, SubjectOption, StudentOption 
 } from './exams/types';
-import { Badge } from '@/components/ui/badge';
 
 const statusConfig: Record<string, { bg: string; label: string }> = {
   scheduled: { bg: 'bg-blue-100 text-blue-700 border-blue-200', label: 'Scheduled' },
@@ -42,6 +44,28 @@ const emptyExamForm: ExamFormData = {
   date: '', startTime: '', endTime: '', totalMarks: '100', passingMarks: '40',
 };
 
+// Dynamic loading for "Low Stack" performance optimization
+const ExamTable = dynamic(() => import('./exams/ExamTable').then(m => m.ExamTable), {
+  loading: () => <TabLoadingSkeleton />
+});
+const ResultsView = dynamic(() => import('./exams/ResultsView').then(m => m.ResultsView), {
+  loading: () => <TabLoadingSkeleton />
+});
+
+function TabLoadingSkeleton() {
+  return (
+    <div className="space-y-4 animate-in fade-in duration-500">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        {[...Array(4)].map((_, i) => <Skeleton key={i} className="h-24 w-full rounded-xl" />)}
+      </div>
+      <div className="flex gap-3">
+        <Skeleton className="h-10 w-full rounded-md" />
+      </div>
+      <Skeleton className="h-[500px] w-full rounded-xl" />
+    </div>
+  );
+}
+
 export function AdminExams() {
   const queryClient = useQueryClient();
 
@@ -50,6 +74,7 @@ export function AdminExams() {
   const [statusFilter, setStatusFilter] = useState('all');
   const [examTypeFilter, setExamTypeFilter] = useState('all');
   const [searchTerm, setSearchTerm] = useState('');
+  const debouncedSearch = useDebounce(searchTerm, 300);
   const [activeTab, setActiveTab] = useState('exams');
 
   // Dialog States
@@ -104,8 +129,8 @@ export function AdminExams() {
   const filtered = exams.filter(exam => {
     const matchClass = classFilter === 'all' || exam.classId === classFilter;
     const matchStatus = statusFilter === 'all' || exam.status === statusFilter;
-    const matchSearch = exam.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
-                       exam.subjectName.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchSearch = exam.name.toLowerCase().includes(debouncedSearch.toLowerCase()) || 
+                       exam.subjectName.toLowerCase().includes(debouncedSearch.toLowerCase());
     return matchClass && matchStatus && matchSearch;
   });
 
