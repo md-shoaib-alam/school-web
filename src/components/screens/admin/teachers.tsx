@@ -4,7 +4,11 @@ import { useState, useEffect, useCallback, useMemo } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Users, Search, Plus, Eye } from "lucide-react";
+import { Users, Search, Plus, Eye, LayoutGrid, List, Mail, Phone, Briefcase, Pencil, Trash2 } from "lucide-react";
+import { useViewMode } from "@/hooks/use-view-mode";
+import { Badge } from "@/components/ui/badge";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { avatarColors } from "./teachers/types";
 import { motion, AnimatePresence } from "framer-motion";
 import { goeyToast as toast } from "goey-toast";
 import { useModulePermissions } from "@/hooks/use-permissions";
@@ -13,6 +17,8 @@ import { useAppStore } from "@/store/use-app-store";
 import { useTeachers } from "@/lib/graphql/hooks/academic.hooks";
 import { useQueryClient } from "@tanstack/react-query";
 import { queryKeys } from "@/lib/graphql/keys";
+import { Pagination } from "@/components/shared/pagination";
+import { useDebounce } from "@/hooks/use-debounce";
 
 // Sub-components
 import { TeacherCard } from "./teachers/TeacherCard";
@@ -35,7 +41,7 @@ export function AdminTeachers() {
 
   // Filter & Search states
   const [search, setSearch] = useState("");
-  const [debouncedSearch, setDebouncedSearch] = useState("");
+  const debouncedSearch = useDebounce(search, 500);
   const [currentPage, setCurrentPage] = useState(1);
 
   const queryClient = useQueryClient();
@@ -56,14 +62,11 @@ export function AdminTeachers() {
   }, [teachersData]);
   const totalItems = teachersData?.total || 0;
   const totalPages = teachersData?.totalPages || 1;
+  const [viewMode, setViewMode] = useViewMode("teachers", "grid");
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setDebouncedSearch(search);
-      setCurrentPage(1);
-    }, 300);
-    return () => clearTimeout(timer);
-  }, [search]);
+    setCurrentPage(1);
+  }, [debouncedSearch]);
 
   // Dialog state
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -210,106 +213,143 @@ export function AdminTeachers() {
             }}
           />
         </div>
-        {canCreate && (
-          <Button
-            className="bg-emerald-600 hover:bg-emerald-700 text-white shrink-0"
-            onClick={handleOpenAdd}
-          >
-            <Plus className="h-4 w-4 mr-2" />
-            Add Teacher
-          </Button>
-        )}
+        <div className="flex items-center gap-3 w-full sm:w-auto">
+          <div className="flex items-center gap-1 bg-gray-100 dark:bg-gray-800 p-1 rounded-lg">
+            <Button
+              variant={viewMode === "table" ? "secondary" : "ghost"}
+              size="sm"
+              onClick={() => setViewMode("table")}
+              className={`h-8 w-8 p-0 ${viewMode === "table" ? "bg-white dark:bg-gray-700 shadow-sm" : ""}`}
+            >
+              <List className="h-4 w-4" />
+            </Button>
+            <Button
+              variant={viewMode === "grid" ? "secondary" : "ghost"}
+              size="sm"
+              onClick={() => setViewMode("grid")}
+              className={`h-8 w-8 p-0 ${viewMode === "grid" ? "bg-white dark:bg-gray-700 shadow-sm" : ""}`}
+            >
+              <LayoutGrid className="h-4 w-4" />
+            </Button>
+          </div>
+          {canCreate && (
+            <Button
+              className="bg-emerald-600 hover:bg-emerald-700 text-white shrink-0 shadow-sm"
+              onClick={handleOpenAdd}
+            >
+              <Plus className="h-4 w-4 mr-2" />
+              Add Teacher
+            </Button>
+          )}
+        </div>
       </div>
 
-      {/* Teacher Grid */}
+      {/* Teacher Content */}
       {loading ? (
         <TeacherSkeleton />
       ) : teachers.length === 0 ? (
-        <Card>
-          <CardContent className="py-16 text-center text-muted-foreground">
-            <Users className="h-12 w-12 mx-auto mb-3 opacity-30" />
-            <p className="font-medium">No teachers found</p>
+        <Card className="border-dashed border-2 bg-transparent">
+          <CardContent className="py-20 text-center text-muted-foreground">
+            <Users className="h-12 w-12 mx-auto mb-4 opacity-20" />
+            <p className="text-lg font-medium">No teachers found</p>
             <p className="text-sm">Try adjusting your search criteria</p>
           </CardContent>
         </Card>
-      ) : (
-        <>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            <AnimatePresence mode="popLayout">
-              {teachers.map((teacher, index) => (
-                <motion.div
-                  key={teacher.id}
-                  layout
-                  initial={{ opacity: 0, scale: 0.9 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{
-                    opacity: 0,
-                    scale: 0.8,
-                    transition: { duration: 0.2 },
-                  }}
-                >
-                  <TeacherCard
-                    teacher={teacher}
-                    index={index}
-                    canEdit={canEdit}
-                    canDelete={canDelete}
-                    deletingId={deletingId}
-                    setDeletingId={setDeletingId}
-                    onEdit={handleOpenEdit}
-                    onDelete={handleDelete}
-                  />
-                </motion.div>
-              ))}
-            </AnimatePresence>
-          </div>
-
-          {/* Pagination Controls */}
-          <div className="flex flex-col sm:flex-row gap-4 items-center justify-between py-4 border-t border-border/50">
-            <p className="text-sm text-muted-foreground order-2 sm:order-1">
-              Showing{" "}
-              <span className="font-medium text-foreground">
-                {teachers.length}
-              </span>{" "}
-              of{" "}
-              <span className="font-medium text-foreground">{totalItems}</span>{" "}
-              teachers
-            </p>
-            <div className="flex items-center gap-2 order-1 sm:order-2">
-              <Button
-                variant="outline"
-                size="sm"
-                disabled={currentPage === 1}
-                onClick={() => setCurrentPage((prev) => prev - 1)}
-              >
-                Previous
-              </Button>
-              <div className="flex items-center gap-1 mx-2">
-                {Array.from({ length: totalPages }, (_, i) => i + 1).map(
-                  (p) => (
-                    <Button
-                      key={p}
-                      variant={currentPage === p ? "default" : "ghost"}
-                      size="sm"
-                      className="h-8 w-8 p-0"
-                      onClick={() => setCurrentPage(p)}
-                    >
-                      {p}
-                    </Button>
-                  ),
-                )}
-              </div>
-              <Button
-                variant="outline"
-                size="sm"
-                disabled={currentPage === totalPages}
-                onClick={() => setCurrentPage((prev) => prev + 1)}
-              >
-                Next
-              </Button>
+      ) : viewMode === "table" ? (
+        <Card className="shadow-sm border-0 overflow-hidden mb-4">
+          <CardContent className="p-0">
+            <div className="overflow-x-auto">
+              <table className="w-full text-left text-sm">
+                <thead className="bg-gray-50 dark:bg-gray-800/50 text-gray-500 dark:text-gray-400 uppercase text-[10px] font-bold tracking-wider">
+                  <tr>
+                    <th className="px-6 py-4">Teacher</th>
+                    <th className="px-6 py-4">Experience</th>
+                    <th className="px-6 py-4">Qualification</th>
+                    <th className="px-6 py-4 text-center">Actions</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
+                  {teachers.map((teacher, index) => {
+                    const initials = teacher.name.split(" ").map((n) => n[0]).join("").slice(0, 2).toUpperCase();
+                    const color = avatarColors[index % avatarColors.length];
+                    return (
+                      <tr key={teacher.id} className="hover:bg-gray-50/50 dark:hover:bg-gray-800/30 transition-colors">
+                        <td className="px-6 py-4">
+                          <div className="flex items-center gap-3">
+                            <Avatar className="h-8 w-8">
+                              <AvatarFallback className={`${color} text-white text-[10px] font-bold`}>
+                                {initials}
+                              </AvatarFallback>
+                            </Avatar>
+                            <div className="flex flex-col">
+                              <span className="font-bold text-gray-900 dark:text-gray-100">{teacher.name}</span>
+                              <span className="text-xs text-muted-foreground">{teacher.email}</span>
+                            </div>
+                          </div>
+                        </td>
+                        <td className="px-6 py-4 text-gray-600 dark:text-gray-400 font-medium">
+                          {teacher.experience || 'N/A'}
+                        </td>
+                        <td className="px-6 py-4">
+                          <Badge variant="outline" className="font-normal text-xs">{teacher.qualification || 'N/A'}</Badge>
+                        </td>
+                        <td className="px-6 py-4">
+                          <div className="flex items-center justify-center gap-2">
+                            {canEdit && (
+                              <Button variant="ghost" size="icon" className="h-8 w-8 text-gray-400 hover:text-emerald-600" onClick={() => handleOpenEdit(teacher)}>
+                                <Pencil className="h-3.5 w-3.5" />
+                              </Button>
+                            )}
+                            {canDelete && (
+                              <Button variant="ghost" size="icon" className="h-8 w-8 text-gray-400 hover:text-red-600" onClick={() => setDeletingId(teacher.id)}>
+                                <Trash2 className="h-3.5 w-3.5" />
+                              </Button>
+                            )}
+                          </div>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
             </div>
-          </div>
-        </>
+          </CardContent>
+        </Card>
+      ) : (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          <AnimatePresence mode="popLayout">
+            {teachers.map((teacher, index) => (
+              <motion.div
+                key={teacher.id}
+                layout
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.9, transition: { duration: 0.2 } }}
+              >
+                <TeacherCard
+                  teacher={teacher}
+                  index={index}
+                  canEdit={canEdit}
+                  canDelete={canDelete}
+                  deletingId={deletingId}
+                  setDeletingId={setDeletingId}
+                  onEdit={handleOpenEdit}
+                  onDelete={handleDelete}
+                />
+              </motion.div>
+            ))}
+          </AnimatePresence>
+        </div>
       )}
+
+      {/* Pagination Controls */}
+      <Pagination
+        currentPage={currentPage}
+        totalPages={totalPages}
+        totalItems={totalItems}
+        itemsPerPage={12}
+        onPageChange={setCurrentPage}
+      />
 
       {/* Add/Edit Teacher Dialog */}
       <TeacherDialog

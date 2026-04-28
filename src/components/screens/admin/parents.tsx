@@ -3,7 +3,12 @@
 import { useState, useEffect, useCallback, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Search, Users, UserPlus } from "lucide-react";
+import { Search, Users, UserPlus, LayoutGrid, List, Pencil, Trash2, Link as LinkIcon, Mail, Phone, Briefcase } from "lucide-react";
+import { useViewMode } from "@/hooks/use-view-mode";
+import { Badge } from "@/components/ui/badge";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { avatarColors } from "./teachers/types";
+import { motion, AnimatePresence } from "framer-motion";
 import { goeyToast as toast } from "goey-toast";
 import api from "@/lib/axios";
 import { useAppStore } from "@/store/use-app-store";
@@ -14,6 +19,8 @@ import {
 } from "@/lib/graphql/hooks/academic.hooks";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { queryKeys } from "@/lib/graphql/keys";
+import { Pagination } from "@/components/shared/pagination";
+import { useDebounce } from "@/hooks/use-debounce";
 
 import { ParentCard } from "./parents/ParentCard";
 import {
@@ -23,19 +30,27 @@ import {
 } from "./parents/ParentDialog";
 import { ParentSkeleton } from "./parents/ParentSkeleton";
 import { ParentInfo, StudentInfo } from "./parents/types";
+import { Card, CardContent } from "@/components/ui/card";
 
 export function AdminParents() {
   const { currentTenantId } = useAppStore();
   const queryClient = useQueryClient();
+  const [viewMode, setViewMode] = useViewMode("parents", "grid");
 
   // Filter & Search states
   const [search, setSearch] = useState("");
+  const debouncedSearch = useDebounce(search, 500);
+  const [currentPage, setCurrentPage] = useState(1);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [debouncedSearch]);
 
   // Queries
   const { 
     data: parentsData, 
     isLoading: loadingParents 
-  } = useParents(currentTenantId || undefined, search || undefined);
+  } = useParents(currentTenantId || undefined, debouncedSearch || undefined, currentPage, 12);
 
   const { data: classesData } = useClassesMin(currentTenantId || undefined);
 
@@ -79,6 +94,8 @@ export function AdminParents() {
       a.name.localeCompare(b.name, undefined, { numeric: true, sensitivity: 'base' })
     );
   }, [parentsData]);
+  const totalItems = parentsData?.total || 0;
+  const totalPages = parentsData?.totalPages || 1;
 
   const students = studentData?.items || [];
   const classes = classesData?.classes || [];
@@ -266,7 +283,7 @@ export function AdminParents() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h2 className="text-xl font-bold text-gray-900 dark:text-gray-100">
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
             Parents
           </h2>
           <p className="text-sm text-gray-500 dark:text-gray-400 mt-0.5">
@@ -274,12 +291,32 @@ export function AdminParents() {
             {parents.reduce((s, p) => s + p.children.length, 0)} children linked
           </p>
         </div>
-        <Button
-          className="bg-emerald-600 hover:bg-emerald-700 text-white"
-          onClick={() => setCreateOpen(true)}
-        >
-          <UserPlus className="h-4 w-4 mr-2" /> Add Parent
-        </Button>
+        <div className="flex items-center gap-3 w-full sm:w-auto">
+          <div className="flex items-center gap-1 bg-gray-100 dark:bg-gray-800 p-1 rounded-lg">
+            <Button
+              variant={viewMode === "table" ? "secondary" : "ghost"}
+              size="sm"
+              onClick={() => setViewMode("table")}
+              className={`h-8 w-8 p-0 ${viewMode === "table" ? "bg-white dark:bg-gray-700 shadow-sm" : ""}`}
+            >
+              <List className="h-4 w-4" />
+            </Button>
+            <Button
+              variant={viewMode === "grid" ? "secondary" : "ghost"}
+              size="sm"
+              onClick={() => setViewMode("grid")}
+              className={`h-8 w-8 p-0 ${viewMode === "grid" ? "bg-white dark:bg-gray-700 shadow-sm" : ""}`}
+            >
+              <LayoutGrid className="h-4 w-4" />
+            </Button>
+          </div>
+          <Button
+            className="bg-emerald-600 hover:bg-emerald-700 text-white shadow-sm"
+            onClick={() => setCreateOpen(true)}
+          >
+            <UserPlus className="h-4 w-4 mr-2" /> Add Parent
+          </Button>
+        </div>
       </div>
 
       {/* Search */}
@@ -293,32 +330,128 @@ export function AdminParents() {
         />
       </div>
 
-      {/* Parent Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-        {filtered.map((parent) => (
-          <ParentCard
-            key={parent.id}
-            parent={parent}
-            linking={linking}
-            onEdit={handleEdit}
-            onDelete={handleDelete}
-            onLinkOpen={(p) => {
-              setSelectedParent(p);
-              setLinkOpen(true);
-              setSelectedClass("all");
-            }}
-            onUnlinkChild={handleUnlinkChild}
-          />
-        ))}
-      </div>
-
-      {filtered.length === 0 && (
-        <div className="text-center py-16 text-gray-400 dark:text-gray-500">
-          <Users className="h-12 w-12 mx-auto mb-4 opacity-50" />
-          <p className="text-lg">No parents found</p>
-          <p className="text-sm mt-1">Add a parent or adjust your search</p>
+      {/* Parent Content */}
+      {loading && parents.length === 0 ? (
+        <ParentSkeleton />
+      ) : parents.length === 0 ? (
+        <div className="text-center py-20 bg-gray-50/30 dark:bg-gray-800/10 rounded-2xl border-dashed border-2">
+          <Users className="h-12 w-12 mx-auto mb-4 opacity-20" />
+          <p className="text-lg font-medium">No parents found</p>
+          <p className="text-sm text-muted-foreground">Add a parent or adjust your search</p>
+        </div>
+      ) : viewMode === "table" ? (
+        <Card className="shadow-sm border-0 overflow-hidden mb-4">
+          <CardContent className="p-0">
+            <div className="overflow-x-auto">
+              <table className="w-full text-left text-sm">
+                <thead className="bg-gray-50 dark:bg-gray-800/50 text-gray-500 dark:text-gray-400 uppercase text-[10px] font-bold tracking-wider">
+                  <tr>
+                    <th className="px-6 py-4">Parent</th>
+                    <th className="px-6 py-4">Children</th>
+                    <th className="px-6 py-4">Occupation</th>
+                    <th className="px-6 py-4 text-center">Actions</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
+                  {parents.map((parent, index) => {
+                    const initials = parent.name.split(" ").map((n) => n[0]).join("").slice(0, 2).toUpperCase();
+                    const color = avatarColors[index % avatarColors.length];
+                    return (
+                      <tr key={parent.id} className="hover:bg-gray-50/50 dark:hover:bg-gray-800/30 transition-colors">
+                        <td className="px-6 py-4">
+                          <div className="flex items-center gap-3">
+                            <Avatar className="h-8 w-8">
+                              <AvatarFallback className={`${color} text-white text-[10px] font-bold`}>
+                                {initials}
+                              </AvatarFallback>
+                            </Avatar>
+                            <div className="flex flex-col">
+                              <span className="font-bold text-gray-900 dark:text-gray-100">{parent.name}</span>
+                              <span className="text-xs text-muted-foreground">{parent.email}</span>
+                            </div>
+                          </div>
+                        </td>
+                        <td className="px-6 py-4">
+                          <div className="flex flex-wrap gap-1">
+                            {parent.children.map((child) => (
+                              <Badge key={child.id} variant="secondary" className="text-[10px] py-0">
+                                {child.name}
+                              </Badge>
+                            ))}
+                            {parent.children.length === 0 && <span className="text-xs text-gray-400 italic">None linked</span>}
+                          </div>
+                        </td>
+                        <td className="px-6 py-4 text-gray-600 dark:text-gray-400 font-medium">
+                          {parent.occupation || 'N/A'}
+                        </td>
+                        <td className="px-6 py-4">
+                          <div className="flex items-center justify-center gap-2">
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              className="h-8 gap-2 text-xs border-emerald-200 text-emerald-600 hover:bg-emerald-50"
+                              onClick={() => {
+                                setSelectedParent(parent);
+                                setLinkOpen(true);
+                                setSelectedClass("all");
+                              }}
+                            >
+                              <LinkIcon className="h-3.5 w-3.5" />
+                              Link
+                            </Button>
+                            <Button variant="ghost" size="icon" className="h-8 w-8 text-gray-400 hover:text-emerald-600" onClick={() => handleEdit(parent)}>
+                              <Pencil className="h-3.5 w-3.5" />
+                            </Button>
+                            <Button variant="ghost" size="icon" className="h-8 w-8 text-gray-400 hover:text-red-600" onClick={() => handleDelete(parent.id)}>
+                              <Trash2 className="h-3.5 w-3.5" />
+                            </Button>
+                          </div>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          </CardContent>
+        </Card>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+          <AnimatePresence mode="popLayout">
+            {parents.map((parent) => (
+              <motion.div
+                key={parent.id}
+                layout
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.9, transition: { duration: 0.2 } }}
+              >
+                <ParentCard
+                  parent={parent}
+                  linking={linking}
+                  onEdit={handleEdit}
+                  onDelete={handleDelete}
+                  onLinkOpen={(p) => {
+                    setSelectedParent(p);
+                    setLinkOpen(true);
+                    setSelectedClass("all");
+                  }}
+                  onUnlinkChild={handleUnlinkChild}
+                />
+              </motion.div>
+            ))}
+          </AnimatePresence>
         </div>
       )}
+
+      {/* Pagination Controls */}
+      <Pagination
+        currentPage={currentPage}
+        totalPages={totalPages}
+        totalItems={totalItems}
+        itemsPerPage={12}
+        onPageChange={setCurrentPage}
+      />
 
       {/* Dialogs */}
       <CreateParentDialog

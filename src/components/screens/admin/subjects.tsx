@@ -64,6 +64,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiFetch } from "@/lib/api";
 import { useModulePermissions } from "@/hooks/use-permissions";
 import { useAppStore } from "@/store/use-app-store";
+import { useViewMode } from "@/hooks/use-view-mode";
 
 interface SubjectInfo {
   id: string;
@@ -112,7 +113,7 @@ export function AdminSubjects() {
 
   const [search, setSearch] = useState("");
   const [classFilter, setClassFilter] = useState("all");
-  const [viewMode, setViewMode] = useState<"table" | "grid">("table");
+  const [viewMode, setViewMode] = useViewMode("subjects", "table");
   const [createOpen, setCreateOpen] = useState(false);
   const [form, setForm] = useState({ ...emptyForm });
 

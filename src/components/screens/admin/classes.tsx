@@ -56,6 +56,7 @@ import type { ClassInfo } from "@/lib/types";
 import { useModulePermissions } from "@/hooks/use-permissions";
 import { useClasses, useTeachersMin } from "@/lib/graphql/hooks";
 import { useAppStore } from "@/store/use-app-store";
+import { useViewMode } from "@/hooks/use-view-mode";
 
 export function AdminClasses() {
   const { currentTenantId } = useAppStore();
@@ -76,7 +77,7 @@ export function AdminClasses() {
     );
   }, [classesData]);
   const teachers = teachersData?.teachers || [];
-  const [viewMode, setViewMode] = useState<"grid" | "table">("grid");
+  const [viewMode, setViewMode] = useViewMode("classes", "grid");
 
   // Only show full skeleton if we have NO data at all
   const loading = classesLoading && classes.length === 0;

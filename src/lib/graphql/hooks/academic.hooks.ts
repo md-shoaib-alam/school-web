@@ -1,4 +1,4 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { useQuery, useMutation, useQueryClient, keepPreviousData } from '@tanstack/react-query'
 import { goeyToast as toast } from 'goey-toast'
 import { graphqlQuery, graphqlMutate } from '../core'
 import { queryKeys } from '../keys'
@@ -19,6 +19,7 @@ export function useSubjects(tenantId?: string, page?: number, limit?: number) {
     queryFn: () => graphqlQuery<{ subjects: SubjectsResponse }>(SUBJECTS, { tenantId, page, limit }).then(d => d.subjects),
     staleTime: 0,
     gcTime: 5 * 60 * 1000,
+    placeholderData: keepPreviousData,
   })
 }
 
@@ -28,6 +29,7 @@ export function useClassesMin(tenantId?: string, page?: number, limit?: number) 
     queryFn: () => graphqlQuery<{ classes: ClassesResponse }>(CLASSES, { tenantId, page, limit }).then(d => d.classes),
     staleTime: 0,
     gcTime: 5 * 60 * 1000,
+    placeholderData: keepPreviousData,
   })
 }
 
@@ -37,6 +39,7 @@ export function useTeachersMin(tenantId?: string, page?: number, limit?: number)
     queryFn: () => graphqlQuery<{ teachers: TeachersResponse }>(TEACHERS, { tenantId, page, limit }).then(d => d.teachers),
     staleTime: 0,
     gcTime: 5 * 60 * 1000,
+    placeholderData: keepPreviousData,
   })
 }
 
@@ -49,6 +52,7 @@ export function useClasses(tenantId?: string, page?: number, limit?: number) {
     },
     staleTime: 0,
     gcTime: 5 * 60 * 1000,
+    placeholderData: keepPreviousData,
   })
 }
 
@@ -58,8 +62,8 @@ export function useTeachers(tenantId?: string, search?: string, page?: number, l
     queryFn: () => graphqlQuery<{ teachers: TeachersResponse }>(TEACHERS, { tenantId, search, page, limit }).then(d => d.teachers),
     staleTime: 30 * 60 * 1000,      // 30 minutes - data is fresh for this duration
     gcTime: 60 * 60 * 1000,         // 1 hour - keep in garbage collection
-    refetchOnWindowFocus: false,     // Don't refetch on window focus
-    refetchOnMount: true             // Only refetch if stale (default, but explicit here)
+    refetchOnMount: true,             // Only refetch if stale (default, but explicit here)
+    placeholderData: keepPreviousData,
   })
 }
 
@@ -69,6 +73,7 @@ export function useStudents(tenantId?: string, classId?: string, search?: string
     queryFn: () => graphqlQuery<{ students: StudentsResponse }>(STUDENTS, { tenantId, classId, search, page, limit }).then(d => d.students),
     staleTime: 0,
     gcTime: 5 * 60 * 1000,
+    placeholderData: keepPreviousData,
   })
 }
 
@@ -78,8 +83,8 @@ export function useParents(tenantId?: string, search?: string, page?: number, li
     queryFn: () => graphqlQuery<{ parents: ParentsResponse }>(PARENTS, { tenantId, search, page, limit }).then(d => d.parents),
     staleTime: 30 * 60 * 1000,      // 30 minutes - data is fresh for this duration
     gcTime: 60 * 60 * 1000,         // 1 hour - keep in garbage collection
-    refetchOnWindowFocus: false,     // Don't refetch on window focus
-    refetchOnMount: true             // Only refetch if stale
+    refetchOnMount: true,             // Only refetch if stale
+    placeholderData: keepPreviousData,
   })
 }
 
