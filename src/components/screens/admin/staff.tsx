@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback, useMemo } from "react";
+import { useState, useCallback, useMemo, useEffect } from "react";
 import {
   useGraphQLMutation,
   useAssignRoleToUser,
@@ -21,11 +21,13 @@ import {
   AlertDialogCancel,
 } from "@/components/ui/alert-dialog";
 import {
-  Users,
   Plus,
   Search,
   RotateCcw,
+  LayoutGrid,
+  List
 } from "lucide-react";
+import { cn } from "@/lib/utils";
 import { goeyToast as toast } from "goey-toast";
 import { useAppStore } from "@/store/use-app-store";
 import { useStaff, useCustomRoles } from "@/lib/graphql/hooks";
@@ -33,6 +35,7 @@ import { useModulePermissions } from "@/hooks/use-permissions";
 
 // Sub-components
 import { StaffTable } from "./staff/StaffTable";
+import { StaffCard } from "./staff/StaffCard";
 import { StaffDialog } from "./staff/StaffDialog";
 import { StaffSkeleton } from "./staff/StaffSkeleton";
 
@@ -86,7 +89,20 @@ export function AdminStaff() {
   const { mutateAsync: deleteUser } = useGraphQLMutation<{ deleteUser: boolean }, any>(DELETE_USER);
   const { mutateAsync: assignRole } = useAssignRoleToUser();
 
-  // --- Dialog States ---
+  const [viewMode, setViewMode] = useState<'table' | 'grid'>('table');
+
+  // Load view mode preference
+  useEffect(() => {
+    const saved = localStorage.getItem('staff_view_mode') as 'table' | 'grid';
+    if (saved) setViewMode(saved);
+  }, []);
+
+  // Save view mode preference
+  const toggleView = (mode: 'table' | 'grid') => {
+    setViewMode(mode);
+    localStorage.setItem('staff_view_mode', mode);
+  };
+
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingMember, setEditingMember] = useState<StaffMember | null>(null);
   const [formData, setFormData] = useState<StaffFormData>(emptyFormData);
@@ -239,6 +255,33 @@ export function AdminStaff() {
         </div>
 
         <div className="flex items-center gap-2">
+          <div className="flex items-center p-1 bg-gray-100 dark:bg-gray-800 rounded-lg mr-2">
+            <Button
+              variant="ghost"
+              size="sm"
+              className={cn(
+                "h-8 px-3 gap-2",
+                viewMode === 'table' && "bg-white dark:bg-gray-700 shadow-sm text-emerald-600"
+              )}
+              onClick={() => toggleView('table')}
+            >
+              <List className="h-4 w-4" />
+              <span className="hidden sm:inline">List</span>
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              className={cn(
+                "h-8 px-3 gap-2",
+                viewMode === 'grid' && "bg-white dark:bg-gray-700 shadow-sm text-emerald-600"
+              )}
+              onClick={() => toggleView('grid')}
+            >
+              <LayoutGrid className="h-4 w-4" />
+              <span className="hidden sm:inline">Grid</span>
+            </Button>
+          </div>
+
           <Button variant="outline" size="icon" onClick={() => refetchStaff()} className="h-10 w-10">
             <RotateCcw className="h-4 w-4" />
           </Button>
@@ -250,12 +293,11 @@ export function AdminStaff() {
         </div>
       </div>
 
-      {/* Table Content */}
-      <Card className="border-none shadow-sm overflow-hidden">
-        <CardContent className="p-0">
+      {/* Content */}
+      <div className={cn(viewMode === 'table' ? "bg-white dark:bg-gray-950 rounded-xl border border-gray-100 dark:border-gray-800 overflow-hidden" : "")}>
           {loadingStaff ? (
             <StaffSkeleton />
-          ) : (
+          ) : viewMode === 'table' ? (
             <StaffTable
               staff={staff}
               onEdit={handleOpenEdit}
@@ -263,9 +305,21 @@ export function AdminStaff() {
               canEdit={canEdit}
               canDelete={canDelete}
             />
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+              {staff.map((member) => (
+                <StaffCard
+                  key={member.id}
+                  member={member}
+                  onEdit={handleOpenEdit}
+                  onDelete={(m) => { setMemberToDelete(m); setDeleteAlertOpen(true); }}
+                  canEdit={canEdit}
+                  canDelete={canDelete}
+                />
+              ))}
+            </div>
           )}
-        </CardContent>
-      </Card>
+      </div>
 
       {/* Dialogs */}
       <StaffDialog

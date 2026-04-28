@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
+import { useState, useEffect, useCallback, useRef, useMemo, memo } from 'react';
 import { useReactToPrint } from 'react-to-print';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -126,7 +126,7 @@ function getExamTypeColor(type: string): string {
 // ── Admit Card Visual Component (Hall Ticket) ──
 // ══════════════════════════════════════════════════════════════
 
-function AdmitCardVisual({ card }: { card: AdmitCard }) {
+const AdmitCardVisual = memo(function AdmitCardVisual({ card }: { card: AdmitCard }) {
   const schoolName = card.school?.name || 'Global Academy';
   const schoolAddress = card.school?.address || 'School Address';
   const schoolPhone = card.school?.phone || '';
@@ -265,7 +265,7 @@ function AdmitCardVisual({ card }: { card: AdmitCard }) {
       </div>
     </div>
   );
-}
+});
 
 // ══════════════════════════════════════════════════════════════
 // ── Main Component ──
@@ -292,7 +292,7 @@ export function AdminAdmitCards() {
   const [viewCard, setViewCard] = useState<AdmitCard | null>(null);
 
   // Print mode
-  const [printMode, setPrintMode] = useState(false);
+  const [preparingPrint, setPreparingPrint] = useState(false);
 
   // ── Queries ──
 
@@ -312,7 +312,7 @@ export function AdminAdmitCards() {
 
   const { data: classData, isLoading: loadingClassData, refetch: refetchClassData } = useQuery({
     queryKey: ['admit-card-data', selectedClassId],
-    queryFn: () => api.get(`/admit-cards?classId=${selectedClassId}&_t=${Date.now()}`),
+    queryFn: () => api.get(`/admit-cards?classId=${selectedClassId}`),
     enabled: !!selectedClassId,
     staleTime: 5 * 60 * 1000,
     gcTime: 10 * 60 * 1000,
@@ -413,10 +413,19 @@ export function AdminAdmitCards() {
     documentTitle: "",
   });
 
-  const handlePrintAll = useReactToPrint({
+  const handlePrintAllBase = useReactToPrint({
     contentRef: allCardsRef,
-    documentTitle: "",
+    documentTitle: `Admit_Cards_${selectedClassId}`,
+    onAfterPrint: () => setPreparingPrint(false),
   });
+
+  const handlePrintAll = useCallback(async () => {
+    setPreparingPrint(true);
+    // Give time for DOM to render the print container
+    setTimeout(() => {
+      handlePrintAllBase();
+    }, 500);
+  }, [handlePrintAllBase]);
 
   // ── Summary ──
   const totalStudents = classData?.students.length || 0;
@@ -442,16 +451,25 @@ export function AdminAdmitCards() {
           </p>
         </div>
         {admitCards.length > 0 && (
-          <Button onClick={handlePrintAll} className="gap-2 bg-slate-800 hover:bg-slate-900 text-white">
-            <Printer className="h-4 w-4" />
-            Print All ({admitCards.length})
+          <Button 
+            onClick={handlePrintAll} 
+            disabled={preparingPrint}
+            className="gap-2 bg-slate-800 hover:bg-slate-900 text-white"
+          >
+            {preparingPrint ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : (
+              <Printer className="h-4 w-4" />
+            )}
+            {preparingPrint ? 'Preparing...' : `Print All (${admitCards.length})`}
           </Button>
         )}
       </div>
 
-      {/* Hidden Batch Print Container */}
-      <div className="hidden">
-        <div ref={allCardsRef} className="print:block p-0">
+      {/* Hidden Batch Print Container - Only render when preparing to print to save DOM weight */}
+      {preparingPrint && (
+        <div className="hidden">
+          <div ref={allCardsRef} className="print:block p-0">
           <style type="text/css" media="print">
             {"@page { size: A4; margin: 0mm; } body { margin: 0; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; } .admit-card-page { page-break-after: always; }"}
           </style>
@@ -475,6 +493,7 @@ export function AdminAdmitCards() {
           ))}
         </div>
       </div>
+    )}
 
       {/* Hidden Single Print Container */}
       <div className="hidden">
@@ -668,11 +687,15 @@ export function AdminAdmitCards() {
 
                 <Button
                   onClick={handlePrintAll}
-                  disabled={admitCards.length === 0 || generating}
+                  disabled={admitCards.length === 0 || generating || preparingPrint}
                   className={`flex-1 gap-2 h-11 border-none ${admitCards.length > 0 ? 'bg-slate-900 text-white hover:bg-black' : 'bg-slate-800/40 text-slate-500 cursor-not-allowed'}`}
                 >
-                  <Printer className="h-4 w-4" />
-                  Print All {admitCards.length > 0 && `(${admitCards.length})`}
+                  {preparingPrint ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <Printer className="h-4 w-4" />
+                  )}
+                  {preparingPrint ? 'Preparing Cards...' : `Print All ${admitCards.length > 0 ? `(${admitCards.length})` : ''}`}
                 </Button>
               </div>
             </CardContent>

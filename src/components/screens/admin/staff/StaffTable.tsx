@@ -11,7 +11,8 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Pencil, Trash2, Shield, Phone, Mail } from "lucide-react";
+import { Pencil, Trash2, Shield, Phone, Mail, Copy, Check } from "lucide-react";
+import { useState } from "react";
 import { StaffMember } from "./types";
 import { getInitials, roleBadgeStyle, avatarStyle } from "./utils";
 
@@ -30,6 +31,13 @@ export function StaffTable({
   canEdit,
   canDelete,
 }: StaffTableProps) {
+  const [copiedId, setCopiedId] = useState<string | null>(null);
+
+  const handleCopy = (email: string, id: string) => {
+    navigator.clipboard.writeText(email);
+    setCopiedId(id);
+    setTimeout(() => setCopiedId(null), 2000);
+  };
   return (
     <div className="overflow-x-auto">
       <Table>
@@ -59,9 +67,22 @@ export function StaffTable({
                         {getInitials(member.name)}
                       </AvatarFallback>
                     </Avatar>
-                    <div className="flex flex-col">
+                    <div className="flex flex-col group">
                       <span className="font-bold text-sm text-gray-900 dark:text-gray-100">{member.name}</span>
-                      <span className="text-[10px] text-gray-500">{member.email}</span>
+                      <div className="flex items-center gap-1.5">
+                        <span className="text-[10px] text-gray-500">{member.email}</span>
+                        <button 
+                          onClick={() => handleCopy(member.email, member.id)}
+                          className="opacity-0 group-hover:opacity-100 transition-opacity p-0.5 hover:bg-gray-100 dark:hover:bg-gray-800 rounded"
+                          title="Copy email"
+                        >
+                          {copiedId === member.id ? (
+                            <Check className="h-2.5 w-2.5 text-emerald-500" />
+                          ) : (
+                            <Copy className="h-2.5 w-2.5 text-gray-400" />
+                          )}
+                        </button>
+                      </div>
                     </div>
                   </div>
                 </TableCell>
