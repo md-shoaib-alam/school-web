@@ -129,7 +129,7 @@ function AdmitCardVisual({ card }: { card: AdmitCard }) {
   const schoolPhone = card.school?.phone || '';
 
   return (
-    <div className="w-[100%] max-w-[750px] mx-auto bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden print:shadow-none print:border-gray-400 print:rounded-none h-[13.8cm] flex flex-col justify-between">
+    <div className="w-[100%] max-w-[750px] mx-auto bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden print:shadow-none print:border-gray-400 print:rounded-none print:max-w-none h-[13.5cm] flex flex-col justify-between">
       <div>
         {/* ── Header ── */}
         <div className="bg-gradient-to-r from-slate-800 via-slate-700 to-slate-800 text-white px-5 py-2">
@@ -425,14 +425,19 @@ export function AdminAdmitCards() {
       {/* Hidden Batch Print Container */}
       <div className="hidden">
         <div ref={allCardsRef} className="print:block p-0">
-          <div className="grid grid-cols-1 gap-0">
+          <div className="grid grid-cols-2 gap-0">
             {admitCards.map((card, idx) => (
               <div 
                 key={card.cardNumber} 
-                className={`flex items-center justify-center h-[14.85cm] ${idx % 2 === 1 ? 'border-t-2 border-dashed border-gray-300' : ''}`}
-                style={{ breakAfter: idx % 2 === 1 ? 'always' : 'auto' }}
+                className="flex items-center justify-center h-[14.85cm] p-2"
+                style={{ 
+                  pageBreakInside: 'avoid',
+                  breakInside: 'avoid'
+                }}
               >
-                <AdmitCardVisual card={card} />
+                <div className="w-full h-full flex items-center justify-center">
+                  <AdmitCardVisual card={card} />
+                </div>
               </div>
             ))}
           </div>
