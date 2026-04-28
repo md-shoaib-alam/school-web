@@ -10,6 +10,7 @@ import { Sidebar } from "./sidebar";
 import { Header } from "./header";
 import { navItems } from "./nav-config";
 import { useIsFetching } from "@tanstack/react-query";
+import { getCookie } from "@/lib/cookies";
 
 function LoadingProgress() {
   const isFetching = useIsFetching();
@@ -51,7 +52,6 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
   // Cookie guard: Redirect to login if cookie is missing while logged in
   useEffect(() => {
     const checkAuth = () => {
-      const { getCookie } = require("@/store/app-store/utils");
       const token = getCookie("school_token");
       if (!token && currentUser) {
         window.location.href = "/";

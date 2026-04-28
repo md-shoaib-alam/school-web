@@ -20,6 +20,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import {
   CalendarDays, Briefcase, Users, Clock, CheckCircle2, XCircle,
   Loader2, FileText, AlertTriangle, Filter, Ban, CalendarOff, Plus, History, Send,
+  GraduationCap,
 } from 'lucide-react';
 import { goeyToast as toast } from 'goey-toast';
 import { apiFetch } from '@/lib/api';
@@ -60,18 +61,18 @@ interface LeaveRequest {
 
 // ── Main Component ──
 
-export function AdminLeaves() {
+export function AdminLeaves({ initialTab = 'teacher' }: { initialTab?: string }) {
   const { currentUser } = useAppStore();
   const isAdmin = currentUser?.role === 'admin' || currentUser?.role === 'super_admin';
 
-  if (isAdmin) return <AdminManagerView />;
+  if (isAdmin) return <AdminManagerView initialTab={initialTab} />;
   return <StaffSelfServiceView />;
 }
 
 // ── Admin View ──
 
-function AdminManagerView() {
-  const [activeTab, setActiveTab] = useState('teacher');
+function AdminManagerView({ initialTab }: { initialTab: string }) {
+  const [activeTab, setActiveTab] = useState(initialTab);
   const [leaves, setLeaves] = useState<LeaveRequest[]>([]);
   const [loading, setLoading] = useState(true);
   const [statusFilter, setStatusFilter] = useState('all');
@@ -116,11 +117,7 @@ function AdminManagerView() {
           <p className="text-muted-foreground text-sm mt-1">Review and manage leave requests from the team</p>
         </div>
       </div>
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
-        <TabsList className="bg-muted/80">
-          <TabsTrigger value="teacher" className="gap-2"><Briefcase className="h-4 w-4" /> Teachers</TabsTrigger>
-          <TabsTrigger value="staff" className="gap-2"><Users className="h-4 w-4" /> Staff</TabsTrigger>
-        </TabsList>
+      <div className="space-y-4">
 
         <Card>
           <CardContent className="p-4 flex flex-col sm:flex-row gap-3">
@@ -184,7 +181,7 @@ function AdminManagerView() {
             )}
           </CardContent>
         </Card>
-      </Tabs>
+      </div>
 
       <Dialog open={dialog.open} onOpenChange={(v: boolean) => setDialog(p => ({...p, open: v}))}>
         <DialogContent>

@@ -2,8 +2,9 @@ import { create } from 'zustand';
 import { AppState, AppUser, UserRole } from './types';
 import { 
   STORAGE_KEYS, invalidateCache, parseScreenFromPath, parseTenantFromPath, 
-  isValidScreen, CACHE_TTL, getCookie
+  isValidScreen, CACHE_TTL
 } from './utils';
+import { getCookie } from '@/lib/cookies';
 
 function getInitialUser(): { isLoggedIn: boolean; currentUser: AppUser | null } {
   if (typeof window === 'undefined') return { isLoggedIn: false, currentUser: null };

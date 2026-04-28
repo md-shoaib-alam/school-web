@@ -4,7 +4,8 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useTheme } from "next-themes";
 import { useAppStore, type UserRole } from "@/store/use-app-store";
-import { setCookie, SESSION_EXPIRY_DAYS } from "@/store/app-store/utils";
+import { setCookie } from "@/lib/cookies";
+import { SESSION_EXPIRY_DAYS } from "@/store/app-store/utils";
 import { Button } from "@/components/ui/button";
 import {
   Card,

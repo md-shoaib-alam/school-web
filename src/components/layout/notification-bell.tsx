@@ -1,11 +1,15 @@
 "use client";
 
 import { useState } from "react";
-import { Bell, ClipboardList, IndianRupee, Calendar, UserCheck } from "lucide-react";
+import { Bell, ClipboardList, IndianRupee, Calendar, UserCheck, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
+import { apiFetch } from "@/lib/api";
+import { formatDistanceToNow } from "date-fns";
+import { useAppStore } from "@/store/use-app-store";
+import { useEffect } from "react";
 
 // Mock notification data
 const MOCK_NOTIFICATIONS = [
@@ -52,18 +56,74 @@ const MOCK_NOTIFICATIONS = [
 ];
 
 export function NotificationBell() {
-  const [notifications, setNotifications] = useState(MOCK_NOTIFICATIONS);
+  const { currentUser } = useAppStore();
+  const [notifications, setNotifications] = useState<any[]>([]);
   const [open, setOpen] = useState(false);
-  const unreadCount = notifications.filter((n) => !n.read).length;
+  const [loading, setLoading] = useState(true);
 
-  const markAllRead = () => {
-    setNotifications((prev) => prev.map((n) => ({ ...n, read: true })));
+  const fetchNotices = async () => {
+    try {
+      const res = await apiFetch("/api/notices");
+      if (res.ok) {
+        const rawNotices = await res.json();
+        
+        // Get read status from localStorage
+        const seenIds = JSON.parse(localStorage.getItem('seen_notices') || '[]');
+        
+        // Map and filter for unread + 10 latest
+        const mapped = rawNotices
+          .filter((n: any) => !seenIds.map(String).includes(String(n.id))) // Only unread
+          .sort((a: any, b: any) => new Date(b.created_at || b.createdAt).getTime() - new Date(a.created_at || a.createdAt).getTime()) // Latest first
+          .slice(0, 10) // Only 10 latest
+          .map((n: any) => ({
+            id: String(n.id),
+            title: n.title,
+            desc: n.content || n.description || "No content available",
+            time: (n.created_at || n.createdAt) ? formatDistanceToNow(new Date(n.created_at || n.createdAt), { addSuffix: true }) : "recently",
+            read: false,
+            icon: <Bell className="h-4 w-4 text-rose-500" />,
+          }));
+
+        setNotifications(mapped);
+      }
+    } catch (err) {
+      console.error("Failed to fetch notices:", err);
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const markRead = (id: number) => {
-    setNotifications((prev) =>
-      prev.map((n) => (n.id === id ? { ...n, read: true } : n)),
-    );
+  useEffect(() => {
+    if (open) {
+      fetchNotices();
+    }
+  }, [open]);
+
+  // Initial fetch for count
+  useEffect(() => {
+    fetchNotices();
+    const interval = setInterval(fetchNotices, 30000); // Check every 30s
+    return () => clearInterval(interval);
+  }, []);
+
+  const unreadCount = notifications.length;
+
+  const markAllRead = () => {
+    const ids = notifications.map(n => n.id);
+    const seenIds = JSON.parse(localStorage.getItem('seen_notices') || '[]');
+    const updatedSeen = Array.from(new Set([...seenIds, ...ids]));
+    localStorage.setItem('seen_notices', JSON.stringify(updatedSeen));
+    setNotifications([]);
+  };
+
+  const markRead = (id: string | number) => {
+    const sId = String(id);
+    const seenIds = JSON.parse(localStorage.getItem('seen_notices') || '[]');
+    if (!seenIds.map(String).includes(sId)) {
+      seenIds.push(sId);
+      localStorage.setItem('seen_notices', JSON.stringify(seenIds));
+    }
+    setNotifications(prev => prev.filter(n => String(n.id) !== sId));
   };
 
   return (
@@ -104,10 +164,18 @@ export function NotificationBell() {
           </Button>
         </div>
         <ScrollArea className="max-h-[380px] overflow-y-auto">
-          {notifications.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-8 text-gray-400">
-              <Bell className="h-8 w-8 mb-2 opacity-40" />
-              <p className="text-sm">No notifications</p>
+          {loading && notifications.length === 0 ? (
+            <div className="flex flex-col items-center justify-center py-12">
+              <Loader2 className="h-6 w-6 animate-spin text-rose-500" />
+              <p className="text-xs text-gray-400 mt-2">Checking notices...</p>
+            </div>
+          ) : notifications.length === 0 ? (
+            <div className="flex flex-col items-center justify-center py-12 text-gray-400">
+              <div className="w-16 h-16 rounded-full bg-gray-50 dark:bg-gray-800/50 flex items-center justify-center mb-3">
+                <Bell className="h-8 w-8 opacity-20" />
+              </div>
+              <p className="text-sm font-medium">No new notices</p>
+              <p className="text-[11px] opacity-60">You're all caught up!</p>
             </div>
           ) : (
             <div className="divide-y divide-gray-50 dark:divide-gray-800/50">

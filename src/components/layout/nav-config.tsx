@@ -148,7 +148,18 @@ export const navItems: Record<UserRole, NavItem[]> = {
     },
     { key: "teachers", label: "Teachers", icon: <Users className="h-4 w-4" /> },
     { key: "parents", label: "Parents", icon: <Heart className="h-4 w-4" /> },
+    { key: "staff", label: "Staff / Employees", icon: <UserPlus className="h-4 w-4" /> },
     { key: "classes", label: "Classes", icon: <School className="h-4 w-4" /> },
+    {
+      key: "leave-management",
+      label: "Leave Management",
+      icon: <CalendarDays className="h-4 w-4" />,
+      children: [
+        { key: "student-leaves", label: "Student Leaves", icon: <GraduationCap className="h-4 w-4" /> },
+        { key: "teacher-leaves", label: "Teacher Leaves", icon: <Briefcase className="h-4 w-4" /> },
+        { key: "staff-leaves", label: "Staff Leaves", icon: <Users className="h-4 w-4" /> },
+      ]
+    },
     {
       key: "promotions-group",
       label: "Class Promotion",
@@ -223,20 +234,9 @@ export const navItems: Record<UserRole, NavItem[]> = {
       permModule: "students",
     },
     {
-      key: "leaves",
-      label: "Leave Management",
-      icon: <CalendarDays className="h-4 w-4" />,
-      permModule: "staff",
-    },
-    {
       key: "roles",
       label: "Roles & Permissions",
       icon: <Shield className="h-4 w-4" />,
-    },
-    {
-      key: "staff",
-      label: "Staff / Employees",
-      icon: <UserPlus className="h-4 w-4" />,
     },
     {
       key: "tickets",
