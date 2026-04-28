@@ -132,7 +132,10 @@ function AdmitCardVisual({ card }: { card: AdmitCard }) {
   const schoolPhone = card.school?.phone || '';
 
   return (
-    <div className="w-[100%] max-w-[750px] mx-auto bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden print:shadow-none print:border-gray-400 print:rounded-none print:max-w-none h-[13cm] flex flex-col justify-between">
+    <div 
+      className="w-[100%] max-w-[750px] mx-auto bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden print:shadow-none print:border-gray-400 print:rounded-none print:max-w-none h-[13cm] print:h-[13.5cm] print:w-[9.6cm] flex flex-col justify-between"
+      style={{ WebkitPrintColorAdjust: 'exact', printColorAdjust: 'exact' } as any}
+    >
       <div>
         {/* ── Header ── */}
         <div className="bg-gradient-to-r from-slate-800 via-slate-700 to-slate-800 text-white px-5 py-2">
@@ -450,10 +453,10 @@ export function AdminAdmitCards() {
       <div className="hidden">
         <div ref={allCardsRef} className="print:block p-0">
           <style type="text/css" media="print">
-            {"@page { size: A4; margin: 0mm; } body { margin: 0; } .admit-card-page { page-break-after: always; }"}
+            {"@page { size: A4; margin: 0mm; } body { margin: 0; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; } .admit-card-page { page-break-after: always; }"}
           </style>
           {Array.from({ length: Math.ceil(admitCards.length / 4) }).map((_, pageIdx) => (
-            <div key={pageIdx} className="grid grid-cols-2 gap-0 p-[5mm] admit-card-page h-[29.7cm] content-start">
+            <div key={pageIdx} className="grid grid-cols-2 gap-x-4 gap-y-6 p-[8mm] admit-card-page h-[29.7cm] content-start">
               {admitCards.slice(pageIdx * 4, (pageIdx + 1) * 4).map((card) => (
                 <div 
                   key={card.cardNumber} 
@@ -477,7 +480,7 @@ export function AdminAdmitCards() {
       <div className="hidden">
         <div ref={singleCardRef} className="print:block p-0 bg-white">
           <style type="text/css" media="print">
-            {"@page { size: A4; margin: 0mm; } body { margin: 0; }"}
+            {"@page { size: A4; margin: 0mm; } body { margin: 0; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }"}
           </style>
           {viewCard && (
             <div className="w-[21cm] h-[29.7cm] p-[5mm] flex flex-wrap content-start">
@@ -701,8 +704,8 @@ export function AdminAdmitCards() {
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead>Card No</TableHead>
-                      <TableHead>Roll No</TableHead>
+                      <TableHead className="hidden sm:table-cell">Card No</TableHead>
+                      <TableHead className="hidden sm:table-cell">Roll No</TableHead>
                       <TableHead>Student Name</TableHead>
                       <TableHead className="hidden sm:table-cell">Class</TableHead>
                       <TableHead className="hidden md:table-cell">Exams</TableHead>
@@ -712,16 +715,22 @@ export function AdminAdmitCards() {
                   <TableBody>
                     {admitCards.map((card) => (
                       <TableRow key={card.cardNumber} className="hover:bg-muted/50">
-                        <TableCell>
+                        <TableCell className="hidden sm:table-cell">
                           <span className="font-mono text-xs text-muted-foreground">{card.cardNumber}</span>
                         </TableCell>
-                        <TableCell className="font-mono text-sm">{card.student.rollNumber}</TableCell>
+                        <TableCell className="hidden sm:table-cell font-mono text-sm">{card.student.rollNumber}</TableCell>
                         <TableCell>
                           <div className="flex items-center gap-2">
                             <div className="h-7 w-7 rounded-full bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 flex items-center justify-center text-[10px] font-bold shrink-0">
                               {card.student.initials}
                             </div>
-                            <span className="font-medium text-sm">{card.student.name}</span>
+                            <div className="flex flex-col min-w-0">
+                              <span className="font-medium text-sm truncate">{card.student.name}</span>
+                              <div className="flex items-center gap-2 sm:hidden mt-0.5">
+                                <span className="text-[10px] text-muted-foreground bg-muted px-1 rounded font-mono">#{card.student.rollNumber}</span>
+                                <span className="text-[10px] text-muted-foreground bg-amber-50 dark:bg-amber-900/20 px-1 rounded font-mono">{card.cardNumber}</span>
+                              </div>
+                            </div>
                           </div>
                         </TableCell>
                         <TableCell className="hidden sm:table-cell text-sm text-muted-foreground">
@@ -806,7 +815,7 @@ export function AdminAdmitCards() {
                 className="gap-2 bg-amber-600 hover:bg-amber-700 text-white shadow-lg shadow-amber-900/20 px-8 h-12 text-base font-semibold"
               >
                 <Printer className="h-5 w-5" />
-                Print This Card
+                Download PDF / Print
               </Button>
             </div>
           )}
