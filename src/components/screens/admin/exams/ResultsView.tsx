@@ -234,14 +234,14 @@ export function ResultsView({
 
           {/* Results Entry Table */}
           <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0">
-              <div>
+            <CardHeader className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div className="space-y-1">
                 <CardTitle className="text-base">Enter Results</CardTitle>
-                <CardDescription>
+                <CardDescription className="text-xs sm:text-sm">
                   Enter marks for each student. Pass/fail is auto-calculated.
                 </CardDescription>
               </div>
-              <div className="flex items-center gap-2">
+              <div className="flex flex-wrap items-center gap-2">
                 <Button 
                   variant="outline"
                   onClick={onSave} 
