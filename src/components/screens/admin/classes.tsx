@@ -45,7 +45,11 @@ import {
   Trash2,
   Loader2,
   Eye,
+  LayoutGrid,
+  List,
+  ExternalLink,
 } from "lucide-react";
+import { useRouter, useParams } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { goeyToast as toast } from "goey-toast";
 import type { ClassInfo } from "@/lib/types";
@@ -57,6 +61,9 @@ export function AdminClasses() {
   const { currentTenantId } = useAppStore();
   const { canCreate, canEdit, canDelete } = useModulePermissions("classes");
   const queryClient = useQueryClient();
+  const router = useRouter();
+  const params = useParams();
+  const slug = params.slug as string;
 
   // ⚡ TanStack Query with GraphQL Group-wise hooks
   const { data: classesData, isLoading: classesLoading } = useClasses(currentTenantId || undefined);
@@ -69,6 +76,7 @@ export function AdminClasses() {
     );
   }, [classesData]);
   const teachers = teachersData?.teachers || [];
+  const [viewMode, setViewMode] = useState<"grid" | "table">("grid");
 
   // Only show full skeleton if we have NO data at all
   const loading = classesLoading && classes.length === 0;
@@ -233,20 +241,6 @@ export function AdminClasses() {
     }
   };
 
-  const gradeColors: Record<string, string> = {
-    "1": "bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 border-green-200 dark:border-green-800",
-    "2": "bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800",
-    "3": "bg-teal-100 dark:bg-teal-900/30 text-teal-700 dark:text-teal-400 border-teal-200 dark:border-teal-800",
-    "4": "bg-cyan-100 dark:bg-cyan-900/30 text-cyan-700 dark:text-cyan-400 border-cyan-200 dark:border-cyan-800",
-    "5": "bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 border-blue-200 dark:border-blue-800",
-    "6": "bg-violet-100 dark:bg-violet-900/30 text-violet-700 dark:text-violet-400 border-violet-200 dark:border-violet-800",
-    "7": "bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-400 border-purple-200 dark:border-purple-800",
-    "8": "bg-rose-100 dark:bg-rose-900/30 text-rose-700 dark:text-rose-400 border-rose-200 dark:border-rose-800",
-    "9": "bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-400 border-orange-200 dark:border-orange-800",
-    "10": "bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 border-amber-200 dark:border-amber-800",
-    "11": "bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 border-red-200 dark:border-red-800",
-    "12": "bg-pink-100 dark:bg-pink-900/30 text-pink-700 dark:text-pink-400 border-pink-200 dark:border-pink-800",
-  };
 
   const getProgressColor = (percentage: number) => {
     if (percentage >= 90) return "[&>div]:bg-red-500";
@@ -366,28 +360,49 @@ export function AdminClasses() {
       )}
 
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
+            Classes
+          </h2>
           <p className="text-sm text-muted-foreground">
             {classes.length} classes configured
           </p>
         </div>
-        {canCreate && (
-          <Button
-            className="bg-emerald-600 hover:bg-emerald-700 text-white"
-            onClick={() => setAddDialogOpen(true)}
-          >
-            <Plus className="h-4 w-4 mr-2" />
-            Add Class
-          </Button>
-        )}
-      </div>
-
-      {/* Class Grid */}
+        <div className="flex items-center gap-3 w-full sm:w-auto">
+          <div className="flex items-center gap-1 bg-gray-100 dark:bg-gray-800 p-1 rounded-lg">
+            <Button
+              variant={viewMode === "table" ? "secondary" : "ghost"}
+              size="sm"
+              onClick={() => setViewMode("table")}
+              className={`h-8 w-8 p-0 ${viewMode === "table" ? "bg-white dark:bg-gray-700 shadow-sm" : ""}`}
+            >
+              <List className="h-4 w-4" />
+            </Button>
+            <Button
+              variant={viewMode === "grid" ? "secondary" : "ghost"}
+              size="sm"
+              onClick={() => setViewMode("grid")}
+              className={`h-8 w-8 p-0 ${viewMode === "grid" ? "bg-white dark:bg-gray-700 shadow-sm" : ""}`}
+            >
+              <LayoutGrid className="h-4 w-4" />
+            </Button>
+          </div>
+          {canCreate && (
+            <Button
+              className="bg-emerald-600 hover:bg-emerald-700 text-white shadow-sm"
+              onClick={() => setAddDialogOpen(true)}
+            >
+              <Plus className="h-4 w-4 mr-2" />
+              Add Class
+            </Button>
+          )}
+        </div>
+      </div>      {/* Class View */}
       {loading ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
           {[...Array(8)].map((_, i) => (
-            <Card key={i}>
+            <Card key={i} className="border-0 shadow-sm">
               <CardContent className="p-6">
                 <Skeleton className="h-6 w-24 mb-4" />
                 <div className="space-y-3">
@@ -400,118 +415,178 @@ export function AdminClasses() {
           ))}
         </div>
       ) : classes.length === 0 ? (
-        <Card>
-          <CardContent className="py-16 text-center text-muted-foreground">
-            <School className="h-12 w-12 mx-auto mb-3 opacity-30" />
-            <p className="font-medium">No classes found</p>
-            <p className="text-sm">Create your first class to get started</p>
+        <Card className="border-dashed border-2 bg-transparent">
+          <CardContent className="py-20 text-center text-muted-foreground">
+            <School className="h-12 w-12 mx-auto mb-4 opacity-20" />
+            <p className="text-lg font-medium">No classes found</p>
+            <p className="text-sm text-muted-foreground">Create your first class to get started</p>
+          </CardContent>
+        </Card>
+      ) : viewMode === "table" ? (
+        <Card className="shadow-sm border-0 overflow-hidden">
+          <CardContent className="p-0">
+            <div className="overflow-x-auto">
+              <table className="w-full text-left text-sm">
+                <thead className="bg-gray-50 dark:bg-gray-800/50 text-gray-500 dark:text-gray-400 uppercase text-[10px] font-bold tracking-wider">
+                  <tr>
+                    <th className="px-6 py-4">Class Details</th>
+                    <th className="px-6 py-4">Section</th>
+                    <th className="px-6 py-4">Teacher</th>
+                    <th className="px-6 py-4">Occupancy</th>
+                    <th className="px-6 py-4 text-center">Actions</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
+                  {classes.map((cls) => {
+                    const percentage = cls.capacity > 0 ? Math.round((cls.studentCount / cls.capacity) * 100) : 0;
+                    return (
+                      <tr key={cls.id} className="hover:bg-gray-50/50 dark:hover:bg-gray-800/30 transition-colors">
+                        <td className="px-6 py-4">
+                          <span className="font-bold text-gray-900 dark:text-gray-100">{cls.name}</span>
+                        </td>
+                        <td className="px-6 py-4">
+                          <Badge variant="outline" className="font-medium">Section {cls.section}</Badge>
+                        </td>
+                        <td className="px-6 py-4">
+                          <div className="flex items-center gap-2">
+                            <UserCheck className="h-3.5 w-3.5 text-blue-500" />
+                            <span className="text-gray-600 dark:text-gray-400">{cls.classTeacher || 'Unassigned'}</span>
+                          </div>
+                        </td>
+                        <td className="px-6 py-4 min-w-[150px]">
+                          <div className="flex flex-col gap-1.5">
+                            <div className="flex justify-between text-[10px] font-medium">
+                              <span className="text-muted-foreground">{cls.studentCount}/{cls.capacity} Students</span>
+                              <span className={percentage >= 90 ? "text-red-500" : "text-emerald-500"}>{percentage}%</span>
+                            </div>
+                            <Progress value={percentage} className={`h-1 ${getProgressColor(percentage)}`} />
+                          </div>
+                        </td>
+                        <td className="px-6 py-4">
+                          <div className="flex items-center justify-center gap-2">
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              className="h-8 gap-2 text-xs border-emerald-200 dark:border-emerald-800 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-50"
+                              onClick={() => router.push(`/${slug}/students?classId=${cls.id}`)}
+                            >
+                              <Users className="h-3.5 w-3.5" />
+                              View Students
+                            </Button>
+                            {canEdit && (
+                              <Button variant="ghost" size="icon" className="h-8 w-8 text-gray-400 hover:text-emerald-600" onClick={() => openEditDialog(cls)}>
+                                <Pencil className="h-3.5 w-3.5" />
+                              </Button>
+                            )}
+                            {canDelete && (
+                              <Button variant="ghost" size="icon" className="h-8 w-8 text-gray-400 hover:text-red-600" onClick={() => { setDeleteTarget(cls); setDeleteDialogOpen(true); }}>
+                                <Trash2 className="h-3.5 w-3.5" />
+                              </Button>
+                            )}
+                          </div>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
           </CardContent>
         </Card>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
           <AnimatePresence mode="popLayout">
             {classes.map((cls) => {
-              const percentage =
-                cls.capacity > 0
-                  ? Math.round((cls.studentCount / cls.capacity) * 100)
-                  : 0;
-              const colorClass =
-                gradeColors[cls.grade] ||
-                "bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 border-gray-200 dark:border-gray-700";
+              const percentage = cls.capacity > 0 ? Math.round((cls.studentCount / cls.capacity) * 100) : 0;
 
               return (
                 <motion.div
                   key={cls.id}
                   layout
-                  initial={{ opacity: 0, scale: 0.9 }}
+                  initial={{ opacity: 0, scale: 0.95 }}
                   animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.8, transition: { duration: 0.2 } }}
+                  exit={{ opacity: 0, scale: 0.9, transition: { duration: 0.2 } }}
                 >
-                  <Card className="hover:shadow-md transition-all duration-200 hover:-translate-y-0.5 relative">
+                  <Card className="hover:shadow-lg transition-all duration-300 hover:-translate-y-1 relative group overflow-hidden border-0 shadow-sm">
                     <CardContent className="p-6">
                       {/* Action buttons - top right */}
-                      {(canEdit || canDelete) && (
-                        <div className="absolute top-3 right-3 flex items-center gap-1">
-                          {canEdit && (
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              className="h-7 w-7 text-muted-foreground hover:text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-900/30"
-                              onClick={() => openEditDialog(cls)}
-                            >
-                              <Pencil className="h-3.5 w-3.5" />
-                            </Button>
-                          )}
-                          {canDelete && (
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              className="h-7 w-7 text-muted-foreground hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/30"
-                              onClick={() => {
-                                setDeleteTarget(cls);
-                                setDeleteDialogOpen(true);
-                              }}
-                            >
-                              <Trash2 className="h-3.5 w-3.5" />
-                            </Button>
-                          )}
-                        </div>
-                      )}
+                      <div className="absolute top-3 right-3 flex items-center gap-1 transition-opacity">
+                        {canEdit && (
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-7 w-7 text-muted-foreground hover:text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-900/30"
+                            onClick={() => openEditDialog(cls)}
+                          >
+                            <Pencil className="h-3.5 w-3.5" />
+                          </Button>
+                        )}
+                        {canDelete && (
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-7 w-7 text-muted-foreground hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/30"
+                            onClick={() => {
+                              setDeleteTarget(cls);
+                              setDeleteDialogOpen(true);
+                            }}
+                          >
+                            <Trash2 className="h-3.5 w-3.5" />
+                          </Button>
+                        )}
+                      </div>
 
                       {/* Class name and grade badge */}
-                      <div className="flex items-start justify-between mb-4 pr-16">
-                        <div>
+                      <div className="flex items-start justify-between mb-4">
+                        <div className="space-y-1">
                           <h3 className="text-lg font-bold text-gray-900 dark:text-gray-100">
                             {cls.name}
                           </h3>
-                          <p className="text-sm text-muted-foreground">
+                          <Badge variant="secondary" className="text-[10px] font-bold uppercase tracking-widest px-2 py-0">
                             Section {cls.section}
-                          </p>
+                          </Badge>
                         </div>
-                        <Badge
-                          variant="outline"
-                          className={`text-xs ${colorClass}`}
-                        >
-                          Grade {cls.grade}
-                        </Badge>
                       </div>
 
                       {/* Stats */}
-                      <div className="grid grid-cols-2 gap-3 mb-4">
-                        <div className="flex items-center gap-2 text-sm">
-                          <Users className="h-4 w-4 text-emerald-500" />
-                          <div>
-                            <span className="font-semibold">
-                              {cls.studentCount}
-                            </span>
-                            <span className="text-muted-foreground">
-                              /{cls.capacity}
-                            </span>
+                      <div className="grid grid-cols-1 gap-3 mb-6 mt-6">
+                        <div className="flex items-center justify-between text-sm">
+                          <div className="flex items-center gap-2">
+                            <Users className="h-4 w-4 text-emerald-500" />
+                            <span className="text-gray-500 font-medium text-xs">Students</span>
                           </div>
+                          <span className="font-bold">{cls.studentCount}<span className="text-gray-400 font-normal ml-0.5">/{cls.capacity}</span></span>
                         </div>
-                        <div className="flex items-center gap-2 text-sm">
-                          <UserCheck className="h-4 w-4 text-blue-500" />
-                          <span className="text-muted-foreground truncate">
-                            {cls.classTeacher}
+                        <div className="flex items-center justify-between text-sm">
+                          <div className="flex items-center gap-2">
+                            <UserCheck className="h-4 w-4 text-blue-500" />
+                            <span className="text-gray-500 font-medium text-xs">Teacher</span>
+                          </div>
+                          <span className="text-gray-700 dark:text-gray-300 font-semibold truncate max-w-[120px]">
+                            {cls.classTeacher || 'Unassigned'}
                           </span>
                         </div>
                       </div>
 
                       {/* Progress bar */}
-                      <div className="space-y-1.5">
-                        <div className="flex items-center justify-between text-xs">
-                          <span className="text-muted-foreground">Capacity</span>
-                          <span
-                            className={`font-medium ${percentage >= 90 ? "text-red-600 dark:text-red-400" : "text-emerald-600 dark:text-emerald-400"}`}
-                          >
-                            {percentage}%
-                          </span>
+                      <div className="space-y-2 mb-6">
+                        <div className="flex items-center justify-between text-[10px] uppercase font-black tracking-tighter text-gray-400">
+                          <span>Capacity</span>
+                          <span className={percentage >= 90 ? "text-red-500" : "text-emerald-500"}>{percentage}% Full</span>
                         </div>
                         <Progress
                           value={percentage}
-                          className={`h-2 ${getProgressColor(percentage)}`}
+                          className={`h-1.5 ${getProgressColor(percentage)}`}
                         />
                       </div>
+
+                      <Button 
+                        className="w-full bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-600 hover:text-white border-0 shadow-none transition-all duration-300 font-bold text-xs h-9"
+                        onClick={() => router.push(`/${slug}/students?classId=${cls.id}`)}
+                      >
+                        <Users className="h-3.5 w-3.5 mr-2" />
+                        View Student Roster
+                      </Button>
                     </CardContent>
                   </Card>
                 </motion.div>

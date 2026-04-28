@@ -20,6 +20,7 @@ import { useStudents, useClassesMin } from "@/lib/graphql/hooks/academic.hooks";
 import { useQueryClient } from "@tanstack/react-query";
 import { queryKeys } from "@/lib/graphql/keys";
 import { useDebounce } from "@/hooks/use-debounce";
+import { useSearchParams } from "next/navigation";
 
 // Sub-components
 import { StudentTable } from "./students/StudentTable";
@@ -90,6 +91,16 @@ export function AdminStudents() {
   const [editingStudent, setEditingStudent] = useState<StudentInfo | null>(null);
   const [formData, setFormData] = useState<StudentFormData>(emptyFormData);
   const [submitting, setSubmitting] = useState(false);
+
+  const searchParams = useSearchParams();
+  const classIdParam = searchParams.get("classId");
+
+  useEffect(() => {
+    if (classIdParam && classIdParam !== classFilter) {
+      setClassFilter(classIdParam);
+      setCurrentPage(1);
+    }
+  }, [classIdParam]);
 
   useEffect(() => {
     setCurrentPage(1);
