@@ -96,16 +96,19 @@ export function StudentTimetable() {
 
   const student = useMemo(
     () =>
-      students.find((s) => s.email === currentUser?.email) ||
-      students[0] ||
-      null,
+      Array.isArray(students)
+        ? students.find((s) => s.email === currentUser?.email) ||
+          students[0] ||
+          null
+        : null,
     [students, currentUser?.email],
   );
 
   const fetchData = useCallback(async () => {
     setLoading(true);
     try {
-      const studentsRes = await apiFetch("/api/students").then((r) => r.json());
+      const studentsJson = await apiFetch("/api/students").then((r) => r.json());
+      const studentsRes = Array.isArray(studentsJson?.items) ? studentsJson.items : [];
       setStudents(studentsRes);
 
       const matchedStudent =

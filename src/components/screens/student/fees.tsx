@@ -62,19 +62,23 @@ export function StudentFees() {
     async function fetchData() {
       try {
         const studentsRes = await apiFetch("/api/students");
-        const studentsData = await studentsRes.json();
-        setStudents(studentsData);
+        const studentsJson = await studentsRes.json();
+        const studentItems = Array.isArray(studentsJson?.items) ? studentsJson.items : [];
+        setStudents(studentItems);
 
         const matchedStudent =
-          studentsData.find(
+          studentItems.find(
             (s: StudentInfo) => s.email === currentUser?.email,
-          ) || studentsData[0];
+          ) || studentItems[0];
 
         if (matchedStudent) {
           const feesRes = await apiFetch(
             `/api/fees?studentId=${matchedStudent.id}`,
           );
-          if (feesRes.ok) setFees(await feesRes.json());
+          if (feesRes.ok) {
+            const feesData = await feesRes.json();
+            setFees(Array.isArray(feesData) ? feesData : []);
+          }
         }
       } catch (error) {
         console.error("Failed to fetch data:", error);

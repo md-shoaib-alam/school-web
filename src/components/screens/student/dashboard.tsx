@@ -60,10 +60,11 @@ export function StudentDashboard() {
     if (currentUser?.email) {
       apiFetch("/api/students")
         .then((r) => r.json())
-        .then((students: any[]) => {
+        .then((data: any) => {
+          const studentItems = Array.isArray(data?.items) ? data.items : [];
           const s =
-            students.find((st) => st.email === currentUser.email) ||
-            students[0];
+            studentItems.find((st: any) => st.email === currentUser.email) ||
+            studentItems[0];
           if (s)
             setStudentInfo({
               className: s.className,

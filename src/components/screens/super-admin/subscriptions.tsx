@@ -100,7 +100,9 @@ export function SuperAdminSubscriptions() {
   // -- Unified Data Logic --
   const unifiedData = useMemo(() => {
     if (selectedTenant === "all") {
-      return (subsData?.subscriptions || []).map((s) => ({
+      const list = subsData?.subscriptions;
+      if (!Array.isArray(list)) return [];
+      return list.map((s) => ({
         id: s.id,
         parent: s.parent,
         subscription: s,
@@ -108,7 +110,9 @@ export function SuperAdminSubscriptions() {
       }));
     }
 
-    return (parentsData?.parents || []).map((p) => {
+    const list = parentsData?.parents;
+    if (!Array.isArray(list)) return [];
+    return list.map((p) => {
       const sub = p.subscription;
       return {
         id: p.id,
@@ -303,7 +307,7 @@ export function SuperAdminSubscriptions() {
         onCreateOpenChange={setCreateDialogOpen}
         createForm={createForm}
         setCreateForm={setCreateForm}
-        parents={parentsData?.parents || []}
+        parents={Array.isArray(parentsData?.parents) ? parentsData.parents : []}
         onCreateSubmit={handleCreate}
         processing={processing}
 

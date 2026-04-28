@@ -64,9 +64,11 @@ export function StudentAttendance() {
 
   const student = useMemo(
     () =>
-      students.find((s) => s.email === currentUser?.email) ||
-      students[0] ||
-      null,
+      Array.isArray(students)
+        ? students.find((s) => s.email === currentUser?.email) ||
+          students[0] ||
+          null
+        : null,
     [students, currentUser?.email],
   );
 
@@ -76,9 +78,8 @@ export function StudentAttendance() {
   const fetchData = useCallback(async () => {
     setLoading(true);
     try {
-      const [studentsRes] = await Promise.all([
-        apiFetch("/api/students").then((r) => r.json()),
-      ]);
+      const studentsJson = await apiFetch("/api/students").then((r) => r.json());
+      const studentsRes = Array.isArray(studentsJson?.items) ? studentsJson.items : [];
       setStudents(studentsRes);
 
       // Use the matched student's classId, or first student's classId

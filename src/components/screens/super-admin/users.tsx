@@ -38,8 +38,9 @@ export function SuperAdminUsers() {
   // Role counts map
   const roleCountsMap = useMemo(() => {
     const map: Record<string, number> = {};
-    if (data?.roleCounts) {
-      data.roleCounts.forEach((rc) => {
+    const roleCounts = data?.roleCounts;
+    if (Array.isArray(roleCounts)) {
+      roleCounts.forEach((rc) => {
         map[rc.role] = rc.count;
       });
     }
@@ -51,9 +52,10 @@ export function SuperAdminUsers() {
 
   // Derive unique tenants from user data for the filter dropdown
   const tenants = useMemo(() => {
-    if (!data?.users) return [];
+    const users = data?.users;
+    if (!Array.isArray(users)) return [];
     const map = new Map<string, TenantInfo>();
-    data.users.forEach((u) => {
+    users.forEach((u) => {
       if (u.tenant?.id && u.tenant?.name && !map.has(u.tenant.id)) {
         map.set(u.tenant.id, {
           id: u.tenant.id,
@@ -146,7 +148,7 @@ export function SuperAdminUsers() {
 
       <UserTable 
         loading={loading}
-        users={data?.users || []}
+        users={Array.isArray(data?.users) ? data.users : []}
         totalCount={totalCount}
         currentPage={currentPage}
         totalPages={totalPages}

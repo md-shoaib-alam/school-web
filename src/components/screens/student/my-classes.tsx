@@ -30,8 +30,9 @@ export function StudentClasses() {
   const [students, setStudents] = useState<StudentInfo[]>([]);
   const [subjects, setSubjects] = useState<SubjectInfo[]>([]);
 
-  const student =
-    students.find((s) => s.email === currentUser?.email) || students[0] || null;
+  const student = Array.isArray(students)
+    ? students.find((s) => s.email === currentUser?.email) || students[0] || null
+    : null;
 
   const fetchData = useCallback(async () => {
     setLoading(true);
@@ -40,12 +41,11 @@ export function StudentClasses() {
         apiFetch("/api/students"),
         apiFetch("/api/subjects"),
       ]);
-      const [studentsData, subjectsData] = await Promise.all([
-        studentsRes.json(),
-        subjectsRes.json(),
-      ]);
-      setStudents(studentsData);
-      setSubjects(subjectsData);
+      const studentsData = await studentsRes.json();
+      const subjectsData = await subjectsRes.json();
+      
+      setStudents(Array.isArray(studentsData?.items) ? studentsData.items : []);
+      setSubjects(Array.isArray(subjectsData) ? subjectsData : []);
     } catch (e) {
       console.error(e);
     } finally {

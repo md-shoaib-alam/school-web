@@ -57,8 +57,9 @@ export function StudentGrades() {
   const [grades, setGrades] = useState<GradeRecord[]>([]);
   const [activeTab, setActiveTab] = useState("all");
 
-  const student =
-    students.find((s) => s.email === currentUser?.email) || students[0] || null;
+  const student = Array.isArray(students)
+    ? students.find((s) => s.email === currentUser?.email) || students[0] || null
+    : null;
 
   const fetchData = useCallback(async () => {
     setLoading(true);
@@ -67,16 +68,19 @@ export function StudentGrades() {
         apiFetch("/api/students"),
         apiFetch(`/api/grades?studentId=${student?.id || ""}`),
       ]);
-      const [studentsData] = await Promise.all([studentsRes.json()]);
+      const studentsData = await studentsRes.json();
       const gradesData = await gradesRes.json();
-      setStudents(studentsData);
+      
+      const studentItems = Array.isArray(studentsData?.items) ? studentsData.items : [];
+      setStudents(studentItems);
+
       if (student?.id) {
-        setGrades(gradesData);
+        setGrades(Array.isArray(gradesData) ? gradesData : []);
       } else {
         setGrades(
-          studentsData.length > 0
+          studentItems.length > 0
             ? await (
-                await apiFetch(`/api/grades?studentId=${studentsData[0].id}`)
+                await apiFetch(`/api/grades?studentId=${studentItems[0].id}`)
               ).json()
             : [],
         );

@@ -28,9 +28,9 @@ export function SuperAdminBilling() {
   const [sortDir, setSortDir] = useState<SortDir>("desc");
 
   // ── Computed Calculations ──
-  const totalSubscriptions = data?.subscriptions.length ?? 0;
-  const totalStatusCount = data
-    ? Object.values(data.statusDistribution).reduce((s, v) => s + v, 0)
+  const totalSubscriptions = data?.subscriptions?.length ?? 0;
+  const totalStatusCount = data?.statusDistribution
+    ? Object.values(data.statusDistribution).reduce((s: number, v: any) => s + v, 0)
     : 0;
   const activeCount = data?.statusDistribution?.active ?? 0;
   const expiredCount = data?.statusDistribution?.expired ?? 0;
@@ -38,19 +38,20 @@ export function SuperAdminBilling() {
   const churnedSubscriptions = expiredCount + cancelledCount;
 
   const totalRevenue = useMemo(() => {
-    if (!data) return 0;
-    return Object.values(data.methodRevenue).reduce((s, m) => s + m.revenue, 0);
+    const revenueData = data?.methodRevenue;
+    if (!revenueData || typeof revenueData !== 'object') return 0;
+    return Object.values(revenueData).reduce((s, m: any) => s + (m?.revenue || 0), 0);
   }, [data]);
 
   const mrr = data?.totalActiveRevenue ?? 0;
 
   const avgRevenuePerTenant = useMemo(() => {
-    if (!data?.tenantBilling.length) return 0;
+    if (!data?.tenantBilling?.length) return 0;
     return Math.round(totalRevenue / data.tenantBilling.length);
   }, [data, totalRevenue]);
 
   const revenueGrowth = useMemo(() => {
-    if (!data?.monthlyTrend.length || data.monthlyTrend.length < 2) return null;
+    if (!data?.monthlyTrend?.length || data.monthlyTrend.length < 2) return null;
     const last = data.monthlyTrend[data.monthlyTrend.length - 1].revenue;
     const prev = data.monthlyTrend[data.monthlyTrend.length - 2].revenue;
     if (prev === 0) return null;
@@ -64,18 +65,20 @@ export function SuperAdminBilling() {
 
   // ── Chart Data Preparation ──
   const planChartData = useMemo(() => {
-    if (!data) return [];
-    return Object.entries(data.planRevenue)
-      .filter(([_, v]) => v.count > 0)
-      .map(([plan, v]) => ({ plan, revenue: v.revenue, count: v.count }))
+    const plans = data?.planRevenue;
+    if (!plans || typeof plans !== 'object') return [];
+    return Object.entries(plans)
+      .filter(([_, v]: [string, any]) => v?.count > 0)
+      .map(([plan, v]: [string, any]) => ({ plan, revenue: v.revenue, count: v.count }))
       .sort((a, b) => b.revenue - a.revenue);
   }, [data]);
 
   const methodChartData = useMemo(() => {
-    if (!data) return [];
-    return Object.entries(data.methodRevenue)
-      .filter(([_, v]) => v.count > 0)
-      .map(([method, v]) => ({
+    const methods = data?.methodRevenue;
+    if (!methods || typeof methods !== 'object') return [];
+    return Object.entries(methods)
+      .filter(([_, v]: [string, any]) => v?.count > 0)
+      .map(([method, v]: [string, any]) => ({
         method: paymentMethodConfig[method]?.label || method,
         count: v.count,
         revenue: v.revenue,
@@ -85,10 +88,11 @@ export function SuperAdminBilling() {
   }, [data]);
 
   const statusChartData = useMemo(() => {
-    if (!data) return [];
-    return Object.entries(data.statusDistribution)
-      .filter(([_, v]) => v > 0)
-      .map(([status, count]) => ({
+    const statusDist = data?.statusDistribution;
+    if (!statusDist || typeof statusDist !== 'object') return [];
+    return Object.entries(statusDist)
+      .filter(([_, v]: [string, any]) => v > 0)
+      .map(([status, count]: [string, any]) => ({
         status: statusConfig[status]?.label || status,
         count,
         fill: STATUS_COLORS[status] || "#94a3b8",
@@ -97,15 +101,17 @@ export function SuperAdminBilling() {
 
   // ── Table Data Preparation ──
   const sortedTenants = useMemo(() => {
-    if (!data) return [];
-    const tenants = [...data.tenantBilling];
+    const list = data?.tenantBilling;
+    if (!Array.isArray(list)) return [];
+    
+    const tenants = [...list];
     tenants.sort((a, b) => {
       const dir = sortDir === "asc" ? 1 : -1;
       switch (sortKey) {
-        case "activeRevenue": return dir * (a.activeRevenue - b.activeRevenue);
-        case "totalRevenue": return dir * (a.totalRevenue - b.totalRevenue);
-        case "name": return dir * a.name.localeCompare(b.name);
-        case "activeSubscriptions": return dir * (a.activeSubscriptions - b.activeSubscriptions);
+        case "activeRevenue": return dir * ((a.activeRevenue || 0) - (b.activeRevenue || 0));
+        case "totalRevenue": return dir * ((a.totalRevenue || 0) - (b.totalRevenue || 0));
+        case "name": return dir * (a.name || "").localeCompare(b.name || "");
+        case "activeSubscriptions": return dir * ((a.activeSubscriptions || 0) - (b.activeSubscriptions || 0));
         default: return 0;
       }
     });
@@ -113,8 +119,9 @@ export function SuperAdminBilling() {
   }, [data, sortKey, sortDir]);
 
   const recentTransactions = useMemo(() => {
-    if (!data) return [];
-    return data.subscriptions.slice(0, 20);
+    const list = data?.subscriptions;
+    if (!Array.isArray(list)) return [];
+    return list.slice(0, 20);
   }, [data]);
 
   const handleSort = (key: SortKey) => {
@@ -150,7 +157,7 @@ export function SuperAdminBilling() {
         expiredCount={expiredCount}
         cancelledCount={cancelledCount}
         avgRevenuePerTenant={avgRevenuePerTenant}
-        tenantCount={data?.tenantBilling.length ?? 0}
+        tenantCount={data?.tenantBilling?.length ?? 0}
         churnRate={churnRate}
       />
 

@@ -24,7 +24,10 @@ export function SuperAdminAuditLogs() {
   });
 
   const filteredLogs = useMemo(() => {
-    return data?.logs.filter((log) => {
+    const list = data?.logs;
+    if (!Array.isArray(list)) return [];
+    
+    return list.filter((log) => {
       if (!search) return true;
       const q = search.toLowerCase();
       return (
@@ -33,7 +36,7 @@ export function SuperAdminAuditLogs() {
         log.details?.toLowerCase().includes(q) ||
         log.tenant?.name?.toLowerCase().includes(q)
       );
-    }) ?? [];
+    });
   }, [data, search]);
 
   const totalLogs = data?.total ?? 0;
