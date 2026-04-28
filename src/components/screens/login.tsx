@@ -123,7 +123,7 @@ export function LoginScreen() {
 
       <div className="w-full max-w-md">
         {/* Logo & Title */}
-        <div className="text-center mb-8 animate-in fade-in slide-in-from-top-4 duration-700">
+        <div className="text-center mb-8">
           <div className="inline-flex items-center justify-center w-20 h-20 rounded-2xl text-white mb-4 shadow-lg bg-gradient-to-br from-rose-600 to-rose-700 shadow-rose-200 dark:shadow-rose-900/40">
             <Building2 className="h-10 w-10" />
           </div>
@@ -143,7 +143,7 @@ export function LoginScreen() {
           </div>
         </div>
 
-        <Card className="shadow-2xl border-0 bg-white/80 backdrop-blur-xl dark:bg-gray-900/80 dark:border dark:border-white/10 animate-in fade-in slide-in-from-bottom-6 duration-700 delay-200">
+        <Card className="shadow-2xl border-0 bg-white/80 backdrop-blur-xl dark:bg-gray-900/80 dark:border dark:border-white/10">
           <CardHeader className="text-center pb-2">
             <div className="mx-auto w-14 h-14 rounded-2xl bg-indigo-500/10 flex items-center justify-center mb-4 border border-indigo-500/20">
               <Mail className="h-7 w-7 text-indigo-600 dark:text-indigo-400" />
