@@ -347,8 +347,8 @@ export function AdminParents() {
                 <thead className="bg-gray-50 dark:bg-gray-800/50 text-gray-500 dark:text-gray-400 uppercase text-[10px] font-bold tracking-wider">
                   <tr>
                     <th className="px-6 py-4">Parent</th>
-                    <th className="px-6 py-4">Children</th>
-                    <th className="px-6 py-4">Occupation</th>
+                    <th className="px-6 py-4 hidden sm:table-cell">Children</th>
+                    <th className="px-6 py-4 hidden lg:table-cell">Occupation</th>
                     <th className="px-6 py-4 text-center">Actions</th>
                   </tr>
                 </thead>
@@ -360,18 +360,24 @@ export function AdminParents() {
                       <tr key={parent.id} className="hover:bg-gray-50/50 dark:hover:bg-gray-800/30 transition-colors">
                         <td className="px-6 py-4">
                           <div className="flex items-center gap-3">
-                            <Avatar className="h-8 w-8">
+                            <Avatar className="h-8 w-8 shrink-0">
                               <AvatarFallback className={`${color} text-white text-[10px] font-bold`}>
                                 {initials}
                               </AvatarFallback>
                             </Avatar>
-                            <div className="flex flex-col">
-                              <span className="font-bold text-gray-900 dark:text-gray-100">{parent.name}</span>
-                              <span className="text-xs text-muted-foreground">{parent.email}</span>
+                            <div className="flex flex-col min-w-0">
+                              <span className="font-bold text-gray-900 dark:text-gray-100 truncate">{parent.name}</span>
+                              <span className="text-[10px] sm:text-xs text-muted-foreground truncate">{parent.email}</span>
+                              {/* Mobile-only info */}
+                              <div className="sm:hidden flex flex-wrap gap-1 mt-1">
+                                <span className="text-[10px] text-emerald-600 dark:text-emerald-400 font-medium bg-emerald-50 dark:bg-emerald-900/20 px-1 rounded">
+                                  {parent.children.length} {parent.children.length === 1 ? 'Child' : 'Children'}
+                                </span>
+                              </div>
                             </div>
                           </div>
                         </td>
-                        <td className="px-6 py-4">
+                        <td className="px-6 py-4 hidden sm:table-cell">
                           <div className="flex flex-wrap gap-1">
                             {parent.children.map((child) => (
                               <Badge key={child.id} variant="secondary" className="text-[10px] py-0">
@@ -381,7 +387,7 @@ export function AdminParents() {
                             {parent.children.length === 0 && <span className="text-xs text-gray-400 italic">None linked</span>}
                           </div>
                         </td>
-                        <td className="px-6 py-4 text-gray-600 dark:text-gray-400 font-medium">
+                        <td className="px-6 py-4 hidden lg:table-cell text-gray-600 dark:text-gray-400 font-medium">
                           {parent.occupation || 'N/A'}
                         </td>
                         <td className="px-6 py-4">
@@ -417,30 +423,22 @@ export function AdminParents() {
         </Card>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-          <AnimatePresence mode="popLayout">
-            {parents.map((parent) => (
-              <motion.div
-                key={parent.id}
-                layout
-                initial={{ opacity: 0, scale: 0.95 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.9, transition: { duration: 0.2 } }}
-              >
-                <ParentCard
-                  parent={parent}
-                  linking={linking}
-                  onEdit={handleEdit}
-                  onDelete={handleDelete}
-                  onLinkOpen={(p) => {
-                    setSelectedParent(p);
-                    setLinkOpen(true);
-                    setSelectedClass("all");
-                  }}
-                  onUnlinkChild={handleUnlinkChild}
-                />
-              </motion.div>
-            ))}
-          </AnimatePresence>
+          {parents.map((parent) => (
+            <div key={parent.id}>
+              <ParentCard
+                parent={parent}
+                linking={linking}
+                onEdit={handleEdit}
+                onDelete={handleDelete}
+                onLinkOpen={(p) => {
+                  setSelectedParent(p);
+                  setLinkOpen(true);
+                  setSelectedClass("all");
+                }}
+                onUnlinkChild={handleUnlinkChild}
+              />
+            </div>
+          ))}
         </div>
       )}
 

@@ -154,13 +154,17 @@ export function AdminCertificates() {
         }
       `}} />
 
-      <div className="flex justify-between items-center no-print">
-        <div>
-          <h1 className="text-2xl font-bold tracking-tight flex items-center gap-2"><Award className="h-7 w-7 text-amber-600" /> Certificates</h1>
-          <p className="text-muted-foreground text-sm">Official student documentation management.</p>
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 no-print">
+        <div className="flex-1 min-w-0">
+          <h1 className="text-xl sm:text-2xl font-bold tracking-tight flex items-center gap-2">
+            <Award className="h-6 w-6 sm:h-7 sm:h-7 text-amber-600 shrink-0" /> 
+            <span className="truncate">Certificates</span>
+          </h1>
+          <p className="text-xs sm:text-sm text-muted-foreground mt-1 line-clamp-1 sm:line-clamp-none">Official student documentation management.</p>
         </div>
-        <Button className="bg-amber-600 hover:bg-amber-700" onClick={() => setGenerateOpen(true)}>
-          <Plus className="h-4 w-4 mr-2" /> Generate
+        <Button className="bg-amber-600 hover:bg-amber-700 h-9 sm:h-10 px-3 sm:px-4 shrink-0 gap-2" onClick={() => setGenerateOpen(true)}>
+          <Plus className="h-4 w-4" /> 
+          <span className="text-sm font-medium">Generate</span>
         </Button>
       </div>
 
@@ -185,24 +189,48 @@ export function AdminCertificates() {
           ) : (
             <Table>
               <TableHeader>
-                <TableRow>
-                  <TableHead>No.</TableHead>
-                  <TableHead>Student</TableHead>
-                  <TableHead>Type</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead className="text-right">Actions</TableHead>
+                <TableRow className="bg-muted/30">
+                  <TableHead className="hidden sm:table-cell px-2 sm:px-4">No.</TableHead>
+                  <TableHead className="px-2 sm:px-4">Student & Type</TableHead>
+                  <TableHead className="hidden sm:table-cell px-2 sm:px-4">Type</TableHead>
+                  <TableHead className="px-2">Status</TableHead>
+                  <TableHead className="text-right px-2 sm:px-4">Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {certificates.map((c: any) => (
                   <TableRow key={c.id}>
-                    <TableCell className="font-mono text-xs">{c.certificateNo}</TableCell>
-                    <TableCell className="font-medium">{c.student?.user?.name || c.content?.studentName}</TableCell>
-                    <TableCell><Badge variant="outline" className={CERT_TYPE_COLORS[c.certificateType]}>{c.certificateType}</Badge></TableCell>
-                    <TableCell><Badge variant={c.status === 'active' ? 'default' : 'destructive'} className={c.status === 'active' ? 'bg-emerald-500' : ''}>{c.status}</Badge></TableCell>
-                    <TableCell className="text-right">
-                      <Button variant="ghost" size="sm" onClick={() => setViewCert(c)}><Eye className="h-4 w-4 mr-1" /> View</Button>
-                      {c.status === 'active' && <Button variant="ghost" size="sm" className="text-red-600" onClick={() => setRevokeCert(c)}><ShieldBan className="h-4 w-4 mr-1" /> Revoke</Button>}
+                    <TableCell className="hidden sm:table-cell font-mono text-xs px-2 sm:px-4">{c.certificateNo}</TableCell>
+                    <TableCell className="px-2 sm:px-4">
+                      <div className="flex flex-col gap-0.5">
+                        <span className="font-medium text-sm">{c.student?.user?.name || c.content?.studentName}</span>
+                        <div className="sm:hidden flex items-center gap-2 mt-1">
+                          <span className="text-[10px] font-mono text-muted-foreground uppercase">{c.certificateNo.split('/').pop()}</span>
+                          <Badge variant="outline" className={`scale-75 origin-left px-1.5 py-0 ${CERT_TYPE_COLORS[c.certificateType]}`}>{c.certificateType}</Badge>
+                        </div>
+                      </div>
+                    </TableCell>
+                    <TableCell className="hidden sm:table-cell px-2 sm:px-4">
+                      <Badge variant="outline" className={CERT_TYPE_COLORS[c.certificateType]}>{c.certificateType}</Badge>
+                    </TableCell>
+                    <TableCell className="px-2">
+                      <Badge variant={c.status === 'active' ? 'default' : 'destructive'} className={`text-[10px] sm:text-xs h-5 sm:h-6 ${c.status === 'active' ? 'bg-emerald-500' : ''}`}>
+                        {c.status}
+                      </Badge>
+                    </TableCell>
+                    <TableCell className="text-right px-2 sm:px-4">
+                      <div className="flex items-center justify-end gap-1">
+                        <Button variant="ghost" size="sm" className="h-8 px-2 text-xs" onClick={() => setViewCert(c)}>
+                          <Eye className="h-3.5 w-3.5 sm:mr-1.5" /> 
+                          <span className="hidden sm:inline">View</span>
+                        </Button>
+                        {c.status === 'active' && (
+                          <Button variant="ghost" size="sm" className="h-8 px-2 text-xs text-red-600 hover:text-red-700 hover:bg-red-50" onClick={() => setRevokeCert(c)}>
+                            <ShieldBan className="h-3.5 w-3.5 sm:mr-1.5" /> 
+                            <span className="hidden sm:inline">Revoke</span>
+                          </Button>
+                        )}
+                      </div>
                     </TableCell>
                   </TableRow>
                 ))}
@@ -260,9 +288,12 @@ export function AdminCertificates() {
               <DialogDescription>Full preview of the student certificate before printing.</DialogDescription>
             </DialogHeader>
           </VisuallyHidden.Root>
-          <div className="p-4 pr-16 border-b flex justify-between items-center bg-white">
-            <h3 className="font-bold text-slate-900">Preview</h3>
-            <Button onClick={() => handlePrint()} className="bg-amber-600 hover:bg-amber-700 text-white"><Printer className="h-4 w-4 mr-2" /> Print PDF</Button>
+          <div className="p-3 sm:p-4 border-b flex justify-between items-center bg-white sticky top-0 z-10">
+            <h3 className="font-bold text-slate-900 truncate mr-2">Preview</h3>
+            <Button onClick={() => handlePrint()} className="bg-amber-600 hover:bg-amber-700 text-white h-9 px-3 shrink-0">
+              <Printer className="h-4 w-4 mr-2" /> 
+              <span className="text-sm">Print PDF</span>
+            </Button>
           </div>
           <div className="max-h-[70vh] overflow-y-auto p-8 bg-gray-100">
             <div ref={contentRef}>

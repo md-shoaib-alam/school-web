@@ -93,6 +93,16 @@ export function Pagination({
 }: PaginationProps) {
   if (totalItems === 0) return null;
 
+  const handlePageChange = (page: number) => {
+    onPageChange(page);
+    window.scrollTo(0, 0);
+  };
+
+  const handleLimitChange = (limit: number) => {
+    onLimitChange?.(limit);
+    window.scrollTo(0, 0);
+  };
+
   return (
     <div className="flex flex-col sm:flex-row items-center justify-between py-4 border-t border-border/50 gap-4 mt-4">
       <div className="flex flex-wrap items-center gap-4">
@@ -114,7 +124,7 @@ export function Pagination({
             <span className="text-xs text-muted-foreground whitespace-nowrap">Rows per page:</span>
             <Select
               value={itemsPerPage.toString()}
-              onValueChange={(v) => onLimitChange(parseInt(v))}
+              onValueChange={(v) => handleLimitChange(parseInt(v))}
             >
               <SelectTrigger className="h-8 w-[70px] bg-transparent border-gray-200 dark:border-gray-800 text-xs">
                 <SelectValue placeholder={itemsPerPage.toString()} />
@@ -135,21 +145,21 @@ export function Pagination({
           size="icon"
           className="h-8 w-8"
           disabled={currentPage <= 1}
-          onClick={() => onPageChange(currentPage - 1)}
+          onClick={() => handlePageChange(currentPage - 1)}
         >
           <ChevronLeft className="h-4 w-4" />
         </Button>
         <PaginationPages
           currentPage={currentPage}
           totalPages={totalPages}
-          onPageChange={onPageChange}
+          onPageChange={handlePageChange}
         />
         <Button
           variant="outline"
           size="icon"
           className="h-8 w-8"
           disabled={currentPage >= totalPages}
-          onClick={() => onPageChange(currentPage + 1)}
+          onClick={() => handlePageChange(currentPage + 1)}
         >
           <ChevronRight className="h-4 w-4" />
         </Button>

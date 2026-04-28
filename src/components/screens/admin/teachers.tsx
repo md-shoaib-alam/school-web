@@ -263,8 +263,8 @@ export function AdminTeachers() {
                 <thead className="bg-gray-50 dark:bg-gray-800/50 text-gray-500 dark:text-gray-400 uppercase text-[10px] font-bold tracking-wider">
                   <tr>
                     <th className="px-6 py-4">Teacher</th>
-                    <th className="px-6 py-4">Experience</th>
-                    <th className="px-6 py-4">Qualification</th>
+                    <th className="px-6 py-4 hidden sm:table-cell">Experience</th>
+                    <th className="px-6 py-4 hidden lg:table-cell">Qualification</th>
                     <th className="px-6 py-4 text-center">Actions</th>
                   </tr>
                 </thead>
@@ -276,21 +276,30 @@ export function AdminTeachers() {
                       <tr key={teacher.id} className="hover:bg-gray-50/50 dark:hover:bg-gray-800/30 transition-colors">
                         <td className="px-6 py-4">
                           <div className="flex items-center gap-3">
-                            <Avatar className="h-8 w-8">
+                            <Avatar className="h-8 w-8 shrink-0">
                               <AvatarFallback className={`${color} text-white text-[10px] font-bold`}>
                                 {initials}
                               </AvatarFallback>
                             </Avatar>
-                            <div className="flex flex-col">
-                              <span className="font-bold text-gray-900 dark:text-gray-100">{teacher.name}</span>
-                              <span className="text-xs text-muted-foreground">{teacher.email}</span>
+                            <div className="flex flex-col min-w-0">
+                              <span className="font-bold text-gray-900 dark:text-gray-100 truncate">{teacher.name}</span>
+                              <span className="text-[10px] sm:text-xs text-muted-foreground truncate">{teacher.email}</span>
+                              {/* Mobile-only info */}
+                              <div className="sm:hidden flex flex-wrap gap-1 mt-1">
+                                <span className="text-[10px] text-emerald-600 dark:text-emerald-400 font-medium bg-emerald-50 dark:bg-emerald-900/20 px-1 rounded">
+                                  {teacher.experience || 'New'} Exp
+                                </span>
+                                <span className="text-[10px] text-slate-600 dark:text-slate-400 font-medium bg-slate-50 dark:bg-slate-900/20 px-1 rounded">
+                                  {teacher.qualification || 'N/A'}
+                                </span>
+                              </div>
                             </div>
                           </div>
                         </td>
-                        <td className="px-6 py-4 text-gray-600 dark:text-gray-400 font-medium">
+                        <td className="px-6 py-4 hidden sm:table-cell text-gray-600 dark:text-gray-400 font-medium">
                           {teacher.experience || 'N/A'}
                         </td>
-                        <td className="px-6 py-4">
+                        <td className="px-6 py-4 hidden lg:table-cell">
                           <Badge variant="outline" className="font-normal text-xs">{teacher.qualification || 'N/A'}</Badge>
                         </td>
                         <td className="px-6 py-4">
@@ -317,28 +326,20 @@ export function AdminTeachers() {
         </Card>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          <AnimatePresence mode="popLayout">
-            {teachers.map((teacher, index) => (
-              <motion.div
-                key={teacher.id}
-                layout
-                initial={{ opacity: 0, scale: 0.95 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.9, transition: { duration: 0.2 } }}
-              >
-                <TeacherCard
-                  teacher={teacher}
-                  index={index}
-                  canEdit={canEdit}
-                  canDelete={canDelete}
-                  deletingId={deletingId}
-                  setDeletingId={setDeletingId}
-                  onEdit={handleOpenEdit}
-                  onDelete={handleDelete}
-                />
-              </motion.div>
-            ))}
-          </AnimatePresence>
+          {teachers.map((teacher, index) => (
+            <div key={teacher.id}>
+              <TeacherCard
+                teacher={teacher}
+                index={index}
+                canEdit={canEdit}
+                canDelete={canDelete}
+                deletingId={deletingId}
+                setDeletingId={setDeletingId}
+                onEdit={handleOpenEdit}
+                onDelete={handleDelete}
+              />
+            </div>
+          ))}
         </div>
       )}
 

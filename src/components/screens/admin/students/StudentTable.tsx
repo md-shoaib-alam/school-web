@@ -47,47 +47,32 @@ export function StudentTable({
           <TableRow>
             <TableHead className="w-16">Roll No</TableHead>
             <TableHead>Name</TableHead>
-            <TableHead className="hidden md:table-cell">
-              Class
-            </TableHead>
-            <TableHead className="hidden sm:table-cell">
-              Gender
-            </TableHead>
-            <TableHead className="hidden lg:table-cell">
-              Parent
-            </TableHead>
-            <TableHead className="hidden lg:table-cell">
-              Phone
-            </TableHead>
+            <TableHead className="hidden md:table-cell">Class</TableHead>
+            <TableHead className="hidden sm:table-cell">Gender</TableHead>
+            <TableHead className="hidden lg:table-cell">Parent</TableHead>
+            <TableHead className="hidden lg:table-cell">Phone</TableHead>
             {(canEdit || canDelete) && (
-              <TableHead className="w-24 text-right">
-                Actions
-              </TableHead>
+              <TableHead className="w-24 text-right">Actions</TableHead>
             )}
           </TableRow>
         </TableHeader>
         <TableBody>
-          <AnimatePresence mode="popLayout">
-            {students.length === 0 ? (
-              <TableRow>
-                <TableCell
-                  colSpan={canEdit || canDelete ? 7 : 6}
-                  className="text-center py-12 text-muted-foreground"
-                >
-                  <GraduationCap className="h-10 w-10 mx-auto mb-2 opacity-30" />
-                  <p>No students found</p>
-                </TableCell>
-              </TableRow>
-            ) : (
-              students.map((student) => (
-                <motion.tr
-                  key={student.id}
-                  layout
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, x: -20, transition: { duration: 0.2 } }}
-                  className="hover:bg-emerald-50/50 dark:hover:bg-emerald-900/20 transition-colors border-b last:border-none group/row"
-                >
+          {students.length === 0 ? (
+            <TableRow>
+              <TableCell
+                colSpan={canEdit || canDelete ? 7 : 6}
+                className="text-center py-12 text-muted-foreground"
+              >
+                <GraduationCap className="h-10 w-10 mx-auto mb-2 opacity-30" />
+                <p>No students found</p>
+              </TableCell>
+            </TableRow>
+          ) : (
+            students.map((student) => (
+              <TableRow
+                key={student.id}
+                className="hover:bg-emerald-50/50 dark:hover:bg-emerald-900/20 transition-colors border-b last:border-none group/row"
+              >
                 <TableCell className="font-mono text-sm">
                   {student.rollNumber}
                 </TableCell>
@@ -156,14 +141,12 @@ export function StudentTable({
                               </AlertDialogTitle>
                               <AlertDialogDescription>
                                 Are you sure you want to delete{" "}
-                                <strong>{student.name}</strong>? This
-                                action cannot be undone.
+                                <strong>{student.name}</strong>? This action
+                                cannot be undone.
                               </AlertDialogDescription>
                             </AlertDialogHeader>
                             <AlertDialogFooter>
-                              <AlertDialogCancel>
-                                Cancel
-                              </AlertDialogCancel>
+                              <AlertDialogCancel>Cancel</AlertDialogCancel>
                               <AlertDialogAction
                                 className="bg-red-600 hover:bg-red-700 text-white"
                                 onClick={() => onDelete(student.id)}
@@ -177,10 +160,9 @@ export function StudentTable({
                     </div>
                   </TableCell>
                 )}
-                </motion.tr>
-              ))
-            )}
-          </AnimatePresence>
+              </TableRow>
+            ))
+          )}
         </TableBody>
       </Table>
     </div>

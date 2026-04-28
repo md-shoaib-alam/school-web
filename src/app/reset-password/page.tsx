@@ -36,7 +36,7 @@ export default function ResetPasswordPage() {
 
   if (isSuccess) {
     return (
-      <div className="min-h-screen flex items-center justify-center p-4 bg-[radial-gradient(ellipse_at_top_left,_var(--tw-gradient-stops))] from-rose-100 via-slate-50 to-emerald-50 dark:from-rose-950/20 dark:via-slate-900 dark:to-emerald-950/20">
+      <div className="min-h-screen flex items-start sm:items-center justify-center p-4 pt-12 sm:pt-4 bg-[radial-gradient(ellipse_at_top_left,_var(--tw-gradient-stops))] from-rose-100 via-slate-50 to-emerald-50 dark:from-rose-950/20 dark:via-slate-900 dark:to-emerald-950/20">
         <Card className="w-full max-w-md border-none shadow-2xl bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl">
           <CardHeader className="text-center pb-2">
             <div className="mx-auto w-20 h-20 bg-emerald-100 dark:bg-emerald-900/30 rounded-3xl flex items-center justify-center mb-6 rotate-3">
@@ -67,7 +67,7 @@ export default function ResetPasswordPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 bg-[radial-gradient(ellipse_at_top_left,_var(--tw-gradient-stops))] from-rose-100 via-slate-50 to-emerald-50 dark:from-rose-950/20 dark:via-slate-900 dark:to-emerald-950/20">
+    <div className="min-h-screen flex items-start sm:items-center justify-center p-4 pt-12 sm:pt-4 bg-[radial-gradient(ellipse_at_top_left,_var(--tw-gradient-stops))] from-rose-100 via-slate-50 to-emerald-50 dark:from-rose-950/20 dark:via-slate-900 dark:to-emerald-950/20">
       <Card className="w-full max-w-md border-none shadow-2xl bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl relative overflow-hidden">
         {/* Decorative corner accent */}
         <div className="absolute -top-10 -right-10 w-24 h-24 bg-rose-500/10 rounded-full blur-2xl" />
