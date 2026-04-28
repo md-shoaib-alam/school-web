@@ -113,7 +113,7 @@ export function ExamDialogs({
                       <TableRow key={row.subjectId} className={row.selected ? 'bg-blue-50/30' : ''}>
                         <TableCell><Checkbox checked={row.selected} onCheckedChange={() => toggleBulkSubject(row.subjectId)} /></TableCell>
                         <TableCell className="font-medium">{row.subjectName}</TableCell>
-                        <TableCell><DatePicker date={row.date ? new Date(row.date) : undefined} onChange={(d) => updateBulkField(row.subjectId, 'date', d?.toISOString().split('T')[0] || '')} /></TableCell>
+                        <TableCell><DatePicker date={row.date ? new Date(row.date) : undefined} onChange={(d) => updateBulkField(row.subjectId, 'date', d?.toISOString().split('T')[0] || '')} disabled={(date) => date < new Date(new Date().setHours(0, 0, 0, 0))} /></TableCell>
                         <TableCell><TimePicker value={row.startTime} onChange={(v) => updateBulkField(row.subjectId, 'startTime', v)} /></TableCell>
                         <TableCell><TimePicker value={row.endTime} onChange={(v) => updateBulkField(row.subjectId, 'endTime', v)} /></TableCell>
                         <TableCell><Input type="number" className="w-16 h-8 text-center" value={row.totalMarks} onChange={(e) => updateBulkField(row.subjectId, 'totalMarks', e.target.value)} /></TableCell>
@@ -150,7 +150,7 @@ export function ExamDialogs({
             <div className="grid grid-cols-2 gap-4">
               <div className="grid gap-2">
                 <Label>Date</Label>
-                <DatePicker date={editForm.date ? new Date(editForm.date) : undefined} onChange={(d) => setEditForm({ ...editForm, date: d?.toISOString().split('T')[0] || '' })} />
+                <DatePicker date={editForm.date ? new Date(editForm.date) : undefined} onChange={(d) => setEditForm({ ...editForm, date: d?.toISOString().split('T')[0] || '' })} disabled={(date) => date < new Date(new Date().setHours(0, 0, 0, 0))} />
               </div>
               <div className="grid gap-2">
                 <Label>Type</Label>

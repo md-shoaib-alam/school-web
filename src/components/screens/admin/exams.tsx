@@ -9,7 +9,7 @@ import {
 } from 'lucide-react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { api, apiFetch } from '@/lib/api';
-import { toast } from 'sonner';
+import { goeyToast as toast } from 'goey-toast';
 import { Button } from '@/components/ui/button';
 
 import dynamic from 'next/dynamic';
@@ -146,30 +146,41 @@ export function AdminExams() {
     setAdding(true);
     try {
       const selectedSubjects = subjects.filter(s => bulkSelected.has(s.id));
-      const payload = selectedSubjects.map(s => ({
-        classId: addForm.classId,
+      const examsPayload = selectedSubjects.map(s => ({
         subjectId: s.id,
-        name: `${addForm.name} - ${s.name}`,
-        examType: addForm.examType,
+        subjectName: s.name,
         date: bulkOverrides[s.id]?.date || addForm.date,
-        startTime: bulkOverrides[s.id]?.startTime || addForm.startTime || null,
-        endTime: bulkOverrides[s.id]?.endTime || addForm.endTime || null,
-        totalMarks: Number(bulkOverrides[s.id]?.totalMarks || addForm.totalMarks),
-        passingMarks: Number(bulkOverrides[s.id]?.passingMarks || addForm.passingMarks),
+        startTime: bulkOverrides[s.id]?.startTime || addForm.startTime || '09:00',
+        endTime: bulkOverrides[s.id]?.endTime || addForm.endTime || '10:00',
+        totalMarks: Number(bulkOverrides[s.id]?.totalMarks || addForm.totalMarks || 100),
+        passingMarks: Number(bulkOverrides[s.id]?.passingMarks || addForm.passingMarks || 40),
       }));
+
+      const payload = {
+        classId: addForm.classId,
+        examType: addForm.examType,
+        name: addForm.name,
+        exams: examsPayload
+      };
 
       const res = await apiFetch('/api/exams/bulk', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ exams: payload }),
+        body: JSON.stringify(payload),
       });
 
       if (res.ok) {
         toast.success('Exams created successfully!');
         setAddOpen(false);
         queryClient.invalidateQueries({ queryKey: ['exams'] });
+      } else {
+        const error = await res.json();
+        toast.error(error.error || 'Failed to create exams');
       }
-    } catch { toast.error('Error creating exams'); }
+    } catch (err) { 
+      console.error('Error creating exams:', err);
+      toast.error('Error creating exams'); 
+    }
     setAdding(false);
   };
 

@@ -45,6 +45,8 @@ const TeacherAssignments = dynamic(() => import('@/components/screens/teacher/as
 const TeacherTimetable = dynamic(() => import('@/components/screens/teacher/timetable').then(m => m.TeacherTimetable), { loading: LoadingScreen });
 const TeacherCalendar = dynamic(() => import('@/components/screens/teacher/calendar').then(m => m.TeacherCalendar), { loading: LoadingScreen });
 const TeacherNotices = dynamic(() => import('@/components/screens/teacher/notices').then(m => m.TeacherNotices), { loading: LoadingScreen });
+const TeacherLeaves = dynamic(() => import('@/components/screens/teacher/leaves').then(m => m.TeacherLeaves), { loading: LoadingScreen });
+const TeacherTickets = dynamic(() => import('@/components/screens/teacher/tickets').then(m => m.TeacherTickets), { loading: LoadingScreen });
 
 const StudentClasses = dynamic(() => import('@/components/screens/student/my-classes').then(m => m.StudentClasses), { loading: LoadingScreen });
 const StudentGrades = dynamic(() => import('@/components/screens/student/my-grades').then(m => m.StudentGrades), { loading: LoadingScreen });
@@ -55,6 +57,7 @@ const StudentCalendar = dynamic(() => import('@/components/screens/student/calen
 const StudentNotices = dynamic(() => import('@/components/screens/student/notices').then(m => m.StudentNotices), { loading: LoadingScreen });
 const StudentFees = dynamic(() => import('@/components/screens/student/fees').then(m => m.StudentFees), { loading: LoadingScreen });
 const StudentTickets = dynamic(() => import('@/components/screens/student/tickets').then(m => m.StudentTickets), { loading: LoadingScreen });
+const StudentLeaves = dynamic(() => import('@/components/screens/student/leaves').then(m => m.StudentLeaves), { loading: LoadingScreen });
 
 const ParentChildren = dynamic(() => import('@/components/screens/parent/children').then(m => m.ParentChildren), { loading: LoadingScreen });
 const ParentGrades = dynamic(() => import('@/components/screens/parent/grades').then(m => m.ParentGrades), { loading: LoadingScreen });
@@ -64,6 +67,7 @@ const ParentNotices = dynamic(() => import('@/components/screens/parent/notices'
 const ParentSubscription = dynamic(() => import('@/components/screens/parent/subscription').then(m => m.ParentSubscription), { loading: LoadingScreen });
 const ParentCalendar = dynamic(() => import('@/components/screens/parent/calendar').then(m => m.ParentCalendar), { loading: LoadingScreen });
 const ParentTimetable = dynamic(() => import('@/components/screens/parent/timetable').then(m => m.ParentTimetable), { loading: LoadingScreen });
+const ParentTickets = dynamic(() => import('@/components/screens/parent/tickets').then(m => m.ParentTickets), { loading: LoadingScreen });
 
 const NotFoundScreen = dynamic(() => import('@/components/screens/error/not-found').then(m => m.NotFoundScreen));
 
@@ -135,7 +139,8 @@ export default function TenantScreenDispatcher() {
       case 'timetable': return <TeacherTimetable />;
       case 'notices': return <TeacherNotices />;
       case 'calendar': return <TeacherCalendar />;
-      case 'tickets': return <AdminTickets />;
+      case 'leaves': return <TeacherLeaves />;
+      case 'tickets': return <TeacherTickets />;
     }
   }
 
@@ -151,6 +156,7 @@ export default function TenantScreenDispatcher() {
       case 'fees': return <StudentFees />;
       case 'tickets': return <StudentTickets />;
       case 'calendar': return <StudentCalendar />;
+      case 'leaves': return <StudentLeaves />;
     }
   }
 
@@ -165,7 +171,7 @@ export default function TenantScreenDispatcher() {
       case 'timetable': return <ParentTimetable />;
       case 'subscription': return <ParentSubscription />;
       case 'calendar': return <ParentCalendar />;
-      case 'tickets': return <StudentTickets />;
+      case 'tickets': return <ParentTickets />;
     }
   }
 
