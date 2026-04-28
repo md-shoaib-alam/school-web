@@ -361,25 +361,28 @@ export function AdminExams({ initialTab = 'exams' }: { initialTab?: string }) {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h2 className="text-2xl font-bold tracking-tight flex items-center gap-2">
-            {activeTab === 'exams' && <GraduationCap className="h-7 w-7 text-blue-600" />}
-            {activeTab === 'results' && <FileText className="h-7 w-7 text-orange-600" />}
-            {activeTab === 'published' && <Trophy className="h-7 w-7 text-yellow-600" />}
-            {activeTab === 'exams' && "Scheduled Exams"}
-            {activeTab === 'results' && "Results Entry"}
-            {activeTab === 'published' && "Published Results"}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div className="flex-1 min-w-0">
+          <h2 className="text-xl sm:text-2xl font-bold tracking-tight flex items-center gap-2">
+            {activeTab === 'exams' && <GraduationCap className="h-6 w-6 sm:h-7 sm:h-7 text-blue-600" />}
+            {activeTab === 'results' && <FileText className="h-6 w-6 sm:h-7 sm:h-7 text-orange-600" />}
+            {activeTab === 'published' && <Trophy className="h-6 w-6 sm:h-7 sm:h-7 text-yellow-600" />}
+            <span className="truncate">
+              {activeTab === 'exams' && "Scheduled Exams"}
+              {activeTab === 'results' && "Results Entry"}
+              {activeTab === 'published' && "Published Results"}
+            </span>
           </h2>
-          <p className="text-muted-foreground">
+          <p className="text-xs sm:text-sm text-muted-foreground mt-1 line-clamp-1 sm:line-clamp-none">
             {activeTab === 'exams' && "Manage and schedule upcoming school examinations."}
             {activeTab === 'results' && "Input and update student marks for completed exams."}
             {activeTab === 'published' && "View and review finalized exam outcomes."}
           </p>
         </div>
         {activeTab === 'exams' && (
-          <Button onClick={() => setAddOpen(true)} className="bg-blue-600 hover:bg-blue-700">
-            <Plus className="h-4 w-4 mr-2" /> New Exam
+          <Button onClick={() => setAddOpen(true)} className="bg-blue-600 hover:bg-blue-700 h-9 sm:h-10 px-3 sm:px-4 shrink-0 gap-2">
+            <Plus className="h-4 w-4" /> 
+            <span className="text-sm font-medium">New Exam</span>
           </Button>
         )}
       </div>
@@ -387,7 +390,7 @@ export function AdminExams({ initialTab = 'exams' }: { initialTab?: string }) {
       <Tabs value={activeTab} onValueChange={(v) => v === 'exams' ? backToExams() : setActiveTab(v)}>
 
         <TabsContent value="exams" className="space-y-6">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
             {summaryCards.map((card, i) => (
               <Card key={i} className="border-none shadow-sm">
                 <CardContent className="p-5 flex items-center justify-between">
@@ -406,6 +409,9 @@ export function AdminExams({ initialTab = 'exams' }: { initialTab?: string }) {
             onOpenResults={openResultsEntry} onOpenEdit={(e) => { setEditForm({ ...e, totalMarks: String(e.totalMarks), passingMarks: String(e.passingMarks) }); setEditOpen(true); }}
             onDelete={handleDelete} deleting={deleting} formatDate={formatDate} formatTime={formatTime}
             getStatusBadge={getStatusBadge} getExamTypeBadge={getExamTypeBadge}
+            classFilter={classFilter} setClassFilter={setClassFilter}
+            statusFilter={statusFilter} setStatusFilter={setStatusFilter}
+            classes={classes}
           />
         </TabsContent>
 
@@ -437,12 +443,15 @@ export function AdminExams({ initialTab = 'exams' }: { initialTab?: string }) {
           </div>
           
           <ExamTable
-            exams={exams.filter(e => e.status === 'completed')} 
+            exams={filtered.filter(e => e.status === 'completed')} 
             loading={loadingExams} searchTerm={searchTerm} setSearchTerm={setSearchTerm}
             onOpenResults={openResultsEntry} 
             onOpenEdit={(e) => { setEditForm({ ...e, totalMarks: String(e.totalMarks), passingMarks: String(e.passingMarks) }); setEditOpen(true); }}
             onDelete={handleDelete} deleting={deleting} formatDate={formatDate} formatTime={formatTime}
             getStatusBadge={getStatusBadge} getExamTypeBadge={getExamTypeBadge}
+            classFilter={classFilter} setClassFilter={setClassFilter}
+            statusFilter={statusFilter} setStatusFilter={setStatusFilter}
+            classes={classes}
           />
         </TabsContent>
       </Tabs>

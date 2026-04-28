@@ -26,6 +26,13 @@ interface ExamTableProps {
   formatTime: (time: string | null | undefined) => string;
   getStatusBadge: (status: string) => React.ReactNode;
   getExamTypeBadge: (type: string) => React.ReactNode;
+  
+  // Filter props
+  classFilter: string;
+  setClassFilter: (v: string) => void;
+  statusFilter: string;
+  setStatusFilter: (v: string) => void;
+  classes: any[];
 }
 
 export function ExamTable({
@@ -41,24 +48,50 @@ export function ExamTable({
   formatTime,
   getStatusBadge,
   getExamTypeBadge,
+  classFilter,
+  setClassFilter,
+  statusFilter,
+  setStatusFilter,
+  classes,
 }: ExamTableProps) {
   return (
     <Card className="border-none shadow-sm overflow-hidden">
-      <div className="p-4 border-b bg-muted/30 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div className="relative w-full sm:w-72">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+      <div className="p-3 sm:p-4 border-b bg-muted/30 flex items-center justify-between gap-3">
+        <div className="relative flex-1">
+          <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
           <Input
-            placeholder="Search exams or subjects..."
-            className="pl-9 h-9"
+            placeholder="Search..."
+            className="pl-8 h-8 sm:h-9 text-sm"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
         </div>
-        <div className="flex items-center gap-2">
-          <Button variant="outline" size="sm" className="h-9 gap-2">
-            <Filter className="h-4 w-4" />
-            Filters
-          </Button>
+        <div className="flex items-center gap-2 shrink-0">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" size="sm" className="h-8 sm:h-9 gap-1.5 px-2 sm:px-3">
+                <Filter className="h-3.5 w-3.5" />
+                <span className="hidden xs:inline">Filters</span>
+                {(classFilter !== 'all' || statusFilter !== 'all') && (
+                  <div className="h-1.5 w-1.5 rounded-full bg-blue-600" />
+                )}
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-64 max-h-[80vh] overflow-y-auto">
+              <DropdownMenuLabel>Filter by Class</DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <div className="max-h-[200px] overflow-y-auto">
+                <DropdownMenuItem onClick={() => setClassFilter('all')} className={classFilter === 'all' ? 'bg-accent' : ''}>
+                  All Classes
+                </DropdownMenuItem>
+                {classes.map((c) => (
+                  <DropdownMenuItem key={c.id} onClick={() => setClassFilter(c.id)} className={classFilter === c.id ? 'bg-accent' : ''}>
+                    {c.name}-{c.section}
+                  </DropdownMenuItem>
+                ))}
+              </div>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       </div>
       
@@ -67,13 +100,13 @@ export function ExamTable({
           <Table>
             <TableHeader>
               <TableRow className="bg-muted/30">
-                <TableHead>Exam Name</TableHead>
-                <TableHead>Subject</TableHead>
+                <TableHead className="px-2 sm:px-4">Exam & Subject</TableHead>
+                <TableHead className="hidden sm:table-cell">Subject</TableHead>
                 <TableHead className="hidden md:table-cell">Class</TableHead>
                 <TableHead className="hidden lg:table-cell">Date</TableHead>
                 <TableHead className="hidden lg:table-cell text-center">Timing</TableHead>
-                <TableHead className="text-center">Status</TableHead>
-                <TableHead className="text-right">Actions</TableHead>
+                <TableHead className="text-center px-2 hidden sm:table-cell">Status</TableHead>
+                <TableHead className="text-right px-2 sm:px-4">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -97,16 +130,22 @@ export function ExamTable({
               ) : (
                 exams.map((exam) => (
                   <TableRow key={exam.id} className="group">
-                    <TableCell>
-                      <div className="flex items-center gap-2">
-                        <span className="font-semibold text-sm whitespace-nowrap">{exam.name}</span>
-                        <div className="scale-[0.8] origin-left">{getExamTypeBadge(exam.examType)}</div>
+                    <TableCell className="px-2 sm:px-4">
+                      <div className="flex flex-col gap-1">
+                        <div className="flex items-center gap-2">
+                          <span className="font-semibold text-sm whitespace-nowrap">{exam.name}</span>
+                          <div className="scale-[0.8] origin-left hidden sm:block">{getExamTypeBadge(exam.examType)}</div>
+                        </div>
+                        <div className="sm:hidden flex flex-col">
+                           <span className="text-xs text-muted-foreground font-medium">{exam.subjectName}</span>
+                           <div className="mt-1">{getExamTypeBadge(exam.examType)}</div>
+                        </div>
                       </div>
                     </TableCell>
-                    <TableCell>
+                    <TableCell className="hidden sm:table-cell">
                       <div className="flex flex-col">
                         <span className="text-sm font-medium">{exam.subjectName}</span>
-                        <span className="text-[9px] text-muted-foreground font-mono leading-none">CODE: {exam.id.slice(-4).toUpperCase()}</span>
+                        <span className="text-[9px] text-muted-foreground font-mono leading-none uppercase">CODE: {exam.id.slice(-4)}</span>
                       </div>
                     </TableCell>
                     <TableCell className="hidden md:table-cell">
@@ -123,17 +162,17 @@ export function ExamTable({
                     <TableCell className="hidden lg:table-cell text-center text-sm text-muted-foreground">
                       {formatTime(exam.startTime)} – {formatTime(exam.endTime)}
                     </TableCell>
-                    <TableCell className="text-center">{getStatusBadge(exam.status)}</TableCell>
-                    <TableCell className="text-right">
+                    <TableCell className="text-center px-2 hidden sm:table-cell">{getStatusBadge(exam.status)}</TableCell>
+                    <TableCell className="text-right px-2 sm:px-4">
                       <div className="flex items-center justify-end gap-1">
                         <Button
                           size="sm"
                           variant="ghost"
-                          className="h-8 text-xs text-blue-600 hover:text-blue-800 hover:bg-blue-50"
+                          className="h-8 px-2 text-xs text-blue-600 hover:text-blue-800 hover:bg-blue-50"
                           onClick={() => onOpenResults(exam)}
                         >
-                          <FileText className="h-3.5 w-3.5 mr-1.5" />
-                          Results
+                          <FileText className="h-3.5 w-3.5 sm:mr-1.5" />
+                          <span className="hidden sm:inline">Results</span>
                         </Button>
                         <Button
                           variant="ghost"

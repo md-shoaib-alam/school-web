@@ -92,37 +92,39 @@ export function ExamDialogs({
               <Input placeholder="e.g. Final 2025" value={addForm.name} onChange={(e) => setAddForm({ ...addForm, name: e.target.value })} />
             </div>
 
-            <div className="border rounded-lg overflow-hidden mt-2">
-              <Table>
-                <TableHeader className="bg-muted/50">
-                  <TableRow>
-                    <TableHead className="w-12"><Checkbox checked={selectedBulkCount === bulkRows.length && bulkRows.length > 0} onCheckedChange={(c) => toggleAllBulk(!!c)} /></TableHead>
-                    <TableHead>Subject</TableHead>
-                    <TableHead>Date *</TableHead>
-                    <TableHead className="text-center">Start</TableHead>
-                    <TableHead className="text-center">End</TableHead>
-                    <TableHead className="text-center">Total</TableHead>
-                    <TableHead className="text-center">Pass</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {bulkRows.length === 0 ? (
-                    <TableRow><TableCell colSpan={7} className="text-center py-8 text-muted-foreground">Select a class first</TableCell></TableRow>
-                  ) : (
-                    bulkRows.map((row) => (
-                      <TableRow key={row.subjectId} className={row.selected ? 'bg-blue-50/30' : ''}>
-                        <TableCell><Checkbox checked={row.selected} onCheckedChange={() => toggleBulkSubject(row.subjectId)} /></TableCell>
-                        <TableCell className="font-medium">{row.subjectName}</TableCell>
-                        <TableCell><DatePicker date={row.date ? new Date(row.date) : undefined} onChange={(d) => updateBulkField(row.subjectId, 'date', d?.toISOString().split('T')[0] || '')} disabled={(date) => date < new Date(new Date().setHours(0, 0, 0, 0))} /></TableCell>
-                        <TableCell><TimePicker value={row.startTime} onChange={(v) => updateBulkField(row.subjectId, 'startTime', v)} /></TableCell>
-                        <TableCell><TimePicker value={row.endTime} onChange={(v) => updateBulkField(row.subjectId, 'endTime', v)} /></TableCell>
-                        <TableCell><Input type="number" className="w-16 h-8 text-center" value={row.totalMarks} onChange={(e) => updateBulkField(row.subjectId, 'totalMarks', e.target.value)} /></TableCell>
-                        <TableCell><Input type="number" className="w-16 h-8 text-center" value={row.passingMarks} onChange={(e) => updateBulkField(row.subjectId, 'passingMarks', e.target.value)} /></TableCell>
-                      </TableRow>
-                    ))
-                  )}
-                </TableBody>
-              </Table>
+            <div className="border rounded-lg overflow-x-auto mt-2">
+              <div className="min-w-[600px]">
+                <Table>
+                  <TableHeader className="bg-muted/50">
+                    <TableRow>
+                      <TableHead className="w-10 px-2 sm:px-4"><Checkbox checked={selectedBulkCount === bulkRows.length && bulkRows.length > 0} onCheckedChange={(c) => toggleAllBulk(!!c)} /></TableHead>
+                      <TableHead className="px-2 sm:px-4">Subject</TableHead>
+                      <TableHead className="w-[140px] px-2 sm:px-4">Date *</TableHead>
+                      <TableHead className="text-center w-[100px] px-2 sm:px-4">Start</TableHead>
+                      <TableHead className="text-center w-[100px] px-2 sm:px-4">End</TableHead>
+                      <TableHead className="text-center w-[80px] px-2 sm:px-4">Total</TableHead>
+                      <TableHead className="text-center w-[80px] px-2 sm:px-4">Pass</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {bulkRows.length === 0 ? (
+                      <TableRow><TableCell colSpan={7} className="text-center py-8 text-muted-foreground">Select a class first</TableCell></TableRow>
+                    ) : (
+                      bulkRows.map((row) => (
+                        <TableRow key={row.subjectId} className={row.selected ? 'bg-blue-50/30' : ''}>
+                          <TableCell className="px-2 sm:px-4"><Checkbox checked={row.selected} onCheckedChange={() => toggleBulkSubject(row.subjectId)} /></TableCell>
+                          <TableCell className="font-medium px-2 sm:px-4 whitespace-nowrap">{row.subjectName}</TableCell>
+                          <TableCell className="px-2 sm:px-4"><DatePicker date={row.date ? new Date(row.date) : undefined} onChange={(d) => updateBulkField(row.subjectId, 'date', d?.toISOString().split('T')[0] || '')} disabled={(date) => date < new Date(new Date().setHours(0, 0, 0, 0))} /></TableCell>
+                          <TableCell className="px-2 sm:px-4"><TimePicker value={row.startTime} onChange={(v) => updateBulkField(row.subjectId, 'startTime', v)} /></TableCell>
+                          <TableCell className="px-2 sm:px-4"><TimePicker value={row.endTime} onChange={(v) => updateBulkField(row.subjectId, 'endTime', v)} /></TableCell>
+                          <TableCell className="px-2 sm:px-4"><Input type="number" className="w-14 sm:w-16 h-8 text-center" value={row.totalMarks} onChange={(e) => updateBulkField(row.subjectId, 'totalMarks', e.target.value)} /></TableCell>
+                          <TableCell className="px-2 sm:px-4"><Input type="number" className="w-14 sm:w-16 h-8 text-center" value={row.passingMarks} onChange={(e) => updateBulkField(row.subjectId, 'passingMarks', e.target.value)} /></TableCell>
+                        </TableRow>
+                      ))
+                    )}
+                  </TableBody>
+                </Table>
+              </div>
             </div>
           </div>
           <DialogFooter className="mt-4">
