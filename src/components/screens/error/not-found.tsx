@@ -14,7 +14,7 @@ export function NotFoundScreen() {
   const { setCurrentScreen, logout } = useAppStore();
 
   const goHome = () => {
-    setCurrentScreen("dashboard");
+    window.location.href = "/";
   };
 
   const goBack = () => {
@@ -27,6 +27,7 @@ export function NotFoundScreen() {
 
   const goLogin = () => {
     logout();
+    window.location.href = "/";
   };
 
   return (

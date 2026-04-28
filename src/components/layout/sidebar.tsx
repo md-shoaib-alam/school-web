@@ -299,7 +299,7 @@ export function Sidebar({
                 className="cursor-pointer gap-2 text-red-600 focus:text-red-600 focus:bg-red-50 dark:focus:bg-red-900/20"
                 onClick={() => {
                   logout();
-                  router.push("/");
+                  window.location.href = "/";
                 }}
               >
                 <LogOut className="h-4 w-4" />

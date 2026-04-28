@@ -2,14 +2,17 @@ import { create } from 'zustand';
 import { AppState, AppUser, UserRole } from './types';
 import { 
   STORAGE_KEYS, invalidateCache, parseScreenFromPath, parseTenantFromPath, 
-  isValidScreen, CACHE_TTL
+  isValidScreen, CACHE_TTL, getCookie
 } from './utils';
 
 function getInitialUser(): { isLoggedIn: boolean; currentUser: AppUser | null } {
   if (typeof window === 'undefined') return { isLoggedIn: false, currentUser: null };
   try {
     const stored = localStorage.getItem(STORAGE_KEYS.USER);
-    if (stored) {
+    const token = getCookie('school_token');
+    
+    // Security: Only consider logged in if BOTH localStorage user and cookie token exist
+    if (stored && token) {
       const parsed = JSON.parse(stored);
       const userData = parsed.state ? parsed.state.currentUser : parsed;
       if (userData && userData.id) return { isLoggedIn: true, currentUser: userData };
@@ -82,9 +85,26 @@ export const useAppStore = create<AppState>((set, get) => ({
         localStorage.removeItem(STORAGE_KEYS.USER);
         localStorage.removeItem(STORAGE_KEYS.LAST_SCREEN);
         localStorage.removeItem('school_token');
+        localStorage.removeItem('schoolsaas_tenant_id');
+        localStorage.removeItem('schoolsaas_tenant_slug');
+        localStorage.removeItem('schoolsaas_tenant_name');
+        localStorage.removeItem('schoolsaas_sidebar_state');
+        sessionStorage.clear();
       } catch { /* ignore */ }
     }
     invalidateCache();
+    if (typeof window !== 'undefined') {
+      try {
+        // Clear all cookies
+        const cookies = document.cookie.split(";");
+        for (let i = 0; i < cookies.length; i++) {
+          const cookie = cookies[i];
+          const eqPos = cookie.indexOf("=");
+          const name = eqPos > -1 ? cookie.substring(0, eqPos) : cookie;
+          document.cookie = name + "=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/";
+        }
+      } catch { /* ignore */ }
+    }
     set({
       isLoggedIn: false,
       currentUser: null,

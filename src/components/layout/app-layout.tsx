@@ -48,6 +48,22 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
     refreshPermissions();
   }, [refreshPermissions]);
 
+  // Cookie guard: Redirect to login if cookie is missing while logged in
+  useEffect(() => {
+    const checkAuth = () => {
+      const { getCookie } = require("@/store/app-store/utils");
+      const token = getCookie("school_token");
+      if (!token && currentUser) {
+        window.location.href = "/";
+      }
+    };
+
+    // Check once on mount and then every few seconds
+    checkAuth();
+    const interval = setInterval(checkAuth, 5000);
+    return () => clearInterval(interval);
+  }, [currentUser]);
+
   if (!currentUser) return null;
 
   // Determine current screen from pathname

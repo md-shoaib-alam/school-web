@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useTheme } from "next-themes";
 import { useAppStore, type UserRole } from "@/store/use-app-store";
+import { setCookie, SESSION_EXPIRY_DAYS } from "@/store/app-store/utils";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -76,6 +77,7 @@ export function LoginScreen() {
 
         if (token) {
           localStorage.setItem("school_token", token);
+          setCookie("school_token", token, SESSION_EXPIRY_DAYS);
         }
 
         login({
@@ -90,12 +92,11 @@ export function LoginScreen() {
           customRole: userData.customRole || null,
         });
 
-        const dashboardUrl = userData.tenantSlug 
-          ? `/${userData.tenantSlug}` 
-          : userData.tenantId 
-            ? `/${userData.tenantId}` 
-            : "/";
-        router.push(dashboardUrl);
+        const tenantId = userData.tenantSlug || userData.tenantId;
+        const dashboardUrl = tenantId ? `/${tenantId}` : "/";
+        
+        // Use window.location.href for a clean entry after login
+        window.location.href = dashboardUrl;
 
         return `Welcome back, ${userData.name}!`;
       },
