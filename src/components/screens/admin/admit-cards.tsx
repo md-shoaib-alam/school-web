@@ -129,7 +129,7 @@ function AdmitCardVisual({ card }: { card: AdmitCard }) {
   const schoolPhone = card.school?.phone || '';
 
   return (
-    <div className="w-[100%] max-w-[750px] mx-auto bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden print:shadow-none print:border-gray-400 print:rounded-none print:max-w-none h-[13.5cm] flex flex-col justify-between">
+    <div className="w-[100%] max-w-[750px] mx-auto bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden print:shadow-none print:border-gray-400 print:rounded-none print:max-w-none h-[13cm] flex flex-col justify-between">
       <div>
         {/* ── Header ── */}
         <div className="bg-gradient-to-r from-slate-800 via-slate-700 to-slate-800 text-white px-5 py-2">
@@ -207,19 +207,17 @@ function AdmitCardVisual({ card }: { card: AdmitCard }) {
           <table className="w-full text-[10px]">
             <thead>
               <tr className="bg-slate-50 border-y border-slate-200">
-                <th className="text-left py-1 px-1.5 font-bold text-slate-700">Date/Day</th>
+                <th className="text-left py-1 px-1.5 font-bold text-slate-700 w-[110px]">Date</th>
                 <th className="text-left py-1 px-1.5 font-bold text-slate-700">Subject</th>
-                <th className="text-center py-1 px-1.5 font-bold text-slate-700">Time</th>
-                <th className="text-right py-1 px-1.5 font-bold text-slate-700">Total/Pass</th>
+                <th className="text-center py-1 px-1.5 font-bold text-slate-700 w-[140px]">Time</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
               {card.exams.map((exam) => {
-                const dayName = exam.date ? new Date(exam.date + 'T00:00:00').toLocaleDateString('en-IN', { weekday: 'short' }) : '';
                 return (
                   <tr key={exam.id}>
                     <td className="py-1 px-1.5 font-medium text-slate-800">
-                      {formatDate(exam.date)} <span className="text-[8px] text-slate-400 ml-0.5">{dayName}</span>
+                      {formatDate(exam.date)}
                     </td>
                     <td className="py-1 px-1.5">
                       <span className="font-bold text-slate-800">{exam.subjectName}</span>
@@ -227,9 +225,6 @@ function AdmitCardVisual({ card }: { card: AdmitCard }) {
                     </td>
                     <td className="py-1 px-1.5 text-center font-mono text-slate-600">
                       {formatTime(exam.startTime)} - {formatTime(exam.endTime)}
-                    </td>
-                    <td className="py-1 px-1.5 text-right font-medium text-slate-800">
-                      {exam.totalMarks} / {exam.passingMarks}
                     </td>
                   </tr>
                 );
@@ -255,11 +250,6 @@ function AdmitCardVisual({ card }: { card: AdmitCard }) {
           </div>
         </div>
 
-        {/* ── Bottom Strip ── */}
-        <div className="bg-gray-50 px-5 py-1 flex items-center justify-between text-[8px] text-gray-400">
-          <span>Printed: {new Date().toLocaleDateString('en-IN')}</span>
-          <span className="font-mono">{card.cardNumber}</span>
-        </div>
       </div>
     </div>
   );
@@ -387,12 +377,12 @@ export function AdminAdmitCards() {
 
   const handlePrintSingle = useReactToPrint({
     contentRef: singleCardRef,
-    documentTitle: viewCard ? `AdmitCard-${viewCard.student.rollNumber}` : 'AdmitCard',
+    documentTitle: "",
   });
 
   const handlePrintAll = useReactToPrint({
     contentRef: allCardsRef,
-    documentTitle: `AdmitCards-${selectedClassId}-${new Date().toLocaleDateString()}`,
+    documentTitle: "",
   });
 
   // ── Summary ──
@@ -425,22 +415,45 @@ export function AdminAdmitCards() {
       {/* Hidden Batch Print Container */}
       <div className="hidden">
         <div ref={allCardsRef} className="print:block p-0">
-          <div className="grid grid-cols-2 gap-0">
-            {admitCards.map((card, idx) => (
-              <div 
-                key={card.cardNumber} 
-                className="flex items-center justify-center h-[14.85cm] p-2"
-                style={{ 
-                  pageBreakInside: 'avoid',
-                  breakInside: 'avoid'
-                }}
-              >
-                <div className="w-full h-full flex items-center justify-center">
-                  <AdmitCardVisual card={card} />
+          <style type="text/css" media="print">
+            {"@page { size: A4; margin: 0mm; } body { margin: 0; } .admit-card-page { page-break-after: always; }"}
+          </style>
+          {Array.from({ length: Math.ceil(admitCards.length / 4) }).map((_, pageIdx) => (
+            <div key={pageIdx} className="grid grid-cols-2 gap-0 p-[5mm] admit-card-page h-[29.7cm] content-start">
+              {admitCards.slice(pageIdx * 4, (pageIdx + 1) * 4).map((card) => (
+                <div 
+                  key={card.cardNumber} 
+                  className="flex items-center justify-center h-[13.8cm] p-1 border border-dashed border-gray-300 print:border-gray-400"
+                  style={{ 
+                    pageBreakInside: 'avoid',
+                    breakInside: 'avoid'
+                  }}
+                >
+                  <div className="w-full h-full flex items-center justify-center p-1">
+                    <AdmitCardVisual card={card} />
+                  </div>
+                </div>
+              ))}
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Hidden Single Print Container */}
+      <div className="hidden">
+        <div ref={singleCardRef} className="print:block p-0 bg-white">
+          <style type="text/css" media="print">
+            {"@page { size: A4; margin: 0mm; } body { margin: 0; }"}
+          </style>
+          {viewCard && (
+            <div className="w-[21cm] h-[29.7cm] p-[5mm] flex flex-wrap content-start">
+              <div className="flex items-center justify-center h-[13.8cm] p-1 border border-dashed border-gray-300 print:border-gray-400 w-[10.5cm]">
+                <div className="w-full h-full flex items-center justify-center p-1">
+                  <AdmitCardVisual card={viewCard} />
                 </div>
               </div>
-            ))}
-          </div>
+            </div>
+          )}
         </div>
       </div>
 
@@ -543,34 +556,36 @@ export function AdminAdmitCards() {
               {/* Student Selection */}
               {totalExams > 0 && (
                 <div className="space-y-2">
-                  <div className="flex items-center justify-between">
-                    <label className="text-sm font-medium">Select Students</label>
-                    <Button variant="ghost" size="sm" onClick={toggleAll} className="text-xs gap-1">
+                  <div className="flex items-center justify-between px-1">
+                    <h3 className="text-sm font-bold text-slate-800 dark:text-slate-200">Select Students</h3>
+                    <Button variant="link" size="sm" onClick={toggleAll} className="text-xs h-auto p-0 font-semibold text-amber-600 hover:text-amber-700">
                       {selectAll ? 'Deselect All' : 'Select All'}
                     </Button>
                   </div>
                   <div className="max-h-52 overflow-y-auto border rounded-lg">
                     <Table>
-                      <TableHeader>
+                      <TableHeader className="bg-slate-50 dark:bg-slate-900/50">
                         <TableRow>
-                          <TableHead className="w-10">
+                          <TableHead className="w-12 px-4">
                             <Checkbox checked={selectAll} onCheckedChange={toggleAll} />
                           </TableHead>
-                          <TableHead>Roll No</TableHead>
-                          <TableHead>Student Name</TableHead>
+                          <TableHead className="w-[40%] px-4">Roll No</TableHead>
+                          <TableHead className="w-[40%] px-4">Student Name</TableHead>
+                          <TableHead className="w-[20%] px-4 text-center">Section</TableHead>
                         </TableRow>
                       </TableHeader>
                       <TableBody>
                         {classData.students.map((student) => (
-                          <TableRow key={student.id} className="hover:bg-muted/50">
-                            <TableCell>
+                          <TableRow key={student.id} className="hover:bg-muted/50 border-slate-100 dark:border-slate-800">
+                            <TableCell className="px-4 text-center">
                               <Checkbox
                                 checked={selectedStudentIds.has(student.id)}
                                 onCheckedChange={() => toggleStudent(student.id)}
                               />
                             </TableCell>
-                            <TableCell className="font-mono text-sm">{student.rollNumber}</TableCell>
-                            <TableCell className="font-medium text-sm">{student.name}</TableCell>
+                            <TableCell className="w-[40%] px-4 font-mono text-xs font-semibold text-slate-600 dark:text-slate-400">{student.rollNumber}</TableCell>
+                            <TableCell className="w-[40%] px-4 font-bold text-sm text-slate-800 dark:text-slate-200">{student.name}</TableCell>
+                            <TableCell className="w-[20%] px-4 text-center text-xs font-medium text-slate-500">{student.section || 'A'}</TableCell>
                           </TableRow>
                         ))}
                       </TableBody>
@@ -579,19 +594,30 @@ export function AdminAdmitCards() {
                 </div>
               )}
 
-              {/* Generate Button */}
-              <Button
-                onClick={handleGenerate}
-                disabled={generating || selectedStudentIds.size === 0 || totalExams === 0}
-                className="w-full gap-2 bg-amber-600 hover:bg-amber-700 text-white h-11"
-              >
-                {generating ? (
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                ) : (
-                  <FileText className="h-4 w-4" />
-                )}
-                {generating ? 'Generating...' : `Generate ${selectedStudentIds.size} Admit Card${selectedStudentIds.size !== 1 ? 's' : ''}`}
-              </Button>
+              {/* Generate & Print Buttons */}
+              <div className="flex flex-col sm:flex-row gap-3">
+                <Button
+                  onClick={handleGenerate}
+                  disabled={generating || selectedStudentIds.size === 0 || totalExams === 0}
+                  className="flex-1 gap-2 bg-amber-600 hover:bg-amber-700 text-white h-11"
+                >
+                  {generating ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <FileText className="h-4 w-4" />
+                  )}
+                  {generating ? 'Generating...' : `Generate ${selectedStudentIds.size} Admit Card${selectedStudentIds.size !== 1 ? 's' : ''}`}
+                </Button>
+
+                <Button
+                  onClick={handlePrintAll}
+                  disabled={admitCards.length === 0 || generating}
+                  className={`flex-1 gap-2 h-11 border-none ${admitCards.length > 0 ? 'bg-slate-900 text-white hover:bg-black' : 'bg-slate-800/40 text-slate-500 cursor-not-allowed'}`}
+                >
+                  <Printer className="h-4 w-4" />
+                  Print All {admitCards.length > 0 && `(${admitCards.length})`}
+                </Button>
+              </div>
             </CardContent>
           </Card>
         )}
@@ -691,35 +717,43 @@ export function AdminAdmitCards() {
         )}
       </div>
 
-      {/* View Admit Card Dialog */}
       <Dialog open={!!viewCard} onOpenChange={(open) => !open && setViewCard(null)}>
-        <DialogContent className="max-w-[780px] max-h-[95vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
-              <FileText className="h-5 w-5 text-amber-600" />
-              Admit Card — {viewCard?.student.name}
+        <DialogContent className="max-w-[850px] max-h-[95vh] overflow-y-auto bg-slate-950 border-slate-800 p-0">
+          <div className="sticky top-0 z-10 bg-slate-900/80 backdrop-blur-md border-b border-slate-800 px-6 py-4 flex items-center justify-between">
+            <DialogTitle className="text-white flex items-center gap-2">
+              <div className="h-8 w-8 rounded-full bg-amber-500/20 text-amber-500 flex items-center justify-center">
+                <FileText className="h-5 w-5" />
+              </div>
+              <span>Admit Card — <span className="text-amber-400">{viewCard?.student.name}</span></span>
             </DialogTitle>
             <DialogDescription className="sr-only">
-              View and print student admit cards.
+              Preview and print student admit card.
             </DialogDescription>
-          </DialogHeader>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setViewCard(null)}
+              className="text-slate-400 hover:text-white hover:bg-slate-800"
+            >
+              <AlertCircle className="h-5 w-5 rotate-45" />
+            </Button>
+          </div>
+
           {viewCard && (
-            <div className="flex flex-col items-center gap-4">
-              <div className="scale-[0.85] sm:scale-100 origin-top">
-                <div ref={singleCardRef} className="p-4 bg-white">
+            <div className="p-8 flex flex-col items-center gap-6 bg-slate-950/50">
+              <div className="scale-[0.8] sm:scale-100 origin-top shadow-2xl shadow-black/50">
+                <div className="bg-white p-4 rounded-lg">
                   <AdmitCardVisual card={viewCard} />
                 </div>
               </div>
-              <div className="flex gap-2">
-                <Button
-                  onClick={() => handlePrintSingle()}
-                  variant="outline"
-                  className="gap-2"
-                >
-                  <Printer className="h-4 w-4" />
-                  Print This Card
-                </Button>
-              </div>
+              
+              <Button
+                onClick={() => handlePrintSingle()}
+                className="gap-2 bg-amber-600 hover:bg-amber-700 text-white shadow-lg shadow-amber-900/20 px-8 h-12 text-base font-semibold"
+              >
+                <Printer className="h-5 w-5" />
+                Print This Card
+              </Button>
             </div>
           )}
         </DialogContent>
