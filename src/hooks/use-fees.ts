@@ -15,7 +15,7 @@ export function useFeeCategories() {
 export function useCreateFeeCategory() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (data: any) => api.post('/fee-categories', data),
+    mutationFn: (data: any) => api.post<any, FeeCategory>('/fee-categories', data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['fee-categories'] });
       toast.success('Fee category created!');
@@ -36,7 +36,7 @@ export function useFeeStructures() {
 export function useCreateFeeStructure() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (data: any) => api.post('/fee-structures', data),
+    mutationFn: (data: any) => api.post<any, FeeStructure>('/fee-structures', data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['fee-structures'] });
       toast.success('Fee structure added!');
@@ -57,7 +57,7 @@ export function useFeeConcessions(studentId?: string) {
 export function useCreateFeeConcession() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (data: any) => api.post('/fee-concessions', data),
+    mutationFn: (data: any) => api.post<any, FeeConcession>('/fee-concessions', data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['fee-concessions'] });
       toast.success('Concession added successfully!');
@@ -85,7 +85,7 @@ export function useFeeReceipts(options: {
 export function useCreateFeeReceipt() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (data: any) => api.post('/fee-receipts', data),
+    mutationFn: (data: any) => api.post<any, FeeReceipt>('/fee-receipts', data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['fee-receipts'] });
       queryClient.invalidateQueries({ queryKey: ['fees'] });
@@ -122,7 +122,7 @@ export function useFeeAssignment(classId: string, feeCategoryId: string, academi
 export function useExecuteFeeAssign() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (data: any) => api.post('/fee-assign', data),
+    mutationFn: (data: any) => api.post<any, any>('/fee-assign', data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['fee-assign'] });
       toast.success('Fee assignment updated!');

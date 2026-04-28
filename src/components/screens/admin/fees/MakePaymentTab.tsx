@@ -76,7 +76,10 @@ export function MakePaymentTab({ canCreate }: MakePaymentTabProps) {
     setLoadingFees(true);
     try {
       const feesRes = await apiFetch(`/api/fees?studentId=${student.id}&status=pending`);
-      if (feesRes.ok) setPendingFees(await feesRes.json());
+      if (feesRes.ok) {
+        const data = await feesRes.json();
+        setPendingFees(data.items || []);
+      }
     } catch { console.error('Error fetching fees'); }
     setLoadingFees(false);
   };
@@ -132,7 +135,8 @@ export function MakePaymentTab({ canCreate }: MakePaymentTabProps) {
       // Refresh fees manually for this student since it's local state for now
       const feesRes = await apiFetch(`/api/fees?studentId=${selectedStudent.id}&status=pending`);
       if (feesRes.ok) {
-        setPendingFees(await feesRes.json());
+        const data = await feesRes.json();
+        setPendingFees(data.items || []);
       }
       setSelectedFeeIds(new Set());
     } catch { /* handled by mutation */ }

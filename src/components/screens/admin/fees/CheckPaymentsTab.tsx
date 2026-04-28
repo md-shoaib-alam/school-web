@@ -21,7 +21,8 @@ import { paymentMethodConfig, receiptStatusConfig } from './config';
 import type { FeeReceipt } from './types';
 
 export function CheckPaymentsTab() {
-  const { data: payments = [], isLoading: loading } = useFeeReceipts();
+  const { data, isLoading: loading } = useFeeReceipts();
+  const payments = data?.items || [];
   const [search, setSearch] = useState('');
   const [methodFilter, setMethodFilter] = useState('all');
   const [dateFilter, setDateFilter] = useState('all');
@@ -31,6 +32,7 @@ export function CheckPaymentsTab() {
   const [selectedPayment, setSelectedPayment] = useState<FeeReceipt | null>(null);
 
   const filtered = useMemo(() => {
+    if (!Array.isArray(payments)) return [];
     return payments.filter(p => {
       const matchSearch = search === '' || p.studentName.toLowerCase().includes(search.toLowerCase()) || p.receiptNumber.toLowerCase().includes(search.toLowerCase());
       const matchMethod = methodFilter === 'all' || p.paymentMethod === methodFilter;

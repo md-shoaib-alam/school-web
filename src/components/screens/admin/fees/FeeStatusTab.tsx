@@ -42,7 +42,7 @@ export function FeeStatusTab() {
   const [studentSearch, setStudentSearch] = useState('');
   const [selectedStudent, setSelectedStudent] = useState<StudentOption | null>(null);
 
-  const { data: fees = [], isLoading: loadingFees } = useQuery<FeeItem[]>({
+  const { data: feeData, isLoading: loadingFees } = useQuery<{ items: FeeItem[] }>({
     queryKey: ['fees', selectedStudent?.id],
     enabled: !!selectedStudent,
     queryFn: async () => {
@@ -50,8 +50,9 @@ export function FeeStatusTab() {
       return res.json();
     }
   });
+  const fees = feeData?.items || [];
 
-  const { data: receipts = [], isLoading: loadingReceipts } = useQuery<FeeReceipt[]>({
+  const { data: receiptsData, isLoading: loadingReceipts } = useQuery<{ items: FeeReceipt[] }>({
     queryKey: ['fee-receipts', selectedStudent?.id],
     enabled: !!selectedStudent,
     queryFn: async () => {
@@ -59,6 +60,7 @@ export function FeeStatusTab() {
       return res.json();
     }
   });
+  const receipts = receiptsData?.items || [];
 
   const { data: concessions = [], isLoading: loadingConcessions } = useFeeConcessions(selectedStudent?.id);
 
