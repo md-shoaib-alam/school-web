@@ -8,7 +8,7 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { BookOpen, Layers, Zap, Loader2, Plus } from 'lucide-react';
+import { BookOpen, Layers, Zap, Loader2, Plus, Save } from 'lucide-react';
 import { DatePicker } from '@/components/ui/date-picker';
 import { TimePicker } from '@/components/ui/time-picker';
 import { ExamFormData, ClassOption, SubjectOption } from './types';
@@ -200,7 +200,4 @@ export function ExamDialogs({
   );
 }
 
-// Helper icons needed by the component but not in main imports
-function Save({ className }: { className?: string }) {
-  return <path className={className} d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z" />;
-}
+

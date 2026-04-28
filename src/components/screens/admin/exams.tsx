@@ -5,7 +5,8 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { 
   ClipboardList, FileText, GraduationCap, Plus, 
-  CalendarDays, CheckCircle2, Clock, RefreshCw
+  CalendarDays, CheckCircle2, Clock, RefreshCw,
+  Trophy
 } from 'lucide-react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { api, apiFetch } from '@/lib/api';
@@ -25,18 +26,18 @@ import {
 } from './exams/types';
 
 const statusConfig: Record<string, { bg: string; label: string }> = {
-  scheduled: { bg: 'bg-blue-100 text-blue-700 border-blue-200', label: 'Scheduled' },
-  ongoing: { bg: 'bg-amber-100 text-amber-700 border-amber-200', label: 'Ongoing' },
-  completed: { bg: 'bg-emerald-100 text-emerald-700 border-emerald-200', label: 'Completed' },
-  cancelled: { bg: 'bg-red-100 text-red-700 border-red-200', label: 'Cancelled' },
+  scheduled: { bg: 'bg-blue-100 text-blue-700 border-blue-200 dark:bg-blue-900/30 dark:text-blue-400 dark:border-blue-800', label: 'Scheduled' },
+  ongoing: { bg: 'bg-amber-100 text-amber-700 border-amber-200 dark:bg-amber-900/30 dark:text-amber-400 dark:border-amber-800', label: 'Ongoing' },
+  completed: { bg: 'bg-emerald-100 text-emerald-700 border-emerald-200 dark:bg-emerald-900/30 dark:text-emerald-400 dark:border-emerald-800', label: 'Published' },
+  cancelled: { bg: 'bg-red-100 text-red-700 border-red-200 dark:bg-red-900/30 dark:text-red-400 dark:border-red-800', label: 'Cancelled' },
 };
 
 const examTypeConfig: Record<string, { bg: string; label: string }> = {
-  unit_test: { bg: 'bg-violet-100 text-violet-700 border-violet-200', label: 'Unit Test' },
-  midterm: { bg: 'bg-indigo-100 text-indigo-700 border-indigo-200', label: 'Midterm' },
-  final: { bg: 'bg-orange-100 text-orange-700 border-orange-200', label: 'Final' },
-  quiz: { bg: 'bg-cyan-100 text-cyan-700 border-cyan-200', label: 'Quiz' },
-  practical: { bg: 'bg-pink-100 text-pink-700 border-pink-200', label: 'Practical' },
+  unit_test: { bg: 'bg-violet-100 text-violet-700 border-violet-200 dark:bg-violet-900/30 dark:text-violet-400 dark:border-violet-800', label: 'Unit Test' },
+  midterm: { bg: 'bg-indigo-100 text-indigo-700 border-indigo-200 dark:bg-indigo-900/30 dark:text-indigo-400 dark:border-indigo-800', label: 'Midterm' },
+  final: { bg: 'bg-orange-100 text-orange-700 border-orange-200 dark:bg-orange-900/30 dark:text-orange-400 dark:border-orange-800', label: 'Final' },
+  quiz: { bg: 'bg-cyan-100 text-cyan-700 border-cyan-200 dark:bg-cyan-900/30 dark:text-cyan-400 dark:border-cyan-800', label: 'Quiz' },
+  practical: { bg: 'bg-pink-100 text-pink-700 border-pink-200 dark:bg-pink-900/30 dark:text-pink-400 dark:border-pink-800', label: 'Practical' },
 };
 
 const emptyExamForm: ExamFormData = {
@@ -92,6 +93,7 @@ export function AdminExams() {
   const [resultRows, setResultRows] = useState<StudentResultRow[]>([]);
   const [savingResults, setSavingResults] = useState(false);
   const [loadingStudents, setLoadingStudents] = useState(false);
+  const [isPublishing, setIsPublishing] = useState(false);
 
   // Bulk Mode Helpers
   const [bulkSelected, setBulkSelected] = useState<Set<string>>(new Set());
@@ -135,10 +137,10 @@ export function AdminExams() {
   });
 
   const summaryCards = [
-    { label: 'Total Exams', value: exams.length, icon: <ClipboardList />, color: 'bg-blue-100' },
-    { label: 'Scheduled', value: exams.filter(e => e.status === 'scheduled').length, icon: <CalendarDays />, color: 'bg-amber-100' },
-    { label: 'Completed', value: exams.filter(e => e.status === 'completed').length, icon: <CheckCircle2 />, color: 'bg-emerald-100' },
-    { label: 'Upcoming', value: exams.filter(e => e.date >= new Date().toISOString().split('T')[0]).length, icon: <Clock />, color: 'bg-violet-100' },
+    { label: 'Total Exams', value: exams.length, icon: <ClipboardList />, color: 'bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400' },
+    { label: 'Scheduled', value: exams.filter(e => e.status === 'scheduled').length, icon: <CalendarDays />, color: 'bg-amber-100 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400' },
+    { label: 'Completed', value: exams.filter(e => e.status === 'completed').length, icon: <CheckCircle2 />, color: 'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400' },
+    { label: 'Upcoming', value: exams.filter(e => e.date >= new Date().toISOString().split('T')[0]).length, icon: <Clock />, color: 'bg-violet-100 dark:bg-violet-900/30 text-violet-600 dark:text-violet-400' },
   ];
 
   // Logic Handlers
@@ -260,6 +262,52 @@ export function AdminExams() {
     setSavingResults(false);
   };
 
+  const handlePublish = async () => {
+    if (!selectedExam) return;
+    setIsPublishing(true);
+    try {
+      // 1. Save Results
+      const res = await apiFetch('/api/exams/results', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          examId: selectedExam.id,
+          results: resultRows.map(r => ({
+            studentId: r.studentId,
+            marksObtained: Number(r.marksObtained) || 0,
+            status: r.status,
+            remarks: r.remarks || null
+          }))
+        }),
+      });
+
+      if (res.ok) {
+        // 2. Update Exam Status to 'completed'
+        const statusRes = await apiFetch('/api/exams', {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            id: selectedExam.id,
+            status: 'completed'
+          }),
+        });
+
+        if (statusRes.ok) {
+          toast.success('Results published successfully!');
+          queryClient.invalidateQueries({ queryKey: ['exams'] });
+          backToExams();
+        } else {
+          toast.error('Failed to update exam status');
+        }
+      } else {
+        toast.error('Failed to save results');
+      }
+    } catch {
+      toast.error('Publishing failed');
+    }
+    setIsPublishing(false);
+  };
+
   const backToExams = () => { setSelectedExam(null); setActiveTab('exams'); };
 
   // Bulk Mode Helpers
@@ -304,9 +352,10 @@ export function AdminExams() {
       </div>
 
       <Tabs value={activeTab} onValueChange={(v) => v === 'exams' ? backToExams() : setActiveTab(v)}>
-        <TabsList className="grid w-full max-w-md grid-cols-2">
+        <TabsList className="grid w-full max-w-xl grid-cols-3">
           <TabsTrigger value="exams" className="gap-2"><ClipboardList className="h-4 w-4" /> Exams</TabsTrigger>
           <TabsTrigger value="results" className="gap-2"><FileText className="h-4 w-4" /> Results Entry</TabsTrigger>
+          <TabsTrigger value="published" className="gap-2"><Trophy className="h-4 w-4" /> Published</TabsTrigger>
         </TabsList>
 
         <TabsContent value="exams" className="space-y-6">
@@ -325,7 +374,7 @@ export function AdminExams() {
           </div>
 
           <ExamTable
-            exams={filtered} loading={loadingExams} searchTerm={searchTerm} setSearchTerm={setSearchTerm}
+            exams={filtered.filter(e => e.status !== 'completed')} loading={loadingExams} searchTerm={searchTerm} setSearchTerm={setSearchTerm}
             onOpenResults={openResultsEntry} onOpenEdit={(e) => { setEditForm({ ...e, totalMarks: String(e.totalMarks), passingMarks: String(e.passingMarks) }); setEditOpen(true); }}
             onDelete={handleDelete} deleting={deleting} formatDate={formatDate} formatTime={formatTime}
             getStatusBadge={getStatusBadge} getExamTypeBadge={getExamTypeBadge}
@@ -337,9 +386,29 @@ export function AdminExams() {
             selectedExam={selectedExam} exams={exams} resultRows={resultRows}
             loadingStudents={loadingStudents} savingResults={savingResults}
             onBack={backToExams} onSelectExam={openResultsEntry}
+            onSave={handleSaveResults} onPublish={handlePublish} isPublishing={isPublishing}
             onUpdateMark={(id, m) => setResultRows(prev => prev.map(r => r.studentId === id ? { ...r, marksObtained: m, status: Number(m) >= (selectedExam?.passingMarks || 40) ? 'pass' : 'fail' } : r))}
             onUpdateRemark={(id, rm) => setResultRows(prev => prev.map(r => r.studentId === id ? { ...r, remarks: rm } : r))}
-            onSave={handleSaveResults} formatDate={formatDate} formatTime={formatTime}
+            formatDate={formatDate} formatTime={formatTime}
+            getStatusBadge={getStatusBadge} getExamTypeBadge={getExamTypeBadge}
+          />
+        </TabsContent>
+
+        <TabsContent value="published" className="space-y-6">
+          <div className="bg-emerald-50 dark:bg-emerald-900/10 border border-emerald-200 dark:border-emerald-800/50 p-4 rounded-xl flex items-center gap-3">
+            <Trophy className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
+            <div>
+              <p className="text-sm font-semibold text-emerald-900 dark:text-emerald-100">Finalized Results</p>
+              <p className="text-xs text-emerald-700 dark:text-emerald-400">These exams have been officially published and results are visible to students.</p>
+            </div>
+          </div>
+          
+          <ExamTable
+            exams={exams.filter(e => e.status === 'completed')} 
+            loading={loadingExams} searchTerm={searchTerm} setSearchTerm={setSearchTerm}
+            onOpenResults={openResultsEntry} 
+            onOpenEdit={(e) => { setEditForm({ ...e, totalMarks: String(e.totalMarks), passingMarks: String(e.passingMarks) }); setEditOpen(true); }}
+            onDelete={handleDelete} deleting={deleting} formatDate={formatDate} formatTime={formatTime}
             getStatusBadge={getStatusBadge} getExamTypeBadge={getExamTypeBadge}
           />
         </TabsContent>

@@ -98,12 +98,16 @@ export function ExamTable({
                 exams.map((exam) => (
                   <TableRow key={exam.id} className="group">
                     <TableCell>
-                      <div className="font-semibold text-sm">{exam.name}</div>
-                      <div className="text-[10px] mt-0.5">{getExamTypeBadge(exam.examType)}</div>
+                      <div className="flex items-center gap-2">
+                        <span className="font-semibold text-sm whitespace-nowrap">{exam.name}</span>
+                        <div className="scale-[0.8] origin-left">{getExamTypeBadge(exam.examType)}</div>
+                      </div>
                     </TableCell>
                     <TableCell>
-                      <div className="text-sm">{exam.subjectName}</div>
-                      <div className="text-[10px] text-muted-foreground font-mono">CODE: {exam.id.slice(-4).toUpperCase()}</div>
+                      <div className="flex flex-col">
+                        <span className="text-sm font-medium">{exam.subjectName}</span>
+                        <span className="text-[9px] text-muted-foreground font-mono leading-none">CODE: {exam.id.slice(-4).toUpperCase()}</span>
+                      </div>
                     </TableCell>
                     <TableCell className="hidden md:table-cell">
                       <Badge variant="secondary" className="font-normal text-xs">

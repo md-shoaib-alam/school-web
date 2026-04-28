@@ -24,6 +24,8 @@ interface ResultsViewProps {
   onUpdateMark: (studentId: string, marks: string) => void;
   onUpdateRemark: (studentId: string, remarks: string) => void;
   onSave: () => void;
+  onPublish: () => void;
+  isPublishing: boolean;
   formatDate: (date: string) => string;
   formatTime: (time: string | null | undefined) => string;
   getStatusBadge: (status: string) => React.ReactNode;
@@ -41,6 +43,8 @@ export function ResultsView({
   onUpdateMark,
   onUpdateRemark,
   onSave,
+  onPublish,
+  isPublishing,
   formatDate,
   formatTime,
   getStatusBadge,
@@ -71,9 +75,9 @@ export function ResultsView({
                 <SelectValue placeholder="Choose an exam..." />
               </SelectTrigger>
               <SelectContent>
-                {exams.filter(e => e.status !== 'cancelled').map((e) => (
+                {exams.filter(e => e.status !== 'cancelled' && e.status !== 'completed').map((e) => (
                   <SelectItem key={e.id} value={e.id}>
-                    {e.name} ({e.subjectName})
+                    {e.name} ({e.subjectName}) — {e.className} {e.classSection}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -184,14 +188,25 @@ export function ResultsView({
               Enter marks for each student. Pass/fail is auto-calculated.
             </CardDescription>
           </div>
-          <Button 
-            onClick={onSave} 
-            disabled={savingResults || resultRows.length === 0}
-            className="bg-blue-600 hover:bg-blue-700"
-          >
-            {savingResults ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Save className="h-4 w-4 mr-2" />}
-            Save Results
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button 
+              variant="outline"
+              onClick={onSave} 
+              disabled={savingResults || isPublishing || resultRows.length === 0}
+              className="border-blue-200 text-blue-700 hover:bg-blue-50"
+            >
+              {savingResults ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Save className="h-4 w-4 mr-2" />}
+              Save Draft
+            </Button>
+            <Button 
+              onClick={onPublish} 
+              disabled={savingResults || isPublishing || resultRows.length === 0}
+              className="bg-emerald-600 hover:bg-emerald-700 text-white gap-2"
+            >
+              {isPublishing ? <Loader2 className="h-4 w-4 animate-spin" /> : <CheckCircle2 className="h-4 w-4" />}
+              Publish Results
+            </Button>
+          </div>
         </CardHeader>
         <CardContent className="p-0">
           {loadingStudents ? (

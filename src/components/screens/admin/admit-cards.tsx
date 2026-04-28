@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { useReactToPrint } from 'react-to-print';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -18,7 +18,8 @@ import {
 import { Skeleton } from '@/components/ui/skeleton';
 import {
   FileText, Printer, Eye, Loader2, GraduationCap, Calendar,
-  Phone, School, BookOpen, ClipboardList, AlertCircle,
+  Phone, School, BookOpen, ClipboardList, AlertCircle, X,
+  RefreshCw,
 } from 'lucide-react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { goeyToast as toast } from "goey-toast";
@@ -56,6 +57,8 @@ interface ExamSchedule {
   endTime: string;
   totalMarks: number;
   passingMarks: number;
+  status: string;
+  resultPublished?: boolean;
 }
 
 interface AdmitCard {
@@ -213,22 +216,28 @@ function AdmitCardVisual({ card }: { card: AdmitCard }) {
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
-              {card.exams.map((exam) => {
-                return (
-                  <tr key={exam.id}>
-                    <td className="py-1 px-1.5 font-medium text-slate-800">
-                      {formatDate(exam.date)}
-                    </td>
-                    <td className="py-1 px-1.5">
-                      <span className="font-bold text-slate-800">{exam.subjectName}</span>
-                      <span className="text-[8px] text-slate-400 ml-1">({exam.subjectCode})</span>
-                    </td>
-                    <td className="py-1 px-1.5 text-center font-mono text-slate-600">
-                      {formatTime(exam.startTime)} - {formatTime(exam.endTime)}
-                    </td>
-                  </tr>
-                );
-              })}
+              {card.exams
+                .filter(exam => {
+                  const isScheduled = exam.status?.trim().toLowerCase() === 'scheduled';
+                  const isUpcoming = exam.date >= new Date().toISOString().split('T')[0];
+                  return (isScheduled || isUpcoming) && !exam.resultPublished;
+                })
+                .map((exam) => {
+                  return (
+                    <tr key={exam.id}>
+                      <td className="py-1 px-1.5 font-medium text-slate-800">
+                        {formatDate(exam.date)}
+                      </td>
+                      <td className="py-1 px-1.5">
+                        <span className="font-bold text-slate-800">{exam.subjectName}</span>
+                        <span className="text-[8px] text-slate-400 ml-1">({exam.subjectCode})</span>
+                      </td>
+                      <td className="py-1 px-1.5 text-center font-mono text-slate-600">
+                        {formatTime(exam.startTime)} - {formatTime(exam.endTime)}
+                      </td>
+                    </tr>
+                  );
+                })}
             </tbody>
           </table>
         </div>
@@ -268,7 +277,7 @@ export function AdminAdmitCards() {
   const [selectedClassId, setSelectedClassId] = useState<string>('');
 
   // Step 2: Select exam type
-  const [selectedExamType, setSelectedExamType] = useState<string>('all');
+  const [selectedExamType, setSelectedExamType] = useState<string>('');
 
   // Step 3: Generate
   const [admitCards, setAdmitCards] = useState<AdmitCard[]>([]);
@@ -298,11 +307,25 @@ export function AdminAdmitCards() {
     staleTime: 10 * 60 * 1000,
   });
 
-  const { data: classData, isLoading: loadingClassData } = useQuery({
+  const { data: classData, isLoading: loadingClassData, refetch: refetchClassData } = useQuery({
     queryKey: ['admit-card-data', selectedClassId],
-    queryFn: () => api.get(`/admit-cards?classId=${selectedClassId}`),
+    queryFn: () => api.get(`/admit-cards?classId=${selectedClassId}&_t=${Date.now()}`),
     enabled: !!selectedClassId,
+    staleTime: 5 * 60 * 1000,
+    gcTime: 10 * 60 * 1000,
   });
+
+  const availableExamTypes = useMemo<string[]>(() => {
+    if (!classData?.exams) return [];
+    // Only show exam types that have at least one active (scheduled or upcoming) exam
+    const activeExams = classData.exams.filter((e: any) => {
+      const isScheduled = e.status?.trim().toLowerCase() === 'scheduled';
+      const isUpcoming = e.date >= new Date().toISOString().split('T')[0];
+      return (isScheduled || isUpcoming) && !e.resultPublished;
+    });
+    const types = new Set(activeExams.map((e: any) => e.examType));
+    return Array.from(types) as string[];
+  }, [classData]);
 
   // Reset selection when class data loads
   useEffect(() => {
@@ -312,10 +335,17 @@ export function AdminAdmitCards() {
     }
   }, [classData]);
 
+  // Auto-select first exam type when they load
+  useEffect(() => {
+    if (availableExamTypes.length > 0 && !selectedExamType) {
+      setSelectedExamType(availableExamTypes[0]);
+    }
+  }, [availableExamTypes, selectedExamType]);
+
   const handleClassChange = (classId: string) => {
     setSelectedClassId(classId);
     setAdmitCards([]);
-    setSelectedExamType('all');
+    setSelectedExamType('');
   };
 
   // ── Generate Admit Cards ──
@@ -387,9 +417,13 @@ export function AdminAdmitCards() {
 
   // ── Summary ──
   const totalStudents = classData?.students.length || 0;
-  const totalExams = classData ? (selectedExamType === 'all'
-    ? classData.exams.length
-    : classData.exams.filter((e) => e.examType === selectedExamType).length) : 0;
+  const totalExams = classData ? (
+    classData.exams.filter((e) => {
+      const isScheduled = e.status?.trim().toLowerCase() === 'scheduled';
+      const isUpcoming = e.date >= new Date().toISOString().split('T')[0];
+      return e.examType === selectedExamType && (isScheduled || isUpcoming) && !e.resultPublished;
+    }).length
+  ) : 0;
 
   return (
     <div className="space-y-6">
@@ -469,28 +503,46 @@ export function AdminAdmitCards() {
             <CardDescription>Choose the class for which you want to generate admit cards</CardDescription>
           </CardHeader>
           <CardContent className="p-4 pt-0">
-            <Select value={selectedClassId} onValueChange={handleClassChange}>
-              <SelectTrigger className="w-full sm:w-72">
-                <SelectValue placeholder={loadingClasses ? 'Loading classes...' : 'Select a class'} />
-              </SelectTrigger>
-              <SelectContent>
-                {classes.map((c) => (
-                  <SelectItem key={c.id} value={c.id}>
-                    <span className="flex items-center gap-2">
-                      <GraduationCap className="h-3.5 w-3.5" />
-                      {c.grade} — {c.name} (Section {c.section})
-                    </span>
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <div className="flex flex-col sm:flex-row items-center gap-3">
+              <Select value={selectedClassId} onValueChange={handleClassChange}>
+                <SelectTrigger className="w-full sm:w-72">
+                  <SelectValue placeholder={loadingClasses ? 'Loading classes...' : 'Select a class'} />
+                </SelectTrigger>
+                <SelectContent>
+                  {classes.map((c) => (
+                    <SelectItem key={c.id} value={c.id}>
+                      <span className="flex items-center gap-2">
+                        <GraduationCap className="h-3.5 w-3.5" />
+                        {c.grade} — {c.name} (Section {c.section})
+                      </span>
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              
+              {selectedClassId && (
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  onClick={() => {
+                    queryClient.invalidateQueries({ queryKey: ['admit-card-data', selectedClassId] });
+                    refetchClassData();
+                  }}
+                  className="gap-2 text-xs h-9"
+                  disabled={loadingClassData}
+                >
+                  <RefreshCw className={`h-3.5 w-3.5 ${loadingClassData ? 'animate-spin' : ''}`} />
+                  Sync Data
+                </Button>
+              )}
+            </div>
           </CardContent>
         </Card>
 
         {/* Step 2: Select Exam Type & Students */}
         {classData && (
           <Card className="border-2 border-amber-200 dark:border-amber-800">
-            <CardHeader className="pb-3">
+            <CardHeader className="pb-1">
               <CardTitle className="text-base flex items-center gap-2">
                 <div className="h-7 w-7 rounded-full bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 flex items-center justify-center text-sm font-bold">2</div>
                 Configure Admit Card
@@ -502,28 +554,30 @@ export function AdminAdmitCards() {
             <CardContent className="p-4 pt-0 space-y-4">
               {/* Exam Type Filter */}
               <div className="space-y-1.5">
-                <label className="text-sm font-medium">Exam Type</label>
+                <label className="text-sm font-medium mb-2 block">Exam Type</label>
                 <div className="flex flex-wrap gap-2">
-                  <Button
-                    variant={selectedExamType === 'all' ? 'default' : 'outline'}
-                    size="sm"
-                    onClick={() => setSelectedExamType('all')}
-                    className="gap-1.5"
-                  >
-                    <BookOpen className="h-3.5 w-3.5" />
-                    All Exams
-                  </Button>
-                  {classData.examTypes.map((type) => (
-                    <Button
-                      key={type}
-                      variant={selectedExamType === type ? 'default' : 'outline'}
-                      size="sm"
-                      onClick={() => setSelectedExamType(type)}
-                      className="gap-1.5"
-                    >
-                      {examTypeLabels[type] || type}
-                    </Button>
-                  ))}
+                  {availableExamTypes.map((type: string) => {
+                    const count = classData.exams.filter((e: any) => {
+                      const isScheduled = e.status?.trim().toLowerCase() === 'scheduled';
+                      const isUpcoming = e.date >= new Date().toISOString().split('T')[0];
+                      return e.examType === type && (isScheduled || isUpcoming) && !e.resultPublished;
+                    }).length;
+                    if (count === 0) return null;
+                    return (
+                      <Button
+                        key={type}
+                        variant={selectedExamType === type ? 'default' : 'outline'}
+                        size="sm"
+                        onClick={() => setSelectedExamType(type)}
+                        className="gap-1.5"
+                      >
+                        {examTypeLabels[type] || type}
+                        <Badge variant="secondary" className="ml-1 px-1 py-0 h-4 text-[10px] min-w-[1.2rem] flex items-center justify-center bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-400 border-none">
+                          {count}
+                        </Badge>
+                      </Button>
+                    );
+                  })}
                 </div>
               </div>
 
@@ -735,7 +789,7 @@ export function AdminAdmitCards() {
               onClick={() => setViewCard(null)}
               className="text-slate-400 hover:text-white hover:bg-slate-800"
             >
-              <AlertCircle className="h-5 w-5 rotate-45" />
+              <X className="h-5 w-5" />
             </Button>
           </div>
 
