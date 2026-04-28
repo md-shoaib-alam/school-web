@@ -57,10 +57,14 @@ const getStatusIcon = (status: string) => {
   }
 };
 
-export function StaffAttendance() {
+interface StaffAttendanceProps {
+  initialTab?: string;
+}
+
+export function StaffAttendance({ initialTab }: StaffAttendanceProps) {
   const queryClient = useQueryClient();
   const { currentTenantId } = useAppStore();
-  const [activeTab, setActiveTab] = useState("teacher");
+  const [activeTab, setActiveTab] = useState(initialTab || "teacher");
   const [selectedDate, setSelectedDate] = useState(
     format(new Date(), "yyyy-MM-dd"),
   );
@@ -177,11 +181,12 @@ export function StaffAttendance() {
     <div className="space-y-6">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
-            Professional Attendance
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100 flex items-center gap-2">
+            {activeTab === 'teacher' ? <GraduationCap className="h-7 w-7 text-emerald-600" /> : <Briefcase className="h-7 w-7 text-blue-600" />}
+            {activeTab === 'teacher' ? 'Teacher Attendance' : 'Admin Staff Attendance'}
           </h2>
           <p className="text-gray-500 dark:text-gray-400 mt-1">
-            Separate logs for Teachers and Admin Staff members.
+            {activeTab === 'teacher' ? 'Manage daily attendance logs for all teachers.' : 'Manage daily attendance logs for admin staff members.'}
           </p>
         </div>
         <div className="flex items-center gap-3">
@@ -200,28 +205,31 @@ export function StaffAttendance() {
         </div>
       </div>
 
-      <Tabs
-        defaultValue="teacher"
-        value={activeTab}
-        onValueChange={setActiveTab}
-        className="w-full"
-      >
-        <TabsList className="grid w-full grid-cols-2 max-w-md bg-gray-100 dark:bg-gray-900 p-1 rounded-2xl h-12">
-          <TabsTrigger
-            value="teacher"
-            className="rounded-xl data-[state=active]:bg-white dark:data-[state=active]:bg-gray-800 data-[state=active]:shadow-sm font-bold flex items-center gap-2"
-          >
-            <GraduationCap className="h-4 w-4" />
-            Teachers
-          </TabsTrigger>
-          <TabsTrigger
-            value="staff"
-            className="rounded-xl data-[state=active]:bg-white dark:data-[state=active]:bg-gray-800 data-[state=active]:shadow-sm font-bold flex items-center gap-2"
-          >
-            <Briefcase className="h-4 w-4" />
-            Admin Staff
-          </TabsTrigger>
-        </TabsList>
+      {!initialTab && (
+        <Tabs
+          defaultValue="teacher"
+          value={activeTab}
+          onValueChange={setActiveTab}
+          className="w-full"
+        >
+          <TabsList className="grid w-full grid-cols-2 max-w-md bg-gray-100 dark:bg-gray-900 p-1 rounded-2xl h-12">
+            <TabsTrigger
+              value="teacher"
+              className="rounded-xl data-[state=active]:bg-white dark:data-[state=active]:bg-gray-800 data-[state=active]:shadow-sm font-bold flex items-center gap-2"
+            >
+              <GraduationCap className="h-4 w-4" />
+              Teachers
+            </TabsTrigger>
+            <TabsTrigger
+              value="staff"
+              className="rounded-xl data-[state=active]:bg-white dark:data-[state=active]:bg-gray-800 data-[state=active]:shadow-sm font-bold flex items-center gap-2"
+            >
+              <Briefcase className="h-4 w-4" />
+              Admin Staff
+            </TabsTrigger>
+          </TabsList>
+        </Tabs>
+      )}
 
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-6">
           <Card className="rounded-xl shadow-sm border-0">
@@ -286,11 +294,8 @@ export function StaffAttendance() {
           </Card>
         </div>
 
-        <TabsContent
-          value={activeTab}
-          className="mt-6 border-0 p-0 focus-visible:ring-0"
-        >
-          <Card className="rounded-xl shadow-sm border-0 bg-white dark:bg-gray-900">
+      <div className="mt-6">
+        <Card className="rounded-xl shadow-sm border-0 bg-white dark:bg-gray-900">
             <CardHeader className="pb-3 px-4">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                 <CardTitle className="text-base font-semibold flex items-center gap-2">
@@ -414,8 +419,7 @@ export function StaffAttendance() {
 
             </CardContent>
           </Card>
-        </TabsContent>
-      </Tabs>
+      </div>
 
       <div className="fixed bottom-6 left-6 right-6 lg:left-[calc(18rem+1.5rem)] lg:right-10 flex flex-col sm:flex-row items-center justify-between bg-white/90 dark:bg-gray-950/90 backdrop-blur-md p-4 px-6 rounded-2xl shadow-2xl border border-gray-100/20 dark:border-gray-800/50 gap-4 z-[100]">
         <div className="flex items-center gap-3 w-full sm:w-auto">

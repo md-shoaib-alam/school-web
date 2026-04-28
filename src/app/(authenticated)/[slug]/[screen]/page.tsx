@@ -123,7 +123,8 @@ export default function TenantScreenDispatcher() {
       case 'certificates': return <AdminCertificates />;
       case 'leaves': return <AdminLeaves />;
       case 'grades': return <TeacherGrades />;
-      case 'staff-attendance': return <StaffAttendance />;
+      case 'teacher-attendance': return <StaffAttendance initialTab="teacher" />;
+      case 'staff-attendance': return <StaffAttendance initialTab="staff" />;
       case 'exams': return <AdminExams initialTab="exams" />;
       case 'results-entry': return <AdminExams initialTab="results" />;
       case 'published-results': return <AdminExams initialTab="published" />;

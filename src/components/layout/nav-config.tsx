@@ -38,6 +38,7 @@ import {
   History,
   Bus,
   IdCard,
+  Briefcase,
 } from "lucide-react";
 import { type UserRole } from "@/store/use-app-store";
 
@@ -169,7 +170,8 @@ export const navItems: Record<UserRole, NavItem[]> = {
       icon: <UserCheck className="h-4 w-4" />,
       children: [
         { key: "attendance", label: "Student Attendance", icon: <Users className="h-4 w-4" /> },
-        { key: "staff-attendance", label: "Staff Attendance", icon: <ClipboardList className="h-4 w-4" /> },
+        { key: "teacher-attendance", label: "Teacher Attendance", icon: <GraduationCap className="h-4 w-4" /> },
+        { key: "staff-attendance", label: "Admin Staff Attendance", icon: <Briefcase className="h-4 w-4" /> },
       ]
     },
     {
