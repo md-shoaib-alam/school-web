@@ -337,7 +337,7 @@ export function StaffAttendance() {
                 />
               </div>
 
-              <ScrollArea className="max-h-[500px]">
+
                 <div className="space-y-2">
                   {queryLoading ? (
                     Array(5)
@@ -411,13 +411,13 @@ export function StaffAttendance() {
                     })
                   )}
                 </div>
-              </ScrollArea>
+
             </CardContent>
           </Card>
         </TabsContent>
       </Tabs>
 
-      <div className="sticky bottom-6 flex flex-col sm:flex-row items-center justify-between bg-white/80 dark:bg-gray-950/80 backdrop-blur-md p-4 px-6 rounded-2xl shadow-2xl border border-gray-100/20 dark:border-gray-800/50 gap-4 z-50">
+      <div className="fixed bottom-6 left-6 right-6 lg:left-[calc(18rem+1.5rem)] lg:right-10 flex flex-col sm:flex-row items-center justify-between bg-white/90 dark:bg-gray-950/90 backdrop-blur-md p-4 px-6 rounded-2xl shadow-2xl border border-gray-100/20 dark:border-gray-800/50 gap-4 z-[100]">
         <div className="flex items-center gap-3 w-full sm:w-auto">
           {hasChanges ? (
             <div className="flex items-center gap-3">
