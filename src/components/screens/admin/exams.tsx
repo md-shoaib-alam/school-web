@@ -9,6 +9,7 @@ import {
   Trophy
 } from 'lucide-react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useRouter, useParams } from 'next/navigation';
 import { api, apiFetch } from '@/lib/api';
 import { goeyToast as toast } from 'goey-toast';
 import { Button } from '@/components/ui/button';
@@ -67,8 +68,10 @@ function TabLoadingSkeleton() {
   );
 }
 
-export function AdminExams() {
+export function AdminExams({ initialTab = 'exams' }: { initialTab?: string }) {
   const queryClient = useQueryClient();
+  const router = useRouter();
+  const { slug } = useParams();
 
   // Filters & Tabs
   const [classFilter, setClassFilter] = useState('all');
@@ -76,7 +79,7 @@ export function AdminExams() {
   const [examTypeFilter, setExamTypeFilter] = useState('all');
   const [searchTerm, setSearchTerm] = useState('');
   const debouncedSearch = useDebounce(searchTerm, 300);
-  const [activeTab, setActiveTab] = useState('exams');
+  const [activeTab, setActiveTab] = useState(initialTab);
 
   // Dialog States
   const [addOpen, setAddOpen] = useState(false);
@@ -98,6 +101,7 @@ export function AdminExams() {
   // Bulk Mode Helpers
   const [bulkSelected, setBulkSelected] = useState<Set<string>>(new Set());
   const [bulkOverrides, setBulkOverrides] = useState<Record<string, Partial<ExamFormData>>>({});
+  const [resultsClassId, setResultsClassId] = useState<string>('');
 
   // Queries
   const { data: examsData, isLoading: loadingExams } = useQuery({
@@ -106,6 +110,15 @@ export function AdminExams() {
       const res = await apiFetch('/api/exams');
       return res.json();
     }
+  });
+
+  const { data: resultsExamsData } = useQuery({
+    queryKey: ['results-exams', resultsClassId],
+    queryFn: async () => {
+      const res = await apiFetch(`/api/exams?classId=${resultsClassId}&limit=100`);
+      return res.json();
+    },
+    enabled: !!resultsClassId
   });
 
   const { data: metadata } = useQuery({
@@ -217,6 +230,10 @@ export function AdminExams() {
 
   const openResultsEntry = async (exam: ExamRecord) => {
     setSelectedExam(exam);
+    setResultsClassId(exam.classId);
+    if (activeTab !== 'results') {
+      router.push(`/${slug}/results-entry`);
+    }
     setActiveTab('results');
     setLoadingStudents(true);
     try {
@@ -308,7 +325,13 @@ export function AdminExams() {
     setIsPublishing(false);
   };
 
-  const backToExams = () => { setSelectedExam(null); setActiveTab('exams'); };
+  const backToExams = () => { 
+    setSelectedExam(null); 
+    if (activeTab !== 'exams') {
+      router.push(`/${slug}/exams`);
+    }
+    setActiveTab('exams'); 
+  };
 
   // Bulk Mode Helpers
   const bulkSubjectsForClass = subjects.filter((s: any) => s.classId === addForm.classId);
@@ -341,22 +364,27 @@ export function AdminExams() {
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-2xl font-bold tracking-tight flex items-center gap-2">
-            <GraduationCap className="h-7 w-7 text-blue-600" />
-            Exam Management
+            {activeTab === 'exams' && <GraduationCap className="h-7 w-7 text-blue-600" />}
+            {activeTab === 'results' && <FileText className="h-7 w-7 text-orange-600" />}
+            {activeTab === 'published' && <Trophy className="h-7 w-7 text-yellow-600" />}
+            {activeTab === 'exams' && "Scheduled Exams"}
+            {activeTab === 'results' && "Results Entry"}
+            {activeTab === 'published' && "Published Results"}
           </h2>
-          <p className="text-muted-foreground">Schedule exams and enter results.</p>
+          <p className="text-muted-foreground">
+            {activeTab === 'exams' && "Manage and schedule upcoming school examinations."}
+            {activeTab === 'results' && "Input and update student marks for completed exams."}
+            {activeTab === 'published' && "View and review finalized exam outcomes."}
+          </p>
         </div>
-        <Button onClick={() => setAddOpen(true)} className="bg-blue-600 hover:bg-blue-700">
-          <Plus className="h-4 w-4 mr-2" /> New Exam
-        </Button>
+        {activeTab === 'exams' && (
+          <Button onClick={() => setAddOpen(true)} className="bg-blue-600 hover:bg-blue-700">
+            <Plus className="h-4 w-4 mr-2" /> New Exam
+          </Button>
+        )}
       </div>
 
       <Tabs value={activeTab} onValueChange={(v) => v === 'exams' ? backToExams() : setActiveTab(v)}>
-        <TabsList className="grid w-full max-w-xl grid-cols-3">
-          <TabsTrigger value="exams" className="gap-2"><ClipboardList className="h-4 w-4" /> Exams</TabsTrigger>
-          <TabsTrigger value="results" className="gap-2"><FileText className="h-4 w-4" /> Results Entry</TabsTrigger>
-          <TabsTrigger value="published" className="gap-2"><Trophy className="h-4 w-4" /> Published</TabsTrigger>
-        </TabsList>
 
         <TabsContent value="exams" className="space-y-6">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -383,7 +411,12 @@ export function AdminExams() {
 
         <TabsContent value="results">
           <ResultsView
-            selectedExam={selectedExam} exams={exams} resultRows={resultRows}
+            selectedExam={selectedExam} 
+            exams={resultsExamsData?.data || []} 
+            classes={metadata?.classes || []} 
+            resultsClassId={resultsClassId}
+            onResultsClassChange={setResultsClassId}
+            resultRows={resultRows}
             loadingStudents={loadingStudents} savingResults={savingResults}
             onBack={backToExams} onSelectExam={openResultsEntry}
             onSave={handleSaveResults} onPublish={handlePublish} isPublishing={isPublishing}
