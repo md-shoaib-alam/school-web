@@ -23,8 +23,8 @@ export function ThemeToggle() {
 
   if (!mounted) {
     return (
-      <Button variant="ghost" size="icon" className="h-9 w-9">
-        <Sun className="h-[18px] w-[18px]" />
+      <Button variant="ghost" size="icon" className="h-10 w-10 md:h-9 md:w-9">
+        <Sun className="h-[22px] w-[22px] md:h-[18px] md:w-[18px]" />
       </Button>
     );
   }
@@ -35,12 +35,12 @@ export function ThemeToggle() {
         <Button
           variant="ghost"
           size="icon"
-          className="h-9 w-9 hover:bg-gray-100 dark:hover:bg-gray-800"
+          className="h-10 w-10 md:h-9 md:w-9 hover:bg-gray-100 dark:hover:bg-gray-800"
         >
           {theme === "dark" ? (
-            <Moon className="h-[18px] w-[18px] text-blue-400" />
+            <Moon className="h-[28px] w-[28px] md:h-[22px] md:w-[22px] text-blue-400" />
           ) : (
-            <Sun className="h-[18px] w-[18px] text-amber-500" />
+            <Sun className="h-[28px] w-[28px] md:h-[22px] md:w-[22px] text-amber-500" />
           )}
         </Button>
       </DropdownMenuTrigger>

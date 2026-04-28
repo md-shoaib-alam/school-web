@@ -72,17 +72,17 @@ export function NotificationBell() {
         <Button
           variant="ghost"
           size="icon"
-          className="relative h-9 w-9 hover:bg-gray-100 dark:hover:bg-gray-800"
+          className="relative h-11 w-11 md:h-10 md:w-10 hover:bg-gray-100 dark:hover:bg-gray-800"
         >
-          <Bell className="h-[18px] w-[18px] text-gray-500 dark:text-gray-400" />
+          <Bell className="h-7 w-7 md:h-6 md:w-6 text-gray-500 dark:text-gray-400" />
           {unreadCount > 0 && (
-            <span className="absolute -top-0.5 -right-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[10px] font-bold text-white ring-2 ring-white dark:ring-gray-900">
+            <span className="absolute top-0 right-0 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[10px] font-bold text-white ring-2 ring-white dark:ring-gray-900">
               {unreadCount}
             </span>
           )}
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-80 p-0" align="end">
+      <PopoverContent className="w-72 sm:w-80 p-0 border-gray-200 dark:border-gray-800 shadow-2xl" align="end" sideOffset={8}>
         <div className="flex items-center justify-between px-4 py-3 border-b border-gray-100 dark:border-gray-800">
           <div className="flex items-center gap-2">
             <h3 className="font-semibold text-sm text-gray-900 dark:text-gray-100">
@@ -97,13 +97,13 @@ export function NotificationBell() {
           <Button
             variant="ghost"
             size="sm"
-            className="text-xs text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 h-7 px-2"
+            className="text-[10px] text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 h-6 px-1.5"
             onClick={markAllRead}
           >
             Mark all read
           </Button>
         </div>
-        <ScrollArea className="max-h-[340px]">
+        <ScrollArea className="max-h-[380px] overflow-y-auto">
           {notifications.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-8 text-gray-400">
               <Bell className="h-8 w-8 mb-2 opacity-40" />
@@ -115,17 +115,17 @@ export function NotificationBell() {
                 <button
                   key={notification.id}
                   className={cn(
-                    "w-full flex items-start gap-3 px-4 py-3 text-left hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors",
+                    "w-full flex items-start gap-2 px-3 py-2.5 text-left hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors",
                     !notification.read && "bg-blue-50/50 dark:bg-blue-900/10",
                   )}
                   onClick={() => markRead(notification.id)}
                 >
-                  <div className="mt-0.5 shrink-0">{notification.icon}</div>
+                  <div className="mt-0.5 shrink-0 scale-90">{notification.icon}</div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-start justify-between gap-2">
                       <p
                         className={cn(
-                          "text-sm truncate",
+                          "text-xs truncate",
                           !notification.read
                             ? "font-semibold text-gray-900 dark:text-gray-100"
                             : "font-medium text-gray-700 dark:text-gray-300",
@@ -134,13 +134,13 @@ export function NotificationBell() {
                         {notification.title}
                       </p>
                       {!notification.read && (
-                        <span className="mt-1.5 h-2 w-2 rounded-full bg-blue-500 shrink-0" />
+                        <span className="mt-1.5 h-1.5 w-1.5 rounded-full bg-blue-500 shrink-0" />
                       )}
                     </div>
-                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5 line-clamp-2">
+                    <p className="text-[11px] text-gray-500 dark:text-gray-400 mt-0.5 line-clamp-1 leading-tight">
                       {notification.desc}
                     </p>
-                    <p className="text-[11px] text-gray-400 dark:text-gray-500 mt-1">
+                    <p className="text-[10px] text-gray-400 dark:text-gray-500 mt-0.5">
                       {notification.time}
                     </p>
                   </div>

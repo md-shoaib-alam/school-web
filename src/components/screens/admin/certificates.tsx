@@ -145,8 +145,9 @@ export function AdminCertificates() {
           body { background: white !important; }
           .cert-frame { 
             width: 190mm !important; 
-            height: 277mm !important; 
+            height: 272mm !important; 
             margin: auto !important; 
+            margin-top: 12mm !important;
             border: 12px double #92400e !important; 
             -webkit-print-color-adjust: exact; 
             print-color-adjust: exact;
@@ -295,9 +296,11 @@ export function AdminCertificates() {
               <span className="text-sm">Print PDF</span>
             </Button>
           </div>
-          <div className="max-h-[70vh] overflow-y-auto p-8 bg-gray-100">
-            <div ref={contentRef}>
-              <CertificateTemplate cert={viewCert} formatDate={formatDate} />
+          <div className="max-h-[75vh] overflow-y-auto p-4 sm:p-8 bg-gray-100/50 flex justify-center">
+            <div className="scale-[0.38] xs:scale-[0.45] sm:scale-[0.7] lg:scale-100 origin-top">
+              <div ref={contentRef} className="w-[210mm] bg-white shadow-2xl">
+                <CertificateTemplate cert={viewCert} formatDate={formatDate} />
+              </div>
             </div>
           </div>
         </DialogContent>

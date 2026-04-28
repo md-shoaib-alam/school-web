@@ -30,10 +30,10 @@ export function Header({ items, resolvedScreen }: HeaderProps) {
         <Button
           variant="ghost"
           size="icon"
-          className="lg:hidden"
+          className="lg:hidden h-10 w-10"
           onClick={toggleSidebar}
         >
-          <Menu className="h-5 w-5" />
+          <Menu className="h-6 w-6" />
         </Button>
         <h1 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
           {items.find((i) => i.key === resolvedScreen)?.label ||
