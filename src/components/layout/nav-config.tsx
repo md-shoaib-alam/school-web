@@ -39,6 +39,8 @@ import {
   Bus,
   IdCard,
   Briefcase,
+  ArrowRight,
+  Zap,
 } from "lucide-react";
 import { type UserRole } from "@/store/use-app-store";
 
@@ -147,7 +149,16 @@ export const navItems: Record<UserRole, NavItem[]> = {
     { key: "teachers", label: "Teachers", icon: <Users className="h-4 w-4" /> },
     { key: "parents", label: "Parents", icon: <Heart className="h-4 w-4" /> },
     { key: "classes", label: "Classes", icon: <School className="h-4 w-4" /> },
-    { key: "promotions", label: "Class Promotion", icon: <GraduationCap className="h-4 w-4" /> },
+    {
+      key: "promotions-group",
+      label: "Class Promotion",
+      icon: <GraduationCap className="h-4 w-4" />,
+      children: [
+        { key: "promotions", label: "Promotions", icon: <ArrowRight className="h-4 w-4" /> },
+        { key: "bulk-promote", label: "Bulk Promote", icon: <Zap className="h-4 w-4" /> },
+        { key: "graduated", label: "Graduated", icon: <GraduationCap className="h-4 w-4" /> },
+      ]
+    },
     {
       key: "exam-management",
       label: "Exam Management",

@@ -55,33 +55,18 @@ export function NewPromotionDialog({
           </DialogDescription>
         </DialogHeader>
         <div className="grid gap-4 py-2">
-          <div className="grid gap-2">
-            <label className="text-sm font-medium">Student *</label>
-            <Select value={form.studentId} onValueChange={handleStudentChange}>
-              <SelectTrigger>
-                <SelectValue placeholder="Select student" />
-              </SelectTrigger>
-              <SelectContent>
-                {students.map((s) => (
-                  <SelectItem key={s.id} value={s.id}>
-                    {s.name} — Roll #{s.rollNumber} ({s.className})
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
           <div className="grid grid-cols-2 gap-4">
             <div className="grid gap-2">
-              <label className="text-sm font-medium">From Class *</label>
-              <Select
-                value={form.fromClassId}
-                onValueChange={(v) => setForm({ ...form, fromClassId: v })}
-                disabled
+              <label className="text-sm font-medium">Filter by Class</label>
+              <Select 
+                value={form.fromClassId} 
+                onValueChange={(v) => setForm({ ...form, fromClassId: v, studentId: "" })}
               >
                 <SelectTrigger>
-                  <SelectValue placeholder="Auto-filled" />
+                  <SelectValue placeholder="All Classes" />
                 </SelectTrigger>
                 <SelectContent>
+                  <SelectItem value="all">All Classes</SelectItem>
                   {classes.map((c) => (
                     <SelectItem key={c.id} value={c.id}>
                       {c.name}-{c.section}
@@ -89,6 +74,31 @@ export function NewPromotionDialog({
                   ))}
                 </SelectContent>
               </Select>
+            </div>
+            <div className="grid gap-2">
+              <label className="text-sm font-medium">Student *</label>
+              <Select value={form.studentId} onValueChange={handleStudentChange}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select student" />
+                </SelectTrigger>
+                <SelectContent className="max-h-[300px]">
+                  {students
+                    .filter(s => !form.fromClassId || form.fromClassId === "all" || s.classId === form.fromClassId)
+                    .map((s) => (
+                      <SelectItem key={s.id} value={s.id}>
+                        {s.name} (#{s.rollNumber})
+                      </SelectItem>
+                    ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+          <div className="grid grid-cols-2 gap-4">
+            <div className="grid gap-2 opacity-60">
+              <label className="text-sm font-medium">Current Class</label>
+              <div className="px-3 py-2 rounded-md border bg-muted text-sm truncate">
+                {students.find(s => s.id === form.studentId)?.className || "Select a student"}
+              </div>
             </div>
             <div className="grid gap-2">
               <label className="text-sm font-medium">To Class *</label>
@@ -280,9 +290,19 @@ export function BulkPromotionDialog({
             </div>
           )}
           {bulkPreview.length > 0 && (
-            <p className="text-sm text-muted-foreground">
-              {bulkPreview.length} student(s) will be promoted
-            </p>
+            <div className="grid gap-2">
+              <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                Students to be promoted ({bulkPreview.length})
+              </label>
+              <div className="max-h-[160px] overflow-y-auto rounded-lg border bg-muted/30 p-2 text-sm space-y-1">
+                {bulkPreview.map((s) => (
+                  <div key={s.id} className="flex justify-between items-center px-2 py-1 rounded hover:bg-muted/50 transition-colors">
+                    <span className="font-medium text-foreground">{s.name}</span>
+                    <span className="text-xs text-muted-foreground">#{s.rollNumber}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
           )}
         </div>
         <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">

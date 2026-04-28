@@ -39,10 +39,15 @@ import {
   RejectPromotionDialog,
 } from "./promotions/PromotionDialogs";
 
-export function AdminPromotions() {
+export function AdminPromotions({ initialTab: propTab }: { initialTab?: "individual" | "bulk" | "graduated" }) {
   const [activeTab, setActiveTab] = useState<
     "individual" | "bulk" | "graduated"
-  >("individual");
+  >(propTab || "individual");
+
+  // Sync tab if prop changes (e.g. clicking sidebar while already on page)
+  useEffect(() => {
+    if (propTab) setActiveTab(propTab);
+  }, [propTab]);
 
   // Data
   const [promotions, setPromotions] = useState<PromotionRecord[]>([]);
@@ -132,7 +137,7 @@ export function AdminPromotions() {
     try {
       const [classesRes, studentsRes] = await Promise.all([
         apiFetch("/api/classes?mode=min"),
-        apiFetch("/api/students?limit=1000&status=active"), // Higher limit for promotion lists
+        apiFetch("/api/students?mode=min"), // Optimized fetch with only essential fields
       ]);
       if (classesRes.ok) setClasses(await classesRes.json());
       if (studentsRes.ok) {
@@ -146,7 +151,6 @@ export function AdminPromotions() {
               rollNumber: string;
               className: string;
               classId: string;
-              status?: string;
             }) => ({
               id: s.id,
               name: s.name,
@@ -499,31 +503,7 @@ export function AdminPromotions() {
           </p>
         </div>
         <div className="flex gap-2 shrink-0 flex-wrap">
-          <Button
-            variant="outline"
-            className="gap-2 border-violet-300 text-violet-700 hover:bg-violet-50 dark:border-violet-800 dark:text-violet-400 dark:hover:bg-violet-900/30"
-            onClick={openGradDialog}
-          >
-            <GraduationCap className="h-4 w-4" />
-            <span className="hidden sm:inline">Graduate</span>
-          </Button>
-          <Button
-            className="gap-2 bg-amber-600 hover:bg-amber-700 text-white"
-            onClick={openBulkDialog}
-          >
-            <Zap className="h-4 w-4" />
-            <span className="hidden sm:inline">Bulk Promote</span>
-          </Button>
-          <Button
-            className="bg-emerald-600 hover:bg-emerald-700 text-white"
-            onClick={() => {
-              setForm({ ...emptyForm, academicYear: getCurrentAcademicYear() });
-              setDialogOpen(true);
-            }}
-          >
-            <Plus className="h-4 w-4" />
-            <span className="hidden sm:inline">New Promotion</span>
-          </Button>
+          {/* Action buttons removed as they are now in the sidebar */}
         </div>
       </div>
 
@@ -584,42 +564,7 @@ export function AdminPromotions() {
         ))}
       </div>
 
-      {/* Tabs */}
-      <div className="flex gap-1 bg-muted/80 p-1 rounded-lg w-fit">
-        {[
-          {
-            key: "individual" as const,
-            label: "Promotions",
-            icon: <ArrowRight className="h-4 w-4" />,
-          },
-          {
-            key: "bulk" as const,
-            label: "Bulk Promote",
-            icon: <Zap className="h-4 w-4" />,
-          },
-          {
-            key: "graduated" as const,
-            label: "Graduated",
-            icon: <GraduationCap className="h-4 w-4" />,
-          },
-        ].map((tab) => (
-          <button
-            key={tab.key}
-            onClick={() => setActiveTab(tab.key)}
-            className={`
-              flex items-center gap-1.5 px-4 py-2 rounded-md text-sm font-medium transition-all
-              ${
-                activeTab === tab.key
-                  ? "bg-background text-foreground shadow-sm"
-                  : "text-muted-foreground hover:text-foreground"
-              }
-            `}
-          >
-            {tab.icon}
-            {tab.label}
-          </button>
-        ))}
-      </div>
+      {/* Tabs removed as sidebar now handles navigation */}
 
       {/* ═══════ INDIVIDUAL PROMOTIONS TAB ═══════ */}
       {activeTab === "individual" && (
@@ -666,6 +611,19 @@ export function AdminPromotions() {
                 <SelectItem value="rejected">Rejected</SelectItem>
               </SelectContent>
             </Select>
+
+            <div className="flex-1" />
+            
+            <Button
+              className="bg-emerald-600 hover:bg-emerald-700 text-white gap-2"
+              onClick={() => {
+                setForm({ ...emptyForm, academicYear: getCurrentAcademicYear() });
+                setDialogOpen(true);
+              }}
+            >
+              <Plus className="h-4 w-4" />
+              <span>New Promotion</span>
+            </Button>
           </div>
 
           <PromotionsTable

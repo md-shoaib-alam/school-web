@@ -119,7 +119,9 @@ export default function TenantScreenDispatcher() {
       case 'staff': return <AdminStaff />;
       case 'school-settings': return <AdminSchoolSettings />;
       case 'tickets': return <AdminTickets />;
-      case 'promotions': return <AdminPromotions />;
+      case 'promotions': return <AdminPromotions initialTab="individual" />;
+      case 'bulk-promote': return <AdminPromotions initialTab="bulk" />;
+      case 'graduated': return <AdminPromotions initialTab="graduated" />;
       case 'certificates': return <AdminCertificates />;
       case 'leaves': return <AdminLeaves />;
       case 'grades': return <TeacherGrades />;
