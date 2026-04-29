@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { apiFetch } from "@/lib/api";
 import { useAppStore } from "@/store/use-app-store";
+import { useParentDashboard } from "@/lib/graphql/hooks";
 import {
   Card,
   CardContent,
@@ -22,45 +23,33 @@ import { getAttendanceStats, getMonthlyData, getCalendarData } from "./attendanc
 
 export function ParentAttendance() {
   const { currentUser } = useAppStore();
-  const [loading, setLoading] = useState(true);
-  const [students, setStudents] = useState<StudentInfo[]>([]);
-  const [allAttendance, setAllAttendance] = useState<AttendanceRecord[]>([]);
   const [activeTab, setActiveTab] = useState("");
+  const [allAttendance, setAllAttendance] = useState<AttendanceRecord[]>([]);
+
+  const { data, isPending } = useParentDashboard(currentUser?.name || "");
+  const students = (data?.children || []) as StudentInfo[];
 
   useEffect(() => {
-    async function fetchData() {
+    if (students.length > 0 && !activeTab) {
+      setActiveTab(students[0].id);
+    }
+  }, [students, activeTab]);
+
+  useEffect(() => {
+    async function fetchAttendance() {
+      if (students.length === 0) return;
       try {
-        const [studentsRes, attendanceRes] = await Promise.all([
-          apiFetch("/api/students"),
-          apiFetch("/api/attendance"),
-        ]);
-        const studentsData = await studentsRes.json();
-        const attendanceData = await attendanceRes.json();
-
-        const parentStudents = studentsData.filter(
-          (s: StudentInfo) => s.parentName === currentUser?.name,
-        );
-        const studentIds = parentStudents.map((s: StudentInfo) => s.id);
-
-        setStudents(parentStudents);
-        setAllAttendance(
-          attendanceData.filter((a: AttendanceRecord) =>
-            studentIds.includes(a.studentId),
-          ),
-        );
-        if (parentStudents.length > 0) {
-          setActiveTab(parentStudents[0].id);
-        }
-      } catch (error) {
-        console.error("Failed to fetch data:", error);
-      } finally {
-        setLoading(false);
+        const res = await apiFetch("/api/attendance");
+        const raw = await res.json();
+        setAllAttendance(Array.isArray(raw) ? raw : (raw.items || []));
+      } catch (e) {
+        console.error("Failed to fetch attendance", e);
       }
     }
-    fetchData();
-  }, [currentUser?.name]);
+    fetchAttendance();
+  }, [students.length]);
 
-  if (loading) return <AttendanceSkeleton />;
+  if (isPending) return <AttendanceSkeleton />;
 
   if (students.length === 0) {
     return (

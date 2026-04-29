@@ -408,3 +408,17 @@ export const ACTIVE_PLATFORM_NOTICE = `
     }
   }
 `
+
+export const PLATFORM_NOTICES = `
+  query PlatformNotices($limit: Int) {
+    platformNotices(limit: $limit) {
+      id title content target isActive createdAt
+    }
+  }
+`
+
+export const DELETE_PLATFORM_NOTICE = `
+  mutation DeletePlatformNotice($id: ID!) {
+    deletePlatformNotice(id: $id) { success message }
+  }
+`

@@ -1,8 +1,8 @@
-"use client";
-
 import { useState, useEffect, useMemo } from "react";
 import { apiFetch } from "@/lib/api";
 import { useAppStore } from "@/store/use-app-store";
+import { useQueryClient } from "@tanstack/react-query";
+import { useParentDashboard } from "@/lib/graphql/hooks";
 import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { CreditCard } from "lucide-react";
@@ -15,40 +15,39 @@ import { FeeTable } from "./fees/FeeTable";
 import { FeesSkeleton } from "./fees/FeesSkeleton";
 
 export function ParentFees() {
+  const queryClient = useQueryClient();
   const { currentUser } = useAppStore();
-  const [loading, setLoading] = useState(true);
-  const [students, setStudents] = useState<StudentInfo[]>([]);
   const [activeTab, setActiveTab] = useState("");
   const [allChildrenFees, setAllChildrenFees] = useState<FeeRecord[]>([]);
 
+  const { data, isPending } = useParentDashboard(currentUser?.name || "");
+  const students = (data?.children || []) as StudentInfo[];
+
   useEffect(() => {
-    async function fetchData() {
+    if (students.length > 0 && !activeTab) {
+      setActiveTab(students[0].id);
+    }
+  }, [students, activeTab]);
+
+  useEffect(() => {
+    async function fetchFees() {
+      if (students.length === 0) return;
       try {
-        const studentsRes = await apiFetch("/api/students");
-        const studentsData = await studentsRes.json();
-
-        const parentStudents = studentsData.filter(
-          (s: StudentInfo) => s.parentName === currentUser?.name,
-        );
-        setStudents(parentStudents);
-
-        if (parentStudents.length > 0) {
-          setActiveTab(parentStudents[0].id);
-          const studentIds = parentStudents.map((s: StudentInfo) => s.id);
-          
-          const promises = studentIds.map((id) => apiFetch(`/api/fees?studentId=${id}`));
-          const responses = await Promise.all(promises);
-          const results = await Promise.all(responses.map((r) => (r.ok ? r.json() : [])));
-          setAllChildrenFees(results.flat() as FeeRecord[]);
-        }
-      } catch (error) {
-        console.error("Failed to fetch data:", error);
-      } finally {
-        setLoading(false);
+        const studentIds = students.map((s: StudentInfo) => s.id);
+        const promises = studentIds.map((id) => apiFetch(`/api/fees?studentId=${id}`));
+        const responses = await Promise.all(promises);
+        const results = await Promise.all(responses.map(async (r) => {
+          if (!r.ok) return [];
+          const data = await r.json();
+          return Array.isArray(data) ? data : (data.items || []);
+        }));
+        setAllChildrenFees(results.flat() as FeeRecord[]);
+      } catch (e) {
+        console.error("Failed to fetch data:", e);
       }
     }
-    fetchData();
-  }, [currentUser?.name]);
+    fetchFees();
+  }, [students.length]);
 
   const summary = useMemo(() => {
     const total = allChildrenFees.reduce((sum, f) => sum + f.amount, 0);
@@ -64,19 +63,51 @@ export function ParentFees() {
     return { total, paid, pending, overdue };
   }, [allChildrenFees]);
 
-  const handlePayNow = (feeId: string) => {
-    setAllChildrenFees((prev) =>
-      prev.map((f) => {
-        if (f.id === feeId) {
-          return { ...f, status: "paid", paidAmount: f.amount };
+  const handlePayNow = async (feeId: string) => {
+    const fee = allChildrenFees.find(f => f.id === feeId);
+    if (!fee) return;
+
+    try {
+      const paymentPromise = (async () => {
+        const res = await apiFetch("/api/fee-receipts", {
+          method: "POST",
+          body: JSON.stringify({
+            studentId: fee.studentId,
+            feeIds: [fee.id],
+            totalAmount: fee.amount,
+            paidAmount: fee.amount,
+            concessionTotal: 0,
+            paymentMethod: "online",
+            feeAmounts: { [fee.id]: fee.amount }
+          })
+        });
+
+        if (!res.ok) {
+          const err = await res.json();
+          throw new Error(err.error || "Payment failed");
         }
-        return f;
-      }),
-    );
-    toast.success("Payment recorded successfully!");
+
+        // Invalidate dashboard and other related queries
+        queryClient.invalidateQueries({ queryKey: ["parent", "dashboard"] });
+        queryClient.invalidateQueries({ queryKey: ["fees"] });
+
+        // Update local state on success
+        setAllChildrenFees((prev) =>
+          prev.map((f) => (f.id === feeId ? { ...f, status: "paid", paidAmount: f.amount } : f))
+        );
+      })();
+
+      toast.promise(paymentPromise, {
+        loading: "Processing payment...",
+        success: "Payment successful!",
+        error: (err) => `Error: ${err.message}`,
+      });
+    } catch (error) {
+      console.error("Payment error:", error);
+    }
   };
 
-  if (loading) return <FeesSkeleton />;
+  if (isPending) return <FeesSkeleton />;
 
   if (students.length === 0) {
     return (

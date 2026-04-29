@@ -132,7 +132,7 @@ export const navItems: Record<UserRole, NavItem[]> = {
     },
     {
       key: "platform-notices",
-      label: "Platform Notices",
+      label: "Notices",
       icon: <Bell className="h-4 w-4" />,
       permModule: "analytics",
     },

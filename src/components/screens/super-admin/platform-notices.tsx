@@ -20,10 +20,31 @@ import {
   History,
   CheckCircle2,
   Info,
-  Send
+  Send,
+  Trash2,
+  Loader2
 } from "lucide-react";
+import {
+  AlertDialog,
+  AlertDialogContent,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogTrigger,
+  AlertDialogAction,
+  AlertDialogCancel,
+} from "@/components/ui/alert-dialog";
 import { goeyToast as toast } from "goey-toast";
-import { useTenants, useGraphQLMutation, SEND_GLOBAL_NOTICE } from "@/lib/graphql/hooks";
+import { 
+  useTenants, 
+  useGraphQLMutation, 
+  useGraphQLQuery,
+  SEND_GLOBAL_NOTICE,
+  PLATFORM_NOTICES,
+  DELETE_PLATFORM_NOTICE 
+} from "@/lib/graphql/hooks";
+import { formatDistanceToNow } from "date-fns";
 
 export function SuperAdminPlatformNotices() {
   const [title, setTitle] = useState("");
@@ -35,9 +56,29 @@ export function SuperAdminPlatformNotices() {
   const { data: tenantsData } = useTenants({ limit: 100 });
   const tenants = tenantsData?.tenants || [];
 
+  // Fetch Real History
+  const { data: historyData, isLoading: historyLoading, refetch: refetchHistory } = useGraphQLQuery<{
+    platformNotices: Array<{
+      id: string;
+      title: string;
+      content: string;
+      target: string;
+      isActive: boolean;
+      createdAt: string;
+    }>
+  }>(
+    ["platform-notices-history"],
+    PLATFORM_NOTICES,
+    { limit: 20 }
+  );
+
   const { mutateAsync: sendNotice } = useGraphQLMutation<{ 
     sendGlobalNotice: { success: boolean; message: string } 
   }, any>(SEND_GLOBAL_NOTICE);
+
+  const { mutateAsync: deleteNotice } = useGraphQLMutation<{
+    deletePlatformNotice: { success: boolean; message: string }
+  }, { id: string }>(DELETE_PLATFORM_NOTICE);
 
   const handleSend = async () => {
     if (!title || !body) {
@@ -60,6 +101,7 @@ export function SuperAdminPlatformNotices() {
         toast.success(response.message || "Notice sent successfully");
         setTitle("");
         setBody("");
+        refetchHistory();
       } else {
         toast.error(response.message || "Failed to send notice");
       }
@@ -70,6 +112,32 @@ export function SuperAdminPlatformNotices() {
     }
   };
 
+  const handleDelete = async (id: string) => {
+    try {
+      const result = await deleteNotice({ id });
+      if (result.deletePlatformNotice.success) {
+        toast.success("Notice deleted successfully");
+        refetchHistory();
+      } else {
+        toast.error("Failed to delete notice");
+      }
+    } catch (error: any) {
+      toast.error(error.message || "An error occurred while deleting notice");
+    }
+  };
+
+  const getTargetLabel = (target: string) => {
+    const labels: Record<string, string> = {
+      all_schools: "School Admins",
+      specific_school: "Specific School",
+      all_parents: "All Parents",
+      school_parents: "School Parents",
+      all_super_admins: "Super Admins",
+      everyone: "Everyone",
+    };
+    return labels[target] || target;
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-4">
@@ -77,8 +145,8 @@ export function SuperAdminPlatformNotices() {
           <Bell className="h-6 w-6 text-amber-600 dark:text-amber-400" />
         </div>
         <div>
-          <h2 className="text-3xl font-bold tracking-tight">Platform Notices</h2>
-          <p className="text-muted-foreground mt-1">Send persistent notices that appear in the global platform bar for all users.</p>
+          <h2 className="text-3xl font-bold tracking-tight">Notices</h2>
+          <p className="text-muted-foreground mt-1">Send global notices that appear in the platform bar for all users.</p>
         </div>
       </div>
 
@@ -200,23 +268,69 @@ export function SuperAdminPlatformNotices() {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="space-y-4">
-                {[
-                  { title: "System Downtime Notice", target: "Everyone", date: "3 hours ago" },
-                  { title: "Price Plan Updates", target: "School Admins", date: "Yesterday" },
-                ].map((log, i) => (
-                  <div key={i} className="flex flex-col gap-1 border-b pb-3 last:border-0">
-                    <p className="text-sm font-medium">{log.title}</p>
-                    <div className="flex items-center justify-between text-xs text-muted-foreground">
-                      <span className="flex items-center gap-1">
-                        <Users className="h-3 w-3" />
-                        {log.target}
-                      </span>
-                      <span>{log.date}</span>
-                    </div>
-                  </div>
-                ))}
-              </div>
+              {historyLoading ? (
+                <div className="flex justify-center py-8">
+                  <Loader2 className="h-6 w-6 animate-spin text-amber-500" />
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  {(historyData?.platformNotices || []).length === 0 ? (
+                    <p className="text-sm text-muted-foreground text-center py-4">No notice history found.</p>
+                  ) : (
+                    historyData?.platformNotices.map((notice) => (
+                      <div key={notice.id} className="group relative flex flex-col gap-1 border-b pb-3 last:border-0">
+                        <div className="flex items-start justify-between">
+                          <p className="text-sm font-medium pr-8">{notice.title}</p>
+                          
+                          <AlertDialog>
+                            <AlertDialogTrigger asChild>
+                              <button 
+                                className="absolute right-0 top-0 opacity-0 group-hover:opacity-100 transition-opacity text-red-500 hover:text-red-700"
+                                title="Delete Notice"
+                              >
+                                <Trash2 className="h-4 w-4" />
+                              </button>
+                            </AlertDialogTrigger>
+                            <AlertDialogContent>
+                              <AlertDialogHeader>
+                                <AlertDialogTitle>Delete Notice</AlertDialogTitle>
+                                <AlertDialogDescription>
+                                  Are you sure you want to delete <strong>{notice.title}</strong>? This will remove it from all user dashboards instantly.
+                                </AlertDialogDescription>
+                              </AlertDialogHeader>
+                              <AlertDialogFooter>
+                                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                <AlertDialogAction 
+                                  className="bg-red-600 hover:bg-red-700 text-white"
+                                  onClick={() => handleDelete(notice.id)}
+                                >
+                                  Delete
+                                </AlertDialogAction>
+                              </AlertDialogFooter>
+                            </AlertDialogContent>
+                          </AlertDialog>
+                        </div>
+                        <div className="flex items-center justify-between text-xs text-muted-foreground">
+                          <span className="flex items-center gap-1">
+                            <Users className="h-3 w-3" />
+                            {getTargetLabel(notice.target)}
+                          </span>
+                          <span>
+                            {(() => {
+                              try {
+                                const d = new Date(notice.createdAt);
+                                return isNaN(d.getTime()) ? "recently" : formatDistanceToNow(d, { addSuffix: true });
+                              } catch {
+                                return "recently";
+                              }
+                            })()}
+                          </span>
+                        </div>
+                      </div>
+                    ))
+                  )}
+                </div>
+              )}
             </CardContent>
           </Card>
         </div>

@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { apiFetch } from "@/lib/api";
 import { useAppStore } from "@/store/use-app-store";
+import { useParentDashboard } from "@/lib/graphql/hooks";
 import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { BarChart3, TrendingUp } from "lucide-react";
@@ -19,42 +20,33 @@ import { getGradesForStudent, getSubjectChartData, getOverallStats } from "./gra
 
 export function ParentGrades() {
   const { currentUser } = useAppStore();
-  const [loading, setLoading] = useState(true);
-  const [students, setStudents] = useState<StudentInfo[]>([]);
   const [grades, setGrades] = useState<GradeRecord[]>([]);
   const [activeTab, setActiveTab] = useState("");
 
+  const { data, isPending } = useParentDashboard(currentUser?.name || "");
+  const students = (data?.children || []) as StudentInfo[];
+
   useEffect(() => {
-    async function fetchData() {
+    if (students.length > 0 && !activeTab) {
+      setActiveTab(students[0].id);
+    }
+  }, [students, activeTab]);
+
+  useEffect(() => {
+    async function fetchGrades() {
+      if (students.length === 0) return;
       try {
-        const [studentsRes, gradesRes] = await Promise.all([
-          apiFetch("/api/students"),
-          apiFetch("/api/grades"),
-        ]);
-        const studentsData = await studentsRes.json();
-        const gradesData = await gradesRes.json();
-
-        const parentStudents = studentsData.filter(
-          (s: StudentInfo) => s.parentName === currentUser?.name,
-        );
-        const studentIds = parentStudents.map((s: StudentInfo) => s.id);
-
-        setStudents(parentStudents);
-        setGrades(gradesData.filter((g: GradeRecord) => studentIds.includes(g.studentId)));
-        
-        if (parentStudents.length > 0) {
-          setActiveTab(parentStudents[0].id);
-        }
-      } catch (error) {
-        console.error("Failed to fetch data:", error);
-      } finally {
-        setLoading(false);
+        const res = await apiFetch("/api/grades");
+        const raw = await res.json();
+        setGrades(Array.isArray(raw) ? raw : (raw.items || []));
+      } catch (e) {
+        console.error("Failed to fetch grades", e);
       }
     }
-    fetchData();
-  }, [currentUser?.name]);
+    fetchGrades();
+  }, [students.length]);
 
-  if (loading) return <GradesSkeleton />;
+  if (isPending) return <GradesSkeleton />;
 
   if (students.length === 0) {
     return (

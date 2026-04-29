@@ -116,7 +116,7 @@ export function useAttendance(tenantId?: string, page?: number, limit?: number) 
   return useQuery<AttendanceResponse>({
     queryKey: [...queryKeys.attendance, tenantId, page, limit],
     queryFn: () => graphqlQuery<{ attendance: AttendanceResponse }>(ATTENDANCE, { tenantId, page, limit }).then(d => d.attendance),
-    staleTime: 60 * 1000,
+    staleTime: 0,
     gcTime: 15 * 60 * 1000,
   })
 }
@@ -125,7 +125,7 @@ export function useStaff(tenantId?: string, role?: string, page?: number, limit?
   return useQuery<StaffResponse>({
     queryKey: [...queryKeys.staff, tenantId, role, page, limit],
     queryFn: () => graphqlQuery<{ staff: StaffResponse }>(STAFF, { tenantId, role, page, limit }).then(d => d.staff),
-    staleTime: 60 * 1000,
+    staleTime: 0,
     gcTime: 15 * 60 * 1000,
   })
 }

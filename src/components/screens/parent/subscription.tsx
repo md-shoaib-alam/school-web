@@ -42,45 +42,24 @@ export function ParentSubscription() {
   const [processing, setProcessing] = useState(false);
   const [addonLoading, setAddonLoading] = useState<string | null>(null);
 
-  const fetchSubscriptions = useCallback(async (pid: string) => {
+  const fetchSubscriptions = useCallback(async () => {
     try {
-      const res = await apiFetch(`/api/subscriptions?parentId=${pid}`);
+      const res = await apiFetch("/api/subscriptions");
       if (!res.ok) throw new Error("Failed to fetch subscriptions");
       const data = await res.json();
+      setParentId(data.parent?.id || null);
       setActiveSubscription(data.activeSubscription || null);
       setAllSubscriptions(data.subscriptions || []);
     } catch {
       toast.error("Failed to load subscription data");
+    } finally {
+      setLoading(false);
     }
   }, []);
 
   useEffect(() => {
-    async function init() {
-      if (!currentUser?.email) {
-        setLoading(false);
-        return;
-      }
-      try {
-        const parentsRes = await apiFetch("/api/parents");
-        if (!parentsRes.ok) throw new Error("Failed to fetch parents");
-        const parents = await parentsRes.json();
-        const matched = parents.find(
-          (p: { email: string }) => p.email === currentUser.email,
-        );
-        if (!matched) {
-          setLoading(false);
-          return;
-        }
-        setParentId(matched.id);
-        await fetchSubscriptions(matched.id);
-      } catch {
-        toast.error("Failed to load parent data");
-      } finally {
-        setLoading(false);
-      }
-    }
-    init();
-  }, [currentUser?.email, fetchSubscriptions]);
+    fetchSubscriptions();
+  }, [fetchSubscriptions]);
 
   const handlePurchase = (plan: Plan) => {
     if (plan.price === 0) {
@@ -114,7 +93,7 @@ export function ParentSubscription() {
       toast.success(`Successfully subscribed to ${purchasingPlan.name} plan! 🎉`);
       setPurchaseDialogOpen(false);
       setPurchasingPlan(null);
-      await fetchSubscriptions(parentId);
+      await fetchSubscriptions();
     } catch {
       toast.error("Purchase failed. Please try again.");
     } finally {
@@ -131,7 +110,7 @@ export function ParentSubscription() {
       });
       if (!res.ok) throw new Error("Cancel failed");
       toast.info("Subscription cancelled. You are now on the Basic plan.");
-      await fetchSubscriptions(parentId!);
+      await fetchSubscriptions();
     } catch {
       toast.error("Failed to cancel subscription.");
     }
@@ -160,7 +139,7 @@ export function ParentSubscription() {
         throw new Error("Failed to add addon");
       }
       toast.success(`${addon.name} added to your subscription!`);
-      await fetchSubscriptions(parentId);
+      await fetchSubscriptions();
     } catch {
       toast.error("Failed to add addon. Please try again.");
     } finally {

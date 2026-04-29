@@ -19,6 +19,7 @@ export interface StudentInfo {
   classId: string;
   parentId?: string;
   parentName?: string;
+  parentEmail?: string;
   gender: string;
   dateOfBirth?: string;
   admissionDate: string;

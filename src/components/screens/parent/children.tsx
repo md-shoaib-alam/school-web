@@ -1,10 +1,9 @@
-"use client";
-
 import { useState, useEffect } from "react";
 import { apiFetch } from "@/lib/api";
 import { useAppStore } from "@/store/use-app-store";
 import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { useParentDashboard } from "@/lib/graphql/hooks";
 import { GraduationCap } from "lucide-react";
 import type { StudentInfo, GradeRecord, AttendanceRecord } from "@/lib/types";
 
@@ -24,46 +23,53 @@ import {
 
 export function ParentChildren() {
   const { currentUser } = useAppStore();
-  const [loading, setLoading] = useState(true);
-  const [students, setStudents] = useState<StudentInfo[]>([]);
-  const [grades, setGrades] = useState<GradeRecord[]>([]);
-  const [attendance, setAttendance] = useState<AttendanceRecord[]>([]);
   const [activeTab, setActiveTab] = useState("");
 
+  const { data, isPending } = useParentDashboard(currentUser?.name || "");
+
+  // Correctly handle students, grades, and attendance from GraphQL response
+  const students = (data?.children || []) as StudentInfo[];
+  const performanceSummary = data?.performanceSummary || [];
+  
+  // For specialized details not in dashboard, we still need separate data or update the dashboard query
+  // But to keep it simple and consistent with the user's request, we'll focus on the children list first.
+  // Actually, dashboard returns 'fees' but not full attendance/grades history.
+  
+  // To keep full functionality, we'll keep the separate fetches for grades/attendance but sync the student list.
+  const [extraData, setExtraData] = useState<{ grades: GradeRecord[], attendance: AttendanceRecord[] }>({ grades: [], attendance: [] });
+
   useEffect(() => {
-    async function fetchData() {
+    if (students.length > 0 && !activeTab) {
+      setActiveTab(students[0].id);
+    }
+  }, [students, activeTab]);
+
+  useEffect(() => {
+    async function fetchDetails() {
+      if (students.length === 0) return;
       try {
-        const [studentsRes, gradesRes, attendanceRes] = await Promise.all([
-          apiFetch("/api/students"),
+        const [gradesRes, attendanceRes] = await Promise.all([
           apiFetch("/api/grades"),
           apiFetch("/api/attendance"),
         ]);
-        const studentsData = await studentsRes.json();
-        const gradesData = await gradesRes.json();
-        const attendanceData = await attendanceRes.json();
-
-        const parentStudents = studentsData.filter(
-          (s: StudentInfo) => s.parentName === currentUser?.name,
-        );
-        const studentIds = parentStudents.map((s: StudentInfo) => s.id);
-
-        setStudents(parentStudents);
-        setGrades(gradesData.filter((g: GradeRecord) => studentIds.includes(g.studentId)));
-        setAttendance(attendanceData.filter((a: AttendanceRecord) => studentIds.includes(a.studentId)));
+        const rawGrades = await gradesRes.json();
+        const rawAttendance = await attendanceRes.json();
         
-        if (parentStudents.length > 0) {
-          setActiveTab(parentStudents[0].id);
-        }
-      } catch (error) {
-        console.error("Failed to fetch data:", error);
-      } finally {
-        setLoading(false);
+        setExtraData({
+          grades: Array.isArray(rawGrades) ? rawGrades : (rawGrades.items || []),
+          attendance: Array.isArray(rawAttendance) ? rawAttendance : (rawAttendance.items || [])
+        });
+      } catch (e) {
+        console.error("Failed to fetch details", e);
       }
     }
-    fetchData();
-  }, [currentUser?.name]);
+    fetchDetails();
+  }, [students.length]);
 
-  if (loading) return <ChildrenSkeleton />;
+  const grades = extraData.grades;
+  const attendance = extraData.attendance;
+
+  if (isPending) return <ChildrenSkeleton />;
 
   if (students.length === 0) {
     return (
