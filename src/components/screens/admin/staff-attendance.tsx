@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useMemo, useEffect } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -295,39 +295,47 @@ export function StaffAttendance({ initialTab }: StaffAttendanceProps) {
         </div>
 
       <div className="mt-6">
-        <Card className="rounded-xl shadow-sm border-0 bg-white dark:bg-gray-900">
-            <CardHeader className="pb-3 px-4">
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                <CardTitle className="text-base font-semibold flex items-center gap-2">
-                  <CalendarDays className="h-4 w-4 text-blue-500" />
-                  {activeTab === "teacher" ? "Teachers List" : "Staff List"}
+        <Card className="rounded-xl shadow-sm border border-gray-200 dark:border-gray-800 overflow-hidden">
+            <CardHeader className="pb-3 sticky top-0 bg-white dark:bg-gray-900/80 backdrop-blur-md z-10 border-b border-gray-200 dark:border-gray-800/40">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div className="flex items-center justify-between sm:justify-start sm:gap-4 flex-1">
+                  <div className="flex items-center gap-2.5">
+                    <div className="h-8 w-8 rounded-lg bg-blue-500/10 flex items-center justify-center border border-blue-500/20">
+                      <CalendarDays className="h-4 w-4 text-blue-500" />
+                    </div>
+                    <div>
+                      <h3 className="text-sm sm:text-base font-bold text-gray-800 dark:text-gray-100 leading-none">
+                        {activeTab === "teacher" ? "Teachers List" : "Staff List"}
+                      </h3>
+                      <p className="text-[10px] text-gray-400 dark:text-gray-500 mt-1 font-medium">
+                        Attendance Registry
+                      </p>
+                    </div>
+                  </div>
                   <Badge
                     variant="secondary"
-                    className="text-xs bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400"
+                    className="text-[10px] h-6 px-2 bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-500/20 rounded-md font-bold"
                   >
                     {records.length} total
                   </Badge>
-                </CardTitle>
-                <div className="flex items-center gap-2">
-                  <span className="text-xs text-gray-400 dark:text-gray-500 mr-1">
-                    Quick Actions:
-                  </span>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="text-xs h-7 border-emerald-200 dark:border-emerald-800 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-900/30"
+                </div>
+
+                <div className="flex items-center gap-1.5 p-1 bg-gray-100 dark:bg-gray-800/60 border border-gray-200 dark:border-gray-700/50 rounded-xl sm:w-auto">
+                  <div className="px-2.5 py-1 text-[9px] font-black uppercase tracking-widest text-gray-400 dark:text-gray-600 italic">
+                    Quick:
+                  </div>
+                  <button
+                    className="flex-1 sm:flex-none py-1.5 px-3 rounded-lg text-[10px] font-bold transition-all bg-emerald-500/10 text-emerald-600 dark:text-emerald-500 border border-emerald-500/20 hover:bg-emerald-500/20 active:scale-95"
                     onClick={() => markAll("present")}
                   >
                     All Present
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="text-xs h-7 border-red-200 dark:border-red-800 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/30"
+                  </button>
+                  <button
+                    className="flex-1 sm:flex-none py-1.5 px-3 rounded-lg text-[10px] font-bold transition-all bg-red-500/10 text-red-600 dark:text-red-500 border border-red-500/20 hover:bg-red-500/20 active:scale-95"
                     onClick={() => markAll("absent")}
                   >
                     All Absent
-                  </Button>
+                  </button>
                 </div>
               </div>
             </CardHeader>

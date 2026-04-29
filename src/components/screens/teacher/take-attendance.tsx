@@ -373,8 +373,8 @@ export function TeacherAttendance() {
       )}
 
       {/* Attendance list */}
-      <Card className="rounded-xl shadow-sm border border-gray-800 overflow-hidden bg-[#09090b]">
-        <CardHeader className="pb-3 sticky top-0 bg-[#09090b] backdrop-blur-md z-10 border-b border-gray-800/40">
+      <Card className="rounded-xl shadow-sm border border-gray-200 dark:border-gray-800 overflow-hidden">
+        <CardHeader className="pb-3 sticky top-0 bg-white dark:bg-gray-900/80 backdrop-blur-md z-10 border-b border-gray-200 dark:border-gray-800/40">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div className="flex items-center justify-between sm:justify-start sm:gap-4 flex-1">
               <div className="flex items-center gap-2.5">
@@ -382,36 +382,36 @@ export function TeacherAttendance() {
                   <CalendarDays className="h-4 w-4 text-blue-500" />
                 </div>
                 <div>
-                  <h3 className="text-sm sm:text-base font-bold text-gray-100 leading-none">
+                  <h3 className="text-sm sm:text-base font-bold text-gray-800 dark:text-gray-100 leading-none">
                     {selectedClass
                       ? `${selectedClass.name} - ${selectedClass.section}`
                       : "Select a class"}
                   </h3>
-                  <p className="text-[10px] text-gray-500 mt-1 font-medium">
+                  <p className="text-[10px] text-gray-400 dark:text-gray-500 mt-1 font-medium">
                     Attendance Registry
                   </p>
                 </div>
               </div>
               <Badge
                 variant="secondary"
-                className="text-[10px] h-6 px-2 bg-blue-500/5 text-blue-400 border-blue-500/10 rounded-md font-bold"
+                className="text-[10px] h-6 px-2 rounded-md font-bold"
               >
                 {students.length} students
               </Badge>
             </div>
 
-            <div className="flex items-center gap-1.5 p-1 bg-[#111113] border border-gray-800/50 rounded-xl sm:w-auto">
-              <div className="px-2.5 py-1 text-[9px] font-black uppercase tracking-widest text-gray-600 italic">
+            <div className="flex items-center gap-1.5 p-1 bg-gray-100 dark:bg-[#111113] border border-gray-200 dark:border-gray-800/50 rounded-xl sm:w-auto">
+              <div className="px-2.5 py-1 text-[9px] font-black uppercase tracking-widest text-gray-400 dark:text-gray-600 italic">
                 Quick:
               </div>
               <button
-                className="flex-1 sm:flex-none py-1.5 px-3 rounded-lg text-[10px] font-bold transition-all bg-emerald-500/5 text-emerald-500 border border-emerald-500/10 hover:bg-emerald-500/10 active:scale-95"
+                className="flex-1 sm:flex-none py-1.5 px-3 rounded-lg text-[10px] font-bold transition-all bg-emerald-500/10 text-emerald-600 dark:text-emerald-500 border border-emerald-500/20 hover:bg-emerald-500/20 active:scale-95"
                 onClick={() => markAll("present")}
               >
                 All Present
               </button>
               <button
-                className="flex-1 sm:flex-none py-1.5 px-3 rounded-lg text-[10px] font-bold transition-all bg-red-500/5 text-red-500 border border-red-500/10 hover:bg-red-500/10 active:scale-95"
+                className="flex-1 sm:flex-none py-1.5 px-3 rounded-lg text-[10px] font-bold transition-all bg-red-500/10 text-red-600 dark:text-red-500 border border-red-500/20 hover:bg-red-500/20 active:scale-95"
                 onClick={() => markAll("absent")}
               >
                 All Absent
@@ -422,81 +422,79 @@ export function TeacherAttendance() {
 
         <CardContent className="p-4 pt-0 overflow-hidden">
           {studentsLoading ? (
-            <div className="space-y-3">
+            <div className="space-y-3 pt-4">
               {[...Array(5)].map((_, i) => (
-                <Skeleton key={i} className="h-14 rounded-lg" />
+                <Skeleton key={i} className="h-16 rounded-xl" />
               ))}
             </div>
           ) : students.length > 0 ? (
-            <div className="max-h-[60vh] overflow-y-auto pr-2 custom-scrollbar">
-              <div className="space-y-2 pb-2 sm:pb-6">
-                {students.map((student, index) => {
-                  const record = records.find((r) => r.studentId === student.id);
-                  const currentStatus = record?.status ?? "present";
-                  return (
-                    <div
-                      key={student.id}
-                      className={`flex items-center gap-2 p-2 sm:p-3 rounded-xl border transition-all ${getStatusBg(currentStatus)}`}
-                    >
-                      <span className="text-[10px] text-gray-500 font-mono w-4 sm:w-6 text-center">
-                        {index + 1}
-                      </span>
+            <>
+              <div className="space-y-2 pt-4">
+                {students.length === 0 ? (
+                  <div className="text-center py-10">
+                    <p className="text-gray-400 dark:text-gray-500 text-sm italic">No students match your search.</p>
+                  </div>
+                ) : (
+                  students.map((student, index) => {
+                    const record = records.find((r) => r.studentId === student.id);
+                    const currentStatus = record?.status ?? "present";
+                    return (
+                      <div
+                        key={student.id}
+                        className={`flex flex-col sm:flex-row items-start sm:items-center gap-3 p-3 rounded-xl border transition-all ${getStatusBg(currentStatus)}`}
+                      >
+                        <div className="flex items-center gap-3 w-full sm:w-auto">
+                          <span className="text-xs text-gray-400 dark:text-gray-500 font-mono w-6 text-center">
+                            {index + 1}
+                          </span>
+                          <Avatar className="h-8 w-8 flex-shrink-0">
+                            <AvatarFallback className="text-[10px] font-semibold bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400">
+                              {getInitials(student.name)}
+                            </AvatarFallback>
+                          </Avatar>
+                          <div className="flex-1 min-w-0">
+                            <p className="text-sm font-medium text-gray-800 dark:text-gray-200 truncate">
+                              {student.name}
+                            </p>
+                            <p className="text-xs text-gray-400 dark:text-gray-500">
+                              {student.rollNumber}
+                            </p>
+                          </div>
+                        </div>
 
-                      <Avatar className="h-7 w-7 sm:h-8 sm:w-8 flex-shrink-0">
-                        <AvatarFallback className="text-[9px] sm:text-[10px] font-semibold bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400">
-                          {getInitials(student.name)}
-                        </AvatarFallback>
-                      </Avatar>
-
-                      <div className="flex-1 min-w-0 ml-1">
-                        <p className="text-xs sm:text-sm font-medium text-gray-800 dark:text-gray-200 truncate">
-                          {student.name}
-                        </p>
-                        <p className="text-[9px] sm:text-xs text-gray-400 dark:text-gray-500">
-                          {student.rollNumber}
-                        </p>
-                      </div>
-
-                      <div className="flex items-center gap-1 sm:gap-1.5 flex-shrink-0">
-                        {(
-                          ["present", "absent", "late"] as AttendanceStatus[]
-                        ).map((status) => (
-                          <button
-                            key={status}
-                            onClick={() => updateRecord(student.id, status)}
-                            className={`flex items-center justify-center gap-1 px-2 sm:px-3 py-1 sm:py-1.5 rounded-lg text-[10px] sm:text-xs font-medium transition-all border ${
-                              currentStatus === status
-                                ? `${getStatusBg(status)} ${
-                                    status === "present"
-                                      ? "bg-emerald-500 dark:bg-emerald-500 text-white"
-                                      : status === "absent"
-                                      ? "bg-red-500 dark:bg-red-500 text-white"
-                                      : "bg-amber-500 dark:bg-amber-500 text-white"
-                                  } border-transparent`
-                                : "border-gray-200 dark:border-gray-700 text-gray-400 dark:text-gray-500 hover:border-gray-300 dark:hover:border-gray-600 hover:text-gray-600 dark:hover:text-gray-300"
-                            }`}
-                          >
-                            <span className="flex-shrink-0">
+                        <div className="flex items-center gap-1.5 w-full sm:w-auto mt-2 sm:mt-0 sm:ml-auto">
+                          {(["present", "absent", "late"] as AttendanceStatus[]).map((status) => (
+                            <button
+                              key={status}
+                              onClick={() => updateRecord(student.id, status)}
+                              className={`flex flex-1 sm:flex-none items-center justify-center gap-1 px-3 py-1.5 rounded-lg text-xs font-medium transition-all border ${
+                                currentStatus === status
+                                  ? `${getStatusBg(status)} ${
+                                      status === "present"
+                                        ? "bg-emerald-500 dark:bg-emerald-500 text-white"
+                                        : status === "absent"
+                                        ? "bg-red-500 dark:bg-red-500 text-white"
+                                        : "bg-amber-500 dark:bg-amber-500 text-white"
+                                    } border-transparent shadow-sm ring-1 ring-white/10`
+                                  : "border-gray-200 dark:border-gray-700 text-gray-400 dark:text-gray-500 hover:border-gray-300 dark:hover:border-gray-600 bg-white dark:bg-gray-950"
+                              }`}
+                            >
                               {getStatusIcon(status)}
-                            </span>
-                            <span className="hidden md:inline capitalize">
-                              {status}
-                            </span>
-                          </button>
-                        ))}
+                              <span className="capitalize">{status}</span>
+                            </button>
+                          ))}
+                        </div>
                       </div>
-                    </div>
-                  );
-                })}
+                    );
+                  })
+                )}
               </div>
-            </div>
+            </>
           ) : (
             <div className="text-center py-16">
               <Users className="h-10 w-10 text-gray-300 dark:text-gray-700 mx-auto mb-3" />
               <p className="text-gray-400 dark:text-gray-500 text-sm">
-                {selectedClassId
-                  ? "No students in this class"
-                  : "Select a class to begin"}
+                {selectedClassId ? "No students in this class" : "Select a class to begin"}
               </p>
             </div>
           )}
@@ -505,7 +503,7 @@ export function TeacherAttendance() {
 
       {/* Floating save bar */}
       {students.length > 0 && (
-        <div className="fixed bottom-1 sm:bottom-4 left-[50%] lg:left-[calc(50%+140px)] -translate-x-1/2 w-[calc(100%-2.5rem)] sm:w-[calc(100%-4rem)] lg:w-[calc(100%-360px)] max-w-4xl z-50 px-3 py-1.5 sm:px-6 sm:py-3 bg-[#09090b]/95 backdrop-blur-2xl border border-white/5 rounded-xl sm:rounded-2xl shadow-2xl animate-in slide-in-from-bottom-4 duration-500">
+        <div className="fixed bottom-1 sm:bottom-4 left-[50%] lg:left-[calc(50%+140px)] -translate-x-1/2 w-[calc(100%-2.5rem)] sm:w-[calc(100%-4rem)] lg:w-[calc(100%-360px)] max-w-4xl z-50 px-3 py-1.5 sm:px-6 sm:py-3 bg-white/95 dark:bg-[#09090b]/95 backdrop-blur-2xl border border-gray-200 dark:border-white/5 rounded-xl sm:rounded-2xl shadow-2xl animate-in slide-in-from-bottom-4 duration-500">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3 sm:gap-6">
               <div

@@ -60,7 +60,13 @@ export function TeacherClasses() {
     staleTime: 5 * 60 * 1000,
   });
 
-  const classes = classData || [];
+  const classes = [...(classData || [])].sort((a, b) => {
+    // Extract numeric part from grade name (e.g. "Grade 5" → 5)
+    const gradeNum = (g: string) => parseInt(g.replace(/\D/g, ""), 10) || 0;
+    const gradeDiff = gradeNum(a.name) - gradeNum(b.name);
+    if (gradeDiff !== 0) return gradeDiff;
+    return a.section.localeCompare(b.section);
+  });
   const loading = classesLoading;
 
   const [selectedClass, setSelectedClass] = useState<ClassInfo | null>(null);
