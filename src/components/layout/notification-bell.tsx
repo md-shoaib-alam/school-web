@@ -57,11 +57,20 @@ export function NotificationBell() {
     }
   }, [open, fetchNotices]);
 
-  // Initial fetch for count
+  // Initial fetch for count + Event listener for real-time updates
   useEffect(() => {
     fetchNotices();
-    const interval = setInterval(fetchNotices, 10000); // Check every 10s
-    return () => clearInterval(interval);
+
+    const handleRefresh = () => {
+      console.log("[BELL] Refreshing via WebSocket signal...");
+      fetchNotices();
+    };
+
+    window.addEventListener('refresh-notifications', handleRefresh);
+    
+    return () => {
+      window.removeEventListener('refresh-notifications', handleRefresh);
+    };
   }, [fetchNotices]);
 
   const unreadCount = notifications.filter(n => !n.read).length;
@@ -99,14 +108,14 @@ export function NotificationBell() {
         <Button
           variant="ghost"
           size="icon"
-          className="relative h-10 w-10 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-800 transition-all duration-200"
+          className="relative h-11 w-11 md:h-10 md:w-10 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-800 transition-all duration-200"
         >
           <Bell className={cn(
-            "h-5 w-5 transition-colors",
+            "h-6 w-6 md:h-5 md:w-5 transition-colors",
             unreadCount > 0 ? "text-indigo-600 dark:text-indigo-400" : "text-gray-500"
           )} />
           {unreadCount > 0 && (
-            <span className="absolute top-2 right-2 flex h-2 w-2 items-center justify-center rounded-full bg-rose-500 ring-2 ring-white dark:ring-gray-900 animate-pulse" />
+            <span className="absolute top-2.5 right-2.5 flex h-2 w-2 items-center justify-center rounded-full bg-rose-500 ring-2 ring-white dark:ring-gray-900 animate-pulse" />
           )}
         </Button>
       </PopoverTrigger>
@@ -216,3 +225,4 @@ export function NotificationBell() {
     </Popover>
   );
 }
+

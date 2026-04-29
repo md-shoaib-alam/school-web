@@ -42,6 +42,7 @@ const ExpensesScreen = dynamic(() => import('@/components/screens/admin/expenses
 const AdminSubscription = dynamic(() => import('@/components/screens/admin/subscription').then(m => m.SchoolSubscriptionScreen), { loading: LoadingScreen });
 
 const TeacherClasses = dynamic(() => import('@/components/screens/teacher/my-classes').then(m => m.TeacherClasses), { loading: LoadingScreen });
+const TeacherSubjects = dynamic(() => import('@/components/screens/teacher/my-subjects').then(m => m.TeacherSubjects), { loading: LoadingScreen });
 const TeacherAttendance = dynamic(() => import('@/components/screens/teacher/take-attendance').then(m => m.TeacherAttendance), { loading: LoadingScreen });
 const TeacherGrades = dynamic(() => import('@/components/screens/teacher/grade-management').then(m => m.TeacherGrades), { loading: LoadingScreen });
 const TeacherAssignments = dynamic(() => import('@/components/screens/teacher/assignments').then(m => m.TeacherAssignments), { loading: LoadingScreen });
@@ -151,6 +152,7 @@ export default function TenantScreenDispatcher() {
     switch (screen) {
       case 'dashboard': return <TeacherDashboard />;
       case 'my-classes': return <TeacherClasses />;
+      case 'my-subjects': return <TeacherSubjects />;
       case 'take-attendance': return <TeacherAttendance />;
       case 'grade-management': return <TeacherGrades />;
       case 'assignments': return <TeacherAssignments />;

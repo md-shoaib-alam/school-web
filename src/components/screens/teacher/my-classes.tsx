@@ -2,13 +2,12 @@
 
 
 import { apiFetch } from "@/lib/api";
+import { useQuery } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import {
   Dialog,
   DialogContent,
@@ -27,11 +26,7 @@ import {
 import {
   School,
   Users,
-  BookOpen,
   ChevronRight,
-  X,
-  Mail,
-  Phone,
 } from "lucide-react";
 
 interface ClassInfo {
@@ -55,43 +50,23 @@ interface StudentInfo {
   parentName: string | null;
 }
 
-interface SubjectInfo {
-  id: string;
-  name: string;
-  code: string;
-  className: string;
-}
-
 export function TeacherClasses() {
-  const [loading, setLoading] = useState(true);
-  const [classes, setClasses] = useState<ClassInfo[]>([]);
-  const [subjects, setSubjects] = useState<SubjectInfo[]>([]);
+  const { data: classData, isLoading: classesLoading } = useQuery<ClassInfo[]>({
+    queryKey: ["teacher-classes"],
+    queryFn: async () => {
+      const res = await apiFetch("/api/classes");
+      return res.json();
+    },
+    staleTime: 5 * 60 * 1000,
+  });
+
+  const classes = classData || [];
+  const loading = classesLoading;
+
   const [selectedClass, setSelectedClass] = useState<ClassInfo | null>(null);
   const [students, setStudents] = useState<StudentInfo[]>([]);
   const [studentsLoading, setStudentsLoading] = useState(false);
   const [dialogOpen, setDialogOpen] = useState(false);
-
-  useEffect(() => {
-    fetchData();
-  }, []);
-
-  const fetchData = async () => {
-    setLoading(true);
-    try {
-      const [classesRes, subjectsRes] = await Promise.all([
-        apiFetch("/api/classes"),
-        apiFetch("/api/subjects"),
-      ]);
-      const classData = await classesRes.json();
-      const subjectData = await subjectsRes.json();
-      setClasses(classData);
-      setSubjects(subjectData);
-    } catch (error) {
-      console.error("Error fetching classes:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const handleOpenClass = async (cls: ClassInfo) => {
     setSelectedClass(cls);
@@ -106,10 +81,6 @@ export function TeacherClasses() {
     } finally {
       setStudentsLoading(false);
     }
-  };
-
-  const getClassSubjects = (className: string) => {
-    return subjects.filter((s) => s.className === className);
   };
 
   const getInitials = (name: string) => {
@@ -156,9 +127,7 @@ export function TeacherClasses() {
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-        {classes.map((cls) => {
-          const classSubjects = getClassSubjects(`${cls.name}-${cls.section}`);
-          return (
+        {classes.map((cls) => (
             <Card
               key={cls.id}
               className="rounded-xl shadow-sm border-0 hover:shadow-md hover:border-blue-200 dark:hover:border-blue-800 transition-all cursor-pointer group"
@@ -182,7 +151,7 @@ export function TeacherClasses() {
                   <ChevronRight className="h-5 w-5 text-gray-300 dark:text-gray-600 group-hover:text-blue-400 dark:group-hover:text-blue-400 transition-colors" />
                 </div>
 
-                <div className="flex items-center gap-4 mb-4">
+                <div className="flex items-center gap-4">
                   <div className="flex items-center gap-1.5 text-sm text-gray-600 dark:text-gray-400">
                     <Users className="h-3.5 w-3.5 text-blue-500 dark:text-blue-400" />
                     <span className="font-medium">{cls.studentCount}</span>
@@ -190,53 +159,20 @@ export function TeacherClasses() {
                       Students
                     </span>
                   </div>
-                  <div className="flex items-center gap-1.5 text-sm text-gray-600 dark:text-gray-400">
-                    <BookOpen className="h-3.5 w-3.5 text-blue-500 dark:text-blue-400" />
-                    <span className="font-medium">{classSubjects.length}</span>
-                    <span className="text-gray-400 dark:text-gray-500">
-                      Subjects
-                    </span>
-                  </div>
-                </div>
-
-                <div className="flex flex-wrap gap-1.5">
-                  {classSubjects.slice(0, 4).map((subject) => (
-                    <Badge
-                      key={subject.id}
-                      variant="secondary"
-                      className="text-[10px] bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 hover:bg-blue-100 dark:hover:bg-blue-900/50 px-2 py-0.5"
-                    >
-                      {subject.name}
-                    </Badge>
-                  ))}
-                  {classSubjects.length > 4 && (
-                    <Badge
-                      variant="secondary"
-                      className="text-[10px] bg-gray-50 dark:bg-gray-800 text-gray-500 dark:text-gray-400 px-2 py-0.5"
-                    >
-                      +{classSubjects.length - 4} more
-                    </Badge>
-                  )}
-                  {classSubjects.length === 0 && (
-                    <span className="text-xs text-gray-400 dark:text-gray-500">
-                      No subjects assigned
-                    </span>
-                  )}
                 </div>
               </CardContent>
             </Card>
-          );
-        })}
+        ))}
       </div>
 
       {classes.length === 0 && (
-        <div className="text-center py-16">
-          <School className="h-12 w-12 text-gray-300 dark:text-gray-700 mx-auto mb-4" />
-          <h3 className="text-lg font-medium text-gray-500 dark:text-gray-400">
-            No Classes Found
+        <div className="text-center py-20 bg-gray-900/20 rounded-3xl border border-dashed border-gray-800">
+          <School className="h-16 w-16 text-gray-700 mx-auto mb-4 opacity-50" />
+          <h3 className="text-xl font-bold text-gray-300">
+            No Classes Assigned
           </h3>
-          <p className="text-sm text-gray-400 dark:text-gray-500 mt-1">
-            No classes are currently assigned to you.
+          <p className="text-gray-500 mt-2 max-w-xs mx-auto">
+            You don't have any classes assigned to you at the moment. Please contact your administrator.
           </p>
         </div>
       )}

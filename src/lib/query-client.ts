@@ -68,6 +68,10 @@ export async function triggerGlobalRefresh(pathOrTag: string) {
       await queryClient.invalidateQueries({ queryKey: ['notices'], refetchType: 'all' });
     }
 
+    if (trigger.includes('subject')) {
+      await queryClient.invalidateQueries({ queryKey: ['teacher-subjects-mine-v2'], refetchType: 'all' });
+    }
+
     // Fallback: If unknown, refresh active queries
     if (!trigger.includes('student') && !trigger.includes('teacher') && !trigger.includes('fee') && !trigger.includes('class') && !trigger.includes('notice')) {
        queryClient.invalidateQueries({ refetchType: 'active' });

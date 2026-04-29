@@ -19,7 +19,6 @@ function LoadingProgress() {
   return <div className="loading-progress-bar" />;
 }
 
-
 export function AppLayout({ children }: { children: React.ReactNode }) {
   const { slug } = useParams();
   const {
@@ -31,7 +30,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
     setSidebarOpen,
     refreshPermissions,
   } = useAppStore();
-  
+
   const pathname = usePathname();
   const router = useRouter();
   const [isChangePasswordOpen, setIsChangePasswordOpen] = useState(false);
@@ -41,7 +40,11 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     if (resolvedTenant && resolvedTenant.slug !== currentTenantSlug) {
-      setCurrentTenant(resolvedTenant.id, resolvedTenant.name, resolvedTenant.slug);
+      setCurrentTenant(
+        resolvedTenant.id,
+        resolvedTenant.name,
+        resolvedTenant.slug,
+      );
     }
   }, [resolvedTenant, currentTenantSlug, setCurrentTenant]);
 
@@ -74,13 +77,17 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
     resolvedScreen = parts[1];
   } else if (parts.length === 1) {
     const p = parts[0];
-    const isTenantRoot = p === currentUser?.tenantId || p === currentTenantSlug || p === currentUser?.tenantSlug;
+    const isTenantRoot =
+      p === currentUser?.tenantId ||
+      p === currentTenantSlug ||
+      p === currentUser?.tenantSlug;
     resolvedScreen = isTenantRoot ? "dashboard" : p;
   }
 
   const isSuperAdmin = currentUser.role === "super_admin";
   const isRoot = isRootAdmin(currentUser);
-  const hasCustomPermissions = !!currentUser.customRole?.permissions &&
+  const hasCustomPermissions =
+    !!currentUser.customRole?.permissions &&
     Object.keys(currentUser.customRole.permissions).length > 0;
   const hasPlatformPermissions = isSuperAdmin && !!currentUser.platformRole;
 
@@ -101,14 +108,24 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
   const navigateTo = (screen: string) => {
     setSidebarOpen(false);
     const tenantIdentifier = currentTenantSlug || currentTenantId;
-    
+
     // For Super Admins, platform routes should always be at the top level (e.g. /users, /feature-flags)
     // We only use the prefix if they are explicitly visiting a school's specific screen.
     const isPlatformRoute = [
-      "dashboard", "tenants", "billing", "users", "audit-logs", 
-      "platform-analytics", "feature-flags", "roles", "staff", 
-      "manage-admins", "subscriptions", "settings", "school-subscriptions",
-      "push-notifications"
+      "dashboard",
+      "tenants",
+      "billing",
+      "users",
+      "audit-logs",
+      "platform-analytics",
+      "feature-flags",
+      "roles",
+      "staff",
+      "manage-admins",
+      "subscriptions",
+      "settings",
+      "school-subscriptions",
+      "push-notifications",
     ].includes(screen);
 
     if (isSuperAdmin && isPlatformRoute) {
@@ -138,9 +155,9 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
         )}
 
         {/* Sidebar */}
-        <Sidebar 
-          items={items} 
-          resolvedScreen={resolvedScreen} 
+        <Sidebar
+          items={items}
+          resolvedScreen={resolvedScreen}
           navigateTo={navigateTo}
           setIsChangePasswordOpen={setIsChangePasswordOpen}
         />
@@ -151,12 +168,14 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
           <Header items={items} resolvedScreen={resolvedScreen} />
 
           {/* Page Content */}
-          <main className="flex-1 overflow-y-auto p-4 lg:p-6">{children}</main>
+          <main className="flex-1 overflow-y-auto p-4 lg:p-6 overscroll-contain">
+            {children}
+          </main>
         </div>
 
-        <ChangePasswordModal 
-          open={isChangePasswordOpen} 
-          onOpenChange={setIsChangePasswordOpen} 
+        <ChangePasswordModal
+          open={isChangePasswordOpen}
+          onOpenChange={setIsChangePasswordOpen}
         />
       </div>
     </NotificationProvider>

@@ -262,6 +262,11 @@ export const navItems: Record<UserRole, NavItem[]> = {
       icon: <School className="h-4 w-4" />,
     },
     {
+      key: "my-subjects",
+      label: "My Subjects",
+      icon: <BookOpen className="h-4 w-4" />,
+    },
+    {
       key: "take-attendance",
       label: "Attendance",
       icon: <UserCheck className="h-4 w-4" />,
