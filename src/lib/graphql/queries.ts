@@ -65,7 +65,7 @@ export const CREATE_TENANT = `
 
 export const UPDATE_TENANT = `
   mutation UpdateTenant($id: ID!, $data: TenantUpdateInput!) {
-    updateTenant(id: $id, data: $data) { id name slug plan status }
+    updateTenant(id: $id, data: $data) { id name slug plan status startDate endDate maxStudents maxTeachers }
   }
 `
 

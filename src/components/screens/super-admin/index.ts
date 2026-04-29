@@ -11,3 +11,4 @@ export * from './settings';
 export * from './manage-admins';
 export * from './subscriptions';
 export * from './school-detail';
+export * from './school-subscriptions';

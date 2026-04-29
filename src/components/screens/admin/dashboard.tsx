@@ -52,8 +52,11 @@ import {
 import type { ChartConfig } from "@/components/ui/chart";
 import { useAppStore } from "@/store/use-app-store";
 import { useQuery } from "@tanstack/react-query";
+import { useTenantDetail } from "@/lib/graphql/hooks/platform.hooks";
 import { api } from "@/lib/api";
+import { Button } from "@/components/ui/button";
 import { goeyToast as toast } from "goey-toast";
+import { differenceInDays } from "date-fns";
 
 const attendanceChartConfig = {
   rate: { label: "Attendance Rate (%)", color: "#10b981" },
@@ -160,8 +163,50 @@ export function AdminDashboard() {
         ? "Good Afternoon"
         : "Good Evening";
 
+  // Subscription Check
+  const { data: tenantDetail } = useTenantDetail(tenantId || "");
+  const tenant = tenantDetail?.tenant;
+  const expiry = tenant?.endDate ? new Date(tenant.endDate) : null;
+  const daysRemaining = expiry ? differenceInDays(expiry, new Date()) : null;
+  const isExpiringSoon = daysRemaining !== null && daysRemaining <= 30;
+  const isExpired = daysRemaining !== null && daysRemaining < 0;
+
   return (
     <div className="space-y-6">
+      {/* Subscription Alert */}
+      {(isExpiringSoon || isExpired) && (
+        <div className={`p-4 rounded-2xl flex items-center justify-between gap-4 border animate-in slide-in-from-top duration-500 ${
+          isExpired 
+            ? "bg-rose-50 border-rose-200 dark:bg-rose-950/20 dark:border-rose-900/50" 
+            : "bg-amber-50 border-amber-200 dark:bg-amber-950/20 dark:border-amber-900/50"
+        }`}>
+          <div className="flex items-center gap-3">
+            <div className={`h-10 w-10 rounded-xl flex items-center justify-center ${
+              isExpired ? "bg-rose-100 text-rose-600" : "bg-amber-100 text-amber-600"
+            }`}>
+              <AlertTriangle className="h-5 w-5" />
+            </div>
+            <div>
+              <p className={`text-sm font-bold ${isExpired ? "text-rose-900 dark:text-rose-200" : "text-amber-900 dark:text-amber-200"}`}>
+                {isExpired ? "Subscription Expired" : "Subscription Expiring Soon"}
+              </p>
+              <p className={`text-xs ${isExpired ? "text-rose-700 dark:text-rose-300" : "text-amber-700 dark:text-amber-300"}`}>
+                {isExpired 
+                  ? "Your school's license has expired. Please renew immediately to avoid service interruption." 
+                  : `Your license will expire in ${daysRemaining} days. Renew now to keep your institution running smoothly.`}
+              </p>
+            </div>
+          </div>
+          <Button 
+            size="sm" 
+            className={isExpired ? "bg-rose-600 hover:bg-rose-700" : "bg-amber-600 hover:bg-amber-700"}
+            onClick={() => window.location.href = `/${tenantId}/school-subscription`}
+          >
+            Renew Now
+          </Button>
+        </div>
+      )}
+
       {/* Welcome Banner - Progressive Summary Stats */}
       <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-teal-600 via-cyan-600 to-teal-700 p-6 text-white shadow-lg">
         <div className="absolute top-0 right-0 w-72 h-72 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/3" />

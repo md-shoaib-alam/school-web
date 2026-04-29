@@ -21,3 +21,4 @@ export * from './staff-attendance';
 export * from './exams';
 export * from './academic-years';
 export * from './expenses';
+export * from './subscription';

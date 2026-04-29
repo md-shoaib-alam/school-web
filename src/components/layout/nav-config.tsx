@@ -67,17 +67,12 @@ export const navItems: Record<UserRole, NavItem[]> = {
       icon: <LayoutDashboard className="h-4 w-4" />,
       permModule: null,
     },
+    // Core Management
     {
       key: "tenants",
-      label: "Schools / Tenants",
+      label: "School Management",
       icon: <Building2 className="h-4 w-4" />,
       permModule: "tenants",
-    },
-    {
-      key: "billing",
-      label: "Billing & Revenue",
-      icon: <Receipt className="h-4 w-4" />,
-      permModule: "billing",
     },
     {
       key: "users",
@@ -86,17 +81,34 @@ export const navItems: Record<UserRole, NavItem[]> = {
       permModule: "users",
     },
     {
-      key: "audit-logs",
-      label: "Audit Logs",
-      icon: <ScrollText className="h-4 w-4" />,
-      permModule: "audit-logs",
+      key: "staff",
+      label: "Staff / Employees",
+      icon: <UserPlus className="h-4 w-4" />,
+      permModule: "staff",
+      rootOnly: true,
+    },
+    
+    // Finances & Licenses
+    {
+      key: "billing",
+      label: "Billing & Revenue",
+      icon: <IndianRupee className="h-4 w-4" />,
+      permModule: "billing",
     },
     {
-      key: "platform-analytics",
-      label: "Analytics",
-      icon: <PieChart className="h-4 w-4" />,
-      permModule: "analytics",
+      key: "school-subscriptions",
+      label: "School Subscriptions",
+      icon: <Crown className="h-4 w-4" />,
+      permModule: "billing",
     },
+    {
+      key: "subscriptions",
+      label: "User Subscriptions",
+      icon: <CreditCard className="h-4 w-4" />,
+      permModule: "billing",
+    },
+
+    // Platform Control
     {
       key: "feature-flags",
       label: "Feature Flags",
@@ -110,28 +122,31 @@ export const navItems: Record<UserRole, NavItem[]> = {
       permModule: "roles",
     },
     {
-      key: "staff",
-      label: "Staff / Employees",
-      icon: <UserPlus className="h-4 w-4" />,
-      permModule: "staff",
-      rootOnly: true,
-    },
-    {
       key: "manage-admins",
       label: "Manage Admins",
       icon: <UserCog className="h-4 w-4" />,
       permModule: "manage-admins",
       rootOnly: true,
     },
+
+    // Insights & Security
     {
-      key: "subscriptions",
-      label: "User Subscriptions",
-      icon: <Crown className="h-4 w-4" />,
-      permModule: "billing",
+      key: "platform-analytics",
+      label: "Platform Analytics",
+      icon: <PieChart className="h-4 w-4" />,
+      permModule: "analytics",
     },
     {
+      key: "audit-logs",
+      label: "Audit Logs",
+      icon: <ScrollText className="h-4 w-4" />,
+      permModule: "audit-logs",
+    },
+
+    // System
+    {
       key: "settings",
-      label: "Settings",
+      label: "Platform Settings",
       icon: <Settings className="h-4 w-4" />,
       permModule: "settings",
     },
@@ -142,33 +157,28 @@ export const navItems: Record<UserRole, NavItem[]> = {
       label: "Dashboard",
       icon: <LayoutDashboard className="h-4 w-4" />,
     },
-    {
-      key: "students",
-      label: "Students",
-      icon: <GraduationCap className="h-4 w-4" />,
-    },
+    // People Management
+    { key: "students", label: "Students", icon: <GraduationCap className="h-4 w-4" /> },
     { key: "teachers", label: "Teachers", icon: <Users className="h-4 w-4" /> },
     { key: "parents", label: "Parents", icon: <Heart className="h-4 w-4" /> },
     { key: "staff", label: "Staff / Employees", icon: <UserPlus className="h-4 w-4" /> },
+    
+    // Academic Management
+    { key: "academic-years", label: "Academic Years", icon: <CalendarDays className="h-4 w-4" /> },
     { key: "classes", label: "Classes", icon: <School className="h-4 w-4" /> },
+    { key: "subjects", label: "Subjects", icon: <BookOpen className="h-4 w-4" /> },
+    { key: "timetable", label: "Timetable", icon: <Clock className="h-4 w-4" /> },
+    { key: "calendar", label: "Calendar", icon: <Calendar className="h-4 w-4" /> },
+
+    // Operations
     {
-      key: "leave-management",
-      label: "Leave Management",
-      icon: <CalendarDays className="h-4 w-4" />,
+      key: "attendance-group",
+      label: "Attendance",
+      icon: <UserCheck className="h-4 w-4" />,
       children: [
-        { key: "student-leaves", label: "Student Leaves", icon: <GraduationCap className="h-4 w-4" /> },
-        { key: "teacher-leaves", label: "Teacher Leaves", icon: <Briefcase className="h-4 w-4" /> },
-        { key: "staff-leaves", label: "Staff Leaves", icon: <Users className="h-4 w-4" /> },
-      ]
-    },
-    {
-      key: "promotions-group",
-      label: "Class Promotion",
-      icon: <GraduationCap className="h-4 w-4" />,
-      children: [
-        { key: "promotions", label: "Promotions", icon: <ArrowRight className="h-4 w-4" /> },
-        { key: "bulk-promote", label: "Bulk Promote", icon: <Zap className="h-4 w-4" /> },
-        { key: "graduated", label: "Graduated", icon: <GraduationCap className="h-4 w-4" /> },
+        { key: "attendance", label: "Student Attendance", icon: <Users className="h-4 w-4" /> },
+        { key: "teacher-attendance", label: "Teacher Attendance", icon: <GraduationCap className="h-4 w-4" /> },
+        { key: "staff-attendance", label: "Admin Staff Attendance", icon: <Briefcase className="h-4 w-4" /> },
       ]
     },
     {
@@ -183,20 +193,28 @@ export const navItems: Record<UserRole, NavItem[]> = {
       ]
     },
     {
-      key: "subjects",
-      label: "Subjects",
-      icon: <BookOpen className="h-4 w-4" />,
-    },
-    {
-      key: "attendance-group",
-      label: "Attendance",
-      icon: <UserCheck className="h-4 w-4" />,
+      key: "promotions-group",
+      label: "Class Promotion",
+      icon: <GraduationCap className="h-4 w-4" />,
       children: [
-        { key: "attendance", label: "Student Attendance", icon: <Users className="h-4 w-4" /> },
-        { key: "teacher-attendance", label: "Teacher Attendance", icon: <GraduationCap className="h-4 w-4" /> },
-        { key: "staff-attendance", label: "Admin Staff Attendance", icon: <Briefcase className="h-4 w-4" /> },
+        { key: "promotions", label: "Promotions", icon: <ArrowRight className="h-4 w-4" /> },
+        { key: "bulk-promote", label: "Bulk Promote", icon: <Zap className="h-4 w-4" /> },
+        { key: "graduated", label: "Graduated", icon: <GraduationCap className="h-4 w-4" /> },
       ]
     },
+    {
+      key: "leave-management",
+      label: "Leave Management",
+      icon: <CalendarDays className="h-4 w-4" />,
+      children: [
+        { key: "student-leaves", label: "Student Leaves", icon: <GraduationCap className="h-4 w-4" /> },
+        { key: "teacher-leaves", label: "Teacher Leaves", icon: <Briefcase className="h-4 w-4" /> },
+        { key: "staff-leaves", label: "Staff Leaves", icon: <Users className="h-4 w-4" /> },
+      ]
+    },
+    { key: "certificates", label: "Certificates", icon: <Award className="h-4 w-4" />, permModule: "students" },
+
+    // Finance
     {
       key: "fees-group",
       label: "Fee Management",
@@ -213,48 +231,16 @@ export const navItems: Record<UserRole, NavItem[]> = {
       ]
     },
     { key: "expenses", label: "School Expenses", icon: <Wallet className="h-4 w-4" /> },
+    
+    // Communication & Support
     { key: "notices", label: "Notices", icon: <Bell className="h-4 w-4" /> },
-    {
-      key: "timetable",
-      label: "Timetable",
-      icon: <Clock className="h-4 w-4" />,
-    },
-    {
-      key: "calendar",
-      label: "Calendar",
-      icon: <Calendar className="h-4 w-4" />,
-    },
-    {
-      key: "reports",
-      label: "Reports",
-      icon: <BarChart3 className="h-4 w-4" />,
-    },
-    {
-      key: "certificates",
-      label: "Certificates",
-      icon: <Award className="h-4 w-4" />,
-      permModule: "students",
-    },
-    {
-      key: "roles",
-      label: "Roles & Permissions",
-      icon: <Shield className="h-4 w-4" />,
-    },
-    {
-      key: "tickets",
-      label: "Support Tickets",
-      icon: <TicketCheck className="h-4 w-4" />,
-    },
-    {
-      key: "academic-years",
-      label: "Academic Years",
-      icon: <CalendarDays className="h-4 w-4" />,
-    },
-    {
-      key: "school-settings",
-      label: "School Settings",
-      icon: <Settings className="h-4 w-4" />,
-    },
+    { key: "tickets", label: "Support Tickets", icon: <TicketCheck className="h-4 w-4" /> },
+
+    // System
+    { key: "roles", label: "Roles & Permissions", icon: <Shield className="h-4 w-4" /> },
+    { key: "school-subscription", label: "My Subscription", icon: <Crown className="h-4 w-4" /> },
+    { key: "school-settings", label: "School Settings", icon: <Settings className="h-4 w-4" /> },
+    { key: "reports", label: "Reports", icon: <BarChart3 className="h-4 w-4" /> },
   ],
   teacher: [
     {

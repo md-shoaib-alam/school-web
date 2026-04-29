@@ -19,6 +19,7 @@ import {
   LogOut,
   ChevronDown,
   ChevronRight,
+  Crown
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { isRootAdmin } from "@/lib/permissions";
@@ -287,6 +288,15 @@ export function Sidebar({
                 </div>
               </div>
               <DropdownMenuSeparator />
+              {currentUser.role === "admin" && (
+                <DropdownMenuItem 
+                  className="cursor-pointer gap-2"
+                  onClick={() => navigateTo("school-subscription")}
+                >
+                  <Crown className="h-4 w-4 text-amber-500" />
+                  My Subscription
+                </DropdownMenuItem>
+              )}
               <DropdownMenuItem 
                 className="cursor-pointer gap-2"
                 onClick={() => setIsChangePasswordOpen(true)}

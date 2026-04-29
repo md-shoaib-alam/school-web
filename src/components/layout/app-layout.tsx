@@ -106,7 +106,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
     const isPlatformRoute = [
       "dashboard", "tenants", "billing", "users", "audit-logs", 
       "platform-analytics", "feature-flags", "roles", "staff", 
-      "manage-admins", "subscriptions", "settings"
+      "manage-admins", "subscriptions", "settings", "school-subscriptions"
     ].includes(screen);
 
     if (isSuperAdmin && isPlatformRoute) {

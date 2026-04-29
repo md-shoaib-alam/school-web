@@ -39,6 +39,7 @@ const AdminExams = dynamic(() => import('@/components/screens/admin/exams').then
 const AdminAdmitCards = dynamic(() => import('@/components/screens/admin/admit-cards').then(m => m.AdminAdmitCards), { loading: LoadingScreen });
 const AcademicYearsScreen = dynamic(() => import('@/components/screens/admin/academic-years').then(m => m.AcademicYearsScreen), { loading: LoadingScreen });
 const ExpensesScreen = dynamic(() => import('@/components/screens/admin/expenses').then(m => m.ExpensesScreen), { loading: LoadingScreen });
+const AdminSubscription = dynamic(() => import('@/components/screens/admin/subscription').then(m => m.SchoolSubscriptionScreen), { loading: LoadingScreen });
 
 const TeacherClasses = dynamic(() => import('@/components/screens/teacher/my-classes').then(m => m.TeacherClasses), { loading: LoadingScreen });
 const TeacherAttendance = dynamic(() => import('@/components/screens/teacher/take-attendance').then(m => m.TeacherAttendance), { loading: LoadingScreen });
@@ -117,6 +118,7 @@ export default function TenantScreenDispatcher() {
       case 'academic-years': return <AcademicYearsScreen />;
       case 'expenses': return <ExpensesScreen />;
       case 'tickets': return <AdminTickets />;
+      case 'school-subscription': return <AdminSubscription />;
       case 'promotions': return <AdminPromotions initialTab="individual" />;
       case 'bulk-promote': return <AdminPromotions initialTab="bulk" />;
       case 'graduated': return <AdminPromotions initialTab="graduated" />;
