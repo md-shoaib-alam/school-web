@@ -60,6 +60,7 @@ import {
   SuperAdminRoles,
   SuperAdminManage,
   SuperAdminStaff,
+  SuperAdminPlatformNotices,
   StaffDashboard,
   NotFoundScreen,
   MaintenanceScreen,
@@ -90,6 +91,7 @@ const roleScreens: Record<UserRole, Set<string>> = {
     "staff",
     "settings",
     "manage-admins",
+    "platform-notices",
   ]),
   admin: new Set([
     "dashboard",
@@ -191,6 +193,8 @@ function ScreenRouter({ screen }: { screen: string }) {
         return <SuperAdminSettings />;
       case "manage-admins":
         return <SuperAdminManage />;
+      case "platform-notices":
+        return <SuperAdminPlatformNotices />;
       default:
         return <NotFoundScreen />;
     }

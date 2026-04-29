@@ -110,10 +110,10 @@ const SuperAdminSchoolSubscriptions = dynamic(
     ),
   { loading: LoadingScreen },
 );
-const SuperAdminPush = dynamic(
+const SuperAdminPlatformNotices = dynamic(
   () =>
-    import("@/components/screens/super-admin/push-notifications").then(
-      (m) => m.SuperAdminPushNotifications,
+    import("@/components/screens/super-admin/platform-notices").then(
+      (m) => m.SuperAdminPlatformNotices,
     ),
   { loading: LoadingScreen },
 );
@@ -219,8 +219,8 @@ export default function GenericSlugDispatcher() {
         return <SuperAdminSubscriptions />;
       case "school-subscriptions":
         return <SuperAdminSchoolSubscriptions />;
-      case "push-notifications":
-        return <SuperAdminPush />;
+      case "platform-notices":
+        return <SuperAdminPlatformNotices />;
     }
   }
 

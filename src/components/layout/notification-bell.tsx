@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Bell, ClipboardList, IndianRupee, Calendar, UserCheck, Loader2 } from "lucide-react";
+import { Bell, ClipboardList, IndianRupee, Calendar, UserCheck, Loader2, Megaphone } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
@@ -39,7 +39,10 @@ export function NotificationBell() {
             desc: n.content || "No content",
             time: n.createdAt ? formatDistanceToNow(new Date(n.createdAt), { addSuffix: true }) : "recently",
             read: n.isRead,
-            icon: <Bell className={cn("h-4 w-4", n.isRead ? "text-gray-400" : "text-rose-500")} />,
+            type: n.type,
+            icon: n.type === 'platform_notice' 
+              ? <Megaphone className={cn("h-4 w-4", n.isRead ? "text-gray-400" : "text-amber-500")} />
+              : <Bell className={cn("h-4 w-4", n.isRead ? "text-gray-400" : "text-rose-500")} />,
           }));
 
         setNotifications(mapped);

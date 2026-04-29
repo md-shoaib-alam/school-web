@@ -131,9 +131,9 @@ export const navItems: Record<UserRole, NavItem[]> = {
       rootOnly: true,
     },
     {
-      key: "push-notifications",
-      label: "Push Notifications",
-      icon: <Send className="h-4 w-4" />,
+      key: "platform-notices",
+      label: "Platform Notices",
+      icon: <Bell className="h-4 w-4" />,
       permModule: "analytics",
     },
 

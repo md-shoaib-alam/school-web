@@ -394,3 +394,17 @@ export const SEND_GLOBAL_PUSH = `
     sendGlobalPush(title: $title, body: $body, target: $target, schoolId: $schoolId) { success message }
   }
 `
+
+export const SEND_GLOBAL_NOTICE = `
+  mutation SendGlobalNotice($title: String!, $body: String!, $target: String!, $schoolId: ID) {
+    sendGlobalNotice(title: $title, body: $body, target: $target, schoolId: $schoolId) { success message }
+  }
+`
+
+export const ACTIVE_PLATFORM_NOTICE = `
+  query ActivePlatformNotice {
+    activePlatformNotice {
+      id title content target isActive createdAt
+    }
+  }
+`

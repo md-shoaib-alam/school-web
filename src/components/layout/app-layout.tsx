@@ -12,6 +12,7 @@ import { navItems } from "./nav-config";
 import { useIsFetching } from "@tanstack/react-query";
 import { getCookie } from "@/lib/cookies";
 import { NotificationProvider } from "@/components/providers/notification-provider";
+import { PlatformNoticeBar } from "./platform-notice-bar";
 
 function LoadingProgress() {
   const isFetching = useIsFetching();
@@ -125,7 +126,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
       "subscriptions",
       "settings",
       "school-subscriptions",
-      "push-notifications",
+      "platform-notices",
     ].includes(screen);
 
     if (isSuperAdmin && isPlatformRoute) {
@@ -143,8 +144,10 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
 
   return (
     <NotificationProvider>
-      <div className="h-dvh flex overflow-hidden bg-gray-50 dark:bg-gray-900">
-        <LoadingProgress />
+      <div className="h-dvh flex flex-col overflow-hidden bg-gray-50 dark:bg-gray-900">
+        <PlatformNoticeBar />
+        <div className="flex-1 flex overflow-hidden">
+          <LoadingProgress />
         {/* Mobile overlay */}
 
         {sidebarOpen && (
@@ -173,6 +176,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
           </main>
         </div>
 
+        </div>
         <ChangePasswordModal
           open={isChangePasswordOpen}
           onOpenChange={setIsChangePasswordOpen}
