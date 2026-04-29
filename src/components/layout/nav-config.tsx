@@ -41,6 +41,7 @@ import {
   Briefcase,
   ArrowRight,
   Zap,
+  Wallet,
 } from "lucide-react";
 import { type UserRole } from "@/store/use-app-store";
 
@@ -197,7 +198,7 @@ export const navItems: Record<UserRole, NavItem[]> = {
       ]
     },
     {
-      key: "fees",
+      key: "fees-group",
       label: "Fee Management",
       icon: <IndianRupee className="h-4 w-4" />,
       children: [
@@ -211,6 +212,7 @@ export const navItems: Record<UserRole, NavItem[]> = {
         { key: "transport-fee", label: "Transport Fee", icon: <Bus className="h-4 w-4" /> },
       ]
     },
+    { key: "expenses", label: "School Expenses", icon: <Wallet className="h-4 w-4" /> },
     { key: "notices", label: "Notices", icon: <Bell className="h-4 w-4" /> },
     {
       key: "timetable",
@@ -242,6 +244,11 @@ export const navItems: Record<UserRole, NavItem[]> = {
       key: "tickets",
       label: "Support Tickets",
       icon: <TicketCheck className="h-4 w-4" />,
+    },
+    {
+      key: "academic-years",
+      label: "Academic Years",
+      icon: <CalendarDays className="h-4 w-4" />,
     },
     {
       key: "school-settings",
@@ -428,6 +435,11 @@ export const navItems: Record<UserRole, NavItem[]> = {
       permModule: "fees",
     },
     {
+      key: "expenses",
+      label: "School Expenses",
+      icon: <Wallet className="h-4 w-4" />,
+    },
+    {
       key: "grades",
       label: "Grades",
       icon: <ClipboardList className="h-4 w-4" />,
@@ -480,6 +492,12 @@ export const navItems: Record<UserRole, NavItem[]> = {
       label: "Certificates",
       icon: <Award className="h-4 w-4" />,
       permModule: "students",
+    },
+    {
+      key: "academic-years",
+      label: "Academic Years",
+      icon: <CalendarDays className="h-4 w-4" />,
+      permModule: "settings",
     },
     {
       key: "tickets",
