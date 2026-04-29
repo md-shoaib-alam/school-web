@@ -6,124 +6,91 @@ import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
+import { Badge } from "@/components/ui/badge";
 import { apiFetch } from "@/lib/api";
 import { formatDistanceToNow } from "date-fns";
 import { useAppStore } from "@/store/use-app-store";
-import { useEffect } from "react";
+import { useEffect, useCallback } from "react";
 
-// Mock notification data
-const MOCK_NOTIFICATIONS = [
-  {
-    id: 1,
-    title: "Mid-Term Exam Schedule",
-    desc: "Exams start from March 15. Check the schedule.",
-    time: "2 min ago",
-    read: false,
-    icon: <ClipboardList className="h-4 w-4 text-blue-500" />,
-  },
-  {
-    id: 2,
-    title: "Fee Payment Reminder",
-    desc: "Pending fees due by March 31.",
-    time: "1 hour ago",
-    read: false,
-    icon: <IndianRupee className="h-4 w-4 text-amber-500" />,
-  },
-  {
-    id: 3,
-    title: "Annual Day Celebration",
-    desc: "Annual day on March 20. All students participate.",
-    time: "3 hours ago",
-    read: false,
-    icon: <Calendar className="h-4 w-4 text-emerald-500" />,
-  },
-  {
-    id: 4,
-    title: "New Notice Posted",
-    desc: "PTM scheduled for next Saturday.",
-    time: "Yesterday",
-    read: true,
-    icon: <Bell className="h-4 w-4 text-violet-500" />,
-  },
-  {
-    id: 5,
-    title: "Attendance Report",
-    desc: "Weekly attendance report is now available.",
-    time: "2 days ago",
-    read: true,
-    icon: <UserCheck className="h-4 w-4 text-rose-500" />,
-  },
-];
+// No mock data - only real notifications from the database
 
 export function NotificationBell() {
-  const { currentUser } = useAppStore();
+  const { currentUser, currentTenantId } = useAppStore();
   const [notifications, setNotifications] = useState<any[]>([]);
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(true);
 
-  const fetchNotices = async () => {
+  const fetchNotices = useCallback(async () => {
+    if (!currentUser) {
+      setLoading(false);
+      return;
+    }
+
     try {
-      const res = await apiFetch("/api/notices");
+      const res = await apiFetch("/api/notifications");
       if (res.ok) {
-        const rawNotices = await res.json();
+        const raw = await res.json();
         
-        // Get read status from localStorage
-        const seenIds = JSON.parse(localStorage.getItem('seen_notices') || '[]');
-        
-        // Map and filter for unread + 10 latest
-        const mapped = rawNotices
-          .filter((n: any) => !seenIds.map(String).includes(String(n.id))) // Only unread
-          .sort((a: any, b: any) => new Date(b.created_at || b.createdAt).getTime() - new Date(a.created_at || a.createdAt).getTime()) // Latest first
-          .slice(0, 10) // Only 10 latest
+        // Map push history to UI format
+        const mapped = raw
           .map((n: any) => ({
-            id: String(n.id),
+            id: n.id,
             title: n.title,
-            desc: n.content || n.description || "No content available",
-            time: (n.created_at || n.createdAt) ? formatDistanceToNow(new Date(n.created_at || n.createdAt), { addSuffix: true }) : "recently",
-            read: false,
-            icon: <Bell className="h-4 w-4 text-rose-500" />,
+            desc: n.content || "No content",
+            time: n.createdAt ? formatDistanceToNow(new Date(n.createdAt), { addSuffix: true }) : "recently",
+            read: n.isRead,
+            icon: <Bell className={cn("h-4 w-4", n.isRead ? "text-gray-400" : "text-rose-500")} />,
           }));
 
         setNotifications(mapped);
       }
     } catch (err) {
-      console.error("Failed to fetch notices:", err);
+      console.error("Failed to fetch notifications:", err);
     } finally {
       setLoading(false);
     }
-  };
+  }, [currentUser]);
 
   useEffect(() => {
     if (open) {
       fetchNotices();
     }
-  }, [open]);
+  }, [open, fetchNotices]);
 
   // Initial fetch for count
   useEffect(() => {
     fetchNotices();
-    const interval = setInterval(fetchNotices, 30000); // Check every 30s
+    const interval = setInterval(fetchNotices, 10000); // Check every 10s
     return () => clearInterval(interval);
-  }, []);
+  }, [fetchNotices]);
 
-  const unreadCount = notifications.length;
+  const unreadCount = notifications.filter(n => !n.read).length;
 
-  const markAllRead = () => {
-    const ids = notifications.map(n => n.id);
-    const seenIds = JSON.parse(localStorage.getItem('seen_notices') || '[]');
-    const updatedSeen = Array.from(new Set([...seenIds, ...ids]));
-    localStorage.setItem('seen_notices', JSON.stringify(updatedSeen));
-    setNotifications([]);
+  const markAllRead = async () => {
+    try {
+      await apiFetch("/api/notifications/read-all", { method: 'PATCH' });
+      setNotifications(prev => prev.map(n => ({ ...n, read: true })));
+    } catch (err) {
+      console.error("Failed to mark all read:", err);
+    }
   };
 
-  const markRead = (id: string | number) => {
-    const sId = String(id);
-    const seenIds = JSON.parse(localStorage.getItem('seen_notices') || '[]');
-    if (!seenIds.map(String).includes(sId)) {
-      seenIds.push(sId);
-      localStorage.setItem('seen_notices', JSON.stringify(seenIds));
+  const markRead = async (id: string | number) => {
+    try {
+      await apiFetch(`/api/notifications/${id}/read`, { method: 'PATCH' });
+      setNotifications(prev => prev.map(n => n.id === id ? { ...n, read: true } : n));
+    } catch (err) {
+      console.error("Failed to mark read:", err);
     }
-    setNotifications(prev => prev.filter(n => String(n.id) !== sId));
+  };
+
+  const clearAll = async () => {
+    try {
+      await apiFetch("/api/notifications", { method: 'DELETE' });
+      setNotifications([]);
+    } catch (err) {
+      console.error("Failed to clear notifications:", err);
+    }
   };
 
   return (
@@ -132,91 +99,119 @@ export function NotificationBell() {
         <Button
           variant="ghost"
           size="icon"
-          className="relative h-11 w-11 md:h-10 md:w-10 hover:bg-gray-100 dark:hover:bg-gray-800"
+          className="relative h-10 w-10 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-800 transition-all duration-200"
         >
-          <Bell className="h-7 w-7 md:h-6 md:w-6 text-gray-500 dark:text-gray-400" />
+          <Bell className={cn(
+            "h-5 w-5 transition-colors",
+            unreadCount > 0 ? "text-indigo-600 dark:text-indigo-400" : "text-gray-500"
+          )} />
           {unreadCount > 0 && (
-            <span className="absolute top-0 right-0 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[10px] font-bold text-white ring-2 ring-white dark:ring-gray-900">
-              {unreadCount}
-            </span>
+            <span className="absolute top-2 right-2 flex h-2 w-2 items-center justify-center rounded-full bg-rose-500 ring-2 ring-white dark:ring-gray-900 animate-pulse" />
           )}
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-72 sm:w-80 p-0 border-gray-200 dark:border-gray-800 shadow-2xl" align="end" sideOffset={8}>
-        <div className="flex items-center justify-between px-4 py-3 border-b border-gray-100 dark:border-gray-800">
+      <PopoverContent className="w-80 sm:w-96 p-0 border-gray-200 dark:border-gray-800 shadow-2xl rounded-2xl overflow-hidden" align="end" sideOffset={8}>
+        <div className="flex items-center justify-between px-5 py-4 bg-gray-50/50 dark:bg-gray-900/50 border-b border-gray-100 dark:border-gray-800">
           <div className="flex items-center gap-2">
-            <h3 className="font-semibold text-sm text-gray-900 dark:text-gray-100">
+            <h3 className="font-bold text-sm text-gray-900 dark:text-gray-100 tracking-tight">
               Notifications
             </h3>
             {unreadCount > 0 && (
-              <span className="flex items-center justify-center h-5 min-w-[20px] px-1 rounded-full bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 text-[10px] font-semibold">
-                {unreadCount} new
-              </span>
+              <Badge variant="secondary" className="bg-indigo-100 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-400 text-[10px] font-bold px-1.5 py-0">
+                {unreadCount} NEW
+              </Badge>
             )}
           </div>
-          <Button
-            variant="ghost"
-            size="sm"
-            className="text-[10px] text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 h-6 px-1.5"
-            onClick={markAllRead}
-          >
-            Mark all read
-          </Button>
+          <div className="flex items-center gap-1">
+            <Button
+              variant="ghost"
+              size="sm"
+              className="text-[10px] h-7 px-2 font-semibold text-gray-500 hover:text-indigo-600 transition-colors"
+              onClick={markAllRead}
+            >
+              Mark all read
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="text-[10px] h-7 px-2 font-semibold text-rose-500 hover:bg-rose-50 hover:text-rose-600 transition-colors"
+              onClick={clearAll}
+            >
+              Clear
+            </Button>
+          </div>
         </div>
-        <ScrollArea className="max-h-[380px] overflow-y-auto">
+        <ScrollArea className="max-h-[420px]">
           {loading && notifications.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-12">
-              <Loader2 className="h-6 w-6 animate-spin text-rose-500" />
-              <p className="text-xs text-gray-400 mt-2">Checking notices...</p>
+            <div className="flex flex-col items-center justify-center py-16">
+              <Loader2 className="h-8 w-8 animate-spin text-indigo-500 opacity-20" />
+              <p className="text-xs text-gray-400 mt-4 font-medium">Updating history...</p>
             </div>
           ) : notifications.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-12 text-gray-400">
-              <div className="w-16 h-16 rounded-full bg-gray-50 dark:bg-gray-800/50 flex items-center justify-center mb-3">
-                <Bell className="h-8 w-8 opacity-20" />
+            <div className="flex flex-col items-center justify-center py-20 text-gray-400">
+              <div className="w-20 h-20 rounded-3xl bg-gray-50 dark:bg-gray-800/50 flex items-center justify-center mb-4 transform rotate-12 transition-transform hover:rotate-0">
+                <Bell className="h-10 w-10 opacity-10" />
               </div>
-              <p className="text-sm font-medium">No new notices</p>
-              <p className="text-[11px] opacity-60">You're all caught up!</p>
+              <p className="text-sm font-bold text-gray-900 dark:text-gray-100">All caught up!</p>
+              <p className="text-xs opacity-60 mt-1">Your notification center is empty</p>
             </div>
           ) : (
             <div className="divide-y divide-gray-50 dark:divide-gray-800/50">
               {notifications.map((notification) => (
-                <button
+                <div
                   key={notification.id}
                   className={cn(
-                    "w-full flex items-start gap-2 px-3 py-2.5 text-left hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors",
-                    !notification.read && "bg-blue-50/50 dark:bg-blue-900/10",
+                    "group relative w-full flex items-start gap-4 px-5 py-4 text-left transition-all duration-200 cursor-pointer",
+                    !notification.read 
+                      ? "bg-indigo-50/30 dark:bg-indigo-900/5" 
+                      : "hover:bg-gray-50 dark:hover:bg-gray-800/30",
                   )}
                   onClick={() => markRead(notification.id)}
                 >
-                  <div className="mt-0.5 shrink-0 scale-90">{notification.icon}</div>
+                  <div className={cn(
+                    "mt-0.5 shrink-0 h-10 w-10 rounded-2xl flex items-center justify-center transition-colors",
+                    !notification.read 
+                      ? "bg-indigo-100 text-indigo-600 dark:bg-indigo-900/40 dark:text-indigo-400" 
+                      : "bg-gray-100 text-gray-400 dark:bg-gray-800 dark:text-gray-500"
+                  )}>
+                    <Bell className="h-5 w-5" />
+                  </div>
                   <div className="flex-1 min-w-0">
-                    <div className="flex items-start justify-between gap-2">
-                      <p
-                        className={cn(
-                          "text-xs truncate",
-                          !notification.read
-                            ? "font-semibold text-gray-900 dark:text-gray-100"
-                            : "font-medium text-gray-700 dark:text-gray-300",
-                        )}
-                      >
+                    <div className="flex items-start justify-between gap-2 mb-1">
+                      <p className={cn(
+                        "text-[13px] leading-tight",
+                        !notification.read
+                          ? "font-bold text-gray-900 dark:text-gray-100"
+                          : "font-medium text-gray-600 dark:text-gray-400",
+                      )}>
                         {notification.title}
                       </p>
-                      {!notification.read && (
-                        <span className="mt-1.5 h-1.5 w-1.5 rounded-full bg-blue-500 shrink-0" />
-                      )}
+                      <p className="text-[10px] text-gray-400 dark:text-gray-500 whitespace-nowrap mt-0.5 font-medium">
+                        {notification.time}
+                      </p>
                     </div>
-                    <p className="text-[11px] text-gray-500 dark:text-gray-400 mt-0.5 line-clamp-1 leading-tight">
+                    <p className={cn(
+                      "text-xs leading-relaxed line-clamp-2",
+                      !notification.read ? "text-gray-600 dark:text-gray-300" : "text-gray-500 dark:text-gray-500"
+                    )}>
                       {notification.desc}
                     </p>
-                    <p className="text-[10px] text-gray-400 dark:text-gray-500 mt-0.5">
-                      {notification.time}
-                    </p>
                   </div>
-                </button>
+                  {!notification.read && (
+                    <div className="absolute left-1 top-1/2 -translate-y-1/2 w-1 h-8 bg-indigo-500 rounded-full opacity-0 group-hover:opacity-100 transition-opacity" />
+                  )}
+                </div>
               ))}
             </div>
           )}
         </ScrollArea>
+        {notifications.length > 0 && (
+          <div className="p-3 bg-gray-50/50 dark:bg-gray-900/50 border-t border-gray-100 dark:border-gray-800 text-center">
+            <p className="text-[10px] text-gray-400 font-medium tracking-wide uppercase">
+              End of notifications
+            </p>
+          </div>
+        )}
       </PopoverContent>
     </Popover>
   );

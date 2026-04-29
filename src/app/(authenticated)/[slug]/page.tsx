@@ -26,6 +26,7 @@ const SuperAdminManage = dynamic(() => import('@/components/screens/super-admin/
 const SuperAdminStaff = dynamic(() => import('@/components/screens/super-admin/staff').then(m => m.SuperAdminStaff), { loading: LoadingScreen });
 const SuperAdminSubscriptions = dynamic(() => import('@/components/screens/super-admin/subscriptions').then(m => m.SuperAdminSubscriptions), { loading: LoadingScreen });
 const SuperAdminSchoolSubscriptions = dynamic(() => import('@/components/screens/super-admin/school-subscriptions').then(m => m.SuperAdminSchoolSubscriptions), { loading: LoadingScreen });
+const SuperAdminPush = dynamic(() => import('@/components/screens/super-admin/push-notifications').then(m => m.SuperAdminPushNotifications), { loading: LoadingScreen });
 
 const TeacherDashboard = dynamic(() => import('@/components/screens/teacher/dashboard').then(m => m.TeacherDashboard), { loading: LoadingScreen });
 const StudentDashboard = dynamic(() => import('@/components/screens/student/dashboard').then(m => m.StudentDashboard), { loading: LoadingScreen });
@@ -79,6 +80,7 @@ export default function GenericSlugDispatcher() {
       case 'manage-admins': return <SuperAdminManage />;
       case 'subscriptions': return <SuperAdminSubscriptions />;
       case 'school-subscriptions': return <SuperAdminSchoolSubscriptions />;
+      case 'push-notifications': return <SuperAdminPush />;
     }
   }
 

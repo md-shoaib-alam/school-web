@@ -80,11 +80,21 @@ export default function TenantScreenDispatcher() {
 
   if (!currentUser) return null;
 
+  // Normalize for comparison
+  const urlSlug = typeof slug === 'string' ? slug.toLowerCase() : '';
+  const userTenantId = currentUser.tenantId?.toLowerCase() || '';
+  const userTenantSlug = currentUser.tenantSlug?.toLowerCase() || '';
+
   // Verify that the slug matches the user's tenant (security check)
-  const isTenantMatch = (slug === currentUser.tenantId || slug === currentUser.tenantSlug);
+  const isTenantMatch = (urlSlug === userTenantId || urlSlug === userTenantSlug);
 
   if (currentUser.role !== 'super_admin' && !isTenantMatch) {
-    console.log('[TenantScreenDispatcher] SHOWING 404 - slug mismatch', { slug, tenantId: currentUser.tenantId, tenantSlug: currentUser.tenantSlug });
+    console.warn('[TenantScreenDispatcher] 404 Triggered - Slug Mismatch:', { 
+      urlSlug, 
+      userTenantId, 
+      userTenantSlug,
+      role: currentUser.role 
+    });
     return <NotFoundScreen />;
   }
   

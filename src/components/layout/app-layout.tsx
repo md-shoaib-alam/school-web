@@ -11,6 +11,7 @@ import { Header } from "./header";
 import { navItems } from "./nav-config";
 import { useIsFetching } from "@tanstack/react-query";
 import { getCookie } from "@/lib/cookies";
+import { NotificationProvider } from "@/components/providers/notification-provider";
 
 function LoadingProgress() {
   const isFetching = useIsFetching();
@@ -106,7 +107,8 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
     const isPlatformRoute = [
       "dashboard", "tenants", "billing", "users", "audit-logs", 
       "platform-analytics", "feature-flags", "roles", "staff", 
-      "manage-admins", "subscriptions", "settings", "school-subscriptions"
+      "manage-admins", "subscriptions", "settings", "school-subscriptions",
+      "push-notifications"
     ].includes(screen);
 
     if (isSuperAdmin && isPlatformRoute) {
@@ -123,38 +125,40 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
   };
 
   return (
-    <div className="h-dvh flex overflow-hidden bg-gray-50 dark:bg-gray-950">
-      <LoadingProgress />
-      {/* Mobile overlay */}
+    <NotificationProvider>
+      <div className="h-dvh flex overflow-hidden bg-gray-50 dark:bg-gray-900">
+        <LoadingProgress />
+        {/* Mobile overlay */}
 
-      {sidebarOpen && (
-        <div
-          className="fixed inset-0 bg-black/50 z-40 lg:hidden"
-          onClick={() => setSidebarOpen(false)}
+        {sidebarOpen && (
+          <div
+            className="fixed inset-0 bg-black/50 z-40 lg:hidden"
+            onClick={() => setSidebarOpen(false)}
+          />
+        )}
+
+        {/* Sidebar */}
+        <Sidebar 
+          items={items} 
+          resolvedScreen={resolvedScreen} 
+          navigateTo={navigateTo}
+          setIsChangePasswordOpen={setIsChangePasswordOpen}
         />
-      )}
 
-      {/* Sidebar */}
-      <Sidebar 
-        items={items} 
-        resolvedScreen={resolvedScreen} 
-        navigateTo={navigateTo}
-        setIsChangePasswordOpen={setIsChangePasswordOpen}
-      />
+        {/* Main Content */}
+        <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
+          {/* Top Header */}
+          <Header items={items} resolvedScreen={resolvedScreen} />
 
-      {/* Main Content */}
-      <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
-        {/* Top Header */}
-        <Header items={items} resolvedScreen={resolvedScreen} />
+          {/* Page Content */}
+          <main className="flex-1 overflow-y-auto p-4 lg:p-6">{children}</main>
+        </div>
 
-        {/* Page Content */}
-        <main className="flex-1 overflow-y-auto p-4 lg:p-6">{children}</main>
+        <ChangePasswordModal 
+          open={isChangePasswordOpen} 
+          onOpenChange={setIsChangePasswordOpen} 
+        />
       </div>
-
-      <ChangePasswordModal 
-        open={isChangePasswordOpen} 
-        onOpenChange={setIsChangePasswordOpen} 
-      />
-    </div>
+    </NotificationProvider>
   );
 }

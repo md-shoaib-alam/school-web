@@ -42,6 +42,8 @@ import {
   ArrowRight,
   Zap,
   Wallet,
+  Send,
+  Smartphone,
 } from "lucide-react";
 import { type UserRole } from "@/store/use-app-store";
 
@@ -127,6 +129,12 @@ export const navItems: Record<UserRole, NavItem[]> = {
       icon: <UserCog className="h-4 w-4" />,
       permModule: "manage-admins",
       rootOnly: true,
+    },
+    {
+      key: "push-notifications",
+      label: "Push Notifications",
+      icon: <Send className="h-4 w-4" />,
+      permModule: "analytics",
     },
 
     // Insights & Security

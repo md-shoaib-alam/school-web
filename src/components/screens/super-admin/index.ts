@@ -12,3 +12,4 @@ export * from './manage-admins';
 export * from './subscriptions';
 export * from './school-detail';
 export * from './school-subscriptions';
+export * from './push-notifications';
