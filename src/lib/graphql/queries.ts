@@ -163,17 +163,17 @@ export const PARENT_DASHBOARD = `
   query ParentDashboard($parentName: String!) {
     parentDashboard(parentName: $parentName) {
       children { 
-        id name className rollNumber gender dateOfBirth 
-        grades { id subjectName examType marks maxMarks grade createdAt }
-        attendance { id date status remarks }
+        id userId name email className classId rollNumber gender dateOfBirth admissionDate
+        grades { id studentId studentName subjectName examType marks maxMarks grade createdAt }
+        attendance { id studentId studentName className date status remarks }
       }
       notices { id title content authorName priority createdAt targetRole }
       fees { id studentName type amount status dueDate paidAmount }
       performanceSummary { name attendanceRate avgGrade grade }
+      subscriptionPlan
     }
   }
-`
-
+`;
 export const TENANT_DETAIL = `
   query TenantDetail($tenantId: String!) {
     tenantDetail(tenantId: $tenantId) {

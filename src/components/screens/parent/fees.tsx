@@ -21,7 +21,7 @@ export function ParentFees() {
   const [allChildrenFees, setAllChildrenFees] = useState<FeeRecord[]>([]);
 
   const { data, isPending } = useParentDashboard(currentUser?.name || "");
-  const students = (data?.children || []) as StudentInfo[];
+  const students = (data?.children || []) as unknown as StudentInfo[];
 
   useEffect(() => {
     if (students.length > 0 && !activeTab) {
@@ -100,7 +100,7 @@ export function ParentFees() {
       toast.promise(paymentPromise, {
         loading: "Processing payment...",
         success: "Payment successful!",
-        error: (err) => `Error: ${err.message}`,
+        error: (err: any) => `Error: ${err.message}`,
       });
     } catch (error) {
       console.error("Payment error:", error);

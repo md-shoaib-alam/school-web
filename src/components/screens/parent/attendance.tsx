@@ -24,30 +24,18 @@ import { getAttendanceStats, getMonthlyData, getCalendarData } from "./attendanc
 export function ParentAttendance() {
   const { currentUser } = useAppStore();
   const [activeTab, setActiveTab] = useState("");
-  const [allAttendance, setAllAttendance] = useState<AttendanceRecord[]>([]);
 
-  const { data, isPending } = useParentDashboard(currentUser?.name || "");
-  const students = (data?.children || []) as StudentInfo[];
+  const [calendarOffset, setCalendarOffset] = useState(0);
+
+  const { data, isPending, refetch } = useParentDashboard(currentUser?.name || "");
+  const students = (data?.children || []) as unknown as StudentInfo[];
+  const isPremium = data?.subscriptionPlan?.toLowerCase() === 'premium';
 
   useEffect(() => {
     if (students.length > 0 && !activeTab) {
       setActiveTab(students[0].id);
     }
   }, [students, activeTab]);
-
-  useEffect(() => {
-    async function fetchAttendance() {
-      if (students.length === 0) return;
-      try {
-        const res = await apiFetch("/api/attendance");
-        const raw = await res.json();
-        setAllAttendance(Array.isArray(raw) ? raw : (raw.items || []));
-      } catch (e) {
-        console.error("Failed to fetch attendance", e);
-      }
-    }
-    fetchAttendance();
-  }, [students.length]);
 
   if (isPending) return <AttendanceSkeleton />;
 
@@ -69,16 +57,24 @@ export function ParentAttendance() {
 
   return (
     <div className="space-y-6 pb-10">
-      <div className="flex items-center gap-2">
-        <UserCheck className="h-5 w-5 text-amber-600" />
-        <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100 uppercase tracking-tight">
-          Attendance Overview
-        </h2>
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <UserCheck className="h-5 w-5 text-amber-600" />
+          <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100 uppercase tracking-tight">
+            Attendance Overview
+          </h2>
+        </div>
+        <button 
+          onClick={() => refetch()}
+          className="text-xs font-bold text-amber-700 bg-amber-50 hover:bg-amber-100 px-3 py-1.5 rounded-lg transition-all"
+        >
+          Refresh Data
+        </button>
       </div>
 
-      <Tabs value={activeTab} onValueChange={setActiveTab}>
+      <Tabs value={activeTab} onValueChange={(val) => { setActiveTab(val); setCalendarOffset(0); }}>
         <TabsList className="bg-amber-50 dark:bg-amber-900/30 p-1">
-          {students.map((student) => (
+          {students.map((student: any) => (
             <TabsTrigger
               key={student.id}
               value={student.id}
@@ -92,13 +88,17 @@ export function ParentAttendance() {
           ))}
         </TabsList>
 
-        {students.map((student) => {
-          const currentAttendance = allAttendance.filter(
-            (a) => a.studentId === student.id,
-          );
+        {students.map((student: any) => {
+          const currentAttendance = student.attendance || [];
           const currentStats = getAttendanceStats(currentAttendance);
           const currentMonthly = getMonthlyData(currentAttendance);
-          const currentCalendar = getCalendarData(currentAttendance);
+          
+          // Calculate calendar window (Full Month)
+          const baseDate = new Date();
+          baseDate.setMonth(baseDate.getMonth() - calendarOffset);
+          const currentCalendar = getCalendarData(currentAttendance, baseDate);
+
+          const periodLabel = baseDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
 
           return (
             <TabsContent
@@ -113,9 +113,18 @@ export function ParentAttendance() {
                 late={currentStats.late}
               />
 
-              <AttendanceChart data={currentMonthly} />
-
-              <AttendanceCalendar data={currentCalendar} />
+              <AttendanceCalendar 
+                data={currentCalendar} 
+                isPremium={isPremium}
+                currentPeriod={periodLabel}
+                onPrev={() => isPremium && setCalendarOffset(prev => prev + 1)}
+                onNext={() => isPremium && setCalendarOffset(prev => Math.max(0, prev - 1))}
+              />
+              
+              <AttendanceChart 
+                data={currentMonthly} 
+                isPremium={isPremium} 
+              />
             </TabsContent>
           );
         })}
