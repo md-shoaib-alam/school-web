@@ -1,3 +1,4 @@
+import { PRICE_LOOKUP } from "@/components/screens/parent/subscription/constants";
 import { DatePicker } from "@/components/ui/date-picker";
 import {
   Dialog,
@@ -122,16 +123,7 @@ export function SubscriptionDialogs({
                 <Select
                   value={createForm.planId}
                   onValueChange={(val) => {
-                    const monthlyPrices: Record<string, number> = { basic: 0, standard: 11, premium: 29 };
-                    const quarterlyPrices: Record<string, number> = { basic: 0, standard: 29, premium: 79 };
-                    const yearlyPrices: Record<string, number> = { basic: 0, standard: 99, premium: 249 };
-                    
-                    const selectedPrice = createForm.period === "yearly" 
-                      ? yearlyPrices[val] 
-                      : createForm.period === "quarterly" 
-                        ? quarterlyPrices[val] 
-                        : monthlyPrices[val];
-                        
+                    const selectedPrice = PRICE_LOOKUP[createForm.period || "yearly"]?.[val];
                     setCreateForm((p: any) => ({
                       ...p,
                       planId: val,
@@ -155,16 +147,7 @@ export function SubscriptionDialogs({
                 <Select
                   value={createForm.period}
                   onValueChange={(val) => {
-                    const monthlyPrices: Record<string, number> = { basic: 0, standard: 11, premium: 29 };
-                    const quarterlyPrices: Record<string, number> = { basic: 0, standard: 29, premium: 79 };
-                    const yearlyPrices: Record<string, number> = { basic: 0, standard: 99, premium: 249 };
-                    
-                    const selectedPrice = val === "yearly" 
-                      ? yearlyPrices[createForm.planId] 
-                      : val === "quarterly" 
-                        ? quarterlyPrices[createForm.planId] 
-                        : monthlyPrices[createForm.planId];
-                        
+                    const selectedPrice = PRICE_LOOKUP[val]?.[createForm.planId];
                     setCreateForm((p: any) => ({ 
                       ...p, 
                       period: val,
@@ -258,17 +241,8 @@ export function SubscriptionDialogs({
                 <Select
                   value={editForm.planName.toLowerCase().replace(" plan", "")}
                   onValueChange={(val) => {
-                    const monthlyPrices: Record<string, number> = { basic: 0, standard: 11, premium: 29 };
-                    const quarterlyPrices: Record<string, number> = { basic: 0, standard: 29, premium: 79 };
-                    const yearlyPrices: Record<string, number> = { basic: 0, standard: 99, premium: 249 };
-                    
                     const currentPeriod = editForm.period || "monthly";
-                    const selectedPrice = currentPeriod === "yearly" 
-                      ? yearlyPrices[val] 
-                      : currentPeriod === "quarterly" 
-                        ? quarterlyPrices[val] 
-                        : monthlyPrices[val];
-                        
+                    const selectedPrice = PRICE_LOOKUP[currentPeriod]?.[val];
                     setEditForm((p: any) => ({
                       ...p,
                       planName: val.charAt(0).toUpperCase() + val.slice(1) + " Plan",
@@ -291,16 +265,8 @@ export function SubscriptionDialogs({
                 <Select
                   value={editForm.period || "monthly"}
                   onValueChange={(val) => {
-                    const monthlyPrices: Record<string, number> = { basic: 0, standard: 11, premium: 29 };
-                    const quarterlyPrices: Record<string, number> = { basic: 0, standard: 29, premium: 79 };
-                    const yearlyPrices: Record<string, number> = { basic: 0, standard: 99, premium: 249 };
-                    
                     const currentPlanId = editForm.planName.toLowerCase().replace(" plan", "");
-                    const selectedPrice = val === "yearly" 
-                      ? yearlyPrices[currentPlanId] 
-                      : val === "quarterly" 
-                        ? quarterlyPrices[currentPlanId] 
-                        : monthlyPrices[currentPlanId];
+                    const selectedPrice = PRICE_LOOKUP[val]?.[currentPlanId];
                         
                     const startDate = editOpen?.startDate ? new Date(editOpen.startDate) : new Date();
                     const newEnd = new Date(startDate);
