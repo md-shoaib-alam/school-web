@@ -31,10 +31,24 @@ export function ParentChildren() {
   const students = data?.children || [];
 
   useEffect(() => {
-    if (students.length > 0 && !activeTab) {
-      setActiveTab(students[0].id);
+    if (students.length > 0) {
+      const savedTab = document.cookie
+        .split("; ")
+        .find((row) => row.startsWith("lastSelectedStudent="))
+        ?.split("=")[1];
+      
+      if (savedTab && students.some(s => s.id === savedTab)) {
+        setActiveTab(savedTab);
+      } else if (!activeTab) {
+        setActiveTab(students[0].id);
+      }
     }
-  }, [students, activeTab]);
+  }, [students]);
+
+  const handleTabChange = (val: string) => {
+    setActiveTab(val);
+    document.cookie = `lastSelectedStudent=${val}; path=/; max-age=31536000`;
+  };
 
   if (isPending) return <ChildrenSkeleton />;
 
@@ -59,7 +73,7 @@ export function ParentChildren() {
         </h2>
       </div>
 
-      <Tabs value={activeTab} onValueChange={setActiveTab}>
+      <Tabs value={activeTab} onValueChange={handleTabChange}>
         <TabsList className="bg-amber-50 dark:bg-amber-900/30 p-1">
           {students.map((student) => (
             <TabsTrigger

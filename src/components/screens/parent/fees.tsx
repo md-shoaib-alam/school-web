@@ -22,12 +22,28 @@ export function ParentFees() {
 
   const { data, isPending } = useParentDashboard(currentUser?.name || "");
   const students = (data?.children || []) as unknown as StudentInfo[];
+  const isPremium = data?.subscriptionPlan?.toLowerCase() === 'premium';
 
+  // Persistence logic
   useEffect(() => {
-    if (students.length > 0 && !activeTab) {
-      setActiveTab(students[0].id);
+    if (students.length > 0) {
+      const savedTab = document.cookie
+        .split("; ")
+        .find((row) => row.startsWith("lastSelectedStudent="))
+        ?.split("=")[1];
+      
+      if (savedTab && students.some(s => s.id === savedTab)) {
+        setActiveTab(savedTab);
+      } else if (!activeTab) {
+        setActiveTab(students[0].id);
+      }
     }
-  }, [students, activeTab]);
+  }, [students]);
+
+  const handleTabChange = (val: string) => {
+    setActiveTab(val);
+    document.cookie = `lastSelectedStudent=${val}; path=/; max-age=31536000`;
+  };
 
   useEffect(() => {
     async function fetchFees() {
@@ -141,7 +157,7 @@ export function ParentFees() {
         overdue={summary.overdue}
       />
 
-      <Tabs value={activeTab} onValueChange={setActiveTab}>
+      <Tabs value={activeTab} onValueChange={handleTabChange}>
         <TabsList className="bg-amber-50 dark:bg-amber-900/30 p-1">
           {students.map((student) => (
             <TabsTrigger
@@ -166,6 +182,7 @@ export function ParentFees() {
                 studentName={student.name}
                 fees={studentFees}
                 onPay={handlePayNow}
+                isPremium={isPremium}
               />
             </TabsContent>
           );

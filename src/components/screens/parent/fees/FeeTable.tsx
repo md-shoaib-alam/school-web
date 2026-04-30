@@ -3,6 +3,9 @@
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { useRouter, useParams } from "next/navigation";
+import { useState, useRef } from "react";
+import { useReactToPrint } from "react-to-print";
 import {
   Table,
   TableBody,
@@ -11,19 +14,56 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { IndianRupee } from "lucide-react";
+import { IndianRupee, Printer, Lock } from "lucide-react";
 import { STATUS_CONFIG, TYPE_ICONS } from "./constants";
 import type { FeeRecord } from "@/lib/types";
+import { ReceiptTemplate } from "./ReceiptTemplate";
 
 interface FeeTableProps {
   studentName: string;
   fees: FeeRecord[];
   onPay: (feeId: string) => void;
+  isPremium?: boolean;
 }
 
-export function FeeTable({ studentName, fees, onPay }: FeeTableProps) {
+export function FeeTable({ studentName, fees, onPay, isPremium }: FeeTableProps) {
+  const router = useRouter();
+  const params = useParams();
+  const slug = params?.slug as string;
+
+  const [selectedFee, setSelectedFee] = useState<FeeRecord | null>(null);
+  const contentRef = useRef<HTMLDivElement>(null);
+
+  const handlePrint = useReactToPrint({
+    contentRef,
+    documentTitle: `Fee_Receipt_${studentName}`,
+  });
+
+  const onPrintClick = (fee: FeeRecord) => {
+    if (!isPremium) {
+      router.push(`/${slug}/subscription`);
+      return;
+    }
+    setSelectedFee(fee);
+    // Give state a moment to update before printing
+    setTimeout(() => {
+      handlePrint();
+    }, 100);
+  };
+
   return (
     <Card className="rounded-xl shadow-sm shadow-none">
+      {/* Hidden Receipt for Printing */}
+      <div className="hidden">
+        {selectedFee && (
+          <ReceiptTemplate 
+            ref={contentRef}
+            studentName={studentName}
+            fee={selectedFee}
+          />
+        )}
+      </div>
+
       <CardHeader className="text-left">
         <CardTitle className="text-base">Fee Details — {studentName}</CardTitle>
         <CardDescription>{fees.length} fee records</CardDescription>
@@ -87,7 +127,28 @@ export function FeeTable({ studentName, fees, onPay }: FeeTableProps) {
                             Pay Now
                           </Button>
                         ) : (
-                          <span className="text-xs text-emerald-600 dark:text-emerald-400 font-medium">✓ Done</span>
+                          <div className="flex flex-col items-center gap-1">
+                            <span className="text-[10px] text-emerald-600 dark:text-emerald-400 font-bold uppercase tracking-wider mb-1">
+                              ✓ Success
+                            </span>
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              className={`h-7 px-2 text-[10px] gap-1 font-bold transition-all ${
+                                isPremium 
+                                  ? "border-emerald-200 text-emerald-600 hover:bg-emerald-50 dark:border-emerald-800/50 dark:text-emerald-400 dark:hover:bg-emerald-900/20" 
+                                  : "border-gray-200 text-gray-400 opacity-60 cursor-not-allowed grayscale"
+                              }`}
+                              onClick={() => onPrintClick(fee)}
+                            >
+                              {isPremium ? (
+                                <Printer className="h-3 w-3" />
+                              ) : (
+                                <Lock className="h-2.5 w-2.5" />
+                              )}
+                              {isPremium ? "Receipt" : "Upgrade"}
+                            </Button>
+                          </div>
                         )}
                       </TableCell>
                     </TableRow>
