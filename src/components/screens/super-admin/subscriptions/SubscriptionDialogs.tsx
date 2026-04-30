@@ -1,3 +1,4 @@
+import { DatePicker } from "@/components/ui/date-picker";
 import {
   Dialog,
   DialogContent,
@@ -261,9 +262,10 @@ export function SubscriptionDialogs({
                     const quarterlyPrices: Record<string, number> = { basic: 0, standard: 29, premium: 79 };
                     const yearlyPrices: Record<string, number> = { basic: 0, standard: 99, premium: 249 };
                     
-                    const selectedPrice = editOpen?.period === "yearly" 
+                    const currentPeriod = editForm.period || "monthly";
+                    const selectedPrice = currentPeriod === "yearly" 
                       ? yearlyPrices[val] 
-                      : editOpen?.period === "quarterly" 
+                      : currentPeriod === "quarterly" 
                         ? quarterlyPrices[val] 
                         : monthlyPrices[val];
                         
@@ -285,6 +287,49 @@ export function SubscriptionDialogs({
                 </Select>
               </div>
               <div className="space-y-2">
+                <Label>Period</Label>
+                <Select
+                  value={editForm.period || "monthly"}
+                  onValueChange={(val) => {
+                    const monthlyPrices: Record<string, number> = { basic: 0, standard: 11, premium: 29 };
+                    const quarterlyPrices: Record<string, number> = { basic: 0, standard: 29, premium: 79 };
+                    const yearlyPrices: Record<string, number> = { basic: 0, standard: 99, premium: 249 };
+                    
+                    const currentPlanId = editForm.planName.toLowerCase().replace(" plan", "");
+                    const selectedPrice = val === "yearly" 
+                      ? yearlyPrices[currentPlanId] 
+                      : val === "quarterly" 
+                        ? quarterlyPrices[currentPlanId] 
+                        : monthlyPrices[currentPlanId];
+                        
+                    const startDate = editOpen?.startDate ? new Date(editOpen.startDate) : new Date();
+                    const newEnd = new Date(startDate);
+                    if (val === "monthly") newEnd.setMonth(newEnd.getMonth() + 1);
+                    else if (val === "quarterly") newEnd.setMonth(newEnd.getMonth() + 3);
+                    else newEnd.setFullYear(newEnd.getFullYear() + 1);
+                        
+                    setEditForm((p: any) => ({
+                      ...p,
+                      period: val,
+                      amount: selectedPrice || p.amount,
+                      endDate: newEnd.toISOString().split('T')[0],
+                    }));
+                  }}
+                >
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="monthly">Monthly</SelectItem>
+                    <SelectItem value="quarterly">Quarterly</SelectItem>
+                    <SelectItem value="yearly">Yearly</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
                 <Label>Amount (₹)</Label>
                 <Input
                   type="number"
@@ -297,8 +342,6 @@ export function SubscriptionDialogs({
                   }
                 />
               </div>
-            </div>
-            <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label>Status</Label>
                 <Select
@@ -316,6 +359,22 @@ export function SubscriptionDialogs({
                     <SelectItem value="expired">Expired</SelectItem>
                   </SelectContent>
                 </Select>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label>Expiry Date</Label>
+                <DatePicker
+                  date={editForm.endDate ? new Date(editForm.endDate) : undefined}
+                  onChange={(date) =>
+                    setEditForm((p: any) => ({
+                      ...p,
+                      endDate: date ? date.toISOString().split('T')[0] : "",
+                    }))
+                  }
+                  className="w-full h-10 rounded-xl border-gray-200 dark:border-gray-700"
+                />
               </div>
               <div className="space-y-2">
                 <Label>Auto Renew</Label>

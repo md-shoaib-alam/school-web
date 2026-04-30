@@ -68,6 +68,7 @@ export function SuperAdminSubscriptions() {
     autoRenew: true,
     paymentMethod: "",
     status: "",
+    endDate: "",
   });
 
   // -- Queries --
@@ -261,6 +262,7 @@ export function SuperAdminSubscriptions() {
       autoRenew: sub.autoRenew,
       paymentMethod: sub.paymentMethod,
       status: sub.status,
+      endDate: sub.endDate || "",
     });
     setEditDialogOpen(sub);
   };
