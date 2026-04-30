@@ -99,7 +99,11 @@ export interface StudentDashboardData {
 }
 
 export interface ParentDashboardData {
-  children: { id: string; name: string; className: string; rollNumber: string; gender: string; dateOfBirth: string }[]
+  children: { 
+    id: string; name: string; className: string; rollNumber: string; gender: string; dateOfBirth: string 
+    grades: { id: string; subjectName: string; examType: string; marks: number; maxMarks: number; grade: string; createdAt: string }[]
+    attendance: { id: string; date: string; status: string; remarks?: string }[]
+  }[]
   notices: { id: string; title: string; content: string; authorName: string; priority: string; createdAt: string; targetRole: string }[]
   fees: { id: string; studentName: string; type: string; amount: number; status: string; dueDate: string; paidAmount: number }[]
   performanceSummary: { name: string; attendanceRate: number; avgGrade: number; grade: string }[]

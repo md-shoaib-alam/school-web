@@ -28,46 +28,13 @@ export function ParentChildren() {
   const { data, isPending } = useParentDashboard(currentUser?.name || "");
 
   // Correctly handle students, grades, and attendance from GraphQL response
-  const students = (data?.children || []) as StudentInfo[];
-  const performanceSummary = data?.performanceSummary || [];
-  
-  // For specialized details not in dashboard, we still need separate data or update the dashboard query
-  // But to keep it simple and consistent with the user's request, we'll focus on the children list first.
-  // Actually, dashboard returns 'fees' but not full attendance/grades history.
-  
-  // To keep full functionality, we'll keep the separate fetches for grades/attendance but sync the student list.
-  const [extraData, setExtraData] = useState<{ grades: GradeRecord[], attendance: AttendanceRecord[] }>({ grades: [], attendance: [] });
+  const students = data?.children || [];
 
   useEffect(() => {
     if (students.length > 0 && !activeTab) {
       setActiveTab(students[0].id);
     }
   }, [students, activeTab]);
-
-  useEffect(() => {
-    async function fetchDetails() {
-      if (students.length === 0) return;
-      try {
-        const [gradesRes, attendanceRes] = await Promise.all([
-          apiFetch("/api/grades"),
-          apiFetch("/api/attendance"),
-        ]);
-        const rawGrades = await gradesRes.json();
-        const rawAttendance = await attendanceRes.json();
-        
-        setExtraData({
-          grades: Array.isArray(rawGrades) ? rawGrades : (rawGrades.items || []),
-          attendance: Array.isArray(rawAttendance) ? rawAttendance : (rawAttendance.items || [])
-        });
-      } catch (e) {
-        console.error("Failed to fetch details", e);
-      }
-    }
-    fetchDetails();
-  }, [students.length]);
-
-  const grades = extraData.grades;
-  const attendance = extraData.attendance;
 
   if (isPending) return <ChildrenSkeleton />;
 
@@ -109,10 +76,10 @@ export function ParentChildren() {
         </TabsList>
 
         {students.map((student) => {
-          const att = getAttendanceForStudent(student.id, attendance);
-          const subjectPerf = getSubjectPerformance(student.id, grades);
-          const overall = getOverallAvg(student.id, grades);
-          const recentGrades = getGradesForStudent(student.id, grades).slice(0, 8);
+          const att = getAttendanceForStudent(student.id, student.attendance || []);
+          const subjectPerf = getSubjectPerformance(student.id, student.grades || []);
+          const overall = getOverallAvg(student.id, student.grades || []);
+          const recentGrades = (student.grades || []).slice(0, 8);
 
           return (
             <TabsContent
