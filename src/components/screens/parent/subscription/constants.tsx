@@ -1,15 +1,18 @@
 import React from "react";
-import { BookOpen, Star, Crown, Zap, Gift } from "lucide-react";
-import { Plan, Addon } from "./types";
+import { BookOpen, Star, Crown } from "lucide-react";
+import { Plan } from "./types";
 
 export const PLANS: Plan[] = [
   {
     id: "basic",
     name: "Basic",
-    price: 0,
-    period: "Forever Free",
     description: "Essential access to track your child's progress",
     icon: <BookOpen className="h-6 w-6" />,
+    pricing: {
+      monthly: { price: 0 },
+      quarterly: { price: 0 },
+      yearly: { price: 0 },
+    },
     features: [
       { text: "View child's grades & reports", included: true },
       { text: "Basic attendance overview", included: true },
@@ -24,14 +27,16 @@ export const PLANS: Plan[] = [
   {
     id: "standard",
     name: "Standard",
-    price: 299,
-    originalPrice: 499,
-    period: "per year",
     description: "Complete visibility into your child's academics",
     badge: "Most Popular",
     badgeColor: "bg-amber-500",
     popular: true,
     icon: <Star className="h-6 w-6" />,
+    pricing: {
+      monthly: { price: 11, originalPrice: 19 },
+      quarterly: { price: 29, originalPrice: 37 },
+      yearly: { price: 99, originalPrice: 199 },
+    },
     features: [
       { text: "View child's grades & reports", included: true },
       { text: "Detailed attendance with trends", included: true },
@@ -46,13 +51,15 @@ export const PLANS: Plan[] = [
   {
     id: "premium",
     name: "Premium",
-    price: 599,
-    originalPrice: 999,
-    period: "per year",
     description: "The ultimate parental engagement experience",
     badge: "Best Value",
     badgeColor: "bg-emerald-500",
     icon: <Crown className="h-6 w-6" />,
+    pricing: {
+      monthly: { price: 29, originalPrice: 49 },
+      quarterly: { price: 79, originalPrice: 102 },
+      yearly: { price: 249, originalPrice: 499 },
+    },
     features: [
       { text: "View child's grades & reports", included: true },
       { text: "Detailed attendance with AI insights", included: true },
@@ -66,31 +73,3 @@ export const PLANS: Plan[] = [
   },
 ];
 
-export const ADDONS: Addon[] = [
-  {
-    id: "transport",
-    name: "Live Bus Tracking",
-    price: 99,
-    period: "per year",
-    description: "Track school bus in real-time",
-    icon: <Zap className="h-5 w-5" />,
-    features: [
-      "Real-time GPS tracking",
-      "ETA notifications",
-      "Geofence alerts",
-    ],
-  },
-  {
-    id: "meals",
-    name: "Meal Plan",
-    price: 149,
-    period: "per month",
-    description: "Healthy meals for your child",
-    icon: <Gift className="h-5 w-5" />,
-    features: [
-      "Daily lunch included",
-      "Nutritional reports",
-      "Special diet options",
-    ],
-  },
-];

@@ -3,26 +3,19 @@ import React from "react";
 export interface Plan {
   id: string;
   name: string;
-  price: number;
-  originalPrice?: number;
-  period: string;
   description: string;
+  icon: React.ReactNode;
   badge?: string;
   badgeColor?: string;
   popular?: boolean;
-  icon: React.ReactNode;
+  pricing: {
+    monthly: { price: number; originalPrice?: number };
+    quarterly: { price: number; originalPrice?: number };
+    yearly: { price: number; originalPrice?: number };
+  };
   features: { text: string; included: boolean }[];
 }
 
-export interface Addon {
-  id: string;
-  name: string;
-  price: number;
-  period: string;
-  description: string;
-  icon: React.ReactNode;
-  features: string[];
-}
 
 export interface SubscriptionRecord {
   id: string;

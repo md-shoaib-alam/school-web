@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { apiFetch } from "@/lib/api";
 import {
   Card,
@@ -19,15 +19,19 @@ import { goeyToast as toast } from "goey-toast";
 import { useAppStore } from "@/store/use-app-store";
 
 // Sub-components
+import {
+  Tabs,
+  TabsList,
+  TabsTrigger,
+} from "@/components/ui/tabs";
 import { PlanCard } from "./subscription/PlanCard";
-import { AddonCard } from "./subscription/AddonCard";
 import { HistoryTable } from "./subscription/HistoryTable";
 import { PurchaseDialog } from "./subscription/PurchaseDialog";
 import { CurrentPlanBanner } from "./subscription/CurrentPlanBanner";
 
 // Types & Constants
-import { Plan, Addon, SubscriptionRecord } from "./subscription/types";
-import { PLANS, ADDONS } from "./subscription/constants";
+import { Plan, SubscriptionRecord } from "./subscription/types";
+import { PLANS } from "./subscription/constants";
 
 export function ParentSubscription() {
   const { currentUser } = useAppStore();
@@ -35,12 +39,29 @@ export function ParentSubscription() {
   const [parentId, setParentId] = useState<string | null>(null);
   const [activeSubscription, setActiveSubscription] = useState<SubscriptionRecord | null>(null);
   const [allSubscriptions, setAllSubscriptions] = useState<SubscriptionRecord[]>([]);
+  const [billingCycle, setBillingCycle] = useState<"monthly" | "quarterly" | "yearly">("quarterly");
   
   // Dialog States
   const [purchaseDialogOpen, setPurchaseDialogOpen] = useState(false);
   const [purchasingPlan, setPurchasingPlan] = useState<Plan | null>(null);
   const [processing, setProcessing] = useState(false);
-  const [addonLoading, setAddonLoading] = useState<string | null>(null);
+  const carouselRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!loading && carouselRef.current && typeof window !== "undefined" && window.innerWidth < 768) {
+      const container = carouselRef.current;
+      // Use a small timeout to ensure layout is calculated
+      const timer = setTimeout(() => {
+        const secondCard = container.children[1] as HTMLElement;
+        if (secondCard) {
+          const scrollAmount = secondCard.offsetLeft - (container.offsetWidth / 2) + (secondCard.offsetWidth / 2);
+          container.scrollLeft = scrollAmount;
+        }
+      }, 50);
+      return () => clearTimeout(timer);
+    }
+  }, [loading]);
+
 
   const fetchSubscriptions = useCallback(async () => {
     try {
@@ -62,7 +83,7 @@ export function ParentSubscription() {
   }, [fetchSubscriptions]);
 
   const handlePurchase = (plan: Plan) => {
-    if (plan.price === 0) {
+    if (plan.id === "basic") {
       if (activeSubscription) {
         handleCancelSubscription(activeSubscription.id);
       }
@@ -84,8 +105,8 @@ export function ParentSubscription() {
           parentId,
           planId: purchasingPlan.id,
           planName: purchasingPlan.name,
-          amount: purchasingPlan.price,
-          period: purchasingPlan.period === "per year" ? "yearly" : "monthly",
+          amount: purchasingPlan.pricing[billingCycle].price,
+          period: billingCycle,
           addons: [],
         }),
       });
@@ -116,41 +137,8 @@ export function ParentSubscription() {
     }
   };
 
-  const handleAddonChange = async (addon: Addon) => {
-    if (!parentId) return;
-    setAddonLoading(addon.id);
-    try {
-      const res = await apiFetch("/api/subscriptions", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          action: "add-addon",
-          parentId,
-          addonName: addon.name,
-          addonPrice: addon.price,
-        }),
-      });
-      if (!res.ok) {
-        const err = await res.json();
-        if (err.error === "No active subscription") {
-          toast.error("Please subscribe to a paid plan first to add add-ons.");
-          return;
-        }
-        throw new Error("Failed to add addon");
-      }
-      toast.success(`${addon.name} added to your subscription!`);
-      await fetchSubscriptions();
-    } catch {
-      toast.error("Failed to add addon. Please try again.");
-    } finally {
-      setAddonLoading(null);
-    }
-  };
 
   const currentPlanId = activeSubscription?.planId || "basic";
-  const activeAddons: string[] = activeSubscription
-    ? JSON.parse(activeSubscription.addons || "[]")
-    : [];
 
   if (loading) {
     return (
@@ -164,56 +152,77 @@ export function ParentSubscription() {
   return (
     <div className="space-y-8 pb-12">
       {/* Header */}
-      <div className="text-center max-w-2xl mx-auto">
-        <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-amber-400 to-orange-500 text-white mb-4 shadow-lg shadow-amber-200 dark:shadow-amber-900/30">
-          <Crown className="h-8 w-8" />
+      <div className="text-center max-w-2xl mx-auto px-4">
+        <div className="inline-flex items-center justify-center w-12 h-12 sm:w-16 sm:h-16 rounded-2xl bg-gradient-to-br from-amber-400 to-orange-500 text-white mb-4 shadow-lg shadow-amber-200 dark:shadow-amber-900/30">
+          <Crown className="h-6 w-6 sm:h-8 sm:w-8" />
         </div>
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Subscription Plans</h2>
-        <p className="text-gray-500 dark:text-gray-400 mt-2">
+        <h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-gray-100">Subscription Plans</h2>
+        <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">
           Choose the plan that works best for you. Upgrade or downgrade anytime.
         </p>
       </div>
 
       {/* Current Plan Banner */}
       {activeSubscription && currentPlanId !== "basic" && (
-        <CurrentPlanBanner 
-          subscription={activeSubscription} 
-          onCancel={handleCancelSubscription} 
-        />
+        <div className="px-4">
+          <CurrentPlanBanner 
+            subscription={activeSubscription} 
+            onCancel={handleCancelSubscription} 
+          />
+        </div>
       )}
 
+      {/* Cycle Switcher */}
+      <div className="flex justify-center px-4">
+        <Tabs 
+          value={billingCycle} 
+          onValueChange={(v) => setBillingCycle(v as any)} 
+          className="bg-gray-100 dark:bg-gray-800 p-1 rounded-2xl border border-gray-200 dark:border-gray-700 shadow-sm w-full max-w-md"
+        >
+          <TabsList className="bg-transparent h-10 sm:h-12 flex w-full gap-1 p-0">
+            <TabsTrigger 
+              value="monthly" 
+              className="flex-1 rounded-xl data-[state=active]:bg-white dark:data-[state=active]:bg-gray-900 data-[state=active]:shadow-sm data-[state=active]:text-amber-600 transition-all font-semibold text-xs sm:text-sm"
+            >
+              Monthly
+            </TabsTrigger>
+            <TabsTrigger 
+              value="quarterly" 
+              className="flex-1 rounded-xl data-[state=active]:bg-white dark:data-[state=active]:bg-gray-900 data-[state=active]:shadow-sm data-[state=active]:text-amber-600 transition-all font-semibold text-xs sm:text-sm"
+            >
+              Quarterly <span className="hidden sm:inline ml-1.5 text-[10px] bg-emerald-100 text-emerald-700 px-1.5 py-0.5 rounded-full">Save 23%</span>
+            </TabsTrigger>
+            <TabsTrigger 
+              value="yearly" 
+              className="flex-1 rounded-xl data-[state=active]:bg-white dark:data-[state=active]:bg-gray-900 data-[state=active]:shadow-sm data-[state=active]:text-amber-600 transition-all font-semibold text-xs sm:text-sm"
+            >
+              Yearly <span className="hidden sm:inline ml-1.5 text-[10px] bg-emerald-100 text-emerald-700 px-1.5 py-0.5 rounded-full">Save 50%</span>
+            </TabsTrigger>
+          </TabsList>
+        </Tabs>
+      </div>
+
       {/* Plan Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div 
+        ref={carouselRef}
+        className="flex md:grid md:grid-cols-3 gap-4 sm:gap-6 px-4 pt-4 overflow-x-auto pb-6 scrollbar-hide snap-x snap-mandatory"
+      >
         {PLANS.map((plan) => (
-          <PlanCard
-            key={plan.id}
-            plan={plan}
-            isActive={currentPlanId === plan.id}
-            onPurchase={handlePurchase}
-          />
+          <div 
+            key={plan.id} 
+            id={`plan-${plan.id}`}
+            className="min-w-[85%] sm:min-w-0 snap-center"
+          >
+            <PlanCard
+              plan={plan}
+              isActive={currentPlanId === plan.id}
+              cycle={billingCycle}
+              onPurchase={handlePurchase}
+            />
+          </div>
         ))}
       </div>
 
-      {/* Add-ons */}
-      <div className="pt-4">
-        <div className="text-center mb-6">
-          <h3 className="text-xl font-bold text-gray-900 dark:text-gray-100">Boost Your Plan</h3>
-          <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-            Add extra features to any subscription
-          </p>
-        </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-2xl mx-auto">
-          {ADDONS.map((addon) => (
-            <AddonCard
-              key={addon.id}
-              addon={addon}
-              isAdded={activeAddons.includes(addon.name)}
-              isLoading={addonLoading === addon.id}
-              onAdd={handleAddonChange}
-            />
-          ))}
-        </div>
-      </div>
 
       {/* Trust Badges */}
       <div className="flex flex-wrap justify-center gap-6 py-4 text-sm text-gray-400 dark:text-gray-500 border-y border-gray-100 dark:border-gray-800">

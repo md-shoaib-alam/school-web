@@ -10,11 +10,21 @@ import { Plan } from "./types";
 interface PlanCardProps {
   plan: Plan;
   isActive: boolean;
+  cycle: "monthly" | "quarterly" | "yearly";
   onPurchase: (plan: Plan) => void;
 }
 
-export function PlanCard({ plan, isActive, onPurchase }: PlanCardProps) {
+export function PlanCard({ plan, isActive, cycle, onPurchase }: PlanCardProps) {
   const isPopular = plan.popular;
+  const currentPricing = plan.pricing[cycle];
+  const price = currentPricing.price;
+  const originalPrice = currentPricing.originalPrice;
+
+  const cycleLabels = {
+    monthly: "per month",
+    quarterly: "per quarter",
+    yearly: "per year"
+  };
 
   return (
     <Card
@@ -36,10 +46,10 @@ export function PlanCard({ plan, isActive, onPurchase }: PlanCardProps) {
         </div>
       )}
 
-      <CardHeader className={`pt-8 ${isPopular ? "pb-2" : ""}`}>
+      <CardHeader className={`pt-6 sm:pt-8 ${isPopular ? "pb-2" : ""}`}>
         <div className="flex items-center justify-between">
           <div
-            className={`h-12 w-12 rounded-xl flex items-center justify-center ${
+            className={`h-10 w-10 sm:h-12 sm:w-12 rounded-xl flex items-center justify-center ${
               isPopular
                 ? "bg-amber-100 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400"
                 : isActive
@@ -50,45 +60,45 @@ export function PlanCard({ plan, isActive, onPurchase }: PlanCardProps) {
             {plan.icon}
           </div>
           {isActive && (
-            <Badge className="bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 text-xs border-emerald-200 dark:border-emerald-800 shadow-none">
+            <Badge className="bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 text-[10px] sm:text-xs border-emerald-200 dark:border-emerald-800 shadow-none">
               <CheckCircle2 className="h-3 w-3 mr-1" /> Active
             </Badge>
           )}
         </div>
-        <div className="mt-4">
-          <CardTitle className="text-xl">{plan.name}</CardTitle>
-          <CardDescription className="mt-1">
+        <div className="mt-3 sm:mt-4">
+          <CardTitle className="text-lg sm:text-xl">{plan.name}</CardTitle>
+          <CardDescription className="mt-1 text-xs sm:text-sm line-clamp-1 sm:line-clamp-none">
             {plan.description}
           </CardDescription>
         </div>
-        <div className="mt-4 flex items-baseline gap-1">
-          {plan.price === 0 ? (
-            <span className="text-3xl font-bold text-gray-900 dark:text-gray-100">
+        <div className="mt-3 sm:mt-4 flex items-baseline gap-1">
+          {price === 0 ? (
+            <span className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-gray-100">
               Free
             </span>
           ) : (
             <>
-              <span className="text-3xl font-bold text-gray-900 dark:text-gray-100">
-                ₹{plan.price}
+              <span className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-gray-100">
+                ₹{price}
               </span>
-              {plan.originalPrice && (
-                <span className="text-sm text-gray-400 dark:text-gray-500 line-through ml-2">
-                  ₹{plan.originalPrice}
+              {originalPrice && (
+                <span className="text-xs sm:text-sm text-gray-400 dark:text-gray-500 line-through ml-1 sm:ml-2">
+                  ₹{originalPrice}
                 </span>
               )}
             </>
           )}
-          {plan.period !== "Forever Free" && (
-            <span className="text-sm text-gray-500 dark:text-gray-400 ml-1">
-              / {plan.period}
+          {price !== 0 && (
+            <span className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 ml-1">
+              / {cycleLabels[cycle]}
             </span>
           )}
         </div>
-        {plan.originalPrice && (
-          <Badge className="mt-2 bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-400 border-red-200 dark:border-red-800 text-xs shadow-none">
+        {originalPrice && price > 0 && (
+          <Badge className="mt-2 bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-400 border-red-200 dark:border-red-800 text-[10px] sm:text-xs shadow-none">
             Save{" "}
             {Math.round(
-              ((plan.originalPrice - plan.price) / plan.originalPrice) *
+              ((originalPrice - price) / originalPrice) *
                 100,
             )}
             %
@@ -96,50 +106,52 @@ export function PlanCard({ plan, isActive, onPurchase }: PlanCardProps) {
         )}
       </CardHeader>
 
-      <CardContent className="pt-0">
+      <CardContent className="pt-0 pb-6 sm:pb-8">
         <Button
-          className={`w-full h-11 text-sm font-semibold rounded-xl mt-2 ${
+          className={`w-full h-10 sm:h-11 text-xs sm:text-sm font-semibold rounded-xl mt-2 ${
             isActive
               ? "bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 hover:bg-emerald-200 dark:hover:bg-emerald-900/50"
               : isPopular
                 ? "bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white shadow-md"
-                : "bg-gray-900 dark:bg-gray-100 hover:bg-gray-800 dark:hover:bg-gray-200 text-white dark:text-gray-900"
+                : plan.id === "premium"
+                  ? "bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white shadow-md"
+                  : "bg-gray-900 dark:bg-gray-100 hover:bg-gray-800 dark:hover:bg-gray-200 text-white dark:text-gray-900"
           }`}
-          onClick={() => (isActive ? null : onPurchase(plan))}
+          onClick={() => (isActive ? null : onPurchase({ ...plan, price } as any))}
           disabled={isActive}
         >
           {isActive ? (
             <>
-              <CheckCircle2 className="h-4 w-4 mr-2" /> Current Plan
+              <CheckCircle2 className="h-3 w-3 sm:h-4 sm:w-4 mr-2" /> Current Plan
             </>
-          ) : plan.price === 0 ? (
+          ) : price === 0 ? (
             "Switch to Free"
           ) : (
             <>
-              Get {plan.name} <ArrowRight className="h-4 w-4 ml-2" />
+              Get {plan.name} <ArrowRight className="h-3 w-3 sm:h-4 sm:w-4 ml-2" />
             </>
           )}
         </Button>
 
-        <Separator className="my-5" />
+        <Separator className="my-4 sm:my-5" />
 
-        <div className="space-y-3">
-          <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+        <div className="space-y-2 sm:space-y-3">
+          <p className="text-[10px] sm:text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
             What&apos;s included
           </p>
           {plan.features.map((feature, idx) => (
-            <div key={idx} className="flex items-start gap-2.5">
+            <div key={idx} className="flex items-start gap-2 sm:gap-2.5">
               {feature.included ? (
-                <div className="h-5 w-5 rounded-full bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0 mt-0.5">
-                  <Check className="h-3 w-3" />
+                <div className="h-4 w-4 sm:h-5 sm:w-5 rounded-full bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0 mt-0.5">
+                  <Check className="h-2.5 w-2.5 sm:h-3 sm:w-3" />
                 </div>
               ) : (
-                <div className="h-5 w-5 rounded-full bg-gray-100 dark:bg-gray-800 text-gray-400 dark:text-gray-500 flex items-center justify-center shrink-0 mt-0.5">
-                  <span className="text-xs">✕</span>
+                <div className="h-4 w-4 sm:h-5 sm:w-5 rounded-full bg-gray-100 dark:bg-gray-800 text-gray-400 dark:text-gray-500 flex items-center justify-center shrink-0 mt-0.5">
+                  <span className="text-[10px]">✕</span>
                 </div>
               )}
               <span
-                className={`text-sm ${feature.included ? "text-gray-700 dark:text-gray-300" : "text-gray-400 dark:text-gray-500"}`}
+                className={`text-[11px] sm:text-sm ${feature.included ? "text-gray-700 dark:text-gray-300" : "text-gray-400 dark:text-gray-500"}`}
               >
                 {feature.text}
               </span>

@@ -120,18 +120,30 @@ export function SubscriptionDialogs({
                 <Label>Plan Type</Label>
                 <Select
                   value={createForm.planId}
-                  onValueChange={(val) =>
+                  onValueChange={(val) => {
+                    const monthlyPrices: Record<string, number> = { basic: 0, standard: 11, premium: 29 };
+                    const quarterlyPrices: Record<string, number> = { basic: 0, standard: 29, premium: 79 };
+                    const yearlyPrices: Record<string, number> = { basic: 0, standard: 99, premium: 249 };
+                    
+                    const selectedPrice = createForm.period === "yearly" 
+                      ? yearlyPrices[val] 
+                      : createForm.period === "quarterly" 
+                        ? quarterlyPrices[val] 
+                        : monthlyPrices[val];
+                        
                     setCreateForm((p: any) => ({
                       ...p,
                       planId: val,
                       planName: val.charAt(0).toUpperCase() + val.slice(1),
-                    }))
-                  }
+                      amount: selectedPrice || 0,
+                    }));
+                  }}
                 >
                   <SelectTrigger>
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
+                    <SelectItem value="basic">Basic</SelectItem>
                     <SelectItem value="standard">Standard</SelectItem>
                     <SelectItem value="premium">Premium</SelectItem>
                   </SelectContent>
@@ -141,15 +153,30 @@ export function SubscriptionDialogs({
                 <Label>Period</Label>
                 <Select
                   value={createForm.period}
-                  onValueChange={(val) =>
-                    setCreateForm((p: any) => ({ ...p, period: val }))
-                  }
+                  onValueChange={(val) => {
+                    const monthlyPrices: Record<string, number> = { basic: 0, standard: 11, premium: 29 };
+                    const quarterlyPrices: Record<string, number> = { basic: 0, standard: 29, premium: 79 };
+                    const yearlyPrices: Record<string, number> = { basic: 0, standard: 99, premium: 249 };
+                    
+                    const selectedPrice = val === "yearly" 
+                      ? yearlyPrices[createForm.planId] 
+                      : val === "quarterly" 
+                        ? quarterlyPrices[createForm.planId] 
+                        : monthlyPrices[createForm.planId];
+                        
+                    setCreateForm((p: any) => ({ 
+                      ...p, 
+                      period: val,
+                      amount: selectedPrice || p.amount 
+                    }));
+                  }}
                 >
                   <SelectTrigger>
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="monthly">Monthly</SelectItem>
+                    <SelectItem value="quarterly">Quarterly</SelectItem>
                     <SelectItem value="yearly">Yearly</SelectItem>
                   </SelectContent>
                 </Select>
@@ -227,12 +254,35 @@ export function SubscriptionDialogs({
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label>Plan Name</Label>
-                <Input
-                  value={editForm.planName}
-                  onChange={(e) =>
-                    setEditForm((p: any) => ({ ...p, planName: e.target.value }))
-                  }
-                />
+                <Select
+                  value={editForm.planName.toLowerCase().replace(" plan", "")}
+                  onValueChange={(val) => {
+                    const monthlyPrices: Record<string, number> = { basic: 0, standard: 11, premium: 29 };
+                    const quarterlyPrices: Record<string, number> = { basic: 0, standard: 29, premium: 79 };
+                    const yearlyPrices: Record<string, number> = { basic: 0, standard: 99, premium: 249 };
+                    
+                    const selectedPrice = editOpen?.period === "yearly" 
+                      ? yearlyPrices[val] 
+                      : editOpen?.period === "quarterly" 
+                        ? quarterlyPrices[val] 
+                        : monthlyPrices[val];
+                        
+                    setEditForm((p: any) => ({
+                      ...p,
+                      planName: val.charAt(0).toUpperCase() + val.slice(1) + " Plan",
+                      amount: selectedPrice || 0,
+                    }));
+                  }}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select Plan" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="basic">Basic Plan</SelectItem>
+                    <SelectItem value="standard">Standard Plan</SelectItem>
+                    <SelectItem value="premium">Premium Plan</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
               <div className="space-y-2">
                 <Label>Amount (₹)</Label>
