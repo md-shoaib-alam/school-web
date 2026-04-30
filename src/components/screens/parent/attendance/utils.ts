@@ -22,12 +22,15 @@ export function getMonthlyData(records: AttendanceRecord[]) {
   for (let i = 5; i >= 0; i--) {
     const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
     const monthLabel = d.toLocaleString("en-US", { month: "short" });
+    const targetYear = d.getFullYear();
+    const targetMonth = d.getMonth();
+
     const monthRecords = records.filter((r) => {
-      const rd = new Date(r.date);
-      return (
-        rd.getFullYear() === d.getFullYear() && rd.getMonth() === d.getMonth()
-      );
+      // Split YYYY-MM-DD to avoid timezone shifts
+      const [ry, rm] = r.date.split("-").map(Number);
+      return ry === targetYear && rm === targetMonth + 1;
     });
+
     months.push({
       month: monthLabel,
       present: monthRecords.filter((r) => r.status === "present").length,
@@ -49,16 +52,15 @@ export function getCalendarData(records: AttendanceRecord[], baseDate = new Date
   const firstDay = new Date(year, month, 1);
   const lastDay = new Date(year, month + 1, 0);
   const numDays = lastDay.getDate();
-  const startDay = firstDay.getDay(); // 0 = Sunday, 1 = Monday, ...
+  const startDay = firstDay.getDay();
 
-  // Padding for start of month (assuming Monday start for UI, but let's stick to Sunday start for standard grid)
   for (let i = 0; i < startDay; i++) {
     days.push({ date: null, day: null, status: null });
   }
 
   for (let i = 1; i <= numDays; i++) {
     const d = new Date(year, month, i);
-    const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(i).padStart(2, '0')}`;
+    const dateStr = `${year}-${String(month + 1).padStart(2, "0")}-${String(i).padStart(2, "0")}`;
     const dayOfWeek = d.getDay();
     days.push({
       date: i,

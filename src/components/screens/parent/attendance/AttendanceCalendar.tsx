@@ -16,79 +16,66 @@ export function AttendanceCalendar({ data, isPremium, onPrev, onNext, currentPer
   const weekDays = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
   return (
-    <Card className="rounded-xl shadow-sm shadow-none overflow-hidden border-none bg-white/50 dark:bg-gray-900/50 backdrop-blur-sm">
-      <CardHeader className="p-4 pb-2">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          <div className="text-left">
-            <div className="flex items-center gap-2">
-              <div className="w-8 h-8 bg-amber-100 dark:bg-amber-900/30 rounded-lg flex items-center justify-center">
-                <Calendar className="h-4 w-4 text-amber-600" />
-              </div>
-              <div>
-                <CardTitle className="text-sm font-bold text-gray-900 dark:text-gray-100">
-                  Attendance Calendar
-                </CardTitle>
-                <CardDescription className="text-[10px] font-medium text-amber-600 dark:text-amber-400 uppercase tracking-wider">
-                  {currentPeriod || "Current Month"}
-                </CardDescription>
-              </div>
+    <Card className="rounded-xl shadow-sm overflow-hidden border-none bg-white/50 dark:bg-gray-900/50 backdrop-blur-sm">
+      <CardHeader className="p-3 sm:p-4 pb-2">
+        <div className="flex flex-row items-center justify-between gap-2">
+          <div className="flex items-center gap-2 sm:gap-3">
+            <div className="w-8 h-8 sm:w-10 sm:h-10 bg-amber-100 dark:bg-amber-900/30 rounded-xl flex items-center justify-center border border-amber-500/20">
+              <Calendar className="h-4 w-4 sm:h-5 sm:w-5 text-amber-600" />
+            </div>
+            <div>
+              <CardTitle className="text-xs sm:text-sm font-bold text-gray-900 dark:text-gray-100">
+                Calendar
+              </CardTitle>
+              <CardDescription className="text-[9px] sm:text-[10px] font-bold text-amber-600 dark:text-amber-400 uppercase tracking-widest">
+                {currentPeriod || "Current"}
+              </CardDescription>
             </div>
           </div>
 
-          <div className="flex items-center gap-1.5 bg-gray-100/80 dark:bg-gray-800/80 p-1 rounded-xl self-start sm:self-center border border-gray-200/50 dark:border-gray-700/50">
+          <div className="flex items-center gap-1 bg-gray-100/80 dark:bg-gray-800/80 p-0.5 sm:p-1 rounded-xl border border-gray-200/50 dark:border-gray-700/50">
             <button
               onClick={onPrev}
-              className={`p-1.5 rounded-lg transition-all ${isPremium ? "hover:bg-white dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200 shadow-sm" : "opacity-30 cursor-not-allowed text-gray-400"}`}
-              title={isPremium ? "Previous Month" : "Premium Only"}
+              className={`p-1 sm:p-1.5 rounded-lg transition-all ${isPremium ? "hover:bg-white dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200 shadow-sm" : "opacity-30 cursor-not-allowed text-gray-400"}`}
+              title={isPremium ? "Previous" : "Premium Only"}
             >
-              <ChevronLeft className="h-4 w-4" />
+              <ChevronLeft className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
             </button>
-            <div className="px-2.5 text-[9px] font-bold uppercase tracking-[0.1em] text-gray-500 dark:text-gray-400 flex items-center gap-1">
-              {!isPremium && <Lock className="h-2.5 w-2.5" />}
+            <div className="px-1 sm:px-2 text-[8px] sm:text-[9px] font-black uppercase tracking-tighter sm:tracking-widest text-gray-400 dark:text-gray-500 flex items-center gap-0.5">
+              {!isPremium && <Lock className="h-2 w-2" />}
               <span>History</span>
             </div>
             <button
               onClick={onNext}
-              className={`p-1.5 rounded-lg transition-all ${isPremium ? "hover:bg-white dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200 shadow-sm" : "opacity-30 cursor-not-allowed text-gray-400"}`}
-              title={isPremium ? "Next Month" : "Premium Only"}
+              className={`p-1 sm:p-1.5 rounded-lg transition-all ${isPremium ? "hover:bg-white dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200 shadow-sm" : "opacity-30 cursor-not-allowed text-gray-400"}`}
+              title={isPremium ? "Next" : "Premium Only"}
             >
-              <ChevronRight className="h-4 w-4" />
+              <ChevronRight className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
             </button>
           </div>
         </div>
       </CardHeader>
-      <CardContent className="p-4">
-        {/* Weekday headers */}
-        <div className="grid grid-cols-7 gap-1 mb-2">
+      <CardContent className="p-2 sm:p-4">
+        <div className="grid grid-cols-7 gap-1 mb-1.5">
           {weekDays.map((day) => (
-            <div key={day} className="text-center text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase py-1">
+            <div key={day} className="text-center text-[9px] sm:text-[10px] font-bold text-gray-400 dark:text-gray-600 uppercase py-1">
               {day}
             </div>
           ))}
         </div>
 
-        {/* Calendar grid */}
         <div className="grid grid-cols-7 gap-1">
           {data.map((day, i) => (
             <div
               key={i}
-              className={`flex flex-col items-center justify-center rounded-lg min-h-[44px] transition-all duration-200 ${
+              className={`flex flex-col items-center justify-center rounded-lg min-h-[36px] sm:min-h-[44px] transition-all duration-200 ${
                 day.date 
                   ? `${getCalendarCellColor(day.status)} shadow-sm hover:scale-[1.02]` 
                   : "bg-transparent opacity-0"
               }`}
-              title={
-                day.date 
-                  ? (day.status
-                      ? day.status.charAt(0).toUpperCase() + day.status.slice(1)
-                      : day.day === "S" || day.day === "S"
-                        ? "Weekend"
-                        : "No data")
-                  : ""
-              }
             >
               {day.date && (
-                <span className="text-xs font-bold">
+                <span className="text-[10px] sm:text-xs font-bold">
                   {day.date}
                 </span>
               )}
@@ -96,19 +83,18 @@ export function AttendanceCalendar({ data, isPremium, onPrev, onNext, currentPer
           ))}
         </div>
 
-        {/* Legend */}
-        <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-2 mt-6 pt-4 border-t border-gray-100 dark:border-gray-800">
+        <div className="flex flex-wrap items-center justify-center gap-x-3 gap-y-1.5 mt-4 pt-3 border-t border-gray-100 dark:border-gray-800">
           {[
             { label: "Present", color: "bg-emerald-500" },
             { label: "Absent", color: "bg-red-500" },
             { label: "Late", color: "bg-amber-500" },
-            { label: "Holiday", color: "bg-gray-200 dark:bg-gray-700" },
+            { label: "Off", color: "bg-gray-200 dark:bg-gray-800" },
           ].map((item) => (
             <div
               key={item.label}
-              className="flex items-center gap-1.5 text-[10px] font-semibold text-gray-500 uppercase tracking-wide"
+              className="flex items-center gap-1 text-[8px] sm:text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-tighter sm:tracking-wide"
             >
-              <div className={`w-2.5 h-2.5 rounded-full ${item.color} shadow-sm`} />
+              <div className={`w-2 h-2 rounded-full ${item.color}`} />
               {item.label}
             </div>
           ))}
