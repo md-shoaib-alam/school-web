@@ -4,6 +4,7 @@
 import { apiFetch } from "@/lib/api";
 import { useState, useEffect, useMemo, useCallback } from "react";
 import { useAppStore } from "@/store/use-app-store";
+import { useParentDashboard } from "@/lib/graphql/hooks";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -56,28 +57,12 @@ function formatTime(time: string): string {
 
 export function ParentTimetable() {
   const { currentUser } = useAppStore();
-  const [loading, setLoading] = useState(true);
-  const [children, setChildren] = useState<StudentInfo[]>([]);
+  const { data: parentData, isLoading: parentLoading } = useParentDashboard(currentUser?.name || "");
   const [selectedChildId, setSelectedChildId] = useState<string>("");
   const [timetable, setTimetable] = useState<TimetableSlot[]>([]);
   const [selectedDay, setSelectedDay] = useState("monday");
 
-  const fetchChildren = useCallback(async () => {
-    try {
-      const res = await apiFetch("/api/students");
-      const data = await res.json();
-      const parentKids = Array.isArray(data)
-        ? data.filter((s: StudentInfo) => s.parentName === currentUser?.name)
-        : [];
-      setChildren(parentKids);
-      if (parentKids.length > 0) {
-        setSelectedChildId(parentKids[0].id);
-      }
-      return parentKids;
-    } catch {
-      return [];
-    }
-  }, [currentUser?.name]);
+  const children = parentData?.children ?? [];
 
   const fetchTimetable = useCallback(async (classId: string) => {
     if (!classId) return;
@@ -91,22 +76,16 @@ export function ParentTimetable() {
   }, []);
 
   useEffect(() => {
-    async function init() {
-      setLoading(true);
-      const kids = await fetchChildren();
-      if (kids.length > 0) {
-        await fetchTimetable(kids[0].classId);
-      }
-      setLoading(false);
+    if (children.length > 0 && !selectedChildId) {
+      setSelectedChildId(children[0].id);
     }
-    init();
-  }, [fetchChildren, fetchTimetable]);
+  }, [children, selectedChildId]);
 
   useEffect(() => {
-    if (!selectedChildId || loading) return;
+    if (!selectedChildId || parentLoading) return;
     const child = children.find((c) => c.id === selectedChildId);
     if (child) fetchTimetable(child.classId);
-  }, [selectedChildId, children, fetchTimetable, loading]);
+  }, [selectedChildId, children, fetchTimetable, parentLoading]);
 
   const subjectColorMap = useMemo(() => {
     const map: Record<string, string> = {};
@@ -150,7 +129,7 @@ export function ParentTimetable() {
     [timeSlots, selectedDay, slotLookup],
   );
 
-  if (loading) {
+  if (parentLoading) {
     return (
       <div className="space-y-6">
         <Skeleton className="h-7 w-40" />

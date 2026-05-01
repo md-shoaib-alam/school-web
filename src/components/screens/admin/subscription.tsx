@@ -37,6 +37,9 @@ export function SchoolSubscriptionScreen() {
   const { currentTenantId } = useAppStore();
   const { data: detailData, isLoading } = useTenantDetail(currentTenantId || "");
 
+  const [isUpgradeOpen, setIsUpgradeOpen] = useState(false);
+  const [isAutoPay, setIsAutoPay] = useState(true);
+
   if (isLoading) {
     return <div className="p-8 text-center">Loading subscription details...</div>;
   }
@@ -82,8 +85,6 @@ export function SchoolSubscriptionScreen() {
     },
   ];
 
-  const [isUpgradeOpen, setIsUpgradeOpen] = useState(false);
-  const [isAutoPay, setIsAutoPay] = useState(true);
 
   const handleToggleAutoPay = (checked: boolean) => {
     setIsAutoPay(checked);
