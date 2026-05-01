@@ -35,7 +35,7 @@ import {
 } from "lucide-react";
 
 export function StudentDashboard() {
-  const { currentUser } = useAppStore();
+  const { currentUser, currentTenantName, currentTenantLogo } = useAppStore();
   const { data, isPending, fetchStatus, isError, error } = useStudentDashboard(
     currentUser?.email,
   );
@@ -121,7 +121,13 @@ export function StudentDashboard() {
       <div className="relative overflow-hidden rounded-xl bg-gradient-to-r from-violet-600 via-purple-600 to-fuchsia-500 p-6 lg:p-8 text-white">
         <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/4" />
         <div className="absolute bottom-0 left-1/2 w-48 h-48 bg-white/5 rounded-full translate-y-1/2" />
-        <div className="relative">
+        <div className="relative flex flex-col sm:flex-row gap-4 items-start sm:items-center">
+          {currentTenantLogo && (
+            <div className="h-16 w-16 rounded-2xl bg-white/20 backdrop-blur-sm flex items-center justify-center overflow-hidden shrink-0 border border-white/10 shadow-inner">
+              <img src={currentTenantLogo} alt={currentTenantName || ""} className="h-full w-full object-cover" />
+            </div>
+          )}
+          <div className="flex-1">
           <div className="flex items-center gap-2 mb-1">
             <span className="text-violet-200 text-sm font-medium">
               {getGreeting()} 👋
@@ -131,7 +137,7 @@ export function StudentDashboard() {
           <p className="text-violet-200 mt-1">
             {studentInfo
               ? `${studentInfo.className} • Roll ${studentInfo.rollNumber}`
-              : "Welcome to Sigel School"}
+              : `Welcome to ${currentTenantName || "the school"}`}
           </p>
           <div className="flex items-center gap-4 mt-4">
             <div className="flex items-center gap-1.5 text-sm bg-white/15 rounded-full px-3 py-1">
@@ -142,6 +148,7 @@ export function StudentDashboard() {
                 day: "numeric",
               })}
             </div>
+          </div>
           </div>
         </div>
       </div>

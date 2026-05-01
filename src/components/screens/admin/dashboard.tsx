@@ -112,7 +112,14 @@ function StatCardSkeleton() {
 }
 
 export function AdminDashboard() {
-  const { currentUser, currentTenantId } = useAppStore();
+  const { 
+    currentUser, 
+    currentTenantId, 
+    currentTenantName, 
+    currentTenantSlug, 
+    currentTenantLogo 
+  } = useAppStore();
+
   const tenantId = currentTenantId || currentUser?.tenantId;
 
   // Optimized: Single network request for everything!
@@ -200,7 +207,7 @@ export function AdminDashboard() {
           <Button 
             size="sm" 
             className={isExpired ? "bg-rose-600 hover:bg-rose-700" : "bg-amber-600 hover:bg-amber-700"}
-            onClick={() => window.location.href = `/${tenantId}/school-subscription`}
+            onClick={() => window.location.href = `/${currentTenantSlug || tenantId}/school-subscription`}
           >
             Renew Now
           </Button>
@@ -213,15 +220,23 @@ export function AdminDashboard() {
         <div className="absolute bottom-0 left-1/3 w-48 h-48 bg-white/5 rounded-full translate-y-1/2" />
         <div className="relative z-10">
           <div className="flex items-center gap-4 mb-3">
-            <div className="h-14 w-14 rounded-2xl bg-white/20 flex items-center justify-center backdrop-blur-sm">
-              <School className="h-7 w-7" />
+            <div className="h-14 w-14 rounded-2xl bg-white/20 flex items-center justify-center backdrop-blur-sm overflow-hidden">
+              {currentTenantLogo || currentUser?.tenantLogo ? (
+                <img 
+                  src={currentTenantLogo || currentUser?.tenantLogo || ""} 
+                  alt={currentTenantName || ""} 
+                  className="h-full w-full object-cover" 
+                />
+              ) : (
+                <School className="h-7 w-7" />
+              )}
             </div>
             <div>
               <h2 className="text-2xl font-bold tracking-tight">
                 {greeting}, {currentUser?.name || "Admin"}!
               </h2>
               <p className="text-teal-100 text-sm">
-                Here&apos;s what&apos;s happening at Sigel School today
+                Here&apos;s what&apos;s happening at {currentTenantName || "the school"} today
               </p>
             </div>
           </div>

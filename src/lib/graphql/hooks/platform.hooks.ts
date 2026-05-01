@@ -88,8 +88,20 @@ export function useTenantDetail(tenantId: string) {
 export function useCreateTenant() {
   const queryClient = useQueryClient()
   return useMutation({
-    mutationFn: (data: TenantInput) => graphqlMutate<{ createTenant: any }>(CREATE_TENANT, { data }).then(d => d.createTenant),
-    onSuccess: (newTenant) => {
+    mutationFn: async (data: any) => {
+      const formData = new FormData();
+      Object.entries(data).forEach(([key, value]) => {
+        if (value !== undefined && value !== null && key !== "logoFile") {
+          formData.append(key, String(value));
+        }
+      });
+      if (data.logoFile) {
+        formData.append("logoFile", data.logoFile);
+      }
+      return api.post('/tenants', formData);
+    },
+    onSuccess: (response: any) => {
+      const newTenant = response.tenant;
       toast.success('School created successfully')
       queryClient.setQueriesData({ queryKey: ['tenants'] }, (old: any) => {
         if (!old) return old
@@ -100,7 +112,7 @@ export function useCreateTenant() {
       queryClient.invalidateQueries({ queryKey: ['tenants'] })
       queryClient.invalidateQueries({ queryKey: ['platform', 'stats'] })
     },
-    onError: (error) => {
+    onError: (error: any) => {
       toast.error('Failed to create tenant', { description: error.message })
     },
   })
@@ -109,8 +121,21 @@ export function useCreateTenant() {
 export function useUpdateTenant() {
   const queryClient = useQueryClient()
   return useMutation({
-    mutationFn: ({ id, data }: { id: string; data: Record<string, unknown> }) => graphqlMutate<{ updateTenant: TenantBasic }>(UPDATE_TENANT, { id, data }).then(d => d.updateTenant),
-    onSuccess: (updatedTenant) => {
+    mutationFn: async ({ id, data }: { id: string; data: any }) => {
+      const formData = new FormData();
+      formData.append("id", id);
+      Object.entries(data).forEach(([key, value]) => {
+        if (value !== undefined && value !== null && key !== "logoFile") {
+          formData.append(key, String(value));
+        }
+      });
+      if (data.logoFile) {
+        formData.append("logoFile", data.logoFile);
+      }
+      return api.put('/tenants', formData);
+    },
+    onSuccess: (response: any) => {
+      const updatedTenant = response.tenant;
       toast.success('School updated successfully')
       queryClient.setQueriesData({ queryKey: ['tenants'] }, (old: any) => {
         if (!old) return old
@@ -123,11 +148,12 @@ export function useUpdateTenant() {
       })
       queryClient.invalidateQueries({ queryKey: ['tenants'] })
     },
-    onError: (error) => {
+    onError: (error: any) => {
       toast.error('Failed to update tenant', { description: error.message })
     },
   })
 }
+
 
 export function useDeleteTenant() {
   const queryClient = useQueryClient()

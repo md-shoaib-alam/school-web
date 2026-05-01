@@ -23,6 +23,8 @@ export interface AppUser {
   tenantId?: string;
   tenantSlug?: string;
   tenantName?: string;
+  tenantLogo?: string | null;
+
   customRole?: CustomRoleInfo | null;
   platformRole?: PlatformRoleInfo | null;
 }
@@ -47,5 +49,8 @@ export interface AppState {
   currentTenantId: string | null;
   currentTenantSlug: string | null;
   currentTenantName: string | null;
-  setCurrentTenant: (id: string, name: string, slug: string) => void;
+  currentTenantLogo: string | null;
+  setCurrentTenant: (id: string, name: string, slug: string, logo?: string | null) => Promise<void>;
+
 }
+

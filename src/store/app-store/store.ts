@@ -36,15 +36,16 @@ function getInitialSidebar(): boolean {
   try { return localStorage.getItem(STORAGE_KEYS.SIDEBAR_STATE) === 'true'; } catch { return false; }
 }
 
-function getInitialTenantInfo(): { id: string | null; slug: string | null; name: string | null } {
-  if (typeof window === 'undefined') return { id: null, slug: null, name: null };
+function getInitialTenantInfo(): { id: string | null; slug: string | null; name: string | null; logo: string | null } {
+  if (typeof window === 'undefined') return { id: null, slug: null, name: null, logo: null };
   try {
     return {
       id: localStorage.getItem('schoolsaas_tenant_id'),
       slug: localStorage.getItem('schoolsaas_tenant_slug'),
       name: localStorage.getItem('schoolsaas_tenant_name'),
+      logo: localStorage.getItem('schoolsaas_tenant_logo'),
     };
-  } catch { return { id: null, slug: null, name: null }; }
+  } catch { return { id: null, slug: null, name: null, logo: null }; }
 }
 
 function buildUrl(tenantId: string | null, tenantSlug: string | null, screen: string): string {
@@ -63,6 +64,7 @@ export const useAppStore = create<AppState>((set, get) => ({
   currentTenantId: (typeof window !== 'undefined' ? parseTenantFromPath(window.location.pathname) : null) || getInitialTenantInfo().id || initialUser.currentUser?.tenantId || null,
   currentTenantSlug: getInitialTenantInfo().slug || initialUser.currentUser?.tenantSlug || null,
   currentTenantName: getInitialTenantInfo().name || initialUser.currentUser?.tenantName || null,
+  currentTenantLogo: getInitialTenantInfo().logo || null,
 
   login: (user) => {
     if (typeof window !== 'undefined') {
@@ -76,6 +78,7 @@ export const useAppStore = create<AppState>((set, get) => ({
       currentTenantId: user.tenantId || null,
       currentTenantSlug: user.tenantSlug || null,
       currentTenantName: user.tenantName || null,
+      currentTenantLogo: user.tenantLogo || null,
     });
     get().refreshPermissions();
   },
@@ -89,6 +92,7 @@ export const useAppStore = create<AppState>((set, get) => ({
         localStorage.removeItem('schoolsaas_tenant_id');
         localStorage.removeItem('schoolsaas_tenant_slug');
         localStorage.removeItem('schoolsaas_tenant_name');
+        localStorage.removeItem('schoolsaas_tenant_logo');
         localStorage.removeItem('schoolsaas_sidebar_state');
         sessionStorage.clear();
       } catch { /* ignore */ }
@@ -114,6 +118,7 @@ export const useAppStore = create<AppState>((set, get) => ({
       currentTenantId: null,
       currentTenantSlug: null,
       currentTenantName: null,
+      currentTenantLogo: null,
     });
   },
 
@@ -137,11 +142,24 @@ export const useAppStore = create<AppState>((set, get) => ({
           tenantId: userData.tenantId,
           tenantSlug: userData.tenantSlug,
           tenantName: userData.tenantName,
+          tenantLogo: userData.tenantLogo,
           customRole: userData.customRole || null,
           platformRole: userData.platformRole || null,
         };
         set({ currentUser: updatedUser });
+        
+        // Sync logo if available in user data but missing in tenant state
+        if (userData.tenantLogo && !get().currentTenantLogo) {
+          get().setCurrentTenant(
+            userData.tenantId, 
+            userData.tenantName, 
+            userData.tenantSlug, 
+            userData.tenantLogo
+          );
+        }
+
         if (typeof window !== 'undefined') {
+
           try { localStorage.setItem(STORAGE_KEYS.USER, JSON.stringify(updatedUser)); } catch { /* ignore */ }
         }
       }
@@ -177,16 +195,79 @@ export const useAppStore = create<AppState>((set, get) => ({
     set({ sidebarOpen: !current });
   },
 
-  setCurrentTenant: (id, name, slug) => {
+  setCurrentTenant: async (id, name, slug, logo) => {
     if (typeof window !== 'undefined') {
       try {
         localStorage.setItem('schoolsaas_tenant_id', id || '');
         localStorage.setItem('schoolsaas_tenant_name', name || '');
         localStorage.setItem('schoolsaas_tenant_slug', slug || '');
+        
+        // --- Aggressive Logo Caching Logic ---
+        const CACHE_KEY = `schoolsaas_logo_cache_${id}`;
+        const cachedStr = localStorage.getItem(CACHE_KEY);
+        const now = Date.now();
+        const EIGHT_HOURS = 8 * 60 * 60 * 1000; // ~3 times a day max
+
+        let finalLogo = logo;
+
+        if (logo) {
+          if (cachedStr) {
+            const cached = JSON.parse(cachedStr);
+            // If same URL and not expired, use cached data
+            if (cached.url === logo && (now - cached.timestamp < EIGHT_HOURS)) {
+              finalLogo = cached.data;
+            } else {
+              // Expired or new URL: Fetch and convert to base64
+              try {
+                const response = await fetch(logo);
+                const blob = await response.blob();
+                const reader = new FileReader();
+                const base64Data = await new Promise<string>((resolve) => {
+                  reader.onloadend = () => resolve(reader.result as string);
+                  reader.readAsDataURL(blob);
+                });
+                localStorage.setItem(CACHE_KEY, JSON.stringify({
+                  url: logo,
+                  data: base64Data,
+                  timestamp: now
+                }));
+                finalLogo = base64Data;
+              } catch (e) {
+                console.warn("Failed to cache logo:", e);
+                // Fallback to URL
+              }
+            }
+          } else {
+            // First time: Fetch and cache
+            try {
+              const response = await fetch(logo);
+              const blob = await response.blob();
+              const reader = new FileReader();
+              const base64Data = await new Promise<string>((resolve) => {
+                reader.onloadend = () => resolve(reader.result as string);
+                reader.readAsDataURL(blob);
+              });
+              localStorage.setItem(CACHE_KEY, JSON.stringify({
+                url: logo,
+                data: base64Data,
+                timestamp: now
+              }));
+              finalLogo = base64Data;
+            } catch (e) {
+              console.warn("Failed to cache logo:", e);
+            }
+          }
+        }
+        
+        localStorage.setItem('schoolsaas_tenant_logo', finalLogo || '');
+        set({ currentTenantId: id, currentTenantName: name, currentTenantSlug: slug, currentTenantLogo: finalLogo });
       } catch { /* ignore */ }
+    } else {
+      set({ currentTenantId: id, currentTenantName: name, currentTenantSlug: slug, currentTenantLogo: logo });
     }
-    set({ currentTenantId: id, currentTenantName: name, currentTenantSlug: slug });
   },
+
+
 }));
 
 if (typeof window !== 'undefined') {

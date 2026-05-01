@@ -40,6 +40,8 @@ export interface Tenant {
 export interface TenantFormData {
   name: string;
   slug: string;
+  logo: string;
+  logoFile?: File | null;
   email: string;
   phone: string;
   address: string;
@@ -108,6 +110,8 @@ export const statusColors: Record<
 export const emptyFormData: TenantFormData = {
   name: "",
   slug: "",
+  logo: "",
+  logoFile: null,
   email: "",
   phone: "",
   address: "",
@@ -119,3 +123,4 @@ export const emptyFormData: TenantFormData = {
   maxClasses: 10,
   status: "active",
 };
+

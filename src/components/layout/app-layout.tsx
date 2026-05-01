@@ -45,7 +45,9 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
         resolvedTenant.id,
         resolvedTenant.name,
         resolvedTenant.slug,
+        resolvedTenant.logo
       );
+
     }
   }, [resolvedTenant, currentTenantSlug, setCurrentTenant]);
 

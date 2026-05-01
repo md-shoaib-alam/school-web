@@ -11,15 +11,19 @@ function getToken(): string | null {
   return localStorage.getItem('school_token');
 }
 
-function authHeaders(): Record<string, string> {
+function authHeaders(isFormData: boolean = false): Record<string, string> {
   const token = getToken();
   const tenantId = typeof window !== 'undefined' ? localStorage.getItem('schoolsaas_tenant_id') : null;
-  return {
-    'Content-Type': 'application/json',
+  const headers: Record<string, string> = {
     ...(token ? { Authorization: `Bearer ${token}` } : {}),
     ...(tenantId ? { 'x-tenant-id': tenantId } : {}),
   };
+  if (!isFormData) {
+    headers['Content-Type'] = 'application/json';
+  }
+  return headers;
 }
+
 
 async function handleResponse(res: Response) {
   if (!res.ok) {
@@ -43,10 +47,11 @@ export const api = {
   },
 
   post: async <T = any>(path: string, body?: unknown): Promise<T> => {
+    const isFormData = body instanceof FormData;
     const res = await fetch(`${API_BASE}${path}`, {
       method: 'POST',
-      headers: authHeaders(),
-      body: body ? JSON.stringify(body) : undefined,
+      headers: authHeaders(isFormData),
+      body: isFormData ? (body as FormData) : (body ? JSON.stringify(body) : undefined),
       keepalive: true,
     });
     const result = await handleResponse(res);
@@ -55,10 +60,11 @@ export const api = {
   },
 
   put: async <T = any>(path: string, body?: unknown): Promise<T> => {
+    const isFormData = body instanceof FormData;
     const res = await fetch(`${API_BASE}${path}`, {
       method: 'PUT',
-      headers: authHeaders(),
-      body: body ? JSON.stringify(body) : undefined,
+      headers: authHeaders(isFormData),
+      body: isFormData ? (body as FormData) : (body ? JSON.stringify(body) : undefined),
       keepalive: true,
     });
     const result = await handleResponse(res);
@@ -66,17 +72,20 @@ export const api = {
     return result;
   },
 
+
   patch: async <T = any>(path: string, body?: unknown): Promise<T> => {
+    const isFormData = body instanceof FormData;
     const res = await fetch(`${API_BASE}${path}`, {
       method: 'PATCH',
-      headers: authHeaders(),
-      body: body ? JSON.stringify(body) : undefined,
+      headers: authHeaders(isFormData),
+      body: isFormData ? (body as FormData) : (body ? JSON.stringify(body) : undefined),
       keepalive: true,
     });
     const result = await handleResponse(res);
     triggerGlobalRefresh(path); // Intelligent refresh
     return result;
   },
+
 
   del: async <T = any>(path: string): Promise<T> => {
     const res = await fetch(`${API_BASE}${path}`, {

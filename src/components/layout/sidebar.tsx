@@ -43,6 +43,7 @@ export function Sidebar({
   const {
     currentUser,
     currentTenantName,
+    currentTenantLogo,
     sidebarOpen,
     toggleSidebar,
     logout,
@@ -95,11 +96,21 @@ export function Sidebar({
         <div className="flex items-center gap-3">
           <div
             className={cn(
-              "w-10 h-10 rounded-xl flex items-center justify-center text-white shadow-md",
+              "w-10 h-10 rounded-xl flex items-center justify-center text-white shadow-md overflow-hidden",
               isSuperAdmin ? "bg-teal-600" : "bg-emerald-600",
             )}
           >
-            <Building2 className="h-5 w-5" />
+            {!isSuperAdmin && (currentTenantLogo || currentUser?.tenantLogo) ? (
+              <img 
+                src={currentTenantLogo || currentUser?.tenantLogo || ""} 
+                alt={currentTenantName || "School Logo"} 
+                className="h-full w-full object-cover" 
+              />
+            ) : (
+
+
+              <Building2 className="h-5 w-5" />
+            )}
           </div>
           <div>
             <h2
@@ -112,7 +123,7 @@ export function Sidebar({
             >
               {isSuperAdmin
                 ? "SchoolSaaS"
-                : currentTenantName || "Sigel School"}
+                : currentTenantName || "the school"}
             </h2>
             <p
               className={cn(

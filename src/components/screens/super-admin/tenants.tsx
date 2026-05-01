@@ -114,6 +114,7 @@ export function SuperAdminTenants() {
     setFormData({
       name: tenant.name,
       slug: tenant.slug,
+      logo: tenant.logo || "",
       email: tenant.email || "",
       phone: tenant.phone || "",
       address: tenant.address || "",
@@ -125,6 +126,7 @@ export function SuperAdminTenants() {
       maxClasses: tenant.maxClasses,
       status: tenant.status,
     });
+
     setAutoSlug(false);
     setFormDialogOpen(true);
   };
