@@ -17,6 +17,7 @@ interface PurchaseDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   plan: Plan | null;
+  cycle: "monthly" | "quarterly" | "yearly";
   processing: boolean;
   onConfirm: () => void;
   userName?: string;
@@ -26,10 +27,20 @@ export function PurchaseDialog({
   open,
   onOpenChange,
   plan,
+  cycle,
   processing,
   onConfirm,
   userName,
 }: PurchaseDialogProps) {
+  const currentPricing = plan?.pricing[cycle];
+  const price = currentPricing?.price ?? 0;
+  const originalPrice = currentPricing?.originalPrice;
+
+  const cycleLabels = {
+    monthly: "Billed Monthly",
+    quarterly: "Billed Quarterly",
+    yearly: "Billed Yearly",
+  };
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-md">
@@ -53,18 +64,18 @@ export function PurchaseDialog({
                       {plan.name} Plan
                     </p>
                     <p className="text-xs text-gray-500 dark:text-gray-400">
-                      {plan.period}
+                      {cycleLabels[cycle]}
                     </p>
                   </div>
                   <div className="text-right">
                     <p className="text-xl font-bold text-gray-900 dark:text-gray-100">
-                      {plan.price === 0
+                      {price === 0
                         ? "Free"
-                        : `₹${plan.price}`}
+                        : `₹${price}`}
                     </p>
-                    {plan.originalPrice && (
+                    {originalPrice && (
                       <p className="text-xs text-gray-400 dark:text-gray-500 line-through">
-                        ₹{plan.originalPrice}
+                        ₹{originalPrice}
                       </p>
                     )}
                   </div>
@@ -131,7 +142,7 @@ export function PurchaseDialog({
                 Processing...
               </>
             ) : (
-              `Pay ₹${plan?.price}`
+              `Pay ₹${price}`
             )}
           </Button>
         </DialogFooter>

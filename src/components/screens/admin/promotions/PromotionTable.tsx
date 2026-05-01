@@ -16,7 +16,8 @@ import {
   XCircle,
   Loader2,
 } from "lucide-react";
-import { PromotionRecord, statusConfig } from "./types";
+import { PromotionRecord } from "./types";
+import { statusConfig } from "./utils";
 
 interface PromotionTableProps {
   records: PromotionRecord[];

@@ -250,6 +250,7 @@ export function ParentSubscription() {
         open={purchaseDialogOpen}
         onOpenChange={setPurchaseDialogOpen}
         plan={purchasingPlan}
+        cycle={billingCycle}
         processing={processing}
         onConfirm={confirmPurchase}
         userName={currentUser?.name}

@@ -134,7 +134,7 @@ export function TeacherLeaves() {
     toast.promise(promise, {
       loading: 'Submitting leave request...',
       success: 'Leave request submitted successfully',
-      error: (err) => err.message || 'Failed to submit leave request',
+      error: (err: any) => err.message || 'Failed to submit leave request',
     });
 
     promise.finally(() => setSubmitting(false));
