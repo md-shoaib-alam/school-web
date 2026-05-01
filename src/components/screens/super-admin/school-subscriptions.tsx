@@ -46,6 +46,7 @@ import {
 import { format } from "date-fns";
 import { goeyToast as toast } from "goey-toast";
 import { DatePicker } from "@/components/ui/date-picker";
+import { SCHOOL_PLANS } from "@/lib/billing-constants";
 
 const ITEMS_PER_PAGE = 10;
 
@@ -239,7 +240,7 @@ export function SuperAdminSchoolSubscriptions() {
       </Card>
 
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent>
+        <DialogContent className="max-w-2xl">
           <DialogHeader>
             <DialogTitle>Manage Subscription: {editingTenant?.name}</DialogTitle>
           </DialogHeader>
@@ -247,13 +248,31 @@ export function SuperAdminSchoolSubscriptions() {
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label>Service Plan</Label>
-                <Select value={editingTenant?.plan} onValueChange={(v) => setEditingTenant({...editingTenant, plan: v})}>
+                <Select 
+                  value={editingTenant?.plan} 
+                  onValueChange={(v) => {
+                    const selectedPlan = SCHOOL_PLANS.find(p => p.id === v);
+                    if (selectedPlan) {
+                      setEditingTenant({
+                        ...editingTenant, 
+                        plan: v,
+                        maxStudents: selectedPlan.limits.students,
+                        maxTeachers: selectedPlan.limits.teachers,
+                        maxParents: selectedPlan.limits.parents,
+                        maxClasses: selectedPlan.limits.classes,
+                      });
+                    } else {
+                      setEditingTenant({...editingTenant, plan: v});
+                    }
+                  }}
+                >
                   <SelectTrigger><SelectValue /></SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="basic">Basic Plan</SelectItem>
-                    <SelectItem value="standard">Standard Plan</SelectItem>
-                    <SelectItem value="premium">Premium Plan</SelectItem>
-                    <SelectItem value="enterprise">Enterprise Plan</SelectItem>
+                    {SCHOOL_PLANS.map(plan => (
+                      <SelectItem key={plan.id} value={plan.id}>
+                        {plan.name} Plan
+                      </SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
               </div>

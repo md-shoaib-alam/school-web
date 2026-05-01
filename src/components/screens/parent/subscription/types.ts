@@ -1,21 +1,6 @@
-import React from "react";
+import { ParentPlan } from "@/lib/billing-constants";
 
-export interface Plan {
-  id: string;
-  name: string;
-  description: string;
-  icon: React.ReactNode;
-  badge?: string;
-  badgeColor?: string;
-  popular?: boolean;
-  pricing: {
-    monthly: { price: number; originalPrice?: number };
-    quarterly: { price: number; originalPrice?: number };
-    yearly: { price: number; originalPrice?: number };
-  };
-  features: { text: string; included: boolean }[];
-}
-
+export type Plan = ParentPlan;
 
 export interface SubscriptionRecord {
   id: string;

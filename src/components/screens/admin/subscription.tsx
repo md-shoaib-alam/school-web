@@ -32,16 +32,22 @@ import {
 } from "lucide-react";
 import { format, differenceInDays } from "date-fns";
 import { goeyToast as toast } from "goey-toast";
+import { cn } from "@/lib/utils";
+
+import { useRouter, useParams } from "next/navigation";
+import React from "react";
+import { SchoolPlan } from "@/lib/billing-constants";
 
 export function SchoolSubscriptionScreen() {
   const { currentTenantId } = useAppStore();
   const { data: detailData, isLoading } = useTenantDetail(currentTenantId || "");
 
-  const [isUpgradeOpen, setIsUpgradeOpen] = useState(false);
+  const router = useRouter();
+  const { slug } = useParams();
   const [isAutoPay, setIsAutoPay] = useState(true);
 
   if (isLoading) {
-    return <div className="p-8 text-center">Loading subscription details...</div>;
+    return <div className="p-8 text-center font-bold text-indigo-600 animate-pulse">Loading subscription details...</div>;
   }
 
   const tenant = detailData?.tenant;
@@ -95,71 +101,80 @@ export function SchoolSubscriptionScreen() {
     });
   };
 
+
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
+    <div className="space-y-6 pb-20">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div className="flex items-center gap-4">
-          <div className="h-12 w-12 rounded-2xl bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center">
-            <Crown className="h-6 w-6 text-amber-600 dark:text-amber-400" />
+          <div className="h-14 w-14 sm:h-12 sm:w-12 rounded-2xl bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center overflow-hidden shrink-0">
+            {tenant.logo ? (
+              <img src={tenant.logo} alt={tenant.name} className="h-full w-full object-cover" />
+            ) : (
+              <Crown className="h-6 w-6 text-amber-600 dark:text-amber-400" />
+            )}
           </div>
           <div>
-            <h2 className="text-3xl font-bold tracking-tight">My Subscription</h2>
-            <p className="text-muted-foreground mt-1">Monitor your school's plan, limits, and usage.</p>
+            <h2 className="text-2xl sm:text-3xl font-bold tracking-tight">My Subscription</h2>
+            <p className="text-xs sm:text-sm text-muted-foreground mt-0.5">Monitor your school's plan, limits, and usage.</p>
           </div>
         </div>
-        <div className="flex items-center gap-2">
-          <Button 
-            variant="outline" 
-            size="sm"
-            className="gap-2 border-rose-200 text-rose-700 hover:bg-rose-50 dark:border-rose-900/30 dark:text-rose-400 dark:hover:bg-rose-900/20"
-            onClick={() => setIsUpgradeOpen(true)}
-          >
-            <ArrowDownCircle className="h-4 w-4" />
-            Downgrade
-          </Button>
+        <div className="flex items-center gap-2 w-full sm:w-auto">
           <Button 
             size="sm"
-            className="gap-2 bg-indigo-600 hover:bg-indigo-700 text-white"
-            onClick={() => setIsUpgradeOpen(true)}
+            className="w-full sm:w-auto gap-2 bg-indigo-600 hover:bg-indigo-700 text-white shadow-lg shadow-indigo-200 dark:shadow-none transition-all hover:scale-105 rounded-xl h-10 px-6"
+            onClick={() => router.push(`/${slug}/manage-plan`)}
           >
             <ArrowUpCircle className="h-4 w-4" />
-            Upgrade Plan
+            Manage Plan
           </Button>
         </div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <Card className="md:col-span-2 border-none shadow-sm bg-gradient-to-br from-indigo-600 to-violet-700 text-white">
-          <CardContent className="p-8">
+        <Card className="md:col-span-2 border-none shadow-sm bg-gradient-to-br from-indigo-600 to-violet-700 text-white relative overflow-hidden group">
+          <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full -mr-32 -mt-32 blur-3xl group-hover:bg-white/10 transition-colors" />
+          <CardContent className="p-8 relative z-10">
             <div className="flex justify-between items-start">
               <div className="space-y-4">
-                <Badge className="bg-white/20 text-white hover:bg-white/30 border-none px-3 py-1 capitalize text-xs font-semibold tracking-wide">
+                <Badge className="bg-white/20 text-white hover:bg-white/30 border-none px-3 py-1 capitalize text-xs font-bold tracking-wide">
                   {tenant.plan} Plan
                 </Badge>
                 <div>
-                  <h3 className="text-4xl font-bold">{tenant.name}</h3>
-                  <p className="opacity-80 mt-1">Platform License for Educational Institutions</p>
+                  <h3 className="text-2xl sm:text-4xl font-extrabold tracking-tight">{tenant.name}</h3>
+                  <p className="opacity-80 mt-1 font-medium text-sm sm:text-lg">Institution License</p>
                 </div>
-                <div className="flex items-center gap-6 pt-4">
-                  <div className="flex items-center gap-2">
-                    <Calendar className="h-5 w-5 opacity-70" />
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-8 pt-2 sm:pt-4">
+                  <div className="flex items-center gap-3">
+                    <div className="h-10 w-10 rounded-xl bg-white/10 flex items-center justify-center shrink-0">
+                      <Calendar className="h-5 w-5" />
+                    </div>
                     <div>
-                      <p className="text-xs opacity-70 uppercase tracking-wider font-semibold">Started</p>
-                      <p className="font-medium">{format(new Date(tenant.startDate), "PPP")}</p>
+                      <p className="text-[10px] opacity-70 uppercase tracking-widest font-black">Subscription Start</p>
+                      <p className="font-bold text-base sm:text-lg">{format(new Date(tenant.startDate), "MMM d, yyyy")}</p>
                     </div>
                   </div>
-                  <div className="flex items-center gap-2">
-                    <Clock className="h-5 w-5 opacity-70" />
+                  <div className="flex items-center gap-3">
+                    <div className="h-10 w-10 rounded-xl bg-white/10 flex items-center justify-center shrink-0">
+                      <Clock className="h-5 w-5" />
+                    </div>
                     <div>
-                      <p className="text-xs opacity-70 uppercase tracking-wider font-semibold">Renewal Date</p>
-                      <p className="font-medium">{tenant.endDate ? format(new Date(tenant.endDate), "PPP") : "Permanent"}</p>
+                      <p className="text-[10px] opacity-70 uppercase tracking-widest font-black">Next Renewal</p>
+                      <p className="font-bold text-base sm:text-lg">{tenant.endDate ? format(new Date(tenant.endDate), "MMM d, yyyy") : "Permanent"}</p>
                     </div>
                   </div>
                 </div>
               </div>
-              <div className="hidden sm:block">
-                <div className="h-24 w-24 rounded-full bg-white/10 flex items-center justify-center border border-white/20 shadow-inner">
-                  <Crown className="h-12 w-12 text-white drop-shadow-lg" />
+              <div className="flex-shrink-0">
+                <div className="h-16 w-16 sm:h-28 sm:w-28 rounded-2xl sm:rounded-3xl bg-white/10 flex items-center justify-center border border-white/20 shadow-2xl backdrop-blur-sm overflow-hidden">
+                  {tenant.logo ? (
+                    <img 
+                      src={tenant.logo} 
+                      alt={tenant.name} 
+                      className="w-full h-full object-cover" 
+                    />
+                  ) : (
+                    <Crown className="h-8 w-8 sm:h-14 sm:w-14 text-white drop-shadow-xl" />
+                  )}
                 </div>
               </div>
             </div>
@@ -168,53 +183,42 @@ export function SchoolSubscriptionScreen() {
 
         <Card className="border-none shadow-sm">
           <CardHeader>
-            <CardTitle className="text-lg">Subscription Status</CardTitle>
+            <CardTitle className="text-lg flex items-center gap-2">
+              <ShieldCheck className="h-5 w-5 text-indigo-600" />
+              Quick Health
+            </CardTitle>
           </CardHeader>
           <CardContent className="space-y-6">
-            <div className="flex items-center justify-between">
-              <span className="text-muted-foreground">Status</span>
-              <Badge className={tenant.status === 'active' ? 'bg-emerald-500 hover:bg-emerald-600' : 'bg-amber-500 hover:bg-amber-600'}>
+            <div className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-900 rounded-xl">
+              <span className="text-sm font-medium text-muted-foreground">Status</span>
+              <Badge className={cn(
+                "px-3 py-1 rounded-full",
+                tenant.status === 'active' ? 'bg-emerald-500 hover:bg-emerald-600' : 'bg-amber-500 hover:bg-amber-600'
+              )}>
                 {tenant.status.toUpperCase()}
               </Badge>
             </div>
-            <div className="pt-4 border-t space-y-4">
-              <div className="text-center">
-                <p className="text-sm text-muted-foreground">Time Remaining</p>
-                <p className={`text-4xl font-bold mt-2 ${isExpired ? 'text-rose-500' : 'text-indigo-600 dark:text-indigo-400'}`}>
-                  {daysRemaining !== null ? (isExpired ? "Expired" : `${daysRemaining} Days`) : "Lifetime"}
+            <div className="pt-2 space-y-4">
+              <div className="text-center p-4 rounded-2xl border-2 border-indigo-50 dark:border-indigo-900/30">
+                <p className="text-xs text-muted-foreground uppercase tracking-widest font-black">Time Remaining</p>
+                <p className={`text-4xl font-black mt-2 ${isExpired ? 'text-rose-500' : 'text-indigo-600 dark:text-indigo-400'}`}>
+                  {daysRemaining !== null ? (isExpired ? "Expired" : `${daysRemaining}d`) : "∞"}
                 </p>
               </div>
-              {!isExpired && daysRemaining !== null && daysRemaining < 30 && (
-                <div className="p-3 bg-amber-50 dark:bg-amber-900/20 rounded-lg flex items-start gap-2 border border-amber-100 dark:border-amber-900/50">
-                  <AlertCircle className="h-4 w-4 text-amber-600 mt-0.5" />
-                  <p className="text-xs text-amber-800 dark:text-amber-200 leading-relaxed">
-                    Your license is expiring soon. Please contact the platform administrator to renew.
-                  </p>
-                </div>
-              )}
-              {tenant.status === 'active' && !isExpired && (
-                <div className="flex items-center justify-center gap-2 text-emerald-600 text-sm font-medium">
-                  <CheckCircle2 className="h-4 w-4" />
-                  Account is healthy
-                </div>
-              )}
-
-              <div className="pt-4 border-t space-y-3">
+              
+              <div className="pt-4 space-y-3">
                 <div className="flex items-center justify-between">
                   <div className="space-y-0.5">
-                    <p className="text-sm font-medium flex items-center gap-2">
+                    <p className="text-sm font-bold flex items-center gap-2">
                       <CreditCard className="h-4 w-4 text-indigo-600" />
                       Auto-Renewal
                     </p>
-                    <p className="text-[10px] text-muted-foreground uppercase tracking-widest font-bold">
-                      {isAutoPay ? "Active via Platform" : "Manual Renewal Only"}
+                    <p className="text-[10px] text-muted-foreground uppercase tracking-widest font-black">
+                      {isAutoPay ? "Secured" : "Manual"}
                     </p>
                   </div>
                   <Switch checked={isAutoPay} onCheckedChange={handleToggleAutoPay} />
                 </div>
-                <p className="text-xs text-muted-foreground italic text-center">
-                  Payments are processed on the 1st of every month.
-                </p>
               </div>
             </div>
           </CardContent>
@@ -222,11 +226,11 @@ export function SchoolSubscriptionScreen() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <Card className="border-none shadow-sm overflow-hidden">
+        <Card className="border-none shadow-sm overflow-hidden border-t-4 border-t-indigo-600">
           <CardHeader className="bg-gray-50/50 dark:bg-gray-900/50 border-b pb-4">
-            <CardTitle className="flex items-center gap-2 text-base font-semibold">
+            <CardTitle className="flex items-center gap-2 text-base font-bold">
               <Building2 className="h-5 w-5 text-indigo-600" />
-              Resource Allocation & Usage
+              Resource Utilization
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-6 pt-6">
@@ -236,114 +240,79 @@ export function SchoolSubscriptionScreen() {
                 <div key={stat.label} className="space-y-2">
                   <div className="flex justify-between items-center text-sm">
                     <div className="flex items-center gap-2">
-                      {stat.icon}
-                      <span className="font-medium">{stat.label}</span>
+                      <div className={cn("p-1.5 rounded-lg", stat.color.replace('bg-', 'bg-') + '/10')}>
+                        {React.cloneElement(stat.icon as React.ReactElement<any>, { 
+                          className: cn("h-4 w-4", stat.color.replace('bg-', 'text-')) 
+                        })}
+                      </div>
+                      <span className="font-bold">{stat.label}</span>
                     </div>
-                    <span className="text-muted-foreground text-xs font-mono">
+                    <span className="text-muted-foreground text-xs font-mono font-bold">
                       {stat.current.toLocaleString()} / {stat.max.toLocaleString()}
                     </span>
                   </div>
-                  <Progress value={percentage} className="h-2" indicatorClassName={stat.color} />
+                  <Progress value={percentage} className="h-2.5 rounded-full" indicatorClassName={stat.color} />
                 </div>
               );
             })}
           </CardContent>
         </Card>
 
-        <Card className="border-none shadow-sm overflow-hidden">
+        <Card className="border-none shadow-sm overflow-hidden border-t-4 border-t-emerald-500">
           <CardHeader className="bg-gray-50/50 dark:bg-gray-900/50 border-b pb-4">
-            <CardTitle className="text-base font-semibold">Plan Features</CardTitle>
+            <CardTitle className="text-base font-bold flex items-center gap-2">
+              <ShieldCheck className="h-5 w-5 text-emerald-500" />
+              Active Privileges
+            </CardTitle>
           </CardHeader>
           <CardContent className="pt-6">
-            <ul className="space-y-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               {[
                 "Unlimited Staff Management",
                 "Advanced Fee Collection",
                 "Custom Exam Report Cards",
                 "Teacher & Student Attendance",
                 "Support Ticket System",
-                "Academic Year History"
+                "Academic Year History",
+                "Mobile App Sync",
+                "Cloud Storage"
               ].map((feature, i) => (
-                <li key={i} className="flex items-center gap-3 text-sm">
-                  <div className="h-5 w-5 rounded-full bg-emerald-50 dark:bg-emerald-900/20 flex items-center justify-center">
-                    <CheckCircle2 className="h-3.5 w-3.5 text-emerald-500" />
+                <div key={i} className="flex items-center gap-3 p-2 rounded-lg bg-gray-50 dark:bg-gray-900/50 border border-transparent hover:border-emerald-100 dark:hover:border-emerald-900/30 transition-all">
+                  <div className="h-5 w-5 rounded-full bg-emerald-500 flex items-center justify-center flex-shrink-0">
+                    <CheckCircle2 className="h-3 w-3 text-white" />
                   </div>
-                  <span className="text-gray-600 dark:text-gray-300">{feature}</span>
-                </li>
+                  <span className="text-xs font-medium text-gray-700 dark:text-gray-300">{feature}</span>
+                </div>
               ))}
-            </ul>
-            <div className="mt-8 p-4 bg-indigo-50 dark:bg-indigo-900/20 rounded-xl border border-indigo-100 dark:border-indigo-900/50">
-              <p className="text-sm font-semibold text-indigo-900 dark:text-indigo-200 text-center">Plan Management</p>
-              <p className="text-xs text-indigo-700 dark:text-indigo-300 text-center mt-1 leading-relaxed">
-                Need to change your student or teacher limits? Use the Upgrade or Downgrade buttons at the top to submit a request.
-              </p>
             </div>
           </CardContent>
         </Card>
       </div>
 
-      <Dialog open={isUpgradeOpen} onOpenChange={setIsUpgradeOpen}>
-        <DialogContent className="sm:max-w-[500px]">
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2 text-2xl">
-              <Settings className="h-6 w-6 text-indigo-600" />
-              Manage Subscription
-            </DialogTitle>
-            <DialogDescription>
-              Submit a request to change your school's plan tier or resource limits.
-            </DialogDescription>
-          </DialogHeader>
-          <div className="py-6 space-y-6 text-center">
-            <div className="h-20 w-20 rounded-2xl bg-indigo-100 dark:bg-indigo-900/30 flex items-center justify-center mx-auto">
-              <Crown className="h-10 w-10 text-indigo-600 dark:text-indigo-400" />
-            </div>
-            <div className="space-y-2">
-              <h4 className="text-lg font-bold px-4">Modifying your institution plan</h4>
-              <p className="text-muted-foreground text-sm leading-relaxed px-4">
-                You are currently on the <span className="font-bold text-indigo-600 dark:text-indigo-400 capitalize">{tenant.plan}</span> plan. To upgrade to a higher tier or downgrade to a smaller plan, please contact our support team.
-              </p>
-            </div>
-            
-            <div className="grid grid-cols-1 gap-4 p-4 bg-gray-50 dark:bg-gray-900 rounded-2xl border text-sm">
-              <div className="flex items-center justify-between px-4">
-                <span className="text-muted-foreground font-medium">Current Students</span>
-                <span className="font-bold">{tenant.maxStudents.toLocaleString()}</span>
-              </div>
-              <div className="border-t border-gray-200 dark:border-gray-800 pt-3 flex items-center justify-between px-4">
-                <span className="text-muted-foreground font-medium">Enterprise Tier</span>
-                <span className="text-emerald-600 font-bold">Unlimited Students</span>
-              </div>
-            </div>
-
-            <div className="pt-4 flex flex-col gap-3">
-              <Button 
-                className="w-full h-12 bg-indigo-600 hover:bg-indigo-700 text-white font-bold gap-2"
-                onClick={() => {
-                  window.location.href = `mailto:support@schoolsaas.com?subject=Subscription Change Request: ${tenant.name}`;
-                  setIsUpgradeOpen(false);
-                }}
-              >
-                <ArrowUpCircle className="h-5 w-5" />
-                Contact for Upgrade
-              </Button>
-              <Button 
-                variant="outline"
-                className="w-full h-12 border-rose-200 text-rose-600 hover:bg-rose-50 gap-2 font-semibold"
-                onClick={() => {
-                  window.location.href = `mailto:support@schoolsaas.com?subject=Downgrade Request: ${tenant.name}`;
-                  setIsUpgradeOpen(false);
-                }}
-              >
-                <ArrowDownCircle className="h-5 w-5" />
-                Contact for Downgrade
-              </Button>
-            </div>
-          </div>
-        </DialogContent>
-      </Dialog>
     </div>
   );
 }
+
+function ShieldCheck({ className }: { className?: string }) {
+  return (
+    <svg 
+      xmlns="http://www.w3.org/2000/svg" 
+      width="24" 
+      height="24" 
+      viewBox="0 0 24 24" 
+      fill="none" 
+      stroke="currentColor" 
+      strokeWidth="2" 
+      strokeLinecap="round" 
+      strokeLinejoin="round" 
+      className={className}
+    >
+      <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10" />
+      <path d="m9 12 2 2 4-4" />
+    </svg>
+  );
+}
+
 
 function Building2({ className }: { className?: string }) {
   return <School className={className} />;

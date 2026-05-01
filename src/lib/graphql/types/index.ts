@@ -21,6 +21,7 @@ export interface BillingDataResponse {
 }
 
 export interface TenantWithStats {
+  logo: any;
   id: string; name: string; slug: string; email: string | null; phone: string | null
   address: string | null; website: string | null; plan: string; status: string
   maxStudents: number; maxTeachers: number; maxParents: number; maxClasses: number

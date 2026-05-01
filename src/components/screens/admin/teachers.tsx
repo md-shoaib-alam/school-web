@@ -107,9 +107,12 @@ export function AdminTeachers() {
     const isEdit = !!editingTeacher;
 
     // OPTIMISTIC UPDATE: Update the UI instantly if editing
+    const queryKey = [queryKeys.teachers, currentTenantId, debouncedSearch, currentPage, 12];
+    const previousTeachers = queryClient.getQueryData(queryKey);
+
     if (isEdit && editingTeacher) {
       const updatedTeacher = { ...editingTeacher, ...formData };
-      queryClient.setQueriesData({ queryKey: queryKeys.teachers }, (old: any) => {
+      queryClient.setQueryData(queryKey, (old: any) => {
         if (!old || !old.teachers) return old;
         return {
           ...old,
@@ -160,21 +163,39 @@ export function AdminTeachers() {
   };
 
   const handleDelete = async (id: string) => {
+    // OPTIMISTIC UPDATE: Remove from UI instantly
+    const previousTeachers = queryClient.getQueryData([queryKeys.teachers, currentTenantId, debouncedSearch, currentPage, 12]);
+    
+    queryClient.setQueryData([queryKeys.teachers, currentTenantId, debouncedSearch, currentPage, 12], (old: any) => {
+      if (!old || !old.teachers) return old;
+      return {
+        ...old,
+        teachers: old.teachers.filter((t: any) => t.id !== id),
+        total: Math.max(0, old.total - 1)
+      };
+    });
+
     toast.promise(
       (async () => {
-        const res = await apiFetch(`/api/teachers?id=${id}`, {
-          method: "DELETE",
-        });
-        if (!res.ok) {
-          const err = await res.json().catch(() => ({}));
-          throw new Error(err.error || "Deletion failed");
-        }
-        queryClient.invalidateQueries({ queryKey: queryKeys.teachers });
-        queryClient.invalidateQueries({ queryKey: ['admin-dashboard', currentTenantId] });
-        setDeletingId(null);
+        try {
+          const res = await apiFetch(`/api/teachers?id=${id}`, {
+            method: "DELETE",
+          });
+          if (!res.ok) {
+            const err = await res.json().catch(() => ({}));
+            throw new Error(err.error || "Deletion failed");
+          }
+          queryClient.invalidateQueries({ queryKey: queryKeys.teachers });
+          queryClient.invalidateQueries({ queryKey: ['admin-dashboard', currentTenantId] });
+          setDeletingId(null);
 
-        // We throw a "success" message to force a RED morphing pill for deletion
-        throw new Error("Teacher record removed");
+          // We throw a "success" message to force a RED morphing pill for deletion
+          throw new Error("Teacher record removed");
+        } catch (err) {
+          // ROLLBACK if failed
+          queryClient.setQueryData([queryKeys.teachers, currentTenantId, debouncedSearch, currentPage, 12], previousTeachers);
+          throw err;
+        }
       })(),
       {
         loading: "Removing teacher record...",
@@ -269,78 +290,99 @@ export function AdminTeachers() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
-                  {teachers.map((teacher, index) => {
-                    const initials = teacher.name.split(" ").map((n) => n[0]).join("").slice(0, 2).toUpperCase();
-                    const color = avatarColors[index % avatarColors.length];
-                    return (
-                      <tr key={teacher.id} className="hover:bg-gray-50/50 dark:hover:bg-gray-800/30 transition-colors">
-                        <td className="px-6 py-4">
-                          <div className="flex items-center gap-3">
-                            <Avatar className="h-8 w-8 shrink-0">
-                              <AvatarFallback className={`${color} text-white text-[10px] font-bold`}>
-                                {initials}
-                              </AvatarFallback>
-                            </Avatar>
-                            <div className="flex flex-col min-w-0">
-                              <span className="font-bold text-gray-900 dark:text-gray-100 truncate">{teacher.name}</span>
-                              <span className="text-[10px] sm:text-xs text-muted-foreground truncate">{teacher.email}</span>
-                              {/* Mobile-only info */}
-                              <div className="sm:hidden flex flex-wrap gap-1 mt-1">
-                                <span className="text-[10px] text-emerald-600 dark:text-emerald-400 font-medium bg-emerald-50 dark:bg-emerald-900/20 px-1 rounded">
-                                  {teacher.experience || 'New'} Exp
-                                </span>
-                                <span className="text-[10px] text-slate-600 dark:text-slate-400 font-medium bg-slate-50 dark:bg-slate-900/20 px-1 rounded">
-                                  {teacher.qualification || 'N/A'}
-                                </span>
+                  <AnimatePresence mode="popLayout">
+                    {teachers.map((teacher, index) => {
+                      const initials = teacher.name.split(" ").map((n) => n[0]).join("").slice(0, 2).toUpperCase();
+                      const color = avatarColors[index % avatarColors.length];
+                      return (
+                        <motion.tr 
+                          key={teacher.id} 
+                          layout
+                          initial={{ opacity: 0, x: -10 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          exit={{ opacity: 0, x: 10, backgroundColor: "rgba(239, 68, 68, 0.05)" }}
+                          transition={{ duration: 0.2 }}
+                          className="hover:bg-gray-50/50 dark:hover:bg-gray-800/30 transition-colors"
+                        >
+                          <td className="px-6 py-4">
+                            <div className="flex items-center gap-3">
+                              <Avatar className="h-8 w-8 shrink-0">
+                                <AvatarFallback className={`${color} text-white text-[10px] font-bold`}>
+                                  {initials}
+                                </AvatarFallback>
+                              </Avatar>
+                              <div className="flex flex-col min-w-0">
+                                <span className="font-bold text-gray-900 dark:text-gray-100 truncate">{teacher.name}</span>
+                                <span className="text-[10px] sm:text-xs text-muted-foreground truncate">{teacher.email}</span>
+                                {/* Mobile-only info */}
+                                <div className="sm:hidden flex flex-wrap gap-1 mt-1">
+                                  <span className="text-[10px] text-emerald-600 dark:text-emerald-400 font-medium bg-emerald-50 dark:bg-emerald-900/20 px-1 rounded">
+                                    {teacher.experience || 'New'} Exp
+                                  </span>
+                                  <span className="text-[10px] text-slate-600 dark:text-slate-400 font-medium bg-slate-50 dark:bg-slate-900/20 px-1 rounded">
+                                    {teacher.qualification || 'N/A'}
+                                  </span>
+                                </div>
                               </div>
                             </div>
-                          </div>
-                        </td>
-                        <td className="px-6 py-4 hidden sm:table-cell text-gray-600 dark:text-gray-400 font-medium">
-                          {teacher.experience || 'N/A'}
-                        </td>
-                        <td className="px-6 py-4 hidden lg:table-cell">
-                          <Badge variant="outline" className="font-normal text-xs">{teacher.qualification || 'N/A'}</Badge>
-                        </td>
-                        <td className="px-6 py-4">
-                          <div className="flex items-center justify-center gap-2">
-                            {canEdit && (
-                              <Button variant="ghost" size="icon" className="h-8 w-8 text-gray-400 hover:text-emerald-600" onClick={() => handleOpenEdit(teacher)}>
-                                <Pencil className="h-3.5 w-3.5" />
-                              </Button>
-                            )}
-                            {canDelete && (
-                              <Button variant="ghost" size="icon" className="h-8 w-8 text-gray-400 hover:text-red-600" onClick={() => setDeletingId(teacher.id)}>
-                                <Trash2 className="h-3.5 w-3.5" />
-                              </Button>
-                            )}
-                          </div>
-                        </td>
-                      </tr>
-                    );
-                  })}
+                          </td>
+                          <td className="px-6 py-4 hidden sm:table-cell text-gray-600 dark:text-gray-400 font-medium">
+                            {teacher.experience || 'N/A'}
+                          </td>
+                          <td className="px-6 py-4 hidden lg:table-cell">
+                            <Badge variant="outline" className="font-normal text-xs">{teacher.qualification || 'N/A'}</Badge>
+                          </td>
+                          <td className="px-6 py-4">
+                            <div className="flex items-center justify-center gap-2">
+                              {canEdit && (
+                                <Button variant="ghost" size="icon" className="h-8 w-8 text-gray-400 hover:text-emerald-600" onClick={() => handleOpenEdit(teacher)}>
+                                  <Pencil className="h-3.5 w-3.5" />
+                                </Button>
+                              )}
+                              {canDelete && (
+                                <Button variant="ghost" size="icon" className="h-8 w-8 text-gray-400 hover:text-red-600" onClick={() => setDeletingId(teacher.id)}>
+                                  <Trash2 className="h-3.5 w-3.5" />
+                                </Button>
+                              )}
+                            </div>
+                          </td>
+                        </motion.tr>
+                      );
+                    })}
+                  </AnimatePresence>
                 </tbody>
               </table>
             </div>
           </CardContent>
         </Card>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {teachers.map((teacher, index) => (
-            <div key={teacher.id}>
-              <TeacherCard
-                teacher={teacher}
-                index={index}
-                canEdit={canEdit}
-                canDelete={canDelete}
-                deletingId={deletingId}
-                setDeletingId={setDeletingId}
-                onEdit={handleOpenEdit}
-                onDelete={handleDelete}
-              />
-            </div>
-          ))}
-        </div>
+        <motion.div 
+          layout
+          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"
+        >
+          <AnimatePresence mode="popLayout">
+            {teachers.map((teacher, index) => (
+              <motion.div 
+                key={teacher.id}
+                layout
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.9, transition: { duration: 0.2 } }}
+              >
+                <TeacherCard
+                  teacher={teacher}
+                  index={index}
+                  canEdit={canEdit}
+                  canDelete={canDelete}
+                  deletingId={deletingId}
+                  setDeletingId={setDeletingId}
+                  onEdit={handleOpenEdit}
+                  onDelete={handleDelete}
+                />
+              </motion.div>
+            ))}
+          </AnimatePresence>
+        </motion.div>
       )}
 
       {/* Pagination Controls */}
