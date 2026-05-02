@@ -30,11 +30,11 @@ export function PlanCard({ plan, isActive, cycle, onPurchase }: PlanCardProps) {
     <Card
       className={`relative rounded-2xl transition-all duration-500 ${
         isPopular
-          ? "premium-border amber-glow shadow-2xl"
-          : "glass-card shadow-lg border-white/20 dark:border-white/10"
+          ? "border-amber-500 shadow-xl bg-white dark:bg-gray-900"
+          : "bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-800 shadow-lg"
       } ${
         isActive
-          ? "ring-2 ring-emerald-500/50 shadow-emerald-500/10"
+          ? "ring-2 ring-emerald-500/50"
           : ""
       }`}
     >

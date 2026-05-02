@@ -209,13 +209,9 @@ export function ParentSubscription() {
 
   return (
     <div className="relative space-y-8 pb-12">
-      {/* Decorative Background Glows */}
-      <div className="absolute top-0 left-1/4 w-64 h-64 bg-amber-200/20 dark:bg-amber-900/10 blur-[100px] rounded-full -z-10" />
-      <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-orange-200/10 dark:bg-orange-900/5 blur-[120px] rounded-full -z-10" />
-
       {/* Header */}
       <div className="text-center max-w-2xl mx-auto px-4 relative">
-        <div className="inline-flex items-center justify-center w-12 h-12 sm:w-16 sm:h-16 rounded-2xl bg-gradient-to-br from-amber-400 to-orange-500 text-white mb-4 shadow-lg shadow-amber-200 dark:shadow-amber-900/30 amber-glow">
+        <div className="inline-flex items-center justify-center w-12 h-12 sm:w-16 sm:h-16 rounded-2xl bg-gradient-to-br from-amber-400 to-orange-500 text-white mb-4 shadow-lg shadow-amber-200 dark:shadow-amber-900/30">
           <Crown className="h-6 w-6 sm:h-8 sm:w-8" />
         </div>
         <h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-gray-100 tracking-tight">Premium Subscriptions</h2>
@@ -239,7 +235,7 @@ export function ParentSubscription() {
         <Tabs 
           value={billingCycle} 
           onValueChange={(v) => setBillingCycle(v as any)} 
-          className="glass-card p-1.5 rounded-2xl shadow-xl w-full max-w-md border border-white/20 dark:border-white/5"
+          className="bg-gray-100 dark:bg-gray-800 p-1.5 rounded-2xl shadow-sm w-full max-w-md border border-gray-200 dark:border-gray-700"
         >
           <TabsList className="bg-transparent h-10 sm:h-12 flex w-full gap-1 p-0">
             <TabsTrigger 
