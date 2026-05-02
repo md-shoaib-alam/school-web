@@ -15,6 +15,16 @@ import {
   Loader2,
   Users as UsersIcon,
 } from "lucide-react";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { goeyToast as toast } from "goey-toast";
 import { useAppStore } from "@/store/use-app-store";
 
@@ -45,6 +55,8 @@ export function ParentSubscription() {
   const [purchaseDialogOpen, setPurchaseDialogOpen] = useState(false);
   const [purchasingPlan, setPurchasingPlan] = useState<Plan | null>(null);
   const [processing, setProcessing] = useState(false);
+  const [cancelDialogOpen, setCancelDialogOpen] = useState(false);
+  const [subToCancel, setSubToCancel] = useState<string | null>(null);
   const carouselRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -97,7 +109,39 @@ export function ParentSubscription() {
     if (!purchasingPlan || !parentId) return;
     setProcessing(true);
     try {
-      // 1. Create Subscription Order on Backend
+      // 🚀 UPGRADE/DOWNGRADE LOGIC
+      if (activeSubscription && activeSubscription.transactionId?.startsWith('sub_')) {
+        const currentPrice = activeSubscription.amount;
+        const newPrice = purchasingPlan.pricing[billingCycle].price;
+        const immediate = newPrice > currentPrice; // Upgrade = immediate, Downgrade = next cycle
+
+        const res = await apiFetch("/api/subscriptions/razorpay/update-subscription", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            subscriptionId: activeSubscription.transactionId,
+            planId: purchasingPlan.id,
+            period: billingCycle,
+            immediate
+          }),
+        });
+
+        const updateData = await res.json();
+        if (!res.ok) throw new Error(updateData.error || "Failed to update subscription");
+
+        toast.success(immediate ? "Plan Upgraded!" : "Plan Downgrade Scheduled", {
+          description: immediate 
+            ? `Your ${purchasingPlan.name} features are now active.` 
+            : `Your downgrade to ${purchasingPlan.name} will happen after this month.`
+        });
+        
+        setPurchaseDialogOpen(false);
+        fetchSubscriptions();
+        setProcessing(false);
+        return;
+      }
+
+      // 1. Create New Subscription Order on Backend
       const res = await apiFetch("/api/subscriptions/razorpay/create-subscription", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -180,18 +224,36 @@ export function ParentSubscription() {
     }
   };
 
-  const handleCancelSubscription = async (subscriptionId: string) => {
+  const handleCancelSubscription = (subscriptionId: string) => {
+    setSubToCancel(subscriptionId);
+    setCancelDialogOpen(true);
+  };
+
+  const confirmCancellation = async () => {
+    if (!subToCancel) return;
+    
+    setProcessing(true);
     try {
-      const res = await apiFetch("/api/subscriptions", {
+      const targetSub = allSubscriptions.find(s => s.id === subToCancel);
+      const rzpSubId = targetSub?.transactionId || subToCancel;
+
+      const res = await apiFetch("/api/subscriptions/razorpay/cancel-subscription", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ action: "cancel", subscriptionId }),
+        body: JSON.stringify({ subscriptionId: rzpSubId }),
       });
+
       if (!res.ok) throw new Error("Cancel failed");
-      toast.info("Subscription cancelled. You are now on the Basic plan.");
+      toast.success("Cancelled at period end", {
+        description: "Auto-pay is now off. Your access remains for now."
+      });
       await fetchSubscriptions();
-    } catch {
-      toast.error("Failed to cancel subscription.");
+    } catch (error: any) {
+      toast.error("Failed to cancel subscription", { description: error.message });
+    } finally {
+      setProcessing(false);
+      setCancelDialogOpen(false);
+      setSubToCancel(null);
     }
   };
 
@@ -313,6 +375,33 @@ export function ParentSubscription() {
         onConfirm={confirmPurchase}
         userName={currentUser?.name}
       />
+
+      {/* Cancellation Confirmation Dialog */}
+      <AlertDialog open={cancelDialogOpen} onOpenChange={setCancelDialogOpen}>
+        <AlertDialogContent className="rounded-2xl border-amber-100 dark:border-amber-900/30 shadow-2xl">
+          <AlertDialogHeader>
+            <AlertDialogTitle className="text-xl font-bold flex items-center gap-2">
+              <span className="w-8 h-8 rounded-full bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center">⚠️</span>
+              Cancel Subscription?
+            </AlertDialogTitle>
+            <AlertDialogDescription className="text-gray-600 dark:text-gray-400 py-2">
+              Your premium features will remain active until the end of the current billing cycle. 
+              After that, you will be moved to the free plan and auto-payments will stop.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter className="sm:justify-end gap-3">
+            <AlertDialogCancel className="rounded-xl border-gray-200 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
+              Keep Premium
+            </AlertDialogCancel>
+            <AlertDialogAction 
+              onClick={confirmCancellation}
+              className="rounded-xl bg-amber-600 hover:bg-amber-700 text-white shadow-md transition-all active:scale-95"
+            >
+              Confirm Cancellation
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
