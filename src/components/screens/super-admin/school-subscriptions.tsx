@@ -95,7 +95,6 @@ export function SuperAdminSchoolSubscriptions() {
         id: editingTenant.id,
         data: payload as any
       });
-      toast.success("School subscription updated");
       setIsDialogOpen(false);
       refetch();
     } catch (err: any) {
