@@ -175,7 +175,7 @@ export function AdminDashboard() {
   const tenant = tenantDetail?.tenant;
   const expiry = tenant?.endDate ? new Date(tenant.endDate) : null;
   const daysRemaining = expiry ? differenceInDays(expiry, new Date()) : null;
-  const isExpiringSoon = daysRemaining !== null && daysRemaining <= 30;
+  const isExpiringSoon = daysRemaining !== null && daysRemaining >= 0 && daysRemaining <= 3;
   const isExpired = daysRemaining !== null && daysRemaining < 0;
 
   return (
