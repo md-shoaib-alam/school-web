@@ -97,27 +97,85 @@ export function ParentSubscription() {
     if (!purchasingPlan || !parentId) return;
     setProcessing(true);
     try {
-      const res = await apiFetch("/api/subscriptions", {
+      // 1. Create Subscription Order on Backend
+      const res = await apiFetch("/api/subscriptions/razorpay/create-subscription", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          action: "purchase",
-          parentId,
           planId: purchasingPlan.id,
-          planName: purchasingPlan.name,
-          amount: purchasingPlan.pricing[billingCycle].price,
           period: billingCycle,
-          addons: [],
+          parentId
         }),
       });
-      if (!res.ok) throw new Error("Purchase failed");
-      toast.success(`Successfully subscribed to ${purchasingPlan.name} plan! 🎉`);
-      setPurchaseDialogOpen(false);
-      setPurchasingPlan(null);
-      await fetchSubscriptions();
-    } catch {
-      toast.error("Purchase failed. Please try again.");
-    } finally {
+      
+      const orderData = await res.json();
+      if (!res.ok) throw new Error(orderData.error || "Failed to initiate subscription");
+
+      // 2. Open Razorpay Checkout for Subscriptions
+      const options = {
+        key: orderData.keyId,
+        subscription_id: orderData.subscriptionId,
+        name: currentUser?.tenantName ? `${currentUser.tenantName} - Premium` : "Eylisia Premium",
+        description: `Unlocking ${purchasingPlan.name} Access`,
+        image: currentUser?.tenantLogo || "https://cdn-icons-png.flaticon.com/512/3135/3135715.png",
+        handler: async (response: any) => {
+          setProcessing(true);
+          try {
+            // 3. Verify Payment and Activate
+            const verifyRes = await apiFetch("/api/subscriptions/razorpay/verify-subscription", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                razorpay_payment_id: response.razorpay_payment_id,
+                razorpay_subscription_id: response.razorpay_subscription_id,
+                razorpay_signature: response.razorpay_signature,
+                parentId,
+                planId: purchasingPlan.id,
+                planName: purchasingPlan.name,
+                amount: purchasingPlan.pricing[billingCycle].price,
+                period: billingCycle
+              }),
+            });
+
+            if (!verifyRes.ok) throw new Error("Verification failed");
+
+            toast.success("Welcome to Premium!", {
+              description: `Your ${purchasingPlan.name} features are now active.`
+            });
+            
+            setPurchaseDialogOpen(false);
+            fetchSubscriptions();
+          } catch (err: any) {
+            toast.error("Activation Failed", {
+              description: "We could not verify your payment. Please contact support."
+            });
+          } finally {
+            setProcessing(false);
+          }
+        },
+        prefill: {
+          name: currentUser?.name || "",
+          email: currentUser?.email || "",
+          contact: (currentUser as any)?.phone || ""
+        },
+        theme: {
+          color: "#f59e0b",
+          backdrop_color: "#0f172a",
+          hide_topbar: false
+        },
+        modal: {
+          ondismiss: () => setProcessing(false),
+          backdrop_close: false,
+          confirm_close: true
+        }
+      };
+
+      const rzp = new (window as any).Razorpay(options);
+      rzp.open();
+    } catch (error: any) {
+      toast.error("Purchase failed", {
+        description: error.message || "Could not connect to payment gateway."
+      });
       setProcessing(false);
     }
   };
@@ -150,15 +208,19 @@ export function ParentSubscription() {
   }
 
   return (
-    <div className="space-y-8 pb-12">
+    <div className="relative space-y-8 pb-12">
+      {/* Decorative Background Glows */}
+      <div className="absolute top-0 left-1/4 w-64 h-64 bg-amber-200/20 dark:bg-amber-900/10 blur-[100px] rounded-full -z-10" />
+      <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-orange-200/10 dark:bg-orange-900/5 blur-[120px] rounded-full -z-10" />
+
       {/* Header */}
-      <div className="text-center max-w-2xl mx-auto px-4">
-        <div className="inline-flex items-center justify-center w-12 h-12 sm:w-16 sm:h-16 rounded-2xl bg-gradient-to-br from-amber-400 to-orange-500 text-white mb-4 shadow-lg shadow-amber-200 dark:shadow-amber-900/30">
+      <div className="text-center max-w-2xl mx-auto px-4 relative">
+        <div className="inline-flex items-center justify-center w-12 h-12 sm:w-16 sm:h-16 rounded-2xl bg-gradient-to-br from-amber-400 to-orange-500 text-white mb-4 shadow-lg shadow-amber-200 dark:shadow-amber-900/30 amber-glow">
           <Crown className="h-6 w-6 sm:h-8 sm:w-8" />
         </div>
-        <h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-gray-100">Subscription Plans</h2>
-        <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">
-          Choose the plan that works best for you. Upgrade or downgrade anytime.
+        <h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-gray-100 tracking-tight">Premium Subscriptions</h2>
+        <p className="text-sm text-gray-500 dark:text-gray-400 mt-2 max-w-md mx-auto leading-relaxed">
+          Unlock advanced analytics, AI-powered insights, and real-time parent-teacher engagement tools.
         </p>
       </div>
 
@@ -177,7 +239,7 @@ export function ParentSubscription() {
         <Tabs 
           value={billingCycle} 
           onValueChange={(v) => setBillingCycle(v as any)} 
-          className="bg-gray-100 dark:bg-gray-800 p-1 rounded-2xl border border-gray-200 dark:border-gray-700 shadow-sm w-full max-w-md"
+          className="glass-card p-1.5 rounded-2xl shadow-xl w-full max-w-md border border-white/20 dark:border-white/5"
         >
           <TabsList className="bg-transparent h-10 sm:h-12 flex w-full gap-1 p-0">
             <TabsTrigger 

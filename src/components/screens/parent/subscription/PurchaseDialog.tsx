@@ -83,41 +83,10 @@ export function PurchaseDialog({
               </CardContent>
             </Card>
 
-            <div className="space-y-3">
-              <div>
-                <label className="text-xs font-medium text-gray-500 dark:text-gray-400 block mb-1.5">
-                  Card Number
-                </label>
-                <div className="h-10 w-full rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50 px-3 flex items-center text-sm text-gray-400 dark:text-gray-500">
-                  4242 •••• •••• 8888
-                </div>
-              </div>
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="text-xs font-medium text-gray-500 dark:text-gray-400 block mb-1.5">
-                    Expiry
-                  </label>
-                  <div className="h-10 w-full rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50 px-3 flex items-center text-sm text-gray-400 dark:text-gray-500">
-                    12/27
-                  </div>
-                </div>
-                <div>
-                  <label className="text-xs font-medium text-gray-500 dark:text-gray-400 block mb-1.5">
-                    CVV
-                  </label>
-                  <div className="h-10 w-full rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50 px-3 flex items-center text-sm text-gray-400 dark:text-gray-500">
-                    •••
-                  </div>
-                </div>
-              </div>
-              <div>
-                <label className="text-xs font-medium text-gray-500 dark:text-gray-400 block mb-1.5">
-                  Cardholder Name
-                </label>
-                <div className="h-10 w-full rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50 px-3 flex items-center text-sm text-gray-400 dark:text-gray-500">
-                  {userName || "Parent Name"}
-                </div>
-              </div>
+            <div className="p-4 bg-amber-50 dark:bg-amber-900/10 rounded-lg border border-amber-100 dark:border-amber-900/20">
+              <p className="text-sm text-amber-800 dark:text-amber-200">
+                You will be redirected to our secure payment gateway to complete your subscription.
+              </p>
             </div>
           </div>
         )}

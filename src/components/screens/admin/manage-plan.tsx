@@ -10,6 +10,7 @@ import { ArrowLeft, Crown, ShieldCheck } from "lucide-react";
 import { useRouter, useParams } from "next/navigation";
 import { goeyToast as toast } from "goey-toast";
 import { useQueryClient } from "@tanstack/react-query";
+import { api } from "@/lib/api";
 
 export function ManagePlanScreen() {
   const router = useRouter();
@@ -23,42 +24,74 @@ export function ManagePlanScreen() {
   const tenant = detailData?.tenant;
 
   const handleUpgrade = async (plan: SchoolPlan) => {
-    const queryKey = ["tenant-detail", currentTenantId];
-    const previousDetail = queryClient.getQueryData(queryKey);
-
-    // OPTIMISTIC UPDATE
-    queryClient.setQueryData(queryKey, (old: any) => {
-      if (!old || !old.tenant) return old;
-      return {
-        ...old,
-        tenant: {
-          ...old.tenant,
-          plan: plan.id,
-          maxStudents: plan.limits.students,
-          maxTeachers: plan.limits.teachers,
-          maxParents: plan.limits.parents,
-          maxClasses: plan.limits.classes,
-        }
-      };
-    });
-
     setIsUpdating(true);
     try {
-      await upgradeSchool.mutateAsync({
-        plan: plan.id,
-        maxStudents: plan.limits.students,
-        maxTeachers: plan.limits.teachers,
-        maxParents: plan.limits.parents,
-        maxClasses: plan.limits.classes,
+      // 1. Create Order on Backend
+      const orderData = await api.post("/tenants/create-subscription-order", { 
+        planId: plan.id 
       });
-      router.push(`/${slug}/school-subscription`);
+
+      const { orderId, amount, currency, keyId } = orderData;
+
+      // 2. Configure Razorpay Options
+      const options = {
+        key: keyId,
+        amount: amount,
+        currency: currency,
+        name: "Eylisia School SaaS",
+        description: `Upgrade to ${plan.name} Plan`,
+        image: "https://z-cdn.chatglm.cn/z-ai/static/logo.svg",
+        order_id: orderId,
+        handler: async (response: any) => {
+          setIsUpdating(true);
+          try {
+            // 3. Verify Payment Signature and Update Plan
+            await api.post("/tenants/verify-subscription-payment", {
+              razorpay_order_id: response.razorpay_order_id,
+              razorpay_payment_id: response.razorpay_payment_id,
+              razorpay_signature: response.razorpay_signature,
+              planId: plan.id,
+              limits: plan.limits
+            });
+
+            toast.success("Subscription Active!", {
+              description: `You are now on the ${plan.name} plan.`
+            });
+            
+            // Invalidate cache to reflect new limits immediately
+            queryClient.invalidateQueries({ queryKey: ["tenant-detail", currentTenantId] });
+            router.push(`/${slug}/school-subscription`);
+          } catch (verifyErr: any) {
+            toast.error("Verification Failed", {
+              description: "Please contact support if your payment was debited."
+            });
+          } finally {
+            setIsUpdating(false);
+          }
+        },
+        prefill: {
+          name: tenant?.name || "",
+          email: tenant?.email || "",
+          contact: tenant?.phone || ""
+        },
+        notes: {
+          tenantId: currentTenantId,
+          planId: plan.id
+        },
+        theme: {
+          color: "#4f46e5"
+        },
+        modal: {
+          ondismiss: () => setIsUpdating(false)
+        }
+      };
+
+      const rzp = new (window as any).Razorpay(options);
+      rzp.open();
     } catch (err: any) {
-      // ROLLBACK
-      queryClient.setQueryData(queryKey, previousDetail);
-      toast.error("Upgrade Failed", {
-        description: err.message || "Something went wrong while processing your request."
+      toast.error("Payment Initiation Failed", {
+        description: err.message || "Could not connect to payment gateway."
       });
-    } finally {
       setIsUpdating(false);
     }
   };

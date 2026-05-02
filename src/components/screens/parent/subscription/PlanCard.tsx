@@ -28,12 +28,14 @@ export function PlanCard({ plan, isActive, cycle, onPurchase }: PlanCardProps) {
 
   return (
     <Card
-      className={`relative rounded-2xl transition-all duration-300 hover:shadow-lg ${
+      className={`relative rounded-2xl transition-all duration-500 ${
         isPopular
-          ? "border-amber-300 dark:border-amber-800 shadow-md ring-2 ring-amber-100 dark:ring-amber-900/30"
-          : isActive
-            ? "border-emerald-300 dark:border-emerald-800 shadow-md ring-2 ring-emerald-100 dark:ring-emerald-900/30"
-            : "border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600"
+          ? "premium-border amber-glow shadow-2xl"
+          : "glass-card shadow-lg border-white/20 dark:border-white/10"
+      } ${
+        isActive
+          ? "ring-2 ring-emerald-500/50 shadow-emerald-500/10"
+          : ""
       }`}
     >
       {plan.badge && (
@@ -110,12 +112,12 @@ export function PlanCard({ plan, isActive, cycle, onPurchase }: PlanCardProps) {
         <Button
           className={`w-full h-10 sm:h-11 text-xs sm:text-sm font-semibold rounded-xl mt-2 ${
             isActive
-              ? "bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 hover:bg-emerald-200 dark:hover:bg-emerald-900/50"
+              ? "bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400"
               : isPopular
-                ? "bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white shadow-md"
+                ? "bg-gradient-to-r from-amber-500 to-orange-500 text-white shadow-md"
                 : plan.id === "premium"
-                  ? "bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white shadow-md"
-                  : "bg-gray-900 dark:bg-gray-100 hover:bg-gray-800 dark:hover:bg-gray-200 text-white dark:text-gray-900"
+                  ? "bg-gradient-to-r from-emerald-500 to-teal-600 text-white shadow-md"
+                  : "bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900"
           }`}
           onClick={() => (isActive ? null : onPurchase({ ...plan, price } as any))}
           disabled={isActive}
@@ -139,24 +141,30 @@ export function PlanCard({ plan, isActive, cycle, onPurchase }: PlanCardProps) {
           <p className="text-[10px] sm:text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
             What&apos;s included
           </p>
-          {plan.features.map((feature, idx) => (
-            <div key={idx} className="flex items-start gap-2 sm:gap-2.5">
-              {feature.included ? (
-                <div className="h-4 w-4 sm:h-5 sm:w-5 rounded-full bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0 mt-0.5">
-                  <Check className="h-2.5 w-2.5 sm:h-3 sm:w-3" />
-                </div>
-              ) : (
-                <div className="h-4 w-4 sm:h-5 sm:w-5 rounded-full bg-gray-100 dark:bg-gray-800 text-gray-400 dark:text-gray-500 flex items-center justify-center shrink-0 mt-0.5">
-                  <span className="text-[10px]">✕</span>
-                </div>
-              )}
-              <span
-                className={`text-[11px] sm:text-sm ${feature.included ? "text-gray-700 dark:text-gray-300" : "text-gray-400 dark:text-gray-500"}`}
-              >
-                {feature.text}
-              </span>
-            </div>
-          ))}
+          {plan.features.map((feature, idx) => {
+            const isObject = typeof feature !== "string";
+            const text = isObject ? (feature as any).text : feature;
+            const included = isObject ? (feature as any).included : true;
+
+            return (
+              <div key={idx} className="flex items-start gap-2 sm:gap-2.5">
+                {included ? (
+                  <div className="h-4 w-4 sm:h-5 sm:w-5 rounded-full bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0 mt-0.5">
+                    <Check className="h-2.5 w-2.5 sm:h-3 sm:w-3" />
+                  </div>
+                ) : (
+                  <div className="h-4 w-4 sm:h-5 sm:w-5 rounded-full bg-gray-100 dark:bg-gray-800 text-gray-400 dark:text-gray-500 flex items-center justify-center shrink-0 mt-0.5">
+                    <span className="text-[10px]">✕</span>
+                  </div>
+                )}
+                <span
+                  className={`text-[11px] sm:text-sm ${included ? "text-gray-700 dark:text-gray-300" : "text-gray-400 dark:text-gray-500"}`}
+                >
+                  {text}
+                </span>
+              </div>
+            );
+          })}
         </div>
       </CardContent>
     </Card>
