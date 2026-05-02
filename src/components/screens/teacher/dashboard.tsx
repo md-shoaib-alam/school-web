@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useRouter } from "next/navigation";
 import { useAppStore } from "@/store/use-app-store";
 import { useTeacherDashboard } from "@/lib/graphql/hooks";
 import { goeyToast as toast } from "goey-toast";
@@ -24,10 +25,17 @@ import {
 } from "lucide-react";
 
 export function TeacherDashboard() {
-  const { currentUser, setCurrentScreen } = useAppStore();
+  const router = useRouter();
+  const { currentUser, currentTenantSlug, currentTenantId, setCurrentScreen } = useAppStore();
 
   const navigateTo = (screen: string) => {
     setCurrentScreen(screen);
+    const tid = currentTenantSlug || currentTenantId || currentUser?.tenantSlug || currentUser?.tenantId;
+    if (tid) {
+      router.push(`/${tid}/${screen}`);
+    } else {
+      router.push(`/${screen}`);
+    }
   };
   const { data, isLoading, isPending, fetchStatus, isError, error } = useTeacherDashboard(
     currentUser?.name || "",

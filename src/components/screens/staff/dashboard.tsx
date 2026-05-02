@@ -2,6 +2,7 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { useRouter } from "next/navigation";
 import { useAppStore } from "@/store/use-app-store";
 import { useAdminDashboard } from "@/lib/graphql/hooks";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -21,8 +22,19 @@ import {
 } from "lucide-react";
 
 export function StaffDashboard() {
-  const { currentUser, currentTenantName, setCurrentScreen } = useAppStore();
+  const router = useRouter();
+  const { currentUser, currentTenantName, currentTenantSlug, currentTenantId, setCurrentScreen } = useAppStore();
   const customRoleName = currentUser?.customRole?.name;
+
+  const navigateTo = (screen: string) => {
+    setCurrentScreen(screen);
+    const tid = currentTenantSlug || currentTenantId || currentUser?.tenantSlug || currentUser?.tenantId;
+    if (tid) {
+      router.push(`/${tid}/${screen}`);
+    } else {
+      router.push(`/${screen}`);
+    }
+  };
 
   const { data, isPending, fetchStatus } = useAdminDashboard(currentUser?.tenantId || "");
 
@@ -231,7 +243,7 @@ export function StaffDashboard() {
           {quickActions.map((action) => (
             <button
               key={action.screen}
-              onClick={() => setCurrentScreen(action.screen)}
+              onClick={() => navigateTo(action.screen)}
               className="flex items-center gap-3 p-4 rounded-xl border border-gray-200 dark:border-gray-800 hover:shadow-md transition-all hover:border-transparent text-left group"
             >
               <div

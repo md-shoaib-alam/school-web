@@ -279,7 +279,15 @@ export function renderTableCells(activeTab: TabType, item: any) {
             </Badge>
           </TableCell>
           <TableCell className={`${cellClasses} text-right text-xs font-bold text-muted-foreground`}>
-            {format(new Date(n.createdAt), "dd MMM yyyy")}
+            {(() => {
+              try {
+                const date = new Date(n.createdAt);
+                if (isNaN(date.getTime())) return "—";
+                return format(date, "dd MMM yyyy");
+              } catch {
+                return "—";
+              }
+            })()}
           </TableCell>
         </>
       );

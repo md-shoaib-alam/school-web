@@ -50,7 +50,7 @@ function getInitialTenantInfo(): { id: string | null; slug: string | null; name:
 
 function buildUrl(tenantId: string | null, tenantSlug: string | null, screen: string): string {
   const identifier = tenantSlug || tenantId;
-  if (!identifier) return screen === 'dashboard' ? '/' : `/${screen}`;
+  if (!identifier) return `/${screen}`;
   return screen === 'dashboard' ? `/${identifier}` : `/${identifier}/${screen}`;
 }
 
@@ -167,10 +167,7 @@ export const useAppStore = create<AppState>((set, get) => ({
   },
 
   setCurrentScreen: (screen) => {
-    const state = get();
     if (typeof window !== 'undefined') {
-      const url = buildUrl(state.currentTenantId, state.currentTenantSlug, screen);
-      window.history.pushState({}, '', url);
       try { localStorage.setItem(STORAGE_KEYS.LAST_SCREEN, screen); } catch { /* ignore */ }
     }
     set({ currentScreen: screen, currentSubScreen: null }); // Reset sub-screen when changing main screen

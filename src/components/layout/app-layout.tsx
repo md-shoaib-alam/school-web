@@ -27,6 +27,8 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
     currentTenantId,
     currentTenantSlug,
     setCurrentTenant,
+    currentScreen,
+    setCurrentScreen,
     sidebarOpen,
     setSidebarOpen,
     refreshPermissions,
@@ -110,6 +112,9 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
 
   const navigateTo = (screen: string) => {
     setSidebarOpen(false);
+    if (screen === currentScreen) return; // Skip if already on this screen
+    
+    setCurrentScreen(screen);
     const tenantIdentifier = currentTenantSlug || currentTenantId;
 
     // For Super Admins, platform routes should always be at the top level (e.g. /users, /feature-flags)
@@ -132,13 +137,13 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
     ].includes(screen);
 
     if (isSuperAdmin && isPlatformRoute) {
-      router.push(screen === "dashboard" ? "/" : `/${screen}`);
+      router.push(`/${screen}`);
       return;
     }
 
-    // Always use the full /[tenant]/[screen] pattern, except for root platform dashboard
+    // Always use the full /[tenant]/[screen] pattern
     if (!tenantIdentifier) {
-      router.push(screen === "dashboard" ? "/" : `/${screen}`);
+      router.push(`/${screen}`);
     } else {
       router.push(`/${tenantIdentifier}/${screen}`);
     }

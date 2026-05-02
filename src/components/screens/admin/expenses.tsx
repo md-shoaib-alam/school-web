@@ -168,6 +168,25 @@ export function ExpensesScreen() {
     }
   };
 
+  const handleExport = async () => {
+    try {
+      const res = await apiFetch("/api/exports?type=expenses", {
+        method: "GET",
+      });
+      if (!res.ok) throw new Error("Export failed");
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `expenses_${new Date().toISOString().split('T')[0]}.xlsx`;
+      a.click();
+      URL.revokeObjectURL(url);
+      toast.success("Expenses exported to Excel successfully");
+    } catch {
+      toast.error("Export failed");
+    }
+  };
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -309,7 +328,7 @@ export function ExpensesScreen() {
           </div>
 
           <div className="flex items-center gap-2">
-            <Button variant="outline" size="sm">
+            <Button variant="outline" size="sm" onClick={handleExport}>
               <Download className="h-4 w-4 mr-2" />
               Export
             </Button>

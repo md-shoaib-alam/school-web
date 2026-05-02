@@ -91,7 +91,7 @@ export function SchoolDetail({
   async function handleExport(dataType: string) {
     setExporting(true);
     try {
-      const res = await apiFetch("/api/export", {
+      const res = await apiFetch("/api/exports", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ tenantId, dataType }),
@@ -101,10 +101,10 @@ export function SchoolDetail({
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
-      a.download = `${tenantSlug}_${dataType}.csv`;
+      a.download = `${tenantSlug}_${dataType}.xlsx`;
       a.click();
       URL.revokeObjectURL(url);
-      toast.success(`${dataType} exported successfully`);
+      toast.success(`${dataType} exported to Excel successfully`);
     } catch {
       toast.error("Export failed");
     } finally {
