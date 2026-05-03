@@ -1,7 +1,7 @@
 "use client";
 
 import { apiFetch } from "@/lib/api";
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { 
   Activity, 
   Database, 
@@ -16,7 +16,12 @@ import {
   Cpu,
   Wifi,
   Cloud,
-  Code
+  Code,
+  Shield,
+  Users,
+  Building2,
+  CreditCard,
+  Workflow
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -27,11 +32,14 @@ export function SuperAdminAnalytics() {
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState<any>(null);
   const [lastChecked, setLastChecked] = useState("");
+  const isFetchingRef = useRef(false);
 
   const fetchHealth = useCallback(async () => {
+    if (isFetchingRef.current) return;
+    isFetchingRef.current = true;
+    
     setLoading(true);
     try {
-      // Fetching from /health which provides the comprehensive system status
       const res = await apiFetch("/api/health");
       if (res.ok) {
         const json = await res.json();
@@ -42,6 +50,7 @@ export function SuperAdminAnalytics() {
       console.error("Failed to fetch health data:", error);
     } finally {
       setLoading(false);
+      isFetchingRef.current = false;
     }
   }, []);
 
@@ -83,6 +92,7 @@ export function SuperAdminAnalytics() {
   const memory = data?.memory || {};
   const pool = data?.pool || {};
   const server = data?.server || {};
+  const records = services?.database?.records || {};
 
   const coreMetrics = [
     { label: "System Uptime", value: formatUptime(data?.uptime), icon: <Clock className="h-4 w-4" />, color: "text-emerald-600" },
@@ -113,7 +123,11 @@ export function SuperAdminAnalytics() {
             Platform Status: <span className={data?.status === "healthy" ? "text-emerald-600 font-bold" : "text-amber-600 font-bold"}>{data?.status?.toUpperCase() || "UNKNOWN"}</span>
           </span>
         </div>
-        <span className="text-xs text-gray-400">Environment: <span className="font-bold uppercase">{server?.environment || "N/A"}</span> • Checked: {lastChecked}</span>
+        <div className="flex items-center gap-4 text-xs text-gray-400">
+           <span className="hidden sm:inline">Environment: <span className="font-bold uppercase text-gray-600 dark:text-gray-300">{server?.environment || "N/A"}</span></span>
+           <span className="hidden sm:inline h-4 w-px bg-gray-200 dark:bg-gray-700" />
+           <span>Checked: {lastChecked}</span>
+        </div>
       </div>
 
       {/* Core Metrics Grid */}
@@ -149,6 +163,8 @@ export function SuperAdminAnalytics() {
             {[
               { label: "Database", status: services?.database?.status, latency: services?.database?.latency, icon: <Database className="h-4 w-4" /> },
               { label: "Redis Cache", status: services?.redis?.status, latency: services?.redis?.latency, icon: <Zap className="h-4 w-4" /> },
+              { label: "Razorpay", status: services?.razorpay?.status, icon: <CreditCard className="h-4 w-4" /> },
+              { label: "BullMQ (Queues)", status: services?.bullmq?.status, icon: <Workflow className="h-4 w-4" /> },
               { label: "Firebase (FCM)", status: services?.firebase?.status, sub: services?.firebase?.serviceAccountName, icon: <Cloud className="h-4 w-4" /> },
               { label: "Object Storage (R2)", status: services?.storage?.status, icon: <Box className="h-4 w-4" /> },
             ].map((svc, i) => (
@@ -173,6 +189,36 @@ export function SuperAdminAnalytics() {
           </CardContent>
         </Card>
 
+        {/* Platform Statistics */}
+        <Card className="border border-gray-200 dark:border-gray-700 shadow-sm bg-white dark:bg-gray-800">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-base font-bold flex items-center gap-2">
+              <Shield className="h-4 w-4 text-teal-600" />
+              Platform Records
+            </CardTitle>
+            <CardDescription className="text-xs">Aggregate counts across all tenants</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-3 pt-4">
+            {[
+              { label: "Total Schools", value: records?.schools, icon: <Building2 className="h-3.5 w-3.5" /> },
+              { label: "Total Users", value: records?.users, icon: <Users className="h-3.5 w-3.5" /> },
+            ].map((stat, i) => (
+              <div key={i} className="flex justify-between items-center py-2 border-b border-gray-100 dark:border-gray-700 last:border-0">
+                <div className="flex items-center gap-2 text-sm text-gray-500">
+                  {stat.icon}
+                  {stat.label}
+                </div>
+                <span className="text-sm font-bold text-gray-900 dark:text-white">{(stat.value || 0).toLocaleString()}</span>
+              </div>
+            ))}
+            <div className="pt-2">
+               <p className="text-[10px] text-gray-400 italic font-medium leading-relaxed">
+                 Real-time synchronization with primary database. Counts reflect all registered entities across the SaaS network.
+               </p>
+            </div>
+          </CardContent>
+        </Card>
+
         {/* Memory Allocation */}
         <Card className="border border-gray-200 dark:border-gray-700 shadow-sm bg-white dark:bg-gray-800">
           <CardHeader className="pb-2">
@@ -184,9 +230,9 @@ export function SuperAdminAnalytics() {
           </CardHeader>
           <CardContent className="space-y-4 pt-4">
             {[
-              { label: "Heap Used", value: memory?.heapUsed },
-              { label: "Heap Total", value: memory?.heapTotal },
-              { label: "External", value: memory?.external },
+              { label: "Heap Used", value: memory?.heapUsed, color: "bg-purple-500" },
+              { label: "Heap Total", value: memory?.heapTotal, color: "bg-blue-500" },
+              { label: "External", value: memory?.external, color: "bg-amber-500" },
             ].map((mem, i) => (
               <div key={i} className="space-y-1">
                 <div className="flex justify-between text-xs font-medium">
@@ -194,7 +240,7 @@ export function SuperAdminAnalytics() {
                   <span className="text-gray-900 dark:text-gray-100">{mem.value}</span>
                 </div>
                 <div className="h-1.5 w-full bg-gray-100 dark:bg-gray-700 rounded-full overflow-hidden">
-                  <div className="h-full bg-purple-500" style={{ width: '45%' }} />
+                  <div className={`h-full ${mem.color}`} style={{ width: '45%' }} />
                 </div>
               </div>
             ))}
@@ -226,33 +272,28 @@ export function SuperAdminAnalytics() {
           </CardContent>
         </Card>
 
-        {/* Server Environment */}
-        <Card className="lg:col-span-2 border border-gray-200 dark:border-gray-700 shadow-sm bg-white dark:bg-gray-800">
+        {/* Runtime Environment */}
+        <Card className="border border-gray-200 dark:border-gray-700 shadow-sm bg-white dark:bg-gray-800">
           <CardHeader className="pb-2">
             <CardTitle className="text-base font-bold flex items-center gap-2">
               <Server className="h-4 w-4 text-gray-600" />
-              Runtime Environment
+              Runtime Details
             </CardTitle>
+            <CardDescription className="text-xs">System environment and node version</CardDescription>
           </CardHeader>
-          <CardContent className="pt-2">
-             <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-                <div className="p-3 rounded-lg bg-gray-50 dark:bg-gray-900/30">
-                  <p className="text-[10px] font-bold text-gray-400 uppercase">OS Platform</p>
-                  <p className="text-sm font-bold mt-1 uppercase">{server?.platform || "Unknown"}</p>
-                </div>
-                <div className="p-3 rounded-lg bg-gray-50 dark:bg-gray-900/30">
-                  <p className="text-[10px] font-bold text-gray-400 uppercase">Node Engine</p>
-                  <p className="text-sm font-bold mt-1">{server?.nodeVersion || "N/A"}</p>
-                </div>
-                <div className="p-3 rounded-lg bg-gray-50 dark:bg-gray-900/30">
-                  <p className="text-[10px] font-bold text-gray-400 uppercase">Environment</p>
-                  <p className="text-sm font-bold mt-1 capitalize">{server?.environment || "N/A"}</p>
-                </div>
-                <div className="p-3 rounded-lg bg-gray-50 dark:bg-gray-900/30">
-                  <p className="text-[10px] font-bold text-gray-400 uppercase">Process ID</p>
-                  <p className="text-sm font-bold mt-1">#4920</p>
-                </div>
-             </div>
+          <CardContent className="space-y-3 pt-4">
+            <div className="flex justify-between items-center py-2 border-b border-gray-100 dark:border-gray-700">
+              <span className="text-sm text-gray-500">OS Platform</span>
+              <span className="text-sm font-bold text-gray-900 dark:text-white uppercase">{server?.platform || "Unknown"}</span>
+            </div>
+            <div className="flex justify-between items-center py-2 border-b border-gray-100 dark:border-gray-700">
+              <span className="text-sm text-gray-500">Node Engine</span>
+              <span className="text-sm font-bold text-gray-900 dark:text-white">{server?.nodeVersion || "N/A"}</span>
+            </div>
+            <div className="flex justify-between items-center py-2">
+              <span className="text-sm text-gray-500">Environment</span>
+              <span className="text-sm font-bold text-gray-900 dark:text-white capitalize">{server?.environment || "N/A"}</span>
+            </div>
           </CardContent>
         </Card>
       </div>
