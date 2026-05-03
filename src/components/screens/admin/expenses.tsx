@@ -56,6 +56,7 @@ import { useExpenses } from "@/hooks/use-expenses";
 import { DatePicker } from "@/components/ui/date-picker";
 import { goeyToast as toast } from "goey-toast";
 import { format } from "date-fns";
+import { apiFetch } from "@/lib/api";
 
 interface FilterState {
   page: number;

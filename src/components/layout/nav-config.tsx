@@ -13,6 +13,7 @@ import {
   FileText,
   Trophy,
   BarChart3,
+  Activity,
   Settings,
   CreditCard,
   TrendingUp,
@@ -140,8 +141,8 @@ export const navItems: Record<UserRole, NavItem[]> = {
     // Insights & Security
     {
       key: "platform-analytics",
-      label: "Platform Analytics",
-      icon: <PieChart className="h-4 w-4" />,
+      label: "System Performance",
+      icon: <Activity className="h-4 w-4" />,
       permModule: "analytics",
     },
     {

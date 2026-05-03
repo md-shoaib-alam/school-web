@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useParams, usePathname, useRouter } from "next/navigation";
 import { useAppStore } from "@/store/use-app-store";
 import { useTenantResolution } from "@/lib/graphql/hooks/platform.hooks";
@@ -110,7 +110,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
     return true;
   });
 
-  const navigateTo = (screen: string) => {
+  const navigateTo = useCallback((screen: string) => {
     setSidebarOpen(false);
     if (screen === currentScreen) return; // Skip if already on this screen
     
@@ -147,7 +147,18 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
     } else {
       router.push(`/${tenantIdentifier}/${screen}`);
     }
-  };
+  }, [currentScreen, currentTenantId, currentTenantSlug, isSuperAdmin, router, setCurrentScreen, setSidebarOpen]);
+
+  // Listen for navigation events from children (e.g. SuperAdminDashboard Quick Actions)
+  useEffect(() => {
+    const handleNavigationEvent = (e: any) => {
+      if (e.detail) {
+        navigateTo(e.detail);
+      }
+    };
+    window.addEventListener("super-admin-navigate", handleNavigationEvent);
+    return () => window.removeEventListener("super-admin-navigate", handleNavigationEvent);
+  }, [navigateTo]);
 
   return (
     <NotificationProvider>

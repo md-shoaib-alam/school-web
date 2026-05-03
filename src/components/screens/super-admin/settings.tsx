@@ -12,9 +12,7 @@ import { PlansTab } from "./settings/PlansTab";
 import { NotificationsTab } from "./settings/NotificationsTab";
 import { SecurityTab } from "./settings/SecurityTab";
 import { ApiTab } from "./settings/ApiTab";
-import { PerformanceAudit } from "./settings/PerformanceAudit";
 import { StickySaveBar } from "./settings/StickySaveBar";
-import { PerformanceData } from "./settings/types";
 
 export function SuperAdminSettings() {
   // General Settings
@@ -46,9 +44,6 @@ export function SuperAdminSettings() {
 
   const [editingPlan, setEditingPlan] = useState<string | null>(null);
 
-  // Performance Monitoring
-  const [checking, setChecking] = useState(false);
-  const [perfData, setPerfData] = useState<PerformanceData | null>(null);
 
   // Fetch maintenance mode from DB on mount
   useEffect(() => {
@@ -111,21 +106,6 @@ export function SuperAdminSettings() {
     }
   };
 
-  const handleCheckPerformance = async () => {
-    setChecking(true);
-    try {
-      const res = await apiFetch("/api/performance");
-      if (!res.ok) throw new Error("Performance check failed");
-      const data = await res.json();
-      if (data.status === "error") throw new Error(data.message);
-      setPerfData(data);
-      toast.success("Performance check completed successfully!");
-    } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Performance check failed");
-    } finally {
-      setChecking(false);
-    }
-  };
 
   const handleSaveAll = () => {
     toast.success("Settings saved successfully!", {
@@ -212,11 +192,6 @@ export function SuperAdminSettings() {
         </TabsContent>
       </Tabs>
 
-      <PerformanceAudit 
-        checking={checking} 
-        onCheck={handleCheckPerformance} 
-        perfData={perfData} 
-      />
 
       <StickySaveBar onSave={handleSaveAll} />
     </div>
