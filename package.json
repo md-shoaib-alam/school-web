@@ -3,7 +3,7 @@
   "version": "0.2.0",
   "private": true,
   "scripts": {
-    "dev": "bun --bun next dev",
+    "dev": "bun next dev",
     "build": "bun --bun next build",
     "start": "bun --bun next start",
     "lint": "next lint"
@@ -48,6 +48,7 @@
     "@tanstack/react-query-persist-client": "^5.99.0",
     "@tanstack/react-table": "^8.21.3",
     "axios": "^1.15.0",
+    "boneyard-js": "^1.8.1",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "cmdk": "^1.1.1",

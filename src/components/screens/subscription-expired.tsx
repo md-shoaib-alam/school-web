@@ -75,7 +75,7 @@ export function SubscriptionExpiredScreen({ tenantName, tenantSlug, role, endDat
             )}
             
             <button 
-              onClick={() => window.location.href = "/"}
+              onClick={() => router.push("/")}
               className="w-full text-center text-sm text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 py-2 transition-colors"
             >
               Back to Dashboard

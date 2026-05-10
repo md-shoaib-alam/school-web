@@ -4,6 +4,7 @@ import "./globals.css";
 import { Providers } from "@/components/providers";
 import { ThemeProvider } from "next-themes";
 import { PHProvider } from "@/components/posthog-provider";
+import '@/bones/registry';
 
 const geistSans = Geist({
   variable: "--font-geist-sans",

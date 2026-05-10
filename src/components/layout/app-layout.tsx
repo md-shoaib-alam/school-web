@@ -21,6 +21,8 @@ function LoadingProgress() {
   return <div className="loading-progress-bar" />;
 }
 
+import { FullPageSkeleton } from "@/components/ui/full-page-skeleton";
+
 export function AppLayout({ children }: { children: React.ReactNode }) {
   const { slug } = useParams();
   const {
@@ -75,7 +77,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
     return () => clearInterval(interval);
   }, [currentUser]);
 
-  if (!currentUser) return null;
+  if (!currentUser) return <FullPageSkeleton />;
 
   // Determine current screen from pathname
   const parts = pathname.split("/").filter(Boolean);
