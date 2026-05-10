@@ -60,7 +60,7 @@ export function TeacherClasses() {
     staleTime: 5 * 60 * 1000,
   });
 
-  const classes = [...(classData || [])].sort((a, b) => {
+  const classes = [...(Array.isArray(classData) ? classData : [])].sort((a, b) => {
     // Extract numeric part from grade name (e.g. "Grade 5" → 5)
     const gradeNum = (g: string) => parseInt(g.replace(/\D/g, ""), 10) || 0;
     const gradeDiff = gradeNum(a.name) - gradeNum(b.name);

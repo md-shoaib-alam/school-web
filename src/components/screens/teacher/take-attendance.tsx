@@ -3,7 +3,7 @@
 import { api } from "@/lib/api";
 import { queryClient } from "@/lib/query-client";
 import { useQuery, useMutation } from "@tanstack/react-query";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -106,24 +106,25 @@ export function TeacherAttendance() {
 
   // ── Fetch classes ──────────────────────────────────────────
 
-  const { data: classes = [], isLoading: classesLoading } = useQuery({
+  const { data: rawClasses, isLoading: classesLoading } = useQuery({
     queryKey: classesKey(),
-    queryFn: () => api.get<ClassInfo[]>("/classes?all=true"),
-    staleTime: 5 * 60 * 1000,
-    select: (data) => {
-      // Auto-select first class on first load
-      if (data.length > 0 && !selectedClassId) {
-        // We set it via side-effect below; just return data
-      }
-      return data;
+    queryFn: async () => {
+      const data = await api.get<any>("/classes?all=true");
+      return (Array.isArray(data) ? data : []) as ClassInfo[];
     },
+    staleTime: 5 * 60 * 1000,
+    select: (data) => data,
   });
 
-  // Auto-select first class once loaded
-  const firstClassId = classes[0]?.id;
-  if (firstClassId && !selectedClassId) {
-    setSelectedClassId(firstClassId);
-  }
+  const classes = Array.isArray(rawClasses) ? rawClasses : [];
+
+  // Auto-select first class once loaded safely in an effect to prevent infinity loop
+  useEffect(() => {
+    const firstClassId = classes[0]?.id;
+    if (firstClassId && !selectedClassId) {
+      setSelectedClassId(firstClassId);
+    }
+  }, [classes, selectedClassId]);
 
   // ── Fetch students for selected class ─────────────────────
 
@@ -168,14 +169,11 @@ export function TeacherAttendance() {
   >({});
   const [saved, setSaved] = useState(false);
 
-  // Reset overrides when class or date changes
-  const prevKey = `${selectedClassId}__${date}`;
-  const [lastKey, setLastKey] = useState(prevKey);
-  if (prevKey !== lastKey) {
-    setLastKey(prevKey);
+  // Reset overrides when class or date changes safely in effect
+  useEffect(() => {
     setLocalOverrides({});
     setSaved(false);
-  }
+  }, [selectedClassId, date]);
 
   const serverRecords = buildRecords(students, existingAttendance);
   const records: AttendanceRecord[] = serverRecords.map((r) => ({
@@ -226,7 +224,7 @@ export function TeacherAttendance() {
     onSuccess: () => {
       setSaved(true);
       setLocalOverrides({});
-      toast.success(`Attendance for ${date} has been recorded successfully.`);
+      toast.success("Attendance saved!");
 
       // Background refetch to sync with server truth
       queryClient.invalidateQueries({
