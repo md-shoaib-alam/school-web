@@ -13,6 +13,7 @@ import { useIsFetching } from "@tanstack/react-query";
 import { getCookie } from "@/lib/cookies";
 import { NotificationProvider } from "@/components/providers/notification-provider";
 import { PlatformNoticeBar } from "./platform-notice-bar";
+import { SubscriptionExpiredScreen } from "@/components/screens/subscription-expired";
 
 function LoadingProgress() {
   const isFetching = useIsFetching();
@@ -26,6 +27,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
     currentUser,
     currentTenantId,
     currentTenantSlug,
+    currentTenantName,
     setCurrentTenant,
     currentScreen,
     setCurrentScreen,
@@ -110,6 +112,24 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
     return true;
   });
 
+  // --- SUBSCRIPTION CHECK LOGIC ---
+  let isExpired = false;
+  if (resolvedTenant && !isSuperAdmin) {
+    const { endDate, status } = resolvedTenant as any;
+    const isInactive = status && status !== "active";
+    const isPastDate = endDate && new Date(endDate) < new Date();
+    if (isInactive || isPastDate) {
+      isExpired = true;
+    }
+  }
+
+  // Whitelist screen so admin can actually pay while expired!
+  const isExemptFromLock = 
+    resolvedScreen === "school-subscription" || 
+    resolvedScreen === "manage-plan" || 
+    isSuperAdmin;
+  // --------------------------------
+
   const navigateTo = useCallback((screen: string) => {
     setSidebarOpen(false);
     if (screen === currentScreen) return; // Skip if already on this screen
@@ -190,7 +210,16 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
 
           {/* Page Content */}
           <main className="flex-1 overflow-y-auto p-4 lg:p-6 overscroll-contain">
-            {children}
+            {isExpired && !isExemptFromLock ? (
+              <SubscriptionExpiredScreen 
+                tenantName={resolvedTenant?.name || currentTenantName || "School"} 
+                tenantSlug={resolvedTenant?.slug || currentTenantSlug || ""}
+                role={currentUser.role}
+                endDate={resolvedTenant?.endDate}
+              />
+            ) : (
+              children
+            )}
           </main>
         </div>
 
