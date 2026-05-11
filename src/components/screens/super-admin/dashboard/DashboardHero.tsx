@@ -33,9 +33,9 @@ export function DashboardHero({ loading, data }: DashboardHeroProps) {
           </div>
         </div>
 
-        <div className="grid grid-cols-2 sm:grid-cols-5 gap-4">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
           {loading ? (
-            Array.from({ length: 5 }).map((_, i) => (
+            Array.from({ length: 4 }).map((_, i) => (
               <div key={i} className="bg-white/5 backdrop-blur-md rounded-2xl px-5 py-4 border border-white/10">
                 <Skeleton className="h-3 w-16 bg-white/10" />
                 <Skeleton className="h-8 w-12 bg-white/10 mt-2" />
@@ -69,13 +69,6 @@ export function DashboardHero({ loading, data }: DashboardHeroProps) {
                 <p className="text-2xl font-black flex items-center gap-2">
                   <CreditCard className="h-5 w-5 text-teal-400 group-hover:scale-110 transition-transform" />
                   {data?.subscriptions.active ?? 0}
-                </p>
-              </div>
-              <div className="bg-white/5 backdrop-blur-md rounded-2xl px-5 py-4 border border-white/10 hover:bg-white/10 transition-colors group hidden sm:block">
-                <p className="text-teal-200 text-[10px] font-black uppercase tracking-widest mb-1">Classes</p>
-                <p className="text-2xl font-black flex items-center gap-2">
-                  <GraduationCap className="h-5 w-5 text-teal-400 group-hover:scale-110 transition-transform" />
-                  {data?.classes ?? 0}
                 </p>
               </div>
             </>

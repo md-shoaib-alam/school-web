@@ -55,7 +55,7 @@ export function useUsers(filters?: { role?: string; tenantId?: string; search?: 
   })
 }
 
-export function useAuditLogs(filters?: { action?: string; page?: number; limit?: number }) {
+export function useAuditLogs(filters?: { action?: string; role?: string; tenantId?: string; page?: number; limit?: number }) {
   return useQuery({
     queryKey: queryKeys.auditLogs(filters),
     queryFn: () => graphqlQuery<{ auditLogs: AuditLogsResponse }>(AUDIT_LOGS, filters as Record<string, unknown>).then(d => d.auditLogs),

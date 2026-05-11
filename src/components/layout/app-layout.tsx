@@ -118,7 +118,8 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
   let isExpired = false;
   if (resolvedTenant && !isSuperAdmin) {
     const { endDate, status } = resolvedTenant as any;
-    const isInactive = status && status !== "active";
+    // Fix: Accept both "active" AND "trial" as valid operational states
+    const isInactive = status && status !== "active" && status !== "trial";
     const isPastDate = endDate && new Date(endDate) < new Date();
     if (isInactive || isPastDate) {
       isExpired = true;
@@ -218,6 +219,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
                 tenantSlug={resolvedTenant?.slug || currentTenantSlug || ""}
                 role={currentUser.role}
                 endDate={resolvedTenant?.endDate}
+                status={resolvedTenant?.status}
               />
             ) : (
               children

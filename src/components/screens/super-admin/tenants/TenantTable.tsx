@@ -38,18 +38,22 @@ import {
   ChevronRight,
 } from "lucide-react";
 import { Tenant, ViewMode, planColors, statusColors } from "./types";
+import { SCHOOL_PLANS } from "@/lib/billing-constants";
 
 // --- Helper Components ---
 
 const PlanBadge = memo(({ plan }: { plan: string }) => {
   const config = planColors[plan] || planColors.basic;
+  const planMeta = SCHOOL_PLANS.find(p => p.id === plan);
+  const displayName = planMeta?.name || plan;
+
   return (
     <Badge
       variant="outline"
       className={`${config.bg} ${config.text} ${config.border} border text-[10px] uppercase tracking-wider py-0.5 px-2 font-semibold`}
     >
       <Crown className="h-3 w-3 mr-1" />
-      {plan}
+      {displayName}
     </Badge>
   );
 });

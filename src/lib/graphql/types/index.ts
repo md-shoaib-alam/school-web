@@ -38,7 +38,16 @@ export interface UsersResponse {
 }
 
 export interface AuditLogsResponse {
-  logs: { id: string; action: string; resource: string; details: string; createdAt: string; tenant: { id: string; name: string } | null }[]
+  logs: { 
+    id: string; 
+    action: string; 
+    resource: string; 
+    details: string; 
+    ipAddress: string | null;
+    createdAt: string; 
+    tenant: { id: string; name: string; slug: string; email: string | null } | null;
+    user: { name: string; email: string } | null;
+  }[]
   total: number; page: number; totalPages: number
   actionTypes: { action: string; count: number }[]
 }

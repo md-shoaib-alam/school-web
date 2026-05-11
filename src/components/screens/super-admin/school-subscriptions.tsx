@@ -106,9 +106,17 @@ export function SuperAdminSchoolSubscriptions() {
     const now = new Date();
     const expiry = endDate ? new Date(endDate) : null;
     
-    if (status !== "active") return <Badge variant="destructive">{status}</Badge>;
-    if (expiry && expiry < now) return <Badge variant="outline" className="text-rose-500 border-rose-500">Expired</Badge>;
-    return <Badge className="bg-emerald-500">Active</Badge>;
+    // 1. Priority check for manual overrides or dedicated states
+    if (status === "trial") return <Badge className="bg-purple-600 dark:bg-purple-500 text-white capitalize">Trial</Badge>;
+    if (status === "suspended") return <Badge variant="destructive" className="capitalize">Suspended</Badge>;
+    
+    // 2. Inactive handles generic non-active falls throughs
+    if (status !== "active") return <Badge variant="destructive" className="capitalize">{status}</Badge>;
+    
+    // 3. Check active period boundaries
+    if (expiry && expiry < now) return <Badge variant="outline" className="text-rose-500 border-rose-500 font-medium">Expired</Badge>;
+    
+    return <Badge className="bg-emerald-500 hover:bg-emerald-600 text-white">Active</Badge>;
   };
 
   return (
@@ -148,7 +156,7 @@ export function SuperAdminSchoolSubscriptions() {
               <div>
                 <p className="text-sm font-medium text-muted-foreground">Active Licenses</p>
                 <p className="text-2xl font-bold">
-                  {tenantsData?.tenants?.filter((t: any) => t.status === 'active').length || 0}
+                  {tenantsData?.tenants?.filter((t: any) => t.status === 'active' || t.status === 'trial').length || 0}
                 </p>
               </div>
             </div>

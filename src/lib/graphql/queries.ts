@@ -48,9 +48,13 @@ export const USERS = `
 `
 
 export const AUDIT_LOGS = `
-  query AuditLogs($action: String, $page: Int, $limit: Int) {
-    auditLogs(action: $action, page: $page, limit: $limit) {
-      logs { id action resource details createdAt tenant { id name } }
+  query AuditLogs($action: String, $role: String, $tenantId: String, $page: Int, $limit: Int) {
+    auditLogs(action: $action, role: $role, tenantId: $tenantId, page: $page, limit: $limit) {
+      logs { 
+        id action resource details ipAddress createdAt 
+        tenant { id name slug email } 
+        user { name email }
+      }
       total page totalPages
       actionTypes { action count }
     }

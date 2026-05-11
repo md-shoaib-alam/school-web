@@ -75,17 +75,17 @@ export function StatusCards({ loading, data, onNavigate }: StatusCardsProps) {
                 <span className="text-2xl font-black text-emerald-700 dark:text-emerald-400">{data?.tenants.active ?? 0}</span>
               </div>
 
-              <div className="flex items-center justify-between p-3.5 rounded-2xl bg-amber-50/50 dark:bg-amber-900/20 border border-amber-100 dark:border-amber-800/50 group hover:scale-[1.02] transition-transform">
+              <div className="flex items-center justify-between p-3.5 rounded-2xl bg-purple-50/50 dark:bg-purple-900/20 border border-purple-100 dark:border-purple-800/50 group hover:scale-[1.02] transition-transform">
                 <div className="flex items-center gap-3">
-                  <div className="h-10 w-10 rounded-xl bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center">
-                    <Clock className="h-5 w-5 text-amber-600" />
+                  <div className="h-10 w-10 rounded-xl bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center">
+                    <Clock className="h-5 w-5 text-purple-600" />
                   </div>
                   <div>
-                    <p className="text-sm font-black text-amber-900 dark:text-amber-100">Trial</p>
-                    <p className="text-[10px] text-amber-600 font-bold uppercase tracking-wider">Evaluation</p>
+                    <p className="text-sm font-black text-purple-900 dark:text-purple-100">Trial</p>
+                    <p className="text-[10px] text-purple-600 font-bold uppercase tracking-wider">Evaluation</p>
                   </div>
                 </div>
-                <span className="text-2xl font-black text-amber-700 dark:text-amber-400">{data?.tenants.trial ?? 0}</span>
+                <span className="text-2xl font-black text-purple-700 dark:text-purple-400">{data?.tenants.trial ?? 0}</span>
               </div>
 
               <div className="flex items-center justify-between p-3.5 rounded-2xl bg-red-50/50 dark:bg-red-900/20 border border-red-100 dark:border-red-800/50 group hover:scale-[1.02] transition-transform">

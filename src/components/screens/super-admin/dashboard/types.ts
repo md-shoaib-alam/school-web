@@ -60,10 +60,10 @@ export interface DashboardData {
 }
 
 export const userChartConfig: ChartConfig = {
-  students: { label: "Students", color: "#059669" },
-  teachers: { label: "Teachers", color: "#10b981" },
-  parents: { label: "Parents", color: "#34d399" },
-  admins: { label: "Admins", color: "#6ee7b7" },
+  students: { label: "Students", color: "#10b981" },
+  teachers: { label: "Teachers", color: "#3b82f6" },
+  parents: { label: "Parents", color: "#f59e0b" },
+  admins: { label: "Admins", color: "#8b5cf6" },
 };
 
 export const growthChartConfig: ChartConfig = {
@@ -76,7 +76,7 @@ export const planChartConfig: ChartConfig = {
   count: { label: "Schools", color: "#059669" },
 };
 
-export const USER_CHART_COLORS = ["#059669", "#10b981", "#34d399", "#6ee7b7"];
+export const USER_CHART_COLORS = ["#10b981", "#3b82f6", "#f59e0b", "#8b5cf6"];
 
 export const PLAN_COLORS: Record<string, string> = {
   basic: "#94a3b8",
