@@ -273,7 +273,7 @@ export const FEES = `
 export const ATTENDANCE = `
   query Attendance($tenantId: String!, $page: Int, $limit: Int) {
     attendance(tenantId: $tenantId, page: $page, limit: $limit) {
-      records { id studentName date status className }
+      records { id studentName date status className createdAt }
       total page totalPages
     }
   }
