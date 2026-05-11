@@ -22,6 +22,7 @@ export interface AvailableSubject {
   code: string;
   className: string;
   teacherName?: string;
+  teacherId?: string;
 }
 
 export interface AvailableTeacher {

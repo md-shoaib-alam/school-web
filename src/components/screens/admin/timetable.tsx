@@ -572,6 +572,7 @@ export function AdminTimetable() {
         availableSubjects={filteredSubjects}
         availableTeachers={availableTeachers}
         workingDays={workingDays}
+        isBreak={!!(editingSlot as any)?.label}
       />
 
       <CreateTimetableDialog
@@ -595,7 +596,7 @@ export function AdminTimetable() {
           }));
           setDaySlots((prev) => ({
             ...prev,
-            [tar]: [...(prev[tar] ?? []), ...copied],
+            [tar]: copied,
           }));
           toast.success(`Copied to ${DAY_LABELS[tar]}`);
         }}
@@ -610,7 +611,7 @@ export function AdminTimetable() {
               id: crypto.randomUUID(),
               day,
             }));
-            updated[day] = [...(updated[day] ?? []), ...copied];
+            updated[day] = copied;
           });
           setDaySlots(updated);
           toast.success("Copied to all days");
