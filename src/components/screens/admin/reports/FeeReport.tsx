@@ -32,9 +32,10 @@ export function FeeReport() {
   useEffect(() => {
     async function fetchFees() {
       try {
-        const res = await apiFetch("/api/fees");
+        const res = await apiFetch("/api/fees?limit=1000");
         if (!res.ok) throw new Error("Failed to fetch fees");
-        setFees(await res.json());
+        const data = await res.json();
+        setFees(data.items || []);
       } catch (err) {
         setError(err instanceof Error ? err.message : "Unknown error");
       } finally {

@@ -91,12 +91,17 @@ export function StudentAttendance() {
         return;
       }
 
+      const params = new URLSearchParams();
+      params.set('classId', matchedStudent.classId);
+      params.set('limit', '1000'); // Fetch wide window for analytics
+
       const attRes = await apiFetch(
-        `/api/attendance?classId=${matchedStudent.classId}`,
+        `/api/attendance?${params.toString()}`,
       );
-      const attData: AttendanceRecord[] = await attRes.json();
+      const data = await attRes.json();
+      const records = Array.isArray(data.records) ? data.records : [];
       setAttendanceData(
-        attData.filter((a) => a.studentId === matchedStudent.id),
+        records.filter((a: AttendanceRecord) => a.studentId === matchedStudent.id),
       );
     } catch (e) {
       console.error(e);

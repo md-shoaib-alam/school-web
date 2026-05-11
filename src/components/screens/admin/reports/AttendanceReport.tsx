@@ -53,9 +53,11 @@ export function AttendanceReport() {
       try {
         const params = new URLSearchParams();
         if (selectedClass !== "all") params.set("classId", selectedClass);
+        params.set("limit", "1000"); // Load wider range for reporting metrics
         const res = await apiFetch(`/api/attendance?${params.toString()}`);
         if (!res.ok) throw new Error("Failed to fetch attendance");
-        setRecords(await res.json());
+        const data = await res.json();
+        setRecords(data.records || []);
       } catch (err) {
         setError(err instanceof Error ? err.message : "Unknown error");
       } finally {
