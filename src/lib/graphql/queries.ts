@@ -15,12 +15,12 @@ export const PLATFORM_STATS = `
 `
 
 export const BILLING_DATA = `
-  query BillingData {
-    billingData {
+  query BillingData($type: String) {
+    billingData(type: $type) {
       totalActiveRevenue
       statusDistribution
       monthlyTrend { month revenue newSubscriptions churned }
-      tenantBilling { id name slug plan status totalRevenue activeRevenue activeSubscriptions totalSubscriptions _count { users classes } }
+      tenantBilling { id name slug plan status totalRevenue activeRevenue activeSubscriptions totalSubscriptions _count { users } }
       subscriptions { id planName amount status paymentMethod startDate createdAt tenant { name } parent { user { name email } } }
       planRevenue
       methodRevenue
@@ -239,11 +239,11 @@ export const PARENTS = `
 `
 
 export const SUBSCRIPTIONS = `
-  query Subscriptions($tenantId: String, $status: String, $search: String, $page: Int, $limit: Int) {
-    subscriptions(tenantId: $tenantId, status: $status, search: $search, page: $page, limit: $limit) {
+  query Subscriptions($tenantId: String, $status: String, $search: String, $startDate: String, $endDate: String, $page: Int, $limit: Int) {
+    subscriptions(tenantId: $tenantId, status: $status, search: $search, startDate: $startDate, endDate: $endDate, page: $page, limit: $limit) {
       subscriptions { 
-        id planName planId amount period status transactionId startDate endDate autoRenew
-        parent { user { name email } students { user { name } } }
+        id planName planId amount period status transactionId paymentMethod startDate endDate autoRenew createdAt
+        parent { user { name email } }
         tenant { name }
       }
       total page totalPages

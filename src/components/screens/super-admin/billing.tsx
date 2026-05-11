@@ -21,17 +21,39 @@ import {
   paymentMethodConfig 
 } from "./billing/types";
 
-export function SuperAdminBilling() {
-  const { data, isLoading: loading, refetch: fetchBilling } = useBillingData();
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 
-  const [sortKey, setSortKey] = useState<SortKey>("activeRevenue");
+const SCHOOL_PRICES: Record<string, number> = {
+  basic: 499,
+  standard: 1499,
+  premium: 3999,
+};
+
+export function SuperAdminBilling() {
+  const [activeTab, setActiveTab] = useState<string>("school");
+  const { data, isLoading: loading, refetch: fetchBilling } = useBillingData(activeTab as any);
+
+  const [sortKey, setSortKey] = useState<SortKey>("totalRevenue");
   const [sortDir, setSortDir] = useState<SortDir>("desc");
 
-  // ── Computed Calculations ──
-  const totalSubscriptions = data?.subscriptions?.length ?? 0;
+  // ── SCHOOL REVENUE COMPUTATIONS ──
+  const schoolMetrics = useMemo(() => {
+    if (!data?.tenantBilling) return { totalRev: 0, active: 0, mrr: 0 };
+    let totalRev = 0;
+    let active = 0;
+    data.tenantBilling.forEach((t: any) => {
+      if (t.status === 'active') active++;
+      const price = SCHOOL_PRICES[t.plan?.toLowerCase()] || 0;
+      totalRev += price;
+    });
+    return { totalRev, active, mrr: totalRev };
+  }, [data?.tenantBilling]);
+
+  // ── PARENT COMPUTED CALCULATIONS ──
   const totalStatusCount = data?.statusDistribution
     ? Object.values(data.statusDistribution).reduce((s: number, v: any) => s + v, 0)
     : 0;
+  const totalSubscriptions = totalStatusCount;
   const activeCount = data?.statusDistribution?.active ?? 0;
   const expiredCount = data?.statusDistribution?.expired ?? 0;
   const cancelledCount = data?.statusDistribution?.cancelled ?? 0;
@@ -49,14 +71,6 @@ export function SuperAdminBilling() {
     if (!data?.tenantBilling?.length) return 0;
     return Math.round(totalRevenue / data.tenantBilling.length);
   }, [data, totalRevenue]);
-
-  const revenueGrowth = useMemo(() => {
-    if (!data?.monthlyTrend?.length || data.monthlyTrend.length < 2) return null;
-    const last = data.monthlyTrend[data.monthlyTrend.length - 1].revenue;
-    const prev = data.monthlyTrend[data.monthlyTrend.length - 2].revenue;
-    if (prev === 0) return null;
-    return Math.round(((last - prev) / prev) * 100);
-  }, [data]);
 
   const churnRate = useMemo(() => {
     if (totalStatusCount === 0) return 0;
@@ -112,6 +126,15 @@ export function SuperAdminBilling() {
         case "totalRevenue": return dir * ((a.totalRevenue || 0) - (b.totalRevenue || 0));
         case "name": return dir * (a.name || "").localeCompare(b.name || "");
         case "activeSubscriptions": return dir * ((a.activeSubscriptions || 0) - (b.activeSubscriptions || 0));
+        case "plan": {
+          const getRank = (p: string) => {
+            const pl = p?.toLowerCase() || "";
+            if (pl === "premium") return 3;
+            if (pl === "standard") return 2;
+            return 1; // basic or other
+          };
+          return dir * (getRank(a.plan) - getRank(b.plan));
+        }
         default: return 0;
       }
     });
@@ -136,55 +159,63 @@ export function SuperAdminBilling() {
   return (
     <div className="space-y-6">
       <BillingHeader 
-        loading={loading}
-        totalRevenue={totalRevenue}
-        totalActiveRevenue={data?.totalActiveRevenue ?? 0}
-        mrr={mrr}
-        revenueGrowth={revenueGrowth}
-        churnRate={churnRate}
-        churnedSubscriptions={churnedSubscriptions}
         onRefresh={fetchBilling}
       />
 
-      <MetricCards 
-        loading={loading}
-        totalActiveRevenue={data?.totalActiveRevenue ?? 0}
-        activeCount={activeCount}
-        mrr={mrr}
-        revenueGrowth={revenueGrowth}
-        totalSubscriptions={totalSubscriptions}
-        churnedSubscriptions={churnedSubscriptions}
-        expiredCount={expiredCount}
-        cancelledCount={cancelledCount}
-        avgRevenuePerTenant={avgRevenuePerTenant}
-        tenantCount={data?.tenantBilling?.length ?? 0}
-        churnRate={churnRate}
-      />
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full space-y-6">
+        <TabsList className="grid w-full max-w-md grid-cols-2">
+          <TabsTrigger value="school">School Revenue</TabsTrigger>
+          <TabsTrigger value="parent">Parent Revenue</TabsTrigger>
+        </TabsList>
 
-      <RevenueTrends 
-        loading={loading}
-        monthlyTrend={data?.monthlyTrend ?? []}
-      />
+        <TabsContent value="school" className="space-y-6 animate-in fade-in-50 duration-300">
+          <MetricCards 
+            loading={loading}
+            totalActiveRevenue={schoolMetrics.totalRev}
+            activeCount={schoolMetrics.active}
+            totalSubscriptions={schoolMetrics.active}
+            churnedSubscriptions={0}
+            expiredCount={0}
+            cancelledCount={0}
+            avgRevenuePerTenant={Math.round(schoolMetrics.totalRev / Math.max(data?.tenantBilling?.length || 1, 1))}
+            tenantCount={data?.tenantBilling?.length ?? 0}
+            churnRate={0}
+          />
+          
+          <TenantBillingTable 
+            loading={loading}
+            tenants={sortedTenants}
+            sortKey={sortKey}
+            sortDir={sortDir}
+            onSort={handleSort}
+            viewMode="school"
+          />
+        </TabsContent>
 
-      <DistributionCharts 
-        loading={loading}
-        planChartData={planChartData}
-        methodChartData={methodChartData}
-        statusChartData={statusChartData}
-      />
+        <TabsContent value="parent" className="space-y-6 animate-in fade-in-50 duration-300">
+          <MetricCards 
+            loading={loading}
+            totalActiveRevenue={data?.totalActiveRevenue ?? 0}
+            activeCount={activeCount}
+            totalSubscriptions={totalSubscriptions}
+            churnedSubscriptions={churnedSubscriptions}
+            expiredCount={expiredCount}
+            cancelledCount={cancelledCount}
+            avgRevenuePerTenant={avgRevenuePerTenant}
+            tenantCount={data?.tenantBilling?.length ?? 0}
+            churnRate={churnRate}
+          />
 
-      <TenantBillingTable 
-        loading={loading}
-        tenants={sortedTenants}
-        sortKey={sortKey}
-        sortDir={sortDir}
-        onSort={handleSort}
-      />
+          <DistributionCharts 
+            loading={loading}
+            planChartData={planChartData}
+            methodChartData={methodChartData}
+            statusChartData={statusChartData}
+          />
 
-      <TransactionTable 
-        loading={loading}
-        transactions={recentTransactions}
-      />
+          <TransactionTable />
+        </TabsContent>
+      </Tabs>
     </div>
   );
 }

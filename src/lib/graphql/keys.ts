@@ -1,6 +1,6 @@
 export const queryKeys = {
   platformStats: ['platform', 'stats'] as const,
-  billing: ['platform', 'billing'] as const,
+  billing: (type?: string) => ['platform', 'billing', type] as const,
   tenants: (filters?: Record<string, unknown>) => ['tenants', filters] as const,
   users: (filters?: Record<string, unknown>) => ['users', filters] as const,
   auditLogs: (filters?: Record<string, unknown>) => ['auditLogs', filters] as const,

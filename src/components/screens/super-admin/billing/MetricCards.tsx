@@ -16,8 +16,6 @@ interface MetricCardsProps {
   loading: boolean;
   totalActiveRevenue: number;
   activeCount: number;
-  mrr: number;
-  revenueGrowth: number | null;
   totalSubscriptions: number;
   churnedSubscriptions: number;
   expiredCount: number;
@@ -31,8 +29,6 @@ export function MetricCards({
   loading,
   totalActiveRevenue,
   activeCount,
-  mrr,
-  revenueGrowth,
   totalSubscriptions,
   churnedSubscriptions,
   expiredCount,
@@ -43,8 +39,8 @@ export function MetricCards({
 }: MetricCardsProps) {
   if (loading) {
     return (
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
-        {[...Array(5)].map((_, i) => (
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        {[...Array(4)].map((_, i) => (
           <Card key={i} className="shadow-sm border-none bg-white dark:bg-gray-800">
             <CardContent className="p-5">
               <Skeleton className="h-4 w-28" />
@@ -58,7 +54,7 @@ export function MetricCards({
   }
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
       {/* Total Active Revenue */}
       <Card className="shadow-sm hover:shadow-md transition-all border-none bg-white dark:bg-gray-800 group">
         <CardContent className="p-5">
@@ -77,34 +73,6 @@ export function MetricCards({
           </p>
           <p className="text-xs text-muted-foreground mt-1 font-medium">
             From {activeCount} active subs
-          </p>
-        </CardContent>
-      </Card>
-
-      {/* Monthly Recurring Revenue */}
-      <Card className="shadow-sm hover:shadow-md transition-all border-none bg-white dark:bg-gray-800 group">
-        <CardContent className="p-5">
-          <div className="flex items-center justify-between mb-3">
-            <div className="h-10 w-10 rounded-xl bg-teal-50 dark:bg-teal-900/30 text-teal-600 flex items-center justify-center group-hover:scale-110 transition-transform">
-              <TrendingUp className="h-5 w-5" />
-            </div>
-            {revenueGrowth !== null && (
-              <Badge
-                variant="outline"
-                className={`text-[10px] ${revenueGrowth >= 0 ? "text-emerald-700 dark:text-emerald-400 border-emerald-200 dark:border-emerald-700 bg-emerald-50 dark:bg-emerald-900/30" : "text-red-700 dark:text-red-400 border-red-200 dark:border-red-700 bg-red-50 dark:bg-red-900/30"}`}
-              >
-                {revenueGrowth >= 0 ? <ArrowUpRight className="h-3 w-3 mr-0.5" /> : <ArrowDownRight className="h-3 w-3 mr-0.5" />}
-                {Math.abs(revenueGrowth)}%
-              </Badge>
-            )}
-          </div>
-          <p className="text-xs text-muted-foreground font-bold uppercase tracking-wider">MRR</p>
-          <p className="text-2xl font-black text-foreground mt-1 flex items-center">
-            <IndianRupee className="h-4 w-4" />
-            {mrr.toLocaleString()}
-          </p>
-          <p className="text-xs text-muted-foreground mt-1 font-medium">
-            vs last month
           </p>
         </CardContent>
       </Card>

@@ -31,10 +31,10 @@ export function usePlatformStats() {
   })
 }
 
-export function useBillingData() {
+export function useBillingData(type?: 'school' | 'parent') {
   return useQuery({
-    queryKey: queryKeys.billing,
-    queryFn: () => graphqlQuery<{ billingData: BillingDataResponse }>(BILLING_DATA).then(d => d.billingData),
+    queryKey: queryKeys.billing(type),
+    queryFn: () => graphqlQuery<{ billingData: BillingDataResponse }>(BILLING_DATA, { type }).then(d => d.billingData),
     staleTime: 30 * 1000,
   })
 }
@@ -63,11 +63,11 @@ export function useAuditLogs(filters?: { action?: string; page?: number; limit?:
   })
 }
 
-export function useSubscriptions(tenantId?: string, status?: string, search?: string, page?: number, limit?: number) {
+export function useSubscriptions(filters?: { tenantId?: string; status?: string; search?: string; startDate?: string; endDate?: string; page?: number; limit?: number }) {
   return useQuery({
-    queryKey: [...queryKeys.subscriptions, tenantId, status, search, page, limit],
+    queryKey: [...queryKeys.subscriptions, filters],
     queryFn: async () => {
-      const data = await graphqlQuery<{ subscriptions: SubscriptionsResponse }>(SUBSCRIPTIONS, { tenantId, status, search, page, limit })
+      const data = await graphqlQuery<{ subscriptions: SubscriptionsResponse }>(SUBSCRIPTIONS, filters || {})
       return data.subscriptions
     },
     staleTime: 5 * 60 * 1000,
