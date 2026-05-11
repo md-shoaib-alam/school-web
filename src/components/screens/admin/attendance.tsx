@@ -370,9 +370,9 @@ export function AdminAttendance() {
                         </TableCell>
                         <TableCell className="text-right pr-6 w-[140px]">
                           <Button
-                            variant="ghost"
+                            variant="outline"
                             size="sm"
-                            className="opacity-0 group-hover:opacity-100 transition-opacity"
+                            className="font-semibold"
                           >
                             View Profile
                           </Button>
