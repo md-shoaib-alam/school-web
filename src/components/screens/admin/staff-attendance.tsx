@@ -178,7 +178,7 @@ export function StaffAttendance({ initialTab }: StaffAttendanceProps) {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 md:pb-18 pb-26">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100 flex items-center gap-2">

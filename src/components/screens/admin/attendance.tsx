@@ -108,18 +108,9 @@ export function AdminAttendance() {
 
   const rawRecords = (attendanceData?.records || []) as AttendanceRecord[];
   const records = rawRecords.filter((r) => {
-    const matchDate = !selectedDate || r.date.startsWith(selectedDate);
-    const matchClass =
-      selectedClass === "all" ||
-      classes.find((c) => c.id === selectedClass)?.name +
-        "-" +
-        classes.find((c) => c.id === selectedClass)?.section ===
-        r.className;
-    
     const matchSearch = !debouncedSearch || 
       r.studentName.toLowerCase().includes(debouncedSearch.toLowerCase());
-
-    return matchDate && matchClass && matchSearch;
+    return matchSearch;
   });
 
   // Summary stats
@@ -309,11 +300,11 @@ export function AdminAttendance() {
               <Table>
                 <TableHeader className="bg-gray-50 dark:bg-gray-900/50">
                   <TableRow>
-                    <TableHead className="font-bold">Student Name</TableHead>
-                    <TableHead className="font-bold">Class</TableHead>
-                    <TableHead className="font-bold">Status</TableHead>
-                    <TableHead className="font-bold">Time</TableHead>
-                    <TableHead className="text-right font-bold">
+                    <TableHead className="font-bold pl-6">Student Name</TableHead>
+                    <TableHead className="font-bold w-[150px]">Class</TableHead>
+                    <TableHead className="font-bold w-[180px]">Status</TableHead>
+                    <TableHead className="font-bold w-[120px]">Time</TableHead>
+                    <TableHead className="text-right font-bold pr-6 w-[140px]">
                       Action
                     </TableHead>
                   </TableRow>
@@ -348,10 +339,10 @@ export function AdminAttendance() {
                         key={record.id}
                         className="hover:bg-gray-50/50 dark:hover:bg-gray-900/50 group transition-colors"
                       >
-                        <TableCell className="font-medium">
+                        <TableCell className="font-medium pl-6">
                           {record.studentName}
                         </TableCell>
-                        <TableCell>
+                        <TableCell className="w-[150px]">
                           <Badge
                             variant="outline"
                             className="font-semibold bg-gray-50 dark:bg-gray-950"
@@ -359,7 +350,7 @@ export function AdminAttendance() {
                             {record.className}
                           </Badge>
                         </TableCell>
-                        <TableCell>
+                        <TableCell className="w-[180px]">
                           <Badge
                             className={`${statusConfig[record.status]?.bg} border shadow-sm`}
                           >
@@ -369,7 +360,7 @@ export function AdminAttendance() {
                             </span>
                           </Badge>
                         </TableCell>
-                        <TableCell className="text-gray-500 text-sm">
+                        <TableCell className="text-gray-500 text-sm w-[120px]">
                           {record.date.includes("T")
                             ? new Date(record.date).toLocaleTimeString([], {
                                 hour: "2-digit",
@@ -377,7 +368,7 @@ export function AdminAttendance() {
                               })
                             : "08:30 AM"}
                         </TableCell>
-                        <TableCell className="text-right">
+                        <TableCell className="text-right pr-6 w-[140px]">
                           <Button
                             variant="ghost"
                             size="sm"
