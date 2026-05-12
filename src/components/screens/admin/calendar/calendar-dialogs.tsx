@@ -45,18 +45,18 @@ export function CalendarDialogs({
     <>
       <Dialog open={dialogOpen} onOpenChange={closeDialog}>
         <DialogContent className="max-w-[550px] rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-2xl p-0 overflow-hidden">
-          <DialogHeader className="p-6 bg-slate-50 dark:bg-slate-950 border-b border-slate-100 dark:border-slate-800">
-            <DialogTitle className="text-xl font-bold text-slate-900 dark:text-white uppercase tracking-tight">
+          <DialogHeader className="p-6 border-b border-slate-100 dark:border-white/[0.05]">
+            <DialogTitle className="text-lg font-bold text-slate-900 dark:text-white tracking-tight">
               {editingEvent ? "Update Event" : "Create New Event"}
             </DialogTitle>
-            <DialogDescription className="text-sm text-slate-500">
+            <DialogDescription className="text-xs text-slate-500 dark:text-slate-400 mt-1">
               {editingEvent ? "Modify the existing schedule details below." : "Add a new holiday, exam, or school event to the calendar."}
             </DialogDescription>
           </DialogHeader>
 
           <div className="p-6 space-y-5 max-h-[70vh] overflow-y-auto no-scrollbar">
             <div className="space-y-2">
-              <Label className="text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">Event Title</Label>
+              <Label className="text-xs font-semibold tracking-tight text-slate-600 dark:text-slate-300">Event Title</Label>
               <Input
                 value={form.title}
                 onChange={(e) => updateForm("title", e.target.value)}
@@ -66,16 +66,16 @@ export function CalendarDialogs({
             </div>
 
              <div className="grid grid-cols-2 gap-4">
-               <div className="space-y-2">
-                 <Label className="text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">Start Date</Label>
+                <div className="space-y-2">
+                  <Label className="text-xs font-semibold tracking-tight text-slate-600 dark:text-slate-300">Start Date</Label>
                  <DatePicker 
                    date={form.date ? new Date(form.date + "T00:00:00") : undefined} 
                    onChange={(d) => updateForm("date", d?.toISOString().split('T')[0] || '')}
                    className="h-10 text-sm w-full"
                  />
                </div>
-               <div className="space-y-2">
-                 <Label className="text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">End Date</Label>
+                <div className="space-y-2">
+                  <Label className="text-xs font-semibold tracking-tight text-slate-600 dark:text-slate-300">End Date</Label>
                  <DatePicker 
                    date={form.endDate ? new Date(form.endDate + "T00:00:00") : undefined} 
                    onChange={(d) => updateForm("endDate", d?.toISOString().split('T')[0] || '')}
@@ -86,25 +86,25 @@ export function CalendarDialogs({
              </div>
 
              <div className="grid grid-cols-2 gap-4">
-               <div className="space-y-2">
-                 <Label className="text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">Category</Label>
+                <div className="space-y-2">
+                  <Label className="text-xs font-semibold tracking-tight text-slate-600 dark:text-slate-300">Category</Label>
                  <Select value={form.type} onValueChange={handleTypeChange}>
-                   <SelectTrigger className="h-10 text-sm uppercase font-normal">
+                   <SelectTrigger className="h-10 text-sm font-normal">
                      <SelectValue />
                    </SelectTrigger>
                    <SelectContent>
                      {ALL_EVENT_TYPES.map((t) => (
-                       <SelectItem key={t} value={t} className="text-xs uppercase font-normal">
+                       <SelectItem key={t} value={t} className="text-sm">
                          {EVENT_TYPE_LABELS[t]}
                        </SelectItem>
                      ))}
                    </SelectContent>
                  </Select>
                </div>
-               <div className="space-y-2">
-                 <Label className="text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">Visible To</Label>
+                <div className="space-y-2">
+                  <Label className="text-xs font-semibold tracking-tight text-slate-600 dark:text-slate-300">Visible To</Label>
                  <Select value={form.targetRole} onValueChange={(v) => updateForm("targetRole", v)}>
-                   <SelectTrigger className="h-10 text-sm uppercase font-normal">
+                   <SelectTrigger className="h-10 text-sm font-normal">
                      <SelectValue />
                    </SelectTrigger>
                    <SelectContent>
@@ -117,12 +117,12 @@ export function CalendarDialogs({
              </div>
 
             <div className="space-y-2">
-              <Label className="text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">Location</Label>
+              <Label className="text-xs font-semibold tracking-tight text-slate-600 dark:text-slate-300">Location</Label>
               <Input value={form.location} onChange={(e) => updateForm("location", e.target.value)} placeholder="e.g. Main Auditorium" className="h-10 text-sm" />
             </div>
 
             <div className="space-y-2">
-              <Label className="text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">Description</Label>
+              <Label className="text-xs font-semibold tracking-tight text-slate-600 dark:text-slate-300">Description</Label>
               <Textarea value={form.description} onChange={(e) => updateForm("description", e.target.value)} placeholder="Add more details about this event..." className="min-h-[80px] text-sm" />
             </div>
 
@@ -135,11 +135,11 @@ export function CalendarDialogs({
             </div>
           </div>
 
-          <DialogFooter className="p-6 bg-slate-50 dark:bg-slate-950 border-t border-slate-100 dark:border-slate-800 flex items-center justify-end gap-3">
-            <Button variant="ghost" onClick={closeDialog} className="rounded-lg font-bold text-xs uppercase" disabled={submitting}>Cancel</Button>
-            <Button onClick={handleSubmit} className="bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg px-6 h-10 font-bold text-xs uppercase" disabled={submitting}>
+          <DialogFooter className="p-6 bg-slate-50/50 dark:bg-white/[0.01] border-t border-slate-100 dark:border-white/[0.05] flex items-center justify-end gap-3">
+            <Button variant="ghost" onClick={closeDialog} className="rounded-xl font-semibold text-sm text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-white/[0.03]" disabled={submitting}>Cancel</Button>
+            <Button onClick={handleSubmit} className="bg-blue-600 hover:bg-blue-500 dark:bg-rose-600 dark:hover:bg-rose-500 text-white shadow-sm rounded-xl px-5 h-10 font-bold text-sm transition-all duration-200 active:scale-95" disabled={submitting}>
               {submitting ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
-              {editingEvent ? "Update Schedule" : "Add to Calendar"}
+              {editingEvent ? "Update Schedule" : "Add Event"}
             </Button>
           </DialogFooter>
         </DialogContent>
