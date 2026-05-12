@@ -124,10 +124,10 @@ export function TopPerformance({ loading, data }: TopPerformanceProps) {
             <Skeleton className="h-[280px] w-full rounded-2xl" />
           ) : (
             <ChartContainer config={planChartConfig} className="h-[280px] w-full">
-              <BarChart data={data?.planDistribution} layout="vertical" margin={{ left: -10, right: 20 }}>
+              <BarChart data={data?.planDistribution} layout="vertical" margin={{ left: 15, right: 20 }}>
                 <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="#f1f5f9" />
                 <XAxis type="number" hide />
-                <YAxis
+                 <YAxis
                   dataKey="plan"
                   type="category"
                   tickLine={false}
@@ -135,6 +135,7 @@ export function TopPerformance({ loading, data }: TopPerformanceProps) {
                   fontSize={11}
                   fontWeight={600}
                   tick={{ fill: "#64748b" }}
+                  width={60}
                 />
                 <ChartTooltip content={<ChartTooltipContent className="rounded-xl border-none shadow-xl" />} />
                 <Bar dataKey="count" radius={[0, 8, 8, 0]} barSize={24}>
