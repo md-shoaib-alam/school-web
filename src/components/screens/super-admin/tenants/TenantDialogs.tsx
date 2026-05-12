@@ -308,12 +308,7 @@ export function TenantDialogs({
                         className="h-full w-full object-cover"
                       />
                     ) : (
-                      <div className="flex flex-col items-center gap-1 text-muted-foreground">
-                        <Globe className="h-8 w-8 opacity-20" />
-                        <span className="text-[10px] font-bold uppercase">
-                          No Logo
-                        </span>
-                      </div>
+                      <img src="/test.webp" alt="Default logo placeholder" className="h-full w-full object-cover opacity-60 group-hover:opacity-100 transition-opacity" />
                     )}
                   </div>
                   <label className="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity rounded-2xl cursor-pointer">
@@ -592,15 +587,7 @@ export function TenantDialogs({
               <DialogHeader>
                 <div className="flex items-center gap-3">
                   <div className="h-12 w-12 rounded-xl bg-teal-100 dark:bg-teal-900/30 text-teal-700 dark:text-teal-400 flex items-center justify-center overflow-hidden">
-                    {viewingTenant.logo ? (
-                      <img
-                        src={viewingTenant.logo}
-                        alt={viewingTenant.name}
-                        className="h-full w-full object-cover"
-                      />
-                    ) : (
-                      <Building2 className="h-6 w-6" />
-                    )}
+                    <img src={viewingTenant.logo || "/test.webp"} alt={viewingTenant.name} className="h-full w-full object-cover" />
                   </div>
                   <div>
                     <DialogTitle className="text-xl">

@@ -33,6 +33,7 @@ export interface DashboardData {
     id: string;
     name: string;
     plan: string;
+    logo: string | null;
     totalRevenue: number;
     studentCount: number;
     _count: {

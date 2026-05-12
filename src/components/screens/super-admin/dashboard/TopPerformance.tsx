@@ -71,7 +71,7 @@ export function TopPerformance({ loading, data }: TopPerformanceProps) {
                       </TableCell>
                       <TableCell>
                         <div className="flex items-center gap-3">
-                          <Building2 className="h-5 w-5 text-muted-foreground/60 shrink-0" />
+                          <img src={tenant.logo || "/test.webp"} alt={tenant.name} className="h-8 w-8 rounded-lg object-cover border shadow-sm shrink-0" />
                           <div>
                             <p className="font-medium text-sm text-gray-900 dark:text-gray-100">{tenant.name}</p>
                             <p className="text-xs text-muted-foreground">

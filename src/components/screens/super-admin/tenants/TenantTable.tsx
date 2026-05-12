@@ -94,11 +94,7 @@ const TenantCard = memo(function TenantCard({
         <div className="flex items-start justify-between gap-2">
           <div className="flex items-center gap-3 min-w-0">
             <div className="h-12 w-12 rounded-xl bg-gradient-to-br from-teal-50 to-teal-100 dark:from-teal-950/40 dark:to-teal-900/40 text-teal-700 dark:text-teal-400 flex items-center justify-center shrink-0 border border-teal-200/50 dark:border-teal-800/30 overflow-hidden">
-              {tenant.logo ? (
-                <img src={tenant.logo} alt={tenant.name} className="h-full w-full object-cover" />
-              ) : (
-                <Building2 className="h-6 w-6" />
-              )}
+              <img src={tenant.logo || "/test.webp"} alt={tenant.name} className="h-full w-full object-cover" />
             </div>
             <div className="min-w-0">
               <h3 className="font-bold text-base truncate">{tenant.name}</h3>
@@ -353,11 +349,7 @@ export function TenantTable({
                 <TableCell>
                   <div className="flex items-center gap-3">
                     <div className="h-9 w-9 rounded-lg bg-teal-50 dark:bg-teal-900/40 text-teal-600 flex items-center justify-center font-bold overflow-hidden border">
-                      {tenant.logo ? (
-                        <img src={tenant.logo} alt={tenant.name} className="h-full w-full object-cover" />
-                      ) : (
-                        tenant.name[0]
-                      )}
+                      <img src={tenant.logo || "/test.webp"} alt={tenant.name} className="h-full w-full object-cover" />
                     </div>
                     <div>
                       <p className="font-bold text-sm">{tenant.name}</p>
