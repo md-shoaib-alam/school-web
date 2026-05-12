@@ -11,6 +11,7 @@ import {
   useCreateUser,
 } from "@/lib/graphql/hooks";
 import { useModulePermissions } from "@/hooks/use-permissions";
+import { goeyToast as toast } from "goey-toast";
 
 // Sub-components
 import { TenantStats } from "./tenants/TenantStats";
@@ -167,7 +168,10 @@ export function SuperAdminTenants() {
         role: "admin",
         tenantId: targetTenantForAdmin.id,
       });
+      toast.success('Admin account created successfully');
       setAdminModalOpen(false);
+    } catch (error: any) {
+      toast.error(error?.message || 'Failed to create admin account');
     } finally {
       setSubmitting(false);
     }

@@ -221,15 +221,11 @@ export function AdminDashboard() {
         <div className="relative z-10">
           <div className="flex items-center gap-4 mb-3">
             <div className="h-14 w-14 rounded-2xl bg-white/20 flex items-center justify-center backdrop-blur-sm overflow-hidden">
-              {currentTenantLogo || currentUser?.tenantLogo ? (
-                <img 
-                  src={currentTenantLogo || currentUser?.tenantLogo || ""} 
-                  alt={currentTenantName || ""} 
-                  className="h-full w-full object-cover" 
-                />
-              ) : (
-                <School className="h-7 w-7" />
-              )}
+              <img 
+                src={currentTenantLogo || currentUser?.tenantLogo || "/test.webp"} 
+                alt={currentTenantName || ""} 
+                className="h-full w-full object-cover" 
+              />
             </div>
             <div>
               <h2 className="text-2xl font-bold tracking-tight">

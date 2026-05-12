@@ -122,11 +122,9 @@ export function StudentDashboard() {
         <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/4" />
         <div className="absolute bottom-0 left-1/2 w-48 h-48 bg-white/5 rounded-full translate-y-1/2" />
         <div className="relative flex flex-col sm:flex-row gap-4 items-start sm:items-center">
-          {currentTenantLogo && (
-            <div className="h-16 w-16 rounded-2xl bg-white/20 backdrop-blur-sm flex items-center justify-center overflow-hidden shrink-0 border border-white/10 shadow-inner">
-              <img src={currentTenantLogo} alt={currentTenantName || ""} className="h-full w-full object-cover" />
-            </div>
-          )}
+          <div className="h-16 w-16 rounded-2xl bg-white/20 backdrop-blur-sm flex items-center justify-center overflow-hidden shrink-0 border border-white/10 shadow-inner">
+            <img src={currentTenantLogo || "/test.webp"} alt={currentTenantName || ""} className="h-full w-full object-cover" />
+          </div>
           <div className="flex-1">
           <div className="flex items-center gap-2 mb-1">
             <span className="text-violet-200 text-sm font-medium">

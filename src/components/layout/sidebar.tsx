@@ -100,15 +100,13 @@ export function Sidebar({
               isSuperAdmin ? "bg-teal-600" : "bg-emerald-600",
             )}
           >
-            {!isSuperAdmin && (currentTenantLogo || currentUser?.tenantLogo) ? (
+            {!isSuperAdmin ? (
               <img 
-                src={currentTenantLogo || currentUser?.tenantLogo || ""} 
+                src={currentTenantLogo || currentUser?.tenantLogo || "/test.webp"} 
                 alt={currentTenantName || "School Logo"} 
                 className="h-full w-full object-cover" 
               />
             ) : (
-
-
               <Building2 className="h-5 w-5" />
             )}
           </div>

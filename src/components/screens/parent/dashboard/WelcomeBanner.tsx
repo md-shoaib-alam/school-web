@@ -18,15 +18,9 @@ export function WelcomeBanner({ userName }: WelcomeBannerProps) {
       <CardContent className="p-6 relative z-10">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div className="flex items-center gap-4">
-            {currentTenantLogo ? (
-              <div className="h-12 w-12 rounded-xl bg-white/20 backdrop-blur-sm flex items-center justify-center overflow-hidden shrink-0">
-                <img src={currentTenantLogo} alt={currentTenantName || ""} className="h-full w-full object-cover" />
-              </div>
-            ) : (
-              <div className="h-12 w-12 rounded-xl bg-white/20 backdrop-blur-sm flex items-center justify-center shrink-0">
-                <School className="h-6 w-6 text-white/80" />
-              </div>
-            )}
+            <div className="h-12 w-12 rounded-xl bg-white/20 backdrop-blur-sm flex items-center justify-center overflow-hidden shrink-0">
+              <img src={currentTenantLogo || "/test.webp"} alt={currentTenantName || ""} className="h-full w-full object-cover" />
+            </div>
             <div className="text-left">
               <h2 className="text-2xl font-bold">
                 Welcome back, {firstName}! 👋
