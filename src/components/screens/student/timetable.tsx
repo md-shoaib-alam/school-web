@@ -1,8 +1,9 @@
 "use client";
 
 
-import { apiFetch } from "@/lib/api";
-import { useEffect, useState, useCallback, useMemo } from "react";
+import { api } from "@/lib/api";
+import { useQuery } from "@tanstack/react-query";
+import { useState, useCallback, useMemo } from "react";
 import { useAppStore } from "@/store/use-app-store";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -90,51 +91,35 @@ export function StudentTimetable() {
   const [selectedDay, setSelectedDay] = useState(
     () => getNow().dayKey || "monday",
   );
-  const [loading, setLoading] = useState(true);
-  const [students, setStudents] = useState<StudentInfo[]>([]);
-  const [timetable, setTimetable] = useState<TimetableSlot[]>([]);
 
-  const student = useMemo(
-    () =>
-      Array.isArray(students)
-        ? students.find((s) => s.email === currentUser?.email) ||
-          students[0] ||
-          null
-        : null,
-    [students, currentUser?.email],
-  );
+  const { data: studentsJson, isLoading: studentsLoading } = useQuery({
+    queryKey: ["student-profile"],
+    queryFn: async () => {
+      const res = await api.get<any>("/students");
+      return res;
+    },
+    staleTime: 5 * 60 * 1000,
+  });
 
-  const fetchData = useCallback(async () => {
-    setLoading(true);
-    try {
-      const studentsJson = await apiFetch("/api/students").then((r) => r.json());
-      const studentsRes = Array.isArray(studentsJson?.items) ? studentsJson.items : [];
-      setStudents(studentsRes);
+  const student = useMemo(() => {
+    const items = Array.isArray(studentsJson?.items) ? studentsJson.items : [];
+    if (items.length === 0) return null;
+    return items.find((s: StudentInfo) => s.email === currentUser?.email) || items[0];
+  }, [studentsJson, currentUser?.email]);
 
-      const matchedStudent =
-        studentsRes.find((s: StudentInfo) => s.email === currentUser?.email) ||
-        studentsRes[0];
+  const classId = student?.classId;
 
-      if (!matchedStudent) {
-        setLoading(false);
-        return;
-      }
+  const { data: timetable = [], isLoading: timetableLoading } = useQuery({
+    queryKey: ["student-timetable", classId],
+    queryFn: async () => {
+      const res = await api.get<any>(`/timetable?classId=${classId}`);
+      return (Array.isArray(res) ? res : []) as TimetableSlot[];
+    },
+    enabled: !!classId,
+    staleTime: 5 * 60 * 1000,
+  });
 
-      const ttRes = await apiFetch(
-        `/api/timetable?classId=${matchedStudent.classId}`,
-      );
-      const ttData = await ttRes.json();
-      setTimetable(ttData);
-    } catch (e) {
-      console.error(e);
-    } finally {
-      setLoading(false);
-    }
-  }, [currentUser?.email]);
-
-  useEffect(() => {
-    fetchData();
-  }, [fetchData]);
+  const loading = studentsLoading || timetableLoading;
 
   /* ─── Computed data ─── */
 
@@ -174,17 +159,29 @@ export function StudentTimetable() {
     return map;
   }, [timetable]);
 
+  // Optimized: Build final lists for each day once
+  const slotsByDay = useMemo(() => {
+    const map: Record<string, TimetableSlot[]> = {
+      monday: [], tuesday: [], wednesday: [], thursday: [], friday: []
+    };
+    
+    DAYS.forEach(day => {
+      map[day] = timeSlots
+        .map((ts) => slotLookup[`${day}-${ts.start}`] || null)
+        .filter(Boolean) as TimetableSlot[];
+    });
+    
+    return map;
+  }, [timeSlots, slotLookup]);
+
   const todaySlots = useMemo(
-    () => timetable.filter((t) => t.day === todayKey),
-    [timetable, todayKey],
+    () => slotsByDay[todayKey] || [],
+    [slotsByDay, todayKey],
   );
 
   const selectedDaySlots = useMemo(
-    () =>
-      timeSlots
-        .map((ts) => slotLookup[`${selectedDay}-${ts.start}`] || null)
-        .filter(Boolean) as TimetableSlot[],
-    [timeSlots, selectedDay, slotLookup],
+    () => slotsByDay[selectedDay] || [],
+    [slotsByDay, selectedDay],
   );
 
   const isCurrentSlot = useCallback(
@@ -474,9 +471,7 @@ export function StudentTimetable() {
                 <ScrollArea className="max-h-[600px]">
                   <div className="px-6 pb-6 space-y-6">
                     {DAYS.map((day) => {
-                      const daySlots = timeSlots
-                        .map((ts) => slotLookup[`${day}-${ts.start}`] || null)
-                        .filter(Boolean) as TimetableSlot[];
+                      const daySlots = slotsByDay[day];
 
                       if (daySlots.length === 0) return null;
 
@@ -592,9 +587,7 @@ export function StudentTimetable() {
                 {DAYS.map((day) => {
                   const isSelected = day === selectedDay;
                   const isToday = day === todayKey;
-                  const daySlotCount = timeSlots
-                    .map((ts) => slotLookup[`${day}-${ts.start}`] || null)
-                    .filter(Boolean).length;
+                  const daySlotCount = slotsByDay[day].length;
 
                   return (
                     <Button
