@@ -28,7 +28,8 @@ export function ManagePlanScreen() {
     try {
       // 1. Create Order on Backend
       const orderData = await api.post("/tenants/create-subscription-order", { 
-        planId: plan.id 
+        planId: plan.id,
+        amount: plan.price
       });
 
       const { orderId, amount, currency, keyId } = orderData;

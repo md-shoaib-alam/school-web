@@ -33,6 +33,13 @@ const SuperAdminTenants = dynamic(
     ),
   { loading: LoadingScreen },
 );
+const SuperAdminDeletedTenants = dynamic(
+  () =>
+    import("@/components/screens/super-admin/deleted-tenants").then(
+      (m) => m.SuperAdminDeletedTenants,
+    ),
+  { loading: LoadingScreen },
+);
 const SuperAdminBilling = dynamic(
   () =>
     import("@/components/screens/super-admin/billing").then(
@@ -197,6 +204,8 @@ export default function GenericSlugDispatcher() {
         return <SuperAdminDashboard />;
       case "tenants":
         return <SuperAdminTenants />;
+      case "deleted-tenants":
+        return <SuperAdminDeletedTenants />;
       case "billing":
         return <SuperAdminBilling />;
       case "users":

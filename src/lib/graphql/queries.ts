@@ -31,7 +31,7 @@ export const BILLING_DATA = `
 export const TENANTS = `
   query Tenants($status: String, $plan: String, $search: String, $page: Int, $limit: Int) {
     tenants(status: $status, plan: $plan, search: $search, page: $page, limit: $limit) {
-      tenants { id name slug logo email phone address website plan status maxStudents maxTeachers maxParents maxClasses startDate endDate createdAt studentCount teacherCount parentCount adminCount activeSubscriptions totalRevenue _count { users classes subscriptions notices events } }
+      tenants { id name slug logo email phone address website plan status maxStudents maxTeachers maxParents maxClasses startDate endDate createdAt deletedAt studentCount teacherCount parentCount adminCount activeSubscriptions totalRevenue _count { users classes subscriptions notices events } }
       total page totalPages
     }
   }
@@ -181,7 +181,7 @@ export const PARENT_DASHBOARD = `
 export const TENANT_DETAIL = `
   query TenantDetail($tenantId: String!) {
     tenantDetail(tenantId: $tenantId) {
-      tenant { id name slug logo email phone address website plan status maxStudents maxTeachers maxParents maxClasses startDate endDate createdAt studentCount teacherCount parentCount adminCount activeSubscriptions totalRevenue _count { users classes subscriptions notices events } }
+      tenant { id name slug logo email phone address website plan status maxStudents maxTeachers maxParents maxClasses startDate endDate createdAt deletedAt studentCount teacherCount parentCount adminCount activeSubscriptions totalRevenue _count { users classes subscriptions notices events } }
       students { id name email phone rollNumber className gender dateOfBirth status }
       teachers { id name email phone qualification experience status }
       parents { id name email phone occupation status }
@@ -428,5 +428,11 @@ export const PLATFORM_NOTICES = `
 export const DELETE_PLATFORM_NOTICE = `
   mutation DeletePlatformNotice($id: ID!) {
     deletePlatformNotice(id: $id) { success message }
+  }
+`
+
+export const RESTORE_TENANT = `
+  mutation RestoreTenant($id: ID!) {
+    restoreTenant(id: $id) { id name status deletedAt }
   }
 `

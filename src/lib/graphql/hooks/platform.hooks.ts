@@ -6,7 +6,7 @@ import { api } from '@/lib/api'
 import { 
   PLATFORM_STATS, BILLING_DATA, TENANTS, USERS, AUDIT_LOGS, 
   CREATE_TENANT, UPDATE_TENANT, DELETE_TENANT, TOGGLE_TENANT_STATUS, SUBSCRIPTIONS,
-  TOGGLE_USER_STATUS, CREATE_USER, TENANT_DETAIL
+  TOGGLE_USER_STATUS, CREATE_USER, TENANT_DETAIL, RESTORE_TENANT
 } from '../queries'
 import { 
   PlatformStatsData, BillingDataResponse, TenantsResponse, UsersResponse, 
@@ -178,18 +178,42 @@ export function useDeleteTenant() {
   return useMutation({
     mutationFn: (id: string) => graphqlMutate<{ deleteTenant: boolean }>(DELETE_TENANT, { id }).then(d => d.deleteTenant),
     onSuccess: (_, deletedId) => {
-      toast.success('School deleted successfully')
-      queryClient.setQueriesData({ queryKey: ['tenants'] }, (old: any) => {
-        if (!old) return old
-        if (Array.isArray(old)) return old.filter((t: any) => t.id !== deletedId)
-        if (old.tenants) return { ...old, tenants: old.tenants.filter((t: any) => t.id !== deletedId), total: Math.max(0, (old.total || 0) - 1) }
-        return old
-      })
+      toast.success('School moved to bin')
       queryClient.invalidateQueries({ queryKey: ['tenants'] })
       queryClient.invalidateQueries({ queryKey: ['platform', 'stats'] })
     },
     onError: (error) => {
       toast.error('Failed to delete tenant', { description: error.message })
+    },
+  })
+}
+
+export function useRestoreTenant() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (id: string) => graphqlMutate<{ restoreTenant: TenantBasic }>(RESTORE_TENANT, { id }).then(d => d.restoreTenant),
+    onSuccess: () => {
+      toast.success('School restored successfully')
+      queryClient.invalidateQueries({ queryKey: ['tenants'] })
+      queryClient.invalidateQueries({ queryKey: ['platform', 'stats'] })
+    },
+    onError: (error) => {
+      toast.error('Failed to restore school', { description: error.message })
+    },
+  })
+}
+
+export function usePermanentDeleteTenant() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (id: string) => api.del(`/tenants/permanent?id=${id}`),
+    onSuccess: () => {
+      toast.success('School permanently removed')
+      queryClient.invalidateQueries({ queryKey: ['tenants'] })
+      queryClient.invalidateQueries({ queryKey: ['platform', 'stats'] })
+    },
+    onError: (error: any) => {
+      toast.error('Failed to remove school', { description: error.message })
     },
   })
 }

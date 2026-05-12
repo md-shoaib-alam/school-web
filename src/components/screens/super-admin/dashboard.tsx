@@ -10,7 +10,7 @@ import { DashboardHero } from "./dashboard/DashboardHero";
 import { StatusCards } from "./dashboard/StatusCards";
 import { GrowthCharts } from "./dashboard/GrowthCharts";
 import { TopPerformance } from "./dashboard/TopPerformance";
-import { ActivityLogs } from "./dashboard/ActivityLogs";
+
 
 export function SuperAdminDashboard() {
   const { data, isLoading: loading, error, isError } = useQuery({
@@ -68,7 +68,7 @@ export function SuperAdminDashboard() {
 
       <TopPerformance loading={loading} data={data} />
 
-      <ActivityLogs loading={loading} data={data} />
+
     </div>
   );
 }

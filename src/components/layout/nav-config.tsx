@@ -45,6 +45,7 @@ import {
   Wallet,
   Send,
   Smartphone,
+  Trash2,
 } from "lucide-react";
 import { type UserRole } from "@/store/use-app-store";
 
@@ -75,6 +76,12 @@ export const navItems: Record<UserRole, NavItem[]> = {
       key: "tenants",
       label: "School Management",
       icon: <Building2 className="h-4 w-4" />,
+      permModule: "tenants",
+    },
+    {
+      key: "deleted-tenants",
+      label: "Deleted Schools",
+      icon: <Trash2 className="h-4 w-4" />,
       permModule: "tenants",
     },
     {
