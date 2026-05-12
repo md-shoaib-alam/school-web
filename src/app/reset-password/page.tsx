@@ -36,27 +36,30 @@ export default function ResetPasswordPage() {
 
   if (isSuccess) {
     return (
-      <div className="min-h-screen flex items-start sm:items-center justify-center p-4 pt-12 sm:pt-4 bg-[radial-gradient(ellipse_at_top_left,_var(--tw-gradient-stops))] from-rose-100 via-slate-50 to-emerald-50 dark:from-rose-950/20 dark:via-slate-900 dark:to-emerald-950/20">
-        <Card className="w-full max-w-md border-none shadow-2xl bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl">
-          <CardHeader className="text-center pb-2">
-            <div className="mx-auto w-20 h-20 bg-emerald-100 dark:bg-emerald-900/30 rounded-3xl flex items-center justify-center mb-6 rotate-3">
+      <div className="min-h-screen flex items-center justify-center p-4 relative bg-gradient-to-br from-slate-50 via-white to-rose-50 dark:from-gray-950 dark:via-gray-900 dark:to-rose-950">
+        <Card className="w-full max-w-md border-0 bg-white/90 border-t border-t-white backdrop-blur-xl dark:bg-gray-900/40 dark:border dark:border-white/[0.06] dark:shadow-black/50 rounded-2xl overflow-hidden relative shadow-2xl">
+          {/* Subtle luxury gradient top border */}
+          <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-emerald-500/40 to-transparent" />
+          
+          <CardHeader className="text-center pt-8 pb-2">
+            <div className="mx-auto w-20 h-20 bg-emerald-50 dark:bg-emerald-950/30 rounded-3xl flex items-center justify-center mb-6 shadow-md border border-emerald-100 dark:border-emerald-900/50 rotate-2">
               <CheckCircle2 className="h-10 w-10 text-emerald-600 dark:text-emerald-400" />
             </div>
-            <CardTitle className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-slate-900 to-slate-700 dark:from-white dark:to-slate-300">
+            <CardTitle className="text-2xl font-bold tracking-tight text-gray-900 dark:text-white/95">
               Check your email
             </CardTitle>
-            <CardDescription className="text-base pt-2">
+            <CardDescription className="text-base pt-2 text-gray-500 dark:text-gray-400 font-medium leading-relaxed">
               A secure link has been sent to <br />
-              <span className="font-semibold text-slate-900 dark:text-white underline decoration-rose-500 decoration-2 underline-offset-4">{email}</span>
+              <span className="font-semibold text-slate-900 dark:text-white underline decoration-emerald-500 decoration-1 underline-offset-4">{email}</span>
             </CardDescription>
           </CardHeader>
-          <CardContent className="pt-8 space-y-4">
-            <Button asChild className="w-full h-12 bg-slate-900 hover:bg-slate-800 dark:bg-white dark:text-slate-900 dark:hover:bg-slate-200 rounded-xl shadow-lg shadow-emerald-500/10 transition-all duration-300">
+          <CardContent className="px-8 pb-8 pt-6 space-y-4">
+            <Button asChild className="w-full h-12 bg-slate-900 hover:bg-slate-850 dark:bg-emerald-600 dark:hover:bg-emerald-500 dark:text-white rounded-xl font-bold shadow-lg shadow-emerald-500/10 hover:shadow-emerald-500/20 transition-all duration-250 active:scale-[0.97] cursor-pointer">
               <Link href="/">Return to Login</Link>
             </Button>
             <button 
               onClick={() => setIsSuccess(false)} 
-              className="w-full text-center text-sm text-rose-500 hover:text-rose-600 font-medium transition-colors"
+              className="w-full text-center text-sm text-rose-500 hover:text-rose-600 font-semibold transition-colors cursor-pointer"
             >
               Didn't receive the email? Try again
             </button>
@@ -67,44 +70,44 @@ export default function ResetPasswordPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-start sm:items-center justify-center p-4 pt-12 sm:pt-4 bg-[radial-gradient(ellipse_at_top_left,_var(--tw-gradient-stops))] from-rose-100 via-slate-50 to-emerald-50 dark:from-rose-950/20 dark:via-slate-900 dark:to-emerald-950/20">
-      <Card className="w-full max-w-md border-none shadow-2xl bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl relative overflow-hidden">
-        {/* Decorative corner accent */}
-        <div className="absolute -top-10 -right-10 w-24 h-24 bg-rose-500/10 rounded-full blur-2xl" />
+    <div className="min-h-screen flex items-center justify-center p-4 relative bg-gradient-to-br from-slate-50 via-white to-rose-50 dark:from-gray-950 dark:via-gray-900 dark:to-rose-950">
+      <Card className="w-full max-w-md border-0 bg-white/90 border-t border-t-white backdrop-blur-xl dark:bg-gray-900/40 dark:border dark:border-white/[0.06] dark:shadow-black/50 rounded-2xl overflow-hidden relative shadow-2xl transition-all duration-300">
+        {/* Subtle luxury gradient top border for dark mode */}
+        <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-rose-500/40 to-transparent" />
         
-        <CardHeader className="space-y-4 relative">
+        <CardHeader className="space-y-5 relative px-8 pt-8 pb-4">
           <Link 
             href="/" 
-            className="group flex items-center text-sm font-medium text-slate-500 hover:text-rose-500 transition-colors w-fit"
+            className="group flex items-center text-sm font-medium text-slate-500 hover:text-rose-600 dark:text-gray-400 dark:hover:text-rose-400 transition-colors w-fit"
           >
             <ArrowLeft className="mr-2 h-4 w-4 group-hover:-translate-x-1 transition-transform" />
             Back to login
           </Link>
           
-          <div className="space-y-1">
-            <div className="w-12 h-12 bg-rose-500 rounded-2xl flex items-center justify-center mb-4 shadow-lg shadow-rose-500/20">
-              <ShieldCheck className="h-6 w-6 text-white" />
+          <div className="space-y-2">
+            <div className="w-14 h-14 bg-gradient-to-br from-rose-500 to-rose-600 dark:from-rose-600 dark:to-rose-700 rounded-2xl flex items-center justify-center mb-4 shadow-lg shadow-rose-500/20">
+              <ShieldCheck className="h-7 w-7 text-white" />
             </div>
-            <CardTitle className="text-3xl font-extrabold tracking-tight bg-clip-text text-transparent bg-gradient-to-br from-slate-900 to-slate-500 dark:from-white dark:to-slate-400">
+            <CardTitle className="text-2xl font-bold tracking-tight text-gray-900 dark:text-white/95">
               Forgot password?
             </CardTitle>
-            <CardDescription className="text-slate-500 dark:text-slate-400 text-base">
+            <CardDescription className="text-slate-500 dark:text-gray-400/90 text-sm font-medium leading-relaxed">
               Enter your email and we'll send you instructions to reset your password.
             </CardDescription>
           </div>
         </CardHeader>
         
-        <CardContent className="pt-2 relative">
+        <CardContent className="px-8 pb-8 pt-2 relative">
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="space-y-2">
-              <Label htmlFor="email" className="text-sm font-semibold pl-1 text-slate-700 dark:text-slate-300">Email Address</Label>
+              <Label htmlFor="email" className="text-sm font-semibold pl-1 text-slate-700 dark:text-gray-300/90">Email Address</Label>
               <div className="relative group">
-                <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400 group-focus-within:text-rose-500 transition-colors" />
+                <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400 group-focus-within:text-rose-500 transition-colors duration-200" />
                 <Input
                   id="email"
                   type="email"
                   placeholder="admin@sigel.edu"
-                  className="pl-11 h-12 bg-white/50 dark:bg-slate-950/50 border-slate-200 dark:border-slate-800 rounded-xl focus:ring-rose-500/20 focus:border-rose-500 transition-all text-base"
+                  className="pl-11 h-12 bg-gray-50/50 dark:bg-[#0c0c0e]/70 dark:border-gray-800/60 dark:text-gray-100 rounded-xl focus:ring-rose-500/15 focus:border-rose-500 dark:focus:ring-rose-500/20 dark:focus:border-rose-500/60 transition-all duration-200 text-base placeholder:text-gray-400/70"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
@@ -115,7 +118,7 @@ export default function ResetPasswordPage() {
             <Button
               type="submit"
               disabled={isLoading || !email}
-              className="w-full h-12 bg-slate-900 hover:bg-slate-800 dark:bg-white dark:text-slate-900 dark:hover:bg-slate-200 rounded-xl font-bold shadow-xl shadow-slate-900/10 dark:shadow-white/5 transition-all active:scale-[0.98] disabled:opacity-50"
+              className="w-full h-12 bg-slate-900 hover:bg-slate-850 dark:bg-rose-600 dark:hover:bg-rose-500 text-white rounded-xl font-bold shadow-lg shadow-rose-500/10 hover:shadow-rose-500/20 transition-all duration-250 active:scale-[0.97] cursor-pointer disabled:opacity-50"
             >
               {isLoading ? (
                 <>
@@ -128,20 +131,16 @@ export default function ResetPasswordPage() {
             </Button>
           </form>
 
-          <div className="mt-8 pt-6 border-t border-slate-100 dark:border-slate-800 text-center">
-            <p className="text-sm text-slate-500 dark:text-slate-400">
+          <div className="mt-8 pt-6 border-t border-gray-100 dark:border-white/[0.05] text-center">
+            <p className="text-sm text-slate-500 dark:text-gray-400 font-medium">
               Suddenly remembered? {' '}
-              <Link href="/" className="text-slate-900 dark:text-white font-bold hover:underline decoration-rose-500 decoration-2 underline-offset-4 decoration-transparent hover:decoration-rose-500 transition-all">
+              <Link href="/" className="text-rose-500 dark:text-rose-400 font-semibold hover:text-rose-600 transition-all">
                 Sign in
               </Link>
             </p>
           </div>
         </CardContent>
       </Card>
-      
-      {/* Background Ambience */}
-      <div className="fixed top-1/4 -right-40 w-[500px] h-[500px] bg-rose-400/5 blur-[120px] pointer-events-none rounded-full" />
-      <div className="fixed bottom-1/4 -left-40 w-[500px] h-[500px] bg-emerald-400/5 blur-[120px] pointer-events-none rounded-full" />
     </div>
   );
 }

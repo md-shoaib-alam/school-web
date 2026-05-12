@@ -126,48 +126,42 @@ export function LoginScreen() {
       <div className="w-full max-w-md">
         {/* Logo & Title */}
         <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-20 h-20 rounded-2xl text-white mb-4 shadow-lg bg-gradient-to-br from-rose-600 to-rose-700 shadow-rose-200 dark:shadow-rose-900/40">
-            <Building2 className="h-10 w-10" />
+          <div className="inline-flex items-center justify-center w-20 h-20 rounded-2xl mb-4 shadow-lg bg-white/90 dark:bg-black/20 overflow-hidden shrink-0 border border-gray-200 dark:border-white/10">
+            <img 
+              src="/test.webp" 
+              alt="School Logo" 
+              className="h-full w-full object-cover" 
+            />
           </div>
-          <h1 className="text-4xl font-extrabold tracking-tight text-gray-900 dark:text-white">
+          <h1 className="text-4xl font-bold tracking-tight text-gray-900 dark:text-white">
             SchoolSaaS
           </h1>
-          <p className="text-lg mt-2 text-gray-500 dark:text-gray-400">
-            Multi-Tenant School Management Platform
+          <p className="text-lg mt-2 text-gray-500 dark:text-gray-400 font-medium">
+            Welcome back! Sign in to continue
           </p>
-          <div className="flex items-center justify-center gap-2 mt-3">
-            <span className="inline-flex items-center gap-1 text-xs font-semibold bg-rose-50 text-rose-700 border border-rose-200 dark:bg-rose-950/50 dark:text-rose-300 dark:border-rose-800/50 px-3 py-1 rounded-full">
-              SaaS Platform
-            </span>
-            <span className="inline-flex items-center gap-1 text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200 dark:bg-emerald-950/50 dark:text-emerald-300 dark:border-emerald-800/50 px-3 py-1 rounded-full">
-              Multi-School
-            </span>
-          </div>
         </div>
 
-        <Card className="shadow-2xl border-0 bg-white/80 backdrop-blur-xl dark:bg-gray-900/80 dark:border dark:border-white/10">
-          <CardHeader className="text-center pb-2">
-            <div className="mx-auto w-14 h-14 rounded-2xl bg-indigo-500/10 flex items-center justify-center mb-4 border border-indigo-500/20">
-              <Mail className="h-7 w-7 text-indigo-600 dark:text-indigo-400" />
-            </div>
-            <CardTitle className="text-2xl font-bold text-gray-900 dark:text-white">
+        <Card className="shadow-2xl border-0 bg-white/90 border-t border-t-white backdrop-blur-xl dark:bg-gray-900/40 dark:border dark:border-white/[0.06] dark:shadow-black/50 rounded-2xl overflow-hidden relative transition-all duration-300">
+          {/* Subtle luxury gradient top border for dark mode */}
+          <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-rose-500/40 to-transparent" />
+          
+          <CardHeader className="text-center pt-8 pb-3">
+            <CardTitle className="text-xl font-bold tracking-tight text-gray-900 dark:text-white/90">
               Login to your account
             </CardTitle>
-            <CardDescription className="text-gray-500 dark:text-gray-400">
-              Enter your credentials to access your dashboard
-            </CardDescription>
           </CardHeader>
-          <CardContent className="pt-4">
-            <form onSubmit={handleLogin} className="space-y-5">
+          
+          <CardContent className="px-7 pb-8 pt-4">
+            <form onSubmit={handleLogin} className="space-y-6">
               <div className="space-y-2">
                 <Label
                   htmlFor="login-email"
-                  className="text-sm font-semibold pl-1 text-gray-700 dark:text-gray-300"
+                  className="text-sm font-semibold pl-1 text-gray-700 dark:text-gray-300/90"
                 >
                   Email or Mobile Number
                 </Label>
                 <div className="relative group">
-                  <div className="absolute left-3.5 top-1/2 -translate-y-1/2 flex items-center gap-1 text-gray-400 group-focus-within:text-rose-500 transition-colors">
+                  <div className="absolute left-3.5 top-1/2 -translate-y-1/2 flex items-center gap-1 text-gray-400 group-focus-within:text-rose-500 transition-colors duration-200">
                     <Mail className="h-4 w-4" />
                     <span className="text-xs">/</span>
                     <School className="h-4 w-4" />
@@ -178,7 +172,7 @@ export function LoginScreen() {
                     placeholder="Email or Mobile"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    className="bg-gray-50/50 dark:bg-gray-950/50 dark:border-gray-800 dark:text-gray-100 pl-16 h-12 rounded-xl focus:ring-rose-500/20 focus:border-rose-500 transition-all"
+                    className="bg-gray-50/50 dark:bg-[#0c0c0e]/70 dark:border-gray-800/60 dark:text-gray-100 pl-16 h-12 rounded-xl focus:ring-rose-500/15 focus:border-rose-500 dark:focus:ring-rose-500/20 dark:focus:border-rose-500/60 transition-all duration-200 placeholder:text-gray-400/70"
                     autoComplete="username"
                     required
                   />
@@ -189,34 +183,34 @@ export function LoginScreen() {
                 <div className="flex items-center justify-between px-1">
                   <Label
                     htmlFor="login-password"
-                    className="text-sm font-semibold text-gray-700 dark:text-gray-300"
+                    className="text-sm font-semibold text-gray-700 dark:text-gray-300/90"
                   >
                     Password
                   </Label>
                   <button
                     type="button"
                     onClick={() => (window.location.href = "/reset-password")}
-                    className="text-xs font-bold text-rose-500 hover:text-rose-600 dark:text-rose-400 dark:hover:text-rose-300 transition-colors"
+                    className="text-xs font-semibold text-rose-500 hover:text-rose-600 dark:text-rose-400/90 dark:hover:text-rose-300 transition-colors duration-200"
                   >
                     Forgot password?
                   </button>
                 </div>
                 <div className="relative group">
-                  <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400 group-focus-within:text-rose-500 transition-colors" />
+                  <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400 group-focus-within:text-rose-500 transition-colors duration-200" />
                   <Input
                     id="login-password"
                     type={showPassword ? "text" : "password"}
                     placeholder="••••••••"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className="bg-gray-50/50 dark:bg-gray-950/50 dark:border-gray-800 dark:text-gray-100 pl-11 pr-11 h-12 rounded-xl focus:ring-rose-500/20 focus:border-rose-500 transition-all"
+                    className="bg-gray-50/50 dark:bg-[#0c0c0e]/70 dark:border-gray-800/60 dark:text-gray-100 pl-11 pr-11 h-12 rounded-xl focus:ring-rose-500/15 focus:border-rose-500 dark:focus:ring-rose-500/20 dark:focus:border-rose-500/60 transition-all duration-200 placeholder:text-gray-400/70"
                     autoComplete="current-password"
                     required
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-rose-500 transition-colors"
+                    className="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-rose-500 transition-colors duration-200"
                   >
                     {showPassword ? (
                       <EyeOff className="h-4 w-4" />
@@ -230,7 +224,7 @@ export function LoginScreen() {
               <Button
                 type="submit"
                 disabled={loading}
-                className="w-full bg-slate-900 hover:bg-slate-800 dark:bg-rose-600 dark:hover:bg-rose-700 text-white h-12 text-base font-bold rounded-xl shadow-lg shadow-rose-500/10 transition-all active:scale-[0.98]"
+                className="w-full bg-slate-900 hover:bg-slate-850 dark:bg-rose-600 dark:hover:bg-rose-500 text-white h-12 text-base font-bold rounded-xl shadow-lg shadow-rose-500/10 hover:shadow-rose-500/20 transition-all duration-250 active:scale-[0.97] cursor-pointer"
               >
                 {loading ? (
                   <>
@@ -241,14 +235,12 @@ export function LoginScreen() {
                   "Sign In"
                 )}
               </Button>
-
             </form>
           </CardContent>
         </Card>
 
         <p className="text-center text-xs mt-8 text-gray-400 dark:text-gray-600 font-medium">
-          &copy; {new Date().getFullYear()} SchoolSaaS Platform. Secure
-          Multi-Tenant Architecture.
+          For assistance, please contact your school administration.
         </p>
       </div>
     </div>
