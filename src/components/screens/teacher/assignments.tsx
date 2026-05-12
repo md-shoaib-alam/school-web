@@ -74,7 +74,7 @@ interface Submission {
 export function TeacherAssignments() {
   const [assignments, setAssignments] = useState<Assignment[]>([]);
   const [subjects, setSubjects] = useState<
-    { id: string; name: string; className: string }[]
+    { id: string; name: string; className: string; classId: string; teacherId: string }[]
   >([]);
   const [loading, setLoading] = useState(true);
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -94,7 +94,7 @@ export function TeacherAssignments() {
   const [gradeForm, setGradeForm] = useState({ grade: "", feedback: "" });
 
   useEffect(() => {
-    Promise.all([apiFetch("/api/assignments"), apiFetch("/api/subjects")])
+    Promise.all([apiFetch("/api/assignments?mine=true"), apiFetch("/api/subjects?mine=true")])
       .then(([aRes, sRes]) => Promise.all([aRes.json(), sRes.json()]))
       .then(([aData, sData]) => {
         setAssignments(aData);
@@ -108,21 +108,27 @@ export function TeacherAssignments() {
       toast.error("Please fill in all required fields");
       return;
     }
+    const selectedSub = subjects.find(s => s.id === form.subjectId);
+    if (!selectedSub) {
+      toast.error("Selected subject not found");
+      return;
+    }
+
     try {
       const res = await apiFetch("/api/assignments", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           ...form,
-          classId: "demo",
-          teacherId: "demo-teacher",
+          classId: selectedSub.classId,
+          teacherId: selectedSub.teacherId,
         }),
       });
       if (res.ok) {
         toast.success("Assignment created successfully!");
         setDialogOpen(false);
         setForm({ title: "", description: "", subjectId: "", dueDate: "" });
-        const data = await apiFetch("/api/assignments").then((r) => r.json());
+        const data = await apiFetch("/api/assignments?mine=true").then((r) => r.json());
         setAssignments(data);
       }
     } catch {
