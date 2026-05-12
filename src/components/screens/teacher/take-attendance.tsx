@@ -142,8 +142,10 @@ export function TeacherAttendance() {
 
   const { data: existingAttendance = [] } = useQuery({
     queryKey: attendanceKey(selectedClassId, date),
-    queryFn: () =>
-      api.get<any[]>(`/attendance?classId=${selectedClassId}&date=${date}`),
+    queryFn: async () => {
+      const res = await api.get<any>(`/attendance?classId=${selectedClassId}&date=${date}`);
+      return Array.isArray(res?.records) ? res.records : [];
+    },
     enabled: !!selectedClassId,
     staleTime: 30 * 1000, // 30 s — background refresh keeps it fresh
   });
@@ -154,14 +156,16 @@ export function TeacherAttendance() {
   const buildRecords = (
     studentList: StudentInfo[],
     attList: any[]
-  ): AttendanceRecord[] =>
-    studentList.map((s) => {
-      const existing = attList.find((a) => a.studentId === s.id);
+  ): AttendanceRecord[] => {
+    const list = Array.isArray(attList) ? attList : [];
+    return studentList.map((s) => {
+      const existing = list.find((a) => a?.studentId === s.id);
       return {
         studentId: s.id,
         status: existing ? (existing.status as AttendanceStatus) : "present",
       };
     });
+  };
 
   // Local overrides — applied on top of server data for instant feel
   const [localOverrides, setLocalOverrides] = useState<

@@ -101,6 +101,16 @@ function isBetween(start: string, end: string): boolean {
   return nowMin >= timeToMinutes(start) && nowMin < timeToMinutes(end);
 }
 
+function formatTime(time: string): string {
+  if (!time) return "";
+  const [h, m] = time.split(":");
+  const hour = parseInt(h ?? "0", 10);
+  const min = m ?? "00";
+  const ampm = hour >= 12 ? "PM" : "AM";
+  const displayHour = hour % 12 === 0 ? 12 : hour % 12;
+  return `${displayHour}:${min} ${ampm}`;
+}
+
 // ---------------------------------------------------------------------------
 // Sub-components
 // ---------------------------------------------------------------------------
@@ -146,10 +156,10 @@ function ViewToggle({
 
 export function TeacherTimetable() {
   const [classes, setClasses] = useState<ClassInfo[]>([]);
-  const [selectedClass, setSelectedClass] = useState("");
+  const [selectedClass, setSelectedClass] = useState("all");
   const [timetable, setTimetable] = useState<TimetableSlot[]>([]);
   const [loading, setLoading] = useState(true);
-  const [viewMode, setViewMode] = useState<ViewMode>("grid");
+  const [viewMode, setViewMode] = useState<ViewMode>("day");
   const [selectedDay, setSelectedDay] = useState("");
 
   useEffect(() => {
@@ -157,19 +167,22 @@ export function TeacherTimetable() {
       .then((r) => r.json())
       .then((data: ClassInfo[]) => {
         setClasses(data);
-        if (data.length > 0) setSelectedClass(data[0].id);
-        setLoading(false);
       });
   }, []);
 
   useEffect(() => {
-    if (!selectedClass) return;
-    apiFetch(`/api/timetable?classId=${selectedClass}`)
+    setLoading(true);
+    const endpoint = selectedClass === "all" 
+      ? "/api/timetable?mine=true" 
+      : `/api/timetable?classId=${selectedClass}`;
+      
+    apiFetch(endpoint)
       .then((r) => r.json())
       .then((data: TimetableSlot[]) => {
         setTimetable(data);
         setLoading(false);
-      });
+      })
+      .catch(() => setLoading(false));
   }, [selectedClass]);
 
   const todayIndex = useMemo(() => toDayIndex(new Date().getDay()), []);
@@ -244,7 +257,7 @@ export function TeacherTimetable() {
     });
   }, [allTimeSlots, selectedDayKey, timetable]);
 
-  if (loading && classes.length === 0) {
+  if (loading && timetable.length === 0) {
     return <LoadingSkeleton />;
   }
 
@@ -330,13 +343,17 @@ function PageHeader({
       </div>
       <div className="flex items-center gap-3">
         <Select value={selectedClass} onValueChange={onClassChange}>
-          <SelectTrigger className="w-48">
-            <SelectValue placeholder="Select class" />
+          <SelectTrigger className="w-56 bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-800">
+            <SelectValue placeholder="Select Schedule" />
           </SelectTrigger>
           <SelectContent>
+            <SelectItem value="all" className="font-semibold text-emerald-600 dark:text-emerald-400">
+              My Personal Schedule
+            </SelectItem>
+            {classes.length > 0 && <div className="h-px bg-gray-100 dark:bg-gray-800 my-1" />}
             {classes.map((c) => (
               <SelectItem key={c.id} value={c.id}>
-                {c.name} - {c.section}
+                Class {c.name} - {c.section}
               </SelectItem>
             ))}
           </SelectContent>
@@ -366,93 +383,110 @@ function GridView({
     <Card className="rounded-xl shadow-sm overflow-hidden">
       <CardContent className="p-0">
         <div className="overflow-x-auto">
-          <table className="w-full min-w-[700px]">
+          <table className="w-full text-sm min-w-[700px]">
             <thead>
-              <tr className="bg-gray-50 dark:bg-gray-800/50">
-                <th className="p-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 w-32 border-r border-gray-100 dark:border-gray-700">
-                  Time
+              <tr className="border-b bg-muted/30">
+                <th className="py-3 px-4 text-left font-medium text-muted-foreground w-36 border-r border-gray-100 dark:border-gray-700">
+                  <div className="flex items-center gap-1.5">
+                    <Clock className="h-3.5 w-3.5" />
+                    Time Slot
+                  </div>
                 </th>
                 {DAYS.map((day) => (
                   <th
                     key={day}
-                    className={`p-3 text-center text-xs font-semibold border-r border-gray-100 dark:border-gray-700 last:border-r-0 ${
+                    className={`py-3 px-2 text-center font-medium border-r border-gray-100 dark:border-gray-700 last:border-r-0 ${
                       day === currentDayKey
-                        ? "text-emerald-700 dark:text-emerald-400 bg-emerald-50/60 dark:bg-emerald-900/20"
-                        : "text-gray-500 dark:text-gray-400"
+                        ? "bg-emerald-50 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-400"
+                        : "text-muted-foreground"
                     }`}
                   >
-                    {DAY_LABELS[day]}
+                    {SHORT_DAY_LABELS[day]}
                     {day === currentDayKey && (
-                      <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full mx-auto mt-1" />
+                      <span className="ml-1.5 inline-block h-1.5 w-1.5 rounded-full bg-emerald-500" />
                     )}
                   </th>
                 ))}
               </tr>
             </thead>
             <tbody>
-              {timeSlots.map((ts, idx) => (
-                <tr
-                  key={ts}
-                  className={
-                    idx % 2 === 0
-                      ? "bg-white dark:bg-gray-950"
-                      : "bg-gray-50/50 dark:bg-gray-900/30"
-                  }
-                >
-                  <td className="p-3 text-xs text-gray-500 dark:text-gray-400 border-r border-gray-100 dark:border-gray-700 font-medium">
-                    <div className="flex items-center gap-1.5">
-                      <Clock className="h-3 w-3" />
-                      {ts}
-                    </div>
-                  </td>
-                  {DAYS.map((day) => {
-                    const slot = getSlot(day, ts);
-                    const isToday = day === currentDayKey;
-                    const inProgress =
-                      slot &&
-                      isToday &&
-                      isBetween(slot.startTime, slot.endTime);
-                    return (
-                      <td
-                        key={day}
-                        className={`p-1.5 border-r border-gray-100 dark:border-gray-700 last:border-r-0 ${
-                          isToday
-                            ? "bg-emerald-50/20 dark:bg-emerald-900/10"
-                            : ""
-                        }`}
-                      >
-                        {slot ? (
-                          <div
-                            className={`relative rounded-lg p-2.5 border transition-shadow ${getColor(
-                              slot.subjectName,
-                            )} ${inProgress ? "ring-2 ring-emerald-400 dark:ring-emerald-500 shadow-md" : ""} ${
-                              isToday
-                                ? "ring-1 ring-emerald-200 dark:ring-emerald-800"
-                                : ""
-                            }`}
-                          >
-                            {inProgress && (
-                              <Badge className="absolute -top-1.5 -right-1.5 bg-emerald-500 text-white text-[9px] px-1.5 py-0 h-4">
-                                Now
-                              </Badge>
-                            )}
-                            <p className="font-semibold text-xs leading-tight">
-                              {slot.subjectName}
-                            </p>
-                            <p className="text-[10px] mt-0.5 opacity-70">
-                              {slot.teacherName}
-                            </p>
-                          </div>
-                        ) : (
-                          <div className="p-2.5 text-xs text-gray-300 dark:text-gray-600 text-center">
-                            —
-                          </div>
-                        )}
-                      </td>
-                    );
-                  })}
-                </tr>
-              ))}
+              {timeSlots.map((ts, idx) => {
+                const [start, end] = ts.split("-");
+                return (
+                  <tr
+                    key={ts}
+                    className={
+                      idx % 2 === 0
+                        ? "bg-background"
+                        : "bg-muted/10"
+                    }
+                  >
+                    <td className="py-3 px-4 align-top border-r border-gray-100 dark:border-gray-700">
+                      <div className="flex items-center gap-2">
+                        <div className="h-7 w-7 rounded-lg bg-muted flex items-center justify-center flex-shrink-0">
+                          <Clock className="h-3.5 w-3.5 text-muted-foreground" />
+                        </div>
+                        <div>
+                          <p className="text-xs font-semibold text-foreground leading-tight">{formatTime(start)}</p>
+                          <p className="text-[11px] text-muted-foreground mt-0.5">
+                            {formatTime(end)}
+                          </p>
+                        </div>
+                      </div>
+                    </td>
+                    {DAYS.map((day) => {
+                      const slot = getSlot(day, ts);
+                      const isToday = day === currentDayKey;
+                      const inProgress =
+                        slot &&
+                        isToday &&
+                        isBetween(slot.startTime, slot.endTime);
+                      return (
+                        <td
+                          key={day}
+                          className={`py-2 px-1.5 align-top border-r border-gray-100 dark:border-gray-700 last:border-r-0 ${
+                            isToday
+                              ? "bg-emerald-50/20 dark:bg-emerald-900/10"
+                              : ""
+                          }`}
+                        >
+                          {slot ? (
+                            <div
+                              className={`relative rounded-lg p-2.5 border transition-shadow ${getColor(
+                                slot.subjectName,
+                              )} ${inProgress ? "ring-2 ring-emerald-400 dark:ring-emerald-500 shadow-md" : ""} ${
+                                isToday
+                                  ? "ring-1 ring-emerald-200 dark:ring-emerald-800"
+                                  : ""
+                              }`}
+                            >
+                              {inProgress && (
+                                <Badge className="absolute -top-1.5 -right-1.5 bg-emerald-500 text-white text-[9px] px-1.5 py-0 h-4">
+                                  Now
+                                </Badge>
+                              )}
+                              <p className="font-semibold text-sm leading-tight">
+                                {slot.subjectName}
+                              </p>
+                              {slot.teacherName && (
+                                <p className="text-xs mt-1 opacity-80">
+                                  {slot.teacherName}
+                                </p>
+                              )}
+                            </div>
+                          ) : (
+                            <div className="rounded-lg border border-dashed border-muted-foreground/20 h-[52px] flex items-center justify-center">
+                              <span className="text-[11px] text-muted-foreground/50">
+                                —
+                              </span>
+                            </div>
+                          )}
+                        </td>
+                      );
+                    })}
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         </div>
@@ -676,55 +710,48 @@ function DayView({
 
           return (
             <div key={slot.id} className="flex items-stretch gap-4">
-              <div className="flex-shrink-0 w-10 flex justify-center pt-4">
+              <div className="flex-shrink-0 w-10 flex justify-center pt-5">
                 <div
-                  className={`w-2.5 h-2.5 rounded-full border-2 border-white dark:border-gray-900 shadow-sm hidden sm:block ${
+                  className={`w-3 h-3 rounded-full border-2 bg-background shadow-sm hidden sm:block transition-all ${
                     inProgress
-                      ? "bg-emerald-500 animate-pulse"
-                      : "bg-gray-400 dark:bg-gray-600"
+                      ? "border-emerald-500 scale-110 ring-2 ring-emerald-100 dark:ring-emerald-900/50"
+                      : "border-emerald-400"
                   }`}
                 />
               </div>
               <Card
-                className={`flex-1 rounded-xl shadow-sm transition-all ${
+                className={`flex-1 rounded-xl shadow-sm transition-all border border-gray-200 dark:border-gray-800 ${
                   inProgress
-                    ? "ring-2 ring-emerald-400 dark:ring-emerald-500 shadow-emerald-100 dark:shadow-emerald-900/30 border-emerald-200 dark:border-emerald-800"
-                    : "hover:shadow-md"
+                    ? "ring-1 ring-emerald-200 dark:ring-emerald-800 bg-emerald-50/30 dark:bg-emerald-900/10"
+                    : "hover:shadow-md bg-white dark:bg-gray-950"
                 }`}
               >
-                <CardContent className="p-4">
-                  <div className="flex flex-col sm:flex-row sm:items-start gap-3">
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2 mb-1">
-                        <Badge
-                          variant="outline"
-                          className={`text-xs font-semibold ${getColor(slot.subjectName)}`}
-                        >
-                          {slot.subjectName}
-                        </Badge>
-                        {inProgress && (
-                          <Badge className="bg-emerald-500 text-white text-[10px] h-5">
-                            In Progress
-                          </Badge>
-                        )}
-                      </div>
-                      <div className="flex items-center gap-4 mt-2">
-                        <div className="flex items-center gap-1.5 text-sm text-gray-500 dark:text-gray-400">
-                          <Clock className="h-3.5 w-3.5" />
-                          <span>
-                            {slot.startTime} – {slot.endTime}
-                          </span>
-                        </div>
-                        <div className="flex items-center gap-1.5 text-sm text-gray-500 dark:text-gray-400">
-                          <User className="h-3.5 w-3.5" />
-                          <span>{slot.teacherName}</span>
-                        </div>
-                        <div className="flex items-center gap-1.5 text-sm text-gray-500 dark:text-gray-400">
-                          <GraduationCap className="h-3.5 w-3.5" />
-                          <span>{slot.className}</span>
-                        </div>
-                      </div>
+                <CardContent className="p-4 flex flex-row items-start justify-between">
+                  <div className="space-y-1.5">
+                    <h4 className="font-bold text-lg text-gray-900 dark:text-gray-100 leading-tight tracking-tight">
+                      {slot.subjectName}
+                    </h4>
+                    <div className="flex flex-col text-sm text-gray-500 dark:text-gray-400 space-y-0.5">
+                      <p>{slot.teacherName}</p>
+                      {slot.className && (
+                        <p className="text-xs text-gray-400 dark:text-gray-500">{slot.className}</p>
+                      )}
                     </div>
+                  </div>
+                  
+                  <div className="flex flex-col items-end gap-2 flex-shrink-0">
+                    <Badge 
+                      variant="outline" 
+                      className="bg-emerald-50 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800/50 font-medium px-2.5 py-1 rounded-lg h-auto text-xs flex items-center gap-1.5"
+                    >
+                      <Clock className="h-3.5 w-3.5" />
+                      {formatTime(slot.startTime)} - {formatTime(slot.endTime)}
+                    </Badge>
+                    {inProgress && (
+                      <Badge className="bg-emerald-600 hover:bg-emerald-600 text-white text-[10px] font-bold h-5 shadow-sm animate-pulse">
+                        Live
+                      </Badge>
+                    )}
                   </div>
                 </CardContent>
               </Card>

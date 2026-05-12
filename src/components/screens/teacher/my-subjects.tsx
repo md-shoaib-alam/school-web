@@ -2,14 +2,16 @@
 
 import { api } from "@/lib/api";
 import { useQuery } from "@tanstack/react-query";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Badge } from "@/components/ui/badge";
 import {
   BookOpen,
   LayoutGrid,
   List,
   School,
+  Clock,
 } from "lucide-react";
 
 // ─── Types ────────────────────────────────────────────────────
@@ -18,10 +20,108 @@ interface SubjectInfo {
   id: string;
   name: string;
   code: string;
-  className: string; // e.g. "Grade 5-A"
+  className: string;
   classId: string;
   teacherName: string;
   teacherId: string;
+}
+
+interface TimetableSlot {
+  id: string;
+  day: string;
+  startTime: string;
+  endTime: string;
+  subjectId: string;
+}
+
+// ─── Helpers ─────────────────────────────────────────────────
+
+function formatTime(time: string): string {
+  if (!time) return "";
+  const [h, m] = time.split(":");
+  const hour = parseInt(h ?? "0", 10);
+  const min = m ?? "00";
+  const ampm = hour >= 12 ? "PM" : "AM";
+  const displayHour = hour % 12 === 0 ? 12 : hour % 12;
+  return `${displayHour}:${min} ${ampm}`;
+}
+
+function getShortDay(day: string) {
+  const map: Record<string, string> = {
+    monday: "Mon",
+    tuesday: "Tue",
+    wednesday: "Wed",
+    thursday: "Thu",
+    friday: "Fri",
+    saturday: "Sat",
+    sunday: "Sun",
+  };
+  return map[day.toLowerCase()] || day.substring(0, 3);
+}
+
+const DAY_ORDER: Record<string, number> = {
+  monday: 1, tuesday: 2, wednesday: 3, thursday: 4, friday: 5, saturday: 6, sunday: 7
+};
+
+function getNowMinutes() {
+  const n = new Date();
+  return n.getHours() * 60 + n.getMinutes();
+}
+
+function getCurrentDayKey() {
+  const d = new Date().getDay(); // 0 Sun
+  return d === 0 ? 7 : d; // 1 Mon -> 7 Sun
+}
+
+function isSlotToday(slot: TimetableSlot): boolean {
+  const curDay = new Date().toLocaleDateString("en-US", { weekday: "long" }).toLowerCase();
+  return slot.day.toLowerCase() === curDay;
+}
+
+function isSlotLive(slot: TimetableSlot): boolean {
+  if (!isSlotToday(slot)) return false;
+
+  const [sH, sM] = slot.startTime.split(":").map(Number);
+  const [eH, eM] = slot.endTime.split(":").map(Number);
+  const start = (sH ?? 0) * 60 + (sM ?? 0);
+  const end = (eH ?? 0) * 60 + (eM ?? 0);
+  const now = getNowMinutes();
+  return now >= start && now < end;
+}
+
+function getNextOccurrenceRank(slots: TimetableSlot[]): number {
+  if (slots.length === 0) return 999999; // Bottom
+  const curDay = getCurrentDayKey();
+  const nowMin = getNowMinutes();
+  let best = Infinity;
+
+  for (const s of slots) {
+    const sDayNum = DAY_ORDER[s.day.toLowerCase()] || 7;
+    const [sh, sm] = s.startTime.split(":").map(Number);
+    const [eh, em] = s.endTime.split(":").map(Number);
+    const sStart = (sh ?? 0) * 60 + (sm ?? 0);
+    const sEnd = (eh ?? 0) * 60 + (em ?? 0);
+
+    let diff = sDayNum - curDay;
+    if (diff < 0) {
+      diff += 7;
+    } else if (diff === 0 && nowMin > sEnd) {
+      // Already passed today, wraps next week
+      diff += 7;
+    }
+    
+    // Calculate exact priority score
+    const score = diff * 1440 + sStart;
+    if (score < best) best = score;
+  }
+  return best;
+}
+
+function sortSlots(a: TimetableSlot, b: TimetableSlot) {
+  const dayA = DAY_ORDER[a.day.toLowerCase()] || 9;
+  const dayB = DAY_ORDER[b.day.toLowerCase()] || 9;
+  if (dayA !== dayB) return dayA - dayB;
+  return a.startTime.localeCompare(b.startTime);
 }
 
 // ─── Cookie helpers ───────────────────────────────────────────
@@ -78,9 +178,40 @@ export function TeacherSubjects() {
   const { data: subjects = [], isLoading } = useQuery<SubjectInfo[]>({
     queryKey: ["teacher-subjects-mine-v2"],
     queryFn: () => api.get<SubjectInfo[]>("/subjects?mine=true"),
-    staleTime: 10 * 60 * 1000, // 10 min — serve from cache, no refetch on every nav
-    gcTime: 30 * 60 * 1000,    // keep in memory for 30 min
+    staleTime: 10 * 60 * 1000,
+    gcTime: 30 * 60 * 1000,
   });
+
+  // Retrieve the single teacher ID from one of the subject assignments to query their complete schedule
+  const teacherId = subjects.find((s) => s.teacherId)?.teacherId;
+
+  const { data: timetable = [] } = useQuery<TimetableSlot[]>({
+    queryKey: ["teacher-timetable-summary", teacherId],
+    queryFn: () => api.get<TimetableSlot[]>(`/timetable?teacherId=${teacherId}`),
+    enabled: !!teacherId,
+    staleTime: 5 * 60 * 1000,
+  });
+
+  const sortedSubjects = useMemo(() => {
+    if (!subjects.length) return [];
+    const list = [...subjects];
+    
+    list.sort((a, b) => {
+      const slotsA = timetable.filter(t => t.subjectId === a.id);
+      const slotsB = timetable.filter(t => t.subjectId === b.id);
+      
+      // Check if currently live (super high priority)
+      const liveA = slotsA.some(isSlotLive);
+      const liveB = slotsB.some(isSlotLive);
+      if (liveA && !liveB) return -1;
+      if (!liveA && liveB) return 1;
+
+      // Fallback to chronological upcoming priority
+      return getNextOccurrenceRank(slotsA) - getNextOccurrenceRank(slotsB);
+    });
+
+    return list;
+  }, [subjects, timetable]);
 
   // ── Loading ──────────────────────────────────────────────
 
@@ -105,7 +236,7 @@ export function TeacherSubjects() {
 
   // ── Empty ────────────────────────────────────────────────
 
-  if (subjects.length === 0) {
+  if (sortedSubjects.length === 0 && !isLoading) {
     return (
       <div className="space-y-6">
         <Header subjects={subjects} view={view} switchView={switchView} />
@@ -125,9 +256,9 @@ export function TeacherSubjects() {
       <Header subjects={subjects} view={view} switchView={switchView} />
 
       {view === "grid" ? (
-        <GridView subjects={subjects} />
+        <GridView subjects={sortedSubjects} timetable={timetable} />
       ) : (
-        <TableView subjects={subjects} />
+        <TableView subjects={sortedSubjects} timetable={timetable} />
       )}
     </div>
   );
@@ -189,36 +320,62 @@ function Header({
 
 // ─── Grid View ────────────────────────────────────────────────
 
-function GridView({ subjects }: { subjects: SubjectInfo[] }) {
+function GridView({ subjects, timetable }: { subjects: SubjectInfo[], timetable: TimetableSlot[] }) {
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
       {subjects.map((subject) => {
         const p = palette(subject.name);
+        const relevantSlots = timetable
+          .filter((s) => s.subjectId === subject.id)
+          .sort(sortSlots);
+        const todaySlots = relevantSlots.filter(isSlotToday);
+        const isLiveNow = todaySlots.some(isSlotLive);
+        const isHappeningToday = todaySlots.length > 0;
+
         return (
           <Card
             key={subject.id}
-            className="rounded-xl shadow-sm border-0 hover:shadow-md transition-all group overflow-hidden"
+            className={`rounded-xl border hover:shadow-md transition-all group overflow-hidden flex flex-col ${
+              isLiveNow 
+                ? "ring-2 ring-emerald-500 shadow-emerald-100 dark:shadow-emerald-900/20 border-emerald-200 dark:border-emerald-800 bg-emerald-50/10 dark:bg-emerald-900/5"
+                : isHappeningToday
+                ? "border-blue-100 dark:border-blue-900/50 bg-blue-50/10 dark:bg-blue-900/5 shadow-sm"
+                : "border-transparent shadow-sm"
+            }`}
           >
-            <CardContent className="p-5">
+            <CardContent className="p-5 flex-1 flex flex-col">
               {/* Icon + name */}
-              <div className="flex items-start gap-3 mb-4">
-                <div
-                  className={`w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0 ${p.icon}`}
-                >
-                  <BookOpen className="h-5 w-5" />
+              <div className="flex items-start justify-between gap-3 mb-4">
+                <div className="flex items-start gap-3 overflow-hidden">
+                  <div
+                    className={`w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0 ${p.icon}`}
+                  >
+                    <BookOpen className="h-5 w-5" />
+                  </div>
+                  <div className="min-w-0">
+                    <h3 className="font-semibold text-gray-900 dark:text-gray-100 leading-tight truncate">
+                      {subject.name}
+                    </h3>
+                    <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5 font-mono">
+                      {subject.code}
+                    </p>
+                  </div>
                 </div>
-                <div className="min-w-0">
-                  <h3 className="font-semibold text-gray-900 dark:text-gray-100 leading-tight truncate">
-                    {subject.name}
-                  </h3>
-                  <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5 font-mono">
-                    {subject.code}
-                  </p>
+                <div className="flex flex-col items-end gap-1">
+                  {isLiveNow ? (
+                    <Badge className="bg-emerald-600 hover:bg-emerald-600 text-white text-[10px] font-bold tracking-wide animate-pulse px-2 py-0.5 h-auto shadow-sm">
+                      LIVE
+                    </Badge>
+                  ) : isHappeningToday ? (
+                    <Badge variant="outline" className="border-blue-200 text-blue-600 dark:border-blue-800 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/20 text-[10px] font-semibold px-2 py-0.5 h-auto">
+                      TODAY
+                    </Badge>
+                  ) : null}
                 </div>
               </div>
 
               {/* Class — prominent */}
-              <div className={`flex items-center gap-2.5 px-3 py-2.5 rounded-lg ${p.bg} border border-current/10`}>
+              <div className={`flex items-center gap-2.5 px-3 py-2.5 rounded-lg ${p.bg} border border-current/10 mb-auto`}>
                 <School className={`h-4 w-4 flex-shrink-0 ${p.icon.split(" ")[1]} dark:text-white/80`} />
                 <div className="min-w-0">
                   <p className="text-[10px] font-semibold uppercase tracking-wider text-gray-400 dark:text-white/50 leading-none mb-0.5">
@@ -229,6 +386,35 @@ function GridView({ subjects }: { subjects: SubjectInfo[] }) {
                   </p>
                 </div>
               </div>
+
+              {/* Subject Timings, if available TODAY */}
+              {todaySlots.length > 0 && (
+                <div className="mt-4 pt-3 border-t border-gray-100 dark:border-gray-800">
+                  <div className="flex items-center gap-1.5 text-[11px] font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2.5">
+                    <Clock className="h-3.5 w-3.5" />
+                    Today's Timing
+                  </div>
+                  <div className="flex flex-wrap gap-2">
+                    {todaySlots.map((slot) => {
+                      const active = isSlotLive(slot);
+                      return (
+                        <Badge 
+                          key={slot.id} 
+                          variant="secondary" 
+                          className={`text-xs font-semibold px-2.5 py-1 border rounded-md shadow-sm h-auto flex items-center transition-all ${
+                            active 
+                              ? "bg-emerald-600 text-white border-emerald-600 shadow-emerald-100 animate-pulse scale-105" 
+                              : "bg-blue-50 dark:bg-blue-900/30 border-blue-200 dark:border-blue-800 text-blue-700 dark:text-blue-400"
+                          }`}
+                        >
+                          {active && <span className="w-1.5 h-1.5 rounded-full bg-white mr-1.5" />}
+                          {formatTime(slot.startTime)} - {formatTime(slot.endTime)}
+                        </Badge>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
             </CardContent>
           </Card>
         );
@@ -239,15 +425,16 @@ function GridView({ subjects }: { subjects: SubjectInfo[] }) {
 
 // ─── Table View ───────────────────────────────────────────────
 
-function TableView({ subjects }: { subjects: SubjectInfo[] }) {
+function TableView({ subjects, timetable }: { subjects: SubjectInfo[], timetable: TimetableSlot[] }) {
   return (
-    <div className="rounded-xl border border-gray-200 dark:border-gray-800 overflow-hidden">
-      <table className="w-full table-fixed">
+    <div className="rounded-xl border border-gray-200 dark:border-gray-800 overflow-x-auto bg-card">
+      <table className="w-full min-w-[800px]">
         <colgroup>
           <col className="w-12" />
-          <col className="w-[34%]" />
-          <col className="w-[28%]" />
-          <col className="w-[38%]" />
+          <col className="w-[25%]" />
+          <col className="w-[12%]" />
+          <col className="w-[20%]" />
+          <col />
         </colgroup>
         <thead>
           <tr className="bg-gray-50 dark:bg-gray-900/50 border-b border-gray-200 dark:border-gray-800">
@@ -263,27 +450,61 @@ function TableView({ subjects }: { subjects: SubjectInfo[] }) {
             <th className="text-xs font-semibold text-gray-500 dark:text-gray-400 text-left py-3 px-3">
               Class
             </th>
+            <th className="text-xs font-semibold text-gray-500 dark:text-gray-400 text-left py-3 px-3">
+              Timings
+            </th>
           </tr>
         </thead>
         <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
           {subjects.map((subject, index) => {
             const p = palette(subject.name);
+            const relevantSlots = timetable
+              .filter((s) => s.subjectId === subject.id)
+              .sort(sortSlots);
+            const todaySlots = relevantSlots.filter(isSlotToday);
+            const isLiveNow = todaySlots.some(isSlotLive);
+            const isHappeningToday = todaySlots.length > 0;
+
             return (
               <tr
                 key={subject.id}
-                className="hover:bg-blue-50/30 dark:hover:bg-blue-900/10 transition-colors"
+                className={`transition-colors ${
+                  isLiveNow 
+                    ? "bg-emerald-50/50 dark:bg-emerald-900/10 hover:bg-emerald-50 dark:hover:bg-emerald-900/20" 
+                    : isHappeningToday
+                    ? "bg-blue-50/30 dark:bg-blue-900/5 hover:bg-blue-50/50 dark:hover:bg-blue-900/10"
+                    : "hover:bg-blue-50/30 dark:hover:bg-blue-900/10"
+                }`}
               >
-                <td className="py-3 pl-4 pr-2 text-xs text-gray-400 font-mono">
-                  {index + 1}
+                <td className="py-3 pl-4 pr-2 text-xs font-mono">
+                  {isLiveNow ? (
+                    <span className="relative flex h-2.5 w-2.5">
+                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                      <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
+                    </span>
+                  ) : (
+                    <span className="text-gray-400">{index + 1}</span>
+                  )}
                 </td>
                 <td className="py-3 px-3">
                   <div className="flex items-center gap-2.5 min-w-0">
                     <div className={`w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0 ${p.icon}`}>
                       <BookOpen className="h-3.5 w-3.5" />
                     </div>
-                    <span className="text-sm font-semibold text-gray-800 dark:text-gray-200 truncate">
-                      {subject.name}
-                    </span>
+                    <div className="flex items-center gap-2 min-w-0">
+                      <span className={`text-sm font-semibold truncate ${
+                        isLiveNow ? "text-emerald-700 dark:text-emerald-400" : 
+                        isHappeningToday ? "text-blue-800 dark:text-blue-300" : 
+                        "text-gray-800 dark:text-gray-200"
+                      }`}>
+                        {subject.name}
+                      </span>
+                      {isLiveNow ? (
+                         <Badge className="bg-emerald-600 text-white text-[9px] px-1 py-0 h-4 font-bold uppercase tracking-tighter flex-shrink-0">Live</Badge>
+                      ) : isHappeningToday ? (
+                         <Badge variant="outline" className="border-blue-200 text-blue-600 text-[9px] px-1 py-0 h-4 font-semibold tracking-tighter flex-shrink-0 bg-blue-50">Today</Badge>
+                      ) : null}
+                    </div>
                   </div>
                 </td>
                 <td className="py-3 px-3">
@@ -297,6 +518,30 @@ function TableView({ subjects }: { subjects: SubjectInfo[] }) {
                     <span className={`text-xs font-bold truncate ${p.icon.split(" ")[1]} dark:text-white`}>
                       {subject.className}
                     </span>
+                  </div>
+                </td>
+                <td className="py-3 px-3">
+                  <div className="flex flex-wrap gap-1.5">
+                    {todaySlots.length > 0 ? (
+                      todaySlots.map((slot) => {
+                        const active = isSlotLive(slot);
+                        return (
+                          <Badge 
+                            key={slot.id} 
+                            variant="secondary" 
+                            className={`text-[11px] font-semibold px-2 py-0.5 h-auto border whitespace-nowrap shadow-sm ${
+                              active
+                                ? "bg-emerald-600 text-white border-emerald-600 animate-pulse"
+                                : "bg-blue-50 dark:bg-blue-900/30 border-blue-200 dark:border-blue-800 text-blue-700 dark:text-blue-400"
+                            }`}
+                          >
+                            {formatTime(slot.startTime)} - {formatTime(slot.endTime)}
+                          </Badge>
+                        );
+                      })
+                    ) : (
+                      <span className="text-[11px] text-gray-400 italic">—</span>
+                    )}
                   </div>
                 </td>
               </tr>
