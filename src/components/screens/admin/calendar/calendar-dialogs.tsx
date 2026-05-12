@@ -11,6 +11,7 @@ import { Switch } from "@/components/ui/switch";
 import { Loader2 } from "lucide-react";
 import { DatePicker } from "@/components/ui/date-picker";
 import { CalendarEvent, EventFormData, ALL_EVENT_TYPES, EVENT_TYPE_COLORS, EVENT_TYPE_LABELS, TARGET_ROLE_LABELS } from "./types";
+import { formatDateISO } from "./utils";
 
 interface CalendarDialogsProps {
   dialogOpen: boolean;
@@ -70,7 +71,7 @@ export function CalendarDialogs({
                   <Label className="text-xs font-semibold tracking-tight text-slate-600 dark:text-slate-300">Start Date</Label>
                  <DatePicker 
                    date={form.date ? new Date(form.date + "T00:00:00") : undefined} 
-                   onChange={(d) => updateForm("date", d?.toISOString().split('T')[0] || '')}
+                   onChange={(d) => updateForm("date", d ? formatDateISO(d) : "")}
                    className="h-10 text-sm w-full"
                  />
                </div>
@@ -78,7 +79,7 @@ export function CalendarDialogs({
                   <Label className="text-xs font-semibold tracking-tight text-slate-600 dark:text-slate-300">End Date</Label>
                  <DatePicker 
                    date={form.endDate ? new Date(form.endDate + "T00:00:00") : undefined} 
-                   onChange={(d) => updateForm("endDate", d?.toISOString().split('T')[0] || '')}
+                   onChange={(d) => updateForm("endDate", d ? formatDateISO(d) : "")}
                    className="h-10 text-sm w-full"
                    placeholder="Optional"
                  />

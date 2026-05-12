@@ -15,6 +15,8 @@ interface CalendarHeaderProps {
   goToToday: () => void;
   canCreate: boolean;
   openCreateDialog: () => void;
+  title?: string;
+  description?: string;
 }
 
 export function CalendarHeader({
@@ -27,26 +29,28 @@ export function CalendarHeader({
   goToToday,
   canCreate,
   openCreateDialog,
+  title = "Calendar",
+  description = "View school events and activities",
 }: CalendarHeaderProps) {
   return (
     <div className="bg-white dark:bg-neutral-900/40 rounded-2xl border border-slate-200/60 dark:border-white/[0.06] shadow-sm overflow-hidden">
       {/* Title & Actions Top Row */}
-      <div className="px-6 py-5 border-b border-slate-100 dark:border-white/[0.05] flex flex-col sm:flex-row gap-4 justify-between items-start sm:items-center">
+      <div className="px-4 py-4 sm:px-6 sm:py-5 border-b border-slate-100 dark:border-white/[0.05] flex flex-col sm:flex-row gap-3 sm:gap-4 justify-between items-start sm:items-center">
         <div className="flex items-center justify-between w-full sm:w-auto">
           <div>
-            <h1 className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">
-              Calendar
+            <h1 className="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white tracking-tight">
+              {title}
             </h1>
-            <p className="text-sm text-slate-500 dark:text-slate-400 mt-0.5">
-              View school events and activities
+            <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-0.5">
+              {description}
             </p>
           </div>
         </div>
 
-        <div className="flex items-center gap-3 w-full sm:w-auto">
-          <div className="flex items-center gap-2 w-full sm:w-auto overflow-x-auto no-scrollbar">
+        <div className="flex items-center w-full sm:w-auto mt-1 sm:mt-0">
+          <div className="flex items-center gap-2 w-full sm:w-auto">
             <Select value={typeFilter} onValueChange={setTypeFilter}>
-              <SelectTrigger className="w-[130px] h-9 text-xs font-semibold border-slate-200/70 dark:border-white/[0.08] rounded-xl">
+              <SelectTrigger className="w-full sm:w-[140px] h-9 text-xs font-semibold border-slate-200/70 dark:border-white/[0.08] rounded-xl">
                 <SelectValue placeholder="All" />
               </SelectTrigger>
               <SelectContent>
@@ -76,7 +80,7 @@ export function CalendarHeader({
       </div>
 
       {/* Month navigation row */}
-      <div className="px-6 py-3 flex items-center justify-between bg-slate-50/40 dark:bg-white/[0.01]">
+      <div className="px-4 py-2.5 sm:px-6 sm:py-3 flex items-center justify-between bg-slate-50/40 dark:bg-white/[0.01]">
         {/* Left Side: Packed Month Navigation */}
         <div className="flex items-center gap-2">
           <Button 
