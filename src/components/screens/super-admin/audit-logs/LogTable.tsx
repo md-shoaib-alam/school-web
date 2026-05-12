@@ -90,6 +90,23 @@ export function LogTable({
   const [showFilters, setShowFilters] = useState(true);
   const [selectedLog, setSelectedLog] = useState<AuditLog | null>(null);
 
+  const getActionColor = (action: string) => {
+    const act = action.toUpperCase();
+    if (act.includes("DELETE") || act.includes("REMOVE") || act.includes("DISABLE")) {
+      return "bg-red-50 text-red-700 border-red-200 dark:bg-red-900/20 dark:text-red-400 dark:border-red-800";
+    }
+    if (act.includes("CREATE") || act.includes("ADD") || act.includes("ENABLE") || act.includes("INVITE")) {
+      return "bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-900/20 dark:text-emerald-400 dark:border-emerald-800";
+    }
+    if (act.includes("UPDATE") || act.includes("EDIT") || act.includes("PATCH") || act.includes("CHANGE")) {
+      return "bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-900/20 dark:text-amber-400 dark:border-amber-800";
+    }
+    if (act.includes("LOGIN") || act.includes("AUTH") || act.includes("VERIFY")) {
+      return "bg-violet-50 text-violet-700 border-violet-200 dark:bg-violet-900/20 dark:text-violet-400 dark:border-violet-800";
+    }
+    return "bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-900/20 dark:text-blue-400 dark:border-blue-800";
+  };
+
   return (
     <div className="space-y-6">
       {/* Page Title Header */}
@@ -217,8 +234,11 @@ export function LogTable({
                         </span>
                       </TableCell>
 
-                      <TableCell className="py-3 px-4 text-sm text-gray-700 dark:text-gray-300 capitalize">
-                        <Badge variant="outline" className="font-normal bg-gray-100/50 dark:bg-gray-800/50">
+                      <TableCell className="py-3 px-4 text-sm capitalize">
+                        <Badge 
+                          variant="outline" 
+                          className={`font-medium px-2 py-0.5 rounded-md border ${getActionColor(log.action)}`}
+                        >
                           {log.action.replace(/_/g, " ").toLowerCase()}
                         </Badge>
                       </TableCell>
