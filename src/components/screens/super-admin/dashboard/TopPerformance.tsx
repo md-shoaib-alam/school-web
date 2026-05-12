@@ -6,7 +6,7 @@ import {
   CardDescription,
 } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Badge } from "@/components/ui/badge";
+
 import {
   Table,
   TableBody,
@@ -20,7 +20,6 @@ import {
   Bar, 
   XAxis, 
   YAxis, 
-  CartesianGrid, 
   Cell 
 } from "recharts";
 import {
@@ -28,8 +27,9 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart";
-import { Crown, Building2, BarChart3, Users, IndianRupee } from "lucide-react";
+import { Crown, Building2, BarChart3 } from "lucide-react";
 import { DashboardData, planChartConfig, PLAN_COLORS } from "./types";
+
 
 interface TopPerformanceProps {
   loading: boolean;
@@ -66,41 +66,27 @@ export function TopPerformance({ loading, data }: TopPerformanceProps) {
                 <TableBody>
                   {data?.topTenants.map((tenant, index) => (
                     <TableRow key={tenant.id} className="hover:bg-emerald-50/20 dark:hover:bg-emerald-900/10 transition-colors border-b last:border-none">
-                      <TableCell className="text-center">
-                        <div className={`h-6 w-6 rounded-full flex items-center justify-center text-[10px] font-black text-white mx-auto shadow-sm ${
-                          index === 0 ? "bg-amber-500" : index === 1 ? "bg-slate-400" : index === 2 ? "bg-amber-700" : "bg-gray-200 dark:bg-gray-700 text-gray-500"
-                        }`}>
-                          {index + 1}
-                        </div>
+                      <TableCell className="text-center font-semibold text-muted-foreground text-sm">
+                        {index + 1}
                       </TableCell>
                       <TableCell>
                         <div className="flex items-center gap-3">
-                          <div className="h-9 w-9 rounded-xl bg-emerald-50 dark:bg-emerald-900/30 flex items-center justify-center shadow-inner">
-                            <Building2 className="h-4 w-4 text-emerald-600" />
-                          </div>
+                          <Building2 className="h-5 w-5 text-muted-foreground/60 shrink-0" />
                           <div>
-                            <p className="font-bold text-sm text-gray-900 dark:text-gray-100">{tenant.name}</p>
-                            <div className="flex items-center gap-2 text-[10px] text-muted-foreground font-bold">
-                              <span className="flex items-center gap-1"><Users className="h-2.5 w-2.5" />{tenant.studentCount}u</span>
-                              <span className="flex items-center gap-1"><BarChart3 className="h-2.5 w-2.5" />{tenant._count.classes}c</span>
-                            </div>
+                            <p className="font-medium text-sm text-gray-900 dark:text-gray-100">{tenant.name}</p>
+                            <p className="text-xs text-muted-foreground">
+                              {tenant.studentCount} students • {tenant._count.classes} classes
+                            </p>
                           </div>
                         </div>
                       </TableCell>
                       <TableCell className="text-center hidden sm:table-cell">
-                        <Badge variant="outline" className={`text-[9px] font-black uppercase tracking-widest h-5 px-2 border-none ${
-                          tenant.plan === 'premium' ? 'bg-amber-50 text-amber-700' : 
-                          tenant.plan === 'enterprise' ? 'bg-purple-50 text-purple-700' : 
-                          'bg-emerald-50 text-emerald-700'
-                        }`}>
+                        <span className="text-xs capitalize text-muted-foreground border px-2 py-0.5 rounded-full bg-muted/30">
                           {tenant.plan}
-                        </Badge>
+                        </span>
                       </TableCell>
-                      <TableCell className="text-right">
-                        <div className="flex items-center justify-end font-black text-sm text-emerald-600">
-                          <IndianRupee className="h-3.5 w-3.5 mr-0.5" />
-                          { (tenant.totalRevenue || 0).toLocaleString() }
-                        </div>
+                      <TableCell className="text-right font-semibold text-sm text-foreground">
+                        ₹{(tenant.totalRevenue || 0).toLocaleString()}
                       </TableCell>
                     </TableRow>
                   ))}
@@ -125,7 +111,7 @@ export function TopPerformance({ loading, data }: TopPerformanceProps) {
           ) : (
             <ChartContainer config={planChartConfig} className="h-[280px] w-full">
               <BarChart data={data?.planDistribution} layout="vertical" margin={{ left: 15, right: 20 }}>
-                <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="#f1f5f9" />
+                {/* Removed grid lines for simplified look */}
                 <XAxis type="number" hide />
                  <YAxis
                   dataKey="plan"
