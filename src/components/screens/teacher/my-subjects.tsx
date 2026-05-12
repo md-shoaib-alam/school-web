@@ -441,7 +441,7 @@ function TableView({ subjects, slotsBySubject }: { subjects: SubjectInfo[], slot
   return (
     <>
       {/* Mobile View for List Mode */}
-      <div className="block md:hidden rounded-xl border border-gray-200 dark:border-gray-800 bg-card overflow-hidden divide-y divide-gray-100 dark:divide-gray-800/50">
+      <div className="block md:hidden space-y-3">
         {subjects.map((subject) => {
           const p = palette(subject.name);
           const relevantSlots = slotsBySubject.get(subject.id) || [];
@@ -452,11 +452,11 @@ function TableView({ subjects, slotsBySubject }: { subjects: SubjectInfo[], slot
           return (
             <div
               key={subject.id}
-              className={`p-4 space-y-3 transition-colors ${
+              className={`p-4 rounded-xl border border-gray-200 dark:border-gray-800 bg-card shadow-sm space-y-3 transition-all ${
                 isLiveNow
-                  ? "bg-emerald-50/30 dark:bg-emerald-950/10"
+                  ? "bg-emerald-50/30 dark:bg-emerald-950/10 ring-1 ring-emerald-500/20"
                   : isHappeningToday
-                  ? "bg-blue-50/20 dark:bg-blue-950/5"
+                  ? "bg-blue-50/20 dark:bg-blue-950/5 ring-1 ring-blue-500/10"
                   : ""
               }`}
             >
@@ -526,15 +526,15 @@ function TableView({ subjects, slotsBySubject }: { subjects: SubjectInfo[], slot
       <div className="hidden md:block rounded-xl border border-gray-200 dark:border-gray-800 overflow-x-auto bg-card">
         <table className="w-full min-w-[800px]">
           <colgroup>
-            <col className="w-12" />
-            <col className="w-[25%]" />
-            <col className="w-[12%]" />
-            <col className="w-[20%]" />
+            <col className="w-16" />
             <col />
+            <col className="w-[15%]" />
+            <col className="w-[22%]" />
+            <col className="w-[24%]" />
           </colgroup>
           <thead>
             <tr className="bg-gray-50 dark:bg-gray-900/50 border-b border-gray-200 dark:border-gray-800">
-              <th className="text-xs font-semibold text-gray-500 dark:text-gray-400 text-left py-3 pl-4 pr-2">
+              <th className="text-xs font-semibold text-gray-500 dark:text-gray-400 text-left py-3 pl-6 pr-2">
                 #
               </th>
               <th className="text-xs font-semibold text-gray-500 dark:text-gray-400 text-left py-3 px-3">
@@ -546,7 +546,7 @@ function TableView({ subjects, slotsBySubject }: { subjects: SubjectInfo[], slot
               <th className="text-xs font-semibold text-gray-500 dark:text-gray-400 text-left py-3 px-3">
                 Class
               </th>
-              <th className="text-xs font-semibold text-gray-500 dark:text-gray-400 text-left py-3 px-3">
+              <th className="text-xs font-semibold text-gray-500 dark:text-gray-400 text-left py-3 pl-3 pr-6">
                 Timings
               </th>
             </tr>
@@ -570,7 +570,7 @@ function TableView({ subjects, slotsBySubject }: { subjects: SubjectInfo[], slot
                       : "hover:bg-blue-50/30 dark:hover:bg-blue-900/10"
                   }`}
                 >
-                  <td className="py-3 pl-4 pr-2 text-xs font-mono">
+                  <td className="py-3 pl-6 pr-2 text-xs font-mono">
                     {isLiveNow ? (
                       <span className="relative flex h-2.5 w-2.5">
                         <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
@@ -614,7 +614,7 @@ function TableView({ subjects, slotsBySubject }: { subjects: SubjectInfo[], slot
                       </span>
                     </div>
                   </td>
-                  <td className="py-3 px-3">
+                  <td className="py-3 pl-3 pr-6">
                     <div className="flex flex-wrap gap-1.5">
                       {todaySlots.length > 0 ? (
                         todaySlots.map((slot) => {
