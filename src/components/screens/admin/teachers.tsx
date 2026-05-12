@@ -19,6 +19,18 @@ import { useQueryClient } from "@tanstack/react-query";
 import { queryKeys } from "@/lib/graphql/keys";
 import { Pagination } from "@/components/shared/pagination";
 import { useDebounce } from "@/hooks/use-debounce";
+import anime from "animejs";
+import {
+  AlertDialog,
+  AlertDialogContent,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogTrigger,
+  AlertDialogAction,
+  AlertDialogCancel,
+} from "@/components/ui/alert-dialog";
 
 // Sub-components
 import { TeacherCard } from "./teachers/TeacherCard";
@@ -163,46 +175,88 @@ export function AdminTeachers() {
   };
 
   const handleDelete = async (id: string) => {
-    // OPTIMISTIC UPDATE: Remove from UI instantly
-    const previousTeachers = queryClient.getQueryData([queryKeys.teachers, currentTenantId, debouncedSearch, currentPage, 12]);
+    const element = document.getElementById(`teacher-item-${id}`);
     
-    queryClient.setQueryData([queryKeys.teachers, currentTenantId, debouncedSearch, currentPage, 12], (old: any) => {
-      if (!old || !old.teachers) return old;
-      return {
-        ...old,
-        teachers: old.teachers.filter((t: any) => t.id !== id),
-        total: Math.max(0, old.total - 1)
-      };
-    });
+    const executeDeletion = async () => {
+      // OPTIMISTIC UPDATE: Remove from UI instantly
+      const previousTeachers = queryClient.getQueryData([queryKeys.teachers, currentTenantId, debouncedSearch, currentPage, 12]);
+      
+      queryClient.setQueryData([queryKeys.teachers, currentTenantId, debouncedSearch, currentPage, 12], (old: any) => {
+        if (!old || !old.teachers) return old;
+        return {
+          ...old,
+          teachers: old.teachers.filter((t: any) => t.id !== id),
+          total: Math.max(0, old.total - 1)
+        };
+      });
 
-    toast.promise(
-      (async () => {
-        try {
-          const res = await apiFetch(`/api/teachers?id=${id}`, {
-            method: "DELETE",
-          });
-          if (!res.ok) {
-            const err = await res.json().catch(() => ({}));
-            throw new Error(err.error || "Deletion failed");
+      toast.promise(
+        (async () => {
+          try {
+            const res = await apiFetch(`/api/teachers?id=${id}`, {
+              method: "DELETE",
+            });
+            if (!res.ok) {
+              const err = await res.json().catch(() => ({}));
+              throw new Error(err.error || "Deletion failed");
+            }
+            queryClient.invalidateQueries({ queryKey: queryKeys.teachers });
+            queryClient.invalidateQueries({ queryKey: ['admin-dashboard', currentTenantId] });
+            setDeletingId(null);
+
+            // We throw a "success" message to force a RED morphing pill for deletion
+            throw new Error("Teacher record removed");
+          } catch (err) {
+            // ROLLBACK if failed
+            queryClient.setQueryData([queryKeys.teachers, currentTenantId, debouncedSearch, currentPage, 12], previousTeachers);
+            throw err;
           }
-          queryClient.invalidateQueries({ queryKey: queryKeys.teachers });
-          queryClient.invalidateQueries({ queryKey: ['admin-dashboard', currentTenantId] });
-          setDeletingId(null);
+        })(),
+        {
+          loading: "Removing teacher record...",
+          success: () => "", // Not reached
+          error: (err: any) => err.message, // Shows the red pill
+        },
+      );
+    };
 
-          // We throw a "success" message to force a RED morphing pill for deletion
-          throw new Error("Teacher record removed");
-        } catch (err) {
-          // ROLLBACK if failed
-          queryClient.setQueryData([queryKeys.teachers, currentTenantId, debouncedSearch, currentPage, 12], previousTeachers);
-          throw err;
+    if (element) {
+      element.style.pointerEvents = 'none';
+      element.style.position = 'relative';
+      element.style.zIndex = '10';
+      
+      // 🌟 Elite Anime.js Physics Exit
+      // Step 1: Scale down, tilt slightly and shoot off to the side
+      anime({
+        targets: element,
+        scale: [1, 0.5],
+        translateX: [0, 150],
+        rotate: '6deg',
+        opacity: [1, 0],
+        duration: 380,
+        easing: 'easeInBack',
+        complete: () => {
+          // Step 2: Instantly collapse layouts to let nearby grid items move smoothly
+          anime({
+            targets: element,
+            maxHeight: 0,
+            height: 0,
+            paddingTop: 0,
+            paddingBottom: 0,
+            marginTop: 0,
+            marginBottom: 0,
+            opacity: 0,
+            duration: 250,
+            easing: 'easeInOutQuad',
+            complete: () => {
+              executeDeletion();
+            }
+          });
         }
-      })(),
-      {
-        loading: "Removing teacher record...",
-        success: () => "", // Not reached
-        error: (err: any) => err.message, // Shows the red pill
-      },
-    );
+      });
+    } else {
+      executeDeletion();
+    }
   };
 
   const isFormValid =
@@ -297,6 +351,7 @@ export function AdminTeachers() {
                       return (
                         <motion.tr 
                           key={teacher.id} 
+                          id={`teacher-item-${teacher.id}`}
                           layout
                           initial={{ opacity: 0, x: -10 }}
                           animate={{ opacity: 1, x: 0 }}
@@ -340,9 +395,38 @@ export function AdminTeachers() {
                                 </Button>
                               )}
                               {canDelete && (
-                                <Button variant="ghost" size="icon" className="h-8 w-8 text-gray-400 hover:text-red-600" onClick={() => setDeletingId(teacher.id)}>
-                                  <Trash2 className="h-3.5 w-3.5" />
-                                </Button>
+                                <AlertDialog
+                                  open={deletingId === teacher.id}
+                                  onOpenChange={(open) => {
+                                    if (!open) setDeletingId(null);
+                                  }}
+                                >
+                                  <AlertDialogTrigger asChild>
+                                    <Button variant="ghost" size="icon" className="h-8 w-8 text-gray-400 hover:text-red-600" onClick={() => setDeletingId(teacher.id)}>
+                                      <Trash2 className="h-3.5 w-3.5" />
+                                    </Button>
+                                  </AlertDialogTrigger>
+                                  <AlertDialogContent>
+                                    <AlertDialogHeader>
+                                      <AlertDialogTitle>Delete Teacher</AlertDialogTitle>
+                                      <AlertDialogDescription>
+                                        Are you sure you want to delete <strong>{teacher.name}</strong>? This action
+                                        cannot be undone.
+                                      </AlertDialogDescription>
+                                    </AlertDialogHeader>
+                                    <AlertDialogFooter>
+                                      <AlertDialogCancel onClick={() => setDeletingId(null)}>
+                                        Cancel
+                                      </AlertDialogCancel>
+                                      <AlertDialogAction
+                                        className="bg-red-600 hover:bg-red-700 text-white"
+                                        onClick={() => handleDelete(teacher.id)}
+                                      >
+                                        Delete
+                                      </AlertDialogAction>
+                                    </AlertDialogFooter>
+                                  </AlertDialogContent>
+                                </AlertDialog>
                               )}
                             </div>
                           </td>
@@ -364,6 +448,7 @@ export function AdminTeachers() {
             {teachers.map((teacher, index) => (
               <motion.div 
                 key={teacher.id}
+                id={`teacher-item-${teacher.id}`}
                 layout
                 initial={{ opacity: 0, scale: 0.95 }}
                 animate={{ opacity: 1, scale: 1 }}
