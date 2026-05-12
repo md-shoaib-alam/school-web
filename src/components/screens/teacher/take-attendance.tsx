@@ -3,7 +3,7 @@
 import { api } from "@/lib/api";
 import { queryClient } from "@/lib/query-client";
 import { useQuery, useMutation } from "@tanstack/react-query";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -152,20 +152,21 @@ export function TeacherAttendance() {
 
   // ── Derive records from students + existing attendance ─────
   // This is the "source of truth" for display; mutations optimistically patch it.
-
-  const buildRecords = (
-    studentList: StudentInfo[],
-    attList: any[]
-  ): AttendanceRecord[] => {
-    const list = Array.isArray(attList) ? attList : [];
-    return studentList.map((s) => {
-      const existing = list.find((a) => a?.studentId === s.id);
-      return {
-        studentId: s.id,
-        status: existing ? (existing.status as AttendanceStatus) : "present",
-      };
+  
+  // Memoize the heavy work of merging datasets (only recalculates on network sync)
+  const serverRecords = useMemo((): AttendanceRecord[] => {
+    const list = Array.isArray(existingAttendance) ? existingAttendance : [];
+    // Build O(1) lookup map for maximum scaling
+    const statusMap = new Map<string, string>();
+    list.forEach((a) => {
+      if (a?.studentId) statusMap.set(a.studentId, a.status);
     });
-  };
+
+    return students.map((s) => ({
+      studentId: s.id,
+      status: (statusMap.get(s.id) as AttendanceStatus) || "present",
+    }));
+  }, [students, existingAttendance]);
 
   // Local overrides — applied on top of server data for instant feel
   const [localOverrides, setLocalOverrides] = useState<
@@ -179,11 +180,13 @@ export function TeacherAttendance() {
     setSaved(false);
   }, [selectedClassId, date]);
 
-  const serverRecords = buildRecords(students, existingAttendance);
-  const records: AttendanceRecord[] = serverRecords.map((r) => ({
-    ...r,
-    status: localOverrides[r.studentId] ?? r.status,
-  }));
+  // Combine server record truth with user pending interactions
+  const records = useMemo((): AttendanceRecord[] => {
+    return serverRecords.map((r) => ({
+      ...r,
+      status: localOverrides[r.studentId] ?? r.status,
+    }));
+  }, [serverRecords, localOverrides]);
 
   // ── Update a single student ────────────────────────────────
 
@@ -255,7 +258,12 @@ export function TeacherAttendance() {
   const totalCount = records.length;
 
   const selectedClass = classes.find((c) => c.id === selectedClassId);
+  
+  const hasExistingAttendance = existingAttendance.length > 0;
   const hasUnsavedChanges = Object.keys(localOverrides).length > 0;
+  
+  // It ONLY needs saving if user toggled something, OR if it has never been submitted to the DB yet.
+  const canSave = hasUnsavedChanges || (!hasExistingAttendance && !saved);
 
   // ── Loading skeleton ───────────────────────────────────────
 
@@ -543,12 +551,9 @@ export function TeacherAttendance() {
 
             <Button
               onClick={() => saveMutation.mutate()}
-              disabled={
-                saveMutation.isPending ||
-                (saved && !hasUnsavedChanges && students.length > 0)
-              }
+              disabled={saveMutation.isPending || !canSave || students.length === 0}
               className={`rounded-lg sm:rounded-xl px-4 py-1.5 sm:px-8 sm:py-5 h-8 sm:h-auto text-[11px] sm:text-sm font-bold transition-all duration-300 flex items-center gap-2 sm:gap-3 shadow-lg ${
-                saved && !hasUnsavedChanges
+                !canSave && students.length > 0
                   ? "bg-gray-800/50 text-gray-600 cursor-not-allowed border border-gray-700/30"
                   : "bg-blue-600 hover:bg-blue-700 text-white shadow-blue-500/25 active:scale-[0.96] hover:shadow-blue-500/40"
               }`}
@@ -563,7 +568,7 @@ export function TeacherAttendance() {
                 />
               )}
               <span>
-                {saved && !hasUnsavedChanges ? "Saved" : "Save Attendance"}
+                {!canSave && students.length > 0 ? "Synchronized" : "Save Attendance"}
               </span>
             </Button>
           </div>

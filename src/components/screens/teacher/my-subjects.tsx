@@ -192,13 +192,27 @@ export function TeacherSubjects() {
     staleTime: 5 * 60 * 1000,
   });
 
+  const slotsBySubject = useMemo(() => {
+    const map = new Map<string, TimetableSlot[]>();
+    if (!timetable.length) return map;
+    
+    timetable.forEach((t) => {
+      if (!map.has(t.subjectId)) map.set(t.subjectId, []);
+      map.get(t.subjectId)!.push(t);
+    });
+
+    // Pre-sort each subject array exactly once
+    map.forEach((list) => list.sort(sortSlots));
+    return map;
+  }, [timetable]);
+
   const sortedSubjects = useMemo(() => {
     if (!subjects.length) return [];
     const list = [...subjects];
     
     list.sort((a, b) => {
-      const slotsA = timetable.filter(t => t.subjectId === a.id);
-      const slotsB = timetable.filter(t => t.subjectId === b.id);
+      const slotsA = slotsBySubject.get(a.id) || [];
+      const slotsB = slotsBySubject.get(b.id) || [];
       
       // Check if currently live (super high priority)
       const liveA = slotsA.some(isSlotLive);
@@ -211,7 +225,7 @@ export function TeacherSubjects() {
     });
 
     return list;
-  }, [subjects, timetable]);
+  }, [subjects, slotsBySubject]);
 
   // ── Loading ──────────────────────────────────────────────
 
@@ -256,9 +270,9 @@ export function TeacherSubjects() {
       <Header subjects={subjects} view={view} switchView={switchView} />
 
       {view === "grid" ? (
-        <GridView subjects={sortedSubjects} timetable={timetable} />
+        <GridView subjects={sortedSubjects} slotsBySubject={slotsBySubject} />
       ) : (
-        <TableView subjects={sortedSubjects} timetable={timetable} />
+        <TableView subjects={sortedSubjects} slotsBySubject={slotsBySubject} />
       )}
     </div>
   );
@@ -320,14 +334,12 @@ function Header({
 
 // ─── Grid View ────────────────────────────────────────────────
 
-function GridView({ subjects, timetable }: { subjects: SubjectInfo[], timetable: TimetableSlot[] }) {
+function GridView({ subjects, slotsBySubject }: { subjects: SubjectInfo[], slotsBySubject: Map<string, TimetableSlot[]> }) {
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
       {subjects.map((subject) => {
         const p = palette(subject.name);
-        const relevantSlots = timetable
-          .filter((s) => s.subjectId === subject.id)
-          .sort(sortSlots);
+        const relevantSlots = slotsBySubject.get(subject.id) || [];
         const todaySlots = relevantSlots.filter(isSlotToday);
         const isLiveNow = todaySlots.some(isSlotLive);
         const isHappeningToday = todaySlots.length > 0;
@@ -425,7 +437,7 @@ function GridView({ subjects, timetable }: { subjects: SubjectInfo[], timetable:
 
 // ─── Table View ───────────────────────────────────────────────
 
-function TableView({ subjects, timetable }: { subjects: SubjectInfo[], timetable: TimetableSlot[] }) {
+function TableView({ subjects, slotsBySubject }: { subjects: SubjectInfo[], slotsBySubject: Map<string, TimetableSlot[]> }) {
   return (
     <div className="rounded-xl border border-gray-200 dark:border-gray-800 overflow-x-auto bg-card">
       <table className="w-full min-w-[800px]">
@@ -458,9 +470,7 @@ function TableView({ subjects, timetable }: { subjects: SubjectInfo[], timetable
         <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
           {subjects.map((subject, index) => {
             const p = palette(subject.name);
-            const relevantSlots = timetable
-              .filter((s) => s.subjectId === subject.id)
-              .sort(sortSlots);
+            const relevantSlots = slotsBySubject.get(subject.id) || [];
             const todaySlots = relevantSlots.filter(isSlotToday);
             const isLiveNow = todaySlots.some(isSlotLive);
             const isHappeningToday = todaySlots.length > 0;

@@ -1,8 +1,9 @@
 "use client";
 
 
-import { apiFetch } from "@/lib/api";
-import { useState, useEffect, useMemo } from "react";
+import { api } from "@/lib/api";
+import { useQuery } from "@tanstack/react-query";
+import { useState, useMemo } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -155,35 +156,33 @@ function ViewToggle({
 // ---------------------------------------------------------------------------
 
 export function TeacherTimetable() {
-  const [classes, setClasses] = useState<ClassInfo[]>([]);
   const [selectedClass, setSelectedClass] = useState("all");
-  const [timetable, setTimetable] = useState<TimetableSlot[]>([]);
-  const [loading, setLoading] = useState(true);
   const [viewMode, setViewMode] = useState<ViewMode>("day");
   const [selectedDay, setSelectedDay] = useState("");
 
-  useEffect(() => {
-    apiFetch("/api/classes")
-      .then((r) => r.json())
-      .then((data: ClassInfo[]) => {
-        setClasses(data);
-      });
-  }, []);
+  const { data: classes = [] } = useQuery({
+    queryKey: ["teacher-classes"],
+    queryFn: async () => {
+      const res = await api.get<any>("/classes");
+      return (Array.isArray(res) ? res : []) as ClassInfo[];
+    },
+    staleTime: 5 * 60 * 1000,
+  });
 
-  useEffect(() => {
-    setLoading(true);
-    const endpoint = selectedClass === "all" 
-      ? "/api/timetable?mine=true" 
-      : `/api/timetable?classId=${selectedClass}`;
-      
-    apiFetch(endpoint)
-      .then((r) => r.json())
-      .then((data: TimetableSlot[]) => {
-        setTimetable(data);
-        setLoading(false);
-      })
-      .catch(() => setLoading(false));
-  }, [selectedClass]);
+  const { data: timetable = [], isLoading: timetableLoading } = useQuery({
+    queryKey: ["teacher-timetable", selectedClass],
+    queryFn: async () => {
+      const endpoint = selectedClass === "all" 
+        ? "/timetable?mine=true" 
+        : `/timetable?classId=${selectedClass}`;
+      const res = await api.get<any>(endpoint);
+      return (Array.isArray(res) ? res : []) as TimetableSlot[];
+    },
+    staleTime: 5 * 60 * 1000,
+  });
+
+  // Keep variable for rendering backwards compat
+  const loading = timetableLoading;
 
   const todayIndex = useMemo(() => toDayIndex(new Date().getDay()), []);
   const currentDayKey = useMemo(() => DAYS[todayIndex], [todayIndex]);
@@ -222,27 +221,35 @@ export function TeacherTimetable() {
     [timetable],
   );
 
+  const slotLookupMap = useMemo(() => {
+    const map = new Map<string, TimetableSlot>();
+    timetable.forEach((t) => {
+      map.set(`${t.day}-${t.startTime}-${t.endTime}`, t);
+    });
+    return map;
+  }, [timetable]);
+
+  const subjectColorMap = useMemo(() => {
+    const map = new Map<string, string>();
+    uniqueSubjects.forEach((subject, i) => {
+      map.set(subject, SUBJECT_COLORS[i % SUBJECT_COLORS.length]);
+    });
+    return map;
+  }, [uniqueSubjects]);
+
   const getColor = (subjectName: string) => {
-    const idx = uniqueSubjects.indexOf(subjectName);
-    return SUBJECT_COLORS[idx % SUBJECT_COLORS.length];
+    return subjectColorMap.get(subjectName) || SUBJECT_COLORS[0];
   };
 
   const getSlot = (day: string, timeSlot: string) => {
     const [start, end] = timeSlot.split("-");
-    return timetable.find(
-      (t) => t.day === day && t.startTime === start && t.endTime === end,
-    );
+    return slotLookupMap.get(`${day}-${start}-${end}`);
   };
 
   const dayViewSlots = useMemo(() => {
     return allTimeSlots.map((ts) => {
       const [start, end] = ts.split("-");
-      const slot = timetable.find(
-        (t) =>
-          t.day === selectedDayKey &&
-          t.startTime === start &&
-          t.endTime === end,
-      );
+      const slot = slotLookupMap.get(`${selectedDayKey}-${start}-${end}`);
       return (
         slot ?? {
           id: `free-${ts}`,
@@ -255,7 +262,7 @@ export function TeacherTimetable() {
         }
       );
     });
-  }, [allTimeSlots, selectedDayKey, timetable]);
+  }, [allTimeSlots, selectedDayKey, slotLookupMap]);
 
   if (loading && timetable.length === 0) {
     return <LoadingSkeleton />;
@@ -676,7 +683,7 @@ function DayView({
       </div>
 
       <div className="relative space-y-3">
-        <div className="absolute left-[19px] top-3 bottom-3 w-0.5 bg-gray-200 dark:bg-gray-700 hidden sm:block" />
+        <div className="absolute left-[19px] top-3 bottom-3 w-0.5 bg-gray-200 dark:bg-gray-700 block" />
 
         {dayViewSlots.map((slot) => {
           const isFree = !slot.subjectName;
@@ -689,7 +696,7 @@ function DayView({
             return (
               <div key={slot.id} className="flex items-stretch gap-4">
                 <div className="flex-shrink-0 w-10 flex justify-center pt-4">
-                  <div className="w-2.5 h-2.5 rounded-full bg-gray-200 dark:bg-gray-700 border-2 border-white dark:border-gray-900 shadow-sm hidden sm:block"></div>
+                  <div className="w-2.5 h-2.5 rounded-full bg-gray-200 dark:bg-gray-700 border-2 border-white dark:border-gray-900 shadow-sm block"></div>
                 </div>
                 <Card className="flex-1 border-dashed border-gray-200 dark:border-gray-700 bg-gray-50/50 dark:bg-gray-800/30 rounded-xl shadow-none">
                   <CardContent className="p-4 flex items-center gap-3">
@@ -712,7 +719,7 @@ function DayView({
             <div key={slot.id} className="flex items-stretch gap-4">
               <div className="flex-shrink-0 w-10 flex justify-center pt-5">
                 <div
-                  className={`w-3 h-3 rounded-full border-2 bg-background shadow-sm hidden sm:block transition-all ${
+                  className={`w-3 h-3 rounded-full border-2 bg-background shadow-sm block transition-all ${
                     inProgress
                       ? "border-emerald-500 scale-110 ring-2 ring-emerald-100 dark:ring-emerald-900/50"
                       : "border-emerald-400"
@@ -726,8 +733,8 @@ function DayView({
                     : "hover:shadow-md bg-white dark:bg-gray-950"
                 }`}
               >
-                <CardContent className="p-4 flex flex-row items-start justify-between">
-                  <div className="space-y-1.5">
+                <CardContent className="p-4 flex flex-row flex-wrap sm:flex-nowrap items-start justify-between gap-3">
+                  <div className="space-y-1.5 min-w-[120px] flex-1">
                     <h4 className="font-bold text-lg text-gray-900 dark:text-gray-100 leading-tight tracking-tight">
                       {slot.subjectName}
                     </h4>
