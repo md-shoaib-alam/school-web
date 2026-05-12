@@ -225,35 +225,41 @@ export function AdminTeachers() {
       element.style.position = 'relative';
       element.style.zIndex = '10';
       
-      // 🌟 Elite Anime.js Physics Exit
-      // Step 1: Scale down, tilt slightly and shoot off to the side
-      anime({
-        targets: element,
-        scale: [1, 0.5],
-        translateX: [0, 150],
-        rotate: '6deg',
-        opacity: [1, 0],
-        duration: 380,
-        easing: 'easeInBack',
+      // 🌟 Elite Anime.js Timeline - The "Pop, Spin & Implode"
+      const tl = anime.timeline({
+        easing: 'easeOutExpo',
         complete: () => {
-          // Step 2: Instantly collapse layouts to let nearby grid items move smoothly
-          anime({
-            targets: element,
-            maxHeight: 0,
-            height: 0,
-            paddingTop: 0,
-            paddingBottom: 0,
-            marginTop: 0,
-            marginBottom: 0,
-            opacity: 0,
-            duration: 250,
-            easing: 'easeInOutQuad',
-            complete: () => {
-              executeDeletion();
-            }
-          });
+          executeDeletion();
         }
       });
+
+      tl.add({
+        targets: element,
+        scale: [1, 1.08],
+        filter: ['brightness(1)', 'brightness(1.1)'],
+        duration: 180,
+        easing: 'easeOutBack' // Satisfying energy "breathe" bump
+      })
+      .add({
+        targets: element,
+        scale: [1.08, 0],
+        rotate: [0, 720], // Double spin vortex
+        opacity: [1, 0],
+        translateY: [0, -40], // Float and lift up
+        duration: 450,
+        easing: 'easeInBack'
+      }, '-=50') // Smooth overlapping
+      .add({
+        targets: element,
+        height: 0,
+        maxHeight: 0,
+        paddingTop: 0,
+        paddingBottom: 0,
+        marginTop: 0,
+        marginBottom: 0,
+        duration: 250,
+        easing: 'easeOutQuad'
+      }, '-=250'); // Collapses container height DURING the spin and shrink!
     } else {
       executeDeletion();
     }
