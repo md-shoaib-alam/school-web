@@ -252,6 +252,7 @@ export function useCreateUser() {
     mutationFn: (data: any) => graphqlMutate<{ createUser: any }>(CREATE_USER, { data }).then(d => d.createUser),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['users'] })
+      toast.success('User account created successfully')
     },
   })
 }
