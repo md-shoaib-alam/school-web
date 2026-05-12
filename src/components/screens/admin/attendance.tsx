@@ -73,9 +73,13 @@ export function AdminAttendance() {
   const plan = tenantData?.plan?.toLowerCase() || "basic";
   const isPremiumOrEnterprise = plan === "premium" || plan === "enterprise";
   const { canCreate, canEdit, canDelete } = useModulePermissions("attendance");
-  const [selectedDate, setSelectedDate] = useState(
-    new Date().toISOString().split("T")[0],
-  );
+  const [selectedDate, setSelectedDate] = useState(() => {
+    const now = new Date();
+    const yyyy = now.getFullYear();
+    const mm = String(now.getMonth() + 1).padStart(2, '0');
+    const dd = String(now.getDate()).padStart(2, '0');
+    return `${yyyy}-${mm}-${dd}`;
+  });
   const [selectedClass, setSelectedClass] = useState<string>("");
   const [search, setSearch] = useState("");
   const [isHistoryMode, setIsHistoryMode] = useState(false);
