@@ -38,6 +38,13 @@ import { TeacherDialog } from "./teachers/TeacherDialog";
 import { TeacherSkeleton } from "./teachers/TeacherSkeleton";
 import type { TeacherInfo } from "./teachers/types";
 
+const premiumLayoutTransition = {
+  type: "spring",
+  stiffness: 280,
+  damping: 28,
+  mass: 0.7
+} as const;
+
 const emptyFormData = {
   name: "",
   email: "",
@@ -225,41 +232,21 @@ export function AdminTeachers() {
       element.style.position = 'relative';
       element.style.zIndex = '10';
       
-      // 🌟 Elite Anime.js Timeline - The "Pop, Spin & Implode"
-      const tl = anime.timeline({
-        easing: 'easeOutExpo',
+      // 🌟 Elite Anime.js Physics Exit
+      // Step 1: Scale down, tilt slightly and shoot off to the side
+      anime({
+        targets: element,
+        scale: [1, 0.5],
+        translateX: [0, 150],
+        rotate: '6deg',
+        opacity: [1, 0],
+        duration: 350,
+        easing: 'easeInBack',
         complete: () => {
+          // Instantly remove from list, letting Framer Motion animate siblings moving UP with our premium spring!
           executeDeletion();
         }
       });
-
-      tl.add({
-        targets: element,
-        scale: [1, 1.08],
-        filter: ['brightness(1)', 'brightness(1.1)'],
-        duration: 180,
-        easing: 'easeOutBack' // Satisfying energy "breathe" bump
-      })
-      .add({
-        targets: element,
-        scale: [1.08, 0],
-        rotate: [0, 720], // Double spin vortex
-        opacity: [1, 0],
-        translateY: [0, -40], // Float and lift up
-        duration: 450,
-        easing: 'easeInBack'
-      }, '-=50') // Smooth overlapping
-      .add({
-        targets: element,
-        height: 0,
-        maxHeight: 0,
-        paddingTop: 0,
-        paddingBottom: 0,
-        marginTop: 0,
-        marginBottom: 0,
-        duration: 250,
-        easing: 'easeOutQuad'
-      }, '-=250'); // Collapses container height DURING the spin and shrink!
     } else {
       executeDeletion();
     }
@@ -358,11 +345,14 @@ export function AdminTeachers() {
                         <motion.tr 
                           key={teacher.id} 
                           id={`teacher-item-${teacher.id}`}
-                          layout
+                          layout="position"
                           initial={{ opacity: 0, x: -10 }}
                           animate={{ opacity: 1, x: 0 }}
-                          exit={{ opacity: 0, x: 10, backgroundColor: "rgba(239, 68, 68, 0.05)" }}
-                          transition={{ duration: 0.2 }}
+                          exit={{ opacity: 0, x: 10 }}
+                          transition={{
+                            layout: premiumLayoutTransition,
+                            opacity: { duration: 0.2 }
+                          }}
                           className="hover:bg-gray-50/50 dark:hover:bg-gray-800/30 transition-colors"
                         >
                           <td className="px-6 py-4">
@@ -456,9 +446,10 @@ export function AdminTeachers() {
                 key={teacher.id}
                 id={`teacher-item-${teacher.id}`}
                 layout
+                transition={premiumLayoutTransition}
                 initial={{ opacity: 0, scale: 0.95 }}
                 animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.9, transition: { duration: 0.2 } }}
+                exit={{ opacity: 0, scale: 0.9 }}
               >
                 <TeacherCard
                   teacher={teacher}
