@@ -53,10 +53,6 @@ export function AttendanceChart({ data, isPremium }: AttendanceChartProps) {
                   <stop offset="0%" stopColor="#ef4444" stopOpacity={0.9} />
                   <stop offset="100%" stopColor="#ef4444" stopOpacity={0.6} />
                 </linearGradient>
-                <linearGradient id="lateGradient" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor="#f59e0b" stopOpacity={0.9} />
-                  <stop offset="100%" stopColor="#f59e0b" stopOpacity={0.6} />
-                </linearGradient>
               </defs>
               <CartesianGrid
                 strokeDasharray="3 3"
@@ -100,12 +96,6 @@ export function AttendanceChart({ data, isPremium }: AttendanceChartProps) {
                 fill="url(#absentGradient)"
                 radius={[3, 3, 0, 0]}
                 name="Absent"
-              />
-              <Bar
-                dataKey="late"
-                fill="url(#lateGradient)"
-                radius={[3, 3, 0, 0]}
-                name="Late"
               />
             </BarChart>
           </ResponsiveContainer>

@@ -29,7 +29,7 @@ import { format, parseISO } from "date-fns";
 import { goeyToast as toast } from "goey-toast";
 import { DatePicker } from "@/components/ui/date-picker";
 
-type AttendanceStatus = "present" | "absent" | "late";
+type AttendanceStatus = "present" | "absent";
 
 const getStatusBg = (status: string) => {
   switch (status) {
@@ -37,8 +37,6 @@ const getStatusBg = (status: string) => {
       return "bg-emerald-50 dark:bg-emerald-900/20 border-emerald-200 dark:border-emerald-800";
     case "absent":
       return "bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800";
-    case "late":
-      return "bg-amber-50 dark:bg-amber-900/20 border-amber-200 dark:border-amber-800";
     default:
       return "";
   }
@@ -50,8 +48,6 @@ const getStatusIcon = (status: string) => {
       return <UserCheck className="h-3.5 w-3.5" />;
     case "absent":
       return <UserX className="h-3.5 w-3.5" />;
-    case "late":
-      return <Clock className="h-3.5 w-3.5" />;
     default:
       return null;
   }
@@ -152,15 +148,13 @@ export function StaffAttendance({ initialTab }: StaffAttendanceProps) {
   const records = attendanceData || [];
   const stats = useMemo(() => {
     let p = 0,
-      a = 0,
-      l = 0;
+      a = 0;
     records.forEach((r) => {
       const s = pendingChanges[r.id] || r.status;
       if (s === "present") p++;
       else if (s === "absent") a++;
-      else if (s === "late") l++;
     });
-    return { p, a, l, total: records.length };
+    return { p, a, total: records.length };
   }, [records, pendingChanges]);
 
   const filtered = records.filter((r) =>
@@ -231,7 +225,7 @@ export function StaffAttendance({ initialTab }: StaffAttendanceProps) {
         </Tabs>
       )}
 
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-6">
+        <div className="grid grid-cols-3 gap-3 mt-6">
           <Card className="rounded-xl shadow-sm border-0">
             <CardContent className="p-4 flex items-center gap-3">
               <div className="w-10 h-10 rounded-xl bg-blue-50 dark:bg-blue-900/30 flex items-center justify-center">
@@ -273,21 +267,6 @@ export function StaffAttendance({ initialTab }: StaffAttendanceProps) {
                 </p>
                 <p className="text-xl font-bold text-red-600 dark:text-red-400">
                   {stats.a}
-                </p>
-              </div>
-            </CardContent>
-          </Card>
-          <Card className="rounded-xl shadow-sm border-0">
-            <CardContent className="p-4 flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-amber-50 dark:bg-amber-900/30 flex items-center justify-center">
-                <Clock className="h-5 w-5 text-amber-500 dark:text-amber-400" />
-              </div>
-              <div>
-                <p className="text-xs text-gray-400 dark:text-gray-500 font-medium">
-                  Late
-                </p>
-                <p className="text-xl font-bold text-amber-600 dark:text-amber-400">
-                  {stats.l}
                 </p>
               </div>
             </CardContent>
@@ -398,7 +377,6 @@ export function StaffAttendance({ initialTab }: StaffAttendanceProps) {
                               [
                                 "present",
                                 "absent",
-                                "late",
                               ] as AttendanceStatus[]
                             ).map((status) => (
                               <button
@@ -408,7 +386,7 @@ export function StaffAttendance({ initialTab }: StaffAttendanceProps) {
                                 }
                                 className={`flex flex-1 sm:flex-none items-center justify-center gap-1 px-3 py-1.5 rounded-lg text-xs font-medium transition-all border ${
                                   cur === status
-                                    ? `${getStatusBg(status)} ${status === "present" ? "bg-emerald-500 dark:bg-emerald-500 text-white" : status === "absent" ? "bg-red-500 dark:bg-red-500 text-white" : "bg-amber-500 dark:bg-amber-500 text-white"} border-transparent shadow-sm ring-1 ring-white/10`
+                                    ? `${getStatusBg(status)} ${status === "present" ? "bg-emerald-500 dark:bg-emerald-500 text-white" : "bg-red-500 dark:bg-red-500 text-white"} border-transparent shadow-sm ring-1 ring-white/10`
                                     : "border-gray-200 dark:border-gray-700 text-gray-400 dark:text-gray-500 hover:border-gray-300 dark:hover:border-gray-600 bg-white dark:bg-gray-950"
                                 }`}
                               >

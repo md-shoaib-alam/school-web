@@ -46,7 +46,7 @@ interface StudentInfo {
   gender: string;
 }
 
-type AttendanceStatus = "present" | "absent" | "late";
+type AttendanceStatus = "present" | "absent";
 
 interface AttendanceRecord {
   studentId: string;
@@ -61,8 +61,6 @@ const getStatusBg = (status: AttendanceStatus) => {
       return "bg-emerald-50 dark:bg-emerald-900/20 border-emerald-200 dark:border-emerald-800";
     case "absent":
       return "bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800";
-    case "late":
-      return "bg-amber-50 dark:bg-amber-900/20 border-amber-200 dark:border-amber-800";
   }
 };
 
@@ -72,8 +70,6 @@ const getStatusIcon = (status: AttendanceStatus) => {
       return <UserCheck className="h-3.5 w-3.5" />;
     case "absent":
       return <UserX className="h-3.5 w-3.5" />;
-    case "late":
-      return <Clock className="h-3.5 w-3.5" />;
   }
 };
 
@@ -254,7 +250,6 @@ export function TeacherAttendance() {
 
   const presentCount = records.filter((r) => r.status === "present").length;
   const absentCount = records.filter((r) => r.status === "absent").length;
-  const lateCount = records.filter((r) => r.status === "late").length;
   const totalCount = records.length;
 
   const selectedClass = classes.find((c) => c.id === selectedClassId);
@@ -341,7 +336,7 @@ export function TeacherAttendance() {
 
       {/* Stats */}
       {students.length > 0 && (
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+        <div className="grid grid-cols-3 gap-3">
           {[
             {
               label: "Total",
@@ -363,13 +358,6 @@ export function TeacherAttendance() {
               icon: <UserX className="h-5 w-5 text-red-500 dark:text-red-400" />,
               bg: "bg-red-50 dark:bg-red-900/30",
               text: "text-red-600 dark:text-red-400",
-            },
-            {
-              label: "Late",
-              value: lateCount,
-              icon: <Clock className="h-5 w-5 text-amber-500 dark:text-amber-400" />,
-              bg: "bg-amber-50 dark:bg-amber-900/30",
-              text: "text-amber-600 dark:text-amber-400",
             },
           ].map(({ label, value, icon, bg, text }) => (
             <Card key={label} className="rounded-xl shadow-sm border-0">
@@ -482,7 +470,7 @@ export function TeacherAttendance() {
                         </div>
 
                         <div className="flex items-center gap-1.5 w-full sm:w-auto mt-2 sm:mt-0 sm:ml-auto">
-                          {(["present", "absent", "late"] as AttendanceStatus[]).map((status) => (
+                          {(["present", "absent"] as AttendanceStatus[]).map((status) => (
                             <button
                               key={status}
                               onClick={() => updateRecord(student.id, status)}
@@ -491,9 +479,7 @@ export function TeacherAttendance() {
                                   ? `${getStatusBg(status)} ${
                                       status === "present"
                                         ? "bg-emerald-500 dark:bg-emerald-500 text-white"
-                                        : status === "absent"
-                                        ? "bg-red-500 dark:bg-red-500 text-white"
-                                        : "bg-amber-500 dark:bg-amber-500 text-white"
+                                        : "bg-red-500 dark:bg-red-500 text-white"
                                     } border-transparent shadow-sm ring-1 ring-white/10`
                                   : "border-gray-200 dark:border-gray-700 text-gray-400 dark:text-gray-500 hover:border-gray-300 dark:hover:border-gray-600 bg-white dark:bg-gray-950"
                               }`}

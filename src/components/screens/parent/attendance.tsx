@@ -127,7 +127,6 @@ export function ParentAttendance() {
                 percentage={currentStats.percentage}
                 present={currentStats.present}
                 absent={currentStats.absent}
-                late={currentStats.late}
               />
 
               <AttendanceCalendar 

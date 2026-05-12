@@ -3,15 +3,13 @@ import { GradeRecord, AttendanceRecord } from "@/lib/types";
 export const getAttendanceForStudent = (studentId: string, attendance: AttendanceRecord[]) => {
   const records = attendance.filter((a) => a.studentId === studentId);
   if (records.length === 0)
-    return { percentage: 0, present: 0, absent: 0, late: 0, total: 0 };
+    return { percentage: 0, present: 0, absent: 0, total: 0 };
   const present = records.filter((a) => a.status === "present").length;
   const absent = records.filter((a) => a.status === "absent").length;
-  const late = records.filter((a) => a.status === "late").length;
   return {
-    percentage: Math.round(((present + late) / records.length) * 100),
+    percentage: Math.round((present / records.length) * 100),
     present,
     absent,
-    late,
     total: records.length,
   };
 };

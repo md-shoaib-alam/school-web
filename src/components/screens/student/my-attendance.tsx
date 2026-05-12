@@ -118,10 +118,9 @@ export function StudentAttendance() {
   const stats = useMemo(() => {
     const present = attendanceData.filter((a) => a.status === "present").length;
     const absent = attendanceData.filter((a) => a.status === "absent").length;
-    const late = attendanceData.filter((a) => a.status === "late").length;
     const total = attendanceData.length;
-    const rate = total > 0 ? Math.round(((present + late) / total) * 100) : 0;
-    return { present, absent, late, total, rate };
+    const rate = total > 0 ? Math.round((present / total) * 100) : 0;
+    return { present, absent, total, rate };
   }, [attendanceData]);
 
   // Monthly breakdown for last 6 months
@@ -141,7 +140,7 @@ export function StudentAttendance() {
       });
 
       const presentCount = monthRecords.filter(
-        (a) => a.status === "present" || a.status === "late",
+        (a) => a.status === "present",
       ).length;
       const rate =
         monthRecords.length > 0
@@ -158,7 +157,7 @@ export function StudentAttendance() {
   const last30Days = useMemo(() => {
     const days: {
       date: Date;
-      status: "present" | "absent" | "late" | "none";
+      status: "present" | "absent" | "none";
       dayOfWeek: number;
     }[] = [];
     const today = new Date();
@@ -170,9 +169,9 @@ export function StudentAttendance() {
       const dayOfWeek = d.getDay();
       const record = attendanceData.find((a) => a.date === dateStr);
 
-      let status: "present" | "absent" | "late" | "none" = "none";
+      let status: "present" | "absent" | "none" = "none";
       if (record) {
-        status = record.status as "present" | "absent" | "late";
+        status = record.status as "present" | "absent";
       }
       // If no record and it's a weekend, keep as 'none'
       // If no record and weekday, also keep as 'none' (could be future or unrecorded)
@@ -194,8 +193,6 @@ export function StudentAttendance() {
         return "bg-emerald-400";
       case "absent":
         return "bg-red-400";
-      case "late":
-        return "bg-amber-400";
       default:
         return "bg-gray-200 dark:bg-gray-700";
     }
@@ -276,7 +273,7 @@ export function StudentAttendance() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="flex items-center gap-4 p-4 rounded-xl bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800">
                 <div className="p-2.5 rounded-lg bg-emerald-100 dark:bg-emerald-900/40">
                   <CheckCircle2 className="h-5 w-5 text-emerald-600" />
@@ -316,26 +313,6 @@ export function StudentAttendance() {
                   %
                 </Badge>
               </div>
-
-              <div className="flex items-center gap-4 p-4 rounded-xl bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800">
-                <div className="p-2.5 rounded-lg bg-amber-100 dark:bg-amber-900/40">
-                  <Clock className="h-5 w-5 text-amber-600" />
-                </div>
-                <div>
-                  <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">
-                    {stats.late}
-                  </p>
-                  <p className="text-xs text-gray-500 dark:text-gray-400 dark:text-gray-500">
-                    Late Days
-                  </p>
-                </div>
-                <Badge className="bg-amber-500 text-white text-[10px] ml-auto shrink-0">
-                  {stats.total > 0
-                    ? Math.round((stats.late / stats.total) * 100)
-                    : 0}
-                  %
-                </Badge>
-              </div>
             </div>
 
             {/* Legend */}
@@ -350,12 +327,6 @@ export function StudentAttendance() {
                 <div className="w-3 h-3 rounded-sm bg-red-400" />
                 <span className="text-xs text-gray-500 dark:text-gray-400 dark:text-gray-500">
                   Absent
-                </span>
-              </div>
-              <div className="flex items-center gap-1.5">
-                <div className="w-3 h-3 rounded-sm bg-amber-400" />
-                <span className="text-xs text-gray-500 dark:text-gray-400 dark:text-gray-500">
-                  Late
                 </span>
               </div>
               <div className="flex items-center gap-1.5">

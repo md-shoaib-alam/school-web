@@ -36,6 +36,7 @@ import {
   Eye,
   School,
   Filter,
+  Lock,
 } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { apiFetch } from "@/lib/api";
@@ -64,17 +65,13 @@ const statusConfig: Record<
     dot: "bg-red-500",
     icon: <UserX className="h-3.5 w-3.5 text-red-500" />,
   },
-  late: {
-    bg: "bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 border-amber-200 dark:border-amber-800",
-    text: "Late",
-    dot: "bg-amber-500",
-    icon: <Clock className="h-3.5 w-3.5 text-amber-500" />,
-  },
 };
 
 export function AdminAttendance() {
   const { currentTenantId, currentTenantSlug } = useAppStore();
   const { data: tenantData } = useTenantResolution(currentTenantSlug || undefined);
+  const plan = tenantData?.plan?.toLowerCase() || "basic";
+  const isPremiumOrEnterprise = plan === "premium" || plan === "enterprise";
   const { canCreate, canEdit, canDelete } = useModulePermissions("attendance");
   const [selectedDate, setSelectedDate] = useState(
     new Date().toISOString().split("T")[0],
@@ -132,10 +129,9 @@ export function AdminAttendance() {
   // Summary stats
   const presentCount = records.filter((r) => r.status === "present").length;
   const absentCount = records.filter((r) => r.status === "absent").length;
-  const lateCount = records.filter((r) => r.status === "late").length;
   const total = records.length;
   const presentRate =
-    total > 0 ? (((presentCount + lateCount) / total) * 100).toFixed(1) : "0";
+    total > 0 ? ((presentCount / total) * 100).toFixed(1) : "0";
 
   const summaryCards = [
     {
@@ -154,15 +150,6 @@ export function AdminAttendance() {
       icon: <UserX className="h-5 w-5 text-red-600 dark:text-red-400" />,
       color: "bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400",
       borderColor: "border-red-200 dark:border-red-800",
-    },
-    {
-      label: "Late",
-      count: lateCount,
-      percentage: total > 0 ? ((lateCount / total) * 100).toFixed(1) : "0",
-      icon: <Clock className="h-5 w-5 text-amber-600 dark:text-amber-400" />,
-      color:
-        "bg-amber-100 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400",
-      borderColor: "border-amber-200 dark:border-amber-800",
     },
     {
       label: "Attendance Rate",
@@ -216,10 +203,9 @@ export function AdminAttendance() {
               now.setHours(0, 0, 0, 0);
               if (date > now) return true; // Lock future dates
 
-              const plan = tenantData?.plan?.toLowerCase() || 'basic';
               let daysAllowed = 7;
               if (plan === 'standard') daysAllowed = 14;
-              if (plan === 'premium') daysAllowed = 28;
+              if (isPremiumOrEnterprise) daysAllowed = 28;
 
               const cutoff = new Date(now);
               cutoff.setDate(cutoff.getDate() - daysAllowed);
@@ -239,11 +225,24 @@ export function AdminAttendance() {
           />
           <Button 
             variant={isHistoryMode ? "default" : "outline"} 
-            className="hidden md:flex"
-            onClick={() => setIsHistoryMode(!isHistoryMode)}
+            className={`hidden md:flex gap-2 ${!isPremiumOrEnterprise ? 'bg-amber-50/30 border-amber-200/60 opacity-85 cursor-not-allowed text-amber-600 dark:bg-amber-900/10 dark:text-amber-400' : ''}`}
+            onClick={() => {
+              if (isPremiumOrEnterprise) {
+                setIsHistoryMode(!isHistoryMode);
+              }
+            }}
+            disabled={!isPremiumOrEnterprise}
+            title={!isPremiumOrEnterprise ? "Full History requires a Premium subscription" : ""}
           >
-            <Eye className="h-4 w-4 mr-2" />
+            {!isPremiumOrEnterprise ? (
+              <Lock className="h-4 w-4 text-amber-500" />
+            ) : (
+              <Eye className="h-4 w-4" />
+            )}
             {isHistoryMode ? "Exit History" : "Full History"}
+            {!isPremiumOrEnterprise && (
+              <Badge className="ml-1 bg-amber-100 hover:bg-amber-100 text-amber-700 border-amber-200 text-[9px] uppercase h-4 py-0 px-1 rounded-sm">Premium</Badge>
+            )}
           </Button>
         </div>
       </div>
@@ -267,7 +266,7 @@ export function AdminAttendance() {
       ) : (
         /* Data Display */
         <>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             {summaryCards.map((card) => (
               <Card
                 key={card.label}

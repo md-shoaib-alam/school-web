@@ -4,10 +4,9 @@ export function getAttendanceStats(records: AttendanceRecord[]) {
   const total = records.length;
   const present = records.filter((r) => r.status === "present").length;
   const absent = records.filter((r) => r.status === "absent").length;
-  const late = records.filter((r) => r.status === "late").length;
   const percentage =
-    total > 0 ? Math.round(((present + late) / total) * 100) : 0;
-  return { total, present, absent, late, percentage };
+    total > 0 ? Math.round((present / total) * 100) : 0;
+  return { total, present, absent, percentage };
 }
 
 export function getMonthlyData(records: AttendanceRecord[]) {
@@ -16,7 +15,6 @@ export function getMonthlyData(records: AttendanceRecord[]) {
     month: string;
     present: number;
     absent: number;
-    late: number;
   }[] = [];
 
   for (let i = 5; i >= 0; i--) {
@@ -35,7 +33,6 @@ export function getMonthlyData(records: AttendanceRecord[]) {
       month: monthLabel,
       present: monthRecords.filter((r) => r.status === "present").length,
       absent: monthRecords.filter((r) => r.status === "absent").length,
-      late: monthRecords.filter((r) => r.status === "late").length,
     });
   }
   return months;
@@ -82,8 +79,6 @@ export function getCalendarCellColor(status: string | null) {
       return "bg-emerald-500 text-white";
     case "absent":
       return "bg-red-500 text-white";
-    case "late":
-      return "bg-amber-500 text-white";
     default:
       return "bg-gray-100 dark:bg-gray-800 text-gray-400 dark:text-gray-500";
   }

@@ -87,7 +87,6 @@ export function AttendanceCalendar({ data, isPremium, onPrev, onNext, currentPer
           {[
             { label: "Present", color: "bg-emerald-500" },
             { label: "Absent", color: "bg-red-500" },
-            { label: "Late", color: "bg-amber-500" },
             { label: "Off", color: "bg-gray-200 dark:bg-gray-800" },
           ].map((item) => (
             <div
