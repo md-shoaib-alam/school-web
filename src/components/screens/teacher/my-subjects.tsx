@@ -439,126 +439,211 @@ function GridView({ subjects, slotsBySubject }: { subjects: SubjectInfo[], slots
 
 function TableView({ subjects, slotsBySubject }: { subjects: SubjectInfo[], slotsBySubject: Map<string, TimetableSlot[]> }) {
   return (
-    <div className="rounded-xl border border-gray-200 dark:border-gray-800 overflow-x-auto bg-card">
-      <table className="w-full min-w-[800px]">
-        <colgroup>
-          <col className="w-12" />
-          <col className="w-[25%]" />
-          <col className="w-[12%]" />
-          <col className="w-[20%]" />
-          <col />
-        </colgroup>
-        <thead>
-          <tr className="bg-gray-50 dark:bg-gray-900/50 border-b border-gray-200 dark:border-gray-800">
-            <th className="text-xs font-semibold text-gray-500 dark:text-gray-400 text-left py-3 pl-4 pr-2">
-              #
-            </th>
-            <th className="text-xs font-semibold text-gray-500 dark:text-gray-400 text-left py-3 px-3">
-              Subject
-            </th>
-            <th className="text-xs font-semibold text-gray-500 dark:text-gray-400 text-left py-3 px-3">
-              Code
-            </th>
-            <th className="text-xs font-semibold text-gray-500 dark:text-gray-400 text-left py-3 px-3">
-              Class
-            </th>
-            <th className="text-xs font-semibold text-gray-500 dark:text-gray-400 text-left py-3 px-3">
-              Timings
-            </th>
-          </tr>
-        </thead>
-        <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
-          {subjects.map((subject, index) => {
-            const p = palette(subject.name);
-            const relevantSlots = slotsBySubject.get(subject.id) || [];
-            const todaySlots = relevantSlots.filter(isSlotToday);
-            const isLiveNow = todaySlots.some(isSlotLive);
-            const isHappeningToday = todaySlots.length > 0;
+    <>
+      {/* Mobile View for List Mode */}
+      <div className="block md:hidden rounded-xl border border-gray-200 dark:border-gray-800 bg-card overflow-hidden divide-y divide-gray-100 dark:divide-gray-800/50">
+        {subjects.map((subject) => {
+          const p = palette(subject.name);
+          const relevantSlots = slotsBySubject.get(subject.id) || [];
+          const todaySlots = relevantSlots.filter(isSlotToday);
+          const isLiveNow = todaySlots.some(isSlotLive);
+          const isHappeningToday = todaySlots.length > 0;
 
-            return (
-              <tr
-                key={subject.id}
-                className={`transition-colors ${
-                  isLiveNow 
-                    ? "bg-emerald-50/50 dark:bg-emerald-900/10 hover:bg-emerald-50 dark:hover:bg-emerald-900/20" 
-                    : isHappeningToday
-                    ? "bg-blue-50/30 dark:bg-blue-900/5 hover:bg-blue-50/50 dark:hover:bg-blue-900/10"
-                    : "hover:bg-blue-50/30 dark:hover:bg-blue-900/10"
-                }`}
-              >
-                <td className="py-3 pl-4 pr-2 text-xs font-mono">
+          return (
+            <div
+              key={subject.id}
+              className={`p-4 space-y-3 transition-colors ${
+                isLiveNow
+                  ? "bg-emerald-50/30 dark:bg-emerald-950/10"
+                  : isHappeningToday
+                  ? "bg-blue-50/20 dark:bg-blue-950/5"
+                  : ""
+              }`}
+            >
+              {/* Row 1: Icon, Subject Name, Code, Badge */}
+              <div className="flex items-start justify-between gap-3">
+                <div className="flex items-center gap-3 min-w-0">
+                  <div className={`w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 ${p.icon}`}>
+                    <BookOpen className="h-4 w-4" />
+                  </div>
+                  <div className="min-w-0">
+                    <h4 className={`text-sm font-bold truncate leading-tight ${
+                      isLiveNow ? "text-emerald-700 dark:text-emerald-400" :
+                      isHappeningToday ? "text-blue-700 dark:text-blue-400" :
+                      "text-gray-900 dark:text-gray-100"
+                    }`}>
+                      {subject.name}
+                    </h4>
+                    <span className="text-[10px] font-mono text-gray-400 dark:text-gray-500 mt-0.5 block">
+                      {subject.code}
+                    </span>
+                  </div>
+                </div>
+                
+                <div className="flex-shrink-0">
                   {isLiveNow ? (
-                    <span className="relative flex h-2.5 w-2.5">
-                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                      <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
-                    </span>
-                  ) : (
-                    <span className="text-gray-400">{index + 1}</span>
-                  )}
-                </td>
-                <td className="py-3 px-3">
-                  <div className="flex items-center gap-2.5 min-w-0">
-                    <div className={`w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0 ${p.icon}`}>
-                      <BookOpen className="h-3.5 w-3.5" />
-                    </div>
-                    <div className="flex items-center gap-2 min-w-0">
-                      <span className={`text-sm font-semibold truncate ${
-                        isLiveNow ? "text-emerald-700 dark:text-emerald-400" : 
-                        isHappeningToday ? "text-blue-800 dark:text-blue-300" : 
-                        "text-gray-800 dark:text-gray-200"
-                      }`}>
-                        {subject.name}
+                    <Badge className="bg-emerald-600 text-white text-[9px] px-1.5 py-0.5 h-auto font-bold uppercase animate-pulse">Live</Badge>
+                  ) : isHappeningToday ? (
+                    <Badge variant="outline" className="border-blue-200 text-blue-600 dark:border-blue-800 dark:text-blue-400 text-[9px] px-1.5 py-0.5 h-auto bg-blue-50/50 dark:bg-blue-900/20 font-semibold">Today</Badge>
+                  ) : null}
+                </div>
+              </div>
+
+              {/* Row 2: Class & Timings */}
+              <div className="flex flex-wrap items-center justify-between gap-3 pt-1">
+                <div className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg ${p.bg} text-xs font-semibold`}>
+                  <School className={`h-3.5 w-3.5 flex-shrink-0 ${p.icon.split(" ")[1]} dark:text-white/80`} />
+                  <span className={`${p.icon.split(" ")[1]} dark:text-white`}>{subject.className}</span>
+                </div>
+
+                {todaySlots.length > 0 && (
+                  <div className="flex flex-wrap gap-1 justify-end flex-1">
+                    {todaySlots.map((slot) => {
+                      const active = isSlotLive(slot);
+                      return (
+                        <Badge
+                          key={slot.id}
+                          variant="secondary"
+                          className={`text-[10px] font-semibold px-2 py-0.5 border rounded-md whitespace-nowrap ${
+                            active
+                              ? "bg-emerald-600 text-white border-emerald-600 animate-pulse"
+                              : "bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800 text-blue-700 dark:text-blue-400"
+                          }`}
+                        >
+                          {formatTime(slot.startTime)} - {formatTime(slot.endTime)}
+                        </Badge>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+            </div>
+          );
+        })}
+      </div>
+
+      {/* Desktop View (HTML Table) */}
+      <div className="hidden md:block rounded-xl border border-gray-200 dark:border-gray-800 overflow-x-auto bg-card">
+        <table className="w-full min-w-[800px]">
+          <colgroup>
+            <col className="w-12" />
+            <col className="w-[25%]" />
+            <col className="w-[12%]" />
+            <col className="w-[20%]" />
+            <col />
+          </colgroup>
+          <thead>
+            <tr className="bg-gray-50 dark:bg-gray-900/50 border-b border-gray-200 dark:border-gray-800">
+              <th className="text-xs font-semibold text-gray-500 dark:text-gray-400 text-left py-3 pl-4 pr-2">
+                #
+              </th>
+              <th className="text-xs font-semibold text-gray-500 dark:text-gray-400 text-left py-3 px-3">
+                Subject
+              </th>
+              <th className="text-xs font-semibold text-gray-500 dark:text-gray-400 text-left py-3 px-3">
+                Code
+              </th>
+              <th className="text-xs font-semibold text-gray-500 dark:text-gray-400 text-left py-3 px-3">
+                Class
+              </th>
+              <th className="text-xs font-semibold text-gray-500 dark:text-gray-400 text-left py-3 px-3">
+                Timings
+              </th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
+            {subjects.map((subject, index) => {
+              const p = palette(subject.name);
+              const relevantSlots = slotsBySubject.get(subject.id) || [];
+              const todaySlots = relevantSlots.filter(isSlotToday);
+              const isLiveNow = todaySlots.some(isSlotLive);
+              const isHappeningToday = todaySlots.length > 0;
+
+              return (
+                <tr
+                  key={subject.id}
+                  className={`transition-colors ${
+                    isLiveNow 
+                      ? "bg-emerald-50/50 dark:bg-emerald-900/10 hover:bg-emerald-50 dark:hover:bg-emerald-900/20" 
+                      : isHappeningToday
+                      ? "bg-blue-50/30 dark:bg-blue-900/5 hover:bg-blue-50/50 dark:hover:bg-blue-900/10"
+                      : "hover:bg-blue-50/30 dark:hover:bg-blue-900/10"
+                  }`}
+                >
+                  <td className="py-3 pl-4 pr-2 text-xs font-mono">
+                    {isLiveNow ? (
+                      <span className="relative flex h-2.5 w-2.5">
+                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                        <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
                       </span>
-                      {isLiveNow ? (
-                         <Badge className="bg-emerald-600 text-white text-[9px] px-1 py-0 h-4 font-bold uppercase tracking-tighter flex-shrink-0">Live</Badge>
-                      ) : isHappeningToday ? (
-                         <Badge variant="outline" className="border-blue-200 text-blue-600 text-[9px] px-1 py-0 h-4 font-semibold tracking-tighter flex-shrink-0 bg-blue-50">Today</Badge>
-                      ) : null}
-                    </div>
-                  </div>
-                </td>
-                <td className="py-3 px-3">
-                  <span className="text-xs font-mono text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded-md inline-block">
-                    {subject.code}
-                  </span>
-                </td>
-                <td className="py-3 px-3">
-                  <div className={`inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg ${p.bg} max-w-full`}>
-                    <School className={`h-3.5 w-3.5 flex-shrink-0 ${p.icon.split(" ")[1]} dark:text-white/80`} />
-                    <span className={`text-xs font-bold truncate ${p.icon.split(" ")[1]} dark:text-white`}>
-                      {subject.className}
-                    </span>
-                  </div>
-                </td>
-                <td className="py-3 px-3">
-                  <div className="flex flex-wrap gap-1.5">
-                    {todaySlots.length > 0 ? (
-                      todaySlots.map((slot) => {
-                        const active = isSlotLive(slot);
-                        return (
-                          <Badge 
-                            key={slot.id} 
-                            variant="secondary" 
-                            className={`text-[11px] font-semibold px-2 py-0.5 h-auto border whitespace-nowrap shadow-sm ${
-                              active
-                                ? "bg-emerald-600 text-white border-emerald-600 animate-pulse"
-                                : "bg-blue-50 dark:bg-blue-900/30 border-blue-200 dark:border-blue-800 text-blue-700 dark:text-blue-400"
-                            }`}
-                          >
-                            {formatTime(slot.startTime)} - {formatTime(slot.endTime)}
-                          </Badge>
-                        );
-                      })
                     ) : (
-                      <span className="text-[11px] text-gray-400 italic">—</span>
+                      <span className="text-gray-400">{index + 1}</span>
                     )}
-                  </div>
-                </td>
-              </tr>
-            );
-          })}
-        </tbody>
-      </table>
-    </div>
+                  </td>
+                  <td className="py-3 px-3">
+                    <div className="flex items-center gap-2.5 min-w-0">
+                      <div className={`w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0 ${p.icon}`}>
+                        <BookOpen className="h-3.5 w-3.5" />
+                      </div>
+                      <div className="flex items-center gap-2 min-w-0">
+                        <span className={`text-sm font-semibold truncate ${
+                          isLiveNow ? "text-emerald-700 dark:text-emerald-400" : 
+                          isHappeningToday ? "text-blue-800 dark:text-blue-300" : 
+                          "text-gray-800 dark:text-gray-200"
+                        }`}>
+                          {subject.name}
+                        </span>
+                        {isLiveNow ? (
+                           <Badge className="bg-emerald-600 text-white text-[9px] px-1 py-0 h-4 font-bold uppercase tracking-tighter flex-shrink-0">Live</Badge>
+                        ) : isHappeningToday ? (
+                           <Badge variant="outline" className="border-blue-200 text-blue-600 text-[9px] px-1 py-0 h-4 font-semibold tracking-tighter flex-shrink-0 bg-blue-50">Today</Badge>
+                        ) : null}
+                      </div>
+                    </div>
+                  </td>
+                  <td className="py-3 px-3">
+                    <span className="text-xs font-mono text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded-md inline-block">
+                      {subject.code}
+                    </span>
+                  </td>
+                  <td className="py-3 px-3">
+                    <div className={`inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg ${p.bg} max-w-full`}>
+                      <School className={`h-3.5 w-3.5 flex-shrink-0 ${p.icon.split(" ")[1]} dark:text-white/80`} />
+                      <span className={`text-xs font-bold truncate ${p.icon.split(" ")[1]} dark:text-white`}>
+                        {subject.className}
+                      </span>
+                    </div>
+                  </td>
+                  <td className="py-3 px-3">
+                    <div className="flex flex-wrap gap-1.5">
+                      {todaySlots.length > 0 ? (
+                        todaySlots.map((slot) => {
+                          const active = isSlotLive(slot);
+                          return (
+                            <Badge 
+                              key={slot.id} 
+                              variant="secondary" 
+                              className={`text-[11px] font-semibold px-2 py-0.5 h-auto border whitespace-nowrap shadow-sm ${
+                                active
+                                  ? "bg-emerald-600 text-white border-emerald-600 animate-pulse"
+                                  : "bg-blue-50 dark:bg-blue-900/30 border-blue-200 dark:border-blue-800 text-blue-700 dark:text-blue-400"
+                              }`}
+                            >
+                              {formatTime(slot.startTime)} - {formatTime(slot.endTime)}
+                            </Badge>
+                          );
+                        })
+                      ) : (
+                        <span className="text-[11px] text-gray-400 italic">—</span>
+                      )}
+                    </div>
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
+    </>
   );
 }
