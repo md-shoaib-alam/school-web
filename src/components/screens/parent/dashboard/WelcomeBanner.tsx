@@ -34,7 +34,9 @@ export function WelcomeBanner({ userName }: WelcomeBannerProps) {
             <Calendar className="h-4 w-4" />
             <span className="text-sm font-medium">
               {new Date().toLocaleDateString("en-US", {
+                weekday: "long",
                 month: "long",
+                day: "numeric",
                 year: "numeric",
               })}
             </span>
