@@ -17,7 +17,6 @@ export function WelcomeBanner({ userName }: WelcomeBannerProps) {
 
   return (
     <Card className="border-0 bg-gradient-to-r from-amber-500 to-orange-500 text-white shadow-md rounded-xl overflow-hidden relative">
-      <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/2" />
       <CardContent className="p-6 lg:p-8 relative z-10">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div className="flex items-center gap-4">
@@ -29,7 +28,7 @@ export function WelcomeBanner({ userName }: WelcomeBannerProps) {
                 {greeting}
               </h2>
               <p className="text-amber-50 mt-1 text-sm lg:text-base font-medium opacity-90">
-                Here&apos;s an overview of your children&apos;s progress at {currentTenantName || "Demo Academy"}.
+                Children&apos;s progress overview.
               </p>
             </div>
           </div>
