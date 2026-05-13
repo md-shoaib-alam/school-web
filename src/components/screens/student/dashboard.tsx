@@ -1,6 +1,5 @@
 "use client";
 
-
 import { apiFetch } from "@/lib/api";
 import { useEffect, useState } from "react";
 import { useAppStore } from "@/store/use-app-store";
@@ -41,7 +40,7 @@ export function StudentDashboard() {
   );
 
   // In React Query v5, when enabled:false, isPending=true but fetchStatus='idle'
-  const isActuallyLoading = isPending && fetchStatus === 'fetching';
+  const isActuallyLoading = isPending && fetchStatus === "fetching";
 
   useEffect(() => {
     if (isError) {
@@ -80,13 +79,6 @@ export function StudentDashboard() {
   const attendanceRate = data?.attendanceRate ?? 0;
   const avgGrade = data?.avgGrade ?? 0;
   const pendingAssignments = data?.pendingAssignments ?? 0;
-
-  const firstName =
-    studentInfo?.name?.split(" ")[0] ||
-    currentUser?.name?.split(" ")[0] ||
-    "Student";
-  const className = studentInfo?.className || "";
-
   const today = new Date();
   const dayNames = [
     "sunday",
@@ -117,54 +109,39 @@ export function StudentDashboard() {
 
   return (
     <div className="space-y-6">
-      <style dangerouslySetInnerHTML={{ __html: `
-        @keyframes bannerFloat {
-          0%, 100% { transform: translateY(-50%) translateY(0px) scale(1.1); }
-          50% { transform: translateY(-50%) translateY(-15px) scale(1.12); }
-        }
-        .animate-floating-image {
-          animation: bannerFloat 6s ease-in-out infinite;
-        }
-      `}} />
       {/* Welcome Banner */}
-      <div className="relative overflow-hidden rounded-xl bg-gradient-to-r from-violet-600 via-purple-600 to-fuchsia-500 p-6 lg:p-8 text-white">
-        <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/4" />
-        <div className="absolute bottom-0 left-1/2 w-48 h-48 bg-white/5 rounded-full translate-y-1/2" />
-        <div className="relative flex flex-col sm:flex-row gap-4 items-start sm:items-center">
-          <div className="h-16 w-16 rounded-2xl bg-white/20 backdrop-blur-sm flex items-center justify-center overflow-hidden shrink-0 border border-white/10 shadow-inner">
-            <img src={currentTenantLogo || "/test.webp"} alt={currentTenantName || ""} className="h-full w-full object-cover" />
-          </div>
-          <div className="flex-1">
-          <div className="flex items-center gap-2 mb-1">
-            <span className="text-violet-200 text-sm font-medium">
-              {getGreeting()} 👋
-            </span>
-          </div>
-          <h2 className="text-2xl lg:text-3xl font-bold">{firstName}!</h2>
-          <p className="text-violet-200 mt-1">
-            {studentInfo
-              ? `${studentInfo.className} • Roll ${studentInfo.rollNumber}`
-              : `Welcome to ${currentTenantName || "the school"}`}
-          </p>
-          <div className="flex items-center gap-4 mt-4">
-            <div className="flex items-center gap-1.5 text-sm bg-white/15 rounded-full px-3 py-1">
-              <Calendar className="h-3.5 w-3.5" />
-              {today.toLocaleDateString("en-US", {
-                weekday: "long",
-                month: "short",
-                day: "numeric",
-              })}
+      <div className="relative overflow-hidden rounded-xl bg-gradient-to-r from-violet-600 via-purple-600 to-fuchsia-500 text-white shadow-md">
+        <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/2" />
+        <div className="p-6 lg:p-8 relative z-10">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div className="flex items-center gap-4">
+              <div className="h-14 w-14 rounded-xl bg-white/20 backdrop-blur-sm flex items-center justify-center overflow-hidden shrink-0 border border-white/10 shadow-inner">
+                <img
+                  src={currentTenantLogo || "/test.webp"}
+                  alt={currentTenantName || ""}
+                  className="h-full w-full object-cover"
+                />
+              </div>
+              <div className="text-left">
+                <h2 className="text-2xl lg:text-3xl font-bold tracking-tight">
+                  {studentInfo?.name || currentUser?.name || "Student"}
+                </h2>
+                <p className="text-violet-100 mt-1 text-sm lg:text-base font-medium opacity-90">
+                  {studentInfo
+                    ? `${studentInfo.className} • Roll ${studentInfo.rollNumber}`
+                    : `Welcome to ${currentTenantName || "the school"}`}
+                </p>
+              </div>
             </div>
-          </div>
-          </div>
-
-          {/* High-End 3D Academic Graphic Overlay */}
-          <div className="hidden lg:block absolute right-4 top-1/2 -translate-y-1/2 h-[150%] w-[320px] pointer-events-none overflow-hidden">
-            <img 
-              src="/dashboard-ill.png" 
-              alt="Academic Graphic" 
-              className="w-full h-full object-contain object-center drop-shadow-[0_20px_30px_rgba(0,0,0,0.3)] animate-floating-image"
-            />
+            <div className="flex items-center gap-2 bg-white/20 backdrop-blur-sm rounded-lg px-4 py-2 shrink-0 self-start sm:self-auto text-white">
+              <Calendar className="h-4 w-4" />
+              <span className="text-sm font-medium">
+                {today.toLocaleDateString("en-US", {
+                  month: "long",
+                  year: "numeric",
+                })}
+              </span>
+            </div>
           </div>
         </div>
       </div>
