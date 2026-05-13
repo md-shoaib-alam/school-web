@@ -63,14 +63,14 @@ type AssessmentGrade = {
   createdAt: string;
 };
 
-export function StudentGrades() {
+export function StudentGrades({ initialTab }: { initialTab?: "exams" | "assessments" }) {
   const { currentUser } = useAppStore();
   const [loading, setLoading] = useState(true);
   const [students, setStudents] = useState<StudentInfo[]>([]);
   const [grades, setGrades] = useState<GradeRecord[]>([]);
   const [assessmentGrades, setAssessmentGrades] = useState<AssessmentGrade[]>([]);
   const [activeTab, setActiveTab] = useState("all");
-  const [topLevelTab, setTopLevelTab] = useState<"exams" | "assessments">("exams");
+  const [topLevelTab, setTopLevelTab] = useState<"exams" | "assessments">(initialTab || "exams");
 
   const student = Array.isArray(students)
     ? students.find((s) => s.email === currentUser?.email) || students[0] || null

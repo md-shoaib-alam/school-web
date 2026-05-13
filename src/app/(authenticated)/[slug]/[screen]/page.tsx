@@ -183,6 +183,8 @@ export default function TenantScreenDispatcher() {
       case 'dashboard': return <StudentDashboard />;
       case 'my-classes': return <StudentClasses />;
       case 'my-grades': return <StudentGrades />;
+      case 'school-exams': return <StudentGrades key="school-exams" initialTab="exams" />;
+      case 'assessments': return <StudentGrades key="assessments" initialTab="assessments" />;
       case 'my-attendance': return <StudentAttendance />;
       case 'assignments':
       case 'homework': return <StudentAssignments />;
