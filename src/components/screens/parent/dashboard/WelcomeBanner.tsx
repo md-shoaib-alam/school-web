@@ -13,7 +13,6 @@ export function WelcomeBanner({ userName }: WelcomeBannerProps) {
   
   // Check if userName is missing or generic to display a cleaner, more professional greeting
   const isGeneric = !userName || userName.toLowerCase() === "parent";
-  const greeting = isGeneric ? "Welcome back! 👋" : `Welcome back, ${userName.split(" ")[0]}! 👋`;
 
   return (
     <Card className="border-0 bg-gradient-to-r from-amber-500 to-orange-500 text-white shadow-md rounded-xl overflow-hidden relative">
@@ -24,11 +23,14 @@ export function WelcomeBanner({ userName }: WelcomeBannerProps) {
               <img src={currentTenantLogo || "/test.webp"} alt={currentTenantName || ""} className="h-full w-full object-cover" />
             </div>
             <div className="text-left">
-              <h2 className="text-2xl lg:text-3xl font-bold tracking-tight">
-                {greeting}
+              <p className="text-amber-100/90 text-xs sm:text-sm font-medium mb-0.5">
+                Welcome back 👋
+              </p>
+              <h2 className="text-xl sm:text-2xl lg:text-3xl font-extrabold tracking-tight leading-tight">
+                {isGeneric ? "Parent" : userName.split(" ")[0]}
               </h2>
-              <p className="text-amber-50 mt-1 text-sm lg:text-base font-medium opacity-90">
-                Children&apos;s progress overview.
+              <p className="text-amber-50/80 mt-0.5 text-xs sm:text-sm font-medium">
+                Children&apos;s progress overview
               </p>
             </div>
           </div>

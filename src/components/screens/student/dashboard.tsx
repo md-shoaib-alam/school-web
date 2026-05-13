@@ -123,10 +123,13 @@ export function StudentDashboard() {
                 />
               </div>
               <div className="text-left">
-                <h2 className="text-2xl lg:text-3xl font-bold tracking-tight">
+                <p className="text-violet-100/90 text-xs sm:text-sm font-medium mb-0.5">
+                  {getGreeting()}
+                </p>
+                <h2 className="text-xl sm:text-2xl lg:text-3xl font-extrabold tracking-tight leading-tight">
                   {studentInfo?.name || currentUser?.name || "Student"}
                 </h2>
-                <p className="text-violet-100 mt-1 text-sm lg:text-base font-medium opacity-90">
+                <p className="text-violet-100/80 mt-0.5 text-xs sm:text-sm font-medium">
                   {studentInfo
                     ? `${studentInfo.className} • Roll ${studentInfo.rollNumber}`
                     : `Welcome to ${currentTenantName || "the school"}`}
