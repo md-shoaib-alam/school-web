@@ -210,19 +210,14 @@ export function StudentGrades({ initialTab }: { initialTab?: "exams" | "assessme
       <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h2 className="text-xl font-bold text-gray-900 dark:text-gray-100">
-            My Grades
+            {topLevelTab === "exams" ? "School Exams" : "Class Assessments"}
           </h2>
-          <p className="text-sm text-gray-500 dark:text-gray-400 dark:text-gray-500 mt-0.5">
-            Track your academic performance across all courses
+          <p className="text-sm text-gray-500 dark:text-gray-400 mt-0.5">
+            {topLevelTab === "exams" 
+              ? "Track your official term examinations and standardized scores" 
+              : "Monitor your periodic teacher assignments, classwork, and quizzes"}
           </p>
         </div>
-
-        <Tabs value={topLevelTab} onValueChange={(v) => setTopLevelTab(v as any)} className="w-auto">
-          <TabsList className="grid grid-cols-2 w-[320px]">
-            <TabsTrigger value="exams">School Exams</TabsTrigger>
-            <TabsTrigger value="assessments">Assessments</TabsTrigger>
-          </TabsList>
-        </Tabs>
       </div>
 
       {topLevelTab === "exams" ? (
