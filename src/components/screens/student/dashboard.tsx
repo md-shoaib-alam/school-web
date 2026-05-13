@@ -176,7 +176,7 @@ export function StudentDashboard() {
           color="emerald"
         />
         <StatCard
-          title="Assignments"
+          title="Homework"
           value={String(pendingAssignments || 0)}
           icon={<ClipboardList className="h-5 w-5" />}
           trend="Pending"

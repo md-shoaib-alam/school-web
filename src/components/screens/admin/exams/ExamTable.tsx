@@ -18,7 +18,6 @@ interface ExamTableProps {
   loading: boolean;
   searchTerm: string;
   setSearchTerm: (s: string) => void;
-  onOpenResults: (exam: ExamRecord) => void;
   onOpenEdit: (exam: ExamRecord) => void;
   onDelete: (id: string) => void;
   deleting: boolean;
@@ -40,7 +39,6 @@ export function ExamTable({
   loading,
   searchTerm,
   setSearchTerm,
-  onOpenResults,
   onOpenEdit,
   onDelete,
   deleting,
@@ -165,15 +163,6 @@ export function ExamTable({
                     <TableCell className="text-center px-2 hidden sm:table-cell">{getStatusBadge(exam.status)}</TableCell>
                     <TableCell className="text-right px-2 sm:px-4">
                       <div className="flex items-center justify-end gap-1">
-                        <Button
-                          size="sm"
-                          variant="ghost"
-                          className="h-8 px-2 text-xs text-blue-600 hover:text-blue-800 hover:bg-blue-50"
-                          onClick={() => onOpenResults(exam)}
-                        >
-                          <FileText className="h-3.5 w-3.5 sm:mr-1.5" />
-                          <span className="hidden sm:inline">Results</span>
-                        </Button>
                         <Button
                           variant="ghost"
                           size="icon"

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { 
@@ -42,7 +42,7 @@ const examTypeConfig: Record<string, { bg: string; label: string }> = {
 };
 
 const emptyExamForm: ExamFormData = {
-  classId: '', subjectId: '', examType: 'unit_test', name: '',
+  classId: '', subjectId: '', examType: 'midterm', name: '',
   date: '', startTime: '', endTime: '', totalMarks: '100', passingMarks: '40',
 };
 
@@ -80,6 +80,14 @@ export function AdminExams({ initialTab = 'exams' }: { initialTab?: string }) {
   const [searchTerm, setSearchTerm] = useState('');
   const debouncedSearch = useDebounce(searchTerm, 300);
   const [activeTab, setActiveTab] = useState(initialTab);
+  
+  useEffect(() => {
+    setActiveTab(initialTab);
+    if (initialTab !== 'results') {
+      setSelectedExam(null);
+      setResultRows([]);
+    }
+  }, [initialTab]);
 
   // Dialog States
   const [addOpen, setAddOpen] = useState(false);
@@ -135,8 +143,11 @@ export function AdminExams({ initialTab = 'exams' }: { initialTab?: string }) {
 
   const exams = useMemo(() => {
     const data = examsData?.data || (Array.isArray(examsData) ? examsData : []);
-    return data as ExamRecord[];
+    return (data as ExamRecord[]).filter(
+      (e) => e.examType === "midterm" || e.examType === "final"
+    );
   }, [examsData]);
+
 
   const classes = metadata?.classes || [];
   const subjects = metadata?.subjects || [];
@@ -406,7 +417,7 @@ export function AdminExams({ initialTab = 'exams' }: { initialTab?: string }) {
 
           <ExamTable
             exams={filtered.filter(e => e.status !== 'completed')} loading={loadingExams} searchTerm={searchTerm} setSearchTerm={setSearchTerm}
-            onOpenResults={openResultsEntry} onOpenEdit={(e) => { setEditForm({ ...e, totalMarks: String(e.totalMarks), passingMarks: String(e.passingMarks) }); setEditOpen(true); }}
+            onOpenEdit={(e) => { setEditForm({ ...e, totalMarks: String(e.totalMarks), passingMarks: String(e.passingMarks) }); setEditOpen(true); }}
             onDelete={handleDelete} deleting={deleting} formatDate={formatDate} formatTime={formatTime}
             getStatusBadge={getStatusBadge} getExamTypeBadge={getExamTypeBadge}
             classFilter={classFilter} setClassFilter={setClassFilter}
@@ -427,7 +438,6 @@ export function AdminExams({ initialTab = 'exams' }: { initialTab?: string }) {
             onBack={backToExams} onSelectExam={openResultsEntry}
             onSave={handleSaveResults} onPublish={handlePublish} isPublishing={isPublishing}
             onUpdateMark={(id, m) => setResultRows(prev => prev.map(r => r.studentId === id ? { ...r, marksObtained: m, status: Number(m) >= (selectedExam?.passingMarks || 40) ? 'pass' : 'fail' } : r))}
-            onUpdateRemark={(id, rm) => setResultRows(prev => prev.map(r => r.studentId === id ? { ...r, remarks: rm } : r))}
             formatDate={formatDate} formatTime={formatTime}
             getStatusBadge={getStatusBadge} getExamTypeBadge={getExamTypeBadge}
           />
@@ -445,7 +455,6 @@ export function AdminExams({ initialTab = 'exams' }: { initialTab?: string }) {
           <ExamTable
             exams={filtered.filter(e => e.status === 'completed')} 
             loading={loadingExams} searchTerm={searchTerm} setSearchTerm={setSearchTerm}
-            onOpenResults={openResultsEntry} 
             onOpenEdit={(e) => { setEditForm({ ...e, totalMarks: String(e.totalMarks), passingMarks: String(e.passingMarks) }); setEditOpen(true); }}
             onDelete={handleDelete} deleting={deleting} formatDate={formatDate} formatTime={formatTime}
             getStatusBadge={getStatusBadge} getExamTypeBadge={getExamTypeBadge}

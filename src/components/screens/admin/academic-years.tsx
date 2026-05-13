@@ -45,6 +45,7 @@ import { useAcademicYears } from "@/hooks/use-academic-years";
 import { DatePicker } from "@/components/ui/date-picker";
 import { goeyToast as toast } from "goey-toast";
 import { format } from "date-fns";
+import { formatLocalDate, parseLocalDate } from "@/lib/utils";
 
 export function AcademicYearsScreen() {
   const { 
@@ -177,15 +178,15 @@ export function AcademicYearsScreen() {
                 <div className="space-y-2">
                   <Label htmlFor="startDate">Start Date</Label>
                   <DatePicker 
-                    date={formData.startDate ? new Date(formData.startDate) : undefined}
-                    onChange={(d) => setFormData({ ...formData, startDate: d ? d.toISOString().split('T')[0] : "" })}
+                    date={parseLocalDate(formData.startDate)}
+                    onChange={(d) => setFormData({ ...formData, startDate: formatLocalDate(d) })}
                   />
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="endDate">End Date</Label>
                   <DatePicker 
-                    date={formData.endDate ? new Date(formData.endDate) : undefined}
-                    onChange={(d) => setFormData({ ...formData, endDate: d ? d.toISOString().split('T')[0] : "" })}
+                    date={parseLocalDate(formData.endDate)}
+                    onChange={(d) => setFormData({ ...formData, endDate: formatLocalDate(d) })}
                   />
                 </div>
               </div>

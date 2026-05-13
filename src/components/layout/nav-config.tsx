@@ -280,13 +280,18 @@ export const navItems: Record<UserRole, NavItem[]> = {
       icon: <UserCheck className="h-4 w-4" />,
     },
     {
-      key: "grade-management",
-      label: "Grades",
+      key: "assessments",
+      label: "Assessments",
       icon: <ClipboardList className="h-4 w-4" />,
     },
     {
-      key: "assignments",
-      label: "Assignments",
+      key: "school-exams",
+      label: "School Exams",
+      icon: <BookOpen className="h-4 w-4" />,
+    },
+    {
+      key: "homework",
+      label: "Homework",
       icon: <FileText className="h-4 w-4" />,
     },
     {
@@ -333,8 +338,8 @@ export const navItems: Record<UserRole, NavItem[]> = {
       icon: <UserCheck className="h-4 w-4" />,
     },
     {
-      key: "assignments",
-      label: "Assignments",
+      key: "homework",
+      label: "Homework",
       icon: <FileText className="h-4 w-4" />,
     },
     {

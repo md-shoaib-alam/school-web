@@ -57,6 +57,7 @@ import { DatePicker } from "@/components/ui/date-picker";
 import { goeyToast as toast } from "goey-toast";
 import { format } from "date-fns";
 import { apiFetch } from "@/lib/api";
+import { formatLocalDate, parseLocalDate } from "@/lib/utils";
 
 interface FilterState {
   page: number;
@@ -87,7 +88,7 @@ export function ExpensesScreen() {
   const [expenseForm, setExpenseForm] = useState({
     categoryId: "",
     amount: "",
-    date: new Date().toISOString().split('T')[0],
+    date: formatLocalDate(new Date()),
     description: "",
     paymentMethod: "cash",
     referenceNo: "",
@@ -116,7 +117,7 @@ export function ExpensesScreen() {
       setExpenseForm({
         categoryId: categories[0]?.id || "",
         amount: "",
-        date: new Date().toISOString().split('T')[0],
+        date: formatLocalDate(new Date()),
         description: "",
         paymentMethod: "cash",
         referenceNo: "",
@@ -179,7 +180,7 @@ export function ExpensesScreen() {
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
-      a.download = `expenses_${new Date().toISOString().split('T')[0]}.xlsx`;
+      a.download = `expenses_${formatLocalDate(new Date())}.xlsx`;
       a.click();
       URL.revokeObjectURL(url);
       toast.success("Expenses exported to Excel successfully");
@@ -423,8 +424,8 @@ export function ExpensesScreen() {
               <div className="space-y-2">
                 <Label>Date</Label>
                 <DatePicker 
-                  date={expenseForm.date ? new Date(expenseForm.date) : undefined}
-                  onChange={(d) => setExpenseForm({...expenseForm, date: d ? d.toISOString().split('T')[0] : "" })}
+                  date={parseLocalDate(expenseForm.date)}
+                  onChange={(d) => setExpenseForm({...expenseForm, date: formatLocalDate(d) })}
                 />
               </div>
               <div className="space-y-2">

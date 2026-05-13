@@ -11,6 +11,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { BookOpen, Layers, Zap, Loader2, Plus, Save } from 'lucide-react';
 import { DatePicker } from '@/components/ui/date-picker';
 import { TimePicker } from '@/components/ui/time-picker';
+import { formatLocalDate, parseLocalDate } from '@/lib/utils';
 import { ExamFormData, ClassOption, SubjectOption } from './types';
 
 interface ExamDialogsProps {
@@ -77,11 +78,8 @@ export function ExamDialogs({
                 <Select value={addForm.examType} onValueChange={(v) => setAddForm({ ...addForm, examType: v })}>
                   <SelectTrigger><SelectValue /></SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="unit_test">Unit Test</SelectItem>
                     <SelectItem value="midterm">Midterm</SelectItem>
                     <SelectItem value="final">Final</SelectItem>
-                    <SelectItem value="quiz">Quiz</SelectItem>
-                    <SelectItem value="practical">Practical</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -114,7 +112,7 @@ export function ExamDialogs({
                         <TableRow key={row.subjectId} className={row.selected ? 'bg-blue-50/30' : ''}>
                           <TableCell className="px-2 sm:px-4"><Checkbox checked={row.selected} onCheckedChange={() => toggleBulkSubject(row.subjectId)} /></TableCell>
                           <TableCell className="font-medium px-2 sm:px-4 whitespace-nowrap">{row.subjectName}</TableCell>
-                          <TableCell className="px-2 sm:px-4"><DatePicker date={row.date ? new Date(row.date) : undefined} onChange={(d) => updateBulkField(row.subjectId, 'date', d?.toISOString().split('T')[0] || '')} disabled={(date) => date < new Date(new Date().setHours(0, 0, 0, 0))} /></TableCell>
+                          <TableCell className="px-2 sm:px-4"><DatePicker date={parseLocalDate(row.date)} onChange={(d) => updateBulkField(row.subjectId, 'date', formatLocalDate(d))} disabled={(date) => date < new Date(new Date().setHours(0, 0, 0, 0))} /></TableCell>
                           <TableCell className="px-2 sm:px-4"><TimePicker value={row.startTime} onChange={(v) => updateBulkField(row.subjectId, 'startTime', v)} /></TableCell>
                           <TableCell className="px-2 sm:px-4"><TimePicker value={row.endTime} onChange={(v) => updateBulkField(row.subjectId, 'endTime', v)} /></TableCell>
                           <TableCell className="px-2 sm:px-4"><Input type="number" className="w-14 sm:w-16 h-8 text-center" value={row.totalMarks} onChange={(e) => updateBulkField(row.subjectId, 'totalMarks', e.target.value)} /></TableCell>
@@ -152,18 +150,15 @@ export function ExamDialogs({
             <div className="grid grid-cols-2 gap-4">
               <div className="grid gap-2">
                 <Label>Date</Label>
-                <DatePicker date={editForm.date ? new Date(editForm.date) : undefined} onChange={(d) => setEditForm({ ...editForm, date: d?.toISOString().split('T')[0] || '' })} disabled={(date) => date < new Date(new Date().setHours(0, 0, 0, 0))} />
+                <DatePicker date={parseLocalDate(editForm.date)} onChange={(d) => setEditForm({ ...editForm, date: formatLocalDate(d) })} disabled={(date) => date < new Date(new Date().setHours(0, 0, 0, 0))} />
               </div>
               <div className="grid gap-2">
                 <Label>Type</Label>
                 <Select value={editForm.examType} onValueChange={(v) => setEditForm({ ...editForm, examType: v })}>
                   <SelectTrigger><SelectValue /></SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="unit_test">Unit Test</SelectItem>
                     <SelectItem value="midterm">Midterm</SelectItem>
                     <SelectItem value="final">Final</SelectItem>
-                    <SelectItem value="quiz">Quiz</SelectItem>
-                    <SelectItem value="practical">Practical</SelectItem>
                   </SelectContent>
                 </Select>
               </div>

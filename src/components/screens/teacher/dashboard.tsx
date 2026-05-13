@@ -140,14 +140,14 @@ export function TeacherDashboard() {
       screen: "take-attendance",
     },
     {
-      label: "Manage Grades",
+      label: "Assessments",
       icon: <ClipboardList className="h-4 w-4" />,
-      screen: "grade-management",
+      screen: "assessments",
     },
     {
-      label: "Create Assignment",
+      label: "Create Homework",
       icon: <FileText className="h-4 w-4" />,
-      screen: "assignments",
+      screen: "homework",
     },
     {
       label: "View Timetable",
@@ -350,7 +350,7 @@ export function TeacherDashboard() {
                 variant="ghost"
                 size="sm"
                 className="text-blue-500 dark:text-blue-400 text-xs hover:bg-blue-50 dark:hover:bg-blue-900/20"
-                onClick={() => navigateTo("assignments")}
+                onClick={() => navigateTo("homework")}
               >
                 View All <ArrowRight className="h-3 w-3 ml-1" />
               </Button>

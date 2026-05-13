@@ -26,7 +26,6 @@ interface ResultsViewProps {
   onBack: () => void;
   onSelectExam: (exam: ExamRecord) => void;
   onUpdateMark: (studentId: string, marks: string) => void;
-  onUpdateRemark: (studentId: string, remarks: string) => void;
   onSave: () => void;
   onPublish: () => void;
   isPublishing: boolean;
@@ -48,7 +47,6 @@ export function ResultsView({
   onBack,
   onSelectExam,
   onUpdateMark,
-  onUpdateRemark,
   onSave,
   onPublish,
   isPublishing,
@@ -281,7 +279,6 @@ export function ResultsView({
                         <TableHead className="hidden sm:table-cell w-20">Roll No</TableHead>
                         <TableHead className="w-28">Marks</TableHead>
                         <TableHead className="w-20 text-center">Status</TableHead>
-                        <TableHead className="hidden md:table-cell w-36">Remarks</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -317,14 +314,6 @@ export function ResultsView({
                                 <AlertCircle className="h-3 w-3 mr-1" /> Pending
                               </Badge>
                             )}
-                          </TableCell>
-                          <TableCell className="hidden md:table-cell">
-                            <Input
-                              value={row.remarks}
-                              onChange={(e) => onUpdateRemark(row.studentId, e.target.value)}
-                              placeholder="Optional remarks"
-                              className="h-8 text-sm"
-                            />
                           </TableCell>
                         </TableRow>
                       ))}

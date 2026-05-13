@@ -1,5 +1,6 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
 import { useAppStore } from '@/store/use-app-store';
 import dynamic from 'next/dynamic';
@@ -46,6 +47,7 @@ const TeacherClasses = dynamic(() => import('@/components/screens/teacher/my-cla
 const TeacherSubjects = dynamic(() => import('@/components/screens/teacher/my-subjects').then(m => m.TeacherSubjects), { loading: LoadingScreen });
 const TeacherAttendance = dynamic(() => import('@/components/screens/teacher/take-attendance').then(m => m.TeacherAttendance), { loading: LoadingScreen });
 const TeacherGrades = dynamic(() => import('@/components/screens/teacher/grade-management').then(m => m.TeacherGrades), { loading: LoadingScreen });
+const TeacherExamsEntry = dynamic(() => import('@/components/screens/teacher/exams-entry').then(m => m.TeacherExamsEntry), { loading: LoadingScreen });
 const TeacherAssignments = dynamic(() => import('@/components/screens/teacher/assignments').then(m => m.TeacherAssignments), { loading: LoadingScreen });
 const TeacherTimetable = dynamic(() => import('@/components/screens/teacher/timetable').then(m => m.TeacherTimetable), { loading: LoadingScreen });
 const TeacherCalendar = dynamic(() => import('@/components/screens/teacher/calendar').then(m => m.TeacherCalendar), { loading: LoadingScreen });
@@ -79,8 +81,15 @@ const NotFoundScreen = dynamic(() => import('@/components/screens/error/not-foun
 export default function TenantScreenDispatcher() {
   const { slug, screen } = useParams();
   const { currentUser } = useAppStore();
+  const [mounted, setMounted] = useState(false);
 
-  if (!currentUser) return null;
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  if (!mounted || !currentUser) {
+    return <LoadingScreen />;
+  }
 
   // Normalize for comparison
   const urlSlug = typeof slug === 'string' ? slug.toLowerCase() : '';
@@ -132,20 +141,20 @@ export default function TenantScreenDispatcher() {
       case 'tickets': return <AdminTickets />;
       case 'school-subscription': return <AdminSubscription />;
       case 'manage-plan': return <ManagePlanScreen />;
-      case 'promotions': return <AdminPromotions initialTab="individual" />;
-      case 'bulk-promote': return <AdminPromotions initialTab="bulk" />;
-      case 'graduated': return <AdminPromotions initialTab="graduated" />;
+      case 'promotions': return <AdminPromotions key="individual-prom" initialTab="individual" />;
+      case 'bulk-promote': return <AdminPromotions key="bulk-prom" initialTab="bulk" />;
+      case 'graduated': return <AdminPromotions key="graduated-prom" initialTab="graduated" />;
       case 'certificates': return <AdminCertificates />;
-      case 'leaves': return <AdminLeaves initialTab="teacher" />;
-      case 'student-leaves': return <AdminLeaves initialTab="student" />;
-      case 'teacher-leaves': return <AdminLeaves initialTab="teacher" />;
-      case 'staff-leaves': return <AdminLeaves initialTab="staff" />;
+      case 'leaves': return <AdminLeaves key="teacher-leaves-main" initialTab="teacher" />;
+      case 'student-leaves': return <AdminLeaves key="student-leaves" initialTab="student" />;
+      case 'teacher-leaves': return <AdminLeaves key="teacher-leaves" initialTab="teacher" />;
+      case 'staff-leaves': return <AdminLeaves key="staff-leaves" initialTab="staff" />;
       case 'grades': return <TeacherGrades />;
-      case 'teacher-attendance': return <StaffAttendance initialTab="teacher" />;
-      case 'staff-attendance': return <StaffAttendance initialTab="staff" />;
-      case 'exams': return <AdminExams initialTab="exams" />;
-      case 'results-entry': return <AdminExams initialTab="results" />;
-      case 'published-results': return <AdminExams initialTab="published" />;
+      case 'teacher-attendance': return <StaffAttendance key="teacher-att" initialTab="teacher" />;
+      case 'staff-attendance': return <StaffAttendance key="staff-att" initialTab="staff" />;
+      case 'exams': return <AdminExams key="exams" initialTab="exams" />;
+      case 'results-entry': return <AdminExams key="results" initialTab="results" />;
+      case 'published-results': return <AdminExams key="published" initialTab="published" />;
       case 'admit-cards': return <AdminAdmitCards />;
     }
   }
@@ -156,8 +165,11 @@ export default function TenantScreenDispatcher() {
       case 'my-classes': return <TeacherClasses />;
       case 'my-subjects': return <TeacherSubjects />;
       case 'take-attendance': return <TeacherAttendance />;
-      case 'grade-management': return <TeacherGrades />;
-      case 'assignments': return <TeacherAssignments />;
+      case 'grade-management':
+      case 'assessments': return <TeacherGrades />;
+      case 'school-exams': return <TeacherExamsEntry />;
+      case 'assignments':
+      case 'homework': return <TeacherAssignments />;
       case 'timetable': return <TeacherTimetable />;
       case 'notices': return <TeacherNotices />;
       case 'calendar': return <TeacherCalendar />;
@@ -172,7 +184,8 @@ export default function TenantScreenDispatcher() {
       case 'my-classes': return <StudentClasses />;
       case 'my-grades': return <StudentGrades />;
       case 'my-attendance': return <StudentAttendance />;
-      case 'assignments': return <StudentAssignments />;
+      case 'assignments':
+      case 'homework': return <StudentAssignments />;
       case 'timetable': return <StudentTimetable />;
       case 'notices': return <StudentNotices />;
       case 'fees': return <StudentFees />;

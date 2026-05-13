@@ -322,21 +322,21 @@ export function TeacherAssignments() {
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
           <h2 className="text-xl font-bold text-gray-900 dark:text-gray-100">
-            My Assignments
+            My Homework
           </h2>
           <p className="text-sm text-gray-500 dark:text-gray-400">
-            {assignments.length} assignments total
+            {assignments.length} homework items total
           </p>
         </div>
         <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
           <DialogTrigger asChild>
             <Button className="bg-blue-600 hover:bg-blue-700 text-white">
-              <Plus className="h-4 w-4 mr-2" /> Create Assignment
+              <Plus className="h-4 w-4 mr-2" /> Create Homework
             </Button>
           </DialogTrigger>
           <DialogContent>
             <DialogHeader>
-              <DialogTitle>Create New Assignment</DialogTitle>
+              <DialogTitle>Create New Homework</DialogTitle>
             </DialogHeader>
             <div className="space-y-4 pt-2">
               <div>
@@ -344,7 +344,7 @@ export function TeacherAssignments() {
                 <Input
                   value={form.title}
                   onChange={(e) => setForm({ ...form, title: e.target.value })}
-                  placeholder="Assignment title"
+                  placeholder="Homework title"
                   className="mt-1.5"
                 />
               </div>
@@ -405,7 +405,9 @@ export function TeacherAssignments() {
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="offline">Offline (Classroom)</SelectItem>
-                      <SelectItem value="online">Online</SelectItem>
+                      <SelectItem value="online" disabled className="text-muted-foreground">
+                        Online (🔒 Premium Only)
+                      </SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -417,7 +419,7 @@ export function TeacherAssignments() {
                   onChange={(e) =>
                     setForm({ ...form, description: e.target.value })
                   }
-                  placeholder="Assignment details..."
+                  placeholder="Homework details..."
                   className="mt-1.5"
                   rows={3}
                 />
@@ -426,7 +428,7 @@ export function TeacherAssignments() {
                 onClick={handleCreate}
                 className="w-full bg-blue-600 hover:bg-blue-700 text-white"
               >
-                Create Assignment
+                Create Homework
               </Button>
             </div>
           </DialogContent>
@@ -440,7 +442,7 @@ export function TeacherAssignments() {
         <Card className="border-red-200 dark:border-red-800 bg-red-50/50 dark:bg-red-900/20 rounded-xl">
           <CardHeader className="pb-2">
             <CardTitle className="text-base text-red-700 dark:text-red-400 flex items-center gap-2">
-              <AlertTriangle className="h-5 w-5" /> Overdue Assignments
+              <AlertTriangle className="h-5 w-5" /> Overdue Homework
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-2">
@@ -582,8 +584,8 @@ export function TeacherAssignments() {
       {assignments.length === 0 && (
         <div className="text-center py-16 text-gray-400 dark:text-gray-500">
           <FileText className="h-12 w-12 mx-auto mb-4 opacity-50" />
-          <p className="text-lg">No assignments yet</p>
-          <p className="text-sm mt-1">Create your first assignment</p>
+          <p className="text-lg">No homework yet</p>
+          <p className="text-sm mt-1">Create your first homework</p>
         </div>
       )}
 
@@ -623,7 +625,7 @@ export function TeacherAssignments() {
               <Users className="h-10 w-10 mx-auto mb-2 opacity-40" />
               <p className="text-sm">No submissions yet</p>
               <p className="text-xs mt-1">
-                Students haven&apos;t submitted this assignment
+                Students haven&apos;t submitted this homework
               </p>
             </div>
           ) : (
@@ -792,10 +794,10 @@ export function TeacherAssignments() {
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle className="flex items-center gap-2">
-              <AlertTriangle className="h-5 w-5 text-amber-500 fill-amber-500/10" /> Mark assignment as complete?
+              <AlertTriangle className="h-5 w-5 text-amber-500 fill-amber-500/10" /> Mark homework as complete?
             </AlertDialogTitle>
             <AlertDialogDescription className="py-1 text-sm">
-              Once you mark this assignment as complete, it indicates all work is finished and finalized. This action will conclude submissions for students. Are you sure you want to continue?
+              Once you mark this homework as complete, it indicates all work is finished and finalized. This action will conclude submissions for students. Are you sure you want to continue?
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter className="mt-2">
