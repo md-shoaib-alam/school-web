@@ -148,6 +148,33 @@ export function StudentDashboard() {
             </div>
           </div>
           </div>
+
+          {/* Elegant Glassmorphic Stats Cards */}
+          <div className="hidden md:flex items-center gap-3 ml-auto shrink-0 pl-6 border-l border-white/15">
+            <div className="flex flex-col items-center bg-white/10 backdrop-blur-md border border-white/10 p-3.5 rounded-2xl min-w-[100px] text-center shadow-lg relative group transition-all duration-300 hover:bg-white/15">
+              <div className="p-1.5 bg-emerald-400/20 rounded-lg text-emerald-300 mb-1.5 group-hover:scale-110 transition-transform duration-300">
+                <UserCheck className="h-4 w-4" />
+              </div>
+              <span className="text-[10px] font-bold uppercase tracking-wider text-violet-200">Attendance</span>
+              <span className="text-xl font-black mt-0.5">{attendanceRate}%</span>
+            </div>
+
+            <div className="flex flex-col items-center bg-white/10 backdrop-blur-md border border-white/10 p-3.5 rounded-2xl min-w-[100px] text-center shadow-lg relative group transition-all duration-300 hover:bg-white/15">
+              <div className="p-1.5 bg-yellow-400/20 rounded-lg text-yellow-300 mb-1.5 group-hover:scale-110 transition-transform duration-300">
+                <GraduationCap className="h-4 w-4" />
+              </div>
+              <span className="text-[10px] font-bold uppercase tracking-wider text-violet-200">Avg Grade</span>
+              <span className="text-xl font-black mt-0.5">{avgGrade}%</span>
+            </div>
+
+            <div className="flex flex-col items-center bg-white/10 backdrop-blur-md border border-white/10 p-3.5 rounded-2xl min-w-[100px] text-center shadow-lg relative group transition-all duration-300 hover:bg-white/15">
+              <div className="p-1.5 bg-cyan-400/20 rounded-lg text-cyan-300 mb-1.5 group-hover:scale-110 transition-transform duration-300">
+                <ClipboardList className="h-4 w-4" />
+              </div>
+              <span className="text-[10px] font-bold uppercase tracking-wider text-violet-200">Homework</span>
+              <span className="text-xl font-black mt-0.5">{pendingAssignments}</span>
+            </div>
+          </div>
         </div>
       </div>
 
