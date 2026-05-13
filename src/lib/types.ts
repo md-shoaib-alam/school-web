@@ -88,6 +88,7 @@ export interface AssignmentInfo {
   dueDate: string;
   submissions: number;
   totalStudents: number;
+  mode: "online" | "offline";
 }
 
 export interface FeeRecord {

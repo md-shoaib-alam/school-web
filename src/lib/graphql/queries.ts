@@ -107,7 +107,7 @@ export const TEACHER_DASHBOARD = `
       totalStudents pendingAssignments
       todaySchedule { id day startTime endTime subjectName className }
       todayAttendance { present total }
-      recentAssignments { id title subjectName className dueDate submissions totalStudents }
+      recentAssignments { id title subjectName className dueDate submissions totalStudents mode }
     }
   }
 `

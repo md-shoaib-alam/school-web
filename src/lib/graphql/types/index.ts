@@ -94,7 +94,7 @@ export interface TeacherDashboardData {
   pendingAssignments: number
   todaySchedule: { id: string; day: string; startTime: string; endTime: string; subjectName: string; className: string }[]
   todayAttendance: { present: number; total: number }
-  recentAssignments: { id: string; title: string; subjectName: string; className: string; dueDate: string; submissions: number; totalStudents: number }[]
+  recentAssignments: { id: string; title: string; subjectName: string; className: string; dueDate: string; submissions: number; totalStudents: number; mode: string }[]
 }
 
 export interface StudentDashboardData {

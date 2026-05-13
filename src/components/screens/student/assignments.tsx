@@ -20,6 +20,8 @@ import {
   Send,
   Star,
   Loader2,
+  Globe,
+  BookOpen,
 } from "lucide-react";
 import type { StudentInfo, AssignmentInfo } from "@/lib/types";
 
@@ -415,6 +417,24 @@ export function StudentAssignments() {
                                 className="text-[10px]"
                               >
                                 {assignment.className}
+                              </Badge>
+                              <Badge
+                                variant="outline"
+                                className={`text-[10px] font-medium px-2 flex items-center gap-1 border rounded-full ${
+                                  assignment.mode === "online"
+                                    ? "bg-indigo-50 text-indigo-700 border-indigo-100/60 dark:bg-indigo-950/20 dark:text-indigo-300 dark:border-indigo-900/50"
+                                    : "bg-amber-50 text-amber-700 border-amber-100/60 dark:bg-amber-950/20 dark:text-amber-300 dark:border-amber-900/50"
+                                }`}
+                              >
+                                {assignment.mode === "online" ? (
+                                  <>
+                                    <Globe className="h-2.5 w-2.5" /> Online
+                                  </>
+                                ) : (
+                                  <>
+                                    <BookOpen className="h-2.5 w-2.5" /> Offline
+                                  </>
+                                )}
                               </Badge>
                             </div>
 
