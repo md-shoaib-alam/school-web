@@ -46,6 +46,7 @@ interface SubjectInfo {
   name: string;
   code: string;
   className: string;
+  classId: string;
   teacherName?: string;
 }
 
@@ -60,9 +61,41 @@ export function TeacherGrades() {
   const [marks, setMarks] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [gradesLoading, setGradesLoading] = useState(false);
 
   useEffect(() => {
-    Promise.all([apiFetch("/api/classes"), apiFetch("/api/subjects")])
+    if (!selectedClass || !selectedSubject || !examType) {
+      setMarks({});
+      return;
+    }
+    setGradesLoading(true);
+    apiFetch(`/api/grades?classId=${selectedClass}&subjectId=${selectedSubject}&examType=${examType}`)
+      .then((r) => r.json())
+      .then((data) => {
+        if (Array.isArray(data)) {
+          const initialMarks: Record<string, string> = {};
+          data.forEach((g: any) => {
+            if (g.studentId && g.marks !== undefined && g.marks !== null) {
+              initialMarks[g.studentId] = g.marks.toString();
+            }
+          });
+          setMarks(initialMarks);
+        } else {
+          setMarks({});
+        }
+      })
+      .catch((e) => {
+        console.error(e);
+        setMarks({});
+      })
+      .finally(() => setGradesLoading(false));
+  }, [selectedClass, selectedSubject, examType]);
+
+  useEffect(() => {
+    Promise.all([
+      apiFetch("/api/classes"),
+      apiFetch("/api/subjects?mine=true"),
+    ])
       .then(([cRes, sRes]) => Promise.all([cRes.json(), sRes.json()]))
       .then(([cData, sData]) => {
         setClasses(cData);
@@ -72,19 +105,21 @@ export function TeacherGrades() {
   }, []);
 
   useEffect(() => {
-    if (!selectedClass) return;
+    if (!selectedClass) {
+      setSelectedSubject("");
+      return;
+    }
     apiFetch(`/api/students?classId=${selectedClass}`)
       .then((r) => r.json())
       .then((data) => {
         setStudents(data);
         setMarks({});
+        setSelectedSubject(""); // Reset subject selection for the new class
       });
   }, [selectedClass]);
 
-  const filteredSubjects = subjects.filter((s) =>
-    s.className.includes(
-      classes.find((c) => c.id === selectedClass)?.name || "",
-    ),
+  const filteredSubjects = subjects.filter(
+    (s) => s.classId === selectedClass,
   );
 
   const getGrade = (m: number, max: number) => {
@@ -112,26 +147,38 @@ export function TeacherGrades() {
     try {
       const maxMarks =
         examType === "quiz" ? 20 : examType === "midterm" ? 50 : 100;
-      for (const student of students) {
-        const m = marks[student.id];
-        if (m && parseFloat(m) > 0) {
-          await apiFetch("/api/grades", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              studentId: student.id,
-              subjectId: selectedSubject,
-              teacherId: "demo-teacher",
-              examType,
-              marks: parseFloat(m),
-              maxMarks,
-              remarks: "",
-            }),
-          });
-        }
+      
+      const records = Object.entries(marks)
+        .filter(([_, val]) => val.trim() !== "")
+        .map(([studentId, val]) => ({
+          studentId,
+          marks: parseFloat(val),
+          remarks: "",
+        }));
+
+      if (records.length === 0) {
+        toast.error("No marks entered to save!");
+        setSaving(false);
+        return;
       }
-      toast.success("Grades saved successfully!");
-    } catch {
+
+      const res = await apiFetch("/api/grades/bulk", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          classId: selectedClass,
+          subjectId: selectedSubject,
+          examType,
+          maxMarks,
+          records,
+        }),
+      });
+
+      if (!res.ok) throw new Error("Bulk insert failed");
+
+      toast.success(`Saved grades for ${records.length} students successfully!`);
+    } catch (error) {
+      console.error(error);
       toast.error("Failed to save grades");
     }
     setSaving(false);
@@ -186,6 +233,7 @@ export function TeacherGrades() {
               <Select
                 value={selectedSubject}
                 onValueChange={setSelectedSubject}
+                disabled={!selectedClass}
               >
                 <SelectTrigger>
                   <SelectValue placeholder="Select subject" />
@@ -259,7 +307,19 @@ export function TeacherGrades() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {students.map((student, idx) => {
+                  {gradesLoading ? (
+                    [...Array(Math.min(students.length, 6))].map((_, i) => (
+                      <TableRow key={i}>
+                        <TableCell><Skeleton className="h-4 w-4" /></TableCell>
+                        <TableCell><Skeleton className="h-4 w-16" /></TableCell>
+                        <TableCell><Skeleton className="h-4 w-32" /></TableCell>
+                        <TableCell><Skeleton className="h-8 w-24" /></TableCell>
+                        <TableCell><Skeleton className="h-6 w-12 rounded-full" /></TableCell>
+                        <TableCell><Skeleton className="h-4 w-full" /></TableCell>
+                      </TableRow>
+                    ))
+                  ) : (
+                    students.map((student, idx) => {
                     const maxMarks =
                       examType === "quiz"
                         ? 20
@@ -289,12 +349,26 @@ export function TeacherGrades() {
                             max={maxMarks}
                             placeholder="0"
                             value={marks[student.id] || ""}
-                            onChange={(e) =>
+                            disabled={gradesLoading}
+                            onChange={(e) => {
+                              const val = e.target.value;
+                              if (val === "") {
+                                const newMarks = { ...marks };
+                                delete newMarks[student.id];
+                                setMarks(newMarks);
+                                return;
+                              }
+                              const num = parseFloat(val);
+                              if (num < 0) return;
+                              if (num > maxMarks) {
+                                toast.error(`Max marks is ${maxMarks}!`);
+                                return;
+                              }
                               setMarks({
                                 ...marks,
-                                [student.id]: e.target.value,
-                              })
-                            }
+                                [student.id]: val,
+                              });
+                            }}
                             className="w-24 h-9 text-center"
                           />
                         </TableCell>
@@ -323,7 +397,7 @@ export function TeacherGrades() {
                         </TableCell>
                       </TableRow>
                     );
-                  })}
+                  }))}
                 </TableBody>
               </Table>
             </div>
