@@ -24,7 +24,7 @@ export function WelcomeBanner({ userName }: WelcomeBannerProps) {
             </div>
             <div className="text-left">
               <p className="text-amber-100/90 text-xs sm:text-sm font-medium mb-0.5">
-                Welcome back 👋
+                Welcome back
               </p>
               <h2 className="text-xl sm:text-2xl lg:text-3xl font-extrabold tracking-tight leading-tight">
                 {isGeneric ? "Parent" : userName.split(" ")[0]}
