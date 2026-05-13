@@ -29,10 +29,12 @@ import {
   DialogDescription,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Calendar } from "@/components/ui/calendar";
 import { Badge } from "@/components/ui/badge";
+import { format } from "date-fns";
 import { Progress } from "@/components/ui/progress";
 import { Skeleton } from "@/components/ui/skeleton";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import {
   Plus,
   FileText,
@@ -43,6 +45,8 @@ import {
   Loader2,
   Star,
   MessageSquare,
+  CalendarDays,
+  Check,
 } from "lucide-react";
 import { goeyToast as toast } from "goey-toast";
 
@@ -56,6 +60,7 @@ interface Assignment {
   dueDate: string;
   submissions: number;
   totalStudents: number;
+  ungradedSubmissions: number;
 }
 
 interface Submission {
@@ -78,11 +83,16 @@ export function TeacherAssignments() {
   >([]);
   const [loading, setLoading] = useState(true);
   const [dialogOpen, setDialogOpen] = useState(false);
-  const [form, setForm] = useState({
+  const [form, setForm] = useState<{
+    title: string;
+    description: string;
+    subjectId: string;
+    dueDate: Date | undefined;
+  }>({
     title: "",
     description: "",
     subjectId: "",
-    dueDate: "",
+    dueDate: undefined,
   });
 
   const [subDialogOpen, setSubDialogOpen] = useState(false);
@@ -91,7 +101,9 @@ export function TeacherAssignments() {
   const [submissions, setSubmissions] = useState<Submission[]>([]);
   const [subLoading, setSubLoading] = useState(false);
   const [gradingId, setGradingId] = useState<string | null>(null);
-  const [gradeForm, setGradeForm] = useState({ grade: "", feedback: "" });
+  const [editedGrades, setEditedGrades] = useState<Record<string, { grade: string; feedback: string }>>({});
+  const [bulkSaving, setBulkSaving] = useState(false);
+  const [completingId, setCompletingId] = useState<string | null>(null);
 
   useEffect(() => {
     Promise.all([apiFetch("/api/assignments?mine=true"), apiFetch("/api/subjects?mine=true")])
@@ -120,6 +132,7 @@ export function TeacherAssignments() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           ...form,
+          dueDate: form.dueDate ? format(form.dueDate, "yyyy-MM-dd") : "",
           classId: selectedSub.classId,
           teacherId: selectedSub.teacherId,
         }),
@@ -127,7 +140,7 @@ export function TeacherAssignments() {
       if (res.ok) {
         toast.success("Assignment created successfully!");
         setDialogOpen(false);
-        setForm({ title: "", description: "", subjectId: "", dueDate: "" });
+        setForm({ title: "", description: "", subjectId: "", dueDate: undefined });
         const data = await apiFetch("/api/assignments?mine=true").then((r) => r.json());
         setAssignments(data);
       }
@@ -136,11 +149,31 @@ export function TeacherAssignments() {
     }
   };
 
+  const handleCompleteAssignment = async (assignmentId: string) => {
+    setCompletingId(assignmentId);
+    try {
+      const res = await apiFetch(`/api/assignments/${assignmentId}/complete`, {
+        method: "PUT",
+      });
+      if (res.ok) {
+        toast.success("Assignment marked as completed!");
+        const data = await apiFetch("/api/assignments?mine=true").then((r) => r.json());
+        setAssignments(data);
+      } else {
+        toast.error("Failed to complete assignment");
+      }
+    } catch {
+      toast.error("Failed to complete assignment");
+    } finally {
+      setCompletingId(null);
+    }
+  };
+
   const handleViewSubmissions = async (assignment: Assignment) => {
     setSelectedAssignment(assignment);
     setSubDialogOpen(true);
     setSubLoading(true);
-    setGradeForm({ grade: "", feedback: "" });
+    setEditedGrades({});
     try {
       const res = await apiFetch(`/api/submissions?assignmentId=${assignment.id}`);
       if (res.ok) {
@@ -156,7 +189,8 @@ export function TeacherAssignments() {
   };
 
   const handleGrade = async (submissionId: string) => {
-    if (!gradeForm.grade.trim()) {
+    const data = editedGrades[submissionId];
+    if (!data || !data.grade.trim()) {
       toast.error("Please enter a grade");
       return;
     }
@@ -167,8 +201,8 @@ export function TeacherAssignments() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           id: submissionId,
-          grade: gradeForm.grade.trim(),
-          feedback: gradeForm.feedback.trim() || undefined,
+          grade: data.grade.trim(),
+          feedback: data.feedback.trim() || undefined,
           status: "graded",
         }),
       });
@@ -179,19 +213,71 @@ export function TeacherAssignments() {
             s.id === submissionId
               ? {
                   ...s,
-                  grade: gradeForm.grade.trim(),
-                  feedback: gradeForm.feedback.trim() || null,
+                  grade: data.grade.trim(),
+                  feedback: data.feedback.trim() || null,
                   status: "graded",
                 }
               : s,
           ),
         );
-        setGradeForm({ grade: "", feedback: "" });
+        setEditedGrades((prev) => {
+          const next = { ...prev };
+          delete next[submissionId];
+          return next;
+        });
       }
     } catch {
       toast.error("Failed to save grade");
     } finally {
       setGradingId(null);
+    }
+  };
+
+  const handleBulkSave = async () => {
+    const updates = Object.entries(editedGrades)
+      .filter(([_, val]) => val.grade.trim() !== "")
+      .map(([id, val]) => ({
+        id,
+        grade: val.grade.trim(),
+        feedback: val.feedback.trim() || undefined,
+        status: "graded",
+      }));
+
+    if (updates.length === 0) {
+      toast.error("No grades entered yet");
+      return;
+    }
+
+    setBulkSaving(true);
+    try {
+      const res = await apiFetch("/api/submissions/bulk", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ updates }),
+      });
+      if (res.ok) {
+        toast.success(`Bulk saved ${updates.length} grades!`);
+        setSubmissions((prev) =>
+          prev.map((s) => {
+            const update = updates.find((u) => u.id === s.id);
+            return update
+              ? {
+                  ...s,
+                  grade: update.grade,
+                  feedback: update.feedback || null,
+                  status: "graded",
+                }
+              : s;
+          })
+        );
+        setEditedGrades({});
+      } else {
+        toast.error("Failed to bulk save grades");
+      }
+    } catch {
+      toast.error("Failed to bulk save grades");
+    } finally {
+      setBulkSaving(false);
     }
   };
 
@@ -260,16 +346,32 @@ export function TeacherAssignments() {
                   </SelectContent>
                 </Select>
               </div>
-              <div>
+              <div className="flex flex-col gap-2">
                 <Label>Due Date *</Label>
-                <Input
-                  type="date"
-                  value={form.dueDate}
-                  onChange={(e) =>
-                    setForm({ ...form, dueDate: e.target.value })
-                  }
-                  className="mt-1.5"
-                />
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant="outline"
+                      className="w-full justify-start text-left font-normal mt-0.5"
+                    >
+                      <CalendarDays className="mr-2 h-4 w-4" />
+                      {form.dueDate ? format(form.dueDate, "PPP") : <span>Pick a date</span>}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0" align="start">
+                    <Calendar
+                      mode="single"
+                      selected={form.dueDate}
+                      onSelect={(date) =>
+                        setForm({ ...form, dueDate: date })
+                      }
+                      disabled={(date) =>
+                        date < new Date(new Date().setHours(0, 0, 0, 0))
+                      }
+                      initialFocus
+                    />
+                  </PopoverContent>
+                </Popover>
               </div>
               <div>
                 <Label>Description</Label>
@@ -296,7 +398,7 @@ export function TeacherAssignments() {
 
       {/* Overdue */}
       {assignments.filter(
-        (a) => isOverdue(a.dueDate) && a.submissions < a.totalStudents,
+        (a) => isOverdue(a.dueDate) && a.ungradedSubmissions > 0,
       ).length > 0 && (
         <Card className="border-red-200 dark:border-red-800 bg-red-50/50 dark:bg-red-900/20 rounded-xl">
           <CardHeader className="pb-2">
@@ -307,7 +409,7 @@ export function TeacherAssignments() {
           <CardContent className="space-y-2">
             {assignments
               .filter(
-                (a) => isOverdue(a.dueDate) && a.submissions < a.totalStudents,
+                (a) => isOverdue(a.dueDate) && a.ungradedSubmissions > 0,
               )
               .map((a) => (
                 <div
@@ -324,7 +426,7 @@ export function TeacherAssignments() {
                     variant="secondary"
                     className="bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400"
                   >
-                    {a.totalStudents - a.submissions} pending
+                    {a.ungradedSubmissions} pending
                   </Badge>
                 </div>
               ))}
@@ -391,7 +493,7 @@ export function TeacherAssignments() {
                   </div>
                 </div>
 
-                <div className="mt-4 pt-3 border-t border-gray-100 dark:border-gray-800">
+                <div className="mt-4 pt-3 border-t border-gray-100 dark:border-gray-800 flex flex-col gap-2">
                   <Button
                     variant="outline"
                     size="sm"
@@ -400,6 +502,20 @@ export function TeacherAssignments() {
                   >
                     <Eye className="h-3.5 w-3.5" />
                     View Submissions ({assignment.submissions})
+                  </Button>
+                  <Button
+                    variant="secondary"
+                    size="sm"
+                    className="w-full text-xs gap-1.5 bg-emerald-50 dark:bg-emerald-950/30 text-emerald-700 dark:text-emerald-400 hover:bg-emerald-100 dark:hover:bg-emerald-900/40 border border-emerald-200/50 dark:border-emerald-800/50"
+                    onClick={() => handleCompleteAssignment(assignment.id)}
+                    disabled={completingId === assignment.id}
+                  >
+                    {completingId === assignment.id ? (
+                      <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                    ) : (
+                      <Check className="h-3.5 w-3.5" />
+                    )}
+                    Mark Complete
                   </Button>
                 </div>
               </CardContent>
@@ -424,10 +540,11 @@ export function TeacherAssignments() {
             setSubDialogOpen(false);
             setSelectedAssignment(null);
             setSubmissions([]);
+            setEditedGrades({});
           }
         }}
       >
-        <DialogContent className="sm:max-w-2xl max-h-[85vh]">
+        <DialogContent className="sm:max-w-2xl max-h-[85vh] overflow-hidden">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <FileText className="h-4 w-4 text-blue-600" />
@@ -455,21 +572,48 @@ export function TeacherAssignments() {
               </p>
             </div>
           ) : (
-            <ScrollArea className="max-h-[55vh] pr-2">
-              <div className="space-y-3 py-2">
+            <div className="space-y-4">
+              {Object.values(editedGrades).some((x) => x.grade.trim() !== "") && (
+                <div className="flex items-center justify-between bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-800 p-3 rounded-lg shadow-sm mb-1 animate-in fade-in slide-in-from-top-2">
+                  <span className="text-xs text-amber-800 dark:text-amber-400 font-medium flex items-center gap-1.5">
+                    <Star className="h-3.5 w-3.5 fill-amber-500/30" />
+                    You have unsaved grades entered
+                  </span>
+                  <Button
+                    size="sm"
+                    className="bg-emerald-600 hover:bg-emerald-700 text-white h-8 font-semibold gap-1.5 shadow-sm"
+                    onClick={handleBulkSave}
+                    disabled={bulkSaving}
+                  >
+                    {bulkSaving ? (
+                      <>
+                        <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                        Saving All...
+                      </>
+                    ) : (
+                      <>
+                        Save All Grades ({Object.values(editedGrades).filter((x) => x.grade.trim() !== "").length})
+                      </>
+                    )}
+                  </Button>
+                </div>
+              )}
+              <div className="max-h-[60vh] overflow-y-auto pr-2 space-y-3 py-2 custom-scrollbar">
                 {submissions.map((sub) => (
                   <div
                     key={sub.id}
                     className={`p-4 rounded-lg border transition-all ${
                       sub.status === "graded"
                         ? "border-emerald-200 dark:border-emerald-800 bg-emerald-50/30 dark:bg-emerald-900/20"
+                        : sub.status === "not_submitted"
+                        ? "border-dashed border-gray-200 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-900/10 opacity-80"
                         : "border-gray-200 dark:border-gray-700 hover:border-blue-200 dark:hover:border-blue-800 hover:bg-blue-50/30 dark:hover:bg-blue-900/20"
                     }`}
                   >
                     <div className="flex items-start justify-between gap-3">
                       <div className="min-w-0">
                         <div className="flex items-center gap-2">
-                          <p className="text-sm font-semibold text-gray-900 dark:text-gray-100">
+                          <p className={`text-sm font-semibold ${sub.status === "not_submitted" ? "text-gray-500 dark:text-gray-400" : "text-gray-900 dark:text-gray-100"}`}>
                             {sub.studentName}
                           </p>
                           <Badge
@@ -477,24 +621,28 @@ export function TeacherAssignments() {
                             className={`text-[10px] ${
                               sub.status === "graded"
                                 ? "bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800"
+                                : sub.status === "not_submitted"
+                                ? "bg-amber-100 dark:bg-amber-900/20 text-amber-700 dark:text-amber-500 border-amber-200 dark:border-amber-900/30"
                                 : "bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 border-blue-200 dark:border-blue-800"
                             }`}
                           >
-                            {sub.status === "graded" ? "✓ Graded" : "Submitted"}
+                            {sub.status === "graded" ? "✓ Graded" : sub.status === "not_submitted" ? "Not Submitted" : "Submitted"}
                           </Badge>
                         </div>
                         <p className="text-[11px] text-gray-400 dark:text-gray-500">
                           {sub.studentEmail} • {sub.studentClass}
                         </p>
                       </div>
-                      <span className="text-[10px] text-gray-400 dark:text-gray-500 shrink-0">
-                        {new Date(sub.submittedAt).toLocaleDateString("en-US", {
-                          month: "short",
-                          day: "numeric",
-                          hour: "numeric",
-                          minute: "2-digit",
-                        })}
-                      </span>
+                      {sub.status !== "not_submitted" && (
+                        <span className="text-[10px] text-gray-400 dark:text-gray-500 shrink-0">
+                          {new Date(sub.submittedAt).toLocaleDateString("en-US", {
+                            month: "short",
+                            day: "numeric",
+                            hour: "numeric",
+                            minute: "2-digit",
+                          })}
+                        </span>
+                      )}
                     </div>
 
                     {sub.content && (
@@ -518,7 +666,7 @@ export function TeacherAssignments() {
                       </div>
                     )}
 
-                    {sub.status !== "graded" && (
+                    {sub.status === "submitted" && (
                       <div className="mt-3 pt-3 border-t border-gray-100 dark:border-gray-800">
                         <div className="flex items-end gap-2">
                           <div className="flex-1">
@@ -527,14 +675,14 @@ export function TeacherAssignments() {
                             </Label>
                             <Input
                               placeholder="e.g. A, B+, 95/100"
-                              value={
-                                gradingId === sub.id ? gradeForm.grade : ""
-                              }
+                              value={editedGrades[sub.id]?.grade || ""}
                               onChange={(e) => {
-                                setGradingId(sub.id);
-                                setGradeForm((prev) => ({
+                                setEditedGrades((prev) => ({
                                   ...prev,
-                                  grade: e.target.value,
+                                  [sub.id]: {
+                                    grade: e.target.value,
+                                    feedback: prev[sub.id]?.feedback || "",
+                                  },
                                 }));
                               }}
                               className="h-8 text-xs"
@@ -546,14 +694,14 @@ export function TeacherAssignments() {
                             </Label>
                             <Input
                               placeholder="Optional feedback"
-                              value={
-                                gradingId === sub.id ? gradeForm.feedback : ""
-                              }
+                              value={editedGrades[sub.id]?.feedback || ""}
                               onChange={(e) => {
-                                setGradingId(sub.id);
-                                setGradeForm((prev) => ({
+                                setEditedGrades((prev) => ({
                                   ...prev,
-                                  feedback: e.target.value,
+                                  [sub.id]: {
+                                    grade: prev[sub.id]?.grade || "",
+                                    feedback: e.target.value,
+                                  },
                                 }));
                               }}
                               className="h-8 text-xs"
@@ -564,7 +712,7 @@ export function TeacherAssignments() {
                             className="bg-emerald-600 hover:bg-emerald-700 text-white text-xs h-8 px-3 shrink-0"
                             onClick={() => handleGrade(sub.id)}
                             disabled={
-                              gradingId === sub.id && !gradeForm.grade.trim()
+                              gradingId === sub.id || !editedGrades[sub.id]?.grade.trim()
                             }
                           >
                             {gradingId === sub.id ? (
@@ -580,7 +728,7 @@ export function TeacherAssignments() {
                   </div>
                 ))}
               </div>
-            </ScrollArea>
+            </div>
           )}
         </DialogContent>
       </Dialog>
