@@ -5,6 +5,7 @@ import { Providers } from "@/components/providers";
 import { ThemeProvider } from "next-themes";
 import { MonitoringProvider } from "@/components/monitoring-provider";
 import { GlobalErrorBoundary } from "@/components/error-boundary";
+import JsonLd from "@/components/json-ld";
 import '@/bones/registry';
 
 const geistSans = Geist({
@@ -17,13 +18,9 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-export const metadata: Metadata = {
-  title: "SchoolSaaS - Multi-Tenant School Management Platform",
-  description: "Modern school management system with multi-tenant support, role-based dashboards, and comprehensive academic management.",
-  icons: {
-    icon: "https://z-cdn.chatglm.cn/z-ai/static/logo.svg",
-  },
-};
+import { generateAdvancedMetadata } from "@/lib/seo/metadata";
+
+export const metadata = generateAdvancedMetadata();
 
 
 import Script from "next/script";
@@ -36,6 +33,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
+        <JsonLd />
         <Script
           id="razorpay-checkout"
           src="https://checkout.razorpay.com/v1/checkout.js"
