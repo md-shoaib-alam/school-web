@@ -119,7 +119,7 @@ export const useAppStore = create<AppState>((set, get) => ({
     const state = get();
     if (!state.isLoggedIn || !state.currentUser) return;
     try {
-      const apiBase = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api';
+      const apiBase = process.env.NEXT_PUBLIC_API_URL || '';
       const token = typeof window !== 'undefined' ? localStorage.getItem('school_token') : null;
       const res = await fetch(`${apiBase}/auth/me?userId=${encodeURIComponent(state.currentUser.id)}`, {
         headers: token ? { Authorization: `Bearer ${token}` } : {},

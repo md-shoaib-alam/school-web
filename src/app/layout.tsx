@@ -3,7 +3,8 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { Providers } from "@/components/providers";
 import { ThemeProvider } from "next-themes";
-import { PHProvider } from "@/components/posthog-provider";
+import { MonitoringProvider } from "@/components/monitoring-provider";
+import { GlobalErrorBoundary } from "@/components/error-boundary";
 import '@/bones/registry';
 
 const geistSans = Geist({
@@ -52,9 +53,11 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           <Providers>
-            <PHProvider>
-              {children}
-            </PHProvider>
+            <MonitoringProvider>
+              <GlobalErrorBoundary>
+                {children}
+              </GlobalErrorBoundary>
+            </MonitoringProvider>
           </Providers>
         </ThemeProvider>
       </body>

@@ -1,28 +1,6 @@
 import { QueryClient, MutationCache } from "@tanstack/react-query";
 
 /**
- * Singleton QueryClient for the entire app
- */
-export const queryClient = new QueryClient({
-  mutationCache: new MutationCache({
-    onSuccess: (_data, _variables, _context, mutation) => {
-      // Get the path from mutationKey if available, otherwise mutation options
-      const path = (mutation.options as any).mutationKey?.[0] || 
-                   (mutation.options as any).mutationFn?.toString() || "";
-      triggerGlobalRefresh(path);
-    },
-  }),
-  defaultOptions: {
-    queries: {
-      staleTime: 0, // Set to 0 so we always get fresh data after changes
-      gcTime: 30 * 60 * 1000,
-      retry: 2,
-      refetchOnWindowFocus: false,
-    },
-  },
-});
-
-/**
  * Intelligent refresh trigger that only invalidates relevant data
  */
 export async function triggerGlobalRefresh(pathOrTag: string) {
@@ -84,3 +62,24 @@ export async function triggerGlobalRefresh(pathOrTag: string) {
   // 2. Refresh again after 500ms to catch any server-side cache lag
   setTimeout(refresh, 500);
 }
+
+/**
+ * Singleton QueryClient for the entire app
+ */
+export const queryClient = new QueryClient({
+  mutationCache: new MutationCache({
+    onSuccess: (_data, _variables, _context, mutation) => {
+      const path = (mutation.options as any).mutationKey?.[0] || 
+                   (mutation.options as any).mutationFn?.toString() || "";
+      triggerGlobalRefresh(path);
+    },
+  }),
+  defaultOptions: {
+    queries: {
+      staleTime: 0,
+      gcTime: 30 * 60 * 1000,
+      retry: 2,
+      refetchOnWindowFocus: false,
+    },
+  },
+});
