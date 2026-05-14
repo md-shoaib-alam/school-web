@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
 import { useAppStore } from '@/store/use-app-store';
 import dynamic from 'next/dynamic';
+import { ParentHomework } from '@/components/screens';
 
 const LoadingScreen = () => (
   <div className="flex h-full items-center justify-center p-8">
@@ -201,7 +202,10 @@ export default function TenantScreenDispatcher() {
     switch (screen) {
       case 'dashboard': return <ParentDashboard />;
       case 'children': return <ParentChildren />;
+      case 'homework': return <ParentHomework />;
       case 'grades': return <ParentGrades />;
+      case 'school-exams': return <ParentGrades initialTab="exams" key="school-exams" />;
+      case 'assessments': return <ParentGrades initialTab="assessments" key="assessments" />;
       case 'attendance': return <ParentAttendance />;
       case 'fees': return <ParentFees />;
       case 'notices': return <ParentNotices />;

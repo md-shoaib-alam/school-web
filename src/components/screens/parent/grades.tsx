@@ -1,12 +1,16 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import { apiFetch } from "@/lib/api";
 import { useAppStore } from "@/store/use-app-store";
 import { useParentDashboard } from "@/lib/graphql/hooks";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { BarChart3, TrendingUp } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { Progress } from "@/components/ui/progress";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "@/components/ui/table";
+import { BarChart3, TrendingUp, BookOpen, Award, CheckCircle2, ClipboardList, GraduationCap } from "lucide-react";
 import type { StudentInfo, GradeRecord } from "@/lib/types";
 
 // Sub-components
@@ -18,10 +22,28 @@ import { GradesSkeleton } from "./grades/GradesSkeleton";
 // Utils
 import { getGradesForStudent, getSubjectChartData, getOverallStats } from "./grades/utils";
 
-export function ParentGrades() {
+interface AssessmentGrade {
+  id: string;
+  assessmentId: string;
+  title: string;
+  type: string;
+  subjectName: string;
+  marksObtained: number;
+  totalMarks: number;
+  passingMarks: number;
+  remarks: string | null;
+  createdAt: string;
+}
+
+export function ParentGrades({ initialTab = "exams" }: { initialTab?: "exams" | "assessments" }) {
   const { currentUser } = useAppStore();
+  const [topLevelTab] = useState<"exams" | "assessments">(initialTab);
   const [grades, setGrades] = useState<GradeRecord[]>([]);
   const [activeTab, setActiveTab] = useState("");
+  
+  // State for Assessment view
+  const [assessmentGrades, setAssessmentGrades] = useState<AssessmentGrade[]>([]);
+  const [loadingAssessments, setLoadingAssessments] = useState(false);
 
   const { data, isPending } = useParentDashboard(currentUser?.name || "");
   const students = (data?.children || []) as StudentInfo[];
@@ -46,9 +68,10 @@ export function ParentGrades() {
     document.cookie = `lastSelectedStudent=${val}; path=/; max-age=31536000`;
   };
 
+  // Fetch Exam Grades (Loads everything for all students at once)
   useEffect(() => {
     async function fetchGrades() {
-      if (students.length === 0) return;
+      if (students.length === 0 || topLevelTab !== "exams") return;
       try {
         const res = await apiFetch("/api/grades");
         const raw = await res.json();
@@ -58,40 +81,118 @@ export function ParentGrades() {
       }
     }
     fetchGrades();
-  }, [students.length]);
+  }, [students.length, topLevelTab]);
+
+  // Fetch Assessments for the active student
+  const fetchAssessmentsForStudent = useCallback(async (studentId: string) => {
+    if (!studentId || topLevelTab !== "assessments") return;
+    setLoadingAssessments(true);
+    try {
+      const res = await apiFetch(`/api/assessments/student-grades?studentId=${studentId}`);
+      if (res.ok) {
+        const raw = await res.json();
+        setAssessmentGrades(Array.isArray(raw) ? raw : []);
+      } else {
+        setAssessmentGrades([]);
+      }
+    } catch (e) {
+      console.error("Failed to fetch assessment grades", e);
+      setAssessmentGrades([]);
+    } finally {
+      setLoadingAssessments(false);
+    }
+  }, [topLevelTab]);
+
+  useEffect(() => {
+    if (activeTab && topLevelTab === "assessments") {
+      fetchAssessmentsForStudent(activeTab);
+    }
+  }, [activeTab, topLevelTab, fetchAssessmentsForStudent]);
+
+  // Process continuous assessment data
+  const assessmentStats = useMemo(() => {
+    if (assessmentGrades.length === 0) return { avg: 0, total: 0, passCount: 0 };
+    
+    const totalPct = assessmentGrades.reduce((sum, item) => sum + (item.marksObtained / item.totalMarks) * 100, 0);
+    const passCount = assessmentGrades.filter((a) => a.marksObtained >= a.passingMarks).length;
+
+    return {
+      avg: Math.round(totalPct / assessmentGrades.length),
+      total: assessmentGrades.length,
+      passCount,
+    };
+  }, [assessmentGrades]);
+
+  const assessmentChartData = useMemo(() => {
+    const subjectMap = new Map<string, { totalPct: number; count: number }>();
+    assessmentGrades.forEach((g) => {
+      const pct = (g.marksObtained / g.totalMarks) * 100;
+      if (!subjectMap.has(g.subjectName)) {
+        subjectMap.set(g.subjectName, { totalPct: 0, count: 0 });
+      }
+      const entry = subjectMap.get(g.subjectName)!;
+      entry.totalPct += pct;
+      entry.count++;
+    });
+    
+    return Array.from(subjectMap.entries()).map(([subject, data]) => ({
+      subject,
+      percentage: Math.round(data.totalPct / data.count),
+    }));
+  }, [assessmentGrades]);
 
   if (isPending) return <GradesSkeleton />;
 
   if (students.length === 0) {
     return (
-      <Card className="rounded-xl shadow-sm">
-        <CardContent className="p-12 text-center">
-          <TrendingUp className="h-12 w-12 mx-auto text-muted-foreground/40" />
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mt-4">No data available</h3>
+      <Card className="rounded-xl shadow-sm border-gray-100 dark:border-zinc-800">
+        <CardContent className="p-12 text-center flex flex-col items-center">
+          <TrendingUp className="h-12 w-12 text-muted-foreground/30" />
+          <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mt-4">No children linked</h3>
+          <p className="text-sm text-muted-foreground mt-1">Contact account services to enroll or link students.</p>
         </CardContent>
       </Card>
     );
   }
 
+  const activeStudentName = students.find(s => s.id === activeTab)?.name || "Student";
+
   return (
     <div className="space-y-6 pb-10">
-      <div className="flex items-center gap-2">
-        <BarChart3 className="h-5 w-5 text-amber-600" />
-        <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100 uppercase tracking-tight">
-          Children&apos;s Grades
-        </h2>
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
+        <div className="flex items-center gap-2">
+          {topLevelTab === "exams" ? (
+            <GraduationCap className="h-5 w-5 text-amber-600" />
+          ) : (
+            <ClipboardList className="h-5 w-5 text-indigo-600" />
+          )}
+          <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100 uppercase tracking-tight">
+            {topLevelTab === "exams" ? "School Exams" : "Class Assessments"}
+          </h2>
+        </div>
+        <Badge variant="outline" className="bg-muted/20 text-muted-foreground shadow-none border-gray-200 dark:border-zinc-800 text-[10px] font-semibold font-sans tracking-wide px-2 py-0.5 uppercase">
+          Parent Portal
+        </Badge>
       </div>
 
       <Tabs value={activeTab} onValueChange={handleTabChange}>
-        <TabsList className="bg-amber-50 dark:bg-amber-900/30 p-1">
+        <TabsList className={`p-1 rounded-lg border shadow-none w-fit ${
+          topLevelTab === "exams" 
+            ? "bg-amber-50/40 border-amber-100/50 dark:bg-amber-950/10 dark:border-amber-900/30" 
+            : "bg-indigo-50/40 border-indigo-100/50 dark:bg-indigo-950/10 dark:border-indigo-900/30"
+        }`}>
           {students.map((student) => (
             <TabsTrigger
               key={student.id}
               value={student.id}
-              className="data-[state=active]:bg-white dark:data-[state=active]:bg-gray-900 data-[state=active]:text-amber-700 dark:data-[state=active]:text-amber-400 data-[state=active]:shadow-sm px-4"
+              className={`px-4 py-1.5 text-xs font-medium rounded-md transition-all data-[state=active]:bg-card data-[state=active]:shadow-xs ${
+                topLevelTab === "exams" 
+                  ? "data-[state=active]:text-amber-700 dark:data-[state=active]:text-amber-400" 
+                  : "data-[state=active]:text-indigo-700 dark:data-[state=active]:text-indigo-400"
+              }`}
             >
               <span className="flex items-center gap-2">
-                <span className="w-2 h-2 rounded-full bg-amber-400" />
+                <span className={`w-2 h-2 rounded-full ${topLevelTab === "exams" ? "bg-amber-500" : "bg-indigo-500"}`} />
                 {student.name}
               </span>
             </TabsTrigger>
@@ -99,6 +200,7 @@ export function ParentGrades() {
         </TabsList>
 
         {students.map((student) => {
+          // Data processing inside the maps
           const studentGrades = getGradesForStudent(student.id, grades);
           const chartData = getSubjectChartData(student.id, grades);
           const stats = getOverallStats(student.id, grades);
@@ -107,24 +209,161 @@ export function ParentGrades() {
             <TabsContent
               key={student.id}
               value={student.id}
-              className="space-y-6 mt-6 animate-in fade-in duration-300"
+              className="space-y-6 mt-6 animate-in fade-in duration-300 text-left"
             >
-              <GradesSummary 
-                avg={stats.avg}
-                grade={stats.grade}
-                highestSubject={stats.highest.subject}
-                highestPct={stats.highest.pct}
-                totalExams={stats.totalExams}
-              />
+              {topLevelTab === "exams" ? (
+                // RENDER OFFICIAL EXAMS VIEW
+                <>
+                  <GradesSummary 
+                    avg={stats.avg}
+                    grade={stats.grade}
+                    highestSubject={stats.highest.subject}
+                    highestPct={stats.highest.pct}
+                    totalExams={stats.totalExams}
+                  />
 
-              <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
-                <div className="lg:col-span-2">
-                  <PerformanceChart data={chartData} />
-                </div>
-                <div className="lg:col-span-3">
-                  <GradesTable studentName={student.name} grades={studentGrades} />
-                </div>
-              </div>
+                  <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
+                    <div className="lg:col-span-2">
+                      <PerformanceChart data={chartData} />
+                    </div>
+                    <div className="lg:col-span-3">
+                      <GradesTable studentName={student.name} grades={studentGrades} />
+                    </div>
+                  </div>
+                </>
+              ) : (
+                // RENDER CONTINUOUS ASSESSMENTS VIEW
+                <>
+                  {loadingAssessments ? (
+                    <div className="space-y-6 py-4">
+                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                        {[...Array(3)].map((_, i) => <div key={i} className="h-28 bg-muted/40 animate-pulse rounded-xl" />)}
+                      </div>
+                      <div className="h-80 bg-muted/30 animate-pulse rounded-xl" />
+                    </div>
+                  ) : (
+                    <>
+                      {/* Assessment Cards */}
+                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                        <Card className="rounded-xl shadow-none border-gray-200/60 dark:border-zinc-800">
+                          <CardContent className="p-5 flex flex-col items-center justify-between text-center">
+                            <div className="inline-flex p-2.5 rounded-lg bg-indigo-50 dark:bg-indigo-950/40 text-indigo-600 dark:text-indigo-400 mb-2">
+                              <TrendingUp className="h-5 w-5" />
+                            </div>
+                            <div>
+                              <p className="text-3xl font-extrabold tracking-tight text-gray-900 dark:text-gray-100">{assessmentStats.avg}%</p>
+                              <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground mt-1">Avg Assessment Score</p>
+                            </div>
+                            <Progress value={assessmentStats.avg} className="mt-3 h-1 bg-muted [&>div]:bg-indigo-600 w-full" />
+                          </CardContent>
+                        </Card>
+
+                        <Card className="rounded-xl shadow-none border-gray-200/60 dark:border-zinc-800">
+                          <CardContent className="p-5 flex flex-col items-center justify-between text-center">
+                            <div className="inline-flex p-2.5 rounded-lg bg-indigo-50 dark:bg-indigo-950/40 text-indigo-600 dark:text-indigo-400 mb-2">
+                              <Award className="h-5 w-5" />
+                            </div>
+                            <div>
+                              <p className="text-3xl font-extrabold tracking-tight text-gray-900 dark:text-gray-100">{assessmentStats.total}</p>
+                              <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground mt-1">Total Assessments</p>
+                            </div>
+                            <p className="text-xs text-muted-foreground mt-3 font-medium">
+                              Across {[...new Set(assessmentGrades.map(g => g.subjectName))].length} graded subjects
+                            </p>
+                          </CardContent>
+                        </Card>
+
+                        <Card className="rounded-xl shadow-none border-gray-200/60 dark:border-zinc-800">
+                          <CardContent className="p-5 flex flex-col items-center justify-between text-center">
+                            <div className="inline-flex p-2.5 rounded-lg bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400 mb-2">
+                              <CheckCircle2 className="h-5 w-5" />
+                            </div>
+                            <div>
+                              <p className="text-3xl font-extrabold tracking-tight text-gray-900 dark:text-gray-100">{assessmentStats.passCount}</p>
+                              <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground mt-1">Passed Items</p>
+                            </div>
+                            <p className="text-xs text-emerald-600 dark:text-emerald-400 font-bold mt-3 flex items-center gap-1">
+                              ✨ Keeping up nicely!
+                            </p>
+                          </CardContent>
+                        </Card>
+                      </div>
+
+                      <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
+                        {/* Re-use exams performance chart with mapped assessment data */}
+                        <div className="lg:col-span-2">
+                          <PerformanceChart data={assessmentChartData} />
+                        </div>
+
+                        {/* List Assessments */}
+                        <div className="lg:col-span-3">
+                          <Card className="rounded-xl shadow-none border-gray-200/60 dark:border-zinc-800 h-full">
+                            <CardHeader className="p-4 border-b border-gray-100/60 dark:border-zinc-800/50">
+                              <CardTitle className="text-sm font-bold text-gray-900 dark:text-gray-100 flex items-center gap-2">
+                                <ClipboardList className="h-4 w-4 text-indigo-500" />
+                                {activeStudentName}&apos;s Assessments
+                              </CardTitle>
+                            </CardHeader>
+                            <CardContent className="p-0">
+                              <ScrollArea className="h-[300px]">
+                                {assessmentGrades.length === 0 ? (
+                                  <div className="p-12 text-center text-muted-foreground flex flex-col items-center">
+                                    <BookOpen className="h-8 w-8 opacity-30 mb-2" />
+                                    <p className="text-xs font-semibold">No assessments recorded yet</p>
+                                  </div>
+                                ) : (
+                                  <Table>
+                                    <TableHeader className="bg-muted/20 sticky top-0">
+                                      <TableRow className="border-zinc-100 dark:border-zinc-800/70">
+                                        <TableHead className="text-xs font-semibold h-9">Subject/Title</TableHead>
+                                        <TableHead className="text-xs font-semibold h-9">Type</TableHead>
+                                        <TableHead className="text-center text-xs font-semibold h-9">Score</TableHead>
+                                        <TableHead className="text-center text-xs font-semibold h-9">Status</TableHead>
+                                      </TableRow>
+                                    </TableHeader>
+                                    <TableBody>
+                                      {assessmentGrades.map((g) => {
+                                        const pct = Math.round((g.marksObtained / g.totalMarks) * 100);
+                                        const isPass = g.marksObtained >= g.passingMarks;
+                                        return (
+                                          <TableRow key={g.id} className="border-zinc-100 dark:border-zinc-800/60">
+                                            <TableCell className="py-2.5 text-left">
+                                              <div className="flex flex-col text-left">
+                                                <span className="text-xs font-semibold text-gray-900 dark:text-gray-100">{g.title}</span>
+                                                <span className="text-[10px] text-muted-foreground">{g.subjectName}</span>
+                                              </div>
+                                            </TableCell>
+                                            <TableCell className="py-2.5">
+                                              <Badge variant="outline" className="text-[9px] bg-muted/30 px-1.5 font-bold uppercase tracking-wide border-none">
+                                                {g.type.replace(/_/g, " ")}
+                                              </Badge>
+                                            </TableCell>
+                                            <TableCell className="py-2.5 text-center">
+                                              <span className="text-xs font-bold">{g.marksObtained}</span>
+                                              <span className="text-[10px] text-muted-foreground">/{g.totalMarks}</span>
+                                            </TableCell>
+                                            <TableCell className="py-2.5 text-center">
+                                              <Badge className={`text-[9px] border-none font-bold shadow-none px-1.5 py-0.5 ${
+                                                isPass ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400" : "bg-rose-100 text-rose-700 dark:bg-rose-950/40 dark:text-rose-400"
+                                              }`}>
+                                                {isPass ? "PASS" : "FAIL"}
+                                              </Badge>
+                                            </TableCell>
+                                          </TableRow>
+                                        );
+                                      })}
+                                    </TableBody>
+                                  </Table>
+                                )}
+                              </ScrollArea>
+                            </CardContent>
+                          </Card>
+                        </div>
+                      </div>
+                    </>
+                  )}
+                </>
+              )}
             </TabsContent>
           );
         })}
