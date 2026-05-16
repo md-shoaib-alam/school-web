@@ -137,13 +137,13 @@ export function CheckReceiptTab({ canEdit, canDelete }: CheckReceiptTabProps) {
                 <Table>
                   <TableHeader>
                     <TableRow className="bg-muted/50">
-                      <TableHead className="w-[120px]">Receipt #</TableHead>
-                      <TableHead>Student</TableHead>
-                      <TableHead className="hidden sm:table-cell">Amount</TableHead>
-                      <TableHead className="hidden md:table-cell">Method</TableHead>
-                      <TableHead className="hidden md:table-cell">Date</TableHead>
-                      <TableHead>Status</TableHead>
-                      <TableHead className="w-24 text-center">Actions</TableHead>
+                      <TableHead className="w-[120px] pl-6 h-12">Receipt #</TableHead>
+                      <TableHead className="h-12">Student</TableHead>
+                      <TableHead className="hidden sm:table-cell h-12">Amount</TableHead>
+                      <TableHead className="hidden md:table-cell h-12">Method</TableHead>
+                      <TableHead className="hidden md:table-cell h-12">Date</TableHead>
+                      <TableHead className="h-12">Status</TableHead>
+                      <TableHead className="w-24 text-center h-12">Actions</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -157,18 +157,18 @@ export function CheckReceiptTab({ canEdit, canDelete }: CheckReceiptTabProps) {
                       const statusCfg = receiptStatusConfig[r.status] || receiptStatusConfig.completed;
                       return (
                         <TableRow key={r.id} className="hover:bg-emerald-50/50 dark:hover:bg-emerald-900/10 transition-colors">
-                          <TableCell><span className="font-mono text-xs font-semibold text-emerald-700 dark:text-emerald-400">{r.receiptNumber}</span></TableCell>
-                          <TableCell className="font-medium text-sm">{r.studentName}</TableCell>
-                          <TableCell className="hidden sm:table-cell font-semibold">₹{r.paidAmount.toLocaleString()}</TableCell>
-                          <TableCell className="hidden md:table-cell">
+                          <TableCell className="pl-6 py-4"><span className="font-mono text-xs font-semibold text-emerald-700 dark:text-emerald-400">{r.receiptNumber}</span></TableCell>
+                          <TableCell className="font-medium text-sm py-4">{r.studentName}</TableCell>
+                          <TableCell className="hidden sm:table-cell font-semibold py-4">₹{r.paidAmount.toLocaleString()}</TableCell>
+                          <TableCell className="hidden md:table-cell py-4">
                             <div className="flex items-center gap-1.5 text-muted-foreground">
                               {paymentMethodIcons[r.paymentMethod] || <Banknote className="h-4 w-4" />}
                               <span className="text-xs capitalize">{r.paymentMethod}</span>
                             </div>
                           </TableCell>
-                          <TableCell className="hidden md:table-cell text-xs text-muted-foreground">{r.paidDate}</TableCell>
-                          <TableCell><Badge variant="outline" className={`${statusCfg.bg} border-0 capitalize text-[10px] px-2 h-5`}>{r.status}</Badge></TableCell>
-                          <TableCell className="text-center">
+                          <TableCell className="hidden md:table-cell text-xs text-muted-foreground py-4">{r.paidDate}</TableCell>
+                          <TableCell className="py-4"><Badge variant="outline" className={`${statusCfg.bg} border-0 capitalize text-[10px] px-2 h-5`}>{r.status}</Badge></TableCell>
+                          <TableCell className="text-center py-4">
                             <div className="flex items-center justify-center gap-1">
                               <Button variant="ghost" size="icon" className="h-7 w-7 text-emerald-500 hover:text-emerald-600 hover:bg-emerald-50" onClick={() => setViewReceipt(r)}><Eye className="h-3.5 w-3.5" /></Button>
                               {canDelete && (

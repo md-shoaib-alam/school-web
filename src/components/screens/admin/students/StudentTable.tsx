@@ -45,8 +45,8 @@ export function StudentTable({
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead className="w-16">Roll No</TableHead>
-            <TableHead>Name</TableHead>
+            <TableHead className="w-16 h-12">Roll No</TableHead>
+            <TableHead className="h-12 ">Name</TableHead>
             <TableHead className="hidden md:table-cell">Class</TableHead>
             <TableHead className="hidden sm:table-cell">Gender</TableHead>
             <TableHead className="hidden lg:table-cell">Parent</TableHead>
@@ -73,10 +73,10 @@ export function StudentTable({
                 key={student.id}
                 className="hover:bg-emerald-50/50 dark:hover:bg-emerald-900/20 transition-colors border-b last:border-none group/row"
               >
-                <TableCell className="font-mono text-sm">
+                <TableCell className="font-mono text-sm py-4">
                   {student.rollNumber}
                 </TableCell>
-                <TableCell>
+                <TableCell className="py-4">
                   <div className="flex items-center gap-3">
                     <div className="h-8 w-8 rounded-full bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 flex items-center justify-center text-xs font-semibold shrink-0">
                       {student.name
@@ -96,22 +96,22 @@ export function StudentTable({
                     </div>
                   </div>
                 </TableCell>
-                <TableCell className="hidden md:table-cell">
+                <TableCell className="hidden md:table-cell py-4">
                   <Badge variant="secondary" className="font-normal">
                     {student.className}
                   </Badge>
                 </TableCell>
-                <TableCell className="hidden sm:table-cell capitalize">
+                <TableCell className="hidden sm:table-cell capitalize py-4">
                   {student.gender}
                 </TableCell>
-                <TableCell className="hidden lg:table-cell text-sm">
+                <TableCell className="hidden lg:table-cell text-sm py-4">
                   {student.parentName || "—"}
                 </TableCell>
-                <TableCell className="hidden lg:table-cell text-sm">
+                <TableCell className="hidden lg:table-cell text-sm py-4">
                   {student.phone || "—"}
                 </TableCell>
                 {(canEdit || canDelete) && (
-                  <TableCell className="text-right">
+                  <TableCell className="text-right py-4">
                     <div className="flex items-center justify-end gap-1">
                       {canEdit && (
                         <Button

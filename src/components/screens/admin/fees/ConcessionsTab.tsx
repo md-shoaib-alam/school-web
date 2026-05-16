@@ -190,13 +190,13 @@ export function ConcessionsTab({ canCreate, canEdit, canDelete }: ConcessionsTab
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Student</TableHead>
-                    <TableHead className="hidden sm:table-cell">Type</TableHead>
-                    <TableHead>Amount</TableHead>
-                    <TableHead className="hidden md:table-cell">Reason</TableHead>
-                    <TableHead className="hidden lg:table-cell">Valid Until</TableHead>
-                    <TableHead>Status</TableHead>
-                    {(canEdit || canDelete) && <TableHead className="w-28 text-center">Actions</TableHead>}
+                    <TableHead className="pl-6 h-12">Student</TableHead>
+                    <TableHead className="hidden sm:table-cell h-12">Type</TableHead>
+                    <TableHead className="h-12">Amount</TableHead>
+                    <TableHead className="hidden md:table-cell h-12">Reason</TableHead>
+                    <TableHead className="hidden lg:table-cell h-12">Valid Until</TableHead>
+                    <TableHead className="h-12">Status</TableHead>
+                    {(canEdit || canDelete) && <TableHead className="w-28 text-center h-12">Actions</TableHead>}
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -210,23 +210,23 @@ export function ConcessionsTab({ canCreate, canEdit, canDelete }: ConcessionsTab
                     const statusCfg = concessionStatusConfig[c.status] || concessionStatusConfig.active;
                     return (
                       <TableRow key={c.id} className="hover:bg-emerald-50/50 dark:hover:bg-emerald-900/20 transition-colors">
-                        <TableCell>
+                        <TableCell className="pl-6 py-4">
                           <div>
                             <span className="font-medium text-sm">{c.studentName}</span>
                             <span className="text-xs text-muted-foreground ml-1">({c.studentClass})</span>
                           </div>
                         </TableCell>
-                        <TableCell className="hidden sm:table-cell">
+                        <TableCell className="hidden sm:table-cell py-4">
                           <Badge variant="outline" className="capitalize">{c.concessionType.replace('_', ' ')}</Badge>
                         </TableCell>
-                        <TableCell className="font-semibold">{c.concessionType === 'percentage' ? `${c.amount}%` : c.concessionType === 'full_waiver' ? 'Full' : `₹${c.amount.toLocaleString()}`}</TableCell>
-                        <TableCell className="hidden md:table-cell text-sm text-muted-foreground truncate max-w-32">{c.reason || '—'}</TableCell>
-                        <TableCell className="hidden lg:table-cell text-sm text-muted-foreground">{c.validUntil || '—'}</TableCell>
-                        <TableCell>
+                        <TableCell className="font-semibold py-4">{c.concessionType === 'percentage' ? `${c.amount}%` : c.concessionType === 'full_waiver' ? 'Full' : `₹${c.amount.toLocaleString()}`}</TableCell>
+                        <TableCell className="hidden md:table-cell text-sm text-muted-foreground truncate max-w-32 py-4">{c.reason || '—'}</TableCell>
+                        <TableCell className="hidden lg:table-cell text-sm text-muted-foreground py-4">{c.validUntil || '—'}</TableCell>
+                        <TableCell className="py-4">
                           <Badge variant="outline" className={`${statusCfg.bg} border-0 capitalize`}>{c.status}</Badge>
                         </TableCell>
                         {(canEdit || canDelete) && (
-                          <TableCell className="text-center">
+                          <TableCell className="text-center py-4">
                             <div className="flex items-center justify-center gap-1">
                               {canEdit && c.status !== 'active' && (
                                 <Button variant="ghost" size="icon" className="h-7 w-7 text-emerald-500 hover:text-emerald-700 hover:bg-emerald-50 dark:hover:bg-emerald-900/30" onClick={() => handleAction(c.id, 'active')} title="Approve"><ThumbsUp className="h-3.5 w-3.5" /></Button>
