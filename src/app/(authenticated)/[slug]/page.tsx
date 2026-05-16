@@ -182,8 +182,12 @@ export default function GenericSlugDispatcher() {
   }, [mounted, resolvedTenant, currentTenantSlug, setCurrentTenant]);
 
   // 2. Check if it's a Tenant Dashboard (matches slug or tenantId, or user is super_admin)
-  const isTenantMatch =
-    currentUser?.tenantId === slug || currentUser?.tenantSlug === slug;
+  const urlSlug = typeof slug === 'string' ? slug.toLowerCase() : '';
+  const userTenantId = currentUser?.tenantId?.toLowerCase() || '';
+  const userTenantSlug = currentUser?.tenantSlug?.toLowerCase() || '';
+  
+  const isTenantMatch = (urlSlug === userTenantId || urlSlug === userTenantSlug);
+  
   const isTenantContext =
     isTenantMatch || (currentUser?.role === "super_admin" && !!resolvedTenant);
 

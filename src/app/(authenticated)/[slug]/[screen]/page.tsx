@@ -81,30 +81,32 @@ export default function TenantScreenDispatcher() {
   const { slug, screen } = useParams();
   const { currentUser } = useAppStore();
   const [mounted, setMounted] = useState(false);
+  const urlSlug = typeof slug === 'string' ? slug.toLowerCase() : '';
+  const userTenantId = currentUser?.tenantId?.toLowerCase() || '';
+  const userTenantSlug = currentUser?.tenantSlug?.toLowerCase() || '';
+  const isTenantMatch = (urlSlug === userTenantId || urlSlug === userTenantSlug);
 
   useEffect(() => {
     setMounted(true);
   }, []);
 
+  // Debug log on every change if mounted
+  useEffect(() => {
+    if (mounted && currentUser && !isTenantMatch && currentUser.role !== 'super_admin') {
+      console.warn('[TenantScreenDispatcher] Slug Mismatch Detected:', { 
+        urlSlug, 
+        userTenantId, 
+        userTenantSlug,
+        role: currentUser.role 
+      });
+    }
+  }, [mounted, isTenantMatch, urlSlug, userTenantId, userTenantSlug, currentUser?.role]);
+
   if (!mounted || !currentUser) {
     return <LoadingScreen />;
   }
 
-  // Normalize for comparison
-  const urlSlug = typeof slug === 'string' ? slug.toLowerCase() : '';
-  const userTenantId = currentUser.tenantId?.toLowerCase() || '';
-  const userTenantSlug = currentUser.tenantSlug?.toLowerCase() || '';
-
-  // Verify that the slug matches the user's tenant (security check)
-  const isTenantMatch = (urlSlug === userTenantId || urlSlug === userTenantSlug);
-
   if (currentUser.role !== 'super_admin' && !isTenantMatch) {
-    console.warn('[TenantScreenDispatcher] 404 Triggered - Slug Mismatch:', { 
-      urlSlug, 
-      userTenantId, 
-      userTenantSlug,
-      role: currentUser.role 
-    });
     return <NotFoundScreen />;
   }
   

@@ -62,6 +62,28 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
     refreshPermissions();
   }, [refreshPermissions]);
 
+  // Determine current screen from pathname
+  const parts = pathname.split("/").filter(Boolean);
+  let resolvedScreen = "dashboard";
+  if (parts.length >= 2) {
+    resolvedScreen = parts[1];
+  } else if (parts.length === 1) {
+    const p = parts[0];
+    const isTenantRoot =
+      p === currentUser?.tenantId ||
+      p === currentTenantSlug ||
+      p === currentUser?.tenantSlug;
+    resolvedScreen = isTenantRoot ? "dashboard" : p;
+  }
+
+  // Sync store screen with URL resolved screen to prevent navigation locks
+  // This ensures that currentScreen always matches what's in the address bar
+  useEffect(() => {
+    if (resolvedScreen && resolvedScreen !== currentScreen) {
+      setCurrentScreen(resolvedScreen);
+    }
+  }, [resolvedScreen, currentScreen, setCurrentScreen]);
+
   // Cookie guard: Redirect to login if cookie is missing while logged in
   useEffect(() => {
     const checkAuth = () => {
@@ -79,19 +101,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
 
   if (!currentUser) return <FullPageSkeleton />;
 
-  // Determine current screen from pathname
-  const parts = pathname.split("/").filter(Boolean);
-  let resolvedScreen = "dashboard";
-  if (parts.length >= 2) {
-    resolvedScreen = parts[1];
-  } else if (parts.length === 1) {
-    const p = parts[0];
-    const isTenantRoot =
-      p === currentUser?.tenantId ||
-      p === currentTenantSlug ||
-      p === currentUser?.tenantSlug;
-    resolvedScreen = isTenantRoot ? "dashboard" : p;
-  }
+
 
   const isSuperAdmin = currentUser.role === "super_admin";
   const isRoot = isRootAdmin(currentUser);
@@ -135,7 +145,6 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
 
   const navigateTo = useCallback((screen: string) => {
     setSidebarOpen(false);
-    if (screen === currentScreen) return; // Skip if already on this screen
     
     setCurrentScreen(screen);
     const tenantIdentifier = currentTenantSlug || currentTenantId;
