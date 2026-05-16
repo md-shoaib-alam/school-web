@@ -157,6 +157,7 @@ export interface TenantsResponse {
   total: number
   page: number
   totalPages: number
+  stats?: { total: number; active: number; trial: number; suspended: number }
 }
 
 export interface SubjectsResponse {

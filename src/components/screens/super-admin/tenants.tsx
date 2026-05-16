@@ -75,13 +75,16 @@ export function SuperAdminTenants() {
 
   // -- Computed Stats --
   const stats = useMemo(() => {
+    if (tenantsData?.stats) {
+      return tenantsData.stats;
+    }
     return {
       total: tenantsData?.total || 0,
-      active: tenants.filter(t => t.status === "active").length, // Note: This only counts current page, ideally server should return these stats
-      trial: tenants.filter(t => t.status === "trial").length,
-      suspended: tenants.filter(t => t.status === "suspended").length,
+      active: 0,
+      trial: 0,
+      suspended: 0,
     };
-  }, [tenantsData, tenants]);
+  }, [tenantsData]);
 
   // -- Helpers --
   const generateSlug = (name: string) => {
