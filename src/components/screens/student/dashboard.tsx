@@ -155,7 +155,7 @@ export function StudentDashboard() {
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         <StatCard
           title="Attendance"
-          value={`${attendanceRate}%`}
+          value={`${Number(attendanceRate).toFixed(2).replace(/\.00$/, "")}%`}
           icon={<UserCheck className="h-5 w-5" />}
           trend={attendanceRate >= 85 ? "Good" : "Needs Improvement"}
           trendUp={attendanceRate >= 85}
@@ -163,7 +163,7 @@ export function StudentDashboard() {
         />
         <StatCard
           title="Average Grade"
-          value={`${avgGrade}%`}
+          value={`${Number(avgGrade).toFixed(2).replace(/\.00$/, "")}%`}
           icon={<TrendingUp className="h-5 w-5" />}
           trend={
             avgGrade >= 75
@@ -322,7 +322,7 @@ export function StudentDashboard() {
                           {g.grade || "N/A"}
                         </Badge>
                         <span className="text-xs text-gray-500 dark:text-gray-400">
-                          {g.marks}/{g.maxMarks}
+                          {Number(g.marks).toFixed(2).replace(/\.00$/, "")}/{g.maxMarks}
                         </span>
                       </div>
                     </div>

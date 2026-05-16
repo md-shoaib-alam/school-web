@@ -339,7 +339,9 @@ export function ParentGrades({ initialTab = "exams" }: { initialTab?: "exams" | 
                                               </Badge>
                                             </TableCell>
                                             <TableCell className="py-2.5 text-center">
-                                              <span className="text-xs font-bold">{g.marksObtained}</span>
+                                              <span className="text-xs font-bold">
+                                                {Number(g.marksObtained).toFixed(2).replace(/\.00$/, "")}
+                                              </span>
                                               <span className="text-[10px] text-muted-foreground">/{g.totalMarks}</span>
                                             </TableCell>
                                             <TableCell className="py-2.5 text-center">

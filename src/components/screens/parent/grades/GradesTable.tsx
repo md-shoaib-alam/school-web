@@ -57,7 +57,7 @@ export function GradesTable({ studentName, grades }: GradesTableProps) {
                       </Badge>
                     </TableCell>
                     <TableCell className="text-sm py-2 text-right font-medium">
-                      {g.marks}
+                      {Number(g.marks).toFixed(2).replace(/\.00$/, "")}
                       <span className="text-muted-foreground">/{g.maxMarks}</span>
                     </TableCell>
                     <TableCell className="text-sm py-2 text-center">

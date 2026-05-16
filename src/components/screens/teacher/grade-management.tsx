@@ -870,7 +870,7 @@ export function TeacherGrades() {
                                 <span className={isPass ? "text-emerald-600 dark:text-emerald-400" : "text-red-600 dark:text-red-400"}>
                                   {isPass ? "Pass" : "Fail"}
                                 </span>
-                                <span className="text-muted-foreground">{pct.toFixed(0)}%</span>
+                                <span className="text-muted-foreground">{pct.toFixed(2).replace(/\.00$/, "")}%</span>
                               </div>
                               <Progress
                                 value={Math.min(pct, 100)}

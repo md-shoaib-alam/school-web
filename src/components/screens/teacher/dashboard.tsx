@@ -125,7 +125,7 @@ export function TeacherDashboard() {
       title: "Today's Attendance",
       value:
         todayAttendance.total > 0
-          ? `${Math.round((todayAttendance.present / todayAttendance.total) * 100)}%`
+          ? `${Number((todayAttendance.present / todayAttendance.total) * 100).toFixed(2).replace(/\.00$/, "")}%`
           : "N/A",
       icon: <UserCheck className="h-5 w-5" />,
       color: "text-violet-600 dark:text-violet-400",

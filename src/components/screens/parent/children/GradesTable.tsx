@@ -46,7 +46,7 @@ export function GradesTable({ grades }: GradesTableProps) {
                   {g.examType}
                 </TableCell>
                 <TableCell className="text-sm text-right font-medium py-2">
-                  {g.marks}/{g.maxMarks}
+                  {Number(g.marks).toFixed(2).replace(/\.00$/, "")}/{g.maxMarks}
                 </TableCell>
                 <TableCell className="text-center py-2">
                   <Badge

@@ -266,7 +266,7 @@ export function AdminDashboard() {
                   <p className="text-teal-100 text-xs font-medium">Attendance Rate</p>
                   <p className="text-2xl font-bold flex items-center gap-1">
                     <Activity className="h-5 w-5 text-teal-200" />
-                    {summary.data?.attendanceRate ?? 0}%
+                    {Number(summary.data?.attendanceRate ?? 0).toFixed(2).replace(/\.00$/, "")}%
                   </p>
                 </div>
                 <div className="bg-white/10 backdrop-blur-sm rounded-xl px-4 py-3">
@@ -340,7 +340,7 @@ export function AdminDashboard() {
                   </div>
                   <div>
                     <p className="text-xs text-muted-foreground">Avg Attendance</p>
-                    <p className="text-2xl font-bold">{summary.data?.attendanceRate ?? 0}%</p>
+                    <p className="text-2xl font-bold">{Number(summary.data?.attendanceRate ?? 0).toFixed(2).replace(/\.00$/, "")}%</p>
                   </div>
                 </div>
               </CardContent>

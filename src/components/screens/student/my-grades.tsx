@@ -462,7 +462,9 @@ export function StudentGrades({ initialTab }: { initialTab?: "exams" | "assessme
                                   </Badge>
                                 </TableCell>
                                 <TableCell className="text-center">
-                                  <span className="text-sm font-semibold text-gray-800 dark:text-gray-200">{g.marks}</span>
+                                  <span className="text-sm font-semibold text-gray-800 dark:text-gray-200">
+                                    {Number(g.marks).toFixed(2).replace(/\.00$/, "")}
+                                  </span>
                                   <span className="text-xs text-gray-400">
                                     /{g.maxMarks}
                                   </span>
@@ -681,7 +683,9 @@ export function StudentGrades({ initialTab }: { initialTab?: "exams" | "assessme
                               </Badge>
                             </TableCell>
                             <TableCell className="text-center">
-                              <span className="text-sm font-bold text-gray-800 dark:text-gray-100">{g.marksObtained}</span>
+                              <span className="text-sm font-bold text-gray-800 dark:text-gray-100">
+                                {Number(g.marksObtained).toFixed(2).replace(/\.00$/, "")}
+                              </span>
                               <span className="text-xs text-gray-400">
                                 /{g.totalMarks}
                               </span>
