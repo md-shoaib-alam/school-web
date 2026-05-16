@@ -93,12 +93,7 @@ export default function TenantScreenDispatcher() {
   // Debug log on every change if mounted
   useEffect(() => {
     if (mounted && currentUser && !isTenantMatch && currentUser.role !== 'super_admin') {
-      console.warn('[TenantScreenDispatcher] Slug Mismatch Detected:', { 
-        urlSlug, 
-        userTenantId, 
-        userTenantSlug,
-        role: currentUser.role 
-      });
+      // Slug mismatch - could be handled by redirect if needed
     }
   }, [mounted, isTenantMatch, urlSlug, userTenantId, userTenantSlug, currentUser?.role]);
 

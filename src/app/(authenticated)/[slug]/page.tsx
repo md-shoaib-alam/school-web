@@ -243,10 +243,6 @@ export default function GenericSlugDispatcher() {
   if (currentUser.role !== "super_admin") {
     const correctSlug = currentUser.tenantSlug || currentUser.tenantId;
     if (correctSlug && typeof window !== "undefined" && slug !== correctSlug) {
-      console.warn(
-        "[GenericSlugDispatcher] Slug Mismatch. Redirecting to correct tenant:",
-        correctSlug,
-      );
       window.location.href = `/${correctSlug}`;
       return <LoadingScreen />;
     }
