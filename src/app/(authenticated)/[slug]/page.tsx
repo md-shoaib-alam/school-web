@@ -6,11 +6,9 @@ import { useAppStore } from "@/store/use-app-store";
 import { useTenantResolution } from "@/lib/graphql/hooks/platform.hooks";
 import dynamic from "next/dynamic";
 
-const LoadingScreen = () => (
-  <div className="flex h-full items-center justify-center p-8">
-    <div className="animate-spin h-8 w-8 border-4 border-rose-500 border-t-transparent rounded-full" />
-  </div>
-);
+import { FullPageSkeleton } from "@/components/ui/full-page-skeleton";
+
+const LoadingScreen = () => <FullPageSkeleton />;
 
 const AdminDashboard = dynamic(
   () =>

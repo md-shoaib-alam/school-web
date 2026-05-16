@@ -32,7 +32,7 @@ import {
   CheckCircle2,
   AlertCircle,
 } from "lucide-react";
-
+import { FullPageSkeleton } from "@/components/ui/full-page-skeleton";
 export function StudentDashboard() {
   const { currentUser, currentTenantName, currentTenantLogo } = useAppStore();
   const { data, isPending, fetchStatus, isError, error } = useStudentDashboard(
@@ -233,11 +233,11 @@ export function StudentDashboard() {
                       <div
                         key={slot.id}
                         className={`flex items-center gap-4 p-3 rounded-lg transition-colors ${isCurrent
-                            ? "bg-violet-50 dark:bg-violet-900/30 border border-violet-200 dark:border-violet-800"
-                            : isPast
-                              ? "bg-gray-50 dark:bg-gray-800/50 opacity-60"
-                              : "bg-gray-50 dark:bg-gray-800/50 hover:bg-violet-50/50 dark:hover:bg-violet-900/20"
-                        }`}
+                          ? "bg-violet-50 dark:bg-violet-900/30 border border-violet-200 dark:border-violet-800"
+                          : isPast
+                            ? "bg-gray-50 dark:bg-gray-800/50 opacity-60"
+                            : "bg-gray-50 dark:bg-gray-800/50 hover:bg-violet-50/50 dark:hover:bg-violet-900/20"
+                          }`}
                       >
                         <div className="flex-shrink-0 w-20 text-center">
                           <p className="text-sm font-semibold text-gray-700 dark:text-gray-300">
@@ -310,11 +310,11 @@ export function StudentDashboard() {
                         <Badge
                           variant="secondary"
                           className={`text-xs font-semibold ${pct >= 80
-                              ? "bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400"
-                              : pct >= 60
-                                ? "bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-400"
-                                : "bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400"
-                          }`}
+                            ? "bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400"
+                            : pct >= 60
+                              ? "bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-400"
+                              : "bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400"
+                            }`}
                         >
                           {g.grade || "N/A"}
                         </Badge>
@@ -351,11 +351,11 @@ export function StudentDashboard() {
                 <div
                   key={notice.id}
                   className={`p-4 rounded-lg border transition-colors hover:shadow-sm ${notice.priority === "urgent"
-                      ? "border-red-200 dark:border-red-800 bg-red-50 dark:bg-red-900/30"
-                      : notice.priority === "important"
-                        ? "border-amber-200 dark:border-amber-800 bg-amber-50 dark:bg-amber-900/30"
-                        : "border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-800/50"
-                  }`}
+                    ? "border-red-200 dark:border-red-800 bg-red-50 dark:bg-red-900/30"
+                    : notice.priority === "important"
+                      ? "border-amber-200 dark:border-amber-800 bg-amber-50 dark:bg-amber-900/30"
+                      : "border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-800/50"
+                    }`}
                 >
                   <div className="flex items-start justify-between gap-2">
                     <div className="min-w-0 flex-1">
@@ -363,11 +363,11 @@ export function StudentDashboard() {
                         <Badge
                           variant="secondary"
                           className={`text-[10px] ${notice.priority === "urgent"
-                              ? "bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400"
-                              : notice.priority === "important"
-                                ? "bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400"
-                                : "bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400"
-                          }`}
+                            ? "bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400"
+                            : notice.priority === "important"
+                              ? "bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400"
+                              : "bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400"
+                            }`}
                         >
                           {notice.priority}
                         </Badge>
@@ -448,19 +448,5 @@ function StatCard({
 
 /* ─── Skeleton ─── */
 function DashboardSkeleton() {
-  return (
-    <div className="space-y-6">
-      <Skeleton className="h-44 w-full rounded-xl" />
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        {[...Array(4)].map((_, i) => (
-          <Skeleton key={i} className="h-28 rounded-xl" />
-        ))}
-      </div>
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <Skeleton className="h-80 lg:col-span-2 rounded-xl" />
-        <Skeleton className="h-80 rounded-xl" />
-      </div>
-      <Skeleton className="h-64 rounded-xl" />
-    </div>
-  );
+  return <FullPageSkeleton />;
 }

@@ -1,13 +1,8 @@
 "use client";
 
 import { useEffect } from "react";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-} from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Skeleton as BoneyardSkeleton } from "boneyard-js/react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -97,17 +92,9 @@ const priorityBorders: Record<string, string> = {
 
 function StatCardSkeleton() {
   return (
-    <Card>
-      <CardContent className="p-6">
-        <div className="flex items-center justify-between">
-          <div className="space-y-2">
-            <Skeleton className="h-4 w-24" />
-            <Skeleton className="h-8 w-16" />
-          </div>
-          <Skeleton className="h-12 w-12 rounded-xl" />
-        </div>
-      </CardContent>
-    </Card>
+    <BoneyardSkeleton name="boneyard-card" loading={true} color="rgba(0,0,0,0.06)" darkColor="rgba(255,255,255,0.05)" animate="pulse">
+      <div className="h-[238px]" />
+    </BoneyardSkeleton>
   );
 }
 

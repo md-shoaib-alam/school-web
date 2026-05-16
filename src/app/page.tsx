@@ -7,6 +7,7 @@ import {
   MaintenanceScreen,
   LoginScreen,
 } from "@/components/screens";
+import { FullPageSkeleton } from "@/components/ui/full-page-skeleton";
 
 // Prevents hydration mismatch: returns false on server, true on client
 const emptySubscribe = () => () => {};
@@ -87,11 +88,7 @@ export default function Home() {
   // Maintenance mode check
   const isSuperAdmin = currentUser?.role === "super_admin";
   if (isLoggedIn && !isSuperAdmin && maintenanceLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-950">
-        <div className="animate-spin h-6 w-6 border-2 border-emerald-500 border-t-transparent rounded-full" />
-      </div>
-    );
+    return <FullPageSkeleton />;
   }
 
   if (isLoggedIn && !isSuperAdmin && maintenanceActive) {
@@ -99,16 +96,6 @@ export default function Home() {
   }
 
   // If we are still here and logged in, we are likely at the root "/" and redirecting.
-  // We show a simple loader while the router.replace kicks in.
-  return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-950">
-      <div className="flex flex-col items-center gap-4">
-        
-        <div className="animate-spin h-10 w-10 border-4 border-rose-500 border-t-transparent rounded-full" />
-        <p className="text-sm font-medium text-gray-500 animate-pulse">
-          Entering Dashboard...
-        </p>
-      </div>
-    </div>
-  );
+  // We show a skeleton while the router.replace kicks in.
+  return <FullPageSkeleton />;
 }

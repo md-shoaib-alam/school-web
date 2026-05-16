@@ -3,7 +3,9 @@
 import { registerBones } from 'boneyard-js'
 
 import _full_app_shell from './full-app-shell.bones.json'
+import _boneyard_card from './boneyard-card.bones.json'
 
 registerBones({
   "full-app-shell": _full_app_shell,
+  "boneyard-card": _boneyard_card,
 })

@@ -6,11 +6,9 @@ import { useAppStore } from '@/store/use-app-store';
 import dynamic from 'next/dynamic';
 import { ParentHomework } from '@/components/screens';
 
-const LoadingScreen = () => (
-  <div className="flex h-full items-center justify-center p-8">
-    <div className="animate-spin h-8 w-8 border-4 border-rose-500 border-t-transparent rounded-full" />
-  </div>
-);
+import { FullPageSkeleton } from "@/components/ui/full-page-skeleton";
+
+const LoadingScreen = () => <FullPageSkeleton />;
 
 const TeacherDashboard = dynamic(() => import('@/components/screens/teacher/dashboard').then(m => m.TeacherDashboard), { loading: LoadingScreen });
 const StudentDashboard = dynamic(() => import('@/components/screens/student/dashboard').then(m => m.StudentDashboard), { loading: LoadingScreen });
