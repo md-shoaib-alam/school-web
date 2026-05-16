@@ -62,8 +62,7 @@ export function StudentDashboard() {
         .then((data: any) => {
           const studentItems = Array.isArray(data?.items) ? data.items : [];
           const s =
-            studentItems.find((st: any) => st.email === currentUser.email) ||
-            studentItems[0];
+            studentItems.find((st: any) => st.email === currentUser.email);
           if (s)
             setStudentInfo({
               className: s.className,
@@ -71,7 +70,7 @@ export function StudentDashboard() {
               name: s.name,
             });
         })
-        .catch(() => {});
+        .catch(() => { });
     }
   }, [currentUser?.email]);
 
@@ -233,8 +232,7 @@ export function StudentDashboard() {
                     return (
                       <div
                         key={slot.id}
-                        className={`flex items-center gap-4 p-3 rounded-lg transition-colors ${
-                          isCurrent
+                        className={`flex items-center gap-4 p-3 rounded-lg transition-colors ${isCurrent
                             ? "bg-violet-50 dark:bg-violet-900/30 border border-violet-200 dark:border-violet-800"
                             : isPast
                               ? "bg-gray-50 dark:bg-gray-800/50 opacity-60"
@@ -311,8 +309,7 @@ export function StudentDashboard() {
                       <div className="flex items-center gap-2 ml-2">
                         <Badge
                           variant="secondary"
-                          className={`text-xs font-semibold ${
-                            pct >= 80
+                          className={`text-xs font-semibold ${pct >= 80
                               ? "bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400"
                               : pct >= 60
                                 ? "bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-400"
@@ -353,8 +350,7 @@ export function StudentDashboard() {
               {studentNotices.slice(0, 4).map((notice) => (
                 <div
                   key={notice.id}
-                  className={`p-4 rounded-lg border transition-colors hover:shadow-sm ${
-                    notice.priority === "urgent"
+                  className={`p-4 rounded-lg border transition-colors hover:shadow-sm ${notice.priority === "urgent"
                       ? "border-red-200 dark:border-red-800 bg-red-50 dark:bg-red-900/30"
                       : notice.priority === "important"
                         ? "border-amber-200 dark:border-amber-800 bg-amber-50 dark:bg-amber-900/30"
@@ -366,8 +362,7 @@ export function StudentDashboard() {
                       <div className="flex items-center gap-2 mb-1">
                         <Badge
                           variant="secondary"
-                          className={`text-[10px] ${
-                            notice.priority === "urgent"
+                          className={`text-[10px] ${notice.priority === "urgent"
                               ? "bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400"
                               : notice.priority === "important"
                                 ? "bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400"
