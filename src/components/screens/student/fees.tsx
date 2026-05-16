@@ -69,7 +69,7 @@ export function StudentFees() {
         const matchedStudent =
           studentItems.find(
             (s: StudentInfo) => s.email === currentUser?.email,
-          ) || studentItems[0];
+          );
 
         if (matchedStudent) {
           const feesRes = await apiFetch(

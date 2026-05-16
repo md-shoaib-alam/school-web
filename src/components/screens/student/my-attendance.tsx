@@ -65,9 +65,7 @@ export function StudentAttendance() {
   const student = useMemo(
     () =>
       Array.isArray(students)
-        ? students.find((s) => s.email === currentUser?.email) ||
-          students[0] ||
-          null
+        ? students.find((s) => s.email === currentUser?.email) || null
         : null,
     [students, currentUser?.email],
   );
@@ -84,8 +82,7 @@ export function StudentAttendance() {
 
       // Use the matched student's classId, or first student's classId
       const matchedStudent =
-        studentsRes.find((s: StudentInfo) => s.email === currentUser?.email) ||
-        studentsRes[0];
+        studentsRes.find((s: StudentInfo) => s.email === currentUser?.email);
       if (!matchedStudent) {
         setLoading(false);
         return;
@@ -207,7 +204,7 @@ export function StudentAttendance() {
         <h2 className="text-xl font-bold text-gray-900 dark:text-gray-100">
           My Attendance
         </h2>
-        <p className="text-sm text-gray-500 dark:text-gray-400 dark:text-gray-500 mt-0.5">
+        <p className="text-sm text-gray-600 dark:text-gray-400 mt-0.5">
           Track your daily attendance and monthly trends
         </p>
       </div>
@@ -250,12 +247,12 @@ export function StudentAttendance() {
                 <span className="text-3xl font-bold text-gray-900 dark:text-gray-100">
                   {stats.rate}%
                 </span>
-                <span className="text-xs text-gray-500 dark:text-gray-400 dark:text-gray-500">
+                <span className="text-xs text-gray-600 dark:text-gray-400">
                   Attendance
                 </span>
               </div>
             </div>
-            <p className="text-sm font-medium text-gray-600 dark:text-gray-400 dark:text-gray-500 mt-4">
+            <p className="text-sm font-medium text-gray-700 dark:text-gray-300 mt-4">
               {student ? student.name : "Student"}
             </p>
             <p className="text-xs text-gray-400 dark:text-gray-500">
@@ -282,7 +279,7 @@ export function StudentAttendance() {
                   <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">
                     {stats.present}
                   </p>
-                  <p className="text-xs text-gray-500 dark:text-gray-400 dark:text-gray-500">
+                  <p className="text-xs text-gray-600 dark:text-gray-400">
                     Present Days
                   </p>
                 </div>
@@ -302,7 +299,7 @@ export function StudentAttendance() {
                   <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">
                     {stats.absent}
                   </p>
-                  <p className="text-xs text-gray-500 dark:text-gray-400 dark:text-gray-500">
+                  <p className="text-xs text-gray-600 dark:text-gray-400">
                     Absent Days
                   </p>
                 </div>
@@ -319,19 +316,19 @@ export function StudentAttendance() {
             <div className="flex items-center gap-4 mt-5 pt-4 border-t border-gray-100">
               <div className="flex items-center gap-1.5">
                 <div className="w-3 h-3 rounded-sm bg-emerald-400" />
-                <span className="text-xs text-gray-500 dark:text-gray-400 dark:text-gray-500">
+                <span className="text-xs text-gray-600 dark:text-gray-400">
                   Present
                 </span>
               </div>
               <div className="flex items-center gap-1.5">
                 <div className="w-3 h-3 rounded-sm bg-red-400" />
-                <span className="text-xs text-gray-500 dark:text-gray-400 dark:text-gray-500">
+                <span className="text-xs text-gray-600 dark:text-gray-400">
                   Absent
                 </span>
               </div>
               <div className="flex items-center gap-1.5">
                 <div className="w-3 h-3 rounded-sm bg-gray-200 dark:bg-gray-700" />
-                <span className="text-xs text-gray-500 dark:text-gray-400 dark:text-gray-500">
+                <span className="text-xs text-gray-600 dark:text-gray-400">
                   No Data
                 </span>
               </div>
@@ -415,7 +412,7 @@ export function StudentAttendance() {
             {["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"].map((d) => (
               <div
                 key={d}
-                className="text-center text-[10px] sm:text-xs font-medium text-gray-400 dark:text-gray-500 py-1"
+                className="text-center text-[10px] sm:text-xs font-medium text-gray-500 dark:text-gray-400 py-1"
               >
                 {d}
               </div>
@@ -448,11 +445,11 @@ export function StudentAttendance() {
                 >
                   <span
                     className={
-                      status === "none" && !isWeekend
-                        ? "text-gray-400 dark:text-gray-500"
-                        : isWeekend && status === "none"
-                          ? "text-gray-300"
-                          : "text-white"
+                      status === "none"
+                        ? isWeekend
+                          ? "text-gray-400 dark:text-gray-500"
+                          : "text-gray-600 dark:text-gray-400"
+                        : "text-white"
                     }
                   >
                     {dayNum}

@@ -73,18 +73,18 @@ export function StudentGrades({ initialTab }: { initialTab?: "exams" | "assessme
   const [topLevelTab, setTopLevelTab] = useState<"exams" | "assessments">(initialTab || "exams");
 
   const student = Array.isArray(students)
-    ? students.find((s) => s.email === currentUser?.email) || students[0] || null
+    ? students.find((s) => s.email === currentUser?.email) || null
     : null;
 
   const fetchData = useCallback(async () => {
     setLoading(true);
     try {
-      const studentsRes = await apiFetch("/api/students");
-      const studentsData = await studentsRes.json();
-      const studentItems = Array.isArray(studentsData?.items) ? studentsData.items : [];
-      setStudents(studentItems);
+      const res = await apiFetch("/api/students/me");
+      if (!res.ok) throw new Error("Failed to fetch student profile");
+      const targetStudent = await res.json();
+      
+      setStudents([targetStudent]); // Keep state compatible with other parts of the component if needed
 
-      const targetStudent = student || studentItems[0];
       if (targetStudent?.id) {
         const [gradesRes, assessRes] = await Promise.all([
           apiFetch(`/api/grades?studentId=${targetStudent.id}`),
@@ -100,13 +100,13 @@ export function StudentGrades({ initialTab }: { initialTab?: "exams" | "assessme
     } finally {
       setLoading(false);
     }
-  }, [student?.id]);
+  }, [currentUser?.email]);
 
   useEffect(() => {
     fetchData();
   }, [fetchData]);
 
-  const studentId = student?.id || students[0]?.id || "";
+  const studentId = student?.id || "";
 
   const filteredGrades = useMemo(() => {
     if (activeTab === "all") return grades;

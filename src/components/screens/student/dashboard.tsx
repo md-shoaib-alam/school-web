@@ -57,13 +57,10 @@ export function StudentDashboard() {
 
   useEffect(() => {
     if (currentUser?.email) {
-      apiFetch("/api/students")
+      apiFetch("/api/students/me")
         .then((r) => r.json())
-        .then((data: any) => {
-          const studentItems = Array.isArray(data?.items) ? data.items : [];
-          const s =
-            studentItems.find((st: any) => st.email === currentUser.email);
-          if (s)
+        .then((s: any) => {
+          if (s && s.id)
             setStudentInfo({
               className: s.className,
               rollNumber: s.rollNumber,

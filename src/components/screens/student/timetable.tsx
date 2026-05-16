@@ -101,10 +101,10 @@ export function StudentTimetable() {
     staleTime: 5 * 60 * 1000,
   });
 
-  const student = useMemo(() => {
+    const student = useMemo(() => {
     const items = Array.isArray(studentsJson?.items) ? studentsJson.items : [];
     if (items.length === 0) return null;
-    return items.find((s: StudentInfo) => s.email === currentUser?.email) || items[0];
+    return items.find((s: StudentInfo) => s.email === currentUser?.email) || null;
   }, [studentsJson, currentUser?.email]);
 
   const classId = student?.classId;

@@ -30,9 +30,7 @@ export function StudentClasses() {
   const [students, setStudents] = useState<StudentInfo[]>([]);
   const [subjects, setSubjects] = useState<SubjectInfo[]>([]);
 
-  const student = Array.isArray(students)
-    ? students.find((s) => s.email === currentUser?.email) || students[0] || null
-    : null;
+  const student = students.find((s) => s.email === currentUser?.email) || null;
 
   const fetchData = useCallback(async () => {
     setLoading(true);

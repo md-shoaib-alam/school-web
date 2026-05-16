@@ -59,9 +59,7 @@ export function StudentAssignments() {
   const student = useMemo(
     () =>
       Array.isArray(students)
-        ? students.find((s) => s.email === currentUser?.email) ||
-          students[0] ||
-          null
+        ? students.find((s) => s.email === currentUser?.email) || null
         : null,
     [students, currentUser?.email],
   );
@@ -73,9 +71,9 @@ export function StudentAssignments() {
       const studentsRes = Array.isArray(studentsJson?.items) ? studentsJson.items : [];
       setStudents(studentsRes);
 
-      const matchedStudent =
-        studentsRes.find((s: StudentInfo) => s.email === currentUser?.email) ||
-        studentsRes[0];
+      const matchedStudent = studentsRes.find(
+        (s: StudentInfo) => s.email === currentUser?.email,
+      );
 
       if (!matchedStudent) {
         setLoading(false);
