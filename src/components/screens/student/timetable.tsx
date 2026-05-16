@@ -92,20 +92,16 @@ export function StudentTimetable() {
     () => getNow().dayKey || "monday",
   );
 
-  const { data: studentsJson, isLoading: studentsLoading } = useQuery({
-    queryKey: ["student-profile"],
+  const { data: targetStudent, isLoading: studentsLoading } = useQuery({
+    queryKey: ["student-profile-me"],
     queryFn: async () => {
-      const res = await api.get<any>("/students");
+      const res = await api.get<any>("/students/me");
       return res;
     },
     staleTime: 5 * 60 * 1000,
   });
 
-    const student = useMemo(() => {
-    const items = Array.isArray(studentsJson?.items) ? studentsJson.items : [];
-    if (items.length === 0) return null;
-    return items.find((s: StudentInfo) => s.email === currentUser?.email) || null;
-  }, [studentsJson, currentUser?.email]);
+  const student = targetStudent || null;
 
   const classId = student?.classId;
 

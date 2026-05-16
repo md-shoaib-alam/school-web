@@ -67,36 +67,31 @@ export function StudentAssignments() {
   const fetchData = useCallback(async () => {
     setLoading(true);
     try {
-      const studentsJson = await apiFetch("/api/students").then((r) => r.json());
-      const studentsRes = Array.isArray(studentsJson?.items) ? studentsJson.items : [];
-      setStudents(studentsRes);
+      const res = await apiFetch("/api/students/me");
+      if (!res.ok) throw new Error("Failed to fetch student profile");
+      const targetStudent = await res.json();
+      
+      setStudents([targetStudent]);
 
-      const matchedStudent = studentsRes.find(
-        (s: StudentInfo) => s.email === currentUser?.email,
-      );
-
-      if (!matchedStudent) {
-        setLoading(false);
-        return;
-      }
-
-      const assignmentsRes = await apiFetch(
-        `/api/assignments?classId=${matchedStudent.classId}`,
-      );
-      const assignmentsData = await assignmentsRes.json();
-      setAssignments(assignmentsData);
-
-      // Fetch real submissions for this student
-      try {
-        const subRes = await apiFetch(
-          `/api/submissions?studentId=${matchedStudent.id}`,
+      if (targetStudent?.id) {
+        const assignmentsRes = await apiFetch(
+          `/api/assignments?classId=${targetStudent.classId}`,
         );
-        if (subRes.ok) {
-          const subJson = await subRes.json();
-          setMySubmissions(subJson.data || []);
+        const assignmentsData = await assignmentsRes.json();
+        setAssignments(assignmentsData);
+
+        // Fetch real submissions for this student
+        try {
+          const subRes = await apiFetch(
+            `/api/submissions?studentId=${targetStudent.id}`,
+          );
+          if (subRes.ok) {
+            const subJson = await subRes.json();
+            setMySubmissions(subJson.data || []);
+          }
+        } catch {
+          /* no submissions yet */
         }
-      } catch {
-        /* no submissions yet */
       }
     } catch (e) {
       console.error(e);

@@ -223,13 +223,13 @@ export function StudentGrades({ initialTab }: { initialTab?: "exams" | "assessme
       {topLevelTab === "exams" ? (
         <div className="space-y-6">
           {/* School Exams Summary Cards */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            <Card className="rounded-xl shadow-sm border-violet-100 dark:border-violet-950/30 bg-gradient-to-tr from-white to-violet-50/20 dark:from-background dark:to-violet-950/10">
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-4">
+            <Card className="col-span-2 sm:col-span-1 rounded-xl shadow-sm border-violet-100 dark:border-violet-950/30 bg-gradient-to-tr from-white to-violet-50/20 dark:from-background dark:to-violet-950/10">
               <CardContent className="p-5 text-center">
                 <div className="inline-flex p-3 rounded-xl bg-gradient-to-br from-violet-500 to-purple-600 text-white mb-3">
                   <TrendingUp className="h-5 w-5" />
                 </div>
-                <p className="text-3xl font-bold text-gray-900 dark:text-gray-100">
+                <p className="text-xl sm:text-3xl font-bold text-gray-900 dark:text-gray-100">
                   {overallAvg}%
                 </p>
                 <p className="text-xs text-gray-500 dark:text-gray-400 dark:text-gray-500 mt-1 font-medium">
@@ -244,7 +244,7 @@ export function StudentGrades({ initialTab }: { initialTab?: "exams" | "assessme
                 <div className="inline-flex p-3 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600 text-white mb-3">
                   <Award className="h-5 w-5" />
                 </div>
-                <p className="text-3xl font-bold text-gray-900 dark:text-gray-100">
+                <p className="text-xl sm:text-3xl font-bold text-gray-900 dark:text-gray-100">
                   {grades.length}
                 </p>
                 <p className="text-xs text-gray-500 dark:text-gray-400 dark:text-gray-500 mt-1 font-medium">
@@ -267,7 +267,7 @@ export function StudentGrades({ initialTab }: { initialTab?: "exams" | "assessme
                 <div className="inline-flex p-3 rounded-xl bg-gradient-to-br from-amber-500 to-orange-600 text-white mb-3">
                   <Star className="h-5 w-5" />
                 </div>
-                <p className="text-3xl font-bold text-gray-900 dark:text-gray-100">
+                <p className="text-xl sm:text-3xl font-bold text-gray-900 dark:text-gray-100">
                   {gradeDistribution.find(
                     (g) => g.grade === "A+" || g.grade === "A",
                   )?.count || 0}
@@ -428,7 +428,8 @@ export function StudentGrades({ initialTab }: { initialTab?: "exams" | "assessme
                 </TabsList>
 
                 <TabsContent value={activeTab}>
-                  <ScrollArea className="max-h-[400px]">
+                  <ScrollArea className="max-h-[500px] w-full">
+                    <div className="min-w-[600px] sm:min-w-full pb-4">
                     {filteredGrades.length === 0 ? (
                       <div className="text-center py-12 text-gray-400 dark:text-gray-500 border border-dashed rounded-xl mt-2">
                         <GraduationCap className="h-10 w-10 mx-auto mb-2 opacity-40" />
@@ -498,8 +499,9 @@ export function StudentGrades({ initialTab }: { initialTab?: "exams" | "assessme
                         </TableBody>
                       </Table>
                     )}
-                  </ScrollArea>
-                </TabsContent>
+                  </div>
+                </ScrollArea>
+              </TabsContent>
               </Tabs>
             </CardContent>
           </Card>
@@ -507,13 +509,13 @@ export function StudentGrades({ initialTab }: { initialTab?: "exams" | "assessme
       ) : (
         <div className="space-y-6">
           {/* Assessments Summary Cards */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            <Card className="rounded-xl shadow-sm border-indigo-100 dark:border-indigo-950/30 bg-gradient-to-tr from-white to-indigo-50/20 dark:from-background dark:to-indigo-950/10">
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-4">
+            <Card className="col-span-2 sm:col-span-1 rounded-xl shadow-sm border-indigo-100 dark:border-indigo-950/30 bg-gradient-to-tr from-white to-indigo-50/20 dark:from-background dark:to-indigo-950/10">
               <CardContent className="p-5 text-center">
                 <div className="inline-flex p-3 rounded-xl bg-gradient-to-br from-indigo-500 to-blue-600 text-white mb-3">
                   <TrendingUp className="h-5 w-5" />
                 </div>
-                <p className="text-3xl font-bold text-gray-900 dark:text-gray-100">
+                <p className="text-xl sm:text-3xl font-bold text-gray-900 dark:text-gray-100">
                   {assessmentAvg}%
                 </p>
                 <p className="text-xs text-gray-500 dark:text-gray-400 dark:text-gray-500 mt-1 font-medium">
@@ -528,7 +530,7 @@ export function StudentGrades({ initialTab }: { initialTab?: "exams" | "assessme
                 <div className="inline-flex p-3 rounded-xl bg-gradient-to-br from-blue-500 to-cyan-600 text-white mb-3">
                   <Award className="h-5 w-5" />
                 </div>
-                <p className="text-3xl font-bold text-gray-900 dark:text-gray-100">
+                <p className="text-xl sm:text-3xl font-bold text-gray-900 dark:text-gray-100">
                   {assessmentGrades.length}
                 </p>
                 <p className="text-xs text-gray-500 dark:text-gray-400 mt-1 font-medium">
@@ -547,7 +549,7 @@ export function StudentGrades({ initialTab }: { initialTab?: "exams" | "assessme
                 <div className="inline-flex p-3 rounded-xl bg-gradient-to-br from-teal-500 to-emerald-600 text-white mb-3">
                   <CheckCircle2 className="h-5 w-5" />
                 </div>
-                <p className="text-3xl font-bold text-gray-900 dark:text-gray-100">
+                <p className="text-xl sm:text-3xl font-bold text-gray-900 dark:text-gray-100">
                   {assessmentGrades.filter(a => a.marksObtained >= a.passingMarks).length}
                 </p>
                 <p className="text-xs text-gray-500 dark:text-gray-400 mt-1 font-medium">
@@ -645,7 +647,8 @@ export function StudentGrades({ initialTab }: { initialTab?: "exams" | "assessme
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <ScrollArea className="max-h-[400px]">
+              <ScrollArea className="max-h-[500px] w-full">
+                <div className="min-w-[700px] sm:min-w-full pb-4">
                 {assessmentGrades.length === 0 ? (
                   <div className="text-center py-12 text-gray-400 dark:text-gray-500 border border-dashed rounded-xl mt-2">
                     <GraduationCap className="h-10 w-10 mx-auto mb-2 opacity-40" />
@@ -710,6 +713,7 @@ export function StudentGrades({ initialTab }: { initialTab?: "exams" | "assessme
                     </TableBody>
                   </Table>
                 )}
+                </div>
               </ScrollArea>
             </CardContent>
           </Card>
@@ -726,10 +730,10 @@ function GradesSkeleton() {
         <Skeleton className="h-7 w-32 mb-2" />
         <Skeleton className="h-4 w-56" />
       </div>
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        {[...Array(3)].map((_, i) => (
-          <Skeleton key={i} className="h-36 rounded-xl" />
-        ))}
+      <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-4">
+        <Skeleton className="col-span-2 sm:col-span-1 h-32 sm:h-36 rounded-xl" />
+        <Skeleton className="h-32 sm:h-36 rounded-xl" />
+        <Skeleton className="h-32 sm:h-36 rounded-xl" />
       </div>
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <Skeleton className="h-72 rounded-xl" />

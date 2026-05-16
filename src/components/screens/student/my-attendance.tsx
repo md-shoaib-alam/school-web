@@ -76,30 +76,26 @@ export function StudentAttendance() {
   const fetchData = useCallback(async () => {
     setLoading(true);
     try {
-      const studentsJson = await apiFetch("/api/students").then((r) => r.json());
-      const studentsRes = Array.isArray(studentsJson?.items) ? studentsJson.items : [];
-      setStudents(studentsRes);
+      const res = await apiFetch("/api/students/me");
+      if (!res.ok) throw new Error("Failed to fetch student profile");
+      const targetStudent = await res.json();
+      
+      setStudents([targetStudent]);
 
-      // Use the matched student's classId, or first student's classId
-      const matchedStudent =
-        studentsRes.find((s: StudentInfo) => s.email === currentUser?.email);
-      if (!matchedStudent) {
-        setLoading(false);
-        return;
+      if (targetStudent?.id) {
+        const params = new URLSearchParams();
+        params.set('classId', targetStudent.classId);
+        params.set('limit', '1000'); // Fetch wide window for analytics
+
+        const attRes = await apiFetch(
+          `/api/attendance?${params.toString()}`,
+        );
+        const data = await attRes.json();
+        const records = Array.isArray(data.records) ? data.records : [];
+        setAttendanceData(
+          records.filter((a: AttendanceRecord) => a.studentId === targetStudent.id),
+        );
       }
-
-      const params = new URLSearchParams();
-      params.set('classId', matchedStudent.classId);
-      params.set('limit', '1000'); // Fetch wide window for analytics
-
-      const attRes = await apiFetch(
-        `/api/attendance?${params.toString()}`,
-      );
-      const data = await attRes.json();
-      const records = Array.isArray(data.records) ? data.records : [];
-      setAttendanceData(
-        records.filter((a: AttendanceRecord) => a.studentId === matchedStudent.id),
-      );
     } catch (e) {
       console.error(e);
     } finally {
