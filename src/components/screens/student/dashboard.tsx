@@ -409,13 +409,12 @@ function StatCard({
   color: string;
 }) {
   const colorMap: Record<string, string> = {
-    violet: "from-violet-500 to-purple-500 bg-violet-50 dark:bg-violet-900/30",
-    emerald:
-      "from-emerald-500 to-teal-500 bg-emerald-50 dark:bg-emerald-900/30",
-    amber: "from-amber-500 to-orange-500 bg-amber-50 dark:bg-amber-900/30",
-    blue: "from-blue-500 to-cyan-500 bg-blue-50 dark:bg-blue-900/30",
+    violet: "bg-violet-600 dark:bg-violet-500",
+    emerald: "bg-emerald-600 dark:bg-emerald-500",
+    amber: "bg-amber-600 dark:bg-amber-500",
+    blue: "bg-blue-600 dark:bg-blue-500",
   };
-  const iconBg = `bg-gradient-to-br ${colorMap[color]?.split(" ")[0]}`;
+  const iconBg = colorMap[color] || "bg-gray-600";
 
   return (
     <Card className="rounded-xl shadow-sm hover:shadow-md transition-shadow">

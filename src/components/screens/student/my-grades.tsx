@@ -226,7 +226,7 @@ export function StudentGrades({ initialTab }: { initialTab?: "exams" | "assessme
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-4">
             <Card className="col-span-2 sm:col-span-1 rounded-xl shadow-sm border-violet-100 dark:border-violet-950/30 bg-gradient-to-tr from-white to-violet-50/20 dark:from-background dark:to-violet-950/10">
               <CardContent className="p-5 text-center">
-                <div className="inline-flex p-3 rounded-xl bg-gradient-to-br from-violet-500 to-purple-600 text-white mb-3">
+                <div className="inline-flex p-3 rounded-xl bg-violet-600 dark:bg-violet-500 text-white mb-3">
                   <TrendingUp className="h-5 w-5" />
                 </div>
                 <p className="text-xl sm:text-3xl font-bold text-gray-900 dark:text-gray-100">
@@ -241,7 +241,7 @@ export function StudentGrades({ initialTab }: { initialTab?: "exams" | "assessme
 
             <Card className="rounded-xl shadow-sm border-emerald-100 dark:border-emerald-950/30 bg-gradient-to-tr from-white to-emerald-50/20 dark:from-background dark:to-emerald-950/10">
               <CardContent className="p-5 text-center">
-                <div className="inline-flex p-3 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600 text-white mb-3">
+                <div className="inline-flex p-3 rounded-xl bg-emerald-600 dark:bg-emerald-500 text-white mb-3">
                   <Award className="h-5 w-5" />
                 </div>
                 <p className="text-xl sm:text-3xl font-bold text-gray-900 dark:text-gray-100">
@@ -264,7 +264,7 @@ export function StudentGrades({ initialTab }: { initialTab?: "exams" | "assessme
 
             <Card className="rounded-xl shadow-sm border-amber-100 dark:border-amber-950/30 bg-gradient-to-tr from-white to-amber-50/20 dark:from-background dark:to-amber-950/10">
               <CardContent className="p-5 text-center">
-                <div className="inline-flex p-3 rounded-xl bg-gradient-to-br from-amber-500 to-orange-600 text-white mb-3">
+                <div className="inline-flex p-3 rounded-xl bg-amber-600 dark:bg-amber-500 text-white mb-3">
                   <Star className="h-5 w-5" />
                 </div>
                 <p className="text-xl sm:text-3xl font-bold text-gray-900 dark:text-gray-100">
@@ -512,7 +512,7 @@ export function StudentGrades({ initialTab }: { initialTab?: "exams" | "assessme
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-4">
             <Card className="col-span-2 sm:col-span-1 rounded-xl shadow-sm border-indigo-100 dark:border-indigo-950/30 bg-gradient-to-tr from-white to-indigo-50/20 dark:from-background dark:to-indigo-950/10">
               <CardContent className="p-5 text-center">
-                <div className="inline-flex p-3 rounded-xl bg-gradient-to-br from-indigo-500 to-blue-600 text-white mb-3">
+                <div className="inline-flex p-3 rounded-xl bg-indigo-600 dark:bg-indigo-500 text-white mb-3">
                   <TrendingUp className="h-5 w-5" />
                 </div>
                 <p className="text-xl sm:text-3xl font-bold text-gray-900 dark:text-gray-100">
@@ -527,7 +527,7 @@ export function StudentGrades({ initialTab }: { initialTab?: "exams" | "assessme
 
             <Card className="rounded-xl shadow-sm border-blue-100 dark:border-blue-950/30 bg-gradient-to-tr from-white to-blue-50/20 dark:from-background dark:to-blue-950/10">
               <CardContent className="p-5 text-center">
-                <div className="inline-flex p-3 rounded-xl bg-gradient-to-br from-blue-500 to-cyan-600 text-white mb-3">
+                <div className="inline-flex p-3 rounded-xl bg-blue-600 dark:bg-blue-500 text-white mb-3">
                   <Award className="h-5 w-5" />
                 </div>
                 <p className="text-xl sm:text-3xl font-bold text-gray-900 dark:text-gray-100">
@@ -546,7 +546,7 @@ export function StudentGrades({ initialTab }: { initialTab?: "exams" | "assessme
 
             <Card className="rounded-xl shadow-sm border-teal-100 dark:border-teal-950/30 bg-gradient-to-tr from-white to-teal-50/20 dark:from-background dark:to-teal-950/10">
               <CardContent className="p-5 text-center">
-                <div className="inline-flex p-3 rounded-xl bg-gradient-to-br from-teal-500 to-emerald-600 text-white mb-3">
+                <div className="inline-flex p-3 rounded-xl bg-teal-600 dark:bg-teal-500 text-white mb-3">
                   <CheckCircle2 className="h-5 w-5" />
                 </div>
                 <p className="text-xl sm:text-3xl font-bold text-gray-900 dark:text-gray-100">
