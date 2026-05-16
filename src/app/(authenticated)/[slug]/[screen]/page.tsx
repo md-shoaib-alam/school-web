@@ -10,12 +10,12 @@ import { FullPageSkeleton } from "@/components/ui/full-page-skeleton";
 
 const LoadingScreen = () => <FullPageSkeleton />;
 
-const TeacherDashboard = dynamic(() => import('@/components/screens/teacher/dashboard').then(m => m.TeacherDashboard), { loading: LoadingScreen });
-const StudentDashboard = dynamic(() => import('@/components/screens/student/dashboard').then(m => m.StudentDashboard), { loading: LoadingScreen });
-const ParentDashboard = dynamic(() => import('@/components/screens/parent/dashboard').then(m => m.ParentDashboard), { loading: LoadingScreen });
-const StaffDashboard = dynamic(() => import('@/components/screens/staff/dashboard').then(m => m.StaffDashboard), { loading: LoadingScreen });
-const AdminDashboard = dynamic(() => import('@/components/screens/admin/dashboard').then(m => m.AdminDashboard), { loading: LoadingScreen });
-const SuperAdminDashboard = dynamic(() => import('@/components/screens/super-admin/dashboard').then(m => m.SuperAdminDashboard), { loading: LoadingScreen });
+const TeacherDashboard = dynamic(() => import('@/components/screens/teacher/dashboard').then(m => m.TeacherDashboard));
+const StudentDashboard = dynamic(() => import('@/components/screens/student/dashboard').then(m => m.StudentDashboard));
+const ParentDashboard = dynamic(() => import('@/components/screens/parent/dashboard').then(m => m.ParentDashboard));
+const StaffDashboard = dynamic(() => import('@/components/screens/staff/dashboard').then(m => m.StaffDashboard));
+const AdminDashboard = dynamic(() => import('@/components/screens/admin/dashboard').then(m => m.AdminDashboard));
+const SuperAdminDashboard = dynamic(() => import('@/components/screens/super-admin/dashboard').then(m => m.SuperAdminDashboard));
 const AdminStudents = dynamic(() => import('@/components/screens/admin/students').then(m => m.AdminStudents), { loading: LoadingScreen });
 const AdminTeachers = dynamic(() => import('@/components/screens/admin/teachers').then(m => m.AdminTeachers), { loading: LoadingScreen });
 const AdminParents = dynamic(() => import('@/components/screens/admin/parents').then(m => m.AdminParents), { loading: LoadingScreen });

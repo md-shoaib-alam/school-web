@@ -83,7 +83,7 @@ export function useStudentDashboard(studentEmail?: string) {
     queryKey: queryKeys.studentDashboard(studentEmail),
     queryFn: () => graphqlQuery<{ studentDashboard: StudentDashboardData }>(STUDENT_DASHBOARD, { studentEmail })
       .then(d => d.studentDashboard),
-    staleTime: 0,
+    staleTime: 60 * 1000,
     enabled: !!studentEmail && studentEmail.trim().length > 0,
     retry: 2,
     retryDelay: (attempt) => Math.min(1000 * 2 ** attempt, 10000),
@@ -95,9 +95,9 @@ export function useParentDashboard(parentName: string) {
     queryKey: queryKeys.parentDashboard(parentName),
     queryFn: () => graphqlQuery<{ parentDashboard: ParentDashboardData }>(PARENT_DASHBOARD, { parentName })
       .then(d => d.parentDashboard),
-    staleTime: 0, // Always refetch in background for real-time accuracy
+    staleTime: 60 * 1000,
     enabled: !!parentName && parentName.trim().length > 0,
-    retry: 3,
+    retry: 1,
     retryDelay: (attempt) => Math.min(1000 * 2 ** attempt, 10000),
   })
 }
