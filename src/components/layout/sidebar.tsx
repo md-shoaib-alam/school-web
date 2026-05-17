@@ -80,7 +80,7 @@ export function Sidebar({
         "fixed lg:static inset-y-0 left-0 z-50 w-72 flex flex-col transition-transform duration-300 lg:translate-x-0 lg:h-dvh border-r overflow-hidden",
         isSuperAdmin
           ? "bg-gradient-to-b from-teal-950 to-teal-900 border-teal-800/50"
-          : "bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-800",
+          : "bg-sidebar border-sidebar-border",
         sidebarOpen ? "translate-x-0" : "-translate-x-full",
       )}
     >
@@ -90,7 +90,7 @@ export function Sidebar({
           "p-4 flex items-center justify-between border-b",
           isSuperAdmin
             ? "border-teal-800/50"
-            : "border-gray-100 dark:border-gray-800",
+            : "border-sidebar-border",
         )}
       >
         <div className="flex items-center gap-3">
@@ -193,7 +193,7 @@ export function Sidebar({
 
                 {/* Sub Items (Accordion) */}
                 {hasChildren && isExpanded && (
-                  <div className="ml-4 pl-4 border-l border-gray-100 dark:border-gray-800 space-y-1 mt-1 animate-in slide-in-from-top-1 duration-200">
+                  <div className="ml-4 pl-4 border-l border-sidebar-border space-y-1 mt-1 animate-in slide-in-from-top-1 duration-200">
                     {item.children?.map((child) => (
                       <Button
                         key={child.key}
@@ -224,7 +224,7 @@ export function Sidebar({
           "p-4 border-t",
           isSuperAdmin
             ? "border-rose-800/50"
-            : "border-gray-100 dark:border-gray-800",
+            : "border-sidebar-border",
         )}
       >
         <div className="flex items-center gap-3">

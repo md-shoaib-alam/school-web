@@ -25,7 +25,7 @@ export function Header({ items, resolvedScreen }: HeaderProps) {
   const isSuperAdmin = currentUser.role === "super_admin";
 
   return (
-    <header className="shrink-0 z-30 bg-white/80 dark:bg-gray-950/80 backdrop-blur-md border-b border-gray-200 dark:border-gray-800 px-4 lg:px-6 h-16 flex items-center justify-between">
+    <header className="shrink-0 z-30 bg-background/80 backdrop-blur-md border-b border-border px-4 lg:px-6 h-16 flex items-center justify-between">
       <div className="flex items-center gap-3">
         <Button
           variant="ghost"

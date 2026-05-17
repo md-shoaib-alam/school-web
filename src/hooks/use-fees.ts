@@ -5,10 +5,10 @@ import type { FeeCategory, FeeStructure, FeeConcession, FeeReceipt, FeeItem } fr
 
 // ── Categories ─────────────────────────────────────────────────────────────
 
-export function useFeeCategories() {
+export function useFeeCategories(mode?: 'min') {
   return useQuery<FeeCategory[]>({
-    queryKey: ['fee-categories'],
-    queryFn: () => api.get('/fee-categories')
+    queryKey: ['fee-categories', mode],
+    queryFn: () => api.get('/fee-categories', { params: { mode } })
   });
 }
 

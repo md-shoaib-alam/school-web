@@ -59,6 +59,7 @@ export function SetFeesTab({ canCreate, canEdit, canDelete }: SetFeesTabProps) {
 
   const { data: structures = [], isLoading: loadingStructures } = useFeeStructures();
   const { data: categories = [], isLoading: loadingCategories } = useFeeCategories();
+  const { data: minCategories = [] } = useFeeCategories('min');
   const { data: classes = [], isLoading: loadingClasses } = useQuery<ClassOption[]>({
     queryKey: ['classes', 'min'],
     queryFn: () => api.get('/classes?mode=min')
@@ -386,7 +387,7 @@ export function SetFeesTab({ canCreate, canEdit, canDelete }: SetFeesTabProps) {
               <Label>Fee Category *</Label>
               <Select value={addForm.feeCategoryId} onValueChange={v => setAddForm(p => ({ ...p, feeCategoryId: v }))}>
                 <SelectTrigger><SelectValue placeholder="Select category" /></SelectTrigger>
-                <SelectContent>{categories.filter(c => c.status === 'active').map(c => <SelectItem key={c.id} value={c.id}>{c.name} ({c.code})</SelectItem>)}</SelectContent>
+                <SelectContent>{minCategories.map(c => <SelectItem key={c.id} value={c.id}>{c.name} ({c.code})</SelectItem>)}</SelectContent>
               </Select>
             </div>
             <div className="grid grid-cols-2 gap-4">

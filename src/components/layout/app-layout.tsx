@@ -194,7 +194,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
 
   return (
     <NotificationProvider>
-      <div className="h-dvh flex flex-col overflow-hidden bg-gray-50 dark:bg-gray-900">
+      <div className="h-dvh flex flex-col overflow-hidden bg-background">
         <PlatformNoticeBar />
         <div className="flex-1 flex overflow-hidden">
           <LoadingProgress />

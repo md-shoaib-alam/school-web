@@ -39,22 +39,37 @@ export function ConcessionsTab({ canCreate, canEdit, canDelete }: ConcessionsTab
   const queryClient = useQueryClient();
   const createConcession = useCreateFeeConcession();
 
-  const { data: students = [] } = useQuery<StudentOption[]>({
-    queryKey: ['students'],
+  const { data: studentsData } = useQuery({
+    queryKey: ['students-min'],
     queryFn: async () => {
-      const res = await apiFetch('/api/students');
-      const data = await res.json();
-      return data.map((s: any) => ({ id: s.id, name: s.name, className: s.className, classId: s.classId, rollNumber: s.rollNumber, phone: s.phone || '' }));
-    }
-  });
-
-  const { data: classes = [] } = useQuery<ClassOption[]>({
-    queryKey: ['classes'],
-    queryFn: async () => {
-      const res = await apiFetch('/api/classes');
+      const res = await apiFetch('/api/students?mode=min&limit=5000');
       return res.json();
     }
   });
+
+  const students = useMemo(() => {
+    const raw = Array.isArray(studentsData) ? studentsData : studentsData?.items || [];
+    return raw.map((s: any) => ({
+      id: s.id,
+      name: s.name,
+      className: s.className,
+      classId: s.classId,
+      rollNumber: s.rollNumber,
+      phone: s.phone || ''
+    }));
+  }, [studentsData]);
+
+  const { data: classesData } = useQuery({
+    queryKey: ['classes-min'],
+    queryFn: async () => {
+      const res = await apiFetch('/api/classes?mode=min');
+      return res.json();
+    }
+  });
+
+  const classes = useMemo(() => {
+    return Array.isArray(classesData) ? classesData : classesData?.items || [];
+  }, [classesData]);
 
   const loading = loadingConcessions;
 
@@ -270,14 +285,14 @@ export function ConcessionsTab({ canCreate, canEdit, canDelete }: ConcessionsTab
               <Label>Class *</Label>
               <Select value={addForm.classId} onValueChange={v => setAddForm(p => ({ ...p, classId: v, studentId: '' }))}>
                 <SelectTrigger><SelectValue placeholder="Select class" /></SelectTrigger>
-                <SelectContent>{classes.map(c => <SelectItem key={c.id} value={c.id}>{c.name}-{c.section} (Grade {c.grade})</SelectItem>)}</SelectContent>
+                <SelectContent>{(Array.isArray(classes) ? classes : []).map(c => <SelectItem key={c.id} value={c.id}>{c.name}-{c.section} (Grade {c.grade})</SelectItem>)}</SelectContent>
               </Select>
             </div>
             <div className="grid gap-2">
               <Label>Student *</Label>
               <Select value={addForm.studentId} onValueChange={v => setAddForm(p => ({ ...p, studentId: v }))} disabled={!addForm.classId}>
                 <SelectTrigger><SelectValue placeholder={addForm.classId ? 'Select student' : 'Select class first'} /></SelectTrigger>
-                <SelectContent>{students.filter(s => !addForm.classId || s.classId === addForm.classId).map(s => <SelectItem key={s.id} value={s.id}>{s.name} ({s.className})</SelectItem>)}</SelectContent>
+                <SelectContent>{(Array.isArray(students) ? students : []).filter(s => !addForm.classId || s.classId === addForm.classId).map(s => <SelectItem key={s.id} value={s.id}>{s.name} ({s.className})</SelectItem>)}</SelectContent>
               </Select>
             </div>
             <div className="grid grid-cols-2 gap-4">
