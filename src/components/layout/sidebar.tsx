@@ -20,7 +20,9 @@ import {
   ChevronDown,
   ChevronRight,
   Crown,
-  User
+  User,
+  PanelLeftClose,
+  PanelLeftOpen
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { isRootAdmin } from "@/lib/permissions";
@@ -99,60 +101,67 @@ export function Sidebar({
         )}
       >
         <div className={cn("flex items-center gap-3", !sidebarOpen && "lg:gap-0 lg:justify-center")}>
-          <div
-            className={cn(
-              "w-10 h-10 rounded-xl flex items-center justify-center text-white shadow-md overflow-hidden shrink-0",
-              isSuperAdmin ? "bg-teal-600" : "bg-emerald-600",
-            )}
-          >
-            {!isSuperAdmin ? (
-              <img 
-                src={currentTenantLogo || currentUser?.tenantLogo || "/test.webp"} 
-                alt={currentTenantName || "School Logo"} 
-                className="h-full w-full object-cover" 
-              />
-            ) : (
-              <Building2 className="h-5 w-5" />
-            )}
-          </div>
-          <div className={cn("transition-all duration-300", !sidebarOpen && "lg:hidden")}>
-            <h2
-              className={cn(
-                "font-bold text-sm",
-                isSuperAdmin
-                  ? "text-white"
-                  : "text-gray-900 dark:text-gray-100",
-              )}
-            >
-              {isSuperAdmin
-                ? "SchoolSaaS"
-                : currentTenantName || "the school"}
-            </h2>
-            <p
-              className={cn(
-                "text-xs",
-                isSuperAdmin ? "text-rose-300" : "text-gray-400",
-              )}
-            >
-              {isSuperAdmin ? "Platform Console" : "Management System"}
-            </p>
-          </div>
+          {sidebarOpen && (
+            <>
+              <div
+                className={cn(
+                  "w-10 h-10 rounded-xl flex items-center justify-center text-white shadow-md overflow-hidden shrink-0",
+                  isSuperAdmin ? "bg-teal-600" : "bg-emerald-600",
+                )}
+              >
+                {!isSuperAdmin ? (
+                  <img 
+                    src={currentTenantLogo || currentUser?.tenantLogo || "/test.webp"} 
+                    alt={currentTenantName || "School Logo"} 
+                    className="h-full w-full object-cover" 
+                  />
+                ) : (
+                  <Building2 className="h-5 w-5" />
+                )}
+              </div>
+              <div className="transition-all duration-300">
+                <h2
+                  className={cn(
+                    "font-bold text-sm",
+                    isSuperAdmin
+                      ? "text-white"
+                      : "text-gray-900 dark:text-gray-100",
+                  )}
+                >
+                  {isSuperAdmin
+                    ? "SchoolSaaS"
+                    : currentTenantName || "the school"}
+                </h2>
+                <p
+                  className={cn(
+                    "text-xs",
+                    isSuperAdmin ? "text-rose-300" : "text-gray-400",
+                  )}
+                >
+                  {isSuperAdmin ? "Platform Console" : "Management System"}
+                </p>
+              </div>
+            </>
+          )}
         </div>
-        {sidebarOpen && (
-          <Button
-            variant="ghost"
-            size="icon"
-            className={cn(
-              "lg:hidden",
-              isSuperAdmin
-                ? "text-rose-300 hover:text-white hover:bg-rose-800"
-                : "text-gray-400 hover:text-gray-600 dark:hover:text-gray-200",
-            )}
-            onClick={toggleSidebar}
-          >
-            <ChevronLeft className="h-5 w-5" />
-          </Button>
-        )}
+        
+        <Button
+          variant="ghost"
+          size="icon"
+          className={cn(
+            "h-8 w-8 transition-all duration-200 hover:scale-105 active:scale-95 shrink-0 border border-gray-200 dark:border-zinc-800/60 shadow-sm rounded-lg",
+            isSuperAdmin
+              ? "text-teal-200 hover:text-white hover:bg-teal-800/40 border-teal-800/50 bg-teal-900/20"
+              : "bg-white dark:bg-zinc-950 text-gray-500 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-200 hover:bg-gray-50 dark:hover:bg-zinc-900",
+          )}
+          onClick={toggleSidebar}
+        >
+          {sidebarOpen ? (
+            <PanelLeftClose className="h-4 w-4" />
+          ) : (
+            <PanelLeftOpen className="h-4 w-4" />
+          )}
+        </Button>
       </div>
 
       {/* Navigation */}

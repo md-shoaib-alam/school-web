@@ -31,7 +31,7 @@ export function Header({ items, resolvedScreen }: HeaderProps) {
         <Button
           variant="ghost"
           size="icon"
-          className="h-10 w-10 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 bg-white hover:bg-gray-50 dark:bg-zinc-900 dark:hover:bg-zinc-800 border border-gray-200 dark:border-zinc-800 shadow-sm transition-all"
+          className="lg:hidden h-10 w-10 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 bg-white hover:bg-gray-50 dark:bg-zinc-900 dark:hover:bg-zinc-800 border border-gray-200 dark:border-zinc-800 shadow-sm transition-all"
           onClick={toggleSidebar}
         >
           {sidebarOpen ? (
