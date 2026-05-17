@@ -163,7 +163,7 @@ export function ParentFees() {
             <TabsTrigger
               key={student.id}
               value={student.id}
-              className="data-[state=active]:bg-white dark:data-[state=active]:bg-gray-900 data-[state=active]:text-amber-700 dark:data-[state=active]:text-amber-400 data-[state=active]:shadow-sm px-4"
+              className="data-[state=active]:bg-white dark:data-[state=active]:bg-gray-900 data-[state=active]:text-amber-700 dark:data-[state=active]:text-amber-400 data-[state=active]:shadow-sm px-4 transition-all hover:bg-amber-100/30 dark:hover:bg-amber-900/20 hover:text-amber-800 dark:hover:text-amber-300"
             >
               <span className="flex items-center gap-2">
                 <span className="w-2 h-2 rounded-full bg-amber-400" />

@@ -187,8 +187,8 @@ export function ParentGrades({ initialTab = "exams" }: { initialTab?: "exams" | 
               value={student.id}
               className={`px-4 py-1.5 text-xs font-medium rounded-md transition-all data-[state=active]:bg-card data-[state=active]:shadow-xs ${
                 topLevelTab === "exams" 
-                  ? "data-[state=active]:text-amber-700 dark:data-[state=active]:text-amber-400" 
-                  : "data-[state=active]:text-indigo-700 dark:data-[state=active]:text-indigo-400"
+                  ? "data-[state=active]:text-amber-700 dark:data-[state=active]:text-amber-400 hover:bg-amber-100/30 dark:hover:bg-amber-900/20 hover:text-amber-800 dark:hover:text-amber-300" 
+                  : "data-[state=active]:text-indigo-700 dark:data-[state=active]:text-indigo-400 hover:bg-indigo-100/30 dark:hover:bg-indigo-900/20 hover:text-indigo-800 dark:hover:text-indigo-300"
               }`}
             >
               <span className="flex items-center gap-2">

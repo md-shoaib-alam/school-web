@@ -99,7 +99,7 @@ export function ParentHomework() {
             <TabsTrigger
               key={child.id}
               value={child.id}
-              className="data-[state=active]:bg-white dark:data-[state=active]:bg-gray-900 data-[state=active]:text-violet-700 dark:data-[state=active]:text-violet-400 data-[state=active]:shadow-sm px-4 text-xs font-medium transition-all"
+              className="data-[state=active]:bg-white dark:data-[state=active]:bg-gray-900 data-[state=active]:text-violet-700 dark:data-[state=active]:text-violet-400 data-[state=active]:shadow-sm px-4 text-xs font-medium transition-all hover:bg-violet-100/30 dark:hover:bg-violet-900/20 hover:text-violet-800 dark:hover:text-violet-300"
             >
               <span className="flex items-center gap-2">
                 <span className="w-2 h-2 rounded-full bg-violet-400" />
@@ -276,11 +276,11 @@ function ChildHomeworkView({ student }: { student: StudentInfo }) {
         <CardContent className="pt-0 px-5 pb-5">
           <Tabs defaultValue="all" value={filterTab} onValueChange={setFilterTab}>
             <TabsList className="mb-4 bg-gray-50 dark:bg-zinc-900 p-1 text-xs font-medium border border-gray-100 dark:border-zinc-800 w-fit">
-              <TabsTrigger value="all" className="px-3 py-1.5">All ({counts.all})</TabsTrigger>
-              <TabsTrigger value="active" className="px-3 py-1.5">Active ({counts.active})</TabsTrigger>
-              <TabsTrigger value="submitted" className="px-3 py-1.5">Submitted ({counts.submitted})</TabsTrigger>
-              <TabsTrigger value="graded" className="px-3 py-1.5">Graded ({counts.graded})</TabsTrigger>
-              <TabsTrigger value="overdue" className="px-3 py-1.5">Overdue ({counts.overdue})</TabsTrigger>
+              <TabsTrigger value="all" className="px-3 py-1.5 transition-all hover:bg-violet-100/60 dark:hover:bg-violet-950/40 hover:text-violet-700 dark:hover:text-violet-400">All ({counts.all})</TabsTrigger>
+              <TabsTrigger value="active" className="px-3 py-1.5 transition-all hover:bg-violet-100/60 dark:hover:bg-violet-950/40 hover:text-violet-700 dark:hover:text-violet-400">Active ({counts.active})</TabsTrigger>
+              <TabsTrigger value="submitted" className="px-3 py-1.5 transition-all hover:bg-violet-100/60 dark:hover:bg-violet-950/40 hover:text-violet-700 dark:hover:text-violet-400">Submitted ({counts.submitted})</TabsTrigger>
+              <TabsTrigger value="graded" className="px-3 py-1.5 transition-all hover:bg-violet-100/60 dark:hover:bg-violet-950/40 hover:text-violet-700 dark:hover:text-violet-400">Graded ({counts.graded})</TabsTrigger>
+              <TabsTrigger value="overdue" className="px-3 py-1.5 transition-all hover:bg-violet-100/60 dark:hover:bg-violet-950/40 hover:text-violet-700 dark:hover:text-violet-400">Overdue ({counts.overdue})</TabsTrigger>
             </TabsList>
 
             <TabsContent value={filterTab}>
