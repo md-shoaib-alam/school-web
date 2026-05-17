@@ -166,11 +166,11 @@ export function Sidebar({
                     isActive && !hasChildren
                       ? isSuperAdmin
                         ? "bg-rose-800/60 text-white font-medium"
-                        : "bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 hover:bg-emerald-100 dark:hover:bg-emerald-900/50 font-medium"
+                        : "bg-white dark:bg-emerald-900/30 text-gray-900 dark:text-emerald-400 shadow-sm hover:bg-white dark:hover:bg-emerald-900/50 font-medium"
                       : isSuperAdmin
                         ? "text-rose-200 hover:text-white hover:bg-rose-800/40"
-                        : "text-gray-600 dark:text-gray-400 hover:bg-emerald-50/50 dark:hover:bg-emerald-900/20 hover:text-emerald-600 dark:hover:text-emerald-400",
-                    isActive && hasChildren && "text-emerald-700 dark:text-emerald-400"
+                        : "text-gray-600 dark:text-gray-400 hover:bg-white dark:hover:bg-emerald-900/20 hover:text-gray-900 dark:hover:text-emerald-400",
+                    isActive && hasChildren && "text-gray-900 font-semibold dark:text-emerald-400"
                   )}
                   onClick={() => {
                     if (hasChildren) {
@@ -201,8 +201,8 @@ export function Sidebar({
                         className={cn(
                           "w-full justify-start gap-3 h-9 px-3 font-normal cursor-pointer transition-all text-sm",
                           resolvedScreen === child.key
-                            ? "bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 font-medium"
-                            : "text-gray-500 hover:text-emerald-600 dark:hover:text-emerald-400 hover:bg-emerald-50/30"
+                            ? "bg-white dark:bg-emerald-900/30 text-gray-900 dark:text-emerald-400 shadow-sm hover:bg-white dark:hover:bg-emerald-900/50 font-medium"
+                            : "text-gray-500 hover:text-gray-900 dark:hover:text-emerald-400 hover:bg-white"
                         )}
                         onClick={() => navigateTo(child.key)}
                       >
