@@ -168,6 +168,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
       "settings",
       "school-subscriptions",
       "platform-notices",
+      "profile",
     ].includes(screen);
 
     if (isSuperAdmin && isPlatformRoute) {
@@ -193,6 +194,15 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
     window.addEventListener("super-admin-navigate", handleNavigationEvent);
     return () => window.removeEventListener("super-admin-navigate", handleNavigationEvent);
   }, [navigateTo]);
+
+  // Listen for open-change-password events from deep components
+  useEffect(() => {
+    const handleOpenPasswordModal = () => {
+      setIsChangePasswordOpen(true);
+    };
+    window.addEventListener("open-change-password", handleOpenPasswordModal);
+    return () => window.removeEventListener("open-change-password", handleOpenPasswordModal);
+  }, []);
 
   return (
     <NotificationProvider>

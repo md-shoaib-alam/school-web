@@ -123,6 +123,14 @@ const SuperAdminPlatformNotices = dynamic(
   { loading: LoadingScreen },
 );
 
+const UserProfileScreen = dynamic(
+  () =>
+    import("@/components/screens/profile").then(
+      (m) => m.UserProfileScreen,
+    ),
+  { loading: LoadingScreen },
+);
+
 const TeacherDashboard = dynamic(
   () =>
     import("@/components/screens/teacher/dashboard").then(
@@ -202,6 +210,8 @@ export default function GenericSlugDispatcher() {
   // 1. Check if it's a Platform Screen (Super Admin only)
   if (currentUser.role === "super_admin") {
     switch (slug) {
+      case "profile":
+        return <UserProfileScreen />;
       case "dashboard":
         return <SuperAdminDashboard />;
       case "tenants":

@@ -2,7 +2,7 @@
 
 import { useAppStore } from "@/store/use-app-store";
 import { Button } from "@/components/ui/button";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import {
   DropdownMenu,
@@ -19,7 +19,8 @@ import {
   LogOut,
   ChevronDown,
   ChevronRight,
-  Crown
+  Crown,
+  User
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { isRootAdmin } from "@/lib/permissions";
@@ -251,6 +252,7 @@ export function Sidebar({
         {sidebarOpen ? (
           <div className="flex items-center gap-3">
             <Avatar className="h-9 w-9">
+              <AvatarImage src={currentUser.avatar} alt={currentUser.name} className="object-cover" />
               <AvatarFallback
                 className={cn(
                   "text-white text-xs font-semibold",
@@ -302,6 +304,7 @@ export function Sidebar({
               <DropdownMenuContent align="end" className="w-56">
                 <div className="flex items-center gap-2 p-2">
                   <Avatar className="h-8 w-8">
+                    <AvatarImage src={currentUser.avatar} alt={currentUser.name} className="object-cover" />
                     <AvatarFallback
                       className={cn(
                         "text-white text-[10px] font-semibold",
@@ -319,6 +322,13 @@ export function Sidebar({
                   </div>
                 </div>
                 <DropdownMenuSeparator />
+                <DropdownMenuItem 
+                  className="cursor-pointer gap-2"
+                  onClick={() => navigateTo("profile")}
+                >
+                  <User className="h-4 w-4 text-emerald-500" />
+                  My Profile
+                </DropdownMenuItem>
                 {currentUser.role === "admin" && (
                   <DropdownMenuItem 
                     className="cursor-pointer gap-2"
@@ -355,6 +365,7 @@ export function Sidebar({
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" className="p-0 h-9 w-9 rounded-full focus-visible:ring-0">
                   <Avatar className="h-9 w-9 cursor-pointer hover:opacity-85 transition-opacity">
+                    <AvatarImage src={currentUser.avatar} alt={currentUser.name} className="object-cover" />
                     <AvatarFallback
                       className={cn(
                         "text-white text-xs font-semibold",
@@ -369,6 +380,7 @@ export function Sidebar({
               <DropdownMenuContent align="start" className="w-56 ml-2">
                 <div className="flex items-center gap-2 p-2">
                   <Avatar className="h-8 w-8">
+                    <AvatarImage src={currentUser.avatar} alt={currentUser.name} className="object-cover" />
                     <AvatarFallback
                       className={cn(
                         "text-white text-[10px] font-semibold",
@@ -386,6 +398,13 @@ export function Sidebar({
                   </div>
                 </div>
                 <DropdownMenuSeparator />
+                <DropdownMenuItem 
+                  className="cursor-pointer gap-2"
+                  onClick={() => navigateTo("profile")}
+                >
+                  <User className="h-4 w-4 text-emerald-500" />
+                  My Profile
+                </DropdownMenuItem>
                 {currentUser.role === "admin" && (
                   <DropdownMenuItem 
                     className="cursor-pointer gap-2"

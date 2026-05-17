@@ -6,3 +6,4 @@ export * from './super-admin';
 export * from './staff';
 export * from './error';
 export * from './login';
+export * from './profile';

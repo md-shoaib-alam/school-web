@@ -24,6 +24,8 @@ export interface AppUser {
   tenantSlug?: string;
   tenantName?: string;
   tenantLogo?: string | null;
+  phone?: string;
+  address?: string;
 
   customRole?: CustomRoleInfo | null;
   platformRole?: PlatformRoleInfo | null;

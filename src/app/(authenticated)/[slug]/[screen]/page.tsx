@@ -10,6 +10,8 @@ import { FullPageSkeleton } from "@/components/ui/full-page-skeleton";
 
 const LoadingScreen = () => <FullPageSkeleton />;
 
+const UserProfileScreen = dynamic(() => import('@/components/screens').then(m => m.UserProfileScreen), { loading: LoadingScreen });
+
 const TeacherDashboard = dynamic(() => import('@/components/screens/teacher/dashboard').then(m => m.TeacherDashboard));
 const StudentDashboard = dynamic(() => import('@/components/screens/student/dashboard').then(m => m.StudentDashboard));
 const ParentDashboard = dynamic(() => import('@/components/screens/parent/dashboard').then(m => m.ParentDashboard));
@@ -107,6 +109,7 @@ export default function TenantScreenDispatcher() {
   
   if (currentUser.role === 'super_admin' || currentUser.role === 'admin' || currentUser.role === 'staff') {
     switch (screen) {
+      case 'profile': return <UserProfileScreen />;
       case 'dashboard': 
         if (currentUser.role === 'super_admin' && slug === 'tenants') return <SuperAdminDashboard />;
         return currentUser.role === 'staff' ? <StaffDashboard /> : <AdminDashboard />;
@@ -157,6 +160,7 @@ export default function TenantScreenDispatcher() {
 
   if (currentUser.role === 'teacher') {
     switch (screen) {
+      case 'profile': return <UserProfileScreen />;
       case 'dashboard': return <TeacherDashboard />;
       case 'my-classes': return <TeacherClasses />;
       case 'my-subjects': return <TeacherSubjects />;
@@ -176,6 +180,7 @@ export default function TenantScreenDispatcher() {
 
   if (currentUser.role === 'student') {
     switch (screen) {
+      case 'profile': return <UserProfileScreen />;
       case 'dashboard': return <StudentDashboard />;
       case 'my-classes': return <StudentClasses />;
       case 'my-grades': return <StudentGrades />;
@@ -195,6 +200,7 @@ export default function TenantScreenDispatcher() {
 
   if (currentUser.role === 'parent') {
     switch (screen) {
+      case 'profile': return <UserProfileScreen />;
       case 'dashboard': return <ParentDashboard />;
       case 'children': return <ParentChildren />;
       case 'homework': return <ParentHomework />;

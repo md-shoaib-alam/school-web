@@ -41,8 +41,9 @@ export function Header({ items, resolvedScreen }: HeaderProps) {
           )}
         </Button>
         <h1 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
-          {items.find((i) => i.key === resolvedScreen)?.label ||
-            "Dashboard"}
+          {resolvedScreen === "profile"
+            ? "My Profile"
+            : items.find((i) => i.key === resolvedScreen)?.label || "Dashboard"}
         </h1>
         {isSuperAdmin && (
           <Badge className="bg-rose-100 dark:bg-rose-900/30 text-rose-700 dark:text-rose-400 border-rose-200 dark:border-rose-800 text-[10px]">
