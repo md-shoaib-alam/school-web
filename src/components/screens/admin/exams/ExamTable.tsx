@@ -8,7 +8,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { 
   Search, Filter, MoreVertical, Edit2, Trash2, Calendar, Clock, 
-  FileText, Pencil, ClipboardList, RefreshCw 
+  FileText, Pencil, ClipboardList, RefreshCw, Eye
 } from 'lucide-react';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { ExamRecord } from './types';
@@ -25,6 +25,7 @@ interface ExamTableProps {
   formatTime: (time: string | null | undefined) => string;
   getStatusBadge: (status: string) => React.ReactNode;
   getExamTypeBadge: (type: string) => React.ReactNode;
+  onViewResults?: (exam: ExamRecord) => void;
   
   // Filter props
   classFilter: string;
@@ -32,6 +33,9 @@ interface ExamTableProps {
   statusFilter: string;
   setStatusFilter: (v: string) => void;
   classes: any[];
+  hideClassFilter?: boolean;
+  flat?: boolean;
+  hideSearchAndFilter?: boolean;
 }
 
 export function ExamTable({
@@ -46,54 +50,72 @@ export function ExamTable({
   formatTime,
   getStatusBadge,
   getExamTypeBadge,
+  onViewResults,
   classFilter,
   setClassFilter,
   statusFilter,
   setStatusFilter,
   classes,
+  hideClassFilter = false,
+  flat = false,
+  hideSearchAndFilter = false,
 }: ExamTableProps) {
+  const Container = flat ? 'div' : Card;
+  const containerProps = flat 
+    ? { className: "overflow-hidden border-none bg-transparent shadow-none" }
+    : { className: "border-none shadow-sm overflow-hidden bg-card" };
+  
+  const ContentContainer = flat ? 'div' : CardContent;
+  const contentProps = { className: "p-0" };
+
   return (
-    <Card className="border-none shadow-sm overflow-hidden">
-      <div className="p-3 sm:p-4 border-b border-gray-100 dark:border-zinc-800 bg-card flex items-center justify-between gap-3">
-        <div className="relative flex-1">
-          <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
-          <Input
-            placeholder="Search..."
-            className="pl-8 h-8 sm:h-9 text-sm"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
+    // @ts-ignore
+    <Container {...containerProps}>
+      {!hideSearchAndFilter && (
+        <div className="p-3 sm:p-4 border-b border-gray-100 dark:border-zinc-800 bg-card flex items-center justify-between gap-3">
+          <div className="relative flex-1">
+            <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
+            <Input
+              placeholder="Search..."
+              className="pl-8 h-8 sm:h-9 text-sm"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+          </div>
+          <div className="flex items-center gap-2 shrink-0">
+            {!hideClassFilter && (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="outline" size="sm" className="h-8 sm:h-9 gap-1.5 px-2 sm:px-3">
+                    <Filter className="h-3.5 w-3.5" />
+                    <span className="hidden xs:inline">Filters</span>
+                    {(classFilter !== 'all' || statusFilter !== 'all') && (
+                      <div className="h-1.5 w-1.5 rounded-full bg-blue-600" />
+                    )}
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-64 max-h-[80vh] overflow-y-auto">
+                  <DropdownMenuLabel>Filter by Class</DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  <div className="max-h-[200px] overflow-y-auto">
+                    <DropdownMenuItem onClick={() => setClassFilter('all')} className={classFilter === 'all' ? 'bg-accent' : ''}>
+                      All Classes
+                    </DropdownMenuItem>
+                    {classes.map((c) => (
+                      <DropdownMenuItem key={c.id} onClick={() => setClassFilter(c.id)} className={classFilter === c.id ? 'bg-accent' : ''}>
+                        {c.name}-{c.section}
+                      </DropdownMenuItem>
+                    ))}
+                  </div>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            )}
+          </div>
         </div>
-        <div className="flex items-center gap-2 shrink-0">
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="outline" size="sm" className="h-8 sm:h-9 gap-1.5 px-2 sm:px-3">
-                <Filter className="h-3.5 w-3.5" />
-                <span className="hidden xs:inline">Filters</span>
-                {(classFilter !== 'all' || statusFilter !== 'all') && (
-                  <div className="h-1.5 w-1.5 rounded-full bg-blue-600" />
-                )}
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-64 max-h-[80vh] overflow-y-auto">
-              <DropdownMenuLabel>Filter by Class</DropdownMenuLabel>
-              <DropdownMenuSeparator />
-              <div className="max-h-[200px] overflow-y-auto">
-                <DropdownMenuItem onClick={() => setClassFilter('all')} className={classFilter === 'all' ? 'bg-accent' : ''}>
-                  All Classes
-                </DropdownMenuItem>
-                {classes.map((c) => (
-                  <DropdownMenuItem key={c.id} onClick={() => setClassFilter(c.id)} className={classFilter === c.id ? 'bg-accent' : ''}>
-                    {c.name}-{c.section}
-                  </DropdownMenuItem>
-                ))}
-              </div>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </div>
-      </div>
+      )}
       
-      <CardContent className="p-0">
+      {/* @ts-ignore */}
+      <ContentContainer {...contentProps}>
         <div className="overflow-x-auto">
           <Table>
             <TableHeader>
@@ -163,6 +185,17 @@ export function ExamTable({
                     <TableCell className="text-center px-2 hidden sm:table-cell">{getStatusBadge(exam.status)}</TableCell>
                     <TableCell className="text-right px-2 sm:px-4">
                       <div className="flex items-center justify-end gap-1">
+                        {onViewResults && exam.status === 'completed' && (
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-8 w-8 text-blue-500 hover:text-blue-700 hover:bg-blue-50"
+                            onClick={() => onViewResults(exam)}
+                            title="View Results"
+                          >
+                            <Eye className="h-4 w-4" />
+                          </Button>
+                        )}
                         <Button
                           variant="ghost"
                           size="icon"
@@ -208,7 +241,7 @@ export function ExamTable({
             </TableBody>
           </Table>
         </div>
-      </CardContent>
-    </Card>
+      </ContentContainer>
+    </Container>
   );
 }
