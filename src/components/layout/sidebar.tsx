@@ -87,10 +87,9 @@ export function Sidebar({
       {/* Sidebar Header */}
       <div
         className={cn(
-          "p-4 flex items-center justify-between border-b",
           isSuperAdmin
-            ? "border-teal-800/50"
-            : "border-sidebar-border",
+            ? "p-4 flex items-center justify-between border-b border-teal-800/50"
+            : "mx-3 mt-3 mb-2 p-3 bg-white dark:bg-zinc-950 border border-gray-200/80 dark:border-zinc-800 rounded-xl shadow-sm flex items-center justify-between",
         )}
       >
         <div className="flex items-center gap-3">
@@ -166,11 +165,11 @@ export function Sidebar({
                     isActive && !hasChildren
                       ? isSuperAdmin
                         ? "bg-rose-800/60 text-white font-medium"
-                        : "bg-white dark:bg-emerald-900/30 text-gray-900 dark:text-emerald-400 shadow-sm hover:bg-white dark:hover:bg-emerald-900/50 font-medium"
+                        : "bg-white dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 shadow-[0_4px_12px_rgba(0,0,0,0.05),0_1px_2px_rgba(0,0,0,0.02)] border border-gray-200/80 dark:border-emerald-900/50 hover:bg-white dark:hover:bg-emerald-900/50 font-semibold"
                       : isSuperAdmin
                         ? "text-rose-200 hover:text-white hover:bg-rose-800/40"
-                        : "text-gray-600 dark:text-gray-400 hover:bg-white dark:hover:bg-emerald-900/20 hover:text-gray-900 dark:hover:text-emerald-400",
-                    isActive && hasChildren && "text-gray-900 font-semibold dark:text-emerald-400"
+                        : "text-gray-600 dark:text-gray-400 border border-transparent hover:bg-white hover:shadow-[0_4px_12px_rgba(0,0,0,0.05),0_1px_2px_rgba(0,0,0,0.02)] hover:border-gray-200/80 dark:hover:border-emerald-900/30 hover:text-emerald-600 dark:hover:text-emerald-400",
+                    isActive && hasChildren && "text-emerald-700 font-semibold dark:text-emerald-400"
                   )}
                   onClick={() => {
                     if (hasChildren) {
@@ -201,8 +200,8 @@ export function Sidebar({
                         className={cn(
                           "w-full justify-start gap-3 h-9 px-3 font-normal cursor-pointer transition-all text-sm",
                           resolvedScreen === child.key
-                            ? "bg-white dark:bg-emerald-900/30 text-gray-900 dark:text-emerald-400 shadow-sm hover:bg-white dark:hover:bg-emerald-900/50 font-medium"
-                            : "text-gray-500 hover:text-gray-900 dark:hover:text-emerald-400 hover:bg-white"
+                            ? "bg-white dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 shadow-[0_4px_12px_rgba(0,0,0,0.05),0_1px_2px_rgba(0,0,0,0.02)] border border-gray-200/80 dark:border-emerald-900/50 hover:bg-white dark:hover:bg-emerald-900/50 font-semibold"
+                            : "text-gray-500 border border-transparent hover:text-emerald-600 dark:hover:text-emerald-400 hover:bg-white hover:shadow-[0_4px_12px_rgba(0,0,0,0.05),0_1px_2px_rgba(0,0,0,0.02)] hover:border-gray-200/80"
                         )}
                         onClick={() => navigateTo(child.key)}
                       >
@@ -221,10 +220,9 @@ export function Sidebar({
       {/* User Profile */}
       <div
         className={cn(
-          "p-4 border-t",
           isSuperAdmin
-            ? "border-rose-800/50"
-            : "border-sidebar-border",
+            ? "p-4 border-t border-rose-800/50"
+            : "mx-3 mb-3 p-3 bg-white dark:bg-zinc-950 border border-gray-200/80 dark:border-zinc-800 rounded-xl shadow-sm",
         )}
       >
         <div className="flex items-center gap-3">
