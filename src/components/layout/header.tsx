@@ -3,7 +3,7 @@
 import { useAppStore } from "@/store/use-app-store";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Menu, ShieldCheck, School, Calendar } from "lucide-react";
+import { Menu, ShieldCheck, School, Calendar, PanelLeftClose, PanelLeftOpen } from "lucide-react";
 import { NotificationBell } from "./notification-bell";
 import { ThemeToggle } from "./theme-toggle";
 import { type NavItem } from "./nav-config";
@@ -18,6 +18,7 @@ export function Header({ items, resolvedScreen }: HeaderProps) {
     currentUser,
     toggleSidebar,
     currentTenantName,
+    sidebarOpen,
   } = useAppStore();
 
   if (!currentUser) return null;
@@ -30,10 +31,14 @@ export function Header({ items, resolvedScreen }: HeaderProps) {
         <Button
           variant="ghost"
           size="icon"
-          className="lg:hidden h-10 w-10"
+          className="h-10 w-10 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 bg-white hover:bg-gray-50 dark:bg-zinc-900 dark:hover:bg-zinc-800 border border-gray-200 dark:border-zinc-800 shadow-sm transition-all"
           onClick={toggleSidebar}
         >
-          <Menu className="h-6 w-6" />
+          {sidebarOpen ? (
+            <PanelLeftClose className="h-5 w-5" />
+          ) : (
+            <PanelLeftOpen className="h-5 w-5" />
+          )}
         </Button>
         <h1 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
           {items.find((i) => i.key === resolvedScreen)?.label ||

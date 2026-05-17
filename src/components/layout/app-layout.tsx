@@ -144,7 +144,9 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
   // --------------------------------
 
   const navigateTo = useCallback((screen: string) => {
-    setSidebarOpen(false);
+    if (typeof window !== 'undefined' && window.innerWidth < 1024) {
+      setSidebarOpen(false);
+    }
     
     setCurrentScreen(screen);
     const tenantIdentifier = currentTenantSlug || currentTenantId;

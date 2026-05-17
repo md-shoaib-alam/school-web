@@ -35,21 +35,18 @@ export function ThemeToggle() {
         <Button
           variant="ghost"
           size="icon"
-          className="h-10 w-10 md:h-9 md:w-9 hover:bg-gray-100 dark:hover:bg-gray-800"
+          className="h-10 w-10 bg-white hover:bg-gray-50 dark:bg-zinc-900 dark:hover:bg-zinc-800 border border-gray-200 dark:border-zinc-800 shadow-sm transition-all cursor-pointer"
         >
           {theme === "dark" ? (
-            <Moon className="h-[28px] w-[28px] md:h-[22px] md:w-[22px] text-blue-400" />
+            <Moon className="h-5 w-5 text-blue-400" />
           ) : (
-            <Sun className="h-[28px] w-[28px] md:h-[22px] md:w-[22px] text-amber-500" />
+            <Sun className="h-5 w-5 text-amber-500" />
           )}
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-36">
         <DropdownMenuItem
-          className={cn(
-            "gap-2 cursor-pointer",
-            theme === "light" && "bg-accent",
-          )}
+          className="gap-2 cursor-pointer"
           onClick={() => setTheme("light")}
         >
           <Sun className="h-4 w-4" />
@@ -57,10 +54,7 @@ export function ThemeToggle() {
           {theme === "light" && <Check className="h-3.5 w-3.5 ml-auto" />}
         </DropdownMenuItem>
         <DropdownMenuItem
-          className={cn(
-            "gap-2 cursor-pointer",
-            theme === "dark" && "bg-accent",
-          )}
+          className="gap-2 cursor-pointer"
           onClick={() => setTheme("dark")}
         >
           <Moon className="h-4 w-4" />

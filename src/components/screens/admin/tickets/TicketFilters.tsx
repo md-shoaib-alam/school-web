@@ -36,13 +36,43 @@ export function TicketFilters({
   return (
     <div className="space-y-4">
       <Tabs value={statusFilter} onValueChange={setStatusFilter}>
-        <TabsList className="bg-gray-100 dark:bg-gray-800">
-          <TabsTrigger value="all">All</TabsTrigger>
-          <TabsTrigger value="open">Open</TabsTrigger>
-          <TabsTrigger value="in_progress">In Progress</TabsTrigger>
-          <TabsTrigger value="on_hold">On Hold</TabsTrigger>
-          <TabsTrigger value="resolved">Resolved</TabsTrigger>
-          <TabsTrigger value="closed">Closed</TabsTrigger>
+        <TabsList className="bg-gray-100/80 dark:bg-zinc-800/80 p-1 border border-gray-200/50 dark:border-zinc-700/50 h-10">
+          <TabsTrigger 
+            value="all" 
+            className="data-[state=active]:bg-white dark:data-[state=active]:bg-zinc-900 data-[state=active]:text-emerald-600 dark:data-[state=active]:text-emerald-400 data-[state=active]:shadow-[0_4px_12px_rgba(16,185,129,0.12)] dark:data-[state=active]:shadow-[0_4px_12px_rgba(0,0,0,0.4)] hover:bg-white/50 dark:hover:bg-zinc-900/50 hover:text-emerald-600 dark:hover:text-emerald-400 font-semibold cursor-pointer transition-all px-3"
+          >
+            All
+          </TabsTrigger>
+          <TabsTrigger 
+            value="open" 
+            className="data-[state=active]:bg-white dark:data-[state=active]:bg-zinc-900 data-[state=active]:text-emerald-600 dark:data-[state=active]:text-emerald-400 data-[state=active]:shadow-[0_4px_12px_rgba(16,185,129,0.12)] dark:data-[state=active]:shadow-[0_4px_12px_rgba(0,0,0,0.4)] hover:bg-white/50 dark:hover:bg-zinc-900/50 hover:text-emerald-600 dark:hover:text-emerald-400 font-semibold cursor-pointer transition-all px-3"
+          >
+            Open
+          </TabsTrigger>
+          <TabsTrigger 
+            value="in_progress" 
+            className="data-[state=active]:bg-white dark:data-[state=active]:bg-zinc-900 data-[state=active]:text-emerald-600 dark:data-[state=active]:text-emerald-400 data-[state=active]:shadow-[0_4px_12px_rgba(16,185,129,0.12)] dark:data-[state=active]:shadow-[0_4px_12px_rgba(0,0,0,0.4)] hover:bg-white/50 dark:hover:bg-zinc-900/50 hover:text-emerald-600 dark:hover:text-emerald-400 font-semibold cursor-pointer transition-all px-3"
+          >
+            In Progress
+          </TabsTrigger>
+          <TabsTrigger 
+            value="on_hold" 
+            className="data-[state=active]:bg-white dark:data-[state=active]:bg-zinc-900 data-[state=active]:text-emerald-600 dark:data-[state=active]:text-emerald-400 data-[state=active]:shadow-[0_4px_12px_rgba(16,185,129,0.12)] dark:data-[state=active]:shadow-[0_4px_12px_rgba(0,0,0,0.4)] hover:bg-white/50 dark:hover:bg-zinc-900/50 hover:text-emerald-600 dark:hover:text-emerald-400 font-semibold cursor-pointer transition-all px-3"
+          >
+            On Hold
+          </TabsTrigger>
+          <TabsTrigger 
+            value="resolved" 
+            className="data-[state=active]:bg-white dark:data-[state=active]:bg-zinc-900 data-[state=active]:text-emerald-600 dark:data-[state=active]:text-emerald-400 data-[state=active]:shadow-[0_4px_12px_rgba(16,185,129,0.12)] dark:data-[state=active]:shadow-[0_4px_12px_rgba(0,0,0,0.4)] hover:bg-white/50 dark:hover:bg-zinc-900/50 hover:text-emerald-600 dark:hover:text-emerald-400 font-semibold cursor-pointer transition-all px-3"
+          >
+            Resolved
+          </TabsTrigger>
+          <TabsTrigger 
+            value="closed" 
+            className="data-[state=active]:bg-white dark:data-[state=active]:bg-zinc-900 data-[state=active]:text-emerald-600 dark:data-[state=active]:text-emerald-400 data-[state=active]:shadow-[0_4px_12px_rgba(16,185,129,0.12)] dark:data-[state=active]:shadow-[0_4px_12px_rgba(0,0,0,0.4)] hover:bg-white/50 dark:hover:bg-zinc-900/50 hover:text-emerald-600 dark:hover:text-emerald-400 font-semibold cursor-pointer transition-all px-3"
+          >
+            Closed
+          </TabsTrigger>
         </TabsList>
       </Tabs>
 

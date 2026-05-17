@@ -33,7 +33,13 @@ function getInitialScreen(currentUser: AppUser | null): string {
 
 function getInitialSidebar(): boolean {
   if (typeof window === 'undefined') return false;
-  try { return localStorage.getItem(STORAGE_KEYS.SIDEBAR_STATE) === 'true'; } catch { return false; }
+  try {
+    const stored = localStorage.getItem(STORAGE_KEYS.SIDEBAR_STATE);
+    if (stored !== null) return stored === 'true';
+    return window.innerWidth >= 1024;
+  } catch {
+    return false;
+  }
 }
 
 function getInitialTenantInfo(): { id: string | null; slug: string | null; name: string | null; logo: string | null } {

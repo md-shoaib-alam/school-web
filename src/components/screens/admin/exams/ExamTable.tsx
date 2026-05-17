@@ -54,7 +54,7 @@ export function ExamTable({
 }: ExamTableProps) {
   return (
     <Card className="border-none shadow-sm overflow-hidden">
-      <div className="p-3 sm:p-4 border-b bg-muted/30 flex items-center justify-between gap-3">
+      <div className="p-3 sm:p-4 border-b border-gray-100 dark:border-zinc-800 bg-card flex items-center justify-between gap-3">
         <div className="relative flex-1">
           <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
           <Input
@@ -97,7 +97,7 @@ export function ExamTable({
         <div className="overflow-x-auto">
           <Table>
             <TableHeader>
-              <TableRow className="bg-muted/30">
+              <TableRow className="bg-muted/30 hover:bg-transparent">
                 <TableHead className="px-2 sm:px-4">Exam & Subject</TableHead>
                 <TableHead className="hidden sm:table-cell">Subject</TableHead>
                 <TableHead className="hidden md:table-cell">Class</TableHead>
@@ -110,14 +110,14 @@ export function ExamTable({
             <TableBody>
               {loading ? (
                 [...Array(5)].map((_, i) => (
-                  <TableRow key={i}>
+                  <TableRow key={i} className="hover:bg-transparent">
                     {[...Array(7)].map((_, j) => (
                       <TableCell key={j}><div className="h-4 w-full bg-muted animate-pulse rounded" /></TableCell>
                     ))}
                   </TableRow>
                 ))
               ) : exams.length === 0 ? (
-                <TableRow>
+                <TableRow className="hover:bg-transparent">
                   <TableCell colSpan={7} className="h-64 text-center">
                     <div className="flex flex-col items-center justify-center text-muted-foreground">
                       <ClipboardList className="h-12 w-12 mb-2 opacity-20" />
@@ -127,7 +127,7 @@ export function ExamTable({
                 </TableRow>
               ) : (
                 exams.map((exam) => (
-                  <TableRow key={exam.id} className="group">
+                  <TableRow key={exam.id} className="group hover:bg-transparent">
                     <TableCell className="px-2 sm:px-4">
                       <div className="flex flex-col gap-1">
                         <div className="flex items-center gap-2">

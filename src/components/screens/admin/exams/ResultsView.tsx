@@ -91,7 +91,7 @@ export function ResultsView({
                     <SelectValue placeholder="Choose a class..." />
                   </div>
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent className="max-h-60">
                   {classes.map((c) => (
                     <SelectItem key={c.id} value={c.id}>{c.grade} - {c.section}</SelectItem>
                   ))}
@@ -114,7 +114,7 @@ export function ResultsView({
                     <SelectValue placeholder="Select Subject/Exam..." />
                   </div>
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent className="max-h-60">
                   {filteredExams.length > 0 ? (
                     filteredExams.map((e) => (
                       <SelectItem key={e.id} value={e.id}>
@@ -273,7 +273,7 @@ export function ResultsView({
                 <div className="overflow-x-auto">
                   <Table>
                     <TableHeader>
-                      <TableRow>
+                      <TableRow className="hover:bg-transparent">
                         <TableHead className="w-10">#</TableHead>
                         <TableHead>Student Name</TableHead>
                         <TableHead className="hidden sm:table-cell w-20">Roll No</TableHead>
@@ -283,7 +283,7 @@ export function ResultsView({
                     </TableHeader>
                     <TableBody>
                       {resultRows.map((row, idx) => (
-                        <TableRow key={row.studentId}>
+                        <TableRow key={row.studentId} className="hover:bg-transparent">
                           <TableCell className="text-xs text-muted-foreground">{idx + 1}</TableCell>
                           <TableCell className="font-medium text-sm">{row.studentName}</TableCell>
                           <TableCell className="hidden sm:table-cell text-xs text-muted-foreground font-mono">

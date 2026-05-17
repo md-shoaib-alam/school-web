@@ -77,25 +77,30 @@ export function Sidebar({
   return (
     <aside
       className={cn(
-        "fixed lg:static inset-y-0 left-0 z-50 w-72 flex flex-col transition-transform duration-300 lg:translate-x-0 lg:h-dvh border-r overflow-hidden",
+        "fixed lg:static inset-y-0 left-0 z-50 flex flex-col transition-all duration-300 lg:h-dvh border-r overflow-hidden",
         isSuperAdmin
           ? "bg-gradient-to-b from-teal-950 to-teal-900 border-teal-800/50"
           : "bg-sidebar border-sidebar-border",
-        sidebarOpen ? "translate-x-0" : "-translate-x-full",
+        sidebarOpen 
+          ? "w-72 translate-x-0 lg:w-72 lg:translate-x-0" 
+          : "w-0 -translate-x-full lg:w-[72px] lg:translate-x-0",
       )}
     >
       {/* Sidebar Header */}
       <div
         className={cn(
           isSuperAdmin
-            ? "p-4 flex items-center justify-between border-b border-teal-800/50"
-            : "mx-3 mt-3 mb-2 p-3 bg-white dark:bg-zinc-950 border border-gray-200/80 dark:border-zinc-800 rounded-xl shadow-sm flex items-center justify-between",
+            ? "p-4 flex items-center border-b border-teal-800/50"
+            : "mx-3 mt-3 mb-2 p-3 bg-white dark:bg-zinc-950 border border-gray-200/80 dark:border-zinc-800 rounded-xl shadow-sm flex items-center",
+          !sidebarOpen 
+            ? "mx-2 mt-3 mb-2 p-2 justify-center lg:mx-2 lg:p-2 lg:justify-center" 
+            : "justify-between"
         )}
       >
-        <div className="flex items-center gap-3">
+        <div className={cn("flex items-center gap-3", !sidebarOpen && "lg:gap-0 lg:justify-center")}>
           <div
             className={cn(
-              "w-10 h-10 rounded-xl flex items-center justify-center text-white shadow-md overflow-hidden",
+              "w-10 h-10 rounded-xl flex items-center justify-center text-white shadow-md overflow-hidden shrink-0",
               isSuperAdmin ? "bg-teal-600" : "bg-emerald-600",
             )}
           >
@@ -109,7 +114,7 @@ export function Sidebar({
               <Building2 className="h-5 w-5" />
             )}
           </div>
-          <div>
+          <div className={cn("transition-all duration-300", !sidebarOpen && "lg:hidden")}>
             <h2
               className={cn(
                 "font-bold text-sm",
@@ -132,23 +137,25 @@ export function Sidebar({
             </p>
           </div>
         </div>
-        <Button
-          variant="ghost"
-          size="icon"
-          className={cn(
-            "lg:hidden",
-            isSuperAdmin
-              ? "text-rose-300 hover:text-white hover:bg-rose-800"
-              : "text-gray-400 hover:text-gray-600 dark:hover:text-gray-200",
-          )}
-          onClick={toggleSidebar}
-        >
-          <ChevronLeft className="h-5 w-5" />
-        </Button>
+        {sidebarOpen && (
+          <Button
+            variant="ghost"
+            size="icon"
+            className={cn(
+              "lg:hidden",
+              isSuperAdmin
+                ? "text-rose-300 hover:text-white hover:bg-rose-800"
+                : "text-gray-400 hover:text-gray-600 dark:hover:text-gray-200",
+            )}
+            onClick={toggleSidebar}
+          >
+            <ChevronLeft className="h-5 w-5" />
+          </Button>
+        )}
       </div>
 
       {/* Navigation */}
-      <nav className="flex-1 overflow-y-auto py-3 px-3 sidebar-scrollbar overscroll-contain">
+      <nav className={cn("flex-1 overflow-y-auto py-3 px-3 sidebar-scrollbar overscroll-contain", !sidebarOpen && "lg:px-2")}>
         <div className="space-y-1">
           {items.map((item) => {
             const hasChildren = item.children && item.children.length > 0;
@@ -162,6 +169,7 @@ export function Sidebar({
                   variant="ghost"
                   className={cn(
                     "w-full justify-start gap-3 h-10 px-3 font-normal cursor-pointer transition-all",
+                    !sidebarOpen && "lg:justify-center lg:px-0 lg:gap-0",
                     isActive && !hasChildren
                       ? isSuperAdmin
                         ? "bg-rose-800/60 text-white font-medium"
@@ -173,25 +181,37 @@ export function Sidebar({
                   )}
                   onClick={() => {
                     if (hasChildren) {
-                      toggleExpand(item.key);
+                      if (!sidebarOpen) {
+                        // Expand sidebar first when folder is clicked in collapsed mode
+                        useAppStore.getState().setSidebarOpen(true);
+                        if (!isExpanded) toggleExpand(item.key);
+                      } else {
+                        toggleExpand(item.key);
+                      }
                     } else {
                       navigateTo(item.key);
                     }
                   }}
                 >
-                  {item.icon}
-                  <span className="flex-1 text-left">{item.label}</span>
-                  {hasChildren ? (
-                    isExpanded ? <ChevronDown className="h-4 w-4 opacity-50" /> : <ChevronRight className="h-4 w-4 opacity-50" />
-                  ) : item.badge && (
-                    <Badge variant="secondary" className="ml-auto text-[10px] h-5 px-1.5">
-                      {item.badge}
-                    </Badge>
+                  <div className="shrink-0 flex items-center justify-center w-5 h-5">
+                    {item.icon}
+                  </div>
+                  <span className={cn("flex-1 text-left transition-all duration-300", !sidebarOpen && "lg:hidden")}>{item.label}</span>
+                  {sidebarOpen && (
+                    <>
+                      {hasChildren ? (
+                        isExpanded ? <ChevronDown className="h-4 w-4 opacity-50" /> : <ChevronRight className="h-4 w-4 opacity-50" />
+                      ) : item.badge && (
+                        <Badge variant="secondary" className="ml-auto text-[10px] h-5 px-1.5">
+                          {item.badge}
+                        </Badge>
+                      )}
+                    </>
                   )}
                 </Button>
 
                 {/* Sub Items (Accordion) */}
-                {hasChildren && isExpanded && (
+                {hasChildren && isExpanded && sidebarOpen && (
                   <div className="ml-4 pl-4 border-l border-sidebar-border space-y-1 mt-1 animate-in slide-in-from-top-1 duration-200">
                     {item.children?.map((child) => (
                       <Button
@@ -205,7 +225,9 @@ export function Sidebar({
                         )}
                         onClick={() => navigateTo(child.key)}
                       >
-                        {child.icon}
+                        <div className="shrink-0 flex items-center justify-center w-4 h-4">
+                          {child.icon}
+                        </div>
                         {child.label}
                       </Button>
                     ))}
@@ -223,108 +245,178 @@ export function Sidebar({
           isSuperAdmin
             ? "p-4 border-t border-rose-800/50"
             : "mx-3 mb-3 p-3 bg-white dark:bg-zinc-950 border border-gray-200/80 dark:border-zinc-800 rounded-xl shadow-sm",
+          !sidebarOpen && "lg:mx-2 lg:p-2"
         )}
       >
-        <div className="flex items-center gap-3">
-          <Avatar className="h-9 w-9">
-            <AvatarFallback
-              className={cn(
-                "text-white text-xs font-semibold",
-                roleColors[currentUser.role],
-              )}
-            >
-              {initials}
-            </AvatarFallback>
-          </Avatar>
-          <div className="flex-1 min-w-0">
-            <p
-              className={cn(
-                "text-sm font-medium truncate",
-                isSuperAdmin
-                  ? "text-white"
-                  : "text-gray-900 dark:text-gray-100",
-              )}
-            >
-              {currentUser.name}
-            </p>
-            <Badge
-              variant="secondary"
-              className={cn(
-                "text-[10px] px-1.5 py-0",
-                isSuperAdmin
-                  ? "bg-rose-800/60 text-rose-200 hover:bg-rose-800/60"
-                  : "",
-              )}
-            >
-              {currentUser.customRole?.name || roleLabels[currentUser.role]}
-            </Badge>
-          </div>
-
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button
-                variant="ghost"
-                size="icon"
+        {sidebarOpen ? (
+          <div className="flex items-center gap-3">
+            <Avatar className="h-9 w-9">
+              <AvatarFallback
                 className={cn(
-                  "h-8 w-8",
-                  isSuperAdmin
-                    ? "text-rose-300 hover:bg-rose-800/60 hover:text-white"
-                    : "text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800",
+                  "text-white text-xs font-semibold",
+                  roleColors[currentUser.role],
                 )}
               >
-                <Settings className="h-4 w-4" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-56">
-              <div className="flex items-center gap-2 p-2">
-                <Avatar className="h-8 w-8">
-                  <AvatarFallback
-                    className={cn(
-                      "text-white text-[10px] font-semibold",
-                      roleColors[currentUser.role],
-                    )}
-                  >
-                    {initials}
-                  </AvatarFallback>
-                </Avatar>
-                <div className="flex flex-col space-y-0.5">
-                  <p className="text-sm font-medium">{currentUser.name}</p>
-                  <p className="text-xs text-muted-foreground truncate">
-                    {currentUser.email}
-                  </p>
+                {initials}
+              </AvatarFallback>
+            </Avatar>
+            <div className="flex-1 min-w-0">
+              <p
+                className={cn(
+                  "text-sm font-medium truncate",
+                  isSuperAdmin
+                    ? "text-white"
+                    : "text-gray-900 dark:text-gray-100",
+                )}
+              >
+                {currentUser.name}
+              </p>
+              <Badge
+                variant="secondary"
+                className={cn(
+                  "text-[10px] px-1.5 py-0",
+                  isSuperAdmin
+                    ? "bg-rose-800/60 text-rose-200 hover:bg-rose-800/60"
+                    : "",
+                )}
+              >
+                {currentUser.customRole?.name || roleLabels[currentUser.role]}
+              </Badge>
+            </div>
+
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className={cn(
+                    "h-8 w-8",
+                    isSuperAdmin
+                      ? "text-rose-300 hover:bg-rose-800/60 hover:text-white"
+                      : "text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800",
+                  )}
+                >
+                  <Settings className="h-4 w-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-56">
+                <div className="flex items-center gap-2 p-2">
+                  <Avatar className="h-8 w-8">
+                    <AvatarFallback
+                      className={cn(
+                        "text-white text-[10px] font-semibold",
+                        roleColors[currentUser.role],
+                      )}
+                    >
+                      {initials}
+                    </AvatarFallback>
+                  </Avatar>
+                  <div className="flex flex-col space-y-0.5">
+                    <p className="text-sm font-medium">{currentUser.name}</p>
+                    <p className="text-xs text-muted-foreground truncate">
+                      {currentUser.email}
+                    </p>
+                  </div>
                 </div>
-              </div>
-              <DropdownMenuSeparator />
-              {currentUser.role === "admin" && (
+                <DropdownMenuSeparator />
+                {currentUser.role === "admin" && (
+                  <DropdownMenuItem 
+                    className="cursor-pointer gap-2"
+                    onClick={() => navigateTo("school-subscription")}
+                  >
+                    <Crown className="h-4 w-4 text-amber-500" />
+                    My Subscription
+                  </DropdownMenuItem>
+                )}
                 <DropdownMenuItem 
                   className="cursor-pointer gap-2"
-                  onClick={() => navigateTo("school-subscription")}
+                  onClick={() => setIsChangePasswordOpen(true)}
                 >
-                  <Crown className="h-4 w-4 text-amber-500" />
-                  My Subscription
+                  <KeyRound className="h-4 w-4 text-orange-500" />
+                  Change Password
                 </DropdownMenuItem>
-              )}
-              <DropdownMenuItem 
-                className="cursor-pointer gap-2"
-                onClick={() => setIsChangePasswordOpen(true)}
-              >
-                <KeyRound className="h-4 w-4 text-orange-500" />
-                Change Password
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem
-                className="cursor-pointer gap-2 text-red-600 focus:text-red-600 focus:bg-red-50 dark:focus:bg-red-900/20"
-                onClick={() => {
-                  logout();
-                  router.replace("/");
-                }}
-              >
-                <LogOut className="h-4 w-4" />
-                Logout
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </div>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem
+                  className="cursor-pointer gap-2 text-red-600 focus:text-red-600 focus:bg-red-50 dark:focus:bg-red-900/20"
+                  onClick={() => {
+                    logout();
+                    router.replace("/");
+                  }}
+                >
+                  <LogOut className="h-4 w-4" />
+                  Logout
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
+        ) : (
+          <div className="flex items-center justify-center">
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" className="p-0 h-9 w-9 rounded-full focus-visible:ring-0">
+                  <Avatar className="h-9 w-9 cursor-pointer hover:opacity-85 transition-opacity">
+                    <AvatarFallback
+                      className={cn(
+                        "text-white text-xs font-semibold",
+                        roleColors[currentUser.role],
+                      )}
+                    >
+                      {initials}
+                    </AvatarFallback>
+                  </Avatar>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="start" className="w-56 ml-2">
+                <div className="flex items-center gap-2 p-2">
+                  <Avatar className="h-8 w-8">
+                    <AvatarFallback
+                      className={cn(
+                        "text-white text-[10px] font-semibold",
+                        roleColors[currentUser.role],
+                      )}
+                    >
+                      {initials}
+                    </AvatarFallback>
+                  </Avatar>
+                  <div className="flex flex-col space-y-0.5">
+                    <p className="text-sm font-medium">{currentUser.name}</p>
+                    <p className="text-xs text-muted-foreground truncate">
+                      {currentUser.email}
+                    </p>
+                  </div>
+                </div>
+                <DropdownMenuSeparator />
+                {currentUser.role === "admin" && (
+                  <DropdownMenuItem 
+                    className="cursor-pointer gap-2"
+                    onClick={() => navigateTo("school-subscription")}
+                  >
+                    <Crown className="h-4 w-4 text-amber-500" />
+                    My Subscription
+                  </DropdownMenuItem>
+                )}
+                <DropdownMenuItem 
+                  className="cursor-pointer gap-2"
+                  onClick={() => setIsChangePasswordOpen(true)}
+                >
+                  <KeyRound className="h-4 w-4 text-orange-500" />
+                  Change Password
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem
+                  className="cursor-pointer gap-2 text-red-600 focus:text-red-600 focus:bg-red-50 dark:focus:bg-red-900/20"
+                  onClick={() => {
+                    logout();
+                    router.replace("/");
+                  }}
+                >
+                  <LogOut className="h-4 w-4" />
+                  Logout
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
+        )}
       </div>
     </aside>
   );

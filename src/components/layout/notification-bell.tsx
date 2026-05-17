@@ -111,7 +111,7 @@ export function NotificationBell() {
         <Button
           variant="ghost"
           size="icon"
-          className="relative h-11 w-11 md:h-10 md:w-10 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-800 transition-all duration-200"
+          className="relative h-10 w-10 bg-white hover:bg-gray-50 dark:bg-zinc-900 dark:hover:bg-zinc-800 border border-gray-200 dark:border-zinc-800 shadow-sm rounded-xl transition-all duration-200 cursor-pointer"
         >
           <Bell className={cn(
             "h-6 w-6 md:h-5 md:w-5 transition-colors",
