@@ -185,6 +185,7 @@ export default function GenericSlugDispatcher() {
         resolvedTenant.id,
         resolvedTenant.name,
         resolvedTenant.slug,
+        resolvedTenant.logo
       );
     }
   }, [mounted, resolvedTenant, currentTenantSlug, setCurrentTenant]);

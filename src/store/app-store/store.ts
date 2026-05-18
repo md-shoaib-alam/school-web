@@ -212,7 +212,7 @@ export const useAppStore = create<AppState>((set, get) => ({
     // 2. ASYNCHRONOUS background caching of logo to base64
     // We DO NOT await this so we don't block the UI mounting!
     (async () => {
-      if (!logo) return;
+      if (!logo || logo === 'undefined' || logo === 'null') return;
       try {
         const CACHE_KEY = `schoolsaas_logo_cache_${id}`;
         const cachedStr = localStorage.getItem(CACHE_KEY);
@@ -228,8 +228,10 @@ export const useAppStore = create<AppState>((set, get) => ({
           }
         }
 
-        // Fetch and cache in background
-        const response = await fetch(logo);
+        // Fetch and cache in background using the backend proxy to bypass CORS
+        const apiBase = process.env.NEXT_PUBLIC_API_URL || '';
+        const proxyUrl = `${apiBase}/tenants/logo-proxy?url=${encodeURIComponent(logo)}`;
+        const response = await fetch(proxyUrl);
         const blob = await response.blob();
         const reader = new FileReader();
         const base64Data = await new Promise<string>((resolve) => {
