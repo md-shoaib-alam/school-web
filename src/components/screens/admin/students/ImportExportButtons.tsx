@@ -55,7 +55,11 @@ export function ImportExportButtons({
         "class (e.g. 10-A)": "10-A",
         "roll_number": "001",
         "gender": "male",
-        "date_of_birth": "2010-05-15"
+        "date_of_birth": "2010-05-15",
+        "blood_group": "O+",
+        "admission_date": "2024-04-01",
+        "transport_route": "Route 1",
+        "pickup_point": "Sector 4 Main Gate"
       },
       {
         "name": "Jane Smith",
@@ -64,11 +68,31 @@ export function ImportExportButtons({
         "class (e.g. 10-A)": "10-A",
         "roll_number": "002",
         "gender": "female",
-        "date_of_birth": "2010-08-22"
+        "date_of_birth": "2010-08-22",
+        "blood_group": "A-",
+        "admission_date": "2024-04-01",
+        "transport_route": "",
+        "pickup_point": ""
       }
     ];
 
     const worksheet = XLSX.utils.json_to_sheet(data);
+
+    // Set custom column widths (in characters) to make every column spacious and easy to read
+    worksheet["!cols"] = [
+      { wch: 20 }, // name
+      { wch: 25 }, // email
+      { wch: 18 }, // phone
+      { wch: 20 }, // class (e.g. 10-A)
+      { wch: 15 }, // roll_number
+      { wch: 12 }, // gender
+      { wch: 16 }, // date_of_birth
+      { wch: 14 }, // blood_group
+      { wch: 16 }, // admission_date
+      { wch: 20 }, // transport_route
+      { wch: 25 }  // pickup_point
+    ];
+
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, "Students Template");
 
@@ -232,6 +256,10 @@ export function ImportExportButtons({
                   "roll_number",
                   "gender",
                   "date_of_birth",
+                  "blood_group",
+                  "admission_date",
+                  "transport_route",
+                  "pickup_point",
                 ].map((col) => (
                   <Badge
                     key={col}
