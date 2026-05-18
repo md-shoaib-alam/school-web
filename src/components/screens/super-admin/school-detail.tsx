@@ -177,7 +177,7 @@ export function SchoolDetail({
       <input
         ref={importInputRef}
         type="file"
-        accept=".csv,.xlsx"
+        accept=".xlsx,.xls,.csv"
         className="hidden"
         onChange={handleImport}
       />
