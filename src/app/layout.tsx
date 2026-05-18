@@ -22,9 +22,6 @@ import { generateAdvancedMetadata } from "@/lib/seo/metadata";
 
 export const metadata = generateAdvancedMetadata();
 
-
-import Script from "next/script";
-
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -34,11 +31,6 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <head>
         <JsonLd />
-        <Script
-          id="razorpay-checkout"
-          src="https://checkout.razorpay.com/v1/checkout.js"
-          strategy="lazyOnload"
-        />
       </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased bg-background text-foreground`}
