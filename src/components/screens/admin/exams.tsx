@@ -117,7 +117,7 @@ export function AdminExams({ initialTab = 'exams' }: { initialTab?: string }) {
   const [statusFilter, setStatusFilter] = useState('all');
   const [examTypeFilter, setExamTypeFilter] = useState('all');
   const [searchTerm, setSearchTerm] = useState('');
-  const [publishedAcademicYearFilter, setPublishedAcademicYearFilter] = useState('all');
+  const [publishedAcademicYearFilter, setPublishedAcademicYearFilter] = useState(currentAcademicYear);
   const [publishedClassFilter, setPublishedClassFilter] = useState('all');
   const [expandedClasses, setExpandedClasses] = useState<Record<string, boolean>>({});
   const debouncedSearch = useDebounce(searchTerm, 300);
@@ -139,6 +139,7 @@ export function AdminExams({ initialTab = 'exams' }: { initialTab?: string }) {
   useEffect(() => {
     if (currentAcademicYear) {
       setAddForm(prev => ({ ...prev, academicYear: prev.academicYear || currentAcademicYear }));
+      setPublishedAcademicYearFilter(prev => prev === 'all' ? currentAcademicYear : prev);
     }
   }, [currentAcademicYear]);
   
@@ -239,7 +240,7 @@ export function AdminExams({ initialTab = 'exams' }: { initialTab?: string }) {
   const publishedFiltered = useMemo(() => {
     return exams.filter(exam => {
       if (exam.status !== 'completed') return false;
-      const matchAcademicYear = publishedAcademicYearFilter === 'all' || exam.academicYear === publishedAcademicYearFilter;
+      const matchAcademicYear = !publishedAcademicYearFilter || exam.academicYear === publishedAcademicYearFilter;
       const matchClass = publishedClassFilter === 'all' || exam.classId === publishedClassFilter;
       return matchAcademicYear && matchClass;
     });
@@ -765,18 +766,17 @@ export function AdminExams({ initialTab = 'exams' }: { initialTab?: string }) {
           ) : (
             <div className="space-y-4 animate-in fade-in duration-300">
               {/* Dual Filter Selectors for Published Results */}
-              <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 bg-card p-3 rounded-xl border border-gray-100 dark:border-zinc-800/80 shadow-sm">
-                <div className="flex flex-1 flex-col sm:flex-row items-stretch sm:items-center gap-3">
-                  <div className="w-full sm:w-[220px]">
+              <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 bg-card p-3 rounded-xl border border-gray-100 dark:border-zinc-800/80 shadow-sm">
+                <div className="flex flex-1 flex-col sm:flex-row items-stretch sm:items-center gap-4">
+                  <div className="w-full sm:w-[260px]">
                     <Select value={publishedAcademicYearFilter} onValueChange={setPublishedAcademicYearFilter}>
-                      <SelectTrigger className="h-9 border-gray-200 dark:border-zinc-800 rounded-lg text-xs font-semibold">
+                      <SelectTrigger className="w-full h-9 border-gray-200 dark:border-zinc-800 rounded-lg text-xs font-semibold">
                         <div className="flex items-center gap-2">
                           <span className="text-muted-foreground font-normal">Academic Year:</span>
-                          <SelectValue placeholder="All Academic Years" />
+                          <SelectValue placeholder="Select Academic Year" />
                         </div>
                       </SelectTrigger>
                       <SelectContent className="rounded-lg">
-                        <SelectItem value="all" className="text-xs font-medium">All Academic Years</SelectItem>
                         {academicYears.map((ay: any) => (
                           <SelectItem key={ay.id} value={ay.name} className="text-xs font-medium">
                             {ay.name} {ay.isCurrent ? '(Current)' : ''}
@@ -788,7 +788,7 @@ export function AdminExams({ initialTab = 'exams' }: { initialTab?: string }) {
 
                   <div className="w-full sm:w-[220px]">
                     <Select value={publishedClassFilter} onValueChange={setPublishedClassFilter}>
-                      <SelectTrigger className="h-9 border-gray-200 dark:border-zinc-800 rounded-lg text-xs font-semibold">
+                      <SelectTrigger className="w-full h-9 border-gray-200 dark:border-zinc-800 rounded-lg text-xs font-semibold">
                         <div className="flex items-center gap-2">
                           <span className="text-muted-foreground font-normal">Class:</span>
                           <SelectValue placeholder="All Classes" />
@@ -806,11 +806,11 @@ export function AdminExams({ initialTab = 'exams' }: { initialTab?: string }) {
                   </div>
                 </div>
 
-                {(publishedAcademicYearFilter !== 'all' || publishedClassFilter !== 'all') && (
+                {(publishedAcademicYearFilter !== currentAcademicYear || publishedClassFilter !== 'all') && (
                   <Button 
                     variant="ghost" 
                     size="sm" 
-                    onClick={() => { setPublishedAcademicYearFilter('all'); setPublishedClassFilter('all'); }}
+                    onClick={() => { setPublishedAcademicYearFilter(currentAcademicYear); setPublishedClassFilter('all'); }}
                     className="text-xs text-muted-foreground hover:text-foreground h-9 px-3 hover:bg-zinc-100 dark:hover:bg-zinc-900 rounded-lg transition-colors shrink-0"
                   >
                     Clear Filters
@@ -824,7 +824,7 @@ export function AdminExams({ initialTab = 'exams' }: { initialTab?: string }) {
                   <h3 className="text-base font-bold text-foreground">No matching published exams found</h3>
                   <p className="text-xs mt-1 max-w-md">No finalized exams match your selected filters. Try clearing or modifying your selections.</p>
                   <Button 
-                    onClick={() => { setPublishedAcademicYearFilter('all'); setPublishedClassFilter('all'); }}
+                    onClick={() => { setPublishedAcademicYearFilter(currentAcademicYear); setPublishedClassFilter('all'); }}
                     variant="outline" 
                     size="sm" 
                     className="mt-4 border-emerald-200 dark:border-emerald-800/50 hover:bg-emerald-50 dark:hover:bg-emerald-950/20 text-emerald-600 dark:text-emerald-400"
