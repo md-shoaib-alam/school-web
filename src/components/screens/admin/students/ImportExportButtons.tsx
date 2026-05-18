@@ -21,6 +21,7 @@ import {
 } from "lucide-react";
 import { apiFetch } from "@/lib/api";
 import { goeyToast as toast } from "goey-toast";
+import * as XLSX from "xlsx";
 
 interface ImportExportButtonsProps {
   canCreate: boolean;
@@ -46,22 +47,43 @@ export function ImportExportButtons({
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const downloadSampleTemplate = () => {
-    const headers =
-      "name,email,phone,class (e.g. 10-A),roll_number,gender,date_of_birth";
-    const sampleRows = [
-      "John Doe,john@school.com,+91 98765 43210,10-A,001,male,2010-05-15",
-      "Jane Smith,jane@school.com,+91 98765 43211,10-A,002,female,2010-08-22",
+    const data = [
+      {
+        "name": "John Doe",
+        "email": "john@school.com",
+        "phone": "+91 98765 43210",
+        "class (e.g. 10-A)": "10-A",
+        "roll_number": "001",
+        "gender": "male",
+        "date_of_birth": "2010-05-15"
+      },
+      {
+        "name": "Jane Smith",
+        "email": "jane@school.com",
+        "phone": "+91 98765 43211",
+        "class (e.g. 10-A)": "10-A",
+        "roll_number": "002",
+        "gender": "female",
+        "date_of_birth": "2010-08-22"
+      }
     ];
-    const csv = [headers, ...sampleRows].join("\n");
-    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+
+    const worksheet = XLSX.utils.json_to_sheet(data);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Students Template");
+
+    // Write workbook to array buffer and trigger download
+    const excelBuffer = XLSX.write(workbook, { bookType: "xlsx", type: "array" });
+    const blob = new Blob([excelBuffer], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=utf-8" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = "sample_students.csv";
+    a.download = "sample_students.xlsx";
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
+    toast.success("Excel template downloaded successfully.");
   };
 
   const handleImport = async () => {
