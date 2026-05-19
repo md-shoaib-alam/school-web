@@ -195,16 +195,22 @@ export function Sidebar({
                     isActive && hasChildren && "text-emerald-700 font-semibold dark:text-emerald-400"
                   )}
                   onClick={() => {
-                    if (hasChildren) {
-                      if (!sidebarOpen) {
-                        // Expand sidebar first when folder is clicked in collapsed mode
-                        useAppStore.getState().setSidebarOpen(true);
-                        if (!isExpanded) toggleExpand(item.key);
-                      } else {
+                    if (!sidebarOpen) {
+                      // Expand sidebar first when any tab is clicked in collapsed mode
+                      useAppStore.getState().setSidebarOpen(true);
+                      if (hasChildren && !isExpanded) {
                         toggleExpand(item.key);
                       }
+                      if (!hasChildren) {
+                        navigateTo(item.key);
+                      }
                     } else {
-                      navigateTo(item.key);
+                      // Normal behavior when sidebar is already open
+                      if (hasChildren) {
+                        toggleExpand(item.key);
+                      } else {
+                        navigateTo(item.key);
+                      }
                     }
                   }}
                 >

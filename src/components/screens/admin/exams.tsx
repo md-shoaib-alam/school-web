@@ -27,6 +27,7 @@ import { useAcademicYears } from '@/hooks/use-academic-years';
 // Sub-components
 import { ExamDialogs } from './exams/ExamDialogs';
 import { ViewResultsDialog } from './exams/ViewResultsDialog';
+import { MarksheetDialog } from './exams/MarksheetDialog';
 import { 
   ExamRecord, ExamFormData, StudentResultRow, 
   ClassOption, SubjectOption, StudentOption 
@@ -160,6 +161,10 @@ export function AdminExams({ initialTab = 'exams' }: { initialTab?: string }) {
   const [viewResultsExam, setViewResultsExam] = useState<ExamRecord | null>(null);
   const [viewResultsData, setViewResultsData] = useState<any[]>([]);
   const [loadingViewResults, setLoadingViewResults] = useState(false);
+
+  // Marksheets Dialog State
+  const [marksheetOpen, setMarksheetOpen] = useState(false);
+  const [marksheetClass, setMarksheetClass] = useState<{ id: string; name: string; section: string } | null>(null);
 
   // Bulk Mode Helpers
   const [bulkSelected, setBulkSelected] = useState<Set<string>>(new Set());
@@ -866,6 +871,19 @@ export function AdminExams({ initialTab = 'exams' }: { initialTab?: string }) {
                             </div>
                             
                             <div className="flex items-center gap-3">
+                              <Button 
+                                variant="outline" 
+                                size="sm" 
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setMarksheetClass(c);
+                                  setMarksheetOpen(true);
+                                }}
+                                className="h-8 border-emerald-200 hover:border-emerald-300 dark:border-emerald-900/50 hover:bg-emerald-50 dark:hover:bg-emerald-950/20 text-emerald-600 dark:text-emerald-400 gap-1.5 rounded-lg text-xs font-semibold px-2.5 shadow-sm transition-colors"
+                              >
+                                <FileText className="h-3.5 w-3.5" />
+                                <span className="hidden xs:inline">Generate Marksheets</span>
+                              </Button>
                               <div className={`p-1.5 rounded-full transition-all duration-300 ${isExpanded ? 'bg-emerald-50 dark:bg-emerald-950/50 text-emerald-600 dark:text-emerald-400' : 'bg-gray-50 dark:bg-zinc-900 text-muted-foreground'}`}>
                                 <ChevronDown className={`h-4 w-4 transition-transform duration-300 ${isExpanded ? 'rotate-180' : ''}`} />
                               </div>
@@ -944,6 +962,17 @@ export function AdminExams({ initialTab = 'exams' }: { initialTab?: string }) {
         formatDate={formatDate}
         formatTime={formatTime}
       />
+
+      {marksheetClass && (
+        <MarksheetDialog
+          open={marksheetOpen}
+          onOpenChange={setMarksheetOpen}
+          classId={marksheetClass.id}
+          classNameStr={marksheetClass.name}
+          classSection={marksheetClass.section}
+          academicYear={publishedAcademicYearFilter || currentAcademicYear}
+        />
+      )}
     </div>
   );
 }
