@@ -3,7 +3,7 @@
 import { apiFetch } from "@/lib/api";
 import { useState, useEffect } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Settings, Globe, Shield, Bell, CreditCard, Server } from "lucide-react";
+import { Settings, Globe, Shield, Bell, CreditCard, Server, Activity } from "lucide-react";
 import { goeyToast as toast } from "goey-toast";
 
 // Sub-components
@@ -13,6 +13,8 @@ import { NotificationsTab } from "./settings/NotificationsTab";
 import { SecurityTab } from "./settings/SecurityTab";
 import { ApiTab } from "./settings/ApiTab";
 import { StickySaveBar } from "./settings/StickySaveBar";
+import { PerformanceAudit } from "./settings/PerformanceAudit";
+import { PerformanceData } from "./settings/types";
 
 export function SuperAdminSettings() {
   // General Settings
@@ -43,6 +45,10 @@ export function SuperAdminSettings() {
   const [webhookUrl, setWebhookUrl] = useState("");
 
   const [editingPlan, setEditingPlan] = useState<string | null>(null);
+
+  // Performance Audit State
+  const [checking, setChecking] = useState(false);
+  const [perfData, setPerfData] = useState<PerformanceData | null>(null);
 
 
   // Fetch maintenance mode from DB on mount
@@ -107,6 +113,26 @@ export function SuperAdminSettings() {
   };
 
 
+  const handleCheckPerformance = async () => {
+    setChecking(true);
+    try {
+      const res = await apiFetch("/api/performance");
+      if (res.ok) {
+        const data = await res.json();
+        setPerfData(data);
+        toast.success("Performance test completed!");
+      } else {
+        toast.error("Failed to run performance audit");
+      }
+    } catch (err) {
+      toast.error("Failed to run performance audit", {
+        description: err instanceof Error ? err.message : String(err),
+      });
+    } finally {
+      setChecking(false);
+    }
+  };
+
   const handleSaveAll = () => {
     toast.success("Settings saved successfully!", {
       description: "Platform settings have been updated.",
@@ -148,6 +174,9 @@ export function SuperAdminSettings() {
           <TabsTrigger value="api" className="gap-1.5 rounded-lg data-[state=active]:bg-white dark:data-[state=active]:bg-gray-800 shadow-none">
             <Server className="h-4 w-4" /> API
           </TabsTrigger>
+          <TabsTrigger value="performance" className="gap-1.5 rounded-lg data-[state=active]:bg-white dark:data-[state=active]:bg-gray-800 shadow-none">
+            <Activity className="h-4 w-4" /> Performance
+          </TabsTrigger>
         </TabsList>
 
         <TabsContent value="general">
@@ -188,6 +217,14 @@ export function SuperAdminSettings() {
           <ApiTab 
             rateLimit={rateLimit} setRateLimit={setRateLimit}
             webhookUrl={webhookUrl} setWebhookUrl={setWebhookUrl}
+          />
+        </TabsContent>
+
+        <TabsContent value="performance">
+          <PerformanceAudit 
+            checking={checking}
+            onCheck={handleCheckPerformance}
+            perfData={perfData}
           />
         </TabsContent>
       </Tabs>
