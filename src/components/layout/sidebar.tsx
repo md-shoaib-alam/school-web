@@ -149,10 +149,10 @@ export function Sidebar({
           variant="ghost"
           size="icon"
           className={cn(
-            "h-8 w-8 transition-all duration-200 hover:scale-105 active:scale-95 shrink-0 border border-gray-200 dark:border-zinc-800/60 shadow-sm rounded-lg",
+            "h-8 w-8 transition-all duration-200 hover:scale-105 active:scale-95 shrink-0 rounded-lg",
             isSuperAdmin
-              ? "text-teal-200 hover:text-white hover:bg-teal-800/40 border-teal-800/50 bg-teal-900/20"
-              : "bg-white dark:bg-zinc-950 text-gray-500 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-200 hover:bg-gray-50 dark:hover:bg-zinc-900",
+              ? "text-teal-200 hover:text-white hover:bg-teal-800/40 border border-teal-800/50 bg-teal-900/20 shadow-sm"
+              : "text-gray-500 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-zinc-900",
           )}
           onClick={toggleSidebar}
         >
