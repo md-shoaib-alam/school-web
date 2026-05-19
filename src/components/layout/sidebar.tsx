@@ -93,11 +93,16 @@ export function Sidebar({
       <div
         className={cn(
           isSuperAdmin
-            ? "p-4 flex items-center border-b border-teal-800/50"
-            : "mx-3 mt-3 mb-2 p-3 bg-white dark:bg-zinc-950 border border-gray-200/80 dark:border-zinc-800 rounded-xl shadow-sm flex items-center",
-          !sidebarOpen 
-            ? "mx-2 mt-3 mb-2 p-2 justify-center lg:mx-2 lg:p-2 lg:justify-center" 
-            : "justify-between"
+            ? cn(
+                "p-4 flex items-center border-b border-teal-800/50",
+                sidebarOpen ? "justify-between" : "justify-center"
+              )
+            : cn(
+                "mt-3 mb-2 bg-white dark:bg-zinc-950 border border-gray-200/80 dark:border-zinc-800 shadow-sm flex items-center",
+                sidebarOpen
+                  ? "mx-3 p-3 rounded-xl justify-between"
+                  : "w-12 h-12 rounded-xl justify-center mx-auto"
+              )
         )}
       >
         <div className={cn("flex items-center gap-3", !sidebarOpen && "lg:gap-0 lg:justify-center")}>
@@ -253,9 +258,16 @@ export function Sidebar({
       <div
         className={cn(
           isSuperAdmin
-            ? "p-4 border-t border-rose-800/50"
-            : "mx-3 mb-3 p-3 bg-white dark:bg-zinc-950 border border-gray-200/80 dark:border-zinc-800 rounded-xl shadow-sm",
-          !sidebarOpen && "lg:mx-2 lg:p-2"
+            ? cn(
+                "p-4 border-t border-rose-800/50",
+                !sidebarOpen && "flex items-center justify-center"
+              )
+            : cn(
+                "bg-white dark:bg-zinc-950 border border-gray-200/80 dark:border-zinc-800 shadow-sm",
+                sidebarOpen
+                  ? "mx-3 mb-3 p-3 rounded-xl"
+                  : "w-12 h-12 mb-3 rounded-xl flex items-center justify-center mx-auto"
+              )
         )}
       >
         {sidebarOpen ? (
