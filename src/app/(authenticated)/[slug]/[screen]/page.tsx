@@ -38,6 +38,7 @@ const AdminCertificates = dynamic(() => import('@/components/screens/admin/certi
 const AdminLeaves = dynamic(() => import('@/components/screens/admin/leaves').then(m => m.AdminLeaves), { loading: LoadingScreen });
 const StaffAttendance = dynamic(() => import('@/components/screens/admin/staff-attendance').then(m => m.StaffAttendance), { loading: LoadingScreen });
 const AdminExams = dynamic(() => import('@/components/screens/admin/exams').then(m => m.AdminExams), { loading: LoadingScreen });
+const AdminPrintMarksheet = dynamic(() => import('@/components/screens/admin/print-marksheet').then(m => m.AdminPrintMarksheet), { loading: LoadingScreen });
 const AdminAdmitCards = dynamic(() => import('@/components/screens/admin/admit-cards').then(m => m.AdminAdmitCards), { loading: LoadingScreen });
 const AcademicYearsScreen = dynamic(() => import('@/components/screens/admin/academic-years').then(m => m.AcademicYearsScreen), { loading: LoadingScreen });
 const ExpensesScreen = dynamic(() => import('@/components/screens/admin/expenses').then(m => m.ExpensesScreen), { loading: LoadingScreen });
@@ -155,7 +156,7 @@ export default function TenantScreenDispatcher() {
       case 'exams': return <AdminExams key="exams" initialTab="exams" />;
       case 'results-entry': return <AdminExams key="results" initialTab="results" />;
       case 'published-results': return <AdminExams key="published" initialTab="published" />;
-      case 'print-marksheet': return <AdminExams key="print-marksheet" initialTab="published" />;
+      case 'print-marksheet': return <AdminPrintMarksheet />;
       case 'admit-cards': return <AdminAdmitCards />;
     }
   }
