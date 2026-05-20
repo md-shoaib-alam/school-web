@@ -22,6 +22,7 @@ export interface TenantBilling {
   id: string;
   name: string;
   slug: string;
+  status: string;
   plan: string;
   activeRevenue: number;
   totalRevenue: number;
@@ -47,7 +48,7 @@ export interface BillingData {
   totalActiveRevenue: number;
 }
 
-export type SortKey = "activeRevenue" | "totalRevenue" | "name" | "activeSubscriptions";
+export type SortKey = "activeRevenue" | "totalRevenue" | "name" | "activeSubscriptions" | "plan";
 export type SortDir = "asc" | "desc";
 
 export const revenueTrendConfig = {

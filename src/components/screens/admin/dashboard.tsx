@@ -1,13 +1,8 @@
 "use client";
 
 import { useEffect } from "react";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-} from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Skeleton as BoneyardSkeleton } from "boneyard-js/react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -97,17 +92,9 @@ const priorityBorders: Record<string, string> = {
 
 function StatCardSkeleton() {
   return (
-    <Card>
-      <CardContent className="p-6">
-        <div className="flex items-center justify-between">
-          <div className="space-y-2">
-            <Skeleton className="h-4 w-24" />
-            <Skeleton className="h-8 w-16" />
-          </div>
-          <Skeleton className="h-12 w-12 rounded-xl" />
-        </div>
-      </CardContent>
-    </Card>
+    <BoneyardSkeleton name="boneyard-card" loading={true} color="rgba(0,0,0,0.06)" darkColor="rgba(255,255,255,0.05)" animate="pulse">
+      <div className="h-[238px]" />
+    </BoneyardSkeleton>
   );
 }
 
@@ -221,15 +208,11 @@ export function AdminDashboard() {
         <div className="relative z-10">
           <div className="flex items-center gap-4 mb-3">
             <div className="h-14 w-14 rounded-2xl bg-white/20 flex items-center justify-center backdrop-blur-sm overflow-hidden">
-              {currentTenantLogo || currentUser?.tenantLogo ? (
-                <img 
-                  src={currentTenantLogo || currentUser?.tenantLogo || ""} 
-                  alt={currentTenantName || ""} 
-                  className="h-full w-full object-cover" 
-                />
-              ) : (
-                <School className="h-7 w-7" />
-              )}
+              <img 
+                src={currentTenantLogo || currentUser?.tenantLogo || "/test.webp"} 
+                alt={currentTenantName || ""} 
+                className="h-full w-full object-cover" 
+              />
             </div>
             <div>
               <h2 className="text-2xl font-bold tracking-tight">
@@ -270,7 +253,7 @@ export function AdminDashboard() {
                   <p className="text-teal-100 text-xs font-medium">Attendance Rate</p>
                   <p className="text-2xl font-bold flex items-center gap-1">
                     <Activity className="h-5 w-5 text-teal-200" />
-                    {summary.data?.attendanceRate ?? 0}%
+                    {Number(summary.data?.attendanceRate ?? 0).toFixed(2).replace(/\.00$/, "")}%
                   </p>
                 </div>
                 <div className="bg-white/10 backdrop-blur-sm rounded-xl px-4 py-3">
@@ -344,7 +327,7 @@ export function AdminDashboard() {
                   </div>
                   <div>
                     <p className="text-xs text-muted-foreground">Avg Attendance</p>
-                    <p className="text-2xl font-bold">{summary.data?.attendanceRate ?? 0}%</p>
+                    <p className="text-2xl font-bold">{Number(summary.data?.attendanceRate ?? 0).toFixed(2).replace(/\.00$/, "")}%</p>
                   </div>
                 </div>
               </CardContent>

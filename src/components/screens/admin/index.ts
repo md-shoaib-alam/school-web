@@ -19,6 +19,7 @@ export * from './certificates';
 export * from './leaves';
 export * from './staff-attendance';
 export * from './exams';
+export * from './print-marksheet';
 export * from './academic-years';
 export * from './expenses';
 export * from './subscription';

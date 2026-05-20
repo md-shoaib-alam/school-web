@@ -431,7 +431,7 @@ export function AdminTimetable() {
         </div>
 
         <div className="flex items-center gap-3 w-full sm:w-auto">
-          <div className="inline-flex items-center rounded-lg border bg-muted/40 p-0.5">
+          <div className="inline-flex items-center rounded-lg border border-gray-200 bg-white dark:bg-zinc-900 p-0.5 shadow-sm">
             <Button
               size="sm"
               variant={viewMode === "grid" ? "default" : "ghost"}
@@ -459,7 +459,7 @@ export function AdminTimetable() {
           </div>
 
           <Select value={selectedClass} onValueChange={setSelectedClass}>
-            <SelectTrigger className="w-full sm:w-56 text-sm">
+            <SelectTrigger className="w-full sm:w-56 text-sm bg-white hover:bg-gray-50/50 dark:bg-zinc-900 border-gray-200 dark:border-zinc-800 shadow-sm">
               <SelectValue placeholder="Select class" />
             </SelectTrigger>
             <SelectContent>
@@ -475,6 +475,7 @@ export function AdminTimetable() {
             <Button
               variant="outline"
               size="sm"
+              className="bg-white hover:bg-gray-50 dark:bg-zinc-900 dark:hover:bg-zinc-800 border-gray-200 dark:border-zinc-800 shadow-sm"
               onClick={() => {
                 setDaysConfigDraft([...workingDays]);
                 setDaysConfigOpen(true);
@@ -489,7 +490,7 @@ export function AdminTimetable() {
             <Button
               size="sm"
               onClick={handleOpenManage}
-              className="bg-emerald-600 text-white hover:bg-emerald-700"
+              className="bg-emerald-600 text-white hover:bg-emerald-700 shadow-md shadow-emerald-600/30 hover:shadow-lg hover:shadow-emerald-600/45 transition-all duration-200"
             >
               <Plus className="h-4 w-4 mr-1.5" />
               Manage
@@ -572,6 +573,7 @@ export function AdminTimetable() {
         availableSubjects={filteredSubjects}
         availableTeachers={availableTeachers}
         workingDays={workingDays}
+        isBreak={!!(editingSlot as any)?.label}
       />
 
       <CreateTimetableDialog
@@ -595,7 +597,7 @@ export function AdminTimetable() {
           }));
           setDaySlots((prev) => ({
             ...prev,
-            [tar]: [...(prev[tar] ?? []), ...copied],
+            [tar]: copied,
           }));
           toast.success(`Copied to ${DAY_LABELS[tar]}`);
         }}
@@ -610,7 +612,7 @@ export function AdminTimetable() {
               id: crypto.randomUUID(),
               day,
             }));
-            updated[day] = [...(updated[day] ?? []), ...copied];
+            updated[day] = copied;
           });
           setDaySlots(updated);
           toast.success("Copied to all days");

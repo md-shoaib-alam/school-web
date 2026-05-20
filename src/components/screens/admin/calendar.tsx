@@ -134,11 +134,16 @@ export function AdminCalendar() {
   };
 
   return (
-    <div className="space-y-3 animate-in fade-in duration-500 overflow-hidden">
+    <div className="space-y-5 animate-in fade-in duration-500 overflow-hidden pb-8">
       {!canCreate && !canEdit && !canDelete && (
-        <div className="flex items-center gap-3 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 dark:border-amber-900/50 dark:bg-amber-900/20">
-          <Eye className="h-5 w-5 text-amber-600 shrink-0" />
-          <span className="text-sm text-amber-700 font-medium">Read-only mode.</span>
+        <div className="flex items-center gap-3 rounded-2xl border border-amber-200/60 bg-amber-50/60 px-4 py-3 dark:border-amber-900/30 dark:bg-amber-950/20 shadow-sm shadow-amber-500/5 animate-in slide-in-from-top-2 duration-300">
+          <div className="h-8 w-8 rounded-xl bg-amber-100 dark:bg-amber-900/50 flex items-center justify-center text-amber-600 dark:text-amber-400">
+            <Eye className="h-4 w-4 shrink-0" />
+          </div>
+          <div>
+            <p className="text-sm text-amber-900 dark:text-amber-200 font-bold leading-none">Read-only Mode</p>
+            <p className="text-xs text-amber-700 dark:text-amber-300 mt-0.5">You can view but not manage school events.</p>
+          </div>
         </div>
       )}
 
@@ -147,8 +152,8 @@ export function AdminCalendar() {
         goToPrevMonth={goToPrevMonth} goToNextMonth={goToNextMonth} goToToday={goToToday} canCreate={canCreate} openCreateDialog={openCreateDialog}
       />
 
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 items-stretch">
-        <div className="lg:col-span-8">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-stretch">
+        <div className="lg:col-span-8 h-full">
           <CalendarGrid
             loading={loading} calendarCells={calendarCells} eventsByDate={eventsByDate}
             selectedDate={selectedDate} setSelectedDate={setSelectedDate} isCurrentMonthDay={isCurrentMonthDay}
@@ -158,9 +163,11 @@ export function AdminCalendar() {
         <CalendarAgenda
           selectedDate={selectedDate} setSelectedDate={setSelectedDate} loading={loading}
           selectedDayEvents={selectedDayEvents} getTypeBadgeStyle={getTypeBadgeStyle}
+          allEvents={filteredEvents}
           canEdit={canEdit} canDelete={canDelete} openEditDialog={openEditDialog} openDeleteConfirm={(id) => { setEventToDelete(id); setDeleteConfirmOpen(true); }}
         />
       </div>
+
 
       <CalendarDialogs
         dialogOpen={dialogOpen} closeDialog={closeDialog} editingEvent={editingEvent} form={form}

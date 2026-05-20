@@ -11,6 +11,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { BookOpen, Layers, Zap, Loader2, Plus, Save } from 'lucide-react';
 import { DatePicker } from '@/components/ui/date-picker';
 import { TimePicker } from '@/components/ui/time-picker';
+import { formatLocalDate, parseLocalDate } from '@/lib/utils';
 import { ExamFormData, ClassOption, SubjectOption } from './types';
 
 interface ExamDialogsProps {
@@ -42,14 +43,19 @@ interface ExamDialogsProps {
   toggleAllBulk: (checked: boolean) => void;
   toggleBulkSubject: (id: string) => void;
   updateBulkField: (id: string, field: string, value: string) => void;
+  academicYears: any[];
+  currentAcademicYear: string;
 }
 
 export function ExamDialogs({
   addOpen, setAddOpen, addForm, setAddForm, adding, onAdd,
   editOpen, setEditOpen, editForm, setEditForm, saving, onSave,
   classes, subjects, subjectsForClass, editSubjectsForClass,
-  bulkRows, selectedBulkCount, toggleAllBulk, toggleBulkSubject, updateBulkField
+  bulkRows, selectedBulkCount, toggleAllBulk, toggleBulkSubject, updateBulkField,
+  academicYears, currentAcademicYear
 }: ExamDialogsProps) {
+  const hasMissingDates = bulkRows.some(row => row.selected && !row.date);
+
   return (
     <>
       {/* NEW EXAM DIALOG */}
@@ -60,11 +66,13 @@ export function ExamDialogs({
             <DialogDescription>Schedule a new exam for your students.</DialogDescription>
           </DialogHeader>
           <div className="grid gap-4 py-2">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               <div className="grid gap-2">
                 <Label>Class *</Label>
                 <Select value={addForm.classId} onValueChange={(v) => setAddForm({ ...addForm, classId: v, subjectId: '' })}>
-                  <SelectTrigger><SelectValue placeholder="Select class" /></SelectTrigger>
+                  <SelectTrigger className="w-full text-left font-medium">
+                    <SelectValue placeholder="Select class" />
+                  </SelectTrigger>
                   <SelectContent>
                     {classes.map((c) => (
                       <SelectItem key={c.id} value={c.id}>{c.name} - {c.section}</SelectItem>
@@ -75,13 +83,30 @@ export function ExamDialogs({
               <div className="grid gap-2">
                 <Label>Exam Type *</Label>
                 <Select value={addForm.examType} onValueChange={(v) => setAddForm({ ...addForm, examType: v })}>
-                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectTrigger className="w-full text-left font-medium">
+                    <SelectValue />
+                  </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="unit_test">Unit Test</SelectItem>
                     <SelectItem value="midterm">Midterm</SelectItem>
                     <SelectItem value="final">Final</SelectItem>
-                    <SelectItem value="quiz">Quiz</SelectItem>
-                    <SelectItem value="practical">Practical</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="grid gap-2">
+                <Label>Academic Year *</Label>
+                <Select 
+                  value={addForm.academicYear || currentAcademicYear} 
+                  onValueChange={(v) => setAddForm({ ...addForm, academicYear: v })}
+                >
+                  <SelectTrigger className="w-full text-left font-medium">
+                    <SelectValue placeholder="Select Academic Year" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {academicYears.map((ay) => (
+                      <SelectItem key={ay.id} value={ay.name}>
+                        {ay.name} {ay.isCurrent && '(Current)'}
+                      </SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
               </div>
@@ -114,11 +139,11 @@ export function ExamDialogs({
                         <TableRow key={row.subjectId} className={row.selected ? 'bg-blue-50/30' : ''}>
                           <TableCell className="px-2 sm:px-4"><Checkbox checked={row.selected} onCheckedChange={() => toggleBulkSubject(row.subjectId)} /></TableCell>
                           <TableCell className="font-medium px-2 sm:px-4 whitespace-nowrap">{row.subjectName}</TableCell>
-                          <TableCell className="px-2 sm:px-4"><DatePicker date={row.date ? new Date(row.date) : undefined} onChange={(d) => updateBulkField(row.subjectId, 'date', d?.toISOString().split('T')[0] || '')} disabled={(date) => date < new Date(new Date().setHours(0, 0, 0, 0))} /></TableCell>
+                          <TableCell className="px-2 sm:px-4"><DatePicker date={parseLocalDate(row.date)} onChange={(d) => updateBulkField(row.subjectId, 'date', formatLocalDate(d))} disabled={(date) => date < new Date(new Date().setHours(0, 0, 0, 0))} /></TableCell>
                           <TableCell className="px-2 sm:px-4"><TimePicker value={row.startTime} onChange={(v) => updateBulkField(row.subjectId, 'startTime', v)} /></TableCell>
                           <TableCell className="px-2 sm:px-4"><TimePicker value={row.endTime} onChange={(v) => updateBulkField(row.subjectId, 'endTime', v)} /></TableCell>
-                          <TableCell className="px-2 sm:px-4"><Input type="number" className="w-14 sm:w-16 h-8 text-center" value={row.totalMarks} onChange={(e) => updateBulkField(row.subjectId, 'totalMarks', e.target.value)} /></TableCell>
-                          <TableCell className="px-2 sm:px-4"><Input type="number" className="w-14 sm:w-16 h-8 text-center" value={row.passingMarks} onChange={(e) => updateBulkField(row.subjectId, 'passingMarks', e.target.value)} /></TableCell>
+                          <TableCell className="px-2 sm:px-4"><Input type="text" inputMode="numeric" pattern="[0-9]*" className="w-16 sm:w-20 h-8 text-center px-1" value={row.totalMarks} onChange={(e) => updateBulkField(row.subjectId, 'totalMarks', e.target.value)} /></TableCell>
+                          <TableCell className="px-2 sm:px-4"><Input type="text" inputMode="numeric" pattern="[0-9]*" className="w-16 sm:w-20 h-8 text-center px-1" value={row.passingMarks} onChange={(e) => updateBulkField(row.subjectId, 'passingMarks', e.target.value)} /></TableCell>
                         </TableRow>
                       ))
                     )}
@@ -127,9 +152,14 @@ export function ExamDialogs({
               </div>
             </div>
           </div>
+          {hasMissingDates && (
+            <div className="text-right text-xs text-rose-500 font-semibold mt-2 animate-pulse">
+              * Please assign a date to all selected subjects before scheduling.
+            </div>
+          )}
           <DialogFooter className="mt-4">
             <Button variant="outline" onClick={() => setAddOpen(false)}>Cancel</Button>
-            <Button disabled={adding || selectedBulkCount === 0 || !addForm.name} onClick={onAdd} className="bg-blue-600 hover:bg-blue-700">
+            <Button disabled={adding || selectedBulkCount === 0 || !addForm.name || hasMissingDates} onClick={onAdd} className="bg-blue-600 hover:bg-blue-700">
               {adding ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Plus className="h-4 w-4 mr-2" />}
               Create {selectedBulkCount} Exam{selectedBulkCount !== 1 ? 's' : ''}
             </Button>
@@ -145,25 +175,42 @@ export function ExamDialogs({
             <DialogDescription>Update schedule or marks for this exam.</DialogDescription>
           </DialogHeader>
           <div className="grid gap-4 py-4">
-            <div className="grid gap-2">
-              <Label>Exam Name</Label>
-              <Input value={editForm.name} onChange={(e) => setEditForm({ ...editForm, name: e.target.value })} />
+            <div className="grid grid-cols-2 gap-4">
+              <div className="grid gap-2">
+                <Label>Exam Name</Label>
+                <Input value={editForm.name} onChange={(e) => setEditForm({ ...editForm, name: e.target.value })} />
+              </div>
+              <div className="grid gap-2">
+                <Label>Academic Year *</Label>
+                <Select 
+                  value={editForm.academicYear || currentAcademicYear} 
+                  onValueChange={(v) => setEditForm({ ...editForm, academicYear: v })}
+                >
+                  <SelectTrigger className="w-full text-left font-medium">
+                    <SelectValue placeholder="Select Academic Year" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {academicYears.map((ay) => (
+                      <SelectItem key={ay.id} value={ay.name}>
+                        {ay.name} {ay.isCurrent && '(Current)'}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div className="grid gap-2">
                 <Label>Date</Label>
-                <DatePicker date={editForm.date ? new Date(editForm.date) : undefined} onChange={(d) => setEditForm({ ...editForm, date: d?.toISOString().split('T')[0] || '' })} disabled={(date) => date < new Date(new Date().setHours(0, 0, 0, 0))} />
+                <DatePicker date={parseLocalDate(editForm.date)} onChange={(d) => setEditForm({ ...editForm, date: formatLocalDate(d) })} disabled={(date) => date < new Date(new Date().setHours(0, 0, 0, 0))} />
               </div>
               <div className="grid gap-2">
                 <Label>Type</Label>
                 <Select value={editForm.examType} onValueChange={(v) => setEditForm({ ...editForm, examType: v })}>
                   <SelectTrigger><SelectValue /></SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="unit_test">Unit Test</SelectItem>
                     <SelectItem value="midterm">Midterm</SelectItem>
                     <SelectItem value="final">Final</SelectItem>
-                    <SelectItem value="quiz">Quiz</SelectItem>
-                    <SelectItem value="practical">Practical</SelectItem>
                   </SelectContent>
                 </Select>
               </div>

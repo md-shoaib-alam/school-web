@@ -164,6 +164,22 @@ export function CreateTimetableDialog({
     }));
   };
 
+  const handleSubjectChange = (periodId: string, subjectId: string) => {
+    const selectedSubject = availableSubjects.find((s) => s.id === subjectId);
+    setDaySlots((prev: any) => ({
+      ...prev,
+      [activeTab]: (prev[activeTab] ?? []).map((s: FormSlot) =>
+        s.id === periodId 
+          ? { 
+              ...s, 
+              subjectId, 
+              teacherId: selectedSubject?.teacherId || s.teacherId 
+            } 
+          : s,
+      ),
+    }));
+  };
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-3xl h-[85vh] max-h-[85vh] flex flex-col p-0 overflow-hidden">
@@ -301,7 +317,7 @@ export function CreateTimetableDialog({
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                       <div className="space-y-1">
                         <label className="text-[10px] font-bold uppercase text-muted-foreground">Subject</label>
-                        <Select value={period.subjectId ?? ""} onValueChange={(v) => updatePeriod(period.id, "subjectId", v)}>
+                        <Select value={period.subjectId ?? ""} onValueChange={(v) => handleSubjectChange(period.id, v)}>
                           <SelectTrigger className="h-9 text-xs"><SelectValue placeholder="Subject" /></SelectTrigger>
                           <SelectContent>{availableSubjects.map((s) => <SelectItem key={s.id} value={s.id}>{s.name}</SelectItem>)}</SelectContent>
                         </Select>

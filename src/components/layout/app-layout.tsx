@@ -13,6 +13,7 @@ import { useIsFetching } from "@tanstack/react-query";
 import { getCookie } from "@/lib/cookies";
 import { NotificationProvider } from "@/components/providers/notification-provider";
 import { PlatformNoticeBar } from "./platform-notice-bar";
+import { SubscriptionExpiredScreen } from "@/components/screens/subscription-expired";
 
 function LoadingProgress() {
   const isFetching = useIsFetching();
@@ -20,12 +21,15 @@ function LoadingProgress() {
   return <div className="loading-progress-bar" />;
 }
 
+import { FullPageSkeleton } from "@/components/ui/full-page-skeleton";
+
 export function AppLayout({ children }: { children: React.ReactNode }) {
   const { slug } = useParams();
   const {
     currentUser,
     currentTenantId,
     currentTenantSlug,
+    currentTenantName,
     setCurrentTenant,
     currentScreen,
     setCurrentScreen,
@@ -58,6 +62,28 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
     refreshPermissions();
   }, [refreshPermissions]);
 
+  // Determine current screen from pathname
+  const parts = pathname.split("/").filter(Boolean);
+  let resolvedScreen = "dashboard";
+  if (parts.length >= 2) {
+    resolvedScreen = parts[1];
+  } else if (parts.length === 1) {
+    const p = parts[0];
+    const isTenantRoot =
+      p === currentUser?.tenantId ||
+      p === currentTenantSlug ||
+      p === currentUser?.tenantSlug;
+    resolvedScreen = isTenantRoot ? "dashboard" : p;
+  }
+
+  // Sync store screen with URL resolved screen to prevent navigation locks
+  // This ensures that currentScreen always matches what's in the address bar
+  useEffect(() => {
+    if (resolvedScreen && resolvedScreen !== currentScreen) {
+      setCurrentScreen(resolvedScreen);
+    }
+  }, [resolvedScreen, currentScreen, setCurrentScreen]);
+
   // Cookie guard: Redirect to login if cookie is missing while logged in
   useEffect(() => {
     const checkAuth = () => {
@@ -73,21 +99,9 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
     return () => clearInterval(interval);
   }, [currentUser]);
 
-  if (!currentUser) return null;
+  if (!currentUser) return <FullPageSkeleton />;
 
-  // Determine current screen from pathname
-  const parts = pathname.split("/").filter(Boolean);
-  let resolvedScreen = "dashboard";
-  if (parts.length >= 2) {
-    resolvedScreen = parts[1];
-  } else if (parts.length === 1) {
-    const p = parts[0];
-    const isTenantRoot =
-      p === currentUser?.tenantId ||
-      p === currentTenantSlug ||
-      p === currentUser?.tenantSlug;
-    resolvedScreen = isTenantRoot ? "dashboard" : p;
-  }
+
 
   const isSuperAdmin = currentUser.role === "super_admin";
   const isRoot = isRootAdmin(currentUser);
@@ -110,9 +124,29 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
     return true;
   });
 
+  // --- SUBSCRIPTION CHECK LOGIC ---
+  let isExpired = false;
+  if (resolvedTenant && !isSuperAdmin) {
+    const { endDate, status } = resolvedTenant as any;
+    // Fix: Accept both "active" AND "trial" as valid operational states
+    const isInactive = status && status !== "active" && status !== "trial";
+    const isPastDate = endDate && new Date(endDate) < new Date();
+    if (isInactive || isPastDate) {
+      isExpired = true;
+    }
+  }
+
+  // Whitelist screen so admin can actually pay while expired!
+  const isExemptFromLock = 
+    resolvedScreen === "school-subscription" || 
+    resolvedScreen === "manage-plan" || 
+    isSuperAdmin;
+  // --------------------------------
+
   const navigateTo = useCallback((screen: string) => {
-    setSidebarOpen(false);
-    if (screen === currentScreen) return; // Skip if already on this screen
+    if (typeof window !== 'undefined' && window.innerWidth < 1024) {
+      setSidebarOpen(false);
+    }
     
     setCurrentScreen(screen);
     const tenantIdentifier = currentTenantSlug || currentTenantId;
@@ -134,6 +168,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
       "settings",
       "school-subscriptions",
       "platform-notices",
+      "profile",
     ].includes(screen);
 
     if (isSuperAdmin && isPlatformRoute) {
@@ -160,9 +195,18 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
     return () => window.removeEventListener("super-admin-navigate", handleNavigationEvent);
   }, [navigateTo]);
 
+  // Listen for open-change-password events from deep components
+  useEffect(() => {
+    const handleOpenPasswordModal = () => {
+      setIsChangePasswordOpen(true);
+    };
+    window.addEventListener("open-change-password", handleOpenPasswordModal);
+    return () => window.removeEventListener("open-change-password", handleOpenPasswordModal);
+  }, []);
+
   return (
     <NotificationProvider>
-      <div className="h-dvh flex flex-col overflow-hidden bg-gray-50 dark:bg-gray-900">
+      <div className="h-dvh flex flex-col overflow-hidden bg-background">
         <PlatformNoticeBar />
         <div className="flex-1 flex overflow-hidden">
           <LoadingProgress />
@@ -190,7 +234,17 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
 
           {/* Page Content */}
           <main className="flex-1 overflow-y-auto p-4 lg:p-6 overscroll-contain">
-            {children}
+            {isExpired && !isExemptFromLock ? (
+              <SubscriptionExpiredScreen 
+                tenantName={resolvedTenant?.name || currentTenantName || "School"} 
+                tenantSlug={resolvedTenant?.slug || currentTenantSlug || ""}
+                role={currentUser.role}
+                endDate={resolvedTenant?.endDate}
+                status={resolvedTenant?.status}
+              />
+            ) : (
+              children
+            )}
           </main>
         </div>
 

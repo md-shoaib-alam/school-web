@@ -1,4 +1,5 @@
-export const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api'
+import { env } from '../env';
+export const API_BASE = env.NEXT_PUBLIC_API_URL;
 export const GRAPHQL_ENDPOINT = `${API_BASE}/graphql`
 
 export async function graphqlQuery<TData>(query: string, variables?: Record<string, unknown>): Promise<TData> {

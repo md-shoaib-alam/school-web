@@ -36,6 +36,7 @@ import {
   Eye,
   School,
   Filter,
+  Lock,
 } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { apiFetch } from "@/lib/api";
@@ -45,6 +46,8 @@ import { useAppStore } from "@/store/use-app-store";
 import { DatePicker } from "@/components/ui/date-picker";
 import { parseISO } from "date-fns";
 import { useDebounce } from "@/hooks/use-debounce";
+import { Pagination } from "@/components/shared/pagination";
+import { useTenantResolution } from "@/lib/graphql/hooks/platform.hooks";
 
 const statusConfig: Record<
   string,
@@ -62,33 +65,47 @@ const statusConfig: Record<
     dot: "bg-red-500",
     icon: <UserX className="h-3.5 w-3.5 text-red-500" />,
   },
-  late: {
-    bg: "bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 border-amber-200 dark:border-amber-800",
-    text: "Late",
-    dot: "bg-amber-500",
-    icon: <Clock className="h-3.5 w-3.5 text-amber-500" />,
-  },
 };
 
 export function AdminAttendance() {
-  const { currentTenantId } = useAppStore();
+  const { currentTenantId, currentTenantSlug } = useAppStore();
+  const { data: tenantData } = useTenantResolution(currentTenantSlug || undefined);
+  const plan = tenantData?.plan?.toLowerCase() || "basic";
+  const isPremiumOrEnterprise = plan === "premium" || plan === "enterprise";
   const { canCreate, canEdit, canDelete } = useModulePermissions("attendance");
-  const [selectedDate, setSelectedDate] = useState(
-    new Date().toISOString().split("T")[0],
-  );
-  const [selectedClass, setSelectedClass] = useState<string | null>(null);
+  const [selectedDate, setSelectedDate] = useState(() => {
+    const now = new Date();
+    const yyyy = now.getFullYear();
+    const mm = String(now.getMonth() + 1).padStart(2, '0');
+    const dd = String(now.getDate()).padStart(2, '0');
+    return `${yyyy}-${mm}-${dd}`;
+  });
+  const [selectedClass, setSelectedClass] = useState<string>("");
   const [search, setSearch] = useState("");
+  const [isHistoryMode, setIsHistoryMode] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
   const debouncedSearch = useDebounce(search, 300);
 
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [selectedDate, selectedClass, isHistoryMode]);
+
   const { data: attendanceData, isLoading: recordsLoading } = useQuery({
-    queryKey: ['attendance', selectedDate, selectedClass],
+    queryKey: ['attendance', selectedDate, selectedClass, isHistoryMode, currentPage],
     queryFn: async () => {
-      const params = new URLSearchParams({ date: selectedDate });
-      if (selectedClass && selectedClass !== 'all') params.set('classId', selectedClass);
+      const params = new URLSearchParams();
+      if (!isHistoryMode && selectedDate) {
+        params.set('date', selectedDate);
+      }
+      if (selectedClass && selectedClass !== 'all') {
+        params.set('classId', selectedClass);
+      }
+      params.set('page', currentPage.toString());
+      params.set('limit', '50');
+      
       const res = await apiFetch(`/api/attendance?${params.toString()}`);
-      if (!res.ok) return { records: [] };
-      const items = await res.json();
-      return { records: items };
+      if (!res.ok) return { records: [], total: 0, totalPages: 0 };
+      return res.json();
     },
     enabled: !!selectedClass
   });
@@ -104,31 +121,21 @@ export function AdminAttendance() {
 
   const loading = recordsLoading || classesLoading;
 
-  const isSelectionMade = selectedClass !== null;
+  const isSelectionMade = selectedClass !== "";
 
   const rawRecords = (attendanceData?.records || []) as AttendanceRecord[];
   const records = rawRecords.filter((r) => {
-    const matchDate = !selectedDate || r.date.startsWith(selectedDate);
-    const matchClass =
-      selectedClass === "all" ||
-      classes.find((c) => c.id === selectedClass)?.name +
-        "-" +
-        classes.find((c) => c.id === selectedClass)?.section ===
-        r.className;
-    
     const matchSearch = !debouncedSearch || 
       r.studentName.toLowerCase().includes(debouncedSearch.toLowerCase());
-
-    return matchDate && matchClass && matchSearch;
+    return matchSearch;
   });
 
   // Summary stats
   const presentCount = records.filter((r) => r.status === "present").length;
   const absentCount = records.filter((r) => r.status === "absent").length;
-  const lateCount = records.filter((r) => r.status === "late").length;
   const total = records.length;
   const presentRate =
-    total > 0 ? (((presentCount + lateCount) / total) * 100).toFixed(1) : "0";
+    total > 0 ? ((presentCount / total) * 100).toFixed(1) : "0";
 
   const summaryCards = [
     {
@@ -147,15 +154,6 @@ export function AdminAttendance() {
       icon: <UserX className="h-5 w-5 text-red-600 dark:text-red-400" />,
       color: "bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400",
       borderColor: "border-red-200 dark:border-red-800",
-    },
-    {
-      label: "Late",
-      count: lateCount,
-      percentage: total > 0 ? ((lateCount / total) * 100).toFixed(1) : "0",
-      icon: <Clock className="h-5 w-5 text-amber-600 dark:text-amber-400" />,
-      color:
-        "bg-amber-100 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400",
-      borderColor: "border-amber-200 dark:border-amber-800",
     },
     {
       label: "Attendance Rate",
@@ -180,7 +178,7 @@ export function AdminAttendance() {
         </div>
         <div className="flex items-center gap-3">
           <Select
-            value={selectedClass || undefined}
+            value={selectedClass}
             onValueChange={setSelectedClass}
           >
             <SelectTrigger className="w-[180px] bg-white dark:bg-gray-950 border-gray-200">
@@ -204,8 +202,22 @@ export function AdminAttendance() {
             </SelectContent>
           </Select>
           <DatePicker
-            date={selectedDate ? parseISO(selectedDate) : undefined}
+            disabled={(date) => {
+              const now = new Date();
+              now.setHours(0, 0, 0, 0);
+              if (date > now) return true; // Lock future dates
+
+              let daysAllowed = 7;
+              if (plan === 'standard') daysAllowed = 14;
+              if (isPremiumOrEnterprise) daysAllowed = 28;
+
+              const cutoff = new Date(now);
+              cutoff.setDate(cutoff.getDate() - daysAllowed);
+              return date < cutoff;
+            }}
+            date={!isHistoryMode && selectedDate ? parseISO(selectedDate) : undefined}
             onChange={(d) => {
+              setIsHistoryMode(false);
               if (d) {
                 const yyyy = d.getFullYear();
                 const mm = String(d.getMonth() + 1).padStart(2, '0');
@@ -215,9 +227,26 @@ export function AdminAttendance() {
             }}
             className="w-[180px]"
           />
-          <Button variant="outline" className="hidden md:flex">
-            <Eye className="h-4 w-4 mr-2" />
-            Full History
+          <Button 
+            variant={isHistoryMode ? "default" : "outline"} 
+            className={`hidden md:flex gap-2 ${!isPremiumOrEnterprise ? 'bg-amber-50/30 border-amber-200/60 opacity-85 cursor-not-allowed text-amber-600 dark:bg-amber-900/10 dark:text-amber-400' : ''}`}
+            onClick={() => {
+              if (isPremiumOrEnterprise) {
+                setIsHistoryMode(!isHistoryMode);
+              }
+            }}
+            disabled={!isPremiumOrEnterprise}
+            title={!isPremiumOrEnterprise ? "Full History requires a Premium subscription" : ""}
+          >
+            {!isPremiumOrEnterprise ? (
+              <Lock className="h-4 w-4 text-amber-500" />
+            ) : (
+              <Eye className="h-4 w-4" />
+            )}
+            {isHistoryMode ? "Exit History" : "Full History"}
+            {!isPremiumOrEnterprise && (
+              <Badge className="ml-1 bg-amber-100 hover:bg-amber-100 text-amber-700 border-amber-200 text-[9px] uppercase h-4 py-0 px-1 rounded-sm">Premium</Badge>
+            )}
           </Button>
         </div>
       </div>
@@ -241,7 +270,7 @@ export function AdminAttendance() {
       ) : (
         /* Data Display */
         <>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             {summaryCards.map((card) => (
               <Card
                 key={card.label}
@@ -309,11 +338,14 @@ export function AdminAttendance() {
               <Table>
                 <TableHeader className="bg-gray-50 dark:bg-gray-900/50">
                   <TableRow>
-                    <TableHead className="font-bold">Student Name</TableHead>
-                    <TableHead className="font-bold">Class</TableHead>
-                    <TableHead className="font-bold">Status</TableHead>
-                    <TableHead className="font-bold">Time</TableHead>
-                    <TableHead className="text-right font-bold">
+                    <TableHead className="font-bold pl-6">Student Name</TableHead>
+                    <TableHead className="font-bold w-[150px]">Class</TableHead>
+                    {isHistoryMode && (
+                      <TableHead className="font-bold w-[150px]">Date</TableHead>
+                    )}
+                    <TableHead className="font-bold w-[180px]">Status</TableHead>
+                    <TableHead className="font-bold w-[120px]">Time</TableHead>
+                    <TableHead className="text-right font-bold pr-6 w-[140px]">
                       Action
                     </TableHead>
                   </TableRow>
@@ -336,7 +368,7 @@ export function AdminAttendance() {
                   ) : records.length === 0 ? (
                     <TableRow>
                       <TableCell
-                        colSpan={5}
+                        colSpan={isHistoryMode ? 6 : 5}
                         className="h-32 text-center text-gray-500 italic"
                       >
                         No attendance records found for this selection.
@@ -348,10 +380,10 @@ export function AdminAttendance() {
                         key={record.id}
                         className="hover:bg-gray-50/50 dark:hover:bg-gray-900/50 group transition-colors"
                       >
-                        <TableCell className="font-medium">
+                        <TableCell className="font-medium pl-6">
                           {record.studentName}
                         </TableCell>
-                        <TableCell>
+                        <TableCell className="w-[150px]">
                           <Badge
                             variant="outline"
                             className="font-semibold bg-gray-50 dark:bg-gray-950"
@@ -359,7 +391,16 @@ export function AdminAttendance() {
                             {record.className}
                           </Badge>
                         </TableCell>
-                        <TableCell>
+                        {isHistoryMode && (
+                          <TableCell className="font-medium w-[150px]">
+                            {new Date(record.date).toLocaleDateString('en-US', {
+                              month: 'short',
+                              day: 'numeric',
+                              year: 'numeric'
+                            })}
+                          </TableCell>
+                        )}
+                        <TableCell className="w-[180px]">
                           <Badge
                             className={`${statusConfig[record.status]?.bg} border shadow-sm`}
                           >
@@ -369,19 +410,24 @@ export function AdminAttendance() {
                             </span>
                           </Badge>
                         </TableCell>
-                        <TableCell className="text-gray-500 text-sm">
-                          {record.date.includes("T")
+                        <TableCell className="text-gray-500 text-sm w-[120px]">
+                          {record.createdAt
+                            ? new Date(record.createdAt).toLocaleTimeString([], {
+                                hour: "2-digit",
+                                minute: "2-digit",
+                              })
+                            : record.date && record.date.includes("T")
                             ? new Date(record.date).toLocaleTimeString([], {
                                 hour: "2-digit",
                                 minute: "2-digit",
                               })
                             : "08:30 AM"}
                         </TableCell>
-                        <TableCell className="text-right">
+                        <TableCell className="text-right pr-6 w-[140px]">
                           <Button
-                            variant="ghost"
+                            variant="outline"
                             size="sm"
-                            className="opacity-0 group-hover:opacity-100 transition-opacity"
+                            className="font-semibold"
                           >
                             View Profile
                           </Button>
@@ -393,6 +439,19 @@ export function AdminAttendance() {
               </Table>
             </CardContent>
           </Card>
+
+          {/* PAGINATION FOOTER */}
+          {!loading && isSelectionMade && attendanceData?.totalPages > 1 && (
+            <div className="mt-4 pb-6">
+              <Pagination 
+                currentPage={currentPage}
+                totalPages={attendanceData.totalPages}
+                totalItems={attendanceData.total || 0}
+                itemsPerPage={50}
+                onPageChange={setCurrentPage}
+              />
+            </div>
+          )}
         </>
       )}
     </div>

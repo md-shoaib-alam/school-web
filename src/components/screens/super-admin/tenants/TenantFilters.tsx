@@ -9,6 +9,7 @@ import {
 } from "@/components/ui/select";
 import { Search, List, LayoutGrid, Plus, Filter } from "lucide-react";
 import { ViewMode } from "./types";
+import { SCHOOL_PLANS } from "@/lib/billing-constants";
 
 interface TenantFiltersProps {
   search: string;
@@ -56,10 +57,11 @@ export function TenantFilters({
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">All Plans</SelectItem>
-                <SelectItem value="basic">Basic</SelectItem>
-                <SelectItem value="standard">Standard</SelectItem>
-                <SelectItem value="premium">Premium</SelectItem>
-                <SelectItem value="enterprise">Enterprise</SelectItem>
+                {SCHOOL_PLANS.map((plan) => (
+                  <SelectItem key={plan.id} value={plan.id}>
+                    {plan.name}
+                  </SelectItem>
+                ))}
               </SelectContent>
             </Select>
 

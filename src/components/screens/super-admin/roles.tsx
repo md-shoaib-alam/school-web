@@ -102,8 +102,9 @@ export function SuperAdminRoles() {
     }
     setSaving(true);
     try {
-      const body = { id: editingRole?.id, name, description, color, permissions };
-      const res = await apiFetch("/api/platform/roles", {
+      const body = { name, description, color, permissions };
+      const url = editingRole ? `/api/platform/roles/${editingRole.id}` : "/api/platform/roles";
+      const res = await apiFetch(url, {
         method: editingRole ? "PUT" : "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(body),
@@ -124,14 +125,14 @@ export function SuperAdminRoles() {
 
   const handleDelete = async (id: string) => {
     try {
-      const usersRes = await apiFetch(`/api/platform/roles/users?roleId=${id}`);
+      const usersRes = await apiFetch(`/api/platform/roles/${id}/users`);
       const usersData = await usersRes.json();
       if (Array.isArray(usersData) && usersData.length > 0) {
         toast.error(`Cannot delete: ${usersData.length} user(s) are assigned to this role.`);
         return;
       }
 
-      const res = await apiFetch(`/api/platform/roles?id=${id}`, { method: "DELETE" });
+      const res = await apiFetch(`/api/platform/roles/${id}`, { method: "DELETE" });
       if (!res.ok) throw new Error("Deletion failed");
       toast.success("Platform role deleted successfully");
       fetchRoles();
@@ -152,8 +153,8 @@ export function SuperAdminRoles() {
 
     try {
       const [assignedRes, availableRes] = await Promise.all([
-        apiFetch(`/api/platform/roles/users?roleId=${role.id}`),
-        apiFetch(`/api/platform/roles/available-users?excludeRoleId=${role.id}`),
+        apiFetch(`/api/platform/roles/${role.id}/users`),
+        apiFetch(`/api/platform/roles/${role.id}/available-users`),
       ]);
       if (!assignedRes.ok || !availableRes.ok) throw new Error();
       setAssignedUsers(await assignedRes.json());
@@ -169,10 +170,10 @@ export function SuperAdminRoles() {
     if (!assigningRole) return;
     setAssignSaving(true);
     try {
-      const res = await apiFetch("/api/platform/roles/users", {
+      const res = await apiFetch(`/api/platform/roles/${assigningRole.id}/users`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ userId, roleId: assigningRole.id, action }),
+        body: JSON.stringify({ userId, action }),
       });
       if (!res.ok) throw new Error();
 

@@ -38,7 +38,16 @@ export interface UsersResponse {
 }
 
 export interface AuditLogsResponse {
-  logs: { id: string; action: string; resource: string; details: string; createdAt: string; tenant: { id: string; name: string } | null }[]
+  logs: { 
+    id: string; 
+    action: string; 
+    resource: string; 
+    details: string; 
+    ipAddress: string | null;
+    createdAt: string; 
+    tenant: { id: string; name: string; slug: string; email: string | null } | null;
+    user: { name: string; email: string } | null;
+  }[]
   total: number; page: number; totalPages: number
   actionTypes: { action: string; count: number }[]
 }
@@ -85,7 +94,7 @@ export interface TeacherDashboardData {
   pendingAssignments: number
   todaySchedule: { id: string; day: string; startTime: string; endTime: string; subjectName: string; className: string }[]
   todayAttendance: { present: number; total: number }
-  recentAssignments: { id: string; title: string; subjectName: string; className: string; dueDate: string; submissions: number; totalStudents: number }[]
+  recentAssignments: { id: string; title: string; subjectName: string; className: string; dueDate: string; submissions: number; totalStudents: number; mode: string }[]
 }
 
 export interface StudentDashboardData {
@@ -148,6 +157,7 @@ export interface TenantsResponse {
   total: number
   page: number
   totalPages: number
+  stats?: { total: number; active: number; trial: number; suspended: number }
 }
 
 export interface SubjectsResponse {

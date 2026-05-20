@@ -151,12 +151,12 @@ export function FeeCategoriesTab({ canCreate, canEdit, canDelete }: FeeCategorie
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Name</TableHead>
-                    <TableHead className="hidden sm:table-cell">Code</TableHead>
-                    <TableHead className="hidden sm:table-cell">Frequency</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead className="hidden md:table-cell">Fees Count</TableHead>
-                    {(canEdit || canDelete) && <TableHead className="w-36 text-center">Actions</TableHead>}
+                    <TableHead className="pl-6 h-12">Name</TableHead>
+                    <TableHead className="hidden sm:table-cell h-12">Code</TableHead>
+                    <TableHead className="hidden sm:table-cell h-12">Frequency</TableHead>
+                    <TableHead className="h-12">Status</TableHead>
+                    <TableHead className="hidden md:table-cell h-12">Fees Count</TableHead>
+                    {(canEdit || canDelete) && <TableHead className="w-36 text-center h-12">Actions</TableHead>}
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -170,23 +170,23 @@ export function FeeCategoriesTab({ canCreate, canEdit, canDelete }: FeeCategorie
                     const freq = frequencyConfig[cat.frequency] || frequencyConfig.yearly;
                     return (
                       <TableRow key={cat.id} className="hover:bg-emerald-50/50 dark:hover:bg-emerald-900/20 transition-colors">
-                        <TableCell>
+                        <TableCell className="pl-6 py-4">
                           <div className="font-medium text-sm">{cat.name}</div>
                           {cat.description && <div className="text-xs text-muted-foreground truncate max-w-48">{cat.description}</div>}
                         </TableCell>
-                        <TableCell className="hidden sm:table-cell"><Badge variant="outline">{cat.code}</Badge></TableCell>
-                        <TableCell className="hidden sm:table-cell">
+                        <TableCell className="hidden sm:table-cell py-4"><Badge variant="outline">{cat.code}</Badge></TableCell>
+                        <TableCell className="hidden sm:table-cell py-4">
                           <Badge variant="outline" className={`${freq.bg} border-0 font-medium`}>{freq.label}</Badge>
                         </TableCell>
-                        <TableCell>
+                        <TableCell className="py-4">
                           <Badge variant="outline" className={cat.status === 'active' ? 'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 border-0' : 'bg-gray-100 dark:bg-gray-900/30 text-gray-500 border-0'}>
                             {cat.status === 'active' ? <CheckCircle2 className="h-3 w-3 mr-1" /> : <Ban className="h-3 w-3 mr-1" />}
                             {cat.status}
                           </Badge>
                         </TableCell>
-                        <TableCell className="hidden md:table-cell text-sm">{cat.feesCount}</TableCell>
+                        <TableCell className="hidden md:table-cell text-sm py-4">{cat.feesCount}</TableCell>
                         {(canEdit || canDelete) && (
-                          <TableCell className="text-center">
+                          <TableCell className="text-center py-4">
                             <div className="flex items-center justify-center gap-1">
                               {canEdit && (
                                 <>

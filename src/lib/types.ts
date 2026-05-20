@@ -64,6 +64,7 @@ export interface AttendanceRecord {
   className: string;
   date: string;
   status: string;
+  createdAt?: string;
 }
 
 export interface GradeRecord {
@@ -87,6 +88,7 @@ export interface AssignmentInfo {
   dueDate: string;
   submissions: number;
   totalStudents: number;
+  mode: "online" | "offline";
 }
 
 export interface FeeRecord {

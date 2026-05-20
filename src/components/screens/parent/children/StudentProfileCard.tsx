@@ -22,7 +22,7 @@ export function StudentProfileCard({
   subjectCount,
 }: StudentProfileCardProps) {
   return (
-    <Card className="rounded-xl shadow-sm border-gray-100 dark:border-gray-800 shadow-none">
+    <Card className="rounded-2xl border border-gray-200/50 dark:border-zinc-800/50 shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.2)] bg-white dark:bg-zinc-950">
       <CardContent className="p-6">
         <div className="flex flex-col sm:flex-row sm:items-start gap-6">
           <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center text-white text-2xl font-bold shadow-md">

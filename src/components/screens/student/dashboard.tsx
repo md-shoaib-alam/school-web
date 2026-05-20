@@ -1,6 +1,5 @@
 "use client";
 
-
 import { apiFetch } from "@/lib/api";
 import { useEffect, useState } from "react";
 import { useAppStore } from "@/store/use-app-store";
@@ -33,7 +32,7 @@ import {
   CheckCircle2,
   AlertCircle,
 } from "lucide-react";
-
+import { FullPageSkeleton } from "@/components/ui/full-page-skeleton";
 export function StudentDashboard() {
   const { currentUser, currentTenantName, currentTenantLogo } = useAppStore();
   const { data, isPending, fetchStatus, isError, error } = useStudentDashboard(
@@ -41,7 +40,7 @@ export function StudentDashboard() {
   );
 
   // In React Query v5, when enabled:false, isPending=true but fetchStatus='idle'
-  const isActuallyLoading = isPending && fetchStatus === 'fetching';
+  const isActuallyLoading = isPending && fetchStatus === "fetching";
 
   useEffect(() => {
     if (isError) {
@@ -58,21 +57,17 @@ export function StudentDashboard() {
 
   useEffect(() => {
     if (currentUser?.email) {
-      apiFetch("/api/students")
+      apiFetch("/api/students/me")
         .then((r) => r.json())
-        .then((data: any) => {
-          const studentItems = Array.isArray(data?.items) ? data.items : [];
-          const s =
-            studentItems.find((st: any) => st.email === currentUser.email) ||
-            studentItems[0];
-          if (s)
+        .then((s: any) => {
+          if (s && s.id)
             setStudentInfo({
               className: s.className,
               rollNumber: s.rollNumber,
               name: s.name,
             });
         })
-        .catch(() => {});
+        .catch(() => { });
     }
   }, [currentUser?.email]);
 
@@ -80,13 +75,6 @@ export function StudentDashboard() {
   const attendanceRate = data?.attendanceRate ?? 0;
   const avgGrade = data?.avgGrade ?? 0;
   const pendingAssignments = data?.pendingAssignments ?? 0;
-
-  const firstName =
-    studentInfo?.name?.split(" ")[0] ||
-    currentUser?.name?.split(" ")[0] ||
-    "Student";
-  const className = studentInfo?.className || "";
-
   const today = new Date();
   const dayNames = [
     "sunday",
@@ -118,37 +106,43 @@ export function StudentDashboard() {
   return (
     <div className="space-y-6">
       {/* Welcome Banner */}
-      <div className="relative overflow-hidden rounded-xl bg-gradient-to-r from-violet-600 via-purple-600 to-fuchsia-500 p-6 lg:p-8 text-white">
-        <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/4" />
-        <div className="absolute bottom-0 left-1/2 w-48 h-48 bg-white/5 rounded-full translate-y-1/2" />
-        <div className="relative flex flex-col sm:flex-row gap-4 items-start sm:items-center">
-          {currentTenantLogo && (
-            <div className="h-16 w-16 rounded-2xl bg-white/20 backdrop-blur-sm flex items-center justify-center overflow-hidden shrink-0 border border-white/10 shadow-inner">
-              <img src={currentTenantLogo} alt={currentTenantName || ""} className="h-full w-full object-cover" />
+      <div className="relative overflow-hidden rounded-xl bg-gradient-to-r from-violet-600 via-purple-600 to-fuchsia-500 text-white shadow-md">
+        <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/2" />
+        <div className="p-6 lg:p-8 relative z-10">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div className="flex items-center gap-4">
+              <div className="h-14 w-14 rounded-xl bg-white/20 backdrop-blur-sm flex items-center justify-center overflow-hidden shrink-0 border border-white/10 shadow-inner">
+                <img
+                  src={currentTenantLogo || "/test.webp"}
+                  alt={currentTenantName || ""}
+                  className="h-full w-full object-cover"
+                />
+              </div>
+              <div className="text-left">
+                <p className="text-violet-100/90 text-xs sm:text-sm font-medium mb-0.5">
+                  {getGreeting()}
+                </p>
+                <h2 className="text-xl sm:text-2xl lg:text-3xl font-extrabold tracking-tight leading-tight">
+                  {studentInfo?.name || currentUser?.name || "Student"}
+                </h2>
+                <p className="text-violet-100/80 mt-0.5 text-xs sm:text-sm font-medium">
+                  {studentInfo
+                    ? `${studentInfo.className} • Roll ${studentInfo.rollNumber}`
+                    : `Welcome to ${currentTenantName || "the school"}`}
+                </p>
+              </div>
             </div>
-          )}
-          <div className="flex-1">
-          <div className="flex items-center gap-2 mb-1">
-            <span className="text-violet-200 text-sm font-medium">
-              {getGreeting()} 👋
-            </span>
-          </div>
-          <h2 className="text-2xl lg:text-3xl font-bold">{firstName}!</h2>
-          <p className="text-violet-200 mt-1">
-            {studentInfo
-              ? `${studentInfo.className} • Roll ${studentInfo.rollNumber}`
-              : `Welcome to ${currentTenantName || "the school"}`}
-          </p>
-          <div className="flex items-center gap-4 mt-4">
-            <div className="flex items-center gap-1.5 text-sm bg-white/15 rounded-full px-3 py-1">
-              <Calendar className="h-3.5 w-3.5" />
-              {today.toLocaleDateString("en-US", {
-                weekday: "long",
-                month: "short",
-                day: "numeric",
-              })}
+            <div className="flex items-center gap-2 bg-white/20 backdrop-blur-sm rounded-lg px-4 py-2 shrink-0 self-start sm:self-auto text-white">
+              <Calendar className="h-4 w-4" />
+              <span className="text-sm font-medium">
+                {today.toLocaleDateString("en-US", {
+                  weekday: "long",
+                  month: "long",
+                  day: "numeric",
+                  year: "numeric",
+                })}
+              </span>
             </div>
-          </div>
           </div>
         </div>
       </div>
@@ -157,7 +151,7 @@ export function StudentDashboard() {
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         <StatCard
           title="Attendance"
-          value={`${attendanceRate}%`}
+          value={`${Number(attendanceRate).toFixed(2).replace(/\.00$/, "")}%`}
           icon={<UserCheck className="h-5 w-5" />}
           trend={attendanceRate >= 85 ? "Good" : "Needs Improvement"}
           trendUp={attendanceRate >= 85}
@@ -165,7 +159,7 @@ export function StudentDashboard() {
         />
         <StatCard
           title="Average Grade"
-          value={`${avgGrade}%`}
+          value={`${Number(avgGrade).toFixed(2).replace(/\.00$/, "")}%`}
           icon={<TrendingUp className="h-5 w-5" />}
           trend={
             avgGrade >= 75
@@ -178,7 +172,7 @@ export function StudentDashboard() {
           color="emerald"
         />
         <StatCard
-          title="Assignments"
+          title="Homework"
           value={String(pendingAssignments || 0)}
           icon={<ClipboardList className="h-5 w-5" />}
           trend="Pending"
@@ -235,13 +229,12 @@ export function StudentDashboard() {
                     return (
                       <div
                         key={slot.id}
-                        className={`flex items-center gap-4 p-3 rounded-lg transition-colors ${
-                          isCurrent
-                            ? "bg-violet-50 dark:bg-violet-900/30 border border-violet-200 dark:border-violet-800"
-                            : isPast
-                              ? "bg-gray-50 dark:bg-gray-800/50 opacity-60"
-                              : "bg-gray-50 dark:bg-gray-800/50 hover:bg-violet-50/50 dark:hover:bg-violet-900/20"
-                        }`}
+                        className={`flex items-center gap-4 p-3 rounded-lg transition-colors ${isCurrent
+                          ? "bg-violet-50 dark:bg-violet-900/30 border border-violet-200 dark:border-violet-800"
+                          : isPast
+                            ? "bg-gray-50 dark:bg-gray-800/50 opacity-60"
+                            : "bg-gray-50 dark:bg-gray-800/50 hover:bg-violet-50/50 dark:hover:bg-violet-900/20"
+                          }`}
                       >
                         <div className="flex-shrink-0 w-20 text-center">
                           <p className="text-sm font-semibold text-gray-700 dark:text-gray-300">
@@ -313,18 +306,17 @@ export function StudentDashboard() {
                       <div className="flex items-center gap-2 ml-2">
                         <Badge
                           variant="secondary"
-                          className={`text-xs font-semibold ${
-                            pct >= 80
-                              ? "bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400"
-                              : pct >= 60
-                                ? "bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-400"
-                                : "bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400"
-                          }`}
+                          className={`text-xs font-semibold ${pct >= 80
+                            ? "bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400"
+                            : pct >= 60
+                              ? "bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-400"
+                              : "bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400"
+                            }`}
                         >
                           {g.grade || "N/A"}
                         </Badge>
                         <span className="text-xs text-gray-500 dark:text-gray-400">
-                          {g.marks}/{g.maxMarks}
+                          {Number(g.marks).toFixed(2).replace(/\.00$/, "")}/{g.maxMarks}
                         </span>
                       </div>
                     </div>
@@ -355,26 +347,24 @@ export function StudentDashboard() {
               {studentNotices.slice(0, 4).map((notice) => (
                 <div
                   key={notice.id}
-                  className={`p-4 rounded-lg border transition-colors hover:shadow-sm ${
-                    notice.priority === "urgent"
-                      ? "border-red-200 dark:border-red-800 bg-red-50 dark:bg-red-900/30"
-                      : notice.priority === "important"
-                        ? "border-amber-200 dark:border-amber-800 bg-amber-50 dark:bg-amber-900/30"
-                        : "border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-800/50"
-                  }`}
+                  className={`p-4 rounded-lg border transition-colors hover:shadow-sm ${notice.priority === "urgent"
+                    ? "border-red-200 dark:border-red-800 bg-red-50 dark:bg-red-900/30"
+                    : notice.priority === "important"
+                      ? "border-amber-200 dark:border-amber-800 bg-amber-50 dark:bg-amber-900/30"
+                      : "border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-800/50"
+                    }`}
                 >
                   <div className="flex items-start justify-between gap-2">
                     <div className="min-w-0 flex-1">
                       <div className="flex items-center gap-2 mb-1">
                         <Badge
                           variant="secondary"
-                          className={`text-[10px] ${
-                            notice.priority === "urgent"
-                              ? "bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400"
-                              : notice.priority === "important"
-                                ? "bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400"
-                                : "bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400"
-                          }`}
+                          className={`text-[10px] ${notice.priority === "urgent"
+                            ? "bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400"
+                            : notice.priority === "important"
+                              ? "bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400"
+                              : "bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400"
+                            }`}
                         >
                           {notice.priority}
                         </Badge>
@@ -419,13 +409,12 @@ function StatCard({
   color: string;
 }) {
   const colorMap: Record<string, string> = {
-    violet: "from-violet-500 to-purple-500 bg-violet-50 dark:bg-violet-900/30",
-    emerald:
-      "from-emerald-500 to-teal-500 bg-emerald-50 dark:bg-emerald-900/30",
-    amber: "from-amber-500 to-orange-500 bg-amber-50 dark:bg-amber-900/30",
-    blue: "from-blue-500 to-cyan-500 bg-blue-50 dark:bg-blue-900/30",
+    violet: "bg-violet-600 dark:bg-violet-500",
+    emerald: "bg-emerald-600 dark:bg-emerald-500",
+    amber: "bg-amber-600 dark:bg-amber-500",
+    blue: "bg-blue-600 dark:bg-blue-500",
   };
-  const iconBg = `bg-gradient-to-br ${colorMap[color]?.split(" ")[0]}`;
+  const iconBg = colorMap[color] || "bg-gray-600";
 
   return (
     <Card className="rounded-xl shadow-sm hover:shadow-md transition-shadow">
@@ -455,19 +444,5 @@ function StatCard({
 
 /* ─── Skeleton ─── */
 function DashboardSkeleton() {
-  return (
-    <div className="space-y-6">
-      <Skeleton className="h-44 w-full rounded-xl" />
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        {[...Array(4)].map((_, i) => (
-          <Skeleton key={i} className="h-28 rounded-xl" />
-        ))}
-      </div>
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <Skeleton className="h-80 lg:col-span-2 rounded-xl" />
-        <Skeleton className="h-80 rounded-xl" />
-      </div>
-      <Skeleton className="h-64 rounded-xl" />
-    </div>
-  );
+  return <FullPageSkeleton />;
 }

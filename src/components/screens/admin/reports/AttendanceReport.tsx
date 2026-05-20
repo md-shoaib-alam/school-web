@@ -53,9 +53,11 @@ export function AttendanceReport() {
       try {
         const params = new URLSearchParams();
         if (selectedClass !== "all") params.set("classId", selectedClass);
+        params.set("limit", "1000"); // Load wider range for reporting metrics
         const res = await apiFetch(`/api/attendance?${params.toString()}`);
         if (!res.ok) throw new Error("Failed to fetch attendance");
-        setRecords(await res.json());
+        const data = await res.json();
+        setRecords(data.records || []);
       } catch (err) {
         setError(err instanceof Error ? err.message : "Unknown error");
       } finally {
@@ -68,33 +70,29 @@ export function AttendanceReport() {
   const summary: AttendanceSummary = useMemo(() => {
     const present = records.filter((r) => r.status === "present").length;
     const absent = records.filter((r) => r.status === "absent").length;
-    const late = records.filter((r) => r.status === "late").length;
     const total = records.length || 1;
     return {
       present,
       absent,
-      late,
       total: records.length,
       presentPct: ((present / total) * 100).toFixed(1),
       absentPct: ((absent / total) * 100).toFixed(1),
-      latePct: ((late / total) * 100).toFixed(1),
     };
   }, [records]);
 
   const dailyData: DailyAttendance[] = useMemo(() => {
     const dateMap = new Map<
       string,
-      { present: number; absent: number; late: number }
+      { present: number; absent: number }
     >();
     for (const r of records) {
       const d = new Date(r.date).toLocaleDateString("en-US", {
         month: "short",
         day: "numeric",
       });
-      const entry = dateMap.get(d) || { present: 0, absent: 0, late: 0 };
+      const entry = dateMap.get(d) || { present: 0, absent: 0 };
       if (r.status === "present") entry.present++;
       else if (r.status === "absent") entry.absent++;
-      else if (r.status === "late") entry.late++;
       dateMap.set(d, entry);
     }
     return Array.from(dateMap.entries())
@@ -119,15 +117,6 @@ export function AttendanceReport() {
       icon: <AlertTriangle className="h-5 w-5 text-red-600" />,
       color: "bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400",
       border: "border-red-200 dark:border-red-800",
-    },
-    {
-      label: "Late",
-      value: summary.late,
-      pct: summary.latePct,
-      icon: <AlertTriangle className="h-5 w-5 text-amber-600" />,
-      color:
-        "bg-amber-100 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400",
-      border: "border-amber-200 dark:border-amber-800",
     },
   ];
 
@@ -164,10 +153,9 @@ export function AttendanceReport() {
         </p>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         {loading ? (
           <>
-            <SummaryCardSkeleton />
             <SummaryCardSkeleton />
             <SummaryCardSkeleton />
           </>
@@ -203,7 +191,7 @@ export function AttendanceReport() {
             Daily Attendance (Last 7 Days)
           </CardTitle>
           <CardDescription>
-            Present, absent, and late counts per day
+            Present and absent counts per day
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -240,12 +228,6 @@ export function AttendanceReport() {
                 <Bar
                   dataKey="absent"
                   fill="var(--color-absent)"
-                  radius={[4, 4, 0, 0]}
-                  maxBarSize={28}
-                />
-                <Bar
-                  dataKey="late"
-                  fill="var(--color-late)"
                   radius={[4, 4, 0, 0]}
                   maxBarSize={28}
                 />

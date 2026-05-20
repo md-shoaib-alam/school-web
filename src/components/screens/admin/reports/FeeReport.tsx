@@ -32,9 +32,10 @@ export function FeeReport() {
   useEffect(() => {
     async function fetchFees() {
       try {
-        const res = await apiFetch("/api/fees");
+        const res = await apiFetch("/api/fees?limit=1000");
         if (!res.ok) throw new Error("Failed to fetch fees");
-        setFees(await res.json());
+        const data = await res.json();
+        setFees(data.items || []);
       } catch (err) {
         setError(err instanceof Error ? err.message : "Unknown error");
       } finally {
@@ -68,7 +69,11 @@ export function FeeReport() {
   }, [fees]);
 
   const overdueStudents = useMemo(() => {
-    const today = new Date().toISOString().split("T")[0];
+    const now = new Date();
+    const yyyy = now.getFullYear();
+    const mm = String(now.getMonth() + 1).padStart(2, '0');
+    const dd = String(now.getDate()).padStart(2, '0');
+    const today = `${yyyy}-${mm}-${dd}`;
     return fees
       .filter((f) => f.status !== "paid" && f.dueDate < today)
       .sort((a, b) => a.dueDate.localeCompare(b.dueDate));

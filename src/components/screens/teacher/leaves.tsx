@@ -180,66 +180,127 @@ export function TeacherLeaves() {
           {loading ? (
             <Skeleton className="h-64 w-full" />
           ) : (
-            <div className="overflow-x-auto">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Leave Type</TableHead>
-                    <TableHead>Start Date</TableHead>
-                    <TableHead>End Date</TableHead>
-                    <TableHead>Reason</TableHead>
-                    <TableHead className="text-center">Status</TableHead>
-                    <TableHead className="text-right">Actions</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {leaves.length === 0 ? (
-                    <TableRow>
-                      <TableCell colSpan={6} className="text-center py-10 opacity-50 italic">
-                        No leave requests yet
-                      </TableCell>
-                    </TableRow>
-                  ) : (
-                    leaves.map((leave) => (
-                      <TableRow key={leave.id}>
-                        <TableCell>
-                          <Badge variant="outline" className={leaveTypeConfig[leave.leaveType]?.bg}>
-                            {leaveTypeConfig[leave.leaveType]?.label || leave.leaveType}
-                          </Badge>
-                        </TableCell>
-                        <TableCell className="text-sm">{leave.startDate}</TableCell>
-                        <TableCell className="text-sm">{leave.endDate}</TableCell>
-                        <TableCell className="text-sm truncate max-w-[200px]">
+            <>
+              {/* Mobile View (Stacked Cards) */}
+              <div className="block md:hidden p-4 space-y-4">
+                {leaves.length === 0 ? (
+                  <div className="text-center py-10 opacity-50 italic text-sm">
+                    No leave requests yet
+                  </div>
+                ) : (
+                  leaves.map((leave) => (
+                    <div key={leave.id} className="border rounded-lg p-4 bg-card shadow-sm space-y-3">
+                      <div className="flex justify-between items-center pb-2 border-b">
+                        <Badge variant="outline" className={leaveTypeConfig[leave.leaveType]?.bg}>
+                          {leaveTypeConfig[leave.leaveType]?.label || leave.leaveType}
+                        </Badge>
+                        <Badge className={statusConfig[leave.status]?.bg}>
+                          {statusConfig[leave.status]?.label || leave.status}
+                        </Badge>
+                      </div>
+                      
+                      <div className="grid grid-cols-2 gap-4 py-1">
+                        <div className="space-y-0.5">
+                          <span className="text-[10px] uppercase tracking-wider text-muted-foreground font-medium">Start Date</span>
+                          <p className="text-sm font-semibold">{leave.startDate}</p>
+                        </div>
+                        <div className="space-y-0.5">
+                          <span className="text-[10px] uppercase tracking-wider text-muted-foreground font-medium">End Date</span>
+                          <p className="text-sm font-semibold">{leave.endDate}</p>
+                        </div>
+                      </div>
+
+                      <div className="space-y-1 bg-muted/30 p-2 rounded text-sm">
+                        <span className="text-[10px] uppercase tracking-wider text-muted-foreground font-medium block">Reason</span>
+                        <p className="text-foreground/90 leading-relaxed italic">
                           {leave.reason || '—'}
-                        </TableCell>
-                        <TableCell className="text-center">
-                          <Badge className={statusConfig[leave.status]?.bg}>
-                            {statusConfig[leave.status]?.label || leave.status}
-                          </Badge>
-                        </TableCell>
-                        <TableCell className="text-right">
-                          {leave.status === 'pending' && (
-                            <Button
-                              size="sm"
-                              variant="ghost"
-                              className="h-7 text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-950/20"
-                              onClick={() => handleCancel(leave.id)}
-                            >
-                              Cancel
-                            </Button>
-                          )}
-                          {leave.status === 'rejected' && leave.approverRemarks && (
-                            <div className="text-xs text-gray-500 max-w-[150px]">
-                              Remarks: {leave.approverRemarks}
-                            </div>
-                          )}
+                        </p>
+                      </div>
+
+                      {leave.status === 'pending' && (
+                        <div className="pt-2 flex justify-end">
+                          <Button
+                            size="sm"
+                            variant="destructive"
+                            className="w-full h-9 bg-red-600 hover:bg-red-700 text-white"
+                            onClick={() => handleCancel(leave.id)}
+                          >
+                            Cancel Leave
+                          </Button>
+                        </div>
+                      )}
+                      {leave.status === 'rejected' && leave.approverRemarks && (
+                        <div className="pt-2 border-t text-xs text-amber-600 dark:text-amber-500 italic">
+                          Remarks: {leave.approverRemarks}
+                        </div>
+                      )}
+                    </div>
+                  ))
+                )}
+              </div>
+
+              {/* Desktop View (Full Table) */}
+              <div className="hidden md:block overflow-x-auto">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead className="pl-6">Leave Type</TableHead>
+                      <TableHead>Start Date</TableHead>
+                      <TableHead>End Date</TableHead>
+                      <TableHead>Reason</TableHead>
+                      <TableHead className="text-center">Status</TableHead>
+                      <TableHead className="text-center pr-6">Actions</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {leaves.length === 0 ? (
+                      <TableRow>
+                        <TableCell colSpan={6} className="text-center py-10 opacity-50 italic">
+                          No leave requests yet
                         </TableCell>
                       </TableRow>
-                    ))
-                  )}
-                </TableBody>
-              </Table>
-            </div>
+                    ) : (
+                      leaves.map((leave) => (
+                        <TableRow key={leave.id}>
+                          <TableCell className="pl-6">
+                            <Badge variant="outline" className={leaveTypeConfig[leave.leaveType]?.bg}>
+                              {leaveTypeConfig[leave.leaveType]?.label || leave.leaveType}
+                            </Badge>
+                          </TableCell>
+                          <TableCell className="text-sm">{leave.startDate}</TableCell>
+                          <TableCell className="text-sm">{leave.endDate}</TableCell>
+                          <TableCell className="text-sm truncate max-w-[200px]">
+                            {leave.reason || '—'}
+                          </TableCell>
+                          <TableCell className="text-center">
+                            <Badge className={statusConfig[leave.status]?.bg}>
+                              {statusConfig[leave.status]?.label || leave.status}
+                            </Badge>
+                          </TableCell>
+                          <TableCell className="text-center pr-6">
+                            {leave.status === 'pending' && (
+                              <Button
+                                size="sm"
+                                variant="ghost"
+                                className="h-7 text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-950/20"
+                                onClick={() => handleCancel(leave.id)}
+                              >
+                                Cancel
+                              </Button>
+                            )}
+                            {leave.status === 'rejected' && leave.approverRemarks && (
+                              <div className="text-xs text-gray-500 max-w-[150px] mx-auto text-center">
+                                Remarks: {leave.approverRemarks}
+                              </div>
+                            )}
+                          </TableCell>
+                        </TableRow>
+                      ))
+                    )}
+                  </TableBody>
+                </Table>
+              </div>
+            </>
           )}
         </CardContent>
       </Card>

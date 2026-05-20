@@ -5,6 +5,8 @@ import { LoginScreen } from '@/components/screens/login';
 import { AppLayout } from '@/components/layout/app-layout';
 import { useSyncExternalStore } from 'react';
 
+import { FullPageSkeleton } from '@/components/ui/full-page-skeleton';
+
 // Prevents hydration mismatch
 const emptySubscribe = () => () => { };
 function useHydrated() {
@@ -19,7 +21,7 @@ export default function AuthenticatedLayout({
   const { isLoggedIn } = useAppStore();
   const hydrated = useHydrated();
 
-  if (!hydrated) return null;
+  if (!hydrated) return <FullPageSkeleton />;
 
   if (!isLoggedIn) {
     return <LoginScreen />;

@@ -10,7 +10,12 @@ import {
   Globe, 
   Lock, 
   Eye, 
-  Server 
+  Server,
+  UserPlus,
+  Shield,
+  UserCog,
+  Bell,
+  Send
 } from "lucide-react";
 
 export interface PlatformRoleRecord {
@@ -48,6 +53,11 @@ export const PLATFORM_MODULES = [
   { key: "security", label: "Security", icon: React.createElement(Lock, { className: "h-4 w-4" }) },
   { key: "reports", label: "Reports & Export", icon: React.createElement(Eye, { className: "h-4 w-4" }) },
   { key: "support", label: "Support Tickets", icon: React.createElement(Server, { className: "h-4 w-4" }) },
+  { key: "staff", label: "Platform Staff", icon: React.createElement(UserPlus, { className: "h-4 w-4" }) },
+  { key: "roles", label: "Role Configuration", icon: React.createElement(Shield, { className: "h-4 w-4" }) },
+  { key: "manage-admins", label: "Admin Management", icon: React.createElement(UserCog, { className: "h-4 w-4" }) },
+  { key: "notices", label: "Platform Notices", icon: React.createElement(Bell, { className: "h-4 w-4" }) },
+  { key: "notifications", label: "Push Notifications", icon: React.createElement(Send, { className: "h-4 w-4" }) },
 ];
 
 export const PERMISSION_ACTIONS = ["view", "create", "edit", "delete"] as const;

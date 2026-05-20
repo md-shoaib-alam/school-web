@@ -3,7 +3,7 @@
 import { api } from "@/lib/api";
 import { queryClient } from "@/lib/query-client";
 import { useQuery, useMutation } from "@tanstack/react-query";
-import { useState } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -46,7 +46,7 @@ interface StudentInfo {
   gender: string;
 }
 
-type AttendanceStatus = "present" | "absent" | "late";
+type AttendanceStatus = "present" | "absent";
 
 interface AttendanceRecord {
   studentId: string;
@@ -61,8 +61,6 @@ const getStatusBg = (status: AttendanceStatus) => {
       return "bg-emerald-50 dark:bg-emerald-900/20 border-emerald-200 dark:border-emerald-800";
     case "absent":
       return "bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800";
-    case "late":
-      return "bg-amber-50 dark:bg-amber-900/20 border-amber-200 dark:border-amber-800";
   }
 };
 
@@ -72,8 +70,6 @@ const getStatusIcon = (status: AttendanceStatus) => {
       return <UserCheck className="h-3.5 w-3.5" />;
     case "absent":
       return <UserX className="h-3.5 w-3.5" />;
-    case "late":
-      return <Clock className="h-3.5 w-3.5" />;
   }
 };
 
@@ -106,24 +102,25 @@ export function TeacherAttendance() {
 
   // ── Fetch classes ──────────────────────────────────────────
 
-  const { data: classes = [], isLoading: classesLoading } = useQuery({
+  const { data: rawClasses, isLoading: classesLoading } = useQuery({
     queryKey: classesKey(),
-    queryFn: () => api.get<ClassInfo[]>("/classes?all=true"),
-    staleTime: 5 * 60 * 1000,
-    select: (data) => {
-      // Auto-select first class on first load
-      if (data.length > 0 && !selectedClassId) {
-        // We set it via side-effect below; just return data
-      }
-      return data;
+    queryFn: async () => {
+      const data = await api.get<any>("/classes?all=true");
+      return (Array.isArray(data) ? data : []) as ClassInfo[];
     },
+    staleTime: 5 * 60 * 1000,
+    select: (data) => data,
   });
 
-  // Auto-select first class once loaded
-  const firstClassId = classes[0]?.id;
-  if (firstClassId && !selectedClassId) {
-    setSelectedClassId(firstClassId);
-  }
+  const classes = Array.isArray(rawClasses) ? rawClasses : [];
+
+  // Auto-select first class once loaded safely in an effect to prevent infinity loop
+  useEffect(() => {
+    const firstClassId = classes[0]?.id;
+    if (firstClassId && !selectedClassId) {
+      setSelectedClassId(firstClassId);
+    }
+  }, [classes, selectedClassId]);
 
   // ── Fetch students for selected class ─────────────────────
 
@@ -141,26 +138,31 @@ export function TeacherAttendance() {
 
   const { data: existingAttendance = [] } = useQuery({
     queryKey: attendanceKey(selectedClassId, date),
-    queryFn: () =>
-      api.get<any[]>(`/attendance?classId=${selectedClassId}&date=${date}`),
+    queryFn: async () => {
+      const res = await api.get<any>(`/attendance?classId=${selectedClassId}&date=${date}`);
+      return Array.isArray(res?.records) ? res.records : [];
+    },
     enabled: !!selectedClassId,
     staleTime: 30 * 1000, // 30 s — background refresh keeps it fresh
   });
 
   // ── Derive records from students + existing attendance ─────
   // This is the "source of truth" for display; mutations optimistically patch it.
-
-  const buildRecords = (
-    studentList: StudentInfo[],
-    attList: any[]
-  ): AttendanceRecord[] =>
-    studentList.map((s) => {
-      const existing = attList.find((a) => a.studentId === s.id);
-      return {
-        studentId: s.id,
-        status: existing ? (existing.status as AttendanceStatus) : "present",
-      };
+  
+  // Memoize the heavy work of merging datasets (only recalculates on network sync)
+  const serverRecords = useMemo((): AttendanceRecord[] => {
+    const list = Array.isArray(existingAttendance) ? existingAttendance : [];
+    // Build O(1) lookup map for maximum scaling
+    const statusMap = new Map<string, string>();
+    list.forEach((a) => {
+      if (a?.studentId) statusMap.set(a.studentId, a.status);
     });
+
+    return students.map((s) => ({
+      studentId: s.id,
+      status: (statusMap.get(s.id) as AttendanceStatus) || "present",
+    }));
+  }, [students, existingAttendance]);
 
   // Local overrides — applied on top of server data for instant feel
   const [localOverrides, setLocalOverrides] = useState<
@@ -168,20 +170,19 @@ export function TeacherAttendance() {
   >({});
   const [saved, setSaved] = useState(false);
 
-  // Reset overrides when class or date changes
-  const prevKey = `${selectedClassId}__${date}`;
-  const [lastKey, setLastKey] = useState(prevKey);
-  if (prevKey !== lastKey) {
-    setLastKey(prevKey);
+  // Reset overrides when class or date changes safely in effect
+  useEffect(() => {
     setLocalOverrides({});
     setSaved(false);
-  }
+  }, [selectedClassId, date]);
 
-  const serverRecords = buildRecords(students, existingAttendance);
-  const records: AttendanceRecord[] = serverRecords.map((r) => ({
-    ...r,
-    status: localOverrides[r.studentId] ?? r.status,
-  }));
+  // Combine server record truth with user pending interactions
+  const records = useMemo((): AttendanceRecord[] => {
+    return serverRecords.map((r) => ({
+      ...r,
+      status: localOverrides[r.studentId] ?? r.status,
+    }));
+  }, [serverRecords, localOverrides]);
 
   // ── Update a single student ────────────────────────────────
 
@@ -226,7 +227,7 @@ export function TeacherAttendance() {
     onSuccess: () => {
       setSaved(true);
       setLocalOverrides({});
-      toast.success(`Attendance for ${date} has been recorded successfully.`);
+      toast.success("Attendance saved!");
 
       // Background refetch to sync with server truth
       queryClient.invalidateQueries({
@@ -249,11 +250,15 @@ export function TeacherAttendance() {
 
   const presentCount = records.filter((r) => r.status === "present").length;
   const absentCount = records.filter((r) => r.status === "absent").length;
-  const lateCount = records.filter((r) => r.status === "late").length;
   const totalCount = records.length;
 
   const selectedClass = classes.find((c) => c.id === selectedClassId);
+  
+  const hasExistingAttendance = existingAttendance.length > 0;
   const hasUnsavedChanges = Object.keys(localOverrides).length > 0;
+  
+  // It ONLY needs saving if user toggled something, OR if it has never been submitted to the DB yet.
+  const canSave = hasUnsavedChanges || (!hasExistingAttendance && !saved);
 
   // ── Loading skeleton ───────────────────────────────────────
 
@@ -331,7 +336,7 @@ export function TeacherAttendance() {
 
       {/* Stats */}
       {students.length > 0 && (
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+        <div className="grid grid-cols-3 gap-3">
           {[
             {
               label: "Total",
@@ -353,13 +358,6 @@ export function TeacherAttendance() {
               icon: <UserX className="h-5 w-5 text-red-500 dark:text-red-400" />,
               bg: "bg-red-50 dark:bg-red-900/30",
               text: "text-red-600 dark:text-red-400",
-            },
-            {
-              label: "Late",
-              value: lateCount,
-              icon: <Clock className="h-5 w-5 text-amber-500 dark:text-amber-400" />,
-              bg: "bg-amber-50 dark:bg-amber-900/30",
-              text: "text-amber-600 dark:text-amber-400",
             },
           ].map(({ label, value, icon, bg, text }) => (
             <Card key={label} className="rounded-xl shadow-sm border-0">
@@ -472,7 +470,7 @@ export function TeacherAttendance() {
                         </div>
 
                         <div className="flex items-center gap-1.5 w-full sm:w-auto mt-2 sm:mt-0 sm:ml-auto">
-                          {(["present", "absent", "late"] as AttendanceStatus[]).map((status) => (
+                          {(["present", "absent"] as AttendanceStatus[]).map((status) => (
                             <button
                               key={status}
                               onClick={() => updateRecord(student.id, status)}
@@ -481,9 +479,7 @@ export function TeacherAttendance() {
                                   ? `${getStatusBg(status)} ${
                                       status === "present"
                                         ? "bg-emerald-500 dark:bg-emerald-500 text-white"
-                                        : status === "absent"
-                                        ? "bg-red-500 dark:bg-red-500 text-white"
-                                        : "bg-amber-500 dark:bg-amber-500 text-white"
+                                        : "bg-red-500 dark:bg-red-500 text-white"
                                     } border-transparent shadow-sm ring-1 ring-white/10`
                                   : "border-gray-200 dark:border-gray-700 text-gray-400 dark:text-gray-500 hover:border-gray-300 dark:hover:border-gray-600 bg-white dark:bg-gray-950"
                               }`}
@@ -541,12 +537,9 @@ export function TeacherAttendance() {
 
             <Button
               onClick={() => saveMutation.mutate()}
-              disabled={
-                saveMutation.isPending ||
-                (saved && !hasUnsavedChanges && students.length > 0)
-              }
+              disabled={saveMutation.isPending || !canSave || students.length === 0}
               className={`rounded-lg sm:rounded-xl px-4 py-1.5 sm:px-8 sm:py-5 h-8 sm:h-auto text-[11px] sm:text-sm font-bold transition-all duration-300 flex items-center gap-2 sm:gap-3 shadow-lg ${
-                saved && !hasUnsavedChanges
+                !canSave && students.length > 0
                   ? "bg-gray-800/50 text-gray-600 cursor-not-allowed border border-gray-700/30"
                   : "bg-blue-600 hover:bg-blue-700 text-white shadow-blue-500/25 active:scale-[0.96] hover:shadow-blue-500/40"
               }`}
@@ -561,7 +554,7 @@ export function TeacherAttendance() {
                 />
               )}
               <span>
-                {saved && !hasUnsavedChanges ? "Saved" : "Save Attendance"}
+                {!canSave && students.length > 0 ? "Synchronized" : "Save Attendance"}
               </span>
             </Button>
           </div>

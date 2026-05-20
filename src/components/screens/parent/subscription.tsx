@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback, useRef } from "react";
+import Script from "next/script";
 import { apiFetch } from "@/lib/api";
 import {
   Card,
@@ -271,6 +272,11 @@ export function ParentSubscription() {
 
   return (
     <div className="relative space-y-8 pb-12">
+      <Script
+        id="razorpay-checkout"
+        src="https://checkout.razorpay.com/v1/checkout.js"
+        strategy="lazyOnload"
+      />
       {/* Header */}
       <div className="text-center max-w-2xl mx-auto px-4 relative">
         <div className="inline-flex items-center justify-center w-12 h-12 sm:w-16 sm:h-16 rounded-2xl bg-gradient-to-br from-amber-400 to-orange-500 text-white mb-4 shadow-lg shadow-amber-200 dark:shadow-amber-900/30">

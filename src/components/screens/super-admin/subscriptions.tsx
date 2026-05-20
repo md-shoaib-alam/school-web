@@ -75,13 +75,13 @@ export function SuperAdminSubscriptions() {
   const { data: tenantsData } = useTenants({ page: 1, limit: 100 });
   const tenants = tenantsData?.tenants || [];
 
-  const { data: subsData, isLoading: loadingSubs } = useSubscriptions(
-    selectedTenant === "all" ? undefined : selectedTenant,
-    statusFilter === "all" ? undefined : statusFilter,
-    debouncedSearch || undefined,
+  const { data: subsData, isLoading: loadingSubs } = useSubscriptions({
+    tenantId: selectedTenant === "all" ? undefined : selectedTenant,
+    status: statusFilter === "all" ? undefined : statusFilter,
+    search: debouncedSearch || undefined,
     page,
-    ITEMS_PER_PAGE
-  );
+    limit: ITEMS_PER_PAGE
+  });
 
   // FIXED: Correct parameters for useParents and increased limit for dropdown
   const { data: parentsData, isLoading: loadingParents } = useParents(

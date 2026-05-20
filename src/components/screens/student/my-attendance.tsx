@@ -65,9 +65,7 @@ export function StudentAttendance() {
   const student = useMemo(
     () =>
       Array.isArray(students)
-        ? students.find((s) => s.email === currentUser?.email) ||
-          students[0] ||
-          null
+        ? students.find((s) => s.email === currentUser?.email) || null
         : null,
     [students, currentUser?.email],
   );
@@ -78,26 +76,26 @@ export function StudentAttendance() {
   const fetchData = useCallback(async () => {
     setLoading(true);
     try {
-      const studentsJson = await apiFetch("/api/students").then((r) => r.json());
-      const studentsRes = Array.isArray(studentsJson?.items) ? studentsJson.items : [];
-      setStudents(studentsRes);
+      const res = await apiFetch("/api/students/me");
+      if (!res.ok) throw new Error("Failed to fetch student profile");
+      const targetStudent = await res.json();
+      
+      setStudents([targetStudent]);
 
-      // Use the matched student's classId, or first student's classId
-      const matchedStudent =
-        studentsRes.find((s: StudentInfo) => s.email === currentUser?.email) ||
-        studentsRes[0];
-      if (!matchedStudent) {
-        setLoading(false);
-        return;
+      if (targetStudent?.id) {
+        const params = new URLSearchParams();
+        params.set('classId', targetStudent.classId);
+        params.set('limit', '1000'); // Fetch wide window for analytics
+
+        const attRes = await apiFetch(
+          `/api/attendance?${params.toString()}`,
+        );
+        const data = await attRes.json();
+        const records = Array.isArray(data.records) ? data.records : [];
+        setAttendanceData(
+          records.filter((a: AttendanceRecord) => a.studentId === targetStudent.id),
+        );
       }
-
-      const attRes = await apiFetch(
-        `/api/attendance?classId=${matchedStudent.classId}`,
-      );
-      const attData: AttendanceRecord[] = await attRes.json();
-      setAttendanceData(
-        attData.filter((a) => a.studentId === matchedStudent.id),
-      );
     } catch (e) {
       console.error(e);
     } finally {
@@ -113,10 +111,9 @@ export function StudentAttendance() {
   const stats = useMemo(() => {
     const present = attendanceData.filter((a) => a.status === "present").length;
     const absent = attendanceData.filter((a) => a.status === "absent").length;
-    const late = attendanceData.filter((a) => a.status === "late").length;
     const total = attendanceData.length;
-    const rate = total > 0 ? Math.round(((present + late) / total) * 100) : 0;
-    return { present, absent, late, total, rate };
+    const rate = total > 0 ? Math.round((present / total) * 100) : 0;
+    return { present, absent, total, rate };
   }, [attendanceData]);
 
   // Monthly breakdown for last 6 months
@@ -136,7 +133,7 @@ export function StudentAttendance() {
       });
 
       const presentCount = monthRecords.filter(
-        (a) => a.status === "present" || a.status === "late",
+        (a) => a.status === "present",
       ).length;
       const rate =
         monthRecords.length > 0
@@ -153,7 +150,7 @@ export function StudentAttendance() {
   const last30Days = useMemo(() => {
     const days: {
       date: Date;
-      status: "present" | "absent" | "late" | "none";
+      status: "present" | "absent" | "none";
       dayOfWeek: number;
     }[] = [];
     const today = new Date();
@@ -165,9 +162,9 @@ export function StudentAttendance() {
       const dayOfWeek = d.getDay();
       const record = attendanceData.find((a) => a.date === dateStr);
 
-      let status: "present" | "absent" | "late" | "none" = "none";
+      let status: "present" | "absent" | "none" = "none";
       if (record) {
-        status = record.status as "present" | "absent" | "late";
+        status = record.status as "present" | "absent";
       }
       // If no record and it's a weekend, keep as 'none'
       // If no record and weekday, also keep as 'none' (could be future or unrecorded)
@@ -189,8 +186,6 @@ export function StudentAttendance() {
         return "bg-emerald-400";
       case "absent":
         return "bg-red-400";
-      case "late":
-        return "bg-amber-400";
       default:
         return "bg-gray-200 dark:bg-gray-700";
     }
@@ -205,7 +200,7 @@ export function StudentAttendance() {
         <h2 className="text-xl font-bold text-gray-900 dark:text-gray-100">
           My Attendance
         </h2>
-        <p className="text-sm text-gray-500 dark:text-gray-400 dark:text-gray-500 mt-0.5">
+        <p className="text-sm text-gray-600 dark:text-gray-400 mt-0.5">
           Track your daily attendance and monthly trends
         </p>
       </div>
@@ -248,12 +243,12 @@ export function StudentAttendance() {
                 <span className="text-3xl font-bold text-gray-900 dark:text-gray-100">
                   {stats.rate}%
                 </span>
-                <span className="text-xs text-gray-500 dark:text-gray-400 dark:text-gray-500">
+                <span className="text-xs text-gray-600 dark:text-gray-400">
                   Attendance
                 </span>
               </div>
             </div>
-            <p className="text-sm font-medium text-gray-600 dark:text-gray-400 dark:text-gray-500 mt-4">
+            <p className="text-sm font-medium text-gray-700 dark:text-gray-300 mt-4">
               {student ? student.name : "Student"}
             </p>
             <p className="text-xs text-gray-400 dark:text-gray-500">
@@ -271,7 +266,7 @@ export function StudentAttendance() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="flex items-center gap-4 p-4 rounded-xl bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800">
                 <div className="p-2.5 rounded-lg bg-emerald-100 dark:bg-emerald-900/40">
                   <CheckCircle2 className="h-5 w-5 text-emerald-600" />
@@ -280,7 +275,7 @@ export function StudentAttendance() {
                   <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">
                     {stats.present}
                   </p>
-                  <p className="text-xs text-gray-500 dark:text-gray-400 dark:text-gray-500">
+                  <p className="text-xs text-gray-600 dark:text-gray-400">
                     Present Days
                   </p>
                 </div>
@@ -300,7 +295,7 @@ export function StudentAttendance() {
                   <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">
                     {stats.absent}
                   </p>
-                  <p className="text-xs text-gray-500 dark:text-gray-400 dark:text-gray-500">
+                  <p className="text-xs text-gray-600 dark:text-gray-400">
                     Absent Days
                   </p>
                 </div>
@@ -311,51 +306,25 @@ export function StudentAttendance() {
                   %
                 </Badge>
               </div>
-
-              <div className="flex items-center gap-4 p-4 rounded-xl bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800">
-                <div className="p-2.5 rounded-lg bg-amber-100 dark:bg-amber-900/40">
-                  <Clock className="h-5 w-5 text-amber-600" />
-                </div>
-                <div>
-                  <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">
-                    {stats.late}
-                  </p>
-                  <p className="text-xs text-gray-500 dark:text-gray-400 dark:text-gray-500">
-                    Late Days
-                  </p>
-                </div>
-                <Badge className="bg-amber-500 text-white text-[10px] ml-auto shrink-0">
-                  {stats.total > 0
-                    ? Math.round((stats.late / stats.total) * 100)
-                    : 0}
-                  %
-                </Badge>
-              </div>
             </div>
 
             {/* Legend */}
             <div className="flex items-center gap-4 mt-5 pt-4 border-t border-gray-100">
               <div className="flex items-center gap-1.5">
                 <div className="w-3 h-3 rounded-sm bg-emerald-400" />
-                <span className="text-xs text-gray-500 dark:text-gray-400 dark:text-gray-500">
+                <span className="text-xs text-gray-600 dark:text-gray-400">
                   Present
                 </span>
               </div>
               <div className="flex items-center gap-1.5">
                 <div className="w-3 h-3 rounded-sm bg-red-400" />
-                <span className="text-xs text-gray-500 dark:text-gray-400 dark:text-gray-500">
+                <span className="text-xs text-gray-600 dark:text-gray-400">
                   Absent
                 </span>
               </div>
               <div className="flex items-center gap-1.5">
-                <div className="w-3 h-3 rounded-sm bg-amber-400" />
-                <span className="text-xs text-gray-500 dark:text-gray-400 dark:text-gray-500">
-                  Late
-                </span>
-              </div>
-              <div className="flex items-center gap-1.5">
                 <div className="w-3 h-3 rounded-sm bg-gray-200 dark:bg-gray-700" />
-                <span className="text-xs text-gray-500 dark:text-gray-400 dark:text-gray-500">
+                <span className="text-xs text-gray-600 dark:text-gray-400">
                   No Data
                 </span>
               </div>
@@ -439,7 +408,7 @@ export function StudentAttendance() {
             {["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"].map((d) => (
               <div
                 key={d}
-                className="text-center text-[10px] sm:text-xs font-medium text-gray-400 dark:text-gray-500 py-1"
+                className="text-center text-[10px] sm:text-xs font-medium text-gray-500 dark:text-gray-400 py-1"
               >
                 {d}
               </div>
@@ -472,11 +441,11 @@ export function StudentAttendance() {
                 >
                   <span
                     className={
-                      status === "none" && !isWeekend
-                        ? "text-gray-400 dark:text-gray-500"
-                        : isWeekend && status === "none"
-                          ? "text-gray-300"
-                          : "text-white"
+                      status === "none"
+                        ? isWeekend
+                          ? "text-gray-400 dark:text-gray-500"
+                          : "text-gray-600 dark:text-gray-400"
+                        : "text-white"
                     }
                   >
                     {dayNum}

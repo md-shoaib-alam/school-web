@@ -45,6 +45,7 @@ import { useAcademicYears } from "@/hooks/use-academic-years";
 import { DatePicker } from "@/components/ui/date-picker";
 import { goeyToast as toast } from "goey-toast";
 import { format } from "date-fns";
+import { formatLocalDate, parseLocalDate } from "@/lib/utils";
 
 export function AcademicYearsScreen() {
   const { 
@@ -177,15 +178,15 @@ export function AcademicYearsScreen() {
                 <div className="space-y-2">
                   <Label htmlFor="startDate">Start Date</Label>
                   <DatePicker 
-                    date={formData.startDate ? new Date(formData.startDate) : undefined}
-                    onChange={(d) => setFormData({ ...formData, startDate: d ? d.toISOString().split('T')[0] : "" })}
+                    date={parseLocalDate(formData.startDate)}
+                    onChange={(d) => setFormData({ ...formData, startDate: formatLocalDate(d) })}
                   />
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="endDate">End Date</Label>
                   <DatePicker 
-                    date={formData.endDate ? new Date(formData.endDate) : undefined}
-                    onChange={(d) => setFormData({ ...formData, endDate: d ? d.toISOString().split('T')[0] : "" })}
+                    date={parseLocalDate(formData.endDate)}
+                    onChange={(d) => setFormData({ ...formData, endDate: formatLocalDate(d) })}
                   />
                 </div>
               </div>
@@ -253,8 +254,8 @@ export function AcademicYearsScreen() {
       {/* Table */}
       <Card className="overflow-hidden border-indigo-100 dark:border-indigo-900/30 shadow-md">
         <Table>
-          <TableHeader className="bg-gray-50 dark:bg-gray-900/50">
-            <TableRow>
+          <TableHeader className="bg-card">
+            <TableRow className="hover:bg-transparent">
               <TableHead className="font-semibold">Session Name</TableHead>
               <TableHead className="font-semibold">Start Date</TableHead>
               <TableHead className="font-semibold">End Date</TableHead>
@@ -265,7 +266,7 @@ export function AcademicYearsScreen() {
           </TableHeader>
           <TableBody>
             {isLoading ? (
-              <TableRow>
+              <TableRow className="hover:bg-transparent">
                 <TableCell colSpan={6} className="text-center py-10">
                   <div className="flex flex-col items-center gap-2">
                     <div className="h-8 w-8 animate-spin rounded-full border-4 border-indigo-500 border-t-transparent" />
@@ -274,7 +275,7 @@ export function AcademicYearsScreen() {
                 </TableCell>
               </TableRow>
             ) : academicYears.length === 0 ? (
-              <TableRow>
+              <TableRow className="hover:bg-transparent">
                 <TableCell colSpan={6} className="text-center py-20">
                   <div className="flex flex-col items-center gap-2">
                     <AlertCircle className="h-10 w-10 text-muted-foreground/30" />
@@ -287,7 +288,7 @@ export function AcademicYearsScreen() {
               </TableRow>
             ) : (
               academicYears.map((year: any) => (
-                <TableRow key={year.id} className="hover:bg-indigo-50/50 dark:hover:bg-indigo-950/10 transition-colors">
+                <TableRow key={year.id} className="hover:bg-transparent transition-colors">
                   <TableCell className="font-medium">{year.name}</TableCell>
                   <TableCell>{format(new Date(year.startDate), "MMM dd, yyyy")}</TableCell>
                   <TableCell>{format(new Date(year.endDate), "MMM dd, yyyy")}</TableCell>

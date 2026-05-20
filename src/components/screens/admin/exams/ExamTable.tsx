@@ -8,7 +8,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { 
   Search, Filter, MoreVertical, Edit2, Trash2, Calendar, Clock, 
-  FileText, Pencil, ClipboardList, RefreshCw 
+  FileText, Pencil, ClipboardList, RefreshCw, Eye
 } from 'lucide-react';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { ExamRecord } from './types';
@@ -18,7 +18,6 @@ interface ExamTableProps {
   loading: boolean;
   searchTerm: string;
   setSearchTerm: (s: string) => void;
-  onOpenResults: (exam: ExamRecord) => void;
   onOpenEdit: (exam: ExamRecord) => void;
   onDelete: (id: string) => void;
   deleting: boolean;
@@ -26,6 +25,7 @@ interface ExamTableProps {
   formatTime: (time: string | null | undefined) => string;
   getStatusBadge: (status: string) => React.ReactNode;
   getExamTypeBadge: (type: string) => React.ReactNode;
+  onViewResults?: (exam: ExamRecord) => void;
   
   // Filter props
   classFilter: string;
@@ -33,6 +33,9 @@ interface ExamTableProps {
   statusFilter: string;
   setStatusFilter: (v: string) => void;
   classes: any[];
+  hideClassFilter?: boolean;
+  flat?: boolean;
+  hideSearchAndFilter?: boolean;
 }
 
 export function ExamTable({
@@ -40,7 +43,6 @@ export function ExamTable({
   loading,
   searchTerm,
   setSearchTerm,
-  onOpenResults,
   onOpenEdit,
   onDelete,
   deleting,
@@ -48,58 +50,76 @@ export function ExamTable({
   formatTime,
   getStatusBadge,
   getExamTypeBadge,
+  onViewResults,
   classFilter,
   setClassFilter,
   statusFilter,
   setStatusFilter,
   classes,
+  hideClassFilter = false,
+  flat = false,
+  hideSearchAndFilter = false,
 }: ExamTableProps) {
+  const Container = flat ? 'div' : Card;
+  const containerProps = flat 
+    ? { className: "overflow-hidden border-none bg-transparent shadow-none" }
+    : { className: "border-none shadow-sm overflow-hidden bg-card" };
+  
+  const ContentContainer = flat ? 'div' : CardContent;
+  const contentProps = { className: "p-0" };
+
   return (
-    <Card className="border-none shadow-sm overflow-hidden">
-      <div className="p-3 sm:p-4 border-b bg-muted/30 flex items-center justify-between gap-3">
-        <div className="relative flex-1">
-          <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
-          <Input
-            placeholder="Search..."
-            className="pl-8 h-8 sm:h-9 text-sm"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
+    // @ts-ignore
+    <Container {...containerProps}>
+      {!hideSearchAndFilter && (
+        <div className="p-3 sm:p-4 border-b border-gray-100 dark:border-zinc-800 bg-card flex items-center justify-between gap-3">
+          <div className="relative flex-1">
+            <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
+            <Input
+              placeholder="Search..."
+              className="pl-8 h-8 sm:h-9 text-sm"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+          </div>
+          <div className="flex items-center gap-2 shrink-0">
+            {!hideClassFilter && (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="outline" size="sm" className="h-8 sm:h-9 gap-1.5 px-2 sm:px-3">
+                    <Filter className="h-3.5 w-3.5" />
+                    <span className="hidden xs:inline">Filters</span>
+                    {(classFilter !== 'all' || statusFilter !== 'all') && (
+                      <div className="h-1.5 w-1.5 rounded-full bg-blue-600" />
+                    )}
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-64 max-h-[80vh] overflow-y-auto">
+                  <DropdownMenuLabel>Filter by Class</DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  <div className="max-h-[200px] overflow-y-auto">
+                    <DropdownMenuItem onClick={() => setClassFilter('all')} className={classFilter === 'all' ? 'bg-accent' : ''}>
+                      All Classes
+                    </DropdownMenuItem>
+                    {classes.map((c) => (
+                      <DropdownMenuItem key={c.id} onClick={() => setClassFilter(c.id)} className={classFilter === c.id ? 'bg-accent' : ''}>
+                        {c.name}-{c.section}
+                      </DropdownMenuItem>
+                    ))}
+                  </div>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            )}
+          </div>
         </div>
-        <div className="flex items-center gap-2 shrink-0">
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="outline" size="sm" className="h-8 sm:h-9 gap-1.5 px-2 sm:px-3">
-                <Filter className="h-3.5 w-3.5" />
-                <span className="hidden xs:inline">Filters</span>
-                {(classFilter !== 'all' || statusFilter !== 'all') && (
-                  <div className="h-1.5 w-1.5 rounded-full bg-blue-600" />
-                )}
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-64 max-h-[80vh] overflow-y-auto">
-              <DropdownMenuLabel>Filter by Class</DropdownMenuLabel>
-              <DropdownMenuSeparator />
-              <div className="max-h-[200px] overflow-y-auto">
-                <DropdownMenuItem onClick={() => setClassFilter('all')} className={classFilter === 'all' ? 'bg-accent' : ''}>
-                  All Classes
-                </DropdownMenuItem>
-                {classes.map((c) => (
-                  <DropdownMenuItem key={c.id} onClick={() => setClassFilter(c.id)} className={classFilter === c.id ? 'bg-accent' : ''}>
-                    {c.name}-{c.section}
-                  </DropdownMenuItem>
-                ))}
-              </div>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </div>
-      </div>
+      )}
       
-      <CardContent className="p-0">
+      {/* @ts-ignore */}
+      <ContentContainer {...contentProps}>
         <div className="overflow-x-auto">
           <Table>
             <TableHeader>
-              <TableRow className="bg-muted/30">
+              <TableRow className="bg-muted/30 hover:bg-transparent">
                 <TableHead className="px-2 sm:px-4">Exam & Subject</TableHead>
                 <TableHead className="hidden sm:table-cell">Subject</TableHead>
                 <TableHead className="hidden md:table-cell">Class</TableHead>
@@ -112,14 +132,14 @@ export function ExamTable({
             <TableBody>
               {loading ? (
                 [...Array(5)].map((_, i) => (
-                  <TableRow key={i}>
+                  <TableRow key={i} className="hover:bg-transparent">
                     {[...Array(7)].map((_, j) => (
                       <TableCell key={j}><div className="h-4 w-full bg-muted animate-pulse rounded" /></TableCell>
                     ))}
                   </TableRow>
                 ))
               ) : exams.length === 0 ? (
-                <TableRow>
+                <TableRow className="hover:bg-transparent">
                   <TableCell colSpan={7} className="h-64 text-center">
                     <div className="flex flex-col items-center justify-center text-muted-foreground">
                       <ClipboardList className="h-12 w-12 mb-2 opacity-20" />
@@ -129,7 +149,7 @@ export function ExamTable({
                 </TableRow>
               ) : (
                 exams.map((exam) => (
-                  <TableRow key={exam.id} className="group">
+                  <TableRow key={exam.id} className="group hover:bg-transparent">
                     <TableCell className="px-2 sm:px-4">
                       <div className="flex flex-col gap-1">
                         <div className="flex items-center gap-2">
@@ -165,15 +185,17 @@ export function ExamTable({
                     <TableCell className="text-center px-2 hidden sm:table-cell">{getStatusBadge(exam.status)}</TableCell>
                     <TableCell className="text-right px-2 sm:px-4">
                       <div className="flex items-center justify-end gap-1">
-                        <Button
-                          size="sm"
-                          variant="ghost"
-                          className="h-8 px-2 text-xs text-blue-600 hover:text-blue-800 hover:bg-blue-50"
-                          onClick={() => onOpenResults(exam)}
-                        >
-                          <FileText className="h-3.5 w-3.5 sm:mr-1.5" />
-                          <span className="hidden sm:inline">Results</span>
-                        </Button>
+                        {onViewResults && exam.status === 'completed' && (
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-8 w-8 text-blue-500 hover:text-blue-700 hover:bg-blue-50"
+                            onClick={() => onViewResults(exam)}
+                            title="View Results"
+                          >
+                            <Eye className="h-4 w-4" />
+                          </Button>
+                        )}
                         <Button
                           variant="ghost"
                           size="icon"
@@ -219,7 +241,7 @@ export function ExamTable({
             </TableBody>
           </Table>
         </div>
-      </CardContent>
-    </Card>
+      </ContentContainer>
+    </Container>
   );
 }

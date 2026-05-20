@@ -59,6 +59,7 @@ export function SetFeesTab({ canCreate, canEdit, canDelete }: SetFeesTabProps) {
 
   const { data: structures = [], isLoading: loadingStructures } = useFeeStructures();
   const { data: categories = [], isLoading: loadingCategories } = useFeeCategories();
+  const { data: minCategories = [] } = useFeeCategories('min');
   const { data: classes = [], isLoading: loadingClasses } = useQuery<ClassOption[]>({
     queryKey: ['classes', 'min'],
     queryFn: () => api.get('/classes?mode=min')
@@ -304,12 +305,12 @@ export function SetFeesTab({ canCreate, canEdit, canDelete }: SetFeesTabProps) {
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Category</TableHead>
-                    <TableHead>Class</TableHead>
-                    <TableHead className="hidden sm:table-cell">Amount</TableHead>
-                    <TableHead className="hidden md:table-cell">Academic Year</TableHead>
-                    <TableHead className="text-center">Assign</TableHead>
-                    {(canEdit || canDelete) && <TableHead className="w-28 text-center">Actions</TableHead>}
+                    <TableHead className="pl-6 h-12">Category</TableHead>
+                    <TableHead className="h-12">Class</TableHead>
+                    <TableHead className="hidden sm:table-cell h-12">Amount</TableHead>
+                    <TableHead className="hidden md:table-cell h-12">Academic Year</TableHead>
+                    <TableHead className="text-center h-12">Assign</TableHead>
+                    {(canEdit || canDelete) && <TableHead className="w-28 text-center h-12">Actions</TableHead>}
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -323,25 +324,25 @@ export function SetFeesTab({ canCreate, canEdit, canDelete }: SetFeesTabProps) {
                   ) : (
                     filtered.map(s => (
                       <TableRow key={s.id} className="hover:bg-emerald-50/50 dark:hover:bg-emerald-900/20 transition-colors">
-                        <TableCell>
+                        <TableCell className="pl-6 py-4">
                           <div>
                             <span className="font-medium text-sm">{s.feeCategoryName}</span>
                             <span className="text-xs text-muted-foreground ml-2">({s.feeCategoryCode})</span>
                           </div>
                         </TableCell>
-                        <TableCell>
+                        <TableCell className="py-4">
                           <Badge variant="outline" className="font-normal">{s.className}</Badge>
                         </TableCell>
-                        <TableCell className="hidden sm:table-cell font-semibold text-emerald-600 dark:text-emerald-400">₹{s.amount.toLocaleString()}</TableCell>
-                        <TableCell className="hidden md:table-cell text-sm text-muted-foreground">{s.academicYear}</TableCell>
-                        <TableCell className="text-center">
+                        <TableCell className="hidden sm:table-cell font-semibold text-emerald-600 dark:text-emerald-400 py-4">₹{s.amount.toLocaleString()}</TableCell>
+                        <TableCell className="hidden md:table-cell text-sm text-muted-foreground py-4">{s.academicYear}</TableCell>
+                        <TableCell className="text-center py-4">
                           <Button variant="outline" size="sm" className="h-7 px-2 text-xs gap-1.5 hover:bg-emerald-50 hover:text-emerald-700 hover:border-emerald-300 dark:hover:bg-emerald-900/30 dark:hover:text-emerald-400" onClick={() => openAssignDialog(s)}>
                             <Users className="h-3.5 w-3.5" />
                             <span className="hidden sm:inline">Assign</span>
                           </Button>
                         </TableCell>
                         {(canEdit || canDelete) && (
-                          <TableCell className="text-center">
+                          <TableCell className="text-center py-4">
                             <div className="flex items-center justify-center gap-1">
                               {canEdit && <Button variant="ghost" size="icon" className="h-7 w-7 text-emerald-500 hover:text-emerald-700 hover:bg-emerald-50 dark:hover:bg-emerald-900/30" onClick={() => handleEdit(s)}><Pencil className="h-3.5 w-3.5" /></Button>}
                               {canDelete && (
@@ -386,7 +387,7 @@ export function SetFeesTab({ canCreate, canEdit, canDelete }: SetFeesTabProps) {
               <Label>Fee Category *</Label>
               <Select value={addForm.feeCategoryId} onValueChange={v => setAddForm(p => ({ ...p, feeCategoryId: v }))}>
                 <SelectTrigger><SelectValue placeholder="Select category" /></SelectTrigger>
-                <SelectContent>{categories.filter(c => c.status === 'active').map(c => <SelectItem key={c.id} value={c.id}>{c.name} ({c.code})</SelectItem>)}</SelectContent>
+                <SelectContent>{minCategories.map(c => <SelectItem key={c.id} value={c.id}>{c.name} ({c.code})</SelectItem>)}</SelectContent>
               </Select>
             </div>
             <div className="grid grid-cols-2 gap-4">

@@ -6,11 +6,9 @@ import { useAppStore } from "@/store/use-app-store";
 import { useTenantResolution } from "@/lib/graphql/hooks/platform.hooks";
 import dynamic from "next/dynamic";
 
-const LoadingScreen = () => (
-  <div className="flex h-full items-center justify-center p-8">
-    <div className="animate-spin h-8 w-8 border-4 border-rose-500 border-t-transparent rounded-full" />
-  </div>
-);
+import { FullPageSkeleton } from "@/components/ui/full-page-skeleton";
+
+const LoadingScreen = () => <FullPageSkeleton />;
 
 const AdminDashboard = dynamic(
   () =>
@@ -30,6 +28,13 @@ const SuperAdminTenants = dynamic(
   () =>
     import("@/components/screens/super-admin/tenants").then(
       (m) => m.SuperAdminTenants,
+    ),
+  { loading: LoadingScreen },
+);
+const SuperAdminDeletedTenants = dynamic(
+  () =>
+    import("@/components/screens/super-admin/deleted-tenants").then(
+      (m) => m.SuperAdminDeletedTenants,
     ),
   { loading: LoadingScreen },
 );
@@ -118,6 +123,14 @@ const SuperAdminPlatformNotices = dynamic(
   { loading: LoadingScreen },
 );
 
+const UserProfileScreen = dynamic(
+  () =>
+    import("@/components/screens/profile").then(
+      (m) => m.UserProfileScreen,
+    ),
+  { loading: LoadingScreen },
+);
+
 const TeacherDashboard = dynamic(
   () =>
     import("@/components/screens/teacher/dashboard").then(
@@ -172,13 +185,18 @@ export default function GenericSlugDispatcher() {
         resolvedTenant.id,
         resolvedTenant.name,
         resolvedTenant.slug,
+        resolvedTenant.logo
       );
     }
   }, [mounted, resolvedTenant, currentTenantSlug, setCurrentTenant]);
 
   // 2. Check if it's a Tenant Dashboard (matches slug or tenantId, or user is super_admin)
-  const isTenantMatch =
-    currentUser?.tenantId === slug || currentUser?.tenantSlug === slug;
+  const urlSlug = typeof slug === 'string' ? slug.toLowerCase() : '';
+  const userTenantId = currentUser?.tenantId?.toLowerCase() || '';
+  const userTenantSlug = currentUser?.tenantSlug?.toLowerCase() || '';
+  
+  const isTenantMatch = (urlSlug === userTenantId || urlSlug === userTenantSlug);
+  
   const isTenantContext =
     isTenantMatch || (currentUser?.role === "super_admin" && !!resolvedTenant);
 
@@ -193,10 +211,14 @@ export default function GenericSlugDispatcher() {
   // 1. Check if it's a Platform Screen (Super Admin only)
   if (currentUser.role === "super_admin") {
     switch (slug) {
+      case "profile":
+        return <UserProfileScreen />;
       case "dashboard":
         return <SuperAdminDashboard />;
       case "tenants":
         return <SuperAdminTenants />;
+      case "deleted-tenants":
+        return <SuperAdminDeletedTenants />;
       case "billing":
         return <SuperAdminBilling />;
       case "users":
@@ -232,10 +254,6 @@ export default function GenericSlugDispatcher() {
   if (currentUser.role !== "super_admin") {
     const correctSlug = currentUser.tenantSlug || currentUser.tenantId;
     if (correctSlug && typeof window !== "undefined" && slug !== correctSlug) {
-      console.warn(
-        "[GenericSlugDispatcher] Slug Mismatch. Redirecting to correct tenant:",
-        correctSlug,
-      );
       window.location.href = `/${correctSlug}`;
       return <LoadingScreen />;
     }

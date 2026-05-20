@@ -7,14 +7,13 @@ interface AttendanceStatsProps {
   percentage: number;
   present: number;
   absent: number;
-  late: number;
 }
 
-export function AttendanceStats({ percentage, present, absent, late }: AttendanceStatsProps) {
+export function AttendanceStats({ percentage, present, absent }: AttendanceStatsProps) {
   return (
-    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
       {/* Percentage circle */}
-      <Card className="rounded-xl shadow-sm col-span-2 md:col-span-1 shadow-none">
+      <Card className="rounded-xl shadow-sm shadow-none">
         <CardContent className="p-6 flex flex-col items-center justify-center">
           <div className="relative w-32 h-32">
             <svg className="w-32 h-32 -rotate-90" viewBox="0 0 128 128">
@@ -45,7 +44,7 @@ export function AttendanceStats({ percentage, present, absent, late }: Attendanc
       {/* Stat cards */}
       <Card className="rounded-xl shadow-sm border-emerald-200 dark:border-emerald-800 shadow-none">
         <CardContent className="p-4">
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3 h-full">
             <div className="h-10 w-10 rounded-xl bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center">
               <CheckCircle2 className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
             </div>
@@ -59,27 +58,13 @@ export function AttendanceStats({ percentage, present, absent, late }: Attendanc
 
       <Card className="rounded-xl shadow-sm border-red-200 dark:border-red-800 shadow-none">
         <CardContent className="p-4">
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3 h-full">
             <div className="h-10 w-10 rounded-xl bg-red-100 dark:bg-red-900/30 flex items-center justify-center">
               <XCircle className="h-5 w-5 text-red-600 dark:text-red-400" />
             </div>
             <div>
               <p className="text-xs text-muted-foreground">Absent Days</p>
               <p className="text-2xl font-bold text-red-600 dark:text-red-400">{absent}</p>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-
-      <Card className="rounded-xl shadow-sm border-amber-200 dark:border-amber-800 shadow-none">
-        <CardContent className="p-4">
-          <div className="flex items-center gap-3">
-            <div className="h-10 w-10 rounded-xl bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center">
-              <Clock className="h-5 w-5 text-amber-600 dark:text-amber-400" />
-            </div>
-            <div>
-              <p className="text-xs text-muted-foreground">Late Days</p>
-              <p className="text-2xl font-bold text-amber-600 dark:text-amber-400">{late}</p>
             </div>
           </div>
         </CardContent>

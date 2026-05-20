@@ -13,6 +13,7 @@ export interface ExamRecord {
   status: 'scheduled' | 'completed' | 'cancelled';
   totalMarks: number;
   passingMarks: number;
+  academicYear?: string;
 }
 
 export interface ExamFormData {
@@ -25,6 +26,7 @@ export interface ExamFormData {
   endTime: string;
   totalMarks: string;
   passingMarks: string;
+  academicYear?: string;
 }
 
 export interface StudentResultRow {

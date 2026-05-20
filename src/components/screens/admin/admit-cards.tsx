@@ -530,7 +530,7 @@ export function AdminAdmitCards() {
                 <SelectTrigger className="w-full sm:w-72">
                   <SelectValue placeholder={loadingClasses ? 'Loading classes...' : 'Select a class'} />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent className="max-h-70">
                   {classes.map((c) => (
                     <SelectItem key={c.id} value={c.id}>
                       <span className="flex items-center gap-2">

@@ -45,6 +45,7 @@ import {
   Wallet,
   Send,
   Smartphone,
+  Trash2,
 } from "lucide-react";
 import { type UserRole } from "@/store/use-app-store";
 
@@ -75,6 +76,12 @@ export const navItems: Record<UserRole, NavItem[]> = {
       key: "tenants",
       label: "School Management",
       icon: <Building2 className="h-4 w-4" />,
+      permModule: "tenants",
+    },
+    {
+      key: "deleted-tenants",
+      label: "Deleted Schools",
+      icon: <Trash2 className="h-4 w-4" />,
       permModule: "tenants",
     },
     {
@@ -199,6 +206,7 @@ export const navItems: Record<UserRole, NavItem[]> = {
         { key: "results-entry", label: "Results Entry", icon: <FileText className="h-4 w-4" /> },
         { key: "published-results", label: "Published Results", icon: <Trophy className="h-4 w-4" /> },
         { key: "admit-cards", label: "Admit Cards", icon: <IdCard className="h-4 w-4" /> },
+        { key: "print-marksheet", label: "Print Marksheet", icon: <Award className="h-4 w-4" /> },
       ]
     },
     {
@@ -273,13 +281,25 @@ export const navItems: Record<UserRole, NavItem[]> = {
       icon: <UserCheck className="h-4 w-4" />,
     },
     {
-      key: "grade-management",
+      key: "grades-group",
       label: "Grades",
-      icon: <ClipboardList className="h-4 w-4" />,
+      icon: <TrendingUp className="h-4 w-4" />,
+      children: [
+        {
+          key: "assessments",
+          label: "Assessments",
+          icon: <ClipboardList className="h-4 w-4" />,
+        },
+        {
+          key: "school-exams",
+          label: "School Exams",
+          icon: <BookOpen className="h-4 w-4" />,
+        },
+      ]
     },
     {
-      key: "assignments",
-      label: "Assignments",
+      key: "homework",
+      label: "Homework",
       icon: <FileText className="h-4 w-4" />,
     },
     {
@@ -316,9 +336,21 @@ export const navItems: Record<UserRole, NavItem[]> = {
       icon: <School className="h-4 w-4" />,
     },
     {
-      key: "my-grades",
+      key: "grades-group",
       label: "My Grades",
       icon: <TrendingUp className="h-4 w-4" />,
+      children: [
+        {
+          key: "school-exams",
+          label: "School Exams",
+          icon: <BookOpen className="h-4 w-4" />,
+        },
+        {
+          key: "assessments",
+          label: "Assessments",
+          icon: <ClipboardList className="h-4 w-4" />,
+        },
+      ]
     },
     {
       key: "my-attendance",
@@ -326,8 +358,8 @@ export const navItems: Record<UserRole, NavItem[]> = {
       icon: <UserCheck className="h-4 w-4" />,
     },
     {
-      key: "assignments",
-      label: "Assignments",
+      key: "homework",
+      label: "Homework",
       icon: <FileText className="h-4 w-4" />,
     },
     {
@@ -365,9 +397,26 @@ export const navItems: Record<UserRole, NavItem[]> = {
       icon: <Users className="h-4 w-4" />,
     },
     {
-      key: "grades",
+      key: "homework",
+      label: "Homework",
+      icon: <FileText className="h-4 w-4" />,
+    },
+    {
+      key: "grades-group",
       label: "Grades",
       icon: <TrendingUp className="h-4 w-4" />,
+      children: [
+        {
+          key: "school-exams",
+          label: "School Exams",
+          icon: <BookOpen className="h-4 w-4" />,
+        },
+        {
+          key: "assessments",
+          label: "Assessments",
+          icon: <ClipboardList className="h-4 w-4" />,
+        },
+      ]
     },
     {
       key: "attendance",
@@ -449,6 +498,12 @@ export const navItems: Record<UserRole, NavItem[]> = {
       key: "admit-cards",
       label: "Admit Cards",
       icon: <IdCard className="h-4 w-4" />,
+      permModule: "exams",
+    },
+    {
+      key: "print-marksheet",
+      label: "Print Marksheet",
+      icon: <Award className="h-4 w-4" />,
       permModule: "exams",
     },
     {

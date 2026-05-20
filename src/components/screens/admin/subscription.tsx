@@ -107,11 +107,7 @@ export function SchoolSubscriptionScreen() {
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div className="flex items-center gap-4">
           <div className="h-14 w-14 sm:h-12 sm:w-12 rounded-2xl bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center overflow-hidden shrink-0">
-            {tenant.logo ? (
-              <img src={tenant.logo} alt={tenant.name} className="h-full w-full object-cover" />
-            ) : (
-              <Crown className="h-6 w-6 text-amber-600 dark:text-amber-400" />
-            )}
+            <img src={tenant.logo || "/test.webp"} alt={tenant.name} className="h-full w-full object-cover" />
           </div>
           <div>
             <h2 className="text-2xl sm:text-3xl font-bold tracking-tight">My Subscription</h2>
@@ -166,15 +162,11 @@ export function SchoolSubscriptionScreen() {
               </div>
               <div className="flex-shrink-0">
                 <div className="h-16 w-16 sm:h-28 sm:w-28 rounded-2xl sm:rounded-3xl bg-white/10 flex items-center justify-center border border-white/20 shadow-2xl backdrop-blur-sm overflow-hidden">
-                  {tenant.logo ? (
-                    <img 
-                      src={tenant.logo} 
-                      alt={tenant.name} 
-                      className="w-full h-full object-cover" 
-                    />
-                  ) : (
-                    <Crown className="h-8 w-8 sm:h-14 sm:w-14 text-white drop-shadow-xl" />
-                  )}
+                  <img 
+                    src={tenant.logo || "/test.webp"} 
+                    alt={tenant.name} 
+                    className="w-full h-full object-cover" 
+                  />
                 </div>
               </div>
             </div>

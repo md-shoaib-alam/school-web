@@ -1,5 +1,5 @@
-importScripts('https://www.gstatic.com/firebasejs/9.0.0/firebase-app-compat.js');
-importScripts('https://www.gstatic.com/firebasejs/9.0.0/firebase-messaging-compat.js');
+importScripts('https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js');
+importScripts('https://www.gstatic.com/firebasejs/10.12.2/firebase-messaging-compat.js');
 
 // This file is static, so we need to inject the config values here 
 // or have the frontend register it with the config.
@@ -19,11 +19,12 @@ const messaging = firebase.messaging();
 messaging.onBackgroundMessage((payload) => {
   console.log('[firebase-messaging-sw.js] Received background message ', payload);
   
-  const notificationTitle = payload.notification.title;
+  const notificationTitle = payload.notification?.title || "New Notification";
   const notificationOptions = {
-    body: payload.notification.body,
-    icon: '/logo.png', // Replace with your school logo path
-    data: payload.data
+    body: payload.notification?.body || "You have a new update.",
+    icon: '/logo.svg', // Matched with your public/logo.svg
+    data: payload.data,
+    badge: '/logo.svg'
   };
 
   self.registration.showNotification(notificationTitle, notificationOptions);

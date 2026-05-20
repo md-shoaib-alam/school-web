@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Script from "next/script";
 import { useAppStore } from "@/store/use-app-store";
 import { useTenantDetail, useUpgradeSchool } from "@/lib/graphql/hooks/platform.hooks";
 import { PricingPlans, SchoolPlan } from "./subscription/pricing-plans";
@@ -28,7 +29,8 @@ export function ManagePlanScreen() {
     try {
       // 1. Create Order on Backend
       const orderData = await api.post("/tenants/create-subscription-order", { 
-        planId: plan.id 
+        planId: plan.id,
+        amount: plan.price
       });
 
       const { orderId, amount, currency, keyId } = orderData;
@@ -106,6 +108,11 @@ export function ManagePlanScreen() {
 
   return (
     <div className="space-y-8 pb-12">
+      <Script
+        id="razorpay-checkout"
+        src="https://checkout.razorpay.com/v1/checkout.js"
+        strategy="lazyOnload"
+      />
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div className="flex items-center gap-3">
           <Button 

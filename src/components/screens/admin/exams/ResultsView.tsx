@@ -26,7 +26,6 @@ interface ResultsViewProps {
   onBack: () => void;
   onSelectExam: (exam: ExamRecord) => void;
   onUpdateMark: (studentId: string, marks: string) => void;
-  onUpdateRemark: (studentId: string, remarks: string) => void;
   onSave: () => void;
   onPublish: () => void;
   isPublishing: boolean;
@@ -48,7 +47,6 @@ export function ResultsView({
   onBack,
   onSelectExam,
   onUpdateMark,
-  onUpdateRemark,
   onSave,
   onPublish,
   isPublishing,
@@ -93,7 +91,7 @@ export function ResultsView({
                     <SelectValue placeholder="Choose a class..." />
                   </div>
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent className="max-h-60">
                   {classes.map((c) => (
                     <SelectItem key={c.id} value={c.id}>{c.grade} - {c.section}</SelectItem>
                   ))}
@@ -116,7 +114,7 @@ export function ResultsView({
                     <SelectValue placeholder="Select Subject/Exam..." />
                   </div>
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent className="max-h-60">
                   {filteredExams.length > 0 ? (
                     filteredExams.map((e) => (
                       <SelectItem key={e.id} value={e.id}>
@@ -275,18 +273,17 @@ export function ResultsView({
                 <div className="overflow-x-auto">
                   <Table>
                     <TableHeader>
-                      <TableRow>
+                      <TableRow className="hover:bg-transparent">
                         <TableHead className="w-10">#</TableHead>
                         <TableHead>Student Name</TableHead>
                         <TableHead className="hidden sm:table-cell w-20">Roll No</TableHead>
                         <TableHead className="w-28">Marks</TableHead>
                         <TableHead className="w-20 text-center">Status</TableHead>
-                        <TableHead className="hidden md:table-cell w-36">Remarks</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
                       {resultRows.map((row, idx) => (
-                        <TableRow key={row.studentId}>
+                        <TableRow key={row.studentId} className="hover:bg-transparent">
                           <TableCell className="text-xs text-muted-foreground">{idx + 1}</TableCell>
                           <TableCell className="font-medium text-sm">{row.studentName}</TableCell>
                           <TableCell className="hidden sm:table-cell text-xs text-muted-foreground font-mono">
@@ -317,14 +314,6 @@ export function ResultsView({
                                 <AlertCircle className="h-3 w-3 mr-1" /> Pending
                               </Badge>
                             )}
-                          </TableCell>
-                          <TableCell className="hidden md:table-cell">
-                            <Input
-                              value={row.remarks}
-                              onChange={(e) => onUpdateRemark(row.studentId, e.target.value)}
-                              placeholder="Optional remarks"
-                              className="h-8 text-sm"
-                            />
                           </TableCell>
                         </TableRow>
                       ))}

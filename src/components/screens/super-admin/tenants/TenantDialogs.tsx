@@ -52,6 +52,7 @@ import {
   XCircle,
 } from "lucide-react";
 import { Tenant, TenantFormData, planColors, statusColors } from "./types";
+import { SCHOOL_PLANS } from "@/lib/billing-constants";
 import { format } from "date-fns";
 import React from "react";
 
@@ -70,13 +71,16 @@ const formatDateSafe = (dateStr: any, formatStr: string = "MMM d, yyyy") => {
 
 const PlanBadge = memo(({ plan }: { plan: string }) => {
   const config = planColors[plan] || planColors.basic;
+  const planMeta = SCHOOL_PLANS.find(p => p.id === plan);
+  const displayName = planMeta?.name || plan;
+  
   return (
     <Badge
       variant="outline"
       className={`${config.bg} ${config.text} ${config.border} border text-[10px] uppercase tracking-wider py-0.5 px-2 font-semibold`}
     >
       <Crown className="h-3 w-3 mr-1" />
-      {plan}
+      {displayName}
     </Badge>
   );
 });
@@ -304,12 +308,7 @@ export function TenantDialogs({
                         className="h-full w-full object-cover"
                       />
                     ) : (
-                      <div className="flex flex-col items-center gap-1 text-muted-foreground">
-                        <Globe className="h-8 w-8 opacity-20" />
-                        <span className="text-[10px] font-bold uppercase">
-                          No Logo
-                        </span>
-                      </div>
+                      <img src="/test.webp" alt="Default logo placeholder" className="h-full w-full object-cover opacity-60 group-hover:opacity-100 transition-opacity" />
                     )}
                   </div>
                   <label className="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity rounded-2xl cursor-pointer">
@@ -445,20 +444,30 @@ export function TenantDialogs({
                   </Label>
                   <Select
                     value={formData.plan}
-                    onValueChange={(v) =>
-                      setFormData((prev) => ({ ...prev, plan: v }))
-                    }
+                    onValueChange={(v) => {
+                      const planDef = SCHOOL_PLANS.find(p => p.id === v);
+                      setFormData((prev) => ({ 
+                        ...prev, 
+                        plan: v,
+                        // Automatically set limits based on plan selection like school-subscriptions does!
+                        ...(planDef ? {
+                          maxStudents: planDef.limits.students,
+                          maxTeachers: planDef.limits.teachers,
+                          maxParents: planDef.limits.parents,
+                          maxClasses: planDef.limits.classes,
+                        } : {})
+                      }));
+                    }}
                   >
                     <SelectTrigger>
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="basic">Basic Plan</SelectItem>
-                      <SelectItem value="standard">Standard Plan</SelectItem>
-                      <SelectItem value="premium">Premium Plan</SelectItem>
-                      <SelectItem value="enterprise">
-                        Enterprise Plan
-                      </SelectItem>
+                      {SCHOOL_PLANS.map(plan => (
+                        <SelectItem key={plan.id} value={plan.id}>
+                          {plan.name} Plan
+                        </SelectItem>
+                      ))}
                     </SelectContent>
                   </Select>
                 </div>
@@ -578,15 +587,7 @@ export function TenantDialogs({
               <DialogHeader>
                 <div className="flex items-center gap-3">
                   <div className="h-12 w-12 rounded-xl bg-teal-100 dark:bg-teal-900/30 text-teal-700 dark:text-teal-400 flex items-center justify-center overflow-hidden">
-                    {viewingTenant.logo ? (
-                      <img
-                        src={viewingTenant.logo}
-                        alt={viewingTenant.name}
-                        className="h-full w-full object-cover"
-                      />
-                    ) : (
-                      <Building2 className="h-6 w-6" />
-                    )}
+                    <img src={viewingTenant.logo || "/test.webp"} alt={viewingTenant.name} className="h-full w-full object-cover" />
                   </div>
                   <div>
                     <DialogTitle className="text-xl">

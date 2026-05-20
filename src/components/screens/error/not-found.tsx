@@ -9,16 +9,18 @@ import {
   RefreshCw,
   LogOut,
 } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 export function NotFoundScreen() {
+  const router = useRouter();
   const { setCurrentScreen, logout } = useAppStore();
 
   const goHome = () => {
-    window.location.href = "/";
+    router.push("/");
   };
 
   const goBack = () => {
-    window.history.back();
+    router.back();
   };
 
   const refreshPage = () => {
@@ -27,7 +29,7 @@ export function NotFoundScreen() {
 
   const goLogin = () => {
     logout();
-    window.location.href = "/";
+    router.replace("/");
   };
 
   return (

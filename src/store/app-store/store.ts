@@ -33,7 +33,13 @@ function getInitialScreen(currentUser: AppUser | null): string {
 
 function getInitialSidebar(): boolean {
   if (typeof window === 'undefined') return false;
-  try { return localStorage.getItem(STORAGE_KEYS.SIDEBAR_STATE) === 'true'; } catch { return false; }
+  try {
+    const stored = localStorage.getItem(STORAGE_KEYS.SIDEBAR_STATE);
+    if (stored !== null) return stored === 'true';
+    return window.innerWidth >= 1024;
+  } catch {
+    return false;
+  }
 }
 
 function getInitialTenantInfo(): { id: string | null; slug: string | null; name: string | null; logo: string | null } {
@@ -86,15 +92,8 @@ export const useAppStore = create<AppState>((set, get) => ({
   logout: () => {
     if (typeof window !== 'undefined') {
       try {
-        localStorage.removeItem(STORAGE_KEYS.USER);
-        localStorage.removeItem(STORAGE_KEYS.LAST_SCREEN);
-        localStorage.removeItem('school_token');
-        localStorage.removeItem('schoolsaas_tenant_id');
-        localStorage.removeItem('schoolsaas_tenant_slug');
-        localStorage.removeItem('schoolsaas_tenant_name');
-        localStorage.removeItem('schoolsaas_tenant_logo');
-        localStorage.removeItem('schoolsaas_sidebar_state');
-        sessionStorage.clear();
+        localStorage.clear(); // COMPLETE wipe of all local data
+        sessionStorage.clear(); // COMPLETE wipe of current session memory
       } catch { /* ignore */ }
     }
     invalidateCache();
@@ -126,7 +125,7 @@ export const useAppStore = create<AppState>((set, get) => ({
     const state = get();
     if (!state.isLoggedIn || !state.currentUser) return;
     try {
-      const apiBase = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api';
+      const apiBase = process.env.NEXT_PUBLIC_API_URL || '';
       const token = typeof window !== 'undefined' ? localStorage.getItem('school_token') : null;
       const res = await fetch(`${apiBase}/auth/me?userId=${encodeURIComponent(state.currentUser.id)}`, {
         headers: token ? { Authorization: `Bearer ${token}` } : {},
@@ -193,75 +192,66 @@ export const useAppStore = create<AppState>((set, get) => ({
   },
 
   setCurrentTenant: async (id, name, slug, logo) => {
-    if (typeof window !== 'undefined') {
+    // 1. IMMEDIATE, INSTANT State Update for snappy UI transition
+    set({ 
+      currentTenantId: id, 
+      currentTenantName: name, 
+      currentTenantSlug: slug, 
+      currentTenantLogo: logo // Set original URL immediately so UI loads instantly
+    });
+
+    if (typeof window === 'undefined') return;
+
+    try {
+      localStorage.setItem('schoolsaas_tenant_id', id || '');
+      localStorage.setItem('schoolsaas_tenant_name', name || '');
+      localStorage.setItem('schoolsaas_tenant_slug', slug || '');
+      localStorage.setItem('schoolsaas_tenant_logo', logo || '');
+    } catch { /* ignore */ }
+
+    // 2. ASYNCHRONOUS background caching of logo to base64
+    // We DO NOT await this so we don't block the UI mounting!
+    (async () => {
+      if (!logo || logo === 'undefined' || logo === 'null') return;
       try {
-        localStorage.setItem('schoolsaas_tenant_id', id || '');
-        localStorage.setItem('schoolsaas_tenant_name', name || '');
-        localStorage.setItem('schoolsaas_tenant_slug', slug || '');
-        
-        // --- Aggressive Logo Caching Logic ---
         const CACHE_KEY = `schoolsaas_logo_cache_${id}`;
         const cachedStr = localStorage.getItem(CACHE_KEY);
         const now = Date.now();
-        const EIGHT_HOURS = 8 * 60 * 60 * 1000; // ~3 times a day max
+        const EIGHT_HOURS = 8 * 60 * 60 * 1000;
 
-        let finalLogo = logo;
-
-        if (logo) {
-          if (cachedStr) {
-            const cached = JSON.parse(cachedStr);
-            // If same URL and not expired, use cached data
-            if (cached.url === logo && (now - cached.timestamp < EIGHT_HOURS)) {
-              finalLogo = cached.data;
-            } else {
-              // Expired or new URL: Fetch and convert to base64
-              try {
-                const response = await fetch(logo);
-                const blob = await response.blob();
-                const reader = new FileReader();
-                const base64Data = await new Promise<string>((resolve) => {
-                  reader.onloadend = () => resolve(reader.result as string);
-                  reader.readAsDataURL(blob);
-                });
-                localStorage.setItem(CACHE_KEY, JSON.stringify({
-                  url: logo,
-                  data: base64Data,
-                  timestamp: now
-                }));
-                finalLogo = base64Data;
-              } catch (e) {
-                console.warn("Failed to cache logo:", e);
-                // Fallback to URL
-              }
-            }
-          } else {
-            // First time: Fetch and cache
-            try {
-              const response = await fetch(logo);
-              const blob = await response.blob();
-              const reader = new FileReader();
-              const base64Data = await new Promise<string>((resolve) => {
-                reader.onloadend = () => resolve(reader.result as string);
-                reader.readAsDataURL(blob);
-              });
-              localStorage.setItem(CACHE_KEY, JSON.stringify({
-                url: logo,
-                data: base64Data,
-                timestamp: now
-              }));
-              finalLogo = base64Data;
-            } catch (e) {
-              console.warn("Failed to cache logo:", e);
-            }
+        if (cachedStr) {
+          const cached = JSON.parse(cachedStr);
+          if (cached.url === logo && (now - cached.timestamp < EIGHT_HOURS)) {
+            // Update state again with base64 if it's already in cache
+            set({ currentTenantLogo: cached.data });
+            return;
           }
         }
+
+        // Fetch and cache in background using the backend proxy to bypass CORS
+        const apiBase = process.env.NEXT_PUBLIC_API_URL || '';
+        const proxyUrl = `${apiBase}/tenants/logo-proxy?url=${encodeURIComponent(logo)}`;
+        const response = await fetch(proxyUrl);
+        const blob = await response.blob();
+        const reader = new FileReader();
+        const base64Data = await new Promise<string>((resolve) => {
+          reader.onloadend = () => resolve(reader.result as string);
+          reader.readAsDataURL(blob);
+        });
         
-        localStorage.setItem('schoolsaas_tenant_logo', finalLogo || '');
-        set({ currentTenantId: id, currentTenantName: name, currentTenantSlug: slug, currentTenantLogo: finalLogo });
-      } catch { /* ignore */ }
-    } else {
-      set({ currentTenantId: id, currentTenantName: name, currentTenantSlug: slug, currentTenantLogo: logo });
-    }
+        localStorage.setItem(CACHE_KEY, JSON.stringify({
+          url: logo,
+          data: base64Data,
+          timestamp: now
+        }));
+        localStorage.setItem('schoolsaas_tenant_logo', base64Data);
+        
+        // Update Zustand state quietly once background processing is complete
+        set({ currentTenantLogo: base64Data });
+      } catch (e) {
+        console.warn("Logo background cache fail:", e);
+      }
+    })();
   },
 
 

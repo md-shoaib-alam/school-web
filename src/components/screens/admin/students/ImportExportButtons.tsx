@@ -21,6 +21,7 @@ import {
 } from "lucide-react";
 import { apiFetch } from "@/lib/api";
 import { goeyToast as toast } from "goey-toast";
+import * as XLSX from "xlsx";
 
 interface ImportExportButtonsProps {
   canCreate: boolean;
@@ -45,23 +46,68 @@ export function ImportExportButtons({
   const [dragOver, setDragOver] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const downloadSampleCSV = () => {
-    const headers =
-      "name,email,phone,class (e.g. 10-A),roll_number,gender,date_of_birth";
-    const sampleRows = [
-      "John Doe,john@school.com,+1 234 567 890,10-A,001,male,2010-05-15",
-      "Jane Smith,jane@school.com,+1 234 567 891,10-A,002,female,2010-08-22",
+  const downloadSampleTemplate = () => {
+    const data = [
+      {
+        "name": "John Doe",
+        "email": "john@school.com",
+        "phone": "+91 98765 43210",
+        "class (e.g. 10-A)": "10-A",
+        "roll_number": "001",
+        "gender": "male",
+        "date_of_birth": "2010-05-15",
+        "blood_group": "O+",
+        "admission_date": "2024-04-01",
+        "transport_route": "Route 1",
+        "pickup_point": "Sector 4 Main Gate"
+      },
+      {
+        "name": "Jane Smith",
+        "email": "jane@school.com",
+        "phone": "+91 98765 43211",
+        "class (e.g. 10-A)": "10-A",
+        "roll_number": "002",
+        "gender": "female",
+        "date_of_birth": "2010-08-22",
+        "blood_group": "A-",
+        "admission_date": "2024-04-01",
+        "transport_route": "",
+        "pickup_point": ""
+      }
     ];
-    const csv = [headers, ...sampleRows].join("\n");
-    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+
+    const worksheet = XLSX.utils.json_to_sheet(data);
+
+    // Set custom column widths (in characters) to make every column spacious and easy to read
+    worksheet["!cols"] = [
+      { wch: 20 }, // name
+      { wch: 25 }, // email
+      { wch: 18 }, // phone
+      { wch: 20 }, // class (e.g. 10-A)
+      { wch: 15 }, // roll_number
+      { wch: 12 }, // gender
+      { wch: 16 }, // date_of_birth
+      { wch: 14 }, // blood_group
+      { wch: 16 }, // admission_date
+      { wch: 20 }, // transport_route
+      { wch: 25 }  // pickup_point
+    ];
+
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Students Template");
+
+    // Write workbook to array buffer and trigger download
+    const excelBuffer = XLSX.write(workbook, { bookType: "xlsx", type: "array" });
+    const blob = new Blob([excelBuffer], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=utf-8" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = "sample_students.csv";
+    a.download = "sample_students.xlsx";
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
+    toast.success("Excel template downloaded successfully.");
   };
 
   const handleImport = async () => {
@@ -101,19 +147,25 @@ export function ImportExportButtons({
     e.preventDefault();
     setDragOver(false);
     const file = e.dataTransfer.files[0];
-    if (file && file.name.endsWith(".csv")) {
+    const extension = file?.name.split('.').pop()?.toLowerCase();
+    if (file && ["xlsx", "xls", "csv"].includes(extension || "")) {
       setImportFile(file);
       setImportResult(null);
     } else {
-      toast.error("Please upload a CSV file.");
+      toast.error("Please upload an Excel (.xlsx, .xls) or CSV file.");
     }
   };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      setImportFile(file);
-      setImportResult(null);
+      const extension = file.name.split('.').pop()?.toLowerCase();
+      if (["xlsx", "xls", "csv"].includes(extension || "")) {
+        setImportFile(file);
+        setImportResult(null);
+      } else {
+        toast.error("Please upload an Excel (.xlsx, .xls) or CSV file.");
+      }
     }
   };
 
@@ -144,11 +196,11 @@ export function ImportExportButtons({
           }
         }}
       >
-        <DialogContent className="sm:max-w-lg">
+         <DialogContent className="sm:max-w-lg">
           <DialogHeader>
             <DialogTitle>Import Students</DialogTitle>
             <DialogDescription>
-              Upload a CSV file to import students in bulk
+              Upload an Excel (.xlsx, .xls) or CSV (.csv) file to import students in bulk
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4 py-2">
@@ -165,7 +217,7 @@ export function ImportExportButtons({
               <input
                 ref={fileInputRef}
                 type="file"
-                accept=".csv"
+                accept=".xlsx,.xls,.csv"
                 className="hidden"
                 onChange={handleFileChange}
               />
@@ -184,17 +236,17 @@ export function ImportExportButtons({
                 <div className="flex flex-col items-center gap-2">
                   <Upload className="h-10 w-10 text-muted-foreground" />
                   <p className="text-sm font-medium text-foreground">
-                    Drop your CSV file here or click to browse
+                    Drop your Excel or CSV file here or click to browse
                   </p>
                   <p className="text-xs text-muted-foreground">
-                    Supports .csv files only
+                    Supports .xlsx, .xls, and .csv files
                   </p>
                 </div>
               )}
             </div>
 
             <div className="rounded-lg bg-muted/50 p-4 space-y-2">
-              <p className="text-sm font-medium">Expected CSV columns:</p>
+              <p className="text-sm font-medium">Expected spreadsheet columns:</p>
               <div className="flex flex-wrap gap-1.5">
                 {[
                   "name",
@@ -204,6 +256,10 @@ export function ImportExportButtons({
                   "roll_number",
                   "gender",
                   "date_of_birth",
+                  "blood_group",
+                  "admission_date",
+                  "transport_route",
+                  "pickup_point",
                 ].map((col) => (
                   <Badge
                     key={col}
@@ -219,11 +275,11 @@ export function ImportExportButtons({
                 className="inline-flex items-center gap-1.5 text-sm text-emerald-600 hover:text-emerald-700 dark:text-emerald-400 hover:underline mt-1"
                 onClick={(e) => {
                   e.stopPropagation();
-                  downloadSampleCSV();
+                  downloadSampleTemplate();
                 }}
               >
                 <Download className="h-3.5 w-3.5" />
-                Download Sample CSV
+                Download Sample Template
               </button>
             </div>
 

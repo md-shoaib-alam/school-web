@@ -4,18 +4,15 @@ import { ChartConfig } from "@/components/ui/chart";
 export interface AttendanceSummary {
   present: number;
   absent: number;
-  late: number;
   total: number;
   presentPct: string;
   absentPct: string;
-  latePct: string;
 }
 
 export interface DailyAttendance {
   date: string;
   present: number;
   absent: number;
-  late: number;
 }
 
 export interface SubjectAverage {
@@ -41,7 +38,6 @@ export interface FeeTypeBreakdown {
 export const attendanceChartConfig = {
   present: { label: "Present", color: "#10b981" },
   absent: { label: "Absent", color: "#ef4444" },
-  late: { label: "Late", color: "#f59e0b" },
 } satisfies ChartConfig;
 
 export const gradeChartConfig = {

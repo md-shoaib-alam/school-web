@@ -58,26 +58,30 @@ export function AdminStudents() {
   const [classFilter, setClassFilter] = useState("all");
   const [currentPage, setCurrentPage] = useState(1);
 
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [debouncedSearch, classFilter]);
+
   const queryClient = useQueryClient();
 
   // Queries
-  const { 
-    data: studentData, 
-    isLoading: loadingStudents 
-  } = useStudents(
-    currentTenantId || undefined, 
+  const { data: studentData, isLoading: loadingStudents } = useStudents(
+    currentTenantId || undefined,
     classFilter === "all" ? undefined : classFilter,
     debouncedSearch || undefined,
-    currentPage, 
-    ITEMS_PER_PAGE
+    currentPage,
+    ITEMS_PER_PAGE,
   );
 
   const { data: classesData } = useClassesMin(currentTenantId || undefined);
 
   const students = useMemo(() => {
     const list = studentData?.students || [];
-    return [...list].sort((a, b) => 
-      a.name.localeCompare(b.name, undefined, { numeric: true, sensitivity: 'base' })
+    return [...list].sort((a, b) =>
+      a.name.localeCompare(b.name, undefined, {
+        numeric: true,
+        sensitivity: "base",
+      }),
     );
   }, [studentData]);
   const totalItems = studentData?.total || 0;
@@ -88,7 +92,9 @@ export function AdminStudents() {
   // Dialog states
   const [dialogOpen, setDialogOpen] = useState(false);
   const [dialogMode, setDialogMode] = useState<"create" | "edit">("create");
-  const [editingStudent, setEditingStudent] = useState<StudentInfo | null>(null);
+  const [editingStudent, setEditingStudent] = useState<StudentInfo | null>(
+    null,
+  );
   const [formData, setFormData] = useState<StudentFormData>(emptyFormData);
   const [submitting, setSubmitting] = useState(false);
 
@@ -134,17 +140,22 @@ export function AdminStudents() {
 
   const handleSubmit = async () => {
     const isCreate = dialogMode === "create";
-    
+
     // OPTIMISTIC UPDATE: Update the UI instantly if editing
     if (!isCreate && editingStudent) {
       const updatedStudent = { ...editingStudent, ...formData };
-      queryClient.setQueriesData({ queryKey: queryKeys.students }, (old: any) => {
-        if (!old || !old.students) return old;
-        return {
-          ...old,
-          students: old.students.map((s: any) => s.id === editingStudent.id ? updatedStudent : s)
-        };
-      });
+      queryClient.setQueriesData(
+        { queryKey: queryKeys.students },
+        (old: any) => {
+          if (!old || !old.students) return old;
+          return {
+            ...old,
+            students: old.students.map((s: any) =>
+              s.id === editingStudent.id ? updatedStudent : s,
+            ),
+          };
+        },
+      );
     }
 
     toast.promise(
@@ -153,8 +164,8 @@ export function AdminStudents() {
         try {
           const url = "/api/students";
           const method = isCreate ? "POST" : "PUT";
-          const body = isCreate 
-            ? formData 
+          const body = isCreate
+            ? formData
             : { id: editingStudent?.id, ...formData };
 
           const res = await apiFetch(url, {
@@ -171,33 +182,43 @@ export function AdminStudents() {
           setDialogOpen(false);
           // Refresh from server to ensure total accuracy
           queryClient.invalidateQueries({ queryKey: queryKeys.students });
-          queryClient.invalidateQueries({ queryKey: ['admin-dashboard', currentTenantId] });
-          return isCreate ? "Student registered successfully" : "Student details updated";
+          queryClient.invalidateQueries({
+            queryKey: ["admin-dashboard", currentTenantId],
+          });
+          return isCreate
+            ? "Student registered successfully"
+            : "Student details updated";
         } finally {
           setSubmitting(false);
         }
       })(),
       {
-        loading: isCreate ? "Registering new student..." : "Updating student details...",
+        loading: isCreate
+          ? "Registering new student..."
+          : "Updating student details...",
         success: (msg) => msg,
         error: (err: any) => err.message,
-      }
+      },
     );
   };
 
   const handleDelete = async (id: string) => {
     toast.promise(
       (async () => {
-        const res = await apiFetch(`/api/students?id=${id}`, { method: "DELETE" });
+        const res = await apiFetch(`/api/students?id=${id}`, {
+          method: "DELETE",
+        });
         if (!res.ok) {
-           const err = await res.json().catch(() => ({}));
-           throw new Error(err.error || "Failed to delete student");
+          const err = await res.json().catch(() => ({}));
+          throw new Error(err.error || "Failed to delete student");
         }
-        
+
         // Refresh from server
         queryClient.invalidateQueries({ queryKey: queryKeys.students });
-        queryClient.invalidateQueries({ queryKey: ['admin-dashboard', currentTenantId] });
-        
+        queryClient.invalidateQueries({
+          queryKey: ["admin-dashboard", currentTenantId],
+        });
+
         // Force a RED morphing pill for deletion
         throw new Error("Student record removed");
       })(),
@@ -205,13 +226,12 @@ export function AdminStudents() {
         loading: "Deleting student records...",
         success: () => "", // Not reached
         error: (err: any) => err.message, // Shows the red pill
-      }
+      },
     );
   };
 
   // --- No longer using client-side filtered/paginated variables ---
   // We use `students` directly as it's now the paginated slice from the server.
-
 
   return (
     <div className="space-y-6">
@@ -221,7 +241,7 @@ export function AdminStudents() {
           <div className="relative flex-1 max-w-sm">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
-              placeholder="Search by name or roll no..."
+              placeholder="Search by name..."
               className="pl-9"
               value={search}
               onChange={(e) => {
@@ -253,10 +273,12 @@ export function AdminStudents() {
 
         {(canCreate || canEdit || canDelete) && (
           <div className="flex gap-2 shrink-0">
-            <ImportExportButtons 
-              canCreate={canCreate} 
-              tenantId={currentTenantId || ""} 
-              onImportSuccess={() => queryClient.invalidateQueries({ queryKey: queryKeys.students })} 
+            <ImportExportButtons
+              canCreate={canCreate}
+              tenantId={currentTenantId || ""}
+              onImportSuccess={() =>
+                queryClient.invalidateQueries({ queryKey: queryKeys.students })
+              }
             />
             {canCreate && (
               <Button

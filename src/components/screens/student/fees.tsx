@@ -61,19 +61,15 @@ export function StudentFees() {
   useEffect(() => {
     async function fetchData() {
       try {
-        const studentsRes = await apiFetch("/api/students");
-        const studentsJson = await studentsRes.json();
-        const studentItems = Array.isArray(studentsJson?.items) ? studentsJson.items : [];
-        setStudents(studentItems);
+        const res = await apiFetch("/api/students/me");
+        if (!res.ok) throw new Error("Failed to fetch student profile");
+        const targetStudent = await res.json();
+        
+        setStudents([targetStudent]);
 
-        const matchedStudent =
-          studentItems.find(
-            (s: StudentInfo) => s.email === currentUser?.email,
-          ) || studentItems[0];
-
-        if (matchedStudent) {
+        if (targetStudent?.id) {
           const feesRes = await apiFetch(
-            `/api/fees?studentId=${matchedStudent.id}`,
+            `/api/fees?studentId=${targetStudent.id}`,
           );
           if (feesRes.ok) {
             const feesData = await feesRes.json();

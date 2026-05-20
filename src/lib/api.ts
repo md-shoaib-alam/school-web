@@ -2,9 +2,10 @@
  * Centralized API client — all requests go to ElysiaJS backend.
  */
 
+import { env } from './env';
 import { triggerGlobalRefresh } from './query-client';
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api';
+const API_BASE = env.NEXT_PUBLIC_API_URL;
 
 function getToken(): string | null {
   if (typeof window === 'undefined') return null;

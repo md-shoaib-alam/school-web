@@ -20,6 +20,8 @@ import {
   Send,
   Star,
   Loader2,
+  Globe,
+  BookOpen,
 } from "lucide-react";
 import type { StudentInfo, AssignmentInfo } from "@/lib/types";
 
@@ -57,9 +59,7 @@ export function StudentAssignments() {
   const student = useMemo(
     () =>
       Array.isArray(students)
-        ? students.find((s) => s.email === currentUser?.email) ||
-          students[0] ||
-          null
+        ? students.find((s) => s.email === currentUser?.email) || null
         : null,
     [students, currentUser?.email],
   );
@@ -67,36 +67,31 @@ export function StudentAssignments() {
   const fetchData = useCallback(async () => {
     setLoading(true);
     try {
-      const studentsJson = await apiFetch("/api/students").then((r) => r.json());
-      const studentsRes = Array.isArray(studentsJson?.items) ? studentsJson.items : [];
-      setStudents(studentsRes);
+      const res = await apiFetch("/api/students/me");
+      if (!res.ok) throw new Error("Failed to fetch student profile");
+      const targetStudent = await res.json();
+      
+      setStudents([targetStudent]);
 
-      const matchedStudent =
-        studentsRes.find((s: StudentInfo) => s.email === currentUser?.email) ||
-        studentsRes[0];
-
-      if (!matchedStudent) {
-        setLoading(false);
-        return;
-      }
-
-      const assignmentsRes = await apiFetch(
-        `/api/assignments?classId=${matchedStudent.classId}`,
-      );
-      const assignmentsData = await assignmentsRes.json();
-      setAssignments(assignmentsData);
-
-      // Fetch real submissions for this student
-      try {
-        const subRes = await apiFetch(
-          `/api/submissions?studentId=${matchedStudent.id}`,
+      if (targetStudent?.id) {
+        const assignmentsRes = await apiFetch(
+          `/api/assignments?classId=${targetStudent.classId}`,
         );
-        if (subRes.ok) {
-          const subJson = await subRes.json();
-          setMySubmissions(subJson.data || []);
+        const assignmentsData = await assignmentsRes.json();
+        setAssignments(assignmentsData);
+
+        // Fetch real submissions for this student
+        try {
+          const subRes = await apiFetch(
+            `/api/submissions?studentId=${targetStudent.id}`,
+          );
+          if (subRes.ok) {
+            const subJson = await subRes.json();
+            setMySubmissions(subJson.data || []);
+          }
+        } catch {
+          /* no submissions yet */
         }
-      } catch {
-        /* no submissions yet */
       }
     } catch (e) {
       console.error(e);
@@ -415,6 +410,24 @@ export function StudentAssignments() {
                                 className="text-[10px]"
                               >
                                 {assignment.className}
+                              </Badge>
+                              <Badge
+                                variant="outline"
+                                className={`text-[10px] font-medium px-2 flex items-center gap-1 border rounded-full ${
+                                  assignment.mode === "online"
+                                    ? "bg-indigo-50 text-indigo-700 border-indigo-100/60 dark:bg-indigo-950/20 dark:text-indigo-300 dark:border-indigo-900/50"
+                                    : "bg-amber-50 text-amber-700 border-amber-100/60 dark:bg-amber-950/20 dark:text-amber-300 dark:border-amber-900/50"
+                                }`}
+                              >
+                                {assignment.mode === "online" ? (
+                                  <>
+                                    <Globe className="h-2.5 w-2.5" /> Online
+                                  </>
+                                ) : (
+                                  <>
+                                    <BookOpen className="h-2.5 w-2.5" /> Offline
+                                  </>
+                                )}
                               </Badge>
                             </div>
 

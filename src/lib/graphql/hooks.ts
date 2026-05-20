@@ -19,7 +19,8 @@ export { useGraphQLQuery, useGraphQLMutation } from './hooks/generic.hooks'
 export { 
   usePlatformStats, useBillingData, useTenants, useUsers, useAuditLogs, 
   useSubscriptions, useTenantDetail, useCreateTenant, useUpdateTenant, 
-  useDeleteTenant, useToggleTenantStatus, useToggleUserStatus, useCreateUser 
+  useDeleteTenant, useRestoreTenant, usePermanentDeleteTenant, 
+  useToggleTenantStatus, useToggleUserStatus, useCreateUser 
 } from './hooks/platform.hooks'
 
 // Academic Hooks

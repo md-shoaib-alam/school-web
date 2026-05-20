@@ -15,12 +15,12 @@ export const PLATFORM_STATS = `
 `
 
 export const BILLING_DATA = `
-  query BillingData {
-    billingData {
+  query BillingData($type: String) {
+    billingData(type: $type) {
       totalActiveRevenue
       statusDistribution
       monthlyTrend { month revenue newSubscriptions churned }
-      tenantBilling { id name slug plan status totalRevenue activeRevenue activeSubscriptions totalSubscriptions _count { users classes } }
+      tenantBilling { id name slug plan status totalRevenue activeRevenue activeSubscriptions totalSubscriptions _count { users } }
       subscriptions { id planName amount status paymentMethod startDate createdAt tenant { name } parent { user { name email } } }
       planRevenue
       methodRevenue
@@ -31,8 +31,9 @@ export const BILLING_DATA = `
 export const TENANTS = `
   query Tenants($status: String, $plan: String, $search: String, $page: Int, $limit: Int) {
     tenants(status: $status, plan: $plan, search: $search, page: $page, limit: $limit) {
-      tenants { id name slug logo email phone address website plan status maxStudents maxTeachers maxParents maxClasses startDate endDate createdAt studentCount teacherCount parentCount adminCount activeSubscriptions totalRevenue _count { users classes subscriptions notices events } }
+      tenants { id name slug logo email phone address website plan status maxStudents maxTeachers maxParents maxClasses startDate endDate createdAt deletedAt studentCount teacherCount parentCount adminCount activeSubscriptions totalRevenue _count { users classes subscriptions notices events } }
       total page totalPages
+      stats { total active trial suspended }
     }
   }
 `
@@ -48,9 +49,13 @@ export const USERS = `
 `
 
 export const AUDIT_LOGS = `
-  query AuditLogs($action: String, $page: Int, $limit: Int) {
-    auditLogs(action: $action, page: $page, limit: $limit) {
-      logs { id action resource details createdAt tenant { id name } }
+  query AuditLogs($action: String, $role: String, $tenantId: String, $page: Int, $limit: Int) {
+    auditLogs(action: $action, role: $role, tenantId: $tenantId, page: $page, limit: $limit) {
+      logs { 
+        id action resource details ipAddress createdAt 
+        tenant { id name slug email } 
+        user { name email }
+      }
       total page totalPages
       actionTypes { action count }
     }
@@ -103,7 +108,7 @@ export const TEACHER_DASHBOARD = `
       totalStudents pendingAssignments
       todaySchedule { id day startTime endTime subjectName className }
       todayAttendance { present total }
-      recentAssignments { id title subjectName className dueDate submissions totalStudents }
+      recentAssignments { id title subjectName className dueDate submissions totalStudents mode }
     }
   }
 `
@@ -177,7 +182,7 @@ export const PARENT_DASHBOARD = `
 export const TENANT_DETAIL = `
   query TenantDetail($tenantId: String!) {
     tenantDetail(tenantId: $tenantId) {
-      tenant { id name slug logo email phone address website plan status maxStudents maxTeachers maxParents maxClasses startDate endDate createdAt studentCount teacherCount parentCount adminCount activeSubscriptions totalRevenue _count { users classes subscriptions notices events } }
+      tenant { id name slug logo email phone address website plan status maxStudents maxTeachers maxParents maxClasses startDate endDate createdAt deletedAt studentCount teacherCount parentCount adminCount activeSubscriptions totalRevenue _count { users classes subscriptions notices events } }
       students { id name email phone rollNumber className gender dateOfBirth status }
       teachers { id name email phone qualification experience status }
       parents { id name email phone occupation status }
@@ -217,8 +222,8 @@ export const TEACHERS = `
 `
 
 export const STUDENTS = `
-  query Students($tenantId: String, $classId: String, $page: Int, $limit: Int) {
-    students(tenantId: $tenantId, classId: $classId, page: $page, limit: $limit) {
+  query Students($tenantId: String, $classId: String, $search: String, $page: Int, $limit: Int) {
+    students(tenantId: $tenantId, classId: $classId, search: $search, page: $page, limit: $limit) {
       students { id name email phone rollNumber className gender dateOfBirth status classId parentId parentName admissionDate }
       total page totalPages
     }
@@ -239,11 +244,11 @@ export const PARENTS = `
 `
 
 export const SUBSCRIPTIONS = `
-  query Subscriptions($tenantId: String, $status: String, $search: String, $page: Int, $limit: Int) {
-    subscriptions(tenantId: $tenantId, status: $status, search: $search, page: $page, limit: $limit) {
+  query Subscriptions($tenantId: String, $status: String, $search: String, $startDate: String, $endDate: String, $page: Int, $limit: Int) {
+    subscriptions(tenantId: $tenantId, status: $status, search: $search, startDate: $startDate, endDate: $endDate, page: $page, limit: $limit) {
       subscriptions { 
-        id planName planId amount period status transactionId startDate endDate autoRenew
-        parent { user { name email } students { user { name } } }
+        id planName planId amount period status transactionId paymentMethod startDate endDate autoRenew createdAt
+        parent { user { name email } }
         tenant { name }
       }
       total page totalPages
@@ -273,7 +278,7 @@ export const FEES = `
 export const ATTENDANCE = `
   query Attendance($tenantId: String!, $page: Int, $limit: Int) {
     attendance(tenantId: $tenantId, page: $page, limit: $limit) {
-      records { id studentName date status className }
+      records { id studentName date status className createdAt }
       total page totalPages
     }
   }
@@ -424,5 +429,11 @@ export const PLATFORM_NOTICES = `
 export const DELETE_PLATFORM_NOTICE = `
   mutation DeletePlatformNotice($id: ID!) {
     deletePlatformNotice(id: $id) { success message }
+  }
+`
+
+export const RESTORE_TENANT = `
+  mutation RestoreTenant($id: ID!) {
+    restoreTenant(id: $id) { id name status deletedAt }
   }
 `

@@ -3,9 +3,17 @@ export interface AuditLog {
   action: string;
   resource: string;
   details: string;
+  ipAddress: string | null;
   createdAt: string;
   tenant: {
+    id: string;
     name: string;
+    slug: string;
+    email: string | null;
+  } | null;
+  user: {
+    name: string;
+    email: string;
   } | null;
 }
 

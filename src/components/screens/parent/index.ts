@@ -7,3 +7,4 @@ export * from './notices';
 export * from './timetable';
 export * from './subscription';
 export * from './calendar';
+export * from './homework';

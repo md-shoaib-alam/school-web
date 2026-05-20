@@ -1,21 +1,23 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
 import { useAppStore } from '@/store/use-app-store';
 import dynamic from 'next/dynamic';
+import { ParentHomework } from '@/components/screens';
 
-const LoadingScreen = () => (
-  <div className="flex h-full items-center justify-center p-8">
-    <div className="animate-spin h-8 w-8 border-4 border-rose-500 border-t-transparent rounded-full" />
-  </div>
-);
+import { FullPageSkeleton } from "@/components/ui/full-page-skeleton";
 
-const TeacherDashboard = dynamic(() => import('@/components/screens/teacher/dashboard').then(m => m.TeacherDashboard), { loading: LoadingScreen });
-const StudentDashboard = dynamic(() => import('@/components/screens/student/dashboard').then(m => m.StudentDashboard), { loading: LoadingScreen });
-const ParentDashboard = dynamic(() => import('@/components/screens/parent/dashboard').then(m => m.ParentDashboard), { loading: LoadingScreen });
-const StaffDashboard = dynamic(() => import('@/components/screens/staff/dashboard').then(m => m.StaffDashboard), { loading: LoadingScreen });
-const AdminDashboard = dynamic(() => import('@/components/screens/admin/dashboard').then(m => m.AdminDashboard), { loading: LoadingScreen });
-const SuperAdminDashboard = dynamic(() => import('@/components/screens/super-admin/dashboard').then(m => m.SuperAdminDashboard), { loading: LoadingScreen });
+const LoadingScreen = () => <FullPageSkeleton />;
+
+const UserProfileScreen = dynamic(() => import('@/components/screens').then(m => m.UserProfileScreen), { loading: LoadingScreen });
+
+const TeacherDashboard = dynamic(() => import('@/components/screens/teacher/dashboard').then(m => m.TeacherDashboard));
+const StudentDashboard = dynamic(() => import('@/components/screens/student/dashboard').then(m => m.StudentDashboard));
+const ParentDashboard = dynamic(() => import('@/components/screens/parent/dashboard').then(m => m.ParentDashboard));
+const StaffDashboard = dynamic(() => import('@/components/screens/staff/dashboard').then(m => m.StaffDashboard));
+const AdminDashboard = dynamic(() => import('@/components/screens/admin/dashboard').then(m => m.AdminDashboard));
+const SuperAdminDashboard = dynamic(() => import('@/components/screens/super-admin/dashboard').then(m => m.SuperAdminDashboard));
 const AdminStudents = dynamic(() => import('@/components/screens/admin/students').then(m => m.AdminStudents), { loading: LoadingScreen });
 const AdminTeachers = dynamic(() => import('@/components/screens/admin/teachers').then(m => m.AdminTeachers), { loading: LoadingScreen });
 const AdminParents = dynamic(() => import('@/components/screens/admin/parents').then(m => m.AdminParents), { loading: LoadingScreen });
@@ -36,6 +38,7 @@ const AdminCertificates = dynamic(() => import('@/components/screens/admin/certi
 const AdminLeaves = dynamic(() => import('@/components/screens/admin/leaves').then(m => m.AdminLeaves), { loading: LoadingScreen });
 const StaffAttendance = dynamic(() => import('@/components/screens/admin/staff-attendance').then(m => m.StaffAttendance), { loading: LoadingScreen });
 const AdminExams = dynamic(() => import('@/components/screens/admin/exams').then(m => m.AdminExams), { loading: LoadingScreen });
+const AdminPrintMarksheet = dynamic(() => import('@/components/screens/admin/print-marksheet').then(m => m.AdminPrintMarksheet), { loading: LoadingScreen });
 const AdminAdmitCards = dynamic(() => import('@/components/screens/admin/admit-cards').then(m => m.AdminAdmitCards), { loading: LoadingScreen });
 const AcademicYearsScreen = dynamic(() => import('@/components/screens/admin/academic-years').then(m => m.AcademicYearsScreen), { loading: LoadingScreen });
 const ExpensesScreen = dynamic(() => import('@/components/screens/admin/expenses').then(m => m.ExpensesScreen), { loading: LoadingScreen });
@@ -46,6 +49,7 @@ const TeacherClasses = dynamic(() => import('@/components/screens/teacher/my-cla
 const TeacherSubjects = dynamic(() => import('@/components/screens/teacher/my-subjects').then(m => m.TeacherSubjects), { loading: LoadingScreen });
 const TeacherAttendance = dynamic(() => import('@/components/screens/teacher/take-attendance').then(m => m.TeacherAttendance), { loading: LoadingScreen });
 const TeacherGrades = dynamic(() => import('@/components/screens/teacher/grade-management').then(m => m.TeacherGrades), { loading: LoadingScreen });
+const TeacherExamsEntry = dynamic(() => import('@/components/screens/teacher/exams-entry').then(m => m.TeacherExamsEntry), { loading: LoadingScreen });
 const TeacherAssignments = dynamic(() => import('@/components/screens/teacher/assignments').then(m => m.TeacherAssignments), { loading: LoadingScreen });
 const TeacherTimetable = dynamic(() => import('@/components/screens/teacher/timetable').then(m => m.TeacherTimetable), { loading: LoadingScreen });
 const TeacherCalendar = dynamic(() => import('@/components/screens/teacher/calendar').then(m => m.TeacherCalendar), { loading: LoadingScreen });
@@ -63,6 +67,7 @@ const StudentNotices = dynamic(() => import('@/components/screens/student/notice
 const StudentFees = dynamic(() => import('@/components/screens/student/fees').then(m => m.StudentFees), { loading: LoadingScreen });
 const StudentTickets = dynamic(() => import('@/components/screens/student/tickets').then(m => m.StudentTickets), { loading: LoadingScreen });
 const StudentLeaves = dynamic(() => import('@/components/screens/student/leaves').then(m => m.StudentLeaves), { loading: LoadingScreen });
+const StudentMarksheet = dynamic(() => import('@/components/screens/student/marksheet').then(m => m.StudentMarksheet), { loading: LoadingScreen });
 
 const ParentChildren = dynamic(() => import('@/components/screens/parent/children').then(m => m.ParentChildren), { loading: LoadingScreen });
 const ParentGrades = dynamic(() => import('@/components/screens/parent/grades').then(m => m.ParentGrades), { loading: LoadingScreen });
@@ -79,29 +84,34 @@ const NotFoundScreen = dynamic(() => import('@/components/screens/error/not-foun
 export default function TenantScreenDispatcher() {
   const { slug, screen } = useParams();
   const { currentUser } = useAppStore();
-
-  if (!currentUser) return null;
-
-  // Normalize for comparison
+  const [mounted, setMounted] = useState(false);
   const urlSlug = typeof slug === 'string' ? slug.toLowerCase() : '';
-  const userTenantId = currentUser.tenantId?.toLowerCase() || '';
-  const userTenantSlug = currentUser.tenantSlug?.toLowerCase() || '';
-
-  // Verify that the slug matches the user's tenant (security check)
+  const userTenantId = currentUser?.tenantId?.toLowerCase() || '';
+  const userTenantSlug = currentUser?.tenantSlug?.toLowerCase() || '';
   const isTenantMatch = (urlSlug === userTenantId || urlSlug === userTenantSlug);
 
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  // Debug log on every change if mounted
+  useEffect(() => {
+    if (mounted && currentUser && !isTenantMatch && currentUser.role !== 'super_admin') {
+      // Slug mismatch - could be handled by redirect if needed
+    }
+  }, [mounted, isTenantMatch, urlSlug, userTenantId, userTenantSlug, currentUser?.role]);
+
+  if (!mounted || !currentUser) {
+    return <LoadingScreen />;
+  }
+
   if (currentUser.role !== 'super_admin' && !isTenantMatch) {
-    console.warn('[TenantScreenDispatcher] 404 Triggered - Slug Mismatch:', { 
-      urlSlug, 
-      userTenantId, 
-      userTenantSlug,
-      role: currentUser.role 
-    });
     return <NotFoundScreen />;
   }
   
   if (currentUser.role === 'super_admin' || currentUser.role === 'admin' || currentUser.role === 'staff') {
     switch (screen) {
+      case 'profile': return <UserProfileScreen />;
       case 'dashboard': 
         if (currentUser.role === 'super_admin' && slug === 'tenants') return <SuperAdminDashboard />;
         return currentUser.role === 'staff' ? <StaffDashboard /> : <AdminDashboard />;
@@ -132,32 +142,37 @@ export default function TenantScreenDispatcher() {
       case 'tickets': return <AdminTickets />;
       case 'school-subscription': return <AdminSubscription />;
       case 'manage-plan': return <ManagePlanScreen />;
-      case 'promotions': return <AdminPromotions initialTab="individual" />;
-      case 'bulk-promote': return <AdminPromotions initialTab="bulk" />;
-      case 'graduated': return <AdminPromotions initialTab="graduated" />;
+      case 'promotions': return <AdminPromotions key="individual-prom" initialTab="individual" />;
+      case 'bulk-promote': return <AdminPromotions key="bulk-prom" initialTab="bulk" />;
+      case 'graduated': return <AdminPromotions key="graduated-prom" initialTab="graduated" />;
       case 'certificates': return <AdminCertificates />;
-      case 'leaves': return <AdminLeaves initialTab="teacher" />;
-      case 'student-leaves': return <AdminLeaves initialTab="student" />;
-      case 'teacher-leaves': return <AdminLeaves initialTab="teacher" />;
-      case 'staff-leaves': return <AdminLeaves initialTab="staff" />;
+      case 'leaves': return <AdminLeaves key="teacher-leaves-main" initialTab="teacher" />;
+      case 'student-leaves': return <AdminLeaves key="student-leaves" initialTab="student" />;
+      case 'teacher-leaves': return <AdminLeaves key="teacher-leaves" initialTab="teacher" />;
+      case 'staff-leaves': return <AdminLeaves key="staff-leaves" initialTab="staff" />;
       case 'grades': return <TeacherGrades />;
-      case 'teacher-attendance': return <StaffAttendance initialTab="teacher" />;
-      case 'staff-attendance': return <StaffAttendance initialTab="staff" />;
-      case 'exams': return <AdminExams initialTab="exams" />;
-      case 'results-entry': return <AdminExams initialTab="results" />;
-      case 'published-results': return <AdminExams initialTab="published" />;
+      case 'teacher-attendance': return <StaffAttendance key="teacher-att" initialTab="teacher" />;
+      case 'staff-attendance': return <StaffAttendance key="staff-att" initialTab="staff" />;
+      case 'exams': return <AdminExams key="exams" initialTab="exams" />;
+      case 'results-entry': return <AdminExams key="results" initialTab="results" />;
+      case 'published-results': return <AdminExams key="published" initialTab="published" />;
+      case 'print-marksheet': return <AdminPrintMarksheet />;
       case 'admit-cards': return <AdminAdmitCards />;
     }
   }
 
   if (currentUser.role === 'teacher') {
     switch (screen) {
+      case 'profile': return <UserProfileScreen />;
       case 'dashboard': return <TeacherDashboard />;
       case 'my-classes': return <TeacherClasses />;
       case 'my-subjects': return <TeacherSubjects />;
       case 'take-attendance': return <TeacherAttendance />;
-      case 'grade-management': return <TeacherGrades />;
-      case 'assignments': return <TeacherAssignments />;
+      case 'grade-management':
+      case 'assessments': return <TeacherGrades />;
+      case 'school-exams': return <TeacherExamsEntry />;
+      case 'assignments':
+      case 'homework': return <TeacherAssignments />;
       case 'timetable': return <TeacherTimetable />;
       case 'notices': return <TeacherNotices />;
       case 'calendar': return <TeacherCalendar />;
@@ -168,11 +183,17 @@ export default function TenantScreenDispatcher() {
 
   if (currentUser.role === 'student') {
     switch (screen) {
+      case 'profile': return <UserProfileScreen />;
       case 'dashboard': return <StudentDashboard />;
       case 'my-classes': return <StudentClasses />;
       case 'my-grades': return <StudentGrades />;
+      case 'school-exams': return <StudentGrades key="school-exams" initialTab="exams" />;
+      case 'assessments': return <StudentGrades key="assessments" initialTab="assessments" />;
+      case 'print-marksheet':
+      case 'view-marksheet': return <StudentMarksheet />;
       case 'my-attendance': return <StudentAttendance />;
-      case 'assignments': return <StudentAssignments />;
+      case 'assignments':
+      case 'homework': return <StudentAssignments />;
       case 'timetable': return <StudentTimetable />;
       case 'notices': return <StudentNotices />;
       case 'fees': return <StudentFees />;
@@ -184,9 +205,13 @@ export default function TenantScreenDispatcher() {
 
   if (currentUser.role === 'parent') {
     switch (screen) {
+      case 'profile': return <UserProfileScreen />;
       case 'dashboard': return <ParentDashboard />;
       case 'children': return <ParentChildren />;
+      case 'homework': return <ParentHomework />;
       case 'grades': return <ParentGrades />;
+      case 'school-exams': return <ParentGrades initialTab="exams" key="school-exams" />;
+      case 'assessments': return <ParentGrades initialTab="assessments" key="assessments" />;
       case 'attendance': return <ParentAttendance />;
       case 'fees': return <ParentFees />;
       case 'notices': return <ParentNotices />;

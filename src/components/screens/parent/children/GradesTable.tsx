@@ -19,7 +19,7 @@ interface GradesTableProps {
 
 export function GradesTable({ grades }: GradesTableProps) {
   return (
-    <Card className="rounded-xl shadow-sm border-gray-100 dark:border-gray-800 shadow-none">
+    <Card className="rounded-2xl border border-gray-200/50 dark:border-zinc-800/50 shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.2)] bg-white dark:bg-zinc-950">
       <CardHeader className="p-4 pb-2">
         <div className="flex items-center gap-2 text-left">
           <Award className="h-5 w-5 text-amber-600" />
@@ -46,7 +46,7 @@ export function GradesTable({ grades }: GradesTableProps) {
                   {g.examType}
                 </TableCell>
                 <TableCell className="text-sm text-right font-medium py-2">
-                  {g.marks}/{g.maxMarks}
+                  {Number(g.marks).toFixed(2).replace(/\.00$/, "")}/{g.maxMarks}
                 </TableCell>
                 <TableCell className="text-center py-2">
                   <Badge

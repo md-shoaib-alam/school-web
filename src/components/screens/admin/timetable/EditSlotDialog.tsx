@@ -39,6 +39,7 @@ interface EditSlotDialogProps {
   availableSubjects: AvailableSubject[];
   availableTeachers: AvailableTeacher[];
   workingDays: string[];
+  isBreak?: boolean;
 }
 
 export function EditSlotDialog({
@@ -51,6 +52,7 @@ export function EditSlotDialog({
   availableSubjects,
   availableTeachers,
   workingDays,
+  isBreak = false,
 }: EditSlotDialogProps) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -66,7 +68,7 @@ export function EditSlotDialog({
         </DialogHeader>
 
         <div className="space-y-4 py-2">
-          {form.label !== undefined && form.label !== null ? (
+          {isBreak ? (
             <div className="space-y-1.5">
               <label className="text-sm font-medium text-foreground">
                 Break Label
@@ -88,9 +90,14 @@ export function EditSlotDialog({
                 </label>
                 <Select
                   value={form.subjectId ?? ""}
-                  onValueChange={(v) =>
-                    setForm((prev: any) => ({ ...prev, subjectId: v }))
-                  }
+                  onValueChange={(v) => {
+                    const sub = availableSubjects.find((s) => s.id === v);
+                    setForm((prev: any) => ({
+                      ...prev,
+                      subjectId: v,
+                      teacherId: sub?.teacherId || prev.teacherId,
+                    }));
+                  }}
                 >
                   <SelectTrigger className="h-10">
                     <SelectValue placeholder="Select subject" />

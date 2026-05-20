@@ -23,7 +23,7 @@ import {
   CheckCircle2,
   AlertCircle,
 } from "lucide-react";
-
+import { FullPageSkeleton } from "@/components/ui/full-page-skeleton";
 export function TeacherDashboard() {
   const router = useRouter();
   const { currentUser, currentTenantSlug, currentTenantId, setCurrentScreen } = useAppStore();
@@ -80,23 +80,7 @@ export function TeacherDashboard() {
   };
 
   if (isActuallyLoading) {
-    return (
-      <div className="space-y-6">
-        <div>
-          <Skeleton className="h-8 w-64 mb-2" />
-          <Skeleton className="h-4 w-96" />
-        </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          {[...Array(4)].map((_, i) => (
-            <Skeleton key={i} className="h-32 rounded-xl" />
-          ))}
-        </div>
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <Skeleton className="h-80 rounded-xl" />
-          <Skeleton className="h-80 rounded-xl" />
-        </div>
-      </div>
-    );
+    return <FullPageSkeleton />;
   }
 
   const stats = [
@@ -125,7 +109,7 @@ export function TeacherDashboard() {
       title: "Today's Attendance",
       value:
         todayAttendance.total > 0
-          ? `${Math.round((todayAttendance.present / todayAttendance.total) * 100)}%`
+          ? `${Number((todayAttendance.present / todayAttendance.total) * 100).toFixed(2).replace(/\.00$/, "")}%`
           : "N/A",
       icon: <UserCheck className="h-5 w-5" />,
       color: "text-violet-600 dark:text-violet-400",
@@ -140,14 +124,14 @@ export function TeacherDashboard() {
       screen: "take-attendance",
     },
     {
-      label: "Manage Grades",
+      label: "Assessments",
       icon: <ClipboardList className="h-4 w-4" />,
-      screen: "grade-management",
+      screen: "assessments",
     },
     {
-      label: "Create Assignment",
+      label: "Create Homework",
       icon: <FileText className="h-4 w-4" />,
-      screen: "assignments",
+      screen: "homework",
     },
     {
       label: "View Timetable",
@@ -350,7 +334,7 @@ export function TeacherDashboard() {
                 variant="ghost"
                 size="sm"
                 className="text-blue-500 dark:text-blue-400 text-xs hover:bg-blue-50 dark:hover:bg-blue-900/20"
-                onClick={() => navigateTo("assignments")}
+                onClick={() => navigateTo("homework")}
               >
                 View All <ArrowRight className="h-3 w-3 ml-1" />
               </Button>
