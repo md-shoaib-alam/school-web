@@ -785,9 +785,9 @@ export function MarksheetPreviewPage({
         </div>
 
         {/* Center/Right controls row */}
-        <div className="flex flex-wrap items-center gap-3">
+        <div className="flex flex-col sm:flex-row flex-wrap items-stretch sm:items-center gap-2 sm:gap-3 w-full lg:w-auto">
           {/* Select Student */}
-          <div className="w-[170px]">
+          <div className="w-full sm:w-[170px]">
             <Select value={selectedStudentId} onValueChange={setSelectedStudentId} disabled={loading || students.length === 0}>
               <SelectTrigger className="w-full h-8 rounded-lg text-xs font-semibold bg-zinc-50/50 dark:bg-zinc-900/30 border-gray-200 dark:border-zinc-800 py-1">
                 <div className="flex items-center gap-1.5 min-w-0 w-full text-left">
@@ -809,7 +809,7 @@ export function MarksheetPreviewPage({
           </div>
 
           {/* Report Template Type */}
-          <div className="w-[160px]">
+          <div className="w-full sm:w-[160px]">
             <Select value={marksheetType} onValueChange={(v: any) => setMarksheetType(v)} disabled={loading || exams.length === 0}>
               <SelectTrigger className="w-full h-8 rounded-lg text-xs font-semibold bg-zinc-50/50 dark:bg-zinc-900/30 border-gray-200 dark:border-zinc-800 py-1">
                 <div className="flex items-center gap-1.5 min-w-0 w-full text-left">
@@ -828,7 +828,7 @@ export function MarksheetPreviewPage({
           </div>
 
           {/* Preview Zoom */}
-          <div className="w-[120px]">
+          <div className="w-full sm:w-[120px]">
             <Select value={zoomScale.toString()} onValueChange={(v) => setZoomScale(parseFloat(v))}>
               <SelectTrigger className="w-full h-8 rounded-lg text-xs font-semibold bg-zinc-50/50 dark:bg-zinc-900/30 border-gray-200 dark:border-zinc-800 py-1">
                 <div className="flex items-center gap-1.5 min-w-0 w-full text-left">
@@ -852,7 +852,7 @@ export function MarksheetPreviewPage({
             onClick={handlePrint}
             disabled={loading || printing || students.length === 0}
             size="sm"
-            className="bg-emerald-600 hover:bg-emerald-700 text-white shrink-0 gap-1.5 shadow-sm rounded-lg h-8 px-4 font-bold text-xs transition-all duration-300 transform active:scale-95"
+            className="w-full sm:w-auto bg-emerald-600 hover:bg-emerald-700 text-white shrink-0 gap-1.5 shadow-sm rounded-lg h-8 px-4 font-bold text-xs transition-all duration-300 transform active:scale-95 justify-center"
           >
             {printing ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Printer className="h-3.5 w-3.5" />}
             <span>Print {selectedStudentId === 'all' ? 'All' : 'Student'}</span>
@@ -904,7 +904,7 @@ export function MarksheetPreviewPage({
             />
 
             {/* True A4 parchment layout sheets preview vertical stack with premium scrollbar */}
-            <div className="w-full max-h-[75vh] overflow-y-auto pb-6 flex flex-col items-center gap-8 bg-zinc-50 dark:bg-zinc-950/20 p-4 sm:p-6 rounded-2xl border border-gray-100 dark:border-zinc-800/50 shadow-inner">
+            <div className="w-full max-h-[75vh] overflow-y-auto overflow-x-auto pb-6 flex flex-col items-center gap-8 bg-zinc-50 dark:bg-zinc-950/20 p-4 sm:p-6 rounded-2xl border border-gray-100 dark:border-zinc-800/50 shadow-inner">
               
               {previewStudents.map((sheet, index) => (
                 <div 
