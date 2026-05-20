@@ -4,10 +4,7 @@ import { useState, useMemo, useEffect } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { 
-  ClipboardList, FileText, GraduationCap, Plus, 
-  CalendarDays, CheckCircle2, Clock, RefreshCw,
-  Trophy, ArrowLeft, ChevronRight, ChevronDown,
-  Search, Filter, Printer, Loader2
+  ClipboardList, FileText, GraduationCap, Plus, Trophy
 } from 'lucide-react';
 import { parseLocalDate } from '@/lib/utils';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
@@ -15,23 +12,22 @@ import { useRouter, useParams, useSearchParams } from 'next/navigation';
 import { api, apiFetch } from '@/lib/api';
 import { goeyToast as toast } from 'goey-toast';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Badge } from '@/components/ui/badge';
 
 import dynamic from 'next/dynamic';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Badge } from '@/components/ui/badge';
-import { useDebounce } from '@/hooks/use-debounce';
 import { useAcademicYears } from '@/hooks/use-academic-years';
 
 // Sub-components
 import { ExamDialogs } from './exams/ExamDialogs';
 import { ViewResultsDialog } from './exams/ViewResultsDialog';
-import { MarksheetPreviewPage } from './exams/MarksheetPreviewPage';
 import { 
   ExamRecord, ExamFormData, StudentResultRow, 
   ClassOption, SubjectOption, StudentOption 
 } from './exams/types';
+import { handlePrintTabularLedger as printTabularLedgerHelper } from './exams/printTabularLedger';
+import { ActiveExamsView } from './exams/ActiveExamsView';
+import { PublishedResultsView } from './exams/PublishedResultsView';
 
 const statusConfig: Record<string, { bg: string; label: string }> = {
   scheduled: { bg: 'bg-blue-100 text-blue-700 border-blue-200 dark:bg-blue-900/30 dark:text-blue-400 dark:border-blue-800', label: 'Scheduled' },
@@ -48,32 +44,6 @@ const examTypeConfig: Record<string, { bg: string; label: string }> = {
   practical: { bg: 'bg-pink-100 text-pink-700 border-pink-200 dark:bg-pink-900/30 dark:text-pink-400 dark:border-pink-800', label: 'Practical' },
 };
 
-const getGroupedExams = (examsList: ExamRecord[]) => {
-  const groups: Record<string, { cycleName: string; academicYear: string; exams: ExamRecord[] }> = {};
-  
-  examsList.forEach(exam => {
-    const cycleName = exam.name.includes(' - ') ? exam.name.split(' - ')[0] : exam.name;
-    const academicYear = exam.academicYear || '2024-2025';
-    const key = `${cycleName}::${academicYear}`;
-    
-    if (!groups[key]) {
-      groups[key] = {
-        cycleName,
-        academicYear,
-        exams: []
-      };
-    }
-    groups[key].exams.push(exam);
-  });
-  
-  return Object.values(groups).sort((a, b) => {
-    if (a.academicYear !== b.academicYear) {
-      return b.academicYear.localeCompare(a.academicYear);
-    }
-    return a.cycleName.localeCompare(b.cycleName);
-  });
-};
-
 const emptyExamForm: ExamFormData = {
   classId: '', subjectId: '', examType: 'midterm', name: '',
   date: '', startTime: '', endTime: '', totalMarks: '100', passingMarks: '40',
@@ -81,9 +51,6 @@ const emptyExamForm: ExamFormData = {
 };
 
 // Dynamic loading for "Low Stack" performance optimization
-const ExamTable = dynamic(() => import('./exams/ExamTable').then(m => m.ExamTable), {
-  loading: () => <TabLoadingSkeleton />
-});
 const ResultsView = dynamic(() => import('./exams/ResultsView').then(m => m.ResultsView), {
   loading: () => <TabLoadingSkeleton />
 });
@@ -105,9 +72,8 @@ function TabLoadingSkeleton() {
 export function AdminExams({ initialTab = 'exams' }: { initialTab?: string }) {
   const queryClient = useQueryClient();
   const router = useRouter();
-  const { slug, screen } = useParams();
+  const { slug } = useParams();
   const searchParams = useSearchParams();
-  const classIdParam = searchParams?.get('classId') || '';
 
   // Academic Years
   const { academicYears } = useAcademicYears();
@@ -117,13 +83,8 @@ export function AdminExams({ initialTab = 'exams' }: { initialTab?: string }) {
 
   // Filters & Tabs
   const [classFilter, setClassFilter] = useState('all');
-  const [statusFilter, setStatusFilter] = useState('all');
-  const [examTypeFilter, setExamTypeFilter] = useState('all');
-  const [searchTerm, setSearchTerm] = useState('');
   const [publishedAcademicYearFilter, setPublishedAcademicYearFilter] = useState(currentAcademicYear);
   const [publishedClassFilter, setPublishedClassFilter] = useState('all');
-  const [expandedClasses, setExpandedClasses] = useState<Record<string, boolean>>({});
-  const debouncedSearch = useDebounce(searchTerm, 300);
   const [activeTab, setActiveTab] = useState(initialTab);
   
   useEffect(() => {
@@ -172,353 +133,18 @@ export function AdminExams({ initialTab = 'exams' }: { initialTab?: string }) {
   const [printingLedgerClassId, setPrintingLedgerClassId] = useState<string | null>(null);
 
   const handlePrintTabularLedger = async (classId: string, className: string, classSection: string) => {
-    setPrintingLedgerClassId(classId);
-    try {
-      // 1. Fetch students & exams
-      const [studentsRes, examsRes] = await Promise.all([
-        apiFetch(`/api/students?classId=${classId}&mode=min&limit=1000`),
-        apiFetch(`/api/exams?classId=${classId}&limit=100`)
-      ]);
-
-      const studentData = await studentsRes.json();
-      const examData = await examsRes.json();
-
-      const loadedStudents = studentData.items || [];
-      const completedExams = (examData.data || examData || []).filter(
-        (e: ExamRecord) => e.status === 'completed' && e.academicYear === (publishedAcademicYearFilter || currentAcademicYear)
-      );
-
-      if (loadedStudents.length === 0) {
-        toast.error('No students found in this class.');
-        setPrintingLedgerClassId(null);
-        return;
-      }
-
-      if (completedExams.length === 0) {
-        toast.error('No completed exams found for this academic cycle.');
-        setPrintingLedgerClassId(null);
-        return;
-      }
-
-      // 2. Fetch results for each completed exam in parallel
-      const resultsPromises = completedExams.map(async (exam: ExamRecord) => {
-        try {
-          const res = await apiFetch(`/api/exams/results?examId=${exam.id}`);
-          const data = await res.json();
-          return { 
-            examId: exam.id, 
-            examName: exam.name, 
-            subjectName: exam.subjectName, 
-            totalMarks: exam.totalMarks, 
-            results: data.results || [] 
-          };
-        } catch (err) {
-          console.error(`Error loading results for exam ${exam.id}:`, err);
-          return { 
-            examId: exam.id, 
-            examName: exam.name, 
-            subjectName: exam.subjectName, 
-            totalMarks: exam.totalMarks, 
-            results: [] 
-          };
-        }
-      });
-
-      const allExamResults = await Promise.all(resultsPromises);
-
-      // 3. Compile tabulation data
-      // For each student, calculate marks for each subject (completed exam)
-      const studentsTabulation = loadedStudents.map((student: any) => {
-        let totalObtained = 0;
-        let totalMax = 0;
-        const subjectMarks: Record<string, { marksObtained: number; totalMarks: number; status: string }> = {};
-
-        allExamResults.forEach(er => {
-          const res = er.results.find((r: any) => r.studentId === student.id);
-          if (res) {
-            const marks = res.marksObtained || 0;
-            subjectMarks[er.subjectName] = {
-              marksObtained: marks,
-              totalMarks: er.totalMarks,
-              status: res.status || 'pending'
-            };
-            totalObtained += marks;
-            totalMax += er.totalMarks;
-          } else {
-            subjectMarks[er.subjectName] = {
-              marksObtained: 0,
-              totalMarks: er.totalMarks,
-              status: 'pending'
-            };
-            totalMax += er.totalMarks;
-          }
-        });
-
-        const percentage = totalMax > 0 ? (totalObtained / totalMax) * 100 : 0;
-        
-        let hasFail = false;
-        let hasPending = false;
-        Object.values(subjectMarks).forEach(s => {
-          if (s.status === 'fail') hasFail = true;
-          if (s.status === 'pending' || s.status === 'absent') hasPending = true;
-        });
-
-        let overallStatus = 'PASS';
-        if (hasPending) overallStatus = 'PENDING';
-        else if (hasFail || percentage < 40) overallStatus = 'FAIL';
-
-        return {
-          id: student.id,
-          name: student.name,
-          rollNumber: student.rollNumber || '-',
-          subjectMarks,
-          totalObtained,
-          totalMax,
-          percentage: percentage.toFixed(1) + '%',
-          status: overallStatus
-        };
-      });
-
-      // Get unique subjects list
-      const subjectsList = Array.from(new Set(allExamResults.map(er => er.subjectName)));
-
-      // 4. Generate beautiful A4 landscape HTML print document
-      const schoolName = loadedStudents[0]?.schoolName || 'SCHOOL ERP ACADEMY';
-      const academicYear = publishedAcademicYearFilter || currentAcademicYear;
-
-      const htmlContent = `
-        <!DOCTYPE html>
-        <html>
-        <head>
-          <title>Tabulation Ledger - ${className} ${classSection}</title>
-          <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
-          <style>
-            @page {
-              size: A4 landscape;
-              margin: 15mm;
-            }
-            body {
-              font-family: 'Inter', sans-serif;
-              color: #1e293b;
-              margin: 0;
-              padding: 0;
-              background-color: #fff;
-              -webkit-print-color-adjust: exact;
-              print-color-adjust: exact;
-            }
-            .header {
-              text-align: center;
-              margin-bottom: 25px;
-              border-bottom: 2px solid #cbd5e1;
-              padding-bottom: 15px;
-            }
-            .school-title {
-              font-family: 'Montserrat', sans-serif;
-              font-size: 22px;
-              font-weight: 800;
-              color: #1e3a8a;
-              margin: 0 0 5px 0;
-              text-transform: uppercase;
-              letter-spacing: 1px;
-            }
-            .ledger-subtitle {
-              font-size: 13px;
-              font-weight: 700;
-              color: #64748b;
-              margin: 0 0 10px 0;
-              text-transform: uppercase;
-              letter-spacing: 2px;
-            }
-            .meta-grid {
-              display: flex;
-              justify-content: center;
-              gap: 40px;
-              font-size: 11px;
-              font-weight: 600;
-              color: #334155;
-            }
-            .meta-item span {
-              color: #1e3a8a;
-              font-weight: 700;
-            }
-            table {
-              width: 100%;
-              border-collapse: collapse;
-              margin-bottom: 30px;
-              font-size: 10.5px;
-            }
-            th, td {
-              border: 1px solid #94a3b8;
-              padding: 7px 8px;
-              text-align: center;
-            }
-            th {
-              background-color: #f1f5f9;
-              color: #0f172a;
-              font-weight: 700;
-              font-family: 'Montserrat', sans-serif;
-              text-transform: uppercase;
-              font-size: 9.5px;
-            }
-            .student-info {
-              text-align: left;
-              font-weight: 600;
-            }
-            .roll-col {
-              width: 50px;
-            }
-            .name-col {
-              text-align: left;
-              padding-left: 10px;
-            }
-            .marks-cell {
-              font-weight: 500;
-            }
-            .fail-marks {
-              color: #dc2626;
-              font-weight: 700;
-            }
-            .total-cell {
-              font-weight: 700;
-              background-color: #f8fafc;
-            }
-            .status-pass {
-              color: #16a34a;
-              font-weight: 750;
-            }
-            .status-fail {
-              color: #dc2626;
-              font-weight: 750;
-            }
-            .status-pending {
-              color: #d97706;
-              font-weight: 750;
-            }
-            .footer-signatures {
-              display: flex;
-              justify-content: space-between;
-              margin-top: 50px;
-              font-size: 10px;
-              font-weight: 700;
-              color: #64748b;
-              padding: 0 30px;
-            }
-            .signature-line {
-              width: 150px;
-              border-bottom: 1.5px solid #94a3b8;
-              margin-bottom: 6px;
-            }
-            .signature-box {
-              display: flex;
-              flex-direction: column;
-              align-items: center;
-            }
-          </style>
-        </head>
-        <body>
-          <div class="header">
-            <h1 class="school-title">${schoolName}</h1>
-            <h2 class="ledger-subtitle">Consolidated Tabular Results Sheet</h2>
-            <div class="meta-grid">
-              <div class="meta-item">CLASS: <span>${className} - ${classSection}</span></div>
-              <div class="meta-item">ACADEMIC YEAR: <span>${academicYear}</span></div>
-              <div class="meta-item">DATE GENERATED: <span>${new Date().toLocaleDateString()}</span></div>
-            </div>
-          </div>
-
-          <table>
-            <thead>
-              <tr>
-                <th class="roll-col">ROLL</th>
-                <th class="name-col">STUDENT NAME</th>
-                ${subjectsList.map(sub => `<th>${sub}</th>`).join('')}
-                <th>TOTAL</th>
-                <th>PERCENTAGE</th>
-                <th>RESULT</th>
-              </tr>
-            </thead>
-            <tbody>
-              ${studentsTabulation.map(student => `
-                <tr>
-                  <td class="roll-col">${student.rollNumber}</td>
-                  <td class="name-col">${student.name}</td>
-                  ${subjectsList.map(sub => {
-                    const marks = student.subjectMarks[sub];
-                    if (!marks) return '<td>-</td>';
-                    if (marks.status === 'pending') {
-                      return `<td class="marks-cell" style="color: #64748b; font-style: italic; font-size: 9px; font-weight: 500;">PENDING</td>`;
-                    }
-                    if (marks.status === 'absent') {
-                      return `<td class="marks-cell" style="color: #dc2626; font-style: italic; font-weight: 700;">ABSENT</td>`;
-                    }
-                    const isFailed = marks.status === 'fail';
-                    return `<td class="marks-cell ${isFailed ? 'fail-marks' : ''}">${marks.marksObtained}/${marks.totalMarks}</td>`;
-                  }).join('')}
-                  <td class="total-cell">${student.totalObtained}/${student.totalMax}</td>
-                  <td class="total-cell">${student.percentage}</td>
-                  <td class="${student.status === 'PASS' ? 'status-pass' : student.status === 'FAIL' ? 'status-fail' : 'status-pending'}">${student.status}</td>
-                </tr>
-              `).join('')}
-            </tbody>
-          </table>
-
-          <div class="footer-signatures">
-            <div class="signature-box">
-              <div class="signature-line"></div>
-              <span>CLASS TEACHER</span>
-            </div>
-            <div class="signature-box">
-              <div class="signature-line"></div>
-              <span>EXAM CONTROLLER</span>
-            </div>
-            <div class="signature-box">
-              <div class="signature-line"></div>
-              <span>PRINCIPAL</span>
-            </div>
-          </div>
-        </body>
-        </html>
-      `;
-
-      // 5. Create sandboxed print iframe
-      const iframe = document.createElement('iframe');
-      iframe.style.position = 'absolute';
-      iframe.style.width = '0';
-      iframe.style.height = '0';
-      iframe.style.border = 'none';
-      
-      document.body.appendChild(iframe);
-      
-      const iframeDoc = iframe.contentWindow?.document || iframe.contentDocument;
-      if (!iframeDoc) {
-        setPrintingLedgerClassId(null);
-        return;
-      }
-
-      iframeDoc.open();
-      iframeDoc.write(htmlContent);
-      iframeDoc.close();
-
-      setTimeout(() => {
-        iframe.contentWindow?.focus();
-        iframe.contentWindow?.print();
-        
-        setTimeout(() => {
-          document.body.removeChild(iframe);
-          setPrintingLedgerClassId(null);
-        }, 1000);
-      }, 300);
-
-    } catch (err) {
-      console.error('Error generating tabulation ledger:', err);
-      toast.error('Failed to generate tabulation ledger.');
-      setPrintingLedgerClassId(null);
-    }
+    await printTabularLedgerHelper({
+      classId,
+      className,
+      classSection,
+      academicYear: publishedAcademicYearFilter || currentAcademicYear,
+      setPrintingLedgerClassId,
+    });
   };
 
   // Queries
   const { data: examsData, isLoading: loadingExams } = useQuery({
-    queryKey: ['exams', classFilter, statusFilter],
+    queryKey: ['exams', classFilter],
     queryFn: async () => {
       const res = await apiFetch('/api/exams');
       return res.json();
@@ -553,61 +179,8 @@ export function AdminExams({ initialTab = 'exams' }: { initialTab?: string }) {
     );
   }, [examsData]);
 
-  const classStats = useMemo(() => {
-    const stats: Record<string, { total: number; scheduled: number; completed: number }> = {};
-    exams.forEach(exam => {
-      if (!stats[exam.classId]) {
-        stats[exam.classId] = { total: 0, scheduled: 0, completed: 0 };
-      }
-      stats[exam.classId].total++;
-      if (exam.status === 'scheduled') stats[exam.classId].scheduled++;
-      if (exam.status === 'completed') stats[exam.classId].completed++;
-    });
-    return stats;
-  }, [exams]);
-
   const classes = metadata?.classes || [];
   const subjects = metadata?.subjects || [];
-
-  const filtered = exams.filter(exam => {
-    const matchClass = classFilter === 'all' || exam.classId === classFilter;
-    const matchStatus = statusFilter === 'all' || exam.status === statusFilter;
-    const matchSearch = exam.name.toLowerCase().includes(debouncedSearch.toLowerCase()) || 
-                       exam.subjectName.toLowerCase().includes(debouncedSearch.toLowerCase());
-    return matchClass && matchStatus && matchSearch;
-  });
-
-  const currentExamsForSummary = classFilter === 'all' 
-    ? exams 
-    : exams.filter(e => e.classId === classFilter);
-
-  const classesWithActiveExams = useMemo(() => {
-    return classes.filter(c => 
-      filtered.some(e => e.classId === c.id && e.status !== 'completed')
-    );
-  }, [classes, filtered]);
-
-  const publishedFiltered = useMemo(() => {
-    return exams.filter(exam => {
-      if (exam.status !== 'completed') return false;
-      const matchAcademicYear = !publishedAcademicYearFilter || exam.academicYear === publishedAcademicYearFilter;
-      const matchClass = publishedClassFilter === 'all' || exam.classId === publishedClassFilter;
-      return matchAcademicYear && matchClass;
-    });
-  }, [exams, publishedAcademicYearFilter, publishedClassFilter]);
-
-  const classesWithCompletedExams = useMemo(() => {
-    return classes.filter(c => 
-      publishedFiltered.some(e => e.classId === c.id)
-    );
-  }, [classes, publishedFiltered]);
-
-  const summaryCards = [
-    { label: 'Total Exams', value: currentExamsForSummary.length, icon: <ClipboardList />, color: 'bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400' },
-    { label: 'Scheduled', value: currentExamsForSummary.filter(e => e.status === 'scheduled').length, icon: <CalendarDays />, color: 'bg-amber-100 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400' },
-    { label: 'Completed', value: currentExamsForSummary.filter(e => e.status === 'completed').length, icon: <CheckCircle2 />, color: 'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400' },
-    { label: 'Upcoming', value: currentExamsForSummary.filter(e => e.date && e.date >= new Date().toISOString().split('T')[0]).length, icon: <Clock />, color: 'bg-violet-100 dark:bg-violet-900/30 text-violet-600 dark:text-violet-400' },
-  ];
 
   // Logic Handlers
   const handleCreate = async () => {
@@ -878,207 +451,22 @@ export function AdminExams({ initialTab = 'exams' }: { initialTab?: string }) {
       <Tabs value={activeTab} onValueChange={(v) => v === 'exams' ? backToExams() : setActiveTab(v)}>
 
         <TabsContent value="exams" className="space-y-6">
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-            {summaryCards.map((card, i) => (
-              <Card key={i} className="border-none shadow-sm">
-                <CardContent className="p-5 flex items-center justify-between">
-                  <div>
-                    <p className="text-xs text-muted-foreground uppercase font-semibold">{card.label}</p>
-                    <h4 className="text-2xl font-bold mt-1">{card.value}</h4>
-                  </div>
-                  <div className={`p-3 rounded-xl ${card.color}`}>{card.icon}</div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-
-          {classFilter === 'all' ? (
-            exams.filter(e => e.status !== 'completed').length === 0 ? (
-              <div className="flex flex-col items-center justify-center p-12 border-2 border-dashed border-gray-200 dark:border-zinc-800 rounded-2xl bg-card text-center text-muted-foreground animate-in fade-in duration-300">
-                <ClipboardList className="h-16 w-16 mb-4 text-blue-500/40" />
-                <h3 className="text-lg font-bold text-foreground">No Active Exams Scheduled</h3>
-                <p className="text-sm mt-1 max-w-md">There are no midterm or final exams currently scheduled for any class. Click "New Exam" to start scheduling!</p>
-              </div>
-            ) : (
-              <div className="space-y-4 animate-in fade-in duration-300">
-                {/* Global Search and Filter Bar */}
-                <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 bg-card p-3 rounded-xl border border-gray-100 dark:border-zinc-800/80 shadow-sm">
-                  <div className="relative flex-1">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                    <Input
-                      placeholder="Search exams by subject or name..."
-                      className="pl-9 h-9 border-gray-200 dark:border-zinc-800 text-sm focus-visible:ring-blue-500 rounded-lg"
-                      value={searchTerm}
-                      onChange={(e) => setSearchTerm(e.target.value)}
-                    />
-                  </div>
-                  
-                  <div className="flex items-center gap-3 shrink-0">
-                    <div className="w-[150px]">
-                      <Select value={statusFilter} onValueChange={setStatusFilter}>
-                        <SelectTrigger className="h-9 border-gray-200 dark:border-zinc-800 rounded-lg text-xs font-semibold">
-                          <SelectValue placeholder="Status" />
-                        </SelectTrigger>
-                        <SelectContent className="rounded-lg">
-                          <SelectItem value="all" className="text-xs font-medium">All Statuses</SelectItem>
-                          <SelectItem value="scheduled" className="text-xs font-medium">Scheduled</SelectItem>
-                          <SelectItem value="ongoing" className="text-xs font-medium">Ongoing</SelectItem>
-                          <SelectItem value="completed" className="text-xs font-medium">Published</SelectItem>
-                          <SelectItem value="cancelled" className="text-xs font-medium">Cancelled</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-
-                    {(searchTerm || statusFilter !== 'all') && (
-                      <Button 
-                        variant="ghost" 
-                        size="sm" 
-                        onClick={() => { setSearchTerm(''); setStatusFilter('all'); }}
-                        className="text-xs text-muted-foreground hover:text-foreground h-9 px-3 hover:bg-zinc-100 dark:hover:bg-zinc-900 rounded-lg transition-colors shrink-0"
-                      >
-                        Clear Filters
-                      </Button>
-                    )}
-                  </div>
-                </div>
-
-                {classesWithActiveExams.length === 0 ? (
-                  <div className="flex flex-col items-center justify-center p-12 border border-dashed border-gray-200 dark:border-zinc-800 rounded-2xl bg-card text-center text-muted-foreground animate-in fade-in duration-300">
-                    <Search className="h-12 w-12 mb-3 text-zinc-300 dark:text-zinc-700" />
-                    <h3 className="text-base font-bold text-foreground">No matching exams found</h3>
-                    <p className="text-xs mt-1 max-w-md">No exams match your search text or status filter. Try clearing or modifying your filter criteria.</p>
-                    <Button 
-                      onClick={() => { setSearchTerm(''); setStatusFilter('all'); }}
-                      variant="outline" 
-                      size="sm" 
-                      className="mt-4"
-                    >
-                      Reset All Filters
-                    </Button>
-                  </div>
-                ) : (
-                  <>
-                    <div className="flex items-center justify-between">
-                      <h3 className="text-sm font-semibold tracking-tight text-foreground/80">Select a Class to View Exams</h3>
-                    </div>
-                    <div className="flex flex-col gap-4">
-                      {classesWithActiveExams.map((c: any) => {
-                        const isExpanded = !!expandedClasses[c.id];
-                        const classExams = filtered.filter(e => e.classId === c.id && e.status !== 'completed');
-                        const stats = classStats[c.id] || { total: 0, scheduled: 0, completed: 0 };
-                        
-                        return (
-                          <Card 
-                            key={c.id} 
-                            className={`border dark:border-zinc-800 shadow-sm overflow-hidden transition-all duration-300 hover:shadow-md bg-card relative py-0 gap-0 ${isExpanded ? 'border-l-4 border-l-blue-600 dark:border-l-blue-500 border-gray-200' : 'border-gray-100'}`}
-                          >
-                            <div 
-                              onClick={() => setExpandedClasses(prev => ({ ...prev, [c.id]: !prev[c.id] }))}
-                              className={`py-2.5 px-4 flex items-center justify-between cursor-pointer hover:bg-accent/40 transition-colors select-none ${isExpanded ? 'bg-blue-50/30 dark:bg-blue-950/10' : ''}`}
-                            >
-                              <div className="flex items-center gap-3">
-                                <div className={`p-2 rounded-lg transition-all duration-300 ${isExpanded ? 'bg-blue-600 text-white shadow-md shadow-blue-500/20' : 'bg-blue-50 dark:bg-blue-950/50 text-blue-600 dark:text-blue-400'}`}>
-                                  <GraduationCap className="h-5 w-5 animate-pulse" />
-                                </div>
-                                <div>
-                                  <h3 className="text-base font-bold text-foreground leading-tight">
-                                    {c.name} - {c.section}
-                                  </h3>
-                                  <p className="text-[11px] text-muted-foreground mt-0 font-medium">
-                                    {classExams.length} active exam{classExams.length !== 1 ? 's' : ''} scheduled
-                                  </p>
-                                </div>
-                              </div>
-                              
-                              <div className="flex items-center gap-3">
-                                <div className="text-right hidden sm:block">
-                                  <span className="text-[11px] font-semibold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/50 px-2 py-0.5 rounded-full border border-emerald-100 dark:border-emerald-900/30">
-                                    {stats.completed} Completed
-                                  </span>
-                                </div>
-                                <div className={`p-1.5 rounded-full transition-all duration-300 ${isExpanded ? 'bg-blue-50 dark:bg-blue-950/50 text-blue-600 dark:text-blue-400' : 'bg-gray-50 dark:bg-zinc-900 text-muted-foreground'}`}>
-                                  <ChevronDown className={`h-4 w-4 transition-transform duration-300 ${isExpanded ? 'rotate-180' : ''}`} />
-                                </div>
-                              </div>
-                            </div>
-
-                            {/* Collapsible Content */}
-                            <div className={`transition-all duration-300 ease-in-out overflow-hidden ${isExpanded ? 'max-h-[2500px] border-t border-gray-100 dark:border-zinc-800' : 'max-h-0'}`}>
-                              <div className="p-4 bg-zinc-50/30 dark:bg-zinc-950/10 space-y-4">
-                                {getGroupedExams(classExams).map((group) => {
-                                  const groupKey = `${group.cycleName}::${group.academicYear}`;
-                                  return (
-                                    <Card key={groupKey} className="border border-gray-100 dark:border-zinc-800 shadow-sm overflow-hidden bg-card">
-                                      <div className="px-4 py-2.5 bg-zinc-50/50 dark:bg-zinc-900/30 border-b border-gray-100 dark:border-zinc-800 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-                                        <div className="flex items-center gap-2">
-                                          <ClipboardList className="h-4.5 w-4.5 text-blue-500" />
-                                          <span className="font-bold text-sm text-foreground">{group.cycleName}</span>
-                                          <Badge variant="outline" className="text-[10px] font-semibold px-2 py-0 border-zinc-200 dark:border-zinc-800 text-muted-foreground bg-zinc-100/50 dark:bg-zinc-900/50">
-                                            {group.academicYear}
-                                          </Badge>
-                                        </div>
-                                        <div className="flex items-center gap-2">
-                                          <span className="text-xs text-muted-foreground font-medium">
-                                            {group.exams.length} subject{group.exams.length !== 1 ? 's' : ''}
-                                          </span>
-                                        </div>
-                                      </div>
-                                      <div className="p-0">
-                                        <ExamTable
-                                          exams={group.exams} loading={loadingExams} searchTerm={searchTerm} setSearchTerm={setSearchTerm}
-                                          onOpenEdit={(e) => { setEditForm({ ...e, totalMarks: String(e.totalMarks), passingMarks: String(e.passingMarks) }); setEditOpen(true); }}
-                                          onDelete={handleDelete} deleting={deleting} formatDate={formatDate} formatTime={formatTime}
-                                          getStatusBadge={getStatusBadge} getExamTypeBadge={getExamTypeBadge}
-                                          onViewResults={handleOpenViewResults}
-                                          classFilter={c.id} setClassFilter={setClassFilter}
-                                          statusFilter={statusFilter} setStatusFilter={setStatusFilter}
-                                          classes={classes}
-                                          hideClassFilter={true}
-                                          flat={true}
-                                          hideSearchAndFilter={true}
-                                        />
-                                      </div>
-                                    </Card>
-                                  );
-                                })}
-                              </div>
-                            </div>
-                          </Card>
-                        );
-                      })}
-                    </div>
-                  </>
-                )}
-              </div>
-            )
-          ) : (
-            <div className="space-y-4 animate-in slide-in-from-bottom-4 duration-300">
-              <div className="flex items-center gap-3">
-                <Button 
-                  variant="outline" 
-                  size="sm" 
-                  onClick={() => setClassFilter('all')}
-                  className="gap-1.5 px-3 py-1.5 h-8 text-xs font-medium"
-                >
-                  <ArrowLeft className="h-3.5 w-3.5" /> Back to Classes
-                </Button>
-                <h3 className="text-lg font-bold text-foreground">
-                  Exams for {classes.find((c: any) => c.id === classFilter)?.name} - {classes.find((c: any) => c.id === classFilter)?.section}
-                </h3>
-              </div>
-              <ExamTable
-                exams={filtered.filter(e => e.status !== 'completed')} loading={loadingExams} searchTerm={searchTerm} setSearchTerm={setSearchTerm}
-                onOpenEdit={(e) => { setEditForm({ ...e, totalMarks: String(e.totalMarks), passingMarks: String(e.passingMarks) }); setEditOpen(true); }}
-                onDelete={handleDelete} deleting={deleting} formatDate={formatDate} formatTime={formatTime}
-                getStatusBadge={getStatusBadge} getExamTypeBadge={getExamTypeBadge}
-                onViewResults={handleOpenViewResults}
-                classFilter={classFilter} setClassFilter={setClassFilter}
-                statusFilter={statusFilter} setStatusFilter={setStatusFilter}
-                classes={classes}
-                hideClassFilter={true}
-              />
-            </div>
-          )}
+          <ActiveExamsView
+            exams={exams}
+            classes={classes}
+            loadingExams={loadingExams}
+            deleting={deleting}
+            handleDelete={handleDelete}
+            setEditForm={setEditForm}
+            setEditOpen={setEditOpen}
+            handleOpenViewResults={handleOpenViewResults}
+            formatDate={formatDate}
+            formatTime={formatTime}
+            getStatusBadge={getStatusBadge}
+            getExamTypeBadge={getExamTypeBadge}
+            classFilter={classFilter}
+            setClassFilter={setClassFilter}
+          />
         </TabsContent>
 
         <TabsContent value="results">
@@ -1099,195 +487,28 @@ export function AdminExams({ initialTab = 'exams' }: { initialTab?: string }) {
         </TabsContent>
 
         <TabsContent value="published" className="space-y-6">
-          <div className="bg-emerald-50 dark:bg-emerald-900/10 border border-emerald-200 dark:border-emerald-800/50 p-4 rounded-xl flex items-center gap-3">
-            <Trophy className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
-            <div>
-              <p className="text-sm font-semibold text-emerald-900 dark:text-emerald-100">Finalized Results</p>
-              <p className="text-xs text-emerald-700 dark:text-emerald-400">These exams have been officially published and results are visible to students.</p>
-            </div>
-          </div>
-          
-          {exams.filter(e => e.status === 'completed').length === 0 ? (
-            <div className="flex flex-col items-center justify-center p-12 border-2 border-dashed border-gray-200 dark:border-zinc-800 rounded-2xl bg-card text-center text-muted-foreground animate-in fade-in duration-300">
-              <Trophy className="h-16 w-16 mb-4 text-emerald-500/40" />
-              <h3 className="text-lg font-bold text-foreground">No Published Results</h3>
-              <p className="text-sm mt-1 max-w-md">There are no finalized or completed exams to view results for yet.</p>
-            </div>
-          ) : (
-            <div className="space-y-4 animate-in fade-in duration-300">
-              {/* Dual Filter Selectors for Published Results */}
-              <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 bg-card p-3 rounded-xl border border-gray-100 dark:border-zinc-800/80 shadow-sm">
-                <div className="flex flex-1 flex-col sm:flex-row items-stretch sm:items-center gap-4">
-                  <div className="w-full sm:w-[260px]">
-                    <Select value={publishedAcademicYearFilter} onValueChange={setPublishedAcademicYearFilter}>
-                      <SelectTrigger className="w-full h-9 border-gray-200 dark:border-zinc-800 rounded-lg text-xs font-semibold">
-                        <div className="flex items-center gap-2">
-                          <span className="text-muted-foreground font-normal">Academic Year:</span>
-                          <SelectValue placeholder="Select Academic Year" />
-                        </div>
-                      </SelectTrigger>
-                      <SelectContent className="rounded-lg">
-                        {academicYears.map((ay: any) => (
-                          <SelectItem key={ay.id} value={ay.name} className="text-xs font-medium">
-                            {ay.name} {ay.isCurrent ? '(Current)' : ''}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  <div className="w-full sm:w-[220px]">
-                    <Select value={publishedClassFilter} onValueChange={setPublishedClassFilter}>
-                      <SelectTrigger className="w-full h-9 border-gray-200 dark:border-zinc-800 rounded-lg text-xs font-semibold">
-                        <div className="flex items-center gap-2">
-                          <span className="text-muted-foreground font-normal">Class:</span>
-                          <SelectValue placeholder="All Classes" />
-                        </div>
-                      </SelectTrigger>
-                      <SelectContent className="rounded-lg">
-                        <SelectItem value="all" className="text-xs font-medium">All Classes</SelectItem>
-                        {classes.map((c: any) => (
-                          <SelectItem key={c.id} value={c.id} className="text-xs font-medium">
-                            {c.name} - {c.section}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </div>
-
-                {(publishedAcademicYearFilter !== currentAcademicYear || publishedClassFilter !== 'all') && (
-                  <Button 
-                    variant="ghost" 
-                    size="sm" 
-                    onClick={() => { setPublishedAcademicYearFilter(currentAcademicYear); setPublishedClassFilter('all'); }}
-                    className="text-xs text-muted-foreground hover:text-foreground h-9 px-3 hover:bg-zinc-100 dark:hover:bg-zinc-900 rounded-lg transition-colors shrink-0"
-                  >
-                    Clear Filters
-                  </Button>
-                )}
-              </div>
-
-              {classesWithCompletedExams.length === 0 ? (
-                <div className="flex flex-col items-center justify-center p-12 border border-dashed border-gray-200 dark:border-zinc-800 rounded-2xl bg-card text-center text-muted-foreground animate-in fade-in duration-300">
-                  <Trophy className="h-12 w-12 mb-3 text-zinc-300 dark:text-zinc-700" />
-                  <h3 className="text-base font-bold text-foreground">No matching published exams found</h3>
-                  <p className="text-xs mt-1 max-w-md">No finalized exams match your selected filters. Try clearing or modifying your selections.</p>
-                  <Button 
-                    onClick={() => { setPublishedAcademicYearFilter(currentAcademicYear); setPublishedClassFilter('all'); }}
-                    variant="outline" 
-                    size="sm" 
-                    className="mt-4 border-emerald-200 dark:border-emerald-800/50 hover:bg-emerald-50 dark:hover:bg-emerald-950/20 text-emerald-600 dark:text-emerald-400"
-                  >
-                    Reset Filters
-                  </Button>
-                </div>
-              ) : (
-                <>
-                  <div className="flex items-center justify-between">
-                    <h3 className="text-sm font-semibold tracking-tight text-foreground/80">Select a Class to View Published Results</h3>
-                  </div>
-                  <div className="flex flex-col gap-4">
-                    {classesWithCompletedExams.map((c: any) => {
-                      const isExpanded = !!expandedClasses[c.id];
-                      const classExams = publishedFiltered.filter(e => e.classId === c.id);
-                      
-                      return (
-                        <Card 
-                          key={c.id} 
-                          className={`border dark:border-zinc-800 shadow-sm overflow-hidden transition-all duration-300 hover:shadow-md bg-card relative py-0 gap-0 ${isExpanded ? 'border-l-4 border-l-emerald-600 dark:border-l-emerald-500 border-gray-200' : 'border-gray-100'}`}
-                        >
-                          <div 
-                            onClick={() => setExpandedClasses(prev => ({ ...prev, [c.id]: !prev[c.id] }))}
-                            className={`py-2.5 px-4 flex items-center justify-between cursor-pointer hover:bg-accent/40 transition-colors select-none ${isExpanded ? 'bg-emerald-50/30 dark:bg-emerald-950/10' : ''}`}
-                          >
-                            <div className="flex items-center gap-3">
-                              <div className={`p-2 rounded-lg transition-all duration-300 ${isExpanded ? 'bg-emerald-600 text-white shadow-md shadow-emerald-500/20' : 'bg-emerald-50 dark:bg-emerald-950/50 text-emerald-600 dark:text-emerald-400'}`}>
-                                <Trophy className="h-5 w-5" />
-                              </div>
-                              <div>
-                                <h3 className="text-base font-bold text-foreground leading-tight">
-                                  {c.name} - {c.section}
-                                </h3>
-                                <p className="text-[11px] text-muted-foreground mt-0 font-medium">
-                                  {classExams.length} published exam{classExams.length !== 1 ? 's' : ''}
-                                </p>
-                              </div>
-                            </div>
-                            
-                            <div className="flex items-center gap-3">
-                              <Button 
-                                variant="outline" 
-                                size="sm" 
-                                disabled={printingLedgerClassId === c.id}
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  handlePrintTabularLedger(c.id, c.name, c.section);
-                                }}
-                                className="h-8 border-emerald-200 hover:border-emerald-300 dark:border-emerald-900/50 hover:bg-emerald-50 dark:hover:bg-emerald-950/20 text-emerald-600 dark:text-emerald-400 gap-1.5 rounded-lg text-xs font-semibold px-2.5 shadow-sm transition-colors"
-                              >
-                                {printingLedgerClassId === c.id ? (
-                                  <Loader2 className="h-3.5 w-3.5 animate-spin" />
-                                ) : (
-                                  <Printer className="h-3.5 w-3.5" />
-                                )}
-                                <span className="hidden xs:inline">Print Tabular Sheet</span>
-                              </Button>
-                              <div className={`p-1.5 rounded-full transition-all duration-300 ${isExpanded ? 'bg-emerald-50 dark:bg-emerald-950/50 text-emerald-600 dark:text-emerald-400' : 'bg-gray-50 dark:bg-zinc-900 text-muted-foreground'}`}>
-                                <ChevronDown className={`h-4 w-4 transition-transform duration-300 ${isExpanded ? 'rotate-180' : ''}`} />
-                              </div>
-                            </div>
-                          </div>
-
-                          {/* Collapsible Content */}
-                          <div className={`transition-all duration-300 ease-in-out overflow-hidden ${isExpanded ? 'max-h-[2500px] border-t border-gray-100 dark:border-zinc-800' : 'max-h-0'}`}>
-                            <div className="p-4 bg-zinc-50/30 dark:bg-zinc-950/10 space-y-4">
-                              {getGroupedExams(classExams).map((group) => {
-                                const groupKey = `${group.cycleName}::${group.academicYear}`;
-                                return (
-                                  <Card key={groupKey} className="border border-gray-100 dark:border-zinc-800 shadow-sm overflow-hidden bg-card">
-                                    <div className="px-4 py-2.5 bg-zinc-50/50 dark:bg-zinc-900/30 border-b border-gray-100 dark:border-zinc-800 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-                                      <div className="flex items-center gap-2">
-                                        <ClipboardList className="h-4.5 w-4.5 text-blue-500" />
-                                        <span className="font-bold text-sm text-foreground">{group.cycleName}</span>
-                                        <Badge variant="outline" className="text-[10px] font-semibold px-2 py-0 border-zinc-200 dark:border-zinc-800 text-muted-foreground bg-zinc-100/50 dark:bg-zinc-900/50">
-                                          {group.academicYear}
-                                        </Badge>
-                                      </div>
-                                      <div className="flex items-center gap-2">
-                                        <span className="text-xs text-muted-foreground font-medium">
-                                          {group.exams.length} subject{group.exams.length !== 1 ? 's' : ''}
-                                        </span>
-                                      </div>
-                                    </div>
-                                    <div className="p-0">
-                                      <ExamTable
-                                        exams={group.exams} loading={loadingExams} searchTerm={searchTerm} setSearchTerm={setSearchTerm}
-                                        onOpenEdit={(e) => { setEditForm({ ...e, totalMarks: String(e.totalMarks), passingMarks: String(e.passingMarks) }); setEditOpen(true); }}
-                                        onDelete={handleDelete} deleting={deleting} formatDate={formatDate} formatTime={formatTime}
-                                        getStatusBadge={getStatusBadge} getExamTypeBadge={getExamTypeBadge}
-                                        onViewResults={handleOpenViewResults}
-                                        classFilter={c.id} setClassFilter={setClassFilter}
-                                        statusFilter={statusFilter} setStatusFilter={setStatusFilter}
-                                        classes={classes}
-                                        hideClassFilter={true}
-                                        flat={true}
-                                        hideSearchAndFilter={true}
-                                      />
-                                    </div>
-                                  </Card>
-                                );
-                              })}
-                            </div>
-                          </div>
-                        </Card>
-                      );
-                    })}
-                  </div>
-                </>
-              )}
-            </div>
-          )}
+          <PublishedResultsView
+            exams={exams}
+            classes={classes}
+            academicYears={academicYears}
+            currentAcademicYear={currentAcademicYear}
+            publishedAcademicYearFilter={publishedAcademicYearFilter}
+            setPublishedAcademicYearFilter={setPublishedAcademicYearFilter}
+            publishedClassFilter={publishedClassFilter}
+            setPublishedClassFilter={setPublishedClassFilter}
+            printingLedgerClassId={printingLedgerClassId}
+            handlePrintTabularLedger={handlePrintTabularLedger}
+            loadingExams={loadingExams}
+            deleting={deleting}
+            handleDelete={handleDelete}
+            setEditForm={setEditForm}
+            setEditOpen={setEditOpen}
+            handleOpenViewResults={handleOpenViewResults}
+            formatDate={formatDate}
+            formatTime={formatTime}
+            getStatusBadge={getStatusBadge}
+            getExamTypeBadge={getExamTypeBadge}
+          />
         </TabsContent>
       </Tabs>
 
