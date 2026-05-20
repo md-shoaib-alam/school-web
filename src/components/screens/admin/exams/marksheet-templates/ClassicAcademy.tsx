@@ -23,7 +23,6 @@ export const ClassicAcademy: React.FC<MarksheetTemplateProps> = ({
       <div className="absolute bottom-4 right-4 w-3.5 h-3.5 border-b-2 border-r-2 border-[#d4af37] z-20" />
 
 
-
       {/* Core Document Flow */}
       <div className="space-y-5 z-10">
         
