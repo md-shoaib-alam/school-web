@@ -36,7 +36,7 @@ export const ClassicAcademy: React.FC<MarksheetTemplateProps> = ({
           </div>
 
           <h3 className="font-extrabold text-xl text-[#1e3a8a] tracking-wider leading-none uppercase font-serif">
-            {classNameStr.toUpperCase()} ACADEMY
+            {sheet.schoolName.toUpperCase()}
           </h3>
           <p className="text-[9px] text-zinc-500 font-bold uppercase tracking-widest mt-1.5 font-sans">
             Official Academic Transcript & Statement of Outcomes

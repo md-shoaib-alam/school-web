@@ -23,7 +23,7 @@ export const ModernMinimalist: React.FC<MarksheetTemplateProps> = ({
         <div className="flex justify-between items-start border-b border-zinc-150 pb-4">
           <div className="space-y-1">
             <h3 className="font-extrabold text-2xl text-slate-900 tracking-tight leading-none font-sans">
-              {classNameStr.toUpperCase()} ACADEMY
+              {sheet.schoolName.toUpperCase()}
             </h3>
             <p className="text-[10px] text-emerald-600 font-bold uppercase tracking-wider font-sans">
               Official Statement of Academic Achievements

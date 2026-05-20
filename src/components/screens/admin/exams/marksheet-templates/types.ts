@@ -2,6 +2,7 @@ export interface MarksheetTemplateProps {
   sheet: {
     studentName: string;
     rollNumber: string;
+    schoolName: string;
     subjects: Array<{
       subjectName: string;
       midtermMarks: string;

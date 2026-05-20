@@ -133,6 +133,7 @@ export function AdminExams({ initialTab = 'exams' }: { initialTab?: string }) {
   
   const [printingLedgerClassId, setPrintingLedgerClassId] = useState<string | null>(null);
   const [ledgerData, setLedgerData] = useState<LedgerData | null>(null);
+  const [ledgerOrientation, setLedgerOrientation] = useState<'landscape' | 'portrait'>('landscape');
   const printRef = useRef<HTMLDivElement>(null);
 
   const handlePrint = useReactToPrint({
@@ -150,8 +151,9 @@ export function AdminExams({ initialTab = 'exams' }: { initialTab?: string }) {
     }
   }, [ledgerData, handlePrint]);
 
-  const handlePrintTabularLedger = async (classId: string, className: string, classSection: string) => {
+  const handlePrintTabularLedger = async (classId: string, className: string, classSection: string, orientation: 'landscape' | 'portrait' = 'landscape') => {
     setPrintingLedgerClassId(classId);
+    setLedgerOrientation(orientation);
     const compiled = await compileTabularLedgerData({
       classId,
       className,

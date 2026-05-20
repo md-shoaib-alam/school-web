@@ -31,7 +31,7 @@ export const RoyalGold: React.FC<MarksheetTemplateProps> = ({
           </div>
 
           <h3 className="font-bold text-2xl text-[#8c6b23] tracking-widest leading-none font-serif uppercase">
-            {classNameStr.toUpperCase()} ACADEMY
+            {sheet.schoolName.toUpperCase()}
           </h3>
           <p className="text-[8.5px] text-amber-800 font-bold uppercase tracking-[3px] mt-1.5 font-serif">
             ESTABLISHED ACADEMIC FELLOWSHIP

@@ -22,7 +22,7 @@ export const StateBoardGreen: React.FC<MarksheetTemplateProps> = ({
             <span className="text-3xl">🇮🇳</span>
             <div>
               <h2 className="font-extrabold text-lg text-emerald-800 leading-none tracking-wide uppercase">
-                GOVERNMENT DECLARED RECOGNISED HIGH SCHOOL
+                {sheet.schoolName.toUpperCase()}
               </h2>
               <p className="text-[7.5px] text-zinc-500 font-bold uppercase tracking-wider mt-1.5">
                 Recognised by State Department of School Education & Literacy

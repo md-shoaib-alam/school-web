@@ -27,8 +27,8 @@ export const CreativeCompact: React.FC<MarksheetTemplateProps> = ({
               🚀
             </div>
             <div>
-              <h3 className="font-black text-lg text-indigo-950 tracking-tight leading-none">
-                {classNameStr} ACADEMY
+              <h3 className="font-black text-lg text-indigo-955 tracking-tight leading-none uppercase">
+                {sheet.schoolName}
               </h3>
               <p className="text-[9px] text-purple-600 font-bold uppercase tracking-wider mt-1">
                 Student Performance & Achievement Report

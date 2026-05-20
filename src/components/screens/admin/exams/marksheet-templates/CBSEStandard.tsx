@@ -36,7 +36,7 @@ export const CBSEStandard: React.FC<MarksheetTemplateProps> = ({
           </div>
           <div className="text-center flex-1 px-4">
             <h2 className="font-extrabold text-xl text-emerald-900 leading-none tracking-wide uppercase">
-              {classNameStr.toUpperCase()} PUBLIC SCHOOL
+              {sheet.schoolName.toUpperCase()}
             </h2>
             <p className="text-[8px] text-zinc-500 font-bold uppercase tracking-widest mt-1">
               Affiliated to Central Board of Secondary Education (CBSE), New Delhi

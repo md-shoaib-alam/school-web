@@ -211,6 +211,7 @@ export function MarksheetPreviewPage({
     return {
       studentName: student.name,
       rollNumber: student.rollNumber || '-',
+      schoolName: student.schoolName || 'SCHOOL ERP ACADEMY',
       subjects: subjectsData,
       totalMaxMarks,
       totalObtainedMarks,

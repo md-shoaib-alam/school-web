@@ -1,5 +1,5 @@
 import React from 'react';
-import { apiFetch } from '../../../../lib/api';
+import { apiFetch } from '@/lib/api';
 import { goeyToast as toast } from 'goey-toast';
 import { ExamRecord } from './types';
 

@@ -19,7 +19,7 @@ export const ICSESemester: React.FC<MarksheetTemplateProps> = ({
         {/* Crest & Header */}
         <div className="text-center pb-2 border-b-2 border-indigo-900">
           <h2 className="font-extrabold text-2xl text-indigo-950 tracking-wider uppercase font-serif">
-            THE SAINT AUGUSTINE CONVENT SCHOOL
+            {sheet.schoolName.toUpperCase()}
           </h2>
           <p className="text-[8px] text-zinc-500 font-bold uppercase tracking-[2px] mt-1.5 font-sans">
             Affiliated to Council for the Indian School Certificate Examinations (CISCE), New Delhi
