@@ -51,14 +51,21 @@ export function MarksheetPreviewPage({
     const loadData = async () => {
       setLoading(true);
       try {
-        // 1. Fetch Students & Completed Exams for this class
-        const [studentsRes, examsRes] = await Promise.all([
+        // 1. Fetch Students & Completed Exams for this class, and Tenant Settings
+        const [studentsRes, examsRes, settingsRes] = await Promise.all([
           apiFetch(`/api/students?classId=${classId}&mode=min&limit=1000`),
-          apiFetch(`/api/exams?classId=${classId}&limit=100`)
+          apiFetch(`/api/exams?classId=${classId}&limit=100`),
+          apiFetch(`/api/tenant-settings`).catch(() => null)
         ]);
 
         const studentData = await studentsRes.json();
         const examData = await examsRes.json();
+        if (settingsRes && settingsRes.ok) {
+          const settingsData = await settingsRes.json();
+          if (settingsData?.defaultMarksheetTemplateId) {
+            setSelectedTemplateId(settingsData.defaultMarksheetTemplateId);
+          }
+        }
 
         const loadedStudents = studentData.items || [];
         // Only consider completed (published) exams
@@ -106,7 +113,6 @@ export function MarksheetPreviewPage({
   useEffect(() => {
     setSelectedStudentId('all');
     setMarksheetType('combined');
-    setSelectedTemplateId('classic');
   }, [classId]);
 
   // Extract unique subjects from exams
