@@ -6,12 +6,14 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { 
   Printer, BookOpen, GraduationCap, Calendar, Clock, Loader2,
-  AlertCircle, CheckCircle2, XCircle, Award, FileText, User, Search, ArrowLeft
+  AlertCircle, CheckCircle2, XCircle, Award, FileText, User, Search, ArrowLeft, Layout
 } from 'lucide-react';
 import { ExamRecord } from './types';
-import { useMemo, useState, useEffect } from 'react';
+import { useMemo, useState, useEffect, useRef } from 'react';
 import { apiFetch } from '@/lib/api';
 import { goeyToast as toast } from 'goey-toast';
+import { useReactToPrint } from 'react-to-print';
+import { MARKSHEET_TEMPLATES } from './marksheet-templates';
 
 interface MarksheetPreviewPageProps {
   classId: string;
@@ -30,6 +32,7 @@ export function MarksheetPreviewPage({
 }: MarksheetPreviewPageProps) {
   const [selectedStudentId, setSelectedStudentId] = useState<string>('all');
   const [marksheetType, setMarksheetType] = useState<'midterm' | 'final' | 'combined'>('combined');
+  const [selectedTemplateId, setSelectedTemplateId] = useState<string>('classic');
   
   const [students, setStudents] = useState<any[]>([]);
   const [exams, setExams] = useState<ExamRecord[]>([]);
@@ -38,6 +41,8 @@ export function MarksheetPreviewPage({
   const [loading, setLoading] = useState<boolean>(false);
   const [printing, setPrinting] = useState<boolean>(false);
   const [zoomScale, setZoomScale] = useState<number>(0.6); // Default to 60% zoom so one full A4 sheet fits perfectly on screen!
+
+  const printContainerRef = useRef<HTMLDivElement>(null);
 
   // Load students, completed exams, and parallel results
   useEffect(() => {
@@ -101,6 +106,7 @@ export function MarksheetPreviewPage({
   useEffect(() => {
     setSelectedStudentId('all');
     setMarksheetType('combined');
+    setSelectedTemplateId('classic');
   }, [classId]);
 
   // Extract unique subjects from exams
@@ -226,538 +232,25 @@ export function MarksheetPreviewPage({
     return student ? [compileMarksheet(student)] : [];
   }, [students, selectedStudentId, exams, resultsMap, marksheetType]);
 
-  // Standard printing action
+  // Modern print handler using react-to-print
+  const handlePrintBase = useReactToPrint({
+    contentRef: printContainerRef,
+    documentTitle: selectedStudentId === 'all' 
+      ? `Marksheets_${classNameStr}_${classSection}` 
+      : `Marksheet_${students.find(s => s.id === selectedStudentId)?.name || 'Student'}`,
+    onAfterPrint: () => setPrinting(false),
+  });
+
   const handlePrint = () => {
     if (students.length === 0) return;
     setPrinting(true);
-
-    // Filter students to print
-    const studentsToPrint = selectedStudentId === 'all' 
-      ? students 
-      : students.filter(s => s.id === selectedStudentId);
-
-    // Create an invisible iframe for print sandboxing
-    const iframe = document.createElement('iframe');
-    iframe.style.position = 'absolute';
-    iframe.style.width = '0';
-    iframe.style.height = '0';
-    iframe.style.border = 'none';
-    
-    document.body.appendChild(iframe);
-    
-    const iframeDoc = iframe.contentWindow?.document || iframe.contentDocument;
-    if (!iframeDoc) {
-      setPrinting(false);
-      return;
-    }
-
-    // Build print HTML content
-    let htmlContent = `
-      <html>
-        <head>
-          <title>Student Marksheets</title>
-          <style>
-            @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800;900&family=Inter:wght@400;500;600;700;800&family=Montserrat:wght@500;600;700;800&display=swap');
-            
-            @page { size: A4; margin: 8mm; }
-            body { 
-              font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; 
-              color: #0f172a; 
-              line-height: 1.4; 
-              margin: 0; 
-              padding: 0; 
-              background-color: #ffffff;
-              -webkit-print-color-adjust: exact;
-              print-color-adjust: exact;
-            }
-            .marksheet-wrapper { 
-              page-break-after: always; 
-              break-after: page; 
-              position: relative; 
-              min-height: 278mm; 
-              box-sizing: border-box; 
-              display: flex; 
-              flex-direction: column; 
-              justify-content: space-between; 
-              padding: 35px 30px;
-              background: #ffffff;
-              border: 5px solid #1e3a8a; /* Deep Navy Outer Border */
-              outline: 2px solid #d4af37; /* Metallic Gold Inner Border */
-              outline-offset: -12px;
-              box-shadow: inset 0 0 50px rgba(212, 175, 55, 0.02);
-            }
-            .marksheet-wrapper:last-child { page-break-after: avoid; break-after: avoid; }
-            
-            /* Decorative Corner Accents */
-            .corner-accent {
-              position: absolute;
-              width: 16px;
-              height: 16px;
-              border: 2px solid #d4af37;
-              z-index: 10;
-              pointer-events: none;
-            }
-            .corner-tl { top: 16px; left: 16px; border-right: none; border-bottom: none; }
-            .corner-tr { top: 16px; right: 16px; border-left: none; border-bottom: none; }
-            .corner-bl { bottom: 16px; left: 16px; border-right: none; border-top: none; }
-            .corner-br { bottom: 16px; right: 16px; border-left: none; border-top: none; }
-
-            /* Crest styling */
-            .crest-container {
-              display: flex;
-              justify-content: center;
-              margin-bottom: 8px;
-              position: relative;
-              z-index: 2;
-            }
-            .academic-crest {
-              width: 55px;
-              height: 55px;
-              background: #1e3a8a;
-              border: 3px solid #d4af37;
-              border-radius: 50%;
-              display: flex;
-              align-items: center;
-              justify-content: center;
-              box-shadow: 0 4px 10px rgba(30, 58, 138, 0.2);
-              position: relative;
-            }
-            .academic-crest::before {
-              content: "🎓";
-              font-size: 26px;
-              filter: drop-shadow(0 2px 2px rgba(0, 0, 0, 0.15));
-            }
-            .academic-crest::after {
-              content: "★";
-              position: absolute;
-              font-size: 8px;
-              color: #d4af37;
-              bottom: 2px;
-            }
-
-            /* Letterhead Header */
-            .letterhead { 
-              text-align: center; 
-              border-bottom: 2px solid #e2e8f0; 
-              padding-bottom: 12px; 
-              margin-bottom: 15px; 
-              position: relative;
-              z-index: 2;
-            }
-            .letterhead::after {
-              content: "";
-              position: absolute;
-              bottom: -2px;
-              left: 50%;
-              transform: translateX(-50%);
-              width: 80px;
-              height: 2px;
-              background: #d4af37;
-            }
-            .school-logo { 
-              font-family: 'Cinzel', serif; 
-              font-size: 24px; 
-              font-weight: 900; 
-              text-transform: uppercase; 
-              color: #1e3a8a; 
-              letter-spacing: 2px; 
-              margin: 4px 0 0 0; 
-            }
-            .school-sub { 
-              font-family: 'Montserrat', sans-serif; 
-              font-size: 9.5px; 
-              color: #475569; 
-              font-weight: 700; 
-              margin: 5px 0 0 0; 
-              text-transform: uppercase; 
-              letter-spacing: 2px; 
-            }
-            
-            .title-box { text-align: center; margin: 12px 0 16px 0; position: relative; z-index: 2; }
-            .report-title { 
-              font-family: 'Montserrat', sans-serif;
-              font-size: 13px; 
-              font-weight: 800; 
-              text-transform: uppercase; 
-              color: #1e3a8a; 
-              letter-spacing: 2.5px; 
-              border: 1.5px solid #1e3a8a;
-              border-left: 5px solid #1e3a8a;
-              border-right: 5px solid #1e3a8a;
-              display: inline-block; 
-              padding: 6px 24px; 
-              background: rgba(30, 58, 138, 0.03);
-              border-radius: 4px;
-            }
-            
-            /* Student info grid */
-            .student-info { 
-              display: grid; 
-              grid-template-columns: repeat(2, 1fr); 
-              gap: 12px 20px; 
-              border: 1.5px solid #e2e8f0; 
-              border-left: 5px solid #d4af37; 
-              border-radius: 4px; 
-              padding: 15px; 
-              background: rgba(248, 250, 252, 0.75); 
-              margin-bottom: 20px; 
-              font-size: 12px; 
-              position: relative;
-              z-index: 2;
-            }
-            .info-item { display: flex; align-items: center; }
-            .info-label { 
-              font-family: 'Montserrat', sans-serif;
-              font-weight: 700; 
-              color: #475569; 
-              width: 125px; 
-              text-transform: uppercase; 
-              font-size: 9px; 
-              letter-spacing: 0.8px; 
-            }
-            .info-val { 
-              color: #0f172a; 
-              font-weight: 700; 
-              white-space: nowrap;
-              overflow: hidden;
-              text-overflow: ellipsis;
-            }
-            
-            /* Table design */
-            .grades-table { 
-              width: 100%; 
-              border-collapse: collapse; 
-              margin-bottom: 22px; 
-              box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
-              position: relative;
-              z-index: 2;
-            }
-            .grades-table th { 
-              background: #1e3a8a; 
-              color: #ffffff; 
-              font-family: 'Montserrat', sans-serif;
-              font-weight: 700; 
-              font-size: 10px; 
-              text-transform: uppercase; 
-              letter-spacing: 0.5px; 
-              padding: 10px 12px;
-              border: none;
-            }
-            .grades-table td { 
-              padding: 10px 12px; 
-              border-bottom: 1px solid #e2e8f0; 
-              font-size: 11px; 
-            }
-            .grades-table tr:hover { background: #f8fafc; }
-            .sub-name { font-weight: 700; color: #1e293b; }
-            .marks-col { font-family: monospace; font-weight: 700; text-align: center; font-size: 11px; }
-            .total-obt { font-weight: 900; color: #0f172a; font-family: monospace; }
-            .pct-col { font-weight: 900; color: #1e3a8a; text-align: center; font-family: monospace; }
-            
-            /* Status Badges */
-            .badge-col { text-align: center; }
-            .badge { 
-              display: inline-block; 
-              padding: 3px 8px; 
-              border-radius: 4px; 
-              font-size: 9px; 
-              font-weight: 800; 
-              text-transform: uppercase; 
-              letter-spacing: 0.8px; 
-            }
-            .badge-pass { background: #f0fdf4; color: #15803d; border: 1px solid #bbf7d0; }
-            .badge-fail { background: #fef2f2; color: #b91c1c; border: 1px solid #fecaca; }
-            .badge-pending { background: #fffbeb; color: #b45309; border: 1px solid #fde68a; }
-            
-            /* Grading Scale */
-            .grading-legend { 
-              display: grid; 
-              grid-template-columns: repeat(7, 1fr); 
-              gap: 4px; 
-              border: 1.5px solid #e2e8f0; 
-              background: #f8fafc; 
-              border-radius: 4px; 
-              padding: 6px; 
-              font-size: 8.5px; 
-              text-align: center; 
-              font-weight: 600; 
-              color: #64748b;
-              margin-bottom: 22px;
-              position: relative;
-              z-index: 2;
-            }
-            .legend-item { border-right: 1px solid #e2e8f0; }
-            .legend-item:last-child { border-right: none; }
-            .legend-grade { font-weight: 800; color: #1e3a8a; }
-            
-            /* Summary Grid */
-            .summary-container { 
-              display: grid; 
-              grid-template-columns: 1.25fr 1fr; 
-              gap: 20px; 
-              margin-bottom: 20px; 
-              position: relative; 
-              z-index: 2;
-            }
-            .remarks-box { 
-              border: 1.5px solid #e2e8f0; 
-              border-left: 4px solid #d4af37; 
-              border-radius: 4px; 
-              padding: 12px 14px; 
-              background: rgba(248, 250, 252, 0.8); 
-              font-size: 11px; 
-            }
-            .remarks-title { 
-              font-family: 'Montserrat', sans-serif;
-              font-weight: 800; 
-              color: #1e3a8a; 
-              margin-bottom: 6px; 
-              text-transform: uppercase; 
-              font-size: 9.5px; 
-              letter-spacing: 0.8px; 
-            }
-            .remarks-text { font-style: italic; color: #334155; font-weight: 600; line-height: 1.5; }
-            
-            .stats-table { width: 100%; margin: 0; }
-            .stats-table td { padding: 6px 10px; border: none; font-size: 11px; }
-            .stats-table tr { border-bottom: 1.5px dashed #e2e8f0; }
-            .stats-table tr:last-child { border-bottom: none; }
-            .stats-lbl { 
-              font-family: 'Montserrat', sans-serif;
-              font-weight: 700; 
-              color: #475569; 
-              text-transform: uppercase; 
-              font-size: 9px; 
-              letter-spacing: 0.5px; 
-            }
-            .stats-val { font-weight: 800; text-align: right; color: #0f172a; }
-            .stats-grade { font-size: 14px; font-weight: 900; }
-            
-            /* Background Watermark */
-            .auth-watermark {
-              position: absolute;
-              top: 50%;
-              left: 50%;
-              transform: translate(-50%, -50%) rotate(-25deg);
-              width: 450px;
-              height: 450px;
-              border: 3px double rgba(30, 58, 138, 0.015);
-              border-radius: 50%;
-              display: flex;
-              align-items: center;
-              justify-content: center;
-              pointer-events: none;
-              user-select: none;
-              z-index: 0;
-            }
-            .auth-watermark-text {
-              font-size: 32px;
-              font-weight: 900;
-              color: rgba(30, 58, 138, 0.022);
-              text-transform: uppercase;
-              letter-spacing: 8px;
-              white-space: nowrap;
-            }
-            
-            /* Signature flow */
-            .footer-sig { 
-              display: flex; 
-              justify-content: space-between; 
-              align-items: flex-end; 
-              font-size: 9.5px; 
-              font-weight: 700; 
-              color: #64748b;
-              border-top: 1.5px dashed #e2e8f0; 
-              padding-top: 15px; 
-              margin-top: 10px;
-              position: relative;
-              z-index: 2;
-            }
-            .sig-line { 
-              border-top: 1.5px solid #cbd5e1; 
-              width: 100px; 
-              text-align: center; 
-              padding-top: 4px; 
-              margin-top: 25px; 
-              text-transform: uppercase;
-              font-size: 8px;
-              letter-spacing: 0.5px;
-            }
-          </style>
-        </head>
-        <body>
-    `;
-
-    studentsToPrint.forEach(student => {
-      const sheet = compileMarksheet(student);
-      
-      htmlContent += `
-        <div class="marksheet-wrapper">
-          <!-- Decorative Corners -->
-          <div class="corner-accent corner-tl"></div>
-          <div class="corner-accent corner-tr"></div>
-          <div class="corner-accent corner-bl"></div>
-          <div class="corner-accent corner-br"></div>
-
-          <!-- Watermark -->
-          <div class="auth-watermark">
-            <div class="auth-watermark-text">OFFICIAL RECORD</div>
-          </div>
-
-          <div style="flex-grow: 1;">
-            <!-- Letterhead -->
-            <div class="crest-container">
-              <div class="academic-crest"></div>
-            </div>
-            <div class="letterhead">
-              <h1 class="school-logo">${classNameStr.toUpperCase()} ACADEMY</h1>
-              <div class="school-sub">Official Academic Transcript & Statement of Grades</div>
-            </div>
-
-            <!-- Title -->
-            <div class="title-box">
-              <div class="report-title">
-                ${marksheetType === 'midterm' ? 'Midterm Marksheet' : marksheetType === 'final' ? 'Final Marksheet' : 'Consolidated Report Card'}
-              </div>
-            </div>
-
-            <!-- Student Info Block -->
-            <div class="student-info">
-              <div class="info-item">
-                <span class="info-label">Student Name:</span>
-                <span class="info-val">${sheet.studentName}</span>
-              </div>
-              <div class="info-item">
-                <span class="info-label">Roll Number:</span>
-                <span class="info-val" style="font-family: monospace;">${sheet.rollNumber}</span>
-              </div>
-              <div class="info-item">
-                <span class="info-label">Class & Section:</span>
-                <span class="info-val">${classNameStr} - ${classSection}</span>
-              </div>
-              <div class="info-item">
-                <span class="info-label">Academic Cycle:</span>
-                <span class="info-val">${academicYear}</span>
-              </div>
-            </div>
-
-            <!-- Subject Table -->
-            <table class="grades-table">
-              <thead>
-                <tr>
-                  <th style="text-align: left; ${marksheetType === 'combined' ? 'width: 30%;' : 'width: 48%;'}">Subject Name</th>
-                  ${marksheetType === 'combined' ? '<th style="width: 13%;">Midterm</th>' : ''}
-                  ${marksheetType === 'combined' ? '<th style="width: 13%;">Final</th>' : ''}
-                  <th style="${marksheetType === 'combined' ? 'width: 18%;' : 'width: 22%;'}">Total Marks</th>
-                  <th style="${marksheetType === 'combined' ? 'width: 13%;' : 'width: 15%;'}">Percentage</th>
-                  <th style="${marksheetType === 'combined' ? 'width: 13%;' : 'width: 15%;'}">Status</th>
-                </tr>
-              </thead>
-              <tbody>
-      `;
-
-      sheet.subjects.forEach(sub => {
-        htmlContent += `
-          <tr>
-            <td class="sub-name">${sub.subjectName}</td>
-            ${marksheetType === 'combined' ? `<td class="marks-col">${sub.midtermMarks}</td>` : ''}
-            ${marksheetType === 'combined' ? `<td class="marks-col">${sub.finalMarks}</td>` : ''}
-            <td class="marks-col total-obt">${sub.obtained}</td>
-            <td class="pct-col">${sub.percentage}%</td>
-            <td class="badge-col">
-              <span class="badge ${
-                sub.status === 'pass' ? 'badge-pass' : sub.status === 'fail' ? 'badge-fail' : 'badge-pending'
-              }">
-                ${sub.status}
-              </span>
-            </td>
-          </tr>
-        `;
-      });
-
-      htmlContent += `
-              </tbody>
-            </table>
-
-            <!-- Legend -->
-            <div class="grading-legend">
-              <div class="legend-item"><span class="legend-grade">A+</span> (90%+)</div>
-              <div class="legend-item"><span class="legend-grade">A</span> (80-89%)</div>
-              <div class="legend-item"><span class="legend-grade">B</span> (70-79%)</div>
-              <div class="legend-item"><span class="legend-grade">C</span> (60-69%)</div>
-              <div class="legend-item"><span class="legend-grade">D</span> (50-59%)</div>
-              <div class="legend-item"><span class="legend-grade">E</span> (40-49%)</div>
-              <div><span class="legend-grade">F</span> (&lt;40%)</div>
-            </div>
-
-            <!-- Remarks & Statistics -->
-            <div class="summary-container">
-              <div class="remarks-box">
-                <div class="remarks-title">Principal Remarks & Evaluation</div>
-                <div class="remarks-text">"${sheet.remarks}" The student has demonstrated ${sheet.status === 'pass' ? 'satisfactory academic standards.' : 'need for substantial core reinforcement.'}</div>
-              </div>
-              <div>
-                <table class="stats-table">
-                  <tbody>
-                    <tr>
-                      <td class="stats-lbl">Aggregate Marks</td>
-                      <td class="stats-val">${sheet.totalObtainedMarks} / ${sheet.totalMaxMarks}</td>
-                    </tr>
-                    <tr>
-                      <td class="stats-lbl">Percentage</td>
-                      <td class="stats-val" style="color: #1e3a8a;">${sheet.overallPercentage}%</td>
-                    </tr>
-                    <tr>
-                      <td class="stats-lbl">Overall Grade</td>
-                      <td class="stats-val stats-grade" style="color: ${sheet.status === 'pass' ? '#15803d' : '#b91c1c'};">${sheet.grade}</td>
-                    </tr>
-                    <tr>
-                      <td class="stats-lbl">Academic Standing</td>
-                      <td class="stats-val">
-                        <span class="badge ${
-                          sheet.status === 'pass' ? 'badge-pass' : sheet.status === 'fail' ? 'badge-fail' : sheet.status === 'pending' ? 'badge-pending' : ''
-                        }">
-                          ${sheet.status}
-                        </span>
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          </div>
-          
-          <div class="footer-sig">
-            <div>Date of Issue: ${new Date().toLocaleDateString()}</div>
-            <div style="display: flex; gap: 40px;">
-              <div class="sig-line">Class Teacher</div>
-              <div class="sig-line">Principal</div>
-            </div>
-          </div>
-        </div>
-      `;
-    });
-
-    htmlContent += `
-        </body>
-      </html>
-    `;
-
-    iframeDoc.write(htmlContent);
-    iframeDoc.close();
-
-    // Print sandbox execution
+    // Give react brief window to mount print contents
     setTimeout(() => {
-      iframe.contentWindow?.focus();
-      iframe.contentWindow?.print();
-      
-      // Clean sandbox iframe
-      setTimeout(() => {
-        document.body.removeChild(iframe);
-        setPrinting(false);
-      }, 1000);
-    }, 300);
+      handlePrintBase();
+    }, 200);
   };
+
+  const SelectedTemplate = MARKSHEET_TEMPLATES.find(t => t.id === selectedTemplateId)?.component || MARKSHEET_TEMPLATES[0].component;
 
   return (
     <div className="space-y-6">
@@ -787,7 +280,7 @@ export function MarksheetPreviewPage({
         {/* Center/Right controls row */}
         <div className="flex flex-col sm:flex-row flex-wrap items-stretch sm:items-center gap-2 sm:gap-3 w-full lg:w-auto">
           {/* Select Student */}
-          <div className="w-full sm:w-[170px]">
+          <div className="w-full sm:w-[150px]">
             <Select value={selectedStudentId} onValueChange={setSelectedStudentId} disabled={loading || students.length === 0}>
               <SelectTrigger className="w-full h-8 rounded-lg text-xs font-semibold bg-zinc-50/50 dark:bg-zinc-900/30 border-gray-200 dark:border-zinc-800 py-1">
                 <div className="flex items-center gap-1.5 min-w-0 w-full text-left">
@@ -808,8 +301,8 @@ export function MarksheetPreviewPage({
             </Select>
           </div>
 
-          {/* Report Template Type */}
-          <div className="w-full sm:w-[160px]">
+          {/* Select Marks Type */}
+          <div className="w-full sm:w-[110px]">
             <Select value={marksheetType} onValueChange={(v: any) => setMarksheetType(v)} disabled={loading || exams.length === 0}>
               <SelectTrigger className="w-full h-8 rounded-lg text-xs font-semibold bg-zinc-50/50 dark:bg-zinc-900/30 border-gray-200 dark:border-zinc-800 py-1">
                 <div className="flex items-center gap-1.5 min-w-0 w-full text-left">
@@ -827,22 +320,43 @@ export function MarksheetPreviewPage({
             </Select>
           </div>
 
+          {/* Select Template Design - Modern Dropdown! */}
+          <div className="w-full sm:w-[150px]">
+            <Select value={selectedTemplateId} onValueChange={setSelectedTemplateId}>
+              <SelectTrigger className="w-full h-8 rounded-lg text-xs font-semibold bg-zinc-50/50 dark:bg-zinc-900/30 border-gray-200 dark:border-zinc-800 py-1">
+                <div className="flex items-center gap-1.5 min-w-0 w-full text-left">
+                  <Layout className="h-3.5 w-3.5 text-indigo-500 shrink-0" />
+                  <span className="truncate flex-1">
+                    <SelectValue placeholder="Select Design" />
+                  </span>
+                </div>
+              </SelectTrigger>
+              <SelectContent className="rounded-xl">
+                {MARKSHEET_TEMPLATES.map(tmpl => (
+                  <SelectItem key={tmpl.id} value={tmpl.id} className="text-xs font-medium">
+                    {tmpl.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
           {/* Preview Zoom */}
-          <div className="w-full sm:w-[120px]">
+          <div className="w-full sm:w-[100px]">
             <Select value={zoomScale.toString()} onValueChange={(v) => setZoomScale(parseFloat(v))}>
               <SelectTrigger className="w-full h-8 rounded-lg text-xs font-semibold bg-zinc-50/50 dark:bg-zinc-900/30 border-gray-200 dark:border-zinc-800 py-1">
                 <div className="flex items-center gap-1.5 min-w-0 w-full text-left">
                   <Search className="h-3.5 w-3.5 text-zinc-400 shrink-0" />
                   <span className="truncate flex-1">
-                    {Math.round(zoomScale * 100)}% Size
+                    {Math.round(zoomScale * 100)}%
                   </span>
                 </div>
               </SelectTrigger>
               <SelectContent className="rounded-xl">
-                <SelectItem value="0.5" className="text-xs font-medium">50% Size</SelectItem>
-                <SelectItem value="0.6" className="text-xs font-medium">60% Size</SelectItem>
-                <SelectItem value="0.75" className="text-xs font-medium">75% Size</SelectItem>
-                <SelectItem value="1" className="text-xs font-medium">100% Size</SelectItem>
+                <SelectItem value="0.5" className="text-xs font-medium">50%</SelectItem>
+                <SelectItem value="0.6" className="text-xs font-medium">60%</SelectItem>
+                <SelectItem value="0.75" className="text-xs font-medium">75%</SelectItem>
+                <SelectItem value="1" className="text-xs font-medium">100%</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -917,7 +431,6 @@ export function MarksheetPreviewPage({
                   }}
                 >
                   <div 
-                    className="relative bg-white text-slate-900 px-9 py-10 border-[6px] border-[#1e3a8a] rounded overflow-hidden select-none flex flex-col justify-between shrink-0 text-left"
                     style={{ 
                       width: 794, 
                       height: 1123,
@@ -925,205 +438,13 @@ export function MarksheetPreviewPage({
                       transformOrigin: 'top left'
                     }}
                   >
-                  
-                  {/* Gold Inner Inset Border */}
-                  <div className="absolute inset-2 border border-[#d4af37] pointer-events-none rounded z-10" />
-
-                  {/* Decorative Corner Accents */}
-                  <div className="absolute top-4 left-4 w-3.5 h-3.5 border-t-2 border-l-2 border-[#d4af37] z-20" />
-                  <div className="absolute top-4 right-4 w-3.5 h-3.5 border-t-2 border-r-2 border-[#d4af37] z-20" />
-                  <div className="absolute bottom-4 left-4 w-3.5 h-3.5 border-b-2 border-l-2 border-[#d4af37] z-20" />
-                  <div className="absolute bottom-4 right-4 w-3.5 h-3.5 border-b-2 border-r-2 border-[#d4af37] z-20" />
-
-                  {/* Background Watermark */}
-                  <div className="absolute inset-0 flex items-center justify-center pointer-events-none select-none z-0 overflow-hidden">
-                    <div className="transform -rotate-[25deg] border-[3px] border-double border-blue-950/[0.015] rounded-full w-[450px] h-[450px] flex items-center justify-center">
-                      <span className="text-[26px] font-black text-blue-950/[0.03] tracking-[8px] uppercase whitespace-nowrap" style={{ fontFamily: "'Montserrat', sans-serif" }}>
-                        OFFICIAL RECORD
-                      </span>
-                    </div>
-                  </div>
-
-                  {/* Core Document Flow */}
-                  <div className="space-y-5">
-                    
-                    {/* Crest & Logo Letterhead */}
-                    <div className="text-center pb-1">
-                      <div className="flex justify-center mb-2">
-                        <div className="w-12 h-12 bg-[#1e3a8a] border-2 border-[#d4af37] rounded-full flex items-center justify-center shadow-md relative">
-                          <span className="text-xl filter drop-shadow">🎓</span>
-                          <span className="absolute bottom-0.5 text-[6px] text-[#d4af37] font-bold">★</span>
-                        </div>
-                      </div>
-
-                      <h3 className="font-extrabold text-xl text-[#1e3a8a] tracking-wider leading-none" style={{ fontFamily: "'Cinzel', serif" }}>
-                        {classNameStr.toUpperCase()} ACADEMY
-                      </h3>
-                      <p className="text-[9px] text-zinc-500 font-bold uppercase tracking-widest mt-1.5" style={{ fontFamily: "'Montserrat', sans-serif" }}>
-                        Official Academic Transcript & Statement of Outcomes
-                      </p>
-                      <div className="w-16 h-0.5 bg-[#d4af37] mx-auto mt-2" />
-                    </div>
-
-                    {/* Title Box */}
-                    <div className="text-center">
-                      <h4 className="inline-block text-[11px] font-black uppercase text-[#1e3a8a] tracking-widest border border-[#1e3a8a] border-x-[4px] py-1.5 px-6 rounded bg-blue-50/50" style={{ fontFamily: "'Montserrat', sans-serif" }}>
-                        {marksheetType === 'midterm' ? 'Midterm Marksheet' : marksheetType === 'final' ? 'Final Marksheet' : 'Consolidated Report Card'}
-                      </h4>
-                    </div>
-
-                    {/* Student Info Block */}
-                    <div className="grid grid-cols-2 gap-x-6 gap-y-3.5 text-xs border border-gray-200 p-4 rounded bg-zinc-50/70">
-                      <div className="flex gap-2">
-                        <span className="text-zinc-500 font-bold uppercase text-[9px] tracking-wider w-24 flex items-center shrink-0" style={{ fontFamily: "'Montserrat', sans-serif" }}>Student Name:</span>
-                        <span className="font-bold text-zinc-900 truncate">{sheet.studentName}</span>
-                      </div>
-                      <div className="flex gap-2">
-                        <span className="text-zinc-500 font-bold uppercase text-[9px] tracking-wider w-24 flex items-center shrink-0" style={{ fontFamily: "'Montserrat', sans-serif" }}>Roll Number:</span>
-                        <span className="font-bold text-zinc-900 font-mono">{sheet.rollNumber}</span>
-                      </div>
-                      <div className="flex gap-2">
-                        <span className="text-zinc-500 font-bold uppercase text-[9px] tracking-wider w-24 flex items-center shrink-0" style={{ fontFamily: "'Montserrat', sans-serif" }}>Class & Section:</span>
-                        <span className="font-bold text-zinc-900 truncate">{classNameStr} - {classSection}</span>
-                      </div>
-                      <div className="flex gap-2">
-                        <span className="text-zinc-500 font-bold uppercase text-[9px] tracking-wider w-24 flex items-center shrink-0" style={{ fontFamily: "'Montserrat', sans-serif" }}>Academic Cycle:</span>
-                        <span className="font-bold text-zinc-900">{academicYear}</span>
-                      </div>
-                    </div>
-
-                    {/* Subject Table */}
-                    <div className="rounded border border-gray-200 overflow-hidden shadow-sm bg-white">
-                      <table className="w-full text-xs border-collapse table-fixed">
-                        <thead>
-                          <tr className="bg-[#1e3a8a] border-none text-white">
-                            <th className={`font-bold px-3 py-2.5 text-left whitespace-normal ${marksheetType === 'combined' ? 'w-[28%]' : 'w-[45%]'}`} style={{ fontFamily: "'Montserrat', sans-serif" }}>Subject Name</th>
-                            {marksheetType === 'combined' && (
-                              <th className="text-center font-bold px-2 py-2.5 whitespace-normal w-[12%]" style={{ fontFamily: "'Montserrat', sans-serif" }}>Midterm</th>
-                            )}
-                            {marksheetType === 'combined' && (
-                              <th className="text-center font-bold px-2 py-2.5 whitespace-normal w-[12%]" style={{ fontFamily: "'Montserrat', sans-serif" }}>Final</th>
-                            )}
-                            <th className={`text-center font-bold px-3 py-2.5 whitespace-normal ${marksheetType === 'combined' ? 'w-[18%]' : 'w-[22%]'}`} style={{ fontFamily: "'Montserrat', sans-serif" }}>
-                              {marksheetType === 'combined' ? 'Combined Total' : 'Marks Obtained'}
-                            </th>
-                            <th className={`text-center font-bold px-3 py-2.5 whitespace-normal ${marksheetType === 'combined' ? 'w-[15%]' : 'w-[16%]'}`} style={{ fontFamily: "'Montserrat', sans-serif" }}>Percentage</th>
-                            <th className={`text-center font-bold px-3 py-2.5 whitespace-normal ${marksheetType === 'combined' ? 'w-[15%]' : 'w-[17%]'}`} style={{ fontFamily: "'Montserrat', sans-serif" }}>Status</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {sheet.subjects.map((sub: any, i: number) => (
-                            <tr key={i} className="border-b border-gray-150 hover:bg-zinc-50/50 transition-colors">
-                              <td className="font-bold text-zinc-800 px-3 py-2.5 truncate text-left">
-                                {sub.subjectName}
-                              </td>
-                              {marksheetType === 'combined' && (
-                                <td className="text-center font-mono text-zinc-500 px-2 py-2.5">
-                                  {sub.midtermMarks}
-                                </td>
-                              )}
-                              {marksheetType === 'combined' && (
-                                <td className="text-center font-mono text-zinc-500 px-2 py-2.5">
-                                  {sub.finalMarks}
-                                </td>
-                              )}
-                              <td className="text-center font-black text-zinc-950 font-mono px-3 py-2.5">
-                                {sub.obtained}
-                              </td>
-                              <td className="text-center font-black text-[#1e3a8a] font-mono px-3 py-2.5">
-                                {sub.percentage}%
-                              </td>
-                              <td className="text-center px-3 py-2.5">
-                                {sub.status === 'pass' && (
-                                  <span className="inline-flex items-center px-2 py-0.5 rounded text-[8.5px] font-extrabold tracking-wider bg-emerald-50 text-emerald-700 border border-emerald-200 uppercase">
-                                    pass
-                                  </span>
-                                )}
-                                {sub.status === 'fail' && (
-                                  <span className="inline-flex items-center px-2 py-0.5 rounded text-[8.5px] font-extrabold tracking-wider bg-red-50 text-red-700 border border-red-200 uppercase">
-                                    fail
-                                  </span>
-                                )}
-                                {sub.status === 'pending' && (
-                                  <span className="inline-flex items-center px-2 py-0.5 rounded text-[8.5px] font-extrabold tracking-wider bg-amber-50 text-amber-700 border border-amber-200 uppercase">
-                                    pending
-                                  </span>
-                                )}
-                              </td>
-                            </tr>
-                          ))}
-                        </tbody>
-                      </table>
-                    </div>
-
-                    {/* Grading Scale Detail */}
-                    <div className="grid grid-cols-7 gap-1 border border-gray-200 bg-zinc-50 rounded p-2 text-[9px] text-zinc-500 text-center font-semibold">
-                      <div className="border-r border-gray-200 last:border-none"><span className="font-bold text-[#1e3a8a]">A+</span> (90%+)</div>
-                      <div className="border-r border-gray-200 last:border-none"><span className="font-bold text-[#1e3a8a]">A</span> (80-89%)</div>
-                      <div className="border-r border-gray-200 last:border-none"><span className="font-bold text-[#1e3a8a]">B</span> (70-79%)</div>
-                      <div className="border-r border-gray-200 last:border-none"><span className="font-bold text-[#1e3a8a]">C</span> (60-69%)</div>
-                      <div className="border-r border-gray-200 last:border-none"><span className="font-bold text-[#1e3a8a]">D</span> (50-59%)</div>
-                      <div className="border-r border-gray-200 last:border-none"><span className="font-bold text-[#1e3a8a]">E</span> (40-49%)</div>
-                      <div className="last:border-none"><span className="font-bold text-[#1e3a8a]">F</span> (&lt;40%)</div>
-                    </div>
-
-                    {/* Remarks & Stats Grid */}
-                    <div className="grid grid-cols-12 gap-4 pt-1">
-                      <div className="col-span-7 p-4 border border-gray-200 rounded bg-zinc-50/50 flex flex-col justify-center">
-                        <p className="text-[9.5px] uppercase font-bold text-[#1e3a8a] tracking-wider mb-1.5" style={{ fontFamily: "'Montserrat', sans-serif" }}>Principal Remarks & Evaluation</p>
-                        <p className="text-xs font-semibold text-zinc-700 italic leading-relaxed">
-                          "{sheet.remarks}" The student has demonstrated {sheet.status === 'pass' ? 'satisfactory academic standards.' : 'need for substantial core reinforcement.'}
-                        </p>
-                      </div>
-
-                      <div className="col-span-5 p-4 border border-gray-200 rounded bg-zinc-50/50 space-y-2.5">
-                        <div className="flex justify-between text-xs font-semibold border-b border-gray-200 pb-1.5 text-zinc-500">
-                          <span className="uppercase text-[9px] tracking-wide" style={{ fontFamily: "'Montserrat', sans-serif" }}>Aggregate Marks:</span>
-                          <span className="text-zinc-900 font-bold font-mono">{sheet.totalObtainedMarks} / {sheet.totalMaxMarks}</span>
-                        </div>
-                        <div className="flex justify-between text-xs font-semibold border-b border-gray-200 pb-1.5 text-zinc-500">
-                          <span className="uppercase text-[9px] tracking-wide" style={{ fontFamily: "'Montserrat', sans-serif" }}>Percentage:</span>
-                          <span className="text-[#1e3a8a] font-bold font-mono">{sheet.overallPercentage}%</span>
-                        </div>
-                        <div className="flex justify-between text-xs font-semibold border-b border-gray-200 pb-1.5 text-zinc-500">
-                          <span className="uppercase text-[9px] tracking-wide flex items-center" style={{ fontFamily: "'Montserrat', sans-serif" }}>Overall Grade:</span>
-                          <span className={`font-black text-sm ${sheet.color}`}>{sheet.grade}</span>
-                        </div>
-                        <div className="flex justify-between items-center text-xs font-semibold text-zinc-500">
-                          <span className="uppercase text-[9px] tracking-wide" style={{ fontFamily: "'Montserrat', sans-serif" }}>Academic Standing:</span>
-                          {sheet.status === 'pass' && (
-                            <span className="inline-flex items-center px-2 py-0.5 rounded text-[8.5px] font-extrabold tracking-wider bg-emerald-50 text-emerald-700 border border-emerald-200 uppercase">PASS</span>
-                          )}
-                          {sheet.status === 'fail' && (
-                            <span className="inline-flex items-center px-2 py-0.5 rounded text-[8.5px] font-extrabold tracking-wider bg-red-50 text-red-700 border border-red-200 uppercase">FAIL</span>
-                          )}
-                          {sheet.status === 'pending' && (
-                            <span className="inline-flex items-center px-2 py-0.5 rounded text-[8.5px] font-extrabold tracking-wider bg-amber-50 text-amber-700 border border-amber-200 uppercase">PENDING</span>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-
-                  </div>
-
-                  {/* Visual Signature Segment - Pinned to the bottom margin */}
-                  <div className="relative z-10 flex justify-between items-end text-[9.5px] font-bold text-zinc-500 border-t border-dashed border-gray-200 pt-6">
-                    <div className="flex flex-col items-center">
-                      <span>Date of Issue: {new Date().toLocaleDateString()}</span>
-                    </div>
-
-                    <div className="flex gap-10">
-                      <div className="flex flex-col items-center">
-                        <div className="w-20 border-b border-zinc-300 mb-1" />
-                        <span>CLASS TEACHER</span>
-                      </div>
-                      <div className="flex flex-col items-center">
-                        <div className="w-20 border-b border-zinc-300 mb-1" />
-                        <span>PRINCIPAL</span>
-                      </div>
-                    </div>
-                  </div>
-
+                    <SelectedTemplate 
+                      sheet={sheet}
+                      classNameStr={classNameStr}
+                      classSection={classSection}
+                      academicYear={academicYear}
+                      marksheetType={marksheetType}
+                    />
                   </div>
                 </div>
               ))}
@@ -1131,6 +452,45 @@ export function MarksheetPreviewPage({
           </div>
         )}
       </div>
+
+      {/* Hidden Print Wrapper for react-to-print */}
+      <div className="hidden">
+        <div ref={printContainerRef} className="print:block bg-white min-h-screen">
+          <style type="text/css" media="print">
+            {`
+              @page { 
+                size: portrait; 
+                margin: 0mm; 
+              } 
+              body { 
+                margin: 0; 
+                -webkit-print-color-adjust: exact !important; 
+                print-color-adjust: exact !important; 
+              }
+              .marksheet-page-break {
+                page-break-after: always;
+                break-after: page;
+              }
+              .marksheet-page-break:last-child {
+                page-break-after: avoid;
+                break-after: avoid;
+              }
+            `}
+          </style>
+          {previewStudents.map((sheet, index) => (
+            <div key={index} className="marksheet-page-break">
+              <SelectedTemplate 
+                sheet={sheet}
+                classNameStr={classNameStr}
+                classSection={classSection}
+                academicYear={academicYear}
+                marksheetType={marksheetType}
+              />
+            </div>
+          ))}
+        </div>
+      </div>
+
     </div>
   );
 }
