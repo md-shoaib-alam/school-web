@@ -761,55 +761,44 @@ export function MarksheetPreviewPage({
 
   return (
     <div className="space-y-6">
-      {/* Premium Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-card border border-gray-100 dark:border-zinc-800 p-5 rounded-2xl shadow-sm">
-        <div className="min-w-0">
+      {/* Sleek, Compact Header & Control Toolbar */}
+      <div className="bg-card border border-gray-150 dark:border-zinc-800/80 p-3 sm:px-4 rounded-xl shadow-sm flex flex-col lg:flex-row items-stretch lg:items-center gap-3 justify-between">
+        {/* Left Side: Back & Class Title */}
+        <div className="flex items-center gap-3 min-w-0">
           <Button 
             variant="ghost" 
+            size="sm"
             onClick={onBack}
-            className="group flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground h-8 px-2 -ml-2 mb-2 rounded-lg transition-colors"
+            className="group flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground h-8 px-2 rounded-lg transition-colors border border-gray-100 dark:border-zinc-800"
           >
-            <ArrowLeft className="h-4 w-4 transition-transform group-hover:-translate-x-0.5" />
-            <span>Back to Published Results</span>
+            <ArrowLeft className="h-3.5 w-3.5 transition-transform group-hover:-translate-x-0.5" />
+            <span className="hidden sm:inline">Back</span>
           </Button>
-
-          <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-foreground flex items-center gap-2">
-            <Award className="h-6 w-6 sm:h-7 sm:w-7 text-emerald-600 dark:text-emerald-500" />
-            <span>Marksheet Preview & Batch Print</span>
-          </h2>
-          <p className="text-xs sm:text-sm text-muted-foreground mt-1">
-            Generate and batch print premium physical statement of grades for <strong className="text-foreground">{classNameStr} - {classSection}</strong>.
-          </p>
+          
+          <div className="min-w-0">
+            <h2 className="text-sm font-bold tracking-tight text-foreground flex items-center gap-1.5 leading-none">
+              <Award className="h-4 w-4 text-emerald-600 dark:text-emerald-500 shrink-0" />
+              <span className="truncate">{classNameStr} - {classSection}</span>
+            </h2>
+            <span className="text-[10px] text-muted-foreground font-semibold uppercase tracking-wider block mt-0.5">Marksheet Preview</span>
+          </div>
         </div>
-        
-        <div className="flex items-center gap-3 shrink-0">
-          <Button 
-            onClick={handlePrint}
-            disabled={loading || printing || students.length === 0}
-            className="bg-emerald-600 hover:bg-emerald-700 text-white shrink-0 gap-2 shadow-sm rounded-xl h-10 px-5 font-bold transition-all duration-300 transform active:scale-95"
-          >
-            {printing ? <Loader2 className="h-4 w-4 animate-spin" /> : <Printer className="h-4 w-4" />}
-            Print {selectedStudentId === 'all' ? 'All Class Marksheets' : 'Student Marksheet'}
-          </Button>
-        </div>
-      </div>
 
-      {/* Configurations & Filtering controls bar */}
-      <div className="bg-card border border-gray-100 dark:border-zinc-800 p-4 sm:p-5 rounded-2xl shadow-sm flex flex-col md:flex-row items-stretch md:items-center gap-4">
-        <div className="flex-1 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          <div className="space-y-1.5 min-w-0">
-            <label className="text-[10px] uppercase font-bold text-muted-foreground tracking-wider block">Select Student</label>
+        {/* Center/Right controls row */}
+        <div className="flex flex-wrap items-center gap-3">
+          {/* Select Student */}
+          <div className="w-[170px]">
             <Select value={selectedStudentId} onValueChange={setSelectedStudentId} disabled={loading || students.length === 0}>
-              <SelectTrigger className="w-full h-10 rounded-xl text-xs font-semibold bg-zinc-50/50 dark:bg-zinc-900/30 border-gray-200 dark:border-zinc-800">
-                <div className="flex items-center gap-2 min-w-0 w-full text-left">
-                  <User className="h-4 w-4 text-zinc-400 shrink-0" />
-                  <span className="truncate flex-1 text-left">
+              <SelectTrigger className="w-full h-8 rounded-lg text-xs font-semibold bg-zinc-50/50 dark:bg-zinc-900/30 border-gray-200 dark:border-zinc-800 py-1">
+                <div className="flex items-center gap-1.5 min-w-0 w-full text-left">
+                  <User className="h-3.5 w-3.5 text-zinc-400 shrink-0" />
+                  <span className="truncate flex-1">
                     <SelectValue placeholder="All Students" />
                   </span>
                 </div>
               </SelectTrigger>
               <SelectContent className="max-h-60 rounded-xl">
-                <SelectItem value="all" className="text-xs font-semibold text-emerald-600 dark:text-emerald-400">All Students (Batch Print)</SelectItem>
+                <SelectItem value="all" className="text-xs font-semibold text-emerald-600 dark:text-emerald-400">All Students</SelectItem>
                 {students.map((s: any) => (
                   <SelectItem key={s.id} value={s.id} className="text-xs font-medium">
                     Roll {s.rollNumber || '-'} — {s.name}
@@ -819,52 +808,55 @@ export function MarksheetPreviewPage({
             </Select>
           </div>
 
-          <div className="space-y-1.5 min-w-0">
-            <label className="text-[10px] uppercase font-bold text-muted-foreground tracking-wider block">Report Template Type</label>
+          {/* Report Template Type */}
+          <div className="w-[160px]">
             <Select value={marksheetType} onValueChange={(v: any) => setMarksheetType(v)} disabled={loading || exams.length === 0}>
-              <SelectTrigger className="w-full h-10 rounded-xl text-xs font-semibold bg-zinc-50/50 dark:bg-zinc-900/30 border-gray-200 dark:border-zinc-800">
-                <div className="flex items-center gap-2 min-w-0 w-full text-left">
-                  <FileText className="h-4 w-4 text-zinc-400 shrink-0" />
-                  <span className="truncate flex-1 text-left">
+              <SelectTrigger className="w-full h-8 rounded-lg text-xs font-semibold bg-zinc-50/50 dark:bg-zinc-900/30 border-gray-200 dark:border-zinc-800 py-1">
+                <div className="flex items-center gap-1.5 min-w-0 w-full text-left">
+                  <FileText className="h-3.5 w-3.5 text-zinc-400 shrink-0" />
+                  <span className="truncate flex-1">
                     <SelectValue placeholder="Select Type" />
                   </span>
                 </div>
               </SelectTrigger>
               <SelectContent className="rounded-xl">
-                <SelectItem value="midterm" className="text-xs font-medium">Midterm Marksheet</SelectItem>
-                <SelectItem value="final" className="text-xs font-medium">Final Marksheet</SelectItem>
-                <SelectItem value="combined" className="text-xs font-semibold text-emerald-600">Combined Marksheet (Midterm + Final)</SelectItem>
+                <SelectItem value="midterm" className="text-xs font-medium">Midterm</SelectItem>
+                <SelectItem value="final" className="text-xs font-medium">Final</SelectItem>
+                <SelectItem value="combined" className="text-xs font-semibold text-emerald-600">Combined</SelectItem>
               </SelectContent>
             </Select>
           </div>
 
-          <div className="space-y-1.5 min-w-0">
-            <label className="text-[10px] uppercase font-bold text-muted-foreground tracking-wider block">Preview Zoom</label>
+          {/* Preview Zoom */}
+          <div className="w-[120px]">
             <Select value={zoomScale.toString()} onValueChange={(v) => setZoomScale(parseFloat(v))}>
-              <SelectTrigger className="w-full h-10 rounded-xl text-xs font-semibold bg-zinc-50/50 dark:bg-zinc-900/30 border-gray-200 dark:border-zinc-800">
-                <div className="flex items-center gap-2 min-w-0 w-full text-left">
-                  <Search className="h-4 w-4 text-zinc-400 shrink-0" />
-                  <span className="truncate flex-1 text-left">
+              <SelectTrigger className="w-full h-8 rounded-lg text-xs font-semibold bg-zinc-50/50 dark:bg-zinc-900/30 border-gray-200 dark:border-zinc-800 py-1">
+                <div className="flex items-center gap-1.5 min-w-0 w-full text-left">
+                  <Search className="h-3.5 w-3.5 text-zinc-400 shrink-0" />
+                  <span className="truncate flex-1">
                     {Math.round(zoomScale * 100)}% Size
                   </span>
                 </div>
               </SelectTrigger>
               <SelectContent className="rounded-xl">
-                <SelectItem value="0.5" className="text-xs font-medium">50% (Very Small)</SelectItem>
-                <SelectItem value="0.6" className="text-xs font-medium">60% (Fits Screen)</SelectItem>
-                <SelectItem value="0.75" className="text-xs font-medium">75% (Medium)</SelectItem>
-                <SelectItem value="1" className="text-xs font-medium">100% (Full A4 Size)</SelectItem>
+                <SelectItem value="0.5" className="text-xs font-medium">50% Size</SelectItem>
+                <SelectItem value="0.6" className="text-xs font-medium">60% Size</SelectItem>
+                <SelectItem value="0.75" className="text-xs font-medium">75% Size</SelectItem>
+                <SelectItem value="1" className="text-xs font-medium">100% Size</SelectItem>
               </SelectContent>
             </Select>
           </div>
 
-          <div className="space-y-1.5 min-w-0">
-            <label className="text-[10px] uppercase font-bold text-muted-foreground tracking-wider block">Class & Standing</label>
-            <div className="h-10 rounded-xl border border-gray-200 dark:border-zinc-800 px-3 bg-zinc-100/50 dark:bg-zinc-900/20 text-xs font-semibold flex items-center justify-between text-muted-foreground gap-2 min-w-0">
-              <span className="truncate flex-1 text-left">{classNameStr} - {classSection}</span>
-              <span className="text-[10px] px-2 py-0.5 rounded-full bg-zinc-200 dark:bg-zinc-850 text-foreground font-mono shrink-0">{academicYear}</span>
-            </div>
-          </div>
+          {/* Print button */}
+          <Button 
+            onClick={handlePrint}
+            disabled={loading || printing || students.length === 0}
+            size="sm"
+            className="bg-emerald-600 hover:bg-emerald-700 text-white shrink-0 gap-1.5 shadow-sm rounded-lg h-8 px-4 font-bold text-xs transition-all duration-300 transform active:scale-95"
+          >
+            {printing ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Printer className="h-3.5 w-3.5" />}
+            <span>Print {selectedStudentId === 'all' ? 'All' : 'Student'}</span>
+          </Button>
         </div>
       </div>
 
