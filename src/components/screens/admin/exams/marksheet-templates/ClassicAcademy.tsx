@@ -22,14 +22,7 @@ export const ClassicAcademy: React.FC<MarksheetTemplateProps> = ({
       <div className="absolute bottom-4 left-4 w-3.5 h-3.5 border-b-2 border-l-2 border-[#d4af37] z-20" />
       <div className="absolute bottom-4 right-4 w-3.5 h-3.5 border-b-2 border-r-2 border-[#d4af37] z-20" />
 
-      {/* Background Watermark */}
-      <div className="absolute inset-0 flex items-center justify-center pointer-events-none select-none z-0 overflow-hidden">
-        <div className="transform -rotate-[25deg] border-[3px] border-double border-blue-950/[0.015] rounded-full w-[450px] h-[450px] flex items-center justify-center">
-          <span className="text-[26px] font-black text-blue-955/[0.03] tracking-[8px] uppercase whitespace-nowrap font-sans">
-            OFFICIAL RECORD
-          </span>
-        </div>
-      </div>
+
 
       {/* Core Document Flow */}
       <div className="space-y-5 z-10">
