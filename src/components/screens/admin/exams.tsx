@@ -11,7 +11,7 @@ import {
 } from 'lucide-react';
 import { parseLocalDate } from '@/lib/utils';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { useRouter, useParams } from 'next/navigation';
+import { useRouter, useParams, useSearchParams } from 'next/navigation';
 import { api, apiFetch } from '@/lib/api';
 import { goeyToast as toast } from 'goey-toast';
 import { Button } from '@/components/ui/button';
@@ -27,7 +27,7 @@ import { useAcademicYears } from '@/hooks/use-academic-years';
 // Sub-components
 import { ExamDialogs } from './exams/ExamDialogs';
 import { ViewResultsDialog } from './exams/ViewResultsDialog';
-import { MarksheetDialog } from './exams/MarksheetDialog';
+import { MarksheetPreviewPage } from './exams/MarksheetPreviewPage';
 import { 
   ExamRecord, ExamFormData, StudentResultRow, 
   ClassOption, SubjectOption, StudentOption 
@@ -105,7 +105,9 @@ function TabLoadingSkeleton() {
 export function AdminExams({ initialTab = 'exams' }: { initialTab?: string }) {
   const queryClient = useQueryClient();
   const router = useRouter();
-  const { slug } = useParams();
+  const { slug, screen } = useParams();
+  const searchParams = useSearchParams();
+  const classIdParam = searchParams?.get('classId') || '';
 
   // Academic Years
   const { academicYears } = useAcademicYears();
@@ -161,10 +163,6 @@ export function AdminExams({ initialTab = 'exams' }: { initialTab?: string }) {
   const [viewResultsExam, setViewResultsExam] = useState<ExamRecord | null>(null);
   const [viewResultsData, setViewResultsData] = useState<any[]>([]);
   const [loadingViewResults, setLoadingViewResults] = useState(false);
-
-  // Marksheets Dialog State
-  const [marksheetOpen, setMarksheetOpen] = useState(false);
-  const [marksheetClass, setMarksheetClass] = useState<{ id: string; name: string; section: string } | null>(null);
 
   // Bulk Mode Helpers
   const [bulkSelected, setBulkSelected] = useState<Set<string>>(new Set());
@@ -347,7 +345,7 @@ export function AdminExams({ initialTab = 'exams' }: { initialTab?: string }) {
     setLoadingStudents(true);
     try {
       const [sRes, rRes] = await Promise.all([
-        apiFetch(`/api/students?classId=${exam.classId}&mode=min`),
+        apiFetch(`/api/students?classId=${exam.classId}&mode=min&limit=1000`),
         apiFetch(`/api/exams/results?examId=${exam.id}`)
       ]);
       const students = (await sRes.json()).items || [];
@@ -372,7 +370,7 @@ export function AdminExams({ initialTab = 'exams' }: { initialTab?: string }) {
     setLoadingViewResults(true);
     try {
       const [sRes, rRes] = await Promise.all([
-        apiFetch(`/api/students?classId=${exam.classId}&mode=min`),
+        apiFetch(`/api/students?classId=${exam.classId}&mode=min&limit=1000`),
         apiFetch(`/api/exams/results?examId=${exam.id}`)
       ]);
       const students = (await sRes.json()).items || [];
@@ -501,6 +499,19 @@ export function AdminExams({ initialTab = 'exams' }: { initialTab?: string }) {
   const formatTime = (t: any) => t || '--:--';
   const getStatusBadge = (s: string) => <Badge className={statusConfig[s]?.bg}>{statusConfig[s]?.label || s}</Badge>;
   const getExamTypeBadge = (t: string) => <Badge className={examTypeConfig[t]?.bg}>{examTypeConfig[t]?.label || t}</Badge>;
+
+  if (screen === 'print-marksheet' && classIdParam) {
+    const activeClass = classes.find((c: any) => c.id === classIdParam);
+    return (
+      <MarksheetPreviewPage
+        classId={classIdParam}
+        classNameStr={activeClass?.name || 'Class'}
+        classSection={activeClass?.section || ''}
+        academicYear={publishedAcademicYearFilter || currentAcademicYear}
+        onBack={() => router.push(`/${slug}/published-results`)}
+      />
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -876,8 +887,7 @@ export function AdminExams({ initialTab = 'exams' }: { initialTab?: string }) {
                                 size="sm" 
                                 onClick={(e) => {
                                   e.stopPropagation();
-                                  setMarksheetClass(c);
-                                  setMarksheetOpen(true);
+                                  router.push(`/${slug}/print-marksheet?classId=${c.id}`);
                                 }}
                                 className="h-8 border-emerald-200 hover:border-emerald-300 dark:border-emerald-900/50 hover:bg-emerald-50 dark:hover:bg-emerald-950/20 text-emerald-600 dark:text-emerald-400 gap-1.5 rounded-lg text-xs font-semibold px-2.5 shadow-sm transition-colors"
                               >
@@ -963,16 +973,6 @@ export function AdminExams({ initialTab = 'exams' }: { initialTab?: string }) {
         formatTime={formatTime}
       />
 
-      {marksheetClass && (
-        <MarksheetDialog
-          open={marksheetOpen}
-          onOpenChange={setMarksheetOpen}
-          classId={marksheetClass.id}
-          classNameStr={marksheetClass.name}
-          classSection={marksheetClass.section}
-          academicYear={publishedAcademicYearFilter || currentAcademicYear}
-        />
-      )}
     </div>
   );
 }

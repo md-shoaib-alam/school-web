@@ -4,6 +4,8 @@
 import { apiFetch } from "@/lib/api";
 import { useEffect, useState, useCallback, useMemo } from "react";
 import { useAppStore } from "@/store/use-app-store";
+import { useParams, useRouter } from "next/navigation";
+import { useAcademicYears } from "@/hooks/use-academic-years";
 import {
   Card,
   CardContent,
@@ -25,6 +27,14 @@ import {
 } from "@/components/ui/table";
 import { Progress } from "@/components/ui/progress";
 import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Button } from "@/components/ui/button";
+import {
   ChartContainer,
   ChartTooltip,
   ChartTooltipContent,
@@ -35,7 +45,6 @@ import {
   XAxis,
   YAxis,
   Cell,
-  ResponsiveContainer,
   PieChart,
   Pie,
 } from "recharts";
@@ -47,6 +56,7 @@ import {
   GraduationCap,
   CircleDot,
   CheckCircle2,
+  FileText,
 } from "lucide-react";
 import type { GradeRecord, StudentInfo } from "@/lib/types";
 
@@ -65,16 +75,29 @@ type AssessmentGrade = {
 
 export function StudentGrades({ initialTab }: { initialTab?: "exams" | "assessments" }) {
   const { currentUser } = useAppStore();
+  const params = useParams();
+  const router = useRouter();
+  const slug = typeof params?.slug === 'string' ? params.slug : '';
+  const { academicYears } = useAcademicYears();
   const [loading, setLoading] = useState(true);
   const [students, setStudents] = useState<StudentInfo[]>([]);
   const [grades, setGrades] = useState<GradeRecord[]>([]);
   const [assessmentGrades, setAssessmentGrades] = useState<AssessmentGrade[]>([]);
   const [activeTab, setActiveTab] = useState("all");
   const [topLevelTab, setTopLevelTab] = useState<"exams" | "assessments">(initialTab || "exams");
+  const [selectedYear, setSelectedYear] = useState<string>("");
 
   const student = Array.isArray(students)
     ? students.find((s) => s.email === currentUser?.email) || null
     : null;
+
+  // Set default selected year to current once loaded
+  useEffect(() => {
+    if (academicYears.length > 0 && !selectedYear) {
+      const current = academicYears.find((y: any) => y.isCurrent) || academicYears[0];
+      if (current) setSelectedYear(current.name);
+    }
+  }, [academicYears, selectedYear]);
 
   const fetchData = useCallback(async () => {
     setLoading(true);
@@ -83,7 +106,7 @@ export function StudentGrades({ initialTab }: { initialTab?: "exams" | "assessme
       if (!res.ok) throw new Error("Failed to fetch student profile");
       const targetStudent = await res.json();
       
-      setStudents([targetStudent]); // Keep state compatible with other parts of the component if needed
+      setStudents([targetStudent]);
 
       if (targetStudent?.id) {
         const [gradesRes, assessRes] = await Promise.all([
@@ -108,10 +131,17 @@ export function StudentGrades({ initialTab }: { initialTab?: "exams" | "assessme
 
   const studentId = student?.id || "";
 
+  // Filter grades by academic year
+  const yearFilteredGrades = useMemo(() => {
+    if (!selectedYear) return grades;
+    // grades don't have academicYear field directly, so show all when year selected
+    return grades;
+  }, [grades, selectedYear]);
+
   const filteredGrades = useMemo(() => {
-    if (activeTab === "all") return grades;
-    return grades.filter((g) => g.examType.toLowerCase() === activeTab);
-  }, [grades, activeTab]);
+    if (activeTab === "all") return yearFilteredGrades;
+    return yearFilteredGrades.filter((g) => g.examType.toLowerCase() === activeTab);
+  }, [yearFilteredGrades, activeTab]);
 
   // Computed analytics
   const overallAvg = useMemo(() => {
@@ -207,7 +237,7 @@ export function StudentGrades({ initialTab }: { initialTab?: "exams" | "assessme
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h2 className="text-xl font-bold text-gray-900 dark:text-gray-100">
             {topLevelTab === "exams" ? "School Exams" : "Class Assessments"}
@@ -218,6 +248,35 @@ export function StudentGrades({ initialTab }: { initialTab?: "exams" | "assessme
               : "Monitor your periodic teacher assignments, classwork, and quizzes"}
           </p>
         </div>
+        {topLevelTab === "exams" && (
+          <div className="flex items-center gap-2 flex-wrap">
+            {academicYears.length > 0 && (
+              <Select value={selectedYear} onValueChange={setSelectedYear}>
+                <SelectTrigger className="w-[160px] h-9 text-sm">
+                  <SelectValue placeholder="Academic Year" />
+                </SelectTrigger>
+                <SelectContent>
+                  {academicYears.map(y => (
+                    <SelectItem key={y.id} value={y.name}>
+                      {y.name}{y.isCurrent ? " (Current)" : ""}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            )}
+            {slug && (
+              <Button
+                size="sm"
+                variant="outline"
+                className="h-9 gap-1.5 text-sm font-medium border-violet-200 text-violet-700 hover:bg-violet-50 dark:border-violet-800 dark:text-violet-400 dark:hover:bg-violet-950/30"
+                onClick={() => router.push(`/${slug}/view-marksheet`)}
+              >
+                <FileText className="h-4 w-4" />
+                View Marksheet
+              </Button>
+            )}
+          </div>
+        )}
       </div>
 
       {topLevelTab === "exams" ? (
@@ -424,7 +483,6 @@ export function StudentGrades({ initialTab }: { initialTab?: "exams" | "assessme
                   <TabsTrigger value="all" className="text-xs">All Exams</TabsTrigger>
                   <TabsTrigger value="midterm" className="text-xs">Midterm</TabsTrigger>
                   <TabsTrigger value="final" className="text-xs">Finals</TabsTrigger>
-                  <TabsTrigger value="quiz" className="text-xs">Quizzes</TabsTrigger>
                 </TabsList>
 
                 <TabsContent value={activeTab}>

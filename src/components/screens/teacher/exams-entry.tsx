@@ -117,7 +117,7 @@ export function TeacherExamsEntry() {
     setLoadingStudents(true);
     
     Promise.all([
-      apiFetch(`/api/students?classId=${selectedClass}&mode=min`),
+      apiFetch(`/api/students?classId=${selectedClass}&mode=min&limit=1000`),
       apiFetch(`/api/exams/results?examId=${selectedExamId}`)
     ])
       .then(async ([studentsRes, resultsRes]) => {

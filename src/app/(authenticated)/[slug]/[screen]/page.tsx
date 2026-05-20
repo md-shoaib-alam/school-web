@@ -66,6 +66,7 @@ const StudentNotices = dynamic(() => import('@/components/screens/student/notice
 const StudentFees = dynamic(() => import('@/components/screens/student/fees').then(m => m.StudentFees), { loading: LoadingScreen });
 const StudentTickets = dynamic(() => import('@/components/screens/student/tickets').then(m => m.StudentTickets), { loading: LoadingScreen });
 const StudentLeaves = dynamic(() => import('@/components/screens/student/leaves').then(m => m.StudentLeaves), { loading: LoadingScreen });
+const StudentMarksheet = dynamic(() => import('@/components/screens/student/marksheet').then(m => m.StudentMarksheet), { loading: LoadingScreen });
 
 const ParentChildren = dynamic(() => import('@/components/screens/parent/children').then(m => m.ParentChildren), { loading: LoadingScreen });
 const ParentGrades = dynamic(() => import('@/components/screens/parent/grades').then(m => m.ParentGrades), { loading: LoadingScreen });
@@ -154,6 +155,7 @@ export default function TenantScreenDispatcher() {
       case 'exams': return <AdminExams key="exams" initialTab="exams" />;
       case 'results-entry': return <AdminExams key="results" initialTab="results" />;
       case 'published-results': return <AdminExams key="published" initialTab="published" />;
+      case 'print-marksheet': return <AdminExams key="print-marksheet" initialTab="published" />;
       case 'admit-cards': return <AdminAdmitCards />;
     }
   }
@@ -186,6 +188,8 @@ export default function TenantScreenDispatcher() {
       case 'my-grades': return <StudentGrades />;
       case 'school-exams': return <StudentGrades key="school-exams" initialTab="exams" />;
       case 'assessments': return <StudentGrades key="assessments" initialTab="assessments" />;
+      case 'print-marksheet':
+      case 'view-marksheet': return <StudentMarksheet />;
       case 'my-attendance': return <StudentAttendance />;
       case 'assignments':
       case 'homework': return <StudentAssignments />;

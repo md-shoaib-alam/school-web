@@ -206,6 +206,7 @@ export const navItems: Record<UserRole, NavItem[]> = {
         { key: "results-entry", label: "Results Entry", icon: <FileText className="h-4 w-4" /> },
         { key: "published-results", label: "Published Results", icon: <Trophy className="h-4 w-4" /> },
         { key: "admit-cards", label: "Admit Cards", icon: <IdCard className="h-4 w-4" /> },
+        { key: "print-marksheet", label: "Print Marksheet", icon: <Award className="h-4 w-4" /> },
       ]
     },
     {
@@ -497,6 +498,12 @@ export const navItems: Record<UserRole, NavItem[]> = {
       key: "admit-cards",
       label: "Admit Cards",
       icon: <IdCard className="h-4 w-4" />,
+      permModule: "exams",
+    },
+    {
+      key: "print-marksheet",
+      label: "Print Marksheet",
+      icon: <Award className="h-4 w-4" />,
       permModule: "exams",
     },
     {
