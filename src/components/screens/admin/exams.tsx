@@ -29,6 +29,7 @@ import {
 import { compileTabularLedgerData, TabularLedgerPrint, LedgerData } from './exams/tabulationLedgerPrinter';
 import { ActiveExamsView } from './exams/ActiveExamsView';
 import { PublishedResultsView } from './exams/PublishedResultsView';
+import { TabulationLedgerPreviewPage } from './exams/TabulationLedgerPreviewPage';
 
 const statusConfig: Record<string, { bg: string; label: string }> = {
   scheduled: { bg: 'bg-blue-100 text-blue-700 border-blue-200 dark:bg-blue-900/30 dark:text-blue-400 dark:border-blue-800', label: 'Scheduled' },
@@ -134,6 +135,7 @@ export function AdminExams({ initialTab = 'exams' }: { initialTab?: string }) {
   const [printingLedgerClassId, setPrintingLedgerClassId] = useState<string | null>(null);
   const [ledgerData, setLedgerData] = useState<LedgerData | null>(null);
   const [ledgerOrientation, setLedgerOrientation] = useState<'landscape' | 'portrait'>('landscape');
+  const [ledgerTemplateId, setLedgerTemplateId] = useState<string>('classic');
   const printRef = useRef<HTMLDivElement>(null);
 
   const handlePrint = useReactToPrint({
@@ -142,6 +144,7 @@ export function AdminExams({ initialTab = 'exams' }: { initialTab?: string }) {
     onAfterPrint: () => {
       setPrintingLedgerClassId(null);
       setLedgerData(null);
+      setLedgerTemplateId('classic');
     },
   });
 
@@ -151,20 +154,28 @@ export function AdminExams({ initialTab = 'exams' }: { initialTab?: string }) {
     }
   }, [ledgerData, handlePrint]);
 
-  const handlePrintTabularLedger = async (classId: string, className: string, classSection: string, orientation: 'landscape' | 'portrait' = 'landscape') => {
-    setPrintingLedgerClassId(classId);
-    setLedgerOrientation(orientation);
-    const compiled = await compileTabularLedgerData({
-      classId,
-      className,
-      classSection,
-      academicYear: publishedAcademicYearFilter || currentAcademicYear,
+  const [previewingLedgerClass, setPreviewingLedgerClass] = useState<{
+    id: string;
+    name: string;
+    section: string;
+    templateId: string;
+    examName?: string;
+  } | null>(null);
+
+  const handlePrintTabularLedger = async (
+    classId: string, 
+    className: string, 
+    classSection: string, 
+    templateId: string = 'classic',
+    examName?: string
+  ) => {
+    setPreviewingLedgerClass({
+      id: classId,
+      name: className,
+      section: classSection,
+      templateId,
+      examName
     });
-    if (compiled) {
-      setLedgerData(compiled);
-    } else {
-      setPrintingLedgerClassId(null);
-    }
   };
 
   // Queries
@@ -280,8 +291,12 @@ export function AdminExams({ initialTab = 'exams' }: { initialTab?: string }) {
     setDeleting(false);
   };
 
-  const openResultsEntry = async (exam: ExamRecord) => {
+  const openResultsEntry = async (exam: ExamRecord | null) => {
     setSelectedExam(exam);
+    if (!exam) {
+      setResultRows([]);
+      return;
+    }
     setResultsClassId(exam.classId);
     if (activeTab !== 'results') {
       router.push(`/${slug}/results-entry`);
@@ -307,6 +322,12 @@ export function AdminExams({ initialTab = 'exams' }: { initialTab?: string }) {
       }));
     } catch { toast.error('Failed to load results'); }
     setLoadingStudents(false);
+  };
+
+  const handleResultsClassChange = (classId: string) => {
+    setResultsClassId(classId);
+    setSelectedExam(null);
+    setResultRows([]);
   };
 
   const handleOpenViewResults = async (exam: ExamRecord) => {
@@ -500,7 +521,7 @@ export function AdminExams({ initialTab = 'exams' }: { initialTab?: string }) {
             exams={resultsExamsData?.data || []} 
             classes={metadata?.classes || []} 
             resultsClassId={resultsClassId}
-            onResultsClassChange={setResultsClassId}
+            onResultsClassChange={handleResultsClassChange}
             resultRows={resultRows}
             loadingStudents={loadingStudents} savingResults={savingResults}
             onBack={backToExams} onSelectExam={openResultsEntry}
@@ -512,28 +533,40 @@ export function AdminExams({ initialTab = 'exams' }: { initialTab?: string }) {
         </TabsContent>
 
         <TabsContent value="published" className="space-y-6">
-          <PublishedResultsView
-            exams={exams}
-            classes={classes}
-            academicYears={academicYears}
-            currentAcademicYear={currentAcademicYear}
-            publishedAcademicYearFilter={publishedAcademicYearFilter}
-            setPublishedAcademicYearFilter={setPublishedAcademicYearFilter}
-            publishedClassFilter={publishedClassFilter}
-            setPublishedClassFilter={setPublishedClassFilter}
-            printingLedgerClassId={printingLedgerClassId}
-            handlePrintTabularLedger={handlePrintTabularLedger}
-            loadingExams={loadingExams}
-            deleting={deleting}
-            handleDelete={handleDelete}
-            setEditForm={setEditForm}
-            setEditOpen={setEditOpen}
-            handleOpenViewResults={handleOpenViewResults}
-            formatDate={formatDate}
-            formatTime={formatTime}
-            getStatusBadge={getStatusBadge}
-            getExamTypeBadge={getExamTypeBadge}
-          />
+          {previewingLedgerClass ? (
+            <TabulationLedgerPreviewPage
+              classId={previewingLedgerClass.id}
+              classNameStr={previewingLedgerClass.name}
+              classSection={previewingLedgerClass.section}
+              academicYear={publishedAcademicYearFilter || currentAcademicYear}
+              initialTemplateId={previewingLedgerClass.templateId}
+              examName={previewingLedgerClass.examName}
+              onBack={() => setPreviewingLedgerClass(null)}
+            />
+          ) : (
+            <PublishedResultsView
+              exams={exams}
+              classes={classes}
+              academicYears={academicYears}
+              currentAcademicYear={currentAcademicYear}
+              publishedAcademicYearFilter={publishedAcademicYearFilter}
+              setPublishedAcademicYearFilter={setPublishedAcademicYearFilter}
+              publishedClassFilter={publishedClassFilter}
+              setPublishedClassFilter={setPublishedClassFilter}
+              printingLedgerClassId={printingLedgerClassId}
+              handlePrintTabularLedger={handlePrintTabularLedger}
+              loadingExams={loadingExams}
+              deleting={deleting}
+              handleDelete={handleDelete}
+              setEditForm={setEditForm}
+              setEditOpen={setEditOpen}
+              handleOpenViewResults={handleOpenViewResults}
+              formatDate={formatDate}
+              formatTime={formatTime}
+              getStatusBadge={getStatusBadge}
+              getExamTypeBadge={getExamTypeBadge}
+            />
+          )}
         </TabsContent>
       </Tabs>
 
@@ -561,7 +594,7 @@ export function AdminExams({ initialTab = 'exams' }: { initialTab?: string }) {
       {/* Hidden batch print container for react-to-print */}
       {ledgerData && (
         <div className="hidden">
-          <TabularLedgerPrint data={ledgerData} ref={printRef} />
+          <TabularLedgerPrint data={ledgerData} templateId={ledgerTemplateId} ref={printRef} />
         </div>
       )}
 

@@ -22,7 +22,7 @@ interface PublishedResultsViewProps {
   publishedClassFilter: string;
   setPublishedClassFilter: React.Dispatch<React.SetStateAction<string>>;
   printingLedgerClassId: string | null;
-  handlePrintTabularLedger: (classId: string, className: string, classSection: string) => Promise<void>;
+  handlePrintTabularLedger: (classId: string, className: string, classSection: string, templateId: string, examName?: string) => Promise<void>;
   loadingExams: boolean;
   deleting: boolean;
   handleDelete: (id: string) => Promise<void>;
@@ -193,23 +193,6 @@ export function PublishedResultsView({
                         </div>
                         
                         <div className="flex items-center gap-3">
-                          <Button 
-                            variant="outline" 
-                            size="sm" 
-                            disabled={printingLedgerClassId === c.id}
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handlePrintTabularLedger(c.id, c.name, c.section);
-                            }}
-                            className="h-8 border-emerald-200 hover:border-emerald-300 dark:border-emerald-900/50 hover:bg-emerald-50 dark:hover:bg-emerald-950/20 text-emerald-600 dark:text-emerald-400 gap-1.5 rounded-lg text-xs font-semibold px-2.5 shadow-sm transition-colors"
-                          >
-                            {printingLedgerClassId === c.id ? (
-                              <Loader2 className="h-3.5 w-3.5 animate-spin" />
-                            ) : (
-                              <Printer className="h-3.5 w-3.5" />
-                            )}
-                            <span className="hidden xs:inline">Print Tabular Sheet</span>
-                          </Button>
                           <div className={`p-1.5 rounded-full transition-all duration-300 ${isExpanded ? 'bg-emerald-50 dark:bg-emerald-950/50 text-emerald-600 dark:text-emerald-400' : 'bg-gray-50 dark:bg-zinc-900 text-muted-foreground'}`}>
                             <ChevronDown className={`h-4 w-4 transition-transform duration-300 ${isExpanded ? 'rotate-180' : ''}`} />
                           </div>
@@ -231,10 +214,21 @@ export function PublishedResultsView({
                                       {group.academicYear}
                                     </Badge>
                                   </div>
-                                  <div className="flex items-center gap-2">
+                                  <div className="flex items-center gap-3">
                                     <span className="text-xs text-muted-foreground font-medium">
                                       {group.exams.length} subject{group.exams.length !== 1 ? 's' : ''}
                                     </span>
+                                    <Button 
+                                      variant="outline" 
+                                      size="sm" 
+                                      onClick={() => {
+                                        handlePrintTabularLedger(c.id, c.name, c.section, 'classic', group.cycleName);
+                                      }}
+                                      className="h-7 border-emerald-200 hover:border-emerald-300 dark:border-emerald-900/50 hover:bg-emerald-50 dark:hover:bg-emerald-950/20 text-emerald-600 dark:text-emerald-400 gap-1.5 rounded-lg text-[11px] font-semibold px-2.5 shadow-sm transition-colors flex items-center justify-center"
+                                    >
+                                      <Printer className="h-3.5 w-3.5" />
+                                      <span>Print Sheet</span>
+                                    </Button>
                                   </div>
                                 </div>
                                 <div className="p-0">

@@ -11,7 +11,7 @@ import {
   FileText, ArrowLeft, BookOpen, Users, CalendarDays, Clock, Trophy, Save, 
   CheckCircle2, XCircle, AlertCircle, Loader2, School, ChevronRight
 } from 'lucide-react';
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { ExamRecord, StudentResultRow } from './types';
 
 interface ResultsViewProps {
@@ -24,7 +24,7 @@ interface ResultsViewProps {
   loadingStudents: boolean;
   savingResults: boolean;
   onBack: () => void;
-  onSelectExam: (exam: ExamRecord) => void;
+  onSelectExam: (exam: ExamRecord | null) => void;
   onUpdateMark: (studentId: string, marks: string) => void;
   onSave: () => void;
   onPublish: () => void;
@@ -60,6 +60,37 @@ export function ResultsView({
     // The exams prop is already filtered by the parent query
     return exams.filter(e => e.status !== 'cancelled' && e.status !== 'completed');
   }, [exams, resultsClassId]);
+
+  const [selectedExamGroup, setSelectedExamGroup] = useState<string>('');
+
+  // Sync selectedExamGroup with selectedExam
+  useEffect(() => {
+    if (selectedExam) {
+      const groupName = selectedExam.name.includes(' - ') ? selectedExam.name.split(' - ')[0] : selectedExam.name;
+      setSelectedExamGroup(groupName);
+    } else {
+      setSelectedExamGroup('');
+    }
+  }, [selectedExam]);
+
+  // Group active exams to get unique base names (e.g. "testing", "2022")
+  const examGroups = useMemo(() => {
+    const groups = new Set<string>();
+    filteredExams.forEach(e => {
+      const groupName = e.name.includes(' - ') ? e.name.split(' - ')[0] : e.name;
+      groups.add(groupName);
+    });
+    return Array.from(groups);
+  }, [filteredExams]);
+
+  // Filter subjects belonging to the selected exam group
+  const subjectsInGroup = useMemo(() => {
+    if (!selectedExamGroup) return [];
+    return filteredExams.filter(e => {
+      const groupName = e.name.includes(' - ') ? e.name.split(' - ')[0] : e.name;
+      return groupName === selectedExamGroup;
+    });
+  }, [filteredExams, selectedExamGroup]);
   
   const resultSummary = {
     total: resultRows.length,
@@ -82,12 +113,15 @@ export function ResultsView({
           </CardTitle>
         </CardHeader>
         <CardContent className="p-4 pt-0">
-          <div className="flex flex-col sm:flex-row items-center gap-4">
-            <div className="w-full sm:w-72">
+          <div className="flex flex-col lg:flex-row items-stretch lg:items-center gap-4">
+            
+            {/* Dropdown 1: Select Class */}
+            <div className="flex-1 min-w-[200px]">
+              <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider block mb-1">Class</label>
               <Select value={resultsClassId} onValueChange={onResultsClassChange}>
                 <SelectTrigger className="w-full h-10">
                   <div className="flex items-center gap-2">
-                    <School className="h-4 w-4 text-orange-500" />
+                    <School className="h-4 w-4 text-orange-500 shrink-0" />
                     <SelectValue placeholder="Choose a class..." />
                   </div>
                 </SelectTrigger>
@@ -99,27 +133,27 @@ export function ResultsView({
               </Select>
             </div>
 
-            <div className="w-full sm:w-80">
+            {/* Dropdown 2: Select Exam Group */}
+            <div className="flex-1 min-w-[200px]">
+              <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider block mb-1">Exam</label>
               <Select 
-                value={selectedExam?.id || ''} 
-                onValueChange={(id) => {
-                  const exam = exams.find(e => e.id === id);
-                  if (exam) onSelectExam(exam);
+                value={selectedExamGroup} 
+                onValueChange={(val) => {
+                  setSelectedExamGroup(val);
+                  onSelectExam(null); // Clear subject selection when changing exam group
                 }}
                 disabled={!resultsClassId}
               >
                 <SelectTrigger className={`w-full h-10 ${resultsClassId ? 'border-orange-200 dark:border-orange-900/50' : 'opacity-50'}`}>
                   <div className="flex items-center gap-2">
-                    <BookOpen className="h-4 w-4 text-emerald-500" />
-                    <SelectValue placeholder="Select Subject/Exam..." />
+                    <Trophy className="h-4 w-4 text-blue-500 shrink-0" />
+                    <SelectValue placeholder="Select Exam..." />
                   </div>
                 </SelectTrigger>
                 <SelectContent className="max-h-60">
-                  {filteredExams.length > 0 ? (
-                    filteredExams.map((e) => (
-                      <SelectItem key={e.id} value={e.id}>
-                        {e.name} ({e.subjectName})
-                      </SelectItem>
+                  {examGroups.length > 0 ? (
+                    examGroups.map((g) => (
+                      <SelectItem key={g} value={g}>{g}</SelectItem>
                     ))
                   ) : (
                     <SelectItem value="none" disabled>No active exams</SelectItem>
@@ -128,10 +162,43 @@ export function ResultsView({
               </Select>
             </div>
 
-            <Button variant="ghost" size="sm" className="text-muted-foreground ml-auto" onClick={onBack}>
-              <ArrowLeft className="h-4 w-4 mr-2" />
-              Exit Entry
-            </Button>
+            {/* Dropdown 3: Select Subject */}
+            <div className="flex-1 min-w-[200px]">
+              <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider block mb-1">Subject</label>
+              <Select 
+                value={selectedExam?.id || ''} 
+                onValueChange={(id) => {
+                  const exam = exams.find(e => e.id === id);
+                  if (exam) onSelectExam(exam);
+                }}
+                disabled={!selectedExamGroup}
+              >
+                <SelectTrigger className={`w-full h-10 ${selectedExamGroup ? 'border-emerald-200 dark:border-emerald-900/50' : 'opacity-50'}`}>
+                  <div className="flex items-center gap-2">
+                    <BookOpen className="h-4 w-4 text-emerald-500 shrink-0" />
+                    <SelectValue placeholder="Select Subject..." />
+                  </div>
+                </SelectTrigger>
+                <SelectContent className="max-h-60">
+                  {subjectsInGroup.length > 0 ? (
+                    subjectsInGroup.map((e) => (
+                      <SelectItem key={e.id} value={e.id}>
+                        {e.subjectName}
+                      </SelectItem>
+                    ))
+                  ) : (
+                    <SelectItem value="none" disabled>No subjects found</SelectItem>
+                  )}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="flex items-end self-end h-10 lg:ml-auto">
+              <Button variant="ghost" size="sm" className="text-muted-foreground" onClick={onBack}>
+                <ArrowLeft className="h-4 w-4 mr-2" />
+                Exit Entry
+              </Button>
+            </div>
           </div>
         </CardContent>
       </Card>
