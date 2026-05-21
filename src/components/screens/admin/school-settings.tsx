@@ -213,7 +213,7 @@ export function AdminSchoolSettings() {
             <button
               type="button"
               onClick={() => {
-                setWorkingDays(new Set(["monday", "tuesday", "wednesday", "thursday", "friday"]));
+                setWorkingDays(new Set<DayKey>(["monday", "tuesday", "wednesday", "thursday", "friday"]));
                 setHasChanges(true);
               }}
               className="text-emerald-600 dark:text-emerald-400 hover:underline font-medium"
@@ -224,7 +224,7 @@ export function AdminSchoolSettings() {
             <button
               type="button"
               onClick={() => {
-                setWorkingDays(new Set(["monday", "tuesday", "wednesday", "thursday", "friday", "saturday"]));
+                setWorkingDays(new Set<DayKey>(["monday", "tuesday", "wednesday", "thursday", "friday", "saturday"]));
                 setHasChanges(true);
               }}
               className="text-emerald-600 dark:text-emerald-400 hover:underline font-medium"
@@ -235,7 +235,7 @@ export function AdminSchoolSettings() {
             <button
               type="button"
               onClick={() => {
-                setWorkingDays(new Set(["sunday", "monday", "tuesday", "wednesday", "thursday"]));
+                setWorkingDays(new Set<DayKey>(["sunday", "monday", "tuesday", "wednesday", "thursday"]));
                 setHasChanges(true);
               }}
               className="text-emerald-600 dark:text-emerald-400 hover:underline font-medium"
