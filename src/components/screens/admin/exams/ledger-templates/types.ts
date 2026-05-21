@@ -1,4 +1,4 @@
-import { LedgerData } from "../tabulationLedgerPrinter";
+import type { LedgerData } from "../tabulationLedgerPrinter";
 
 export interface LedgerTemplateProps {
     data: LedgerData;
