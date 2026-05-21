@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useTheme } from "next-themes";
-import { useAppStore, type UserRole } from "@/store/use-app-store";
+import { useAppStore, STORAGE_KEYS, type UserRole } from "@/store/use-app-store";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -176,7 +176,7 @@ export function UserProfileScreen() {
     // Save to store and local storage
     useAppStore.setState({ currentUser: updatedUser });
     if (typeof window !== "undefined") {
-      localStorage.setItem("schoolsaas_user", JSON.stringify(updatedUser));
+      localStorage.setItem(STORAGE_KEYS.USER, JSON.stringify(updatedUser));
     }
     
     setIsEditOpen(false);
@@ -223,7 +223,7 @@ export function UserProfileScreen() {
             </Avatar>
             {/* Hover overlay */}
             <div className="absolute inset-0 bg-black/40 rounded-full flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200 border-4 border-transparent">
-              <Camera className="h-5 w-5 text-white animate-bounce" />
+              <Camera className="h-5 w-5 text-white transition-transform duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-110" />
               <span className="text-[9px] font-black text-white uppercase tracking-widest mt-1">Change</span>
             </div>
             <span className="absolute bottom-1 right-1 flex h-4 w-4">

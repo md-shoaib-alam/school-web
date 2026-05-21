@@ -162,9 +162,10 @@ export function StudentTimetable() {
     };
     
     DAYS.forEach(day => {
-      map[day] = timeSlots
-        .map((ts) => slotLookup[`${day}-${ts.start}`] || null)
-        .filter(Boolean) as TimetableSlot[];
+      map[day] = timeSlots.flatMap((ts) => {
+        const slot = slotLookup[`${day}-${ts.start}`];
+        return slot ? [slot] : [];
+      });
     });
     
     return map;

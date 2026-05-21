@@ -35,12 +35,10 @@ export function StudentClasses() {
   const fetchData = useCallback(async () => {
     setLoading(true);
     try {
-      const [studentsRes, subjectsRes] = await Promise.all([
-        apiFetch("/api/students"),
-        apiFetch("/api/subjects"),
+      const [studentsData, subjectsData] = await Promise.all([
+        apiFetch("/api/students").then((res) => res.json()),
+        apiFetch("/api/subjects").then((res) => res.json()),
       ]);
-      const studentsData = await studentsRes.json();
-      const subjectsData = await subjectsRes.json();
       
       setStudents(Array.isArray(studentsData?.items) ? studentsData.items : []);
       setSubjects(Array.isArray(subjectsData) ? subjectsData : []);

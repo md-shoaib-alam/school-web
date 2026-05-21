@@ -123,9 +123,10 @@ export function ParentTimetable() {
 
   const selectedDaySlots = useMemo(
     () =>
-      timeSlots
-        .map((ts) => slotLookup[`${selectedDay}-${ts.start}`] || null)
-        .filter(Boolean) as TimetableSlot[],
+      timeSlots.flatMap((ts) => {
+        const slot = slotLookup[`${selectedDay}-${ts.start}`];
+        return slot ? [slot] : [];
+      }),
     [timeSlots, selectedDay, slotLookup],
   );
 

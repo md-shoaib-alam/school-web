@@ -53,7 +53,7 @@ export function TabulationLedgerPreviewPage({
   examName,
   onBack
 }: TabulationLedgerPreviewPageProps) {
-  const [selectedTemplateId, setSelectedTemplateId] = useState<string>(initialTemplateId);
+  const [selectedTemplateId, setSelectedTemplateId] = useState<string>(() => initialTemplateId);
   const [state, setState] = useState<{
     loading: boolean;
     ledgerData: LedgerData | null;

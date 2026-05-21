@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useSyncExternalStore, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, redirect } from "next/navigation";
 import { useAppStore } from "@/store/use-app-store";
 import { apiFetch } from "@/lib/api";
 import {
@@ -69,40 +69,27 @@ export default function Home() {
     };
   }, [isLoggedIn, currentUser, userRole]);
 
-  // Unified Redirection Logic: Redirect to tenant-specific URL if logged in
-  useEffect(() => {
-    if (mounted && isLoggedIn && currentUser) {
-      const parts = window.location.pathname.split("/").filter(Boolean);
-      const isSuperAdmin = userRole === "super_admin";
-      const expectedPrefix =
-        userTenantSlug || userTenantId || currentTenantId;
-
-      // Only redirect if we are literally at the root "/"
-      if (parts.length === 0) {
-        if (!expectedPrefix && !isSuperAdmin) return;
-
-        const url = !expectedPrefix
-          ? `/${currentScreen}`
-          : currentScreen === "dashboard"
-            ? `/${expectedPrefix}`
-            : `/${expectedPrefix}/${currentScreen}`;
-
-        router.replace(url);
-      }
-    }
-  }, [
-    mounted,
-    isLoggedIn,
-    userRole,
-    userTenantSlug,
-    userTenantId,
-    currentTenantId,
-    currentScreen,
-    router,
-  ]);
-
   // Not mounted yet → render nothing (avoids hydration mismatch)
   if (!mounted) return null;
+
+  // Unified Redirection Logic: Redirect to tenant-specific URL if logged in
+  if (isLoggedIn && currentUser) {
+    const parts = window.location.pathname.split("/").filter(Boolean);
+    const isSuperAdmin = userRole === "super_admin";
+    const expectedPrefix =
+      userTenantSlug || userTenantId || currentTenantId;
+
+    // Only redirect if we are literally at the root "/"
+    if (parts.length === 0 && (expectedPrefix || isSuperAdmin)) {
+      const url = !expectedPrefix
+        ? `/${currentScreen}`
+        : currentScreen === "dashboard"
+          ? `/${expectedPrefix}`
+          : `/${expectedPrefix}/${currentScreen}`;
+
+      redirect(url);
+    }
+  }
 
   // Not logged in → show login
   if (!isLoggedIn) return <LoginScreen />;

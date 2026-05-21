@@ -6,18 +6,8 @@ import {
   CardDescription,
 } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-import {
-  BarChart,
-  Bar,
-  PieChart,
-  Pie,
-  Cell,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  ResponsiveContainer,
-  Tooltip as RTooltip,
-} from "recharts";
+import { useState, useEffect } from "react";
+import type * as RechartsTypes from "recharts";
 import {
   ChartContainer,
   ChartTooltip,
@@ -39,6 +29,12 @@ export function DistributionCharts({
   methodChartData,
   statusChartData,
 }: DistributionChartsProps) {
+  const [recharts, setRecharts] = useState<typeof import("recharts") | null>(null);
+
+  useEffect(() => {
+    import("recharts").then(setRecharts);
+  }, []);
+
   return (
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
       {/* Revenue by Plan */}
@@ -52,71 +48,76 @@ export function DistributionCharts({
           </CardDescription>
         </CardHeader>
         <CardContent>
-          {loading ? (
+          {loading || !recharts ? (
             <Skeleton className="h-[240px] w-full rounded-xl" />
           ) : (
             <ChartContainer
               config={planRevenueConfig}
               className="h-[240px] w-full"
             >
-              <BarChart
-                data={planChartData}
-                layout="vertical"
-                margin={{ top: 5, right: 30, left: 10, bottom: 5 }}
-              >
-                <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="#e2e8f0" />
-                <XAxis
-                  type="number"
-                  tickLine={false}
-                  axisLine={false}
-                  fontSize={10}
-                  tick={{ fill: "#94a3b8" }}
-                  tickFormatter={(v) =>
-                    `₹${v >= 1000 ? `${(v / 1000).toFixed(0)}k` : v}`
-                  }
-                />
-                <YAxis
-                  type="category"
-                  dataKey="plan"
-                  tickLine={false}
-                  axisLine={false}
-                  fontSize={12}
-                  width={70}
-                  tick={{ fill: "#374151" }}
-                />
-                <ChartTooltip
-                  content={
-                    <ChartTooltipContent
-                      formatter={(value, _name, item) => {
-                        const d = item.payload as any;
-                        return [
-                          `₹${d.revenue.toLocaleString()} (${d.count} subs)`,
-                          d.plan,
-                        ];
-                      }}
+              {(() => {
+                const { BarChart, Bar, Cell, XAxis, YAxis, CartesianGrid } = recharts;
+                return (
+                  <BarChart
+                    data={planChartData}
+                    layout="vertical"
+                    margin={{ top: 5, right: 30, left: 10, bottom: 5 }}
+                  >
+                    <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="#e2e8f0" />
+                    <XAxis
+                      type="number"
+                      tickLine={false}
+                      axisLine={false}
+                      fontSize={10}
+                      tick={{ fill: "#94a3b8" }}
+                      tickFormatter={(v) =>
+                        `₹${v >= 1000 ? `${(v / 1000).toFixed(0)}k` : v}`
+                      }
                     />
-                  }
-                />
-                <Bar
-                  dataKey="revenue"
-                  radius={[0, 6, 6, 0]}
-                  maxBarSize={28}
-                >
-                  {planChartData.map((entry, i) => {
-                    const planColors: Record<string, string> = {
-                      Basic: "#94a3b8",
-                      Standard: "#f59e0b",
-                      Premium: "#10b981",
-                    };
-                    return (
-                      <Cell
-                        key={i}
-                        fill={planColors[entry.plan] || "#6366f1"}
-                      />
-                    );
-                  })}
-                </Bar>
-              </BarChart>
+                    <YAxis
+                      type="category"
+                      dataKey="plan"
+                      tickLine={false}
+                      axisLine={false}
+                      fontSize={12}
+                      width={70}
+                      tick={{ fill: "#374151" }}
+                    />
+                    <ChartTooltip
+                      content={
+                        <ChartTooltipContent
+                          formatter={(value, _name, item) => {
+                            const d = item.payload as any;
+                            return [
+                              `₹${d.revenue.toLocaleString()} (${d.count} subs)`,
+                              d.plan,
+                            ];
+                          }}
+                        />
+                      }
+                    />
+                    <Bar
+                      dataKey="revenue"
+                      radius={[0, 6, 6, 0]}
+                      maxBarSize={28}
+                    >
+                      {planChartData.map((entry, i) => {
+                        const planColors: Record<string, string> = {
+                          Basic: "#94a3b8",
+                          Standard: "#f59e0b",
+                          Premium: "#10b981",
+                        };
+                        return (
+                          <Cell
+                            key={i}
+                            fill={planColors[entry.plan] || "#6366f1"}
+                          />
+                        );
+                      })}
+                    </Bar>
+                  </BarChart>
+                );
+              })()}
             </ChartContainer>
           )}
         </CardContent>
@@ -133,33 +134,38 @@ export function DistributionCharts({
           </CardDescription>
         </CardHeader>
         <CardContent>
-          {loading ? (
+          {loading || !recharts ? (
             <Skeleton className="h-[240px] w-full rounded-xl" />
           ) : (
             <div className="h-[240px] w-full">
-              <ResponsiveContainer width="100%" height="100%">
-                <PieChart>
-                  <Pie
-                    data={methodChartData}
-                    cx="50%"
-                    cy="50%"
-                    innerRadius={55}
-                    outerRadius={85}
-                    paddingAngle={5}
-                    dataKey="revenue"
-                    nameKey="method"
-                    stroke="none"
-                  >
-                    {methodChartData.map((entry, index) => (
-                      <Cell key={index} fill={entry.fill} />
-                    ))}
-                  </Pie>
-                  <RTooltip
-                    formatter={(value: number) => `₹${value.toLocaleString()}`}
-                    contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}
-                  />
-                </PieChart>
-              </ResponsiveContainer>
+              {(() => {
+                const { ResponsiveContainer, PieChart, Pie, Cell, Tooltip: RTooltip } = recharts;
+                return (
+                  <ResponsiveContainer width="100%" height="100%">
+                    <PieChart>
+                      <Pie
+                        data={methodChartData}
+                        cx="50%"
+                        cy="50%"
+                        innerRadius={55}
+                        outerRadius={85}
+                        paddingAngle={5}
+                        dataKey="revenue"
+                        nameKey="method"
+                        stroke="none"
+                      >
+                        {methodChartData.map((entry, index) => (
+                          <Cell key={index} fill={entry.fill} />
+                        ))}
+                      </Pie>
+                      <RTooltip
+                        formatter={(value: number) => `₹${value.toLocaleString()}`}
+                        contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}
+                      />
+                    </PieChart>
+                  </ResponsiveContainer>
+                );
+              })()}
             </div>
           )}
         </CardContent>
@@ -176,33 +182,38 @@ export function DistributionCharts({
           </CardDescription>
         </CardHeader>
         <CardContent>
-          {loading ? (
+          {loading || !recharts ? (
             <Skeleton className="h-[240px] w-full rounded-xl" />
           ) : (
             <div className="h-[240px] w-full">
-              <ResponsiveContainer width="100%" height="100%">
-                <PieChart>
-                  <Pie
-                    data={statusChartData}
-                    cx="50%"
-                    cy="50%"
-                    innerRadius={55}
-                    outerRadius={85}
-                    paddingAngle={5}
-                    dataKey="count"
-                    nameKey="status"
-                    stroke="none"
-                  >
-                    {statusChartData.map((entry, index) => (
-                      <Cell key={index} fill={entry.fill} />
-                    ))}
-                  </Pie>
-                  <RTooltip
-                    formatter={(value: number) => `${value} subscriptions`}
-                    contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}
-                  />
-                </PieChart>
-              </ResponsiveContainer>
+              {(() => {
+                const { ResponsiveContainer, PieChart, Pie, Cell, Tooltip: RTooltip } = recharts;
+                return (
+                  <ResponsiveContainer width="100%" height="100%">
+                    <PieChart>
+                      <Pie
+                        data={statusChartData}
+                        cx="50%"
+                        cy="50%"
+                        innerRadius={55}
+                        outerRadius={85}
+                        paddingAngle={5}
+                        dataKey="count"
+                        nameKey="status"
+                        stroke="none"
+                      >
+                        {statusChartData.map((entry, index) => (
+                          <Cell key={index} fill={entry.fill} />
+                        ))}
+                      </Pie>
+                      <RTooltip
+                        formatter={(value: number) => `${value} subscriptions`}
+                        contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}
+                      />
+                    </PieChart>
+                  </ResponsiveContainer>
+                );
+              })()}
             </div>
           )}
         </CardContent>

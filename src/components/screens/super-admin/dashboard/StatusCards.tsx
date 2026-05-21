@@ -21,7 +21,8 @@ import {
   ClipboardList, 
   ArrowUpRight 
 } from "lucide-react";
-import { PieChart, Pie, Cell, Legend } from "recharts";
+import { useState, useEffect } from "react";
+import type * as RechartsTypes from "recharts";
 import {
   ChartContainer,
   ChartTooltip,
@@ -36,6 +37,12 @@ interface StatusCardsProps {
 }
 
 export function StatusCards({ loading, data, onNavigate }: StatusCardsProps) {
+  const [recharts, setRecharts] = useState<typeof import("recharts") | null>(null);
+
+  useEffect(() => {
+    import("recharts").then(setRecharts);
+  }, []);
+
   const userDistributionData = data
     ? [
         { name: "Students", value: data.users.students, fill: USER_CHART_COLORS[0] },
@@ -114,29 +121,34 @@ export function StatusCards({ loading, data, onNavigate }: StatusCardsProps) {
           <CardDescription className="text-xs">Breakdown by role across all schools</CardDescription>
         </CardHeader>
         <CardContent>
-          {loading ? (
+          {loading || !recharts ? (
             <Skeleton className="h-[280px] w-full rounded-2xl" />
           ) : (
             <div className="space-y-6">
               <ChartContainer config={userChartConfig} className="h-[220px] w-full">
-                <PieChart>
-                  <Pie
-                    data={userDistributionData}
-                    cx="50%"
-                    cy="50%"
-                    innerRadius={60}
-                    outerRadius={90}
-                    paddingAngle={5}
-                    dataKey="value"
-                    nameKey="name"
-                    stroke="none"
-                  >
-                    {userDistributionData.map((_, index) => (
-                      <Cell key={`cell-${index}`} fill={USER_CHART_COLORS[index % USER_CHART_COLORS.length]} />
-                    ))}
-                  </Pie>
-                  <ChartTooltip content={<ChartTooltipContent />} />
-                </PieChart>
+                {(() => {
+                  const { PieChart, Pie, Cell } = recharts;
+                  return (
+                    <PieChart>
+                      <Pie
+                        data={userDistributionData}
+                        cx="50%"
+                        cy="50%"
+                        innerRadius={60}
+                        outerRadius={90}
+                        paddingAngle={5}
+                        dataKey="value"
+                        nameKey="name"
+                        stroke="none"
+                      >
+                        {userDistributionData.map((_, index) => (
+                          <Cell key={`cell-${index}`} fill={USER_CHART_COLORS[index % USER_CHART_COLORS.length]} />
+                        ))}
+                      </Pie>
+                      <ChartTooltip content={<ChartTooltipContent />} />
+                    </PieChart>
+                  );
+                })()}
               </ChartContainer>
               <div className="grid grid-cols-2 gap-3">
                 {userDistributionData.map((item) => (

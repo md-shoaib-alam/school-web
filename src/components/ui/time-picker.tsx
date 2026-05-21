@@ -111,7 +111,7 @@ export function TimePicker({ value, onChange, className }: TimePickerProps) {
             className="w-full h-8 text-[11px] font-bold" 
             onClick={() => setOpen(false)}
           >
-            Done
+            Confirm time
           </Button>
         </div>
       </PopoverContent>

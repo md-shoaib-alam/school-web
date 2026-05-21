@@ -12,9 +12,14 @@ function getToken(): string | null {
   return localStorage.getItem('school_token');
 }
 
+function getTenantId(): string | null {
+  if (typeof window === 'undefined') return null;
+  return localStorage.getItem('schoolsaas_tenant_id');
+}
+
 function authHeaders(isFormData: boolean = false): Record<string, string> {
   const token = getToken();
-  const tenantId = typeof window !== 'undefined' ? localStorage.getItem('schoolsaas_tenant_id') : null;
+  const tenantId = getTenantId();
   const headers: Record<string, string> = {
     ...(token ? { Authorization: `Bearer ${token}` } : {}),
     ...(tenantId ? { 'x-tenant-id': tenantId } : {}),
@@ -138,7 +143,7 @@ export async function apiFetch(path: string, init?: RequestInit): Promise<Respon
   const url = `${normalizedBase}${cleanPath}`;
 
   const token = getToken();
-  const tenantId = typeof window !== 'undefined' ? localStorage.getItem('schoolsaas_tenant_id') : null;
+  const tenantId = getTenantId();
   const headers: Record<string, string> = {
     ...(token ? { Authorization: `Bearer ${token}` } : {}),
     ...(tenantId ? { 'x-tenant-id': tenantId } : {}),

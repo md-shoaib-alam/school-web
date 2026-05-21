@@ -1,7 +1,7 @@
 import { AppUser, UserRole } from './types';
 
 export const STORAGE_KEYS = {
-  USER: 'schoolsaas_user',
+  USER: 'schoolsaas_user:v1',
   THEME: 'schoolsaas-theme',
   LAST_SCREEN: 'schoolsaas_last_screen',
   SIDEBAR_STATE: 'schoolsaas_sidebar',

@@ -85,7 +85,7 @@ export function AdminExams({ initialTab = 'exams' }: { initialTab?: string }) {
   const [classFilter, setClassFilter] = useState('all');
   const [publishedAcademicYearFilter, setPublishedAcademicYearFilter] = useState(currentAcademicYear);
   const [publishedClassFilter, setPublishedClassFilter] = useState('all');
-  const [activeTab, setActiveTab] = useState(initialTab);
+  const [activeTab, setActiveTab] = useState(() => initialTab);
 
   // Dialog States
   const [addOpen, setAddOpen] = useState(false);

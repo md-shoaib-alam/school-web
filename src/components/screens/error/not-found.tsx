@@ -57,7 +57,7 @@ export function NotFoundScreen() {
       </div>
 
       {/* Inline styles for modern micro-animations */}
-      <style dangerouslySetInnerHTML={{ __html: `
+      <style>{`
         @keyframes fade-down {
           from { opacity: 0; transform: translateY(-20px); }
           to { opacity: 1; transform: translateY(0); }
@@ -70,7 +70,7 @@ export function NotFoundScreen() {
           from { opacity: 0; transform: translateY(20px); }
           to { opacity: 1; transform: translateY(0); }
         }
-      `}} />
+      `}</style>
     </div>
   );
 }

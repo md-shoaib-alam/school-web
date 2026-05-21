@@ -39,15 +39,7 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart";
-import {
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  Cell,
-  PieChart,
-  Pie,
-} from "recharts";
+import type * as RechartsTypes from "recharts";
 import {
   TrendingUp,
   Award,
@@ -75,6 +67,12 @@ type AssessmentGrade = {
 
 export function StudentGrades({ initialTab }: { initialTab?: "exams" | "assessments" }) {
   const { currentUser } = useAppStore();
+  const [recharts, setRecharts] = useState<typeof import("recharts") | null>(null);
+
+  useEffect(() => {
+    import("recharts").then(setRecharts);
+  }, []);
+
   const params = useParams();
   const router = useRouter();
   const slug = typeof params?.slug === 'string' ? params.slug : '';
@@ -109,12 +107,10 @@ export function StudentGrades({ initialTab }: { initialTab?: "exams" | "assessme
       setStudents([targetStudent]);
 
       if (targetStudent?.id) {
-        const [gradesRes, assessRes] = await Promise.all([
-          apiFetch(`/api/grades?studentId=${targetStudent.id}`),
-          apiFetch(`/api/assessments/student-grades?studentId=${targetStudent.id}`)
+        const [gradesData, assessData] = await Promise.all([
+          apiFetch(`/api/grades?studentId=${targetStudent.id}`).then((res) => res.json()),
+          apiFetch(`/api/assessments/student-grades?studentId=${targetStudent.id}`).then((res) => res.json())
         ]);
-        const gradesData = await gradesRes.json();
-        const assessData = await assessRes.json();
         setGrades(Array.isArray(gradesData) ? gradesData : []);
         setAssessmentGrades(Array.isArray(assessData) ? assessData : []);
       }
@@ -367,31 +363,40 @@ export function StudentGrades({ initialTab }: { initialTab?: "exams" | "assessme
               </CardHeader>
               <CardContent>
                 {latestExam.data.length > 0 ? (
-                  <ChartContainer config={chartConfig} className="h-[260px] w-full">
-                    <BarChart
-                      data={latestExam.data}
-                      layout="vertical"
-                      margin={{ left: 10, right: 10 }}
-                    >
-                      <XAxis
-                        type="number"
-                        domain={[0, 100]}
-                        tick={{ fontSize: 11 }}
-                      />
-                      <YAxis
-                        type="category"
-                        dataKey="subject"
-                        width={90}
-                        tick={{ fontSize: 11 }}
-                      />
-                      <ChartTooltip content={<ChartTooltipContent />} />
-                      <Bar dataKey="marks" radius={[0, 6, 6, 0]} barSize={22}>
-                        {latestExam.data.map((entry, index) => (
-                          <Cell key={index} fill={entry.fill} />
-                        ))}
-                      </Bar>
-                    </BarChart>
-                  </ChartContainer>
+                  !recharts ? (
+                    <Skeleton className="h-[260px] w-full" />
+                  ) : (
+                    <ChartContainer config={chartConfig} className="h-[260px] w-full">
+                      {(() => {
+                        const { BarChart, Bar, XAxis, YAxis, Cell } = recharts;
+                        return (
+                          <BarChart
+                            data={latestExam.data}
+                            layout="vertical"
+                            margin={{ left: 10, right: 10 }}
+                          >
+                            <XAxis
+                              type="number"
+                              domain={[0, 100]}
+                              tick={{ fontSize: 11 }}
+                            />
+                            <YAxis
+                              type="category"
+                              dataKey="subject"
+                              width={90}
+                              tick={{ fontSize: 11 }}
+                            />
+                            <ChartTooltip content={<ChartTooltipContent />} />
+                            <Bar dataKey="marks" radius={[0, 6, 6, 0]} barSize={22}>
+                              {latestExam.data.map((entry, index) => (
+                                <Cell key={index} fill={entry.fill} />
+                              ))}
+                            </Bar>
+                          </BarChart>
+                        );
+                      })()}
+                    </ChartContainer>
+                  )
                 ) : (
                   <div className="h-[260px] flex items-center justify-center text-gray-400 dark:text-gray-500 border-2 border-dashed rounded-xl border-gray-100 dark:border-zinc-800">
                     <p className="text-sm">No subject chart data available</p>
@@ -413,29 +418,38 @@ export function StudentGrades({ initialTab }: { initialTab?: "exams" | "assessme
               <CardContent>
                 {pieData.length > 0 ? (
                   <div className="flex items-center gap-6">
-                    <ChartContainer
-                      config={chartConfig}
-                      className="h-[200px] w-[200px]"
-                    >
-                      <PieChart>
-                        <ChartTooltip
-                          content={<ChartTooltipContent nameKey="name" />}
-                        />
-                        <Pie
-                          data={pieData}
-                          cx="50%"
-                          cy="50%"
-                          innerRadius={50}
-                          outerRadius={80}
-                          paddingAngle={3}
-                          dataKey="value"
-                        >
-                          {pieData.map((entry, index) => (
-                            <Cell key={index} fill={entry.fill} stroke="none" />
-                          ))}
-                        </Pie>
-                      </PieChart>
-                    </ChartContainer>
+                    {!recharts ? (
+                      <Skeleton className="h-[200px] w-[200px]" />
+                    ) : (
+                      <ChartContainer
+                        config={chartConfig}
+                        className="h-[200px] w-[200px]"
+                      >
+                        {(() => {
+                          const { PieChart, Pie, Cell } = recharts;
+                          return (
+                            <PieChart>
+                              <ChartTooltip
+                                content={<ChartTooltipContent nameKey="name" />}
+                              />
+                              <Pie
+                                data={pieData}
+                                cx="50%"
+                                cy="50%"
+                                innerRadius={50}
+                                outerRadius={80}
+                                paddingAngle={3}
+                                dataKey="value"
+                              >
+                                {pieData.map((entry, index) => (
+                                  <Cell key={index} fill={entry.fill} stroke="none" />
+                                ))}
+                              </Pie>
+                            </PieChart>
+                          );
+                        })()}
+                      </ChartContainer>
+                    )}
                     <div className="flex flex-col gap-2">
                       {gradeDistribution.map((g) => (
                         <div
@@ -643,31 +657,40 @@ export function StudentGrades({ initialTab }: { initialTab?: "exams" | "assessme
               </CardHeader>
               <CardContent>
                 {latestAssessmentChartData.length > 0 ? (
-                  <ChartContainer config={chartConfig} className="h-[260px] w-full">
-                    <BarChart
-                      data={latestAssessmentChartData}
-                      layout="vertical"
-                      margin={{ left: 10, right: 10 }}
-                    >
-                      <XAxis
-                        type="number"
-                        domain={[0, 100]}
-                        tick={{ fontSize: 11 }}
-                      />
-                      <YAxis
-                        type="category"
-                        dataKey="subject"
-                        width={90}
-                        tick={{ fontSize: 11 }}
-                      />
-                      <ChartTooltip content={<ChartTooltipContent />} />
-                      <Bar dataKey="marks" radius={[0, 6, 6, 0]} barSize={22}>
-                        {latestAssessmentChartData.map((entry, index) => (
-                          <Cell key={index} fill={entry.fill} />
-                        ))}
-                      </Bar>
-                    </BarChart>
-                  </ChartContainer>
+                  !recharts ? (
+                    <Skeleton className="h-[260px] w-full" />
+                  ) : (
+                    <ChartContainer config={chartConfig} className="h-[260px] w-full">
+                      {(() => {
+                        const { BarChart, Bar, XAxis, YAxis, Cell } = recharts;
+                        return (
+                          <BarChart
+                            data={latestAssessmentChartData}
+                            layout="vertical"
+                            margin={{ left: 10, right: 10 }}
+                          >
+                            <XAxis
+                              type="number"
+                              domain={[0, 100]}
+                              tick={{ fontSize: 11 }}
+                            />
+                            <YAxis
+                              type="category"
+                              dataKey="subject"
+                              width={90}
+                              tick={{ fontSize: 11 }}
+                            />
+                            <ChartTooltip content={<ChartTooltipContent />} />
+                            <Bar dataKey="marks" radius={[0, 6, 6, 0]} barSize={22}>
+                              {latestAssessmentChartData.map((entry, index) => (
+                                <Cell key={index} fill={entry.fill} />
+                              ))}
+                            </Bar>
+                          </BarChart>
+                        );
+                      })()}
+                    </ChartContainer>
+                  )
                 ) : (
                   <div className="h-[260px] flex items-center justify-center text-gray-400 dark:text-gray-500 border-2 border-dashed rounded-xl border-gray-100 dark:border-zinc-800">
                     <p className="text-sm">No continuous assessment data available</p>

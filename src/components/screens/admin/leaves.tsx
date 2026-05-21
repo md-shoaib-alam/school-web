@@ -72,7 +72,7 @@ export function AdminLeaves({ initialTab = 'teacher' }: { initialTab?: string })
 // ── Admin View ──
 
 function AdminManagerView({ initialTab }: { initialTab: string }) {
-  const [activeTab, setActiveTab] = useState(initialTab);
+  const activeTab = initialTab;
   const [leaves, setLeaves] = useState<LeaveRequest[]>([]);
   const [loading, setLoading] = useState(true);
   const [statusFilter, setStatusFilter] = useState('all');

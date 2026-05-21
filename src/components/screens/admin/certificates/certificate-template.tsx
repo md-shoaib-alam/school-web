@@ -33,10 +33,10 @@ export function CertificateTemplate({ cert, formatDate }: CertificateTemplatePro
       <div className="relative cert-frame flex flex-col border-4 border-double border-amber-800 rounded-lg p-8 sm:p-12 bg-white mx-auto dark:bg-white dark:text-gray-900 min-h-[250mm]">
         
         {/* Decorative Corners */}
-        <div className="absolute top-2 left-2 w-12 h-12 border-t-4 border-l-4 border-amber-800 rounded-tl-md" />
-        <div className="absolute top-2 right-2 w-12 h-12 border-t-4 border-r-4 border-amber-800 rounded-tr-md" />
-        <div className="absolute bottom-2 left-2 w-12 h-12 border-b-4 border-l-4 border-amber-800 rounded-bl-md" />
-        <div className="absolute bottom-2 right-2 w-12 h-12 border-b-4 border-r-4 border-amber-800 rounded-br-md" />
+        <div className="absolute top-2 left-2 w-12 h-12 border-t-[3px] border-l-[3px] border-amber-800 rounded-tl-md" />
+        <div className="absolute top-2 right-2 w-12 h-12 border-t-[3px] border-r-[3px] border-amber-800 rounded-tr-md" />
+        <div className="absolute bottom-2 left-2 w-12 h-12 border-b-[3px] border-l-[3px] border-amber-800 rounded-bl-md" />
+        <div className="absolute bottom-2 right-2 w-12 h-12 border-b-[3px] border-r-[3px] border-amber-800 rounded-br-md" />
 
         {/* School Header */}
         <div className="text-center space-y-3 mb-10">

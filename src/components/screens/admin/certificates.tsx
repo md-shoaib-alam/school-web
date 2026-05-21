@@ -139,7 +139,7 @@ export function AdminCertificates() {
 
   return (
     <div className="space-y-6">
-      <style dangerouslySetInnerHTML={{ __html: `
+      <style>{`
         @media print {
           @page { size: A4 portrait; margin: 0; }
           body { background: white !important; }
@@ -153,7 +153,7 @@ export function AdminCertificates() {
             print-color-adjust: exact;
           }
         }
-      `}} />
+      `}</style>
 
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 no-print">
         <div className="flex-1 min-w-0">

@@ -18,7 +18,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid } from "recharts";
+import type * as RechartsTypes from "recharts";
 import {
   ChartContainer,
   ChartTooltip,
@@ -30,9 +30,14 @@ import { SubjectAverage, gradeChartConfig } from "./types";
 import { ChartSkeleton, TableSkeleton } from "./SummaryComponents";
 
 export function AcademicReport() {
+  const [recharts, setRecharts] = useState<typeof import("recharts") | null>(null);
   const [grades, setGrades] = useState<GradeRecord[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    import("recharts").then(setRecharts);
+  }, []);
 
   useEffect(() => {
     async function fetchGrades() {
@@ -91,10 +96,11 @@ export function AcademicReport() {
         averageMarks: Math.round(data.totalMarks / data.count),
         maxMarks: Math.round(data.totalMax / data.count),
         studentCount: data.count,
-        highestGrade:
-          data.grades.sort(
-            (a, b) => (gradeRank[b] ?? 0) - (gradeRank[a] ?? 0),
-          )[0] || "N/A",
+        highestGrade: data.grades.length > 0
+          ? data.grades.reduce((highest, current) =>
+              (gradeRank[current] ?? 0) > (gradeRank[highest] ?? 0) ? current : highest
+            )
+          : "N/A",
       }))
       .sort((a, b) => b.averageMarks - a.averageMarks);
   }, [grades]);
@@ -137,7 +143,7 @@ export function AcademicReport() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          {loading ? (
+          {loading || !recharts ? (
             <ChartSkeleton />
           ) : grades.length === 0 ? (
             <div className="text-center py-12 text-muted-foreground">
@@ -149,28 +155,33 @@ export function AcademicReport() {
               config={gradeChartConfig}
               className="h-[300px] w-full"
             >
-              <BarChart data={gradeDistribution}>
-                <CartesianGrid strokeDasharray="3 3" vertical={false} />
-                <XAxis
-                  dataKey="grade"
-                  tickLine={false}
-                  axisLine={false}
-                  fontSize={12}
-                />
-                <YAxis
-                  tickLine={false}
-                  axisLine={false}
-                  fontSize={12}
-                  allowDecimals={false}
-                />
-                <ChartTooltip content={<ChartTooltipContent />} />
-                <Bar
-                  dataKey="count"
-                  fill="var(--color-count)"
-                  radius={[6, 6, 0, 0]}
-                  maxBarSize={52}
-                />
-              </BarChart>
+              {(() => {
+                const { BarChart, Bar, XAxis, YAxis, CartesianGrid } = recharts;
+                return (
+                  <BarChart data={gradeDistribution}>
+                    <CartesianGrid strokeDasharray="3 3" vertical={false} />
+                    <XAxis
+                      dataKey="grade"
+                      tickLine={false}
+                      axisLine={false}
+                      fontSize={12}
+                    />
+                    <YAxis
+                      tickLine={false}
+                      axisLine={false}
+                      fontSize={12}
+                      allowDecimals={false}
+                    />
+                    <ChartTooltip content={<ChartTooltipContent />} />
+                    <Bar
+                      dataKey="count"
+                      fill="var(--color-count)"
+                      radius={[6, 6, 0, 0]}
+                      maxBarSize={52}
+                    />
+                  </BarChart>
+                );
+              })()}
             </ChartContainer>
           )}
         </CardContent>

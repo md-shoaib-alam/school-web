@@ -9,8 +9,9 @@ export default function JsonLd() {
         <script
           key={index}
           type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
-        />
+        >
+          {JSON.stringify(schema)}
+        </script>
       ))}
     </>
   );

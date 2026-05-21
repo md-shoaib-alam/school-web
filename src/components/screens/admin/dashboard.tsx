@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Skeleton as BoneyardSkeleton } from "boneyard-js/react";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -24,19 +24,7 @@ import {
   BarChart3,
   Activity,
 } from "lucide-react";
-import {
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
-  PieChart,
-  Pie,
-  Cell,
-  Legend,
-} from "recharts";
+import type * as RechartsTypes from "recharts";
 import {
   ChartContainer,
   ChartTooltip,
@@ -99,6 +87,12 @@ function StatCardSkeleton() {
 }
 
 export function AdminDashboard() {
+  const [recharts, setRecharts] = useState<typeof import("recharts") | null>(null);
+
+  useEffect(() => {
+    import("recharts").then(setRecharts);
+  }, []);
+
   const { 
     currentUser, 
     currentTenantId, 
@@ -346,18 +340,23 @@ export function AdminDashboard() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            {attendance.isLoading && !attendance.data ? (
+            {attendance.isLoading || !recharts ? (
               <Skeleton className="h-[280px] w-full" />
             ) : (
-              <ChartContainer config={attendanceChartConfig} className="h-[280px] w-full">
-                <BarChart data={attendance.data ?? []}>
-                  <CartesianGrid strokeDasharray="3 3" vertical={false} />
-                  <XAxis dataKey="month" tickLine={false} axisLine={false} fontSize={12} />
-                  <YAxis domain={[0, 100]} tickLine={false} axisLine={false} fontSize={12} unit="%" />
-                  <ChartTooltip content={<ChartTooltipContent />} />
-                  <Bar dataKey="rate" fill="var(--color-rate)" radius={[6, 6, 0, 0]} maxBarSize={48} />
-                </BarChart>
-              </ChartContainer>
+              (() => {
+                const { BarChart, Bar, XAxis, YAxis, CartesianGrid } = recharts;
+                return (
+                  <ChartContainer config={attendanceChartConfig} className="h-[280px] w-full">
+                    <BarChart data={attendance.data ?? []}>
+                      <CartesianGrid strokeDasharray="3 3" vertical={false} />
+                      <XAxis dataKey="month" tickLine={false} axisLine={false} fontSize={12} />
+                      <YAxis domain={[0, 100]} tickLine={false} axisLine={false} fontSize={12} unit="%" />
+                      <ChartTooltip content={<ChartTooltipContent />} />
+                      <Bar dataKey="rate" fill="var(--color-rate)" radius={[6, 6, 0, 0]} maxBarSize={48} />
+                    </BarChart>
+                  </ChartContainer>
+                );
+              })()
             )}
           </CardContent>
         </Card>
@@ -370,25 +369,30 @@ export function AdminDashboard() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            {academic.isLoading && !academic.data ? (
+            {academic.isLoading || !recharts ? (
               <Skeleton className="h-[300px] w-full" />
             ) : (
-              <ChartContainer config={pieChartConfig} className="h-[300px] w-full">
-                <PieChart>
-                  <Pie
-                    data={academic.data?.classDistribution ?? []}
-                    cx="50%" cy="45%" innerRadius={50} outerRadius={80} paddingAngle={2}
-                    dataKey="students" nameKey="name"
-                    label={({ name, percent }) => `${name.split("-")[0]} ${(percent * 100).toFixed(0)}%`}
-                    labelLine={false} fontSize={10}
-                  >
-                    {(academic.data?.classDistribution ?? []).map((_, i) => (
-                      <Cell key={i} fill={COLORS[i % COLORS.length]} />
-                    ))}
-                  </Pie>
-                  <ChartTooltip content={<ChartTooltipContent />} />
-                </PieChart>
-              </ChartContainer>
+              (() => {
+                const { PieChart, Pie, Cell } = recharts;
+                return (
+                  <ChartContainer config={pieChartConfig} className="h-[300px] w-full">
+                    <PieChart>
+                      <Pie
+                        data={academic.data?.classDistribution ?? []}
+                        cx="50%" cy="45%" innerRadius={50} outerRadius={80} paddingAngle={2}
+                        dataKey="students" nameKey="name"
+                        label={({ name, percent }) => `${name.split("-")[0]} ${(percent * 100).toFixed(0)}%`}
+                        labelLine={false} fontSize={10}
+                      >
+                        {(academic.data?.classDistribution ?? []).map((_, i) => (
+                          <Cell key={i} fill={COLORS[i % COLORS.length]} />
+                        ))}
+                      </Pie>
+                      <ChartTooltip content={<ChartTooltipContent />} />
+                    </PieChart>
+                  </ChartContainer>
+                );
+              })()
             )}
           </CardContent>
         </Card>
@@ -404,19 +408,24 @@ export function AdminDashboard() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            {financial.isLoading ? (
+            {financial.isLoading || !recharts ? (
               <Skeleton className="h-[280px] w-full" />
             ) : (
-              <ChartContainer config={feeChartConfig} className="h-[280px] w-full">
-                <BarChart data={financial.data?.feeByType ?? []} layout="vertical">
-                  <CartesianGrid strokeDasharray="3 3" horizontal={false} />
-                  <XAxis type="number" tickLine={false} axisLine={false} fontSize={12} tickFormatter={(v) => `₹${(v / 1000).toFixed(0)}k`} />
-                  <YAxis type="category" dataKey="type" tickLine={false} axisLine={false} fontSize={12} width={70} tickFormatter={(v) => v.charAt(0).toUpperCase() + v.slice(1)} />
-                  <ChartTooltip content={<ChartTooltipContent />} />
-                  <Bar dataKey="collected" fill="var(--color-collected)" radius={[0, 4, 4, 0]} maxBarSize={20} />
-                  <Bar dataKey="pending" fill="var(--color-pending)" radius={[0, 4, 4, 0]} maxBarSize={20} />
-                </BarChart>
-              </ChartContainer>
+              (() => {
+                const { BarChart, Bar, XAxis, YAxis, CartesianGrid } = recharts;
+                return (
+                  <ChartContainer config={feeChartConfig} className="h-[280px] w-full">
+                    <BarChart data={financial.data?.feeByType ?? []} layout="vertical">
+                      <CartesianGrid strokeDasharray="3 3" horizontal={false} />
+                      <XAxis type="number" tickLine={false} axisLine={false} fontSize={12} tickFormatter={(v) => `₹${(v / 1000).toFixed(0)}k`} />
+                      <YAxis type="category" dataKey="type" tickLine={false} axisLine={false} fontSize={12} width={70} tickFormatter={(v) => v.charAt(0).toUpperCase() + v.slice(1)} />
+                      <ChartTooltip content={<ChartTooltipContent />} />
+                      <Bar dataKey="collected" fill="var(--color-collected)" radius={[0, 4, 4, 0]} maxBarSize={20} />
+                      <Bar dataKey="pending" fill="var(--color-pending)" radius={[0, 4, 4, 0]} maxBarSize={20} />
+                    </BarChart>
+                  </ChartContainer>
+                );
+              })()
             )}
           </CardContent>
         </Card>

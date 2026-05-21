@@ -7,14 +7,8 @@ import {
 } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Progress } from "@/components/ui/progress";
-import {
-  BarChart,
-  Bar,
-  Cell,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-} from "recharts";
+import { useState, useEffect } from "react";
+import type * as RechartsTypes from "recharts";
 import {
   ChartContainer,
   ChartTooltip,
@@ -50,6 +44,12 @@ export function UsageCharts({
   activeUsers,
   platformData,
 }: UsageChartsProps) {
+  const [recharts, setRecharts] = useState<typeof import("recharts") | null>(null);
+
+  useEffect(() => {
+    import("recharts").then(setRecharts);
+  }, []);
+
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
       {/* Feature Usage */}
@@ -64,47 +64,52 @@ export function UsageCharts({
           </CardDescription>
         </CardHeader>
         <CardContent>
-          {loading ? (
+          {loading || !recharts ? (
             <ChartSkeleton />
           ) : (
             <ChartContainer
               config={featureUsageConfig}
               className="h-[340px] w-full"
             >
-              <BarChart data={featureUsageData} layout="vertical" margin={{ left: 10, right: 40 }}>
-                <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="#e2e8f0" />
-                <XAxis
-                  type="number"
-                  domain={[0, 100]}
-                  tickLine={false}
-                  axisLine={false}
-                  fontSize={12}
-                  unit="%"
-                />
-                <YAxis
-                  type="category"
-                  dataKey="feature"
-                  tickLine={false}
-                  axisLine={false}
-                  fontSize={12}
-                  width={100}
-                />
-                <ChartTooltip content={<ChartTooltipContent />} />
-                <Bar dataKey="usage" radius={[0, 4, 4, 0]} maxBarSize={20}>
-                  {featureUsageData.map((_, index) => (
-                    <Cell
-                      key={`feature-${index}`}
-                      fill={
-                        index < 3
-                          ? "#10b981"
-                          : index < 6
-                            ? "#3b82f6"
-                            : "#f59e0b"
-                      }
+              {(() => {
+                const { BarChart, Bar, Cell, XAxis, YAxis, CartesianGrid } = recharts;
+                return (
+                  <BarChart data={featureUsageData} layout="vertical" margin={{ left: 10, right: 40 }}>
+                    <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="#e2e8f0" />
+                    <XAxis
+                      type="number"
+                      domain={[0, 100]}
+                      tickLine={false}
+                      axisLine={false}
+                      fontSize={12}
+                      unit="%"
                     />
-                  ))}
-                </Bar>
-              </BarChart>
+                    <YAxis
+                      type="category"
+                      dataKey="feature"
+                      tickLine={false}
+                      axisLine={false}
+                      fontSize={12}
+                      width={100}
+                    />
+                    <ChartTooltip content={<ChartTooltipContent />} />
+                    <Bar dataKey="usage" radius={[0, 4, 4, 0]} maxBarSize={20}>
+                      {featureUsageData.map((_, index) => (
+                        <Cell
+                          key={`feature-${index}`}
+                          fill={
+                            index < 3
+                              ? "#10b981"
+                              : index < 6
+                                ? "#3b82f6"
+                                : "#f59e0b"
+                          }
+                        />
+                      ))}
+                    </Bar>
+                  </BarChart>
+                );
+              })()}
             </ChartContainer>
           )}
         </CardContent>

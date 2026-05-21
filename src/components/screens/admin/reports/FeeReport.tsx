@@ -13,7 +13,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid } from "recharts";
+import type * as RechartsTypes from "recharts";
 import {
   ChartContainer,
   ChartTooltip,
@@ -25,9 +25,14 @@ import { FeeSummary, FeeTypeBreakdown, feeBreakdownConfig } from "./types";
 import { SummaryCardSkeleton, ChartSkeleton, TableSkeleton } from "./SummaryComponents";
 
 export function FeeReport() {
+  const [recharts, setRecharts] = useState<typeof import("recharts") | null>(null);
   const [fees, setFees] = useState<FeeRecord[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    import("recharts").then(setRecharts);
+  }, []);
 
   useEffect(() => {
     async function fetchFees() {
@@ -169,7 +174,7 @@ export function FeeReport() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          {loading ? (
+          {loading || !recharts ? (
             <ChartSkeleton />
           ) : typeBreakdown.length === 0 ? (
             <div className="text-center py-12 text-muted-foreground">
@@ -181,37 +186,42 @@ export function FeeReport() {
               config={feeBreakdownConfig}
               className="h-[300px] w-full"
             >
-              <BarChart data={typeBreakdown}>
-                <CartesianGrid strokeDasharray="3 3" vertical={false} />
-                <XAxis
-                  dataKey="type"
-                  tickLine={false}
-                  axisLine={false}
-                  fontSize={12}
-                  tickFormatter={(v: string) =>
-                    v.charAt(0).toUpperCase() + v.slice(1)
-                  }
-                />
-                <YAxis
-                  tickLine={false}
-                  axisLine={false}
-                  fontSize={12}
-                  tickFormatter={(v: number) => `₹${(v / 1000).toFixed(0)}k`}
-                />
-                <ChartTooltip content={<ChartTooltipContent />} />
-                <Bar
-                  dataKey="collected"
-                  fill="var(--color-collected)"
-                  radius={[4, 4, 0, 0]}
-                  maxBarSize={40}
-                />
-                <Bar
-                  dataKey="pending"
-                  fill="var(--color-pending)"
-                  radius={[4, 4, 0, 0]}
-                  maxBarSize={40}
-                />
-              </BarChart>
+              {(() => {
+                const { BarChart, Bar, XAxis, YAxis, CartesianGrid } = recharts;
+                return (
+                  <BarChart data={typeBreakdown}>
+                    <CartesianGrid strokeDasharray="3 3" vertical={false} />
+                    <XAxis
+                      dataKey="type"
+                      tickLine={false}
+                      axisLine={false}
+                      fontSize={12}
+                      tickFormatter={(v: string) =>
+                        v.charAt(0).toUpperCase() + v.slice(1)
+                      }
+                    />
+                    <YAxis
+                      tickLine={false}
+                      axisLine={false}
+                      fontSize={12}
+                      tickFormatter={(v: number) => `₹${(v / 1000).toFixed(0)}k`}
+                    />
+                    <ChartTooltip content={<ChartTooltipContent />} />
+                    <Bar
+                      dataKey="collected"
+                      fill="var(--color-collected)"
+                      radius={[4, 4, 0, 0]}
+                      maxBarSize={40}
+                    />
+                    <Bar
+                      dataKey="pending"
+                      fill="var(--color-pending)"
+                      radius={[4, 4, 0, 0]}
+                      maxBarSize={40}
+                    />
+                  </BarChart>
+                );
+              })()}
             </ChartContainer>
           )}
         </CardContent>

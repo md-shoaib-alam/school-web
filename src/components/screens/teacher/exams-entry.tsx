@@ -121,8 +121,10 @@ export function TeacherExamsEntry() {
       apiFetch(`/api/exams/results?examId=${selectedExamId}`)
     ])
       .then(async ([studentsRes, resultsRes]) => {
-        const studentsData = await studentsRes.json();
-        const resultsData = await resultsRes.json();
+        const [studentsData, resultsData] = await Promise.all([
+          studentsRes.json(),
+          resultsRes.json()
+        ]);
 
         const studentsList = studentsData.items || (Array.isArray(studentsData) ? studentsData : []);
         const resultsList = resultsData.results || [];
@@ -370,7 +372,7 @@ export function TeacherExamsEntry() {
       ) : (
         <div className="space-y-6 animate-in fade-in zoom-in-95 duration-300">
           {/* Exam Info Card */}
-          <Card className="border-l-4 border-l-blue-500">
+          <Card className="border-blue-100 dark:border-blue-900/30 bg-blue-50/30 dark:bg-blue-950/10">
             <CardContent className="p-5">
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                 <div className="space-y-1">

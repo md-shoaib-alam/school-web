@@ -774,7 +774,7 @@ function EditClassDialog({
           <DialogTitle>Edit Class</DialogTitle>
           <DialogDescription>Update class details</DialogDescription>
         </DialogHeader>
-        <ClassForm value={editData} onChange={onChange} />
+        <ClassForm value={editData} onChange={(v) => onChange({ ...v, id: v.id ?? "" })} />
         <DialogFooter>
           <Button variant="outline" onClick={() => onOpenChange(false)}>
             Cancel

@@ -74,20 +74,17 @@ export function MarksheetPreviewPage({
     const loadData = async () => {
       setLoading(true);
       try {
-        // 1. Fetch Students & Completed Exams for this class, and Tenant Settings
-        const [studentsRes, examsRes, settingsRes] = await Promise.all([
-          apiFetch(`/api/students?classId=${classId}&mode=min&limit=1000`),
-          apiFetch(`/api/exams?classId=${classId}&limit=100`),
-          apiFetch(`/api/tenant-settings`).catch(() => null)
+        // 1. Fetch Students & Completed Exams for this class, and Tenant Settings in parallel
+        const [studentData, examData, settingsData] = await Promise.all([
+          apiFetch(`/api/students?classId=${classId}&mode=min&limit=1000`).then((res) => res.json()),
+          apiFetch(`/api/exams?classId=${classId}&limit=100`).then((res) => res.json()),
+          apiFetch(`/api/tenant-settings`)
+            .then((res) => (res.ok ? res.json() : null))
+            .catch(() => null)
         ]);
 
-        const studentData = await studentsRes.json();
-        const examData = await examsRes.json();
-        if (settingsRes && settingsRes.ok) {
-          const settingsData = await settingsRes.json();
-          if (settingsData?.defaultMarksheetTemplateId) {
-            setSelectedTemplateId(settingsData.defaultMarksheetTemplateId);
-          }
+        if (settingsData?.defaultMarksheetTemplateId) {
+          setSelectedTemplateId(settingsData.defaultMarksheetTemplateId);
         }
 
         const loadedStudents = studentData.items || [];
@@ -101,18 +98,18 @@ export function MarksheetPreviewPage({
 
         // 2. Fetch results in parallel for each completed exam
         if (completedExams.length > 0) {
-          const resultsPromises = completedExams.map(async (exam: ExamRecord) => {
-            try {
-              const res = await apiFetch(`/api/exams/results?examId=${exam.id}`);
-              const data = await res.json();
-              return { examId: exam.id, results: data.results || [] };
-            } catch (err) {
-              console.error(`Error loading results for exam ${exam.id}:`, err);
-              return { examId: exam.id, results: [] };
-            }
-          });
-
-          const allResults = await Promise.all(resultsPromises);
+          const allResults = await Promise.all(
+            completedExams.map(async (exam: ExamRecord) => {
+              try {
+                const res = await apiFetch(`/api/exams/results?examId=${exam.id}`);
+                const data = await res.json();
+                return { examId: exam.id, results: data.results || [] };
+              } catch (err) {
+                console.error(`Error loading results for exam ${exam.id}:`, err);
+                return { examId: exam.id, results: [] };
+              }
+            })
+          );
           const map: Record<string, any[]> = {};
           allResults.forEach(item => {
             map[item.examId] = item.results;
@@ -429,7 +426,7 @@ export function MarksheetPreviewPage({
           </div>
         ) : previewStudents.length === 0 ? (
           <div className="flex flex-col items-center justify-center text-center py-20 text-muted-foreground max-w-md mx-auto animate-in fade-in duration-300">
-            <AlertCircle className="h-10 w-10 mb-3 opacity-30 animate-bounce" />
+            <AlertCircle className="h-10 w-10 mb-3 opacity-30 animate-in fade-in slide-in-from-top-3 duration-700 ease-[cubic-bezier(0.16,1,0.3,1)]" />
             <p className="text-xs">No student records available</p>
           </div>
         ) : (
