@@ -1,6 +1,28 @@
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
+import { Cinzel, Montserrat, Inter } from 'next/font/google';
+
+const cinzel = Cinzel({
+  subsets: ['latin'],
+  weight: ['600', '700', '800', '900'],
+  variable: '--font-cinzel',
+  display: 'swap',
+});
+
+const montserrat = Montserrat({
+  subsets: ['latin'],
+  weight: ['500', '600', '700', '800'],
+  variable: '--font-montserrat',
+  display: 'swap',
+});
+
+const inter = Inter({
+  subsets: ['latin'],
+  weight: ['400', '500', '600', '700', '800'],
+  variable: '--font-inter',
+  display: 'swap',
+});
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -222,14 +244,7 @@ export function TabulationLedgerPreviewPage({
             </p>
           </div>
         ) : (
-          <div className="w-full flex flex-col items-center">
-            {/* Google Fonts Preload for Preview Card */}
-            {/* eslint-disable-next-line @next/next/no-page-custom-font */}
-            <link 
-              rel="stylesheet" 
-              href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800;900&family=Montserrat:wght@500;600;700;800&family=Inter:wght@400;500;600;700;800&display=swap" 
-            />
-
+          <div className={`w-full flex flex-col items-center ${cinzel.className} ${montserrat.className} ${inter.className}`}>
             {/* A4 Landscape parchment layout sheets preview container */}
             <div className="w-full max-h-[70vh] overflow-y-auto overflow-x-auto pb-6 flex flex-col items-center gap-8 bg-zinc-50 dark:bg-zinc-950/20 p-4 sm:p-6 rounded-2xl border border-gray-150 dark:border-zinc-800/50 shadow-inner">
               <div 

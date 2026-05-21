@@ -1,4 +1,5 @@
 import { memo } from "react";
+import Image from "next/image";
 import {
   Dialog,
   DialogContent,
@@ -298,19 +299,21 @@ export function TenantDialogs({
               {/* Logo Upload */}
               <div className="flex flex-col sm:flex-row gap-4 items-center sm:items-start pb-2">
                 <div className="relative group cursor-pointer">
-                  <div className="h-24 w-24 rounded-2xl border-2 border-dashed border-muted-foreground/20 flex items-center justify-center overflow-hidden bg-muted/30 group-hover:bg-muted/50 transition-all">
+                  <div className="h-24 w-24 rounded-2xl border-2 border-dashed border-muted-foreground/20 flex items-center justify-center overflow-hidden bg-muted/30 group-hover:bg-muted/50 transition-all relative">
                     {formData.logoFile || formData.logo ? (
-                      <img
+                      <Image
                         src={
                           formData.logoFile
                             ? URL.createObjectURL(formData.logoFile)
                             : formData.logo
                         }
                         alt="Logo preview"
-                        className="h-full w-full object-cover"
+                        fill
+                        className="object-cover"
+                        unoptimized
                       />
                     ) : (
-                      <img src="/test.webp" alt="Default logo placeholder" className="h-full w-full object-cover opacity-60 group-hover:opacity-100 transition-opacity" />
+                      <Image src="/test.webp" alt="Default logo placeholder" fill className="object-cover opacity-60 group-hover:opacity-100 transition-opacity" unoptimized />
                     )}
                   </div>
                   <label className="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity rounded-2xl cursor-pointer">
@@ -588,8 +591,8 @@ export function TenantDialogs({
             <>
               <DialogHeader>
                 <div className="flex items-center gap-3">
-                  <div className="h-12 w-12 rounded-xl bg-teal-100 dark:bg-teal-900/30 text-teal-700 dark:text-teal-400 flex items-center justify-center overflow-hidden">
-                    <img src={viewingTenant.logo || "/test.webp"} alt={viewingTenant.name} className="h-full w-full object-cover" />
+                  <div className="h-12 w-12 rounded-xl bg-teal-100 dark:bg-teal-900/30 text-teal-700 dark:text-teal-400 flex items-center justify-center overflow-hidden relative">
+                    <Image src={viewingTenant.logo || "/test.webp"} alt={viewingTenant.name} fill className="object-cover" unoptimized />
                   </div>
                   <div>
                     <DialogTitle className="text-xl">

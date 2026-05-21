@@ -1,5 +1,28 @@
 'use client';
 
+import { Cinzel, Montserrat, Inter } from 'next/font/google';
+
+const cinzel = Cinzel({
+  subsets: ['latin'],
+  weight: ['600', '700', '800', '900'],
+  variable: '--font-cinzel',
+  display: 'swap',
+});
+
+const montserrat = Montserrat({
+  subsets: ['latin'],
+  weight: ['500', '600', '700', '800'],
+  variable: '--font-montserrat',
+  display: 'swap',
+});
+
+const inter = Inter({
+  subsets: ['latin'],
+  weight: ['400', '500', '600', '700', '800'],
+  variable: '--font-inter',
+  display: 'swap',
+});
+
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -410,20 +433,13 @@ export function MarksheetPreviewPage({
             <p className="text-xs">No student records available</p>
           </div>
         ) : (
-          <div className="w-full max-w-4xl mx-auto space-y-4">
+          <div className={`w-full max-w-4xl mx-auto space-y-4 ${cinzel.className} ${montserrat.className} ${inter.className}`}>
             {selectedStudentId === 'all' && (
               <div className="bg-emerald-50/50 dark:bg-emerald-900/10 border border-emerald-200/50 dark:border-emerald-800/40 p-4 rounded-xl text-xs text-emerald-700 dark:text-emerald-400 flex items-center gap-3 font-medium shadow-sm animate-in slide-in-from-top-2 duration-300">
                 <CheckCircle2 className="h-5 w-5 shrink-0 text-emerald-500" />
                 <span>Showing previews for <strong>all {students.length} students</strong>. Scroll down to inspect. Clicking <strong>Print</strong> will generate the clean print packet.</span>
               </div>
             )}
-
-            {/* Google Fonts Preload for Preview Card */}
-            {/* eslint-disable-next-line @next/next/no-page-custom-font */}
-            <link 
-              rel="stylesheet" 
-              href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800;900&family=Montserrat:wght@500;600;700;800&family=Inter:wght@400;500;600;700;800&display=swap" 
-            />
 
             {/* True A4 parchment layout sheets preview vertical stack with premium scrollbar */}
             <div className="w-full max-h-[75vh] overflow-y-auto overflow-x-auto pb-6 flex flex-col items-center gap-8 bg-zinc-50 dark:bg-zinc-950/20 p-4 sm:p-6 rounded-2xl border border-gray-100 dark:border-zinc-800/50 shadow-inner">
