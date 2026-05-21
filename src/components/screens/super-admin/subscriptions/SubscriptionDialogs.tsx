@@ -215,7 +215,7 @@ export function SubscriptionDialogs({
             >
               {processing ? (
                 <>
-                  <Loader2 className="h-4 w-4 mr-2 animate-spin" /> Creating...
+                  <Loader2 className="size-4 mr-2 animate-spin" /> Creating...
                 </>
               ) : (
                 "Create Subscription"
@@ -339,7 +339,7 @@ export function SubscriptionDialogs({
                       endDate: date ? date.toISOString().split('T')[0] : "",
                     }))
                   }
-                  className="w-full h-10 rounded-xl border-gray-200 dark:border-gray-700"
+                  className="w-full h-10 rounded-xl border-zinc-200 dark:border-zinc-700"
                 />
               </div>
               <div className="space-y-2">
@@ -384,8 +384,8 @@ export function SubscriptionDialogs({
       <Dialog open={!!extendOpen} onOpenChange={(open) => !open && onExtendOpenChange(null)}>
         <DialogContent className="sm:max-w-[400px]">
           <DialogHeader>
-            <div className="h-12 w-12 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 mb-2">
-              <CalendarClock className="h-6 w-6" />
+            <div className="size-12 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 mb-2">
+              <CalendarClock className="size-6" />
             </div>
             <DialogTitle>Extend Validity</DialogTitle>
             <DialogDescription>

@@ -58,7 +58,7 @@ export function PromotionsTable({
           </div>
         ) : promotions.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-16 text-muted-foreground">
-            <ArrowRight className="h-10 w-10 mb-2 opacity-30" />
+            <ArrowRight className="size-10 mb-2 opacity-30" />
             <p className="text-sm">No promotion records found</p>
             <p className="text-xs mt-1">
               Click &quot;New Promotion&quot; to create one
@@ -93,7 +93,7 @@ export function PromotionsTable({
                     >
                       <TableCell>
                         <div className="flex items-center gap-3">
-                          <div className="h-8 w-8 rounded-full bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 flex items-center justify-center text-xs font-semibold shrink-0">
+                          <div className="size-8 rounded-full bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 flex items-center justify-center text-xs font-semibold shrink-0">
                             {promo.studentName
                               .split(" ")
                               .map((n) => n[0])
@@ -117,7 +117,7 @@ export function PromotionsTable({
                           >
                             {promo.fromClassName}
                           </Badge>
-                          <ArrowRight className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
+                          <ArrowRight className="size-3.5 text-muted-foreground shrink-0" />
                           <Badge
                             variant="outline"
                             className="font-normal whitespace-nowrap"
@@ -151,9 +151,9 @@ export function PromotionsTable({
                               disabled={approvingId === promo.id}
                             >
                               {approvingId === promo.id ? (
-                                <Loader2 className="h-3 w-3 mr-1 animate-spin" />
+                                <Loader2 className="size-3 mr-1 animate-spin" />
                               ) : (
-                                <CheckCircle2 className="h-3 w-3 mr-1" />
+                                <CheckCircle2 className="size-3 mr-1" />
                               )}
                               Approve
                             </Button>
@@ -163,7 +163,7 @@ export function PromotionsTable({
                               className="h-7 text-xs text-red-600 border-red-200 hover:bg-red-50 dark:border-red-800 dark:hover:bg-red-900/30 dark:text-red-400"
                               onClick={() => openRejectDialog(promo)}
                             >
-                              <XCircle className="h-3 w-3 mr-1" />
+                              <XCircle className="size-3 mr-1" />
                               Reject
                             </Button>
                           </div>

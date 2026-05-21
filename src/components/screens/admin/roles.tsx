@@ -202,24 +202,24 @@ export function AdminRoles() {
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h2 className="text-2xl font-semibold text-gray-900 dark:text-gray-100">Roles & Permissions</h2>
-          <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+          <h2 className="text-2xl font-semibold text-zinc-900 dark:text-zinc-100">Roles & Permissions</h2>
+          <p className="text-sm text-zinc-500 dark:text-zinc-400 mt-1">
             Create custom roles and control staff access
           </p>
         </div>
         
         <div className="flex items-center gap-3">
-          <div className="flex items-center p-1 bg-gray-100 dark:bg-gray-800 rounded-lg">
+          <div className="flex items-center p-1 bg-zinc-100 dark:bg-zinc-800 rounded-lg">
             <Button
               variant="ghost"
               size="sm"
               className={cn(
                 "h-8 px-3 gap-2",
-                viewMode === 'grid' && "bg-white dark:bg-gray-700 shadow-sm text-emerald-600"
+                viewMode === 'grid' && "bg-white dark:bg-zinc-700 shadow-sm text-emerald-600"
               )}
               onClick={() => toggleView('grid')}
             >
-              <LayoutGrid className="h-4 w-4" />
+              <LayoutGrid className="size-4" />
               <span className="hidden sm:inline">Grid</span>
             </Button>
             <Button
@@ -227,28 +227,28 @@ export function AdminRoles() {
               size="sm"
               className={cn(
                 "h-8 px-3 gap-2",
-                viewMode === 'table' && "bg-white dark:bg-gray-700 shadow-sm text-emerald-600"
+                viewMode === 'table' && "bg-white dark:bg-zinc-700 shadow-sm text-emerald-600"
               )}
               onClick={() => toggleView('table')}
             >
-              <List className="h-4 w-4" />
+              <List className="size-4" />
               <span className="hidden sm:inline">Table</span>
             </Button>
           </div>
 
           <Button onClick={openCreateDialog} className="bg-emerald-600 hover:bg-emerald-700 text-white">
-            <Plus className="h-4 w-4 mr-2" /> Create Role
+            <Plus className="size-4 mr-2" /> Create Role
           </Button>
         </div>
       </div>
 
       {roles.length === 0 ? (
         <Card className="border-dashed">
-          <CardContent className="flex flex-col items-center justify-center py-16 text-gray-400">
-            <Shield className="h-12 w-12 mb-3 opacity-40" />
+          <CardContent className="flex flex-col items-center justify-center py-16 text-zinc-400">
+            <Shield className="size-12 mb-3 opacity-40" />
             <p className="text-lg font-medium">No custom roles yet</p>
             <Button onClick={openCreateDialog} variant="outline" className="mt-4">
-              <Plus className="h-4 w-4 mr-2" /> Create Role
+              <Plus className="size-4 mr-2" /> Create Role
             </Button>
           </CardContent>
         </Card>

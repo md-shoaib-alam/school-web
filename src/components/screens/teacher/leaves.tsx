@@ -31,19 +31,19 @@ import { format } from 'date-fns';
 // ── Status Config ──
 
 const statusConfig: Record<string, { bg: string; icon: React.ReactNode; label: string }> = {
-  pending: { bg: 'bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 border-amber-200 dark:border-amber-800', icon: <Clock className="h-3.5 w-3.5" />, label: 'Pending' },
-  approved: { bg: 'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800', icon: <CheckCircle2 className="h-3.5 w-3.5" />, label: 'Approved' },
-  rejected: { bg: 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 border-red-200 dark:border-red-800', icon: <XCircle className="h-3.5 w-3.5" />, label: 'Rejected' },
-  cancelled: { bg: 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-400 border-gray-200 dark:border-gray-700', icon: <Ban className="h-3.5 w-3.5" />, label: 'Cancelled' },
+  pending: { bg: 'bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 border-amber-200 dark:border-amber-800', icon: <Clock className="size-3.5" />, label: 'Pending' },
+  approved: { bg: 'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800', icon: <CheckCircle2 className="size-3.5" />, label: 'Approved' },
+  rejected: { bg: 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 border-red-200 dark:border-red-800', icon: <XCircle className="size-3.5" />, label: 'Rejected' },
+  cancelled: { bg: 'bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-400 border-zinc-200 dark:border-zinc-700', icon: <Ban className="size-3.5" />, label: 'Cancelled' },
 };
 
 const leaveTypeConfig: Record<string, { bg: string; icon: React.ReactNode; label: string }> = {
-  casual: { bg: 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 border-blue-200 dark:border-blue-800', icon: <CalendarDays className="h-3.5 w-3.5" />, label: 'Casual' },
-  sick: { bg: 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 border-red-200 dark:border-red-800', icon: <AlertTriangle className="h-3.5 w-3.5" />, label: 'Sick' },
-  earned: { bg: 'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800', icon: <CheckCircle2 className="h-3.5 w-3.5" />, label: 'Earned' },
-  maternity: { bg: 'bg-pink-100 dark:bg-pink-900/30 text-pink-700 dark:text-pink-400 border-pink-200 dark:border-pink-800', icon: <CalendarDays className="h-3.5 w-3.5" />, label: 'Maternity' },
-  paternity: { bg: 'bg-violet-100 dark:bg-violet-900/30 text-violet-700 dark:text-violet-400 border-violet-200 dark:border-violet-800', icon: <CalendarDays className="h-3.5 w-3.5" />, label: 'Paternity' },
-  duty: { bg: 'bg-sky-100 dark:bg-sky-900/30 text-sky-700 dark:text-sky-400 border-sky-200 dark:border-sky-800', icon: <CalendarDays className="h-3.5 w-3.5" />, label: 'Duty Leave' },
+  casual: { bg: 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 border-blue-200 dark:border-blue-800', icon: <CalendarDays className="size-3.5" />, label: 'Casual' },
+  sick: { bg: 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 border-red-200 dark:border-red-800', icon: <AlertTriangle className="size-3.5" />, label: 'Sick' },
+  earned: { bg: 'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800', icon: <CheckCircle2 className="size-3.5" />, label: 'Earned' },
+  maternity: { bg: 'bg-pink-100 dark:bg-pink-900/30 text-pink-700 dark:text-pink-400 border-pink-200 dark:border-pink-800', icon: <CalendarDays className="size-3.5" />, label: 'Maternity' },
+  paternity: { bg: 'bg-violet-100 dark:bg-violet-900/30 text-violet-700 dark:text-violet-400 border-violet-200 dark:border-violet-800', icon: <CalendarDays className="size-3.5" />, label: 'Paternity' },
+  duty: { bg: 'bg-sky-100 dark:bg-sky-900/30 text-sky-700 dark:text-sky-400 border-sky-200 dark:border-sky-800', icon: <CalendarDays className="size-3.5" />, label: 'Duty Leave' },
 };
 
 interface LeaveRequest {
@@ -165,13 +165,13 @@ export function TeacherLeaves() {
       <div className="flex justify-between items-center">
         <div>
           <h2 className="text-2xl font-semibold tracking-tight flex items-center gap-2">
-            <CalendarDays className="h-6 w-6 text-primary" />
+            <CalendarDays className="size-6 text-primary" />
             My Leaves
           </h2>
           <p className="text-muted-foreground text-sm mt-1">View and manage your leave requests</p>
         </div>
         <Button className="bg-emerald-600 hover:bg-emerald-700" onClick={() => setApplyOpen(true)}>
-          <Plus className="h-4 w-4 mr-2" />
+          <Plus className="size-4 mr-2" />
           Apply for Leave
         </Button>
       </div>
@@ -291,7 +291,7 @@ export function TeacherLeaves() {
                               </Button>
                             )}
                             {leave.status === 'rejected' && leave.approverRemarks && (
-                              <div className="text-xs text-gray-500 max-w-[150px] mx-auto text-center">
+                              <div className="text-xs text-zinc-500 max-w-[150px] mx-auto text-center">
                                 Remarks: {leave.approverRemarks}
                               </div>
                             )}
@@ -346,7 +346,7 @@ export function TeacherLeaves() {
                       className="w-full justify-start text-left font-normal"
                       suppressHydrationWarning
                     >
-                      <CalendarDays className="mr-2 h-4 w-4" />
+                      <CalendarDays className="mr-2 size-4" />
                       {form.startDate ? format(form.startDate, 'MMM dd, yyyy') : 'Pick a date'}
                     </Button>
                   </PopoverTrigger>
@@ -372,7 +372,7 @@ export function TeacherLeaves() {
                       className="w-full justify-start text-left font-normal"
                       suppressHydrationWarning
                     >
-                      <CalendarDays className="mr-2 h-4 w-4" />
+                      <CalendarDays className="mr-2 size-4" />
                       {form.endDate ? format(form.endDate, 'MMM dd, yyyy') : 'Pick a date'}
                     </Button>
                   </PopoverTrigger>
@@ -415,7 +415,7 @@ export function TeacherLeaves() {
             >
               {submitting ? (
                 <>
-                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  <Loader2 className="size-4 mr-2 animate-spin" />
                   Submitting...
                 </>
               ) : (

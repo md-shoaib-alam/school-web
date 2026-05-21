@@ -21,7 +21,7 @@ export function UserHeader({ totalCount, roleCountsMap }: UserHeaderProps) {
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h2 className="text-2xl font-semibold text-gray-900 dark:text-gray-100 tracking-tight">
+          <h2 className="text-2xl font-semibold text-zinc-900 dark:text-zinc-100 tracking-tight">
             User Management
           </h2>
           <p className="text-sm font-bold text-muted-foreground">
@@ -32,7 +32,7 @@ export function UserHeader({ totalCount, roleCountsMap }: UserHeaderProps) {
           variant="outline"
           className="w-fit gap-1.5 border-teal-200 dark:border-teal-700 text-teal-700 dark:text-teal-400 bg-teal-50 dark:bg-teal-900/30 text-[10px] font-black uppercase tracking-widest px-3 py-1.5 rounded-full shadow-sm"
         >
-          <Shield className="h-3.5 w-3.5" />
+          <Shield className="size-3.5" />
           Cross-Tenant View
         </Badge>
       </div>
@@ -50,13 +50,13 @@ export function UserHeader({ totalCount, roleCountsMap }: UserHeaderProps) {
               <CardContent className="p-4">
                 <div className="flex items-center justify-between mb-3">
                   <div className={`p-2 rounded-xl ${stat.iconBg} shadow-inner`}>
-                    <Icon className="h-4 w-4" />
+                    <Icon className="size-4" />
                   </div>
                   <span className={`text-[10px] font-black uppercase tracking-widest ${stat.color} opacity-80`}>
                     {percentage}%
                   </span>
                 </div>
-                <p className="text-2xl font-black text-gray-900 dark:text-gray-100">
+                <p className="text-2xl font-black text-zinc-900 dark:text-zinc-100">
                   {count.toLocaleString()}
                 </p>
                 <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground mt-0.5">

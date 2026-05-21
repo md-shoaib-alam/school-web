@@ -25,11 +25,11 @@ export const ReceiptTemplate = React.forwardRef<HTMLDivElement, ReceiptTemplateP
     });
 
     return (
-      <div ref={ref} className="p-10 bg-white text-black w-full max-w-[700px] mx-auto font-serif print:p-12 border border-gray-300">
+      <div ref={ref} className="p-10 bg-white text-black w-full max-w-[700px] mx-auto font-serif print:p-12 border border-zinc-300">
         {/* Header */}
         <div className="flex items-start justify-between border-b pb-6 mb-8">
           <div className="flex gap-4">
-            <div className="w-16 h-16 border-2 border-black flex items-center justify-center">
+            <div className="size-16 border-2 border-black flex items-center justify-center">
               <GraduationCap size={40} className="text-black" />
             </div>
             <div>
@@ -83,7 +83,7 @@ export const ReceiptTemplate = React.forwardRef<HTMLDivElement, ReceiptTemplateP
         <div className="mb-12">
           <table className="w-full border-collapse border border-black text-sm">
             <thead>
-              <tr className="bg-gray-100">
+              <tr className="bg-zinc-100">
                 <th className="border border-black p-2 text-left w-12">S.No.</th>
                 <th className="border border-black p-2 text-left">Description</th>
                 <th className="border border-black p-2 text-right w-32">Amount (₹)</th>
@@ -94,13 +94,13 @@ export const ReceiptTemplate = React.forwardRef<HTMLDivElement, ReceiptTemplateP
                 <td className="border border-black p-2 text-left align-top">1.</td>
                 <td className="border border-black p-2 text-left align-top h-32">
                   <p className="font-bold capitalize">{fee.type} Fee Collection</p>
-                  <p className="text-[10px] mt-2 italic text-gray-600">Payment received via Online Portal</p>
+                  <p className="text-[10px] mt-2 italic text-zinc-600">Payment received via Online Portal</p>
                 </td>
                 <td className="border border-black p-2 text-right align-top font-bold">
                   {fee.amount.toLocaleString()}.00
                 </td>
               </tr>
-              <tr className="bg-gray-50">
+              <tr className="bg-zinc-50">
                 <td colSpan={2} className="border border-black p-2 text-right font-bold uppercase tracking-wider">
                   Total Amount Received
                 </td>
@@ -132,8 +132,8 @@ export const ReceiptTemplate = React.forwardRef<HTMLDivElement, ReceiptTemplateP
         </div>
 
         {/* Bottom Bar */}
-        <div className="mt-12 pt-4 border-t border-gray-200 text-center">
-          <p className="text-[9px] uppercase tracking-widest text-gray-400">DEMO ACADEMY — Powered by school Management System</p>
+        <div className="mt-12 pt-4 border-t border-zinc-200 text-center">
+          <p className="text-[9px] uppercase tracking-widest text-zinc-400">DEMO ACADEMY — Powered by school Management System</p>
         </div>
       </div>
     );

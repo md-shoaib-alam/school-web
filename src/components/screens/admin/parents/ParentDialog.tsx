@@ -245,7 +245,7 @@ export function LinkChildDialog({
           <div className="space-y-6 py-2">
             {selectedParent && selectedParent.children.length > 0 && (
               <div className="space-y-2">
-                <Label className="text-xs text-gray-500 dark:text-gray-400">
+                <Label className="text-xs text-zinc-500 dark:text-zinc-400">
                   Currently Linked
                 </Label>
                 <div className="flex flex-wrap gap-2">
@@ -260,10 +260,10 @@ export function LinkChildDialog({
                         onClick={() =>
                           onUnlinkChild(selectedParent.id, child.id)
                         }
-                        className="h-4 w-4 rounded-full hover:bg-emerald-200 dark:hover:bg-emerald-800 flex items-center justify-center transition-colors"
+                        className="size-4 rounded-full hover:bg-emerald-200 dark:hover:bg-emerald-800 flex items-center justify-center transition-colors"
                         disabled={linking}
                       >
-                        <X className="h-3 w-3" />
+                        <X className="size-3" />
                       </button>
                     </Badge>
                   ))}
@@ -274,7 +274,7 @@ export function LinkChildDialog({
             <Separator />
 
             <div>
-              <Label className="text-xs text-gray-500 dark:text-gray-400 mb-1.5 block">
+              <Label className="text-xs text-zinc-500 dark:text-zinc-400 mb-1.5 block">
                 Filter by Class
               </Label>
               <Select value={selectedClass} onValueChange={setSelectedClass}>
@@ -293,20 +293,20 @@ export function LinkChildDialog({
             </div>
 
             <div>
-              <Label className="text-xs text-gray-500 dark:text-gray-400 mb-2 block font-semibold">
+              <Label className="text-xs text-zinc-500 dark:text-zinc-400 mb-2 block font-semibold">
                 Available Students
               </Label>
               {loading ? (
                 <div className="text-center py-10">
-                  <Loader2 className="h-8 w-8 animate-spin mx-auto text-blue-500 mb-2" />
-                  <p className="text-sm text-gray-500">Searching for students...</p>
+                  <Loader2 className="size-8 animate-spin mx-auto text-blue-500 mb-2" />
+                  <p className="text-sm text-zinc-500">Searching for students...</p>
                 </div>
               ) : filteredStudents.length === 0 ? (
-                <div className="text-center py-10 bg-gray-50 dark:bg-gray-900/20 rounded-xl border border-dashed border-gray-200 dark:border-gray-800">
-                  <p className="text-gray-400 dark:text-gray-500 text-sm">
+                <div className="text-center py-10 bg-zinc-50 dark:bg-zinc-900/20 rounded-xl border border-dashed border-zinc-200 dark:border-zinc-800">
+                  <p className="text-zinc-400 dark:text-zinc-500 text-sm">
                     No unlinked students found
                   </p>
-                  <p className="text-[10px] mt-1 text-gray-400">
+                  <p className="text-[10px] mt-1 text-zinc-400">
                     Try changing class filter or add new students
                   </p>
                 </div>
@@ -315,17 +315,17 @@ export function LinkChildDialog({
                   {filteredStudents.map((student) => (
                     <div
                       key={student.id}
-                      className="flex items-center justify-between p-3 rounded-xl border border-gray-100 dark:border-gray-800 hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:border-blue-200 dark:hover:border-blue-800/50 transition-all group"
+                      className="flex items-center justify-between p-3 rounded-xl border border-zinc-100 dark:border-zinc-800 hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:border-blue-200 dark:hover:border-blue-800/50 transition-all group"
                     >
                       <div className="flex items-center gap-3">
-                        <div className="h-8 w-8 rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform">
-                          <GraduationCap className="h-4 w-4" />
+                        <div className="size-8 rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform">
+                          <GraduationCap className="size-4" />
                         </div>
                         <div>
-                          <p className="text-sm font-bold text-gray-800 dark:text-gray-200">
+                          <p className="text-sm font-bold text-zinc-800 dark:text-zinc-200">
                             {student.name}
                           </p>
-                          <p className="text-[10px] text-gray-500 dark:text-gray-400 font-medium">
+                          <p className="text-[10px] text-zinc-500 dark:text-zinc-400 font-medium">
                             {student.className} • Roll {student.rollNumber}
                           </p>
                         </div>
@@ -337,9 +337,9 @@ export function LinkChildDialog({
                         disabled={linking}
                       >
                         {linking ? (
-                          <Loader2 className="h-3 w-3 animate-spin" />
+                          <Loader2 className="size-3 animate-spin" />
                         ) : (
-                          <Link2 className="h-3.5 w-3.5 mr-1" />
+                          <Link2 className="size-3.5 mr-1" />
                         )}
                         Link
                       </Button>

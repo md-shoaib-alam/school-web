@@ -42,8 +42,8 @@ export function NotificationBell() {
             read: n.isRead,
             type: n.type,
             icon: n.type === 'platform_notice' 
-              ? <Megaphone className={cn("h-4 w-4", n.isRead ? "text-gray-400" : "text-amber-500")} />
-              : <Bell className={cn("h-4 w-4", n.isRead ? "text-gray-400" : "text-rose-500")} />,
+              ? <Megaphone className={cn("size-4", n.isRead ? "text-zinc-400" : "text-amber-500")} />
+              : <Bell className={cn("size-4", n.isRead ? "text-zinc-400" : "text-rose-500")} />,
           }));
 
         setNotifications(mapped);
@@ -112,25 +112,25 @@ export function NotificationBell() {
         <Button
           variant="ghost"
           size="icon"
-          className="relative h-10 w-10 bg-white hover:bg-gray-50 dark:bg-zinc-900 dark:hover:bg-zinc-800 border border-gray-200 dark:border-zinc-800 shadow-sm rounded-xl transition-all duration-200 cursor-pointer"
+          className="relative size-10 bg-white hover:bg-zinc-50 dark:bg-zinc-900 dark:hover:bg-zinc-800 border border-zinc-200 dark:border-zinc-800 shadow-sm rounded-xl transition-all duration-200 cursor-pointer"
         >
           <Bell className={cn(
-            "h-6 w-6 md:h-5 md:w-5 transition-colors",
-            unreadCount > 0 ? "text-indigo-600 dark:text-indigo-400" : "text-gray-500"
+            "size-6 md:size-5 transition-colors",
+            unreadCount > 0 ? "text-violet-600 dark:text-violet-400" : "text-zinc-500"
           )} />
           {unreadCount > 0 && (
-            <span className="absolute top-2.5 right-2.5 flex h-2 w-2 items-center justify-center rounded-full bg-rose-500 ring-2 ring-white dark:ring-gray-900 animate-pulse" />
+            <span className="absolute top-2.5 right-2.5 flex size-2 items-center justify-center rounded-full bg-rose-500 ring-2 ring-white dark:ring-zinc-900 animate-pulse" />
           )}
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-80 sm:w-96 p-0 border-gray-200 dark:border-gray-800 shadow-2xl rounded-2xl overflow-hidden" align="end" sideOffset={8}>
-        <div className="flex items-center justify-between px-5 py-4 bg-gray-50/50 dark:bg-gray-900/50 border-b border-gray-100 dark:border-gray-800">
+      <PopoverContent className="w-80 sm:w-96 p-0 border-zinc-200 dark:border-zinc-800 shadow-2xl rounded-2xl overflow-hidden" align="end" sideOffset={8}>
+        <div className="flex items-center justify-between px-5 py-4 bg-zinc-50/50 dark:bg-zinc-900/50 border-b border-zinc-100 dark:border-zinc-800">
           <div className="flex items-center gap-2">
-            <h3 className="font-semibold text-sm text-gray-900 dark:text-gray-100 tracking-tight">
+            <h3 className="font-semibold text-sm text-zinc-900 dark:text-zinc-100 tracking-tight">
               Notifications
             </h3>
             {unreadCount > 0 && (
-              <Badge variant="secondary" className="bg-indigo-100 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-400 text-[10px] font-bold px-1.5 py-0">
+              <Badge variant="secondary" className="bg-violet-100 text-violet-700 dark:bg-violet-900/30 dark:text-violet-400 text-[10px] font-bold px-1.5 py-0">
                 {unreadCount} NEW
               </Badge>
             )}
@@ -139,7 +139,7 @@ export function NotificationBell() {
             <Button
               variant="ghost"
               size="sm"
-              className="text-[10px] h-7 px-2 font-semibold text-gray-500 hover:text-indigo-600 transition-colors"
+              className="text-[10px] h-7 px-2 font-semibold text-zinc-500 hover:text-violet-600 transition-colors"
               onClick={markAllRead}
             >
               Mark all read
@@ -157,29 +157,29 @@ export function NotificationBell() {
         <ScrollArea className="max-h-[420px]">
           {loading && notifications.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-16">
-              <Loader2 className="h-8 w-8 animate-spin text-indigo-500 opacity-20" />
-              <p className="text-xs text-gray-400 mt-4 font-medium">Updating history...</p>
+              <Loader2 className="size-8 animate-spin text-violet-500 opacity-20" />
+              <p className="text-xs text-zinc-400 mt-4 font-medium">Updating history...</p>
             </div>
           ) : notifications.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-20 text-gray-400">
-              <div className="w-20 h-20 rounded-3xl bg-gray-50 dark:bg-gray-800/50 flex items-center justify-center mb-4 transform rotate-12 transition-transform hover:rotate-0">
-                <Bell className="h-10 w-10 opacity-10" />
+            <div className="flex flex-col items-center justify-center py-20 text-zinc-400">
+              <div className="size-20 rounded-3xl bg-zinc-50 dark:bg-zinc-800/50 flex items-center justify-center mb-4 transform rotate-12 transition-transform hover:rotate-0">
+                <Bell className="size-10 opacity-10" />
               </div>
-              <p className="text-sm font-bold text-gray-900 dark:text-gray-100">All caught up!</p>
+              <p className="text-sm font-bold text-zinc-900 dark:text-zinc-100">All caught up!</p>
               <p className="text-xs opacity-60 mt-1">Your notification center is empty</p>
             </div>
           ) : (
-            <div className="divide-y divide-gray-50 dark:divide-gray-800/50">
+            <div className="divide-y divide-zinc-50 dark:divide-zinc-800/50">
               {notifications.map((notification) => (
                 <div
                   key={notification.id}
                   role="button"
                   tabIndex={0}
                   className={cn(
-                    "group relative w-full flex items-start gap-4 px-5 py-4 text-left transition-all duration-200 cursor-pointer focus:outline-none focus:ring-1 focus:ring-indigo-500",
+                    "group relative w-full flex items-start gap-4 px-5 py-4 text-left transition-all duration-200 cursor-pointer focus:outline-none focus:ring-1 focus:ring-violet-500",
                     !notification.read 
-                      ? "bg-indigo-50/30 dark:bg-indigo-900/5" 
-                      : "hover:bg-gray-50 dark:hover:bg-gray-800/30",
+                      ? "bg-violet-50/30 dark:bg-violet-900/5" 
+                      : "hover:bg-zinc-50 dark:hover:bg-zinc-800/30",
                   )}
                   onClick={() => markRead(notification.id)}
                   onKeyDown={(e) => {
@@ -190,36 +190,36 @@ export function NotificationBell() {
                   }}
                 >
                   <div className={cn(
-                    "mt-0.5 shrink-0 h-10 w-10 rounded-2xl flex items-center justify-center transition-colors",
+                    "mt-0.5 shrink-0 size-10 rounded-2xl flex items-center justify-center transition-colors",
                     !notification.read 
-                      ? "bg-indigo-100 text-indigo-600 dark:bg-indigo-900/40 dark:text-indigo-400" 
-                      : "bg-gray-100 text-gray-400 dark:bg-gray-800 dark:text-gray-500"
+                      ? "bg-violet-100 text-violet-600 dark:bg-violet-900/40 dark:text-violet-400" 
+                      : "bg-zinc-100 text-zinc-400 dark:bg-zinc-800 dark:text-zinc-500"
                   )}>
-                    <Bell className="h-5 w-5" />
+                    <Bell className="size-5" />
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-start justify-between gap-2 mb-1">
                       <p className={cn(
                         "text-[13px] leading-tight",
                         !notification.read
-                          ? "font-bold text-gray-900 dark:text-gray-100"
-                          : "font-medium text-gray-600 dark:text-gray-400",
+                          ? "font-bold text-zinc-900 dark:text-zinc-100"
+                          : "font-medium text-zinc-600 dark:text-zinc-400",
                       )}>
                         {notification.title}
                       </p>
-                      <p className="text-[10px] text-gray-400 dark:text-gray-500 whitespace-nowrap mt-0.5 font-medium">
+                      <p className="text-[10px] text-zinc-400 dark:text-zinc-500 whitespace-nowrap mt-0.5 font-medium">
                         {notification.time}
                       </p>
                     </div>
                     <p className={cn(
                       "text-xs leading-relaxed line-clamp-2",
-                      !notification.read ? "text-gray-600 dark:text-gray-300" : "text-gray-500 dark:text-gray-500"
+                      !notification.read ? "text-zinc-600 dark:text-zinc-300" : "text-zinc-500 dark:text-zinc-500"
                     )}>
                       {notification.desc}
                     </p>
                   </div>
                   {!notification.read && (
-                    <div className="absolute left-1 top-1/2 -translate-y-1/2 w-1 h-8 bg-indigo-500 rounded-full opacity-0 group-hover:opacity-100 transition-opacity" />
+                    <div className="absolute left-1 top-1/2 -translate-y-1/2 w-1 h-8 bg-violet-500 rounded-full opacity-0 group-hover:opacity-100 transition-opacity" />
                   )}
                 </div>
               ))}
@@ -227,8 +227,8 @@ export function NotificationBell() {
           )}
         </ScrollArea>
         {notifications.length > 0 && (
-          <div className="p-3 bg-gray-50/50 dark:bg-gray-900/50 border-t border-gray-100 dark:border-gray-800 text-center">
-            <p className="text-[10px] text-gray-400 font-medium tracking-wide uppercase">
+          <div className="p-3 bg-zinc-50/50 dark:bg-zinc-900/50 border-t border-zinc-100 dark:border-zinc-800 text-center">
+            <p className="text-[10px] text-zinc-400 font-medium tracking-wide uppercase">
               End of notifications
             </p>
           </div>

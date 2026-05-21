@@ -108,11 +108,11 @@ export function ExpensesScreen() {
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div className="flex items-center gap-4">
-          <div className="h-12 w-12 rounded-2xl bg-rose-100 dark:bg-rose-900/30 flex items-center justify-center">
-            <Wallet className="h-6 w-6 text-rose-600 dark:text-rose-400" />
+          <div className="size-12 rounded-2xl bg-rose-100 dark:bg-rose-900/30 flex items-center justify-center">
+            <Wallet className="size-6 text-rose-600 dark:text-rose-400" />
           </div>
           <div>
-            <h2 className="text-3xl font-semibold tracking-tight text-gray-900 dark:text-gray-100">Expenses</h2>
+            <h2 className="text-3xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-100">Expenses</h2>
             <p className="text-muted-foreground mt-1">Manage school expenditures and categories.</p>
           </div>
         </div>
@@ -129,7 +129,7 @@ export function ExpensesScreen() {
             onClick={() => handleOpenExpense()} 
             className="bg-rose-600 hover:bg-rose-700 text-white shadow-lg shadow-rose-500/20"
           >
-            <Plus className="h-4 w-4 mr-2" />
+            <Plus className="size-4 mr-2" />
             Add Expense
           </Button>
         </div>

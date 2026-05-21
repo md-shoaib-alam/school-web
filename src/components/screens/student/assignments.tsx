@@ -258,11 +258,11 @@ export function StudentAssignments() {
       case "submitted":
         return "text-emerald-600";
       case "active":
-        return "text-gray-500 dark:text-gray-400 dark:text-gray-500 dark:text-gray-400";
+        return "text-zinc-500 dark:text-zinc-400 dark:text-zinc-500 dark:text-zinc-400";
       case "overdue":
         return "text-red-600 dark:text-red-400 font-medium";
       default:
-        return "text-gray-500 dark:text-gray-400 dark:text-gray-500 dark:text-gray-400";
+        return "text-zinc-500 dark:text-zinc-400 dark:text-zinc-500 dark:text-zinc-400";
     }
   };
 
@@ -302,10 +302,10 @@ export function StudentAssignments() {
     <div className="space-y-6">
       {/* Header */}
       <div>
-        <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">
+        <h2 className="text-xl font-semibold text-zinc-900 dark:text-zinc-100">
           My Assignments
         </h2>
-        <p className="text-sm text-gray-500 dark:text-gray-400 dark:text-gray-500 dark:text-gray-400 mt-0.5">
+        <p className="text-sm text-zinc-500 dark:text-zinc-400 dark:text-zinc-500 dark:text-zinc-400 mt-0.5">
           Manage and track your homework and assignments
         </p>
       </div>
@@ -315,31 +315,31 @@ export function StudentAssignments() {
         <SummaryCard
           label="Total"
           count={counts.all}
-          icon={<FileText className="h-4 w-4" />}
+          icon={<FileText className="size-4" />}
           color="violet"
         />
         <SummaryCard
           label="Active"
           count={counts.active}
-          icon={<Clock className="h-4 w-4" />}
+          icon={<Clock className="size-4" />}
           color="amber"
         />
         <SummaryCard
           label="Submitted"
           count={counts.submitted}
-          icon={<CheckCircle2 className="h-4 w-4" />}
+          icon={<CheckCircle2 className="size-4" />}
           color="emerald"
         />
         <SummaryCard
           label="Graded"
           count={counts.graded}
-          icon={<Star className="h-4 w-4" />}
+          icon={<Star className="size-4" />}
           color="violet"
         />
         <SummaryCard
           label="Overdue"
           count={counts.overdue}
-          icon={<AlertTriangle className="h-4 w-4" />}
+          icon={<AlertTriangle className="size-4" />}
           color="red"
         />
       </div>
@@ -348,7 +348,7 @@ export function StudentAssignments() {
       <Card className="rounded-xl shadow-sm">
         <CardHeader className="pb-3">
           <CardTitle className="text-base flex items-center gap-2">
-            <FileText className="h-4 w-4 text-violet-500" />
+            <FileText className="size-4 text-violet-500" />
             Assignment List
           </CardTitle>
         </CardHeader>
@@ -373,8 +373,8 @@ export function StudentAssignments() {
             <TabsContent value={activeTab}>
               <ScrollArea className="max-h-[600px]">
                 {filteredAssignments.length === 0 ? (
-                  <div className="text-center py-12 text-gray-400 dark:text-gray-500 dark:text-gray-400">
-                    <FileText className="h-10 w-10 mx-auto mb-2 opacity-40" />
+                  <div className="text-center py-12 text-zinc-400 dark:text-zinc-500 dark:text-zinc-400">
+                    <FileText className="size-10 mx-auto mb-2 opacity-40" />
                     <p className="text-sm">No assignments found</p>
                     <p className="text-xs mt-1">
                       {activeTab === "all"
@@ -396,7 +396,7 @@ export function StudentAssignments() {
                                 ? "border-violet-200 dark:border-violet-800 dark:border-violet-800 bg-violet-50/50"
                                 : assignment.status === "submitted"
                                   ? "border-emerald-200 dark:border-emerald-800 bg-emerald-50/50"
-                                  : "border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 hover:border-violet-200 dark:border-violet-800 dark:hover:border-violet-800"
+                                  : "border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 hover:border-violet-200 dark:border-violet-800 dark:hover:border-violet-800"
                           }
                         `}
                       >
@@ -404,7 +404,7 @@ export function StudentAssignments() {
                           {/* Content */}
                           <div className="flex-1 min-w-0">
                             <div className="flex items-start justify-between gap-2 mb-1.5">
-                              <h4 className="font-semibold text-sm text-gray-900 dark:text-gray-100 truncate">
+                              <h4 className="font-semibold text-sm text-zinc-900 dark:text-zinc-100 truncate">
                                 {assignment.title}
                               </h4>
                               {getStatusBadge(assignment.status)}
@@ -424,23 +424,23 @@ export function StudentAssignments() {
                                 variant="outline"
                                 className={`text-[10px] font-medium px-2 flex items-center gap-1 border rounded-full ${
                                   assignment.mode === "online"
-                                    ? "bg-indigo-50 text-indigo-700 border-indigo-100/60 dark:bg-indigo-950/20 dark:text-indigo-300 dark:border-indigo-900/50"
+                                    ? "bg-violet-50 text-violet-700 border-violet-100/60 dark:bg-violet-950/20 dark:text-violet-300 dark:border-violet-900/50"
                                     : "bg-amber-50 text-amber-700 border-amber-100/60 dark:bg-amber-950/20 dark:text-amber-300 dark:border-amber-900/50"
                                 }`}
                               >
                                 {assignment.mode === "online" ? (
                                   <>
-                                    <Globe className="h-2.5 w-2.5" /> Online
+                                    <Globe className="size-2.5" /> Online
                                   </>
                                 ) : (
                                   <>
-                                    <BookOpen className="h-2.5 w-2.5" /> Offline
+                                    <BookOpen className="size-2.5" /> Offline
                                   </>
                                 )}
                               </Badge>
                             </div>
 
-                            <p className="text-xs text-gray-500 dark:text-gray-400 dark:text-gray-500 dark:text-gray-400 mb-2">
+                            <p className="text-xs text-zinc-500 dark:text-zinc-400 dark:text-zinc-500 dark:text-zinc-400 mb-2">
                               Teacher: {assignment.teacherName}
                             </p>
 
@@ -462,7 +462,7 @@ export function StudentAssignments() {
                             <div className="flex items-center gap-4">
                               <div className="flex items-center gap-1.5" suppressHydrationWarning>
                                 <Clock
-                                  className={`h-3.5 w-3.5 ${getCountdownColor(assignment.status)}`}
+                                  className={`size-3.5 ${getCountdownColor(assignment.status)}`}
                                 />
                                 <span
                                   className={`text-xs ${getCountdownColor(assignment.status)}`}
@@ -470,7 +470,7 @@ export function StudentAssignments() {
                                   {assignment.countdown}
                                 </span>
                               </div>
-                              <span className="text-[10px] text-gray-400 dark:text-gray-500 dark:text-gray-400" suppressHydrationWarning>
+                              <span className="text-[10px] text-zinc-400 dark:text-zinc-500 dark:text-zinc-400" suppressHydrationWarning>
                                 Due: {formatAssignmentDate(assignment.dueDate)}
                               </span>
                             </div>
@@ -494,22 +494,22 @@ export function StudentAssignments() {
                                 `}
                                 >
                                   {submittingId === assignment.id ? (
-                                    <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                                    <Loader2 className="size-3.5 animate-spin" />
                                   ) : (
-                                    <Send className="h-3.5 w-3.5" />
+                                    <Send className="size-3.5" />
                                   )}
                                   Submit
                                 </Button>
                               )}
                             {assignment.status === "submitted" && (
                               <Badge className="bg-emerald-100 text-emerald-700 text-[10px] gap-1">
-                                <CheckCircle2 className="h-3 w-3" />
+                                <CheckCircle2 className="size-3" />
                                 Submitted
                               </Badge>
                             )}
                             {assignment.status === "graded" && (
                               <Badge className="bg-violet-100 text-violet-700 dark:text-violet-400 text-[10px] gap-1">
-                                <Star className="h-3 w-3" />
+                                <Star className="size-3" />
                                 Graded
                               </Badge>
                             )}
@@ -517,12 +517,12 @@ export function StudentAssignments() {
                         </div>
 
                         {/* Progress bar */}
-                        <div className="mt-3 pt-2 border-t border-gray-100">
+                        <div className="mt-3 pt-2 border-t border-zinc-100">
                           <div className="flex items-center justify-between mb-1">
-                            <span className="text-[10px] text-gray-400 dark:text-gray-500 dark:text-gray-400">
+                            <span className="text-[10px] text-zinc-400 dark:text-zinc-500 dark:text-zinc-400">
                               Progress
                             </span>
-                            <span className="text-[10px] text-gray-500 dark:text-gray-400 font-medium">
+                            <span className="text-[10px] text-zinc-500 dark:text-zinc-400 font-medium">
                               {getProgressValue(assignment.status)}%
                             </span>
                           </div>
@@ -576,11 +576,11 @@ function SummaryCard({
           >
             {icon}
           </div>
-          <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">
+          <p className="text-2xl font-bold text-zinc-900 dark:text-zinc-100">
             {count}
           </p>
         </div>
-        <p className="text-xs text-gray-500 dark:text-gray-400 dark:text-gray-500 dark:text-gray-400 mt-2">
+        <p className="text-xs text-zinc-500 dark:text-zinc-400 dark:text-zinc-500 dark:text-zinc-400 mt-2">
           {label} Assignments
         </p>
       </CardContent>

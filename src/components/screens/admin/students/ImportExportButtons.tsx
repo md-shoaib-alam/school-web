@@ -182,7 +182,7 @@ export function ImportExportButtons({
           setImportResult(null);
         }}
       >
-        <Upload className="h-4 w-4 mr-2" />
+        <Upload className="size-4 mr-2" />
         Import Students
       </Button>
 
@@ -223,7 +223,7 @@ export function ImportExportButtons({
               />
               {importFile ? (
                 <div className="flex flex-col items-center gap-2">
-                  <FileSpreadsheet className="h-10 w-10 text-emerald-600" />
+                  <FileSpreadsheet className="size-10 text-emerald-600" />
                   <p className="text-sm font-medium text-foreground">
                     {importFile.name}
                   </p>
@@ -234,7 +234,7 @@ export function ImportExportButtons({
                 </div>
               ) : (
                 <div className="flex flex-col items-center gap-2">
-                  <Upload className="h-10 w-10 text-muted-foreground" />
+                  <Upload className="size-10 text-muted-foreground" />
                   <p className="text-sm font-medium text-foreground">
                     Drop your Excel or CSV file here or click to browse
                   </p>
@@ -278,7 +278,7 @@ export function ImportExportButtons({
                   downloadSampleTemplate();
                 }}
               >
-                <Download className="h-3.5 w-3.5" />
+                <Download className="size-3.5" />
                 Download Sample Template
               </button>
             </div>
@@ -288,9 +288,9 @@ export function ImportExportButtons({
                 className={`rounded-lg p-4 flex items-start gap-3 ${importResult.success ? "bg-emerald-50 dark:bg-emerald-900/30 border border-emerald-200 dark:border-emerald-800" : "bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-800"}`}
               >
                 {importResult.success ? (
-                  <CheckCircle2 className="h-5 w-5 text-emerald-600 shrink-0 mt-0.5" />
+                  <CheckCircle2 className="size-5 text-emerald-600 shrink-0 mt-0.5" />
                 ) : (
-                  <AlertCircle className="h-5 w-5 text-red-600 shrink-0 mt-0.5" />
+                  <AlertCircle className="size-5 text-red-600 shrink-0 mt-0.5" />
                 )}
                 <div className="text-sm">
                   <p className="font-medium">
@@ -319,12 +319,12 @@ export function ImportExportButtons({
             >
               {importing ? (
                 <>
-                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  <Loader2 className="size-4 mr-2 animate-spin" />
                   Importing...
                 </>
               ) : (
                 <>
-                  <Upload className="h-4 w-4 mr-2" />
+                  <Upload className="size-4 mr-2" />
                   Import Students
                 </>
               )}

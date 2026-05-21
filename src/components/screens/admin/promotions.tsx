@@ -513,7 +513,7 @@ export function AdminPromotions({ initialTab: propTab }: { initialTab?: "individ
           {
             label: "Total Promotions",
             value: summary.total,
-            icon: <Users className="h-5 w-5" />,
+            icon: <Users className="size-5" />,
             color:
               "bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400",
             border: "border-blue-200 dark:border-blue-800",
@@ -521,7 +521,7 @@ export function AdminPromotions({ initialTab: propTab }: { initialTab?: "individ
           {
             label: "Pending Review",
             value: summary.pending,
-            icon: <Clock className="h-5 w-5" />,
+            icon: <Clock className="size-5" />,
             color:
               "bg-amber-100 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400",
             border: "border-amber-200 dark:border-amber-800",
@@ -529,7 +529,7 @@ export function AdminPromotions({ initialTab: propTab }: { initialTab?: "individ
           {
             label: "Approved",
             value: summary.approved,
-            icon: <CheckCircle2 className="h-5 w-5" />,
+            icon: <CheckCircle2 className="size-5" />,
             color:
               "bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400",
             border: "border-emerald-200 dark:border-emerald-800",
@@ -537,7 +537,7 @@ export function AdminPromotions({ initialTab: propTab }: { initialTab?: "individ
           {
             label: "Graduated",
             value: summary.graduated,
-            icon: <GraduationCap className="h-5 w-5" />,
+            icon: <GraduationCap className="size-5" />,
             color:
               "bg-violet-100 dark:bg-violet-900/30 text-violet-600 dark:text-violet-400",
             border: "border-violet-200 dark:border-violet-800",
@@ -549,7 +549,7 @@ export function AdminPromotions({ initialTab: propTab }: { initialTab?: "individ
           >
             <CardContent className="p-4 flex items-center gap-4">
               <div
-                className={`h-12 w-12 rounded-xl flex items-center justify-center shrink-0 ${card.color}`}
+                className={`size-12 rounded-xl flex items-center justify-center shrink-0 ${card.color}`}
               >
                 {card.icon}
               </div>
@@ -621,7 +621,7 @@ export function AdminPromotions({ initialTab: propTab }: { initialTab?: "individ
                 setDialogOpen(true);
               }}
             >
-              <Plus className="h-4 w-4" />
+              <Plus className="size-4" />
               <span>New Promotion</span>
             </Button>
           </div>

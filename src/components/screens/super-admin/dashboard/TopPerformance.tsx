@@ -40,10 +40,10 @@ export function TopPerformance({ loading, data }: TopPerformanceProps) {
   return (
     <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
       {/* Top Performing Schools */}
-      <Card className="lg:col-span-3 border-none shadow-sm bg-white dark:bg-gray-800">
+      <Card className="lg:col-span-3 border-none shadow-sm bg-white dark:bg-zinc-800">
         <CardHeader>
           <CardTitle className="text-base font-bold flex items-center gap-2">
-            <Crown className="h-4 w-4 text-amber-500" /> Top Performing Schools
+            <Crown className="size-4 text-amber-500" /> Top Performing Schools
           </CardTitle>
           <CardDescription className="text-xs">Ranked by active subscription revenue</CardDescription>
         </CardHeader>
@@ -53,10 +53,10 @@ export function TopPerformance({ loading, data }: TopPerformanceProps) {
               {[...Array(5)].map((_, i) => <Skeleton key={i} className="h-14 w-full rounded-xl" />)}
             </div>
           ) : (
-            <div className="rounded-2xl border border-gray-50 dark:border-gray-900 overflow-hidden">
+            <div className="rounded-2xl border border-zinc-50 dark:border-zinc-900 overflow-hidden">
               <Table>
                 <TableHeader>
-                  <TableRow className="bg-gray-50/50 dark:bg-gray-900/50 hover:bg-transparent">
+                  <TableRow className="bg-zinc-50/50 dark:bg-zinc-900/50 hover:bg-transparent">
                     <TableHead className="w-12 text-[10px] font-black uppercase tracking-widest text-center">#</TableHead>
                     <TableHead className="text-[10px] font-black uppercase tracking-widest">School</TableHead>
                     <TableHead className="hidden sm:table-cell text-[10px] font-black uppercase tracking-widest text-center">Plan</TableHead>
@@ -71,9 +71,9 @@ export function TopPerformance({ loading, data }: TopPerformanceProps) {
                       </TableCell>
                       <TableCell>
                         <div className="flex items-center gap-3">
-                          <img src={tenant.logo || "/test.webp"} alt={tenant.name} className="h-8 w-8 rounded-lg object-cover border shadow-sm shrink-0" />
+                          <img src={tenant.logo || "/test.webp"} alt={tenant.name} className="size-8 rounded-lg object-cover border shadow-sm shrink-0" />
                           <div>
-                            <p className="font-medium text-sm text-gray-900 dark:text-gray-100">{tenant.name}</p>
+                            <p className="font-medium text-sm text-zinc-900 dark:text-zinc-100">{tenant.name}</p>
                             <p className="text-xs text-muted-foreground">
                               {tenant.studentCount} students • {tenant._count.classes} classes
                             </p>
@@ -98,10 +98,10 @@ export function TopPerformance({ loading, data }: TopPerformanceProps) {
       </Card>
 
       {/* Plan Distribution Chart */}
-      <Card className="lg:col-span-2 border-none shadow-sm bg-white dark:bg-gray-800">
+      <Card className="lg:col-span-2 border-none shadow-sm bg-white dark:bg-zinc-800">
         <CardHeader>
           <CardTitle className="text-base font-bold flex items-center gap-2">
-            <BarChart3 className="h-4 w-4 text-emerald-600" /> Plan Distribution
+            <BarChart3 className="size-4 text-emerald-600" /> Plan Distribution
           </CardTitle>
           <CardDescription className="text-xs">Breakdown of schools by subscription tier</CardDescription>
         </CardHeader>
@@ -130,7 +130,7 @@ export function TopPerformance({ loading, data }: TopPerformanceProps) {
                           <Cell 
                             key={`cell-${index}`} 
                             fill={PLAN_COLORS[entry.plan.toLowerCase()] || "#10b981"} 
-                            className="stroke-white dark:stroke-gray-800 stroke-2 hover:opacity-90 transition-opacity"
+                            className="stroke-white dark:stroke-zinc-800 stroke-2 hover:opacity-90 transition-opacity"
                           />
                         ))}
                       </Pie>
@@ -141,7 +141,7 @@ export function TopPerformance({ loading, data }: TopPerformanceProps) {
 
               {/* Total indicator in center of donut */}
               <div className="absolute top-[105px] left-1/2 -translate-x-1/2 -translate-y-1/2 flex flex-col items-center justify-center pointer-events-none">
-                <span className="text-3xl font-black text-gray-900 dark:text-gray-100">
+                <span className="text-3xl font-black text-zinc-900 dark:text-zinc-100">
                   {data?.planDistribution.reduce((acc, curr) => acc + curr.count, 0) || 0}
                 </span>
                 <span className="text-[10px] uppercase font-bold tracking-wider text-muted-foreground">
@@ -155,9 +155,9 @@ export function TopPerformance({ loading, data }: TopPerformanceProps) {
                   const color = PLAN_COLORS[entry.plan.toLowerCase()] || "#10b981";
                   return (
                     <div key={entry.plan} className="flex items-center gap-1.5 hover:opacity-80 transition-opacity cursor-pointer">
-                      <div className="w-2.5 h-2.5 rounded-full shrink-0 animate-pulse" style={{ backgroundColor: color }} />
-                      <span className="text-xs font-semibold capitalize text-gray-700 dark:text-gray-300">
-                        {entry.plan}: <span className="font-bold text-gray-900 dark:text-gray-100">{entry.count}</span>
+                      <div className="size-2.5 rounded-full shrink-0 animate-pulse" style={{ backgroundColor: color }} />
+                      <span className="text-xs font-semibold capitalize text-zinc-700 dark:text-zinc-300">
+                        {entry.plan}: <span className="font-bold text-zinc-900 dark:text-zinc-100">{entry.count}</span>
                       </span>
                     </div>
                   );

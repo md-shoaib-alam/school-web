@@ -130,15 +130,15 @@ export function StudentDashboard() {
     <div className="space-y-6">
       {/* Welcome Banner */}
       <div className="relative overflow-hidden rounded-xl bg-gradient-to-r from-violet-600 via-purple-600 to-fuchsia-500 text-white shadow-md">
-        <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/2" />
+        <div className="absolute top-0 right-0 size-32 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/2" />
         <div className="p-6 lg:p-8 relative z-10">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div className="flex items-center gap-4">
-              <div className="h-14 w-14 rounded-xl bg-white/20 backdrop-blur-sm flex items-center justify-center overflow-hidden shrink-0 border border-white/10 shadow-inner">
+              <div className="size-14 rounded-xl bg-white/20 backdrop-blur-sm flex items-center justify-center overflow-hidden shrink-0 border border-white/10 shadow-inner">
                 <img
                   src={currentTenantLogo || "/test.webp"}
                   alt={currentTenantName || ""}
-                  className="h-full w-full object-cover"
+                  className="size-full object-cover"
                 />
               </div>
               <div className="text-left">
@@ -156,7 +156,7 @@ export function StudentDashboard() {
               </div>
             </div>
             <div className="flex items-center gap-2 bg-white/20 backdrop-blur-sm rounded-lg px-4 py-2 shrink-0 self-start sm:self-auto text-white" suppressHydrationWarning>
-              <Calendar className="h-4 w-4" />
+              <Calendar className="size-4" />
               <span className="text-sm font-medium">
                 {today.toLocaleDateString("en-US", {
                   weekday: "long",
@@ -175,7 +175,7 @@ export function StudentDashboard() {
         <StatCard
           title="Attendance"
           value={`${Number(attendanceRate).toFixed(2).replace(/\.00$/, "")}%`}
-          icon={<UserCheck className="h-5 w-5" />}
+          icon={<UserCheck className="size-5" />}
           trend={attendanceRate >= 85 ? "Good" : "Needs Improvement"}
           trendUp={attendanceRate >= 85}
           color="violet"
@@ -183,7 +183,7 @@ export function StudentDashboard() {
         <StatCard
           title="Average Grade"
           value={`${Number(avgGrade).toFixed(2).replace(/\.00$/, "")}%`}
-          icon={<TrendingUp className="h-5 w-5" />}
+          icon={<TrendingUp className="size-5" />}
           trend={
             avgGrade >= 75
               ? "Excellent"
@@ -197,7 +197,7 @@ export function StudentDashboard() {
         <StatCard
           title="Homework"
           value={String(pendingAssignments || 0)}
-          icon={<ClipboardList className="h-5 w-5" />}
+          icon={<ClipboardList className="size-5" />}
           trend="Pending"
           trendUp={false}
           color="amber"
@@ -205,7 +205,7 @@ export function StudentDashboard() {
         <StatCard
           title="Events"
           value={String(pendingAssignments || 0)}
-          icon={<Calendar className="h-5 w-5" />}
+          icon={<Calendar className="size-5" />}
           trend="Upcoming"
           trendUp={true}
           color="blue"
@@ -219,7 +219,7 @@ export function StudentDashboard() {
           <CardHeader className="pb-3">
             <div className="flex items-center justify-between">
               <CardTitle className="flex items-center gap-2 text-base">
-                <Clock className="h-4 w-4 text-violet-500" />
+                <Clock className="size-4 text-violet-500" />
                 Today&apos;s Schedule
               </CardTitle>
               <Badge variant="secondary" className="text-xs">
@@ -229,8 +229,8 @@ export function StudentDashboard() {
           </CardHeader>
           <CardContent>
             {todayTimetable.length === 0 ? (
-              <div className="text-center py-8 text-gray-400 dark:text-gray-500">
-                <BookOpen className="h-10 w-10 mx-auto mb-2 opacity-50" />
+              <div className="text-center py-8 text-zinc-400 dark:text-zinc-500">
+                <BookOpen className="size-10 mx-auto mb-2 opacity-50" />
                 <p className="text-sm">No classes scheduled for today</p>
                 <p className="text-xs mt-1">Enjoy your day off! 🎉</p>
               </div>
@@ -245,27 +245,27 @@ export function StudentDashboard() {
                         className={`flex items-center gap-4 p-3 rounded-lg transition-colors ${isCurrent
                           ? "bg-violet-50 dark:bg-violet-900/30 border border-violet-200 dark:border-violet-800"
                           : isPast
-                            ? "bg-gray-50 dark:bg-gray-800/50 opacity-60"
-                            : "bg-gray-50 dark:bg-gray-800/50 hover:bg-violet-50/50 dark:hover:bg-violet-900/20"
+                            ? "bg-zinc-50 dark:bg-zinc-800/50 opacity-60"
+                            : "bg-zinc-50 dark:bg-zinc-800/50 hover:bg-violet-50/50 dark:hover:bg-violet-900/20"
                           }`}
                         suppressHydrationWarning
                       >
                         <div className="flex-shrink-0 w-20 text-center">
-                          <p className="text-sm font-semibold text-gray-700 dark:text-gray-300">
+                          <p className="text-sm font-semibold text-zinc-700 dark:text-zinc-300">
                             {slot.startTime}
                           </p>
-                          <p className="text-xs text-gray-400 dark:text-gray-500">
+                          <p className="text-xs text-zinc-400 dark:text-zinc-500">
                             {slot.endTime}
                           </p>
                         </div>
                         <div
-                          className={`w-0.5 h-10 rounded-full ${isCurrent ? "bg-violet-400" : "bg-gray-200 dark:bg-gray-700"}`}
+                          className={`w-0.5 h-10 rounded-full ${isCurrent ? "bg-violet-400" : "bg-zinc-200 dark:bg-zinc-700"}`}
                         />
                         <div className="flex-1 min-w-0">
-                          <p className="font-medium text-sm text-gray-900 dark:text-gray-100 truncate">
+                          <p className="font-medium text-sm text-zinc-900 dark:text-zinc-100 truncate">
                             {slot.subjectName}
                           </p>
-                          <p className="text-xs text-gray-500 dark:text-gray-400">
+                          <p className="text-xs text-zinc-500 dark:text-zinc-400">
                             {slot.className}
                           </p>
                         </div>
@@ -275,7 +275,7 @@ export function StudentDashboard() {
                           </Badge>
                         )}
                         {isPast && (
-                          <CheckCircle2 className="h-4 w-4 text-green-400" />
+                          <CheckCircle2 className="size-4 text-green-400" />
                         )}
                       </div>
                     );
@@ -290,14 +290,14 @@ export function StudentDashboard() {
         <Card className="rounded-xl shadow-sm">
           <CardHeader className="pb-3">
             <CardTitle className="flex items-center gap-2 text-base">
-              <Star className="h-4 w-4 text-violet-500" />
+              <Star className="size-4 text-violet-500" />
               Recent Grades
             </CardTitle>
           </CardHeader>
           <CardContent>
             {recentGrades.length === 0 ? (
-              <div className="text-center py-8 text-gray-400 dark:text-gray-500">
-                <GraduationCap className="h-8 w-8 mx-auto mb-2 opacity-50" />
+              <div className="text-center py-8 text-zinc-400 dark:text-zinc-500">
+                <GraduationCap className="size-8 mx-auto mb-2 opacity-50" />
                 <p className="text-sm">No grades yet</p>
               </div>
             ) : (
@@ -310,10 +310,10 @@ export function StudentDashboard() {
                       className="flex items-center justify-between"
                     >
                       <div className="min-w-0 flex-1">
-                        <p className="text-sm font-medium text-gray-900 dark:text-gray-100 truncate">
+                        <p className="text-sm font-medium text-zinc-900 dark:text-zinc-100 truncate">
                           {g.subjectName}
                         </p>
-                        <p className="text-xs text-gray-500 dark:text-gray-400">
+                        <p className="text-xs text-zinc-500 dark:text-zinc-400">
                           {g.examType}
                         </p>
                       </div>
@@ -329,7 +329,7 @@ export function StudentDashboard() {
                         >
                           {g.grade || "N/A"}
                         </Badge>
-                        <span className="text-xs text-gray-500 dark:text-gray-400">
+                        <span className="text-xs text-zinc-500 dark:text-zinc-400">
                           {Number(g.marks).toFixed(2).replace(/\.00$/, "")}/{g.maxMarks}
                         </span>
                       </div>
@@ -346,14 +346,14 @@ export function StudentDashboard() {
       <Card className="rounded-xl shadow-sm">
         <CardHeader className="pb-3">
           <CardTitle className="flex items-center gap-2 text-base">
-            <Bell className="h-4 w-4 text-violet-500" />
+            <Bell className="size-4 text-violet-500" />
             Announcements & Notices
           </CardTitle>
         </CardHeader>
         <CardContent>
           {studentNotices.length === 0 ? (
-            <div className="text-center py-6 text-gray-400 dark:text-gray-500">
-              <Bell className="h-8 w-8 mx-auto mb-2 opacity-50" />
+            <div className="text-center py-6 text-zinc-400 dark:text-zinc-500">
+              <Bell className="size-8 mx-auto mb-2 opacity-50" />
               <p className="text-sm">No announcements</p>
             </div>
           ) : (
@@ -365,7 +365,7 @@ export function StudentDashboard() {
                     ? "border-red-200 dark:border-red-800 bg-red-50 dark:bg-red-900/30"
                     : notice.priority === "important"
                       ? "border-amber-200 dark:border-amber-800 bg-amber-50 dark:bg-amber-900/30"
-                      : "border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-800/50"
+                      : "border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-800/50"
                     }`}
                 >
                   <div className="flex items-start justify-between gap-2">
@@ -377,24 +377,24 @@ export function StudentDashboard() {
                             ? "bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400"
                             : notice.priority === "important"
                               ? "bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400"
-                              : "bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400"
+                              : "bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400"
                             }`}
                         >
                           {notice.priority}
                         </Badge>
                       </div>
-                      <h4 className="font-semibold text-sm text-gray-900 dark:text-gray-100">
+                      <h4 className="font-semibold text-sm text-zinc-900 dark:text-zinc-100">
                         {notice.title}
                       </h4>
-                      <p className="text-xs text-gray-500 dark:text-gray-400 mt-1 line-clamp-2">
+                      <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-1 line-clamp-2">
                         {notice.content}
                       </p>
-                      <p className="text-[10px] text-gray-400 dark:text-gray-500 mt-2" suppressHydrationWarning>
+                      <p className="text-[10px] text-zinc-400 dark:text-zinc-500 mt-2" suppressHydrationWarning>
                         {notice.authorName} •{" "}
                         {formatDate(notice.createdAt)}
                       </p>
                     </div>
-                    <ChevronRight className="h-4 w-4 text-gray-300 dark:text-gray-600 flex-shrink-0 mt-1" />
+                    <ChevronRight className="size-4 text-zinc-300 dark:text-zinc-600 flex-shrink-0 mt-1" />
                   </div>
                 </div>
               ))}
@@ -428,7 +428,7 @@ function StatCard({
     amber: "bg-amber-600 dark:bg-amber-500",
     blue: "bg-blue-600 dark:bg-blue-500",
   };
-  const iconBg = colorMap[color] || "bg-gray-600";
+  const iconBg = colorMap[color] || "bg-zinc-600";
 
   return (
     <Card className="rounded-xl shadow-sm hover:shadow-md transition-shadow">
@@ -437,10 +437,10 @@ function StatCard({
           <div className={`p-2 rounded-lg text-white ${iconBg}`}>{icon}</div>
         </div>
         <div className="mt-3">
-          <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">
+          <p className="text-2xl font-bold text-zinc-900 dark:text-zinc-100">
             {value}
           </p>
-          <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+          <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">
             {title}
           </p>
         </div>

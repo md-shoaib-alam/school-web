@@ -59,7 +59,7 @@ export function ExpensesTable({
 }: ExpensesTableProps) {
   return (
     <Card className="overflow-hidden border-rose-100 dark:border-rose-900/30 shadow-md">
-      <div className="p-4 border-b bg-gray-50/50 dark:bg-gray-900/50 flex flex-wrap items-center justify-between gap-4">
+      <div className="p-4 border-b bg-zinc-50/50 dark:bg-zinc-900/50 flex flex-wrap items-center justify-between gap-4">
         <div className="flex items-center gap-3">
           <Select 
             value={filters.categoryId || "all"} 
@@ -93,7 +93,7 @@ export function ExpensesTable({
 
         <div className="flex items-center gap-2">
           <Button variant="outline" size="sm" onClick={onExport}>
-            <Download className="h-4 w-4 mr-2" />
+            <Download className="size-4 mr-2" />
             Export
           </Button>
         </div>
@@ -101,7 +101,7 @@ export function ExpensesTable({
 
       <Table>
         <TableHeader>
-          <TableRow className="bg-gray-50 dark:bg-gray-900/50">
+          <TableRow className="bg-zinc-50 dark:bg-zinc-900/50">
             <TableHead>Date</TableHead>
             <TableHead>Category</TableHead>
             <TableHead>Description</TableHead>
@@ -149,18 +149,18 @@ export function ExpensesTable({
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                       <Button variant="ghost" size="icon">
-                        <MoreVertical className="h-4 w-4" />
+                        <MoreVertical className="size-4" />
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
                       <DropdownMenuItem onClick={() => onEdit(e)}>
-                        <Edit2 className="h-4 w-4 mr-2" /> Edit
+                        <Edit2 className="size-4 mr-2" /> Edit
                       </DropdownMenuItem>
                       <DropdownMenuItem 
                         onClick={() => onDelete(e.id)} 
                         className="text-rose-600 focus:text-rose-600"
                       >
-                        <Trash2 className="h-4 w-4 mr-2" /> Delete
+                        <Trash2 className="size-4 mr-2" /> Delete
                       </DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>

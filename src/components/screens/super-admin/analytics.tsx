@@ -95,10 +95,10 @@ export function SuperAdminAnalytics() {
   const records = services?.database?.records || {};
 
   const coreMetrics = [
-    { label: "System Uptime", value: formatUptime(data?.uptime), icon: <Clock className="h-4 w-4" />, color: "text-emerald-600" },
-    { label: "Server Latency", value: server?.totalLatency || "0ms", icon: <Activity className="h-4 w-4" />, color: "text-blue-600" },
-    { label: "Memory (RSS)", value: memory?.rss || "0 MB", icon: <Cpu className="h-4 w-4" />, color: "text-purple-600" },
-    { label: "Node Version", value: server?.nodeVersion || "N/A", icon: <Code className="h-4 w-4" />, color: "text-amber-600" },
+    { label: "System Uptime", value: formatUptime(data?.uptime), icon: <Clock className="size-4" />, color: "text-emerald-600" },
+    { label: "Server Latency", value: server?.totalLatency || "0ms", icon: <Activity className="size-4" />, color: "text-blue-600" },
+    { label: "Memory (RSS)", value: memory?.rss || "0 MB", icon: <Cpu className="size-4" />, color: "text-purple-600" },
+    { label: "Node Version", value: server?.nodeVersion || "N/A", icon: <Code className="size-4" />, color: "text-amber-600" },
   ];
 
   return (
@@ -106,26 +106,26 @@ export function SuperAdminAnalytics() {
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-semibold text-gray-900 dark:text-white">System Performance & Health</h1>
-          <p className="text-sm text-gray-500 dark:text-gray-400">Comprehensive real-time infrastructure and service monitoring</p>
+          <h1 className="text-2xl font-semibold text-zinc-900 dark:text-white">System Performance & Health</h1>
+          <p className="text-sm text-zinc-500 dark:text-zinc-400">Comprehensive real-time infrastructure and service monitoring</p>
         </div>
         <Button variant="outline" className="gap-2" onClick={fetchHealth} disabled={loading}>
-          <RefreshCw className={loading ? "h-4 w-4 animate-spin" : "h-4 w-4"} />
+          <RefreshCw className={loading ? "size-4 animate-spin" : "size-4"} />
           Sync Health Data
         </Button>
       </div>
 
       {/* Status Bar */}
-      <div className="flex items-center justify-between px-4 py-3 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-sm">
+      <div className="flex items-center justify-between px-4 py-3 bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-lg shadow-sm">
         <div className="flex items-center gap-2">
-          <div className={`h-2 w-2 rounded-full ${data?.status === "healthy" ? "bg-emerald-500" : "bg-amber-500"}`} />
-          <span className="text-sm font-medium text-gray-700 dark:text-gray-200">
+          <div className={`size-2 rounded-full ${data?.status === "healthy" ? "bg-emerald-500" : "bg-amber-500"}`} />
+          <span className="text-sm font-medium text-zinc-700 dark:text-zinc-200">
             Platform Status: <span className={data?.status === "healthy" ? "text-emerald-600 font-bold" : "text-amber-600 font-bold"}>{data?.status?.toUpperCase() || "UNKNOWN"}</span>
           </span>
         </div>
-        <div className="flex items-center gap-4 text-xs text-gray-400">
-           <span className="hidden sm:inline">Environment: <span className="font-bold uppercase text-gray-600 dark:text-gray-300">{server?.environment || "N/A"}</span></span>
-           <span className="hidden sm:inline h-4 w-px bg-gray-200 dark:bg-gray-700" />
+        <div className="flex items-center gap-4 text-xs text-zinc-400">
+           <span className="hidden sm:inline">Environment: <span className="font-bold uppercase text-zinc-600 dark:text-zinc-300">{server?.environment || "N/A"}</span></span>
+           <span className="hidden sm:inline h-4 w-px bg-zinc-200 dark:bg-zinc-700" />
            <span>Checked: {lastChecked}</span>
         </div>
       </div>
@@ -133,15 +133,15 @@ export function SuperAdminAnalytics() {
       {/* Core Metrics Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {coreMetrics.map((metric, i) => (
-          <Card key={i} className="border border-gray-200 dark:border-gray-700 shadow-sm bg-white dark:bg-gray-800">
+          <Card key={i} className="border border-zinc-200 dark:border-zinc-700 shadow-sm bg-white dark:bg-zinc-800">
             <CardContent className="p-5">
               <div className="flex items-center gap-3 mb-2">
                 <div className={`${metric.color}`}>
                   {metric.icon}
                 </div>
-                <span className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">{metric.label}</span>
+                <span className="text-xs font-semibold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">{metric.label}</span>
               </div>
-              <div className="text-2xl font-bold text-gray-900 dark:text-white">
+              <div className="text-2xl font-bold text-zinc-900 dark:text-white">
                 {metric.value}
               </div>
             </CardContent>
@@ -151,38 +151,38 @@ export function SuperAdminAnalytics() {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Service Connectivity */}
-        <Card className="lg:col-span-2 border border-gray-200 dark:border-gray-700 shadow-sm bg-white dark:bg-gray-800">
+        <Card className="lg:col-span-2 border border-zinc-200 dark:border-zinc-700 shadow-sm bg-white dark:bg-zinc-800">
           <CardHeader className="pb-2">
             <CardTitle className="text-base font-bold flex items-center gap-2">
-              <Wifi className="h-4 w-4 text-emerald-600" />
+              <Wifi className="size-4 text-emerald-600" />
               Service Connectivity
             </CardTitle>
             <CardDescription className="text-xs">Connection status and latency for core platform services</CardDescription>
           </CardHeader>
           <CardContent className="pt-4 grid grid-cols-1 sm:grid-cols-2 gap-3">
             {[
-              { label: "Database", status: services?.database?.status, latency: services?.database?.latency, icon: <Database className="h-4 w-4" /> },
-              { label: "Redis Cache", status: services?.redis?.status, latency: services?.redis?.latency, icon: <Zap className="h-4 w-4" /> },
-              { label: "Razorpay", status: services?.razorpay?.status, icon: <CreditCard className="h-4 w-4" /> },
-              { label: "BullMQ (Queues)", status: services?.bullmq?.status, icon: <Workflow className="h-4 w-4" /> },
-              { label: "Firebase (FCM)", status: services?.firebase?.status, sub: services?.firebase?.serviceAccountName, icon: <Cloud className="h-4 w-4" /> },
-              { label: "Object Storage (R2)", status: services?.storage?.status, icon: <Box className="h-4 w-4" /> },
+              { label: "Database", status: services?.database?.status, latency: services?.database?.latency, icon: <Database className="size-4" /> },
+              { label: "Redis Cache", status: services?.redis?.status, latency: services?.redis?.latency, icon: <Zap className="size-4" /> },
+              { label: "Razorpay", status: services?.razorpay?.status, icon: <CreditCard className="size-4" /> },
+              { label: "BullMQ (Queues)", status: services?.bullmq?.status, icon: <Workflow className="size-4" /> },
+              { label: "Firebase (FCM)", status: services?.firebase?.status, sub: services?.firebase?.serviceAccountName, icon: <Cloud className="size-4" /> },
+              { label: "Object Storage (R2)", status: services?.storage?.status, icon: <Box className="size-4" /> },
             ].map((svc, i) => (
-              <div key={i} className="flex items-center justify-between p-3 rounded-lg border border-gray-100 dark:border-gray-700 bg-gray-50/50 dark:bg-gray-900/20">
+              <div key={i} className="flex items-center justify-between p-3 rounded-lg border border-zinc-100 dark:border-zinc-700 bg-zinc-50/50 dark:bg-zinc-900/20">
                 <div className="flex items-center gap-3">
-                  <div className={svc.status === "connected" ? "text-emerald-500" : "text-gray-400"}>
+                  <div className={svc.status === "connected" ? "text-emerald-500" : "text-zinc-400"}>
                     {svc.icon}
                   </div>
                   <div className="flex flex-col">
-                    <span className="text-sm font-bold text-gray-700 dark:text-gray-200">{svc.label}</span>
-                    {svc.sub && <span className="text-[10px] text-gray-400 truncate max-w-[120px]">{svc.sub}</span>}
+                    <span className="text-sm font-bold text-zinc-700 dark:text-zinc-200">{svc.label}</span>
+                    {svc.sub && <span className="text-[10px] text-zinc-400 truncate max-w-[120px]">{svc.sub}</span>}
                   </div>
                 </div>
                 <div className="flex flex-col items-end">
                   <Badge variant="outline" className={`text-[9px] ${svc.status === "connected" ? "bg-emerald-50 text-emerald-700 border-emerald-200" : "bg-red-50 text-red-700 border-red-200"}`}>
                     {svc.status?.toUpperCase() || "OFFLINE"}
                   </Badge>
-                  {svc.latency && <span className="text-[10px] text-gray-400 mt-1">{svc.latency}</span>}
+                  {svc.latency && <span className="text-[10px] text-zinc-400 mt-1">{svc.latency}</span>}
                 </div>
               </div>
             ))}
@@ -190,29 +190,29 @@ export function SuperAdminAnalytics() {
         </Card>
 
         {/* Platform Statistics */}
-        <Card className="border border-gray-200 dark:border-gray-700 shadow-sm bg-white dark:bg-gray-800">
+        <Card className="border border-zinc-200 dark:border-zinc-700 shadow-sm bg-white dark:bg-zinc-800">
           <CardHeader className="pb-2">
             <CardTitle className="text-base font-bold flex items-center gap-2">
-              <Shield className="h-4 w-4 text-teal-600" />
+              <Shield className="size-4 text-teal-600" />
               Platform Records
             </CardTitle>
             <CardDescription className="text-xs">Aggregate counts across all tenants</CardDescription>
           </CardHeader>
           <CardContent className="space-y-3 pt-4">
             {[
-              { label: "Total Schools", value: records?.schools, icon: <Building2 className="h-3.5 w-3.5" /> },
-              { label: "Total Users", value: records?.users, icon: <Users className="h-3.5 w-3.5" /> },
+              { label: "Total Schools", value: records?.schools, icon: <Building2 className="size-3.5" /> },
+              { label: "Total Users", value: records?.users, icon: <Users className="size-3.5" /> },
             ].map((stat, i) => (
-              <div key={i} className="flex justify-between items-center py-2 border-b border-gray-100 dark:border-gray-700 last:border-0">
-                <div className="flex items-center gap-2 text-sm text-gray-500">
+              <div key={i} className="flex justify-between items-center py-2 border-b border-zinc-100 dark:border-zinc-700 last:border-0">
+                <div className="flex items-center gap-2 text-sm text-zinc-500">
                   {stat.icon}
                   {stat.label}
                 </div>
-                <span className="text-sm font-bold text-gray-900 dark:text-white">{(stat.value || 0).toLocaleString()}</span>
+                <span className="text-sm font-bold text-zinc-900 dark:text-white">{(stat.value || 0).toLocaleString()}</span>
               </div>
             ))}
             <div className="pt-2">
-               <p className="text-[10px] text-gray-400 italic font-medium leading-relaxed">
+               <p className="text-[10px] text-zinc-400 italic font-medium leading-relaxed">
                  Real-time synchronization with primary database. Counts reflect all registered entities across the SaaS network.
                </p>
             </div>
@@ -220,10 +220,10 @@ export function SuperAdminAnalytics() {
         </Card>
 
         {/* Memory Allocation */}
-        <Card className="border border-gray-200 dark:border-gray-700 shadow-sm bg-white dark:bg-gray-800">
+        <Card className="border border-zinc-200 dark:border-zinc-700 shadow-sm bg-white dark:bg-zinc-800">
           <CardHeader className="pb-2">
             <CardTitle className="text-base font-bold flex items-center gap-2">
-              <HardDrive className="h-4 w-4 text-purple-600" />
+              <HardDrive className="size-4 text-purple-600" />
               Memory Allocation
             </CardTitle>
             <CardDescription className="text-xs">Node.js process memory distribution</CardDescription>
@@ -236,10 +236,10 @@ export function SuperAdminAnalytics() {
             ].map((mem, i) => (
               <div key={i} className="space-y-1">
                 <div className="flex justify-between text-xs font-medium">
-                  <span className="text-gray-500">{mem.label}</span>
-                  <span className="text-gray-900 dark:text-gray-100">{mem.value}</span>
+                  <span className="text-zinc-500">{mem.label}</span>
+                  <span className="text-zinc-900 dark:text-zinc-100">{mem.value}</span>
                 </div>
-                <div className="h-1.5 w-full bg-gray-100 dark:bg-gray-700 rounded-full overflow-hidden">
+                <div className="h-1.5 w-full bg-zinc-100 dark:bg-zinc-700 rounded-full overflow-hidden">
                   <div className={`h-full ${mem.color}`} style={{ width: '45%' }} />
                 </div>
               </div>
@@ -248,51 +248,51 @@ export function SuperAdminAnalytics() {
         </Card>
 
         {/* Connection Pool */}
-        <Card className="border border-gray-200 dark:border-gray-700 shadow-sm bg-white dark:bg-gray-800">
+        <Card className="border border-zinc-200 dark:border-zinc-700 shadow-sm bg-white dark:bg-zinc-800">
           <CardHeader className="pb-2">
             <CardTitle className="text-base font-bold flex items-center gap-2">
-              <Layers className="h-4 w-4 text-amber-600" />
+              <Layers className="size-4 text-amber-600" />
               Connection Pool
             </CardTitle>
             <CardDescription className="text-xs">Database pooling and saturation</CardDescription>
           </CardHeader>
           <CardContent className="space-y-3 pt-4">
-            <div className="flex justify-between items-center py-2 border-b border-gray-100 dark:border-gray-700">
-              <span className="text-sm text-gray-500">Active / Max</span>
-              <span className="text-sm font-bold text-gray-900 dark:text-white">{pool?.active} / {pool?.max}</span>
+            <div className="flex justify-between items-center py-2 border-b border-zinc-100 dark:border-zinc-700">
+              <span className="text-sm text-zinc-500">Active / Max</span>
+              <span className="text-sm font-bold text-zinc-900 dark:text-white">{pool?.active} / {pool?.max}</span>
             </div>
-            <div className="flex justify-between items-center py-2 border-b border-gray-100 dark:border-gray-700">
-              <span className="text-sm text-gray-500">Idle / Waiting</span>
-              <span className="text-sm font-bold text-gray-900 dark:text-white">{pool?.idle} / {pool?.waiting}</span>
+            <div className="flex justify-between items-center py-2 border-b border-zinc-100 dark:border-zinc-700">
+              <span className="text-sm text-zinc-500">Idle / Waiting</span>
+              <span className="text-sm font-bold text-zinc-900 dark:text-white">{pool?.idle} / {pool?.waiting}</span>
             </div>
             <div className="flex justify-between items-center py-2">
-              <span className="text-sm text-gray-500">Total Count</span>
-              <span className="text-sm font-bold text-gray-900 dark:text-white">{pool?.totalCount}</span>
+              <span className="text-sm text-zinc-500">Total Count</span>
+              <span className="text-sm font-bold text-zinc-900 dark:text-white">{pool?.totalCount}</span>
             </div>
           </CardContent>
         </Card>
 
         {/* Runtime Environment */}
-        <Card className="border border-gray-200 dark:border-gray-700 shadow-sm bg-white dark:bg-gray-800">
+        <Card className="border border-zinc-200 dark:border-zinc-700 shadow-sm bg-white dark:bg-zinc-800">
           <CardHeader className="pb-2">
             <CardTitle className="text-base font-bold flex items-center gap-2">
-              <Server className="h-4 w-4 text-gray-600" />
+              <Server className="size-4 text-zinc-600" />
               Runtime Details
             </CardTitle>
             <CardDescription className="text-xs">System environment and node version</CardDescription>
           </CardHeader>
           <CardContent className="space-y-3 pt-4">
-            <div className="flex justify-between items-center py-2 border-b border-gray-100 dark:border-gray-700">
-              <span className="text-sm text-gray-500">OS Platform</span>
-              <span className="text-sm font-bold text-gray-900 dark:text-white uppercase">{server?.platform || "Unknown"}</span>
+            <div className="flex justify-between items-center py-2 border-b border-zinc-100 dark:border-zinc-700">
+              <span className="text-sm text-zinc-500">OS Platform</span>
+              <span className="text-sm font-bold text-zinc-900 dark:text-white uppercase">{server?.platform || "Unknown"}</span>
             </div>
-            <div className="flex justify-between items-center py-2 border-b border-gray-100 dark:border-gray-700">
-              <span className="text-sm text-gray-500">Node Engine</span>
-              <span className="text-sm font-bold text-gray-900 dark:text-white">{server?.nodeVersion || "N/A"}</span>
+            <div className="flex justify-between items-center py-2 border-b border-zinc-100 dark:border-zinc-700">
+              <span className="text-sm text-zinc-500">Node Engine</span>
+              <span className="text-sm font-bold text-zinc-900 dark:text-white">{server?.nodeVersion || "N/A"}</span>
             </div>
             <div className="flex justify-between items-center py-2">
-              <span className="text-sm text-gray-500">Environment</span>
-              <span className="text-sm font-bold text-gray-900 dark:text-white capitalize">{server?.environment || "N/A"}</span>
+              <span className="text-sm text-zinc-500">Environment</span>
+              <span className="text-sm font-bold text-zinc-900 dark:text-white capitalize">{server?.environment || "N/A"}</span>
             </div>
           </CardContent>
         </Card>

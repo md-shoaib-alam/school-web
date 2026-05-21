@@ -52,7 +52,7 @@ const PlanBadge = memo(({ plan }: { plan: string }) => {
       variant="outline"
       className={`${config.bg} ${config.text} ${config.border} border text-[10px] uppercase tracking-wider py-0.5 px-2 font-semibold`}
     >
-      <Crown className="h-3 w-3 mr-1" />
+      <Crown className="size-3 mr-1" />
       {displayName}
     </Badge>
   );
@@ -93,13 +93,13 @@ const TenantCard = memo(function TenantCard({
       <CardContent className="p-5 space-y-4">
         <div className="flex items-start justify-between gap-2">
           <div className="flex items-center gap-3 min-w-0">
-            <div className="h-12 w-12 rounded-xl bg-gradient-to-br from-teal-50 to-teal-100 dark:from-teal-950/40 dark:to-teal-900/40 text-teal-700 dark:text-teal-400 flex items-center justify-center shrink-0 border border-teal-200/50 dark:border-teal-800/30 overflow-hidden">
-              <img src={tenant.logo || "/test.webp"} alt={tenant.name} className="h-full w-full object-cover" />
+            <div className="size-12 rounded-xl bg-gradient-to-br from-teal-50 to-teal-100 dark:from-teal-950/40 dark:to-teal-900/40 text-teal-700 dark:text-teal-400 flex items-center justify-center shrink-0 border border-teal-200/50 dark:border-teal-800/30 overflow-hidden">
+              <img src={tenant.logo || "/test.webp"} alt={tenant.name} className="size-full object-cover" />
             </div>
             <div className="min-w-0">
               <h3 className="font-semibold text-base truncate">{tenant.name}</h3>
               <p className="text-xs text-muted-foreground flex items-center gap-1">
-                <Globe className="h-3 w-3" />
+                <Globe className="size-3" />
                 {tenant.slug}
               </p>
             </div>
@@ -109,38 +109,38 @@ const TenantCard = memo(function TenantCard({
               <Button
                 variant="ghost"
                 size="icon"
-                className="h-8 w-8 shrink-0 hover:bg-teal-50 dark:hover:bg-teal-950/50"
+                className="size-8 shrink-0 hover:bg-teal-50 dark:hover:bg-teal-950/50"
               >
-                <MoreVertical className="h-4 w-4" />
+                <MoreVertical className="size-4" />
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-48">
               <DropdownMenuItem onClick={onView}>
-                <Eye className="h-4 w-4 mr-2" />
+                <Eye className="size-4 mr-2" />
                 Details
               </DropdownMenuItem>
               <DropdownMenuItem onClick={onManageData}>
-                <Database className="h-4 w-4 mr-2" />
+                <Database className="size-4 mr-2" />
                 Manage Data
               </DropdownMenuItem>
               <DropdownMenuItem onClick={() => onAddAdmin(tenant)}>
-                <ShieldCheck className="h-4 w-4 mr-2 text-indigo-600" />
+                <ShieldCheck className="size-4 mr-2 text-violet-600" />
                 Create Admin
               </DropdownMenuItem>
               <DropdownMenuItem onClick={onEdit}>
-                <Edit className="h-4 w-4 mr-2" />
+                <Edit className="size-4 mr-2" />
                 Edit
               </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem onClick={onToggleStatus}>
                 {tenant.status === "active" ? (
                   <>
-                    <Ban className="h-4 w-4 mr-2" />
+                    <Ban className="size-4 mr-2" />
                     Suspend
                   </>
                 ) : (
                   <>
-                    <CheckCircle2 className="h-4 w-4 mr-2" />
+                    <CheckCircle2 className="size-4 mr-2" />
                     Activate
                   </>
                 )}
@@ -150,7 +150,7 @@ const TenantCard = memo(function TenantCard({
                 className="text-red-600 focus:text-red-600"
                 onClick={onDelete}
               >
-                <Trash2 className="h-4 w-4 mr-2" />
+                <Trash2 className="size-4 mr-2" />
                 Delete
               </DropdownMenuItem>
             </DropdownMenuContent>
@@ -164,7 +164,7 @@ const TenantCard = memo(function TenantCard({
 
         <div className="grid grid-cols-3 gap-2 py-1">
           <div className="text-center py-2 px-1 rounded-xl bg-muted/40 border border-muted-foreground/5">
-            <GraduationCap className="h-4 w-4 mx-auto text-teal-500 mb-1" />
+            <GraduationCap className="size-4 mx-auto text-teal-500 mb-1" />
             <p className="text-sm font-bold leading-tight">
               {tenant.studentCount}
             </p>
@@ -173,7 +173,7 @@ const TenantCard = memo(function TenantCard({
             </p>
           </div>
           <div className="text-center py-2 px-1 rounded-xl bg-muted/40 border border-muted-foreground/5">
-            <Users className="h-4 w-4 mx-auto text-blue-500 mb-1" />
+            <Users className="size-4 mx-auto text-blue-500 mb-1" />
             <p className="text-sm font-bold leading-tight">
               {tenant.teacherCount}
             </p>
@@ -182,7 +182,7 @@ const TenantCard = memo(function TenantCard({
             </p>
           </div>
           <div className="text-center py-2 px-1 rounded-xl bg-muted/40 border border-muted-foreground/5">
-            <UserCheck className="h-4 w-4 mx-auto text-emerald-500 mb-1" />
+            <UserCheck className="size-4 mx-auto text-emerald-500 mb-1" />
             <p className="text-sm font-bold leading-tight">
               {tenant.parentCount}
             </p>
@@ -212,11 +212,11 @@ const TenantCard = memo(function TenantCard({
             </Button>
           </div>
           <Button
-            className="w-full bg-indigo-600 hover:bg-indigo-700 text-white h-9 rounded-lg gap-2 shadow-sm shadow-indigo-200 dark:shadow-none transition-all active:scale-[0.98]"
+            className="w-full bg-violet-600 hover:bg-violet-700 text-white h-9 rounded-lg gap-2 shadow-sm shadow-violet-200 dark:shadow-none transition-all active:scale-[0.98]"
             size="sm"
             onClick={() => onAddAdmin(tenant)}
           >
-            <ShieldCheck className="h-4 w-4" />
+            <ShieldCheck className="size-4" />
             Add School Admin
           </Button>
         </div>
@@ -270,8 +270,8 @@ export function TenantTable({
     return (
       <Card className="py-20 text-center border-dashed border-2">
         <CardContent className="space-y-3">
-          <div className="h-16 w-16 bg-muted rounded-full flex items-center justify-center mx-auto mb-2">
-            <Building2 className="h-8 w-8 text-muted-foreground opacity-50" />
+          <div className="size-16 bg-muted rounded-full flex items-center justify-center mx-auto mb-2">
+            <Building2 className="size-8 text-muted-foreground opacity-50" />
           </div>
           <h3 className="font-semibold text-lg">No schools found</h3>
           <p className="text-muted-foreground max-w-xs mx-auto">
@@ -312,7 +312,7 @@ export function TenantTable({
                 onClick={() => onPageChange(currentPage - 1)}
                 disabled={currentPage === 1}
               >
-                <ChevronLeft className="h-4 w-4 mr-1" /> Previous
+                <ChevronLeft className="size-4 mr-1" /> Previous
               </Button>
               <Button
                 variant="outline"
@@ -320,7 +320,7 @@ export function TenantTable({
                 onClick={() => onPageChange(currentPage + 1)}
                 disabled={currentPage === totalPages}
               >
-                Next <ChevronRight className="h-4 w-4 ml-1" />
+                Next <ChevronRight className="size-4 ml-1" />
               </Button>
             </div>
           </div>
@@ -348,8 +348,8 @@ export function TenantTable({
               <TableRow key={tenant.id} className="hover:bg-teal-50/30 dark:hover:bg-teal-950/20 transition-colors">
                 <TableCell>
                   <div className="flex items-center gap-3">
-                    <div className="h-9 w-9 rounded-lg bg-teal-50 dark:bg-teal-900/40 text-teal-600 flex items-center justify-center font-bold overflow-hidden border">
-                      <img src={tenant.logo || "/test.webp"} alt={tenant.name} className="h-full w-full object-cover" />
+                    <div className="size-9 rounded-lg bg-teal-50 dark:bg-teal-900/40 text-teal-600 flex items-center justify-center font-bold overflow-hidden border">
+                      <img src={tenant.logo || "/test.webp"} alt={tenant.name} className="size-full object-cover" />
                     </div>
                     <div>
                       <p className="font-bold text-sm">{tenant.name}</p>
@@ -382,38 +382,38 @@ export function TenantTable({
                 <TableCell>
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" size="icon" className="h-8 w-8">
-                        <MoreVertical className="h-4 w-4" />
+                      <Button variant="ghost" size="icon" className="size-8">
+                        <MoreVertical className="size-4" />
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end" className="w-48">
                       <DropdownMenuItem onClick={() => onView(tenant)}>
-                        <Eye className="h-4 w-4 mr-2" /> Details
+                        <Eye className="size-4 mr-2" /> Details
                       </DropdownMenuItem>
                       <DropdownMenuItem onClick={() => onManageData(tenant)}>
-                        <Database className="h-4 w-4 mr-2" /> Manage Data
+                        <Database className="size-4 mr-2" /> Manage Data
                       </DropdownMenuItem>
                       <DropdownMenuItem onClick={() => onAddAdmin(tenant)}>
-                        <ShieldCheck className="h-4 w-4 mr-2 text-indigo-600" /> Create Admin
+                        <ShieldCheck className="size-4 mr-2 text-violet-600" /> Create Admin
                       </DropdownMenuItem>
                       <DropdownMenuItem onClick={() => onEdit(tenant)}>
-                        <Edit className="h-4 w-4 mr-2" /> Edit
+                        <Edit className="size-4 mr-2" /> Edit
                       </DropdownMenuItem>
                       <DropdownMenuSeparator />
                       <DropdownMenuItem onClick={() => onToggleStatus(tenant)}>
                         {tenant.status === "active" ? (
                           <>
-                            <Ban className="h-4 w-4 mr-2" /> Suspend
+                            <Ban className="size-4 mr-2" /> Suspend
                           </>
                         ) : (
                           <>
-                            <CheckCircle2 className="h-4 w-4 mr-2" /> Activate
+                            <CheckCircle2 className="size-4 mr-2" /> Activate
                           </>
                         )}
                       </DropdownMenuItem>
                       <DropdownMenuSeparator />
                       <DropdownMenuItem className="text-red-600 focus:text-red-600" onClick={() => onDelete(tenant)}>
-                        <Trash2 className="h-4 w-4 mr-2" /> Delete
+                        <Trash2 className="size-4 mr-2" /> Delete
                       </DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>
@@ -437,7 +437,7 @@ export function TenantTable({
               onClick={() => onPageChange(currentPage - 1)}
               disabled={currentPage === 1}
             >
-              <ChevronLeft className="h-3.5 w-3.5" />
+              <ChevronLeft className="size-3.5" />
             </Button>
             <div className="flex items-center gap-1 px-2">
               <span className="text-xs font-bold">{currentPage}</span>
@@ -451,7 +451,7 @@ export function TenantTable({
               onClick={() => onPageChange(currentPage + 1)}
               disabled={currentPage === totalPages}
             >
-              <ChevronRight className="h-3.5 w-3.5" />
+              <ChevronRight className="size-3.5" />
             </Button>
           </div>
         </div>

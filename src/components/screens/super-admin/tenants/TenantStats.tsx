@@ -37,7 +37,7 @@ const StatCard = memo(function StatCard({
             </div>
           </div>
           <div
-            className={`h-10 w-10 sm:h-12 sm:w-12 rounded-xl ${iconBg} ${iconColor} flex items-center justify-center shrink-0`}
+            className={`size-10 sm:size-12 rounded-xl ${iconBg} ${iconColor} flex items-center justify-center shrink-0`}
           >
             {icon}
           </div>
@@ -62,7 +62,7 @@ export function TenantStats({ stats }: TenantStatsProps) {
       <StatCard
         title="Total Schools"
         value={stats.total}
-        icon={<Building2 className="h-5 w-5" />}
+        icon={<Building2 className="size-5" />}
         iconBg="bg-teal-100 dark:bg-teal-900/30"
         iconColor="text-teal-600"
         trend={null}
@@ -70,7 +70,7 @@ export function TenantStats({ stats }: TenantStatsProps) {
       <StatCard
         title="Active Schools"
         value={stats.active}
-        icon={<CheckCircle2 className="h-5 w-5" />}
+        icon={<CheckCircle2 className="size-5" />}
         iconBg="bg-emerald-100 dark:bg-emerald-900/30"
         iconColor="text-emerald-600"
         trend={
@@ -82,7 +82,7 @@ export function TenantStats({ stats }: TenantStatsProps) {
       <StatCard
         title="Trial Schools"
         value={stats.trial}
-        icon={<Activity className="h-5 w-5" />}
+        icon={<Activity className="size-5" />}
         iconBg="bg-blue-100 dark:bg-blue-900/30"
         iconColor="text-blue-600"
         trend={null}
@@ -90,7 +90,7 @@ export function TenantStats({ stats }: TenantStatsProps) {
       <StatCard
         title="Suspended"
         value={stats.suspended}
-        icon={<Ban className="h-5 w-5" />}
+        icon={<Ban className="size-5" />}
         iconBg="bg-red-100 dark:bg-red-900/30"
         iconColor="text-red-600"
         trend={null}

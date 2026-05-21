@@ -138,7 +138,7 @@ export function ConcessionsTab({ canCreate, canEdit, canDelete }: ConcessionsTab
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <Card className="hover:shadow-md transition-shadow">
           <CardContent className="p-4 flex items-center gap-4">
-            <div className="h-12 w-12 rounded-xl flex items-center justify-center bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400"><Percent className="h-5 w-5" /></div>
+            <div className="size-12 rounded-xl flex items-center justify-center bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400"><Percent className="size-5" /></div>
             <div>
               <p className="text-xs text-muted-foreground">Active Concessions</p>
               <p className="text-2xl font-bold">{activeConcessions.length}</p>
@@ -147,7 +147,7 @@ export function ConcessionsTab({ canCreate, canEdit, canDelete }: ConcessionsTab
         </Card>
         <Card className="hover:shadow-md transition-shadow">
           <CardContent className="p-4 flex items-center gap-4">
-            <div className="h-12 w-12 rounded-xl flex items-center justify-center bg-amber-100 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400"><DollarSign className="h-5 w-5" /></div>
+            <div className="size-12 rounded-xl flex items-center justify-center bg-amber-100 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400"><DollarSign className="size-5" /></div>
             <div>
               <p className="text-xs text-muted-foreground">Total Concession Amount</p>
               <p className="text-2xl font-bold">₹{totalConcessionAmount.toLocaleString()}</p>
@@ -186,7 +186,7 @@ export function ConcessionsTab({ canCreate, canEdit, canDelete }: ConcessionsTab
         <div className="sm:ml-auto">
           {canCreate && (
             <Button className="bg-emerald-600 hover:bg-emerald-700 text-white" onClick={() => setAddOpen(true)}>
-              <Plus className="h-4 w-4 mr-2" />Add Concession
+              <Plus className="size-4 mr-2" />Add Concession
             </Button>
           )}
         </div>
@@ -218,7 +218,7 @@ export function ConcessionsTab({ canCreate, canEdit, canDelete }: ConcessionsTab
                   {filtered.length === 0 ? (
                     <TableRow>
                       <TableCell colSpan={7} className="text-center py-12 text-muted-foreground">
-                        <Percent className="h-10 w-10 mx-auto mb-2 opacity-30" /><p>No concessions found</p>
+                        <Percent className="size-10 mx-auto mb-2 opacity-30" /><p>No concessions found</p>
                       </TableCell>
                     </TableRow>
                   ) : filtered.map(c => {
@@ -244,15 +244,15 @@ export function ConcessionsTab({ canCreate, canEdit, canDelete }: ConcessionsTab
                           <TableCell className="text-center py-4">
                             <div className="flex items-center justify-center gap-1">
                               {canEdit && c.status !== 'active' && (
-                                <Button variant="ghost" size="icon" className="h-7 w-7 text-emerald-500 hover:text-emerald-700 hover:bg-emerald-50 dark:hover:bg-emerald-900/30" onClick={() => handleAction(c.id, 'active')} title="Approve"><ThumbsUp className="h-3.5 w-3.5" /></Button>
+                                <Button variant="ghost" size="icon" className="size-7 text-emerald-500 hover:text-emerald-700 hover:bg-emerald-50 dark:hover:bg-emerald-900/30" onClick={() => handleAction(c.id, 'active')} title="Approve"><ThumbsUp className="size-3.5" /></Button>
                               )}
                               {canEdit && c.status === 'active' && (
-                                <Button variant="ghost" size="icon" className="h-7 w-7 text-amber-500 hover:text-amber-700 hover:bg-amber-50 dark:hover:bg-amber-900/30" onClick={() => handleAction(c.id, 'revoked')} title="Revoke"><Ban className="h-3.5 w-3.5" /></Button>
+                                <Button variant="ghost" size="icon" className="size-7 text-amber-500 hover:text-amber-700 hover:bg-amber-50 dark:hover:bg-amber-900/30" onClick={() => handleAction(c.id, 'revoked')} title="Revoke"><Ban className="size-3.5" /></Button>
                               )}
                               {canDelete && (
                                 <AlertDialog>
                                   <AlertDialogTrigger asChild>
-                                    <Button variant="ghost" size="icon" className="h-7 w-7 text-red-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/30"><Trash2 className="h-3.5 w-3.5" /></Button>
+                                    <Button variant="ghost" size="icon" className="size-7 text-red-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/30"><Trash2 className="size-3.5" /></Button>
                                   </AlertDialogTrigger>
                                   <AlertDialogContent>
                                     <AlertDialogHeader><AlertDialogTitle>Delete Concession</AlertDialogTitle><AlertDialogDescription>Delete concession for {c.studentName}?</AlertDialogDescription></AlertDialogHeader>

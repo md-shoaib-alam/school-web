@@ -29,7 +29,7 @@ export function SubscriptionFilters({
     <Card>
       <CardContent className="p-4 flex flex-col md:flex-row gap-4 items-center">
         <div className="relative flex-1 w-full">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
           <Input
             placeholder="Search by parent name, email or transaction ID..."
             className="pl-9 h-11"
@@ -40,7 +40,7 @@ export function SubscriptionFilters({
         <div className="flex gap-2 w-full md:w-auto">
           <Select value={statusFilter} onValueChange={onStatusFilterChange}>
             <SelectTrigger className="w-[140px] h-11">
-              <Filter className="h-4 w-4 mr-2" />
+              <Filter className="size-4 mr-2" />
               <SelectValue placeholder="Status" />
             </SelectTrigger>
             <SelectContent>
@@ -54,10 +54,10 @@ export function SubscriptionFilters({
           <Button
             variant="outline"
             size="icon"
-            className="h-11 w-11"
+            className="size-11"
             onClick={onRefresh}
           >
-            <RotateCcw className="h-4 w-4" />
+            <RotateCcw className="size-4" />
           </Button>
         </div>
       </CardContent>

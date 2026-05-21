@@ -45,7 +45,7 @@ export function CreateTicketDialog({
       <DialogContent className="sm:max-w-lg">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
-            <Ticket className="h-5 w-5 text-emerald-600" />
+            <Ticket className="size-5 text-emerald-600" />
             Create New Support Ticket
           </DialogTitle>
           <DialogDescription>
@@ -135,7 +135,7 @@ export function CreateTicketDialog({
             disabled={loading || !form.title.trim() || !form.description.trim()}
             className="bg-emerald-600 hover:bg-emerald-700 text-white"
           >
-            {loading && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
+            {loading && <Loader2 className="size-4 mr-2 animate-spin" />}
             Create Ticket
           </Button>
         </DialogFooter>

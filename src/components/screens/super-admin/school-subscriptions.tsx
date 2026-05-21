@@ -128,8 +128,8 @@ export function SuperAdminSchoolSubscriptions() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
-          <div className="h-12 w-12 rounded-2xl bg-indigo-100 dark:bg-indigo-900/30 flex items-center justify-center">
-            <ShieldCheck className="h-6 w-6 text-indigo-600 dark:text-indigo-400" />
+          <div className="size-12 rounded-2xl bg-violet-100 dark:bg-violet-900/30 flex items-center justify-center">
+            <ShieldCheck className="size-6 text-violet-600 dark:text-violet-400" />
           </div>
           <div>
             <h2 className="text-3xl font-semibold tracking-tight">School Subscriptions</h2>
@@ -142,8 +142,8 @@ export function SuperAdminSchoolSubscriptions() {
         <Card>
           <CardContent className="pt-6">
             <div className="flex items-center gap-4">
-              <div className="h-10 w-10 rounded-full bg-blue-100 dark:bg-blue-900/50 flex items-center justify-center text-blue-600">
-                <Building2 className="h-5 w-5" />
+              <div className="size-10 rounded-full bg-blue-100 dark:bg-blue-900/50 flex items-center justify-center text-blue-600">
+                <Building2 className="size-5" />
               </div>
               <div>
                 <p className="text-sm font-medium text-muted-foreground">Total Schools</p>
@@ -155,8 +155,8 @@ export function SuperAdminSchoolSubscriptions() {
         <Card>
           <CardContent className="pt-6">
             <div className="flex items-center gap-4">
-              <div className="h-10 w-10 rounded-full bg-emerald-100 dark:bg-emerald-900/50 flex items-center justify-center text-emerald-600">
-                <ArrowUpCircle className="h-5 w-5" />
+              <div className="size-10 rounded-full bg-emerald-100 dark:bg-emerald-900/50 flex items-center justify-center text-emerald-600">
+                <ArrowUpCircle className="size-5" />
               </div>
               <div>
                 <p className="text-sm font-medium text-muted-foreground">Active Licenses</p>
@@ -170,8 +170,8 @@ export function SuperAdminSchoolSubscriptions() {
         <Card>
           <CardContent className="pt-6">
             <div className="flex items-center gap-4">
-              <div className="h-10 w-10 rounded-full bg-amber-100 dark:bg-amber-900/50 flex items-center justify-center text-amber-600">
-                <Clock className="h-5 w-5" />
+              <div className="size-10 rounded-full bg-amber-100 dark:bg-amber-900/50 flex items-center justify-center text-amber-600">
+                <Clock className="size-5" />
               </div>
               <div>
                 <p className="text-sm font-medium text-muted-foreground">Expiring Soon</p>
@@ -187,7 +187,7 @@ export function SuperAdminSchoolSubscriptions() {
       <Card>
         <div className="p-4 border-b flex items-center gap-4">
           <div className="relative flex-1">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
             <Input 
               placeholder="Search schools..." 
               className="pl-9" 
@@ -220,14 +220,14 @@ export function SuperAdminSchoolSubscriptions() {
                 <TableRow key={tenant.id}>
                   <TableCell className="font-medium">{tenant.name}</TableCell>
                   <TableCell className="capitalize">
-                    <Badge variant="secondary" className="bg-indigo-50 text-indigo-700 border-indigo-100">
+                    <Badge variant="secondary" className="bg-violet-50 text-violet-700 border-violet-100">
                       {tenant.plan}
                     </Badge>
                   </TableCell>
                   <TableCell suppressHydrationWarning>{getStatusBadge(tenant.status, tenant.endDate)}</TableCell>
                   <TableCell suppressHydrationWarning>
                     <div className="flex items-center gap-2">
-                      <Calendar className="h-3.5 w-3.5 text-muted-foreground" />
+                      <Calendar className="size-3.5 text-muted-foreground" />
                       {tenant.endDate ? format(new Date(tenant.endDate), "PP") : "No expiry"}
                     </div>
                   </TableCell>
@@ -237,9 +237,9 @@ export function SuperAdminSchoolSubscriptions() {
                       variant="outline" 
                       size="sm" 
                       onClick={() => handleEdit(tenant)}
-                      className="h-8 gap-1.5 border-indigo-100 text-indigo-600 hover:bg-indigo-50 hover:text-indigo-700 dark:border-indigo-900/50 dark:text-indigo-400 dark:hover:bg-indigo-900/30"
+                      className="h-8 gap-1.5 border-violet-100 text-violet-600 hover:bg-violet-50 hover:text-violet-700 dark:border-violet-900/50 dark:text-violet-400 dark:hover:bg-violet-900/30"
                     >
-                      <Settings2 className="h-3.5 w-3.5" />
+                      <Settings2 className="size-3.5" />
                       Manage
                     </Button>
                   </TableCell>
@@ -249,19 +249,19 @@ export function SuperAdminSchoolSubscriptions() {
           </TableBody>
         </Table>
         {!isLoading && tenantsData && tenantsData.totalPages > 1 && (
-          <div className="flex flex-col sm:flex-row items-center justify-between px-6 py-4 bg-gray-50/50 dark:bg-gray-900/20 border-t gap-4">
+          <div className="flex flex-col sm:flex-row items-center justify-between px-6 py-4 bg-zinc-50/50 dark:bg-zinc-900/20 border-t gap-4">
             <div className="flex items-center gap-4 order-2 sm:order-1">
               <p className="text-sm text-muted-foreground">
                 Showing{" "}
-                <span className="font-semibold text-indigo-600 dark:text-indigo-400">
+                <span className="font-semibold text-violet-600 dark:text-violet-400">
                   {(currentPage - 1) * ITEMS_PER_PAGE + 1}
                 </span>{" "}
                 to{" "}
-                <span className="font-semibold text-indigo-600 dark:text-indigo-400">
+                <span className="font-semibold text-violet-600 dark:text-violet-400">
                   {Math.min(currentPage * ITEMS_PER_PAGE, tenantsData.total)}
                 </span>{" "}
                 of{" "}
-                <span className="font-semibold text-gray-900 dark:text-gray-100">
+                <span className="font-semibold text-zinc-900 dark:text-zinc-100">
                   {tenantsData.total}
                 </span>{" "}
                 entries
@@ -279,9 +279,9 @@ export function SuperAdminSchoolSubscriptions() {
                 size="sm"
                 onClick={() => setCurrentPage(currentPage - 1)}
                 disabled={currentPage === 1}
-                className="h-8 w-8 p-0"
+                className="size-8 p-0"
               >
-                <ChevronLeft className="h-4 w-4" />
+                <ChevronLeft className="size-4" />
               </Button>
 
               <div className="flex items-center gap-1 mx-1">
@@ -298,10 +298,10 @@ export function SuperAdminSchoolSubscriptions() {
                           variant={currentPage === pageNum ? "default" : "outline"}
                           size="sm"
                           className={cn(
-                            "h-8 w-8 p-0 text-xs",
+                            "size-8 p-0 text-xs",
                             currentPage === pageNum
-                              ? "bg-indigo-600 hover:bg-indigo-700 shadow-sm"
-                              : "hover:bg-indigo-50",
+                              ? "bg-violet-600 hover:bg-violet-700 shadow-sm"
+                              : "hover:bg-violet-50",
                           )}
                           onClick={() => setCurrentPage(pageNum)}
                         >
@@ -331,9 +331,9 @@ export function SuperAdminSchoolSubscriptions() {
                 size="sm"
                 onClick={() => setCurrentPage(currentPage + 1)}
                 disabled={currentPage === tenantsData.totalPages}
-                className="h-8 w-8 p-0"
+                className="size-8 p-0"
               >
-                <ChevronRight className="h-4 w-4" />
+                <ChevronRight className="size-4" />
               </Button>
             </div>
           </div>
@@ -440,7 +440,7 @@ export function SuperAdminSchoolSubscriptions() {
             </div>
 
             <div className="p-3 bg-amber-50 dark:bg-amber-950/20 rounded-lg border border-amber-100 dark:border-amber-900/50 flex items-start gap-3">
-              <AlertCircle className="h-5 w-5 text-amber-600 mt-0.5" />
+              <AlertCircle className="size-5 text-amber-600 mt-0.5" />
               <p className="text-xs text-amber-800 dark:text-amber-200">
                 Updating these settings will immediately affect the school's ability to login and add data.
               </p>
@@ -448,7 +448,7 @@ export function SuperAdminSchoolSubscriptions() {
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setIsDialogOpen(false)}>Cancel</Button>
-            <Button onClick={handleUpdate} className="bg-indigo-600 hover:bg-indigo-700">Update License</Button>
+            <Button onClick={handleUpdate} className="bg-violet-600 hover:bg-violet-700">Update License</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

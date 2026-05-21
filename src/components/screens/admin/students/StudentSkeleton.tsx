@@ -31,7 +31,7 @@ export function StudentSkeleton() {
               <TableCell><Skeleton className="h-4 w-8" /></TableCell>
               <TableCell>
                 <div className="flex items-center gap-3">
-                  <Skeleton className="h-8 w-8 rounded-full" />
+                  <Skeleton className="size-8 rounded-full" />
                   <div className="space-y-1">
                     <Skeleton className="h-4 w-32" />
                     <Skeleton className="h-3 w-20 md:hidden" />
@@ -44,8 +44,8 @@ export function StudentSkeleton() {
               <TableCell className="hidden lg:table-cell"><Skeleton className="h-4 w-28" /></TableCell>
               <TableCell className="text-right">
                 <div className="flex justify-end gap-2">
-                  <Skeleton className="h-8 w-8 rounded-md" />
-                  <Skeleton className="h-8 w-8 rounded-md" />
+                  <Skeleton className="size-8 rounded-md" />
+                  <Skeleton className="size-8 rounded-md" />
                 </div>
               </TableCell>
             </TableRow>

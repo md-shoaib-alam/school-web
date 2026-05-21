@@ -30,12 +30,12 @@ export function GrowthCharts({ loading, data }: GrowthChartsProps) {
   }, []);
 
   return (
-    <Card className="border-none shadow-sm bg-white dark:bg-gray-800">
+    <Card className="border-none shadow-sm bg-white dark:bg-zinc-800">
       <CardHeader className="pb-2">
         <div className="flex items-center justify-between">
           <div>
             <CardTitle className="text-base font-bold flex items-center gap-2">
-              <TrendingUp className="h-4 w-4 text-emerald-600" /> Platform Growth Trends
+              <TrendingUp className="size-4 text-emerald-600" /> Platform Growth Trends
             </CardTitle>
             <CardDescription className="text-xs">
               New schools, users, and revenue over the last 6 months

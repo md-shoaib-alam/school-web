@@ -60,8 +60,8 @@ export function StaffDialogs({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-md rounded-3xl border-2">
         <DialogHeader>
-          <div className="h-12 w-12 rounded-2xl bg-teal-50 dark:bg-teal-900/30 flex items-center justify-center mb-4">
-            <Shield className="h-6 w-6 text-teal-600 dark:text-teal-400" />
+          <div className="size-12 rounded-2xl bg-teal-50 dark:bg-teal-900/30 flex items-center justify-center mb-4">
+            <Shield className="size-6 text-teal-600 dark:text-teal-400" />
           </div>
           <DialogTitle className="text-2xl font-black tracking-tight">
             {editingStaff ? "Edit Staff Member" : "Add Platform Staff"}
@@ -77,7 +77,7 @@ export function StaffDialogs({
           <div className="space-y-2">
             <Label htmlFor="staff-name" className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">Full Name</Label>
             <div className="relative">
-              <UserRound className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground opacity-50" />
+              <UserRound className="absolute left-3.5 top-1/2 -translate-y-1/2 size-4 text-muted-foreground opacity-50" />
               <Input
                 id="staff-name"
                 className="pl-11 h-11 rounded-xl border-2 focus-visible:ring-teal-500/20 focus-visible:border-teal-500 font-bold"
@@ -92,7 +92,7 @@ export function StaffDialogs({
             <div className="space-y-2">
               <Label htmlFor="staff-email" className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">Work Email</Label>
               <div className="relative">
-                <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground opacity-50" />
+                <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 size-4 text-muted-foreground opacity-50" />
                 <Input
                   id="staff-email"
                   type="email"
@@ -110,7 +110,7 @@ export function StaffDialogs({
               {editingStaff ? "New Password (Optional)" : "Security Password"}
             </Label>
             <div className="relative">
-              <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground opacity-50" />
+              <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 size-4 text-muted-foreground opacity-50" />
               <Input
                 id="staff-password"
                 type={showPassword ? "text" : "password"}
@@ -124,7 +124,7 @@ export function StaffDialogs({
                 onClick={() => setShowPassword(!showPassword)}
                 className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-teal-600 transition-colors"
               >
-                {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                {showPassword ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
               </button>
             </div>
           </div>
@@ -132,7 +132,7 @@ export function StaffDialogs({
           <div className="space-y-2">
             <Label htmlFor="staff-phone" className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">Contact Number</Label>
             <div className="relative">
-              <Phone className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground opacity-50" />
+              <Phone className="absolute left-3.5 top-1/2 -translate-y-1/2 size-4 text-muted-foreground opacity-50" />
               <Input
                 id="staff-phone"
                 className="pl-11 h-11 rounded-xl border-2 focus-visible:ring-teal-500/20 focus-visible:border-teal-500 font-bold"
@@ -156,7 +156,7 @@ export function StaffDialogs({
                 {roles.map((role) => (
                   <SelectItem key={role.id} value={role.id} className="text-xs font-black uppercase tracking-widest py-3">
                     <div className="flex items-center gap-2">
-                      <div className="h-2 w-2 rounded-full" style={{ backgroundColor: role.color }} />
+                      <div className="size-2 rounded-full" style={{ backgroundColor: role.color }} />
                       {role.name}
                     </div>
                   </SelectItem>
@@ -166,7 +166,7 @@ export function StaffDialogs({
           </div>
 
           {editingStaff && (
-            <div className="flex items-center gap-3 p-3 rounded-2xl bg-gray-50 dark:bg-gray-900 border-2 border-transparent">
+            <div className="flex items-center gap-3 p-3 rounded-2xl bg-zinc-50 dark:bg-zinc-900 border-2 border-transparent">
               <Checkbox
                 id="staff-active"
                 className="rounded-md border-2"
@@ -190,7 +190,7 @@ export function StaffDialogs({
             disabled={submitting || !isFormValid}
           >
             {submitting ? (
-              <Loader2 className="h-4 w-4 animate-spin" />
+              <Loader2 className="size-4 animate-spin" />
             ) : (editingStaff ? "Update Member" : "Create Account")}
           </Button>
         </DialogFooter>

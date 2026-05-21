@@ -155,12 +155,12 @@ export function ViewResultsDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-3xl max-h-[85vh] flex flex-col p-0 overflow-hidden rounded-xl border border-gray-100 dark:border-zinc-800 shadow-2xl">
-        <DialogHeader className="p-5 pb-3 border-b border-gray-100 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-950/20">
+      <DialogContent className="max-w-3xl max-h-[85vh] flex flex-col p-0 overflow-hidden rounded-xl border border-zinc-100 dark:border-zinc-800 shadow-2xl">
+        <DialogHeader className="p-5 pb-3 border-b border-zinc-100 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-950/20">
           <div className="flex items-center justify-between pr-8">
             <div className="space-y-1">
               <DialogTitle className="text-lg font-bold flex items-center gap-2 text-foreground">
-                <Trophy className="h-5 w-5 text-emerald-600 dark:text-emerald-500" />
+                <Trophy className="size-5 text-emerald-600 dark:text-emerald-500" />
                 View Published Results
               </DialogTitle>
               <DialogDescription className="text-xs text-muted-foreground">
@@ -173,7 +173,7 @@ export function ViewResultsDialog({
                 size="sm"
                 className="bg-zinc-900 hover:bg-zinc-800 text-white dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-200 shrink-0 gap-1.5 shadow-sm rounded-lg"
               >
-                <Printer className="h-3.5 w-3.5" />
+                <Printer className="size-3.5" />
                 Print Tabulation
               </Button>
             )}
@@ -193,37 +193,37 @@ export function ViewResultsDialog({
             </div>
           ) : !exam ? (
             <div className="text-center py-12 text-muted-foreground">
-              <AlertCircle className="h-10 w-10 mx-auto mb-2 opacity-30" />
+              <AlertCircle className="size-10 mx-auto mb-2 opacity-30" />
               <p>No exam selected</p>
             </div>
           ) : (
             <div className="space-y-5" ref={printAreaRef}>
               {/* Exam Info Summary Banner */}
-              <div className="p-4 rounded-xl border border-gray-100 dark:border-zinc-800/80 bg-card/50 flex flex-wrap items-center justify-between gap-4">
+              <div className="p-4 rounded-xl border border-zinc-100 dark:border-zinc-800/80 bg-card/50 flex flex-wrap items-center justify-between gap-4">
                 <div className="space-y-1">
                   <h4 className="font-semibold text-sm text-foreground flex items-center gap-1.5">
-                    <BookOpen className="h-4 w-4 text-blue-500" />
+                    <BookOpen className="size-4 text-blue-500" />
                     {exam.name} – {exam.subjectName}
                   </h4>
                   <div className="flex flex-wrap gap-x-3 gap-y-1 text-xs text-muted-foreground font-medium">
                     <span className="flex items-center gap-1">
-                      <GraduationCap className="h-3.5 w-3.5 text-zinc-400" />
+                      <GraduationCap className="size-3.5 text-zinc-400" />
                       {exam.className} - {exam.classSection}
                     </span>
                     <span className="flex items-center gap-1">
-                      <Calendar className="h-3.5 w-3.5 text-zinc-400" />
+                      <Calendar className="size-3.5 text-zinc-400" />
                       {formatDate(exam.date)}
                     </span>
                     {exam.startTime && (
                       <span className="flex items-center gap-1">
-                        <Clock className="h-3.5 w-3.5 text-zinc-400" />
+                        <Clock className="size-3.5 text-zinc-400" />
                         {formatTime(exam.startTime)} – {formatTime(exam.endTime)}
                       </span>
                     )}
                   </div>
                 </div>
 
-                <div className="flex items-center gap-3 text-xs border-t sm:border-t-0 sm:border-l pt-3 sm:pt-0 sm:pl-4 border-gray-100 dark:border-zinc-800 font-semibold">
+                <div className="flex items-center gap-3 text-xs border-t sm:border-t-0 sm:border-l pt-3 sm:pt-0 sm:pl-4 border-zinc-100 dark:border-zinc-800 font-semibold">
                   <span className="text-muted-foreground">
                     Total Marks: <span className="text-foreground">{exam.totalMarks}</span>
                   </span>
@@ -235,7 +235,7 @@ export function ViewResultsDialog({
 
               {/* Summary Stats Grid */}
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                <div className="p-3 text-center rounded-xl bg-zinc-50 dark:bg-zinc-900 border border-gray-100 dark:border-zinc-800/60 shadow-sm">
+                <div className="p-3 text-center rounded-xl bg-zinc-50 dark:bg-zinc-900 border border-zinc-100 dark:border-zinc-800/60 shadow-sm">
                   <p className="text-[10px] text-muted-foreground uppercase font-bold tracking-wider">Total Students</p>
                   <p className="text-xl font-extrabold mt-1 text-foreground">{stats.total}</p>
                 </div>
@@ -254,7 +254,7 @@ export function ViewResultsDialog({
               </div>
 
               {/* Student Results Table */}
-              <div className="rounded-xl border border-gray-100 dark:border-zinc-800 overflow-hidden shadow-sm bg-card">
+              <div className="rounded-xl border border-zinc-100 dark:border-zinc-800 overflow-hidden shadow-sm bg-card">
                 <Table>
                   <TableHeader>
                     <TableRow className="bg-zinc-50/50 dark:bg-zinc-900/50 hover:bg-transparent">
@@ -273,7 +273,7 @@ export function ViewResultsDialog({
                       </TableRow>
                     ) : (
                       results.map((row) => (
-                        <TableRow key={row.studentId} className="hover:bg-transparent border-b border-gray-100 dark:border-zinc-800/80">
+                        <TableRow key={row.studentId} className="hover:bg-transparent border-b border-zinc-100 dark:border-zinc-800/80">
                           <TableCell className="text-center text-xs font-semibold text-muted-foreground font-mono">
                             {row.rollNumber || '–'}
                           </TableCell>
@@ -286,17 +286,17 @@ export function ViewResultsDialog({
                           <TableCell className="text-center">
                             {row.status === 'pass' && (
                               <Badge className="bg-emerald-100 text-emerald-700 hover:bg-emerald-100 border-none px-2.5 py-0.5 h-5 font-bold rounded-full text-[10px]">
-                                <CheckCircle2 className="h-3 w-3 mr-1" /> Pass
+                                <CheckCircle2 className="size-3 mr-1" /> Pass
                               </Badge>
                             )}
                             {row.status === 'fail' && (
                               <Badge className="bg-red-100 text-red-700 hover:bg-red-100 border-none px-2.5 py-0.5 h-5 font-bold rounded-full text-[10px]">
-                                <XCircle className="h-3 w-3 mr-1" /> Fail
+                                <XCircle className="size-3 mr-1" /> Fail
                               </Badge>
                             )}
                             {row.status === 'pending' && (
                               <Badge className="bg-amber-100 text-amber-700 hover:bg-amber-100 border-none px-2.5 py-0.5 h-5 font-bold rounded-full text-[10px]">
-                                <AlertCircle className="h-3 w-3 mr-1" /> Pending
+                                <AlertCircle className="size-3 mr-1" /> Pending
                               </Badge>
                             )}
                           </TableCell>

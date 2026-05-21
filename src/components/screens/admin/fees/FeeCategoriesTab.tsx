@@ -126,13 +126,13 @@ export function FeeCategoriesTab({ canCreate, canEdit, canDelete }: FeeCategorie
     <div className="space-y-4">
       <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center">
         <div className="relative flex-1 max-w-sm">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
           <Input placeholder="Search categories..." className="pl-9" value={search} onChange={e => setSearch(e.target.value)} />
         </div>
         <div className="sm:ml-auto">
           {canCreate && (
             <Button className="bg-emerald-600 hover:bg-emerald-700 text-white" onClick={() => setAddOpen(true)}>
-              <Plus className="h-4 w-4 mr-2" />Add Category
+              <Plus className="size-4 mr-2" />Add Category
             </Button>
           )}
         </div>
@@ -163,7 +163,7 @@ export function FeeCategoriesTab({ canCreate, canEdit, canDelete }: FeeCategorie
                   {filtered.length === 0 ? (
                     <TableRow>
                       <TableCell colSpan={6} className="text-center py-12 text-muted-foreground">
-                        <Tag className="h-10 w-10 mx-auto mb-2 opacity-30" /><p>No categories found</p>
+                        <Tag className="size-10 mx-auto mb-2 opacity-30" /><p>No categories found</p>
                       </TableCell>
                     </TableRow>
                   ) : filtered.map(cat => {
@@ -179,8 +179,8 @@ export function FeeCategoriesTab({ canCreate, canEdit, canDelete }: FeeCategorie
                           <Badge variant="outline" className={`${freq.bg} border-0 font-medium`}>{freq.label}</Badge>
                         </TableCell>
                         <TableCell className="py-4">
-                          <Badge variant="outline" className={cat.status === 'active' ? 'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 border-0' : 'bg-gray-100 dark:bg-gray-900/30 text-gray-500 border-0'}>
-                            {cat.status === 'active' ? <CheckCircle2 className="h-3 w-3 mr-1" /> : <Ban className="h-3 w-3 mr-1" />}
+                          <Badge variant="outline" className={cat.status === 'active' ? 'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 border-0' : 'bg-zinc-100 dark:bg-zinc-900/30 text-zinc-500 border-0'}>
+                            {cat.status === 'active' ? <CheckCircle2 className="size-3 mr-1" /> : <Ban className="size-3 mr-1" />}
                             {cat.status}
                           </Badge>
                         </TableCell>
@@ -190,16 +190,16 @@ export function FeeCategoriesTab({ canCreate, canEdit, canDelete }: FeeCategorie
                             <div className="flex items-center justify-center gap-1">
                               {canEdit && (
                                 <>
-                                  <Button variant="ghost" size="icon" className="h-7 w-7 text-emerald-500 hover:text-emerald-700 hover:bg-emerald-50 dark:hover:bg-emerald-900/30" onClick={() => handleEdit(cat)} title="Edit"><Pencil className="h-3.5 w-3.5" /></Button>
-                                  <Button variant="ghost" size="icon" className="h-7 w-7 text-amber-500 hover:text-amber-700 hover:bg-amber-50 dark:hover:bg-amber-900/30" onClick={() => toggleStatus(cat)} title="Toggle status">
-                                    {cat.status === 'active' ? <Ban className="h-3.5 w-3.5" /> : <CheckCircle2 className="h-3.5 w-3.5" />}
+                                  <Button variant="ghost" size="icon" className="size-7 text-emerald-500 hover:text-emerald-700 hover:bg-emerald-50 dark:hover:bg-emerald-900/30" onClick={() => handleEdit(cat)} title="Edit"><Pencil className="size-3.5" /></Button>
+                                  <Button variant="ghost" size="icon" className="size-7 text-amber-500 hover:text-amber-700 hover:bg-amber-50 dark:hover:bg-amber-900/30" onClick={() => toggleStatus(cat)} title="Toggle status">
+                                    {cat.status === 'active' ? <Ban className="size-3.5" /> : <CheckCircle2 className="size-3.5" />}
                                   </Button>
                                 </>
                               )}
                               {canDelete && (
                                 <AlertDialog>
                                   <AlertDialogTrigger asChild>
-                                    <Button variant="ghost" size="icon" className="h-7 w-7 text-red-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/30"><Trash2 className="h-3.5 w-3.5" /></Button>
+                                    <Button variant="ghost" size="icon" className="size-7 text-red-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/30"><Trash2 className="size-3.5" /></Button>
                                   </AlertDialogTrigger>
                                   <AlertDialogContent>
                                     <AlertDialogHeader><AlertDialogTitle>Delete Category</AlertDialogTitle><AlertDialogDescription>Delete &quot;{cat.name}&quot;? This will also remove associated structures.</AlertDialogDescription></AlertDialogHeader>

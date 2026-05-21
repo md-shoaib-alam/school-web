@@ -15,14 +15,14 @@ export function AdminReports() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
         <div className="flex items-center gap-3">
-          <div className="h-12 w-12 rounded-2xl bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center text-emerald-600 dark:text-emerald-400">
-            <BarChart3 className="h-6 w-6" />
+          <div className="size-12 rounded-2xl bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center text-emerald-600 dark:text-emerald-400">
+            <BarChart3 className="size-6" />
           </div>
           <div>
-            <h2 className="text-2xl font-semibold text-gray-900 dark:text-gray-100">
+            <h2 className="text-2xl font-semibold text-zinc-900 dark:text-zinc-100">
               Administrative Reports
             </h2>
-            <p className="text-sm text-gray-500 dark:text-gray-400">
+            <p className="text-sm text-zinc-500 dark:text-zinc-400">
               Comprehensive analytics across all school departments
             </p>
           </div>
@@ -32,26 +32,26 @@ export function AdminReports() {
       {/* Main Tabs */}
       <Tabs defaultValue="attendance" className="space-y-6">
         <div className="overflow-x-auto pb-1">
-          <TabsList className="bg-gray-100 dark:bg-gray-800 p-1 rounded-xl h-auto flex-nowrap w-fit">
+          <TabsList className="bg-zinc-100 dark:bg-zinc-800 p-1 rounded-xl h-auto flex-nowrap w-fit">
             <TabsTrigger
               value="attendance"
-              className="rounded-lg px-6 py-2.5 data-[state=active]:bg-white dark:data-[state=active]:bg-gray-950 data-[state=active]:text-emerald-600 data-[state=active]:shadow-sm transition-all"
+              className="rounded-lg px-6 py-2.5 data-[state=active]:bg-white dark:data-[state=active]:bg-zinc-950 data-[state=active]:text-emerald-600 data-[state=active]:shadow-sm transition-all"
             >
-              <TrendingUp className="h-4 w-4 mr-2" />
+              <TrendingUp className="size-4 mr-2" />
               Attendance
             </TabsTrigger>
             <TabsTrigger
               value="academic"
-              className="rounded-lg px-6 py-2.5 data-[state=active]:bg-white dark:data-[state=active]:bg-gray-950 data-[state=active]:text-emerald-600 data-[state=active]:shadow-sm transition-all"
+              className="rounded-lg px-6 py-2.5 data-[state=active]:bg-white dark:data-[state=active]:bg-zinc-950 data-[state=active]:text-emerald-600 data-[state=active]:shadow-sm transition-all"
             >
-              <GraduationCap className="h-4 w-4 mr-2" />
+              <GraduationCap className="size-4 mr-2" />
               Academic
             </TabsTrigger>
             <TabsTrigger
               value="fees"
-              className="rounded-lg px-6 py-2.5 data-[state=active]:bg-white dark:data-[state=active]:bg-gray-950 data-[state=active]:text-emerald-600 data-[state=active]:shadow-sm transition-all"
+              className="rounded-lg px-6 py-2.5 data-[state=active]:bg-white dark:data-[state=active]:bg-zinc-950 data-[state=active]:text-emerald-600 data-[state=active]:shadow-sm transition-all"
             >
-              <IndianRupee className="h-4 w-4 mr-2" />
+              <IndianRupee className="size-4 mr-2" />
               Finances
             </TabsTrigger>
           </TabsList>

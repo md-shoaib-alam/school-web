@@ -69,7 +69,7 @@ export function TimePicker({ value, onChange, className }: TimePickerProps) {
           <span className="text-[11px] font-medium">
             {hour12}:{minute} {period}
           </span>
-          <Clock className="h-3.5 w-3.5 text-muted-foreground opacity-70" />
+          <Clock className="size-3.5 text-muted-foreground opacity-70" />
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-auto p-3" align="start">

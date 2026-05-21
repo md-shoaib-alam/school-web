@@ -46,7 +46,7 @@ export function WorkingDaysDialog({
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
-            <Settings className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
+            <Settings className="size-5 text-emerald-600 dark:text-emerald-400" />
             Working Days Configuration
           </DialogTitle>
           <DialogDescription>
@@ -70,13 +70,13 @@ export function WorkingDaysDialog({
                 }`}
               >
                 <CalendarDays
-                  className={`h-5 w-5 ${isSelected ? "text-emerald-600 dark:text-emerald-400" : "text-muted-foreground/50"}`}
+                  className={`size-5 ${isSelected ? "text-emerald-600 dark:text-emerald-400" : "text-muted-foreground/50"}`}
                 />
                 <span className="text-[11px] font-bold uppercase tracking-wider">
                   {DAY_LABELS[day]}
                 </span>
                 {!isSelected && (
-                  <span className="text-[10px] text-gray-400 dark:text-gray-500 font-medium">
+                  <span className="text-[10px] text-zinc-400 dark:text-zinc-500 font-medium">
                     Holiday
                   </span>
                 )}
@@ -194,7 +194,7 @@ export function WorkingDaysDialog({
             className="bg-emerald-600 hover:bg-emerald-700 text-white"
           >
             {saving && (
-              <Loader2 className="h-4 w-4 mr-1.5 animate-spin" />
+              <Loader2 className="size-4 mr-1.5 animate-spin" />
             )}
             {saving
               ? "Saving..."

@@ -75,9 +75,9 @@ const priorityConfig: Record<
   { bg: string; text: string; border: string }
 > = {
   normal: {
-    bg: "bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300",
+    bg: "bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300",
     text: "Normal",
-    border: "border-l-gray-400 dark:border-l-gray-500",
+    border: "border-l-zinc-400 dark:border-l-zinc-500",
   },
   important: {
     bg: "bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-400",
@@ -99,7 +99,7 @@ const roleConfig: Record<string, string> = {
     "bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400",
   parent:
     "bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400",
-  all: "bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300",
+  all: "bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300",
 };
 
 interface NoticeFormData {
@@ -252,7 +252,7 @@ export function AdminNotices() {
       {/* Read-only banner */}
       {!canCreate && !canEdit && !canDelete && (
         <div className="flex items-center gap-2 rounded-lg border border-amber-200 dark:border-amber-800 bg-amber-50 dark:bg-amber-900/30 px-3 py-2">
-          <Eye className="h-4 w-4 text-amber-600 dark:text-amber-400 shrink-0" />
+          <Eye className="size-4 text-amber-600 dark:text-amber-400 shrink-0" />
           <span className="text-xs text-amber-700 dark:text-amber-300 font-medium">
             Read-only mode — you have view permission only for this module.
           </span>
@@ -263,7 +263,7 @@ export function AdminNotices() {
       <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
         <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto flex-1">
           <div className="relative flex-1 max-w-sm">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
             <Input
               placeholder="Search notices..."
               className="pl-9"
@@ -291,7 +291,7 @@ export function AdminNotices() {
               setCreateOpen(true);
             }}
           >
-            <Plus className="h-4 w-4 mr-2" />
+            <Plus className="size-4 mr-2" />
             Create Notice
           </Button>
         )}
@@ -313,7 +313,7 @@ export function AdminNotices() {
       ) : filtered.length === 0 ? (
         <Card>
           <CardContent className="py-16 text-center text-muted-foreground">
-            <Megaphone className="h-12 w-12 mx-auto mb-3 opacity-30" />
+            <Megaphone className="size-12 mx-auto mb-3 opacity-30" />
             <p className="font-medium">No notices found</p>
             <p className="text-sm">Create your first notice to get started</p>
           </CardContent>
@@ -334,7 +334,7 @@ export function AdminNotices() {
                   <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3">
                     <div className="flex-1 min-w-0">
                       <div className="flex flex-wrap items-center gap-2 mb-2">
-                        <h3 className="font-semibold text-gray-900 dark:text-gray-100">
+                        <h3 className="font-semibold text-zinc-900 dark:text-zinc-100">
                           {noticesLoading && notices.length === 0 ? (
                             <Skeleton className="h-5 w-48" />
                           ) : (
@@ -359,11 +359,11 @@ export function AdminNotices() {
                       </p>
                       <div className="flex flex-wrap items-center gap-3 mt-3 text-xs text-muted-foreground">
                         <div className="flex items-center gap-1">
-                          <User className="h-3 w-3" />
+                          <User className="size-3" />
                           <span>{notice.authorName}</span>
                         </div>
                         <div className="flex items-center gap-1">
-                          <Calendar className="h-3 w-3" />
+                          <Calendar className="size-3" />
                           <span suppressHydrationWarning>
                             {formatNoticeDate(notice.createdAt)}
                           </span>
@@ -375,11 +375,11 @@ export function AdminNotices() {
                         <Button
                           variant="ghost"
                           size="icon"
-                          className="h-8 w-8 text-emerald-500 hover:text-emerald-700 hover:bg-emerald-50 dark:hover:bg-emerald-900/30"
+                          className="size-8 text-emerald-500 hover:text-emerald-700 hover:bg-emerald-50 dark:hover:bg-emerald-900/30"
                           onClick={() => handleEdit(notice)}
                           title="Edit"
                         >
-                          <Pencil className="h-4 w-4" />
+                          <Pencil className="size-4" />
                         </Button>
                       )}
                       {canDelete && (
@@ -388,10 +388,10 @@ export function AdminNotices() {
                             <Button
                               variant="ghost"
                               size="icon"
-                              className="h-8 w-8 text-red-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/30"
+                              className="size-8 text-red-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/30"
                               title="Delete"
                             >
-                              <Trash2 className="h-4 w-4" />
+                              <Trash2 className="size-4" />
                             </Button>
                           </AlertDialogTrigger>
                           <AlertDialogContent>

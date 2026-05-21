@@ -68,18 +68,18 @@ export function DetailTabs({
   }
 
   return (
-    <Card className="border-none shadow-sm bg-white dark:bg-gray-800 overflow-hidden">
+    <Card className="border-none shadow-sm bg-white dark:bg-zinc-800 overflow-hidden">
       <CardContent className="p-6">
         <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as TabType)}>
           {/* Header Actions */}
           <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 mb-8">
             <div className="overflow-x-auto pb-2 scrollbar-hide">
-              <TabsList className="h-11 p-1 bg-gray-100 dark:bg-gray-900/50 rounded-xl">
+              <TabsList className="h-11 p-1 bg-zinc-100 dark:bg-zinc-900/50 rounded-xl">
                 {TAB_CONFIG.map((tab) => (
                   <TabsTrigger
                     key={tab.value}
                     value={tab.value}
-                    className="gap-2 px-5 text-xs font-black uppercase tracking-widest data-[state=active]:bg-white dark:data-[state=active]:bg-gray-800 data-[state=active]:shadow-sm rounded-lg transition-all"
+                    className="gap-2 px-5 text-xs font-black uppercase tracking-widest data-[state=active]:bg-white dark:data-[state=active]:bg-zinc-800 data-[state=active]:shadow-sm rounded-lg transition-all"
                   >
                     {tab.icon}
                     <span className="hidden sm:inline">{tab.label}</span>
@@ -94,12 +94,12 @@ export function DetailTabs({
                 size="sm"
                 onClick={() => onExport(activeTab)}
                 disabled={exporting || filteredData.length === 0}
-                className="h-10 text-[11px] font-black uppercase tracking-widest px-4 border-2 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-900 transition-all"
+                className="h-10 text-[11px] font-black uppercase tracking-widest px-4 border-2 rounded-xl hover:bg-zinc-50 dark:hover:bg-zinc-900 transition-all"
               >
                 {exporting ? (
-                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  <Loader2 className="size-4 mr-2 animate-spin" />
                 ) : (
-                  <Download className="h-4 w-4 mr-2" />
+                  <Download className="size-4 mr-2" />
                 )}
                 Export Excel
               </Button>
@@ -108,12 +108,12 @@ export function DetailTabs({
                 size="sm"
                 onClick={onImportClick}
                 disabled={importing}
-                className="h-10 text-[11px] font-black uppercase tracking-widest px-4 border-2 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-900 transition-all"
+                className="h-10 text-[11px] font-black uppercase tracking-widest px-4 border-2 rounded-xl hover:bg-zinc-50 dark:hover:bg-zinc-900 transition-all"
               >
                 {importing ? (
-                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  <Loader2 className="size-4 mr-2 animate-spin" />
                 ) : (
-                  <Upload className="h-4 w-4 mr-2" />
+                  <Upload className="size-4 mr-2" />
                 )}
                 Import CSV
               </Button>
@@ -122,7 +122,7 @@ export function DetailTabs({
 
           {/* Search & Filter */}
           <div className="relative mb-6">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
             <Input
               placeholder={`Search in ${activeTab.charAt(0).toUpperCase() + activeTab.slice(1)}...`}
               className="pl-12 h-12 rounded-xl border-2 focus-visible:ring-rose-500/20 focus-visible:border-rose-500 font-medium"
@@ -130,7 +130,7 @@ export function DetailTabs({
               onChange={(e) => setSearch(e.target.value)}
             />
             <div className="absolute right-4 top-1/2 -translate-y-1/2">
-              <Filter className="h-4 w-4 text-muted-foreground opacity-50" />
+              <Filter className="size-4 text-muted-foreground opacity-50" />
             </div>
           </div>
 
@@ -138,11 +138,11 @@ export function DetailTabs({
           {TAB_CONFIG.map((tab) => (
             <TabsContent key={tab.value} value={tab.value} className="mt-0 focus-visible:outline-none focus-visible:ring-0">
               {filteredData.length === 0 ? (
-                <div className="py-24 text-center border-2 border-dashed border-gray-100 dark:border-gray-800 rounded-3xl">
-                  <div className="h-20 w-20 mx-auto mb-6 rounded-full bg-gray-50 dark:bg-gray-900 flex items-center justify-center text-muted-foreground/30">
+                <div className="py-24 text-center border-2 border-dashed border-zinc-100 dark:border-zinc-800 rounded-3xl">
+                  <div className="size-20 mx-auto mb-6 rounded-full bg-zinc-50 dark:bg-zinc-900 flex items-center justify-center text-muted-foreground/30">
                     {tab.icon}
                   </div>
-                  <h3 className="text-xl font-semibold text-gray-900 dark:text-gray-100">
+                  <h3 className="text-xl font-semibold text-zinc-900 dark:text-zinc-100">
                     No {tab.label.toLowerCase()} found
                   </h3>
                   <p className="text-sm text-muted-foreground mt-2 font-medium max-w-[280px] mx-auto leading-relaxed">
@@ -153,11 +153,11 @@ export function DetailTabs({
                 </div>
               ) : (
                 <div className="space-y-4">
-                  <div className="rounded-2xl border-2 border-gray-50 dark:border-gray-900 overflow-hidden shadow-sm">
+                  <div className="rounded-2xl border-2 border-zinc-50 dark:border-zinc-900 overflow-hidden shadow-sm">
                     <div className="overflow-x-auto">
                       <Table>
                         <TableHeader>
-                          <TableRow className="bg-gray-50/50 dark:bg-gray-900/50 hover:bg-transparent">
+                          <TableRow className="bg-zinc-50/50 dark:bg-zinc-900/50 hover:bg-transparent">
                             <TableHeaders activeTab={activeTab} />
                           </TableRow>
                         </TableHeader>
@@ -176,7 +176,7 @@ export function DetailTabs({
                   </div>
 
                   {/* Pagination */}
-                  <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-4 border-t border-gray-50 dark:border-gray-900">
+                  <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-4 border-t border-zinc-50 dark:border-zinc-900">
                     <p className="text-xs font-black uppercase tracking-widest text-muted-foreground">
                       Showing <span className="text-rose-600">{(currentPage - 1) * 20 + 1}</span> to <span className="text-rose-600">{Math.min(currentPage * 20, filteredData.length)}</span> of {filteredData.length} records
                     </p>
@@ -184,11 +184,11 @@ export function DetailTabs({
                       <Button
                         variant="ghost"
                         size="icon"
-                        className="h-10 w-10 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-800"
+                        className="size-10 rounded-xl hover:bg-zinc-100 dark:hover:bg-zinc-800"
                         disabled={currentPage <= 1}
                         onClick={() => setCurrentPage((p) => p - 1)}
                       >
-                        <ChevronLeft className="h-5 w-5" />
+                        <ChevronLeft className="size-5" />
                       </Button>
                       <div className="flex items-center gap-1 px-1">
                         {getPaginationRange(currentPage, totalPages).map((page, idx) =>
@@ -199,7 +199,7 @@ export function DetailTabs({
                               key={page}
                               variant={currentPage === page ? "default" : "ghost"}
                               size="sm"
-                              className={`h-9 w-9 rounded-xl font-black text-xs ${currentPage === page ? 'bg-rose-600 text-white shadow-lg shadow-rose-200 dark:shadow-none' : 'hover:bg-gray-100 dark:hover:bg-gray-800'}`}
+                              className={`size-9 rounded-xl font-black text-xs ${currentPage === page ? 'bg-rose-600 text-white shadow-lg shadow-rose-200 dark:shadow-none' : 'hover:bg-zinc-100 dark:hover:bg-zinc-800'}`}
                               onClick={() => setCurrentPage(page)}
                             >
                               {page}
@@ -210,11 +210,11 @@ export function DetailTabs({
                       <Button
                         variant="ghost"
                         size="icon"
-                        className="h-10 w-10 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-800"
+                        className="size-10 rounded-xl hover:bg-zinc-100 dark:hover:bg-zinc-800"
                         disabled={currentPage >= totalPages}
                         onClick={() => setCurrentPage((p) => p + 1)}
                       >
-                        <ChevronRight className="h-5 w-5" />
+                        <ChevronRight className="size-5" />
                       </Button>
                     </div>
                   </div>

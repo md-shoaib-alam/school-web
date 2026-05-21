@@ -37,7 +37,7 @@ export function RevenueCharts({ loading, revenueBreakdown }: RevenueChartsProps)
       <Card>
         <CardHeader className="pb-2">
           <CardTitle className="text-base font-bold flex items-center gap-2">
-            <IndianRupee className="h-4 w-4 text-teal-500" />
+            <IndianRupee className="size-4 text-teal-500" />
             Revenue by Tenant (Top 10)
           </CardTitle>
           <CardDescription>
@@ -96,7 +96,7 @@ export function RevenueCharts({ loading, revenueBreakdown }: RevenueChartsProps)
       <Card>
         <CardHeader className="pb-2">
           <CardTitle className="text-base font-bold flex items-center gap-2">
-            <Globe className="h-4 w-4 text-blue-500" />
+            <Globe className="size-4 text-blue-500" />
             Geographic Distribution
           </CardTitle>
           <CardDescription>Tenant distribution by region</CardDescription>
@@ -107,7 +107,7 @@ export function RevenueCharts({ loading, revenueBreakdown }: RevenueChartsProps)
               <div key={geo.country} className="space-y-1.5">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <div className={`h-2.5 w-2.5 rounded-full ${geo.color}`} />
+                    <div className={`size-2.5 rounded-full ${geo.color}`} />
                     <span className="text-sm font-bold">{geo.country}</span>
                   </div>
                   <span className="text-xs font-bold text-muted-foreground">{geo.percentage}%</span>

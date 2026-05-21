@@ -180,7 +180,7 @@ export function TransportFeeTab() {
           <Card className="lg:col-span-2">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <div>
-                <CardTitle className="text-base flex items-center gap-2"><Map className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />Transport Routes</CardTitle>
+                <CardTitle className="text-base flex items-center gap-2"><Map className="size-4 text-emerald-600 dark:text-emerald-400" />Transport Routes</CardTitle>
                 <CardDescription>All active school bus routes and fees</CardDescription>
               </div>
               <Button size="sm" className="h-8 bg-emerald-600 hover:bg-emerald-700 dark:bg-emerald-700 dark:hover:bg-emerald-600" onClick={() => setAddRouteOpen(true)}>Add Route</Button>
@@ -218,7 +218,7 @@ export function TransportFeeTab() {
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <div>
-                <CardTitle className="text-base flex items-center gap-2"><Truck className="h-4 w-4 text-blue-600 dark:text-blue-400" />Vehicles</CardTitle>
+                <CardTitle className="text-base flex items-center gap-2"><Truck className="size-4 text-blue-600 dark:text-blue-400" />Vehicles</CardTitle>
                 <CardDescription>Fleet status</CardDescription>
               </div>
               <Button size="sm" variant="outline" className="h-8" onClick={() => setAddVehicleOpen(true)}>Add</Button>
@@ -228,8 +228,8 @@ export function TransportFeeTab() {
                 <p className="text-center py-8 text-xs text-muted-foreground">No vehicles registered</p>
               ) : vehicles.map((v: any) => (
                 <div key={v.id} className="flex items-center gap-3 p-3 rounded-lg border hover:bg-accent/50 transition-colors">
-                  <div className="h-10 w-10 rounded-lg bg-blue-100 dark:bg-blue-900/40 text-blue-600 dark:text-blue-400 flex items-center justify-center shrink-0">
-                    <Bus className="h-5 w-5" />
+                  <div className="size-10 rounded-lg bg-blue-100 dark:bg-blue-900/40 text-blue-600 dark:text-blue-400 flex items-center justify-center shrink-0">
+                    <Bus className="size-5" />
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-semibold">{v.number}</p>
@@ -245,10 +245,10 @@ export function TransportFeeTab() {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <div>
-              <CardTitle className="text-base flex items-center gap-2"><ShieldCheck className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />Student Transport List</CardTitle>
+              <CardTitle className="text-base flex items-center gap-2"><ShieldCheck className="size-4 text-emerald-600 dark:text-emerald-400" />Student Transport List</CardTitle>
               <CardDescription>Students subscribed to transport services</CardDescription>
             </div>
-            <Button size="sm" className="h-8 gap-1 bg-emerald-600 hover:bg-emerald-700 dark:bg-emerald-700 dark:hover:bg-emerald-600" onClick={() => setAssignDialogOpen(true)}><UserPlus className="h-3.5 w-3.5" />Assign Student</Button>
+            <Button size="sm" className="h-8 gap-1 bg-emerald-600 hover:bg-emerald-700 dark:bg-emerald-700 dark:hover:bg-emerald-600" onClick={() => setAssignDialogOpen(true)}><UserPlus className="size-3.5" />Assign Student</Button>
           </CardHeader>
           <CardContent className="p-0">
             {loadingAssignments ? (

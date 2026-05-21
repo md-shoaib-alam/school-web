@@ -27,12 +27,12 @@ export function SubscriptionStats({
 }: SubscriptionStatsProps) {
   return (
     <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-teal-950 via-teal-900 to-teal-800 p-6 text-white shadow-lg">
-      <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/3" />
+      <div className="absolute top-0 right-0 size-64 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/3" />
       <div className="relative z-10">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div className="flex items-center gap-4">
-            <div className="h-12 w-12 rounded-xl bg-white/10 flex items-center justify-center backdrop-blur-sm border border-white/20">
-              <Crown className="h-6 w-6 text-teal-200" />
+            <div className="size-12 rounded-xl bg-white/10 flex items-center justify-center backdrop-blur-sm border border-white/20">
+              <Crown className="size-6 text-teal-200" />
             </div>
             <div>
               <h2 className="text-2xl font-semibold tracking-tight">
@@ -46,7 +46,7 @@ export function SubscriptionStats({
 
           <div className="flex items-center gap-3">
             <div className="bg-white/10 backdrop-blur-md rounded-lg border border-white/20 p-1 flex items-center gap-2">
-              <Building2 className="h-4 w-4 ml-2 text-teal-200" />
+              <Building2 className="size-4 ml-2 text-teal-200" />
               <Select
                 value={selectedTenant}
                 onValueChange={onTenantChange}
@@ -69,7 +69,7 @@ export function SubscriptionStats({
                 className="bg-white/20 border-white/30 hover:bg-white/30 text-white"
                 onClick={onNewSetup}
               >
-                <Plus className="h-4 w-4 mr-2" /> New Setup
+                <Plus className="size-4 mr-2" /> New Setup
               </Button>
             )}
           </div>
@@ -89,7 +89,7 @@ export function SubscriptionStats({
               Total Revenue
             </p>
             <p className="text-xl font-bold mt-0.5 flex items-center gap-1">
-              <IndianRupee className="h-3.5 w-3.5" />
+              <IndianRupee className="size-3.5" />
               {(stats?.totalRevenue || 0).toLocaleString()}
             </p>
           </div>
@@ -98,7 +98,7 @@ export function SubscriptionStats({
               Avg Plan Value
             </p>
             <p className="text-xl font-bold mt-0.5 flex items-center gap-1">
-              <IndianRupee className="h-3.5 w-3.5" />
+              <IndianRupee className="size-3.5" />
               {stats?.totalSubscriptions
                 ? Math.round(
                     stats.totalRevenue / stats.totalSubscriptions,

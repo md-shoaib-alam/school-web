@@ -35,7 +35,7 @@ export const CBSEStandard: React.FC<MarksheetTemplateProps> = ({
 
   return (
     <div 
-      className="relative bg-white text-slate-900 px-9 py-8 border-[5px] border-emerald-800 rounded overflow-hidden select-none flex flex-col justify-between shrink-0 text-left h-[1123px] w-[794px] box-border font-sans"
+      className="relative bg-white text-zinc-900 px-9 py-8 border-[5px] border-emerald-800 rounded overflow-hidden select-none flex flex-col justify-between shrink-0 text-left h-[1123px] w-[794px] box-border font-sans"
       style={{ WebkitPrintColorAdjust: 'exact', printColorAdjust: 'exact' }}
     >
       {/* Dynamic Header */}
@@ -43,7 +43,7 @@ export const CBSEStandard: React.FC<MarksheetTemplateProps> = ({
         
         {/* CBSE Authentic Header */}
         <div className="flex justify-between items-center border-b-2 border-emerald-800 pb-3">
-          <div className="w-14 h-14 bg-emerald-50 border border-emerald-800 rounded-full flex items-center justify-center shrink-0">
+          <div className="size-14 bg-emerald-50 border border-emerald-800 rounded-full flex items-center justify-center shrink-0">
             <span className="text-2xl">🏫</span>
           </div>
           <div className="text-center flex-1 px-4">
@@ -57,7 +57,7 @@ export const CBSEStandard: React.FC<MarksheetTemplateProps> = ({
               ACADEMIC ASSESSMENT REPORT CARD: {academicYear}
             </p>
           </div>
-          <div className="w-14 h-14 border border-zinc-200 rounded flex flex-col items-center justify-center text-[7px] font-bold text-zinc-400">
+          <div className="size-14 border border-zinc-200 rounded flex flex-col items-center justify-center text-[7px] font-bold text-zinc-400">
             <span>STUDENT</span>
             <span>PHOTO</span>
           </div>
@@ -110,9 +110,9 @@ export const CBSEStandard: React.FC<MarksheetTemplateProps> = ({
               <tbody>
                 {sheet.subjects.map((sub, sIdx) => (
                   <tr key={sIdx} className="border-b border-zinc-150 hover:bg-zinc-50/50">
-                    <td className="px-3 py-2 text-left font-bold text-slate-800 truncate">{sub.subjectName}</td>
-                    {marksheetType === 'combined' && <td className="px-3 py-2 text-center font-mono text-slate-600">{sub.midtermMarks}</td>}
-                    {marksheetType === 'combined' && <td className="px-3 py-2 text-center font-mono text-slate-600">{sub.finalMarks}</td>}
+                    <td className="px-3 py-2 text-left font-bold text-zinc-800 truncate">{sub.subjectName}</td>
+                    {marksheetType === 'combined' && <td className="px-3 py-2 text-center font-mono text-zinc-600">{sub.midtermMarks}</td>}
+                    {marksheetType === 'combined' && <td className="px-3 py-2 text-center font-mono text-zinc-600">{sub.finalMarks}</td>}
                     <td className="px-3 py-2 text-center font-black font-mono text-emerald-800">{sub.obtained}</td>
                     <td className="px-3 py-2 text-center">
                       <span className="font-black text-emerald-900 bg-emerald-50 border border-emerald-250 px-2 py-0.5 rounded text-[10px]">

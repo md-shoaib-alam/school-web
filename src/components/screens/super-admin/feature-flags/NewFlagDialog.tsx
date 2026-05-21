@@ -52,14 +52,14 @@ export function NewFlagDialog({ onAdd }: { onAdd: (flag: FeatureFlag) => void })
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button className="h-11 px-6 bg-teal-600 hover:bg-teal-700 text-white rounded-xl font-black text-[10px] uppercase tracking-widest shadow-lg shadow-teal-200 dark:shadow-none transition-all hover:scale-105 active:scale-95">
-          <Plus className="h-4 w-4 mr-2" />
+          <Plus className="size-4 mr-2" />
           Create New Flag
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-md rounded-3xl border-2">
         <DialogHeader>
-          <div className="h-12 w-12 rounded-2xl bg-teal-50 dark:bg-teal-900/30 flex items-center justify-center mb-4">
-            <Blocks className="h-6 w-6 text-teal-600 dark:text-teal-400" />
+          <div className="size-12 rounded-2xl bg-teal-50 dark:bg-teal-900/30 flex items-center justify-center mb-4">
+            <Blocks className="size-6 text-teal-600 dark:text-teal-400" />
           </div>
           <DialogTitle className="text-2xl font-black tracking-tight">
             Create Feature Flag

@@ -123,7 +123,7 @@ export function SuperAdminDeletedTenants() {
 
       <Card className="bg-amber-50 dark:bg-amber-950/20 border-amber-200 text-amber-900 dark:text-amber-100">
         <CardContent className="flex items-center gap-4 p-4">
-          <AlertTriangle className="h-6 w-6 shrink-0 text-amber-600 dark:text-amber-400" />
+          <AlertTriangle className="size-6 shrink-0 text-amber-600 dark:text-amber-400" />
           <p className="text-sm font-medium">
             Retention Policy Active: Items in the bin are automatically flushed permanently after 28 days of static existence. Automated cleansing cycles run nightly.
           </p>
@@ -131,7 +131,7 @@ export function SuperAdminDeletedTenants() {
       </Card>
 
       <div className="flex items-center max-w-md relative">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
         <Input 
           placeholder="Search deleted schools..." 
           className="pl-9"
@@ -164,7 +164,7 @@ export function SuperAdminDeletedTenants() {
                   <TableRow>
                     <TableCell colSpan={4} className="h-32 text-center text-muted-foreground">
                       <div className="flex flex-col items-center gap-2">
-                        <Building2 className="h-8 w-8 opacity-20" />
+                        <Building2 className="size-8 opacity-20" />
                         <p>Bin is empty. No schools are currently slated for disposal.</p>
                       </div>
                     </TableCell>
@@ -178,8 +178,8 @@ export function SuperAdminDeletedTenants() {
                       <TableRow key={tenant.id} className="group transition-colors hover:bg-muted/40">
                         <TableCell>
                           <div className="flex items-center gap-3">
-                            <div className="h-9 w-9 rounded bg-muted flex items-center justify-center text-muted-foreground">
-                              <Building2 className="h-5 w-5" />
+                            <div className="size-9 rounded bg-muted flex items-center justify-center text-muted-foreground">
+                              <Building2 className="size-5" />
                             </div>
                             <div>
                               <div className="font-semibold text-sm">{tenant.name}</div>
@@ -189,7 +189,7 @@ export function SuperAdminDeletedTenants() {
                         </TableCell>
                          <TableCell>
                           <div className="flex items-center gap-2 text-sm">
-                            <Calendar className="h-4 w-4 text-muted-foreground" />
+                            <Calendar className="size-4 text-muted-foreground" />
                             <span>
                               {tenant.deletedAt 
                                 ? format(toSafeDate(tenant.deletedAt), "MMM d, yyyy HH:mm")
@@ -204,7 +204,7 @@ export function SuperAdminDeletedTenants() {
                                variant={isUrgent ? "destructive" : "outline"}
                                className={isUrgent ? "" : "bg-amber-100 dark:bg-amber-900/30 text-amber-800 dark:text-amber-300 border-amber-200"}
                              >
-                               <Clock className="h-3 w-3 mr-1" />
+                               <Clock className="size-3 mr-1" />
                                {daysLeft} days left
                              </Badge>
                              <span className="text-xs text-muted-foreground hidden md:inline">
@@ -223,7 +223,7 @@ export function SuperAdminDeletedTenants() {
                                 setRestoreDialogOpen(true);
                               }}
                             >
-                              <RotateCcw className="h-3.5 w-3.5" />
+                              <RotateCcw className="size-3.5" />
                               Restore
                             </Button>
                             <Button 
@@ -235,7 +235,7 @@ export function SuperAdminDeletedTenants() {
                                 setPurgeDialogOpen(true);
                               }}
                             >
-                              <Trash2 className="h-3.5 w-3.5" />
+                              <Trash2 className="size-3.5" />
                               Purge
                             </Button>
                           </div>

@@ -15,7 +15,7 @@ export function PromotionSkeleton() {
   return (
     <div className="space-y-6">
       <Card className="border-none shadow-sm">
-        <CardHeader className="border-b bg-gray-50/50 dark:bg-gray-900/20">
+        <CardHeader className="border-b bg-zinc-50/50 dark:bg-zinc-900/20">
           <Skeleton className="h-6 w-48" />
         </CardHeader>
         <CardContent className="p-0">

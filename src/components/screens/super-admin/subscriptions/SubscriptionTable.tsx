@@ -100,8 +100,8 @@ export function SubscriptionTable({
               <TableRow>
                 <TableCell colSpan={6} className="h-64 text-center">
                   <div className="flex flex-col items-center justify-center space-y-3">
-                    <div className="h-12 w-12 rounded-full bg-teal-100 flex items-center justify-center text-teal-600">
-                      <Building2 className="h-6 w-6" />
+                    <div className="size-12 rounded-full bg-teal-100 flex items-center justify-center text-teal-600">
+                      <Building2 className="size-6" />
                     </div>
                     <div>
                       <p className="font-bold text-lg">No Results Found</p>
@@ -127,10 +127,10 @@ export function SubscriptionTable({
                       <div className="flex items-center gap-3">
                         <div
                           className={cn(
-                            "h-10 w-10 rounded-full flex items-center justify-center font-bold uppercase",
+                            "size-10 rounded-full flex items-center justify-center font-bold uppercase",
                             sub
                               ? "bg-teal-100 dark:bg-teal-900/30 text-teal-700"
-                              : "bg-gray-100 dark:bg-gray-800 text-gray-500",
+                              : "bg-zinc-100 dark:bg-zinc-800 text-zinc-500",
                           )}
                         >
                           {parent?.user?.name?.[0] || parent?.name?.[0]}
@@ -148,7 +148,7 @@ export function SubscriptionTable({
                                 <Badge
                                   key={s.id}
                                   variant="outline"
-                                  className="text-[10px] py-0 h-4 bg-white dark:bg-gray-950"
+                                  className="text-[10px] py-0 h-4 bg-white dark:bg-zinc-950"
                                 >
                                   {s.name || s.user?.name}
                                 </Badge>
@@ -170,9 +170,9 @@ export function SubscriptionTable({
                             )}
                           >
                             {sub.planName === "Premium" ? (
-                              <Crown className="h-4 w-4" />
+                              <Crown className="size-4" />
                             ) : (
-                              <Star className="h-4 w-4" />
+                              <Star className="size-4" />
                             )}
                           </div>
                           <div>
@@ -196,13 +196,13 @@ export function SubscriptionTable({
                           "gap-1 py-1 px-2 text-[11px] font-medium border shadow-none",
                           sub
                             ? statusConfig[sub.status]?.bg
-                            : "bg-gray-100 dark:bg-gray-800 text-gray-600 border-gray-200 dark:border-gray-700",
+                            : "bg-zinc-100 dark:bg-zinc-800 text-zinc-600 border-zinc-200 dark:border-zinc-700",
                         )}
                       >
                         {sub ? (
                           statusConfig[sub.status]?.icon
                         ) : (
-                          <X className="h-3 w-3" />
+                          <X className="size-3" />
                         )}
                         {sub
                           ? statusConfig[sub.status]?.label
@@ -216,7 +216,7 @@ export function SubscriptionTable({
                             {sub.period}
                           </span>
                           <span suppressHydrationWarning className="text-[10px] text-muted-foreground flex items-center gap-1">
-                            <CalendarDays className="h-3 w-3" />
+                            <CalendarDays className="size-3" />
                             {new Date(sub.startDate).toLocaleDateString()}
                           </span>
                         </div>
@@ -227,7 +227,7 @@ export function SubscriptionTable({
                     <TableCell>
                       {sub ? (
                         <div className="flex items-center gap-1 font-bold text-sm text-emerald-600 dark:text-emerald-400">
-                          <IndianRupee className="h-3.5 w-3.5" />
+                          <IndianRupee className="size-3.5" />
                           {sub.amount.toLocaleString()}
                         </div>
                       ) : (
@@ -241,9 +241,9 @@ export function SubscriptionTable({
                             <Button
                               variant="ghost"
                               size="icon"
-                              className="h-8 w-8"
+                              className="size-8"
                             >
-                              <MoreVertical className="h-4 w-4" />
+                              <MoreVertical className="size-4" />
                             </Button>
                           </DropdownMenuTrigger>
                           <DropdownMenuContent align="end" className="w-56">
@@ -252,10 +252,10 @@ export function SubscriptionTable({
                             </DropdownMenuLabel>
                             <DropdownMenuSeparator />
                             <DropdownMenuItem onClick={() => onEdit(sub)}>
-                              <Pencil className="h-4 w-4 mr-2" /> Edit Details
+                              <Pencil className="size-4 mr-2" /> Edit Details
                             </DropdownMenuItem>
                             <DropdownMenuItem onClick={() => onExtend(sub)}>
-                              <CalendarClock className="h-4 w-4 mr-2" /> Extend
+                              <CalendarClock className="size-4 mr-2" /> Extend
                               Validity
                             </DropdownMenuItem>
                             <DropdownMenuSeparator />
@@ -263,7 +263,7 @@ export function SubscriptionTable({
                               className="text-red-600 focus:text-red-700 focus:bg-red-50"
                               onClick={() => onDelete(sub)}
                             >
-                              <Trash2 className="h-4 w-4 mr-2" /> Delete Record
+                              <Trash2 className="size-4 mr-2" /> Delete Record
                             </DropdownMenuItem>
                           </DropdownMenuContent>
                         </DropdownMenu>
@@ -274,7 +274,7 @@ export function SubscriptionTable({
                           className="text-teal-600 hover:text-teal-700 hover:bg-teal-50"
                           onClick={() => onAssign(item)}
                         >
-                          <Plus className="h-3.5 w-3.5 mr-1.5" />
+                          <Plus className="size-3.5 mr-1.5" />
                           Assign
                         </Button>
                       )}
@@ -287,7 +287,7 @@ export function SubscriptionTable({
         </Table>
       </div>
       {!loading && totalPages > 1 && (
-        <div className="flex flex-col sm:flex-row items-center justify-between px-6 py-4 bg-gray-50/50 dark:bg-gray-900/20 border-t gap-4">
+        <div className="flex flex-col sm:flex-row items-center justify-between px-6 py-4 bg-zinc-50/50 dark:bg-zinc-900/20 border-t gap-4">
           <div className="flex items-center gap-4 order-2 sm:order-1">
             <p className="text-sm text-muted-foreground">
               Showing{" "}
@@ -299,7 +299,7 @@ export function SubscriptionTable({
                 {Math.min(page * limit, totalEntries)}
               </span>{" "}
               of{" "}
-              <span className="font-semibold text-gray-900 dark:text-gray-100">
+              <span className="font-semibold text-zinc-900 dark:text-zinc-100">
                 {totalEntries}
               </span>{" "}
               entries
@@ -318,9 +318,9 @@ export function SubscriptionTable({
               size="sm"
               onClick={() => onPageChange(page - 1)}
               disabled={page === 1}
-              className="h-8 w-8 p-0"
+              className="size-8 p-0"
             >
-              <ChevronLeft className="h-4 w-4" />
+              <ChevronLeft className="size-4" />
             </Button>
 
             <div className="flex items-center gap-1 mx-1">
@@ -338,7 +338,7 @@ export function SubscriptionTable({
                         variant={page === pageNum ? "default" : "outline"}
                         size="sm"
                         className={cn(
-                          "h-8 w-8 p-0 text-xs",
+                          "size-8 p-0 text-xs",
                           page === pageNum
                             ? "bg-teal-600 hover:bg-teal-700 shadow-sm"
                             : "hover:bg-teal-50",
@@ -372,9 +372,9 @@ export function SubscriptionTable({
               size="sm"
               onClick={() => onPageChange(page + 1)}
               disabled={page === totalPages}
-              className="h-8 w-8 p-0"
+              className="size-8 p-0"
             >
-              <ChevronRight className="h-4 w-4" />
+              <ChevronRight className="size-4" />
             </Button>
           </div>
         </div>

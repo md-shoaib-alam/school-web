@@ -38,7 +38,7 @@ export function GraduationsTable({ graduations }: GraduationsTableProps) {
       <CardContent className="p-0">
         {graduations.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-16 text-muted-foreground">
-            <GraduationCap className="h-10 w-10 mb-2 opacity-30" />
+            <GraduationCap className="size-10 mb-2 opacity-30" />
             <p className="text-sm">No graduation records found</p>
           </div>
         ) : (
@@ -62,7 +62,7 @@ export function GraduationsTable({ graduations }: GraduationsTableProps) {
                   >
                     <TableCell>
                       <div className="flex items-center gap-3">
-                        <div className="h-8 w-8 rounded-full bg-violet-100 dark:bg-violet-900/30 text-violet-700 dark:text-violet-400 flex items-center justify-center text-xs font-semibold shrink-0">
+                        <div className="size-8 rounded-full bg-violet-100 dark:bg-violet-900/30 text-violet-700 dark:text-violet-400 flex items-center justify-center text-xs font-semibold shrink-0">
                           {grad.studentName
                             .split(" ")
                             .map((n) => n[0])

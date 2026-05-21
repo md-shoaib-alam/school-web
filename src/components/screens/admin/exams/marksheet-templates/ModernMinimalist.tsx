@@ -11,11 +11,11 @@ export const ModernMinimalist: React.FC<MarksheetTemplateProps> = ({
 }) => {
   return (
     <div 
-      className="relative bg-white text-slate-900 px-10 py-10 rounded overflow-hidden select-none flex flex-col justify-between shrink-0 text-left h-[1123px] w-[794px] box-border border border-zinc-200"
+      className="relative bg-white text-zinc-900 px-10 py-10 rounded overflow-hidden select-none flex flex-col justify-between shrink-0 text-left h-[1123px] w-[794px] box-border border border-zinc-200"
       style={{ WebkitPrintColorAdjust: 'exact', printColorAdjust: 'exact' }}
     >
       {/* Sleek Asymmetric Side Bar Accent */}
-      <div className="absolute left-0 top-0 bottom-0 w-3 bg-gradient-to-b from-blue-600 via-indigo-600 to-emerald-500 z-10" />
+      <div className="absolute left-0 top-0 bottom-0 w-3 bg-gradient-to-b from-blue-600 via-violet-600 to-emerald-500 z-10" />
 
       {/* Core Document Flow */}
       <div className="space-y-6 z-10 ml-2">
@@ -23,7 +23,7 @@ export const ModernMinimalist: React.FC<MarksheetTemplateProps> = ({
         {/* Modern Header */}
         <div className="flex justify-between items-start border-b border-zinc-150 pb-4">
           <div className="space-y-1">
-            <h3 className="font-semibold text-2xl text-slate-900 tracking-tight leading-none font-sans">
+            <h3 className="font-semibold text-2xl text-zinc-900 tracking-tight leading-none font-sans">
               {sheet.schoolName.toUpperCase()}
             </h3>
             <p className="text-[10px] text-emerald-600 font-bold uppercase tracking-wider font-sans">
@@ -31,7 +31,7 @@ export const ModernMinimalist: React.FC<MarksheetTemplateProps> = ({
             </p>
           </div>
           <div className="text-right space-y-1 font-sans">
-            <span className="text-[10px] bg-slate-100 text-slate-700 px-3 py-1 rounded-full font-bold uppercase tracking-wide">
+            <span className="text-[10px] bg-zinc-100 text-zinc-700 px-3 py-1 rounded-full font-bold uppercase tracking-wide">
               {marksheetType === 'combined' ? 'Combined Cycle' : marksheetType.toUpperCase() + ' CYCLE'}
             </span>
             <p className="text-[9px] text-zinc-400 font-semibold">{academicYear}</p>
@@ -41,7 +41,7 @@ export const ModernMinimalist: React.FC<MarksheetTemplateProps> = ({
         {/* Title Box */}
         <div className="flex justify-between items-center bg-zinc-50/50 border border-zinc-100 rounded-lg p-3 font-sans">
           <div>
-            <h4 className="text-xs font-semibold uppercase text-slate-700 tracking-wider">
+            <h4 className="text-xs font-semibold uppercase text-zinc-700 tracking-wider">
               {marksheetType === 'midterm' ? 'Midterm Marksheet' : marksheetType === 'final' ? 'Final Marksheet' : 'Consolidated Report Card'}
             </h4>
             <p className="text-[9px] text-zinc-400 font-medium">Class Performance Summary</p>
@@ -76,7 +76,7 @@ export const ModernMinimalist: React.FC<MarksheetTemplateProps> = ({
         <div className="overflow-hidden border border-zinc-150 rounded-lg bg-white font-sans">
           <table className="w-full text-xs border-collapse table-fixed">
             <thead>
-              <tr className="bg-slate-900 text-white text-[9.5px]">
+              <tr className="bg-zinc-900 text-white text-[9.5px]">
                 <th className={`font-bold px-3 py-2 text-left whitespace-normal ${marksheetType === 'combined' ? 'w-[32%]' : 'w-[50%]'}`}>Subject Name</th>
                 {marksheetType === 'combined' && <th className="font-bold px-3 py-2 text-center w-[15%]">Midterm</th>}
                 {marksheetType === 'combined' && <th className="font-bold px-3 py-2 text-center w-[15%]">Final</th>}
@@ -88,14 +88,14 @@ export const ModernMinimalist: React.FC<MarksheetTemplateProps> = ({
             <tbody>
               {sheet.subjects.map((sub, sIdx) => (
                 <tr key={sIdx} className="border-b border-zinc-100 hover:bg-zinc-50/40">
-                  <td className="px-3 py-2.5 text-left font-bold text-slate-800 truncate">{sub.subjectName}</td>
-                  {marksheetType === 'combined' && <td className="px-3 py-2.5 text-center font-mono text-slate-500">{sub.midtermMarks}</td>}
-                  {marksheetType === 'combined' && <td className="px-3 py-2.5 text-center font-mono text-slate-500">{sub.finalMarks}</td>}
+                  <td className="px-3 py-2.5 text-left font-bold text-zinc-800 truncate">{sub.subjectName}</td>
+                  {marksheetType === 'combined' && <td className="px-3 py-2.5 text-center font-mono text-zinc-500">{sub.midtermMarks}</td>}
+                  {marksheetType === 'combined' && <td className="px-3 py-2.5 text-center font-mono text-zinc-500">{sub.finalMarks}</td>}
                   <td className="px-3 py-2.5 text-center font-black font-mono text-blue-900">{sub.obtained}</td>
                   <td className="px-3 py-2.5 text-center">
                     <div className="flex flex-col items-center justify-center gap-0.5">
-                      <span className="font-black text-slate-900 font-mono">{sub.percentage}%</span>
-                      <div className="w-12 h-1 bg-slate-100 rounded-full overflow-hidden">
+                      <span className="font-black text-zinc-900 font-mono">{sub.percentage}%</span>
+                      <div className="w-12 h-1 bg-zinc-100 rounded-full overflow-hidden">
                         <div 
                           className={`h-full rounded-full ${sub.status === 'pass' ? 'bg-emerald-500' : 'bg-red-500'}`} 
                           style={{ width: `${Math.min(sub.percentage, 100)}%` }} 
@@ -152,7 +152,7 @@ export const ModernMinimalist: React.FC<MarksheetTemplateProps> = ({
 
         {/* Remarks Section */}
         <div className="border border-zinc-150 rounded-lg p-4 bg-zinc-50/20 font-sans text-xs">
-          <h5 className="font-semibold text-[9px] uppercase tracking-wider text-slate-800 mb-1">Academic Assessment & Evaluation Remarks</h5>
+          <h5 className="font-semibold text-[9px] uppercase tracking-wider text-zinc-800 mb-1">Academic Assessment & Evaluation Remarks</h5>
           <p className="italic text-zinc-600 font-medium leading-relaxed">
             "{sheet.remarks}" {sheet.status === 'pass' ? 'The student continues to demonstrate high diligence and rigorous understanding.' : 'Targeted learning pathways and core feedback support are recommended.'}
           </p>

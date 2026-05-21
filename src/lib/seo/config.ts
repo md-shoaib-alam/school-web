@@ -58,6 +58,6 @@ export const SEO_CONFIG = {
     instagram: "@nutkhut_erp"
   },
 
-  themeColor: "#4f46e5", // Indigo-600
+  themeColor: "#7c3aed", // Violet-600
   logoUrl: "https://nutkhut-erp.com/logo.png"
 };

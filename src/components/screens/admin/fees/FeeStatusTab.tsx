@@ -93,7 +93,7 @@ export function FeeStatusTab() {
         /* Student Search */
         <Card className="hover:shadow-md transition-shadow">
           <CardHeader>
-            <CardTitle className="text-base flex items-center gap-2"><UserCheck className="h-5 w-5 text-emerald-600" />Check Fee Status</CardTitle>
+            <CardTitle className="text-base flex items-center gap-2"><UserCheck className="size-5 text-emerald-600" />Check Fee Status</CardTitle>
             <CardDescription>Search for a student to view their complete fee status</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -106,23 +106,23 @@ export function FeeStatusTab() {
                 </SelectContent>
               </Select>
               <div className="relative flex-1">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
                 <Input placeholder="Search by name or phone number..." className="pl-9" value={studentSearch} onChange={e => setStudentSearch(e.target.value)} />
               </div>
             </div>
             <div className="max-h-96 overflow-y-auto rounded-lg border divide-y">
               {filteredStudents.length === 0 ? (
-                <div className="p-8 text-center text-muted-foreground"><Search className="h-8 w-8 mx-auto mb-2 opacity-30" /><p>No students found</p></div>
+                <div className="p-8 text-center text-muted-foreground"><Search className="size-8 mx-auto mb-2 opacity-30" /><p>No students found</p></div>
               ) : filteredStudents.map(s => (
                 <button key={s.id} className="w-full flex items-center gap-3 p-3 hover:bg-emerald-50/50 dark:hover:bg-emerald-900/20 transition-colors text-left" onClick={() => handleSelectStudent(s)}>
-                  <div className="h-10 w-10 rounded-full bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 flex items-center justify-center text-sm font-semibold shrink-0">
+                  <div className="size-10 rounded-full bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 flex items-center justify-center text-sm font-semibold shrink-0">
                     {s.name.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase()}
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="font-medium text-sm">{s.name}</p>
                     <p className="text-xs text-muted-foreground">{s.className} • {s.phone || 'No phone'}</p>
                   </div>
-                  <ChevronRight className="h-4 w-4 text-muted-foreground shrink-0" />
+                  <ChevronRight className="size-4 text-muted-foreground shrink-0" />
                 </button>
               ))}
             </div>
@@ -133,7 +133,7 @@ export function FeeStatusTab() {
           {/* Student Header */}
           <Card className="hover:shadow-md transition-shadow">
             <CardContent className="p-4 flex items-center gap-4">
-              <div className="h-14 w-14 rounded-full bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 flex items-center justify-center text-xl font-bold shrink-0">
+              <div className="size-14 rounded-full bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 flex items-center justify-center text-xl font-bold shrink-0">
                 {selectedStudent.name.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase()}
               </div>
               <div className="flex-1 min-w-0">
@@ -202,7 +202,7 @@ export function FeeStatusTab() {
                 <CardContent className="p-0">
                   {fees.length === 0 ? (
                     <div className="p-12 text-center text-muted-foreground">
-                      <DollarSign className="h-10 w-10 mx-auto mb-2 opacity-30" /><p>No fee records found</p>
+                      <DollarSign className="size-10 mx-auto mb-2 opacity-30" /><p>No fee records found</p>
                     </div>
                   ) : (
                     <div className="overflow-x-auto">
@@ -257,8 +257,8 @@ export function FeeStatusTab() {
                     <div className="divide-y">
                       {receipts.slice(0, 5).map(r => (
                         <div key={r.id} className="flex items-center gap-3 p-3 hover:bg-emerald-50/50 dark:hover:bg-emerald-900/20 transition-colors">
-                          <div className="h-10 w-10 rounded-xl bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0">
-                            {paymentMethodIcons[r.paymentMethod] || <DollarSign className="h-5 w-5" />}
+                          <div className="size-10 rounded-xl bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0">
+                            {paymentMethodIcons[r.paymentMethod] || <DollarSign className="size-5" />}
                           </div>
                           <div className="flex-1 min-w-0">
                             <p className="font-mono text-xs font-semibold">{r.receiptNumber}</p>

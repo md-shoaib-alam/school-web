@@ -119,7 +119,7 @@ export function TeacherDialog({
           >
             {submitting ? (
               <>
-                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                <Loader2 className="size-4 mr-2 animate-spin" />
                 {editingTeacher ? "Updating..." : "Adding..."}
               </>
             ) : editingTeacher ? (

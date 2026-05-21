@@ -33,8 +33,8 @@ export function WelcomeBanner({ userName }: WelcomeBannerProps) {
       <CardContent className="p-6 lg:p-8 relative z-10">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div className="flex items-center gap-4">
-            <div className="h-14 w-14 rounded-xl bg-muted flex items-center justify-center overflow-hidden shrink-0 border border-border">
-              <img src={currentTenantLogo || "/test.webp"} alt={currentTenantName || ""} className="h-full w-full object-cover" />
+            <div className="size-14 rounded-xl bg-muted flex items-center justify-center overflow-hidden shrink-0 border border-border">
+              <img src={currentTenantLogo || "/test.webp"} alt={currentTenantName || ""} className="size-full object-cover" />
             </div>
             <div className="text-left">
               <p className="text-muted-foreground text-xs sm:text-sm font-medium mb-0.5">
@@ -49,7 +49,7 @@ export function WelcomeBanner({ userName }: WelcomeBannerProps) {
             </div>
           </div>
           <div className="flex items-center gap-2 bg-muted border border-border rounded-lg px-4 py-2 text-muted-foreground shrink-0 self-start sm:self-auto">
-            <Calendar className="h-4 w-4" />
+            <Calendar className="size-4" />
             <span className="text-sm font-medium" suppressHydrationWarning>
               {todayString}
             </span>

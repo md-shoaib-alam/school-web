@@ -4,7 +4,7 @@ import { LedgerTemplateProps } from './types';
 export const TealClean: React.FC<LedgerTemplateProps> = ({ data }) => {
   return (
     <div 
-      className="p-[6mm] bg-white text-slate-800 font-sans print:p-0 min-h-screen"
+      className="p-[6mm] bg-white text-zinc-800 font-sans print:p-0 min-h-screen"
       style={{ WebkitPrintColorAdjust: 'exact', printColorAdjust: 'exact' }}
     >
       <style type="text/css" media="print">
@@ -24,8 +24,8 @@ export const TealClean: React.FC<LedgerTemplateProps> = ({ data }) => {
 
       {/* Modern Header Banner */}
       <div className="bg-gradient-to-r from-teal-800 to-emerald-700 p-4 rounded-xl text-white text-center mb-4 shadow-sm relative overflow-hidden">
-        <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full -mr-8 -mt-8"></div>
-        <div className="absolute bottom-0 left-0 w-24 h-24 bg-white/5 rounded-full -ml-8 -mb-8"></div>
+        <div className="absolute top-0 right-0 size-32 bg-white/5 rounded-full -mr-8 -mt-8"></div>
+        <div className="absolute bottom-0 left-0 size-24 bg-white/5 rounded-full -ml-8 -mb-8"></div>
         
         <h1 className="font-semibold text-xl tracking-wider uppercase leading-none">
           {data.schoolName}
@@ -51,67 +51,67 @@ export const TealClean: React.FC<LedgerTemplateProps> = ({ data }) => {
       </div>
 
       {/* Table */}
-      <table className="w-full border-collapse border border-slate-200 text-[9.5px]">
+      <table className="w-full border-collapse border border-zinc-200 text-[9.5px]">
         <thead>
           <tr className="bg-teal-900 text-white font-semibold border-b border-teal-950">
-            <th className="border border-slate-200 p-1.5 text-center w-[40px]">S.No</th>
-            <th className="border border-slate-200 p-1.5 text-center w-[60px]">Roll No</th>
-            <th className="border border-slate-200 p-1.5 text-left">Student Candidate</th>
+            <th className="border border-zinc-200 p-1.5 text-center w-[40px]">S.No</th>
+            <th className="border border-zinc-200 p-1.5 text-center w-[60px]">Roll No</th>
+            <th className="border border-zinc-200 p-1.5 text-left">Student Candidate</th>
             {data.subjectsList.map(sub => (
-              <th key={sub} className="border border-slate-200 p-1.5 text-center font-medium">
+              <th key={sub} className="border border-zinc-200 p-1.5 text-center font-medium">
                 {sub} <br />
                 <span className="text-[7.5px] text-teal-200/90 font-normal">({data.subjectMaxMarks[sub] || 100})</span>
               </th>
             ))}
-            <th className="border border-slate-200 p-1.5 text-center w-[70px] bg-teal-800 text-white">Total</th>
-            <th className="border border-slate-200 p-1.5 text-center w-[80px] bg-teal-800 text-white">Percentage</th>
-            <th className="border border-slate-200 p-1.5 text-center w-[50px]">Grade</th>
-            <th className="border border-slate-200 p-1.5 text-center w-[75px]">Result</th>
+            <th className="border border-zinc-200 p-1.5 text-center w-[70px] bg-teal-800 text-white">Total</th>
+            <th className="border border-zinc-200 p-1.5 text-center w-[80px] bg-teal-800 text-white">Percentage</th>
+            <th className="border border-zinc-200 p-1.5 text-center w-[50px]">Grade</th>
+            <th className="border border-zinc-200 p-1.5 text-center w-[75px]">Result</th>
           </tr>
         </thead>
         <tbody>
           {data.studentsTabulation.map((student, idx) => (
             <tr 
               key={idx} 
-              className={`hover:bg-teal-50/20 border-b border-slate-100 ${
+              className={`hover:bg-teal-50/20 border-b border-zinc-100 ${
                 idx % 2 === 1 ? 'bg-teal-50/10' : ''
               }`}
             >
-              <td className="border border-slate-200 p-1 text-center font-bold text-teal-800">{idx + 1}</td>
-              <td className="border border-slate-200 p-1 text-center font-mono text-slate-600">{student.rollNumber}</td>
-              <td className="border border-slate-200 p-1 text-left font-semibold text-slate-800">{student.name}</td>
+              <td className="border border-zinc-200 p-1 text-center font-bold text-teal-800">{idx + 1}</td>
+              <td className="border border-zinc-200 p-1 text-center font-mono text-zinc-600">{student.rollNumber}</td>
+              <td className="border border-zinc-200 p-1 text-left font-semibold text-zinc-800">{student.name}</td>
               {data.subjectsList.map(sub => {
                 const marks = student.subjectMarks[sub];
-                if (!marks) return <td key={sub} className="border border-slate-200 p-1 text-center text-slate-400 font-normal">-</td>;
+                if (!marks) return <td key={sub} className="border border-zinc-200 p-1 text-center text-zinc-400 font-normal">-</td>;
                 if (marks.status === 'pending') {
                   return (
-                    <td key={sub} className="border border-slate-200 p-1 text-center text-amber-500 italic text-[9px] font-medium">
+                    <td key={sub} className="border border-zinc-200 p-1 text-center text-amber-500 italic text-[9px] font-medium">
                       PENDING
                     </td>
                   );
                 }
                 if (marks.status === 'absent') {
                   return (
-                    <td key={sub} className="border border-slate-200 p-1 text-center text-red-500 italic font-bold">
+                    <td key={sub} className="border border-zinc-200 p-1 text-center text-red-500 italic font-bold">
                       ABSENT
                     </td>
                   );
                 }
                 const isFailed = marks.status === 'fail';
                 return (
-                  <td key={sub} className={`border border-slate-200 p-1 text-center ${isFailed ? 'text-red-500 font-semibold bg-red-50/10' : 'text-slate-700'}`}>
+                  <td key={sub} className={`border border-zinc-200 p-1 text-center ${isFailed ? 'text-red-500 font-semibold bg-red-50/10' : 'text-zinc-700'}`}>
                     {marks.marksObtained}/{marks.totalMarks}
                   </td>
                 );
               })}
-              <td className="border border-slate-200 p-1 text-center font-semibold bg-teal-50/25 text-teal-900">{student.totalObtained}/{student.totalMax}</td>
-              <td className="border border-slate-200 p-1 text-center font-semibold bg-teal-50/25 text-teal-900">{student.percentage}</td>
-              <td className={`border border-slate-200 p-1 text-center font-bold ${
-                student.grade === 'A+' || student.grade === 'A' ? 'text-teal-650' : student.grade === 'F' ? 'text-red-500' : 'text-slate-750'
+              <td className="border border-zinc-200 p-1 text-center font-semibold bg-teal-50/25 text-teal-900">{student.totalObtained}/{student.totalMax}</td>
+              <td className="border border-zinc-200 p-1 text-center font-semibold bg-teal-50/25 text-teal-900">{student.percentage}</td>
+              <td className={`border border-zinc-200 p-1 text-center font-bold ${
+                student.grade === 'A+' || student.grade === 'A' ? 'text-teal-650' : student.grade === 'F' ? 'text-red-500' : 'text-zinc-750'
               }`}>
                 {student.grade}
               </td>
-              <td className="border border-slate-200 p-1 text-center">
+              <td className="border border-zinc-200 p-1 text-center">
                 <span className={`inline-block px-1.5 py-0.5 rounded text-[8.5px] font-bold uppercase tracking-wider ${
                   student.status === 'PASS' 
                     ? 'text-teal-800 bg-teal-100/50' 
@@ -128,17 +128,17 @@ export const TealClean: React.FC<LedgerTemplateProps> = ({ data }) => {
       </table>
 
       {/* Signature blocks */}
-      <div className="flex justify-between mt-12 px-8 text-[9px] font-semibold text-slate-500">
+      <div className="flex justify-between mt-12 px-8 text-[9px] font-semibold text-zinc-500">
         <div className="flex flex-col items-center">
-          <div className="w-[120px] border-b border-slate-200 mb-1"></div>
+          <div className="w-[120px] border-b border-zinc-200 mb-1"></div>
           <span>CLASS ADVISOR</span>
         </div>
         <div className="flex flex-col items-center">
-          <div className="w-[120px] border-b border-slate-200 mb-1"></div>
+          <div className="w-[120px] border-b border-zinc-200 mb-1"></div>
           <span>CONTROLLER OF EXAMS</span>
         </div>
         <div className="flex flex-col items-center">
-          <div className="w-[120px] border-b border-slate-200 mb-1"></div>
+          <div className="w-[120px] border-b border-zinc-200 mb-1"></div>
           <span>PRINCIPAL</span>
         </div>
       </div>

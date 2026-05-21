@@ -32,8 +32,8 @@ export function SubjectSkeleton() {
               <TableCell><Skeleton className="h-4 w-24" /></TableCell>
               <TableCell>
                 <div className="flex justify-center gap-2">
-                  <Skeleton className="h-8 w-8 rounded-md" />
-                  <Skeleton className="h-8 w-8 rounded-md" />
+                  <Skeleton className="size-8 rounded-md" />
+                  <Skeleton className="size-8 rounded-md" />
                 </div>
               </TableCell>
             </TableRow>

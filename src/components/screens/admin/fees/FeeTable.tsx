@@ -31,17 +31,17 @@ function formatFeeDate(dateStr: string) {
 const statusConfig: Record<string, { bg: string; icon: React.ReactNode; label: string }> = {
   paid: {
     bg: "bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800",
-    icon: <CheckCircle2 className="h-3.5 w-3.5" />,
+    icon: <CheckCircle2 className="size-3.5" />,
     label: "Paid",
   },
   pending: {
     bg: "bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 border-amber-200 dark:border-amber-800",
-    icon: <Clock className="h-3.5 w-3.5" />,
+    icon: <Clock className="size-3.5" />,
     label: "Pending",
   },
   overdue: {
     bg: "bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 border-red-200 dark:border-red-800",
-    icon: <AlertTriangle className="h-3.5 w-3.5" />,
+    icon: <AlertTriangle className="size-3.5" />,
     label: "Overdue",
   },
 };
@@ -66,32 +66,32 @@ export function FeeTable({
   return (
     <div className="overflow-x-auto">
       <Table>
-        <TableHeader className="bg-gray-50/50 dark:bg-gray-900/20">
+        <TableHeader className="bg-zinc-50/50 dark:bg-zinc-900/20">
           <TableRow>
-            <TableHead className="font-bold uppercase text-[10px] tracking-widest text-gray-500">Student</TableHead>
-            <TableHead className="font-bold uppercase text-[10px] tracking-widest text-gray-500">Fee Type</TableHead>
-            <TableHead className="font-bold uppercase text-[10px] tracking-widest text-gray-500">Status</TableHead>
-            <TableHead className="font-bold uppercase text-[10px] tracking-widest text-gray-500">Amount</TableHead>
-            <TableHead className="font-bold uppercase text-[10px] tracking-widest text-gray-500">Due Date</TableHead>
-            <TableHead className="text-right font-bold uppercase text-[10px] tracking-widest text-gray-500">Actions</TableHead>
+            <TableHead className="font-bold uppercase text-[10px] tracking-widest text-zinc-500">Student</TableHead>
+            <TableHead className="font-bold uppercase text-[10px] tracking-widest text-zinc-500">Fee Type</TableHead>
+            <TableHead className="font-bold uppercase text-[10px] tracking-widest text-zinc-500">Status</TableHead>
+            <TableHead className="font-bold uppercase text-[10px] tracking-widest text-zinc-500">Amount</TableHead>
+            <TableHead className="font-bold uppercase text-[10px] tracking-widest text-zinc-500">Due Date</TableHead>
+            <TableHead className="text-right font-bold uppercase text-[10px] tracking-widest text-zinc-500">Actions</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {records.length === 0 ? (
             <TableRow>
-              <TableCell colSpan={6} className="h-32 text-center text-gray-500">
+              <TableCell colSpan={6} className="h-32 text-center text-zinc-500">
                 No fee records found.
               </TableCell>
             </TableRow>
           ) : (
             records.map((record) => (
-              <TableRow key={record.id} className="hover:bg-gray-50/50 dark:hover:bg-gray-900/10 transition-colors">
+              <TableRow key={record.id} className="hover:bg-zinc-50/50 dark:hover:bg-zinc-900/10 transition-colors">
                 <TableCell>
                   <div className="flex flex-col">
-                    <span className="font-bold text-sm text-gray-900 dark:text-gray-100">
+                    <span className="font-bold text-sm text-zinc-900 dark:text-zinc-100">
                       {record.student?.name}
                     </span>
-                    <span className="text-[10px] text-gray-500">
+                    <span className="text-[10px] text-zinc-500">
                       {record.student?.class
                         ? `${record.student.class.name}-${record.student.class.section}`
                         : "No Class"}
@@ -99,7 +99,7 @@ export function FeeTable({
                   </div>
                 </TableCell>
                 <TableCell>
-                  <span className="text-xs font-medium text-gray-700 dark:text-gray-300 capitalize">
+                  <span className="text-xs font-medium text-zinc-700 dark:text-zinc-300 capitalize">
                     {record.type.replace(/_/g, " ")}
                   </span>
                 </TableCell>
@@ -116,7 +116,7 @@ export function FeeTable({
                 </TableCell>
                 <TableCell>
                   <div className="flex flex-col">
-                    <span className="text-sm font-bold text-gray-900 dark:text-gray-100">
+                    <span className="text-sm font-bold text-zinc-900 dark:text-zinc-100">
                       ₹{record.amount.toLocaleString()}
                     </span>
                     {record.paidAmount > 0 && (
@@ -127,7 +127,7 @@ export function FeeTable({
                   </div>
                 </TableCell>
                 <TableCell>
-                  <span className="text-xs text-gray-600 dark:text-gray-400" suppressHydrationWarning>
+                  <span className="text-xs text-zinc-600 dark:text-zinc-400" suppressHydrationWarning>
                     {formatFeeDate(record.dueDate)}
                   </span>
                 </TableCell>
@@ -136,19 +136,19 @@ export function FeeTable({
                     <Button
                       variant="ghost"
                       size="icon"
-                      className="h-8 w-8 text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20"
+                      className="size-8 text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20"
                       onClick={() => onView(record)}
                     >
-                      <Eye className="h-4 w-4" />
+                      <Eye className="size-4" />
                     </Button>
                     {canEdit && (
                       <Button
                         variant="ghost"
                         size="icon"
-                        className="h-8 w-8 text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-900/20"
+                        className="size-8 text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-900/20"
                         onClick={() => onEdit(record)}
                       >
-                        <Pencil className="h-4 w-4" />
+                        <Pencil className="size-4" />
                       </Button>
                     )}
                     {canDelete && (
@@ -157,9 +157,9 @@ export function FeeTable({
                           <Button
                             variant="ghost"
                             size="icon"
-                            className="h-8 w-8 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20"
+                            className="size-8 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20"
                           >
-                            <Trash2 className="h-4 w-4" />
+                            <Trash2 className="size-4" />
                           </Button>
                         </AlertDialogTrigger>
                         <AlertDialogContent>

@@ -319,7 +319,7 @@ export function AdminClasses() {
       {/* Read-only banner */}
       {!canCreate && !canEdit && !canDelete && (
         <div className="flex items-center gap-2 rounded-lg border border-amber-200 dark:border-amber-800 bg-amber-50 dark:bg-amber-900/30 px-3 py-2">
-          <Eye className="h-4 w-4 text-amber-600 dark:text-amber-400 shrink-0" />
+          <Eye className="size-4 text-amber-600 dark:text-amber-400 shrink-0" />
           <span className="text-xs text-amber-700 dark:text-amber-300 font-medium">
             Read-only mode — you have view permission only for this module.
           </span>
@@ -329,7 +329,7 @@ export function AdminClasses() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h2 className="text-2xl font-semibold text-gray-900 dark:text-gray-100">
+          <h2 className="text-2xl font-semibold text-zinc-900 dark:text-zinc-100">
             Classes
           </h2>
           <p className="text-sm text-muted-foreground">
@@ -337,22 +337,22 @@ export function AdminClasses() {
           </p>
         </div>
         <div className="flex items-center gap-3 w-full sm:w-auto">
-          <div className="flex items-center gap-1 bg-gray-100 dark:bg-gray-800 p-1 rounded-lg">
+          <div className="flex items-center gap-1 bg-zinc-100 dark:bg-zinc-800 p-1 rounded-lg">
             <Button
               variant={viewMode === "table" ? "secondary" : "ghost"}
               size="sm"
               onClick={() => setViewMode("table")}
-              className={`h-8 w-8 p-0 ${viewMode === "table" ? "bg-white dark:bg-gray-700 shadow-sm" : ""}`}
+              className={`size-8 p-0 ${viewMode === "table" ? "bg-white dark:bg-zinc-700 shadow-sm" : ""}`}
             >
-              <List className="h-4 w-4" />
+              <List className="size-4" />
             </Button>
             <Button
               variant={viewMode === "grid" ? "secondary" : "ghost"}
               size="sm"
               onClick={() => setViewMode("grid")}
-              className={`h-8 w-8 p-0 ${viewMode === "grid" ? "bg-white dark:bg-gray-700 shadow-sm" : ""}`}
+              className={`size-8 p-0 ${viewMode === "grid" ? "bg-white dark:bg-zinc-700 shadow-sm" : ""}`}
             >
-              <LayoutGrid className="h-4 w-4" />
+              <LayoutGrid className="size-4" />
             </Button>
           </div>
           {canCreate && (
@@ -360,7 +360,7 @@ export function AdminClasses() {
               className="bg-emerald-600 hover:bg-emerald-700 text-white shadow-sm"
               onClick={() => dispatch({ type: "TOGGLE_ADD", payload: true })}
             >
-              <Plus className="h-4 w-4 mr-2" />
+              <Plus className="size-4 mr-2" />
               Add Class
             </Button>
           )}
@@ -386,7 +386,7 @@ export function AdminClasses() {
       ) : classes.length === 0 ? (
         <Card className="border-dashed border-2 bg-transparent">
           <CardContent className="py-20 text-center text-muted-foreground">
-            <School className="h-12 w-12 mx-auto mb-4 opacity-20" />
+            <School className="size-12 mx-auto mb-4 opacity-20" />
             <p className="text-lg font-medium">No classes found</p>
             <p className="text-sm text-muted-foreground">Create your first class to get started</p>
           </CardContent>
@@ -396,7 +396,7 @@ export function AdminClasses() {
           <CardContent className="p-0">
             <div className="overflow-x-auto">
               <table className="w-full text-left text-sm">
-                <thead className="bg-gray-50 dark:bg-gray-800/50 text-gray-500 dark:text-gray-400 uppercase text-[10px] font-bold tracking-wider">
+                <thead className="bg-zinc-50 dark:bg-zinc-800/50 text-zinc-500 dark:text-zinc-400 uppercase text-[10px] font-bold tracking-wider">
                   <tr>
                     <th className="px-6 py-4">Class Details</th>
                     <th className="px-6 py-4">Section</th>
@@ -405,21 +405,21 @@ export function AdminClasses() {
                     <th className="px-6 py-4 text-center">Actions</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
+                <tbody className="divide-y divide-zinc-100 dark:divide-zinc-800">
                   {classes.map((cls) => {
                     const percentage = cls.capacity > 0 ? Math.round((cls.studentCount / cls.capacity) * 100) : 0;
                     return (
-                      <tr key={cls.id} className="hover:bg-gray-50/50 dark:hover:bg-gray-800/30 transition-colors">
+                      <tr key={cls.id} className="hover:bg-zinc-50/50 dark:hover:bg-zinc-800/30 transition-colors">
                         <td className="px-6 py-4">
-                          <span className="font-bold text-gray-900 dark:text-gray-100">{cls.name}</span>
+                          <span className="font-bold text-zinc-900 dark:text-zinc-100">{cls.name}</span>
                         </td>
                         <td className="px-6 py-4">
                           <Badge variant="outline" className="font-medium">Section {cls.section}</Badge>
                         </td>
                         <td className="px-6 py-4">
                           <div className="flex items-center gap-2">
-                            <UserCheck className="h-3.5 w-3.5 text-blue-500" />
-                            <span className="text-gray-600 dark:text-gray-400">{cls.classTeacher || 'Unassigned'}</span>
+                            <UserCheck className="size-3.5 text-blue-500" />
+                            <span className="text-zinc-600 dark:text-zinc-400">{cls.classTeacher || 'Unassigned'}</span>
                           </div>
                         </td>
                         <td className="px-6 py-4 min-w-[150px]">
@@ -439,17 +439,17 @@ export function AdminClasses() {
                               className="h-8 gap-2 text-xs border-emerald-200 dark:border-emerald-800 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-50"
                               onClick={() => router.push(`/${slug}/students?classId=${cls.id}`)}
                             >
-                              <Users className="h-3.5 w-3.5" />
+                              <Users className="size-3.5" />
                               View Students
                             </Button>
                             {canEdit && (
-                              <Button variant="ghost" size="icon" className="h-8 w-8 text-gray-400 hover:text-emerald-600" onClick={() => openEditDialog(cls)}>
-                                <Pencil className="h-3.5 w-3.5" />
+                              <Button variant="ghost" size="icon" className="size-8 text-zinc-400 hover:text-emerald-600" onClick={() => openEditDialog(cls)}>
+                                <Pencil className="size-3.5" />
                               </Button>
                             )}
                             {canDelete && (
-                              <Button variant="ghost" size="icon" className="h-8 w-8 text-gray-400 hover:text-red-600" onClick={() => { dispatch({ type: "OPEN_DELETE", payload: cls }); }}>
-                                <Trash2 className="h-3.5 w-3.5" />
+                              <Button variant="ghost" size="icon" className="size-8 text-zinc-400 hover:text-red-600" onClick={() => { dispatch({ type: "OPEN_DELETE", payload: cls }); }}>
+                                <Trash2 className="size-3.5" />
                               </Button>
                             )}
                           </div>
@@ -485,22 +485,22 @@ export function AdminClasses() {
                             <Button
                               variant="ghost"
                               size="icon"
-                              className="h-7 w-7 text-muted-foreground hover:text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-900/30"
+                              className="size-7 text-muted-foreground hover:text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-900/30"
                               onClick={() => openEditDialog(cls)}
                             >
-                              <Pencil className="h-3.5 w-3.5" />
+                              <Pencil className="size-3.5" />
                             </Button>
                           )}
                           {canDelete && (
                             <Button
                               variant="ghost"
                               size="icon"
-                              className="h-7 w-7 text-muted-foreground hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/30"
+                              className="size-7 text-muted-foreground hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/30"
                               onClick={() => {
                                 dispatch({ type: "OPEN_DELETE", payload: cls });
                               }}
                             >
-                              <Trash2 className="h-3.5 w-3.5" />
+                              <Trash2 className="size-3.5" />
                             </Button>
                           )}
                         </div>
@@ -508,7 +508,7 @@ export function AdminClasses() {
                         {/* Class name and grade badge */}
                         <div className="flex items-start justify-between mb-4">
                           <div className="space-y-1">
-                            <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
+                            <h3 className="text-lg font-semibold text-zinc-900 dark:text-zinc-100">
                               {cls.name}
                             </h3>
                             <Badge variant="secondary" className="text-[10px] font-bold uppercase tracking-widest px-2 py-0">
@@ -521,17 +521,17 @@ export function AdminClasses() {
                         <div className="grid grid-cols-1 gap-3 mb-6 mt-6">
                           <div className="flex items-center justify-between text-sm">
                             <div className="flex items-center gap-2">
-                              <Users className="h-4 w-4 text-emerald-500" />
-                              <span className="text-gray-500 font-medium text-xs">Students</span>
+                              <Users className="size-4 text-emerald-500" />
+                              <span className="text-zinc-500 font-medium text-xs">Students</span>
                             </div>
-                            <span className="font-bold">{cls.studentCount}<span className="text-gray-400 font-normal ml-0.5">/{cls.capacity}</span></span>
+                            <span className="font-bold">{cls.studentCount}<span className="text-zinc-400 font-normal ml-0.5">/{cls.capacity}</span></span>
                           </div>
                           <div className="flex items-center justify-between text-sm">
                             <div className="flex items-center gap-2">
-                              <UserCheck className="h-4 w-4 text-blue-500" />
-                              <span className="text-gray-500 font-medium text-xs">Teacher</span>
+                              <UserCheck className="size-4 text-blue-500" />
+                              <span className="text-zinc-500 font-medium text-xs">Teacher</span>
                             </div>
-                            <span className="text-gray-700 dark:text-gray-300 font-semibold truncate max-w-[120px]">
+                            <span className="text-zinc-700 dark:text-zinc-300 font-semibold truncate max-w-[120px]">
                               {cls.classTeacher || 'Unassigned'}
                             </span>
                           </div>
@@ -539,7 +539,7 @@ export function AdminClasses() {
 
                         {/* Progress bar */}
                         <div className="space-y-2 mb-6">
-                          <div className="flex items-center justify-between text-[10px] uppercase font-black tracking-tighter text-gray-400">
+                          <div className="flex items-center justify-between text-[10px] uppercase font-black tracking-tighter text-zinc-400">
                             <span>Capacity</span>
                             <span className={percentage >= 90 ? "text-red-500" : "text-emerald-500"}>{percentage}% Full</span>
                           </div>
@@ -553,7 +553,7 @@ export function AdminClasses() {
                           className="w-full bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-600 hover:text-white border-0 shadow-none transition-all duration-300 font-bold text-xs h-9"
                           onClick={() => router.push(`/${slug}/students?classId=${cls.id}`)}
                         >
-                          <Users className="h-3.5 w-3.5 mr-2" />
+                          <Users className="size-3.5 mr-2" />
                           View Students
                         </Button>
                       </CardContent>
@@ -743,7 +743,7 @@ function AddClassDialog({
               !formData.grade
             }
           >
-            {submitting && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
+            {submitting && <Loader2 className="size-4 mr-2 animate-spin" />}
             {submitting ? "Adding..." : "Add Class"}
           </Button>
         </DialogFooter>
@@ -791,7 +791,7 @@ function EditClassDialog({
               !editData.grade
             }
           >
-            {editing && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
+            {editing && <Loader2 className="size-4 mr-2 animate-spin" />}
             {editing ? "Saving..." : "Save Changes"}
           </Button>
         </DialogFooter>
@@ -836,7 +836,7 @@ function DeleteClassDialog({
             disabled={deleting}
             className="bg-red-600 hover:bg-red-700 text-white"
           >
-            {deleting && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
+            {deleting && <Loader2 className="size-4 mr-2 animate-spin" />}
             {deleting ? "Deleting..." : "Delete"}
           </AlertDialogAction>
         </AlertDialogFooter>

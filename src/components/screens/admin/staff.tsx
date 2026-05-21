@@ -245,27 +245,27 @@ export function AdminStaff() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
         <div className="relative max-w-sm flex-1 w-full">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
           <Input
             placeholder="Search by name, email, phone..."
-            className="pl-9 bg-white dark:bg-gray-900"
+            className="pl-9 bg-white dark:bg-zinc-900"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />
         </div>
 
         <div className="flex items-center gap-2">
-          <div className="flex items-center p-1 bg-gray-100 dark:bg-gray-800 rounded-lg mr-2">
+          <div className="flex items-center p-1 bg-zinc-100 dark:bg-zinc-800 rounded-lg mr-2">
             <Button
               variant="ghost"
               size="sm"
               className={cn(
                 "h-8 px-3 gap-2",
-                viewMode === 'table' && "bg-white dark:bg-gray-700 shadow-sm text-emerald-600"
+                viewMode === 'table' && "bg-white dark:bg-zinc-700 shadow-sm text-emerald-600"
               )}
               onClick={() => toggleView('table')}
             >
-              <List className="h-4 w-4" />
+              <List className="size-4" />
               <span className="hidden sm:inline">List</span>
             </Button>
             <Button
@@ -273,28 +273,28 @@ export function AdminStaff() {
               size="sm"
               className={cn(
                 "h-8 px-3 gap-2",
-                viewMode === 'grid' && "bg-white dark:bg-gray-700 shadow-sm text-emerald-600"
+                viewMode === 'grid' && "bg-white dark:bg-zinc-700 shadow-sm text-emerald-600"
               )}
               onClick={() => toggleView('grid')}
             >
-              <LayoutGrid className="h-4 w-4" />
+              <LayoutGrid className="size-4" />
               <span className="hidden sm:inline">Grid</span>
             </Button>
           </div>
 
-          <Button variant="outline" size="icon" onClick={() => refetchStaff()} className="h-10 w-10">
-            <RotateCcw className="h-4 w-4" />
+          <Button variant="outline" size="icon" onClick={() => refetchStaff()} className="size-10">
+            <RotateCcw className="size-4" />
           </Button>
           {canCreate && (
             <Button className="bg-emerald-600 hover:bg-emerald-700 text-white shadow-none" onClick={handleOpenCreate}>
-              <Plus className="h-4 w-4 mr-2" /> Add Staff
+              <Plus className="size-4 mr-2" /> Add Staff
             </Button>
           )}
         </div>
       </div>
 
       {/* Content */}
-      <div className={cn(viewMode === 'table' ? "bg-white dark:bg-gray-950 rounded-xl border border-gray-100 dark:border-gray-800 overflow-hidden" : "")}>
+      <div className={cn(viewMode === 'table' ? "bg-white dark:bg-zinc-950 rounded-xl border border-zinc-100 dark:border-zinc-800 overflow-hidden" : "")}>
           {loadingStaff ? (
             <StaffSkeleton />
           ) : viewMode === 'table' ? (

@@ -41,23 +41,23 @@ export function Header({ items, resolvedScreen }: HeaderProps) {
         <Button
           variant="ghost"
           size="icon"
-          className="lg:hidden h-10 w-10 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 bg-white hover:bg-gray-50 dark:bg-zinc-900 dark:hover:bg-zinc-800 border border-gray-200 dark:border-zinc-800 shadow-sm transition-all"
+          className="lg:hidden size-10 text-zinc-500 hover:text-zinc-700 dark:text-zinc-400 dark:hover:text-zinc-200 bg-white hover:bg-zinc-50 dark:bg-zinc-900 dark:hover:bg-zinc-800 border border-zinc-200 dark:border-zinc-800 shadow-sm transition-all"
           onClick={toggleSidebar}
         >
           {sidebarOpen ? (
-            <PanelLeftClose className="h-5 w-5" />
+            <PanelLeftClose className="size-5" />
           ) : (
-            <PanelLeftOpen className="h-5 w-5" />
+            <PanelLeftOpen className="size-5" />
           )}
         </Button>
-        <h1 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
+        <h1 className="text-lg font-semibold text-zinc-900 dark:text-zinc-100">
           {resolvedScreen === "profile"
             ? "My Profile"
             : items.find((i) => i.key === resolvedScreen)?.label || "Dashboard"}
         </h1>
         {isSuperAdmin && (
           <Badge className="bg-rose-100 dark:bg-rose-900/30 text-rose-700 dark:text-rose-400 border-rose-200 dark:border-rose-800 text-[10px]">
-            <ShieldCheck className="h-3 w-3 mr-1" />
+            <ShieldCheck className="size-3 mr-1" />
             Platform Level
           </Badge>
         )}
@@ -65,12 +65,12 @@ export function Header({ items, resolvedScreen }: HeaderProps) {
       <div className="flex items-center gap-2">
         {!isSuperAdmin && currentTenantName && (
           <Badge variant="outline" className="hidden sm:flex gap-1 text-xs">
-            <School className="h-3 w-3" />
+            <School className="size-3" />
             {currentTenantName}
           </Badge>
         )}
-        <div className="hidden md:flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400 mr-2" suppressHydrationWarning>
-          <Calendar className="h-4 w-4" />
+        <div className="hidden md:flex items-center gap-2 text-sm text-zinc-500 dark:text-zinc-400 mr-2" suppressHydrationWarning>
+          <Calendar className="size-4" />
           {todayString}
         </div>
         <NotificationBell />

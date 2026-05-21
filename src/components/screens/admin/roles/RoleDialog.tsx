@@ -71,7 +71,7 @@ export function RoleDialog({
       <DialogContent className="sm:max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
-            <Shield className="h-5 w-5 text-emerald-600" />
+            <Shield className="size-5 text-emerald-600" />
             {editingRole ? `Edit "${editingRole.name}"` : "Create New Role"}
           </DialogTitle>
           <DialogDescription>
@@ -107,7 +107,7 @@ export function RoleDialog({
               {COLOR_PRESETS.map((c) => (
                 <button
                   key={c}
-                  className="w-8 h-8 rounded-full border-2 transition-transform hover:scale-110 flex items-center justify-center"
+                  className="size-8 rounded-full border-2 transition-transform hover:scale-110 flex items-center justify-center"
                   style={{
                     backgroundColor: c,
                     borderColor: color === c ? c : "transparent",
@@ -130,14 +130,14 @@ export function RoleDialog({
               </Badge>
             </div>
 
-            <div className="grid grid-cols-[1fr_repeat(4,_minmax(0,_1fr))] gap-px bg-gray-200 dark:bg-gray-700 rounded-lg overflow-hidden border dark:border-gray-700">
-              <div className="bg-gray-100 dark:bg-gray-800 px-3 py-2 text-xs font-semibold text-gray-600 dark:text-gray-400">
+            <div className="grid grid-cols-[1fr_repeat(4,_minmax(0,_1fr))] gap-px bg-zinc-200 dark:bg-zinc-700 rounded-lg overflow-hidden border dark:border-zinc-700">
+              <div className="bg-zinc-100 dark:bg-zinc-800 px-3 py-2 text-xs font-semibold text-zinc-600 dark:text-zinc-400">
                 Module
               </div>
               {PERMISSION_ACTIONS.map((action) => (
                 <div
                   key={action}
-                  className="bg-gray-100 dark:bg-gray-800 px-2 py-2 text-xs font-semibold text-gray-600 dark:text-gray-400 text-center"
+                  className="bg-zinc-100 dark:bg-zinc-800 px-2 py-2 text-xs font-semibold text-zinc-600 dark:text-zinc-400 text-center"
                 >
                   {ACTION_LABELS[action]}
                 </div>
@@ -146,17 +146,17 @@ export function RoleDialog({
               {PERMISSION_MODULES.map((mod, idx) => (
                 <Fragment key={mod.key}>
                   <div
-                    className={`flex items-center gap-2 px-3 py-2.5 text-sm ${idx % 2 === 0 ? "bg-white dark:bg-gray-900" : "bg-gray-50 dark:bg-gray-900/50"}`}
+                    className={`flex items-center gap-2 px-3 py-2.5 text-sm ${idx % 2 === 0 ? "bg-white dark:bg-zinc-900" : "bg-zinc-50 dark:bg-zinc-900/50"}`}
                   >
                     <span className="mr-1">{mod.icon}</span>
-                    <span className="font-medium text-gray-700 dark:text-gray-300">
+                    <span className="font-medium text-zinc-700 dark:text-zinc-300">
                       {mod.label}
                     </span>
                   </div>
                   {PERMISSION_ACTIONS.map((action) => (
                     <div
                       key={action}
-                      className={`flex items-center justify-center py-2.5 ${idx % 2 === 0 ? "bg-white dark:bg-gray-900" : "bg-gray-50 dark:bg-gray-900/50"}`}
+                      className={`flex items-center justify-center py-2.5 ${idx % 2 === 0 ? "bg-white dark:bg-zinc-900" : "bg-zinc-50 dark:bg-zinc-900/50"}`}
                     >
                       <Checkbox
                         checked={(permissions[mod.key] || []).includes(action)}
@@ -222,7 +222,7 @@ export function RoleDialog({
             disabled={saving || !name.trim()}
             className="bg-emerald-600 hover:bg-emerald-700 text-white"
           >
-            {saving && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
+            {saving && <Loader2 className="size-4 mr-2 animate-spin" />}
             {editingRole ? "Update Role" : "Create Role"}
           </Button>
         </DialogFooter>

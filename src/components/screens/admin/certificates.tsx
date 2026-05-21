@@ -158,13 +158,13 @@ export function AdminCertificates() {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 no-print">
         <div className="flex-1 min-w-0">
           <h1 className="text-xl sm:text-2xl font-semibold tracking-tight flex items-center gap-2">
-            <Award className="h-6 w-6 sm:h-7 sm:h-7 text-amber-600 shrink-0" /> 
+            <Award className="size-6 sm:h-7 sm:h-7 text-amber-600 shrink-0" /> 
             <span className="truncate">Certificates</span>
           </h1>
           <p className="text-xs sm:text-sm text-muted-foreground mt-1 line-clamp-1 sm:line-clamp-none">Official student documentation management.</p>
         </div>
         <Button className="bg-amber-600 hover:bg-amber-700 h-9 sm:h-10 px-3 sm:px-4 shrink-0 gap-2" onClick={() => setGenerateOpen(true)}>
-          <Plus className="h-4 w-4" /> 
+          <Plus className="size-4" /> 
           <span className="text-sm font-medium">Generate</span>
         </Button>
       </div>
@@ -222,12 +222,12 @@ export function AdminCertificates() {
                     <TableCell className="text-right px-2 sm:px-4">
                       <div className="flex items-center justify-end gap-1">
                         <Button variant="ghost" size="sm" className="h-8 px-2 text-xs" onClick={() => setViewCert(c)}>
-                          <Eye className="h-3.5 w-3.5 sm:mr-1.5" /> 
+                          <Eye className="size-3.5 sm:mr-1.5" /> 
                           <span className="hidden sm:inline">View</span>
                         </Button>
                         {c.status === 'active' && (
                           <Button variant="ghost" size="sm" className="h-8 px-2 text-xs text-red-600 hover:text-red-700 hover:bg-red-50" onClick={() => setRevokeCert(c)}>
-                            <ShieldBan className="h-3.5 w-3.5 sm:mr-1.5" /> 
+                            <ShieldBan className="size-3.5 sm:mr-1.5" /> 
                             <span className="hidden sm:inline">Revoke</span>
                           </Button>
                         )}
@@ -257,7 +257,7 @@ export function AdminCertificates() {
             </Select>
 
             <Select value={form.studentId} onValueChange={v => setForm({...form, studentId: v})} disabled={!selectedClassId || studentsLoading}>
-              <SelectTrigger>{studentsLoading ? <Loader2 className="h-4 w-4 animate-spin mx-auto" /> : <SelectValue placeholder="Select Student" />}</SelectTrigger>
+              <SelectTrigger>{studentsLoading ? <Loader2 className="size-4 animate-spin mx-auto" /> : <SelectValue placeholder="Select Student" />}</SelectTrigger>
               <SelectContent>{students.map((s: any) => <SelectItem key={s.id} value={s.id}>{s.name || 'Unknown'}</SelectItem>)}</SelectContent>
             </Select>
 
@@ -275,14 +275,14 @@ export function AdminCertificates() {
           </div>
           <DialogFooter>
             <Button className="bg-amber-600" onClick={() => generateMutation.mutate({ studentId: form.studentId, certificateType: form.certificateType, issueDate: form.issueDate, content: { notes: form.notes } })} disabled={generateMutation.isPending}>
-              {generateMutation.isPending && <Loader2 className="h-4 w-4 mr-2 animate-spin" />} Generate
+              {generateMutation.isPending && <Loader2 className="size-4 mr-2 animate-spin" />} Generate
             </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
 
       <Dialog open={!!viewCert} onOpenChange={v => !v && setViewCert(null)}>
-        <DialogContent className="sm:max-w-4xl p-0 overflow-hidden no-print text-slate-900">
+        <DialogContent className="sm:max-w-4xl p-0 overflow-hidden no-print text-zinc-900">
           <VisuallyHidden.Root>
             <DialogHeader>
               <DialogTitle>Certificate Preview</DialogTitle>
@@ -290,13 +290,13 @@ export function AdminCertificates() {
             </DialogHeader>
           </VisuallyHidden.Root>
           <div className="p-3 sm:p-4 border-b flex justify-between items-center bg-white sticky top-0 z-10">
-            <h3 className="font-semibold text-slate-900 truncate mr-2">Preview</h3>
+            <h3 className="font-semibold text-zinc-900 truncate mr-2">Preview</h3>
             <Button onClick={() => handlePrint()} className="bg-amber-600 hover:bg-amber-700 text-white h-9 px-3 shrink-0">
-              <Printer className="h-4 w-4 mr-2" /> 
+              <Printer className="size-4 mr-2" /> 
               <span className="text-sm">Print PDF</span>
             </Button>
           </div>
-          <div className="max-h-[75vh] overflow-y-auto p-4 sm:p-8 bg-gray-100/50 flex justify-center">
+          <div className="max-h-[75vh] overflow-y-auto p-4 sm:p-8 bg-zinc-100/50 flex justify-center">
             <div className="scale-[0.38] xs:scale-[0.45] sm:scale-[0.7] lg:scale-100 origin-top">
               <div ref={contentRef} className="w-[210mm] bg-white shadow-2xl">
                 <CertificateTemplate cert={viewCert} formatDate={formatDate} />

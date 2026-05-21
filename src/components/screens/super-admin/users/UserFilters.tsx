@@ -30,12 +30,12 @@ export function UserFilters({
   tenants,
 }: UserFiltersProps) {
   return (
-    <Card className="border-none shadow-sm bg-white dark:bg-gray-800 overflow-hidden">
+    <Card className="border-none shadow-sm bg-white dark:bg-zinc-800 overflow-hidden">
       <CardContent className="p-4">
         <div className="flex flex-col lg:flex-row gap-4 items-start lg:items-center">
           {/* Search */}
           <div className="relative flex-1 w-full lg:max-w-sm">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground opacity-50" />
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 size-4 text-muted-foreground opacity-50" />
             <Input
               placeholder="Search users by name or email..."
               className="pl-11 h-11 rounded-xl border-2 focus-visible:ring-teal-500/20 focus-visible:border-teal-500 font-medium"
@@ -47,7 +47,7 @@ export function UserFilters({
           <div className="flex flex-col sm:flex-row gap-3 w-full lg:w-auto">
             {/* Role Filter */}
             <div className="flex items-center gap-2 flex-1 sm:w-48">
-              <Filter className="h-4 w-4 text-muted-foreground shrink-0" />
+              <Filter className="size-4 text-muted-foreground shrink-0" />
               <Select value={roleFilter} onValueChange={onRoleFilterChange}>
                 <SelectTrigger className="h-11 rounded-xl border-2">
                   <SelectValue placeholder="Filter by role" />
@@ -64,7 +64,7 @@ export function UserFilters({
 
             {/* Tenant Filter */}
             <div className="flex items-center gap-2 flex-1 sm:w-60">
-              <Building2 className="h-4 w-4 text-muted-foreground shrink-0" />
+              <Building2 className="size-4 text-muted-foreground shrink-0" />
               <Select value={tenantFilter} onValueChange={onTenantFilterChange}>
                 <SelectTrigger className="h-11 rounded-xl border-2">
                   <SelectValue placeholder="Filter by school" />

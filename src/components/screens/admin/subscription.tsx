@@ -67,7 +67,7 @@ export function SchoolSubscriptionScreen() {
   }, [tenant?.endDate]);
 
   if (isLoading) {
-    return <div className="p-8 text-center font-bold text-indigo-600 animate-pulse">Loading subscription details...</div>;
+    return <div className="p-8 text-center font-bold text-violet-600 animate-pulse">Loading subscription details...</div>;
   }
 
   if (!tenant) {
@@ -82,28 +82,28 @@ export function SchoolSubscriptionScreen() {
   const usageStats = [
     { 
       label: "Students", 
-      icon: <Users className="h-4 w-4" />, 
+      icon: <Users className="size-4" />, 
       current: tenant.studentCount || 0, 
       max: tenant.maxStudents,
       color: "bg-blue-500"
     },
     { 
       label: "Teachers", 
-      icon: <UserPlus className="h-4 w-4" />, 
+      icon: <UserPlus className="size-4" />, 
       current: tenant.teacherCount || 0, 
       max: tenant.maxTeachers,
       color: "bg-emerald-500"
     },
     { 
       label: "Parents", 
-      icon: <Heart className="h-4 w-4" />, 
+      icon: <Heart className="size-4" />, 
       current: tenant.parentCount || 0, 
       max: tenant.maxParents,
       color: "bg-rose-500"
     },
     { 
       label: "Classes", 
-      icon: <School className="h-4 w-4" />, 
+      icon: <School className="size-4" />, 
       current: tenant.maxClasses > 0 ? (detailData?.classes?.length || 0) : 0, 
       max: tenant.maxClasses,
       color: "bg-amber-500"
@@ -124,8 +124,8 @@ export function SchoolSubscriptionScreen() {
     <div className="space-y-6 pb-20">
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div className="flex items-center gap-4">
-          <div className="h-14 w-14 sm:h-12 sm:w-12 rounded-2xl bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center overflow-hidden shrink-0">
-            <img src={tenant.logo || "/test.webp"} alt={tenant.name} className="h-full w-full object-cover" />
+          <div className="size-14 sm:size-12 rounded-2xl bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center overflow-hidden shrink-0">
+            <img src={tenant.logo || "/test.webp"} alt={tenant.name} className="size-full object-cover" />
           </div>
           <div>
             <h2 className="text-2xl sm:text-3xl font-semibold tracking-tight">My Subscription</h2>
@@ -135,18 +135,18 @@ export function SchoolSubscriptionScreen() {
         <div className="flex items-center gap-2 w-full sm:w-auto">
           <Button 
             size="sm"
-            className="w-full sm:w-auto gap-2 bg-indigo-600 hover:bg-indigo-700 text-white shadow-lg shadow-indigo-200 dark:shadow-none transition-all hover:scale-105 rounded-xl h-10 px-6"
+            className="w-full sm:w-auto gap-2 bg-violet-600 hover:bg-violet-700 text-white shadow-lg shadow-violet-200 dark:shadow-none transition-all hover:scale-105 rounded-xl h-10 px-6"
             onClick={() => router.push(`/${slug}/manage-plan`)}
           >
-            <ArrowUpCircle className="h-4 w-4" />
+            <ArrowUpCircle className="size-4" />
             Manage Plan
           </Button>
         </div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <Card className="md:col-span-2 border-none shadow-sm bg-gradient-to-br from-indigo-600 to-violet-700 text-white relative overflow-hidden group">
-          <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full -mr-32 -mt-32 blur-3xl group-hover:bg-white/10 transition-colors" />
+        <Card className="md:col-span-2 border-none shadow-sm bg-gradient-to-br from-violet-600 to-violet-700 text-white relative overflow-hidden group">
+          <div className="absolute top-0 right-0 size-64 bg-white/5 rounded-full -mr-32 -mt-32 blur-3xl group-hover:bg-white/10 transition-colors" />
           <CardContent className="p-8 relative z-10">
             <div className="flex justify-between items-start">
               <div className="space-y-4">
@@ -159,8 +159,8 @@ export function SchoolSubscriptionScreen() {
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-8 pt-2 sm:pt-4">
                   <div className="flex items-center gap-3">
-                    <div className="h-10 w-10 rounded-xl bg-white/10 flex items-center justify-center shrink-0">
-                      <Calendar className="h-5 w-5" />
+                    <div className="size-10 rounded-xl bg-white/10 flex items-center justify-center shrink-0">
+                      <Calendar className="size-5" />
                     </div>
                     <div>
                       <p className="text-[10px] opacity-70 uppercase tracking-widest font-black">Subscription Start</p>
@@ -168,8 +168,8 @@ export function SchoolSubscriptionScreen() {
                     </div>
                   </div>
                   <div className="flex items-center gap-3">
-                    <div className="h-10 w-10 rounded-xl bg-white/10 flex items-center justify-center shrink-0">
-                      <Clock className="h-5 w-5" />
+                    <div className="size-10 rounded-xl bg-white/10 flex items-center justify-center shrink-0">
+                      <Clock className="size-5" />
                     </div>
                     <div>
                       <p className="text-[10px] opacity-70 uppercase tracking-widest font-black">Next Renewal</p>
@@ -179,11 +179,11 @@ export function SchoolSubscriptionScreen() {
                 </div>
               </div>
               <div className="flex-shrink-0">
-                <div className="h-16 w-16 sm:h-28 sm:w-28 rounded-2xl sm:rounded-3xl bg-white/10 flex items-center justify-center border border-white/20 shadow-2xl backdrop-blur-sm overflow-hidden">
+                <div className="size-16 sm:size-28 rounded-2xl sm:rounded-3xl bg-white/10 flex items-center justify-center border border-white/20 shadow-2xl backdrop-blur-sm overflow-hidden">
                   <img 
                     src={tenant.logo || "/test.webp"} 
                     alt={tenant.name} 
-                    className="w-full h-full object-cover" 
+                    className="size-full object-cover" 
                   />
                 </div>
               </div>
@@ -194,12 +194,12 @@ export function SchoolSubscriptionScreen() {
         <Card className="border-none shadow-sm">
           <CardHeader>
             <CardTitle className="text-lg flex items-center gap-2">
-              <ShieldCheck className="h-5 w-5 text-indigo-600" />
+              <ShieldCheck className="size-5 text-violet-600" />
               Quick Health
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-6">
-            <div className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-900 rounded-xl">
+            <div className="flex items-center justify-between p-3 bg-zinc-50 dark:bg-zinc-900 rounded-xl">
               <span className="text-sm font-medium text-muted-foreground">Status</span>
               <Badge className={cn(
                 "px-3 py-1 rounded-full",
@@ -209,9 +209,9 @@ export function SchoolSubscriptionScreen() {
               </Badge>
             </div>
             <div className="pt-2 space-y-4">
-              <div className="text-center p-4 rounded-2xl border-2 border-indigo-50 dark:border-indigo-900/30">
+              <div className="text-center p-4 rounded-2xl border-2 border-violet-50 dark:border-violet-900/30">
                 <p className="text-xs text-muted-foreground uppercase tracking-widest font-black">Time Remaining</p>
-                <p className={`text-4xl font-black mt-2 ${isExpired ? 'text-rose-500' : 'text-indigo-600 dark:text-indigo-400'}`} suppressHydrationWarning>
+                <p className={`text-4xl font-black mt-2 ${isExpired ? 'text-rose-500' : 'text-violet-600 dark:text-violet-400'}`} suppressHydrationWarning>
                   {daysRemaining !== null ? (isExpired ? "Expired" : `${daysRemaining}d`) : "∞"}
                 </p>
               </div>
@@ -220,7 +220,7 @@ export function SchoolSubscriptionScreen() {
                 <div className="flex items-center justify-between">
                   <div className="space-y-0.5">
                     <p className="text-sm font-bold flex items-center gap-2">
-                      <CreditCard className="h-4 w-4 text-indigo-600" />
+                      <CreditCard className="size-4 text-violet-600" />
                       Auto-Renewal
                     </p>
                     <p className="text-[10px] text-muted-foreground uppercase tracking-widest font-black">
@@ -236,10 +236,10 @@ export function SchoolSubscriptionScreen() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <Card className="border-none shadow-sm overflow-hidden border-t-4 border-t-indigo-600">
-          <CardHeader className="bg-gray-50/50 dark:bg-gray-900/50 border-b pb-4">
+        <Card className="border-none shadow-sm overflow-hidden border-t-4 border-t-violet-600">
+          <CardHeader className="bg-zinc-50/50 dark:bg-zinc-900/50 border-b pb-4">
             <CardTitle className="flex items-center gap-2 text-base font-bold">
-              <Building2 className="h-5 w-5 text-indigo-600" />
+              <Building2 className="size-5 text-violet-600" />
               Resource Utilization
             </CardTitle>
           </CardHeader>
@@ -252,7 +252,7 @@ export function SchoolSubscriptionScreen() {
                     <div className="flex items-center gap-2">
                       <div className={cn("p-1.5 rounded-lg", stat.color.replace('bg-', 'bg-') + '/10')}>
                         {React.cloneElement(stat.icon as React.ReactElement<any>, { 
-                          className: cn("h-4 w-4", stat.color.replace('bg-', 'text-')) 
+                          className: cn("size-4", stat.color.replace('bg-', 'text-')) 
                         })}
                       </div>
                       <span className="font-bold">{stat.label}</span>
@@ -269,9 +269,9 @@ export function SchoolSubscriptionScreen() {
         </Card>
 
         <Card className="border-none shadow-sm overflow-hidden border-t-4 border-t-emerald-500">
-          <CardHeader className="bg-gray-50/50 dark:bg-gray-900/50 border-b pb-4">
+          <CardHeader className="bg-zinc-50/50 dark:bg-zinc-900/50 border-b pb-4">
             <CardTitle className="text-base font-bold flex items-center gap-2">
-              <ShieldCheck className="h-5 w-5 text-emerald-500" />
+              <ShieldCheck className="size-5 text-emerald-500" />
               Active Privileges
             </CardTitle>
           </CardHeader>
@@ -287,11 +287,11 @@ export function SchoolSubscriptionScreen() {
                 "Mobile App Sync",
                 "Cloud Storage"
               ].map((feature, i) => (
-                <div key={i} className="flex items-center gap-3 p-2 rounded-lg bg-gray-50 dark:bg-gray-900/50 border border-transparent hover:border-emerald-100 dark:hover:border-emerald-900/30 transition-all">
-                  <div className="h-5 w-5 rounded-full bg-emerald-500 flex items-center justify-center flex-shrink-0">
-                    <CheckCircle2 className="h-3 w-3 text-white" />
+                <div key={i} className="flex items-center gap-3 p-2 rounded-lg bg-zinc-50 dark:bg-zinc-900/50 border border-transparent hover:border-emerald-100 dark:hover:border-emerald-900/30 transition-all">
+                  <div className="size-5 rounded-full bg-emerald-500 flex items-center justify-center flex-shrink-0">
+                    <CheckCircle2 className="size-3 text-white" />
                   </div>
-                  <span className="text-xs font-medium text-gray-700 dark:text-gray-300">{feature}</span>
+                  <span className="text-xs font-medium text-zinc-700 dark:text-zinc-300">{feature}</span>
                 </div>
               ))}
             </div>

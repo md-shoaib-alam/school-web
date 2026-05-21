@@ -63,7 +63,7 @@ export function GraduatedTab({
       <Card className="border-violet-200 dark:border-violet-800">
         <CardHeader>
           <CardTitle className="text-base flex items-center gap-2">
-            <GraduationCap className="h-4 w-4 text-violet-500" />
+            <GraduationCap className="size-4 text-violet-500" />
             Quick Graduate / Pass-Out
           </CardTitle>
           <CardDescription>
@@ -115,7 +115,7 @@ export function GraduatedTab({
             <div className="space-y-3">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2 text-sm font-medium">
-                  <Users className="h-4 w-4" />
+                  <Users className="size-4" />
                   <span>Select students to graduate</span>
                 </div>
                 <div className="flex gap-2">
@@ -171,7 +171,7 @@ export function GraduatedTab({
             onClick={handleGraduate}
             disabled={gradSubmitting || !gradClassId || !gradAcademicYear || gradSelectedIds.size === 0}
           >
-            {gradSubmitting ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <GraduationCap className="h-4 w-4 mr-2" />}
+            {gradSubmitting ? <Loader2 className="size-4 mr-2 animate-spin" /> : <GraduationCap className="size-4 mr-2" />}
             {gradSubmitting ? 'Graduating...' : `Graduate ${gradSelectedIds.size} Student(s)`}
           </Button>
         </CardContent>

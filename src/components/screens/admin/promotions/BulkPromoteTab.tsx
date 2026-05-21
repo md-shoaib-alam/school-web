@@ -57,7 +57,7 @@ export function BulkPromoteTab({
       <Card>
         <CardHeader>
           <CardTitle className="text-base flex items-center gap-2">
-            <Zap className="h-4 w-4 text-amber-500" />
+            <Zap className="size-4 text-amber-500" />
             Bulk Class Promotion
           </CardTitle>
           <CardDescription>
@@ -85,7 +85,7 @@ export function BulkPromoteTab({
               </Select>
               {bulkFromClass && isLastClass(bulkFromClass, classes) && (
                 <div className="flex items-center gap-2 text-sm text-violet-600 dark:text-violet-400 bg-violet-50 dark:bg-violet-900/20 rounded-lg px-3 py-2 border border-violet-200 dark:border-violet-800">
-                  <GraduationCap className="h-4 w-4 shrink-0" />
+                  <GraduationCap className="size-4 shrink-0" />
                   <span>This is the highest class — students should be <strong>graduated</strong> instead.</span>
                 </div>
               )}
@@ -136,7 +136,7 @@ export function BulkPromoteTab({
           {bulkPreview.length > 0 && (
             <div className="space-y-3">
               <div className="flex items-center gap-2 text-sm font-medium">
-                <Users className="h-4 w-4" />
+                <Users className="size-4" />
                 <span>{bulkPreview.length} student(s) will be promoted</span>
               </div>
               <div className="max-h-52 overflow-y-auto rounded-lg border">
@@ -171,7 +171,7 @@ export function BulkPromoteTab({
             onClick={handleBulkPromote}
             disabled={bulkSubmitting || !bulkFromClass || !bulkToClass || !bulkAcademicYear || bulkPreview.length === 0}
           >
-            {bulkSubmitting ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Zap className="h-4 w-4 mr-2" />}
+            {bulkSubmitting ? <Loader2 className="size-4 mr-2 animate-spin" /> : <Zap className="size-4 mr-2" />}
             {bulkSubmitting ? 'Creating Promotions...' : `Promote ${bulkPreview.length} Student(s)`}
           </Button>
         </CardContent>

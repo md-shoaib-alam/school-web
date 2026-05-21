@@ -59,7 +59,7 @@ export function EditSlotDialog({
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
-            <Pencil className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
+            <Pencil className="size-5 text-emerald-600 dark:text-emerald-400" />
             Edit Timetable Slot
           </DialogTitle>
           <DialogDescription>
@@ -212,7 +212,7 @@ export function EditSlotDialog({
             className="bg-emerald-600 hover:bg-emerald-700 text-white"
           >
             {saving && (
-              <Loader2 className="h-4 w-4 mr-1.5 animate-spin" />
+              <Loader2 className="size-4 mr-1.5 animate-spin" />
             )}
             {saving ? "Saving..." : "Save Changes"}
           </Button>

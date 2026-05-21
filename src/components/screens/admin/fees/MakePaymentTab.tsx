@@ -147,7 +147,7 @@ export function MakePaymentTab({ canCreate }: MakePaymentTabProps) {
     return (
       <Card>
         <CardContent className="p-12 text-center text-muted-foreground">
-          <CreditCard className="h-10 w-10 mx-auto mb-2 opacity-30" /><p>You do not have permission to make payments.</p>
+          <CreditCard className="size-10 mx-auto mb-2 opacity-30" /><p>You do not have permission to make payments.</p>
         </CardContent>
       </Card>
     );
@@ -159,7 +159,7 @@ export function MakePaymentTab({ canCreate }: MakePaymentTabProps) {
       <Dialog open={showSuccess} onOpenChange={setShowSuccess}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
-            <DialogTitle className="flex items-center gap-2 text-emerald-600"><CheckCircle2 className="h-6 w-6" />Payment Successful!</DialogTitle>
+            <DialogTitle className="flex items-center gap-2 text-emerald-600"><CheckCircle2 className="size-6" />Payment Successful!</DialogTitle>
             <DialogDescription>Payment has been recorded successfully.</DialogDescription>
           </DialogHeader>
           <div className="bg-emerald-50 dark:bg-emerald-900/20 rounded-lg p-4 text-center space-y-2">
@@ -177,7 +177,7 @@ export function MakePaymentTab({ canCreate }: MakePaymentTabProps) {
         /* Step 1: Select Student */
         <Card className="hover:shadow-md transition-shadow">
           <CardHeader>
-            <CardTitle className="text-base flex items-center gap-2"><UserCheck className="h-5 w-5 text-emerald-600" />Select Student</CardTitle>
+            <CardTitle className="text-base flex items-center gap-2"><UserCheck className="size-5 text-emerald-600" />Select Student</CardTitle>
             <CardDescription>Search and select a student to make a payment</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -190,23 +190,23 @@ export function MakePaymentTab({ canCreate }: MakePaymentTabProps) {
                 </SelectContent>
               </Select>
               <div className="relative flex-1">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
                 <Input placeholder="Search by name or phone number..." className="pl-9" value={studentSearch} onChange={e => setStudentSearch(e.target.value)} />
               </div>
             </div>
             <div className="max-h-96 overflow-y-auto rounded-lg border divide-y">
               {filteredStudents.length === 0 ? (
-                <div className="p-8 text-center text-muted-foreground"><Search className="h-8 w-8 mx-auto mb-2 opacity-30" /><p>No students found</p></div>
+                <div className="p-8 text-center text-muted-foreground"><Search className="size-8 mx-auto mb-2 opacity-30" /><p>No students found</p></div>
               ) : filteredStudents.map(s => (
                 <button key={s.id} className="w-full flex items-center gap-3 p-3 hover:bg-emerald-50/50 dark:hover:bg-emerald-900/20 transition-colors text-left" onClick={() => handleSelectStudent(s)}>
-                  <div className="h-10 w-10 rounded-full bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 flex items-center justify-center text-sm font-semibold shrink-0">
+                  <div className="size-10 rounded-full bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 flex items-center justify-center text-sm font-semibold shrink-0">
                     {s.name.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase()}
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="font-medium text-sm">{s.name}</p>
                     <p className="text-xs text-muted-foreground">{s.className} • {s.phone || 'No phone'}</p>
                   </div>
-                  <ChevronRight className="h-4 w-4 text-muted-foreground shrink-0" />
+                  <ChevronRight className="size-4 text-muted-foreground shrink-0" />
                 </button>
               ))}
             </div>
@@ -218,7 +218,7 @@ export function MakePaymentTab({ canCreate }: MakePaymentTabProps) {
           {/* Student Header */}
           <Card className="hover:shadow-md transition-shadow">
             <CardContent className="p-4 flex items-center gap-4">
-              <div className="h-12 w-12 rounded-full bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 flex items-center justify-center text-lg font-bold shrink-0">
+              <div className="size-12 rounded-full bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 flex items-center justify-center text-lg font-bold shrink-0">
                 {selectedStudent.name.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase()}
               </div>
               <div className="flex-1 min-w-0">
@@ -235,7 +235,7 @@ export function MakePaymentTab({ canCreate }: MakePaymentTabProps) {
           {concessions.length > 0 && (
             <Card className="border-amber-200 dark:border-amber-800 bg-amber-50/50 dark:bg-amber-900/10">
               <CardHeader className="pb-2">
-                <CardTitle className="text-sm flex items-center gap-2 text-amber-700 dark:text-amber-400"><Percent className="h-4 w-4" />Active Concessions</CardTitle>
+                <CardTitle className="text-sm flex items-center gap-2 text-amber-700 dark:text-amber-400"><Percent className="size-4" />Active Concessions</CardTitle>
               </CardHeader>
               <CardContent className="pb-4">
                 <div className="space-y-1">
@@ -271,7 +271,7 @@ export function MakePaymentTab({ canCreate }: MakePaymentTabProps) {
                 <div className="p-6 space-y-3">{[...Array(3)].map((_, i) => <Skeleton key={i} className="h-14 w-full" />)}</div>
               ) : pendingFees.length === 0 ? (
                 <div className="p-12 text-center text-muted-foreground">
-                  <CheckCircle2 className="h-10 w-10 mx-auto mb-2 text-emerald-500 opacity-50" /><p>All fees paid! No pending fees.</p>
+                  <CheckCircle2 className="size-10 mx-auto mb-2 text-emerald-500 opacity-50" /><p>All fees paid! No pending fees.</p>
                 </div>
               ) : (
                 <div className="divide-y">
@@ -297,7 +297,7 @@ export function MakePaymentTab({ canCreate }: MakePaymentTabProps) {
           {selectedFeeIds.size > 0 && (
             <Card className="border-emerald-200 dark:border-emerald-800 bg-emerald-50/50 dark:bg-emerald-900/10">
               <CardHeader>
-                <CardTitle className="text-base flex items-center gap-2"><CreditCard className="h-5 w-5 text-emerald-600" />Payment Summary</CardTitle>
+                <CardTitle className="text-base flex items-center gap-2"><CreditCard className="size-5 text-emerald-600" />Payment Summary</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="space-y-2 text-sm">
@@ -310,11 +310,11 @@ export function MakePaymentTab({ canCreate }: MakePaymentTabProps) {
                   <Label>Payment Method</Label>
                   <div className="grid grid-cols-5 gap-2">
                     {[
-                      { id: 'cash', icon: <Banknote className="h-5 w-5" />, label: 'Cash' },
-                      { id: 'cheque', icon: <FileText className="h-5 w-5" />, label: 'Cheque' },
-                      { id: 'online', icon: <Building2 className="h-5 w-5" />, label: 'Online' },
-                      { id: 'upi', icon: <Smartphone className="h-5 w-5" />, label: 'UPI' },
-                      { id: 'card', icon: <CreditCard className="h-5 w-5" />, label: 'Card' },
+                      { id: 'cash', icon: <Banknote className="size-5" />, label: 'Cash' },
+                      { id: 'cheque', icon: <FileText className="size-5" />, label: 'Cheque' },
+                      { id: 'online', icon: <Building2 className="size-5" />, label: 'Online' },
+                      { id: 'upi', icon: <Smartphone className="size-5" />, label: 'UPI' },
+                      { id: 'card', icon: <CreditCard className="size-5" />, label: 'Card' },
                     ].map(m => (
                       <button
                         key={m.id}
@@ -333,7 +333,7 @@ export function MakePaymentTab({ canCreate }: MakePaymentTabProps) {
                     <><span className="animate-spin mr-2">⏳</span>Processing...</>
                   ) : (
                     <>
-                      <Sparkles className="h-5 w-5 mr-2" />
+                      <Sparkles className="size-5 mr-2" />
                       Pay ₹{calculation.payable.toLocaleString()} via {paymentMethod.charAt(0).toUpperCase() + paymentMethod.slice(1)}
                     </>
                   )}

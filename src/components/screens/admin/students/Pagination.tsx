@@ -73,7 +73,7 @@ function PaginationPages({
             key={page}
             variant={currentPage === page ? "default" : "outline"}
             size="icon"
-            className={`h-8 w-8 text-sm ${currentPage === page ? "bg-emerald-600 hover:bg-emerald-700 text-white" : ""}`}
+            className={`size-8 text-sm ${currentPage === page ? "bg-emerald-600 hover:bg-emerald-700 text-white" : ""}`}
             onClick={() => onPageChange(page)}
           >
             {page}
@@ -127,7 +127,7 @@ export function Pagination({
               value={itemsPerPage.toString()}
               onValueChange={(v) => handleLimitChange(parseInt(v))}
             >
-              <SelectTrigger className="h-8 w-[70px] bg-transparent border-gray-200 dark:border-gray-800 text-xs">
+              <SelectTrigger className="h-8 w-[70px] bg-transparent border-zinc-200 dark:border-zinc-800 text-xs">
                 <SelectValue placeholder={itemsPerPage.toString()} />
               </SelectTrigger>
               <SelectContent>
@@ -144,11 +144,11 @@ export function Pagination({
         <Button
           variant="outline"
           size="icon"
-          className="h-8 w-8"
+          className="size-8"
           disabled={currentPage <= 1}
           onClick={() => handlePageChange(currentPage - 1)}
         >
-          <ChevronLeft className="h-4 w-4" />
+          <ChevronLeft className="size-4" />
         </Button>
         <PaginationPages
           currentPage={currentPage}
@@ -158,11 +158,11 @@ export function Pagination({
         <Button
           variant="outline"
           size="icon"
-          className="h-8 w-8"
+          className="size-8"
           disabled={currentPage >= totalPages}
           onClick={() => handlePageChange(currentPage + 1)}
         >
-          <ChevronRight className="h-4 w-4" />
+          <ChevronRight className="size-4" />
         </Button>
       </div>
     </div>

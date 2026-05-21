@@ -20,15 +20,15 @@ export const ICSESemester: React.FC<MarksheetTemplateProps> = ({
 
   return (
     <div 
-      className="relative bg-white text-[#1e293b] px-10 py-10 border-[6px] border-double border-indigo-900 rounded overflow-hidden select-none flex flex-col justify-between shrink-0 text-left h-[1123px] w-[794px] box-border font-serif"
+      className="relative bg-white text-[#1e293b] px-10 py-10 border-[6px] border-double border-violet-900 rounded overflow-hidden select-none flex flex-col justify-between shrink-0 text-left h-[1123px] w-[794px] box-border font-serif"
       style={{ WebkitPrintColorAdjust: 'exact', printColorAdjust: 'exact' }}
     >
       {/* ICSE Elegant Layout */}
       <div className="space-y-5">
         
         {/* Crest & Header */}
-        <div className="text-center pb-2 border-b-2 border-indigo-900">
-          <h2 className="font-semibold text-2xl text-indigo-950 tracking-wider uppercase font-serif">
+        <div className="text-center pb-2 border-b-2 border-violet-900">
+          <h2 className="font-semibold text-2xl text-violet-950 tracking-wider uppercase font-serif">
             {sheet.schoolName.toUpperCase()}
           </h2>
           <p className="text-[8px] text-zinc-500 font-bold uppercase tracking-[2px] mt-1.5 font-sans">
@@ -36,7 +36,7 @@ export const ICSESemester: React.FC<MarksheetTemplateProps> = ({
             <br />
             School Code: IN-{getDeterministicId(sheet.schoolName + 'code', 100, 999)}
           </p>
-          <p className="text-[11px] text-indigo-900 font-extrabold tracking-widest mt-2 uppercase font-serif">
+          <p className="text-[11px] text-violet-900 font-extrabold tracking-widest mt-2 uppercase font-serif">
             PROGRESS STATEMENT: SEMESTER TERM {marksheetType === 'midterm' ? 'I' : marksheetType === 'final' ? 'II' : 'CUMULATIVE'} ({academicYear})
           </p>
         </div>
@@ -45,39 +45,39 @@ export const ICSESemester: React.FC<MarksheetTemplateProps> = ({
         <div className="grid grid-cols-3 gap-4 text-xs font-sans bg-zinc-55/40 p-3 rounded border border-zinc-200">
           <div>
             <span className="text-zinc-400 font-bold uppercase text-[7.5px] tracking-wider block mb-0.5">Scholastic Candidate</span>
-            <span className="font-bold text-slate-800 truncate block">{sheet.studentName}</span>
+            <span className="font-bold text-zinc-800 truncate block">{sheet.studentName}</span>
           </div>
           <div>
             <span className="text-zinc-400 font-bold uppercase text-[7.5px] tracking-wider block mb-0.5">Unique ID / SRN</span>
-            <span className="font-bold text-slate-800 font-mono block">UID-{getDeterministicId(sheet.studentName + 'uid', 5000000, 9999999)}</span>
+            <span className="font-bold text-zinc-800 font-mono block">UID-{getDeterministicId(sheet.studentName + 'uid', 5000000, 9999999)}</span>
           </div>
           <div>
             <span className="text-zinc-400 font-bold uppercase text-[7.5px] tracking-wider block mb-0.5">Class & Section</span>
-            <span className="font-bold text-slate-800 block">{classNameStr} - {classSection}</span>
+            <span className="font-bold text-zinc-800 block">{classNameStr} - {classSection}</span>
           </div>
           <div>
             <span className="text-zinc-400 font-bold uppercase text-[7.5px] tracking-wider block mb-0.5">Attendance Tracker</span>
-            <span className="font-bold text-slate-800 block">93.5% / 210 Days</span>
+            <span className="font-bold text-zinc-800 block">93.5% / 210 Days</span>
           </div>
           <div>
             <span className="text-zinc-400 font-bold uppercase text-[7.5px] tracking-wider block mb-0.5">National Rank Index</span>
-            <span className="font-bold text-indigo-900 block font-mono">IND-{sheet.rollNumber}</span>
+            <span className="font-bold text-violet-900 block font-mono">IND-{sheet.rollNumber}</span>
           </div>
           <div>
             <span className="text-zinc-400 font-bold uppercase text-[7.5px] tracking-wider block mb-0.5">Registrar Ledger No</span>
-            <span className="font-bold text-slate-800 block font-mono">REG-2026/A</span>
+            <span className="font-bold text-zinc-800 block font-mono">REG-2026/A</span>
           </div>
         </div>
 
         {/* Academic Marks Scoreboard */}
         <div className="space-y-1">
-          <h4 className="text-[10px] font-semibold uppercase text-indigo-950 tracking-wider">
+          <h4 className="text-[10px] font-semibold uppercase text-violet-950 tracking-wider">
             SCHOLASTIC OUTCOMES & SEMESTER STANDINGS
           </h4>
-          <div className="rounded border border-indigo-900 overflow-hidden bg-white">
+          <div className="rounded border border-violet-900 overflow-hidden bg-white">
             <table className="w-full text-xs border-collapse table-fixed">
               <thead>
-                <tr className="bg-indigo-950 text-white text-[9.5px]">
+                <tr className="bg-violet-950 text-white text-[9.5px]">
                   <th className="font-bold px-3 py-2 text-left w-[42%]">PRESCRIBED SUBJECTS</th>
                   {marksheetType === 'combined' && <th className="font-bold px-3 py-2 text-center w-[13%]">HALF YEARLY</th>}
                   {marksheetType === 'combined' && <th className="font-bold px-3 py-2 text-center w-[13%]">YEAR END</th>}
@@ -88,12 +88,12 @@ export const ICSESemester: React.FC<MarksheetTemplateProps> = ({
               <tbody>
                 {sheet.subjects.map((sub, sIdx) => (
                   <tr key={sIdx} className="border-b border-zinc-200 hover:bg-zinc-50/50">
-                    <td className="px-3 py-2.5 text-left font-bold text-slate-800 truncate font-serif">{sub.subjectName}</td>
+                    <td className="px-3 py-2.5 text-left font-bold text-zinc-800 truncate font-serif">{sub.subjectName}</td>
                     {marksheetType === 'combined' && <td className="px-3 py-2.5 text-center font-mono text-zinc-500">{sub.midtermMarks}</td>}
                     {marksheetType === 'combined' && <td className="px-3 py-2.5 text-center font-mono text-zinc-500">{sub.finalMarks}</td>}
-                    <td className="px-3 py-2.5 text-center font-black font-mono text-indigo-950">{sub.obtained}</td>
+                    <td className="px-3 py-2.5 text-center font-black font-mono text-violet-950">{sub.obtained}</td>
                     <td className="px-3 py-2.5 text-center">
-                      <span className="font-black text-indigo-950 font-sans text-[10px]">
+                      <span className="font-black text-violet-950 font-sans text-[10px]">
                         {getICSEGrade(sub.percentage)}
                       </span>
                     </td>
@@ -108,7 +108,7 @@ export const ICSESemester: React.FC<MarksheetTemplateProps> = ({
         <div className="grid grid-cols-12 gap-5 text-xs font-sans">
           
           <div className="col-span-7 border border-zinc-200 rounded p-4 bg-zinc-50/20">
-            <h5 className="font-semibold text-[9px] uppercase tracking-wider text-indigo-950 mb-1.5">REGISTRAR CONVOCATION VERDICT</h5>
+            <h5 className="font-semibold text-[9px] uppercase tracking-wider text-violet-950 mb-1.5">REGISTRAR CONVOCATION VERDICT</h5>
             <p className="italic text-zinc-600 font-medium leading-relaxed">
               "{sheet.remarks}" The student is certified to have acquired standard scholastic outcomes prescribed under the Council rules.
             </p>
@@ -121,15 +121,15 @@ export const ICSESemester: React.FC<MarksheetTemplateProps> = ({
             </div>
             <div className="flex justify-between border-b border-dashed border-zinc-200 pb-1 text-zinc-500 font-semibold">
               <span className="text-[8px] uppercase tracking-wider">HONOR PERCENTAGE</span>
-              <span className="text-indigo-900 font-black font-mono">{sheet.overallPercentage}%</span>
+              <span className="text-violet-900 font-black font-mono">{sheet.overallPercentage}%</span>
             </div>
             <div className="flex justify-between border-b border-dashed border-zinc-200 pb-1 text-zinc-500 font-semibold">
               <span className="text-[8px] uppercase tracking-wider">OUTCOME GRADE</span>
-              <span className="text-indigo-950 font-black">{sheet.grade}</span>
+              <span className="text-violet-950 font-black">{sheet.grade}</span>
             </div>
             <div className="flex justify-between items-center text-zinc-500 font-semibold">
               <span className="text-[8px] uppercase tracking-wider">SCHOLASTIC VERDICT</span>
-              <span className="text-indigo-900 font-black text-[9px]">{sheet.status === 'pass' ? 'HONORABLY PASSED' : 'RETAINED'}</span>
+              <span className="text-violet-900 font-black text-[9px]">{sheet.status === 'pass' ? 'HONORABLY PASSED' : 'RETAINED'}</span>
             </div>
           </div>
 
@@ -138,7 +138,7 @@ export const ICSESemester: React.FC<MarksheetTemplateProps> = ({
       </div>
 
       {/* ICSE Formal Sign-off segment */}
-      <div className="flex justify-between items-end text-[9.5px] font-bold text-zinc-400 border-t-2 border-indigo-900 pt-4 mt-2 font-sans z-10">
+      <div className="flex justify-between items-end text-[9.5px] font-bold text-zinc-400 border-t-2 border-violet-900 pt-4 mt-2 font-sans z-10">
         <div>COUNCIL REGISTRY STATEMENT — CISCE SYSTEM</div>
         <div className="flex gap-10">
           <div className="flex flex-col items-center">

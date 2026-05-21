@@ -30,8 +30,8 @@ export function PlanCard({ plan, isActive, cycle, onPurchase }: PlanCardProps) {
     <Card
       className={`relative rounded-2xl transition-all duration-500 ${
         isPopular
-          ? "border-amber-500 shadow-xl bg-white dark:bg-gray-900"
-          : "bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-800 shadow-lg"
+          ? "border-amber-500 shadow-xl bg-white dark:bg-zinc-900"
+          : "bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800 shadow-lg"
       } ${
         isActive
           ? "ring-2 ring-emerald-500/50"
@@ -51,19 +51,19 @@ export function PlanCard({ plan, isActive, cycle, onPurchase }: PlanCardProps) {
       <CardHeader className={`pt-6 sm:pt-8 ${isPopular ? "pb-2" : ""}`}>
         <div className="flex items-center justify-between">
           <div
-            className={`h-10 w-10 sm:h-12 sm:w-12 rounded-xl flex items-center justify-center ${
+            className={`size-10 sm:size-12 rounded-xl flex items-center justify-center ${
               isPopular
                 ? "bg-amber-100 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400"
                 : isActive
                   ? "bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400"
-                  : "bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400"
+                  : "bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400"
             }`}
           >
             {plan.icon}
           </div>
           {isActive && (
             <Badge className="bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 text-[10px] sm:text-xs border-emerald-200 dark:border-emerald-800 shadow-none">
-              <CheckCircle2 className="h-3 w-3 mr-1" /> Active
+              <CheckCircle2 className="size-3 mr-1" /> Active
             </Badge>
           )}
         </div>
@@ -75,23 +75,23 @@ export function PlanCard({ plan, isActive, cycle, onPurchase }: PlanCardProps) {
         </div>
         <div className="mt-3 sm:mt-4 flex items-baseline gap-1">
           {price === 0 ? (
-            <span className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-gray-100">
+            <span className="text-2xl sm:text-3xl font-bold text-zinc-900 dark:text-zinc-100">
               Free
             </span>
           ) : (
             <>
-              <span className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-gray-100">
+              <span className="text-2xl sm:text-3xl font-bold text-zinc-900 dark:text-zinc-100">
                 ₹{price}
               </span>
               {originalPrice && (
-                <span className="text-xs sm:text-sm text-gray-400 dark:text-gray-500 line-through ml-1 sm:ml-2">
+                <span className="text-xs sm:text-sm text-zinc-400 dark:text-zinc-500 line-through ml-1 sm:ml-2">
                   ₹{originalPrice}
                 </span>
               )}
             </>
           )}
           {price !== 0 && (
-            <span className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 ml-1">
+            <span className="text-xs sm:text-sm text-zinc-500 dark:text-zinc-400 ml-1">
               / {cycleLabels[cycle]}
             </span>
           )}
@@ -117,20 +117,20 @@ export function PlanCard({ plan, isActive, cycle, onPurchase }: PlanCardProps) {
                 ? "bg-gradient-to-r from-amber-500 to-orange-500 text-white shadow-md"
                 : plan.id === "premium"
                   ? "bg-gradient-to-r from-emerald-500 to-teal-600 text-white shadow-md"
-                  : "bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900"
+                  : "bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900"
           }`}
           onClick={() => (isActive ? null : onPurchase({ ...plan, price } as any))}
           disabled={isActive}
         >
           {isActive ? (
             <>
-              <CheckCircle2 className="h-3 w-3 sm:h-4 sm:w-4 mr-2" /> Current Plan
+              <CheckCircle2 className="size-3 sm:size-4 mr-2" /> Current Plan
             </>
           ) : price === 0 ? (
             "Switch to Free"
           ) : (
             <>
-              Get {plan.name} <ArrowRight className="h-3 w-3 sm:h-4 sm:w-4 ml-2" />
+              Get {plan.name} <ArrowRight className="size-3 sm:size-4 ml-2" />
             </>
           )}
         </Button>
@@ -138,7 +138,7 @@ export function PlanCard({ plan, isActive, cycle, onPurchase }: PlanCardProps) {
         <Separator className="my-4 sm:my-5" />
 
         <div className="space-y-2 sm:space-y-3">
-          <p className="text-[10px] sm:text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+          <p className="text-[10px] sm:text-xs font-semibold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">
             What&apos;s included
           </p>
           {plan.features.map((feature, idx) => {
@@ -149,16 +149,16 @@ export function PlanCard({ plan, isActive, cycle, onPurchase }: PlanCardProps) {
             return (
               <div key={idx} className="flex items-start gap-2 sm:gap-2.5">
                 {included ? (
-                  <div className="h-4 w-4 sm:h-5 sm:w-5 rounded-full bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0 mt-0.5">
-                    <Check className="h-2.5 w-2.5 sm:h-3 sm:w-3" />
+                  <div className="size-4 sm:size-5 rounded-full bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0 mt-0.5">
+                    <Check className="size-2.5 sm:size-3" />
                   </div>
                 ) : (
-                  <div className="h-4 w-4 sm:h-5 sm:w-5 rounded-full bg-gray-100 dark:bg-gray-800 text-gray-400 dark:text-gray-500 flex items-center justify-center shrink-0 mt-0.5">
+                  <div className="size-4 sm:size-5 rounded-full bg-zinc-100 dark:bg-zinc-800 text-zinc-400 dark:text-zinc-500 flex items-center justify-center shrink-0 mt-0.5">
                     <span className="text-[10px]">✕</span>
                   </div>
                 )}
                 <span
-                  className={`text-[11px] sm:text-sm ${included ? "text-gray-700 dark:text-gray-300" : "text-gray-400 dark:text-gray-500"}`}
+                  className={`text-[11px] sm:text-sm ${included ? "text-zinc-700 dark:text-zinc-300" : "text-zinc-400 dark:text-zinc-500"}`}
                 >
                   {text}
                 </span>

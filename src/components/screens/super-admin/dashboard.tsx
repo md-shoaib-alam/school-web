@@ -35,8 +35,8 @@ export function SuperAdminDashboard() {
       <div className="flex items-center justify-center min-h-[400px]">
         <Card className="border-red-200 dark:border-red-700 bg-red-50 dark:bg-red-900/30 max-w-md w-full rounded-3xl overflow-hidden shadow-2xl">
           <CardContent className="p-8 text-center text-red-600">
-            <div className="h-16 w-16 bg-red-100 dark:bg-red-900/30 rounded-2xl flex items-center justify-center mx-auto mb-6">
-              <AlertTriangle className="h-8 w-8" />
+            <div className="size-16 bg-red-100 dark:bg-red-900/30 rounded-2xl flex items-center justify-center mx-auto mb-6">
+              <AlertTriangle className="size-8" />
             </div>
             <p className="text-xl font-black mb-2">System Sync Failed</p>
             <p className="text-sm font-medium opacity-80 mb-6">

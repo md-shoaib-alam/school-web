@@ -11,17 +11,17 @@ export const ClassicAcademy: React.FC<MarksheetTemplateProps> = ({
 }) => {
   return (
     <div 
-      className="relative bg-white text-slate-900 px-9 py-10 border-[6px] border-[#1e3a8a] rounded overflow-hidden select-none flex flex-col justify-between shrink-0 text-left h-[1123px] w-[794px] box-border"
+      className="relative bg-white text-zinc-900 px-9 py-10 border-[6px] border-[#1e3a8a] rounded overflow-hidden select-none flex flex-col justify-between shrink-0 text-left h-[1123px] w-[794px] box-border"
       style={{ WebkitPrintColorAdjust: 'exact', printColorAdjust: 'exact' }}
     >
       {/* Gold Inner Inset Border */}
       <div className="absolute inset-2 border border-[#d4af37] pointer-events-none rounded z-10" />
 
       {/* Decorative Corner Accents */}
-      <div className="absolute top-4 left-4 w-3.5 h-3.5 border-t-2 border-l-2 border-[#d4af37] z-20" />
-      <div className="absolute top-4 right-4 w-3.5 h-3.5 border-t-2 border-r-2 border-[#d4af37] z-20" />
-      <div className="absolute bottom-4 left-4 w-3.5 h-3.5 border-b-2 border-l-2 border-[#d4af37] z-20" />
-      <div className="absolute bottom-4 right-4 w-3.5 h-3.5 border-b-2 border-r-2 border-[#d4af37] z-20" />
+      <div className="absolute top-4 left-4 size-3.5 border-t-2 border-l-2 border-[#d4af37] z-20" />
+      <div className="absolute top-4 right-4 size-3.5 border-t-2 border-r-2 border-[#d4af37] z-20" />
+      <div className="absolute bottom-4 left-4 size-3.5 border-b-2 border-l-2 border-[#d4af37] z-20" />
+      <div className="absolute bottom-4 right-4 size-3.5 border-b-2 border-r-2 border-[#d4af37] z-20" />
 
 
       {/* Core Document Flow */}
@@ -30,7 +30,7 @@ export const ClassicAcademy: React.FC<MarksheetTemplateProps> = ({
         {/* Crest & Logo Letterhead */}
         <div className="text-center pb-1">
           <div className="flex justify-center mb-2">
-            <div className="w-12 h-12 bg-[#1e3a8a] border-2 border-[#d4af37] rounded-full flex items-center justify-center shadow-md relative">
+            <div className="size-12 bg-[#1e3a8a] border-2 border-[#d4af37] rounded-full flex items-center justify-center shadow-md relative">
               <span className="text-xl filter drop-shadow">🎓</span>
               <span className="absolute bottom-0.5 text-[6px] text-[#d4af37] font-bold">★</span>
             </div>
@@ -53,7 +53,7 @@ export const ClassicAcademy: React.FC<MarksheetTemplateProps> = ({
         </div>
 
         {/* Student Info Block */}
-        <div className="grid grid-cols-2 gap-x-6 gap-y-3.5 text-xs border border-gray-200 p-4 rounded bg-zinc-50/70 font-sans">
+        <div className="grid grid-cols-2 gap-x-6 gap-y-3.5 text-xs border border-zinc-200 p-4 rounded bg-zinc-50/70 font-sans">
           <div className="flex gap-2">
             <span className="text-zinc-500 font-bold uppercase text-[9px] tracking-wider w-24 flex items-center shrink-0">Student Name:</span>
             <span className="font-bold text-zinc-900 truncate">{sheet.studentName}</span>
@@ -73,7 +73,7 @@ export const ClassicAcademy: React.FC<MarksheetTemplateProps> = ({
         </div>
 
         {/* Subject Table */}
-        <div className="rounded border border-gray-200 overflow-hidden shadow-sm bg-white font-sans">
+        <div className="rounded border border-zinc-200 overflow-hidden shadow-sm bg-white font-sans">
           <table className="w-full text-xs border-collapse table-fixed">
             <thead>
               <tr className="bg-[#1e3a8a] border-none text-white text-[10px]">
@@ -88,9 +88,9 @@ export const ClassicAcademy: React.FC<MarksheetTemplateProps> = ({
             <tbody>
               {sheet.subjects.map((sub, sIdx) => (
                 <tr key={sIdx} className="border-b border-zinc-150 hover:bg-zinc-50/50">
-                  <td className="px-3 py-2.5 text-left font-bold text-slate-800 truncate">{sub.subjectName}</td>
-                  {marksheetType === 'combined' && <td className="px-3 py-2.5 text-center font-mono text-slate-600">{sub.midtermMarks}</td>}
-                  {marksheetType === 'combined' && <td className="px-3 py-2.5 text-center font-mono text-slate-600">{sub.finalMarks}</td>}
+                  <td className="px-3 py-2.5 text-left font-bold text-zinc-800 truncate">{sub.subjectName}</td>
+                  {marksheetType === 'combined' && <td className="px-3 py-2.5 text-center font-mono text-zinc-600">{sub.midtermMarks}</td>}
+                  {marksheetType === 'combined' && <td className="px-3 py-2.5 text-center font-mono text-zinc-600">{sub.finalMarks}</td>}
                   <td className="px-3 py-2.5 text-center font-black font-mono text-[#1e3a8a]">{sub.obtained}</td>
                   <td className="px-3 py-2.5 text-center font-bold text-blue-900 font-mono">{sub.percentage}%</td>
                   <td className="px-3 py-2.5 text-center">
@@ -111,37 +111,37 @@ export const ClassicAcademy: React.FC<MarksheetTemplateProps> = ({
         </div>
 
         {/* Legend */}
-        <div className="grid grid-cols-7 gap-1 border border-gray-200 bg-zinc-50/70 rounded p-1.5 text-[8px] text-center font-bold text-zinc-500 font-sans">
-          <div className="border-r border-gray-200"><span className="text-[#1e3a8a] font-extrabold">A+</span> (90%+)</div>
-          <div className="border-r border-gray-200"><span className="text-[#1e3a8a] font-extrabold">A</span> (80-89%)</div>
-          <div className="border-r border-gray-200"><span className="text-[#1e3a8a] font-extrabold">B</span> (70-79%)</div>
-          <div className="border-r border-gray-200"><span className="text-[#1e3a8a] font-extrabold">C</span> (60-69%)</div>
-          <div className="border-r border-gray-200"><span className="text-[#1e3a8a] font-extrabold">D</span> (50-59%)</div>
-          <div className="border-r border-gray-200"><span className="text-[#1e3a8a] font-extrabold">E</span> (40-49%)</div>
+        <div className="grid grid-cols-7 gap-1 border border-zinc-200 bg-zinc-50/70 rounded p-1.5 text-[8px] text-center font-bold text-zinc-500 font-sans">
+          <div className="border-r border-zinc-200"><span className="text-[#1e3a8a] font-extrabold">A+</span> (90%+)</div>
+          <div className="border-r border-zinc-200"><span className="text-[#1e3a8a] font-extrabold">A</span> (80-89%)</div>
+          <div className="border-r border-zinc-200"><span className="text-[#1e3a8a] font-extrabold">B</span> (70-79%)</div>
+          <div className="border-r border-zinc-200"><span className="text-[#1e3a8a] font-extrabold">C</span> (60-69%)</div>
+          <div className="border-r border-zinc-200"><span className="text-[#1e3a8a] font-extrabold">D</span> (50-59%)</div>
+          <div className="border-r border-zinc-200"><span className="text-[#1e3a8a] font-extrabold">E</span> (40-49%)</div>
           <div><span className="text-red-600 font-extrabold">F</span> (&lt;40%)</div>
         </div>
 
         {/* Remarks & Statistics */}
         <div className="grid grid-cols-12 gap-5 font-sans">
-          <div className="col-span-7 border border-gray-200 border-l-[4px] border-l-[#d4af37] rounded p-4 bg-zinc-50/40 text-xs">
+          <div className="col-span-7 border border-zinc-200 border-l-[4px] border-l-[#d4af37] rounded p-4 bg-zinc-50/40 text-xs">
             <h5 className="font-semibold text-[9px] uppercase tracking-wider text-[#1e3a8a] mb-1.5">Evaluation & Principal Remarks</h5>
             <p className="italic text-zinc-600 font-medium leading-relaxed">
               "{sheet.remarks}" The student has demonstrated {sheet.status === 'pass' ? 'satisfactory academic standards.' : 'need for core learning reinforcements.'}
             </p>
           </div>
           
-          <div className="col-span-5 bg-white border border-gray-200 rounded p-2.5">
+          <div className="col-span-5 bg-white border border-zinc-200 rounded p-2.5">
             <table className="w-full text-xs">
               <tbody>
-                <tr className="border-b border-dashed border-gray-200">
+                <tr className="border-b border-dashed border-zinc-200">
                   <td className="py-2 text-[9px] font-bold text-zinc-500 uppercase tracking-wider">Aggregate</td>
                   <td className="py-2 text-right font-bold text-zinc-900 font-mono">{sheet.totalObtainedMarks} / {sheet.totalMaxMarks}</td>
                 </tr>
-                <tr className="border-b border-dashed border-gray-200">
+                <tr className="border-b border-dashed border-zinc-200">
                   <td className="py-2 text-[9px] font-bold text-zinc-500 uppercase tracking-wider">Percentage</td>
                   <td className="py-2 text-right font-black text-[#1e3a8a] font-mono">{sheet.overallPercentage}%</td>
                 </tr>
-                <tr className="border-b border-dashed border-gray-200">
+                <tr className="border-b border-dashed border-zinc-200">
                   <td className="py-2 text-[9px] font-bold text-zinc-500 uppercase tracking-wider">Letter Grade</td>
                   <td className={`py-2 text-right text-base font-black ${
                     sheet.status === 'pass' ? 'text-emerald-600' : 'text-red-600'
@@ -169,7 +169,7 @@ export const ClassicAcademy: React.FC<MarksheetTemplateProps> = ({
       </div>
 
       {/* Signature Area */}
-      <div className="flex justify-between items-end text-[9.5px] font-semibold text-zinc-400 border-t border-dashed border-gray-200 pt-4 mt-2 font-sans z-10">
+      <div className="flex justify-between items-end text-[9.5px] font-semibold text-zinc-400 border-t border-dashed border-zinc-200 pt-4 mt-2 font-sans z-10">
         <div>Date of Issue: <ClientDate /></div>
         <div className="flex gap-10">
           <div className="flex flex-col items-center">

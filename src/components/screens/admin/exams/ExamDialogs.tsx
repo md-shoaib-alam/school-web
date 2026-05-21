@@ -170,7 +170,7 @@ export function ExamDialogs({
           <DialogFooter className="mt-4">
             <Button variant="outline" onClick={() => setAddOpen(false)}>Cancel</Button>
             <Button disabled={adding || selectedBulkCount === 0 || !addForm.name || hasMissingDates} onClick={onAdd} className="bg-blue-600 hover:bg-blue-700">
-              {adding ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Plus className="h-4 w-4 mr-2" />}
+              {adding ? <Loader2 className="size-4 mr-2 animate-spin" /> : <Plus className="size-4 mr-2" />}
               Create {selectedBulkCount} Exam{selectedBulkCount !== 1 ? 's' : ''}
             </Button>
           </DialogFooter>
@@ -249,7 +249,7 @@ export function ExamDialogs({
           <DialogFooter>
             <Button variant="outline" onClick={() => setEditOpen(false)}>Cancel</Button>
             <Button disabled={saving} onClick={onSave} className="bg-amber-600 hover:bg-amber-700">
-              {saving ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Save className="h-4 w-4 mr-2" />}
+              {saving ? <Loader2 className="size-4 mr-2 animate-spin" /> : <Save className="size-4 mr-2" />}
               Save Changes
             </Button>
           </DialogFooter>

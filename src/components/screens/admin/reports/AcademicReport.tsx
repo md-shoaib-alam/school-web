@@ -124,7 +124,7 @@ export function AcademicReport() {
     return (
       <Card className="border-red-200 dark:border-red-800 bg-red-50 dark:bg-red-900/30">
         <CardContent className="p-6 text-center text-red-600 dark:text-red-400">
-          <GraduationCap className="h-8 w-8 mx-auto mb-2 opacity-50" />
+          <GraduationCap className="size-8 mx-auto mb-2 opacity-50" />
           <p className="font-medium">Failed to load academic report</p>
           <p className="text-sm mt-1">{error}</p>
         </CardContent>
@@ -146,7 +146,7 @@ export function AcademicReport() {
             <ChartSkeleton />
           ) : grades.length === 0 ? (
             <div className="text-center py-12 text-muted-foreground">
-              <GraduationCap className="h-10 w-10 mx-auto mb-2 opacity-30" />
+              <GraduationCap className="size-10 mx-auto mb-2 opacity-30" />
               <p className="text-sm">No grade data available</p>
             </div>
           ) : (
@@ -200,7 +200,7 @@ export function AcademicReport() {
             <TableSkeleton rows={6} />
           ) : subjectAverages.length === 0 ? (
             <div className="text-center py-12 text-muted-foreground">
-              <BarChart3 className="h-10 w-10 mx-auto mb-2 opacity-30" />
+              <BarChart3 className="size-10 mx-auto mb-2 opacity-30" />
               <p className="text-sm">No subject data available</p>
             </div>
           ) : (
@@ -224,8 +224,8 @@ export function AcademicReport() {
                     <TableRow key={row.subject}>
                       <TableCell className="font-medium">
                         <div className="flex items-center gap-2">
-                          <div className="h-7 w-7 rounded-lg bg-violet-100 dark:bg-violet-900/30 text-violet-600 dark:text-violet-400 flex items-center justify-center">
-                            <GraduationCap className="h-3.5 w-3.5" />
+                          <div className="size-7 rounded-lg bg-violet-100 dark:bg-violet-900/30 text-violet-600 dark:text-violet-400 flex items-center justify-center">
+                            <GraduationCap className="size-3.5" />
                           </div>
                           {row.subject}
                         </div>

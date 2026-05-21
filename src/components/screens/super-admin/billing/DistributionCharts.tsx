@@ -37,10 +37,10 @@ export function DistributionCharts({
   return (
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
       {/* Revenue by Plan */}
-      <Card className="shadow-sm border-none bg-white dark:bg-gray-800">
+      <Card className="shadow-sm border-none bg-white dark:bg-zinc-800">
         <CardHeader className="pb-2">
           <CardTitle className="text-base font-bold flex items-center gap-2">
-            <BarChart3 className="h-4 w-4 text-emerald-600" /> Revenue by Plan
+            <BarChart3 className="size-4 text-emerald-600" /> Revenue by Plan
           </CardTitle>
           <CardDescription>
             Active revenue and subscription count per plan
@@ -123,10 +123,10 @@ export function DistributionCharts({
       </Card>
 
       {/* Payment Method Distribution */}
-      <Card className="shadow-sm border-none bg-white dark:bg-gray-800">
+      <Card className="shadow-sm border-none bg-white dark:bg-zinc-800">
         <CardHeader className="pb-2">
           <CardTitle className="text-base font-bold flex items-center gap-2">
-            <PieChartIcon className="h-4 w-4 text-emerald-600" /> Payment Methods
+            <PieChartIcon className="size-4 text-emerald-600" /> Payment Methods
           </CardTitle>
           <CardDescription>
             Preferred methods by revenue volume
@@ -171,10 +171,10 @@ export function DistributionCharts({
       </Card>
 
       {/* Subscription Status Distribution */}
-      <Card className="shadow-sm border-none bg-white dark:bg-gray-800">
+      <Card className="shadow-sm border-none bg-white dark:bg-zinc-800">
         <CardHeader className="pb-2">
           <CardTitle className="text-base font-bold flex items-center gap-2">
-            <Activity className="h-4 w-4 text-emerald-600" /> Status Distribution
+            <Activity className="size-4 text-emerald-600" /> Status Distribution
           </CardTitle>
           <CardDescription>
             Lifecycle of all subscription records

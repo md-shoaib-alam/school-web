@@ -31,17 +31,17 @@ const statusConfig: Record<
   paid: {
     bg: "bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800",
     text: "Paid",
-    icon: <CheckCircle2 className="h-3.5 w-3.5" />,
+    icon: <CheckCircle2 className="size-3.5" />,
   },
   pending: {
     bg: "bg-violet-100 dark:bg-violet-900/30 text-violet-700 dark:text-violet-400 border-violet-200 dark:border-violet-800",
     text: "Pending",
-    icon: <Clock className="h-3.5 w-3.5" />,
+    icon: <Clock className="size-3.5" />,
   },
   overdue: {
     bg: "bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 border-red-200 dark:border-red-800",
     text: "Overdue",
-    icon: <AlertTriangle className="h-3.5 w-3.5" />,
+    icon: <AlertTriangle className="size-3.5" />,
   },
 };
 
@@ -122,8 +122,8 @@ export function StudentFees() {
     <div className="space-y-6">
       {/* Header */}
       <div className="flex items-center gap-2">
-        <CreditCard className="h-5 w-5 text-violet-600" />
-        <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
+        <CreditCard className="size-5 text-violet-600" />
+        <h2 className="text-lg font-semibold text-zinc-900 dark:text-zinc-100">
           My Fees
         </h2>
       </div>
@@ -133,12 +133,12 @@ export function StudentFees() {
         <Card className="rounded-xl shadow-sm hover:shadow-md transition-shadow">
           <CardContent className="p-4">
             <div className="flex items-center gap-3">
-              <div className="h-10 w-10 rounded-xl bg-violet-100 dark:bg-violet-900/30 flex items-center justify-center">
-                <IndianRupee className="h-5 w-5 text-violet-600 dark:text-violet-400" />
+              <div className="size-10 rounded-xl bg-violet-100 dark:bg-violet-900/30 flex items-center justify-center">
+                <IndianRupee className="size-5 text-violet-600 dark:text-violet-400" />
               </div>
               <div>
                 <p className="text-xs text-muted-foreground">Total Fees</p>
-                <p className="text-xl font-bold text-gray-900 dark:text-gray-100">
+                <p className="text-xl font-bold text-zinc-900 dark:text-zinc-100">
                   ₹{summary.total.toLocaleString()}
                 </p>
               </div>
@@ -149,8 +149,8 @@ export function StudentFees() {
         <Card className="rounded-xl shadow-sm border-emerald-200 hover:shadow-md transition-shadow">
           <CardContent className="p-4">
             <div className="flex items-center gap-3">
-              <div className="h-10 w-10 rounded-xl bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center">
-                <CheckCircle2 className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
+              <div className="size-10 rounded-xl bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center">
+                <CheckCircle2 className="size-5 text-emerald-600 dark:text-emerald-400" />
               </div>
               <div>
                 <p className="text-xs text-muted-foreground">Paid</p>
@@ -165,8 +165,8 @@ export function StudentFees() {
         <Card className="rounded-xl shadow-sm border-violet-200 hover:shadow-md transition-shadow">
           <CardContent className="p-4">
             <div className="flex items-center gap-3">
-              <div className="h-10 w-10 rounded-xl bg-violet-100 dark:bg-violet-900/30 flex items-center justify-center">
-                <Clock className="h-5 w-5 text-violet-600 dark:text-violet-400" />
+              <div className="size-10 rounded-xl bg-violet-100 dark:bg-violet-900/30 flex items-center justify-center">
+                <Clock className="size-5 text-violet-600 dark:text-violet-400" />
               </div>
               <div>
                 <p className="text-xs text-muted-foreground">Pending</p>
@@ -181,8 +181,8 @@ export function StudentFees() {
         <Card className="rounded-xl shadow-sm border-red-200 hover:shadow-md transition-shadow">
           <CardContent className="p-4">
             <div className="flex items-center gap-3">
-              <div className="h-10 w-10 rounded-xl bg-red-100 dark:bg-red-900/30 flex items-center justify-center">
-                <AlertTriangle className="h-5 w-5 text-red-600 dark:text-red-400" />
+              <div className="size-10 rounded-xl bg-red-100 dark:bg-red-900/30 flex items-center justify-center">
+                <AlertTriangle className="size-5 text-red-600 dark:text-red-400" />
               </div>
               <div>
                 <p className="text-xs text-muted-foreground">Overdue</p>
@@ -199,7 +199,7 @@ export function StudentFees() {
       <Card className="rounded-xl shadow-sm">
         <CardHeader>
           <CardTitle className="text-base flex items-center gap-2">
-            <IndianRupee className="h-4 w-4 text-violet-500" />
+            <IndianRupee className="size-4 text-violet-500" />
             Fee Records
           </CardTitle>
         </CardHeader>
@@ -224,7 +224,7 @@ export function StudentFees() {
                       colSpan={5}
                       className="text-center py-12 text-muted-foreground"
                     >
-                      <IndianRupee className="h-10 w-10 mx-auto mb-2 opacity-30" />
+                      <IndianRupee className="size-10 mx-auto mb-2 opacity-30" />
                       <p>No fee records found</p>
                     </TableCell>
                   </TableRow>

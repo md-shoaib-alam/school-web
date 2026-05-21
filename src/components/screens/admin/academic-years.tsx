@@ -144,11 +144,11 @@ export function AcademicYearsScreen() {
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-3">
-            <div className="h-12 w-12 rounded-2xl bg-indigo-100 dark:bg-indigo-900/30 flex items-center justify-center">
-              <CalendarDays className="h-6 w-6 text-indigo-600 dark:text-indigo-400" />
+            <div className="size-12 rounded-2xl bg-violet-100 dark:bg-violet-900/30 flex items-center justify-center">
+              <CalendarDays className="size-6 text-violet-600 dark:text-violet-400" />
             </div>
             <div>
-              <h2 className="text-3xl font-semibold tracking-tight text-gray-900 dark:text-gray-100">
+              <h2 className="text-3xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-100">
                 Academic Years
               </h2>
               <p className="text-muted-foreground mt-1">
@@ -160,12 +160,12 @@ export function AcademicYearsScreen() {
 
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
           <DialogTrigger asChild>
-            <Button onClick={() => handleOpenDialog()} className="bg-indigo-600 hover:bg-indigo-700 text-white shadow-lg shadow-indigo-500/20">
-              <Plus className="h-4 w-4 mr-2" />
+            <Button onClick={() => handleOpenDialog()} className="bg-violet-600 hover:bg-violet-700 text-white shadow-lg shadow-violet-500/20">
+              <Plus className="size-4 mr-2" />
               Add Academic Year
             </Button>
           </DialogTrigger>
-          <DialogContent className="sm:max-w-[425px] border-indigo-100 dark:border-indigo-900/50">
+          <DialogContent className="sm:max-w-[425px] border-violet-100 dark:border-violet-900/50">
             <DialogHeader>
               <DialogTitle>{editingYear ? "Edit Academic Year" : "New Academic Year"}</DialogTitle>
               <DialogDescription>
@@ -200,7 +200,7 @@ export function AcademicYearsScreen() {
                 </div>
               </div>
               <DialogFooter className="pt-4">
-                <Button type="submit" disabled={isCreating || isUpdating} className="w-full bg-indigo-600 hover:bg-indigo-700 text-white">
+                <Button type="submit" disabled={isCreating || isUpdating} className="w-full bg-violet-600 hover:bg-violet-700 text-white">
                   {isCreating || isUpdating ? "Saving..." : (editingYear ? "Update Year" : "Create Year")}
                 </Button>
               </DialogFooter>
@@ -211,15 +211,15 @@ export function AcademicYearsScreen() {
 
       {/* Stats / Info */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <Card className="border-indigo-100 dark:border-indigo-900/30 bg-indigo-50/30 dark:bg-indigo-950/10 shadow-sm">
+        <Card className="border-violet-100 dark:border-violet-900/30 bg-violet-50/30 dark:bg-violet-950/10 shadow-sm">
           <CardContent className="pt-6">
             <div className="flex items-center gap-4">
-              <div className="h-10 w-10 rounded-full bg-indigo-100 dark:bg-indigo-900/50 flex items-center justify-center">
-                <ShieldCheck className="h-5 w-5 text-indigo-600 dark:text-indigo-400" />
+              <div className="size-10 rounded-full bg-violet-100 dark:bg-violet-900/50 flex items-center justify-center">
+                <ShieldCheck className="size-5 text-violet-600 dark:text-violet-400" />
               </div>
               <div>
-                <p className="text-sm font-medium text-indigo-800 dark:text-indigo-300">Current Session</p>
-                <p className="text-2xl font-bold text-indigo-900 dark:text-indigo-100">
+                <p className="text-sm font-medium text-violet-800 dark:text-violet-300">Current Session</p>
+                <p className="text-2xl font-bold text-violet-900 dark:text-violet-100">
                   {academicYears.find((y: any) => y.isCurrent)?.name || "Not Set"}
                 </p>
               </div>
@@ -230,8 +230,8 @@ export function AcademicYearsScreen() {
         <Card className="border-emerald-100 dark:border-emerald-900/30 bg-emerald-50/30 dark:bg-emerald-950/10 shadow-sm">
           <CardContent className="pt-6">
             <div className="flex items-center gap-4">
-              <div className="h-10 w-10 rounded-full bg-emerald-100 dark:bg-emerald-900/50 flex items-center justify-center">
-                <CheckCircle2 className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
+              <div className="size-10 rounded-full bg-emerald-100 dark:bg-emerald-900/50 flex items-center justify-center">
+                <CheckCircle2 className="size-5 text-emerald-600 dark:text-emerald-400" />
               </div>
               <div>
                 <p className="text-sm font-medium text-emerald-800 dark:text-emerald-300">Active Sessions</p>
@@ -246,8 +246,8 @@ export function AcademicYearsScreen() {
         <Card className="border-amber-100 dark:border-amber-900/30 bg-amber-50/30 dark:bg-amber-950/10 shadow-sm">
           <CardContent className="pt-6">
             <div className="flex items-center gap-4">
-              <div className="h-10 w-10 rounded-full bg-amber-100 dark:bg-amber-900/50 flex items-center justify-center">
-                <Clock className="h-5 w-5 text-amber-600 dark:text-amber-400" />
+              <div className="size-10 rounded-full bg-amber-100 dark:bg-amber-900/50 flex items-center justify-center">
+                <Clock className="size-5 text-amber-600 dark:text-amber-400" />
               </div>
               <div>
                 <p className="text-sm font-medium text-amber-800 dark:text-amber-300">Upcoming Sessions</p>
@@ -261,7 +261,7 @@ export function AcademicYearsScreen() {
       </div>
 
       {/* Table */}
-      <Card className="overflow-hidden border-indigo-100 dark:border-indigo-900/30 shadow-md">
+      <Card className="overflow-hidden border-violet-100 dark:border-violet-900/30 shadow-md">
         <Table>
           <TableHeader className="bg-card">
             <TableRow className="hover:bg-transparent">
@@ -278,7 +278,7 @@ export function AcademicYearsScreen() {
               <TableRow className="hover:bg-transparent">
                 <TableCell colSpan={6} className="text-center py-10">
                   <div className="flex flex-col items-center gap-2">
-                    <div className="h-8 w-8 animate-spin rounded-full border-4 border-indigo-500 border-t-transparent" />
+                    <div className="size-8 animate-spin rounded-full border-4 border-violet-500 border-t-transparent" />
                     <span className="text-sm text-muted-foreground">Loading sessions...</span>
                   </div>
                 </TableCell>
@@ -287,7 +287,7 @@ export function AcademicYearsScreen() {
               <TableRow className="hover:bg-transparent">
                 <TableCell colSpan={6} className="text-center py-20">
                   <div className="flex flex-col items-center gap-2">
-                    <AlertCircle className="h-10 w-10 text-muted-foreground/30" />
+                    <AlertCircle className="size-10 text-muted-foreground/30" />
                     <span className="text-lg font-medium text-muted-foreground">No academic years found</span>
                     <Button variant="outline" onClick={() => handleOpenDialog()} className="mt-2">
                       Create your first session
@@ -308,8 +308,8 @@ export function AcademicYearsScreen() {
                   </TableCell>
                   <TableCell>
                     {year.isCurrent ? (
-                      <div className="flex items-center gap-1.5 text-indigo-600 dark:text-indigo-400 font-semibold">
-                        <CheckCircle2 className="h-4 w-4" />
+                      <div className="flex items-center gap-1.5 text-violet-600 dark:text-violet-400 font-semibold">
+                        <CheckCircle2 className="size-4" />
                         <span>Current</span>
                       </div>
                     ) : (
@@ -317,7 +317,7 @@ export function AcademicYearsScreen() {
                         variant="ghost" 
                         size="sm" 
                         onClick={() => handleSetCurrent(year.id)}
-                        className="text-xs text-muted-foreground hover:text-indigo-600"
+                        className="text-xs text-muted-foreground hover:text-violet-600"
                       >
                         Set as Current
                       </Button>
@@ -326,21 +326,21 @@ export function AcademicYearsScreen() {
                   <TableCell className="text-right">
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" size="icon" className="h-8 w-8">
-                          <MoreVertical className="h-4 w-4" />
+                        <Button variant="ghost" size="icon" className="size-8">
+                          <MoreVertical className="size-4" />
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end" className="w-40">
                         <DropdownMenuItem onClick={() => handleOpenDialog(year)}>
-                          <Edit2 className="h-4 w-4 mr-2" />
+                          <Edit2 className="size-4 mr-2" />
                           Edit
                         </DropdownMenuItem>
                         <DropdownMenuItem onClick={() => handleSetCurrent(year.id)} disabled={year.isCurrent}>
-                          <CheckCircle2 className="h-4 w-4 mr-2" />
+                          <CheckCircle2 className="size-4 mr-2" />
                           Make Current
                         </DropdownMenuItem>
                         <DropdownMenuItem onClick={() => handleDelete(year.id)} className="text-red-600 focus:text-red-600">
-                          <Trash2 className="h-4 w-4 mr-2" />
+                          <Trash2 className="size-4 mr-2" />
                           Delete
                         </DropdownMenuItem>
                       </DropdownMenuContent>

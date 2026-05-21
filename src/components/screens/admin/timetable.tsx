@@ -417,8 +417,8 @@ export function AdminTimetable() {
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
         <div className="flex items-center gap-3">
-          <div className="h-10 w-10 rounded-xl bg-emerald-100 text-emerald-600 flex items-center justify-center">
-            <Calendar className="h-5 w-5" />
+          <div className="size-10 rounded-xl bg-emerald-100 text-emerald-600 flex items-center justify-center">
+            <Calendar className="size-5" />
           </div>
           <div>
             <h2 className="text-lg font-semibold">Weekly Timetable</h2>
@@ -431,13 +431,13 @@ export function AdminTimetable() {
         </div>
 
         <div className="flex items-center gap-3 w-full sm:w-auto">
-          <div className="inline-flex items-center rounded-lg border border-gray-200 bg-white dark:bg-zinc-900 p-0.5 shadow-sm">
+          <div className="inline-flex items-center rounded-lg border border-zinc-200 bg-white dark:bg-zinc-900 p-0.5 shadow-sm">
             <Button
               size="sm"
               variant={viewMode === "grid" ? "default" : "ghost"}
               onClick={() => setViewMode("grid")}
             >
-              <LayoutGrid className="h-4 w-4 mr-1.5" />
+              <LayoutGrid className="size-4 mr-1.5" />
               <span className="hidden sm:inline">Grid</span>
             </Button>
             <Button
@@ -445,7 +445,7 @@ export function AdminTimetable() {
               variant={viewMode === "list" ? "default" : "ghost"}
               onClick={() => setViewMode("list")}
             >
-              <List className="h-4 w-4 mr-1.5" />
+              <List className="size-4 mr-1.5" />
               <span className="hidden sm:inline">List</span>
             </Button>
             <Button
@@ -453,13 +453,13 @@ export function AdminTimetable() {
               variant={viewMode === "day" ? "default" : "ghost"}
               onClick={() => setViewMode("day")}
             >
-              <CalendarDays className="h-4 w-4 mr-1.5" />
+              <CalendarDays className="size-4 mr-1.5" />
               <span className="hidden sm:inline">Day</span>
             </Button>
           </div>
 
           <Select value={selectedClass} onValueChange={setSelectedClass}>
-            <SelectTrigger className="w-full sm:w-56 text-sm bg-white hover:bg-gray-50/50 dark:bg-zinc-900 border-gray-200 dark:border-zinc-800 shadow-sm">
+            <SelectTrigger className="w-full sm:w-56 text-sm bg-white hover:bg-zinc-50/50 dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800 shadow-sm">
               <SelectValue placeholder="Select class" />
             </SelectTrigger>
             <SelectContent>
@@ -475,13 +475,13 @@ export function AdminTimetable() {
             <Button
               variant="outline"
               size="sm"
-              className="bg-white hover:bg-gray-50 dark:bg-zinc-900 dark:hover:bg-zinc-800 border-gray-200 dark:border-zinc-800 shadow-sm"
+              className="bg-white hover:bg-zinc-50 dark:bg-zinc-900 dark:hover:bg-zinc-800 border-zinc-200 dark:border-zinc-800 shadow-sm"
               onClick={() => {
                 setDaysConfigDraft([...workingDays]);
                 setDaysConfigOpen(true);
               }}
             >
-              <Settings className="h-4 w-4 sm:mr-1.5" />
+              <Settings className="size-4 sm:mr-1.5" />
               <span className="hidden sm:inline">Settings</span>
             </Button>
           )}
@@ -492,7 +492,7 @@ export function AdminTimetable() {
               onClick={handleOpenManage}
               className="bg-emerald-600 text-white hover:bg-emerald-700 shadow-md shadow-emerald-600/30 hover:shadow-lg hover:shadow-emerald-600/45 transition-all duration-200"
             >
-              <Plus className="h-4 w-4 mr-1.5" />
+              <Plus className="size-4 mr-1.5" />
               Manage
             </Button>
           )}
@@ -505,8 +505,8 @@ export function AdminTimetable() {
             <TimetableSkeleton viewMode={viewMode} />
           ) : slots.length === 0 ? (
             <div className="text-center py-24 text-muted-foreground bg-muted/5">
-              <div className="h-16 w-16 bg-muted/20 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Calendar className="h-8 w-8 opacity-20" />
+              <div className="size-16 bg-muted/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Calendar className="size-8 opacity-20" />
               </div>
               <p className="font-medium">No timetable records found</p>
               <p className="text-xs max-w-[200px] mx-auto mt-1 opacity-60">

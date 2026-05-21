@@ -55,7 +55,7 @@ export function UsageCharts({
       <Card>
         <CardHeader className="pb-2">
           <CardTitle className="text-base font-bold flex items-center gap-2">
-            <Zap className="h-4 w-4 text-amber-500" />
+            <Zap className="size-4 text-amber-500" />
             Feature Usage
           </CardTitle>
           <CardDescription>
@@ -118,7 +118,7 @@ export function UsageCharts({
       <Card>
         <CardHeader className="pb-2">
           <CardTitle className="text-base font-bold flex items-center gap-2">
-            <Server className="h-4 w-4 text-emerald-500" />
+            <Server className="size-4 text-emerald-500" />
             Performance Metrics
           </CardTitle>
           <CardDescription>
@@ -130,8 +130,8 @@ export function UsageCharts({
           <div className="space-y-3 p-4 rounded-xl bg-emerald-50/50 dark:bg-emerald-900/10 border border-emerald-100/50 dark:border-emerald-800/30">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <div className="h-10 w-10 rounded-xl bg-white dark:bg-emerald-900/30 text-emerald-600 flex items-center justify-center shadow-sm">
-                  <Wifi className="h-5 w-5" />
+                <div className="size-10 rounded-xl bg-white dark:bg-emerald-900/30 text-emerald-600 flex items-center justify-center shadow-sm">
+                  <Wifi className="size-5" />
                 </div>
                 <div>
                   <p className="text-sm font-bold text-emerald-900 dark:text-emerald-300 uppercase tracking-tight">
@@ -145,7 +145,7 @@ export function UsageCharts({
                   {serverUptime}%
                 </p>
                 <p className="text-[10px] text-emerald-500 font-bold flex items-center gap-1 justify-end">
-                  <ArrowUpRight className="h-3 w-3" /> 99.7% LTM
+                  <ArrowUpRight className="size-3" /> 99.7% LTM
                 </p>
               </div>
             </div>
@@ -159,8 +159,8 @@ export function UsageCharts({
           <div className="space-y-3 p-4 rounded-xl bg-blue-50/50 dark:bg-blue-900/10 border border-blue-100/50 dark:border-blue-800/30">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <div className="h-10 w-10 rounded-xl bg-white dark:bg-blue-900/30 text-blue-600 flex items-center justify-center shadow-sm">
-                  <Clock className="h-5 w-5" />
+                <div className="size-10 rounded-xl bg-white dark:bg-blue-900/30 text-blue-600 flex items-center justify-center shadow-sm">
+                  <Clock className="size-5" />
                 </div>
                 <div>
                   <p className="text-sm font-bold text-blue-900 dark:text-blue-300 uppercase tracking-tight">
@@ -174,7 +174,7 @@ export function UsageCharts({
                   {avgResponseTime}ms
                 </p>
                 <p className="text-[10px] text-emerald-600 font-bold flex items-center gap-1 justify-end">
-                  <ArrowDownRight className="h-3 w-3" /> -12ms WoW
+                  <ArrowDownRight className="size-3" /> -12ms WoW
                 </p>
               </div>
             </div>
@@ -188,8 +188,8 @@ export function UsageCharts({
           <div className="space-y-3 p-4 rounded-xl bg-teal-50/50 dark:bg-teal-900/10 border border-teal-100/50 dark:border-teal-800/30">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <div className="h-10 w-10 rounded-xl bg-white dark:bg-teal-900/30 text-teal-600 flex items-center justify-center shadow-sm">
-                  <UserCheck className="h-5 w-5" />
+                <div className="size-10 rounded-xl bg-white dark:bg-teal-900/30 text-teal-600 flex items-center justify-center shadow-sm">
+                  <UserCheck className="size-5" />
                 </div>
                 <div>
                   <p className="text-sm font-bold text-teal-900 dark:text-teal-300 uppercase tracking-tight">
@@ -203,7 +203,7 @@ export function UsageCharts({
                   {activeUsers.toLocaleString()}
                 </p>
                 <p className="text-[10px] text-emerald-600 font-bold flex items-center gap-1 justify-end">
-                  <ArrowUpRight className="h-3 w-3" /> +18% vs yesterday
+                  <ArrowUpRight className="size-3" /> +18% vs yesterday
                 </p>
               </div>
             </div>

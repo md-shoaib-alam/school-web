@@ -41,9 +41,9 @@ const formatDate = (dateStr: string) => {
 
 export function RoleTable({ roles, onEdit, onAssign, onDelete }: RoleTableProps) {
   return (
-    <div className="rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-950 overflow-hidden shadow-sm">
+    <div className="rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 overflow-hidden shadow-sm">
       <Table>
-        <TableHeader className="bg-gray-50/50 dark:bg-gray-900/50">
+        <TableHeader className="bg-zinc-50/50 dark:bg-zinc-900/50">
           <TableRow>
             <TableHead className="w-[250px]">Role Name</TableHead>
             <TableHead>Staff Assigned</TableHead>
@@ -63,19 +63,19 @@ export function RoleTable({ roles, onEdit, onAssign, onDelete }: RoleTableProps)
              const permCount = Object.values(perms).flat().length;
 
              return (
-              <TableRow key={role.id} className="hover:bg-gray-50/50 dark:hover:bg-gray-900/50 transition-colors">
+              <TableRow key={role.id} className="hover:bg-zinc-50/50 dark:hover:bg-zinc-900/50 transition-colors">
                 <TableCell>
                   <div className="flex items-center gap-3">
                     <div 
-                      className="w-8 h-8 rounded-lg flex items-center justify-center text-white text-sm font-bold shrink-0"
+                      className="size-8 rounded-lg flex items-center justify-center text-white text-sm font-bold shrink-0"
                       style={{ backgroundColor: role.color }}
                     >
                       {role.name.charAt(0).toUpperCase()}
                     </div>
                     <div>
-                      <p className="font-semibold text-gray-900 dark:text-gray-100">{role.name}</p>
+                      <p className="font-semibold text-zinc-900 dark:text-zinc-100">{role.name}</p>
                       {role.description && (
-                        <p className="text-[10px] text-gray-500 line-clamp-1">{role.description}</p>
+                        <p className="text-[10px] text-zinc-500 line-clamp-1">{role.description}</p>
                       )}
                     </div>
                   </div>
@@ -87,17 +87,17 @@ export function RoleTable({ roles, onEdit, onAssign, onDelete }: RoleTableProps)
                     className="h-8 gap-2 text-xs hover:bg-blue-50 hover:text-blue-600 dark:hover:bg-blue-900/30"
                     onClick={() => onAssign(role)}
                   >
-                    <Users className="h-3.5 w-3.5" />
+                    <Users className="size-3.5" />
                     {role.userCount} staff
                   </Button>
                 </TableCell>
                 <TableCell>
-                  <div className="flex items-center gap-1.5 text-xs text-gray-600 dark:text-gray-400">
-                    <Shield className="h-3.5 w-3.5" />
+                  <div className="flex items-center gap-1.5 text-xs text-zinc-600 dark:text-zinc-400">
+                    <Shield className="size-3.5" />
                     {permCount} modules
                   </div>
                 </TableCell>
-                <TableCell className="text-xs text-gray-500" suppressHydrationWarning>
+                <TableCell className="text-xs text-zinc-500" suppressHydrationWarning>
                   {formatDate(role.createdAt)}
                 </TableCell>
                 <TableCell className="text-right">
@@ -105,27 +105,27 @@ export function RoleTable({ roles, onEdit, onAssign, onDelete }: RoleTableProps)
                     <Button
                       variant="ghost"
                       size="icon"
-                      className="h-8 w-8 text-blue-500 hover:text-blue-700 hover:bg-blue-50 dark:hover:bg-blue-900/30"
+                      className="size-8 text-blue-500 hover:text-blue-700 hover:bg-blue-50 dark:hover:bg-blue-900/30"
                       onClick={() => onAssign(role)}
                     >
-                      <UserPlus className="h-4 w-4" />
+                      <UserPlus className="size-4" />
                     </Button>
                     <Button
                       variant="ghost"
                       size="icon"
-                      className="h-8 w-8 text-emerald-500 hover:text-emerald-700 hover:bg-emerald-50 dark:hover:bg-emerald-900/30"
+                      className="size-8 text-emerald-500 hover:text-emerald-700 hover:bg-emerald-50 dark:hover:bg-emerald-900/30"
                       onClick={() => onEdit(role)}
                     >
-                      <Pencil className="h-4 w-4" />
+                      <Pencil className="size-4" />
                     </Button>
                     <AlertDialog>
                       <AlertDialogTrigger asChild>
                         <Button
                           variant="ghost"
                           size="icon"
-                          className="h-8 w-8 text-red-500 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900/30"
+                          className="size-8 text-red-500 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900/30"
                         >
-                          <Trash2 className="h-4 w-4" />
+                          <Trash2 className="size-4" />
                         </Button>
                       </AlertDialogTrigger>
                       <AlertDialogContent>

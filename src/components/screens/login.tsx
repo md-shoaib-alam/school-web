@@ -37,13 +37,13 @@ function ThemeToggleLogin() {
     <Button
       variant="ghost"
       size="icon"
-      className="absolute top-4 right-4 h-10 w-10 rounded-full hover:bg-white/20 dark:hover:bg-black/20 text-gray-600 dark:text-gray-300 z-10"
+      className="absolute top-4 right-4 size-10 rounded-full hover:bg-white/20 dark:hover:bg-black/20 text-zinc-600 dark:text-zinc-300 z-10"
       onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
       aria-label="Toggle theme"
       suppressHydrationWarning
     >
-      <Moon className="h-5 w-5 block dark:hidden" />
-      <Sun className="h-5 w-5 hidden dark:block" />
+      <Moon className="size-5 block dark:hidden" />
+      <Sun className="size-5 hidden dark:block" />
     </Button>
   );
 }
@@ -118,7 +118,7 @@ export function LoginScreen() {
 
   return (
     <div
-      className="min-h-screen flex items-center justify-center p-4 relative bg-gradient-to-br from-slate-50 via-white to-rose-50 dark:from-gray-950 dark:via-gray-900 dark:to-rose-950"
+      className="min-h-screen flex items-center justify-center p-4 relative bg-gradient-to-br from-zinc-50 via-white to-rose-50 dark:from-zinc-950 dark:via-zinc-900 dark:to-rose-950"
       suppressHydrationWarning
     >
       <ThemeToggleLogin />
@@ -126,27 +126,27 @@ export function LoginScreen() {
       <div className="w-full max-w-md">
         {/* Logo & Title */}
         <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-20 h-20 rounded-2xl mb-4 shadow-lg bg-white/90 dark:bg-black/20 overflow-hidden shrink-0 border border-gray-200 dark:border-white/10">
+          <div className="inline-flex items-center justify-center size-20 rounded-2xl mb-4 shadow-lg bg-white/90 dark:bg-black/20 overflow-hidden shrink-0 border border-zinc-200 dark:border-white/10">
             <img 
               src="/test.webp" 
               alt="School Logo" 
-              className="h-full w-full object-cover" 
+              className="size-full object-cover" 
             />
           </div>
-          <h1 className="text-4xl font-semibold tracking-tight text-gray-900 dark:text-white">
+          <h1 className="text-4xl font-semibold tracking-tight text-zinc-900 dark:text-white">
             SchoolSaaS
           </h1>
-          <p className="text-lg mt-2 text-gray-500 dark:text-gray-400 font-medium">
+          <p className="text-lg mt-2 text-zinc-500 dark:text-zinc-400 font-medium">
             Welcome back! Sign in to continue
           </p>
         </div>
 
-        <Card className="shadow-2xl border-0 bg-white/90 border-t border-t-white backdrop-blur-xl dark:bg-gray-900/40 dark:border dark:border-white/[0.06] dark:shadow-black/50 rounded-2xl overflow-hidden relative transition-all duration-300">
+        <Card className="shadow-2xl border-0 bg-white/90 border-t border-t-white backdrop-blur-xl dark:bg-zinc-900/40 dark:border dark:border-white/[0.06] dark:shadow-black/50 rounded-2xl overflow-hidden relative transition-all duration-300">
           {/* Subtle luxury gradient top border for dark mode */}
           <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-rose-500/40 to-transparent" />
           
           <CardHeader className="text-center pt-8 pb-3">
-            <CardTitle className="text-xl font-bold tracking-tight text-gray-900 dark:text-white/90">
+            <CardTitle className="text-xl font-bold tracking-tight text-zinc-900 dark:text-white/90">
               Login to your account
             </CardTitle>
           </CardHeader>
@@ -156,15 +156,15 @@ export function LoginScreen() {
               <div className="space-y-2">
                 <Label
                   htmlFor="login-email"
-                  className="text-sm font-semibold pl-1 text-gray-700 dark:text-gray-300/90"
+                  className="text-sm font-semibold pl-1 text-zinc-700 dark:text-zinc-300/90"
                 >
                   Email or Mobile Number
                 </Label>
                 <div className="relative group">
-                  <div className="absolute left-3.5 top-1/2 -translate-y-1/2 flex items-center gap-1 text-gray-400 group-focus-within:text-rose-500 transition-colors duration-200">
-                    <Mail className="h-4 w-4" />
+                  <div className="absolute left-3.5 top-1/2 -translate-y-1/2 flex items-center gap-1 text-zinc-400 group-focus-within:text-rose-500 transition-colors duration-200">
+                    <Mail className="size-4" />
                     <span className="text-xs">/</span>
-                    <School className="h-4 w-4" />
+                    <School className="size-4" />
                   </div>
                   <Input
                     id="login-email"
@@ -172,7 +172,7 @@ export function LoginScreen() {
                     placeholder="Email or Mobile"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    className="bg-gray-50/50 dark:bg-[#0c0c0e]/70 dark:border-gray-800/60 dark:text-gray-100 pl-16 h-12 rounded-xl focus:ring-rose-500/15 focus:border-rose-500 dark:focus:ring-rose-500/20 dark:focus:border-rose-500/60 transition-all duration-200 placeholder:text-gray-400/70"
+                    className="bg-zinc-50/50 dark:bg-[#0c0c0e]/70 dark:border-zinc-800/60 dark:text-zinc-100 pl-16 h-12 rounded-xl focus:ring-rose-500/15 focus:border-rose-500 dark:focus:ring-rose-500/20 dark:focus:border-rose-500/60 transition-all duration-200 placeholder:text-zinc-400/70"
                     autoComplete="username"
                     required
                   />
@@ -183,7 +183,7 @@ export function LoginScreen() {
                 <div className="flex items-center justify-between px-1">
                   <Label
                     htmlFor="login-password"
-                    className="text-sm font-semibold text-gray-700 dark:text-gray-300/90"
+                    className="text-sm font-semibold text-zinc-700 dark:text-zinc-300/90"
                   >
                     Password
                   </Label>
@@ -196,26 +196,26 @@ export function LoginScreen() {
                   </button>
                 </div>
                 <div className="relative group">
-                  <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400 group-focus-within:text-rose-500 transition-colors duration-200" />
+                  <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 size-5 text-zinc-400 group-focus-within:text-rose-500 transition-colors duration-200" />
                   <Input
                     id="login-password"
                     type={showPassword ? "text" : "password"}
                     placeholder="••••••••"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className="bg-gray-50/50 dark:bg-[#0c0c0e]/70 dark:border-gray-800/60 dark:text-gray-100 pl-11 pr-11 h-12 rounded-xl focus:ring-rose-500/15 focus:border-rose-500 dark:focus:ring-rose-500/20 dark:focus:border-rose-500/60 transition-all duration-200 placeholder:text-gray-400/70"
+                    className="bg-zinc-50/50 dark:bg-[#0c0c0e]/70 dark:border-zinc-800/60 dark:text-zinc-100 pl-11 pr-11 h-12 rounded-xl focus:ring-rose-500/15 focus:border-rose-500 dark:focus:ring-rose-500/20 dark:focus:border-rose-500/60 transition-all duration-200 placeholder:text-zinc-400/70"
                     autoComplete="current-password"
                     required
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-rose-500 transition-colors duration-200"
+                    className="absolute right-3.5 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-rose-500 transition-colors duration-200"
                   >
                     {showPassword ? (
-                      <EyeOff className="h-4 w-4" />
+                      <EyeOff className="size-4" />
                     ) : (
-                      <Eye className="h-4 w-4" />
+                      <Eye className="size-4" />
                     )}
                   </button>
                 </div>
@@ -224,11 +224,11 @@ export function LoginScreen() {
               <Button
                 type="submit"
                 disabled={loading}
-                className="w-full bg-slate-900 hover:bg-slate-850 dark:bg-rose-600 dark:hover:bg-rose-500 text-white h-12 text-base font-bold rounded-xl shadow-lg shadow-rose-500/10 hover:shadow-rose-500/20 transition-all duration-250 active:scale-[0.97] cursor-pointer"
+                className="w-full bg-zinc-900 hover:bg-zinc-850 dark:bg-rose-600 dark:hover:bg-rose-500 text-white h-12 text-base font-bold rounded-xl shadow-lg shadow-rose-500/10 hover:shadow-rose-500/20 transition-all duration-250 active:scale-[0.97] cursor-pointer"
               >
                 {loading ? (
                   <>
-                    <Loader2 className="h-5 w-5 mr-2 animate-spin" />
+                    <Loader2 className="size-5 mr-2 animate-spin" />
                     Authenticating...
                   </>
                 ) : (
@@ -239,7 +239,7 @@ export function LoginScreen() {
           </CardContent>
         </Card>
 
-        <p className="text-center text-xs mt-8 text-gray-400 dark:text-gray-600 font-medium">
+        <p className="text-center text-xs mt-8 text-zinc-400 dark:text-zinc-600 font-medium">
           For assistance, please contact your school administration.
         </p>
       </div>

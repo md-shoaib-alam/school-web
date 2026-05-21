@@ -137,8 +137,8 @@ export function AdminCalendar() {
     <div className="space-y-5 animate-in fade-in duration-500 overflow-hidden pb-8">
       {!canCreate && !canEdit && !canDelete && (
         <div className="flex items-center gap-3 rounded-2xl border border-amber-200/60 bg-amber-50/60 px-4 py-3 dark:border-amber-900/30 dark:bg-amber-950/20 shadow-sm shadow-amber-500/5 animate-in slide-in-from-top-2 duration-300">
-          <div className="h-8 w-8 rounded-xl bg-amber-100 dark:bg-amber-900/50 flex items-center justify-center text-amber-600 dark:text-amber-400">
-            <Eye className="h-4 w-4 shrink-0" />
+          <div className="size-8 rounded-xl bg-amber-100 dark:bg-amber-900/50 flex items-center justify-center text-amber-600 dark:text-amber-400">
+            <Eye className="size-4 shrink-0" />
           </div>
           <div>
             <p className="text-sm text-amber-900 dark:text-amber-200 font-bold leading-none">Read-only Mode</p>

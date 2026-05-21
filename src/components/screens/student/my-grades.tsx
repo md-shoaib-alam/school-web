@@ -234,10 +234,10 @@ export function StudentGrades({ initialTab }: { initialTab?: "exams" | "assessme
       {/* Header */}
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">
+          <h2 className="text-xl font-semibold text-zinc-900 dark:text-zinc-100">
             {topLevelTab === "exams" ? "School Exams" : "Class Assessments"}
           </h2>
-          <p className="text-sm text-gray-500 dark:text-gray-400 mt-0.5">
+          <p className="text-sm text-zinc-500 dark:text-zinc-400 mt-0.5">
             {topLevelTab === "exams" 
               ? "Track your official term examinations and standardized scores" 
               : "Monitor your periodic teacher assignments, classwork, and quizzes"}
@@ -266,7 +266,7 @@ export function StudentGrades({ initialTab }: { initialTab?: "exams" | "assessme
                 className="h-9 gap-1.5 text-sm font-medium border-violet-200 text-violet-700 hover:bg-violet-50 dark:border-violet-800 dark:text-violet-400 dark:hover:bg-violet-950/30"
                 onClick={() => router.push(`/${slug}/view-marksheet`)}
               >
-                <FileText className="h-4 w-4" />
+                <FileText className="size-4" />
                 View Marksheet
               </Button>
             )}
@@ -281,12 +281,12 @@ export function StudentGrades({ initialTab }: { initialTab?: "exams" | "assessme
             <Card className="col-span-2 sm:col-span-1 rounded-xl shadow-sm border-violet-100 dark:border-violet-950/30 bg-gradient-to-tr from-white to-violet-50/20 dark:from-background dark:to-violet-950/10">
               <CardContent className="p-5 text-center">
                 <div className="inline-flex p-3 rounded-xl bg-violet-600 dark:bg-violet-500 text-white mb-3">
-                  <TrendingUp className="h-5 w-5" />
+                  <TrendingUp className="size-5" />
                 </div>
-                <p className="text-xl sm:text-3xl font-bold text-gray-900 dark:text-gray-100">
+                <p className="text-xl sm:text-3xl font-bold text-zinc-900 dark:text-zinc-100">
                   {overallAvg}%
                 </p>
-                <p className="text-xs text-gray-500 dark:text-gray-400 dark:text-gray-500 mt-1 font-medium">
+                <p className="text-xs text-zinc-500 dark:text-zinc-400 dark:text-zinc-500 mt-1 font-medium">
                   Exam Average
                 </p>
                 <Progress value={overallAvg} className="mt-3 h-2" />
@@ -296,15 +296,15 @@ export function StudentGrades({ initialTab }: { initialTab?: "exams" | "assessme
             <Card className="rounded-xl shadow-sm border-emerald-100 dark:border-emerald-950/30 bg-gradient-to-tr from-white to-emerald-50/20 dark:from-background dark:to-emerald-950/10">
               <CardContent className="p-5 text-center">
                 <div className="inline-flex p-3 rounded-xl bg-emerald-600 dark:bg-emerald-500 text-white mb-3">
-                  <Award className="h-5 w-5" />
+                  <Award className="size-5" />
                 </div>
-                <p className="text-xl sm:text-3xl font-bold text-gray-900 dark:text-gray-100">
+                <p className="text-xl sm:text-3xl font-bold text-zinc-900 dark:text-zinc-100">
                   {grades.length}
                 </p>
-                <p className="text-xs text-gray-500 dark:text-gray-400 dark:text-gray-500 mt-1 font-medium">
+                <p className="text-xs text-zinc-500 dark:text-zinc-400 dark:text-zinc-500 mt-1 font-medium">
                   Total Records
                 </p>
-                <div className="flex items-center justify-center gap-1 mt-3 text-xs text-gray-400 dark:text-gray-500 font-medium">
+                <div className="flex items-center justify-center gap-1 mt-3 text-xs text-zinc-400 dark:text-zinc-500 font-medium">
                   <span>
                     {[...new Set(grades.map((g) => g.subjectName))].length} subjects
                   </span>
@@ -319,14 +319,14 @@ export function StudentGrades({ initialTab }: { initialTab?: "exams" | "assessme
             <Card className="rounded-xl shadow-sm border-amber-100 dark:border-amber-950/30 bg-gradient-to-tr from-white to-amber-50/20 dark:from-background dark:to-amber-950/10">
               <CardContent className="p-5 text-center">
                 <div className="inline-flex p-3 rounded-xl bg-amber-600 dark:bg-amber-500 text-white mb-3">
-                  <Star className="h-5 w-5" />
+                  <Star className="size-5" />
                 </div>
-                <p className="text-xl sm:text-3xl font-bold text-gray-900 dark:text-gray-100">
+                <p className="text-xl sm:text-3xl font-bold text-zinc-900 dark:text-zinc-100">
                   {gradeDistribution.find(
                     (g) => g.grade === "A+" || g.grade === "A",
                   )?.count || 0}
                 </p>
-                <p className="text-xs text-gray-500 dark:text-gray-400 dark:text-gray-500 mt-1 font-medium">
+                <p className="text-xs text-zinc-500 dark:text-zinc-400 dark:text-zinc-500 mt-1 font-medium">
                   A/A+ Grades
                 </p>
                 <div className="flex items-center justify-center gap-1 mt-3">
@@ -350,10 +350,10 @@ export function StudentGrades({ initialTab }: { initialTab?: "exams" | "assessme
 
           {/* School Exams Charts */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <Card className="rounded-xl shadow-sm border-gray-200/60 dark:border-zinc-800">
+            <Card className="rounded-xl shadow-sm border-zinc-200/60 dark:border-zinc-800">
               <CardHeader className="pb-2">
                 <CardTitle className="text-base flex items-center gap-2 font-semibold">
-                  <BarChart3 className="h-4 w-4 text-violet-500" />
+                  <BarChart3 className="size-4 text-violet-500" />
                   Subject Performance
                 </CardTitle>
                 <CardDescription className="text-xs">
@@ -397,17 +397,17 @@ export function StudentGrades({ initialTab }: { initialTab?: "exams" | "assessme
                     </ChartContainer>
                   )
                 ) : (
-                  <div className="h-[260px] flex items-center justify-center text-gray-400 dark:text-gray-500 border-2 border-dashed rounded-xl border-gray-100 dark:border-zinc-800">
+                  <div className="h-[260px] flex items-center justify-center text-zinc-400 dark:text-zinc-500 border-2 border-dashed rounded-xl border-zinc-100 dark:border-zinc-800">
                     <p className="text-sm">No subject chart data available</p>
                   </div>
                 )}
               </CardContent>
             </Card>
 
-            <Card className="rounded-xl shadow-sm border-gray-200/60 dark:border-zinc-800">
+            <Card className="rounded-xl shadow-sm border-zinc-200/60 dark:border-zinc-800">
               <CardHeader className="pb-2">
                 <CardTitle className="text-base flex items-center gap-2 font-semibold">
-                  <CircleDot className="h-4 w-4 text-violet-500" />
+                  <CircleDot className="size-4 text-violet-500" />
                   Grade Distribution
                 </CardTitle>
                 <CardDescription className="text-xs">
@@ -418,11 +418,11 @@ export function StudentGrades({ initialTab }: { initialTab?: "exams" | "assessme
                 {pieData.length > 0 ? (
                   <div className="flex items-center gap-6">
                     {!recharts ? (
-                      <Skeleton className="h-[200px] w-[200px]" />
+                      <Skeleton className="size-[200px]" />
                     ) : (
                       <ChartContainer
                         config={chartConfig}
-                        className="h-[200px] w-[200px]"
+                        className="size-[200px]"
                       >
                         {(() => {
                           const { PieChart, Pie, Cell } = recharts;
@@ -456,10 +456,10 @@ export function StudentGrades({ initialTab }: { initialTab?: "exams" | "assessme
                           className="flex items-center gap-2 text-sm"
                         >
                           <div
-                            className="w-3 h-3 rounded-sm"
+                            className="size-3 rounded-sm"
                             style={{ backgroundColor: gradeColorMap[g.grade] }}
                           />
-                          <span className="text-gray-600 dark:text-gray-400 font-medium">
+                          <span className="text-zinc-600 dark:text-zinc-400 font-medium">
                             {g.grade}
                           </span>
                           <Badge variant="secondary" className="text-[10px] ml-1 font-normal">
@@ -470,7 +470,7 @@ export function StudentGrades({ initialTab }: { initialTab?: "exams" | "assessme
                     </div>
                   </div>
                 ) : (
-                  <div className="h-[200px] flex items-center justify-center text-gray-400 dark:text-gray-500 border-2 border-dashed rounded-xl border-gray-100 dark:border-zinc-800">
+                  <div className="h-[200px] flex items-center justify-center text-zinc-400 dark:text-zinc-500 border-2 border-dashed rounded-xl border-zinc-100 dark:border-zinc-800">
                     <p className="text-sm font-medium">No distribution data</p>
                   </div>
                 )}
@@ -479,10 +479,10 @@ export function StudentGrades({ initialTab }: { initialTab?: "exams" | "assessme
           </div>
 
           {/* School Exams Table */}
-          <Card className="rounded-xl shadow-sm border-gray-200/60 dark:border-zinc-800">
+          <Card className="rounded-xl shadow-sm border-zinc-200/60 dark:border-zinc-800">
             <CardHeader className="pb-3">
               <CardTitle className="text-base flex items-center gap-2 font-semibold">
-                <GraduationCap className="h-4 w-4 text-violet-500" />
+                <GraduationCap className="size-4 text-violet-500" />
                 All Exam Grades
               </CardTitle>
             </CardHeader>
@@ -492,7 +492,7 @@ export function StudentGrades({ initialTab }: { initialTab?: "exams" | "assessme
                 value={activeTab}
                 onValueChange={setActiveTab}
               >
-                <TabsList className="mb-4 bg-gray-50 dark:bg-zinc-900 p-1">
+                <TabsList className="mb-4 bg-zinc-50 dark:bg-zinc-900 p-1">
                   <TabsTrigger value="all" className="text-xs">All Exams</TabsTrigger>
                   <TabsTrigger value="midterm" className="text-xs">Midterm</TabsTrigger>
                   <TabsTrigger value="final" className="text-xs">Finals</TabsTrigger>
@@ -502,14 +502,14 @@ export function StudentGrades({ initialTab }: { initialTab?: "exams" | "assessme
                   <ScrollArea className="max-h-[500px] w-full">
                     <div className="min-w-[600px] sm:min-w-full pb-4">
                     {filteredGrades.length === 0 ? (
-                      <div className="text-center py-12 text-gray-400 dark:text-gray-500 border border-dashed rounded-xl mt-2">
-                        <GraduationCap className="h-10 w-10 mx-auto mb-2 opacity-40" />
+                      <div className="text-center py-12 text-zinc-400 dark:text-zinc-500 border border-dashed rounded-xl mt-2">
+                        <GraduationCap className="size-10 mx-auto mb-2 opacity-40" />
                         <p className="text-sm font-medium">No exam grades found</p>
                       </div>
                     ) : (
                       <Table>
                         <TableHeader>
-                          <TableRow className="border-gray-100 dark:border-zinc-800">
+                          <TableRow className="border-zinc-100 dark:border-zinc-800">
                             <TableHead className="font-semibold">Subject</TableHead>
                             <TableHead className="font-semibold">Exam Type</TableHead>
                             <TableHead className="text-center font-semibold">Marks</TableHead>
@@ -521,7 +521,7 @@ export function StudentGrades({ initialTab }: { initialTab?: "exams" | "assessme
                           {filteredGrades.map((g) => {
                             const pct = Math.round((g.marks / g.maxMarks) * 100);
                             return (
-                              <TableRow key={g.id} className="border-gray-100 dark:border-zinc-800 hover:bg-gray-50/50 dark:hover:bg-zinc-800/30">
+                              <TableRow key={g.id} className="border-zinc-100 dark:border-zinc-800 hover:bg-zinc-50/50 dark:hover:bg-zinc-800/30">
                                 <TableCell className="font-medium">
                                   {g.subjectName}
                                 </TableCell>
@@ -534,17 +534,17 @@ export function StudentGrades({ initialTab }: { initialTab?: "exams" | "assessme
                                   </Badge>
                                 </TableCell>
                                 <TableCell className="text-center">
-                                  <span className="text-sm font-semibold text-gray-800 dark:text-gray-200">
+                                  <span className="text-sm font-semibold text-zinc-800 dark:text-zinc-200">
                                     {Number(g.marks).toFixed(2).replace(/\.00$/, "")}
                                   </span>
-                                  <span className="text-xs text-gray-400">
+                                  <span className="text-xs text-zinc-400">
                                     /{g.maxMarks}
                                   </span>
                                 </TableCell>
                                 <TableCell className="text-center">
                                   <div className="flex items-center justify-center gap-2">
-                                    <Progress value={pct} className="w-16 h-1.5 bg-gray-100 dark:bg-zinc-800 [&>div]:bg-violet-500" />
-                                    <span className="text-xs font-medium text-gray-600 dark:text-gray-400">
+                                    <Progress value={pct} className="w-16 h-1.5 bg-zinc-100 dark:bg-zinc-800 [&>div]:bg-violet-500" />
+                                    <span className="text-xs font-medium text-zinc-600 dark:text-zinc-400">
                                       {pct}%
                                     </span>
                                   </div>
@@ -581,18 +581,18 @@ export function StudentGrades({ initialTab }: { initialTab?: "exams" | "assessme
         <div className="space-y-6">
           {/* Assessments Summary Cards */}
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 sm:gap-4">
-            <Card className="col-span-2 sm:col-span-1 rounded-xl shadow-sm border-indigo-100 dark:border-indigo-950/30 bg-white dark:bg-background">
+            <Card className="col-span-2 sm:col-span-1 rounded-xl shadow-sm border-violet-100 dark:border-violet-950/30 bg-white dark:bg-background">
               <CardContent className="p-3 sm:p-5 text-center">
-                <div className="inline-flex p-2 sm:p-3 rounded-xl bg-indigo-600 dark:bg-indigo-500 text-white mb-2 sm:mb-3">
-                  <TrendingUp className="h-4 w-4 sm:h-5 sm:h-5" />
+                <div className="inline-flex p-2 sm:p-3 rounded-xl bg-violet-600 dark:bg-violet-500 text-white mb-2 sm:mb-3">
+                  <TrendingUp className="size-4 sm:h-5 sm:h-5" />
                 </div>
-                <p className="text-lg sm:text-3xl font-bold text-gray-900 dark:text-gray-100">
+                <p className="text-lg sm:text-3xl font-bold text-zinc-900 dark:text-zinc-100">
                   {assessmentAvg}%
                 </p>
-                <p className="hidden sm:block text-xs text-gray-500 dark:text-gray-400 mt-1 font-medium">
+                <p className="hidden sm:block text-xs text-zinc-500 dark:text-zinc-400 mt-1 font-medium">
                   Assessment Average
                 </p>
-                <p className="sm:hidden text-[10px] text-gray-500 dark:text-gray-400 mt-1 font-medium">
+                <p className="sm:hidden text-[10px] text-zinc-500 dark:text-zinc-400 mt-1 font-medium">
                   Average
                 </p>
                 <Progress value={assessmentAvg} className="mt-2 sm:mt-3 h-1 sm:h-2" />
@@ -602,18 +602,18 @@ export function StudentGrades({ initialTab }: { initialTab?: "exams" | "assessme
             <Card className="rounded-xl shadow-sm border-blue-100 dark:border-blue-950/30 bg-white dark:bg-background">
               <CardContent className="p-3 sm:p-5 text-center">
                 <div className="inline-flex p-2 sm:p-3 rounded-xl bg-blue-600 dark:bg-blue-500 text-white mb-2 sm:mb-3">
-                  <Award className="h-4 w-4 sm:h-5 sm:h-5" />
+                  <Award className="size-4 sm:h-5 sm:h-5" />
                 </div>
-                <p className="text-lg sm:text-3xl font-bold text-gray-900 dark:text-gray-100">
+                <p className="text-lg sm:text-3xl font-bold text-zinc-900 dark:text-zinc-100">
                   {assessmentGrades.length}
                 </p>
-                <p className="hidden sm:block text-xs text-gray-500 dark:text-gray-400 mt-1 font-medium">
+                <p className="hidden sm:block text-xs text-zinc-500 dark:text-zinc-400 mt-1 font-medium">
                   Total Graded
                 </p>
-                <p className="sm:hidden text-[10px] text-gray-500 dark:text-gray-400 mt-1 font-medium">
+                <p className="sm:hidden text-[10px] text-zinc-500 dark:text-zinc-400 mt-1 font-medium">
                   Graded
                 </p>
-                <div className="flex items-center justify-center gap-1 mt-2 sm:mt-3 text-[10px] sm:text-xs text-gray-400 dark:text-gray-500 font-medium">
+                <div className="flex items-center justify-center gap-1 mt-2 sm:mt-3 text-[10px] sm:text-xs text-zinc-400 dark:text-zinc-500 font-medium">
                   <span>
                     {[...new Set(assessmentGrades.map((a) => a.subjectName))].length} subjects
                   </span>
@@ -624,15 +624,15 @@ export function StudentGrades({ initialTab }: { initialTab?: "exams" | "assessme
             <Card className="rounded-xl shadow-sm border-teal-100 dark:border-teal-950/30 bg-white dark:bg-background">
               <CardContent className="p-3 sm:p-5 text-center">
                 <div className="inline-flex p-2 sm:p-3 rounded-xl bg-teal-600 dark:bg-teal-500 text-white mb-2 sm:mb-3">
-                  <CheckCircle2 className="h-4 w-4 sm:h-5 sm:h-5" />
+                  <CheckCircle2 className="size-4 sm:h-5 sm:h-5" />
                 </div>
-                <p className="text-lg sm:text-3xl font-bold text-gray-900 dark:text-gray-100">
+                <p className="text-lg sm:text-3xl font-bold text-zinc-900 dark:text-zinc-100">
                   {assessmentGrades.filter(a => (a.marksObtained || 0) >= (a.passingMarks || 0)).length}
                 </p>
-                <p className="hidden sm:block text-xs text-gray-500 dark:text-gray-400 mt-1 font-medium">
+                <p className="hidden sm:block text-xs text-zinc-500 dark:text-zinc-400 mt-1 font-medium">
                   Subjects Passed
                 </p>
-                <p className="sm:hidden text-[10px] text-gray-500 dark:text-gray-400 mt-1 font-medium">
+                <p className="sm:hidden text-[10px] text-zinc-500 dark:text-zinc-400 mt-1 font-medium">
                   Passed
                 </p>
                 <div className="flex items-center justify-center gap-1 mt-2 sm:mt-3 text-[10px] sm:text-xs text-teal-600 dark:text-teal-400 font-semibold">
@@ -644,10 +644,10 @@ export function StudentGrades({ initialTab }: { initialTab?: "exams" | "assessme
 
           {/* Assessment Charts Row */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <Card className="rounded-xl shadow-sm border-gray-200/60 dark:border-zinc-800">
+            <Card className="rounded-xl shadow-sm border-zinc-200/60 dark:border-zinc-800">
               <CardHeader className="pb-2">
                 <CardTitle className="text-base flex items-center gap-2 font-semibold">
-                  <BarChart3 className="h-4 w-4 text-indigo-500" />
+                  <BarChart3 className="size-4 text-violet-500" />
                   Assessment Performance by Subject
                 </CardTitle>
                 <CardDescription className="text-xs">
@@ -691,17 +691,17 @@ export function StudentGrades({ initialTab }: { initialTab?: "exams" | "assessme
                     </ChartContainer>
                   )
                 ) : (
-                  <div className="h-[260px] flex items-center justify-center text-gray-400 dark:text-gray-500 border-2 border-dashed rounded-xl border-gray-100 dark:border-zinc-800">
+                  <div className="h-[260px] flex items-center justify-center text-zinc-400 dark:text-zinc-500 border-2 border-dashed rounded-xl border-zinc-100 dark:border-zinc-800">
                     <p className="text-sm">No continuous assessment data available</p>
                   </div>
                 )}
               </CardContent>
             </Card>
 
-            <Card className="rounded-xl shadow-sm border-gray-200/60 dark:border-zinc-800 flex flex-col justify-between">
+            <Card className="rounded-xl shadow-sm border-zinc-200/60 dark:border-zinc-800 flex flex-col justify-between">
               <CardHeader className="pb-2">
                 <CardTitle className="text-base flex items-center gap-2 font-semibold">
-                  <Star className="h-4 w-4 text-indigo-500" />
+                  <Star className="size-4 text-violet-500" />
                   Tips for Improvement
                 </CardTitle>
                 <CardDescription className="text-xs">
@@ -709,17 +709,17 @@ export function StudentGrades({ initialTab }: { initialTab?: "exams" | "assessme
                 </CardDescription>
               </CardHeader>
               <CardContent className="flex-1 flex flex-col justify-center py-6">
-                <div className="space-y-4 font-medium text-sm text-gray-600 dark:text-gray-300">
+                <div className="space-y-4 font-medium text-sm text-zinc-600 dark:text-zinc-300">
                   <div className="flex items-start gap-3">
-                    <div className="w-1.5 h-1.5 rounded-full bg-indigo-500 mt-1.5 shrink-0" />
+                    <div className="size-1.5 rounded-full bg-violet-500 mt-1.5 shrink-0" />
                     <p>Regular class assessments weigh directly into your overall academic profile. Don't skip assignments!</p>
                   </div>
                   <div className="flex items-start gap-3">
-                    <div className="w-1.5 h-1.5 rounded-full bg-indigo-500 mt-1.5 shrink-0" />
+                    <div className="size-1.5 rounded-full bg-violet-500 mt-1.5 shrink-0" />
                     <p>If you scored below {assessmentAvg}% in any recent unit test, consider requesting extra practice materials from your teacher.</p>
                   </div>
                   <div className="flex items-start gap-3">
-                    <div className="w-1.5 h-1.5 rounded-full bg-indigo-500 mt-1.5 shrink-0" />
+                    <div className="size-1.5 rounded-full bg-violet-500 mt-1.5 shrink-0" />
                     <p>Check teacher remarks inside the table below to find constructive feedback on individual topics.</p>
                   </div>
                 </div>
@@ -728,10 +728,10 @@ export function StudentGrades({ initialTab }: { initialTab?: "exams" | "assessme
           </div>
 
           {/* Assessment Grades Table */}
-          <Card className="rounded-xl shadow-sm border-gray-200/60 dark:border-zinc-800">
+          <Card className="rounded-xl shadow-sm border-zinc-200/60 dark:border-zinc-800">
             <CardHeader className="pb-3">
               <CardTitle className="text-base flex items-center gap-2 font-semibold">
-                <GraduationCap className="h-4 w-4 text-indigo-500" />
+                <GraduationCap className="size-4 text-violet-500" />
                 All Graded Assessments
               </CardTitle>
             </CardHeader>
@@ -739,14 +739,14 @@ export function StudentGrades({ initialTab }: { initialTab?: "exams" | "assessme
               <ScrollArea className="max-h-[500px] w-full">
                 <div className="min-w-[700px] sm:min-w-full pb-4">
                 {assessmentGrades.length === 0 ? (
-                  <div className="text-center py-12 text-gray-400 dark:text-gray-500 border border-dashed rounded-xl mt-2">
-                    <GraduationCap className="h-10 w-10 mx-auto mb-2 opacity-40" />
+                  <div className="text-center py-12 text-zinc-400 dark:text-zinc-500 border border-dashed rounded-xl mt-2">
+                    <GraduationCap className="size-10 mx-auto mb-2 opacity-40" />
                     <p className="text-sm font-medium">No assessment records graded yet</p>
                   </div>
                 ) : (
                   <Table>
                     <TableHeader>
-                      <TableRow className="border-gray-100 dark:border-zinc-800">
+                      <TableRow className="border-zinc-100 dark:border-zinc-800">
                         <TableHead className="font-semibold">Assessment Title</TableHead>
                         <TableHead className="font-semibold">Subject</TableHead>
                         <TableHead className="font-semibold">Type</TableHead>
@@ -759,8 +759,8 @@ export function StudentGrades({ initialTab }: { initialTab?: "exams" | "assessme
                       {assessmentGrades.map((g) => {
                         const isPass = g.marksObtained >= g.passingMarks;
                         return (
-                          <TableRow key={g.id} className="border-gray-100 dark:border-zinc-800 hover:bg-gray-50/50 dark:hover:bg-zinc-800/30">
-                            <TableCell className="font-semibold text-gray-900 dark:text-gray-100">
+                          <TableRow key={g.id} className="border-zinc-100 dark:border-zinc-800 hover:bg-zinc-50/50 dark:hover:bg-zinc-800/30">
+                            <TableCell className="font-semibold text-zinc-900 dark:text-zinc-100">
                               {g.title}
                             </TableCell>
                             <TableCell className="font-medium">
@@ -769,16 +769,16 @@ export function StudentGrades({ initialTab }: { initialTab?: "exams" | "assessme
                             <TableCell>
                               <Badge
                                 variant="outline"
-                                className="text-[11px] capitalize bg-gray-50 dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800 font-medium"
+                                className="text-[11px] capitalize bg-zinc-50 dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800 font-medium"
                               >
                                 {g.type.replace(/_/g, ' ')}
                               </Badge>
                             </TableCell>
                             <TableCell className="text-center">
-                              <span className="text-sm font-bold text-gray-800 dark:text-gray-100">
+                              <span className="text-sm font-bold text-zinc-800 dark:text-zinc-100">
                                 {Number(g.marksObtained).toFixed(2).replace(/\.00$/, "")}
                               </span>
-                              <span className="text-xs text-gray-400">
+                              <span className="text-xs text-zinc-400">
                                 /{g.totalMarks}
                               </span>
                             </TableCell>
@@ -793,7 +793,7 @@ export function StudentGrades({ initialTab }: { initialTab?: "exams" | "assessme
                                 {isPass ? 'PASS' : 'FAIL'}
                               </Badge>
                             </TableCell>
-                            <TableCell className="text-xs text-gray-500 dark:text-gray-400 max-w-[200px] truncate font-medium">
+                            <TableCell className="text-xs text-zinc-500 dark:text-zinc-400 max-w-[200px] truncate font-medium">
                               {g.remarks || <span className="opacity-40">—</span>}
                             </TableCell>
                           </TableRow>

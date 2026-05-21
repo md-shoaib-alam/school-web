@@ -25,10 +25,10 @@ export function PerformanceChart({ data }: PerformanceChartProps) {
   }, []);
 
   return (
-    <Card className="rounded-xl shadow-sm shadow-none border-gray-100 dark:border-gray-800">
+    <Card className="rounded-xl shadow-sm shadow-none border-zinc-100 dark:border-zinc-800">
       <CardHeader className="p-4 pb-0">
         <CardTitle className="text-sm font-semibold flex items-center gap-2 text-left">
-          <BarChart3 className="h-4 w-4 text-amber-600" />
+          <BarChart3 className="size-4 text-amber-600" />
           Performance by Subject
         </CardTitle>
         <CardDescription className="text-left">Average score percentage</CardDescription>

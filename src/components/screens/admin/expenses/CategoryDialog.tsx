@@ -42,7 +42,7 @@ export function CategoryDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogTrigger asChild>
         <Button variant="outline" className="border-rose-200 hover:bg-rose-50 dark:border-rose-800">
-          <Tag className="h-4 w-4 mr-2" />
+          <Tag className="size-4 mr-2" />
           Categories
         </Button>
       </DialogTrigger>

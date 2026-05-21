@@ -76,8 +76,8 @@ export function ParentHomework() {
     return (
       <Card className="rounded-xl shadow-sm">
         <CardContent className="p-12 text-center">
-          <Users className="h-12 w-12 mx-auto text-muted-foreground/40" />
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mt-4">No children registered</h3>
+          <Users className="size-12 mx-auto text-muted-foreground/40" />
+          <h3 className="text-lg font-semibold text-zinc-900 dark:text-zinc-100 mt-4">No children registered</h3>
           <p className="text-sm text-muted-foreground mt-1">Contact administration to link your child to this account.</p>
         </CardContent>
       </Card>
@@ -87,8 +87,8 @@ export function ParentHomework() {
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-2">
-        <BookMarked className="h-5 w-5 text-violet-600" />
-        <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100 uppercase tracking-tight">
+        <BookMarked className="size-5 text-violet-600" />
+        <h2 className="text-lg font-semibold text-zinc-900 dark:text-zinc-100 uppercase tracking-tight">
           Children&apos;s Homework
         </h2>
       </div>
@@ -99,10 +99,10 @@ export function ParentHomework() {
             <TabsTrigger
               key={child.id}
               value={child.id}
-              className="data-[state=active]:bg-white dark:data-[state=active]:bg-gray-900 data-[state=active]:text-violet-700 dark:data-[state=active]:text-violet-400 data-[state=active]:shadow-sm px-4 text-xs font-medium transition-all hover:bg-violet-100/30 dark:hover:bg-violet-900/20 hover:text-violet-800 dark:hover:text-violet-300"
+              className="data-[state=active]:bg-white dark:data-[state=active]:bg-zinc-900 data-[state=active]:text-violet-700 dark:data-[state=active]:text-violet-400 data-[state=active]:shadow-sm px-4 text-xs font-medium transition-all hover:bg-violet-100/30 dark:hover:bg-violet-900/20 hover:text-violet-800 dark:hover:text-violet-300"
             >
               <span className="flex items-center gap-2">
-                <span className="w-2 h-2 rounded-full bg-violet-400" />
+                <span className="size-2 rounded-full bg-violet-400" />
                 {child.name}
               </span>
             </TabsTrigger>
@@ -267,17 +267,17 @@ function ChildHomeworkView({ student }: { student: StudentInfo }) {
   return (
     <div className="space-y-6">
       <div className="grid grid-cols-2 lg:grid-cols-5 gap-3">
-        <HomeworkSummaryCard label="Total" count={counts.all} icon={<FileText className="h-4 w-4" />} themeColor="violet" />
-        <HomeworkSummaryCard label="Active" count={counts.active} icon={<Clock className="h-4 w-4" />} themeColor="amber" />
-        <HomeworkSummaryCard label="Submitted" count={counts.submitted} icon={<CheckCircle2 className="h-4 w-4" />} themeColor="emerald" />
-        <HomeworkSummaryCard label="Graded" count={counts.graded} icon={<Star className="h-4 w-4" />} themeColor="violet" />
-        <HomeworkSummaryCard label="Overdue" count={counts.overdue} icon={<AlertTriangle className="h-4 w-4" />} themeColor="red" />
+        <HomeworkSummaryCard label="Total" count={counts.all} icon={<FileText className="size-4" />} themeColor="violet" />
+        <HomeworkSummaryCard label="Active" count={counts.active} icon={<Clock className="size-4" />} themeColor="amber" />
+        <HomeworkSummaryCard label="Submitted" count={counts.submitted} icon={<CheckCircle2 className="size-4" />} themeColor="emerald" />
+        <HomeworkSummaryCard label="Graded" count={counts.graded} icon={<Star className="size-4" />} themeColor="violet" />
+        <HomeworkSummaryCard label="Overdue" count={counts.overdue} icon={<AlertTriangle className="size-4" />} themeColor="red" />
       </div>
 
-      <Card className="rounded-xl shadow-sm border-gray-200/60 dark:border-zinc-800">
+      <Card className="rounded-xl shadow-sm border-zinc-200/60 dark:border-zinc-800">
         <CardHeader className="pb-3 pt-5">
           <CardTitle className="text-sm font-semibold flex items-center gap-2 tracking-tight">
-            <FileText className="h-4 w-4 text-violet-500" />
+            <FileText className="size-4 text-violet-500" />
             Homework Tracker
           </CardTitle>
         </CardHeader>
@@ -294,10 +294,10 @@ function ChildHomeworkView({ student }: { student: StudentInfo }) {
             <TabsContent value={filterTab}>
               <ScrollArea className="max-h-[500px] pr-3">
                 {filteredAssignments.length === 0 ? (
-                  <div className="text-center py-16 text-gray-400 dark:text-gray-500 border-2 border-dashed border-gray-100 dark:border-zinc-800 rounded-xl">
-                    <FileText className="h-10 w-10 mx-auto mb-3 opacity-30" />
-                    <p className="text-sm font-semibold text-gray-900 dark:text-gray-100">No assignments found</p>
-                    <p className="text-xs text-gray-500 mt-1">
+                  <div className="text-center py-16 text-zinc-400 dark:text-zinc-500 border-2 border-dashed border-zinc-100 dark:border-zinc-800 rounded-xl">
+                    <FileText className="size-10 mx-auto mb-3 opacity-30" />
+                    <p className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">No assignments found</p>
+                    <p className="text-xs text-zinc-500 mt-1">
                       {filterTab === "all" ? "No homework records found for this child." : `No homework marked as ${filterTab} at this time.`}
                     </p>
                   </div>
@@ -310,19 +310,19 @@ function ChildHomeworkView({ student }: { student: StudentInfo }) {
                           a.status === "overdue" ? "border-rose-100 dark:border-rose-950/40 bg-rose-50/10" :
                           a.status === "graded" ? "border-violet-100 dark:border-violet-950/40 bg-violet-50/10" :
                           a.status === "submitted" ? "border-emerald-100 dark:border-emerald-950/40 bg-emerald-50/10" :
-                          "border-gray-100 dark:border-zinc-800"
+                          "border-zinc-100 dark:border-zinc-800"
                         }`}
                       >
                         <div className="flex items-start justify-between gap-2">
                           <div className="flex-1 min-w-0 text-left">
                             <div className="flex items-center gap-2 mb-1">
-                              <h4 className="font-semibold text-sm text-gray-900 dark:text-gray-100 truncate">{a.title}</h4>
+                              <h4 className="font-semibold text-sm text-zinc-900 dark:text-zinc-100 truncate">{a.title}</h4>
                               {getStatusBadge(a.status)}
                             </div>
                             <div className="flex flex-wrap items-center gap-2 mb-2">
                               <Badge variant="outline" className="text-[10px] bg-muted/30 border-border shadow-none font-medium">{a.subjectName}</Badge>
                               <Badge variant="outline" className="text-[10px] bg-muted/30 border-border shadow-none font-medium flex items-center gap-1">
-                                {a.mode === "online" ? <Globe className="h-2.5 w-2.5 text-sky-500" /> : <BookOpen className="h-2.5 w-2.5 text-amber-500" />}
+                                {a.mode === "online" ? <Globe className="size-2.5 text-sky-500" /> : <BookOpen className="size-2.5 text-amber-500" />}
                                 {a.mode === "online" ? "Online Submission" : "Offline Paper"}
                               </Badge>
                             </div>
@@ -337,7 +337,7 @@ function ChildHomeworkView({ student }: { student: StudentInfo }) {
 
                             <div className="flex items-center gap-4 text-xs text-muted-foreground">
                               <div className="flex items-center gap-1">
-                                <Clock className={`h-3.5 w-3.5 ${a.status === "overdue" ? "text-rose-500" : "text-muted-foreground"}`} />
+                                <Clock className={`size-3.5 ${a.status === "overdue" ? "text-rose-500" : "text-muted-foreground"}`} />
                                 <span className={a.status === "overdue" ? "text-rose-600 font-medium" : ""} suppressHydrationWarning>{a.countdown}</span>
                               </div>
                               <span suppressHydrationWarning>Due: {formatDueDate(a.dueDate)}</span>
@@ -345,10 +345,10 @@ function ChildHomeworkView({ student }: { student: StudentInfo }) {
                           </div>
                         </div>
 
-                        <div className="mt-3 pt-2 border-t border-gray-100/70 dark:border-zinc-800/60 flex flex-col gap-1">
+                        <div className="mt-3 pt-2 border-t border-zinc-100/70 dark:border-zinc-800/60 flex flex-col gap-1">
                           <div className="flex items-center justify-between text-[10px] text-muted-foreground">
                             <span>Progress Tracking</span>
-                            <span className="font-medium text-gray-700 dark:text-gray-300">{getProgressValue(a.status)}%</span>
+                            <span className="font-medium text-zinc-700 dark:text-zinc-300">{getProgressValue(a.status)}%</span>
                           </div>
                           <Progress value={getProgressValue(a.status)} className={`h-1 ${getProgressColor(a.status)}`} />
                         </div>
@@ -375,11 +375,11 @@ function HomeworkSummaryCard({ label, count, icon, themeColor }: { label: string
   };
   const theme = schemes[themeColor];
   return (
-    <Card className="rounded-xl shadow-none border-gray-200/60 dark:border-zinc-800">
+    <Card className="rounded-xl shadow-none border-zinc-200/60 dark:border-zinc-800">
       <CardContent className="p-4 text-left flex flex-col justify-between h-full">
         <div className="flex items-center justify-between">
           <div className={`p-2 rounded-lg bg-gradient-to-br ${theme.split(" ").slice(0,2).join(" ")} text-white shadow-xs`}>{icon}</div>
-          <span className="text-2xl font-black tracking-tight text-gray-900 dark:text-gray-100">{count}</span>
+          <span className="text-2xl font-black tracking-tight text-zinc-900 dark:text-zinc-100">{count}</span>
         </div>
         <p className="text-[11px] font-semibold text-muted-foreground mt-2">{label} Tasks</p>
       </CardContent>

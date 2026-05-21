@@ -40,16 +40,16 @@ function MiniStat({
   isCurrency,
 }: MiniStatProps) {
   return (
-    <Card className="border-none shadow-sm hover:shadow-md transition-shadow group overflow-hidden bg-white dark:bg-gray-800">
+    <Card className="border-none shadow-sm hover:shadow-md transition-shadow group overflow-hidden bg-white dark:bg-zinc-800">
       <CardContent className="p-4 flex items-center gap-4 relative">
-        <div className={`h-11 w-11 rounded-xl ${iconBg} ${iconColor} flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform shadow-inner`}>
+        <div className={`size-11 rounded-xl ${iconBg} ${iconColor} flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform shadow-inner`}>
           {icon}
         </div>
         <div className="min-w-0">
           <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground mb-0.5">{label}</p>
           <div className="flex items-baseline gap-1">
             <span className="text-xl font-black truncate flex items-center">
-              {isCurrency && <IndianRupee className="h-3.5 w-3.5 mr-0.5" />}
+              {isCurrency && <IndianRupee className="size-3.5 mr-0.5" />}
               {typeof value === 'number' ? value.toLocaleString() : value}
             </span>
             {sub && <span className="text-[10px] font-bold text-muted-foreground">{sub}</span>}
@@ -76,18 +76,18 @@ export function DetailHeader({
         <Button
           variant="ghost"
           size="sm"
-          className="w-fit text-muted-foreground hover:text-foreground hover:bg-gray-100 dark:hover:bg-gray-800 rounded-xl px-4 h-9 font-bold transition-all"
+          className="w-fit text-muted-foreground hover:text-foreground hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-xl px-4 h-9 font-bold transition-all"
           onClick={onBack}
         >
-          <ArrowLeft className="h-4 w-4 mr-2" />
+          <ArrowLeft className="size-4 mr-2" />
           Back to Schools
         </Button>
       </div>
 
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-2">
         <div className="flex items-center gap-5">
-          <div className="h-14 w-14 rounded-2xl bg-gradient-to-br from-rose-500 to-pink-600 text-white flex items-center justify-center shrink-0 shadow-lg shadow-rose-100 dark:shadow-none">
-            <Building2 className="h-7 w-7" />
+          <div className="size-14 rounded-2xl bg-gradient-to-br from-rose-500 to-pink-600 text-white flex items-center justify-center shrink-0 shadow-lg shadow-rose-100 dark:shadow-none">
+            <Building2 className="size-7" />
           </div>
           <div className="min-w-0">
             <h1 className="text-2xl font-semibold tracking-tight truncate leading-tight">
@@ -109,7 +109,7 @@ export function DetailHeader({
             variant="outline"
             className={`${statusCfg.bg} ${statusCfg.text} border-2 border-transparent capitalize font-black text-[10px] px-3 py-1 rounded-full flex items-center gap-1.5 shadow-sm`}
           >
-            <div className={`h-1.5 w-1.5 rounded-full ${statusCfg.text.replace('text-', 'bg-')}`} />
+            <div className={`size-1.5 rounded-full ${statusCfg.text.replace('text-', 'bg-')}`} />
             {tenant?.status || "unknown"}
           </Badge>
         </div>
@@ -117,7 +117,7 @@ export function DetailHeader({
 
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
         <MiniStat
-          icon={<GraduationCap className="h-5 w-5" />}
+          icon={<GraduationCap className="size-5" />}
           label="Students"
           value={tenant?.studentCount ?? 0}
           sub={tenant?.maxStudents ? `/${tenant.maxStudents}` : undefined}
@@ -125,7 +125,7 @@ export function DetailHeader({
           iconColor="text-rose-600"
         />
         <MiniStat
-          icon={<Users className="h-5 w-5" />}
+          icon={<Users className="size-5" />}
           label="Teachers"
           value={tenant?.teacherCount ?? 0}
           sub={tenant?.maxTeachers ? `/${tenant.maxTeachers}` : undefined}
@@ -133,7 +133,7 @@ export function DetailHeader({
           iconColor="text-blue-600"
         />
         <MiniStat
-          icon={<UserCheck className="h-5 w-5" />}
+          icon={<UserCheck className="size-5" />}
           label="Parents"
           value={tenant?.parentCount ?? 0}
           sub={tenant?.maxParents ? `/${tenant.maxParents}` : undefined}
@@ -141,7 +141,7 @@ export function DetailHeader({
           iconColor="text-emerald-600"
         />
         <MiniStat
-          icon={<School className="h-5 w-5" />}
+          icon={<School className="size-5" />}
           label="Classes"
           value={tenant?._count?.classes ?? 0}
           sub={tenant?.maxClasses ? `/${tenant.maxClasses}` : undefined}
@@ -149,7 +149,7 @@ export function DetailHeader({
           iconColor="text-purple-600"
         />
         <MiniStat
-          icon={<IndianRupee className="h-5 w-5" />}
+          icon={<IndianRupee className="size-5" />}
           label="Revenue"
           value={tenant?.totalRevenue ?? 0}
           isCurrency

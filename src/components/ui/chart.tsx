@@ -69,8 +69,8 @@ function ChartContainer({
             {children}
           </ResponsiveContainer>
         ) : (
-          <div className="w-full h-full flex items-center justify-center">
-            <div className="h-full w-full animate-pulse bg-muted rounded-lg" />
+          <div className="size-full flex items-center justify-center">
+            <div className="size-full animate-pulse bg-muted rounded-lg" />
           </div>
         )}
       </div>
@@ -225,7 +225,7 @@ function ChartTooltipContentInner({
                         className={cn(
                           "shrink-0 rounded-[2px] border-(--color-border) bg-(--color-bg)",
                           {
-                            "h-2.5 w-2.5": indicator === "dot",
+                            "size-2.5": indicator === "dot",
                             "w-1": indicator === "line",
                             "w-0 border-[1.5px] border-dashed bg-transparent":
                               indicator === "dashed",
@@ -319,7 +319,7 @@ function ChartLegendContent({
               <itemConfig.icon />
             ) : (
               <div
-                className="h-2 w-2 shrink-0 rounded-[2px]"
+                className="size-2 shrink-0 rounded-[2px]"
                 style={{
                   backgroundColor: item.color,
                 }}

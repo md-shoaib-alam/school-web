@@ -218,7 +218,7 @@ export function AdminTickets() {
           className="bg-emerald-600 hover:bg-emerald-700 text-white shadow-[0_4px_14px_rgba(16,185,129,0.35)] dark:shadow-[0_4px_14px_rgba(16,185,129,0.2)] hover:shadow-[0_6px_20px_rgba(16,185,129,0.45)] dark:hover:shadow-[0_6px_20px_rgba(16,185,129,0.3)] transition-all duration-200 cursor-pointer" 
           onClick={() => setCreateOpen(true)}
         >
-          <Plus className="h-4 w-4 mr-2" />New Ticket
+          <Plus className="size-4 mr-2" />New Ticket
         </Button>
       </div>
 

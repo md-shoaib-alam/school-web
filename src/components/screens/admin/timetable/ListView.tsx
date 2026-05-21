@@ -90,15 +90,15 @@ export function ListView({
 
                     <div className="shrink-0">
                       <Circle
-                        className={`h-2 w-2 fill-current ${isCurrent ? "text-emerald-500" : "text-transparent"}`}
+                        className={`size-2 fill-current ${isCurrent ? "text-emerald-500" : "text-transparent"}`}
                       />
                     </div>
 
-                    <ChevronRight className="h-3.5 w-3.5 shrink-0 text-muted-foreground/40" />
+                    <ChevronRight className="size-3.5 shrink-0 text-muted-foreground/40" />
 
                     {slot.label ? (
                       <div className="inline-flex items-center gap-1.5 rounded-full border px-2.5 py-0.5 text-xs font-medium shrink-0 bg-amber-100 text-amber-700 border-amber-200 dark:bg-amber-900/30 dark:text-amber-400 dark:border-amber-800">
-                         <Clock className="h-3 w-3" />
+                         <Clock className="size-3" />
                          {slot.label}
                       </div>
                     ) : (
@@ -106,7 +106,7 @@ export function ListView({
                         className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-0.5 text-xs font-medium shrink-0 ${getSubjectBadgeClass(slot.subjectName, uniqueSubjects)}`}
                       >
                         <span
-                          className={`h-1.5 w-1.5 rounded-full ${getSubjectDotClass(slot.subjectName, uniqueSubjects)}`}
+                          className={`size-1.5 rounded-full ${getSubjectDotClass(slot.subjectName, uniqueSubjects)}`}
                         />
                         {slot.subjectName}
                       </div>
@@ -127,19 +127,19 @@ export function ListView({
                         {canEdit && (
                           <button
                             onClick={() => onEditSlot(slot)}
-                            className="h-6 w-6 rounded-full flex items-center justify-center text-muted-foreground/40 hover:text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-900/20 transition-all"
+                            className="size-6 rounded-full flex items-center justify-center text-muted-foreground/40 hover:text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-900/20 transition-all"
                             title="Edit slot"
                           >
-                            <Pencil className="h-3 w-3" />
+                            <Pencil className="size-3" />
                           </button>
                         )}
                         {canDelete && (
                           <button
                             onClick={() => onDeleteSlot(slot.id)}
-                            className="h-6 w-6 rounded-full flex items-center justify-center text-muted-foreground/40 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 transition-all"
+                            className="size-6 rounded-full flex items-center justify-center text-muted-foreground/40 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 transition-all"
                             title="Delete slot"
                           >
-                            <Trash2 className="h-3 w-3" />
+                            <Trash2 className="size-3" />
                           </button>
                         )}
                       </div>
