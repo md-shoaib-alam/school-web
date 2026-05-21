@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useParams, useRouter, redirect } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { useAppStore } from "@/store/use-app-store";
 import { useTenantResolution } from "@/lib/graphql/hooks/platform.hooks";
 import dynamic from "next/dynamic";
@@ -203,19 +203,21 @@ export default function GenericSlugDispatcherClient() {
     isTenantMatch || (currentUser?.role === "super_admin" && !!resolvedTenant);
 
   // [FIX] Auto-redirection if slug mismatch
-  const correctSlug = currentUser?.role !== "super_admin" ? (currentUser?.tenantSlug || currentUser?.tenantId) : null;
-  const isSlugMismatch = correctSlug && slug !== correctSlug;
-
-  if (mounted) {
-    if (isSlugMismatch && correctSlug) {
-      redirect(`/${correctSlug}`);
+  useEffect(() => {
+    if (mounted && currentUser) {
+      const correctSlug = currentUser.role !== "super_admin" ? (currentUser.tenantSlug || currentUser.tenantId) : null;
+      if (correctSlug && slug !== correctSlug) {
+        router.replace(`/${correctSlug}`);
+        return;
+      }
+      
+      if (isTenantContext) {
+        router.replace(`/${slug}/dashboard`);
+      }
     }
-    if (isTenantContext) {
-      redirect(`/${slug}/dashboard`);
-    }
-  }
+  }, [mounted, currentUser, isTenantContext, slug, router]);
 
-  if (!mounted || !currentUser || isSlugMismatch) return <LoadingScreen />;
+  if (!mounted || !currentUser) return <LoadingScreen />;
 
   // 1. Check if it's a Platform Screen (Super Admin only)
   if (currentUser.role === "super_admin") {
@@ -255,6 +257,7 @@ export default function GenericSlugDispatcherClient() {
     }
   }
 
+  // Show loading while useEffect redirect kicks in
   if (isTenantContext) {
     return <LoadingScreen />;
   }

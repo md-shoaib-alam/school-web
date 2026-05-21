@@ -2,7 +2,6 @@
 
 import { useState, useRef } from "react";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import {
   Dialog,
   DialogContent,
@@ -13,15 +12,16 @@ import {
 } from "@/components/ui/dialog";
 import {
   Upload,
-  Download,
-  FileSpreadsheet,
-  AlertCircle,
-  CheckCircle2,
   Loader2,
 } from "lucide-react";
 import { apiFetch } from "@/lib/api";
 import { goeyToast as toast } from "goey-toast";
 import * as XLSX from "xlsx";
+
+// Sub-components
+import { FileUploadZone } from "./import/FileUploadZone";
+import { ExpectedColumnsInfo } from "./import/ExpectedColumnsInfo";
+import { ImportResultAlert } from "./import/ImportResultAlert";
 
 interface ImportExportButtonsProps {
   canCreate: boolean;
@@ -204,117 +204,24 @@ export function ImportExportButtons({
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4 py-2">
-            <div
-              className={`border-2 border-dashed rounded-lg p-8 text-center cursor-pointer transition-colors ${dragOver ? "border-emerald-500 bg-emerald-50 dark:bg-emerald-900/30" : "border-muted-foreground/25 hover:border-emerald-400 hover:bg-muted/50"}`}
-              onDragOver={(e) => {
-                e.preventDefault();
-                setDragOver(true);
-              }}
-              onDragLeave={() => setDragOver(false)}
+            <FileUploadZone 
+              dragOver={dragOver}
+              setDragOver={setDragOver}
               onDrop={handleDrop}
-              onClick={() => fileInputRef.current?.click()}
-              role="button"
-              tabIndex={0}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter' || e.key === ' ') {
-                  e.preventDefault();
-                  fileInputRef.current?.click();
-                }
+              onFileClick={() => fileInputRef.current?.click()}
+              importFile={importFile}
+              fileInputRef={fileInputRef}
+              onFileChange={handleFileChange}
+            />
+
+            <ExpectedColumnsInfo 
+              onDownloadSample={(e) => {
+                e.stopPropagation();
+                downloadSampleTemplate();
               }}
-            >
-              <input
-                ref={fileInputRef}
-                type="file"
-                accept=".xlsx,.xls,.csv"
-                className="hidden"
-                onChange={handleFileChange}
-              />
-              {importFile ? (
-                <div className="flex flex-col items-center gap-2">
-                  <FileSpreadsheet className="size-10 text-emerald-600" />
-                  <p className="text-sm font-medium text-foreground">
-                    {importFile.name}
-                  </p>
-                  <p className="text-xs text-muted-foreground">
-                    {(importFile.size / 1024).toFixed(1)} KB — Click or drop to
-                    replace
-                  </p>
-                </div>
-              ) : (
-                <div className="flex flex-col items-center gap-2">
-                  <Upload className="size-10 text-muted-foreground" />
-                  <p className="text-sm font-medium text-foreground">
-                    Drop your Excel or CSV file here or click to browse
-                  </p>
-                  <p className="text-xs text-muted-foreground">
-                    Supports .xlsx, .xls, and .csv files
-                  </p>
-                </div>
-              )}
-            </div>
+            />
 
-            <div className="rounded-lg bg-muted/50 p-4 space-y-2">
-              <p className="text-sm font-medium">Expected spreadsheet columns:</p>
-              <div className="flex flex-wrap gap-1.5">
-                {[
-                  "name",
-                  "email",
-                  "phone",
-                  "class (e.g. 10-A)",
-                  "roll_number",
-                  "gender",
-                  "date_of_birth",
-                  "blood_group",
-                  "admission_date",
-                  "transport_route",
-                  "pickup_point",
-                ].map((col) => (
-                  <Badge
-                    key={col}
-                    variant="secondary"
-                    className="text-xs font-mono"
-                  >
-                    {col}
-                  </Badge>
-                ))}
-              </div>
-              <button
-                type="button"
-                className="inline-flex items-center gap-1.5 text-sm text-emerald-600 hover:text-emerald-700 dark:text-emerald-400 hover:underline mt-1"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  downloadSampleTemplate();
-                }}
-              >
-                <Download className="size-3.5" />
-                Download Sample Template
-              </button>
-            </div>
-
-            {importResult && (
-              <div
-                className={`rounded-lg p-4 flex items-start gap-3 ${importResult.success ? "bg-emerald-50 dark:bg-emerald-900/30 border border-emerald-200 dark:border-emerald-800" : "bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-800"}`}
-              >
-                {importResult.success ? (
-                  <CheckCircle2 className="size-5 text-emerald-600 shrink-0 mt-0.5" />
-                ) : (
-                  <AlertCircle className="size-5 text-red-600 shrink-0 mt-0.5" />
-                )}
-                <div className="text-sm">
-                  <p className="font-medium">
-                    {importResult.success
-                      ? "Import completed"
-                      : "Import completed with issues"}
-                  </p>
-                  <p className="text-muted-foreground">
-                    {importResult.imported} of {importResult.total} students
-                    imported successfully
-                    {importResult.errors > 0 &&
-                      ` · ${importResult.errors} errors`}
-                  </p>
-                </div>
-              </div>
-            )}
+            <ImportResultAlert result={importResult} />
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setImportDialogOpen(false)}>
