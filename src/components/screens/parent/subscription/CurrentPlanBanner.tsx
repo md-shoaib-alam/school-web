@@ -10,6 +10,15 @@ interface CurrentPlanBannerProps {
   onCancel: (id: string) => void;
 }
 
+const formatSubscriptionDate = (dateStr?: string | null) => {
+  if (!dateStr) return "";
+  return new Date(dateStr).toLocaleDateString("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  });
+};
+
 export function CurrentPlanBanner({ subscription, onCancel }: CurrentPlanBannerProps) {
   const activeAddons: string[] = JSON.parse(subscription.addons || "[]");
 
@@ -24,10 +33,10 @@ export function CurrentPlanBanner({ subscription, onCancel }: CurrentPlanBannerP
             <p className="font-semibold text-emerald-800 dark:text-emerald-300 leading-none text-xs sm:text-base">
               Active: {subscription.planName} Plan
             </p>
-            <p className="text-[9px] sm:text-xs text-emerald-600 dark:text-emerald-400 mt-0.5 truncate">
+            <p className="text-[9px] sm:text-xs text-emerald-600 dark:text-emerald-400 mt-0.5 truncate" suppressHydrationWarning>
               {subscription.endDate
-                ? `Renews on ${new Date(subscription.endDate).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}`
-                : `Started ${new Date(subscription.startDate).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}`}
+                ? `Renews on ${formatSubscriptionDate(subscription.endDate)}`
+                : `Started ${formatSubscriptionDate(subscription.startDate)}`}
             </p>
           </div>
         </div>

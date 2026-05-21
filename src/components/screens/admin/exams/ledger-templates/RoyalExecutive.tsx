@@ -34,7 +34,7 @@ export const RoyalExecutive: React.FC<LedgerTemplateProps> = ({ data }) => {
         <div className="flex justify-center gap-12 mt-2.5 text-[10px] font-bold text-stone-600 tracking-wide font-sans">
           <div>CLASS & SECTION: <span className="text-amber-800 font-bold border-b border-stone-200 pb-0.5">{data.className} - {data.classSection}</span></div>
           <div>ACADEMIC CYCLE: <span className="text-amber-800 font-bold border-b border-stone-200 pb-0.5">{data.academicYear}</span></div>
-          <div>GEN DATE: <span className="text-amber-800 font-bold border-b border-stone-200 pb-0.5">{new Date().toLocaleDateString()}</span></div>
+          <div>GEN DATE: <span className="text-amber-800 font-bold border-b border-stone-200 pb-0.5" suppressHydrationWarning>{new Date().toLocaleDateString()}</span></div>
         </div>
       </div>
 

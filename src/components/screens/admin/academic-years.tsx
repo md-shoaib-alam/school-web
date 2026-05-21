@@ -47,6 +47,15 @@ import { goeyToast as toast } from "goey-toast";
 import { format } from "date-fns";
 import { formatLocalDate, parseLocalDate } from "@/lib/utils";
 
+function getUpcomingCount(academicYears: any[]): number {
+  const now = new Date();
+  return academicYears.filter((y: any) => new Date(y.startDate) > now).length;
+}
+
+function formatSessionDate(dateStr: string): string {
+  return format(new Date(dateStr), "MMM dd, yyyy");
+}
+
 export function AcademicYearsScreen() {
   const { 
     academicYears, 
@@ -242,8 +251,8 @@ export function AcademicYearsScreen() {
               </div>
               <div>
                 <p className="text-sm font-medium text-amber-800 dark:text-amber-300">Upcoming Sessions</p>
-                <p className="text-2xl font-bold text-amber-900 dark:text-amber-100">
-                  {academicYears.filter((y: any) => new Date(y.startDate) > new Date()).length}
+                <p className="text-2xl font-bold text-amber-900 dark:text-amber-100" suppressHydrationWarning>
+                  {getUpcomingCount(academicYears)}
                 </p>
               </div>
             </div>
@@ -290,8 +299,8 @@ export function AcademicYearsScreen() {
               academicYears.map((year: any) => (
                 <TableRow key={year.id} className="hover:bg-transparent transition-colors">
                   <TableCell className="font-medium">{year.name}</TableCell>
-                  <TableCell>{format(new Date(year.startDate), "MMM dd, yyyy")}</TableCell>
-                  <TableCell>{format(new Date(year.endDate), "MMM dd, yyyy")}</TableCell>
+                  <TableCell suppressHydrationWarning>{formatSessionDate(year.startDate)}</TableCell>
+                  <TableCell suppressHydrationWarning>{formatSessionDate(year.endDate)}</TableCell>
                   <TableCell>
                     <Badge variant={year.status === "active" ? "default" : "secondary"} className={year.status === "active" ? "bg-emerald-500 hover:bg-emerald-600" : ""}>
                       {year.status}

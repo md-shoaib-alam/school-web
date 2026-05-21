@@ -199,7 +199,7 @@ export function StaffDashboard() {
             <div className="text-sm font-medium opacity-90">
               Today&apos;s Date
             </div>
-            <div className="text-lg font-bold">
+            <div className="text-lg font-bold" suppressHydrationWarning>
               {new Date().toLocaleDateString("en-US", {
                 weekday: "short",
                 month: "short",

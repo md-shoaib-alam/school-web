@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { apiFetch } from "@/lib/api";
 import { useAppStore } from "@/store/use-app-store";
 import { useParentDashboard } from "@/lib/graphql/hooks";
@@ -26,6 +26,20 @@ export function ParentAttendance() {
   const [activeTab, setActiveTab] = useState("");
 
   const [calendarOffset, setCalendarOffset] = useState(0);
+
+  const baseDate = useMemo(() => {
+    const d = new Date();
+    d.setMonth(d.getMonth() - calendarOffset);
+    return d;
+  }, [calendarOffset]);
+
+  const periodLabel = useMemo(() => {
+    try {
+      return baseDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+    } catch (e) {
+      return "";
+    }
+  }, [baseDate]);
 
   const { data, isPending, refetch } = useParentDashboard(currentUser?.name || "");
   const students = (data?.children || []) as any[];
@@ -111,18 +125,14 @@ export function ParentAttendance() {
           const currentStats = getAttendanceStats(currentAttendance);
           const currentMonthly = getMonthlyData(currentAttendance);
           
-          // Calculate calendar window (Full Month)
-          const baseDate = new Date();
-          baseDate.setMonth(baseDate.getMonth() - calendarOffset);
           const currentCalendar = getCalendarData(currentAttendance, baseDate);
-
-          const periodLabel = baseDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
 
           return (
             <TabsContent
               key={student.id}
               value={student.id}
               className="space-y-6 mt-6 animate-in fade-in duration-300"
+              suppressHydrationWarning
             >
               <AttendanceStats 
                 percentage={currentStats.percentage}

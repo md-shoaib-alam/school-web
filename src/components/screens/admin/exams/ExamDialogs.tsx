@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
@@ -55,6 +55,16 @@ export function ExamDialogs({
   academicYears, currentAcademicYear
 }: ExamDialogsProps) {
   const hasMissingDates = bulkRows.some(row => row.selected && !row.date);
+
+  const today = useMemo(() => {
+    const d = new Date();
+    d.setHours(0, 0, 0, 0);
+    return d;
+  }, []);
+
+  const isPastDate = useMemo(() => (date: Date) => {
+    return date < today;
+  }, [today]);
 
   return (
     <>
@@ -139,7 +149,7 @@ export function ExamDialogs({
                         <TableRow key={row.subjectId} className={row.selected ? 'bg-blue-50/30' : ''}>
                           <TableCell className="px-2 sm:px-4"><Checkbox checked={row.selected} onCheckedChange={() => toggleBulkSubject(row.subjectId)} /></TableCell>
                           <TableCell className="font-medium px-2 sm:px-4 whitespace-nowrap">{row.subjectName}</TableCell>
-                          <TableCell className="px-2 sm:px-4"><DatePicker date={parseLocalDate(row.date)} onChange={(d) => updateBulkField(row.subjectId, 'date', formatLocalDate(d))} disabled={(date) => date < new Date(new Date().setHours(0, 0, 0, 0))} /></TableCell>
+                          <TableCell className="px-2 sm:px-4" suppressHydrationWarning><DatePicker date={parseLocalDate(row.date)} onChange={(d) => updateBulkField(row.subjectId, 'date', formatLocalDate(d))} disabled={isPastDate} /></TableCell>
                           <TableCell className="px-2 sm:px-4"><TimePicker value={row.startTime} onChange={(v) => updateBulkField(row.subjectId, 'startTime', v)} /></TableCell>
                           <TableCell className="px-2 sm:px-4"><TimePicker value={row.endTime} onChange={(v) => updateBulkField(row.subjectId, 'endTime', v)} /></TableCell>
                           <TableCell className="px-2 sm:px-4"><Input type="text" inputMode="numeric" pattern="[0-9]*" className="w-16 sm:w-20 h-8 text-center px-1" value={row.totalMarks} onChange={(e) => updateBulkField(row.subjectId, 'totalMarks', e.target.value)} /></TableCell>
@@ -200,9 +210,9 @@ export function ExamDialogs({
               </div>
             </div>
             <div className="grid grid-cols-2 gap-4">
-              <div className="grid gap-2">
+              <div className="grid gap-2" suppressHydrationWarning>
                 <Label>Date</Label>
-                <DatePicker date={parseLocalDate(editForm.date)} onChange={(d) => setEditForm({ ...editForm, date: formatLocalDate(d) })} disabled={(date) => date < new Date(new Date().setHours(0, 0, 0, 0))} />
+                <DatePicker date={parseLocalDate(editForm.date)} onChange={(d) => setEditForm({ ...editForm, date: formatLocalDate(d) })} disabled={isPastDate} />
               </div>
               <div className="grid gap-2">
                 <Label>Type</Label>

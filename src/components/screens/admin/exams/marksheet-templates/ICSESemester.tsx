@@ -1,5 +1,6 @@
 import React from 'react';
 import { MarksheetTemplateProps } from './types';
+import { getDeterministicId } from './mockUtils';
 
 export const ICSESemester: React.FC<MarksheetTemplateProps> = ({
   sheet,
@@ -33,7 +34,7 @@ export const ICSESemester: React.FC<MarksheetTemplateProps> = ({
           <p className="text-[8px] text-zinc-500 font-bold uppercase tracking-[2px] mt-1.5 font-sans">
             Affiliated to Council for the Indian School Certificate Examinations (CISCE), New Delhi
             <br />
-            School Code: IN-{Math.floor(100 + Math.random() * 900)}
+            School Code: IN-{getDeterministicId(sheet.schoolName + 'code', 100, 999)}
           </p>
           <p className="text-[11px] text-indigo-900 font-extrabold tracking-widest mt-2 uppercase font-serif">
             PROGRESS STATEMENT: SEMESTER TERM {marksheetType === 'midterm' ? 'I' : marksheetType === 'final' ? 'II' : 'CUMULATIVE'} ({academicYear})
@@ -48,7 +49,7 @@ export const ICSESemester: React.FC<MarksheetTemplateProps> = ({
           </div>
           <div>
             <span className="text-zinc-400 font-bold uppercase text-[7.5px] tracking-wider block mb-0.5">Unique ID / SRN</span>
-            <span className="font-bold text-slate-800 font-mono block">UID-{5000000 + Math.floor(Math.random() * 4999999)}</span>
+            <span className="font-bold text-slate-800 font-mono block">UID-{getDeterministicId(sheet.studentName + 'uid', 5000000, 9999999)}</span>
           </div>
           <div>
             <span className="text-zinc-400 font-bold uppercase text-[7.5px] tracking-wider block mb-0.5">Class & Section</span>

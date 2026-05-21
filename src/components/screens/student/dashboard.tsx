@@ -33,6 +33,29 @@ import {
   AlertCircle,
 } from "lucide-react";
 import { FullPageSkeleton } from "@/components/ui/full-page-skeleton";
+
+const formatDate = (dateStr: string) => {
+  if (!dateStr) return "";
+  return new Date(dateStr).toLocaleDateString();
+};
+
+const getSlotStatus = (startTime: string, endTime: string) => {
+  const now = new Date();
+  const [startH, startM] = startTime.split(":").map(Number);
+  const [endH, endM] = endTime.split(":").map(Number);
+  
+  const slotStart = new Date(now);
+  slotStart.setHours(startH, startM, 0, 0);
+  
+  const slotEnd = new Date(now);
+  slotEnd.setHours(endH, endM, 0, 0);
+  
+  return {
+    isCurrent: now >= slotStart && now <= slotEnd,
+    isPast: now > slotEnd
+  };
+};
+
 export function StudentDashboard() {
   const { currentUser, currentTenantName, currentTenantLogo } = useAppStore();
   const { data, isPending, fetchStatus, isError, error } = useStudentDashboard(
@@ -119,7 +142,7 @@ export function StudentDashboard() {
                 />
               </div>
               <div className="text-left">
-                <p className="text-violet-100/90 text-xs sm:text-sm font-medium mb-0.5">
+                <p className="text-violet-100/90 text-xs sm:text-sm font-medium mb-0.5" suppressHydrationWarning>
                   {getGreeting()}
                 </p>
                 <h2 className="text-xl sm:text-2xl lg:text-3xl font-semibold tracking-tight leading-tight">
@@ -132,7 +155,7 @@ export function StudentDashboard() {
                 </p>
               </div>
             </div>
-            <div className="flex items-center gap-2 bg-white/20 backdrop-blur-sm rounded-lg px-4 py-2 shrink-0 self-start sm:self-auto text-white">
+            <div className="flex items-center gap-2 bg-white/20 backdrop-blur-sm rounded-lg px-4 py-2 shrink-0 self-start sm:self-auto text-white" suppressHydrationWarning>
               <Calendar className="h-4 w-4" />
               <span className="text-sm font-medium">
                 {today.toLocaleDateString("en-US", {
@@ -215,17 +238,7 @@ export function StudentDashboard() {
               <ScrollArea className="max-h-[320px]">
                 <div className="space-y-2">
                   {todayTimetable.map((slot) => {
-                    const now = new Date();
-                    const [startH, startM] = slot.startTime
-                      .split(":")
-                      .map(Number);
-                    const [endH, endM] = slot.endTime.split(":").map(Number);
-                    const slotStart = new Date(now);
-                    slotStart.setHours(startH, startM);
-                    const slotEnd = new Date(now);
-                    slotEnd.setHours(endH, endM);
-                    const isCurrent = now >= slotStart && now <= slotEnd;
-                    const isPast = now > slotEnd;
+                    const { isCurrent, isPast } = getSlotStatus(slot.startTime, slot.endTime);
                     return (
                       <div
                         key={slot.id}
@@ -235,6 +248,7 @@ export function StudentDashboard() {
                             ? "bg-gray-50 dark:bg-gray-800/50 opacity-60"
                             : "bg-gray-50 dark:bg-gray-800/50 hover:bg-violet-50/50 dark:hover:bg-violet-900/20"
                           }`}
+                        suppressHydrationWarning
                       >
                         <div className="flex-shrink-0 w-20 text-center">
                           <p className="text-sm font-semibold text-gray-700 dark:text-gray-300">
@@ -375,9 +389,9 @@ export function StudentDashboard() {
                       <p className="text-xs text-gray-500 dark:text-gray-400 mt-1 line-clamp-2">
                         {notice.content}
                       </p>
-                      <p className="text-[10px] text-gray-400 dark:text-gray-500 mt-2">
+                      <p className="text-[10px] text-gray-400 dark:text-gray-500 mt-2" suppressHydrationWarning>
                         {notice.authorName} •{" "}
-                        {new Date(notice.createdAt).toLocaleDateString()}
+                        {formatDate(notice.createdAt)}
                       </p>
                     </div>
                     <ChevronRight className="h-4 w-4 text-gray-300 dark:text-gray-600 flex-shrink-0 mt-1" />

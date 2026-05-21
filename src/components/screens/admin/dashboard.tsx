@@ -77,6 +77,26 @@ const priorityBorders: Record<string, string> = {
   urgent: "border-l-red-500",
 };
 
+function getGreeting() {
+  const hours = new Date().getHours();
+  if (hours < 12) return "Good Morning";
+  if (hours < 17) return "Good Afternoon";
+  return "Good Evening";
+}
+
+function getDaysRemaining(endDate?: string | null) {
+  if (!endDate) return null;
+  const expiry = new Date(endDate);
+  const now = new Date();
+  expiry.setHours(0, 0, 0, 0);
+  now.setHours(0, 0, 0, 0);
+  return differenceInDays(expiry, now);
+}
+
+function formatNoticeDate(createdAt: string | Date) {
+  return new Date(createdAt).toLocaleDateString();
+}
+
 function StatCardSkeleton() {
   return (
     <BoneyardSkeleton name="boneyard-card" loading={true} color="rgba(0,0,0,0.06)" darkColor="rgba(255,255,255,0.05)" animate="pulse">
@@ -142,19 +162,12 @@ export function AdminDashboard() {
   // Only show full skeleton if we have NO data at all
   const loading = isLoading && !dashboardData;
 
-  const today = new Date();
-  const greeting =
-    today.getHours() < 12
-      ? "Good Morning"
-      : today.getHours() < 17
-        ? "Good Afternoon"
-        : "Good Evening";
+  const greeting = getGreeting();
 
   // Subscription Check
   const { data: tenantDetail } = useTenantDetail(tenantId || "");
   const tenant = tenantDetail?.tenant;
-  const expiry = tenant?.endDate ? new Date(tenant.endDate) : null;
-  const daysRemaining = expiry ? differenceInDays(expiry, new Date()) : null;
+  const daysRemaining = getDaysRemaining(tenant?.endDate);
   const isExpiringSoon = daysRemaining !== null && daysRemaining >= 0 && daysRemaining <= 3;
   const isExpired = daysRemaining !== null && daysRemaining < 0;
 
@@ -208,7 +221,7 @@ export function AdminDashboard() {
               />
             </div>
             <div>
-              <h2 className="text-2xl font-semibold tracking-tight">
+              <h2 className="text-2xl font-semibold tracking-tight" suppressHydrationWarning>
                 {greeting}, {currentUser?.name || "Admin"}!
               </h2>
               <p className="text-teal-100 text-sm">
@@ -458,7 +471,7 @@ export function AdminDashboard() {
                       <div className="flex items-center gap-2 mt-2 text-[11px] text-muted-foreground">
                         <span>{notice.authorName}</span>
                         <span>•</span>
-                        <span>{new Date(notice.createdAt).toLocaleDateString()}</span>
+                        <span suppressHydrationWarning>{formatNoticeDate(notice.createdAt)}</span>
                       </div>
                     </div>
                   ))

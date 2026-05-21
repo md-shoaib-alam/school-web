@@ -26,6 +26,14 @@ interface FeeTableProps {
   isPremium?: boolean;
 }
 
+const formatDate = (dateStr: string) => {
+  try {
+    return new Date(dateStr).toLocaleDateString();
+  } catch (e) {
+    return dateStr;
+  }
+};
+
 export function FeeTable({ studentName, fees, onPay, isPremium }: FeeTableProps) {
   const router = useRouter();
   const params = useParams();
@@ -103,8 +111,8 @@ export function FeeTable({ studentName, fees, onPay, isPremium }: FeeTableProps)
                       <TableCell className="hidden sm:table-cell text-sm font-medium text-left">
                         ₹{fee.amount.toLocaleString()}
                       </TableCell>
-                      <TableCell className="hidden md:table-cell text-sm text-muted-foreground text-left">
-                        {new Date(fee.dueDate).toLocaleDateString()}
+                      <TableCell className="hidden md:table-cell text-sm text-muted-foreground text-left" suppressHydrationWarning>
+                        {formatDate(fee.dueDate)}
                       </TableCell>
                       <TableCell className="hidden md:table-cell text-sm text-left">
                         <span className={fee.paidAmount > 0 ? "text-emerald-600 dark:text-emerald-400 font-medium" : "text-muted-foreground"}>

@@ -163,6 +163,20 @@ export function AdminAttendance() {
     },
   ];
 
+  const isDatePickerDisabled = (date: Date) => {
+    const now = new Date();
+    now.setHours(0, 0, 0, 0);
+    if (date > now) return true; // Lock future dates
+
+    let daysAllowed = 7;
+    if (plan === 'standard') daysAllowed = 14;
+    if (isPremiumOrEnterprise) daysAllowed = 28;
+
+    const cutoff = new Date(now);
+    cutoff.setDate(cutoff.getDate() - daysAllowed);
+    return date < cutoff;
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -174,7 +188,7 @@ export function AdminAttendance() {
             Class-wise attendance tracking and insights
           </p>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-3" suppressHydrationWarning>
           <Select
             value={selectedClass}
             onValueChange={(val) => {
@@ -203,19 +217,7 @@ export function AdminAttendance() {
             </SelectContent>
           </Select>
           <DatePicker
-            disabled={(date) => {
-              const now = new Date();
-              now.setHours(0, 0, 0, 0);
-              if (date > now) return true; // Lock future dates
-
-              let daysAllowed = 7;
-              if (plan === 'standard') daysAllowed = 14;
-              if (isPremiumOrEnterprise) daysAllowed = 28;
-
-              const cutoff = new Date(now);
-              cutoff.setDate(cutoff.getDate() - daysAllowed);
-              return date < cutoff;
-            }}
+            disabled={isDatePickerDisabled}
             date={!isHistoryMode && selectedDate ? parseISO(selectedDate) : undefined}
             onChange={(d) => {
               setIsHistoryMode(false);
@@ -395,7 +397,7 @@ export function AdminAttendance() {
                           </Badge>
                         </TableCell>
                         {isHistoryMode && (
-                          <TableCell className="font-medium w-[150px]">
+                          <TableCell className="font-medium w-[150px]" suppressHydrationWarning>
                             {new Date(record.date).toLocaleDateString('en-US', {
                               month: 'short',
                               day: 'numeric',
@@ -413,7 +415,7 @@ export function AdminAttendance() {
                             </span>
                           </Badge>
                         </TableCell>
-                        <TableCell className="text-gray-500 text-sm w-[120px]">
+                        <TableCell className="text-gray-500 text-sm w-[120px]" suppressHydrationWarning>
                           {record.createdAt
                             ? new Date(record.createdAt).toLocaleTimeString([], {
                                 hour: "2-digit",

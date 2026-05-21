@@ -42,6 +42,9 @@ export function CalendarDialogs({
   deleting,
   handleConfirmDelete,
 }: CalendarDialogsProps) {
+  const startDateVal = form.date ? new Date(form.date + "T00:00:00") : undefined;
+  const endDateVal = form.endDate ? new Date(form.endDate + "T00:00:00") : undefined;
+
   return (
     <>
       <Dialog open={dialogOpen} onOpenChange={closeDialog}>
@@ -66,11 +69,11 @@ export function CalendarDialogs({
               />
             </div>
 
-             <div className="grid grid-cols-2 gap-4">
+             <div className="grid grid-cols-2 gap-4" suppressHydrationWarning>
                 <div className="space-y-2">
                   <Label className="text-xs font-semibold tracking-tight text-slate-600 dark:text-slate-300">Start Date</Label>
                  <DatePicker 
-                   date={form.date ? new Date(form.date + "T00:00:00") : undefined} 
+                   date={startDateVal} 
                    onChange={(d) => updateForm("date", d ? formatDateISO(d) : "")}
                    className="h-10 text-sm w-full"
                  />
@@ -78,7 +81,7 @@ export function CalendarDialogs({
                 <div className="space-y-2">
                   <Label className="text-xs font-semibold tracking-tight text-slate-600 dark:text-slate-300">End Date</Label>
                  <DatePicker 
-                   date={form.endDate ? new Date(form.endDate + "T00:00:00") : undefined} 
+                   date={endDateVal} 
                    onChange={(d) => updateForm("endDate", d ? formatDateISO(d) : "")}
                    className="h-10 text-sm w-full"
                    placeholder="Optional"

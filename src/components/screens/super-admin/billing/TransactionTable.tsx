@@ -24,6 +24,22 @@ import { useSubscriptions } from "@/lib/graphql/hooks";
 
 type DateRangeOption = 'today' | 'yesterday' | 'week' | 'all';
 
+const formatTxDate = (dateStr: string) => {
+  try {
+    return format(new Date(dateStr), "dd MMM yyyy");
+  } catch (e) {
+    return dateStr;
+  }
+};
+
+const formatTxTime = (dateStr: string) => {
+  try {
+    return format(new Date(dateStr), "HH:mm");
+  } catch (e) {
+    return "";
+  }
+};
+
 export function TransactionTable() {
   const [page, setPage] = useState(1);
   const [dateRange, setDateRange] = useState<DateRangeOption>('all');
@@ -170,14 +186,14 @@ export function TransactionTable() {
                           <span className="hidden md:inline">{meth.label}</span>
                         </div>
                       </TableCell>
-                      <TableCell className="text-right">
+                      <TableCell className="text-right" suppressHydrationWarning>
                         <div className="flex flex-col items-end">
                           <div className="text-sm font-bold text-foreground">
-                            {format(new Date(sub.createdAt), "dd MMM yyyy")}
+                            {formatTxDate(sub.createdAt)}
                           </div>
                           <div className="text-[10px] text-muted-foreground font-medium flex items-center gap-1">
                             <CalendarDays className="h-3 w-3" />
-                            {format(new Date(sub.createdAt), "HH:mm")}
+                            {formatTxTime(sub.createdAt)}
                           </div>
                         </div>
                       </TableCell>

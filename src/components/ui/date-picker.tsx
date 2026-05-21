@@ -36,7 +36,7 @@ export function DatePicker({ date, onChange, placeholder = 'Pick a date', classN
           )}
         >
           <CalendarIcon className="h-3.5 w-3.5 text-muted-foreground opacity-70" />
-          <span className="text-[11px] font-medium truncate">
+          <span className="text-[11px] font-medium truncate" suppressHydrationWarning>
             {date ? format(date, "PP") : placeholder}
           </span>
         </Button>

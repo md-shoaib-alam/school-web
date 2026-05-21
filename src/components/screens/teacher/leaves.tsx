@@ -344,6 +344,7 @@ export function TeacherLeaves() {
                     <Button
                       variant="outline"
                       className="w-full justify-start text-left font-normal"
+                      suppressHydrationWarning
                     >
                       <CalendarDays className="mr-2 h-4 w-4" />
                       {form.startDate ? format(form.startDate, 'MMM dd, yyyy') : 'Pick a date'}
@@ -369,6 +370,7 @@ export function TeacherLeaves() {
                     <Button
                       variant="outline"
                       className="w-full justify-start text-left font-normal"
+                      suppressHydrationWarning
                     >
                       <CalendarDays className="mr-2 h-4 w-4" />
                       {form.endDate ? format(form.endDate, 'MMM dd, yyyy') : 'Pick a date'}

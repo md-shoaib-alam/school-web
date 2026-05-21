@@ -24,6 +24,47 @@ import {
   AlertCircle,
 } from "lucide-react";
 import { FullPageSkeleton } from "@/components/ui/full-page-skeleton";
+const getGreeting = () => {
+  try {
+    const hour = new Date().getHours();
+    if (hour < 12) return "Good Morning";
+    if (hour < 17) return "Good Afternoon";
+    return "Good Evening";
+  } catch (e) {
+    return "Welcome";
+  }
+};
+
+const formatTime = (time: string) => {
+  try {
+    const [hours, minutes] = time.split(":");
+    const h = parseInt(hours);
+    const ampm = h >= 12 ? "PM" : "AM";
+    return `${h % 12 || 12}:${minutes} ${ampm}`;
+  } catch (e) {
+    return time;
+  }
+};
+
+const formatDate = (dateStr: string) => {
+  try {
+    return new Date(dateStr).toLocaleDateString("en-US", {
+      month: "short",
+      day: "numeric",
+    });
+  } catch (e) {
+    return dateStr;
+  }
+};
+
+const getIsOverdue = (dueDate: string) => {
+  try {
+    return new Date(dueDate) < new Date();
+  } catch (e) {
+    return false;
+  }
+};
+
 export function TeacherDashboard() {
   const router = useRouter();
   const { currentUser, currentTenantSlug, currentTenantId, setCurrentScreen } = useAppStore();
@@ -57,27 +98,6 @@ export function TeacherDashboard() {
   const todaySchedule = data?.todaySchedule ?? [];
   const todayAttendance = data?.todayAttendance ?? { present: 0, total: 0 };
   const assignments = data?.recentAssignments ?? [];
-
-  const getGreeting = () => {
-    const hour = new Date().getHours();
-    if (hour < 12) return "Good Morning";
-    if (hour < 17) return "Good Afternoon";
-    return "Good Evening";
-  };
-
-  const formatTime = (time: string) => {
-    const [hours, minutes] = time.split(":");
-    const h = parseInt(hours);
-    const ampm = h >= 12 ? "PM" : "AM";
-    return `${h % 12 || 12}:${minutes} ${ampm}`;
-  };
-
-  const formatDate = (dateStr: string) => {
-    return new Date(dateStr).toLocaleDateString("en-US", {
-      month: "short",
-      day: "numeric",
-    });
-  };
 
   if (isActuallyLoading) {
     return <FullPageSkeleton />;

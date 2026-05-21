@@ -220,7 +220,7 @@ export function TableCells({ activeTab, item }: { activeTab: TabType; item: any 
               {f.status}
             </Badge>
           </TableCell>
-          <TableCell className={`${cellClasses} text-right text-xs font-bold text-muted-foreground`}>
+          <TableCell className={`${cellClasses} text-right text-xs font-bold text-muted-foreground`} suppressHydrationWarning>
             {format(new Date(f.dueDate), "dd MMM yyyy")}
           </TableCell>
         </>
@@ -241,7 +241,7 @@ export function TableCells({ activeTab, item }: { activeTab: TabType; item: any 
           <TableCell className={cellClasses}>
             <Badge variant="secondary" className="text-[10px] font-bold border-none">{a.className}</Badge>
           </TableCell>
-          <TableCell className={cellClasses}>
+          <TableCell className={cellClasses} suppressHydrationWarning>
             <div className="flex items-center gap-2 text-xs font-bold text-muted-foreground">
               <Clock className="h-3.5 w-3.5" />
               {format(new Date(a.date), "dd MMM yyyy")}
@@ -278,7 +278,7 @@ export function TableCells({ activeTab, item }: { activeTab: TabType; item: any 
               {n.priority}
             </Badge>
           </TableCell>
-          <TableCell className={`${cellClasses} text-right text-xs font-bold text-muted-foreground`}>
+          <TableCell className={`${cellClasses} text-right text-xs font-bold text-muted-foreground`} suppressHydrationWarning>
             {(() => {
               try {
                 const date = new Date(n.createdAt);

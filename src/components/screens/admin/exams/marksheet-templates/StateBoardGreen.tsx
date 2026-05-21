@@ -1,5 +1,6 @@
 import React from 'react';
 import { MarksheetTemplateProps } from './types';
+import { getDeterministicId } from './mockUtils';
 
 export const StateBoardGreen: React.FC<MarksheetTemplateProps> = ({
   sheet,
@@ -50,7 +51,7 @@ export const StateBoardGreen: React.FC<MarksheetTemplateProps> = ({
           </div>
           <div className="col-span-6 flex">
             <span className="text-emerald-900 font-bold text-[8.5px] w-28 shrink-0">SCHOLASTIC NO (SNo):</span>
-            <span className="font-bold text-slate-800 font-mono">SNo-{Math.floor(10000 + Math.random() * 89999)}</span>
+            <span className="font-bold text-slate-800 font-mono">SNo-{getDeterministicId(sheet.studentName + 'scholastic', 10000, 99999)}</span>
           </div>
           <div className="col-span-6 flex">
             <span className="text-emerald-900 font-bold text-[8.5px] w-28 shrink-0">NAME OF STUDENT:</span>
@@ -66,7 +67,7 @@ export const StateBoardGreen: React.FC<MarksheetTemplateProps> = ({
           </div>
           <div className="col-span-6 flex">
             <span className="text-emerald-900 font-bold text-[8.5px] w-28 shrink-0">BOARD REGISTRATION:</span>
-            <span className="font-bold text-slate-800 font-mono">BRN-2026-{100 + Math.floor(Math.random() * 899)}</span>
+            <span className="font-bold text-slate-800 font-mono">BRN-2026-{getDeterministicId(sheet.studentName + 'board', 100, 999)}</span>
           </div>
         </div>
 

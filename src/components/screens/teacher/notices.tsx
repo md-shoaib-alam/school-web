@@ -114,7 +114,7 @@ export function TeacherNotices() {
                     <p className="text-sm font-medium text-gray-900 dark:text-gray-100 truncate">
                       {n.title}
                     </p>
-                    <span className="text-[10px] text-gray-400 dark:text-gray-500 ml-3 shrink-0">
+                    <span className="text-[10px] text-gray-400 dark:text-gray-500 ml-3 shrink-0" suppressHydrationWarning>
                       {new Date(n.createdAt).toLocaleDateString("en-US", {
                         month: "short",
                         day: "numeric",
@@ -184,7 +184,7 @@ export function TeacherNotices() {
                           : notice.targetRole}
                       </span>
                     </div>
-                    <span className="flex items-center gap-1">
+                    <span className="flex items-center gap-1" suppressHydrationWarning>
                       <Clock className="h-3 w-3" />
                       {new Date(notice.createdAt).toLocaleDateString("en-US", {
                         month: "short",

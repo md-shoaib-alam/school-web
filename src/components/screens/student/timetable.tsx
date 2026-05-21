@@ -85,7 +85,17 @@ function getNow(): { timeStr: string; dayKey: string } {
 /* ─── Component ─── */
 
 export function StudentTimetable() {
-  const { currentUser } = useAppStore();
+  const todayDateString = useMemo(() => {
+    try {
+      return new Date().toLocaleDateString("en-US", {
+        month: "long",
+        day: "numeric",
+        year: "numeric",
+      });
+    } catch (e) {
+      return "";
+    }
+  }, []);
 
   const [viewMode, setViewMode] = useState<ViewMode>("grid");
   const [selectedDay, setSelectedDay] = useState(
@@ -267,12 +277,8 @@ export function StudentTimetable() {
               <p className="text-sm font-medium text-gray-900 dark:text-gray-100">
                 {todayKey ? DAY_FULL_LABELS[todayKey] : "Weekend"}
               </p>
-              <p className="text-xs text-gray-500 dark:text-gray-400 dark:text-gray-500 dark:text-gray-400">
-                {new Date().toLocaleDateString("en-US", {
-                  month: "long",
-                  day: "numeric",
-                  year: "numeric",
-                })}
+              <p className="text-xs text-gray-500 dark:text-gray-400 dark:text-gray-500 dark:text-gray-400" suppressHydrationWarning>
+                {todayDateString}
               </p>
             </div>
           </CardContent>

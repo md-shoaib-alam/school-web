@@ -31,6 +31,14 @@ interface RoleTableProps {
   onDelete: (id: string) => void;
 }
 
+const formatDate = (dateStr: string) => {
+  try {
+    return new Date(dateStr).toLocaleDateString();
+  } catch (e) {
+    return dateStr;
+  }
+};
+
 export function RoleTable({ roles, onEdit, onAssign, onDelete }: RoleTableProps) {
   return (
     <div className="rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-950 overflow-hidden shadow-sm">
@@ -89,8 +97,8 @@ export function RoleTable({ roles, onEdit, onAssign, onDelete }: RoleTableProps)
                     {permCount} modules
                   </div>
                 </TableCell>
-                <TableCell className="text-xs text-gray-500">
-                  {new Date(role.createdAt).toLocaleDateString()}
+                <TableCell className="text-xs text-gray-500" suppressHydrationWarning>
+                  {formatDate(role.createdAt)}
                 </TableCell>
                 <TableCell className="text-right">
                   <div className="flex justify-end gap-1">

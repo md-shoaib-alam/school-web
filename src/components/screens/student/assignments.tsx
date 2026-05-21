@@ -46,6 +46,15 @@ interface EnrichedAssignment extends AssignmentInfo {
   feedback: string | null;
 }
 
+const formatAssignmentDate = (dateStr: string) => {
+  if (!dateStr) return "";
+  return new Date(dateStr).toLocaleDateString("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  });
+};
+
 export function StudentAssignments() {
   const { currentUser } = useAppStore();
   const [loading, setLoading] = useState(true);
@@ -451,7 +460,7 @@ export function StudentAssignments() {
                               )}
 
                             <div className="flex items-center gap-4">
-                              <div className="flex items-center gap-1.5">
+                              <div className="flex items-center gap-1.5" suppressHydrationWarning>
                                 <Clock
                                   className={`h-3.5 w-3.5 ${getCountdownColor(assignment.status)}`}
                                 />
@@ -461,15 +470,8 @@ export function StudentAssignments() {
                                   {assignment.countdown}
                                 </span>
                               </div>
-                              <span className="text-[10px] text-gray-400 dark:text-gray-500 dark:text-gray-400">
-                                Due:{" "}
-                                {new Date(
-                                  assignment.dueDate,
-                                ).toLocaleDateString("en-US", {
-                                  month: "short",
-                                  day: "numeric",
-                                  year: "numeric",
-                                })}
+                              <span className="text-[10px] text-gray-400 dark:text-gray-500 dark:text-gray-400" suppressHydrationWarning>
+                                Due: {formatAssignmentDate(assignment.dueDate)}
                               </span>
                             </div>
                           </div>

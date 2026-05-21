@@ -23,6 +23,14 @@ interface PromotionsTableProps {
   openRejectDialog: (promotion: PromotionRecord) => void;
 }
 
+const formatDate = (dateStr: string) => {
+  try {
+    return new Date(dateStr).toLocaleDateString();
+  } catch (e) {
+    return dateStr;
+  }
+};
+
 export function PromotionsTable({
   promotions,
   loading,
@@ -130,8 +138,8 @@ export function PromotionsTable({
                           <span className="ml-1">{config.label}</span>
                         </Badge>
                       </TableCell>
-                      <TableCell className="hidden lg:table-cell text-sm text-muted-foreground">
-                        {new Date(promo.createdAt).toLocaleDateString()}
+                      <TableCell className="hidden lg:table-cell text-sm text-muted-foreground" suppressHydrationWarning>
+                        {formatDate(promo.createdAt)}
                       </TableCell>
                       <TableCell className="text-center">
                         {promo.status === "pending" ? (

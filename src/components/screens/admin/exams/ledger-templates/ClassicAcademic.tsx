@@ -28,7 +28,7 @@ export const ClassicAcademic: React.FC<LedgerTemplateProps> = ({ data }) => {
         <div className="flex justify-center gap-10 mt-2 text-[10px] font-semibold text-slate-600">
           <div>CLASS: <span className="text-slate-900 font-bold">{data.className} - {data.classSection}</span></div>
           <div>ACADEMIC YEAR: <span className="text-slate-900 font-bold">{data.academicYear}</span></div>
-          <div>DATE GENERATED: <span className="text-slate-900 font-bold">{new Date().toLocaleDateString()}</span></div>
+          <div>DATE GENERATED: <span className="text-slate-900 font-bold" suppressHydrationWarning>{new Date().toLocaleDateString()}</span></div>
         </div>
       </div>
 

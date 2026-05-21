@@ -51,6 +51,16 @@ const ACTION_COLORS: Record<string, string> = {
   UPDATE_SUBSCRIPTION: "bg-amber-50 text-amber-700 border-amber-100",
 };
 
+const formatLogDate = (dateStr: string) => {
+  if (!dateStr) return "";
+  return format(new Date(dateStr), "dd MMM, yyyy");
+};
+
+const formatLogTime = (dateStr: string) => {
+  if (!dateStr) return "";
+  return format(new Date(dateStr), "HH:mm");
+};
+
 export function ActivityLogs({ loading, data }: ActivityLogsProps) {
   return (
     <Card className="border-none shadow-sm bg-white dark:bg-gray-800 overflow-hidden">
@@ -105,14 +115,14 @@ export function ActivityLogs({ loading, data }: ActivityLogsProps) {
                         {log.metadata ? JSON.stringify(log.metadata) : "System operation"}
                       </p>
                     </TableCell>
-                    <TableCell className="text-right py-4 pr-6">
+                    <TableCell className="text-right py-4 pr-6" suppressHydrationWarning>
                       <div className="flex flex-col items-end">
                         <span className="text-xs font-black text-gray-900 dark:text-gray-100">
-                          {format(new Date(log.createdAt), "dd MMM, yyyy")}
+                          {formatLogDate(log.createdAt)}
                         </span>
                         <span className="text-[10px] font-bold text-muted-foreground flex items-center gap-1">
                           <Clock className="h-2.5 w-2.5" />
-                          {format(new Date(log.createdAt), "HH:mm")}
+                          {formatLogTime(log.createdAt)}
                         </span>
                       </div>
                     </TableCell>

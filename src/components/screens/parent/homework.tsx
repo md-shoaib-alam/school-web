@@ -123,6 +123,14 @@ export function ParentHomework() {
   );
 }
 
+const formatDueDate = (dueDate: string) => {
+  try {
+    return new Date(dueDate).toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" });
+  } catch (e) {
+    return dueDate;
+  }
+};
+
 /* ─── Child Homework View ─── */
 function ChildHomeworkView({ student }: { student: StudentInfo }) {
   const [loading, setLoading] = useState(true);
@@ -330,9 +338,9 @@ function ChildHomeworkView({ student }: { student: StudentInfo }) {
                             <div className="flex items-center gap-4 text-xs text-muted-foreground">
                               <div className="flex items-center gap-1">
                                 <Clock className={`h-3.5 w-3.5 ${a.status === "overdue" ? "text-rose-500" : "text-muted-foreground"}`} />
-                                <span className={a.status === "overdue" ? "text-rose-600 font-medium" : ""}>{a.countdown}</span>
+                                <span className={a.status === "overdue" ? "text-rose-600 font-medium" : ""} suppressHydrationWarning>{a.countdown}</span>
                               </div>
-                              <span>Due: {new Date(a.dueDate).toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" })}</span>
+                              <span suppressHydrationWarning>Due: {formatDueDate(a.dueDate)}</span>
                             </div>
                           </div>
                         </div>

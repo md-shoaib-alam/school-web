@@ -78,6 +78,12 @@ export function StudentLeaves() {
 
   const currentUserId = currentUser?.id;
 
+  const isPastDate = (date: Date) => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    return date < today;
+  };
+
   const fetchMyLeaves = useCallback(async () => {
     if (!currentUserId) return;
     setLoading(true);
@@ -344,6 +350,7 @@ export function StudentLeaves() {
                     <Button
                       variant="outline"
                       className="w-full justify-start text-left font-normal"
+                      suppressHydrationWarning
                     >
                       <CalendarDays className="mr-2 h-4 w-4" />
                       {form.startDate ? format(form.startDate, 'MMM dd, yyyy') : 'Pick a date'}
@@ -356,7 +363,7 @@ export function StudentLeaves() {
                       onSelect={(date) => {
                         if (date) setForm({ ...form, startDate: date });
                       }}
-                      disabled={(date) => date < new Date(new Date().setHours(0, 0, 0, 0))}
+                      disabled={isPastDate}
                       initialFocus
                     />
                   </PopoverContent>
@@ -369,6 +376,7 @@ export function StudentLeaves() {
                     <Button
                       variant="outline"
                       className="w-full justify-start text-left font-normal"
+                      suppressHydrationWarning
                     >
                       <CalendarDays className="mr-2 h-4 w-4" />
                       {form.endDate ? format(form.endDate, 'MMM dd, yyyy') : 'Pick a date'}

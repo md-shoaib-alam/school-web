@@ -592,7 +592,7 @@ export function AdminTimetable() {
           if (sourcePeriods.length === 0) return;
           const copied = sourcePeriods.map((slot) => ({
             ...slot,
-            id: crypto.randomUUID(),
+            id: typeof window !== "undefined" ? window.crypto.randomUUID() : "",
             day: tar,
           }));
           setDaySlots((prev) => ({
@@ -609,7 +609,7 @@ export function AdminTimetable() {
             if (day === src) return;
             const copied = sourcePeriods.map((slot) => ({
               ...slot,
-              id: crypto.randomUUID(),
+              id: typeof window !== "undefined" ? window.crypto.randomUUID() : "",
               day,
             }));
             updated[day] = copied;
