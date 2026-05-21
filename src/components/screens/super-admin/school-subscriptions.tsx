@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { 
   useTenants, 
   useUpdateTenant 
@@ -41,8 +41,11 @@ import {
   AlertCircle,
   Clock,
   ArrowUpCircle,
-  Settings2
+  Settings2,
+  ChevronLeft,
+  ChevronRight
 } from "lucide-react";
+import { cn } from "@/lib/utils";
 import { format } from "date-fns";
 import { goeyToast as toast } from "goey-toast";
 import { DatePicker } from "@/components/ui/date-picker";
@@ -55,6 +58,11 @@ export function SuperAdminSchoolSubscriptions() {
   const [currentPage, setCurrentPage] = useState(1);
   const [editingTenant, setEditingTenant] = useState<any>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+
+  // Reset page when search changes
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [search]);
 
   const { data: tenantsData, isLoading, refetch } = useTenants({
     search: search || undefined,
@@ -244,6 +252,96 @@ export function SuperAdminSchoolSubscriptions() {
             )}
           </TableBody>
         </Table>
+        {!isLoading && tenantsData && tenantsData.totalPages > 1 && (
+          <div className="flex flex-col sm:flex-row items-center justify-between px-6 py-4 bg-gray-50/50 dark:bg-gray-900/20 border-t gap-4">
+            <div className="flex items-center gap-4 order-2 sm:order-1">
+              <p className="text-sm text-muted-foreground">
+                Showing{" "}
+                <span className="font-semibold text-indigo-600 dark:text-indigo-400">
+                  {(currentPage - 1) * ITEMS_PER_PAGE + 1}
+                </span>{" "}
+                to{" "}
+                <span className="font-semibold text-indigo-600 dark:text-indigo-400">
+                  {Math.min(currentPage * ITEMS_PER_PAGE, tenantsData.total)}
+                </span>{" "}
+                of{" "}
+                <span className="font-semibold text-gray-900 dark:text-gray-100">
+                  {tenantsData.total}
+                </span>{" "}
+                entries
+              </p>
+              <div className="flex items-center gap-2">
+                <span className="text-xs text-muted-foreground whitespace-nowrap">
+                  Rows per page: {ITEMS_PER_PAGE}
+                </span>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-1 order-1 sm:order-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setCurrentPage(currentPage - 1)}
+                disabled={currentPage === 1}
+                className="h-8 w-8 p-0"
+              >
+                <ChevronLeft className="h-4 w-4" />
+              </Button>
+
+              <div className="flex items-center gap-1 mx-1">
+                {Array.from({ length: tenantsData.totalPages }, (_, i) => i + 1).map(
+                  (pageNum) => {
+                    if (
+                      pageNum === 1 ||
+                      pageNum === tenantsData.totalPages ||
+                      (pageNum >= currentPage - 1 && pageNum <= currentPage + 1)
+                    ) {
+                      return (
+                        <Button
+                          key={pageNum}
+                          variant={currentPage === pageNum ? "default" : "outline"}
+                          size="sm"
+                          className={cn(
+                            "h-8 w-8 p-0 text-xs",
+                            currentPage === pageNum
+                              ? "bg-indigo-600 hover:bg-indigo-700 shadow-sm"
+                              : "hover:bg-indigo-50",
+                          )}
+                          onClick={() => setCurrentPage(pageNum)}
+                        >
+                          {pageNum}
+                        </Button>
+                      );
+                    }
+
+                    if (pageNum === 2 || pageNum === tenantsData.totalPages - 1) {
+                      return (
+                        <span
+                          key={pageNum}
+                          className="px-1 text-muted-foreground text-xs"
+                        >
+                          ...
+                        </span>
+                      );
+                    }
+
+                    return null;
+                  },
+                )}
+              </div>
+
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setCurrentPage(currentPage + 1)}
+                disabled={currentPage === tenantsData.totalPages}
+                className="h-8 w-8 p-0"
+              >
+                <ChevronRight className="h-4 w-4" />
+              </Button>
+            </div>
+          </div>
+        )}
       </Card>
 
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
