@@ -8,6 +8,14 @@ export const StateBoardGreen: React.FC<MarksheetTemplateProps> = ({
   academicYear,
   marksheetType,
 }) => {
+  const getStateBoardGrade = (pct: number) => {
+    if (pct >= 75) return 'A+';
+    if (pct >= 60) return 'A';
+    if (pct >= 50) return 'B';
+    if (pct >= 35) return 'C';
+    return 'D';
+  };
+
   return (
     <div 
       className="relative bg-white text-slate-800 px-9 py-8 border-[5px] border-emerald-700 rounded overflow-hidden select-none flex flex-col justify-between shrink-0 text-left h-[1123px] w-[794px] box-border font-sans"
@@ -84,7 +92,7 @@ export const StateBoardGreen: React.FC<MarksheetTemplateProps> = ({
                     <td className="px-3 py-2.5 text-center font-black font-mono text-emerald-800">{sub.obtained}</td>
                     <td className="px-3 py-2.5 text-center">
                       <span className="font-black text-emerald-800 font-mono text-[10px]">
-                        {sheet.grade}
+                        {getStateBoardGrade(sub.percentage)}
                       </span>
                     </td>
                   </tr>

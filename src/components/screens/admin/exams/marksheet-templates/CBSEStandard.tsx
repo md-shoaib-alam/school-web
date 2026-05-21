@@ -21,6 +21,17 @@ export const CBSEStandard: React.FC<MarksheetTemplateProps> = ({
     { area: 'Respect for Rules & Values', grade: 'A' },
   ];
 
+  const getCBSEGrade = (pct: number) => {
+    if (pct >= 91) return 'A1';
+    if (pct >= 81) return 'A2';
+    if (pct >= 71) return 'B1';
+    if (pct >= 61) return 'B2';
+    if (pct >= 51) return 'C1';
+    if (pct >= 41) return 'C2';
+    if (pct >= 33) return 'D';
+    return 'E';
+  };
+
   return (
     <div 
       className="relative bg-white text-slate-900 px-9 py-8 border-[5px] border-emerald-800 rounded overflow-hidden select-none flex flex-col justify-between shrink-0 text-left h-[1123px] w-[794px] box-border font-sans"
@@ -38,7 +49,7 @@ export const CBSEStandard: React.FC<MarksheetTemplateProps> = ({
             <h2 className="font-extrabold text-xl text-emerald-900 leading-none tracking-wide uppercase">
               {sheet.schoolName.toUpperCase()}
             </h2>
-            <p className="text-[8px] text-zinc-500 font-bold uppercase tracking-widest mt-1">
+            <p className="text-[8px] text-zinc-500 font-bold uppercase tracking-widest mt-1.5">
               Affiliated to Central Board of Secondary Education (CBSE), New Delhi
             </p>
             <p className="text-[10px] text-emerald-800 font-bold tracking-wider mt-1 uppercase">
@@ -52,7 +63,7 @@ export const CBSEStandard: React.FC<MarksheetTemplateProps> = ({
         </div>
 
         {/* Indian / CBSE Student Info Matrix */}
-        <div className="grid grid-cols-12 gap-y-2.5 gap-x-4 text-xs border border-zinc-200 p-3 rounded-lg bg-zinc-50/50">
+        <div className="grid grid-cols-12 gap-y-2.5 gap-x-4 text-xs border border-zinc-200 p-3 rounded-lg bg-zinc-55/30">
           <div className="col-span-6 flex">
             <span className="text-zinc-500 font-bold uppercase text-[8.5px] w-32 shrink-0">Student's Name:</span>
             <span className="font-bold text-zinc-900 truncate">{sheet.studentName}</span>
@@ -104,7 +115,7 @@ export const CBSEStandard: React.FC<MarksheetTemplateProps> = ({
                     <td className="px-3 py-2 text-center font-black font-mono text-emerald-800">{sub.obtained}</td>
                     <td className="px-3 py-2 text-center">
                       <span className="font-black text-emerald-900 bg-emerald-50 border border-emerald-250 px-2 py-0.5 rounded text-[10px]">
-                        {sheet.grade}
+                        {getCBSEGrade(sub.percentage)}
                       </span>
                     </td>
                   </tr>

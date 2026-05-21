@@ -8,6 +8,15 @@ export const ICSESemester: React.FC<MarksheetTemplateProps> = ({
   academicYear,
   marksheetType,
 }) => {
+  const getICSEGrade = (pct: number) => {
+    if (pct >= 90) return 'A';
+    if (pct >= 80) return 'B';
+    if (pct >= 70) return 'C';
+    if (pct >= 60) return 'D';
+    if (pct >= 40) return 'E';
+    return 'F';
+  };
+
   return (
     <div 
       className="relative bg-white text-[#1e293b] px-10 py-10 border-[6px] border-double border-indigo-900 rounded overflow-hidden select-none flex flex-col justify-between shrink-0 text-left h-[1123px] w-[794px] box-border font-serif"
@@ -84,7 +93,7 @@ export const ICSESemester: React.FC<MarksheetTemplateProps> = ({
                     <td className="px-3 py-2.5 text-center font-black font-mono text-indigo-950">{sub.obtained}</td>
                     <td className="px-3 py-2.5 text-center">
                       <span className="font-black text-indigo-950 font-sans text-[10px]">
-                        {sheet.grade}
+                        {getICSEGrade(sub.percentage)}
                       </span>
                     </td>
                   </tr>

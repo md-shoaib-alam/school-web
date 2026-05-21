@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo, useEffect, useRef } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { 
@@ -13,7 +13,6 @@ import { api, apiFetch } from '@/lib/api';
 import { goeyToast as toast } from 'goey-toast';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { useReactToPrint } from 'react-to-print';
 
 import dynamic from 'next/dynamic';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -26,9 +25,9 @@ import {
   ExamRecord, ExamFormData, StudentResultRow, 
   ClassOption, SubjectOption, StudentOption 
 } from './exams/types';
-import { compileTabularLedgerData, TabularLedgerPrint, LedgerData } from './exams/tabulationLedgerPrinter';
 import { ActiveExamsView } from './exams/ActiveExamsView';
 import { PublishedResultsView } from './exams/PublishedResultsView';
+import { TabulationLedgerPreviewPage } from './exams/TabulationLedgerPreviewPage';
 
 const statusConfig: Record<string, { bg: string; label: string }> = {
   scheduled: { bg: 'bg-blue-100 text-blue-700 border-blue-200 dark:bg-blue-900/30 dark:text-blue-400 dark:border-blue-800', label: 'Scheduled' },
@@ -131,40 +130,30 @@ export function AdminExams({ initialTab = 'exams' }: { initialTab?: string }) {
   const [bulkOverrides, setBulkOverrides] = useState<Record<string, Partial<ExamFormData>>>({});
   const [resultsClassId, setResultsClassId] = useState<string>('');
   
-  const [printingLedgerClassId, setPrintingLedgerClassId] = useState<string | null>(null);
-  const [ledgerData, setLedgerData] = useState<LedgerData | null>(null);
-  const [ledgerOrientation, setLedgerOrientation] = useState<'landscape' | 'portrait'>('landscape');
-  const printRef = useRef<HTMLDivElement>(null);
+  const [printingLedgerClassId] = useState<string | null>(null);
 
-  const handlePrint = useReactToPrint({
-    contentRef: printRef,
-    documentTitle: ledgerData ? `Tabulation_Ledger_${ledgerData.className}_${ledgerData.classSection}` : 'Tabulation_Ledger',
-    onAfterPrint: () => {
-      setPrintingLedgerClassId(null);
-      setLedgerData(null);
-    },
-  });
+  const [previewingLedgerClass, setPreviewingLedgerClass] = useState<{
+    id: string;
+    name: string;
+    section: string;
+    templateId: string;
+    examName?: string;
+  } | null>(null);
 
-  useEffect(() => {
-    if (ledgerData && printRef.current) {
-      handlePrint();
-    }
-  }, [ledgerData, handlePrint]);
-
-  const handlePrintTabularLedger = async (classId: string, className: string, classSection: string, orientation: 'landscape' | 'portrait' = 'landscape') => {
-    setPrintingLedgerClassId(classId);
-    setLedgerOrientation(orientation);
-    const compiled = await compileTabularLedgerData({
-      classId,
-      className,
-      classSection,
-      academicYear: publishedAcademicYearFilter || currentAcademicYear,
+  const handlePrintTabularLedger = async (
+    classId: string, 
+    className: string, 
+    classSection: string, 
+    templateId: string = 'classic',
+    examName?: string
+  ) => {
+    setPreviewingLedgerClass({
+      id: classId,
+      name: className,
+      section: classSection,
+      templateId,
+      examName
     });
-    if (compiled) {
-      setLedgerData(compiled);
-    } else {
-      setPrintingLedgerClassId(null);
-    }
   };
 
   // Queries
@@ -280,8 +269,12 @@ export function AdminExams({ initialTab = 'exams' }: { initialTab?: string }) {
     setDeleting(false);
   };
 
-  const openResultsEntry = async (exam: ExamRecord) => {
+  const openResultsEntry = async (exam: ExamRecord | null) => {
     setSelectedExam(exam);
+    if (!exam) {
+      setResultRows([]);
+      return;
+    }
     setResultsClassId(exam.classId);
     if (activeTab !== 'results') {
       router.push(`/${slug}/results-entry`);
@@ -307,6 +300,12 @@ export function AdminExams({ initialTab = 'exams' }: { initialTab?: string }) {
       }));
     } catch { toast.error('Failed to load results'); }
     setLoadingStudents(false);
+  };
+
+  const handleResultsClassChange = (classId: string) => {
+    setResultsClassId(classId);
+    setSelectedExam(null);
+    setResultRows([]);
   };
 
   const handleOpenViewResults = async (exam: ExamRecord) => {
@@ -500,7 +499,7 @@ export function AdminExams({ initialTab = 'exams' }: { initialTab?: string }) {
             exams={resultsExamsData?.data || []} 
             classes={metadata?.classes || []} 
             resultsClassId={resultsClassId}
-            onResultsClassChange={setResultsClassId}
+            onResultsClassChange={handleResultsClassChange}
             resultRows={resultRows}
             loadingStudents={loadingStudents} savingResults={savingResults}
             onBack={backToExams} onSelectExam={openResultsEntry}
@@ -512,28 +511,40 @@ export function AdminExams({ initialTab = 'exams' }: { initialTab?: string }) {
         </TabsContent>
 
         <TabsContent value="published" className="space-y-6">
-          <PublishedResultsView
-            exams={exams}
-            classes={classes}
-            academicYears={academicYears}
-            currentAcademicYear={currentAcademicYear}
-            publishedAcademicYearFilter={publishedAcademicYearFilter}
-            setPublishedAcademicYearFilter={setPublishedAcademicYearFilter}
-            publishedClassFilter={publishedClassFilter}
-            setPublishedClassFilter={setPublishedClassFilter}
-            printingLedgerClassId={printingLedgerClassId}
-            handlePrintTabularLedger={handlePrintTabularLedger}
-            loadingExams={loadingExams}
-            deleting={deleting}
-            handleDelete={handleDelete}
-            setEditForm={setEditForm}
-            setEditOpen={setEditOpen}
-            handleOpenViewResults={handleOpenViewResults}
-            formatDate={formatDate}
-            formatTime={formatTime}
-            getStatusBadge={getStatusBadge}
-            getExamTypeBadge={getExamTypeBadge}
-          />
+          {previewingLedgerClass ? (
+            <TabulationLedgerPreviewPage
+              classId={previewingLedgerClass.id}
+              classNameStr={previewingLedgerClass.name}
+              classSection={previewingLedgerClass.section}
+              academicYear={publishedAcademicYearFilter || currentAcademicYear}
+              initialTemplateId={previewingLedgerClass.templateId}
+              examName={previewingLedgerClass.examName}
+              onBack={() => setPreviewingLedgerClass(null)}
+            />
+          ) : (
+            <PublishedResultsView
+              exams={exams}
+              classes={classes}
+              academicYears={academicYears}
+              currentAcademicYear={currentAcademicYear}
+              publishedAcademicYearFilter={publishedAcademicYearFilter}
+              setPublishedAcademicYearFilter={setPublishedAcademicYearFilter}
+              publishedClassFilter={publishedClassFilter}
+              setPublishedClassFilter={setPublishedClassFilter}
+              printingLedgerClassId={printingLedgerClassId}
+              handlePrintTabularLedger={handlePrintTabularLedger}
+              loadingExams={loadingExams}
+              deleting={deleting}
+              handleDelete={handleDelete}
+              setEditForm={setEditForm}
+              setEditOpen={setEditOpen}
+              handleOpenViewResults={handleOpenViewResults}
+              formatDate={formatDate}
+              formatTime={formatTime}
+              getStatusBadge={getStatusBadge}
+              getExamTypeBadge={getExamTypeBadge}
+            />
+          )}
         </TabsContent>
       </Tabs>
 
@@ -557,13 +568,6 @@ export function AdminExams({ initialTab = 'exams' }: { initialTab?: string }) {
         formatDate={formatDate}
         formatTime={formatTime}
       />
-
-      {/* Hidden batch print container for react-to-print */}
-      {ledgerData && (
-        <div className="hidden">
-          <TabularLedgerPrint data={ledgerData} ref={printRef} />
-        </div>
-      )}
 
     </div>
   );
