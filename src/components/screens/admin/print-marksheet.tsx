@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo, useEffect, Suspense } from 'react';
 import { Card } from '@/components/ui/card';
 import { 
   FileText, Trophy, ChevronDown, Award
@@ -13,8 +13,11 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { useAcademicYears } from '@/hooks/use-academic-years';
 import { MarksheetPreviewPage } from './exams/MarksheetPreviewPage';
 import { ExamRecord } from './exams/types';
+import { FullPageSkeleton } from "@/components/ui/full-page-skeleton";
 
-export function AdminPrintMarksheet() {
+const LoadingScreen = () => <FullPageSkeleton />;
+
+export function AdminPrintMarksheetContent() {
   const router = useRouter();
   const { slug } = useParams();
   const searchParams = useSearchParams();
@@ -263,5 +266,13 @@ export function AdminPrintMarksheet() {
         </div>
       )}
     </div>
+  );
+}
+
+export function AdminPrintMarksheet() {
+  return (
+    <Suspense fallback={<LoadingScreen />}>
+      <AdminPrintMarksheetContent />
+    </Suspense>
   );
 }

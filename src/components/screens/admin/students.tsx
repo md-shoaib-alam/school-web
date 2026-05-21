@@ -21,6 +21,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { queryKeys } from "@/lib/graphql/keys";
 import { useDebounce } from "@/hooks/use-debounce";
 import { useSearchParams } from "next/navigation";
+import { Suspense } from "react";
 
 // Sub-components
 import { StudentTable } from "./students/StudentTable";
@@ -48,7 +49,7 @@ const emptyFormData: StudentFormData = {
   pickupPoint: "",
 };
 
-export function AdminStudents() {
+function AdminStudentsContent() {
   const { currentTenantId } = useAppStore();
   const { canCreate, canEdit, canDelete } = useModulePermissions("students");
 
@@ -340,5 +341,13 @@ export function AdminStudents() {
         onSubmit={handleSubmit}
       />
     </div>
+  );
+}
+
+export function AdminStudents() {
+  return (
+    <Suspense fallback={<StudentSkeleton />}>
+      <AdminStudentsContent />
+    </Suspense>
   );
 }

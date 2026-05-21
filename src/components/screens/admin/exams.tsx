@@ -2,6 +2,7 @@
 
 import { Tabs, TabsContent } from '@/components/ui/tabs';
 import dynamic from 'next/dynamic';
+import { Suspense } from 'react';
 import { 
   TabLoadingSkeleton, 
   formatDate, 
@@ -24,7 +25,7 @@ const ResultsView = dynamic(() => import('./exams/ResultsView').then(m => m.Resu
   loading: () => <TabLoadingSkeleton />
 });
 
-export function AdminExams({ initialTab = 'exams' }: { initialTab?: string }) {
+function AdminExamsContent({ initialTab = 'exams' }: { initialTab?: string }) {
   const state = useExamsState(initialTab);
 
   return (
@@ -153,5 +154,13 @@ export function AdminExams({ initialTab = 'exams' }: { initialTab?: string }) {
       />
 
     </div>
+  );
+}
+
+export function AdminExams(props: { initialTab?: string }) {
+  return (
+    <Suspense fallback={<TabLoadingSkeleton />}>
+      <AdminExamsContent {...props} />
+    </Suspense>
   );
 }
