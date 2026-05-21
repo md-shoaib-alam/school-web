@@ -457,6 +457,14 @@ export function SetFeesTab({ canCreate, canEdit, canDelete }: SetFeesTabProps) {
                       key={student.id}
                       className={cn('flex items-center gap-3 px-3 py-2.5 border-b last:border-b-0 cursor-pointer transition-colors hover:bg-zinc-50 dark:hover:bg-zinc-900/50', selectedStudents.has(student.id) && 'bg-emerald-50 dark:bg-emerald-900/20')}
                       onClick={() => { if (!student.isPaid) toggleStudent(student.id); }}
+                      role="button"
+                      tabIndex={0}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                          e.preventDefault();
+                          if (!student.isPaid) toggleStudent(student.id);
+                        }
+                      }}
                     >
                       <Checkbox checked={selectedStudents.has(student.id)} disabled={student.isPaid} className={selectedStudents.has(student.id) ? 'data-[state=checked]:bg-emerald-600 data-[state=checked]:border-emerald-600' : ''} />
                       <div className="flex-1 min-w-0">

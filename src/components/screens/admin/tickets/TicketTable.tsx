@@ -189,6 +189,14 @@ export function TicketTable({ tickets, loading, onOpenDetail }: TicketTableProps
             key={ticket.id}
             className="p-4 space-y-3 cursor-pointer hover:bg-zinc-50/50 dark:hover:bg-zinc-900/50 transition-colors"
             onClick={() => onOpenDetail(ticket.id)}
+            role="button"
+            tabIndex={0}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                onOpenDetail(ticket.id);
+              }
+            }}
           >
             <div className="flex items-start justify-between gap-2">
               <div className="min-w-0 flex-1">

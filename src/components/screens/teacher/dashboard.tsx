@@ -463,6 +463,14 @@ export function TeacherDashboard() {
                 key={cls.id}
                 className="p-4 rounded-xl border border-zinc-100 dark:border-zinc-800 hover:border-blue-200 dark:hover:border-blue-800 hover:shadow-sm transition-all cursor-pointer"
                 onClick={() => navigateTo("my-classes")}
+                role="button"
+                tabIndex={0}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    navigateTo("my-classes");
+                  }
+                }}
               >
                 <div className="flex items-center gap-3">
                   <div className="size-10 rounded-xl bg-blue-50 dark:bg-blue-900/30 flex items-center justify-center">
