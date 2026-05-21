@@ -16,10 +16,8 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { 
-  BarChart, 
-  Bar, 
-  XAxis, 
-  YAxis, 
+  PieChart, 
+  Pie, 
   Cell 
 } from "recharts";
 import {
@@ -109,28 +107,56 @@ export function TopPerformance({ loading, data }: TopPerformanceProps) {
           {loading ? (
             <Skeleton className="h-[280px] w-full rounded-2xl" />
           ) : (
-            <ChartContainer config={planChartConfig} className="h-[280px] w-full">
-              <BarChart data={data?.planDistribution} layout="vertical" margin={{ left: 15, right: 20 }}>
-                {/* Removed grid lines for simplified look */}
-                <XAxis type="number" hide />
-                 <YAxis
-                  dataKey="plan"
-                  type="category"
-                  tickLine={false}
-                  axisLine={false}
-                  fontSize={11}
-                  fontWeight={600}
-                  tick={{ fill: "#64748b" }}
-                  width={60}
-                />
-                <ChartTooltip content={<ChartTooltipContent className="rounded-xl border-none shadow-xl" />} />
-                <Bar dataKey="count" radius={[0, 8, 8, 0]} barSize={24}>
-                  {data?.planDistribution.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={PLAN_COLORS[entry.plan.toLowerCase()] || "#10b981"} />
-                  ))}
-                </Bar>
-              </BarChart>
-            </ChartContainer>
+            <div className="relative flex flex-col items-center">
+              <ChartContainer config={planChartConfig} className="h-[210px] w-full">
+                <PieChart>
+                  <ChartTooltip content={<ChartTooltipContent className="rounded-xl border-none shadow-xl" />} />
+                  <Pie
+                    data={data?.planDistribution}
+                    dataKey="count"
+                    nameKey="plan"
+                    cx="50%"
+                    cy="50%"
+                    innerRadius={65}
+                    outerRadius={90}
+                    paddingAngle={4}
+                  >
+                    {data?.planDistribution.map((entry, index) => (
+                      <Cell 
+                        key={`cell-${index}`} 
+                        fill={PLAN_COLORS[entry.plan.toLowerCase()] || "#10b981"} 
+                        className="stroke-white dark:stroke-gray-800 stroke-2 hover:opacity-90 transition-opacity"
+                      />
+                    ))}
+                  </Pie>
+                </PieChart>
+              </ChartContainer>
+
+              {/* Total indicator in center of donut */}
+              <div className="absolute top-[105px] left-1/2 -translate-x-1/2 -translate-y-1/2 flex flex-col items-center justify-center pointer-events-none">
+                <span className="text-3xl font-black text-gray-900 dark:text-gray-100">
+                  {data?.planDistribution.reduce((acc, curr) => acc + curr.count, 0) || 0}
+                </span>
+                <span className="text-[10px] uppercase font-bold tracking-wider text-muted-foreground">
+                  Schools
+                </span>
+              </div>
+
+              {/* Custom styled color-wise Legend */}
+              <div className="flex flex-wrap items-center justify-center gap-x-5 gap-y-2 mt-4 px-2">
+                {data?.planDistribution.map((entry) => {
+                  const color = PLAN_COLORS[entry.plan.toLowerCase()] || "#10b981";
+                  return (
+                    <div key={entry.plan} className="flex items-center gap-1.5 hover:opacity-80 transition-opacity cursor-pointer">
+                      <div className="w-2.5 h-2.5 rounded-full shrink-0 animate-pulse" style={{ backgroundColor: color }} />
+                      <span className="text-xs font-semibold capitalize text-gray-700 dark:text-gray-300">
+                        {entry.plan}: <span className="font-bold text-gray-900 dark:text-gray-100">{entry.count}</span>
+                      </span>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
           )}
         </CardContent>
       </Card>
