@@ -177,6 +177,14 @@ export function PublishedResultsView({
                       <div 
                         onClick={() => setExpandedClasses(prev => ({ ...prev, [c.id]: !prev[c.id] }))}
                         className={`py-2.5 px-4 flex items-center justify-between cursor-pointer hover:bg-accent/40 transition-colors select-none ${isExpanded ? 'bg-emerald-50/30 dark:bg-emerald-950/10' : ''}`}
+                        role="button"
+                        tabIndex={0}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter' || e.key === ' ') {
+                            e.preventDefault();
+                            setExpandedClasses(prev => ({ ...prev, [c.id]: !prev[c.id] }));
+                          }
+                        }}
                       >
                         <div className="flex items-center gap-3">
                           <div className={`p-2 rounded-lg transition-all duration-300 ${isExpanded ? 'bg-emerald-600 text-white shadow-md shadow-emerald-500/20' : 'bg-emerald-50 dark:bg-emerald-950/50 text-emerald-600 dark:text-emerald-400'}`}>

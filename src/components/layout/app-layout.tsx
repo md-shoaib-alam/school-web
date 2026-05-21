@@ -215,6 +215,15 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
           <div
             className="fixed inset-0 bg-black/50 z-40 lg:hidden"
             onClick={() => setSidebarOpen(false)}
+            role="button"
+            aria-label="Close sidebar"
+            tabIndex={0}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                setSidebarOpen(false);
+              }
+            }}
           />
         )}
 

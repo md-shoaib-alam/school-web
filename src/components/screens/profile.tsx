@@ -214,6 +214,14 @@ export function UserProfileScreen() {
             onClick={handleOpenEdit}
             className="relative group cursor-pointer shrink-0"
             title="Click to edit profile"
+            role="button"
+            tabIndex={0}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                handleOpenEdit();
+              }
+            }}
           >
             <Avatar className="size-24 border-4 border-white/30 shadow-2xl transition-all duration-300 group-hover:scale-105 group-hover:border-white/50">
               <AvatarImage src={currentUser.avatar} alt={currentUser.name} className="object-cover animate-in fade-in" />

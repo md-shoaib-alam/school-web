@@ -276,7 +276,19 @@ export function MakePaymentTab({ canCreate }: MakePaymentTabProps) {
               ) : (
                 <div className="divide-y">
                   {pendingFees.map(fee => (
-                    <div key={fee.id} className="flex items-center gap-3 p-3 hover:bg-emerald-50/50 dark:hover:bg-emerald-900/20 transition-colors cursor-pointer" onClick={() => toggleFee(fee.id)}>
+                    <div 
+                      key={fee.id} 
+                      className="flex items-center gap-3 p-3 hover:bg-emerald-50/50 dark:hover:bg-emerald-900/20 transition-colors cursor-pointer" 
+                      onClick={() => toggleFee(fee.id)}
+                      role="button"
+                      tabIndex={0}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                          e.preventDefault();
+                          toggleFee(fee.id);
+                        }
+                      }}
+                    >
                       <Checkbox checked={selectedFeeIds.has(fee.id)} />
                       <div className="flex-1 min-w-0">
                         <p className="font-medium text-sm">{fee.feeCategoryName || fee.type}</p>
