@@ -150,7 +150,7 @@ export function SuperAdminSettings() {
             <Settings className="h-6 w-6" />
           </div>
           <div>
-            <h1 className="text-2xl font-bold tracking-tight">Platform Settings</h1>
+            <h1 className="text-2xl font-semibold tracking-tight">Platform Settings</h1>
             <p className="text-teal-50 text-sm opacity-90">
               Configure global platform branding, regional standards, and maintenance states
             </p>

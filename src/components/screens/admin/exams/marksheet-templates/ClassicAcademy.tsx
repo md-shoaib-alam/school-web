@@ -47,7 +47,7 @@ export const ClassicAcademy: React.FC<MarksheetTemplateProps> = ({
 
         {/* Title Box */}
         <div className="text-center">
-          <h4 className="inline-block text-[11px] font-black uppercase text-[#1e3a8a] tracking-widest border border-[#1e3a8a] border-x-[4px] py-1.5 px-6 rounded bg-blue-50/50 font-sans">
+          <h4 className="inline-block text-[11px] font-semibold uppercase text-[#1e3a8a] tracking-widest border border-[#1e3a8a] border-x-[4px] py-1.5 px-6 rounded bg-blue-50/50 font-sans">
             {marksheetType === 'midterm' ? 'Midterm Marksheet' : marksheetType === 'final' ? 'Final Marksheet' : 'Consolidated Report Card'}
           </h4>
         </div>
@@ -124,7 +124,7 @@ export const ClassicAcademy: React.FC<MarksheetTemplateProps> = ({
         {/* Remarks & Statistics */}
         <div className="grid grid-cols-12 gap-5 font-sans">
           <div className="col-span-7 border border-gray-200 border-l-[4px] border-l-[#d4af37] rounded p-4 bg-zinc-50/40 text-xs">
-            <h5 className="font-extrabold text-[9px] uppercase tracking-wider text-[#1e3a8a] mb-1.5">Evaluation & Principal Remarks</h5>
+            <h5 className="font-semibold text-[9px] uppercase tracking-wider text-[#1e3a8a] mb-1.5">Evaluation & Principal Remarks</h5>
             <p className="italic text-zinc-600 font-medium leading-relaxed">
               "{sheet.remarks}" The student has demonstrated {sheet.status === 'pass' ? 'satisfactory academic standards.' : 'need for core learning reinforcements.'}
             </p>

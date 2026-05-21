@@ -111,7 +111,7 @@ export function LogTable({
     <div className="space-y-6">
       {/* Page Title Header */}
       <div className="px-1">
-        <h1 className="text-2xl font-bold tracking-tight text-gray-900 dark:text-gray-100">Audit Logs</h1>
+        <h1 className="text-2xl font-semibold tracking-tight text-gray-900 dark:text-gray-100">Audit Logs</h1>
         <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
           Monitor any changes made to your project, schema and content with audit logs.
         </p>

@@ -23,7 +23,7 @@ export const ClassicAcademic: React.FC<LedgerTemplateProps> = ({ data }) => {
 
       {/* Header */}
       <div className="text-center mb-4 border-b-2 border-slate-200 pb-3">
-        <h1 className="font-bold text-xl tracking-wider text-slate-900 uppercase font-serif">{data.schoolName}</h1>
+        <h1 className="font-semibold text-xl tracking-wider text-slate-900 uppercase font-serif">{data.schoolName}</h1>
         <h2 className="text-xs font-semibold text-slate-500 uppercase tracking-widest mt-0.5">{data.ledgerTitle}</h2>
         <div className="flex justify-center gap-10 mt-2 text-[10px] font-semibold text-slate-600">
           <div>CLASS: <span className="text-slate-900 font-bold">{data.className} - {data.classSection}</span></div>

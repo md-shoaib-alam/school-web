@@ -17,7 +17,7 @@ export function RoleHeader({ onCreateRole }: RoleHeaderProps) {
             <Shield className="h-7 w-7 text-teal-200" />
           </div>
           <div>
-            <h2 className="text-2xl font-bold tracking-tight">Platform Roles & Permissions</h2>
+            <h2 className="text-2xl font-semibold tracking-tight">Platform Roles & Permissions</h2>
             <p className="text-teal-100 text-sm mt-0.5 opacity-90">
               Define granular access control and assign roles to platform staff
             </p>

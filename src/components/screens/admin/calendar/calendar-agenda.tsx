@@ -75,7 +75,7 @@ export function CalendarAgenda({
       <div className="bg-white dark:bg-neutral-900/40 border border-slate-200/60 dark:border-white/[0.06] shadow-sm rounded-2xl p-5 sm:p-6 flex flex-col overflow-hidden">
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-2">
-            <h3 className="text-base font-bold text-slate-900 dark:text-white tracking-tight">
+            <h3 className="text-base font-semibold text-slate-900 dark:text-white tracking-tight">
               {isViewingToday ? "Today's Events" : "Selected Day"}
             </h3>
             {selectedDate && !isViewingToday && (
@@ -119,7 +119,7 @@ export function CalendarAgenda({
                   
                   <div className="flex items-start justify-between pl-3.5">
                     <div className="space-y-2 min-w-0 flex-1">
-                      <h4 className="text-[14px] font-bold text-slate-800 dark:text-slate-100 leading-snug tracking-tight group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors duration-200 truncate pr-2">
+                      <h4 className="text-[14px] font-semibold text-slate-800 dark:text-slate-100 leading-snug tracking-tight group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors duration-200 truncate pr-2">
                         {ev.title}
                       </h4>
                       <div className="flex flex-wrap items-center gap-2.5 text-[10px] font-medium text-slate-500 dark:text-slate-400">
@@ -156,7 +156,7 @@ export function CalendarAgenda({
       {/* 2. Bottom Card: Upcoming Events */}
       <div className="bg-white dark:bg-neutral-900/40 border border-slate-200/60 dark:border-white/[0.06] shadow-sm rounded-2xl p-5 sm:p-6 flex flex-col overflow-hidden">
         <div className="flex items-center justify-between mb-4">
-          <h3 className="text-base font-bold text-slate-900 dark:text-white tracking-tight">
+          <h3 className="text-base font-semibold text-slate-900 dark:text-white tracking-tight">
             Upcoming Events
           </h3>
           <Button 
@@ -195,7 +195,7 @@ export function CalendarAgenda({
                   
                   <div className="flex justify-between items-center pl-3.5">
                     <div className="space-y-1.5 min-w-0 flex-1 pr-3">
-                      <h4 className="text-[13px] font-bold text-slate-800 dark:text-slate-200 leading-snug group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors duration-200 truncate">
+                      <h4 className="text-[13px] font-semibold text-slate-800 dark:text-slate-200 leading-snug group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors duration-200 truncate">
                         {ev.title}
                       </h4>
                       <div className="flex items-center gap-2.5 text-[10px] font-medium text-slate-400 dark:text-slate-500">
@@ -223,7 +223,7 @@ export function CalendarAgenda({
 
       {/* 3. Categories Legend */}
       <div className="bg-white dark:bg-neutral-900/40 border border-slate-200/60 dark:border-white/[0.06] shadow-sm rounded-2xl p-4 sm:p-5 shrink-0 mt-auto">
-        <h4 className="text-[11px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-3 border-b border-slate-100 dark:border-white/[0.04] pb-1.5">
+        <h4 className="text-[11px] font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-3 border-b border-slate-100 dark:border-white/[0.04] pb-1.5">
           Event Categories
         </h4>
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-2 gap-2">

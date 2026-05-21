@@ -35,7 +35,7 @@ export function SubscriptionStats({
               <Crown className="h-6 w-6 text-teal-200" />
             </div>
             <div>
-              <h2 className="text-2xl font-bold tracking-tight">
+              <h2 className="text-2xl font-semibold tracking-tight">
                 Parent Subscriptions
               </h2>
               <p className="text-teal-200 text-sm">

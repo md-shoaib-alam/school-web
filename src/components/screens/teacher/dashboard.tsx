@@ -144,7 +144,7 @@ export function TeacherDashboard() {
     <div className="space-y-6">
       {/* Greeting */}
       <div>
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
+        <h2 className="text-2xl font-semibold text-gray-900 dark:text-gray-100">
           {getGreeting()}, {currentUser?.name || "Mr. John Smith"} 👋
         </h2>
         <p className="text-gray-500 dark:text-gray-400 mt-1">

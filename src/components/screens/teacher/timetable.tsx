@@ -341,7 +341,7 @@ function PageHeader({
   return (
     <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
       <div>
-        <h2 className="text-xl font-bold text-gray-900 dark:text-gray-100">
+        <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">
           My Timetable
         </h2>
         <p className="text-sm text-gray-500 dark:text-gray-400">
@@ -668,7 +668,7 @@ function DayView({
       </div>
 
       <div className="flex items-center gap-2">
-        <h3 className="text-lg font-bold text-gray-900 dark:text-gray-100">
+        <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
           {DAY_LABELS[dayKey]}
         </h3>
         {dayKey === currentDayKey && (
@@ -735,7 +735,7 @@ function DayView({
               >
                 <CardContent className="p-4 flex flex-row flex-wrap sm:flex-nowrap items-start justify-between gap-3">
                   <div className="space-y-1.5 min-w-[120px] flex-1">
-                    <h4 className="font-bold text-lg text-gray-900 dark:text-gray-100 leading-tight tracking-tight">
+                    <h4 className="font-semibold text-lg text-gray-900 dark:text-gray-100 leading-tight tracking-tight">
                       {slot.subjectName}
                     </h4>
                     <div className="flex flex-col text-sm text-gray-500 dark:text-gray-400 space-y-0.5">

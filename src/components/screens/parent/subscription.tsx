@@ -282,7 +282,7 @@ export function ParentSubscription() {
         <div className="inline-flex items-center justify-center w-12 h-12 sm:w-16 sm:h-16 rounded-2xl bg-gradient-to-br from-amber-400 to-orange-500 text-white mb-4 shadow-lg shadow-amber-200 dark:shadow-amber-900/30">
           <Crown className="h-6 w-6 sm:h-8 sm:w-8" />
         </div>
-        <h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-gray-100 tracking-tight">Premium Subscriptions</h2>
+        <h2 className="text-xl sm:text-2xl font-semibold text-gray-900 dark:text-gray-100 tracking-tight">Premium Subscriptions</h2>
         <p className="text-sm text-gray-500 dark:text-gray-400 mt-2 max-w-md mx-auto leading-relaxed">
           Unlock advanced analytics, AI-powered insights, and real-time parent-teacher engagement tools.
         </p>
@@ -362,7 +362,7 @@ export function ParentSubscription() {
       <div className="space-y-4">
         <div className="flex items-center gap-2">
           <Receipt className="h-5 w-5 text-gray-600 dark:text-gray-400" />
-          <h3 className="text-xl font-bold text-gray-900 dark:text-gray-100">Payment History</h3>
+          <h3 className="text-xl font-semibold text-gray-900 dark:text-gray-100">Payment History</h3>
         </div>
         <Card className="rounded-xl border-gray-200 dark:border-gray-700 shadow-none overflow-hidden">
           <CardContent className="p-0">

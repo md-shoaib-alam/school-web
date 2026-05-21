@@ -165,7 +165,7 @@ export function ParentTimetable() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h2 className="text-xl font-bold text-gray-900 dark:text-gray-100">
+          <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">
             Class Timetable
           </h2>
           <p className="text-sm text-gray-500 dark:text-gray-400 mt-0.5">

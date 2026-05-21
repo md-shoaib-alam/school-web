@@ -21,7 +21,7 @@ export function BillingHeader({
               <IndianRupee className="h-7 w-7" />
             </div>
             <div>
-              <h2 className="text-2xl font-bold tracking-tight">Billing & Revenue</h2>
+              <h2 className="text-2xl font-semibold tracking-tight">Billing & Revenue</h2>
               <p className="text-emerald-50 text-sm opacity-90">
                 Platform-wide financial analytics and subscription insights
               </p>

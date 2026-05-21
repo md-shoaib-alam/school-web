@@ -50,7 +50,7 @@ export function SubscriptionExpiredScreen({ tenantName, tenantSlug, role, endDat
           <div className={`mx-auto w-20 h-20 ${circleColor} rounded-full flex items-center justify-center mb-4 transition-colors`}>
             {icon}
           </div>
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-white">{title}</h2>
+          <h2 className="text-2xl font-semibold text-gray-900 dark:text-white">{title}</h2>
           <p className={`${isSuspended ? "text-red-700 dark:text-red-400" : "text-amber-700 dark:text-amber-400"} text-sm font-medium mt-1`}>
             {subHeading}
           </p>

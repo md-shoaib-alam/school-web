@@ -19,7 +19,7 @@ export function AdminReports() {
             <BarChart3 className="h-6 w-6" />
           </div>
           <div>
-            <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
+            <h2 className="text-2xl font-semibold text-gray-900 dark:text-gray-100">
               Administrative Reports
             </h2>
             <p className="text-sm text-gray-500 dark:text-gray-400">

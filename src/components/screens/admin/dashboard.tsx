@@ -208,7 +208,7 @@ export function AdminDashboard() {
               />
             </div>
             <div>
-              <h2 className="text-2xl font-bold tracking-tight">
+              <h2 className="text-2xl font-semibold tracking-tight">
                 {greeting}, {currentUser?.name || "Admin"}!
               </h2>
               <p className="text-teal-100 text-sm">

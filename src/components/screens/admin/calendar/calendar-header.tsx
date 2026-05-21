@@ -38,7 +38,7 @@ export function CalendarHeader({
       <div className="px-4 py-4 sm:px-6 sm:py-5 border-b border-slate-100 dark:border-white/[0.05] flex flex-col sm:flex-row gap-3 sm:gap-4 justify-between items-start sm:items-center">
         <div className="flex items-center justify-between w-full sm:w-auto">
           <div>
-            <h1 className="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white tracking-tight">
+            <h1 className="text-xl sm:text-2xl font-semibold text-slate-900 dark:text-white tracking-tight">
               {title}
             </h1>
             <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-0.5">
@@ -92,7 +92,7 @@ export function CalendarHeader({
             <ChevronLeft className="h-4 w-4 fill-current" />
           </Button>
           
-          <h2 className="text-base font-bold text-slate-800 dark:text-slate-200 tracking-tight min-w-[100px] text-center">
+          <h2 className="text-base font-semibold text-slate-800 dark:text-slate-200 tracking-tight min-w-[100px] text-center">
             {MONTH_NAMES[currentMonth]} {currentYear}
           </h2>
 

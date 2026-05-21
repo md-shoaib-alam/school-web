@@ -145,7 +145,7 @@ export function SuperAdminPlatformNotices() {
           <Bell className="h-6 w-6 text-amber-600 dark:text-amber-400" />
         </div>
         <div>
-          <h2 className="text-3xl font-bold tracking-tight">Notices</h2>
+          <h2 className="text-3xl font-semibold tracking-tight">Notices</h2>
           <p className="text-muted-foreground mt-1">Send global notices that appear in the platform bar for all users.</p>
         </div>
       </div>

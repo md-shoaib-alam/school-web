@@ -152,7 +152,7 @@ export function TabulationLedgerPreviewPage({
           </Button>
           
           <div className="min-w-0">
-            <h2 className="text-sm font-bold tracking-tight text-foreground flex items-center gap-1.5 leading-none">
+            <h2 className="text-sm font-semibold tracking-tight text-foreground flex items-center gap-1.5 leading-none">
               <Award className="h-4 w-4 text-emerald-600 dark:text-emerald-500 shrink-0" />
               <span className="truncate">{classNameStr} - {classSection}</span>
             </h2>
@@ -238,7 +238,7 @@ export function TabulationLedgerPreviewPage({
             <div className="w-16 h-16 bg-blue-50 dark:bg-blue-900/10 text-blue-600 dark:text-blue-400 rounded-full flex items-center justify-center mb-4">
               <AlertCircle className="h-8 w-8" />
             </div>
-            <h3 className="text-base font-bold text-foreground">No Ledger Compiled</h3>
+            <h3 className="text-base font-semibold text-foreground">No Ledger Compiled</h3>
             <p className="text-xs mt-1">
               Could not compile academic ledger data for this class. Make sure exams are completed and results are loaded properly.
             </p>

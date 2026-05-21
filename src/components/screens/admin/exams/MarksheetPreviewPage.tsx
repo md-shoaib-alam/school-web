@@ -1,42 +1,14 @@
 'use client';
 
-import { Cinzel, Montserrat, Inter } from 'next/font/google';
-
-const cinzel = Cinzel({
-  subsets: ['latin'],
-  weight: ['600', '700', '800', '900'],
-  variable: '--font-cinzel',
-  display: 'swap',
-});
-
-const montserrat = Montserrat({
-  subsets: ['latin'],
-  weight: ['500', '600', '700', '800'],
-  variable: '--font-montserrat',
-  display: 'swap',
-});
-
-const inter = Inter({
-  subsets: ['latin'],
-  weight: ['400', '500', '600', '700', '800'],
-  variable: '--font-inter',
-  display: 'swap',
-});
-
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Skeleton } from '@/components/ui/skeleton';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { 
-  Printer, BookOpen, GraduationCap, Calendar, Clock, Loader2,
-  AlertCircle, CheckCircle2, XCircle, Award, FileText, User, Search, ArrowLeft, Layout
-} from 'lucide-react';
 import { ExamRecord } from './types';
 import { useMemo, useState, useEffect, useRef } from 'react';
 import { apiFetch } from '@/lib/api';
 import { goeyToast as toast } from 'goey-toast';
 import { useReactToPrint } from 'react-to-print';
 import { MARKSHEET_TEMPLATES } from './marksheet-templates';
+import { MarksheetControls } from './marksheet-preview/MarksheetControls';
+import { MarksheetSheetsPreview } from './marksheet-preview/MarksheetSheetsPreview';
+import { MarksheetPrintContainer } from './marksheet-preview/MarksheetPrintContainer';
 
 interface MarksheetPreviewPageProps {
   classId: string;
@@ -281,237 +253,48 @@ export function MarksheetPreviewPage({
 
   return (
     <div className="space-y-6">
-      {/* Sleek, Compact Header & Control Toolbar */}
-      <div className="bg-card border border-gray-150 dark:border-zinc-800/80 p-3 sm:px-4 rounded-xl shadow-sm flex flex-col lg:flex-row items-stretch lg:items-center gap-3 justify-between">
-        {/* Left Side: Back & Class Title */}
-        <div className="flex items-center gap-3 min-w-0">
-          <Button 
-            variant="ghost" 
-            size="sm"
-            onClick={onBack}
-            className="group flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground h-8 px-2 rounded-lg transition-colors border border-gray-100 dark:border-zinc-800"
-          >
-            <ArrowLeft className="h-3.5 w-3.5 transition-transform group-hover:-translate-x-0.5" />
-            <span className="hidden sm:inline">Back</span>
-          </Button>
-          
-          <div className="min-w-0">
-            <h2 className="text-sm font-bold tracking-tight text-foreground flex items-center gap-1.5 leading-none">
-              <Award className="h-4 w-4 text-emerald-600 dark:text-emerald-500 shrink-0" />
-              <span className="truncate">{classNameStr} - {classSection}</span>
-            </h2>
-            <span className="text-[10px] text-muted-foreground font-semibold uppercase tracking-wider block mt-0.5">Marksheet Preview</span>
-          </div>
-        </div>
+      <MarksheetControls
+        classNameStr={classNameStr}
+        classSection={classSection}
+        onBack={onBack}
+        selectedStudentId={selectedStudentId}
+        setSelectedStudentId={setSelectedStudentId}
+        marksheetType={marksheetType}
+        setMarksheetType={setMarksheetType}
+        selectedTemplateId={selectedTemplateId}
+        setSelectedTemplateId={setSelectedTemplateId}
+        zoomScale={zoomScale}
+        setZoomScale={setZoomScale}
+        handlePrint={handlePrint}
+        students={students}
+        exams={exams}
+        loading={loading}
+        printing={printing}
+      />
 
-        {/* Center/Right controls row */}
-        <div className="flex flex-col sm:flex-row flex-wrap items-stretch sm:items-center gap-2 sm:gap-3 w-full lg:w-auto">
-          {/* Select Student */}
-          <div className="w-full sm:w-[150px]">
-            <Select value={selectedStudentId} onValueChange={setSelectedStudentId} disabled={loading || students.length === 0}>
-              <SelectTrigger className="w-full h-8 rounded-lg text-xs font-semibold bg-zinc-50/50 dark:bg-zinc-900/30 border-gray-200 dark:border-zinc-800 py-1">
-                <div className="flex items-center gap-1.5 min-w-0 w-full text-left">
-                  <User className="h-3.5 w-3.5 text-zinc-400 shrink-0" />
-                  <span className="truncate flex-1">
-                    <SelectValue placeholder="All Students" />
-                  </span>
-                </div>
-              </SelectTrigger>
-              <SelectContent className="max-h-60 rounded-xl">
-                <SelectItem value="all" className="text-xs font-semibold text-emerald-600 dark:text-emerald-400">All Students</SelectItem>
-                {students.map((s: any) => (
-                  <SelectItem key={s.id} value={s.id} className="text-xs font-medium">
-                    Roll {s.rollNumber || '-'} — {s.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
+      <MarksheetSheetsPreview
+        loading={loading}
+        exams={exams}
+        students={students}
+        previewStudents={previewStudents}
+        zoomScale={zoomScale}
+        SelectedTemplate={SelectedTemplate}
+        classNameStr={classNameStr}
+        classSection={classSection}
+        academicYear={academicYear}
+        marksheetType={marksheetType}
+        selectedStudentId={selectedStudentId}
+      />
 
-          {/* Select Marks Type */}
-          <div className="w-full sm:w-[110px]">
-            <Select value={marksheetType} onValueChange={(v: any) => setMarksheetType(v)} disabled={loading || exams.length === 0}>
-              <SelectTrigger className="w-full h-8 rounded-lg text-xs font-semibold bg-zinc-50/50 dark:bg-zinc-900/30 border-gray-200 dark:border-zinc-800 py-1">
-                <div className="flex items-center gap-1.5 min-w-0 w-full text-left">
-                  <FileText className="h-3.5 w-3.5 text-zinc-400 shrink-0" />
-                  <span className="truncate flex-1">
-                    <SelectValue placeholder="Select Type" />
-                  </span>
-                </div>
-              </SelectTrigger>
-              <SelectContent className="rounded-xl">
-                <SelectItem value="midterm" className="text-xs font-medium">Midterm</SelectItem>
-                <SelectItem value="final" className="text-xs font-medium">Final</SelectItem>
-                <SelectItem value="combined" className="text-xs font-semibold text-emerald-600">Combined</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
-          {/* Select Template Design - Modern Dropdown! */}
-          <div className="w-full sm:w-[150px]">
-            <Select value={selectedTemplateId} onValueChange={setSelectedTemplateId}>
-              <SelectTrigger className="w-full h-8 rounded-lg text-xs font-semibold bg-zinc-50/50 dark:bg-zinc-900/30 border-gray-200 dark:border-zinc-800 py-1">
-                <div className="flex items-center gap-1.5 min-w-0 w-full text-left">
-                  <Layout className="h-3.5 w-3.5 text-indigo-500 shrink-0" />
-                  <span className="truncate flex-1">
-                    <SelectValue placeholder="Select Design" />
-                  </span>
-                </div>
-              </SelectTrigger>
-              <SelectContent className="rounded-xl">
-                {MARKSHEET_TEMPLATES.map(tmpl => (
-                  <SelectItem key={tmpl.id} value={tmpl.id} className="text-xs font-medium">
-                    {tmpl.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-
-          {/* Preview Zoom */}
-          <div className="w-full sm:w-[100px]">
-            <Select value={zoomScale.toString()} onValueChange={(v) => setZoomScale(parseFloat(v))}>
-              <SelectTrigger className="w-full h-8 rounded-lg text-xs font-semibold bg-zinc-50/50 dark:bg-zinc-900/30 border-gray-200 dark:border-zinc-800 py-1">
-                <div className="flex items-center gap-1.5 min-w-0 w-full text-left">
-                  <Search className="h-3.5 w-3.5 text-zinc-400 shrink-0" />
-                  <span className="truncate flex-1">
-                    {Math.round(zoomScale * 100)}%
-                  </span>
-                </div>
-              </SelectTrigger>
-              <SelectContent className="rounded-xl">
-                <SelectItem value="0.5" className="text-xs font-medium">50%</SelectItem>
-                <SelectItem value="0.6" className="text-xs font-medium">60%</SelectItem>
-                <SelectItem value="0.75" className="text-xs font-medium">75%</SelectItem>
-                <SelectItem value="1" className="text-xs font-medium">100%</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
-          {/* Print button */}
-          <Button 
-            onClick={handlePrint}
-            disabled={loading || printing || students.length === 0}
-            size="sm"
-            className="w-full sm:w-auto bg-emerald-600 hover:bg-emerald-700 text-white shrink-0 gap-1.5 shadow-sm rounded-lg h-8 px-4 font-bold text-xs transition-all duration-300 transform active:scale-95 justify-center"
-          >
-            {printing ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Printer className="h-3.5 w-3.5" />}
-            <span>Print {selectedStudentId === 'all' ? 'All' : 'Student'}</span>
-          </Button>
-        </div>
-      </div>
-
-      {/* Main Preview scroll wrapper */}
-      <div className="bg-card border border-gray-100 dark:border-zinc-800 p-6 rounded-2xl shadow-sm overflow-hidden flex flex-col min-h-[600px] items-center justify-center">
-        {loading ? (
-          <div className="w-full max-w-4xl space-y-6 py-10 animate-in fade-in duration-300">
-            <div className="flex items-center gap-4">
-              <Skeleton className="h-12 w-12 rounded-full" />
-              <div className="space-y-2">
-                <Skeleton className="h-4 w-48" />
-                <Skeleton className="h-3 w-72" />
-              </div>
-            </div>
-            <Skeleton className="h-[550px] w-full rounded-2xl" />
-          </div>
-        ) : exams.length === 0 ? (
-          <div className="flex flex-col items-center justify-center text-center py-20 text-muted-foreground max-w-md mx-auto animate-in fade-in duration-300">
-            <div className="w-16 h-16 bg-blue-50 dark:bg-blue-900/10 text-blue-600 dark:text-blue-400 rounded-full flex items-center justify-center mb-4">
-              <AlertCircle className="h-8 w-8" />
-            </div>
-            <h3 className="text-base font-bold text-foreground">No Published Exams</h3>
-            <p className="text-xs mt-1">
-              There are no completed midterm or final exams published under the selected Academic Cycle for this class. Please verify the academic stand or exam configuration.
-            </p>
-          </div>
-        ) : previewStudents.length === 0 ? (
-          <div className="flex flex-col items-center justify-center text-center py-20 text-muted-foreground max-w-md mx-auto animate-in fade-in duration-300">
-            <AlertCircle className="h-10 w-10 mb-3 opacity-30 animate-in fade-in slide-in-from-top-3 duration-700 ease-[cubic-bezier(0.16,1,0.3,1)]" />
-            <p className="text-xs">No student records available</p>
-          </div>
-        ) : (
-          <div className={`w-full max-w-4xl mx-auto space-y-4 ${cinzel.className} ${montserrat.className} ${inter.className}`}>
-            {selectedStudentId === 'all' && (
-              <div className="bg-emerald-50/50 dark:bg-emerald-900/10 border border-emerald-200/50 dark:border-emerald-800/40 p-4 rounded-xl text-xs text-emerald-700 dark:text-emerald-400 flex items-center gap-3 font-medium shadow-sm animate-in slide-in-from-top-2 duration-300">
-                <CheckCircle2 className="h-5 w-5 shrink-0 text-emerald-500" />
-                <span>Showing previews for <strong>all {students.length} students</strong>. Scroll down to inspect. Clicking <strong>Print</strong> will generate the clean print packet.</span>
-              </div>
-            )}
-
-            {/* True A4 parchment layout sheets preview vertical stack with premium scrollbar */}
-            <div className="w-full max-h-[75vh] overflow-y-auto overflow-x-auto pb-6 flex flex-col items-center gap-8 bg-zinc-50 dark:bg-zinc-950/20 p-4 sm:p-6 rounded-2xl border border-gray-100 dark:border-zinc-800/50 shadow-inner">
-              
-              {previewStudents.map((sheet, index) => (
-                <div 
-                  key={index}
-                  className="shrink-0 transition-all duration-300 shadow-2xl rounded-lg"
-                  style={{ 
-                    width: 794 * zoomScale, 
-                    height: 1123 * zoomScale, 
-                    overflow: 'hidden' 
-                  }}
-                >
-                  <div 
-                    style={{ 
-                      width: 794, 
-                      height: 1123,
-                      transform: `scale(${zoomScale})`,
-                      transformOrigin: 'top left'
-                    }}
-                  >
-                    <SelectedTemplate 
-                      sheet={sheet}
-                      classNameStr={classNameStr}
-                      classSection={classSection}
-                      academicYear={academicYear}
-                      marksheetType={marksheetType}
-                    />
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-      </div>
-
-      {/* Hidden Print Wrapper for react-to-print */}
-      <div className="hidden">
-        <div ref={printContainerRef} className="print:block bg-white min-h-screen">
-          <style type="text/css" media="print">
-            {`
-              @page { 
-                size: portrait; 
-                margin: 0mm; 
-              } 
-              body { 
-                margin: 0; 
-                -webkit-print-color-adjust: exact !important; 
-                print-color-adjust: exact !important; 
-              }
-              .marksheet-page-break {
-                page-break-after: always;
-                break-after: page;
-              }
-              .marksheet-page-break:last-child {
-                page-break-after: avoid;
-                break-after: avoid;
-              }
-            `}
-          </style>
-          {previewStudents.map((sheet, index) => (
-            <div key={index} className="marksheet-page-break">
-              <SelectedTemplate 
-                sheet={sheet}
-                classNameStr={classNameStr}
-                classSection={classSection}
-                academicYear={academicYear}
-                marksheetType={marksheetType}
-              />
-            </div>
-          ))}
-        </div>
-      </div>
-
+      <MarksheetPrintContainer
+        printContainerRef={printContainerRef}
+        previewStudents={previewStudents}
+        SelectedTemplate={SelectedTemplate}
+        classNameStr={classNameStr}
+        classSection={classSection}
+        academicYear={academicYear}
+        marksheetType={marksheetType}
+      />
     </div>
   );
 }

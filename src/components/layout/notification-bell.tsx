@@ -126,7 +126,7 @@ export function NotificationBell() {
       <PopoverContent className="w-80 sm:w-96 p-0 border-gray-200 dark:border-gray-800 shadow-2xl rounded-2xl overflow-hidden" align="end" sideOffset={8}>
         <div className="flex items-center justify-between px-5 py-4 bg-gray-50/50 dark:bg-gray-900/50 border-b border-gray-100 dark:border-gray-800">
           <div className="flex items-center gap-2">
-            <h3 className="font-bold text-sm text-gray-900 dark:text-gray-100 tracking-tight">
+            <h3 className="font-semibold text-sm text-gray-900 dark:text-gray-100 tracking-tight">
               Notifications
             </h3>
             {unreadCount > 0 && (

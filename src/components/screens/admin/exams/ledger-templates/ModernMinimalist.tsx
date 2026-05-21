@@ -27,7 +27,7 @@ export const ModernMinimalist: React.FC<LedgerTemplateProps> = ({ data }) => {
       {/* Header Info */}
       <div className="flex flex-col sm:flex-row sm:justify-between sm:items-end border-b border-zinc-150 pb-3 mb-4">
         <div>
-          <h1 className="font-extrabold text-xl tracking-tight text-slate-900 uppercase">{data.schoolName}</h1>
+          <h1 className="font-semibold text-xl tracking-tight text-slate-900 uppercase">{data.schoolName}</h1>
           <p className="text-[10px] text-indigo-600 font-bold uppercase tracking-wider mt-0.5">{data.ledgerTitle}</p>
         </div>
         <div className="flex gap-6 text-[10px] font-bold text-slate-500 mt-2 sm:mt-0">

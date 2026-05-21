@@ -106,7 +106,7 @@ export function SuperAdminAnalytics() {
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">System Performance & Health</h1>
+          <h1 className="text-2xl font-semibold text-gray-900 dark:text-white">System Performance & Health</h1>
           <p className="text-sm text-gray-500 dark:text-gray-400">Comprehensive real-time infrastructure and service monitoring</p>
         </div>
         <Button variant="outline" className="gap-2" onClick={fetchHealth} disabled={loading}>

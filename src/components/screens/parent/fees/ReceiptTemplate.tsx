@@ -33,13 +33,13 @@ export const ReceiptTemplate = React.forwardRef<HTMLDivElement, ReceiptTemplateP
               <GraduationCap size={40} className="text-black" />
             </div>
             <div>
-              <h1 className="text-xl font-bold uppercase tracking-tight">{schoolName}</h1>
+              <h1 className="text-xl font-semibold uppercase tracking-tight">{schoolName}</h1>
               <p className="text-[10px] leading-tight max-w-[250px]">{schoolAddress}</p>
               <p className="text-[10px] font-bold mt-1">Contact: {schoolContact}</p>
             </div>
           </div>
           <div className="text-right">
-            <h2 className="text-lg font-bold border-2 border-black px-4 py-1 inline-block mb-3">FEE RECEIPT</h2>
+            <h2 className="text-lg font-semibold border-2 border-black px-4 py-1 inline-block mb-3">FEE RECEIPT</h2>
             <div className="text-[11px] font-medium space-y-1">
               <p>Receipt No: <span className="font-bold underline">{fee.id.substring(0, 8).toUpperCase()}</span></p>
               <p>Date: <span className="font-bold underline">{today}</span></p>

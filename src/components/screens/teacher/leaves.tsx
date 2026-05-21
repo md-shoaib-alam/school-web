@@ -164,7 +164,7 @@ export function TeacherLeaves() {
       {/* Header */}
       <div className="flex justify-between items-center">
         <div>
-          <h2 className="text-2xl font-bold tracking-tight flex items-center gap-2">
+          <h2 className="text-2xl font-semibold tracking-tight flex items-center gap-2">
             <CalendarDays className="h-6 w-6 text-primary" />
             My Leaves
           </h2>

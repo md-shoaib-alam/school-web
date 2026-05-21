@@ -329,7 +329,7 @@ export function AdminClasses() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
+          <h2 className="text-2xl font-semibold text-gray-900 dark:text-gray-100">
             Classes
           </h2>
           <p className="text-sm text-muted-foreground">
@@ -508,7 +508,7 @@ export function AdminClasses() {
                         {/* Class name and grade badge */}
                         <div className="flex items-start justify-between mb-4">
                           <div className="space-y-1">
-                            <h3 className="text-lg font-bold text-gray-900 dark:text-gray-100">
+                            <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
                               {cls.name}
                             </h3>
                             <Badge variant="secondary" className="text-[10px] font-bold uppercase tracking-widest px-2 py-0">

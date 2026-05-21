@@ -97,7 +97,7 @@ const TenantCard = memo(function TenantCard({
               <img src={tenant.logo || "/test.webp"} alt={tenant.name} className="h-full w-full object-cover" />
             </div>
             <div className="min-w-0">
-              <h3 className="font-bold text-base truncate">{tenant.name}</h3>
+              <h3 className="font-semibold text-base truncate">{tenant.name}</h3>
               <p className="text-xs text-muted-foreground flex items-center gap-1">
                 <Globe className="h-3 w-3" />
                 {tenant.slug}
@@ -273,7 +273,7 @@ export function TenantTable({
           <div className="h-16 w-16 bg-muted rounded-full flex items-center justify-center mx-auto mb-2">
             <Building2 className="h-8 w-8 text-muted-foreground opacity-50" />
           </div>
-          <h3 className="font-bold text-lg">No schools found</h3>
+          <h3 className="font-semibold text-lg">No schools found</h3>
           <p className="text-muted-foreground max-w-xs mx-auto">
             Try adjusting your filters or search query to find the school you are looking for.
           </p>

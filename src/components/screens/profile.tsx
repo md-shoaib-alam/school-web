@@ -236,7 +236,7 @@ export function UserProfileScreen() {
           <div className="flex-1 text-center md:text-left space-y-2">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
               <div>
-                <h1 className="text-3xl font-black tracking-tight">{currentUser.name}</h1>
+                <h1 className="text-3xl font-semibold tracking-tight">{currentUser.name}</h1>
                 <p className="text-white/80 font-medium text-sm flex items-center justify-center md:justify-start gap-1.5 mt-1">
                   <Mail className="h-3.5 w-3.5" /> {currentUser.email}
                 </p>
@@ -472,7 +472,7 @@ export function UserProfileScreen() {
                   {/* Theme Switcher Widget */}
                   <div className="space-y-3">
                     <div>
-                      <h4 className="text-sm font-bold">Workspace Appearance Mode</h4>
+                      <h4 className="text-sm font-semibold">Workspace Appearance Mode</h4>
                       <p className="text-xs text-gray-500 dark:text-zinc-400">Select a premium color scheme tailored for maximum comfort.</p>
                     </div>
                     <div className="grid grid-cols-3 gap-3">
@@ -510,7 +510,7 @@ export function UserProfileScreen() {
                     <div className="space-y-1">
                       <div className="flex items-center gap-2">
                         <Lock className="h-4 w-4 text-orange-500" />
-                        <h4 className="text-sm font-bold">Account Access Code</h4>
+                        <h4 className="text-sm font-semibold">Account Access Code</h4>
                       </div>
                       <p className="text-xs text-gray-500 dark:text-zinc-400 leading-relaxed">
                         Secure password used to authenticate your login sessions. Update regularly to prevent breach.

@@ -46,7 +46,7 @@ export const CBSEStandard: React.FC<MarksheetTemplateProps> = ({
             <span className="text-2xl">🏫</span>
           </div>
           <div className="text-center flex-1 px-4">
-            <h2 className="font-extrabold text-xl text-emerald-900 leading-none tracking-wide uppercase">
+            <h2 className="font-semibold text-xl text-emerald-900 leading-none tracking-wide uppercase">
               {sheet.schoolName.toUpperCase()}
             </h2>
             <p className="text-[8px] text-zinc-500 font-bold uppercase tracking-widest mt-1.5">
@@ -92,7 +92,7 @@ export const CBSEStandard: React.FC<MarksheetTemplateProps> = ({
 
         {/* Scholastic Areas Table */}
         <div className="space-y-1">
-          <h4 className="text-[9px] font-black uppercase text-emerald-900 tracking-wider">
+          <h4 className="text-[9px] font-semibold uppercase text-emerald-900 tracking-wider">
             PART 1: SCHOLASTIC AREAS
           </h4>
           <div className="rounded border border-zinc-200 overflow-hidden bg-white">
@@ -128,7 +128,7 @@ export const CBSEStandard: React.FC<MarksheetTemplateProps> = ({
         {/* CBSE PART 2 & 3: Co-Scholastic & Discipline */}
         <div className="grid grid-cols-2 gap-4">
           <div className="space-y-1">
-            <h4 className="text-[9px] font-black uppercase text-emerald-900 tracking-wider">
+            <h4 className="text-[9px] font-semibold uppercase text-emerald-900 tracking-wider">
               PART 2: CO-SCHOLASTIC AREAS (3-Point Scale A-C)
             </h4>
             <div className="rounded border border-zinc-200 overflow-hidden bg-white">
@@ -152,7 +152,7 @@ export const CBSEStandard: React.FC<MarksheetTemplateProps> = ({
           </div>
 
           <div className="space-y-1">
-            <h4 className="text-[9px] font-black uppercase text-emerald-900 tracking-wider">
+            <h4 className="text-[9px] font-semibold uppercase text-emerald-900 tracking-wider">
               PART 3: DISCIPLINE (3-Point Scale A-C)
             </h4>
             <div className="rounded border border-zinc-200 overflow-hidden bg-white">

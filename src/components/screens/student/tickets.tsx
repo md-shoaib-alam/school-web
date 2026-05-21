@@ -353,7 +353,7 @@ export function StudentTickets() {
       <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
         <div className="flex items-center gap-3">
           <div>
-            <h2 className="text-xl font-bold text-gray-900 dark:text-gray-100">
+            <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">
               My Tickets
             </h2>
             <p className="text-sm text-gray-500 dark:text-gray-400 mt-0.5">

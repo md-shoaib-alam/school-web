@@ -29,7 +29,7 @@ export const StateBoardGreen: React.FC<MarksheetTemplateProps> = ({
           <div className="flex justify-center items-center gap-3">
             <span className="text-3xl">🇮🇳</span>
             <div>
-              <h2 className="font-extrabold text-lg text-emerald-800 leading-none tracking-wide uppercase">
+              <h2 className="font-semibold text-lg text-emerald-800 leading-none tracking-wide uppercase">
                 {sheet.schoolName.toUpperCase()}
               </h2>
               <p className="text-[7.5px] text-zinc-500 font-bold uppercase tracking-wider mt-1.5">

@@ -321,7 +321,7 @@ export function TeacherAssignments() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h2 className="text-xl font-bold text-gray-900 dark:text-gray-100">
+          <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">
             My Homework
           </h2>
           <p className="text-sm text-gray-500 dark:text-gray-400">

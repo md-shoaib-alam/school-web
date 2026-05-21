@@ -105,7 +105,7 @@ export function ActiveExamsView({
             <CardContent className="p-5 flex items-center justify-between">
               <div>
                 <p className="text-xs text-muted-foreground uppercase font-semibold">{card.label}</p>
-                <h4 className="text-2xl font-bold mt-1">{card.value}</h4>
+                <h4 className="text-2xl font-semibold mt-1">{card.value}</h4>
               </div>
               <div className={`p-3 rounded-xl ${card.color}`}>{card.icon}</div>
             </CardContent>
@@ -117,7 +117,7 @@ export function ActiveExamsView({
         exams.filter(e => e.status !== 'completed').length === 0 ? (
           <div className="flex flex-col items-center justify-center p-12 border-2 border-dashed border-gray-200 dark:border-zinc-800 rounded-2xl bg-card text-center text-muted-foreground animate-in fade-in duration-300">
             <ClipboardList className="h-16 w-16 mb-4 text-blue-500/40" />
-            <h3 className="text-lg font-bold text-foreground">No Active Exams Scheduled</h3>
+            <h3 className="text-lg font-semibold text-foreground">No Active Exams Scheduled</h3>
             <p className="text-sm mt-1 max-w-md">There are no midterm or final exams currently scheduled for any class. Click "New Exam" to start scheduling!</p>
           </div>
         ) : (
@@ -166,7 +166,7 @@ export function ActiveExamsView({
             {classesWithActiveExams.length === 0 ? (
               <div className="flex flex-col items-center justify-center p-12 border border-dashed border-gray-200 dark:border-zinc-800 rounded-2xl bg-card text-center text-muted-foreground animate-in fade-in duration-300">
                 <Search className="h-12 w-12 mb-3 text-zinc-300 dark:text-zinc-700" />
-                <h3 className="text-base font-bold text-foreground">No matching exams found</h3>
+                <h3 className="text-base font-semibold text-foreground">No matching exams found</h3>
                 <p className="text-xs mt-1 max-w-md">No exams match your search text or status filter. Try clearing or modifying your filter criteria.</p>
                 <Button 
                   onClick={() => { setSearchTerm(''); setStatusFilter('all'); }}
@@ -202,7 +202,7 @@ export function ActiveExamsView({
                               <GraduationCap className="h-5 w-5 animate-pulse" />
                             </div>
                             <div>
-                              <h3 className="text-base font-bold text-foreground leading-tight">
+                              <h3 className="text-base font-semibold text-foreground leading-tight">
                                 {c.name} - {c.section}
                               </h3>
                               <p className="text-[11px] text-muted-foreground mt-0 font-medium">
@@ -283,7 +283,7 @@ export function ActiveExamsView({
             >
               <ArrowLeft className="h-3.5 w-3.5" /> Back to Classes
             </Button>
-            <h3 className="text-lg font-bold text-foreground">
+            <h3 className="text-lg font-semibold text-foreground">
               Exams for {classes.find((c: any) => c.id === classFilter)?.name} - {classes.find((c: any) => c.id === classFilter)?.section}
             </h3>
           </div>

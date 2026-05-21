@@ -27,7 +27,7 @@ export const ICSESemester: React.FC<MarksheetTemplateProps> = ({
         
         {/* Crest & Header */}
         <div className="text-center pb-2 border-b-2 border-indigo-900">
-          <h2 className="font-extrabold text-2xl text-indigo-950 tracking-wider uppercase font-serif">
+          <h2 className="font-semibold text-2xl text-indigo-950 tracking-wider uppercase font-serif">
             {sheet.schoolName.toUpperCase()}
           </h2>
           <p className="text-[8px] text-zinc-500 font-bold uppercase tracking-[2px] mt-1.5 font-sans">
@@ -70,7 +70,7 @@ export const ICSESemester: React.FC<MarksheetTemplateProps> = ({
 
         {/* Academic Marks Scoreboard */}
         <div className="space-y-1">
-          <h4 className="text-[10px] font-black uppercase text-indigo-950 tracking-wider">
+          <h4 className="text-[10px] font-semibold uppercase text-indigo-950 tracking-wider">
             SCHOLASTIC OUTCOMES & SEMESTER STANDINGS
           </h4>
           <div className="rounded border border-indigo-900 overflow-hidden bg-white">
@@ -107,7 +107,7 @@ export const ICSESemester: React.FC<MarksheetTemplateProps> = ({
         <div className="grid grid-cols-12 gap-5 text-xs font-sans">
           
           <div className="col-span-7 border border-zinc-200 rounded p-4 bg-zinc-50/20">
-            <h5 className="font-bold text-[9px] uppercase tracking-wider text-indigo-950 mb-1.5">REGISTRAR CONVOCATION VERDICT</h5>
+            <h5 className="font-semibold text-[9px] uppercase tracking-wider text-indigo-950 mb-1.5">REGISTRAR CONVOCATION VERDICT</h5>
             <p className="italic text-zinc-600 font-medium leading-relaxed">
               "{sheet.remarks}" The student is certified to have acquired standard scholastic outcomes prescribed under the Council rules.
             </p>

@@ -101,7 +101,7 @@ export function AdminPrintMarksheet() {
     <div className="space-y-6 animate-in fade-in duration-300">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div className="flex-1 min-w-0">
-          <h2 className="text-xl sm:text-2xl font-bold tracking-tight flex items-center gap-2">
+          <h2 className="text-xl sm:text-2xl font-semibold tracking-tight flex items-center gap-2">
             <Award className="h-6 w-6 sm:h-7 sm:w-7 text-emerald-600 dark:text-emerald-500" />
             <span className="truncate">Print Marksheets</span>
           </h2>
@@ -122,7 +122,7 @@ export function AdminPrintMarksheet() {
       {exams.filter(e => e.status === 'completed').length === 0 ? (
         <div className="flex flex-col items-center justify-center p-12 border-2 border-dashed border-gray-200 dark:border-zinc-800 rounded-2xl bg-card text-center text-muted-foreground">
           <Trophy className="h-16 w-16 mb-4 text-emerald-500/40" />
-          <h3 className="text-lg font-bold text-foreground">No Completed Exams</h3>
+          <h3 className="text-lg font-semibold text-foreground">No Completed Exams</h3>
           <p className="text-sm mt-1 max-w-md">There are no completed or finalized exams to print marksheets for yet.</p>
         </div>
       ) : (
@@ -183,7 +183,7 @@ export function AdminPrintMarksheet() {
           {classesWithCompletedExams.length === 0 ? (
             <div className="flex flex-col items-center justify-center p-12 border border-dashed border-gray-200 dark:border-zinc-800 rounded-2xl bg-card text-center text-muted-foreground">
               <Trophy className="h-12 w-12 mb-3 text-zinc-300 dark:text-zinc-700" />
-              <h3 className="text-base font-bold text-foreground">No matching classes found</h3>
+              <h3 className="text-base font-semibold text-foreground">No matching classes found</h3>
               <p className="text-xs mt-1 max-w-md">No classes with completed exams match your filters.</p>
               <Button 
                 onClick={() => { setPublishedAcademicYearFilter(currentAcademicYear); setPublishedClassFilter('all'); }}
@@ -218,7 +218,7 @@ export function AdminPrintMarksheet() {
                             <Trophy className="h-5 w-5" />
                           </div>
                           <div>
-                            <h3 className="text-base font-bold text-foreground leading-tight">
+                            <h3 className="text-base font-semibold text-foreground leading-tight">
                               {c.name} - {c.section}
                             </h3>
                             <p className="text-[11px] text-muted-foreground mt-0 font-medium">

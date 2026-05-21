@@ -107,7 +107,7 @@ export function UserDetailSheet({
 
             {/* User Details */}
             <div className="space-y-4">
-              <h3 className="text-[10px] font-black uppercase tracking-widest text-muted-foreground mb-4">Core Information</h3>
+              <h3 className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground mb-4">Core Information</h3>
               
               <InfoRow icon={<UserRound />} label="Full Name" value={user.name} />
               <InfoRow 
@@ -124,7 +124,7 @@ export function UserDetailSheet({
 
             {/* Context Section */}
             <div className="space-y-4">
-              <h3 className="text-[10px] font-black uppercase tracking-widest text-muted-foreground mb-4">Context & Metadata</h3>
+              <h3 className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground mb-4">Context & Metadata</h3>
               
               <div className="p-4 rounded-2xl bg-gray-50 dark:bg-gray-900 border-2 border-transparent hover:border-teal-500/20 transition-all">
                 <div className="flex items-center gap-3 mb-3">

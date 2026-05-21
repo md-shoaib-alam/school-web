@@ -42,7 +42,7 @@ export const RoyalGold: React.FC<MarksheetTemplateProps> = ({
 
         {/* Title Box */}
         <div className="text-center mt-2">
-          <h4 className="inline-block text-[11px] font-black uppercase text-[#8c6b23] tracking-[3px] border-b border-t border-[#b38f36] py-1 px-8 font-serif">
+          <h4 className="inline-block text-[11px] font-semibold uppercase text-[#8c6b23] tracking-[3px] border-b border-t border-[#b38f36] py-1 px-8 font-serif">
             {marksheetType === 'midterm' ? 'Midterm Convocation' : marksheetType === 'final' ? 'Final Convocation' : 'Consolidated Statement of Honors'}
           </h4>
         </div>
@@ -119,7 +119,7 @@ export const RoyalGold: React.FC<MarksheetTemplateProps> = ({
         {/* Remarks & Statistics */}
         <div className="grid grid-cols-12 gap-5 font-serif">
           <div className="col-span-7 border border-[#e3d7b8] border-l-[4px] border-l-[#b38f36] rounded p-4 bg-[#f2ecdb]/20 text-xs">
-            <h5 className="font-bold text-[9.5px] uppercase tracking-wider text-amber-900 mb-1.5">Academic Assessor Summary</h5>
+            <h5 className="font-semibold text-[9.5px] uppercase tracking-wider text-amber-900 mb-1.5">Academic Assessor Summary</h5>
             <p className="italic text-slate-700 leading-relaxed font-medium">
               "{sheet.remarks}" The candidate stands in {sheet.status === 'pass' ? 'excellent scholastic repute.' : 'need of supportive educational coaching.'}
             </p>

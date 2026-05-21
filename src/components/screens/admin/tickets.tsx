@@ -211,7 +211,7 @@ export function AdminTickets() {
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
         <div>
-          <h2 className="text-xl font-bold">Support Tickets</h2>
+          <h2 className="text-xl font-semibold">Support Tickets</h2>
           <p className="text-sm text-muted-foreground">{tickets.length} total tickets</p>
         </div>
         <Button 
