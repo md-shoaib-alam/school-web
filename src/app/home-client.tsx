@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useSyncExternalStore, useState } from "react";
+import { useEffect, useSyncExternalStore, useReducer } from "react";
 import { useRouter } from "next/navigation";
 import { useAppStore } from "@/store/use-app-store";
 import { apiFetch } from "@/lib/api";
@@ -20,14 +20,37 @@ function useHydrated() {
   );
 }
 
+interface MaintenanceState {
+  active: boolean;
+  message: string;
+  loading: boolean;
+}
+
+type MaintenanceAction = 
+  | { type: 'START_LOADING' }
+  | { type: 'SET_DATA', payload: { active: boolean, message: string } }
+  | { type: 'STOP_LOADING' };
+
+function maintenanceReducer(state: MaintenanceState, action: MaintenanceAction): MaintenanceState {
+  switch (action.type) {
+    case 'START_LOADING': return { ...state, loading: true };
+    case 'SET_DATA': return { ...state, active: action.payload.active, message: action.payload.message, loading: false };
+    case 'STOP_LOADING': return { ...state, loading: false };
+    default: return state;
+  }
+}
+
 export default function HomeClient() {
   const { isLoggedIn, currentUser, currentScreen, currentTenantId } =
     useAppStore();
   const mounted = useHydrated();
   const router = useRouter();
-  const [maintenanceActive, setMaintenanceActive] = useState(false);
-  const [maintenanceMessage, setMaintenanceMessage] = useState("");
-  const [maintenanceLoading, setMaintenanceLoading] = useState(true);
+  
+  const [maintenance, dispatchMaintenance] = useReducer(maintenanceReducer, {
+    active: false,
+    message: "",
+    loading: true
+  });
 
   const userRole = currentUser?.role;
 
@@ -35,13 +58,13 @@ export default function HomeClient() {
   useEffect(() => {
     if (!isLoggedIn || !currentUser || userRole === "super_admin") {
       queueMicrotask(() => {
-        setMaintenanceLoading(false);
+        dispatchMaintenance({ type: 'STOP_LOADING' });
       });
       return;
     }
     
     queueMicrotask(() => {
-      setMaintenanceLoading(true);
+      dispatchMaintenance({ type: 'START_LOADING' });
     });
     let cancelled = false;
     
@@ -51,15 +74,20 @@ export default function HomeClient() {
         if (!cancelled && Array.isArray(data)) {
           const modeSetting = data.find((s: any) => s.key === "maintenance_mode");
           const msgSetting = data.find((s: any) => s.key === "maintenance_message");
-          setMaintenanceActive(modeSetting?.value === "true");
-          if (msgSetting?.value) {
-            setMaintenanceMessage(msgSetting.value);
-          }
+          
+          dispatchMaintenance({
+            type: 'SET_DATA',
+            payload: {
+              active: modeSetting?.value === "true",
+              message: msgSetting?.value || ""
+            }
+          });
+        } else if (!cancelled) {
+          dispatchMaintenance({ type: 'STOP_LOADING' });
         }
       })
-      .catch(() => {})
-      .finally(() => {
-        if (!cancelled) setMaintenanceLoading(false);
+      .catch(() => {
+        if (!cancelled) dispatchMaintenance({ type: 'STOP_LOADING' });
       });
       
     return () => {
@@ -107,32 +135,6 @@ export default function HomeClient() {
 
   if (isLoggedIn && !isSuperAdmin && maintenance.active) {
     return <MaintenanceScreen message={maintenance.message} />;
-  }
-
-  return <FullPageSkeleton />;
-}
-ntScreen, currentTenantId, router]);
-
-  // Not mounted yet → render nothing (avoids hydration mismatch)
-  if (!mounted) return null;
-
-  // Not logged in → show login
-  if (!isLoggedIn) return <LoginScreen />;
-
-  // If logged in but still at "/", show skeleton while useEffect redirect kicks in
-  const parts = window.location.pathname.split("/").filter(Boolean);
-  if (parts.length === 0) {
-    return <FullPageSkeleton />;
-  }
-
-  // Maintenance mode check
-  const isSuperAdmin = userRole === "super_admin";
-  if (isLoggedIn && !isSuperAdmin && maintenanceLoading) {
-    return <FullPageSkeleton />;
-  }
-
-  if (isLoggedIn && !isSuperAdmin && maintenanceActive) {
-    return <MaintenanceScreen message={maintenanceMessage} />;
   }
 
   return <FullPageSkeleton />;
