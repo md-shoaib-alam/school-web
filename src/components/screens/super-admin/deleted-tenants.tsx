@@ -277,14 +277,16 @@ export function SuperAdminDeletedTenants() {
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle className="text-destructive">Final Irrevocable Destruction?</AlertDialogTitle>
-            <AlertDialogDescription className="space-y-2 text-foreground/90">
-              <p>Warning! This transcends logical state triggers. Execution will trigger absolute recursive data cascades, vaporizing:</p>
-              <ul className="list-disc list-inside text-sm ml-2 opacity-80">
-                <li>All linked Subscriptions & Transaction Records</li>
-                <li>All User Accounts & Identity Vaults</li>
-                <li>All Gradebooks, Attendance & Assets</li>
-              </ul>
-              <p className="font-bold mt-4">THIS CANNOT BE UNDONE.</p>
+            <AlertDialogDescription asChild>
+              <div className="space-y-2 text-foreground/90">
+                <p>Warning! This transcends logical state triggers. Execution will trigger absolute recursive data cascades, vaporizing:</p>
+                <ul className="list-disc list-inside text-sm ml-2 opacity-80">
+                  <li>All linked Subscriptions & Transaction Records</li>
+                  <li>All User Accounts & Identity Vaults</li>
+                  <li>All Gradebooks, Attendance & Assets</li>
+                </ul>
+                <p className="font-bold mt-4">THIS CANNOT BE UNDONE.</p>
+              </div>
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
