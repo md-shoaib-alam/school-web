@@ -1,0 +1,93 @@
+"use client";
+
+import { Card, CardContent } from "@/components/ui/card";
+import { Heart, School, IndianRupee, UserCheck } from "lucide-react";
+import { Skeleton as BoneyardSkeleton } from "boneyard-js/react";
+
+interface MetricStatsProps {
+  isLoading: boolean;
+  data?: {
+    totalParents: number;
+    totalClasses: number;
+    totalRevenue: number;
+    attendanceRate: number;
+  };
+}
+
+function StatCardSkeleton() {
+  return (
+    <BoneyardSkeleton name="boneyard-card" loading={true} color="rgba(0,0,0,0.06)" darkColor="rgba(255,255,255,0.05)" animate="pulse">
+      <div className="h-[110px]" />
+    </BoneyardSkeleton>
+  );
+}
+
+export function MetricStats({ isLoading, data }: MetricStatsProps) {
+  if (isLoading && !data) {
+    return (
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        <StatCardSkeleton />
+        <StatCardSkeleton />
+        <StatCardSkeleton />
+        <StatCardSkeleton />
+      </div>
+    );
+  }
+
+  return (
+    <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      <Card className="hover:shadow-md transition-shadow">
+        <CardContent className="p-5">
+          <div className="flex items-center gap-3">
+            <div className="size-11 rounded-xl bg-rose-100 dark:bg-rose-900/30 text-rose-600 dark:text-rose-400 flex items-center justify-center">
+              <Heart className="size-5" />
+            </div>
+            <div>
+              <p className="text-xs text-muted-foreground">Total Parents</p>
+              <p className="text-2xl font-bold">{data?.totalParents ?? 0}</p>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+      <Card className="hover:shadow-md transition-shadow">
+        <CardContent className="p-5">
+          <div className="flex items-center gap-3">
+            <div className="size-11 rounded-xl bg-cyan-100 dark:bg-cyan-900/30 text-cyan-600 dark:text-cyan-400 flex items-center justify-center">
+              <School className="size-5" />
+            </div>
+            <div>
+              <p className="text-xs text-muted-foreground">Total Classes</p>
+              <p className="text-2xl font-bold">{data?.totalClasses ?? 0}</p>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+      <Card className="hover:shadow-md transition-shadow">
+        <CardContent className="p-5">
+          <div className="flex items-center gap-3">
+            <div className="size-11 rounded-xl bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 flex items-center justify-center">
+              <IndianRupee className="size-5" />
+            </div>
+            <div>
+              <p className="text-xs text-muted-foreground">Fee Revenue</p>
+              <p className="text-2xl font-bold">₹{(data?.totalRevenue ?? 0).toLocaleString()}</p>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+      <Card className="hover:shadow-md transition-shadow">
+        <CardContent className="p-5">
+          <div className="flex items-center gap-3">
+            <div className="size-11 rounded-xl bg-violet-100 dark:bg-violet-900/30 text-violet-600 dark:text-violet-400 flex items-center justify-center">
+              <UserCheck className="size-5" />
+            </div>
+            <div>
+              <p className="text-xs text-muted-foreground">Avg Attendance</p>
+              <p className="text-2xl font-bold">{Number(data?.attendanceRate ?? 0).toFixed(2).replace(/\.00$/, "")}%</p>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+    </div>
+  );
+}

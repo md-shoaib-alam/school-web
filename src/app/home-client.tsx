@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useSyncExternalStore, useState } from "react";
-import { useRouter, redirect } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { useAppStore } from "@/store/use-app-store";
 import { apiFetch } from "@/lib/api";
 import {
@@ -30,8 +30,6 @@ export default function HomeClient() {
   const [maintenanceLoading, setMaintenanceLoading] = useState(true);
 
   const userRole = currentUser?.role;
-  const userTenantSlug = currentUser?.tenantSlug;
-  const userTenantId = currentUser?.tenantId;
 
   // Check maintenance mode for non-super_admin users
   useEffect(() => {
@@ -69,30 +67,63 @@ export default function HomeClient() {
     };
   }, [isLoggedIn, currentUser, userRole]);
 
+  // Unified Redirection Logic: Redirect to tenant-specific URL if logged in
+  useEffect(() => {
+    if (mounted && isLoggedIn && currentUser) {
+      const parts = window.location.pathname.split("/").filter(Boolean);
+      const isSuperAdmin = currentUser.role === "super_admin";
+      const expectedPrefix = currentUser.tenantSlug || currentUser.tenantId || currentTenantId;
+
+      // Only redirect if we are literally at the root "/"
+      if (parts.length === 0 && (expectedPrefix || isSuperAdmin)) {
+        const url = !expectedPrefix
+          ? `/${currentScreen}`
+          : currentScreen === "dashboard"
+            ? `/${expectedPrefix}`
+            : `/${expectedPrefix}/${currentScreen}`;
+
+        router.replace(url);
+      }
+    }
+  }, [mounted, isLoggedIn, currentUser, currentScreen, currentTenantId, router]);
+
   // Not mounted yet → render nothing (avoids hydration mismatch)
   if (!mounted) return null;
 
-  // Unified Redirection Logic: Redirect to tenant-specific URL if logged in
-  if (isLoggedIn && currentUser) {
-    const parts = window.location.pathname.split("/").filter(Boolean);
-    const isSuperAdmin = userRole === "super_admin";
-    const expectedPrefix =
-      userTenantSlug || userTenantId || currentTenantId;
+  // Not logged in → show login
+  if (!isLoggedIn) return <LoginScreen />;
 
-    // Only redirect if we are literally at the root "/"
-    if (parts.length === 0 && (expectedPrefix || isSuperAdmin)) {
-      const url = !expectedPrefix
-        ? `/${currentScreen}`
-        : currentScreen === "dashboard"
-          ? `/${expectedPrefix}`
-          : `/${expectedPrefix}/${currentScreen}`;
-
-      redirect(url);
-    }
+  // If logged in but still at "/", show skeleton while useEffect redirect kicks in
+  const parts = window.location.pathname.split("/").filter(Boolean);
+  if (parts.length === 0) {
+    return <FullPageSkeleton />;
   }
+
+  // Maintenance mode check
+  const isSuperAdmin = userRole === "super_admin";
+  if (isLoggedIn && !isSuperAdmin && maintenance.loading) {
+    return <FullPageSkeleton />;
+  }
+
+  if (isLoggedIn && !isSuperAdmin && maintenance.active) {
+    return <MaintenanceScreen message={maintenance.message} />;
+  }
+
+  return <FullPageSkeleton />;
+}
+ntScreen, currentTenantId, router]);
+
+  // Not mounted yet → render nothing (avoids hydration mismatch)
+  if (!mounted) return null;
 
   // Not logged in → show login
   if (!isLoggedIn) return <LoginScreen />;
+
+  // If logged in but still at "/", show skeleton while useEffect redirect kicks in
+  const parts = window.location.pathname.split("/").filter(Boolean);
+  if (parts.length === 0) {
+    return <FullPageSkeleton />;
+  }
 
   // Maintenance mode check
   const isSuperAdmin = userRole === "super_admin";
@@ -104,7 +135,5 @@ export default function HomeClient() {
     return <MaintenanceScreen message={maintenanceMessage} />;
   }
 
-  // If we are still here and logged in, we are likely at the root "/" and redirecting.
-  // We show a skeleton while the router.replace kicks in.
   return <FullPageSkeleton />;
 }

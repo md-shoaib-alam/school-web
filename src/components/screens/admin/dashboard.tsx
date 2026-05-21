@@ -1,81 +1,21 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Skeleton as BoneyardSkeleton } from "boneyard-js/react";
-import { Skeleton } from "@/components/ui/skeleton";
-import { Badge } from "@/components/ui/badge";
-import {
-  Users,
-  GraduationCap,
-  School,
-  IndianRupee,
-  Calendar,
-  Megaphone,
-  ArrowUpRight,
-  ArrowDownRight,
-  Heart,
-  CreditCard,
-  BookOpen,
-  Clock,
-  CheckCircle2,
-  AlertTriangle,
-  UserCheck,
-  BarChart3,
-  Activity,
-} from "lucide-react";
-import {
-  ChartContainer,
-  ChartTooltip,
-  ChartTooltipContent,
-  ChartLegend,
-  ChartLegendContent,
-} from "@/components/ui/chart";
-import type { ChartConfig } from "@/components/ui/chart";
 import { useAppStore } from "@/store/use-app-store";
 import { useQuery } from "@tanstack/react-query";
 import { useTenantDetail } from "@/lib/graphql/hooks/platform.hooks";
 import { api } from "@/lib/api";
-import { Button } from "@/components/ui/button";
 import { goeyToast as toast } from "goey-toast";
 import { differenceInDays } from "date-fns";
 
-const attendanceChartConfig = {
-  rate: { label: "Attendance Rate (%)", color: "#10b981" },
-} satisfies ChartConfig;
-
-const feeChartConfig = {
-  collected: { label: "Collected", color: "#10b981" },
-  pending: { label: "Pending", color: "#f59e0b" },
-} satisfies ChartConfig;
-
-const pieChartConfig = {
-  students: { label: "Students", color: "#10b981" },
-} satisfies ChartConfig;
-
-const COLORS = [
-  "#10b981",
-  "#059669",
-  "#047857",
-  "#065f46",
-  "#34d399",
-  "#6ee7b7",
-  "#a7f3d0",
-  "#d1fae5",
-];
-
-const priorityColors: Record<string, string> = {
-  normal: "bg-zinc-100 text-zinc-700 dark:bg-zinc-800 dark:text-zinc-300",
-  important:
-    "bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400",
-  urgent: "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400",
-};
-
-const priorityBorders: Record<string, string> = {
-  normal: "border-l-zinc-400 dark:border-l-zinc-500",
-  important: "border-l-orange-500",
-  urgent: "border-l-red-500",
-};
+// Sub-components
+import { SubscriptionAlert } from "./dashboard/SubscriptionAlert";
+import { WelcomeBanner } from "./dashboard/WelcomeBanner";
+import { MetricStats } from "./dashboard/MetricStats";
+import { AttendanceTrend } from "./dashboard/AttendanceTrend";
+import { ClassDistribution } from "./dashboard/ClassDistribution";
+import { FeeCollection } from "./dashboard/FeeCollection";
+import { RecentNotices } from "./dashboard/RecentNotices";
 
 function getGreeting() {
   const hours = new Date().getHours();
@@ -91,18 +31,6 @@ function getDaysRemaining(endDate?: string | null) {
   expiry.setHours(0, 0, 0, 0);
   now.setHours(0, 0, 0, 0);
   return differenceInDays(expiry, now);
-}
-
-function formatNoticeDate(createdAt: string | Date) {
-  return new Date(createdAt).toLocaleDateString();
-}
-
-function StatCardSkeleton() {
-  return (
-    <BoneyardSkeleton name="boneyard-card" loading={true} color="rgba(0,0,0,0.06)" darkColor="rgba(255,255,255,0.05)" animate="pulse">
-      <div className="h-[238px]" />
-    </BoneyardSkeleton>
-  );
 }
 
 export function AdminDashboard() {
@@ -134,33 +62,12 @@ export function AdminDashboard() {
 
   // In React Query v5, when enabled:false, isPending=true but fetchStatus='idle'
   const isLoading = isPending && fetchStatus === 'fetching';
-  const isError = error !== null;
 
   useEffect(() => {
     if (error) {
       toast.error("Dashboard data failed to load", { description: (error as any).message });
     }
   }, [error]);
-
-  // Map the unified data for the existing UI components
-  const summary = { 
-    data: dashboardData ? {
-      totalStudents: dashboardData.totalStudents,
-      totalTeachers: dashboardData.totalTeachers,
-      totalParents: dashboardData.totalParents,
-      totalClasses: dashboardData.totalClasses,
-      attendanceRate: dashboardData.attendanceRate,
-      upcomingEvents: dashboardData.upcomingEvents,
-    } : undefined, 
-    isLoading 
-  };
-  const attendance = { data: dashboardData?.monthlyAttendance, isLoading };
-  const academic = { data: { classDistribution: dashboardData?.classDistribution }, isLoading };
-  const financial = { data: { totalRevenue: dashboardData?.totalRevenue, feeByType: dashboardData?.feeByType }, isLoading };
-  const notices = { data: dashboardData?.recentNotices, isLoading };
-
-  // Only show full skeleton if we have NO data at all
-  const loading = isLoading && !dashboardData;
 
   const greeting = getGreeting();
 
@@ -173,313 +80,62 @@ export function AdminDashboard() {
 
   return (
     <div className="space-y-6">
-      {/* Subscription Alert */}
-      {(isExpiringSoon || isExpired) && (
-        <div className={`p-4 rounded-2xl flex items-center justify-between gap-4 border animate-in slide-in-from-top duration-500 ${
-          isExpired 
-            ? "bg-rose-50 border-rose-200 dark:bg-rose-950/20 dark:border-rose-900/50" 
-            : "bg-amber-50 border-amber-200 dark:bg-amber-950/20 dark:border-amber-900/50"
-        }`}>
-          <div className="flex items-center gap-3">
-            <div className={`size-10 rounded-xl flex items-center justify-center ${
-              isExpired ? "bg-rose-100 text-rose-600" : "bg-amber-100 text-amber-600"
-            }`}>
-              <AlertTriangle className="size-5" />
-            </div>
-            <div>
-              <p className={`text-sm font-bold ${isExpired ? "text-rose-900 dark:text-rose-200" : "text-amber-900 dark:text-amber-200"}`}>
-                {isExpired ? "Subscription Expired" : "Subscription Expiring Soon"}
-              </p>
-              <p className={`text-xs ${isExpired ? "text-rose-700 dark:text-rose-300" : "text-amber-700 dark:text-amber-300"}`}>
-                {isExpired 
-                  ? "Your school's license has expired. Please renew immediately to avoid service interruption." 
-                  : `Your license will expire in ${daysRemaining} days. Renew now to keep your institution running smoothly.`}
-              </p>
-            </div>
-          </div>
-          <Button 
-            size="sm" 
-            className={isExpired ? "bg-rose-600 hover:bg-rose-700" : "bg-amber-600 hover:bg-amber-700"}
-            onClick={() => window.location.href = `/${currentTenantSlug || tenantId}/school-subscription`}
-          >
-            Renew Now
-          </Button>
-        </div>
-      )}
+      <SubscriptionAlert 
+        isExpired={isExpired}
+        isExpiringSoon={isExpiringSoon}
+        daysRemaining={daysRemaining}
+        onRenew={() => window.location.href = `/${currentTenantSlug || tenantId}/school-subscription`}
+      />
 
-      {/* Welcome Banner - Progressive Summary Stats */}
-      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-teal-600 via-cyan-600 to-teal-700 p-6 text-white shadow-lg">
-        <div className="absolute top-0 right-0 size-72 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/3" />
-        <div className="absolute bottom-0 left-1/3 size-48 bg-white/5 rounded-full translate-y-1/2" />
-        <div className="relative z-10">
-          <div className="flex items-center gap-4 mb-3">
-            <div className="size-14 rounded-2xl bg-white/20 flex items-center justify-center backdrop-blur-sm overflow-hidden">
-              <img 
-                src={currentTenantLogo || currentUser?.tenantLogo || "/test.webp"} 
-                alt={currentTenantName || ""} 
-                className="size-full object-cover" 
-              />
-            </div>
-            <div>
-              <h2 className="text-2xl font-semibold tracking-tight" suppressHydrationWarning>
-                {greeting}, {currentUser?.name || "Admin"}!
-              </h2>
-              <p className="text-teal-100 text-sm">
-                Here&apos;s what&apos;s happening at {currentTenantName || "the school"} today
-              </p>
-            </div>
-          </div>
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-4">
-            {summary.isLoading && !summary.data ? (
-              <>
-                {[...Array(4)].map((_, i) => (
-                  <div key={i} className="bg-white/10 backdrop-blur-sm rounded-xl px-4 py-3">
-                    <Skeleton className="h-3 w-20 bg-white/20" />
-                    <Skeleton className="h-7 w-12 bg-white/20 mt-1" />
-                  </div>
-                ))}
-              </>
-            ) : (
-              <>
-                <div className="bg-white/10 backdrop-blur-sm rounded-xl px-4 py-3">
-                  <p className="text-teal-100 text-xs font-medium">Total Students</p>
-                  <p className="text-2xl font-bold flex items-center gap-1">
-                    <GraduationCap className="size-5 text-teal-200" />
-                    {summary.data?.totalStudents ?? 0}
-                  </p>
-                </div>
-                <div className="bg-white/10 backdrop-blur-sm rounded-xl px-4 py-3">
-                  <p className="text-teal-100 text-xs font-medium">Total Teachers</p>
-                  <p className="text-2xl font-bold flex items-center gap-1">
-                    <Users className="size-5 text-teal-200" />
-                    {summary.data?.totalTeachers ?? 0}
-                  </p>
-                </div>
-                <div className="bg-white/10 backdrop-blur-sm rounded-xl px-4 py-3">
-                  <p className="text-teal-100 text-xs font-medium">Attendance Rate</p>
-                  <p className="text-2xl font-bold flex items-center gap-1">
-                    <Activity className="size-5 text-teal-200" />
-                    {Number(summary.data?.attendanceRate ?? 0).toFixed(2).replace(/\.00$/, "")}%
-                  </p>
-                </div>
-                <div className="bg-white/10 backdrop-blur-sm rounded-xl px-4 py-3">
-                  <p className="text-teal-100 text-xs font-medium">Upcoming Events</p>
-                  <p className="text-2xl font-bold flex items-center gap-1">
-                    <Calendar className="size-5 text-teal-200" />
-                    {summary.data?.upcomingEvents ?? 0}
-                  </p>
-                </div>
-              </>
-            )}
-          </div>
-        </div>
-      </div>
+      <WelcomeBanner
+        greeting={greeting}
+        userName={currentUser?.name || "Admin"}
+        tenantName={currentTenantName || "the school"}
+        tenantLogo={currentTenantLogo || currentUser?.tenantLogo || "/test.webp"}
+        isLoading={isLoading}
+        summaryData={dashboardData ? {
+          totalStudents: dashboardData.totalStudents,
+          totalTeachers: dashboardData.totalTeachers,
+          attendanceRate: dashboardData.attendanceRate,
+          upcomingEvents: dashboardData.upcomingEvents,
+        } : undefined}
+      />
 
-      {/* Overview Stats Row */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        {summary.isLoading && !summary.data ? (
-          <>
-            <StatCardSkeleton />
-            <StatCardSkeleton />
-            <StatCardSkeleton />
-            <StatCardSkeleton />
-          </>
-        ) : (
-          <>
-            <Card className="hover:shadow-md transition-shadow">
-              <CardContent className="p-5">
-                <div className="flex items-center gap-3">
-                  <div className="size-11 rounded-xl bg-rose-100 dark:bg-rose-900/30 text-rose-600 dark:text-rose-400 flex items-center justify-center">
-                    <Heart className="size-5" />
-                  </div>
-                  <div>
-                    <p className="text-xs text-muted-foreground">Total Parents</p>
-                    <p className="text-2xl font-bold">{summary.data?.totalParents ?? 0}</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-            <Card className="hover:shadow-md transition-shadow">
-              <CardContent className="p-5">
-                <div className="flex items-center gap-3">
-                  <div className="size-11 rounded-xl bg-cyan-100 dark:bg-cyan-900/30 text-cyan-600 dark:text-cyan-400 flex items-center justify-center">
-                    <School className="size-5" />
-                  </div>
-                  <div>
-                    <p className="text-xs text-muted-foreground">Total Classes</p>
-                    <p className="text-2xl font-bold">{summary.data?.totalClasses ?? 0}</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-            <Card className="hover:shadow-md transition-shadow">
-              <CardContent className="p-5">
-                <div className="flex items-center gap-3">
-                  <div className="size-11 rounded-xl bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 flex items-center justify-center">
-                    <IndianRupee className="size-5" />
-                  </div>
-                  <div>
-                    <p className="text-xs text-muted-foreground">Fee Revenue</p>
-                    <p className="text-2xl font-bold">₹{(financial.data?.totalRevenue ?? 0).toLocaleString()}</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-            <Card className="hover:shadow-md transition-shadow">
-              <CardContent className="p-5">
-                <div className="flex items-center gap-3">
-                  <div className="size-11 rounded-xl bg-violet-100 dark:bg-violet-900/30 text-violet-600 dark:text-violet-400 flex items-center justify-center">
-                    <UserCheck className="size-5" />
-                  </div>
-                  <div>
-                    <p className="text-xs text-muted-foreground">Avg Attendance</p>
-                    <p className="text-2xl font-bold">{Number(summary.data?.attendanceRate ?? 0).toFixed(2).replace(/\.00$/, "")}%</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </>
-        )}
-      </div>
+      <MetricStats 
+        isLoading={isLoading}
+        data={dashboardData ? {
+          totalParents: dashboardData.totalParents,
+          totalClasses: dashboardData.totalClasses,
+          totalRevenue: dashboardData.totalRevenue,
+          attendanceRate: dashboardData.attendanceRate,
+        } : undefined}
+      />
 
-      {/* Charts Row */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <Card className="lg:col-span-2">
-          <CardHeader>
-            <CardTitle className="text-base flex items-center gap-2">
-              <Activity className="size-4 text-teal-600" />
-              Monthly Attendance Trend
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            {attendance.isLoading || !recharts ? (
-              <Skeleton className="h-[280px] w-full" />
-            ) : (
-              (() => {
-                const { BarChart, Bar, XAxis, YAxis, CartesianGrid } = recharts;
-                return (
-                  <ChartContainer config={attendanceChartConfig} className="h-[280px] w-full">
-                    <BarChart data={attendance.data ?? []}>
-                      <CartesianGrid strokeDasharray="3 3" vertical={false} />
-                      <XAxis dataKey="month" tickLine={false} axisLine={false} fontSize={12} />
-                      <YAxis domain={[0, 100]} tickLine={false} axisLine={false} fontSize={12} unit="%" />
-                      <ChartTooltip content={<ChartTooltipContent />} />
-                      <Bar dataKey="rate" fill="var(--color-rate)" radius={[6, 6, 0, 0]} maxBarSize={48} />
-                    </BarChart>
-                  </ChartContainer>
-                );
-              })()
-            )}
-          </CardContent>
-        </Card>
+        <AttendanceTrend 
+          isLoading={isLoading}
+          data={dashboardData?.monthlyAttendance ?? []}
+          recharts={recharts}
+        />
 
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-base flex items-center gap-2">
-              <GraduationCap className="size-4 text-cyan-600" />
-              Class Distribution
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            {academic.isLoading || !recharts ? (
-              <Skeleton className="h-[300px] w-full" />
-            ) : (
-              (() => {
-                const { PieChart, Pie, Cell } = recharts;
-                return (
-                  <ChartContainer config={pieChartConfig} className="h-[300px] w-full">
-                    <PieChart>
-                      <Pie
-                        data={academic.data?.classDistribution ?? []}
-                        cx="50%" cy="45%" innerRadius={50} outerRadius={80} paddingAngle={2}
-                        dataKey="students" nameKey="name"
-                        label={({ name, percent }) => `${name.split("-")[0]} ${(percent * 100).toFixed(0)}%`}
-                        labelLine={false} fontSize={10}
-                      >
-                        {(academic.data?.classDistribution ?? []).map((_, i) => (
-                          <Cell key={i} fill={COLORS[i % COLORS.length]} />
-                        ))}
-                      </Pie>
-                      <ChartTooltip content={<ChartTooltipContent />} />
-                    </PieChart>
-                  </ChartContainer>
-                );
-              })()
-            )}
-          </CardContent>
-        </Card>
+        <ClassDistribution 
+          isLoading={isLoading}
+          data={dashboardData?.classDistribution ?? []}
+          recharts={recharts}
+        />
       </div>
 
-      {/* Financial & Notices */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-base flex items-center gap-2">
-              <IndianRupee className="size-4 text-emerald-600" />
-              Fee Collection
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            {financial.isLoading || !recharts ? (
-              <Skeleton className="h-[280px] w-full" />
-            ) : (
-              (() => {
-                const { BarChart, Bar, XAxis, YAxis, CartesianGrid } = recharts;
-                return (
-                  <ChartContainer config={feeChartConfig} className="h-[280px] w-full">
-                    <BarChart data={financial.data?.feeByType ?? []} layout="vertical">
-                      <CartesianGrid strokeDasharray="3 3" horizontal={false} />
-                      <XAxis type="number" tickLine={false} axisLine={false} fontSize={12} tickFormatter={(v) => `₹${(v / 1000).toFixed(0)}k`} />
-                      <YAxis type="category" dataKey="type" tickLine={false} axisLine={false} fontSize={12} width={70} tickFormatter={(v) => v.charAt(0).toUpperCase() + v.slice(1)} />
-                      <ChartTooltip content={<ChartTooltipContent />} />
-                      <Bar dataKey="collected" fill="var(--color-collected)" radius={[0, 4, 4, 0]} maxBarSize={20} />
-                      <Bar dataKey="pending" fill="var(--color-pending)" radius={[0, 4, 4, 0]} maxBarSize={20} />
-                    </BarChart>
-                  </ChartContainer>
-                );
-              })()
-            )}
-          </CardContent>
-        </Card>
+        <FeeCollection 
+          isLoading={isLoading}
+          data={dashboardData?.feeByType ?? []}
+          recharts={recharts}
+        />
 
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-base flex items-center gap-2">
-              <Megaphone className="size-4 text-amber-500" />
-              Recent Notices
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            {notices.isLoading ? (
-              <div className="space-y-3">
-                {[...Array(4)].map((_, i) => <Skeleton key={i} className="h-16 w-full rounded-lg" />)}
-              </div>
-            ) : (
-              <div className="space-y-3 max-h-[320px] overflow-y-auto pr-1">
-                {(notices.data ?? []).length === 0 ? (
-                  <p className="text-sm text-muted-foreground text-center py-8">No notices yet</p>
-                ) : (
-                  (notices.data ?? []).map((notice) => (
-                    <div key={notice.id} className={`p-3 rounded-lg border border-l-4 ${priorityBorders[notice.priority] || priorityBorders.normal} bg-white dark:bg-zinc-900 hover:shadow-sm transition-shadow`}>
-                      <div className="flex items-start justify-between gap-2">
-                        <div className="min-w-0 flex-1">
-                          <p className="text-sm font-medium truncate">{notice.title}</p>
-                          <p className="text-xs text-muted-foreground mt-0.5 line-clamp-1">{notice.content}</p>
-                        </div>
-                        <Badge className={`text-[10px] shrink-0 ${priorityColors[notice.priority] || priorityColors.normal}`}>{notice.priority}</Badge>
-                      </div>
-                      <div className="flex items-center gap-2 mt-2 text-[11px] text-muted-foreground">
-                        <span>{notice.authorName}</span>
-                        <span>•</span>
-                        <span suppressHydrationWarning>{formatNoticeDate(notice.createdAt)}</span>
-                      </div>
-                    </div>
-                  ))
-                )}
-              </div>
-            )}
-          </CardContent>
-        </Card>
+        <RecentNotices 
+          isLoading={isLoading}
+          data={dashboardData?.recentNotices ?? []}
+        />
       </div>
     </div>
   );

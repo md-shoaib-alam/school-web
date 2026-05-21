@@ -2,11 +2,19 @@
 
 import { useRouter } from "next/navigation";
 import Image from "next/image";
+import { useAppStore } from "@/store/use-app-store";
+import { LogOut } from "lucide-react";
 
 export function NotFoundScreen() {
   const router = useRouter();
+  const { logout, isLoggedIn } = useAppStore();
 
   const goHome = () => {
+    router.push("/");
+  };
+
+  const handleLogout = () => {
+    logout();
     router.push("/");
   };
 
@@ -41,14 +49,26 @@ export function NotFoundScreen() {
         </div>
       </div>
 
-      {/* Bottom Section: Action Button */}
+      {/* Bottom Section: Action Buttons */}
       <div className="w-full flex flex-col items-center gap-6 animate-[fade-up_0.8s_ease-out_0.2s_forwards] opacity-0">
-        <button
-          onClick={goHome}
-          className="bg-[#FAA21B] hover:bg-[#E08D10] text-[#412137] dark:text-[#25101E] font-bold text-sm sm:text-base py-3 px-10 rounded-full shadow-[0_4px_14px_rgba(250,162,27,0.35)] hover:shadow-[0_6px_20px_rgba(250,162,27,0.5)] transition-all duration-300 transform hover:scale-105 active:scale-95 cursor-pointer"
-        >
-          Back to Home
-        </button>
+        <div className="flex flex-col sm:flex-row items-center gap-4">
+          <button
+            onClick={goHome}
+            className="bg-[#FAA21B] hover:bg-[#E08D10] text-[#412137] dark:text-[#25101E] font-bold text-sm sm:text-base py-3 px-10 rounded-full shadow-[0_4px_14px_rgba(250,162,27,0.35)] hover:shadow-[0_6px_20px_rgba(250,162,27,0.5)] transition-all duration-300 transform hover:scale-105 active:scale-95 cursor-pointer"
+          >
+            Back to Home
+          </button>
+
+          {isLoggedIn && (
+            <button
+              onClick={handleLogout}
+              className="flex items-center gap-2 bg-white/50 dark:bg-white/5 hover:bg-white/80 dark:hover:bg-white/10 text-zinc-700 dark:text-zinc-300 font-semibold text-sm py-3 px-8 rounded-full border border-zinc-200 dark:border-zinc-800 transition-all duration-300 transform hover:scale-105 active:scale-95 cursor-pointer"
+            >
+              <LogOut className="size-4" />
+              Sign Out
+            </button>
+          )}
+        </div>
 
         {/* Subtle Supporting Footer Text */}
         <p className="text-xs font-medium text-[#BD695B] dark:text-[#A8584B] tracking-wide">
