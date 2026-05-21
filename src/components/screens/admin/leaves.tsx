@@ -277,12 +277,12 @@ function StaffSelfServiceView() {
           <div className="space-y-4 py-4">
              <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-1">
-                  <label className="text-xs font-medium">Start Date</label>
-                  <Input type="date" value={form.startDate} onChange={e => setForm({...form, startDate: e.target.value})} />
+                  <label htmlFor="start-date" className="text-xs font-medium">Start Date</label>
+                  <Input id="start-date" type="date" value={form.startDate} onChange={e => setForm({...form, startDate: e.target.value})} />
                 </div>
                 <div className="space-y-1">
-                  <label className="text-xs font-medium">End Date</label>
-                  <Input type="date" value={form.endDate} onChange={e => setForm({...form, endDate: e.target.value})} />
+                  <label htmlFor="end-date" className="text-xs font-medium">End Date</label>
+                  <Input id="end-date" type="date" value={form.endDate} onChange={e => setForm({...form, endDate: e.target.value})} />
                 </div>
              </div>
              <Select value={form.leaveType} onValueChange={v => setForm({...form, leaveType: v})}>

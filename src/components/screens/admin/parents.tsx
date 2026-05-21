@@ -53,10 +53,6 @@ export function AdminParents() {
   const debouncedSearch = useDebounce(search, 500);
   const [currentPage, setCurrentPage] = useState(1);
 
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [debouncedSearch]);
-
   // Queries
   const { 
     data: parentsData, 
@@ -337,7 +333,10 @@ export function AdminParents() {
           placeholder="Search parents or children..."
           className="pl-9"
           value={search}
-          onChange={(e) => setSearch(e.target.value)}
+          onChange={(e) => {
+            setSearch(e.target.value);
+            setCurrentPage(1);
+          }}
         />
       </div>
 

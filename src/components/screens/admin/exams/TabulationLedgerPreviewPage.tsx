@@ -32,8 +32,14 @@ export function TabulationLedgerPreviewPage({
   onBack
 }: TabulationLedgerPreviewPageProps) {
   const [selectedTemplateId, setSelectedTemplateId] = useState<string>(initialTemplateId);
-  const [ledgerData, setLedgerData] = useState<LedgerData | null>(null);
-  const [loading, setLoading] = useState<boolean>(false);
+  const [state, setState] = useState<{
+    loading: boolean;
+    ledgerData: LedgerData | null;
+  }>({
+    loading: false,
+    ledgerData: null,
+  });
+  const { loading, ledgerData } = state;
   const [printing, setPrinting] = useState<boolean>(false);
   const [zoomScale, setZoomScale] = useState<number>(0.65); // Default to 65% zoom for landscape preview
   const [unscaledHeight, setUnscaledHeight] = useState<number>(794);
@@ -46,7 +52,7 @@ export function TabulationLedgerPreviewPage({
     if (!classId) return;
 
     const loadData = async () => {
-      setLoading(true);
+      setState(prev => ({ ...prev, loading: true }));
       try {
         const compiled = await compileTabularLedgerData({
           classId,
@@ -56,15 +62,15 @@ export function TabulationLedgerPreviewPage({
           examName
         });
         if (compiled) {
-          setLedgerData(compiled);
+          setState({ loading: false, ledgerData: compiled });
         } else {
           toast.error("Failed to compile tabulation ledger data");
+          setState(prev => ({ ...prev, loading: false }));
         }
       } catch (err) {
         console.error("Failed to load tabulation data:", err);
         toast.error("An error occurred while compiling tabulation data");
-      } finally {
-        setLoading(false);
+        setState(prev => ({ ...prev, loading: false }));
       }
     };
 
@@ -218,6 +224,7 @@ export function TabulationLedgerPreviewPage({
         ) : (
           <div className="w-full flex flex-col items-center">
             {/* Google Fonts Preload for Preview Card */}
+            {/* eslint-disable-next-line @next/next/no-page-custom-font */}
             <link 
               rel="stylesheet" 
               href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800;900&family=Montserrat:wght@500;600;700;800&family=Inter:wght@400;500;600;700;800&display=swap" 

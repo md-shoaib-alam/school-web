@@ -40,6 +40,7 @@ export function ParentAttendance() {
         ?.split("=")[1];
       
       if (savedTab && students.some(s => s.id === savedTab)) {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         setActiveTab(savedTab);
       } else if (!activeTab) {
         setActiveTab(students[0].id);

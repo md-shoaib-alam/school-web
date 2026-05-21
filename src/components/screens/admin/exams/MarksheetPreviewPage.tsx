@@ -419,6 +419,7 @@ export function MarksheetPreviewPage({
             )}
 
             {/* Google Fonts Preload for Preview Card */}
+            {/* eslint-disable-next-line @next/next/no-page-custom-font */}
             <link 
               rel="stylesheet" 
               href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800;900&family=Montserrat:wght@500;600;700;800&family=Inter:wght@400;500;600;700;800&display=swap" 

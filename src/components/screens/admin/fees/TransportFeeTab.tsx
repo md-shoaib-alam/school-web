@@ -323,7 +323,7 @@ export function TransportFeeTab() {
           <div className="grid gap-4 py-4">
             <div className="space-y-2">
               <Label>Select Class *</Label>
-              <Select value={assignmentData.classId} onValueChange={v => setAssignmentData({...assignmentData, classId: v, studentId: ''})}>
+              <Select value={assignmentData.classId} onValueChange={v => setAssignmentData(prev => ({...prev, classId: v, studentId: ''}))}>
                 <SelectTrigger><SelectValue placeholder="Select class first..." /></SelectTrigger>
                 <SelectContent>
                   {classes.map((c: any) => <SelectItem key={c.id} value={c.id}>{c.name}-{c.section} (Grade {c.grade})</SelectItem>)}
@@ -332,18 +332,25 @@ export function TransportFeeTab() {
             </div>
             <div className="space-y-2">
               <Label>Select Student *</Label>
-              <Select value={assignmentData.studentId} onValueChange={v => setAssignmentData({...assignmentData, studentId: v})} disabled={!assignmentData.classId}>
+              <Select value={assignmentData.studentId} onValueChange={v => setAssignmentData(prev => ({...prev, studentId: v}))} disabled={!assignmentData.classId}>
                 <SelectTrigger><SelectValue placeholder={assignmentData.classId ? "Select student..." : "Pick a class first"} /></SelectTrigger>
                 <SelectContent>
-                  {students.filter((s: any) => !assignmentData.classId || s.classId === assignmentData.classId).map((s: any) => (
-                    <SelectItem key={s.id} value={s.id}>{s.user?.name || s.name}</SelectItem>
-                  ))}
+                  {students.reduce((acc: React.ReactNode[], s: any) => {
+                    if (!assignmentData.classId || s.classId === assignmentData.classId) {
+                      acc.push(
+                        <SelectItem key={s.id} value={s.id}>
+                          {s.user?.name || s.name}
+                        </SelectItem>
+                      );
+                    }
+                    return acc;
+                  }, [])}
                 </SelectContent>
               </Select>
             </div>
             <div className="space-y-2">
               <Label>Select Route</Label>
-              <Select value={assignmentData.routeId} onValueChange={v => setAssignmentData({...assignmentData, routeId: v})}>
+              <Select value={assignmentData.routeId} onValueChange={v => setAssignmentData(prev => ({...prev, routeId: v}))}>
                 <SelectTrigger><SelectValue placeholder="Select route..." /></SelectTrigger>
                 <SelectContent>
                   {routes.map((r: any) => <SelectItem key={r.id} value={r.id}>{r.name} (₹{r.fee})</SelectItem>)}
@@ -354,7 +361,7 @@ export function TransportFeeTab() {
               <Label className="mb-1">Start Date</Label>
               <DatePicker 
                 date={assignmentData.startDate ? parseISO(assignmentData.startDate) : undefined} 
-                onChange={(d) => setAssignmentData({...assignmentData, startDate: d ? d.toISOString().split('T')[0] : ''})} 
+                onChange={(d) => setAssignmentData(prev => ({...prev, startDate: d ? d.toISOString().split('T')[0] : ''}))} 
                 className="w-full h-10"
               />
             </div>
@@ -378,15 +385,15 @@ export function TransportFeeTab() {
           <div className="grid gap-4 py-4">
             <div className="space-y-2">
               <Label>Route Name *</Label>
-              <Input placeholder="e.g. North Sector Loop" value={routeData.name} onChange={e => setRouteData({...routeData, name: e.target.value})} />
+              <Input placeholder="e.g. North Sector Loop" value={routeData.name} onChange={e => setRouteData(prev => ({...prev, name: e.target.value}))} />
             </div>
             <div className="space-y-2">
               <Label>Monthly Fee (₹) *</Label>
-              <Input type="number" placeholder="e.g. 1500" value={routeData.fee} onChange={e => setRouteData({...routeData, fee: e.target.value})} />
+              <Input type="number" placeholder="e.g. 1500" value={routeData.fee} onChange={e => setRouteData(prev => ({...prev, fee: e.target.value}))} />
             </div>
             <div className="space-y-2">
               <Label>Assign Vehicle (Optional)</Label>
-              <Select value={routeData.vehicleId} onValueChange={v => setRouteData({...routeData, vehicleId: v})}>
+              <Select value={routeData.vehicleId} onValueChange={v => setRouteData(prev => ({...prev, vehicleId: v}))}>
                 <SelectTrigger><SelectValue placeholder="Select vehicle" /></SelectTrigger>
                 <SelectContent>
                   <SelectItem value="none">No Vehicle</SelectItem>
@@ -414,23 +421,23 @@ export function TransportFeeTab() {
           <div className="grid gap-4 py-4">
             <div className="space-y-2">
               <Label>Vehicle Number *</Label>
-              <Input placeholder="e.g. DL 01 AB 1234" value={vehicleData.number} onChange={e => setVehicleData({...vehicleData, number: e.target.value})} />
+              <Input placeholder="e.g. DL 01 AB 1234" value={vehicleData.number} onChange={e => setVehicleData(prev => ({...prev, number: e.target.value}))} />
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label>Type</Label>
-                <Select value={vehicleData.type} onValueChange={v => setVehicleData({...vehicleData, type: v})}>
+                <Select value={vehicleData.type} onValueChange={v => setVehicleData(prev => ({...prev, type: v}))}>
                   <SelectTrigger><SelectValue /></SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="bus">Bus</SelectItem>
-                    <SelectItem value="van">Van</SelectItem>
-                    <SelectItem value="mini_bus">Mini Bus</SelectItem>
+                     <SelectItem value="bus">Bus</SelectItem>
+                     <SelectItem value="van">Van</SelectItem>
+                     <SelectItem value="mini_bus">Mini Bus</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
               <div className="space-y-2">
                 <Label>Capacity</Label>
-                <Input type="number" value={vehicleData.capacity} onChange={e => setVehicleData({...vehicleData, capacity: e.target.value})} />
+                <Input type="number" value={vehicleData.capacity} onChange={e => setVehicleData(prev => ({...prev, capacity: e.target.value}))} />
               </div>
             </div>
           </div>

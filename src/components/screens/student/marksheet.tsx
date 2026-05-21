@@ -242,6 +242,7 @@ export function StudentMarksheet() {
       ) : (
         <div className="w-full overflow-x-auto pb-6 flex justify-center bg-zinc-50 dark:bg-zinc-950/20 p-4 sm:p-6 rounded-2xl">
           {/* Google Fonts Preload for Preview Card */}
+          {/* eslint-disable-next-line @next/next/no-page-custom-font */}
           <link 
             rel="stylesheet" 
             href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800;900&family=Montserrat:wght@500;600;700;800&family=Inter:wght@400;500;600;700;800&display=swap" 
