@@ -2,6 +2,7 @@
 
 import { Skeleton } from "@/components/ui/skeleton";
 import { GraduationCap, Users, Activity, Calendar } from "lucide-react";
+import Image from "next/image";
 
 interface WelcomeBannerProps {
   greeting: string;
@@ -31,11 +32,13 @@ export function WelcomeBanner({
       <div className="absolute bottom-0 left-1/3 size-48 bg-white/5 rounded-full translate-y-1/2" />
       <div className="relative z-10">
         <div className="flex items-center gap-4 mb-3">
-          <div className="size-14 rounded-2xl bg-white/20 flex items-center justify-center backdrop-blur-sm overflow-hidden">
-            <img 
+          <div className="size-14 rounded-2xl bg-white/20 flex items-center justify-center backdrop-blur-sm overflow-hidden relative">
+            <Image 
               src={tenantLogo || "/test.webp"} 
-              alt={tenantName || ""} 
-              className="size-full object-cover" 
+              alt={tenantName || "School Logo"} 
+              fill
+              className="object-cover" 
+              sizes="56px"
             />
           </div>
           <div>
@@ -51,7 +54,7 @@ export function WelcomeBanner({
           {isLoading && !summaryData ? (
             <>
               {[...Array(4)].map((_, i) => (
-                <div key={i} className="bg-white/10 backdrop-blur-sm rounded-xl px-4 py-3">
+                <div key={`welcome-skel-${i}`} className="bg-white/10 backdrop-blur-sm rounded-xl px-4 py-3">
                   <Skeleton className="h-3 w-20 bg-white/20" />
                   <Skeleton className="h-7 w-12 bg-white/20 mt-1" />
                 </div>

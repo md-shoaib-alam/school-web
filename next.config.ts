@@ -3,6 +3,14 @@ import { withSentryConfig } from "@sentry/nextjs";
 
 const nextConfig: NextConfig = {
   allowedDevOrigins: ['192.168.1.33', 'localhost:3000'],
+  images: {
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'pub-0c4be3a2bb63412c804a5baf73659e3d.r2.dev',
+      },
+    ],
+  },
 };
 
 export default withSentryConfig(nextConfig, {

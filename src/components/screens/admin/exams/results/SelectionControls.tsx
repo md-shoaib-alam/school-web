@@ -48,9 +48,9 @@ export function SelectionControls({
           
           {/* Dropdown 1: Select Class */}
           <div className="flex-1 min-w-[200px]">
-            <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider block mb-1">Class</label>
+            <label htmlFor="results-class-select" className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider block mb-1">Class</label>
             <Select value={resultsClassId} onValueChange={onResultsClassChange}>
-              <SelectTrigger className="w-full h-10">
+              <SelectTrigger id="results-class-select" className="w-full h-10">
                 <div className="flex items-center gap-2">
                   <School className="size-4 text-orange-500 shrink-0" />
                   <SelectValue placeholder="Choose a class..." />
@@ -66,7 +66,7 @@ export function SelectionControls({
 
           {/* Dropdown 2: Select Exam Group */}
           <div className="flex-1 min-w-[200px]">
-            <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider block mb-1">Exam</label>
+            <label htmlFor="results-exam-select" className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider block mb-1">Exam</label>
             <Select 
               value={selectedExamGroup} 
               onValueChange={(val) => {
@@ -75,7 +75,7 @@ export function SelectionControls({
               }}
               disabled={!resultsClassId}
             >
-              <SelectTrigger className={`w-full h-10 ${resultsClassId ? 'border-orange-200 dark:border-orange-900/50' : 'opacity-50'}`}>
+              <SelectTrigger id="results-exam-select" className={`w-full h-10 ${resultsClassId ? 'border-orange-200 dark:border-orange-900/50' : 'opacity-50'}`}>
                 <div className="flex items-center gap-2">
                   <Trophy className="size-4 text-blue-500 shrink-0" />
                   <SelectValue placeholder="Select Exam..." />
@@ -95,7 +95,7 @@ export function SelectionControls({
 
           {/* Dropdown 3: Select Subject */}
           <div className="flex-1 min-w-[200px]">
-            <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider block mb-1">Subject</label>
+            <label htmlFor="results-subject-select" className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider block mb-1">Subject</label>
             <Select 
               value={selectedExam?.id || ''} 
               onValueChange={(id) => {
@@ -104,7 +104,7 @@ export function SelectionControls({
               }}
               disabled={!selectedExamGroup}
             >
-              <SelectTrigger className={`w-full h-10 ${selectedExamGroup ? 'border-emerald-200 dark:border-emerald-900/50' : 'opacity-50'}`}>
+              <SelectTrigger id="results-subject-select" className={`w-full h-10 ${selectedExamGroup ? 'border-emerald-200 dark:border-emerald-900/50' : 'opacity-50'}`}>
                 <div className="flex items-center gap-2">
                   <BookOpen className="size-4 text-emerald-500 shrink-0" />
                   <SelectValue placeholder="Select Subject..." />

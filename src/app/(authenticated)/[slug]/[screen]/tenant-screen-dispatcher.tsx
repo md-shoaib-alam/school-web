@@ -1,17 +1,15 @@
 "use client";
 
-import { useState, useEffect, Suspense } from 'react';
-import { useParams } from 'next/navigation';
+import { useEffect, useSyncExternalStore } from 'react';
+import { useParams, redirect } from 'next/navigation';
 import { useAppStore } from '@/store/use-app-store';
 import dynamic from 'next/dynamic';
 import { ParentHomework } from '@/components/screens';
-
 import { FullPageSkeleton } from "@/components/ui/full-page-skeleton";
 
 const LoadingScreen = () => <FullPageSkeleton />;
 
 const UserProfileScreen = dynamic(() => import('@/components/screens').then(m => m.UserProfileScreen), { loading: LoadingScreen });
-
 const TeacherDashboard = dynamic(() => import('@/components/screens/teacher/dashboard').then(m => m.TeacherDashboard));
 const StudentDashboard = dynamic(() => import('@/components/screens/student/dashboard').then(m => m.StudentDashboard));
 const ParentDashboard = dynamic(() => import('@/components/screens/parent/dashboard').then(m => m.ParentDashboard));
@@ -81,37 +79,42 @@ const ParentTickets = dynamic(() => import('@/components/screens/parent/tickets'
 
 const NotFoundScreen = dynamic(() => import('@/components/screens/error/not-found').then(m => m.NotFoundScreen));
 
+const emptySubscribe = () => () => {};
+function useHydrated() {
+  return useSyncExternalStore(emptySubscribe, () => true, () => false);
+}
+
 export default function TenantScreenDispatcherClient() {
   const { slug, screen } = useParams();
+  const mounted = useHydrated();
   const { currentUser } = useAppStore();
-  const [mounted, setMounted] = useState(false);
-  const urlSlug = typeof slug === 'string' ? slug.toLowerCase() : '';
-  const userTenantId = currentUser?.tenantId?.toLowerCase() || '';
-  const userTenantSlug = currentUser?.tenantSlug?.toLowerCase() || '';
-  const isTenantMatch = (urlSlug === userTenantId || urlSlug === userTenantSlug);
 
-  useEffect(() => {
-    queueMicrotask(() => {
-      setMounted(true);
-    });
-  }, []);
+  // REDIRECTION LOGIC (DURING RENDER)
+  if (mounted && currentUser) {
+    const urlSlug = typeof slug === 'string' ? slug.toLowerCase() : '';
+    const userTenantId = currentUser?.tenantId?.toLowerCase() || '';
+    const userTenantSlug = currentUser?.tenantSlug?.toLowerCase() || '';
+    const isTenantMatch = (urlSlug === userTenantId || urlSlug === userTenantSlug);
 
-  // [FIX] Auto-redirection if slug mismatch
-  useEffect(() => {
-    if (mounted && currentUser && currentUser.role !== 'super_admin' && !isTenantMatch) {
+    if (currentUser.role !== 'super_admin' && !isTenantMatch) {
       const correctSlug = currentUser.tenantSlug || currentUser.tenantId;
       if (correctSlug) {
-        window.location.href = `/${correctSlug}/${screen}`;
+        redirect(`/${correctSlug}/${screen}`);
       }
     }
-  }, [mounted, isTenantMatch, screen, currentUser?.role, currentUser?.tenantSlug, currentUser?.tenantId]);
+  }
 
   if (!mounted || !currentUser) {
     return <LoadingScreen />;
   }
 
+  const urlSlug = typeof slug === 'string' ? slug.toLowerCase() : '';
+  const userTenantId = currentUser?.tenantId?.toLowerCase() || '';
+  const userTenantSlug = currentUser?.tenantSlug?.toLowerCase() || '';
+  const isTenantMatch = (urlSlug === userTenantId || urlSlug === userTenantSlug);
+
   if (currentUser.role !== 'super_admin' && !isTenantMatch) {
-    return <LoadingScreen />; // Show loading while useEffect redirect kicks in
+    return <LoadingScreen />;
   }
   
   if (currentUser.role === 'super_admin' || currentUser.role === 'admin' || currentUser.role === 'staff') {
@@ -120,7 +123,7 @@ export default function TenantScreenDispatcherClient() {
       case 'dashboard': 
         if (currentUser.role === 'super_admin' && slug === 'tenants') return <SuperAdminDashboard />;
         return currentUser.role === 'staff' ? <StaffDashboard /> : <AdminDashboard />;
-      case 'students': return <Suspense fallback={<LoadingScreen />}><AdminStudents /></Suspense>;
+      case 'students': return <AdminStudents />;
       case 'teachers': return <AdminTeachers />;
       case 'parents': return <AdminParents />;
       case 'classes': return <AdminClasses />;
@@ -158,10 +161,10 @@ export default function TenantScreenDispatcherClient() {
       case 'grades': return <TeacherGrades />;
       case 'teacher-attendance': return <StaffAttendance key="teacher-att" initialTab="teacher" />;
       case 'staff-attendance': return <StaffAttendance key="staff-att" initialTab="staff" />;
-      case 'exams': return <Suspense fallback={<LoadingScreen />}><AdminExams key="exams" initialTab="exams" /></Suspense>;
-      case 'results-entry': return <Suspense fallback={<LoadingScreen />}><AdminExams key="results" initialTab="results" /></Suspense>;
-      case 'published-results': return <Suspense fallback={<LoadingScreen />}><AdminExams key="published" initialTab="published" /></Suspense>;
-      case 'print-marksheet': return <Suspense fallback={<LoadingScreen />}><AdminPrintMarksheet /></Suspense>;
+      case 'exams': return <AdminExams key="exams" initialTab="exams" />;
+      case 'results-entry': return <AdminExams key="results" initialTab="results" />;
+      case 'published-results': return <AdminExams key="published" initialTab="published" />;
+      case 'print-marksheet': return <AdminPrintMarksheet />;
       case 'admit-cards': return <AdminAdmitCards />;
     }
   }
@@ -225,6 +228,13 @@ export default function TenantScreenDispatcherClient() {
       case 'calendar': return <ParentCalendar />;
       case 'tickets': return <ParentTickets />;
     }
+  }
+
+  // FAIL-SAFE: If we got here and the user is logged in,
+  // they are at an invalid screen. Redirect them to their dashboard.
+  if (mounted && currentUser) {
+    const fallback = currentUser.tenantSlug || currentUser.tenantId || "";
+    redirect(fallback ? `/${fallback}/dashboard` : "/dashboard");
   }
 
   return <NotFoundScreen />;

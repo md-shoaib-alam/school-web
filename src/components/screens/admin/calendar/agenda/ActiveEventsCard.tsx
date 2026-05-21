@@ -75,6 +75,14 @@ export function ActiveEventsCard({
               <div 
                 key={ev.id} 
                 onClick={() => onDetailClick(ev)}
+                role="button"
+                tabIndex={0}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    onDetailClick(ev);
+                  }
+                }}
                 className="group relative p-3.5 bg-zinc-50/30 dark:bg-white/[0.02] hover:bg-white dark:hover:bg-white/[0.04] border border-zinc-100 dark:border-white/[0.05] hover:border-zinc-200/80 hover:shadow-[0_4px_12px_rgba(0,0,0,0.02)] dark:hover:shadow-[0_4px_20px_rgba(0,0,0,0.2)] rounded-2xl transition-all duration-200 cursor-pointer hover:-translate-y-0.5 active:translate-y-0"
               >
                 <div className="absolute left-0 top-3 bottom-3 w-1 rounded-r-full transition-transform duration-300 group-hover:scale-y-125" style={{ backgroundColor: ev.color || EVENT_TYPE_COLORS[ev.type] || "#3b82f6" }} />
