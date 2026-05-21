@@ -1,41 +1,25 @@
 'use client';
 
-import { useState, useEffect, useCallback, useRef, useMemo, memo } from 'react';
+import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { useReactToPrint } from 'react-to-print';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
+import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Checkbox } from '@/components/ui/checkbox';
 import {
-  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
-} from '@/components/ui/select';
-import {
-  Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
-} from '@/components/ui/table';
-import {
-  Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription,
-} from '@/components/ui/dialog';
-import { Skeleton } from '@/components/ui/skeleton';
-import {
-  FileText, Printer, Eye, Loader2, GraduationCap, Calendar,
-  Phone, School, BookOpen, ClipboardList, AlertCircle, X,
-  RefreshCw,
+  FileText, Printer, Loader2, School,
 } from 'lucide-react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { goeyToast as toast } from "goey-toast";
 import { api, apiFetch } from '@/lib/api';
+import { Skeleton } from '@/components/ui/skeleton';
 
-// ══════════════════════════════════════════════════════════════
-// ── Types ──
-// ══════════════════════════════════════════════════════════════
+// Sub-components
+import { ClassSelector } from './admit-cards/ClassSelector';
+import { ConfigurationCard } from './admit-cards/ConfigurationCard';
+import { GeneratedCardsTable } from './admit-cards/GeneratedCardsTable';
+import { ViewCardDialog } from './admit-cards/ViewCardDialog';
+import { BatchPrintContainers } from './admit-cards/BatchPrintContainers';
 
-interface ClassOption {
-  id: string;
-  name: string;
-  section: string;
-  grade: string;
-}
-
+// Types
 interface StudentInfo {
   id: string;
   rollNumber: string;
@@ -75,26 +59,6 @@ interface AdmitCard {
   generatedAt: string;
 }
 
-interface ClassData {
-  class: { id: string; name: string; section: string; grade: string };
-  school: { name: string; address: string | null; phone: string | null; email: string | null } | null;
-  examTypes: string[];
-  exams: ExamSchedule[];
-  students: { id: string; rollNumber: string; name: string; class: { id: string; name: string; section: string; grade: string } }[];
-}
-
-// ══════════════════════════════════════════════════════════════
-// ── Helpers ──
-// ══════════════════════════════════════════════════════════════
-
-const examTypeLabels: Record<string, string> = {
-  unit_test: 'Unit Test',
-  midterm: 'Mid-Term',
-  final: 'Final Exam',
-  quiz: 'Quiz',
-  practical: 'Practical',
-};
-
 const examTypeColors: Record<string, string> = {
   unit_test: 'bg-sky-100 dark:bg-sky-900/30 text-sky-700 dark:text-sky-400',
   midterm: 'bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400',
@@ -103,178 +67,13 @@ const examTypeColors: Record<string, string> = {
   practical: 'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400',
 };
 
-function formatDate(dateStr: string): string {
-  if (!dateStr) return 'N/A';
-  try {
-    return new Date(dateStr).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
-  } catch { return dateStr; }
-}
-
 function getTodayDateString(): string {
   return new Date().toISOString().split('T')[0];
-}
-
-function formatTime(time: string): string {
-  if (!time) return '—';
-  const [h, m] = time.split(':').map(Number);
-  const ampm = h >= 12 ? 'PM' : 'AM';
-  const hour = h % 12 || 12;
-  return `${hour}:${String(m).padStart(2, '0')} ${ampm}`;
 }
 
 function getExamTypeColor(type: string): string {
   return examTypeColors[type] || 'bg-zinc-100 dark:bg-zinc-900/30 text-zinc-700 dark:text-zinc-400';
 }
-
-// ══════════════════════════════════════════════════════════════
-// ── Admit Card Visual Component (Hall Ticket) ──
-// ══════════════════════════════════════════════════════════════
-
-const AdmitCardVisual = memo(function AdmitCardVisual({ card }: { card: AdmitCard }) {
-  const schoolName = card.school?.name || 'Global Academy';
-  const schoolAddress = card.school?.address || 'School Address';
-  const schoolPhone = card.school?.phone || '';
-  const todayDateString = useMemo(() => getTodayDateString(), []);
-
-  return (
-    <div 
-      className="w-[100%] max-w-[750px] mx-auto bg-white rounded-lg shadow-sm border border-zinc-200 overflow-hidden print:shadow-none print:border-zinc-400 print:rounded-none print:max-w-none h-[13cm] print:h-[13.5cm] print:w-[9.6cm] flex flex-col justify-between"
-      style={{ WebkitPrintColorAdjust: 'exact', printColorAdjust: 'exact' } as any}
-    >
-      <div>
-        {/* ── Header ── */}
-        <div className="bg-gradient-to-r from-zinc-800 via-zinc-700 to-zinc-800 text-white px-5 py-2">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <div className="size-9 rounded-full bg-white/15 flex items-center justify-center border-2 border-white/20">
-                <GraduationCap className="size-5 text-amber-300" />
-              </div>
-              <div>
-                <h2 className="text-sm font-semibold tracking-wide leading-tight">{schoolName.toUpperCase()}</h2>
-                <p className="text-[9px] text-zinc-300 truncate max-w-[300px]">{schoolAddress}</p>
-              </div>
-            </div>
-            <div className="text-right">
-              <p className="text-[8px] uppercase tracking-[0.2em] text-zinc-400 font-medium">Examination</p>
-              <p className="text-lg font-bold text-amber-300 leading-tight">ADMIT CARD</p>
-              <p className="text-[9px] text-zinc-400 font-mono">{card.cardNumber}</p>
-            </div>
-          </div>
-        </div>
-
-        {/* ── Academic Year Banner ── */}
-        <div className="bg-amber-500/5 border-b border-amber-400/20 px-5 py-1 flex items-center justify-between">
-          <p className="text-[10px] font-semibold text-amber-700 dark:text-amber-500">
-            <School className="size-2.5 inline mr-1" />
-            Class: {card.class.grade} — {card.class.name} ({card.class.section})
-          </p>
-          <p className="text-[10px] text-muted-foreground flex items-center gap-1">
-            <Calendar className="size-2.5" />
-            Session 2024-25
-          </p>
-        </div>
-
-        {/* ── Student Info Section ── */}
-        <div className="px-5 py-2">
-          <div className="flex gap-4">
-            <div className="shrink-0">
-              <div className="h-20 w-16 rounded border-2 border-dashed border-zinc-300 bg-zinc-50 flex flex-col items-center justify-center">
-                <span className="text-xl font-bold text-zinc-300">{card.student.initials}</span>
-                <span className="text-[7px] text-zinc-300 mt-0.5">PHOTO</span>
-              </div>
-            </div>
-
-            <div className="flex-1 grid grid-cols-2 gap-x-4 gap-y-1 text-xs">
-              <div>
-                <p className="text-[9px] text-zinc-400 uppercase font-medium">Student Name</p>
-                <p className="font-bold text-zinc-900 truncate">{card.student.name}</p>
-              </div>
-              <div>
-                <p className="text-[9px] text-zinc-400 uppercase font-medium">Roll Number</p>
-                <p className="font-bold text-zinc-900">{card.student.rollNumber}</p>
-              </div>
-              <div>
-                <p className="text-[9px] text-zinc-400 uppercase font-medium">Guardian Name</p>
-                <p className="font-medium text-zinc-800 truncate">{card.student.parentName || '—'}</p>
-              </div>
-              <div>
-                <p className="text-[9px] text-zinc-400 uppercase font-medium">Class</p>
-                <p className="font-bold text-zinc-900">{card.class.grade} - {card.class.name}</p>
-              </div>
-              <div>
-                <p className="text-[9px] text-zinc-400 uppercase font-medium">D.O.B</p>
-                <p className="font-medium text-zinc-800" suppressHydrationWarning>{formatDate(card.student.dateOfBirth || '')}</p>
-              </div>
-              <div>
-                <p className="text-[9px] text-zinc-400 uppercase font-medium">Section</p>
-                <p className="font-medium text-zinc-800">{card.class.section}</p>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* ── Exam Schedule Table ── */}
-        <div className="px-5 py-1">
-          <table className="w-full text-[10px]">
-            <thead>
-              <tr className="bg-zinc-50 border-y border-zinc-200">
-                <th className="text-left py-1 px-1.5 font-bold text-zinc-700 w-[110px]">Date</th>
-                <th className="text-left py-1 px-1.5 font-bold text-zinc-700">Subject</th>
-                <th className="text-center py-1 px-1.5 font-bold text-zinc-700 w-[140px]">Time</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-zinc-100" suppressHydrationWarning>
-              {card.exams
-                .filter(exam => {
-                  const isScheduled = exam.status?.trim().toLowerCase() === 'scheduled';
-                  const isUpcoming = exam.date >= todayDateString;
-                  return (isScheduled || isUpcoming) && !exam.resultPublished;
-                })
-                .map((exam) => {
-                  return (
-                    <tr key={exam.id}>
-                      <td className="py-1 px-1.5 font-medium text-zinc-800">
-                        {formatDate(exam.date)}
-                      </td>
-                      <td className="py-1 px-1.5">
-                        <span className="font-bold text-zinc-800">{exam.subjectName}</span>
-                        <span className="text-[8px] text-zinc-400 ml-1">({exam.subjectCode})</span>
-                      </td>
-                      <td className="py-1 px-1.5 text-center font-mono text-zinc-600">
-                        {formatTime(exam.startTime)} - {formatTime(exam.endTime)}
-                      </td>
-                    </tr>
-                  );
-                })}
-            </tbody>
-          </table>
-        </div>
-      </div>
-
-      <div>
-        {/* ── Footer / Signatures ── */}
-        <div className="px-5 py-2 border-t border-dashed border-zinc-200">
-          <div className="flex items-end justify-between gap-4">
-            <div className="text-center border-t border-zinc-300 pt-0.5 mt-4 flex-1">
-              <p className="text-[8px] text-zinc-500">Teacher</p>
-            </div>
-            <div className="text-center border-t border-zinc-300 pt-0.5 mt-4 flex-1">
-              <p className="text-[8px] text-zinc-500">Parent</p>
-            </div>
-            <div className="text-center border-t-2 border-zinc-800 pt-0.5 mt-4 flex-1">
-              <p className="text-[9px] text-zinc-800 font-bold">Principal</p>
-            </div>
-          </div>
-        </div>
-
-      </div>
-    </div>
-  );
-});
-
-// ══════════════════════════════════════════════════════════════
-// ── Main Component ──
-// ══════════════════════════════════════════════════════════════
 
 export function AdminAdmitCards() {
   const queryClient = useQueryClient();
@@ -282,25 +81,14 @@ export function AdminAdmitCards() {
   const allCardsRef = useRef<HTMLDivElement>(null);
   const todayDateString = useMemo(() => getTodayDateString(), []);
 
-  // Step 1: Select class
   const [selectedClassId, setSelectedClassId] = useState<string>('');
-
-  // Step 2: Select exam type
   const [selectedExamType, setSelectedExamType] = useState<string>('');
-
-  // Step 3: Generate
   const [admitCards, setAdmitCards] = useState<AdmitCard[]>([]);
   const [generating, setGenerating] = useState(false);
   const [selectedStudentIds, setSelectedStudentIds] = useState<Set<string>>(new Set());
   const [selectAll, setSelectAll] = useState(true);
-
-  // View dialog
   const [viewCard, setViewCard] = useState<AdmitCard | null>(null);
-
-  // Print mode
   const [preparingPrint, setPreparingPrint] = useState(false);
-
-  // ── Queries ──
 
   const { data: classes = [], isLoading: loadingClasses } = useQuery({
     queryKey: ['classes-min'],
@@ -326,7 +114,6 @@ export function AdminAdmitCards() {
 
   const availableExamTypes = useMemo<string[]>(() => {
     if (!classData?.exams) return [];
-    // Only show exam types that have at least one active (scheduled or upcoming) exam
     const activeExams = classData.exams.filter((e: any) => {
       const isScheduled = e.status?.trim().toLowerCase() === 'scheduled';
       const isUpcoming = e.date >= todayDateString;
@@ -336,7 +123,6 @@ export function AdminAdmitCards() {
     return Array.from(types) as string[];
   }, [classData, todayDateString]);
 
-  // Reset selection when class data loads
   useEffect(() => {
     if (classData?.students) {
       queueMicrotask(() => {
@@ -346,7 +132,6 @@ export function AdminAdmitCards() {
     }
   }, [classData]);
 
-  // Auto-select first exam type when they load
   useEffect(() => {
     if (availableExamTypes.length > 0 && !selectedExamType) {
       queueMicrotask(() => {
@@ -361,16 +146,9 @@ export function AdminAdmitCards() {
     setSelectedExamType('');
   };
 
-  // ── Generate Admit Cards ──
   const handleGenerate = async () => {
-    if (!selectedClassId) {
-      toast.error('Please select a class');
-      return;
-    }
-    if (selectedStudentIds.size === 0) {
-      toast.error('Please select at least one student');
-      return;
-    }
+    if (!selectedClassId) { toast.error('Please select a class'); return; }
+    if (selectedStudentIds.size === 0) { toast.error('Please select at least one student'); return; }
 
     setGenerating(true);
     try {
@@ -390,13 +168,10 @@ export function AdminAdmitCards() {
         const err = await res.json();
         toast.error(err.error || 'Failed to generate admit cards');
       }
-    } catch {
-      toast.error('Error generating admit cards');
-    }
+    } catch { toast.error('Error generating admit cards'); }
     setGenerating(false);
   };
 
-  // ── Select/Deselect Students ──
   const toggleStudent = (id: string) => {
     setSelectedStudentIds((prev) => {
       const next = new Set(prev);
@@ -407,13 +182,13 @@ export function AdminAdmitCards() {
     });
   };
 
-  const toggleAll = () => {
+  const handleToggleAll = () => {
     if (!classData) return;
     if (selectAll) {
       setSelectedStudentIds(new Set());
       setSelectAll(false);
     } else {
-      setSelectedStudentIds(new Set(classData.students.map((s) => s.id)));
+      setSelectedStudentIds(new Set(classData.students.map((s: any) => s.id)));
       setSelectAll(true);
     }
   };
@@ -431,16 +206,14 @@ export function AdminAdmitCards() {
 
   const handlePrintAll = useCallback(async () => {
     setPreparingPrint(true);
-    // Give time for DOM to render the print container
     setTimeout(() => {
       handlePrintAllBase();
     }, 500);
   }, [handlePrintAllBase]);
 
-  // ── Summary ──
   const totalStudents = classData?.students.length || 0;
   const totalExams = classData ? (
-    classData.exams.filter((e) => {
+    classData.exams.filter((e: any) => {
       const isScheduled = e.status?.trim().toLowerCase() === 'scheduled';
       const isUpcoming = e.date >= todayDateString;
       return e.examType === selectedExamType && (isScheduled || isUpcoming) && !e.resultPublished;
@@ -449,7 +222,6 @@ export function AdminAdmitCards() {
 
   return (
     <div className="space-y-6">
-      {/* Header */}
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-2xl font-semibold tracking-tight flex items-center gap-2">
@@ -466,253 +238,52 @@ export function AdminAdmitCards() {
             disabled={preparingPrint}
             className="gap-2 bg-zinc-800 hover:bg-zinc-900 text-white"
           >
-            {preparingPrint ? (
-              <Loader2 className="size-4 animate-spin" />
-            ) : (
-              <Printer className="size-4" />
-            )}
+            {preparingPrint ? <Loader2 className="size-4 animate-spin" /> : <Printer className="size-4" />}
             {preparingPrint ? 'Preparing...' : `Print All (${admitCards.length})`}
           </Button>
         )}
       </div>
 
-      {/* Hidden Batch Print Container - Only render when preparing to print to save DOM weight */}
-      {preparingPrint && (
-        <div className="hidden">
-          <div ref={allCardsRef} className="print:block p-0">
-          <style type="text/css" media="print">
-            {"@page { size: A4; margin: 0mm; } body { margin: 0; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; } .admit-card-page { page-break-after: always; }"}
-          </style>
-          {Array.from({ length: Math.ceil(admitCards.length / 4) }).map((_, pageIdx) => (
-            <div key={pageIdx} className="grid grid-cols-2 gap-x-4 gap-y-6 p-[8mm] admit-card-page h-[29.7cm] content-start">
-              {admitCards.slice(pageIdx * 4, (pageIdx + 1) * 4).map((card) => (
-                <div 
-                  key={card.cardNumber} 
-                  className="flex items-center justify-center h-[13.8cm] p-1 border border-dashed border-zinc-300 print:border-zinc-400"
-                  style={{ 
-                    pageBreakInside: 'avoid',
-                    breakInside: 'avoid'
-                  }}
-                >
-                  <div className="size-full flex items-center justify-center p-1">
-                    <AdmitCardVisual card={card} />
-                  </div>
-                </div>
-              ))}
-            </div>
-          ))}
-        </div>
-      </div>
-    )}
+      <BatchPrintContainers 
+        preparingPrint={preparingPrint}
+        allCardsRef={allCardsRef}
+        singleCardRef={singleCardRef}
+        admitCards={admitCards}
+        viewCard={viewCard}
+        selectedClassId={selectedClassId}
+      />
 
-      {/* Hidden Single Print Container */}
-      <div className="hidden">
-        <div ref={singleCardRef} className="print:block p-0 bg-white">
-          <style type="text/css" media="print">
-            {"@page { size: A4; margin: 0mm; } body { margin: 0; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }"}
-          </style>
-          {viewCard && (
-            <div className="w-[21cm] h-[29.7cm] p-[5mm] flex flex-wrap content-start">
-              <div className="flex items-center justify-center h-[13.8cm] p-1 border border-dashed border-zinc-300 print:border-zinc-400 w-[10.5cm]">
-                <div className="size-full flex items-center justify-center p-1">
-                  <AdmitCardVisual card={viewCard} />
-                </div>
-              </div>
-            </div>
-          )}
-        </div>
-      </div>
-
-      {/* Normal Mode: Step-by-step generation */}
       <div className="space-y-6">
-        {/* Step 1: Select Class */}
-        <Card className="border-2 border-amber-200 dark:border-amber-800">
-          <CardHeader className="pb-3">
-            <CardTitle className="text-base flex items-center gap-2">
-              <div className="size-7 rounded-full bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 flex items-center justify-center text-sm font-bold">1</div>
-              Select Class
-            </CardTitle>
-            <CardDescription>Choose the class for which you want to generate admit cards</CardDescription>
-          </CardHeader>
-          <CardContent className="p-4 pt-0">
-            <div className="flex flex-col sm:flex-row items-center gap-3">
-              <Select value={selectedClassId} onValueChange={handleClassChange}>
-                <SelectTrigger className="w-full sm:w-72">
-                  <SelectValue placeholder={loadingClasses ? 'Loading classes...' : 'Select a class'} />
-                </SelectTrigger>
-                <SelectContent className="max-h-70">
-                  {classes.map((c) => (
-                    <SelectItem key={c.id} value={c.id}>
-                      <span className="flex items-center gap-2">
-                        <GraduationCap className="size-3.5" />
-                        {c.grade} — {c.name} (Section {c.section})
-                      </span>
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              
-              {selectedClassId && (
-                <Button 
-                  variant="outline" 
-                  size="sm" 
-                  onClick={() => {
-                    queryClient.invalidateQueries({ queryKey: ['admit-card-data', selectedClassId] });
-                    refetchClassData();
-                  }}
-                  className="gap-2 text-xs h-9"
-                  disabled={loadingClassData}
-                >
-                  <RefreshCw className={`size-3.5 ${loadingClassData ? 'animate-spin' : ''}`} />
-                  Sync Data
-                </Button>
-              )}
-            </div>
-          </CardContent>
-        </Card>
+        <ClassSelector 
+          selectedClassId={selectedClassId}
+          onClassChange={handleClassChange}
+          classes={classes}
+          loadingClasses={loadingClasses}
+          loadingClassData={loadingClassData}
+          onSyncData={() => { queryClient.invalidateQueries({ queryKey: ['admit-card-data', selectedClassId] }); refetchClassData(); }}
+        />
 
-        {/* Step 2: Select Exam Type & Students */}
         {classData && (
-          <Card className="border-2 border-amber-200 dark:border-amber-800">
-            <CardHeader className="pb-1">
-              <CardTitle className="text-base flex items-center gap-2">
-                <div className="size-7 rounded-full bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 flex items-center justify-center text-sm font-bold">2</div>
-                Configure Admit Card
-              </CardTitle>
-              <CardDescription>
-                Filter by exam type and select students
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="p-4 pt-0 space-y-4">
-              {/* Exam Type Filter */}
-              <div className="space-y-1.5">
-                <label className="text-sm font-medium mb-2 block">Exam Type</label>
-                <div className="flex flex-wrap gap-2" suppressHydrationWarning>
-                  {availableExamTypes.map((type: string) => {
-                    const count = classData.exams.filter((e: any) => {
-                      const isScheduled = e.status?.trim().toLowerCase() === 'scheduled';
-                      const isUpcoming = e.date >= todayDateString;
-                      return e.examType === type && (isScheduled || isUpcoming) && !e.resultPublished;
-                    }).length;
-                    if (count === 0) return null;
-                    return (
-                      <Button
-                        key={type}
-                        variant={selectedExamType === type ? 'default' : 'outline'}
-                        size="sm"
-                        onClick={() => setSelectedExamType(type)}
-                        className="gap-1.5"
-                      >
-                        {examTypeLabels[type] || type}
-                        <Badge variant="secondary" className="ml-1 px-1 py-0 h-4 text-[10px] min-w-[1.2rem] flex items-center justify-center bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-400 border-none">
-                          {count}
-                        </Badge>
-                      </Button>
-                    );
-                  })}
-                </div>
-              </div>
-
-              {/* Summary Stats */}
-              <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                <div className="bg-muted/50 rounded-lg p-3">
-                  <p className="text-[10px] uppercase text-muted-foreground tracking-wider">Students</p>
-                  <p className="text-xl font-bold">{totalStudents}</p>
-                </div>
-                <div className="bg-muted/50 rounded-lg p-3" suppressHydrationWarning>
-                  <p className="text-[10px] uppercase text-muted-foreground tracking-wider">Exams</p>
-                  <p className="text-xl font-bold">{totalExams}</p>
-                </div>
-                <div className="bg-muted/50 rounded-lg p-3">
-                  <p className="text-[10px] uppercase text-muted-foreground tracking-wider">Selected</p>
-                  <p className="text-xl font-bold text-amber-600">{selectedStudentIds.size}</p>
-                </div>
-              </div>
-
-              {totalExams === 0 && (
-                <div className="bg-amber-50 dark:bg-amber-900/10 border border-amber-200/50 rounded-lg p-3 flex items-start gap-2">
-                  <AlertCircle className="size-4 text-amber-600 mt-0.5 shrink-0" />
-                  <div>
-                    <p className="text-sm font-medium text-amber-700 dark:text-amber-500">No exams found</p>
-                    <p className="text-xs text-muted-foreground">Create exams for this class first in the Exams section before generating admit cards.</p>
-                  </div>
-                </div>
-              )}
-
-              {/* Student Selection */}
-              {totalExams > 0 && (
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between px-1">
-                    <h3 className="text-sm font-semibold text-zinc-800 dark:text-zinc-200">Select Students</h3>
-                    <Button variant="link" size="sm" onClick={toggleAll} className="text-xs h-auto p-0 font-semibold text-amber-600 hover:text-amber-700">
-                      {selectAll ? 'Deselect All' : 'Select All'}
-                    </Button>
-                  </div>
-                  <div className="max-h-52 overflow-y-auto border rounded-lg">
-                    <Table>
-                      <TableHeader className="bg-zinc-50 dark:bg-zinc-900/50">
-                        <TableRow>
-                          <TableHead className="w-12 px-4">
-                            <Checkbox checked={selectAll} onCheckedChange={toggleAll} />
-                          </TableHead>
-                          <TableHead className="w-[40%] px-4">Roll No</TableHead>
-                          <TableHead className="w-[40%] px-4">Student Name</TableHead>
-                          <TableHead className="w-[20%] px-4 text-center">Section</TableHead>
-                        </TableRow>
-                      </TableHeader>
-                      <TableBody>
-                        {classData.students.map((student) => (
-                          <TableRow key={student.id} className="hover:bg-muted/50 border-zinc-100 dark:border-zinc-800">
-                            <TableCell className="px-4 text-center">
-                              <Checkbox
-                                checked={selectedStudentIds.has(student.id)}
-                                onCheckedChange={() => toggleStudent(student.id)}
-                              />
-                            </TableCell>
-                            <TableCell className="w-[40%] px-4 font-mono text-xs font-semibold text-zinc-600 dark:text-zinc-400">{student.rollNumber}</TableCell>
-                            <TableCell className="w-[40%] px-4 font-bold text-sm text-zinc-800 dark:text-zinc-200">{student.name}</TableCell>
-                            <TableCell className="w-[20%] px-4 text-center text-xs font-medium text-zinc-500">{student.section || 'A'}</TableCell>
-                          </TableRow>
-                        ))}
-                      </TableBody>
-                    </Table>
-                  </div>
-                </div>
-              )}
-
-              {/* Generate & Print Buttons */}
-              <div className="flex flex-col sm:flex-row gap-3">
-                <Button
-                  onClick={handleGenerate}
-                  disabled={generating || selectedStudentIds.size === 0 || totalExams === 0}
-                  className="flex-1 gap-2 bg-amber-600 hover:bg-amber-700 text-white h-11"
-                >
-                  {generating ? (
-                    <Loader2 className="size-4 animate-spin" />
-                  ) : (
-                    <FileText className="size-4" />
-                  )}
-                  {generating ? 'Generating...' : `Generate ${selectedStudentIds.size} Admit Card${selectedStudentIds.size !== 1 ? 's' : ''}`}
-                </Button>
-
-                <Button
-                  onClick={handlePrintAll}
-                  disabled={admitCards.length === 0 || generating || preparingPrint}
-                  className={`flex-1 gap-2 h-11 border-none ${admitCards.length > 0 ? 'bg-zinc-900 text-white hover:bg-zinc-950' : 'bg-zinc-800/40 text-zinc-500 cursor-not-allowed'}`}
-                >
-                  {preparingPrint ? (
-                    <Loader2 className="size-4 animate-spin" />
-                  ) : (
-                    <Printer className="size-4" />
-                  )}
-                  {preparingPrint ? 'Preparing Cards...' : `Print All ${admitCards.length > 0 ? `(${admitCards.length})` : ''}`}
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
+          <ConfigurationCard 
+            availableExamTypes={availableExamTypes}
+            selectedExamType={selectedExamType}
+            setSelectedExamType={setSelectedExamType}
+            classData={classData}
+            todayDateString={todayDateString}
+            totalStudents={totalStudents}
+            totalExams={totalExams}
+            selectedStudentIds={selectedStudentIds}
+            selectAll={selectAll}
+            onToggleAll={handleToggleAll}
+            onToggleStudent={toggleStudent}
+            onGenerate={handleGenerate}
+            generating={generating}
+            onPrintAll={handlePrintAll}
+            admitCardsCount={admitCards.length}
+            preparingPrint={preparingPrint}
+          />
         )}
 
-        {/* Loading state for class data */}
         {loadingClassData && (
           <div className="space-y-3">
             <Skeleton className="h-8 w-full" />
@@ -720,88 +291,14 @@ export function AdminAdmitCards() {
           </div>
         )}
 
-        {/* Step 3: Generated Admit Cards */}
         {admitCards.length > 0 && (
-          <Card>
-            <CardHeader className="pb-3">
-              <CardTitle className="text-base flex items-center gap-2">
-                <div className="size-7 rounded-full bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 flex items-center justify-center text-sm font-bold">3</div>
-                Generated Admit Cards
-              </CardTitle>
-              <CardDescription>
-                {admitCards.length} admit card{admitCards.length !== 1 ? 's' : ''} ready — view, print, or download
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="p-0">
-              <div className="overflow-x-auto">
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead className="hidden sm:table-cell">Card No</TableHead>
-                      <TableHead className="hidden sm:table-cell">Roll No</TableHead>
-                      <TableHead>Student Name</TableHead>
-                      <TableHead className="hidden sm:table-cell">Class</TableHead>
-                      <TableHead className="hidden md:table-cell">Exams</TableHead>
-                      <TableHead className="w-24 text-right">Actions</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {admitCards.map((card) => (
-                      <TableRow key={card.cardNumber} className="hover:bg-muted/50">
-                        <TableCell className="hidden sm:table-cell">
-                          <span className="font-mono text-xs text-muted-foreground">{card.cardNumber}</span>
-                        </TableCell>
-                        <TableCell className="hidden sm:table-cell font-mono text-sm">{card.student.rollNumber}</TableCell>
-                        <TableCell>
-                          <div className="flex items-center gap-2">
-                            <div className="size-7 rounded-full bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 flex items-center justify-center text-[10px] font-bold shrink-0">
-                              {card.student.initials}
-                            </div>
-                            <div className="flex flex-col min-w-0">
-                              <span className="font-medium text-sm truncate">{card.student.name}</span>
-                              <div className="flex items-center gap-2 sm:hidden mt-0.5">
-                                <span className="text-[10px] text-muted-foreground bg-muted px-1 rounded font-mono">#{card.student.rollNumber}</span>
-                                <span className="text-[10px] text-muted-foreground bg-amber-50 dark:bg-amber-900/20 px-1 rounded font-mono">{card.cardNumber}</span>
-                              </div>
-                            </div>
-                          </div>
-                        </TableCell>
-                        <TableCell className="hidden sm:table-cell text-sm text-muted-foreground">
-                          {card.class.grade} — {card.class.name} ({card.class.section})
-                        </TableCell>
-                        <TableCell className="hidden md:table-cell">
-                          <div className="flex flex-wrap gap-1">
-                            {card.exams.slice(0, 2).map((exam) => (
-                              <Badge key={exam.id} variant="outline" className={`text-[10px] gap-0.5 ${getExamTypeColor(exam.examType)}`}>
-                                {exam.subjectName}
-                              </Badge>
-                            ))}
-                            {card.exams.length > 2 && (
-                              <Badge variant="secondary" className="text-[10px]">+{card.exams.length - 2}</Badge>
-                            )}
-                          </div>
-                        </TableCell>
-                        <TableCell className="text-right">
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => setViewCard(card)}
-                            className="gap-1.5 text-amber-600 hover:text-amber-700"
-                          >
-                            <Eye className="size-4" />
-                            View
-                          </Button>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </div>
-            </CardContent>
-          </Card>
+          <GeneratedCardsTable 
+            admitCards={admitCards}
+            onView={setViewCard}
+            getExamTypeColor={getExamTypeColor}
+          />
         )}
 
-        {/* No data states */}
         {!loadingClasses && classes.length === 0 && (
           <Card>
             <CardContent className="py-12 text-center text-muted-foreground">
@@ -813,47 +310,11 @@ export function AdminAdmitCards() {
         )}
       </div>
 
-      <Dialog open={!!viewCard} onOpenChange={(open) => !open && setViewCard(null)}>
-        <DialogContent className="max-w-[850px] max-h-[95vh] overflow-y-auto bg-zinc-950 border-zinc-800 p-0">
-          <div className="sticky top-0 z-10 bg-zinc-900/80 backdrop-blur-md border-b border-zinc-800 px-6 py-4 flex items-center justify-between">
-            <DialogTitle className="text-white flex items-center gap-2">
-              <div className="size-8 rounded-full bg-amber-500/20 text-amber-500 flex items-center justify-center">
-                <FileText className="size-5" />
-              </div>
-              <span>Admit Card — <span className="text-amber-400">{viewCard?.student.name}</span></span>
-            </DialogTitle>
-            <DialogDescription className="sr-only">
-              Preview and print student admit card.
-            </DialogDescription>
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => setViewCard(null)}
-              className="text-zinc-400 hover:text-white hover:bg-zinc-800"
-            >
-              <X className="size-5" />
-            </Button>
-          </div>
-
-          {viewCard && (
-            <div className="p-8 flex flex-col items-center gap-6 bg-zinc-950/50">
-              <div className="scale-[0.8] sm:scale-100 origin-top shadow-2xl shadow-black/50">
-                <div className="bg-white p-4 rounded-lg">
-                  <AdmitCardVisual card={viewCard} />
-                </div>
-              </div>
-              
-              <Button
-                onClick={() => handlePrintSingle()}
-                className="gap-2 bg-amber-600 hover:bg-amber-700 text-white shadow-lg shadow-amber-900/20 px-8 h-12 text-base font-semibold"
-              >
-                <Printer className="size-5" />
-                Download PDF / Print
-              </Button>
-            </div>
-          )}
-        </DialogContent>
-      </Dialog>
+      <ViewCardDialog 
+        card={viewCard}
+        onOpenChange={(open) => !open && setViewCard(null)}
+        onPrint={() => handlePrintSingle()}
+      />
     </div>
   );
 }

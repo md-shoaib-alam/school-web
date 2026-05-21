@@ -1,15 +1,7 @@
 "use client";
 
-import { useState, useEffect, useCallback, useMemo } from "react";
-import { Card, CardContent } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { Users, Search, Plus, Eye, LayoutGrid, List, Mail, Phone, Briefcase, Pencil, Trash2 } from "lucide-react";
+import { useState, useEffect, useMemo } from "react";
 import { useViewMode } from "@/hooks/use-view-mode";
-import { Badge } from "@/components/ui/badge";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { avatarColors } from "./teachers/types";
-import { LazyMotion, domAnimation, m, AnimatePresence } from "framer-motion";
 import { goeyToast as toast } from "goey-toast";
 import { useModulePermissions } from "@/hooks/use-permissions";
 import { apiFetch } from "@/lib/api";
@@ -20,30 +12,16 @@ import { queryKeys } from "@/lib/graphql/keys";
 import { Pagination } from "@/components/shared/pagination";
 import { useDebounce } from "@/hooks/use-debounce";
 import anime from "animejs";
-import {
-  AlertDialog,
-  AlertDialogContent,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogTrigger,
-  AlertDialogAction,
-  AlertDialogCancel,
-} from "@/components/ui/alert-dialog";
 
 // Sub-components
-import { TeacherCard } from "./teachers/TeacherCard";
 import { TeacherDialog } from "./teachers/TeacherDialog";
 import { TeacherSkeleton } from "./teachers/TeacherSkeleton";
+import { TeachersHeader } from "./teachers/TeachersHeader";
+import { TeachersTableView } from "./teachers/TeachersTableView";
+import { TeachersGridView } from "./teachers/TeachersGridView";
+import { TeachersEmptyState } from "./teachers/TeachersEmptyState";
+import { Eye } from "lucide-react";
 import type { TeacherInfo } from "./teachers/types";
-
-const premiumLayoutTransition = {
-  type: "spring",
-  stiffness: 280,
-  damping: 28,
-  mass: 0.7
-} as const;
 
 const emptyFormData = {
   name: "",
@@ -51,26 +29,24 @@ const emptyFormData = {
   phone: "",
   qualification: "",
   experience: "",
-  password: "", // Added for consistency
+  password: "",
 };
 
 export function AdminTeachers() {
   const { currentTenantId } = useAppStore();
   const { canCreate, canEdit, canDelete } = useModulePermissions("teachers");
 
-  // Filter & Search states
   const [search, setSearch] = useState("");
   const debouncedSearch = useDebounce(search, 500);
   const [currentPage, setCurrentPage] = useState(1);
 
   const queryClient = useQueryClient();
 
-  // Queries
   const { data: teachersData, isLoading: loading } = useTeachers(
     currentTenantId || undefined,
     debouncedSearch || undefined,
     currentPage,
-    12, // ITEMS_PER_PAGE
+    12,
   );
 
   const teachers = useMemo(() => {
@@ -79,6 +55,7 @@ export function AdminTeachers() {
       a.name.localeCompare(b.name, undefined, { numeric: true, sensitivity: 'base' })
     );
   }, [teachersData]);
+  
   const totalItems = teachersData?.total || 0;
   const totalPages = teachersData?.totalPages || 1;
   const [viewMode, setViewMode] = useViewMode("teachers", "grid");
@@ -87,15 +64,10 @@ export function AdminTeachers() {
     setCurrentPage(1);
   }, [debouncedSearch]);
 
-  // Dialog state
   const [dialogOpen, setDialogOpen] = useState(false);
-  const [editingTeacher, setEditingTeacher] = useState<TeacherInfo | null>(
-    null,
-  );
+  const [editingTeacher, setEditingTeacher] = useState<TeacherInfo | null>(null);
   const [formData, setFormData] = useState(emptyFormData);
   const [submitting, setSubmitting] = useState(false);
-
-  // Delete state
   const [deletingId, setDeletingId] = useState<string | null>(null);
 
   const handleOpenAdd = () => {
@@ -124,10 +96,7 @@ export function AdminTeachers() {
     }
 
     const isEdit = !!editingTeacher;
-
-    // OPTIMISTIC UPDATE: Update the UI instantly if editing
     const queryKey = [queryKeys.teachers, currentTenantId, debouncedSearch, currentPage, 12];
-    const previousTeachers = queryClient.getQueryData(queryKey);
 
     if (isEdit && editingTeacher) {
       const updatedTeacher = { ...editingTeacher, ...formData };
@@ -146,26 +115,18 @@ export function AdminTeachers() {
         try {
           const url = "/api/teachers";
           const method = isEdit ? "PUT" : "POST";
-          const body = isEdit
-            ? { id: editingTeacher.id, ...formData }
-            : formData;
-
           const res = await apiFetch(url, {
             method,
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(body),
+            body: JSON.stringify(isEdit ? { id: editingTeacher.id, ...formData } : formData),
           });
 
           if (!res.ok) {
-            const err = await res.json().catch(() => ({}));
-            throw new Error(
-              err.error || `Failed to ${isEdit ? "update" : "add"} teacher`,
-            );
+            const errData = await res.json().catch(() => ({}));
+            throw new Error(errData.error || `Failed to ${isEdit ? "update" : "add"} teacher`);
           }
 
           setDialogOpen(false);
-          setEditingTeacher(null);
-          setFormData(emptyFormData);
           queryClient.invalidateQueries({ queryKey: queryKeys.teachers });
           queryClient.invalidateQueries({ queryKey: ['admin-dashboard', currentTenantId] });
           return isEdit ? "Teacher updated" : "Teacher added";
@@ -185,10 +146,10 @@ export function AdminTeachers() {
     const element = document.getElementById(`teacher-item-${id}`);
     
     const executeDeletion = async () => {
-      // OPTIMISTIC UPDATE: Remove from UI instantly
-      const previousTeachers = queryClient.getQueryData([queryKeys.teachers, currentTenantId, debouncedSearch, currentPage, 12]);
+      const queryKey = [queryKeys.teachers, currentTenantId, debouncedSearch, currentPage, 12];
+      const previousTeachers = queryClient.getQueryData(queryKey);
       
-      queryClient.setQueryData([queryKeys.teachers, currentTenantId, debouncedSearch, currentPage, 12], (old: any) => {
+      queryClient.setQueryData(queryKey, (old: any) => {
         if (!old || !old.teachers) return old;
         return {
           ...old,
@@ -200,9 +161,7 @@ export function AdminTeachers() {
       toast.promise(
         (async () => {
           try {
-            const res = await apiFetch(`/api/teachers?id=${id}`, {
-              method: "DELETE",
-            });
+            const res = await apiFetch(`/api/teachers?id=${id}`, { method: "DELETE" });
             if (!res.ok) {
               const err = await res.json().catch(() => ({}));
               throw new Error(err.error || "Deletion failed");
@@ -210,28 +169,22 @@ export function AdminTeachers() {
             queryClient.invalidateQueries({ queryKey: queryKeys.teachers });
             queryClient.invalidateQueries({ queryKey: ['admin-dashboard', currentTenantId] });
             setDeletingId(null);
-
-            // We throw a "success" message to force a RED morphing pill for deletion
             throw new Error("Teacher record removed");
           } catch (err) {
-            // ROLLBACK if failed
-            queryClient.setQueryData([queryKeys.teachers, currentTenantId, debouncedSearch, currentPage, 12], previousTeachers);
+            queryClient.setQueryData(queryKey, previousTeachers);
             throw err;
           }
         })(),
         {
           loading: "Removing teacher record...",
-          success: () => "", // Not reached
-          error: (err: any) => err.message, // Shows the red pill
+          success: () => "",
+          error: (err: any) => err.message,
         },
       );
     };
 
     if (element) {
       element.style.cssText += '; pointer-events: none; position: relative; z-index: 10;';
-      
-      // 🌟 Elite Anime.js Physics Exit
-      // Step 1: Scale down, tilt slightly and shoot off to the side
       anime({
         targets: element,
         scale: [1, 0.5],
@@ -240,18 +193,12 @@ export function AdminTeachers() {
         opacity: [1, 0],
         duration: 350,
         easing: 'easeInBack',
-        complete: () => {
-          // Instantly remove from list, letting Framer Motion animate siblings moving UP with our premium spring!
-          executeDeletion();
-        }
+        complete: () => executeDeletion()
       });
     } else {
       executeDeletion();
     }
   };
-
-  const isFormValid =
-    formData.name.trim() !== "" && formData.email.trim() !== "";
 
   return (
     <div className="space-y-6">
@@ -260,216 +207,46 @@ export function AdminTeachers() {
         <div className="flex items-center gap-2 rounded-lg border border-amber-200 dark:border-amber-800 bg-amber-50 dark:bg-amber-900/30 px-3 py-2">
           <Eye className="size-4 text-amber-600 dark:text-amber-400 shrink-0" />
           <span className="text-xs text-amber-700 dark:text-amber-300 font-medium">
-            Read-only mode — you have view permission only for this module.
+            Read-only mode, you have view permission only for this module.
           </span>
         </div>
       )}
 
-      {/* Header with search and add button */}
-      <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
-        <div className="relative max-w-sm flex-1">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
-          <Input
-            placeholder="Search teachers..."
-            className="pl-9"
-            value={search}
-            onChange={(e) => {
-              setSearch(e.target.value);
-              setCurrentPage(1);
-            }}
-          />
-        </div>
-        <div className="flex items-center gap-3 w-full sm:w-auto">
-          <div className="flex items-center gap-1 bg-zinc-100 dark:bg-zinc-800 p-1 rounded-lg">
-            <Button
-              variant={viewMode === "table" ? "secondary" : "ghost"}
-              size="sm"
-              onClick={() => setViewMode("table")}
-              className={`size-8 p-0 ${viewMode === "table" ? "bg-white dark:bg-zinc-700 shadow-sm" : ""}`}
-            >
-              <List className="size-4" />
-            </Button>
-            <Button
-              variant={viewMode === "grid" ? "secondary" : "ghost"}
-              size="sm"
-              onClick={() => setViewMode("grid")}
-              className={`size-8 p-0 ${viewMode === "grid" ? "bg-white dark:bg-zinc-700 shadow-sm" : ""}`}
-            >
-              <LayoutGrid className="size-4" />
-            </Button>
-          </div>
-          {canCreate && (
-            <Button
-              className="bg-emerald-600 hover:bg-emerald-700 text-white shrink-0 shadow-sm"
-              onClick={handleOpenAdd}
-            >
-              <Plus className="size-4 mr-2" />
-              Add Teacher
-            </Button>
-          )}
-        </div>
-      </div>
+      <TeachersHeader 
+        search={search}
+        onSearchChange={setSearch}
+        viewMode={viewMode}
+        setViewMode={setViewMode}
+        canCreate={canCreate}
+        onAddClick={handleOpenAdd}
+      />
 
-      {/* Teacher Content */}
       {loading ? (
         <TeacherSkeleton />
       ) : teachers.length === 0 ? (
-        <Card className="border-dashed border-2 bg-transparent">
-          <CardContent className="py-20 text-center text-muted-foreground">
-            <Users className="size-12 mx-auto mb-4 opacity-20" />
-            <p className="text-lg font-medium">No teachers found</p>
-            <p className="text-sm">Try adjusting your search criteria</p>
-          </CardContent>
-        </Card>
+        <TeachersEmptyState />
       ) : viewMode === "table" ? (
-        <Card className="shadow-sm border-0 overflow-hidden mb-4">
-          <CardContent className="p-0">
-            <div className="overflow-x-auto">
-              <table className="w-full text-left text-sm">
-                <thead className="bg-zinc-50 dark:bg-zinc-800/50 text-zinc-500 dark:text-zinc-400 uppercase text-[10px] font-bold tracking-wider">
-                  <tr>
-                    <th className="px-6 py-4">Teacher</th>
-                    <th className="px-6 py-4 hidden sm:table-cell">Experience</th>
-                    <th className="px-6 py-4 hidden lg:table-cell">Qualification</th>
-                    <th className="px-6 py-4 text-center">Actions</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-zinc-100 dark:divide-zinc-800">
-                  <LazyMotion features={domAnimation}>
-                    <AnimatePresence mode="popLayout">
-                      {teachers.map((teacher, index) => {
-                        const initials = teacher.name.split(" ").map((n) => n[0]).join("").slice(0, 2).toUpperCase();
-                        const color = avatarColors[index % avatarColors.length];
-                        return (
-                          <m.tr 
-                          key={teacher.id} 
-                          id={`teacher-item-${teacher.id}`}
-                          layout="position"
-                          initial={{ opacity: 0, x: -10 }}
-                          animate={{ opacity: 1, x: 0 }}
-                          exit={{ opacity: 0, x: 10 }}
-                          transition={{
-                            layout: premiumLayoutTransition,
-                            opacity: { duration: 0.2 }
-                          }}
-                          className="hover:bg-zinc-50/50 dark:hover:bg-zinc-800/30 transition-colors"
-                        >
-                          <td className="px-6 py-4">
-                            <div className="flex items-center gap-3">
-                              <Avatar className="size-8 shrink-0">
-                                <AvatarFallback className={`${color} text-white text-[10px] font-bold`}>
-                                  {initials}
-                                </AvatarFallback>
-                              </Avatar>
-                              <div className="flex flex-col min-w-0">
-                                <span className="font-bold text-zinc-900 dark:text-zinc-100 truncate">{teacher.name}</span>
-                                <span className="text-[10px] sm:text-xs text-muted-foreground truncate">{teacher.email}</span>
-                                {/* Mobile-only info */}
-                                <div className="sm:hidden flex flex-wrap gap-1 mt-1">
-                                  <span className="text-[10px] text-emerald-600 dark:text-emerald-400 font-medium bg-emerald-50 dark:bg-emerald-900/20 px-1 rounded">
-                                    {teacher.experience || 'New'} Exp
-                                  </span>
-                                  <span className="text-[10px] text-zinc-600 dark:text-zinc-400 font-medium bg-zinc-50 dark:bg-zinc-900/20 px-1 rounded">
-                                    {teacher.qualification || 'N/A'}
-                                  </span>
-                                </div>
-                              </div>
-                            </div>
-                          </td>
-                          <td className="px-6 py-4 hidden sm:table-cell text-zinc-600 dark:text-zinc-400 font-medium">
-                            {teacher.experience || 'N/A'}
-                          </td>
-                          <td className="px-6 py-4 hidden lg:table-cell">
-                            <Badge variant="outline" className="font-normal text-xs">{teacher.qualification || 'N/A'}</Badge>
-                          </td>
-                          <td className="px-6 py-4">
-                            <div className="flex items-center justify-center gap-2">
-                              {canEdit && (
-                                <Button variant="ghost" size="icon" className="size-8 text-zinc-400 hover:text-emerald-600" onClick={() => handleOpenEdit(teacher)}>
-                                  <Pencil className="size-3.5" />
-                                </Button>
-                              )}
-                              {canDelete && (
-                                <AlertDialog
-                                  open={deletingId === teacher.id}
-                                  onOpenChange={(open) => {
-                                    if (!open) setDeletingId(null);
-                                  }}
-                                >
-                                  <AlertDialogTrigger asChild>
-                                    <Button variant="ghost" size="icon" className="size-8 text-zinc-400 hover:text-red-600" onClick={() => setDeletingId(teacher.id)}>
-                                      <Trash2 className="size-3.5" />
-                                    </Button>
-                                  </AlertDialogTrigger>
-                                  <AlertDialogContent>
-                                    <AlertDialogHeader>
-                                      <AlertDialogTitle>Delete Teacher</AlertDialogTitle>
-                                      <AlertDialogDescription>
-                                        Are you sure you want to delete <strong>{teacher.name}</strong>? This action
-                                        cannot be undone.
-                                      </AlertDialogDescription>
-                                    </AlertDialogHeader>
-                                    <AlertDialogFooter>
-                                      <AlertDialogCancel onClick={() => setDeletingId(null)}>
-                                        Cancel
-                                      </AlertDialogCancel>
-                                      <AlertDialogAction
-                                        className="bg-red-600 hover:bg-red-700 text-white"
-                                        onClick={() => handleDelete(teacher.id)}
-                                      >
-                                        Delete
-                                      </AlertDialogAction>
-                                    </AlertDialogFooter>
-                                  </AlertDialogContent>
-                                </AlertDialog>
-                              )}
-                            </div>
-                          </td>
-                        </m.tr>
-                      );
-                    })}
-                  </AnimatePresence>
-                </LazyMotion>
-                </tbody>
-              </table>
-            </div>
-          </CardContent>
-        </Card>
+        <TeachersTableView 
+          teachers={teachers}
+          canEdit={canEdit}
+          canDelete={canDelete}
+          onEdit={handleOpenEdit}
+          onDelete={handleDelete}
+          deletingId={deletingId}
+          setDeletingId={setDeletingId}
+        />
       ) : (
-        <LazyMotion features={domAnimation}>
-          <m.div 
-            layout
-            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"
-          >
-            <AnimatePresence mode="popLayout">
-              {teachers.map((teacher, index) => (
-                <m.div 
-                key={teacher.id}
-                id={`teacher-item-${teacher.id}`}
-                layout
-                transition={premiumLayoutTransition}
-                initial={{ opacity: 0, scale: 0.95 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.9 }}
-              >
-                <TeacherCard
-                  teacher={teacher}
-                  index={index}
-                  canEdit={canEdit}
-                  canDelete={canDelete}
-                  deletingId={deletingId}
-                  setDeletingId={setDeletingId}
-                  onEdit={handleOpenEdit}
-                  onDelete={handleDelete}
-                />
-              </m.div>
-            ))}
-          </AnimatePresence>
-        </m.div>
-      </LazyMotion>
+        <TeachersGridView 
+          teachers={teachers}
+          canEdit={canEdit}
+          canDelete={canDelete}
+          deletingId={deletingId}
+          setDeletingId={setDeletingId}
+          onEdit={handleOpenEdit}
+          onDelete={handleDelete}
+        />
       )}
 
-      {/* Pagination Controls */}
       <Pagination
         currentPage={currentPage}
         totalPages={totalPages}
@@ -478,7 +255,6 @@ export function AdminTeachers() {
         onPageChange={setCurrentPage}
       />
 
-      {/* Add/Edit Teacher Dialog */}
       <TeacherDialog
         open={dialogOpen}
         onOpenChange={(open) => {
@@ -493,7 +269,7 @@ export function AdminTeachers() {
         setFormData={setFormData}
         submitting={submitting}
         onSubmit={handleSubmit}
-        isFormValid={isFormValid}
+        isFormValid={formData.name.trim() !== "" && formData.email.trim() !== ""}
       />
     </div>
   );

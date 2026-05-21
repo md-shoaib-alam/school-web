@@ -4,23 +4,6 @@ import { apiFetch } from "@/lib/api";
 import { useState, useMemo, useCallback } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Skeleton } from "@/components/ui/skeleton";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import {
-  Calendar,
-  LayoutGrid,
-  List,
-  CalendarDays,
-  Plus,
-  Settings,
-} from "lucide-react";
 import { goeyToast as toast } from "goey-toast";
 import { useModulePermissions } from "@/hooks/use-permissions";
 import { useAppStore } from "@/store/use-app-store";
@@ -34,13 +17,14 @@ import { TimetableSkeleton } from "./timetable/TimetableSkeleton";
 import { CreateTimetableDialog } from "./timetable/CreateTimetableDialog";
 import { EditSlotDialog } from "./timetable/EditSlotDialog";
 import { WorkingDaysDialog } from "./timetable/WorkingDaysDialog";
+import { TimetableHeader } from "./timetable/TimetableHeader";
+import { EmptyTimetableState } from "./timetable/EmptyTimetableState";
 
 // Constants & Helpers
 import {
   DEFAULT_DAYS,
   ALL_DAYS,
   DAY_LABELS,
-  DAY_FULL_LABELS,
 } from "./timetable/constants";
 import { getCurrentDayIndex } from "./timetable/helpers";
 import type { ViewMode, TimetableSlot, FormSlot } from "./timetable/types";
@@ -56,13 +40,7 @@ export function AdminTimetable() {
   // Create timetable dialog state
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
   const [daySlots, setDaySlots] = useState<Record<string, FormSlot[]>>({
-    monday: [],
-    tuesday: [],
-    wednesday: [],
-    thursday: [],
-    friday: [],
-    saturday: [],
-    sunday: [],
+    monday: [], tuesday: [], wednesday: [], thursday: [], friday: [], saturday: [], sunday: [],
   });
   const [saving, setSaving] = useState(false);
 
@@ -70,12 +48,7 @@ export function AdminTimetable() {
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [editingSlot, setEditingSlot] = useState<TimetableSlot | null>(null);
   const [editForm, setEditForm] = useState({
-    subjectId: "",
-    teacherId: "",
-    startTime: "",
-    endTime: "",
-    day: "",
-    label: "",
+    subjectId: "", teacherId: "", startTime: "", endTime: "", day: "", label: "",
   });
   const [editSaving, setEditSaving] = useState(false);
 
@@ -86,11 +59,9 @@ export function AdminTimetable() {
 
   const { canCreate, canEdit, canDelete } = useModulePermissions("timetable");
 
-  // ── Queries (TanStack Query for Caching) ──
+  // ── Queries ──
 
-  const { data: classes = [], isLoading: isLoadingClasses } = useQuery<
-    ClassInfo[]
-  >({
+  const { data: classes = [], isLoading: isLoadingClasses } = useQuery<ClassInfo[]>({
     queryKey: ["classes", currentTenantId, "min"],
     queryFn: async () => {
       const res = await apiFetch("/api/classes?mode=min");
@@ -105,9 +76,7 @@ export function AdminTimetable() {
   const { data: workingDays = DEFAULT_DAYS } = useQuery<string[]>({
     queryKey: ["working-days", currentTenantId],
     queryFn: async () => {
-      const res = await apiFetch(
-        `/api/tenant-settings?tenantId=${currentTenantId}`,
-      );
+      const res = await apiFetch(`/api/tenant-settings?tenantId=${currentTenantId}`);
       if (res.ok) {
         const data = await res.json();
         return data.workingDays || DEFAULT_DAYS;
@@ -117,9 +86,7 @@ export function AdminTimetable() {
     enabled: !!currentTenantId,
   });
 
-  const { data: slots = [], isLoading: isLoadingTimetable } = useQuery<
-    TimetableSlot[]
-  >({
+  const { data: slots = [], isLoading: isLoadingTimetable } = useQuery<TimetableSlot[]>({
     queryKey: ["timetable", selectedClass],
     queryFn: async () => {
       if (!selectedClass) return [];
@@ -150,7 +117,6 @@ export function AdminTimetable() {
     enabled: createDialogOpen || editDialogOpen,
   });
 
-  // Filter subjects for the current class in memory (very fast since data is minified)
   const filteredSubjects = useMemo(() => {
     if (!selectedClass) return availableSubjects;
     return availableSubjects.filter((s: any) => s.classId === selectedClass);
@@ -169,23 +135,13 @@ export function AdminTimetable() {
       return res.json();
     },
     onSuccess: (_data, variables) => {
-      // Optimistically update the cache
       const currentClassInfo = classes.find((c) => c.id === selectedClass);
-      const className = currentClassInfo
-        ? `${currentClassInfo.name}-${currentClassInfo.section}`
-        : "";
-
+      const className = currentClassInfo ? `${currentClassInfo.name}-${currentClassInfo.section}` : "";
       const updatedSlots = variables.slots.map((s) => {
         const sub = availableSubjects.find((sub: any) => sub.id === s.subjectId);
         const teach = availableTeachers.find((t: any) => t.id === s.teacherId);
-        return {
-          ...s,
-          subjectName: sub?.name || "",
-          teacherName: teach?.name || "",
-          className: className,
-        };
+        return { ...s, subjectName: sub?.name || "", teacherName: teach?.name || "", className: className };
       });
-
       queryClient.setQueryData(["timetable", selectedClass], updatedSlots);
       toast.success("Timetable updated");
       setCreateDialogOpen(false);
@@ -197,18 +153,11 @@ export function AdminTimetable() {
 
   const deleteMutation = useMutation({
     mutationFn: async (id: string) => {
-      const res = await apiFetch(`/api/timetable?id=${id}`, {
-        method: "DELETE",
-      });
+      const res = await apiFetch(`/api/timetable?id=${id}`, { method: "DELETE" });
       if (!res.ok) throw new Error("Delete failed");
     },
     onSuccess: (_data, deletedId) => {
-      // Optimistically update the cache
-      queryClient.setQueryData(
-        ["timetable", selectedClass],
-        (old: any[] | undefined) =>
-          old ? old.filter((s) => s.id !== deletedId) : [],
-      );
+      queryClient.setQueryData(["timetable", selectedClass], (old: any[] | undefined) => old ? old.filter((s) => s.id !== deletedId) : []);
       toast.success("Slot deleted");
       queryClient.invalidateQueries({ queryKey: ["timetable", selectedClass] });
     },
@@ -218,29 +167,9 @@ export function AdminTimetable() {
   // ── Handlers ──
 
   const handleOpenManage = useCallback(async () => {
-    // Fill daySlots from existing data
-    const initial: Record<string, FormSlot[]> = {
-      monday: [],
-      tuesday: [],
-      wednesday: [],
-      thursday: [],
-      friday: [],
-      saturday: [],
-      sunday: [],
-    };
-    slots.forEach((slot: any) => {
-      if (initial[slot.day]) {
-        initial[slot.day].push({
-          ...slot,
-          subjectId: slot.subjectId ?? "",
-          teacherId: slot.teacherId ?? "",
-          label: slot.label ?? undefined,
-        });
-      }
-    });
-    ALL_DAYS.forEach((day) => {
-      initial[day]?.sort((a, b) => a.startTime.localeCompare(b.startTime));
-    });
+    const initial: Record<string, FormSlot[]> = { monday: [], tuesday: [], wednesday: [], thursday: [], friday: [], saturday: [], sunday: [] };
+    slots.forEach((slot: any) => { if (initial[slot.day]) { initial[slot.day].push({ ...slot, subjectId: slot.subjectId ?? "", teacherId: slot.teacherId ?? "", label: slot.label ?? undefined }); } });
+    ALL_DAYS.forEach((day) => { initial[day]?.sort((a, b) => a.startTime.localeCompare(b.startTime)); });
     setDaySlots(initial);
     setCreateDialogOpen(true);
   }, [slots]);
@@ -249,33 +178,15 @@ export function AdminTimetable() {
     if (!selectedClass) return;
     setSaving(true);
     const allFlatSlots = workingDays.flatMap((day) => daySlots[day] ?? []);
-    const validSlots = allFlatSlots.filter(
-      (p) => (p.subjectId && p.teacherId) || p.label,
-    );
-
-    if (validSlots.length === 0) {
-      toast.error("Please add at least one valid period.");
-      setSaving(false);
-      return;
-    }
-    bulkSaveMutation.mutate({
-      slots: validSlots.map((p) => ({
-        classId: selectedClass,
-        ...p,
-      })),
-      classId: selectedClass,
-    });
+    const validSlots = allFlatSlots.filter((p) => (p.subjectId && p.teacherId) || p.label);
+    if (validSlots.length === 0) { toast.error("Please add at least one valid period."); setSaving(false); return; }
+    bulkSaveMutation.mutate({ slots: validSlots.map((p) => ({ classId: selectedClass, ...p })), classId: selectedClass });
   };
 
   const handleEditSlot = (slot: TimetableSlot) => {
     setEditingSlot(slot);
     setEditForm({
-      subjectId: slot.subjectId ?? "",
-      teacherId: slot.teacherId ?? "",
-      startTime: slot.startTime ?? "",
-      endTime: slot.endTime ?? "",
-      day: slot.day ?? "",
-      label: (slot as any).label ?? "",
+      subjectId: slot.subjectId ?? "", teacherId: slot.teacherId ?? "", startTime: slot.startTime ?? "", endTime: slot.endTime ?? "", day: slot.day ?? "", label: (slot as any).label ?? "",
     });
     setEditDialogOpen(true);
   };
@@ -284,99 +195,37 @@ export function AdminTimetable() {
     if (!editingSlot) return;
     setEditSaving(true);
     try {
-      const res = await apiFetch(`/api/timetable?id=${editingSlot.id}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(editForm),
-      });
+      const res = await apiFetch(`/api/timetable?id=${editingSlot.id}`, { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify(editForm) });
       if (res.ok) {
-        // Optimistically update the cache
-        const sub = availableSubjects.find(
-          (s: any) => s.id === editForm.subjectId,
-        );
-        const teach = availableTeachers.find(
-          (t: any) => t.id === editForm.teacherId,
-        );
-
-        queryClient.setQueryData(
-          ["timetable", selectedClass],
-          (old: any[] | undefined) => {
-            if (!old) return [];
-            return old.map((s) =>
-              s.id === editingSlot.id
-                ? {
-                    ...s,
-                    ...editForm,
-                    subjectName: sub?.name || s.subjectName,
-                    teacherName: teach?.name || s.teacherName,
-                  }
-                : s,
-            );
-          },
-        );
-
+        const sub = availableSubjects.find((s: any) => s.id === editForm.subjectId);
+        const teach = availableTeachers.find((t: any) => t.id === editForm.teacherId);
+        queryClient.setQueryData(["timetable", selectedClass], (old: any[] | undefined) => {
+          if (!old) return [];
+          return old.map((s) => s.id === editingSlot.id ? { ...s, ...editForm, subjectName: sub?.name || s.subjectName, teacherName: teach?.name || s.teacherName } : s);
+        });
         toast.success("Slot updated");
         setEditDialogOpen(false);
-        queryClient.invalidateQueries({
-          queryKey: ["timetable", selectedClass],
-        });
-      } else {
-        toast.error("Failed to update slot");
-      }
-    } finally {
-      setEditSaving(false);
-    }
+        queryClient.invalidateQueries({ queryKey: ["timetable", selectedClass] });
+      } else { toast.error("Failed to update slot"); }
+    } finally { setEditSaving(false); }
   };
 
   const handleWorkingDaysSave = async () => {
     setDaysConfigSaving(true);
     try {
-      const res = await apiFetch("/api/tenant-settings", {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          tenantId: currentTenantId,
-          settings: { workingDays: daysConfigDraft },
-        }),
-      });
-      if (res.ok) {
-        queryClient.invalidateQueries({
-          queryKey: ["working-days", currentTenantId],
-        });
-        setDaysConfigOpen(false);
-        toast.success("Working days updated");
-      }
-    } finally {
-      setDaysConfigSaving(false);
-    }
+      const res = await apiFetch("/api/tenant-settings", { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ tenantId: currentTenantId, settings: { workingDays: daysConfigDraft } }) });
+      if (res.ok) { queryClient.invalidateQueries({ queryKey: ["working-days", currentTenantId] }); setDaysConfigOpen(false); toast.success("Working days updated"); }
+    } finally { setDaysConfigSaving(false); }
   };
 
-  const currentClass = useMemo(
-    () => classes.find((c) => c.id === selectedClass),
-    [classes, selectedClass],
-  );
-
-  // ── Layout Derived State ──
-  const uniqueSubjects = useMemo(
-    () => Array.from(new Set(slots.map((s) => s.subjectName))),
-    [slots],
-  );
-  const currentDayIndex = useMemo(
-    () => getCurrentDayIndex(workingDays),
-    [workingDays],
-  );
+  const currentClass = useMemo(() => classes.find((c) => c.id === selectedClass), [classes, selectedClass]);
+  const uniqueSubjects = useMemo(() => Array.from(new Set(slots.map((s) => s.subjectName))), [slots]);
+  const currentDayIndex = useMemo(() => getCurrentDayIndex(workingDays), [workingDays]);
 
   const timeSlots = useMemo(() => {
     const unique = new Map<string, { start: string; end: string }>();
-    slots.forEach((s) =>
-      unique.set(`${s.startTime}-${s.endTime}`, {
-        start: s.startTime,
-        end: s.endTime,
-      }),
-    );
-    return Array.from(unique.values()).sort((a, b) =>
-      a.start.localeCompare(b.start),
-    );
+    slots.forEach((s) => unique.set(`${s.startTime}-${s.endTime}`, { start: s.startTime, end: s.endTime }));
+    return Array.from(unique.values()).sort((a, b) => a.start.localeCompare(b.start));
   }, [slots]);
 
   const gridData = useMemo(() => {
@@ -393,227 +242,72 @@ export function AdminTimetable() {
 
   const slotsByDay = useMemo(() => {
     const data = new Map<string, TimetableSlot[]>();
-    slots.forEach((slot) => {
-      if (!data.has(slot.day)) data.set(slot.day, []);
-      data.get(slot.day)!.push(slot);
-    });
-    data.forEach((list) =>
-      list.sort((a, b) => a.startTime.localeCompare(b.startTime)),
-    );
+    slots.forEach((slot) => { if (!data.has(slot.day)) data.set(slot.day, []); data.get(slot.day)!.push(slot); });
+    data.forEach((list) => list.sort((a, b) => a.startTime.localeCompare(b.startTime)));
     return data;
   }, [slots]);
 
-  const effectiveDay = workingDays.includes(selectedDay)
-    ? selectedDay
-    : workingDays[currentDayIndex] || workingDays[0];
+  const effectiveDay = workingDays.includes(selectedDay) ? selectedDay : workingDays[currentDayIndex] || workingDays[0];
   const selectedDaySlots = useMemo(() => {
-    return timeSlots.map(({ start, end }) => {
-      const key = `${start}-${end}`;
-      return gridData.get(effectiveDay)?.get(key) || [];
-    });
+    return timeSlots.map(({ start, end }) => { const key = `${start}-${end}`; return gridData.get(effectiveDay)?.get(key) || []; });
   }, [effectiveDay, timeSlots, gridData]);
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
-        <div className="flex items-center gap-3">
-          <div className="size-10 rounded-xl bg-emerald-100 text-emerald-600 flex items-center justify-center">
-            <Calendar className="size-5" />
-          </div>
-          <div>
-            <h2 className="text-lg font-semibold">Weekly Timetable</h2>
-            <p className="text-sm text-muted-foreground">
-              {currentClass
-                ? `${currentClass.name}-${currentClass.section}`
-                : "Select a class"}
-            </p>
-          </div>
-        </div>
-
-        <div className="flex items-center gap-3 w-full sm:w-auto">
-          <div className="inline-flex items-center rounded-lg border border-zinc-200 bg-white dark:bg-zinc-900 p-0.5 shadow-sm">
-            <Button
-              size="sm"
-              variant={viewMode === "grid" ? "default" : "ghost"}
-              onClick={() => setViewMode("grid")}
-            >
-              <LayoutGrid className="size-4 mr-1.5" />
-              <span className="hidden sm:inline">Grid</span>
-            </Button>
-            <Button
-              size="sm"
-              variant={viewMode === "list" ? "default" : "ghost"}
-              onClick={() => setViewMode("list")}
-            >
-              <List className="size-4 mr-1.5" />
-              <span className="hidden sm:inline">List</span>
-            </Button>
-            <Button
-              size="sm"
-              variant={viewMode === "day" ? "default" : "ghost"}
-              onClick={() => setViewMode("day")}
-            >
-              <CalendarDays className="size-4 mr-1.5" />
-              <span className="hidden sm:inline">Day</span>
-            </Button>
-          </div>
-
-          <Select value={selectedClass} onValueChange={setSelectedClass}>
-            <SelectTrigger className="w-full sm:w-56 text-sm bg-white hover:bg-zinc-50/50 dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800 shadow-sm">
-              <SelectValue placeholder="Select class" />
-            </SelectTrigger>
-            <SelectContent>
-              {classes.map((c) => (
-                <SelectItem key={c.id} value={c.id}>
-                  {c.name}-{c.section}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-
-          {canEdit && (
-            <Button
-              variant="outline"
-              size="sm"
-              className="bg-white hover:bg-zinc-50 dark:bg-zinc-900 dark:hover:bg-zinc-800 border-zinc-200 dark:border-zinc-800 shadow-sm"
-              onClick={() => {
-                setDaysConfigDraft([...workingDays]);
-                setDaysConfigOpen(true);
-              }}
-            >
-              <Settings className="size-4 sm:mr-1.5" />
-              <span className="hidden sm:inline">Settings</span>
-            </Button>
-          )}
-
-          {selectedClass && canCreate && (
-            <Button
-              size="sm"
-              onClick={handleOpenManage}
-              className="bg-emerald-600 text-white hover:bg-emerald-700 shadow-md shadow-emerald-600/30 hover:shadow-lg hover:shadow-emerald-600/45 transition-all duration-200"
-            >
-              <Plus className="size-4 mr-1.5" />
-              Manage
-            </Button>
-          )}
-        </div>
-      </div>
+      <TimetableHeader 
+        currentClass={currentClass}
+        viewMode={viewMode}
+        setViewMode={setViewMode}
+        selectedClass={selectedClass}
+        onClassChange={setSelectedClass}
+        classes={classes}
+        canEdit={canEdit}
+        canCreate={canCreate}
+        onSettingsClick={() => { setDaysConfigDraft([...workingDays]); setDaysConfigOpen(true); }}
+        onManageClick={handleOpenManage}
+      />
 
       <Card className="border-none shadow-sm shadow-emerald-600/5 overflow-hidden">
         <CardContent className="p-0">
           {isLoadingTimetable || isLoadingClasses ? (
             <TimetableSkeleton viewMode={viewMode} />
           ) : slots.length === 0 ? (
-            <div className="text-center py-24 text-muted-foreground bg-muted/5">
-              <div className="size-16 bg-muted/20 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Calendar className="size-8 opacity-20" />
-              </div>
-              <p className="font-medium">No timetable records found</p>
-              <p className="text-xs max-w-[200px] mx-auto mt-1 opacity-60">
-                Please add periods using the &quot;Manage&quot; button above.
-              </p>
-            </div>
+            <EmptyTimetableState />
           ) : viewMode === "grid" ? (
-            <GridView
-              timeSlots={timeSlots}
-              gridData={gridData}
-              uniqueSubjects={uniqueSubjects}
-              workingDays={workingDays}
-              currentDayIndex={currentDayIndex}
-              onDeleteSlot={(id) => deleteMutation.mutate(id)}
-              onEditSlot={handleEditSlot}
-              canEdit={canEdit}
-              canDelete={canDelete}
-            />
+            <GridView timeSlots={timeSlots} gridData={gridData} uniqueSubjects={uniqueSubjects} workingDays={workingDays} currentDayIndex={currentDayIndex} onDeleteSlot={(id) => deleteMutation.mutate(id)} onEditSlot={handleEditSlot} canEdit={canEdit} canDelete={canDelete} />
           ) : viewMode === "list" ? (
-            <ListView
-              slotsByDay={slotsByDay}
-              uniqueSubjects={uniqueSubjects}
-              workingDays={workingDays}
-              currentDayIndex={currentDayIndex}
-              onDeleteSlot={(id) => deleteMutation.mutate(id)}
-              onEditSlot={handleEditSlot}
-              canEdit={canEdit}
-              canDelete={canDelete}
-            />
+            <ListView slotsByDay={slotsByDay} uniqueSubjects={uniqueSubjects} workingDays={workingDays} currentDayIndex={currentDayIndex} onDeleteSlot={(id) => deleteMutation.mutate(id)} onEditSlot={handleEditSlot} canEdit={canEdit} canDelete={canDelete} />
           ) : (
-            <DayView
-              selectedDay={effectiveDay}
-              selectedDaySlots={selectedDaySlots}
-              timeSlots={timeSlots}
-              uniqueSubjects={uniqueSubjects}
-              workingDays={workingDays}
-              currentDayIndex={currentDayIndex}
-              onSelectDay={setSelectedDay}
-              onDeleteSlot={(id) => deleteMutation.mutate(id)}
-              onEditSlot={handleEditSlot}
-              canEdit={canEdit}
-              canDelete={canDelete}
-            />
+            <DayView selectedDay={effectiveDay} selectedDaySlots={selectedDaySlots} timeSlots={timeSlots} uniqueSubjects={uniqueSubjects} workingDays={workingDays} currentDayIndex={currentDayIndex} onSelectDay={setSelectedDay} onDeleteSlot={(id) => deleteMutation.mutate(id)} onEditSlot={handleEditSlot} canEdit={canEdit} canDelete={canDelete} />
           )}
         </CardContent>
       </Card>
 
-      <WorkingDaysDialog
-        open={daysConfigOpen}
-        onOpenChange={setDaysConfigOpen}
-        draft={daysConfigDraft}
-        setDraft={setDaysConfigDraft}
-        onSave={handleWorkingDaysSave}
-        saving={daysConfigSaving}
-      />
-
-      <EditSlotDialog
-        open={editDialogOpen}
-        onOpenChange={setEditDialogOpen}
-        form={editForm}
-        setForm={setEditForm}
-        onSave={handleEditSave}
-        saving={editSaving}
-        availableSubjects={filteredSubjects}
-        availableTeachers={availableTeachers}
-        workingDays={workingDays}
-        isBreak={!!(editingSlot as any)?.label}
-      />
-
-      <CreateTimetableDialog
-        open={createDialogOpen}
-        onOpenChange={setCreateDialogOpen}
-        currentClass={currentClass}
-        workingDays={workingDays}
-        daySlots={daySlots}
-        setDaySlots={setDaySlots}
-        availableSubjects={filteredSubjects}
-        availableTeachers={availableTeachers}
-        onSave={handleBulkSave}
-        saving={saving}
+      <WorkingDaysDialog open={daysConfigOpen} onOpenChange={setDaysConfigOpen} draft={daysConfigDraft} setDraft={setDaysConfigDraft} onSave={handleWorkingDaysSave} saving={daysConfigSaving} />
+      <EditSlotDialog open={editDialogOpen} onOpenChange={setEditDialogOpen} form={editForm} setForm={setEditForm} onSave={handleEditSave} saving={editSaving} availableSubjects={filteredSubjects} availableTeachers={availableTeachers} workingDays={workingDays} isBreak={!!(editingSlot as any)?.label} />
+      <CreateTimetableDialog 
+        open={createDialogOpen} 
+        onOpenChange={setCreateDialogOpen} 
+        currentClass={currentClass} 
+        workingDays={workingDays} 
+        daySlots={daySlots} 
+        setDaySlots={setDaySlots} 
+        availableSubjects={filteredSubjects} 
+        availableTeachers={availableTeachers} 
+        onSave={handleBulkSave} 
+        saving={saving} 
         onCopyToDay={(src, tar) => {
           const sourcePeriods = daySlots[src] ?? [];
           if (sourcePeriods.length === 0) return;
-          const copied = sourcePeriods.map((slot) => ({
-            ...slot,
-            id: typeof window !== "undefined" ? window.crypto.randomUUID() : "",
-            day: tar,
-          }));
-          setDaySlots((prev) => ({
-            ...prev,
-            [tar]: copied,
-          }));
+          const copied = sourcePeriods.map((slot) => ({ ...slot, id: typeof window !== "undefined" ? window.crypto.randomUUID() : "", day: tar }));
+          setDaySlots((prev) => ({ ...prev, [tar]: copied }));
           toast.success(`Copied to ${DAY_LABELS[tar]}`);
         }}
         onCopyToAllDays={(src) => {
           const sourcePeriods = daySlots[src] ?? [];
           if (sourcePeriods.length === 0) return;
           const updated = { ...daySlots };
-          workingDays.forEach((day) => {
-            if (day === src) return;
-            const copied = sourcePeriods.map((slot) => ({
-              ...slot,
-              id: typeof window !== "undefined" ? window.crypto.randomUUID() : "",
-              day,
-            }));
-            updated[day] = copied;
-          });
+          workingDays.forEach((day) => { if (day === src) return; const copied = sourcePeriods.map((slot) => ({ ...slot, id: typeof window !== "undefined" ? window.crypto.randomUUID() : "", day })); updated[day] = copied; });
           setDaySlots(updated);
           toast.success("Copied to all days");
         }}
