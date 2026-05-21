@@ -1,5 +1,6 @@
 "use client";
 
+import type { Dispatch, SetStateAction } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -25,7 +26,7 @@ interface NewPromotionDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   form: PromotionFormData;
-  setForm: (form: PromotionFormData) => void;
+  setForm: Dispatch<SetStateAction<PromotionFormData>>;
   students: StudentOption[];
   classes: ClassOption[];
   submitting: boolean;
@@ -57,12 +58,12 @@ export function NewPromotionDialog({
         <div className="grid gap-4 py-2">
           <div className="grid grid-cols-2 gap-4">
             <div className="grid gap-2">
-              <label className="text-sm font-medium">Filter by Class</label>
+              <label htmlFor="promotion-filter-class" className="text-sm font-medium">Filter by Class</label>
               <Select 
                 value={form.fromClassId} 
-                onValueChange={(v) => setForm({ ...form, fromClassId: v, studentId: "" })}
+                onValueChange={(v) => setForm((prev) => ({ ...prev, fromClassId: v, studentId: "" }))}
               >
-                <SelectTrigger>
+                <SelectTrigger id="promotion-filter-class">
                   <SelectValue placeholder="All Classes" />
                 </SelectTrigger>
                 <SelectContent>
@@ -76,67 +77,73 @@ export function NewPromotionDialog({
               </Select>
             </div>
             <div className="grid gap-2">
-              <label className="text-sm font-medium">Student *</label>
+              <label htmlFor="promotion-student" className="text-sm font-medium">Student *</label>
               <Select value={form.studentId} onValueChange={handleStudentChange}>
-                <SelectTrigger>
+                <SelectTrigger id="promotion-student">
                   <SelectValue placeholder="Select student" />
                 </SelectTrigger>
                 <SelectContent className="max-h-[300px]">
-                  {students
-                    .filter(s => !form.fromClassId || form.fromClassId === "all" || s.classId === form.fromClassId)
-                    .map((s) => (
-                      <SelectItem key={s.id} value={s.id}>
-                        {s.name} (#{s.rollNumber})
-                      </SelectItem>
-                    ))}
+                  {students.flatMap((s) =>
+                    !form.fromClassId || form.fromClassId === "all" || s.classId === form.fromClassId
+                      ? [
+                          <SelectItem key={s.id} value={s.id}>
+                            {s.name} (#{s.rollNumber})
+                          </SelectItem>,
+                        ]
+                      : [],
+                  )}
                 </SelectContent>
               </Select>
             </div>
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div className="grid gap-2 opacity-60">
-              <label className="text-sm font-medium">Current Class</label>
+              <p className="text-sm font-medium">Current Class</p>
               <div className="px-3 py-2 rounded-md border bg-muted text-sm truncate">
                 {students.find(s => s.id === form.studentId)?.className || "Select a student"}
               </div>
             </div>
             <div className="grid gap-2">
-              <label className="text-sm font-medium">To Class *</label>
+              <label htmlFor="promotion-to-class" className="text-sm font-medium">To Class *</label>
               <Select
                 value={form.toClassId}
-                onValueChange={(v) => setForm({ ...form, toClassId: v })}
+                onValueChange={(v) => setForm((prev) => ({ ...prev, toClassId: v }))}
               >
-                <SelectTrigger>
+                <SelectTrigger id="promotion-to-class">
                   <SelectValue placeholder="Select class" />
                 </SelectTrigger>
                 <SelectContent>
-                  {classes
-                    .filter((c) => c.id !== form.fromClassId)
-                    .map((c) => (
-                      <SelectItem key={c.id} value={c.id}>
-                        {c.name}-{c.section} (Grade {c.grade})
-                      </SelectItem>
-                    ))}
+                  {classes.flatMap((c) =>
+                    c.id !== form.fromClassId
+                      ? [
+                          <SelectItem key={c.id} value={c.id}>
+                            {c.name}-{c.section} (Grade {c.grade})
+                          </SelectItem>,
+                        ]
+                      : [],
+                  )}
                 </SelectContent>
               </Select>
             </div>
           </div>
           <div className="grid gap-2">
-            <label className="text-sm font-medium">Academic Year *</label>
+            <label htmlFor="promotion-academic-year" className="text-sm font-medium">Academic Year *</label>
             <Input
+              id="promotion-academic-year"
               placeholder="e.g. 2025-2026"
               value={form.academicYear}
               onChange={(e) =>
-                setForm({ ...form, academicYear: e.target.value })
+                setForm((prev) => ({ ...prev, academicYear: e.target.value }))
               }
             />
           </div>
           <div className="grid gap-2">
-            <label className="text-sm font-medium">Remarks</label>
+            <label htmlFor="promotion-remarks" className="text-sm font-medium">Remarks</label>
             <Textarea
+              id="promotion-remarks"
               placeholder="Optional remarks..."
               value={form.remarks}
-              onChange={(e) => setForm({ ...form, remarks: e.target.value })}
+              onChange={(e) => setForm((prev) => ({ ...prev, remarks: e.target.value }))}
               rows={3}
             />
           </div>
@@ -159,7 +166,7 @@ export function NewPromotionDialog({
             {submitting ? (
               <>
                 <Loader2 className="size-4 mr-2 animate-spin" />
-                Submitting...
+                Submitting…
               </>
             ) : (
               "Submit Promotion"
@@ -220,12 +227,12 @@ export function BulkPromotionDialog({
         <div className="grid gap-4 py-2">
           <div className="grid grid-cols-2 gap-4">
             <div className="grid gap-2">
-              <label className="text-sm font-medium">From Class *</label>
+              <label htmlFor="bulk-from-class" className="text-sm font-medium">From Class *</label>
               <Select
                 value={bulkFromClass}
                 onValueChange={handleBulkFromClassChange}
               >
-                <SelectTrigger>
+                <SelectTrigger id="bulk-from-class">
                   <SelectValue placeholder="Current class" />
                 </SelectTrigger>
                 <SelectContent>
@@ -243,9 +250,9 @@ export function BulkPromotionDialog({
               </Select>
             </div>
             <div className="grid gap-2">
-              <label className="text-sm font-medium">To Class *</label>
+              <label htmlFor="bulk-to-class" className="text-sm font-medium">To Class *</label>
               <Select value={bulkToClass} onValueChange={setBulkToClass}>
-                <SelectTrigger>
+                <SelectTrigger id="bulk-to-class">
                   <SelectValue placeholder="Auto-detected" />
                 </SelectTrigger>
                 <SelectContent>
@@ -265,15 +272,17 @@ export function BulkPromotionDialog({
             </div>
           </div>
           <div className="grid gap-2">
-            <label className="text-sm font-medium">Academic Year *</label>
+            <label htmlFor="bulk-academic-year" className="text-sm font-medium">Academic Year *</label>
             <Input
+              id="bulk-academic-year"
               value={bulkAcademicYear}
               onChange={(e) => setBulkAcademicYear(e.target.value)}
             />
           </div>
           <div className="grid gap-2">
-            <label className="text-sm font-medium">Remarks</label>
+            <label htmlFor="bulk-remarks" className="text-sm font-medium">Remarks</label>
             <Textarea
+              id="bulk-remarks"
               value={bulkRemarks}
               onChange={(e) => setBulkRemarks(e.target.value)}
               placeholder="Optional..."
@@ -291,9 +300,9 @@ export function BulkPromotionDialog({
           )}
           {bulkPreview.length > 0 && (
             <div className="grid gap-2">
-              <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
+              <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
                 Students to be promoted ({bulkPreview.length})
-              </label>
+              </p>
               <div className="max-h-[160px] overflow-y-auto rounded-lg border bg-muted/30 p-2 text-sm space-y-1">
                 {bulkPreview.map((s) => (
                   <div key={s.id} className="flex justify-between items-center px-2 py-1 rounded hover:bg-muted/50 transition-colors">
@@ -323,7 +332,7 @@ export function BulkPromotionDialog({
             {bulkSubmitting ? (
               <>
                 <Loader2 className="size-4 mr-2 animate-spin" />
-                Creating...
+                Creating…
               </>
             ) : (
               `Promote ${bulkPreview.length} Students`
@@ -372,10 +381,11 @@ export function RejectPromotionDialog({
           </DialogDescription>
         </DialogHeader>
         <div className="grid gap-2 py-2">
-          <label className="text-sm font-medium">
+          <label htmlFor="reject-remarks" className="text-sm font-medium">
             Reason for rejection (optional)
           </label>
           <Textarea
+            id="reject-remarks"
             placeholder="Provide reason..."
             value={rejectRemarks}
             onChange={(e) => setRejectRemarks(e.target.value)}
@@ -394,7 +404,7 @@ export function RejectPromotionDialog({
             {rejecting ? (
               <>
                 <Loader2 className="size-4 mr-2 animate-spin" />
-                Rejecting...
+                Rejecting…
               </>
             ) : (
               "Confirm Reject"
