@@ -94,7 +94,11 @@ export const compileTabularLedgerData = async ({
     }
 
     if (completedExams.length === 0) {
-      toast.error('No completed exams found for this academic cycle.');
+      toast.error(
+        examName
+          ? `No completed exams found matching "${examName}" in this academic cycle.`
+          : 'No completed exams found for this academic cycle.'
+      );
       return null;
     }
 
