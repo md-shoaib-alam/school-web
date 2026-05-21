@@ -149,7 +149,7 @@ export function AdminSchoolSettings() {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
         <Loader2 className="size-8 animate-spin text-emerald-500" />
-        <span className="ml-3 text-gray-500 dark:text-gray-400">
+        <span className="ml-3 text-zinc-500 dark:text-zinc-400">
           Loading settings...
         </span>
       </div>
@@ -160,10 +160,10 @@ export function AdminSchoolSettings() {
     <div className="space-y-6">
       {/* Page Header */}
       <div>
-        <h2 className="text-2xl font-semibold text-gray-900 dark:text-gray-100">
+        <h2 className="text-2xl font-semibold text-zinc-900 dark:text-zinc-100">
           School Settings
         </h2>
-        <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+        <p className="text-sm text-zinc-500 dark:text-zinc-400 mt-1">
           Configure your school preferences and template defaults
         </p>
       </div>
@@ -172,7 +172,7 @@ export function AdminSchoolSettings() {
       <Card>
         <CardHeader className="pb-3">
           <CardTitle className="text-base font-bold">Working Days</CardTitle>
-          <p className="text-sm text-gray-500 dark:text-gray-400">
+          <p className="text-sm text-zinc-500 dark:text-zinc-400">
             Select the days your school holds classes and timetable schedules
           </p>
         </CardHeader>
@@ -190,7 +190,7 @@ export function AdminSchoolSettings() {
                     ${
                       isSelected
                         ? "border-emerald-500 bg-emerald-50/30 dark:bg-emerald-950/10"
-                        : "border-gray-200 dark:border-zinc-800 hover:bg-zinc-50 dark:hover:bg-zinc-900/30"
+                        : "border-zinc-200 dark:border-zinc-800 hover:bg-zinc-50 dark:hover:bg-zinc-900/30"
                     }
                     ${isLastSelected && !isSelected ? "opacity-50 pointer-events-none" : ""}
                   `}
@@ -200,7 +200,7 @@ export function AdminSchoolSettings() {
                     onCheckedChange={() => toggleDay(day.key)}
                     disabled={isLastSelected && isSelected}
                   />
-                  <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                  <span className="text-sm font-medium text-zinc-700 dark:text-zinc-300">
                     {day.label}
                   </span>
                 </label>
@@ -250,12 +250,12 @@ export function AdminSchoolSettings() {
       <Card>
         <CardHeader>
           <div className="flex items-center gap-3">
-            <div className="size-9 rounded-lg bg-indigo-100 dark:bg-indigo-900/30 flex items-center justify-center text-lg">
+            <div className="size-9 rounded-lg bg-violet-100 dark:bg-violet-900/30 flex items-center justify-center text-lg">
               📄
             </div>
             <div>
               <CardTitle className="text-lg">Marksheet Template Preference</CardTitle>
-              <p className="text-sm text-gray-500 dark:text-gray-400 mt-0.5">
+              <p className="text-sm text-zinc-500 dark:text-zinc-400 mt-0.5">
                 Choose the default marksheet template layout for both admin printing and student dashboards
               </p>
             </div>
@@ -270,9 +270,9 @@ export function AdminSchoolSettings() {
                 setHasChanges(true);
               }}
             >
-              <SelectTrigger className="w-full h-10 border-indigo-200 dark:border-indigo-900/50">
+              <SelectTrigger className="w-full h-10 border-violet-200 dark:border-violet-900/50">
                 <div className="flex items-center gap-2">
-                  <Settings className="size-4 text-indigo-500" />
+                  <Settings className="size-4 text-violet-500" />
                   <SelectValue placeholder="Choose default marksheet..." />
                 </div>
               </SelectTrigger>
@@ -287,16 +287,16 @@ export function AdminSchoolSettings() {
               </SelectContent>
             </Select>
           </div>
-          <div className="p-3 bg-zinc-50 dark:bg-zinc-900/50 rounded-lg border border-gray-100 dark:border-zinc-800 text-xs text-muted-foreground flex gap-2">
-            <Info className="size-4 text-indigo-500 shrink-0" />
+          <div className="p-3 bg-zinc-50 dark:bg-zinc-900/50 rounded-lg border border-zinc-100 dark:border-zinc-800 text-xs text-muted-foreground flex gap-2">
+            <Info className="size-4 text-violet-500 shrink-0" />
             <span>Changing this default will automatically format the report card preview under student login profiles to use this style.</span>
           </div>
         </CardContent>
       </Card>
 
       {/* Summary and Save - Dashboard Page Level Footer */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 p-5 bg-card border border-gray-100 dark:border-zinc-800/80 rounded-xl shadow-sm">
-        <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 p-5 bg-card border border-zinc-100 dark:border-zinc-800/80 rounded-xl shadow-sm">
+        <div className="flex items-center gap-2 text-sm text-zinc-500 dark:text-zinc-400">
           <CheckCircle2
             className={`size-4 ${
               hasChanges ? "text-amber-500" : "text-emerald-500"

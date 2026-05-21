@@ -31,7 +31,7 @@ export const receiptStatusConfig: Record<string, { bg: string }> = {
 
 export const concessionStatusConfig: Record<string, { bg: string }> = {
   active: { bg: 'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400' },
-  expired: { bg: 'bg-gray-100 dark:bg-gray-900/30 text-gray-700 dark:text-gray-400' },
+  expired: { bg: 'bg-zinc-100 dark:bg-zinc-900/30 text-zinc-700 dark:text-zinc-400' },
   revoked: { bg: 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400' },
 };
 

@@ -23,8 +23,8 @@ export function FlagCard({
     <Card
       className={`relative overflow-hidden border-2 transition-all duration-300 rounded-3xl group ${
         flag.enabled
-          ? "border-emerald-500/20 bg-white dark:bg-gray-800 shadow-lg shadow-emerald-500/5"
-          : "border-gray-100 dark:border-gray-900 bg-gray-50/50 dark:bg-gray-900/50"
+          ? "border-emerald-500/20 bg-white dark:bg-zinc-800 shadow-lg shadow-emerald-500/5"
+          : "border-zinc-100 dark:border-zinc-900 bg-zinc-50/50 dark:bg-zinc-900/50"
       }`}
     >
       <CardContent className="p-6">
@@ -35,13 +35,13 @@ export function FlagCard({
               className={`size-12 rounded-2xl flex items-center justify-center shrink-0 transition-all duration-500 ${
                 flag.enabled
                   ? "bg-emerald-500 text-white shadow-lg shadow-emerald-200 dark:shadow-none rotate-0"
-                  : "bg-gray-100 dark:bg-gray-800 text-gray-400 rotate-12"
+                  : "bg-zinc-100 dark:bg-zinc-800 text-zinc-400 rotate-12"
               }`}
             >
               <IconComp className="size-6" />
             </div>
             <div className="min-w-0 flex-1 pt-1">
-              <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100 truncate uppercase tracking-widest">
+              <h3 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100 truncate uppercase tracking-widest">
                 {flag.name}
               </h3>
               <p className="text-[11px] font-bold text-muted-foreground mt-1 line-clamp-2 leading-relaxed">
@@ -63,7 +63,7 @@ export function FlagCard({
             className={`text-[9px] font-black uppercase tracking-widest px-2.5 h-6 border-transparent transition-colors ${
               flag.enabled
                 ? "bg-emerald-50 text-emerald-700"
-                : "bg-gray-100 text-gray-500"
+                : "bg-zinc-100 text-zinc-500"
             }`}
           >
             {flag.enabled ? (
@@ -88,14 +88,14 @@ export function FlagCard({
         </div>
 
         {/* Rollout Controls */}
-        <div className="mt-6 space-y-3 p-4 rounded-2xl bg-gray-50/50 dark:bg-gray-900/50 border-2 border-transparent group-hover:border-emerald-500/10 transition-all">
+        <div className="mt-6 space-y-3 p-4 rounded-2xl bg-zinc-50/50 dark:bg-zinc-900/50 border-2 border-transparent group-hover:border-emerald-500/10 transition-all">
           <div className="flex items-center justify-between">
             <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Phased Rollout</Label>
             <span
               className={`text-xs font-black tabular-nums ${
                 flag.enabled
                   ? "text-emerald-600"
-                  : "text-gray-400"
+                  : "text-zinc-400"
               }`}
             >
               {flag.rolloutPercentage}%

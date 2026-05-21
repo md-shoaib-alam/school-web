@@ -60,9 +60,9 @@ export const ITEMS_PER_PAGE = 8;
 
 export const planColors: Record<string, { bg: string; text: string; border: string }> = {
   basic: {
-    bg: "bg-gray-100 dark:bg-gray-800",
-    text: "text-gray-700 dark:text-gray-300",
-    border: "border-gray-200 dark:border-gray-700",
+    bg: "bg-zinc-100 dark:bg-zinc-800",
+    text: "text-zinc-700 dark:text-zinc-300",
+    border: "border-zinc-200 dark:border-zinc-700",
   },
   standard: {
     bg: "bg-blue-100 dark:bg-blue-900/30",
@@ -101,8 +101,8 @@ export const statusColors: Record<
     icon: React.createElement(Ban, { className: "size-3" }),
   },
   inactive: {
-    bg: "bg-gray-100 dark:bg-gray-800",
-    text: "text-gray-600 dark:text-gray-400",
+    bg: "bg-zinc-100 dark:bg-zinc-800",
+    text: "text-zinc-600 dark:text-zinc-400",
     icon: React.createElement(XCircle, { className: "size-3" }),
   },
 };

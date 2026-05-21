@@ -82,7 +82,7 @@ const STATUS_COLORS: Record<string, string> = {
   resolved:
     "bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800",
   closed:
-    "bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400 border-gray-200 dark:border-gray-700",
+    "bg-zinc-100 dark:bg-zinc-800 text-zinc-500 dark:text-zinc-400 border-zinc-200 dark:border-zinc-700",
 };
 
 const PRIORITY_COLORS: Record<string, string> = {
@@ -353,10 +353,10 @@ export function StudentTickets() {
       <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
         <div className="flex items-center gap-3">
           <div>
-            <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">
+            <h2 className="text-xl font-semibold text-zinc-900 dark:text-zinc-100">
               My Tickets
             </h2>
-            <p className="text-sm text-gray-500 dark:text-gray-400 mt-0.5">
+            <p className="text-sm text-zinc-500 dark:text-zinc-400 mt-0.5">
               {tickets.length} ticket{tickets.length !== 1 ? "s" : ""}
               {openCount > 0 ? ` - ${openCount} active` : ""}
             </p>
@@ -390,11 +390,11 @@ export function StudentTickets() {
       ) : tickets.length === 0 ? (
         <Card className="rounded-xl shadow-sm">
           <CardContent className="py-16 text-center">
-            <Ticket className="size-12 mx-auto text-gray-200 mb-3" />
-            <p className="text-sm font-medium text-gray-500 dark:text-gray-400">
+            <Ticket className="size-12 mx-auto text-zinc-200 mb-3" />
+            <p className="text-sm font-medium text-zinc-500 dark:text-zinc-400">
               No tickets yet
             </p>
-            <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">
+            <p className="text-xs text-zinc-400 dark:text-zinc-500 mt-1">
               Submit a ticket if you need help from the school
             </p>
           </CardContent>
@@ -404,14 +404,14 @@ export function StudentTickets() {
           {tickets.map((ticket) => (
             <Card
               key={ticket.id}
-              className="rounded-xl shadow-sm hover:shadow-md transition-shadow cursor-pointer border-gray-100 dark:border-gray-800"
+              className="rounded-xl shadow-sm hover:shadow-md transition-shadow cursor-pointer border-zinc-100 dark:border-zinc-800"
               onClick={() => openTicketDetail(ticket.id)}
             >
               <CardContent className="p-4">
                 <div className="flex items-start justify-between gap-3">
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-1.5">
-                      <h3 className="font-semibold text-gray-900 dark:text-gray-100 text-sm truncate">
+                      <h3 className="font-semibold text-zinc-900 dark:text-zinc-100 text-sm truncate">
                         {ticket.title}
                       </h3>
                     </div>
@@ -430,12 +430,12 @@ export function StudentTickets() {
                       </Badge>
                       <Badge
                         variant="outline"
-                        className="text-[10px] font-medium bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400"
+                        className="text-[10px] font-medium bg-zinc-100 dark:bg-zinc-800 text-zinc-500 dark:text-zinc-400"
                       >
                         {getCategoryLabel(ticket.category)}
                       </Badge>
                     </div>
-                    <div className="flex items-center justify-between text-[11px] text-gray-400 dark:text-gray-500">
+                    <div className="flex items-center justify-between text-[11px] text-zinc-400 dark:text-zinc-500">
                       <div className="flex items-center gap-3">
                         <span className="flex items-center gap-1">
                           <MessageSquare className="size-3" />
@@ -586,10 +586,10 @@ export function StudentTickets() {
               {/* Ticket Info (read-only for students) */}
               <div className="p-4 space-y-3 border-b">
                 <div>
-                  <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
+                  <h3 className="text-lg font-semibold text-zinc-900 dark:text-zinc-100">
                     {selectedTicket.title}
                   </h3>
-                  <p className="text-sm text-gray-500 dark:text-gray-400 mt-1 leading-relaxed">
+                  <p className="text-sm text-zinc-500 dark:text-zinc-400 mt-1 leading-relaxed">
                     {selectedTicket.description}
                   </p>
                 </div>
@@ -609,15 +609,15 @@ export function StudentTickets() {
                   </Badge>
                   <Badge
                     variant="outline"
-                    className="text-[10px] font-medium bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400"
+                    className="text-[10px] font-medium bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400"
                   >
                     {getCategoryLabel(selectedTicket.category)}
                   </Badge>
                 </div>
 
                 {selectedTicket.assignee && (
-                  <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
-                    <span className="text-gray-500 dark:text-gray-400">
+                  <div className="flex items-center gap-2 text-sm text-zinc-600 dark:text-zinc-400">
+                    <span className="text-zinc-500 dark:text-zinc-400">
                       Assigned to:
                     </span>
                     <Avatar className="size-5">
@@ -636,8 +636,8 @@ export function StudentTickets() {
 
               {/* Conversation Thread */}
               <div className="flex-1 overflow-hidden flex flex-col min-h-0">
-                <div className="px-4 py-2 border-b bg-gray-50/50 dark:bg-gray-900/50">
-                  <span className="text-xs font-medium text-gray-500 dark:text-gray-400">
+                <div className="px-4 py-2 border-b bg-zinc-50/50 dark:bg-zinc-900/50">
+                  <span className="text-xs font-medium text-zinc-500 dark:text-zinc-400">
                     Conversation ({selectedTicket.messages?.length || 0}{" "}
                     messages)
                   </span>
@@ -646,7 +646,7 @@ export function StudentTickets() {
                   <div className="p-4 space-y-4">
                     {(!selectedTicket.messages ||
                       selectedTicket.messages.length === 0) && (
-                      <div className="text-center py-8 text-gray-400 dark:text-gray-500">
+                      <div className="text-center py-8 text-zinc-400 dark:text-zinc-500">
                         <MessageSquare className="size-8 mx-auto mb-2 opacity-40" />
                         <p className="text-sm">No messages yet</p>
                         <p className="text-xs">
@@ -660,7 +660,7 @@ export function StudentTickets() {
                           <AvatarFallback
                             className={`text-[10px] ${
                               ROLE_COLORS[msg.author?.role || "student"] ||
-                              "bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400"
+                              "bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400"
                             }`}
                           >
                             {msg.author ? getInitials(msg.author.name) : "??"}
@@ -668,7 +668,7 @@ export function StudentTickets() {
                         </Avatar>
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-2 flex-wrap">
-                            <span className="text-sm font-medium text-gray-900 dark:text-gray-100">
+                            <span className="text-sm font-medium text-zinc-900 dark:text-zinc-100">
                               {msg.author?.name || "Unknown"}
                             </span>
                             {msg.author?.role && (
@@ -686,11 +686,11 @@ export function StudentTickets() {
                                 (You)
                               </span>
                             )}
-                            <span className="text-[11px] text-gray-400 dark:text-gray-500">
+                            <span className="text-[11px] text-zinc-400 dark:text-zinc-500">
                               {formatDateTime(msg.createdAt)}
                             </span>
                           </div>
-                          <p className="text-sm text-gray-700 dark:text-gray-300 mt-1 leading-relaxed whitespace-pre-wrap">
+                          <p className="text-sm text-zinc-700 dark:text-zinc-300 mt-1 leading-relaxed whitespace-pre-wrap">
                             {msg.message}
                           </p>
                         </div>
@@ -701,7 +701,7 @@ export function StudentTickets() {
 
                 {/* Reply Input */}
                 {selectedTicket.status !== "closed" && (
-                  <div className="p-4 border-t bg-white dark:bg-gray-900">
+                  <div className="p-4 border-t bg-white dark:bg-zinc-900">
                     <div className="flex gap-2">
                       <Textarea
                         placeholder="Type your reply..."
@@ -717,7 +717,7 @@ export function StudentTickets() {
                       />
                     </div>
                     <div className="flex items-center justify-between mt-2">
-                      <span className="text-[10px] text-gray-400 dark:text-gray-500">
+                      <span className="text-[10px] text-zinc-400 dark:text-zinc-500">
                         Press Ctrl+Enter to send
                       </span>
                       <Button
@@ -738,8 +738,8 @@ export function StudentTickets() {
                 )}
 
                 {selectedTicket.status === "closed" && (
-                  <div className="p-4 border-t bg-gray-50 dark:bg-gray-900">
-                    <p className="text-sm text-gray-500 dark:text-gray-400 text-center">
+                  <div className="p-4 border-t bg-zinc-50 dark:bg-zinc-900">
+                    <p className="text-sm text-zinc-500 dark:text-zinc-400 text-center">
                       This ticket is closed. No further replies can be sent.
                     </p>
                   </div>

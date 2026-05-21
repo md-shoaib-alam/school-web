@@ -21,7 +21,7 @@ export function UserHeader({ totalCount, roleCountsMap }: UserHeaderProps) {
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h2 className="text-2xl font-semibold text-gray-900 dark:text-gray-100 tracking-tight">
+          <h2 className="text-2xl font-semibold text-zinc-900 dark:text-zinc-100 tracking-tight">
             User Management
           </h2>
           <p className="text-sm font-bold text-muted-foreground">
@@ -56,7 +56,7 @@ export function UserHeader({ totalCount, roleCountsMap }: UserHeaderProps) {
                     {percentage}%
                   </span>
                 </div>
-                <p className="text-2xl font-black text-gray-900 dark:text-gray-100">
+                <p className="text-2xl font-black text-zinc-900 dark:text-zinc-100">
                   {count.toLocaleString()}
                 </p>
                 <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground mt-0.5">

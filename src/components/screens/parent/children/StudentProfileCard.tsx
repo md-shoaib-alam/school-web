@@ -31,7 +31,7 @@ export function StudentProfileCard({
   subjectCount,
 }: StudentProfileCardProps) {
   return (
-    <Card className="rounded-2xl border border-gray-200/50 dark:border-zinc-800/50 shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.2)] bg-white dark:bg-zinc-950">
+    <Card className="rounded-2xl border border-zinc-200/50 dark:border-zinc-800/50 shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.2)] bg-white dark:bg-zinc-950">
       <CardContent className="p-6">
         <div className="flex flex-col sm:flex-row sm:items-start gap-6">
           <div className="size-20 rounded-2xl bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center text-white text-2xl font-bold shadow-md">
@@ -40,23 +40,23 @@ export function StudentProfileCard({
           <div className="flex-1 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 text-left">
             <div className="space-y-1">
               <div className="flex items-center gap-1.5 text-xs text-muted-foreground"><User className="size-3" /> Full Name</div>
-              <p className="text-sm font-semibold text-gray-900 dark:text-gray-100">{student.name}</p>
+              <p className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">{student.name}</p>
             </div>
             <div className="space-y-1">
               <div className="flex items-center gap-1.5 text-xs text-muted-foreground"><GraduationCap className="size-3" /> Class</div>
-              <p className="text-sm font-semibold text-gray-900 dark:text-gray-100">{student.className}</p>
+              <p className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">{student.className}</p>
             </div>
             <div className="space-y-1">
               <div className="flex items-center gap-1.5 text-xs text-muted-foreground"><Hash className="size-3" /> Roll Number</div>
-              <p className="text-sm font-semibold text-gray-900 dark:text-gray-100">{student.rollNumber}</p>
+              <p className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">{student.rollNumber}</p>
             </div>
             <div className="space-y-1">
               <div className="flex items-center gap-1.5 text-xs text-muted-foreground"><User className="size-3" /> Gender</div>
-              <p className="text-sm font-semibold text-gray-900 dark:text-gray-100">{student.gender === "male" ? "Male" : "Female"}</p>
+              <p className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">{student.gender === "male" ? "Male" : "Female"}</p>
             </div>
             <div className="space-y-1">
               <div className="flex items-center gap-1.5 text-xs text-muted-foreground"><Calendar className="size-3" /> Date of Birth</div>
-              <p className="text-sm font-semibold text-gray-900 dark:text-gray-100" suppressHydrationWarning>
+              <p className="text-sm font-semibold text-zinc-900 dark:text-zinc-100" suppressHydrationWarning>
                 {formatDob(student.dateOfBirth)}
               </p>
             </div>
@@ -72,7 +72,7 @@ export function StudentProfileCard({
             <div className="space-y-1">
               <div className="flex items-center gap-1.5 text-xs text-muted-foreground"><Award className="size-3" /> Average Grade</div>
               <div className="flex items-center gap-2">
-                <span className="text-sm font-bold text-gray-900 dark:text-gray-100">{overallAvg}%</span>
+                <span className="text-sm font-bold text-zinc-900 dark:text-zinc-100">{overallAvg}%</span>
                 <Badge variant="outline" className={`font-bold text-xs shadow-none ${overallGrade.startsWith("A") ? "border-emerald-200 dark:border-emerald-800 bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400" : overallGrade.startsWith("B") ? "border-blue-200 dark:border-blue-800 bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400" : "border-amber-200 dark:border-amber-800 bg-amber-50 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400"}`}>
                   {overallGrade}
                 </Badge>
@@ -80,7 +80,7 @@ export function StudentProfileCard({
             </div>
             <div className="space-y-1">
               <div className="flex items-center gap-1.5 text-xs text-muted-foreground"><BookOpen className="size-3" /> Subjects</div>
-              <p className="text-sm font-semibold text-gray-900 dark:text-gray-100">{subjectCount}</p>
+              <p className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">{subjectCount}</p>
             </div>
           </div>
         </div>

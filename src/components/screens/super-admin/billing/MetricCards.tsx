@@ -41,7 +41,7 @@ export function MetricCards({
     return (
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {[...Array(4)].map((_, i) => (
-          <Card key={i} className="shadow-sm border-none bg-white dark:bg-gray-800">
+          <Card key={i} className="shadow-sm border-none bg-white dark:bg-zinc-800">
             <CardContent className="p-5">
               <Skeleton className="h-4 w-28" />
               <Skeleton className="h-8 w-20 mt-3" />
@@ -56,7 +56,7 @@ export function MetricCards({
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
       {/* Total Active Revenue */}
-      <Card className="shadow-sm hover:shadow-md transition-all border-none bg-white dark:bg-gray-800 group">
+      <Card className="shadow-sm hover:shadow-md transition-all border-none bg-white dark:bg-zinc-800 group">
         <CardContent className="p-5">
           <div className="flex items-center justify-between mb-3">
             <div className="size-10 rounded-xl bg-emerald-50 dark:bg-emerald-900/30 text-emerald-600 flex items-center justify-center group-hover:scale-110 transition-transform">
@@ -78,13 +78,13 @@ export function MetricCards({
       </Card>
 
       {/* Total Subscriptions */}
-      <Card className="shadow-sm hover:shadow-md transition-all border-none bg-white dark:bg-gray-800 group">
+      <Card className="shadow-sm hover:shadow-md transition-all border-none bg-white dark:bg-zinc-800 group">
         <CardContent className="p-5">
           <div className="flex items-center justify-between mb-3">
             <div className="size-10 rounded-xl bg-amber-50 dark:bg-amber-900/30 text-amber-600 flex items-center justify-center group-hover:scale-110 transition-transform">
               <Receipt className="size-5" />
             </div>
-            <Badge variant="outline" className="text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/30 text-[10px]">
+            <Badge variant="outline" className="text-zinc-700 dark:text-zinc-300 border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-900/30 text-[10px]">
               <BarChart3 className="size-3 mr-0.5" /> Total
             </Badge>
           </div>
@@ -99,7 +99,7 @@ export function MetricCards({
       </Card>
 
       {/* Avg Revenue Per Tenant */}
-      <Card className="shadow-sm hover:shadow-md transition-all border-none bg-white dark:bg-gray-800 group">
+      <Card className="shadow-sm hover:shadow-md transition-all border-none bg-white dark:bg-zinc-800 group">
         <CardContent className="p-5">
           <div className="flex items-center justify-between mb-3">
             <div className="size-10 rounded-xl bg-violet-50 dark:bg-violet-900/30 text-violet-600 flex items-center justify-center group-hover:scale-110 transition-transform">
@@ -121,7 +121,7 @@ export function MetricCards({
       </Card>
 
       {/* Churn Analytics */}
-      <Card className="shadow-sm hover:shadow-md transition-all border-none bg-white dark:bg-gray-800 group">
+      <Card className="shadow-sm hover:shadow-md transition-all border-none bg-white dark:bg-zinc-800 group">
         <CardContent className="p-5">
           <div className="flex items-center justify-between mb-3">
             <div className="size-10 rounded-xl bg-red-50 dark:bg-red-900/30 text-red-600 flex items-center justify-center group-hover:scale-110 transition-transform">

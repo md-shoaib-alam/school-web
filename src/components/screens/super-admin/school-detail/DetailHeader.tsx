@@ -40,7 +40,7 @@ function MiniStat({
   isCurrency,
 }: MiniStatProps) {
   return (
-    <Card className="border-none shadow-sm hover:shadow-md transition-shadow group overflow-hidden bg-white dark:bg-gray-800">
+    <Card className="border-none shadow-sm hover:shadow-md transition-shadow group overflow-hidden bg-white dark:bg-zinc-800">
       <CardContent className="p-4 flex items-center gap-4 relative">
         <div className={`size-11 rounded-xl ${iconBg} ${iconColor} flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform shadow-inner`}>
           {icon}
@@ -76,7 +76,7 @@ export function DetailHeader({
         <Button
           variant="ghost"
           size="sm"
-          className="w-fit text-muted-foreground hover:text-foreground hover:bg-gray-100 dark:hover:bg-gray-800 rounded-xl px-4 h-9 font-bold transition-all"
+          className="w-fit text-muted-foreground hover:text-foreground hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-xl px-4 h-9 font-bold transition-all"
           onClick={onBack}
         >
           <ArrowLeft className="size-4 mr-2" />

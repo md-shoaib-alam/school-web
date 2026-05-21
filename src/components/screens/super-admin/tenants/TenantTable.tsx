@@ -124,7 +124,7 @@ const TenantCard = memo(function TenantCard({
                 Manage Data
               </DropdownMenuItem>
               <DropdownMenuItem onClick={() => onAddAdmin(tenant)}>
-                <ShieldCheck className="size-4 mr-2 text-indigo-600" />
+                <ShieldCheck className="size-4 mr-2 text-violet-600" />
                 Create Admin
               </DropdownMenuItem>
               <DropdownMenuItem onClick={onEdit}>
@@ -212,7 +212,7 @@ const TenantCard = memo(function TenantCard({
             </Button>
           </div>
           <Button
-            className="w-full bg-indigo-600 hover:bg-indigo-700 text-white h-9 rounded-lg gap-2 shadow-sm shadow-indigo-200 dark:shadow-none transition-all active:scale-[0.98]"
+            className="w-full bg-violet-600 hover:bg-violet-700 text-white h-9 rounded-lg gap-2 shadow-sm shadow-violet-200 dark:shadow-none transition-all active:scale-[0.98]"
             size="sm"
             onClick={() => onAddAdmin(tenant)}
           >
@@ -394,7 +394,7 @@ export function TenantTable({
                         <Database className="size-4 mr-2" /> Manage Data
                       </DropdownMenuItem>
                       <DropdownMenuItem onClick={() => onAddAdmin(tenant)}>
-                        <ShieldCheck className="size-4 mr-2 text-indigo-600" /> Create Admin
+                        <ShieldCheck className="size-4 mr-2 text-violet-600" /> Create Admin
                       </DropdownMenuItem>
                       <DropdownMenuItem onClick={() => onEdit(tenant)}>
                         <Edit className="size-4 mr-2" /> Edit

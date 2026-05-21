@@ -382,10 +382,10 @@ export function AdminSubjects() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">
+          <h2 className="text-xl font-semibold text-zinc-900 dark:text-zinc-100">
             Subjects
           </h2>
-          <p className="text-sm text-gray-500 dark:text-gray-400 mt-0.5">
+          <p className="text-sm text-zinc-500 dark:text-zinc-400 mt-0.5">
             {subjects.length} subjects across all classes
           </p>
         </div>
@@ -457,12 +457,12 @@ export function AdminSubjects() {
           </Select>
         </div>
 
-        <div className="flex items-center gap-1 bg-gray-100 dark:bg-gray-800 p-1 rounded-lg">
+        <div className="flex items-center gap-1 bg-zinc-100 dark:bg-zinc-800 p-1 rounded-lg">
           <Button
             variant={viewMode === "table" ? "secondary" : "ghost"}
             size="sm"
             onClick={() => setViewMode("table")}
-            className={`size-8 p-0 ${viewMode === "table" ? "bg-white dark:bg-gray-700 shadow-sm" : ""}`}
+            className={`size-8 p-0 ${viewMode === "table" ? "bg-white dark:bg-zinc-700 shadow-sm" : ""}`}
           >
             <List className="size-4" />
           </Button>
@@ -470,7 +470,7 @@ export function AdminSubjects() {
             variant={viewMode === "grid" ? "secondary" : "ghost"}
             size="sm"
             onClick={() => setViewMode("grid")}
-            className={`size-8 p-0 ${viewMode === "grid" ? "bg-white dark:bg-gray-700 shadow-sm" : ""}`}
+            className={`size-8 p-0 ${viewMode === "grid" ? "bg-white dark:bg-zinc-700 shadow-sm" : ""}`}
           >
             <LayoutGrid className="size-4" />
           </Button>
@@ -540,7 +540,7 @@ export function AdminSubjects() {
                           </div>
                         </TableCell>
                         <TableCell>
-                          <code className="px-2 py-0.5 rounded bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 text-xs font-mono">
+                          <code className="px-2 py-0.5 rounded bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 text-xs font-mono">
                             {subject.code}
                           </code>
                         </TableCell>
@@ -657,7 +657,7 @@ export function AdminSubjects() {
                     </div>
 
                     <div className="space-y-1">
-                      <h3 className="font-semibold text-gray-900 dark:text-gray-100 truncate">
+                      <h3 className="font-semibold text-zinc-900 dark:text-zinc-100 truncate">
                         {subject.name}
                       </h3>
                       <p className="text-xs font-mono text-muted-foreground uppercase tracking-wider">
@@ -665,21 +665,21 @@ export function AdminSubjects() {
                       </p>
                     </div>
 
-                    <div className="mt-4 pt-4 border-t border-gray-100 dark:border-gray-800 space-y-3">
+                    <div className="mt-4 pt-4 border-t border-zinc-100 dark:border-zinc-800 space-y-3">
                       <div className="flex items-center justify-between">
-                        <span className="text-[10px] uppercase font-bold text-gray-400 tracking-tighter">Class</span>
+                        <span className="text-[10px] uppercase font-bold text-zinc-400 tracking-tighter">Class</span>
                         <Badge variant="secondary" className="text-[10px] px-2 py-0">
                           {subject.className}
                         </Badge>
                       </div>
                       <div className="flex items-center justify-between">
-                        <span className="text-[10px] uppercase font-bold text-gray-400 tracking-tighter">Teacher</span>
+                        <span className="text-[10px] uppercase font-bold text-zinc-400 tracking-tighter">Teacher</span>
                         {subject.teacherName && subject.teacherName !== "Not Assigned" ? (
                           <div className="flex items-center gap-1.5">
                             <div className="size-5 rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 flex items-center justify-center text-[8px] font-bold">
                               {subject.teacherName.split(" ").map(n => n[0]).join("").slice(0, 2)}
                             </div>
-                            <span className="text-xs font-medium text-gray-700 dark:text-gray-300 max-w-[100px] truncate">
+                            <span className="text-xs font-medium text-zinc-700 dark:text-zinc-300 max-w-[100px] truncate">
                               {subject.teacherName}
                             </span>
                           </div>

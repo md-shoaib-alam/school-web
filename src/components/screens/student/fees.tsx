@@ -123,7 +123,7 @@ export function StudentFees() {
       {/* Header */}
       <div className="flex items-center gap-2">
         <CreditCard className="size-5 text-violet-600" />
-        <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
+        <h2 className="text-lg font-semibold text-zinc-900 dark:text-zinc-100">
           My Fees
         </h2>
       </div>
@@ -138,7 +138,7 @@ export function StudentFees() {
               </div>
               <div>
                 <p className="text-xs text-muted-foreground">Total Fees</p>
-                <p className="text-xl font-bold text-gray-900 dark:text-gray-100">
+                <p className="text-xl font-bold text-zinc-900 dark:text-zinc-100">
                   ₹{summary.total.toLocaleString()}
                 </p>
               </div>

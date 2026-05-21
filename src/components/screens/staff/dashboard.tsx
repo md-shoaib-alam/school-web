@@ -60,7 +60,7 @@ export function StaffDashboard() {
         {/* Stats Grid Skeleton */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           {[1, 2, 3, 4].map((i) => (
-            <Card key={i} className="border-0 shadow-sm bg-white dark:bg-gray-900">
+            <Card key={i} className="border-0 shadow-sm bg-white dark:bg-zinc-900">
               <CardContent className="p-4">
                 <div className="flex items-center justify-between">
                   <div className="space-y-2">
@@ -175,10 +175,10 @@ export function StaffDashboard() {
       {/* Welcome Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h2 className="text-2xl font-semibold text-gray-900 dark:text-white">
+          <h2 className="text-2xl font-semibold text-zinc-900 dark:text-white">
             Welcome back, {currentUser?.name?.split(" ")[0]}! 👋
           </h2>
-          <p className="text-gray-500 dark:text-gray-400 mt-1">
+          <p className="text-zinc-500 dark:text-zinc-400 mt-1">
             Here&apos;s what&apos;s happening at{" "}
             {currentTenantName || "your school"} today.
           </p>
@@ -218,10 +218,10 @@ export function StaffDashboard() {
             <CardContent className="p-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">
+                  <p className="text-sm text-zinc-500 dark:text-zinc-400">
                     {stat.label}
                   </p>
-                  <p className="text-2xl font-bold mt-1 text-gray-900 dark:text-white">
+                  <p className="text-2xl font-bold mt-1 text-zinc-900 dark:text-white">
                     {stat.value}
                   </p>
                 </div>
@@ -236,7 +236,7 @@ export function StaffDashboard() {
 
       {/* Quick Actions */}
       <div>
-        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">
+        <h3 className="text-lg font-semibold text-zinc-900 dark:text-white mb-3">
           Quick Actions
         </h3>
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
@@ -244,14 +244,14 @@ export function StaffDashboard() {
             <button
               key={action.screen}
               onClick={() => navigateTo(action.screen)}
-              className="flex items-center gap-3 p-4 rounded-xl border border-gray-200 dark:border-gray-800 hover:shadow-md transition-all hover:border-transparent text-left group"
+              className="flex items-center gap-3 p-4 rounded-xl border border-zinc-200 dark:border-zinc-800 hover:shadow-md transition-all hover:border-transparent text-left group"
             >
               <div
                 className={`p-2 rounded-lg text-white ${action.color} transition-transform group-hover:scale-110`}
               >
                 {action.icon}
               </div>
-              <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+              <span className="text-sm font-medium text-zinc-700 dark:text-zinc-300">
                 {action.label}
               </span>
             </button>
@@ -264,7 +264,7 @@ export function StaffDashboard() {
         <Card>
           <CardHeader>
             <CardTitle className="text-lg flex items-center gap-2">
-              <ClipboardList className="size-5 text-gray-400 dark:text-gray-500" />
+              <ClipboardList className="size-5 text-zinc-400 dark:text-zinc-500" />
               Recent Broadcasts
             </CardTitle>
           </CardHeader>
@@ -274,23 +274,23 @@ export function StaffDashboard() {
                 data?.recentNotices.map((activity) => (
                   <div
                     key={activity.id}
-                    className="flex items-start gap-3 py-2 border-b border-gray-50 dark:border-gray-800/50 last:border-0"
+                    className="flex items-start gap-3 py-2 border-b border-zinc-50 dark:border-zinc-800/50 last:border-0"
                   >
                     <div className="mt-0.5 shrink-0">
                       <Bell className="size-4 text-amber-500" />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm font-semibold text-gray-700 dark:text-gray-300 line-clamp-1">
+                      <p className="text-sm font-semibold text-zinc-700 dark:text-zinc-300 line-clamp-1">
                         {activity.title}
                       </p>
-                      <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+                      <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">
                         {activity.content.substring(0, 60)}...
                       </p>
                     </div>
                   </div>
                 ))
               ) : (
-                <p className="text-sm text-gray-400 italic">
+                <p className="text-sm text-zinc-400 italic">
                   No recent notices found.
                 </p>
               )}
@@ -302,13 +302,13 @@ export function StaffDashboard() {
         <Card>
           <CardHeader>
             <CardTitle className="text-lg flex items-center gap-2">
-              <AlertCircle className="size-5 text-gray-400 dark:text-gray-500" />
+              <AlertCircle className="size-5 text-zinc-400 dark:text-zinc-500" />
               School Composition
             </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              <div className="flex items-center justify-between p-3 rounded-lg bg-gray-50 dark:bg-gray-900">
+              <div className="flex items-center justify-between p-3 rounded-lg bg-zinc-50 dark:bg-zinc-900">
                 <div className="flex items-center gap-3">
                   <Users className="size-4 text-emerald-500" />
                   <span className="text-sm font-medium">Students Enrolled</span>
@@ -317,7 +317,7 @@ export function StaffDashboard() {
                   {data?.totalStudents}
                 </span>
               </div>
-              <div className="flex items-center justify-between p-3 rounded-lg bg-gray-50 dark:bg-gray-900">
+              <div className="flex items-center justify-between p-3 rounded-lg bg-zinc-50 dark:bg-zinc-900">
                 <div className="flex items-center gap-3">
                   <School className="size-4 text-blue-500" />
                   <span className="text-sm font-medium">
@@ -328,7 +328,7 @@ export function StaffDashboard() {
                   {data?.totalClasses}
                 </span>
               </div>
-              <div className="flex items-center justify-between p-3 rounded-lg bg-gray-50 dark:bg-gray-900">
+              <div className="flex items-center justify-between p-3 rounded-lg bg-zinc-50 dark:bg-zinc-900">
                 <div className="flex items-center gap-3">
                   <TrendingUp className="size-4 text-violet-500" />
                   <span className="text-sm font-medium">

@@ -30,7 +30,7 @@ export function RevenueTrends({ loading, monthlyTrend }: RevenueTrendsProps) {
   }, []);
 
   return (
-    <Card className="shadow-sm border-none bg-white dark:bg-gray-800">
+    <Card className="shadow-sm border-none bg-white dark:bg-zinc-800">
       <CardHeader className="pb-2">
         <div className="flex items-center justify-between">
           <div>

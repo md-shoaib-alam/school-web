@@ -20,7 +20,7 @@ export function AttendanceStats({ percentage, present, absent }: AttendanceStats
               <circle
                 cx="64" cy="64" r="56"
                 fill="none" stroke="#f3f4f6" strokeWidth="10"
-                className="dark:stroke-gray-700"
+                className="dark:stroke-zinc-700"
               />
               <circle
                 cx="64" cy="64" r="56"

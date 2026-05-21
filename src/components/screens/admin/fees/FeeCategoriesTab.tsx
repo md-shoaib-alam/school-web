@@ -179,7 +179,7 @@ export function FeeCategoriesTab({ canCreate, canEdit, canDelete }: FeeCategorie
                           <Badge variant="outline" className={`${freq.bg} border-0 font-medium`}>{freq.label}</Badge>
                         </TableCell>
                         <TableCell className="py-4">
-                          <Badge variant="outline" className={cat.status === 'active' ? 'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 border-0' : 'bg-gray-100 dark:bg-gray-900/30 text-gray-500 border-0'}>
+                          <Badge variant="outline" className={cat.status === 'active' ? 'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 border-0' : 'bg-zinc-100 dark:bg-zinc-900/30 text-zinc-500 border-0'}>
                             {cat.status === 'active' ? <CheckCircle2 className="size-3 mr-1" /> : <Ban className="size-3 mr-1" />}
                             {cat.status}
                           </Badge>

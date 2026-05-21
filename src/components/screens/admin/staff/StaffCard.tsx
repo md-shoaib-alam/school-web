@@ -28,20 +28,20 @@ export function StaffCard({ member, onEdit, onDelete, canEdit, canDelete }: Staf
   };
 
   return (
-    <Card className="group hover:shadow-md transition-all duration-200 border-gray-100 dark:border-gray-800 overflow-hidden">
+    <Card className="group hover:shadow-md transition-all duration-200 border-zinc-100 dark:border-zinc-800 overflow-hidden">
       <CardContent className="p-0">
         <div className="h-1.5 w-full" style={{ backgroundColor: member.customRole?.color || "#6366f1" }} />
         
         <div className="p-4">
           <div className="flex items-start justify-between mb-4">
             <div className="flex items-center gap-3">
-              <Avatar className="size-12 border-2 border-white dark:border-gray-900 shadow-sm">
+              <Avatar className="size-12 border-2 border-white dark:border-zinc-900 shadow-sm">
                 <AvatarFallback style={avatarStyle(member.customRole?.color || "#6366f1")}>
                   {getInitials(member.name)}
                 </AvatarFallback>
               </Avatar>
               <div className="flex-1 min-w-0">
-                <h3 className="font-semibold text-gray-900 dark:text-gray-100 truncate leading-tight pr-1">
+                <h3 className="font-semibold text-zinc-900 dark:text-zinc-100 truncate leading-tight pr-1">
                   {member.name}
                 </h3>
                 <div className="flex flex-wrap items-center gap-1.5 mt-1.5">
@@ -62,7 +62,7 @@ export function StaffCard({ member, onEdit, onDelete, canEdit, canDelete }: Staf
                     variant="outline"
                     className={cn(
                       "px-1.5 py-0 h-4.5 text-[9px] font-bold uppercase tracking-tight shrink-0",
-                      member.isActive ? "text-emerald-600 bg-emerald-50 border-emerald-100" : "text-gray-400 bg-gray-50 border-gray-100"
+                      member.isActive ? "text-emerald-600 bg-emerald-50 border-emerald-100" : "text-zinc-400 bg-zinc-50 border-zinc-100"
                     )}
                   >
                     {member.isActive ? "Active" : "Offline"}
@@ -95,24 +95,24 @@ export function StaffCard({ member, onEdit, onDelete, canEdit, canDelete }: Staf
             </div>
           </div>
 
-          <div className="space-y-2 pt-2 border-t border-gray-50 dark:border-gray-800/50">
+          <div className="space-y-2 pt-2 border-t border-zinc-50 dark:border-zinc-800/50">
             <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400 min-w-0">
+              <div className="flex items-center gap-2 text-xs text-zinc-500 dark:text-zinc-400 min-w-0">
                 <Mail className="size-3 shrink-0" />
                 <span className="truncate">{member.email}</span>
               </div>
               <Button 
                 variant="ghost" 
                 size="icon" 
-                className="size-6 opacity-0 group-hover:opacity-100 transition-all duration-200 hover:bg-gray-100 dark:hover:bg-gray-800 shrink-0"
+                className="size-6 opacity-0 group-hover:opacity-100 transition-all duration-200 hover:bg-zinc-100 dark:hover:bg-zinc-800 shrink-0"
                 onClick={handleCopy}
                 title="Copy email"
               >
-                {copied ? <Check className="size-3 text-emerald-500" /> : <Copy className="size-3 text-gray-400" />}
+                {copied ? <Check className="size-3 text-emerald-500" /> : <Copy className="size-3 text-zinc-400" />}
               </Button>
             </div>
             
-            <div className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
+            <div className="flex items-center gap-2 text-xs text-zinc-500 dark:text-zinc-400">
               <Phone className="size-3" />
               <span>{member.phone || "No contact"}</span>
             </div>

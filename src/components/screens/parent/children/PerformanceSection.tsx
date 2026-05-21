@@ -18,7 +18,7 @@ interface PerformanceSectionProps {
 
 export function PerformanceSection({ data }: PerformanceSectionProps) {
   return (
-    <Card className="rounded-2xl border border-gray-200/50 dark:border-zinc-800/50 shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.2)] bg-white dark:bg-zinc-950">
+    <Card className="rounded-2xl border border-zinc-200/50 dark:border-zinc-800/50 shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.2)] bg-white dark:bg-zinc-950">
       <CardHeader className="p-4 pb-2">
         <div className="flex items-center gap-2 text-left">
           <TrendingUp className="size-5 text-amber-600" />
@@ -32,7 +32,7 @@ export function PerformanceSection({ data }: PerformanceSectionProps) {
           {data.map((sp) => (
             <div key={sp.subject} className="space-y-1.5 text-left">
               <div className="flex items-center justify-between">
-                <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                <span className="text-sm font-medium text-zinc-700 dark:text-zinc-300">
                   {sp.subject}
                 </span>
                 <div className="flex items-center gap-2">
@@ -58,7 +58,7 @@ export function PerformanceSection({ data }: PerformanceSectionProps) {
                   value={sp.avgPct}
                   className="h-2.5 flex-1 [&>div]:bg-amber-500"
                 />
-                <span className="text-xs font-semibold text-gray-600 dark:text-gray-400 w-10 text-right">
+                <span className="text-xs font-semibold text-zinc-600 dark:text-zinc-400 w-10 text-right">
                   {sp.avgPct}%
                 </span>
               </div>

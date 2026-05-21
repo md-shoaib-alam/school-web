@@ -290,21 +290,21 @@ export function AdminParents() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h2 className="text-2xl font-semibold text-gray-900 dark:text-gray-100">
+          <h2 className="text-2xl font-semibold text-zinc-900 dark:text-zinc-100">
             Parents
           </h2>
-          <p className="text-sm text-gray-500 dark:text-gray-400 mt-0.5">
+          <p className="text-sm text-zinc-500 dark:text-zinc-400 mt-0.5">
             {parents.length} parents registered •{" "}
             {parents.reduce((s, p) => s + p.children.length, 0)} children linked
           </p>
         </div>
         <div className="flex items-center gap-3 w-full sm:w-auto">
-          <div className="flex items-center gap-1 bg-gray-100 dark:bg-gray-800 p-1 rounded-lg">
+          <div className="flex items-center gap-1 bg-zinc-100 dark:bg-zinc-800 p-1 rounded-lg">
             <Button
               variant={viewMode === "table" ? "secondary" : "ghost"}
               size="sm"
               onClick={() => setViewMode("table")}
-              className={`size-8 p-0 ${viewMode === "table" ? "bg-white dark:bg-gray-700 shadow-sm" : ""}`}
+              className={`size-8 p-0 ${viewMode === "table" ? "bg-white dark:bg-zinc-700 shadow-sm" : ""}`}
             >
               <List className="size-4" />
             </Button>
@@ -312,7 +312,7 @@ export function AdminParents() {
               variant={viewMode === "grid" ? "secondary" : "ghost"}
               size="sm"
               onClick={() => setViewMode("grid")}
-              className={`size-8 p-0 ${viewMode === "grid" ? "bg-white dark:bg-gray-700 shadow-sm" : ""}`}
+              className={`size-8 p-0 ${viewMode === "grid" ? "bg-white dark:bg-zinc-700 shadow-sm" : ""}`}
             >
               <LayoutGrid className="size-4" />
             </Button>
@@ -328,7 +328,7 @@ export function AdminParents() {
 
       {/* Search */}
       <div className="relative max-w-md">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-gray-400 dark:text-gray-500" />
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-zinc-400 dark:text-zinc-500" />
         <Input
           placeholder="Search parents or children..."
           className="pl-9"
@@ -344,7 +344,7 @@ export function AdminParents() {
       {loading && parents.length === 0 ? (
         <ParentSkeleton />
       ) : parents.length === 0 ? (
-        <div className="text-center py-20 bg-gray-50/30 dark:bg-gray-800/10 rounded-2xl border-dashed border-2">
+        <div className="text-center py-20 bg-zinc-50/30 dark:bg-zinc-800/10 rounded-2xl border-dashed border-2">
           <Users className="size-12 mx-auto mb-4 opacity-20" />
           <p className="text-lg font-medium">No parents found</p>
           <p className="text-sm text-muted-foreground">Add a parent or adjust your search</p>
@@ -354,7 +354,7 @@ export function AdminParents() {
           <CardContent className="p-0">
             <div className="overflow-x-auto">
               <table className="w-full text-left text-sm">
-                <thead className="bg-gray-50 dark:bg-gray-800/50 text-gray-500 dark:text-gray-400 uppercase text-[10px] font-bold tracking-wider">
+                <thead className="bg-zinc-50 dark:bg-zinc-800/50 text-zinc-500 dark:text-zinc-400 uppercase text-[10px] font-bold tracking-wider">
                   <tr>
                     <th className="px-6 py-4">Parent</th>
                     <th className="px-6 py-4 hidden sm:table-cell">Children</th>
@@ -362,12 +362,12 @@ export function AdminParents() {
                     <th className="px-6 py-4 text-center">Actions</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
+                <tbody className="divide-y divide-zinc-100 dark:divide-zinc-800">
                   {parents.map((parent, index) => {
                     const initials = parent.name.split(" ").map((n) => n[0]).join("").slice(0, 2).toUpperCase();
                     const color = avatarColors[index % avatarColors.length];
                     return (
-                      <tr key={parent.id} className="hover:bg-gray-50/50 dark:hover:bg-gray-800/30 transition-colors">
+                      <tr key={parent.id} className="hover:bg-zinc-50/50 dark:hover:bg-zinc-800/30 transition-colors">
                         <td className="px-6 py-4">
                           <div className="flex items-center gap-3">
                             <Avatar className="size-8 shrink-0">
@@ -376,7 +376,7 @@ export function AdminParents() {
                               </AvatarFallback>
                             </Avatar>
                             <div className="flex flex-col min-w-0">
-                              <span className="font-bold text-gray-900 dark:text-gray-100 truncate">{parent.name}</span>
+                              <span className="font-bold text-zinc-900 dark:text-zinc-100 truncate">{parent.name}</span>
                               <span className="text-[10px] sm:text-xs text-muted-foreground truncate">{parent.email}</span>
                               {/* Mobile-only info */}
                               <div className="sm:hidden flex flex-wrap gap-1 mt-1">
@@ -394,10 +394,10 @@ export function AdminParents() {
                                 {child.name}
                               </Badge>
                             ))}
-                            {parent.children.length === 0 && <span className="text-xs text-gray-400 italic">None linked</span>}
+                            {parent.children.length === 0 && <span className="text-xs text-zinc-400 italic">None linked</span>}
                           </div>
                         </td>
-                        <td className="px-6 py-4 hidden lg:table-cell text-gray-600 dark:text-gray-400 font-medium">
+                        <td className="px-6 py-4 hidden lg:table-cell text-zinc-600 dark:text-zinc-400 font-medium">
                           {parent.occupation || 'N/A'}
                         </td>
                         <td className="px-6 py-4">
@@ -415,12 +415,12 @@ export function AdminParents() {
                               <LinkIcon className="size-3.5" />
                               Link
                             </Button>
-                            <Button variant="ghost" size="icon" className="size-8 text-gray-400 hover:text-emerald-600" onClick={() => handleEdit(parent)}>
+                            <Button variant="ghost" size="icon" className="size-8 text-zinc-400 hover:text-emerald-600" onClick={() => handleEdit(parent)}>
                               <Pencil className="size-3.5" />
                             </Button>
                             <AlertDialog>
                               <AlertDialogTrigger asChild>
-                                <Button variant="ghost" size="icon" className="size-8 text-gray-400 hover:text-red-600" title="Delete">
+                                <Button variant="ghost" size="icon" className="size-8 text-zinc-400 hover:text-red-600" title="Delete">
                                   <Trash2 className="size-3.5" />
                                 </Button>
                               </AlertDialogTrigger>

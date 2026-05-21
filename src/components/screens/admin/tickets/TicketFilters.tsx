@@ -36,7 +36,7 @@ export function TicketFilters({
   return (
     <div className="space-y-4">
       <Tabs value={statusFilter} onValueChange={setStatusFilter}>
-        <TabsList className="bg-gray-100/80 dark:bg-zinc-800/80 p-1 border border-gray-200/50 dark:border-zinc-700/50 h-10">
+        <TabsList className="bg-zinc-100/80 dark:bg-zinc-800/80 p-1 border border-zinc-200/50 dark:border-zinc-700/50 h-10">
           <TabsTrigger 
             value="all" 
             className="data-[state=active]:bg-white dark:data-[state=active]:bg-zinc-900 data-[state=active]:text-emerald-600 dark:data-[state=active]:text-emerald-400 data-[state=active]:shadow-[0_4px_12px_rgba(16,185,129,0.12)] dark:data-[state=active]:shadow-[0_4px_12px_rgba(0,0,0,0.4)] hover:bg-white/50 dark:hover:bg-zinc-900/50 hover:text-emerald-600 dark:hover:text-emerald-400 font-semibold cursor-pointer transition-all px-3"

@@ -75,9 +75,9 @@ const priorityConfig: Record<
   { bg: string; text: string; border: string }
 > = {
   normal: {
-    bg: "bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300",
+    bg: "bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300",
     text: "Normal",
-    border: "border-l-gray-400 dark:border-l-gray-500",
+    border: "border-l-zinc-400 dark:border-l-zinc-500",
   },
   important: {
     bg: "bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-400",
@@ -99,7 +99,7 @@ const roleConfig: Record<string, string> = {
     "bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400",
   parent:
     "bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400",
-  all: "bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300",
+  all: "bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300",
 };
 
 interface NoticeFormData {
@@ -334,7 +334,7 @@ export function AdminNotices() {
                   <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3">
                     <div className="flex-1 min-w-0">
                       <div className="flex flex-wrap items-center gap-2 mb-2">
-                        <h3 className="font-semibold text-gray-900 dark:text-gray-100">
+                        <h3 className="font-semibold text-zinc-900 dark:text-zinc-100">
                           {noticesLoading && notices.length === 0 ? (
                             <Skeleton className="h-5 w-48" />
                           ) : (

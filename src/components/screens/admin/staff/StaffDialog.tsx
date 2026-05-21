@@ -106,7 +106,7 @@ export function StaffDialog({
               <SelectContent>
                 <SelectItem value="none">
                   <div className="flex items-center gap-2">
-                    <Shield className="size-3 text-gray-400" />
+                    <Shield className="size-3 text-zinc-400" />
                     Standard / No Role
                   </div>
                 </SelectItem>
@@ -139,7 +139,7 @@ export function StaffDialog({
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-600"
                 >
                   {showPassword ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
                 </button>
@@ -159,7 +159,7 @@ export function StaffDialog({
             </div>
             <div className="space-y-2">
               <Label htmlFor="status" className="block pb-1">Account Status</Label>
-              <div className="flex items-center space-x-2 h-10 px-3 border rounded-md bg-gray-50/50 dark:bg-gray-950">
+              <div className="flex items-center space-x-2 h-10 px-3 border rounded-md bg-zinc-50/50 dark:bg-zinc-950">
                 <Checkbox
                   id="status"
                   checked={formData.isActive}

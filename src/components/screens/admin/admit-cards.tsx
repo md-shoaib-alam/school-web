@@ -123,7 +123,7 @@ function formatTime(time: string): string {
 }
 
 function getExamTypeColor(type: string): string {
-  return examTypeColors[type] || 'bg-gray-100 dark:bg-gray-900/30 text-gray-700 dark:text-gray-400';
+  return examTypeColors[type] || 'bg-zinc-100 dark:bg-zinc-900/30 text-zinc-700 dark:text-zinc-400';
 }
 
 // ══════════════════════════════════════════════════════════════
@@ -138,12 +138,12 @@ const AdmitCardVisual = memo(function AdmitCardVisual({ card }: { card: AdmitCar
 
   return (
     <div 
-      className="w-[100%] max-w-[750px] mx-auto bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden print:shadow-none print:border-gray-400 print:rounded-none print:max-w-none h-[13cm] print:h-[13.5cm] print:w-[9.6cm] flex flex-col justify-between"
+      className="w-[100%] max-w-[750px] mx-auto bg-white rounded-lg shadow-sm border border-zinc-200 overflow-hidden print:shadow-none print:border-zinc-400 print:rounded-none print:max-w-none h-[13cm] print:h-[13.5cm] print:w-[9.6cm] flex flex-col justify-between"
       style={{ WebkitPrintColorAdjust: 'exact', printColorAdjust: 'exact' } as any}
     >
       <div>
         {/* ── Header ── */}
-        <div className="bg-gradient-to-r from-slate-800 via-slate-700 to-slate-800 text-white px-5 py-2">
+        <div className="bg-gradient-to-r from-zinc-800 via-zinc-700 to-zinc-800 text-white px-5 py-2">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <div className="size-9 rounded-full bg-white/15 flex items-center justify-center border-2 border-white/20">
@@ -151,13 +151,13 @@ const AdmitCardVisual = memo(function AdmitCardVisual({ card }: { card: AdmitCar
               </div>
               <div>
                 <h2 className="text-sm font-semibold tracking-wide leading-tight">{schoolName.toUpperCase()}</h2>
-                <p className="text-[9px] text-slate-300 truncate max-w-[300px]">{schoolAddress}</p>
+                <p className="text-[9px] text-zinc-300 truncate max-w-[300px]">{schoolAddress}</p>
               </div>
             </div>
             <div className="text-right">
-              <p className="text-[8px] uppercase tracking-[0.2em] text-slate-400 font-medium">Examination</p>
+              <p className="text-[8px] uppercase tracking-[0.2em] text-zinc-400 font-medium">Examination</p>
               <p className="text-lg font-bold text-amber-300 leading-tight">ADMIT CARD</p>
-              <p className="text-[9px] text-slate-400 font-mono">{card.cardNumber}</p>
+              <p className="text-[9px] text-zinc-400 font-mono">{card.cardNumber}</p>
             </div>
           </div>
         </div>
@@ -178,36 +178,36 @@ const AdmitCardVisual = memo(function AdmitCardVisual({ card }: { card: AdmitCar
         <div className="px-5 py-2">
           <div className="flex gap-4">
             <div className="shrink-0">
-              <div className="h-20 w-16 rounded border-2 border-dashed border-gray-300 bg-gray-50 flex flex-col items-center justify-center">
-                <span className="text-xl font-bold text-gray-300">{card.student.initials}</span>
-                <span className="text-[7px] text-gray-300 mt-0.5">PHOTO</span>
+              <div className="h-20 w-16 rounded border-2 border-dashed border-zinc-300 bg-zinc-50 flex flex-col items-center justify-center">
+                <span className="text-xl font-bold text-zinc-300">{card.student.initials}</span>
+                <span className="text-[7px] text-zinc-300 mt-0.5">PHOTO</span>
               </div>
             </div>
 
             <div className="flex-1 grid grid-cols-2 gap-x-4 gap-y-1 text-xs">
               <div>
-                <p className="text-[9px] text-gray-400 uppercase font-medium">Student Name</p>
-                <p className="font-bold text-gray-900 truncate">{card.student.name}</p>
+                <p className="text-[9px] text-zinc-400 uppercase font-medium">Student Name</p>
+                <p className="font-bold text-zinc-900 truncate">{card.student.name}</p>
               </div>
               <div>
-                <p className="text-[9px] text-gray-400 uppercase font-medium">Roll Number</p>
-                <p className="font-bold text-gray-900">{card.student.rollNumber}</p>
+                <p className="text-[9px] text-zinc-400 uppercase font-medium">Roll Number</p>
+                <p className="font-bold text-zinc-900">{card.student.rollNumber}</p>
               </div>
               <div>
-                <p className="text-[9px] text-gray-400 uppercase font-medium">Guardian Name</p>
-                <p className="font-medium text-gray-800 truncate">{card.student.parentName || '—'}</p>
+                <p className="text-[9px] text-zinc-400 uppercase font-medium">Guardian Name</p>
+                <p className="font-medium text-zinc-800 truncate">{card.student.parentName || '—'}</p>
               </div>
               <div>
-                <p className="text-[9px] text-gray-400 uppercase font-medium">Class</p>
-                <p className="font-bold text-gray-900">{card.class.grade} - {card.class.name}</p>
+                <p className="text-[9px] text-zinc-400 uppercase font-medium">Class</p>
+                <p className="font-bold text-zinc-900">{card.class.grade} - {card.class.name}</p>
               </div>
               <div>
-                <p className="text-[9px] text-gray-400 uppercase font-medium">D.O.B</p>
-                <p className="font-medium text-gray-800" suppressHydrationWarning>{formatDate(card.student.dateOfBirth || '')}</p>
+                <p className="text-[9px] text-zinc-400 uppercase font-medium">D.O.B</p>
+                <p className="font-medium text-zinc-800" suppressHydrationWarning>{formatDate(card.student.dateOfBirth || '')}</p>
               </div>
               <div>
-                <p className="text-[9px] text-gray-400 uppercase font-medium">Section</p>
-                <p className="font-medium text-gray-800">{card.class.section}</p>
+                <p className="text-[9px] text-zinc-400 uppercase font-medium">Section</p>
+                <p className="font-medium text-zinc-800">{card.class.section}</p>
               </div>
             </div>
           </div>
@@ -217,13 +217,13 @@ const AdmitCardVisual = memo(function AdmitCardVisual({ card }: { card: AdmitCar
         <div className="px-5 py-1">
           <table className="w-full text-[10px]">
             <thead>
-              <tr className="bg-slate-50 border-y border-slate-200">
-                <th className="text-left py-1 px-1.5 font-bold text-slate-700 w-[110px]">Date</th>
-                <th className="text-left py-1 px-1.5 font-bold text-slate-700">Subject</th>
-                <th className="text-center py-1 px-1.5 font-bold text-slate-700 w-[140px]">Time</th>
+              <tr className="bg-zinc-50 border-y border-zinc-200">
+                <th className="text-left py-1 px-1.5 font-bold text-zinc-700 w-[110px]">Date</th>
+                <th className="text-left py-1 px-1.5 font-bold text-zinc-700">Subject</th>
+                <th className="text-center py-1 px-1.5 font-bold text-zinc-700 w-[140px]">Time</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-100" suppressHydrationWarning>
+            <tbody className="divide-y divide-zinc-100" suppressHydrationWarning>
               {card.exams
                 .filter(exam => {
                   const isScheduled = exam.status?.trim().toLowerCase() === 'scheduled';
@@ -233,14 +233,14 @@ const AdmitCardVisual = memo(function AdmitCardVisual({ card }: { card: AdmitCar
                 .map((exam) => {
                   return (
                     <tr key={exam.id}>
-                      <td className="py-1 px-1.5 font-medium text-slate-800">
+                      <td className="py-1 px-1.5 font-medium text-zinc-800">
                         {formatDate(exam.date)}
                       </td>
                       <td className="py-1 px-1.5">
-                        <span className="font-bold text-slate-800">{exam.subjectName}</span>
-                        <span className="text-[8px] text-slate-400 ml-1">({exam.subjectCode})</span>
+                        <span className="font-bold text-zinc-800">{exam.subjectName}</span>
+                        <span className="text-[8px] text-zinc-400 ml-1">({exam.subjectCode})</span>
                       </td>
-                      <td className="py-1 px-1.5 text-center font-mono text-slate-600">
+                      <td className="py-1 px-1.5 text-center font-mono text-zinc-600">
                         {formatTime(exam.startTime)} - {formatTime(exam.endTime)}
                       </td>
                     </tr>
@@ -253,16 +253,16 @@ const AdmitCardVisual = memo(function AdmitCardVisual({ card }: { card: AdmitCar
 
       <div>
         {/* ── Footer / Signatures ── */}
-        <div className="px-5 py-2 border-t border-dashed border-gray-200">
+        <div className="px-5 py-2 border-t border-dashed border-zinc-200">
           <div className="flex items-end justify-between gap-4">
-            <div className="text-center border-t border-gray-300 pt-0.5 mt-4 flex-1">
-              <p className="text-[8px] text-gray-500">Teacher</p>
+            <div className="text-center border-t border-zinc-300 pt-0.5 mt-4 flex-1">
+              <p className="text-[8px] text-zinc-500">Teacher</p>
             </div>
-            <div className="text-center border-t border-gray-300 pt-0.5 mt-4 flex-1">
-              <p className="text-[8px] text-gray-500">Parent</p>
+            <div className="text-center border-t border-zinc-300 pt-0.5 mt-4 flex-1">
+              <p className="text-[8px] text-zinc-500">Parent</p>
             </div>
-            <div className="text-center border-t-2 border-slate-800 pt-0.5 mt-4 flex-1">
-              <p className="text-[9px] text-slate-800 font-bold">Principal</p>
+            <div className="text-center border-t-2 border-zinc-800 pt-0.5 mt-4 flex-1">
+              <p className="text-[9px] text-zinc-800 font-bold">Principal</p>
             </div>
           </div>
         </div>
@@ -464,7 +464,7 @@ export function AdminAdmitCards() {
           <Button 
             onClick={handlePrintAll} 
             disabled={preparingPrint}
-            className="gap-2 bg-slate-800 hover:bg-slate-900 text-white"
+            className="gap-2 bg-zinc-800 hover:bg-zinc-900 text-white"
           >
             {preparingPrint ? (
               <Loader2 className="size-4 animate-spin" />
@@ -488,7 +488,7 @@ export function AdminAdmitCards() {
               {admitCards.slice(pageIdx * 4, (pageIdx + 1) * 4).map((card) => (
                 <div 
                   key={card.cardNumber} 
-                  className="flex items-center justify-center h-[13.8cm] p-1 border border-dashed border-gray-300 print:border-gray-400"
+                  className="flex items-center justify-center h-[13.8cm] p-1 border border-dashed border-zinc-300 print:border-zinc-400"
                   style={{ 
                     pageBreakInside: 'avoid',
                     breakInside: 'avoid'
@@ -513,7 +513,7 @@ export function AdminAdmitCards() {
           </style>
           {viewCard && (
             <div className="w-[21cm] h-[29.7cm] p-[5mm] flex flex-wrap content-start">
-              <div className="flex items-center justify-center h-[13.8cm] p-1 border border-dashed border-gray-300 print:border-gray-400 w-[10.5cm]">
+              <div className="flex items-center justify-center h-[13.8cm] p-1 border border-dashed border-zinc-300 print:border-zinc-400 w-[10.5cm]">
                 <div className="size-full flex items-center justify-center p-1">
                   <AdmitCardVisual card={viewCard} />
                 </div>
@@ -643,14 +643,14 @@ export function AdminAdmitCards() {
               {totalExams > 0 && (
                 <div className="space-y-2">
                   <div className="flex items-center justify-between px-1">
-                    <h3 className="text-sm font-semibold text-slate-800 dark:text-slate-200">Select Students</h3>
+                    <h3 className="text-sm font-semibold text-zinc-800 dark:text-zinc-200">Select Students</h3>
                     <Button variant="link" size="sm" onClick={toggleAll} className="text-xs h-auto p-0 font-semibold text-amber-600 hover:text-amber-700">
                       {selectAll ? 'Deselect All' : 'Select All'}
                     </Button>
                   </div>
                   <div className="max-h-52 overflow-y-auto border rounded-lg">
                     <Table>
-                      <TableHeader className="bg-slate-50 dark:bg-slate-900/50">
+                      <TableHeader className="bg-zinc-50 dark:bg-zinc-900/50">
                         <TableRow>
                           <TableHead className="w-12 px-4">
                             <Checkbox checked={selectAll} onCheckedChange={toggleAll} />
@@ -662,16 +662,16 @@ export function AdminAdmitCards() {
                       </TableHeader>
                       <TableBody>
                         {classData.students.map((student) => (
-                          <TableRow key={student.id} className="hover:bg-muted/50 border-slate-100 dark:border-slate-800">
+                          <TableRow key={student.id} className="hover:bg-muted/50 border-zinc-100 dark:border-zinc-800">
                             <TableCell className="px-4 text-center">
                               <Checkbox
                                 checked={selectedStudentIds.has(student.id)}
                                 onCheckedChange={() => toggleStudent(student.id)}
                               />
                             </TableCell>
-                            <TableCell className="w-[40%] px-4 font-mono text-xs font-semibold text-slate-600 dark:text-slate-400">{student.rollNumber}</TableCell>
-                            <TableCell className="w-[40%] px-4 font-bold text-sm text-slate-800 dark:text-slate-200">{student.name}</TableCell>
-                            <TableCell className="w-[20%] px-4 text-center text-xs font-medium text-slate-500">{student.section || 'A'}</TableCell>
+                            <TableCell className="w-[40%] px-4 font-mono text-xs font-semibold text-zinc-600 dark:text-zinc-400">{student.rollNumber}</TableCell>
+                            <TableCell className="w-[40%] px-4 font-bold text-sm text-zinc-800 dark:text-zinc-200">{student.name}</TableCell>
+                            <TableCell className="w-[20%] px-4 text-center text-xs font-medium text-zinc-500">{student.section || 'A'}</TableCell>
                           </TableRow>
                         ))}
                       </TableBody>
@@ -698,7 +698,7 @@ export function AdminAdmitCards() {
                 <Button
                   onClick={handlePrintAll}
                   disabled={admitCards.length === 0 || generating || preparingPrint}
-                  className={`flex-1 gap-2 h-11 border-none ${admitCards.length > 0 ? 'bg-slate-900 text-white hover:bg-gray-950' : 'bg-slate-800/40 text-slate-500 cursor-not-allowed'}`}
+                  className={`flex-1 gap-2 h-11 border-none ${admitCards.length > 0 ? 'bg-zinc-900 text-white hover:bg-zinc-950' : 'bg-zinc-800/40 text-zinc-500 cursor-not-allowed'}`}
                 >
                   {preparingPrint ? (
                     <Loader2 className="size-4 animate-spin" />
@@ -814,8 +814,8 @@ export function AdminAdmitCards() {
       </div>
 
       <Dialog open={!!viewCard} onOpenChange={(open) => !open && setViewCard(null)}>
-        <DialogContent className="max-w-[850px] max-h-[95vh] overflow-y-auto bg-slate-950 border-slate-800 p-0">
-          <div className="sticky top-0 z-10 bg-slate-900/80 backdrop-blur-md border-b border-slate-800 px-6 py-4 flex items-center justify-between">
+        <DialogContent className="max-w-[850px] max-h-[95vh] overflow-y-auto bg-zinc-950 border-zinc-800 p-0">
+          <div className="sticky top-0 z-10 bg-zinc-900/80 backdrop-blur-md border-b border-zinc-800 px-6 py-4 flex items-center justify-between">
             <DialogTitle className="text-white flex items-center gap-2">
               <div className="size-8 rounded-full bg-amber-500/20 text-amber-500 flex items-center justify-center">
                 <FileText className="size-5" />
@@ -829,14 +829,14 @@ export function AdminAdmitCards() {
               variant="ghost"
               size="icon"
               onClick={() => setViewCard(null)}
-              className="text-slate-400 hover:text-white hover:bg-slate-800"
+              className="text-zinc-400 hover:text-white hover:bg-zinc-800"
             >
               <X className="size-5" />
             </Button>
           </div>
 
           {viewCard && (
-            <div className="p-8 flex flex-col items-center gap-6 bg-slate-950/50">
+            <div className="p-8 flex flex-col items-center gap-6 bg-zinc-950/50">
               <div className="scale-[0.8] sm:scale-100 origin-top shadow-2xl shadow-black/50">
                 <div className="bg-white p-4 rounded-lg">
                   <AdmitCardVisual card={viewCard} />

@@ -431,7 +431,7 @@ export function AdminTimetable() {
         </div>
 
         <div className="flex items-center gap-3 w-full sm:w-auto">
-          <div className="inline-flex items-center rounded-lg border border-gray-200 bg-white dark:bg-zinc-900 p-0.5 shadow-sm">
+          <div className="inline-flex items-center rounded-lg border border-zinc-200 bg-white dark:bg-zinc-900 p-0.5 shadow-sm">
             <Button
               size="sm"
               variant={viewMode === "grid" ? "default" : "ghost"}
@@ -459,7 +459,7 @@ export function AdminTimetable() {
           </div>
 
           <Select value={selectedClass} onValueChange={setSelectedClass}>
-            <SelectTrigger className="w-full sm:w-56 text-sm bg-white hover:bg-gray-50/50 dark:bg-zinc-900 border-gray-200 dark:border-zinc-800 shadow-sm">
+            <SelectTrigger className="w-full sm:w-56 text-sm bg-white hover:bg-zinc-50/50 dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800 shadow-sm">
               <SelectValue placeholder="Select class" />
             </SelectTrigger>
             <SelectContent>
@@ -475,7 +475,7 @@ export function AdminTimetable() {
             <Button
               variant="outline"
               size="sm"
-              className="bg-white hover:bg-gray-50 dark:bg-zinc-900 dark:hover:bg-zinc-800 border-gray-200 dark:border-zinc-800 shadow-sm"
+              className="bg-white hover:bg-zinc-50 dark:bg-zinc-900 dark:hover:bg-zinc-800 border-zinc-200 dark:border-zinc-800 shadow-sm"
               onClick={() => {
                 setDaysConfigDraft([...workingDays]);
                 setDaysConfigOpen(true);

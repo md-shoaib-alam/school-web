@@ -123,10 +123,10 @@ export function TeacherClasses() {
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-2xl font-semibold text-gray-900 dark:text-gray-100">
+        <h2 className="text-2xl font-semibold text-zinc-900 dark:text-zinc-100">
           My Classes
         </h2>
-        <p className="text-gray-500 dark:text-gray-400 mt-1">
+        <p className="text-zinc-500 dark:text-zinc-400 mt-1">
           {classes.length} classes assigned to you. Click on a class to view
           student details.
         </p>
@@ -146,22 +146,22 @@ export function TeacherClasses() {
                       <School className="size-6 text-blue-500 dark:text-blue-400" />
                     </div>
                     <div>
-                      <h3 className="font-semibold text-gray-900 dark:text-gray-100">
+                      <h3 className="font-semibold text-zinc-900 dark:text-zinc-100">
                         {cls.name}
                       </h3>
-                      <p className="text-sm text-gray-400 dark:text-gray-500">
+                      <p className="text-sm text-zinc-400 dark:text-zinc-500">
                         Section {cls.section}
                       </p>
                     </div>
                   </div>
-                  <ChevronRight className="size-5 text-gray-300 dark:text-gray-600 group-hover:text-blue-400 dark:group-hover:text-blue-400 transition-colors" />
+                  <ChevronRight className="size-5 text-zinc-300 dark:text-zinc-600 group-hover:text-blue-400 dark:group-hover:text-blue-400 transition-colors" />
                 </div>
 
                 <div className="flex items-center gap-4">
-                  <div className="flex items-center gap-1.5 text-sm text-gray-600 dark:text-gray-400">
+                  <div className="flex items-center gap-1.5 text-sm text-zinc-600 dark:text-zinc-400">
                     <Users className="size-3.5 text-blue-500 dark:text-blue-400" />
                     <span className="font-medium">{cls.studentCount}</span>
-                    <span className="text-gray-400 dark:text-gray-500">
+                    <span className="text-zinc-400 dark:text-zinc-500">
                       Students
                     </span>
                   </div>
@@ -172,12 +172,12 @@ export function TeacherClasses() {
       </div>
 
       {classes.length === 0 && (
-        <div className="text-center py-20 bg-gray-900/20 rounded-3xl border border-dashed border-gray-800">
-          <School className="size-16 text-gray-700 mx-auto mb-4 opacity-50" />
-          <h3 className="text-xl font-semibold text-gray-300">
+        <div className="text-center py-20 bg-zinc-900/20 rounded-3xl border border-dashed border-zinc-800">
+          <School className="size-16 text-zinc-700 mx-auto mb-4 opacity-50" />
+          <h3 className="text-xl font-semibold text-zinc-300">
             No Classes Assigned
           </h3>
-          <p className="text-gray-500 mt-2 max-w-xs mx-auto">
+          <p className="text-zinc-500 mt-2 max-w-xs mx-auto">
             You don't have any classes assigned to you at the moment. Please contact your administrator.
           </p>
         </div>
@@ -210,23 +210,23 @@ export function TeacherClasses() {
                 ))}
               </div>
             ) : students.length > 0 ? (
-              <div className="mt-4 rounded-xl border border-gray-100 dark:border-gray-800 overflow-hidden">
+              <div className="mt-4 rounded-xl border border-zinc-100 dark:border-zinc-800 overflow-hidden">
                 <Table>
                   <TableHeader>
-                    <TableRow className="bg-gray-50/80 dark:bg-gray-800/50 hover:bg-gray-50/80 dark:hover:bg-gray-800/50">
-                      <TableHead className="text-xs font-semibold text-gray-500 dark:text-gray-400 w-[50px]">
+                    <TableRow className="bg-zinc-50/80 dark:bg-zinc-800/50 hover:bg-zinc-50/80 dark:hover:bg-zinc-800/50">
+                      <TableHead className="text-xs font-semibold text-zinc-500 dark:text-zinc-400 w-[50px]">
                         #
                       </TableHead>
-                      <TableHead className="text-xs font-semibold text-gray-500 dark:text-gray-400">
+                      <TableHead className="text-xs font-semibold text-zinc-500 dark:text-zinc-400">
                         Student
                       </TableHead>
-                      <TableHead className="text-xs font-semibold text-gray-500 dark:text-gray-400 hidden sm:table-cell">
+                      <TableHead className="text-xs font-semibold text-zinc-500 dark:text-zinc-400 hidden sm:table-cell">
                         Roll No
                       </TableHead>
-                      <TableHead className="text-xs font-semibold text-gray-500 dark:text-gray-400 hidden md:table-cell">
+                      <TableHead className="text-xs font-semibold text-zinc-500 dark:text-zinc-400 hidden md:table-cell">
                         Gender
                       </TableHead>
-                      <TableHead className="text-xs font-semibold text-gray-500 dark:text-gray-400 hidden md:table-cell">
+                      <TableHead className="text-xs font-semibold text-zinc-500 dark:text-zinc-400 hidden md:table-cell">
                         Parent
                       </TableHead>
                     </TableRow>
@@ -237,7 +237,7 @@ export function TeacherClasses() {
                         key={student.id}
                         className="hover:bg-blue-50/30 dark:hover:bg-blue-900/10 transition-colors"
                       >
-                        <TableCell className="text-sm text-gray-400 dark:text-gray-500 font-mono">
+                        <TableCell className="text-sm text-zinc-400 dark:text-zinc-500 font-mono">
                           {index + 1}
                         </TableCell>
                         <TableCell>
@@ -248,16 +248,16 @@ export function TeacherClasses() {
                               </AvatarFallback>
                             </Avatar>
                             <div>
-                              <p className="text-sm font-medium text-gray-800 dark:text-gray-200">
+                              <p className="text-sm font-medium text-zinc-800 dark:text-zinc-200">
                                 {student.name}
                               </p>
-                              <p className="text-xs text-gray-400 dark:text-gray-500 sm:hidden">
+                              <p className="text-xs text-zinc-400 dark:text-zinc-500 sm:hidden">
                                 {student.rollNumber}
                               </p>
                             </div>
                           </div>
                         </TableCell>
-                        <TableCell className="text-sm text-gray-600 dark:text-gray-400 hidden sm:table-cell">
+                        <TableCell className="text-sm text-zinc-600 dark:text-zinc-400 hidden sm:table-cell">
                           {student.rollNumber}
                         </TableCell>
                         <TableCell className="hidden md:table-cell">
@@ -268,7 +268,7 @@ export function TeacherClasses() {
                             {student.gender}
                           </Badge>
                         </TableCell>
-                        <TableCell className="text-sm text-gray-500 dark:text-gray-400 hidden md:table-cell">
+                        <TableCell className="text-sm text-zinc-500 dark:text-zinc-400 hidden md:table-cell">
                           {student.parentName || "—"}
                         </TableCell>
                       </TableRow>
@@ -278,8 +278,8 @@ export function TeacherClasses() {
               </div>
             ) : (
               <div className="text-center py-12">
-                <Users className="size-10 text-gray-300 dark:text-gray-700 mx-auto mb-3" />
-                <p className="text-gray-400 dark:text-gray-500 text-sm">
+                <Users className="size-10 text-zinc-300 dark:text-zinc-700 mx-auto mb-3" />
+                <p className="text-zinc-400 dark:text-zinc-500 text-sm">
                   No students in this class yet
                 </p>
               </div>

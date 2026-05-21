@@ -127,7 +127,7 @@ export function Pagination({
               value={itemsPerPage.toString()}
               onValueChange={(v) => handleLimitChange(parseInt(v))}
             >
-              <SelectTrigger className="h-8 w-[70px] bg-transparent border-gray-200 dark:border-gray-800 text-xs">
+              <SelectTrigger className="h-8 w-[70px] bg-transparent border-zinc-200 dark:border-zinc-800 text-xs">
                 <SelectValue placeholder={itemsPerPage.toString()} />
               </SelectTrigger>
               <SelectContent>

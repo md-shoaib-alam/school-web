@@ -215,15 +215,15 @@ export function StudentTimetable() {
       {/* Header + View Toggle */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">
+          <h2 className="text-xl font-semibold text-zinc-900 dark:text-zinc-100">
             My Timetable
           </h2>
-          <p className="text-sm text-gray-500 dark:text-gray-400 dark:text-gray-500 dark:text-gray-400 mt-0.5">
+          <p className="text-sm text-zinc-500 dark:text-zinc-400 dark:text-zinc-500 dark:text-zinc-400 mt-0.5">
             Weekly class schedule and time slots
           </p>
         </div>
 
-        <div className="flex items-center gap-1 rounded-lg border border-gray-200 dark:border-gray-700 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 p-1">
+        <div className="flex items-center gap-1 rounded-lg border border-zinc-200 dark:border-zinc-700 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-900 p-1">
           <Button
             size="sm"
             variant={viewMode === "grid" ? "default" : "ghost"}
@@ -231,7 +231,7 @@ export function StudentTimetable() {
             className={
               viewMode === "grid"
                 ? "bg-violet-600 text-white hover:bg-violet-700 shadow-sm"
-                : "text-gray-500 dark:text-gray-400 dark:text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300"
+                : "text-zinc-500 dark:text-zinc-400 dark:text-zinc-500 dark:text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-300"
             }
           >
             <LayoutGrid className="size-4 mr-1.5" />
@@ -244,7 +244,7 @@ export function StudentTimetable() {
             className={
               viewMode === "list"
                 ? "bg-violet-600 text-white hover:bg-violet-700 shadow-sm"
-                : "text-gray-500 dark:text-gray-400 dark:text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300"
+                : "text-zinc-500 dark:text-zinc-400 dark:text-zinc-500 dark:text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-300"
             }
           >
             <List className="size-4 mr-1.5" />
@@ -257,7 +257,7 @@ export function StudentTimetable() {
             className={
               viewMode === "day"
                 ? "bg-violet-600 text-white hover:bg-violet-700 shadow-sm"
-                : "text-gray-500 dark:text-gray-400 dark:text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300"
+                : "text-zinc-500 dark:text-zinc-400 dark:text-zinc-500 dark:text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-300"
             }
           >
             <CalendarDays className="size-4 mr-1.5" />
@@ -274,10 +274,10 @@ export function StudentTimetable() {
               <Calendar className="size-5" />
             </div>
             <div>
-              <p className="text-sm font-medium text-gray-900 dark:text-gray-100">
+              <p className="text-sm font-medium text-zinc-900 dark:text-zinc-100">
                 {todayKey ? DAY_FULL_LABELS[todayKey] : "Weekend"}
               </p>
-              <p className="text-xs text-gray-500 dark:text-gray-400 dark:text-gray-500 dark:text-gray-400" suppressHydrationWarning>
+              <p className="text-xs text-zinc-500 dark:text-zinc-400 dark:text-zinc-500 dark:text-zinc-400" suppressHydrationWarning>
                 {todayDateString}
               </p>
             </div>
@@ -290,10 +290,10 @@ export function StudentTimetable() {
               <BookOpen className="size-5" />
             </div>
             <div>
-              <p className="text-sm font-medium text-gray-900 dark:text-gray-100">
+              <p className="text-sm font-medium text-zinc-900 dark:text-zinc-100">
                 {todaySlots.length} Classes
               </p>
-              <p className="text-xs text-gray-500 dark:text-gray-400 dark:text-gray-500 dark:text-gray-400">
+              <p className="text-xs text-zinc-500 dark:text-zinc-400 dark:text-zinc-500 dark:text-zinc-400">
                 Scheduled for today
               </p>
             </div>
@@ -306,14 +306,14 @@ export function StudentTimetable() {
               <Clock className="size-5" />
             </div>
             <div>
-              <p className="text-sm font-medium text-gray-900 dark:text-gray-100">
+              <p className="text-sm font-medium text-zinc-900 dark:text-zinc-100">
                 {nextPeriod
                   ? `Next: ${nextPeriod.subjectName}`
                   : todaySlots.length > 0
                     ? "No more classes"
                     : "No classes today"}
               </p>
-              <p className="text-xs text-gray-500 dark:text-gray-400 dark:text-gray-500 dark:text-gray-400">
+              <p className="text-xs text-zinc-500 dark:text-zinc-400 dark:text-zinc-500 dark:text-zinc-400">
                 {nextPeriod
                   ? `At ${formatTime(nextPeriod.startTime)}`
                   : todaySlots.length > 0
@@ -329,11 +329,11 @@ export function StudentTimetable() {
       {timeSlots.length === 0 ? (
         <Card className="rounded-xl shadow-sm">
           <CardContent className="py-16 text-center">
-            <BookOpen className="size-12 mx-auto mb-3 text-gray-300" />
-            <p className="text-sm font-medium text-gray-500 dark:text-gray-400 dark:text-gray-500 dark:text-gray-400">
+            <BookOpen className="size-12 mx-auto mb-3 text-zinc-300" />
+            <p className="text-sm font-medium text-zinc-500 dark:text-zinc-400 dark:text-zinc-500 dark:text-zinc-400">
               No timetable configured
             </p>
-            <p className="text-xs text-gray-400 dark:text-gray-500 dark:text-gray-400 mt-1">
+            <p className="text-xs text-zinc-400 dark:text-zinc-500 dark:text-zinc-400 mt-1">
               Contact your school administrator
             </p>
           </CardContent>
@@ -361,14 +361,14 @@ export function StudentTimetable() {
                   <div className="min-w-[640px]">
                     {/* Table Header */}
                     <div className="grid grid-cols-[100px_repeat(5,1fr)] gap-1.5 mb-2">
-                      <div className="text-xs font-medium text-gray-400 dark:text-gray-500 dark:text-gray-400 px-2 py-2" />
+                      <div className="text-xs font-medium text-zinc-400 dark:text-zinc-500 dark:text-zinc-400 px-2 py-2" />
                       {DAYS.map((day) => (
                         <div
                           key={day}
                           className={`text-center text-xs font-semibold py-2 rounded-lg ${
                             day === todayKey
                               ? "bg-violet-100 dark:bg-violet-900/30 text-violet-700"
-                              : "text-gray-600 dark:text-gray-400"
+                              : "text-zinc-600 dark:text-zinc-400"
                           }`}
                         >
                           {DAY_LABELS[day]}
@@ -385,10 +385,10 @@ export function StudentTimetable() {
                         {/* Time label */}
                         <div className="flex items-center justify-center px-2 py-1">
                           <div className="text-center">
-                            <p className="text-xs font-semibold text-gray-700 dark:text-gray-300">
+                            <p className="text-xs font-semibold text-zinc-700 dark:text-zinc-300">
                               {formatTime(slot.start)}
                             </p>
-                            <p className="text-[10px] text-gray-400 dark:text-gray-500 dark:text-gray-400">
+                            <p className="text-[10px] text-zinc-400 dark:text-zinc-500 dark:text-zinc-400">
                               {formatTime(slot.end)}
                             </p>
                           </div>
@@ -414,8 +414,8 @@ export function StudentTimetable() {
                               className={`rounded-lg border px-2 py-2 min-h-[60px] transition-all ${
                                 cellSlot
                                   ? subjectColorMap[cellSlot.subjectName] ||
-                                    "bg-gray-50 dark:bg-gray-800/50 border-gray-200 dark:border-gray-700 dark:border-gray-700"
-                                  : "bg-gray-50/50 dark:bg-gray-800/50 border-gray-100 dark:border-gray-800 border-dashed"
+                                    "bg-zinc-50 dark:bg-zinc-800/50 border-zinc-200 dark:border-zinc-700 dark:border-zinc-700"
+                                  : "bg-zinc-50/50 dark:bg-zinc-800/50 border-zinc-100 dark:border-zinc-800 border-dashed"
                               } ${isToday && !cellSlot ? "bg-violet-50/30 border-violet-100" : ""} ${
                                 isCurrent
                                   ? "ring-2 ring-violet-500 ring-offset-1 shadow-md scale-[1.02]"
@@ -438,7 +438,7 @@ export function StudentTimetable() {
                                 </div>
                               ) : (
                                 <div className="h-full flex items-center justify-center">
-                                  <span className="text-[10px] text-gray-300">
+                                  <span className="text-[10px] text-zinc-300">
                                     —
                                   </span>
                                 </div>
@@ -488,7 +488,7 @@ export function StudentTimetable() {
                               className={`px-3 py-1 rounded-full text-xs font-bold ${
                                 isToday
                                   ? "bg-violet-600 text-white"
-                                  : "bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400 dark:text-gray-500 dark:text-gray-400"
+                                  : "bg-zinc-100 dark:bg-zinc-800 text-zinc-500 dark:text-zinc-400 dark:text-zinc-500 dark:text-zinc-400"
                               }`}
                             >
                               {isToday
@@ -500,7 +500,7 @@ export function StudentTimetable() {
                                 {daySlots.length} classes
                               </Badge>
                             )}
-                            <div className="flex-1 h-px bg-gray-100 dark:bg-gray-800" />
+                            <div className="flex-1 h-px bg-zinc-100 dark:bg-zinc-800" />
                           </div>
 
                           {/* Day Entries */}
@@ -515,7 +515,7 @@ export function StudentTimetable() {
                                 !isCurrent;
                               const colorClass =
                                 subjectColorMap[slot.subjectName] ||
-                                "bg-gray-50 dark:bg-gray-800/50 text-gray-700 dark:text-gray-300 border-gray-200 dark:border-gray-700 dark:border-gray-700";
+                                "bg-zinc-50 dark:bg-zinc-800/50 text-zinc-700 dark:text-zinc-300 border-zinc-200 dark:border-zinc-700 dark:border-zinc-700";
 
                               return (
                                 <div
@@ -539,7 +539,7 @@ export function StudentTimetable() {
                                     className={`min-w-[100px] ${
                                       isCurrent
                                         ? "text-violet-700 dark:text-violet-400"
-                                        : "text-gray-600 dark:text-gray-400"
+                                        : "text-zinc-600 dark:text-zinc-400"
                                     }`}
                                   >
                                     <p className="text-xs font-semibold">
@@ -554,7 +554,7 @@ export function StudentTimetable() {
                                       <span
                                         className={`inline-flex items-center px-2 py-0.5 rounded-md text-xs font-semibold border ${
                                           subjectColorMap[slot.subjectName] ||
-                                          "bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 border-gray-200 dark:border-gray-700 dark:border-gray-700"
+                                          "bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 border-zinc-200 dark:border-zinc-700 dark:border-zinc-700"
                                         }`}
                                       >
                                         {slot.subjectName}
@@ -565,7 +565,7 @@ export function StudentTimetable() {
                                         </Badge>
                                       )}
                                     </div>
-                                    <p className="text-[11px] text-gray-400 dark:text-gray-500 dark:text-gray-400 mt-0.5 truncate">
+                                    <p className="text-[11px] text-zinc-400 dark:text-zinc-500 dark:text-zinc-400 mt-0.5 truncate">
                                       {slot.teacherName}
                                     </p>
                                   </div>
@@ -603,7 +603,7 @@ export function StudentTimetable() {
                           ? "bg-violet-600 text-white hover:bg-violet-700 shadow-sm"
                           : isToday
                             ? "border-violet-300 dark:border-violet-700 text-violet-600 dark:text-violet-400 hover:bg-violet-50 dark:hover:bg-violet-900/20"
-                            : "text-gray-500 dark:text-gray-400"
+                            : "text-zinc-500 dark:text-zinc-400"
                       }`}
                     >
                       {DAY_LABELS[day]}
@@ -620,7 +620,7 @@ export function StudentTimetable() {
                 <CardContent className="p-4">
                   <div className="flex items-center justify-between">
                     <div>
-                      <h3 className="text-base font-semibold text-gray-900 dark:text-gray-100">
+                      <h3 className="text-base font-semibold text-zinc-900 dark:text-zinc-100">
                         {DAY_FULL_LABELS[selectedDay]}
                         {selectedDay === todayKey && (
                           <span className="ml-2 text-sm font-normal text-violet-500">
@@ -628,20 +628,20 @@ export function StudentTimetable() {
                           </span>
                         )}
                       </h3>
-                      <p className="text-xs text-gray-400 dark:text-gray-500 dark:text-gray-400 mt-0.5">
+                      <p className="text-xs text-zinc-400 dark:text-zinc-500 dark:text-zinc-400 mt-0.5">
                         {selectedDaySlots.length} classes scheduled
                       </p>
                     </div>
                     {selectedDaySlots.length > 0 && (
                       <div className="text-right">
-                        <p className="text-xs text-gray-500 dark:text-gray-400">
+                        <p className="text-xs text-zinc-500 dark:text-zinc-400">
                           {formatTime(selectedDaySlots[0].startTime)} –{" "}
                           {formatTime(
                             selectedDaySlots[selectedDaySlots.length - 1]
                               .endTime,
                           )}
                         </p>
-                        <p className="text-[11px] text-gray-400 dark:text-gray-500 dark:text-gray-400">
+                        <p className="text-[11px] text-zinc-400 dark:text-zinc-500 dark:text-zinc-400">
                           {(() => {
                             const totalMin = selectedDaySlots.reduce(
                               (acc, s) => {
@@ -672,7 +672,7 @@ export function StudentTimetable() {
               <div className="relative space-y-3">
                 {/* Timeline line */}
                 {selectedDaySlots.length > 0 && (
-                  <div className="absolute left-[23px] top-8 bottom-8 w-px bg-gray-200 dark:bg-gray-700 dark:bg-gray-700 hidden sm:block" />
+                  <div className="absolute left-[23px] top-8 bottom-8 w-px bg-zinc-200 dark:bg-zinc-700 dark:bg-zinc-700 hidden sm:block" />
                 )}
 
                 {timeSlots.map((ts, idx) => {
@@ -694,16 +694,16 @@ export function StudentTimetable() {
                         key={`${selectedDay}-${ts.start}`}
                         className="relative"
                       >
-                        <Card className="rounded-xl border-dashed border-gray-200 dark:border-gray-700 dark:border-gray-700 bg-gray-50/50 dark:bg-gray-900/50">
+                        <Card className="rounded-xl border-dashed border-zinc-200 dark:border-zinc-700 dark:border-zinc-700 bg-zinc-50/50 dark:bg-zinc-900/50">
                           <CardContent className="p-4 flex items-center gap-4">
                             <div className="hidden sm:flex flex-col items-center z-10">
-                              <div className="size-5 rounded-full border-2 border-gray-300 dark:border-gray-600 dark:border-gray-600 bg-white dark:bg-gray-900" />
+                              <div className="size-5 rounded-full border-2 border-zinc-300 dark:border-zinc-600 dark:border-zinc-600 bg-white dark:bg-zinc-900" />
                             </div>
                             <div className="flex-1 flex items-center gap-3">
-                              <div className="text-xs text-gray-400 dark:text-gray-500 dark:text-gray-400 font-medium min-w-[90px]">
+                              <div className="text-xs text-zinc-400 dark:text-zinc-500 dark:text-zinc-400 font-medium min-w-[90px]">
                                 {formatTime(ts.start)} – {formatTime(ts.end)}
                               </div>
-                              <div className="flex items-center gap-2 text-gray-400 dark:text-gray-500 dark:text-gray-400">
+                              <div className="flex items-center gap-2 text-zinc-400 dark:text-zinc-500 dark:text-zinc-400">
                                 <Clock className="size-3.5" />
                                 <span className="text-xs font-medium">
                                   Free Period
@@ -718,7 +718,7 @@ export function StudentTimetable() {
 
                   const colorClass =
                     subjectColorMap[slot.subjectName] ||
-                    "bg-gray-50 dark:bg-gray-800/50 text-gray-700 dark:text-gray-300 border-gray-200 dark:border-gray-700 dark:border-gray-700";
+                    "bg-zinc-50 dark:bg-zinc-800/50 text-zinc-700 dark:text-zinc-300 border-zinc-200 dark:border-zinc-700 dark:border-zinc-700";
 
                   return (
                     <div key={slot.id} className="relative">
@@ -728,7 +728,7 @@ export function StudentTimetable() {
                             ? "border-violet-300 shadow-lg shadow-violet-100"
                             : isPastSlot
                               ? "opacity-60"
-                              : "border-gray-200 dark:border-gray-700"
+                              : "border-zinc-200 dark:border-zinc-700"
                         }`}
                       >
                         <CardContent className="p-4">
@@ -737,14 +737,14 @@ export function StudentTimetable() {
                             <div className="hidden sm:flex flex-col items-center z-10 pt-0.5">
                               {isCurrentSlotActive ? (
                                 <div className="size-5 rounded-full bg-violet-500 border-2 border-violet-300 flex items-center justify-center">
-                                  <div className="size-2 rounded-full bg-white dark:bg-gray-900 animate-pulse" />
+                                  <div className="size-2 rounded-full bg-white dark:bg-zinc-900 animate-pulse" />
                                 </div>
                               ) : (
                                 <div
                                   className={`size-5 rounded-full border-2 ${
                                     isPastSlot
-                                      ? "border-gray-300 dark:border-gray-600 dark:border-gray-600 bg-gray-200 dark:bg-gray-700 dark:bg-gray-700"
-                                      : "border-violet-400 bg-white dark:bg-gray-900"
+                                      ? "border-zinc-300 dark:border-zinc-600 dark:border-zinc-600 bg-zinc-200 dark:bg-zinc-700 dark:bg-zinc-700"
+                                      : "border-violet-400 bg-white dark:bg-zinc-900"
                                   }`}
                                 />
                               )}
@@ -756,7 +756,7 @@ export function StudentTimetable() {
                                 <div className="flex-1 min-w-0">
                                   <div className="flex items-center gap-2 flex-wrap">
                                     <h4
-                                      className={`text-sm font-bold truncate ${colorClass.split(" ")[1] || "text-gray-900 dark:text-gray-100"}`}
+                                      className={`text-sm font-bold truncate ${colorClass.split(" ")[1] || "text-zinc-900 dark:text-zinc-100"}`}
                                     >
                                       {slot.subjectName}
                                     </h4>
@@ -769,7 +769,7 @@ export function StudentTimetable() {
                                 </div>
                               </div>
 
-                              <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1.5 text-xs text-gray-500 dark:text-gray-400">
+                              <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1.5 text-xs text-zinc-500 dark:text-zinc-400">
                                 <span className="flex items-center gap-1">
                                   <Clock className="size-3.5" />
                                   {formatTime(slot.startTime)} –{" "}
@@ -850,7 +850,7 @@ export function StudentTimetable() {
                                   isCurrentSlotActive
                                     ? "bg-violet-600 text-white"
                                     : isPastSlot
-                                      ? "bg-gray-100 dark:bg-gray-800 text-gray-400 dark:text-gray-500 dark:text-gray-400"
+                                      ? "bg-zinc-100 dark:bg-zinc-800 text-zinc-400 dark:text-zinc-500 dark:text-zinc-400"
                                       : colorClass
                                 }`}
                               >

@@ -128,8 +128,8 @@ export function SuperAdminSchoolSubscriptions() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
-          <div className="size-12 rounded-2xl bg-indigo-100 dark:bg-indigo-900/30 flex items-center justify-center">
-            <ShieldCheck className="size-6 text-indigo-600 dark:text-indigo-400" />
+          <div className="size-12 rounded-2xl bg-violet-100 dark:bg-violet-900/30 flex items-center justify-center">
+            <ShieldCheck className="size-6 text-violet-600 dark:text-violet-400" />
           </div>
           <div>
             <h2 className="text-3xl font-semibold tracking-tight">School Subscriptions</h2>
@@ -220,7 +220,7 @@ export function SuperAdminSchoolSubscriptions() {
                 <TableRow key={tenant.id}>
                   <TableCell className="font-medium">{tenant.name}</TableCell>
                   <TableCell className="capitalize">
-                    <Badge variant="secondary" className="bg-indigo-50 text-indigo-700 border-indigo-100">
+                    <Badge variant="secondary" className="bg-violet-50 text-violet-700 border-violet-100">
                       {tenant.plan}
                     </Badge>
                   </TableCell>
@@ -237,7 +237,7 @@ export function SuperAdminSchoolSubscriptions() {
                       variant="outline" 
                       size="sm" 
                       onClick={() => handleEdit(tenant)}
-                      className="h-8 gap-1.5 border-indigo-100 text-indigo-600 hover:bg-indigo-50 hover:text-indigo-700 dark:border-indigo-900/50 dark:text-indigo-400 dark:hover:bg-indigo-900/30"
+                      className="h-8 gap-1.5 border-violet-100 text-violet-600 hover:bg-violet-50 hover:text-violet-700 dark:border-violet-900/50 dark:text-violet-400 dark:hover:bg-violet-900/30"
                     >
                       <Settings2 className="size-3.5" />
                       Manage
@@ -249,19 +249,19 @@ export function SuperAdminSchoolSubscriptions() {
           </TableBody>
         </Table>
         {!isLoading && tenantsData && tenantsData.totalPages > 1 && (
-          <div className="flex flex-col sm:flex-row items-center justify-between px-6 py-4 bg-gray-50/50 dark:bg-gray-900/20 border-t gap-4">
+          <div className="flex flex-col sm:flex-row items-center justify-between px-6 py-4 bg-zinc-50/50 dark:bg-zinc-900/20 border-t gap-4">
             <div className="flex items-center gap-4 order-2 sm:order-1">
               <p className="text-sm text-muted-foreground">
                 Showing{" "}
-                <span className="font-semibold text-indigo-600 dark:text-indigo-400">
+                <span className="font-semibold text-violet-600 dark:text-violet-400">
                   {(currentPage - 1) * ITEMS_PER_PAGE + 1}
                 </span>{" "}
                 to{" "}
-                <span className="font-semibold text-indigo-600 dark:text-indigo-400">
+                <span className="font-semibold text-violet-600 dark:text-violet-400">
                   {Math.min(currentPage * ITEMS_PER_PAGE, tenantsData.total)}
                 </span>{" "}
                 of{" "}
-                <span className="font-semibold text-gray-900 dark:text-gray-100">
+                <span className="font-semibold text-zinc-900 dark:text-zinc-100">
                   {tenantsData.total}
                 </span>{" "}
                 entries
@@ -300,8 +300,8 @@ export function SuperAdminSchoolSubscriptions() {
                           className={cn(
                             "size-8 p-0 text-xs",
                             currentPage === pageNum
-                              ? "bg-indigo-600 hover:bg-indigo-700 shadow-sm"
-                              : "hover:bg-indigo-50",
+                              ? "bg-violet-600 hover:bg-violet-700 shadow-sm"
+                              : "hover:bg-violet-50",
                           )}
                           onClick={() => setCurrentPage(pageNum)}
                         >
@@ -448,7 +448,7 @@ export function SuperAdminSchoolSubscriptions() {
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setIsDialogOpen(false)}>Cancel</Button>
-            <Button onClick={handleUpdate} className="bg-indigo-600 hover:bg-indigo-700">Update License</Button>
+            <Button onClick={handleUpdate} className="bg-violet-600 hover:bg-violet-700">Update License</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

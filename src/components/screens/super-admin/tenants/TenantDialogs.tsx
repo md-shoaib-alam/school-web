@@ -773,7 +773,7 @@ export function TenantDialogs({
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2 font-bold text-xl">
-              <ShieldCheck className="size-5 text-indigo-600" />
+              <ShieldCheck className="size-5 text-violet-600" />
               Create School Admin
             </DialogTitle>
             <DialogDescription>
@@ -805,7 +805,7 @@ export function TenantDialogs({
                 Email Address
               </Label>
               <div className="relative group">
-                <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 size-5 text-gray-400" />
+                <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 size-5 text-zinc-400" />
                 <Input
                   type="email"
                   placeholder="admin@school.com"
@@ -825,7 +825,7 @@ export function TenantDialogs({
                 Phone Number (Optional)
               </Label>
               <div className="relative group">
-                <Phone className="absolute left-3.5 top-1/2 -translate-y-1/2 size-5 text-gray-400" />
+                <Phone className="absolute left-3.5 top-1/2 -translate-y-1/2 size-5 text-zinc-400" />
                 <Input
                   placeholder="+1 (555) 000-0000"
                   className="pl-11 h-11 rounded-xl"
@@ -844,7 +844,7 @@ export function TenantDialogs({
                 Initial Password
               </Label>
               <div className="relative group">
-                <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 size-5 text-gray-400" />
+                <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 size-5 text-zinc-400" />
                 <Input
                   type={showAdminPassword ? "text" : "password"}
                   placeholder="Create a secure password"
@@ -877,7 +877,7 @@ export function TenantDialogs({
               Cancel
             </Button>
             <Button
-              className="bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl min-w-[140px]"
+              className="bg-violet-600 hover:bg-violet-700 text-white rounded-xl min-w-[140px]"
               onClick={onCreateAdmin}
               disabled={
                 submitting ||

@@ -17,7 +17,7 @@ export function StaffSkeleton() {
       <CardContent className="p-0">
         <Table>
           <TableHeader>
-            <TableRow className="bg-gray-50/50 dark:bg-gray-900/20">
+            <TableRow className="bg-zinc-50/50 dark:bg-zinc-900/20">
               <TableHead className="w-[300px]"><Skeleton className="h-4 w-24" /></TableHead>
               <TableHead><Skeleton className="h-4 w-20" /></TableHead>
               <TableHead><Skeleton className="h-4 w-16" /></TableHead>

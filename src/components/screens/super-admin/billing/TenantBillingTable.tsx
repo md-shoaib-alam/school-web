@@ -44,7 +44,7 @@ export function TenantBillingTable({
   const isSchoolMode = viewMode === 'school';
 
   return (
-    <Card className="shadow-sm border-none bg-white dark:bg-gray-800">
+    <Card className="shadow-sm border-none bg-white dark:bg-zinc-800">
       <CardHeader>
         <CardTitle className="text-base flex items-center gap-2">
           <Building2 className="size-4 text-emerald-600" /> {isSchoolMode ? "School Revenue" : "Revenue by Tenant"}
@@ -56,10 +56,10 @@ export function TenantBillingTable({
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <div className="rounded-xl border border-gray-100 dark:border-gray-700 overflow-hidden">
+        <div className="rounded-xl border border-zinc-100 dark:border-zinc-700 overflow-hidden">
           <Table>
             <TableHeader>
-              <TableRow className="bg-gray-50/50 dark:bg-gray-900/50 hover:bg-gray-50/50">
+              <TableRow className="bg-zinc-50/50 dark:bg-zinc-900/50 hover:bg-zinc-50/50">
                 <TableHead
                   className="cursor-pointer hover:text-emerald-600 transition-colors"
                   onClick={() => onSort("name")}
@@ -141,7 +141,7 @@ export function TenantBillingTable({
                     const schoolPrice = SCHOOL_PRICES[tenant.plan?.toLowerCase()] || 0;
 
                     return (
-                      <TableRow key={tenant.id} className="hover:bg-gray-50/50 dark:hover:bg-gray-900/50 transition-colors">
+                      <TableRow key={tenant.id} className="hover:bg-zinc-50/50 dark:hover:bg-zinc-900/50 transition-colors">
                         <TableCell>
                           <div className="font-bold text-sm">{tenant.name}</div>
                           <div className="text-[10px] text-muted-foreground font-mono">/{tenant.slug}</div>

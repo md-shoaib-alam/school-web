@@ -35,7 +35,7 @@ export const CBSEStandard: React.FC<MarksheetTemplateProps> = ({
 
   return (
     <div 
-      className="relative bg-white text-slate-900 px-9 py-8 border-[5px] border-emerald-800 rounded overflow-hidden select-none flex flex-col justify-between shrink-0 text-left h-[1123px] w-[794px] box-border font-sans"
+      className="relative bg-white text-zinc-900 px-9 py-8 border-[5px] border-emerald-800 rounded overflow-hidden select-none flex flex-col justify-between shrink-0 text-left h-[1123px] w-[794px] box-border font-sans"
       style={{ WebkitPrintColorAdjust: 'exact', printColorAdjust: 'exact' }}
     >
       {/* Dynamic Header */}
@@ -110,9 +110,9 @@ export const CBSEStandard: React.FC<MarksheetTemplateProps> = ({
               <tbody>
                 {sheet.subjects.map((sub, sIdx) => (
                   <tr key={sIdx} className="border-b border-zinc-150 hover:bg-zinc-50/50">
-                    <td className="px-3 py-2 text-left font-bold text-slate-800 truncate">{sub.subjectName}</td>
-                    {marksheetType === 'combined' && <td className="px-3 py-2 text-center font-mono text-slate-600">{sub.midtermMarks}</td>}
-                    {marksheetType === 'combined' && <td className="px-3 py-2 text-center font-mono text-slate-600">{sub.finalMarks}</td>}
+                    <td className="px-3 py-2 text-left font-bold text-zinc-800 truncate">{sub.subjectName}</td>
+                    {marksheetType === 'combined' && <td className="px-3 py-2 text-center font-mono text-zinc-600">{sub.midtermMarks}</td>}
+                    {marksheetType === 'combined' && <td className="px-3 py-2 text-center font-mono text-zinc-600">{sub.finalMarks}</td>}
                     <td className="px-3 py-2 text-center font-black font-mono text-emerald-800">{sub.obtained}</td>
                     <td className="px-3 py-2 text-center">
                       <span className="font-black text-emerald-900 bg-emerald-50 border border-emerald-250 px-2 py-0.5 rounded text-[10px]">

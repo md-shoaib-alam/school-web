@@ -239,7 +239,7 @@ export function SuperAdminPlatformNotices() {
         </Card>
 
         <div className="space-y-6">
-          <Card className="border-none shadow-sm bg-gradient-to-br from-amber-50 to-white dark:from-amber-950/10 dark:to-gray-900">
+          <Card className="border-none shadow-sm bg-gradient-to-br from-amber-50 to-white dark:from-amber-950/10 dark:to-zinc-900">
             <CardHeader>
               <CardTitle className="text-lg flex items-center gap-2">
                 <Info className="size-5 text-amber-600" />

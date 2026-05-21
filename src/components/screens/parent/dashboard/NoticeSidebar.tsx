@@ -90,7 +90,7 @@ export function NoticeSidebar({ notices, overdueFees, performance }: NoticeSideb
               {notices.slice(0, 5).map((notice) => (
                 <div key={notice.id} className="space-y-1 group">
                   <div className="flex items-start justify-between gap-2">
-                    <h4 className="text-sm font-medium text-gray-900 dark:text-gray-100 group-hover:text-amber-600 dark:group-hover:text-amber-400 transition-colors line-clamp-1">
+                    <h4 className="text-sm font-medium text-zinc-900 dark:text-zinc-100 group-hover:text-amber-600 dark:group-hover:text-amber-400 transition-colors line-clamp-1">
                       {notice.title}
                     </h4>
                     <Badge
@@ -100,7 +100,7 @@ export function NoticeSidebar({ notices, overdueFees, performance }: NoticeSideb
                           ? "border-red-200 dark:border-red-800 bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-400"
                           : notice.priority === "important"
                             ? "border-amber-200 dark:border-amber-800 bg-amber-50 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400"
-                            : "border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-800/50 text-gray-500 dark:text-gray-400"
+                            : "border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-800/50 text-zinc-500 dark:text-zinc-400"
                       }`}
                     >
                       {notice.priority}
@@ -133,11 +133,11 @@ export function NoticeSidebar({ notices, overdueFees, performance }: NoticeSideb
         <CardContent className="p-4 pt-0 space-y-3">
           {performance.map((student) => (
             <div key={student.name} className="flex items-center justify-between">
-              <span className="text-sm text-gray-600 dark:text-gray-400 truncate max-w-[120px]">
+              <span className="text-sm text-zinc-600 dark:text-zinc-400 truncate max-w-[120px]">
                 {student.name}
               </span>
               <div className="flex items-center gap-2">
-                <span className="text-sm font-semibold text-gray-900 dark:text-gray-100">{student.avg}%</span>
+                <span className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">{student.avg}%</span>
                 <Badge
                   variant="outline"
                   className={`text-xs font-bold shadow-none ${

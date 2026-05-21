@@ -265,7 +265,7 @@ export function ParentSubscription() {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
         <Loader2 className="size-8 animate-spin text-amber-500" />
-        <span className="ml-3 text-gray-500 dark:text-gray-400">Loading subscriptions...</span>
+        <span className="ml-3 text-zinc-500 dark:text-zinc-400">Loading subscriptions...</span>
       </div>
     );
   }
@@ -282,8 +282,8 @@ export function ParentSubscription() {
         <div className="inline-flex items-center justify-center size-12 sm:size-16 rounded-2xl bg-gradient-to-br from-amber-400 to-orange-500 text-white mb-4 shadow-lg shadow-amber-200 dark:shadow-amber-900/30">
           <Crown className="size-6 sm:size-8" />
         </div>
-        <h2 className="text-xl sm:text-2xl font-semibold text-gray-900 dark:text-gray-100 tracking-tight">Premium Subscriptions</h2>
-        <p className="text-sm text-gray-500 dark:text-gray-400 mt-2 max-w-md mx-auto leading-relaxed">
+        <h2 className="text-xl sm:text-2xl font-semibold text-zinc-900 dark:text-zinc-100 tracking-tight">Premium Subscriptions</h2>
+        <p className="text-sm text-zinc-500 dark:text-zinc-400 mt-2 max-w-md mx-auto leading-relaxed">
           Unlock advanced analytics, AI-powered insights, and real-time parent-teacher engagement tools.
         </p>
       </div>
@@ -303,24 +303,24 @@ export function ParentSubscription() {
         <Tabs 
           value={billingCycle} 
           onValueChange={(v) => setBillingCycle(v as any)} 
-          className="bg-gray-100 dark:bg-gray-800 p-1.5 rounded-2xl shadow-sm w-full max-w-md border border-gray-200 dark:border-gray-700"
+          className="bg-zinc-100 dark:bg-zinc-800 p-1.5 rounded-2xl shadow-sm w-full max-w-md border border-zinc-200 dark:border-zinc-700"
         >
           <TabsList className="bg-transparent h-10 sm:h-12 flex w-full gap-1 p-0">
             <TabsTrigger 
               value="monthly" 
-              className="flex-1 rounded-xl data-[state=active]:bg-white dark:data-[state=active]:bg-gray-900 data-[state=active]:shadow-sm data-[state=active]:text-amber-600 transition-all font-semibold text-xs sm:text-sm"
+              className="flex-1 rounded-xl data-[state=active]:bg-white dark:data-[state=active]:bg-zinc-900 data-[state=active]:shadow-sm data-[state=active]:text-amber-600 transition-all font-semibold text-xs sm:text-sm"
             >
               Monthly
             </TabsTrigger>
             <TabsTrigger 
               value="quarterly" 
-              className="flex-1 rounded-xl data-[state=active]:bg-white dark:data-[state=active]:bg-gray-900 data-[state=active]:shadow-sm data-[state=active]:text-amber-600 transition-all font-semibold text-xs sm:text-sm"
+              className="flex-1 rounded-xl data-[state=active]:bg-white dark:data-[state=active]:bg-zinc-900 data-[state=active]:shadow-sm data-[state=active]:text-amber-600 transition-all font-semibold text-xs sm:text-sm"
             >
               Quarterly <span className="hidden sm:inline ml-1.5 text-[10px] bg-emerald-100 text-emerald-700 px-1.5 py-0.5 rounded-full">Save 23%</span>
             </TabsTrigger>
             <TabsTrigger 
               value="yearly" 
-              className="flex-1 rounded-xl data-[state=active]:bg-white dark:data-[state=active]:bg-gray-900 data-[state=active]:shadow-sm data-[state=active]:text-amber-600 transition-all font-semibold text-xs sm:text-sm"
+              className="flex-1 rounded-xl data-[state=active]:bg-white dark:data-[state=active]:bg-zinc-900 data-[state=active]:shadow-sm data-[state=active]:text-amber-600 transition-all font-semibold text-xs sm:text-sm"
             >
               Yearly <span className="hidden sm:inline ml-1.5 text-[10px] bg-emerald-100 text-emerald-700 px-1.5 py-0.5 rounded-full">Save 50%</span>
             </TabsTrigger>
@@ -351,7 +351,7 @@ export function ParentSubscription() {
 
 
       {/* Trust Badges */}
-      <div className="flex flex-wrap justify-center gap-6 py-4 text-sm text-gray-400 dark:text-gray-500 border-y border-gray-100 dark:border-gray-800">
+      <div className="flex flex-wrap justify-center gap-6 py-4 text-sm text-zinc-400 dark:text-zinc-500 border-y border-zinc-100 dark:border-zinc-800">
         <div className="flex items-center gap-1.5"><Shield className="size-4" /><span>Secure Payment</span></div>
         <div className="flex items-center gap-1.5"><Clock className="size-4" /><span>Cancel Anytime</span></div>
         <div className="flex items-center gap-1.5"><TrendingUp className="size-4" /><span>Upgrade Anytime</span></div>
@@ -361,10 +361,10 @@ export function ParentSubscription() {
       {/* Payment History */}
       <div className="space-y-4">
         <div className="flex items-center gap-2">
-          <Receipt className="size-5 text-gray-600 dark:text-gray-400" />
-          <h3 className="text-xl font-semibold text-gray-900 dark:text-gray-100">Payment History</h3>
+          <Receipt className="size-5 text-zinc-600 dark:text-zinc-400" />
+          <h3 className="text-xl font-semibold text-zinc-900 dark:text-zinc-100">Payment History</h3>
         </div>
-        <Card className="rounded-xl border-gray-200 dark:border-gray-700 shadow-none overflow-hidden">
+        <Card className="rounded-xl border-zinc-200 dark:border-zinc-700 shadow-none overflow-hidden">
           <CardContent className="p-0">
             <HistoryTable subscriptions={allSubscriptions} />
           </CardContent>
@@ -390,13 +390,13 @@ export function ParentSubscription() {
               <span className="size-8 rounded-full bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center">⚠️</span>
               Cancel Subscription?
             </AlertDialogTitle>
-            <AlertDialogDescription className="text-gray-600 dark:text-gray-400 py-2">
+            <AlertDialogDescription className="text-zinc-600 dark:text-zinc-400 py-2">
               Your premium features will remain active until the end of the current billing cycle. 
               After that, you will be moved to the free plan and auto-payments will stop.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter className="sm:justify-end gap-3">
-            <AlertDialogCancel className="rounded-xl border-gray-200 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
+            <AlertDialogCancel className="rounded-xl border-zinc-200 dark:border-zinc-800 hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors">
               Keep Premium
             </AlertDialogCancel>
             <AlertDialogAction 

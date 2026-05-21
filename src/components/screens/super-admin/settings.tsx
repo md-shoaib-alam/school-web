@@ -160,7 +160,7 @@ export function SuperAdminSettings() {
 
       <div className="grid grid-cols-1 gap-6">
         {/* General Configuration Card */}
-        <Card className="border-gray-200/80 dark:border-gray-800 shadow-sm">
+        <Card className="border-zinc-200/80 dark:border-zinc-800 shadow-sm">
           <CardHeader>
             <CardTitle className="text-base flex items-center gap-2">
               <Globe className="size-5 text-teal-500" />
@@ -261,7 +261,7 @@ export function SuperAdminSettings() {
             <div className="space-y-4">
               <div className="flex items-center justify-between">
                 <div className="space-y-0.5">
-                  <Label className="text-sm font-semibold text-gray-900 dark:text-gray-100">
+                  <Label className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">
                     System Maintenance Mode
                   </Label>
                   <p className="text-xs text-muted-foreground pr-4">
@@ -299,7 +299,7 @@ export function SuperAdminSettings() {
                       value={maintenanceMessage}
                       onChange={(e) => setMaintenanceMessage(e.target.value)}
                       placeholder="e.g. System upgrade in progress. Back online in 20 minutes."
-                      className="min-h-[90px] rounded-xl border-amber-200 dark:border-amber-900 focus-visible:ring-amber-500 dark:bg-gray-900 bg-white"
+                      className="min-h-[90px] rounded-xl border-amber-200 dark:border-amber-900 focus-visible:ring-amber-500 dark:bg-zinc-900 bg-white"
                     />
                     <p className="text-xs text-amber-600/90 dark:text-amber-400">
                       This message will render directly on the block screen for all public portals.
@@ -314,7 +314,7 @@ export function SuperAdminSettings() {
 
       {/* Sticky Save Bar */}
       <div className="sticky bottom-4 z-10 mt-8">
-        <Card className="shadow-xl border border-teal-100 dark:border-teal-900 bg-white/95 dark:bg-gray-900/95 backdrop-blur-md rounded-2xl">
+        <Card className="shadow-xl border border-teal-100 dark:border-teal-900 bg-white/95 dark:bg-zinc-900/95 backdrop-blur-md rounded-2xl">
           <CardContent className="p-4 flex items-center justify-between">
             <div className="text-xs sm:text-sm text-muted-foreground font-medium flex items-center gap-2">
               <div className="size-2 rounded-full bg-teal-500 animate-ping" />

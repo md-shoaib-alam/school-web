@@ -64,7 +64,7 @@ export function SubjectTable({
                     {subject.code}
                   </Badge>
                 </TableCell>
-                <TableCell className="font-medium text-gray-900 dark:text-gray-100">
+                <TableCell className="font-medium text-zinc-900 dark:text-zinc-100">
                   {subject.name}
                 </TableCell>
                 <TableCell>

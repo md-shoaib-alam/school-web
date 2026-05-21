@@ -112,7 +112,7 @@ export function ExpensesScreen() {
             <Wallet className="size-6 text-rose-600 dark:text-rose-400" />
           </div>
           <div>
-            <h2 className="text-3xl font-semibold tracking-tight text-gray-900 dark:text-gray-100">Expenses</h2>
+            <h2 className="text-3xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-100">Expenses</h2>
             <p className="text-muted-foreground mt-1">Manage school expenditures and categories.</p>
           </div>
         </div>

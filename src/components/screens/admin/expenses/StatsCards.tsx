@@ -59,7 +59,7 @@ export function StatsCards({ stats }: StatsCardsProps) {
             {stats?.categoryWiseExpenses?.map((c: any) => (
               <div 
                 key={c.categoryId} 
-                className="flex flex-col items-center min-w-[100px] p-2 rounded-lg bg-gray-50 dark:bg-gray-800/50 border"
+                className="flex flex-col items-center min-w-[100px] p-2 rounded-lg bg-zinc-50 dark:bg-zinc-800/50 border"
               >
                 <span className="text-xs text-muted-foreground truncate w-full text-center">
                   {c.categoryName}

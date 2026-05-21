@@ -115,7 +115,7 @@ export function ActiveExamsView({
 
       {classFilter === 'all' ? (
         exams.filter(e => e.status !== 'completed').length === 0 ? (
-          <div className="flex flex-col items-center justify-center p-12 border-2 border-dashed border-gray-200 dark:border-zinc-800 rounded-2xl bg-card text-center text-muted-foreground animate-in fade-in duration-300">
+          <div className="flex flex-col items-center justify-center p-12 border-2 border-dashed border-zinc-200 dark:border-zinc-800 rounded-2xl bg-card text-center text-muted-foreground animate-in fade-in duration-300">
             <ClipboardList className="size-16 mb-4 text-blue-500/40" />
             <h3 className="text-lg font-semibold text-foreground">No Active Exams Scheduled</h3>
             <p className="text-sm mt-1 max-w-md">There are no midterm or final exams currently scheduled for any class. Click "New Exam" to start scheduling!</p>
@@ -123,12 +123,12 @@ export function ActiveExamsView({
         ) : (
           <div className="space-y-4 animate-in fade-in duration-300">
             {/* Global Search and Filter Bar */}
-            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 bg-card p-3 rounded-xl border border-gray-100 dark:border-zinc-800/80 shadow-sm">
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 bg-card p-3 rounded-xl border border-zinc-100 dark:border-zinc-800/80 shadow-sm">
               <div className="relative flex-1">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
                 <Input
                   placeholder="Search exams by subject or name..."
-                  className="pl-9 h-9 border-gray-200 dark:border-zinc-800 text-sm focus-visible:ring-blue-500 rounded-lg"
+                  className="pl-9 h-9 border-zinc-200 dark:border-zinc-800 text-sm focus-visible:ring-blue-500 rounded-lg"
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                 />
@@ -137,7 +137,7 @@ export function ActiveExamsView({
               <div className="flex items-center gap-3 shrink-0">
                 <div className="w-[150px]">
                   <Select value={statusFilter} onValueChange={setStatusFilter}>
-                    <SelectTrigger className="h-9 border-gray-200 dark:border-zinc-800 rounded-lg text-xs font-semibold">
+                    <SelectTrigger className="h-9 border-zinc-200 dark:border-zinc-800 rounded-lg text-xs font-semibold">
                       <SelectValue placeholder="Status" />
                     </SelectTrigger>
                     <SelectContent className="rounded-lg">
@@ -164,7 +164,7 @@ export function ActiveExamsView({
             </div>
 
             {classesWithActiveExams.length === 0 ? (
-              <div className="flex flex-col items-center justify-center p-12 border border-dashed border-gray-200 dark:border-zinc-800 rounded-2xl bg-card text-center text-muted-foreground animate-in fade-in duration-300">
+              <div className="flex flex-col items-center justify-center p-12 border border-dashed border-zinc-200 dark:border-zinc-800 rounded-2xl bg-card text-center text-muted-foreground animate-in fade-in duration-300">
                 <Search className="size-12 mb-3 text-zinc-300 dark:text-zinc-700" />
                 <h3 className="text-base font-semibold text-foreground">No matching exams found</h3>
                 <p className="text-xs mt-1 max-w-md">No exams match your search text or status filter. Try clearing or modifying your filter criteria.</p>
@@ -191,7 +191,7 @@ export function ActiveExamsView({
                     return (
                       <Card 
                         key={c.id} 
-                        className={`border dark:border-zinc-800 shadow-sm overflow-hidden transition-all duration-300 hover:shadow-md bg-card relative py-0 gap-0 ${isExpanded ? 'border-l-4 border-l-blue-600 dark:border-l-blue-500 border-gray-200' : 'border-gray-100'}`}
+                        className={`border dark:border-zinc-800 shadow-sm overflow-hidden transition-all duration-300 hover:shadow-md bg-card relative py-0 gap-0 ${isExpanded ? 'border-l-4 border-l-blue-600 dark:border-l-blue-500 border-zinc-200' : 'border-zinc-100'}`}
                       >
                         <div 
                           onClick={() => setExpandedClasses(prev => ({ ...prev, [c.id]: !prev[c.id] }))}
@@ -217,20 +217,20 @@ export function ActiveExamsView({
                                 {stats.completed} Completed
                               </span>
                             </div>
-                            <div className={`p-1.5 rounded-full transition-all duration-300 ${isExpanded ? 'bg-blue-50 dark:bg-blue-950/50 text-blue-600 dark:text-blue-400' : 'bg-gray-50 dark:bg-zinc-900 text-muted-foreground'}`}>
+                            <div className={`p-1.5 rounded-full transition-all duration-300 ${isExpanded ? 'bg-blue-50 dark:bg-blue-950/50 text-blue-600 dark:text-blue-400' : 'bg-zinc-50 dark:bg-zinc-900 text-muted-foreground'}`}>
                               <ChevronDown className={`size-4 transition-transform duration-300 ${isExpanded ? 'rotate-180' : ''}`} />
                             </div>
                           </div>
                         </div>
 
                         {/* Collapsible Content */}
-                        <div className={`transition-all duration-300 ease-in-out overflow-hidden ${isExpanded ? 'max-h-[2500px] border-t border-gray-100 dark:border-zinc-800' : 'max-h-0'}`}>
+                        <div className={`transition-all duration-300 ease-in-out overflow-hidden ${isExpanded ? 'max-h-[2500px] border-t border-zinc-100 dark:border-zinc-800' : 'max-h-0'}`}>
                           <div className="p-4 bg-zinc-50/30 dark:bg-zinc-950/10 space-y-4">
                             {getGroupedExams(classExams).map((group) => {
                               const groupKey = `${group.cycleName}::${group.academicYear}`;
                               return (
-                                <Card key={groupKey} className="border border-gray-100 dark:border-zinc-800 shadow-sm overflow-hidden bg-card">
-                                  <div className="px-4 py-2.5 bg-zinc-50/50 dark:bg-zinc-900/30 border-b border-gray-100 dark:border-zinc-800 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                                <Card key={groupKey} className="border border-zinc-100 dark:border-zinc-800 shadow-sm overflow-hidden bg-card">
+                                  <div className="px-4 py-2.5 bg-zinc-50/50 dark:bg-zinc-900/30 border-b border-zinc-100 dark:border-zinc-800 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                                     <div className="flex items-center gap-2">
                                       <ClipboardList className="size-4.5 text-blue-500" />
                                       <span className="font-bold text-sm text-foreground">{group.cycleName}</span>

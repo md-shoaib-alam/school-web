@@ -85,10 +85,10 @@ export const statusConfig: Record<string, { bg: string; text: string; border: st
     label: "Active",
   },
   expired: {
-    bg: "bg-gray-50 dark:bg-gray-900",
-    text: "text-gray-600 dark:text-gray-400",
-    border: "border-gray-200 dark:border-gray-700",
-    dot: "bg-gray-400",
+    bg: "bg-zinc-50 dark:bg-zinc-900",
+    text: "text-zinc-600 dark:text-zinc-400",
+    border: "border-zinc-200 dark:border-zinc-700",
+    dot: "bg-zinc-400",
     label: "Expired",
   },
   cancelled: {
@@ -115,7 +115,7 @@ export const paymentMethodConfig: Record<string, { icon: React.ReactNode; color:
   },
   upi: {
     icon: React.createElement(Wallet, { className: "size-3.5" }),
-    color: "text-indigo-600",
+    color: "text-violet-600",
     label: "UPI",
   },
   netbanking: {
@@ -130,16 +130,16 @@ export const paymentMethodConfig: Record<string, { icon: React.ReactNode; color:
   },
   free: {
     icon: React.createElement(Receipt, { className: "size-3.5" }),
-    color: "text-gray-500 dark:text-gray-400",
+    color: "text-zinc-500 dark:text-zinc-400",
     label: "Free",
   },
 };
 
 export const planBadgeConfig: Record<string, { bg: string; text: string; border: string }> = {
   Basic: {
-    bg: "bg-slate-50 dark:bg-slate-900/30",
-    text: "text-slate-700 dark:text-slate-300",
-    border: "border-slate-200 dark:border-slate-700",
+    bg: "bg-zinc-50 dark:bg-zinc-900/30",
+    text: "text-zinc-700 dark:text-zinc-300",
+    border: "border-zinc-200 dark:border-zinc-700",
   },
   Standard: {
     bg: "bg-amber-50 dark:bg-amber-900/30",

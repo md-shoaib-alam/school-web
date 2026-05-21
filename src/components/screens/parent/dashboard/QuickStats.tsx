@@ -19,7 +19,7 @@ export function QuickStats({ childrenCount, noticeCount, pendingFees }: QuickSta
           </div>
           <div className="text-left">
             <p className="text-sm text-muted-foreground">Total Children</p>
-            <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">{childrenCount}</p>
+            <p className="text-2xl font-bold text-zinc-900 dark:text-zinc-100">{childrenCount}</p>
           </div>
         </CardContent>
       </Card>
@@ -30,7 +30,7 @@ export function QuickStats({ childrenCount, noticeCount, pendingFees }: QuickSta
           </div>
           <div className="text-left">
             <p className="text-sm text-muted-foreground">Active Notices</p>
-            <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">{noticeCount}</p>
+            <p className="text-2xl font-bold text-zinc-900 dark:text-zinc-100">{noticeCount}</p>
           </div>
         </CardContent>
       </Card>
@@ -41,7 +41,7 @@ export function QuickStats({ childrenCount, noticeCount, pendingFees }: QuickSta
           </div>
           <div className="text-left">
             <p className="text-sm text-muted-foreground">Pending Fees</p>
-            <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">
+            <p className="text-2xl font-bold text-zinc-900 dark:text-zinc-100">
               ₹{pendingFees.toLocaleString()}
             </p>
           </div>

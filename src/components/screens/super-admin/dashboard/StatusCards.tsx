@@ -54,7 +54,7 @@ export function StatusCards({ loading, data, onNavigate }: StatusCardsProps) {
   return (
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
       {/* Tenant Status Breakdown */}
-      <Card className="border-none shadow-sm bg-white dark:bg-gray-800">
+      <Card className="border-none shadow-sm bg-white dark:bg-zinc-800">
         <CardHeader>
           <CardTitle className="text-base font-bold flex items-center gap-2">
             <Building2 className="size-4 text-emerald-600" /> Tenant Status
@@ -112,7 +112,7 @@ export function StatusCards({ loading, data, onNavigate }: StatusCardsProps) {
       </Card>
 
       {/* User Distribution Chart */}
-      <Card className="border-none shadow-sm bg-white dark:bg-gray-800">
+      <Card className="border-none shadow-sm bg-white dark:bg-zinc-800">
         <CardHeader>
           <CardTitle className="text-base font-bold flex items-center gap-2">
             <Users className="size-4 text-emerald-600" /> User Distribution
@@ -151,8 +151,8 @@ export function StatusCards({ loading, data, onNavigate }: StatusCardsProps) {
               </ChartContainer>
               <div className="grid grid-cols-2 gap-3">
                 {userDistributionData.map((item) => (
-                  <div key={item.name} className="p-2.5 rounded-xl bg-gray-50 dark:bg-gray-900/50 border border-gray-100 dark:border-gray-800/50 text-center group">
-                    <p className="text-lg font-black text-gray-900 dark:text-gray-100 leading-none mb-1 group-hover:scale-110 transition-transform">{item.value.toLocaleString()}</p>
+                  <div key={item.name} className="p-2.5 rounded-xl bg-zinc-50 dark:bg-zinc-900/50 border border-zinc-100 dark:border-zinc-800/50 text-center group">
+                    <p className="text-lg font-black text-zinc-900 dark:text-zinc-100 leading-none mb-1 group-hover:scale-110 transition-transform">{item.value.toLocaleString()}</p>
                     <div className="flex items-center justify-center gap-1.5">
                       <div className="size-2 rounded-full" style={{ backgroundColor: item.fill }} />
                       <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">{item.name}</span>
@@ -166,7 +166,7 @@ export function StatusCards({ loading, data, onNavigate }: StatusCardsProps) {
       </Card>
 
       {/* Quick Actions */}
-      <Card className="border-none shadow-sm bg-white dark:bg-gray-800">
+      <Card className="border-none shadow-sm bg-white dark:bg-zinc-800">
         <CardHeader>
           <CardTitle className="text-base font-bold flex items-center gap-2">
             <Zap className="size-4 text-emerald-600" /> Quick Actions
@@ -206,7 +206,7 @@ export function StatusCards({ loading, data, onNavigate }: StatusCardsProps) {
             icon={<ClipboardList className="size-4" />} 
             label="Audit Logs" 
             sub="Security & activity" 
-            color="bg-gray-700"
+            color="bg-zinc-700"
             onClick={() => onNavigate("audit-logs")}
           />
         </CardContent>
@@ -219,14 +219,14 @@ function ActionButton({ icon, label, sub, color, onClick }: any) {
   return (
     <Button
       variant="outline"
-      className="w-full justify-start gap-4 h-[60px] rounded-2xl border-2 border-gray-100 dark:border-gray-800 hover:border-emerald-500/30 hover:bg-emerald-50/10 transition-all group"
+      className="w-full justify-start gap-4 h-[60px] rounded-2xl border-2 border-zinc-100 dark:border-zinc-800 hover:border-emerald-500/30 hover:bg-emerald-50/10 transition-all group"
       onClick={onClick}
     >
       <div className={`size-10 rounded-xl ${color} flex items-center justify-center text-white shadow-lg shadow-${color.split('-')[1]}-200 dark:shadow-none group-hover:scale-110 transition-transform`}>
         {icon}
       </div>
       <div className="text-left flex-1 min-w-0">
-        <p className="font-black text-sm text-gray-900 dark:text-gray-100">{label}</p>
+        <p className="font-black text-sm text-zinc-900 dark:text-zinc-100">{label}</p>
         <p className="text-[10px] text-muted-foreground font-bold uppercase tracking-widest">{sub}</p>
       </div>
       <ArrowUpRight className="size-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-all -translate-x-2 group-hover:translate-x-0" />

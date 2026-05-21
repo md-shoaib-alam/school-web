@@ -217,7 +217,7 @@ export function UserProfileScreen() {
           >
             <Avatar className="size-24 border-4 border-white/30 shadow-2xl transition-all duration-300 group-hover:scale-105 group-hover:border-white/50">
               <AvatarImage src={currentUser.avatar} alt={currentUser.name} className="object-cover animate-in fade-in" />
-              <AvatarFallback className="text-3xl font-extrabold bg-white text-slate-800">
+              <AvatarFallback className="text-3xl font-extrabold bg-white text-zinc-800">
                 {initials}
               </AvatarFallback>
             </Avatar>
@@ -276,7 +276,7 @@ export function UserProfileScreen() {
         {/* Left 2 Columns: Tabs */}
         <div className="lg:col-span-2 space-y-6">
           <Tabs defaultValue="overview" className="w-full">
-            <TabsList className="grid w-full grid-cols-2 bg-gray-100/80 dark:bg-zinc-900/60 p-1.5 rounded-2xl border border-gray-200/50 dark:border-zinc-800/30 backdrop-blur-md h-12 shadow-sm">
+            <TabsList className="grid w-full grid-cols-2 bg-zinc-100/80 dark:bg-zinc-900/60 p-1.5 rounded-2xl border border-zinc-200/50 dark:border-zinc-800/30 backdrop-blur-md h-12 shadow-sm">
               <TabsTrigger 
                 value="overview" 
                 className="rounded-xl font-bold text-xs sm:text-sm gap-2 transition-all duration-200 hover:text-emerald-600 dark:hover:text-emerald-400 data-[state=active]:bg-white dark:data-[state=active]:bg-zinc-950 data-[state=active]:text-emerald-600 dark:data-[state=active]:text-emerald-400 data-[state=active]:shadow-md hover:scale-[1.01] active:scale-[0.99]"
@@ -295,7 +295,7 @@ export function UserProfileScreen() {
 
             {/* Tab 1: Overview */}
             <TabsContent value="overview" className="mt-4 focus-visible:outline-none">
-              <Card className="border border-gray-200/80 dark:border-zinc-800/80 shadow-sm rounded-2xl">
+              <Card className="border border-zinc-200/80 dark:border-zinc-800/80 shadow-sm rounded-2xl">
                 <CardHeader className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-4">
                   <div>
                     <CardTitle className="text-lg font-bold">Profile Details</CardTitle>
@@ -305,7 +305,7 @@ export function UserProfileScreen() {
                     {currentUser.role === "admin" && (
                       <Button
                         onClick={handleCopySchoolUrl}
-                        className="bg-indigo-600 hover:bg-indigo-700 dark:bg-indigo-500 dark:hover:bg-indigo-600 text-white font-bold rounded-xl text-xs gap-1.5 h-9 w-full sm:w-auto justify-center transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md hover:shadow-indigo-500/25 active:translate-y-0 active:scale-[0.98]"
+                        className="bg-violet-600 hover:bg-violet-700 dark:bg-violet-500 dark:hover:bg-violet-600 text-white font-bold rounded-xl text-xs gap-1.5 h-9 w-full sm:w-auto justify-center transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md hover:shadow-violet-500/25 active:translate-y-0 active:scale-[0.98]"
                       >
                         <Share2 className="size-3.5" />
                         {copiedField === "SchoolUrl" ? "Copied URL!" : "Copy School Portal URL"}
@@ -324,9 +324,9 @@ export function UserProfileScreen() {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
 
                     {/* Name */}
-                    <div className="p-4 bg-gray-50/50 dark:bg-[#0c0c0e]/30 border border-gray-200/50 dark:border-zinc-800/50 rounded-xl space-y-1 relative group">
-                      <p className="text-[10px] uppercase font-bold text-gray-500 dark:text-zinc-400">Full Name</p>
-                      <p className="text-sm font-semibold text-gray-900 dark:text-gray-100 truncate pr-6">{currentUser.name}</p>
+                    <div className="p-4 bg-zinc-50/50 dark:bg-[#0c0c0e]/30 border border-zinc-200/50 dark:border-zinc-800/50 rounded-xl space-y-1 relative group">
+                      <p className="text-[10px] uppercase font-bold text-zinc-500 dark:text-zinc-400">Full Name</p>
+                      <p className="text-sm font-semibold text-zinc-900 dark:text-zinc-100 truncate pr-6">{currentUser.name}</p>
                       <Button
                         variant="ghost"
                         size="icon"
@@ -338,12 +338,12 @@ export function UserProfileScreen() {
                     </div>
 
                     {/* Email */}
-                    <div className="p-4 bg-gray-50/50 dark:bg-[#0c0c0e]/30 border border-gray-200/50 dark:border-zinc-800/50 rounded-xl space-y-1 relative group">
+                    <div className="p-4 bg-zinc-50/50 dark:bg-[#0c0c0e]/30 border border-zinc-200/50 dark:border-zinc-800/50 rounded-xl space-y-1 relative group">
                       <div className="flex items-center gap-1.5">
-                        <p className="text-[10px] uppercase font-bold text-gray-500 dark:text-zinc-400">Email Address</p>
+                        <p className="text-[10px] uppercase font-bold text-zinc-500 dark:text-zinc-400">Email Address</p>
                         <Badge variant="outline" className="text-[8px] h-3.5 px-1 py-0 border-emerald-500/30 text-emerald-500 bg-emerald-500/5 font-bold">Verified</Badge>
                       </div>
-                      <p className="text-sm font-semibold text-gray-900 dark:text-gray-100 truncate pr-6">{currentUser.email}</p>
+                      <p className="text-sm font-semibold text-zinc-900 dark:text-zinc-100 truncate pr-6">{currentUser.email}</p>
                       <Button
                         variant="ghost"
                         size="icon"
@@ -355,20 +355,20 @@ export function UserProfileScreen() {
                     </div>
 
                     {/* Role */}
-                    <div className="p-4 bg-gray-50/50 dark:bg-[#0c0c0e]/30 border border-gray-200/50 dark:border-zinc-800/50 rounded-xl space-y-1">
-                      <p className="text-[10px] uppercase font-bold text-gray-500 dark:text-zinc-400">Primary Authority Role</p>
+                    <div className="p-4 bg-zinc-50/50 dark:bg-[#0c0c0e]/30 border border-zinc-200/50 dark:border-zinc-800/50 rounded-xl space-y-1">
+                      <p className="text-[10px] uppercase font-bold text-zinc-500 dark:text-zinc-400">Primary Authority Role</p>
                       <div className="flex items-center gap-1.5 mt-0.5">
                         <Shield className="size-4 text-emerald-500" />
-                        <span className="text-sm font-semibold text-gray-900 dark:text-gray-100 capitalize">{currentUser.role.replace("_", " ")}</span>
+                        <span className="text-sm font-semibold text-zinc-900 dark:text-zinc-100 capitalize">{currentUser.role.replace("_", " ")}</span>
                       </div>
                     </div>
 
                     {/* Mobile Number */}
-                    <div className="p-4 bg-gray-50/50 dark:bg-[#0c0c0e]/30 border border-gray-200/50 dark:border-zinc-800/50 rounded-xl space-y-1 relative group">
-                      <p className="text-[10px] uppercase font-bold text-gray-500 dark:text-zinc-400">Mobile Number</p>
+                    <div className="p-4 bg-zinc-50/50 dark:bg-[#0c0c0e]/30 border border-zinc-200/50 dark:border-zinc-800/50 rounded-xl space-y-1 relative group">
+                      <p className="text-[10px] uppercase font-bold text-zinc-500 dark:text-zinc-400">Mobile Number</p>
                       <div className="flex items-center gap-1.5 mt-0.5 pr-6">
                         <Phone className="size-4 text-blue-500" />
-                        <span className="text-sm font-semibold text-gray-900 dark:text-gray-100">
+                        <span className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">
                           {currentUser.phone || "+91 98765 43210"}
                         </span>
                       </div>
@@ -385,11 +385,11 @@ export function UserProfileScreen() {
                     </div>
 
                     {/* Residential Address */}
-                    <div className="p-4 bg-gray-50/50 dark:bg-[#0c0c0e]/30 border border-gray-200/50 dark:border-zinc-800/50 rounded-xl space-y-1 relative group md:col-span-2">
-                      <p className="text-[10px] uppercase font-bold text-gray-500 dark:text-zinc-400">Residential Address</p>
+                    <div className="p-4 bg-zinc-50/50 dark:bg-[#0c0c0e]/30 border border-zinc-200/50 dark:border-zinc-800/50 rounded-xl space-y-1 relative group md:col-span-2">
+                      <p className="text-[10px] uppercase font-bold text-zinc-500 dark:text-zinc-400">Residential Address</p>
                       <div className="flex items-start gap-1.5 mt-0.5 pr-6">
                         <MapPin className="size-4 text-rose-500 shrink-0 mt-0.5" />
-                        <span className="text-sm font-semibold text-gray-900 dark:text-gray-100 leading-normal">
+                        <span className="text-sm font-semibold text-zinc-900 dark:text-zinc-100 leading-normal">
                           {currentUser.address || "7/A, Sector-4, HSR Layout, Bangalore, India"}
                         </span>
                       </div>
@@ -410,17 +410,17 @@ export function UserProfileScreen() {
                       <>
                         {/* School Portal URL for Admin */}
                         {currentUser.role === "admin" && (
-                          <div className="p-4 bg-indigo-500/5 dark:bg-indigo-500/10 border border-indigo-500/15 rounded-xl space-y-2 md:col-span-2 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 relative group">
+                          <div className="p-4 bg-violet-500/5 dark:bg-violet-500/10 border border-violet-500/15 rounded-xl space-y-2 md:col-span-2 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 relative group">
                             <div className="space-y-0.5 min-w-0 flex-1">
-                              <p className="text-[10px] uppercase font-bold text-indigo-600 dark:text-indigo-400">Shareable School Portal URL</p>
-                              <p className="text-xs font-mono font-bold text-gray-900 dark:text-gray-100 break-all">
+                              <p className="text-[10px] uppercase font-bold text-violet-600 dark:text-violet-400">Shareable School Portal URL</p>
+                              <p className="text-xs font-mono font-bold text-zinc-900 dark:text-zinc-100 break-all">
                                 {getSchoolUrl()}
                               </p>
                             </div>
                             <Button
                               onClick={handleCopySchoolUrl}
                               variant="outline"
-                              className="h-8 border-indigo-500/25 hover:bg-indigo-500/10 dark:hover:bg-indigo-500/20 text-indigo-600 dark:text-indigo-400 text-xs font-bold rounded-lg shrink-0 gap-1.5 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-sm active:translate-y-0 active:scale-[0.97]"
+                              className="h-8 border-violet-500/25 hover:bg-violet-500/10 dark:hover:bg-violet-500/20 text-violet-600 dark:text-violet-400 text-xs font-bold rounded-lg shrink-0 gap-1.5 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-sm active:translate-y-0 active:scale-[0.97]"
                             >
                               {copiedField === "SchoolUrl" ? <Check className="size-3.5 text-green-500" /> : <Copy className="size-3.5" />}
                               Copy URL
@@ -428,9 +428,9 @@ export function UserProfileScreen() {
                           </div>
                         )}
                         {/* School Slug */}
-                        <div className="p-4 bg-gray-50/50 dark:bg-[#0c0c0e]/30 border border-gray-200/50 dark:border-zinc-800/50 rounded-xl space-y-1 relative group">
-                          <p className="text-[10px] uppercase font-bold text-gray-500 dark:text-zinc-400">School URL Identifier</p>
-                          <p className="text-sm font-semibold text-gray-900 dark:text-gray-100 break-all pr-10">{currentTenantSlug || currentUser.tenantSlug || "N/A"}</p>
+                        <div className="p-4 bg-zinc-50/50 dark:bg-[#0c0c0e]/30 border border-zinc-200/50 dark:border-zinc-800/50 rounded-xl space-y-1 relative group">
+                          <p className="text-[10px] uppercase font-bold text-zinc-500 dark:text-zinc-400">School URL Identifier</p>
+                          <p className="text-sm font-semibold text-zinc-900 dark:text-zinc-100 break-all pr-10">{currentTenantSlug || currentUser.tenantSlug || "N/A"}</p>
                           <Button
                             variant="ghost"
                             size="icon"
@@ -446,11 +446,11 @@ export function UserProfileScreen() {
                   </div>
 
                   {/* Motivational Quote banner */}
-                  <div className="p-4 bg-gradient-to-br from-indigo-50 to-indigo-100/50 dark:from-indigo-950/20 dark:to-slate-900 border border-indigo-100 dark:border-indigo-950/50 rounded-2xl flex items-start gap-3 mt-6">
-                    <CheckCircle2 className="size-5 text-indigo-600 dark:text-indigo-400 shrink-0 mt-0.5" />
+                  <div className="p-4 bg-gradient-to-br from-violet-50 to-violet-100/50 dark:from-violet-950/20 dark:to-zinc-900 border border-violet-100 dark:border-violet-950/50 rounded-2xl flex items-start gap-3 mt-6">
+                    <CheckCircle2 className="size-5 text-violet-600 dark:text-violet-400 shrink-0 mt-0.5" />
                     <div>
-                      <p className="text-sm font-semibold text-indigo-950 dark:text-indigo-200">Role Purpose & Duty</p>
-                      <p className="text-xs text-indigo-700 dark:text-indigo-300/85 mt-1 leading-relaxed italic">
+                      <p className="text-sm font-semibold text-violet-950 dark:text-violet-200">Role Purpose & Duty</p>
+                      <p className="text-xs text-violet-700 dark:text-violet-300/85 mt-1 leading-relaxed italic">
                         &ldquo;{roleQuotes[currentUser.role]}&rdquo;
                       </p>
                     </div>
@@ -463,7 +463,7 @@ export function UserProfileScreen() {
 
             {/* Tab 3: Security & Themes */}
             <TabsContent value="settings" className="mt-4 focus-visible:outline-none">
-              <Card className="border border-gray-200/80 dark:border-zinc-800/80 shadow-sm rounded-2xl">
+              <Card className="border border-zinc-200/80 dark:border-zinc-800/80 shadow-sm rounded-2xl">
                 <CardHeader>
                   <CardTitle className="text-lg font-bold">Preferences & Security</CardTitle>
                   <CardDescription>Customize your workspace themes and lock down credentials.</CardDescription>
@@ -473,7 +473,7 @@ export function UserProfileScreen() {
                   <div className="space-y-3">
                     <div>
                       <h4 className="text-sm font-semibold">Workspace Appearance Mode</h4>
-                      <p className="text-xs text-gray-500 dark:text-zinc-400">Select a premium color scheme tailored for maximum comfort.</p>
+                      <p className="text-xs text-zinc-500 dark:text-zinc-400">Select a premium color scheme tailored for maximum comfort.</p>
                     </div>
                     <div className="grid grid-cols-3 gap-3">
                       <Button
@@ -497,7 +497,7 @@ export function UserProfileScreen() {
                         onClick={() => setTheme("system")}
                         className="h-20 flex flex-col gap-2 rounded-xl justify-center items-center font-bold"
                       >
-                        <Laptop className="size-5 text-slate-500" />
+                        <Laptop className="size-5 text-zinc-500" />
                         <span className="text-xs">System Default</span>
                       </Button>
                     </div>
@@ -506,13 +506,13 @@ export function UserProfileScreen() {
                   <Separator />
 
                   {/* Password reset & security credentials */}
-                  <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 p-4 bg-gray-50 dark:bg-zinc-950 border border-gray-200/50 dark:border-zinc-800/50 rounded-2xl">
+                  <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 p-4 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200/50 dark:border-zinc-800/50 rounded-2xl">
                     <div className="space-y-1">
                       <div className="flex items-center gap-2">
                         <Lock className="size-4 text-orange-500" />
                         <h4 className="text-sm font-semibold">Account Access Code</h4>
                       </div>
-                      <p className="text-xs text-gray-500 dark:text-zinc-400 leading-relaxed">
+                      <p className="text-xs text-zinc-500 dark:text-zinc-400 leading-relaxed">
                         Secure password used to authenticate your login sessions. Update regularly to prevent breach.
                       </p>
                     </div>
@@ -533,7 +533,7 @@ export function UserProfileScreen() {
         <div className="space-y-6 lg:mt-[52px]">
 
           {/* Quick Actions Card */}
-          <Card className="border border-gray-200/80 dark:border-zinc-800/80 shadow-sm rounded-2xl">
+          <Card className="border border-zinc-200/80 dark:border-zinc-800/80 shadow-sm rounded-2xl">
             <CardHeader>
               <CardTitle className="text-base font-bold">Quick Actions</CardTitle>
             </CardHeader>
@@ -576,18 +576,18 @@ export function UserProfileScreen() {
 
       {/* 5. GORGEOUS PREMIUM EDIT PROFILE DIALOG */}
       <Dialog open={isEditOpen} onOpenChange={setIsEditOpen}>
-        <DialogContent className="sm:max-w-[480px] p-6 rounded-3xl border border-gray-200/80 dark:border-zinc-800/80 shadow-2xl bg-white dark:bg-[#09090b]">
+        <DialogContent className="sm:max-w-[480px] p-6 rounded-3xl border border-zinc-200/80 dark:border-zinc-800/80 shadow-2xl bg-white dark:bg-[#09090b]">
           <DialogHeader className="space-y-1.5">
             <DialogTitle className="text-xl font-black tracking-tight">Edit Profile Details</DialogTitle>
-            <DialogDescription className="text-xs text-gray-500 dark:text-zinc-400">
+            <DialogDescription className="text-xs text-zinc-500 dark:text-zinc-400">
               Modify your personal verified details. Changes reflect instantly.
             </DialogDescription>
           </DialogHeader>
 
           <form onSubmit={handleSaveProfile} className="space-y-5 mt-2">
             {/* Avatar Uploader Section */}
-            <div className="flex flex-col items-center gap-3 p-4 bg-gray-50/50 dark:bg-zinc-900/20 border border-gray-200/50 dark:border-zinc-800/50 rounded-2xl">
-              <Label className="text-xs font-bold text-gray-500 dark:text-zinc-400 uppercase tracking-wider">Profile Photo</Label>
+            <div className="flex flex-col items-center gap-3 p-4 bg-zinc-50/50 dark:bg-zinc-900/20 border border-zinc-200/50 dark:border-zinc-800/50 rounded-2xl">
+              <Label className="text-xs font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">Profile Photo</Label>
               
               <div className="relative group">
                 <Avatar className="size-20 border-2 border-emerald-500/20 shadow-lg">
@@ -609,7 +609,7 @@ export function UserProfileScreen() {
 
               {/* Preset illustrations */}
               <div className="space-y-1.5 w-full text-center">
-                <span className="text-[10px] text-gray-500 dark:text-zinc-400 font-semibold">Or choose a premium profile preset</span>
+                <span className="text-[10px] text-zinc-500 dark:text-zinc-400 font-semibold">Or choose a premium profile preset</span>
                 <div className="flex items-center justify-center gap-2 mt-1">
                   {PRESET_AVATARS.map((avatarUrl, idx) => (
                     <button
@@ -632,45 +632,45 @@ export function UserProfileScreen() {
             {/* Input fields */}
             <div className="space-y-3.5">
               <div className="space-y-1">
-                <Label htmlFor="edit-name" className="text-xs font-bold text-gray-500 dark:text-zinc-400">Full Name</Label>
+                <Label htmlFor="edit-name" className="text-xs font-bold text-zinc-500 dark:text-zinc-400">Full Name</Label>
                 <Input
                   id="edit-name"
                   value={editName}
                   onChange={(e) => setEditName(e.target.value)}
                   placeholder="Enter your full name"
-                  className="rounded-xl border-gray-200/80 dark:border-zinc-800/80 h-10 font-medium"
+                  className="rounded-xl border-zinc-200/80 dark:border-zinc-800/80 h-10 font-medium"
                 />
               </div>
 
               <div className="space-y-1">
-                <Label htmlFor="edit-phone" className="text-xs font-bold text-gray-500 dark:text-zinc-400">Mobile Number</Label>
+                <Label htmlFor="edit-phone" className="text-xs font-bold text-zinc-500 dark:text-zinc-400">Mobile Number</Label>
                 <Input
                   id="edit-phone"
                   value={editPhone}
                   onChange={(e) => setEditPhone(e.target.value)}
                   placeholder="+91 98765 43210"
-                  className="rounded-xl border-gray-200/80 dark:border-zinc-800/80 h-10 font-medium"
+                  className="rounded-xl border-zinc-200/80 dark:border-zinc-800/80 h-10 font-medium"
                 />
               </div>
 
               <div className="space-y-1">
-                <Label htmlFor="edit-address" className="text-xs font-bold text-gray-500 dark:text-zinc-400">Residential Address</Label>
+                <Label htmlFor="edit-address" className="text-xs font-bold text-zinc-500 dark:text-zinc-400">Residential Address</Label>
                 <Textarea
                   id="edit-address"
                   value={editAddress}
                   onChange={(e) => setEditAddress(e.target.value)}
                   placeholder="Enter residential address"
-                  className="rounded-xl border-gray-200/80 dark:border-zinc-800/80 min-h-[70px] resize-none font-medium text-xs leading-normal"
+                  className="rounded-xl border-zinc-200/80 dark:border-zinc-800/80 min-h-[70px] resize-none font-medium text-xs leading-normal"
                 />
               </div>
             </div>
 
-            <DialogFooter className="flex gap-2 sm:gap-0 pt-2 border-t border-gray-100 dark:border-zinc-900">
+            <DialogFooter className="flex gap-2 sm:gap-0 pt-2 border-t border-zinc-100 dark:border-zinc-900">
               <Button
                 type="button"
                 variant="ghost"
                 onClick={() => setIsEditOpen(false)}
-                className="rounded-xl font-bold text-xs hover:bg-gray-100 dark:hover:bg-zinc-900"
+                className="rounded-xl font-bold text-xs hover:bg-zinc-100 dark:hover:bg-zinc-900"
               >
                 Cancel
               </Button>

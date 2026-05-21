@@ -16,7 +16,7 @@ export function AttendanceCalendar({ data, isPremium, onPrev, onNext, currentPer
   const weekDays = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
   return (
-    <Card className="rounded-xl shadow-sm overflow-hidden border-none bg-white/50 dark:bg-gray-900/50 backdrop-blur-sm">
+    <Card className="rounded-xl shadow-sm overflow-hidden border-none bg-white/50 dark:bg-zinc-900/50 backdrop-blur-sm">
       <CardHeader className="p-3 sm:p-4 pb-2">
         <div className="flex flex-row items-center justify-between gap-2">
           <div className="flex items-center gap-2 sm:gap-3">
@@ -24,7 +24,7 @@ export function AttendanceCalendar({ data, isPremium, onPrev, onNext, currentPer
               <Calendar className="size-4 sm:size-5 text-amber-600" />
             </div>
             <div>
-              <CardTitle className="text-xs sm:text-sm font-bold text-gray-900 dark:text-gray-100">
+              <CardTitle className="text-xs sm:text-sm font-bold text-zinc-900 dark:text-zinc-100">
                 Calendar
               </CardTitle>
               <CardDescription className="text-[9px] sm:text-[10px] font-bold text-amber-600 dark:text-amber-400 uppercase tracking-widest">
@@ -33,21 +33,21 @@ export function AttendanceCalendar({ data, isPremium, onPrev, onNext, currentPer
             </div>
           </div>
 
-          <div className="flex items-center gap-1 bg-gray-100/80 dark:bg-gray-800/80 p-0.5 sm:p-1 rounded-xl border border-gray-200/50 dark:border-gray-700/50">
+          <div className="flex items-center gap-1 bg-zinc-100/80 dark:bg-zinc-800/80 p-0.5 sm:p-1 rounded-xl border border-zinc-200/50 dark:border-zinc-700/50">
             <button
               onClick={onPrev}
-              className={`p-1 sm:p-1.5 rounded-lg transition-all ${isPremium ? "hover:bg-white dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200 shadow-sm" : "opacity-30 cursor-not-allowed text-gray-400"}`}
+              className={`p-1 sm:p-1.5 rounded-lg transition-all ${isPremium ? "hover:bg-white dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-200 shadow-sm" : "opacity-30 cursor-not-allowed text-zinc-400"}`}
               title={isPremium ? "Previous" : "Premium Only"}
             >
               <ChevronLeft className="size-3.5 sm:size-4" />
             </button>
-            <div className="px-1 sm:px-2 text-[8px] sm:text-[9px] font-black uppercase tracking-tighter sm:tracking-widest text-gray-400 dark:text-gray-500 flex items-center gap-0.5">
+            <div className="px-1 sm:px-2 text-[8px] sm:text-[9px] font-black uppercase tracking-tighter sm:tracking-widest text-zinc-400 dark:text-zinc-500 flex items-center gap-0.5">
               {!isPremium && <Lock className="size-2" />}
               <span>History</span>
             </div>
             <button
               onClick={onNext}
-              className={`p-1 sm:p-1.5 rounded-lg transition-all ${isPremium ? "hover:bg-white dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200 shadow-sm" : "opacity-30 cursor-not-allowed text-gray-400"}`}
+              className={`p-1 sm:p-1.5 rounded-lg transition-all ${isPremium ? "hover:bg-white dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-200 shadow-sm" : "opacity-30 cursor-not-allowed text-zinc-400"}`}
               title={isPremium ? "Next" : "Premium Only"}
             >
               <ChevronRight className="size-3.5 sm:size-4" />
@@ -58,7 +58,7 @@ export function AttendanceCalendar({ data, isPremium, onPrev, onNext, currentPer
       <CardContent className="p-2 sm:p-4">
         <div className="grid grid-cols-7 gap-1 mb-1.5">
           {weekDays.map((day) => (
-            <div key={day} className="text-center text-[9px] sm:text-[10px] font-bold text-gray-400 dark:text-gray-600 uppercase py-1">
+            <div key={day} className="text-center text-[9px] sm:text-[10px] font-bold text-zinc-400 dark:text-zinc-600 uppercase py-1">
               {day}
             </div>
           ))}
@@ -83,15 +83,15 @@ export function AttendanceCalendar({ data, isPremium, onPrev, onNext, currentPer
           ))}
         </div>
 
-        <div className="flex flex-wrap items-center justify-center gap-x-3 gap-y-1.5 mt-4 pt-3 border-t border-gray-100 dark:border-gray-800">
+        <div className="flex flex-wrap items-center justify-center gap-x-3 gap-y-1.5 mt-4 pt-3 border-t border-zinc-100 dark:border-zinc-800">
           {[
             { label: "Present", color: "bg-emerald-500" },
             { label: "Absent", color: "bg-red-500" },
-            { label: "Off", color: "bg-gray-200 dark:bg-gray-800" },
+            { label: "Off", color: "bg-zinc-200 dark:bg-zinc-800" },
           ].map((item) => (
             <div
               key={item.label}
-              className="flex items-center gap-1 text-[8px] sm:text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-tighter sm:tracking-wide"
+              className="flex items-center gap-1 text-[8px] sm:text-[10px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-tighter sm:tracking-wide"
             >
               <div className={`size-2 rounded-full ${item.color}`} />
               {item.label}

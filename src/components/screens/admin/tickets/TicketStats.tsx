@@ -19,10 +19,10 @@ export function TicketStats({ stats }: TicketStatsProps) {
         <CardContent className="p-4">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">
+              <p className="text-xs font-medium text-zinc-500 dark:text-zinc-400 uppercase tracking-wide">
                 Open
               </p>
-              <p className="text-2xl font-bold text-gray-900 dark:text-gray-100 mt-1">
+              <p className="text-2xl font-bold text-zinc-900 dark:text-zinc-100 mt-1">
                 {stats.open}
               </p>
             </div>
@@ -36,10 +36,10 @@ export function TicketStats({ stats }: TicketStatsProps) {
         <CardContent className="p-4">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">
+              <p className="text-xs font-medium text-zinc-500 dark:text-zinc-400 uppercase tracking-wide">
                 In Progress
               </p>
-              <p className="text-2xl font-bold text-gray-900 dark:text-gray-100 mt-1">
+              <p className="text-2xl font-bold text-zinc-900 dark:text-zinc-100 mt-1">
                 {stats.in_progress}
               </p>
             </div>
@@ -53,10 +53,10 @@ export function TicketStats({ stats }: TicketStatsProps) {
         <CardContent className="p-4">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">
+              <p className="text-xs font-medium text-zinc-500 dark:text-zinc-400 uppercase tracking-wide">
                 Resolved
               </p>
-              <p className="text-2xl font-bold text-gray-900 dark:text-gray-100 mt-1">
+              <p className="text-2xl font-bold text-zinc-900 dark:text-zinc-100 mt-1">
                 {stats.resolved}
               </p>
             </div>
@@ -66,19 +66,19 @@ export function TicketStats({ stats }: TicketStatsProps) {
           </div>
         </CardContent>
       </Card>
-      <Card className="border-gray-200 dark:border-gray-800 bg-gray-50/30 dark:bg-gray-950/10">
+      <Card className="border-zinc-200 dark:border-zinc-800 bg-zinc-50/30 dark:bg-zinc-950/10">
         <CardContent className="p-4">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">
+              <p className="text-xs font-medium text-zinc-500 dark:text-zinc-400 uppercase tracking-wide">
                 Closed
               </p>
-              <p className="text-2xl font-bold text-gray-900 dark:text-gray-100 mt-1">
+              <p className="text-2xl font-bold text-zinc-900 dark:text-zinc-100 mt-1">
                 {stats.closed}
               </p>
             </div>
-            <div className="size-10 rounded-lg bg-gray-100 dark:bg-gray-800 flex items-center justify-center">
-              <XCircle className="size-5 text-gray-500 dark:text-gray-400" />
+            <div className="size-10 rounded-lg bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center">
+              <XCircle className="size-5 text-zinc-500 dark:text-zinc-400" />
             </div>
           </div>
         </CardContent>

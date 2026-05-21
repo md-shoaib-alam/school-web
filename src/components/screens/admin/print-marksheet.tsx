@@ -120,7 +120,7 @@ export function AdminPrintMarksheet() {
       </div>
 
       {exams.filter(e => e.status === 'completed').length === 0 ? (
-        <div className="flex flex-col items-center justify-center p-12 border-2 border-dashed border-gray-200 dark:border-zinc-800 rounded-2xl bg-card text-center text-muted-foreground">
+        <div className="flex flex-col items-center justify-center p-12 border-2 border-dashed border-zinc-200 dark:border-zinc-800 rounded-2xl bg-card text-center text-muted-foreground">
           <Trophy className="size-16 mb-4 text-emerald-500/40" />
           <h3 className="text-lg font-semibold text-foreground">No Completed Exams</h3>
           <p className="text-sm mt-1 max-w-md">There are no completed or finalized exams to print marksheets for yet.</p>
@@ -128,11 +128,11 @@ export function AdminPrintMarksheet() {
       ) : (
         <div className="space-y-4">
           {/* Dual Filter Selectors */}
-          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 bg-card p-3 rounded-xl border border-gray-100 dark:border-zinc-800/80 shadow-sm">
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 bg-card p-3 rounded-xl border border-zinc-100 dark:border-zinc-800/80 shadow-sm">
             <div className="flex flex-1 flex-col sm:flex-row items-stretch sm:items-center gap-4">
               <div className="w-full sm:w-[260px]">
                 <Select value={publishedAcademicYearFilter} onValueChange={setPublishedAcademicYearFilter}>
-                  <SelectTrigger className="w-full h-9 border-gray-200 dark:border-zinc-800 rounded-lg text-xs font-semibold">
+                  <SelectTrigger className="w-full h-9 border-zinc-200 dark:border-zinc-800 rounded-lg text-xs font-semibold">
                     <div className="flex items-center gap-2">
                       <span className="text-muted-foreground font-normal">Academic Year:</span>
                       <SelectValue placeholder="Select Academic Year" />
@@ -150,7 +150,7 @@ export function AdminPrintMarksheet() {
 
               <div className="w-full sm:w-[220px]">
                 <Select value={publishedClassFilter} onValueChange={setPublishedClassFilter}>
-                  <SelectTrigger className="w-full h-9 border-gray-200 dark:border-zinc-800 rounded-lg text-xs font-semibold">
+                  <SelectTrigger className="w-full h-9 border-zinc-200 dark:border-zinc-800 rounded-lg text-xs font-semibold">
                     <div className="flex items-center gap-2">
                       <span className="text-muted-foreground font-normal">Class:</span>
                       <SelectValue placeholder="All Classes" />
@@ -181,7 +181,7 @@ export function AdminPrintMarksheet() {
           </div>
 
           {classesWithCompletedExams.length === 0 ? (
-            <div className="flex flex-col items-center justify-center p-12 border border-dashed border-gray-200 dark:border-zinc-800 rounded-2xl bg-card text-center text-muted-foreground">
+            <div className="flex flex-col items-center justify-center p-12 border border-dashed border-zinc-200 dark:border-zinc-800 rounded-2xl bg-card text-center text-muted-foreground">
               <Trophy className="size-12 mb-3 text-zinc-300 dark:text-zinc-700" />
               <h3 className="text-base font-semibold text-foreground">No matching classes found</h3>
               <p className="text-xs mt-1 max-w-md">No classes with completed exams match your filters.</p>
@@ -207,7 +207,7 @@ export function AdminPrintMarksheet() {
                   return (
                     <Card 
                       key={c.id} 
-                      className={`border dark:border-zinc-800 shadow-sm overflow-hidden transition-all duration-300 hover:shadow-md bg-card relative py-0 gap-0 ${isExpanded ? 'border-l-4 border-l-emerald-600 dark:border-l-emerald-500 border-gray-200' : 'border-gray-100'}`}
+                      className={`border dark:border-zinc-800 shadow-sm overflow-hidden transition-all duration-300 hover:shadow-md bg-card relative py-0 gap-0 ${isExpanded ? 'border-l-4 border-l-emerald-600 dark:border-l-emerald-500 border-zinc-200' : 'border-zinc-100'}`}
                     >
                       <div 
                         onClick={() => setExpandedClasses(prev => ({ ...prev, [c.id]: !prev[c.id] }))}
@@ -240,14 +240,14 @@ export function AdminPrintMarksheet() {
                             <FileText className="size-3.5" />
                             <span className="hidden xs:inline">Generate Marksheets</span>
                           </Button>
-                          <div className={`p-1.5 rounded-full transition-all duration-300 ${isExpanded ? 'bg-emerald-50 dark:bg-emerald-950/50 text-emerald-600 dark:text-emerald-400' : 'bg-gray-50 dark:bg-zinc-900 text-muted-foreground'}`}>
+                          <div className={`p-1.5 rounded-full transition-all duration-300 ${isExpanded ? 'bg-emerald-50 dark:bg-emerald-950/50 text-emerald-600 dark:text-emerald-400' : 'bg-zinc-50 dark:bg-zinc-900 text-muted-foreground'}`}>
                             <ChevronDown className={`size-4 transition-transform duration-300 ${isExpanded ? 'rotate-180' : ''}`} />
                           </div>
                         </div>
                       </div>
 
                       {/* Collapsible Content */}
-                      <div className={`transition-all duration-300 ease-in-out overflow-hidden ${isExpanded ? 'max-h-[2500px] border-t border-gray-100 dark:border-zinc-800' : 'max-h-0'}`}>
+                      <div className={`transition-all duration-300 ease-in-out overflow-hidden ${isExpanded ? 'max-h-[2500px] border-t border-zinc-100 dark:border-zinc-800' : 'max-h-0'}`}>
                         <div className="p-4 bg-zinc-50/30 dark:bg-zinc-950/10 space-y-4">
                           <div className="text-xs text-muted-foreground font-medium">
                             Published exams list is ready. Click "Generate Marksheets" above to begin printing midterm, final, or combined report cards.

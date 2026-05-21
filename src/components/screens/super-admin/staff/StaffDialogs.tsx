@@ -166,7 +166,7 @@ export function StaffDialogs({
           </div>
 
           {editingStaff && (
-            <div className="flex items-center gap-3 p-3 rounded-2xl bg-gray-50 dark:bg-gray-900 border-2 border-transparent">
+            <div className="flex items-center gap-3 p-3 rounded-2xl bg-zinc-50 dark:bg-zinc-900 border-2 border-transparent">
               <Checkbox
                 id="staff-active"
                 className="rounded-md border-2"

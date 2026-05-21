@@ -52,7 +52,7 @@ export const SCHOOL_PLANS: SchoolPlan[] = [
     description: "Ideal for small preschools and private tutoring centers.",
     price: 499,
     icon: <Zap className="size-6" />,
-    color: "indigo",
+    color: "violet",
     limits: {
       students: 100,
       teachers: 20,

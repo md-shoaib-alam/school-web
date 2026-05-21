@@ -198,7 +198,7 @@ export function StudentAttendance() {
       case "absent":
         return "bg-red-400";
       default:
-        return "bg-gray-200 dark:bg-gray-700";
+        return "bg-zinc-200 dark:bg-zinc-700";
     }
   };
 
@@ -208,10 +208,10 @@ export function StudentAttendance() {
     <div className="space-y-6">
       {/* Header */}
       <div>
-        <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">
+        <h2 className="text-xl font-semibold text-zinc-900 dark:text-zinc-100">
           My Attendance
         </h2>
-        <p className="text-sm text-gray-600 dark:text-gray-400 mt-0.5">
+        <p className="text-sm text-zinc-600 dark:text-zinc-400 mt-0.5">
           Track your daily attendance and monthly trends
         </p>
       </div>
@@ -251,18 +251,18 @@ export function StudentAttendance() {
                 />
               </svg>
               <div className="absolute inset-0 flex flex-col items-center justify-center">
-                <span className="text-3xl font-bold text-gray-900 dark:text-gray-100">
+                <span className="text-3xl font-bold text-zinc-900 dark:text-zinc-100">
                   {stats.rate}%
                 </span>
-                <span className="text-xs text-gray-600 dark:text-gray-400">
+                <span className="text-xs text-zinc-600 dark:text-zinc-400">
                   Attendance
                 </span>
               </div>
             </div>
-            <p className="text-sm font-medium text-gray-700 dark:text-gray-300 mt-4">
+            <p className="text-sm font-medium text-zinc-700 dark:text-zinc-300 mt-4">
               {student ? student.name : "Student"}
             </p>
-            <p className="text-xs text-gray-400 dark:text-gray-500">
+            <p className="text-xs text-zinc-400 dark:text-zinc-500">
               {student?.className || "Class"} &middot; {stats.total} total days
             </p>
           </CardContent>
@@ -283,10 +283,10 @@ export function StudentAttendance() {
                   <CheckCircle2 className="size-5 text-emerald-600" />
                 </div>
                 <div>
-                  <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">
+                  <p className="text-2xl font-bold text-zinc-900 dark:text-zinc-100">
                     {stats.present}
                   </p>
-                  <p className="text-xs text-gray-600 dark:text-gray-400">
+                  <p className="text-xs text-zinc-600 dark:text-zinc-400">
                     Present Days
                   </p>
                 </div>
@@ -303,10 +303,10 @@ export function StudentAttendance() {
                   <XCircle className="size-5 text-red-600" />
                 </div>
                 <div>
-                  <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">
+                  <p className="text-2xl font-bold text-zinc-900 dark:text-zinc-100">
                     {stats.absent}
                   </p>
-                  <p className="text-xs text-gray-600 dark:text-gray-400">
+                  <p className="text-xs text-zinc-600 dark:text-zinc-400">
                     Absent Days
                   </p>
                 </div>
@@ -320,22 +320,22 @@ export function StudentAttendance() {
             </div>
 
             {/* Legend */}
-            <div className="flex items-center gap-4 mt-5 pt-4 border-t border-gray-100">
+            <div className="flex items-center gap-4 mt-5 pt-4 border-t border-zinc-100">
               <div className="flex items-center gap-1.5">
                 <div className="size-3 rounded-sm bg-emerald-400" />
-                <span className="text-xs text-gray-600 dark:text-gray-400">
+                <span className="text-xs text-zinc-600 dark:text-zinc-400">
                   Present
                 </span>
               </div>
               <div className="flex items-center gap-1.5">
                 <div className="size-3 rounded-sm bg-red-400" />
-                <span className="text-xs text-gray-600 dark:text-gray-400">
+                <span className="text-xs text-zinc-600 dark:text-zinc-400">
                   Absent
                 </span>
               </div>
               <div className="flex items-center gap-1.5">
-                <div className="size-3 rounded-sm bg-gray-200 dark:bg-gray-700" />
-                <span className="text-xs text-gray-600 dark:text-gray-400">
+                <div className="size-3 rounded-sm bg-zinc-200 dark:bg-zinc-700" />
+                <span className="text-xs text-zinc-600 dark:text-zinc-400">
                   No Data
                 </span>
               </div>
@@ -354,7 +354,7 @@ export function StudentAttendance() {
         </CardHeader>
         <CardContent>
           {!recharts ? (
-            <div className="h-[260px] animate-pulse bg-gray-200/50 dark:bg-gray-800/50 rounded-lg" />
+            <div className="h-[260px] animate-pulse bg-zinc-200/50 dark:bg-zinc-800/50 rounded-lg" />
           ) : monthlyData.some((m) => m.rate > 0) ? (
             <ChartContainer config={chartConfig} className="h-[260px] w-full">
               {(() => {
@@ -397,7 +397,7 @@ export function StudentAttendance() {
               })()}
             </ChartContainer>
           ) : (
-            <div className="h-[260px] flex items-center justify-center text-gray-400 dark:text-gray-500">
+            <div className="h-[260px] flex items-center justify-center text-zinc-400 dark:text-zinc-500">
               <div className="text-center">
                 <Calendar className="size-10 mx-auto mb-2 opacity-40" />
                 <p className="text-sm">No monthly data available yet</p>
@@ -426,7 +426,7 @@ export function StudentAttendance() {
             {["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"].map((d) => (
               <div
                 key={d}
-                className="text-center text-[10px] sm:text-xs font-medium text-gray-500 dark:text-gray-400 py-1"
+                className="text-center text-[10px] sm:text-xs font-medium text-zinc-500 dark:text-zinc-400 py-1"
               >
                 {d}
               </div>
@@ -462,8 +462,8 @@ export function StudentAttendance() {
                     className={
                       status === "none"
                         ? isWeekend
-                          ? "text-gray-400 dark:text-gray-500"
-                          : "text-gray-600 dark:text-gray-400"
+                          ? "text-zinc-400 dark:text-zinc-500"
+                          : "text-zinc-600 dark:text-zinc-400"
                         : "text-white"
                     }
                   >

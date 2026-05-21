@@ -56,25 +56,25 @@ export function PurchaseDialog({
 
         {plan && (
           <div className="space-y-4 py-2">
-            <Card className="border-gray-200 dark:border-gray-700 shadow-none">
+            <Card className="border-zinc-200 dark:border-zinc-700 shadow-none">
               <CardContent className="p-4">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="font-semibold text-gray-900 dark:text-gray-100">
+                    <p className="font-semibold text-zinc-900 dark:text-zinc-100">
                       {plan.name} Plan
                     </p>
-                    <p className="text-xs text-gray-500 dark:text-gray-400">
+                    <p className="text-xs text-zinc-500 dark:text-zinc-400">
                       {cycleLabels[cycle]}
                     </p>
                   </div>
                   <div className="text-right">
-                    <p className="text-xl font-bold text-gray-900 dark:text-gray-100">
+                    <p className="text-xl font-bold text-zinc-900 dark:text-zinc-100">
                       {price === 0
                         ? "Free"
                         : `₹${price}`}
                     </p>
                     {originalPrice && (
-                      <p className="text-xs text-gray-400 dark:text-gray-500 line-through">
+                      <p className="text-xs text-zinc-400 dark:text-zinc-500 line-through">
                         ₹{originalPrice}
                       </p>
                     )}

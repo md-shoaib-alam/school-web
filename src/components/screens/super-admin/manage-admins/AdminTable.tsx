@@ -43,7 +43,7 @@ function Tooltip({
   return (
     <div className="relative group">
       {children}
-      <div className="absolute bottom-full right-0 mb-2 px-2 py-1 text-xs bg-gray-900 text-white rounded shadow-lg opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none z-50">
+      <div className="absolute bottom-full right-0 mb-2 px-2 py-1 text-xs bg-zinc-900 text-white rounded shadow-lg opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none z-50">
         {text}
       </div>
     </div>
@@ -112,7 +112,7 @@ export function AdminTable({
                     >
                       <TableCell>
                         <div className="flex items-center gap-3">
-                          <Avatar className="size-10 shrink-0 ring-2 ring-white dark:ring-gray-800 shadow-sm">
+                          <Avatar className="size-10 shrink-0 ring-2 ring-white dark:ring-zinc-800 shadow-sm">
                             <AvatarFallback className="bg-teal-500 text-white text-xs font-bold">
                               {getInitials(admin.name)}
                             </AvatarFallback>

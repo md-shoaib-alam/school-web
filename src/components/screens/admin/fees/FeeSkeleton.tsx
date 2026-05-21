@@ -32,7 +32,7 @@ export function FeeSkeleton() {
       </div>
 
       <Card className="border-none shadow-sm overflow-hidden">
-        <CardHeader className="border-b bg-gray-50/50 dark:bg-gray-900/20">
+        <CardHeader className="border-b bg-zinc-50/50 dark:bg-zinc-900/20">
           <div className="flex justify-between items-center">
             <Skeleton className="h-6 w-32" />
             <Skeleton className="h-9 w-40" />

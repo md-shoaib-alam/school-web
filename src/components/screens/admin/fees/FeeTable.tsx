@@ -66,32 +66,32 @@ export function FeeTable({
   return (
     <div className="overflow-x-auto">
       <Table>
-        <TableHeader className="bg-gray-50/50 dark:bg-gray-900/20">
+        <TableHeader className="bg-zinc-50/50 dark:bg-zinc-900/20">
           <TableRow>
-            <TableHead className="font-bold uppercase text-[10px] tracking-widest text-gray-500">Student</TableHead>
-            <TableHead className="font-bold uppercase text-[10px] tracking-widest text-gray-500">Fee Type</TableHead>
-            <TableHead className="font-bold uppercase text-[10px] tracking-widest text-gray-500">Status</TableHead>
-            <TableHead className="font-bold uppercase text-[10px] tracking-widest text-gray-500">Amount</TableHead>
-            <TableHead className="font-bold uppercase text-[10px] tracking-widest text-gray-500">Due Date</TableHead>
-            <TableHead className="text-right font-bold uppercase text-[10px] tracking-widest text-gray-500">Actions</TableHead>
+            <TableHead className="font-bold uppercase text-[10px] tracking-widest text-zinc-500">Student</TableHead>
+            <TableHead className="font-bold uppercase text-[10px] tracking-widest text-zinc-500">Fee Type</TableHead>
+            <TableHead className="font-bold uppercase text-[10px] tracking-widest text-zinc-500">Status</TableHead>
+            <TableHead className="font-bold uppercase text-[10px] tracking-widest text-zinc-500">Amount</TableHead>
+            <TableHead className="font-bold uppercase text-[10px] tracking-widest text-zinc-500">Due Date</TableHead>
+            <TableHead className="text-right font-bold uppercase text-[10px] tracking-widest text-zinc-500">Actions</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {records.length === 0 ? (
             <TableRow>
-              <TableCell colSpan={6} className="h-32 text-center text-gray-500">
+              <TableCell colSpan={6} className="h-32 text-center text-zinc-500">
                 No fee records found.
               </TableCell>
             </TableRow>
           ) : (
             records.map((record) => (
-              <TableRow key={record.id} className="hover:bg-gray-50/50 dark:hover:bg-gray-900/10 transition-colors">
+              <TableRow key={record.id} className="hover:bg-zinc-50/50 dark:hover:bg-zinc-900/10 transition-colors">
                 <TableCell>
                   <div className="flex flex-col">
-                    <span className="font-bold text-sm text-gray-900 dark:text-gray-100">
+                    <span className="font-bold text-sm text-zinc-900 dark:text-zinc-100">
                       {record.student?.name}
                     </span>
-                    <span className="text-[10px] text-gray-500">
+                    <span className="text-[10px] text-zinc-500">
                       {record.student?.class
                         ? `${record.student.class.name}-${record.student.class.section}`
                         : "No Class"}
@@ -99,7 +99,7 @@ export function FeeTable({
                   </div>
                 </TableCell>
                 <TableCell>
-                  <span className="text-xs font-medium text-gray-700 dark:text-gray-300 capitalize">
+                  <span className="text-xs font-medium text-zinc-700 dark:text-zinc-300 capitalize">
                     {record.type.replace(/_/g, " ")}
                   </span>
                 </TableCell>
@@ -116,7 +116,7 @@ export function FeeTable({
                 </TableCell>
                 <TableCell>
                   <div className="flex flex-col">
-                    <span className="text-sm font-bold text-gray-900 dark:text-gray-100">
+                    <span className="text-sm font-bold text-zinc-900 dark:text-zinc-100">
                       ₹{record.amount.toLocaleString()}
                     </span>
                     {record.paidAmount > 0 && (
@@ -127,7 +127,7 @@ export function FeeTable({
                   </div>
                 </TableCell>
                 <TableCell>
-                  <span className="text-xs text-gray-600 dark:text-gray-400" suppressHydrationWarning>
+                  <span className="text-xs text-zinc-600 dark:text-zinc-400" suppressHydrationWarning>
                     {formatFeeDate(record.dueDate)}
                   </span>
                 </TableCell>

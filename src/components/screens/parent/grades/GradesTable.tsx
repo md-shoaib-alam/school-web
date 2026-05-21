@@ -21,7 +21,7 @@ interface GradesTableProps {
 
 export function GradesTable({ studentName, grades }: GradesTableProps) {
   return (
-    <Card className="rounded-xl shadow-sm shadow-none border-gray-100 dark:border-gray-800">
+    <Card className="rounded-xl shadow-sm shadow-none border-zinc-100 dark:border-zinc-800">
       <CardHeader className="p-4 pb-2 text-left">
         <CardTitle className="text-sm font-semibold flex items-center gap-2">
           <Award className="size-4 text-amber-600" />

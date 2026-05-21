@@ -76,7 +76,7 @@ export function WorkingDaysDialog({
                   {DAY_LABELS[day]}
                 </span>
                 {!isSelected && (
-                  <span className="text-[10px] text-gray-400 dark:text-gray-500 font-medium">
+                  <span className="text-[10px] text-zinc-400 dark:text-zinc-500 font-medium">
                     Holiday
                   </span>
                 )}

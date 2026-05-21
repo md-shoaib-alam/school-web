@@ -110,7 +110,7 @@ export interface Notice {
 }
 
 export const planColors: Record<string, { bg: string; text: string; border: string }> = {
-  basic: { bg: "bg-gray-100 dark:bg-gray-800", text: "text-gray-700 dark:text-gray-300", border: "border-gray-200 dark:border-gray-700" },
+  basic: { bg: "bg-zinc-100 dark:bg-zinc-800", text: "text-zinc-700 dark:text-zinc-300", border: "border-zinc-200 dark:border-zinc-700" },
   standard: { bg: "bg-blue-100 dark:bg-blue-900/30", text: "text-blue-700 dark:text-blue-400", border: "border-blue-200 dark:border-blue-700" },
   premium: { bg: "bg-purple-100 dark:bg-purple-900/30", text: "text-purple-700 dark:text-purple-400", border: "border-purple-200 dark:border-purple-700" },
   enterprise: { bg: "bg-amber-100 dark:bg-amber-900/30", text: "text-amber-700 dark:text-amber-400", border: "border-amber-200 dark:border-amber-700" },
@@ -120,7 +120,7 @@ export const statusColors: Record<string, { bg: string; text: string; icon: Reac
   active: { bg: "bg-emerald-100 dark:bg-emerald-900/30", text: "text-emerald-700 dark:text-emerald-400", icon: React.createElement(CheckCircle2, { className: "size-3" }) },
   trial: { bg: "bg-blue-100 dark:bg-blue-900/30", text: "text-blue-700 dark:text-blue-400", icon: React.createElement(Activity, { className: "size-3" }) },
   suspended: { bg: "bg-red-100 dark:bg-red-900/30", text: "text-red-700 dark:text-red-400", icon: React.createElement(Ban, { className: "size-3" }) },
-  inactive: { bg: "bg-gray-100 dark:bg-gray-800", text: "text-gray-600 dark:text-gray-400", icon: React.createElement(XCircle, { className: "size-3" }) },
+  inactive: { bg: "bg-zinc-100 dark:bg-zinc-800", text: "text-zinc-600 dark:text-zinc-400", icon: React.createElement(XCircle, { className: "size-3" }) },
 };
 
 export const TAB_CONFIG: { value: TabType; label: string; icon: React.ReactNode }[] = [

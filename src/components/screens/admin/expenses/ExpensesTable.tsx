@@ -59,7 +59,7 @@ export function ExpensesTable({
 }: ExpensesTableProps) {
   return (
     <Card className="overflow-hidden border-rose-100 dark:border-rose-900/30 shadow-md">
-      <div className="p-4 border-b bg-gray-50/50 dark:bg-gray-900/50 flex flex-wrap items-center justify-between gap-4">
+      <div className="p-4 border-b bg-zinc-50/50 dark:bg-zinc-900/50 flex flex-wrap items-center justify-between gap-4">
         <div className="flex items-center gap-3">
           <Select 
             value={filters.categoryId || "all"} 
@@ -101,7 +101,7 @@ export function ExpensesTable({
 
       <Table>
         <TableHeader>
-          <TableRow className="bg-gray-50 dark:bg-gray-900/50">
+          <TableRow className="bg-zinc-50 dark:bg-zinc-900/50">
             <TableHead>Date</TableHead>
             <TableHead>Category</TableHead>
             <TableHead>Description</TableHead>

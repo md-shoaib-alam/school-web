@@ -280,12 +280,12 @@ export function AdminTeachers() {
           />
         </div>
         <div className="flex items-center gap-3 w-full sm:w-auto">
-          <div className="flex items-center gap-1 bg-gray-100 dark:bg-gray-800 p-1 rounded-lg">
+          <div className="flex items-center gap-1 bg-zinc-100 dark:bg-zinc-800 p-1 rounded-lg">
             <Button
               variant={viewMode === "table" ? "secondary" : "ghost"}
               size="sm"
               onClick={() => setViewMode("table")}
-              className={`size-8 p-0 ${viewMode === "table" ? "bg-white dark:bg-gray-700 shadow-sm" : ""}`}
+              className={`size-8 p-0 ${viewMode === "table" ? "bg-white dark:bg-zinc-700 shadow-sm" : ""}`}
             >
               <List className="size-4" />
             </Button>
@@ -293,7 +293,7 @@ export function AdminTeachers() {
               variant={viewMode === "grid" ? "secondary" : "ghost"}
               size="sm"
               onClick={() => setViewMode("grid")}
-              className={`size-8 p-0 ${viewMode === "grid" ? "bg-white dark:bg-gray-700 shadow-sm" : ""}`}
+              className={`size-8 p-0 ${viewMode === "grid" ? "bg-white dark:bg-zinc-700 shadow-sm" : ""}`}
             >
               <LayoutGrid className="size-4" />
             </Button>
@@ -326,7 +326,7 @@ export function AdminTeachers() {
           <CardContent className="p-0">
             <div className="overflow-x-auto">
               <table className="w-full text-left text-sm">
-                <thead className="bg-gray-50 dark:bg-gray-800/50 text-gray-500 dark:text-gray-400 uppercase text-[10px] font-bold tracking-wider">
+                <thead className="bg-zinc-50 dark:bg-zinc-800/50 text-zinc-500 dark:text-zinc-400 uppercase text-[10px] font-bold tracking-wider">
                   <tr>
                     <th className="px-6 py-4">Teacher</th>
                     <th className="px-6 py-4 hidden sm:table-cell">Experience</th>
@@ -334,7 +334,7 @@ export function AdminTeachers() {
                     <th className="px-6 py-4 text-center">Actions</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
+                <tbody className="divide-y divide-zinc-100 dark:divide-zinc-800">
                   <LazyMotion features={domAnimation}>
                     <AnimatePresence mode="popLayout">
                       {teachers.map((teacher, index) => {
@@ -352,7 +352,7 @@ export function AdminTeachers() {
                             layout: premiumLayoutTransition,
                             opacity: { duration: 0.2 }
                           }}
-                          className="hover:bg-gray-50/50 dark:hover:bg-gray-800/30 transition-colors"
+                          className="hover:bg-zinc-50/50 dark:hover:bg-zinc-800/30 transition-colors"
                         >
                           <td className="px-6 py-4">
                             <div className="flex items-center gap-3">
@@ -362,21 +362,21 @@ export function AdminTeachers() {
                                 </AvatarFallback>
                               </Avatar>
                               <div className="flex flex-col min-w-0">
-                                <span className="font-bold text-gray-900 dark:text-gray-100 truncate">{teacher.name}</span>
+                                <span className="font-bold text-zinc-900 dark:text-zinc-100 truncate">{teacher.name}</span>
                                 <span className="text-[10px] sm:text-xs text-muted-foreground truncate">{teacher.email}</span>
                                 {/* Mobile-only info */}
                                 <div className="sm:hidden flex flex-wrap gap-1 mt-1">
                                   <span className="text-[10px] text-emerald-600 dark:text-emerald-400 font-medium bg-emerald-50 dark:bg-emerald-900/20 px-1 rounded">
                                     {teacher.experience || 'New'} Exp
                                   </span>
-                                  <span className="text-[10px] text-slate-600 dark:text-slate-400 font-medium bg-slate-50 dark:bg-slate-900/20 px-1 rounded">
+                                  <span className="text-[10px] text-zinc-600 dark:text-zinc-400 font-medium bg-zinc-50 dark:bg-zinc-900/20 px-1 rounded">
                                     {teacher.qualification || 'N/A'}
                                   </span>
                                 </div>
                               </div>
                             </div>
                           </td>
-                          <td className="px-6 py-4 hidden sm:table-cell text-gray-600 dark:text-gray-400 font-medium">
+                          <td className="px-6 py-4 hidden sm:table-cell text-zinc-600 dark:text-zinc-400 font-medium">
                             {teacher.experience || 'N/A'}
                           </td>
                           <td className="px-6 py-4 hidden lg:table-cell">
@@ -385,7 +385,7 @@ export function AdminTeachers() {
                           <td className="px-6 py-4">
                             <div className="flex items-center justify-center gap-2">
                               {canEdit && (
-                                <Button variant="ghost" size="icon" className="size-8 text-gray-400 hover:text-emerald-600" onClick={() => handleOpenEdit(teacher)}>
+                                <Button variant="ghost" size="icon" className="size-8 text-zinc-400 hover:text-emerald-600" onClick={() => handleOpenEdit(teacher)}>
                                   <Pencil className="size-3.5" />
                                 </Button>
                               )}
@@ -397,7 +397,7 @@ export function AdminTeachers() {
                                   }}
                                 >
                                   <AlertDialogTrigger asChild>
-                                    <Button variant="ghost" size="icon" className="size-8 text-gray-400 hover:text-red-600" onClick={() => setDeletingId(teacher.id)}>
+                                    <Button variant="ghost" size="icon" className="size-8 text-zinc-400 hover:text-red-600" onClick={() => setDeletingId(teacher.id)}>
                                       <Trash2 className="size-3.5" />
                                     </Button>
                                   </AlertDialogTrigger>

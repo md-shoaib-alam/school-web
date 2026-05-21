@@ -48,7 +48,7 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
       // 1. Show Toast inside the App
       toast.success(payload.notification?.title || "New Notification", {
         description: payload.notification?.body || "You have a new message",
-        icon: <Bell className="size-5 text-indigo-500" />,
+        icon: <Bell className="size-5 text-violet-500" />,
         duration: 10000
       });
 

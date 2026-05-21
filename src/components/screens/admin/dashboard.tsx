@@ -65,14 +65,14 @@ const COLORS = [
 ];
 
 const priorityColors: Record<string, string> = {
-  normal: "bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300",
+  normal: "bg-zinc-100 text-zinc-700 dark:bg-zinc-800 dark:text-zinc-300",
   important:
     "bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400",
   urgent: "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400",
 };
 
 const priorityBorders: Record<string, string> = {
-  normal: "border-l-gray-400 dark:border-l-gray-500",
+  normal: "border-l-zinc-400 dark:border-l-zinc-500",
   important: "border-l-orange-500",
   urgent: "border-l-red-500",
 };
@@ -460,7 +460,7 @@ export function AdminDashboard() {
                   <p className="text-sm text-muted-foreground text-center py-8">No notices yet</p>
                 ) : (
                   (notices.data ?? []).map((notice) => (
-                    <div key={notice.id} className={`p-3 rounded-lg border border-l-4 ${priorityBorders[notice.priority] || priorityBorders.normal} bg-white dark:bg-gray-900 hover:shadow-sm transition-shadow`}>
+                    <div key={notice.id} className={`p-3 rounded-lg border border-l-4 ${priorityBorders[notice.priority] || priorityBorders.normal} bg-white dark:bg-zinc-900 hover:shadow-sm transition-shadow`}>
                       <div className="flex items-start justify-between gap-2">
                         <div className="min-w-0 flex-1">
                           <p className="text-sm font-medium truncate">{notice.title}</p>

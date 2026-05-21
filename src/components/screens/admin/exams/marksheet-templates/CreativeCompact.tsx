@@ -11,24 +11,24 @@ export const CreativeCompact: React.FC<MarksheetTemplateProps> = ({
 }) => {
   return (
     <div 
-      className="relative bg-white text-slate-800 px-10 py-10 rounded overflow-hidden select-none flex flex-col justify-between shrink-0 text-left h-[1123px] w-[794px] box-border border-4 border-dashed border-indigo-200"
+      className="relative bg-white text-zinc-800 px-10 py-10 rounded overflow-hidden select-none flex flex-col justify-between shrink-0 text-left h-[1123px] w-[794px] box-border border-4 border-dashed border-violet-200"
       style={{ WebkitPrintColorAdjust: 'exact', printColorAdjust: 'exact' }}
     >
       {/* Dynamic Colorful Accent Elements */}
-      <div className="absolute -top-12 -right-12 size-24 bg-gradient-to-br from-indigo-400 to-purple-400 rounded-full blur-xl opacity-20 pointer-events-none" />
+      <div className="absolute -top-12 -right-12 size-24 bg-gradient-to-br from-violet-400 to-purple-400 rounded-full blur-xl opacity-20 pointer-events-none" />
       <div className="absolute -bottom-12 -left-12 size-32 bg-gradient-to-tr from-emerald-300 to-cyan-300 rounded-full blur-xl opacity-20 pointer-events-none" />
 
       {/* Core Document Flow */}
       <div className="space-y-6 z-10">
         
         {/* Creative Header */}
-        <div className="flex justify-between items-center bg-gradient-to-r from-indigo-50 via-purple-50/30 to-white border border-indigo-100 rounded-2xl p-4 font-sans">
+        <div className="flex justify-between items-center bg-gradient-to-r from-violet-50 via-purple-50/30 to-white border border-violet-100 rounded-2xl p-4 font-sans">
           <div className="flex items-center gap-3">
-            <div className="size-10 bg-indigo-600 text-white rounded-xl flex items-center justify-center font-bold text-lg shadow-md shadow-indigo-200">
+            <div className="size-10 bg-violet-600 text-white rounded-xl flex items-center justify-center font-bold text-lg shadow-md shadow-violet-200">
               🚀
             </div>
             <div>
-              <h3 className="font-semibold text-lg text-indigo-955 tracking-tight leading-none uppercase">
+              <h3 className="font-semibold text-lg text-violet-955 tracking-tight leading-none uppercase">
                 {sheet.schoolName}
               </h3>
               <p className="text-[9px] text-purple-600 font-bold uppercase tracking-wider mt-1">
@@ -37,7 +37,7 @@ export const CreativeCompact: React.FC<MarksheetTemplateProps> = ({
             </div>
           </div>
           <div className="text-right">
-            <span className="inline-block text-[8px] bg-indigo-600 text-white px-2.5 py-0.5 rounded-full font-black uppercase tracking-wider">
+            <span className="inline-block text-[8px] bg-violet-600 text-white px-2.5 py-0.5 rounded-full font-black uppercase tracking-wider">
               {marksheetType === 'combined' ? 'Combined Term' : marksheetType.toUpperCase() + ' TERM'}
             </span>
             <p className="text-[9px] text-zinc-400 font-black mt-1">{academicYear}</p>
@@ -47,31 +47,31 @@ export const CreativeCompact: React.FC<MarksheetTemplateProps> = ({
         {/* Student Info Block */}
         <div className="grid grid-cols-2 gap-4 text-xs font-sans">
           <div className="flex items-center gap-3 bg-zinc-50/70 border border-zinc-100 p-3 rounded-xl">
-            <div className="size-8 bg-indigo-100 text-indigo-700 rounded-lg flex items-center justify-center font-bold text-sm shrink-0">👤</div>
+            <div className="size-8 bg-violet-100 text-violet-700 rounded-lg flex items-center justify-center font-bold text-sm shrink-0">👤</div>
             <div className="min-w-0">
               <span className="text-zinc-400 font-bold uppercase text-[7.5px] tracking-wider block">Student</span>
-              <span className="font-extrabold text-slate-800 truncate block">{sheet.studentName}</span>
+              <span className="font-extrabold text-zinc-800 truncate block">{sheet.studentName}</span>
             </div>
           </div>
           <div className="flex items-center gap-3 bg-zinc-50/70 border border-zinc-100 p-3 rounded-xl">
             <div className="size-8 bg-purple-100 text-purple-700 rounded-lg flex items-center justify-center font-bold text-sm shrink-0">🔢</div>
             <div className="min-w-0">
               <span className="text-zinc-400 font-bold uppercase text-[7.5px] tracking-wider block">Roll Number</span>
-              <span className="font-extrabold text-slate-800 font-mono block">{sheet.rollNumber}</span>
+              <span className="font-extrabold text-zinc-800 font-mono block">{sheet.rollNumber}</span>
             </div>
           </div>
           <div className="flex items-center gap-3 bg-zinc-50/70 border border-zinc-100 p-3 rounded-xl">
             <div className="size-8 bg-emerald-100 text-emerald-700 rounded-lg flex items-center justify-center font-bold text-sm shrink-0">🏫</div>
             <div className="min-w-0">
               <span className="text-zinc-400 font-bold uppercase text-[7.5px] tracking-wider block">Grade Form</span>
-              <span className="font-extrabold text-slate-800 truncate block">{classNameStr} - {classSection}</span>
+              <span className="font-extrabold text-zinc-800 truncate block">{classNameStr} - {classSection}</span>
             </div>
           </div>
           <div className="flex items-center gap-3 bg-zinc-50/70 border border-zinc-100 p-3 rounded-xl">
             <div className="size-8 bg-cyan-100 text-cyan-700 rounded-lg flex items-center justify-center font-bold text-sm shrink-0">📅</div>
             <div className="min-w-0">
               <span className="text-zinc-400 font-bold uppercase text-[7.5px] tracking-wider block">Issue Date</span>
-              <span className="font-extrabold text-slate-800 block"><ClientDate /></span>
+              <span className="font-extrabold text-zinc-800 block"><ClientDate /></span>
             </div>
           </div>
         </div>
@@ -80,7 +80,7 @@ export const CreativeCompact: React.FC<MarksheetTemplateProps> = ({
         <div className="overflow-hidden border border-zinc-150 rounded-xl bg-white font-sans shadow-sm">
           <table className="w-full text-xs border-collapse table-fixed">
             <thead>
-              <tr className="bg-gradient-to-r from-indigo-950 to-indigo-900 text-white text-[9.5px]">
+              <tr className="bg-gradient-to-r from-violet-950 to-violet-900 text-white text-[9.5px]">
                 <th className={`font-bold px-3 py-2 text-left whitespace-normal ${marksheetType === 'combined' ? 'w-[32%]' : 'w-[50%]'}`}>Subject Disciplines</th>
                 {marksheetType === 'combined' && <th className="font-bold px-3 py-2 text-center w-[15%]">Midterm</th>}
                 {marksheetType === 'combined' && <th className="font-bold px-3 py-2 text-center w-[15%]">Final</th>}
@@ -92,15 +92,15 @@ export const CreativeCompact: React.FC<MarksheetTemplateProps> = ({
             <tbody>
               {sheet.subjects.map((sub, sIdx) => (
                 <tr key={sIdx} className="border-b border-zinc-100 hover:bg-zinc-50/50">
-                  <td className="px-3 py-2.5 text-left font-black text-indigo-950 truncate">{sub.subjectName}</td>
+                  <td className="px-3 py-2.5 text-left font-black text-violet-950 truncate">{sub.subjectName}</td>
                   {marksheetType === 'combined' && <td className="px-3 py-2.5 text-center font-mono text-zinc-500">{sub.midtermMarks}</td>}
                   {marksheetType === 'combined' && <td className="px-3 py-2.5 text-center font-mono text-zinc-500">{sub.finalMarks}</td>}
-                  <td className="px-3 py-2.5 text-center font-black font-mono text-indigo-600">{sub.obtained}</td>
+                  <td className="px-3 py-2.5 text-center font-black font-mono text-violet-600">{sub.obtained}</td>
                   <td className="px-3 py-2.5 text-center">
-                    <span className="font-black text-indigo-950 font-mono block mb-0.5">{sub.percentage}%</span>
+                    <span className="font-black text-violet-950 font-mono block mb-0.5">{sub.percentage}%</span>
                     <div className="w-12 h-1 bg-zinc-100 rounded-full overflow-hidden mx-auto">
                       <div 
-                        className={`h-full rounded-full ${sub.status === 'pass' ? 'bg-indigo-500' : 'bg-rose-500'}`} 
+                        className={`h-full rounded-full ${sub.status === 'pass' ? 'bg-violet-500' : 'bg-rose-500'}`} 
                         style={{ width: `${Math.min(sub.percentage, 100)}%` }} 
                       />
                     </div>
@@ -125,12 +125,12 @@ export const CreativeCompact: React.FC<MarksheetTemplateProps> = ({
         {/* Creative Circular Summary Scorecard */}
         <div className="grid grid-cols-12 gap-4 font-sans">
           
-          <div className="col-span-5 bg-gradient-to-br from-indigo-900 to-indigo-950 text-white p-4 rounded-2xl flex flex-col justify-between shadow-md shadow-indigo-100">
+          <div className="col-span-5 bg-gradient-to-br from-violet-900 to-violet-950 text-white p-4 rounded-2xl flex flex-col justify-between shadow-md shadow-violet-100">
             <div>
-              <span className="text-indigo-200 font-bold uppercase text-[7.5px] tracking-wider block">Aggregate Marks</span>
-              <span className="font-black text-2xl font-mono block mt-1">{sheet.totalObtainedMarks} <span className="text-indigo-300 text-xs">/ {sheet.totalMaxMarks}</span></span>
+              <span className="text-violet-200 font-bold uppercase text-[7.5px] tracking-wider block">Aggregate Marks</span>
+              <span className="font-black text-2xl font-mono block mt-1">{sheet.totalObtainedMarks} <span className="text-violet-300 text-xs">/ {sheet.totalMaxMarks}</span></span>
             </div>
-            <div className="border-t border-indigo-850 pt-2 mt-4 flex justify-between items-center text-[9px] font-bold text-indigo-200 uppercase tracking-wider">
+            <div className="border-t border-violet-850 pt-2 mt-4 flex justify-between items-center text-[9px] font-bold text-violet-200 uppercase tracking-wider">
               <span>Overall Standing</span>
               <span className={`px-2 py-0.5 rounded text-white ${
                 sheet.status === 'pass' ? 'bg-emerald-500' : 'bg-rose-500'
@@ -140,10 +140,10 @@ export const CreativeCompact: React.FC<MarksheetTemplateProps> = ({
 
           <div className="col-span-3 bg-zinc-50/70 border border-zinc-100 p-4 rounded-2xl flex flex-col items-center justify-between text-center">
             <span className="text-zinc-400 font-bold uppercase text-[7.5px] tracking-wider block">Final Grade</span>
-            <div className="size-14 bg-indigo-50 border-4 border-indigo-500 rounded-full flex items-center justify-center font-black text-indigo-700 text-xl shadow-inner my-2">
+            <div className="size-14 bg-violet-50 border-4 border-violet-500 rounded-full flex items-center justify-center font-black text-violet-700 text-xl shadow-inner my-2">
               {sheet.grade}
             </div>
-            <span className="text-[8px] text-indigo-500 font-bold uppercase tracking-wider">Scholastic Standing</span>
+            <span className="text-[8px] text-violet-500 font-bold uppercase tracking-wider">Scholastic Standing</span>
           </div>
 
           <div className="col-span-4 bg-zinc-50/70 border border-zinc-100 p-4 rounded-2xl flex flex-col items-center justify-between text-center">
@@ -157,8 +157,8 @@ export const CreativeCompact: React.FC<MarksheetTemplateProps> = ({
         </div>
 
         {/* Remarks Section */}
-        <div className="border border-indigo-100 rounded-xl p-4 bg-gradient-to-r from-indigo-50/30 to-purple-50/10 font-sans text-xs">
-          <h5 className="font-semibold text-[9px] uppercase tracking-wider text-indigo-950 mb-1">Assessor Feedback Summary</h5>
+        <div className="border border-violet-100 rounded-xl p-4 bg-gradient-to-r from-violet-50/30 to-purple-50/10 font-sans text-xs">
+          <h5 className="font-semibold text-[9px] uppercase tracking-wider text-violet-950 mb-1">Assessor Feedback Summary</h5>
           <p className="italic text-zinc-600 font-medium leading-relaxed">
             "{sheet.remarks}" {sheet.status === 'pass' ? 'The student has displayed amazing academic growth and solid dedication.' : 'Extra tutorial assistance and concept strengthening are advised.'}
           </p>

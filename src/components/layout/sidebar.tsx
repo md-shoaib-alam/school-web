@@ -98,7 +98,7 @@ export function Sidebar({
                 sidebarOpen ? "justify-between" : "justify-center"
               )
             : cn(
-                "mt-3 mb-2 bg-white dark:bg-zinc-950 border border-gray-200/80 dark:border-zinc-800 shadow-sm flex items-center",
+                "mt-3 mb-2 bg-white dark:bg-zinc-950 border border-zinc-200/80 dark:border-zinc-800 shadow-sm flex items-center",
                 sidebarOpen
                   ? "mx-3 p-3 rounded-xl justify-between"
                   : "size-12 rounded-xl justify-center mx-auto"
@@ -130,7 +130,7 @@ export function Sidebar({
                     "font-bold text-sm",
                     isSuperAdmin
                       ? "text-white"
-                      : "text-gray-900 dark:text-gray-100",
+                      : "text-zinc-900 dark:text-zinc-100",
                   )}
                 >
                   {isSuperAdmin
@@ -140,7 +140,7 @@ export function Sidebar({
                 <p
                   className={cn(
                     "text-xs",
-                    isSuperAdmin ? "text-rose-300" : "text-gray-400",
+                    isSuperAdmin ? "text-rose-300" : "text-zinc-400",
                   )}
                 >
                   {isSuperAdmin ? "Platform Console" : "Management System"}
@@ -157,7 +157,7 @@ export function Sidebar({
             "size-8 transition-all duration-200 hover:scale-105 active:scale-95 shrink-0 rounded-lg",
             isSuperAdmin
               ? "text-teal-200 hover:text-white hover:bg-teal-800/40 border border-teal-800/50 bg-teal-900/20 shadow-sm"
-              : "text-gray-500 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-zinc-900",
+              : "text-zinc-500 hover:text-zinc-800 dark:text-zinc-400 dark:hover:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-900",
           )}
           onClick={toggleSidebar}
         >
@@ -188,10 +188,10 @@ export function Sidebar({
                     isActive && !hasChildren
                       ? isSuperAdmin
                         ? "bg-rose-800/60 text-white font-medium"
-                        : "bg-white dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 shadow-[0_4px_12px_rgba(0,0,0,0.05),0_1px_2px_rgba(0,0,0,0.02)] border border-gray-200/80 dark:border-emerald-900/50 hover:bg-white dark:hover:bg-emerald-900/50 font-semibold"
+                        : "bg-white dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 shadow-[0_4px_12px_rgba(0,0,0,0.05),0_1px_2px_rgba(0,0,0,0.02)] border border-zinc-200/80 dark:border-emerald-900/50 hover:bg-white dark:hover:bg-emerald-900/50 font-semibold"
                       : isSuperAdmin
                         ? "text-rose-200 hover:text-white hover:bg-rose-800/40"
-                        : "text-gray-600 dark:text-gray-400 border border-transparent hover:bg-white hover:shadow-[0_4px_12px_rgba(0,0,0,0.05),0_1px_2px_rgba(0,0,0,0.02)] hover:border-gray-200/80 dark:hover:border-emerald-900/30 hover:text-emerald-600 dark:hover:text-emerald-400",
+                        : "text-zinc-600 dark:text-zinc-400 border border-transparent hover:bg-white hover:shadow-[0_4px_12px_rgba(0,0,0,0.05),0_1px_2px_rgba(0,0,0,0.02)] hover:border-zinc-200/80 dark:hover:border-emerald-900/30 hover:text-emerald-600 dark:hover:text-emerald-400",
                     isActive && hasChildren && "text-emerald-700 font-semibold dark:text-emerald-400"
                   )}
                   onClick={() => {
@@ -241,8 +241,8 @@ export function Sidebar({
                         className={cn(
                           "w-full justify-start gap-3 h-9 px-3 font-normal cursor-pointer transition-all text-sm",
                           resolvedScreen === child.key
-                            ? "bg-white dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 shadow-[0_4px_12px_rgba(0,0,0,0.05),0_1px_2px_rgba(0,0,0,0.02)] border border-gray-200/80 dark:border-emerald-900/50 hover:bg-white dark:hover:bg-emerald-900/50 font-semibold"
-                            : "text-gray-500 border border-transparent hover:text-emerald-600 dark:hover:text-emerald-400 hover:bg-white hover:shadow-[0_4px_12px_rgba(0,0,0,0.05),0_1px_2px_rgba(0,0,0,0.02)] hover:border-gray-200/80"
+                            ? "bg-white dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 shadow-[0_4px_12px_rgba(0,0,0,0.05),0_1px_2px_rgba(0,0,0,0.02)] border border-zinc-200/80 dark:border-emerald-900/50 hover:bg-white dark:hover:bg-emerald-900/50 font-semibold"
+                            : "text-zinc-500 border border-transparent hover:text-emerald-600 dark:hover:text-emerald-400 hover:bg-white hover:shadow-[0_4px_12px_rgba(0,0,0,0.05),0_1px_2px_rgba(0,0,0,0.02)] hover:border-zinc-200/80"
                         )}
                         onClick={() => navigateTo(child.key)}
                       >
@@ -269,7 +269,7 @@ export function Sidebar({
                 !sidebarOpen && "flex items-center justify-center"
               )
             : cn(
-                "bg-white dark:bg-zinc-950 border border-gray-200/80 dark:border-zinc-800 shadow-sm",
+                "bg-white dark:bg-zinc-950 border border-zinc-200/80 dark:border-zinc-800 shadow-sm",
                 sidebarOpen
                   ? "mx-3 mb-3 p-3 rounded-xl"
                   : "size-12 mb-3 rounded-xl flex items-center justify-center mx-auto"
@@ -295,7 +295,7 @@ export function Sidebar({
                   "text-sm font-medium truncate",
                   isSuperAdmin
                     ? "text-white"
-                    : "text-gray-900 dark:text-gray-100",
+                    : "text-zinc-900 dark:text-zinc-100",
                 )}
               >
                 {currentUser.name}
@@ -322,7 +322,7 @@ export function Sidebar({
                     "size-8",
                     isSuperAdmin
                       ? "text-rose-300 hover:bg-rose-800/60 hover:text-white"
-                      : "text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800",
+                      : "text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800",
                   )}
                 >
                   <Settings className="size-4" />

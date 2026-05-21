@@ -54,7 +54,7 @@ export function RoleCard({ role, onEdit, onAssign, onDelete }: RoleCardProps) {
             <div>
               <CardTitle className="text-base">{role.name}</CardTitle>
               {role.description && (
-                <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5 line-clamp-1">
+                <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5 line-clamp-1">
                   {role.description}
                 </p>
               )}
@@ -113,7 +113,7 @@ export function RoleCard({ role, onEdit, onAssign, onDelete }: RoleCardProps) {
         </div>
       </CardHeader>
       <CardContent className="pt-0">
-        <div className="flex items-center gap-4 text-xs text-gray-500 dark:text-gray-400">
+        <div className="flex items-center gap-4 text-xs text-zinc-500 dark:text-zinc-400">
           <button
             onClick={() => onAssign(role)}
             className="flex items-center gap-1 hover:text-blue-600 dark:hover:text-blue-400 transition-colors cursor-pointer"

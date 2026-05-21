@@ -36,7 +36,7 @@ export function ChildrenOverview({ childrenList }: ChildrenOverviewProps) {
     <div className="space-y-4">
       <div className="flex items-center gap-2">
         <GraduationCap className="size-5 text-amber-600" />
-        <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 uppercase tracking-tight">
+        <h3 className="text-lg font-semibold text-zinc-900 dark:text-zinc-100 uppercase tracking-tight">
           Your Children
         </h3>
       </div>
@@ -50,7 +50,7 @@ export function ChildrenOverview({ childrenList }: ChildrenOverviewProps) {
                     {student.name.split(" ").map((n) => n[0]).join("")}
                   </div>
                   <div>
-                    <h4 className="font-semibold text-gray-900 dark:text-gray-100 truncate max-w-[120px]">
+                    <h4 className="font-semibold text-zinc-900 dark:text-zinc-100 truncate max-w-[120px]">
                       {student.name}
                     </h4>
                     <p className="text-xs text-muted-foreground">{student.className}</p>
@@ -73,7 +73,7 @@ export function ChildrenOverview({ childrenList }: ChildrenOverviewProps) {
                 <div>
                   <div className="flex items-center justify-between text-sm mb-1">
                     <span className="text-muted-foreground">Average Score</span>
-                    <span className="font-medium text-gray-900 dark:text-gray-100">
+                    <span className="font-medium text-zinc-900 dark:text-zinc-100">
                       {student.avgPct}% ({student.grade})
                     </span>
                   </div>

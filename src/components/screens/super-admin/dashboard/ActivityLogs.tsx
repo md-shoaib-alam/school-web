@@ -47,7 +47,7 @@ const ACTION_COLORS: Record<string, string> = {
   UPDATE_TENANT: "bg-blue-50 text-blue-700 border-blue-100",
   DELETE_TENANT: "bg-red-50 text-red-700 border-red-100",
   CREATE_USER: "bg-violet-50 text-violet-700 border-violet-100",
-  LOGIN: "bg-gray-50 text-gray-700 border-gray-200",
+  LOGIN: "bg-zinc-50 text-zinc-700 border-zinc-200",
   UPDATE_SUBSCRIPTION: "bg-amber-50 text-amber-700 border-amber-100",
 };
 
@@ -63,7 +63,7 @@ const formatLogTime = (dateStr: string) => {
 
 export function ActivityLogs({ loading, data }: ActivityLogsProps) {
   return (
-    <Card className="border-none shadow-sm bg-white dark:bg-gray-800 overflow-hidden">
+    <Card className="border-none shadow-sm bg-white dark:bg-zinc-800 overflow-hidden">
       <CardHeader>
         <CardTitle className="text-base font-bold flex items-center gap-2">
           <ClipboardList className="size-4 text-emerald-600" /> Recent Platform Activity
@@ -71,10 +71,10 @@ export function ActivityLogs({ loading, data }: ActivityLogsProps) {
         <CardDescription className="text-xs">System-wide audit logs and operations</CardDescription>
       </CardHeader>
       <CardContent className="p-0">
-        <div className="border-t border-gray-50 dark:border-gray-900">
+        <div className="border-t border-zinc-50 dark:border-zinc-900">
           <Table>
             <TableHeader>
-              <TableRow className="bg-gray-50/30 dark:bg-gray-900/30 hover:bg-transparent">
+              <TableRow className="bg-zinc-50/30 dark:bg-zinc-900/30 hover:bg-transparent">
                 <TableHead className="text-[10px] font-black uppercase tracking-widest pl-6">Action</TableHead>
                 <TableHead className="text-[10px] font-black uppercase tracking-widest">Admin / School</TableHead>
                 <TableHead className="text-[10px] font-black uppercase tracking-widest">Details</TableHead>
@@ -92,16 +92,16 @@ export function ActivityLogs({ loading, data }: ActivityLogsProps) {
                 ))
               ) : (
                 (data?.activityLogs || []).map((log) => (
-                  <TableRow key={log.id} className="hover:bg-gray-50/50 dark:hover:bg-gray-900/30 transition-colors border-b last:border-none">
+                  <TableRow key={log.id} className="hover:bg-zinc-50/50 dark:hover:bg-zinc-900/30 transition-colors border-b last:border-none">
                     <TableCell className="pl-6 py-4">
-                      <Badge variant="outline" className={`gap-1.5 font-black text-[9px] h-6 uppercase tracking-widest px-2 border-none ${ACTION_COLORS[log.action] || 'bg-gray-100'}`}>
+                      <Badge variant="outline" className={`gap-1.5 font-black text-[9px] h-6 uppercase tracking-widest px-2 border-none ${ACTION_COLORS[log.action] || 'bg-zinc-100'}`}>
                         {ACTION_ICONS[log.action]}
                         {formatAction(log.action)}
                       </Badge>
                     </TableCell>
                     <TableCell className="py-4">
                       <div className="flex flex-col">
-                        <span className="font-bold text-sm text-gray-900 dark:text-gray-100">{log.user.name}</span>
+                        <span className="font-bold text-sm text-zinc-900 dark:text-zinc-100">{log.user.name}</span>
                         {log.tenant && (
                           <span className="text-[10px] font-bold text-muted-foreground flex items-center gap-1">
                             <Building2 className="size-2.5" />
@@ -117,7 +117,7 @@ export function ActivityLogs({ loading, data }: ActivityLogsProps) {
                     </TableCell>
                     <TableCell className="text-right py-4 pr-6" suppressHydrationWarning>
                       <div className="flex flex-col items-end">
-                        <span className="text-xs font-black text-gray-900 dark:text-gray-100">
+                        <span className="text-xs font-black text-zinc-900 dark:text-zinc-100">
                           {formatLogDate(log.createdAt)}
                         </span>
                         <span className="text-[10px] font-bold text-muted-foreground flex items-center gap-1">

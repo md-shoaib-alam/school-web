@@ -229,7 +229,7 @@ export function StudentDashboard() {
           </CardHeader>
           <CardContent>
             {todayTimetable.length === 0 ? (
-              <div className="text-center py-8 text-gray-400 dark:text-gray-500">
+              <div className="text-center py-8 text-zinc-400 dark:text-zinc-500">
                 <BookOpen className="size-10 mx-auto mb-2 opacity-50" />
                 <p className="text-sm">No classes scheduled for today</p>
                 <p className="text-xs mt-1">Enjoy your day off! 🎉</p>
@@ -245,27 +245,27 @@ export function StudentDashboard() {
                         className={`flex items-center gap-4 p-3 rounded-lg transition-colors ${isCurrent
                           ? "bg-violet-50 dark:bg-violet-900/30 border border-violet-200 dark:border-violet-800"
                           : isPast
-                            ? "bg-gray-50 dark:bg-gray-800/50 opacity-60"
-                            : "bg-gray-50 dark:bg-gray-800/50 hover:bg-violet-50/50 dark:hover:bg-violet-900/20"
+                            ? "bg-zinc-50 dark:bg-zinc-800/50 opacity-60"
+                            : "bg-zinc-50 dark:bg-zinc-800/50 hover:bg-violet-50/50 dark:hover:bg-violet-900/20"
                           }`}
                         suppressHydrationWarning
                       >
                         <div className="flex-shrink-0 w-20 text-center">
-                          <p className="text-sm font-semibold text-gray-700 dark:text-gray-300">
+                          <p className="text-sm font-semibold text-zinc-700 dark:text-zinc-300">
                             {slot.startTime}
                           </p>
-                          <p className="text-xs text-gray-400 dark:text-gray-500">
+                          <p className="text-xs text-zinc-400 dark:text-zinc-500">
                             {slot.endTime}
                           </p>
                         </div>
                         <div
-                          className={`w-0.5 h-10 rounded-full ${isCurrent ? "bg-violet-400" : "bg-gray-200 dark:bg-gray-700"}`}
+                          className={`w-0.5 h-10 rounded-full ${isCurrent ? "bg-violet-400" : "bg-zinc-200 dark:bg-zinc-700"}`}
                         />
                         <div className="flex-1 min-w-0">
-                          <p className="font-medium text-sm text-gray-900 dark:text-gray-100 truncate">
+                          <p className="font-medium text-sm text-zinc-900 dark:text-zinc-100 truncate">
                             {slot.subjectName}
                           </p>
-                          <p className="text-xs text-gray-500 dark:text-gray-400">
+                          <p className="text-xs text-zinc-500 dark:text-zinc-400">
                             {slot.className}
                           </p>
                         </div>
@@ -296,7 +296,7 @@ export function StudentDashboard() {
           </CardHeader>
           <CardContent>
             {recentGrades.length === 0 ? (
-              <div className="text-center py-8 text-gray-400 dark:text-gray-500">
+              <div className="text-center py-8 text-zinc-400 dark:text-zinc-500">
                 <GraduationCap className="size-8 mx-auto mb-2 opacity-50" />
                 <p className="text-sm">No grades yet</p>
               </div>
@@ -310,10 +310,10 @@ export function StudentDashboard() {
                       className="flex items-center justify-between"
                     >
                       <div className="min-w-0 flex-1">
-                        <p className="text-sm font-medium text-gray-900 dark:text-gray-100 truncate">
+                        <p className="text-sm font-medium text-zinc-900 dark:text-zinc-100 truncate">
                           {g.subjectName}
                         </p>
-                        <p className="text-xs text-gray-500 dark:text-gray-400">
+                        <p className="text-xs text-zinc-500 dark:text-zinc-400">
                           {g.examType}
                         </p>
                       </div>
@@ -329,7 +329,7 @@ export function StudentDashboard() {
                         >
                           {g.grade || "N/A"}
                         </Badge>
-                        <span className="text-xs text-gray-500 dark:text-gray-400">
+                        <span className="text-xs text-zinc-500 dark:text-zinc-400">
                           {Number(g.marks).toFixed(2).replace(/\.00$/, "")}/{g.maxMarks}
                         </span>
                       </div>
@@ -352,7 +352,7 @@ export function StudentDashboard() {
         </CardHeader>
         <CardContent>
           {studentNotices.length === 0 ? (
-            <div className="text-center py-6 text-gray-400 dark:text-gray-500">
+            <div className="text-center py-6 text-zinc-400 dark:text-zinc-500">
               <Bell className="size-8 mx-auto mb-2 opacity-50" />
               <p className="text-sm">No announcements</p>
             </div>
@@ -365,7 +365,7 @@ export function StudentDashboard() {
                     ? "border-red-200 dark:border-red-800 bg-red-50 dark:bg-red-900/30"
                     : notice.priority === "important"
                       ? "border-amber-200 dark:border-amber-800 bg-amber-50 dark:bg-amber-900/30"
-                      : "border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-800/50"
+                      : "border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-800/50"
                     }`}
                 >
                   <div className="flex items-start justify-between gap-2">
@@ -377,24 +377,24 @@ export function StudentDashboard() {
                             ? "bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400"
                             : notice.priority === "important"
                               ? "bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400"
-                              : "bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400"
+                              : "bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400"
                             }`}
                         >
                           {notice.priority}
                         </Badge>
                       </div>
-                      <h4 className="font-semibold text-sm text-gray-900 dark:text-gray-100">
+                      <h4 className="font-semibold text-sm text-zinc-900 dark:text-zinc-100">
                         {notice.title}
                       </h4>
-                      <p className="text-xs text-gray-500 dark:text-gray-400 mt-1 line-clamp-2">
+                      <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-1 line-clamp-2">
                         {notice.content}
                       </p>
-                      <p className="text-[10px] text-gray-400 dark:text-gray-500 mt-2" suppressHydrationWarning>
+                      <p className="text-[10px] text-zinc-400 dark:text-zinc-500 mt-2" suppressHydrationWarning>
                         {notice.authorName} •{" "}
                         {formatDate(notice.createdAt)}
                       </p>
                     </div>
-                    <ChevronRight className="size-4 text-gray-300 dark:text-gray-600 flex-shrink-0 mt-1" />
+                    <ChevronRight className="size-4 text-zinc-300 dark:text-zinc-600 flex-shrink-0 mt-1" />
                   </div>
                 </div>
               ))}
@@ -428,7 +428,7 @@ function StatCard({
     amber: "bg-amber-600 dark:bg-amber-500",
     blue: "bg-blue-600 dark:bg-blue-500",
   };
-  const iconBg = colorMap[color] || "bg-gray-600";
+  const iconBg = colorMap[color] || "bg-zinc-600";
 
   return (
     <Card className="rounded-xl shadow-sm hover:shadow-md transition-shadow">
@@ -437,10 +437,10 @@ function StatCard({
           <div className={`p-2 rounded-lg text-white ${iconBg}`}>{icon}</div>
         </div>
         <div className="mt-3">
-          <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">
+          <p className="text-2xl font-bold text-zinc-900 dark:text-zinc-100">
             {value}
           </p>
-          <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+          <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">
             {title}
           </p>
         </div>

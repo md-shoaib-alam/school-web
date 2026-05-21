@@ -19,10 +19,10 @@ export function AdminReports() {
             <BarChart3 className="size-6" />
           </div>
           <div>
-            <h2 className="text-2xl font-semibold text-gray-900 dark:text-gray-100">
+            <h2 className="text-2xl font-semibold text-zinc-900 dark:text-zinc-100">
               Administrative Reports
             </h2>
-            <p className="text-sm text-gray-500 dark:text-gray-400">
+            <p className="text-sm text-zinc-500 dark:text-zinc-400">
               Comprehensive analytics across all school departments
             </p>
           </div>
@@ -32,24 +32,24 @@ export function AdminReports() {
       {/* Main Tabs */}
       <Tabs defaultValue="attendance" className="space-y-6">
         <div className="overflow-x-auto pb-1">
-          <TabsList className="bg-gray-100 dark:bg-gray-800 p-1 rounded-xl h-auto flex-nowrap w-fit">
+          <TabsList className="bg-zinc-100 dark:bg-zinc-800 p-1 rounded-xl h-auto flex-nowrap w-fit">
             <TabsTrigger
               value="attendance"
-              className="rounded-lg px-6 py-2.5 data-[state=active]:bg-white dark:data-[state=active]:bg-gray-950 data-[state=active]:text-emerald-600 data-[state=active]:shadow-sm transition-all"
+              className="rounded-lg px-6 py-2.5 data-[state=active]:bg-white dark:data-[state=active]:bg-zinc-950 data-[state=active]:text-emerald-600 data-[state=active]:shadow-sm transition-all"
             >
               <TrendingUp className="size-4 mr-2" />
               Attendance
             </TabsTrigger>
             <TabsTrigger
               value="academic"
-              className="rounded-lg px-6 py-2.5 data-[state=active]:bg-white dark:data-[state=active]:bg-gray-950 data-[state=active]:text-emerald-600 data-[state=active]:shadow-sm transition-all"
+              className="rounded-lg px-6 py-2.5 data-[state=active]:bg-white dark:data-[state=active]:bg-zinc-950 data-[state=active]:text-emerald-600 data-[state=active]:shadow-sm transition-all"
             >
               <GraduationCap className="size-4 mr-2" />
               Academic
             </TabsTrigger>
             <TabsTrigger
               value="fees"
-              className="rounded-lg px-6 py-2.5 data-[state=active]:bg-white dark:data-[state=active]:bg-gray-950 data-[state=active]:text-emerald-600 data-[state=active]:shadow-sm transition-all"
+              className="rounded-lg px-6 py-2.5 data-[state=active]:bg-white dark:data-[state=active]:bg-zinc-950 data-[state=active]:text-emerald-600 data-[state=active]:shadow-sm transition-all"
             >
               <IndianRupee className="size-4 mr-2" />
               Finances

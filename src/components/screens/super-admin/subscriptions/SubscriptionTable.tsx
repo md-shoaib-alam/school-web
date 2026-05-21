@@ -130,7 +130,7 @@ export function SubscriptionTable({
                             "size-10 rounded-full flex items-center justify-center font-bold uppercase",
                             sub
                               ? "bg-teal-100 dark:bg-teal-900/30 text-teal-700"
-                              : "bg-gray-100 dark:bg-gray-800 text-gray-500",
+                              : "bg-zinc-100 dark:bg-zinc-800 text-zinc-500",
                           )}
                         >
                           {parent?.user?.name?.[0] || parent?.name?.[0]}
@@ -148,7 +148,7 @@ export function SubscriptionTable({
                                 <Badge
                                   key={s.id}
                                   variant="outline"
-                                  className="text-[10px] py-0 h-4 bg-white dark:bg-gray-950"
+                                  className="text-[10px] py-0 h-4 bg-white dark:bg-zinc-950"
                                 >
                                   {s.name || s.user?.name}
                                 </Badge>
@@ -196,7 +196,7 @@ export function SubscriptionTable({
                           "gap-1 py-1 px-2 text-[11px] font-medium border shadow-none",
                           sub
                             ? statusConfig[sub.status]?.bg
-                            : "bg-gray-100 dark:bg-gray-800 text-gray-600 border-gray-200 dark:border-gray-700",
+                            : "bg-zinc-100 dark:bg-zinc-800 text-zinc-600 border-zinc-200 dark:border-zinc-700",
                         )}
                       >
                         {sub ? (
@@ -287,7 +287,7 @@ export function SubscriptionTable({
         </Table>
       </div>
       {!loading && totalPages > 1 && (
-        <div className="flex flex-col sm:flex-row items-center justify-between px-6 py-4 bg-gray-50/50 dark:bg-gray-900/20 border-t gap-4">
+        <div className="flex flex-col sm:flex-row items-center justify-between px-6 py-4 bg-zinc-50/50 dark:bg-zinc-900/20 border-t gap-4">
           <div className="flex items-center gap-4 order-2 sm:order-1">
             <p className="text-sm text-muted-foreground">
               Showing{" "}
@@ -299,7 +299,7 @@ export function SubscriptionTable({
                 {Math.min(page * limit, totalEntries)}
               </span>{" "}
               of{" "}
-              <span className="font-semibold text-gray-900 dark:text-gray-100">
+              <span className="font-semibold text-zinc-900 dark:text-zinc-100">
                 {totalEntries}
               </span>{" "}
               entries

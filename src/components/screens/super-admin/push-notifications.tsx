@@ -76,8 +76,8 @@ export function SuperAdminPushNotifications() {
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-4">
-        <div className="size-12 rounded-2xl bg-indigo-100 dark:bg-indigo-900/30 flex items-center justify-center">
-          <Send className="size-6 text-indigo-600 dark:text-indigo-400" />
+        <div className="size-12 rounded-2xl bg-violet-100 dark:bg-violet-900/30 flex items-center justify-center">
+          <Send className="size-6 text-violet-600 dark:text-violet-400" />
         </div>
         <div>
           <h2 className="text-3xl font-semibold tracking-tight">Push Notifications</h2>
@@ -153,7 +153,7 @@ export function SuperAdminPushNotifications() {
                 Reset
               </Button>
               <Button 
-                className="bg-indigo-600 hover:bg-indigo-700 text-white gap-2"
+                className="bg-violet-600 hover:bg-violet-700 text-white gap-2"
                 onClick={handleSend}
                 disabled={sending}
               >
@@ -165,10 +165,10 @@ export function SuperAdminPushNotifications() {
         </Card>
 
         <div className="space-y-6">
-          <Card className="border-none shadow-sm bg-gradient-to-br from-indigo-50 to-white dark:from-indigo-950/10 dark:to-gray-900">
+          <Card className="border-none shadow-sm bg-gradient-to-br from-violet-50 to-white dark:from-violet-950/10 dark:to-zinc-900">
             <CardHeader>
               <CardTitle className="text-lg flex items-center gap-2">
-                <Info className="size-5 text-indigo-600" />
+                <Info className="size-5 text-violet-600" />
                 Technical Info
               </CardTitle>
             </CardHeader>
@@ -177,7 +177,7 @@ export function SuperAdminPushNotifications() {
                 We recommend using **Firebase Cloud Messaging (FCM)** for cross-platform delivery.
               </p>
               <div className="space-y-2">
-                <div className="flex items-center gap-2 text-xs font-medium text-indigo-700 dark:text-indigo-400 uppercase tracking-widest">
+                <div className="flex items-center gap-2 text-xs font-medium text-violet-700 dark:text-violet-400 uppercase tracking-widest">
                   <Smartphone className="size-3" />
                   Delivery Channels
                 </div>
@@ -202,7 +202,7 @@ export function SuperAdminPushNotifications() {
           <Card className="border-none shadow-sm">
             <CardHeader>
               <CardTitle className="text-lg flex items-center gap-2">
-                <History className="size-5 text-indigo-600" />
+                <History className="size-5 text-violet-600" />
                 Recent Activity
               </CardTitle>
             </CardHeader>

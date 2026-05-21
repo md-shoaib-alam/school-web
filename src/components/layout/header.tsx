@@ -41,7 +41,7 @@ export function Header({ items, resolvedScreen }: HeaderProps) {
         <Button
           variant="ghost"
           size="icon"
-          className="lg:hidden size-10 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 bg-white hover:bg-gray-50 dark:bg-zinc-900 dark:hover:bg-zinc-800 border border-gray-200 dark:border-zinc-800 shadow-sm transition-all"
+          className="lg:hidden size-10 text-zinc-500 hover:text-zinc-700 dark:text-zinc-400 dark:hover:text-zinc-200 bg-white hover:bg-zinc-50 dark:bg-zinc-900 dark:hover:bg-zinc-800 border border-zinc-200 dark:border-zinc-800 shadow-sm transition-all"
           onClick={toggleSidebar}
         >
           {sidebarOpen ? (
@@ -50,7 +50,7 @@ export function Header({ items, resolvedScreen }: HeaderProps) {
             <PanelLeftOpen className="size-5" />
           )}
         </Button>
-        <h1 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
+        <h1 className="text-lg font-semibold text-zinc-900 dark:text-zinc-100">
           {resolvedScreen === "profile"
             ? "My Profile"
             : items.find((i) => i.key === resolvedScreen)?.label || "Dashboard"}
@@ -69,7 +69,7 @@ export function Header({ items, resolvedScreen }: HeaderProps) {
             {currentTenantName}
           </Badge>
         )}
-        <div className="hidden md:flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400 mr-2" suppressHydrationWarning>
+        <div className="hidden md:flex items-center gap-2 text-sm text-zinc-500 dark:text-zinc-400 mr-2" suppressHydrationWarning>
           <Calendar className="size-4" />
           {todayString}
         </div>

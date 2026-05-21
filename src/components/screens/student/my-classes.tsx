@@ -14,7 +14,7 @@ import type { StudentInfo, SubjectInfo } from "@/lib/types";
 const subjectColors = [
   "from-violet-500 to-purple-600",
   "from-pink-500 to-rose-600",
-  "from-blue-500 to-indigo-600",
+  "from-blue-500 to-violet-600",
   "from-emerald-500 to-teal-600",
   "from-amber-500 to-orange-600",
   "from-cyan-500 to-sky-600",
@@ -66,10 +66,10 @@ export function StudentClasses() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">
+          <h2 className="text-xl font-semibold text-zinc-900 dark:text-zinc-100">
             My Classes
           </h2>
-          <p className="text-sm text-gray-500 dark:text-gray-400 mt-0.5">
+          <p className="text-sm text-zinc-500 dark:text-zinc-400 mt-0.5">
             {mySubjects.length} subjects enrolled in{" "}
             {student?.className || "your class"}
           </p>
@@ -93,10 +93,10 @@ export function StudentClasses() {
               <GraduationCap className="size-6" />
             </div>
             <div className="flex-1">
-              <h3 className="font-semibold text-gray-900 dark:text-gray-100">
+              <h3 className="font-semibold text-zinc-900 dark:text-zinc-100">
                 Welcome, {firstName}!
               </h3>
-              <p className="text-sm text-gray-500 dark:text-gray-400">
+              <p className="text-sm text-zinc-500 dark:text-zinc-400">
                 Class {student.className} • {mySubjects.length} Subjects
               </p>
             </div>
@@ -105,7 +105,7 @@ export function StudentClasses() {
                 <p className="text-lg font-bold text-violet-600 dark:text-violet-400">
                   {mySubjects.length}
                 </p>
-                <p className="text-[10px] text-gray-500 dark:text-gray-400 uppercase tracking-wide">
+                <p className="text-[10px] text-zinc-500 dark:text-zinc-400 uppercase tracking-wide">
                   Subjects
                 </p>
               </div>
@@ -118,11 +118,11 @@ export function StudentClasses() {
       {mySubjects.length === 0 ? (
         <Card className="rounded-xl shadow-sm">
           <CardContent className="py-16 text-center">
-            <BookOpen className="size-12 mx-auto text-gray-300 dark:text-gray-600 mb-3" />
-            <p className="text-gray-500 dark:text-gray-400 font-medium">
+            <BookOpen className="size-12 mx-auto text-zinc-300 dark:text-zinc-600 mb-3" />
+            <p className="text-zinc-500 dark:text-zinc-400 font-medium">
               No subjects found
             </p>
-            <p className="text-sm text-gray-400 dark:text-gray-500 mt-1">
+            <p className="text-sm text-zinc-400 dark:text-zinc-500 mt-1">
               Your class subjects will appear here
             </p>
           </CardContent>
@@ -132,7 +132,7 @@ export function StudentClasses() {
           {mySubjects.map((subject, i) => (
             <div
               key={subject.id}
-              className="group relative rounded-xl border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-sm hover:shadow-md transition-all duration-200 overflow-hidden hover:border-violet-200 dark:border-violet-800 dark:hover:border-violet-800"
+              className="group relative rounded-xl border border-zinc-100 dark:border-zinc-800 bg-white dark:bg-zinc-900 shadow-sm hover:shadow-md transition-all duration-200 overflow-hidden hover:border-violet-200 dark:border-violet-800 dark:hover:border-violet-800"
             >
               {/* Color Accent */}
               <div
@@ -148,23 +148,23 @@ export function StudentClasses() {
                   </div>
                   <Badge
                     variant="outline"
-                    className="text-[10px] font-mono text-gray-500 dark:text-gray-400 border-gray-200 dark:border-gray-700"
+                    className="text-[10px] font-mono text-zinc-500 dark:text-zinc-400 border-zinc-200 dark:border-zinc-700"
                   >
                     {subject.code}
                   </Badge>
                 </div>
 
-                <h3 className="font-semibold text-gray-900 dark:text-gray-100 text-sm mb-3 line-clamp-1">
+                <h3 className="font-semibold text-zinc-900 dark:text-zinc-100 text-sm mb-3 line-clamp-1">
                   {subject.name}
                 </h3>
 
                 <div className="space-y-2">
-                  <div className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
-                    <User className="size-3.5 text-gray-400 dark:text-gray-500" />
+                  <div className="flex items-center gap-2 text-xs text-zinc-500 dark:text-zinc-400">
+                    <User className="size-3.5 text-zinc-400 dark:text-zinc-500" />
                     <span className="truncate">{subject.teacherName}</span>
                   </div>
-                  <div className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
-                    <GraduationCap className="size-3.5 text-gray-400 dark:text-gray-500" />
+                  <div className="flex items-center gap-2 text-xs text-zinc-500 dark:text-zinc-400">
+                    <GraduationCap className="size-3.5 text-zinc-400 dark:text-zinc-500" />
                     <span>{subject.className}</span>
                   </div>
                 </div>

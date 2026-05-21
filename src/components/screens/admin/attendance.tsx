@@ -181,10 +181,10 @@ export function AdminAttendance() {
     <div className="space-y-6">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h2 className="text-2xl font-semibold text-gray-900 dark:text-white">
+          <h2 className="text-2xl font-semibold text-zinc-900 dark:text-white">
             Attendance Management
           </h2>
-          <p className="text-gray-500 dark:text-gray-400">
+          <p className="text-zinc-500 dark:text-zinc-400">
             Class-wise attendance tracking and insights
           </p>
         </div>
@@ -196,7 +196,7 @@ export function AdminAttendance() {
               setCurrentPage(1);
             }}
           >
-            <SelectTrigger className="w-[180px] bg-white dark:bg-gray-950 border-gray-200">
+            <SelectTrigger className="w-[180px] bg-white dark:bg-zinc-950 border-zinc-200">
               <SelectValue placeholder="Select Class" />
             </SelectTrigger>
             <SelectContent>
@@ -258,15 +258,15 @@ export function AdminAttendance() {
 
       {!isSelectionMade ? (
         /* Empty State */
-        <div className="py-20 flex flex-col items-center justify-center text-center space-y-4 border-2 border-dashed border-gray-200 dark:border-gray-800 rounded-3xl">
-          <div className="p-4 bg-gray-50 dark:bg-gray-900 rounded-full">
-            <UserCheck className="size-12 text-gray-300" />
+        <div className="py-20 flex flex-col items-center justify-center text-center space-y-4 border-2 border-dashed border-zinc-200 dark:border-zinc-800 rounded-3xl">
+          <div className="p-4 bg-zinc-50 dark:bg-zinc-900 rounded-full">
+            <UserCheck className="size-12 text-zinc-300" />
           </div>
           <div className="max-w-xs">
-            <h4 className="text-lg font-medium text-gray-900 dark:text-white">
+            <h4 className="text-lg font-medium text-zinc-900 dark:text-white">
               Ready to track?
             </h4>
-            <p className="text-sm text-gray-500 italic">
+            <p className="text-sm text-zinc-500 italic">
               Please select a class from the dropdown above to view student
               attendance data.
             </p>
@@ -284,10 +284,10 @@ export function AdminAttendance() {
                 <CardContent className="p-4">
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">
+                      <p className="text-xs font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
                         {card.label}
                       </p>
-                      <div className="text-2xl font-bold mt-1 text-gray-900 dark:text-white">
+                      <div className="text-2xl font-bold mt-1 text-zinc-900 dark:text-white">
                         {loading ? (
                           <Skeleton className="h-8 w-12" />
                         ) : (
@@ -301,13 +301,13 @@ export function AdminAttendance() {
                   </div>
                   {card.percentage && (
                     <div className="mt-3 flex items-center gap-2">
-                      <div className="flex-1 h-1.5 bg-gray-100 dark:bg-gray-800 rounded-full overflow-hidden">
+                      <div className="flex-1 h-1.5 bg-zinc-100 dark:bg-zinc-800 rounded-full overflow-hidden">
                         <div
                           className={`h-full ${statusConfig[card.label.toLowerCase()]?.dot || "bg-blue-500"}`}
                           style={{ width: `${card.percentage}%` }}
                         />
                       </div>
-                      <span className="text-[10px] font-bold text-gray-500">
+                      <span className="text-[10px] font-bold text-zinc-500">
                         {card.percentage}%
                       </span>
                     </div>
@@ -317,7 +317,7 @@ export function AdminAttendance() {
             ))}
           </div>
 
-          <Card className="shadow-lg border-gray-100 dark:border-gray-800">
+          <Card className="shadow-lg border-zinc-100 dark:border-zinc-800">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
               <div>
                 <CardTitle className="text-xl font-bold">
@@ -330,7 +330,7 @@ export function AdminAttendance() {
                 </CardDescription>
               </div>
               <div className="relative w-64">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-gray-400" />
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-zinc-400" />
                 <Input 
                   placeholder="Search students..." 
                   className="pl-9" 
@@ -341,7 +341,7 @@ export function AdminAttendance() {
             </CardHeader>
             <CardContent className="p-0">
               <Table>
-                <TableHeader className="bg-gray-50 dark:bg-gray-900/50">
+                <TableHeader className="bg-zinc-50 dark:bg-zinc-900/50">
                   <TableRow>
                     <TableHead className="font-bold pl-6">Student Name</TableHead>
                     <TableHead className="font-bold w-[150px]">Class</TableHead>
@@ -374,7 +374,7 @@ export function AdminAttendance() {
                     <TableRow>
                       <TableCell
                         colSpan={isHistoryMode ? 6 : 5}
-                        className="h-32 text-center text-gray-500 italic"
+                        className="h-32 text-center text-zinc-500 italic"
                       >
                         No attendance records found for this selection.
                       </TableCell>
@@ -383,7 +383,7 @@ export function AdminAttendance() {
                     records.map((record) => (
                       <TableRow
                         key={record.id}
-                        className="hover:bg-gray-50/50 dark:hover:bg-gray-900/50 group transition-colors"
+                        className="hover:bg-zinc-50/50 dark:hover:bg-zinc-900/50 group transition-colors"
                       >
                         <TableCell className="font-medium pl-6">
                           {record.studentName}
@@ -391,7 +391,7 @@ export function AdminAttendance() {
                         <TableCell className="w-[150px]">
                           <Badge
                             variant="outline"
-                            className="font-semibold bg-gray-50 dark:bg-gray-950"
+                            className="font-semibold bg-zinc-50 dark:bg-zinc-950"
                           >
                             {record.className}
                           </Badge>
@@ -415,7 +415,7 @@ export function AdminAttendance() {
                             </span>
                           </Badge>
                         </TableCell>
-                        <TableCell className="text-gray-500 text-sm w-[120px]" suppressHydrationWarning>
+                        <TableCell className="text-zinc-500 text-sm w-[120px]" suppressHydrationWarning>
                           {record.createdAt
                             ? new Date(record.createdAt).toLocaleTimeString([], {
                                 hour: "2-digit",

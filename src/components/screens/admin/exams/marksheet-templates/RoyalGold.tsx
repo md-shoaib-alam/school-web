@@ -11,7 +11,7 @@ export const RoyalGold: React.FC<MarksheetTemplateProps> = ({
 }) => {
   return (
     <div 
-      className="relative bg-[#faf7f0] text-slate-800 px-10 py-10 rounded overflow-hidden select-none flex flex-col justify-between shrink-0 text-left h-[1123px] w-[794px] box-border border-8 border-double border-[#b38f36]"
+      className="relative bg-[#faf7f0] text-zinc-800 px-10 py-10 rounded overflow-hidden select-none flex flex-col justify-between shrink-0 text-left h-[1123px] w-[794px] box-border border-8 border-double border-[#b38f36]"
       style={{ WebkitPrintColorAdjust: 'exact', printColorAdjust: 'exact' }}
     >
       {/* Decorative Ornate Corners */}
@@ -51,19 +51,19 @@ export const RoyalGold: React.FC<MarksheetTemplateProps> = ({
         <div className="grid grid-cols-2 gap-x-6 gap-y-3.5 text-xs border border-[#e3d7b8] p-4 rounded bg-[#f2ecdb]/50 font-serif">
           <div className="flex gap-2">
             <span className="text-amber-900/60 font-bold uppercase text-[9px] tracking-wider w-24 flex items-center shrink-0">Scholastic Name:</span>
-            <span className="font-bold text-slate-800 truncate">{sheet.studentName}</span>
+            <span className="font-bold text-zinc-800 truncate">{sheet.studentName}</span>
           </div>
           <div className="flex gap-2">
             <span className="text-amber-900/60 font-bold uppercase text-[9px] tracking-wider w-24 flex items-center shrink-0">Roll Number:</span>
-            <span className="font-bold text-slate-800 font-mono">{sheet.rollNumber}</span>
+            <span className="font-bold text-zinc-800 font-mono">{sheet.rollNumber}</span>
           </div>
           <div className="flex gap-2">
             <span className="text-amber-900/60 font-bold uppercase text-[9px] tracking-wider w-24 flex items-center shrink-0">Class & Form:</span>
-            <span className="font-bold text-slate-800 truncate">{classNameStr} - {classSection}</span>
+            <span className="font-bold text-zinc-800 truncate">{classNameStr} - {classSection}</span>
           </div>
           <div className="flex gap-2">
             <span className="text-amber-900/60 font-bold uppercase text-[9px] tracking-wider w-24 flex items-center shrink-0">Academic Year:</span>
-            <span className="font-bold text-slate-800">{academicYear}</span>
+            <span className="font-bold text-zinc-800">{academicYear}</span>
           </div>
         </div>
 
@@ -83,11 +83,11 @@ export const RoyalGold: React.FC<MarksheetTemplateProps> = ({
             <tbody>
               {sheet.subjects.map((sub, sIdx) => (
                 <tr key={sIdx} className="border-b border-[#ebdcb3] hover:bg-[#f6ecd3]/30">
-                  <td className="px-3 py-2.5 text-left font-bold text-slate-700 truncate">{sub.subjectName}</td>
-                  {marksheetType === 'combined' && <td className="px-3 py-2.5 text-center font-mono text-slate-500">{sub.midtermMarks}</td>}
-                  {marksheetType === 'combined' && <td className="px-3 py-2.5 text-center font-mono text-slate-500">{sub.finalMarks}</td>}
+                  <td className="px-3 py-2.5 text-left font-bold text-zinc-700 truncate">{sub.subjectName}</td>
+                  {marksheetType === 'combined' && <td className="px-3 py-2.5 text-center font-mono text-zinc-500">{sub.midtermMarks}</td>}
+                  {marksheetType === 'combined' && <td className="px-3 py-2.5 text-center font-mono text-zinc-500">{sub.finalMarks}</td>}
                   <td className="px-3 py-2.5 text-center font-black font-mono text-amber-900">{sub.obtained}</td>
-                  <td className="px-3 py-2.5 text-center font-bold text-slate-800 font-mono">{sub.percentage}%</td>
+                  <td className="px-3 py-2.5 text-center font-bold text-zinc-800 font-mono">{sub.percentage}%</td>
                   <td className="px-3 py-2.5 text-center">
                     <span className={`inline-block px-2.5 py-0.5 rounded text-[9px] font-black uppercase tracking-wider ${
                       sub.status === 'pass' 
@@ -120,7 +120,7 @@ export const RoyalGold: React.FC<MarksheetTemplateProps> = ({
         <div className="grid grid-cols-12 gap-5 font-serif">
           <div className="col-span-7 border border-[#e3d7b8] border-l-[4px] border-l-[#b38f36] rounded p-4 bg-[#f2ecdb]/20 text-xs">
             <h5 className="font-semibold text-[9.5px] uppercase tracking-wider text-amber-900 mb-1.5">Academic Assessor Summary</h5>
-            <p className="italic text-slate-700 leading-relaxed font-medium">
+            <p className="italic text-zinc-700 leading-relaxed font-medium">
               "{sheet.remarks}" The candidate stands in {sheet.status === 'pass' ? 'excellent scholastic repute.' : 'need of supportive educational coaching.'}
             </p>
           </div>
@@ -130,7 +130,7 @@ export const RoyalGold: React.FC<MarksheetTemplateProps> = ({
               <tbody>
                 <tr className="border-b border-dashed border-[#e3d7b8]">
                   <td className="py-2 text-[9px] font-bold text-amber-800 uppercase tracking-wider">Scholastic Marks</td>
-                  <td className="py-2 text-right font-bold text-slate-800 font-mono">{sheet.totalObtainedMarks} / {sheet.totalMaxMarks}</td>
+                  <td className="py-2 text-right font-bold text-zinc-800 font-mono">{sheet.totalObtainedMarks} / {sheet.totalMaxMarks}</td>
                 </tr>
                 <tr className="border-b border-dashed border-[#e3d7b8]">
                   <td className="py-2 text-[9px] font-bold text-amber-800 uppercase tracking-wider">Honor Score</td>

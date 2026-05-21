@@ -54,7 +54,7 @@ export function MarksheetSheetsPreview({
   selectedStudentId
 }: MarksheetSheetsPreviewProps) {
   return (
-    <div className="bg-card border border-gray-100 dark:border-zinc-800 p-6 rounded-2xl shadow-sm overflow-hidden flex flex-col min-h-[600px] items-center justify-center">
+    <div className="bg-card border border-zinc-100 dark:border-zinc-800 p-6 rounded-2xl shadow-sm overflow-hidden flex flex-col min-h-[600px] items-center justify-center">
       {loading ? (
         <div className="w-full max-w-4xl space-y-6 py-10 animate-in fade-in duration-300">
           <div className="flex items-center gap-4">
@@ -91,7 +91,7 @@ export function MarksheetSheetsPreview({
           )}
 
           {/* True A4 parchment layout sheets preview vertical stack with premium scrollbar */}
-          <div className="w-full max-h-[75vh] overflow-y-auto overflow-x-auto pb-6 flex flex-col items-center gap-8 bg-zinc-50 dark:bg-zinc-950/20 p-4 sm:p-6 rounded-2xl border border-gray-100 dark:border-zinc-800/50 shadow-inner">
+          <div className="w-full max-h-[75vh] overflow-y-auto overflow-x-auto pb-6 flex flex-col items-center gap-8 bg-zinc-50 dark:bg-zinc-950/20 p-4 sm:p-6 rounded-2xl border border-zinc-100 dark:border-zinc-800/50 shadow-inner">
             
             {previewStudents.map((sheet, index) => (
               <div 

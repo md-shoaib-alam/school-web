@@ -16,12 +16,12 @@ export function FeeSummary({ total, paid, pending, overdue }: FeeSummaryProps) {
       <Card className="rounded-xl shadow-sm hover:shadow-md transition-shadow shadow-none">
         <CardContent className="p-4 text-left">
           <div className="flex items-center gap-3">
-            <div className="size-10 rounded-xl bg-gray-100 dark:bg-gray-800 flex items-center justify-center">
-              <IndianRupee className="size-5 text-gray-600 dark:text-gray-400" />
+            <div className="size-10 rounded-xl bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center">
+              <IndianRupee className="size-5 text-zinc-600 dark:text-zinc-400" />
             </div>
             <div>
               <p className="text-xs text-muted-foreground">Total Fees</p>
-              <p className="text-xl font-bold text-gray-900 dark:text-gray-100">
+              <p className="text-xl font-bold text-zinc-900 dark:text-zinc-100">
                 ₹{total.toLocaleString()}
               </p>
             </div>

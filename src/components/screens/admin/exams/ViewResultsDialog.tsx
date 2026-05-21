@@ -155,8 +155,8 @@ export function ViewResultsDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-3xl max-h-[85vh] flex flex-col p-0 overflow-hidden rounded-xl border border-gray-100 dark:border-zinc-800 shadow-2xl">
-        <DialogHeader className="p-5 pb-3 border-b border-gray-100 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-950/20">
+      <DialogContent className="max-w-3xl max-h-[85vh] flex flex-col p-0 overflow-hidden rounded-xl border border-zinc-100 dark:border-zinc-800 shadow-2xl">
+        <DialogHeader className="p-5 pb-3 border-b border-zinc-100 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-950/20">
           <div className="flex items-center justify-between pr-8">
             <div className="space-y-1">
               <DialogTitle className="text-lg font-bold flex items-center gap-2 text-foreground">
@@ -199,7 +199,7 @@ export function ViewResultsDialog({
           ) : (
             <div className="space-y-5" ref={printAreaRef}>
               {/* Exam Info Summary Banner */}
-              <div className="p-4 rounded-xl border border-gray-100 dark:border-zinc-800/80 bg-card/50 flex flex-wrap items-center justify-between gap-4">
+              <div className="p-4 rounded-xl border border-zinc-100 dark:border-zinc-800/80 bg-card/50 flex flex-wrap items-center justify-between gap-4">
                 <div className="space-y-1">
                   <h4 className="font-semibold text-sm text-foreground flex items-center gap-1.5">
                     <BookOpen className="size-4 text-blue-500" />
@@ -223,7 +223,7 @@ export function ViewResultsDialog({
                   </div>
                 </div>
 
-                <div className="flex items-center gap-3 text-xs border-t sm:border-t-0 sm:border-l pt-3 sm:pt-0 sm:pl-4 border-gray-100 dark:border-zinc-800 font-semibold">
+                <div className="flex items-center gap-3 text-xs border-t sm:border-t-0 sm:border-l pt-3 sm:pt-0 sm:pl-4 border-zinc-100 dark:border-zinc-800 font-semibold">
                   <span className="text-muted-foreground">
                     Total Marks: <span className="text-foreground">{exam.totalMarks}</span>
                   </span>
@@ -235,7 +235,7 @@ export function ViewResultsDialog({
 
               {/* Summary Stats Grid */}
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                <div className="p-3 text-center rounded-xl bg-zinc-50 dark:bg-zinc-900 border border-gray-100 dark:border-zinc-800/60 shadow-sm">
+                <div className="p-3 text-center rounded-xl bg-zinc-50 dark:bg-zinc-900 border border-zinc-100 dark:border-zinc-800/60 shadow-sm">
                   <p className="text-[10px] text-muted-foreground uppercase font-bold tracking-wider">Total Students</p>
                   <p className="text-xl font-extrabold mt-1 text-foreground">{stats.total}</p>
                 </div>
@@ -254,7 +254,7 @@ export function ViewResultsDialog({
               </div>
 
               {/* Student Results Table */}
-              <div className="rounded-xl border border-gray-100 dark:border-zinc-800 overflow-hidden shadow-sm bg-card">
+              <div className="rounded-xl border border-zinc-100 dark:border-zinc-800 overflow-hidden shadow-sm bg-card">
                 <Table>
                   <TableHeader>
                     <TableRow className="bg-zinc-50/50 dark:bg-zinc-900/50 hover:bg-transparent">
@@ -273,7 +273,7 @@ export function ViewResultsDialog({
                       </TableRow>
                     ) : (
                       results.map((row) => (
-                        <TableRow key={row.studentId} className="hover:bg-transparent border-b border-gray-100 dark:border-zinc-800/80">
+                        <TableRow key={row.studentId} className="hover:bg-transparent border-b border-zinc-100 dark:border-zinc-800/80">
                           <TableCell className="text-center text-xs font-semibold text-muted-foreground font-mono">
                             {row.rollNumber || '–'}
                           </TableCell>

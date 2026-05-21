@@ -37,31 +37,31 @@ export function PromotionTable({
   return (
     <div className="overflow-x-auto">
       <Table>
-        <TableHeader className="bg-gray-50/50 dark:bg-gray-900/20">
+        <TableHeader className="bg-zinc-50/50 dark:bg-zinc-900/20">
           <TableRow>
-            <TableHead className="font-bold uppercase text-[10px] tracking-widest text-gray-500">Student</TableHead>
-            <TableHead className="font-bold uppercase text-[10px] tracking-widest text-gray-500">
+            <TableHead className="font-bold uppercase text-[10px] tracking-widest text-zinc-500">Student</TableHead>
+            <TableHead className="font-bold uppercase text-[10px] tracking-widest text-zinc-500">
               {type === 'promotion' ? 'Transition' : 'Graduated From'}
             </TableHead>
-            <TableHead className="font-bold uppercase text-[10px] tracking-widest text-gray-500">Year</TableHead>
-            <TableHead className="font-bold uppercase text-[10px] tracking-widest text-gray-500">Status</TableHead>
-            {type === 'promotion' && <TableHead className="text-right font-bold uppercase text-[10px] tracking-widest text-gray-500">Actions</TableHead>}
+            <TableHead className="font-bold uppercase text-[10px] tracking-widest text-zinc-500">Year</TableHead>
+            <TableHead className="font-bold uppercase text-[10px] tracking-widest text-zinc-500">Status</TableHead>
+            {type === 'promotion' && <TableHead className="text-right font-bold uppercase text-[10px] tracking-widest text-zinc-500">Actions</TableHead>}
           </TableRow>
         </TableHeader>
         <TableBody>
           {records.length === 0 ? (
             <TableRow>
-              <TableCell colSpan={type === 'promotion' ? 5 : 4} className="h-32 text-center text-gray-500">
+              <TableCell colSpan={type === 'promotion' ? 5 : 4} className="h-32 text-center text-zinc-500">
                 No records found.
               </TableCell>
             </TableRow>
           ) : (
             records.map((record) => (
-              <TableRow key={record.id} className="hover:bg-gray-50/50 dark:hover:bg-gray-900/10 transition-colors">
+              <TableRow key={record.id} className="hover:bg-zinc-50/50 dark:hover:bg-zinc-900/10 transition-colors">
                 <TableCell>
                   <div className="flex flex-col">
-                    <span className="font-bold text-sm text-gray-900 dark:text-gray-100">{record.studentName}</span>
-                    <span className="text-[10px] text-gray-500">{record.studentEmail}</span>
+                    <span className="font-bold text-sm text-zinc-900 dark:text-zinc-100">{record.studentName}</span>
+                    <span className="text-[10px] text-zinc-500">{record.studentEmail}</span>
                   </div>
                 </TableCell>
                 <TableCell>
@@ -69,7 +69,7 @@ export function PromotionTable({
                     <span className="text-xs font-medium">{record.fromClassName}</span>
                     {type === 'promotion' && (
                       <>
-                        <ArrowRight className="size-3 text-gray-400" />
+                        <ArrowRight className="size-3 text-zinc-400" />
                         <span className="text-xs font-bold text-emerald-600 dark:text-emerald-400">
                           {record.toClassName}
                         </span>
@@ -78,7 +78,7 @@ export function PromotionTable({
                   </div>
                 </TableCell>
                 <TableCell>
-                  <Badge variant="outline" className="text-[10px] font-bold bg-gray-50 dark:bg-gray-800">
+                  <Badge variant="outline" className="text-[10px] font-bold bg-zinc-50 dark:bg-zinc-800">
                     {record.academicYear}
                   </Badge>
                 </TableCell>

@@ -58,7 +58,7 @@ export function StaffTable({
 }: StaffTableProps) {
   if (loading) {
     return (
-      <Card className="border-none shadow-sm bg-white dark:bg-gray-800">
+      <Card className="border-none shadow-sm bg-white dark:bg-zinc-800">
         <CardContent className="p-6 space-y-4">
           {[...Array(6)].map((_, i) => (
             <Skeleton key={i} className="h-16 w-full rounded-2xl" />
@@ -70,11 +70,11 @@ export function StaffTable({
 
   if (filtered.length === 0) {
     return (
-      <div className="py-24 text-center bg-white dark:bg-gray-800 rounded-3xl border-2 border-dashed border-gray-100 dark:border-gray-900">
-        <div className="size-20 mx-auto mb-6 rounded-full bg-gray-50 dark:bg-gray-900 flex items-center justify-center text-muted-foreground/30">
+      <div className="py-24 text-center bg-white dark:bg-zinc-800 rounded-3xl border-2 border-dashed border-zinc-100 dark:border-zinc-900">
+        <div className="size-20 mx-auto mb-6 rounded-full bg-zinc-50 dark:bg-zinc-900 flex items-center justify-center text-muted-foreground/30">
           <Users className="size-10" />
         </div>
-        <h3 className="text-xl font-semibold text-gray-900 dark:text-gray-100">No staff members found</h3>
+        <h3 className="text-xl font-semibold text-zinc-900 dark:text-zinc-100">No staff members found</h3>
         <p className="text-sm font-medium text-muted-foreground mt-2 max-w-[280px] mx-auto leading-relaxed">
           {staffList.length === 0
             ? 'Start building your platform team by clicking "Add Staff" above.'
@@ -85,12 +85,12 @@ export function StaffTable({
   }
 
   return (
-    <Card className="border-none shadow-sm bg-white dark:bg-gray-800 overflow-hidden">
+    <Card className="border-none shadow-sm bg-white dark:bg-zinc-800 overflow-hidden">
       <CardContent className="p-0">
         <div className="overflow-x-auto">
           <Table>
             <TableHeader>
-              <TableRow className="bg-gray-50/50 dark:bg-gray-900/50 hover:bg-transparent">
+              <TableRow className="bg-zinc-50/50 dark:bg-zinc-900/50 hover:bg-transparent">
                 <TableHead className="min-w-[220px] uppercase tracking-widest text-[10px] font-black text-muted-foreground py-4 pl-6">Member</TableHead>
                 <TableHead className="hidden sm:table-cell uppercase tracking-widest text-[10px] font-black text-muted-foreground py-4">Contact Info</TableHead>
                 <TableHead className="hidden lg:table-cell uppercase tracking-widest text-[10px] font-black text-muted-foreground py-4">Platform Role</TableHead>
@@ -122,7 +122,7 @@ export function StaffTable({
                         </Avatar>
                         <div className="min-w-0 flex-1">
                           <div className="flex items-center gap-2 flex-wrap">
-                            <p className="font-bold text-sm text-gray-900 dark:text-gray-100 truncate">
+                            <p className="font-bold text-sm text-zinc-900 dark:text-zinc-100 truncate">
                               {member.name}
                             </p>
                           </div>
@@ -137,7 +137,7 @@ export function StaffTable({
                       <div className="space-y-1">
                         <div className="flex items-center gap-1.5 min-w-0">
                           <Mail className="size-3 text-muted-foreground shrink-0" />
-                          <span className="text-[11px] font-bold text-gray-700 dark:text-gray-300 truncate">
+                          <span className="text-[11px] font-bold text-zinc-700 dark:text-zinc-300 truncate">
                             {member.email}
                           </span>
                         </div>
@@ -219,7 +219,7 @@ export function StaffTable({
                                   </AlertDialogTitle>
                                   <AlertDialogDescription className="font-medium text-sm">
                                     Are you sure you want to permanently delete{" "}
-                                    <span className="font-black text-gray-900 dark:text-gray-100">{member.name}</span>? 
+                                    <span className="font-black text-zinc-900 dark:text-zinc-100">{member.name}</span>? 
                                     This action cannot be undone and will revoke all access immediately.
                                   </AlertDialogDescription>
                                 </AlertDialogHeader>
@@ -248,7 +248,7 @@ export function StaffTable({
         </div>
 
         {!loading && filtered.length > 0 && (
-          <div className="px-6 py-4 border-t border-gray-50 dark:border-gray-900 bg-gray-50/30 dark:bg-gray-900/30">
+          <div className="px-6 py-4 border-t border-zinc-50 dark:border-zinc-900 bg-zinc-50/30 dark:bg-zinc-900/30">
             <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">
               Directly managing <span className="text-teal-600">{filtered.length}</span> platform personnel records
             </p>

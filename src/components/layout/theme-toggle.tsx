@@ -35,7 +35,7 @@ export function ThemeToggle() {
         <Button
           variant="ghost"
           size="icon"
-          className="size-10 bg-white hover:bg-gray-50 dark:bg-zinc-900 dark:hover:bg-zinc-800 border border-gray-200 dark:border-zinc-800 shadow-sm transition-all cursor-pointer"
+          className="size-10 bg-white hover:bg-zinc-50 dark:bg-zinc-900 dark:hover:bg-zinc-800 border border-zinc-200 dark:border-zinc-800 shadow-sm transition-all cursor-pointer"
         >
           {theme === "dark" ? (
             <Moon className="size-5 text-blue-400" />

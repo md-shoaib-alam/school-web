@@ -339,7 +339,7 @@ export function SubscriptionDialogs({
                       endDate: date ? date.toISOString().split('T')[0] : "",
                     }))
                   }
-                  className="w-full h-10 rounded-xl border-gray-200 dark:border-gray-700"
+                  className="w-full h-10 rounded-xl border-zinc-200 dark:border-zinc-700"
                 />
               </div>
               <div className="space-y-2">

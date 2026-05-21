@@ -49,7 +49,7 @@ export function ParentNotices() {
     <div className="space-y-6 pb-10">
       <div className="flex items-center gap-2">
         <Bell className="size-5 text-amber-600" />
-        <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100 uppercase tracking-tight">
+        <h2 className="text-lg font-semibold text-zinc-900 dark:text-zinc-100 uppercase tracking-tight">
           School Notices
         </h2>
       </div>

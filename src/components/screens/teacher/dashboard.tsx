@@ -164,10 +164,10 @@ export function TeacherDashboard() {
     <div className="space-y-6">
       {/* Greeting */}
       <div>
-        <h2 className="text-2xl font-semibold text-gray-900 dark:text-gray-100">
+        <h2 className="text-2xl font-semibold text-zinc-900 dark:text-zinc-100">
           {getGreeting()}, {currentUser?.name || "Mr. John Smith"} 👋
         </h2>
-        <p className="text-gray-500 dark:text-gray-400 mt-1">
+        <p className="text-zinc-500 dark:text-zinc-400 mt-1">
           Here&apos;s an overview of your classes and activities today.
         </p>
       </div>
@@ -182,10 +182,10 @@ export function TeacherDashboard() {
             <CardContent className="p-5">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-gray-500 dark:text-gray-400 font-medium">
+                  <p className="text-sm text-zinc-500 dark:text-zinc-400 font-medium">
                     {stat.title}
                   </p>
-                  <p className="text-2xl font-bold text-gray-900 dark:text-gray-100 mt-1">
+                  <p className="text-2xl font-bold text-zinc-900 dark:text-zinc-100 mt-1">
                     {stat.value}
                   </p>
                 </div>
@@ -218,11 +218,11 @@ export function TeacherDashboard() {
           <CardContent className="p-4 pt-0">
             {todaySchedule.length === 0 ? (
               <div className="text-center py-8">
-                <CalendarDays className="size-10 text-gray-300 dark:text-gray-600 mx-auto mb-3" />
-                <p className="text-gray-400 dark:text-gray-500 text-sm">
+                <CalendarDays className="size-10 text-zinc-300 dark:text-zinc-600 mx-auto mb-3" />
+                <p className="text-zinc-400 dark:text-zinc-500 text-sm">
                   No classes scheduled for today
                 </p>
-                <p className="text-gray-300 dark:text-gray-600 text-xs mt-1">
+                <p className="text-zinc-300 dark:text-zinc-600 text-xs mt-1">
                   Enjoy your day off!
                 </p>
               </div>
@@ -237,16 +237,16 @@ export function TeacherDashboard() {
                       <p className="text-xs font-semibold text-blue-600 dark:text-blue-400">
                         {formatTime(entry.startTime)}
                       </p>
-                      <p className="text-[10px] text-gray-400 dark:text-gray-500">
+                      <p className="text-[10px] text-zinc-400 dark:text-zinc-500">
                         {formatTime(entry.endTime)}
                       </p>
                     </div>
-                    <div className="w-px h-8 bg-gray-200 dark:bg-gray-700" />
+                    <div className="w-px h-8 bg-zinc-200 dark:bg-zinc-700" />
                     <div className="flex-1">
-                      <p className="text-sm font-medium text-gray-800 dark:text-gray-200">
+                      <p className="text-sm font-medium text-zinc-800 dark:text-zinc-200">
                         {entry.subjectName}
                       </p>
-                      <p className="text-xs text-gray-400 dark:text-gray-500">
+                      <p className="text-xs text-zinc-400 dark:text-zinc-500">
                         {entry.className}
                       </p>
                     </div>
@@ -282,7 +282,7 @@ export function TeacherDashboard() {
                 >
                   <span className="text-blue-500">{action.icon}</span>
                   {action.label}
-                  <ArrowRight className="size-3.5 ml-auto text-gray-300 dark:text-gray-600" />
+                  <ArrowRight className="size-3.5 ml-auto text-zinc-300 dark:text-zinc-600" />
                 </Button>
               ))}
             </div>
@@ -320,10 +320,10 @@ export function TeacherDashboard() {
                       <BookOpen className="size-4 text-blue-500" />
                     </div>
                     <div>
-                      <p className="text-sm font-medium text-gray-800 dark:text-gray-200">
+                      <p className="text-sm font-medium text-zinc-800 dark:text-zinc-200">
                         {subject.name}
                       </p>
-                      <p className="text-xs text-gray-400 dark:text-gray-500">
+                      <p className="text-xs text-zinc-400 dark:text-zinc-500">
                         {subject.className} • {subject.code}
                       </p>
                     </div>
@@ -332,8 +332,8 @@ export function TeacherDashboard() {
               ))}
               {subjects.length === 0 && (
                 <div className="text-center py-6">
-                  <BookOpen className="size-8 text-gray-300 dark:text-gray-600 mx-auto mb-2" />
-                  <p className="text-gray-400 dark:text-gray-500 text-sm">
+                  <BookOpen className="size-8 text-zinc-300 dark:text-zinc-600 mx-auto mb-2" />
+                  <p className="text-zinc-400 dark:text-zinc-500 text-sm">
                     No subjects assigned
                   </p>
                 </div>
@@ -377,7 +377,7 @@ export function TeacherDashboard() {
                     className="p-3 rounded-lg hover:bg-blue-50/50 dark:hover:bg-blue-900/20 transition-colors"
                   >
                     <div className="flex items-center justify-between mb-1">
-                      <p className="text-sm font-medium text-gray-800 dark:text-gray-200 truncate max-w-[200px]">
+                      <p className="text-sm font-medium text-zinc-800 dark:text-zinc-200 truncate max-w-[200px]">
                         {assignment.title}
                       </p>
                       <Badge
@@ -401,7 +401,7 @@ export function TeacherDashboard() {
                         )}
                       </Badge>
                     </div>
-                    <div className="flex items-center justify-between text-xs text-gray-400 dark:text-gray-500 mb-2">
+                    <div className="flex items-center justify-between text-xs text-zinc-400 dark:text-zinc-500 mb-2">
                       <span>
                         {assignment.subjectName} • {assignment.className}
                       </span>
@@ -410,7 +410,7 @@ export function TeacherDashboard() {
                         submitted
                       </span>
                     </div>
-                    <div className="w-full bg-gray-100 dark:bg-gray-800 rounded-full h-1.5">
+                    <div className="w-full bg-zinc-100 dark:bg-zinc-800 rounded-full h-1.5">
                       <div
                         className={`h-1.5 rounded-full transition-all ${
                           progressPct === 100
@@ -427,8 +427,8 @@ export function TeacherDashboard() {
               })}
               {assignments.length === 0 && (
                 <div className="text-center py-6">
-                  <FileText className="size-8 text-gray-300 dark:text-gray-600 mx-auto mb-2" />
-                  <p className="text-gray-400 dark:text-gray-500 text-sm">
+                  <FileText className="size-8 text-zinc-300 dark:text-zinc-600 mx-auto mb-2" />
+                  <p className="text-zinc-400 dark:text-zinc-500 text-sm">
                     No assignments created yet
                   </p>
                 </div>
@@ -461,7 +461,7 @@ export function TeacherDashboard() {
             {classes.map((cls) => (
               <div
                 key={cls.id}
-                className="p-4 rounded-xl border border-gray-100 dark:border-gray-800 hover:border-blue-200 dark:hover:border-blue-800 hover:shadow-sm transition-all cursor-pointer"
+                className="p-4 rounded-xl border border-zinc-100 dark:border-zinc-800 hover:border-blue-200 dark:hover:border-blue-800 hover:shadow-sm transition-all cursor-pointer"
                 onClick={() => navigateTo("my-classes")}
               >
                 <div className="flex items-center gap-3">
@@ -469,20 +469,20 @@ export function TeacherDashboard() {
                     <School className="size-5 text-blue-500" />
                   </div>
                   <div>
-                    <p className="text-sm font-semibold text-gray-800 dark:text-gray-200">
+                    <p className="text-sm font-semibold text-zinc-800 dark:text-zinc-200">
                       {cls.name}
                     </p>
-                    <p className="text-xs text-gray-400 dark:text-gray-500">
+                    <p className="text-xs text-zinc-400 dark:text-zinc-500">
                       Section {cls.section}
                     </p>
                   </div>
                 </div>
                 <div className="mt-3 flex items-center justify-between">
-                  <span className="text-xs text-gray-400 dark:text-gray-500">
+                  <span className="text-xs text-zinc-400 dark:text-zinc-500">
                     <Users className="size-3 inline mr-1" />
                     {cls.studentCount} Students
                   </span>
-                  <ArrowRight className="size-3.5 text-gray-300 dark:text-gray-600" />
+                  <ArrowRight className="size-3.5 text-zinc-300 dark:text-zinc-600" />
                 </div>
               </div>
             ))}

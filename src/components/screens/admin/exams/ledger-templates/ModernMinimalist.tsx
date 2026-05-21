@@ -4,7 +4,7 @@ import { LedgerTemplateProps } from './types';
 export const ModernMinimalist: React.FC<LedgerTemplateProps> = ({ data }) => {
   return (
     <div 
-      className="p-[6mm] bg-white text-slate-900 font-sans print:p-0 min-h-screen"
+      className="p-[6mm] bg-white text-zinc-900 font-sans print:p-0 min-h-screen"
       style={{ WebkitPrintColorAdjust: 'exact', printColorAdjust: 'exact' }}
     >
       <style type="text/css" media="print">
@@ -22,18 +22,18 @@ export const ModernMinimalist: React.FC<LedgerTemplateProps> = ({ data }) => {
       </style>
 
       {/* Header Accent Line */}
-      <div className="h-1.5 w-full bg-gradient-to-r from-blue-600 via-indigo-500 to-emerald-500 rounded-full mb-4" />
+      <div className="h-1.5 w-full bg-gradient-to-r from-blue-600 via-violet-500 to-emerald-500 rounded-full mb-4" />
 
       {/* Header Info */}
       <div className="flex flex-col sm:flex-row sm:justify-between sm:items-end border-b border-zinc-150 pb-3 mb-4">
         <div>
-          <h1 className="font-semibold text-xl tracking-tight text-slate-900 uppercase">{data.schoolName}</h1>
-          <p className="text-[10px] text-indigo-600 font-bold uppercase tracking-wider mt-0.5">{data.ledgerTitle}</p>
+          <h1 className="font-semibold text-xl tracking-tight text-zinc-900 uppercase">{data.schoolName}</h1>
+          <p className="text-[10px] text-violet-600 font-bold uppercase tracking-wider mt-0.5">{data.ledgerTitle}</p>
         </div>
-        <div className="flex gap-6 text-[10px] font-bold text-slate-500 mt-2 sm:mt-0">
-          <div>CLASS: <span className="text-slate-800">{data.className} - {data.classSection}</span></div>
-          <div>CYCLE: <span className="text-slate-800">{data.academicYear}</span></div>
-          <div>DATE: <span className="text-slate-800" suppressHydrationWarning>{new Date().toLocaleDateString()}</span></div>
+        <div className="flex gap-6 text-[10px] font-bold text-zinc-500 mt-2 sm:mt-0">
+          <div>CLASS: <span className="text-zinc-800">{data.className} - {data.classSection}</span></div>
+          <div>CYCLE: <span className="text-zinc-800">{data.academicYear}</span></div>
+          <div>DATE: <span className="text-zinc-800" suppressHydrationWarning>{new Date().toLocaleDateString()}</span></div>
         </div>
       </div>
 
@@ -41,7 +41,7 @@ export const ModernMinimalist: React.FC<LedgerTemplateProps> = ({ data }) => {
       <div className="grid grid-cols-6 gap-3 mb-4">
         <div className="bg-zinc-50 border border-zinc-100 rounded-lg p-2 flex flex-col justify-center">
           <span className="text-[8px] text-zinc-400 font-bold uppercase tracking-wider block">Total Students</span>
-          <span className="text-xs font-black text-slate-900 font-mono mt-0.5">{data.totalStudents}</span>
+          <span className="text-xs font-black text-zinc-900 font-mono mt-0.5">{data.totalStudents}</span>
         </div>
         <div className="bg-emerald-50/50 border border-emerald-100/60 rounded-lg p-2 flex flex-col justify-center">
           <span className="text-[8px] text-emerald-600 font-bold uppercase tracking-wider block">Passed</span>
@@ -59,12 +59,12 @@ export const ModernMinimalist: React.FC<LedgerTemplateProps> = ({ data }) => {
         ) : (
           <div className="bg-zinc-50 border border-zinc-100 rounded-lg p-2 flex flex-col justify-center">
             <span className="text-[8px] text-zinc-400 font-bold uppercase tracking-wider block">Incomplete</span>
-            <span className="text-xs font-black text-slate-900 font-mono mt-0.5">0</span>
+            <span className="text-xs font-black text-zinc-900 font-mono mt-0.5">0</span>
           </div>
         )}
-        <div className="bg-indigo-50/50 border border-indigo-100/60 rounded-lg p-2 flex flex-col justify-center">
-          <span className="text-[8px] text-indigo-600 font-bold uppercase tracking-wider block">Pass Rate</span>
-          <span className="text-xs font-black text-indigo-850 font-mono mt-0.5">{data.totalStudents > 0 ? ((data.passCount / data.totalStudents) * 100).toFixed(1) + '%' : '0%'}</span>
+        <div className="bg-violet-50/50 border border-violet-100/60 rounded-lg p-2 flex flex-col justify-center">
+          <span className="text-[8px] text-violet-600 font-bold uppercase tracking-wider block">Pass Rate</span>
+          <span className="text-xs font-black text-violet-850 font-mono mt-0.5">{data.totalStudents > 0 ? ((data.passCount / data.totalStudents) * 100).toFixed(1) + '%' : '0%'}</span>
         </div>
         <div className="bg-blue-50/50 border border-blue-100/60 rounded-lg p-2 flex flex-col justify-center">
           <span className="text-[8px] text-blue-600 font-bold uppercase tracking-wider block">Class Avg %</span>
@@ -76,7 +76,7 @@ export const ModernMinimalist: React.FC<LedgerTemplateProps> = ({ data }) => {
       <div className="overflow-hidden border border-zinc-200 rounded-xl bg-white shadow-sm">
         <table className="w-full text-[9.5px] border-collapse table-fixed">
           <thead>
-            <tr className="bg-slate-900 text-white font-bold text-center border-b border-zinc-200">
+            <tr className="bg-zinc-900 text-white font-bold text-center border-b border-zinc-200">
               <th className="p-2 w-[40px] text-center font-bold">S.NO</th>
               <th className="p-2 w-[60px] text-center font-bold">ROLL</th>
               <th className="p-2 text-left font-bold w-[18%]">STUDENT NAME</th>
@@ -101,8 +101,8 @@ export const ModernMinimalist: React.FC<LedgerTemplateProps> = ({ data }) => {
                 }`}
               >
                 <td className="p-2 text-center font-mono text-zinc-500">{idx + 1}</td>
-                <td className="p-2 text-center font-mono font-bold text-slate-800">{student.rollNumber}</td>
-                <td className="p-2 text-left font-bold text-slate-900 truncate">{student.name}</td>
+                <td className="p-2 text-center font-mono font-bold text-zinc-800">{student.rollNumber}</td>
+                <td className="p-2 text-left font-bold text-zinc-900 truncate">{student.name}</td>
                 {data.subjectsList.map(sub => {
                   const marks = student.subjectMarks[sub];
                   if (!marks) return <td key={sub} className="p-2 text-center text-zinc-300 font-medium">-</td>;
@@ -122,14 +122,14 @@ export const ModernMinimalist: React.FC<LedgerTemplateProps> = ({ data }) => {
                   }
                   const isFailed = marks.status === 'fail';
                   return (
-                    <td key={sub} className={`p-2 text-center font-medium ${isFailed ? 'text-red-550 font-semibold' : 'text-slate-700'}`}>
+                    <td key={sub} className={`p-2 text-center font-medium ${isFailed ? 'text-red-550 font-semibold' : 'text-zinc-700'}`}>
                       {marks.marksObtained}
                       <span className="text-[7.5px] text-zinc-450 font-normal">/{marks.totalMarks}</span>
                     </td>
                   );
                 })}
-                <td className="p-2 text-center font-mono font-bold text-indigo-905">{student.totalObtained}/{student.totalMax}</td>
-                <td className="p-2 text-center font-mono font-black text-slate-800">{student.percentage}</td>
+                <td className="p-2 text-center font-mono font-bold text-violet-905">{student.totalObtained}/{student.totalMax}</td>
+                <td className="p-2 text-center font-mono font-black text-zinc-800">{student.percentage}</td>
                 <td className="p-2 text-center">
                   <span className={`inline-block px-1.5 py-0.5 rounded text-[8px] font-extrabold font-mono ${
                     student.grade === 'A+' || student.grade === 'A'

@@ -282,7 +282,7 @@ export function AdminCertificates() {
       </Dialog>
 
       <Dialog open={!!viewCert} onOpenChange={v => !v && setViewCert(null)}>
-        <DialogContent className="sm:max-w-4xl p-0 overflow-hidden no-print text-slate-900">
+        <DialogContent className="sm:max-w-4xl p-0 overflow-hidden no-print text-zinc-900">
           <VisuallyHidden.Root>
             <DialogHeader>
               <DialogTitle>Certificate Preview</DialogTitle>
@@ -290,13 +290,13 @@ export function AdminCertificates() {
             </DialogHeader>
           </VisuallyHidden.Root>
           <div className="p-3 sm:p-4 border-b flex justify-between items-center bg-white sticky top-0 z-10">
-            <h3 className="font-semibold text-slate-900 truncate mr-2">Preview</h3>
+            <h3 className="font-semibold text-zinc-900 truncate mr-2">Preview</h3>
             <Button onClick={() => handlePrint()} className="bg-amber-600 hover:bg-amber-700 text-white h-9 px-3 shrink-0">
               <Printer className="size-4 mr-2" /> 
               <span className="text-sm">Print PDF</span>
             </Button>
           </div>
-          <div className="max-h-[75vh] overflow-y-auto p-4 sm:p-8 bg-gray-100/50 flex justify-center">
+          <div className="max-h-[75vh] overflow-y-auto p-4 sm:p-8 bg-zinc-100/50 flex justify-center">
             <div className="scale-[0.38] xs:scale-[0.45] sm:scale-[0.7] lg:scale-100 origin-top">
               <div ref={contentRef} className="w-[210mm] bg-white shadow-2xl">
                 <CertificateTemplate cert={viewCert} formatDate={formatDate} />

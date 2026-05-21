@@ -38,12 +38,12 @@ interface RoleGridProps {
 export function RoleGrid({ roles, onEdit, onDelete, onAssignUsers }: RoleGridProps) {
   if (roles.length === 0) {
     return (
-      <Card className="border-2 border-dashed border-gray-100 dark:border-gray-800 bg-transparent">
-        <CardContent className="flex flex-col items-center justify-center py-20 text-gray-400 dark:text-gray-500">
-          <div className="size-20 rounded-full bg-gray-50 dark:bg-gray-800 flex items-center justify-center mb-6">
+      <Card className="border-2 border-dashed border-zinc-100 dark:border-zinc-800 bg-transparent">
+        <CardContent className="flex flex-col items-center justify-center py-20 text-zinc-400 dark:text-zinc-500">
+          <div className="size-20 rounded-full bg-zinc-50 dark:bg-zinc-800 flex items-center justify-center mb-6">
             <Shield className="size-10 opacity-20" />
           </div>
-          <p className="text-xl font-bold text-gray-900 dark:text-gray-100">No platform roles yet</p>
+          <p className="text-xl font-bold text-zinc-900 dark:text-zinc-100">No platform roles yet</p>
           <p className="text-sm mt-1 max-w-[280px] text-center leading-relaxed">
             Create your first custom role or use a template above to get started
           </p>
@@ -63,7 +63,7 @@ export function RoleGrid({ roles, onEdit, onDelete, onAssignUsers }: RoleGridPro
         const userCount = role._count?.users ?? 0;
 
         return (
-          <Card key={role.id} className="hover:shadow-lg transition-all border-none bg-white dark:bg-gray-800 group overflow-hidden relative">
+          <Card key={role.id} className="hover:shadow-lg transition-all border-none bg-white dark:bg-zinc-800 group overflow-hidden relative">
             <div 
               className="absolute top-0 left-0 w-1.5 h-full opacity-70 group-hover:opacity-100 transition-opacity" 
               style={{ backgroundColor: role.color }}
@@ -90,7 +90,7 @@ export function RoleGrid({ roles, onEdit, onDelete, onAssignUsers }: RoleGridPro
                   <Button
                     variant="secondary"
                     size="icon"
-                    className="size-8 rounded-lg bg-gray-100 dark:bg-gray-700 hover:bg-teal-50 hover:text-teal-600 dark:hover:bg-teal-900/40"
+                    className="size-8 rounded-lg bg-zinc-100 dark:bg-zinc-700 hover:bg-teal-50 hover:text-teal-600 dark:hover:bg-teal-900/40"
                     onClick={() => onAssignUsers(role)}
                     title="Assign Users"
                   >
@@ -99,7 +99,7 @@ export function RoleGrid({ roles, onEdit, onDelete, onAssignUsers }: RoleGridPro
                   <Button
                     variant="secondary"
                     size="icon"
-                    className="size-8 rounded-lg bg-gray-100 dark:bg-gray-700 hover:bg-emerald-50 hover:text-emerald-600 dark:hover:bg-emerald-900/40"
+                    className="size-8 rounded-lg bg-zinc-100 dark:bg-zinc-700 hover:bg-emerald-50 hover:text-emerald-600 dark:hover:bg-emerald-900/40"
                     onClick={() => onEdit(role)}
                     title="Edit Role"
                   >
@@ -110,7 +110,7 @@ export function RoleGrid({ roles, onEdit, onDelete, onAssignUsers }: RoleGridPro
                       <Button
                         variant="secondary"
                         size="icon"
-                        className="size-8 rounded-lg bg-gray-100 dark:bg-gray-700 hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-900/40"
+                        className="size-8 rounded-lg bg-zinc-100 dark:bg-zinc-700 hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-900/40"
                         title="Delete Role"
                       >
                         <Trash2 className="size-4" />
@@ -142,7 +142,7 @@ export function RoleGrid({ roles, onEdit, onDelete, onAssignUsers }: RoleGridPro
             </CardHeader>
             <CardContent className="space-y-4">
               {/* Stats Bar */}
-              <div className="flex items-center justify-between p-3 rounded-xl bg-gray-50/50 dark:bg-gray-900/30 border border-gray-100 dark:border-gray-800">
+              <div className="flex items-center justify-between p-3 rounded-xl bg-zinc-50/50 dark:bg-zinc-900/30 border border-zinc-100 dark:border-zinc-800">
                 <div className="flex items-center gap-1.5 text-xs font-bold text-muted-foreground">
                   <Shield className="size-3.5 text-teal-600" />
                   <span>{permCount} Perms</span>
@@ -179,7 +179,7 @@ export function RoleGrid({ roles, onEdit, onDelete, onAssignUsers }: RoleGridPro
                   <p className="text-[10px] text-muted-foreground font-medium italic">No permissions defined</p>
                 )}
                 {permCount > 8 && (
-                  <div className="absolute bottom-0 right-0 h-6 w-12 bg-gradient-to-l from-white dark:from-gray-800 to-transparent flex items-center justify-end">
+                  <div className="absolute bottom-0 right-0 h-6 w-12 bg-gradient-to-l from-white dark:from-zinc-800 to-transparent flex items-center justify-end">
                     <span className="text-[10px] font-black text-muted-foreground">+{permCount - 8}</span>
                   </div>
                 )}
@@ -187,7 +187,7 @@ export function RoleGrid({ roles, onEdit, onDelete, onAssignUsers }: RoleGridPro
 
               {/* Manage Link */}
               <button
-                className="w-full pt-3 mt-1 border-t border-gray-100 dark:border-gray-800 flex items-center justify-between group/link text-[11px] font-bold text-teal-600 dark:text-teal-400 hover:text-teal-700 transition-colors"
+                className="w-full pt-3 mt-1 border-t border-zinc-100 dark:border-zinc-800 flex items-center justify-between group/link text-[11px] font-bold text-teal-600 dark:text-teal-400 hover:text-teal-700 transition-colors"
                 onClick={() => onAssignUsers(role)}
               >
                 <div className="flex items-center gap-2">

@@ -34,7 +34,7 @@ const statusConfig: Record<string, { bg: string; icon: React.ReactNode; label: s
   pending: { bg: 'bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 border-amber-200 dark:border-amber-800', icon: <Clock className="size-3.5" />, label: 'Pending' },
   approved: { bg: 'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800', icon: <CheckCircle2 className="size-3.5" />, label: 'Approved' },
   rejected: { bg: 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 border-red-200 dark:border-red-800', icon: <XCircle className="size-3.5" />, label: 'Rejected' },
-  cancelled: { bg: 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-400 border-gray-200 dark:border-gray-700', icon: <Ban className="size-3.5" />, label: 'Cancelled' },
+  cancelled: { bg: 'bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-400 border-zinc-200 dark:border-zinc-700', icon: <Ban className="size-3.5" />, label: 'Cancelled' },
 };
 
 const leaveTypeConfig: Record<string, { bg: string; icon: React.ReactNode; label: string }> = {
@@ -291,7 +291,7 @@ export function TeacherLeaves() {
                               </Button>
                             )}
                             {leave.status === 'rejected' && leave.approverRemarks && (
-                              <div className="text-xs text-gray-500 max-w-[150px] mx-auto text-center">
+                              <div className="text-xs text-zinc-500 max-w-[150px] mx-auto text-center">
                                 Remarks: {leave.approverRemarks}
                               </div>
                             )}

@@ -81,7 +81,7 @@ export function SuperAdminFeatureFlags() {
       <FlagSummary totalCount={totalCount} totalEnabled={totalEnabled} />
 
       <Tabs defaultValue="core" className="w-full">
-        <TabsList className="h-12 w-full sm:w-auto bg-white dark:bg-gray-800 rounded-2xl p-1 shadow-sm border-2 border-transparent">
+        <TabsList className="h-12 w-full sm:w-auto bg-white dark:bg-zinc-800 rounded-2xl p-1 shadow-sm border-2 border-transparent">
           <TabsTrigger value="core" className="flex-1 sm:flex-none gap-2 rounded-xl data-[state=active]:bg-teal-50 data-[state=active]:text-teal-700 font-black text-[10px] uppercase tracking-widest transition-all">
             <Blocks className="size-3.5" />
             Core

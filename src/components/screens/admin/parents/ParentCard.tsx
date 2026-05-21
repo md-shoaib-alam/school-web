@@ -60,12 +60,12 @@ export function ParentCard({
               </AvatarFallback>
             </Avatar>
             <div>
-              <h3 className="font-semibold text-gray-900 dark:text-gray-100 text-sm">
+              <h3 className="font-semibold text-zinc-900 dark:text-zinc-100 text-sm">
                 {parent.name}
               </h3>
               <div className="flex items-center gap-1.5 mt-0.5">
-                <Mail className="size-3 text-slate-500 dark:text-zinc-400" />
-                <span className="text-xs text-slate-700 dark:text-zinc-300">
+                <Mail className="size-3 text-zinc-500 dark:text-zinc-400" />
+                <span className="text-xs text-zinc-700 dark:text-zinc-300">
                   {parent.email}
                 </span>
               </div>
@@ -124,7 +124,7 @@ export function ParentCard({
         </div>
 
         {/* Parent Details */}
-        <div className="flex items-center gap-4 text-xs text-slate-600 dark:text-zinc-300 mb-4">
+        <div className="flex items-center gap-4 text-xs text-zinc-600 dark:text-zinc-300 mb-4">
           {parent.phone && (
             <span className="flex items-center gap-1">
               <Phone className="size-3" /> {parent.phone}
@@ -141,7 +141,7 @@ export function ParentCard({
         <Separator className="mb-3" />
         <div className="space-y-2">
           <div className="flex items-center justify-between mb-2">
-            <span className="text-xs font-medium text-slate-600 dark:text-zinc-300 flex items-center gap-1">
+            <span className="text-xs font-medium text-zinc-600 dark:text-zinc-300 flex items-center gap-1">
               <Baby className="size-3" /> Children ({parent.children.length})
             </span>
             <Button
@@ -155,9 +155,9 @@ export function ParentCard({
           </div>
 
           {parent.children.length === 0 ? (
-            <div className="text-center py-6 bg-gray-50 dark:bg-gray-800/50 rounded-lg">
-              <GraduationCap className="size-8 mx-auto text-gray-300 dark:text-gray-600 mb-2" />
-              <p className="text-xs text-slate-500 dark:text-zinc-400">
+            <div className="text-center py-6 bg-zinc-50 dark:bg-zinc-800/50 rounded-lg">
+              <GraduationCap className="size-8 mx-auto text-zinc-300 dark:text-zinc-600 mb-2" />
+              <p className="text-xs text-zinc-500 dark:text-zinc-400">
                 No children linked yet
               </p>
               <Button
@@ -174,17 +174,17 @@ export function ParentCard({
               {parent.children.map((child) => (
                 <div
                   key={child.id}
-                  className="flex items-center justify-between bg-gray-50 dark:bg-gray-800/50 rounded-lg px-3 py-2"
+                  className="flex items-center justify-between bg-zinc-50 dark:bg-zinc-800/50 rounded-lg px-3 py-2"
                 >
                   <div className="flex items-center gap-2.5 min-w-0">
                     <div className="size-7 rounded-full bg-violet-100 dark:bg-violet-900/30 text-violet-600 dark:text-violet-400 flex items-center justify-center text-[10px] font-bold shrink-0">
                       {child.gender === "male" ? "👦" : "👧"}
                     </div>
                     <div className="min-w-0">
-                      <p className="text-xs font-medium text-gray-800 dark:text-gray-200 truncate">
+                      <p className="text-xs font-medium text-zinc-800 dark:text-zinc-200 truncate">
                         {child.name}
                       </p>
-                      <p className="text-[10px] text-slate-500 dark:text-zinc-400">
+                      <p className="text-[10px] text-zinc-500 dark:text-zinc-400">
                         {child.className} • Roll {child.rollNumber}
                       </p>
                     </div>

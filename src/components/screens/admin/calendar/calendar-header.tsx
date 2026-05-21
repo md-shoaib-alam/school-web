@@ -33,15 +33,15 @@ export function CalendarHeader({
   description = "View school events and activities",
 }: CalendarHeaderProps) {
   return (
-    <div className="bg-white dark:bg-neutral-900/40 rounded-2xl border border-slate-200/60 dark:border-white/[0.06] shadow-sm overflow-hidden">
+    <div className="bg-white dark:bg-neutral-900/40 rounded-2xl border border-zinc-200/60 dark:border-white/[0.06] shadow-sm overflow-hidden">
       {/* Title & Actions Top Row */}
-      <div className="px-4 py-4 sm:px-6 sm:py-5 border-b border-slate-100 dark:border-white/[0.05] flex flex-col sm:flex-row gap-3 sm:gap-4 justify-between items-start sm:items-center">
+      <div className="px-4 py-4 sm:px-6 sm:py-5 border-b border-zinc-100 dark:border-white/[0.05] flex flex-col sm:flex-row gap-3 sm:gap-4 justify-between items-start sm:items-center">
         <div className="flex items-center justify-between w-full sm:w-auto">
           <div>
-            <h1 className="text-xl sm:text-2xl font-semibold text-slate-900 dark:text-white tracking-tight">
+            <h1 className="text-xl sm:text-2xl font-semibold text-zinc-900 dark:text-white tracking-tight">
               {title}
             </h1>
-            <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-0.5">
+            <p className="text-xs sm:text-sm text-zinc-500 dark:text-zinc-400 mt-0.5">
               {description}
             </p>
           </div>
@@ -50,7 +50,7 @@ export function CalendarHeader({
         <div className="flex items-center w-full sm:w-auto mt-1 sm:mt-0">
           <div className="flex items-center gap-2 w-full sm:w-auto">
             <Select value={typeFilter} onValueChange={setTypeFilter}>
-              <SelectTrigger className="w-full sm:w-[140px] h-9 text-xs font-semibold border-slate-200/70 dark:border-white/[0.08] rounded-xl">
+              <SelectTrigger className="w-full sm:w-[140px] h-9 text-xs font-semibold border-zinc-200/70 dark:border-white/[0.08] rounded-xl">
                 <SelectValue placeholder="All" />
               </SelectTrigger>
               <SelectContent>
@@ -80,7 +80,7 @@ export function CalendarHeader({
       </div>
 
       {/* Month navigation row */}
-      <div className="px-4 py-2.5 sm:px-6 sm:py-3 flex items-center justify-between bg-slate-50/40 dark:bg-white/[0.01]">
+      <div className="px-4 py-2.5 sm:px-6 sm:py-3 flex items-center justify-between bg-zinc-50/40 dark:bg-white/[0.01]">
         {/* Left Side: Packed Month Navigation */}
         <div className="flex items-center gap-2">
           <Button 
@@ -92,7 +92,7 @@ export function CalendarHeader({
             <ChevronLeft className="size-4 fill-current" />
           </Button>
           
-          <h2 className="text-base font-semibold text-slate-800 dark:text-slate-200 tracking-tight min-w-[100px] text-center">
+          <h2 className="text-base font-semibold text-zinc-800 dark:text-zinc-200 tracking-tight min-w-[100px] text-center">
             {MONTH_NAMES[currentMonth]} {currentYear}
           </h2>
 
@@ -110,7 +110,7 @@ export function CalendarHeader({
         <Button 
           variant="outline" 
           size="sm" 
-          className="h-8 px-4 text-xs font-bold border-slate-200/70 dark:border-white/[0.08] hover:bg-slate-50 dark:hover:bg-white/[0.02] rounded-xl transition-all duration-150 active:scale-95 text-slate-700 dark:text-slate-300"
+          className="h-8 px-4 text-xs font-bold border-zinc-200/70 dark:border-white/[0.08] hover:bg-zinc-50 dark:hover:bg-white/[0.02] rounded-xl transition-all duration-150 active:scale-95 text-zinc-700 dark:text-zinc-300"
           onClick={goToToday}
         >
           Today

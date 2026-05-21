@@ -41,9 +41,9 @@ const formatDate = (dateStr: string) => {
 
 export function RoleTable({ roles, onEdit, onAssign, onDelete }: RoleTableProps) {
   return (
-    <div className="rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-950 overflow-hidden shadow-sm">
+    <div className="rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 overflow-hidden shadow-sm">
       <Table>
-        <TableHeader className="bg-gray-50/50 dark:bg-gray-900/50">
+        <TableHeader className="bg-zinc-50/50 dark:bg-zinc-900/50">
           <TableRow>
             <TableHead className="w-[250px]">Role Name</TableHead>
             <TableHead>Staff Assigned</TableHead>
@@ -63,7 +63,7 @@ export function RoleTable({ roles, onEdit, onAssign, onDelete }: RoleTableProps)
              const permCount = Object.values(perms).flat().length;
 
              return (
-              <TableRow key={role.id} className="hover:bg-gray-50/50 dark:hover:bg-gray-900/50 transition-colors">
+              <TableRow key={role.id} className="hover:bg-zinc-50/50 dark:hover:bg-zinc-900/50 transition-colors">
                 <TableCell>
                   <div className="flex items-center gap-3">
                     <div 
@@ -73,9 +73,9 @@ export function RoleTable({ roles, onEdit, onAssign, onDelete }: RoleTableProps)
                       {role.name.charAt(0).toUpperCase()}
                     </div>
                     <div>
-                      <p className="font-semibold text-gray-900 dark:text-gray-100">{role.name}</p>
+                      <p className="font-semibold text-zinc-900 dark:text-zinc-100">{role.name}</p>
                       {role.description && (
-                        <p className="text-[10px] text-gray-500 line-clamp-1">{role.description}</p>
+                        <p className="text-[10px] text-zinc-500 line-clamp-1">{role.description}</p>
                       )}
                     </div>
                   </div>
@@ -92,12 +92,12 @@ export function RoleTable({ roles, onEdit, onAssign, onDelete }: RoleTableProps)
                   </Button>
                 </TableCell>
                 <TableCell>
-                  <div className="flex items-center gap-1.5 text-xs text-gray-600 dark:text-gray-400">
+                  <div className="flex items-center gap-1.5 text-xs text-zinc-600 dark:text-zinc-400">
                     <Shield className="size-3.5" />
                     {permCount} modules
                   </div>
                 </TableCell>
-                <TableCell className="text-xs text-gray-500" suppressHydrationWarning>
+                <TableCell className="text-xs text-zinc-500" suppressHydrationWarning>
                   {formatDate(role.createdAt)}
                 </TableCell>
                 <TableCell className="text-right">

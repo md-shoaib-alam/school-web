@@ -321,10 +321,10 @@ export function TeacherAssignments() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">
+          <h2 className="text-xl font-semibold text-zinc-900 dark:text-zinc-100">
             My Homework
           </h2>
-          <p className="text-sm text-gray-500 dark:text-gray-400">
+          <p className="text-sm text-zinc-500 dark:text-zinc-400">
             {assignments.length} homework items total
           </p>
         </div>
@@ -453,11 +453,11 @@ export function TeacherAssignments() {
               .map((a) => (
                 <div
                   key={a.id}
-                  className="flex items-center justify-between bg-white dark:bg-gray-900 p-3 rounded-lg"
+                  className="flex items-center justify-between bg-white dark:bg-zinc-900 p-3 rounded-lg"
                 >
                   <div>
                     <p className="font-medium text-sm">{a.title}</p>
-                    <p className="text-xs text-gray-500 dark:text-gray-400">
+                    <p className="text-xs text-zinc-500 dark:text-zinc-400">
                       {a.className} • {a.subjectName}
                     </p>
                   </div>
@@ -481,15 +481,15 @@ export function TeacherAssignments() {
           return (
             <Card
               key={assignment.id}
-              className={`rounded-xl shadow-sm ${overdue ? "border-red-200 dark:border-red-800" : "border-gray-100 dark:border-gray-800"} hover:shadow-md transition-shadow`}
+              className={`rounded-xl shadow-sm ${overdue ? "border-red-200 dark:border-red-800" : "border-zinc-100 dark:border-zinc-800"} hover:shadow-md transition-shadow`}
             >
               <CardContent className="p-5">
                 <div className="flex items-start justify-between mb-3">
                   <div className="flex-1">
-                    <h3 className="font-semibold text-gray-900 dark:text-gray-100 text-sm">
+                    <h3 className="font-semibold text-zinc-900 dark:text-zinc-100 text-sm">
                       {assignment.title}
                     </h3>
-                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                    <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-1">
                       {assignment.subjectName} • {assignment.className}
                     </p>
                   </div>
@@ -504,12 +504,12 @@ export function TeacherAssignments() {
                 </div>
 
                 {assignment.description && (
-                  <p className="text-xs text-gray-400 dark:text-gray-500 mb-3 line-clamp-2">
+                  <p className="text-xs text-zinc-400 dark:text-zinc-500 mb-3 line-clamp-2">
                     {assignment.description}
                   </p>
                 )}
 
-                <div className="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400 mb-3">
+                <div className="flex items-center justify-between text-xs text-zinc-500 dark:text-zinc-400 mb-3">
                   <span className="flex items-center gap-1">
                     <Clock className="size-3" /> Due: {assignment.dueDate}
                   </span>
@@ -517,7 +517,7 @@ export function TeacherAssignments() {
                     variant="outline"
                     className={`text-[10px] font-medium px-2 py-0.5 flex items-center gap-1 border rounded-full ${
                       assignment.mode === "online"
-                        ? "bg-indigo-50 text-indigo-700 border-indigo-100/60 dark:bg-indigo-950/20 dark:text-indigo-300 dark:border-indigo-900/50"
+                        ? "bg-violet-50 text-violet-700 border-violet-100/60 dark:bg-violet-950/20 dark:text-violet-300 dark:border-violet-900/50"
                         : "bg-amber-50 text-amber-700 border-amber-100/60 dark:bg-amber-950/20 dark:text-amber-300 dark:border-amber-900/50"
                     }`}
                   >
@@ -535,7 +535,7 @@ export function TeacherAssignments() {
 
                 <div className="space-y-1.5">
                   <div className="flex justify-between text-xs">
-                    <span className="text-gray-500 dark:text-gray-400">
+                    <span className="text-zinc-500 dark:text-zinc-400">
                       Submissions
                     </span>
                     <span className="font-medium">
@@ -543,14 +543,14 @@ export function TeacherAssignments() {
                     </span>
                   </div>
                   <Progress value={pct} className="h-2" />
-                  <div className="flex items-center gap-1.5 text-xs text-gray-500 dark:text-gray-400 mt-1">
+                  <div className="flex items-center gap-1.5 text-xs text-zinc-500 dark:text-zinc-400 mt-1">
                     <Users className="size-3" />
                     {assignment.totalStudents - assignment.submissions} students
                     haven't submitted
                   </div>
                 </div>
 
-                <div className="mt-4 pt-3 border-t border-gray-100 dark:border-gray-800 flex flex-col gap-2">
+                <div className="mt-4 pt-3 border-t border-zinc-100 dark:border-zinc-800 flex flex-col gap-2">
                   <Button
                     variant="outline"
                     size="sm"
@@ -582,7 +582,7 @@ export function TeacherAssignments() {
       </div>
 
       {assignments.length === 0 && (
-        <div className="text-center py-16 text-gray-400 dark:text-gray-500">
+        <div className="text-center py-16 text-zinc-400 dark:text-zinc-500">
           <FileText className="size-12 mx-auto mb-4 opacity-50" />
           <p className="text-lg">No homework yet</p>
           <p className="text-sm mt-1">Create your first homework</p>
@@ -621,7 +621,7 @@ export function TeacherAssignments() {
               ))}
             </div>
           ) : submissions.length === 0 ? (
-            <div className="py-12 text-center text-gray-400 dark:text-gray-500">
+            <div className="py-12 text-center text-zinc-400 dark:text-zinc-500">
               <Users className="size-10 mx-auto mb-2 opacity-40" />
               <p className="text-sm">No submissions yet</p>
               <p className="text-xs mt-1">
@@ -642,14 +642,14 @@ export function TeacherAssignments() {
                         sub.status === "graded"
                           ? "border-emerald-200 dark:border-emerald-800 bg-emerald-50/30 dark:bg-emerald-900/20"
                           : sub.status === "not_submitted" && !isOfflinePending
-                          ? "border-dashed border-gray-200 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-900/10 opacity-80"
-                          : "border-gray-200 dark:border-gray-700 hover:border-blue-200 dark:hover:border-blue-800 hover:bg-blue-50/30 dark:hover:bg-blue-900/20"
+                          ? "border-dashed border-zinc-200 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-900/10 opacity-80"
+                          : "border-zinc-200 dark:border-zinc-700 hover:border-blue-200 dark:hover:border-blue-800 hover:bg-blue-50/30 dark:hover:bg-blue-900/20"
                       }`}
                     >
                       <div className="flex items-start justify-between gap-3">
                         <div className="min-w-0">
                           <div className="flex items-center gap-2">
-                            <p className={`text-sm font-semibold ${(sub.status === "not_submitted" && !isOfflinePending) ? "text-gray-500 dark:text-gray-400" : "text-gray-900 dark:text-gray-100"}`}>
+                            <p className={`text-sm font-semibold ${(sub.status === "not_submitted" && !isOfflinePending) ? "text-zinc-500 dark:text-zinc-400" : "text-zinc-900 dark:text-zinc-100"}`}>
                               {sub.studentName}
                             </p>
                             <Badge
@@ -660,7 +660,7 @@ export function TeacherAssignments() {
                                   : isOfflinePending
                                   ? "bg-amber-50 dark:bg-amber-900/20 text-amber-700 dark:text-amber-400 border-amber-200 dark:border-amber-800/50"
                                   : sub.status === "not_submitted"
-                                  ? "bg-gray-100 dark:bg-gray-900/20 text-gray-600 dark:text-gray-400 border-gray-200 dark:border-gray-800"
+                                  ? "bg-zinc-100 dark:bg-zinc-900/20 text-zinc-600 dark:text-zinc-400 border-zinc-200 dark:border-zinc-800"
                                   : "bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 border-blue-200 dark:border-blue-800"
                               }`}
                             >
@@ -677,12 +677,12 @@ export function TeacherAssignments() {
                               )}
                             </Badge>
                           </div>
-                          <p className="text-[11px] text-gray-400 dark:text-gray-500">
+                          <p className="text-[11px] text-zinc-400 dark:text-zinc-500">
                             {sub.studentEmail} • {sub.studentClass}
                           </p>
                         </div>
                         {sub.status !== "not_submitted" && (
-                          <span className="text-[10px] text-gray-400 dark:text-gray-500 shrink-0" suppressHydrationWarning>
+                          <span className="text-[10px] text-zinc-400 dark:text-zinc-500 shrink-0" suppressHydrationWarning>
                             {new Date(sub.submittedAt).toLocaleDateString("en-US", {
                               month: "short",
                               day: "numeric",
@@ -694,7 +694,7 @@ export function TeacherAssignments() {
                       </div>
 
                       {sub.content && (
-                        <p className="mt-2 text-xs text-gray-600 dark:text-gray-300 bg-white dark:bg-gray-900 rounded-md p-2 line-clamp-3">
+                        <p className="mt-2 text-xs text-zinc-600 dark:text-zinc-300 bg-white dark:bg-zinc-900 rounded-md p-2 line-clamp-3">
                           {sub.content}
                         </p>
                       )}
@@ -706,7 +706,7 @@ export function TeacherAssignments() {
                             Grade: {sub.grade}
                           </span>
                           {sub.feedback && (
-                            <span className="flex items-center gap-1 text-gray-500 dark:text-gray-400">
+                            <span className="flex items-center gap-1 text-zinc-500 dark:text-zinc-400">
                               <MessageSquare className="size-3" />
                               {sub.feedback}
                             </span>
@@ -715,10 +715,10 @@ export function TeacherAssignments() {
                       )}
 
                       {canGrade && (
-                        <div className="mt-3 pt-3 border-t border-gray-100 dark:border-gray-800">
+                        <div className="mt-3 pt-3 border-t border-zinc-100 dark:border-zinc-800">
                           <div className="flex items-end gap-2">
                             <div className="flex-1">
-                              <Label className="text-[10px] uppercase tracking-wider text-gray-400 dark:text-gray-500 mb-1">
+                              <Label className="text-[10px] uppercase tracking-wider text-zinc-400 dark:text-zinc-500 mb-1">
                                 Grade
                               </Label>
                               <Input
@@ -737,7 +737,7 @@ export function TeacherAssignments() {
                               />
                             </div>
                             <div className="flex-1">
-                              <Label className="text-[10px] uppercase tracking-wider text-gray-400 dark:text-gray-500 mb-1">
+                              <Label className="text-[10px] uppercase tracking-wider text-zinc-400 dark:text-zinc-500 mb-1">
                                 Feedback
                               </Label>
                               <Input
@@ -764,7 +764,7 @@ export function TeacherAssignments() {
               </div>
 
               {Object.values(editedGrades).some((x) => x.grade.trim() !== "") && (
-                <div className="mt-2 pt-4 border-t border-gray-100 dark:border-gray-800 bg-background sticky bottom-0 animate-in fade-in slide-in-from-bottom-3 duration-200">
+                <div className="mt-2 pt-4 border-t border-zinc-100 dark:border-zinc-800 bg-background sticky bottom-0 animate-in fade-in slide-in-from-bottom-3 duration-200">
                   <Button
                     size="lg"
                     className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold gap-2 shadow-md py-5 text-sm transition-all flex items-center justify-center"

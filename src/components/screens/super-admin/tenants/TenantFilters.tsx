@@ -85,7 +85,7 @@ export function TenantFilters({
             <Button
               variant={viewMode === "grid" ? "secondary" : "ghost"}
               size="icon"
-              className={`size-8 rounded-lg ${viewMode === "grid" ? "shadow-sm bg-white dark:bg-gray-800" : ""}`}
+              className={`size-8 rounded-lg ${viewMode === "grid" ? "shadow-sm bg-white dark:bg-zinc-800" : ""}`}
               onClick={() => onViewModeChange("grid")}
             >
               <LayoutGrid className="size-4" />
@@ -93,7 +93,7 @@ export function TenantFilters({
             <Button
               variant={viewMode === "table" ? "secondary" : "ghost"}
               size="icon"
-              className={`size-8 rounded-lg ${viewMode === "table" ? "shadow-sm bg-white dark:bg-gray-800" : ""}`}
+              className={`size-8 rounded-lg ${viewMode === "table" ? "shadow-sm bg-white dark:bg-zinc-800" : ""}`}
               onClick={() => onViewModeChange("table")}
             >
               <List className="size-4" />

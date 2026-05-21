@@ -145,10 +145,10 @@ export function ParentGrades({ initialTab = "exams" }: { initialTab?: "exams" | 
 
   if (students.length === 0) {
     return (
-      <Card className="rounded-xl shadow-sm border-gray-100 dark:border-zinc-800">
+      <Card className="rounded-xl shadow-sm border-zinc-100 dark:border-zinc-800">
         <CardContent className="p-12 text-center flex flex-col items-center">
           <TrendingUp className="size-12 text-muted-foreground/30" />
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mt-4">No children linked</h3>
+          <h3 className="text-lg font-semibold text-zinc-900 dark:text-zinc-100 mt-4">No children linked</h3>
           <p className="text-sm text-muted-foreground mt-1">Contact account services to enroll or link students.</p>
         </CardContent>
       </Card>
@@ -164,13 +164,13 @@ export function ParentGrades({ initialTab = "exams" }: { initialTab?: "exams" | 
           {topLevelTab === "exams" ? (
             <GraduationCap className="size-5 text-amber-600" />
           ) : (
-            <ClipboardList className="size-5 text-indigo-600" />
+            <ClipboardList className="size-5 text-violet-600" />
           )}
-          <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100 uppercase tracking-tight">
+          <h2 className="text-lg font-semibold text-zinc-900 dark:text-zinc-100 uppercase tracking-tight">
             {topLevelTab === "exams" ? "School Exams" : "Class Assessments"}
           </h2>
         </div>
-        <Badge variant="outline" className="bg-muted/20 text-muted-foreground shadow-none border-gray-200 dark:border-zinc-800 text-[10px] font-semibold font-sans tracking-wide px-2 py-0.5 uppercase">
+        <Badge variant="outline" className="bg-muted/20 text-muted-foreground shadow-none border-zinc-200 dark:border-zinc-800 text-[10px] font-semibold font-sans tracking-wide px-2 py-0.5 uppercase">
           Parent Portal
         </Badge>
       </div>
@@ -179,7 +179,7 @@ export function ParentGrades({ initialTab = "exams" }: { initialTab?: "exams" | 
         <TabsList className={`p-1 rounded-lg border shadow-none w-fit ${
           topLevelTab === "exams" 
             ? "bg-amber-50/40 border-amber-100/50 dark:bg-amber-950/10 dark:border-amber-900/30" 
-            : "bg-indigo-50/40 border-indigo-100/50 dark:bg-indigo-950/10 dark:border-indigo-900/30"
+            : "bg-violet-50/40 border-violet-100/50 dark:bg-violet-950/10 dark:border-violet-900/30"
         }`}>
           {students.map((student) => (
             <TabsTrigger
@@ -188,11 +188,11 @@ export function ParentGrades({ initialTab = "exams" }: { initialTab?: "exams" | 
               className={`px-4 py-1.5 text-xs font-medium rounded-md transition-all data-[state=active]:bg-card data-[state=active]:shadow-xs ${
                 topLevelTab === "exams" 
                   ? "data-[state=active]:text-amber-700 dark:data-[state=active]:text-amber-400 hover:bg-amber-100/30 dark:hover:bg-amber-900/20 hover:text-amber-800 dark:hover:text-amber-300" 
-                  : "data-[state=active]:text-indigo-700 dark:data-[state=active]:text-indigo-400 hover:bg-indigo-100/30 dark:hover:bg-indigo-900/20 hover:text-indigo-800 dark:hover:text-indigo-300"
+                  : "data-[state=active]:text-violet-700 dark:data-[state=active]:text-violet-400 hover:bg-violet-100/30 dark:hover:bg-violet-900/20 hover:text-violet-800 dark:hover:text-violet-300"
               }`}
             >
               <span className="flex items-center gap-2">
-                <span className={`size-2 rounded-full ${topLevelTab === "exams" ? "bg-amber-500" : "bg-indigo-500"}`} />
+                <span className={`size-2 rounded-full ${topLevelTab === "exams" ? "bg-amber-500" : "bg-violet-500"}`} />
                 {student.name}
               </span>
             </TabsTrigger>
@@ -245,26 +245,26 @@ export function ParentGrades({ initialTab = "exams" }: { initialTab?: "exams" | 
                     <>
                       {/* Assessment Cards */}
                       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                        <Card className="rounded-xl shadow-none border-gray-200/60 dark:border-zinc-800">
+                        <Card className="rounded-xl shadow-none border-zinc-200/60 dark:border-zinc-800">
                           <CardContent className="p-5 flex flex-col items-center justify-between text-center">
-                            <div className="inline-flex p-2.5 rounded-lg bg-indigo-50 dark:bg-indigo-950/40 text-indigo-600 dark:text-indigo-400 mb-2">
+                            <div className="inline-flex p-2.5 rounded-lg bg-violet-50 dark:bg-violet-950/40 text-violet-600 dark:text-violet-400 mb-2">
                               <TrendingUp className="size-5" />
                             </div>
                             <div>
-                              <p className="text-3xl font-extrabold tracking-tight text-gray-900 dark:text-gray-100">{assessmentStats.avg}%</p>
+                              <p className="text-3xl font-extrabold tracking-tight text-zinc-900 dark:text-zinc-100">{assessmentStats.avg}%</p>
                               <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground mt-1">Avg Assessment Score</p>
                             </div>
-                            <Progress value={assessmentStats.avg} className="mt-3 h-1 bg-muted [&>div]:bg-indigo-600 w-full" />
+                            <Progress value={assessmentStats.avg} className="mt-3 h-1 bg-muted [&>div]:bg-violet-600 w-full" />
                           </CardContent>
                         </Card>
 
-                        <Card className="rounded-xl shadow-none border-gray-200/60 dark:border-zinc-800">
+                        <Card className="rounded-xl shadow-none border-zinc-200/60 dark:border-zinc-800">
                           <CardContent className="p-5 flex flex-col items-center justify-between text-center">
-                            <div className="inline-flex p-2.5 rounded-lg bg-indigo-50 dark:bg-indigo-950/40 text-indigo-600 dark:text-indigo-400 mb-2">
+                            <div className="inline-flex p-2.5 rounded-lg bg-violet-50 dark:bg-violet-950/40 text-violet-600 dark:text-violet-400 mb-2">
                               <Award className="size-5" />
                             </div>
                             <div>
-                              <p className="text-3xl font-extrabold tracking-tight text-gray-900 dark:text-gray-100">{assessmentStats.total}</p>
+                              <p className="text-3xl font-extrabold tracking-tight text-zinc-900 dark:text-zinc-100">{assessmentStats.total}</p>
                               <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground mt-1">Total Assessments</p>
                             </div>
                             <p className="text-xs text-muted-foreground mt-3 font-medium">
@@ -273,13 +273,13 @@ export function ParentGrades({ initialTab = "exams" }: { initialTab?: "exams" | 
                           </CardContent>
                         </Card>
 
-                        <Card className="rounded-xl shadow-none border-gray-200/60 dark:border-zinc-800">
+                        <Card className="rounded-xl shadow-none border-zinc-200/60 dark:border-zinc-800">
                           <CardContent className="p-5 flex flex-col items-center justify-between text-center">
                             <div className="inline-flex p-2.5 rounded-lg bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400 mb-2">
                               <CheckCircle2 className="size-5" />
                             </div>
                             <div>
-                              <p className="text-3xl font-extrabold tracking-tight text-gray-900 dark:text-gray-100">{assessmentStats.passCount}</p>
+                              <p className="text-3xl font-extrabold tracking-tight text-zinc-900 dark:text-zinc-100">{assessmentStats.passCount}</p>
                               <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground mt-1">Passed Items</p>
                             </div>
                             <p className="text-xs text-emerald-600 dark:text-emerald-400 font-bold mt-3 flex items-center gap-1">
@@ -297,10 +297,10 @@ export function ParentGrades({ initialTab = "exams" }: { initialTab?: "exams" | 
 
                         {/* List Assessments */}
                         <div className="lg:col-span-3">
-                          <Card className="rounded-xl shadow-none border-gray-200/60 dark:border-zinc-800 h-full">
-                            <CardHeader className="p-4 border-b border-gray-100/60 dark:border-zinc-800/50">
-                              <CardTitle className="text-sm font-bold text-gray-900 dark:text-gray-100 flex items-center gap-2">
-                                <ClipboardList className="size-4 text-indigo-500" />
+                          <Card className="rounded-xl shadow-none border-zinc-200/60 dark:border-zinc-800 h-full">
+                            <CardHeader className="p-4 border-b border-zinc-100/60 dark:border-zinc-800/50">
+                              <CardTitle className="text-sm font-bold text-zinc-900 dark:text-zinc-100 flex items-center gap-2">
+                                <ClipboardList className="size-4 text-violet-500" />
                                 {activeStudentName}&apos;s Assessments
                               </CardTitle>
                             </CardHeader>
@@ -329,7 +329,7 @@ export function ParentGrades({ initialTab = "exams" }: { initialTab?: "exams" | 
                                           <TableRow key={g.id} className="border-zinc-100 dark:border-zinc-800/60">
                                             <TableCell className="py-2.5 text-left">
                                               <div className="flex flex-col text-left">
-                                                <span className="text-xs font-semibold text-gray-900 dark:text-gray-100">{g.title}</span>
+                                                <span className="text-xs font-semibold text-zinc-900 dark:text-zinc-100">{g.title}</span>
                                                 <span className="text-[10px] text-muted-foreground">{g.subjectName}</span>
                                               </div>
                                             </TableCell>

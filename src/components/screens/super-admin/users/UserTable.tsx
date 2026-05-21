@@ -79,7 +79,7 @@ export function UserTable({
 
   if (loading) {
     return (
-      <Card className="border-none shadow-sm bg-white dark:bg-gray-800">
+      <Card className="border-none shadow-sm bg-white dark:bg-zinc-800">
         <CardContent className="p-6 space-y-4">
           <div className="flex items-center gap-4">
             <Skeleton className="size-10 rounded-full" />
@@ -87,7 +87,7 @@ export function UserTable({
             <Skeleton className="h-4 w-32 ml-auto" />
           </div>
           {[...Array(8)].map((_, i) => (
-            <div key={i} className="flex items-center gap-4 py-2 border-b last:border-none border-gray-100 dark:border-gray-800">
+            <div key={i} className="flex items-center gap-4 py-2 border-b last:border-none border-zinc-100 dark:border-zinc-800">
               <Skeleton className="size-8 rounded-full" />
               <Skeleton className="h-4 w-40" />
               <Skeleton className="h-4 w-52" />
@@ -100,12 +100,12 @@ export function UserTable({
   }
 
   return (
-    <Card className="border-none shadow-sm bg-white dark:bg-gray-800 overflow-hidden">
+    <Card className="border-none shadow-sm bg-white dark:bg-zinc-800 overflow-hidden">
       <CardContent className="p-0">
         <div className="overflow-x-auto">
           <Table>
             <TableHeader>
-              <TableRow className="bg-gray-50/50 dark:bg-gray-900/50 hover:bg-transparent">
+              <TableRow className="bg-zinc-50/50 dark:bg-zinc-900/50 hover:bg-transparent">
                 <TableHead className="w-[280px] min-w-[200px] uppercase tracking-widest text-[10px] font-black text-muted-foreground py-4 pl-6">
                   <div className="flex items-center gap-2">
                     <UserRound className="size-3.5" /> Name
@@ -148,7 +148,7 @@ export function UserTable({
                   <TableRow key="empty">
                     <TableCell colSpan={7} className="text-center py-24 text-muted-foreground">
                       <Users className="size-16 mx-auto mb-6 opacity-10" />
-                      <p className="text-xl font-black text-gray-900 dark:text-gray-100">No users found</p>
+                      <p className="text-xl font-black text-zinc-900 dark:text-zinc-100">No users found</p>
                       <p className="text-sm font-medium mt-1">Try adjusting your filters or search term</p>
                     </TableCell>
                   </TableRow>
@@ -173,12 +173,12 @@ export function UserTable({
                             user.role === "admin" ? "bg-emerald-500" : 
                             user.role === "teacher" ? "bg-blue-500" : 
                             user.role === "student" ? "bg-violet-500" : 
-                            user.role === "staff" ? "bg-indigo-500" : "bg-amber-500"
+                            user.role === "staff" ? "bg-violet-500" : "bg-amber-500"
                           }`}>
                             {initials}
                           </div>
                           <div className="min-w-0">
-                            <p className="font-bold text-sm text-gray-900 dark:text-gray-100 truncate">{user.name}</p>
+                            <p className="font-bold text-sm text-zinc-900 dark:text-zinc-100 truncate">{user.name}</p>
                             <p className="text-[10px] text-muted-foreground font-medium md:hidden truncate">{user.email}</p>
                           </div>
                         </div>
@@ -209,10 +209,10 @@ export function UserTable({
                       <TableCell className="py-4">
                         {user.tenant ? (
                           <div className="flex items-center gap-2">
-                            <div className="size-6 rounded-lg bg-gray-50 dark:bg-gray-900 flex items-center justify-center shrink-0">
+                            <div className="size-6 rounded-lg bg-zinc-50 dark:bg-zinc-900 flex items-center justify-center shrink-0">
                               <Building2 className="size-3 text-muted-foreground" />
                             </div>
-                            <span className="text-xs font-bold text-gray-700 dark:text-gray-300 truncate max-w-[140px]">{user.tenant.name}</span>
+                            <span className="text-xs font-bold text-zinc-700 dark:text-zinc-300 truncate max-w-[140px]">{user.tenant.name}</span>
                           </div>
                         ) : (
                           <span className="text-xs font-bold text-muted-foreground opacity-50">—</span>
@@ -254,7 +254,7 @@ export function UserTable({
 
         {/* Pagination */}
         {totalCount > 0 && (
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-4 px-6 py-4 border-t border-gray-50 dark:border-gray-900 bg-gray-50/30 dark:bg-gray-900/30">
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-4 px-6 py-4 border-t border-zinc-50 dark:border-zinc-900 bg-zinc-50/30 dark:bg-zinc-900/30">
             <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">
               Showing <span className="text-teal-600">{startItem.toLocaleString()}</span> to <span className="text-teal-600">{endItem.toLocaleString()}</span> of {totalCount.toLocaleString()} users
             </p>
@@ -262,7 +262,7 @@ export function UserTable({
               <Button
                 variant="ghost"
                 size="icon"
-                className="size-9 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-800"
+                className="size-9 rounded-xl hover:bg-zinc-100 dark:hover:bg-zinc-800"
                 disabled={currentPage <= 1}
                 onClick={() => onPageChange(currentPage - 1)}
               >
@@ -277,7 +277,7 @@ export function UserTable({
                       key={page}
                       variant={currentPage === page ? "default" : "ghost"}
                       size="sm"
-                      className={`size-8 rounded-xl font-black text-xs ${currentPage === page ? 'bg-teal-600 text-white shadow-lg shadow-teal-200 dark:shadow-none' : 'hover:bg-gray-100 dark:hover:bg-gray-800'}`}
+                      className={`size-8 rounded-xl font-black text-xs ${currentPage === page ? 'bg-teal-600 text-white shadow-lg shadow-teal-200 dark:shadow-none' : 'hover:bg-zinc-100 dark:hover:bg-zinc-800'}`}
                       onClick={() => onPageChange(page)}
                     >
                       {page}
@@ -288,7 +288,7 @@ export function UserTable({
               <Button
                 variant="ghost"
                 size="icon"
-                className="size-9 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-800"
+                className="size-9 rounded-xl hover:bg-zinc-100 dark:hover:bg-zinc-800"
                 disabled={currentPage >= totalPages}
                 onClick={() => onPageChange(currentPage + 1)}
               >

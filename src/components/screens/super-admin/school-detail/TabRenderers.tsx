@@ -112,14 +112,14 @@ export function TableCells({ activeTab, item }: { activeTab: TabType; item: any 
                 {s.name.charAt(0)}
               </div>
               <div>
-                <div className="font-bold text-gray-900 dark:text-gray-100">{s.name}</div>
+                <div className="font-bold text-zinc-900 dark:text-zinc-100">{s.name}</div>
                 <div className="text-[10px] text-muted-foreground font-medium">{s.gender}</div>
               </div>
             </div>
           </TableCell>
           <TableCell className={`${cellClasses} font-mono text-xs font-bold text-muted-foreground`}>{s.rollNumber}</TableCell>
           <TableCell className={cellClasses}>
-            <Badge variant="secondary" className="rounded-lg font-bold text-[10px] bg-gray-100 dark:bg-gray-800 border-none">{s.className}</Badge>
+            <Badge variant="secondary" className="rounded-lg font-bold text-[10px] bg-zinc-100 dark:bg-zinc-800 border-none">{s.className}</Badge>
           </TableCell>
           <TableCell className={cellClasses}>
             <div className="text-xs font-medium">{s.email}</div>
@@ -138,7 +138,7 @@ export function TableCells({ activeTab, item }: { activeTab: TabType; item: any 
               <div className="size-8 rounded-lg bg-blue-50 dark:bg-blue-900/20 text-blue-600 flex items-center justify-center font-black text-xs">
                 {t.name.charAt(0)}
               </div>
-              <div className="font-bold text-gray-900 dark:text-gray-100">{t.name}</div>
+              <div className="font-bold text-zinc-900 dark:text-zinc-100">{t.name}</div>
             </div>
           </TableCell>
           <TableCell className={`${cellClasses} text-xs font-bold`}>{t.qualification}</TableCell>
@@ -160,7 +160,7 @@ export function TableCells({ activeTab, item }: { activeTab: TabType; item: any 
               <div className="size-8 rounded-lg bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 flex items-center justify-center font-black text-xs">
                 {p.name.charAt(0)}
               </div>
-              <div className="font-bold text-gray-900 dark:text-gray-100">{p.name}</div>
+              <div className="font-bold text-zinc-900 dark:text-zinc-100">{p.name}</div>
             </div>
           </TableCell>
           <TableCell className={`${cellClasses} text-xs font-medium`}>{p.email}</TableCell>
@@ -179,7 +179,7 @@ export function TableCells({ activeTab, item }: { activeTab: TabType; item: any 
               <div className="size-8 rounded-lg bg-purple-50 dark:bg-purple-900/20 text-purple-600 flex items-center justify-center font-black text-xs">
                 {c.name.charAt(0)}
               </div>
-              <div className="font-bold text-gray-900 dark:text-gray-100">{c.name}</div>
+              <div className="font-bold text-zinc-900 dark:text-zinc-100">{c.name}</div>
             </div>
           </TableCell>
           <TableCell className={cellClasses}>
@@ -203,7 +203,7 @@ export function TableCells({ activeTab, item }: { activeTab: TabType; item: any 
       return (
         <>
           <TableCell className={cellClasses}>
-            <div className="flex items-center gap-2 font-bold text-gray-900 dark:text-gray-100">
+            <div className="flex items-center gap-2 font-bold text-zinc-900 dark:text-zinc-100">
               <UserCircle className="size-4 text-muted-foreground" />
               {f.studentName}
             </div>
@@ -236,7 +236,7 @@ export function TableCells({ activeTab, item }: { activeTab: TabType; item: any 
       return (
         <>
           <TableCell className={cellClasses}>
-            <div className="font-bold text-gray-900 dark:text-gray-100">{a.studentName}</div>
+            <div className="font-bold text-zinc-900 dark:text-zinc-100">{a.studentName}</div>
           </TableCell>
           <TableCell className={cellClasses}>
             <Badge variant="secondary" className="text-[10px] font-bold border-none">{a.className}</Badge>
@@ -265,12 +265,12 @@ export function TableCells({ activeTab, item }: { activeTab: TabType; item: any 
       return (
         <>
           <TableCell className={cellClasses}>
-            <div className="font-bold text-gray-900 dark:text-gray-100">{n.title}</div>
+            <div className="font-bold text-zinc-900 dark:text-zinc-100">{n.title}</div>
             <div className="text-[10px] text-muted-foreground truncate max-w-[200px]">{n.content}</div>
           </TableCell>
           <TableCell className={`${cellClasses} text-xs font-bold`}>{n.authorName}</TableCell>
           <TableCell className={cellClasses}>
-            <Badge variant="outline" className="text-[10px] font-black uppercase tracking-wider h-5 bg-gray-50 dark:bg-gray-900/50">{n.targetRole}</Badge>
+            <Badge variant="outline" className="text-[10px] font-black uppercase tracking-wider h-5 bg-zinc-50 dark:bg-zinc-900/50">{n.targetRole}</Badge>
           </TableCell>
           <TableCell className={`${cellClasses} text-center`}>
             <Badge variant="outline" className={`${getPriorityColor(n.priority)} font-black text-[9px] px-2 py-0 h-5 flex items-center justify-center gap-1 w-fit mx-auto capitalize`}>

@@ -30,7 +30,7 @@ export function UserFilters({
   tenants,
 }: UserFiltersProps) {
   return (
-    <Card className="border-none shadow-sm bg-white dark:bg-gray-800 overflow-hidden">
+    <Card className="border-none shadow-sm bg-white dark:bg-zinc-800 overflow-hidden">
       <CardContent className="p-4">
         <div className="flex flex-col lg:flex-row gap-4 items-start lg:items-center">
           {/* Search */}

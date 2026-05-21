@@ -44,7 +44,7 @@ export const statusConfig: Record<
     label: "Cancelled",
   },
   expired: {
-    bg: "bg-gray-100 text-gray-600 border-gray-200 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-700",
+    bg: "bg-zinc-100 text-zinc-600 border-zinc-200 dark:bg-zinc-800 dark:text-zinc-400 dark:border-zinc-700",
     icon: React.createElement(Clock, { className: "size-3.5" }),
     label: "Expired",
   },

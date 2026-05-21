@@ -15,7 +15,7 @@ interface RoleTemplatesProps {
 
 export function RoleTemplates({ onSelectTemplate }: RoleTemplatesProps) {
   return (
-    <Card className="border-none bg-white dark:bg-gray-800 shadow-sm">
+    <Card className="border-none bg-white dark:bg-zinc-800 shadow-sm">
       <CardHeader className="pb-4">
         <CardTitle className="text-base font-bold flex items-center gap-2">
           <Blocks className="size-4 text-teal-500" />
@@ -33,9 +33,9 @@ export function RoleTemplates({ onSelectTemplate }: RoleTemplatesProps) {
               <button
                 key={template.name}
                 onClick={() => onSelectTemplate(template)}
-                className="flex flex-col gap-2 p-4 rounded-2xl border-2 border-dashed border-gray-100 dark:border-gray-700 hover:border-teal-300 dark:hover:border-teal-700 hover:bg-teal-50/50 dark:hover:bg-teal-900/10 transition-all text-left group relative overflow-hidden"
+                className="flex flex-col gap-2 p-4 rounded-2xl border-2 border-dashed border-zinc-100 dark:border-zinc-700 hover:border-teal-300 dark:hover:border-teal-700 hover:bg-teal-50/50 dark:hover:bg-teal-900/10 transition-all text-left group relative overflow-hidden"
               >
-                <div className="absolute top-0 right-0 size-16 bg-gray-50 dark:bg-gray-900/50 rounded-bl-full -translate-y-1/2 translate-x-1/2 group-hover:bg-teal-100/50 dark:group-hover:bg-teal-800/30 transition-colors" />
+                <div className="absolute top-0 right-0 size-16 bg-zinc-50 dark:bg-zinc-900/50 rounded-bl-full -translate-y-1/2 translate-x-1/2 group-hover:bg-teal-100/50 dark:group-hover:bg-teal-800/30 transition-colors" />
                 <div className="relative z-10 flex items-center gap-2 mb-1">
                   <div
                     className="size-9 rounded-xl flex items-center justify-center text-white text-xs font-black shadow-sm"
@@ -43,15 +43,15 @@ export function RoleTemplates({ onSelectTemplate }: RoleTemplatesProps) {
                   >
                     {template.name.charAt(0)}
                   </div>
-                  <span className="font-bold text-sm text-gray-900 dark:text-gray-100 leading-tight">
+                  <span className="font-bold text-sm text-zinc-900 dark:text-zinc-100 leading-tight">
                     {template.name}
                   </span>
                 </div>
-                <p className="text-[11px] text-gray-500 dark:text-gray-400 line-clamp-2 leading-relaxed h-8">
+                <p className="text-[11px] text-zinc-500 dark:text-zinc-400 line-clamp-2 leading-relaxed h-8">
                   {template.description}
                 </p>
                 <div className="flex items-center gap-1.5 mt-1">
-                  <Badge variant="secondary" className="text-[9px] font-bold h-5 px-2 bg-gray-100 dark:bg-gray-700/50 text-gray-600 dark:text-gray-300 border-none">
+                  <Badge variant="secondary" className="text-[9px] font-bold h-5 px-2 bg-zinc-100 dark:bg-zinc-700/50 text-zinc-600 dark:text-zinc-300 border-none">
                     {permCount} Permissions
                   </Badge>
                 </div>

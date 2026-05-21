@@ -17,7 +17,7 @@ export function MaintenanceScreen({ message }: { message?: string }) {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 bg-gradient-to-b from-gray-50 to-gray-100 dark:from-gray-950 dark:to-gray-900">
+    <div className="min-h-screen flex items-center justify-center p-4 bg-gradient-to-b from-zinc-50 to-zinc-100 dark:from-zinc-950 dark:to-zinc-900">
       <div className="text-center max-w-lg">
         {/* Animated wrench icon */}
         <div className="relative mb-8 flex justify-center">
@@ -58,7 +58,7 @@ export function MaintenanceScreen({ message }: { message?: string }) {
         {/* School name badge */}
         {currentTenantName && (
           <div className="mt-4 animate-[fade-up_0.6s_ease-out_0.45s_forwards] opacity-0">
-            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-sm text-sm font-medium text-gray-600 dark:text-gray-300">
+            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 shadow-sm text-sm font-medium text-zinc-600 dark:text-zinc-300">
               <Building2 className="size-3.5" />
               {currentTenantName}
             </span>
@@ -66,7 +66,7 @@ export function MaintenanceScreen({ message }: { message?: string }) {
         )}
 
         {/* Description */}
-        <p className="text-gray-500 dark:text-gray-400 mt-4 text-base leading-relaxed animate-[fade-up_0.6s_ease-out_0.55s_forwards] opacity-0 max-w-md mx-auto whitespace-pre-line">
+        <p className="text-zinc-500 dark:text-zinc-400 mt-4 text-base leading-relaxed animate-[fade-up_0.6s_ease-out_0.55s_forwards] opacity-0 max-w-md mx-auto whitespace-pre-line">
           {message || (
             <>
               Our platform is currently undergoing scheduled maintenance to bring
@@ -97,7 +97,7 @@ export function MaintenanceScreen({ message }: { message?: string }) {
           <Button
             variant="outline"
             onClick={goLogin}
-            className="gap-2 border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800"
+            className="gap-2 border-zinc-200 dark:border-zinc-700 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-800"
           >
             <LogOut className="size-4" />
             Logout
@@ -105,7 +105,7 @@ export function MaintenanceScreen({ message }: { message?: string }) {
         </div>
 
         {/* Bottom text */}
-        <p className="text-xs text-gray-400 dark:text-gray-600 mt-10 animate-[fade-in_0.5s_ease_1s_forwards] opacity-0">
+        <p className="text-xs text-zinc-400 dark:text-zinc-600 mt-10 animate-[fade-in_0.5s_ease_1s_forwards] opacity-0">
           SchoolSaaS — If this persists, please contact your school
           administrator.
         </p>

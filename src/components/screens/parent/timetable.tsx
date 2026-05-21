@@ -148,11 +148,11 @@ export function ParentTimetable() {
     return (
       <Card className="rounded-xl shadow-sm">
         <CardContent className="py-16 text-center">
-          <BookOpen className="size-12 mx-auto text-gray-200 dark:text-gray-700 mb-3" />
-          <p className="text-sm font-medium text-gray-500 dark:text-gray-400">
+          <BookOpen className="size-12 mx-auto text-zinc-200 dark:text-zinc-700 mb-3" />
+          <p className="text-sm font-medium text-zinc-500 dark:text-zinc-400">
             No children found
           </p>
-          <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">
+          <p className="text-xs text-zinc-400 dark:text-zinc-500 mt-1">
             No students are linked to your account.
           </p>
         </CardContent>
@@ -165,10 +165,10 @@ export function ParentTimetable() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">
+          <h2 className="text-xl font-semibold text-zinc-900 dark:text-zinc-100">
             Class Timetable
           </h2>
-          <p className="text-sm text-gray-500 dark:text-gray-400 mt-0.5">
+          <p className="text-sm text-zinc-500 dark:text-zinc-400 mt-0.5">
             View your children&apos;s weekly schedules
           </p>
         </div>
@@ -197,10 +197,10 @@ export function ParentTimetable() {
               <BookOpen className="size-5" />
             </div>
             <div>
-              <p className="text-sm font-medium text-gray-900 dark:text-gray-100">
+              <p className="text-sm font-medium text-zinc-900 dark:text-zinc-100">
                 {children.find((c) => c.id === selectedChildId)?.name || "—"}
               </p>
-              <p className="text-xs text-gray-500 dark:text-gray-400">
+              <p className="text-xs text-zinc-500 dark:text-zinc-400">
                 {children.find((c) => c.id === selectedChildId)?.className ||
                   "—"}
               </p>
@@ -214,10 +214,10 @@ export function ParentTimetable() {
               <CalendarDays className="size-5" />
             </div>
             <div>
-              <p className="text-sm font-medium text-gray-900 dark:text-gray-100">
+              <p className="text-sm font-medium text-zinc-900 dark:text-zinc-100">
                 {selectedDaySlots.length} Periods
               </p>
-              <p className="text-xs text-gray-500 dark:text-gray-400">
+              <p className="text-xs text-zinc-500 dark:text-zinc-400">
                 {DAY_FULL_LABELS[selectedDay]}
               </p>
             </div>
@@ -230,12 +230,12 @@ export function ParentTimetable() {
               <Clock className="size-5" />
             </div>
             <div>
-              <p className="text-sm font-medium text-gray-900 dark:text-gray-100">
+              <p className="text-sm font-medium text-zinc-900 dark:text-zinc-100">
                 {selectedDaySlots.length > 0
                   ? `${formatTime(selectedDaySlots[0].startTime)} – ${formatTime(selectedDaySlots[selectedDaySlots.length - 1].endTime)}`
                   : "No classes"}
               </p>
-              <p className="text-xs text-gray-500 dark:text-gray-400">
+              <p className="text-xs text-zinc-500 dark:text-zinc-400">
                 School hours
               </p>
             </div>
@@ -254,7 +254,7 @@ export function ParentTimetable() {
             className={`rounded-full px-4 shrink-0 ${
               selectedDay === day
                 ? "bg-amber-600 text-white hover:bg-amber-700 shadow-sm"
-                : "text-gray-500 dark:text-gray-400"
+                : "text-zinc-500 dark:text-zinc-400"
             }`}
           >
             {DAY_LABELS[day]}
@@ -266,11 +266,11 @@ export function ParentTimetable() {
       {timeSlots.length === 0 ? (
         <Card className="rounded-xl shadow-sm">
           <CardContent className="py-16 text-center">
-            <BookOpen className="size-12 mx-auto text-gray-300 dark:text-gray-700" />
-            <p className="text-sm font-medium text-gray-500 dark:text-gray-400">
+            <BookOpen className="size-12 mx-auto text-zinc-300 dark:text-zinc-700" />
+            <p className="text-sm font-medium text-zinc-500 dark:text-zinc-400">
               No timetable configured
             </p>
-            <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">
+            <p className="text-xs text-zinc-400 dark:text-zinc-500 mt-1">
               Contact the school administrator
             </p>
           </CardContent>
@@ -292,12 +292,12 @@ export function ParentTimetable() {
                     return (
                       <div
                         key={`${selectedDay}-${ts.start}`}
-                        className="flex items-center gap-4 p-3 rounded-lg border border-dashed border-gray-200 dark:border-gray-700 bg-gray-50/50 dark:bg-gray-800/30"
+                        className="flex items-center gap-4 p-3 rounded-lg border border-dashed border-zinc-200 dark:border-zinc-700 bg-zinc-50/50 dark:bg-zinc-800/30"
                       >
-                        <div className="text-xs text-gray-400 dark:text-gray-500 font-medium min-w-[90px]">
+                        <div className="text-xs text-zinc-400 dark:text-zinc-500 font-medium min-w-[90px]">
                           {formatTime(ts.start)} – {formatTime(ts.end)}
                         </div>
-                        <div className="flex items-center gap-2 text-gray-400 dark:text-gray-500">
+                        <div className="flex items-center gap-2 text-zinc-400 dark:text-zinc-500">
                           <Clock className="size-3.5" />
                           <span className="text-xs font-medium">
                             Free Period
@@ -309,14 +309,14 @@ export function ParentTimetable() {
 
                   const colorClass =
                     subjectColorMap[slot.subjectName] ||
-                    "bg-gray-50 dark:bg-gray-800 text-gray-700 dark:text-gray-300 border-gray-200 dark:border-gray-700";
+                    "bg-zinc-50 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 border-zinc-200 dark:border-zinc-700";
 
                   return (
                     <div
                       key={slot.id}
-                      className="flex items-center gap-4 p-3 rounded-lg border border-gray-200 dark:border-gray-700 hover:shadow-sm transition-all"
+                      className="flex items-center gap-4 p-3 rounded-lg border border-zinc-200 dark:border-zinc-700 hover:shadow-sm transition-all"
                     >
-                      <div className="text-xs text-gray-600 dark:text-gray-400 font-medium min-w-[90px]">
+                      <div className="text-xs text-zinc-600 dark:text-zinc-400 font-medium min-w-[90px]">
                         {formatTime(slot.startTime)} –{" "}
                         {formatTime(slot.endTime)}
                       </div>
@@ -328,7 +328,7 @@ export function ParentTimetable() {
                             {slot.subjectName}
                           </span>
                         </div>
-                        <div className="flex items-center gap-3 mt-1 text-[11px] text-gray-400 dark:text-gray-500">
+                        <div className="flex items-center gap-3 mt-1 text-[11px] text-zinc-400 dark:text-zinc-500">
                           <span className="flex items-center gap-1">
                             <User className="size-3" />
                             {slot.teacherName}
