@@ -9,8 +9,6 @@ import {
   ChartTooltipContent,
 } from "@/components/ui/chart";
 import type { ChartConfig } from "@/components/ui/chart";
-import type * as RechartsTypes from "recharts";
-
 const chartConfig = {
   percentage: { label: "Score %", color: "#f59e0b" },
 } satisfies ChartConfig;

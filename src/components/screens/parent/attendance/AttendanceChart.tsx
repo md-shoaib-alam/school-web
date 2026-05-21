@@ -4,7 +4,6 @@ import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/com
 import { Calendar } from "lucide-react";
 import { useRouter, useParams } from "next/navigation";
 import { useState, useEffect } from "react";
-import type * as RechartsTypes from "recharts";
 
 interface AttendanceChartProps {
   data: any[];

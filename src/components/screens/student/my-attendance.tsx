@@ -13,7 +13,6 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart";
-import type * as RechartsTypes from "recharts";
 import {
   UserCheck,
   Calendar,

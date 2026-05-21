@@ -6,7 +6,6 @@ import {
   CardDescription,
 } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-import type * as RechartsTypes from "recharts";
 import { useState, useEffect } from "react";
 import {
   ChartContainer,

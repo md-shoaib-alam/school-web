@@ -8,7 +8,6 @@ import {
 import { Skeleton } from "@/components/ui/skeleton";
 import { Progress } from "@/components/ui/progress";
 import { useState, useEffect } from "react";
-import type * as RechartsTypes from "recharts";
 import {
   ChartContainer,
   ChartTooltip,

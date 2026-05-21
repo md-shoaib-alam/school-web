@@ -192,7 +192,7 @@ export function ParentCard({
                   <Button
                     variant="ghost"
                     size="icon"
-                    className="h-6 w-6 text-slate-500 hover:text-red-700 hover:bg-red-50 dark:text-zinc-400 dark:hover:text-red-400 dark:hover:bg-red-950/40 shrink-0"
+                    className="h-6 w-6 text-rose-600/80 hover:text-rose-900 hover:bg-rose-100/50 dark:text-rose-400/80 dark:hover:text-rose-200 dark:hover:bg-rose-950/40 shrink-0"
                     onClick={() => onUnlinkChild(parent.id, child.id)}
                     disabled={linking}
                     title="Unlink"

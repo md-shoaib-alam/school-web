@@ -9,7 +9,7 @@ import { useViewMode } from "@/hooks/use-view-mode";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { avatarColors } from "./teachers/types";
-import { motion, AnimatePresence } from "framer-motion";
+import { LazyMotion, domAnimation, m, AnimatePresence } from "framer-motion";
 import { goeyToast as toast } from "goey-toast";
 import { useModulePermissions } from "@/hooks/use-permissions";
 import { apiFetch } from "@/lib/api";
@@ -228,9 +228,7 @@ export function AdminTeachers() {
     };
 
     if (element) {
-      element.style.pointerEvents = 'none';
-      element.style.position = 'relative';
-      element.style.zIndex = '10';
+      element.style.cssText += '; pointer-events: none; position: relative; z-index: 10;';
       
       // 🌟 Elite Anime.js Physics Exit
       // Step 1: Scale down, tilt slightly and shoot off to the side
@@ -337,12 +335,13 @@ export function AdminTeachers() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
-                  <AnimatePresence mode="popLayout">
-                    {teachers.map((teacher, index) => {
-                      const initials = teacher.name.split(" ").map((n) => n[0]).join("").slice(0, 2).toUpperCase();
-                      const color = avatarColors[index % avatarColors.length];
-                      return (
-                        <motion.tr 
+                  <LazyMotion features={domAnimation}>
+                    <AnimatePresence mode="popLayout">
+                      {teachers.map((teacher, index) => {
+                        const initials = teacher.name.split(" ").map((n) => n[0]).join("").slice(0, 2).toUpperCase();
+                        const color = avatarColors[index % avatarColors.length];
+                        return (
+                          <m.tr 
                           key={teacher.id} 
                           id={`teacher-item-${teacher.id}`}
                           layout="position"
@@ -426,23 +425,25 @@ export function AdminTeachers() {
                               )}
                             </div>
                           </td>
-                        </motion.tr>
+                        </m.tr>
                       );
                     })}
                   </AnimatePresence>
+                </LazyMotion>
                 </tbody>
               </table>
             </div>
           </CardContent>
         </Card>
       ) : (
-        <motion.div 
-          layout
-          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"
-        >
-          <AnimatePresence mode="popLayout">
-            {teachers.map((teacher, index) => (
-              <motion.div 
+        <LazyMotion features={domAnimation}>
+          <m.div 
+            layout
+            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"
+          >
+            <AnimatePresence mode="popLayout">
+              {teachers.map((teacher, index) => (
+                <m.div 
                 key={teacher.id}
                 id={`teacher-item-${teacher.id}`}
                 layout
@@ -461,10 +462,11 @@ export function AdminTeachers() {
                   onEdit={handleOpenEdit}
                   onDelete={handleDelete}
                 />
-              </motion.div>
+              </m.div>
             ))}
           </AnimatePresence>
-        </motion.div>
+        </m.div>
+      </LazyMotion>
       )}
 
       {/* Pagination Controls */}

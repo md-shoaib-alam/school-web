@@ -22,7 +22,6 @@ import {
   ArrowUpRight 
 } from "lucide-react";
 import { useState, useEffect } from "react";
-import type * as RechartsTypes from "recharts";
 import {
   ChartContainer,
   ChartTooltip,

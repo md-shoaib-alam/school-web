@@ -8,7 +8,7 @@ import { useViewMode } from "@/hooks/use-view-mode";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { avatarColors } from "./teachers/types";
-import { motion, AnimatePresence } from "framer-motion";
+
 import {
   AlertDialog,
   AlertDialogAction,

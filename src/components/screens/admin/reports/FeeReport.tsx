@@ -13,7 +13,6 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import type * as RechartsTypes from "recharts";
 import {
   ChartContainer,
   ChartTooltip,

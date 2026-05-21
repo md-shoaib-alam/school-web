@@ -24,7 +24,6 @@ import {
   BarChart3,
   Activity,
 } from "lucide-react";
-import type * as RechartsTypes from "recharts";
 import {
   ChartContainer,
   ChartTooltip,

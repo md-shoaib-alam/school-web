@@ -16,7 +16,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import type * as RechartsTypes from "recharts";
 import {
   ChartContainer,
   ChartTooltip,

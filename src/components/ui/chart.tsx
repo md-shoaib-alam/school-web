@@ -1,8 +1,6 @@
 "use client"
 
 import * as React from "react"
-import type * as RechartsPrimitive from "recharts"
-
 import { cn } from "@/lib/utils"
 
 // Format: { THEME_NAME: CSS_SELECTOR }
@@ -121,7 +119,7 @@ const ChartTooltip = React.forwardRef<any, any>((props, ref) => {
 })
 ChartTooltip.displayName = "Tooltip"
 
-type ChartTooltipContentProps = React.ComponentProps<typeof RechartsPrimitive.Tooltip> &
+type ChartTooltipContentProps = React.ComponentProps<typeof import("recharts").Tooltip> &
   React.ComponentProps<"div"> & {
     hideLabel?: boolean
     hideIndicator?: boolean
@@ -288,7 +286,7 @@ function ChartLegendContent({
   verticalAlign = "bottom",
   nameKey,
 }: React.ComponentProps<"div"> &
-  Pick<RechartsPrimitive.LegendProps, "payload" | "verticalAlign"> & {
+  Pick<import("recharts").LegendProps, "payload" | "verticalAlign"> & {
     hideIcon?: boolean
     nameKey?: string
   }) {
