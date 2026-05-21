@@ -257,7 +257,7 @@ export function TeacherDashboard() {
                 <Button
                   key={action.screen}
                   variant="ghost"
-                  className="w-full justify-start gap-3 h-11 px-3 text-gray-600 dark:text-gray-400 hover:bg-blue-50 dark:hover:bg-blue-900/30 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+                  className="w-full justify-start gap-3 h-11 px-3 text-slate-800 dark:text-slate-200 hover:bg-blue-50 dark:hover:bg-blue-900/30 hover:text-blue-700 dark:hover:text-blue-400 transition-colors"
                   onClick={() => navigateTo(action.screen)}
                 >
                   <span className="text-blue-500">{action.icon}</span>

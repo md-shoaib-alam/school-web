@@ -48,7 +48,7 @@ export function ParentHomework() {
   const { currentUser } = useAppStore();
   const [activeStudentId, setActiveStudentId] = useState("");
   const { data, isPending } = useParentDashboard(currentUser?.name || "");
-  const children = (data?.children || []) as StudentInfo[];
+  const children = useMemo(() => (data?.children || []) as StudentInfo[], [data?.children]);
 
   useEffect(() => {
     if (children.length > 0) {
@@ -57,13 +57,12 @@ export function ParentHomework() {
         .find((row) => row.startsWith("parentSelectedStudentHome="))
         ?.split("=")[1];
       
-      if (savedTab && children.some(s => s.id === savedTab)) {
-        setActiveStudentId(savedTab);
-      } else if (!activeStudentId) {
-        setActiveStudentId(children[0].id);
+      const targetId = savedTab && children.some(s => s.id === savedTab) ? savedTab : children[0].id;
+      if (targetId !== activeStudentId) {
+        setActiveStudentId(targetId);
       }
     }
-  }, [children]);
+  }, [children, activeStudentId]);
 
   const handleStudentChange = (val: string) => {
     setActiveStudentId(val);

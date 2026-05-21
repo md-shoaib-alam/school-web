@@ -46,7 +46,7 @@ export function AdminPromotions({ initialTab: propTab }: { initialTab?: "individ
 
   // Sync tab if prop changes (e.g. clicking sidebar while already on page)
   useEffect(() => {
-    if (propTab) setActiveTab(propTab);
+    if (propTab) queueMicrotask(() => setActiveTab(propTab));
   }, [propTab]);
 
   // Data

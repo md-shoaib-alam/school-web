@@ -170,7 +170,9 @@ export default function GenericSlugDispatcher() {
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    setMounted(true);
+    queueMicrotask(() => {
+      setMounted(true);
+    });
   }, []);
 
   const { data: resolvedTenant } = useTenantResolution(slug as string);
@@ -200,13 +202,23 @@ export default function GenericSlugDispatcher() {
   const isTenantContext =
     isTenantMatch || (currentUser?.role === "super_admin" && !!resolvedTenant);
 
+  // [FIX] Auto-redirection if slug mismatch
+  const correctSlug = currentUser?.role !== "super_admin" ? (currentUser?.tenantSlug || currentUser?.tenantId) : null;
+  const isSlugMismatch = correctSlug && slug !== correctSlug;
+
+  useEffect(() => {
+    if (mounted && isSlugMismatch && correctSlug) {
+      router.replace(`/${correctSlug}`);
+    }
+  }, [mounted, isSlugMismatch, correctSlug, router]);
+
   useEffect(() => {
     if (mounted && isTenantContext) {
       router.replace(`/${slug}/dashboard`);
     }
   }, [mounted, isTenantContext, slug, router]);
 
-  if (!mounted || !currentUser) return <LoadingScreen />;
+  if (!mounted || !currentUser || isSlugMismatch) return <LoadingScreen />;
 
   // 1. Check if it's a Platform Screen (Super Admin only)
   if (currentUser.role === "super_admin") {
@@ -248,15 +260,6 @@ export default function GenericSlugDispatcher() {
 
   if (isTenantContext) {
     return <LoadingScreen />;
-  }
-
-  // [FIX] Auto-redirection if slug mismatch
-  if (currentUser.role !== "super_admin") {
-    const correctSlug = currentUser.tenantSlug || currentUser.tenantId;
-    if (correctSlug && typeof window !== "undefined" && slug !== correctSlug) {
-      window.location.href = `/${correctSlug}`;
-      return <LoadingScreen />;
-    }
   }
 
   return <NotFoundScreen />;

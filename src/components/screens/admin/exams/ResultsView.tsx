@@ -67,9 +67,9 @@ export function ResultsView({
   useEffect(() => {
     if (selectedExam) {
       const groupName = selectedExam.name.includes(' - ') ? selectedExam.name.split(' - ')[0] : selectedExam.name;
-      setSelectedExamGroup(groupName);
+      queueMicrotask(() => setSelectedExamGroup(groupName));
     } else {
-      setSelectedExamGroup('');
+      queueMicrotask(() => setSelectedExamGroup(''));
     }
   }, [selectedExam]);
 

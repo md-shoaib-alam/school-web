@@ -33,7 +33,9 @@ export function AdminPrintMarksheet() {
 
   useEffect(() => {
     if (currentAcademicYear) {
-      setPublishedAcademicYearFilter(prev => prev === 'all' ? currentAcademicYear : prev);
+      queueMicrotask(() => {
+        setPublishedAcademicYearFilter(prev => prev === 'all' ? currentAcademicYear : prev);
+      });
     }
   }, [currentAcademicYear]);
 

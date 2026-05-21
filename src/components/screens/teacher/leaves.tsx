@@ -76,11 +76,13 @@ export function TeacherLeaves() {
   });
   const [submitting, setSubmitting] = useState(false);
 
+  const currentUserId = currentUser?.id;
+
   const fetchMyLeaves = useCallback(async () => {
-    if (!currentUser) return;
+    if (!currentUserId) return;
     setLoading(true);
     try {
-      const res = await apiFetch(`/api/leaves?userId=${currentUser.id}`);
+      const res = await apiFetch(`/api/leaves?userId=${currentUserId}`);
       if (res.ok) {
         setLeaves(await res.json());
       }
@@ -89,7 +91,7 @@ export function TeacherLeaves() {
     } finally {
       setLoading(false);
     }
-  }, [currentUser]);
+  }, [currentUserId]);
 
   useEffect(() => {
     fetchMyLeaves();

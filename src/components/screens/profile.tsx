@@ -325,13 +325,13 @@ export function UserProfileScreen() {
 
                     {/* Name */}
                     <div className="p-4 bg-gray-50/50 dark:bg-[#0c0c0e]/30 border border-gray-200/50 dark:border-zinc-800/50 rounded-xl space-y-1 relative group">
-                      <p className="text-[10px] uppercase font-bold text-gray-400 dark:text-zinc-500">Full Name</p>
+                      <p className="text-[10px] uppercase font-bold text-gray-500 dark:text-zinc-400">Full Name</p>
                       <p className="text-sm font-semibold text-gray-900 dark:text-gray-100 truncate pr-6">{currentUser.name}</p>
                       <Button
                         variant="ghost"
                         size="icon"
                         onClick={() => handleCopy(currentUser.name, "Name")}
-                        className="h-7 w-7 absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-emerald-500 hover:bg-emerald-500/10 dark:hover:bg-emerald-500/20 rounded-lg transition-all duration-200 hover:scale-105 active:scale-95"
+                        className="h-7 w-7 absolute right-2 top-1/2 -translate-y-1/2 text-gray-500 hover:text-emerald-600 dark:text-zinc-400 hover:bg-emerald-500/10 dark:hover:bg-emerald-500/20 rounded-lg transition-all duration-200 hover:scale-105 active:scale-95"
                       >
                         {copiedField === "Name" ? <Check className="h-3.5 w-3.5 text-green-500" /> : <Copy className="h-3.5 w-3.5" />}
                       </Button>
@@ -340,7 +340,7 @@ export function UserProfileScreen() {
                     {/* Email */}
                     <div className="p-4 bg-gray-50/50 dark:bg-[#0c0c0e]/30 border border-gray-200/50 dark:border-zinc-800/50 rounded-xl space-y-1 relative group">
                       <div className="flex items-center gap-1.5">
-                        <p className="text-[10px] uppercase font-bold text-gray-400 dark:text-zinc-500">Email Address</p>
+                        <p className="text-[10px] uppercase font-bold text-gray-500 dark:text-zinc-400">Email Address</p>
                         <Badge variant="outline" className="text-[8px] h-3.5 px-1 py-0 border-emerald-500/30 text-emerald-500 bg-emerald-500/5 font-bold">Verified</Badge>
                       </div>
                       <p className="text-sm font-semibold text-gray-900 dark:text-gray-100 truncate pr-6">{currentUser.email}</p>
@@ -348,7 +348,7 @@ export function UserProfileScreen() {
                         variant="ghost"
                         size="icon"
                         onClick={() => handleCopy(currentUser.email, "Email")}
-                        className="h-7 w-7 absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-emerald-500 hover:bg-emerald-500/10 dark:hover:bg-emerald-500/20 rounded-lg transition-all duration-200 hover:scale-105 active:scale-95"
+                        className="h-7 w-7 absolute right-2 top-1/2 -translate-y-1/2 text-gray-500 hover:text-emerald-600 dark:text-zinc-400 hover:bg-emerald-500/10 dark:hover:bg-emerald-500/20 rounded-lg transition-all duration-200 hover:scale-105 active:scale-95"
                       >
                         {copiedField === "Email" ? <Check className="h-3.5 w-3.5 text-green-500" /> : <Copy className="h-3.5 w-3.5" />}
                       </Button>
@@ -356,7 +356,7 @@ export function UserProfileScreen() {
 
                     {/* Role */}
                     <div className="p-4 bg-gray-50/50 dark:bg-[#0c0c0e]/30 border border-gray-200/50 dark:border-zinc-800/50 rounded-xl space-y-1">
-                      <p className="text-[10px] uppercase font-bold text-gray-400 dark:text-zinc-500">Primary Authority Role</p>
+                      <p className="text-[10px] uppercase font-bold text-gray-500 dark:text-zinc-400">Primary Authority Role</p>
                       <div className="flex items-center gap-1.5 mt-0.5">
                         <Shield className="h-4 w-4 text-emerald-500" />
                         <span className="text-sm font-semibold text-gray-900 dark:text-gray-100 capitalize">{currentUser.role.replace("_", " ")}</span>
@@ -365,7 +365,7 @@ export function UserProfileScreen() {
 
                     {/* Mobile Number */}
                     <div className="p-4 bg-gray-50/50 dark:bg-[#0c0c0e]/30 border border-gray-200/50 dark:border-zinc-800/50 rounded-xl space-y-1 relative group">
-                      <p className="text-[10px] uppercase font-bold text-gray-400 dark:text-zinc-500">Mobile Number</p>
+                      <p className="text-[10px] uppercase font-bold text-gray-500 dark:text-zinc-400">Mobile Number</p>
                       <div className="flex items-center gap-1.5 mt-0.5 pr-6">
                         <Phone className="h-4 w-4 text-blue-500" />
                         <span className="text-sm font-semibold text-gray-900 dark:text-gray-100">
@@ -377,7 +377,7 @@ export function UserProfileScreen() {
                         variant="ghost"
                         size="icon"
                         onClick={() => handleCopy(currentUser.phone || "+91 98765 43210", "Mobile Number")}
-                        className="h-7 w-7 absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-emerald-500 hover:bg-emerald-500/10 dark:hover:bg-emerald-500/20 rounded-lg transition-all duration-200 hover:scale-105 active:scale-95"
+                        className="h-7 w-7 absolute right-2 top-1/2 -translate-y-1/2 text-gray-500 hover:text-emerald-600 dark:text-zinc-400 hover:bg-emerald-500/10 dark:hover:bg-emerald-500/20 rounded-lg transition-all duration-200 hover:scale-105 active:scale-95"
                         title="Copy Mobile"
                       >
                         {copiedField === "Mobile Number" ? <Check className="h-3.5 w-3.5 text-green-500" /> : <Copy className="h-3.5 w-3.5" />}
@@ -386,7 +386,7 @@ export function UserProfileScreen() {
 
                     {/* Residential Address */}
                     <div className="p-4 bg-gray-50/50 dark:bg-[#0c0c0e]/30 border border-gray-200/50 dark:border-zinc-800/50 rounded-xl space-y-1 relative group md:col-span-2">
-                      <p className="text-[10px] uppercase font-bold text-gray-400 dark:text-zinc-500">Residential Address</p>
+                      <p className="text-[10px] uppercase font-bold text-gray-500 dark:text-zinc-400">Residential Address</p>
                       <div className="flex items-start gap-1.5 mt-0.5 pr-6">
                         <MapPin className="h-4 w-4 text-rose-500 shrink-0 mt-0.5" />
                         <span className="text-sm font-semibold text-gray-900 dark:text-gray-100 leading-normal">
@@ -398,7 +398,7 @@ export function UserProfileScreen() {
                         variant="ghost"
                         size="icon"
                         onClick={() => handleCopy(currentUser.address || "7/A, Sector-4, HSR Layout, Bangalore, India", "Address")}
-                        className="h-7 w-7 absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-emerald-500 hover:bg-emerald-500/10 dark:hover:bg-emerald-500/20 rounded-lg transition-all duration-200 hover:scale-105 active:scale-95"
+                        className="h-7 w-7 absolute right-2 top-1/2 -translate-y-1/2 text-gray-500 hover:text-emerald-600 dark:text-zinc-400 hover:bg-emerald-500/10 dark:hover:bg-emerald-500/20 rounded-lg transition-all duration-200 hover:scale-105 active:scale-95"
                         title="Copy Address"
                       >
                         {copiedField === "Address" ? <Check className="h-3.5 w-3.5 text-green-500" /> : <Copy className="h-3.5 w-3.5" />}
@@ -429,7 +429,7 @@ export function UserProfileScreen() {
                         )}
                         {/* School Slug */}
                         <div className="p-4 bg-gray-50/50 dark:bg-[#0c0c0e]/30 border border-gray-200/50 dark:border-zinc-800/50 rounded-xl space-y-1 relative group">
-                          <p className="text-[10px] uppercase font-bold text-gray-400 dark:text-zinc-500">School URL Identifier</p>
+                          <p className="text-[10px] uppercase font-bold text-gray-500 dark:text-zinc-400">School URL Identifier</p>
                           <p className="text-sm font-semibold text-gray-900 dark:text-gray-100 break-all pr-10">{currentTenantSlug || currentUser.tenantSlug || "N/A"}</p>
                           <Button
                             variant="ghost"
@@ -587,7 +587,7 @@ export function UserProfileScreen() {
           <form onSubmit={handleSaveProfile} className="space-y-5 mt-2">
             {/* Avatar Uploader Section */}
             <div className="flex flex-col items-center gap-3 p-4 bg-gray-50/50 dark:bg-zinc-900/20 border border-gray-200/50 dark:border-zinc-800/50 rounded-2xl">
-              <Label className="text-xs font-bold text-gray-400 dark:text-zinc-500 uppercase tracking-wider">Profile Photo</Label>
+              <Label className="text-xs font-bold text-gray-500 dark:text-zinc-400 uppercase tracking-wider">Profile Photo</Label>
               
               <div className="relative group">
                 <Avatar className="h-20 w-20 border-2 border-emerald-500/20 shadow-lg">
@@ -609,7 +609,7 @@ export function UserProfileScreen() {
 
               {/* Preset illustrations */}
               <div className="space-y-1.5 w-full text-center">
-                <span className="text-[10px] text-gray-400 dark:text-zinc-500 font-semibold">Or choose a premium profile preset</span>
+                <span className="text-[10px] text-gray-500 dark:text-zinc-400 font-semibold">Or choose a premium profile preset</span>
                 <div className="flex items-center justify-center gap-2 mt-1">
                   {PRESET_AVATARS.map((avatarUrl, idx) => (
                     <button

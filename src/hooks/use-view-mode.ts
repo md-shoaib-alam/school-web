@@ -6,10 +6,13 @@ export function useViewMode(key: string, defaultMode: "grid" | "table" = "grid")
   useEffect(() => {
     // Load from localStorage or cookie
     const saved = localStorage.getItem(`view-mode-${key}`);
-    if (saved === "grid" || saved === "table") {
-      setViewMode(saved);
+    if ((saved === "grid" || saved === "table") && saved !== viewMode) {
+      const timer = setTimeout(() => {
+        setViewMode(saved);
+      }, 0);
+      return () => clearTimeout(timer);
     }
-  }, [key]);
+  }, [key, viewMode]);
 
   const toggleViewMode = (mode: "grid" | "table") => {
     setViewMode(mode);

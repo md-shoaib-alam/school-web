@@ -97,21 +97,17 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
     checkAuth();
     const interval = setInterval(checkAuth, 5000);
     return () => clearInterval(interval);
-  }, [currentUser]);
+  }, [currentUser?.id]);
 
-  if (!currentUser) return <FullPageSkeleton />;
-
-
-
-  const isSuperAdmin = currentUser.role === "super_admin";
-  const isRoot = isRootAdmin(currentUser);
+  const isSuperAdmin = currentUser?.role === "super_admin";
+  const isRoot = currentUser ? isRootAdmin(currentUser) : false;
   const hasCustomPermissions =
-    !!currentUser.customRole?.permissions &&
+    !!currentUser?.customRole?.permissions &&
     Object.keys(currentUser.customRole.permissions).length > 0;
-  const hasPlatformPermissions = isSuperAdmin && !!currentUser.platformRole;
+  const hasPlatformPermissions = isSuperAdmin && !!currentUser?.platformRole;
 
   // Filter nav items based on permissions
-  const allItems = navItems[currentUser.role];
+  const allItems = currentUser ? navItems[currentUser.role] : [];
   const items = allItems.filter((item) => {
     if (item.key === "dashboard") return true;
     if (item.rootOnly && !isRoot) return false;
@@ -204,6 +200,8 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
     window.addEventListener("open-change-password", handleOpenPasswordModal);
     return () => window.removeEventListener("open-change-password", handleOpenPasswordModal);
   }, []);
+
+  if (!currentUser) return <FullPageSkeleton />;
 
   return (
     <NotificationProvider>

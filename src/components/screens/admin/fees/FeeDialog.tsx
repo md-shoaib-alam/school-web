@@ -78,7 +78,7 @@ export function FeeDialog({
   // Reset class filter when dialog opens/closes
   useEffect(() => {
     if (!open) {
-      setSelectedClassId("all");
+      queueMicrotask(() => setSelectedClassId("all"));
     }
   }, [open]);
 

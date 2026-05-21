@@ -203,6 +203,7 @@ function getCategoryLabel(value: string): string {
 // ── Component ──
 export function StudentTickets() {
   const { currentUser, currentTenantId } = useAppStore();
+  const currentUserId = currentUser?.id;
 
   // Data states
   const [tickets, setTickets] = useState<TicketItem[]>([]);
@@ -228,12 +229,12 @@ export function StudentTickets() {
 
   // ── Fetch my tickets ──
   const fetchTickets = useCallback(async () => {
-    if (!currentTenantId || !currentUser) return;
+    if (!currentTenantId || !currentUserId) return;
     setLoading(true);
     try {
       const params = new URLSearchParams({
         tenantId: currentTenantId,
-        createdBy: currentUser.id,
+        createdBy: currentUserId,
       });
       const res = await apiFetch(`/api/tickets?${params.toString()}`);
       if (res.ok) {
@@ -245,7 +246,7 @@ export function StudentTickets() {
     } finally {
       setLoading(false);
     }
-  }, [currentTenantId, currentUser]);
+  }, [currentTenantId, currentUserId]);
 
   useEffect(() => {
     fetchTickets();

@@ -23,13 +23,20 @@ export default function AuthenticatedLayout({
   const hydrated = useHydrated();
   const [maintenanceActive, setMaintenanceActive] = useState(false);
   const [maintenanceMessage, setMaintenanceMessage] = useState("");
-  const [maintenanceLoading, setMaintenanceLoading] = useState(false);
+  const [maintenanceLoading, setMaintenanceLoading] = useState(true);
 
   // Check maintenance mode for non-super_admin users
   useEffect(() => {
-    if (!isLoggedIn || !currentUser || currentUser.role === "super_admin")
+    if (!isLoggedIn || !currentUser || currentUser.role === "super_admin") {
+      queueMicrotask(() => {
+        setMaintenanceLoading(false);
+      });
       return;
-    setMaintenanceLoading(true);
+    }
+    
+    queueMicrotask(() => {
+      setMaintenanceLoading(true);
+    });
     let cancelled = false;
     
     apiFetch("/api/platform-settings")
@@ -52,7 +59,7 @@ export default function AuthenticatedLayout({
     return () => {
       cancelled = true;
     };
-  }, [isLoggedIn, currentUser]);
+  }, [isLoggedIn, currentUser?.role]);
 
   if (!hydrated) return <FullPageSkeleton />;
 

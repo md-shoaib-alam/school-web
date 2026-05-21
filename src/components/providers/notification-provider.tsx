@@ -9,12 +9,13 @@ import { useGraphQLMutation, SAVE_NOTIFICATION_TOKEN } from "@/lib/graphql/hooks
 
 export function NotificationProvider({ children }: { children: React.ReactNode }) {
   const { currentUser } = useAppStore();
+  const currentUserId = currentUser?.id;
   const [token, setToken] = useState<string | null>(null);
   const { mutate: saveToken } = useGraphQLMutation(SAVE_NOTIFICATION_TOKEN);
 
   useEffect(() => {
     // We only ask for permission if the user is logged in
-    if (currentUser) {
+    if (currentUserId) {
       const initNotifications = async () => {
         try {
           const fcmToken = await requestNotificationPermission();
@@ -37,7 +38,7 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
       const timer = setTimeout(initNotifications, 5000);
       return () => clearTimeout(timer);
     }
-  }, [currentUser, saveToken]);
+  }, [currentUserId, saveToken]);
 
   useEffect(() => {
     // Listen for messages while the app is open (foreground)

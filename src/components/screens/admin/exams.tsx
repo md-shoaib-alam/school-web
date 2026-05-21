@@ -86,14 +86,6 @@ export function AdminExams({ initialTab = 'exams' }: { initialTab?: string }) {
   const [publishedAcademicYearFilter, setPublishedAcademicYearFilter] = useState(currentAcademicYear);
   const [publishedClassFilter, setPublishedClassFilter] = useState('all');
   const [activeTab, setActiveTab] = useState(initialTab);
-  
-  useEffect(() => {
-    setActiveTab(initialTab);
-    if (initialTab !== 'results') {
-      setSelectedExam(null);
-      setResultRows([]);
-    }
-  }, [initialTab]);
 
   // Dialog States
   const [addOpen, setAddOpen] = useState(false);
@@ -102,8 +94,10 @@ export function AdminExams({ initialTab = 'exams' }: { initialTab?: string }) {
   
   useEffect(() => {
     if (currentAcademicYear) {
-      setAddForm(prev => ({ ...prev, academicYear: prev.academicYear || currentAcademicYear }));
-      setPublishedAcademicYearFilter(prev => prev === 'all' ? currentAcademicYear : prev);
+      queueMicrotask(() => {
+        setAddForm(prev => ({ ...prev, academicYear: prev.academicYear || currentAcademicYear }));
+        setPublishedAcademicYearFilter(prev => prev === 'all' ? currentAcademicYear : prev);
+      });
     }
   }, [currentAcademicYear]);
   
@@ -118,6 +112,16 @@ export function AdminExams({ initialTab = 'exams' }: { initialTab?: string }) {
   const [savingResults, setSavingResults] = useState(false);
   const [loadingStudents, setLoadingStudents] = useState(false);
   const [isPublishing, setIsPublishing] = useState(false);
+
+  useEffect(() => {
+    queueMicrotask(() => {
+      setActiveTab(initialTab);
+      if (initialTab !== 'results') {
+        setSelectedExam(null);
+        setResultRows([]);
+      }
+    });
+  }, [initialTab]);
 
   // View Results Dialog State
   const [viewResultsOpen, setViewResultsOpen] = useState(false);

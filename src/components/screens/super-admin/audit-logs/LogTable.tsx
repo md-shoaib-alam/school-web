@@ -371,11 +371,11 @@ export function LogTable({
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
                    <span className="text-xs font-bold text-gray-800 dark:text-gray-200">Action Event Payload</span>
-                   <Badge variant="outline" className="text-[10px] font-mono bg-gray-100 dark:bg-black">
+                   <Badge variant="outline" className="text-[10px] font-mono bg-gray-100 dark:bg-gray-950">
                       {selectedLog.action}
                    </Badge>
                 </div>
-                <div className="relative bg-gray-950 dark:bg-black border border-gray-800 rounded-md p-3 overflow-hidden">
+                <div className="relative bg-gray-950 dark:bg-gray-950 border border-gray-800 rounded-md p-3 overflow-hidden">
                   <pre className="text-[11px] font-mono text-emerald-400 whitespace-pre-wrap break-all max-h-[200px] overflow-y-auto custom-scrollbar leading-relaxed">
                     {(() => {
                       try {

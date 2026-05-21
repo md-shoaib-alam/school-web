@@ -333,15 +333,19 @@ export function AdminAdmitCards() {
   // Reset selection when class data loads
   useEffect(() => {
     if (classData?.students) {
-      setSelectedStudentIds(new Set(classData.students.map((s: any) => s.id)));
-      setSelectAll(true);
+      queueMicrotask(() => {
+        setSelectedStudentIds(new Set(classData.students.map((s: any) => s.id)));
+        setSelectAll(true);
+      });
     }
   }, [classData]);
 
   // Auto-select first exam type when they load
   useEffect(() => {
     if (availableExamTypes.length > 0 && !selectedExamType) {
-      setSelectedExamType(availableExamTypes[0]);
+      queueMicrotask(() => {
+        setSelectedExamType(availableExamTypes[0]);
+      });
     }
   }, [availableExamTypes, selectedExamType]);
 
@@ -688,7 +692,7 @@ export function AdminAdmitCards() {
                 <Button
                   onClick={handlePrintAll}
                   disabled={admitCards.length === 0 || generating || preparingPrint}
-                  className={`flex-1 gap-2 h-11 border-none ${admitCards.length > 0 ? 'bg-slate-900 text-white hover:bg-black' : 'bg-slate-800/40 text-slate-500 cursor-not-allowed'}`}
+                  className={`flex-1 gap-2 h-11 border-none ${admitCards.length > 0 ? 'bg-slate-900 text-white hover:bg-gray-950' : 'bg-slate-800/40 text-slate-500 cursor-not-allowed'}`}
                 >
                   {preparingPrint ? (
                     <Loader2 className="h-4 w-4 animate-spin" />

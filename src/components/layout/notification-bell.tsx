@@ -16,12 +16,13 @@ import { useEffect, useCallback } from "react";
 
 export function NotificationBell() {
   const { currentUser, currentTenantId } = useAppStore();
+  const currentUserId = currentUser?.id;
   const [notifications, setNotifications] = useState<any[]>([]);
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(true);
 
   const fetchNotices = useCallback(async () => {
-    if (!currentUser) {
+    if (!currentUserId) {
       setLoading(false);
       return;
     }
@@ -52,7 +53,7 @@ export function NotificationBell() {
     } finally {
       setLoading(false);
     }
-  }, [currentUser]);
+  }, [currentUserId]);
 
   useEffect(() => {
     if (open) {

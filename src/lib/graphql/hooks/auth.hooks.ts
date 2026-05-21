@@ -11,12 +11,12 @@ export function useRequestPasswordReset() {
 
 export function useChangePassword() {
   return useMutation({
-    mutationFn: (vars: { oldPassword: String; newPassword: String }) => 
+    mutationFn: (vars: { oldPassword: string; newPassword: string }) => 
       graphqlMutate<{ changePassword: boolean }>(CHANGE_PASSWORD, vars as Record<string, unknown>).then(d => d.changePassword),
     onSuccess: () => {
       toast.success('Password changed successfully')
     },
-    onError: (error) => {
+    onError: (error: any) => {
       toast.error('Failed to change password', { description: error.message })
     }
   })

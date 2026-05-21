@@ -64,8 +64,8 @@ export function ParentCard({
                 {parent.name}
               </h3>
               <div className="flex items-center gap-1.5 mt-0.5">
-                <Mail className="h-3 w-3 text-gray-400 dark:text-gray-500" />
-                <span className="text-xs text-gray-500 dark:text-gray-400">
+                <Mail className="h-3 w-3 text-slate-500 dark:text-zinc-400" />
+                <span className="text-xs text-slate-700 dark:text-zinc-300">
                   {parent.email}
                 </span>
               </div>
@@ -95,7 +95,7 @@ export function ParentCard({
                 <Button
                   variant="ghost"
                   size="icon"
-                  className="h-8 w-8 text-red-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/30"
+                  className="h-8 w-8 text-red-600 hover:text-red-700 hover:bg-red-50 dark:text-red-400 dark:hover:text-red-300 dark:hover:bg-red-950/40"
                   title="Delete"
                 >
                   <Trash2 className="h-4 w-4" />
@@ -124,7 +124,7 @@ export function ParentCard({
         </div>
 
         {/* Parent Details */}
-        <div className="flex items-center gap-4 text-xs text-gray-500 dark:text-gray-400 mb-4">
+        <div className="flex items-center gap-4 text-xs text-slate-600 dark:text-zinc-300 mb-4">
           {parent.phone && (
             <span className="flex items-center gap-1">
               <Phone className="h-3 w-3" /> {parent.phone}
@@ -141,7 +141,7 @@ export function ParentCard({
         <Separator className="mb-3" />
         <div className="space-y-2">
           <div className="flex items-center justify-between mb-2">
-            <span className="text-xs font-medium text-gray-500 dark:text-gray-400 flex items-center gap-1">
+            <span className="text-xs font-medium text-slate-600 dark:text-zinc-300 flex items-center gap-1">
               <Baby className="h-3 w-3" /> Children ({parent.children.length})
             </span>
             <Button
@@ -157,7 +157,7 @@ export function ParentCard({
           {parent.children.length === 0 ? (
             <div className="text-center py-6 bg-gray-50 dark:bg-gray-800/50 rounded-lg">
               <GraduationCap className="h-8 w-8 mx-auto text-gray-300 dark:text-gray-600 mb-2" />
-              <p className="text-xs text-gray-400 dark:text-gray-500">
+              <p className="text-xs text-slate-500 dark:text-zinc-400">
                 No children linked yet
               </p>
               <Button
@@ -184,7 +184,7 @@ export function ParentCard({
                       <p className="text-xs font-medium text-gray-800 dark:text-gray-200 truncate">
                         {child.name}
                       </p>
-                      <p className="text-[10px] text-gray-400 dark:text-gray-500">
+                      <p className="text-[10px] text-slate-500 dark:text-zinc-400">
                         {child.className} • Roll {child.rollNumber}
                       </p>
                     </div>
@@ -192,7 +192,7 @@ export function ParentCard({
                   <Button
                     variant="ghost"
                     size="icon"
-                    className="h-6 w-6 text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/30 shrink-0"
+                    className="h-6 w-6 text-slate-500 hover:text-red-700 hover:bg-red-50 dark:text-zinc-400 dark:hover:text-red-400 dark:hover:bg-red-950/40 shrink-0"
                     onClick={() => onUnlinkChild(parent.id, child.id)}
                     disabled={linking}
                     title="Unlink"

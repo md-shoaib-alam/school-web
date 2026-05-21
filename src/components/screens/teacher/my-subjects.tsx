@@ -167,8 +167,14 @@ export function TeacherSubjects() {
 
   // Hydrate from cookie after mount
   useEffect(() => {
-    setView(getViewCookie());
-  }, []);
+    const saved = getViewCookie();
+    if (saved !== view) {
+      const timer = setTimeout(() => {
+        setView(saved);
+      }, 0);
+      return () => clearTimeout(timer);
+    }
+  }, [view]);
 
   const switchView = (v: "grid" | "table") => {
     setView(v);

@@ -168,7 +168,7 @@ export function MakePaymentTab({ canCreate }: MakePaymentTabProps) {
             <p className="text-2xl font-bold">₹{calculation.payable.toLocaleString()}</p>
           </div>
           <DialogFooter>
-            <Button onClick={() => setShowSuccess(false)} className="bg-emerald-600 hover:bg-emerald-700 text-white">Done</Button>
+            <Button onClick={() => setShowSuccess(false)} className="bg-emerald-600 hover:bg-emerald-700 text-white">Finish</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

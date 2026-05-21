@@ -212,14 +212,16 @@ function StaffSelfServiceView() {
   const [applyOpen, setApplyOpen] = useState(false);
   const [form, setForm] = useState({ leaveType: 'casual', startDate: new Date().toISOString().split('T')[0], endDate: new Date().toISOString().split('T')[0], reason: '' });
 
+  const currentUserId = currentUser?.id;
+
   const fetchMyLeaves = useCallback(async () => {
-    if (!currentUser) return;
+    if (!currentUserId) return;
     setLoading(true);
     try {
-      const res = await apiFetch(`/api/leaves?userId=${currentUser.id}`);
+      const res = await apiFetch(`/api/leaves?userId=${currentUserId}`);
       if (res.ok) setLeaves(await res.json());
     } catch { /* silent */ } finally { setLoading(false); }
-  }, [currentUser]);
+  }, [currentUserId]);
 
   useEffect(() => { fetchMyLeaves(); }, [fetchMyLeaves]);
 
@@ -289,7 +291,7 @@ function StaffSelfServiceView() {
              </Select>
              <Textarea placeholder="Reason..." value={form.reason} onChange={e => setForm({...form, reason: e.target.value})} />
           </div>
-          <DialogFooter><Button onClick={handleApply}>Submit</Button></DialogFooter>
+          <DialogFooter><Button onClick={handleApply}>Apply Leave</Button></DialogFooter>
         </DialogContent>
       </Dialog>
     </div>

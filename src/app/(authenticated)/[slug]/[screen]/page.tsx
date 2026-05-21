@@ -91,7 +91,9 @@ export default function TenantScreenDispatcher() {
   const isTenantMatch = (urlSlug === userTenantId || urlSlug === userTenantSlug);
 
   useEffect(() => {
-    setMounted(true);
+    queueMicrotask(() => {
+      setMounted(true);
+    });
   }, []);
 
   // Debug log on every change if mounted

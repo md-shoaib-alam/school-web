@@ -151,7 +151,9 @@ export function SetFeesTab({ canCreate, canEdit, canDelete }: SetFeesTabProps) {
 
   useEffect(() => {
     if (assignData?.students) {
-      setSelectedStudents(new Set<string>(assignData.students.filter((st: any) => st.isAssigned).map((st: any) => st.id)));
+      queueMicrotask(() => {
+        setSelectedStudents(new Set<string>(assignData.students.filter((st: any) => st.isAssigned).map((st: any) => st.id)));
+      });
     }
   }, [assignData]);
 

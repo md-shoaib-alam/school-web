@@ -3,6 +3,7 @@
 import { useEffect, useSyncExternalStore, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAppStore } from "@/store/use-app-store";
+import { apiFetch } from "@/lib/api";
 import {
   MaintenanceScreen,
   LoginScreen,
@@ -25,37 +26,56 @@ export default function Home() {
   const mounted = useHydrated();
   const router = useRouter();
   const [maintenanceActive, setMaintenanceActive] = useState(false);
-  const [maintenanceLoading, setMaintenanceLoading] = useState(false);
+  const [maintenanceMessage, setMaintenanceMessage] = useState("");
+  const [maintenanceLoading, setMaintenanceLoading] = useState(true);
+
+  const userRole = currentUser?.role;
+  const userTenantSlug = currentUser?.tenantSlug;
+  const userTenantId = currentUser?.tenantId;
 
   // Check maintenance mode for non-super_admin users
   useEffect(() => {
-    if (!isLoggedIn || !currentUser || currentUser.role === "super_admin")
+    if (!isLoggedIn || !currentUser || userRole === "super_admin") {
+      queueMicrotask(() => {
+        setMaintenanceLoading(false);
+      });
       return;
-    setMaintenanceLoading(true);
+    }
+    
+    queueMicrotask(() => {
+      setMaintenanceLoading(true);
+    });
     let cancelled = false;
-    fetch("/api/platform-settings?key=maintenance_mode")
+    
+    apiFetch("/api/platform-settings")
       .then((res) => (res.ok ? res.json() : null))
       .then((data) => {
-        if (!cancelled && data) {
-          setMaintenanceActive(data.value === "true");
+        if (!cancelled && Array.isArray(data)) {
+          const modeSetting = data.find((s: any) => s.key === "maintenance_mode");
+          const msgSetting = data.find((s: any) => s.key === "maintenance_message");
+          setMaintenanceActive(modeSetting?.value === "true");
+          if (msgSetting?.value) {
+            setMaintenanceMessage(msgSetting.value);
+          }
         }
       })
       .catch(() => {})
       .finally(() => {
         if (!cancelled) setMaintenanceLoading(false);
       });
+      
     return () => {
       cancelled = true;
     };
-  }, [isLoggedIn, currentUser]);
+  }, [isLoggedIn, currentUser, userRole]);
 
   // Unified Redirection Logic: Redirect to tenant-specific URL if logged in
   useEffect(() => {
     if (mounted && isLoggedIn && currentUser) {
       const parts = window.location.pathname.split("/").filter(Boolean);
-      const isSuperAdmin = currentUser.role === "super_admin";
+      const isSuperAdmin = userRole === "super_admin";
       const expectedPrefix =
-        currentUser.tenantSlug || currentUser.tenantId || currentTenantId;
+        userTenantSlug || userTenantId || currentTenantId;
 
       // Only redirect if we are literally at the root "/"
       if (parts.length === 0) {
@@ -73,7 +93,9 @@ export default function Home() {
   }, [
     mounted,
     isLoggedIn,
-    currentUser,
+    userRole,
+    userTenantSlug,
+    userTenantId,
     currentTenantId,
     currentScreen,
     router,
@@ -86,13 +108,13 @@ export default function Home() {
   if (!isLoggedIn) return <LoginScreen />;
 
   // Maintenance mode check
-  const isSuperAdmin = currentUser?.role === "super_admin";
+  const isSuperAdmin = userRole === "super_admin";
   if (isLoggedIn && !isSuperAdmin && maintenanceLoading) {
     return <FullPageSkeleton />;
   }
 
   if (isLoggedIn && !isSuperAdmin && maintenanceActive) {
-    return <MaintenanceScreen />;
+    return <MaintenanceScreen message={maintenanceMessage} />;
   }
 
   // If we are still here and logged in, we are likely at the root "/" and redirecting.

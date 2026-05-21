@@ -255,7 +255,7 @@ export function CheckPaymentsTab() {
                           <Badge variant="outline" className={`${stCfg.bg} border-0 font-medium capitalize text-xs`}>{p.status}</Badge>
                         </TableCell>
                         <TableCell className="text-center">
-                          <Button variant="ghost" size="icon" className="h-7 w-7 text-gray-500 hover:text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-900/30" onClick={() => { setSelectedPayment(p); setViewDialogOpen(true); }}>
+                          <Button variant="ghost" size="icon" className="h-7 w-7 text-slate-700 dark:text-zinc-300 hover:text-emerald-700 dark:hover:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-900/30" onClick={() => { setSelectedPayment(p); setViewDialogOpen(true); }}>
                             <Eye className="h-3.5 w-3.5" />
                           </Button>
                         </TableCell>

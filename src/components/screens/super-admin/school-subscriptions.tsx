@@ -59,10 +59,7 @@ export function SuperAdminSchoolSubscriptions() {
   const [editingTenant, setEditingTenant] = useState<any>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
-  // Reset page when search changes
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [search]);
+
 
   const { data: tenantsData, isLoading, refetch } = useTenants({
     search: search || undefined,
@@ -195,7 +192,10 @@ export function SuperAdminSchoolSubscriptions() {
               placeholder="Search schools..." 
               className="pl-9" 
               value={search}
-              onChange={(e) => setSearch(e.target.value)}
+              onChange={(e) => {
+                setSearch(e.target.value);
+                setCurrentPage(1);
+              }}
             />
           </div>
         </div>

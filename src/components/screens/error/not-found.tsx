@@ -20,6 +20,7 @@ export function NotFoundScreen() {
             src="/logo.svg"
             alt="School Aura Logo"
             fill
+            sizes="(max-width: 768px) 100vw, 256px"
             className="object-contain dark:invert-[0.05]"
             priority
           />
@@ -33,6 +34,7 @@ export function NotFoundScreen() {
             src="/404 page.svg"
             alt="404 - Page Not Found"
             fill
+            sizes="(max-width: 1024px) 100vw, 896px"
             className="object-contain"
             priority
           />
@@ -55,7 +57,7 @@ export function NotFoundScreen() {
       </div>
 
       {/* Inline styles for modern micro-animations */}
-      <style jsx global>{`
+      <style dangerouslySetInnerHTML={{ __html: `
         @keyframes fade-down {
           from { opacity: 0; transform: translateY(-20px); }
           to { opacity: 1; transform: translateY(0); }
@@ -68,7 +70,7 @@ export function NotFoundScreen() {
           from { opacity: 0; transform: translateY(20px); }
           to { opacity: 1; transform: translateY(0); }
         }
-      `}</style>
+      `}} />
     </div>
   );
 }

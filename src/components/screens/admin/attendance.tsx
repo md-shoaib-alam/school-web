@@ -86,9 +86,7 @@ export function AdminAttendance() {
   const [currentPage, setCurrentPage] = useState(1);
   const debouncedSearch = useDebounce(search, 300);
 
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [selectedDate, selectedClass, isHistoryMode]);
+
 
   const { data: attendanceData, isLoading: recordsLoading } = useQuery({
     queryKey: ['attendance', selectedDate, selectedClass, isHistoryMode, currentPage],
@@ -179,7 +177,10 @@ export function AdminAttendance() {
         <div className="flex items-center gap-3">
           <Select
             value={selectedClass}
-            onValueChange={setSelectedClass}
+            onValueChange={(val) => {
+              setSelectedClass(val);
+              setCurrentPage(1);
+            }}
           >
             <SelectTrigger className="w-[180px] bg-white dark:bg-gray-950 border-gray-200">
               <SelectValue placeholder="Select Class" />
@@ -223,6 +224,7 @@ export function AdminAttendance() {
                 const mm = String(d.getMonth() + 1).padStart(2, '0');
                 const dd = String(d.getDate()).padStart(2, '0');
                 setSelectedDate(`${yyyy}-${mm}-${dd}`);
+                setCurrentPage(1);
               }
             }}
             className="w-[180px]"
@@ -233,6 +235,7 @@ export function AdminAttendance() {
             onClick={() => {
               if (isPremiumOrEnterprise) {
                 setIsHistoryMode(!isHistoryMode);
+                setCurrentPage(1);
               }
             }}
             disabled={!isPremiumOrEnterprise}

@@ -318,7 +318,7 @@ export function AdminCertificates() {
            <p className="py-4 text-sm">Are you sure you want to revoke <strong>{revokeCert?.certificateNo}</strong>?</p>
            <DialogFooter>
               <Button variant="outline" onClick={() => setRevokeCert(null)}>Cancel</Button>
-              <Button className="bg-red-600" onClick={() => revokeMutation.mutate(revokeCert?.id!)} disabled={revokeMutation.isPending}>Confirm Revoke</Button>
+              <Button className="bg-red-600" onClick={() => revokeCert && revokeMutation.mutate(revokeCert.id)} disabled={revokeMutation.isPending}>Confirm Revoke</Button>
            </DialogFooter>
         </DialogContent>
       </Dialog>

@@ -112,7 +112,7 @@ export function TeacherAttendance() {
     select: (data) => data,
   });
 
-  const classes = Array.isArray(rawClasses) ? rawClasses : [];
+  const classes = useMemo(() => (Array.isArray(rawClasses) ? rawClasses : []), [rawClasses]);
 
   // Auto-select first class once loaded safely in an effect to prevent infinity loop
   useEffect(() => {
@@ -172,9 +172,11 @@ export function TeacherAttendance() {
 
   // Reset overrides when class or date changes safely in effect
   useEffect(() => {
-    setLocalOverrides({});
-    setSaved(false);
-  }, [selectedClassId, date]);
+    if (Object.keys(localOverrides).length > 0 || saved) {
+      setLocalOverrides({});
+      setSaved(false);
+    }
+  }, [selectedClassId, date, localOverrides, saved]);
 
   // Combine server record truth with user pending interactions
   const records = useMemo((): AttendanceRecord[] => {

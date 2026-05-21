@@ -352,7 +352,7 @@ export function RoleDialogs({
           </div>
 
           <DialogFooter className="p-6 bg-gray-50/80 dark:bg-gray-900/50 border-t border-gray-100 dark:border-gray-800">
-            <Button onClick={() => setAssignDialogOpen(false)} className="rounded-xl px-8 h-11 font-black bg-gray-900 dark:bg-gray-800 text-white hover:bg-black transition-all">
+            <Button onClick={() => setAssignDialogOpen(false)} className="rounded-xl px-8 h-11 font-black bg-gray-900 dark:bg-gray-800 text-white hover:bg-gray-950 transition-all">
               Done Managing Access
             </Button>
           </DialogFooter>
