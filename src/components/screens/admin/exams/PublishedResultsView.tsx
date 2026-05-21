@@ -218,17 +218,27 @@ export function PublishedResultsView({
                                     <span className="text-xs text-muted-foreground font-medium">
                                       {group.exams.length} subject{group.exams.length !== 1 ? 's' : ''}
                                     </span>
-                                    <Button 
-                                      variant="outline" 
-                                      size="sm" 
-                                      onClick={() => {
-                                        handlePrintTabularLedger(c.id, c.name, c.section, 'classic', group.cycleName);
-                                      }}
-                                      className="h-7 border-emerald-200 hover:border-emerald-300 dark:border-emerald-900/50 hover:bg-emerald-50 dark:hover:bg-emerald-950/20 text-emerald-600 dark:text-emerald-400 gap-1.5 rounded-lg text-[11px] font-semibold px-2.5 shadow-sm transition-colors flex items-center justify-center"
-                                    >
-                                      <Printer className="h-3.5 w-3.5" />
-                                      <span>Print Sheet</span>
-                                    </Button>
+                                    {(() => {
+                                      const isPrintingLedger = printingLedgerClassId === c.id;
+                                      return (
+                                        <Button 
+                                          variant="outline" 
+                                          size="sm" 
+                                          disabled={isPrintingLedger}
+                                          onClick={() => {
+                                            handlePrintTabularLedger(c.id, c.name, c.section, 'classic', group.cycleName);
+                                          }}
+                                          className="h-7 border-emerald-200 hover:border-emerald-300 dark:border-emerald-900/50 hover:bg-emerald-50 dark:hover:bg-emerald-950/20 text-emerald-600 dark:text-emerald-400 gap-1.5 rounded-lg text-[11px] font-semibold px-2.5 shadow-sm transition-colors flex items-center justify-center disabled:opacity-70 disabled:cursor-not-allowed"
+                                        >
+                                          {isPrintingLedger ? (
+                                            <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                                          ) : (
+                                            <Printer className="h-3.5 w-3.5" />
+                                          )}
+                                          <span>{isPrintingLedger ? 'Printing...' : 'Print Sheet'}</span>
+                                        </Button>
+                                      );
+                                    })()}
                                   </div>
                                 </div>
                                 <div className="p-0">
