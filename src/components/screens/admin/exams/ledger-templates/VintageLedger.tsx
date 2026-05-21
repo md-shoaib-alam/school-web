@@ -30,13 +30,13 @@ export const VintageLedger: React.FC<LedgerTemplateProps> = ({ data }) => {
         <div className="absolute bottom-1 left-1 border-b border-l border-[#8a7355] w-3 h-3"></div>
         <div className="absolute bottom-1 right-1 border-b border-r border-[#8a7355] w-3 h-3"></div>
         
-        <h1 className="font-extrabold text-2xl tracking-widest text-[#5c4028] uppercase font-serif">
+        <h1 className="font-semibold text-2xl tracking-widest text-[#5c4028] uppercase font-serif">
           {data.schoolName}
         </h1>
         <div className="text-[10px] italic text-[#8a7355] my-0.5 font-serif font-semibold tracking-wide">
           Official Tabulation Registry
         </div>
-        <h2 className="text-[11px] font-bold text-[#2c241e] uppercase tracking-wider mt-1 border-b border-dashed border-[#8a7355]/40 pb-1.5 max-w-lg mx-auto">
+        <h2 className="text-[11px] font-semibold text-[#2c241e] uppercase tracking-wider mt-1 border-b border-dashed border-[#8a7355]/40 pb-1.5 max-w-lg mx-auto">
           {data.ledgerTitle}
         </h2>
         <div className="flex justify-center gap-12 mt-2 text-[9.5px] font-semibold text-[#5c4028] font-serif">

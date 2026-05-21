@@ -132,7 +132,7 @@ export function SuperAdminSchoolSubscriptions() {
             <ShieldCheck className="h-6 w-6 text-indigo-600 dark:text-indigo-400" />
           </div>
           <div>
-            <h2 className="text-3xl font-bold tracking-tight">School Subscriptions</h2>
+            <h2 className="text-3xl font-semibold tracking-tight">School Subscriptions</h2>
             <p className="text-muted-foreground mt-1">Manage school-level plans, limits, and license periods.</p>
           </div>
         </div>

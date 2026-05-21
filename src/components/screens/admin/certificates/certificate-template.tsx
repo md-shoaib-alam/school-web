@@ -46,7 +46,7 @@ export function CertificateTemplate({ cert, formatDate }: CertificateTemplatePro
             </div>
           </div>
           <div className="space-y-1">
-            <h2 className="text-3xl font-extrabold text-amber-900 tracking-tight uppercase font-serif">Sunrise Academy</h2>
+            <h2 className="text-3xl font-semibold text-amber-900 tracking-tight uppercase font-serif">Sunrise Academy</h2>
             <p className="text-sm font-medium text-gray-700 italic">Affiliated to Central Board of Secondary Education (CBSE)</p>
             <p className="text-xs text-gray-600">123 Education Lane, Academic City — PIN: 560001</p>
           </div>
@@ -59,7 +59,7 @@ export function CertificateTemplate({ cert, formatDate }: CertificateTemplatePro
 
         {/* Certificate Title */}
         <div className="text-center mb-10">
-          <h3 className="text-4xl font-bold text-amber-800 uppercase tracking-[0.2em] mb-2 drop-shadow-sm">
+          <h3 className="text-4xl font-semibold text-amber-800 uppercase tracking-[0.2em] mb-2 drop-shadow-sm">
             {(cert.certificateType || '').toUpperCase().split(' ')[0]}
           </h3>
           <h4 className="text-xl font-semibold text-amber-700 uppercase tracking-widest mb-3">CERTIFICATE</h4>

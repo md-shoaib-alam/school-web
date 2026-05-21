@@ -142,7 +142,7 @@ export function DetailTabs({
                   <div className="h-20 w-20 mx-auto mb-6 rounded-full bg-gray-50 dark:bg-gray-900 flex items-center justify-center text-muted-foreground/30">
                     {tab.icon}
                   </div>
-                  <h3 className="text-xl font-black text-gray-900 dark:text-gray-100">
+                  <h3 className="text-xl font-semibold text-gray-900 dark:text-gray-100">
                     No {tab.label.toLowerCase()} found
                   </h3>
                   <p className="text-sm text-muted-foreground mt-2 font-medium max-w-[280px] mx-auto leading-relaxed">

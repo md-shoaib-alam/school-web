@@ -289,7 +289,7 @@ export function TeacherAttendance() {
     <div className="space-y-6 pb-6 sm:pb-20">
       {/* Title */}
       <div>
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
+        <h2 className="text-2xl font-semibold text-gray-900 dark:text-gray-100">
           Take Attendance
         </h2>
         <p className="text-gray-500 dark:text-gray-400 mt-1">
@@ -393,7 +393,7 @@ export function TeacherAttendance() {
                   <CalendarDays className="h-4 w-4 text-blue-500" />
                 </div>
                 <div>
-                  <h3 className="text-sm sm:text-base font-bold text-gray-800 dark:text-gray-100 leading-none">
+                  <h3 className="text-sm sm:text-base font-semibold text-gray-800 dark:text-gray-100 leading-none">
                     {selectedClass
                       ? `${selectedClass.name} - ${selectedClass.section}`
                       : "Select a class"}

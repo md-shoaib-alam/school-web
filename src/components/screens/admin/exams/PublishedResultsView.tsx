@@ -87,7 +87,7 @@ export function PublishedResultsView({
       {exams.filter(e => e.status === 'completed').length === 0 ? (
         <div className="flex flex-col items-center justify-center p-12 border-2 border-dashed border-gray-200 dark:border-zinc-800 rounded-2xl bg-card text-center text-muted-foreground animate-in fade-in duration-300">
           <Trophy className="h-16 w-16 mb-4 text-emerald-500/40" />
-          <h3 className="text-lg font-bold text-foreground">No Published Results</h3>
+          <h3 className="text-lg font-semibold text-foreground">No Published Results</h3>
           <p className="text-sm mt-1 max-w-md">There are no finalized or completed exams to view results for yet.</p>
         </div>
       ) : (
@@ -148,7 +148,7 @@ export function PublishedResultsView({
           {classesWithCompletedExams.length === 0 ? (
             <div className="flex flex-col items-center justify-center p-12 border border-dashed border-gray-200 dark:border-zinc-800 rounded-2xl bg-card text-center text-muted-foreground animate-in fade-in duration-300">
               <Trophy className="h-12 w-12 mb-3 text-zinc-300 dark:text-zinc-700" />
-              <h3 className="text-base font-bold text-foreground">No matching published exams found</h3>
+              <h3 className="text-base font-semibold text-foreground">No matching published exams found</h3>
               <p className="text-xs mt-1 max-w-md">No finalized exams match your selected filters. Try clearing or modifying your selections.</p>
               <Button 
                 onClick={() => { setPublishedAcademicYearFilter(currentAcademicYear); setPublishedClassFilter('all'); }}
@@ -183,7 +183,7 @@ export function PublishedResultsView({
                             <Trophy className="h-5 w-5" />
                           </div>
                           <div>
-                            <h3 className="text-base font-bold text-foreground leading-tight">
+                            <h3 className="text-base font-semibold text-foreground leading-tight">
                               {c.name} - {c.section}
                             </h3>
                             <p className="text-[11px] text-muted-foreground mt-0 font-medium">

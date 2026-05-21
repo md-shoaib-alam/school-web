@@ -49,7 +49,7 @@ export function MaintenanceScreen({ message }: { message?: string }) {
         </div>
 
         {/* Title */}
-        <h1 className="text-4xl sm:text-5xl font-black tracking-tight animate-[fade-up_0.7s_cubic-bezier(0.34,1.56,0.64,1)_0.3s_forwards] opacity-0">
+        <h1 className="text-4xl sm:text-5xl font-semibold tracking-tight animate-[fade-up_0.7s_cubic-bezier(0.34,1.56,0.64,1)_0.3s_forwards] opacity-0">
           <span className="text-amber-600 dark:text-amber-500">
             Under Maintenance
           </span>

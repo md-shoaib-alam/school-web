@@ -170,7 +170,7 @@ export function StaffAttendance({ initialTab }: StaffAttendanceProps) {
     <div className="space-y-6 md:pb-18 pb-26">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100 flex items-center gap-2">
+          <h2 className="text-2xl font-semibold text-gray-900 dark:text-gray-100 flex items-center gap-2">
             {activeTab === 'teacher' ? <GraduationCap className="h-7 w-7 text-emerald-600" /> : <Briefcase className="h-7 w-7 text-blue-600" />}
             {activeTab === 'teacher' ? 'Teacher Attendance' : 'Admin Staff Attendance'}
           </h2>
@@ -278,7 +278,7 @@ export function StaffAttendance({ initialTab }: StaffAttendanceProps) {
                       <CalendarDays className="h-4 w-4 text-blue-500" />
                     </div>
                     <div>
-                      <h3 className="text-sm sm:text-base font-bold text-gray-800 dark:text-gray-100 leading-none">
+                      <h3 className="text-sm sm:text-base font-semibold text-gray-800 dark:text-gray-100 leading-none">
                         {activeTab === "teacher" ? "Teachers List" : "Staff List"}
                       </h3>
                       <p className="text-[10px] text-gray-400 dark:text-gray-500 mt-1 font-medium">

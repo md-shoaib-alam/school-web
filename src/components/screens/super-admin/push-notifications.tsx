@@ -80,7 +80,7 @@ export function SuperAdminPushNotifications() {
           <Send className="h-6 w-6 text-indigo-600 dark:text-indigo-400" />
         </div>
         <div>
-          <h2 className="text-3xl font-bold tracking-tight">Push Notifications</h2>
+          <h2 className="text-3xl font-semibold tracking-tight">Push Notifications</h2>
           <p className="text-muted-foreground mt-1">Send real-time alerts to schools and parents across all devices.</p>
         </div>
       </div>

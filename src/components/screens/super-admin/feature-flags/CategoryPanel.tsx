@@ -34,7 +34,7 @@ export function CategoryPanel({
             <CategoryIcon className="h-6 w-6" />
           </div>
           <div>
-            <h3 className="text-base font-black capitalize tracking-tight">{category} Capabilities</h3>
+            <h3 className="text-base font-semibold capitalize tracking-tight">{category} Capabilities</h3>
             <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground mt-0.5">
               <span className="text-emerald-600">{enabledCount}</span> Active / {flags.length} Registered
             </p>

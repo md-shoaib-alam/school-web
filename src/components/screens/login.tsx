@@ -133,7 +133,7 @@ export function LoginScreen() {
               className="h-full w-full object-cover" 
             />
           </div>
-          <h1 className="text-4xl font-bold tracking-tight text-gray-900 dark:text-white">
+          <h1 className="text-4xl font-semibold tracking-tight text-gray-900 dark:text-white">
             SchoolSaaS
           </h1>
           <p className="text-lg mt-2 text-gray-500 dark:text-gray-400 font-medium">

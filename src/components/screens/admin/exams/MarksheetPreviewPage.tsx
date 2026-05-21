@@ -296,7 +296,7 @@ export function MarksheetPreviewPage({
           </Button>
           
           <div className="min-w-0">
-            <h2 className="text-sm font-bold tracking-tight text-foreground flex items-center gap-1.5 leading-none">
+            <h2 className="text-sm font-semibold tracking-tight text-foreground flex items-center gap-1.5 leading-none">
               <Award className="h-4 w-4 text-emerald-600 dark:text-emerald-500 shrink-0" />
               <span className="truncate">{classNameStr} - {classSection}</span>
             </h2>
@@ -419,7 +419,7 @@ export function MarksheetPreviewPage({
             <div className="w-16 h-16 bg-blue-50 dark:bg-blue-900/10 text-blue-600 dark:text-blue-400 rounded-full flex items-center justify-center mb-4">
               <AlertCircle className="h-8 w-8" />
             </div>
-            <h3 className="text-base font-bold text-foreground">No Published Exams</h3>
+            <h3 className="text-base font-semibold text-foreground">No Published Exams</h3>
             <p className="text-xs mt-1">
               There are no completed midterm or final exams published under the selected Academic Cycle for this class. Please verify the academic stand or exam configuration.
             </p>

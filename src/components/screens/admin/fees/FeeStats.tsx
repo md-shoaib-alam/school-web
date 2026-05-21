@@ -26,7 +26,7 @@ export function FeeStats({
               <p className="text-xs font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-widest">
                 Total Revenue
               </p>
-              <h3 className="text-2xl font-black text-gray-900 dark:text-gray-100">
+              <h3 className="text-2xl font-semibold text-gray-900 dark:text-gray-100">
                 ₹{totalRevenue.toLocaleString()}
               </h3>
             </div>
@@ -44,7 +44,7 @@ export function FeeStats({
               <p className="text-xs font-bold text-amber-600 dark:text-amber-400 uppercase tracking-widest">
                 Outstanding
               </p>
-              <h3 className="text-2xl font-black text-gray-900 dark:text-gray-100">
+              <h3 className="text-2xl font-semibold text-gray-900 dark:text-gray-100">
                 ₹{pendingAmount.toLocaleString()}
               </h3>
             </div>
@@ -62,7 +62,7 @@ export function FeeStats({
               <p className="text-xs font-bold text-blue-600 dark:text-blue-400 uppercase tracking-widest">
                 Collection Rate
               </p>
-              <h3 className="text-2xl font-black text-gray-900 dark:text-gray-100">
+              <h3 className="text-2xl font-semibold text-gray-900 dark:text-gray-100">
                 {collectionRate}%
               </h3>
             </div>

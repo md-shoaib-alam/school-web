@@ -157,7 +157,7 @@ export function AdminCertificates() {
 
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 no-print">
         <div className="flex-1 min-w-0">
-          <h1 className="text-xl sm:text-2xl font-bold tracking-tight flex items-center gap-2">
+          <h1 className="text-xl sm:text-2xl font-semibold tracking-tight flex items-center gap-2">
             <Award className="h-6 w-6 sm:h-7 sm:h-7 text-amber-600 shrink-0" /> 
             <span className="truncate">Certificates</span>
           </h1>
@@ -290,7 +290,7 @@ export function AdminCertificates() {
             </DialogHeader>
           </VisuallyHidden.Root>
           <div className="p-3 sm:p-4 border-b flex justify-between items-center bg-white sticky top-0 z-10">
-            <h3 className="font-bold text-slate-900 truncate mr-2">Preview</h3>
+            <h3 className="font-semibold text-slate-900 truncate mr-2">Preview</h3>
             <Button onClick={() => handlePrint()} className="bg-amber-600 hover:bg-amber-700 text-white h-9 px-3 shrink-0">
               <Printer className="h-4 w-4 mr-2" /> 
               <span className="text-sm">Print PDF</span>

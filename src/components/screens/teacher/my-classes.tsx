@@ -123,7 +123,7 @@ export function TeacherClasses() {
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
+        <h2 className="text-2xl font-semibold text-gray-900 dark:text-gray-100">
           My Classes
         </h2>
         <p className="text-gray-500 dark:text-gray-400 mt-1">
@@ -174,7 +174,7 @@ export function TeacherClasses() {
       {classes.length === 0 && (
         <div className="text-center py-20 bg-gray-900/20 rounded-3xl border border-dashed border-gray-800">
           <School className="h-16 w-16 text-gray-700 mx-auto mb-4 opacity-50" />
-          <h3 className="text-xl font-bold text-gray-300">
+          <h3 className="text-xl font-semibold text-gray-300">
             No Classes Assigned
           </h3>
           <p className="text-gray-500 mt-2 max-w-xs mx-auto">

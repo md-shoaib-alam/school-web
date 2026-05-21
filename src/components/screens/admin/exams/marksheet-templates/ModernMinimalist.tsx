@@ -41,7 +41,7 @@ export const ModernMinimalist: React.FC<MarksheetTemplateProps> = ({
         {/* Title Box */}
         <div className="flex justify-between items-center bg-zinc-50/50 border border-zinc-100 rounded-lg p-3 font-sans">
           <div>
-            <h4 className="text-xs font-black uppercase text-slate-700 tracking-wider">
+            <h4 className="text-xs font-semibold uppercase text-slate-700 tracking-wider">
               {marksheetType === 'midterm' ? 'Midterm Marksheet' : marksheetType === 'final' ? 'Final Marksheet' : 'Consolidated Report Card'}
             </h4>
             <p className="text-[9px] text-zinc-400 font-medium">Class Performance Summary</p>
@@ -152,7 +152,7 @@ export const ModernMinimalist: React.FC<MarksheetTemplateProps> = ({
 
         {/* Remarks Section */}
         <div className="border border-zinc-150 rounded-lg p-4 bg-zinc-50/20 font-sans text-xs">
-          <h5 className="font-extrabold text-[9px] uppercase tracking-wider text-slate-800 mb-1">Academic Assessment & Evaluation Remarks</h5>
+          <h5 className="font-semibold text-[9px] uppercase tracking-wider text-slate-800 mb-1">Academic Assessment & Evaluation Remarks</h5>
           <p className="italic text-zinc-600 font-medium leading-relaxed">
             "{sheet.remarks}" {sheet.status === 'pass' ? 'The student continues to demonstrate high diligence and rigorous understanding.' : 'Targeted learning pathways and core feedback support are recommended.'}
           </p>

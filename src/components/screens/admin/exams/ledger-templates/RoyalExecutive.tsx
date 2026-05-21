@@ -24,11 +24,11 @@ export const RoyalExecutive: React.FC<LedgerTemplateProps> = ({ data }) => {
 
       {/* Ornate Double Border Box for School Branding */}
       <div className="border-4 border-double border-amber-600 p-3 text-center mb-4 bg-stone-50/50">
-        <h1 className="font-extrabold text-2xl tracking-widest text-amber-900 uppercase font-serif">
+        <h1 className="font-semibold text-2xl tracking-widest text-amber-900 uppercase font-serif">
           {data.schoolName}
         </h1>
         <div className="w-[120px] h-[1px] bg-amber-600 mx-auto my-1.5" />
-        <h2 className="text-[11px] font-bold text-stone-600 uppercase tracking-widest leading-none">
+        <h2 className="text-[11px] font-semibold text-stone-600 uppercase tracking-widest leading-none">
           {data.ledgerTitle}
         </h2>
         <div className="flex justify-center gap-12 mt-2.5 text-[10px] font-bold text-stone-600 tracking-wide font-sans">

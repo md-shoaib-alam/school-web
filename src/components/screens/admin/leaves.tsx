@@ -113,7 +113,7 @@ function AdminManagerView({ initialTab }: { initialTab: string }) {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-bold tracking-tight flex items-center gap-2"><CalendarDays className="h-6 w-6 text-primary" /> Leave Management</h2>
+          <h2 className="text-2xl font-semibold tracking-tight flex items-center gap-2"><CalendarDays className="h-6 w-6 text-primary" /> Leave Management</h2>
           <p className="text-muted-foreground text-sm mt-1">Review and manage leave requests from the team</p>
         </div>
       </div>
@@ -239,7 +239,7 @@ function StaffSelfServiceView() {
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
-        <h2 className="text-2xl font-bold">My Leaves</h2>
+        <h2 className="text-2xl font-semibold">My Leaves</h2>
         <Button className="bg-emerald-600" onClick={() => setApplyOpen(true)}><Plus className="h-4 w-4 mr-2" /> Apply</Button>
       </div>
       <Card>

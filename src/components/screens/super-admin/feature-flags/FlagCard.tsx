@@ -41,7 +41,7 @@ export function FlagCard({
               <IconComp className="h-6 w-6" />
             </div>
             <div className="min-w-0 flex-1 pt-1">
-              <h3 className="text-sm font-black text-gray-900 dark:text-gray-100 truncate uppercase tracking-widest">
+              <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100 truncate uppercase tracking-widest">
                 {flag.name}
               </h3>
               <p className="text-[11px] font-bold text-muted-foreground mt-1 line-clamp-2 leading-relaxed">

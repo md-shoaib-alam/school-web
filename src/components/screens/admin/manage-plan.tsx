@@ -124,7 +124,7 @@ export function ManagePlanScreen() {
             <ArrowLeft className="h-5 w-5" />
           </Button>
           <div>
-            <h2 className="text-xl sm:text-3xl font-bold tracking-tight flex items-center gap-2">
+            <h2 className="text-xl sm:text-3xl font-semibold tracking-tight flex items-center gap-2">
               Upgrade Institution
               <Crown className="h-5 w-5 sm:h-6 sm:w-6 text-amber-500 fill-amber-500/20" />
             </h2>
@@ -142,7 +142,7 @@ export function ManagePlanScreen() {
         </CardHeader>
         <CardContent className="relative z-10 py-4 sm:py-6 flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div>
-            <h3 className="text-4xl sm:text-6xl font-black capitalize tracking-tighter mb-1 sm:mb-2 drop-shadow-md">{tenant.plan}</h3>
+            <h3 className="text-4xl sm:text-6xl font-semibold capitalize tracking-tighter mb-1 sm:mb-2 drop-shadow-md">{tenant.plan}</h3>
             <p className="text-indigo-100 flex items-center gap-2 font-medium text-xs sm:text-base">
               <span className="h-2.5 w-2.5 rounded-full bg-emerald-400 animate-pulse shadow-[0_0_8px_rgba(52,211,153,0.8)]" />
               Institutions using this tier have unlocked full {tenant.plan} capabilities.
@@ -181,7 +181,7 @@ export function ManagePlanScreen() {
             <ShieldCheck className="h-7 w-7 sm:h-8 sm:w-8 text-indigo-600 dark:text-indigo-400" />
           </div>
           <div>
-            <h4 className="font-black text-gray-900 dark:text-gray-100 text-base sm:text-lg">Enterprise-Grade Security</h4>
+            <h4 className="font-semibold text-gray-900 dark:text-gray-100 text-base sm:text-lg">Enterprise-Grade Security</h4>
             <p className="text-xs sm:text-sm text-muted-foreground mt-1 max-w-md">Every plan features 256-bit encryption and automated daily backups.</p>
           </div>
         </div>

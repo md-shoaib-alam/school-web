@@ -452,7 +452,7 @@ export function AdminExams({ initialTab = 'exams' }: { initialTab?: string }) {
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div className="flex-1 min-w-0">
-          <h2 className="text-xl sm:text-2xl font-bold tracking-tight flex items-center gap-2">
+          <h2 className="text-xl sm:text-2xl font-semibold tracking-tight flex items-center gap-2">
             {activeTab === 'exams' && <GraduationCap className="h-6 w-6 sm:h-7 sm:h-7 text-blue-600" />}
             {activeTab === 'results' && <FileText className="h-6 w-6 sm:h-7 sm:h-7 text-orange-600" />}
             {activeTab === 'published' && <Trophy className="h-6 w-6 sm:h-7 sm:h-7 text-yellow-600" />}

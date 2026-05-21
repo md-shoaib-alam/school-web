@@ -145,7 +145,7 @@ const AdmitCardVisual = memo(function AdmitCardVisual({ card }: { card: AdmitCar
                 <GraduationCap className="h-5 w-5 text-amber-300" />
               </div>
               <div>
-                <h2 className="text-sm font-bold tracking-wide leading-tight">{schoolName.toUpperCase()}</h2>
+                <h2 className="text-sm font-semibold tracking-wide leading-tight">{schoolName.toUpperCase()}</h2>
                 <p className="text-[9px] text-slate-300 truncate max-w-[300px]">{schoolAddress}</p>
               </div>
             </div>
@@ -446,7 +446,7 @@ export function AdminAdmitCards() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-bold tracking-tight flex items-center gap-2">
+          <h2 className="text-2xl font-semibold tracking-tight flex items-center gap-2">
             <FileText className="h-6 w-6 text-amber-600" />
             Admit Cards
           </h2>
@@ -637,7 +637,7 @@ export function AdminAdmitCards() {
               {totalExams > 0 && (
                 <div className="space-y-2">
                   <div className="flex items-center justify-between px-1">
-                    <h3 className="text-sm font-bold text-slate-800 dark:text-slate-200">Select Students</h3>
+                    <h3 className="text-sm font-semibold text-slate-800 dark:text-slate-200">Select Students</h3>
                     <Button variant="link" size="sm" onClick={toggleAll} className="text-xs h-auto p-0 font-semibold text-amber-600 hover:text-amber-700">
                       {selectAll ? 'Deselect All' : 'Select All'}
                     </Button>

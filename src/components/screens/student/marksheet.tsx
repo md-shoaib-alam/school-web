@@ -221,7 +221,7 @@ export function StudentMarksheet() {
       {/* ── Toolbar ── */}
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h2 className="text-xl font-bold text-gray-900 dark:text-gray-100 flex items-center gap-2">
+          <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100 flex items-center gap-2">
             <FileText className="h-5 w-5 text-violet-500" />
             My Marksheet
           </h2>

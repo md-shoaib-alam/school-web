@@ -41,7 +41,7 @@ export function StaffCard({ member, onEdit, onDelete, canEdit, canDelete }: Staf
                 </AvatarFallback>
               </Avatar>
               <div className="flex-1 min-w-0">
-                <h3 className="font-bold text-gray-900 dark:text-gray-100 truncate leading-tight pr-1">
+                <h3 className="font-semibold text-gray-900 dark:text-gray-100 truncate leading-tight pr-1">
                   {member.name}
                 </h3>
                 <div className="flex flex-wrap items-center gap-1.5 mt-1.5">

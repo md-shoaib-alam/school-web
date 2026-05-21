@@ -27,7 +27,7 @@ export const TealClean: React.FC<LedgerTemplateProps> = ({ data }) => {
         <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full -mr-8 -mt-8"></div>
         <div className="absolute bottom-0 left-0 w-24 h-24 bg-white/5 rounded-full -ml-8 -mb-8"></div>
         
-        <h1 className="font-extrabold text-xl tracking-wider uppercase leading-none">
+        <h1 className="font-semibold text-xl tracking-wider uppercase leading-none">
           {data.schoolName}
         </h1>
         <h2 className="text-[10px] font-medium text-teal-100 uppercase tracking-widest mt-1.5 leading-none">

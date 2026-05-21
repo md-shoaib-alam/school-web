@@ -110,7 +110,7 @@ export function SchoolSubscriptionScreen() {
             <img src={tenant.logo || "/test.webp"} alt={tenant.name} className="h-full w-full object-cover" />
           </div>
           <div>
-            <h2 className="text-2xl sm:text-3xl font-bold tracking-tight">My Subscription</h2>
+            <h2 className="text-2xl sm:text-3xl font-semibold tracking-tight">My Subscription</h2>
             <p className="text-xs sm:text-sm text-muted-foreground mt-0.5">Monitor your school's plan, limits, and usage.</p>
           </div>
         </div>
@@ -136,7 +136,7 @@ export function SchoolSubscriptionScreen() {
                   {tenant.plan} Plan
                 </Badge>
                 <div>
-                  <h3 className="text-2xl sm:text-4xl font-extrabold tracking-tight">{tenant.name}</h3>
+                  <h3 className="text-2xl sm:text-4xl font-semibold tracking-tight">{tenant.name}</h3>
                   <p className="opacity-80 mt-1 font-medium text-sm sm:text-lg">Institution License</p>
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-8 pt-2 sm:pt-4">

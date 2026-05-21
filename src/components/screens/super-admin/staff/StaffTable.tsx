@@ -74,7 +74,7 @@ export function StaffTable({
         <div className="h-20 w-20 mx-auto mb-6 rounded-full bg-gray-50 dark:bg-gray-900 flex items-center justify-center text-muted-foreground/30">
           <Users className="h-10 w-10" />
         </div>
-        <h3 className="text-xl font-black text-gray-900 dark:text-gray-100">No staff members found</h3>
+        <h3 className="text-xl font-semibold text-gray-900 dark:text-gray-100">No staff members found</h3>
         <p className="text-sm font-medium text-muted-foreground mt-2 max-w-[280px] mx-auto leading-relaxed">
           {staffList.length === 0
             ? 'Start building your platform team by clicking "Add Staff" above.'

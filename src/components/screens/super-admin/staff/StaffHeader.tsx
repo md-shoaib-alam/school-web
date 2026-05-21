@@ -18,7 +18,7 @@ export function StaffHeader({
   return (
     <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
       <div>
-        <h2 className="text-2xl font-black text-gray-900 dark:text-gray-100 tracking-tight">
+        <h2 className="text-2xl font-semibold text-gray-900 dark:text-gray-100 tracking-tight">
           Staff Management
         </h2>
         <p className="text-sm font-bold text-muted-foreground mt-0.5">

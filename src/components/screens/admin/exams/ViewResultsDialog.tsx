@@ -201,7 +201,7 @@ export function ViewResultsDialog({
               {/* Exam Info Summary Banner */}
               <div className="p-4 rounded-xl border border-gray-100 dark:border-zinc-800/80 bg-card/50 flex flex-wrap items-center justify-between gap-4">
                 <div className="space-y-1">
-                  <h4 className="font-bold text-sm text-foreground flex items-center gap-1.5">
+                  <h4 className="font-semibold text-sm text-foreground flex items-center gap-1.5">
                     <BookOpen className="h-4 w-4 text-blue-500" />
                     {exam.name} – {exam.subjectName}
                   </h4>

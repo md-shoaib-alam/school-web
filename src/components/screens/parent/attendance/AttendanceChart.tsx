@@ -124,7 +124,7 @@ export function AttendanceChart({ data, isPremium }: AttendanceChartProps) {
               <div className="w-10 h-10 sm:w-12 sm:h-12 bg-amber-100 dark:bg-amber-900/50 rounded-full flex items-center justify-center mx-auto mb-2 sm:mb-3">
                 <Calendar className="h-5 w-5 sm:h-6 sm:w-6 text-amber-600" />
               </div>
-              <h4 className="text-xs sm:text-sm font-bold text-gray-900 dark:text-gray-100 mb-1">Unlock Analytics</h4>
+              <h4 className="text-xs sm:text-sm font-semibold text-gray-900 dark:text-gray-100 mb-1">Unlock Analytics</h4>
               <p className="text-[10px] sm:text-[11px] text-muted-foreground mb-3 sm:mb-4 px-2">
                 6-month history and monthly trends are for Premium members.
               </p>

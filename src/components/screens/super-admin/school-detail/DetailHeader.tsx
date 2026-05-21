@@ -90,7 +90,7 @@ export function DetailHeader({
             <Building2 className="h-7 w-7" />
           </div>
           <div className="min-w-0">
-            <h1 className="text-2xl font-black tracking-tight truncate leading-tight">
+            <h1 className="text-2xl font-semibold tracking-tight truncate leading-tight">
               {tenant?.name || tenantName}
             </h1>
             <p className="text-xs font-black text-rose-600 dark:text-rose-400 mt-0.5 tracking-wider uppercase">

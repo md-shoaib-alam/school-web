@@ -158,7 +158,7 @@ export const CreativeCompact: React.FC<MarksheetTemplateProps> = ({
 
         {/* Remarks Section */}
         <div className="border border-indigo-100 rounded-xl p-4 bg-gradient-to-r from-indigo-50/30 to-purple-50/10 font-sans text-xs">
-          <h5 className="font-extrabold text-[9px] uppercase tracking-wider text-indigo-950 mb-1">Assessor Feedback Summary</h5>
+          <h5 className="font-semibold text-[9px] uppercase tracking-wider text-indigo-950 mb-1">Assessor Feedback Summary</h5>
           <p className="italic text-zinc-600 font-medium leading-relaxed">
             "{sheet.remarks}" {sheet.status === 'pass' ? 'The student has displayed amazing academic growth and solid dedication.' : 'Extra tutorial assistance and concept strengthening are advised.'}
           </p>

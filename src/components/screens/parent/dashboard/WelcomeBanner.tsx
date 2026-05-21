@@ -26,7 +26,7 @@ export function WelcomeBanner({ userName }: WelcomeBannerProps) {
               <p className="text-muted-foreground text-xs sm:text-sm font-medium mb-0.5">
                 Welcome back
               </p>
-              <h2 className="text-xl sm:text-2xl lg:text-3xl font-extrabold tracking-tight leading-tight text-foreground">
+              <h2 className="text-xl sm:text-2xl lg:text-3xl font-semibold tracking-tight leading-tight text-foreground">
                 {isGeneric ? "Parent" : userName.split(" ")[0]}
               </h2>
               <p className="text-muted-foreground/80 mt-0.5 text-xs sm:text-sm font-medium">
