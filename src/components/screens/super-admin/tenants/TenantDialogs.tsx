@@ -309,11 +309,12 @@ export function TenantDialogs({
                         }
                         alt="Logo preview"
                         fill
+                        sizes="96px"
                         className="object-cover"
                         unoptimized
                       />
                     ) : (
-                      <Image src="/test.webp" alt="Default logo placeholder" fill className="object-cover opacity-60 group-hover:opacity-100 transition-opacity" unoptimized />
+                      <Image src="/test.webp" alt="Default logo placeholder" fill sizes="96px" className="object-cover opacity-60 group-hover:opacity-100 transition-opacity" unoptimized />
                     )}
                   </div>
                   <label className="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity rounded-2xl cursor-pointer">
@@ -592,7 +593,7 @@ export function TenantDialogs({
               <DialogHeader>
                 <div className="flex items-center gap-3">
                   <div className="h-12 w-12 rounded-xl bg-teal-100 dark:bg-teal-900/30 text-teal-700 dark:text-teal-400 flex items-center justify-center overflow-hidden relative">
-                    <Image src={viewingTenant.logo || "/test.webp"} alt={viewingTenant.name} fill className="object-cover" unoptimized />
+                    <Image src={viewingTenant.logo || "/test.webp"} alt={viewingTenant.name} fill sizes="48px" className="object-cover" unoptimized />
                   </div>
                   <div>
                     <DialogTitle className="text-xl">
