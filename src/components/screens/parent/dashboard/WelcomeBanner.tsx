@@ -1,5 +1,6 @@
 "use client";
 
+import { useMemo } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Calendar, School } from "lucide-react";
 import { useAppStore } from "@/store/use-app-store";
@@ -10,6 +11,19 @@ interface WelcomeBannerProps {
 
 export function WelcomeBanner({ userName }: WelcomeBannerProps) {
   const { currentTenantName, currentTenantLogo } = useAppStore();
+
+  const todayString = useMemo(() => {
+    try {
+      return new Date().toLocaleDateString("en-US", {
+        weekday: "long",
+        month: "long",
+        day: "numeric",
+        year: "numeric",
+      });
+    } catch (e) {
+      return "";
+    }
+  }, []);
 
   // Check if userName is missing or generic to display a cleaner, more professional greeting
   const isGeneric = !userName || userName.toLowerCase() === "parent";
@@ -36,13 +50,8 @@ export function WelcomeBanner({ userName }: WelcomeBannerProps) {
           </div>
           <div className="flex items-center gap-2 bg-muted border border-border rounded-lg px-4 py-2 text-muted-foreground shrink-0 self-start sm:self-auto">
             <Calendar className="h-4 w-4" />
-            <span className="text-sm font-medium">
-              {new Date().toLocaleDateString("en-US", {
-                weekday: "long",
-                month: "long",
-                day: "numeric",
-                year: "numeric",
-              })}
+            <span className="text-sm font-medium" suppressHydrationWarning>
+              {todayString}
             </span>
           </div>
         </div>

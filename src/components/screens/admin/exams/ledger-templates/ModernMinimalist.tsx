@@ -33,7 +33,7 @@ export const ModernMinimalist: React.FC<LedgerTemplateProps> = ({ data }) => {
         <div className="flex gap-6 text-[10px] font-bold text-slate-500 mt-2 sm:mt-0">
           <div>CLASS: <span className="text-slate-800">{data.className} - {data.classSection}</span></div>
           <div>CYCLE: <span className="text-slate-800">{data.academicYear}</span></div>
-          <div>DATE: <span className="text-slate-800">{new Date().toLocaleDateString()}</span></div>
+          <div>DATE: <span className="text-slate-800" suppressHydrationWarning>{new Date().toLocaleDateString()}</span></div>
         </div>
       </div>
 

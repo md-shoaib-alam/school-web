@@ -46,6 +46,15 @@ import {
 } from "@/lib/graphql/hooks";
 import { formatDistanceToNow } from "date-fns";
 
+const getNoticeDistanceToNow = (createdAt: string) => {
+  try {
+    const d = new Date(createdAt);
+    return isNaN(d.getTime()) ? "recently" : formatDistanceToNow(d, { addSuffix: true });
+  } catch {
+    return "recently";
+  }
+};
+
 export function SuperAdminPlatformNotices() {
   const [title, setTitle] = useState("");
   const [body, setBody] = useState("");
@@ -315,15 +324,8 @@ export function SuperAdminPlatformNotices() {
                             <Users className="h-3 w-3" />
                             {getTargetLabel(notice.target)}
                           </span>
-                          <span>
-                            {(() => {
-                              try {
-                                const d = new Date(notice.createdAt);
-                                return isNaN(d.getTime()) ? "recently" : formatDistanceToNow(d, { addSuffix: true });
-                              } catch {
-                                return "recently";
-                              }
-                            })()}
+                          <span suppressHydrationWarning>
+                            {getNoticeDistanceToNow(notice.createdAt)}
                           </span>
                         </div>
                       </div>

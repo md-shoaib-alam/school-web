@@ -42,7 +42,7 @@ export const VintageLedger: React.FC<LedgerTemplateProps> = ({ data }) => {
         <div className="flex justify-center gap-12 mt-2 text-[9.5px] font-semibold text-[#5c4028] font-serif">
           <div>Class Standing: <span className="underline decoration-[#8a7355] underline-offset-2">{data.className} - {data.classSection}</span></div>
           <div>Academic Session: <span className="underline decoration-[#8a7355] underline-offset-2">{data.academicYear}</span></div>
-          <div>Recorded Date: <span className="underline decoration-[#8a7355] underline-offset-2">{new Date().toLocaleDateString()}</span></div>
+          <div>Recorded Date: <span className="underline decoration-[#8a7355] underline-offset-2" suppressHydrationWarning>{new Date().toLocaleDateString()}</span></div>
         </div>
       </div>
 

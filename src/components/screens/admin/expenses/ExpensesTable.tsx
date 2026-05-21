@@ -27,6 +27,10 @@ import {
   DropdownMenuTrigger 
 } from "@/components/ui/dropdown-menu";
 
+function formatExpenseDate(dateStr: string) {
+  return format(new Date(dateStr), "MMM dd, yyyy");
+}
+
 interface ExpensesTableProps {
   expenses: any[];
   categories: any[];
@@ -123,8 +127,8 @@ export function ExpensesTable({
           ) : (
             expenses.map((e: any) => (
               <TableRow key={e.id} className="hover:bg-rose-50/50 dark:hover:bg-rose-950/10">
-                <TableCell className="font-medium">
-                  {format(new Date(e.date), "MMM dd, yyyy")}
+                <TableCell className="font-medium" suppressHydrationWarning>
+                  {formatExpenseDate(e.date)}
                 </TableCell>
                 <TableCell>
                   <Badge variant="outline" className="font-normal border-rose-200 text-rose-700 bg-rose-50/50">

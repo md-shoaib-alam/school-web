@@ -33,6 +33,14 @@ interface NoticeSidebarProps {
   performance: PerformanceSummary[];
 }
 
+const formatNoticeDateShort = (dateStr: string) => {
+  try {
+    return new Date(dateStr).toLocaleDateString("en-US", { month: "short", day: "numeric" });
+  } catch (e) {
+    return dateStr;
+  }
+};
+
 export function NoticeSidebar({ notices, overdueFees, performance }: NoticeSidebarProps) {
   return (
     <div className="space-y-6 text-left">
@@ -101,8 +109,8 @@ export function NoticeSidebar({ notices, overdueFees, performance }: NoticeSideb
                   <p className="text-xs text-muted-foreground line-clamp-2">
                     {notice.content}
                   </p>
-                  <p className="text-[10px] text-muted-foreground">
-                    {new Date(notice.createdAt).toLocaleDateString("en-US", { month: "short", day: "numeric" })}
+                  <p className="text-[10px] text-muted-foreground" suppressHydrationWarning>
+                    {formatNoticeDateShort(notice.createdAt)}
                   </p>
                 </div>
               ))}

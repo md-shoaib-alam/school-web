@@ -46,11 +46,30 @@ export function SchoolSubscriptionScreen() {
   const { slug } = useParams();
   const [isAutoPay, setIsAutoPay] = useState(true);
 
+  const tenant = detailData?.tenant;
+
+  const formattedStartDate = React.useMemo(() => {
+    if (!tenant?.startDate) return "";
+    try {
+      return format(new Date(tenant.startDate), "MMM d, yyyy");
+    } catch (e) {
+      return tenant.startDate || "";
+    }
+  }, [tenant?.startDate]);
+
+  const formattedEndDate = React.useMemo(() => {
+    if (!tenant?.endDate) return "Permanent";
+    try {
+      return format(new Date(tenant.endDate), "MMM d, yyyy");
+    } catch (e) {
+      return tenant.endDate;
+    }
+  }, [tenant?.endDate]);
+
   if (isLoading) {
     return <div className="p-8 text-center font-bold text-indigo-600 animate-pulse">Loading subscription details...</div>;
   }
 
-  const tenant = detailData?.tenant;
   if (!tenant) {
     return <div className="p-8 text-center text-muted-foreground">Could not load subscription information.</div>;
   }
@@ -101,7 +120,6 @@ export function SchoolSubscriptionScreen() {
     });
   };
 
-
   return (
     <div className="space-y-6 pb-20">
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
@@ -146,7 +164,7 @@ export function SchoolSubscriptionScreen() {
                     </div>
                     <div>
                       <p className="text-[10px] opacity-70 uppercase tracking-widest font-black">Subscription Start</p>
-                      <p className="font-bold text-base sm:text-lg">{format(new Date(tenant.startDate), "MMM d, yyyy")}</p>
+                      <p className="font-bold text-base sm:text-lg" suppressHydrationWarning>{formattedStartDate}</p>
                     </div>
                   </div>
                   <div className="flex items-center gap-3">
@@ -155,7 +173,7 @@ export function SchoolSubscriptionScreen() {
                     </div>
                     <div>
                       <p className="text-[10px] opacity-70 uppercase tracking-widest font-black">Next Renewal</p>
-                      <p className="font-bold text-base sm:text-lg">{tenant.endDate ? format(new Date(tenant.endDate), "MMM d, yyyy") : "Permanent"}</p>
+                      <p className="font-bold text-base sm:text-lg" suppressHydrationWarning>{formattedEndDate}</p>
                     </div>
                   </div>
                 </div>
@@ -193,7 +211,7 @@ export function SchoolSubscriptionScreen() {
             <div className="pt-2 space-y-4">
               <div className="text-center p-4 rounded-2xl border-2 border-indigo-50 dark:border-indigo-900/30">
                 <p className="text-xs text-muted-foreground uppercase tracking-widest font-black">Time Remaining</p>
-                <p className={`text-4xl font-black mt-2 ${isExpired ? 'text-rose-500' : 'text-indigo-600 dark:text-indigo-400'}`}>
+                <p className={`text-4xl font-black mt-2 ${isExpired ? 'text-rose-500' : 'text-indigo-600 dark:text-indigo-400'}`} suppressHydrationWarning>
                   {daysRemaining !== null ? (isExpired ? "Expired" : `${daysRemaining}d`) : "∞"}
                 </p>
               </div>

@@ -682,7 +682,7 @@ export function TeacherAssignments() {
                           </p>
                         </div>
                         {sub.status !== "not_submitted" && (
-                          <span className="text-[10px] text-gray-400 dark:text-gray-500 shrink-0">
+                          <span className="text-[10px] text-gray-400 dark:text-gray-500 shrink-0" suppressHydrationWarning>
                             {new Date(sub.submittedAt).toLocaleDateString("en-US", {
                               month: "short",
                               day: "numeric",

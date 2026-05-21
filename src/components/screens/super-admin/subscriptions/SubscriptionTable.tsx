@@ -215,7 +215,7 @@ export function SubscriptionTable({
                           <span className="text-sm font-medium capitalize">
                             {sub.period}
                           </span>
-                          <span className="text-[10px] text-muted-foreground flex items-center gap-1">
+                          <span suppressHydrationWarning className="text-[10px] text-muted-foreground flex items-center gap-1">
                             <CalendarDays className="h-3 w-3" />
                             {new Date(sub.startDate).toLocaleDateString()}
                           </span>

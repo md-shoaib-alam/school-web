@@ -18,6 +18,14 @@ interface GraduationsTableProps {
   graduations: PromotionRecord[];
 }
 
+const formatDate = (dateStr: string) => {
+  try {
+    return new Date(dateStr).toLocaleDateString();
+  } catch (e) {
+    return dateStr;
+  }
+};
+
 export function GraduationsTable({ graduations }: GraduationsTableProps) {
   return (
     <Card>
@@ -87,8 +95,8 @@ export function GraduationsTable({ graduations }: GraduationsTableProps) {
                         <span className="ml-1">Graduated</span>
                       </Badge>
                     </TableCell>
-                    <TableCell className="hidden lg:table-cell text-sm text-muted-foreground">
-                      {new Date(grad.createdAt).toLocaleDateString()}
+                    <TableCell className="hidden lg:table-cell text-sm text-muted-foreground" suppressHydrationWarning>
+                      {formatDate(grad.createdAt)}
                     </TableCell>
                   </TableRow>
                 ))}

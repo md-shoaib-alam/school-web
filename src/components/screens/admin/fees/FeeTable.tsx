@@ -24,6 +24,10 @@ import {
 import { CheckCircle2, Clock, AlertTriangle, Pencil, Trash2, Eye } from "lucide-react";
 import type { FeeRecord } from "./types";
 
+function formatFeeDate(dateStr: string) {
+  return new Date(dateStr).toLocaleDateString();
+}
+
 const statusConfig: Record<string, { bg: string; icon: React.ReactNode; label: string }> = {
   paid: {
     bg: "bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800",
@@ -123,8 +127,8 @@ export function FeeTable({
                   </div>
                 </TableCell>
                 <TableCell>
-                  <span className="text-xs text-gray-600 dark:text-gray-400">
-                    {new Date(record.dueDate).toLocaleDateString()}
+                  <span className="text-xs text-gray-600 dark:text-gray-400" suppressHydrationWarning>
+                    {formatFeeDate(record.dueDate)}
                   </span>
                 </TableCell>
                 <TableCell className="text-right">

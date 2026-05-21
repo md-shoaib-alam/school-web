@@ -1,5 +1,6 @@
 import React from 'react';
 import { MarksheetTemplateProps } from './types';
+import { getDeterministicId } from './mockUtils';
 
 export const CBSEStandard: React.FC<MarksheetTemplateProps> = ({
   sheet,
@@ -78,7 +79,7 @@ export const CBSEStandard: React.FC<MarksheetTemplateProps> = ({
           </div>
           <div className="col-span-6 flex">
             <span className="text-zinc-500 font-bold uppercase text-[8.5px] w-32 shrink-0">Admission No. (SRN):</span>
-            <span className="font-bold text-zinc-900 font-mono">SRN-{1000 + Math.floor(Math.random() * 8999)}</span>
+            <span className="font-bold text-zinc-900 font-mono">SRN-{getDeterministicId(sheet.studentName + 'admission', 1000, 9999)}</span>
           </div>
           <div className="col-span-6 flex">
             <span className="text-zinc-500 font-bold uppercase text-[8.5px] w-32 shrink-0">Father's Name:</span>

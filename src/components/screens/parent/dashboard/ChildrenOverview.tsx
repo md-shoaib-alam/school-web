@@ -22,6 +22,15 @@ interface ChildrenOverviewProps {
   childrenList: ChildPerformance[];
 }
 
+const formatDob = (dob: string | null | undefined) => {
+  if (!dob) return "";
+  try {
+    return new Date(dob).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
+  } catch (e) {
+    return dob;
+  }
+};
+
 export function ChildrenOverview({ childrenList }: ChildrenOverviewProps) {
   return (
     <div className="space-y-4">
@@ -78,8 +87,8 @@ export function ChildrenOverview({ childrenList }: ChildrenOverviewProps) {
                   {student.gender === "male" ? "Male" : "Female"}
                 </span>
                 {student.dateOfBirth && (
-                  <span>
-                    DOB: {new Date(student.dateOfBirth).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
+                  <span suppressHydrationWarning>
+                    DOB: {formatDob(student.dateOfBirth)}
                   </span>
                 )}
               </div>

@@ -36,7 +36,7 @@ export const TealClean: React.FC<LedgerTemplateProps> = ({ data }) => {
         <div className="flex justify-center gap-10 mt-3 text-[9.5px] font-semibold text-teal-50">
           <div>CLASS: <span className="text-white border-b border-teal-400 pb-0.5">{data.className} - {data.classSection}</span></div>
           <div>CYCLE: <span className="text-white border-b border-teal-400 pb-0.5">{data.academicYear}</span></div>
-          <div>DATE: <span className="text-white border-b border-teal-400 pb-0.5">{new Date().toLocaleDateString()}</span></div>
+          <div>DATE: <span className="text-white border-b border-teal-400 pb-0.5" suppressHydrationWarning>{new Date().toLocaleDateString()}</span></div>
         </div>
       </div>
 

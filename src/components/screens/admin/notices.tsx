@@ -58,6 +58,18 @@ import { useModulePermissions } from "@/hooks/use-permissions";
 import { useQueryClient } from "@tanstack/react-query";
 import { useNotices } from "@/lib/graphql/hooks";
 
+const formatNoticeDate = (dateStr: string) => {
+  try {
+    return new Date(dateStr).toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    });
+  } catch (e) {
+    return dateStr;
+  }
+};
+
 const priorityConfig: Record<
   string,
   { bg: string; text: string; border: string }
@@ -352,15 +364,8 @@ export function AdminNotices() {
                         </div>
                         <div className="flex items-center gap-1">
                           <Calendar className="h-3 w-3" />
-                          <span>
-                            {new Date(notice.createdAt).toLocaleDateString(
-                              "en-US",
-                              {
-                                year: "numeric",
-                                month: "long",
-                                day: "numeric",
-                              },
-                            )}
+                          <span suppressHydrationWarning>
+                            {formatNoticeDate(notice.createdAt)}
                           </span>
                         </div>
                       </div>

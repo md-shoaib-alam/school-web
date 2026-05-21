@@ -14,6 +14,15 @@ interface StudentProfileCardProps {
   subjectCount: number;
 }
 
+const formatDob = (dob: string | null | undefined) => {
+  if (!dob) return "N/A";
+  try {
+    return new Date(dob).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" });
+  } catch (e) {
+    return dob;
+  }
+};
+
 export function StudentProfileCard({
   student,
   attendancePct,
@@ -47,8 +56,8 @@ export function StudentProfileCard({
             </div>
             <div className="space-y-1">
               <div className="flex items-center gap-1.5 text-xs text-muted-foreground"><Calendar className="h-3 w-3" /> Date of Birth</div>
-              <p className="text-sm font-semibold text-gray-900 dark:text-gray-100">
-                {student.dateOfBirth ? new Date(student.dateOfBirth).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" }) : "N/A"}
+              <p className="text-sm font-semibold text-gray-900 dark:text-gray-100" suppressHydrationWarning>
+                {formatDob(student.dateOfBirth)}
               </p>
             </div>
             <div className="space-y-1">

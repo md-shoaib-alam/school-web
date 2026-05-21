@@ -11,6 +11,18 @@ interface NoticeListProps {
   isSearching: boolean;
 }
 
+const formatNoticeDate = (dateStr: string) => {
+  try {
+    return new Date(dateStr).toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    });
+  } catch (e) {
+    return dateStr;
+  }
+};
+
 export function NoticeList({ notices, isSearching }: NoticeListProps) {
   if (notices.length === 0) {
     return (
@@ -67,12 +79,8 @@ export function NoticeList({ notices, isSearching }: NoticeListProps) {
                         {notice.authorName}
                       </span>
                     </span>
-                    <span>
-                      {new Date(notice.createdAt).toLocaleDateString("en-US", {
-                        year: "numeric",
-                        month: "long",
-                        day: "numeric",
-                      })}
+                    <span suppressHydrationWarning>
+                      {formatNoticeDate(notice.createdAt)}
                     </span>
                   </div>
                 </div>

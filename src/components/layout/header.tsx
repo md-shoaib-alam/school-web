@@ -1,5 +1,6 @@
 "use client";
 
+import { useMemo } from "react";
 import { useAppStore } from "@/store/use-app-store";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -20,6 +21,15 @@ export function Header({ items, resolvedScreen }: HeaderProps) {
     currentTenantName,
     sidebarOpen,
   } = useAppStore();
+
+  const todayString = useMemo(() => {
+    return new Date().toLocaleDateString("en-US", {
+      weekday: "long",
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    });
+  }, []);
 
   if (!currentUser) return null;
 
@@ -59,14 +69,9 @@ export function Header({ items, resolvedScreen }: HeaderProps) {
             {currentTenantName}
           </Badge>
         )}
-        <div className="hidden md:flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400 mr-2">
+        <div className="hidden md:flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400 mr-2" suppressHydrationWarning>
           <Calendar className="h-4 w-4" />
-          {new Date().toLocaleDateString("en-US", {
-            weekday: "long",
-            year: "numeric",
-            month: "long",
-            day: "numeric",
-          })}
+          {todayString}
         </div>
         <NotificationBell />
         <ThemeToggle />

@@ -110,6 +110,10 @@ function formatDate(dateStr: string): string {
   } catch { return dateStr; }
 }
 
+function getTodayDateString(): string {
+  return new Date().toISOString().split('T')[0];
+}
+
 function formatTime(time: string): string {
   if (!time) return '—';
   const [h, m] = time.split(':').map(Number);
@@ -130,6 +134,7 @@ const AdmitCardVisual = memo(function AdmitCardVisual({ card }: { card: AdmitCar
   const schoolName = card.school?.name || 'Global Academy';
   const schoolAddress = card.school?.address || 'School Address';
   const schoolPhone = card.school?.phone || '';
+  const todayDateString = useMemo(() => getTodayDateString(), []);
 
   return (
     <div 
@@ -198,7 +203,7 @@ const AdmitCardVisual = memo(function AdmitCardVisual({ card }: { card: AdmitCar
               </div>
               <div>
                 <p className="text-[9px] text-gray-400 uppercase font-medium">D.O.B</p>
-                <p className="font-medium text-gray-800">{formatDate(card.student.dateOfBirth || '')}</p>
+                <p className="font-medium text-gray-800" suppressHydrationWarning>{formatDate(card.student.dateOfBirth || '')}</p>
               </div>
               <div>
                 <p className="text-[9px] text-gray-400 uppercase font-medium">Section</p>
@@ -218,11 +223,11 @@ const AdmitCardVisual = memo(function AdmitCardVisual({ card }: { card: AdmitCar
                 <th className="text-center py-1 px-1.5 font-bold text-slate-700 w-[140px]">Time</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-100">
+            <tbody className="divide-y divide-slate-100" suppressHydrationWarning>
               {card.exams
                 .filter(exam => {
                   const isScheduled = exam.status?.trim().toLowerCase() === 'scheduled';
-                  const isUpcoming = exam.date >= new Date().toISOString().split('T')[0];
+                  const isUpcoming = exam.date >= todayDateString;
                   return (isScheduled || isUpcoming) && !exam.resultPublished;
                 })
                 .map((exam) => {
@@ -275,6 +280,7 @@ export function AdminAdmitCards() {
   const queryClient = useQueryClient();
   const singleCardRef = useRef<HTMLDivElement>(null);
   const allCardsRef = useRef<HTMLDivElement>(null);
+  const todayDateString = useMemo(() => getTodayDateString(), []);
 
   // Step 1: Select class
   const [selectedClassId, setSelectedClassId] = useState<string>('');
@@ -323,12 +329,12 @@ export function AdminAdmitCards() {
     // Only show exam types that have at least one active (scheduled or upcoming) exam
     const activeExams = classData.exams.filter((e: any) => {
       const isScheduled = e.status?.trim().toLowerCase() === 'scheduled';
-      const isUpcoming = e.date >= new Date().toISOString().split('T')[0];
+      const isUpcoming = e.date >= todayDateString;
       return (isScheduled || isUpcoming) && !e.resultPublished;
     });
     const types = new Set(activeExams.map((e: any) => e.examType));
     return Array.from(types) as string[];
-  }, [classData]);
+  }, [classData, todayDateString]);
 
   // Reset selection when class data loads
   useEffect(() => {
@@ -436,7 +442,7 @@ export function AdminAdmitCards() {
   const totalExams = classData ? (
     classData.exams.filter((e) => {
       const isScheduled = e.status?.trim().toLowerCase() === 'scheduled';
-      const isUpcoming = e.date >= new Date().toISOString().split('T')[0];
+      const isUpcoming = e.date >= todayDateString;
       return e.examType === selectedExamType && (isScheduled || isUpcoming) && !e.resultPublished;
     }).length
   ) : 0;
@@ -581,11 +587,11 @@ export function AdminAdmitCards() {
               {/* Exam Type Filter */}
               <div className="space-y-1.5">
                 <label className="text-sm font-medium mb-2 block">Exam Type</label>
-                <div className="flex flex-wrap gap-2">
+                <div className="flex flex-wrap gap-2" suppressHydrationWarning>
                   {availableExamTypes.map((type: string) => {
                     const count = classData.exams.filter((e: any) => {
                       const isScheduled = e.status?.trim().toLowerCase() === 'scheduled';
-                      const isUpcoming = e.date >= new Date().toISOString().split('T')[0];
+                      const isUpcoming = e.date >= todayDateString;
                       return e.examType === type && (isScheduled || isUpcoming) && !e.resultPublished;
                     }).length;
                     if (count === 0) return null;
@@ -613,7 +619,7 @@ export function AdminAdmitCards() {
                   <p className="text-[10px] uppercase text-muted-foreground tracking-wider">Students</p>
                   <p className="text-xl font-bold">{totalStudents}</p>
                 </div>
-                <div className="bg-muted/50 rounded-lg p-3">
+                <div className="bg-muted/50 rounded-lg p-3" suppressHydrationWarning>
                   <p className="text-[10px] uppercase text-muted-foreground tracking-wider">Exams</p>
                   <p className="text-xl font-bold">{totalExams}</p>
                 </div>

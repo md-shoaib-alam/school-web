@@ -224,8 +224,8 @@ export function SuperAdminSchoolSubscriptions() {
                       {tenant.plan}
                     </Badge>
                   </TableCell>
-                  <TableCell>{getStatusBadge(tenant.status, tenant.endDate)}</TableCell>
-                  <TableCell>
+                  <TableCell suppressHydrationWarning>{getStatusBadge(tenant.status, tenant.endDate)}</TableCell>
+                  <TableCell suppressHydrationWarning>
                     <div className="flex items-center gap-2">
                       <Calendar className="h-3.5 w-3.5 text-muted-foreground" />
                       {tenant.endDate ? format(new Date(tenant.endDate), "PP") : "No expiry"}

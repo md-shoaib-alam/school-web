@@ -66,6 +66,8 @@ export function StudentAttendance() {
     import("recharts").then(setRecharts);
   }, []);
 
+  const todayString = useMemo(() => new Date().toDateString(), []);
+
   const student = useMemo(
     () =>
       Array.isArray(students)
@@ -439,7 +441,7 @@ export function StudentAttendance() {
 
             {/* Day squares */}
             {last30Days.map(({ date, status }, idx) => {
-              const isToday = date.toDateString() === new Date().toDateString();
+              const isToday = date.toDateString() === todayString;
               const isWeekend = date.getDay() === 0 || date.getDay() === 6;
               const dayNum = date.getDate();
 
@@ -454,6 +456,7 @@ export function StudentAttendance() {
                     ${isWeekend && status === "none" ? "opacity-40" : ""}
                   `}
                   title={`${date.toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" })}: ${status === "none" ? "No data" : status.charAt(0).toUpperCase() + status.slice(1)}`}
+                  suppressHydrationWarning
                 >
                   <span
                     className={

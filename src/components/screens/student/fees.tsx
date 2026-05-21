@@ -52,6 +52,11 @@ const typeIcons: Record<string, string> = {
   transport: "🚌",
 };
 
+const formatFeeDate = (dateStr: string) => {
+  if (!dateStr) return "";
+  return new Date(dateStr).toLocaleDateString();
+};
+
 export function StudentFees() {
   const { currentUser } = useAppStore();
   const [loading, setLoading] = useState(true);
@@ -245,8 +250,8 @@ export function StudentFees() {
                         <TableCell className="hidden sm:table-cell text-sm font-medium">
                           ₹{fee.amount.toLocaleString()}
                         </TableCell>
-                        <TableCell className="hidden md:table-cell text-sm text-muted-foreground">
-                          {new Date(fee.dueDate).toLocaleDateString()}
+                        <TableCell className="hidden md:table-cell text-sm text-muted-foreground" suppressHydrationWarning>
+                          {formatFeeDate(fee.dueDate)}
                         </TableCell>
                         <TableCell className="hidden md:table-cell text-sm">
                           <span

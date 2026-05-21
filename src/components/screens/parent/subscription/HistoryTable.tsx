@@ -17,6 +17,15 @@ interface HistoryTableProps {
   subscriptions: SubscriptionRecord[];
 }
 
+const formatSubscriptionDate = (dateStr?: string | null) => {
+  if (!dateStr) return "";
+  return new Date(dateStr).toLocaleDateString("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  });
+};
+
 export function HistoryTable({ subscriptions }: HistoryTableProps) {
   if (subscriptions.length === 0) {
     return (
@@ -53,12 +62,8 @@ export function HistoryTable({ subscriptions }: HistoryTableProps) {
             </div>
             
             <div className="flex justify-between items-center text-sm">
-              <span className="text-gray-500 dark:text-gray-400">
-                {new Date(sub.createdAt).toLocaleDateString("en-US", {
-                  month: "short",
-                  day: "numeric",
-                  year: "numeric",
-                })}
+              <span className="text-gray-500 dark:text-gray-400" suppressHydrationWarning>
+                {formatSubscriptionDate(sub.createdAt)}
               </span>
               {sub.status === "active" ? (
                 <Badge className="bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800 text-[10px] shadow-none">
@@ -124,12 +129,8 @@ export function HistoryTable({ subscriptions }: HistoryTableProps) {
                     <span>₹{sub.amount.toLocaleString()}</span>
                   )}
                 </TableCell>
-                <TableCell className="text-gray-500 dark:text-gray-400">
-                  {new Date(sub.createdAt).toLocaleDateString("en-US", {
-                    month: "short",
-                    day: "numeric",
-                    year: "numeric",
-                  })}
+                <TableCell className="text-gray-500 dark:text-gray-400" suppressHydrationWarning>
+                  {formatSubscriptionDate(sub.createdAt)}
                 </TableCell>
                 <TableCell>
                   {sub.status === "active" ? (
