@@ -260,10 +260,10 @@ export function LinkChildDialog({
                         onClick={() =>
                           onUnlinkChild(selectedParent.id, child.id)
                         }
-                        className="h-4 w-4 rounded-full hover:bg-emerald-200 dark:hover:bg-emerald-800 flex items-center justify-center transition-colors"
+                        className="size-4 rounded-full hover:bg-emerald-200 dark:hover:bg-emerald-800 flex items-center justify-center transition-colors"
                         disabled={linking}
                       >
-                        <X className="h-3 w-3" />
+                        <X className="size-3" />
                       </button>
                     </Badge>
                   ))}
@@ -298,7 +298,7 @@ export function LinkChildDialog({
               </Label>
               {loading ? (
                 <div className="text-center py-10">
-                  <Loader2 className="h-8 w-8 animate-spin mx-auto text-blue-500 mb-2" />
+                  <Loader2 className="size-8 animate-spin mx-auto text-blue-500 mb-2" />
                   <p className="text-sm text-gray-500">Searching for students...</p>
                 </div>
               ) : filteredStudents.length === 0 ? (
@@ -318,8 +318,8 @@ export function LinkChildDialog({
                       className="flex items-center justify-between p-3 rounded-xl border border-gray-100 dark:border-gray-800 hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:border-blue-200 dark:hover:border-blue-800/50 transition-all group"
                     >
                       <div className="flex items-center gap-3">
-                        <div className="h-8 w-8 rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform">
-                          <GraduationCap className="h-4 w-4" />
+                        <div className="size-8 rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform">
+                          <GraduationCap className="size-4" />
                         </div>
                         <div>
                           <p className="text-sm font-bold text-gray-800 dark:text-gray-200">
@@ -337,9 +337,9 @@ export function LinkChildDialog({
                         disabled={linking}
                       >
                         {linking ? (
-                          <Loader2 className="h-3 w-3 animate-spin" />
+                          <Loader2 className="size-3 animate-spin" />
                         ) : (
-                          <Link2 className="h-3.5 w-3.5 mr-1" />
+                          <Link2 className="size-3.5 mr-1" />
                         )}
                         Link
                       </Button>

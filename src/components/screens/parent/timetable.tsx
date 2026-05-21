@@ -148,7 +148,7 @@ export function ParentTimetable() {
     return (
       <Card className="rounded-xl shadow-sm">
         <CardContent className="py-16 text-center">
-          <BookOpen className="h-12 w-12 mx-auto text-gray-200 dark:text-gray-700 mb-3" />
+          <BookOpen className="size-12 mx-auto text-gray-200 dark:text-gray-700 mb-3" />
           <p className="text-sm font-medium text-gray-500 dark:text-gray-400">
             No children found
           </p>
@@ -194,7 +194,7 @@ export function ParentTimetable() {
         <Card className="rounded-xl shadow-sm">
           <CardContent className="p-4 flex items-center gap-4">
             <div className="p-2.5 rounded-lg bg-gradient-to-br from-amber-500 to-orange-600 text-white">
-              <BookOpen className="h-5 w-5" />
+              <BookOpen className="size-5" />
             </div>
             <div>
               <p className="text-sm font-medium text-gray-900 dark:text-gray-100">
@@ -211,7 +211,7 @@ export function ParentTimetable() {
         <Card className="rounded-xl shadow-sm">
           <CardContent className="p-4 flex items-center gap-4">
             <div className="p-2.5 rounded-lg bg-gradient-to-br from-emerald-500 to-teal-600 text-white">
-              <CalendarDays className="h-5 w-5" />
+              <CalendarDays className="size-5" />
             </div>
             <div>
               <p className="text-sm font-medium text-gray-900 dark:text-gray-100">
@@ -227,7 +227,7 @@ export function ParentTimetable() {
         <Card className="rounded-xl shadow-sm">
           <CardContent className="p-4 flex items-center gap-4">
             <div className="p-2.5 rounded-lg bg-gradient-to-br from-cyan-500 to-blue-600 text-white">
-              <Clock className="h-5 w-5" />
+              <Clock className="size-5" />
             </div>
             <div>
               <p className="text-sm font-medium text-gray-900 dark:text-gray-100">
@@ -266,7 +266,7 @@ export function ParentTimetable() {
       {timeSlots.length === 0 ? (
         <Card className="rounded-xl shadow-sm">
           <CardContent className="py-16 text-center">
-            <BookOpen className="h-12 w-12 mx-auto text-gray-300 dark:text-gray-700" />
+            <BookOpen className="size-12 mx-auto text-gray-300 dark:text-gray-700" />
             <p className="text-sm font-medium text-gray-500 dark:text-gray-400">
               No timetable configured
             </p>
@@ -279,7 +279,7 @@ export function ParentTimetable() {
         <Card className="rounded-xl shadow-sm">
           <CardHeader className="pb-3">
             <CardTitle className="text-base flex items-center gap-2">
-              <CalendarDays className="h-4 w-4 text-amber-500" />
+              <CalendarDays className="size-4 text-amber-500" />
               {DAY_FULL_LABELS[selectedDay]} Schedule
             </CardTitle>
           </CardHeader>
@@ -298,7 +298,7 @@ export function ParentTimetable() {
                           {formatTime(ts.start)} – {formatTime(ts.end)}
                         </div>
                         <div className="flex items-center gap-2 text-gray-400 dark:text-gray-500">
-                          <Clock className="h-3.5 w-3.5" />
+                          <Clock className="size-3.5" />
                           <span className="text-xs font-medium">
                             Free Period
                           </span>
@@ -330,11 +330,11 @@ export function ParentTimetable() {
                         </div>
                         <div className="flex items-center gap-3 mt-1 text-[11px] text-gray-400 dark:text-gray-500">
                           <span className="flex items-center gap-1">
-                            <User className="h-3 w-3" />
+                            <User className="size-3" />
                             {slot.teacherName}
                           </span>
                           <span className="flex items-center gap-1">
-                            <MapPin className="h-3 w-3" />
+                            <MapPin className="size-3" />
                             {slot.className}
                           </span>
                         </div>
@@ -353,7 +353,7 @@ export function ParentTimetable() {
         <Card className="rounded-xl shadow-sm">
           <CardHeader className="pb-3">
             <CardTitle className="text-base flex items-center gap-2">
-              <BookOpen className="h-4 w-4 text-amber-500" />
+              <BookOpen className="size-4 text-amber-500" />
               Subjects
             </CardTitle>
           </CardHeader>
@@ -364,7 +364,7 @@ export function ParentTimetable() {
                   key={subject}
                   className={`inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border text-xs font-medium ${colorClass}`}
                 >
-                  <div className="w-2 h-2 rounded-full bg-current opacity-60" />
+                  <div className="size-2 rounded-full bg-current opacity-60" />
                   {subject}
                 </div>
               ))}

@@ -21,8 +21,8 @@ export function StatsCards({ stats }: StatsCardsProps) {
       <Card className="border-rose-100 dark:border-rose-900/30 bg-rose-50/30 dark:bg-rose-950/10">
         <CardContent className="pt-6">
           <div className="flex items-center gap-4">
-            <div className="h-10 w-10 rounded-full bg-rose-100 dark:bg-rose-900/50 flex items-center justify-center">
-              <TrendingDown className="h-5 w-5 text-rose-600 dark:text-rose-400" />
+            <div className="size-10 rounded-full bg-rose-100 dark:bg-rose-900/50 flex items-center justify-center">
+              <TrendingDown className="size-5 text-rose-600 dark:text-rose-400" />
             </div>
             <div>
               <p className="text-sm font-medium text-rose-800 dark:text-rose-300">Total Expenses</p>
@@ -37,8 +37,8 @@ export function StatsCards({ stats }: StatsCardsProps) {
       <Card className="border-emerald-100 dark:border-emerald-900/30 bg-emerald-50/30 dark:bg-emerald-950/10">
         <CardContent className="pt-6">
           <div className="flex items-center gap-4">
-            <div className="h-10 w-10 rounded-full bg-emerald-100 dark:bg-emerald-900/50 flex items-center justify-center">
-              <Calendar className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
+            <div className="size-10 rounded-full bg-emerald-100 dark:bg-emerald-900/50 flex items-center justify-center">
+              <Calendar className="size-5 text-emerald-600 dark:text-emerald-400" />
             </div>
             <div>
               <p className="text-sm font-medium text-emerald-800 dark:text-emerald-300">This Month</p>

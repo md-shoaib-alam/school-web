@@ -15,7 +15,7 @@ export function QuickStats({ childrenCount, noticeCount, pendingFees }: QuickSta
       <Card className="rounded-xl shadow-sm shadow-none">
         <CardContent className="p-4 flex items-center gap-4">
           <div className="p-3 rounded-xl bg-amber-50 dark:bg-amber-900/30">
-            <Users className="h-5 w-5 text-amber-600" />
+            <Users className="size-5 text-amber-600" />
           </div>
           <div className="text-left">
             <p className="text-sm text-muted-foreground">Total Children</p>
@@ -26,7 +26,7 @@ export function QuickStats({ childrenCount, noticeCount, pendingFees }: QuickSta
       <Card className="rounded-xl shadow-sm shadow-none">
         <CardContent className="p-4 flex items-center gap-4">
           <div className="p-3 rounded-xl bg-blue-50 dark:bg-blue-900/30">
-            <Bell className="h-5 w-5 text-blue-600" />
+            <Bell className="size-5 text-blue-600" />
           </div>
           <div className="text-left">
             <p className="text-sm text-muted-foreground">Active Notices</p>
@@ -37,7 +37,7 @@ export function QuickStats({ childrenCount, noticeCount, pendingFees }: QuickSta
       <Card className="rounded-xl shadow-sm shadow-none">
         <CardContent className="p-4 flex items-center gap-4">
           <div className="p-3 rounded-xl bg-red-50 dark:bg-red-900/30">
-            <IndianRupee className="h-5 w-5 text-red-600" />
+            <IndianRupee className="size-5 text-red-600" />
           </div>
           <div className="text-left">
             <p className="text-sm text-muted-foreground">Pending Fees</p>

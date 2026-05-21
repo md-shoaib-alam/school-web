@@ -30,7 +30,7 @@ export function HistoryTable({ subscriptions }: HistoryTableProps) {
   if (subscriptions.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-12 text-gray-400 dark:text-gray-500">
-        <Receipt className="h-10 w-10 mb-3 opacity-40" />
+        <Receipt className="size-10 mb-3 opacity-40" />
         <p className="text-sm font-medium">No payment history</p>
         <p className="text-xs mt-1">
           Your past subscriptions will appear here
@@ -67,11 +67,11 @@ export function HistoryTable({ subscriptions }: HistoryTableProps) {
               </span>
               {sub.status === "active" ? (
                 <Badge className="bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800 text-[10px] shadow-none">
-                  <CheckCircle2 className="h-3 w-3 mr-1" /> Active
+                  <CheckCircle2 className="size-3 mr-1" /> Active
                 </Badge>
               ) : (
                 <Badge className="bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-400 border-red-200 dark:border-red-800 text-[10px] shadow-none">
-                  <XCircle className="h-3 w-3 mr-1" /> Cancelled
+                  <XCircle className="size-3 mr-1" /> Cancelled
                 </Badge>
               )}
             </div>
@@ -135,11 +135,11 @@ export function HistoryTable({ subscriptions }: HistoryTableProps) {
                 <TableCell>
                   {sub.status === "active" ? (
                     <Badge className="bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800 text-xs shadow-none">
-                      <CheckCircle2 className="h-3 w-3 mr-1" /> Active
+                      <CheckCircle2 className="size-3 mr-1" /> Active
                     </Badge>
                   ) : (
                     <Badge className="bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-400 border-red-200 dark:border-red-800 text-xs shadow-none">
-                      <XCircle className="h-3 w-3 mr-1" /> Cancelled
+                      <XCircle className="size-3 mr-1" /> Cancelled
                     </Badge>
                   )}
                 </TableCell>

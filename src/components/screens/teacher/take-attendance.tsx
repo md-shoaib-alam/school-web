@@ -67,9 +67,9 @@ const getStatusBg = (status: AttendanceStatus) => {
 const getStatusIcon = (status: AttendanceStatus) => {
   switch (status) {
     case "present":
-      return <UserCheck className="h-3.5 w-3.5" />;
+      return <UserCheck className="size-3.5" />;
     case "absent":
-      return <UserX className="h-3.5 w-3.5" />;
+      return <UserX className="size-3.5" />;
   }
 };
 
@@ -345,21 +345,21 @@ export function TeacherAttendance() {
             {
               label: "Total",
               value: totalCount,
-              icon: <Users className="h-5 w-5 text-blue-500 dark:text-blue-400" />,
+              icon: <Users className="size-5 text-blue-500 dark:text-blue-400" />,
               bg: "bg-blue-50 dark:bg-blue-900/30",
               text: "text-gray-900 dark:text-gray-100",
             },
             {
               label: "Present",
               value: presentCount,
-              icon: <UserCheck className="h-5 w-5 text-emerald-500 dark:text-emerald-400" />,
+              icon: <UserCheck className="size-5 text-emerald-500 dark:text-emerald-400" />,
               bg: "bg-emerald-50 dark:bg-emerald-900/30",
               text: "text-emerald-600 dark:text-emerald-400",
             },
             {
               label: "Absent",
               value: absentCount,
-              icon: <UserX className="h-5 w-5 text-red-500 dark:text-red-400" />,
+              icon: <UserX className="size-5 text-red-500 dark:text-red-400" />,
               bg: "bg-red-50 dark:bg-red-900/30",
               text: "text-red-600 dark:text-red-400",
             },
@@ -367,7 +367,7 @@ export function TeacherAttendance() {
             <Card key={label} className="rounded-xl shadow-sm border-0">
               <CardContent className="p-4 flex items-center gap-3">
                 <div
-                  className={`w-10 h-10 rounded-xl ${bg} flex items-center justify-center`}
+                  className={`size-10 rounded-xl ${bg} flex items-center justify-center`}
                 >
                   {icon}
                 </div>
@@ -389,8 +389,8 @@ export function TeacherAttendance() {
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div className="flex items-center justify-between sm:justify-start sm:gap-4 flex-1">
               <div className="flex items-center gap-2.5">
-                <div className="h-8 w-8 rounded-lg bg-blue-500/10 flex items-center justify-center border border-blue-500/20">
-                  <CalendarDays className="h-4 w-4 text-blue-500" />
+                <div className="size-8 rounded-lg bg-blue-500/10 flex items-center justify-center border border-blue-500/20">
+                  <CalendarDays className="size-4 text-blue-500" />
                 </div>
                 <div>
                   <h3 className="text-sm sm:text-base font-semibold text-gray-800 dark:text-gray-100 leading-none">
@@ -458,7 +458,7 @@ export function TeacherAttendance() {
                           <span className="text-xs text-gray-400 dark:text-gray-500 font-mono w-6 text-center">
                             {index + 1}
                           </span>
-                          <Avatar className="h-8 w-8 flex-shrink-0">
+                          <Avatar className="size-8 flex-shrink-0">
                             <AvatarFallback className="text-[10px] font-semibold bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400">
                               {getInitials(student.name)}
                             </AvatarFallback>
@@ -501,7 +501,7 @@ export function TeacherAttendance() {
             </>
           ) : (
             <div className="text-center py-16">
-              <Users className="h-10 w-10 text-gray-300 dark:text-gray-700 mx-auto mb-3" />
+              <Users className="size-10 text-gray-300 dark:text-gray-700 mx-auto mb-3" />
               <p className="text-gray-400 dark:text-gray-500 text-sm">
                 {selectedClassId ? "No students in this class" : "Select a class to begin"}
               </p>
@@ -524,7 +524,7 @@ export function TeacherAttendance() {
               >
                 {saved && !hasUnsavedChanges ? (
                   <span className="flex items-center gap-1.5">
-                    <CheckCircle className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
+                    <CheckCircle className="size-3 sm:size-3.5" />
                     <span>Synchronized</span>
                   </span>
                 ) : (
@@ -533,7 +533,7 @@ export function TeacherAttendance() {
               </div>
               {saved && !hasUnsavedChanges && (
                 <div className="hidden md:flex items-center gap-1.5 text-emerald-500 text-[10px] sm:text-xs font-medium animate-in fade-in slide-in-from-left-1">
-                  <div className="h-1 w-1 sm:h-1.5 sm:w-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                  <div className="size-1 sm:size-1.5 rounded-full bg-emerald-500 animate-pulse" />
                   <span>Cloud Live</span>
                 </div>
               )}
@@ -549,10 +549,10 @@ export function TeacherAttendance() {
               }`}
             >
               {saveMutation.isPending ? (
-                <div className="h-3 w-3 sm:h-4 sm:w-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                <div className="size-3 sm:size-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
               ) : (
                 <Save
-                  className={`h-3 w-3 sm:h-4 sm:w-4 ${
+                  className={`size-3 sm:size-4 ${
                     !(saved && !hasUnsavedChanges) && "animate-bounce"
                   }`}
                 />

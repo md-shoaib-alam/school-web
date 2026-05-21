@@ -221,8 +221,8 @@ export function StudentAttendance() {
         {/* Attendance Circle */}
         <Card className="rounded-xl shadow-sm">
           <CardContent className="p-6 flex flex-col items-center justify-center">
-            <div className="relative w-44 h-44">
-              <svg className="w-full h-full -rotate-90" viewBox="0 0 160 160">
+            <div className="relative size-44">
+              <svg className="size-full -rotate-90" viewBox="0 0 160 160">
                 <circle
                   cx="80"
                   cy="80"
@@ -272,7 +272,7 @@ export function StudentAttendance() {
         <Card className="lg:col-span-2 rounded-xl shadow-sm">
           <CardHeader className="pb-3">
             <CardTitle className="text-base flex items-center gap-2">
-              <UserCheck className="h-4 w-4 text-violet-500" />
+              <UserCheck className="size-4 text-violet-500" />
               Attendance Summary
             </CardTitle>
           </CardHeader>
@@ -280,7 +280,7 @@ export function StudentAttendance() {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="flex items-center gap-4 p-4 rounded-xl bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800">
                 <div className="p-2.5 rounded-lg bg-emerald-100 dark:bg-emerald-900/40">
-                  <CheckCircle2 className="h-5 w-5 text-emerald-600" />
+                  <CheckCircle2 className="size-5 text-emerald-600" />
                 </div>
                 <div>
                   <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">
@@ -300,7 +300,7 @@ export function StudentAttendance() {
 
               <div className="flex items-center gap-4 p-4 rounded-xl bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800">
                 <div className="p-2.5 rounded-lg bg-red-100 dark:bg-red-900/40">
-                  <XCircle className="h-5 w-5 text-red-600" />
+                  <XCircle className="size-5 text-red-600" />
                 </div>
                 <div>
                   <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">
@@ -322,19 +322,19 @@ export function StudentAttendance() {
             {/* Legend */}
             <div className="flex items-center gap-4 mt-5 pt-4 border-t border-gray-100">
               <div className="flex items-center gap-1.5">
-                <div className="w-3 h-3 rounded-sm bg-emerald-400" />
+                <div className="size-3 rounded-sm bg-emerald-400" />
                 <span className="text-xs text-gray-600 dark:text-gray-400">
                   Present
                 </span>
               </div>
               <div className="flex items-center gap-1.5">
-                <div className="w-3 h-3 rounded-sm bg-red-400" />
+                <div className="size-3 rounded-sm bg-red-400" />
                 <span className="text-xs text-gray-600 dark:text-gray-400">
                   Absent
                 </span>
               </div>
               <div className="flex items-center gap-1.5">
-                <div className="w-3 h-3 rounded-sm bg-gray-200 dark:bg-gray-700" />
+                <div className="size-3 rounded-sm bg-gray-200 dark:bg-gray-700" />
                 <span className="text-xs text-gray-600 dark:text-gray-400">
                   No Data
                 </span>
@@ -348,7 +348,7 @@ export function StudentAttendance() {
       <Card className="rounded-xl shadow-sm">
         <CardHeader className="pb-2">
           <CardTitle className="text-base flex items-center gap-2">
-            <Calendar className="h-4 w-4 text-violet-500" />
+            <Calendar className="size-4 text-violet-500" />
             Monthly Attendance Rate
           </CardTitle>
         </CardHeader>
@@ -399,7 +399,7 @@ export function StudentAttendance() {
           ) : (
             <div className="h-[260px] flex items-center justify-center text-gray-400 dark:text-gray-500">
               <div className="text-center">
-                <Calendar className="h-10 w-10 mx-auto mb-2 opacity-40" />
+                <Calendar className="size-10 mx-auto mb-2 opacity-40" />
                 <p className="text-sm">No monthly data available yet</p>
               </div>
             </div>
@@ -412,7 +412,7 @@ export function StudentAttendance() {
         <CardHeader className="pb-3">
           <div className="flex items-center justify-between">
             <CardTitle className="text-base flex items-center gap-2">
-              <Calendar className="h-4 w-4 text-violet-500" />
+              <Calendar className="size-4 text-violet-500" />
               Last 30 Days
             </CardTitle>
             <Badge variant="secondary" className="text-xs">

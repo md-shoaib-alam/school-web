@@ -101,7 +101,7 @@ export function CheckReceiptTab({ canEdit, canDelete }: CheckReceiptTabProps) {
       {/* Filters */}
       <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center">
         <div className="relative flex-1 max-w-sm">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
           <Input 
             placeholder="Search receipt # or student..." 
             className="pl-9" 
@@ -150,7 +150,7 @@ export function CheckReceiptTab({ canEdit, canDelete }: CheckReceiptTabProps) {
                     {receipts.length === 0 ? (
                       <TableRow>
                         <TableCell colSpan={7} className="text-center py-12 text-muted-foreground">
-                          <Receipt className="h-10 w-10 mx-auto mb-2 opacity-30" /><p>No receipts found</p>
+                          <Receipt className="size-10 mx-auto mb-2 opacity-30" /><p>No receipts found</p>
                         </TableCell>
                       </TableRow>
                     ) : receipts.map(r => {
@@ -162,7 +162,7 @@ export function CheckReceiptTab({ canEdit, canDelete }: CheckReceiptTabProps) {
                           <TableCell className="hidden sm:table-cell font-semibold py-4">₹{r.paidAmount.toLocaleString()}</TableCell>
                           <TableCell className="hidden md:table-cell py-4">
                             <div className="flex items-center gap-1.5 text-muted-foreground">
-                              {paymentMethodIcons[r.paymentMethod] || <Banknote className="h-4 w-4" />}
+                              {paymentMethodIcons[r.paymentMethod] || <Banknote className="size-4" />}
                               <span className="text-xs capitalize">{r.paymentMethod}</span>
                             </div>
                           </TableCell>
@@ -170,11 +170,11 @@ export function CheckReceiptTab({ canEdit, canDelete }: CheckReceiptTabProps) {
                           <TableCell className="py-4"><Badge variant="outline" className={`${statusCfg.bg} border-0 capitalize text-[10px] px-2 h-5`}>{r.status}</Badge></TableCell>
                           <TableCell className="text-center py-4">
                             <div className="flex items-center justify-center gap-1">
-                              <Button variant="ghost" size="icon" className="h-7 w-7 text-emerald-500 hover:text-emerald-600 hover:bg-emerald-50" onClick={() => setViewReceipt(r)}><Eye className="h-3.5 w-3.5" /></Button>
+                              <Button variant="ghost" size="icon" className="size-7 text-emerald-500 hover:text-emerald-600 hover:bg-emerald-50" onClick={() => setViewReceipt(r)}><Eye className="size-3.5" /></Button>
                               {canDelete && (
                                 <AlertDialog>
                                   <AlertDialogTrigger asChild>
-                                    <Button variant="ghost" size="icon" className="h-7 w-7 text-red-400 hover:text-red-600 hover:bg-red-50"><Trash2 className="h-3.5 w-3.5" /></Button>
+                                    <Button variant="ghost" size="icon" className="size-7 text-red-400 hover:text-red-600 hover:bg-red-50"><Trash2 className="size-3.5" /></Button>
                                   </AlertDialogTrigger>
                                   <AlertDialogContent>
                                     <AlertDialogHeader><AlertDialogTitle>Delete Receipt</AlertDialogTitle><AlertDialogDescription>Delete receipt {r.receiptNumber}? This action cannot be undone.</AlertDialogDescription></AlertDialogHeader>
@@ -216,7 +216,7 @@ export function CheckReceiptTab({ canEdit, canDelete }: CheckReceiptTabProps) {
                           key={i}
                           variant={page === i + 1 ? "default" : "outline"}
                           size="sm"
-                          className={`h-8 w-8 text-xs p-0 ${page === i + 1 ? 'bg-emerald-600 hover:bg-emerald-700' : ''}`}
+                          className={`size-8 text-xs p-0 ${page === i + 1 ? 'bg-emerald-600 hover:bg-emerald-700' : ''}`}
                           onClick={() => setPage(i + 1)}
                         >
                           {i + 1}
@@ -244,7 +244,7 @@ export function CheckReceiptTab({ canEdit, canDelete }: CheckReceiptTabProps) {
       <Dialog open={!!viewReceipt} onOpenChange={() => setViewReceipt(null)}>
         <DialogContent className="sm:max-w-lg">
           <DialogHeader>
-            <DialogTitle className="flex items-center gap-2"><Receipt className="h-5 w-5 text-emerald-600" />Receipt Details</DialogTitle>
+            <DialogTitle className="flex items-center gap-2"><Receipt className="size-5 text-emerald-600" />Receipt Details</DialogTitle>
             <DialogDescription>Receipt #{viewReceipt?.receiptNumber}</DialogDescription>
           </DialogHeader>
           {viewReceipt && (
@@ -291,7 +291,7 @@ export function CheckReceiptTab({ canEdit, canDelete }: CheckReceiptTabProps) {
             </div>
           )}
           <DialogFooter className="gap-2 sm:gap-0">
-            <Button variant="outline" className="flex-1 sm:flex-none" onClick={handlePrint}><Printer className="h-4 w-4 mr-2" />Print</Button>
+            <Button variant="outline" className="flex-1 sm:flex-none" onClick={handlePrint}><Printer className="size-4 mr-2" />Print</Button>
             <Button variant="default" className="flex-1 sm:flex-none bg-emerald-600 hover:bg-emerald-700" onClick={() => setViewReceipt(null)}>Close</Button>
           </DialogFooter>
         </DialogContent>

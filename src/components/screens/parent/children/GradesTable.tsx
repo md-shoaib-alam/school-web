@@ -22,7 +22,7 @@ export function GradesTable({ grades }: GradesTableProps) {
     <Card className="rounded-2xl border border-gray-200/50 dark:border-zinc-800/50 shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.2)] bg-white dark:bg-zinc-950">
       <CardHeader className="p-4 pb-2">
         <div className="flex items-center gap-2 text-left">
-          <Award className="h-5 w-5 text-amber-600" />
+          <Award className="size-5 text-amber-600" />
           <CardTitle className="text-sm font-semibold">
             Recent Grades
           </CardTitle>

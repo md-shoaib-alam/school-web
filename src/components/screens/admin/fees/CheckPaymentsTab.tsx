@@ -82,10 +82,10 @@ export function CheckPaymentsTab() {
   }, [filtered]);
 
   const summaryCards = [
-    { label: 'Total Payments', amount: totalPaid, icon: <CircleDollarSign className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />, color: 'bg-emerald-100 dark:bg-emerald-900/30' },
-    { label: 'Total Original', amount: totalOriginal, icon: <DollarSign className="h-5 w-5 text-amber-600 dark:text-amber-400" />, color: 'bg-amber-100 dark:bg-amber-900/30' },
-    { label: 'Concessions Given', amount: totalConcessions, icon: <Percent className="h-5 w-5 text-violet-600 dark:text-violet-400" />, color: 'bg-violet-100 dark:bg-violet-900/30' },
-    { label: 'Avg. Payment', amount: avgPayment, icon: <TrendingUp className="h-5 w-5 text-blue-600 dark:text-blue-400" />, color: 'bg-blue-100 dark:bg-blue-900/30' },
+    { label: 'Total Payments', amount: totalPaid, icon: <CircleDollarSign className="size-5 text-emerald-600 dark:text-emerald-400" />, color: 'bg-emerald-100 dark:bg-emerald-900/30' },
+    { label: 'Total Original', amount: totalOriginal, icon: <DollarSign className="size-5 text-amber-600 dark:text-amber-400" />, color: 'bg-amber-100 dark:bg-amber-900/30' },
+    { label: 'Concessions Given', amount: totalConcessions, icon: <Percent className="size-5 text-violet-600 dark:text-violet-400" />, color: 'bg-violet-100 dark:bg-violet-900/30' },
+    { label: 'Avg. Payment', amount: avgPayment, icon: <TrendingUp className="size-5 text-blue-600 dark:text-blue-400" />, color: 'bg-blue-100 dark:bg-blue-900/30' },
   ];
 
   return (
@@ -97,7 +97,7 @@ export function CheckPaymentsTab() {
             <CardContent className="p-4">
               <div className="flex items-center justify-between mb-2">
                 <p className="text-xs text-muted-foreground font-medium">{card.label}</p>
-                <div className={`h-9 w-9 rounded-lg flex items-center justify-center ${card.color}`}>{card.icon}</div>
+                <div className={`size-9 rounded-lg flex items-center justify-center ${card.color}`}>{card.icon}</div>
               </div>
               <p className="text-2xl font-bold">₹{Math.round(card.amount).toLocaleString()}</p>
               {card.label === 'Total Payments' && (
@@ -120,7 +120,7 @@ export function CheckPaymentsTab() {
                 const cfg = paymentMethodConfig[method] || paymentMethodConfig.cash;
                 return (
                   <div key={method} className="flex items-center gap-3 p-3 rounded-xl border bg-muted/30 hover:bg-muted/50 transition-colors">
-                    <div className={`h-10 w-10 rounded-lg flex items-center justify-center ${cfg.color}`}>{cfg.icon}</div>
+                    <div className={`size-10 rounded-lg flex items-center justify-center ${cfg.color}`}>{cfg.icon}</div>
                     <div className="min-w-0">
                       <p className="text-sm font-medium capitalize">{method}</p>
                       <p className="text-xs text-muted-foreground">{data.count} × ₹{data.total.toLocaleString()}</p>
@@ -136,7 +136,7 @@ export function CheckPaymentsTab() {
       {/* Filters */}
       <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center flex-wrap">
         <div className="relative flex-1 max-w-sm min-w-[200px]">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
           <Input placeholder="Search by name, phone, or receipt #..." className="pl-9" value={search} onChange={e => setSearch(e.target.value)} />
         </div>
         <Select value={methodFilter} onValueChange={setMethodFilter}>
@@ -208,7 +208,7 @@ export function CheckPaymentsTab() {
             <div className="p-6 space-y-3">{[...Array(8)].map((_, i) => <Skeleton key={i} className="h-12 w-full" />)}</div>
           ) : filtered.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-12 text-muted-foreground">
-              <CircleDollarSign className="h-10 w-10 mb-2 opacity-30" />
+              <CircleDollarSign className="size-10 mb-2 opacity-30" />
               <p className="text-sm">No payments found</p>
               <p className="text-xs mt-1">Payments will appear here once fees are collected</p>
             </div>
@@ -239,7 +239,7 @@ export function CheckPaymentsTab() {
                         </TableCell>
                         <TableCell>
                           <div className="flex items-center gap-2">
-                            <div className="h-7 w-7 rounded-full bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 flex items-center justify-center text-[10px] font-semibold">
+                            <div className="size-7 rounded-full bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 flex items-center justify-center text-[10px] font-semibold">
                               {p.studentName.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase()}
                             </div>
                             <span className="font-medium text-sm">{p.studentName}</span>
@@ -256,8 +256,8 @@ export function CheckPaymentsTab() {
                           <Badge variant="outline" className={`${stCfg.bg} border-0 font-medium capitalize text-xs`}>{p.status}</Badge>
                         </TableCell>
                         <TableCell className="text-center">
-                          <Button variant="ghost" size="icon" className="h-7 w-7 text-emerald-800 dark:text-emerald-300 hover:text-emerald-900 dark:hover:text-emerald-200 hover:bg-emerald-100/50 dark:hover:bg-emerald-900/50" onClick={() => { setSelectedPayment(p); setViewDialogOpen(true); }}>
-                            <Eye className="h-3.5 w-3.5" />
+                          <Button variant="ghost" size="icon" className="size-7 text-emerald-800 dark:text-emerald-300 hover:text-emerald-900 dark:hover:text-emerald-200 hover:bg-emerald-100/50 dark:hover:bg-emerald-900/50" onClick={() => { setSelectedPayment(p); setViewDialogOpen(true); }}>
+                            <Eye className="size-3.5" />
                           </Button>
                         </TableCell>
                       </TableRow>
@@ -275,7 +275,7 @@ export function CheckPaymentsTab() {
         <DialogContent className="sm:max-w-lg">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
-              <CircleDollarSign className="h-5 w-5 text-emerald-600" />
+              <CircleDollarSign className="size-5 text-emerald-600" />
               Payment Details
             </DialogTitle>
             <DialogDescription>{selectedPayment?.receiptNumber}</DialogDescription>
@@ -283,7 +283,7 @@ export function CheckPaymentsTab() {
           {selectedPayment && (
             <div className="space-y-4">
               <div className="flex items-center gap-3 p-3 rounded-xl bg-muted/50">
-                <div className="h-12 w-12 rounded-full bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 flex items-center justify-center text-sm font-bold">
+                <div className="size-12 rounded-full bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 flex items-center justify-center text-sm font-bold">
                   {selectedPayment.studentName.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase()}
                 </div>
                 <div>
@@ -338,7 +338,7 @@ export function CheckPaymentsTab() {
                     {selectedPayment.feeItems.map((item, idx) => (
                       <div key={item.id} className="flex items-center justify-between px-3 py-2 hover:bg-muted/50 text-sm">
                         <div className="flex items-center gap-2">
-                          <span className="h-5 w-5 rounded bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 flex items-center justify-center text-[10px] font-bold">{idx + 1}</span>
+                          <span className="size-5 rounded bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 flex items-center justify-center text-[10px] font-bold">{idx + 1}</span>
                           <span className="font-medium">{item.feeCategoryName || item.type}</span>
                         </div>
                         <div className="text-right">

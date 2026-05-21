@@ -23,27 +23,27 @@ export function MaintenanceScreen({ message }: { message?: string }) {
         <div className="relative mb-8 flex justify-center">
           {/* Outer pulsing ring */}
           <div className="absolute inset-0 flex items-center justify-center animate-[ping_2.5s_ease-in-out_infinite]">
-            <div className="w-48 h-48 rounded-full bg-amber-100 dark:bg-amber-950/30 opacity-20" />
+            <div className="size-48 rounded-full bg-amber-100 dark:bg-amber-950/30 opacity-20" />
           </div>
 
           {/* Middle ring */}
           <div className="absolute inset-0 flex items-center justify-center animate-pulse">
-            <div className="w-36 h-36 rounded-full bg-amber-100 dark:bg-amber-950/20 opacity-30" />
+            <div className="size-36 rounded-full bg-amber-100 dark:bg-amber-950/20 opacity-30" />
           </div>
 
           {/* Main icon container */}
-          <div className="relative inline-flex items-center justify-center w-28 h-28 animate-[scale-in_0.6s_cubic-bezier(0.34,1.56,0.64,1)_forwards] opacity-0">
-            <div className="absolute w-28 h-28 rounded-full bg-gradient-to-br from-amber-500 to-orange-500 shadow-2xl shadow-amber-300/50 dark:shadow-amber-900/50" />
+          <div className="relative inline-flex items-center justify-center size-28 animate-[scale-in_0.6s_cubic-bezier(0.34,1.56,0.64,1)_forwards] opacity-0">
+            <div className="absolute size-28 rounded-full bg-gradient-to-br from-amber-500 to-orange-500 shadow-2xl shadow-amber-300/50 dark:shadow-amber-900/50" />
             <div className="relative z-10 text-white">
-              <Wrench className="w-14 h-14" />
+              <Wrench className="size-14" />
             </div>
           </div>
 
           {/* Floating gear */}
-          <div className="absolute -top-2 -right-4 w-8 h-8 rounded-lg bg-orange-400 dark:bg-orange-500 flex items-center justify-center shadow-lg animate-[float-bounce_3s_ease-in-out_infinite]">
+          <div className="absolute -top-2 -right-4 size-8 rounded-lg bg-orange-400 dark:bg-orange-500 flex items-center justify-center shadow-lg animate-[float-bounce_3s_ease-in-out_infinite]">
             <span className="text-white text-sm">⚙</span>
           </div>
-          <div className="absolute -bottom-1 -left-4 w-8 h-8 rounded-lg bg-amber-500 dark:bg-amber-600 flex items-center justify-center shadow-lg animate-[float-bounce_3s_ease-in-out_1s_infinite]">
+          <div className="absolute -bottom-1 -left-4 size-8 rounded-lg bg-amber-500 dark:bg-amber-600 flex items-center justify-center shadow-lg animate-[float-bounce_3s_ease-in-out_1s_infinite]">
             <span className="text-white text-lg">🔧</span>
           </div>
         </div>
@@ -59,7 +59,7 @@ export function MaintenanceScreen({ message }: { message?: string }) {
         {currentTenantName && (
           <div className="mt-4 animate-[fade-up_0.6s_ease-out_0.45s_forwards] opacity-0">
             <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-sm text-sm font-medium text-gray-600 dark:text-gray-300">
-              <Building2 className="h-3.5 w-3.5" />
+              <Building2 className="size-3.5" />
               {currentTenantName}
             </span>
           </div>
@@ -79,7 +79,7 @@ export function MaintenanceScreen({ message }: { message?: string }) {
 
         {/* Estimated time */}
         <div className="mt-4 inline-flex items-center gap-2 px-4 py-2 rounded-full bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800/50 animate-[fade-up_0.6s_ease-out_0.65s_forwards] opacity-0">
-          <div className="h-2 w-2 rounded-full bg-amber-500 animate-pulse" />
+          <div className="size-2 rounded-full bg-amber-500 animate-pulse" />
           <span className="text-xs font-medium text-amber-700 dark:text-amber-400">
             Maintenance in progress — please check back in a few minutes
           </span>
@@ -91,7 +91,7 @@ export function MaintenanceScreen({ message }: { message?: string }) {
             onClick={refreshPage}
             className="gap-2 bg-amber-500 hover:bg-amber-600 dark:bg-amber-600 dark:hover:bg-amber-700 text-white"
           >
-            <RefreshCw className="h-4 w-4" />
+            <RefreshCw className="size-4" />
             Check Again
           </Button>
           <Button
@@ -99,7 +99,7 @@ export function MaintenanceScreen({ message }: { message?: string }) {
             onClick={goLogin}
             className="gap-2 border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800"
           >
-            <LogOut className="h-4 w-4" />
+            <LogOut className="size-4" />
             Logout
           </Button>
         </div>

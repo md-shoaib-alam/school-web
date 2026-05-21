@@ -107,21 +107,21 @@ export function TeacherDashboard() {
     {
       title: "My Classes",
       value: classes.length,
-      icon: <School className="h-5 w-5" />,
+      icon: <School className="size-5" />,
       color: "text-blue-600 dark:text-blue-400",
       bg: "bg-blue-50 dark:bg-blue-900/30",
     },
     {
       title: "Total Students",
       value: totalStudents,
-      icon: <Users className="h-5 w-5" />,
+      icon: <Users className="size-5" />,
       color: "text-emerald-600 dark:text-emerald-400",
       bg: "bg-emerald-50 dark:bg-emerald-900/30",
     },
     {
       title: "Pending Assignments",
       value: pendingAssignments,
-      icon: <FileText className="h-5 w-5" />,
+      icon: <FileText className="size-5" />,
       color: "text-amber-600 dark:text-amber-400",
       bg: "bg-amber-50 dark:bg-amber-900/30",
     },
@@ -131,7 +131,7 @@ export function TeacherDashboard() {
         todayAttendance.total > 0
           ? `${Number((todayAttendance.present / todayAttendance.total) * 100).toFixed(2).replace(/\.00$/, "")}%`
           : "N/A",
-      icon: <UserCheck className="h-5 w-5" />,
+      icon: <UserCheck className="size-5" />,
       color: "text-violet-600 dark:text-violet-400",
       bg: "bg-violet-50 dark:bg-violet-900/30",
     },
@@ -140,22 +140,22 @@ export function TeacherDashboard() {
   const quickActions = [
     {
       label: "Take Attendance",
-      icon: <UserCheck className="h-4 w-4" />,
+      icon: <UserCheck className="size-4" />,
       screen: "take-attendance",
     },
     {
       label: "Assessments",
-      icon: <ClipboardList className="h-4 w-4" />,
+      icon: <ClipboardList className="size-4" />,
       screen: "assessments",
     },
     {
       label: "Create Homework",
-      icon: <FileText className="h-4 w-4" />,
+      icon: <FileText className="size-4" />,
       screen: "homework",
     },
     {
       label: "View Timetable",
-      icon: <CalendarDays className="h-4 w-4" />,
+      icon: <CalendarDays className="size-4" />,
       screen: "timetable",
     },
   ];
@@ -204,7 +204,7 @@ export function TeacherDashboard() {
           <CardHeader className="pb-3">
             <div className="flex items-center justify-between">
               <CardTitle className="text-base font-semibold flex items-center gap-2">
-                <Clock className="h-4 w-4 text-blue-500" />
+                <Clock className="size-4 text-blue-500" />
                 Today&apos;s Schedule
               </CardTitle>
               <Badge
@@ -218,7 +218,7 @@ export function TeacherDashboard() {
           <CardContent className="p-4 pt-0">
             {todaySchedule.length === 0 ? (
               <div className="text-center py-8">
-                <CalendarDays className="h-10 w-10 text-gray-300 dark:text-gray-600 mx-auto mb-3" />
+                <CalendarDays className="size-10 text-gray-300 dark:text-gray-600 mx-auto mb-3" />
                 <p className="text-gray-400 dark:text-gray-500 text-sm">
                   No classes scheduled for today
                 </p>
@@ -267,7 +267,7 @@ export function TeacherDashboard() {
         <Card className="rounded-xl shadow-sm border-0">
           <CardHeader className="pb-3">
             <CardTitle className="text-base font-semibold flex items-center gap-2">
-              <TrendingUp className="h-4 w-4 text-blue-500" />
+              <TrendingUp className="size-4 text-blue-500" />
               Quick Actions
             </CardTitle>
           </CardHeader>
@@ -282,7 +282,7 @@ export function TeacherDashboard() {
                 >
                   <span className="text-blue-500">{action.icon}</span>
                   {action.label}
-                  <ArrowRight className="h-3.5 w-3.5 ml-auto text-gray-300 dark:text-gray-600" />
+                  <ArrowRight className="size-3.5 ml-auto text-gray-300 dark:text-gray-600" />
                 </Button>
               ))}
             </div>
@@ -297,7 +297,7 @@ export function TeacherDashboard() {
           <CardHeader className="pb-3">
             <div className="flex items-center justify-between">
               <CardTitle className="text-base font-semibold flex items-center gap-2">
-                <BookOpen className="h-4 w-4 text-blue-500" />
+                <BookOpen className="size-4 text-blue-500" />
                 My Subjects
               </CardTitle>
               <Badge
@@ -316,8 +316,8 @@ export function TeacherDashboard() {
                   className="flex items-center justify-between p-3 rounded-lg hover:bg-blue-50/50 dark:hover:bg-blue-900/20 transition-colors"
                 >
                   <div className="flex items-center gap-3">
-                    <div className="w-9 h-9 rounded-lg bg-blue-50 dark:bg-blue-900/30 flex items-center justify-center">
-                      <BookOpen className="h-4 w-4 text-blue-500" />
+                    <div className="size-9 rounded-lg bg-blue-50 dark:bg-blue-900/30 flex items-center justify-center">
+                      <BookOpen className="size-4 text-blue-500" />
                     </div>
                     <div>
                       <p className="text-sm font-medium text-gray-800 dark:text-gray-200">
@@ -332,7 +332,7 @@ export function TeacherDashboard() {
               ))}
               {subjects.length === 0 && (
                 <div className="text-center py-6">
-                  <BookOpen className="h-8 w-8 text-gray-300 dark:text-gray-600 mx-auto mb-2" />
+                  <BookOpen className="size-8 text-gray-300 dark:text-gray-600 mx-auto mb-2" />
                   <p className="text-gray-400 dark:text-gray-500 text-sm">
                     No subjects assigned
                   </p>
@@ -347,7 +347,7 @@ export function TeacherDashboard() {
           <CardHeader className="pb-3">
             <div className="flex items-center justify-between">
               <CardTitle className="text-base font-semibold flex items-center gap-2">
-                <FileText className="h-4 w-4 text-blue-500" />
+                <FileText className="size-4 text-blue-500" />
                 Recent Assignments
               </CardTitle>
               <Button
@@ -356,7 +356,7 @@ export function TeacherDashboard() {
                 className="text-blue-500 dark:text-blue-400 text-xs hover:bg-blue-50 dark:hover:bg-blue-900/20"
                 onClick={() => navigateTo("homework")}
               >
-                View All <ArrowRight className="h-3 w-3 ml-1" />
+                View All <ArrowRight className="size-3 ml-1" />
               </Button>
             </div>
           </CardHeader>
@@ -390,12 +390,12 @@ export function TeacherDashboard() {
                       >
                         {isOverdue ? (
                           <>
-                            <AlertCircle className="h-2.5 w-2.5 mr-0.5" />{" "}
+                            <AlertCircle className="size-2.5 mr-0.5" />{" "}
                             Overdue
                           </>
                         ) : (
                           <>
-                            <CheckCircle2 className="h-2.5 w-2.5 mr-0.5" /> Due{" "}
+                            <CheckCircle2 className="size-2.5 mr-0.5" /> Due{" "}
                             {formatDate(assignment.dueDate)}
                           </>
                         )}
@@ -427,7 +427,7 @@ export function TeacherDashboard() {
               })}
               {assignments.length === 0 && (
                 <div className="text-center py-6">
-                  <FileText className="h-8 w-8 text-gray-300 dark:text-gray-600 mx-auto mb-2" />
+                  <FileText className="size-8 text-gray-300 dark:text-gray-600 mx-auto mb-2" />
                   <p className="text-gray-400 dark:text-gray-500 text-sm">
                     No assignments created yet
                   </p>
@@ -443,7 +443,7 @@ export function TeacherDashboard() {
         <CardHeader className="pb-3">
           <div className="flex items-center justify-between">
             <CardTitle className="text-base font-semibold flex items-center gap-2">
-              <School className="h-4 w-4 text-blue-500" />
+              <School className="size-4 text-blue-500" />
               My Classes
             </CardTitle>
             <Button
@@ -452,7 +452,7 @@ export function TeacherDashboard() {
               className="text-blue-500 dark:text-blue-400 text-xs hover:bg-blue-50 dark:hover:bg-blue-900/20"
               onClick={() => navigateTo("my-classes")}
             >
-              View All <ArrowRight className="h-3 w-3 ml-1" />
+              View All <ArrowRight className="size-3 ml-1" />
             </Button>
           </div>
         </CardHeader>
@@ -465,8 +465,8 @@ export function TeacherDashboard() {
                 onClick={() => navigateTo("my-classes")}
               >
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-blue-50 dark:bg-blue-900/30 flex items-center justify-center">
-                    <School className="h-5 w-5 text-blue-500" />
+                  <div className="size-10 rounded-xl bg-blue-50 dark:bg-blue-900/30 flex items-center justify-center">
+                    <School className="size-5 text-blue-500" />
                   </div>
                   <div>
                     <p className="text-sm font-semibold text-gray-800 dark:text-gray-200">
@@ -479,10 +479,10 @@ export function TeacherDashboard() {
                 </div>
                 <div className="mt-3 flex items-center justify-between">
                   <span className="text-xs text-gray-400 dark:text-gray-500">
-                    <Users className="h-3 w-3 inline mr-1" />
+                    <Users className="size-3 inline mr-1" />
                     {cls.studentCount} Students
                   </span>
-                  <ArrowRight className="h-3.5 w-3.5 text-gray-300 dark:text-gray-600" />
+                  <ArrowRight className="size-3.5 text-gray-300 dark:text-gray-600" />
                 </div>
               </div>
             ))}

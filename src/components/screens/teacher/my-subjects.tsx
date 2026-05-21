@@ -261,7 +261,7 @@ export function TeacherSubjects() {
       <div className="space-y-6">
         <Header subjects={subjects} view={view} switchView={switchView} />
         <div className="text-center py-20 bg-gray-900/20 rounded-3xl border border-dashed border-gray-800">
-          <BookOpen className="h-16 w-16 text-gray-700 mx-auto mb-4 opacity-50" />
+          <BookOpen className="size-16 text-gray-700 mx-auto mb-4 opacity-50" />
           <h3 className="text-xl font-semibold text-gray-300">No Subjects Assigned</h3>
           <p className="text-gray-500 mt-2 max-w-xs mx-auto">
             You don't have any subjects assigned yet. Contact your administrator.
@@ -320,7 +320,7 @@ function Header({
           }`}
           title="Grid view"
         >
-          <LayoutGrid className="h-4 w-4" />
+          <LayoutGrid className="size-4" />
         </button>
         <button
           onClick={() => switchView("table")}
@@ -331,7 +331,7 @@ function Header({
           }`}
           title="Table view"
         >
-          <List className="h-4 w-4" />
+          <List className="size-4" />
         </button>
       </div>
     </div>
@@ -366,9 +366,9 @@ function GridView({ subjects, slotsBySubject }: { subjects: SubjectInfo[], slots
               <div className="flex items-start justify-between gap-3 mb-4">
                 <div className="flex items-start gap-3 overflow-hidden">
                   <div
-                    className={`w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0 ${p.icon}`}
+                    className={`size-11 rounded-xl flex items-center justify-center flex-shrink-0 ${p.icon}`}
                   >
-                    <BookOpen className="h-5 w-5" />
+                    <BookOpen className="size-5" />
                   </div>
                   <div className="min-w-0">
                     <h3 className="font-semibold text-gray-900 dark:text-gray-100 leading-tight truncate">
@@ -394,7 +394,7 @@ function GridView({ subjects, slotsBySubject }: { subjects: SubjectInfo[], slots
 
               {/* Class — prominent */}
               <div className={`flex items-center gap-2.5 px-3 py-2.5 rounded-lg ${p.bg} border border-current/10 mb-auto`}>
-                <School className={`h-4 w-4 flex-shrink-0 ${p.icon.split(" ")[1]} dark:text-white/80`} />
+                <School className={`size-4 flex-shrink-0 ${p.icon.split(" ")[1]} dark:text-white/80`} />
                 <div className="min-w-0">
                   <p className="text-[10px] font-semibold uppercase tracking-wider text-gray-400 dark:text-white/50 leading-none mb-0.5">
                     Class
@@ -409,7 +409,7 @@ function GridView({ subjects, slotsBySubject }: { subjects: SubjectInfo[], slots
               {todaySlots.length > 0 && (
                 <div className="mt-4 pt-3 border-t border-gray-100 dark:border-gray-800">
                   <div className="flex items-center gap-1.5 text-[11px] font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2.5">
-                    <Clock className="h-3.5 w-3.5" />
+                    <Clock className="size-3.5" />
                     Today's Timing
                   </div>
                   <div className="flex flex-wrap gap-2">
@@ -425,7 +425,7 @@ function GridView({ subjects, slotsBySubject }: { subjects: SubjectInfo[], slots
                               : "bg-blue-50 dark:bg-blue-900/30 border-blue-200 dark:border-blue-800 text-blue-700 dark:text-blue-400"
                           }`}
                         >
-                          {active && <span className="w-1.5 h-1.5 rounded-full bg-white mr-1.5" />}
+                          {active && <span className="size-1.5 rounded-full bg-white mr-1.5" />}
                           {formatTime(slot.startTime)} - {formatTime(slot.endTime)}
                         </Badge>
                       );
@@ -469,8 +469,8 @@ function TableView({ subjects, slotsBySubject }: { subjects: SubjectInfo[], slot
               {/* Row 1: Icon, Subject Name, Code, Badge */}
               <div className="flex items-start justify-between gap-3">
                 <div className="flex items-center gap-3 min-w-0">
-                  <div className={`w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 ${p.icon}`}>
-                    <BookOpen className="h-4 w-4" />
+                  <div className={`size-9 rounded-xl flex items-center justify-center flex-shrink-0 ${p.icon}`}>
+                    <BookOpen className="size-4" />
                   </div>
                   <div className="min-w-0">
                     <h4 className={`text-sm font-bold truncate leading-tight ${
@@ -498,7 +498,7 @@ function TableView({ subjects, slotsBySubject }: { subjects: SubjectInfo[], slot
               {/* Row 2: Class & Timings */}
               <div className="flex flex-wrap items-center justify-between gap-3 pt-1">
                 <div className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg ${p.bg} text-xs font-semibold`}>
-                  <School className={`h-3.5 w-3.5 flex-shrink-0 ${p.icon.split(" ")[1]} dark:text-white/80`} />
+                  <School className={`size-3.5 flex-shrink-0 ${p.icon.split(" ")[1]} dark:text-white/80`} />
                   <span className={`${p.icon.split(" ")[1]} dark:text-white`}>{subject.className}</span>
                 </div>
 
@@ -578,9 +578,9 @@ function TableView({ subjects, slotsBySubject }: { subjects: SubjectInfo[], slot
                 >
                   <td className="py-3 pl-6 pr-2 text-xs font-mono">
                     {isLiveNow ? (
-                      <span className="relative flex h-2.5 w-2.5">
-                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                        <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
+                      <span className="relative flex size-2.5">
+                        <span className="animate-ping absolute inline-flex size-full rounded-full bg-emerald-400 opacity-75"></span>
+                        <span className="relative inline-flex rounded-full size-2.5 bg-emerald-500"></span>
                       </span>
                     ) : (
                       <span className="text-gray-400">{index + 1}</span>
@@ -588,8 +588,8 @@ function TableView({ subjects, slotsBySubject }: { subjects: SubjectInfo[], slot
                   </td>
                   <td className="py-3 px-3">
                     <div className="flex items-center gap-2.5 min-w-0">
-                      <div className={`w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0 ${p.icon}`}>
-                        <BookOpen className="h-3.5 w-3.5" />
+                      <div className={`size-7 rounded-lg flex items-center justify-center flex-shrink-0 ${p.icon}`}>
+                        <BookOpen className="size-3.5" />
                       </div>
                       <div className="flex items-center gap-2 min-w-0">
                         <span className={`text-sm font-semibold truncate ${
@@ -614,7 +614,7 @@ function TableView({ subjects, slotsBySubject }: { subjects: SubjectInfo[], slot
                   </td>
                   <td className="py-3 px-3">
                     <div className={`inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg ${p.bg} max-w-full`}>
-                      <School className={`h-3.5 w-3.5 flex-shrink-0 ${p.icon.split(" ")[1]} dark:text-white/80`} />
+                      <School className={`size-3.5 flex-shrink-0 ${p.icon.split(" ")[1]} dark:text-white/80`} />
                       <span className={`text-xs font-bold truncate ${p.icon.split(" ")[1]} dark:text-white`}>
                         {subject.className}
                       </span>

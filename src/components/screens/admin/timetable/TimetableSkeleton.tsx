@@ -54,7 +54,7 @@ export function TimetableSkeleton({ viewMode }: TimetableSkeletonProps) {
       </div>
       {[...Array(5)].map((_, i) => (
         <div key={i} className="flex gap-4">
-          <Skeleton className="h-4 w-4 rounded-full mt-4" />
+          <Skeleton className="size-4 rounded-full mt-4" />
           <Skeleton className="h-20 flex-1 rounded-xl" />
         </div>
       ))}

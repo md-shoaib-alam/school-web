@@ -130,15 +130,15 @@ export function StudentDashboard() {
     <div className="space-y-6">
       {/* Welcome Banner */}
       <div className="relative overflow-hidden rounded-xl bg-gradient-to-r from-violet-600 via-purple-600 to-fuchsia-500 text-white shadow-md">
-        <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/2" />
+        <div className="absolute top-0 right-0 size-32 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/2" />
         <div className="p-6 lg:p-8 relative z-10">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div className="flex items-center gap-4">
-              <div className="h-14 w-14 rounded-xl bg-white/20 backdrop-blur-sm flex items-center justify-center overflow-hidden shrink-0 border border-white/10 shadow-inner">
+              <div className="size-14 rounded-xl bg-white/20 backdrop-blur-sm flex items-center justify-center overflow-hidden shrink-0 border border-white/10 shadow-inner">
                 <img
                   src={currentTenantLogo || "/test.webp"}
                   alt={currentTenantName || ""}
-                  className="h-full w-full object-cover"
+                  className="size-full object-cover"
                 />
               </div>
               <div className="text-left">
@@ -156,7 +156,7 @@ export function StudentDashboard() {
               </div>
             </div>
             <div className="flex items-center gap-2 bg-white/20 backdrop-blur-sm rounded-lg px-4 py-2 shrink-0 self-start sm:self-auto text-white" suppressHydrationWarning>
-              <Calendar className="h-4 w-4" />
+              <Calendar className="size-4" />
               <span className="text-sm font-medium">
                 {today.toLocaleDateString("en-US", {
                   weekday: "long",
@@ -175,7 +175,7 @@ export function StudentDashboard() {
         <StatCard
           title="Attendance"
           value={`${Number(attendanceRate).toFixed(2).replace(/\.00$/, "")}%`}
-          icon={<UserCheck className="h-5 w-5" />}
+          icon={<UserCheck className="size-5" />}
           trend={attendanceRate >= 85 ? "Good" : "Needs Improvement"}
           trendUp={attendanceRate >= 85}
           color="violet"
@@ -183,7 +183,7 @@ export function StudentDashboard() {
         <StatCard
           title="Average Grade"
           value={`${Number(avgGrade).toFixed(2).replace(/\.00$/, "")}%`}
-          icon={<TrendingUp className="h-5 w-5" />}
+          icon={<TrendingUp className="size-5" />}
           trend={
             avgGrade >= 75
               ? "Excellent"
@@ -197,7 +197,7 @@ export function StudentDashboard() {
         <StatCard
           title="Homework"
           value={String(pendingAssignments || 0)}
-          icon={<ClipboardList className="h-5 w-5" />}
+          icon={<ClipboardList className="size-5" />}
           trend="Pending"
           trendUp={false}
           color="amber"
@@ -205,7 +205,7 @@ export function StudentDashboard() {
         <StatCard
           title="Events"
           value={String(pendingAssignments || 0)}
-          icon={<Calendar className="h-5 w-5" />}
+          icon={<Calendar className="size-5" />}
           trend="Upcoming"
           trendUp={true}
           color="blue"
@@ -219,7 +219,7 @@ export function StudentDashboard() {
           <CardHeader className="pb-3">
             <div className="flex items-center justify-between">
               <CardTitle className="flex items-center gap-2 text-base">
-                <Clock className="h-4 w-4 text-violet-500" />
+                <Clock className="size-4 text-violet-500" />
                 Today&apos;s Schedule
               </CardTitle>
               <Badge variant="secondary" className="text-xs">
@@ -230,7 +230,7 @@ export function StudentDashboard() {
           <CardContent>
             {todayTimetable.length === 0 ? (
               <div className="text-center py-8 text-gray-400 dark:text-gray-500">
-                <BookOpen className="h-10 w-10 mx-auto mb-2 opacity-50" />
+                <BookOpen className="size-10 mx-auto mb-2 opacity-50" />
                 <p className="text-sm">No classes scheduled for today</p>
                 <p className="text-xs mt-1">Enjoy your day off! 🎉</p>
               </div>
@@ -275,7 +275,7 @@ export function StudentDashboard() {
                           </Badge>
                         )}
                         {isPast && (
-                          <CheckCircle2 className="h-4 w-4 text-green-400" />
+                          <CheckCircle2 className="size-4 text-green-400" />
                         )}
                       </div>
                     );
@@ -290,14 +290,14 @@ export function StudentDashboard() {
         <Card className="rounded-xl shadow-sm">
           <CardHeader className="pb-3">
             <CardTitle className="flex items-center gap-2 text-base">
-              <Star className="h-4 w-4 text-violet-500" />
+              <Star className="size-4 text-violet-500" />
               Recent Grades
             </CardTitle>
           </CardHeader>
           <CardContent>
             {recentGrades.length === 0 ? (
               <div className="text-center py-8 text-gray-400 dark:text-gray-500">
-                <GraduationCap className="h-8 w-8 mx-auto mb-2 opacity-50" />
+                <GraduationCap className="size-8 mx-auto mb-2 opacity-50" />
                 <p className="text-sm">No grades yet</p>
               </div>
             ) : (
@@ -346,14 +346,14 @@ export function StudentDashboard() {
       <Card className="rounded-xl shadow-sm">
         <CardHeader className="pb-3">
           <CardTitle className="flex items-center gap-2 text-base">
-            <Bell className="h-4 w-4 text-violet-500" />
+            <Bell className="size-4 text-violet-500" />
             Announcements & Notices
           </CardTitle>
         </CardHeader>
         <CardContent>
           {studentNotices.length === 0 ? (
             <div className="text-center py-6 text-gray-400 dark:text-gray-500">
-              <Bell className="h-8 w-8 mx-auto mb-2 opacity-50" />
+              <Bell className="size-8 mx-auto mb-2 opacity-50" />
               <p className="text-sm">No announcements</p>
             </div>
           ) : (
@@ -394,7 +394,7 @@ export function StudentDashboard() {
                         {formatDate(notice.createdAt)}
                       </p>
                     </div>
-                    <ChevronRight className="h-4 w-4 text-gray-300 dark:text-gray-600 flex-shrink-0 mt-1" />
+                    <ChevronRight className="size-4 text-gray-300 dark:text-gray-600 flex-shrink-0 mt-1" />
                   </div>
                 </div>
               ))}

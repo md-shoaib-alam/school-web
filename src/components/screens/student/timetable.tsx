@@ -234,7 +234,7 @@ export function StudentTimetable() {
                 : "text-gray-500 dark:text-gray-400 dark:text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300"
             }
           >
-            <LayoutGrid className="h-4 w-4 mr-1.5" />
+            <LayoutGrid className="size-4 mr-1.5" />
             Grid
           </Button>
           <Button
@@ -247,7 +247,7 @@ export function StudentTimetable() {
                 : "text-gray-500 dark:text-gray-400 dark:text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300"
             }
           >
-            <List className="h-4 w-4 mr-1.5" />
+            <List className="size-4 mr-1.5" />
             List
           </Button>
           <Button
@@ -260,7 +260,7 @@ export function StudentTimetable() {
                 : "text-gray-500 dark:text-gray-400 dark:text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300"
             }
           >
-            <CalendarDays className="h-4 w-4 mr-1.5" />
+            <CalendarDays className="size-4 mr-1.5" />
             Day
           </Button>
         </div>
@@ -271,7 +271,7 @@ export function StudentTimetable() {
         <Card className="rounded-xl shadow-sm">
           <CardContent className="p-4 flex items-center gap-4">
             <div className="p-2.5 rounded-lg bg-gradient-to-br from-violet-500 to-purple-600 text-white">
-              <Calendar className="h-5 w-5" />
+              <Calendar className="size-5" />
             </div>
             <div>
               <p className="text-sm font-medium text-gray-900 dark:text-gray-100">
@@ -287,7 +287,7 @@ export function StudentTimetable() {
         <Card className="rounded-xl shadow-sm">
           <CardContent className="p-4 flex items-center gap-4">
             <div className="p-2.5 rounded-lg bg-gradient-to-br from-emerald-500 to-teal-600 text-white">
-              <BookOpen className="h-5 w-5" />
+              <BookOpen className="size-5" />
             </div>
             <div>
               <p className="text-sm font-medium text-gray-900 dark:text-gray-100">
@@ -303,7 +303,7 @@ export function StudentTimetable() {
         <Card className="rounded-xl shadow-sm">
           <CardContent className="p-4 flex items-center gap-4">
             <div className="p-2.5 rounded-lg bg-gradient-to-br from-amber-500 to-orange-600 text-white">
-              <Clock className="h-5 w-5" />
+              <Clock className="size-5" />
             </div>
             <div>
               <p className="text-sm font-medium text-gray-900 dark:text-gray-100">
@@ -329,7 +329,7 @@ export function StudentTimetable() {
       {timeSlots.length === 0 ? (
         <Card className="rounded-xl shadow-sm">
           <CardContent className="py-16 text-center">
-            <BookOpen className="h-12 w-12 mx-auto mb-3 text-gray-300" />
+            <BookOpen className="size-12 mx-auto mb-3 text-gray-300" />
             <p className="text-sm font-medium text-gray-500 dark:text-gray-400 dark:text-gray-500 dark:text-gray-400">
               No timetable configured
             </p>
@@ -346,7 +346,7 @@ export function StudentTimetable() {
               <CardHeader className="pb-3">
                 <div className="flex items-center justify-between">
                   <CardTitle className="text-base flex items-center gap-2">
-                    <BookOpen className="h-4 w-4 text-violet-500" />
+                    <BookOpen className="size-4 text-violet-500" />
                     Weekly Schedule
                   </CardTitle>
                   {todayKey && (
@@ -460,7 +460,7 @@ export function StudentTimetable() {
               <CardHeader className="pb-3">
                 <div className="flex items-center justify-between">
                   <CardTitle className="text-base flex items-center gap-2">
-                    <List className="h-4 w-4 text-violet-500" />
+                    <List className="size-4 text-violet-500" />
                     All Classes
                   </CardTitle>
                   {todayKey && (
@@ -529,7 +529,7 @@ export function StudentTimetable() {
                                   {/* Now indicator */}
                                   {isCurrent && (
                                     <div className="flex flex-col items-center">
-                                      <div className="w-2.5 h-2.5 rounded-full bg-violet-500 animate-pulse" />
+                                      <div className="size-2.5 rounded-full bg-violet-500 animate-pulse" />
                                       <div className="w-px h-6 bg-violet-300" />
                                     </div>
                                   )}
@@ -608,7 +608,7 @@ export function StudentTimetable() {
                     >
                       {DAY_LABELS[day]}
                       {isToday && !isSelected && (
-                        <span className="ml-1.5 w-1.5 h-1.5 rounded-full bg-violet-500 inline-block" />
+                        <span className="ml-1.5 size-1.5 rounded-full bg-violet-500 inline-block" />
                       )}
                     </Button>
                   );
@@ -697,14 +697,14 @@ export function StudentTimetable() {
                         <Card className="rounded-xl border-dashed border-gray-200 dark:border-gray-700 dark:border-gray-700 bg-gray-50/50 dark:bg-gray-900/50">
                           <CardContent className="p-4 flex items-center gap-4">
                             <div className="hidden sm:flex flex-col items-center z-10">
-                              <div className="w-5 h-5 rounded-full border-2 border-gray-300 dark:border-gray-600 dark:border-gray-600 bg-white dark:bg-gray-900" />
+                              <div className="size-5 rounded-full border-2 border-gray-300 dark:border-gray-600 dark:border-gray-600 bg-white dark:bg-gray-900" />
                             </div>
                             <div className="flex-1 flex items-center gap-3">
                               <div className="text-xs text-gray-400 dark:text-gray-500 dark:text-gray-400 font-medium min-w-[90px]">
                                 {formatTime(ts.start)} – {formatTime(ts.end)}
                               </div>
                               <div className="flex items-center gap-2 text-gray-400 dark:text-gray-500 dark:text-gray-400">
-                                <Clock className="h-3.5 w-3.5" />
+                                <Clock className="size-3.5" />
                                 <span className="text-xs font-medium">
                                   Free Period
                                 </span>
@@ -736,12 +736,12 @@ export function StudentTimetable() {
                             {/* Timeline dot */}
                             <div className="hidden sm:flex flex-col items-center z-10 pt-0.5">
                               {isCurrentSlotActive ? (
-                                <div className="w-5 h-5 rounded-full bg-violet-500 border-2 border-violet-300 flex items-center justify-center">
-                                  <div className="w-2 h-2 rounded-full bg-white dark:bg-gray-900 animate-pulse" />
+                                <div className="size-5 rounded-full bg-violet-500 border-2 border-violet-300 flex items-center justify-center">
+                                  <div className="size-2 rounded-full bg-white dark:bg-gray-900 animate-pulse" />
                                 </div>
                               ) : (
                                 <div
-                                  className={`w-5 h-5 rounded-full border-2 ${
+                                  className={`size-5 rounded-full border-2 ${
                                     isPastSlot
                                       ? "border-gray-300 dark:border-gray-600 dark:border-gray-600 bg-gray-200 dark:bg-gray-700 dark:bg-gray-700"
                                       : "border-violet-400 bg-white dark:bg-gray-900"
@@ -771,16 +771,16 @@ export function StudentTimetable() {
 
                               <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1.5 text-xs text-gray-500 dark:text-gray-400">
                                 <span className="flex items-center gap-1">
-                                  <Clock className="h-3.5 w-3.5" />
+                                  <Clock className="size-3.5" />
                                   {formatTime(slot.startTime)} –{" "}
                                   {formatTime(slot.endTime)}
                                 </span>
                                 <span className="flex items-center gap-1">
-                                  <User className="h-3.5 w-3.5" />
+                                  <User className="size-3.5" />
                                   {slot.teacherName}
                                 </span>
                                 <span className="flex items-center gap-1">
-                                  <MapPin className="h-3.5 w-3.5" />
+                                  <MapPin className="size-3.5" />
                                   {slot.className}
                                 </span>
                               </div>
@@ -788,7 +788,7 @@ export function StudentTimetable() {
                               {isCurrentSlotActive && (
                                 <div className="mt-3">
                                   <div className="flex items-center gap-2">
-                                    <Timer className="h-3.5 w-3.5 text-violet-500" />
+                                    <Timer className="size-3.5 text-violet-500" />
                                     <span className="text-xs text-violet-600 font-medium">
                                       {(() => {
                                         const [eh, em] = slot.endTime
@@ -846,7 +846,7 @@ export function StudentTimetable() {
                             {/* Period number badge */}
                             <div className="shrink-0">
                               <div
-                                className={`w-8 h-8 rounded-lg flex items-center justify-center text-xs font-bold ${
+                                className={`size-8 rounded-lg flex items-center justify-center text-xs font-bold ${
                                   isCurrentSlotActive
                                     ? "bg-violet-600 text-white"
                                     : isPastSlot
@@ -872,7 +872,7 @@ export function StudentTimetable() {
             <Card className="rounded-xl shadow-sm">
               <CardHeader className="pb-3">
                 <CardTitle className="text-base flex items-center gap-2">
-                  <BookOpen className="h-4 w-4 text-violet-500" />
+                  <BookOpen className="size-4 text-violet-500" />
                   Subjects
                 </CardTitle>
               </CardHeader>
@@ -884,7 +884,7 @@ export function StudentTimetable() {
                         key={subject}
                         className={`inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border text-xs font-medium ${colorClass}`}
                       >
-                        <div className="w-2 h-2 rounded-full bg-current opacity-60" />
+                        <div className="size-2 rounded-full bg-current opacity-60" />
                         {subject}
                       </div>
                     ),

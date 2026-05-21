@@ -57,13 +57,13 @@ const statusConfig: Record<
     bg: "bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800",
     text: "Present",
     dot: "bg-emerald-500",
-    icon: <CheckCircle2 className="h-3.5 w-3.5 text-emerald-500" />,
+    icon: <CheckCircle2 className="size-3.5 text-emerald-500" />,
   },
   absent: {
     bg: "bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 border-red-200 dark:border-red-800",
     text: "Absent",
     dot: "bg-red-500",
-    icon: <UserX className="h-3.5 w-3.5 text-red-500" />,
+    icon: <UserX className="size-3.5 text-red-500" />,
   },
 };
 
@@ -140,7 +140,7 @@ export function AdminAttendance() {
       label: "Present",
       count: presentCount,
       percentage: total > 0 ? ((presentCount / total) * 100).toFixed(1) : "0",
-      icon: <CheckCircle2 className="h-5 w-5 text-emerald-600" />,
+      icon: <CheckCircle2 className="size-5 text-emerald-600" />,
       color:
         "bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400",
       borderColor: "border-emerald-200 dark:border-emerald-800",
@@ -149,7 +149,7 @@ export function AdminAttendance() {
       label: "Absent",
       count: absentCount,
       percentage: total > 0 ? ((absentCount / total) * 100).toFixed(1) : "0",
-      icon: <UserX className="h-5 w-5 text-red-600 dark:text-red-400" />,
+      icon: <UserX className="size-5 text-red-600 dark:text-red-400" />,
       color: "bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400",
       borderColor: "border-red-200 dark:border-red-800",
     },
@@ -157,7 +157,7 @@ export function AdminAttendance() {
       label: "Attendance Rate",
       count: `${presentRate}%`,
       percentage: null,
-      icon: <UserCheck className="h-5 w-5 text-blue-600 dark:text-blue-400" />,
+      icon: <UserCheck className="size-5 text-blue-600 dark:text-blue-400" />,
       color: "bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400",
       borderColor: "border-blue-200 dark:border-blue-800",
     },
@@ -205,7 +205,7 @@ export function AdminAttendance() {
                 className="font-bold text-emerald-600 italic"
               >
                 <span className="flex items-center gap-2 italic">
-                  <Filter className="h-4 w-4" />
+                  <Filter className="size-4" />
                   All Classes
                 </span>
               </SelectItem>
@@ -244,9 +244,9 @@ export function AdminAttendance() {
             title={!isPremiumOrEnterprise ? "Full History requires a Premium subscription" : ""}
           >
             {!isPremiumOrEnterprise ? (
-              <Lock className="h-4 w-4 text-amber-500" />
+              <Lock className="size-4 text-amber-500" />
             ) : (
-              <Eye className="h-4 w-4" />
+              <Eye className="size-4" />
             )}
             {isHistoryMode ? "Exit History" : "Full History"}
             {!isPremiumOrEnterprise && (
@@ -260,7 +260,7 @@ export function AdminAttendance() {
         /* Empty State */
         <div className="py-20 flex flex-col items-center justify-center text-center space-y-4 border-2 border-dashed border-gray-200 dark:border-gray-800 rounded-3xl">
           <div className="p-4 bg-gray-50 dark:bg-gray-900 rounded-full">
-            <UserCheck className="h-12 w-12 text-gray-300" />
+            <UserCheck className="size-12 text-gray-300" />
           </div>
           <div className="max-w-xs">
             <h4 className="text-lg font-medium text-gray-900 dark:text-white">
@@ -330,7 +330,7 @@ export function AdminAttendance() {
                 </CardDescription>
               </div>
               <div className="relative w-64">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-gray-400" />
                 <Input 
                   placeholder="Search students..." 
                   className="pl-9" 

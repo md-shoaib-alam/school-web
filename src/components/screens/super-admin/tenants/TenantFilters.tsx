@@ -41,7 +41,7 @@ export function TenantFilters({
       <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
         <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto flex-1">
           <div className="relative flex-1 max-w-sm">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
             <Input
               placeholder="Search schools..."
               className="pl-9 h-10 rounded-xl"
@@ -85,18 +85,18 @@ export function TenantFilters({
             <Button
               variant={viewMode === "grid" ? "secondary" : "ghost"}
               size="icon"
-              className={`h-8 w-8 rounded-lg ${viewMode === "grid" ? "shadow-sm bg-white dark:bg-gray-800" : ""}`}
+              className={`size-8 rounded-lg ${viewMode === "grid" ? "shadow-sm bg-white dark:bg-gray-800" : ""}`}
               onClick={() => onViewModeChange("grid")}
             >
-              <LayoutGrid className="h-4 w-4" />
+              <LayoutGrid className="size-4" />
             </Button>
             <Button
               variant={viewMode === "table" ? "secondary" : "ghost"}
               size="icon"
-              className={`h-8 w-8 rounded-lg ${viewMode === "table" ? "shadow-sm bg-white dark:bg-gray-800" : ""}`}
+              className={`size-8 rounded-lg ${viewMode === "table" ? "shadow-sm bg-white dark:bg-gray-800" : ""}`}
               onClick={() => onViewModeChange("table")}
             >
-              <List className="h-4 w-4" />
+              <List className="size-4" />
             </Button>
           </div>
           
@@ -105,7 +105,7 @@ export function TenantFilters({
               className="bg-teal-600 hover:bg-teal-700 text-white flex-1 sm:flex-none h-10 rounded-xl gap-2 shadow-md shadow-teal-100 dark:shadow-none"
               onClick={onAddClick}
             >
-              <Plus className="h-4 w-4" />
+              <Plus className="size-4" />
               Add School
             </Button>
           )}

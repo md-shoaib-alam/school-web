@@ -213,9 +213,9 @@ export function LogTable({
                       {/* Column 1: User Name with Avatar */}
                       <TableCell className="py-3 px-4">
                         <div className="flex items-center gap-3">
-                          <Avatar className="h-8 w-8 bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
+                          <Avatar className="size-8 bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
                             <AvatarImage src={`https://api.dicebear.com/7.x/initials/svg?seed=${log.user?.name || log.tenant?.name || 'Sys'}`} />
-                            <AvatarFallback className="text-[10px] bg-gray-100 text-gray-500"><User className="h-3.5 w-3.5" /></AvatarFallback>
+                            <AvatarFallback className="text-[10px] bg-gray-100 text-gray-500"><User className="size-3.5" /></AvatarFallback>
                           </Avatar>
                           <div className="flex flex-col">
                             <span className="text-sm font-medium text-gray-900 dark:text-gray-100">
@@ -251,10 +251,10 @@ export function LogTable({
                         <Button 
                           variant="ghost" 
                           size="icon" 
-                          className="h-8 w-8 rounded-full text-gray-400 hover:text-gray-900 dark:hover:text-gray-100"
+                          className="size-8 rounded-full text-gray-400 hover:text-gray-900 dark:hover:text-gray-100"
                           onClick={() => setSelectedLog(log)}
                         >
-                          <MoreHorizontal className="h-4 w-4" />
+                          <MoreHorizontal className="size-4" />
                         </Button>
                       </TableCell>
                     </TableRow>
@@ -269,11 +269,11 @@ export function LogTable({
                 Displaying {(page - 1) * limit + 1} to {Math.min(page * limit, totalLogs)} of {totalLogs.toLocaleString()} records
               </div>
               <div className="flex items-center gap-1">
-                <Button variant="outline" size="icon" className="h-7 w-7 p-0 bg-white dark:bg-transparent" onClick={() => onPageChange(1)} disabled={page <= 1}>
-                  <ChevronsLeft className="h-3.5 w-3.5" />
+                <Button variant="outline" size="icon" className="size-7 p-0 bg-white dark:bg-transparent" onClick={() => onPageChange(1)} disabled={page <= 1}>
+                  <ChevronsLeft className="size-3.5" />
                 </Button>
-                <Button variant="outline" size="icon" className="h-7 w-7 p-0 bg-white dark:bg-transparent" onClick={() => onPageChange(page - 1)} disabled={page <= 1}>
-                  <ChevronLeft className="h-3.5 w-3.5" />
+                <Button variant="outline" size="icon" className="size-7 p-0 bg-white dark:bg-transparent" onClick={() => onPageChange(page - 1)} disabled={page <= 1}>
+                  <ChevronLeft className="size-3.5" />
                 </Button>
                 
                 <div className="flex gap-1 mx-1">
@@ -285,7 +285,7 @@ export function LogTable({
                         key={p}
                         variant={page === p ? "default" : "outline"}
                         size="sm" 
-                        className={`h-7 w-7 text-xs p-0 ${page === p ? 'bg-[#0056b3] text-white' : 'bg-white dark:bg-transparent'}`}
+                        className={`size-7 text-xs p-0 ${page === p ? 'bg-[#0056b3] text-white' : 'bg-white dark:bg-transparent'}`}
                         onClick={() => onPageChange(p)}
                       >
                         {p}
@@ -294,11 +294,11 @@ export function LogTable({
                   })}
                 </div>
 
-                <Button variant="outline" size="icon" className="h-7 w-7 p-0 bg-white dark:bg-transparent" onClick={() => onPageChange(page + 1)} disabled={page >= totalPages}>
-                  <ChevronRight className="h-3.5 w-3.5" />
+                <Button variant="outline" size="icon" className="size-7 p-0 bg-white dark:bg-transparent" onClick={() => onPageChange(page + 1)} disabled={page >= totalPages}>
+                  <ChevronRight className="size-3.5" />
                 </Button>
-                <Button variant="outline" size="icon" className="h-7 w-7 p-0 bg-white dark:bg-transparent" onClick={() => onPageChange(totalPages)} disabled={page >= totalPages}>
-                  <ChevronsRight className="h-3.5 w-3.5" />
+                <Button variant="outline" size="icon" className="size-7 p-0 bg-white dark:bg-transparent" onClick={() => onPageChange(totalPages)} disabled={page >= totalPages}>
+                  <ChevronsRight className="size-3.5" />
                 </Button>
               </div>
             </div>
@@ -310,7 +310,7 @@ export function LogTable({
         <DialogContent className="max-w-lg border-gray-200 dark:border-gray-800 sm:rounded-xl">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2 text-lg">
-              <Activity className="h-5 w-5 text-blue-600" />
+              <Activity className="size-5 text-blue-600" />
               Audit Event Details
             </DialogTitle>
             <DialogDescription>
@@ -324,7 +324,7 @@ export function LogTable({
               <div className="grid grid-cols-2 gap-3">
                 <div className="p-2.5 rounded-lg border border-gray-100 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-900/30">
                   <span className="text-[10px] font-semibold uppercase tracking-wider text-gray-400 flex items-center gap-1.5 mb-1">
-                    <Clock className="h-3 w-3" /> Executed At
+                    <Clock className="size-3" /> Executed At
                   </span>
                   <p className="text-xs font-medium text-gray-900 dark:text-gray-100">
                     {formatTimestamp(selectedLog.createdAt)}
@@ -332,7 +332,7 @@ export function LogTable({
                 </div>
                 <div className="p-2.5 rounded-lg border border-gray-100 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-900/30">
                   <span className="text-[10px] font-semibold uppercase tracking-wider text-gray-400 flex items-center gap-1.5 mb-1">
-                    <Database className="h-3 w-3" /> Target Module
+                    <Database className="size-3" /> Target Module
                   </span>
                   <Badge variant="secondary" className="uppercase text-[9px] h-5 tracking-wide font-bold">
                     {selectedLog.resource}

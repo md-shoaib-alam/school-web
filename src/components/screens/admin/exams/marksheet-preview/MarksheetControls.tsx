@@ -55,13 +55,13 @@ export function MarksheetControls({
           onClick={onBack}
           className="group flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground h-8 px-2 rounded-lg transition-colors border border-gray-100 dark:border-zinc-800"
         >
-          <ArrowLeft className="h-3.5 w-3.5 transition-transform group-hover:-translate-x-0.5" />
+          <ArrowLeft className="size-3.5 transition-transform group-hover:-translate-x-0.5" />
           <span className="hidden sm:inline">Back</span>
         </Button>
         
         <div className="min-w-0">
           <h2 className="text-sm font-semibold tracking-tight text-foreground flex items-center gap-1.5 leading-none">
-            <Award className="h-4 w-4 text-emerald-600 dark:text-emerald-500 shrink-0" />
+            <Award className="size-4 text-emerald-600 dark:text-emerald-500 shrink-0" />
             <span className="truncate">{classNameStr} - {classSection}</span>
           </h2>
           <span className="text-[10px] text-muted-foreground font-semibold uppercase tracking-wider block mt-0.5">Marksheet Preview</span>
@@ -75,7 +75,7 @@ export function MarksheetControls({
           <Select value={selectedStudentId} onValueChange={setSelectedStudentId} disabled={loading || students.length === 0}>
             <SelectTrigger className="w-full h-8 rounded-lg text-xs font-semibold bg-zinc-50/50 dark:bg-zinc-900/30 border-gray-200 dark:border-zinc-800 py-1">
               <div className="flex items-center gap-1.5 min-w-0 w-full text-left">
-                <User className="h-3.5 w-3.5 text-zinc-400 shrink-0" />
+                <User className="size-3.5 text-zinc-400 shrink-0" />
                 <span className="truncate flex-1">
                   <SelectValue placeholder="All Students" />
                 </span>
@@ -97,7 +97,7 @@ export function MarksheetControls({
           <Select value={marksheetType} onValueChange={(v: any) => setMarksheetType(v)} disabled={loading || exams.length === 0}>
             <SelectTrigger className="w-full h-8 rounded-lg text-xs font-semibold bg-zinc-50/50 dark:bg-zinc-900/30 border-gray-200 dark:border-zinc-800 py-1">
               <div className="flex items-center gap-1.5 min-w-0 w-full text-left">
-                <FileText className="h-3.5 w-3.5 text-zinc-400 shrink-0" />
+                <FileText className="size-3.5 text-zinc-400 shrink-0" />
                 <span className="truncate flex-1">
                   <SelectValue placeholder="Select Type" />
                 </span>
@@ -116,7 +116,7 @@ export function MarksheetControls({
           <Select value={selectedTemplateId} onValueChange={setSelectedTemplateId}>
             <SelectTrigger className="w-full h-8 rounded-lg text-xs font-semibold bg-zinc-50/50 dark:bg-zinc-900/30 border-gray-200 dark:border-zinc-800 py-1">
               <div className="flex items-center gap-1.5 min-w-0 w-full text-left">
-                <Layout className="h-3.5 w-3.5 text-indigo-500 shrink-0" />
+                <Layout className="size-3.5 text-indigo-500 shrink-0" />
                 <span className="truncate flex-1">
                   <SelectValue placeholder="Select Design" />
                 </span>
@@ -137,7 +137,7 @@ export function MarksheetControls({
           <Select value={zoomScale.toString()} onValueChange={(v) => setZoomScale(parseFloat(v))}>
             <SelectTrigger className="w-full h-8 rounded-lg text-xs font-semibold bg-zinc-50/50 dark:bg-zinc-900/30 border-gray-200 dark:border-zinc-800 py-1">
               <div className="flex items-center gap-1.5 min-w-0 w-full text-left">
-                <Search className="h-3.5 w-3.5 text-zinc-400 shrink-0" />
+                <Search className="size-3.5 text-zinc-400 shrink-0" />
                 <span className="truncate flex-1">
                   {Math.round(zoomScale * 100)}%
                 </span>
@@ -159,7 +159,7 @@ export function MarksheetControls({
           size="sm"
           className="w-full sm:w-auto bg-emerald-600 hover:bg-emerald-700 text-white shrink-0 gap-1.5 shadow-sm rounded-lg h-8 px-4 font-bold text-xs transition-all duration-300 transform active:scale-95 justify-center"
         >
-          {printing ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Printer className="h-3.5 w-3.5" />}
+          {printing ? <Loader2 className="size-3.5 animate-spin" /> : <Printer className="size-3.5" />}
           <span>Print {selectedStudentId === 'all' ? 'All' : 'Student'}</span>
         </Button>
       </div>

@@ -109,27 +109,27 @@ export const statusConfig: Record<string, { bg: string; text: string; border: st
 
 export const paymentMethodConfig: Record<string, { icon: React.ReactNode; color: string; label: string }> = {
   card: {
-    icon: React.createElement(CreditCard, { className: "h-3.5 w-3.5" }),
+    icon: React.createElement(CreditCard, { className: "size-3.5" }),
     color: "text-emerald-600",
     label: "Card",
   },
   upi: {
-    icon: React.createElement(Wallet, { className: "h-3.5 w-3.5" }),
+    icon: React.createElement(Wallet, { className: "size-3.5" }),
     color: "text-indigo-600",
     label: "UPI",
   },
   netbanking: {
-    icon: React.createElement(Building2, { className: "h-3.5 w-3.5" }),
+    icon: React.createElement(Building2, { className: "size-3.5" }),
     color: "text-sky-600",
     label: "Net Banking",
   },
   wallet: {
-    icon: React.createElement(Wallet, { className: "h-3.5 w-3.5" }),
+    icon: React.createElement(Wallet, { className: "size-3.5" }),
     color: "text-amber-600",
     label: "Wallet",
   },
   free: {
-    icon: React.createElement(Receipt, { className: "h-3.5 w-3.5" }),
+    icon: React.createElement(Receipt, { className: "size-3.5" }),
     color: "text-gray-500 dark:text-gray-400",
     label: "Free",
   },

@@ -58,7 +58,7 @@ export function CalendarHeader({
                 {ALL_EVENT_TYPES.map((t) => (
                   <SelectItem key={t} value={t} className="text-xs">
                     <div className="flex items-center gap-2">
-                      <span className="w-2 h-2 rounded-full" style={{ backgroundColor: EVENT_TYPE_COLORS[t] }} />
+                      <span className="size-2 rounded-full" style={{ backgroundColor: EVENT_TYPE_COLORS[t] }} />
                       <span>{EVENT_TYPE_LABELS[t]}</span>
                     </div>
                   </SelectItem>
@@ -71,7 +71,7 @@ export function CalendarHeader({
                 className="bg-blue-600 hover:bg-blue-500 dark:bg-rose-600 dark:hover:bg-rose-500 text-white shadow-sm rounded-xl h-9 px-4 text-xs font-bold flex items-center transition-all duration-200 active:scale-95 ml-auto sm:ml-0" 
                 onClick={openCreateDialog}
               >
-                <Plus className="h-3.5 w-3.5 mr-1.5 stroke-[2.5]" />
+                <Plus className="size-3.5 mr-1.5 stroke-[2.5]" />
                 Add Event
               </Button>
             )}
@@ -86,10 +86,10 @@ export function CalendarHeader({
           <Button 
             variant="ghost" 
             size="icon" 
-            className="h-8 w-8 rounded-full hover:bg-blue-50 dark:hover:bg-blue-950/30 text-blue-600 dark:text-blue-400 flex items-center justify-center transition-colors duration-200" 
+            className="size-8 rounded-full hover:bg-blue-50 dark:hover:bg-blue-950/30 text-blue-600 dark:text-blue-400 flex items-center justify-center transition-colors duration-200" 
             onClick={goToPrevMonth}
           >
-            <ChevronLeft className="h-4 w-4 fill-current" />
+            <ChevronLeft className="size-4 fill-current" />
           </Button>
           
           <h2 className="text-base font-semibold text-slate-800 dark:text-slate-200 tracking-tight min-w-[100px] text-center">
@@ -99,10 +99,10 @@ export function CalendarHeader({
           <Button 
             variant="ghost" 
             size="icon" 
-            className="h-8 w-8 rounded-full hover:bg-blue-50 dark:hover:bg-blue-950/30 text-blue-600 dark:text-blue-400 flex items-center justify-center transition-colors duration-200" 
+            className="size-8 rounded-full hover:bg-blue-50 dark:hover:bg-blue-950/30 text-blue-600 dark:text-blue-400 flex items-center justify-center transition-colors duration-200" 
             onClick={goToNextMonth}
           >
-            <ChevronRight className="h-4 w-4 fill-current" />
+            <ChevronRight className="size-4 fill-current" />
           </Button>
         </div>
 

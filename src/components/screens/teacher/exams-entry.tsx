@@ -291,8 +291,8 @@ export function TeacherExamsEntry() {
       <Card className="border-orange-500/20 dark:border-orange-500/10 shadow-sm overflow-hidden">
         <CardHeader className="p-4 pb-2">
           <CardTitle className="text-base flex items-center gap-3">
-            <div className="h-7 w-7 rounded-full bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-400 flex items-center justify-center text-sm font-bold">
-              {selectedExam ? <CheckCircle2 className="h-4 w-4" /> : "1"}
+            <div className="size-7 rounded-full bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-400 flex items-center justify-center text-sm font-bold">
+              {selectedExam ? <CheckCircle2 className="size-4" /> : "1"}
             </div>
             Select Class & Subject
           </CardTitle>
@@ -303,7 +303,7 @@ export function TeacherExamsEntry() {
               <Select value={selectedClass} onValueChange={setSelectedClass}>
                 <SelectTrigger className="w-full h-10">
                   <div className="flex items-center gap-2">
-                    <School className="h-4 w-4 text-orange-500" />
+                    <School className="size-4 text-orange-500" />
                     <SelectValue placeholder="Choose a class..." />
                   </div>
                 </SelectTrigger>
@@ -326,9 +326,9 @@ export function TeacherExamsEntry() {
                 <SelectTrigger className={`w-full h-10 ${selectedClass ? 'border-orange-200 dark:border-orange-900/50' : 'opacity-50'}`}>
                   <div className="flex items-center gap-2">
                     {loadingExams ? (
-                      <Loader2 className="h-4 w-4 animate-spin text-blue-500" />
+                      <Loader2 className="size-4 animate-spin text-blue-500" />
                     ) : (
-                      <BookOpen className="h-4 w-4 text-emerald-500" />
+                      <BookOpen className="size-4 text-emerald-500" />
                     )}
                     <SelectValue placeholder={loadingExams ? "Fetching exams..." : "Select Subject/Exam..."} />
                   </div>
@@ -356,13 +356,13 @@ export function TeacherExamsEntry() {
           <CardContent className="py-20 text-center text-muted-foreground">
             {selectedClass ? (
               <>
-                <BookOpen className="h-12 w-12 mx-auto mb-4 opacity-20" />
+                <BookOpen className="size-12 mx-auto mb-4 opacity-20" />
                 <p className="text-lg font-medium">Please select an exam to continue</p>
                 <p className="text-sm">Pick an exam from your assigned subjects above to start entering results.</p>
               </>
             ) : (
               <>
-                <School className="h-12 w-12 mx-auto mb-4 opacity-20" />
+                <School className="size-12 mx-auto mb-4 opacity-20" />
                 <p className="text-lg font-medium">No Class Selected</p>
                 <p className="text-sm">Choose a class at the top to see available exams.</p>
               </>
@@ -377,20 +377,20 @@ export function TeacherExamsEntry() {
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                 <div className="space-y-1">
                   <h3 className="text-lg font-semibold flex items-center gap-2">
-                    <FileText className="h-5 w-5 text-blue-600" />
+                    <FileText className="size-5 text-blue-600" />
                     {selectedExam.name}
                   </h3>
                   <div className="flex flex-wrap gap-x-4 gap-y-1 text-sm text-muted-foreground">
                     <span className="flex items-center gap-1">
-                      <BookOpen className="h-3.5 w-3.5" />
+                      <BookOpen className="size-3.5" />
                       {selectedExam.subjectName}
                     </span>
                     <span className="flex items-center gap-1">
-                      <Users className="h-3.5 w-3.5" />
+                      <Users className="size-3.5" />
                       {selectedExam.className} - {selectedExam.classSection}
                     </span>
                     <span className="flex items-center gap-1">
-                      <CalendarDays className="h-3.5 w-3.5" />
+                      <CalendarDays className="size-3.5" />
                       {formatDate(selectedExam.date)}
                     </span>
                   </div>
@@ -465,7 +465,7 @@ export function TeacherExamsEntry() {
                   disabled={savingResults || isPublishing || resultRows.length === 0}
                   className="border-blue-200 text-blue-700 hover:bg-blue-50"
                 >
-                  {savingResults ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Save className="h-4 w-4 mr-2" />}
+                  {savingResults ? <Loader2 className="size-4 mr-2 animate-spin" /> : <Save className="size-4 mr-2" />}
                   Save Draft
                 </Button>
                 <Button 
@@ -473,7 +473,7 @@ export function TeacherExamsEntry() {
                   disabled={savingResults || isPublishing || resultRows.length === 0 || selectedExam.status === "completed"}
                   className="bg-emerald-600 hover:bg-emerald-700 text-white gap-2"
                 >
-                  {isPublishing ? <Loader2 className="h-4 w-4 animate-spin" /> : <CheckCircle2 className="h-4 w-4" />}
+                  {isPublishing ? <Loader2 className="size-4 animate-spin" /> : <CheckCircle2 className="size-4" />}
                   {selectedExam.status === "completed" ? "Already Published" : "Publish Results"}
                 </Button>
               </div>
@@ -487,7 +487,7 @@ export function TeacherExamsEntry() {
                 </div>
               ) : resultRows.length === 0 ? (
                 <div className="text-center py-12 text-muted-foreground">
-                  <Users className="h-10 w-10 mx-auto mb-2 opacity-30" />
+                  <Users className="size-10 mx-auto mb-2 opacity-30" />
                   <p>No students found for this class</p>
                 </div>
               ) : (
@@ -523,15 +523,15 @@ export function TeacherExamsEntry() {
                           <TableCell className="text-center">
                             {row.marksObtained.trim() === "" ? (
                               <Badge className="bg-amber-100 text-amber-700 hover:bg-amber-100 border-none px-2 py-0 h-5">
-                                <AlertCircle className="h-3 w-3 mr-1" /> Pending
+                                <AlertCircle className="size-3 mr-1" /> Pending
                               </Badge>
                             ) : row.status === "pass" ? (
                               <Badge className="bg-emerald-100 text-emerald-700 hover:bg-emerald-100 border-none px-2 py-0 h-5">
-                                <CheckCircle2 className="h-3 w-3 mr-1" /> Pass
+                                <CheckCircle2 className="size-3 mr-1" /> Pass
                               </Badge>
                             ) : (
                               <Badge className="bg-red-100 text-red-700 hover:bg-red-100 border-none px-2 py-0 h-5">
-                                <XCircle className="h-3 w-3 mr-1" /> Fail
+                                <XCircle className="size-3 mr-1" /> Fail
                               </Badge>
                             )}
                           </TableCell>

@@ -25,10 +25,10 @@ export const VintageLedger: React.FC<LedgerTemplateProps> = ({ data }) => {
       {/* Ornate Header */}
       <div className="border border-[#8a7355] p-4 text-center mb-4 bg-[#fcf9f2] shadow-sm relative">
         {/* Corner decorations */}
-        <div className="absolute top-1 left-1 border-t border-l border-[#8a7355] w-3 h-3"></div>
-        <div className="absolute top-1 right-1 border-t border-r border-[#8a7355] w-3 h-3"></div>
-        <div className="absolute bottom-1 left-1 border-b border-l border-[#8a7355] w-3 h-3"></div>
-        <div className="absolute bottom-1 right-1 border-b border-r border-[#8a7355] w-3 h-3"></div>
+        <div className="absolute top-1 left-1 border-t border-l border-[#8a7355] size-3"></div>
+        <div className="absolute top-1 right-1 border-t border-r border-[#8a7355] size-3"></div>
+        <div className="absolute bottom-1 left-1 border-b border-l border-[#8a7355] size-3"></div>
+        <div className="absolute bottom-1 right-1 border-b border-r border-[#8a7355] size-3"></div>
         
         <h1 className="font-semibold text-2xl tracking-widest text-[#5c4028] uppercase font-serif">
           {data.schoolName}

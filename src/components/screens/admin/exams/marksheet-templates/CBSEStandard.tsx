@@ -43,7 +43,7 @@ export const CBSEStandard: React.FC<MarksheetTemplateProps> = ({
         
         {/* CBSE Authentic Header */}
         <div className="flex justify-between items-center border-b-2 border-emerald-800 pb-3">
-          <div className="w-14 h-14 bg-emerald-50 border border-emerald-800 rounded-full flex items-center justify-center shrink-0">
+          <div className="size-14 bg-emerald-50 border border-emerald-800 rounded-full flex items-center justify-center shrink-0">
             <span className="text-2xl">🏫</span>
           </div>
           <div className="text-center flex-1 px-4">
@@ -57,7 +57,7 @@ export const CBSEStandard: React.FC<MarksheetTemplateProps> = ({
               ACADEMIC ASSESSMENT REPORT CARD: {academicYear}
             </p>
           </div>
-          <div className="w-14 h-14 border border-zinc-200 rounded flex flex-col items-center justify-center text-[7px] font-bold text-zinc-400">
+          <div className="size-14 border border-zinc-200 rounded flex flex-col items-center justify-center text-[7px] font-bold text-zinc-400">
             <span>STUDENT</span>
             <span>PHOTO</span>
           </div>

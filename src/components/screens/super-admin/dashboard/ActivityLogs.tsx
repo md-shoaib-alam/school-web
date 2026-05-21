@@ -34,12 +34,12 @@ interface ActivityLogsProps {
 }
 
 const ACTION_ICONS: Record<string, React.ReactNode> = {
-  CREATE_TENANT: <Plus className="h-3.5 w-3.5" />,
-  UPDATE_TENANT: <Building2 className="h-3.5 w-3.5" />,
-  DELETE_TENANT: <AlertTriangle className="h-3.5 w-3.5" />,
-  CREATE_USER: <UserCog className="h-3.5 w-3.5" />,
-  LOGIN: <ShieldCheck className="h-3.5 w-3.5" />,
-  UPDATE_SUBSCRIPTION: <CreditCard className="h-3.5 w-3.5" />,
+  CREATE_TENANT: <Plus className="size-3.5" />,
+  UPDATE_TENANT: <Building2 className="size-3.5" />,
+  DELETE_TENANT: <AlertTriangle className="size-3.5" />,
+  CREATE_USER: <UserCog className="size-3.5" />,
+  LOGIN: <ShieldCheck className="size-3.5" />,
+  UPDATE_SUBSCRIPTION: <CreditCard className="size-3.5" />,
 };
 
 const ACTION_COLORS: Record<string, string> = {
@@ -66,7 +66,7 @@ export function ActivityLogs({ loading, data }: ActivityLogsProps) {
     <Card className="border-none shadow-sm bg-white dark:bg-gray-800 overflow-hidden">
       <CardHeader>
         <CardTitle className="text-base font-bold flex items-center gap-2">
-          <ClipboardList className="h-4 w-4 text-emerald-600" /> Recent Platform Activity
+          <ClipboardList className="size-4 text-emerald-600" /> Recent Platform Activity
         </CardTitle>
         <CardDescription className="text-xs">System-wide audit logs and operations</CardDescription>
       </CardHeader>
@@ -104,7 +104,7 @@ export function ActivityLogs({ loading, data }: ActivityLogsProps) {
                         <span className="font-bold text-sm text-gray-900 dark:text-gray-100">{log.user.name}</span>
                         {log.tenant && (
                           <span className="text-[10px] font-bold text-muted-foreground flex items-center gap-1">
-                            <Building2 className="h-2.5 w-2.5" />
+                            <Building2 className="size-2.5" />
                             {log.tenant.name}
                           </span>
                         )}
@@ -121,7 +121,7 @@ export function ActivityLogs({ loading, data }: ActivityLogsProps) {
                           {formatLogDate(log.createdAt)}
                         </span>
                         <span className="text-[10px] font-bold text-muted-foreground flex items-center gap-1">
-                          <Clock className="h-2.5 w-2.5" />
+                          <Clock className="size-2.5" />
                           {formatLogTime(log.createdAt)}
                         </span>
                       </div>

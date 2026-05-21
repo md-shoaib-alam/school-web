@@ -20,8 +20,8 @@ export function AttendanceCalendar({ data, isPremium, onPrev, onNext, currentPer
       <CardHeader className="p-3 sm:p-4 pb-2">
         <div className="flex flex-row items-center justify-between gap-2">
           <div className="flex items-center gap-2 sm:gap-3">
-            <div className="w-8 h-8 sm:w-10 sm:h-10 bg-amber-100 dark:bg-amber-900/30 rounded-xl flex items-center justify-center border border-amber-500/20">
-              <Calendar className="h-4 w-4 sm:h-5 sm:w-5 text-amber-600" />
+            <div className="size-8 sm:size-10 bg-amber-100 dark:bg-amber-900/30 rounded-xl flex items-center justify-center border border-amber-500/20">
+              <Calendar className="size-4 sm:size-5 text-amber-600" />
             </div>
             <div>
               <CardTitle className="text-xs sm:text-sm font-bold text-gray-900 dark:text-gray-100">
@@ -39,10 +39,10 @@ export function AttendanceCalendar({ data, isPremium, onPrev, onNext, currentPer
               className={`p-1 sm:p-1.5 rounded-lg transition-all ${isPremium ? "hover:bg-white dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200 shadow-sm" : "opacity-30 cursor-not-allowed text-gray-400"}`}
               title={isPremium ? "Previous" : "Premium Only"}
             >
-              <ChevronLeft className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+              <ChevronLeft className="size-3.5 sm:size-4" />
             </button>
             <div className="px-1 sm:px-2 text-[8px] sm:text-[9px] font-black uppercase tracking-tighter sm:tracking-widest text-gray-400 dark:text-gray-500 flex items-center gap-0.5">
-              {!isPremium && <Lock className="h-2 w-2" />}
+              {!isPremium && <Lock className="size-2" />}
               <span>History</span>
             </div>
             <button
@@ -50,7 +50,7 @@ export function AttendanceCalendar({ data, isPremium, onPrev, onNext, currentPer
               className={`p-1 sm:p-1.5 rounded-lg transition-all ${isPremium ? "hover:bg-white dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200 shadow-sm" : "opacity-30 cursor-not-allowed text-gray-400"}`}
               title={isPremium ? "Next" : "Premium Only"}
             >
-              <ChevronRight className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+              <ChevronRight className="size-3.5 sm:size-4" />
             </button>
           </div>
         </div>
@@ -93,7 +93,7 @@ export function AttendanceCalendar({ data, isPremium, onPrev, onNext, currentPer
               key={item.label}
               className="flex items-center gap-1 text-[8px] sm:text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-tighter sm:tracking-wide"
             >
-              <div className={`w-2 h-2 rounded-full ${item.color}`} />
+              <div className={`size-2 rounded-full ${item.color}`} />
               {item.label}
             </div>
           ))}

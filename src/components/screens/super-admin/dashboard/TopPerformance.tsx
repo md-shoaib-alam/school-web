@@ -43,7 +43,7 @@ export function TopPerformance({ loading, data }: TopPerformanceProps) {
       <Card className="lg:col-span-3 border-none shadow-sm bg-white dark:bg-gray-800">
         <CardHeader>
           <CardTitle className="text-base font-bold flex items-center gap-2">
-            <Crown className="h-4 w-4 text-amber-500" /> Top Performing Schools
+            <Crown className="size-4 text-amber-500" /> Top Performing Schools
           </CardTitle>
           <CardDescription className="text-xs">Ranked by active subscription revenue</CardDescription>
         </CardHeader>
@@ -71,7 +71,7 @@ export function TopPerformance({ loading, data }: TopPerformanceProps) {
                       </TableCell>
                       <TableCell>
                         <div className="flex items-center gap-3">
-                          <img src={tenant.logo || "/test.webp"} alt={tenant.name} className="h-8 w-8 rounded-lg object-cover border shadow-sm shrink-0" />
+                          <img src={tenant.logo || "/test.webp"} alt={tenant.name} className="size-8 rounded-lg object-cover border shadow-sm shrink-0" />
                           <div>
                             <p className="font-medium text-sm text-gray-900 dark:text-gray-100">{tenant.name}</p>
                             <p className="text-xs text-muted-foreground">
@@ -101,7 +101,7 @@ export function TopPerformance({ loading, data }: TopPerformanceProps) {
       <Card className="lg:col-span-2 border-none shadow-sm bg-white dark:bg-gray-800">
         <CardHeader>
           <CardTitle className="text-base font-bold flex items-center gap-2">
-            <BarChart3 className="h-4 w-4 text-emerald-600" /> Plan Distribution
+            <BarChart3 className="size-4 text-emerald-600" /> Plan Distribution
           </CardTitle>
           <CardDescription className="text-xs">Breakdown of schools by subscription tier</CardDescription>
         </CardHeader>
@@ -155,7 +155,7 @@ export function TopPerformance({ loading, data }: TopPerformanceProps) {
                   const color = PLAN_COLORS[entry.plan.toLowerCase()] || "#10b981";
                   return (
                     <div key={entry.plan} className="flex items-center gap-1.5 hover:opacity-80 transition-opacity cursor-pointer">
-                      <div className="w-2.5 h-2.5 rounded-full shrink-0 animate-pulse" style={{ backgroundColor: color }} />
+                      <div className="size-2.5 rounded-full shrink-0 animate-pulse" style={{ backgroundColor: color }} />
                       <span className="text-xs font-semibold capitalize text-gray-700 dark:text-gray-300">
                         {entry.plan}: <span className="font-bold text-gray-900 dark:text-gray-100">{entry.count}</span>
                       </span>

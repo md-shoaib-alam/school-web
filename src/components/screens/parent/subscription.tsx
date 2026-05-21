@@ -264,7 +264,7 @@ export function ParentSubscription() {
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
-        <Loader2 className="h-8 w-8 animate-spin text-amber-500" />
+        <Loader2 className="size-8 animate-spin text-amber-500" />
         <span className="ml-3 text-gray-500 dark:text-gray-400">Loading subscriptions...</span>
       </div>
     );
@@ -279,8 +279,8 @@ export function ParentSubscription() {
       />
       {/* Header */}
       <div className="text-center max-w-2xl mx-auto px-4 relative">
-        <div className="inline-flex items-center justify-center w-12 h-12 sm:w-16 sm:h-16 rounded-2xl bg-gradient-to-br from-amber-400 to-orange-500 text-white mb-4 shadow-lg shadow-amber-200 dark:shadow-amber-900/30">
-          <Crown className="h-6 w-6 sm:h-8 sm:w-8" />
+        <div className="inline-flex items-center justify-center size-12 sm:size-16 rounded-2xl bg-gradient-to-br from-amber-400 to-orange-500 text-white mb-4 shadow-lg shadow-amber-200 dark:shadow-amber-900/30">
+          <Crown className="size-6 sm:size-8" />
         </div>
         <h2 className="text-xl sm:text-2xl font-semibold text-gray-900 dark:text-gray-100 tracking-tight">Premium Subscriptions</h2>
         <p className="text-sm text-gray-500 dark:text-gray-400 mt-2 max-w-md mx-auto leading-relaxed">
@@ -352,16 +352,16 @@ export function ParentSubscription() {
 
       {/* Trust Badges */}
       <div className="flex flex-wrap justify-center gap-6 py-4 text-sm text-gray-400 dark:text-gray-500 border-y border-gray-100 dark:border-gray-800">
-        <div className="flex items-center gap-1.5"><Shield className="h-4 w-4" /><span>Secure Payment</span></div>
-        <div className="flex items-center gap-1.5"><Clock className="h-4 w-4" /><span>Cancel Anytime</span></div>
-        <div className="flex items-center gap-1.5"><TrendingUp className="h-4 w-4" /><span>Upgrade Anytime</span></div>
-        <div className="flex items-center gap-1.5"><UsersIcon className="h-4 w-4" /><span>5000+ Parents Trust Us</span></div>
+        <div className="flex items-center gap-1.5"><Shield className="size-4" /><span>Secure Payment</span></div>
+        <div className="flex items-center gap-1.5"><Clock className="size-4" /><span>Cancel Anytime</span></div>
+        <div className="flex items-center gap-1.5"><TrendingUp className="size-4" /><span>Upgrade Anytime</span></div>
+        <div className="flex items-center gap-1.5"><UsersIcon className="size-4" /><span>5000+ Parents Trust Us</span></div>
       </div>
 
       {/* Payment History */}
       <div className="space-y-4">
         <div className="flex items-center gap-2">
-          <Receipt className="h-5 w-5 text-gray-600 dark:text-gray-400" />
+          <Receipt className="size-5 text-gray-600 dark:text-gray-400" />
           <h3 className="text-xl font-semibold text-gray-900 dark:text-gray-100">Payment History</h3>
         </div>
         <Card className="rounded-xl border-gray-200 dark:border-gray-700 shadow-none overflow-hidden">
@@ -387,7 +387,7 @@ export function ParentSubscription() {
         <AlertDialogContent className="rounded-2xl border-amber-100 dark:border-amber-900/30 shadow-2xl">
           <AlertDialogHeader>
             <AlertDialogTitle className="text-xl font-bold flex items-center gap-2">
-              <span className="w-8 h-8 rounded-full bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center">⚠️</span>
+              <span className="size-8 rounded-full bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center">⚠️</span>
               Cancel Subscription?
             </AlertDialogTitle>
             <AlertDialogDescription className="text-gray-600 dark:text-gray-400 py-2">

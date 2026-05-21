@@ -142,7 +142,7 @@ export function CalendarDialogs({
           <DialogFooter className="p-6 bg-slate-50/50 dark:bg-white/[0.01] border-t border-slate-100 dark:border-white/[0.05] flex items-center justify-end gap-3">
             <Button variant="ghost" onClick={closeDialog} className="rounded-xl font-semibold text-sm text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-white/[0.03]" disabled={submitting}>Cancel</Button>
             <Button onClick={handleSubmit} className="bg-blue-600 hover:bg-blue-500 dark:bg-rose-600 dark:hover:bg-rose-500 text-white shadow-sm rounded-xl px-5 h-10 font-bold text-sm transition-all duration-200 active:scale-95" disabled={submitting}>
-              {submitting ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
+              {submitting ? <Loader2 className="size-4 animate-spin mr-2" /> : null}
               {editingEvent ? "Update Schedule" : "Add Event"}
             </Button>
           </DialogFooter>
@@ -160,7 +160,7 @@ export function CalendarDialogs({
           <AlertDialogFooter className="mt-6 flex gap-3">
             <AlertDialogCancel className="rounded-lg border-slate-200 dark:border-slate-700 font-bold h-10 px-4">Discard</AlertDialogCancel>
             <AlertDialogAction className="rounded-lg bg-red-600 hover:bg-red-700 text-white font-bold h-10 px-4" onClick={handleConfirmDelete} disabled={deleting}>
-              {deleting ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
+              {deleting ? <Loader2 className="size-4 animate-spin mr-2" /> : null}
               Confirm Deletion
             </AlertDialogAction>
           </AlertDialogFooter>

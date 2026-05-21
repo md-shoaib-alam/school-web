@@ -49,7 +49,7 @@ export function NoticeSidebar({ notices, overdueFees, performance }: NoticeSideb
         <Card className="rounded-xl shadow-sm border-red-200 dark:border-red-800 bg-red-50/50 dark:bg-red-900/20 shadow-none">
           <CardHeader className="p-4 pb-2">
             <div className="flex items-center gap-2">
-              <AlertTriangle className="h-5 w-5 text-red-500" />
+              <AlertTriangle className="size-5 text-red-500" />
               <CardTitle className="text-sm font-semibold text-red-800">
                 Fee Payment Overdue
               </CardTitle>
@@ -80,7 +80,7 @@ export function NoticeSidebar({ notices, overdueFees, performance }: NoticeSideb
       <Card className="rounded-xl shadow-sm shadow-none">
         <CardHeader className="p-4 pb-2">
           <div className="flex items-center gap-2">
-            <Clock className="h-5 w-5 text-amber-600" />
+            <Clock className="size-5 text-amber-600" />
             <CardTitle className="text-sm font-semibold">Recent Notices</CardTitle>
           </div>
         </CardHeader>
@@ -126,7 +126,7 @@ export function NoticeSidebar({ notices, overdueFees, performance }: NoticeSideb
       <Card className="rounded-xl shadow-sm shadow-none">
         <CardHeader className="p-4 pb-2">
           <div className="flex items-center gap-2">
-            <TrendingUp className="h-5 w-5 text-amber-600" />
+            <TrendingUp className="size-5 text-amber-600" />
             <CardTitle className="text-sm font-semibold">Performance Summary</CardTitle>
           </div>
         </CardHeader>

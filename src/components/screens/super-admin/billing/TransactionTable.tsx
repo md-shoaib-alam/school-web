@@ -89,7 +89,7 @@ export function TransactionTable() {
       <CardHeader className="pb-2 space-y-4 md:space-y-0 md:flex-row md:items-center md:justify-between">
         <div>
           <CardTitle className="text-base flex items-center gap-2">
-            <Receipt className="h-4 w-4 text-emerald-600" /> Transaction History
+            <Receipt className="size-4 text-emerald-600" /> Transaction History
           </CardTitle>
           <CardDescription className="flex items-center gap-1.5 mt-0.5">
             Total {totalCount} {dateRange === 'all' ? 'total ' : ''}payments records
@@ -141,7 +141,7 @@ export function TransactionTable() {
                 <TableRow>
                   <TableCell colSpan={6} className="h-32 text-center">
                     <div className="flex flex-col items-center justify-center text-muted-foreground">
-                      <Receipt className="h-8 w-8 mb-2 opacity-20" />
+                      <Receipt className="size-8 mb-2 opacity-20" />
                       <span className="text-sm font-medium">No transactions found for this period</span>
                     </div>
                   </TableCell>
@@ -170,13 +170,13 @@ export function TransactionTable() {
                       </TableCell>
                       <TableCell className="text-right font-black text-foreground">
                         <div className="flex items-center justify-end">
-                          <IndianRupee className="h-3.5 w-3.5 mr-0.5" />
+                          <IndianRupee className="size-3.5 mr-0.5" />
                           {sub.amount.toLocaleString()}
                         </div>
                       </TableCell>
                       <TableCell className="text-center">
                         <div className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full border ${st.bg} ${st.text} ${st.border} text-[10px] font-bold mx-auto`}>
-                          <div className={`h-1.5 w-1.5 rounded-full ${st.dot}`} />
+                          <div className={`size-1.5 rounded-full ${st.dot}`} />
                           {st.label}
                         </div>
                       </TableCell>
@@ -192,7 +192,7 @@ export function TransactionTable() {
                             {formatTxDate(sub.createdAt)}
                           </div>
                           <div className="text-[10px] text-muted-foreground font-medium flex items-center gap-1">
-                            <CalendarDays className="h-3 w-3" />
+                            <CalendarDays className="size-3" />
                             {formatTxTime(sub.createdAt)}
                           </div>
                         </div>
@@ -215,11 +215,11 @@ export function TransactionTable() {
               size="sm"
               disabled={page === 1 || loading}
               onClick={() => setPage((p) => Math.max(1, p - 1))}
-              className="h-8 w-8 p-0 border-gray-200 dark:border-gray-700 shadow-none"
+              className="size-8 p-0 border-gray-200 dark:border-gray-700 shadow-none"
             >
-              <ChevronLeft className="h-4 w-4" />
+              <ChevronLeft className="size-4" />
             </Button>
-            <div className="flex items-center justify-center bg-emerald-50 dark:bg-emerald-900/30 text-emerald-600 text-xs font-bold w-8 h-8 rounded-md border border-emerald-200 dark:border-emerald-800">
+            <div className="flex items-center justify-center bg-emerald-50 dark:bg-emerald-900/30 text-emerald-600 text-xs font-bold size-8 rounded-md border border-emerald-200 dark:border-emerald-800">
               {page}
             </div>
             <Button
@@ -227,9 +227,9 @@ export function TransactionTable() {
               size="sm"
               disabled={page >= totalPages || loading}
               onClick={() => setPage((p) => p + 1)}
-              className="h-8 w-8 p-0 border-gray-200 dark:border-gray-700 shadow-none"
+              className="size-8 p-0 border-gray-200 dark:border-gray-700 shadow-none"
             >
-              <ChevronRight className="h-4 w-4" />
+              <ChevronRight className="size-4" />
             </Button>
           </div>
         </div>

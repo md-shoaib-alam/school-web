@@ -31,17 +31,17 @@ function formatFeeDate(dateStr: string) {
 const statusConfig: Record<string, { bg: string; icon: React.ReactNode; label: string }> = {
   paid: {
     bg: "bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800",
-    icon: <CheckCircle2 className="h-3.5 w-3.5" />,
+    icon: <CheckCircle2 className="size-3.5" />,
     label: "Paid",
   },
   pending: {
     bg: "bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 border-amber-200 dark:border-amber-800",
-    icon: <Clock className="h-3.5 w-3.5" />,
+    icon: <Clock className="size-3.5" />,
     label: "Pending",
   },
   overdue: {
     bg: "bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 border-red-200 dark:border-red-800",
-    icon: <AlertTriangle className="h-3.5 w-3.5" />,
+    icon: <AlertTriangle className="size-3.5" />,
     label: "Overdue",
   },
 };
@@ -136,19 +136,19 @@ export function FeeTable({
                     <Button
                       variant="ghost"
                       size="icon"
-                      className="h-8 w-8 text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20"
+                      className="size-8 text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20"
                       onClick={() => onView(record)}
                     >
-                      <Eye className="h-4 w-4" />
+                      <Eye className="size-4" />
                     </Button>
                     {canEdit && (
                       <Button
                         variant="ghost"
                         size="icon"
-                        className="h-8 w-8 text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-900/20"
+                        className="size-8 text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-900/20"
                         onClick={() => onEdit(record)}
                       >
-                        <Pencil className="h-4 w-4" />
+                        <Pencil className="size-4" />
                       </Button>
                     )}
                     {canDelete && (
@@ -157,9 +157,9 @@ export function FeeTable({
                           <Button
                             variant="ghost"
                             size="icon"
-                            className="h-8 w-8 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20"
+                            className="size-8 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20"
                           >
-                            <Trash2 className="h-4 w-4" />
+                            <Trash2 className="size-4" />
                           </Button>
                         </AlertDialogTrigger>
                         <AlertDialogContent>

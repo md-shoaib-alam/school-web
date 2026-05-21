@@ -45,9 +45,9 @@ const getStatusBg = (status: string) => {
 const getStatusIcon = (status: string) => {
   switch (status) {
     case "present":
-      return <UserCheck className="h-3.5 w-3.5" />;
+      return <UserCheck className="size-3.5" />;
     case "absent":
-      return <UserX className="h-3.5 w-3.5" />;
+      return <UserX className="size-3.5" />;
     default:
       return null;
   }
@@ -171,7 +171,7 @@ export function StaffAttendance({ initialTab }: StaffAttendanceProps) {
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <h2 className="text-2xl font-semibold text-gray-900 dark:text-gray-100 flex items-center gap-2">
-            {activeTab === 'teacher' ? <GraduationCap className="h-7 w-7 text-emerald-600" /> : <Briefcase className="h-7 w-7 text-blue-600" />}
+            {activeTab === 'teacher' ? <GraduationCap className="size-7 text-emerald-600" /> : <Briefcase className="size-7 text-blue-600" />}
             {activeTab === 'teacher' ? 'Teacher Attendance' : 'Admin Staff Attendance'}
           </h2>
           <p className="text-gray-500 dark:text-gray-400 mt-1">
@@ -206,14 +206,14 @@ export function StaffAttendance({ initialTab }: StaffAttendanceProps) {
               value="teacher"
               className="rounded-xl data-[state=active]:bg-white dark:data-[state=active]:bg-gray-800 data-[state=active]:shadow-sm font-bold flex items-center gap-2"
             >
-              <GraduationCap className="h-4 w-4" />
+              <GraduationCap className="size-4" />
               Teachers
             </TabsTrigger>
             <TabsTrigger
               value="staff"
               className="rounded-xl data-[state=active]:bg-white dark:data-[state=active]:bg-gray-800 data-[state=active]:shadow-sm font-bold flex items-center gap-2"
             >
-              <Briefcase className="h-4 w-4" />
+              <Briefcase className="size-4" />
               Admin Staff
             </TabsTrigger>
           </TabsList>
@@ -223,8 +223,8 @@ export function StaffAttendance({ initialTab }: StaffAttendanceProps) {
         <div className="grid grid-cols-3 gap-3 mt-6">
           <Card className="rounded-xl shadow-sm border-0">
             <CardContent className="p-4 flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-blue-50 dark:bg-blue-900/30 flex items-center justify-center">
-                <Users className="h-5 w-5 text-blue-500 dark:text-blue-400" />
+              <div className="size-10 rounded-xl bg-blue-50 dark:bg-blue-900/30 flex items-center justify-center">
+                <Users className="size-5 text-blue-500 dark:text-blue-400" />
               </div>
               <div>
                 <p className="text-xs text-gray-400 dark:text-gray-500 font-medium">
@@ -238,8 +238,8 @@ export function StaffAttendance({ initialTab }: StaffAttendanceProps) {
           </Card>
           <Card className="rounded-xl shadow-sm border-0">
             <CardContent className="p-4 flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-emerald-50 dark:bg-emerald-900/30 flex items-center justify-center">
-                <UserCheck className="h-5 w-5 text-emerald-500 dark:text-emerald-400" />
+              <div className="size-10 rounded-xl bg-emerald-50 dark:bg-emerald-900/30 flex items-center justify-center">
+                <UserCheck className="size-5 text-emerald-500 dark:text-emerald-400" />
               </div>
               <div>
                 <p className="text-xs text-gray-400 dark:text-gray-500 font-medium">
@@ -253,8 +253,8 @@ export function StaffAttendance({ initialTab }: StaffAttendanceProps) {
           </Card>
           <Card className="rounded-xl shadow-sm border-0">
             <CardContent className="p-4 flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-red-50 dark:bg-red-900/30 flex items-center justify-center">
-                <UserX className="h-5 w-5 text-red-500 dark:text-red-400" />
+              <div className="size-10 rounded-xl bg-red-50 dark:bg-red-900/30 flex items-center justify-center">
+                <UserX className="size-5 text-red-500 dark:text-red-400" />
               </div>
               <div>
                 <p className="text-xs text-gray-400 dark:text-gray-500 font-medium">
@@ -274,8 +274,8 @@ export function StaffAttendance({ initialTab }: StaffAttendanceProps) {
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div className="flex items-center justify-between sm:justify-start sm:gap-4 flex-1">
                   <div className="flex items-center gap-2.5">
-                    <div className="h-8 w-8 rounded-lg bg-blue-500/10 flex items-center justify-center border border-blue-500/20">
-                      <CalendarDays className="h-4 w-4 text-blue-500" />
+                    <div className="size-8 rounded-lg bg-blue-500/10 flex items-center justify-center border border-blue-500/20">
+                      <CalendarDays className="size-4 text-blue-500" />
                     </div>
                     <div>
                       <h3 className="text-sm sm:text-base font-semibold text-gray-800 dark:text-gray-100 leading-none">
@@ -315,7 +315,7 @@ export function StaffAttendance({ initialTab }: StaffAttendanceProps) {
             </CardHeader>
             <CardContent className="p-4 pt-0">
               <div className="relative group max-w-sm mb-4">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-gray-400" />
                 <Input
                   placeholder={`Search ${activeTab === "teacher" ? "teachers" : "staff"}...`}
                   value={searchQuery}
@@ -352,7 +352,7 @@ export function StaffAttendance({ initialTab }: StaffAttendanceProps) {
                             <span className="text-xs text-gray-400 dark:text-gray-500 font-mono w-6 text-center">
                               {index + 1}
                             </span>
-                            <Avatar className="h-8 w-8 flex-shrink-0">
+                            <Avatar className="size-8 flex-shrink-0">
                               <AvatarFallback className="text-[10px] font-semibold bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400">
                                 {getInitials(staff.staffName)}
                               </AvatarFallback>
@@ -406,7 +406,7 @@ export function StaffAttendance({ initialTab }: StaffAttendanceProps) {
         <div className="flex items-center gap-3 w-full sm:w-auto">
           {hasChanges ? (
             <div className="flex items-center gap-3">
-              <div className="h-2 w-2 bg-indigo-500 rounded-full animate-ping" />
+              <div className="size-2 bg-indigo-500 rounded-full animate-ping" />
               <span className="text-xs font-bold text-indigo-500 uppercase tracking-widest">
                 {Object.keys(pendingChanges).length} Pending in{" "}
                 {activeTab === "teacher" ? "Teachers" : "Staff"}
@@ -427,7 +427,7 @@ export function StaffAttendance({ initialTab }: StaffAttendanceProps) {
             "Syncing..."
           ) : (
             <span className="flex items-center justify-center gap-2 tracking-wide">
-              <Save className="h-4 w-4" /> Save {activeTab} Attendance
+              <Save className="size-4" /> Save {activeTab} Attendance
             </span>
           )}
         </Button>

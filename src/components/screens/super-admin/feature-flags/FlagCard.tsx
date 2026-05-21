@@ -32,13 +32,13 @@ export function FlagCard({
         <div className="flex items-start justify-between gap-4">
           <div className="flex items-start gap-4 min-w-0 flex-1">
             <div
-              className={`h-12 w-12 rounded-2xl flex items-center justify-center shrink-0 transition-all duration-500 ${
+              className={`size-12 rounded-2xl flex items-center justify-center shrink-0 transition-all duration-500 ${
                 flag.enabled
                   ? "bg-emerald-500 text-white shadow-lg shadow-emerald-200 dark:shadow-none rotate-0"
                   : "bg-gray-100 dark:bg-gray-800 text-gray-400 rotate-12"
               }`}
             >
-              <IconComp className="h-6 w-6" />
+              <IconComp className="size-6" />
             </div>
             <div className="min-w-0 flex-1 pt-1">
               <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100 truncate uppercase tracking-widest">
@@ -68,11 +68,11 @@ export function FlagCard({
           >
             {flag.enabled ? (
               <>
-                <ToggleRight className="h-3 w-3 mr-1.5" /> Live
+                <ToggleRight className="size-3 mr-1.5" /> Live
               </>
             ) : (
               <>
-                <ToggleLeft className="h-3 w-3 mr-1.5" /> Off
+                <ToggleLeft className="size-3 mr-1.5" /> Off
               </>
             )}
           </Badge>

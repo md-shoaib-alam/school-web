@@ -230,25 +230,25 @@ export function TeacherGrades() {
     {
       label: "Total Assessments",
       value: assessments.length,
-      icon: <ClipboardList className="h-5 w-5" />,
+      icon: <ClipboardList className="size-5" />,
       color: "bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400",
     },
     {
       label: "Class Average",
       value: selectedAssessmentId ? `${classAvg} / ${maxMarks}` : "N/A",
-      icon: <GraduationCap className="h-5 w-5" />,
+      icon: <GraduationCap className="size-5" />,
       color: "bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600 dark:text-indigo-400",
     },
     {
       label: "Passing Ratio",
       value: selectedAssessmentId && marksArray.length > 0 ? `${passPct}%` : "N/A",
-      icon: <Trophy className="h-5 w-5" />,
+      icon: <Trophy className="size-5" />,
       color: "bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400",
     },
     {
       label: "Students Evaluated",
       value: selectedAssessmentId ? `${marksArray.length} / ${students.length}` : students.length,
-      icon: <Users className="h-5 w-5" />,
+      icon: <Users className="size-5" />,
       color: "bg-violet-50 dark:bg-violet-900/20 text-violet-600 dark:text-violet-400",
     },
   ];
@@ -409,14 +409,14 @@ export function TeacherGrades() {
           <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
             <DialogTrigger asChild>
               <Button className="bg-blue-600 hover:bg-blue-700 text-white shadow-md font-semibold transition-all hover:translate-y-[-1px] group">
-                <Plus className="h-4 w-4 mr-2 group-hover:rotate-90 transition-all duration-200" />
+                <Plus className="size-4 mr-2 group-hover:rotate-90 transition-all duration-200" />
                 Create Assessment
               </Button>
             </DialogTrigger>
             <DialogContent className="sm:max-w-[425px] rounded-2xl">
               <DialogHeader>
                 <DialogTitle className="flex items-center gap-2 text-xl font-semibold">
-                  <Sparkles className="h-5 w-5 text-blue-500" />
+                  <Sparkles className="size-5 text-blue-500" />
                   New Assessment
                 </DialogTitle>
               </DialogHeader>
@@ -540,7 +540,7 @@ export function TeacherGrades() {
                   disabled={isCreating || !newTitle.trim()}
                   className="w-full bg-blue-600 hover:bg-blue-700 text-white"
                 >
-                  {isCreating ? <Loader2 className="h-4 w-4 animate-spin" /> : "Create Assessment"}
+                  {isCreating ? <Loader2 className="size-4 animate-spin" /> : "Create Assessment"}
                 </Button>
               </DialogFooter>
             </DialogContent>
@@ -552,7 +552,7 @@ export function TeacherGrades() {
         {/* Read-only banner */}
         {!canCreate && !canEdit && !canDelete && (
           <div className="flex items-center gap-2 rounded-lg border border-amber-200 dark:border-amber-800 bg-amber-50 dark:bg-amber-900/20 px-3 py-2">
-            <Eye className="h-4 w-4 text-amber-600 dark:text-amber-400 shrink-0" />
+            <Eye className="size-4 text-amber-600 dark:text-amber-400 shrink-0" />
             <span className="text-xs text-amber-700 dark:text-amber-300 font-medium">
               Read-only mode — you have view permission only for this module.
             </span>
@@ -574,7 +574,7 @@ export function TeacherGrades() {
                 : "border-transparent text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
             }`}
           >
-            <Clock className={`h-4 w-4 ${activeTab === "active" ? "text-blue-500" : ""}`} />
+            <Clock className={`size-4 ${activeTab === "active" ? "text-blue-500" : ""}`} />
             <span>Active</span>
             {!listLoading && activeTab === "active" && assessments.length > 0 && (
               <Badge className="bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300 border-blue-100 dark:border-blue-900/50 font-medium px-1.5 py-0 text-[10px] pointer-events-none rounded-full transition-all">
@@ -593,7 +593,7 @@ export function TeacherGrades() {
                 : "border-transparent text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
             }`}
           >
-            <CheckCircle2 className={`h-4 w-4 ${activeTab === "completed" ? "text-emerald-500" : ""}`} />
+            <CheckCircle2 className={`size-4 ${activeTab === "completed" ? "text-emerald-500" : ""}`} />
             <span>Completed / Finalized</span>
             {!listLoading && activeTab === "completed" && assessments.length > 0 && (
               <Badge className="bg-emerald-50 text-emerald-700 dark:bg-emerald-950/20 dark:text-emerald-300 border-emerald-100 dark:border-emerald-900/50 font-medium px-1.5 py-0 text-[10px] pointer-events-none rounded-full transition-all">
@@ -660,7 +660,7 @@ export function TeacherGrades() {
                         variant="outline"
                         className="text-[10px] bg-emerald-50 text-emerald-700 border-emerald-100/60 dark:bg-emerald-950/20 dark:text-emerald-300 dark:border-emerald-900/50 font-medium px-2 py-0.5 flex items-center gap-1 border rounded-full shrink-0"
                       >
-                        <CheckCircle2 className="h-2.5 w-2.5" />
+                        <CheckCircle2 className="size-2.5" />
                         Completed
                       </Badge>
                     )}
@@ -668,13 +668,13 @@ export function TeacherGrades() {
 
                   <div className="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400 mb-3">
                     <span className="flex items-center gap-1">
-                      <FileText className="h-3 w-3" /> {a.type}
+                      <FileText className="size-3" /> {a.type}
                     </span>
                     <Badge
                       variant="outline"
                       className={`text-[10px] font-medium px-2 py-0.5 flex items-center gap-1 border rounded-full bg-indigo-50 text-indigo-700 border-indigo-100/60 dark:bg-indigo-950/20 dark:text-indigo-300 dark:border-indigo-900/50`}
                     >
-                      <Globe className="h-2.5 w-2.5" /> Offline
+                      <Globe className="size-2.5" /> Offline
                     </Badge>
                   </div>
 
@@ -689,7 +689,7 @@ export function TeacherGrades() {
                     </div>
                     <Progress value={pct} className="h-2" />
                     <div className="flex items-center gap-1.5 text-xs text-gray-500 dark:text-gray-400 mt-1">
-                      <Users className="h-3 w-3" />
+                      <Users className="size-3" />
                       {totalStudents - gradedCount} students haven't submitted
                     </div>
                   </div>
@@ -701,7 +701,7 @@ export function TeacherGrades() {
                       className="w-full text-xs gap-1.5"
                       onClick={() => setSelectedAssessmentId(a.id)}
                     >
-                      <Eye className="h-3.5 w-3.5" />
+                      <Eye className="size-3.5" />
                       {isCompleted ? "View Final Scores" : "View Submissions"} ({gradedCount})
                     </Button>
                     <Button
@@ -716,9 +716,9 @@ export function TeacherGrades() {
                       disabled={isCompleted || completingId === a.id}
                     >
                       {completingId === a.id ? (
-                        <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                        <Loader2 className="size-3.5 animate-spin" />
                       ) : (
-                        <Check className="h-3.5 w-3.5" />
+                        <Check className="size-3.5" />
                       )}
                       {isCompleted ? "Finalized / Completed" : "Mark Complete"}
                     </Button>
@@ -745,7 +745,7 @@ export function TeacherGrades() {
           <DialogContent className="sm:max-w-2xl max-h-[85vh] overflow-hidden flex flex-col">
             <DialogHeader>
               <DialogTitle className="flex items-center gap-2">
-                <ClipboardList className="h-4 w-4 text-blue-600" />
+                <ClipboardList className="size-4 text-blue-600" />
                 {activeAssessment?.title || "Record Scores"}
               </DialogTitle>
               <DialogDescription>
@@ -761,7 +761,7 @@ export function TeacherGrades() {
               </div>
             ) : students.length === 0 ? (
               <div className="py-12 text-center text-gray-400 dark:text-gray-500">
-                <Users className="h-10 w-10 mx-auto mb-2 opacity-40" />
+                <Users className="size-10 mx-auto mb-2 opacity-40" />
                 <p className="text-sm">No students found</p>
                 <p className="text-xs mt-1">
                   There are no students in this class.
@@ -896,12 +896,12 @@ export function TeacherGrades() {
                     >
                       {saving ? (
                         <>
-                          <Loader2 className="h-4 w-4 animate-spin" />
+                          <Loader2 className="size-4 animate-spin" />
                           Saving grades...
                         </>
                       ) : (
                         <>
-                          <Save className="h-4 w-4 mr-1" />
+                          <Save className="size-4 mr-1" />
                           Save All Entered Grades
                         </>
                       )}
@@ -918,9 +918,9 @@ export function TeacherGrades() {
           <div className="text-center py-16 bg-gray-50/40 dark:bg-gray-900/10 rounded-xl border border-dashed border-border flex flex-col items-center justify-center animate-in fade-in-50 duration-500">
             <div className={`${activeTab === "active" ? "bg-blue-50 dark:bg-blue-900/20" : "bg-emerald-50 dark:bg-emerald-900/20"} p-4 rounded-full mb-4`}>
               {activeTab === "active" ? (
-                <FileText className="h-10 w-10 text-blue-600 dark:text-blue-400 opacity-90" />
+                <FileText className="size-10 text-blue-600 dark:text-blue-400 opacity-90" />
               ) : (
-                <CheckCircle2 className="h-10 w-10 text-emerald-600 dark:text-emerald-400 opacity-90" />
+                <CheckCircle2 className="size-10 text-emerald-600 dark:text-emerald-400 opacity-90" />
               )}
             </div>
             <h3 className="text-lg font-semibold text-foreground">
@@ -936,7 +936,7 @@ export function TeacherGrades() {
                 onClick={() => setIsDialogOpen(true)}
                 className="mt-4 bg-blue-600 hover:bg-blue-700 text-white font-semibold shadow-md transition-all duration-200"
               >
-                <Plus className="h-4 w-4 mr-2" />
+                <Plus className="size-4 mr-2" />
                 Create First Assessment
               </Button>
             )}
@@ -946,7 +946,7 @@ export function TeacherGrades() {
         {/* Empty State: No Students Found */}
         {selectedAssessmentId && students.length === 0 && (
           <div className="text-center py-16 text-gray-400 dark:text-gray-500">
-            <BookOpen className="h-12 w-12 mx-auto mb-4 opacity-50" />
+            <BookOpen className="size-12 mx-auto mb-4 opacity-50" />
             <p>No students found in this class</p>
           </div>
         )}
@@ -956,7 +956,7 @@ export function TeacherGrades() {
           <AlertDialogContent>
             <AlertDialogHeader>
               <AlertDialogTitle className="flex items-center gap-2">
-                <AlertTriangle className="h-5 w-5 text-amber-500 fill-amber-500/10" /> Finalize Assessment?
+                <AlertTriangle className="size-5 text-amber-500 fill-amber-500/10" /> Finalize Assessment?
               </AlertDialogTitle>
               <AlertDialogDescription className="py-1 text-sm">
                 Once you mark this assessment as complete, all student scores will be locked and finalized. You will not be able to edit or save changes to the grades in the future. Are you sure you want to proceed?

@@ -57,7 +57,7 @@ export function StatusCards({ loading, data, onNavigate }: StatusCardsProps) {
       <Card className="border-none shadow-sm bg-white dark:bg-gray-800">
         <CardHeader>
           <CardTitle className="text-base font-bold flex items-center gap-2">
-            <Building2 className="h-4 w-4 text-emerald-600" /> Tenant Status
+            <Building2 className="size-4 text-emerald-600" /> Tenant Status
           </CardTitle>
           <CardDescription className="text-xs">Active, trial, and suspended schools</CardDescription>
         </CardHeader>
@@ -70,8 +70,8 @@ export function StatusCards({ loading, data, onNavigate }: StatusCardsProps) {
             <>
               <div className="flex items-center justify-between p-3.5 rounded-2xl bg-emerald-50/50 dark:bg-emerald-900/20 border border-emerald-100 dark:border-emerald-800/50 group hover:scale-[1.02] transition-transform">
                 <div className="flex items-center gap-3">
-                  <div className="h-10 w-10 rounded-xl bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center">
-                    <CheckCircle2 className="h-5 w-5 text-emerald-600" />
+                  <div className="size-10 rounded-xl bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center">
+                    <CheckCircle2 className="size-5 text-emerald-600" />
                   </div>
                   <div>
                     <p className="text-sm font-black text-emerald-900 dark:text-emerald-100">Active</p>
@@ -83,8 +83,8 @@ export function StatusCards({ loading, data, onNavigate }: StatusCardsProps) {
 
               <div className="flex items-center justify-between p-3.5 rounded-2xl bg-purple-50/50 dark:bg-purple-900/20 border border-purple-100 dark:border-purple-800/50 group hover:scale-[1.02] transition-transform">
                 <div className="flex items-center gap-3">
-                  <div className="h-10 w-10 rounded-xl bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center">
-                    <Clock className="h-5 w-5 text-purple-600" />
+                  <div className="size-10 rounded-xl bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center">
+                    <Clock className="size-5 text-purple-600" />
                   </div>
                   <div>
                     <p className="text-sm font-black text-purple-900 dark:text-purple-100">Trial</p>
@@ -96,8 +96,8 @@ export function StatusCards({ loading, data, onNavigate }: StatusCardsProps) {
 
               <div className="flex items-center justify-between p-3.5 rounded-2xl bg-red-50/50 dark:bg-red-900/20 border border-red-100 dark:border-red-800/50 group hover:scale-[1.02] transition-transform">
                 <div className="flex items-center gap-3">
-                  <div className="h-10 w-10 rounded-xl bg-red-100 dark:bg-red-900/30 flex items-center justify-center">
-                    <AlertTriangle className="h-5 w-5 text-red-600" />
+                  <div className="size-10 rounded-xl bg-red-100 dark:bg-red-900/30 flex items-center justify-center">
+                    <AlertTriangle className="size-5 text-red-600" />
                   </div>
                   <div>
                     <p className="text-sm font-black text-red-900 dark:text-red-100">Suspended</p>
@@ -115,7 +115,7 @@ export function StatusCards({ loading, data, onNavigate }: StatusCardsProps) {
       <Card className="border-none shadow-sm bg-white dark:bg-gray-800">
         <CardHeader>
           <CardTitle className="text-base font-bold flex items-center gap-2">
-            <Users className="h-4 w-4 text-emerald-600" /> User Distribution
+            <Users className="size-4 text-emerald-600" /> User Distribution
           </CardTitle>
           <CardDescription className="text-xs">Breakdown by role across all schools</CardDescription>
         </CardHeader>
@@ -154,7 +154,7 @@ export function StatusCards({ loading, data, onNavigate }: StatusCardsProps) {
                   <div key={item.name} className="p-2.5 rounded-xl bg-gray-50 dark:bg-gray-900/50 border border-gray-100 dark:border-gray-800/50 text-center group">
                     <p className="text-lg font-black text-gray-900 dark:text-gray-100 leading-none mb-1 group-hover:scale-110 transition-transform">{item.value.toLocaleString()}</p>
                     <div className="flex items-center justify-center gap-1.5">
-                      <div className="h-2 w-2 rounded-full" style={{ backgroundColor: item.fill }} />
+                      <div className="size-2 rounded-full" style={{ backgroundColor: item.fill }} />
                       <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">{item.name}</span>
                     </div>
                   </div>
@@ -169,41 +169,41 @@ export function StatusCards({ loading, data, onNavigate }: StatusCardsProps) {
       <Card className="border-none shadow-sm bg-white dark:bg-gray-800">
         <CardHeader>
           <CardTitle className="text-base font-bold flex items-center gap-2">
-            <Zap className="h-4 w-4 text-emerald-600" /> Quick Actions
+            <Zap className="size-4 text-emerald-600" /> Quick Actions
           </CardTitle>
           <CardDescription className="text-xs">Frequent administrative operations</CardDescription>
         </CardHeader>
         <CardContent className="space-y-3">
           <ActionButton 
-            icon={<Plus className="h-4 w-4" />} 
+            icon={<Plus className="size-4" />} 
             label="Add New School" 
             sub="Register a new tenant" 
             color="bg-emerald-600"
             onClick={() => onNavigate("tenants")}
           />
           <ActionButton 
-            icon={<IndianRupee className="h-4 w-4" />} 
+            icon={<IndianRupee className="size-4" />} 
             label="View Billing" 
             sub="Revenue & invoices" 
             color="bg-violet-600"
             onClick={() => onNavigate("billing")}
           />
           <ActionButton 
-            icon={<FileDown className="h-4 w-4" />} 
+            icon={<FileDown className="size-4" />} 
             label="Export Report" 
             sub="Download analytics" 
             color="bg-amber-600"
             onClick={() => onNavigate("platform-analytics")}
           />
           <ActionButton 
-            icon={<UserCog className="h-4 w-4" />} 
+            icon={<UserCog className="size-4" />} 
             label="Manage Users" 
             sub="Platform staff" 
             color="bg-teal-600"
             onClick={() => onNavigate("users")}
           />
           <ActionButton 
-            icon={<ClipboardList className="h-4 w-4" />} 
+            icon={<ClipboardList className="size-4" />} 
             label="Audit Logs" 
             sub="Security & activity" 
             color="bg-gray-700"
@@ -222,14 +222,14 @@ function ActionButton({ icon, label, sub, color, onClick }: any) {
       className="w-full justify-start gap-4 h-[60px] rounded-2xl border-2 border-gray-100 dark:border-gray-800 hover:border-emerald-500/30 hover:bg-emerald-50/10 transition-all group"
       onClick={onClick}
     >
-      <div className={`h-10 w-10 rounded-xl ${color} flex items-center justify-center text-white shadow-lg shadow-${color.split('-')[1]}-200 dark:shadow-none group-hover:scale-110 transition-transform`}>
+      <div className={`size-10 rounded-xl ${color} flex items-center justify-center text-white shadow-lg shadow-${color.split('-')[1]}-200 dark:shadow-none group-hover:scale-110 transition-transform`}>
         {icon}
       </div>
       <div className="text-left flex-1 min-w-0">
         <p className="font-black text-sm text-gray-900 dark:text-gray-100">{label}</p>
         <p className="text-[10px] text-muted-foreground font-bold uppercase tracking-widest">{sub}</p>
       </div>
-      <ArrowUpRight className="h-4 w-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-all -translate-x-2 group-hover:translate-x-0" />
+      <ArrowUpRight className="size-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-all -translate-x-2 group-hover:translate-x-0" />
     </Button>
   );
 }

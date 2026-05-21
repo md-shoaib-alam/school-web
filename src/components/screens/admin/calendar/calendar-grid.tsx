@@ -32,7 +32,7 @@ export function CalendarGrid({
           ))}
           {Array.from({ length: 35 }).map((_, i) => (
             <div key={i} className="aspect-square flex items-center justify-center">
-              <Skeleton className="h-9 w-9 rounded-full" />
+              <Skeleton className="size-9 rounded-full" />
             </div>
           ))}
         </div>
@@ -69,7 +69,7 @@ export function CalendarGrid({
                 type="button"
                 onClick={() => setSelectedDate(dateStr)}
                 className={`
-                  relative h-9 w-9 sm:h-11 sm:w-11 flex flex-col items-center justify-center rounded-full text-sm font-medium 
+                  relative size-9 sm:size-11 flex flex-col items-center justify-center rounded-full text-sm font-medium 
                   transition-all duration-200 active:scale-90 group cursor-pointer
                   ${!inCurrentMonth ? "text-slate-300 dark:text-slate-700 opacity-40" : "text-slate-700 dark:text-slate-200"}
                   ${isSelected 
@@ -88,7 +88,7 @@ export function CalendarGrid({
                     {dayEvents.slice(0, 3).map((ev, i) => (
                       <span 
                         key={ev.id} 
-                        className={`w-1 h-1 rounded-full ${isSelected ? "bg-white" : ""}`}
+                        className={`size-1 rounded-full ${isSelected ? "bg-white" : ""}`}
                         style={!isSelected ? { backgroundColor: ev.color || EVENT_TYPE_COLORS[ev.type] || "#3b82f6" } : undefined}
                       />
                     ))}

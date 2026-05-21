@@ -205,8 +205,8 @@ export function UserProfileScreen() {
       {/* 1. Stunning Hero Section */}
       <div className={`relative overflow-hidden rounded-3xl bg-gradient-to-r ${roleGradients[currentUser.role]} p-6 md:p-8 text-white shadow-xl`}>
         {/* Decorative dynamic glows */}
-        <div className="absolute -right-20 -top-20 h-60 w-60 rounded-full bg-white/10 blur-3xl pointer-events-none" />
-        <div className="absolute -left-20 -bottom-20 h-60 w-60 rounded-full bg-black/20 blur-3xl pointer-events-none" />
+        <div className="absolute -right-20 -top-20 size-60 rounded-full bg-white/10 blur-3xl pointer-events-none" />
+        <div className="absolute -left-20 -bottom-20 size-60 rounded-full bg-black/20 blur-3xl pointer-events-none" />
 
         <div className="relative flex flex-col md:flex-row items-center md:items-start gap-6 z-10">
           {/* Avatar Ring with Hover Edit */}
@@ -215,7 +215,7 @@ export function UserProfileScreen() {
             className="relative group cursor-pointer shrink-0"
             title="Click to edit profile"
           >
-            <Avatar className="h-24 w-24 border-4 border-white/30 shadow-2xl transition-all duration-300 group-hover:scale-105 group-hover:border-white/50">
+            <Avatar className="size-24 border-4 border-white/30 shadow-2xl transition-all duration-300 group-hover:scale-105 group-hover:border-white/50">
               <AvatarImage src={currentUser.avatar} alt={currentUser.name} className="object-cover animate-in fade-in" />
               <AvatarFallback className="text-3xl font-extrabold bg-white text-slate-800">
                 {initials}
@@ -223,12 +223,12 @@ export function UserProfileScreen() {
             </Avatar>
             {/* Hover overlay */}
             <div className="absolute inset-0 bg-black/40 rounded-full flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200 border-4 border-transparent">
-              <Camera className="h-5 w-5 text-white transition-transform duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-110" />
+              <Camera className="size-5 text-white transition-transform duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-110" />
               <span className="text-[9px] font-black text-white uppercase tracking-widest mt-1">Change</span>
             </div>
-            <span className="absolute bottom-1 right-1 flex h-4 w-4">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-4 w-4 bg-green-500 border-2 border-white"></span>
+            <span className="absolute bottom-1 right-1 flex size-4">
+              <span className="animate-ping absolute inline-flex size-full rounded-full bg-green-400 opacity-75"></span>
+              <span className="relative inline-flex rounded-full size-4 bg-green-500 border-2 border-white"></span>
             </span>
           </div>
 
@@ -238,7 +238,7 @@ export function UserProfileScreen() {
               <div>
                 <h1 className="text-3xl font-semibold tracking-tight">{currentUser.name}</h1>
                 <p className="text-white/80 font-medium text-sm flex items-center justify-center md:justify-start gap-1.5 mt-1">
-                  <Mail className="h-3.5 w-3.5" /> {currentUser.email}
+                  <Mail className="size-3.5" /> {currentUser.email}
                 </p>
               </div>
               <div className="flex justify-center gap-2">
@@ -257,13 +257,13 @@ export function UserProfileScreen() {
 
             <div className="flex flex-col sm:flex-row gap-4 items-center justify-between text-xs text-white/95">
               <div className="flex items-center gap-2">
-                <Building2 className="h-4 w-4 text-white/70" />
+                <Building2 className="size-4 text-white/70" />
                 <span className="font-semibold">
                   School: {currentUser.role === "super_admin" ? "SaaS Platform Management" : currentTenantName || currentUser.tenantName || "NutKhut School"}
                 </span>
               </div>
               <div className="flex items-center gap-2">
-                <Clock className="h-4 w-4 text-white/70" />
+                <Clock className="size-4 text-white/70" />
                 <span>Verified Account Logged In</span>
               </div>
             </div>
@@ -281,14 +281,14 @@ export function UserProfileScreen() {
                 value="overview" 
                 className="rounded-xl font-bold text-xs sm:text-sm gap-2 transition-all duration-200 hover:text-emerald-600 dark:hover:text-emerald-400 data-[state=active]:bg-white dark:data-[state=active]:bg-zinc-950 data-[state=active]:text-emerald-600 dark:data-[state=active]:text-emerald-400 data-[state=active]:shadow-md hover:scale-[1.01] active:scale-[0.99]"
               >
-                <User className="h-4 w-4" />
+                <User className="size-4" />
                 Overview
               </TabsTrigger>
               <TabsTrigger 
                 value="settings" 
                 className="rounded-xl font-bold text-xs sm:text-sm gap-2 transition-all duration-200 hover:text-emerald-600 dark:hover:text-emerald-400 data-[state=active]:bg-white dark:data-[state=active]:bg-zinc-950 data-[state=active]:text-emerald-600 dark:data-[state=active]:text-emerald-400 data-[state=active]:shadow-md hover:scale-[1.01] active:scale-[0.99]"
               >
-                <Palette className="h-4 w-4" />
+                <Palette className="size-4" />
                 Security & Themes
               </TabsTrigger>
             </TabsList>
@@ -307,7 +307,7 @@ export function UserProfileScreen() {
                         onClick={handleCopySchoolUrl}
                         className="bg-indigo-600 hover:bg-indigo-700 dark:bg-indigo-500 dark:hover:bg-indigo-600 text-white font-bold rounded-xl text-xs gap-1.5 h-9 w-full sm:w-auto justify-center transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md hover:shadow-indigo-500/25 active:translate-y-0 active:scale-[0.98]"
                       >
-                        <Share2 className="h-3.5 w-3.5" />
+                        <Share2 className="size-3.5" />
                         {copiedField === "SchoolUrl" ? "Copied URL!" : "Copy School Portal URL"}
                       </Button>
                     )}
@@ -331,9 +331,9 @@ export function UserProfileScreen() {
                         variant="ghost"
                         size="icon"
                         onClick={() => handleCopy(currentUser.name, "Name")}
-                        className="h-7 w-7 absolute right-2 top-1/2 -translate-y-1/2 text-emerald-800/80 hover:text-emerald-950 dark:text-emerald-400/80 dark:hover:text-emerald-200 hover:bg-emerald-100/60 dark:hover:bg-emerald-900/40 rounded-lg transition-all duration-200 hover:scale-105 active:scale-95"
+                        className="size-7 absolute right-2 top-1/2 -translate-y-1/2 text-emerald-800/80 hover:text-emerald-950 dark:text-emerald-400/80 dark:hover:text-emerald-200 hover:bg-emerald-100/60 dark:hover:bg-emerald-900/40 rounded-lg transition-all duration-200 hover:scale-105 active:scale-95"
                       >
-                        {copiedField === "Name" ? <Check className="h-3.5 w-3.5 text-green-500" /> : <Copy className="h-3.5 w-3.5" />}
+                        {copiedField === "Name" ? <Check className="size-3.5 text-green-500" /> : <Copy className="size-3.5" />}
                       </Button>
                     </div>
 
@@ -348,9 +348,9 @@ export function UserProfileScreen() {
                         variant="ghost"
                         size="icon"
                         onClick={() => handleCopy(currentUser.email, "Email")}
-                        className="h-7 w-7 absolute right-2 top-1/2 -translate-y-1/2 text-emerald-800/80 hover:text-emerald-950 dark:text-emerald-400/80 dark:hover:text-emerald-200 hover:bg-emerald-100/60 dark:hover:bg-emerald-900/40 rounded-lg transition-all duration-200 hover:scale-105 active:scale-95"
+                        className="size-7 absolute right-2 top-1/2 -translate-y-1/2 text-emerald-800/80 hover:text-emerald-950 dark:text-emerald-400/80 dark:hover:text-emerald-200 hover:bg-emerald-100/60 dark:hover:bg-emerald-900/40 rounded-lg transition-all duration-200 hover:scale-105 active:scale-95"
                       >
-                        {copiedField === "Email" ? <Check className="h-3.5 w-3.5 text-green-500" /> : <Copy className="h-3.5 w-3.5" />}
+                        {copiedField === "Email" ? <Check className="size-3.5 text-green-500" /> : <Copy className="size-3.5" />}
                       </Button>
                     </div>
 
@@ -358,7 +358,7 @@ export function UserProfileScreen() {
                     <div className="p-4 bg-gray-50/50 dark:bg-[#0c0c0e]/30 border border-gray-200/50 dark:border-zinc-800/50 rounded-xl space-y-1">
                       <p className="text-[10px] uppercase font-bold text-gray-500 dark:text-zinc-400">Primary Authority Role</p>
                       <div className="flex items-center gap-1.5 mt-0.5">
-                        <Shield className="h-4 w-4 text-emerald-500" />
+                        <Shield className="size-4 text-emerald-500" />
                         <span className="text-sm font-semibold text-gray-900 dark:text-gray-100 capitalize">{currentUser.role.replace("_", " ")}</span>
                       </div>
                     </div>
@@ -367,7 +367,7 @@ export function UserProfileScreen() {
                     <div className="p-4 bg-gray-50/50 dark:bg-[#0c0c0e]/30 border border-gray-200/50 dark:border-zinc-800/50 rounded-xl space-y-1 relative group">
                       <p className="text-[10px] uppercase font-bold text-gray-500 dark:text-zinc-400">Mobile Number</p>
                       <div className="flex items-center gap-1.5 mt-0.5 pr-6">
-                        <Phone className="h-4 w-4 text-blue-500" />
+                        <Phone className="size-4 text-blue-500" />
                         <span className="text-sm font-semibold text-gray-900 dark:text-gray-100">
                           {currentUser.phone || "+91 98765 43210"}
                         </span>
@@ -377,10 +377,10 @@ export function UserProfileScreen() {
                         variant="ghost"
                         size="icon"
                         onClick={() => handleCopy(currentUser.phone || "+91 98765 43210", "Mobile Number")}
-                        className="h-7 w-7 absolute right-2 top-1/2 -translate-y-1/2 text-emerald-800/80 hover:text-emerald-950 dark:text-emerald-400/80 dark:hover:text-emerald-200 hover:bg-emerald-100/60 dark:hover:bg-emerald-900/40 rounded-lg transition-all duration-200 hover:scale-105 active:scale-95"
+                        className="size-7 absolute right-2 top-1/2 -translate-y-1/2 text-emerald-800/80 hover:text-emerald-950 dark:text-emerald-400/80 dark:hover:text-emerald-200 hover:bg-emerald-100/60 dark:hover:bg-emerald-900/40 rounded-lg transition-all duration-200 hover:scale-105 active:scale-95"
                         title="Copy Mobile"
                       >
-                        {copiedField === "Mobile Number" ? <Check className="h-3.5 w-3.5 text-green-500" /> : <Copy className="h-3.5 w-3.5" />}
+                        {copiedField === "Mobile Number" ? <Check className="size-3.5 text-green-500" /> : <Copy className="size-3.5" />}
                       </Button>
                     </div>
 
@@ -388,7 +388,7 @@ export function UserProfileScreen() {
                     <div className="p-4 bg-gray-50/50 dark:bg-[#0c0c0e]/30 border border-gray-200/50 dark:border-zinc-800/50 rounded-xl space-y-1 relative group md:col-span-2">
                       <p className="text-[10px] uppercase font-bold text-gray-500 dark:text-zinc-400">Residential Address</p>
                       <div className="flex items-start gap-1.5 mt-0.5 pr-6">
-                        <MapPin className="h-4 w-4 text-rose-500 shrink-0 mt-0.5" />
+                        <MapPin className="size-4 text-rose-500 shrink-0 mt-0.5" />
                         <span className="text-sm font-semibold text-gray-900 dark:text-gray-100 leading-normal">
                           {currentUser.address || "7/A, Sector-4, HSR Layout, Bangalore, India"}
                         </span>
@@ -398,10 +398,10 @@ export function UserProfileScreen() {
                         variant="ghost"
                         size="icon"
                         onClick={() => handleCopy(currentUser.address || "7/A, Sector-4, HSR Layout, Bangalore, India", "Address")}
-                        className="h-7 w-7 absolute right-2 top-1/2 -translate-y-1/2 text-emerald-800/80 hover:text-emerald-950 dark:text-emerald-400/80 dark:hover:text-emerald-200 hover:bg-emerald-100/60 dark:hover:bg-emerald-900/40 rounded-lg transition-all duration-200 hover:scale-105 active:scale-95"
+                        className="size-7 absolute right-2 top-1/2 -translate-y-1/2 text-emerald-800/80 hover:text-emerald-950 dark:text-emerald-400/80 dark:hover:text-emerald-200 hover:bg-emerald-100/60 dark:hover:bg-emerald-900/40 rounded-lg transition-all duration-200 hover:scale-105 active:scale-95"
                         title="Copy Address"
                       >
-                        {copiedField === "Address" ? <Check className="h-3.5 w-3.5 text-green-500" /> : <Copy className="h-3.5 w-3.5" />}
+                        {copiedField === "Address" ? <Check className="size-3.5 text-green-500" /> : <Copy className="size-3.5" />}
                       </Button>
                     </div>
 
@@ -422,7 +422,7 @@ export function UserProfileScreen() {
                               variant="outline"
                               className="h-8 border-indigo-500/25 hover:bg-indigo-500/10 dark:hover:bg-indigo-500/20 text-indigo-600 dark:text-indigo-400 text-xs font-bold rounded-lg shrink-0 gap-1.5 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-sm active:translate-y-0 active:scale-[0.97]"
                             >
-                              {copiedField === "SchoolUrl" ? <Check className="h-3.5 w-3.5 text-green-500" /> : <Copy className="h-3.5 w-3.5" />}
+                              {copiedField === "SchoolUrl" ? <Check className="size-3.5 text-green-500" /> : <Copy className="size-3.5" />}
                               Copy URL
                             </Button>
                           </div>
@@ -435,9 +435,9 @@ export function UserProfileScreen() {
                             variant="ghost"
                             size="icon"
                             onClick={() => handleCopy(currentTenantSlug || currentUser.tenantSlug || "", "School Identifier")}
-                            className="h-10 w-10 sm:h-7 sm:w-7 absolute right-2 top-1/2 -translate-y-1/2 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity"
+                            className="size-10 sm:size-7 absolute right-2 top-1/2 -translate-y-1/2 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity"
                           >
-                            {copiedField === "School Identifier" ? <Check className="h-4 w-4 sm:h-3.5 sm:w-3.5 text-green-500" /> : <Copy className="h-4 w-4 sm:h-3.5 sm:w-3.5" />}
+                            {copiedField === "School Identifier" ? <Check className="size-4 sm:size-3.5 text-green-500" /> : <Copy className="size-4 sm:size-3.5" />}
                           </Button>
                         </div>
 
@@ -447,7 +447,7 @@ export function UserProfileScreen() {
 
                   {/* Motivational Quote banner */}
                   <div className="p-4 bg-gradient-to-br from-indigo-50 to-indigo-100/50 dark:from-indigo-950/20 dark:to-slate-900 border border-indigo-100 dark:border-indigo-950/50 rounded-2xl flex items-start gap-3 mt-6">
-                    <CheckCircle2 className="h-5 w-5 text-indigo-600 dark:text-indigo-400 shrink-0 mt-0.5" />
+                    <CheckCircle2 className="size-5 text-indigo-600 dark:text-indigo-400 shrink-0 mt-0.5" />
                     <div>
                       <p className="text-sm font-semibold text-indigo-950 dark:text-indigo-200">Role Purpose & Duty</p>
                       <p className="text-xs text-indigo-700 dark:text-indigo-300/85 mt-1 leading-relaxed italic">
@@ -481,7 +481,7 @@ export function UserProfileScreen() {
                         onClick={() => setTheme("light")}
                         className="h-20 flex flex-col gap-2 rounded-xl justify-center items-center font-bold"
                       >
-                        <Sun className="h-5 w-5 text-amber-500" />
+                        <Sun className="size-5 text-amber-500" />
                         <span className="text-xs">Light Theme</span>
                       </Button>
                       <Button
@@ -489,7 +489,7 @@ export function UserProfileScreen() {
                         onClick={() => setTheme("dark")}
                         className="h-20 flex flex-col gap-2 rounded-xl justify-center items-center font-bold"
                       >
-                        <Moon className="h-5 w-5 text-blue-400" />
+                        <Moon className="size-5 text-blue-400" />
                         <span className="text-xs">Dark Theme</span>
                       </Button>
                       <Button
@@ -497,7 +497,7 @@ export function UserProfileScreen() {
                         onClick={() => setTheme("system")}
                         className="h-20 flex flex-col gap-2 rounded-xl justify-center items-center font-bold"
                       >
-                        <Laptop className="h-5 w-5 text-slate-500" />
+                        <Laptop className="size-5 text-slate-500" />
                         <span className="text-xs">System Default</span>
                       </Button>
                     </div>
@@ -509,7 +509,7 @@ export function UserProfileScreen() {
                   <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 p-4 bg-gray-50 dark:bg-zinc-950 border border-gray-200/50 dark:border-zinc-800/50 rounded-2xl">
                     <div className="space-y-1">
                       <div className="flex items-center gap-2">
-                        <Lock className="h-4 w-4 text-orange-500" />
+                        <Lock className="size-4 text-orange-500" />
                         <h4 className="text-sm font-semibold">Account Access Code</h4>
                       </div>
                       <p className="text-xs text-gray-500 dark:text-zinc-400 leading-relaxed">
@@ -520,7 +520,7 @@ export function UserProfileScreen() {
                       onClick={handlePasswordChange}
                       className="bg-orange-600 hover:bg-orange-500 text-white font-bold rounded-xl flex items-center gap-2"
                     >
-                      <KeyRound className="h-4 w-4" /> Change Password
+                      <KeyRound className="size-4" /> Change Password
                     </Button>
                   </div>
                 </CardContent>
@@ -545,7 +545,7 @@ export function UserProfileScreen() {
                   onClick={() => router.push(currentUser.role === "admin" ? "school-subscription" : "subscription")}
                   className="w-full h-11 justify-start gap-3 rounded-xl border-amber-200/80 hover:bg-amber-500/5 hover:text-amber-600 font-semibold transition-all duration-200 hover:-translate-y-0.5 hover:shadow-sm active:translate-y-0 active:scale-[0.98]"
                 >
-                  <Crown className="h-4 w-4 text-amber-500" />
+                  <Crown className="size-4 text-amber-500" />
                   My Subscription
                 </Button>
               )}
@@ -556,7 +556,7 @@ export function UserProfileScreen() {
                 onClick={handlePasswordChange}
                 className="w-full h-11 justify-start gap-3 rounded-xl hover:bg-orange-500/5 hover:text-orange-600 font-semibold transition-all duration-200 hover:-translate-y-0.5 hover:shadow-sm active:translate-y-0 active:scale-[0.98]"
               >
-                <KeyRound className="h-4 w-4 text-orange-500" />
+                <KeyRound className="size-4 text-orange-500" />
                 Change Password
               </Button>
 
@@ -566,7 +566,7 @@ export function UserProfileScreen() {
                 onClick={handleLogout}
                 className="w-full h-11 justify-start gap-3 rounded-xl bg-red-50 hover:bg-red-100 text-red-600 dark:bg-red-950/20 dark:hover:bg-red-950/40 border-0 shadow-none font-semibold transition-all duration-200 hover:-translate-y-0.5 hover:shadow-sm active:translate-y-0 active:scale-[0.98]"
               >
-                <LogOut className="h-4 w-4" />
+                <LogOut className="size-4" />
                 Log Out Account
               </Button>
             </CardContent>
@@ -590,14 +590,14 @@ export function UserProfileScreen() {
               <Label className="text-xs font-bold text-gray-500 dark:text-zinc-400 uppercase tracking-wider">Profile Photo</Label>
               
               <div className="relative group">
-                <Avatar className="h-20 w-20 border-2 border-emerald-500/20 shadow-lg">
+                <Avatar className="size-20 border-2 border-emerald-500/20 shadow-lg">
                   <AvatarImage src={editAvatar} className="object-cover" />
                   <AvatarFallback className="text-2xl font-black bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
                     {initials}
                   </AvatarFallback>
                 </Avatar>
                 <label className="absolute inset-0 bg-black/40 rounded-full flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200 cursor-pointer">
-                  <Camera className="h-4 w-4 text-white" />
+                  <Camera className="size-4 text-white" />
                   <input
                     type="file"
                     accept="image/*"
@@ -616,13 +616,13 @@ export function UserProfileScreen() {
                       key={idx}
                       type="button"
                       onClick={() => setEditAvatar(avatarUrl)}
-                      className={`h-8 w-8 rounded-full overflow-hidden border-2 transition-all ${
+                      className={`size-8 rounded-full overflow-hidden border-2 transition-all ${
                         editAvatar === avatarUrl 
                           ? "border-emerald-500 scale-110 shadow-md" 
                           : "border-transparent opacity-70 hover:opacity-100 hover:scale-105"
                       }`}
                     >
-                      <img src={avatarUrl} alt="Preset Avatar" className="h-full w-full object-cover animate-in fade-in" />
+                      <img src={avatarUrl} alt="Preset Avatar" className="size-full object-cover animate-in fade-in" />
                     </button>
                   ))}
                 </div>

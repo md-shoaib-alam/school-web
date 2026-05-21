@@ -181,7 +181,7 @@ export function StudentDialog({
           <div className="space-y-4 pt-2 border-t mt-2">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <Bus className="h-4 w-4 text-emerald-600" />
+                <Bus className="size-4 text-emerald-600" />
                 <Label htmlFor="transport" className="text-sm font-semibold">Transport Service</Label>
               </div>
               <Switch 
@@ -242,7 +242,7 @@ export function StudentDialog({
           >
             {submitting ? (
               <>
-                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                <Loader2 className="size-4 mr-2 animate-spin" />
                 {isCreate ? "Adding..." : "Updating..."}
               </>
             ) : (

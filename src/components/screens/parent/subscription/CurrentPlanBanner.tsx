@@ -26,8 +26,8 @@ export function CurrentPlanBanner({ subscription, onCancel }: CurrentPlanBannerP
     <Card className="border-emerald-200 dark:border-emerald-800 bg-gradient-to-r from-emerald-50 to-teal-50 dark:from-emerald-900/20 dark:to-teal-900/20 shadow-none">
       <CardContent className="p-2 sm:p-3 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 sm:gap-4">
         <div className="flex items-center gap-2 sm:gap-3 w-full">
-          <div className="h-6 w-6 sm:h-9 sm:w-9 rounded-full bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0">
-            <CheckCircle2 className="h-3.5 w-3.5 sm:h-5 sm:w-5" />
+          <div className="size-6 sm:size-9 rounded-full bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0">
+            <CheckCircle2 className="size-3.5 sm:size-5" />
           </div>
           <div className="min-w-0 flex-1">
             <p className="font-semibold text-emerald-800 dark:text-emerald-300 leading-none text-xs sm:text-base">

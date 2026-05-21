@@ -35,7 +35,7 @@ export function ChildrenOverview({ childrenList }: ChildrenOverviewProps) {
   return (
     <div className="space-y-4">
       <div className="flex items-center gap-2">
-        <GraduationCap className="h-5 w-5 text-amber-600" />
+        <GraduationCap className="size-5 text-amber-600" />
         <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 uppercase tracking-tight">
           Your Children
         </h3>
@@ -46,7 +46,7 @@ export function ChildrenOverview({ childrenList }: ChildrenOverviewProps) {
             <CardContent className="p-5 text-left">
               <div className="flex items-start justify-between mb-4">
                 <div className="flex items-center gap-3">
-                  <div className="w-11 h-11 rounded-full bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center text-amber-700 dark:text-amber-400 font-bold text-sm">
+                  <div className="size-11 rounded-full bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center text-amber-700 dark:text-amber-400 font-bold text-sm">
                     {student.name.split(" ").map((n) => n[0]).join("")}
                   </div>
                   <div>

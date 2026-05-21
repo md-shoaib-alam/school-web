@@ -43,7 +43,7 @@ export function AdminDialogs({
       <DialogContent className="sm:max-w-md rounded-2xl">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2 text-xl font-bold">
-            <ShieldCheck className="h-6 w-6 text-teal-600 dark:text-teal-400" />
+            <ShieldCheck className="size-6 text-teal-600 dark:text-teal-400" />
             {editingAdmin ? "Edit Super Admin" : "Add New Super Admin"}
           </DialogTitle>
           <DialogDescription>
@@ -99,7 +99,7 @@ export function AdminDialogs({
               )}
             </Label>
             <div className="relative group">
-              <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground group-focus-within:text-teal-600 transition-colors" />
+              <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 size-5 text-muted-foreground group-focus-within:text-teal-600 transition-colors" />
               <Input
                 id="sa-password"
                 type={showPassword ? "text" : "password"}
@@ -117,7 +117,7 @@ export function AdminDialogs({
                 onClick={() => setShowPassword(!showPassword)}
                 className="absolute right-3.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-teal-600 transition-colors"
               >
-                {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                {showPassword ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
               </button>
             </div>
             {!editingAdmin && formData.password && formData.password.length < 6 && (
@@ -160,7 +160,7 @@ export function AdminDialogs({
           >
             {submitting ? (
               <>
-                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                <Loader2 className="size-4 mr-2 animate-spin" />
                 Processing...
               </>
             ) : editingAdmin ? (

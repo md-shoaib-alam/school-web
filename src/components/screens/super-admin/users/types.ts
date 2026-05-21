@@ -56,37 +56,37 @@ export const ROLE_CONFIG: Record<string, { color: string; bg: string; icon: Reac
   super_admin: {
     color: "text-teal-700 dark:text-teal-400",
     bg: "bg-teal-100 dark:bg-teal-900/30 border-teal-200 dark:border-teal-700",
-    icon: React.createElement(Shield, { className: "h-3.5 w-3.5" }),
+    icon: React.createElement(Shield, { className: "size-3.5" }),
     label: "Super Admin",
   },
   admin: {
     color: "text-emerald-700 dark:text-emerald-400",
     bg: "bg-emerald-100 dark:bg-emerald-900/30 border-emerald-200 dark:border-emerald-700",
-    icon: React.createElement(Crown, { className: "h-3.5 w-3.5" }),
+    icon: React.createElement(Crown, { className: "size-3.5" }),
     label: "Admin",
   },
   teacher: {
     color: "text-blue-700 dark:text-blue-400",
     bg: "bg-blue-100 dark:bg-blue-900/30 border-blue-200 dark:border-blue-700",
-    icon: React.createElement(BookOpen, { className: "h-3.5 w-3.5" }),
+    icon: React.createElement(BookOpen, { className: "size-3.5" }),
     label: "Teacher",
   },
   student: {
     color: "text-violet-700 dark:text-violet-400",
     bg: "bg-violet-100 dark:bg-violet-900/30 border-violet-200 dark:border-violet-700",
-    icon: React.createElement(GraduationCap, { className: "h-3.5 w-3.5" }),
+    icon: React.createElement(GraduationCap, { className: "size-3.5" }),
     label: "Student",
   },
   parent: {
     color: "text-amber-700 dark:text-amber-400",
     bg: "bg-amber-100 dark:bg-amber-900/30 border-amber-200 dark:border-amber-700",
-    icon: React.createElement(Heart, { className: "h-3.5 w-3.5" }),
+    icon: React.createElement(Heart, { className: "size-3.5" }),
     label: "Parent",
   },
   staff: {
     color: "text-indigo-700 dark:text-indigo-400",
     bg: "bg-indigo-100 dark:bg-indigo-900/30 border-indigo-200 dark:border-indigo-700",
-    icon: React.createElement(UserCog, { className: "h-3.5 w-3.5" }),
+    icon: React.createElement(UserCog, { className: "size-3.5" }),
     label: "Staff",
   },
 };

@@ -35,7 +35,7 @@ export function RevenueTrends({ loading, monthlyTrend }: RevenueTrendsProps) {
         <div className="flex items-center justify-between">
           <div>
             <CardTitle className="text-base font-bold flex items-center gap-2">
-              <TrendingUp className="h-4 w-4 text-emerald-600" /> 
+              <TrendingUp className="size-4 text-emerald-600" /> 
               Revenue Trend (12 Months)
             </CardTitle>
             <CardDescription className="mt-1">

@@ -15,8 +15,8 @@ export function AttendanceStats({ percentage, present, absent }: AttendanceStats
       {/* Percentage circle */}
       <Card className="rounded-xl shadow-sm shadow-none">
         <CardContent className="p-6 flex flex-col items-center justify-center">
-          <div className="relative w-32 h-32">
-            <svg className="w-32 h-32 -rotate-90" viewBox="0 0 128 128">
+          <div className="relative size-32">
+            <svg className="size-32 -rotate-90" viewBox="0 0 128 128">
               <circle
                 cx="64" cy="64" r="56"
                 fill="none" stroke="#f3f4f6" strokeWidth="10"
@@ -45,8 +45,8 @@ export function AttendanceStats({ percentage, present, absent }: AttendanceStats
       <Card className="rounded-xl shadow-sm border-emerald-200 dark:border-emerald-800 shadow-none">
         <CardContent className="p-4">
           <div className="flex items-center gap-3 h-full">
-            <div className="h-10 w-10 rounded-xl bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center">
-              <CheckCircle2 className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
+            <div className="size-10 rounded-xl bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center">
+              <CheckCircle2 className="size-5 text-emerald-600 dark:text-emerald-400" />
             </div>
             <div>
               <p className="text-xs text-muted-foreground">Present Days</p>
@@ -59,8 +59,8 @@ export function AttendanceStats({ percentage, present, absent }: AttendanceStats
       <Card className="rounded-xl shadow-sm border-red-200 dark:border-red-800 shadow-none">
         <CardContent className="p-4">
           <div className="flex items-center gap-3 h-full">
-            <div className="h-10 w-10 rounded-xl bg-red-100 dark:bg-red-900/30 flex items-center justify-center">
-              <XCircle className="h-5 w-5 text-red-600 dark:text-red-400" />
+            <div className="size-10 rounded-xl bg-red-100 dark:bg-red-900/30 flex items-center justify-center">
+              <XCircle className="size-5 text-red-600 dark:text-red-400" />
             </div>
             <div>
               <p className="text-xs text-muted-foreground">Absent Days</p>

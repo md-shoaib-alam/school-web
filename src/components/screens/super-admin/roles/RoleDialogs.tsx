@@ -105,8 +105,8 @@ export function RoleDialogs({
         <DialogContent className="sm:max-w-2xl max-h-[90vh] overflow-y-auto rounded-3xl p-0 border-none shadow-2xl">
           <DialogHeader className="p-6 pb-2 bg-gradient-to-br from-teal-50 to-white dark:from-gray-900 dark:to-gray-800">
             <DialogTitle className="flex items-center gap-3 text-xl font-black">
-              <div className="h-10 w-10 rounded-xl bg-teal-600 flex items-center justify-center text-white shadow-lg shadow-teal-200 dark:shadow-none">
-                <Shield className="h-5 w-5" />
+              <div className="size-10 rounded-xl bg-teal-600 flex items-center justify-center text-white shadow-lg shadow-teal-200 dark:shadow-none">
+                <Shield className="size-5" />
               </div>
               {editingRole ? `Edit "${editingRole.name}"` : "Create New Platform Role"}
             </DialogTitle>
@@ -155,12 +155,12 @@ export function RoleDialogs({
                       }}
                       onClick={() => setColor(c)}
                     >
-                      {color === c && <div className="h-1.5 w-1.5 rounded-full bg-white" />}
+                      {color === c && <div className="size-1.5 rounded-full bg-white" />}
                     </button>
                   ))}
                 </div>
                 <div className="p-4 rounded-xl border border-teal-100 dark:border-teal-900 bg-teal-50/50 dark:bg-teal-900/20 flex items-center gap-3">
-                  <div className="h-10 w-10 rounded-lg shadow-sm" style={{ backgroundColor: color }} />
+                  <div className="size-10 rounded-lg shadow-sm" style={{ backgroundColor: color }} />
                   <div className="text-xs font-bold text-teal-800 dark:text-teal-300">
                     Role Preview Color
                   </div>
@@ -173,7 +173,7 @@ export function RoleDialogs({
             <div className="space-y-4">
               <div className="flex items-center justify-between">
                 <Label className="text-xs font-black uppercase tracking-widest text-muted-foreground flex items-center gap-2">
-                  <CheckCircle2 className="h-4 w-4 text-emerald-500" />
+                  <CheckCircle2 className="size-4 text-emerald-500" />
                   Permission Matrix
                 </Label>
                 <Badge variant="outline" className="text-[10px] font-bold">
@@ -194,7 +194,7 @@ export function RoleDialogs({
                   {PLATFORM_MODULES.map((module) => (
                     <div key={module.key} className="grid grid-cols-5 p-3 hover:bg-gray-50/30 dark:hover:bg-gray-900/20 transition-colors">
                       <div className="flex items-center gap-2">
-                        <div className="h-7 w-7 rounded-lg bg-gray-100 dark:bg-gray-800 flex items-center justify-center text-muted-foreground">
+                        <div className="size-7 rounded-lg bg-gray-100 dark:bg-gray-800 flex items-center justify-center text-muted-foreground">
                           {module.icon}
                         </div>
                         <span className="text-xs font-bold">{module.label}</span>
@@ -204,7 +204,7 @@ export function RoleDialogs({
                           <Checkbox
                             checked={(permissions[module.key] || []).includes(action)}
                             onCheckedChange={() => togglePermission(module.key, action)}
-                            className="rounded-md h-5 w-5 data-[state=checked]:bg-teal-600 data-[state=checked]:border-teal-600"
+                            className="rounded-md size-5 data-[state=checked]:bg-teal-600 data-[state=checked]:border-teal-600"
                           />
                         </div>
                       ))}
@@ -225,7 +225,7 @@ export function RoleDialogs({
               className="bg-teal-600 hover:bg-teal-700 text-white rounded-xl px-8 h-11 font-black shadow-lg shadow-teal-100 dark:shadow-none min-w-[140px]"
             >
               {saving ? (
-                <Loader2 className="h-4 w-4 animate-spin" />
+                <Loader2 className="size-4 animate-spin" />
               ) : editingRole ? (
                 "Update Role"
               ) : (
@@ -241,8 +241,8 @@ export function RoleDialogs({
         <DialogContent className="sm:max-w-3xl max-h-[90vh] overflow-y-auto rounded-3xl p-0 border-none shadow-2xl">
           <DialogHeader className="p-6 pb-4 border-b border-gray-100 dark:border-gray-800">
             <DialogTitle className="flex items-center gap-3 text-xl font-black">
-              <div className="h-10 w-10 rounded-xl bg-purple-600 flex items-center justify-center text-white">
-                <Users className="h-5 w-5" />
+              <div className="size-10 rounded-xl bg-purple-600 flex items-center justify-center text-white">
+                <Users className="size-5" />
               </div>
               Assign Users to &quot;{assigningRole?.name}&quot;
             </DialogTitle>
@@ -256,7 +256,7 @@ export function RoleDialogs({
                 <Badge variant="secondary" className="text-[10px] font-bold">{filteredAvailable.length} candidates</Badge>
               </div>
               <div className="relative">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-gray-400" />
                 <Input
                   placeholder="Search by name or email..."
                   value={userSearch}
@@ -269,18 +269,18 @@ export function RoleDialogs({
                 <div className="h-[300px] overflow-y-auto p-2 custom-scrollbar space-y-2">
                   {assignLoading ? (
                     <div className="flex items-center justify-center h-full">
-                      <Loader2 className="h-6 w-6 animate-spin text-teal-500" />
+                      <Loader2 className="size-6 animate-spin text-teal-500" />
                     </div>
                   ) : filteredAvailable.length === 0 ? (
                     <div className="flex flex-col items-center justify-center h-full text-center p-4">
-                      <Search className="h-8 w-8 text-gray-300 mb-2" />
+                      <Search className="size-8 text-gray-300 mb-2" />
                       <p className="text-xs font-bold text-muted-foreground">No users found</p>
                     </div>
                   ) : (
                     filteredAvailable.map((user) => (
                       <div key={user.id} className="flex items-center justify-between p-2 rounded-xl bg-white dark:bg-gray-800 border border-transparent hover:border-teal-200 shadow-sm transition-all group">
                         <div className="flex items-center gap-3">
-                          <Avatar className="h-8 w-8 border-2 border-white dark:border-gray-700 shadow-sm">
+                          <Avatar className="size-8 border-2 border-white dark:border-gray-700 shadow-sm">
                             <AvatarFallback className="text-[10px] font-bold bg-teal-50 text-teal-600">{getInitials(user.name)}</AvatarFallback>
                           </Avatar>
                           <div className="min-w-0">
@@ -291,11 +291,11 @@ export function RoleDialogs({
                         <Button
                           size="icon"
                           variant="ghost"
-                          className="h-7 w-7 rounded-lg text-teal-600 hover:bg-teal-50 dark:hover:bg-teal-900/30 opacity-0 group-hover:opacity-100 transition-opacity"
+                          className="size-7 rounded-lg text-teal-600 hover:bg-teal-50 dark:hover:bg-teal-900/30 opacity-0 group-hover:opacity-100 transition-opacity"
                           disabled={assignSaving}
                           onClick={() => onAssign(user.id)}
                         >
-                          <UserPlus className="h-3.5 w-3.5" />
+                          <UserPlus className="size-3.5" />
                         </Button>
                       </div>
                     ))
@@ -315,18 +315,18 @@ export function RoleDialogs({
                 <div className="h-[352px] overflow-y-auto p-2 custom-scrollbar space-y-2">
                   {assignLoading ? (
                     <div className="flex items-center justify-center h-full">
-                      <Loader2 className="h-6 w-6 animate-spin text-teal-500" />
+                      <Loader2 className="size-6 animate-spin text-teal-500" />
                     </div>
                   ) : assignedUsers.length === 0 ? (
                     <div className="flex flex-col items-center justify-center h-full text-center p-4">
-                      <Users className="h-8 w-8 text-teal-200 mb-2" />
+                      <Users className="size-8 text-teal-200 mb-2" />
                       <p className="text-xs font-bold text-teal-600/60">No users assigned yet</p>
                     </div>
                   ) : (
                     assignedUsers.map((user) => (
                       <div key={user.id} className="flex items-center justify-between p-2 rounded-xl bg-white dark:bg-gray-800 border border-teal-100 dark:border-teal-900/50 shadow-sm group">
                         <div className="flex items-center gap-3">
-                          <Avatar className="h-8 w-8 border-2 border-teal-100 dark:border-teal-900 shadow-sm">
+                          <Avatar className="size-8 border-2 border-teal-100 dark:border-teal-900 shadow-sm">
                             <AvatarFallback className="text-[10px] font-bold bg-teal-600 text-white">{getInitials(user.name)}</AvatarFallback>
                           </Avatar>
                           <div className="min-w-0">
@@ -337,11 +337,11 @@ export function RoleDialogs({
                         <Button
                           size="icon"
                           variant="ghost"
-                          className="h-7 w-7 rounded-lg text-red-600 hover:bg-red-50 dark:hover:bg-red-900/30 opacity-0 group-hover:opacity-100 transition-opacity"
+                          className="size-7 rounded-lg text-red-600 hover:bg-red-50 dark:hover:bg-red-900/30 opacity-0 group-hover:opacity-100 transition-opacity"
                           disabled={assignSaving}
                           onClick={() => onUnassign(user.id)}
                         >
-                          <UserMinus className="h-3.5 w-3.5" />
+                          <UserMinus className="size-3.5" />
                         </Button>
                       </div>
                     ))

@@ -47,7 +47,7 @@ export function TenantBillingTable({
     <Card className="shadow-sm border-none bg-white dark:bg-gray-800">
       <CardHeader>
         <CardTitle className="text-base flex items-center gap-2">
-          <Building2 className="h-4 w-4 text-emerald-600" /> {isSchoolMode ? "School Revenue" : "Revenue by Tenant"}
+          <Building2 className="size-4 text-emerald-600" /> {isSchoolMode ? "School Revenue" : "Revenue by Tenant"}
         </CardTitle>
         <CardDescription>
           {isSchoolMode 
@@ -65,7 +65,7 @@ export function TenantBillingTable({
                   onClick={() => onSort("name")}
                 >
                   <div className="flex items-center gap-1 uppercase tracking-wider text-[10px] font-bold">
-                    School {sortKey === "name" && <ArrowUpDown className="h-3 w-3" />}
+                    School {sortKey === "name" && <ArrowUpDown className="size-3" />}
                   </div>
                 </TableHead>
                 <TableHead className={isSchoolMode ? "w-[15%]" : "w-[12%]"}>
@@ -76,7 +76,7 @@ export function TenantBillingTable({
                   onClick={() => onSort("plan")}
                 >
                   <div className="flex items-center justify-center gap-1 uppercase tracking-wider text-[10px] font-bold">
-                    Active Plan {sortKey === "plan" && <ArrowUpDown className="h-3 w-3" />}
+                    Active Plan {sortKey === "plan" && <ArrowUpDown className="size-3" />}
                   </div>
                 </TableHead>
                 
@@ -86,7 +86,7 @@ export function TenantBillingTable({
                     onClick={() => onSort("plan")}
                   >
                     <div className="flex items-center justify-end gap-1 uppercase tracking-wider text-[10px] font-bold">
-                      Plan Price {sortKey === "plan" && <ArrowUpDown className="h-3 w-3" />}
+                      Plan Price {sortKey === "plan" && <ArrowUpDown className="size-3" />}
                     </div>
                   </TableHead>
                 ) : (
@@ -96,7 +96,7 @@ export function TenantBillingTable({
                       onClick={() => onSort("activeRevenue")}
                     >
                       <div className="flex items-center justify-end gap-1 uppercase tracking-wider text-[10px] font-bold">
-                        Active Rev {sortKey === "activeRevenue" && <ArrowUpDown className="h-3 w-3" />}
+                        Active Rev {sortKey === "activeRevenue" && <ArrowUpDown className="size-3" />}
                       </div>
                     </TableHead>
                     <TableHead
@@ -104,7 +104,7 @@ export function TenantBillingTable({
                       onClick={() => onSort("totalRevenue")}
                     >
                       <div className="flex items-center justify-end gap-1 uppercase tracking-wider text-[10px] font-bold">
-                        Total Rev {sortKey === "totalRevenue" && <ArrowUpDown className="h-3 w-3" />}
+                        Total Rev {sortKey === "totalRevenue" && <ArrowUpDown className="size-3" />}
                       </div>
                     </TableHead>
                   </>
@@ -116,7 +116,7 @@ export function TenantBillingTable({
                     onClick={() => onSort("activeSubscriptions")}
                   >
                     <div className="flex items-center justify-center gap-1 uppercase tracking-wider text-[10px] font-bold">
-                      Active Subs {sortKey === "activeSubscriptions" && <ArrowUpDown className="h-3 w-3" />}
+                      Active Subs {sortKey === "activeSubscriptions" && <ArrowUpDown className="size-3" />}
                     </div>
                   </TableHead>
                 )}
@@ -163,7 +163,7 @@ export function TenantBillingTable({
                         {isSchoolMode ? (
                           <TableCell className="text-right font-black text-blue-600 dark:text-blue-400">
                             <div className="flex items-center justify-end">
-                              <IndianRupee className="h-3 w-3 mr-0.5" />
+                              <IndianRupee className="size-3 mr-0.5" />
                               {schoolPrice.toLocaleString()}
                               <span className="text-[9px] text-muted-foreground ml-1 font-normal">/mo</span>
                             </div>
@@ -172,13 +172,13 @@ export function TenantBillingTable({
                           <>
                             <TableCell className="text-right font-black text-emerald-600 dark:text-emerald-400">
                               <div className="flex items-center justify-end">
-                                <IndianRupee className="h-3 w-3 mr-0.5" />
+                                <IndianRupee className="size-3 mr-0.5" />
                                 {tenant.activeRevenue.toLocaleString()}
                               </div>
                             </TableCell>
                             <TableCell className="text-right font-bold text-muted-foreground">
                               <div className="flex items-center justify-end">
-                                <IndianRupee className="h-3 w-3 mr-0.5" />
+                                <IndianRupee className="size-3 mr-0.5" />
                                 {tenant.totalRevenue.toLocaleString()}
                               </div>
                             </TableCell>

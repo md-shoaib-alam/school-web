@@ -88,22 +88,22 @@ export const statusColors: Record<
   active: {
     bg: "bg-emerald-100 dark:bg-emerald-900/30",
     text: "text-emerald-700 dark:text-emerald-400",
-    icon: React.createElement(CheckCircle2, { className: "h-3 w-3" }),
+    icon: React.createElement(CheckCircle2, { className: "size-3" }),
   },
   trial: {
     bg: "bg-blue-100 dark:bg-blue-900/30",
     text: "text-blue-700 dark:text-blue-400",
-    icon: React.createElement(Activity, { className: "h-3 w-3" }),
+    icon: React.createElement(Activity, { className: "size-3" }),
   },
   suspended: {
     bg: "bg-red-100 dark:bg-red-900/30",
     text: "text-red-700 dark:text-red-400",
-    icon: React.createElement(Ban, { className: "h-3 w-3" }),
+    icon: React.createElement(Ban, { className: "size-3" }),
   },
   inactive: {
     bg: "bg-gray-100 dark:bg-gray-800",
     text: "text-gray-600 dark:text-gray-400",
-    icon: React.createElement(XCircle, { className: "h-3 w-3" }),
+    icon: React.createElement(XCircle, { className: "size-3" }),
   },
 };
 

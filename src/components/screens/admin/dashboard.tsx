@@ -181,10 +181,10 @@ export function AdminDashboard() {
             : "bg-amber-50 border-amber-200 dark:bg-amber-950/20 dark:border-amber-900/50"
         }`}>
           <div className="flex items-center gap-3">
-            <div className={`h-10 w-10 rounded-xl flex items-center justify-center ${
+            <div className={`size-10 rounded-xl flex items-center justify-center ${
               isExpired ? "bg-rose-100 text-rose-600" : "bg-amber-100 text-amber-600"
             }`}>
-              <AlertTriangle className="h-5 w-5" />
+              <AlertTriangle className="size-5" />
             </div>
             <div>
               <p className={`text-sm font-bold ${isExpired ? "text-rose-900 dark:text-rose-200" : "text-amber-900 dark:text-amber-200"}`}>
@@ -209,15 +209,15 @@ export function AdminDashboard() {
 
       {/* Welcome Banner - Progressive Summary Stats */}
       <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-teal-600 via-cyan-600 to-teal-700 p-6 text-white shadow-lg">
-        <div className="absolute top-0 right-0 w-72 h-72 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/3" />
-        <div className="absolute bottom-0 left-1/3 w-48 h-48 bg-white/5 rounded-full translate-y-1/2" />
+        <div className="absolute top-0 right-0 size-72 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/3" />
+        <div className="absolute bottom-0 left-1/3 size-48 bg-white/5 rounded-full translate-y-1/2" />
         <div className="relative z-10">
           <div className="flex items-center gap-4 mb-3">
-            <div className="h-14 w-14 rounded-2xl bg-white/20 flex items-center justify-center backdrop-blur-sm overflow-hidden">
+            <div className="size-14 rounded-2xl bg-white/20 flex items-center justify-center backdrop-blur-sm overflow-hidden">
               <img 
                 src={currentTenantLogo || currentUser?.tenantLogo || "/test.webp"} 
                 alt={currentTenantName || ""} 
-                className="h-full w-full object-cover" 
+                className="size-full object-cover" 
               />
             </div>
             <div>
@@ -244,28 +244,28 @@ export function AdminDashboard() {
                 <div className="bg-white/10 backdrop-blur-sm rounded-xl px-4 py-3">
                   <p className="text-teal-100 text-xs font-medium">Total Students</p>
                   <p className="text-2xl font-bold flex items-center gap-1">
-                    <GraduationCap className="h-5 w-5 text-teal-200" />
+                    <GraduationCap className="size-5 text-teal-200" />
                     {summary.data?.totalStudents ?? 0}
                   </p>
                 </div>
                 <div className="bg-white/10 backdrop-blur-sm rounded-xl px-4 py-3">
                   <p className="text-teal-100 text-xs font-medium">Total Teachers</p>
                   <p className="text-2xl font-bold flex items-center gap-1">
-                    <Users className="h-5 w-5 text-teal-200" />
+                    <Users className="size-5 text-teal-200" />
                     {summary.data?.totalTeachers ?? 0}
                   </p>
                 </div>
                 <div className="bg-white/10 backdrop-blur-sm rounded-xl px-4 py-3">
                   <p className="text-teal-100 text-xs font-medium">Attendance Rate</p>
                   <p className="text-2xl font-bold flex items-center gap-1">
-                    <Activity className="h-5 w-5 text-teal-200" />
+                    <Activity className="size-5 text-teal-200" />
                     {Number(summary.data?.attendanceRate ?? 0).toFixed(2).replace(/\.00$/, "")}%
                   </p>
                 </div>
                 <div className="bg-white/10 backdrop-blur-sm rounded-xl px-4 py-3">
                   <p className="text-teal-100 text-xs font-medium">Upcoming Events</p>
                   <p className="text-2xl font-bold flex items-center gap-1">
-                    <Calendar className="h-5 w-5 text-teal-200" />
+                    <Calendar className="size-5 text-teal-200" />
                     {summary.data?.upcomingEvents ?? 0}
                   </p>
                 </div>
@@ -289,8 +289,8 @@ export function AdminDashboard() {
             <Card className="hover:shadow-md transition-shadow">
               <CardContent className="p-5">
                 <div className="flex items-center gap-3">
-                  <div className="h-11 w-11 rounded-xl bg-rose-100 dark:bg-rose-900/30 text-rose-600 dark:text-rose-400 flex items-center justify-center">
-                    <Heart className="h-5 w-5" />
+                  <div className="size-11 rounded-xl bg-rose-100 dark:bg-rose-900/30 text-rose-600 dark:text-rose-400 flex items-center justify-center">
+                    <Heart className="size-5" />
                   </div>
                   <div>
                     <p className="text-xs text-muted-foreground">Total Parents</p>
@@ -302,8 +302,8 @@ export function AdminDashboard() {
             <Card className="hover:shadow-md transition-shadow">
               <CardContent className="p-5">
                 <div className="flex items-center gap-3">
-                  <div className="h-11 w-11 rounded-xl bg-cyan-100 dark:bg-cyan-900/30 text-cyan-600 dark:text-cyan-400 flex items-center justify-center">
-                    <School className="h-5 w-5" />
+                  <div className="size-11 rounded-xl bg-cyan-100 dark:bg-cyan-900/30 text-cyan-600 dark:text-cyan-400 flex items-center justify-center">
+                    <School className="size-5" />
                   </div>
                   <div>
                     <p className="text-xs text-muted-foreground">Total Classes</p>
@@ -315,8 +315,8 @@ export function AdminDashboard() {
             <Card className="hover:shadow-md transition-shadow">
               <CardContent className="p-5">
                 <div className="flex items-center gap-3">
-                  <div className="h-11 w-11 rounded-xl bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 flex items-center justify-center">
-                    <IndianRupee className="h-5 w-5" />
+                  <div className="size-11 rounded-xl bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 flex items-center justify-center">
+                    <IndianRupee className="size-5" />
                   </div>
                   <div>
                     <p className="text-xs text-muted-foreground">Fee Revenue</p>
@@ -328,8 +328,8 @@ export function AdminDashboard() {
             <Card className="hover:shadow-md transition-shadow">
               <CardContent className="p-5">
                 <div className="flex items-center gap-3">
-                  <div className="h-11 w-11 rounded-xl bg-violet-100 dark:bg-violet-900/30 text-violet-600 dark:text-violet-400 flex items-center justify-center">
-                    <UserCheck className="h-5 w-5" />
+                  <div className="size-11 rounded-xl bg-violet-100 dark:bg-violet-900/30 text-violet-600 dark:text-violet-400 flex items-center justify-center">
+                    <UserCheck className="size-5" />
                   </div>
                   <div>
                     <p className="text-xs text-muted-foreground">Avg Attendance</p>
@@ -347,7 +347,7 @@ export function AdminDashboard() {
         <Card className="lg:col-span-2">
           <CardHeader>
             <CardTitle className="text-base flex items-center gap-2">
-              <Activity className="h-4 w-4 text-teal-600" />
+              <Activity className="size-4 text-teal-600" />
               Monthly Attendance Trend
             </CardTitle>
           </CardHeader>
@@ -376,7 +376,7 @@ export function AdminDashboard() {
         <Card>
           <CardHeader>
             <CardTitle className="text-base flex items-center gap-2">
-              <GraduationCap className="h-4 w-4 text-cyan-600" />
+              <GraduationCap className="size-4 text-cyan-600" />
               Class Distribution
             </CardTitle>
           </CardHeader>
@@ -415,7 +415,7 @@ export function AdminDashboard() {
         <Card>
           <CardHeader>
             <CardTitle className="text-base flex items-center gap-2">
-              <IndianRupee className="h-4 w-4 text-emerald-600" />
+              <IndianRupee className="size-4 text-emerald-600" />
               Fee Collection
             </CardTitle>
           </CardHeader>
@@ -445,7 +445,7 @@ export function AdminDashboard() {
         <Card>
           <CardHeader>
             <CardTitle className="text-base flex items-center gap-2">
-              <Megaphone className="h-4 w-4 text-amber-500" />
+              <Megaphone className="size-4 text-amber-500" />
               Recent Notices
             </CardTitle>
           </CardHeader>

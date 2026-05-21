@@ -258,7 +258,7 @@ export function AdminTeachers() {
       {/* Read-only banner */}
       {!canCreate && !canEdit && !canDelete && (
         <div className="flex items-center gap-2 rounded-lg border border-amber-200 dark:border-amber-800 bg-amber-50 dark:bg-amber-900/30 px-3 py-2">
-          <Eye className="h-4 w-4 text-amber-600 dark:text-amber-400 shrink-0" />
+          <Eye className="size-4 text-amber-600 dark:text-amber-400 shrink-0" />
           <span className="text-xs text-amber-700 dark:text-amber-300 font-medium">
             Read-only mode — you have view permission only for this module.
           </span>
@@ -268,7 +268,7 @@ export function AdminTeachers() {
       {/* Header with search and add button */}
       <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
         <div className="relative max-w-sm flex-1">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
           <Input
             placeholder="Search teachers..."
             className="pl-9"
@@ -285,17 +285,17 @@ export function AdminTeachers() {
               variant={viewMode === "table" ? "secondary" : "ghost"}
               size="sm"
               onClick={() => setViewMode("table")}
-              className={`h-8 w-8 p-0 ${viewMode === "table" ? "bg-white dark:bg-gray-700 shadow-sm" : ""}`}
+              className={`size-8 p-0 ${viewMode === "table" ? "bg-white dark:bg-gray-700 shadow-sm" : ""}`}
             >
-              <List className="h-4 w-4" />
+              <List className="size-4" />
             </Button>
             <Button
               variant={viewMode === "grid" ? "secondary" : "ghost"}
               size="sm"
               onClick={() => setViewMode("grid")}
-              className={`h-8 w-8 p-0 ${viewMode === "grid" ? "bg-white dark:bg-gray-700 shadow-sm" : ""}`}
+              className={`size-8 p-0 ${viewMode === "grid" ? "bg-white dark:bg-gray-700 shadow-sm" : ""}`}
             >
-              <LayoutGrid className="h-4 w-4" />
+              <LayoutGrid className="size-4" />
             </Button>
           </div>
           {canCreate && (
@@ -303,7 +303,7 @@ export function AdminTeachers() {
               className="bg-emerald-600 hover:bg-emerald-700 text-white shrink-0 shadow-sm"
               onClick={handleOpenAdd}
             >
-              <Plus className="h-4 w-4 mr-2" />
+              <Plus className="size-4 mr-2" />
               Add Teacher
             </Button>
           )}
@@ -316,7 +316,7 @@ export function AdminTeachers() {
       ) : teachers.length === 0 ? (
         <Card className="border-dashed border-2 bg-transparent">
           <CardContent className="py-20 text-center text-muted-foreground">
-            <Users className="h-12 w-12 mx-auto mb-4 opacity-20" />
+            <Users className="size-12 mx-auto mb-4 opacity-20" />
             <p className="text-lg font-medium">No teachers found</p>
             <p className="text-sm">Try adjusting your search criteria</p>
           </CardContent>
@@ -356,7 +356,7 @@ export function AdminTeachers() {
                         >
                           <td className="px-6 py-4">
                             <div className="flex items-center gap-3">
-                              <Avatar className="h-8 w-8 shrink-0">
+                              <Avatar className="size-8 shrink-0">
                                 <AvatarFallback className={`${color} text-white text-[10px] font-bold`}>
                                   {initials}
                                 </AvatarFallback>
@@ -385,8 +385,8 @@ export function AdminTeachers() {
                           <td className="px-6 py-4">
                             <div className="flex items-center justify-center gap-2">
                               {canEdit && (
-                                <Button variant="ghost" size="icon" className="h-8 w-8 text-gray-400 hover:text-emerald-600" onClick={() => handleOpenEdit(teacher)}>
-                                  <Pencil className="h-3.5 w-3.5" />
+                                <Button variant="ghost" size="icon" className="size-8 text-gray-400 hover:text-emerald-600" onClick={() => handleOpenEdit(teacher)}>
+                                  <Pencil className="size-3.5" />
                                 </Button>
                               )}
                               {canDelete && (
@@ -397,8 +397,8 @@ export function AdminTeachers() {
                                   }}
                                 >
                                   <AlertDialogTrigger asChild>
-                                    <Button variant="ghost" size="icon" className="h-8 w-8 text-gray-400 hover:text-red-600" onClick={() => setDeletingId(teacher.id)}>
-                                      <Trash2 className="h-3.5 w-3.5" />
+                                    <Button variant="ghost" size="icon" className="size-8 text-gray-400 hover:text-red-600" onClick={() => setDeletingId(teacher.id)}>
+                                      <Trash2 className="size-3.5" />
                                     </Button>
                                   </AlertDialogTrigger>
                                   <AlertDialogContent>

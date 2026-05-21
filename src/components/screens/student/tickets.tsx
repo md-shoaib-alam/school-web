@@ -363,7 +363,7 @@ export function StudentTickets() {
           </div>
           {openCount > 0 && (
             <Badge className="bg-violet-100 dark:bg-violet-900/30 text-violet-700 dark:text-violet-400 border-violet-200 dark:border-violet-800 gap-1">
-              <Clock className="h-3 w-3" />
+              <Clock className="size-3" />
               {openCount} Active
             </Badge>
           )}
@@ -375,7 +375,7 @@ export function StudentTickets() {
             setCreateOpen(true);
           }}
         >
-          <Plus className="h-4 w-4 mr-2" />
+          <Plus className="size-4 mr-2" />
           New Ticket
         </Button>
       </div>
@@ -390,7 +390,7 @@ export function StudentTickets() {
       ) : tickets.length === 0 ? (
         <Card className="rounded-xl shadow-sm">
           <CardContent className="py-16 text-center">
-            <Ticket className="h-12 w-12 mx-auto text-gray-200 mb-3" />
+            <Ticket className="size-12 mx-auto text-gray-200 mb-3" />
             <p className="text-sm font-medium text-gray-500 dark:text-gray-400">
               No tickets yet
             </p>
@@ -438,17 +438,17 @@ export function StudentTickets() {
                     <div className="flex items-center justify-between text-[11px] text-gray-400 dark:text-gray-500">
                       <div className="flex items-center gap-3">
                         <span className="flex items-center gap-1">
-                          <MessageSquare className="h-3 w-3" />
+                          <MessageSquare className="size-3" />
                           {ticket._count.messages} message
                           {ticket._count.messages !== 1 ? "s" : ""}
                         </span>
                         <span className="flex items-center gap-1">
-                          <Tag className="h-3 w-3" />
+                          <Tag className="size-3" />
                           {getCategoryLabel(ticket.category)}
                         </span>
                       </div>
                       <span className="flex items-center gap-1">
-                        <Clock className="h-3 w-3" />
+                        <Clock className="size-3" />
                         {formatDate(ticket.createdAt)}
                       </span>
                     </div>
@@ -456,13 +456,13 @@ export function StudentTickets() {
                   <Button
                     variant="ghost"
                     size="icon"
-                    className="h-8 w-8 text-violet-500 hover:text-violet-700 hover:bg-violet-50 dark:hover:bg-violet-900/20 shrink-0"
+                    className="size-8 text-violet-500 hover:text-violet-700 hover:bg-violet-50 dark:hover:bg-violet-900/20 shrink-0"
                     onClick={(e) => {
                       e.stopPropagation();
                       openTicketDetail(ticket.id);
                     }}
                   >
-                    <Eye className="h-4 w-4" />
+                    <Eye className="size-4" />
                   </Button>
                 </div>
               </CardContent>
@@ -579,7 +579,7 @@ export function StudentTickets() {
 
           {detailLoading ? (
             <div className="flex-1 flex items-center justify-center">
-              <Loader2 className="h-8 w-8 animate-spin text-violet-500" />
+              <Loader2 className="size-8 animate-spin text-violet-500" />
             </div>
           ) : selectedTicket ? (
             <div className="flex-1 flex flex-col min-h-0">
@@ -620,7 +620,7 @@ export function StudentTickets() {
                     <span className="text-gray-500 dark:text-gray-400">
                       Assigned to:
                     </span>
-                    <Avatar className="h-5 w-5">
+                    <Avatar className="size-5">
                       <AvatarFallback className="text-[9px] bg-violet-100 text-violet-700">
                         {getInitials(selectedTicket.assignee.name)}
                       </AvatarFallback>
@@ -647,7 +647,7 @@ export function StudentTickets() {
                     {(!selectedTicket.messages ||
                       selectedTicket.messages.length === 0) && (
                       <div className="text-center py-8 text-gray-400 dark:text-gray-500">
-                        <MessageSquare className="h-8 w-8 mx-auto mb-2 opacity-40" />
+                        <MessageSquare className="size-8 mx-auto mb-2 opacity-40" />
                         <p className="text-sm">No messages yet</p>
                         <p className="text-xs">
                           Our team will review your ticket soon
@@ -656,7 +656,7 @@ export function StudentTickets() {
                     )}
                     {selectedTicket.messages?.map((msg) => (
                       <div key={msg.id} className="flex gap-3">
-                        <Avatar className="h-8 w-8 shrink-0 mt-0.5">
+                        <Avatar className="size-8 shrink-0 mt-0.5">
                           <AvatarFallback
                             className={`text-[10px] ${
                               ROLE_COLORS[msg.author?.role || "student"] ||
@@ -727,9 +727,9 @@ export function StudentTickets() {
                         disabled={sendingReply || !replyMessage.trim()}
                       >
                         {sendingReply ? (
-                          <Loader2 className="h-3.5 w-3.5 mr-1 animate-spin" />
+                          <Loader2 className="size-3.5 mr-1 animate-spin" />
                         ) : (
-                          <Send className="h-3.5 w-3.5 mr-1" />
+                          <Send className="size-3.5 mr-1" />
                         )}
                         Reply
                       </Button>

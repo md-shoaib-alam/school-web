@@ -236,8 +236,8 @@ export function SetFeesTab({ canCreate, canEdit, canDelete }: SetFeesTabProps) {
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <Card className="hover:shadow-md transition-shadow">
           <CardContent className="p-4 flex items-center gap-4">
-            <div className="h-12 w-12 rounded-xl flex items-center justify-center bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400">
-              <Tag className="h-5 w-5" />
+            <div className="size-12 rounded-xl flex items-center justify-center bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400">
+              <Tag className="size-5" />
             </div>
             <div>
               <p className="text-xs text-muted-foreground">Total Categories</p>
@@ -247,8 +247,8 @@ export function SetFeesTab({ canCreate, canEdit, canDelete }: SetFeesTabProps) {
         </Card>
         <Card className="hover:shadow-md transition-shadow">
           <CardContent className="p-4 flex items-center gap-4">
-            <div className="h-12 w-12 rounded-xl flex items-center justify-center bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400">
-              <Layers className="h-5 w-5" />
+            <div className="size-12 rounded-xl flex items-center justify-center bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400">
+              <Layers className="size-5" />
             </div>
             <div>
               <p className="text-xs text-muted-foreground">Total Structures</p>
@@ -258,8 +258,8 @@ export function SetFeesTab({ canCreate, canEdit, canDelete }: SetFeesTabProps) {
         </Card>
         <Card className="hover:shadow-md transition-shadow">
           <CardContent className="p-4 flex items-center gap-4">
-            <div className="h-12 w-12 rounded-xl flex items-center justify-center bg-amber-100 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400">
-              <CircleDollarSign className="h-5 w-5" />
+            <div className="size-12 rounded-xl flex items-center justify-center bg-amber-100 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400">
+              <CircleDollarSign className="size-5" />
             </div>
             <div>
               <p className="text-xs text-muted-foreground">Revenue Expected</p>
@@ -287,7 +287,7 @@ export function SetFeesTab({ canCreate, canEdit, canDelete }: SetFeesTabProps) {
         <div className="sm:ml-auto">
           {canCreate && (
             <Button className="bg-emerald-600 hover:bg-emerald-700 text-white" onClick={() => setAddOpen(true)}>
-              <Plus className="h-4 w-4 mr-2" />Add Structure
+              <Plus className="size-4 mr-2" />Add Structure
             </Button>
           )}
         </div>
@@ -319,7 +319,7 @@ export function SetFeesTab({ canCreate, canEdit, canDelete }: SetFeesTabProps) {
                   {filtered.length === 0 ? (
                     <TableRow>
                       <TableCell colSpan={6} className="text-center py-12 text-muted-foreground">
-                        <Layers className="h-10 w-10 mx-auto mb-2 opacity-30" />
+                        <Layers className="size-10 mx-auto mb-2 opacity-30" />
                         <p>No fee structures found</p>
                       </TableCell>
                     </TableRow>
@@ -339,18 +339,18 @@ export function SetFeesTab({ canCreate, canEdit, canDelete }: SetFeesTabProps) {
                         <TableCell className="hidden md:table-cell text-sm text-muted-foreground py-4">{s.academicYear}</TableCell>
                         <TableCell className="text-center py-4">
                           <Button variant="outline" size="sm" className="h-7 px-2 text-xs gap-1.5 hover:bg-emerald-50 hover:text-emerald-700 hover:border-emerald-300 dark:hover:bg-emerald-900/30 dark:hover:text-emerald-400" onClick={() => openAssignDialog(s)}>
-                            <Users className="h-3.5 w-3.5" />
+                            <Users className="size-3.5" />
                             <span className="hidden sm:inline">Assign</span>
                           </Button>
                         </TableCell>
                         {(canEdit || canDelete) && (
                           <TableCell className="text-center py-4">
                             <div className="flex items-center justify-center gap-1">
-                              {canEdit && <Button variant="ghost" size="icon" className="h-7 w-7 text-emerald-500 hover:text-emerald-700 hover:bg-emerald-50 dark:hover:bg-emerald-900/30" onClick={() => handleEdit(s)}><Pencil className="h-3.5 w-3.5" /></Button>}
+                              {canEdit && <Button variant="ghost" size="icon" className="size-7 text-emerald-500 hover:text-emerald-700 hover:bg-emerald-50 dark:hover:bg-emerald-900/30" onClick={() => handleEdit(s)}><Pencil className="size-3.5" /></Button>}
                               {canDelete && (
                                 <AlertDialog>
                                   <AlertDialogTrigger asChild>
-                                    <Button variant="ghost" size="icon" className="h-7 w-7 text-red-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/30"><Trash2 className="h-3.5 w-3.5" /></Button>
+                                    <Button variant="ghost" size="icon" className="size-7 text-red-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/30"><Trash2 className="size-3.5" /></Button>
                                   </AlertDialogTrigger>
                                   <AlertDialogContent>
                                     <AlertDialogHeader>
@@ -427,7 +427,7 @@ export function SetFeesTab({ canCreate, canEdit, canDelete }: SetFeesTabProps) {
             </DialogDescription>
           </DialogHeader>
           {assignLoading ? (
-            <div className="py-8 flex justify-center"><div className="animate-spin h-6 w-6 border-2 border-emerald-500 border-t-transparent rounded-full" /></div>
+            <div className="py-8 flex justify-center"><div className="animate-spin size-6 border-2 border-emerald-500 border-t-transparent rounded-full" /></div>
           ) : assignData && (
             <div className="space-y-3">
               <div className="flex flex-wrap items-center gap-2 text-sm">
@@ -438,12 +438,12 @@ export function SetFeesTab({ canCreate, canEdit, canDelete }: SetFeesTabProps) {
                     {selectedStudents.size === assignData.students.filter(s => !s.isPaid).length ? 'Deselect All' : 'Select All'}
                   </Button>
                   <Button variant="outline" size="sm" className="h-7 text-xs gap-1" onClick={selectTransport}>
-                    <Bus className="h-3 w-3" /> Transport Only
+                    <Bus className="size-3" /> Transport Only
                   </Button>
                 </div>
               </div>
               <div className="relative">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
                 <Input placeholder="Search students..." className="pl-9 h-9" value={searchStudent} onChange={e => setSearchStudent(e.target.value)} />
               </div>
               <div className="border rounded-lg max-h-72 overflow-y-auto">
@@ -463,7 +463,7 @@ export function SetFeesTab({ canCreate, canEdit, canDelete }: SetFeesTabProps) {
                         <div className="flex items-center gap-2">
                           <span className="text-sm font-medium truncate">{student.name}</span>
                           <span className="text-xs text-muted-foreground">#{student.rollNumber}</span>
-                          {student.hasTransport && <Badge variant="secondary" className="text-[10px] h-4 px-1 bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400 border-0"><Bus className="h-2.5 w-2.5 mr-0.5" />Transport</Badge>}
+                          {student.hasTransport && <Badge variant="secondary" className="text-[10px] h-4 px-1 bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400 border-0"><Bus className="size-2.5 mr-0.5" />Transport</Badge>}
                         </div>
                       </div>
                       {student.isPaid && <Badge variant="secondary" className="text-[10px] bg-emerald-100 text-emerald-700 border-0 shrink-0">Paid ✓</Badge>}

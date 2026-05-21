@@ -158,7 +158,7 @@ export function NewPromotionDialog({
           >
             {submitting ? (
               <>
-                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                <Loader2 className="size-4 mr-2 animate-spin" />
                 Submitting...
               </>
             ) : (
@@ -209,7 +209,7 @@ export function BulkPromotionDialog({
       <DialogContent className="sm:max-w-lg">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
-            <Zap className="h-5 w-5 text-amber-500" />
+            <Zap className="size-5 text-amber-500" />
             Bulk Promotion
           </DialogTitle>
           <DialogDescription>
@@ -282,7 +282,7 @@ export function BulkPromotionDialog({
           </div>
           {bulkFromClass && isLastClass(bulkFromClass, classes) && (
             <div className="flex items-center gap-2 text-sm text-violet-600 dark:text-violet-400 bg-violet-50 dark:bg-violet-900/20 rounded-lg px-3 py-2 border border-violet-200 dark:border-violet-800">
-              <GraduationCap className="h-4 w-4 shrink-0" />
+              <GraduationCap className="size-4 shrink-0" />
               <span>
                 This is the highest class. Consider using{" "}
                 <strong>Graduate</strong> instead.
@@ -322,7 +322,7 @@ export function BulkPromotionDialog({
           >
             {bulkSubmitting ? (
               <>
-                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                <Loader2 className="size-4 mr-2 animate-spin" />
                 Creating...
               </>
             ) : (
@@ -359,7 +359,7 @@ export function RejectPromotionDialog({
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
-            <AlertTriangle className="h-5 w-5 text-red-500" />
+            <AlertTriangle className="size-5 text-red-500" />
             Reject Promotion
           </DialogTitle>
           <DialogDescription>
@@ -393,7 +393,7 @@ export function RejectPromotionDialog({
           >
             {rejecting ? (
               <>
-                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                <Loader2 className="size-4 mr-2 animate-spin" />
                 Rejecting...
               </>
             ) : (

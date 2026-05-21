@@ -42,8 +42,8 @@ export function NotificationBell() {
             read: n.isRead,
             type: n.type,
             icon: n.type === 'platform_notice' 
-              ? <Megaphone className={cn("h-4 w-4", n.isRead ? "text-gray-400" : "text-amber-500")} />
-              : <Bell className={cn("h-4 w-4", n.isRead ? "text-gray-400" : "text-rose-500")} />,
+              ? <Megaphone className={cn("size-4", n.isRead ? "text-gray-400" : "text-amber-500")} />
+              : <Bell className={cn("size-4", n.isRead ? "text-gray-400" : "text-rose-500")} />,
           }));
 
         setNotifications(mapped);
@@ -112,14 +112,14 @@ export function NotificationBell() {
         <Button
           variant="ghost"
           size="icon"
-          className="relative h-10 w-10 bg-white hover:bg-gray-50 dark:bg-zinc-900 dark:hover:bg-zinc-800 border border-gray-200 dark:border-zinc-800 shadow-sm rounded-xl transition-all duration-200 cursor-pointer"
+          className="relative size-10 bg-white hover:bg-gray-50 dark:bg-zinc-900 dark:hover:bg-zinc-800 border border-gray-200 dark:border-zinc-800 shadow-sm rounded-xl transition-all duration-200 cursor-pointer"
         >
           <Bell className={cn(
-            "h-6 w-6 md:h-5 md:w-5 transition-colors",
+            "size-6 md:size-5 transition-colors",
             unreadCount > 0 ? "text-indigo-600 dark:text-indigo-400" : "text-gray-500"
           )} />
           {unreadCount > 0 && (
-            <span className="absolute top-2.5 right-2.5 flex h-2 w-2 items-center justify-center rounded-full bg-rose-500 ring-2 ring-white dark:ring-gray-900 animate-pulse" />
+            <span className="absolute top-2.5 right-2.5 flex size-2 items-center justify-center rounded-full bg-rose-500 ring-2 ring-white dark:ring-gray-900 animate-pulse" />
           )}
         </Button>
       </PopoverTrigger>
@@ -157,13 +157,13 @@ export function NotificationBell() {
         <ScrollArea className="max-h-[420px]">
           {loading && notifications.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-16">
-              <Loader2 className="h-8 w-8 animate-spin text-indigo-500 opacity-20" />
+              <Loader2 className="size-8 animate-spin text-indigo-500 opacity-20" />
               <p className="text-xs text-gray-400 mt-4 font-medium">Updating history...</p>
             </div>
           ) : notifications.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-20 text-gray-400">
-              <div className="w-20 h-20 rounded-3xl bg-gray-50 dark:bg-gray-800/50 flex items-center justify-center mb-4 transform rotate-12 transition-transform hover:rotate-0">
-                <Bell className="h-10 w-10 opacity-10" />
+              <div className="size-20 rounded-3xl bg-gray-50 dark:bg-gray-800/50 flex items-center justify-center mb-4 transform rotate-12 transition-transform hover:rotate-0">
+                <Bell className="size-10 opacity-10" />
               </div>
               <p className="text-sm font-bold text-gray-900 dark:text-gray-100">All caught up!</p>
               <p className="text-xs opacity-60 mt-1">Your notification center is empty</p>
@@ -190,12 +190,12 @@ export function NotificationBell() {
                   }}
                 >
                   <div className={cn(
-                    "mt-0.5 shrink-0 h-10 w-10 rounded-2xl flex items-center justify-center transition-colors",
+                    "mt-0.5 shrink-0 size-10 rounded-2xl flex items-center justify-center transition-colors",
                     !notification.read 
                       ? "bg-indigo-100 text-indigo-600 dark:bg-indigo-900/40 dark:text-indigo-400" 
                       : "bg-gray-100 text-gray-400 dark:bg-gray-800 dark:text-gray-500"
                   )}>
-                    <Bell className="h-5 w-5" />
+                    <Bell className="size-5" />
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-start justify-between gap-2 mb-1">

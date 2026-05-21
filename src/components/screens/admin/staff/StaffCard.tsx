@@ -35,7 +35,7 @@ export function StaffCard({ member, onEdit, onDelete, canEdit, canDelete }: Staf
         <div className="p-4">
           <div className="flex items-start justify-between mb-4">
             <div className="flex items-center gap-3">
-              <Avatar className="h-12 w-12 border-2 border-white dark:border-gray-900 shadow-sm">
+              <Avatar className="size-12 border-2 border-white dark:border-gray-900 shadow-sm">
                 <AvatarFallback style={avatarStyle(member.customRole?.color || "#6366f1")}>
                   {getInitials(member.name)}
                 </AvatarFallback>
@@ -76,20 +76,20 @@ export function StaffCard({ member, onEdit, onDelete, canEdit, canDelete }: Staf
                 <Button 
                   size="icon" 
                   variant="ghost" 
-                  className="h-8 w-8 text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-900/20"
+                  className="size-8 text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-900/20"
                   onClick={() => onEdit(member)}
                 >
-                  <Pencil className="h-3.5 w-3.5" />
+                  <Pencil className="size-3.5" />
                 </Button>
               )}
               {canDelete && (
                 <Button 
                   size="icon" 
                   variant="ghost" 
-                  className="h-8 w-8 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20"
+                  className="size-8 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20"
                   onClick={() => onDelete(member)}
                 >
-                  <Trash2 className="h-3.5 w-3.5" />
+                  <Trash2 className="size-3.5" />
                 </Button>
               )}
             </div>
@@ -98,22 +98,22 @@ export function StaffCard({ member, onEdit, onDelete, canEdit, canDelete }: Staf
           <div className="space-y-2 pt-2 border-t border-gray-50 dark:border-gray-800/50">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400 min-w-0">
-                <Mail className="h-3 w-3 shrink-0" />
+                <Mail className="size-3 shrink-0" />
                 <span className="truncate">{member.email}</span>
               </div>
               <Button 
                 variant="ghost" 
                 size="icon" 
-                className="h-6 w-6 opacity-0 group-hover:opacity-100 transition-all duration-200 hover:bg-gray-100 dark:hover:bg-gray-800 shrink-0"
+                className="size-6 opacity-0 group-hover:opacity-100 transition-all duration-200 hover:bg-gray-100 dark:hover:bg-gray-800 shrink-0"
                 onClick={handleCopy}
                 title="Copy email"
               >
-                {copied ? <Check className="h-3 w-3 text-emerald-500" /> : <Copy className="h-3 w-3 text-gray-400" />}
+                {copied ? <Check className="size-3 text-emerald-500" /> : <Copy className="size-3 text-gray-400" />}
               </Button>
             </div>
             
             <div className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
-              <Phone className="h-3 w-3" />
+              <Phone className="size-3" />
               <span>{member.phone || "No contact"}</span>
             </div>
           </div>

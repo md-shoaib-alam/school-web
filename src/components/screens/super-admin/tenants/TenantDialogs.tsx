@@ -80,7 +80,7 @@ const PlanBadge = memo(({ plan }: { plan: string }) => {
       variant="outline"
       className={`${config.bg} ${config.text} ${config.border} border text-[10px] uppercase tracking-wider py-0.5 px-2 font-semibold`}
     >
-      <Crown className="h-3 w-3 mr-1" />
+      <Crown className="size-3 mr-1" />
       {displayName}
     </Badge>
   );
@@ -112,7 +112,7 @@ const InfoItem = memo(
     return (
       <div className="flex items-start gap-2 p-2 rounded-lg bg-muted/30 hover:bg-muted/50 transition-colors">
         <div className="text-muted-foreground mt-0.5">
-          <Icon className="h-4 w-4" />
+          <Icon className="size-4" />
         </div>
         <div className="min-w-0">
           <p className="text-[10px] text-muted-foreground uppercase tracking-tight">
@@ -148,7 +148,7 @@ const UsageStat = memo(
       <div className={`p-3 rounded-lg ${bgClass}/30 space-y-1.5`}>
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
-            <Icon className="h-4 w-4" />
+            <Icon className="size-4" />
             {label}
           </div>
           {pct !== null && (
@@ -299,7 +299,7 @@ export function TenantDialogs({
               {/* Logo Upload */}
               <div className="flex flex-col sm:flex-row gap-4 items-center sm:items-start pb-2">
                 <div className="relative group cursor-pointer">
-                  <div className="h-24 w-24 rounded-2xl border-2 border-dashed border-muted-foreground/20 flex items-center justify-center overflow-hidden bg-muted/30 group-hover:bg-muted/50 transition-all relative">
+                  <div className="size-24 rounded-2xl border-2 border-dashed border-muted-foreground/20 flex items-center justify-center overflow-hidden bg-muted/30 group-hover:bg-muted/50 transition-all relative">
                     {formData.logoFile || formData.logo ? (
                       <Image
                         src={
@@ -336,7 +336,7 @@ export function TenantDialogs({
                   {(formData.logoFile || formData.logo) && (
                     <button
                       type="button"
-                      className="absolute -top-1 -right-1 h-5 w-5 bg-red-500 text-white rounded-full flex items-center justify-center shadow-lg hover:bg-red-600 transition-colors"
+                      className="absolute -top-1 -right-1 size-5 bg-red-500 text-white rounded-full flex items-center justify-center shadow-lg hover:bg-red-600 transition-colors"
                       onClick={() =>
                         setFormData((prev) => ({
                           ...prev,
@@ -345,7 +345,7 @@ export function TenantDialogs({
                         }))
                       }
                     >
-                      <XCircle className="h-3 w-3" />
+                      <XCircle className="size-3" />
                     </button>
                   )}
                 </div>
@@ -502,7 +502,7 @@ export function TenantDialogs({
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
                 <div className="grid gap-1">
                   <Label className="text-xs text-muted-foreground flex items-center gap-1">
-                    <GraduationCap className="h-3 w-3" /> Max Students
+                    <GraduationCap className="size-3" /> Max Students
                   </Label>
                   <Input
                     type="number"
@@ -517,7 +517,7 @@ export function TenantDialogs({
                 </div>
                 <div className="grid gap-1">
                   <Label className="text-xs text-muted-foreground flex items-center gap-1">
-                    <Users className="h-3 w-3" /> Max Teachers
+                    <Users className="size-3" /> Max Teachers
                   </Label>
                   <Input
                     type="number"
@@ -532,7 +532,7 @@ export function TenantDialogs({
                 </div>
                 <div className="grid gap-1">
                   <Label className="text-xs text-muted-foreground flex items-center gap-1">
-                    <UserCheck className="h-3 w-3" /> Max Parents
+                    <UserCheck className="size-3" /> Max Parents
                   </Label>
                   <Input
                     type="number"
@@ -547,7 +547,7 @@ export function TenantDialogs({
                 </div>
                 <div className="grid gap-1">
                   <Label className="text-xs text-muted-foreground flex items-center gap-1">
-                    <Building2 className="h-3 w-3" /> Max Classes
+                    <Building2 className="size-3" /> Max Classes
                   </Label>
                   <Input
                     type="number"
@@ -592,7 +592,7 @@ export function TenantDialogs({
             <>
               <DialogHeader>
                 <div className="flex items-center gap-3">
-                  <div className="h-12 w-12 rounded-xl bg-teal-100 dark:bg-teal-900/30 text-teal-700 dark:text-teal-400 flex items-center justify-center overflow-hidden relative">
+                  <div className="size-12 rounded-xl bg-teal-100 dark:bg-teal-900/30 text-teal-700 dark:text-teal-400 flex items-center justify-center overflow-hidden relative">
                     <Image src={viewingTenant.logo || "/test.webp"} alt={viewingTenant.name} fill sizes="48px" className="object-cover" unoptimized />
                   </div>
                   <div>
@@ -733,7 +733,7 @@ export function TenantDialogs({
                     onEditClick(viewingTenant);
                   }}
                 >
-                  <Edit className="h-4 w-4 mr-2" />
+                  <Edit className="size-4 mr-2" />
                   Edit School
                 </Button>
               </DialogFooter>
@@ -773,7 +773,7 @@ export function TenantDialogs({
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2 font-bold text-xl">
-              <ShieldCheck className="h-5 w-5 text-indigo-600" />
+              <ShieldCheck className="size-5 text-indigo-600" />
               Create School Admin
             </DialogTitle>
             <DialogDescription>
@@ -805,7 +805,7 @@ export function TenantDialogs({
                 Email Address
               </Label>
               <div className="relative group">
-                <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
+                <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 size-5 text-gray-400" />
                 <Input
                   type="email"
                   placeholder="admin@school.com"
@@ -825,7 +825,7 @@ export function TenantDialogs({
                 Phone Number (Optional)
               </Label>
               <div className="relative group">
-                <Phone className="absolute left-3.5 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
+                <Phone className="absolute left-3.5 top-1/2 -translate-y-1/2 size-5 text-gray-400" />
                 <Input
                   placeholder="+1 (555) 000-0000"
                   className="pl-11 h-11 rounded-xl"
@@ -844,7 +844,7 @@ export function TenantDialogs({
                 Initial Password
               </Label>
               <div className="relative group">
-                <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
+                <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 size-5 text-gray-400" />
                 <Input
                   type={showAdminPassword ? "text" : "password"}
                   placeholder="Create a secure password"
@@ -860,13 +860,13 @@ export function TenantDialogs({
                 <Button
                   variant="ghost"
                   size="icon"
-                  className="absolute right-1.5 top-1/2 -translate-y-1/2 h-8 w-8"
+                  className="absolute right-1.5 top-1/2 -translate-y-1/2 size-8"
                   onClick={() => setShowAdminPassword(!showAdminPassword)}
                 >
                   {showAdminPassword ? (
-                    <EyeOff className="h-4 w-4" />
+                    <EyeOff className="size-4" />
                   ) : (
-                    <Eye className="h-4 w-4" />
+                    <Eye className="size-4" />
                   )}
                 </Button>
               </div>
@@ -887,7 +887,7 @@ export function TenantDialogs({
               }
             >
               {submitting ? (
-                <Loader2 className="h-4 w-4 animate-spin" />
+                <Loader2 className="size-4 animate-spin" />
               ) : (
                 "Create Admin"
               )}

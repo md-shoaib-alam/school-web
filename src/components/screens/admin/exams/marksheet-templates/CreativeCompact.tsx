@@ -15,8 +15,8 @@ export const CreativeCompact: React.FC<MarksheetTemplateProps> = ({
       style={{ WebkitPrintColorAdjust: 'exact', printColorAdjust: 'exact' }}
     >
       {/* Dynamic Colorful Accent Elements */}
-      <div className="absolute -top-12 -right-12 w-24 h-24 bg-gradient-to-br from-indigo-400 to-purple-400 rounded-full blur-xl opacity-20 pointer-events-none" />
-      <div className="absolute -bottom-12 -left-12 w-32 h-32 bg-gradient-to-tr from-emerald-300 to-cyan-300 rounded-full blur-xl opacity-20 pointer-events-none" />
+      <div className="absolute -top-12 -right-12 size-24 bg-gradient-to-br from-indigo-400 to-purple-400 rounded-full blur-xl opacity-20 pointer-events-none" />
+      <div className="absolute -bottom-12 -left-12 size-32 bg-gradient-to-tr from-emerald-300 to-cyan-300 rounded-full blur-xl opacity-20 pointer-events-none" />
 
       {/* Core Document Flow */}
       <div className="space-y-6 z-10">
@@ -24,7 +24,7 @@ export const CreativeCompact: React.FC<MarksheetTemplateProps> = ({
         {/* Creative Header */}
         <div className="flex justify-between items-center bg-gradient-to-r from-indigo-50 via-purple-50/30 to-white border border-indigo-100 rounded-2xl p-4 font-sans">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-indigo-600 text-white rounded-xl flex items-center justify-center font-bold text-lg shadow-md shadow-indigo-200">
+            <div className="size-10 bg-indigo-600 text-white rounded-xl flex items-center justify-center font-bold text-lg shadow-md shadow-indigo-200">
               🚀
             </div>
             <div>
@@ -47,28 +47,28 @@ export const CreativeCompact: React.FC<MarksheetTemplateProps> = ({
         {/* Student Info Block */}
         <div className="grid grid-cols-2 gap-4 text-xs font-sans">
           <div className="flex items-center gap-3 bg-zinc-50/70 border border-zinc-100 p-3 rounded-xl">
-            <div className="w-8 h-8 bg-indigo-100 text-indigo-700 rounded-lg flex items-center justify-center font-bold text-sm shrink-0">👤</div>
+            <div className="size-8 bg-indigo-100 text-indigo-700 rounded-lg flex items-center justify-center font-bold text-sm shrink-0">👤</div>
             <div className="min-w-0">
               <span className="text-zinc-400 font-bold uppercase text-[7.5px] tracking-wider block">Student</span>
               <span className="font-extrabold text-slate-800 truncate block">{sheet.studentName}</span>
             </div>
           </div>
           <div className="flex items-center gap-3 bg-zinc-50/70 border border-zinc-100 p-3 rounded-xl">
-            <div className="w-8 h-8 bg-purple-100 text-purple-700 rounded-lg flex items-center justify-center font-bold text-sm shrink-0">🔢</div>
+            <div className="size-8 bg-purple-100 text-purple-700 rounded-lg flex items-center justify-center font-bold text-sm shrink-0">🔢</div>
             <div className="min-w-0">
               <span className="text-zinc-400 font-bold uppercase text-[7.5px] tracking-wider block">Roll Number</span>
               <span className="font-extrabold text-slate-800 font-mono block">{sheet.rollNumber}</span>
             </div>
           </div>
           <div className="flex items-center gap-3 bg-zinc-50/70 border border-zinc-100 p-3 rounded-xl">
-            <div className="w-8 h-8 bg-emerald-100 text-emerald-700 rounded-lg flex items-center justify-center font-bold text-sm shrink-0">🏫</div>
+            <div className="size-8 bg-emerald-100 text-emerald-700 rounded-lg flex items-center justify-center font-bold text-sm shrink-0">🏫</div>
             <div className="min-w-0">
               <span className="text-zinc-400 font-bold uppercase text-[7.5px] tracking-wider block">Grade Form</span>
               <span className="font-extrabold text-slate-800 truncate block">{classNameStr} - {classSection}</span>
             </div>
           </div>
           <div className="flex items-center gap-3 bg-zinc-50/70 border border-zinc-100 p-3 rounded-xl">
-            <div className="w-8 h-8 bg-cyan-100 text-cyan-700 rounded-lg flex items-center justify-center font-bold text-sm shrink-0">📅</div>
+            <div className="size-8 bg-cyan-100 text-cyan-700 rounded-lg flex items-center justify-center font-bold text-sm shrink-0">📅</div>
             <div className="min-w-0">
               <span className="text-zinc-400 font-bold uppercase text-[7.5px] tracking-wider block">Issue Date</span>
               <span className="font-extrabold text-slate-800 block"><ClientDate /></span>
@@ -140,7 +140,7 @@ export const CreativeCompact: React.FC<MarksheetTemplateProps> = ({
 
           <div className="col-span-3 bg-zinc-50/70 border border-zinc-100 p-4 rounded-2xl flex flex-col items-center justify-between text-center">
             <span className="text-zinc-400 font-bold uppercase text-[7.5px] tracking-wider block">Final Grade</span>
-            <div className="w-14 h-14 bg-indigo-50 border-4 border-indigo-500 rounded-full flex items-center justify-center font-black text-indigo-700 text-xl shadow-inner my-2">
+            <div className="size-14 bg-indigo-50 border-4 border-indigo-500 rounded-full flex items-center justify-center font-black text-indigo-700 text-xl shadow-inner my-2">
               {sheet.grade}
             </div>
             <span className="text-[8px] text-indigo-500 font-bold uppercase tracking-wider">Scholastic Standing</span>
@@ -148,7 +148,7 @@ export const CreativeCompact: React.FC<MarksheetTemplateProps> = ({
 
           <div className="col-span-4 bg-zinc-50/70 border border-zinc-100 p-4 rounded-2xl flex flex-col items-center justify-between text-center">
             <span className="text-zinc-400 font-bold uppercase text-[7.5px] tracking-wider block">Total Percentage</span>
-            <div className="w-14 h-14 bg-purple-50 border-4 border-purple-500 rounded-full flex items-center justify-center font-black text-purple-700 text-md font-mono shadow-inner my-2">
+            <div className="size-14 bg-purple-50 border-4 border-purple-500 rounded-full flex items-center justify-center font-black text-purple-700 text-md font-mono shadow-inner my-2">
               {sheet.overallPercentage}%
             </div>
             <span className="text-[8px] text-purple-500 font-bold uppercase tracking-wider">Success Rate</span>

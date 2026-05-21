@@ -33,16 +33,16 @@ export function CertificateTemplate({ cert, formatDate }: CertificateTemplatePro
       <div className="relative cert-frame flex flex-col border-4 border-double border-amber-800 rounded-lg p-8 sm:p-12 bg-white mx-auto dark:bg-white dark:text-gray-900 min-h-[250mm]">
         
         {/* Decorative Corners */}
-        <div className="absolute top-2 left-2 w-12 h-12 border-t-[3px] border-l-[3px] border-amber-800 rounded-tl-md" />
-        <div className="absolute top-2 right-2 w-12 h-12 border-t-[3px] border-r-[3px] border-amber-800 rounded-tr-md" />
-        <div className="absolute bottom-2 left-2 w-12 h-12 border-b-[3px] border-l-[3px] border-amber-800 rounded-bl-md" />
-        <div className="absolute bottom-2 right-2 w-12 h-12 border-b-[3px] border-r-[3px] border-amber-800 rounded-br-md" />
+        <div className="absolute top-2 left-2 size-12 border-t-[3px] border-l-[3px] border-amber-800 rounded-tl-md" />
+        <div className="absolute top-2 right-2 size-12 border-t-[3px] border-r-[3px] border-amber-800 rounded-tr-md" />
+        <div className="absolute bottom-2 left-2 size-12 border-b-[3px] border-l-[3px] border-amber-800 rounded-bl-md" />
+        <div className="absolute bottom-2 right-2 size-12 border-b-[3px] border-r-[3px] border-amber-800 rounded-br-md" />
 
         {/* School Header */}
         <div className="text-center space-y-3 mb-10">
           <div className="flex items-center justify-center gap-4">
-            <div className="h-16 w-16 rounded-full bg-amber-50 text-amber-700 flex items-center justify-center border-2 border-amber-200">
-              <GraduationCap className="h-10 w-10" />
+            <div className="size-16 rounded-full bg-amber-50 text-amber-700 flex items-center justify-center border-2 border-amber-200">
+              <GraduationCap className="size-10" />
             </div>
           </div>
           <div className="space-y-1">
@@ -52,7 +52,7 @@ export function CertificateTemplate({ cert, formatDate }: CertificateTemplatePro
           </div>
           <div className="flex items-center justify-center gap-3 pt-2">
             <div className="w-32 h-[1px] bg-amber-800" />
-            <div className="h-2 w-2 rotate-45 bg-amber-800" />
+            <div className="size-2 rotate-45 bg-amber-800" />
             <div className="w-32 h-[1px] bg-amber-800" />
           </div>
         </div>
@@ -100,7 +100,7 @@ export function CertificateTemplate({ cert, formatDate }: CertificateTemplatePro
             <p className="text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-1">DATE OF ISSUE</p>
             <p className="text-sm font-bold text-gray-800">{formatDate(cert.issueDate)}</p>
           </div>
-          <div className="h-16 w-16 rounded-full border border-dashed border-amber-200 flex items-center justify-center opacity-30">
+          <div className="size-16 rounded-full border border-dashed border-amber-200 flex items-center justify-center opacity-30">
             <p className="text-[8px] font-bold text-center">OFFICIAL<br/>SEAL</p>
           </div>
           <div className="text-center">

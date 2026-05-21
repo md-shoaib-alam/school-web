@@ -150,8 +150,8 @@ export function SuperAdminPlatformNotices() {
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-4">
-        <div className="h-12 w-12 rounded-2xl bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center">
-          <Bell className="h-6 w-6 text-amber-600 dark:text-amber-400" />
+        <div className="size-12 rounded-2xl bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center">
+          <Bell className="size-6 text-amber-600 dark:text-amber-400" />
         </div>
         <div>
           <h2 className="text-3xl font-semibold tracking-tight">Notices</h2>
@@ -232,7 +232,7 @@ export function SuperAdminPlatformNotices() {
                 disabled={sending}
               >
                 {sending ? "Sending..." : "Publish Notice"}
-                <Send className="h-4 w-4" />
+                <Send className="size-4" />
               </Button>
             </div>
           </CardContent>
@@ -242,7 +242,7 @@ export function SuperAdminPlatformNotices() {
           <Card className="border-none shadow-sm bg-gradient-to-br from-amber-50 to-white dark:from-amber-950/10 dark:to-gray-900">
             <CardHeader>
               <CardTitle className="text-lg flex items-center gap-2">
-                <Info className="h-5 w-5 text-amber-600" />
+                <Info className="size-5 text-amber-600" />
                 How it works
               </CardTitle>
             </CardHeader>
@@ -252,16 +252,16 @@ export function SuperAdminPlatformNotices() {
               </p>
               <div className="space-y-2">
                 <div className="flex items-center gap-2 text-xs font-medium text-amber-700 dark:text-amber-400 uppercase tracking-widest">
-                  <Bell className="h-3 w-3" />
+                  <Bell className="size-3" />
                   Visibility
                 </div>
                 <ul className="text-sm space-y-2">
                   <li className="flex items-center gap-2">
-                    <CheckCircle2 className="h-4 w-4 text-emerald-500" />
+                    <CheckCircle2 className="size-4 text-emerald-500" />
                     Top Global Bar
                   </li>
                   <li className="flex items-center gap-2">
-                    <CheckCircle2 className="h-4 w-4 text-emerald-500" />
+                    <CheckCircle2 className="size-4 text-emerald-500" />
                     Real-time Push
                   </li>
                 </ul>
@@ -272,14 +272,14 @@ export function SuperAdminPlatformNotices() {
           <Card className="border-none shadow-sm">
             <CardHeader>
               <CardTitle className="text-lg flex items-center gap-2">
-                <History className="h-5 w-5 text-amber-600" />
+                <History className="size-5 text-amber-600" />
                 Notice History
               </CardTitle>
             </CardHeader>
             <CardContent>
               {historyLoading ? (
                 <div className="flex justify-center py-8">
-                  <Loader2 className="h-6 w-6 animate-spin text-amber-500" />
+                  <Loader2 className="size-6 animate-spin text-amber-500" />
                 </div>
               ) : (
                 <div className="space-y-4">
@@ -297,7 +297,7 @@ export function SuperAdminPlatformNotices() {
                                 className="absolute right-0 top-0 opacity-0 group-hover:opacity-100 transition-opacity text-red-500 hover:text-red-700"
                                 title="Delete Notice"
                               >
-                                <Trash2 className="h-4 w-4" />
+                                <Trash2 className="size-4" />
                               </button>
                             </AlertDialogTrigger>
                             <AlertDialogContent>
@@ -321,7 +321,7 @@ export function SuperAdminPlatformNotices() {
                         </div>
                         <div className="flex items-center justify-between text-xs text-muted-foreground">
                           <span className="flex items-center gap-1">
-                            <Users className="h-3 w-3" />
+                            <Users className="size-3" />
                             {getTargetLabel(notice.target)}
                           </span>
                           <span suppressHydrationWarning>

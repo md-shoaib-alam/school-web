@@ -51,7 +51,7 @@ export const SCHOOL_PLANS: SchoolPlan[] = [
     name: "Starter",
     description: "Ideal for small preschools and private tutoring centers.",
     price: 499,
-    icon: <Zap className="h-6 w-6" />,
+    icon: <Zap className="size-6" />,
     color: "indigo",
     limits: {
       students: 100,
@@ -72,7 +72,7 @@ export const SCHOOL_PLANS: SchoolPlan[] = [
     name: "Growth",
     description: "Perfect for established schools looking to digitize operations.",
     price: 1499,
-    icon: <Shield className="h-6 w-6" />,
+    icon: <Shield className="size-6" />,
     color: "emerald",
     popular: true,
     limits: {
@@ -95,7 +95,7 @@ export const SCHOOL_PLANS: SchoolPlan[] = [
     name: "Institution",
     description: "The complete solution for large-scale educational institutions.",
     price: 3999,
-    icon: <Crown className="h-6 w-6" />,
+    icon: <Crown className="size-6" />,
     color: "amber",
     limits: {
       students: 2000,
@@ -121,7 +121,7 @@ export const PARENT_PLANS: ParentPlan[] = [
     id: "basic",
     name: "Basic",
     description: "Essential access to track your child's progress",
-    icon: <BookOpen className="h-6 w-6" />,
+    icon: <BookOpen className="size-6" />,
     color: "blue",
     pricing: {
       monthly: { price: 0 },
@@ -142,7 +142,7 @@ export const PARENT_PLANS: ParentPlan[] = [
     badge: "Most Popular",
     badgeColor: "bg-amber-500",
     popular: true,
-    icon: <Star className="h-6 w-6" />,
+    icon: <Star className="size-6" />,
     color: "amber",
     pricing: {
       monthly: { price: 11, originalPrice: 19 },
@@ -162,7 +162,7 @@ export const PARENT_PLANS: ParentPlan[] = [
     description: "The ultimate parental engagement experience",
     badge: "Best Value",
     badgeColor: "bg-emerald-500",
-    icon: <Crown className="h-6 w-6" />,
+    icon: <Crown className="size-6" />,
     color: "emerald",
     pricing: {
       monthly: { price: 29, originalPrice: 49 },

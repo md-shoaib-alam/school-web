@@ -18,7 +18,7 @@ export function RoleTemplates({ onSelectTemplate }: RoleTemplatesProps) {
     <Card className="border-none bg-white dark:bg-gray-800 shadow-sm">
       <CardHeader className="pb-4">
         <CardTitle className="text-base font-bold flex items-center gap-2">
-          <Blocks className="h-4 w-4 text-teal-500" />
+          <Blocks className="size-4 text-teal-500" />
           Role Templates
         </CardTitle>
         <CardDescription>
@@ -35,10 +35,10 @@ export function RoleTemplates({ onSelectTemplate }: RoleTemplatesProps) {
                 onClick={() => onSelectTemplate(template)}
                 className="flex flex-col gap-2 p-4 rounded-2xl border-2 border-dashed border-gray-100 dark:border-gray-700 hover:border-teal-300 dark:hover:border-teal-700 hover:bg-teal-50/50 dark:hover:bg-teal-900/10 transition-all text-left group relative overflow-hidden"
               >
-                <div className="absolute top-0 right-0 w-16 h-16 bg-gray-50 dark:bg-gray-900/50 rounded-bl-full -translate-y-1/2 translate-x-1/2 group-hover:bg-teal-100/50 dark:group-hover:bg-teal-800/30 transition-colors" />
+                <div className="absolute top-0 right-0 size-16 bg-gray-50 dark:bg-gray-900/50 rounded-bl-full -translate-y-1/2 translate-x-1/2 group-hover:bg-teal-100/50 dark:group-hover:bg-teal-800/30 transition-colors" />
                 <div className="relative z-10 flex items-center gap-2 mb-1">
                   <div
-                    className="h-9 w-9 rounded-xl flex items-center justify-center text-white text-xs font-black shadow-sm"
+                    className="size-9 rounded-xl flex items-center justify-center text-white text-xs font-black shadow-sm"
                     style={{ backgroundColor: template.color }}
                   >
                     {template.name.charAt(0)}

@@ -95,10 +95,10 @@ export function SuperAdminAnalytics() {
   const records = services?.database?.records || {};
 
   const coreMetrics = [
-    { label: "System Uptime", value: formatUptime(data?.uptime), icon: <Clock className="h-4 w-4" />, color: "text-emerald-600" },
-    { label: "Server Latency", value: server?.totalLatency || "0ms", icon: <Activity className="h-4 w-4" />, color: "text-blue-600" },
-    { label: "Memory (RSS)", value: memory?.rss || "0 MB", icon: <Cpu className="h-4 w-4" />, color: "text-purple-600" },
-    { label: "Node Version", value: server?.nodeVersion || "N/A", icon: <Code className="h-4 w-4" />, color: "text-amber-600" },
+    { label: "System Uptime", value: formatUptime(data?.uptime), icon: <Clock className="size-4" />, color: "text-emerald-600" },
+    { label: "Server Latency", value: server?.totalLatency || "0ms", icon: <Activity className="size-4" />, color: "text-blue-600" },
+    { label: "Memory (RSS)", value: memory?.rss || "0 MB", icon: <Cpu className="size-4" />, color: "text-purple-600" },
+    { label: "Node Version", value: server?.nodeVersion || "N/A", icon: <Code className="size-4" />, color: "text-amber-600" },
   ];
 
   return (
@@ -110,7 +110,7 @@ export function SuperAdminAnalytics() {
           <p className="text-sm text-gray-500 dark:text-gray-400">Comprehensive real-time infrastructure and service monitoring</p>
         </div>
         <Button variant="outline" className="gap-2" onClick={fetchHealth} disabled={loading}>
-          <RefreshCw className={loading ? "h-4 w-4 animate-spin" : "h-4 w-4"} />
+          <RefreshCw className={loading ? "size-4 animate-spin" : "size-4"} />
           Sync Health Data
         </Button>
       </div>
@@ -118,7 +118,7 @@ export function SuperAdminAnalytics() {
       {/* Status Bar */}
       <div className="flex items-center justify-between px-4 py-3 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-sm">
         <div className="flex items-center gap-2">
-          <div className={`h-2 w-2 rounded-full ${data?.status === "healthy" ? "bg-emerald-500" : "bg-amber-500"}`} />
+          <div className={`size-2 rounded-full ${data?.status === "healthy" ? "bg-emerald-500" : "bg-amber-500"}`} />
           <span className="text-sm font-medium text-gray-700 dark:text-gray-200">
             Platform Status: <span className={data?.status === "healthy" ? "text-emerald-600 font-bold" : "text-amber-600 font-bold"}>{data?.status?.toUpperCase() || "UNKNOWN"}</span>
           </span>
@@ -154,19 +154,19 @@ export function SuperAdminAnalytics() {
         <Card className="lg:col-span-2 border border-gray-200 dark:border-gray-700 shadow-sm bg-white dark:bg-gray-800">
           <CardHeader className="pb-2">
             <CardTitle className="text-base font-bold flex items-center gap-2">
-              <Wifi className="h-4 w-4 text-emerald-600" />
+              <Wifi className="size-4 text-emerald-600" />
               Service Connectivity
             </CardTitle>
             <CardDescription className="text-xs">Connection status and latency for core platform services</CardDescription>
           </CardHeader>
           <CardContent className="pt-4 grid grid-cols-1 sm:grid-cols-2 gap-3">
             {[
-              { label: "Database", status: services?.database?.status, latency: services?.database?.latency, icon: <Database className="h-4 w-4" /> },
-              { label: "Redis Cache", status: services?.redis?.status, latency: services?.redis?.latency, icon: <Zap className="h-4 w-4" /> },
-              { label: "Razorpay", status: services?.razorpay?.status, icon: <CreditCard className="h-4 w-4" /> },
-              { label: "BullMQ (Queues)", status: services?.bullmq?.status, icon: <Workflow className="h-4 w-4" /> },
-              { label: "Firebase (FCM)", status: services?.firebase?.status, sub: services?.firebase?.serviceAccountName, icon: <Cloud className="h-4 w-4" /> },
-              { label: "Object Storage (R2)", status: services?.storage?.status, icon: <Box className="h-4 w-4" /> },
+              { label: "Database", status: services?.database?.status, latency: services?.database?.latency, icon: <Database className="size-4" /> },
+              { label: "Redis Cache", status: services?.redis?.status, latency: services?.redis?.latency, icon: <Zap className="size-4" /> },
+              { label: "Razorpay", status: services?.razorpay?.status, icon: <CreditCard className="size-4" /> },
+              { label: "BullMQ (Queues)", status: services?.bullmq?.status, icon: <Workflow className="size-4" /> },
+              { label: "Firebase (FCM)", status: services?.firebase?.status, sub: services?.firebase?.serviceAccountName, icon: <Cloud className="size-4" /> },
+              { label: "Object Storage (R2)", status: services?.storage?.status, icon: <Box className="size-4" /> },
             ].map((svc, i) => (
               <div key={i} className="flex items-center justify-between p-3 rounded-lg border border-gray-100 dark:border-gray-700 bg-gray-50/50 dark:bg-gray-900/20">
                 <div className="flex items-center gap-3">
@@ -193,15 +193,15 @@ export function SuperAdminAnalytics() {
         <Card className="border border-gray-200 dark:border-gray-700 shadow-sm bg-white dark:bg-gray-800">
           <CardHeader className="pb-2">
             <CardTitle className="text-base font-bold flex items-center gap-2">
-              <Shield className="h-4 w-4 text-teal-600" />
+              <Shield className="size-4 text-teal-600" />
               Platform Records
             </CardTitle>
             <CardDescription className="text-xs">Aggregate counts across all tenants</CardDescription>
           </CardHeader>
           <CardContent className="space-y-3 pt-4">
             {[
-              { label: "Total Schools", value: records?.schools, icon: <Building2 className="h-3.5 w-3.5" /> },
-              { label: "Total Users", value: records?.users, icon: <Users className="h-3.5 w-3.5" /> },
+              { label: "Total Schools", value: records?.schools, icon: <Building2 className="size-3.5" /> },
+              { label: "Total Users", value: records?.users, icon: <Users className="size-3.5" /> },
             ].map((stat, i) => (
               <div key={i} className="flex justify-between items-center py-2 border-b border-gray-100 dark:border-gray-700 last:border-0">
                 <div className="flex items-center gap-2 text-sm text-gray-500">
@@ -223,7 +223,7 @@ export function SuperAdminAnalytics() {
         <Card className="border border-gray-200 dark:border-gray-700 shadow-sm bg-white dark:bg-gray-800">
           <CardHeader className="pb-2">
             <CardTitle className="text-base font-bold flex items-center gap-2">
-              <HardDrive className="h-4 w-4 text-purple-600" />
+              <HardDrive className="size-4 text-purple-600" />
               Memory Allocation
             </CardTitle>
             <CardDescription className="text-xs">Node.js process memory distribution</CardDescription>
@@ -251,7 +251,7 @@ export function SuperAdminAnalytics() {
         <Card className="border border-gray-200 dark:border-gray-700 shadow-sm bg-white dark:bg-gray-800">
           <CardHeader className="pb-2">
             <CardTitle className="text-base font-bold flex items-center gap-2">
-              <Layers className="h-4 w-4 text-amber-600" />
+              <Layers className="size-4 text-amber-600" />
               Connection Pool
             </CardTitle>
             <CardDescription className="text-xs">Database pooling and saturation</CardDescription>
@@ -276,7 +276,7 @@ export function SuperAdminAnalytics() {
         <Card className="border border-gray-200 dark:border-gray-700 shadow-sm bg-white dark:bg-gray-800">
           <CardHeader className="pb-2">
             <CardTitle className="text-base font-bold flex items-center gap-2">
-              <Server className="h-4 w-4 text-gray-600" />
+              <Server className="size-4 text-gray-600" />
               Runtime Details
             </CardTitle>
             <CardDescription className="text-xs">System environment and node version</CardDescription>

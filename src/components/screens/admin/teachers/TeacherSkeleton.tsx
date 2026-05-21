@@ -10,7 +10,7 @@ export function TeacherSkeleton() {
         <Card key={i}>
           <CardContent className="p-6">
             <div className="flex items-center gap-4">
-              <Skeleton className="h-14 w-14 rounded-full" />
+              <Skeleton className="size-14 rounded-full" />
               <div className="space-y-2 flex-1">
                 <Skeleton className="h-5 w-32" />
                 <Skeleton className="h-3 w-40" />

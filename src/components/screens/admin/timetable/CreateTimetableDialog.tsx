@@ -187,7 +187,7 @@ export function CreateTimetableDialog({
         <div className="p-6 pb-0 shrink-0">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
-              <Calendar className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
+              <Calendar className="size-5 text-emerald-600 dark:text-emerald-400" />
               Manage Timetable
             </DialogTitle>
             <DialogDescription>
@@ -221,7 +221,7 @@ export function CreateTimetableDialog({
           <div className="flex flex-col gap-4 mt-4">
             {/* Copy Feature */}
             <div className="flex flex-wrap items-center gap-2 rounded-lg border bg-muted/30 p-3">
-              <Copy className="h-4 w-4 text-muted-foreground shrink-0" />
+              <Copy className="size-4 text-muted-foreground shrink-0" />
               <span className="text-sm font-medium text-muted-foreground whitespace-nowrap">Duplicate:</span>
               <Select value={copySourceDay} onValueChange={setCopySourceDay}>
                 <SelectTrigger className="h-8 text-sm w-32">
@@ -275,7 +275,7 @@ export function CreateTimetableDialog({
           <div className="py-4 space-y-4">
             {currentTabPeriods.length === 0 ? (
               <div className="text-center py-10 text-muted-foreground border rounded-lg border-dashed">
-                <BookOpen className="h-10 w-10 mx-auto mb-2 opacity-25" />
+                <BookOpen className="size-10 mx-auto mb-2 opacity-25" />
                 <p className="text-sm">No periods on {DAY_FULL_LABELS[activeTab]}</p>
               </div>
             ) : (
@@ -283,11 +283,11 @@ export function CreateTimetableDialog({
                 <div key={period.id} className={`rounded-lg border p-4 ${period.label ? "bg-amber-50/30 border-amber-100 dark:bg-amber-900/10 dark:border-amber-900/30" : "bg-muted/20"}`}>
                   <div className="flex items-center justify-between mb-3">
                     <span className={`text-[10px] font-bold uppercase tracking-wider flex items-center gap-1.5 ${period.label ? "text-amber-600 dark:text-amber-400" : "text-muted-foreground"}`}>
-                      {period.label ? <Clock className="h-3 w-3" /> : <BookOpen className="h-3 w-3" />}
+                      {period.label ? <Clock className="size-3" /> : <BookOpen className="size-3" />}
                       {period.label ? "BREAK / EVENT" : `Period ${idx + 1}`}
                     </span>
-                    <Button variant="ghost" size="sm" className="h-7 w-7 p-0 text-muted-foreground hover:text-red-600" onClick={() => removePeriod(period.id)}>
-                      <Trash2 className="h-4 w-4" />
+                    <Button variant="ghost" size="sm" className="size-7 p-0 text-muted-foreground hover:text-red-600" onClick={() => removePeriod(period.id)}>
+                      <Trash2 className="size-4" />
                     </Button>
                   </div>
 
@@ -358,7 +358,7 @@ export function CreateTimetableDialog({
                   }, 50);
                 }}
               >
-                <Plus className="h-4 w-4 mr-1.5" /> Add Period
+                <Plus className="size-4 mr-1.5" /> Add Period
               </Button>
               <Button
                 variant="outline"
@@ -372,7 +372,7 @@ export function CreateTimetableDialog({
                   }, 50);
                 }}
               >
-                <Plus className="h-4 w-4 mr-1.5" /> Add Break
+                <Plus className="size-4 mr-1.5" /> Add Break
               </Button>
             </div>
           </div>
@@ -382,7 +382,7 @@ export function CreateTimetableDialog({
         <div className="p-6 pt-4 border-t shrink-0 flex items-center justify-end gap-3 bg-background">
           <Button variant="outline" onClick={() => onOpenChange(false)} disabled={saving}>Cancel</Button>
           <Button onClick={onSave} disabled={saving} className="bg-emerald-600 hover:bg-emerald-700 text-white min-w-[140px]">
-             {saving ? <><Loader2 className="h-4 w-4 mr-2 animate-spin" /> Saving...</> : `Save ${totalPeriodCount} Periods`}
+             {saving ? <><Loader2 className="size-4 mr-2 animate-spin" /> Saving...</> : `Save ${totalPeriodCount} Periods`}
           </Button>
         </div>
       </DialogContent>

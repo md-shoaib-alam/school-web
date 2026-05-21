@@ -62,7 +62,7 @@ export function DayView({
               <span className="relative flex items-center gap-1.5">
                 {DAY_LABELS[day]}
                 {isCurrentDay && !isActive && (
-                  <span className="absolute -top-1 -right-1 h-1.5 w-1.5 rounded-full bg-emerald-500" />
+                  <span className="absolute -top-1 -right-1 size-1.5 rounded-full bg-emerald-500" />
                 )}
               </span>
             </Button>
@@ -94,7 +94,7 @@ export function DayView({
       <div className="px-4 sm:px-6 pb-6">
         {!hasAnySlot && timeSlots.length > 0 ? (
           <div className="text-center py-12 text-muted-foreground">
-            <Coffee className="h-10 w-10 mx-auto mb-2 opacity-30" />
+            <Coffee className="size-10 mx-auto mb-2 opacity-30" />
             <p className="font-medium">No classes scheduled</p>
             <p className="text-sm mt-1">
               This day is completely free for the selected class.
@@ -119,7 +119,7 @@ export function DayView({
                   <div key={`period-${idx}`} className="relative flex gap-4">
                     <div className="relative shrink-0 z-10 mt-5">
                       <div
-                        className={`h-2.5 w-2.5 rounded-full border-2 ${
+                        className={`size-2.5 rounded-full border-2 ${
                           isCurrent
                             ? "bg-emerald-500 border-emerald-300 dark:border-emerald-600 ring-4 ring-emerald-100 dark:ring-emerald-900/40"
                             : hasSlots
@@ -161,7 +161,7 @@ export function DayView({
                                  className={`shrink-0 rounded-lg border px-3 py-1.5 text-xs font-medium ${slot.label ? "bg-amber-100 text-amber-700 border-amber-200 dark:bg-amber-900/30 dark:text-amber-400 dark:border-amber-800" : getSubjectBadgeClass(slot.subjectName, uniqueSubjects)}`}
                                >
                                  <div className="flex items-center gap-1.5">
-                                   <Clock className="h-3 w-3" />
+                                   <Clock className="size-3" />
                                    {formatTime(slot.startTime)} -{" "}
                                    {formatTime(slot.endTime)}
                                  </div>
@@ -171,19 +171,19 @@ export function DayView({
                                   {canEdit && (
                                     <button
                                       onClick={() => onEditSlot(slot)}
-                                      className="shrink-0 h-7 w-7 rounded-lg flex items-center justify-center text-muted-foreground/40 hover:text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-900/20 transition-all"
+                                      className="shrink-0 size-7 rounded-lg flex items-center justify-center text-muted-foreground/40 hover:text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-900/20 transition-all"
                                       title="Edit slot"
                                     >
-                                      <Pencil className="h-3.5 w-3.5" />
+                                      <Pencil className="size-3.5" />
                                     </button>
                                   )}
                                   {canDelete && (
                                     <button
                                       onClick={() => onDeleteSlot(slot.id)}
-                                      className="shrink-0 h-7 w-7 rounded-lg flex items-center justify-center text-muted-foreground/40 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 transition-all"
+                                      className="shrink-0 size-7 rounded-lg flex items-center justify-center text-muted-foreground/40 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 transition-all"
                                       title="Delete slot"
                                     >
-                                      <Trash2 className="h-3.5 w-3.5" />
+                                      <Trash2 className="size-3.5" />
                                     </button>
                                   )}
                                 </div>

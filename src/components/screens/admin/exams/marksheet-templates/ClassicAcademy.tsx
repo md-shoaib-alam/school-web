@@ -18,10 +18,10 @@ export const ClassicAcademy: React.FC<MarksheetTemplateProps> = ({
       <div className="absolute inset-2 border border-[#d4af37] pointer-events-none rounded z-10" />
 
       {/* Decorative Corner Accents */}
-      <div className="absolute top-4 left-4 w-3.5 h-3.5 border-t-2 border-l-2 border-[#d4af37] z-20" />
-      <div className="absolute top-4 right-4 w-3.5 h-3.5 border-t-2 border-r-2 border-[#d4af37] z-20" />
-      <div className="absolute bottom-4 left-4 w-3.5 h-3.5 border-b-2 border-l-2 border-[#d4af37] z-20" />
-      <div className="absolute bottom-4 right-4 w-3.5 h-3.5 border-b-2 border-r-2 border-[#d4af37] z-20" />
+      <div className="absolute top-4 left-4 size-3.5 border-t-2 border-l-2 border-[#d4af37] z-20" />
+      <div className="absolute top-4 right-4 size-3.5 border-t-2 border-r-2 border-[#d4af37] z-20" />
+      <div className="absolute bottom-4 left-4 size-3.5 border-b-2 border-l-2 border-[#d4af37] z-20" />
+      <div className="absolute bottom-4 right-4 size-3.5 border-b-2 border-r-2 border-[#d4af37] z-20" />
 
 
       {/* Core Document Flow */}
@@ -30,7 +30,7 @@ export const ClassicAcademy: React.FC<MarksheetTemplateProps> = ({
         {/* Crest & Logo Letterhead */}
         <div className="text-center pb-1">
           <div className="flex justify-center mb-2">
-            <div className="w-12 h-12 bg-[#1e3a8a] border-2 border-[#d4af37] rounded-full flex items-center justify-center shadow-md relative">
+            <div className="size-12 bg-[#1e3a8a] border-2 border-[#d4af37] rounded-full flex items-center justify-center shadow-md relative">
               <span className="text-xl filter drop-shadow">🎓</span>
               <span className="absolute bottom-0.5 text-[6px] text-[#d4af37] font-bold">★</span>
             </div>

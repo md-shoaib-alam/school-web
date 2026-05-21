@@ -101,7 +101,7 @@ export function Sidebar({
                 "mt-3 mb-2 bg-white dark:bg-zinc-950 border border-gray-200/80 dark:border-zinc-800 shadow-sm flex items-center",
                 sidebarOpen
                   ? "mx-3 p-3 rounded-xl justify-between"
-                  : "w-12 h-12 rounded-xl justify-center mx-auto"
+                  : "size-12 rounded-xl justify-center mx-auto"
               )
         )}
       >
@@ -110,7 +110,7 @@ export function Sidebar({
             <>
               <div
                 className={cn(
-                  "w-10 h-10 rounded-xl flex items-center justify-center text-white shadow-md overflow-hidden shrink-0",
+                  "size-10 rounded-xl flex items-center justify-center text-white shadow-md overflow-hidden shrink-0",
                   isSuperAdmin ? "bg-teal-600" : "bg-emerald-600",
                 )}
               >
@@ -118,10 +118,10 @@ export function Sidebar({
                   <img 
                     src={currentTenantLogo || currentUser?.tenantLogo || "/test.webp"} 
                     alt={currentTenantName || "School Logo"} 
-                    className="h-full w-full object-cover" 
+                    className="size-full object-cover" 
                   />
                 ) : (
-                  <Building2 className="h-5 w-5" />
+                  <Building2 className="size-5" />
                 )}
               </div>
               <div className="transition-all duration-300">
@@ -154,7 +154,7 @@ export function Sidebar({
           variant="ghost"
           size="icon"
           className={cn(
-            "h-8 w-8 transition-all duration-200 hover:scale-105 active:scale-95 shrink-0 rounded-lg",
+            "size-8 transition-all duration-200 hover:scale-105 active:scale-95 shrink-0 rounded-lg",
             isSuperAdmin
               ? "text-teal-200 hover:text-white hover:bg-teal-800/40 border border-teal-800/50 bg-teal-900/20 shadow-sm"
               : "text-gray-500 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-zinc-900",
@@ -162,9 +162,9 @@ export function Sidebar({
           onClick={toggleSidebar}
         >
           {sidebarOpen ? (
-            <PanelLeftClose className="h-4 w-4" />
+            <PanelLeftClose className="size-4" />
           ) : (
-            <PanelLeftOpen className="h-4 w-4" />
+            <PanelLeftOpen className="size-4" />
           )}
         </Button>
       </div>
@@ -214,14 +214,14 @@ export function Sidebar({
                     }
                   }}
                 >
-                  <div className="shrink-0 flex items-center justify-center w-5 h-5">
+                  <div className="shrink-0 flex items-center justify-center size-5">
                     {item.icon}
                   </div>
                   <span className={cn("flex-1 text-left transition-all duration-300", !sidebarOpen && "lg:hidden")}>{item.label}</span>
                   {sidebarOpen && (
                     <>
                       {hasChildren ? (
-                        isExpanded ? <ChevronDown className="h-4 w-4 opacity-50" /> : <ChevronRight className="h-4 w-4 opacity-50" />
+                        isExpanded ? <ChevronDown className="size-4 opacity-50" /> : <ChevronRight className="size-4 opacity-50" />
                       ) : item.badge && (
                         <Badge variant="secondary" className="ml-auto text-[10px] h-5 px-1.5">
                           {item.badge}
@@ -246,7 +246,7 @@ export function Sidebar({
                         )}
                         onClick={() => navigateTo(child.key)}
                       >
-                        <div className="shrink-0 flex items-center justify-center w-4 h-4">
+                        <div className="shrink-0 flex items-center justify-center size-4">
                           {child.icon}
                         </div>
                         {child.label}
@@ -272,13 +272,13 @@ export function Sidebar({
                 "bg-white dark:bg-zinc-950 border border-gray-200/80 dark:border-zinc-800 shadow-sm",
                 sidebarOpen
                   ? "mx-3 mb-3 p-3 rounded-xl"
-                  : "w-12 h-12 mb-3 rounded-xl flex items-center justify-center mx-auto"
+                  : "size-12 mb-3 rounded-xl flex items-center justify-center mx-auto"
               )
         )}
       >
         {sidebarOpen ? (
           <div className="flex items-center gap-3">
-            <Avatar className="h-9 w-9">
+            <Avatar className="size-9">
               <AvatarImage src={currentUser.avatar} alt={currentUser.name} className="object-cover" />
               <AvatarFallback
                 className={cn(
@@ -319,18 +319,18 @@ export function Sidebar({
                   variant="ghost"
                   size="icon"
                   className={cn(
-                    "h-8 w-8",
+                    "size-8",
                     isSuperAdmin
                       ? "text-rose-300 hover:bg-rose-800/60 hover:text-white"
                       : "text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800",
                   )}
                 >
-                  <Settings className="h-4 w-4" />
+                  <Settings className="size-4" />
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-56">
                 <div className="flex items-center gap-2 p-2">
-                  <Avatar className="h-8 w-8">
+                  <Avatar className="size-8">
                     <AvatarImage src={currentUser.avatar} alt={currentUser.name} className="object-cover" />
                     <AvatarFallback
                       className={cn(
@@ -353,7 +353,7 @@ export function Sidebar({
                   className="cursor-pointer gap-2"
                   onClick={() => navigateTo("profile")}
                 >
-                  <User className="h-4 w-4 text-emerald-500" />
+                  <User className="size-4 text-emerald-500" />
                   My Profile
                 </DropdownMenuItem>
                 {currentUser.role === "admin" && (
@@ -361,7 +361,7 @@ export function Sidebar({
                     className="cursor-pointer gap-2"
                     onClick={() => navigateTo("school-subscription")}
                   >
-                    <Crown className="h-4 w-4 text-amber-500" />
+                    <Crown className="size-4 text-amber-500" />
                     My Subscription
                   </DropdownMenuItem>
                 )}
@@ -369,7 +369,7 @@ export function Sidebar({
                   className="cursor-pointer gap-2"
                   onClick={() => setIsChangePasswordOpen(true)}
                 >
-                  <KeyRound className="h-4 w-4 text-orange-500" />
+                  <KeyRound className="size-4 text-orange-500" />
                   Change Password
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
@@ -380,7 +380,7 @@ export function Sidebar({
                     router.replace("/");
                   }}
                 >
-                  <LogOut className="h-4 w-4" />
+                  <LogOut className="size-4" />
                   Logout
                 </DropdownMenuItem>
               </DropdownMenuContent>
@@ -390,8 +390,8 @@ export function Sidebar({
           <div className="flex items-center justify-center">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" className="p-0 h-9 w-9 rounded-full focus-visible:ring-0">
-                  <Avatar className="h-9 w-9 cursor-pointer hover:opacity-85 transition-opacity">
+                <Button variant="ghost" className="p-0 size-9 rounded-full focus-visible:ring-0">
+                  <Avatar className="size-9 cursor-pointer hover:opacity-85 transition-opacity">
                     <AvatarImage src={currentUser.avatar} alt={currentUser.name} className="object-cover" />
                     <AvatarFallback
                       className={cn(
@@ -406,7 +406,7 @@ export function Sidebar({
               </DropdownMenuTrigger>
               <DropdownMenuContent align="start" className="w-56 ml-2">
                 <div className="flex items-center gap-2 p-2">
-                  <Avatar className="h-8 w-8">
+                  <Avatar className="size-8">
                     <AvatarImage src={currentUser.avatar} alt={currentUser.name} className="object-cover" />
                     <AvatarFallback
                       className={cn(
@@ -429,7 +429,7 @@ export function Sidebar({
                   className="cursor-pointer gap-2"
                   onClick={() => navigateTo("profile")}
                 >
-                  <User className="h-4 w-4 text-emerald-500" />
+                  <User className="size-4 text-emerald-500" />
                   My Profile
                 </DropdownMenuItem>
                 {currentUser.role === "admin" && (
@@ -437,7 +437,7 @@ export function Sidebar({
                     className="cursor-pointer gap-2"
                     onClick={() => navigateTo("school-subscription")}
                   >
-                    <Crown className="h-4 w-4 text-amber-500" />
+                    <Crown className="size-4 text-amber-500" />
                     My Subscription
                   </DropdownMenuItem>
                 )}
@@ -445,7 +445,7 @@ export function Sidebar({
                   className="cursor-pointer gap-2"
                   onClick={() => setIsChangePasswordOpen(true)}
                 >
-                  <KeyRound className="h-4 w-4 text-orange-500" />
+                  <KeyRound className="size-4 text-orange-500" />
                   Change Password
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
@@ -456,7 +456,7 @@ export function Sidebar({
                     router.replace("/");
                   }}
                 >
-                  <LogOut className="h-4 w-4" />
+                  <LogOut className="size-4" />
                   Logout
                 </DropdownMenuItem>
               </DropdownMenuContent>

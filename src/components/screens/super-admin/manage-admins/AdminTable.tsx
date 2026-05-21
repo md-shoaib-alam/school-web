@@ -82,7 +82,7 @@ export function AdminTable({
           </div>
         ) : filteredAdmins.length === 0 ? (
           <div className="py-20 text-center text-muted-foreground border-dashed border-2 m-4 rounded-xl">
-            <ShieldCheck className="h-12 w-12 mx-auto mb-3 opacity-20" />
+            <ShieldCheck className="size-12 mx-auto mb-3 opacity-20" />
             <p className="font-bold text-lg text-foreground">No super admin accounts</p>
             <p className="text-sm mt-1 max-w-xs mx-auto">
               {admins.length === 0
@@ -112,7 +112,7 @@ export function AdminTable({
                     >
                       <TableCell>
                         <div className="flex items-center gap-3">
-                          <Avatar className="h-10 w-10 shrink-0 ring-2 ring-white dark:ring-gray-800 shadow-sm">
+                          <Avatar className="size-10 shrink-0 ring-2 ring-white dark:ring-gray-800 shadow-sm">
                             <AvatarFallback className="bg-teal-500 text-white text-xs font-bold">
                               {getInitials(admin.name)}
                             </AvatarFallback>
@@ -124,7 +124,7 @@ export function AdminTable({
                               </p>
                               {isRoot && (
                                 <Badge className="bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 border border-amber-200 dark:border-amber-800 hover:bg-amber-100 dark:hover:bg-amber-900/30 text-[10px] gap-1 px-1.5 py-0 shadow-none font-semibold">
-                                  <LockKeyhole className="h-3 w-3" />
+                                  <LockKeyhole className="size-3" />
                                   Root Owner
                                 </Badge>
                               )}
@@ -137,7 +137,7 @@ export function AdminTable({
                       </TableCell>
                       <TableCell className="hidden sm:table-cell">
                         <div className="flex items-center gap-1.5 min-w-0">
-                          <Mail className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
+                          <Mail className="size-3.5 text-muted-foreground shrink-0" />
                           <span className="text-sm truncate font-medium text-muted-foreground">
                             {admin.email}
                           </span>
@@ -156,7 +156,7 @@ export function AdminTable({
                       </TableCell>
                       <TableCell className="hidden md:table-cell">
                         <div className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground uppercase tracking-tight">
-                          <Clock className="h-3.5 w-3.5" />
+                          <Clock className="size-3.5" />
                           {formatDate(admin.createdAt)}
                         </div>
                       </TableCell>
@@ -167,18 +167,18 @@ export function AdminTable({
                               <Button
                                 variant="ghost"
                                 size="icon"
-                                className="h-8 w-8"
+                                className="size-8"
                                 disabled
                               >
-                                <Pencil className="h-4 w-4" />
+                                <Pencil className="size-4" />
                               </Button>
                               <Button
                                 variant="ghost"
                                 size="icon"
-                                className="h-8 w-8"
+                                className="size-8"
                                 disabled
                               >
-                                <Trash2 className="h-4 w-4" />
+                                <Trash2 className="size-4" />
                               </Button>
                             </div>
                           </Tooltip>
@@ -187,10 +187,10 @@ export function AdminTable({
                             <Button
                               variant="ghost"
                               size="icon"
-                              className="h-8 w-8 text-muted-foreground hover:text-teal-600 hover:bg-teal-50 dark:hover:bg-teal-900/20"
+                              className="size-8 text-muted-foreground hover:text-teal-600 hover:bg-teal-50 dark:hover:bg-teal-900/20"
                               onClick={() => onEdit(admin)}
                             >
-                              <Pencil className="h-4 w-4" />
+                              <Pencil className="size-4" />
                             </Button>
                             <AlertDialog
                               open={deletingId === admin.id}
@@ -202,10 +202,10 @@ export function AdminTable({
                                 <Button
                                   variant="ghost"
                                   size="icon"
-                                  className="h-8 w-8 text-muted-foreground hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20"
+                                  className="size-8 text-muted-foreground hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20"
                                   onClick={() => setDeletingId(admin.id)}
                                 >
-                                  <Trash2 className="h-4 w-4" />
+                                  <Trash2 className="size-4" />
                                 </Button>
                               </AlertDialogTrigger>
                               <AlertDialogContent className="rounded-2xl">

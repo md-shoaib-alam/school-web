@@ -143,7 +143,7 @@ function ViewToggle({
               : "text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:bg-white dark:hover:bg-gray-800"
           }
         >
-          <Icon className="h-4 w-4" />
+          <Icon className="size-4" />
           <span className="hidden sm:inline">{label}</span>
         </Button>
       ))}
@@ -395,7 +395,7 @@ function GridView({
               <tr className="border-b bg-muted/30">
                 <th className="py-3 px-4 text-left font-medium text-muted-foreground w-36 border-r border-gray-100 dark:border-gray-700">
                   <div className="flex items-center gap-1.5">
-                    <Clock className="h-3.5 w-3.5" />
+                    <Clock className="size-3.5" />
                     Time Slot
                   </div>
                 </th>
@@ -410,7 +410,7 @@ function GridView({
                   >
                     {SHORT_DAY_LABELS[day]}
                     {day === currentDayKey && (
-                      <span className="ml-1.5 inline-block h-1.5 w-1.5 rounded-full bg-emerald-500" />
+                      <span className="ml-1.5 inline-block size-1.5 rounded-full bg-emerald-500" />
                     )}
                   </th>
                 ))}
@@ -430,8 +430,8 @@ function GridView({
                   >
                     <td className="py-3 px-4 align-top border-r border-gray-100 dark:border-gray-700">
                       <div className="flex items-center gap-2">
-                        <div className="h-7 w-7 rounded-lg bg-muted flex items-center justify-center flex-shrink-0">
-                          <Clock className="h-3.5 w-3.5 text-muted-foreground" />
+                        <div className="size-7 rounded-lg bg-muted flex items-center justify-center flex-shrink-0">
+                          <Clock className="size-3.5 text-muted-foreground" />
                         </div>
                         <div>
                           <p className="text-xs font-semibold text-foreground leading-tight">{formatTime(start)}</p>
@@ -533,7 +533,7 @@ function ListView({
             }`}
           >
             <CalendarDays
-              className={`h-4 w-4 ${
+              className={`size-4 ${
                 day === currentDayKey
                   ? "text-emerald-600 dark:text-emerald-400"
                   : "text-gray-400 dark:text-gray-500"
@@ -574,7 +574,7 @@ function ListView({
                   }`}
                 >
                   <div className="flex-shrink-0 w-24 flex items-center gap-1.5 text-xs text-gray-500 dark:text-gray-400 font-medium">
-                    <Clock className="h-3.5 w-3.5 flex-shrink-0" />
+                    <Clock className="size-3.5 flex-shrink-0" />
                     <span>
                       {slot.startTime} - {slot.endTime}
                     </span>
@@ -588,12 +588,12 @@ function ListView({
                   </Badge>
 
                   <div className="hidden sm:flex items-center gap-1 text-xs text-gray-500 dark:text-gray-400 min-w-0">
-                    <User className="h-3 w-3 flex-shrink-0" />
+                    <User className="size-3 flex-shrink-0" />
                     <span className="truncate">{slot.teacherName}</span>
                   </div>
 
                   <div className="hidden md:flex items-center gap-1 text-xs text-gray-500 dark:text-gray-400 min-w-0 ml-auto">
-                    <GraduationCap className="h-3 w-3 flex-shrink-0" />
+                    <GraduationCap className="size-3 flex-shrink-0" />
                     <span className="truncate">{slot.className}</span>
                   </div>
 
@@ -696,11 +696,11 @@ function DayView({
             return (
               <div key={slot.id} className="flex items-stretch gap-4">
                 <div className="flex-shrink-0 w-10 flex justify-center pt-4">
-                  <div className="w-2.5 h-2.5 rounded-full bg-gray-200 dark:bg-gray-700 border-2 border-white dark:border-gray-900 shadow-sm block"></div>
+                  <div className="size-2.5 rounded-full bg-gray-200 dark:bg-gray-700 border-2 border-white dark:border-gray-900 shadow-sm block"></div>
                 </div>
                 <Card className="flex-1 border-dashed border-gray-200 dark:border-gray-700 bg-gray-50/50 dark:bg-gray-800/30 rounded-xl shadow-none">
                   <CardContent className="p-4 flex items-center gap-3">
-                    <Coffee className="h-5 w-5 text-gray-300 dark:text-gray-600" />
+                    <Coffee className="size-5 text-gray-300 dark:text-gray-600" />
                     <div>
                       <p className="text-sm font-medium text-gray-400 dark:text-gray-500">
                         Free Period
@@ -719,7 +719,7 @@ function DayView({
             <div key={slot.id} className="flex items-stretch gap-4">
               <div className="flex-shrink-0 w-10 flex justify-center pt-5">
                 <div
-                  className={`w-3 h-3 rounded-full border-2 bg-background shadow-sm block transition-all ${
+                  className={`size-3 rounded-full border-2 bg-background shadow-sm block transition-all ${
                     inProgress
                       ? "border-emerald-500 scale-110 ring-2 ring-emerald-100 dark:ring-emerald-900/50"
                       : "border-emerald-400"
@@ -751,7 +751,7 @@ function DayView({
                       variant="outline" 
                       className="bg-emerald-50 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800/50 font-medium px-2.5 py-1 rounded-lg h-auto text-xs flex items-center gap-1.5"
                     >
-                      <Clock className="h-3.5 w-3.5" />
+                      <Clock className="size-3.5" />
                       {formatTime(slot.startTime)} - {formatTime(slot.endTime)}
                     </Badge>
                     {inProgress && (
@@ -791,7 +791,7 @@ function LoadingSkeleton() {
 function EmptyState() {
   return (
     <div className="text-center py-16 text-gray-400 dark:text-gray-500">
-      <BookOpen className="h-12 w-12 mx-auto mb-4 opacity-50" />
+      <BookOpen className="size-12 mx-auto mb-4 opacity-50" />
       <p className="text-lg font-medium text-gray-500 dark:text-gray-400">
         No timetable available
       </p>

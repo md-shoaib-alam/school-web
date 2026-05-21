@@ -82,10 +82,10 @@ export function CalendarAgenda({
               <Button 
                 variant="ghost" 
                 size="icon" 
-                className="h-6 w-6 text-slate-400 hover:text-rose-500 dark:hover:text-rose-400 ml-0.5 rounded-full" 
+                className="size-6 text-slate-400 hover:text-rose-500 dark:hover:text-rose-400 ml-0.5 rounded-full" 
                 onClick={() => setSelectedDate(null)}
               >
-                <X className="h-3.5 w-3.5" />
+                <X className="size-3.5" />
               </Button>
             )}
           </div>
@@ -102,7 +102,7 @@ export function CalendarAgenda({
             </div>
           ) : activeEventsList.length === 0 ? (
             <div className="flex-1 flex flex-col items-center justify-center py-6 border border-slate-100 dark:border-white/[0.04] bg-slate-50/30 dark:bg-white/[0.01] rounded-xl text-center">
-              <CalendarCheck2 className="h-8 w-8 text-slate-300 dark:text-slate-600 mb-2 stroke-[1.5]" />
+              <CalendarCheck2 className="size-8 text-slate-300 dark:text-slate-600 mb-2 stroke-[1.5]" />
               <p className="text-xs font-medium text-slate-500 dark:text-slate-400">
                 No events scheduled for this day
               </p>
@@ -127,7 +127,7 @@ export function CalendarAgenda({
                           {EVENT_TYPE_LABELS[ev.type] || ev.type}
                         </span>
                         <span className="flex items-center gap-1 text-slate-400 dark:text-slate-500 font-semibold">
-                          <Clock className="h-3 w-3 shrink-0 opacity-70" />
+                          <Clock className="size-3 shrink-0 opacity-70" />
                           {ev.allDay ? "All Day" : "Scheduled"}
                         </span>
                       </div>
@@ -135,13 +135,13 @@ export function CalendarAgenda({
 
                     <div className="flex items-center gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity duration-200 shrink-0 ml-2">
                       {canEdit && (
-                        <Button variant="ghost" size="icon" className="h-7 w-7 rounded-lg hover:bg-white dark:hover:bg-neutral-800 border border-transparent hover:border-slate-200/60 dark:hover:border-white/[0.08]" onClick={(e) => { e.stopPropagation(); openEditDialog(ev); }}>
-                          <Pencil className="h-3 w-3 text-slate-500 hover:text-blue-600 dark:hover:text-rose-400" />
+                        <Button variant="ghost" size="icon" className="size-7 rounded-lg hover:bg-white dark:hover:bg-neutral-800 border border-transparent hover:border-slate-200/60 dark:hover:border-white/[0.08]" onClick={(e) => { e.stopPropagation(); openEditDialog(ev); }}>
+                          <Pencil className="size-3 text-slate-500 hover:text-blue-600 dark:hover:text-rose-400" />
                         </Button>
                       )}
                       {canDelete && (
-                        <Button variant="ghost" size="icon" className="h-7 w-7 rounded-lg hover:bg-white dark:hover:bg-neutral-800 border border-transparent hover:border-slate-200/60 dark:hover:border-white/[0.08]" onClick={(e) => { e.stopPropagation(); openDeleteConfirm(ev.id); }}>
-                          <Trash2 className="h-3 w-3 text-slate-500 hover:text-rose-600" />
+                        <Button variant="ghost" size="icon" className="size-7 rounded-lg hover:bg-white dark:hover:bg-neutral-800 border border-transparent hover:border-slate-200/60 dark:hover:border-white/[0.08]" onClick={(e) => { e.stopPropagation(); openDeleteConfirm(ev.id); }}>
+                          <Trash2 className="size-3 text-slate-500 hover:text-rose-600" />
                         </Button>
                       )}
                     </div>
@@ -162,10 +162,10 @@ export function CalendarAgenda({
           <Button 
             variant="ghost" 
             size="icon" 
-            className="h-7 w-7 text-blue-500 hover:text-blue-600 dark:text-blue-400 rounded-full transition-transform duration-500 active:rotate-180"
+            className="size-7 text-blue-500 hover:text-blue-600 dark:text-blue-400 rounded-full transition-transform duration-500 active:rotate-180"
             onClick={() => window.location.reload()}
           >
-            <RotateCw className="h-3.5 w-3.5 stroke-[2]" />
+            <RotateCw className="size-3.5 stroke-[2]" />
           </Button>
         </div>
 
@@ -178,7 +178,7 @@ export function CalendarAgenda({
             </div>
           ) : upcomingEventsList.length === 0 ? (
             <div className="flex-1 flex flex-col items-center justify-center py-6 border border-slate-100 dark:border-white/[0.04] bg-slate-50/30 dark:bg-white/[0.01] rounded-xl text-center">
-              <CalendarDays className="h-7 w-7 text-slate-300 dark:text-slate-600 mb-2 stroke-[1.5]" />
+              <CalendarDays className="size-7 text-slate-300 dark:text-slate-600 mb-2 stroke-[1.5]" />
               <p className="text-xs font-medium text-slate-500 dark:text-slate-400">
                 No upcoming events schedule
               </p>
@@ -204,7 +204,7 @@ export function CalendarAgenda({
                         </span>
                         {ev.location && (
                           <span className="flex items-center gap-1 truncate font-semibold">
-                            <MapPin className="h-2.5 w-2.5 shrink-0 opacity-70" />
+                            <MapPin className="size-2.5 shrink-0 opacity-70" />
                             {ev.location}
                           </span>
                         )}
@@ -229,7 +229,7 @@ export function CalendarAgenda({
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-2 gap-2">
           {ALL_EVENT_TYPES.slice(0, 8).map((t) => (
             <div key={t} className="flex items-center gap-1.5 text-xs font-medium text-slate-600 dark:text-slate-300">
-              <span className="w-2 h-2 rounded-full shrink-0 shadow-sm" style={{ backgroundColor: EVENT_TYPE_COLORS[t] }} />
+              <span className="size-2 rounded-full shrink-0 shadow-sm" style={{ backgroundColor: EVENT_TYPE_COLORS[t] }} />
               <span className="truncate tracking-tight text-[11px]">{EVENT_TYPE_LABELS[t]}</span>
             </div>
           ))}
@@ -268,7 +268,7 @@ export function CalendarAgenda({
                   {/* Date Segment */}
                   <div className="flex items-start gap-3.5 text-sm">
                     <div className="p-2 rounded-xl bg-blue-50 dark:bg-blue-950/20 text-blue-600 dark:text-blue-400 shrink-0 border border-blue-100/30 dark:border-blue-900/20">
-                      <Calendar className="h-4 w-4" />
+                      <Calendar className="size-4" />
                     </div>
                     <div className="pt-0.5">
                       <p className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">Schedule Date</p>
@@ -285,7 +285,7 @@ export function CalendarAgenda({
                   {detailEvent.location && (
                     <div className="flex items-start gap-3.5 text-sm">
                       <div className="p-2 rounded-xl bg-indigo-50 dark:bg-indigo-950/20 text-indigo-600 dark:text-indigo-400 shrink-0 border border-indigo-100/30 dark:border-indigo-900/20">
-                        <MapPin className="h-4 w-4" />
+                        <MapPin className="size-4" />
                       </div>
                       <div className="pt-0.5">
                         <p className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">Location</p>
@@ -297,7 +297,7 @@ export function CalendarAgenda({
                   {/* Visibility Target Role Segment */}
                   <div className="flex items-start gap-3.5 text-sm">
                     <div className="p-2 rounded-xl bg-amber-50 dark:bg-amber-950/20 text-amber-600 dark:text-amber-400 shrink-0 border border-amber-100/30 dark:border-amber-900/20">
-                      <Users className="h-4 w-4" />
+                      <Users className="size-4" />
                     </div>
                     <div className="pt-0.5">
                       <p className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">Event Audience</p>
@@ -311,7 +311,7 @@ export function CalendarAgenda({
                   {detailEvent.description && (
                     <div className="flex items-start gap-3.5 text-sm pt-4 border-t border-slate-100 dark:border-white/[0.04] mt-4">
                       <div className="p-2 rounded-xl bg-slate-50 dark:bg-white/[0.02] text-slate-500 shrink-0 border border-slate-100/50 dark:border-white/[0.02]">
-                        <AlignLeft className="h-4 w-4" />
+                        <AlignLeft className="size-4" />
                       </div>
                       <div className="flex-1 pt-0.5">
                         <p className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-1.5">Description</p>

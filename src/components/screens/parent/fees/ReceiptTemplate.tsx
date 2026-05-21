@@ -29,7 +29,7 @@ export const ReceiptTemplate = React.forwardRef<HTMLDivElement, ReceiptTemplateP
         {/* Header */}
         <div className="flex items-start justify-between border-b pb-6 mb-8">
           <div className="flex gap-4">
-            <div className="w-16 h-16 border-2 border-black flex items-center justify-center">
+            <div className="size-16 border-2 border-black flex items-center justify-center">
               <GraduationCap size={40} className="text-black" />
             </div>
             <div>

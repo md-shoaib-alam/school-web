@@ -266,7 +266,7 @@ export function StudentGrades({ initialTab }: { initialTab?: "exams" | "assessme
                 className="h-9 gap-1.5 text-sm font-medium border-violet-200 text-violet-700 hover:bg-violet-50 dark:border-violet-800 dark:text-violet-400 dark:hover:bg-violet-950/30"
                 onClick={() => router.push(`/${slug}/view-marksheet`)}
               >
-                <FileText className="h-4 w-4" />
+                <FileText className="size-4" />
                 View Marksheet
               </Button>
             )}
@@ -281,7 +281,7 @@ export function StudentGrades({ initialTab }: { initialTab?: "exams" | "assessme
             <Card className="col-span-2 sm:col-span-1 rounded-xl shadow-sm border-violet-100 dark:border-violet-950/30 bg-gradient-to-tr from-white to-violet-50/20 dark:from-background dark:to-violet-950/10">
               <CardContent className="p-5 text-center">
                 <div className="inline-flex p-3 rounded-xl bg-violet-600 dark:bg-violet-500 text-white mb-3">
-                  <TrendingUp className="h-5 w-5" />
+                  <TrendingUp className="size-5" />
                 </div>
                 <p className="text-xl sm:text-3xl font-bold text-gray-900 dark:text-gray-100">
                   {overallAvg}%
@@ -296,7 +296,7 @@ export function StudentGrades({ initialTab }: { initialTab?: "exams" | "assessme
             <Card className="rounded-xl shadow-sm border-emerald-100 dark:border-emerald-950/30 bg-gradient-to-tr from-white to-emerald-50/20 dark:from-background dark:to-emerald-950/10">
               <CardContent className="p-5 text-center">
                 <div className="inline-flex p-3 rounded-xl bg-emerald-600 dark:bg-emerald-500 text-white mb-3">
-                  <Award className="h-5 w-5" />
+                  <Award className="size-5" />
                 </div>
                 <p className="text-xl sm:text-3xl font-bold text-gray-900 dark:text-gray-100">
                   {grades.length}
@@ -319,7 +319,7 @@ export function StudentGrades({ initialTab }: { initialTab?: "exams" | "assessme
             <Card className="rounded-xl shadow-sm border-amber-100 dark:border-amber-950/30 bg-gradient-to-tr from-white to-amber-50/20 dark:from-background dark:to-amber-950/10">
               <CardContent className="p-5 text-center">
                 <div className="inline-flex p-3 rounded-xl bg-amber-600 dark:bg-amber-500 text-white mb-3">
-                  <Star className="h-5 w-5" />
+                  <Star className="size-5" />
                 </div>
                 <p className="text-xl sm:text-3xl font-bold text-gray-900 dark:text-gray-100">
                   {gradeDistribution.find(
@@ -353,7 +353,7 @@ export function StudentGrades({ initialTab }: { initialTab?: "exams" | "assessme
             <Card className="rounded-xl shadow-sm border-gray-200/60 dark:border-zinc-800">
               <CardHeader className="pb-2">
                 <CardTitle className="text-base flex items-center gap-2 font-semibold">
-                  <BarChart3 className="h-4 w-4 text-violet-500" />
+                  <BarChart3 className="size-4 text-violet-500" />
                   Subject Performance
                 </CardTitle>
                 <CardDescription className="text-xs">
@@ -407,7 +407,7 @@ export function StudentGrades({ initialTab }: { initialTab?: "exams" | "assessme
             <Card className="rounded-xl shadow-sm border-gray-200/60 dark:border-zinc-800">
               <CardHeader className="pb-2">
                 <CardTitle className="text-base flex items-center gap-2 font-semibold">
-                  <CircleDot className="h-4 w-4 text-violet-500" />
+                  <CircleDot className="size-4 text-violet-500" />
                   Grade Distribution
                 </CardTitle>
                 <CardDescription className="text-xs">
@@ -418,11 +418,11 @@ export function StudentGrades({ initialTab }: { initialTab?: "exams" | "assessme
                 {pieData.length > 0 ? (
                   <div className="flex items-center gap-6">
                     {!recharts ? (
-                      <Skeleton className="h-[200px] w-[200px]" />
+                      <Skeleton className="size-[200px]" />
                     ) : (
                       <ChartContainer
                         config={chartConfig}
-                        className="h-[200px] w-[200px]"
+                        className="size-[200px]"
                       >
                         {(() => {
                           const { PieChart, Pie, Cell } = recharts;
@@ -456,7 +456,7 @@ export function StudentGrades({ initialTab }: { initialTab?: "exams" | "assessme
                           className="flex items-center gap-2 text-sm"
                         >
                           <div
-                            className="w-3 h-3 rounded-sm"
+                            className="size-3 rounded-sm"
                             style={{ backgroundColor: gradeColorMap[g.grade] }}
                           />
                           <span className="text-gray-600 dark:text-gray-400 font-medium">
@@ -482,7 +482,7 @@ export function StudentGrades({ initialTab }: { initialTab?: "exams" | "assessme
           <Card className="rounded-xl shadow-sm border-gray-200/60 dark:border-zinc-800">
             <CardHeader className="pb-3">
               <CardTitle className="text-base flex items-center gap-2 font-semibold">
-                <GraduationCap className="h-4 w-4 text-violet-500" />
+                <GraduationCap className="size-4 text-violet-500" />
                 All Exam Grades
               </CardTitle>
             </CardHeader>
@@ -503,7 +503,7 @@ export function StudentGrades({ initialTab }: { initialTab?: "exams" | "assessme
                     <div className="min-w-[600px] sm:min-w-full pb-4">
                     {filteredGrades.length === 0 ? (
                       <div className="text-center py-12 text-gray-400 dark:text-gray-500 border border-dashed rounded-xl mt-2">
-                        <GraduationCap className="h-10 w-10 mx-auto mb-2 opacity-40" />
+                        <GraduationCap className="size-10 mx-auto mb-2 opacity-40" />
                         <p className="text-sm font-medium">No exam grades found</p>
                       </div>
                     ) : (
@@ -584,7 +584,7 @@ export function StudentGrades({ initialTab }: { initialTab?: "exams" | "assessme
             <Card className="col-span-2 sm:col-span-1 rounded-xl shadow-sm border-indigo-100 dark:border-indigo-950/30 bg-white dark:bg-background">
               <CardContent className="p-3 sm:p-5 text-center">
                 <div className="inline-flex p-2 sm:p-3 rounded-xl bg-indigo-600 dark:bg-indigo-500 text-white mb-2 sm:mb-3">
-                  <TrendingUp className="h-4 w-4 sm:h-5 sm:h-5" />
+                  <TrendingUp className="size-4 sm:h-5 sm:h-5" />
                 </div>
                 <p className="text-lg sm:text-3xl font-bold text-gray-900 dark:text-gray-100">
                   {assessmentAvg}%
@@ -602,7 +602,7 @@ export function StudentGrades({ initialTab }: { initialTab?: "exams" | "assessme
             <Card className="rounded-xl shadow-sm border-blue-100 dark:border-blue-950/30 bg-white dark:bg-background">
               <CardContent className="p-3 sm:p-5 text-center">
                 <div className="inline-flex p-2 sm:p-3 rounded-xl bg-blue-600 dark:bg-blue-500 text-white mb-2 sm:mb-3">
-                  <Award className="h-4 w-4 sm:h-5 sm:h-5" />
+                  <Award className="size-4 sm:h-5 sm:h-5" />
                 </div>
                 <p className="text-lg sm:text-3xl font-bold text-gray-900 dark:text-gray-100">
                   {assessmentGrades.length}
@@ -624,7 +624,7 @@ export function StudentGrades({ initialTab }: { initialTab?: "exams" | "assessme
             <Card className="rounded-xl shadow-sm border-teal-100 dark:border-teal-950/30 bg-white dark:bg-background">
               <CardContent className="p-3 sm:p-5 text-center">
                 <div className="inline-flex p-2 sm:p-3 rounded-xl bg-teal-600 dark:bg-teal-500 text-white mb-2 sm:mb-3">
-                  <CheckCircle2 className="h-4 w-4 sm:h-5 sm:h-5" />
+                  <CheckCircle2 className="size-4 sm:h-5 sm:h-5" />
                 </div>
                 <p className="text-lg sm:text-3xl font-bold text-gray-900 dark:text-gray-100">
                   {assessmentGrades.filter(a => (a.marksObtained || 0) >= (a.passingMarks || 0)).length}
@@ -647,7 +647,7 @@ export function StudentGrades({ initialTab }: { initialTab?: "exams" | "assessme
             <Card className="rounded-xl shadow-sm border-gray-200/60 dark:border-zinc-800">
               <CardHeader className="pb-2">
                 <CardTitle className="text-base flex items-center gap-2 font-semibold">
-                  <BarChart3 className="h-4 w-4 text-indigo-500" />
+                  <BarChart3 className="size-4 text-indigo-500" />
                   Assessment Performance by Subject
                 </CardTitle>
                 <CardDescription className="text-xs">
@@ -701,7 +701,7 @@ export function StudentGrades({ initialTab }: { initialTab?: "exams" | "assessme
             <Card className="rounded-xl shadow-sm border-gray-200/60 dark:border-zinc-800 flex flex-col justify-between">
               <CardHeader className="pb-2">
                 <CardTitle className="text-base flex items-center gap-2 font-semibold">
-                  <Star className="h-4 w-4 text-indigo-500" />
+                  <Star className="size-4 text-indigo-500" />
                   Tips for Improvement
                 </CardTitle>
                 <CardDescription className="text-xs">
@@ -711,15 +711,15 @@ export function StudentGrades({ initialTab }: { initialTab?: "exams" | "assessme
               <CardContent className="flex-1 flex flex-col justify-center py-6">
                 <div className="space-y-4 font-medium text-sm text-gray-600 dark:text-gray-300">
                   <div className="flex items-start gap-3">
-                    <div className="w-1.5 h-1.5 rounded-full bg-indigo-500 mt-1.5 shrink-0" />
+                    <div className="size-1.5 rounded-full bg-indigo-500 mt-1.5 shrink-0" />
                     <p>Regular class assessments weigh directly into your overall academic profile. Don't skip assignments!</p>
                   </div>
                   <div className="flex items-start gap-3">
-                    <div className="w-1.5 h-1.5 rounded-full bg-indigo-500 mt-1.5 shrink-0" />
+                    <div className="size-1.5 rounded-full bg-indigo-500 mt-1.5 shrink-0" />
                     <p>If you scored below {assessmentAvg}% in any recent unit test, consider requesting extra practice materials from your teacher.</p>
                   </div>
                   <div className="flex items-start gap-3">
-                    <div className="w-1.5 h-1.5 rounded-full bg-indigo-500 mt-1.5 shrink-0" />
+                    <div className="size-1.5 rounded-full bg-indigo-500 mt-1.5 shrink-0" />
                     <p>Check teacher remarks inside the table below to find constructive feedback on individual topics.</p>
                   </div>
                 </div>
@@ -731,7 +731,7 @@ export function StudentGrades({ initialTab }: { initialTab?: "exams" | "assessme
           <Card className="rounded-xl shadow-sm border-gray-200/60 dark:border-zinc-800">
             <CardHeader className="pb-3">
               <CardTitle className="text-base flex items-center gap-2 font-semibold">
-                <GraduationCap className="h-4 w-4 text-indigo-500" />
+                <GraduationCap className="size-4 text-indigo-500" />
                 All Graded Assessments
               </CardTitle>
             </CardHeader>
@@ -740,7 +740,7 @@ export function StudentGrades({ initialTab }: { initialTab?: "exams" | "assessme
                 <div className="min-w-[700px] sm:min-w-full pb-4">
                 {assessmentGrades.length === 0 ? (
                   <div className="text-center py-12 text-gray-400 dark:text-gray-500 border border-dashed rounded-xl mt-2">
-                    <GraduationCap className="h-10 w-10 mx-auto mb-2 opacity-40" />
+                    <GraduationCap className="size-10 mx-auto mb-2 opacity-40" />
                     <p className="text-sm font-medium">No assessment records graded yet</p>
                   </div>
                 ) : (

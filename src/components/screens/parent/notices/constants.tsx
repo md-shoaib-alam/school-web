@@ -8,14 +8,14 @@ export const PRIORITY_CONFIG: Record<
     bg: "bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300",
     text: "Normal",
     border: "border-l-gray-400 dark:border-l-gray-600",
-    icon: <Info className="h-3.5 w-3.5 text-gray-500 dark:text-gray-400" />,
+    icon: <Info className="size-3.5 text-gray-500 dark:text-gray-400" />,
   },
   important: {
     bg: "bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-300",
     text: "Important",
     border: "border-l-orange-500",
     icon: (
-      <AlertTriangle className="h-3.5 w-3.5 text-orange-500 dark:text-orange-400" />
+      <AlertTriangle className="size-3.5 text-orange-500 dark:text-orange-400" />
     ),
   },
   urgent: {
@@ -23,7 +23,7 @@ export const PRIORITY_CONFIG: Record<
     text: "Urgent",
     border: "border-l-red-500",
     icon: (
-      <AlertTriangle className="h-3.5 w-3.5 text-red-500 dark:text-red-400" />
+      <AlertTriangle className="size-3.5 text-red-500 dark:text-red-400" />
     ),
   },
 };

@@ -24,7 +24,7 @@ export function GradesTable({ studentName, grades }: GradesTableProps) {
     <Card className="rounded-xl shadow-sm shadow-none border-gray-100 dark:border-gray-800">
       <CardHeader className="p-4 pb-2 text-left">
         <CardTitle className="text-sm font-semibold flex items-center gap-2">
-          <Award className="h-4 w-4 text-amber-600" />
+          <Award className="size-4 text-amber-600" />
           Detailed Grades
         </CardTitle>
         <CardDescription>

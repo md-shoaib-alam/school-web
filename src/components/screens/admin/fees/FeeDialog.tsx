@@ -87,7 +87,7 @@ export function FeeDialog({
       <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2 text-emerald-600">
-            <IndianRupee className="h-5 w-5" />
+            <IndianRupee className="size-5" />
             {title}
           </DialogTitle>
           <DialogDescription>
@@ -100,7 +100,7 @@ export function FeeDialog({
             {mode === "create" && (
               <div className="space-y-2 col-span-2">
                 <Label className="flex items-center gap-2">
-                  <School className="h-4 w-4 text-muted-foreground" />
+                  <School className="size-4 text-muted-foreground" />
                   Select Class (to filter students)
                 </Label>
                 <Select
@@ -250,7 +250,7 @@ export function FeeDialog({
               onClick={onSubmit}
               disabled={submitting}
             >
-              {submitting && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
+              {submitting && <Loader2 className="size-4 mr-2 animate-spin" />}
               {mode === "create" ? "Create Record" : "Save Changes"}
             </Button>
           )}

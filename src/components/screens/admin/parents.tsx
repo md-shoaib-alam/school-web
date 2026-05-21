@@ -304,31 +304,31 @@ export function AdminParents() {
               variant={viewMode === "table" ? "secondary" : "ghost"}
               size="sm"
               onClick={() => setViewMode("table")}
-              className={`h-8 w-8 p-0 ${viewMode === "table" ? "bg-white dark:bg-gray-700 shadow-sm" : ""}`}
+              className={`size-8 p-0 ${viewMode === "table" ? "bg-white dark:bg-gray-700 shadow-sm" : ""}`}
             >
-              <List className="h-4 w-4" />
+              <List className="size-4" />
             </Button>
             <Button
               variant={viewMode === "grid" ? "secondary" : "ghost"}
               size="sm"
               onClick={() => setViewMode("grid")}
-              className={`h-8 w-8 p-0 ${viewMode === "grid" ? "bg-white dark:bg-gray-700 shadow-sm" : ""}`}
+              className={`size-8 p-0 ${viewMode === "grid" ? "bg-white dark:bg-gray-700 shadow-sm" : ""}`}
             >
-              <LayoutGrid className="h-4 w-4" />
+              <LayoutGrid className="size-4" />
             </Button>
           </div>
           <Button
             className="bg-emerald-600 hover:bg-emerald-700 text-white shadow-sm"
             onClick={() => setCreateOpen(true)}
           >
-            <UserPlus className="h-4 w-4 mr-2" /> Add Parent
+            <UserPlus className="size-4 mr-2" /> Add Parent
           </Button>
         </div>
       </div>
 
       {/* Search */}
       <div className="relative max-w-md">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 dark:text-gray-500" />
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-gray-400 dark:text-gray-500" />
         <Input
           placeholder="Search parents or children..."
           className="pl-9"
@@ -345,7 +345,7 @@ export function AdminParents() {
         <ParentSkeleton />
       ) : parents.length === 0 ? (
         <div className="text-center py-20 bg-gray-50/30 dark:bg-gray-800/10 rounded-2xl border-dashed border-2">
-          <Users className="h-12 w-12 mx-auto mb-4 opacity-20" />
+          <Users className="size-12 mx-auto mb-4 opacity-20" />
           <p className="text-lg font-medium">No parents found</p>
           <p className="text-sm text-muted-foreground">Add a parent or adjust your search</p>
         </div>
@@ -370,7 +370,7 @@ export function AdminParents() {
                       <tr key={parent.id} className="hover:bg-gray-50/50 dark:hover:bg-gray-800/30 transition-colors">
                         <td className="px-6 py-4">
                           <div className="flex items-center gap-3">
-                            <Avatar className="h-8 w-8 shrink-0">
+                            <Avatar className="size-8 shrink-0">
                               <AvatarFallback className={`${color} text-white text-[10px] font-bold`}>
                                 {initials}
                               </AvatarFallback>
@@ -412,16 +412,16 @@ export function AdminParents() {
                                 setSelectedClass("all");
                               }}
                             >
-                              <LinkIcon className="h-3.5 w-3.5" />
+                              <LinkIcon className="size-3.5" />
                               Link
                             </Button>
-                            <Button variant="ghost" size="icon" className="h-8 w-8 text-gray-400 hover:text-emerald-600" onClick={() => handleEdit(parent)}>
-                              <Pencil className="h-3.5 w-3.5" />
+                            <Button variant="ghost" size="icon" className="size-8 text-gray-400 hover:text-emerald-600" onClick={() => handleEdit(parent)}>
+                              <Pencil className="size-3.5" />
                             </Button>
                             <AlertDialog>
                               <AlertDialogTrigger asChild>
-                                <Button variant="ghost" size="icon" className="h-8 w-8 text-gray-400 hover:text-red-600" title="Delete">
-                                  <Trash2 className="h-3.5 w-3.5" />
+                                <Button variant="ghost" size="icon" className="size-8 text-gray-400 hover:text-red-600" title="Delete">
+                                  <Trash2 className="size-3.5" />
                                 </Button>
                               </AlertDialogTrigger>
                               <AlertDialogContent>

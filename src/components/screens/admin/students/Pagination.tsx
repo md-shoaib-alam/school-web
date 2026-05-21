@@ -73,7 +73,7 @@ function PaginationPages({
             key={page}
             variant={currentPage === page ? "default" : "outline"}
             size="icon"
-            className={`h-8 w-8 text-sm ${currentPage === page ? "bg-emerald-600 hover:bg-emerald-700 text-white" : ""}`}
+            className={`size-8 text-sm ${currentPage === page ? "bg-emerald-600 hover:bg-emerald-700 text-white" : ""}`}
             onClick={() => onPageChange(page)}
           >
             {page}
@@ -144,11 +144,11 @@ export function Pagination({
         <Button
           variant="outline"
           size="icon"
-          className="h-8 w-8"
+          className="size-8"
           disabled={currentPage <= 1}
           onClick={() => handlePageChange(currentPage - 1)}
         >
-          <ChevronLeft className="h-4 w-4" />
+          <ChevronLeft className="size-4" />
         </Button>
         <PaginationPages
           currentPage={currentPage}
@@ -158,11 +158,11 @@ export function Pagination({
         <Button
           variant="outline"
           size="icon"
-          className="h-8 w-8"
+          className="size-8"
           disabled={currentPage >= totalPages}
           onClick={() => handlePageChange(currentPage + 1)}
         >
-          <ChevronRight className="h-4 w-4" />
+          <ChevronRight className="size-4" />
         </Button>
       </div>
     </div>

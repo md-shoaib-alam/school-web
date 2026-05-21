@@ -94,7 +94,7 @@ export function StudentNotices() {
         </div>
         {urgentCount > 0 && (
           <Badge className="bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 dark:text-red-400 border-red-200 dark:border-red-800 gap-1 self-start">
-            <Bell className="h-3.5 w-3.5" />
+            <Bell className="size-3.5" />
             {urgentCount} Urgent
           </Badge>
         )}
@@ -105,7 +105,7 @@ export function StudentNotices() {
         <Card className="border-red-200 dark:border-red-800 bg-red-50/50 dark:bg-red-900/20 rounded-xl">
           <CardContent className="p-4">
             <div className="flex items-center gap-2 mb-2">
-              <Bell className="h-4 w-4 text-red-600" />
+              <Bell className="size-4 text-red-600" />
               <span className="text-sm font-semibold text-red-700 dark:text-red-400">
                 Urgent Notices
               </span>
@@ -136,7 +136,7 @@ export function StudentNotices() {
       {notices.length === 0 ? (
         <Card className="rounded-xl shadow-sm">
           <CardContent className="py-16 text-center">
-            <Bell className="h-12 w-12 mx-auto text-gray-200 dark:text-gray-700 mb-3" />
+            <Bell className="size-12 mx-auto text-gray-200 dark:text-gray-700 mb-3" />
             <p className="text-sm font-medium text-gray-500 dark:text-gray-400">
               No notices
             </p>
@@ -179,18 +179,18 @@ export function StudentNotices() {
                   <div className="flex items-center justify-between text-[11px] text-gray-400 dark:text-gray-500 border-t border-gray-50 dark:border-gray-800 pt-2">
                     <div className="flex items-center gap-3">
                       <span className="flex items-center gap-1">
-                        <User className="h-3 w-3" />
+                        <User className="size-3" />
                         {notice.authorName}
                       </span>
                       <span className="flex items-center gap-1">
-                        <Tag className="h-3 w-3" />
+                        <Tag className="size-3" />
                         {notice.targetRole === "all"
                           ? "Everyone"
                           : notice.targetRole}
                       </span>
                     </div>
                     <span className="flex items-center gap-1" suppressHydrationWarning>
-                      <Clock className="h-3 w-3" />
+                      <Clock className="size-3" />
                       {formatNoticeDate(notice.createdAt)}
                     </span>
                   </div>

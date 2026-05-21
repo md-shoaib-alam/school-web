@@ -142,8 +142,8 @@ export function TeacherClasses() {
               <CardContent className="p-5">
                 <div className="flex items-start justify-between mb-4">
                   <div className="flex items-center gap-3">
-                    <div className="w-12 h-12 rounded-xl bg-blue-50 dark:bg-blue-900/30 flex items-center justify-center group-hover:bg-blue-100 dark:group-hover:bg-blue-900/50 transition-colors">
-                      <School className="h-6 w-6 text-blue-500 dark:text-blue-400" />
+                    <div className="size-12 rounded-xl bg-blue-50 dark:bg-blue-900/30 flex items-center justify-center group-hover:bg-blue-100 dark:group-hover:bg-blue-900/50 transition-colors">
+                      <School className="size-6 text-blue-500 dark:text-blue-400" />
                     </div>
                     <div>
                       <h3 className="font-semibold text-gray-900 dark:text-gray-100">
@@ -154,12 +154,12 @@ export function TeacherClasses() {
                       </p>
                     </div>
                   </div>
-                  <ChevronRight className="h-5 w-5 text-gray-300 dark:text-gray-600 group-hover:text-blue-400 dark:group-hover:text-blue-400 transition-colors" />
+                  <ChevronRight className="size-5 text-gray-300 dark:text-gray-600 group-hover:text-blue-400 dark:group-hover:text-blue-400 transition-colors" />
                 </div>
 
                 <div className="flex items-center gap-4">
                   <div className="flex items-center gap-1.5 text-sm text-gray-600 dark:text-gray-400">
-                    <Users className="h-3.5 w-3.5 text-blue-500 dark:text-blue-400" />
+                    <Users className="size-3.5 text-blue-500 dark:text-blue-400" />
                     <span className="font-medium">{cls.studentCount}</span>
                     <span className="text-gray-400 dark:text-gray-500">
                       Students
@@ -173,7 +173,7 @@ export function TeacherClasses() {
 
       {classes.length === 0 && (
         <div className="text-center py-20 bg-gray-900/20 rounded-3xl border border-dashed border-gray-800">
-          <School className="h-16 w-16 text-gray-700 mx-auto mb-4 opacity-50" />
+          <School className="size-16 text-gray-700 mx-auto mb-4 opacity-50" />
           <h3 className="text-xl font-semibold text-gray-300">
             No Classes Assigned
           </h3>
@@ -188,8 +188,8 @@ export function TeacherClasses() {
         <DialogContent className="max-w-3xl max-h-[85vh] p-0">
           <DialogHeader className="p-6 pb-0">
             <DialogTitle className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-blue-50 dark:bg-blue-900/30 flex items-center justify-center">
-                <Users className="h-5 w-5 text-blue-500 dark:text-blue-400" />
+              <div className="size-10 rounded-xl bg-blue-50 dark:bg-blue-900/30 flex items-center justify-center">
+                <Users className="size-5 text-blue-500 dark:text-blue-400" />
               </div>
               <div>
                 <span className="text-lg font-semibold">
@@ -242,7 +242,7 @@ export function TeacherClasses() {
                         </TableCell>
                         <TableCell>
                           <div className="flex items-center gap-3">
-                            <Avatar className="h-8 w-8">
+                            <Avatar className="size-8">
                               <AvatarFallback className="text-[10px] font-semibold bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400">
                                 {getInitials(student.name)}
                               </AvatarFallback>
@@ -278,7 +278,7 @@ export function TeacherClasses() {
               </div>
             ) : (
               <div className="text-center py-12">
-                <Users className="h-10 w-10 text-gray-300 dark:text-gray-700 mx-auto mb-3" />
+                <Users className="size-10 text-gray-300 dark:text-gray-700 mx-auto mb-3" />
                 <p className="text-gray-400 dark:text-gray-500 text-sm">
                   No students in this class yet
                 </p>

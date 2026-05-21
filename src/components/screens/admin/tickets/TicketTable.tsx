@@ -43,7 +43,7 @@ export function TicketTable({ tickets, loading, onOpenDetail }: TicketTableProps
   if (tickets.length === 0) {
     return (
       <div className="py-16 text-center text-muted-foreground">
-        <Ticket className="h-12 w-12 mx-auto mb-3 opacity-30" />
+        <Ticket className="size-12 mx-auto mb-3 opacity-30" />
         <p className="font-medium">No tickets found</p>
         <p className="text-sm mt-1">Create a new ticket to get started</p>
       </div>
@@ -106,7 +106,7 @@ export function TicketTable({ tickets, loading, onOpenDetail }: TicketTableProps
                 </TableCell>
                 <TableCell>
                   <div className="flex items-center gap-2">
-                    <Avatar className="h-6 w-6">
+                    <Avatar className="size-6">
                       <AvatarFallback className="text-[10px] bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400">
                         {ticket.creator
                           ? getInitials(ticket.creator.name)
@@ -131,7 +131,7 @@ export function TicketTable({ tickets, loading, onOpenDetail }: TicketTableProps
                 <TableCell>
                   {ticket.assignee ? (
                     <div className="flex items-center gap-2">
-                      <Avatar className="h-6 w-6">
+                      <Avatar className="size-6">
                         <AvatarFallback className="text-[10px] bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400">
                           {getInitials(ticket.assignee.name)}
                         </AvatarFallback>
@@ -156,7 +156,7 @@ export function TicketTable({ tickets, loading, onOpenDetail }: TicketTableProps
                 </TableCell>
                 <TableCell className="text-center">
                   <span className="inline-flex items-center gap-1 text-sm text-gray-500 dark:text-gray-400">
-                    <MessageSquare className="h-3.5 w-3.5" />
+                    <MessageSquare className="size-3.5" />
                     {ticket._count.messages}
                   </span>
                 </TableCell>
@@ -169,11 +169,11 @@ export function TicketTable({ tickets, loading, onOpenDetail }: TicketTableProps
                   <Button
                     variant="ghost"
                     size="icon"
-                    className="h-8 w-8 text-emerald-600 hover:text-emerald-800 hover:bg-emerald-50 dark:hover:bg-emerald-900/20"
+                    className="size-8 text-emerald-600 hover:text-emerald-800 hover:bg-emerald-50 dark:hover:bg-emerald-900/20"
                     onClick={() => onOpenDetail(ticket.id)}
                     title="View"
                   >
-                    <Eye className="h-4 w-4" />
+                    <Eye className="size-4" />
                   </Button>
                 </TableCell>
               </TableRow>
@@ -213,9 +213,9 @@ export function TicketTable({ tickets, loading, onOpenDetail }: TicketTableProps
               <Button
                 variant="ghost"
                 size="icon"
-                className="h-8 w-8 text-emerald-600 shrink-0"
+                className="size-8 text-emerald-600 shrink-0"
               >
-                <Eye className="h-4 w-4" />
+                <Eye className="size-4" />
               </Button>
             </div>
             <div className="flex items-center justify-between text-[11px] text-gray-500 dark:text-gray-400">

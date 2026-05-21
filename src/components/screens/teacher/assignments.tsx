@@ -331,7 +331,7 @@ export function TeacherAssignments() {
         <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
           <DialogTrigger asChild>
             <Button className="bg-blue-600 hover:bg-blue-700 text-white">
-              <Plus className="h-4 w-4 mr-2" /> Create Homework
+              <Plus className="size-4 mr-2" /> Create Homework
             </Button>
           </DialogTrigger>
           <DialogContent>
@@ -375,7 +375,7 @@ export function TeacherAssignments() {
                         variant="outline"
                         className="w-full justify-start text-left font-normal mt-0.5"
                       >
-                        <CalendarDays className="mr-2 h-4 w-4" />
+                        <CalendarDays className="mr-2 size-4" />
                         {form.dueDate ? format(form.dueDate, "PPP") : <span>Pick a date</span>}
                       </Button>
                     </PopoverTrigger>
@@ -442,7 +442,7 @@ export function TeacherAssignments() {
         <Card className="border-red-200 dark:border-red-800 bg-red-50/50 dark:bg-red-900/20 rounded-xl">
           <CardHeader className="pb-2">
             <CardTitle className="text-base text-red-700 dark:text-red-400 flex items-center gap-2">
-              <AlertTriangle className="h-5 w-5" /> Overdue Homework
+              <AlertTriangle className="size-5" /> Overdue Homework
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-2">
@@ -511,7 +511,7 @@ export function TeacherAssignments() {
 
                 <div className="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400 mb-3">
                   <span className="flex items-center gap-1">
-                    <Clock className="h-3 w-3" /> Due: {assignment.dueDate}
+                    <Clock className="size-3" /> Due: {assignment.dueDate}
                   </span>
                   <Badge
                     variant="outline"
@@ -523,11 +523,11 @@ export function TeacherAssignments() {
                   >
                     {assignment.mode === "online" ? (
                       <>
-                        <Globe className="h-2.5 w-2.5" /> Online
+                        <Globe className="size-2.5" /> Online
                       </>
                     ) : (
                       <>
-                        <BookOpen className="h-2.5 w-2.5" /> Offline
+                        <BookOpen className="size-2.5" /> Offline
                       </>
                     )}
                   </Badge>
@@ -544,7 +544,7 @@ export function TeacherAssignments() {
                   </div>
                   <Progress value={pct} className="h-2" />
                   <div className="flex items-center gap-1.5 text-xs text-gray-500 dark:text-gray-400 mt-1">
-                    <Users className="h-3 w-3" />
+                    <Users className="size-3" />
                     {assignment.totalStudents - assignment.submissions} students
                     haven't submitted
                   </div>
@@ -557,7 +557,7 @@ export function TeacherAssignments() {
                     className="w-full text-xs gap-1.5"
                     onClick={() => handleViewSubmissions(assignment)}
                   >
-                    <Eye className="h-3.5 w-3.5" />
+                    <Eye className="size-3.5" />
                     View Submissions ({assignment.submissions})
                   </Button>
                   <Button
@@ -568,9 +568,9 @@ export function TeacherAssignments() {
                     disabled={completingId === assignment.id}
                   >
                     {completingId === assignment.id ? (
-                      <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                      <Loader2 className="size-3.5 animate-spin" />
                     ) : (
-                      <Check className="h-3.5 w-3.5" />
+                      <Check className="size-3.5" />
                     )}
                     Mark Complete
                   </Button>
@@ -583,7 +583,7 @@ export function TeacherAssignments() {
 
       {assignments.length === 0 && (
         <div className="text-center py-16 text-gray-400 dark:text-gray-500">
-          <FileText className="h-12 w-12 mx-auto mb-4 opacity-50" />
+          <FileText className="size-12 mx-auto mb-4 opacity-50" />
           <p className="text-lg">No homework yet</p>
           <p className="text-sm mt-1">Create your first homework</p>
         </div>
@@ -604,7 +604,7 @@ export function TeacherAssignments() {
         <DialogContent className="sm:max-w-2xl max-h-[85vh] overflow-hidden">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
-              <FileText className="h-4 w-4 text-blue-600" />
+              <FileText className="size-4 text-blue-600" />
               {selectedAssignment?.title}
             </DialogTitle>
             <DialogDescription>
@@ -622,7 +622,7 @@ export function TeacherAssignments() {
             </div>
           ) : submissions.length === 0 ? (
             <div className="py-12 text-center text-gray-400 dark:text-gray-500">
-              <Users className="h-10 w-10 mx-auto mb-2 opacity-40" />
+              <Users className="size-10 mx-auto mb-2 opacity-40" />
               <p className="text-sm">No submissions yet</p>
               <p className="text-xs mt-1">
                 Students haven&apos;t submitted this homework
@@ -668,7 +668,7 @@ export function TeacherAssignments() {
                                 "✓ Graded"
                               ) : isOfflinePending ? (
                                 <>
-                                  <BookOpen className="h-2.5 w-2.5" /> Offline
+                                  <BookOpen className="size-2.5" /> Offline
                                 </>
                               ) : sub.status === "not_submitted" ? (
                                 "Not Submitted"
@@ -702,12 +702,12 @@ export function TeacherAssignments() {
                       {sub.status === "graded" && (
                         <div className="mt-2 flex items-center gap-3 text-xs">
                           <span className="flex items-center gap-1 font-semibold text-emerald-700 dark:text-emerald-400">
-                            <Star className="h-3 w-3" />
+                            <Star className="size-3" />
                             Grade: {sub.grade}
                           </span>
                           {sub.feedback && (
                             <span className="flex items-center gap-1 text-gray-500 dark:text-gray-400">
-                              <MessageSquare className="h-3 w-3" />
+                              <MessageSquare className="size-3" />
                               {sub.feedback}
                             </span>
                           )}
@@ -773,12 +773,12 @@ export function TeacherAssignments() {
                   >
                     {bulkSaving ? (
                       <>
-                        <Loader2 className="h-4 w-4 animate-spin" />
+                        <Loader2 className="size-4 animate-spin" />
                         Saving all grades...
                       </>
                     ) : (
                       <>
-                        <Star className="h-4 w-4 mr-1 fill-white/20" />
+                        <Star className="size-4 mr-1 fill-white/20" />
                         Save All Entered Grades ({Object.values(editedGrades).filter((x) => x.grade.trim() !== "").length})
                       </>
                     )}
@@ -794,7 +794,7 @@ export function TeacherAssignments() {
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle className="flex items-center gap-2">
-              <AlertTriangle className="h-5 w-5 text-amber-500 fill-amber-500/10" /> Mark homework as complete?
+              <AlertTriangle className="size-5 text-amber-500 fill-amber-500/10" /> Mark homework as complete?
             </AlertDialogTitle>
             <AlertDialogDescription className="py-1 text-sm">
               Once you mark this homework as complete, it indicates all work is finished and finalized. This action will conclude submissions for students. Are you sure you want to continue?

@@ -86,7 +86,7 @@ export function TicketDetailSheet({
 
         {loading ? (
           <div className="flex-1 flex items-center justify-center">
-            <Loader2 className="h-8 w-8 animate-spin text-emerald-500" />
+            <Loader2 className="size-8 animate-spin text-emerald-500" />
           </div>
         ) : ticket ? (
           <div className="flex-1 flex flex-col min-h-0">
@@ -188,7 +188,7 @@ export function TicketDetailSheet({
                   disabled={updatingTicket}
                 >
                   {updatingTicket && (
-                    <Loader2 className="h-3.5 w-3.5 mr-1 animate-spin" />
+                    <Loader2 className="size-3.5 mr-1 animate-spin" />
                   )}
                   Save Changes
                 </Button>
@@ -206,7 +206,7 @@ export function TicketDetailSheet({
                 <div className="p-4 space-y-4">
                   {(!ticket.messages || ticket.messages.length === 0) && (
                     <div className="text-center py-8 text-gray-400 dark:text-gray-500">
-                      <MessageSquare className="h-8 w-8 mx-auto mb-2 opacity-40" />
+                      <MessageSquare className="size-8 mx-auto mb-2 opacity-40" />
                       <p className="text-sm">No messages yet</p>
                       <p className="text-xs">
                         Start the conversation with a reply
@@ -215,7 +215,7 @@ export function TicketDetailSheet({
                   )}
                   {ticket.messages?.map((msg) => (
                     <div key={msg.id} className="flex gap-3">
-                      <Avatar className="h-8 w-8 shrink-0 mt-0.5">
+                      <Avatar className="size-8 shrink-0 mt-0.5">
                         <AvatarFallback
                           className={`text-[10px] ${
                             ROLE_COLORS[msg.author?.role || "student"] ||
@@ -281,9 +281,9 @@ export function TicketDetailSheet({
                       disabled={sendingReply || !replyMessage.trim()}
                     >
                       {sendingReply ? (
-                        <Loader2 className="h-3.5 w-3.5 mr-1 animate-spin" />
+                        <Loader2 className="size-3.5 mr-1 animate-spin" />
                       ) : (
-                        <Send className="h-3.5 w-3.5 mr-1" />
+                        <Send className="size-3.5 mr-1" />
                       )}
                       Reply
                     </Button>

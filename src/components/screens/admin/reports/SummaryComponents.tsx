@@ -12,7 +12,7 @@ export function SummaryCardSkeleton() {
             <Skeleton className="h-4 w-24" />
             <Skeleton className="h-7 w-16" />
           </div>
-          <Skeleton className="h-10 w-10 rounded-xl" />
+          <Skeleton className="size-10 rounded-xl" />
         </div>
       </CardContent>
     </Card>

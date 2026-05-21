@@ -46,7 +46,7 @@ export function PurchaseDialog({
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
-            <CreditCard className="h-5 w-5 text-amber-500" />
+            <CreditCard className="size-5 text-amber-500" />
             Confirm Purchase
           </DialogTitle>
           <DialogDescription>
@@ -107,7 +107,7 @@ export function PurchaseDialog({
           >
             {processing ? (
               <>
-                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                <Loader2 className="size-4 mr-2 animate-spin" />
                 Processing...
               </>
             ) : (

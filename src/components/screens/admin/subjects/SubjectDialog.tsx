@@ -125,7 +125,7 @@ export function SubjectDialog({
             disabled={submitting}
             className="bg-emerald-600 hover:bg-emerald-700 text-white"
           >
-            {submitting && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
+            {submitting && <Loader2 className="size-4 mr-2 animate-spin" />}
             {isCreate ? "Add Subject" : "Save Changes"}
           </Button>
         </DialogFooter>

@@ -15,10 +15,10 @@ export const RoyalGold: React.FC<MarksheetTemplateProps> = ({
       style={{ WebkitPrintColorAdjust: 'exact', printColorAdjust: 'exact' }}
     >
       {/* Decorative Ornate Corners */}
-      <div className="absolute top-2 left-2 w-8 h-8 border-t-2 border-l-2 border-[#b38f36] z-20 pointer-events-none" />
-      <div className="absolute top-2 right-2 w-8 h-8 border-t-2 border-r-2 border-[#b38f36] z-20 pointer-events-none" />
-      <div className="absolute bottom-2 left-2 w-8 h-8 border-b-2 border-l-2 border-[#b38f36] z-20 pointer-events-none" />
-      <div className="absolute bottom-2 right-2 w-8 h-8 border-b-2 border-r-2 border-[#b38f36] z-20 pointer-events-none" />
+      <div className="absolute top-2 left-2 size-8 border-t-2 border-l-2 border-[#b38f36] z-20 pointer-events-none" />
+      <div className="absolute top-2 right-2 size-8 border-t-2 border-r-2 border-[#b38f36] z-20 pointer-events-none" />
+      <div className="absolute bottom-2 left-2 size-8 border-b-2 border-l-2 border-[#b38f36] z-20 pointer-events-none" />
+      <div className="absolute bottom-2 right-2 size-8 border-b-2 border-r-2 border-[#b38f36] z-20 pointer-events-none" />
 
       {/* Core Document Flow */}
       <div className="space-y-5 z-10">
@@ -26,7 +26,7 @@ export const RoyalGold: React.FC<MarksheetTemplateProps> = ({
         {/* Royal Crest */}
         <div className="text-center">
           <div className="flex justify-center mb-1">
-            <div className="w-14 h-14 bg-gradient-to-br from-[#d4af37] to-[#b38f36] border-2 border-white rounded-full flex items-center justify-center shadow-lg relative">
+            <div className="size-14 bg-gradient-to-br from-[#d4af37] to-[#b38f36] border-2 border-white rounded-full flex items-center justify-center shadow-lg relative">
               <span className="text-2xl filter drop-shadow">🏛️</span>
             </div>
           </div>

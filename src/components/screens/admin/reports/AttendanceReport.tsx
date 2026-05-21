@@ -109,7 +109,7 @@ export function AttendanceReport() {
       label: "Present",
       value: summary.present,
       pct: summary.presentPct,
-      icon: <TrendingUp className="h-5 w-5 text-emerald-600" />,
+      icon: <TrendingUp className="size-5 text-emerald-600" />,
       color:
         "bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400",
       border: "border-emerald-200 dark:border-emerald-800",
@@ -118,7 +118,7 @@ export function AttendanceReport() {
       label: "Absent",
       value: summary.absent,
       pct: summary.absentPct,
-      icon: <AlertTriangle className="h-5 w-5 text-red-600" />,
+      icon: <AlertTriangle className="size-5 text-red-600" />,
       color: "bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400",
       border: "border-red-200 dark:border-red-800",
     },
@@ -128,7 +128,7 @@ export function AttendanceReport() {
     return (
       <Card className="border-red-200 dark:border-red-800 bg-red-50 dark:bg-red-900/30">
         <CardContent className="p-6 text-center text-red-600 dark:text-red-400">
-          <AlertTriangle className="h-8 w-8 mx-auto mb-2 opacity-50" />
+          <AlertTriangle className="size-8 mx-auto mb-2 opacity-50" />
           <p className="font-medium">Failed to load attendance report</p>
           <p className="text-sm mt-1">{error}</p>
         </CardContent>
@@ -178,7 +178,7 @@ export function AttendanceReport() {
                     </p>
                   </div>
                   <div
-                    className={`h-10 w-10 rounded-xl flex items-center justify-center ${card.color}`}
+                    className={`size-10 rounded-xl flex items-center justify-center ${card.color}`}
                   >
                     {card.icon}
                   </div>
@@ -203,7 +203,7 @@ export function AttendanceReport() {
             <ChartSkeleton />
           ) : dailyData.length === 0 ? (
             <div className="text-center py-12 text-muted-foreground">
-              <BarChart3 className="h-10 w-10 mx-auto mb-2 opacity-30" />
+              <BarChart3 className="size-10 mx-auto mb-2 opacity-30" />
               <p className="text-sm">
                 No attendance data available for the selected period
               </p>

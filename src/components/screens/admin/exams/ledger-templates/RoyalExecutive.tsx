@@ -41,19 +41,19 @@ export const RoyalExecutive: React.FC<LedgerTemplateProps> = ({ data }) => {
       {/* Stats Board */}
       <div className="flex justify-around items-center bg-stone-100/80 border-y-2 border-stone-300 py-1.5 mb-4 text-[9.5px] text-stone-700 font-semibold tracking-wide font-sans">
         <div>TOTAL ENROLLMENT: <span className="text-amber-900 font-bold">{data.totalStudents}</span></div>
-        <div className="w-1.5 h-1.5 rounded-full bg-amber-600"></div>
+        <div className="size-1.5 rounded-full bg-amber-600"></div>
         <div>PASSED: <span className="text-green-700 font-bold">{data.passCount}</span></div>
-        <div className="w-1.5 h-1.5 rounded-full bg-amber-600"></div>
+        <div className="size-1.5 rounded-full bg-amber-600"></div>
         <div>FAILED: <span className="text-red-700 font-bold">{data.failCount}</span></div>
         {data.pendingCount > 0 && (
           <>
-            <div className="w-1.5 h-1.5 rounded-full bg-amber-600"></div>
+            <div className="size-1.5 rounded-full bg-amber-600"></div>
             <div>INCOMPLETE: <span className="text-amber-700 font-bold">{data.pendingCount}</span></div>
           </>
         )}
-        <div className="w-1.5 h-1.5 rounded-full bg-amber-600"></div>
+        <div className="size-1.5 rounded-full bg-amber-600"></div>
         <div>PASS RATE: <span className="text-amber-900 font-bold">{data.totalStudents > 0 ? ((data.passCount / data.totalStudents) * 100).toFixed(1) + '%' : '0%'}</span></div>
-        <div className="w-1.5 h-1.5 rounded-full bg-amber-600"></div>
+        <div className="size-1.5 rounded-full bg-amber-600"></div>
         <div>CLASS MEAN AVG: <span className="text-amber-900 font-bold">{data.classAverage}</span></div>
       </div>
 

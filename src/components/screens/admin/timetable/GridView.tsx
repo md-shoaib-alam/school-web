@@ -40,7 +40,7 @@ export function GridView({
             <tr className="border-b bg-muted/30">
               <th className="py-3 px-4 text-left font-medium text-muted-foreground w-36">
                 <div className="flex items-center gap-1.5">
-                  <Clock className="h-3.5 w-3.5" />
+                  <Clock className="size-3.5" />
                   Time Slot
                 </div>
               </th>
@@ -55,7 +55,7 @@ export function GridView({
                 >
                   {DAY_LABELS[day]}
                   {idx === currentDayIndex && (
-                    <span className="ml-1.5 inline-block h-1.5 w-1.5 rounded-full bg-emerald-500" />
+                    <span className="ml-1.5 inline-block size-1.5 rounded-full bg-emerald-500" />
                   )}
                 </th>
               ))}
@@ -69,8 +69,8 @@ export function GridView({
               >
                 <td className="py-3 px-4 align-top">
                   <div className="flex items-center gap-2">
-                    <div className="h-7 w-7 rounded-lg bg-muted flex items-center justify-center">
-                      <Clock className="h-3.5 w-3.5 text-muted-foreground" />
+                    <div className="size-7 rounded-lg bg-muted flex items-center justify-center">
+                      <Clock className="size-3.5 text-muted-foreground" />
                     </div>
                     <div>
                       <p className="text-xs font-medium">{formatTime(start)}</p>
@@ -114,19 +114,19 @@ export function GridView({
                                   {canEdit && (
                                     <button
                                       onClick={() => onEditSlot(slot)}
-                                      className="h-5 w-5 rounded-full bg-emerald-100 dark:bg-emerald-900/40 text-emerald-600 dark:text-emerald-400 flex items-center justify-center hover:bg-emerald-200 dark:hover:bg-emerald-800"
+                                      className="size-5 rounded-full bg-emerald-100 dark:bg-emerald-900/40 text-emerald-600 dark:text-emerald-400 flex items-center justify-center hover:bg-emerald-200 dark:hover:bg-emerald-800"
                                       title="Edit slot"
                                     >
-                                      <Pencil className="h-2.5 w-2.5" />
+                                      <Pencil className="size-2.5" />
                                     </button>
                                   )}
                                   {canDelete && (
                                     <button
                                       onClick={() => onDeleteSlot(slot.id)}
-                                      className="h-5 w-5 rounded-full bg-red-100 dark:bg-red-900/40 text-red-600 dark:text-red-400 flex items-center justify-center hover:bg-red-200 dark:hover:bg-red-800"
+                                      className="size-5 rounded-full bg-red-100 dark:bg-red-900/40 text-red-600 dark:text-red-400 flex items-center justify-center hover:bg-red-200 dark:hover:bg-red-800"
                                       title="Delete slot"
                                     >
-                                      <Trash2 className="h-3 w-3" />
+                                      <Trash2 className="size-3" />
                                     </button>
                                   )}
                                 </div>
@@ -211,19 +211,19 @@ export function GridView({
                                 {canEdit && (
                                   <button
                                     onClick={() => onEditSlot(slot)}
-                                    className="shrink-0 h-6 w-6 rounded-full flex items-center justify-center text-muted-foreground/50 hover:text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-900/20 transition-all"
+                                    className="shrink-0 size-6 rounded-full flex items-center justify-center text-muted-foreground/50 hover:text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-900/20 transition-all"
                                     title="Edit slot"
                                   >
-                                    <Pencil className="h-3 w-3" />
+                                    <Pencil className="size-3" />
                                   </button>
                                 )}
                                 {canDelete && (
                                   <button
                                     onClick={() => onDeleteSlot(slot.id)}
-                                    className="shrink-0 h-6 w-6 rounded-full flex items-center justify-center text-muted-foreground/50 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 transition-all"
+                                    className="shrink-0 size-6 rounded-full flex items-center justify-center text-muted-foreground/50 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 transition-all"
                                     title="Delete slot"
                                   >
-                                    <Trash2 className="h-3 w-3" />
+                                    <Trash2 className="size-3" />
                                   </button>
                                 )}
                               </>

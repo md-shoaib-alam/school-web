@@ -116,7 +116,7 @@ export function ActiveExamsView({
       {classFilter === 'all' ? (
         exams.filter(e => e.status !== 'completed').length === 0 ? (
           <div className="flex flex-col items-center justify-center p-12 border-2 border-dashed border-gray-200 dark:border-zinc-800 rounded-2xl bg-card text-center text-muted-foreground animate-in fade-in duration-300">
-            <ClipboardList className="h-16 w-16 mb-4 text-blue-500/40" />
+            <ClipboardList className="size-16 mb-4 text-blue-500/40" />
             <h3 className="text-lg font-semibold text-foreground">No Active Exams Scheduled</h3>
             <p className="text-sm mt-1 max-w-md">There are no midterm or final exams currently scheduled for any class. Click "New Exam" to start scheduling!</p>
           </div>
@@ -125,7 +125,7 @@ export function ActiveExamsView({
             {/* Global Search and Filter Bar */}
             <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 bg-card p-3 rounded-xl border border-gray-100 dark:border-zinc-800/80 shadow-sm">
               <div className="relative flex-1">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
                 <Input
                   placeholder="Search exams by subject or name..."
                   className="pl-9 h-9 border-gray-200 dark:border-zinc-800 text-sm focus-visible:ring-blue-500 rounded-lg"
@@ -165,7 +165,7 @@ export function ActiveExamsView({
 
             {classesWithActiveExams.length === 0 ? (
               <div className="flex flex-col items-center justify-center p-12 border border-dashed border-gray-200 dark:border-zinc-800 rounded-2xl bg-card text-center text-muted-foreground animate-in fade-in duration-300">
-                <Search className="h-12 w-12 mb-3 text-zinc-300 dark:text-zinc-700" />
+                <Search className="size-12 mb-3 text-zinc-300 dark:text-zinc-700" />
                 <h3 className="text-base font-semibold text-foreground">No matching exams found</h3>
                 <p className="text-xs mt-1 max-w-md">No exams match your search text or status filter. Try clearing or modifying your filter criteria.</p>
                 <Button 
@@ -199,7 +199,7 @@ export function ActiveExamsView({
                         >
                           <div className="flex items-center gap-3">
                             <div className={`p-2 rounded-lg transition-all duration-300 ${isExpanded ? 'bg-blue-600 text-white shadow-md shadow-blue-500/20' : 'bg-blue-50 dark:bg-blue-950/50 text-blue-600 dark:text-blue-400'}`}>
-                              <GraduationCap className="h-5 w-5 animate-pulse" />
+                              <GraduationCap className="size-5 animate-pulse" />
                             </div>
                             <div>
                               <h3 className="text-base font-semibold text-foreground leading-tight">
@@ -218,7 +218,7 @@ export function ActiveExamsView({
                               </span>
                             </div>
                             <div className={`p-1.5 rounded-full transition-all duration-300 ${isExpanded ? 'bg-blue-50 dark:bg-blue-950/50 text-blue-600 dark:text-blue-400' : 'bg-gray-50 dark:bg-zinc-900 text-muted-foreground'}`}>
-                              <ChevronDown className={`h-4 w-4 transition-transform duration-300 ${isExpanded ? 'rotate-180' : ''}`} />
+                              <ChevronDown className={`size-4 transition-transform duration-300 ${isExpanded ? 'rotate-180' : ''}`} />
                             </div>
                           </div>
                         </div>
@@ -232,7 +232,7 @@ export function ActiveExamsView({
                                 <Card key={groupKey} className="border border-gray-100 dark:border-zinc-800 shadow-sm overflow-hidden bg-card">
                                   <div className="px-4 py-2.5 bg-zinc-50/50 dark:bg-zinc-900/30 border-b border-gray-100 dark:border-zinc-800 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                                     <div className="flex items-center gap-2">
-                                      <ClipboardList className="h-4.5 w-4.5 text-blue-500" />
+                                      <ClipboardList className="size-4.5 text-blue-500" />
                                       <span className="font-bold text-sm text-foreground">{group.cycleName}</span>
                                       <Badge variant="outline" className="text-[10px] font-semibold px-2 py-0 border-zinc-200 dark:border-zinc-800 text-muted-foreground bg-zinc-100/50 dark:bg-zinc-900/50">
                                         {group.academicYear}
@@ -281,7 +281,7 @@ export function ActiveExamsView({
               onClick={() => setClassFilter('all')}
               className="gap-1.5 px-3 py-1.5 h-8 text-xs font-medium"
             >
-              <ArrowLeft className="h-3.5 w-3.5" /> Back to Classes
+              <ArrowLeft className="size-3.5" /> Back to Classes
             </Button>
             <h3 className="text-lg font-semibold text-foreground">
               Exams for {classes.find((c: any) => c.id === classFilter)?.name} - {classes.find((c: any) => c.id === classFilter)?.section}

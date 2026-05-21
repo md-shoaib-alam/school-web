@@ -42,8 +42,8 @@ export default function ResetPasswordPage() {
           <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-emerald-500/40 to-transparent" />
           
           <CardHeader className="text-center pt-8 pb-2">
-            <div className="mx-auto w-20 h-20 bg-emerald-50 dark:bg-emerald-950/30 rounded-3xl flex items-center justify-center mb-6 shadow-md border border-emerald-100 dark:border-emerald-900/50 rotate-2">
-              <CheckCircle2 className="h-10 w-10 text-emerald-600 dark:text-emerald-400" />
+            <div className="mx-auto size-20 bg-emerald-50 dark:bg-emerald-950/30 rounded-3xl flex items-center justify-center mb-6 shadow-md border border-emerald-100 dark:border-emerald-900/50 rotate-2">
+              <CheckCircle2 className="size-10 text-emerald-600 dark:text-emerald-400" />
             </div>
             <CardTitle className="text-2xl font-bold tracking-tight text-gray-900 dark:text-white/95">
               Check your email
@@ -80,13 +80,13 @@ export default function ResetPasswordPage() {
             href="/" 
             className="group flex items-center text-sm font-medium text-slate-500 hover:text-rose-600 dark:text-gray-400 dark:hover:text-rose-400 transition-colors w-fit"
           >
-            <ArrowLeft className="mr-2 h-4 w-4 group-hover:-translate-x-1 transition-transform" />
+            <ArrowLeft className="mr-2 size-4 group-hover:-translate-x-1 transition-transform" />
             Back to login
           </Link>
           
           <div className="space-y-2">
-            <div className="w-14 h-14 bg-gradient-to-br from-rose-500 to-rose-600 dark:from-rose-600 dark:to-rose-700 rounded-2xl flex items-center justify-center mb-4 shadow-lg shadow-rose-500/20">
-              <ShieldCheck className="h-7 w-7 text-white" />
+            <div className="size-14 bg-gradient-to-br from-rose-500 to-rose-600 dark:from-rose-600 dark:to-rose-700 rounded-2xl flex items-center justify-center mb-4 shadow-lg shadow-rose-500/20">
+              <ShieldCheck className="size-7 text-white" />
             </div>
             <CardTitle className="text-2xl font-bold tracking-tight text-gray-900 dark:text-white/95">
               Forgot password?
@@ -102,7 +102,7 @@ export default function ResetPasswordPage() {
             <div className="space-y-2">
               <Label htmlFor="email" className="text-sm font-semibold pl-1 text-slate-700 dark:text-gray-300/90">Email Address</Label>
               <div className="relative group">
-                <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400 group-focus-within:text-rose-500 transition-colors duration-200" />
+                <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 size-5 text-slate-400 group-focus-within:text-rose-500 transition-colors duration-200" />
                 <Input
                   id="email"
                   type="email"
@@ -122,7 +122,7 @@ export default function ResetPasswordPage() {
             >
               {isLoading ? (
                 <>
-                  <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                  <Loader2 className="mr-2 size-5 animate-spin" />
                   Sending secure link...
                 </>
               ) : (

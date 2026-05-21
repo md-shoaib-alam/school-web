@@ -48,7 +48,7 @@ export function AssignRoleDialog({
       <DialogContent className="sm:max-w-lg max-h-[85vh] overflow-hidden flex flex-col">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
-            <UserPlus className="h-5 w-5 text-blue-600" />
+            <UserPlus className="size-5 text-blue-600" />
             Manage Staff — {activeRole?.name}
           </DialogTitle>
           <DialogDescription>
@@ -58,7 +58,7 @@ export function AssignRoleDialog({
 
         {loading ? (
           <div className="flex-1 flex items-center justify-center py-12">
-            <Loader2 className="h-6 w-6 animate-spin text-emerald-500" />
+            <Loader2 className="size-6 animate-spin text-emerald-500" />
           </div>
         ) : (
           <>
@@ -66,7 +66,7 @@ export function AssignRoleDialog({
               {/* Assigned Users */}
               <div>
                 <h4 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2 flex items-center gap-2">
-                  <Users className="h-4 w-4 text-emerald-500" />
+                  <Users className="size-4 text-emerald-500" />
                   Assigned Staff ({assignedUsers.length})
                 </h4>
                 {assignedUsers.length === 0 ? (
@@ -80,7 +80,7 @@ export function AssignRoleDialog({
                         key={user.id}
                         className="flex items-center gap-3 p-3 rounded-lg border bg-emerald-50/50 dark:bg-emerald-900/10 border-emerald-200 dark:border-emerald-800/50"
                       >
-                        <Avatar className="h-8 w-8">
+                        <Avatar className="size-8">
                           <AvatarFallback
                             className="text-white text-xs font-bold"
                             style={{ backgroundColor: activeRole?.color }}
@@ -105,14 +105,14 @@ export function AssignRoleDialog({
                         <Button
                           variant="ghost"
                           size="icon"
-                          className="h-7 w-7 shrink-0 hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-900/30"
+                          className="size-7 shrink-0 hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-900/30"
                           onClick={() => onAssignChange(user.id, null)}
                           disabled={assigningLoading === user.id}
                         >
                           {assigningLoading === user.id ? (
-                            <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                            <Loader2 className="size-3.5 animate-spin" />
                           ) : (
-                            <UserMinus className="h-3.5 w-3.5" />
+                            <UserMinus className="size-3.5" />
                           )}
                         </Button>
                       </div>
@@ -126,12 +126,12 @@ export function AssignRoleDialog({
               {/* Available Users */}
               <div>
                 <h4 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2 flex items-center gap-2">
-                  <UserPlus className="h-4 w-4 text-blue-500" />
+                  <UserPlus className="size-4 text-blue-500" />
                   Available to Assign ({filteredAvailable.length})
                 </h4>
                 {/* Search */}
                 <div className="relative mb-2">
-                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 dark:text-gray-500" />
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-gray-400 dark:text-gray-500" />
                   <Input
                     placeholder="Search teachers & staff..."
                     className="pl-9 h-9"
@@ -143,7 +143,7 @@ export function AssignRoleDialog({
                       onClick={() => setSearchQuery("")}
                       className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300"
                     >
-                      <X className="h-3.5 w-3.5" />
+                      <X className="size-3.5" />
                     </button>
                   )}
                 </div>
@@ -162,7 +162,7 @@ export function AssignRoleDialog({
                           key={user.id}
                           className="flex items-center gap-3 p-2.5 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors border border-transparent hover:border-gray-100 dark:hover:border-gray-800"
                         >
-                          <Avatar className="h-7 w-7">
+                          <Avatar className="size-7">
                             <AvatarFallback className="bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300 text-xs font-bold shrink-0">
                               {getInitial(user.name)}
                             </AvatarFallback>
@@ -190,14 +190,14 @@ export function AssignRoleDialog({
                           <Button
                             variant="ghost"
                             size="icon"
-                            className="h-7 w-7 shrink-0 hover:bg-blue-50 hover:text-blue-600 dark:hover:bg-blue-900/30"
+                            className="size-7 shrink-0 hover:bg-blue-50 hover:text-blue-600 dark:hover:bg-blue-900/30"
                             onClick={() => onAssignChange(user.id, activeRole!.id)}
                             disabled={assigningLoading === user.id}
                           >
                             {assigningLoading === user.id ? (
-                              <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                              <Loader2 className="size-3.5 animate-spin" />
                             ) : (
-                              <UserPlus className="h-3.5 w-3.5" />
+                              <UserPlus className="size-3.5" />
                             )}
                           </Button>
                         </div>

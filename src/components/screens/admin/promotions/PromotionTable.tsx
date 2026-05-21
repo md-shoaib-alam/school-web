@@ -69,7 +69,7 @@ export function PromotionTable({
                     <span className="text-xs font-medium">{record.fromClassName}</span>
                     {type === 'promotion' && (
                       <>
-                        <ArrowRight className="h-3 w-3 text-gray-400" />
+                        <ArrowRight className="size-3 text-gray-400" />
                         <span className="text-xs font-bold text-emerald-600 dark:text-emerald-400">
                           {record.toClassName}
                         </span>
@@ -105,9 +105,9 @@ export function PromotionTable({
                           disabled={!!approvingId}
                         >
                           {approvingId === record.id ? (
-                            <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                            <Loader2 className="size-3.5 animate-spin" />
                           ) : (
-                            <CheckCircle2 className="h-3.5 w-3.5" />
+                            <CheckCircle2 className="size-3.5" />
                           )}
                         </Button>
                         <Button
@@ -117,7 +117,7 @@ export function PromotionTable({
                           onClick={() => onReject?.(record)}
                           disabled={!!approvingId}
                         >
-                          <XCircle className="h-3.5 w-3.5" />
+                          <XCircle className="size-3.5" />
                         </Button>
                       </div>
                     )}

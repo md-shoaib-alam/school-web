@@ -73,8 +73,8 @@ export function ChangePasswordModal({
     <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <div className="mx-auto w-12 h-12 rounded-full bg-orange-100 dark:bg-orange-900/30 flex items-center justify-center mb-2">
-            <KeyRound className="h-6 w-6 text-orange-600 dark:text-orange-400" />
+          <div className="mx-auto size-12 rounded-full bg-orange-100 dark:bg-orange-900/30 flex items-center justify-center mb-2">
+            <KeyRound className="size-6 text-orange-600 dark:text-orange-400" />
           </div>
           <DialogTitle className="text-center text-xl">Change Password</DialogTitle>
           <DialogDescription className="text-center">
@@ -100,9 +100,9 @@ export function ChangePasswordModal({
                 onClick={() => setShowOldPassword(!showOldPassword)}
               >
                 {showOldPassword ? (
-                  <EyeOff className="h-4 w-4" />
+                  <EyeOff className="size-4" />
                 ) : (
-                  <Eye className="h-4 w-4" />
+                  <Eye className="size-4" />
                 )}
               </button>
             </div>
@@ -125,9 +125,9 @@ export function ChangePasswordModal({
                 onClick={() => setShowNewPassword(!showNewPassword)}
               >
                 {showNewPassword ? (
-                  <EyeOff className="h-4 w-4" />
+                  <EyeOff className="size-4" />
                 ) : (
-                  <Eye className="h-4 w-4" />
+                  <Eye className="size-4" />
                 )}
               </button>
             </div>
@@ -150,9 +150,9 @@ export function ChangePasswordModal({
                 onClick={() => setShowConfirmPassword(!showConfirmPassword)}
               >
                 {showConfirmPassword ? (
-                  <EyeOff className="h-4 w-4" />
+                  <EyeOff className="size-4" />
                 ) : (
-                  <Eye className="h-4 w-4" />
+                  <Eye className="size-4" />
                 )}
               </button>
             </div>
@@ -178,7 +178,7 @@ export function ChangePasswordModal({
             >
               {changePasswordMutation.isPending ? (
                 <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  <Loader2 className="mr-2 size-4 animate-spin" />
                   Updating...
                 </>
               ) : (

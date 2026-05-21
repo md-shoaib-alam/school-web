@@ -83,28 +83,28 @@ export function SuperAdminFeatureFlags() {
       <Tabs defaultValue="core" className="w-full">
         <TabsList className="h-12 w-full sm:w-auto bg-white dark:bg-gray-800 rounded-2xl p-1 shadow-sm border-2 border-transparent">
           <TabsTrigger value="core" className="flex-1 sm:flex-none gap-2 rounded-xl data-[state=active]:bg-teal-50 data-[state=active]:text-teal-700 font-black text-[10px] uppercase tracking-widest transition-all">
-            <Blocks className="h-3.5 w-3.5" />
+            <Blocks className="size-3.5" />
             Core
             <Badge variant="secondary" className="ml-1 h-5 min-w-[20px] text-[8px] font-black px-1.5 rounded-lg border-none bg-teal-100/50 text-teal-700">
               {getFlagsByCategory("core").length}
             </Badge>
           </TabsTrigger>
           <TabsTrigger value="premium" className="flex-1 sm:flex-none gap-2 rounded-xl data-[state=active]:bg-amber-50 data-[state=active]:text-amber-700 font-black text-[10px] uppercase tracking-widest transition-all">
-            <Crown className="h-3.5 w-3.5" />
+            <Crown className="size-3.5" />
             Premium
             <Badge variant="secondary" className="ml-1 h-5 min-w-[20px] text-[8px] font-black px-1.5 rounded-lg border-none bg-amber-100/50 text-amber-700">
               {getFlagsByCategory("premium").length}
             </Badge>
           </TabsTrigger>
           <TabsTrigger value="enterprise" className="flex-1 sm:flex-none gap-2 rounded-xl data-[state=active]:bg-purple-50 data-[state=active]:text-purple-700 font-black text-[10px] uppercase tracking-widest transition-all">
-            <Gem className="h-3.5 w-3.5" />
+            <Gem className="size-3.5" />
             Enterprise
             <Badge variant="secondary" className="ml-1 h-5 min-w-[20px] text-[8px] font-black px-1.5 rounded-lg border-none bg-purple-100/50 text-purple-700">
               {getFlagsByCategory("enterprise").length}
             </Badge>
           </TabsTrigger>
           <TabsTrigger value="beta" className="flex-1 sm:flex-none gap-2 rounded-xl data-[state=active]:bg-teal-50 data-[state=active]:text-teal-700 font-black text-[10px] uppercase tracking-widest transition-all">
-            <FlaskConical className="h-3.5 w-3.5" />
+            <FlaskConical className="size-3.5" />
             Beta
             <Badge variant="secondary" className="ml-1 h-5 min-w-[20px] text-[8px] font-black px-1.5 rounded-lg border-none bg-teal-100/50 text-teal-700">
               {getFlagsByCategory("beta").length}

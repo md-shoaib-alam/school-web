@@ -52,7 +52,7 @@ export function ParentCard({
         {/* Parent Header */}
         <div className="flex items-start justify-between mb-4">
           <div className="flex items-center gap-3">
-            <Avatar className="h-11 w-11">
+            <Avatar className="size-11">
               <AvatarFallback
                 className={`${getAvatarColor(parent.name)} text-white text-sm font-semibold`}
               >
@@ -64,7 +64,7 @@ export function ParentCard({
                 {parent.name}
               </h3>
               <div className="flex items-center gap-1.5 mt-0.5">
-                <Mail className="h-3 w-3 text-slate-500 dark:text-zinc-400" />
+                <Mail className="size-3 text-slate-500 dark:text-zinc-400" />
                 <span className="text-xs text-slate-700 dark:text-zinc-300">
                   {parent.email}
                 </span>
@@ -75,30 +75,30 @@ export function ParentCard({
             <Button
               variant="ghost"
               size="icon"
-              className="h-8 w-8 text-emerald-500 hover:text-emerald-700 hover:bg-emerald-50 dark:hover:bg-emerald-900/30"
+              className="size-8 text-emerald-500 hover:text-emerald-700 hover:bg-emerald-50 dark:hover:bg-emerald-900/30"
               onClick={() => onEdit(parent)}
               title="Edit"
             >
-              <Pencil className="h-4 w-4" />
+              <Pencil className="size-4" />
             </Button>
             <Button
               variant="ghost"
               size="icon"
-              className="h-8 w-8 text-blue-500 hover:text-blue-700 hover:bg-blue-50 dark:hover:bg-blue-900/30"
+              className="size-8 text-blue-500 hover:text-blue-700 hover:bg-blue-50 dark:hover:bg-blue-900/30"
               onClick={() => onLinkOpen(parent)}
               title="Link Child"
             >
-              <Link2 className="h-4 w-4" />
+              <Link2 className="size-4" />
             </Button>
             <AlertDialog>
               <AlertDialogTrigger asChild>
                 <Button
                   variant="ghost"
                   size="icon"
-                  className="h-8 w-8 text-red-600 hover:text-red-700 hover:bg-red-50 dark:text-red-400 dark:hover:text-red-300 dark:hover:bg-red-950/40"
+                  className="size-8 text-red-600 hover:text-red-700 hover:bg-red-50 dark:text-red-400 dark:hover:text-red-300 dark:hover:bg-red-950/40"
                   title="Delete"
                 >
-                  <Trash2 className="h-4 w-4" />
+                  <Trash2 className="size-4" />
                 </Button>
               </AlertDialogTrigger>
               <AlertDialogContent>
@@ -127,12 +127,12 @@ export function ParentCard({
         <div className="flex items-center gap-4 text-xs text-slate-600 dark:text-zinc-300 mb-4">
           {parent.phone && (
             <span className="flex items-center gap-1">
-              <Phone className="h-3 w-3" /> {parent.phone}
+              <Phone className="size-3" /> {parent.phone}
             </span>
           )}
           {parent.occupation && (
             <span className="flex items-center gap-1">
-              <Briefcase className="h-3 w-3" /> {parent.occupation}
+              <Briefcase className="size-3" /> {parent.occupation}
             </span>
           )}
         </div>
@@ -142,7 +142,7 @@ export function ParentCard({
         <div className="space-y-2">
           <div className="flex items-center justify-between mb-2">
             <span className="text-xs font-medium text-slate-600 dark:text-zinc-300 flex items-center gap-1">
-              <Baby className="h-3 w-3" /> Children ({parent.children.length})
+              <Baby className="size-3" /> Children ({parent.children.length})
             </span>
             <Button
               variant="ghost"
@@ -150,13 +150,13 @@ export function ParentCard({
               className="h-6 text-[11px] text-blue-600 hover:text-blue-700 hover:bg-blue-50 dark:hover:bg-blue-900/30 px-2"
               onClick={() => onLinkOpen(parent)}
             >
-              <Plus className="h-3 w-3 mr-1" /> Link Child
+              <Plus className="size-3 mr-1" /> Link Child
             </Button>
           </div>
 
           {parent.children.length === 0 ? (
             <div className="text-center py-6 bg-gray-50 dark:bg-gray-800/50 rounded-lg">
-              <GraduationCap className="h-8 w-8 mx-auto text-gray-300 dark:text-gray-600 mb-2" />
+              <GraduationCap className="size-8 mx-auto text-gray-300 dark:text-gray-600 mb-2" />
               <p className="text-xs text-slate-500 dark:text-zinc-400">
                 No children linked yet
               </p>
@@ -166,7 +166,7 @@ export function ParentCard({
                 className="mt-2 h-7 text-xs text-blue-600 dark:text-blue-400 border-blue-200 dark:border-blue-800 hover:bg-blue-50 dark:hover:bg-blue-900/30"
                 onClick={() => onLinkOpen(parent)}
               >
-                <Link2 className="h-3 w-3 mr-1" /> Link a Child
+                <Link2 className="size-3 mr-1" /> Link a Child
               </Button>
             </div>
           ) : (
@@ -177,7 +177,7 @@ export function ParentCard({
                   className="flex items-center justify-between bg-gray-50 dark:bg-gray-800/50 rounded-lg px-3 py-2"
                 >
                   <div className="flex items-center gap-2.5 min-w-0">
-                    <div className="h-7 w-7 rounded-full bg-violet-100 dark:bg-violet-900/30 text-violet-600 dark:text-violet-400 flex items-center justify-center text-[10px] font-bold shrink-0">
+                    <div className="size-7 rounded-full bg-violet-100 dark:bg-violet-900/30 text-violet-600 dark:text-violet-400 flex items-center justify-center text-[10px] font-bold shrink-0">
                       {child.gender === "male" ? "👦" : "👧"}
                     </div>
                     <div className="min-w-0">
@@ -192,12 +192,12 @@ export function ParentCard({
                   <Button
                     variant="ghost"
                     size="icon"
-                    className="h-6 w-6 text-rose-600/80 hover:text-rose-900 hover:bg-rose-100/50 dark:text-rose-400/80 dark:hover:text-rose-200 dark:hover:bg-rose-950/40 shrink-0"
+                    className="size-6 text-rose-600/80 hover:text-rose-900 hover:bg-rose-100/50 dark:text-rose-400/80 dark:hover:text-rose-200 dark:hover:bg-rose-950/40 shrink-0"
                     onClick={() => onUnlinkChild(parent.id, child.id)}
                     disabled={linking}
                     title="Unlink"
                   >
-                    <Unlink className="h-3 w-3" />
+                    <Unlink className="size-3" />
                   </Button>
                 </div>
               ))}

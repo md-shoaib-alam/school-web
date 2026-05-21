@@ -58,12 +58,12 @@ export function UserDetailSheet({
           user.role === "student" ? "bg-violet-600" : 
           user.role === "staff" ? "bg-indigo-600" : "bg-amber-600"
         }`}>
-          <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2 blur-2xl" />
-          <div className="absolute bottom-0 left-0 w-24 h-24 bg-black/5 rounded-full translate-y-1/2 -translate-x-1/2 blur-xl" />
+          <div className="absolute top-0 right-0 size-32 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2 blur-2xl" />
+          <div className="absolute bottom-0 left-0 size-24 bg-black/5 rounded-full translate-y-1/2 -translate-x-1/2 blur-xl" />
           
           <SheetHeader className="relative z-10 text-left">
             <div className="flex items-center gap-5">
-              <div className="h-20 w-20 rounded-3xl bg-white/20 backdrop-blur-md flex items-center justify-center text-white text-2xl font-black shadow-lg border border-white/20">
+              <div className="size-20 rounded-3xl bg-white/20 backdrop-blur-md flex items-center justify-center text-white text-2xl font-black shadow-lg border border-white/20">
                 {initials}
               </div>
               <div className="min-w-0">
@@ -86,7 +86,7 @@ export function UserDetailSheet({
                 <Badge variant="outline" className={`h-8 px-3 rounded-full font-black text-[10px] uppercase tracking-widest border-2 ${
                   user.isActive ? "bg-emerald-50 text-emerald-700 border-emerald-100" : "bg-red-50 text-red-700 border-red-100"
                 }`}>
-                  <div className={`h-1.5 w-1.5 rounded-full mr-2 ${user.isActive ? "bg-emerald-500" : "bg-red-500"}`} />
+                  <div className={`size-1.5 rounded-full mr-2 ${user.isActive ? "bg-emerald-500" : "bg-red-500"}`} />
                   {user.isActive ? "Active Account" : "Suspended Account"}
                 </Badge>
               </div>
@@ -99,7 +99,7 @@ export function UserDetailSheet({
                 onClick={() => onToggleStatus(user.id)}
                 disabled={toggling}
               >
-                {toggling ? <Loader2 className="h-3 w-3 animate-spin mr-2" /> : (user.isActive ? "Deactivate" : "Activate")}
+                {toggling ? <Loader2 className="size-3 animate-spin mr-2" /> : (user.isActive ? "Deactivate" : "Activate")}
               </Button>
             </div>
 
@@ -128,8 +128,8 @@ export function UserDetailSheet({
               
               <div className="p-4 rounded-2xl bg-gray-50 dark:bg-gray-900 border-2 border-transparent hover:border-teal-500/20 transition-all">
                 <div className="flex items-center gap-3 mb-3">
-                  <div className="h-8 w-8 rounded-lg bg-white dark:bg-gray-800 flex items-center justify-center shadow-sm">
-                    <Building2 className="h-4 w-4 text-teal-600" />
+                  <div className="size-8 rounded-lg bg-white dark:bg-gray-800 flex items-center justify-center shadow-sm">
+                    <Building2 className="size-4 text-teal-600" />
                   </div>
                   <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Tenant Affiliation</p>
                 </div>
@@ -145,8 +145,8 @@ export function UserDetailSheet({
 
               <div className="p-4 rounded-2xl bg-gray-50 dark:bg-gray-900 border-2 border-transparent">
                 <div className="flex items-center gap-3 mb-3">
-                  <div className="h-8 w-8 rounded-lg bg-white dark:bg-gray-800 flex items-center justify-center shadow-sm">
-                    <Calendar className="h-4 w-4 text-violet-600" />
+                  <div className="size-8 rounded-lg bg-white dark:bg-gray-800 flex items-center justify-center shadow-sm">
+                    <Calendar className="size-4 text-violet-600" />
                   </div>
                   <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Registration Date</p>
                 </div>
@@ -174,8 +174,8 @@ function InfoRow({ icon, label, value, canCopy }: any) {
   return (
     <div className="flex items-start justify-between group gap-4 p-4 rounded-2xl hover:bg-gray-50/50 dark:hover:bg-gray-900/50 transition-colors">
       <div className="flex items-start gap-4 min-w-0">
-        <div className="h-8 w-8 rounded-lg bg-gray-100 dark:bg-gray-900 flex items-center justify-center shrink-0">
-          {React.cloneElement(icon, { className: "h-4 w-4 text-muted-foreground" })}
+        <div className="size-8 rounded-lg bg-gray-100 dark:bg-gray-900 flex items-center justify-center shrink-0">
+          {React.cloneElement(icon, { className: "size-4 text-muted-foreground" })}
         </div>
         <div className="min-w-0">
           <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground mb-0.5">{label}</p>
@@ -187,13 +187,13 @@ function InfoRow({ icon, label, value, canCopy }: any) {
         <Button
           variant="ghost"
           size="icon"
-          className={`h-8 w-8 rounded-lg shrink-0 transition-all hover:bg-gray-100 dark:hover:bg-gray-900 ${copied ? 'bg-emerald-50 dark:bg-emerald-900/20' : ''}`}
+          className={`size-8 rounded-lg shrink-0 transition-all hover:bg-gray-100 dark:hover:bg-gray-900 ${copied ? 'bg-emerald-50 dark:bg-emerald-900/20' : ''}`}
           onClick={handleCopy}
         >
           {copied ? (
-            <Check className="h-3.5 w-3.5 text-emerald-600" />
+            <Check className="size-3.5 text-emerald-600" />
           ) : (
-            <Copy className="h-3.5 w-3.5 text-muted-foreground" />
+            <Copy className="size-3.5 text-muted-foreground" />
           )}
         </Button>
       )}

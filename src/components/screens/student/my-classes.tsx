@@ -79,7 +79,7 @@ export function StudentClasses() {
             variant="secondary"
             className="text-sm px-3 py-1 bg-violet-50 dark:bg-violet-900/20 text-violet-700 dark:text-violet-400 border-violet-200 dark:border-violet-800"
           >
-            <GraduationCap className="h-3.5 w-3.5 mr-1.5" />
+            <GraduationCap className="size-3.5 mr-1.5" />
             {student.className} • Roll {student.rollNumber}
           </Badge>
         )}
@@ -90,7 +90,7 @@ export function StudentClasses() {
         <div className="rounded-xl bg-gradient-to-r from-violet-50 to-purple-50 dark:from-violet-900/20 dark:to-purple-900/20 border border-violet-100 dark:border-violet-800 p-4 lg:p-5">
           <div className="flex items-center gap-4">
             <div className="p-3 rounded-xl bg-gradient-to-br from-violet-500 to-purple-600 text-white shadow-sm">
-              <GraduationCap className="h-6 w-6" />
+              <GraduationCap className="size-6" />
             </div>
             <div className="flex-1">
               <h3 className="font-semibold text-gray-900 dark:text-gray-100">
@@ -118,7 +118,7 @@ export function StudentClasses() {
       {mySubjects.length === 0 ? (
         <Card className="rounded-xl shadow-sm">
           <CardContent className="py-16 text-center">
-            <BookOpen className="h-12 w-12 mx-auto text-gray-300 dark:text-gray-600 mb-3" />
+            <BookOpen className="size-12 mx-auto text-gray-300 dark:text-gray-600 mb-3" />
             <p className="text-gray-500 dark:text-gray-400 font-medium">
               No subjects found
             </p>
@@ -144,7 +144,7 @@ export function StudentClasses() {
                   <div
                     className={`p-2.5 rounded-lg bg-gradient-to-br ${subjectColors[i % subjectColors.length]} text-white shadow-sm`}
                   >
-                    <BookOpen className="h-5 w-5" />
+                    <BookOpen className="size-5" />
                   </div>
                   <Badge
                     variant="outline"
@@ -160,11 +160,11 @@ export function StudentClasses() {
 
                 <div className="space-y-2">
                   <div className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
-                    <User className="h-3.5 w-3.5 text-gray-400 dark:text-gray-500" />
+                    <User className="size-3.5 text-gray-400 dark:text-gray-500" />
                     <span className="truncate">{subject.teacherName}</span>
                   </div>
                   <div className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
-                    <GraduationCap className="h-3.5 w-3.5 text-gray-400 dark:text-gray-500" />
+                    <GraduationCap className="size-3.5 text-gray-400 dark:text-gray-500" />
                     <span>{subject.className}</span>
                   </div>
                 </div>
@@ -172,7 +172,7 @@ export function StudentClasses() {
 
               {/* Hover Arrow */}
               <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity">
-                <ArrowRight className="h-4 w-4 text-violet-400" />
+                <ArrowRight className="size-4 text-violet-400" />
               </div>
             </div>
           ))}

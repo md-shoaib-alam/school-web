@@ -25,10 +25,10 @@ export function SubscriptionExpiredScreen({ tenantName, tenantSlug, role, endDat
 
   // UI Constants conditioned on status
   const title = isSuspended ? "Account Suspended" : "Subscription Expired";
-  const icon = isSuspended ? <ShieldAlert className="w-10 h-10 text-red-600 dark:text-red-400" /> : <Lock className="w-10 h-10 text-amber-600 dark:text-amber-400" />;
+  const icon = isSuspended ? <ShieldAlert className="size-10 text-red-600 dark:text-red-400" /> : <Lock className="size-10 text-amber-600 dark:text-amber-400" />;
   const bannerColor = isSuspended ? "bg-red-50 dark:bg-red-950/30" : "bg-amber-50 dark:bg-amber-950/30";
   const circleColor = isSuspended ? "bg-red-100 dark:bg-red-900/50" : "bg-amber-100 dark:bg-amber-900/50";
-  const indicatorIcon = isSuspended ? <ShieldAlert className="w-6 h-6 text-red-500" /> : <AlertCircle className="w-6 h-6 text-amber-500" />;
+  const indicatorIcon = isSuspended ? <ShieldAlert className="size-6 text-red-500" /> : <AlertCircle className="size-6 text-amber-500" />;
   
   const subHeading = isSuspended 
     ? "This school account is currently locked." 
@@ -47,7 +47,7 @@ export function SubscriptionExpiredScreen({ tenantName, tenantSlug, role, endDat
           <div className="absolute top-4 right-4">
             {indicatorIcon}
           </div>
-          <div className={`mx-auto w-20 h-20 ${circleColor} rounded-full flex items-center justify-center mb-4 transition-colors`}>
+          <div className={`mx-auto size-20 ${circleColor} rounded-full flex items-center justify-center mb-4 transition-colors`}>
             {icon}
           </div>
           <h2 className="text-2xl font-semibold text-gray-900 dark:text-white">{title}</h2>
@@ -85,7 +85,7 @@ export function SubscriptionExpiredScreen({ tenantName, tenantSlug, role, endDat
                 href="mailto:support@schoolsaas.com" 
                 className="w-full flex items-center justify-center gap-2 bg-red-600 hover:bg-red-700 text-white font-semibold py-3 px-4 rounded-xl shadow-md transition-colors"
               >
-                <Mail className="w-5 h-5" />
+                <Mail className="size-5" />
                 Contact Support
               </a>
             ) : isAdmin ? (
@@ -93,7 +93,7 @@ export function SubscriptionExpiredScreen({ tenantName, tenantSlug, role, endDat
                 onClick={() => router.push(`/${tenantSlug}/school-subscription`)}
                 className="w-full flex items-center justify-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-3 px-4 rounded-xl shadow-md group transition-colors"
               >
-                <CreditCard className="w-5 h-5" />
+                <CreditCard className="size-5" />
                 Renew Subscription
               </button>
             ) : (
@@ -101,7 +101,7 @@ export function SubscriptionExpiredScreen({ tenantName, tenantSlug, role, endDat
                 disabled
                 className="w-full flex items-center justify-center gap-2 bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400 font-medium py-3 px-4 rounded-xl cursor-not-allowed"
               >
-                <Mail className="w-5 h-5" />
+                <Mail className="size-5" />
                 Contact School Administrator
               </button>
             )}

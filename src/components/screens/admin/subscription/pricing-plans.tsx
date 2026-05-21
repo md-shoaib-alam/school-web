@@ -54,7 +54,7 @@ export function PricingPlans({ currentPlan, onSelectPlan, isLoading }: PricingPl
               </div>
             )}
             <CardHeader className="pb-4">
-              <div className={cn("h-12 w-12 rounded-xl flex items-center justify-center mb-4", colorStyles)}>
+              <div className={cn("size-12 rounded-xl flex items-center justify-center mb-4", colorStyles)}>
                 {plan.icon}
               </div>
               <CardTitle className="text-xl font-bold">{plan.name}</CardTitle>
@@ -72,15 +72,15 @@ export function PricingPlans({ currentPlan, onSelectPlan, isLoading }: PricingPl
                 </div>
                 <div className="grid grid-cols-2 gap-y-2">
                   <div className="flex items-center gap-2 text-sm">
-                    <Users className="h-3.5 w-3.5 text-gray-400" />
+                    <Users className="size-3.5 text-gray-400" />
                     <span>{plan.limits.students.toLocaleString()} Students</span>
                   </div>
                   <div className="flex items-center gap-2 text-sm">
-                    <UserPlus className="h-3.5 w-3.5 text-gray-400" />
+                    <UserPlus className="size-3.5 text-gray-400" />
                     <span>{plan.limits.teachers} Teachers</span>
                   </div>
                   <div className="flex items-center gap-2 text-sm">
-                    <School className="h-3.5 w-3.5 text-gray-400" />
+                    <School className="size-3.5 text-gray-400" />
                     <span>{plan.limits.classes} Classes</span>
                   </div>
                 </div>
@@ -95,8 +95,8 @@ export function PricingPlans({ currentPlan, onSelectPlan, isLoading }: PricingPl
 
                   return (
                     <div key={i} className="flex items-start gap-2 text-sm">
-                      <div className="mt-1 h-4 w-4 rounded-full bg-emerald-100 flex items-center justify-center flex-shrink-0">
-                        <Check className="h-2.5 w-2.5 text-emerald-600" />
+                      <div className="mt-1 size-4 rounded-full bg-emerald-100 flex items-center justify-center flex-shrink-0">
+                        <Check className="size-2.5 text-emerald-600" />
                       </div>
                       <span className="text-gray-600 dark:text-gray-300">{text}</span>
                     </div>

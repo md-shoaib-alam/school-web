@@ -42,22 +42,22 @@ export interface AvailableUser extends AssignedUser {
 }
 
 export const PLATFORM_MODULES = [
-  { key: "tenants", label: "Schools / Tenants", icon: React.createElement(Building2, { className: "h-4 w-4" }) },
-  { key: "users", label: "All Users", icon: React.createElement(Users, { className: "h-4 w-4" }) },
-  { key: "billing", label: "Billing & Revenue", icon: React.createElement(Receipt, { className: "h-4 w-4" }) },
-  { key: "audit-logs", label: "Audit Logs", icon: React.createElement(ScrollText, { className: "h-4 w-4" }) },
-  { key: "analytics", label: "Analytics", icon: React.createElement(PieChart, { className: "h-4 w-4" }) },
-  { key: "feature-flags", label: "Feature Flags", icon: React.createElement(Blocks, { className: "h-4 w-4" }) },
-  { key: "settings", label: "Settings", icon: React.createElement(Settings, { className: "h-4 w-4" }) },
-  { key: "api", label: "API & Integrations", icon: React.createElement(Globe, { className: "h-4 w-4" }) },
-  { key: "security", label: "Security", icon: React.createElement(Lock, { className: "h-4 w-4" }) },
-  { key: "reports", label: "Reports & Export", icon: React.createElement(Eye, { className: "h-4 w-4" }) },
-  { key: "support", label: "Support Tickets", icon: React.createElement(Server, { className: "h-4 w-4" }) },
-  { key: "staff", label: "Platform Staff", icon: React.createElement(UserPlus, { className: "h-4 w-4" }) },
-  { key: "roles", label: "Role Configuration", icon: React.createElement(Shield, { className: "h-4 w-4" }) },
-  { key: "manage-admins", label: "Admin Management", icon: React.createElement(UserCog, { className: "h-4 w-4" }) },
-  { key: "notices", label: "Platform Notices", icon: React.createElement(Bell, { className: "h-4 w-4" }) },
-  { key: "notifications", label: "Push Notifications", icon: React.createElement(Send, { className: "h-4 w-4" }) },
+  { key: "tenants", label: "Schools / Tenants", icon: React.createElement(Building2, { className: "size-4" }) },
+  { key: "users", label: "All Users", icon: React.createElement(Users, { className: "size-4" }) },
+  { key: "billing", label: "Billing & Revenue", icon: React.createElement(Receipt, { className: "size-4" }) },
+  { key: "audit-logs", label: "Audit Logs", icon: React.createElement(ScrollText, { className: "size-4" }) },
+  { key: "analytics", label: "Analytics", icon: React.createElement(PieChart, { className: "size-4" }) },
+  { key: "feature-flags", label: "Feature Flags", icon: React.createElement(Blocks, { className: "size-4" }) },
+  { key: "settings", label: "Settings", icon: React.createElement(Settings, { className: "size-4" }) },
+  { key: "api", label: "API & Integrations", icon: React.createElement(Globe, { className: "size-4" }) },
+  { key: "security", label: "Security", icon: React.createElement(Lock, { className: "size-4" }) },
+  { key: "reports", label: "Reports & Export", icon: React.createElement(Eye, { className: "size-4" }) },
+  { key: "support", label: "Support Tickets", icon: React.createElement(Server, { className: "size-4" }) },
+  { key: "staff", label: "Platform Staff", icon: React.createElement(UserPlus, { className: "size-4" }) },
+  { key: "roles", label: "Role Configuration", icon: React.createElement(Shield, { className: "size-4" }) },
+  { key: "manage-admins", label: "Admin Management", icon: React.createElement(UserCog, { className: "size-4" }) },
+  { key: "notices", label: "Platform Notices", icon: React.createElement(Bell, { className: "size-4" }) },
+  { key: "notifications", label: "Push Notifications", icon: React.createElement(Send, { className: "size-4" }) },
 ];
 
 export const PERMISSION_ACTIONS = ["view", "create", "edit", "delete"] as const;

@@ -52,7 +52,7 @@ export function TeacherCard({
       <CardContent className="p-6">
         {/* Header */}
         <div className="flex items-start gap-4">
-          <Avatar className="h-14 w-14 shrink-0 ring-2 ring-white dark:ring-gray-800 shadow-sm">
+          <Avatar className="size-14 shrink-0 ring-2 ring-white dark:ring-gray-800 shadow-sm">
             <AvatarFallback className={`${color} text-white text-sm font-bold`}>
               {initials}
             </AvatarFallback>
@@ -62,7 +62,7 @@ export function TeacherCard({
               {teacher.name}
             </h3>
             <div className="flex items-center gap-1.5 text-sm text-muted-foreground mt-0.5">
-              <Mail className="h-3 w-3 shrink-0" />
+              <Mail className="size-3 shrink-0" />
               <span className="truncate">{teacher.email}</span>
             </div>
             {teacher.phone && (
@@ -77,10 +77,10 @@ export function TeacherCard({
                 <Button
                   variant="ghost"
                   size="icon"
-                  className="h-8 w-8 text-muted-foreground hover:text-emerald-600"
+                  className="size-8 text-muted-foreground hover:text-emerald-600"
                   onClick={() => onEdit(teacher)}
                 >
-                  <Pencil className="h-4 w-4" />
+                  <Pencil className="size-4" />
                 </Button>
               )}
               {canDelete && (
@@ -94,10 +94,10 @@ export function TeacherCard({
                     <Button
                       variant="ghost"
                       size="icon"
-                      className="h-8 w-8 text-muted-foreground hover:text-red-600"
+                      className="size-8 text-muted-foreground hover:text-red-600"
                       onClick={() => setDeletingId(teacher.id)}
                     >
-                      <Trash2 className="h-4 w-4" />
+                      <Trash2 className="size-4" />
                     </Button>
                   </AlertDialogTrigger>
                   <AlertDialogContent>
@@ -130,7 +130,7 @@ export function TeacherCard({
         <div className="mt-5 space-y-3">
           {/* Subjects */}
           <div className="flex items-start gap-2">
-            <BookOpen className="h-4 w-4 text-muted-foreground mt-0.5 shrink-0" />
+            <BookOpen className="size-4 text-muted-foreground mt-0.5 shrink-0" />
             <div className="flex flex-wrap gap-1.5">
               {(teacher.subjects || []).map((subject, idx) => (
                 <Badge
@@ -146,7 +146,7 @@ export function TeacherCard({
 
           {/* Classes */}
           <div className="flex items-start gap-2">
-            <GraduationCap className="h-4 w-4 text-muted-foreground mt-0.5 shrink-0" />
+            <GraduationCap className="size-4 text-muted-foreground mt-0.5 shrink-0" />
             <div className="flex flex-wrap gap-1.5">
               {(teacher.classes || []).map((cls) => (
                 <Badge key={cls} variant="outline" className="text-xs font-normal">
@@ -160,13 +160,13 @@ export function TeacherCard({
           <div className="flex items-center gap-4 pt-2 border-t dark:border-gray-700">
             {teacher.experience && (
               <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
-                <Briefcase className="h-3.5 w-3.5" />
+                <Briefcase className="size-3.5" />
                 <span>{teacher.experience} exp</span>
               </div>
             )}
             {teacher.qualification && (
               <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
-                <Award className="h-3.5 w-3.5" />
+                <Award className="size-3.5" />
                 <span>{teacher.qualification}</span>
               </div>
             )}

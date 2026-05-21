@@ -26,7 +26,7 @@ export function AdminHeader({
         </div>
         <div className="flex gap-3 items-center w-full sm:w-auto">
           <div className="relative max-w-xs flex-1 sm:flex-none w-full sm:w-64">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
             <Input
               placeholder="Search by name or email..."
               className="pl-9 h-10 rounded-xl"
@@ -38,7 +38,7 @@ export function AdminHeader({
             className="bg-teal-600 hover:bg-teal-700 text-white shrink-0 h-10 rounded-xl gap-2 shadow-md shadow-teal-100 dark:shadow-none"
             onClick={onAddClick}
           >
-            <Plus className="h-4 w-4" />
+            <Plus className="size-4" />
             Add Super Admin
           </Button>
         </div>
@@ -46,7 +46,7 @@ export function AdminHeader({
 
       <div className="rounded-xl border border-teal-200 bg-teal-50 dark:bg-teal-950/20 dark:border-teal-800/30 p-4">
         <div className="flex items-start gap-3">
-          <ShieldCheck className="h-5 w-5 text-teal-600 dark:text-teal-400 shrink-0 mt-0.5" />
+          <ShieldCheck className="size-5 text-teal-600 dark:text-teal-400 shrink-0 mt-0.5" />
           <div className="text-sm">
             <p className="font-medium text-teal-800 dark:text-teal-300">
               Platform Admin Accounts

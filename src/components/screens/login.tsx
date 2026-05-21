@@ -37,13 +37,13 @@ function ThemeToggleLogin() {
     <Button
       variant="ghost"
       size="icon"
-      className="absolute top-4 right-4 h-10 w-10 rounded-full hover:bg-white/20 dark:hover:bg-black/20 text-gray-600 dark:text-gray-300 z-10"
+      className="absolute top-4 right-4 size-10 rounded-full hover:bg-white/20 dark:hover:bg-black/20 text-gray-600 dark:text-gray-300 z-10"
       onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
       aria-label="Toggle theme"
       suppressHydrationWarning
     >
-      <Moon className="h-5 w-5 block dark:hidden" />
-      <Sun className="h-5 w-5 hidden dark:block" />
+      <Moon className="size-5 block dark:hidden" />
+      <Sun className="size-5 hidden dark:block" />
     </Button>
   );
 }
@@ -126,11 +126,11 @@ export function LoginScreen() {
       <div className="w-full max-w-md">
         {/* Logo & Title */}
         <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-20 h-20 rounded-2xl mb-4 shadow-lg bg-white/90 dark:bg-black/20 overflow-hidden shrink-0 border border-gray-200 dark:border-white/10">
+          <div className="inline-flex items-center justify-center size-20 rounded-2xl mb-4 shadow-lg bg-white/90 dark:bg-black/20 overflow-hidden shrink-0 border border-gray-200 dark:border-white/10">
             <img 
               src="/test.webp" 
               alt="School Logo" 
-              className="h-full w-full object-cover" 
+              className="size-full object-cover" 
             />
           </div>
           <h1 className="text-4xl font-semibold tracking-tight text-gray-900 dark:text-white">
@@ -162,9 +162,9 @@ export function LoginScreen() {
                 </Label>
                 <div className="relative group">
                   <div className="absolute left-3.5 top-1/2 -translate-y-1/2 flex items-center gap-1 text-gray-400 group-focus-within:text-rose-500 transition-colors duration-200">
-                    <Mail className="h-4 w-4" />
+                    <Mail className="size-4" />
                     <span className="text-xs">/</span>
-                    <School className="h-4 w-4" />
+                    <School className="size-4" />
                   </div>
                   <Input
                     id="login-email"
@@ -196,7 +196,7 @@ export function LoginScreen() {
                   </button>
                 </div>
                 <div className="relative group">
-                  <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400 group-focus-within:text-rose-500 transition-colors duration-200" />
+                  <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 size-5 text-gray-400 group-focus-within:text-rose-500 transition-colors duration-200" />
                   <Input
                     id="login-password"
                     type={showPassword ? "text" : "password"}
@@ -213,9 +213,9 @@ export function LoginScreen() {
                     className="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-rose-500 transition-colors duration-200"
                   >
                     {showPassword ? (
-                      <EyeOff className="h-4 w-4" />
+                      <EyeOff className="size-4" />
                     ) : (
-                      <Eye className="h-4 w-4" />
+                      <Eye className="size-4" />
                     )}
                   </button>
                 </div>
@@ -228,7 +228,7 @@ export function LoginScreen() {
               >
                 {loading ? (
                   <>
-                    <Loader2 className="h-5 w-5 mr-2 animate-spin" />
+                    <Loader2 className="size-5 mr-2 animate-spin" />
                     Authenticating...
                   </>
                 ) : (

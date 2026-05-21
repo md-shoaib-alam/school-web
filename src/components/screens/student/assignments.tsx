@@ -315,31 +315,31 @@ export function StudentAssignments() {
         <SummaryCard
           label="Total"
           count={counts.all}
-          icon={<FileText className="h-4 w-4" />}
+          icon={<FileText className="size-4" />}
           color="violet"
         />
         <SummaryCard
           label="Active"
           count={counts.active}
-          icon={<Clock className="h-4 w-4" />}
+          icon={<Clock className="size-4" />}
           color="amber"
         />
         <SummaryCard
           label="Submitted"
           count={counts.submitted}
-          icon={<CheckCircle2 className="h-4 w-4" />}
+          icon={<CheckCircle2 className="size-4" />}
           color="emerald"
         />
         <SummaryCard
           label="Graded"
           count={counts.graded}
-          icon={<Star className="h-4 w-4" />}
+          icon={<Star className="size-4" />}
           color="violet"
         />
         <SummaryCard
           label="Overdue"
           count={counts.overdue}
-          icon={<AlertTriangle className="h-4 w-4" />}
+          icon={<AlertTriangle className="size-4" />}
           color="red"
         />
       </div>
@@ -348,7 +348,7 @@ export function StudentAssignments() {
       <Card className="rounded-xl shadow-sm">
         <CardHeader className="pb-3">
           <CardTitle className="text-base flex items-center gap-2">
-            <FileText className="h-4 w-4 text-violet-500" />
+            <FileText className="size-4 text-violet-500" />
             Assignment List
           </CardTitle>
         </CardHeader>
@@ -374,7 +374,7 @@ export function StudentAssignments() {
               <ScrollArea className="max-h-[600px]">
                 {filteredAssignments.length === 0 ? (
                   <div className="text-center py-12 text-gray-400 dark:text-gray-500 dark:text-gray-400">
-                    <FileText className="h-10 w-10 mx-auto mb-2 opacity-40" />
+                    <FileText className="size-10 mx-auto mb-2 opacity-40" />
                     <p className="text-sm">No assignments found</p>
                     <p className="text-xs mt-1">
                       {activeTab === "all"
@@ -430,11 +430,11 @@ export function StudentAssignments() {
                               >
                                 {assignment.mode === "online" ? (
                                   <>
-                                    <Globe className="h-2.5 w-2.5" /> Online
+                                    <Globe className="size-2.5" /> Online
                                   </>
                                 ) : (
                                   <>
-                                    <BookOpen className="h-2.5 w-2.5" /> Offline
+                                    <BookOpen className="size-2.5" /> Offline
                                   </>
                                 )}
                               </Badge>
@@ -462,7 +462,7 @@ export function StudentAssignments() {
                             <div className="flex items-center gap-4">
                               <div className="flex items-center gap-1.5" suppressHydrationWarning>
                                 <Clock
-                                  className={`h-3.5 w-3.5 ${getCountdownColor(assignment.status)}`}
+                                  className={`size-3.5 ${getCountdownColor(assignment.status)}`}
                                 />
                                 <span
                                   className={`text-xs ${getCountdownColor(assignment.status)}`}
@@ -494,22 +494,22 @@ export function StudentAssignments() {
                                 `}
                                 >
                                   {submittingId === assignment.id ? (
-                                    <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                                    <Loader2 className="size-3.5 animate-spin" />
                                   ) : (
-                                    <Send className="h-3.5 w-3.5" />
+                                    <Send className="size-3.5" />
                                   )}
                                   Submit
                                 </Button>
                               )}
                             {assignment.status === "submitted" && (
                               <Badge className="bg-emerald-100 text-emerald-700 text-[10px] gap-1">
-                                <CheckCircle2 className="h-3 w-3" />
+                                <CheckCircle2 className="size-3" />
                                 Submitted
                               </Badge>
                             )}
                             {assignment.status === "graded" && (
                               <Badge className="bg-violet-100 text-violet-700 dark:text-violet-400 text-[10px] gap-1">
-                                <Star className="h-3 w-3" />
+                                <Star className="size-3" />
                                 Graded
                               </Badge>
                             )}

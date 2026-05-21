@@ -20,7 +20,7 @@ export function FeeSkeleton() {
           <Card key={i} className="border-none shadow-sm overflow-hidden">
             <CardContent className="p-6">
               <div className="flex items-center gap-4">
-                <Skeleton className="h-10 w-10 rounded-xl" />
+                <Skeleton className="size-10 rounded-xl" />
                 <div className="space-y-2">
                   <Skeleton className="h-4 w-20" />
                   <Skeleton className="h-6 w-28" />
@@ -60,8 +60,8 @@ export function FeeSkeleton() {
                   <TableCell><Skeleton className="h-4 w-20" /></TableCell>
                   <TableCell className="text-right">
                     <div className="flex justify-end gap-2">
-                      <Skeleton className="h-8 w-8 rounded-md" />
-                      <Skeleton className="h-8 w-8 rounded-md" />
+                      <Skeleton className="size-8 rounded-md" />
+                      <Skeleton className="size-8 rounded-md" />
                     </div>
                   </TableCell>
                 </TableRow>

@@ -147,13 +147,13 @@ export function TabulationLedgerPreviewPage({
             onClick={onBack}
             className="group flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground h-8 px-2 rounded-lg transition-colors border border-gray-100 dark:border-zinc-800"
           >
-            <ArrowLeft className="h-3.5 w-3.5 transition-transform group-hover:-translate-x-0.5" />
+            <ArrowLeft className="size-3.5 transition-transform group-hover:-translate-x-0.5" />
             <span className="hidden sm:inline">Back</span>
           </Button>
           
           <div className="min-w-0">
             <h2 className="text-sm font-semibold tracking-tight text-foreground flex items-center gap-1.5 leading-none">
-              <Award className="h-4 w-4 text-emerald-600 dark:text-emerald-500 shrink-0" />
+              <Award className="size-4 text-emerald-600 dark:text-emerald-500 shrink-0" />
               <span className="truncate">{classNameStr} - {classSection}</span>
             </h2>
             <span className="text-[10px] text-muted-foreground font-semibold uppercase tracking-wider block mt-0.5">
@@ -170,7 +170,7 @@ export function TabulationLedgerPreviewPage({
             <Select value={selectedTemplateId} onValueChange={setSelectedTemplateId}>
               <SelectTrigger className="w-full h-8 rounded-lg text-xs font-semibold bg-zinc-50/50 dark:bg-zinc-900/30 border-gray-200 dark:border-zinc-800 py-1">
                 <div className="flex items-center gap-1.5 min-w-0 w-full text-left">
-                  <Layout className="h-3.5 w-3.5 text-indigo-500 shrink-0" />
+                  <Layout className="size-3.5 text-indigo-500 shrink-0" />
                   <span className="truncate flex-1">
                     <SelectValue placeholder="Select Design" />
                   </span>
@@ -191,7 +191,7 @@ export function TabulationLedgerPreviewPage({
             <Select value={zoomScale.toString()} onValueChange={(v) => setZoomScale(parseFloat(v))}>
               <SelectTrigger className="w-full h-8 rounded-lg text-xs font-semibold bg-zinc-50/50 dark:bg-zinc-900/30 border-gray-200 dark:border-zinc-800 py-1">
                 <div className="flex items-center gap-1.5 min-w-0 w-full text-left">
-                  <Search className="h-3.5 w-3.5 text-zinc-400 shrink-0" />
+                  <Search className="size-3.5 text-zinc-400 shrink-0" />
                   <span className="truncate flex-1">
                     {Math.round(zoomScale * 100)}%
                   </span>
@@ -214,7 +214,7 @@ export function TabulationLedgerPreviewPage({
             size="sm"
             className="w-full sm:w-auto bg-emerald-600 hover:bg-emerald-700 text-white shrink-0 gap-1.5 shadow-sm rounded-lg h-8 px-4 font-bold text-xs transition-all duration-300 transform active:scale-95 justify-center"
           >
-            {printing ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Printer className="h-3.5 w-3.5" />}
+            {printing ? <Loader2 className="size-3.5 animate-spin" /> : <Printer className="size-3.5" />}
             <span>Print Ledger</span>
           </Button>
         </div>
@@ -225,7 +225,7 @@ export function TabulationLedgerPreviewPage({
         {loading ? (
           <div className="w-full space-y-6 py-10 animate-in fade-in duration-300">
             <div className="flex items-center gap-4">
-              <Skeleton className="h-12 w-12 rounded-full" />
+              <Skeleton className="size-12 rounded-full" />
               <div className="space-y-2">
                 <Skeleton className="h-4 w-48" />
                 <Skeleton className="h-3 w-72" />
@@ -235,8 +235,8 @@ export function TabulationLedgerPreviewPage({
           </div>
         ) : !ledgerData ? (
           <div className="flex flex-col items-center justify-center text-center py-20 text-muted-foreground max-w-md mx-auto animate-in fade-in duration-300">
-            <div className="w-16 h-16 bg-blue-50 dark:bg-blue-900/10 text-blue-600 dark:text-blue-400 rounded-full flex items-center justify-center mb-4">
-              <AlertCircle className="h-8 w-8" />
+            <div className="size-16 bg-blue-50 dark:bg-blue-900/10 text-blue-600 dark:text-blue-400 rounded-full flex items-center justify-center mb-4">
+              <AlertCircle className="size-8" />
             </div>
             <h3 className="text-base font-semibold text-foreground">No Ledger Compiled</h3>
             <p className="text-xs mt-1">

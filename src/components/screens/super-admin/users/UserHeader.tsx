@@ -32,7 +32,7 @@ export function UserHeader({ totalCount, roleCountsMap }: UserHeaderProps) {
           variant="outline"
           className="w-fit gap-1.5 border-teal-200 dark:border-teal-700 text-teal-700 dark:text-teal-400 bg-teal-50 dark:bg-teal-900/30 text-[10px] font-black uppercase tracking-widest px-3 py-1.5 rounded-full shadow-sm"
         >
-          <Shield className="h-3.5 w-3.5" />
+          <Shield className="size-3.5" />
           Cross-Tenant View
         </Badge>
       </div>
@@ -50,7 +50,7 @@ export function UserHeader({ totalCount, roleCountsMap }: UserHeaderProps) {
               <CardContent className="p-4">
                 <div className="flex items-center justify-between mb-3">
                   <div className={`p-2 rounded-xl ${stat.iconBg} shadow-inner`}>
-                    <Icon className="h-4 w-4" />
+                    <Icon className="size-4" />
                   </div>
                   <span className={`text-[10px] font-black uppercase tracking-widest ${stat.color} opacity-80`}>
                     {percentage}%

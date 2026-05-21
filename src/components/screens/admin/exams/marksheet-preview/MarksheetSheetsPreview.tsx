@@ -58,7 +58,7 @@ export function MarksheetSheetsPreview({
       {loading ? (
         <div className="w-full max-w-4xl space-y-6 py-10 animate-in fade-in duration-300">
           <div className="flex items-center gap-4">
-            <Skeleton className="h-12 w-12 rounded-full" />
+            <Skeleton className="size-12 rounded-full" />
             <div className="space-y-2">
               <Skeleton className="h-4 w-48" />
               <Skeleton className="h-3 w-72" />
@@ -68,8 +68,8 @@ export function MarksheetSheetsPreview({
         </div>
       ) : exams.length === 0 ? (
         <div className="flex flex-col items-center justify-center text-center py-20 text-muted-foreground max-w-md mx-auto animate-in fade-in duration-300">
-          <div className="w-16 h-16 bg-blue-50 dark:bg-blue-900/10 text-blue-600 dark:text-blue-400 rounded-full flex items-center justify-center mb-4">
-            <AlertCircle className="h-8 w-8" />
+          <div className="size-16 bg-blue-50 dark:bg-blue-900/10 text-blue-600 dark:text-blue-400 rounded-full flex items-center justify-center mb-4">
+            <AlertCircle className="size-8" />
           </div>
           <h3 className="text-base font-semibold text-foreground">No Published Exams</h3>
           <p className="text-xs mt-1">
@@ -78,14 +78,14 @@ export function MarksheetSheetsPreview({
         </div>
       ) : previewStudents.length === 0 ? (
         <div className="flex flex-col items-center justify-center text-center py-20 text-muted-foreground max-w-md mx-auto animate-in fade-in duration-300">
-          <AlertCircle className="h-10 w-10 mb-3 opacity-30 animate-in fade-in slide-in-from-top-3 duration-700 ease-[cubic-bezier(0.16,1,0.3,1)]" />
+          <AlertCircle className="size-10 mb-3 opacity-30 animate-in fade-in slide-in-from-top-3 duration-700 ease-[cubic-bezier(0.16,1,0.3,1)]" />
           <p className="text-xs">No student records available</p>
         </div>
       ) : (
         <div className={`w-full max-w-4xl mx-auto space-y-4 ${cinzel.className} ${montserrat.className} ${inter.className}`}>
           {selectedStudentId === 'all' && (
             <div className="bg-emerald-50/50 dark:bg-emerald-900/10 border border-emerald-200/50 dark:border-emerald-800/40 p-4 rounded-xl text-xs text-emerald-700 dark:text-emerald-400 flex items-center gap-3 font-medium shadow-sm animate-in slide-in-from-top-2 duration-300">
-              <CheckCircle2 className="h-5 w-5 shrink-0 text-emerald-500" />
+              <CheckCircle2 className="size-5 shrink-0 text-emerald-500" />
               <span>Showing previews for <strong>all {students.length} students</strong>. Scroll down to inspect. Clicking <strong>Print</strong> will generate the clean print packet.</span>
             </div>
           )}

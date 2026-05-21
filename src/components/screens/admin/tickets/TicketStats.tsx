@@ -26,8 +26,8 @@ export function TicketStats({ stats }: TicketStatsProps) {
                 {stats.open}
               </p>
             </div>
-            <div className="h-10 w-10 rounded-lg bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
-              <AlertCircle className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+            <div className="size-10 rounded-lg bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
+              <AlertCircle className="size-5 text-blue-600 dark:text-blue-400" />
             </div>
           </div>
         </CardContent>
@@ -43,8 +43,8 @@ export function TicketStats({ stats }: TicketStatsProps) {
                 {stats.in_progress}
               </p>
             </div>
-            <div className="h-10 w-10 rounded-lg bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center">
-              <Clock className="h-5 w-5 text-amber-600 dark:text-amber-400" />
+            <div className="size-10 rounded-lg bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center">
+              <Clock className="size-5 text-amber-600 dark:text-amber-400" />
             </div>
           </div>
         </CardContent>
@@ -60,8 +60,8 @@ export function TicketStats({ stats }: TicketStatsProps) {
                 {stats.resolved}
               </p>
             </div>
-            <div className="h-10 w-10 rounded-lg bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center">
-              <CheckCircle2 className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
+            <div className="size-10 rounded-lg bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center">
+              <CheckCircle2 className="size-5 text-emerald-600 dark:text-emerald-400" />
             </div>
           </div>
         </CardContent>
@@ -77,8 +77,8 @@ export function TicketStats({ stats }: TicketStatsProps) {
                 {stats.closed}
               </p>
             </div>
-            <div className="h-10 w-10 rounded-lg bg-gray-100 dark:bg-gray-800 flex items-center justify-center">
-              <XCircle className="h-5 w-5 text-gray-500 dark:text-gray-400" />
+            <div className="size-10 rounded-lg bg-gray-100 dark:bg-gray-800 flex items-center justify-center">
+              <XCircle className="size-5 text-gray-500 dark:text-gray-400" />
             </div>
           </div>
         </CardContent>

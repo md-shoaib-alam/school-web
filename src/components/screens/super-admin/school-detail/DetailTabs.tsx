@@ -97,9 +97,9 @@ export function DetailTabs({
                 className="h-10 text-[11px] font-black uppercase tracking-widest px-4 border-2 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-900 transition-all"
               >
                 {exporting ? (
-                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  <Loader2 className="size-4 mr-2 animate-spin" />
                 ) : (
-                  <Download className="h-4 w-4 mr-2" />
+                  <Download className="size-4 mr-2" />
                 )}
                 Export Excel
               </Button>
@@ -111,9 +111,9 @@ export function DetailTabs({
                 className="h-10 text-[11px] font-black uppercase tracking-widest px-4 border-2 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-900 transition-all"
               >
                 {importing ? (
-                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  <Loader2 className="size-4 mr-2 animate-spin" />
                 ) : (
-                  <Upload className="h-4 w-4 mr-2" />
+                  <Upload className="size-4 mr-2" />
                 )}
                 Import CSV
               </Button>
@@ -122,7 +122,7 @@ export function DetailTabs({
 
           {/* Search & Filter */}
           <div className="relative mb-6">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
             <Input
               placeholder={`Search in ${activeTab.charAt(0).toUpperCase() + activeTab.slice(1)}...`}
               className="pl-12 h-12 rounded-xl border-2 focus-visible:ring-rose-500/20 focus-visible:border-rose-500 font-medium"
@@ -130,7 +130,7 @@ export function DetailTabs({
               onChange={(e) => setSearch(e.target.value)}
             />
             <div className="absolute right-4 top-1/2 -translate-y-1/2">
-              <Filter className="h-4 w-4 text-muted-foreground opacity-50" />
+              <Filter className="size-4 text-muted-foreground opacity-50" />
             </div>
           </div>
 
@@ -139,7 +139,7 @@ export function DetailTabs({
             <TabsContent key={tab.value} value={tab.value} className="mt-0 focus-visible:outline-none focus-visible:ring-0">
               {filteredData.length === 0 ? (
                 <div className="py-24 text-center border-2 border-dashed border-gray-100 dark:border-gray-800 rounded-3xl">
-                  <div className="h-20 w-20 mx-auto mb-6 rounded-full bg-gray-50 dark:bg-gray-900 flex items-center justify-center text-muted-foreground/30">
+                  <div className="size-20 mx-auto mb-6 rounded-full bg-gray-50 dark:bg-gray-900 flex items-center justify-center text-muted-foreground/30">
                     {tab.icon}
                   </div>
                   <h3 className="text-xl font-semibold text-gray-900 dark:text-gray-100">
@@ -184,11 +184,11 @@ export function DetailTabs({
                       <Button
                         variant="ghost"
                         size="icon"
-                        className="h-10 w-10 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-800"
+                        className="size-10 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-800"
                         disabled={currentPage <= 1}
                         onClick={() => setCurrentPage((p) => p - 1)}
                       >
-                        <ChevronLeft className="h-5 w-5" />
+                        <ChevronLeft className="size-5" />
                       </Button>
                       <div className="flex items-center gap-1 px-1">
                         {getPaginationRange(currentPage, totalPages).map((page, idx) =>
@@ -199,7 +199,7 @@ export function DetailTabs({
                               key={page}
                               variant={currentPage === page ? "default" : "ghost"}
                               size="sm"
-                              className={`h-9 w-9 rounded-xl font-black text-xs ${currentPage === page ? 'bg-rose-600 text-white shadow-lg shadow-rose-200 dark:shadow-none' : 'hover:bg-gray-100 dark:hover:bg-gray-800'}`}
+                              className={`size-9 rounded-xl font-black text-xs ${currentPage === page ? 'bg-rose-600 text-white shadow-lg shadow-rose-200 dark:shadow-none' : 'hover:bg-gray-100 dark:hover:bg-gray-800'}`}
                               onClick={() => setCurrentPage(page)}
                             >
                               {page}
@@ -210,11 +210,11 @@ export function DetailTabs({
                       <Button
                         variant="ghost"
                         size="icon"
-                        className="h-10 w-10 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-800"
+                        className="size-10 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-800"
                         disabled={currentPage >= totalPages}
                         onClick={() => setCurrentPage((p) => p + 1)}
                       >
-                        <ChevronRight className="h-5 w-5" />
+                        <ChevronRight className="size-5" />
                       </Button>
                     </div>
                   </div>

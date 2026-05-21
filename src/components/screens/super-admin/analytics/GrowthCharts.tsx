@@ -40,7 +40,7 @@ export function GrowthCharts({ loading, tenantGrowth, userGrowth }: GrowthCharts
       <Card className="overflow-hidden">
         <CardHeader className="pb-2">
           <CardTitle className="text-base font-bold flex items-center gap-2">
-            <TrendingUp className="h-4 w-4 text-teal-500" />
+            <TrendingUp className="size-4 text-teal-500" />
             Tenant Growth
           </CardTitle>
           <CardDescription>
@@ -89,7 +89,7 @@ export function GrowthCharts({ loading, tenantGrowth, userGrowth }: GrowthCharts
       <Card className="overflow-hidden">
         <CardHeader className="pb-2">
           <CardTitle className="text-base font-bold flex items-center gap-2">
-            <Users className="h-4 w-4 text-emerald-500" />
+            <Users className="size-4 text-emerald-500" />
             User Growth by Role
           </CardTitle>
           <CardDescription>Users breakdown over 12 months</CardDescription>

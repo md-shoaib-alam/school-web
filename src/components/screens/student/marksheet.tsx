@@ -211,7 +211,7 @@ export function StudentMarksheet() {
 
   if (!studentInfo) return (
     <div className="flex flex-col items-center justify-center py-20 text-gray-400">
-      <AlertCircle className="h-10 w-10 mb-3 opacity-50" />
+      <AlertCircle className="size-10 mb-3 opacity-50" />
       <p className="text-sm font-medium">Could not load student information.</p>
     </div>
   );
@@ -222,7 +222,7 @@ export function StudentMarksheet() {
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100 flex items-center gap-2">
-            <FileText className="h-5 w-5 text-violet-500" />
+            <FileText className="size-5 text-violet-500" />
             My Marksheet
           </h2>
           <p className="text-sm text-gray-500 dark:text-gray-400 mt-0.5">
@@ -258,7 +258,7 @@ export function StudentMarksheet() {
       {/* ── Sheet Preview ── */}
       {!compiledSheet || compiledSheet.subjects.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-20 text-gray-400 dark:text-gray-500 border-2 border-dashed rounded-xl">
-          <GraduationCap className="h-12 w-12 mb-3 opacity-40" />
+          <GraduationCap className="size-12 mb-3 opacity-40" />
           <p className="text-sm font-medium">No published exam results found for {selectedYear}</p>
           <p className="text-xs mt-1 opacity-60">Results will appear here once your teacher publishes them.</p>
         </div>

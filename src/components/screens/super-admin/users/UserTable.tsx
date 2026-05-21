@@ -82,13 +82,13 @@ export function UserTable({
       <Card className="border-none shadow-sm bg-white dark:bg-gray-800">
         <CardContent className="p-6 space-y-4">
           <div className="flex items-center gap-4">
-            <Skeleton className="h-10 w-10 rounded-full" />
+            <Skeleton className="size-10 rounded-full" />
             <Skeleton className="h-4 w-48" />
             <Skeleton className="h-4 w-32 ml-auto" />
           </div>
           {[...Array(8)].map((_, i) => (
             <div key={i} className="flex items-center gap-4 py-2 border-b last:border-none border-gray-100 dark:border-gray-800">
-              <Skeleton className="h-8 w-8 rounded-full" />
+              <Skeleton className="size-8 rounded-full" />
               <Skeleton className="h-4 w-40" />
               <Skeleton className="h-4 w-52" />
               <Skeleton className="h-6 w-24 ml-auto" />
@@ -108,32 +108,32 @@ export function UserTable({
               <TableRow className="bg-gray-50/50 dark:bg-gray-900/50 hover:bg-transparent">
                 <TableHead className="w-[280px] min-w-[200px] uppercase tracking-widest text-[10px] font-black text-muted-foreground py-4 pl-6">
                   <div className="flex items-center gap-2">
-                    <UserRound className="h-3.5 w-3.5" /> Name
+                    <UserRound className="size-3.5" /> Name
                   </div>
                 </TableHead>
                 <TableHead className="min-w-[200px] uppercase tracking-widest text-[10px] font-black text-muted-foreground py-4">
                   <div className="flex items-center gap-2">
-                    <Mail className="h-3.5 w-3.5" /> Email
+                    <Mail className="size-3.5" /> Email
                   </div>
                 </TableHead>
                 <TableHead className="min-w-[120px] uppercase tracking-widest text-[10px] font-black text-muted-foreground py-4">
                   <div className="flex items-center gap-2">
-                    <UserCog className="h-3.5 w-3.5" /> Role
+                    <UserCog className="size-3.5" /> Role
                   </div>
                 </TableHead>
                 <TableHead className="min-w-[160px] uppercase tracking-widest text-[10px] font-black text-muted-foreground py-4">
                   <div className="flex items-center gap-2">
-                    <Building2 className="h-3.5 w-3.5" /> School
+                    <Building2 className="size-3.5" /> School
                   </div>
                 </TableHead>
                 <TableHead className="min-w-[100px] uppercase tracking-widest text-[10px] font-black text-muted-foreground py-4">
                   <div className="flex items-center gap-2">
-                    <Activity className="h-3.5 w-3.5" /> Status
+                    <Activity className="size-3.5" /> Status
                   </div>
                 </TableHead>
                 <TableHead className="min-w-[120px] hidden md:table-cell uppercase tracking-widest text-[10px] font-black text-muted-foreground py-4">
                   <div className="flex items-center gap-2">
-                    <Calendar className="h-3.5 w-3.5" /> Joined
+                    <Calendar className="size-3.5" /> Joined
                   </div>
                 </TableHead>
                 <TableHead className="w-[60px] text-right pr-6 py-4">
@@ -147,7 +147,7 @@ export function UserTable({
                 {users.length === 0 ? (
                   <TableRow key="empty">
                     <TableCell colSpan={7} className="text-center py-24 text-muted-foreground">
-                      <Users className="h-16 w-16 mx-auto mb-6 opacity-10" />
+                      <Users className="size-16 mx-auto mb-6 opacity-10" />
                       <p className="text-xl font-black text-gray-900 dark:text-gray-100">No users found</p>
                       <p className="text-sm font-medium mt-1">Try adjusting your filters or search term</p>
                     </TableCell>
@@ -168,7 +168,7 @@ export function UserTable({
                     >
                       <TableCell className="pl-6 py-4">
                         <div className="flex items-center gap-3">
-                          <div className={`h-9 w-9 rounded-xl flex items-center justify-center text-xs font-black shrink-0 text-white shadow-sm ${
+                          <div className={`size-9 rounded-xl flex items-center justify-center text-xs font-black shrink-0 text-white shadow-sm ${
                             user.role === "super_admin" ? "bg-teal-500" : 
                             user.role === "admin" ? "bg-emerald-500" : 
                             user.role === "teacher" ? "bg-blue-500" : 
@@ -189,13 +189,13 @@ export function UserTable({
                           <Button
                             variant="ghost"
                             size="icon"
-                            className={`h-6 w-6 rounded-md shrink-0 transition-all hover:bg-teal-50 dark:hover:bg-teal-900/30 ${copiedId === user.id ? 'bg-emerald-50 dark:bg-emerald-900/20' : ''}`}
+                            className={`size-6 rounded-md shrink-0 transition-all hover:bg-teal-50 dark:hover:bg-teal-900/30 ${copiedId === user.id ? 'bg-emerald-50 dark:bg-emerald-900/20' : ''}`}
                             onClick={(e) => handleCopy(e, user.email, user.id)}
                           >
                             {copiedId === user.id ? (
-                              <Check className="h-3 w-3 text-emerald-600" />
+                              <Check className="size-3 text-emerald-600" />
                             ) : (
-                              <Copy className="h-3 w-3 text-muted-foreground" />
+                              <Copy className="size-3 text-muted-foreground" />
                             )}
                           </Button>
                         </div>
@@ -209,8 +209,8 @@ export function UserTable({
                       <TableCell className="py-4">
                         {user.tenant ? (
                           <div className="flex items-center gap-2">
-                            <div className="h-6 w-6 rounded-lg bg-gray-50 dark:bg-gray-900 flex items-center justify-center shrink-0">
-                              <Building2 className="h-3 w-3 text-muted-foreground" />
+                            <div className="size-6 rounded-lg bg-gray-50 dark:bg-gray-900 flex items-center justify-center shrink-0">
+                              <Building2 className="size-3 text-muted-foreground" />
                             </div>
                             <span className="text-xs font-bold text-gray-700 dark:text-gray-300 truncate max-w-[140px]">{user.tenant.name}</span>
                           </div>
@@ -222,7 +222,7 @@ export function UserTable({
                         <Badge variant="outline" className={`text-[9px] font-black uppercase tracking-widest px-2.5 h-6 border-transparent ${
                           user.isActive ? "bg-emerald-50 text-emerald-700" : "bg-red-50 text-red-700"
                         }`}>
-                          <div className={`h-1.5 w-1.5 rounded-full mr-1.5 ${user.isActive ? "bg-emerald-500" : "bg-red-500"}`} />
+                          <div className={`size-1.5 rounded-full mr-1.5 ${user.isActive ? "bg-emerald-500" : "bg-red-500"}`} />
                           {user.isActive ? "Active" : "Inactive"}
                         </Badge>
                       </TableCell>
@@ -233,13 +233,13 @@ export function UserTable({
                         <Button
                           variant="ghost"
                           size="icon"
-                          className="h-8 w-8 rounded-lg text-muted-foreground hover:text-teal-600 hover:bg-teal-50 dark:hover:bg-teal-900/30"
+                          className="size-8 rounded-lg text-muted-foreground hover:text-teal-600 hover:bg-teal-50 dark:hover:bg-teal-900/30"
                           onClick={(e) => {
                             e.stopPropagation();
                             onUserClick(user);
                           }}
                         >
-                          <Eye className="h-4 w-4" />
+                          <Eye className="size-4" />
                         </Button>
                       </TableCell>
                     </m.tr>
@@ -262,11 +262,11 @@ export function UserTable({
               <Button
                 variant="ghost"
                 size="icon"
-                className="h-9 w-9 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-800"
+                className="size-9 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-800"
                 disabled={currentPage <= 1}
                 onClick={() => onPageChange(currentPage - 1)}
               >
-                <ChevronLeft className="h-4 w-4" />
+                <ChevronLeft className="size-4" />
               </Button>
               <div className="flex items-center gap-1 px-1">
                 {getPageNumbers().map((page, idx) =>
@@ -277,7 +277,7 @@ export function UserTable({
                       key={page}
                       variant={currentPage === page ? "default" : "ghost"}
                       size="sm"
-                      className={`h-8 w-8 rounded-xl font-black text-xs ${currentPage === page ? 'bg-teal-600 text-white shadow-lg shadow-teal-200 dark:shadow-none' : 'hover:bg-gray-100 dark:hover:bg-gray-800'}`}
+                      className={`size-8 rounded-xl font-black text-xs ${currentPage === page ? 'bg-teal-600 text-white shadow-lg shadow-teal-200 dark:shadow-none' : 'hover:bg-gray-100 dark:hover:bg-gray-800'}`}
                       onClick={() => onPageChange(page)}
                     >
                       {page}
@@ -288,11 +288,11 @@ export function UserTable({
               <Button
                 variant="ghost"
                 size="icon"
-                className="h-9 w-9 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-800"
+                className="size-9 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-800"
                 disabled={currentPage >= totalPages}
                 onClick={() => onPageChange(currentPage + 1)}
               >
-                <ChevronRight className="h-4 w-4" />
+                <ChevronRight className="size-4" />
               </Button>
             </div>
           </div>

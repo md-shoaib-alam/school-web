@@ -93,7 +93,7 @@ export function FeeTable({ studentName, fees, onPay, isPremium }: FeeTableProps)
               {fees.length === 0 ? (
                 <TableRow>
                   <TableCell colSpan={6} className="text-center py-12 text-muted-foreground">
-                    <IndianRupee className="h-10 w-10 mx-auto mb-2 opacity-30" />
+                    <IndianRupee className="size-10 mx-auto mb-2 opacity-30" />
                     <p>No fee records found</p>
                   </TableCell>
                 </TableRow>
@@ -150,9 +150,9 @@ export function FeeTable({ studentName, fees, onPay, isPremium }: FeeTableProps)
                               onClick={() => onPrintClick(fee)}
                             >
                               {isPremium ? (
-                                <Printer className="h-3 w-3" />
+                                <Printer className="size-3" />
                               ) : (
-                                <Lock className="h-2.5 w-2.5" />
+                                <Lock className="size-2.5" />
                               )}
                               {isPremium ? "Receipt" : "Upgrade"}
                             </Button>

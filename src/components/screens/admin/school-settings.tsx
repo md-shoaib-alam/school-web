@@ -148,7 +148,7 @@ export function AdminSchoolSettings() {
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
-        <Loader2 className="h-8 w-8 animate-spin text-emerald-500" />
+        <Loader2 className="size-8 animate-spin text-emerald-500" />
         <span className="ml-3 text-gray-500 dark:text-gray-400">
           Loading settings...
         </span>
@@ -250,7 +250,7 @@ export function AdminSchoolSettings() {
       <Card>
         <CardHeader>
           <div className="flex items-center gap-3">
-            <div className="h-9 w-9 rounded-lg bg-indigo-100 dark:bg-indigo-900/30 flex items-center justify-center text-lg">
+            <div className="size-9 rounded-lg bg-indigo-100 dark:bg-indigo-900/30 flex items-center justify-center text-lg">
               📄
             </div>
             <div>
@@ -272,7 +272,7 @@ export function AdminSchoolSettings() {
             >
               <SelectTrigger className="w-full h-10 border-indigo-200 dark:border-indigo-900/50">
                 <div className="flex items-center gap-2">
-                  <Settings className="h-4 w-4 text-indigo-500" />
+                  <Settings className="size-4 text-indigo-500" />
                   <SelectValue placeholder="Choose default marksheet..." />
                 </div>
               </SelectTrigger>
@@ -288,7 +288,7 @@ export function AdminSchoolSettings() {
             </Select>
           </div>
           <div className="p-3 bg-zinc-50 dark:bg-zinc-900/50 rounded-lg border border-gray-100 dark:border-zinc-800 text-xs text-muted-foreground flex gap-2">
-            <Info className="h-4 w-4 text-indigo-500 shrink-0" />
+            <Info className="size-4 text-indigo-500 shrink-0" />
             <span>Changing this default will automatically format the report card preview under student login profiles to use this style.</span>
           </div>
         </CardContent>
@@ -298,7 +298,7 @@ export function AdminSchoolSettings() {
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 p-5 bg-card border border-gray-100 dark:border-zinc-800/80 rounded-xl shadow-sm">
         <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400">
           <CheckCircle2
-            className={`h-4 w-4 ${
+            className={`size-4 ${
               hasChanges ? "text-amber-500" : "text-emerald-500"
             }`}
           />
@@ -316,12 +316,12 @@ export function AdminSchoolSettings() {
         >
           {saving ? (
             <>
-              <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+              <Loader2 className="size-4 mr-2 animate-spin" />
               Saving...
             </>
           ) : (
             <>
-              <Save className="h-4 w-4 mr-2" />
+              <Save className="size-4 mr-2" />
               Save Changes
             </>
           )}

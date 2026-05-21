@@ -71,8 +71,8 @@ export function StaffTable({
   if (filtered.length === 0) {
     return (
       <div className="py-24 text-center bg-white dark:bg-gray-800 rounded-3xl border-2 border-dashed border-gray-100 dark:border-gray-900">
-        <div className="h-20 w-20 mx-auto mb-6 rounded-full bg-gray-50 dark:bg-gray-900 flex items-center justify-center text-muted-foreground/30">
-          <Users className="h-10 w-10" />
+        <div className="size-20 mx-auto mb-6 rounded-full bg-gray-50 dark:bg-gray-900 flex items-center justify-center text-muted-foreground/30">
+          <Users className="size-10" />
         </div>
         <h3 className="text-xl font-semibold text-gray-900 dark:text-gray-100">No staff members found</h3>
         <p className="text-sm font-medium text-muted-foreground mt-2 max-w-[280px] mx-auto leading-relaxed">
@@ -112,7 +112,7 @@ export function StaffTable({
                   >
                     <TableCell className="pl-6 py-4">
                       <div className="flex items-center gap-3">
-                        <Avatar className="h-10 w-10 shrink-0 shadow-sm rounded-xl">
+                        <Avatar className="size-10 shrink-0 shadow-sm rounded-xl">
                           <AvatarFallback
                             className="text-xs font-black rounded-xl"
                             style={avatarStyle(roleColor)}
@@ -136,13 +136,13 @@ export function StaffTable({
                     <TableCell className="hidden sm:table-cell py-4">
                       <div className="space-y-1">
                         <div className="flex items-center gap-1.5 min-w-0">
-                          <Mail className="h-3 w-3 text-muted-foreground shrink-0" />
+                          <Mail className="size-3 text-muted-foreground shrink-0" />
                           <span className="text-[11px] font-bold text-gray-700 dark:text-gray-300 truncate">
                             {member.email}
                           </span>
                         </div>
                         <div className="flex items-center gap-1.5 min-w-0 opacity-60">
-                          <Phone className="h-3 w-3 text-muted-foreground shrink-0" />
+                          <Phone className="size-3 text-muted-foreground shrink-0" />
                           <span className="text-[10px] font-bold truncate">
                             {member.phone || "—"}
                           </span>
@@ -157,12 +157,12 @@ export function StaffTable({
                           className="font-black text-[9px] uppercase tracking-widest gap-1.5 h-6 border-transparent px-2.5 shadow-sm"
                           style={roleBadgeStyle(member.platformRole.color)}
                         >
-                          <Shield className="h-2.5 w-2.5" />
+                          <Shield className="size-2.5" />
                           {member.platformRole.name}
                         </Badge>
                       ) : (
                         <span className="text-[10px] font-bold text-muted-foreground flex items-center gap-1.5 opacity-50">
-                          <UserCircle className="h-3.5 w-3.5" />
+                          <UserCircle className="size-3.5" />
                           No Role Assigned
                         </span>
                       )}
@@ -177,7 +177,7 @@ export function StaffTable({
                             : "bg-red-50 text-red-700"
                         }`}
                       >
-                        <div className={`h-1.5 w-1.5 rounded-full mr-1.5 ${member.isActive ? "bg-emerald-500" : "bg-red-500"}`} />
+                        <div className={`size-1.5 rounded-full mr-1.5 ${member.isActive ? "bg-emerald-500" : "bg-red-500"}`} />
                         {member.isActive ? "Active" : "Inactive"}
                       </Badge>
                     </TableCell>
@@ -189,10 +189,10 @@ export function StaffTable({
                             <Button
                               variant="ghost"
                               size="icon"
-                              className="h-8 w-8 rounded-lg text-muted-foreground hover:text-teal-600 hover:bg-teal-50 dark:hover:bg-teal-900/30"
+                              className="size-8 rounded-lg text-muted-foreground hover:text-teal-600 hover:bg-teal-50 dark:hover:bg-teal-900/30"
                               onClick={() => onEdit(member)}
                             >
-                              <Pencil className="h-4 w-4" />
+                              <Pencil className="size-4" />
                             </Button>
                           )}
                           {canDelete && (
@@ -206,10 +206,10 @@ export function StaffTable({
                                 <Button
                                   variant="ghost"
                                   size="icon"
-                                  className="h-8 w-8 rounded-lg text-muted-foreground hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/30"
+                                  className="size-8 rounded-lg text-muted-foreground hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/30"
                                   onClick={() => setDeletingId(member.id)}
                                 >
-                                  <Trash2 className="h-4 w-4" />
+                                  <Trash2 className="size-4" />
                                 </Button>
                               </AlertDialogTrigger>
                               <AlertDialogContent className="rounded-2xl border-2">

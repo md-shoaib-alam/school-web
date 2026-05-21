@@ -71,7 +71,7 @@ export function RoleDialog({
       <DialogContent className="sm:max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
-            <Shield className="h-5 w-5 text-emerald-600" />
+            <Shield className="size-5 text-emerald-600" />
             {editingRole ? `Edit "${editingRole.name}"` : "Create New Role"}
           </DialogTitle>
           <DialogDescription>
@@ -107,7 +107,7 @@ export function RoleDialog({
               {COLOR_PRESETS.map((c) => (
                 <button
                   key={c}
-                  className="w-8 h-8 rounded-full border-2 transition-transform hover:scale-110 flex items-center justify-center"
+                  className="size-8 rounded-full border-2 transition-transform hover:scale-110 flex items-center justify-center"
                   style={{
                     backgroundColor: c,
                     borderColor: color === c ? c : "transparent",
@@ -222,7 +222,7 @@ export function RoleDialog({
             disabled={saving || !name.trim()}
             className="bg-emerald-600 hover:bg-emerald-700 text-white"
           >
-            {saving && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
+            {saving && <Loader2 className="size-4 mr-2 animate-spin" />}
             {editingRole ? "Update Role" : "Create Role"}
           </Button>
         </DialogFooter>

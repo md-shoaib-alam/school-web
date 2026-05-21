@@ -108,7 +108,7 @@ export function TableCells({ activeTab, item }: { activeTab: TabType; item: any 
         <>
           <TableCell className={cellClasses}>
             <div className="flex items-center gap-2">
-              <div className="h-8 w-8 rounded-lg bg-rose-50 dark:bg-rose-900/20 text-rose-600 flex items-center justify-center font-black text-xs">
+              <div className="size-8 rounded-lg bg-rose-50 dark:bg-rose-900/20 text-rose-600 flex items-center justify-center font-black text-xs">
                 {s.name.charAt(0)}
               </div>
               <div>
@@ -135,7 +135,7 @@ export function TableCells({ activeTab, item }: { activeTab: TabType; item: any 
         <>
           <TableCell className={cellClasses}>
             <div className="flex items-center gap-2">
-              <div className="h-8 w-8 rounded-lg bg-blue-50 dark:bg-blue-900/20 text-blue-600 flex items-center justify-center font-black text-xs">
+              <div className="size-8 rounded-lg bg-blue-50 dark:bg-blue-900/20 text-blue-600 flex items-center justify-center font-black text-xs">
                 {t.name.charAt(0)}
               </div>
               <div className="font-bold text-gray-900 dark:text-gray-100">{t.name}</div>
@@ -157,7 +157,7 @@ export function TableCells({ activeTab, item }: { activeTab: TabType; item: any 
         <>
           <TableCell className={cellClasses}>
             <div className="flex items-center gap-2">
-              <div className="h-8 w-8 rounded-lg bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 flex items-center justify-center font-black text-xs">
+              <div className="size-8 rounded-lg bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 flex items-center justify-center font-black text-xs">
                 {p.name.charAt(0)}
               </div>
               <div className="font-bold text-gray-900 dark:text-gray-100">{p.name}</div>
@@ -176,7 +176,7 @@ export function TableCells({ activeTab, item }: { activeTab: TabType; item: any 
         <>
           <TableCell className={cellClasses}>
             <div className="flex items-center gap-2">
-              <div className="h-8 w-8 rounded-lg bg-purple-50 dark:bg-purple-900/20 text-purple-600 flex items-center justify-center font-black text-xs">
+              <div className="size-8 rounded-lg bg-purple-50 dark:bg-purple-900/20 text-purple-600 flex items-center justify-center font-black text-xs">
                 {c.name.charAt(0)}
               </div>
               <div className="font-bold text-gray-900 dark:text-gray-100">{c.name}</div>
@@ -204,14 +204,14 @@ export function TableCells({ activeTab, item }: { activeTab: TabType; item: any 
         <>
           <TableCell className={cellClasses}>
             <div className="flex items-center gap-2 font-bold text-gray-900 dark:text-gray-100">
-              <UserCircle className="h-4 w-4 text-muted-foreground" />
+              <UserCircle className="size-4 text-muted-foreground" />
               {f.studentName}
             </div>
           </TableCell>
           <TableCell className={`${cellClasses} text-xs font-bold text-muted-foreground uppercase tracking-wider`}>{f.type}</TableCell>
           <TableCell className={`${cellClasses} text-right font-black`}>
             <div className="flex items-center justify-end text-emerald-600">
-              <IndianRupee className="h-3.5 w-3.5 mr-0.5" />
+              <IndianRupee className="size-3.5 mr-0.5" />
               {f.amount.toLocaleString()}
             </div>
           </TableCell>
@@ -243,7 +243,7 @@ export function TableCells({ activeTab, item }: { activeTab: TabType; item: any 
           </TableCell>
           <TableCell className={cellClasses} suppressHydrationWarning>
             <div className="flex items-center gap-2 text-xs font-bold text-muted-foreground">
-              <Clock className="h-3.5 w-3.5" />
+              <Clock className="size-3.5" />
               {format(new Date(a.date), "dd MMM yyyy")}
             </div>
           </TableCell>
@@ -274,7 +274,7 @@ export function TableCells({ activeTab, item }: { activeTab: TabType; item: any 
           </TableCell>
           <TableCell className={`${cellClasses} text-center`}>
             <Badge variant="outline" className={`${getPriorityColor(n.priority)} font-black text-[9px] px-2 py-0 h-5 flex items-center justify-center gap-1 w-fit mx-auto capitalize`}>
-              {n.priority === 'high' && <ShieldAlert className="h-3 w-3" />}
+              {n.priority === 'high' && <ShieldAlert className="size-3" />}
               {n.priority}
             </Badge>
           </TableCell>

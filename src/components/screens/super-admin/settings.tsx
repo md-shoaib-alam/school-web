@@ -132,7 +132,7 @@ export function SuperAdminSettings() {
   if (loading) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[400px] gap-3">
-        <Loader2 className="h-8 w-8 animate-spin text-teal-600" />
+        <Loader2 className="size-8 animate-spin text-teal-600" />
         <span className="text-sm font-medium text-muted-foreground animate-pulse">
           Loading platform configurations...
         </span>
@@ -144,10 +144,10 @@ export function SuperAdminSettings() {
     <div className="space-y-6 max-w-5xl mx-auto pb-8">
       {/* Header Banner */}
       <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-teal-600 via-teal-500 to-pink-600 p-6 text-white shadow-lg">
-        <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/3 blur-2xl pointer-events-none" />
+        <div className="absolute top-0 right-0 size-64 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/3 blur-2xl pointer-events-none" />
         <div className="relative z-10 flex items-center gap-4">
-          <div className="h-12 w-12 rounded-xl bg-white/20 flex items-center justify-center backdrop-blur-md border border-white/30">
-            <Settings className="h-6 w-6" />
+          <div className="size-12 rounded-xl bg-white/20 flex items-center justify-center backdrop-blur-md border border-white/30">
+            <Settings className="size-6" />
           </div>
           <div>
             <h1 className="text-2xl font-semibold tracking-tight">Platform Settings</h1>
@@ -163,7 +163,7 @@ export function SuperAdminSettings() {
         <Card className="border-gray-200/80 dark:border-gray-800 shadow-sm">
           <CardHeader>
             <CardTitle className="text-base flex items-center gap-2">
-              <Globe className="h-5 w-5 text-teal-500" />
+              <Globe className="size-5 text-teal-500" />
               General Preferences
             </CardTitle>
             <CardDescription>
@@ -279,7 +279,7 @@ export function SuperAdminSettings() {
               {maintenanceMode && (
                 <div className="mt-4 p-4 rounded-2xl border border-amber-200 dark:border-amber-900/50 bg-amber-50/50 dark:bg-amber-950/20 space-y-4 animate-in fade-in slide-in-from-top-2 duration-300">
                   <div className="flex items-start gap-3">
-                    <ShieldAlert className="h-5 w-5 text-amber-600 dark:text-amber-500 shrink-0 mt-0.5" />
+                    <ShieldAlert className="size-5 text-amber-600 dark:text-amber-500 shrink-0 mt-0.5" />
                     <div>
                       <p className="text-sm font-semibold text-amber-800 dark:text-amber-300">
                         Maintenance Mode is currently active
@@ -317,7 +317,7 @@ export function SuperAdminSettings() {
         <Card className="shadow-xl border border-teal-100 dark:border-teal-900 bg-white/95 dark:bg-gray-900/95 backdrop-blur-md rounded-2xl">
           <CardContent className="p-4 flex items-center justify-between">
             <div className="text-xs sm:text-sm text-muted-foreground font-medium flex items-center gap-2">
-              <div className="h-2 w-2 rounded-full bg-teal-500 animate-ping" />
+              <div className="size-2 rounded-full bg-teal-500 animate-ping" />
               <span>Changes will be instantly synced to the database.</span>
             </div>
             <Button
@@ -327,12 +327,12 @@ export function SuperAdminSettings() {
             >
               {savingAll ? (
                 <>
-                  <Loader2 className="h-4 w-4 animate-spin" />
+                  <Loader2 className="size-4 animate-spin" />
                   Saving...
                 </>
               ) : (
                 <>
-                  <Save className="h-4 w-4" />
+                  <Save className="size-4" />
                   Save Settings
                 </>
               )}

@@ -28,7 +28,7 @@ export function NoticeList({ notices, isSearching }: NoticeListProps) {
     return (
       <Card className="rounded-xl shadow-sm shadow-none">
         <CardContent className="py-16 text-center text-muted-foreground">
-          <Megaphone className="h-12 w-12 mx-auto mb-3 opacity-30" />
+          <Megaphone className="size-12 mx-auto mb-3 opacity-30" />
           <p className="font-medium">No notices found</p>
           <p className="text-sm">
             {isSearching

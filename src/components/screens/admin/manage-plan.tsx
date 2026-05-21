@@ -101,7 +101,7 @@ export function ManagePlanScreen() {
   if (isDetailLoading || !tenant) {
     return (
       <div className="flex items-center justify-center h-[60vh]">
-        <div className="animate-spin h-8 w-8 border-4 border-indigo-500 border-t-transparent rounded-full" />
+        <div className="animate-spin size-8 border-4 border-indigo-500 border-t-transparent rounded-full" />
       </div>
     );
   }
@@ -121,12 +121,12 @@ export function ManagePlanScreen() {
             onClick={() => router.back()}
             className="rounded-full hover:bg-indigo-50 dark:hover:bg-indigo-900/20 text-indigo-600 dark:text-indigo-400 shrink-0"
           >
-            <ArrowLeft className="h-5 w-5" />
+            <ArrowLeft className="size-5" />
           </Button>
           <div>
             <h2 className="text-xl sm:text-3xl font-semibold tracking-tight flex items-center gap-2">
               Upgrade Institution
-              <Crown className="h-5 w-5 sm:h-6 sm:w-6 text-amber-500 fill-amber-500/20" />
+              <Crown className="size-5 sm:size-6 text-amber-500 fill-amber-500/20" />
             </h2>
             <p className="text-xs sm:text-sm text-muted-foreground mt-0.5">Scale your school's digital operations.</p>
           </div>
@@ -135,7 +135,7 @@ export function ManagePlanScreen() {
 
       <Card className="bg-gradient-to-br from-indigo-700 via-indigo-800 to-violet-900 dark:from-indigo-950 dark:via-indigo-900 dark:to-violet-950 border-none overflow-hidden text-white relative shadow-2xl shadow-indigo-200 dark:shadow-none">
         <div className="absolute top-0 right-0 p-8 opacity-10">
-          <ShieldCheck className="h-40 w-40" />
+          <ShieldCheck className="size-40" />
         </div>
         <CardHeader className="relative z-10">
           <CardTitle className="text-sm font-bold uppercase tracking-[0.2em] opacity-70">Current Active Plan</CardTitle>
@@ -144,7 +144,7 @@ export function ManagePlanScreen() {
           <div>
             <h3 className="text-4xl sm:text-6xl font-semibold capitalize tracking-tighter mb-1 sm:mb-2 drop-shadow-md">{tenant.plan}</h3>
             <p className="text-indigo-100 flex items-center gap-2 font-medium text-xs sm:text-base">
-              <span className="h-2.5 w-2.5 rounded-full bg-emerald-400 animate-pulse shadow-[0_0_8px_rgba(52,211,153,0.8)]" />
+              <span className="size-2.5 rounded-full bg-emerald-400 animate-pulse shadow-[0_0_8px_rgba(52,211,153,0.8)]" />
               Institutions using this tier have unlocked full {tenant.plan} capabilities.
             </p>
           </div>
@@ -177,8 +177,8 @@ export function ManagePlanScreen() {
 
       <div className="mt-8 sm:mt-16 p-6 sm:p-8 rounded-2xl sm:rounded-[2rem] bg-indigo-50/50 dark:bg-indigo-950/20 border border-dashed border-indigo-200 dark:border-indigo-800/50 flex flex-col md:flex-row items-center justify-between gap-6 sm:gap-8">
         <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-6 text-center sm:text-left">
-          <div className="h-14 w-14 sm:h-16 sm:w-16 rounded-xl sm:rounded-2xl bg-white dark:bg-gray-900 flex items-center justify-center shadow-xl shadow-indigo-100 dark:shadow-none border border-indigo-50 dark:border-indigo-900/50 shrink-0">
-            <ShieldCheck className="h-7 w-7 sm:h-8 sm:w-8 text-indigo-600 dark:text-indigo-400" />
+          <div className="size-14 sm:size-16 rounded-xl sm:rounded-2xl bg-white dark:bg-gray-900 flex items-center justify-center shadow-xl shadow-indigo-100 dark:shadow-none border border-indigo-50 dark:border-indigo-900/50 shrink-0">
+            <ShieldCheck className="size-7 sm:size-8 text-indigo-600 dark:text-indigo-400" />
           </div>
           <div>
             <h4 className="font-semibold text-gray-900 dark:text-gray-100 text-base sm:text-lg">Enterprise-Grade Security</h4>

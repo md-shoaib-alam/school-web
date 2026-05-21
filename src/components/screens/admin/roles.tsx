@@ -219,7 +219,7 @@ export function AdminRoles() {
               )}
               onClick={() => toggleView('grid')}
             >
-              <LayoutGrid className="h-4 w-4" />
+              <LayoutGrid className="size-4" />
               <span className="hidden sm:inline">Grid</span>
             </Button>
             <Button
@@ -231,13 +231,13 @@ export function AdminRoles() {
               )}
               onClick={() => toggleView('table')}
             >
-              <List className="h-4 w-4" />
+              <List className="size-4" />
               <span className="hidden sm:inline">Table</span>
             </Button>
           </div>
 
           <Button onClick={openCreateDialog} className="bg-emerald-600 hover:bg-emerald-700 text-white">
-            <Plus className="h-4 w-4 mr-2" /> Create Role
+            <Plus className="size-4 mr-2" /> Create Role
           </Button>
         </div>
       </div>
@@ -245,10 +245,10 @@ export function AdminRoles() {
       {roles.length === 0 ? (
         <Card className="border-dashed">
           <CardContent className="flex flex-col items-center justify-center py-16 text-gray-400">
-            <Shield className="h-12 w-12 mb-3 opacity-40" />
+            <Shield className="size-12 mb-3 opacity-40" />
             <p className="text-lg font-medium">No custom roles yet</p>
             <Button onClick={openCreateDialog} variant="outline" className="mt-4">
-              <Plus className="h-4 w-4 mr-2" /> Create Role
+              <Plus className="size-4 mr-2" /> Create Role
             </Button>
           </CardContent>
         </Card>

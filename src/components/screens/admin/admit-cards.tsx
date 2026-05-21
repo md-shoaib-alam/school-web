@@ -146,8 +146,8 @@ const AdmitCardVisual = memo(function AdmitCardVisual({ card }: { card: AdmitCar
         <div className="bg-gradient-to-r from-slate-800 via-slate-700 to-slate-800 text-white px-5 py-2">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <div className="h-9 w-9 rounded-full bg-white/15 flex items-center justify-center border-2 border-white/20">
-                <GraduationCap className="h-5 w-5 text-amber-300" />
+              <div className="size-9 rounded-full bg-white/15 flex items-center justify-center border-2 border-white/20">
+                <GraduationCap className="size-5 text-amber-300" />
               </div>
               <div>
                 <h2 className="text-sm font-semibold tracking-wide leading-tight">{schoolName.toUpperCase()}</h2>
@@ -165,11 +165,11 @@ const AdmitCardVisual = memo(function AdmitCardVisual({ card }: { card: AdmitCar
         {/* ── Academic Year Banner ── */}
         <div className="bg-amber-500/5 border-b border-amber-400/20 px-5 py-1 flex items-center justify-between">
           <p className="text-[10px] font-semibold text-amber-700 dark:text-amber-500">
-            <School className="h-2.5 w-2.5 inline mr-1" />
+            <School className="size-2.5 inline mr-1" />
             Class: {card.class.grade} — {card.class.name} ({card.class.section})
           </p>
           <p className="text-[10px] text-muted-foreground flex items-center gap-1">
-            <Calendar className="h-2.5 w-2.5" />
+            <Calendar className="size-2.5" />
             Session 2024-25
           </p>
         </div>
@@ -453,7 +453,7 @@ export function AdminAdmitCards() {
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-2xl font-semibold tracking-tight flex items-center gap-2">
-            <FileText className="h-6 w-6 text-amber-600" />
+            <FileText className="size-6 text-amber-600" />
             Admit Cards
           </h2>
           <p className="text-muted-foreground text-sm mt-1">
@@ -467,9 +467,9 @@ export function AdminAdmitCards() {
             className="gap-2 bg-slate-800 hover:bg-slate-900 text-white"
           >
             {preparingPrint ? (
-              <Loader2 className="h-4 w-4 animate-spin" />
+              <Loader2 className="size-4 animate-spin" />
             ) : (
-              <Printer className="h-4 w-4" />
+              <Printer className="size-4" />
             )}
             {preparingPrint ? 'Preparing...' : `Print All (${admitCards.length})`}
           </Button>
@@ -494,7 +494,7 @@ export function AdminAdmitCards() {
                     breakInside: 'avoid'
                   }}
                 >
-                  <div className="w-full h-full flex items-center justify-center p-1">
+                  <div className="size-full flex items-center justify-center p-1">
                     <AdmitCardVisual card={card} />
                   </div>
                 </div>
@@ -514,7 +514,7 @@ export function AdminAdmitCards() {
           {viewCard && (
             <div className="w-[21cm] h-[29.7cm] p-[5mm] flex flex-wrap content-start">
               <div className="flex items-center justify-center h-[13.8cm] p-1 border border-dashed border-gray-300 print:border-gray-400 w-[10.5cm]">
-                <div className="w-full h-full flex items-center justify-center p-1">
+                <div className="size-full flex items-center justify-center p-1">
                   <AdmitCardVisual card={viewCard} />
                 </div>
               </div>
@@ -529,7 +529,7 @@ export function AdminAdmitCards() {
         <Card className="border-2 border-amber-200 dark:border-amber-800">
           <CardHeader className="pb-3">
             <CardTitle className="text-base flex items-center gap-2">
-              <div className="h-7 w-7 rounded-full bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 flex items-center justify-center text-sm font-bold">1</div>
+              <div className="size-7 rounded-full bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 flex items-center justify-center text-sm font-bold">1</div>
               Select Class
             </CardTitle>
             <CardDescription>Choose the class for which you want to generate admit cards</CardDescription>
@@ -544,7 +544,7 @@ export function AdminAdmitCards() {
                   {classes.map((c) => (
                     <SelectItem key={c.id} value={c.id}>
                       <span className="flex items-center gap-2">
-                        <GraduationCap className="h-3.5 w-3.5" />
+                        <GraduationCap className="size-3.5" />
                         {c.grade} — {c.name} (Section {c.section})
                       </span>
                     </SelectItem>
@@ -563,7 +563,7 @@ export function AdminAdmitCards() {
                   className="gap-2 text-xs h-9"
                   disabled={loadingClassData}
                 >
-                  <RefreshCw className={`h-3.5 w-3.5 ${loadingClassData ? 'animate-spin' : ''}`} />
+                  <RefreshCw className={`size-3.5 ${loadingClassData ? 'animate-spin' : ''}`} />
                   Sync Data
                 </Button>
               )}
@@ -576,7 +576,7 @@ export function AdminAdmitCards() {
           <Card className="border-2 border-amber-200 dark:border-amber-800">
             <CardHeader className="pb-1">
               <CardTitle className="text-base flex items-center gap-2">
-                <div className="h-7 w-7 rounded-full bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 flex items-center justify-center text-sm font-bold">2</div>
+                <div className="size-7 rounded-full bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 flex items-center justify-center text-sm font-bold">2</div>
                 Configure Admit Card
               </CardTitle>
               <CardDescription>
@@ -631,7 +631,7 @@ export function AdminAdmitCards() {
 
               {totalExams === 0 && (
                 <div className="bg-amber-50 dark:bg-amber-900/10 border border-amber-200/50 rounded-lg p-3 flex items-start gap-2">
-                  <AlertCircle className="h-4 w-4 text-amber-600 mt-0.5 shrink-0" />
+                  <AlertCircle className="size-4 text-amber-600 mt-0.5 shrink-0" />
                   <div>
                     <p className="text-sm font-medium text-amber-700 dark:text-amber-500">No exams found</p>
                     <p className="text-xs text-muted-foreground">Create exams for this class first in the Exams section before generating admit cards.</p>
@@ -688,9 +688,9 @@ export function AdminAdmitCards() {
                   className="flex-1 gap-2 bg-amber-600 hover:bg-amber-700 text-white h-11"
                 >
                   {generating ? (
-                    <Loader2 className="h-4 w-4 animate-spin" />
+                    <Loader2 className="size-4 animate-spin" />
                   ) : (
-                    <FileText className="h-4 w-4" />
+                    <FileText className="size-4" />
                   )}
                   {generating ? 'Generating...' : `Generate ${selectedStudentIds.size} Admit Card${selectedStudentIds.size !== 1 ? 's' : ''}`}
                 </Button>
@@ -701,9 +701,9 @@ export function AdminAdmitCards() {
                   className={`flex-1 gap-2 h-11 border-none ${admitCards.length > 0 ? 'bg-slate-900 text-white hover:bg-gray-950' : 'bg-slate-800/40 text-slate-500 cursor-not-allowed'}`}
                 >
                   {preparingPrint ? (
-                    <Loader2 className="h-4 w-4 animate-spin" />
+                    <Loader2 className="size-4 animate-spin" />
                   ) : (
-                    <Printer className="h-4 w-4" />
+                    <Printer className="size-4" />
                   )}
                   {preparingPrint ? 'Preparing Cards...' : `Print All ${admitCards.length > 0 ? `(${admitCards.length})` : ''}`}
                 </Button>
@@ -725,7 +725,7 @@ export function AdminAdmitCards() {
           <Card>
             <CardHeader className="pb-3">
               <CardTitle className="text-base flex items-center gap-2">
-                <div className="h-7 w-7 rounded-full bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 flex items-center justify-center text-sm font-bold">3</div>
+                <div className="size-7 rounded-full bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 flex items-center justify-center text-sm font-bold">3</div>
                 Generated Admit Cards
               </CardTitle>
               <CardDescription>
@@ -754,7 +754,7 @@ export function AdminAdmitCards() {
                         <TableCell className="hidden sm:table-cell font-mono text-sm">{card.student.rollNumber}</TableCell>
                         <TableCell>
                           <div className="flex items-center gap-2">
-                            <div className="h-7 w-7 rounded-full bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 flex items-center justify-center text-[10px] font-bold shrink-0">
+                            <div className="size-7 rounded-full bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 flex items-center justify-center text-[10px] font-bold shrink-0">
                               {card.student.initials}
                             </div>
                             <div className="flex flex-col min-w-0">
@@ -788,7 +788,7 @@ export function AdminAdmitCards() {
                             onClick={() => setViewCard(card)}
                             className="gap-1.5 text-amber-600 hover:text-amber-700"
                           >
-                            <Eye className="h-4 w-4" />
+                            <Eye className="size-4" />
                             View
                           </Button>
                         </TableCell>
@@ -805,7 +805,7 @@ export function AdminAdmitCards() {
         {!loadingClasses && classes.length === 0 && (
           <Card>
             <CardContent className="py-12 text-center text-muted-foreground">
-              <School className="h-10 w-10 mx-auto mb-2 opacity-30" />
+              <School className="size-10 mx-auto mb-2 opacity-30" />
               <p className="font-medium">No classes found</p>
               <p className="text-sm">Create classes first in the Classes section</p>
             </CardContent>
@@ -817,8 +817,8 @@ export function AdminAdmitCards() {
         <DialogContent className="max-w-[850px] max-h-[95vh] overflow-y-auto bg-slate-950 border-slate-800 p-0">
           <div className="sticky top-0 z-10 bg-slate-900/80 backdrop-blur-md border-b border-slate-800 px-6 py-4 flex items-center justify-between">
             <DialogTitle className="text-white flex items-center gap-2">
-              <div className="h-8 w-8 rounded-full bg-amber-500/20 text-amber-500 flex items-center justify-center">
-                <FileText className="h-5 w-5" />
+              <div className="size-8 rounded-full bg-amber-500/20 text-amber-500 flex items-center justify-center">
+                <FileText className="size-5" />
               </div>
               <span>Admit Card — <span className="text-amber-400">{viewCard?.student.name}</span></span>
             </DialogTitle>
@@ -831,7 +831,7 @@ export function AdminAdmitCards() {
               onClick={() => setViewCard(null)}
               className="text-slate-400 hover:text-white hover:bg-slate-800"
             >
-              <X className="h-5 w-5" />
+              <X className="size-5" />
             </Button>
           </div>
 
@@ -847,7 +847,7 @@ export function AdminAdmitCards() {
                 onClick={() => handlePrintSingle()}
                 className="gap-2 bg-amber-600 hover:bg-amber-700 text-white shadow-lg shadow-amber-900/20 px-8 h-12 text-base font-semibold"
               >
-                <Printer className="h-5 w-5" />
+                <Printer className="size-5" />
                 Download PDF / Print
               </Button>
             </div>

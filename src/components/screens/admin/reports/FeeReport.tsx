@@ -92,7 +92,7 @@ export function FeeReport() {
     {
       label: "Total Fees",
       value: `₹${summary.totalFees.toLocaleString()}`,
-      icon: <IndianRupee className="h-5 w-5 text-violet-600" />,
+      icon: <IndianRupee className="size-5 text-violet-600" />,
       color:
         "bg-violet-100 dark:bg-violet-900/30 text-violet-600 dark:text-violet-400",
       border: "border-violet-200 dark:border-violet-800",
@@ -101,7 +101,7 @@ export function FeeReport() {
     {
       label: "Collected",
       value: `₹${summary.collected.toLocaleString()}`,
-      icon: <IndianRupee className="h-5 w-5 text-emerald-600" />,
+      icon: <IndianRupee className="size-5 text-emerald-600" />,
       color:
         "bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400",
       border: "border-emerald-200 dark:border-emerald-800",
@@ -110,7 +110,7 @@ export function FeeReport() {
     {
       label: "Pending",
       value: `₹${summary.pending.toLocaleString()}`,
-      icon: <AlertTriangle className="h-5 w-5 text-amber-600" />,
+      icon: <AlertTriangle className="size-5 text-amber-600" />,
       color:
         "bg-amber-100 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400",
       border: "border-amber-200 dark:border-amber-800",
@@ -122,7 +122,7 @@ export function FeeReport() {
     return (
       <Card className="border-red-200 dark:border-red-800 bg-red-50 dark:bg-red-900/30">
         <CardContent className="p-6 text-center text-red-600 dark:text-red-400">
-          <IndianRupee className="h-8 w-8 mx-auto mb-2 opacity-50" />
+          <IndianRupee className="size-8 mx-auto mb-2 opacity-50" />
           <p className="font-medium">Failed to load fee report</p>
           <p className="text-sm mt-1">{error}</p>
         </CardContent>
@@ -154,7 +154,7 @@ export function FeeReport() {
                     </p>
                   </div>
                   <div
-                    className={`h-10 w-10 rounded-xl flex items-center justify-center ${card.color}`}
+                    className={`size-10 rounded-xl flex items-center justify-center ${card.color}`}
                   >
                     {card.icon}
                   </div>
@@ -177,7 +177,7 @@ export function FeeReport() {
             <ChartSkeleton />
           ) : typeBreakdown.length === 0 ? (
             <div className="text-center py-12 text-muted-foreground">
-              <IndianRupee className="h-10 w-10 mx-auto mb-2 opacity-30" />
+              <IndianRupee className="size-10 mx-auto mb-2 opacity-30" />
               <p className="text-sm">No fee data available</p>
             </div>
           ) : (
@@ -229,7 +229,7 @@ export function FeeReport() {
       <Card className="border-amber-200 dark:border-amber-800">
         <CardHeader className="bg-amber-50/50 dark:bg-amber-900/10 border-b border-amber-200 dark:border-amber-800">
           <CardTitle className="text-base flex items-center gap-2">
-            <AlertTriangle className="h-5 w-5 text-amber-600" />
+            <AlertTriangle className="size-5 text-amber-600" />
             Urgent: Overdue Student Fees
           </CardTitle>
           <CardDescription className="text-amber-700/70 dark:text-amber-400/70">
@@ -269,8 +269,8 @@ export function FeeReport() {
                         ₹{(f.amount - f.paidAmount).toLocaleString()}
                       </TableCell>
                       <TableCell className="text-right">
-                        <Button variant="ghost" size="icon" className="h-8 w-8 p-0">
-                          <Eye className="h-4 w-4 opacity-50" />
+                        <Button variant="ghost" size="icon" className="size-8 p-0">
+                          <Eye className="size-4 opacity-50" />
                         </Button>
                       </TableCell>
                     </TableRow>

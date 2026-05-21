@@ -49,7 +49,7 @@ export function SubjectTable({
                 colSpan={canEdit || canDelete ? 5 : 4}
                 className="text-center py-12 text-muted-foreground"
               >
-                <BookOpen className="h-10 w-10 mx-auto mb-2 opacity-30" />
+                <BookOpen className="size-10 mx-auto mb-2 opacity-30" />
                 <p>No subjects found</p>
               </TableCell>
             </TableRow>
@@ -82,20 +82,20 @@ export function SubjectTable({
                         <Button
                           variant="ghost"
                           size="icon"
-                          className="h-8 w-8 text-muted-foreground hover:text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-900/30"
+                          className="size-8 text-muted-foreground hover:text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-900/30"
                           onClick={() => onEdit(subject)}
                         >
-                          <Pencil className="h-4 w-4" />
+                          <Pencil className="size-4" />
                         </Button>
                       )}
                       {canDelete && (
                         <Button
                           variant="ghost"
                           size="icon"
-                          className="h-8 w-8 text-red-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/30"
+                          className="size-8 text-red-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/30"
                           onClick={() => onDelete(subject.id)}
                         >
-                          <Trash2 className="h-4 w-4" />
+                          <Trash2 className="size-4" />
                         </Button>
                       )}
                     </div>

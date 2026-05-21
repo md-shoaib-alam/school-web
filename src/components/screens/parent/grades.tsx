@@ -147,7 +147,7 @@ export function ParentGrades({ initialTab = "exams" }: { initialTab?: "exams" | 
     return (
       <Card className="rounded-xl shadow-sm border-gray-100 dark:border-zinc-800">
         <CardContent className="p-12 text-center flex flex-col items-center">
-          <TrendingUp className="h-12 w-12 text-muted-foreground/30" />
+          <TrendingUp className="size-12 text-muted-foreground/30" />
           <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mt-4">No children linked</h3>
           <p className="text-sm text-muted-foreground mt-1">Contact account services to enroll or link students.</p>
         </CardContent>
@@ -162,9 +162,9 @@ export function ParentGrades({ initialTab = "exams" }: { initialTab?: "exams" | 
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
         <div className="flex items-center gap-2">
           {topLevelTab === "exams" ? (
-            <GraduationCap className="h-5 w-5 text-amber-600" />
+            <GraduationCap className="size-5 text-amber-600" />
           ) : (
-            <ClipboardList className="h-5 w-5 text-indigo-600" />
+            <ClipboardList className="size-5 text-indigo-600" />
           )}
           <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100 uppercase tracking-tight">
             {topLevelTab === "exams" ? "School Exams" : "Class Assessments"}
@@ -192,7 +192,7 @@ export function ParentGrades({ initialTab = "exams" }: { initialTab?: "exams" | 
               }`}
             >
               <span className="flex items-center gap-2">
-                <span className={`w-2 h-2 rounded-full ${topLevelTab === "exams" ? "bg-amber-500" : "bg-indigo-500"}`} />
+                <span className={`size-2 rounded-full ${topLevelTab === "exams" ? "bg-amber-500" : "bg-indigo-500"}`} />
                 {student.name}
               </span>
             </TabsTrigger>
@@ -248,7 +248,7 @@ export function ParentGrades({ initialTab = "exams" }: { initialTab?: "exams" | 
                         <Card className="rounded-xl shadow-none border-gray-200/60 dark:border-zinc-800">
                           <CardContent className="p-5 flex flex-col items-center justify-between text-center">
                             <div className="inline-flex p-2.5 rounded-lg bg-indigo-50 dark:bg-indigo-950/40 text-indigo-600 dark:text-indigo-400 mb-2">
-                              <TrendingUp className="h-5 w-5" />
+                              <TrendingUp className="size-5" />
                             </div>
                             <div>
                               <p className="text-3xl font-extrabold tracking-tight text-gray-900 dark:text-gray-100">{assessmentStats.avg}%</p>
@@ -261,7 +261,7 @@ export function ParentGrades({ initialTab = "exams" }: { initialTab?: "exams" | 
                         <Card className="rounded-xl shadow-none border-gray-200/60 dark:border-zinc-800">
                           <CardContent className="p-5 flex flex-col items-center justify-between text-center">
                             <div className="inline-flex p-2.5 rounded-lg bg-indigo-50 dark:bg-indigo-950/40 text-indigo-600 dark:text-indigo-400 mb-2">
-                              <Award className="h-5 w-5" />
+                              <Award className="size-5" />
                             </div>
                             <div>
                               <p className="text-3xl font-extrabold tracking-tight text-gray-900 dark:text-gray-100">{assessmentStats.total}</p>
@@ -276,7 +276,7 @@ export function ParentGrades({ initialTab = "exams" }: { initialTab?: "exams" | 
                         <Card className="rounded-xl shadow-none border-gray-200/60 dark:border-zinc-800">
                           <CardContent className="p-5 flex flex-col items-center justify-between text-center">
                             <div className="inline-flex p-2.5 rounded-lg bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400 mb-2">
-                              <CheckCircle2 className="h-5 w-5" />
+                              <CheckCircle2 className="size-5" />
                             </div>
                             <div>
                               <p className="text-3xl font-extrabold tracking-tight text-gray-900 dark:text-gray-100">{assessmentStats.passCount}</p>
@@ -300,7 +300,7 @@ export function ParentGrades({ initialTab = "exams" }: { initialTab?: "exams" | 
                           <Card className="rounded-xl shadow-none border-gray-200/60 dark:border-zinc-800 h-full">
                             <CardHeader className="p-4 border-b border-gray-100/60 dark:border-zinc-800/50">
                               <CardTitle className="text-sm font-bold text-gray-900 dark:text-gray-100 flex items-center gap-2">
-                                <ClipboardList className="h-4 w-4 text-indigo-500" />
+                                <ClipboardList className="size-4 text-indigo-500" />
                                 {activeStudentName}&apos;s Assessments
                               </CardTitle>
                             </CardHeader>
@@ -308,7 +308,7 @@ export function ParentGrades({ initialTab = "exams" }: { initialTab?: "exams" | 
                               <ScrollArea className="h-[300px]">
                                 {assessmentGrades.length === 0 ? (
                                   <div className="p-12 text-center text-muted-foreground flex flex-col items-center">
-                                    <BookOpen className="h-8 w-8 opacity-30 mb-2" />
+                                    <BookOpen className="size-8 opacity-30 mb-2" />
                                     <p className="text-xs font-semibold">No assessments recorded yet</p>
                                   </div>
                                 ) : (
