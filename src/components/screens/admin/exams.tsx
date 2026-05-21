@@ -26,7 +26,7 @@ import {
   ExamRecord, ExamFormData, StudentResultRow, 
   ClassOption, SubjectOption, StudentOption 
 } from './exams/types';
-import { compileTabularLedgerData, TabularLedgerPrint, LedgerData } from './exams/tabulationLedgerPrinter';
+import { TabularLedgerPrint, LedgerData } from './exams/tabulationLedgerPrinter';
 import { ActiveExamsView } from './exams/ActiveExamsView';
 import { PublishedResultsView } from './exams/PublishedResultsView';
 import { TabulationLedgerPreviewPage } from './exams/TabulationLedgerPreviewPage';
