@@ -47,7 +47,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { motion, AnimatePresence } from "framer-motion";
+import { LazyMotion, domAnimation, m, AnimatePresence } from "framer-motion";
 import {
   BookOpen,
   Search,
@@ -520,9 +520,10 @@ export function AdminSubjects() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  <AnimatePresence mode="popLayout">
-                    {filtered.map((subject) => (
-                      <motion.tr
+                  <LazyMotion features={domAnimation}>
+                    <AnimatePresence mode="popLayout">
+                      {filtered.map((subject) => (
+                        <m.tr
                         key={subject.id}
                         layout
                         initial={{ opacity: 0, y: 10 }}
@@ -600,9 +601,10 @@ export function AdminSubjects() {
                             </div>
                           )}
                         </TableCell>
-                      </motion.tr>
+                      </m.tr>
                     ))}
                   </AnimatePresence>
+                </LazyMotion>
                 </TableBody>
               </Table>
             </div>
@@ -610,9 +612,10 @@ export function AdminSubjects() {
         </Card>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-          <AnimatePresence mode="popLayout">
-            {filtered.map((subject) => (
-              <motion.div
+          <LazyMotion features={domAnimation}>
+            <AnimatePresence mode="popLayout">
+              {filtered.map((subject) => (
+                <m.div
                 key={subject.id}
                 layout
                 initial={{ opacity: 0, scale: 0.95 }}
@@ -687,9 +690,10 @@ export function AdminSubjects() {
                     </div>
                   </CardContent>
                 </Card>
-              </motion.div>
+              </m.div>
             ))}
           </AnimatePresence>
+        </LazyMotion>
         </div>
       )}
 

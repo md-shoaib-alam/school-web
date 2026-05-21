@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useParams, useRouter } from "next/navigation";
+import { useParams, useRouter, redirect } from "next/navigation";
 import { useAppStore } from "@/store/use-app-store";
 import { useTenantResolution } from "@/lib/graphql/hooks/platform.hooks";
 import dynamic from "next/dynamic";
@@ -206,17 +206,14 @@ export default function GenericSlugDispatcher() {
   const correctSlug = currentUser?.role !== "super_admin" ? (currentUser?.tenantSlug || currentUser?.tenantId) : null;
   const isSlugMismatch = correctSlug && slug !== correctSlug;
 
-  useEffect(() => {
-    if (mounted && isSlugMismatch && correctSlug) {
-      router.replace(`/${correctSlug}`);
+  if (mounted) {
+    if (isSlugMismatch && correctSlug) {
+      redirect(`/${correctSlug}`);
     }
-  }, [mounted, isSlugMismatch, correctSlug, router]);
-
-  useEffect(() => {
-    if (mounted && isTenantContext) {
-      router.replace(`/${slug}/dashboard`);
+    if (isTenantContext) {
+      redirect(`/${slug}/dashboard`);
     }
-  }, [mounted, isTenantContext, slug, router]);
+  }
 
   if (!mounted || !currentUser || isSlugMismatch) return <LoadingScreen />;
 

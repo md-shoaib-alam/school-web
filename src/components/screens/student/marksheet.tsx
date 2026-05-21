@@ -1,5 +1,28 @@
 'use client';
 
+import { Cinzel, Montserrat, Inter } from 'next/font/google';
+
+const cinzel = Cinzel({
+  subsets: ['latin'],
+  weight: ['600', '700', '800', '900'],
+  variable: '--font-cinzel',
+  display: 'swap',
+});
+
+const montserrat = Montserrat({
+  subsets: ['latin'],
+  weight: ['500', '600', '700', '800'],
+  variable: '--font-montserrat',
+  display: 'swap',
+});
+
+const inter = Inter({
+  subsets: ['latin'],
+  weight: ['400', '500', '600', '700', '800'],
+  variable: '--font-inter',
+  display: 'swap',
+});
+
 import { useEffect, useState, useMemo } from 'react';
 import { apiFetch } from '@/lib/api';
 import { useAppStore } from '@/store/use-app-store';
@@ -240,14 +263,7 @@ export function StudentMarksheet() {
           <p className="text-xs mt-1 opacity-60">Results will appear here once your teacher publishes them.</p>
         </div>
       ) : (
-        <div className="w-full overflow-x-auto pb-6 flex justify-center bg-zinc-50 dark:bg-zinc-950/20 p-4 sm:p-6 rounded-2xl">
-          {/* Google Fonts Preload for Preview Card */}
-          {/* eslint-disable-next-line @next/next/no-page-custom-font */}
-          <link 
-            rel="stylesheet" 
-            href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800;900&family=Montserrat:wght@500;600;700;800&family=Inter:wght@400;500;600;700;800&display=swap" 
-          />
-
+        <div className={`w-full overflow-x-auto pb-6 flex justify-center bg-zinc-50 dark:bg-zinc-950/20 p-4 sm:p-6 rounded-2xl ${cinzel.className} ${montserrat.className} ${inter.className}`}>
           <div 
             className="shrink-0 transition-all duration-300 shadow-2xl rounded-lg bg-white"
             style={{ 

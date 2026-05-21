@@ -66,14 +66,11 @@ export const compileTabularLedgerData = async ({
   examName?: string;
 }): Promise<LedgerData | null> => {
   try {
-    // 1. Fetch students & exams
-    const [studentsRes, examsRes] = await Promise.all([
-      apiFetch(`/api/students?classId=${classId}&mode=min&limit=1000`),
-      apiFetch(`/api/exams?classId=${classId}&limit=100`)
+    // 1. Fetch students & exams in parallel with json parsing
+    const [studentData, examData] = await Promise.all([
+      apiFetch(`/api/students?classId=${classId}&mode=min&limit=1000`).then((res) => res.json()),
+      apiFetch(`/api/exams?classId=${classId}&limit=100`).then((res) => res.json())
     ]);
-
-    const studentData = await studentsRes.json();
-    const examData = await examsRes.json();
 
     const loadedStudents = studentData.items || [];
     const completedExams = (examData.data || examData || []).filter(
@@ -103,30 +100,30 @@ export const compileTabularLedgerData = async ({
     }
 
     // 2. Fetch results for each completed exam in parallel
-    const resultsPromises = completedExams.map(async (exam: ExamRecord): Promise<ExamResultDetail> => {
-      try {
-        const res = await apiFetch(`/api/exams/results?examId=${exam.id}`);
-        const data = await res.json();
-        return { 
-          examId: exam.id, 
-          examName: exam.name, 
-          subjectName: exam.subjectName, 
-          totalMarks: exam.totalMarks, 
-          results: data.results || [] 
-        };
-      } catch (err) {
-        console.error(`Error loading results for exam ${exam.id}:`, err);
-        return { 
-          examId: exam.id, 
-          examName: exam.name, 
-          subjectName: exam.subjectName, 
-          totalMarks: exam.totalMarks, 
-          results: [] 
-        };
-      }
-    });
-
-    const allExamResults: ExamResultDetail[] = await Promise.all(resultsPromises);
+    const allExamResults: ExamResultDetail[] = await Promise.all(
+      completedExams.map(async (exam: ExamRecord): Promise<ExamResultDetail> => {
+        try {
+          const res = await apiFetch(`/api/exams/results?examId=${exam.id}`);
+          const data = await res.json();
+          return { 
+            examId: exam.id, 
+            examName: exam.name, 
+            subjectName: exam.subjectName, 
+            totalMarks: exam.totalMarks, 
+            results: data.results || [] 
+          };
+        } catch (err) {
+          console.error(`Error loading results for exam ${exam.id}:`, err);
+          return { 
+            examId: exam.id, 
+            examName: exam.name, 
+            subjectName: exam.subjectName, 
+            totalMarks: exam.totalMarks, 
+            results: [] 
+          };
+        }
+      })
+    );
 
     // 3. Compile tabulation data
     const subjectMaxMarks: Record<string, number> = {};

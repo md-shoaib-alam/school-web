@@ -48,7 +48,7 @@ import {
   List,
 } from "lucide-react";
 import { useRouter, useParams } from "next/navigation";
-import { motion, AnimatePresence } from "framer-motion";
+import { LazyMotion, domAnimation, m, AnimatePresence } from "framer-motion";
 import { goeyToast as toast } from "goey-toast";
 import type { ClassInfo } from "@/lib/types";
 import { useModulePermissions } from "@/hooks/use-permissions";
@@ -464,103 +464,105 @@ export function AdminClasses() {
         </Card>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-          <AnimatePresence mode="popLayout">
-            {classes.map((cls) => {
-              const percentage = cls.capacity > 0 ? Math.round((cls.studentCount / cls.capacity) * 100) : 0;
+          <LazyMotion features={domAnimation}>
+            <AnimatePresence mode="popLayout">
+              {classes.map((cls) => {
+                const percentage = cls.capacity > 0 ? Math.round((cls.studentCount / cls.capacity) * 100) : 0;
 
-              return (
-                <motion.div
-                  key={cls.id}
-                  layout
-                  initial={{ opacity: 0, scale: 0.95 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.9, transition: { duration: 0.2 } }}
-                >
-                  <Card className="hover:shadow-lg transition-all duration-300 hover:-translate-y-1 relative group overflow-hidden border-0 shadow-sm">
-                    <CardContent className="p-6">
-                      {/* Action buttons - top right */}
-                      <div className="absolute top-3 right-3 flex items-center gap-1 transition-opacity">
-                        {canEdit && (
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            className="h-7 w-7 text-muted-foreground hover:text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-900/30"
-                            onClick={() => openEditDialog(cls)}
-                          >
-                            <Pencil className="h-3.5 w-3.5" />
-                          </Button>
-                        )}
-                        {canDelete && (
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            className="h-7 w-7 text-muted-foreground hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/30"
-                            onClick={() => {
-                              dispatch({ type: "OPEN_DELETE", payload: cls });
-                            }}
-                          >
-                            <Trash2 className="h-3.5 w-3.5" />
-                          </Button>
-                        )}
-                      </div>
-
-                      {/* Class name and grade badge */}
-                      <div className="flex items-start justify-between mb-4">
-                        <div className="space-y-1">
-                          <h3 className="text-lg font-bold text-gray-900 dark:text-gray-100">
-                            {cls.name}
-                          </h3>
-                          <Badge variant="secondary" className="text-[10px] font-bold uppercase tracking-widest px-2 py-0">
-                            Section {cls.section}
-                          </Badge>
+                return (
+                  <m.div
+                    key={cls.id}
+                    layout
+                    initial={{ opacity: 0, scale: 0.95 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.9, transition: { duration: 0.2 } }}
+                  >
+                    <Card className="hover:shadow-lg transition-all duration-300 hover:-translate-y-1 relative group overflow-hidden border-0 shadow-sm">
+                      <CardContent className="p-6">
+                        {/* Action buttons - top right */}
+                        <div className="absolute top-3 right-3 flex items-center gap-1 transition-opacity">
+                          {canEdit && (
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-7 w-7 text-muted-foreground hover:text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-900/30"
+                              onClick={() => openEditDialog(cls)}
+                            >
+                              <Pencil className="h-3.5 w-3.5" />
+                            </Button>
+                          )}
+                          {canDelete && (
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-7 w-7 text-muted-foreground hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/30"
+                              onClick={() => {
+                                dispatch({ type: "OPEN_DELETE", payload: cls });
+                              }}
+                            >
+                              <Trash2 className="h-3.5 w-3.5" />
+                            </Button>
+                          )}
                         </div>
-                      </div>
 
-                      {/* Stats */}
-                      <div className="grid grid-cols-1 gap-3 mb-6 mt-6">
-                        <div className="flex items-center justify-between text-sm">
-                          <div className="flex items-center gap-2">
-                            <Users className="h-4 w-4 text-emerald-500" />
-                            <span className="text-gray-500 font-medium text-xs">Students</span>
+                        {/* Class name and grade badge */}
+                        <div className="flex items-start justify-between mb-4">
+                          <div className="space-y-1">
+                            <h3 className="text-lg font-bold text-gray-900 dark:text-gray-100">
+                              {cls.name}
+                            </h3>
+                            <Badge variant="secondary" className="text-[10px] font-bold uppercase tracking-widest px-2 py-0">
+                              Section {cls.section}
+                            </Badge>
                           </div>
-                          <span className="font-bold">{cls.studentCount}<span className="text-gray-400 font-normal ml-0.5">/{cls.capacity}</span></span>
                         </div>
-                        <div className="flex items-center justify-between text-sm">
-                          <div className="flex items-center gap-2">
-                            <UserCheck className="h-4 w-4 text-blue-500" />
-                            <span className="text-gray-500 font-medium text-xs">Teacher</span>
+
+                        {/* Stats */}
+                        <div className="grid grid-cols-1 gap-3 mb-6 mt-6">
+                          <div className="flex items-center justify-between text-sm">
+                            <div className="flex items-center gap-2">
+                              <Users className="h-4 w-4 text-emerald-500" />
+                              <span className="text-gray-500 font-medium text-xs">Students</span>
+                            </div>
+                            <span className="font-bold">{cls.studentCount}<span className="text-gray-400 font-normal ml-0.5">/{cls.capacity}</span></span>
                           </div>
-                          <span className="text-gray-700 dark:text-gray-300 font-semibold truncate max-w-[120px]">
-                            {cls.classTeacher || 'Unassigned'}
-                          </span>
+                          <div className="flex items-center justify-between text-sm">
+                            <div className="flex items-center gap-2">
+                              <UserCheck className="h-4 w-4 text-blue-500" />
+                              <span className="text-gray-500 font-medium text-xs">Teacher</span>
+                            </div>
+                            <span className="text-gray-700 dark:text-gray-300 font-semibold truncate max-w-[120px]">
+                              {cls.classTeacher || 'Unassigned'}
+                            </span>
+                          </div>
                         </div>
-                      </div>
 
-                      {/* Progress bar */}
-                      <div className="space-y-2 mb-6">
-                        <div className="flex items-center justify-between text-[10px] uppercase font-black tracking-tighter text-gray-400">
-                          <span>Capacity</span>
-                          <span className={percentage >= 90 ? "text-red-500" : "text-emerald-500"}>{percentage}% Full</span>
+                        {/* Progress bar */}
+                        <div className="space-y-2 mb-6">
+                          <div className="flex items-center justify-between text-[10px] uppercase font-black tracking-tighter text-gray-400">
+                            <span>Capacity</span>
+                            <span className={percentage >= 90 ? "text-red-500" : "text-emerald-500"}>{percentage}% Full</span>
+                          </div>
+                          <Progress
+                            value={percentage}
+                            className={`h-1.5 ${getProgressColor(percentage)}`}
+                          />
                         </div>
-                        <Progress
-                          value={percentage}
-                          className={`h-1.5 ${getProgressColor(percentage)}`}
-                        />
-                      </div>
 
-                      <Button 
-                        className="w-full bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-600 hover:text-white border-0 shadow-none transition-all duration-300 font-bold text-xs h-9"
-                        onClick={() => router.push(`/${slug}/students?classId=${cls.id}`)}
-                      >
-                        <Users className="h-3.5 w-3.5 mr-2" />
-                        View Students
-                      </Button>
-                    </CardContent>
-                  </Card>
-                </motion.div>
-              );
-            })}
-          </AnimatePresence>
+                        <Button 
+                          className="w-full bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-600 hover:text-white border-0 shadow-none transition-all duration-300 font-bold text-xs h-9"
+                          onClick={() => router.push(`/${slug}/students?classId=${cls.id}`)}
+                        >
+                          <Users className="h-3.5 w-3.5 mr-2" />
+                          View Students
+                        </Button>
+                      </CardContent>
+                    </Card>
+                  </m.div>
+                );
+              })}
+            </AnimatePresence>
+          </LazyMotion>
         </div>
       )}
 
@@ -774,7 +776,7 @@ function EditClassDialog({
           <DialogTitle>Edit Class</DialogTitle>
           <DialogDescription>Update class details</DialogDescription>
         </DialogHeader>
-        <ClassForm value={editData} onChange={onChange} />
+        <ClassForm value={editData} onChange={(v) => onChange({ ...v, id: v.id ?? "" })} />
         <DialogFooter>
           <Button variant="outline" onClick={() => onOpenChange(false)}>
             Cancel

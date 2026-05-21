@@ -1,8 +1,6 @@
 "use client"
 
 import * as React from "react"
-import * as RechartsPrimitive from "recharts"
-
 import { cn } from "@/lib/utils"
 
 // Format: { THEME_NAME: CSS_SELECTOR }
@@ -42,12 +40,17 @@ function ChartContainer({
   ...props
 }: React.ComponentProps<"div"> & {
   config: ChartConfig
-  children: React.ComponentProps<
-    typeof RechartsPrimitive.ResponsiveContainer
-  >["children"]
+  children: any
 }) {
   const uniqueId = React.useId()
   const chartId = `chart-${id || uniqueId.replace(/:/g, "")}`
+  const [ResponsiveContainer, setResponsiveContainer] = React.useState<any>(null)
+
+  React.useEffect(() => {
+    import("recharts").then((mod) => {
+      setResponsiveContainer(() => mod.ResponsiveContainer)
+    })
+  }, [])
 
   return (
     <ChartContext.Provider value={{ config }}>
@@ -61,9 +64,15 @@ function ChartContainer({
         {...props}
       >
         <ChartStyle id={chartId} config={config} />
-        <RechartsPrimitive.ResponsiveContainer>
-          {children}
-        </RechartsPrimitive.ResponsiveContainer>
+        {ResponsiveContainer ? (
+          <ResponsiveContainer>
+            {children}
+          </ResponsiveContainer>
+        ) : (
+          <div className="w-full h-full flex items-center justify-center">
+            <div className="h-full w-full animate-pulse bg-muted rounded-lg" />
+          </div>
+        )}
       </div>
     </ChartContext.Provider>
   )
@@ -79,11 +88,10 @@ const ChartStyle = ({ id, config }: { id: string; config: ChartConfig }) => {
   }
 
   return (
-    <style
-      dangerouslySetInnerHTML={{
-        __html: Object.entries(THEMES)
-          .map(
-            ([theme, prefix]) => `
+    <style>
+      {Object.entries(THEMES)
+        .map(
+          ([theme, prefix]) => `
 ${prefix} [data-chart=${id}] {
 ${colorConfig
   .map(([key, itemConfig]) => {
@@ -95,16 +103,40 @@ ${colorConfig
   .join("\n")}
 }
 `
-          )
-          .join("\n"),
-      }}
-    />
+        )
+        .join("\n")}
+    </style>
   )
 }
 
-const ChartTooltip = RechartsPrimitive.Tooltip
+const ChartTooltip = React.forwardRef<any, any>((props, ref) => {
+  const [Tooltip, setTooltip] = React.useState<any>(null)
+  React.useEffect(() => {
+    import("recharts").then((mod) => setTooltip(() => mod.Tooltip))
+  }, [])
+  if (!Tooltip) return null
+  return <Tooltip ref={ref} {...props} />
+})
+ChartTooltip.displayName = "Tooltip"
 
-function ChartTooltipContent({
+type ChartTooltipContentProps = React.ComponentProps<typeof import("recharts").Tooltip> &
+  React.ComponentProps<"div"> & {
+    hideLabel?: boolean
+    hideIndicator?: boolean
+    indicator?: "line" | "dot" | "dashed"
+    nameKey?: string
+    labelKey?: string
+  }
+
+function ChartTooltipContent(props: ChartTooltipContentProps) {
+  if (!props.active || !props.payload?.length) {
+    return null
+  }
+
+  return <ChartTooltipContentInner {...props} />
+}
+
+function ChartTooltipContentInner({
   active,
   payload,
   className,
@@ -118,14 +150,7 @@ function ChartTooltipContent({
   color,
   nameKey,
   labelKey,
-}: React.ComponentProps<typeof RechartsPrimitive.Tooltip> &
-  React.ComponentProps<"div"> & {
-    hideLabel?: boolean
-    hideIndicator?: boolean
-    indicator?: "line" | "dot" | "dashed"
-    nameKey?: string
-    labelKey?: string
-  }) {
+}: ChartTooltipContentProps) {
   const { config } = useChart()
 
   const tooltipLabel = React.useMemo(() => {
@@ -164,11 +189,7 @@ function ChartTooltipContent({
     labelKey,
   ])
 
-  if (!active || !payload?.length) {
-    return null
-  }
-
-  const nestLabel = payload.length === 1 && indicator !== "dot"
+  const nestLabel = payload!.length === 1 && indicator !== "dot"
 
   return (
     <div
@@ -179,7 +200,7 @@ function ChartTooltipContent({
     >
       {!nestLabel ? tooltipLabel : null}
       <div className="grid gap-1.5">
-        {payload.map((item, index) => {
+        {payload!.map((item, index) => {
           const key = `${nameKey || item.name || item.dataKey || "value"}`
           const itemConfig = getPayloadConfigFromPayload(config, item, key)
           const indicatorColor = color || item.payload.fill || item.color
@@ -248,7 +269,15 @@ function ChartTooltipContent({
   )
 }
 
-const ChartLegend = RechartsPrimitive.Legend
+const ChartLegend = React.forwardRef<any, any>((props, ref) => {
+  const [Legend, setLegend] = React.useState<any>(null)
+  React.useEffect(() => {
+    import("recharts").then((mod) => setLegend(() => mod.Legend))
+  }, [])
+  if (!Legend) return null
+  return <Legend ref={ref} {...props} />
+})
+ChartLegend.displayName = "Legend"
 
 function ChartLegendContent({
   className,
@@ -257,7 +286,7 @@ function ChartLegendContent({
   verticalAlign = "bottom",
   nameKey,
 }: React.ComponentProps<"div"> &
-  Pick<RechartsPrimitive.LegendProps, "payload" | "verticalAlign"> & {
+  Pick<import("recharts").LegendProps, "payload" | "verticalAlign"> & {
     hideIcon?: boolean
     nameKey?: string
   }) {

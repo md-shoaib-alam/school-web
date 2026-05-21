@@ -14,7 +14,7 @@ import {
 } from "./types";
 import { IndianRupee, Clock, UserCircle, ShieldAlert } from "lucide-react";
 
-export function renderTableHeaders(activeTab: TabType) {
+export function TableHeaders({ activeTab }: { activeTab: TabType }) {
   const commonClasses = "uppercase tracking-widest text-[10px] font-black text-muted-foreground py-4";
   switch (activeTab) {
     case "students":
@@ -88,18 +88,18 @@ export function renderTableHeaders(activeTab: TabType) {
   }
 }
 
-export function renderTableCells(activeTab: TabType, item: any) {
+function StatusBadge({ status }: { status: string }) {
+  const colors = statusColors[status] || statusColors.inactive;
+  return (
+    <Badge variant="outline" className={`${colors.bg} ${colors.text} border-transparent capitalize font-black text-[9px] px-2 py-0 h-5 flex items-center gap-1 w-fit`}>
+      {colors.icon}
+      {status}
+    </Badge>
+  );
+}
+
+export function TableCells({ activeTab, item }: { activeTab: TabType; item: any }) {
   const cellClasses = "py-4 text-sm font-medium";
-  
-  const renderStatus = (status: string) => {
-    const colors = statusColors[status] || statusColors.inactive;
-    return (
-      <Badge variant="outline" className={`${colors.bg} ${colors.text} border-transparent capitalize font-black text-[9px] px-2 py-0 h-5 flex items-center gap-1 w-fit`}>
-        {colors.icon}
-        {status}
-      </Badge>
-    );
-  };
 
   switch (activeTab) {
     case "students": {
@@ -125,7 +125,7 @@ export function renderTableCells(activeTab: TabType, item: any) {
             <div className="text-xs font-medium">{s.email}</div>
             <div className="text-[10px] text-muted-foreground">{s.phone}</div>
           </TableCell>
-          <TableCell className={cellClasses}>{renderStatus(s.status)}</TableCell>
+          <TableCell className={cellClasses}><StatusBadge status={s.status} /></TableCell>
         </>
       );
     }
@@ -147,7 +147,7 @@ export function renderTableCells(activeTab: TabType, item: any) {
             <div className="text-xs font-medium">{t.email}</div>
             <div className="text-[10px] text-muted-foreground">{t.phone}</div>
           </TableCell>
-          <TableCell className={cellClasses}>{renderStatus(t.status)}</TableCell>
+          <TableCell className={cellClasses}><StatusBadge status={t.status} /></TableCell>
         </>
       );
     }
@@ -166,7 +166,7 @@ export function renderTableCells(activeTab: TabType, item: any) {
           <TableCell className={`${cellClasses} text-xs font-medium`}>{p.email}</TableCell>
           <TableCell className={`${cellClasses} text-xs font-medium`}>{p.phone}</TableCell>
           <TableCell className={`${cellClasses} text-xs font-bold text-muted-foreground`}>{p.occupation}</TableCell>
-          <TableCell className={cellClasses}>{renderStatus(p.status)}</TableCell>
+          <TableCell className={cellClasses}><StatusBadge status={p.status} /></TableCell>
         </>
       );
     }

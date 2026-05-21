@@ -13,7 +13,6 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart";
-import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer } from "recharts";
 import {
   UserCheck,
   Calendar,
@@ -57,10 +56,15 @@ const MONTH_NAMES = [
 ];
 
 export function StudentAttendance() {
+  const [recharts, setRecharts] = useState<typeof import("recharts") | null>(null);
   const { currentUser } = useAppStore();
   const [loading, setLoading] = useState(true);
   const [students, setStudents] = useState<StudentInfo[]>([]);
   const [attendanceData, setAttendanceData] = useState<AttendanceRecord[]>([]);
+
+  useEffect(() => {
+    import("recharts").then(setRecharts);
+  }, []);
 
   const student = useMemo(
     () =>
@@ -155,12 +159,17 @@ export function StudentAttendance() {
     }[] = [];
     const today = new Date();
 
+    const attendanceMap = new Map<string, AttendanceRecord>();
+    for (const record of attendanceData) {
+      attendanceMap.set(record.date, record);
+    }
+
     for (let i = 29; i >= 0; i--) {
       const d = new Date(today);
       d.setDate(today.getDate() - i);
       const dateStr = d.toISOString().split("T")[0];
       const dayOfWeek = d.getDay();
-      const record = attendanceData.find((a) => a.date === dateStr);
+      const record = attendanceMap.get(dateStr);
 
       let status: "present" | "absent" | "none" = "none";
       if (record) {
@@ -342,41 +351,48 @@ export function StudentAttendance() {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          {monthlyData.some((m) => m.rate > 0) ? (
+          {!recharts ? (
+            <div className="h-[260px] animate-pulse bg-gray-200/50 dark:bg-gray-800/50 rounded-lg" />
+          ) : monthlyData.some((m) => m.rate > 0) ? (
             <ChartContainer config={chartConfig} className="h-[260px] w-full">
-              <BarChart data={monthlyData} margin={{ left: -10, right: 10 }}>
-                <XAxis
-                  dataKey="month"
-                  tick={{ fontSize: 12 }}
-                  axisLine={false}
-                  tickLine={false}
-                />
-                <YAxis
-                  domain={[0, 100]}
-                  tick={{ fontSize: 11 }}
-                  axisLine={false}
-                  tickLine={false}
-                  tickFormatter={(v: string | number) => `${Number(v)}%`}
-                />
-                <ChartTooltip
-                  content={
-                    <ChartTooltipContent
-                      formatter={
-                        ((v: string | number) => [
-                          `${v}%`,
-                          "Attendance",
-                        ]) as never
+              {(() => {
+                const { BarChart, Bar, XAxis, YAxis } = recharts;
+                return (
+                  <BarChart data={monthlyData} margin={{ left: -10, right: 10 }}>
+                    <XAxis
+                      dataKey="month"
+                      tick={{ fontSize: 12 }}
+                      axisLine={false}
+                      tickLine={false}
+                    />
+                    <YAxis
+                      domain={[0, 100]}
+                      tick={{ fontSize: 11 }}
+                      axisLine={false}
+                      tickLine={false}
+                      tickFormatter={(v: string | number) => `${Number(v)}%`}
+                    />
+                    <ChartTooltip
+                      content={
+                        <ChartTooltipContent
+                          formatter={
+                            ((v: string | number) => [
+                              `${v}%`,
+                              "Attendance",
+                            ]) as never
+                          }
+                        />
                       }
                     />
-                  }
-                />
-                <Bar
-                  dataKey="rate"
-                  fill="#8b5cf6"
-                  radius={[6, 6, 0, 0]}
-                  barSize={40}
-                />
-              </BarChart>
+                    <Bar
+                      dataKey="rate"
+                      fill="#8b5cf6"
+                      radius={[6, 6, 0, 0]}
+                      barSize={40}
+                    />
+                  </BarChart>
+                );
+              })()}
             </ChartContainer>
           ) : (
             <div className="h-[260px] flex items-center justify-center text-gray-400 dark:text-gray-500">

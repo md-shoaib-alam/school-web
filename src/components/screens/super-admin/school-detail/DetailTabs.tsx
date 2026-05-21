@@ -21,7 +21,7 @@ import {
   Filter
 } from "lucide-react";
 import { TabType, TAB_CONFIG } from "./types";
-import { renderTableHeaders, renderTableCells } from "./TabRenderers";
+import { TableHeaders, TableCells } from "./TabRenderers";
 
 interface DetailTabsProps {
   activeTab: TabType;
@@ -158,7 +158,7 @@ export function DetailTabs({
                       <Table>
                         <TableHeader>
                           <TableRow className="bg-gray-50/50 dark:bg-gray-900/50 hover:bg-transparent">
-                            {renderTableHeaders(activeTab)}
+                            <TableHeaders activeTab={activeTab} />
                           </TableRow>
                         </TableHeader>
                         <TableBody>
@@ -167,7 +167,7 @@ export function DetailTabs({
                               key={item.id || idx}
                               className="hover:bg-rose-50/30 dark:hover:bg-rose-900/10 transition-colors border-b last:border-none"
                             >
-                              {renderTableCells(activeTab, item)}
+                              <TableCells activeTab={activeTab} item={item} />
                             </TableRow>
                           ))}
                         </TableBody>

@@ -16,7 +16,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid } from "recharts";
 import {
   ChartContainer,
   ChartTooltip,
@@ -28,11 +27,16 @@ import { AttendanceSummary, DailyAttendance, attendanceChartConfig } from "./typ
 import { SummaryCardSkeleton, ChartSkeleton } from "./SummaryComponents";
 
 export function AttendanceReport() {
+  const [recharts, setRecharts] = useState<typeof import("recharts") | null>(null);
   const [classes, setClasses] = useState<ClassInfo[]>([]);
   const [records, setRecords] = useState<AttendanceRecord[]>([]);
   const [selectedClass, setSelectedClass] = useState<string>("all");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    import("recharts").then(setRecharts);
+  }, []);
 
   useEffect(() => {
     async function fetchClasses() {
@@ -195,7 +199,7 @@ export function AttendanceReport() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          {loading ? (
+          {loading || !recharts ? (
             <ChartSkeleton />
           ) : dailyData.length === 0 ? (
             <div className="text-center py-12 text-muted-foreground">
@@ -209,29 +213,34 @@ export function AttendanceReport() {
               config={attendanceChartConfig}
               className="h-[300px] w-full"
             >
-              <BarChart data={dailyData}>
-                <CartesianGrid strokeDasharray="3 3" vertical={false} />
-                <XAxis
-                  dataKey="date"
-                  tickLine={false}
-                  axisLine={false}
-                  fontSize={12}
-                />
-                <YAxis tickLine={false} axisLine={false} fontSize={12} />
-                <ChartTooltip content={<ChartTooltipContent />} />
-                <Bar
-                  dataKey="present"
-                  fill="var(--color-present)"
-                  radius={[4, 4, 0, 0]}
-                  maxBarSize={28}
-                />
-                <Bar
-                  dataKey="absent"
-                  fill="var(--color-absent)"
-                  radius={[4, 4, 0, 0]}
-                  maxBarSize={28}
-                />
-              </BarChart>
+              {(() => {
+                const { BarChart, Bar, XAxis, YAxis, CartesianGrid } = recharts;
+                return (
+                  <BarChart data={dailyData}>
+                    <CartesianGrid strokeDasharray="3 3" vertical={false} />
+                    <XAxis
+                      dataKey="date"
+                      tickLine={false}
+                      axisLine={false}
+                      fontSize={12}
+                    />
+                    <YAxis tickLine={false} axisLine={false} fontSize={12} />
+                    <ChartTooltip content={<ChartTooltipContent />} />
+                    <Bar
+                      dataKey="present"
+                      fill="var(--color-present)"
+                      radius={[4, 4, 0, 0]}
+                      maxBarSize={28}
+                    />
+                    <Bar
+                      dataKey="absent"
+                      fill="var(--color-absent)"
+                      radius={[4, 4, 0, 0]}
+                      maxBarSize={28}
+                    />
+                  </BarChart>
+                );
+              })()}
             </ChartContainer>
           )}
         </CardContent>

@@ -48,10 +48,7 @@ export function ViewResultsDialog({
 
     // Create an invisible iframe
     const iframe = document.createElement('iframe');
-    iframe.style.position = 'absolute';
-    iframe.style.width = '0';
-    iframe.style.height = '0';
-    iframe.style.border = 'none';
+    iframe.style.cssText = 'position: absolute; width: 0; height: 0; border: none;';
     
     document.body.appendChild(iframe);
     

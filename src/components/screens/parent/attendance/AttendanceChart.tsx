@@ -3,15 +3,7 @@
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { Calendar } from "lucide-react";
 import { useRouter, useParams } from "next/navigation";
-import {
-  Bar,
-  BarChart,
-  XAxis,
-  YAxis,
-  Tooltip,
-  ResponsiveContainer,
-  CartesianGrid,
-} from "recharts";
+import { useState, useEffect } from "react";
 
 interface AttendanceChartProps {
   data: any[];
@@ -22,6 +14,12 @@ export function AttendanceChart({ data, isPremium }: AttendanceChartProps) {
   const router = useRouter();
   const params = useParams();
   const slug = params?.slug as string;
+
+  const [recharts, setRecharts] = useState<typeof import("recharts") | null>(null);
+
+  useEffect(() => {
+    import("recharts").then(setRecharts);
+  }, []);
 
   return (
     <Card className="rounded-xl shadow-sm relative overflow-hidden border-none bg-white/50 dark:bg-gray-900/50 backdrop-blur-sm">
@@ -38,67 +36,86 @@ export function AttendanceChart({ data, isPremium }: AttendanceChartProps) {
       </CardHeader>
       <CardContent className="p-2 sm:p-4 relative">
         <div className={`h-[200px] sm:h-64 w-full transition-all duration-500 ${!isPremium ? "blur-[6px] pointer-events-none select-none opacity-40 scale-95" : ""}`}>
-          <ResponsiveContainer width="100%" height="100%">
-            <BarChart
-              data={data}
-              barGap={1}
-              barCategoryGap="15%"
-            >
-              <defs>
-                <linearGradient id="presentGradient" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor="#10b981" stopOpacity={0.9} />
-                  <stop offset="100%" stopColor="#10b981" stopOpacity={0.6} />
-                </linearGradient>
-                <linearGradient id="absentGradient" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor="#ef4444" stopOpacity={0.9} />
-                  <stop offset="100%" stopColor="#ef4444" stopOpacity={0.6} />
-                </linearGradient>
-              </defs>
-              <CartesianGrid
-                strokeDasharray="3 3"
-                vertical={false}
-                stroke="#f3f4f6"
-                className="dark:stroke-gray-800/50"
-              />
-              <XAxis
-                dataKey="month"
-                tick={{ fontSize: 10, fill: "#9ca3af" }}
-                axisLine={false}
-                tickLine={false}
-              />
-              <YAxis
-                tick={{ fontSize: 10, fill: "#9ca3af" }}
-                axisLine={false}
-                tickLine={false}
-                allowDecimals={false}
-                width={20}
-              />
-              <Tooltip
-                cursor={{ fill: "rgba(0,0,0,0.04)" }}
-                contentStyle={{
-                  backgroundColor: "rgba(17, 24, 39, 0.95)",
-                  backdropFilter: "blur(8px)",
-                  borderRadius: "12px",
-                  border: "1px solid rgba(255,255,255,0.1)",
-                  boxShadow: "0 10px 15px -3px rgba(0, 0, 0, 0.3)",
-                  padding: "8px",
-                }}
-                labelStyle={{ color: "#9ca3af", marginBottom: "2px", fontSize: "10px", fontWeight: "bold" }}
-              />
-              <Bar
-                dataKey="present"
-                fill="url(#presentGradient)"
-                radius={[3, 3, 0, 0]}
-                name="Present"
-              />
-              <Bar
-                dataKey="absent"
-                fill="url(#absentGradient)"
-                radius={[3, 3, 0, 0]}
-                name="Absent"
-              />
-            </BarChart>
-          </ResponsiveContainer>
+          {!recharts ? (
+            <div className="h-full w-full flex items-center justify-center">
+              <div className="h-full w-full animate-pulse bg-gray-200/50 dark:bg-gray-800/50 rounded-lg" />
+            </div>
+          ) : (
+            (() => {
+              const {
+                Bar,
+                BarChart,
+                XAxis,
+                YAxis,
+                Tooltip,
+                ResponsiveContainer,
+                CartesianGrid,
+              } = recharts;
+              return (
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart
+                    data={data}
+                    barGap={1}
+                    barCategoryGap="15%"
+                  >
+                    <defs>
+                      <linearGradient id="presentGradient" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stopColor="#10b981" stopOpacity={0.9} />
+                        <stop offset="100%" stopColor="#10b981" stopOpacity={0.6} />
+                      </linearGradient>
+                      <linearGradient id="absentGradient" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stopColor="#ef4444" stopOpacity={0.9} />
+                        <stop offset="100%" stopColor="#ef4444" stopOpacity={0.6} />
+                      </linearGradient>
+                    </defs>
+                    <CartesianGrid
+                      strokeDasharray="3 3"
+                      vertical={false}
+                      stroke="#f3f4f6"
+                      className="dark:stroke-gray-800/50"
+                    />
+                    <XAxis
+                      dataKey="month"
+                      tick={{ fontSize: 10, fill: "#9ca3af" }}
+                      axisLine={false}
+                      tickLine={false}
+                    />
+                    <YAxis
+                      tick={{ fontSize: 10, fill: "#9ca3af" }}
+                      axisLine={false}
+                      tickLine={false}
+                      allowDecimals={false}
+                      width={20}
+                    />
+                    <Tooltip
+                      cursor={{ fill: "rgba(0,0,0,0.04)" }}
+                      contentStyle={{
+                        backgroundColor: "rgba(17, 24, 39, 0.95)",
+                        backdropFilter: "blur(8px)",
+                        borderRadius: "12px",
+                        border: "1px solid rgba(255,255,255,0.1)",
+                        boxShadow: "0 10px 15px -3px rgba(0, 0, 0, 0.3)",
+                        padding: "8px",
+                      }}
+                      labelStyle={{ color: "#9ca3af", marginBottom: "2px", fontSize: "10px", fontWeight: "bold" }}
+                    />
+                    <Bar
+                      dataKey="present"
+                      fill="url(#presentGradient)"
+                      radius={[3, 3, 0, 0]}
+                      name="Present"
+                    />
+                    <Bar
+                      dataKey="absent"
+                      fill="url(#absentGradient)"
+                      radius={[3, 3, 0, 0]}
+                      name="Absent"
+                    />
+                  </BarChart>
+                </ResponsiveContainer>
+              );
+            })()
+          )}
         </div>
 
         {!isPremium && (

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { useParams } from 'next/navigation';
 import { useAppStore } from '@/store/use-app-store';
 import dynamic from 'next/dynamic';
@@ -117,7 +117,7 @@ export default function TenantScreenDispatcher() {
       case 'dashboard': 
         if (currentUser.role === 'super_admin' && slug === 'tenants') return <SuperAdminDashboard />;
         return currentUser.role === 'staff' ? <StaffDashboard /> : <AdminDashboard />;
-      case 'students': return <AdminStudents />;
+      case 'students': return <Suspense fallback={<LoadingScreen />}><AdminStudents /></Suspense>;
       case 'teachers': return <AdminTeachers />;
       case 'parents': return <AdminParents />;
       case 'classes': return <AdminClasses />;
@@ -155,10 +155,10 @@ export default function TenantScreenDispatcher() {
       case 'grades': return <TeacherGrades />;
       case 'teacher-attendance': return <StaffAttendance key="teacher-att" initialTab="teacher" />;
       case 'staff-attendance': return <StaffAttendance key="staff-att" initialTab="staff" />;
-      case 'exams': return <AdminExams key="exams" initialTab="exams" />;
-      case 'results-entry': return <AdminExams key="results" initialTab="results" />;
-      case 'published-results': return <AdminExams key="published" initialTab="published" />;
-      case 'print-marksheet': return <AdminPrintMarksheet />;
+      case 'exams': return <Suspense fallback={<LoadingScreen />}><AdminExams key="exams" initialTab="exams" /></Suspense>;
+      case 'results-entry': return <Suspense fallback={<LoadingScreen />}><AdminExams key="results" initialTab="results" /></Suspense>;
+      case 'published-results': return <Suspense fallback={<LoadingScreen />}><AdminExams key="published" initialTab="published" /></Suspense>;
+      case 'print-marksheet': return <Suspense fallback={<LoadingScreen />}><AdminPrintMarksheet /></Suspense>;
       case 'admit-cards': return <AdminAdmitCards />;
     }
   }

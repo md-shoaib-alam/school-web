@@ -15,11 +15,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { 
-  PieChart, 
-  Pie, 
-  Cell 
-} from "recharts";
+import { useState, useEffect } from "react";
 import {
   ChartContainer,
   ChartTooltip,
@@ -35,6 +31,12 @@ interface TopPerformanceProps {
 }
 
 export function TopPerformance({ loading, data }: TopPerformanceProps) {
+  const [recharts, setRecharts] = useState<typeof import("recharts") | null>(null);
+
+  useEffect(() => {
+    import("recharts").then(setRecharts);
+  }, []);
+
   return (
     <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
       {/* Top Performing Schools */}
@@ -104,32 +106,37 @@ export function TopPerformance({ loading, data }: TopPerformanceProps) {
           <CardDescription className="text-xs">Breakdown of schools by subscription tier</CardDescription>
         </CardHeader>
         <CardContent>
-          {loading ? (
+          {loading || !recharts ? (
             <Skeleton className="h-[280px] w-full rounded-2xl" />
           ) : (
             <div className="relative flex flex-col items-center">
               <ChartContainer config={planChartConfig} className="h-[210px] w-full">
-                <PieChart>
-                  <ChartTooltip content={<ChartTooltipContent className="rounded-xl border-none shadow-xl" />} />
-                  <Pie
-                    data={data?.planDistribution}
-                    dataKey="count"
-                    nameKey="plan"
-                    cx="50%"
-                    cy="50%"
-                    innerRadius={65}
-                    outerRadius={90}
-                    paddingAngle={4}
-                  >
-                    {data?.planDistribution.map((entry, index) => (
-                      <Cell 
-                        key={`cell-${index}`} 
-                        fill={PLAN_COLORS[entry.plan.toLowerCase()] || "#10b981"} 
-                        className="stroke-white dark:stroke-gray-800 stroke-2 hover:opacity-90 transition-opacity"
-                      />
-                    ))}
-                  </Pie>
-                </PieChart>
+                {(() => {
+                  const { PieChart, Pie, Cell } = recharts;
+                  return (
+                    <PieChart>
+                      <ChartTooltip content={<ChartTooltipContent className="rounded-xl border-none shadow-xl" />} />
+                      <Pie
+                        data={data?.planDistribution}
+                        dataKey="count"
+                        nameKey="plan"
+                        cx="50%"
+                        cy="50%"
+                        innerRadius={65}
+                        outerRadius={90}
+                        paddingAngle={4}
+                      >
+                        {data?.planDistribution.map((entry, index) => (
+                          <Cell 
+                            key={`cell-${index}`} 
+                            fill={PLAN_COLORS[entry.plan.toLowerCase()] || "#10b981"} 
+                            className="stroke-white dark:stroke-gray-800 stroke-2 hover:opacity-90 transition-opacity"
+                          />
+                        ))}
+                      </Pie>
+                    </PieChart>
+                  );
+                })()}
               </ChartContainer>
 
               {/* Total indicator in center of donut */}

@@ -43,11 +43,14 @@ export const getNextClass = (
   if (!fromClass) return null;
 
   const fromGrade = parseInt(fromClass.grade) || 0;
-  const nextClass = allClasses
-    .filter((c) => parseInt(c.grade) === fromGrade + 1)
-    .sort((a, b) => a.section.localeCompare(b.section))[0];
+  const candidates = allClasses.filter((c) => parseInt(c.grade) === fromGrade + 1);
+  const nextClass = candidates.length > 0
+    ? candidates.reduce((best, current) =>
+        current.section.localeCompare(best.section) < 0 ? current : best
+      )
+    : null;
 
-  return nextClass || null;
+  return nextClass;
 };
 
 export const isLastClass = (

@@ -68,11 +68,6 @@ export function StaffAttendance({ initialTab }: StaffAttendanceProps) {
   const [pendingChanges, setPendingChanges] = useState<Record<string, string>>(
     {},
   );
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
 
   // 🚀 Scaling-Ready Data Fetching with Axios
   const { data: attendanceData, isLoading: queryLoading, error } = useQuery({

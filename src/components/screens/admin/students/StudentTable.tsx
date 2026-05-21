@@ -10,7 +10,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { motion, AnimatePresence } from "framer-motion";
+
 import {
   AlertDialog,
   AlertDialogContent,

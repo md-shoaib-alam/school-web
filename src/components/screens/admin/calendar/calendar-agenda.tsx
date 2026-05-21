@@ -7,6 +7,8 @@ import { CalendarDays, CalendarCheck2, Clock, MapPin, Pencil, Trash2, X, RotateC
 import { CalendarEvent, ALL_EVENT_TYPES, EVENT_TYPE_COLORS, EVENT_TYPE_LABELS, TARGET_ROLE_LABELS } from "./types";
 import { isToday, formatDateISO } from "./utils";
 
+const EMPTY_EVENTS: CalendarEvent[] = [];
+
 interface CalendarAgendaProps {
   selectedDate: string | null;
   setSelectedDate: (d: string | null) => void;
@@ -26,7 +28,7 @@ export function CalendarAgenda({
   loading,
   selectedDayEvents,
   getTypeBadgeStyle,
-  allEvents = [],
+  allEvents = EMPTY_EVENTS,
   canEdit,
   canDelete,
   openEditDialog,

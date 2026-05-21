@@ -41,11 +41,18 @@ export const getSubjectPerformance = (studentId: string, grades: GradeRecord[]) 
         (sum, m, i) => sum + (m / data.maxMarks[i]) * 100,
         0,
       ) / data.marks.length;
-    const bestGrade =
-      data.grades.sort((a, b) => {
-        const order = ["A+", "A", "B+", "B", "C", "D"];
-        return order.indexOf(a) - order.indexOf(b);
-      })[0] || "N/A";
+    const bestGrade = (() => {
+      const order = ["A+", "A", "B+", "B", "C", "D"];
+      return data.grades.length > 0
+        ? data.grades.reduce((best, current) => {
+            const currentIdx = order.indexOf(current);
+            const bestIdx = order.indexOf(best);
+            const validCurrent = currentIdx === -1 ? Infinity : currentIdx;
+            const validBest = bestIdx === -1 ? Infinity : bestIdx;
+            return validCurrent < validBest ? current : best;
+          })
+        : "N/A";
+    })();
     return {
       subject,
       avgPct: Math.round(avgPct),

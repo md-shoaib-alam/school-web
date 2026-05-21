@@ -37,7 +37,7 @@ interface AssessmentGrade {
 
 export function ParentGrades({ initialTab = "exams" }: { initialTab?: "exams" | "assessments" }) {
   const { currentUser } = useAppStore();
-  const [topLevelTab] = useState<"exams" | "assessments">(initialTab);
+  const topLevelTab = initialTab;
   const [grades, setGrades] = useState<GradeRecord[]>([]);
   const [activeTab, setActiveTab] = useState("");
   

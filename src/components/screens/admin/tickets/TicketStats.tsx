@@ -15,7 +15,7 @@ interface TicketStatsProps {
 export function TicketStats({ stats }: TicketStatsProps) {
   return (
     <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-      <Card className="border-l-4 border-l-blue-500">
+      <Card className="border-blue-100 dark:border-blue-900/30 bg-blue-50/30 dark:bg-blue-950/10">
         <CardContent className="p-4">
           <div className="flex items-center justify-between">
             <div>
@@ -32,7 +32,7 @@ export function TicketStats({ stats }: TicketStatsProps) {
           </div>
         </CardContent>
       </Card>
-      <Card className="border-l-4 border-l-amber-500">
+      <Card className="border-amber-100 dark:border-amber-900/30 bg-amber-50/30 dark:bg-amber-950/10">
         <CardContent className="p-4">
           <div className="flex items-center justify-between">
             <div>
@@ -49,7 +49,7 @@ export function TicketStats({ stats }: TicketStatsProps) {
           </div>
         </CardContent>
       </Card>
-      <Card className="border-l-4 border-l-emerald-500">
+      <Card className="border-emerald-100 dark:border-emerald-900/30 bg-emerald-50/30 dark:bg-emerald-950/10">
         <CardContent className="p-4">
           <div className="flex items-center justify-between">
             <div>
@@ -66,7 +66,7 @@ export function TicketStats({ stats }: TicketStatsProps) {
           </div>
         </CardContent>
       </Card>
-      <Card className="border-l-4 border-l-gray-400">
+      <Card className="border-gray-200 dark:border-gray-800 bg-gray-50/30 dark:bg-gray-950/10">
         <CardContent className="p-4">
           <div className="flex items-center justify-between">
             <div>

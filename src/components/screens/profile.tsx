@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useTheme } from "next-themes";
-import { useAppStore, type UserRole } from "@/store/use-app-store";
+import { useAppStore, STORAGE_KEYS, type UserRole } from "@/store/use-app-store";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -176,7 +176,7 @@ export function UserProfileScreen() {
     // Save to store and local storage
     useAppStore.setState({ currentUser: updatedUser });
     if (typeof window !== "undefined") {
-      localStorage.setItem("schoolsaas_user", JSON.stringify(updatedUser));
+      localStorage.setItem(STORAGE_KEYS.USER, JSON.stringify(updatedUser));
     }
     
     setIsEditOpen(false);
@@ -223,7 +223,7 @@ export function UserProfileScreen() {
             </Avatar>
             {/* Hover overlay */}
             <div className="absolute inset-0 bg-black/40 rounded-full flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200 border-4 border-transparent">
-              <Camera className="h-5 w-5 text-white animate-bounce" />
+              <Camera className="h-5 w-5 text-white transition-transform duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-110" />
               <span className="text-[9px] font-black text-white uppercase tracking-widest mt-1">Change</span>
             </div>
             <span className="absolute bottom-1 right-1 flex h-4 w-4">
@@ -331,7 +331,7 @@ export function UserProfileScreen() {
                         variant="ghost"
                         size="icon"
                         onClick={() => handleCopy(currentUser.name, "Name")}
-                        className="h-7 w-7 absolute right-2 top-1/2 -translate-y-1/2 text-gray-500 hover:text-emerald-600 dark:text-zinc-400 hover:bg-emerald-500/10 dark:hover:bg-emerald-500/20 rounded-lg transition-all duration-200 hover:scale-105 active:scale-95"
+                        className="h-7 w-7 absolute right-2 top-1/2 -translate-y-1/2 text-emerald-800/80 hover:text-emerald-950 dark:text-emerald-400/80 dark:hover:text-emerald-200 hover:bg-emerald-100/60 dark:hover:bg-emerald-900/40 rounded-lg transition-all duration-200 hover:scale-105 active:scale-95"
                       >
                         {copiedField === "Name" ? <Check className="h-3.5 w-3.5 text-green-500" /> : <Copy className="h-3.5 w-3.5" />}
                       </Button>
@@ -348,7 +348,7 @@ export function UserProfileScreen() {
                         variant="ghost"
                         size="icon"
                         onClick={() => handleCopy(currentUser.email, "Email")}
-                        className="h-7 w-7 absolute right-2 top-1/2 -translate-y-1/2 text-gray-500 hover:text-emerald-600 dark:text-zinc-400 hover:bg-emerald-500/10 dark:hover:bg-emerald-500/20 rounded-lg transition-all duration-200 hover:scale-105 active:scale-95"
+                        className="h-7 w-7 absolute right-2 top-1/2 -translate-y-1/2 text-emerald-800/80 hover:text-emerald-950 dark:text-emerald-400/80 dark:hover:text-emerald-200 hover:bg-emerald-100/60 dark:hover:bg-emerald-900/40 rounded-lg transition-all duration-200 hover:scale-105 active:scale-95"
                       >
                         {copiedField === "Email" ? <Check className="h-3.5 w-3.5 text-green-500" /> : <Copy className="h-3.5 w-3.5" />}
                       </Button>
@@ -377,7 +377,7 @@ export function UserProfileScreen() {
                         variant="ghost"
                         size="icon"
                         onClick={() => handleCopy(currentUser.phone || "+91 98765 43210", "Mobile Number")}
-                        className="h-7 w-7 absolute right-2 top-1/2 -translate-y-1/2 text-gray-500 hover:text-emerald-600 dark:text-zinc-400 hover:bg-emerald-500/10 dark:hover:bg-emerald-500/20 rounded-lg transition-all duration-200 hover:scale-105 active:scale-95"
+                        className="h-7 w-7 absolute right-2 top-1/2 -translate-y-1/2 text-emerald-800/80 hover:text-emerald-950 dark:text-emerald-400/80 dark:hover:text-emerald-200 hover:bg-emerald-100/60 dark:hover:bg-emerald-900/40 rounded-lg transition-all duration-200 hover:scale-105 active:scale-95"
                         title="Copy Mobile"
                       >
                         {copiedField === "Mobile Number" ? <Check className="h-3.5 w-3.5 text-green-500" /> : <Copy className="h-3.5 w-3.5" />}
@@ -398,7 +398,7 @@ export function UserProfileScreen() {
                         variant="ghost"
                         size="icon"
                         onClick={() => handleCopy(currentUser.address || "7/A, Sector-4, HSR Layout, Bangalore, India", "Address")}
-                        className="h-7 w-7 absolute right-2 top-1/2 -translate-y-1/2 text-gray-500 hover:text-emerald-600 dark:text-zinc-400 hover:bg-emerald-500/10 dark:hover:bg-emerald-500/20 rounded-lg transition-all duration-200 hover:scale-105 active:scale-95"
+                        className="h-7 w-7 absolute right-2 top-1/2 -translate-y-1/2 text-emerald-800/80 hover:text-emerald-950 dark:text-emerald-400/80 dark:hover:text-emerald-200 hover:bg-emerald-100/60 dark:hover:bg-emerald-900/40 rounded-lg transition-all duration-200 hover:scale-105 active:scale-95"
                         title="Copy Address"
                       >
                         {copiedField === "Address" ? <Check className="h-3.5 w-3.5 text-green-500" /> : <Copy className="h-3.5 w-3.5" />}

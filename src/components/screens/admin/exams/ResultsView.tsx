@@ -224,7 +224,7 @@ export function ResultsView({
       ) : (
         <div className="space-y-6 animate-in fade-in zoom-in-95 duration-300">
           {/* Exam info card */}
-          <Card className="border-l-4 border-l-blue-500">
+          <Card className="border-blue-100 dark:border-blue-900/30 bg-blue-50/30 dark:bg-blue-950/10">
             <CardContent className="p-5">
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                 <div className="space-y-1">

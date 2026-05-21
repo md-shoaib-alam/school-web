@@ -2,9 +2,19 @@ import { env } from '../env';
 export const API_BASE = env.NEXT_PUBLIC_API_URL;
 export const GRAPHQL_ENDPOINT = `${API_BASE}/graphql`
 
+function getStoredToken(): string | null {
+  if (typeof window === 'undefined') return null;
+  return localStorage.getItem('school_token');
+}
+
+function getStoredTenantId(): string | null {
+  if (typeof window === 'undefined') return null;
+  return localStorage.getItem('schoolsaas_tenant_id');
+}
+
 export async function graphqlQuery<TData>(query: string, variables?: Record<string, unknown>): Promise<TData> {
-  const token = typeof window !== 'undefined' ? localStorage.getItem('school_token') : null;
-  const tenantId = typeof window !== 'undefined' ? localStorage.getItem('schoolsaas_tenant_id') : null;
+  const token = getStoredToken();
+  const tenantId = getStoredTenantId();
   const res = await fetch(GRAPHQL_ENDPOINT, {
     method: 'POST',
     headers: { 
@@ -30,8 +40,8 @@ export async function graphqlQuery<TData>(query: string, variables?: Record<stri
 }
 
 export async function graphqlMutate<TData>(mutation: string, variables?: Record<string, unknown>): Promise<TData> {
-  const token = typeof window !== 'undefined' ? localStorage.getItem('school_token') : null;
-  const tenantId = typeof window !== 'undefined' ? localStorage.getItem('schoolsaas_tenant_id') : null;
+  const token = getStoredToken();
+  const tenantId = getStoredTenantId();
   const res = await fetch(GRAPHQL_ENDPOINT, {
     method: 'POST',
     headers: { 

@@ -14,14 +14,14 @@ export function ParentCalendar() {
   const currentTenantId = useAppStore((s) => s.currentTenantId);
 
   // --- State ---
-  const today = useMemo(() => new Date(), []);
+  const today = new Date();
   const [currentYear, setCurrentYear] = useState(today.getFullYear());
   const [currentMonth, setCurrentMonth] = useState(today.getMonth());
   const [selectedDate, setSelectedDate] = useState<string | null>(formatDateISO(today));
   const [typeFilter, setTypeFilter] = useState<string>("all");
 
   // --- TanStack Query ---
-  const monthKey = useMemo(() => `${currentYear}-${String(currentMonth + 1).padStart(2, "0")}`, [currentYear, currentMonth]);
+  const monthKey = `${currentYear}-${String(currentMonth + 1).padStart(2, "0")}`;
   const { data: allEvents = [], isLoading: loading } = useCalendarEvents(currentTenantId, monthKey);
   
   // Client-side Role Filtering

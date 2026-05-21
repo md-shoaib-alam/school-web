@@ -1,5 +1,6 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { BarChart3 } from "lucide-react";
 import {
@@ -8,8 +9,6 @@ import {
   ChartTooltipContent,
 } from "@/components/ui/chart";
 import type { ChartConfig } from "@/components/ui/chart";
-import { Bar, BarChart, XAxis, YAxis, CartesianGrid } from "recharts";
-
 const chartConfig = {
   percentage: { label: "Score %", color: "#f59e0b" },
 } satisfies ChartConfig;
@@ -19,6 +18,12 @@ interface PerformanceChartProps {
 }
 
 export function PerformanceChart({ data }: PerformanceChartProps) {
+  const [recharts, setRecharts] = useState<typeof import("recharts") | null>(null);
+
+  useEffect(() => {
+    import("recharts").then(setRecharts);
+  }, []);
+
   return (
     <Card className="rounded-xl shadow-sm shadow-none border-gray-100 dark:border-gray-800">
       <CardHeader className="p-4 pb-0">
@@ -30,39 +35,48 @@ export function PerformanceChart({ data }: PerformanceChartProps) {
       </CardHeader>
       <CardContent className="p-4">
         {data.length > 0 ? (
-          <ChartContainer
-            config={chartConfig}
-            className="h-[280px] w-full"
-          >
-            <BarChart
-              data={data}
-              layout="vertical"
-              margin={{ left: 10, right: 20, top: 5, bottom: 5 }}
+          !recharts ? (
+            <div className="h-[280px] w-full animate-pulse bg-muted rounded-lg" />
+          ) : (
+            <ChartContainer
+              config={chartConfig}
+              className="h-[280px] w-full"
             >
-              <CartesianGrid
-                strokeDasharray="3 3"
-                horizontal={false}
-              />
-              <XAxis
-                type="number"
-                domain={[0, 100]}
-                tickFormatter={(v) => `${v}%`}
-              />
-              <YAxis
-                type="category"
-                dataKey="subject"
-                width={80}
-                tick={{ fontSize: 12 }}
-              />
-              <ChartTooltip content={<ChartTooltipContent />} />
-              <Bar
-                dataKey="percentage"
-                fill="var(--color-percentage)"
-                radius={[0, 4, 4, 0]}
-                maxBarSize={24}
-              />
-            </BarChart>
-          </ChartContainer>
+              {(() => {
+                const { Bar, BarChart, XAxis, YAxis, CartesianGrid } = recharts;
+                return (
+                  <BarChart
+                    data={data}
+                    layout="vertical"
+                    margin={{ left: 10, right: 20, top: 5, bottom: 5 }}
+                  >
+                    <CartesianGrid
+                      strokeDasharray="3 3"
+                      horizontal={false}
+                    />
+                    <XAxis
+                      type="number"
+                      domain={[0, 100]}
+                      tickFormatter={(v) => `${v}%`}
+                    />
+                    <YAxis
+                      type="category"
+                      dataKey="subject"
+                      width={80}
+                      tick={{ fontSize: 12 }}
+                    />
+                    <ChartTooltip content={<ChartTooltipContent />} />
+                    <Bar
+                      dataKey="percentage"
+                      fill="var(--color-percentage)"
+                      radius={[0, 4, 4, 0]}
+                      maxBarSize={24}
+                    />
+                  </BarChart>
+                );
+              })()}
+            </ChartContainer>
+          )
         ) : (
           <div className="flex items-center justify-center h-[280px] text-muted-foreground text-sm">
             No grade data available

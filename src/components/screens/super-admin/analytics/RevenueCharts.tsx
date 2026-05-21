@@ -6,18 +6,7 @@ import {
   CardDescription,
 } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-import {
-  BarChart,
-  Bar,
-  PieChart,
-  Pie,
-  Cell,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
-} from "recharts";
+import { useState, useEffect } from "react";
 import {
   ChartContainer,
   ChartTooltip,
@@ -36,6 +25,12 @@ function ChartSkeleton() {
 }
 
 export function RevenueCharts({ loading, revenueBreakdown }: RevenueChartsProps) {
+  const [recharts, setRecharts] = useState<typeof import("recharts") | null>(null);
+
+  useEffect(() => {
+    import("recharts").then(setRecharts);
+  }, []);
+
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
       {/* Revenue Breakdown by Tenant */}
@@ -50,43 +45,48 @@ export function RevenueCharts({ loading, revenueBreakdown }: RevenueChartsProps)
           </CardDescription>
         </CardHeader>
         <CardContent>
-          {loading ? (
+          {loading || !recharts ? (
             <ChartSkeleton />
           ) : (
             <ChartContainer
               config={revenueConfig}
               className="h-[300px] w-full"
             >
-              <BarChart data={revenueBreakdown} layout="vertical" margin={{ left: 10, right: 30 }}>
-                <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="#e2e8f0" />
-                <XAxis
-                  type="number"
-                  tickLine={false}
-                  axisLine={false}
-                  fontSize={12}
-                  tickFormatter={(v) => `₹${(v / 1000).toFixed(0)}k`}
-                />
-                <YAxis
-                  type="category"
-                  dataKey="name"
-                  tickLine={false}
-                  axisLine={false}
-                  fontSize={11}
-                  width={120}
-                  tickFormatter={(v: string) =>
-                    v.length > 18 ? v.slice(0, 18) + "..." : v
-                  }
-                />
-                <ChartTooltip content={<ChartTooltipContent />} />
-                <Bar dataKey="revenue" radius={[0, 4, 4, 0]} maxBarSize={24}>
-                  {revenueBreakdown.map((_, index) => (
-                    <Cell
-                      key={`cell-${index}`}
-                      fill={PIE_COLORS[index % PIE_COLORS.length]}
+              {(() => {
+                const { BarChart, Bar, Cell, XAxis, YAxis, CartesianGrid } = recharts;
+                return (
+                  <BarChart data={revenueBreakdown} layout="vertical" margin={{ left: 10, right: 30 }}>
+                    <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="#e2e8f0" />
+                    <XAxis
+                      type="number"
+                      tickLine={false}
+                      axisLine={false}
+                      fontSize={12}
+                      tickFormatter={(v) => `₹${(v / 1000).toFixed(0)}k`}
                     />
-                  ))}
-                </Bar>
-              </BarChart>
+                    <YAxis
+                      type="category"
+                      dataKey="name"
+                      tickLine={false}
+                      axisLine={false}
+                      fontSize={11}
+                      width={120}
+                      tickFormatter={(v: string) =>
+                        v.length > 18 ? v.slice(0, 18) + "..." : v
+                      }
+                    />
+                    <ChartTooltip content={<ChartTooltipContent />} />
+                    <Bar dataKey="revenue" radius={[0, 4, 4, 0]} maxBarSize={24}>
+                      {revenueBreakdown.map((_, index) => (
+                        <Cell
+                          key={`cell-${index}`}
+                          fill={PIE_COLORS[index % PIE_COLORS.length]}
+                        />
+                      ))}
+                    </Bar>
+                  </BarChart>
+                );
+              })()}
             </ChartContainer>
           )}
         </CardContent>
@@ -125,35 +125,44 @@ export function RevenueCharts({ loading, revenueBreakdown }: RevenueChartsProps)
 
             <div className="mt-6 pt-4 border-t flex items-center justify-center">
               <div className="h-[180px] w-full">
-                <ResponsiveContainer width="100%" height="100%">
-                  <PieChart>
-                    <Pie
-                      data={geographicData}
-                      cx="50%"
-                      cy="50%"
-                      innerRadius={45}
-                      outerRadius={75}
-                      paddingAngle={5}
-                      dataKey="percentage"
-                      nameKey="country"
-                      stroke="none"
-                    >
-                      {geographicData.map((_, index) => (
-                        <Cell
-                          key={`geo-${index}`}
-                          fill={PIE_COLORS[index % PIE_COLORS.length]}
-                        />
-                      ))}
-                    </Pie>
-                    <Tooltip
-                      formatter={(value: number, name: string) => [
-                        `${value}%`,
-                        name,
-                      ]}
-                      contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}
-                    />
-                  </PieChart>
-                </ResponsiveContainer>
+                {!recharts ? (
+                  <Skeleton className="h-[180px] w-full rounded-xl" />
+                ) : (
+                  (() => {
+                    const { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } = recharts;
+                    return (
+                      <ResponsiveContainer width="100%" height="100%">
+                        <PieChart>
+                          <Pie
+                            data={geographicData}
+                            cx="50%"
+                            cy="50%"
+                            innerRadius={45}
+                            outerRadius={75}
+                            paddingAngle={5}
+                            dataKey="percentage"
+                            nameKey="country"
+                            stroke="none"
+                          >
+                            {geographicData.map((_, index) => (
+                              <Cell
+                                key={`geo-${index}`}
+                                fill={PIE_COLORS[index % PIE_COLORS.length]}
+                              />
+                            ))}
+                          </Pie>
+                          <Tooltip
+                            formatter={(value: number, name: string) => [
+                              `${value}%`,
+                              name,
+                            ]}
+                            contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}
+                          />
+                        </PieChart>
+                      </ResponsiveContainer>
+                    );
+                  })()
+                )}
               </div>
             </div>
           </div>
