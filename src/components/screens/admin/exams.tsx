@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo, useEffect, useRef } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { 
@@ -13,7 +13,6 @@ import { api, apiFetch } from '@/lib/api';
 import { goeyToast as toast } from 'goey-toast';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { useReactToPrint } from 'react-to-print';
 
 import dynamic from 'next/dynamic';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -26,7 +25,6 @@ import {
   ExamRecord, ExamFormData, StudentResultRow, 
   ClassOption, SubjectOption, StudentOption 
 } from './exams/types';
-import { TabularLedgerPrint, LedgerData } from './exams/tabulationLedgerPrinter';
 import { ActiveExamsView } from './exams/ActiveExamsView';
 import { PublishedResultsView } from './exams/PublishedResultsView';
 import { TabulationLedgerPreviewPage } from './exams/TabulationLedgerPreviewPage';
@@ -132,27 +130,7 @@ export function AdminExams({ initialTab = 'exams' }: { initialTab?: string }) {
   const [bulkOverrides, setBulkOverrides] = useState<Record<string, Partial<ExamFormData>>>({});
   const [resultsClassId, setResultsClassId] = useState<string>('');
   
-  const [printingLedgerClassId, setPrintingLedgerClassId] = useState<string | null>(null);
-  const [ledgerData, setLedgerData] = useState<LedgerData | null>(null);
-  const [ledgerOrientation, setLedgerOrientation] = useState<'landscape' | 'portrait'>('landscape');
-  const [ledgerTemplateId, setLedgerTemplateId] = useState<string>('classic');
-  const printRef = useRef<HTMLDivElement>(null);
-
-  const handlePrint = useReactToPrint({
-    contentRef: printRef,
-    documentTitle: ledgerData ? `Tabulation_Ledger_${ledgerData.className}_${ledgerData.classSection}` : 'Tabulation_Ledger',
-    onAfterPrint: () => {
-      setPrintingLedgerClassId(null);
-      setLedgerData(null);
-      setLedgerTemplateId('classic');
-    },
-  });
-
-  useEffect(() => {
-    if (ledgerData && printRef.current) {
-      handlePrint();
-    }
-  }, [ledgerData, handlePrint]);
+  const [printingLedgerClassId] = useState<string | null>(null);
 
   const [previewingLedgerClass, setPreviewingLedgerClass] = useState<{
     id: string;
@@ -590,13 +568,6 @@ export function AdminExams({ initialTab = 'exams' }: { initialTab?: string }) {
         formatDate={formatDate}
         formatTime={formatTime}
       />
-
-      {/* Hidden batch print container for react-to-print */}
-      {ledgerData && (
-        <div className="hidden">
-          <TabularLedgerPrint data={ledgerData} templateId={ledgerTemplateId} ref={printRef} />
-        </div>
-      )}
 
     </div>
   );
