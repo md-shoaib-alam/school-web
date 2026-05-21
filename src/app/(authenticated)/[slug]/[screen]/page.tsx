@@ -96,19 +96,22 @@ export default function TenantScreenDispatcher() {
     });
   }, []);
 
-  // Debug log on every change if mounted
+  // [FIX] Auto-redirection if slug mismatch
   useEffect(() => {
-    if (mounted && currentUser && !isTenantMatch && currentUser.role !== 'super_admin') {
-      // Slug mismatch - could be handled by redirect if needed
+    if (mounted && currentUser && currentUser.role !== 'super_admin' && !isTenantMatch) {
+      const correctSlug = currentUser.tenantSlug || currentUser.tenantId;
+      if (correctSlug) {
+        window.location.href = `/${correctSlug}/${screen}`;
+      }
     }
-  }, [mounted, isTenantMatch, urlSlug, userTenantId, userTenantSlug, currentUser?.role]);
+  }, [mounted, isTenantMatch, screen, currentUser?.role, currentUser?.tenantSlug, currentUser?.tenantId]);
 
   if (!mounted || !currentUser) {
     return <LoadingScreen />;
   }
 
   if (currentUser.role !== 'super_admin' && !isTenantMatch) {
-    return <NotFoundScreen />;
+    return <LoadingScreen />; // Show loading while useEffect redirect kicks in
   }
   
   if (currentUser.role === 'super_admin' || currentUser.role === 'admin' || currentUser.role === 'staff') {
