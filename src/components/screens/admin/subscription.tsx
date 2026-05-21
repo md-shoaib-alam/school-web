@@ -46,11 +46,30 @@ export function SchoolSubscriptionScreen() {
   const { slug } = useParams();
   const [isAutoPay, setIsAutoPay] = useState(true);
 
+  const tenant = detailData?.tenant;
+
+  const formattedStartDate = React.useMemo(() => {
+    if (!tenant?.startDate) return "";
+    try {
+      return format(new Date(tenant.startDate), "MMM d, yyyy");
+    } catch (e) {
+      return tenant.startDate || "";
+    }
+  }, [tenant?.startDate]);
+
+  const formattedEndDate = React.useMemo(() => {
+    if (!tenant?.endDate) return "Permanent";
+    try {
+      return format(new Date(tenant.endDate), "MMM d, yyyy");
+    } catch (e) {
+      return tenant.endDate;
+    }
+  }, [tenant?.endDate]);
+
   if (isLoading) {
     return <div className="p-8 text-center font-bold text-indigo-600 animate-pulse">Loading subscription details...</div>;
   }
 
-  const tenant = detailData?.tenant;
   if (!tenant) {
     return <div className="p-8 text-center text-muted-foreground">Could not load subscription information.</div>;
   }
@@ -100,24 +119,6 @@ export function SchoolSubscriptionScreen() {
         : "You will need to manually renew your plan before it expires."
     });
   };
-
-
-  const formattedStartDate = React.useMemo(() => {
-    try {
-      return format(new Date(tenant.startDate), "MMM d, yyyy");
-    } catch (e) {
-      return tenant.startDate || "";
-    }
-  }, [tenant.startDate]);
-
-  const formattedEndDate = React.useMemo(() => {
-    if (!tenant.endDate) return "Permanent";
-    try {
-      return format(new Date(tenant.endDate), "MMM d, yyyy");
-    } catch (e) {
-      return tenant.endDate;
-    }
-  }, [tenant.endDate]);
 
   return (
     <div className="space-y-6 pb-20">
