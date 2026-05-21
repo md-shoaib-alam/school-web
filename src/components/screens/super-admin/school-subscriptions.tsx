@@ -150,7 +150,7 @@ export function SuperAdminSchoolSubscriptions() {
               </div>
               <div>
                 <p className="text-sm font-medium text-muted-foreground">Total Schools</p>
-                <p className="text-2xl font-bold">{tenantsData?.total || 0}</p>
+                <p className="text-2xl font-bold">{tenantsData?.stats?.total ?? 0}</p>
               </div>
             </div>
           </CardContent>
@@ -164,7 +164,7 @@ export function SuperAdminSchoolSubscriptions() {
               <div>
                 <p className="text-sm font-medium text-muted-foreground">Active Licenses</p>
                 <p className="text-2xl font-bold">
-                  {tenantsData?.tenants?.filter((t: any) => t.status === 'active' || t.status === 'trial').length || 0}
+                  {(tenantsData?.stats?.active ?? 0) + (tenantsData?.stats?.trial ?? 0)}
                 </p>
               </div>
             </div>
@@ -179,11 +179,7 @@ export function SuperAdminSchoolSubscriptions() {
               <div>
                 <p className="text-sm font-medium text-muted-foreground">Expiring Soon</p>
                 <p className="text-2xl font-bold">
-                  {tenantsData?.tenants?.filter((t: any) => {
-                    if (!t.endDate) return false;
-                    const diff = new Date(t.endDate).getTime() - new Date().getTime();
-                    return diff > 0 && diff < 30 * 24 * 60 * 60 * 1000;
-                  }).length || 0}
+                  {tenantsData?.stats?.expiring ?? 0}
                 </p>
               </div>
             </div>
