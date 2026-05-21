@@ -156,6 +156,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
     const isPlatformRoute = [
       "dashboard",
       "tenants",
+      "deleted-tenants",
       "billing",
       "users",
       "audit-logs",

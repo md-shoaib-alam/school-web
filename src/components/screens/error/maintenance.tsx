@@ -4,7 +4,8 @@ import { Button } from "@/components/ui/button";
 import { useAppStore } from "@/store/use-app-store";
 import { Wrench, RefreshCw, LogOut, Building2 } from "lucide-react";
 
-export function MaintenanceScreen() {
+
+export function MaintenanceScreen({ message }: { message?: string }) {
   const { logout, currentTenantName } = useAppStore();
 
   const refreshPage = () => {
@@ -65,11 +66,15 @@ export function MaintenanceScreen() {
         )}
 
         {/* Description */}
-        <p className="text-gray-500 dark:text-gray-400 mt-4 text-base leading-relaxed animate-[fade-up_0.6s_ease-out_0.55s_forwards] opacity-0 max-w-md mx-auto">
-          Our platform is currently undergoing scheduled maintenance to bring
-          you improvements.
-          <br />
-          We&apos;ll be back shortly. Thank you for your patience!
+        <p className="text-gray-500 dark:text-gray-400 mt-4 text-base leading-relaxed animate-[fade-up_0.6s_ease-out_0.55s_forwards] opacity-0 max-w-md mx-auto whitespace-pre-line">
+          {message || (
+            <>
+              Our platform is currently undergoing scheduled maintenance to bring
+              you improvements.
+              <br />
+              We&apos;ll be back shortly. Thank you for your patience!
+            </>
+          )}
         </p>
 
         {/* Estimated time */}

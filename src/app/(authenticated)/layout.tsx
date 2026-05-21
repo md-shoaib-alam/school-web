@@ -3,8 +3,9 @@
 import { useAppStore } from '@/store/use-app-store';
 import { LoginScreen } from '@/components/screens/login';
 import { AppLayout } from '@/components/layout/app-layout';
-import { useSyncExternalStore } from 'react';
-
+import { useSyncExternalStore, useState, useEffect } from 'react';
+import { apiFetch } from '@/lib/api';
+import { MaintenanceScreen } from '@/components/screens/error/maintenance';
 import { FullPageSkeleton } from '@/components/ui/full-page-skeleton';
 
 // Prevents hydration mismatch
@@ -18,13 +19,54 @@ export default function AuthenticatedLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const { isLoggedIn } = useAppStore();
+  const { isLoggedIn, currentUser } = useAppStore();
   const hydrated = useHydrated();
+  const [maintenanceActive, setMaintenanceActive] = useState(false);
+  const [maintenanceMessage, setMaintenanceMessage] = useState("");
+  const [maintenanceLoading, setMaintenanceLoading] = useState(false);
+
+  // Check maintenance mode for non-super_admin users
+  useEffect(() => {
+    if (!isLoggedIn || !currentUser || currentUser.role === "super_admin")
+      return;
+    setMaintenanceLoading(true);
+    let cancelled = false;
+    
+    apiFetch("/api/platform-settings")
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (!cancelled && Array.isArray(data)) {
+          const modeSetting = data.find((s: any) => s.key === "maintenance_mode");
+          const msgSetting = data.find((s: any) => s.key === "maintenance_message");
+          setMaintenanceActive(modeSetting?.value === "true");
+          if (msgSetting?.value) {
+            setMaintenanceMessage(msgSetting.value);
+          }
+        }
+      })
+      .catch(() => {})
+      .finally(() => {
+        if (!cancelled) setMaintenanceLoading(false);
+      });
+      
+    return () => {
+      cancelled = true;
+    };
+  }, [isLoggedIn, currentUser]);
 
   if (!hydrated) return <FullPageSkeleton />;
 
   if (!isLoggedIn) {
     return <LoginScreen />;
+  }
+
+  const isSuperAdmin = currentUser?.role === "super_admin";
+  if (!isSuperAdmin && maintenanceLoading) {
+    return <FullPageSkeleton />;
+  }
+
+  if (!isSuperAdmin && maintenanceActive) {
+    return <MaintenanceScreen message={maintenanceMessage} />;
   }
 
   return <AppLayout>{children}</AppLayout>;
