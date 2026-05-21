@@ -173,13 +173,21 @@ export function NotificationBell() {
               {notifications.map((notification) => (
                 <div
                   key={notification.id}
+                  role="button"
+                  tabIndex={0}
                   className={cn(
-                    "group relative w-full flex items-start gap-4 px-5 py-4 text-left transition-all duration-200 cursor-pointer",
+                    "group relative w-full flex items-start gap-4 px-5 py-4 text-left transition-all duration-200 cursor-pointer focus:outline-none focus:ring-1 focus:ring-indigo-500",
                     !notification.read 
                       ? "bg-indigo-50/30 dark:bg-indigo-900/5" 
                       : "hover:bg-gray-50 dark:hover:bg-gray-800/30",
                   )}
                   onClick={() => markRead(notification.id)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault();
+                      markRead(notification.id);
+                    }
+                  }}
                 >
                   <div className={cn(
                     "mt-0.5 shrink-0 h-10 w-10 rounded-2xl flex items-center justify-center transition-colors",

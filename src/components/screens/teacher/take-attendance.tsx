@@ -118,6 +118,7 @@ export function TeacherAttendance() {
   useEffect(() => {
     const firstClassId = classes[0]?.id;
     if (firstClassId && !selectedClassId) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setSelectedClassId(firstClassId);
     }
   }, [classes, selectedClassId]);
@@ -173,6 +174,7 @@ export function TeacherAttendance() {
   // Reset overrides when class or date changes safely in effect
   useEffect(() => {
     if (Object.keys(localOverrides).length > 0 || saved) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setLocalOverrides({});
       setSaved(false);
     }

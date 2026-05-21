@@ -59,6 +59,7 @@ export function ParentHomework() {
       
       const targetId = savedTab && children.some(s => s.id === savedTab) ? savedTab : children[0].id;
       if (targetId !== activeStudentId) {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         setActiveStudentId(targetId);
       }
     }

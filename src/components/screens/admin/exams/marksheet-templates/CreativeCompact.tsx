@@ -1,5 +1,6 @@
 import React from 'react';
 import { MarksheetTemplateProps } from './types';
+import { ClientDate } from './ClientDate';
 
 export const CreativeCompact: React.FC<MarksheetTemplateProps> = ({
   sheet,
@@ -27,7 +28,7 @@ export const CreativeCompact: React.FC<MarksheetTemplateProps> = ({
               🚀
             </div>
             <div>
-              <h3 className="font-black text-lg text-indigo-955 tracking-tight leading-none uppercase">
+              <h3 className="font-semibold text-lg text-indigo-955 tracking-tight leading-none uppercase">
                 {sheet.schoolName}
               </h3>
               <p className="text-[9px] text-purple-600 font-bold uppercase tracking-wider mt-1">
@@ -70,7 +71,7 @@ export const CreativeCompact: React.FC<MarksheetTemplateProps> = ({
             <div className="w-8 h-8 bg-cyan-100 text-cyan-700 rounded-lg flex items-center justify-center font-bold text-sm shrink-0">📅</div>
             <div className="min-w-0">
               <span className="text-zinc-400 font-bold uppercase text-[7.5px] tracking-wider block">Issue Date</span>
-              <span className="font-extrabold text-slate-800 block">{new Date().toLocaleDateString()}</span>
+              <span className="font-extrabold text-slate-800 block"><ClientDate /></span>
             </div>
           </div>
         </div>
@@ -167,7 +168,7 @@ export const CreativeCompact: React.FC<MarksheetTemplateProps> = ({
 
       {/* Signature Area */}
       <div className="flex justify-between items-end text-[9px] font-semibold text-zinc-400 border-t border-zinc-150 pt-4 mt-2 font-sans z-10">
-        <div>Registry Convocation Record — {new Date().toLocaleDateString()}</div>
+        <div>Registry Convocation Record — <ClientDate /></div>
         <div className="flex gap-8">
           <div className="flex flex-col items-center">
             <div className="w-[90px] border-b border-zinc-200 mb-1" />

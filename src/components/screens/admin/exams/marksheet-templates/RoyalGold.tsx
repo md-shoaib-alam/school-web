@@ -1,5 +1,6 @@
 import React from 'react';
 import { MarksheetTemplateProps } from './types';
+import { ClientDate } from './ClientDate';
 
 export const RoyalGold: React.FC<MarksheetTemplateProps> = ({
   sheet,
@@ -30,7 +31,7 @@ export const RoyalGold: React.FC<MarksheetTemplateProps> = ({
             </div>
           </div>
 
-          <h3 className="font-bold text-2xl text-[#8c6b23] tracking-widest leading-none font-serif uppercase">
+          <h3 className="font-semibold text-2xl text-[#8c6b23] tracking-widest leading-none font-serif uppercase">
             {sheet.schoolName.toUpperCase()}
           </h3>
           <p className="text-[8.5px] text-amber-800 font-bold uppercase tracking-[3px] mt-1.5 font-serif">
@@ -154,7 +155,7 @@ export const RoyalGold: React.FC<MarksheetTemplateProps> = ({
 
       {/* Signature Area */}
       <div className="flex justify-between items-end text-[9.5px] font-bold text-amber-900/60 border-t border-dashed border-[#ebdcb3] pt-4 mt-2 font-serif z-10">
-        <div>Registry Convocation Record — {new Date().toLocaleDateString()}</div>
+        <div>Registry Convocation Record — <ClientDate /></div>
         <div className="flex gap-10">
           <div className="flex flex-col items-center">
             <div className="w-[100px] border-b border-[#b38f36] mb-1" />

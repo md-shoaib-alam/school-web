@@ -19,10 +19,10 @@ interface ChildPerformance {
 }
 
 interface ChildrenOverviewProps {
-  children: ChildPerformance[];
+  childrenList: ChildPerformance[];
 }
 
-export function ChildrenOverview({ children }: ChildrenOverviewProps) {
+export function ChildrenOverview({ childrenList }: ChildrenOverviewProps) {
   return (
     <div className="space-y-4">
       <div className="flex items-center gap-2">
@@ -32,7 +32,7 @@ export function ChildrenOverview({ children }: ChildrenOverviewProps) {
         </h3>
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        {children.map((student) => (
+        {childrenList.map((student) => (
           <Card key={student.id} className="rounded-xl shadow-sm hover:shadow-md transition-shadow shadow-none">
             <CardContent className="p-5 text-left">
               <div className="flex items-start justify-between mb-4">

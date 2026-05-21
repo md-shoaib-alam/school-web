@@ -74,7 +74,7 @@ export function ExamTable({
       {!hideSearchAndFilter && (
         <div className="p-3 sm:p-4 border-b border-gray-100 dark:border-zinc-800 bg-card flex items-center justify-between gap-3">
           <div className="relative flex-1">
-            <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
+            <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 size-3.5 text-muted-foreground" />
             <Input
               placeholder="Search..."
               className="pl-8 h-8 sm:h-9 text-sm"
@@ -87,10 +87,10 @@ export function ExamTable({
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button variant="outline" size="sm" className="h-8 sm:h-9 gap-1.5 px-2 sm:px-3">
-                    <Filter className="h-3.5 w-3.5" />
+                    <Filter className="size-3.5" />
                     <span className="hidden xs:inline">Filters</span>
                     {(classFilter !== 'all' || statusFilter !== 'all') && (
-                      <div className="h-1.5 w-1.5 rounded-full bg-blue-600" />
+                      <div className="size-1.5 rounded-full bg-blue-600" />
                     )}
                   </Button>
                 </DropdownMenuTrigger>
@@ -131,10 +131,10 @@ export function ExamTable({
             </TableHeader>
             <TableBody>
               {loading ? (
-                [...Array(5)].map((_, i) => (
-                  <TableRow key={i} className="hover:bg-transparent">
-                    {[...Array(7)].map((_, j) => (
-                      <TableCell key={j}><div className="h-4 w-full bg-muted animate-pulse rounded" /></TableCell>
+                ['row-1', 'row-2', 'row-3', 'row-4', 'row-5'].map((rowId) => (
+                  <TableRow key={rowId} className="hover:bg-transparent">
+                    {['col-1', 'col-2', 'col-3', 'col-4', 'col-5', 'col-6', 'col-7'].map((colId) => (
+                      <TableCell key={colId}><div className="h-4 w-full bg-muted animate-pulse rounded" /></TableCell>
                     ))}
                   </TableRow>
                 ))
@@ -142,7 +142,7 @@ export function ExamTable({
                 <TableRow className="hover:bg-transparent">
                   <TableCell colSpan={7} className="h-64 text-center">
                     <div className="flex flex-col items-center justify-center text-muted-foreground">
-                      <ClipboardList className="h-12 w-12 mb-2 opacity-20" />
+                      <ClipboardList className="size-12 mb-2 opacity-20" />
                       <p>No exams found matching your filters</p>
                     </div>
                   </TableCell>
@@ -175,7 +175,7 @@ export function ExamTable({
                     </TableCell>
                     <TableCell className="hidden lg:table-cell text-sm">
                       <div className="flex items-center gap-1.5">
-                        <Calendar className="h-3.5 w-3.5 text-muted-foreground" />
+                        <Calendar className="size-3.5 text-muted-foreground" />
                         {formatDate(exam.date)}
                       </div>
                     </TableCell>
@@ -189,29 +189,29 @@ export function ExamTable({
                           <Button
                             variant="ghost"
                             size="icon"
-                            className="h-8 w-8 text-blue-500 hover:text-blue-700 hover:bg-blue-50"
+                            className="size-8 text-blue-500 hover:text-blue-700 hover:bg-blue-50"
                             onClick={() => onViewResults(exam)}
                             title="View Results"
                           >
-                            <Eye className="h-4 w-4" />
+                            <Eye className="size-4" />
                           </Button>
                         )}
                         <Button
                           variant="ghost"
                           size="icon"
-                          className="h-8 w-8 text-amber-500 hover:text-amber-700 hover:bg-amber-50"
+                          className="size-8 text-amber-500 hover:text-amber-700 hover:bg-amber-50"
                           onClick={() => onOpenEdit(exam)}
                         >
-                          <Pencil className="h-4 w-4" />
+                          <Pencil className="size-4" />
                         </Button>
                         <AlertDialog>
                           <AlertDialogTrigger asChild>
                             <Button
                               variant="ghost"
                               size="icon"
-                              className="h-8 w-8 text-red-400 hover:text-red-600 hover:bg-red-50"
+                              className="size-8 text-red-400 hover:text-red-600 hover:bg-red-50"
                             >
-                              <Trash2 className="h-4 w-4" />
+                              <Trash2 className="size-4" />
                             </Button>
                           </AlertDialogTrigger>
                           <AlertDialogContent>

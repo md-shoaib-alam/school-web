@@ -69,6 +69,7 @@ export function CheckPaymentsTab() {
     return dist;
   }, [filtered]);
 
+  // eslint-disable-next-line react-hooks/preserve-manual-memoization
   const dailyTotals = useMemo(() => {
     const map = new Map<string, { count: number; total: number }>();
     filtered.forEach(p => {

@@ -1,5 +1,6 @@
 import React from 'react';
 import { MarksheetTemplateProps } from './types';
+import { ClientDate } from './ClientDate';
 
 export const ModernMinimalist: React.FC<MarksheetTemplateProps> = ({
   sheet,
@@ -22,7 +23,7 @@ export const ModernMinimalist: React.FC<MarksheetTemplateProps> = ({
         {/* Modern Header */}
         <div className="flex justify-between items-start border-b border-zinc-150 pb-4">
           <div className="space-y-1">
-            <h3 className="font-extrabold text-2xl text-slate-900 tracking-tight leading-none font-sans">
+            <h3 className="font-semibold text-2xl text-slate-900 tracking-tight leading-none font-sans">
               {sheet.schoolName.toUpperCase()}
             </h3>
             <p className="text-[10px] text-emerald-600 font-bold uppercase tracking-wider font-sans">
@@ -67,7 +68,7 @@ export const ModernMinimalist: React.FC<MarksheetTemplateProps> = ({
           </div>
           <div className="bg-zinc-50/50 border border-zinc-100 p-2.5 rounded-lg">
             <span className="text-zinc-400 font-bold uppercase text-[8px] tracking-wider block mb-1">Generated On</span>
-            <span className="font-bold text-zinc-900 block">{new Date().toLocaleDateString()}</span>
+            <span className="font-bold text-zinc-900 block"><ClientDate /></span>
           </div>
         </div>
 

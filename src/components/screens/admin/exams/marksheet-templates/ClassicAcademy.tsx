@@ -1,5 +1,6 @@
 import React from 'react';
 import { MarksheetTemplateProps } from './types';
+import { ClientDate } from './ClientDate';
 
 export const ClassicAcademy: React.FC<MarksheetTemplateProps> = ({
   sheet,
@@ -35,7 +36,7 @@ export const ClassicAcademy: React.FC<MarksheetTemplateProps> = ({
             </div>
           </div>
 
-          <h3 className="font-extrabold text-xl text-[#1e3a8a] tracking-wider leading-none uppercase font-serif">
+          <h3 className="font-semibold text-xl text-[#1e3a8a] tracking-wider leading-none uppercase font-serif">
             {sheet.schoolName.toUpperCase()}
           </h3>
           <p className="text-[9px] text-zinc-500 font-bold uppercase tracking-widest mt-1.5 font-sans">
@@ -169,7 +170,7 @@ export const ClassicAcademy: React.FC<MarksheetTemplateProps> = ({
 
       {/* Signature Area */}
       <div className="flex justify-between items-end text-[9.5px] font-semibold text-zinc-400 border-t border-dashed border-gray-200 pt-4 mt-2 font-sans z-10">
-        <div>Date of Issue: {new Date().toLocaleDateString()}</div>
+        <div>Date of Issue: <ClientDate /></div>
         <div className="flex gap-10">
           <div className="flex flex-col items-center">
             <div className="w-[100px] border-b border-zinc-300 mb-1" />

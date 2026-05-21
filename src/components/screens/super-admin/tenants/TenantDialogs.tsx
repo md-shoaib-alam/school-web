@@ -100,17 +100,19 @@ const StatusBadge = memo(({ status }: { status: string }) => {
 
 const InfoItem = memo(
   ({
-    icon,
+    icon: Icon,
     label,
     value,
   }: {
-    icon: React.ReactNode;
+    icon: React.ComponentType<{ className?: string }>;
     label: string;
     value: string | null | undefined;
   }) => {
     return (
       <div className="flex items-start gap-2 p-2 rounded-lg bg-muted/30 hover:bg-muted/50 transition-colors">
-        <div className="text-muted-foreground mt-0.5">{icon}</div>
+        <div className="text-muted-foreground mt-0.5">
+          <Icon className="h-4 w-4" />
+        </div>
         <div className="min-w-0">
           <p className="text-[10px] text-muted-foreground uppercase tracking-tight">
             {label}
@@ -124,14 +126,14 @@ const InfoItem = memo(
 
 const UsageStat = memo(
   ({
-    icon,
+    icon: Icon,
     label,
     current,
     max,
     color,
     isCurrency = false,
   }: {
-    icon: React.ReactNode;
+    icon: React.ComponentType<{ className?: string }>;
     label: string;
     current: number;
     max: number | null;
@@ -145,7 +147,7 @@ const UsageStat = memo(
       <div className={`p-3 rounded-lg ${bgClass}/30 space-y-1.5`}>
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
-            {icon}
+            <Icon className="h-4 w-4" />
             {label}
           </div>
           {pct !== null && (
@@ -612,22 +614,22 @@ export function TenantDialogs({
                   </h4>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <InfoItem
-                      icon={<Mail className="h-4 w-4" />}
+                      icon={Mail}
                       label="Email"
                       value={viewingTenant.email}
                     />
                     <InfoItem
-                      icon={<Phone className="h-4 w-4" />}
+                      icon={Phone}
                       label="Phone"
                       value={viewingTenant.phone}
                     />
                     <InfoItem
-                      icon={<Globe className="h-4 w-4" />}
+                      icon={Globe}
                       label="Website"
                       value={viewingTenant.website}
                     />
                     <InfoItem
-                      icon={<MapPin className="h-4 w-4" />}
+                      icon={MapPin}
                       label="Address"
                       value={viewingTenant.address}
                     />
@@ -642,42 +644,42 @@ export function TenantDialogs({
                   </h4>
                   <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
                     <UsageStat
-                      icon={<GraduationCap className="h-4 w-4" />}
+                      icon={GraduationCap}
                       label="Students"
                       current={viewingTenant.studentCount}
                       max={viewingTenant.maxStudents}
                       color="bg-teal-100"
                     />
                     <UsageStat
-                      icon={<Users className="h-4 w-4" />}
+                      icon={Users}
                       label="Teachers"
                       current={viewingTenant.teacherCount}
                       max={viewingTenant.maxTeachers}
                       color="bg-blue-100"
                     />
                     <UsageStat
-                      icon={<UserCheck className="h-4 w-4" />}
+                      icon={UserCheck}
                       label="Parents"
                       current={viewingTenant.parentCount}
                       max={viewingTenant.maxParents}
                       color="bg-emerald-100"
                     />
                     <UsageStat
-                      icon={<Building2 className="h-4 w-4" />}
+                      icon={Building2}
                       label="Classes"
                       current={viewingTenant._count.classes}
                       max={viewingTenant.maxClasses}
                       color="bg-amber-100"
                     />
                     <UsageStat
-                      icon={<CreditCard className="h-4 w-4" />}
+                      icon={CreditCard}
                       label="Subscriptions"
                       current={viewingTenant.activeSubscriptions}
                       max={null}
                       color="bg-purple-100"
                     />
                     <UsageStat
-                      icon={<Crown className="h-4 w-4" />}
+                      icon={Crown}
                       label="Revenue"
                       current={viewingTenant.totalRevenue}
                       max={null}
@@ -695,17 +697,17 @@ export function TenantDialogs({
                   </h4>
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                     <InfoItem
-                      icon={<Calendar className="h-4 w-4" />}
+                      icon={Calendar}
                       label="Created"
                       value={formatDateSafe(viewingTenant.createdAt)}
                     />
                     <InfoItem
-                      icon={<Calendar className="h-4 w-4" />}
+                      icon={Calendar}
                       label="Start"
                       value={formatDateSafe(viewingTenant.startDate)}
                     />
                     <InfoItem
-                      icon={<Calendar className="h-4 w-4" />}
+                      icon={Calendar}
                       label="End"
                       value={formatDateSafe(viewingTenant.endDate)}
                     />
