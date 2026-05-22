@@ -39,7 +39,7 @@ export function UpcomingEventsCard({
         {loading ? (
           <div className="space-y-3">
             {[1, 2].map((i) => (
-              <div key={i} className="h-14 w-full bg-zinc-50/60 dark:bg-white/[0.02] rounded-xl animate-pulse" />
+              <div key={`upcoming-skel-${i}`} className="h-14 w-full bg-zinc-50/60 dark:bg-white/[0.02] rounded-xl animate-pulse" />
             ))}
           </div>
         ) : upcomingEventsList.length === 0 ? (

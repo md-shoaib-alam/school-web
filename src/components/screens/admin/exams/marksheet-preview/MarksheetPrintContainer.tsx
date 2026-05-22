@@ -45,8 +45,8 @@ export function MarksheetPrintContainer({
             }
           `}
         </style>
-        {previewStudents.map((sheet, index) => (
-          <div key={index} className="marksheet-page-break">
+        {previewStudents.map((sheet) => (
+          <div key={sheet.id} className="marksheet-page-break">
             <SelectedTemplate 
               sheet={sheet}
               classNameStr={classNameStr}

@@ -39,7 +39,7 @@ export function RecentNotices({ isLoading, data }: RecentNoticesProps) {
       <CardContent>
         {isLoading ? (
           <div className="space-y-3">
-            {[...Array(4)].map((_, i) => <Skeleton key={i} className="h-16 w-full rounded-lg" />)}
+            {[...Array(4)].map((_, i) => <Skeleton key={`notice-skel-${i}`} className="h-16 w-full rounded-lg" />)}
           </div>
         ) : (
           <div className="space-y-3 max-h-[320px] overflow-y-auto pr-1">

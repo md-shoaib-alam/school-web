@@ -71,7 +71,7 @@ export const CBSEStandard: React.FC<MarksheetTemplateProps> = ({
           </div>
           <div className="col-span-6 flex">
             <span className="text-zinc-500 font-bold uppercase text-[8.5px] w-32 shrink-0">Class / Section:</span>
-            <span className="font-bold text-zinc-900">{classNameStr} — {classSection}</span>
+            <span className="font-bold text-zinc-900">{classNameStr}, {classSection}</span>
           </div>
           <div className="col-span-6 flex">
             <span className="text-zinc-500 font-bold uppercase text-[8.5px] w-32 shrink-0">Roll Number:</span>

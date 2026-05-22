@@ -85,7 +85,7 @@ export function MarksheetControls({
               <SelectItem value="all" className="text-xs font-semibold text-emerald-600 dark:text-emerald-400">All Students</SelectItem>
               {students.map((s: any) => (
                 <SelectItem key={s.id} value={s.id} className="text-xs font-medium">
-                  Roll {s.rollNumber || '-'} — {s.name}
+                  Roll {s.rollNumber || '-'}: {s.name}
                 </SelectItem>
               ))}
             </SelectContent>

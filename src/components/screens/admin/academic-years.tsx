@@ -279,7 +279,7 @@ export function AcademicYearsScreen() {
                 <TableCell colSpan={6} className="text-center py-10">
                   <div className="flex flex-col items-center gap-2">
                     <div className="size-8 animate-spin rounded-full border-4 border-violet-500 border-t-transparent" />
-                    <span className="text-sm text-muted-foreground">Loading sessions...</span>
+                    <span className="text-sm text-muted-foreground">Loading sessions…</span>
                   </div>
                 </TableCell>
               </TableRow>
