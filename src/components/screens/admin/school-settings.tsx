@@ -409,26 +409,29 @@ export function AdminSchoolSettings() {
       {/* Marksheet Template Preview Dialog */}
       <Dialog open={previewOpen} onOpenChange={setPreviewOpen}>
         <DialogContent className="max-w-5xl h-[92vh] flex flex-col p-0 overflow-hidden bg-zinc-950/5 dark:bg-zinc-900/5 border-zinc-200 dark:border-zinc-800">
-          <DialogHeader className="p-6 bg-white dark:bg-zinc-950 border-b border-zinc-150 dark:border-zinc-800 shrink-0">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-              <div>
-                <DialogTitle className="text-xl font-bold text-zinc-900 dark:text-zinc-50 flex items-center gap-2">
-                  <span className="text-violet-500">📄</span> Marksheet Template Preview
+          <DialogHeader className="px-5 py-3 bg-white dark:bg-zinc-950 border-b border-zinc-150 dark:border-zinc-800 shrink-0">
+            <div className="flex flex-row items-center justify-between gap-4 pr-6">
+              <div className="flex items-center gap-2">
+                <span className="text-base shrink-0">📄</span>
+                <DialogTitle className="text-sm font-bold text-zinc-900 dark:text-zinc-50 flex items-center gap-1.5 truncate">
+                  Marksheet Preview
+                  <span className="text-zinc-300 dark:text-zinc-700 font-normal">|</span>
+                  <span className="text-violet-600 dark:text-violet-400 font-semibold truncate">{selectedTemplate.name}</span>
                 </DialogTitle>
-                <DialogDescription className="text-zinc-500 dark:text-zinc-400 text-xs mt-1">
-                  Viewing a high-fidelity rendering of the <strong className="text-violet-600 dark:text-violet-400 font-semibold">“{selectedTemplate.name}”</strong> style layout with mock academic details.
+                <DialogDescription className="sr-only">
+                  High-fidelity rendering of the selected marksheet layout template.
                 </DialogDescription>
               </div>
               
               {/* Zoom Controls */}
-              <div className="flex items-center gap-2 bg-zinc-100 dark:bg-zinc-900 p-1 rounded-lg border border-zinc-200 dark:border-zinc-800 self-start sm:self-center shrink-0">
-                <span className="text-[10px] font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 px-2">Zoom:</span>
+              <div className="flex items-center gap-1.5 bg-zinc-100 dark:bg-zinc-900 p-1 rounded-lg border border-zinc-200 dark:border-zinc-800 shrink-0">
+                <span className="text-[9px] font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 px-1">Zoom:</span>
                 {[0.5, 0.6, 0.75, 1.0].map((zoom) => (
                   <button
                     key={zoom}
                     type="button"
                     onClick={() => setPreviewZoom(zoom)}
-                    className={`px-2.5 py-1 rounded text-xs font-semibold transition-all ${
+                    className={`px-2 py-0.5 rounded text-[10px] font-semibold transition-all ${
                       previewZoom === zoom
                         ? "bg-white dark:bg-zinc-800 text-violet-600 dark:text-violet-400 shadow-xs border border-zinc-200/50 dark:border-zinc-700/50"
                         : "text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100"
