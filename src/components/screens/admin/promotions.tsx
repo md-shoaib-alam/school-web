@@ -33,11 +33,9 @@ import { getCurrentAcademicYear, getNextClass } from "./promotions/utils";
 import { PromotionsTable } from "./promotions/PromotionsTable";
 import { BulkPromoteTab } from "./promotions/BulkPromoteTab";
 import { GraduatedTab } from "./promotions/GraduatedTab";
-import {
-  NewPromotionDialog,
-  BulkPromotionDialog,
-  RejectPromotionDialog,
-} from "./promotions/PromotionDialogs";
+import { NewPromotionDialog } from "./promotions/PromotionDialogs";
+import { BulkPromotionDialog } from "./promotions/BulkPromotionDialog";
+import { RejectPromotionDialog } from "./promotions/RejectPromotionDialog";
 
 export function AdminPromotions({ initialTab: propTab }: { initialTab?: "individual" | "bulk" | "graduated" }) {
   const [activeTab, setActiveTab] = useState<
@@ -71,7 +69,7 @@ export function AdminPromotions({ initialTab: propTab }: { initialTab?: "individ
   const [bulkFromClass, setBulkFromClass] = useState("");
   const [bulkToClass, setBulkToClass] = useState("");
   const [bulkAcademicYear, setBulkAcademicYear] = useState(
-    getCurrentAcademicYear(),
+    () => getCurrentAcademicYear(),
   );
   const [bulkRemarks, setBulkRemarks] = useState("");
   const [bulkSubmitting, setBulkSubmitting] = useState(false);
@@ -79,7 +77,7 @@ export function AdminPromotions({ initialTab: propTab }: { initialTab?: "individ
   // Graduation dialog
   const [gradClassId, setGradClassId] = useState("");
   const [gradAcademicYear, setGradAcademicYear] = useState(
-    getCurrentAcademicYear(),
+    () => getCurrentAcademicYear(),
   );
   const [gradRemarks, setGradRemarks] = useState("");
   const [gradSelectedIds, setGradSelectedIds] = useState<Set<string>>(

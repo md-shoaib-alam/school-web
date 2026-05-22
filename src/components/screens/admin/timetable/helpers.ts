@@ -1,6 +1,6 @@
 import { SUBJECT_COLORS, SUBJECT_DOT_COLORS } from "./constants";
 
-export function getSubjectColorIndex(
+function getSubjectColorIndex(
   uniqueSubjects: string[],
   subject: string,
 ): number {

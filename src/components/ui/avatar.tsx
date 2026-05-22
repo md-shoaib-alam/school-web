@@ -21,6 +21,7 @@ function Avatar({
   )
 }
 
+// react-doctor-disable-next-line react-doctor/no-multi-comp
 function AvatarImage({
   className,
   ...props
@@ -34,6 +35,7 @@ function AvatarImage({
   )
 }
 
+// react-doctor-disable-next-line react-doctor/no-multi-comp
 function AvatarFallback({
   className,
   ...props

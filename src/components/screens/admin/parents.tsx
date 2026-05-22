@@ -19,11 +19,9 @@ import { ParentsHeader } from "./parents/ParentsHeader";
 import { ParentsTableView } from "./parents/ParentsTableView";
 import { ParentsGridView } from "./parents/ParentsGridView";
 import { ParentsEmptyState } from "./parents/ParentsEmptyState";
-import {
-  CreateParentDialog,
-  EditParentDialog,
-  LinkChildDialog,
-} from "./parents/ParentDialog";
+import { EditParentDialog } from "./parents/ParentDialog";
+import { CreateParentDialog } from "./parents/CreateParentDialog";
+import { LinkChildDialog } from "./parents/LinkChildDialog";
 import { ParentSkeleton } from "./parents/ParentSkeleton";
 import { ParentInfo, StudentInfo } from "./parents/types";
 

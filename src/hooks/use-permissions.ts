@@ -15,10 +15,10 @@ import { useAppStore } from '@/store/use-app-store';
  *   const canEdit = usePermission('timetable', 'edit');
  *   const canCreate = usePermission('students', 'create');
  */
-export function usePermission(module: string, action: string): boolean {
+function usePermission(module: string, action: string): boolean {
   const currentUser = useAppStore((s) => s.currentUser);
 
-  // No user or no custom role = full access (admin, teacher without custom role, student, parent, etc.)
+  // No user or no custom role = full access (admin, teacher without custom role, etc.)
   if (!currentUser || !currentUser.customRole?.permissions) return true;
 
   // User has a custom role → enforce its permissions
