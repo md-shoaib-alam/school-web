@@ -207,6 +207,7 @@ export function MarksheetPreviewPage({
     else if (hasFail || overallPercentage < 40) overallStatus = 'fail';
 
     return {
+      id: student.id,
       studentName: student.name,
       rollNumber: student.rollNumber || '-',
       schoolName: student.schoolName || 'SCHOOL ERP ACADEMY',

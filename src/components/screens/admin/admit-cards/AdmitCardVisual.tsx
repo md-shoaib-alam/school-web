@@ -150,26 +150,27 @@ export const AdmitCardVisual = memo(function AdmitCardVisual({ card }: { card: A
               </tr>
             </thead>
             <tbody className="divide-y divide-zinc-100" suppressHydrationWarning>
-              {card.exams
-                .filter(exam => {
-                  const isScheduled = exam.status?.trim().toLowerCase() === 'scheduled';
-                  const isUpcoming = exam.date >= todayDateString;
-                  return (isScheduled || isUpcoming) && !exam.resultPublished;
-                })
-                .map((exam) => (
-                  <tr key={exam.id}>
-                    <td className="py-1 px-1.5 font-medium text-zinc-800">
-                      {formatDate(exam.date)}
-                    </td>
-                    <td className="py-1 px-1.5">
-                      <span className="font-bold text-zinc-800">{exam.subjectName}</span>
-                      <span className="text-[8px] text-zinc-400 ml-1">({exam.subjectCode})</span>
-                    </td>
-                    <td className="py-1 px-1.5 text-center font-mono text-zinc-600">
-                      {formatTime(exam.startTime)} - {formatTime(exam.endTime)}
-                    </td>
-                  </tr>
-                ))}
+              {card.exams.reduce<React.ReactNode[]>((acc, exam) => {
+                const isScheduled = exam.status?.trim().toLowerCase() === 'scheduled';
+                const isUpcoming = exam.date >= todayDateString;
+                if ((isScheduled || isUpcoming) && !exam.resultPublished) {
+                  acc.push(
+                    <tr key={exam.id}>
+                      <td className="py-1 px-1.5 font-medium text-zinc-800">
+                        {formatDate(exam.date)}
+                      </td>
+                      <td className="py-1 px-1.5">
+                        <span className="font-bold text-zinc-800">{exam.subjectName}</span>
+                        <span className="text-[8px] text-zinc-400 ml-1">({exam.subjectCode})</span>
+                      </td>
+                      <td className="py-1 px-1.5 text-center font-mono text-zinc-600">
+                        {formatTime(exam.startTime)} - {formatTime(exam.endTime)}
+                      </td>
+                    </tr>
+                  );
+                }
+                return acc;
+              }, [])}
             </tbody>
           </table>
         </div>

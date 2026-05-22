@@ -22,7 +22,7 @@ export function AdminCalendar() {
   const today = new Date();
   const [currentYear, setCurrentYear] = useState(() => today.getFullYear());
   const [currentMonth, setCurrentMonth] = useState(() => today.getMonth());
-  const [selectedDate, setSelectedDate] = useState<string | null>(formatDateISO(today));
+  const [selectedDate, setSelectedDate] = useState<string | null>(() => formatDateISO(today));
   const [typeFilter, setTypeFilter] = useState<string>("all");
 
   // Dialog state

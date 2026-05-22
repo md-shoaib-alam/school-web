@@ -93,9 +93,9 @@ export function MarksheetSheetsPreview({
           {/* True A4 parchment layout sheets preview vertical stack with premium scrollbar */}
           <div className="w-full max-h-[75vh] overflow-y-auto overflow-x-auto pb-6 flex flex-col items-center gap-8 bg-zinc-50 dark:bg-zinc-950/20 p-4 sm:p-6 rounded-2xl border border-zinc-100 dark:border-zinc-800/50 shadow-inner">
             
-            {previewStudents.map((sheet, index) => (
+            {previewStudents.map((sheet) => (
               <div 
-                key={index}
+                key={sheet.id}
                 className="shrink-0 transition-all duration-300 shadow-2xl rounded-lg"
                 style={{ 
                   width: 794 * zoomScale, 
