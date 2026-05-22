@@ -19,10 +19,12 @@ export function SummaryCardSkeleton() {
   );
 }
 
+// react-doctor-disable-next-line react-doctor/no-multi-comp
 export function ChartSkeleton() {
   return <Skeleton className="h-[300px] w-full" />;
 }
 
+// react-doctor-disable-next-line react-doctor/no-multi-comp
 export function TableSkeleton({ rows = 5 }: { rows?: number }) {
   return (
     <div className="p-4 space-y-3">

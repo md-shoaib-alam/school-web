@@ -11,37 +11,39 @@ import {
   DialogDescription,
 } from "@/components/ui/dialog";
 
-interface EditParentDialogProps {
+interface CreateParentDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  editForm: any;
-  setEditForm: (form: any) => void;
-  onSave: () => void;
-  editing: boolean;
+  createForm: any;
+  setCreateForm: (form: any) => void;
+  onCreate: () => void;
+  creating: boolean;
 }
 
-export function EditParentDialog({
+export function CreateParentDialog({
   open,
   onOpenChange,
-  editForm,
-  setEditForm,
-  onSave,
-  editing,
-}: EditParentDialogProps) {
+  createForm,
+  setCreateForm,
+  onCreate,
+  creating,
+}: CreateParentDialogProps) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Edit Parent</DialogTitle>
-          <DialogDescription>Update parent information</DialogDescription>
+          <DialogTitle>Add New Parent</DialogTitle>
+          <DialogDescription>
+            Create a new parent account in the system
+          </DialogDescription>
         </DialogHeader>
         <div className="space-y-4 pt-2">
           <div>
             <Label>Full Name *</Label>
             <Input
-              value={editForm.name}
+              value={createForm.name}
               onChange={(e) =>
-                setEditForm({ ...editForm, name: e.target.value })
+                setCreateForm({ ...createForm, name: e.target.value })
               }
               placeholder="e.g. Robert Anderson"
               className="mt-1.5"
@@ -51,20 +53,32 @@ export function EditParentDialog({
             <Label>Email *</Label>
             <Input
               type="email"
-              value={editForm.email}
+              value={createForm.email}
               onChange={(e) =>
-                setEditForm({ ...editForm, email: e.target.value })
+                setCreateForm({ ...createForm, email: e.target.value })
               }
               placeholder="parent@sigel.edu"
               className="mt-1.5"
             />
           </div>
           <div>
+            <Label>Login Password</Label>
+            <Input
+              type="password"
+              value={createForm.password}
+              onChange={(e) =>
+                setCreateForm({ ...createForm, password: e.target.value })
+              }
+              placeholder="Set login password (default: changeme123)"
+              className="mt-1.5"
+            />
+          </div>
+          <div>
             <Label>Phone</Label>
             <Input
-              value={editForm.phone}
+              value={createForm.phone}
               onChange={(e) =>
-                setEditForm({ ...editForm, phone: e.target.value })
+                setCreateForm({ ...createForm, phone: e.target.value })
               }
               placeholder="555-0201"
               className="mt-1.5"
@@ -73,20 +87,20 @@ export function EditParentDialog({
           <div>
             <Label>Occupation</Label>
             <Input
-              value={editForm.occupation}
+              value={createForm.occupation}
               onChange={(e) =>
-                setEditForm({ ...editForm, occupation: e.target.value })
+                setCreateForm({ ...createForm, occupation: e.target.value })
               }
               placeholder="e.g. Engineer"
               className="mt-1.5"
             />
           </div>
           <Button
-            onClick={onSave}
-            disabled={editing}
+            onClick={onCreate}
+            disabled={creating}
             className="w-full bg-emerald-600 hover:bg-emerald-700 text-white"
           >
-            {editing ? "Saving..." : "Save Changes"}
+            {creating ? "Creating..." : "Create Parent"}
           </Button>
         </div>
       </DialogContent>

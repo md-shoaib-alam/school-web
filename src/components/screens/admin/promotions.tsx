@@ -33,11 +33,9 @@ import { getCurrentAcademicYear, getNextClass } from "./promotions/utils";
 import { PromotionsTable } from "./promotions/PromotionsTable";
 import { BulkPromoteTab } from "./promotions/BulkPromoteTab";
 import { GraduatedTab } from "./promotions/GraduatedTab";
-import {
-  NewPromotionDialog,
-  BulkPromotionDialog,
-  RejectPromotionDialog,
-} from "./promotions/PromotionDialogs";
+import { NewPromotionDialog } from "./promotions/PromotionDialogs";
+import { BulkPromotionDialog } from "./promotions/BulkPromotionDialog";
+import { RejectPromotionDialog } from "./promotions/RejectPromotionDialog";
 
 export function AdminPromotions({ initialTab: propTab }: { initialTab?: "individual" | "bulk" | "graduated" }) {
   const [activeTab, setActiveTab] = useState<
