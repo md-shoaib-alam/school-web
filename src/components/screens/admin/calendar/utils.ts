@@ -15,7 +15,7 @@ export function formatDateISO(d: Date): string {
   return `${y}-${m}-${day}`;
 }
 
-export function isSameDay(d1: string | Date, d2: string | Date): boolean {
+function isSameDay(d1: string | Date, d2: string | Date): boolean {
   const a = typeof d1 === "string" ? d1 : formatDateISO(d1);
   const b = typeof d2 === "string" ? d2 : formatDateISO(d2);
   return a === b;
@@ -25,7 +25,7 @@ export function isToday(dateStr: string): boolean {
   return isSameDay(dateStr, new Date());
 }
 
-export function formatDisplayDate(dateStr: string): string {
+function formatDisplayDate(dateStr: string): string {
   const d = new Date(dateStr + "T00:00:00");
   return d.toLocaleDateString("en-US", {
     weekday: "long",

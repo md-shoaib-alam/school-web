@@ -71,7 +71,7 @@ export function AdminPromotions({ initialTab: propTab }: { initialTab?: "individ
   const [bulkFromClass, setBulkFromClass] = useState("");
   const [bulkToClass, setBulkToClass] = useState("");
   const [bulkAcademicYear, setBulkAcademicYear] = useState(
-    getCurrentAcademicYear(),
+    () => getCurrentAcademicYear(),
   );
   const [bulkRemarks, setBulkRemarks] = useState("");
   const [bulkSubmitting, setBulkSubmitting] = useState(false);
@@ -79,7 +79,7 @@ export function AdminPromotions({ initialTab: propTab }: { initialTab?: "individ
   // Graduation dialog
   const [gradClassId, setGradClassId] = useState("");
   const [gradAcademicYear, setGradAcademicYear] = useState(
-    getCurrentAcademicYear(),
+    () => getCurrentAcademicYear(),
   );
   const [gradRemarks, setGradRemarks] = useState("");
   const [gradSelectedIds, setGradSelectedIds] = useState<Set<string>>(

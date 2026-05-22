@@ -277,7 +277,7 @@ export function SuperAdminSchoolSubscriptions() {
               <Button
                 variant="outline"
                 size="sm"
-                onClick={() => setCurrentPage(currentPage - 1)}
+                onClick={() => setCurrentPage((prev) => prev - 1)}
                 disabled={currentPage === 1}
                 className="size-8 p-0"
               >
@@ -329,7 +329,7 @@ export function SuperAdminSchoolSubscriptions() {
               <Button
                 variant="outline"
                 size="sm"
-                onClick={() => setCurrentPage(currentPage + 1)}
+                onClick={() => setCurrentPage((prev) => prev + 1)}
                 disabled={currentPage === tenantsData.totalPages}
                 className="size-8 p-0"
               >

@@ -14,10 +14,11 @@ export function StudentCalendar() {
   const currentTenantId = useAppStore((s) => s.currentTenantId);
 
   // --- State ---
-  const today = new Date();
-  const [currentYear, setCurrentYear] = useState(today.getFullYear());
-  const [currentMonth, setCurrentMonth] = useState(today.getMonth());
-  const [selectedDate, setSelectedDate] = useState<string | null>(formatDateISO(today));
+  const [currentYear, setCurrentYear] = useState(() => new Date().getFullYear());
+  const [currentMonth, setCurrentMonth] = useState(() => new Date().getMonth());
+  const [selectedDate, setSelectedDate] = useState<string | null>(() =>
+    formatDateISO(new Date()),
+  );
   const [typeFilter, setTypeFilter] = useState<string>("all");
 
   // --- TanStack Query ---

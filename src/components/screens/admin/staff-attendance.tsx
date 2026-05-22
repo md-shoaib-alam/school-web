@@ -61,7 +61,7 @@ export function StaffAttendance({ initialTab }: StaffAttendanceProps) {
   const queryClient = useQueryClient();
   const { currentTenantId } = useAppStore();
   const [activeTab, setActiveTab] = useState(initialTab || "teacher");
-  const [selectedDate, setSelectedDate] = useState(
+  const [selectedDate, setSelectedDate] = useState(() =>
     format(new Date(), "yyyy-MM-dd"),
   );
   const [searchQuery, setSearchQuery] = useState("");
