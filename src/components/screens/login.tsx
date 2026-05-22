@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import Image from "next/image";
 import { useTheme } from "next-themes";
 import { useAppStore, type UserRole } from "@/store/use-app-store";
 import { setCookie } from "@/lib/cookies";
@@ -127,9 +128,12 @@ export function LoginScreen() {
         {/* Logo & Title */}
         <div className="text-center mb-8">
           <div className="inline-flex items-center justify-center size-20 rounded-2xl mb-4 shadow-lg bg-white/90 dark:bg-black/20 overflow-hidden shrink-0 border border-zinc-200 dark:border-white/10">
-            <img 
+            <Image 
               src="/test.webp" 
               alt="School Logo" 
+              width={80}
+              height={80}
+              priority
               className="size-full object-cover" 
             />
           </div>

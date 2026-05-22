@@ -4,10 +4,8 @@ import { useEffect, useSyncExternalStore, useReducer } from "react";
 import { useRouter, redirect } from "next/navigation";
 import { useAppStore } from "@/store/use-app-store";
 import { apiFetch } from "@/lib/api";
-import {
-  MaintenanceScreen,
-  LoginScreen,
-} from "@/components/screens";
+import { LoginScreen } from "@/components/screens/login";
+import { MaintenanceScreen } from "@/components/screens/error/maintenance";
 import { FullPageSkeleton } from "@/components/ui/full-page-skeleton";
 
 // Prevents hydration mismatch: returns false on server, true on client
@@ -40,7 +38,7 @@ function maintenanceReducer(state: MaintenanceState, action: MaintenanceAction):
   }
 }
 
-export default function HomeClient() {
+export default function HomeClient({ initialHasToken }: { initialHasToken: boolean }) {
   const { isLoggedIn, currentUser, currentScreen, currentTenantId } =
     useAppStore();
   const mounted = useHydrated();
@@ -113,8 +111,10 @@ export default function HomeClient() {
     };
   }, [isLoggedIn, currentUser, userRole]);
 
-  // Not mounted yet → render nothing (avoids hydration mismatch)
-  if (!mounted) return null;
+  // Not mounted yet → render appropriate component based on server cookie (avoids hydration mismatch)
+  if (!mounted) {
+    return initialHasToken ? <FullPageSkeleton /> : <LoginScreen />;
+  }
 
   // Not logged in → show login
   if (!isLoggedIn) return <LoginScreen />;
