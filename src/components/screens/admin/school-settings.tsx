@@ -1,6 +1,5 @@
 "use client";
 
-
 import { apiFetch } from "@/lib/api";
 import { useState, useEffect, useCallback } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -10,9 +9,11 @@ import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Loader2, Settings, Info, Save, CheckCircle2 } from "lucide-react";
+import { Loader2, Settings, Info, Save, CheckCircle2, Eye } from "lucide-react";
 import { goeyToast as toast } from "goey-toast";
 import { useAppStore } from "@/store/use-app-store";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import { MARKSHEET_TEMPLATES, ClassicAcademy } from "./exams/marksheet-templates";
 
 const ALL_DAYS = [
   { key: "monday", label: "Monday", short: "Mon", icon: "📅" },
@@ -34,6 +35,67 @@ const DEFAULT_WORKING_DAYS: DayKey[] = [
   "friday",
 ];
 
+const MOCK_PREVIEW_SHEET = {
+  sheet: {
+    studentName: "Aarav Sharma",
+    rollNumber: "2026-A104",
+    schoolName: "St. Xavier's High School",
+    subjects: [
+      {
+        subjectName: "Mathematics",
+        midtermMarks: "42/50",
+        finalMarks: "88/100",
+        obtained: "88",
+        percentage: 88,
+        status: "pass" as const,
+      },
+      {
+        subjectName: "Science",
+        midtermMarks: "45/50",
+        finalMarks: "92/100",
+        obtained: "92",
+        percentage: 92,
+        status: "pass" as const,
+      },
+      {
+        subjectName: "English Language",
+        midtermMarks: "40/50",
+        finalMarks: "85/100",
+        obtained: "85",
+        percentage: 85,
+        status: "pass" as const,
+      },
+      {
+        subjectName: "Social Science",
+        midtermMarks: "38/50",
+        finalMarks: "79/100",
+        obtained: "79",
+        percentage: 79,
+        status: "pass" as const,
+      },
+      {
+        subjectName: "Computer Applications",
+        midtermMarks: "48/50",
+        finalMarks: "96/100",
+        obtained: "96",
+        percentage: 96,
+        status: "pass" as const,
+      },
+    ],
+    totalMaxMarks: 500,
+    totalObtainedMarks: 440,
+    overallPercentage: 88,
+    grade: "A+",
+    remarks: "Excellent academic performance! Aarav demonstrates strong analytical thinking and consistency across all subjects.",
+    color: "#1e3a8a",
+    status: "pass" as const,
+  },
+  classNameStr: "Grade X",
+  classSection: "A",
+  academicYear: "2025–2026",
+  marksheetType: "combined" as const,
+};
+
 interface TenantSettings {
   workingDays: string[];
   [key: string]: unknown;
@@ -52,6 +114,8 @@ export function AdminSchoolSettings() {
   const [initialSettings, setInitialSettings] = useState<TenantSettings | null>(
     null,
   );
+  const [previewOpen, setPreviewOpen] = useState(false);
+  const [previewZoom, setPreviewZoom] = useState(0.6);
 
   const fetchSettings = useCallback(async () => {
     if (!currentTenantId) return;
@@ -144,6 +208,9 @@ export function AdminSchoolSettings() {
   };
 
   const selectedCount = workingDays.size;
+
+  const selectedTemplate = MARKSHEET_TEMPLATES.find((t) => t.id === defaultMarksheetTemplateId) || MARKSHEET_TEMPLATES[0];
+  const PreviewComponent = selectedTemplate.component || ClassicAcademy;
 
   if (loading) {
     return (
@@ -262,30 +329,41 @@ export function AdminSchoolSettings() {
           </div>
         </CardHeader>
         <CardContent className="pt-0 space-y-4">
-          <div className="w-full max-w-md">
-            <Select 
-              value={defaultMarksheetTemplateId} 
-              onValueChange={(val) => {
-                setDefaultMarksheetTemplateId(val);
-                setHasChanges(true);
-              }}
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full max-w-lg">
+            <div className="flex-1">
+              <Select 
+                value={defaultMarksheetTemplateId} 
+                onValueChange={(val) => {
+                  setDefaultMarksheetTemplateId(val);
+                  setHasChanges(true);
+                }}
+              >
+                <SelectTrigger className="w-full h-10 border-violet-200 dark:border-violet-900/50 bg-background">
+                  <div className="flex items-center gap-2">
+                    <Settings className="size-4 text-violet-500" />
+                    <SelectValue placeholder="Choose default marksheet…" />
+                  </div>
+                </SelectTrigger>
+                <SelectContent className="max-h-60">
+                  <SelectItem value="classic">Classic Academy</SelectItem>
+                  <SelectItem value="modern">Modern Minimalist</SelectItem>
+                  <SelectItem value="royal">Royal Gold Elite</SelectItem>
+                  <SelectItem value="creative">Creative Compact</SelectItem>
+                  <SelectItem value="cbse">CBSE Public School</SelectItem>
+                  <SelectItem value="icse">ICSE Semester Convent</SelectItem>
+                  <SelectItem value="stateboard">State Board Green-Elite</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <Button
+              type="button"
+              variant="outline"
+              className="h-10 border-violet-200 dark:border-violet-900/50 hover:bg-violet-50 dark:hover:bg-violet-950/20 text-violet-700 dark:text-violet-400 gap-1.5 font-semibold text-xs shrink-0"
+              onClick={() => setPreviewOpen(true)}
             >
-              <SelectTrigger className="w-full h-10 border-violet-200 dark:border-violet-900/50">
-                <div className="flex items-center gap-2">
-                  <Settings className="size-4 text-violet-500" />
-                  <SelectValue placeholder="Choose default marksheet..." />
-                </div>
-              </SelectTrigger>
-              <SelectContent className="max-h-60">
-                <SelectItem value="classic">Classic Academy</SelectItem>
-                <SelectItem value="modern">Modern Minimalist</SelectItem>
-                <SelectItem value="royal">Royal Gold Elite</SelectItem>
-                <SelectItem value="creative">Creative Compact</SelectItem>
-                <SelectItem value="cbse">CBSE Public School</SelectItem>
-                <SelectItem value="icse">ICSE Semester Convent</SelectItem>
-                <SelectItem value="stateboard">State Board Green-Elite</SelectItem>
-              </SelectContent>
-            </Select>
+              <Eye className="size-4" />
+              Preview Template
+            </Button>
           </div>
           <div className="p-3 bg-zinc-50 dark:bg-zinc-900/50 rounded-lg border border-zinc-100 dark:border-zinc-800 text-xs text-muted-foreground flex gap-2">
             <Info className="size-4 text-violet-500 shrink-0" />
@@ -317,7 +395,7 @@ export function AdminSchoolSettings() {
           {saving ? (
             <>
               <Loader2 className="size-4 mr-2 animate-spin" />
-              Saving...
+              Saving…
             </>
           ) : (
             <>
@@ -327,6 +405,66 @@ export function AdminSchoolSettings() {
           )}
         </Button>
       </div>
+
+      {/* Marksheet Template Preview Dialog */}
+      <Dialog open={previewOpen} onOpenChange={setPreviewOpen}>
+        <DialogContent className="max-w-5xl h-[92vh] flex flex-col p-0 overflow-hidden bg-zinc-950/5 dark:bg-zinc-900/5 border-zinc-200 dark:border-zinc-800">
+          <DialogHeader className="p-6 bg-white dark:bg-zinc-950 border-b border-zinc-150 dark:border-zinc-800 shrink-0">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div>
+                <DialogTitle className="text-xl font-bold text-zinc-900 dark:text-zinc-50 flex items-center gap-2">
+                  <span className="text-violet-500">📄</span> Marksheet Template Preview
+                </DialogTitle>
+                <DialogDescription className="text-zinc-500 dark:text-zinc-400 text-xs mt-1">
+                  Viewing a high-fidelity rendering of the <strong className="text-violet-600 dark:text-violet-400 font-semibold">“{selectedTemplate.name}”</strong> style layout with mock academic details.
+                </DialogDescription>
+              </div>
+              
+              {/* Zoom Controls */}
+              <div className="flex items-center gap-2 bg-zinc-100 dark:bg-zinc-900 p-1 rounded-lg border border-zinc-200 dark:border-zinc-800 self-start sm:self-center shrink-0">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 px-2">Zoom:</span>
+                {[0.5, 0.6, 0.75, 1.0].map((zoom) => (
+                  <button
+                    key={zoom}
+                    type="button"
+                    onClick={() => setPreviewZoom(zoom)}
+                    className={`px-2.5 py-1 rounded text-xs font-semibold transition-all ${
+                      previewZoom === zoom
+                        ? "bg-white dark:bg-zinc-800 text-violet-600 dark:text-violet-400 shadow-xs border border-zinc-200/50 dark:border-zinc-700/50"
+                        : "text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100"
+                    }`}
+                  >
+                    {zoom * 100}%
+                  </button>
+                ))}
+              </div>
+            </div>
+          </DialogHeader>
+
+          {/* Centered Scrollable Document Viewer */}
+          <div className="flex-1 overflow-auto p-8 flex justify-center items-start min-h-0">
+            <div 
+              style={{ 
+                width: `${794 * previewZoom}px`, 
+                height: `${1123 * previewZoom}px`,
+                transition: "all 0.2s cubic-bezier(0.4, 0, 0.2, 1)"
+              }} 
+              className="overflow-hidden border border-zinc-200 dark:border-zinc-800 rounded-lg shadow-2xl relative bg-white shrink-0"
+            >
+              <div 
+                style={{ 
+                  transform: `scale(${previewZoom})`, 
+                  transformOrigin: "top left",
+                  width: "794px",
+                  height: "1123px",
+                }}
+              >
+                <PreviewComponent {...MOCK_PREVIEW_SHEET} />
+              </div>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
