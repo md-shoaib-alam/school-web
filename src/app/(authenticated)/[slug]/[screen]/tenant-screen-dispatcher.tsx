@@ -4,12 +4,12 @@ import { useEffect, useSyncExternalStore } from 'react';
 import { useParams, redirect } from 'next/navigation';
 import { useAppStore } from '@/store/use-app-store';
 import dynamic from 'next/dynamic';
-import { ParentHomework } from '@/components/screens';
 import { FullPageSkeleton } from "@/components/ui/full-page-skeleton";
 
 const LoadingScreen = () => <FullPageSkeleton />;
 
-const UserProfileScreen = dynamic(() => import('@/components/screens').then(m => m.UserProfileScreen), { loading: LoadingScreen });
+const ParentHomework = dynamic(() => import('@/components/screens/parent/homework').then(m => m.ParentHomework), { loading: LoadingScreen });
+const UserProfileScreen = dynamic(() => import('@/components/screens/profile').then(m => m.UserProfileScreen), { loading: LoadingScreen });
 const TeacherDashboard = dynamic(() => import('@/components/screens/teacher/dashboard').then(m => m.TeacherDashboard));
 const StudentDashboard = dynamic(() => import('@/components/screens/student/dashboard').then(m => m.StudentDashboard));
 const ParentDashboard = dynamic(() => import('@/components/screens/parent/dashboard').then(m => m.ParentDashboard));

@@ -20,8 +20,8 @@ export function AdminCalendar() {
 
   // --- State ---
   const today = new Date();
-  const [currentYear, setCurrentYear] = useState(today.getFullYear());
-  const [currentMonth, setCurrentMonth] = useState(today.getMonth());
+  const [currentYear, setCurrentYear] = useState(() => today.getFullYear());
+  const [currentMonth, setCurrentMonth] = useState(() => today.getMonth());
   const [selectedDate, setSelectedDate] = useState<string | null>(formatDateISO(today));
   const [typeFilter, setTypeFilter] = useState<string>("all");
 

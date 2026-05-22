@@ -31,7 +31,8 @@ import {
 } from 'lucide-react';
 import { useReactToPrint } from 'react-to-print';
 import { goeyToast as toast } from 'goey-toast';
-import { compileTabularLedgerData, TabularLedgerPrint, LedgerData } from './tabulationLedgerPrinter';
+import { TabularLedgerPrint } from './tabulationLedgerPrinter';
+import { compileTabularLedgerData, LedgerData } from './ledger-utils';
 import { LEDGER_TEMPLATES } from './ledger-templates';
 
 interface TabulationLedgerPreviewPageProps {
