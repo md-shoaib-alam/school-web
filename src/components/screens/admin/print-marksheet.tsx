@@ -14,6 +14,7 @@ import { useAcademicYears } from '@/hooks/use-academic-years';
 import { MarksheetPreviewPage } from './exams/MarksheetPreviewPage';
 import { ExamRecord } from './exams/types';
 import { FullPageSkeleton } from "@/components/ui/full-page-skeleton";
+import { goeyToast as toast } from 'goey-toast';
 
 const LoadingScreen = () => <FullPageSkeleton />;
 
@@ -28,6 +29,24 @@ export function AdminPrintMarksheetContent() {
   const currentAcademicYear = useMemo(() => {
     return academicYears.find((ay: any) => ay.isCurrent)?.name || '2024-2025';
   }, [academicYears]);
+
+  // Settings for inline vs tab preview
+  const [enableModalMarksheetPreview, setEnableModalMarksheetPreview] = useState<boolean>(false);
+
+  useEffect(() => {
+    const fetchSettings = async () => {
+      try {
+        const res = await apiFetch("/api/tenant-settings");
+        if (res.ok) {
+          const data = await res.json();
+          setEnableModalMarksheetPreview(data.enableModalMarksheetPreview === true);
+        }
+      } catch (err) {
+        console.error("Failed to load settings:", err);
+      }
+    };
+    fetchSettings();
+  }, []);
 
   // Filters
   const [publishedAcademicYearFilter, setPublishedAcademicYearFilter] = useState(currentAcademicYear);
@@ -244,7 +263,26 @@ export function AdminPrintMarksheetContent() {
                             size="sm" 
                             onClick={(e) => {
                               e.stopPropagation();
-                              router.push(`/${slug}/print-marksheet?classId=${c.id}`);
+                              if (enableModalMarksheetPreview) {
+                                router.push(`/${slug}/print-marksheet?classId=${c.id}`);
+                              } else {
+                                toast.promise(
+                                  (async () => {
+                                    const { handleMarksheetPreviewNewTab } = await import('./exams/marksheetPrinter');
+                                    await handleMarksheetPreviewNewTab({
+                                      classId: c.id,
+                                      classNameStr: c.name,
+                                      classSection: c.section,
+                                      academicYear: publishedAcademicYearFilter || currentAcademicYear
+                                    });
+                                  })(),
+                                  {
+                                    loading: 'Loading marksheet workspace...',
+                                    success: 'Marksheet workspace opened in a new tab!',
+                                    error: 'Failed to load marksheet workspace',
+                                  }
+                                );
+                              }
                             }}
                             className="h-8 border-emerald-200 hover:border-emerald-300 dark:border-emerald-900/50 hover:bg-emerald-50 dark:hover:bg-emerald-950/20 text-emerald-600 dark:text-emerald-400 gap-1.5 rounded-lg text-xs font-semibold px-2.5 shadow-sm transition-colors"
                           >
