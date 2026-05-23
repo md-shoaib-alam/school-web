@@ -48,7 +48,7 @@ export function CertificateTemplate({ cert, formatDate }: CertificateTemplatePro
           <div className="space-y-1">
             <h2 className="text-3xl font-semibold text-amber-900 tracking-tight uppercase font-serif">Sunrise Academy</h2>
             <p className="text-sm font-medium text-zinc-700 italic">Affiliated to Central Board of Secondary Education (CBSE)</p>
-            <p className="text-xs text-zinc-600">123 Education Lane, Academic City — PIN: 560001</p>
+            <p className="text-xs text-zinc-600">123 Education Lane, Academic City, PIN: 560001</p>
           </div>
           <div className="flex items-center justify-center gap-3 pt-2">
             <div className="w-32 h-[1px] bg-amber-800" />

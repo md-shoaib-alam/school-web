@@ -25,9 +25,11 @@ import {
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import api from "@/lib/axios";
 import { useAppStore } from "@/store/use-app-store";
-import { format, parseISO } from "date-fns";
+import { format } from "date-fns";
 import { goeyToast as toast } from "goey-toast";
-import { DatePicker } from "@/components/ui/date-picker";
+import { AttendanceHeader } from "./staff-attendance/AttendanceHeader";
+import { AttendanceStats } from "./staff-attendance/AttendanceStats";
+import { AttendanceFooter } from "./staff-attendance/AttendanceFooter";
 
 type AttendanceStatus = "present" | "absent";
 
@@ -168,31 +170,11 @@ export function StaffAttendance({ initialTab }: StaffAttendanceProps) {
 
   return (
     <div className="space-y-6 md:pb-18 pb-26">
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div>
-          <h2 className="text-2xl font-semibold text-zinc-900 dark:text-zinc-100 flex items-center gap-2">
-            {activeTab === 'teacher' ? <GraduationCap className="size-7 text-emerald-600" /> : <Briefcase className="size-7 text-blue-600" />}
-            {activeTab === 'teacher' ? 'Teacher Attendance' : 'Admin Staff Attendance'}
-          </h2>
-          <p className="text-zinc-500 dark:text-zinc-400 mt-1">
-            {activeTab === 'teacher' ? 'Manage daily attendance logs for all teachers.' : 'Manage daily attendance logs for admin staff members.'}
-          </p>
-        </div>
-        <div className="flex items-center gap-3">
-          <DatePicker
-            date={selectedDate ? parseISO(selectedDate) : undefined}
-            onChange={(d) => {
-              if (d) {
-                const yyyy = d.getFullYear();
-                const mm = String(d.getMonth() + 1).padStart(2, '0');
-                const dd = String(d.getDate()).padStart(2, '0');
-                setSelectedDate(`${yyyy}-${mm}-${dd}`);
-              }
-            }}
-            className="rounded-xl dark:[color-scheme:dark] w-fit"
-          />
-        </div>
-      </div>
+      <AttendanceHeader
+        activeTab={activeTab}
+        selectedDate={selectedDate}
+        onDateChange={setSelectedDate}
+      />
 
       {!initialTab && (
         <Tabs
@@ -220,53 +202,11 @@ export function StaffAttendance({ initialTab }: StaffAttendanceProps) {
         </Tabs>
       )}
 
-        <div className="grid grid-cols-3 gap-3 mt-6">
-          <Card className="rounded-xl shadow-sm border-0">
-            <CardContent className="p-4 flex items-center gap-3">
-              <div className="size-10 rounded-xl bg-blue-50 dark:bg-blue-900/30 flex items-center justify-center">
-                <Users className="size-5 text-blue-500 dark:text-blue-400" />
-              </div>
-              <div>
-                <p className="text-xs text-zinc-400 dark:text-zinc-500 font-medium">
-                  Total
-                </p>
-                <p className="text-xl font-bold text-zinc-900 dark:text-zinc-100">
-                  {stats.total}
-                </p>
-              </div>
-            </CardContent>
-          </Card>
-          <Card className="rounded-xl shadow-sm border-0">
-            <CardContent className="p-4 flex items-center gap-3">
-              <div className="size-10 rounded-xl bg-emerald-50 dark:bg-emerald-900/30 flex items-center justify-center">
-                <UserCheck className="size-5 text-emerald-500 dark:text-emerald-400" />
-              </div>
-              <div>
-                <p className="text-xs text-zinc-400 dark:text-zinc-500 font-medium">
-                  Present
-                </p>
-                <p className="text-xl font-bold text-emerald-600 dark:text-emerald-400">
-                  {stats.p}
-                </p>
-              </div>
-            </CardContent>
-          </Card>
-          <Card className="rounded-xl shadow-sm border-0">
-            <CardContent className="p-4 flex items-center gap-3">
-              <div className="size-10 rounded-xl bg-red-50 dark:bg-red-900/30 flex items-center justify-center">
-                <UserX className="size-5 text-red-500 dark:text-red-400" />
-              </div>
-              <div>
-                <p className="text-xs text-zinc-400 dark:text-zinc-500 font-medium">
-                  Absent
-                </p>
-                <p className="text-xl font-bold text-red-600 dark:text-red-400">
-                  {stats.a}
-                </p>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
+      <AttendanceStats
+        total={stats.total}
+        present={stats.p}
+        absent={stats.a}
+      />
 
       <div className="mt-6">
         <Card className="rounded-xl shadow-sm border border-zinc-200 dark:border-zinc-800 overflow-hidden">
@@ -402,36 +342,13 @@ export function StaffAttendance({ initialTab }: StaffAttendanceProps) {
           </Card>
       </div>
 
-      <div className="fixed bottom-6 left-6 right-6 lg:left-[calc(18rem+1.5rem)] lg:right-10 flex flex-col sm:flex-row items-center justify-between bg-white/90 dark:bg-zinc-950/90 backdrop-blur-md p-4 px-6 rounded-2xl shadow-2xl border border-zinc-100/20 dark:border-zinc-800/50 gap-4 z-[100]">
-        <div className="flex items-center gap-3 w-full sm:w-auto">
-          {hasChanges ? (
-            <div className="flex items-center gap-3">
-              <div className="size-2 bg-violet-500 rounded-full animate-ping" />
-              <span className="text-xs font-bold text-violet-500 uppercase tracking-widest">
-                {Object.keys(pendingChanges).length} Pending in{" "}
-                {activeTab === "teacher" ? "Teachers" : "Staff"}
-              </span>
-            </div>
-          ) : (
-            <span className="text-xs font-bold text-zinc-400 uppercase tracking-widest italic hidden sm:inline">
-              No unsaved changes
-            </span>
-          )}
-        </div>
-        <Button
-          onClick={handleSave}
-          disabled={isSaving || !hasChanges}
-          className="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white rounded-xl px-10 h-12 shadow-lg shadow-blue-500/20 font-bold"
-        >
-          {isSaving ? (
-            "Syncing..."
-          ) : (
-            <span className="flex items-center justify-center gap-2 tracking-wide">
-              <Save className="size-4" /> Save {activeTab} Attendance
-            </span>
-          )}
-        </Button>
-      </div>
+      <AttendanceFooter
+        hasChanges={hasChanges}
+        pendingCount={Object.keys(pendingChanges).length}
+        activeTab={activeTab}
+        isSaving={isSaving}
+        onSave={handleSave}
+      />
     </div>
   );
 }
