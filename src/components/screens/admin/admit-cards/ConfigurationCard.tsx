@@ -32,6 +32,8 @@ interface ConfigurationCardProps {
   onPrintAll: () => void;
   admitCardsCount: number;
   preparingPrint: boolean;
+  selectedTemplate: string;
+  setSelectedTemplate: (v: string) => void;
 }
 
 export function ConfigurationCard({
@@ -51,6 +53,8 @@ export function ConfigurationCard({
   onPrintAll,
   admitCardsCount,
   preparingPrint,
+  selectedTemplate,
+  setSelectedTemplate,
 }: ConfigurationCardProps) {
   return (
     <Card className="border-2 border-amber-200 dark:border-amber-800">
@@ -62,6 +66,21 @@ export function ConfigurationCard({
         <CardDescription>Filter by exam type and select students</CardDescription>
       </CardHeader>
       <CardContent className="p-4 pt-0 space-y-4">
+        {/* Template Selector */}
+        <div className="space-y-1.5">
+          <label className="text-sm font-medium mb-1.5 block">Print Template</label>
+          <select 
+            value={selectedTemplate} 
+            onChange={(e) => setSelectedTemplate(e.target.value)}
+            className="w-full h-9 px-3 rounded-lg border border-zinc-200 dark:border-zinc-800 bg-background text-xs font-semibold focus:outline-none focus:ring-1 focus:ring-amber-500 cursor-pointer"
+            style={{ colorScheme: 'dark' }}
+          >
+            <option value="classic_quad">Classic Quad (4 per A4 Page)</option>
+            <option value="premium_modern">Premium Modern (4 per A4 Page)</option>
+            <option value="compact_dual">Detailed Dual (2 per A4 Page)</option>
+            <option value="minimal_ticket">Minimalist Ticket (4 per A4 Page)</option>
+          </select>
+        </div>
         {/* Exam Cycle Filter */}
         <div className="space-y-1.5">
           <label className="text-sm font-medium mb-2 block">Exam Cycle</label>

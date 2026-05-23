@@ -20,6 +20,7 @@ function AdmitCardPrintPreview({
 }: AdmitCardPrintPreviewProps) {
   const [zoomScale, setZoomScale] = useState<number>(0.6);
   const [printing, setPrinting] = useState<boolean>(false);
+  const [selectedTemplate, setSelectedTemplate] = useState<string>('classic_quad');
   const printContainerRef = useRef<HTMLDivElement>(null);
 
   const handlePrintBase = useReactToPrint({
@@ -36,20 +37,40 @@ function AdmitCardPrintPreview({
     }, 200);
   };
 
+  const cardsPerPage = selectedTemplate === 'compact_dual' ? 2 : 4;
+  const totalPages = Math.ceil(admitCards.length / cardsPerPage);
+
   return (
     <div className="min-h-screen flex flex-col bg-zinc-950 text-zinc-100 font-sans">
       {/* Custom Standalone Toolbar */}
       <div className="toolbar no-print">
         <div className="toolbar-title flex items-center gap-2">
           <span style={{ fontSize: "1.1rem" }}>🎫</span>
-          <span className="font-bold tracking-tight text-white">Admit Card Preview</span>
+          <span className="font-bold tracking-tight text-white">Admit Card Workspace</span>
           <span className="toolbar-badge select-none">{classNameStr} - {classSection}</span>
           <span className="text-[10px] text-zinc-400 font-semibold uppercase tracking-wider ml-2 bg-amber-500/10 text-amber-400 px-2 py-0.5 rounded border border-amber-500/20">
-            {admitCards.length} Cards Generated
+            {admitCards.length} Cards
           </span>
         </div>
         
         <div className="toolbar-actions flex items-center gap-3">
+          {/* Template Switcher */}
+          <div className="flex items-center gap-2 bg-white/10 px-2.5 py-1.5 rounded-lg border border-white/10">
+            <span className="text-[10px] text-zinc-300 font-bold uppercase tracking-wider">Style:</span>
+            <select 
+              value={selectedTemplate} 
+              onChange={(e) => setSelectedTemplate(e.target.value)}
+              className="bg-zinc-800 text-white text-xs font-bold border-none rounded px-2 py-1 outline-none cursor-pointer focus:ring-1 focus:ring-amber-500"
+              style={{ colorScheme: 'dark' }}
+            >
+              <option value="classic_quad">Classic Quad (4 per A4)</option>
+              <option value="premium_modern">Premium Modern (4 per A4)</option>
+              <option value="compact_dual">Detailed Dual (2 per A4)</option>
+              <option value="minimal_ticket">Minimalist Ticket (4 per A4)</option>
+            </select>
+          </div>
+
+          {/* Zoom Controls */}
           <div className="zoom-controls">
             <button 
               className="zoom-btn" 
@@ -70,7 +91,7 @@ function AdmitCardPrintPreview({
             </button>
           </div>
           
-          <button className="action-btn bg-amber-600 hover:bg-amber-700 text-white" onClick={handlePrint} disabled={printing}>
+          <button className="action-btn bg-emerald-600 hover:bg-emerald-700 text-white" onClick={handlePrint} disabled={printing}>
             {printing ? (
               <>
                 <Loader2 className="size-3.5 animate-spin mr-1.5" />
@@ -93,7 +114,7 @@ function AdmitCardPrintPreview({
       {/* Scrollable grid pattern viewport */}
       <div className="viewer-container overflow-y-auto flex-1 flex flex-col items-center justify-start">
         <div className="flex flex-col items-center gap-8 py-10 w-full animate-in fade-in duration-300">
-          {Array.from({ length: Math.ceil(admitCards.length / 4) }).map((_, pageIdx) => (
+          {Array.from({ length: totalPages }).map((_, pageIdx) => (
             <div 
               key={`page-${pageIdx}`}
               className="shrink-0 transition-all duration-300 paper-shadow bg-white flex flex-col justify-start"
@@ -104,7 +125,10 @@ function AdmitCardPrintPreview({
               }}
             >
               <div 
-                className="grid grid-cols-2 gap-x-4 gap-y-6 p-[8mm] content-start bg-white"
+                className={selectedTemplate === 'compact_dual' 
+                  ? "grid grid-cols-1 gap-y-6 p-[12mm] content-start bg-white"
+                  : "grid grid-cols-2 gap-x-4 gap-y-6 p-[8mm] content-start bg-white"
+                }
                 style={{ 
                   width: 794, 
                   height: 1123,
@@ -112,13 +136,16 @@ function AdmitCardPrintPreview({
                   transformOrigin: 'top left'
                 }}
               >
-                {admitCards.slice(pageIdx * 4, (pageIdx + 1) * 4).map((card) => (
+                {admitCards.slice(pageIdx * cardsPerPage, (pageIdx + 1) * cardsPerPage).map((card) => (
                   <div 
                     key={card.cardNumber} 
-                    className="flex items-center justify-center h-[13.8cm] p-1 border border-dashed border-zinc-300"
+                    className={selectedTemplate === 'compact_dual'
+                      ? "flex items-center justify-center h-[12.8cm] p-1 border border-dashed border-zinc-200"
+                      : "flex items-center justify-center h-[13.8cm] p-1 border border-dashed border-zinc-300"
+                    }
                   >
                     <div className="size-full flex items-center justify-center p-1">
-                      <AdmitCardVisual card={card} />
+                      <AdmitCardVisual card={card} templateId={selectedTemplate} />
                     </div>
                   </div>
                 ))}
@@ -134,19 +161,28 @@ function AdmitCardPrintPreview({
           <style type="text/css" media="print">
             {"@page { size: A4; margin: 0mm; } body { margin: 0; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; } .admit-card-page { page-break-after: always; }"}
           </style>
-          {Array.from({ length: Math.ceil(admitCards.length / 4) }).map((_, pageIdx) => (
-            <div key={`page-print-${pageIdx}`} className="grid grid-cols-2 gap-x-4 gap-y-6 p-[8mm] admit-card-page h-[29.7cm] content-start bg-white">
-              {admitCards.slice(pageIdx * 4, (pageIdx + 1) * 4).map((card) => (
+          {Array.from({ length: totalPages }).map((_, pageIdx) => (
+            <div 
+              key={`page-print-${pageIdx}`} 
+              className={selectedTemplate === 'compact_dual'
+                ? "grid grid-cols-1 gap-y-6 p-[12mm] admit-card-page h-[29.7cm] content-start bg-white"
+                : "grid grid-cols-2 gap-x-4 gap-y-6 p-[8mm] admit-card-page h-[29.7cm] content-start bg-white"
+              }
+            >
+              {admitCards.slice(pageIdx * cardsPerPage, (pageIdx + 1) * cardsPerPage).map((card) => (
                 <div 
                   key={`print-${card.cardNumber}`} 
-                  className="flex items-center justify-center h-[13.8cm] p-1 border border-dashed border-zinc-300"
+                  className={selectedTemplate === 'compact_dual'
+                    ? "flex items-center justify-center h-[12.8cm] p-1 border border-dashed border-zinc-200"
+                    : "flex items-center justify-center h-[13.8cm] p-1 border border-dashed border-zinc-300"
+                  }
                   style={{ 
                     pageBreakInside: 'avoid',
                     breakInside: 'avoid'
                   }}
                 >
                   <div className="size-full flex items-center justify-center p-1">
-                    <AdmitCardVisual card={card} />
+                    <AdmitCardVisual card={card} templateId={selectedTemplate} />
                   </div>
                 </div>
               ))}
@@ -202,7 +238,7 @@ export async function handleAdmitCardPreviewNewTab({
           align-items: center;
           justify-content: space-between;
           padding: 0.75rem 1.5rem;
-          background: linear-gradient(135deg, #78350f 0%, #0f172a 100%); /* Warm Amber to Slate */
+          background: linear-gradient(135deg, #065f46 0%, #0f172a 100%); /* Warm Emerald to Slate */
           color: #ffffff;
           box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.3);
           border-bottom: 1px solid rgba(255, 255, 255, 0.05);
@@ -220,11 +256,11 @@ export async function handleAdmitCardPreviewNewTab({
         .toolbar-badge {
           font-size: 0.7rem;
           font-weight: 600;
-          color: #fde68a; /* amber-200 */
-          background-color: rgba(245, 158, 11, 0.15); /* amber-500 */
+          color: #a7f3d0; /* emerald-200 */
+          background-color: rgba(16, 185, 129, 0.15); /* emerald-500 */
           padding: 0.25rem 0.75rem;
           border-radius: 9999px;
-          border: 1px solid rgba(245, 158, 11, 0.2);
+          border: 1px solid rgba(16, 185, 129, 0.2);
           text-transform: uppercase;
           letter-spacing: 0.05em;
         }
@@ -263,14 +299,13 @@ export async function handleAdmitCardPreviewNewTab({
         
         .zoom-btn.active {
           color: #ffffff;
-          background-color: #f59e0b; /* amber-500 */
+          background-color: #10b981; /* emerald-500 */
         }
         
         .action-btn {
           display: inline-flex;
           align-items: center;
           gap: 0.5rem;
-          background-color: #10b981;
           border: none;
           color: #ffffff;
           padding: 0.45rem 1rem;
@@ -283,7 +318,6 @@ export async function handleAdmitCardPreviewNewTab({
         }
         
         .action-btn:hover {
-          background-color: #059669;
           transform: translateY(-1px);
           box-shadow: 0 4px 6px rgba(16, 185, 129, 0.3);
         }

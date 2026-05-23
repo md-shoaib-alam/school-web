@@ -173,6 +173,7 @@ export function AdminAdmitCards() {
   
   // Load Admit Card Preview Preference
   const [enableModalAdmitCardPreview, setEnableModalAdmitCardPreview] = useState<boolean>(false);
+  const [selectedTemplate, setSelectedTemplate] = useState<string>('classic_quad');
 
   useEffect(() => {
     const fetchSettings = async () => {
@@ -386,6 +387,7 @@ export function AdminAdmitCards() {
         admitCards={admitCards}
         viewCard={viewCard}
         selectedClassId={selectedClassId}
+        templateId={selectedTemplate}
       />
 
       <div className="space-y-6">
@@ -416,6 +418,8 @@ export function AdminAdmitCards() {
             onPrintAll={handlePrintAll}
             admitCardsCount={admitCards.length}
             preparingPrint={preparingPrint}
+            selectedTemplate={selectedTemplate}
+            setSelectedTemplate={setSelectedTemplate}
           />
         )}
 
@@ -449,6 +453,7 @@ export function AdminAdmitCards() {
         card={viewCard}
         onOpenChange={(open) => !open && dispatch({ type: 'SET_VIEW_CARD', card: null })}
         onPrint={() => handlePrintSingle()}
+        templateId={selectedTemplate}
       />
     </div>
   );
