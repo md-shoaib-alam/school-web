@@ -1,7 +1,7 @@
 "use client";
 
 import { apiFetch } from "@/lib/api";
-import { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -14,6 +14,7 @@ import { goeyToast as toast } from "goey-toast";
 import { useAppStore } from "@/store/use-app-store";
 import { MARKSHEET_TEMPLATES } from "./exams/marksheet-templates";
 import { handleMarksheetPreview } from "./school-settings/marksheet-preview";
+import { Switch } from "@/components/ui/switch";
 
 const ALL_DAYS = [
   { key: "monday", label: "Monday", short: "Mon", icon: "📅" },
@@ -40,6 +41,171 @@ interface TenantSettings {
   [key: string]: unknown;
 }
 
+function PrintSheetModePreview({ isEnabled }: { isEnabled: boolean }) {
+  return (
+    <div className="relative w-full max-w-[340px] h-[185px] bg-zinc-950 border border-zinc-800 rounded-xl overflow-hidden shadow-xl select-none mx-auto lg:mx-0 flex flex-col transition-all duration-300">
+      {/* Dynamic Simulated Browser Tabs Bar */}
+      <div className="h-8 bg-zinc-900 border-b border-zinc-850 px-2.5 flex items-end gap-1.5 shrink-0 justify-between">
+        {/* Window controls */}
+        <div className="flex items-center gap-1 mb-2">
+          <span className="size-2 rounded-full bg-red-500/50" />
+          <span className="size-2 rounded-full bg-yellow-500/50" />
+          <span className="size-2 rounded-full bg-green-500/50" />
+        </div>
+        
+        {/* Real-looking browser tabs! */}
+        <div className="flex-1 flex gap-1 items-end max-w-[210px] h-6 overflow-hidden">
+          {/* Main App Tab */}
+          <div className={`h-5 px-2 rounded-t-md text-[8px] font-medium flex items-center gap-1 shrink-0 transition-colors duration-200 ${
+            isEnabled ? "bg-zinc-950 text-emerald-400 border-t border-x border-zinc-800" : "bg-zinc-900/60 text-zinc-500"
+          }`}>
+            🏫 Admin Portal
+          </div>
+          
+          {/* Standalone Tab */}
+          {!isEnabled && (
+            <div className="h-5 px-2 rounded-t-md bg-zinc-950 text-emerald-400 border-t border-x border-zinc-800/80 text-[8px] font-semibold flex items-center gap-1 animate-in slide-in-from-bottom-2 duration-300 shrink-0">
+              🖨️ Print Sheet
+            </div>
+          )}
+        </div>
+
+        {/* Tab badge indicator */}
+        <div className="flex items-center gap-1 mb-1.5">
+          <span className="text-[7.5px] text-zinc-400 font-semibold bg-zinc-855 border border-zinc-800 px-1 py-0.5 rounded leading-none shrink-0">
+            {isEnabled ? "Inline" : "Separate"}
+          </span>
+        </div>
+      </div>
+
+      {/* Main mockup canvas */}
+      <div className="flex-1 bg-zinc-900/40 p-3 relative overflow-hidden flex flex-col justify-between">
+        {/* Mock dashboard base behind everything */}
+        <div className="space-y-2 opacity-60">
+          {/* Header Row */}
+          <div className="flex justify-between items-center">
+            <div className="h-3 w-16 bg-zinc-800 rounded-sm" />
+            <div className="h-3.5 w-10 bg-emerald-500/10 border border-emerald-500/20 rounded-sm" />
+          </div>
+          
+          {/* Fake Table Grid */}
+          <div className="space-y-1">
+            <div className="h-2 w-full bg-zinc-800/50 rounded-sm flex items-center px-1 gap-1">
+              <div className="h-1 w-4 bg-zinc-700 rounded-sm" />
+              <div className="h-1 w-6 bg-zinc-700 rounded-sm" />
+              <div className="h-1 w-8 bg-zinc-700 rounded-sm" />
+            </div>
+            {["row-1", "row-2"].map((rowId) => (
+              <div key={rowId} className="h-2 w-full bg-zinc-900/60 rounded-sm flex items-center px-1 gap-1 border-t border-zinc-800/30">
+                <div className="h-1 w-3 bg-zinc-800 rounded-sm" />
+                <div className="h-1 w-5 bg-zinc-800 rounded-sm" />
+                <div className="h-1 w-7 bg-zinc-800 rounded-sm" />
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Mode-specific Overlay Visualizers */}
+        {isEnabled ? (
+          /* Inline Popover Dialog Modal Mode */
+          <div className="absolute inset-0 bg-black/65 backdrop-blur-[0.5px] flex flex-col items-center justify-center p-2.5 transition-all duration-300 z-30 animate-in fade-in">
+            {/* Explainer badge */}
+            <div className="absolute top-1 text-[7.5px] text-zinc-350 font-bold bg-zinc-900 border border-zinc-800 px-1.5 py-0.5 rounded-full flex items-center gap-1 select-none shadow">
+              <span className="size-1 bg-emerald-500 rounded-full animate-ping" />
+              <span>Modal overlay on the current screen</span>
+            </div>
+
+            <div className="w-[190px] h-[105px] bg-zinc-900 border border-zinc-700 rounded-lg shadow-2xl flex flex-col p-2 justify-between scale-100 opacity-100 transition-all duration-300 ease-out transform animate-in zoom-in-95 mt-2.5">
+              {/* Mini Modal Title Bar */}
+              <div className="flex items-center justify-between border-b border-zinc-800 pb-1 mb-1">
+                <div className="flex items-center gap-1">
+                  <span className="size-1.5 rounded-full bg-emerald-500" />
+                  <span className="text-[7px] font-bold text-zinc-300">Inline Preview Dialog</span>
+                </div>
+                <span className="text-[7px] text-zinc-500 hover:text-zinc-300 cursor-pointer">✕</span>
+              </div>
+              
+              {/* Mini Report Sheet Mockup */}
+              <div className="flex-1 bg-zinc-950/95 rounded border border-zinc-800/60 p-1 flex flex-col gap-1 overflow-hidden">
+                <div className="grid grid-cols-4 gap-0.5 border-b border-zinc-900 pb-0.5">
+                  <span className="text-[5px] text-zinc-500 font-bold">Roll</span>
+                  <span className="text-[5px] text-zinc-500 font-bold">Student</span>
+                  <span className="text-[5px] text-zinc-500 font-bold">GPA</span>
+                  <span className="text-[5px] text-zinc-500 font-bold">Status</span>
+                </div>
+                <div className="grid grid-cols-4 gap-0.5 items-center">
+                  <span className="text-[5px] text-zinc-400">101</span>
+                  <span className="text-[5px] text-zinc-300 truncate">A. Khan</span>
+                  <span className="text-[5px] text-emerald-400 font-bold">4.00</span>
+                  <span className="text-[4px] px-0.5 py-0 bg-emerald-500/10 text-emerald-400 rounded-sm font-medium w-fit">Pass</span>
+                </div>
+              </div>
+
+              {/* Mini Modal Action Button */}
+              <div className="flex justify-between items-center mt-1 pt-1 border-t border-zinc-800">
+                <span className="text-[5px] text-zinc-500">Esc key to exit modal</span>
+                <span className="px-1 py-0.5 bg-emerald-600 rounded text-[5px] text-white font-semibold flex items-center gap-0.5 leading-none">
+                  🖨️ Print
+                </span>
+              </div>
+            </div>
+          </div>
+        ) : (
+          /* New Tab Preview Mode */
+          <div className="absolute inset-0 flex items-center justify-center p-3 transition-all duration-300 z-30 pointer-events-none animate-in fade-in">
+            {/* Explainer badge */}
+            <div className="absolute top-1 text-[7.5px] text-zinc-355 font-bold bg-zinc-900 border border-zinc-800 px-1.5 py-0.5 rounded-full flex items-center gap-1 select-none shadow">
+              <span className="size-1 bg-emerald-500 rounded-full animate-ping" />
+              <span>Slides open in a separate new tab</span>
+            </div>
+
+            {/* Click pointer indicator */}
+            <div className="absolute left-[38%] top-[25%] size-5 z-40 animate-ping rounded-full border border-emerald-500/40 bg-emerald-500/10 duration-1000" />
+            
+            {/* The second overlapping page representing "New Browser Window/Tab" */}
+            <div className="w-[185px] h-[105px] bg-zinc-950 border border-emerald-500/40 rounded-lg shadow-[0_4px_20px_rgba(16,185,129,0.18)] flex flex-col absolute right-2 bottom-1 translate-x-0 translate-y-0 z-20 scale-100 opacity-100 transition-all duration-500 ease-out transform animate-in slide-in-from-bottom-4 slide-in-from-right-4 mt-2">
+              {/* Mini browser top bar of the new window */}
+              <div className="h-4 bg-zinc-900 border-b border-zinc-800/80 px-1.5 flex items-center gap-1 justify-between">
+                <div className="flex items-center gap-0.5">
+                  <span className="size-1 rounded-full bg-red-500/60" />
+                  <span className="size-1 rounded-full bg-emerald-500/60 animate-pulse" />
+                </div>
+                <div className="flex-1 mx-1.5 h-2.5 bg-zinc-950 border border-zinc-850 rounded px-1 text-[5px] text-emerald-400 font-mono flex items-center justify-center truncate">
+                  school.edu/print-sheet-tab
+                </div>
+                <div className="size-1.5 bg-emerald-500 rounded-full animate-ping shrink-0" />
+              </div>
+
+              {/* Content of the standalone tab */}
+              <div className="flex-1 p-1.5 bg-zinc-950 flex flex-col justify-between overflow-hidden">
+                <div className="flex items-center justify-between border-b border-zinc-900 pb-0.5">
+                  <span className="text-[6px] text-zinc-350 font-semibold truncate">Tabulation Report Sheet</span>
+                  <span className="text-[5px] text-emerald-400 font-bold bg-emerald-500/10 px-0.5 rounded">Standalone</span>
+                </div>
+
+                <div className="flex-1 my-1 border border-dashed border-zinc-800 rounded p-0.5 flex flex-col gap-0.5 bg-zinc-900/40 justify-center">
+                  <div className="flex items-center gap-1 justify-center">
+                    <span className="text-[12px] animate-bounce">📄</span>
+                    <div className="flex flex-col gap-0.5">
+                      <span className="text-[5px] text-zinc-400">Class 10 - Section A</span>
+                      <span className="text-[4px] text-zinc-500">Press Ctrl+P to print immediately</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="flex items-center justify-between text-[4px] text-zinc-500">
+                  <span>Zoom: 100%</span>
+                  <span>Print-Ready Grid</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
 export function AdminSchoolSettings() {
   const { currentTenantId } = useAppStore();
 
@@ -49,6 +215,7 @@ export function AdminSchoolSettings() {
     new Set(DEFAULT_WORKING_DAYS),
   );
   const [defaultMarksheetTemplateId, setDefaultMarksheetTemplateId] = useState<string>("classic");
+  const [enableModalTabulationPreview, setEnableModalTabulationPreview] = useState<boolean>(false);
   const [hasChanges, setHasChanges] = useState(false);
   const [initialSettings, setInitialSettings] = useState<TenantSettings | null>(
     null,
@@ -73,6 +240,9 @@ export function AdminSchoolSettings() {
       }
       if (data.defaultMarksheetTemplateId && typeof data.defaultMarksheetTemplateId === "string") {
         setDefaultMarksheetTemplateId(data.defaultMarksheetTemplateId);
+      }
+      if (typeof data.enableModalTabulationPreview === "boolean") {
+        setEnableModalTabulationPreview(data.enableModalTabulationPreview);
       }
     } catch {
       // Use defaults if fetch fails
@@ -117,6 +287,7 @@ export function AdminSchoolSettings() {
         ...(initialSettings || {}),
         workingDays: Array.from(workingDays),
         defaultMarksheetTemplateId,
+        enableModalTabulationPreview,
       };
 
       const res = await apiFetch("/api/tenant-settings", {
@@ -132,7 +303,7 @@ export function AdminSchoolSettings() {
 
       setHasChanges(false);
       setInitialSettings((prev) =>
-        prev ? { ...prev, workingDays: Array.from(workingDays), defaultMarksheetTemplateId } : prev,
+        prev ? { ...prev, workingDays: Array.from(workingDays), defaultMarksheetTemplateId, enableModalTabulationPreview } : prev,
       );
       toast.success("School settings saved successfully.");
     } catch (err) {
@@ -272,7 +443,7 @@ export function AdminSchoolSettings() {
                   setHasChanges(true);
                 }}
               >
-                <SelectTrigger className="w-full h-10 border-violet-200 dark:border-violet-900/50 bg-background">
+                <SelectTrigger className="w-full h-10 border-violet-200 dark:border-violet-900/50 bg-background text-xs font-medium">
                   <div className="flex items-center gap-2">
                     <Settings className="size-4 text-violet-500" />
                     <SelectValue placeholder="Choose default marksheet…" />
@@ -302,6 +473,64 @@ export function AdminSchoolSettings() {
           <div className="p-3 bg-zinc-50 dark:bg-zinc-900/50 rounded-lg border border-zinc-100 dark:border-zinc-800 text-xs text-muted-foreground flex gap-2">
             <Info className="size-4 text-violet-500 shrink-0" />
             <span>Changing this default will automatically format the report card preview under student login profiles to use this style.</span>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Print Sheet Settings Card */}
+      <Card>
+        <CardHeader>
+          <div className="flex items-center gap-3">
+            <div className="size-9 rounded-lg bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center text-lg">
+              📊
+            </div>
+            <div>
+              <CardTitle className="text-lg">Print Sheet Preference</CardTitle>
+              <p className="text-sm text-zinc-500 dark:text-zinc-400 mt-0.5">
+                Configure the default preview and printing mode for class academic print sheets
+              </p>
+            </div>
+          </div>
+        </CardHeader>
+        <CardContent className="pt-0">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
+            {/* Left Column (7 cols): Switch settings & info */}
+            <div className="lg:col-span-7 space-y-4">
+              <div className="flex items-center justify-between p-3.5 bg-zinc-50/50 dark:bg-zinc-900/10 rounded-lg border border-zinc-150 dark:border-zinc-800/60 w-full">
+                <div className="space-y-0.5 pr-4">
+                  <Label htmlFor="enableModalTabulationPreview" className="text-sm font-semibold cursor-pointer text-zinc-800 dark:text-zinc-200">
+                    Inline Print Sheet Preview
+                  </Label>
+                  <p className="text-xs text-muted-foreground">
+                    Open print sheets in a popover dialog modal instead of a new browser tab.
+                  </p>
+                </div>
+                <Switch
+                  id="enableModalTabulationPreview"
+                  checked={enableModalTabulationPreview}
+                  onCheckedChange={(checked) => {
+                    setEnableModalTabulationPreview(checked);
+                    setHasChanges(true);
+                  }}
+                />
+              </div>
+              <div className="p-3 bg-zinc-50 dark:bg-zinc-900/50 rounded-lg border border-zinc-100 dark:border-zinc-800 text-xs text-muted-foreground flex gap-2">
+                <Info className="size-4 text-emerald-500 shrink-0" />
+                <span>Changing this default will format how administrators and teachers preview finalized results sheets.</span>
+              </div>
+            </div>
+
+            {/* Right Column (5 cols): Example preview animation */}
+            <div className="lg:col-span-5 flex flex-col items-center lg:items-start pl-0 lg:pl-6 border-t lg:border-t-0 lg:border-l border-zinc-100 dark:border-zinc-800 pt-6 lg:pt-0">
+              <div className="text-xs font-semibold text-zinc-500 dark:text-zinc-400 mb-2.5 flex items-center gap-1.5 select-none">
+                <span className="relative flex h-2 w-2">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                </span>
+                Interactive Preview Demonstration
+              </div>
+              <PrintSheetModePreview isEnabled={enableModalTabulationPreview} />
+            </div>
           </div>
         </CardContent>
       </Card>
