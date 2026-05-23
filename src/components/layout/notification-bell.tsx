@@ -55,11 +55,12 @@ export function NotificationBell() {
     }
   }, [currentUserId]);
 
-  useEffect(() => {
-    if (open) {
+  const handleOpenChange = (nextOpen: boolean) => {
+    setOpen(nextOpen);
+    if (nextOpen) {
       fetchNotices();
     }
-  }, [open, fetchNotices]);
+  };
 
   // Initial fetch for count + Event listener for real-time updates
   useEffect(() => {
@@ -107,7 +108,7 @@ export function NotificationBell() {
   };
 
   return (
-    <Popover open={open} onOpenChange={setOpen}>
+    <Popover open={open} onOpenChange={handleOpenChange}>
       <PopoverTrigger asChild>
         <Button
           variant="ghost"
