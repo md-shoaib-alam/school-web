@@ -17,6 +17,7 @@ import {
 import { WorkingDaysSettingsCard } from "./school-settings/working-days-card";
 import { MarksheetSettingsCard } from "./school-settings/marksheet-settings-card";
 import { PrintSheetSettingsCard } from "./school-settings/print-sheet-settings-card";
+import { AdmitCardSettingsCard } from "./school-settings/admit-card-settings-card";
 
 export function AdminSchoolSettings() {
   const { currentTenantId } = useAppStore();
@@ -64,6 +65,10 @@ export function AdminSchoolSettings() {
     dispatch({ type: "TOGGLE_TABULATION_PREVIEW", checked });
   };
 
+  const handleToggleAdmitCardPreview = (checked: boolean) => {
+    dispatch({ type: "TOGGLE_ADMIT_CARD_PREVIEW", checked });
+  };
+
   const handleSave = async () => {
     if (!currentTenantId) return;
     if (state.workingDays.size === 0) {
@@ -79,6 +84,7 @@ export function AdminSchoolSettings() {
         defaultMarksheetTemplateId: state.defaultMarksheetTemplateId,
         enableModalTabulationPreview: state.enableModalTabulationPreview,
         enableModalMarksheetPreview: state.enableModalMarksheetPreview,
+        enableModalAdmitCardPreview: state.enableModalAdmitCardPreview,
       };
 
       const res = await apiFetch("/api/tenant-settings", {
@@ -99,6 +105,7 @@ export function AdminSchoolSettings() {
           defaultMarksheetTemplateId: state.defaultMarksheetTemplateId,
           enableModalTabulationPreview: state.enableModalTabulationPreview,
           enableModalMarksheetPreview: state.enableModalMarksheetPreview,
+          enableModalAdmitCardPreview: state.enableModalAdmitCardPreview,
         },
       });
       toast.success("School settings saved successfully.");
@@ -152,6 +159,12 @@ export function AdminSchoolSettings() {
       <PrintSheetSettingsCard
         enableModalTabulationPreview={state.enableModalTabulationPreview}
         onToggleTabulationPreview={handleToggleTabulationPreview}
+      />
+
+      {/* Admit Card Settings Card */}
+      <AdmitCardSettingsCard
+        enableModalAdmitCardPreview={state.enableModalAdmitCardPreview}
+        onToggleAdmitCardPreview={handleToggleAdmitCardPreview}
       />
 
       {/* Summary and Save - Dashboard Page Level Footer */}

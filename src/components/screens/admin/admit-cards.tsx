@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useCallback, useRef, useMemo, useReducer } from 'react';
+import { useState, useEffect, useCallback, useRef, useMemo, useReducer } from 'react';
 import { useReactToPrint } from 'react-to-print';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -170,6 +170,24 @@ export function AdminAdmitCards() {
   const todayDateString = useMemo(() => getTodayDateString(), []);
 
   const [state, dispatch] = useReducer(admitCardReducer, initialAdmitCardState);
+  
+  // Load Admit Card Preview Preference
+  const [enableModalAdmitCardPreview, setEnableModalAdmitCardPreview] = useState<boolean>(false);
+
+  useEffect(() => {
+    const fetchSettings = async () => {
+      try {
+        const res = await apiFetch("/api/tenant-settings");
+        if (res.ok) {
+          const data = await res.json();
+          setEnableModalAdmitCardPreview(data.enableModalAdmitCardPreview === true);
+        }
+      } catch (err) {
+        console.error("Failed to load settings:", err);
+      }
+    };
+    fetchSettings();
+  }, []);
   const {
     selectedClassId,
     selectedExamType,
@@ -281,11 +299,33 @@ export function AdminAdmitCards() {
   });
 
   const handlePrintAll = useCallback(async () => {
-    dispatch({ type: 'SET_PREPARING_PRINT', preparing: true });
-    setTimeout(() => {
-      handlePrintAllBase();
-    }, 500);
-  }, [handlePrintAllBase]);
+    if (enableModalAdmitCardPreview) {
+      dispatch({ type: 'SET_PREPARING_PRINT', preparing: true });
+      setTimeout(() => {
+        handlePrintAllBase();
+      }, 500);
+    } else {
+      const activeClass = classes.find((c: any) => c.id === selectedClassId);
+      const classNameStr = activeClass?.name || 'Class';
+      const classSection = activeClass?.section || '';
+      
+      toast.promise(
+        (async () => {
+          const { handleAdmitCardPreviewNewTab } = await import('./admit-cards/admitCardPrinter');
+          await handleAdmitCardPreviewNewTab({
+            admitCards,
+            classNameStr,
+            classSection,
+          });
+        })(),
+        {
+          loading: 'Loading admit card workspace...',
+          success: 'Admit card workspace opened in a new tab!',
+          error: 'Failed to load admit card workspace',
+        }
+      );
+    }
+  }, [enableModalAdmitCardPreview, handlePrintAllBase, classes, selectedClassId, admitCards]);
 
   const totalStudents = classData?.students.length || 0;
   const totalExams = classData ? (

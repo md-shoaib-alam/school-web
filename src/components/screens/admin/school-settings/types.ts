@@ -25,6 +25,7 @@ export interface TenantSettings {
   defaultMarksheetTemplateId?: string;
   enableModalTabulationPreview?: boolean;
   enableModalMarksheetPreview?: boolean;
+  enableModalAdmitCardPreview?: boolean;
   [key: string]: unknown;
 }
 
@@ -35,6 +36,7 @@ export interface SettingsState {
   defaultMarksheetTemplateId: string;
   enableModalTabulationPreview: boolean;
   enableModalMarksheetPreview: boolean;
+  enableModalAdmitCardPreview: boolean;
   hasChanges: boolean;
   initialSettings: TenantSettings | null;
 }
@@ -48,6 +50,7 @@ export type SettingsAction =
   | { type: "SET_MARKSHEET_TEMPLATE"; templateId: string }
   | { type: "TOGGLE_TABULATION_PREVIEW"; checked: boolean }
   | { type: "TOGGLE_MARKSHEET_PREVIEW"; checked: boolean }
+  | { type: "TOGGLE_ADMIT_CARD_PREVIEW"; checked: boolean }
   | { type: "SAVE_START" }
   | {
       type: "SAVE_SUCCESS";
@@ -56,6 +59,7 @@ export type SettingsAction =
         defaultMarksheetTemplateId: string;
         enableModalTabulationPreview: boolean;
         enableModalMarksheetPreview: boolean;
+        enableModalAdmitCardPreview: boolean;
       };
     }
   | { type: "SAVE_ERROR" };
@@ -67,6 +71,7 @@ export const initialState: SettingsState = {
   defaultMarksheetTemplateId: "classic",
   enableModalTabulationPreview: false,
   enableModalMarksheetPreview: false,
+  enableModalAdmitCardPreview: false,
   hasChanges: false,
   initialSettings: null,
 };
@@ -84,6 +89,7 @@ export function settingsReducer(state: SettingsState, action: SettingsAction): S
       let nextTemplateId = state.defaultMarksheetTemplateId;
       let nextTabPreview = state.enableModalTabulationPreview;
       let nextMarksheetPreview = state.enableModalMarksheetPreview;
+      let nextAdmitCardPreview = state.enableModalAdmitCardPreview;
 
       if (data.workingDays && Array.isArray(data.workingDays)) {
         const validDays = data.workingDays.filter((d: string) =>
@@ -102,6 +108,9 @@ export function settingsReducer(state: SettingsState, action: SettingsAction): S
       if (typeof data.enableModalMarksheetPreview === "boolean") {
         nextMarksheetPreview = data.enableModalMarksheetPreview;
       }
+      if (typeof data.enableModalAdmitCardPreview === "boolean") {
+        nextAdmitCardPreview = data.enableModalAdmitCardPreview;
+      }
 
       return {
         ...state,
@@ -111,6 +120,7 @@ export function settingsReducer(state: SettingsState, action: SettingsAction): S
         defaultMarksheetTemplateId: nextTemplateId,
         enableModalTabulationPreview: nextTabPreview,
         enableModalMarksheetPreview: nextMarksheetPreview,
+        enableModalAdmitCardPreview: nextAdmitCardPreview,
         hasChanges: false,
       };
     }
@@ -156,13 +166,19 @@ export function settingsReducer(state: SettingsState, action: SettingsAction): S
         enableModalMarksheetPreview: action.checked,
         hasChanges: true,
       };
+    case "TOGGLE_ADMIT_CARD_PREVIEW":
+      return {
+        ...state,
+        enableModalAdmitCardPreview: action.checked,
+        hasChanges: true,
+      };
     case "SAVE_START":
       return {
         ...state,
         saving: true,
       };
     case "SAVE_SUCCESS": {
-      const { workingDays, defaultMarksheetTemplateId, enableModalTabulationPreview, enableModalMarksheetPreview } = action.payload;
+      const { workingDays, defaultMarksheetTemplateId, enableModalTabulationPreview, enableModalMarksheetPreview, enableModalAdmitCardPreview } = action.payload;
       return {
         ...state,
         saving: false,
@@ -174,6 +190,7 @@ export function settingsReducer(state: SettingsState, action: SettingsAction): S
               defaultMarksheetTemplateId,
               enableModalTabulationPreview,
               enableModalMarksheetPreview,
+              enableModalAdmitCardPreview,
             }
           : null,
       };
