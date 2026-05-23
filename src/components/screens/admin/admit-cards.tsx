@@ -85,8 +85,7 @@ export function AdminAdmitCards() {
   const [selectedExamType, setSelectedExamType] = useState<string>('');
   const [admitCards, setAdmitCards] = useState<AdmitCard[]>([]);
   const [generating, setGenerating] = useState(false);
-  const [selectedStudentIds, setSelectedStudentIds] = useState<Set<string>>(new Set());
-  const [selectAll, setSelectAll] = useState(true);
+  const [deselectedStudentIds, setDeselectedStudentIds] = useState<Set<string>>(new Set());
   const [viewCard, setViewCard] = useState<AdmitCard | null>(null);
   const [preparingPrint, setPreparingPrint] = useState(false);
 
@@ -123,27 +122,24 @@ export function AdminAdmitCards() {
     return Array.from(types) as string[];
   }, [classData, todayDateString]);
 
-  useEffect(() => {
-    if (classData?.students) {
-      queueMicrotask(() => {
-        setSelectedStudentIds(new Set(classData.students.map((s: any) => s.id)));
-        setSelectAll(true);
-      });
-    }
-  }, [classData]);
+  const currentExamType = selectedExamType || availableExamTypes[0] || '';
 
-  useEffect(() => {
-    if (availableExamTypes.length > 0 && !selectedExamType) {
-      queueMicrotask(() => {
-        setSelectedExamType(availableExamTypes[0]);
-      });
-    }
-  }, [availableExamTypes, selectedExamType]);
+  const selectedStudentIds = useMemo<Set<string>>(() => {
+    if (!classData?.students) return new Set<string>();
+    const allIds = classData.students.map((s: any) => s.id as string);
+    return new Set<string>(allIds.filter((id) => !deselectedStudentIds.has(id)));
+  }, [classData, deselectedStudentIds]);
+
+  const selectAll = useMemo(() => {
+    if (!classData?.students || classData.students.length === 0) return false;
+    return deselectedStudentIds.size === 0;
+  }, [classData, deselectedStudentIds]);
 
   const handleClassChange = (classId: string) => {
     setSelectedClassId(classId);
     setAdmitCards([]);
     setSelectedExamType('');
+    setDeselectedStudentIds(new Set());
   };
 
   const handleGenerate = async () => {
@@ -156,7 +152,7 @@ export function AdminAdmitCards() {
         method: 'POST',
         body: JSON.stringify({
           classId: selectedClassId,
-          examType: selectedExamType,
+          examType: currentExamType,
           studentIds: Array.from(selectedStudentIds),
         }),
       });
@@ -173,11 +169,10 @@ export function AdminAdmitCards() {
   };
 
   const toggleStudent = (id: string) => {
-    setSelectedStudentIds((prev) => {
+    setDeselectedStudentIds((prev) => {
       const next = new Set(prev);
       if (next.has(id)) next.delete(id);
       else next.add(id);
-      setSelectAll(classData ? next.size === classData.students.length : false);
       return next;
     });
   };
@@ -185,11 +180,9 @@ export function AdminAdmitCards() {
   const handleToggleAll = () => {
     if (!classData) return;
     if (selectAll) {
-      setSelectedStudentIds(new Set());
-      setSelectAll(false);
+      setDeselectedStudentIds(new Set(classData.students.map((s: any) => s.id)));
     } else {
-      setSelectedStudentIds(new Set(classData.students.map((s: any) => s.id)));
-      setSelectAll(true);
+      setDeselectedStudentIds(new Set());
     }
   };
 
@@ -216,7 +209,7 @@ export function AdminAdmitCards() {
     classData.exams.filter((e: any) => {
       const isScheduled = e.status?.trim().toLowerCase() === 'scheduled';
       const isUpcoming = e.date >= todayDateString;
-      return e.examType === selectedExamType && (isScheduled || isUpcoming) && !e.resultPublished;
+      return e.examType === currentExamType && (isScheduled || isUpcoming) && !e.resultPublished;
     }).length
   ) : 0;
 
