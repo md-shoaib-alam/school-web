@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
+import { useEffect, useCallback, useRef, useMemo, useReducer } from 'react';
 import { useReactToPrint } from 'react-to-print';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -75,19 +75,110 @@ function getExamTypeColor(type: string): string {
   return examTypeColors[type] || 'bg-zinc-100 dark:bg-zinc-900/30 text-zinc-700 dark:text-zinc-400';
 }
 
+// Reducer State & Types
+interface AdmitCardState {
+  selectedClassId: string;
+  selectedExamType: string;
+  admitCards: AdmitCard[];
+  generating: boolean;
+  deselectedStudentIds: Set<string>;
+  viewCard: AdmitCard | null;
+  preparingPrint: boolean;
+}
+
+type AdmitCardAction =
+  | { type: 'SET_CLASS_ID'; classId: string }
+  | { type: 'SET_EXAM_TYPE'; examType: string }
+  | { type: 'SET_ADMIT_CARDS'; admitCards: AdmitCard[] }
+  | { type: 'SET_GENERATING'; generating: boolean }
+  | { type: 'TOGGLE_STUDENT'; id: string }
+  | { type: 'TOGGLE_ALL_STUDENTS'; selectAll: boolean; studentIds: string[] }
+  | { type: 'SET_VIEW_CARD'; card: AdmitCard | null }
+  | { type: 'SET_PREPARING_PRINT'; preparing: boolean };
+
+const initialAdmitCardState: AdmitCardState = {
+  selectedClassId: '',
+  selectedExamType: '',
+  admitCards: [],
+  generating: false,
+  deselectedStudentIds: new Set<string>(),
+  viewCard: null,
+  preparingPrint: false,
+};
+
+function admitCardReducer(state: AdmitCardState, action: AdmitCardAction): AdmitCardState {
+  switch (action.type) {
+    case 'SET_CLASS_ID':
+      return {
+        ...state,
+        selectedClassId: action.classId,
+        admitCards: [],
+        selectedExamType: '',
+        deselectedStudentIds: new Set<string>(),
+      };
+    case 'SET_EXAM_TYPE':
+      return {
+        ...state,
+        selectedExamType: action.examType,
+      };
+    case 'SET_ADMIT_CARDS':
+      return {
+        ...state,
+        admitCards: action.admitCards,
+      };
+    case 'SET_GENERATING':
+      return {
+        ...state,
+        generating: action.generating,
+      };
+    case 'TOGGLE_STUDENT': {
+      const next = new Set(state.deselectedStudentIds);
+      if (next.has(action.id)) {
+        next.delete(action.id);
+      } else {
+        next.add(action.id);
+      }
+      return {
+        ...state,
+        deselectedStudentIds: next,
+      };
+    }
+    case 'TOGGLE_ALL_STUDENTS':
+      return {
+        ...state,
+        deselectedStudentIds: action.selectAll ? new Set<string>(action.studentIds) : new Set<string>(),
+      };
+    case 'SET_VIEW_CARD':
+      return {
+        ...state,
+        viewCard: action.card,
+      };
+    case 'SET_PREPARING_PRINT':
+      return {
+        ...state,
+        preparingPrint: action.preparing,
+      };
+    default:
+      return state;
+  }
+}
+
 export function AdminAdmitCards() {
   const queryClient = useQueryClient();
   const singleCardRef = useRef<HTMLDivElement>(null);
   const allCardsRef = useRef<HTMLDivElement>(null);
   const todayDateString = useMemo(() => getTodayDateString(), []);
 
-  const [selectedClassId, setSelectedClassId] = useState<string>('');
-  const [selectedExamType, setSelectedExamType] = useState<string>('');
-  const [admitCards, setAdmitCards] = useState<AdmitCard[]>([]);
-  const [generating, setGenerating] = useState(false);
-  const [deselectedStudentIds, setDeselectedStudentIds] = useState<Set<string>>(new Set());
-  const [viewCard, setViewCard] = useState<AdmitCard | null>(null);
-  const [preparingPrint, setPreparingPrint] = useState(false);
+  const [state, dispatch] = useReducer(admitCardReducer, initialAdmitCardState);
+  const {
+    selectedClassId,
+    selectedExamType,
+    admitCards,
+    generating,
+    deselectedStudentIds,
+    viewCard,
+    preparingPrint,
+  } = state;
 
   const { data: classes = [], isLoading: loadingClasses } = useQuery({
     queryKey: ['classes-min'],
@@ -136,17 +227,14 @@ export function AdminAdmitCards() {
   }, [classData, deselectedStudentIds]);
 
   const handleClassChange = (classId: string) => {
-    setSelectedClassId(classId);
-    setAdmitCards([]);
-    setSelectedExamType('');
-    setDeselectedStudentIds(new Set());
+    dispatch({ type: 'SET_CLASS_ID', classId });
   };
 
   const handleGenerate = async () => {
     if (!selectedClassId) { toast.error('Please select a class'); return; }
     if (selectedStudentIds.size === 0) { toast.error('Please select at least one student'); return; }
 
-    setGenerating(true);
+    dispatch({ type: 'SET_GENERATING', generating: true });
     try {
       const res = await apiFetch('/api/admit-cards', {
         method: 'POST',
@@ -158,32 +246,27 @@ export function AdminAdmitCards() {
       });
       if (res.ok) {
         const data = await res.json();
-        setAdmitCards(data.admitCards);
+        dispatch({ type: 'SET_ADMIT_CARDS', admitCards: data.admitCards });
         toast.success(`${data.totalGenerated} admit card${data.totalGenerated !== 1 ? 's' : ''} generated successfully!`);
       } else {
         const err = await res.json();
         toast.error(err.error || 'Failed to generate admit cards');
       }
     } catch { toast.error('Error generating admit cards'); }
-    setGenerating(false);
+    dispatch({ type: 'SET_GENERATING', generating: false });
   };
 
   const toggleStudent = (id: string) => {
-    setDeselectedStudentIds((prev) => {
-      const next = new Set(prev);
-      if (next.has(id)) next.delete(id);
-      else next.add(id);
-      return next;
-    });
+    dispatch({ type: 'TOGGLE_STUDENT', id });
   };
 
   const handleToggleAll = () => {
     if (!classData) return;
-    if (selectAll) {
-      setDeselectedStudentIds(new Set(classData.students.map((s: any) => s.id)));
-    } else {
-      setDeselectedStudentIds(new Set());
-    }
+    dispatch({
+      type: 'TOGGLE_ALL_STUDENTS',
+      selectAll,
+      studentIds: classData.students.map((s: any) => s.id),
+    });
   };
 
   const handlePrintSingle = useReactToPrint({
@@ -194,11 +277,11 @@ export function AdminAdmitCards() {
   const handlePrintAllBase = useReactToPrint({
     contentRef: allCardsRef,
     documentTitle: `Admit_Cards_${selectedClassId}`,
-    onAfterPrint: () => setPreparingPrint(false),
+    onAfterPrint: () => dispatch({ type: 'SET_PREPARING_PRINT', preparing: false }),
   });
 
   const handlePrintAll = useCallback(async () => {
-    setPreparingPrint(true);
+    dispatch({ type: 'SET_PREPARING_PRINT', preparing: true });
     setTimeout(() => {
       handlePrintAllBase();
     }, 500);
@@ -259,8 +342,8 @@ export function AdminAdmitCards() {
         {classData && (
           <ConfigurationCard 
             availableExamTypes={availableExamTypes}
-            selectedExamType={selectedExamType}
-            setSelectedExamType={setSelectedExamType}
+            selectedExamType={currentExamType}
+            setSelectedExamType={(examType) => dispatch({ type: 'SET_EXAM_TYPE', examType })}
             classData={classData}
             todayDateString={todayDateString}
             totalStudents={totalStudents}
@@ -287,7 +370,7 @@ export function AdminAdmitCards() {
         {admitCards.length > 0 && (
           <GeneratedCardsTable 
             admitCards={admitCards}
-            onView={setViewCard}
+            onView={(card) => dispatch({ type: 'SET_VIEW_CARD', card })}
             getExamTypeColor={getExamTypeColor}
           />
         )}
@@ -305,7 +388,7 @@ export function AdminAdmitCards() {
 
       <ViewCardDialog 
         card={viewCard}
-        onOpenChange={(open) => !open && setViewCard(null)}
+        onOpenChange={(open) => !open && dispatch({ type: 'SET_VIEW_CARD', card: null })}
         onPrint={() => handlePrintSingle()}
       />
     </div>
