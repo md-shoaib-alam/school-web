@@ -723,7 +723,7 @@ export function AdminSchoolSettings() {
               <div className="flex items-center justify-between p-3.5 bg-zinc-50/50 dark:bg-zinc-900/10 rounded-lg border border-zinc-150 dark:border-zinc-800/60 w-full">
                 <div className="space-y-0.5 pr-4">
                   <Label htmlFor="enableModalMarksheetPreview" className="text-sm font-semibold cursor-pointer text-zinc-800 dark:text-zinc-200">
-                    Inline Marksheet Preview
+                    Inline Marksheet Print
                   </Label>
                   <p className="text-xs text-muted-foreground">
                     Open marksheet previews in a popover dialog modal instead of a new browser tab.
@@ -782,7 +782,7 @@ export function AdminSchoolSettings() {
               <div className="flex items-center justify-between p-3.5 bg-zinc-50/50 dark:bg-zinc-900/10 rounded-lg border border-zinc-150 dark:border-zinc-800/60 w-full">
                 <div className="space-y-0.5 pr-4">
                   <Label htmlFor="enableModalTabulationPreview" className="text-sm font-semibold cursor-pointer text-zinc-800 dark:text-zinc-200">
-                    Inline Print Sheet Preview
+                    Inline Print Sheet
                   </Label>
                   <p className="text-xs text-muted-foreground">
                     Open print sheets in a popover dialog modal instead of a new browser tab.
