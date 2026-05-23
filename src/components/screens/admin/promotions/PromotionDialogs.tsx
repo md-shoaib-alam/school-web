@@ -81,13 +81,16 @@ export function NewPromotionDialog({
                   <SelectValue placeholder="Select student" />
                 </SelectTrigger>
                 <SelectContent className="max-h-[300px]">
-                  {students
-                    .filter(s => !form.fromClassId || form.fromClassId === "all" || s.classId === form.fromClassId)
-                    .map((s) => (
-                      <SelectItem key={s.id} value={s.id}>
-                        {s.name} (#{s.rollNumber})
-                      </SelectItem>
-                    ))}
+                  {students.reduce<React.ReactNode[]>((acc, s) => {
+                    if (!form.fromClassId || form.fromClassId === "all" || s.classId === form.fromClassId) {
+                      acc.push(
+                        <SelectItem key={s.id} value={s.id}>
+                          {s.name} (#{s.rollNumber})
+                        </SelectItem>
+                      );
+                    }
+                    return acc;
+                  }, [])}
                 </SelectContent>
               </Select>
             </div>

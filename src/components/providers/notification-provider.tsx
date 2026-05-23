@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef } from "react";
 import { requestNotificationPermission, onForegroundMessage } from "@/lib/firebase";
 import { useAppStore } from "@/store/use-app-store";
 import { goeyToast as toast } from "goey-toast";
@@ -10,7 +10,7 @@ import { useGraphQLMutation, SAVE_NOTIFICATION_TOKEN } from "@/lib/graphql/hooks
 export function NotificationProvider({ children }: { children: React.ReactNode }) {
   const { currentUser } = useAppStore();
   const currentUserId = currentUser?.id;
-  const [token, setToken] = useState<string | null>(null);
+  const tokenRef = useRef<string | null>(null);
   const { mutate: saveToken } = useGraphQLMutation(SAVE_NOTIFICATION_TOKEN);
 
   useEffect(() => {
@@ -20,7 +20,7 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
         try {
           const fcmToken = await requestNotificationPermission();
           if (fcmToken) {
-            setToken(fcmToken);
+            tokenRef.current = fcmToken;
             console.log("FCM Token Generated:", fcmToken);
             
             // Save token to backend

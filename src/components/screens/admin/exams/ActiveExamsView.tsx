@@ -100,8 +100,8 @@ export function ActiveExamsView({
   return (
     <div className="space-y-6">
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        {summaryCards.map((card, i) => (
-          <Card key={i} className="border-none shadow-sm">
+        {summaryCards.map((card) => (
+          <Card key={card.label} className="border-none shadow-sm">
             <CardContent className="p-5 flex items-center justify-between">
               <div>
                 <p className="text-xs text-muted-foreground uppercase font-semibold">{card.label}</p>
