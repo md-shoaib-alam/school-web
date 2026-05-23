@@ -38,6 +38,7 @@ interface MarksheetSheetsPreviewProps {
   academicYear: string;
   marksheetType: 'midterm' | 'final' | 'combined';
   selectedStudentId: string;
+  isStandalone?: boolean;
 }
 
 export function MarksheetSheetsPreview({
@@ -51,10 +52,72 @@ export function MarksheetSheetsPreview({
   classSection,
   academicYear,
   marksheetType,
-  selectedStudentId
+  selectedStudentId,
+  isStandalone
 }: MarksheetSheetsPreviewProps) {
+  if (isStandalone) {
+    if (loading) {
+      return (
+        <div className="flex flex-col items-center justify-center py-20 text-muted-foreground animate-in fade-in duration-300">
+          <div className="size-8 rounded-full border-2 border-zinc-600 border-t-zinc-200 animate-spin mb-3" />
+          <p className="text-sm font-medium">Loading marksheet templates...</p>
+        </div>
+      );
+    }
+    if (exams.length === 0) {
+      return (
+        <div className="flex flex-col items-center justify-center text-center py-20 text-muted-foreground max-w-md mx-auto animate-in fade-in duration-300">
+          <AlertCircle className="size-12 text-zinc-400 mb-3" />
+          <h3 className="text-base font-semibold text-zinc-200">No Published Exams</h3>
+          <p className="text-xs mt-1">There are no completed midterm or final exams published for this class.</p>
+        </div>
+      );
+    }
+    if (previewStudents.length === 0) {
+      return (
+        <div className="flex flex-col items-center justify-center text-center py-20 text-muted-foreground max-w-md mx-auto animate-in fade-in duration-300">
+          <AlertCircle className="size-12 text-zinc-400 mb-3" />
+          <p className="text-sm font-medium">No student records found</p>
+        </div>
+      );
+    }
+
+    return (
+      <div className={`flex flex-col items-center gap-8 py-10 w-full animate-in fade-in duration-300 ${cinzel.className} ${montserrat.className} ${inter.className}`}>
+        {previewStudents.map((sheet) => (
+          <div 
+            key={sheet.id}
+            className="shrink-0 transition-all duration-300 paper-shadow bg-white"
+            style={{ 
+              width: 794 * zoomScale, 
+              height: 1123 * zoomScale, 
+              overflow: 'hidden' 
+            }}
+          >
+            <div 
+              style={{ 
+                width: 794, 
+                height: 1123,
+                transform: `scale(${zoomScale})`,
+                transformOrigin: 'top left'
+              }}
+            >
+              <SelectedTemplate 
+                sheet={sheet}
+                classNameStr={classNameStr}
+                classSection={classSection}
+                academicYear={academicYear}
+                marksheetType={marksheetType}
+              />
+            </div>
+          </div>
+        ))}
+      </div>
+    );
+  }
+
   return (
-    <div className="bg-card border border-zinc-100 dark:border-zinc-800 p-6 rounded-2xl shadow-sm overflow-hidden flex flex-col min-h-[600px] items-center justify-center">
+    <div className="bg-card border border-zinc-150 dark:border-zinc-800 p-6 rounded-2xl shadow-sm overflow-hidden flex flex-col min-h-[600px] items-center justify-center">
       {loading ? (
         <div className="w-full max-w-4xl space-y-6 py-10 animate-in fade-in duration-300">
           <div className="flex items-center gap-4">

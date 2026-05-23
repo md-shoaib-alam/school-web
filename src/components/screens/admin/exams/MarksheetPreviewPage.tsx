@@ -5,6 +5,7 @@ import { useMemo, useState, useEffect, useRef } from 'react';
 import { apiFetch } from '@/lib/api';
 import { goeyToast as toast } from 'goey-toast';
 import { useReactToPrint } from 'react-to-print';
+import { Printer, Loader2 } from 'lucide-react';
 import { MARKSHEET_TEMPLATES } from './marksheet-templates';
 import { MarksheetControls } from './marksheet-preview/MarksheetControls';
 import { MarksheetSheetsPreview } from './marksheet-preview/MarksheetSheetsPreview';
@@ -16,6 +17,7 @@ interface MarksheetPreviewPageProps {
   classSection: string; // e.g. "A"
   academicYear: string;
   onBack: () => void;
+  isStandalone?: boolean;
 }
 
 export function MarksheetPreviewPage({
@@ -23,7 +25,8 @@ export function MarksheetPreviewPage({
   classNameStr,
   classSection,
   academicYear,
-  onBack
+  onBack,
+  isStandalone = false
 }: MarksheetPreviewPageProps) {
   const [selectedStudentId, setSelectedStudentId] = useState<string>('all');
   const [marksheetType, setMarksheetType] = useState<'midterm' | 'final' | 'combined'>('combined');
@@ -251,6 +254,130 @@ export function MarksheetPreviewPage({
   };
 
   const SelectedTemplate = MARKSHEET_TEMPLATES.find(t => t.id === selectedTemplateId)?.component || MARKSHEET_TEMPLATES[0].component;
+
+  if (isStandalone) {
+    return (
+      <div className="min-h-screen flex flex-col bg-zinc-950 text-zinc-100">
+        {/* Custom Standalone Toolbar */}
+        <div className="toolbar no-print">
+          <div className="toolbar-title">
+            <span style={{ fontSize: "1.1rem" }}>📄</span>
+            <span>Marksheet Preview</span>
+            <span className="toolbar-badge select-none">{classNameStr} - {classSection}</span>
+            
+            {/* Student Dropdown Selector */}
+            <select 
+              value={selectedStudentId} 
+              onChange={(e) => setSelectedStudentId(e.target.value)}
+              disabled={loading || students.length === 0}
+              className="ml-4 bg-slate-900 text-white border border-white/10 rounded-lg px-2.5 py-1 text-xs font-semibold cursor-pointer outline-none hover:bg-slate-800 transition-colors"
+            >
+              <option value="all">All Students</option>
+              {students.map((s: any) => (
+                <option key={s.id} value={s.id}>
+                  Roll {s.rollNumber || '-'}: {s.name}
+                </option>
+              ))}
+            </select>
+
+            {/* Marksheet Type Dropdown Selector */}
+            <select 
+              value={marksheetType} 
+              onChange={(e) => setMarksheetType(e.target.value as any)}
+              disabled={loading || exams.length === 0}
+              className="ml-2 bg-slate-900 text-white border border-white/10 rounded-lg px-2.5 py-1 text-xs font-semibold cursor-pointer outline-none hover:bg-slate-800 transition-colors"
+            >
+              <option value="midterm">Midterm</option>
+              <option value="final">Final</option>
+              <option value="combined">Combined</option>
+            </select>
+
+            {/* Template Dropdown Selector */}
+            <select 
+              value={selectedTemplateId} 
+              onChange={(e) => setSelectedTemplateId(e.target.value)}
+              className="ml-2 bg-slate-900 text-white border border-white/10 rounded-lg px-2.5 py-1 text-xs font-semibold cursor-pointer outline-none hover:bg-slate-800 transition-colors"
+            >
+              {MARKSHEET_TEMPLATES.map(tmpl => (
+                <option key={tmpl.id} value={tmpl.id}>
+                  {tmpl.name}
+                </option>
+              ))}
+            </select>
+          </div>
+          
+          <div className="toolbar-actions">
+            <div className="zoom-controls">
+              <button 
+                className="zoom-btn" 
+                onClick={() => setZoomScale(Math.max(zoomScale - 0.1, 0.4))}
+                title="Zoom Out"
+              >
+                −
+              </button>
+              <span className="zoom-btn active" style={{ cursor: "default" }}>
+                {Math.round(zoomScale * 100)}%
+              </span>
+              <button 
+                className="zoom-btn" 
+                onClick={() => setZoomScale(Math.min(zoomScale + 0.1, 1.5))}
+                title="Zoom In"
+              >
+                +
+              </button>
+            </div>
+            
+            <button className="action-btn" onClick={handlePrint} disabled={loading || printing}>
+              {printing ? (
+                <>
+                  <Loader2 className="size-3.5 animate-spin mr-1" />
+                  Printing...
+                </>
+              ) : (
+                <>
+                  <Printer className="size-3.5 mr-1" />
+                  Print
+                </>
+              )}
+            </button>
+            
+            <button className="action-btn action-btn-secondary" onClick={onBack}>
+              Close Preview
+            </button>
+          </div>
+        </div>
+        
+        {/* Standalone View Container */}
+        <div className="viewer-container">
+          <MarksheetSheetsPreview
+            loading={loading}
+            exams={exams}
+            students={students}
+            previewStudents={previewStudents}
+            zoomScale={zoomScale}
+            SelectedTemplate={SelectedTemplate}
+            classNameStr={classNameStr}
+            classSection={classSection}
+            academicYear={academicYear}
+            marksheetType={marksheetType}
+            selectedStudentId={selectedStudentId}
+            isStandalone={true}
+          />
+        </div>
+
+        {/* Hidden Print Container */}
+        <MarksheetPrintContainer
+          printContainerRef={printContainerRef}
+          previewStudents={previewStudents}
+          SelectedTemplate={SelectedTemplate}
+          classNameStr={classNameStr}
+          classSection={classSection}
+          academicYear={academicYear}
+          marksheetType={marksheetType}
+        />
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">

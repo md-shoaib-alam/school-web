@@ -20,7 +20,7 @@ export async function handleMarksheetPreviewNewTab({
     return;
   }
 
-  // Build standard document structure
+  // Build standard document structure with our custom viewer styling
   previewWindow.document.write(`
     <!DOCTYPE html>
     <html lang="en">
@@ -31,11 +31,166 @@ export async function handleMarksheetPreviewNewTab({
       <style>
         body {
           margin: 0;
-          padding: 1.5rem;
-          background-color: #09090b;
-          color: #f4f4f5;
+          padding: 0;
+          background-color: #f8fafc;
+          color: #0f172a;
           font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+          display: flex;
+          flex-direction: column;
           min-height: 100vh;
+        }
+        
+        /* Top bar styling */
+        .toolbar {
+          position: sticky;
+          top: 0;
+          z-index: 50;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          padding: 0.75rem 1.5rem;
+          background: linear-gradient(135deg, #2e1065 0%, #0f172a 100%); /* Deep Violet to Slate */
+          color: #ffffff;
+          box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.3);
+          border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        
+        .toolbar-title {
+          font-size: 0.875rem;
+          font-weight: 700;
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+          letter-spacing: 0.025em;
+        }
+        
+        .toolbar-badge {
+          font-size: 0.7rem;
+          font-weight: 600;
+          color: #ddd6fe; /* violet-200 */
+          background-color: rgba(139, 92, 246, 0.15); /* violet-500 */
+          padding: 0.25rem 0.75rem;
+          border-radius: 9999px;
+          border: 1px solid rgba(139, 92, 246, 0.2);
+          text-transform: uppercase;
+          letter-spacing: 0.05em;
+        }
+        
+        .toolbar-actions {
+          display: flex;
+          align-items: center;
+          gap: 1rem;
+        }
+        
+        .zoom-controls {
+          display: flex;
+          align-items: center;
+          background-color: rgba(15, 23, 42, 0.6);
+          padding: 0.25rem;
+          border-radius: 0.5rem;
+          border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .zoom-btn {
+          background: none;
+          border: none;
+          color: #94a3b8;
+          padding: 0.25rem 0.625rem;
+          font-size: 0.75rem;
+          font-weight: 700;
+          cursor: pointer;
+          border-radius: 0.25rem;
+          transition: all 0.15s ease;
+        }
+        
+        .zoom-btn:hover {
+          color: #ffffff;
+          background-color: rgba(255, 255, 255, 0.08);
+        }
+        
+        .zoom-btn.active {
+          color: #ffffff;
+          background-color: #8b5cf6; /* violet-500 */
+        }
+        
+        .action-btn {
+          display: inline-flex;
+          align-items: center;
+          gap: 0.5rem;
+          background-color: #10b981;
+          border: none;
+          color: #ffffff;
+          padding: 0.45rem 1rem;
+          font-size: 0.75rem;
+          font-weight: 700;
+          border-radius: 0.375rem;
+          cursor: pointer;
+          transition: all 0.15s ease;
+          box-shadow: 0 2px 4px rgba(16, 185, 129, 0.2);
+        }
+        
+        .action-btn:hover {
+          background-color: #059669;
+          transform: translateY(-1px);
+          box-shadow: 0 4px 6px rgba(16, 185, 129, 0.3);
+        }
+        
+        .action-btn-secondary {
+          background-color: rgba(255, 255, 255, 0.1);
+          color: #f1f5f9;
+          box-shadow: none;
+        }
+        
+        .action-btn-secondary:hover {
+          background-color: rgba(255, 255, 255, 0.15);
+          color: #ffffff;
+          box-shadow: none;
+        }
+        
+        .viewer-container {
+          flex: 1;
+          overflow: auto;
+          padding: 2.5rem;
+          display: flex;
+          justify-content: center;
+          align-items: flex-start;
+          background-color: #f1f5f9;
+          background-image: radial-gradient(#cbd5e1 1px, transparent 1px);
+          background-size: 16px 16px;
+        }
+        
+        .paper-shadow {
+          box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+          border-radius: 0.5rem;
+          background-color: #ffffff;
+          overflow: hidden;
+          border: 1px solid rgba(0, 0, 0, 0.05);
+          transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        @media print {
+          .no-print {
+            display: none !important;
+          }
+          body {
+            background: #ffffff !important;
+          }
+          .viewer-container {
+            padding: 0 !important;
+            background: none !important;
+            overflow: visible !important;
+          }
+          .paper-shadow {
+            box-shadow: none !important;
+            border: none !important;
+            border-radius: 0 !important;
+            width: 794px !important;
+            height: 1123px !important;
+            transform: none !important;
+          }
+          #preview-root {
+            transform: none !important;
+          }
         }
       </style>
     </head>
@@ -87,6 +242,7 @@ export async function handleMarksheetPreviewNewTab({
         classSection,
         academicYear,
         onBack: () => previewWindow.close(),
+        isStandalone: true,
       })
     );
   }
