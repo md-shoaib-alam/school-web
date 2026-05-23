@@ -220,18 +220,41 @@ export function AdminAdmitCards() {
     gcTime: 10 * 60 * 1000,
   });
 
-  const availableExamTypes = useMemo<string[]>(() => {
+  const availableCycles = useMemo(() => {
     if (!classData?.exams) return [];
     const activeExams = classData.exams.filter((e: any) => {
       const isScheduled = e.status?.trim().toLowerCase() === 'scheduled';
       const isUpcoming = e.date >= todayDateString;
       return (isScheduled || isUpcoming) && !e.resultPublished;
     });
-    const types = new Set(activeExams.map((e: any) => e.examType));
-    return Array.from(types) as string[];
+
+    const groups: Record<string, { cycleName: string; examType: string; exams: any[] }> = {};
+    activeExams.forEach((e: any) => {
+      const cycleName = e.name.includes(' - ') ? e.name.split(' - ')[0] : e.name;
+      const key = `${cycleName}::${e.examType}`;
+      if (!groups[key]) {
+        groups[key] = {
+          cycleName,
+          examType: e.examType,
+          exams: []
+        };
+      }
+      groups[key].exams.push(e);
+    });
+
+    return Object.values(groups).sort((a, b) => a.cycleName.localeCompare(b.cycleName));
   }, [classData, todayDateString]);
 
+  const availableExamTypes = useMemo<string[]>(() => {
+    return availableCycles.map(c => `${c.cycleName}::${c.examType}`);
+  }, [availableCycles]);
+
   const currentExamType = selectedExamType || availableExamTypes[0] || '';
+
+  const currentCycle = useMemo(() => {
+    if (availableCycles.length === 0) return null;
+    return availableCycles.find(c => `${c.cycleName}::${c.examType}` === currentExamType) || availableCycles[0];
+  }, [availableCycles, currentExamType]);
 
   const selectedStudentIds = useMemo<Set<string>>(() => {
     if (!classData?.students) return new Set<string>();
@@ -254,11 +277,13 @@ export function AdminAdmitCards() {
 
     dispatch({ type: 'SET_GENERATING', generating: true });
     try {
+      const examIds = currentCycle?.exams.map((e: any) => e.id) || [];
       const res = await apiFetch('/api/admit-cards', {
         method: 'POST',
         body: JSON.stringify({
           classId: selectedClassId,
-          examType: currentExamType,
+          examType: currentCycle?.examType || '',
+          examIds,
           studentIds: Array.from(selectedStudentIds),
         }),
       });
@@ -328,13 +353,7 @@ export function AdminAdmitCards() {
   }, [enableModalAdmitCardPreview, handlePrintAllBase, classes, selectedClassId, admitCards]);
 
   const totalStudents = classData?.students.length || 0;
-  const totalExams = classData ? (
-    classData.exams.filter((e: any) => {
-      const isScheduled = e.status?.trim().toLowerCase() === 'scheduled';
-      const isUpcoming = e.date >= todayDateString;
-      return e.examType === currentExamType && (isScheduled || isUpcoming) && !e.resultPublished;
-    }).length
-  ) : 0;
+  const totalExams = currentCycle?.exams.length || 0;
 
   return (
     <div className="space-y-6">

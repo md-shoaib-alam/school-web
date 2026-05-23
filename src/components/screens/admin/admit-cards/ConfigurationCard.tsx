@@ -62,26 +62,28 @@ export function ConfigurationCard({
         <CardDescription>Filter by exam type and select students</CardDescription>
       </CardHeader>
       <CardContent className="p-4 pt-0 space-y-4">
-        {/* Exam Type Filter */}
+        {/* Exam Cycle Filter */}
         <div className="space-y-1.5">
-          <label className="text-sm font-medium mb-2 block">Exam Type</label>
+          <label className="text-sm font-medium mb-2 block">Exam Cycle</label>
           <div className="flex flex-wrap gap-2">
-            {availableExamTypes.map((type: string) => {
+            {availableExamTypes.map((typeKey: string) => {
+              const [cycleName, examType] = typeKey.split('::');
               const count = classData.exams.filter((e: any) => {
                 const isScheduled = e.status?.trim().toLowerCase() === 'scheduled';
                 const isUpcoming = e.date >= todayDateString;
-                return e.examType === type && (isScheduled || isUpcoming) && !e.resultPublished;
+                const eCycleName = e.name.includes(' - ') ? e.name.split(' - ')[0] : e.name;
+                return eCycleName === cycleName && e.examType === examType && (isScheduled || isUpcoming) && !e.resultPublished;
               }).length;
               if (count === 0) return null;
               return (
                 <Button
-                  key={type}
-                  variant={selectedExamType === type ? 'default' : 'outline'}
+                  key={typeKey}
+                  variant={selectedExamType === typeKey ? 'default' : 'outline'}
                   size="sm"
-                  onClick={() => setSelectedExamType(type)}
+                  onClick={() => setSelectedExamType(typeKey)}
                   className="gap-1.5"
                 >
-                  {examTypeLabels[type] || type}
+                  {cycleName}
                   <Badge variant="secondary" className="ml-1 px-1 py-0 h-4 text-[10px] min-w-[1.2rem] flex items-center justify-center bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-400 border-none">
                     {count}
                   </Badge>
