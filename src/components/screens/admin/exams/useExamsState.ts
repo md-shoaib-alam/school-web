@@ -78,6 +78,22 @@ export function useExamsState(initialTab = 'exams') {
   const [resultsClassId, setResultsClassId] = useState<string>('');
   
   const [printingLedgerClassId] = useState<string | null>(null);
+  const [enableModalTabulationPreview, setEnableModalTabulationPreview] = useState<boolean>(false);
+
+  useEffect(() => {
+    const fetchTenantSettings = async () => {
+      try {
+        const res = await apiFetch('/api/tenant-settings');
+        if (res.ok) {
+          const data = await res.json();
+          setEnableModalTabulationPreview(data.enableModalTabulationPreview === true);
+        }
+      } catch (err) {
+        console.error("Failed to load tenant settings", err);
+      }
+    };
+    fetchTenantSettings();
+  }, []);
 
   const [previewingLedgerClass, setPreviewingLedgerClass] = useState<{
     id: string;
@@ -94,13 +110,34 @@ export function useExamsState(initialTab = 'exams') {
     templateId: string = 'classic',
     examName?: string
   ) => {
-    setPreviewingLedgerClass({
-      id: classId,
-      name: className,
-      section: classSection,
-      templateId,
-      examName
-    });
+    if (enableModalTabulationPreview) {
+      setPreviewingLedgerClass({
+        id: classId,
+        name: className,
+        section: classSection,
+        templateId,
+        examName
+      });
+    } else {
+      toast.promise(
+        (async () => {
+          const { handleTabulationLedgerPreview } = await import('./tabulationLedgerPrinter');
+          await handleTabulationLedgerPreview({
+            classId,
+            classNameStr: className,
+            classSection,
+            academicYear: publishedAcademicYearFilter || currentAcademicYear,
+            templateId,
+            examName
+          });
+        })(),
+        {
+          loading: 'Compiling tabulation ledger...',
+          success: 'Tabulation ledger compiled and preview opened!',
+          error: 'Failed to compile tabulation ledger',
+        }
+      );
+    }
   };
 
   // Queries
