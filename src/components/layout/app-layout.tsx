@@ -166,6 +166,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
       "school-subscriptions",
       "platform-notices",
       "profile",
+      "reports",
     ].includes(screen);
 
     if (isSuperAdmin && isPlatformRoute) {
