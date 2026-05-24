@@ -41,10 +41,12 @@ interface ClassFormProps {
     section: string;
     grade: string;
     capacity: string;
+    classTeacherId?: string;
     id?: string;
   };
   onChange: (v: any) => void;
   enableGradeSelection?: boolean;
+  teachers?: any[];
 }
 
 function getMappedGradeFromName(name: string): string {
@@ -57,7 +59,7 @@ function getMappedGradeFromName(name: string): string {
   return numMatch ? numMatch[0] : "";
 }
 
-function ClassForm({ value, onChange, enableGradeSelection = true }: ClassFormProps) {
+function ClassForm({ value, onChange, enableGradeSelection = true, teachers = [] }: ClassFormProps) {
   return (
     <div className="grid gap-4 py-2">
       <div className="grid grid-cols-2 gap-4">
@@ -135,6 +137,25 @@ function ClassForm({ value, onChange, enableGradeSelection = true }: ClassFormPr
         </div>
       )}
       <div className="grid gap-2">
+        <Label>Class Teacher</Label>
+        <Select
+          value={value.classTeacherId || "none"}
+          onValueChange={(v) => onChange({ ...value, classTeacherId: v === "none" ? "" : v })}
+        >
+          <SelectTrigger>
+            <SelectValue placeholder="Assign a Class Teacher" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="none">Unassigned / None</SelectItem>
+            {teachers.map((teacher: any) => (
+              <SelectItem key={teacher.id} value={teacher.id}>
+                {teacher.name}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
+      <div className="grid gap-2">
         <Label>Capacity</Label>
         <Input
           type="number"
@@ -173,6 +194,7 @@ interface ClassDialogsProps {
   onDelete: () => void;
 
   enableGradeSelection?: boolean;
+  teachers?: any[];
 }
 
 export function ClassDialogs({
@@ -180,6 +202,7 @@ export function ClassDialogs({
   editOpen, setEditOpen, editData, setEditData, editing, onEdit,
   deleteOpen, setDeleteOpen, deleteTarget, deleting, onDelete,
   enableGradeSelection = true,
+  teachers = [],
 }: ClassDialogsProps) {
   return (
     <>
@@ -190,7 +213,7 @@ export function ClassDialogs({
             <DialogTitle>Add New Class</DialogTitle>
             <DialogDescription>Create a new class section</DialogDescription>
           </DialogHeader>
-          <ClassForm value={addFormData} onChange={setAddFormData} enableGradeSelection={enableGradeSelection} />
+          <ClassForm value={addFormData} onChange={setAddFormData} enableGradeSelection={enableGradeSelection} teachers={teachers} />
           <DialogFooter>
             <Button variant="outline" onClick={() => setAddOpen(false)}>
               Cancel
@@ -214,7 +237,7 @@ export function ClassDialogs({
             <DialogTitle>Edit Class</DialogTitle>
             <DialogDescription>Update class details</DialogDescription>
           </DialogHeader>
-          <ClassForm value={editData} onChange={setEditData} enableGradeSelection={enableGradeSelection} />
+          <ClassForm value={editData} onChange={setEditData} enableGradeSelection={enableGradeSelection} teachers={teachers} />
           <DialogFooter>
             <Button variant="outline" onClick={() => setEditOpen(false)}>
               Cancel

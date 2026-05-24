@@ -10,7 +10,7 @@ import { useRouter, useParams } from "next/navigation";
 import { goeyToast as toast } from "goey-toast";
 import type { ClassInfo } from "@/lib/types";
 import { useModulePermissions } from "@/hooks/use-permissions";
-import { useClasses } from "@/lib/graphql/hooks";
+import { useClasses, useTeachers } from "@/lib/graphql/hooks";
 import { useAppStore } from "@/store/use-app-store";
 import { useViewMode } from "@/hooks/use-view-mode";
 
@@ -28,6 +28,7 @@ interface DialogState {
     section: string;
     grade: string;
     capacity: string;
+    classTeacherId: string;
   };
   adding: boolean;
   editOpen: boolean;
@@ -37,6 +38,7 @@ interface DialogState {
     section: string;
     grade: string;
     capacity: string;
+    classTeacherId: string;
   };
   editing: boolean;
   deleteOpen: boolean;
@@ -59,10 +61,10 @@ type DialogAction =
 
 const initialDialogState: DialogState = {
   addOpen: false,
-  addFormData: { name: "", section: "", grade: "", capacity: "40" },
+  addFormData: { name: "", section: "", grade: "", capacity: "40", classTeacherId: "" },
   adding: false,
   editOpen: false,
-  editData: { id: "", name: "", section: "", grade: "", capacity: "40" },
+  editData: { id: "", name: "", section: "", grade: "", capacity: "40", classTeacherId: "" },
   editing: false,
   deleteOpen: false,
   deleteTarget: null,
@@ -78,7 +80,7 @@ function dialogReducer(state: DialogState, action: DialogAction): DialogState {
     case "SET_ADDING":
       return { ...state, adding: action.payload };
     case "RESET_ADD":
-      return { ...state, addFormData: { name: "", section: "", grade: "", capacity: "40" } };
+      return { ...state, addFormData: { name: "", section: "", grade: "", capacity: "40", classTeacherId: "" } };
     case "OPEN_EDIT":
       return {
         ...state,
@@ -89,6 +91,7 @@ function dialogReducer(state: DialogState, action: DialogAction): DialogState {
           section: action.payload.section,
           grade: action.payload.grade,
           capacity: String(action.payload.capacity),
+          classTeacherId: action.payload.classTeacherId || "",
         },
       };
     case "TOGGLE_EDIT":
@@ -132,6 +135,10 @@ export function AdminClasses() {
   });
 
   const enableGradeSelection = settingsData?.enableGradeSelection ?? true;
+
+  // Fetch all teachers in the tenant to populate the assign class teacher dropdown
+  const { data: teachersData } = useTeachers(currentTenantId || undefined);
+  const teachers = teachersData?.teachers || [];
 
   const classes = useMemo(() => {
     const list = classesData?.classes || [];
@@ -370,6 +377,7 @@ export function AdminClasses() {
         deleting={deleting}
         onDelete={handleDeleteClass}
         enableGradeSelection={enableGradeSelection}
+        teachers={teachers}
       />
     </div>
   );
