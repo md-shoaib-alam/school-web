@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -56,31 +56,32 @@ export function ExpenseDialog({
     status: "paid"
   });
 
-  useEffect(() => {
+  const [prevOpen, setPrevOpen] = useState(open);
+  const [prevEditingExpense, setPrevEditingExpense] = useState(editingExpense);
+
+  if (open !== prevOpen || editingExpense !== prevEditingExpense) {
+    setPrevOpen(open);
+    setPrevEditingExpense(editingExpense);
     if (open) {
-      if (editingExpense) {
-        setForm({
-          categoryId: editingExpense.categoryId,
-          amount: editingExpense.amount.toString(),
-          date: editingExpense.date,
-          description: editingExpense.description || "",
-          paymentMethod: editingExpense.paymentMethod,
-          referenceNo: editingExpense.referenceNo || "",
-          status: editingExpense.status
-        });
-      } else {
-        setForm({
-          categoryId: categories[0]?.id || "",
-          amount: "",
-          date: formatLocalDate(new Date()),
-          description: "",
-          paymentMethod: "cash",
-          referenceNo: "",
-          status: "paid"
-        });
-      }
+      setForm(editingExpense ? {
+        categoryId: editingExpense.categoryId,
+        amount: editingExpense.amount.toString(),
+        date: editingExpense.date,
+        description: editingExpense.description || "",
+        paymentMethod: editingExpense.paymentMethod,
+        referenceNo: editingExpense.referenceNo || "",
+        status: editingExpense.status
+      } : {
+        categoryId: categories[0]?.id || "",
+        amount: "",
+        date: formatLocalDate(new Date()),
+        description: "",
+        paymentMethod: "cash",
+        referenceNo: "",
+        status: "paid"
+      });
     }
-  }, [open, editingExpense, categories]);
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
