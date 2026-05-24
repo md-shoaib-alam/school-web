@@ -312,6 +312,7 @@ function Header({
       {/* View toggle */}
       <div className="flex items-center gap-1 p-1 bg-zinc-100 dark:bg-zinc-800/60 rounded-xl border border-zinc-200 dark:border-zinc-700/50 flex-shrink-0">
         <button
+          type="button"
           onClick={() => switchView("grid")}
           className={`p-1.5 rounded-lg transition-all ${
             view === "grid"
@@ -323,6 +324,7 @@ function Header({
           <LayoutGrid className="size-4" />
         </button>
         <button
+          type="button"
           onClick={() => switchView("table")}
           className={`p-1.5 rounded-lg transition-all ${
             view === "table"

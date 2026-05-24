@@ -114,7 +114,7 @@ export function FeeStatusTab() {
               {filteredStudents.length === 0 ? (
                 <div className="p-8 text-center text-muted-foreground"><Search className="size-8 mx-auto mb-2 opacity-30" /><p>No students found</p></div>
               ) : filteredStudents.map(s => (
-                <button key={s.id} className="w-full flex items-center gap-3 p-3 hover:bg-emerald-50/50 dark:hover:bg-emerald-900/20 transition-colors text-left" onClick={() => handleSelectStudent(s)}>
+                <button key={s.id} type="button" className="w-full flex items-center gap-3 p-3 hover:bg-emerald-50/50 dark:hover:bg-emerald-900/20 transition-colors text-left" onClick={() => handleSelectStudent(s)}>
                   <div className="size-10 rounded-full bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 flex items-center justify-center text-sm font-semibold shrink-0">
                     {s.name.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase()}
                   </div>

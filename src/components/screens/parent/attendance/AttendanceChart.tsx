@@ -129,6 +129,7 @@ export function AttendanceChart({ data, isPremium }: AttendanceChartProps) {
                 6-month history and monthly trends are for Premium members.
               </p>
               <button 
+                type="button"
                 onClick={() => router.push(`/${slug}/subscription`)}
                 className="w-full bg-amber-600 hover:bg-amber-700 text-white text-[10px] sm:text-xs font-bold py-2 sm:py-2.5 px-4 rounded-xl transition-all shadow-md shadow-amber-600/20 active:scale-95 uppercase tracking-wider"
               >

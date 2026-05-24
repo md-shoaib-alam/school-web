@@ -23,7 +23,7 @@ export function ThemeToggle() {
 
   if (!mounted) {
     return (
-      <Button variant="ghost" size="icon" className="size-10 md:size-9">
+      <Button type="button" variant="ghost" size="icon" className="size-10 md:size-9">
         <Sun className="size-[22px] md:size-[18px]" />
       </Button>
     );
@@ -33,6 +33,7 @@ export function ThemeToggle() {
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button
+          type="button"
           variant="ghost"
           size="icon"
           className="size-10 bg-white hover:bg-zinc-50 dark:bg-zinc-900 dark:hover:bg-zinc-800 border border-zinc-200 dark:border-zinc-800 shadow-sm transition-all cursor-pointer"

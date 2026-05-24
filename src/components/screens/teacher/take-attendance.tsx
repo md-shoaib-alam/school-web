@@ -416,12 +416,14 @@ export function TeacherAttendance() {
                 Quick:
               </div>
               <button
+                type="button"
                 className="flex-1 sm:flex-none py-1.5 px-3 rounded-lg text-[10px] font-bold transition-all bg-emerald-500/10 text-emerald-600 dark:text-emerald-500 border border-emerald-500/20 hover:bg-emerald-500/20 active:scale-95"
                 onClick={() => markAll("present")}
               >
                 All Present
               </button>
               <button
+                type="button"
                 className="flex-1 sm:flex-none py-1.5 px-3 rounded-lg text-[10px] font-bold transition-all bg-red-500/10 text-red-600 dark:text-red-500 border border-red-500/20 hover:bg-red-500/20 active:scale-95"
                 onClick={() => markAll("absent")}
               >

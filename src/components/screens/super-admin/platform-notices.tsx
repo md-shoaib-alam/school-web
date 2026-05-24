@@ -294,6 +294,7 @@ export function SuperAdminPlatformNotices() {
                           <AlertDialog>
                             <AlertDialogTrigger asChild>
                               <button 
+                                type="button"
                                 className="absolute right-0 top-0 opacity-0 group-hover:opacity-100 transition-opacity text-red-500 hover:text-red-700"
                                 title="Delete Notice"
                               >

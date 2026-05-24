@@ -39,6 +39,7 @@ export function Header({ items, resolvedScreen }: HeaderProps) {
     <header className="shrink-0 z-30 bg-background/80 backdrop-blur-md border-b border-border px-4 lg:px-6 h-16 flex items-center justify-between">
       <div className="flex items-center gap-3">
         <Button
+          type="button"
           variant="ghost"
           size="icon"
           className="lg:hidden size-10 text-zinc-500 hover:text-zinc-700 dark:text-zinc-400 dark:hover:text-zinc-200 bg-white hover:bg-zinc-50 dark:bg-zinc-900 dark:hover:bg-zinc-800 border border-zinc-200 dark:border-zinc-800 shadow-sm transition-all"

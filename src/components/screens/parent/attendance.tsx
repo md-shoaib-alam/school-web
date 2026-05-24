@@ -97,6 +97,7 @@ export function ParentAttendance() {
           </h2>
         </div>
         <button 
+          type="button"
           onClick={() => refetch()}
           className="text-xs font-bold text-amber-700 bg-amber-50 hover:bg-amber-100 px-3 py-1.5 rounded-lg transition-all"
         >

@@ -90,6 +90,7 @@ export function SubscriptionExpiredScreen({ tenantName, tenantSlug, role, endDat
               </a>
             ) : isAdmin ? (
               <button 
+                type="button"
                 onClick={() => router.push(`/${tenantSlug}/school-subscription`)}
                 className="w-full flex items-center justify-center gap-2 bg-violet-600 hover:bg-violet-700 text-white font-semibold py-3 px-4 rounded-xl shadow-md group transition-colors"
               >
@@ -98,6 +99,7 @@ export function SubscriptionExpiredScreen({ tenantName, tenantSlug, role, endDat
               </button>
             ) : (
               <button 
+                type="button"
                 disabled
                 className="w-full flex items-center justify-center gap-2 bg-zinc-100 dark:bg-zinc-700 text-zinc-500 dark:text-zinc-400 font-medium py-3 px-4 rounded-xl cursor-not-allowed"
               >
@@ -107,6 +109,7 @@ export function SubscriptionExpiredScreen({ tenantName, tenantSlug, role, endDat
             )}
             
             <button 
+              type="button"
               onClick={() => router.push("/")}
               className="w-full text-center text-sm text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300 py-2 transition-colors"
             >

@@ -187,6 +187,7 @@ export function RoleGrid({ roles, onEdit, onDelete, onAssignUsers }: RoleGridPro
 
               {/* Manage Link */}
               <button
+                type="button"
                 className="w-full pt-3 mt-1 border-t border-zinc-100 dark:border-zinc-800 flex items-center justify-between group/link text-[11px] font-bold text-teal-600 dark:text-teal-400 hover:text-teal-700 transition-colors"
                 onClick={() => onAssignUsers(role)}
               >

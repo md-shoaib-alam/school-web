@@ -115,6 +115,7 @@ export function RoleCard({ role, onEdit, onAssign, onDelete }: RoleCardProps) {
       <CardContent className="pt-0">
         <div className="flex items-center gap-4 text-xs text-zinc-500 dark:text-zinc-400">
           <button
+            type="button"
             onClick={() => onAssign(role)}
             className="flex items-center gap-1 hover:text-blue-600 dark:hover:text-blue-400 transition-colors cursor-pointer"
           >

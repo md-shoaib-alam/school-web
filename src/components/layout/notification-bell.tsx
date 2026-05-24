@@ -111,6 +111,7 @@ export function NotificationBell() {
     <Popover open={open} onOpenChange={handleOpenChange}>
       <PopoverTrigger asChild>
         <Button
+          type="button"
           variant="ghost"
           size="icon"
           className="relative size-10 bg-white hover:bg-zinc-50 dark:bg-zinc-900 dark:hover:bg-zinc-800 border border-zinc-200 dark:border-zinc-800 shadow-sm rounded-xl transition-all duration-200 cursor-pointer"
@@ -138,6 +139,7 @@ export function NotificationBell() {
           </div>
           <div className="flex items-center gap-1">
             <Button
+              type="button"
               variant="ghost"
               size="sm"
               className="text-[10px] h-7 px-2 font-semibold text-zinc-500 hover:text-violet-600 transition-colors"
@@ -146,6 +148,7 @@ export function NotificationBell() {
               Mark all read
             </Button>
             <Button
+              type="button"
               variant="ghost"
               size="sm"
               className="text-[10px] h-7 px-2 font-semibold text-rose-500 hover:bg-rose-50 hover:text-rose-600 transition-colors"

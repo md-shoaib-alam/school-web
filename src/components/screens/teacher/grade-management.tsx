@@ -564,6 +564,7 @@ export function TeacherGrades() {
         {/* Status Selection Tabs */}
         <div className="flex border-b border-zinc-100 dark:border-zinc-800/80 mb-2 animate-in fade-in-50">
           <button
+            type="button"
             onClick={() => {
               if (!listLoading) setActiveTab("active");
             }}
@@ -583,6 +584,7 @@ export function TeacherGrades() {
             )}
           </button>
           <button
+            type="button"
             onClick={() => {
               if (!listLoading) setActiveTab("completed");
             }}

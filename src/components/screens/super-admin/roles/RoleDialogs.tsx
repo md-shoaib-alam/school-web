@@ -147,6 +147,7 @@ export function RoleDialogs({
                   {COLOR_PRESETS.map((c) => (
                     <button
                       key={c}
+                      type="button"
                       className="w-full aspect-square rounded-full border-4 transition-all hover:scale-110 flex items-center justify-center"
                       style={{
                         backgroundColor: c,

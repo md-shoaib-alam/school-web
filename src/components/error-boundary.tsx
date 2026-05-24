@@ -26,6 +26,7 @@ export function GlobalErrorBoundary({ children }: Props) {
             
             <div className="space-y-3">
               <button
+                type="button"
                 onClick={() => resetError()}
                 className="w-full py-3 px-4 bg-violet-600 hover:bg-violet-700 text-white font-semibold rounded-xl transition-all duration-200 shadow-lg shadow-violet-200"
               >
@@ -33,6 +34,7 @@ export function GlobalErrorBoundary({ children }: Props) {
               </button>
               
               <button
+                type="button"
                 onClick={() => window.location.href = '/'}
                 className="w-full py-3 px-4 bg-white hover:bg-zinc-50 text-zinc-700 font-semibold rounded-xl border border-zinc-200 transition-all duration-200"
               >

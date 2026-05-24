@@ -151,6 +151,7 @@ export function SidebarFooter({
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button
+                type="button"
                 variant="ghost"
                 size="icon"
                 className={cn(
@@ -174,7 +175,7 @@ export function SidebarFooter({
         <div className="flex items-center justify-center">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="p-0 size-9 rounded-full focus-visible:ring-0">
+              <Button type="button" variant="ghost" className="p-0 size-9 rounded-full focus-visible:ring-0">
                 <Avatar className="size-9 cursor-pointer hover:opacity-85 transition-opacity">
                   <AvatarImage src={currentUser.avatar} alt={currentUser.name} className="object-cover" />
                   <AvatarFallback

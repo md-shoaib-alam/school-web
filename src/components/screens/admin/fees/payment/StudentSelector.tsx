@@ -63,6 +63,7 @@ export function StudentSelector({
             filteredStudents.map(s => (
               <button 
                 key={s.id} 
+                type="button"
                 className="w-full flex items-center gap-3 p-3 hover:bg-emerald-50/50 dark:hover:bg-emerald-900/20 transition-colors text-left" 
                 onClick={() => onSelectStudent(s)}
               >

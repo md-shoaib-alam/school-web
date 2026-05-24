@@ -58,6 +58,7 @@ export default function ResetPasswordClient() {
               <Link href="/">Return to Login</Link>
             </Button>
             <button 
+              type="button"
               onClick={() => setIsSuccess(false)} 
               className="w-full text-center text-sm text-rose-500 hover:text-rose-600 font-semibold transition-colors cursor-pointer"
             >

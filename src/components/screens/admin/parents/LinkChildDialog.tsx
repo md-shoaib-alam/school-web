@@ -76,6 +76,7 @@ export function LinkChildDialog({
                     >
                       {child.name}
                       <button
+                        type="button"
                         onClick={() =>
                           onUnlinkChild(selectedParent.id, child.id)
                         }

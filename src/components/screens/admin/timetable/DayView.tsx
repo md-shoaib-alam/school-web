@@ -170,6 +170,7 @@ export function DayView({
                                 <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-all">
                                   {canEdit && (
                                     <button
+                                      type="button"
                                       onClick={() => onEditSlot(slot)}
                                       className="shrink-0 size-7 rounded-lg flex items-center justify-center text-muted-foreground/40 hover:text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-900/20 transition-all"
                                       title="Edit slot"
@@ -179,6 +180,7 @@ export function DayView({
                                   )}
                                   {canDelete && (
                                     <button
+                                      type="button"
                                       onClick={() => onDeleteSlot(slot.id)}
                                       className="shrink-0 size-7 rounded-lg flex items-center justify-center text-muted-foreground/40 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 transition-all"
                                       title="Delete slot"

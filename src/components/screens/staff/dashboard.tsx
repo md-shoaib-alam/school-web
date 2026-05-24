@@ -243,6 +243,7 @@ export function StaffDashboard() {
           {quickActions.map((action) => (
             <button
               key={action.screen}
+              type="button"
               onClick={() => navigateTo(action.screen)}
               className="flex items-center gap-3 p-4 rounded-xl border border-zinc-200 dark:border-zinc-800 hover:shadow-md transition-all hover:border-transparent text-left group"
             >
