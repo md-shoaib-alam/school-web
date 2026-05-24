@@ -361,7 +361,7 @@ export function StudentTimetable() {
                   <div className="min-w-[640px]">
                     {/* Table Header */}
                     <div className="grid grid-cols-[100px_repeat(5,1fr)] gap-1.5 mb-2">
-                      <div className="text-xs font-medium text-zinc-400 dark:text-zinc-500 dark:text-zinc-400 px-2 py-2" />
+                      <div className="text-xs font-medium text-zinc-400 dark:text-zinc-500 dark:text-zinc-400 p-2" />
                       {DAYS.map((day) => (
                         <div
                           key={day}
@@ -411,7 +411,7 @@ export function StudentTimetable() {
                           return (
                             <div
                               key={day}
-                              className={`rounded-lg border px-2 py-2 min-h-[60px] transition-all ${
+                              className={`rounded-lg border p-2 min-h-[60px] transition-all ${
                                 cellSlot
                                   ? subjectColorMap[cellSlot.subjectName] ||
                                     "bg-zinc-50 dark:bg-zinc-800/50 border-zinc-200 dark:border-zinc-700 dark:border-zinc-700"

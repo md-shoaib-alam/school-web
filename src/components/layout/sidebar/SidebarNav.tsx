@@ -27,7 +27,7 @@ export function SidebarNav({
   onNavigate,
 }: SidebarNavProps) {
   return (
-    <nav className={cn("flex-1 overflow-y-auto py-3 px-3 sidebar-scrollbar overscroll-contain", !sidebarOpen && "lg:px-2")}>
+    <nav className={cn("flex-1 overflow-y-auto p-3 sidebar-scrollbar overscroll-contain", !sidebarOpen && "lg:px-2")}>
       <div className="space-y-1">
         {items.map((item) => {
           const hasChildren = item.children && item.children.length > 0;

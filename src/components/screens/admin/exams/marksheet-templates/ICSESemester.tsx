@@ -21,7 +21,7 @@ export const ICSESemester: React.FC<MarksheetTemplateProps> = ({
 
   return (
     <div 
-      className="relative bg-white text-[#1e293b] px-10 py-10 border-[6px] border-double border-violet-900 rounded overflow-hidden select-none flex flex-col justify-between shrink-0 text-left h-[1123px] w-[794px] box-border font-serif"
+      className="relative bg-white text-[#1e293b] p-10 border-[6px] border-double border-violet-900 rounded overflow-hidden select-none flex flex-col justify-between shrink-0 text-left h-[1123px] w-[794px] box-border font-serif"
       style={{ WebkitPrintColorAdjust: 'exact', printColorAdjust: 'exact' }}
     >
       {/* ICSE Elegant Layout */}

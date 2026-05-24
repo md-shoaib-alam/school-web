@@ -130,7 +130,7 @@ export function DayView({
                     </div>
 
                     {hasSlots ? (
-                      <div className="group relative flex-1 rounded-xl border px-4 py-4 transition-all bg-card hover:shadow-sm space-y-3">
+                      <div className="group relative flex-1 rounded-xl border p-4 transition-all bg-card hover:shadow-sm space-y-3">
                         {isCurrent && (
                           <Badge className="bg-emerald-600 text-white hover:bg-emerald-600 text-[10px] px-1.5 py-0">
                             In Progress
@@ -195,7 +195,7 @@ export function DayView({
                         ))}
                       </div>
                     ) : (
-                      <div className="flex-1 rounded-xl border border-dashed border-muted-foreground/25 px-4 py-4">
+                      <div className="flex-1 rounded-xl border border-dashed border-muted-foreground/25 p-4">
                         <p className="text-sm font-medium text-muted-foreground/50">
                           Free Period
                         </p>

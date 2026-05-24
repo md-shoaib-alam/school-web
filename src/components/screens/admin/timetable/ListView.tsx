@@ -40,7 +40,7 @@ export function ListView({
         return (
           <div
             key={day}
-            className={`py-4 px-4 sm:px-6 ${isToday ? "bg-emerald-50/50 dark:bg-emerald-900/10" : ""}`}
+            className={`p-4 sm:px-6 ${isToday ? "bg-emerald-50/50 dark:bg-emerald-900/10" : ""}`}
           >
             <div className="flex items-center gap-3 mb-3">
               <h3
