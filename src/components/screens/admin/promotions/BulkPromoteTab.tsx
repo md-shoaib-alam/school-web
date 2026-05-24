@@ -21,7 +21,7 @@ import {
 } from "@/components/ui/table";
 import { Zap, GraduationCap, Users, Loader2 } from "lucide-react";
 import { ClassOption, StudentOption } from "./types";
-import { isLastClass } from "./utils";
+import { isLastClass, getNumericGrade } from "./utils";
 
 interface BulkPromoteTabProps {
   classes: ClassOption[];
@@ -75,7 +75,7 @@ export function BulkPromoteTab({
                 </SelectTrigger>
                 <SelectContent>
                   {classes
-                    .sort((a, b) => (parseInt(a.grade) || 0) - (parseInt(b.grade) || 0))
+                    .sort((a, b) => getNumericGrade(a.grade) - getNumericGrade(b.grade))
                     .map((c) => (
                       <SelectItem key={c.id} value={c.id}>
                         {c.name}-{c.section} (Grade {c.grade}) — {c.studentCount} students
@@ -100,7 +100,7 @@ export function BulkPromoteTab({
                 <SelectContent>
                   {classes
                     .filter((c) => c.id !== bulkFromClass)
-                    .sort((a, b) => (parseInt(a.grade) || 0) - (parseInt(b.grade) || 0))
+                    .sort((a, b) => getNumericGrade(a.grade) - getNumericGrade(b.grade))
                     .map((c) => (
                       <SelectItem key={c.id} value={c.id}>
                         {c.name}-{c.section} (Grade {c.grade})

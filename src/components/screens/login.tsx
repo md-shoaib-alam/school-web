@@ -134,6 +134,7 @@ export function LoginScreen() {
               width={80}
               height={80}
               priority
+              unoptimized
               className="size-full object-cover" 
             />
           </div>

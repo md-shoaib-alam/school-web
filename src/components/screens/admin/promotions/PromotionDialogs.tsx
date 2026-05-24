@@ -19,6 +19,7 @@ import {
 } from "@/components/ui/dialog";
 import { Loader2 } from "lucide-react";
 import { ClassOption, StudentOption, PromotionFormData } from "./types";
+import { getNumericGrade } from "./utils";
 
 interface NewPromotionDialogProps {
   open: boolean;
@@ -66,11 +67,13 @@ export function NewPromotionDialog({
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">All Classes</SelectItem>
-                  {classes.map((c) => (
-                    <SelectItem key={c.id} value={c.id}>
-                      {c.name}-{c.section}
-                    </SelectItem>
-                  ))}
+                  {classes
+                    .sort((a, b) => getNumericGrade(a.grade) - getNumericGrade(b.grade))
+                    .map((c) => (
+                      <SelectItem key={c.id} value={c.id}>
+                        {c.name}-{c.section}
+                      </SelectItem>
+                    ))}
                 </SelectContent>
               </Select>
             </div>
@@ -114,6 +117,7 @@ export function NewPromotionDialog({
                 <SelectContent>
                   {classes
                     .filter((c) => c.id !== form.fromClassId)
+                    .sort((a, b) => getNumericGrade(a.grade) - getNumericGrade(b.grade))
                     .map((c) => (
                       <SelectItem key={c.id} value={c.id}>
                         {c.name}-{c.section} (Grade {c.grade})

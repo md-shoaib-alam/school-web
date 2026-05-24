@@ -8,6 +8,7 @@ export const StateBoardGreen: React.FC<MarksheetTemplateProps> = ({
   classSection,
   academicYear,
   marksheetType,
+  examName,
 }) => {
   const getStateBoardGrade = (pct: number) => {
     if (pct >= 75) return 'A+';
@@ -37,7 +38,7 @@ export const StateBoardGreen: React.FC<MarksheetTemplateProps> = ({
                 Recognised by State Department of School Education & Literacy
               </p>
               <p className="text-[10px] text-zinc-700 font-extrabold tracking-widest mt-1 uppercase">
-                REPORT CARD & STATEMENT OF SCHOLASTIC MARKS ({academicYear})
+                {examName ? `${examName} REPORT CARD` : 'REPORT CARD & STATEMENT OF SCHOLASTIC MARKS'} ({academicYear})
               </p>
             </div>
           </div>
@@ -77,11 +78,13 @@ export const StateBoardGreen: React.FC<MarksheetTemplateProps> = ({
             <table className="w-full text-xs border-collapse table-fixed">
               <thead>
                 <tr className="bg-emerald-700 text-white text-[9.5px]">
-                  <th className="font-bold px-3 py-2 text-left w-[42%]">SUBJECT NAME</th>
-                  {marksheetType === 'combined' && <th className="font-bold px-3 py-2 text-center w-[13%]">PRE-BOARD I</th>}
-                  {marksheetType === 'combined' && <th className="font-bold px-3 py-2 text-center w-[13%]">PRE-BOARD II</th>}
+                  <th className="font-bold px-3 py-2 text-left w-[24%]">SUBJECT NAME</th>
+                  {marksheetType === 'combined' && <th className="font-bold px-3 py-2 text-center w-[12%]">PRE-BOARD I</th>}
+                  {marksheetType === 'combined' && <th className="font-bold px-3 py-2 text-center w-[12%]">PRE-BOARD II</th>}
+                  <th className="font-bold px-3 py-2 text-center w-[18%]">MAX MARKS</th>
+                  <th className="font-bold px-3 py-2 text-center w-[18%]">PASSING MARKS</th>
                   <th className="font-bold px-3 py-2 text-center w-[18%]">AGGREGATE OBTAINED</th>
-                  <th className="font-bold px-3 py-2 text-center w-[14%]">GRADE</th>
+                  <th className="font-bold px-3 py-2 text-center w-[22%]">GRADE</th>
                 </tr>
               </thead>
               <tbody>
@@ -90,7 +93,9 @@ export const StateBoardGreen: React.FC<MarksheetTemplateProps> = ({
                     <td className="px-3 py-2.5 text-left font-extrabold text-zinc-800 truncate">{sub.subjectName}</td>
                     {marksheetType === 'combined' && <td className="px-3 py-2.5 text-center font-mono text-zinc-500">{sub.midtermMarks}</td>}
                     {marksheetType === 'combined' && <td className="px-3 py-2.5 text-center font-mono text-zinc-500">{sub.finalMarks}</td>}
-                    <td className="px-3 py-2.5 text-center font-black font-mono text-emerald-800">{sub.obtained}</td>
+                    <td className="px-3 py-2.5 text-center font-bold font-mono text-zinc-700">{sub.maxMarks ?? 100}</td>
+                    <td className="px-3 py-2.5 text-center font-medium font-mono text-zinc-600">{sub.passingMarks ?? 33}</td>
+                    <td className="px-3 py-2.5 text-center font-black font-mono text-emerald-800">{sub.obtainedMarks ?? 0}</td>
                     <td className="px-3 py-2.5 text-center">
                       <span className="font-black text-emerald-800 font-mono text-[10px]">
                         {getStateBoardGrade(sub.percentage)}

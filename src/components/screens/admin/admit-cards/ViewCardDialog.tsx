@@ -9,12 +9,14 @@ interface ViewCardDialogProps {
   card: any | null;
   onOpenChange: (open: boolean) => void;
   onPrint: () => void;
+  templateId?: string;
 }
 
 export function ViewCardDialog({
   card,
   onOpenChange,
   onPrint,
+  templateId = 'classic_quad',
 }: ViewCardDialogProps) {
   return (
     <Dialog open={!!card} onOpenChange={onOpenChange}>
@@ -43,7 +45,7 @@ export function ViewCardDialog({
           <div className="p-8 flex flex-col items-center gap-6 bg-zinc-950/50">
             <div className="scale-[0.8] sm:scale-100 origin-top shadow-2xl shadow-black/50">
               <div className="bg-white p-4 rounded-lg">
-                <AdmitCardVisual card={card} />
+                <AdmitCardVisual card={card} templateId={templateId} />
               </div>
             </div>
             

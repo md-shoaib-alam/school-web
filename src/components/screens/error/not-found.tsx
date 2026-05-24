@@ -1,6 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
+import { useState, useEffect } from "react";
 import Image from "next/image";
 import { useAppStore } from "@/store/use-app-store";
 import { LogOut } from "lucide-react";
@@ -8,6 +9,11 @@ import { LogOut } from "lucide-react";
 export function NotFoundScreen() {
   const router = useRouter();
   const { logout, isLoggedIn } = useAppStore();
+
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const goHome = () => {
     router.push("/");
@@ -59,7 +65,7 @@ export function NotFoundScreen() {
             Back to Home
           </button>
 
-          {isLoggedIn && (
+          {mounted && isLoggedIn && (
             <button
               onClick={handleLogout}
               className="flex items-center gap-2 bg-white/50 dark:bg-white/5 hover:bg-white/80 dark:hover:bg-white/10 text-zinc-700 dark:text-zinc-300 font-semibold text-sm py-3 px-8 rounded-full border border-zinc-200 dark:border-zinc-800 transition-all duration-300 transform hover:scale-105 active:scale-95 cursor-pointer"

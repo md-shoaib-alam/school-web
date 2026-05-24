@@ -41,12 +41,25 @@ interface ClassFormProps {
     section: string;
     grade: string;
     capacity: string;
+    classTeacherId?: string;
     id?: string;
   };
   onChange: (v: any) => void;
+  enableGradeSelection?: boolean;
+  teachers?: any[];
 }
 
-function ClassForm({ value, onChange }: ClassFormProps) {
+function getMappedGradeFromName(name: string): string {
+  if (!name) return "";
+  const normalized = name.trim().toLowerCase();
+  if (normalized === "nursery") return "Nursery";
+  if (normalized === "lkg") return "LKG";
+  if (normalized === "ukg") return "UKG";
+  const numMatch = name.match(/\d+/);
+  return numMatch ? numMatch[0] : "";
+}
+
+function ClassForm({ value, onChange, enableGradeSelection = true, teachers = [] }: ClassFormProps) {
   return (
     <div className="grid gap-4 py-2">
       <div className="grid grid-cols-2 gap-4">
@@ -54,13 +67,21 @@ function ClassForm({ value, onChange }: ClassFormProps) {
           <Label>Class Name</Label>
           <Select
             value={value.name}
-            onValueChange={(v) => onChange({ ...value, name: v })}
+            onValueChange={(v) => {
+              const mappedGrade = getMappedGradeFromName(v);
+              onChange({
+                ...value,
+                name: v,
+                grade: !enableGradeSelection ? mappedGrade : value.grade,
+              });
+            }}
           >
             <SelectTrigger>
               <SelectValue placeholder="Select" />
             </SelectTrigger>
             <SelectContent>
               {[
+                "Nursery", "LKG", "UKG",
                 "Class 1", "Class 2", "Class 3", "Class 4", "Class 5", "Class 6",
                 "Class 7", "Class 8", "Class 9", "Class 10", "Class 11", "Class 12",
               ].map((name) => (
@@ -90,19 +111,45 @@ function ClassForm({ value, onChange }: ClassFormProps) {
           </Select>
         </div>
       </div>
+      {enableGradeSelection && (
+        <div className="grid gap-2">
+          <Label>Grade</Label>
+          <Select
+            value={value.grade}
+            onValueChange={(v) => onChange({ ...value, grade: v })}
+          >
+            <SelectTrigger>
+              <SelectValue placeholder="Select grade" />
+            </SelectTrigger>
+            <SelectContent>
+              {["Nursery", "LKG", "UKG"].map((grade) => (
+                <SelectItem key={grade} value={grade}>
+                  {grade}
+                </SelectItem>
+              ))}
+              {Array.from({ length: 12 }, (_, i) => (
+                <SelectItem key={i + 1} value={String(i + 1)}>
+                  Grade {i + 1}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+      )}
       <div className="grid gap-2">
-        <Label>Grade</Label>
+        <Label>Class Teacher</Label>
         <Select
-          value={value.grade}
-          onValueChange={(v) => onChange({ ...value, grade: v })}
+          value={value.classTeacherId || "none"}
+          onValueChange={(v) => onChange({ ...value, classTeacherId: v === "none" ? "" : v })}
         >
           <SelectTrigger>
-            <SelectValue placeholder="Select grade" />
+            <SelectValue placeholder="Assign a Class Teacher" />
           </SelectTrigger>
           <SelectContent>
-            {Array.from({ length: 12 }, (_, i) => (
-              <SelectItem key={i + 1} value={String(i + 1)}>
-                Grade {i + 1}
+            <SelectItem value="none">Unassigned / None</SelectItem>
+            {teachers.map((teacher: any) => (
+              <SelectItem key={teacher.id} value={teacher.id}>
+                {teacher.name}
               </SelectItem>
             ))}
           </SelectContent>
@@ -145,12 +192,17 @@ interface ClassDialogsProps {
   deleteTarget: ClassInfo | null;
   deleting: boolean;
   onDelete: () => void;
+
+  enableGradeSelection?: boolean;
+  teachers?: any[];
 }
 
 export function ClassDialogs({
   addOpen, setAddOpen, addFormData, setAddFormData, adding, onAdd,
   editOpen, setEditOpen, editData, setEditData, editing, onEdit,
-  deleteOpen, setDeleteOpen, deleteTarget, deleting, onDelete
+  deleteOpen, setDeleteOpen, deleteTarget, deleting, onDelete,
+  enableGradeSelection = true,
+  teachers = [],
 }: ClassDialogsProps) {
   return (
     <>
@@ -161,7 +213,7 @@ export function ClassDialogs({
             <DialogTitle>Add New Class</DialogTitle>
             <DialogDescription>Create a new class section</DialogDescription>
           </DialogHeader>
-          <ClassForm value={addFormData} onChange={setAddFormData} />
+          <ClassForm value={addFormData} onChange={setAddFormData} enableGradeSelection={enableGradeSelection} teachers={teachers} />
           <DialogFooter>
             <Button variant="outline" onClick={() => setAddOpen(false)}>
               Cancel
@@ -169,7 +221,7 @@ export function ClassDialogs({
             <Button
               className="bg-emerald-600 hover:bg-emerald-700 text-white"
               onClick={onAdd}
-              disabled={adding || !addFormData.name || !addFormData.section || !addFormData.grade}
+              disabled={adding || !addFormData.name || !addFormData.section || (!enableGradeSelection ? !getMappedGradeFromName(addFormData.name) : !addFormData.grade)}
             >
               {adding && <Loader2 className="size-4 mr-2 animate-spin" />}
               {adding ? "Adding..." : "Add Class"}
@@ -185,7 +237,7 @@ export function ClassDialogs({
             <DialogTitle>Edit Class</DialogTitle>
             <DialogDescription>Update class details</DialogDescription>
           </DialogHeader>
-          <ClassForm value={editData} onChange={setEditData} />
+          <ClassForm value={editData} onChange={setEditData} enableGradeSelection={enableGradeSelection} teachers={teachers} />
           <DialogFooter>
             <Button variant="outline" onClick={() => setEditOpen(false)}>
               Cancel
@@ -193,7 +245,7 @@ export function ClassDialogs({
             <Button
               className="bg-emerald-600 hover:bg-emerald-700 text-white"
               onClick={onEdit}
-              disabled={editing || !editData.name || !editData.section || !editData.grade}
+              disabled={editing || !editData.name || !editData.section || (!enableGradeSelection ? !getMappedGradeFromName(editData.name) : !editData.grade)}
             >
               {editing && <Loader2 className="size-4 mr-2 animate-spin" />}
               {editing ? "Saving..." : "Save Changes"}

@@ -47,6 +47,7 @@ export interface ClassInfo {
   capacity: number;
   studentCount: number;
   classTeacher?: string;
+  classTeacherId?: string;
 }
 
 export interface SubjectInfo {

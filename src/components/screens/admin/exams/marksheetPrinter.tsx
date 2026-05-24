@@ -1,73 +1,21 @@
-import { MARKSHEET_TEMPLATES, ClassicAcademy } from "../exams/marksheet-templates";
+import React from 'react';
 import { createRoot } from "react-dom/client";
 import { goeyToast as toast } from "goey-toast";
-import * as React from "react";
+import { MarksheetPreviewPage } from './MarksheetPreviewPage';
 
-export const MOCK_PREVIEW_SHEET = {
-  sheet: {
-    studentName: "Aarav Sharma",
-    rollNumber: "2026-A104",
-    schoolName: "St. Xavier's High School",
-    subjects: [
-      {
-        subjectName: "Mathematics",
-        midtermMarks: "42/50",
-        finalMarks: "88/100",
-        obtained: "88",
-        percentage: 88,
-        status: "pass" as const,
-      },
-      {
-        subjectName: "Science",
-        midtermMarks: "45/50",
-        finalMarks: "92/100",
-        obtained: "92",
-        percentage: 92,
-        status: "pass" as const,
-      },
-      {
-        subjectName: "English Language",
-        midtermMarks: "40/50",
-        finalMarks: "85/100",
-        obtained: "85",
-        percentage: 85,
-        status: "pass" as const,
-      },
-      {
-        subjectName: "Social Science",
-        midtermMarks: "38/50",
-        finalMarks: "79/100",
-        obtained: "79",
-        percentage: 79,
-        status: "pass" as const,
-      },
-      {
-        subjectName: "Computer Applications",
-        midtermMarks: "48/50",
-        finalMarks: "96/100",
-        obtained: "96",
-        percentage: 96,
-        status: "pass" as const,
-      },
-    ],
-    totalMaxMarks: 500,
-    totalObtainedMarks: 440,
-    overallPercentage: 88,
-    grade: "A+",
-    remarks: "Excellent academic performance! Aarav demonstrates strong analytical thinking and consistency across all subjects.",
-    color: "#1e3a8a",
-    status: "pass" as const,
-  },
-  classNameStr: "Grade X",
-  classSection: "A",
-  academicYear: "2025–2026",
-  marksheetType: "midterm" as const,
-};
-
-export function handleMarksheetPreview(templateId: string) {
-  const selectedTemplate = MARKSHEET_TEMPLATES.find((t) => t.id === templateId) || MARKSHEET_TEMPLATES[0];
-  const PreviewComponent = selectedTemplate.component || ClassicAcademy;
-
+export async function handleMarksheetPreviewNewTab({
+  classId,
+  classNameStr,
+  classSection,
+  academicYear,
+  examName,
+}: {
+  classId: string;
+  classNameStr: string;
+  classSection: string;
+  academicYear: string;
+  examName?: string;
+}) {
   const previewWindow = window.open("", "_blank");
   if (!previewWindow) {
     toast.error("Popup blocked! Please allow popups to view the marksheet preview.");
@@ -79,7 +27,7 @@ export function handleMarksheetPreview(templateId: string) {
     <!DOCTYPE html>
     <html lang="en">
     <head>
-      <title>Marksheet Preview - ${selectedTemplate.name}</title>
+      <title>Marksheet Preview - ${classNameStr} (${classSection})</title>
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width, initial-scale=1">
       <style>
@@ -103,7 +51,7 @@ export function handleMarksheetPreview(templateId: string) {
           align-items: center;
           justify-content: space-between;
           padding: 0.75rem 1.5rem;
-          background: linear-gradient(135deg, #1e1b4b 0%, #0f172a 100%);
+          background: linear-gradient(135deg, #2e1065 0%, #0f172a 100%); /* Deep Violet to Slate */
           color: #ffffff;
           box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.3);
           border-bottom: 1px solid rgba(255, 255, 255, 0.05);
@@ -121,8 +69,8 @@ export function handleMarksheetPreview(templateId: string) {
         .toolbar-badge {
           font-size: 0.7rem;
           font-weight: 600;
-          color: #a78bfa;
-          background-color: rgba(139, 92, 246, 0.15);
+          color: #ddd6fe; /* violet-200 */
+          background-color: rgba(139, 92, 246, 0.15); /* violet-500 */
           padding: 0.25rem 0.75rem;
           border-radius: 9999px;
           border: 1px solid rgba(139, 92, 246, 0.2);
@@ -164,7 +112,7 @@ export function handleMarksheetPreview(templateId: string) {
         
         .zoom-btn.active {
           color: #ffffff;
-          background-color: #8b5cf6;
+          background-color: #8b5cf6; /* violet-500 */
         }
         
         .action-btn {
@@ -249,68 +197,7 @@ export function handleMarksheetPreview(templateId: string) {
       </style>
     </head>
     <body>
-      <div class="toolbar no-print">
-        <div class="toolbar-title">
-          <span style="font-size: 1.1rem;">📄</span>
-          <span>Marksheet Preview</span>
-          <span class="toolbar-badge">${selectedTemplate.name}</span>
-        </div>
-        
-        <div class="toolbar-actions">
-          <div class="zoom-controls">
-            <button class="zoom-btn" id="zoom-out" title="Zoom Out">−</button>
-            <span class="zoom-btn active" style="cursor: default;" id="zoom-label">60%</span>
-            <button class="zoom-btn" id="zoom-in" title="Zoom In">+</button>
-          </div>
-          
-          <button class="action-btn" id="print-btn">
-            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
-            Print
-          </button>
-          
-          <button class="action-btn action-btn-secondary" id="close-btn">
-            Close Preview
-          </button>
-        </div>
-      </div>
-      
-      <div class="viewer-container">
-        <div class="paper-shadow" id="paper-sheet" style="width: ${794 * 0.6}px; height: ${1123 * 0.6}px;">
-          <div id="preview-root" style="width: 794px; height: 1123px; transform: scale(0.6); transform-origin: top left;">
-          </div>
-        </div>
-      </div>
-      
-      <script>
-        let currentZoom = 0.6;
-        const paperSheet = document.getElementById('paper-sheet');
-        const previewRoot = document.getElementById('preview-root');
-        const zoomLabel = document.getElementById('zoom-label');
-        
-        function updateZoom(newZoom) {
-          currentZoom = Math.min(Math.max(newZoom, 0.4), 1.5);
-          previewRoot.style.transform = \`scale(\${currentZoom})\`;
-          paperSheet.style.width = \`\${794 * currentZoom}px\`;
-          paperSheet.style.height = \`\${1123 * currentZoom}px\`;
-          zoomLabel.textContent = \`\${Math.round(currentZoom * 100)}%\`;
-        }
-        
-        document.getElementById('zoom-in').addEventListener('click', () => {
-          updateZoom(currentZoom + 0.1);
-        });
-        
-        document.getElementById('zoom-out').addEventListener('click', () => {
-          updateZoom(currentZoom - 0.1);
-        });
-        
-        document.getElementById('print-btn').addEventListener('click', () => {
-          window.print();
-        });
-        
-        document.getElementById('close-btn').addEventListener('click', () => {
-          window.close();
-        });
-      </script>
+      <div id="preview-root"></div>
     </body>
     </html>
   `);
@@ -350,6 +237,16 @@ export function handleMarksheetPreview(templateId: string) {
   const container = previewWindow.document.getElementById("preview-root");
   if (container) {
     const root = createRoot(container);
-    root.render(React.createElement(PreviewComponent, MOCK_PREVIEW_SHEET));
+    root.render(
+      React.createElement(MarksheetPreviewPage, {
+        classId,
+        classNameStr,
+        classSection,
+        academicYear,
+        examName,
+        onBack: () => previewWindow.close(),
+        isStandalone: true,
+      })
+    );
   }
 }

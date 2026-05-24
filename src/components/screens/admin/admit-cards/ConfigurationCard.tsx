@@ -32,6 +32,8 @@ interface ConfigurationCardProps {
   onPrintAll: () => void;
   admitCardsCount: number;
   preparingPrint: boolean;
+  selectedTemplate: string;
+  setSelectedTemplate: (v: string) => void;
 }
 
 export function ConfigurationCard({
@@ -51,6 +53,8 @@ export function ConfigurationCard({
   onPrintAll,
   admitCardsCount,
   preparingPrint,
+  selectedTemplate,
+  setSelectedTemplate,
 }: ConfigurationCardProps) {
   return (
     <Card className="border-2 border-amber-200 dark:border-amber-800">
@@ -62,26 +66,43 @@ export function ConfigurationCard({
         <CardDescription>Filter by exam type and select students</CardDescription>
       </CardHeader>
       <CardContent className="p-4 pt-0 space-y-4">
-        {/* Exam Type Filter */}
+        {/* Template Selector */}
         <div className="space-y-1.5">
-          <label className="text-sm font-medium mb-2 block">Exam Type</label>
+          <label className="text-sm font-medium mb-1.5 block">Print Template</label>
+          <select 
+            value={selectedTemplate} 
+            onChange={(e) => setSelectedTemplate(e.target.value)}
+            className="w-full h-9 px-3 rounded-lg border border-zinc-200 dark:border-zinc-800 bg-background text-xs font-semibold focus:outline-none focus:ring-1 focus:ring-amber-500 cursor-pointer"
+            style={{ colorScheme: 'dark' }}
+          >
+            <option value="classic_quad">Classic Quad (4 per A4 Page)</option>
+            <option value="premium_modern">Premium Modern (4 per A4 Page)</option>
+            <option value="compact_dual">Detailed Dual (2 per A4 Page)</option>
+            <option value="minimal_ticket">Minimalist Ticket (4 per A4 Page)</option>
+          </select>
+        </div>
+        {/* Exam Cycle Filter */}
+        <div className="space-y-1.5">
+          <label className="text-sm font-medium mb-2 block">Exam Cycle</label>
           <div className="flex flex-wrap gap-2">
-            {availableExamTypes.map((type: string) => {
+            {availableExamTypes.map((typeKey: string) => {
+              const [cycleName, examType] = typeKey.split('::');
               const count = classData.exams.filter((e: any) => {
                 const isScheduled = e.status?.trim().toLowerCase() === 'scheduled';
                 const isUpcoming = e.date >= todayDateString;
-                return e.examType === type && (isScheduled || isUpcoming) && !e.resultPublished;
+                const eCycleName = e.name.includes(' - ') ? e.name.split(' - ')[0] : e.name;
+                return eCycleName === cycleName && e.examType === examType && (isScheduled || isUpcoming) && !e.resultPublished;
               }).length;
               if (count === 0) return null;
               return (
                 <Button
-                  key={type}
-                  variant={selectedExamType === type ? 'default' : 'outline'}
+                  key={typeKey}
+                  variant={selectedExamType === typeKey ? 'default' : 'outline'}
                   size="sm"
-                  onClick={() => setSelectedExamType(type)}
+                  onClick={() => setSelectedExamType(typeKey)}
                   className="gap-1.5"
                 >
-                  {examTypeLabels[type] || type}
+                  {cycleName}
                   <Badge variant="secondary" className="ml-1 px-1 py-0 h-4 text-[10px] min-w-[1.2rem] flex items-center justify-center bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-400 border-none">
                     {count}
                   </Badge>

@@ -8,6 +8,7 @@ export const ModernMinimalist: React.FC<MarksheetTemplateProps> = ({
   classSection,
   academicYear,
   marksheetType,
+  examName,
 }) => {
   return (
     <div 
@@ -42,7 +43,7 @@ export const ModernMinimalist: React.FC<MarksheetTemplateProps> = ({
         <div className="flex justify-between items-center bg-zinc-50/50 border border-zinc-100 rounded-lg p-3 font-sans">
           <div>
             <h4 className="text-xs font-semibold uppercase text-zinc-700 tracking-wider">
-              {marksheetType === 'midterm' ? 'Midterm Marksheet' : marksheetType === 'final' ? 'Final Marksheet' : 'Consolidated Report Card'}
+              {examName ? `${examName} Marksheet` : (marksheetType === 'midterm' ? 'Midterm Marksheet' : marksheetType === 'final' ? 'Final Marksheet' : 'Consolidated Report Card')}
             </h4>
             <p className="text-[9px] text-zinc-400 font-medium">Class Performance Summary</p>
           </div>
@@ -77,12 +78,14 @@ export const ModernMinimalist: React.FC<MarksheetTemplateProps> = ({
           <table className="w-full text-xs border-collapse table-fixed">
             <thead>
               <tr className="bg-zinc-900 text-white text-[9.5px]">
-                <th className={`font-bold px-3 py-2 text-left whitespace-normal ${marksheetType === 'combined' ? 'w-[32%]' : 'w-[50%]'}`}>Subject Name</th>
-                {marksheetType === 'combined' && <th className="font-bold px-3 py-2 text-center w-[15%]">Midterm</th>}
-                {marksheetType === 'combined' && <th className="font-bold px-3 py-2 text-center w-[15%]">Final</th>}
-                <th className={`font-bold px-3 py-2 text-center ${marksheetType === 'combined' ? 'w-[15%]' : 'w-[18%]'}`}>Obtained</th>
-                <th className={`font-bold px-3 py-2 text-center ${marksheetType === 'combined' ? 'w-[12%]' : 'w-[15%]'}`}>Score %</th>
-                <th className={`font-bold px-3 py-2 text-center ${marksheetType === 'combined' ? 'w-[11%]' : 'w-[17%]'}`}>Status</th>
+                <th className={`font-bold px-3 py-2 text-left whitespace-normal ${marksheetType === 'combined' ? 'w-[22%]' : 'w-[22%]'}`}>Subject Name</th>
+                {marksheetType === 'combined' && <th className="font-bold px-3 py-2 text-center w-[12%]">Midterm</th>}
+                {marksheetType === 'combined' && <th className="font-bold px-3 py-2 text-center w-[12%]">Final</th>}
+                <th className={`font-bold px-3 py-2 text-center ${marksheetType === 'combined' ? 'w-[11%]' : 'w-[15%]'}`}>Max Marks</th>
+                <th className={`font-bold px-3 py-2 text-center ${marksheetType === 'combined' ? 'w-[11%]' : 'w-[15%]'}`}>Passing Marks</th>
+                <th className={`font-bold px-3 py-2 text-center ${marksheetType === 'combined' ? 'w-[11%]' : 'w-[16%]'}`}>Obtained Marks</th>
+                <th className={`font-bold px-3 py-2 text-center ${marksheetType === 'combined' ? 'w-[10%]' : 'w-[16%]'}`}>Percentage</th>
+                <th className={`font-bold px-3 py-2 text-center ${marksheetType === 'combined' ? 'w-[11%]' : 'w-[16%]'}`}>Status</th>
               </tr>
             </thead>
             <tbody>
@@ -91,7 +94,9 @@ export const ModernMinimalist: React.FC<MarksheetTemplateProps> = ({
                   <td className="px-3 py-2.5 text-left font-bold text-zinc-800 truncate">{sub.subjectName}</td>
                   {marksheetType === 'combined' && <td className="px-3 py-2.5 text-center font-mono text-zinc-500">{sub.midtermMarks}</td>}
                   {marksheetType === 'combined' && <td className="px-3 py-2.5 text-center font-mono text-zinc-500">{sub.finalMarks}</td>}
-                  <td className="px-3 py-2.5 text-center font-black font-mono text-blue-900">{sub.obtained}</td>
+                  <td className="px-3 py-2.5 text-center font-bold font-mono text-zinc-700">{sub.maxMarks ?? 100}</td>
+                  <td className="px-3 py-2.5 text-center font-medium font-mono text-zinc-600">{sub.passingMarks ?? 33}</td>
+                  <td className="px-3 py-2.5 text-center font-black font-mono text-blue-900">{sub.obtainedMarks ?? 0}</td>
                   <td className="px-3 py-2.5 text-center">
                     <div className="flex flex-col items-center justify-center gap-0.5">
                       <span className="font-black text-zinc-900 font-mono">{sub.percentage}%</span>

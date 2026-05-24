@@ -5,10 +5,13 @@ import { useMemo, useState, useEffect, useRef } from 'react';
 import { apiFetch } from '@/lib/api';
 import { goeyToast as toast } from 'goey-toast';
 import { useReactToPrint } from 'react-to-print';
+import { Printer, Loader2 } from 'lucide-react';
 import { MARKSHEET_TEMPLATES } from './marksheet-templates';
 import { MarksheetControls } from './marksheet-preview/MarksheetControls';
+import { MarksheetStandaloneToolbar } from './marksheet-preview/MarksheetStandaloneToolbar';
 import { MarksheetSheetsPreview } from './marksheet-preview/MarksheetSheetsPreview';
 import { MarksheetPrintContainer } from './marksheet-preview/MarksheetPrintContainer';
+
 
 interface MarksheetPreviewPageProps {
   classId: string;
@@ -16,6 +19,8 @@ interface MarksheetPreviewPageProps {
   classSection: string; // e.g. "A"
   academicYear: string;
   onBack: () => void;
+  isStandalone?: boolean;
+  examName?: string;
 }
 
 export function MarksheetPreviewPage({
@@ -23,10 +28,12 @@ export function MarksheetPreviewPage({
   classNameStr,
   classSection,
   academicYear,
-  onBack
+  onBack,
+  isStandalone = false,
+  examName
 }: MarksheetPreviewPageProps) {
   const [selectedStudentId, setSelectedStudentId] = useState<string>('all');
-  const [marksheetType, setMarksheetType] = useState<'midterm' | 'final' | 'combined'>('combined');
+  const [marksheetType, setMarksheetType] = useState<'midterm' | 'final'>('midterm');
   const [selectedTemplateId, setSelectedTemplateId] = useState<string>('classic');
   
   const [students, setStudents] = useState<any[]>([]);
@@ -61,9 +68,16 @@ export function MarksheetPreviewPage({
 
         const loadedStudents = studentData.items || [];
         // Only consider completed (published) exams
-        const completedExams = (examData.data || examData || []).filter(
+        let completedExams = (examData.data || examData || []).filter(
           (e: ExamRecord) => e.status === 'completed' && e.academicYear === academicYear
         );
+
+        if (examName) {
+          completedExams = completedExams.filter((e: ExamRecord) => {
+            const cycleName = e.name.includes(' - ') ? e.name.split(' - ')[0] : e.name;
+            return cycleName.toLowerCase() === examName.toLowerCase();
+          });
+        }
 
         setStudents(loadedStudents);
         setExams(completedExams);
@@ -104,7 +118,7 @@ export function MarksheetPreviewPage({
   // Clean student selection state when opened
   useEffect(() => {
     setSelectedStudentId('all');
-    setMarksheetType('combined');
+    setMarksheetType('midterm');
   }, [classId]);
 
   // Extract unique subjects from exams
@@ -157,20 +171,24 @@ export function MarksheetPreviewPage({
 
       let subMax = 0;
       let subObtained = 0;
+      let subPassing = 0;
       let status: 'pass' | 'fail' | 'pending' = 'pending';
 
       if (marksheetType === 'midterm') {
         subMax = midtermMax;
         subObtained = midtermMarks || 0;
+        subPassing = midtermExam?.passingMarks || 0;
         status = midtermStudentResult ? midtermStudentResult.status : 'pending';
       } else if (marksheetType === 'final') {
         subMax = finalMax;
         subObtained = finalMarks || 0;
+        subPassing = finalExam?.passingMarks || 0;
         status = finalStudentResult ? finalStudentResult.status : 'pending';
       } else {
         // Combined
         subMax = midtermMax + finalMax;
         subObtained = (midtermMarks || 0) + (finalMarks || 0);
+        subPassing = (midtermExam?.passingMarks || 0) + (finalExam?.passingMarks || 0);
         
         // Pass if combined percentage is >= 40% (or pass both)
         if (midtermStudentResult && finalStudentResult) {
@@ -194,6 +212,9 @@ export function MarksheetPreviewPage({
         midtermMarks: midtermMarks !== null ? `${midtermMarks}/${midtermMax}` : '-',
         finalMarks: finalMarks !== null ? `${finalMarks}/${finalMax}` : '-',
         obtained: subMax > 0 ? `${subObtained}/${subMax}` : '-',
+        maxMarks: subMax,
+        obtainedMarks: subObtained,
+        passingMarks: subPassing,
         percentage: subMax > 0 ? Math.round((subObtained / subMax) * 100) : 0,
         status
       };
@@ -252,6 +273,62 @@ export function MarksheetPreviewPage({
 
   const SelectedTemplate = MARKSHEET_TEMPLATES.find(t => t.id === selectedTemplateId)?.component || MARKSHEET_TEMPLATES[0].component;
 
+  if (isStandalone) {
+    return (
+      <div className="min-h-screen flex flex-col bg-zinc-950 text-zinc-100">
+        <MarksheetStandaloneToolbar
+          classNameStr={classNameStr}
+          classSection={classSection}
+          selectedStudentId={selectedStudentId}
+          setSelectedStudentId={setSelectedStudentId}
+          students={students}
+          loading={loading}
+          marksheetType={marksheetType}
+          setMarksheetType={setMarksheetType}
+          exams={exams}
+          selectedTemplateId={selectedTemplateId}
+          setSelectedTemplateId={setSelectedTemplateId}
+          zoomScale={zoomScale}
+          setZoomScale={setZoomScale}
+          printing={printing}
+          handlePrint={handlePrint}
+          onBack={onBack}
+        />
+        
+        {/* Standalone View Container */}
+        <div className="viewer-container">
+          <MarksheetSheetsPreview
+            loading={loading}
+            exams={exams}
+            students={students}
+            previewStudents={previewStudents}
+            zoomScale={zoomScale}
+            SelectedTemplate={SelectedTemplate}
+            classNameStr={classNameStr}
+            classSection={classSection}
+            academicYear={academicYear}
+            marksheetType={marksheetType}
+            selectedStudentId={selectedStudentId}
+            isStandalone={true}
+            examName={examName}
+          />
+        </div>
+
+        {/* Hidden Print Container */}
+        <MarksheetPrintContainer
+          printContainerRef={printContainerRef}
+          previewStudents={previewStudents}
+          SelectedTemplate={SelectedTemplate}
+          classNameStr={classNameStr}
+          classSection={classSection}
+          academicYear={academicYear}
+          marksheetType={marksheetType}
+          examName={examName}
+        />
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6">
       <MarksheetControls
@@ -285,6 +362,7 @@ export function MarksheetPreviewPage({
         academicYear={academicYear}
         marksheetType={marksheetType}
         selectedStudentId={selectedStudentId}
+        examName={examName}
       />
 
       <MarksheetPrintContainer
@@ -295,6 +373,7 @@ export function MarksheetPreviewPage({
         classSection={classSection}
         academicYear={academicYear}
         marksheetType={marksheetType}
+        examName={examName}
       />
     </div>
   );

@@ -8,6 +8,7 @@ export const CreativeCompact: React.FC<MarksheetTemplateProps> = ({
   classSection,
   academicYear,
   marksheetType,
+  examName,
 }) => {
   return (
     <div 
@@ -38,7 +39,7 @@ export const CreativeCompact: React.FC<MarksheetTemplateProps> = ({
           </div>
           <div className="text-right">
             <span className="inline-block text-[8px] bg-violet-600 text-white px-2.5 py-0.5 rounded-full font-black uppercase tracking-wider">
-              {marksheetType === 'combined' ? 'Combined Term' : marksheetType.toUpperCase() + ' TERM'}
+              {examName ? examName : (marksheetType === 'combined' ? 'Combined Term' : marksheetType.toUpperCase() + ' TERM')}
             </span>
             <p className="text-[9px] text-zinc-400 font-black mt-1">{academicYear}</p>
           </div>
@@ -81,12 +82,14 @@ export const CreativeCompact: React.FC<MarksheetTemplateProps> = ({
           <table className="w-full text-xs border-collapse table-fixed">
             <thead>
               <tr className="bg-gradient-to-r from-violet-950 to-violet-900 text-white text-[9.5px]">
-                <th className={`font-bold px-3 py-2 text-left whitespace-normal ${marksheetType === 'combined' ? 'w-[32%]' : 'w-[50%]'}`}>Subject Disciplines</th>
-                {marksheetType === 'combined' && <th className="font-bold px-3 py-2 text-center w-[15%]">Midterm</th>}
-                {marksheetType === 'combined' && <th className="font-bold px-3 py-2 text-center w-[15%]">Final</th>}
-                <th className={`font-bold px-3 py-2 text-center ${marksheetType === 'combined' ? 'w-[15%]' : 'w-[18%]'}`}>Obtained</th>
-                <th className={`font-bold px-3 py-2 text-center ${marksheetType === 'combined' ? 'w-[12%]' : 'w-[15%]'}`}>Score %</th>
-                <th className={`font-bold px-3 py-2 text-center ${marksheetType === 'combined' ? 'w-[11%]' : 'w-[17%]'}`}>Status</th>
+                <th className={`font-bold px-3 py-2 text-left whitespace-normal ${marksheetType === 'combined' ? 'w-[22%]' : 'w-[22%]'}`}>Subject Name</th>
+                {marksheetType === 'combined' && <th className="font-bold px-3 py-2 text-center w-[12%]">Midterm</th>}
+                {marksheetType === 'combined' && <th className="font-bold px-3 py-2 text-center w-[12%]">Final</th>}
+                <th className={`font-bold px-3 py-2 text-center ${marksheetType === 'combined' ? 'w-[11%]' : 'w-[15%]'}`}>Max Marks</th>
+                <th className={`font-bold px-3 py-2 text-center ${marksheetType === 'combined' ? 'w-[11%]' : 'w-[15%]'}`}>Passing Marks</th>
+                <th className={`font-bold px-3 py-2 text-center ${marksheetType === 'combined' ? 'w-[11%]' : 'w-[16%]'}`}>Obtained Marks</th>
+                <th className={`font-bold px-3 py-2 text-center ${marksheetType === 'combined' ? 'w-[10%]' : 'w-[16%]'}`}>Percentage</th>
+                <th className={`font-bold px-3 py-2 text-center ${marksheetType === 'combined' ? 'w-[11%]' : 'w-[16%]'}`}>Status</th>
               </tr>
             </thead>
             <tbody>
@@ -95,7 +98,9 @@ export const CreativeCompact: React.FC<MarksheetTemplateProps> = ({
                   <td className="px-3 py-2.5 text-left font-black text-violet-950 truncate">{sub.subjectName}</td>
                   {marksheetType === 'combined' && <td className="px-3 py-2.5 text-center font-mono text-zinc-500">{sub.midtermMarks}</td>}
                   {marksheetType === 'combined' && <td className="px-3 py-2.5 text-center font-mono text-zinc-500">{sub.finalMarks}</td>}
-                  <td className="px-3 py-2.5 text-center font-black font-mono text-violet-600">{sub.obtained}</td>
+                  <td className="px-3 py-2.5 text-center font-bold font-mono text-zinc-700">{sub.maxMarks ?? 100}</td>
+                  <td className="px-3 py-2.5 text-center font-medium font-mono text-zinc-600">{sub.passingMarks ?? 33}</td>
+                  <td className="px-3 py-2.5 text-center font-black font-mono text-violet-600">{sub.obtainedMarks ?? 0}</td>
                   <td className="px-3 py-2.5 text-center">
                     <span className="font-black text-violet-950 font-mono block mb-0.5">{sub.percentage}%</span>
                     <div className="w-12 h-1 bg-zinc-100 rounded-full overflow-hidden mx-auto">

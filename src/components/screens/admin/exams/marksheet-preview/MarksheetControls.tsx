@@ -14,8 +14,8 @@ interface MarksheetControlsProps {
   onBack: () => void;
   selectedStudentId: string;
   setSelectedStudentId: (id: string) => void;
-  marksheetType: 'midterm' | 'final' | 'combined';
-  setMarksheetType: (type: 'midterm' | 'final' | 'combined') => void;
+  marksheetType: 'midterm' | 'final';
+  setMarksheetType: (type: 'midterm' | 'final') => void;
   selectedTemplateId: string;
   setSelectedTemplateId: (id: string) => void;
   zoomScale: number;
@@ -106,7 +106,6 @@ export function MarksheetControls({
             <SelectContent className="rounded-xl">
               <SelectItem value="midterm" className="text-xs font-medium">Midterm</SelectItem>
               <SelectItem value="final" className="text-xs font-medium">Final</SelectItem>
-              <SelectItem value="combined" className="text-xs font-semibold text-emerald-600">Combined</SelectItem>
             </SelectContent>
           </Select>
         </div>

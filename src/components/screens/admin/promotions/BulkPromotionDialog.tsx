@@ -19,7 +19,7 @@ import {
 } from "@/components/ui/dialog";
 import { Loader2, Zap, GraduationCap } from "lucide-react";
 import { ClassOption, StudentOption } from "./types";
-import { isLastClass } from "./utils";
+import { isLastClass, getNumericGrade } from "./utils";
 
 interface BulkPromotionDialogProps {
   open: boolean;
@@ -82,7 +82,7 @@ export function BulkPromotionDialog({
                   {classes
                     .sort(
                     (a, b) =>
-                      (parseInt(a.grade) || 0) - (parseInt(b.grade) || 0),
+                      getNumericGrade(a.grade) - getNumericGrade(b.grade),
                   )
                     .map((c) => (
                       <SelectItem key={c.id} value={c.id}>
@@ -103,7 +103,7 @@ export function BulkPromotionDialog({
                     .filter((c) => c.id !== bulkFromClass)
                     .sort(
                     (a, b) =>
-                      (parseInt(a.grade) || 0) - (parseInt(b.grade) || 0),
+                      getNumericGrade(a.grade) - getNumericGrade(b.grade),
                   )
                     .map((c) => (
                       <SelectItem key={c.id} value={c.id}>

@@ -158,6 +158,12 @@ export const navItems: Record<UserRole, NavItem[]> = {
       icon: <ScrollText className="size-4" />,
       permModule: "audit-logs",
     },
+    {
+      key: "reports",
+      label: "Reports & Exports",
+      icon: <BarChart3 className="size-4" />,
+      permModule: null,
+    },
 
     // System
     {

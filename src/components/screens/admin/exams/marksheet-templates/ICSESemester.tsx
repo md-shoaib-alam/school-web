@@ -8,6 +8,7 @@ export const ICSESemester: React.FC<MarksheetTemplateProps> = ({
   classSection,
   academicYear,
   marksheetType,
+  examName,
 }) => {
   const getICSEGrade = (pct: number) => {
     if (pct >= 90) return 'A';
@@ -37,7 +38,7 @@ export const ICSESemester: React.FC<MarksheetTemplateProps> = ({
             School Code: IN-{getDeterministicId(sheet.schoolName + 'code', 100, 999)}
           </p>
           <p className="text-[11px] text-violet-900 font-extrabold tracking-widest mt-2 uppercase font-serif">
-            PROGRESS STATEMENT: SEMESTER TERM {marksheetType === 'midterm' ? 'I' : marksheetType === 'final' ? 'II' : 'CUMULATIVE'} ({academicYear})
+            {examName ? examName : `PROGRESS STATEMENT: SEMESTER TERM ${marksheetType === 'midterm' ? 'I' : marksheetType === 'final' ? 'II' : 'CUMULATIVE'}`} ({academicYear})
           </p>
         </div>
 
@@ -77,12 +78,14 @@ export const ICSESemester: React.FC<MarksheetTemplateProps> = ({
           <div className="rounded border border-violet-900 overflow-hidden bg-white">
             <table className="w-full text-xs border-collapse table-fixed">
               <thead>
-                <tr className="bg-violet-950 text-white text-[9.5px]">
-                  <th className="font-bold px-3 py-2 text-left w-[42%]">PRESCRIBED SUBJECTS</th>
-                  {marksheetType === 'combined' && <th className="font-bold px-3 py-2 text-center w-[13%]">HALF YEARLY</th>}
-                  {marksheetType === 'combined' && <th className="font-bold px-3 py-2 text-center w-[13%]">YEAR END</th>}
-                  <th className="font-bold px-3 py-2 text-center w-[18%]">CUMULATIVE MARKS</th>
-                  <th className="font-bold px-3 py-2 text-center w-[14%]">FINAL GRADE</th>
+                <tr className="bg-violet-955 text-white text-[9.5px]">
+                  <th className="font-bold px-3 py-2 text-left w-[24%]">PRESCRIBED SUBJECTS</th>
+                  {marksheetType === 'combined' && <th className="font-bold px-3 py-2 text-center w-[12%]">HALF YEARLY</th>}
+                  {marksheetType === 'combined' && <th className="font-bold px-3 py-2 text-center w-[12%]">YEAR END</th>}
+                  <th className="font-bold px-3 py-2 text-center w-[18%]">MAX MARKS</th>
+                  <th className="font-bold px-3 py-2 text-center w-[18%]">PASSING MARKS</th>
+                  <th className="font-bold px-3 py-2 text-center w-[18%]">OBTAINED MARKS</th>
+                  <th className="font-bold px-3 py-2 text-center w-[22%]">FINAL GRADE</th>
                 </tr>
               </thead>
               <tbody>
@@ -91,7 +94,9 @@ export const ICSESemester: React.FC<MarksheetTemplateProps> = ({
                     <td className="px-3 py-2.5 text-left font-bold text-zinc-800 truncate font-serif">{sub.subjectName}</td>
                     {marksheetType === 'combined' && <td className="px-3 py-2.5 text-center font-mono text-zinc-500">{sub.midtermMarks}</td>}
                     {marksheetType === 'combined' && <td className="px-3 py-2.5 text-center font-mono text-zinc-500">{sub.finalMarks}</td>}
-                    <td className="px-3 py-2.5 text-center font-black font-mono text-violet-950">{sub.obtained}</td>
+                    <td className="px-3 py-2.5 text-center font-bold font-mono text-zinc-700">{sub.maxMarks ?? 100}</td>
+                    <td className="px-3 py-2.5 text-center font-medium font-mono text-zinc-600">{sub.passingMarks ?? 33}</td>
+                    <td className="px-3 py-2.5 text-center font-black font-mono text-violet-950">{sub.obtainedMarks ?? 0}</td>
                     <td className="px-3 py-2.5 text-center">
                       <span className="font-black text-violet-950 font-sans text-[10px]">
                         {getICSEGrade(sub.percentage)}
