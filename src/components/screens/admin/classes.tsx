@@ -2,7 +2,7 @@
 
 import { apiFetch } from "@/lib/api";
 import { useMemo, useReducer } from "react";
-import { useQueryClient } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { School } from "lucide-react";
@@ -118,6 +118,20 @@ export function AdminClasses() {
 
   // ⚡ TanStack Query with GraphQL Group-wise hooks
   const { data: classesData, isLoading: classesLoading } = useClasses(currentTenantId || undefined);
+
+  // Fetch school/tenant settings dynamically to determine grade creation mode
+  const { data: settingsData } = useQuery({
+    queryKey: ["tenant-settings", currentTenantId],
+    queryFn: async () => {
+      if (!currentTenantId) return null;
+      const res = await apiFetch("/api/tenant-settings");
+      if (!res.ok) return null;
+      return res.json();
+    },
+    enabled: !!currentTenantId,
+  });
+
+  const enableGradeSelection = settingsData?.enableGradeSelection ?? true;
 
   const classes = useMemo(() => {
     const list = classesData?.classes || [];
@@ -355,6 +369,7 @@ export function AdminClasses() {
         deleteTarget={deleteTarget}
         deleting={deleting}
         onDelete={handleDeleteClass}
+        enableGradeSelection={enableGradeSelection}
       />
     </div>
   );

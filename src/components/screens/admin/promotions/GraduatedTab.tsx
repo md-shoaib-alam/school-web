@@ -23,6 +23,7 @@ import {
 import { GraduationCap, Users, Loader2 } from "lucide-react";
 import { ClassOption, StudentOption, PromotionRecord } from "./types";
 import { GraduationsTable } from "./GraduationsTable";
+import { getNumericGrade } from "./utils";
 
 interface GraduatedTabProps {
   classes: ClassOption[];
@@ -80,7 +81,7 @@ export function GraduatedTab({
                 </SelectTrigger>
                 <SelectContent>
                   {classes
-                    .sort((a, b) => (parseInt(b.grade) || 0) - (parseInt(a.grade) || 0))
+                    .sort((a, b) => getNumericGrade(b.grade) - getNumericGrade(a.grade))
                     .map((c) => (
                       <SelectItem key={c.id} value={c.id}>
                         {c.name}-{c.section} (Grade {c.grade}) — {c.studentCount} students

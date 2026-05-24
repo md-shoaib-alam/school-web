@@ -35,6 +35,16 @@ export function getCurrentAcademicYear(): string {
   return m >= 3 ? `${y}-${y + 1}` : `${y - 1}-${y}`;
 }
 
+export function getNumericGrade(gradeStr: string): number {
+  if (!gradeStr) return 0;
+  const normalized = gradeStr.trim().toLowerCase();
+  if (normalized === "nursery") return -2;
+  if (normalized === "lkg") return -1;
+  if (normalized === "ukg") return 0;
+  const parsed = parseInt(gradeStr);
+  return isNaN(parsed) ? 0 : parsed;
+}
+
 export const getNextClass = (
   fromClassId: string,
   allClasses: ClassOption[],
@@ -42,8 +52,8 @@ export const getNextClass = (
   const fromClass = allClasses.find((c) => c.id === fromClassId);
   if (!fromClass) return null;
 
-  const fromGrade = parseInt(fromClass.grade) || 0;
-  const candidates = allClasses.filter((c) => parseInt(c.grade) === fromGrade + 1);
+  const fromGrade = getNumericGrade(fromClass.grade);
+  const candidates = allClasses.filter((c) => getNumericGrade(c.grade) === fromGrade + 1);
   const nextClass = candidates.length > 0
     ? candidates.reduce((best, current) =>
         current.section.localeCompare(best.section) < 0 ? current : best
@@ -59,7 +69,8 @@ export const isLastClass = (
 ): boolean => {
   const cls = classes.find((c) => c.id === classId);
   if (!cls) return false;
-  const grade = parseInt(cls.grade) || 0;
-  const maxGrade = Math.max(...classes.map((c) => parseInt(c.grade) || 0));
+  const grade = getNumericGrade(cls.grade);
+  const maxGrade = Math.max(...classes.map((c) => getNumericGrade(c.grade)));
   return grade >= maxGrade;
 };
+

@@ -26,6 +26,7 @@ export interface TenantSettings {
   enableModalTabulationPreview?: boolean;
   enableModalMarksheetPreview?: boolean;
   enableModalAdmitCardPreview?: boolean;
+  enableGradeSelection?: boolean;
   [key: string]: unknown;
 }
 
@@ -37,6 +38,7 @@ export interface SettingsState {
   enableModalTabulationPreview: boolean;
   enableModalMarksheetPreview: boolean;
   enableModalAdmitCardPreview: boolean;
+  enableGradeSelection: boolean;
   hasChanges: boolean;
   initialSettings: TenantSettings | null;
 }
@@ -51,6 +53,7 @@ export type SettingsAction =
   | { type: "TOGGLE_TABULATION_PREVIEW"; checked: boolean }
   | { type: "TOGGLE_MARKSHEET_PREVIEW"; checked: boolean }
   | { type: "TOGGLE_ADMIT_CARD_PREVIEW"; checked: boolean }
+  | { type: "TOGGLE_GRADE_SELECTION"; checked: boolean }
   | { type: "SAVE_START" }
   | {
       type: "SAVE_SUCCESS";
@@ -60,6 +63,7 @@ export type SettingsAction =
         enableModalTabulationPreview: boolean;
         enableModalMarksheetPreview: boolean;
         enableModalAdmitCardPreview: boolean;
+        enableGradeSelection: boolean;
       };
     }
   | { type: "SAVE_ERROR" };
@@ -72,6 +76,7 @@ export const initialState: SettingsState = {
   enableModalTabulationPreview: false,
   enableModalMarksheetPreview: false,
   enableModalAdmitCardPreview: false,
+  enableGradeSelection: true,
   hasChanges: false,
   initialSettings: null,
 };
@@ -90,6 +95,7 @@ export function settingsReducer(state: SettingsState, action: SettingsAction): S
       let nextTabPreview = state.enableModalTabulationPreview;
       let nextMarksheetPreview = state.enableModalMarksheetPreview;
       let nextAdmitCardPreview = state.enableModalAdmitCardPreview;
+      let nextGradeSelection = state.enableGradeSelection;
 
       if (data.workingDays && Array.isArray(data.workingDays)) {
         const validDays = data.workingDays.filter((d: string) =>
@@ -111,6 +117,9 @@ export function settingsReducer(state: SettingsState, action: SettingsAction): S
       if (typeof data.enableModalAdmitCardPreview === "boolean") {
         nextAdmitCardPreview = data.enableModalAdmitCardPreview;
       }
+      if (typeof data.enableGradeSelection === "boolean") {
+        nextGradeSelection = data.enableGradeSelection;
+      }
 
       return {
         ...state,
@@ -121,6 +130,7 @@ export function settingsReducer(state: SettingsState, action: SettingsAction): S
         enableModalTabulationPreview: nextTabPreview,
         enableModalMarksheetPreview: nextMarksheetPreview,
         enableModalAdmitCardPreview: nextAdmitCardPreview,
+        enableGradeSelection: nextGradeSelection,
         hasChanges: false,
       };
     }
@@ -172,13 +182,19 @@ export function settingsReducer(state: SettingsState, action: SettingsAction): S
         enableModalAdmitCardPreview: action.checked,
         hasChanges: true,
       };
+    case "TOGGLE_GRADE_SELECTION":
+      return {
+        ...state,
+        enableGradeSelection: action.checked,
+        hasChanges: true,
+      };
     case "SAVE_START":
       return {
         ...state,
         saving: true,
       };
     case "SAVE_SUCCESS": {
-      const { workingDays, defaultMarksheetTemplateId, enableModalTabulationPreview, enableModalMarksheetPreview, enableModalAdmitCardPreview } = action.payload;
+      const { workingDays, defaultMarksheetTemplateId, enableModalTabulationPreview, enableModalMarksheetPreview, enableModalAdmitCardPreview, enableGradeSelection } = action.payload;
       return {
         ...state,
         saving: false,
@@ -186,11 +202,12 @@ export function settingsReducer(state: SettingsState, action: SettingsAction): S
         initialSettings: state.initialSettings
           ? {
               ...state.initialSettings,
-              workingDays,
-              defaultMarksheetTemplateId,
-              enableModalTabulationPreview,
-              enableModalMarksheetPreview,
-              enableModalAdmitCardPreview,
+               workingDays,
+               defaultMarksheetTemplateId,
+               enableModalTabulationPreview,
+               enableModalMarksheetPreview,
+               enableModalAdmitCardPreview,
+               enableGradeSelection,
             }
           : null,
       };
