@@ -72,6 +72,7 @@ export function StaffTable({
                       <div className="flex items-center gap-1.5">
                         <span className="text-[10px] text-zinc-500">{member.email}</span>
                         <button 
+                          type="button"
                           onClick={() => handleCopy(member.email, member.id)}
                           className="opacity-0 group-hover:opacity-100 transition-opacity p-0.5 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded"
                           title="Copy email"

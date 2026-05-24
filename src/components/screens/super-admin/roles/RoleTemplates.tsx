@@ -32,6 +32,7 @@ export function RoleTemplates({ onSelectTemplate }: RoleTemplatesProps) {
             return (
               <button
                 key={template.name}
+                type="button"
                 onClick={() => onSelectTemplate(template)}
                 className="flex flex-col gap-2 p-4 rounded-2xl border-2 border-dashed border-zinc-100 dark:border-zinc-700 hover:border-teal-300 dark:hover:border-teal-700 hover:bg-teal-50/50 dark:hover:bg-teal-900/10 transition-all text-left group relative overflow-hidden"
               >

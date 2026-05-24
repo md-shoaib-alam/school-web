@@ -312,6 +312,7 @@ function Header({
       {/* View toggle */}
       <div className="flex items-center gap-1 p-1 bg-zinc-100 dark:bg-zinc-800/60 rounded-xl border border-zinc-200 dark:border-zinc-700/50 flex-shrink-0">
         <button
+          type="button"
           onClick={() => switchView("grid")}
           className={`p-1.5 rounded-lg transition-all ${
             view === "grid"
@@ -323,6 +324,7 @@ function Header({
           <LayoutGrid className="size-4" />
         </button>
         <button
+          type="button"
           onClick={() => switchView("table")}
           className={`p-1.5 rounded-lg transition-all ${
             view === "table"
@@ -543,13 +545,13 @@ function TableView({ subjects, slotsBySubject }: { subjects: SubjectInfo[], slot
               <th className="text-xs font-semibold text-zinc-500 dark:text-zinc-400 text-left py-3 pl-6 pr-2">
                 #
               </th>
-              <th className="text-xs font-semibold text-zinc-500 dark:text-zinc-400 text-left py-3 px-3">
+              <th className="text-xs font-semibold text-zinc-500 dark:text-zinc-400 text-left p-3">
                 Subject
               </th>
-              <th className="text-xs font-semibold text-zinc-500 dark:text-zinc-400 text-left py-3 px-3">
+              <th className="text-xs font-semibold text-zinc-500 dark:text-zinc-400 text-left p-3">
                 Code
               </th>
-              <th className="text-xs font-semibold text-zinc-500 dark:text-zinc-400 text-left py-3 px-3">
+              <th className="text-xs font-semibold text-zinc-500 dark:text-zinc-400 text-left p-3">
                 Class
               </th>
               <th className="text-xs font-semibold text-zinc-500 dark:text-zinc-400 text-left py-3 pl-3 pr-6">
@@ -586,7 +588,7 @@ function TableView({ subjects, slotsBySubject }: { subjects: SubjectInfo[], slot
                       <span className="text-zinc-400">{index + 1}</span>
                     )}
                   </td>
-                  <td className="py-3 px-3">
+                  <td className="p-3">
                     <div className="flex items-center gap-2.5 min-w-0">
                       <div className={`size-7 rounded-lg flex items-center justify-center flex-shrink-0 ${p.icon}`}>
                         <BookOpen className="size-3.5" />
@@ -607,12 +609,12 @@ function TableView({ subjects, slotsBySubject }: { subjects: SubjectInfo[], slot
                       </div>
                     </div>
                   </td>
-                  <td className="py-3 px-3">
+                  <td className="p-3">
                     <span className="text-xs font-mono text-zinc-500 dark:text-zinc-400 bg-zinc-100 dark:bg-zinc-800 px-2 py-1 rounded-md inline-block">
                       {subject.code}
                     </span>
                   </td>
-                  <td className="py-3 px-3">
+                  <td className="p-3">
                     <div className={`inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg ${p.bg} max-w-full`}>
                       <School className={`size-3.5 flex-shrink-0 ${p.icon.split(" ")[1]} dark:text-white/80`} />
                       <span className={`text-xs font-bold truncate ${p.icon.split(" ")[1]} dark:text-white`}>

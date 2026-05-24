@@ -130,7 +130,7 @@ export function DayView({
                     </div>
 
                     {hasSlots ? (
-                      <div className="group relative flex-1 rounded-xl border px-4 py-4 transition-all bg-card hover:shadow-sm space-y-3">
+                      <div className="group relative flex-1 rounded-xl border p-4 transition-all bg-card hover:shadow-sm space-y-3">
                         {isCurrent && (
                           <Badge className="bg-emerald-600 text-white hover:bg-emerald-600 text-[10px] px-1.5 py-0">
                             In Progress
@@ -170,6 +170,7 @@ export function DayView({
                                 <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-all">
                                   {canEdit && (
                                     <button
+                                      type="button"
                                       onClick={() => onEditSlot(slot)}
                                       className="shrink-0 size-7 rounded-lg flex items-center justify-center text-muted-foreground/40 hover:text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-900/20 transition-all"
                                       title="Edit slot"
@@ -179,6 +180,7 @@ export function DayView({
                                   )}
                                   {canDelete && (
                                     <button
+                                      type="button"
                                       onClick={() => onDeleteSlot(slot.id)}
                                       className="shrink-0 size-7 rounded-lg flex items-center justify-center text-muted-foreground/40 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 transition-all"
                                       title="Delete slot"
@@ -193,7 +195,7 @@ export function DayView({
                         ))}
                       </div>
                     ) : (
-                      <div className="flex-1 rounded-xl border border-dashed border-muted-foreground/25 px-4 py-4">
+                      <div className="flex-1 rounded-xl border border-dashed border-muted-foreground/25 p-4">
                         <p className="text-sm font-medium text-muted-foreground/50">
                           Free Period
                         </p>

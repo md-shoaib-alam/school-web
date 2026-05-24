@@ -31,11 +31,11 @@ export function MyClassesOverview({ classes, onViewAll }: MyClassesOverviewProps
       <CardContent className="p-4 pt-0">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
           {classes.map((cls) => (
-            <div
+            <button
               key={cls.id}
-              className="p-4 rounded-xl border border-zinc-100 dark:border-zinc-800 hover:border-blue-200 dark:hover:border-blue-800 hover:shadow-sm transition-all cursor-pointer"
+              type="button"
+              className="w-full text-left bg-transparent p-4 rounded-xl border border-zinc-100 dark:border-zinc-800 hover:border-blue-200 dark:hover:border-blue-800 hover:shadow-sm transition-all cursor-pointer"
               onClick={onViewAll}
-              role="button"
               tabIndex={0}
               onKeyDown={(e) => {
                 if (e.key === 'Enter' || e.key === ' ') {
@@ -64,7 +64,7 @@ export function MyClassesOverview({ classes, onViewAll }: MyClassesOverviewProps
                 </span>
                 <ArrowRight className="size-3.5 text-zinc-300 dark:text-zinc-600" />
               </div>
-            </div>
+            </button>
           ))}
         </div>
       </CardContent>

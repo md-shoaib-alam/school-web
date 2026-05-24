@@ -35,7 +35,7 @@ export function CalendarHeader({
   return (
     <div className="bg-white dark:bg-neutral-900/40 rounded-2xl border border-zinc-200/60 dark:border-white/[0.06] shadow-sm overflow-hidden">
       {/* Title & Actions Top Row */}
-      <div className="px-4 py-4 sm:px-6 sm:py-5 border-b border-zinc-100 dark:border-white/[0.05] flex flex-col sm:flex-row gap-3 sm:gap-4 justify-between items-start sm:items-center">
+      <div className="p-4 sm:px-6 sm:py-5 border-b border-zinc-100 dark:border-white/[0.05] flex flex-col sm:flex-row gap-3 sm:gap-4 justify-between items-start sm:items-center">
         <div className="flex items-center justify-between w-full sm:w-auto">
           <div>
             <h1 className="text-xl sm:text-2xl font-semibold text-zinc-900 dark:text-white tracking-tight">

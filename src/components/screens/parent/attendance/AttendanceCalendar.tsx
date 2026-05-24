@@ -35,6 +35,7 @@ export function AttendanceCalendar({ data, isPremium, onPrev, onNext, currentPer
 
           <div className="flex items-center gap-1 bg-zinc-100/80 dark:bg-zinc-800/80 p-0.5 sm:p-1 rounded-xl border border-zinc-200/50 dark:border-zinc-700/50">
             <button
+              type="button"
               onClick={onPrev}
               className={`p-1 sm:p-1.5 rounded-lg transition-all ${isPremium ? "hover:bg-white dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-200 shadow-sm" : "opacity-30 cursor-not-allowed text-zinc-400"}`}
               title={isPremium ? "Previous" : "Premium Only"}
@@ -46,6 +47,7 @@ export function AttendanceCalendar({ data, isPremium, onPrev, onNext, currentPer
               <span>History</span>
             </div>
             <button
+              type="button"
               onClick={onNext}
               className={`p-1 sm:p-1.5 rounded-lg transition-all ${isPremium ? "hover:bg-white dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-200 shadow-sm" : "opacity-30 cursor-not-allowed text-zinc-400"}`}
               title={isPremium ? "Next" : "Premium Only"}

@@ -78,11 +78,11 @@ export function AssignFeesDialog({
                 data.students
                   .filter((s: any) => !debouncedSearch || s.name.toLowerCase().includes(debouncedSearch.toLowerCase()) || s.rollNumber.toLowerCase().includes(debouncedSearch.toLowerCase()))
                   .map((student: any) => (
-                  <div
+                  <button
                     key={student.id}
-                    className={cn('flex items-center gap-3 px-3 py-2.5 border-b last:border-b-0 cursor-pointer transition-colors hover:bg-zinc-50 dark:hover:bg-zinc-900/50', selectedIds.has(student.id) && 'bg-emerald-50 dark:bg-emerald-900/20')}
+                    type="button"
+                    className={cn('w-full flex items-center gap-3 px-3 py-2.5 border-b last:border-b-0 cursor-pointer transition-colors hover:bg-zinc-50 dark:hover:bg-zinc-900/50 text-left bg-transparent', selectedIds.has(student.id) && 'bg-emerald-50 dark:bg-emerald-900/20')}
                     onClick={() => { if (!student.isPaid) onToggle(student.id); }}
-                    role="button"
                     tabIndex={0}
                     onKeyDown={(e) => {
                       if (e.key === 'Enter' || e.key === ' ') {
@@ -100,7 +100,7 @@ export function AssignFeesDialog({
                       </div>
                     </div>
                     {student.isPaid && <Badge variant="secondary" className="text-[10px] bg-emerald-100 text-emerald-700 border-0 shrink-0">Paid ✓</Badge>}
-                  </div>
+                  </button>
                 ))
               )}
             </div>

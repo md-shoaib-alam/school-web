@@ -111,6 +111,7 @@ export function NotificationBell() {
     <Popover open={open} onOpenChange={handleOpenChange}>
       <PopoverTrigger asChild>
         <Button
+          type="button"
           variant="ghost"
           size="icon"
           className="relative size-10 bg-white hover:bg-zinc-50 dark:bg-zinc-900 dark:hover:bg-zinc-800 border border-zinc-200 dark:border-zinc-800 shadow-sm rounded-xl transition-all duration-200 cursor-pointer"
@@ -138,6 +139,7 @@ export function NotificationBell() {
           </div>
           <div className="flex items-center gap-1">
             <Button
+              type="button"
               variant="ghost"
               size="sm"
               className="text-[10px] h-7 px-2 font-semibold text-zinc-500 hover:text-violet-600 transition-colors"
@@ -146,6 +148,7 @@ export function NotificationBell() {
               Mark all read
             </Button>
             <Button
+              type="button"
               variant="ghost"
               size="sm"
               className="text-[10px] h-7 px-2 font-semibold text-rose-500 hover:bg-rose-50 hover:text-rose-600 transition-colors"
@@ -172,12 +175,12 @@ export function NotificationBell() {
           ) : (
             <div className="divide-y divide-zinc-50 dark:divide-zinc-800/50">
               {notifications.map((notification) => (
-                <div
+                <button
                   key={notification.id}
-                  role="button"
+                  type="button"
                   tabIndex={0}
                   className={cn(
-                    "group relative w-full flex items-start gap-4 px-5 py-4 text-left transition-all duration-200 cursor-pointer focus:outline-none focus:ring-1 focus:ring-violet-500",
+                    "group relative w-full flex items-start gap-4 px-5 py-4 text-left transition-all duration-200 cursor-pointer focus:outline-none focus:ring-1 focus:ring-violet-500 bg-transparent border-none p-0",
                     !notification.read 
                       ? "bg-violet-50/30 dark:bg-violet-900/5" 
                       : "hover:bg-zinc-50 dark:hover:bg-zinc-800/30",
@@ -222,7 +225,7 @@ export function NotificationBell() {
                   {!notification.read && (
                     <div className="absolute left-1 top-1/2 -translate-y-1/2 w-1 h-8 bg-violet-500 rounded-full opacity-0 group-hover:opacity-100 transition-opacity" />
                   )}
-                </div>
+                </button>
               ))}
             </div>
           )}

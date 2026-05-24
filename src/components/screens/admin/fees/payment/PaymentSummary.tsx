@@ -62,6 +62,7 @@ export function PaymentSummary({
             ].map(m => (
               <button
                 key={m.id}
+                type="button"
                 className={`flex flex-col items-center gap-1 p-3 rounded-lg border-2 transition-all text-xs ${paymentMethod === m.id ? 'border-emerald-500 bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400' : 'border-transparent bg-muted/50 hover:bg-muted text-muted-foreground'}`}
                 onClick={() => setPaymentMethod(m.id)}
               >

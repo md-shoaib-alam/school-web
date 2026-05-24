@@ -107,6 +107,7 @@ export function StandardReports({
             </div>
             
             <button 
+              type="button"
               onClick={() => onDownloadReport(report.name, report.format, report.data)}
               className="flex items-center gap-1 text-[10px] font-bold py-1.5 px-3 bg-zinc-100 dark:bg-teal-950/40 hover:bg-teal-600 dark:hover:bg-teal-600 border border-zinc-250 dark:border-teal-900 hover:border-teal-500 text-zinc-700 dark:text-teal-400 hover:text-white dark:hover:text-white cursor-pointer rounded-lg transition-all active:scale-95 shrink-0"
             >

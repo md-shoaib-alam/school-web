@@ -73,6 +73,7 @@ function AdmitCardPrintPreview({
           {/* Zoom Controls */}
           <div className="zoom-controls">
             <button 
+              type="button"
               className="zoom-btn" 
               onClick={() => setZoomScale(Math.max(zoomScale - 0.1, 0.4))}
               title="Zoom Out"
@@ -83,6 +84,7 @@ function AdmitCardPrintPreview({
               {Math.round(zoomScale * 100)}%
             </span>
             <button 
+              type="button"
               className="zoom-btn" 
               onClick={() => setZoomScale(Math.min(zoomScale + 0.1, 1.5))}
               title="Zoom In"
@@ -91,7 +93,7 @@ function AdmitCardPrintPreview({
             </button>
           </div>
           
-          <button className="action-btn bg-emerald-600 hover:bg-emerald-700 text-white" onClick={handlePrint} disabled={printing}>
+          <button type="button" className="action-btn bg-emerald-600 hover:bg-emerald-700 text-white" onClick={handlePrint} disabled={printing}>
             {printing ? (
               <>
                 <Loader2 className="size-3.5 animate-spin mr-1.5" />
@@ -105,7 +107,7 @@ function AdmitCardPrintPreview({
             )}
           </button>
           
-          <button className="action-btn action-btn-secondary" onClick={onBack}>
+          <button type="button" className="action-btn action-btn-secondary" onClick={onBack}>
             Close Preview
           </button>
         </div>

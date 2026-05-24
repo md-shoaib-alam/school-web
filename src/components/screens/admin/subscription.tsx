@@ -55,7 +55,7 @@ export function SchoolSubscriptionScreen() {
     } catch (e) {
       return tenant.startDate || "";
     }
-  }, [tenant?.startDate]);
+  }, [tenant]);
 
   const formattedEndDate = React.useMemo(() => {
     if (!tenant?.endDate) return "Permanent";
@@ -64,7 +64,7 @@ export function SchoolSubscriptionScreen() {
     } catch (e) {
       return tenant.endDate;
     }
-  }, [tenant?.endDate]);
+  }, [tenant]);
 
   if (isLoading) {
     return <div className="p-8 text-center font-bold text-violet-600 animate-pulse">Loading subscription details...</div>;

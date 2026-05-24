@@ -252,6 +252,7 @@ export function CreateTimetableDialog({
                 return (
                   <button
                     key={day}
+                    type="button"
                     onClick={() => setActiveTab(day)}
                     className={`relative flex-1 px-3 py-2 text-sm font-medium transition-colors text-center border-b-2 -mb-px ${
                       isActive ? "border-emerald-600 text-emerald-700 dark:text-emerald-400" : "border-transparent text-muted-foreground hover:text-foreground"

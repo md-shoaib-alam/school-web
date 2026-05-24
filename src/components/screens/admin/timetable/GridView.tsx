@@ -113,6 +113,7 @@ export function GridView({
                                 <div className="absolute -top-1.5 -right-1.5 flex items-center gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity">
                                   {canEdit && (
                                     <button
+                                      type="button"
                                       onClick={() => onEditSlot(slot)}
                                       className="size-5 rounded-full bg-emerald-100 dark:bg-emerald-900/40 text-emerald-600 dark:text-emerald-400 flex items-center justify-center hover:bg-emerald-200 dark:hover:bg-emerald-800"
                                       title="Edit slot"
@@ -122,6 +123,7 @@ export function GridView({
                                   )}
                                   {canDelete && (
                                     <button
+                                      type="button"
                                       onClick={() => onDeleteSlot(slot.id)}
                                       className="size-5 rounded-full bg-red-100 dark:bg-red-900/40 text-red-600 dark:text-red-400 flex items-center justify-center hover:bg-red-200 dark:hover:bg-red-800"
                                       title="Delete slot"

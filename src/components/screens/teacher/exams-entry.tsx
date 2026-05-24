@@ -286,7 +286,7 @@ export function TeacherExamsEntry() {
   }
 
   return (
-    <div className="px-4 md:px-8 py-4 space-y-6 max-w-[1600px] mx-auto">
+    <div className="p-4 md:px-8 space-y-6 max-w-[1600px] mx-auto">
       {/* Persistent Selectors Card */}
       <Card className="border-orange-500/20 dark:border-orange-500/10 shadow-sm overflow-hidden">
         <CardHeader className="p-4 pb-2">

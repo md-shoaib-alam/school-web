@@ -100,6 +100,7 @@ export function TransactionTable() {
           {(['all', 'today', 'yesterday', 'week'] as const).map((range) => (
             <button
               key={range}
+              type="button"
               onClick={() => handleRangeChange(range)}
               className={`px-3 py-1.5 text-xs font-bold rounded-md transition-all capitalize ${
                 dateRange === range 

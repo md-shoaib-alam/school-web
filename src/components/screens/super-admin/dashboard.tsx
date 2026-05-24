@@ -43,6 +43,7 @@ export function SuperAdminDashboard() {
               {error?.message || "We encountered a network error while syncing platform data."}
             </p>
             <button 
+              type="button"
               onClick={() => window.location.reload()}
               className="px-6 py-2.5 bg-red-600 text-white rounded-xl font-black text-sm hover:bg-red-700 transition-colors"
             >
