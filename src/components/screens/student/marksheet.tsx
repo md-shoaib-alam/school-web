@@ -133,13 +133,14 @@ export function StudentMarksheet() {
       const midMax = mid?.totalMarks || 0;
       const finMax = fin?.totalMarks || 0;
 
-      let subMax = 0, subObt = 0, status: 'pass' | 'fail' | 'pending' = 'pending';
+      let subMax = 0, subObt = 0, subPassing = 0, status: 'pass' | 'fail' | 'pending' = 'pending';
       if (marksheetType === 'midterm') {
-        subMax = midMax; subObt = midM ?? 0; status = midRes ? midRes.status : 'pending';
+        subMax = midMax; subObt = midM ?? 0; subPassing = mid?.passingMarks || 0; status = midRes ? midRes.status : 'pending';
       } else if (marksheetType === 'final') {
-        subMax = finMax; subObt = finM ?? 0; status = finRes ? finRes.status : 'pending';
+        subMax = finMax; subObt = finM ?? 0; subPassing = fin?.passingMarks || 0; status = finRes ? finRes.status : 'pending';
       } else {
         subMax = midMax + finMax; subObt = (midM ?? 0) + (finM ?? 0);
+        subPassing = (mid?.passingMarks || 0) + (fin?.passingMarks || 0);
         if (midRes && finRes) {
           const passing = (mid?.passingMarks || 0) + (fin?.passingMarks || 0);
           status = subObt >= passing ? 'pass' : 'fail';
@@ -152,7 +153,7 @@ export function StudentMarksheet() {
         if (status === 'pending') hasPending = true;
       }
       const pct = subMax > 0 ? Math.round((subObt / subMax) * 100) : 0;
-      return { subjectName: sub.name, midM, midMax, finM, finMax, subObt, subMax, pct, status };
+      return { subjectName: sub.name, midM, midMax, finM, finMax, subObt, subMax, pct, status, subPassing };
     });
 
     const overallPct = totalMax > 0 ? Math.round((totalObtained / totalMax) * 100) : 0;
@@ -177,6 +178,9 @@ export function StudentMarksheet() {
         midtermMarks: row.midM !== null ? `${row.midM}/${row.midMax}` : '-',
         finalMarks: row.finM !== null ? `${row.finM}/${row.finMax}` : '-',
         obtained: row.subMax > 0 ? `${row.subObt}/${row.subMax}` : '-',
+        maxMarks: row.subMax,
+        obtainedMarks: row.subObt,
+        passingMarks: row.subPassing,
         percentage: row.pct,
         status: row.status
       };

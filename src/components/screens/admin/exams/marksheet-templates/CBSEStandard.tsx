@@ -100,11 +100,13 @@ export const CBSEStandard: React.FC<MarksheetTemplateProps> = ({
             <table className="w-full text-xs border-collapse table-fixed">
               <thead>
                 <tr className="bg-emerald-800 border-none text-white text-[9.5px]">
-                  <th className="font-bold px-3 py-2 text-left w-[42%]">SUBJECT NAME</th>
-                  {marksheetType === 'combined' && <th className="font-bold px-3 py-2 text-center w-[13%]">TERM I (100)</th>}
-                  {marksheetType === 'combined' && <th className="font-bold px-3 py-2 text-center w-[13%]">TERM II (100)</th>}
-                  <th className="font-bold px-3 py-2 text-center w-[18%]">CUMULATIVE (200)</th>
-                  <th className="font-bold px-3 py-2 text-center w-[14%]">GRADE</th>
+                  <th className="font-bold px-3 py-2 text-left w-[35%]">SUBJECT NAME</th>
+                  {marksheetType === 'combined' && <th className="font-bold px-3 py-2 text-center w-[12%]">TERM I (100)</th>}
+                  {marksheetType === 'combined' && <th className="font-bold px-3 py-2 text-center w-[12%]">TERM II (100)</th>}
+                  <th className="font-bold px-3 py-2 text-center w-[15%]">MAX MARKS</th>
+                  <th className="font-bold px-3 py-2 text-center w-[15%]">PASSING MARKS</th>
+                  <th className="font-bold px-3 py-2 text-center w-[15%]">OBTAINED MARKS</th>
+                  <th className="font-bold px-3 py-2 text-center w-[20%]">GRADE</th>
                 </tr>
               </thead>
               <tbody>
@@ -113,7 +115,9 @@ export const CBSEStandard: React.FC<MarksheetTemplateProps> = ({
                     <td className="px-3 py-2 text-left font-bold text-zinc-800 truncate">{sub.subjectName}</td>
                     {marksheetType === 'combined' && <td className="px-3 py-2 text-center font-mono text-zinc-600">{sub.midtermMarks}</td>}
                     {marksheetType === 'combined' && <td className="px-3 py-2 text-center font-mono text-zinc-600">{sub.finalMarks}</td>}
-                    <td className="px-3 py-2 text-center font-black font-mono text-emerald-800">{sub.obtained}</td>
+                    <td className="px-3 py-2 text-center font-bold font-mono text-zinc-700">{sub.maxMarks ?? 100}</td>
+                    <td className="px-3 py-2 text-center font-medium font-mono text-zinc-600">{sub.passingMarks ?? 33}</td>
+                    <td className="px-3 py-2 text-center font-black font-mono text-emerald-800">{sub.obtainedMarks ?? 0}</td>
                     <td className="px-3 py-2 text-center">
                       <span className="font-black text-emerald-900 bg-emerald-50 border border-emerald-250 px-2 py-0.5 rounded text-[10px]">
                         {getCBSEGrade(sub.percentage)}

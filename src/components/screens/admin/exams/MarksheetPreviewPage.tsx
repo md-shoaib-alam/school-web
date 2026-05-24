@@ -160,20 +160,24 @@ export function MarksheetPreviewPage({
 
       let subMax = 0;
       let subObtained = 0;
+      let subPassing = 0;
       let status: 'pass' | 'fail' | 'pending' = 'pending';
 
       if (marksheetType === 'midterm') {
         subMax = midtermMax;
         subObtained = midtermMarks || 0;
+        subPassing = midtermExam?.passingMarks || 0;
         status = midtermStudentResult ? midtermStudentResult.status : 'pending';
       } else if (marksheetType === 'final') {
         subMax = finalMax;
         subObtained = finalMarks || 0;
+        subPassing = finalExam?.passingMarks || 0;
         status = finalStudentResult ? finalStudentResult.status : 'pending';
       } else {
         // Combined
         subMax = midtermMax + finalMax;
         subObtained = (midtermMarks || 0) + (finalMarks || 0);
+        subPassing = (midtermExam?.passingMarks || 0) + (finalExam?.passingMarks || 0);
         
         // Pass if combined percentage is >= 40% (or pass both)
         if (midtermStudentResult && finalStudentResult) {
@@ -197,6 +201,9 @@ export function MarksheetPreviewPage({
         midtermMarks: midtermMarks !== null ? `${midtermMarks}/${midtermMax}` : '-',
         finalMarks: finalMarks !== null ? `${finalMarks}/${finalMax}` : '-',
         obtained: subMax > 0 ? `${subObtained}/${subMax}` : '-',
+        maxMarks: subMax,
+        obtainedMarks: subObtained,
+        passingMarks: subPassing,
         percentage: subMax > 0 ? Math.round((subObtained / subMax) * 100) : 0,
         status
       };

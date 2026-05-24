@@ -8,6 +8,9 @@ export interface MarksheetTemplateProps {
       midtermMarks: string;
       finalMarks: string;
       obtained: string;
+      maxMarks?: number;
+      obtainedMarks?: number;
+      passingMarks?: number;
       percentage: number;
       status: 'pass' | 'fail' | 'pending';
     }>;
