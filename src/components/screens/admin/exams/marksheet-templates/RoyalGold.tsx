@@ -72,14 +72,14 @@ export const RoyalGold: React.FC<MarksheetTemplateProps> = ({
           <table className="w-full text-xs border-collapse table-fixed">
             <thead>
               <tr className="bg-[#8c6b23] text-white text-[10px]">
-                <th className={`font-bold px-3 py-2 text-left whitespace-normal ${marksheetType === 'combined' ? 'w-[25%]' : 'w-[35%]'}`}>Scholastic Disciplines</th>
+                <th className={`font-bold px-3 py-2 text-left whitespace-normal ${marksheetType === 'combined' ? 'w-[22%]' : 'w-[22%]'}`}>Scholastic Disciplines</th>
                 {marksheetType === 'combined' && <th className="font-bold px-3 py-2 text-center w-[12%]">Midterm</th>}
                 {marksheetType === 'combined' && <th className="font-bold px-3 py-2 text-center w-[12%]">Final</th>}
                 <th className={`font-bold px-3 py-2 text-center ${marksheetType === 'combined' ? 'w-[11%]' : 'w-[15%]'}`}>Max Marks</th>
                 <th className={`font-bold px-3 py-2 text-center ${marksheetType === 'combined' ? 'w-[11%]' : 'w-[15%]'}`}>Passing Marks</th>
-                <th className={`font-bold px-3 py-2 text-center ${marksheetType === 'combined' ? 'w-[11%]' : 'w-[15%]'}`}>Obtained Marks</th>
-                <th className={`font-bold px-3 py-2 text-center ${marksheetType === 'combined' ? 'w-[9%]' : 'w-[10%]'}`}>Percentage</th>
-                <th className={`font-bold px-3 py-2 text-center ${marksheetType === 'combined' ? 'w-[9%]' : 'w-[10%]'}`}>Verdict</th>
+                <th className={`font-bold px-3 py-2 text-center ${marksheetType === 'combined' ? 'w-[11%]' : 'w-[16%]'}`}>Obtained Marks</th>
+                <th className={`font-bold px-3 py-2 text-center ${marksheetType === 'combined' ? 'w-[10%]' : 'w-[16%]'}`}>Percentage</th>
+                <th className={`font-bold px-3 py-2 text-center ${marksheetType === 'combined' ? 'w-[11%]' : 'w-[16%]'}`}>Verdict</th>
               </tr>
             </thead>
             <tbody>

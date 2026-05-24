@@ -100,13 +100,13 @@ export const CBSEStandard: React.FC<MarksheetTemplateProps> = ({
             <table className="w-full text-xs border-collapse table-fixed">
               <thead>
                 <tr className="bg-emerald-800 border-none text-white text-[9.5px]">
-                  <th className="font-bold px-3 py-2 text-left w-[35%]">SUBJECT NAME</th>
+                  <th className="font-bold px-3 py-2 text-left w-[24%]">SUBJECT NAME</th>
                   {marksheetType === 'combined' && <th className="font-bold px-3 py-2 text-center w-[12%]">TERM I (100)</th>}
                   {marksheetType === 'combined' && <th className="font-bold px-3 py-2 text-center w-[12%]">TERM II (100)</th>}
-                  <th className="font-bold px-3 py-2 text-center w-[15%]">MAX MARKS</th>
-                  <th className="font-bold px-3 py-2 text-center w-[15%]">PASSING MARKS</th>
-                  <th className="font-bold px-3 py-2 text-center w-[15%]">OBTAINED MARKS</th>
-                  <th className="font-bold px-3 py-2 text-center w-[20%]">GRADE</th>
+                  <th className="font-bold px-3 py-2 text-center w-[18%]">MAX MARKS</th>
+                  <th className="font-bold px-3 py-2 text-center w-[18%]">PASSING MARKS</th>
+                  <th className="font-bold px-3 py-2 text-center w-[18%]">OBTAINED MARKS</th>
+                  <th className="font-bold px-3 py-2 text-center w-[22%]">GRADE</th>
                 </tr>
               </thead>
               <tbody>

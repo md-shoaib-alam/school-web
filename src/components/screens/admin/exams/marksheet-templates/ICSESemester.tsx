@@ -78,13 +78,13 @@ export const ICSESemester: React.FC<MarksheetTemplateProps> = ({
             <table className="w-full text-xs border-collapse table-fixed">
               <thead>
                 <tr className="bg-violet-955 text-white text-[9.5px]">
-                  <th className="font-bold px-3 py-2 text-left w-[35%]">PRESCRIBED SUBJECTS</th>
+                  <th className="font-bold px-3 py-2 text-left w-[24%]">PRESCRIBED SUBJECTS</th>
                   {marksheetType === 'combined' && <th className="font-bold px-3 py-2 text-center w-[12%]">HALF YEARLY</th>}
                   {marksheetType === 'combined' && <th className="font-bold px-3 py-2 text-center w-[12%]">YEAR END</th>}
-                  <th className="font-bold px-3 py-2 text-center w-[15%]">MAX MARKS</th>
-                  <th className="font-bold px-3 py-2 text-center w-[15%]">PASSING MARKS</th>
-                  <th className="font-bold px-3 py-2 text-center w-[15%]">OBTAINED MARKS</th>
-                  <th className="font-bold px-3 py-2 text-center w-[20%]">FINAL GRADE</th>
+                  <th className="font-bold px-3 py-2 text-center w-[18%]">MAX MARKS</th>
+                  <th className="font-bold px-3 py-2 text-center w-[18%]">PASSING MARKS</th>
+                  <th className="font-bold px-3 py-2 text-center w-[18%]">OBTAINED MARKS</th>
+                  <th className="font-bold px-3 py-2 text-center w-[22%]">FINAL GRADE</th>
                 </tr>
               </thead>
               <tbody>

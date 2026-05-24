@@ -77,13 +77,13 @@ export const StateBoardGreen: React.FC<MarksheetTemplateProps> = ({
             <table className="w-full text-xs border-collapse table-fixed">
               <thead>
                 <tr className="bg-emerald-700 text-white text-[9.5px]">
-                  <th className="font-bold px-3 py-2 text-left w-[35%]">SUBJECT NAME</th>
+                  <th className="font-bold px-3 py-2 text-left w-[24%]">SUBJECT NAME</th>
                   {marksheetType === 'combined' && <th className="font-bold px-3 py-2 text-center w-[12%]">PRE-BOARD I</th>}
                   {marksheetType === 'combined' && <th className="font-bold px-3 py-2 text-center w-[12%]">PRE-BOARD II</th>}
-                  <th className="font-bold px-3 py-2 text-center w-[15%]">MAX MARKS</th>
-                  <th className="font-bold px-3 py-2 text-center w-[15%]">PASSING MARKS</th>
-                  <th className="font-bold px-3 py-2 text-center w-[15%]">AGGREGATE OBTAINED</th>
-                  <th className="font-bold px-3 py-2 text-center w-[20%]">GRADE</th>
+                  <th className="font-bold px-3 py-2 text-center w-[18%]">MAX MARKS</th>
+                  <th className="font-bold px-3 py-2 text-center w-[18%]">PASSING MARKS</th>
+                  <th className="font-bold px-3 py-2 text-center w-[18%]">AGGREGATE OBTAINED</th>
+                  <th className="font-bold px-3 py-2 text-center w-[22%]">GRADE</th>
                 </tr>
               </thead>
               <tbody>
