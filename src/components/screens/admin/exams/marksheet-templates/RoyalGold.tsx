@@ -8,6 +8,7 @@ export const RoyalGold: React.FC<MarksheetTemplateProps> = ({
   classSection,
   academicYear,
   marksheetType,
+  examName,
 }) => {
   return (
     <div 
@@ -43,7 +44,7 @@ export const RoyalGold: React.FC<MarksheetTemplateProps> = ({
         {/* Title Box */}
         <div className="text-center mt-2">
           <h4 className="inline-block text-[11px] font-semibold uppercase text-[#8c6b23] tracking-[3px] border-b border-t border-[#b38f36] py-1 px-8 font-serif">
-            {marksheetType === 'midterm' ? 'Midterm Convocation' : marksheetType === 'final' ? 'Final Convocation' : 'Consolidated Statement of Honors'}
+            {examName ? `${examName} Convocation` : (marksheetType === 'midterm' ? 'Midterm Convocation' : marksheetType === 'final' ? 'Final Convocation' : 'Consolidated Statement of Honors')}
           </h4>
         </div>
 

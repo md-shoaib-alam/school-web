@@ -8,6 +8,7 @@ export const CBSEStandard: React.FC<MarksheetTemplateProps> = ({
   classSection,
   academicYear,
   marksheetType,
+  examName,
 }) => {
   // Mock co-scholastic & discipline grades common in CBSE
   const coScholastic = [
@@ -54,7 +55,7 @@ export const CBSEStandard: React.FC<MarksheetTemplateProps> = ({
               Affiliated to Central Board of Secondary Education (CBSE), New Delhi
             </p>
             <p className="text-[10px] text-emerald-800 font-bold tracking-wider mt-1 uppercase">
-              ACADEMIC ASSESSMENT REPORT CARD: {academicYear}
+              {examName ? `${examName} REPORT CARD` : 'ACADEMIC ASSESSMENT REPORT CARD'}: {academicYear}
             </p>
           </div>
           <div className="size-14 border border-zinc-200 rounded flex flex-col items-center justify-center text-[7px] font-bold text-zinc-400">

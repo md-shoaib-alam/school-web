@@ -8,6 +8,7 @@ export const StateBoardGreen: React.FC<MarksheetTemplateProps> = ({
   classSection,
   academicYear,
   marksheetType,
+  examName,
 }) => {
   const getStateBoardGrade = (pct: number) => {
     if (pct >= 75) return 'A+';
@@ -37,7 +38,7 @@ export const StateBoardGreen: React.FC<MarksheetTemplateProps> = ({
                 Recognised by State Department of School Education & Literacy
               </p>
               <p className="text-[10px] text-zinc-700 font-extrabold tracking-widest mt-1 uppercase">
-                REPORT CARD & STATEMENT OF SCHOLASTIC MARKS ({academicYear})
+                {examName ? `${examName} REPORT CARD` : 'REPORT CARD & STATEMENT OF SCHOLASTIC MARKS'} ({academicYear})
               </p>
             </div>
           </div>

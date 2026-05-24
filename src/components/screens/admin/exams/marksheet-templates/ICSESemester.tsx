@@ -8,6 +8,7 @@ export const ICSESemester: React.FC<MarksheetTemplateProps> = ({
   classSection,
   academicYear,
   marksheetType,
+  examName,
 }) => {
   const getICSEGrade = (pct: number) => {
     if (pct >= 90) return 'A';
@@ -37,7 +38,7 @@ export const ICSESemester: React.FC<MarksheetTemplateProps> = ({
             School Code: IN-{getDeterministicId(sheet.schoolName + 'code', 100, 999)}
           </p>
           <p className="text-[11px] text-violet-900 font-extrabold tracking-widest mt-2 uppercase font-serif">
-            PROGRESS STATEMENT: SEMESTER TERM {marksheetType === 'midterm' ? 'I' : marksheetType === 'final' ? 'II' : 'CUMULATIVE'} ({academicYear})
+            {examName ? examName : `PROGRESS STATEMENT: SEMESTER TERM ${marksheetType === 'midterm' ? 'I' : marksheetType === 'final' ? 'II' : 'CUMULATIVE'}`} ({academicYear})
           </p>
         </div>
 

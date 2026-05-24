@@ -3,7 +3,7 @@
 import { useState, useMemo, useEffect, Suspense } from 'react';
 import { Card } from '@/components/ui/card';
 import { 
-  FileText, Trophy, ChevronDown, Award
+  FileText, Trophy, ChevronDown, Award, ClipboardList, Printer
 } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { useRouter, useParams, useSearchParams } from 'next/navigation';
@@ -12,6 +12,8 @@ import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useAcademicYears } from '@/hooks/use-academic-years';
 import { MarksheetPreviewPage } from './exams/MarksheetPreviewPage';
+import { Badge } from '@/components/ui/badge';
+import { getGroupedExams } from './exams/utils';
 import { ExamRecord } from './exams/types';
 import { FullPageSkeleton } from "@/components/ui/full-page-skeleton";
 import { goeyToast as toast } from 'goey-toast';
@@ -106,6 +108,8 @@ export function AdminPrintMarksheetContent() {
     );
   }, [classes, publishedFiltered]);
 
+  const examNameParam = searchParams?.get('examName') || '';
+
   if (classIdParam) {
     const activeClass = classes.find((c: any) => c.id === classIdParam);
     return (
@@ -114,6 +118,7 @@ export function AdminPrintMarksheetContent() {
         classNameStr={activeClass?.name || 'Class'}
         classSection={activeClass?.section || ''}
         academicYear={publishedAcademicYearFilter || currentAcademicYear}
+        examName={examNameParam}
         onBack={() => router.push(`/${slug}/print-marksheet`)}
       />
     );
@@ -258,37 +263,6 @@ export function AdminPrintMarksheetContent() {
                         </div>
                         
                         <div className="flex items-center gap-3">
-                          <Button 
-                            variant="outline" 
-                            size="sm" 
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              if (enableModalMarksheetPreview) {
-                                router.push(`/${slug}/print-marksheet?classId=${c.id}`);
-                              } else {
-                                toast.promise(
-                                  (async () => {
-                                    const { handleMarksheetPreviewNewTab } = await import('./exams/marksheetPrinter');
-                                    await handleMarksheetPreviewNewTab({
-                                      classId: c.id,
-                                      classNameStr: c.name,
-                                      classSection: c.section,
-                                      academicYear: publishedAcademicYearFilter || currentAcademicYear
-                                    });
-                                  })(),
-                                  {
-                                    loading: 'Loading marksheet workspace...',
-                                    success: 'Marksheet workspace opened in a new tab!',
-                                    error: 'Failed to load marksheet workspace',
-                                  }
-                                );
-                              }
-                            }}
-                            className="h-8 border-emerald-200 hover:border-emerald-300 dark:border-emerald-900/50 hover:bg-emerald-50 dark:hover:bg-emerald-950/20 text-emerald-600 dark:text-emerald-400 gap-1.5 rounded-lg text-xs font-semibold px-2.5 shadow-sm transition-colors"
-                          >
-                            <FileText className="size-3.5" />
-                            <span className="hidden xs:inline">Generate Marksheets</span>
-                          </Button>
                           <div className={`p-1.5 rounded-full transition-all duration-300 ${isExpanded ? 'bg-emerald-50 dark:bg-emerald-950/50 text-emerald-600 dark:text-emerald-400' : 'bg-zinc-50 dark:bg-zinc-900 text-muted-foreground'}`}>
                             <ChevronDown className={`size-4 transition-transform duration-300 ${isExpanded ? 'rotate-180' : ''}`} />
                           </div>
@@ -298,9 +272,59 @@ export function AdminPrintMarksheetContent() {
                       {/* Collapsible Content */}
                       <div className={`transition-all duration-300 ease-in-out overflow-hidden ${isExpanded ? 'max-h-[2500px] border-t border-zinc-100 dark:border-zinc-800' : 'max-h-0'}`}>
                         <div className="p-4 bg-zinc-50/30 dark:bg-zinc-950/10 space-y-4">
-                          <div className="text-xs text-muted-foreground font-medium">
-                            Published exams list is ready. Click "Generate Marksheets" above to begin printing midterm or final report cards.
-                          </div>
+                          {getGroupedExams(classExams).map((group) => {
+                            const groupKey = `${group.cycleName}::${group.academicYear}`;
+                            return (
+                              <Card key={groupKey} className="border border-zinc-100 dark:border-zinc-800 shadow-sm overflow-hidden bg-card">
+                                <div className="px-4 py-2.5 bg-zinc-50/50 dark:bg-zinc-900/30 border-b border-zinc-100 dark:border-zinc-800 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                                  <div className="flex items-center gap-2">
+                                    <ClipboardList className="size-4.5 text-blue-500" />
+                                    <span className="font-bold text-sm text-foreground">{group.cycleName}</span>
+                                    <Badge variant="outline" className="text-[10px] font-semibold px-2 py-0 border-zinc-200 dark:border-zinc-800 text-muted-foreground bg-zinc-100/50 dark:bg-zinc-900/50">
+                                      {group.academicYear}
+                                    </Badge>
+                                  </div>
+                                  <div className="flex items-center gap-3">
+                                    <span className="text-xs text-muted-foreground font-medium">
+                                      {group.exams.length} subject{group.exams.length !== 1 ? 's' : ''}
+                                    </span>
+                                    <Button 
+                                      variant="outline" 
+                                      size="sm" 
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        if (enableModalMarksheetPreview) {
+                                          router.push(`/${slug}/print-marksheet?classId=${c.id}&examName=${encodeURIComponent(group.cycleName)}`);
+                                        } else {
+                                          toast.promise(
+                                            (async () => {
+                                              const { handleMarksheetPreviewNewTab } = await import('./exams/marksheetPrinter');
+                                              await handleMarksheetPreviewNewTab({
+                                                classId: c.id,
+                                                classNameStr: c.name,
+                                                classSection: c.section,
+                                                academicYear: publishedAcademicYearFilter || currentAcademicYear,
+                                                examName: group.cycleName
+                                              });
+                                            })(),
+                                            {
+                                              loading: 'Loading marksheet workspace...',
+                                              success: 'Marksheet workspace opened in a new tab!',
+                                              error: 'Failed to load marksheet workspace',
+                                            }
+                                          );
+                                        }
+                                      }}
+                                      className="h-7 border-emerald-200 hover:border-emerald-300 dark:border-emerald-900/50 hover:bg-emerald-50 dark:hover:bg-emerald-950/20 text-emerald-600 dark:text-emerald-400 gap-1.5 rounded-lg text-[11px] font-semibold px-2.5 shadow-sm transition-colors flex items-center justify-center font-sans"
+                                    >
+                                      <Printer className="size-3.5" />
+                                      <span>Generate Marksheets</span>
+                                    </Button>
+                                  </div>
+                                </div>
+                              </Card>
+                            );
+                          })}
                         </div>
                       </div>
                     </Card>

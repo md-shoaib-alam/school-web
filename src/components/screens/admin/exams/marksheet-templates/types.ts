@@ -26,4 +26,5 @@ export interface MarksheetTemplateProps {
   classSection: string;
   academicYear: string;
   marksheetType: 'midterm' | 'final' | 'combined';
+  examName?: string;
 }

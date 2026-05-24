@@ -8,6 +8,7 @@ export const ClassicAcademy: React.FC<MarksheetTemplateProps> = ({
   classSection,
   academicYear,
   marksheetType,
+  examName,
 }) => {
   return (
     <div 
@@ -48,7 +49,7 @@ export const ClassicAcademy: React.FC<MarksheetTemplateProps> = ({
         {/* Title Box */}
         <div className="text-center">
           <h4 className="inline-block text-[11px] font-semibold uppercase text-[#1e3a8a] tracking-widest border border-[#1e3a8a] border-x-[4px] py-1.5 px-6 rounded bg-blue-50/50 font-sans">
-            {marksheetType === 'midterm' ? 'Midterm Marksheet' : marksheetType === 'final' ? 'Final Marksheet' : 'Consolidated Report Card'}
+            {examName ? `${examName} Marksheet` : (marksheetType === 'midterm' ? 'Midterm Marksheet' : marksheetType === 'final' ? 'Final Marksheet' : 'Consolidated Report Card')}
           </h4>
         </div>
 

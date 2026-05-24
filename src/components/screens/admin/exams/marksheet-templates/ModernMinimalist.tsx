@@ -8,6 +8,7 @@ export const ModernMinimalist: React.FC<MarksheetTemplateProps> = ({
   classSection,
   academicYear,
   marksheetType,
+  examName,
 }) => {
   return (
     <div 
@@ -42,7 +43,7 @@ export const ModernMinimalist: React.FC<MarksheetTemplateProps> = ({
         <div className="flex justify-between items-center bg-zinc-50/50 border border-zinc-100 rounded-lg p-3 font-sans">
           <div>
             <h4 className="text-xs font-semibold uppercase text-zinc-700 tracking-wider">
-              {marksheetType === 'midterm' ? 'Midterm Marksheet' : marksheetType === 'final' ? 'Final Marksheet' : 'Consolidated Report Card'}
+              {examName ? `${examName} Marksheet` : (marksheetType === 'midterm' ? 'Midterm Marksheet' : marksheetType === 'final' ? 'Final Marksheet' : 'Consolidated Report Card')}
             </h4>
             <p className="text-[9px] text-zinc-400 font-medium">Class Performance Summary</p>
           </div>

@@ -10,6 +10,7 @@ interface MarksheetPrintContainerProps {
   classSection: string;
   academicYear: string;
   marksheetType: 'midterm' | 'final' | 'combined';
+  examName?: string;
 }
 
 export function MarksheetPrintContainer({
@@ -19,7 +20,8 @@ export function MarksheetPrintContainer({
   classNameStr,
   classSection,
   academicYear,
-  marksheetType
+  marksheetType,
+  examName
 }: MarksheetPrintContainerProps) {
   return (
     <div className="hidden">
@@ -53,6 +55,7 @@ export function MarksheetPrintContainer({
               classSection={classSection}
               academicYear={academicYear}
               marksheetType={marksheetType}
+              examName={examName}
             />
           </div>
         ))}

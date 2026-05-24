@@ -8,11 +8,13 @@ export async function handleMarksheetPreviewNewTab({
   classNameStr,
   classSection,
   academicYear,
+  examName,
 }: {
   classId: string;
   classNameStr: string;
   classSection: string;
   academicYear: string;
+  examName?: string;
 }) {
   const previewWindow = window.open("", "_blank");
   if (!previewWindow) {
@@ -241,6 +243,7 @@ export async function handleMarksheetPreviewNewTab({
         classNameStr,
         classSection,
         academicYear,
+        examName,
         onBack: () => previewWindow.close(),
         isStandalone: true,
       })

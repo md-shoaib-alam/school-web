@@ -8,6 +8,7 @@ export const CreativeCompact: React.FC<MarksheetTemplateProps> = ({
   classSection,
   academicYear,
   marksheetType,
+  examName,
 }) => {
   return (
     <div 
@@ -38,7 +39,7 @@ export const CreativeCompact: React.FC<MarksheetTemplateProps> = ({
           </div>
           <div className="text-right">
             <span className="inline-block text-[8px] bg-violet-600 text-white px-2.5 py-0.5 rounded-full font-black uppercase tracking-wider">
-              {marksheetType === 'combined' ? 'Combined Term' : marksheetType.toUpperCase() + ' TERM'}
+              {examName ? examName : (marksheetType === 'combined' ? 'Combined Term' : marksheetType.toUpperCase() + ' TERM')}
             </span>
             <p className="text-[9px] text-zinc-400 font-black mt-1">{academicYear}</p>
           </div>

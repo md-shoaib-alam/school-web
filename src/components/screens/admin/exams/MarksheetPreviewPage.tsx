@@ -18,6 +18,7 @@ interface MarksheetPreviewPageProps {
   academicYear: string;
   onBack: () => void;
   isStandalone?: boolean;
+  examName?: string;
 }
 
 export function MarksheetPreviewPage({
@@ -26,7 +27,8 @@ export function MarksheetPreviewPage({
   classSection,
   academicYear,
   onBack,
-  isStandalone = false
+  isStandalone = false,
+  examName
 }: MarksheetPreviewPageProps) {
   const [selectedStudentId, setSelectedStudentId] = useState<string>('all');
   const [marksheetType, setMarksheetType] = useState<'midterm' | 'final'>('midterm');
@@ -64,9 +66,16 @@ export function MarksheetPreviewPage({
 
         const loadedStudents = studentData.items || [];
         // Only consider completed (published) exams
-        const completedExams = (examData.data || examData || []).filter(
+        let completedExams = (examData.data || examData || []).filter(
           (e: ExamRecord) => e.status === 'completed' && e.academicYear === academicYear
         );
+
+        if (examName) {
+          completedExams = completedExams.filter((e: ExamRecord) => {
+            const cycleName = e.name.includes(' - ') ? e.name.split(' - ')[0] : e.name;
+            return cycleName.toLowerCase() === examName.toLowerCase();
+          });
+        }
 
         setStudents(loadedStudents);
         setExams(completedExams);
@@ -368,6 +377,7 @@ export function MarksheetPreviewPage({
             marksheetType={marksheetType}
             selectedStudentId={selectedStudentId}
             isStandalone={true}
+            examName={examName}
           />
         </div>
 
@@ -380,6 +390,7 @@ export function MarksheetPreviewPage({
           classSection={classSection}
           academicYear={academicYear}
           marksheetType={marksheetType}
+          examName={examName}
         />
       </div>
     );
@@ -418,6 +429,7 @@ export function MarksheetPreviewPage({
         academicYear={academicYear}
         marksheetType={marksheetType}
         selectedStudentId={selectedStudentId}
+        examName={examName}
       />
 
       <MarksheetPrintContainer
@@ -428,6 +440,7 @@ export function MarksheetPreviewPage({
         classSection={classSection}
         academicYear={academicYear}
         marksheetType={marksheetType}
+        examName={examName}
       />
     </div>
   );

@@ -39,6 +39,7 @@ interface MarksheetSheetsPreviewProps {
   marksheetType: 'midterm' | 'final' | 'combined';
   selectedStudentId: string;
   isStandalone?: boolean;
+  examName?: string;
 }
 
 export function MarksheetSheetsPreview({
@@ -53,7 +54,8 @@ export function MarksheetSheetsPreview({
   academicYear,
   marksheetType,
   selectedStudentId,
-  isStandalone
+  isStandalone,
+  examName
 }: MarksheetSheetsPreviewProps) {
   if (isStandalone) {
     if (loading) {
@@ -108,6 +110,7 @@ export function MarksheetSheetsPreview({
                 classSection={classSection}
                 academicYear={academicYear}
                 marksheetType={marksheetType}
+                examName={examName}
               />
             </div>
           </div>
@@ -180,6 +183,7 @@ export function MarksheetSheetsPreview({
                     classSection={classSection}
                     academicYear={academicYear}
                     marksheetType={marksheetType}
+                    examName={examName}
                   />
                 </div>
               </div>
