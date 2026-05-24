@@ -41,7 +41,7 @@ export function StudentMarksheet() {
   const [studentInfo, setStudentInfo] = useState<any>(null);
   const [exams, setExams] = useState<ExamRecord[]>([]);
   const [resultsMap, setResultsMap] = useState<Record<string, any[]>>({});
-  const [marksheetType, setMarksheetType] = useState<'midterm' | 'final' | 'combined'>('combined');
+  const [marksheetType, setMarksheetType] = useState<'midterm' | 'final'>('midterm');
   const [selectedYear, setSelectedYear] = useState('');
 
   useEffect(() => {
@@ -247,7 +247,6 @@ export function StudentMarksheet() {
           <Select value={marksheetType} onValueChange={(v: any) => setMarksheetType(v)}>
             <SelectTrigger className="w-[130px] h-9 text-sm"><SelectValue /></SelectTrigger>
             <SelectContent>
-              <SelectItem value="combined">Combined</SelectItem>
               <SelectItem value="midterm">Midterm</SelectItem>
               <SelectItem value="final">Final</SelectItem>
             </SelectContent>

@@ -137,7 +137,7 @@ export function AdminPrintMarksheetContent() {
         <Trophy className="size-5 text-emerald-600 dark:text-emerald-400" />
         <div>
           <p className="text-sm font-semibold text-emerald-900 dark:text-emerald-100">Official Grade Reports</p>
-          <p className="text-xs text-emerald-700 dark:text-emerald-400">Generate A4-formatted midterm, final, or combined grade sheets for students.</p>
+          <p className="text-xs text-emerald-700 dark:text-emerald-400">Generate A4-formatted midterm or final grade sheets for students.</p>
         </div>
       </div>
 
@@ -299,7 +299,7 @@ export function AdminPrintMarksheetContent() {
                       <div className={`transition-all duration-300 ease-in-out overflow-hidden ${isExpanded ? 'max-h-[2500px] border-t border-zinc-100 dark:border-zinc-800' : 'max-h-0'}`}>
                         <div className="p-4 bg-zinc-50/30 dark:bg-zinc-950/10 space-y-4">
                           <div className="text-xs text-muted-foreground font-medium">
-                            Published exams list is ready. Click "Generate Marksheets" above to begin printing midterm, final, or combined report cards.
+                            Published exams list is ready. Click "Generate Marksheets" above to begin printing midterm or final report cards.
                           </div>
                         </div>
                       </div>

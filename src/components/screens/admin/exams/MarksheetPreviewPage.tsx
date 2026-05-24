@@ -29,7 +29,7 @@ export function MarksheetPreviewPage({
   isStandalone = false
 }: MarksheetPreviewPageProps) {
   const [selectedStudentId, setSelectedStudentId] = useState<string>('all');
-  const [marksheetType, setMarksheetType] = useState<'midterm' | 'final' | 'combined'>('combined');
+  const [marksheetType, setMarksheetType] = useState<'midterm' | 'final'>('midterm');
   const [selectedTemplateId, setSelectedTemplateId] = useState<string>('classic');
   
   const [students, setStudents] = useState<any[]>([]);
@@ -107,7 +107,7 @@ export function MarksheetPreviewPage({
   // Clean student selection state when opened
   useEffect(() => {
     setSelectedStudentId('all');
-    setMarksheetType('combined');
+    setMarksheetType('midterm');
   }, [classId]);
 
   // Extract unique subjects from exams
@@ -289,7 +289,6 @@ export function MarksheetPreviewPage({
             >
               <option value="midterm">Midterm</option>
               <option value="final">Final</option>
-              <option value="combined">Combined</option>
             </select>
 
             {/* Template Dropdown Selector */}

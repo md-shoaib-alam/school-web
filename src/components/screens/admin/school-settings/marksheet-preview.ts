@@ -61,7 +61,7 @@ export const MOCK_PREVIEW_SHEET = {
   classNameStr: "Grade X",
   classSection: "A",
   academicYear: "2025–2026",
-  marksheetType: "combined" as const,
+  marksheetType: "midterm" as const,
 };
 
 export function handleMarksheetPreview(templateId: string) {
