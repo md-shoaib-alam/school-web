@@ -213,10 +213,10 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
         {/* Mobile overlay */}
 
         {sidebarOpen && (
-          <div
-            className="fixed inset-0 bg-black/50 z-40 lg:hidden"
+          <button
+            type="button"
+            className="fixed inset-0 bg-black/50 z-40 lg:hidden border-none p-0"
             onClick={() => setSidebarOpen(false)}
-            role="button"
             aria-label="Close sidebar"
             tabIndex={0}
             onKeyDown={(e) => {

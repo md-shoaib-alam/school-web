@@ -97,11 +97,11 @@ export function PendingFeesChecklist({
           ) : (
             <div className="divide-y">
               {pendingFees.map(fee => (
-                <div 
+                <button 
                   key={fee.id} 
-                  className="flex items-center gap-3 p-3 hover:bg-emerald-50/50 dark:hover:bg-emerald-900/20 transition-colors cursor-pointer" 
+                  type="button"
+                  className="w-full flex items-center gap-3 p-3 hover:bg-emerald-50/50 dark:hover:bg-emerald-900/20 transition-colors cursor-pointer text-left bg-transparent border-none" 
                   onClick={() => onToggleFee(fee.id)}
-                  role="button"
                   tabIndex={0}
                   onKeyDown={(e) => {
                     if (e.key === 'Enter' || e.key === ' ') {
@@ -119,7 +119,7 @@ export function PendingFeesChecklist({
                     <p className="font-semibold text-sm">₹{fee.amount.toLocaleString()}</p>
                     {fee.concession > 0 && <p className="text-xs text-amber-600">-₹{fee.concession.toLocaleString()} concession</p>}
                   </div>
-                </div>
+                </button>
               ))}
             </div>
           )}

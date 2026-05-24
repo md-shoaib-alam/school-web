@@ -185,11 +185,11 @@ export function TicketTable({ tickets, loading, onOpenDetail }: TicketTableProps
       {/* Mobile cards */}
       <div className="md:hidden divide-y">
         {tickets.map((ticket) => (
-          <div
+          <button
             key={ticket.id}
-            className="p-4 space-y-3 cursor-pointer hover:bg-zinc-50/50 dark:hover:bg-zinc-900/50 transition-colors"
+            type="button"
+            className="w-full text-left bg-transparent border-none p-4 space-y-3 cursor-pointer hover:bg-zinc-50/50 dark:hover:bg-zinc-900/50 transition-colors"
             onClick={() => onOpenDetail(ticket.id)}
-            role="button"
             tabIndex={0}
             onKeyDown={(e) => {
               if (e.key === 'Enter' || e.key === ' ') {
@@ -230,7 +230,7 @@ export function TicketTable({ tickets, loading, onOpenDetail }: TicketTableProps
               <span>{getCategoryLabel(ticket.category)}</span>
               <span>{formatDate(ticket.createdAt)}</span>
             </div>
-          </div>
+          </button>
         ))}
       </div>
     </>

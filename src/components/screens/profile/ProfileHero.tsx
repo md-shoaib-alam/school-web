@@ -38,11 +38,11 @@ export function ProfileHero({ user, initials, onEditClick, tenantName }: Profile
       <div className="absolute -left-20 -bottom-20 size-60 rounded-full bg-black/20 blur-3xl pointer-events-none" />
 
       <div className="relative flex flex-col md:flex-row items-center md:items-start gap-6 z-10">
-        <div 
+        <button 
+          type="button"
           onClick={onEditClick}
-          className="relative group cursor-pointer shrink-0"
+          className="relative group cursor-pointer shrink-0 bg-transparent border-none p-0"
           title="Click to edit profile"
-          role="button"
           tabIndex={0}
           onKeyDown={(e) => {
             if (e.key === 'Enter' || e.key === ' ') {
@@ -65,7 +65,7 @@ export function ProfileHero({ user, initials, onEditClick, tenantName }: Profile
             <span className="animate-ping absolute inline-flex size-full rounded-full bg-green-400 opacity-75"></span>
             <span className="relative inline-flex rounded-full size-4 bg-green-500 border-2 border-white"></span>
           </span>
-        </div>
+        </button>
 
         <div className="flex-1 text-center md:text-left space-y-2">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">

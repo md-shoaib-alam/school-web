@@ -22,8 +22,9 @@ export function FileUploadZone({
   onFileChange,
 }: FileUploadZoneProps) {
   return (
-    <div
-      className={`border-2 border-dashed rounded-lg p-8 text-center cursor-pointer transition-colors ${dragOver ? "border-emerald-500 bg-emerald-50 dark:bg-emerald-900/30" : "border-muted-foreground/25 hover:border-emerald-400 hover:bg-muted/50"}`}
+    <button
+      type="button"
+      className={`w-full border-2 border-dashed rounded-lg p-8 text-center cursor-pointer transition-colors ${dragOver ? "border-emerald-500 bg-emerald-50 dark:bg-emerald-900/30" : "border-muted-foreground/25 hover:border-emerald-400 hover:bg-muted/50"}`}
       onDragOver={(e) => {
         e.preventDefault();
         setDragOver(true);
@@ -31,7 +32,6 @@ export function FileUploadZone({
       onDragLeave={() => setDragOver(false)}
       onDrop={onDrop}
       onClick={onFileClick}
-      role="button"
       tabIndex={0}
       onKeyDown={(e) => {
         if (e.key === 'Enter' || e.key === ' ') {
@@ -69,6 +69,6 @@ export function FileUploadZone({
           </p>
         </div>
       )}
-    </div>
+    </button>
   );
 }

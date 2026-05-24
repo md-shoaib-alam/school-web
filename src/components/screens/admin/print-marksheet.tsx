@@ -236,10 +236,10 @@ export function AdminPrintMarksheetContent() {
                       key={c.id} 
                       className={`border dark:border-zinc-800 shadow-sm overflow-hidden transition-all duration-300 hover:shadow-md bg-card relative py-0 gap-0 ${isExpanded ? 'border-l-4 border-l-emerald-600 dark:border-l-emerald-500 border-zinc-200' : 'border-zinc-100'}`}
                     >
-                      <div 
+                      <button 
+                        type="button"
                         onClick={() => setExpandedClasses(prev => ({ ...prev, [c.id]: !prev[c.id] }))}
-                        className={`py-2.5 px-4 flex items-center justify-between cursor-pointer hover:bg-accent/40 transition-colors select-none ${isExpanded ? 'bg-emerald-50/30 dark:bg-emerald-950/10' : ''}`}
-                        role="button"
+                        className={`w-full text-left py-2.5 px-4 flex items-center justify-between cursor-pointer hover:bg-accent/40 transition-colors select-none ${isExpanded ? 'bg-emerald-50/30 dark:bg-emerald-950/10' : ''}`}
                         tabIndex={0}
                         onKeyDown={(e) => {
                           if (e.key === 'Enter' || e.key === ' ') {
@@ -267,7 +267,7 @@ export function AdminPrintMarksheetContent() {
                             <ChevronDown className={`size-4 transition-transform duration-300 ${isExpanded ? 'rotate-180' : ''}`} />
                           </div>
                         </div>
-                      </div>
+                      </button>
 
                       {/* Collapsible Content */}
                       <div className={`transition-all duration-300 ease-in-out overflow-hidden ${isExpanded ? 'max-h-[2500px] border-t border-zinc-100 dark:border-zinc-800' : 'max-h-0'}`}>
