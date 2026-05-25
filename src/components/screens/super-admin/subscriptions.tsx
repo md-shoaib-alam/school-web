@@ -342,6 +342,16 @@ export function SuperAdminSubscriptions() {
 
   return (
     <div className="space-y-6">
+      <div className="flex items-center gap-4">
+        <div className="size-12 rounded-2xl bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
+          <CreditCard className="size-6 text-blue-600 dark:text-blue-400" />
+        </div>
+        <div>
+          <h2 className="text-3xl font-semibold tracking-tight">B2C Parent Subscriptions</h2>
+          <p className="text-muted-foreground mt-1">Manage individual parent plan enrollments across all schools.</p>
+        </div>
+      </div>
+
       <SubscriptionStats 
         stats={stats}
         selectedTenant={selectedTenant}
