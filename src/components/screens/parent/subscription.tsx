@@ -26,7 +26,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { goeyToast as toast } from "goey-toast";
+import { toast } from "sonner";
 import { useAppStore } from "@/store/use-app-store";
 
 // Sub-components

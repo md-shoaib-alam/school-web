@@ -1,6 +1,6 @@
 import React from 'react';
 import { createRoot } from "react-dom/client";
-import { goeyToast as toast } from "goey-toast";
+import { toast } from "sonner";
 import { MarksheetPreviewPage } from './MarksheetPreviewPage';
 
 export async function handleMarksheetPreviewNewTab({

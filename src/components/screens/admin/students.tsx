@@ -12,7 +12,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Plus, Search, Eye, RotateCcw } from "lucide-react";
-import { goeyToast as toast } from "goey-toast";
+import { toast } from "sonner";
 import { apiFetch } from "@/lib/api";
 import { useModulePermissions } from "@/hooks/use-permissions";
 import { useAppStore } from "@/store/use-app-store";

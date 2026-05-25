@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { goeyToast as toast } from 'goey-toast'
+import { toast } from "sonner";
 import { graphqlQuery, graphqlMutate } from '../core'
 import { queryKeys } from '../keys'
 import { api } from '@/lib/api'
@@ -178,7 +178,7 @@ export function useDeleteTenant() {
   return useMutation({
     mutationFn: (id: string) => graphqlMutate<{ deleteTenant: boolean }>(DELETE_TENANT, { id }).then(d => d.deleteTenant),
     onSuccess: (_, deletedId) => {
-      toast.success('School moved to bin')
+      toast.error('School moved to bin')
       queryClient.invalidateQueries({ queryKey: ['tenants'] })
       queryClient.invalidateQueries({ queryKey: ['platform', 'stats'] })
     },
@@ -208,7 +208,7 @@ export function usePermanentDeleteTenant() {
   return useMutation({
     mutationFn: (id: string) => api.del(`/tenants/permanent?id=${id}`),
     onSuccess: () => {
-      toast.success('School permanently removed')
+      toast.error('School permanently removed')
       queryClient.invalidateQueries({ queryKey: ['tenants'] })
       queryClient.invalidateQueries({ queryKey: ['platform', 'stats'] })
     },

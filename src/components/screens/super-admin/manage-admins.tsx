@@ -2,7 +2,7 @@
 
 import { apiFetch } from "@/lib/api";
 import { useState, useEffect, useCallback, useMemo, useReducer } from "react";
-import { goeyToast as toast } from "goey-toast";
+import { toast } from "sonner";
 
 // Sub-components
 import { AdminHeader } from "./manage-admins/AdminHeader";

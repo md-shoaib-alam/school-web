@@ -3,7 +3,7 @@
 import { useState, useMemo, useRef } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { apiFetch } from "@/lib/api";
-import { goeyToast as toast } from "goey-toast";
+import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
 import { useTenantDetail } from "@/lib/graphql/hooks";
 

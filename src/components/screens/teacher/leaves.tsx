@@ -23,7 +23,7 @@ import { Calendar } from '@/components/ui/calendar';
 import {
   CalendarDays, Clock, CheckCircle2, XCircle, AlertTriangle, Ban, Plus, Loader2,
 } from 'lucide-react';
-import { goeyToast as toast } from 'goey-toast';
+import { toast } from "sonner";
 import { apiFetch } from '@/lib/api';
 import { useAppStore } from '@/store/use-app-store';
 import { format } from 'date-fns';

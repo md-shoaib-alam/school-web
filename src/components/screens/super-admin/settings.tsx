@@ -3,7 +3,7 @@
 import { apiFetch } from "@/lib/api";
 import { useEffect, useReducer } from "react";
 import { Globe, Settings, Save, Loader2, ShieldAlert } from "lucide-react";
-import { goeyToast as toast } from "goey-toast";
+import { toast } from "sonner";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";

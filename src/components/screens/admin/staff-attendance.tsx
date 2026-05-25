@@ -26,7 +26,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import api from "@/lib/axios";
 import { useAppStore } from "@/store/use-app-store";
 import { format } from "date-fns";
-import { goeyToast as toast } from "goey-toast";
+import { toast } from "sonner";
 import { AttendanceHeader } from "./staff-attendance/AttendanceHeader";
 import { AttendanceStats } from "./staff-attendance/AttendanceStats";
 import { AttendanceFooter } from "./staff-attendance/AttendanceFooter";

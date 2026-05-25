@@ -1,5 +1,5 @@
 import { createRoot } from "react-dom/client";
-import { goeyToast as toast } from "goey-toast";
+import { toast } from "sonner";
 import React from 'react';
 
 // This utility function is moved to a separate file to avoid Fast Refresh issues 

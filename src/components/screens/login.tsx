@@ -28,7 +28,7 @@ import {
   Loader2,
   School,
 } from "lucide-react";
-import { goeyToast as toast } from "goey-toast";
+import { toast } from "sonner";
 import { loginWithElysia } from "@/lib/api";
 
 function ThemeToggleLogin() {

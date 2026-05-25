@@ -4,7 +4,7 @@ import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAppStore } from "@/store/use-app-store";
 import { useTeacherDashboard } from "@/lib/graphql/hooks";
-import { goeyToast as toast } from "goey-toast";
+import { toast } from "sonner";
 import { FullPageSkeleton } from "@/components/ui/full-page-skeleton";
 
 // Sub-components

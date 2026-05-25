@@ -1,5 +1,5 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { goeyToast as toast } from 'goey-toast'
+import { toast } from "sonner";
 import { graphqlMutate } from '../core'
 import { REQUEST_PASSWORD_RESET, CHANGE_PASSWORD } from '../queries'
 

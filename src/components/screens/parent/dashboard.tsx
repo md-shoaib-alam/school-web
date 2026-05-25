@@ -3,7 +3,7 @@
 import { useEffect } from "react";
 import { useAppStore } from "@/store/use-app-store";
 import { useParentDashboard } from "@/lib/graphql/hooks";
-import { goeyToast as toast } from "goey-toast";
+import { toast } from "sonner";
 
 // Sub-components
 import { WelcomeBanner } from "./dashboard_components/WelcomeBanner";

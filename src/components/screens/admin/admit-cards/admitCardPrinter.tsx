@@ -1,6 +1,6 @@
 import React, { useState, useRef } from 'react';
 import { createRoot } from "react-dom/client";
-import { goeyToast as toast } from "goey-toast";
+import { toast } from "sonner";
 import { useReactToPrint } from 'react-to-print';
 import { Printer, Loader2 } from 'lucide-react';
 import { AdmitCardVisual } from './AdmitCardVisual';

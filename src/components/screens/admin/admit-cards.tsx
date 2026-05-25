@@ -8,7 +8,7 @@ import {
   FileText, Printer, Loader2, School,
 } from 'lucide-react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { goeyToast as toast } from "goey-toast";
+import { toast } from "sonner";
 import { api, apiFetch } from '@/lib/api';
 import { Skeleton } from '@/components/ui/skeleton';
 

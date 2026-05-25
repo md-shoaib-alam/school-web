@@ -16,7 +16,7 @@ import { Badge } from '@/components/ui/badge';
 import { getGroupedExams } from './exams/utils';
 import { ExamRecord } from './exams/types';
 import { FullPageSkeleton } from "@/components/ui/full-page-skeleton";
-import { goeyToast as toast } from 'goey-toast';
+import { toast } from "sonner";
 
 const LoadingScreen = () => <FullPageSkeleton />;
 

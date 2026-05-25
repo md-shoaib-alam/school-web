@@ -2,7 +2,7 @@
 
 import { useReducer, useEffect, useMemo } from "react";
 import { useViewMode } from "@/hooks/use-view-mode";
-import { goeyToast as toast } from "goey-toast";
+import { toast } from "sonner";
 import { useModulePermissions } from "@/hooks/use-permissions";
 import { apiFetch } from "@/lib/api";
 import { useAppStore } from "@/store/use-app-store";

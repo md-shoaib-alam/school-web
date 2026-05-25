@@ -7,7 +7,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { School } from "lucide-react";
 import { useRouter, useParams } from "next/navigation";
-import { goeyToast as toast } from "goey-toast";
+import { toast } from "sonner";
 import type { ClassInfo } from "@/lib/types";
 import { useModulePermissions } from "@/hooks/use-permissions";
 import { useClasses, useTeachers } from "@/lib/graphql/hooks";

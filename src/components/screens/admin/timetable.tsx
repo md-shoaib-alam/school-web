@@ -4,7 +4,7 @@ import { apiFetch } from "@/lib/api";
 import { useReducer, useMemo, useCallback, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Card, CardContent } from "@/components/ui/card";
-import { goeyToast as toast } from "goey-toast";
+import { toast } from "sonner";
 import { useModulePermissions } from "@/hooks/use-permissions";
 import { useAppStore } from "@/store/use-app-store";
 import type { ClassInfo } from "@/lib/types";

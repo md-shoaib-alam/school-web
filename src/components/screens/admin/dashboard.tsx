@@ -5,7 +5,7 @@ import { useAppStore } from "@/store/use-app-store";
 import { useQuery } from "@tanstack/react-query";
 import { useTenantDetail } from "@/lib/graphql/hooks/platform.hooks";
 import { api } from "@/lib/api";
-import { goeyToast as toast } from "goey-toast";
+import { toast } from "sonner";
 import { differenceInDays } from "date-fns";
 
 // Sub-components

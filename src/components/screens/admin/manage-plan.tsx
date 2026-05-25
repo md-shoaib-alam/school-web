@@ -9,7 +9,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, Crown, ShieldCheck } from "lucide-react";
 import { useRouter, useParams } from "next/navigation";
-import { goeyToast as toast } from "goey-toast";
+import { toast } from "sonner";
 import { useQueryClient } from "@tanstack/react-query";
 import { api } from "@/lib/api";
 

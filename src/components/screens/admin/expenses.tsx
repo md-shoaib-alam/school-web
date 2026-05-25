@@ -4,7 +4,7 @@ import { useState } from "react";
 import { Wallet, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useExpenses } from "@/hooks/use-expenses";
-import { goeyToast as toast } from "goey-toast";
+import { toast } from "sonner";
 import { apiFetch } from "@/lib/api";
 import { formatLocalDate } from "@/lib/utils";
 

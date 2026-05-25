@@ -2,7 +2,7 @@
 
 import { apiFetch } from "@/lib/api";
 import { useReducer, useEffect, useMemo } from "react";
-import { goeyToast as toast } from "goey-toast";
+import { toast } from "sonner";
 import {
   useParents,
   useSubscriptions,

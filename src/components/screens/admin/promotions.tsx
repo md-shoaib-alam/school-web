@@ -19,7 +19,7 @@ import {
   GraduationCap,
   Zap,
 } from "lucide-react";
-import { goeyToast as toast } from "goey-toast";
+import { toast } from "sonner";
 import { apiFetch } from "@/lib/api";
 
 import {

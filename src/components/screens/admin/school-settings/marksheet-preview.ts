@@ -1,6 +1,6 @@
 import { MARKSHEET_TEMPLATES, ClassicAcademy } from "../exams/marksheet-templates";
 import { createRoot } from "react-dom/client";
-import { goeyToast as toast } from "goey-toast";
+import { toast } from "sonner";
 import * as React from "react";
 
 export const MOCK_PREVIEW_SHEET = {

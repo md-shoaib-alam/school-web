@@ -4,7 +4,7 @@ import { useReducer, useMemo } from 'react';
 import { Button } from '@/components/ui/button';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiFetch } from '@/lib/api';
-import { goeyToast as toast } from 'goey-toast';
+import { toast } from "sonner";
 
 // Sub-components
 import { RoutesAndVehiclesView } from './transport/RoutesAndVehiclesView';

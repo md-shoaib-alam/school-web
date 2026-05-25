@@ -3,7 +3,7 @@
 import { ExamRecord } from './types';
 import { useMemo, useState, useEffect, useRef, useReducer } from 'react';
 import { apiFetch } from '@/lib/api';
-import { goeyToast as toast } from 'goey-toast';
+import { toast } from "sonner";
 import { useReactToPrint } from 'react-to-print';
 import { Printer, Loader2 } from 'lucide-react';
 import { MARKSHEET_TEMPLATES } from './marksheet-templates';

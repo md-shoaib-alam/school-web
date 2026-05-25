@@ -31,7 +31,7 @@ import {
   Settings
 } from "lucide-react";
 import { format, differenceInDays } from "date-fns";
-import { goeyToast as toast } from "goey-toast";
+import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 
 import { useRouter, useParams } from "next/navigation";

@@ -2,7 +2,7 @@
 
 import { useReducer, useEffect, useMemo } from "react";
 import { useViewMode } from "@/hooks/use-view-mode";
-import { goeyToast as toast } from "goey-toast";
+import { toast } from "sonner";
 import api from "@/lib/axios";
 import { useAppStore } from "@/store/use-app-store";
 import {

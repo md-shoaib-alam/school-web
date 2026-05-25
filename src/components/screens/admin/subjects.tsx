@@ -8,7 +8,7 @@ import { apiFetch } from "@/lib/api";
 import { useModulePermissions } from "@/hooks/use-permissions";
 import { useAppStore } from "@/store/use-app-store";
 import { useViewMode } from "@/hooks/use-view-mode";
-import { goeyToast as toast } from "goey-toast";
+import { toast } from "sonner";
 
 // Sub-components
 import { SubjectsHeader } from "./subjects/SubjectsHeader";

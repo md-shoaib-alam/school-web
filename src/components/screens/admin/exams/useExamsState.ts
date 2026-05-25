@@ -4,7 +4,7 @@ import { useState, useMemo, useEffect } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useRouter, useParams, useSearchParams } from 'next/navigation';
 import { api, apiFetch } from '@/lib/api';
-import { goeyToast as toast } from 'goey-toast';
+import { toast } from "sonner";
 import { useAcademicYears } from '@/hooks/use-academic-years';
 import { 
   ExamRecord, ExamFormData, StudentResultRow, 

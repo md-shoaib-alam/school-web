@@ -24,7 +24,7 @@ import * as VisuallyHidden from '@radix-ui/react-visually-hidden';
 import {
   Award, Eye, Plus, Printer, ShieldBan, Loader2,
 } from 'lucide-react';
-import { goeyToast as toast } from 'goey-toast';
+import { toast } from "sonner";
 import { apiFetch } from '@/lib/api';
 import { CertificateTemplate } from './certificates/certificate-template';
 

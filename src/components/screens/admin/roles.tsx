@@ -14,7 +14,7 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Plus, Shield, LayoutGrid, List } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { goeyToast as toast } from "goey-toast";
+import { toast } from "sonner";
 import { useAppStore } from "@/store/use-app-store";
 
 // Sub-components

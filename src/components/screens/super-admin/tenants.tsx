@@ -11,7 +11,7 @@ import {
   useCreateUser,
 } from "@/lib/graphql/hooks";
 import { useModulePermissions } from "@/hooks/use-permissions";
-import { goeyToast as toast } from "goey-toast";
+import { toast } from "sonner";
 
 // Sub-components
 import { TenantStats } from "./tenants/TenantStats";

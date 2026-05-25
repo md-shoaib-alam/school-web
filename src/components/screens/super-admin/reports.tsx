@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useMemo } from "react";
-import { goeyToast as toast } from "goey-toast";
+import { toast } from "sonner";
 import { useTenants, useUsers } from "@/lib/graphql/hooks";
 
 // Subcomponents and types

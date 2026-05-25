@@ -19,7 +19,7 @@ import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
 import { Search, Receipt, Banknote, Eye, Trash2, Printer, CheckCircle2 } from 'lucide-react';
-import { goeyToast as toast } from 'goey-toast';
+import { toast } from "sonner";
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiFetch } from '@/lib/api';
 import { useFeeReceipts } from '@/hooks/use-fees';

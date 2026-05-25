@@ -28,7 +28,7 @@ import {
   List
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { goeyToast as toast } from "goey-toast";
+import { toast } from "sonner";
 import { useAppStore } from "@/store/use-app-store";
 import { useStaff, useCustomRoles } from "@/lib/graphql/hooks";
 import { useModulePermissions } from "@/hooks/use-permissions";

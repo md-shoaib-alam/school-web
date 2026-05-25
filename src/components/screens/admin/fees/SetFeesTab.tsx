@@ -3,7 +3,7 @@
 import { useReducer, useEffect, useMemo } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Tag, Layers, CircleDollarSign, Plus } from 'lucide-react';
-import { goeyToast as toast } from 'goey-toast';
+import { toast } from "sonner";
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import api from '@/lib/axios';
 import { useFeeCategories, useFeeStructures, useCreateFeeStructure, useFeeAssignment } from '@/hooks/use-fees';

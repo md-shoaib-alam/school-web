@@ -8,7 +8,7 @@ import {
   Palette,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { goeyToast as toast } from "goey-toast";
+import { toast } from "sonner";
 
 // UI Components
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";

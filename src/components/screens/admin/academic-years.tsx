@@ -43,7 +43,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useAcademicYears } from "@/hooks/use-academic-years";
 import { DatePicker } from "@/components/ui/date-picker";
-import { goeyToast as toast } from "goey-toast";
+import { toast } from "sonner";
 import { format } from "date-fns";
 import { formatLocalDate, parseLocalDate } from "@/lib/utils";
 

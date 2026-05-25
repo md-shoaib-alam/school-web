@@ -4,7 +4,7 @@ import { useState, useMemo, useCallback, useReducer } from "react";
 import { useAppStore } from "@/store/use-app-store";
 import { useModulePermissions } from "@/hooks/use-permissions";
 import { Eye } from "lucide-react";
-import { goeyToast as toast } from "goey-toast";
+import { toast } from "sonner";
 
 import { CalendarEvent, EventFormData, EMPTY_FORM, EVENT_TYPE_COLORS } from "./calendar/types";
 import { formatDateISO, eventFallsOnDate, getDaysInMonth, getFirstDayOfWeek } from "./calendar/utils";

@@ -45,7 +45,7 @@ import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ClipboardList, Save, BookOpen, Users, Eye, Plus, Loader2, FileText, Sparkles, GraduationCap, Trophy, CheckCircle2, Check, Clock, Globe, AlertTriangle } from "lucide-react";
-import { goeyToast as toast } from "goey-toast";
+import { toast } from "sonner";
 import { useModulePermissions } from "@/hooks/use-permissions";
 import { initialState, gradeManagementReducer } from "./grade-management/types";
 

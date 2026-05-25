@@ -3,7 +3,7 @@
 import { apiFetch } from "@/lib/api";
 import { useReducer, useEffect, useCallback } from "react";
 import { Loader2 } from "lucide-react";
-import { goeyToast as toast } from "goey-toast";
+import { toast } from "sonner";
 
 // Sub-components
 import { RoleHeader } from "./roles/RoleHeader";

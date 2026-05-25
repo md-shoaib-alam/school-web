@@ -47,7 +47,7 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
-import { goeyToast as toast } from "goey-toast";
+import { toast } from "sonner";
 import { DatePicker } from "@/components/ui/date-picker";
 import { SCHOOL_PLANS } from "@/lib/billing-constants";
 
