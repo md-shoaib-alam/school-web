@@ -273,6 +273,9 @@ export function TeacherAssignments() {
           <DialogContent>
             <DialogHeader>
               <DialogTitle>Create New Homework</DialogTitle>
+              <DialogDescription>
+                Fill in the details below to assign new homework to your students.
+              </DialogDescription>
             </DialogHeader>
             <div className="space-y-4 pt-2">
               <div>
