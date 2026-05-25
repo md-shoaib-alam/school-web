@@ -142,7 +142,7 @@ function AdminStudentsContent() {
   const queryClient = useQueryClient();
 
   // Queries
-  const { data: studentData, isLoading: loadingStudents } = useStudents(
+  const { data: studentData, isFetching: loadingStudents } = useStudents(
     currentTenantId || undefined,
     classFilter === "all" ? undefined : classFilter,
     debouncedSearch || undefined,
