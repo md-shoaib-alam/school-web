@@ -37,9 +37,8 @@ export function StudentSelector({
       <CardContent className="space-y-4">
         <div className="flex flex-col sm:flex-row gap-3">
           <Select value={classFilter} onValueChange={v => { setClassFilter(v); setStudentSearch(''); }}>
-            <SelectTrigger className="w-full sm:w-44"><SelectValue placeholder="Class" /></SelectTrigger>
+            <SelectTrigger className="w-full sm:w-44"><SelectValue placeholder="Select Class" /></SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">All Classes</SelectItem>
               {classes.map(c => <SelectItem key={c.id} value={c.id}>{c.name}-{c.section} (Grade {c.grade})</SelectItem>)}
             </SelectContent>
           </Select>
@@ -53,7 +52,7 @@ export function StudentSelector({
             />
           </div>
         </div>
-        <div className="max-h-96 overflow-y-auto rounded-lg border divide-y">
+        <div className="rounded-lg border divide-y">
           {filteredStudents.length === 0 ? (
             <div className="p-8 text-center text-muted-foreground">
               <Search className="size-8 mx-auto mb-2 opacity-30" />

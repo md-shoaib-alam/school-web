@@ -5,10 +5,15 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { CreditCard, Banknote, FileText, Building2, Smartphone, Sparkles } from "lucide-react";
 
+import { Input } from "@/components/ui/input";
+
 interface PaymentSummaryProps {
   totalAmount: number;
   concessionTotal: number;
   payable: number;
+  alreadyPaid?: number;
+  paidAmount: number | null;
+  onPaidAmountChange: (v: number) => void;
   paymentMethod: string;
   setPaymentMethod: (v: string) => void;
   onPay: () => void;
@@ -19,11 +24,16 @@ export function PaymentSummary({
   totalAmount,
   concessionTotal,
   payable,
+  alreadyPaid = 0,
+  paidAmount,
+  onPaidAmountChange,
   paymentMethod,
   setPaymentMethod,
   onPay,
   paying,
 }: PaymentSummaryProps) {
+  const displayPaidAmount = paidAmount !== null ? paidAmount : payable;
+
   return (
     <Card className="border-emerald-200 dark:border-emerald-800 bg-emerald-50/50 dark:bg-emerald-900/10">
       <CardHeader>
@@ -44,10 +54,36 @@ export function PaymentSummary({
               <span>-₹{concessionTotal.toLocaleString()}</span>
             </div>
           )}
-          <div className="flex justify-between text-lg font-bold pt-2 border-t">
-            <span>Payable</span>
+          {alreadyPaid > 0 && (
+            <div className="flex justify-between text-blue-600">
+              <span>Previously Paid</span>
+              <span>-₹{alreadyPaid.toLocaleString()}</span>
+            </div>
+          )}
+          <div className="flex justify-between text-base font-semibold pt-2 border-t">
+            <span>Net Payable</span>
             <span className="text-emerald-600 dark:text-emerald-400">₹{payable.toLocaleString()}</span>
           </div>
+        </div>
+
+        <div className="space-y-2 pt-2 border-t">
+          <Label className="text-sm font-bold">Amount Being Paid (₹) *</Label>
+          <div className="relative">
+            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground font-semibold">₹</span>
+            <Input 
+              type="number"
+              className="pl-7 h-12 text-lg font-bold border-2 border-emerald-200 focus:border-emerald-500 bg-white"
+              value={displayPaidAmount}
+              onChange={(e) => onPaidAmountChange(Number(e.target.value))}
+              placeholder="Enter amount"
+            />
+          </div>
+          {displayPaidAmount < payable && displayPaidAmount > 0 && (
+            <p className="text-[10px] text-amber-600 font-bold uppercase tracking-tight">Partial Payment: ₹{(payable - displayPaidAmount).toLocaleString()} will remain pending</p>
+          )}
+          {displayPaidAmount > payable && (
+            <p className="text-[10px] text-blue-600 font-bold uppercase tracking-tight">Advance Payment: ₹{(displayPaidAmount - payable).toLocaleString()} will be added as credit</p>
+          )}
         </div>
 
         <div className="space-y-2">

@@ -25,9 +25,17 @@ export function MakePaymentTab({ canCreate }: MakePaymentTabProps) {
   const { data: students = [] } = useQuery<StudentOption[]>({
     queryKey: ['students'],
     queryFn: async () => {
-      const res = await apiFetch('/api/students');
+      const res = await apiFetch('/api/students?limit=1000');
       const data = await res.json();
-      return data.map((s: any) => ({ id: s.id, name: s.name, className: s.className, classId: s.classId, rollNumber: s.rollNumber, phone: s.phone || '' }));
+      const items = data.items || [];
+      return items.map((s: any) => ({ 
+        id: s.id, 
+        name: s.name, 
+        className: s.className, 
+        classId: s.classId, 
+        rollNumber: s.rollNumber, 
+        phone: s.phone || '' 
+      }));
     }
   });
 
@@ -39,7 +47,7 @@ export function MakePaymentTab({ canCreate }: MakePaymentTabProps) {
     }
   });
 
-  const [classFilter, setClassFilter] = useState('all');
+  const [classFilter, setClassFilter] = useState('');
   const [studentSearch, setStudentSearch] = useState('');
   const [selectedStudent, setSelectedStudent] = useState<StudentOption | null>(null);
   const [pendingFees, setPendingFees] = useState<FeeItem[]>([]);
@@ -50,8 +58,10 @@ export function MakePaymentTab({ canCreate }: MakePaymentTabProps) {
   const [paying, setPaying] = useState(false);
   const [receiptNumber, setReceiptNumber] = useState('');
   const [showSuccess, setShowSuccess] = useState(false);
+  const [customPaidAmount, setCustomPaidAmount] = useState<number | null>(null);
 
   const filteredStudents = useMemo(() => {
+    if (!classFilter) return [];
     let result = students;
     if (classFilter !== 'all') {
       result = result.filter(s => s.classId === classFilter);
@@ -67,8 +77,9 @@ export function MakePaymentTab({ canCreate }: MakePaymentTabProps) {
     setReceiptNumber('');
     setShowSuccess(false);
     setLoadingFees(true);
+    setCustomPaidAmount(null);
     try {
-      const feesRes = await apiFetch(`/api/fees?studentId=${student.id}&status=pending`);
+      const feesRes = await apiFetch(`/api/fees?studentId=${student.id}&status=pending,overdue,partially_paid`);
       if (feesRes.ok) {
         const data = await feesRes.json();
         setPendingFees(data.items || []);
@@ -99,34 +110,38 @@ export function MakePaymentTab({ canCreate }: MakePaymentTabProps) {
   const calculation = useMemo(() => {
     const totalAmount = selectedFees.reduce((s, f) => s + f.amount, 0);
     const concessionTotal = selectedFees.reduce((s, f) => s + f.concession, 0);
-    const payable = totalAmount - concessionTotal;
-    return { totalAmount, concessionTotal, payable };
+    const alreadyPaid = selectedFees.reduce((s, f) => s + (f.paidAmount || 0), 0);
+    const payable = Math.max(0, totalAmount - concessionTotal - alreadyPaid);
+    return { totalAmount, concessionTotal, payable, alreadyPaid };
   }, [selectedFees]);
 
   const handlePay = async () => {
     if (selectedFeeIds.size === 0) { toast.error('Select at least one fee to pay'); return; }
     if (!selectedStudent) return;
+    
+    const finalPaidAmount = customPaidAmount !== null ? customPaidAmount : calculation.payable;
+    if (finalPaidAmount <= 0) { toast.error('Amount must be greater than zero'); return; }
+
     setPaying(true);
     try {
       const feeAmounts: Record<string, number> = {};
-      for (const f of selectedFees) {
-        feeAmounts[f.id] = f.amount - f.concession;
-      }
+      // For the API, we just send how much the total PAID was. 
+      // The backend will distribute it.
       const data = await createReceipt.mutateAsync({
         studentId: selectedStudent.id,
         feeIds: Array.from(selectedFeeIds),
-        feeAmounts,
         totalAmount: calculation.totalAmount,
-        paidAmount: calculation.payable,
+        paidAmount: finalPaidAmount,
         concessionTotal: calculation.concessionTotal,
         paymentMethod,
       });
       
       setReceiptNumber(data.receiptNumber);
       setShowSuccess(true);
+      setCustomPaidAmount(null);
       
-      // Refresh fees manually for this student since it's local state for now
-      const feesRes = await apiFetch(`/api/fees?studentId=${selectedStudent.id}&status=pending`);
+      // Refresh fees manually
+      const feesRes = await apiFetch(`/api/fees?studentId=${selectedStudent.id}&status=pending,overdue,partially_paid`);
       if (feesRes.ok) {
         const data = await feesRes.json();
         setPendingFees(data.items || []);
@@ -152,7 +167,7 @@ export function MakePaymentTab({ canCreate }: MakePaymentTabProps) {
         open={showSuccess}
         onOpenChange={setShowSuccess}
         receiptNumber={receiptNumber}
-        amount={calculation.payable}
+        amount={customPaidAmount !== null ? customPaidAmount : calculation.payable}
       />
 
       {!selectedStudent ? (
@@ -183,6 +198,9 @@ export function MakePaymentTab({ canCreate }: MakePaymentTabProps) {
               totalAmount={calculation.totalAmount}
               concessionTotal={calculation.concessionTotal}
               payable={calculation.payable}
+              alreadyPaid={calculation.alreadyPaid}
+              paidAmount={customPaidAmount}
+              onPaidAmountChange={setCustomPaidAmount}
               paymentMethod={paymentMethod}
               setPaymentMethod={setPaymentMethod}
               onPay={handlePay}

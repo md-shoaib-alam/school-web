@@ -1,7 +1,7 @@
 "use client";
 
 import { apiFetch } from "@/lib/api";
-import { useReducer, useEffect, useMemo } from "react";
+import { useReducer, useEffect, useMemo, useState } from "react";
 import {
   Card,
   CardContent,
@@ -64,6 +64,7 @@ import { reducer, initialState, Assignment, Submission } from "./reducer";
 
 export function TeacherAssignments() {
   const [state, dispatch] = useReducer(reducer, initialState);
+  const [isCalendarOpen, setIsCalendarOpen] = useState(false);
   const {
     assignments, subjects, loading, dialogOpen, form, subDialogOpen,
     selectedAssignment, submissions, subLoading, gradingId,
@@ -329,7 +330,7 @@ export function TeacherAssignments() {
               <div className="grid grid-cols-2 gap-4">
                 <div className="flex flex-col gap-2">
                   <Label>Due Date *</Label>
-                  <Popover>
+                  <Popover open={isCalendarOpen} onOpenChange={setIsCalendarOpen}>
                     <PopoverTrigger asChild>
                       <Button
                         variant="outline"
@@ -343,9 +344,10 @@ export function TeacherAssignments() {
                       <Calendar
                         mode="single"
                         selected={form.dueDate}
-                        onSelect={(date) =>
-                          dispatch({ type: 'SET_FORM', payload: { dueDate: date } })
-                        }
+                        onSelect={(date) => {
+                          dispatch({ type: 'SET_FORM', payload: { dueDate: date } });
+                          setIsCalendarOpen(false);
+                        }}
                         disabled={(date) =>
                           date < new Date(new Date().setHours(0, 0, 0, 0))
                         }

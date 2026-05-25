@@ -83,7 +83,7 @@ export function FeeStatusTab() {
   const totalFees = fees.reduce((s, f) => s + f.amount, 0);
   const totalPaid = fees.filter(f => f.status === 'paid').reduce((s, f) => s + f.paidAmount, 0);
   const totalConcessions = fees.reduce((s, f) => s + f.concession, 0);
-  const totalPending = fees.filter(f => f.status === 'pending' || f.status === 'overdue').reduce((s, f) => s + (f.amount - f.concession - f.paidAmount), 0);
+  const totalPending = fees.filter(f => f.status === 'pending' || f.status === 'overdue' || f.status === 'partially_paid').reduce((s, f) => s + (f.amount - f.concession - f.paidAmount), 0);
   const totalOverdue = fees.filter(f => f.status === 'overdue').reduce((s, f) => s + (f.amount - f.concession - f.paidAmount), 0);
   const payPercentage = totalFees > 0 ? Math.round((totalPaid / totalFees) * 100) : 0;
 
