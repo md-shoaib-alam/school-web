@@ -227,6 +227,7 @@ export default function TenantScreenDispatcherClient() {
       case 'subscription': return <ParentSubscription />;
       case 'calendar': return <ParentCalendar />;
       case 'tickets': return <ParentTickets />;
+      case 'view-marksheet': return <StudentMarksheet />;
     }
   }
 

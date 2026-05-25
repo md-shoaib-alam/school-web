@@ -140,8 +140,8 @@ export function StatusCards({ loading, data, onNavigate }: StatusCardsProps) {
                         nameKey="name"
                         stroke="none"
                       >
-                        {userDistributionData.map((_, index) => (
-                          <Cell key={`cell-${index}`} fill={USER_CHART_COLORS[index % USER_CHART_COLORS.length]} />
+                        {userDistributionData.map((item, index) => (
+                          <Cell key={item.name} fill={USER_CHART_COLORS[index % USER_CHART_COLORS.length]} />
                         ))}
                       </Pie>
                       <ChartTooltip content={<ChartTooltipContent />} />

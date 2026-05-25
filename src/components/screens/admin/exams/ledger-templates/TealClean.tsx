@@ -72,7 +72,7 @@ export const TealClean: React.FC<LedgerTemplateProps> = ({ data }) => {
         <tbody>
           {data.studentsTabulation.map((student, idx) => (
             <tr 
-              key={idx} 
+              key={student.rollNumber} 
               className={`hover:bg-teal-50/20 border-b border-zinc-100 ${
                 idx % 2 === 1 ? 'bg-teal-50/10' : ''
               }`}

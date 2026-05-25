@@ -81,7 +81,7 @@ export function FeeTable({ studentName, fees, onPay, isPremium }: FeeTableProps)
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead className="text-left">Fee Type</TableHead>
+                <TableHead className="text-left pl-6">Fee Type</TableHead>
                 <TableHead className="hidden sm:table-cell text-left">Amount</TableHead>
                 <TableHead className="hidden md:table-cell text-left">Due Date</TableHead>
                 <TableHead className="hidden md:table-cell text-left">Paid Amount</TableHead>
@@ -102,7 +102,7 @@ export function FeeTable({ studentName, fees, onPay, isPremium }: FeeTableProps)
                   const config = STATUS_CONFIG[fee.status] || STATUS_CONFIG.pending;
                   return (
                     <TableRow key={fee.id} className="hover:bg-amber-50/30 dark:hover:bg-amber-900/10 transition-colors">
-                      <TableCell>
+                      <TableCell className="pl-6">
                         <div className="flex items-center gap-2">
                           <span className="text-lg">{TYPE_ICONS[fee.type] || "💰"}</span>
                           <span className="font-medium text-sm capitalize">{fee.type}</span>

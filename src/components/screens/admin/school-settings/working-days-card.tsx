@@ -18,12 +18,9 @@ export function WorkingDaysSettingsCard({
     <Card>
       <CardHeader className="pb-3">
         <CardTitle className="text-base font-bold">Working Days</CardTitle>
-        <p className="text-sm text-zinc-500 dark:text-zinc-400">
-          Select the days your school holds classes and timetable schedules
-        </p>
       </CardHeader>
       <CardContent className="space-y-4">
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7 gap-3">
+        <div className="grid grid-cols-2 min-[400px]:grid-cols-3 sm:grid-cols-4 md:grid-cols-4 lg:grid-cols-7 gap-2 sm:gap-3">
           {ALL_DAYS.map((day) => {
             const isSelected = workingDays.has(day.key);
             const isLastSelected = isSelected && workingDays.size <= 1;
@@ -32,7 +29,7 @@ export function WorkingDaysSettingsCard({
               <label
                 key={day.key}
                 className={`
-                  flex items-center gap-3 p-3 rounded-lg border cursor-pointer transition-colors
+                  flex items-center gap-2 p-2.5 rounded-lg border cursor-pointer transition-colors
                   ${
                     isSelected
                       ? "border-emerald-500 bg-emerald-50/30 dark:bg-emerald-950/10"
@@ -45,8 +42,9 @@ export function WorkingDaysSettingsCard({
                   checked={isSelected}
                   onCheckedChange={() => onToggleDay(day.key)}
                   disabled={isLastSelected && isSelected}
+                  className="size-3.5"
                 />
-                <span className="text-sm font-medium text-zinc-700 dark:text-zinc-300">
+                <span className="text-[11px] sm:text-sm font-medium text-zinc-700 dark:text-zinc-300 truncate">
                   {day.label}
                 </span>
               </label>

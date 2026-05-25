@@ -12,16 +12,21 @@ interface WelcomeBannerProps {
 export function WelcomeBanner({ userName }: WelcomeBannerProps) {
   const { currentTenantName, currentTenantLogo } = useAppStore();
 
-  const todayString = useMemo(() => {
+  const dates = useMemo(() => {
     try {
-      return new Date().toLocaleDateString("en-US", {
-        weekday: "long",
-        month: "long",
-        day: "numeric",
-        year: "numeric",
-      });
+      const now = new Date();
+      const day = now.getDate();
+      const month = now.toLocaleDateString("en-US", { month: "long" });
+      const year = now.getFullYear();
+      const weekday = now.toLocaleDateString("en-US", { weekday: "long" });
+      
+      const datePart = `${day} ${month}, ${year}`;
+      return {
+        full: `${weekday}, ${datePart}`,
+        short: datePart
+      };
     } catch (e) {
-      return "";
+      return { full: "", short: "" };
     }
   }, []);
 
@@ -30,28 +35,23 @@ export function WelcomeBanner({ userName }: WelcomeBannerProps) {
 
   return (
     <Card className="rounded-xl border border-border shadow-sm overflow-hidden bg-card">
-      <CardContent className="p-6 lg:p-8 relative z-10">
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-          <div className="flex items-center gap-4">
-            <div className="size-14 rounded-xl bg-muted flex items-center justify-center overflow-hidden shrink-0 border border-border">
+      <CardContent className="p-4 lg:p-4 relative z-10">
+        <div className="flex items-center justify-between gap-4">
+          <div className="flex items-center gap-3 sm:gap-4">
+            <div className="size-10 sm:size-14 rounded-xl bg-muted flex items-center justify-center overflow-hidden shrink-0 border border-border">
               <img src={currentTenantLogo || "/test.webp"} alt={currentTenantName || ""} className="size-full object-cover" />
             </div>
             <div className="text-left">
-              <p className="text-muted-foreground text-xs sm:text-sm font-medium mb-0.5">
-                Welcome back
-              </p>
-              <h2 className="text-xl sm:text-2xl lg:text-3xl font-semibold tracking-tight leading-tight text-foreground">
-                {isGeneric ? "Parent" : userName.split(" ")[0]}
+              <h2 className="text-lg sm:text-2xl lg:text-3xl font-semibold tracking-tight leading-tight text-foreground">
+                {userName || "Parent"}
               </h2>
-              <p className="text-muted-foreground/80 mt-0.5 text-xs sm:text-sm font-medium">
-                Children&apos;s progress overview
-              </p>
             </div>
           </div>
-          <div className="flex items-center gap-2 bg-muted border border-border rounded-lg px-4 py-2 text-muted-foreground shrink-0 self-start sm:self-auto">
-            <Calendar className="size-4" />
-            <span className="text-sm font-medium" suppressHydrationWarning>
-              {todayString}
+          <div className="flex items-center gap-2 bg-muted border border-border rounded-lg px-3 py-1.5 sm:px-4 sm:py-2 text-zinc-600 dark:text-zinc-300 shrink-0 w-fit">
+            <Calendar className="size-3.5 sm:size-4 text-zinc-500 dark:text-zinc-400" />
+            <span className="text-[10px] sm:text-sm font-medium" suppressHydrationWarning>
+              <span className="hidden sm:inline">{dates.full}</span>
+              <span className="sm:hidden">{dates.short}</span>
             </span>
           </div>
         </div>

@@ -79,7 +79,7 @@ export const RoyalExecutive: React.FC<LedgerTemplateProps> = ({ data }) => {
         <tbody>
           {data.studentsTabulation.map((student, idx) => (
             <tr 
-              key={idx} 
+              key={student.rollNumber} 
               className={`hover:bg-amber-50/30 border-b border-stone-300 ${
                 idx % 2 === 1 ? 'bg-stone-50/40' : ''
               }`}

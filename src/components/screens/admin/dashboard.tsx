@@ -17,13 +17,6 @@ import { ClassDistribution } from "./dashboard/ClassDistribution";
 import { FeeCollection } from "./dashboard/FeeCollection";
 import { RecentNotices } from "./dashboard/RecentNotices";
 
-function getGreeting() {
-  const hours = new Date().getHours();
-  if (hours < 12) return "Good Morning";
-  if (hours < 17) return "Good Afternoon";
-  return "Good Evening";
-}
-
 function getDaysRemaining(endDate?: string | null) {
   if (!endDate) return null;
   const expiry = new Date(endDate);
@@ -69,8 +62,6 @@ export function AdminDashboard() {
     }
   }, [error]);
 
-  const greeting = getGreeting();
-
   // Subscription Check
   const { data: tenantDetail } = useTenantDetail(tenantId || "");
   const tenant = tenantDetail?.tenant;
@@ -88,7 +79,6 @@ export function AdminDashboard() {
       />
 
       <WelcomeBanner
-        greeting={greeting}
         userName={currentUser?.name || "Admin"}
         tenantName={currentTenantName || "the school"}
         tenantLogo={currentTenantLogo || currentUser?.tenantLogo || "/test.webp"}

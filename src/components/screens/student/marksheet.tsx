@@ -24,6 +24,7 @@ const inter = Inter({
 });
 
 import { useEffect, useState, useMemo } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { apiFetch } from '@/lib/api';
 import { useAppStore } from '@/store/use-app-store';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -36,6 +37,8 @@ import { MARKSHEET_TEMPLATES } from '@/components/screens/admin/exams/marksheet-
 export function StudentMarksheet() {
   const { currentUser } = useAppStore();
   const { academicYears } = useAcademicYears();
+  const searchParams = useSearchParams();
+  const studentIdParam = searchParams.get('studentId');
 
   const [loading, setLoading] = useState(true);
   const [studentInfo, setStudentInfo] = useState<any>(null);
@@ -58,8 +61,9 @@ export function StudentMarksheet() {
     const load = async () => {
       setLoading(true);
       try {
+        const studentUrl = studentIdParam ? `/api/students/${studentIdParam}` : '/api/students/me';
         const [meRes, settingsRes] = await Promise.all([
-          apiFetch('/api/students/me'),
+          apiFetch(studentUrl),
           apiFetch('/api/tenant-settings').catch(() => null)
         ]);
 

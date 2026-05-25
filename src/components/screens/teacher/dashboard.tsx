@@ -15,17 +15,6 @@ import { TeacherSubjects } from "./dashboard/TeacherSubjects";
 import { RecentAssignments } from "./dashboard/RecentAssignments";
 import { MyClassesOverview } from "./dashboard/MyClassesOverview";
 
-const getGreeting = () => {
-  try {
-    const hour = new Date().getHours();
-    if (hour < 12) return "Good Morning";
-    if (hour < 17) return "Good Afternoon";
-    return "Good Evening";
-  } catch (e) {
-    return "Welcome";
-  }
-};
-
 const formatTime = (time: string) => {
   try {
     const [hours, minutes] = time.split(":");
@@ -96,11 +85,8 @@ export function TeacherDashboard() {
       {/* Greeting */}
       <div>
         <h2 className="text-2xl font-semibold text-zinc-900 dark:text-zinc-100">
-          {getGreeting()}, {currentUser?.name || "Mr. John Smith"} 👋
+          {currentUser?.name || "Teacher"}
         </h2>
-        <p className="text-zinc-500 dark:text-zinc-400 mt-1">
-          Here&apos;s an overview of your classes and activities today.
-        </p>
       </div>
 
       <TeacherStats 

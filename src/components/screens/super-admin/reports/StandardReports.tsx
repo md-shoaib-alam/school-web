@@ -84,7 +84,7 @@ export function StandardReports({
           }
         ].map((report, idx) => (
           <div 
-            key={idx}
+            key={report.name}
             className={`p-3.5 rounded-xl flex items-center justify-between transition-all hover:bg-zinc-100 dark:hover:bg-zinc-850/60 ${report.bg}`}
           >
             <div className="flex items-start gap-3 text-left">

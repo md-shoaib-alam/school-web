@@ -136,14 +136,14 @@ export function AdminSchoolSettings() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       {/* Page Header */}
       <div>
-        <h2 className="text-2xl font-semibold text-zinc-900 dark:text-zinc-100">
+        <h2 className="text-xl sm:text-2xl font-semibold text-zinc-900 dark:text-zinc-100">
           School Settings
         </h2>
-        <p className="text-sm text-zinc-500 dark:text-zinc-400 mt-1">
-          Configure your school preferences and template defaults
+        <p className="text-xs sm:text-sm text-zinc-500 dark:text-zinc-400 mt-1">
+          Configure school preferences and template defaults
         </p>
       </div>
 

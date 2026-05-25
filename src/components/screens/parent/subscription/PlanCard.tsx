@@ -147,7 +147,7 @@ export function PlanCard({ plan, isActive, cycle, onPurchase }: PlanCardProps) {
             const included = isObject ? (feature as any).included : true;
 
             return (
-              <div key={idx} className="flex items-start gap-2 sm:gap-2.5">
+              <div key={text} className="flex items-start gap-2 sm:gap-2.5">
                 {included ? (
                   <div className="size-4 sm:size-5 rounded-full bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0 mt-0.5">
                     <Check className="size-2.5 sm:size-3" />

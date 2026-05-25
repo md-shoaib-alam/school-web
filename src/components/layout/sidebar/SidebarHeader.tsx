@@ -70,14 +70,11 @@ export function SidebarHeader({
                   ? "SchoolSaaS"
                   : tenantName || "the school"}
               </h2>
-              <p
-                className={cn(
-                  "text-xs",
-                  isSuperAdmin ? "text-rose-300" : "text-zinc-400",
-                )}
-              >
-                {isSuperAdmin ? "Platform Console" : "Management System"}
-              </p>
+              {isSuperAdmin && (
+                <p className="text-xs text-rose-300">
+                  Platform Console
+                </p>
+              )}
             </div>
           </>
         )}

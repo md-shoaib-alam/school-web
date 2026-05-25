@@ -108,7 +108,7 @@ export function DistributionCharts({
                         };
                         return (
                           <Cell
-                            key={i}
+                            key={entry.plan}
                             fill={planColors[entry.plan] || "#6366f1"}
                           />
                         );
@@ -202,7 +202,7 @@ export function DistributionCharts({
                         stroke="none"
                       >
                         {statusChartData.map((entry, index) => (
-                          <Cell key={index} fill={entry.fill} />
+                          <Cell key={entry.status} fill={entry.fill} />
                         ))}
                       </Pie>
                       <RTooltip

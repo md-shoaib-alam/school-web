@@ -94,7 +94,7 @@ export function PricingPlans({ currentPlan, onSelectPlan, isLoading }: PricingPl
                   if (!included) return null;
 
                   return (
-                    <div key={i} className="flex items-start gap-2 text-sm">
+                    <div key={text} className="flex items-start gap-2 text-sm">
                       <div className="mt-1 size-4 rounded-full bg-emerald-100 flex items-center justify-center flex-shrink-0">
                         <Check className="size-2.5 text-emerald-600" />
                       </div>

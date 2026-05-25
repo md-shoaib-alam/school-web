@@ -128,7 +128,7 @@ export function TopPerformance({ loading, data }: TopPerformanceProps) {
                       >
                         {data?.planDistribution.map((entry, index) => (
                           <Cell 
-                            key={`cell-${index}`} 
+                            key={entry.plan} 
                             fill={PLAN_COLORS[entry.plan.toLowerCase()] || "#10b981"} 
                             className="stroke-white dark:stroke-zinc-800 stroke-2 hover:opacity-90 transition-opacity"
                           />

@@ -116,7 +116,7 @@ export function DayView({
                     : false;
 
                 return (
-                  <div key={`period-${idx}`} className="relative flex gap-4">
+                  <div key={`${timeSlots[idx].start}-${timeSlots[idx].end}`} className="relative flex gap-4">
                     <div className="relative shrink-0 z-10 mt-5">
                       <div
                         className={`size-2.5 rounded-full border-2 ${
