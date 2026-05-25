@@ -94,20 +94,22 @@ export function ParentHomework() {
       </div>
 
       <Tabs value={activeStudentId} onValueChange={handleStudentChange}>
-        <TabsList className="bg-violet-50/50 dark:bg-violet-950/20 p-1 border border-violet-100/50 dark:border-violet-900/20">
-          {children.map((child) => (
-            <TabsTrigger
-              key={child.id}
-              value={child.id}
-              className="data-[state=active]:bg-white dark:data-[state=active]:bg-zinc-900 data-[state=active]:text-violet-700 dark:data-[state=active]:text-violet-400 data-[state=active]:shadow-sm px-4 text-xs font-medium transition-all hover:bg-violet-100/30 dark:hover:bg-violet-900/20 hover:text-violet-800 dark:hover:text-violet-300"
-            >
-              <span className="flex items-center gap-2">
-                <span className="size-2 rounded-full bg-violet-400" />
-                {child.name}
-              </span>
-            </TabsTrigger>
-          ))}
-        </TabsList>
+        <div className="w-full overflow-x-auto pb-1 no-scrollbar">
+          <TabsList className="bg-violet-50/50 dark:bg-violet-950/20 p-1 border border-violet-100/50 dark:border-violet-900/20 w-fit">
+            {children.map((child) => (
+              <TabsTrigger
+                key={child.id}
+                value={child.id}
+                className="data-[state=active]:bg-white dark:data-[state=active]:bg-zinc-900 data-[state=active]:text-violet-700 dark:data-[state=active]:text-violet-400 data-[state=active]:shadow-sm px-4 text-xs font-medium transition-all hover:bg-violet-100/30 dark:hover:bg-violet-900/20 hover:text-violet-800 dark:hover:text-violet-300 whitespace-nowrap"
+              >
+                <span className="flex items-center gap-2">
+                  <span className={`size-2 rounded-full ${activeStudentId === child.id ? "bg-violet-400" : "bg-zinc-300 dark:bg-zinc-700"}`} />
+                  {child.name}
+                </span>
+              </TabsTrigger>
+            ))}
+          </TabsList>
+        </div>
 
         {children.map((child) => (
           <TabsContent
@@ -283,13 +285,15 @@ function ChildHomeworkView({ student }: { student: StudentInfo }) {
         </CardHeader>
         <CardContent className="pt-0 px-5 pb-5">
           <Tabs defaultValue="all" value={filterTab} onValueChange={setFilterTab}>
-            <TabsList className="mb-4 bg-violet-50/60 dark:bg-zinc-900 p-1 text-xs font-medium border border-violet-100/50 dark:border-zinc-800 w-fit rounded-lg">
-              <TabsTrigger value="all" className="px-3 py-1.5 transition-all rounded-md data-[state=active]:bg-white dark:data-[state=active]:bg-zinc-800 data-[state=active]:text-violet-700 dark:data-[state=active]:text-violet-300 data-[state=active]:shadow-sm hover:bg-violet-100/60 dark:hover:bg-violet-950/40 hover:text-violet-700 dark:hover:text-violet-400">All ({counts.all})</TabsTrigger>
-              <TabsTrigger value="active" className="px-3 py-1.5 transition-all rounded-md data-[state=active]:bg-white dark:data-[state=active]:bg-zinc-800 data-[state=active]:text-violet-700 dark:data-[state=active]:text-violet-300 data-[state=active]:shadow-sm hover:bg-violet-100/60 dark:hover:bg-violet-950/40 hover:text-violet-700 dark:hover:text-violet-400">Active ({counts.active})</TabsTrigger>
-              <TabsTrigger value="submitted" className="px-3 py-1.5 transition-all rounded-md data-[state=active]:bg-white dark:data-[state=active]:bg-zinc-800 data-[state=active]:text-violet-700 dark:data-[state=active]:text-violet-300 data-[state=active]:shadow-sm hover:bg-violet-100/60 dark:hover:bg-violet-950/40 hover:text-violet-700 dark:hover:text-violet-400">Submitted ({counts.submitted})</TabsTrigger>
-              <TabsTrigger value="graded" className="px-3 py-1.5 transition-all rounded-md data-[state=active]:bg-white dark:data-[state=active]:bg-zinc-800 data-[state=active]:text-violet-700 dark:data-[state=active]:text-violet-300 data-[state=active]:shadow-sm hover:bg-violet-100/60 dark:hover:bg-violet-950/40 hover:text-violet-700 dark:hover:text-violet-400">Graded ({counts.graded})</TabsTrigger>
-              <TabsTrigger value="overdue" className="px-3 py-1.5 transition-all rounded-md data-[state=active]:bg-white dark:data-[state=active]:bg-zinc-800 data-[state=active]:text-violet-700 dark:data-[state=active]:text-violet-300 data-[state=active]:shadow-sm hover:bg-violet-100/60 dark:hover:bg-violet-950/40 hover:text-violet-700 dark:hover:text-violet-400">Overdue ({counts.overdue})</TabsTrigger>
-            </TabsList>
+            <div className="w-full overflow-x-auto pb-1 no-scrollbar mb-4">
+              <TabsList className="bg-violet-50/60 dark:bg-zinc-900 p-1 text-xs font-medium border border-violet-100/50 dark:border-zinc-800 w-fit rounded-lg">
+                <TabsTrigger value="all" className="px-3 py-1.5 transition-all rounded-md data-[state=active]:bg-white dark:data-[state=active]:bg-zinc-800 data-[state=active]:text-violet-700 dark:data-[state=active]:text-violet-300 data-[state=active]:shadow-sm hover:bg-violet-100/60 dark:hover:bg-violet-950/40 hover:text-violet-700 dark:hover:text-violet-400 whitespace-nowrap">All ({counts.all})</TabsTrigger>
+                <TabsTrigger value="active" className="px-3 py-1.5 transition-all rounded-md data-[state=active]:bg-white dark:data-[state=active]:bg-zinc-800 data-[state=active]:text-violet-700 dark:data-[state=active]:text-violet-300 data-[state=active]:shadow-sm hover:bg-violet-100/60 dark:hover:bg-violet-950/40 hover:text-violet-700 dark:hover:text-violet-400 whitespace-nowrap">Active ({counts.active})</TabsTrigger>
+                <TabsTrigger value="submitted" className="px-3 py-1.5 transition-all rounded-md data-[state=active]:bg-white dark:data-[state=active]:bg-zinc-800 data-[state=active]:text-violet-700 dark:data-[state=active]:text-violet-300 data-[state=active]:shadow-sm hover:bg-violet-100/60 dark:hover:bg-violet-950/40 hover:text-violet-700 dark:hover:text-violet-400 whitespace-nowrap">Submitted ({counts.submitted})</TabsTrigger>
+                <TabsTrigger value="graded" className="px-3 py-1.5 transition-all rounded-md data-[state=active]:bg-white dark:data-[state=active]:bg-zinc-800 data-[state=active]:text-violet-700 dark:data-[state=active]:text-violet-300 data-[state=active]:shadow-sm hover:bg-violet-100/60 dark:hover:bg-violet-950/40 hover:text-violet-700 dark:hover:text-violet-400 whitespace-nowrap">Graded ({counts.graded})</TabsTrigger>
+                <TabsTrigger value="overdue" className="px-3 py-1.5 transition-all rounded-md data-[state=active]:bg-white dark:data-[state=active]:bg-zinc-800 data-[state=active]:text-violet-700 dark:data-[state=active]:text-violet-300 data-[state=active]:shadow-sm hover:bg-violet-100/60 dark:hover:bg-violet-950/40 hover:text-violet-700 dark:hover:text-violet-400 whitespace-nowrap">Overdue ({counts.overdue})</TabsTrigger>
+              </TabsList>
+            </div>
 
             <TabsContent value={filterTab}>
               <ScrollArea className="max-h-[500px] pr-3">

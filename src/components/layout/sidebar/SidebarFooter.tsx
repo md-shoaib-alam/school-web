@@ -69,13 +69,22 @@ export function SidebarFooter({
         My Profile
       </DropdownMenuItem>
       {currentUser.role === "admin" && (
-        <DropdownMenuItem 
-          className="cursor-pointer gap-2"
-          onClick={() => onNavigate("school-subscription")}
-        >
-          <Crown className="size-4 text-amber-500" />
-          My Subscription
-        </DropdownMenuItem>
+        <>
+          <DropdownMenuItem 
+            className="cursor-pointer gap-2"
+            onClick={() => onNavigate("school-subscription")}
+          >
+            <Crown className="size-4 text-amber-500" />
+            My Subscription
+          </DropdownMenuItem>
+          <DropdownMenuItem 
+            className="cursor-pointer gap-2"
+            onClick={() => onNavigate("school-settings")}
+          >
+            <Settings className="size-4 text-blue-500" />
+            School Settings
+          </DropdownMenuItem>
+        </>
       )}
       <DropdownMenuItem 
         className="cursor-pointer gap-2"

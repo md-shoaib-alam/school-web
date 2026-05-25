@@ -54,11 +54,7 @@ export function Header({ items, resolvedScreen }: HeaderProps) {
           className="lg:hidden size-10 text-zinc-500 hover:text-zinc-700 dark:text-zinc-400 dark:hover:text-zinc-200 bg-white hover:bg-zinc-50 dark:bg-zinc-900 dark:hover:bg-zinc-800 border border-zinc-200 dark:border-zinc-800 shadow-sm transition-all"
           onClick={toggleSidebar}
         >
-          {sidebarOpen ? (
-            <PanelLeftClose className="size-5" />
-          ) : (
-            <PanelLeftOpen className="size-5" />
-          )}
+          <Menu className="size-5" />
         </Button>
         <h1 className="text-base sm:text-lg font-semibold text-zinc-900 dark:text-zinc-100">
           {resolvedScreen === "profile"
@@ -73,12 +69,6 @@ export function Header({ items, resolvedScreen }: HeaderProps) {
         )}
       </div>
       <div className="flex items-center gap-2">
-        {!isSuperAdmin && currentTenantName && currentUser.role !== 'parent' && currentUser.role !== 'student' && (
-          <Badge variant="outline" className="hidden sm:flex gap-1 text-xs">
-            <School className="size-3" />
-            {currentTenantName}
-          </Badge>
-        )}
         <div className="hidden md:flex items-center gap-2 text-sm text-zinc-600 dark:text-zinc-300 mr-2" suppressHydrationWarning>
           <Calendar className="size-4 text-zinc-500 dark:text-zinc-400" />
           <span className="hidden lg:inline">{dates.full}</span>
