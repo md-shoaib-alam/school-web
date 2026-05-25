@@ -107,13 +107,13 @@ export const navItems: Record<UserRole, NavItem[]> = {
     },
     {
       key: "school-subscriptions",
-      label: "School Subscriptions",
+      label: "B2B School Subscriptions",
       icon: <Crown className="size-4" />,
       permModule: "billing",
     },
     {
       key: "subscriptions",
-      label: "User Subscriptions",
+      label: "B2C Parent Subscriptions",
       icon: <CreditCard className="size-4" />,
       permModule: "billing",
     },

@@ -1,7 +1,7 @@
 "use client";
 
 import { apiFetch } from "@/lib/api";
-import { useReducer, useEffect } from "react";
+import { useReducer, useEffect, useMemo, useState } from "react";
 import {
   Card,
   CardContent,
@@ -64,6 +64,7 @@ import { reducer, initialState, Assignment, Submission } from "./reducer";
 
 export function TeacherAssignments() {
   const [state, dispatch] = useReducer(reducer, initialState);
+  const [isCalendarOpen, setIsCalendarOpen] = useState(false);
   const {
     assignments, subjects, loading, dialogOpen, form, subDialogOpen,
     selectedAssignment, submissions, subLoading, gradingId,
@@ -98,7 +99,6 @@ export function TeacherAssignments() {
         body: JSON.stringify({
           ...form,
           dueDate: form.dueDate ? format(form.dueDate, "yyyy-MM-dd") : "",
-          classId: selectedSub.classId,
           teacherId: selectedSub.teacherId,
         }),
       });
@@ -112,6 +112,21 @@ export function TeacherAssignments() {
       toast.error("Failed to create assignment");
     }
   };
+
+  const uniqueClasses = useMemo(() => {
+    const classesMap = new Map();
+    subjects.forEach(s => {
+      if (!classesMap.has(s.classId)) {
+        classesMap.set(s.classId, s.className);
+      }
+    });
+    return Array.from(classesMap.entries()).map(([id, name]) => ({ id, name }));
+  }, [subjects]);
+
+  const filteredSubjects = useMemo(() => {
+    if (!form.classId) return [];
+    return subjects.filter(s => s.classId === form.classId);
+  }, [subjects, form.classId]);
 
   const handleCompleteAssignment = async (assignmentId: string) => {
     dispatch({ type: 'SET_COMPLETING_ID', payload: assignmentId });
@@ -259,6 +274,9 @@ export function TeacherAssignments() {
           <DialogContent>
             <DialogHeader>
               <DialogTitle>Create New Homework</DialogTitle>
+              <DialogDescription>
+                Fill in the details below to assign new homework to your students.
+              </DialogDescription>
             </DialogHeader>
             <div className="space-y-4 pt-2">
               <div>
@@ -270,28 +288,49 @@ export function TeacherAssignments() {
                   className="mt-1.5"
                 />
               </div>
-              <div>
-                <Label>Subject *</Label>
-                <Select
-                  value={form.subjectId}
-                  onValueChange={(v) => dispatch({ type: 'SET_FORM', payload: { subjectId: v } })}
-                >
-                  <SelectTrigger className="mt-1.5">
-                    <SelectValue placeholder="Select subject" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {subjects.map((s) => (
-                      <SelectItem key={s.id} value={s.id}>
-                        {s.name} ({s.className})
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label>Class *</Label>
+                  <Select
+                    value={form.classId}
+                    onValueChange={(v) => dispatch({ type: 'SET_FORM', payload: { classId: v, subjectId: "" } })}
+                  >
+                    <SelectTrigger className="mt-1.5">
+                      <SelectValue placeholder="Select class" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {uniqueClasses.map((c) => (
+                        <SelectItem key={c.id} value={c.id}>
+                          {c.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div>
+                  <Label>Subject *</Label>
+                  <Select
+                    value={form.subjectId}
+                    disabled={!form.classId}
+                    onValueChange={(v) => dispatch({ type: 'SET_FORM', payload: { subjectId: v } })}
+                  >
+                    <SelectTrigger className="mt-1.5">
+                      <SelectValue placeholder={form.classId ? "Select subject" : "Select class first"} />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {filteredSubjects.map((s) => (
+                        <SelectItem key={s.id} value={s.id}>
+                          {s.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div className="flex flex-col gap-2">
                   <Label>Due Date *</Label>
-                  <Popover>
+                  <Popover open={isCalendarOpen} onOpenChange={setIsCalendarOpen}>
                     <PopoverTrigger asChild>
                       <Button
                         variant="outline"
@@ -305,9 +344,10 @@ export function TeacherAssignments() {
                       <Calendar
                         mode="single"
                         selected={form.dueDate}
-                        onSelect={(date) =>
-                          dispatch({ type: 'SET_FORM', payload: { dueDate: date } })
-                        }
+                        onSelect={(date) => {
+                          dispatch({ type: 'SET_FORM', payload: { dueDate: date } });
+                          setIsCalendarOpen(false);
+                        }}
                         disabled={(date) =>
                           date < new Date(new Date().setHours(0, 0, 0, 0))
                         }

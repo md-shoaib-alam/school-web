@@ -118,6 +118,10 @@ export function PendingFeesChecklist({
                   <div className="text-right">
                     <p className="font-semibold text-sm">₹{fee.amount.toLocaleString()}</p>
                     {fee.concession > 0 && <p className="text-xs text-amber-600">-₹{fee.concession.toLocaleString()} concession</p>}
+                    {fee.paidAmount > 0 && <p className="text-xs text-blue-600">-₹{fee.paidAmount.toLocaleString()} previously paid</p>}
+                    {(fee.paidAmount > 0 || fee.concession > 0) && (
+                      <p className="text-xs font-bold text-emerald-600 border-t mt-1 pt-1">Bal: ₹{(fee.amount - fee.concession - fee.paidAmount).toLocaleString()}</p>
+                    )}
                   </div>
                 </button>
               ))}

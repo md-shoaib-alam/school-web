@@ -103,7 +103,7 @@ export function AdminTeachers() {
 
   const queryClient = useQueryClient();
 
-  const { data: teachersData, isLoading: loading } = useTeachers(
+  const { data: teachersData, isFetching: loading } = useTeachers(
     currentTenantId || undefined,
     debouncedSearch || undefined,
     currentPage,

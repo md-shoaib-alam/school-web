@@ -38,10 +38,9 @@ export function SubjectsFilters({
         </div>
         <Select value={classFilter} onValueChange={onClassFilterChange}>
           <SelectTrigger className="w-full sm:w-[200px]">
-            <SelectValue placeholder="All Classes" />
+            <SelectValue placeholder="Select Class" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">All Classes</SelectItem>
             {(classes || []).map((c: any) => (
               <SelectItem key={c.id} value={c.id}>
                 {c.name} - {c.section}

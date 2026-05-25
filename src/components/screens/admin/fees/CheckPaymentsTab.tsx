@@ -1,6 +1,6 @@
 "use client";
 
-import { useReducer, useMemo } from 'react';
+import { useReducer, useMemo, useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -15,7 +15,13 @@ import {
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription,
 } from '@/components/ui/dialog';
-import { Search, CircleDollarSign, TrendingUp, Percent, DollarSign, Eye } from 'lucide-react';
+import {
+  Popover, PopoverContent, PopoverTrigger,
+} from '@/components/ui/popover';
+import { Calendar } from '@/components/ui/calendar';
+import { DateRange } from 'react-day-picker';
+import { Search, CircleDollarSign, TrendingUp, Percent, DollarSign, Eye, Calendar as CalendarIcon } from 'lucide-react';
+import { format } from 'date-fns';
 import { useFeeReceipts } from '@/hooks/use-fees';
 import { paymentMethodConfig, receiptStatusConfig } from './config';
 import type { FeeReceipt } from './types';
@@ -42,7 +48,7 @@ type Action =
 const initialState: State = {
   search: '',
   methodFilter: 'all',
-  dateFilter: 'all',
+  dateFilter: 'today',
   fromDate: '',
   toDate: '',
   viewDialogOpen: false,
@@ -80,6 +86,9 @@ export function CheckPaymentsTab() {
   const payments = data?.items || [];
   
   const [state, dispatch] = useReducer(reducer, initialState);
+  const [isFromCalendarOpen, setIsFromCalendarOpen] = useState(false);
+  const [isToCalendarOpen, setIsToCalendarOpen] = useState(false);
+
   const {
     search,
     methodFilter,
@@ -220,10 +229,46 @@ export function CheckPaymentsTab() {
           </SelectContent>
         </Select>
         {dateFilter === 'custom' && (
-          <>
-            <Input type="date" className="w-full sm:w-36" value={fromDate} onChange={e => dispatch({ type: 'SET_FROM_DATE', payload: e.target.value })} />
-            <Input type="date" className="w-full sm:w-36" value={toDate} onChange={e => dispatch({ type: 'SET_TO_DATE', payload: e.target.value })} />
-          </>
+          <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
+            <Popover open={isFromCalendarOpen} onOpenChange={setIsFromCalendarOpen}>
+              <PopoverTrigger asChild>
+                <Button variant="outline" className="w-full sm:w-44 justify-start text-left font-normal bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800">
+                  <CalendarIcon className="mr-2 h-4 w-4 text-muted-foreground" />
+                  {fromDate ? format(new Date(fromDate), "PPP") : <span className="text-muted-foreground">From date</span>}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0" align="start">
+                <Calendar
+                  mode="single"
+                  selected={fromDate ? new Date(fromDate) : undefined}
+                  onSelect={(date) => {
+                    dispatch({ type: 'SET_FROM_DATE', payload: date ? format(date, "yyyy-MM-dd") : '' });
+                    setIsFromCalendarOpen(false);
+                  }}
+                  initialFocus
+                />
+              </PopoverContent>
+            </Popover>
+            <Popover open={isToCalendarOpen} onOpenChange={setIsToCalendarOpen}>
+              <PopoverTrigger asChild>
+                <Button variant="outline" className="w-full sm:w-44 justify-start text-left font-normal bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800">
+                  <CalendarIcon className="mr-2 h-4 w-4 text-muted-foreground" />
+                  {toDate ? format(new Date(toDate), "PPP") : <span className="text-muted-foreground">To date</span>}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0" align="start">
+                <Calendar
+                  mode="single"
+                  selected={toDate ? new Date(toDate) : undefined}
+                  onSelect={(date) => {
+                    dispatch({ type: 'SET_TO_DATE', payload: date ? format(date, "yyyy-MM-dd") : '' });
+                    setIsToCalendarOpen(false);
+                  }}
+                  initialFocus
+                />
+              </PopoverContent>
+            </Popover>
+          </div>
         )}
       </div>
 

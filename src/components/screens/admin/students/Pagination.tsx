@@ -96,16 +96,16 @@ export function Pagination({
 
   const handlePageChange = (page: number) => {
     onPageChange(page);
-    window.scrollTo(0, 0);
+    document.querySelector('main')?.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const handleLimitChange = (limit: number) => {
     onLimitChange?.(limit);
-    window.scrollTo(0, 0);
+    document.querySelector('main')?.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   return (
-    <div className="flex flex-col sm:flex-row items-center justify-between px-4 py-3 border-t gap-3">
+    <div className="flex flex-col sm:flex-row items-center justify-between px-6 py-3 border-t gap-3">
       <div className="flex flex-wrap items-center gap-4">
         <p className="text-sm text-muted-foreground">
           Showing{" "}

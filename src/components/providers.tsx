@@ -13,8 +13,8 @@ function ToasterProvider() {
   return (
     <Toaster 
       richColors 
+      expand={true}
       position="top-center" 
-      closeButton 
       duration={3000} 
       theme={theme as "light" | "dark" | "system"}
     />

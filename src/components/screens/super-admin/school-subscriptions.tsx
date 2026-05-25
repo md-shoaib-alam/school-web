@@ -132,7 +132,7 @@ export function SuperAdminSchoolSubscriptions() {
             <ShieldCheck className="size-6 text-violet-600 dark:text-violet-400" />
           </div>
           <div>
-            <h2 className="text-3xl font-semibold tracking-tight">School Subscriptions</h2>
+            <h2 className="text-3xl font-semibold tracking-tight">B2B School Licenses</h2>
             <p className="text-muted-foreground mt-1">Manage school-level plans, limits, and license periods.</p>
           </div>
         </div>
@@ -371,7 +371,7 @@ export function SuperAdminSchoolSubscriptions() {
                   <SelectContent>
                     {SCHOOL_PLANS.map(plan => (
                       <SelectItem key={plan.id} value={plan.id}>
-                        {plan.name} Plan
+                        {plan.name}
                       </SelectItem>
                     ))}
                   </SelectContent>

@@ -76,7 +76,7 @@ export function TimetableHeader({
 
         <Select value={selectedClass} onValueChange={onClassChange}>
           <SelectTrigger className="w-full sm:w-56 text-sm bg-white hover:bg-zinc-50/50 dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800 shadow-sm">
-            <SelectValue placeholder="Select class" />
+            <SelectValue placeholder="Select Class" />
           </SelectTrigger>
           <SelectContent>
             {classes.map((c) => (

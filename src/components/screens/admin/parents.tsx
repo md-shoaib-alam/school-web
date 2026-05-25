@@ -129,8 +129,8 @@ export function AdminParents() {
   // Queries
   const { 
     data: parentsData, 
-    isLoading: loadingParents 
-  } = useParents(currentTenantId || undefined, debouncedSearch || undefined, currentPage, 12);
+    isFetching: loadingParents 
+  } = useParents(currentTenantId || undefined, debouncedSearch || undefined, currentPage, 15);
 
   const { data: classesData } = useClassesMin(currentTenantId || undefined);
 
@@ -161,18 +161,16 @@ export function AdminParents() {
   });
 
 
+  const { parents: rawParents = [], total: totalItems = 0, totalPages = 1 } = parentsData || {};
+
   const parents = useMemo(() => {
-    const list = parentsData?.parents || [];
-    return [...list].sort((a, b) => 
+    return [...rawParents].sort((a, b) => 
       a.name.localeCompare(b.name, undefined, { numeric: true, sensitivity: 'base' })
     );
-  }, [parentsData]);
-  const totalItems = parentsData?.total || 0;
-  const totalPages = parentsData?.totalPages || 1;
+  }, [rawParents]);
 
   const students = studentData?.items || [];
   const classes = classesData?.classes || [];
-  const loading = loadingParents;
 
   const filteredStudents = useMemo(() => {
     return students.filter(
@@ -255,8 +253,9 @@ export function AdminParents() {
       { loading: "Removing parent record...", success: () => "", error: (err: any) => err.message, },
     );
   };
-
-  if (loading && parents.length === 0) return <ParentSkeleton />;
+  
+  // Show skeleton during initial load OR when fetching new page data
+  if (loadingParents) return <ParentSkeleton />;
 
   return (
     <div className="space-y-6">
@@ -294,7 +293,7 @@ export function AdminParents() {
         currentPage={currentPage}
         totalPages={totalPages}
         totalItems={totalItems}
-        itemsPerPage={12}
+        itemsPerPage={15}
         onPageChange={(v) => dispatch({ type: 'SET_CURRENT_PAGE', payload: v })}
       />
 

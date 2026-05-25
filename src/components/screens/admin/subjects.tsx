@@ -54,7 +54,7 @@ type Action =
 
 const initialState: State = {
   search: "",
-  classFilter: "all",
+  classFilter: "",
   createOpen: false,
   form: { ...emptyForm },
   editOpen: false,

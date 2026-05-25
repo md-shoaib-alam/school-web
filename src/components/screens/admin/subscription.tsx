@@ -227,7 +227,7 @@ export function SchoolSubscriptionScreen() {
                       {isAutoPay ? "Secured" : "Manual"}
                     </p>
                   </div>
-                  <Switch checked={isAutoPay} onCheckedChange={handleToggleAutoPay} />
+                  <Switch checked={isAutoPay} disabled className="opacity-100 data-[state=checked]:bg-emerald-500" />
                 </div>
               </div>
             </div>

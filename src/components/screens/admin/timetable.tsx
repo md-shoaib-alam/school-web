@@ -147,7 +147,6 @@ export function AdminTimetable() {
       const res = await apiFetch("/api/classes?mode=min");
       if (!res.ok) throw new Error("Failed to fetch classes");
       const data = await res.json();
-      if (data.length > 0 && !selectedClass) dispatch({ type: 'SET_SELECTED_CLASS', payload: data[0].id });
       return data;
     },
     staleTime: 5 * 60 * 1000,

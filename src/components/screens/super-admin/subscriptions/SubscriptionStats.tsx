@@ -36,7 +36,7 @@ export function SubscriptionStats({
             </div>
             <div>
               <h2 className="text-2xl font-semibold tracking-tight">
-                Parent Subscriptions
+                B2C User Subscriptions
               </h2>
               <p className="text-teal-200 text-sm">
                 Manage premium access across all schools

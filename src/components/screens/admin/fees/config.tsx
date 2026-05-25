@@ -1,4 +1,4 @@
-import { CheckCircle2, Clock, AlertTriangle, Banknote, FileText, Building2, Smartphone, CreditCard } from "lucide-react";
+import { CheckCircle2, Clock, AlertTriangle, Banknote, FileText, Building2, Smartphone, CreditCard, Sparkles } from "lucide-react";
 import { ReactNode } from "react";
 
 export const feeStatusConfig: Record<string, { bg: string; icon: ReactNode }> = {
@@ -13,6 +13,14 @@ export const feeStatusConfig: Record<string, { bg: string; icon: ReactNode }> = 
   overdue: {
     bg: 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 border-red-200 dark:border-red-800',
     icon: <AlertTriangle className="size-3.5" />,
+  },
+  partially_paid: {
+    bg: 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 border-blue-200 dark:border-blue-800',
+    icon: <Clock className="size-3.5" />,
+  },
+  advance: {
+    bg: 'bg-violet-100 dark:bg-violet-900/30 text-violet-700 dark:text-violet-400 border-violet-200 dark:border-violet-800',
+    icon: <Sparkles className="size-3.5" />,
   },
 };
 
