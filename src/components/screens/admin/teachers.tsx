@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useMemo } from "react";
+import { useReducer, useEffect, useMemo } from "react";
 import { useViewMode } from "@/hooks/use-view-mode";
 import { goeyToast as toast } from "goey-toast";
 import { useModulePermissions } from "@/hooks/use-permissions";
@@ -32,13 +32,74 @@ const emptyFormData = {
   password: "",
 };
 
+type State = {
+  search: string;
+  currentPage: number;
+  dialogOpen: boolean;
+  editingTeacher: TeacherInfo | null;
+  formData: typeof emptyFormData;
+  submitting: boolean;
+  deletingId: string | null;
+};
+
+type Action =
+  | { type: "SET_SEARCH"; payload: string }
+  | { type: "SET_CURRENT_PAGE"; payload: number }
+  | { type: "OPEN_DIALOG"; payload: { teacher: TeacherInfo | null; formData: typeof emptyFormData } }
+  | { type: "CLOSE_DIALOG" }
+  | { type: "SET_FORM_DATA"; payload: typeof emptyFormData }
+  | { type: "SET_SUBMITTING"; payload: boolean }
+  | { type: "SET_DELETING_ID"; payload: string | null };
+
+function reducer(state: State, action: Action): State {
+  switch (action.type) {
+    case "SET_SEARCH":
+      return { ...state, search: action.payload, currentPage: 1 };
+    case "SET_CURRENT_PAGE":
+      return { ...state, currentPage: action.payload };
+    case "OPEN_DIALOG":
+      return {
+        ...state,
+        dialogOpen: true,
+        editingTeacher: action.payload.teacher,
+        formData: action.payload.formData,
+      };
+    case "CLOSE_DIALOG":
+      return {
+        ...state,
+        dialogOpen: false,
+        editingTeacher: null,
+        formData: emptyFormData,
+      };
+    case "SET_FORM_DATA":
+      return { ...state, formData: action.payload };
+    case "SET_SUBMITTING":
+      return { ...state, submitting: action.payload };
+    case "SET_DELETING_ID":
+      return { ...state, deletingId: action.payload };
+    default:
+      return state;
+  }
+}
+
+const initialState: State = {
+  search: "",
+  currentPage: 1,
+  dialogOpen: false,
+  editingTeacher: null,
+  formData: emptyFormData,
+  submitting: false,
+  deletingId: null,
+};
+
 export function AdminTeachers() {
   const { currentTenantId } = useAppStore();
   const { canCreate, canEdit, canDelete } = useModulePermissions("teachers");
 
-  const [search, setSearch] = useState("");
+  const [state, dispatch] = useReducer(reducer, initialState);
+  const { search, currentPage, dialogOpen, editingTeacher, formData, submitting, deletingId } = state;
+
   const debouncedSearch = useDebounce(search, 500);
-  const [currentPage, setCurrentPage] = useState(1);
 
   const queryClient = useQueryClient();
 
@@ -60,33 +121,25 @@ export function AdminTeachers() {
   const totalPages = teachersData?.totalPages || 1;
   const [viewMode, setViewMode] = useViewMode("teachers", "grid");
 
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [debouncedSearch]);
-
-  const [dialogOpen, setDialogOpen] = useState(false);
-  const [editingTeacher, setEditingTeacher] = useState<TeacherInfo | null>(null);
-  const [formData, setFormData] = useState(emptyFormData);
-  const [submitting, setSubmitting] = useState(false);
-  const [deletingId, setDeletingId] = useState<string | null>(null);
-
   const handleOpenAdd = () => {
-    setEditingTeacher(null);
-    setFormData(emptyFormData);
-    setDialogOpen(true);
+    dispatch({ type: "OPEN_DIALOG", payload: { teacher: null, formData: emptyFormData } });
   };
 
   const handleOpenEdit = (teacher: TeacherInfo) => {
-    setEditingTeacher(teacher);
-    setFormData({
-      name: teacher.name,
-      email: teacher.email,
-      phone: teacher.phone || "",
-      qualification: teacher.qualification || "",
-      experience: teacher.experience || "",
-      password: "",
+    dispatch({
+      type: "OPEN_DIALOG",
+      payload: {
+        teacher,
+        formData: {
+          name: teacher.name,
+          email: teacher.email,
+          phone: teacher.phone || "",
+          qualification: teacher.qualification || "",
+          experience: teacher.experience || "",
+          password: "",
+        },
+      },
     });
-    setDialogOpen(true);
   };
 
   const handleSubmit = async () => {
@@ -111,7 +164,7 @@ export function AdminTeachers() {
 
     toast.promise(
       (async () => {
-        setSubmitting(true);
+        dispatch({ type: "SET_SUBMITTING", payload: true });
         try {
           const url = "/api/teachers";
           const method = isEdit ? "PUT" : "POST";
@@ -126,12 +179,12 @@ export function AdminTeachers() {
             throw new Error(errData.error || `Failed to ${isEdit ? "update" : "add"} teacher`);
           }
 
-          setDialogOpen(false);
+          dispatch({ type: "CLOSE_DIALOG" });
           queryClient.invalidateQueries({ queryKey: queryKeys.teachers });
           queryClient.invalidateQueries({ queryKey: ['admin-dashboard', currentTenantId] });
           return isEdit ? "Teacher updated" : "Teacher added";
         } finally {
-          setSubmitting(false);
+          dispatch({ type: "SET_SUBMITTING", payload: false });
         }
       })(),
       {
@@ -168,7 +221,7 @@ export function AdminTeachers() {
             }
             queryClient.invalidateQueries({ queryKey: queryKeys.teachers });
             queryClient.invalidateQueries({ queryKey: ['admin-dashboard', currentTenantId] });
-            setDeletingId(null);
+            dispatch({ type: "SET_DELETING_ID", payload: null });
             throw new Error("Teacher record removed");
           } catch (err) {
             queryClient.setQueryData(queryKey, previousTeachers);
@@ -214,7 +267,7 @@ export function AdminTeachers() {
 
       <TeachersHeader 
         search={search}
-        onSearchChange={setSearch}
+        onSearchChange={(val) => dispatch({ type: "SET_SEARCH", payload: val })}
         viewMode={viewMode}
         setViewMode={setViewMode}
         canCreate={canCreate}
@@ -233,7 +286,7 @@ export function AdminTeachers() {
           onEdit={handleOpenEdit}
           onDelete={handleDelete}
           deletingId={deletingId}
-          setDeletingId={setDeletingId}
+          setDeletingId={(id) => dispatch({ type: "SET_DELETING_ID", payload: id })}
         />
       ) : (
         <TeachersGridView 
@@ -241,7 +294,7 @@ export function AdminTeachers() {
           canEdit={canEdit}
           canDelete={canDelete}
           deletingId={deletingId}
-          setDeletingId={setDeletingId}
+          setDeletingId={(id) => dispatch({ type: "SET_DELETING_ID", payload: id })}
           onEdit={handleOpenEdit}
           onDelete={handleDelete}
         />
@@ -252,21 +305,21 @@ export function AdminTeachers() {
         totalPages={totalPages}
         totalItems={totalItems}
         itemsPerPage={12}
-        onPageChange={setCurrentPage}
+        onPageChange={(page) => dispatch({ type: "SET_CURRENT_PAGE", payload: page })}
       />
 
       <TeacherDialog
         open={dialogOpen}
         onOpenChange={(open) => {
-          setDialogOpen(open);
           if (!open) {
-            setEditingTeacher(null);
-            setFormData(emptyFormData);
+            dispatch({ type: "CLOSE_DIALOG" });
+          } else {
+            // This case might not be triggered from the dialog itself but handle open change
           }
         }}
         editingTeacher={editingTeacher}
         formData={formData}
-        setFormData={setFormData}
+        setFormData={(data: any) => dispatch({ type: "SET_FORM_DATA", payload: data })}
         submitting={submitting}
         onSubmit={handleSubmit}
         isFormValid={formData.name.trim() !== "" && formData.email.trim() !== ""}

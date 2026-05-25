@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useMemo, useCallback } from 'react';
+import { useState, useEffect, useMemo, useCallback, useReducer } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -33,22 +33,97 @@ interface FeeCategoriesTabProps {
   canDelete: boolean;
 }
 
+type State = {
+  search: string;
+  addOpen: boolean;
+  addForm: { name: string; code: string; description: string; frequency: string };
+  adding: boolean;
+  editOpen: boolean;
+  editItem: FeeCategory | null;
+  editForm: { name: string; code: string; description: string; frequency: string };
+  saving: boolean;
+  deleting: boolean;
+};
+
+type Action =
+  | { type: 'SET_SEARCH'; payload: string }
+  | { type: 'SET_ADD_OPEN'; payload: boolean }
+  | { type: 'SET_ADD_FORM'; payload: Partial<State['addForm']> }
+  | { type: 'SET_ADDING'; payload: boolean }
+  | { type: 'OPEN_EDIT'; payload: FeeCategory }
+  | { type: 'SET_EDIT_OPEN'; payload: boolean }
+  | { type: 'SET_EDIT_FORM'; payload: Partial<State['editForm']> }
+  | { type: 'SET_SAVING'; payload: boolean }
+  | { type: 'SET_DELETING'; payload: boolean }
+  | { type: 'RESET_ADD_FORM' };
+
+const initialAddForm = { name: '', code: '', description: '', frequency: 'yearly' };
+const initialState: State = {
+  search: '',
+  addOpen: false,
+  addForm: { ...initialAddForm },
+  adding: false,
+  editOpen: false,
+  editItem: null,
+  editForm: { name: '', code: '', description: '', frequency: '' },
+  saving: false,
+  deleting: false,
+};
+
+function reducer(state: State, action: Action): State {
+  switch (action.type) {
+    case 'SET_SEARCH':
+      return { ...state, search: action.payload };
+    case 'SET_ADD_OPEN':
+      return { ...state, addOpen: action.payload };
+    case 'SET_ADD_FORM':
+      return { ...state, addForm: { ...state.addForm, ...action.payload } };
+    case 'SET_ADDING':
+      return { ...state, adding: action.payload };
+    case 'OPEN_EDIT':
+      return {
+        ...state,
+        editOpen: true,
+        editItem: action.payload,
+        editForm: {
+          name: action.payload.name,
+          code: action.payload.code,
+          description: action.payload.description || '',
+          frequency: action.payload.frequency,
+        },
+      };
+    case 'SET_EDIT_OPEN':
+      return { ...state, editOpen: action.payload, editItem: action.payload ? state.editItem : null };
+    case 'SET_EDIT_FORM':
+      return { ...state, editForm: { ...state.editForm, ...action.payload } };
+    case 'SET_SAVING':
+      return { ...state, saving: action.payload };
+    case 'SET_DELETING':
+      return { ...state, deleting: action.payload };
+    case 'RESET_ADD_FORM':
+      return { ...state, addForm: { ...initialAddForm } };
+    default:
+      return state;
+  }
+}
+
 export function FeeCategoriesTab({ canCreate, canEdit, canDelete }: FeeCategoriesTabProps) {
   const { data: categories = [], isLoading: loading } = useFeeCategories();
   const queryClient = useQueryClient();
   const createCategory = useCreateFeeCategory();
 
-  const [search, setSearch] = useState('');
-
-  const [addOpen, setAddOpen] = useState(false);
-  const [addForm, setAddForm] = useState({ name: '', code: '', description: '', frequency: 'yearly' });
-  const [adding, setAdding] = useState(false);
-
-  const [editOpen, setEditOpen] = useState(false);
-  const [editItem, setEditItem] = useState<FeeCategory | null>(null);
-  const [editForm, setEditForm] = useState({ name: '', code: '', description: '', frequency: '' });
-  const [saving, setSaving] = useState(false);
-  const [deleting, setDeleting] = useState(false);
+  const [state, dispatch] = useReducer(reducer, initialState);
+  const {
+    search,
+    addOpen,
+    addForm,
+    adding,
+    editOpen,
+    editItem,
+    editForm,
+    saving,
+    deleting,
+  } = state;
 
   const filtered = useMemo(() => {
     if (!search) return categories;
@@ -58,24 +133,22 @@ export function FeeCategoriesTab({ canCreate, canEdit, canDelete }: FeeCategorie
 
   const handleAdd = async () => {
     if (!addForm.name || !addForm.code) { toast.error('Name and code are required'); return; }
-    setAdding(true);
+    dispatch({ type: 'SET_ADDING', payload: true });
     try {
       await createCategory.mutateAsync(addForm);
-      setAddOpen(false);
-      setAddForm({ name: '', code: '', description: '', frequency: 'yearly' });
+      dispatch({ type: 'SET_ADD_OPEN', payload: false });
+      dispatch({ type: 'RESET_ADD_FORM' });
     } catch { /* handled by mutation */ }
-    setAdding(false);
+    dispatch({ type: 'SET_ADDING', payload: false });
   };
 
   const handleEdit = (cat: FeeCategory) => {
-    setEditItem(cat);
-    setEditForm({ name: cat.name, code: cat.code, description: cat.description || '', frequency: cat.frequency });
-    setEditOpen(true);
+    dispatch({ type: 'OPEN_EDIT', payload: cat });
   };
 
   const handleEditSave = async () => {
     if (!editItem) return;
-    setSaving(true);
+    dispatch({ type: 'SET_SAVING', payload: true });
     try {
       const res = await apiFetch('/api/fee-categories', {
         method: 'PUT',
@@ -85,13 +158,13 @@ export function FeeCategoriesTab({ canCreate, canEdit, canDelete }: FeeCategorie
       if (res.ok) {
         toast.success('Category updated!');
         queryClient.invalidateQueries({ queryKey: ['fee-categories'] });
-        setEditOpen(false);
+        dispatch({ type: 'SET_EDIT_OPEN', payload: false });
       } else {
         const err = await res.json().catch(() => ({}));
         toast.error(err.error || 'Failed to update');
       }
     } catch { toast.error('Error updating'); }
-    setSaving(false);
+    dispatch({ type: 'SET_SAVING', payload: false });
   };
 
   const toggleStatus = async (cat: FeeCategory) => {
@@ -110,7 +183,7 @@ export function FeeCategoriesTab({ canCreate, canEdit, canDelete }: FeeCategorie
   };
 
   const handleDelete = async (id: string) => {
-    setDeleting(true);
+    dispatch({ type: 'SET_DELETING', payload: true });
     try {
       const res = await apiFetch(`/api/fee-categories?id=${id}`, { method: 'DELETE' });
       if (res.ok) {
@@ -119,7 +192,7 @@ export function FeeCategoriesTab({ canCreate, canEdit, canDelete }: FeeCategorie
       }
       else toast.error('Failed to delete');
     } catch { toast.error('Error deleting'); }
-    setDeleting(false);
+    dispatch({ type: 'SET_DELETING', payload: false });
   };
 
   return (
@@ -127,11 +200,16 @@ export function FeeCategoriesTab({ canCreate, canEdit, canDelete }: FeeCategorie
       <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center">
         <div className="relative flex-1 max-w-sm">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
-          <Input placeholder="Search categories..." className="pl-9" value={search} onChange={e => setSearch(e.target.value)} />
+          <Input
+            placeholder="Search categories..."
+            className="pl-9"
+            value={search}
+            onChange={e => dispatch({ type: 'SET_SEARCH', payload: e.target.value })}
+          />
         </div>
         <div className="sm:ml-auto">
           {canCreate && (
-            <Button className="bg-emerald-600 hover:bg-emerald-700 text-white" onClick={() => setAddOpen(true)}>
+            <Button className="bg-emerald-600 hover:bg-emerald-700 text-white" onClick={() => dispatch({ type: 'SET_ADD_OPEN', payload: true })}>
               <Plus className="size-4 mr-2" />Add Category
             </Button>
           )}
@@ -224,18 +302,18 @@ export function FeeCategoriesTab({ canCreate, canEdit, canDelete }: FeeCategorie
       </Card>
 
       {/* Add Category Dialog */}
-      <Dialog open={addOpen} onOpenChange={setAddOpen}>
+      <Dialog open={addOpen} onOpenChange={(o) => dispatch({ type: 'SET_ADD_OPEN', payload: o })}>
         <DialogContent className="sm:max-w-lg">
           <DialogHeader><DialogTitle>Add Fee Category</DialogTitle><DialogDescription>Create a new fee category</DialogDescription></DialogHeader>
           <div className="grid gap-4 py-2">
             <div className="grid grid-cols-2 gap-4">
-              <div className="grid gap-2"><Label>Name *</Label><Input value={addForm.name} onChange={e => setAddForm(p => ({ ...p, name: e.target.value }))} placeholder="Tuition Fee" /></div>
-              <div className="grid gap-2"><Label>Code *</Label><Input value={addForm.code} onChange={e => setAddForm(p => ({ ...p, code: e.target.value }))} placeholder="TUITION" className="uppercase" /></div>
+              <div className="grid gap-2"><Label>Name *</Label><Input value={addForm.name} onChange={e => dispatch({ type: 'SET_ADD_FORM', payload: { name: e.target.value } })} placeholder="Tuition Fee" /></div>
+              <div className="grid gap-2"><Label>Code *</Label><Input value={addForm.code} onChange={e => dispatch({ type: 'SET_ADD_FORM', payload: { code: e.target.value } })} placeholder="TUITION" className="uppercase" /></div>
             </div>
-            <div className="grid gap-2"><Label>Description</Label><Input value={addForm.description} onChange={e => setAddForm(p => ({ ...p, description: e.target.value }))} placeholder="Optional description" /></div>
+            <div className="grid gap-2"><Label>Description</Label><Input value={addForm.description} onChange={e => dispatch({ type: 'SET_ADD_FORM', payload: { description: e.target.value } })} placeholder="Optional description" /></div>
             <div className="grid gap-2">
               <Label>Frequency *</Label>
-              <Select value={addForm.frequency} onValueChange={v => setAddForm(p => ({ ...p, frequency: v }))}>
+              <Select value={addForm.frequency} onValueChange={v => dispatch({ type: 'SET_ADD_FORM', payload: { frequency: v } })}>
                 <SelectTrigger><SelectValue /></SelectTrigger>
                 <SelectContent>
                   <SelectItem value="monthly">Monthly</SelectItem>
@@ -247,25 +325,25 @@ export function FeeCategoriesTab({ canCreate, canEdit, canDelete }: FeeCategorie
             </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setAddOpen(false)}>Cancel</Button>
+            <Button variant="outline" onClick={() => dispatch({ type: 'SET_ADD_OPEN', payload: false })}>Cancel</Button>
             <Button className="bg-emerald-600 hover:bg-emerald-700 text-white" onClick={handleAdd} disabled={adding || !addForm.name || !addForm.code}>{adding ? 'Adding...' : 'Add Category'}</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
 
       {/* Edit Category Dialog */}
-      <Dialog open={editOpen} onOpenChange={setEditOpen}>
+      <Dialog open={editOpen} onOpenChange={(o) => dispatch({ type: 'SET_EDIT_OPEN', payload: o })}>
         <DialogContent className="sm:max-w-lg">
           <DialogHeader><DialogTitle>Edit Category</DialogTitle><DialogDescription>Update &quot;{editItem?.name}&quot;</DialogDescription></DialogHeader>
           <div className="grid gap-4 py-2">
             <div className="grid grid-cols-2 gap-4">
-              <div className="grid gap-2"><Label>Name</Label><Input value={editForm.name} onChange={e => setEditForm(p => ({ ...p, name: e.target.value }))} /></div>
-              <div className="grid gap-2"><Label>Code</Label><Input value={editForm.code} onChange={e => setEditForm(p => ({ ...p, code: e.target.value }))} className="uppercase" /></div>
+              <div className="grid gap-2"><Label>Name</Label><Input value={editForm.name} onChange={e => dispatch({ type: 'SET_EDIT_FORM', payload: { name: e.target.value } })} /></div>
+              <div className="grid gap-2"><Label>Code</Label><Input value={editForm.code} onChange={e => dispatch({ type: 'SET_EDIT_FORM', payload: { code: e.target.value } })} className="uppercase" /></div>
             </div>
-            <div className="grid gap-2"><Label>Description</Label><Input value={editForm.description} onChange={e => setEditForm(p => ({ ...p, description: e.target.value }))} /></div>
+            <div className="grid gap-2"><Label>Description</Label><Input value={editForm.description} onChange={e => dispatch({ type: 'SET_EDIT_FORM', payload: { description: e.target.value } })} /></div>
             <div className="grid gap-2">
               <Label>Frequency</Label>
-              <Select value={editForm.frequency} onValueChange={v => setEditForm(p => ({ ...p, frequency: v }))}>
+              <Select value={editForm.frequency} onValueChange={v => dispatch({ type: 'SET_EDIT_FORM', payload: { frequency: v } })}>
                 <SelectTrigger><SelectValue /></SelectTrigger>
                 <SelectContent>
                   <SelectItem value="monthly">Monthly</SelectItem>
@@ -277,7 +355,7 @@ export function FeeCategoriesTab({ canCreate, canEdit, canDelete }: FeeCategorie
             </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setEditOpen(false)}>Cancel</Button>
+            <Button variant="outline" onClick={() => dispatch({ type: 'SET_EDIT_OPEN', payload: false })}>Cancel</Button>
             <Button className="bg-emerald-600 hover:bg-emerald-700 text-white" onClick={handleEditSave} disabled={saving}>{saving ? 'Saving...' : 'Save Changes'}</Button>
           </DialogFooter>
         </DialogContent>
@@ -285,3 +363,4 @@ export function FeeCategoriesTab({ canCreate, canEdit, canDelete }: FeeCategorie
     </div>
   );
 }
+

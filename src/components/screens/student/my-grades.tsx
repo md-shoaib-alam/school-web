@@ -2,7 +2,7 @@
 
 
 import { apiFetch } from "@/lib/api";
-import { useEffect, useState, useCallback, useMemo } from "react";
+import { useEffect, useReducer, useCallback, useMemo } from "react";
 import { useAppStore } from "@/store/use-app-store";
 import { useParams, useRouter } from "next/navigation";
 import { useAcademicYears } from "@/hooks/use-academic-years";
@@ -64,67 +64,130 @@ type AssessmentGrade = {
   createdAt: string;
 };
 
+type State = {
+  recharts: typeof import("recharts") | null;
+  loading: boolean;
+  students: StudentInfo[];
+  grades: GradeRecord[];
+  assessmentGrades: AssessmentGrade[];
+  activeTab: string;
+  topLevelTab: "exams" | "assessments";
+  selectedYear: string;
+};
+
+type Action =
+  | { type: 'SET_RECHARTS'; payload: typeof import("recharts") }
+  | { type: 'SET_LOADING'; payload: boolean }
+  | { type: 'SET_DATA'; payload: { students: StudentInfo[]; grades: GradeRecord[]; assessmentGrades: AssessmentGrade[] } }
+  | { type: 'SET_ACTIVE_TAB'; payload: string }
+  | { type: 'SET_TOP_LEVEL_TAB'; payload: "exams" | "assessments" }
+  | { type: 'SET_SELECTED_YEAR'; payload: string };
+
+function reducer(state: State, action: Action): State {
+  switch (action.type) {
+    case 'SET_RECHARTS':
+      return { ...state, recharts: action.payload };
+    case 'SET_LOADING':
+      return { ...state, loading: action.payload };
+    case 'SET_DATA':
+      return { ...state, ...action.payload };
+    case 'SET_ACTIVE_TAB':
+      return { ...state, activeTab: action.payload };
+    case 'SET_TOP_LEVEL_TAB':
+      return { ...state, topLevelTab: action.payload };
+    case 'SET_SELECTED_YEAR':
+      return { ...state, selectedYear: action.payload };
+    default:
+      return state;
+  }
+}
+
 export function StudentGrades({ initialTab }: { initialTab?: "exams" | "assessments" }) {
   const { currentUser } = useAppStore();
-  const [recharts, setRecharts] = useState<typeof import("recharts") | null>(null);
+  
+  const initialState: State = {
+    recharts: null,
+    loading: true,
+    students: [],
+    grades: [],
+    assessmentGrades: [],
+    activeTab: "all",
+    topLevelTab: initialTab || "exams",
+    selectedYear: "",
+  };
+
+  const [state, dispatch] = useReducer(reducer, initialState);
+  const {
+    recharts,
+    loading,
+    students,
+    grades,
+    assessmentGrades,
+    activeTab,
+    topLevelTab,
+    selectedYear,
+  } = state;
 
   useEffect(() => {
-    import("recharts").then(setRecharts);
+    import("recharts").then((mod) => dispatch({ type: 'SET_RECHARTS', payload: mod }));
   }, []);
 
   const params = useParams();
   const router = useRouter();
   const slug = typeof params?.slug === 'string' ? params.slug : '';
   const { academicYears } = useAcademicYears();
-  const [loading, setLoading] = useState(true);
-  const [students, setStudents] = useState<StudentInfo[]>([]);
-  const [grades, setGrades] = useState<GradeRecord[]>([]);
-  const [assessmentGrades, setAssessmentGrades] = useState<AssessmentGrade[]>([]);
-  const [activeTab, setActiveTab] = useState("all");
-  const [topLevelTab, setTopLevelTab] = useState<"exams" | "assessments">(initialTab || "exams");
-  const [selectedYear, setSelectedYear] = useState<string>("");
 
-  const student = Array.isArray(students)
-    ? students.find((s) => s.email === currentUser?.email) || null
-    : null;
+  const student = useMemo(() => {
+    return Array.isArray(students)
+      ? students.find((s) => s.email === currentUser?.email) || null
+      : null;
+  }, [students, currentUser?.email]);
 
   // Set default selected year to current once loaded
   useEffect(() => {
     if (academicYears.length > 0 && !selectedYear) {
       const current = academicYears.find((y: any) => y.isCurrent) || academicYears[0];
-      if (current) setSelectedYear(current.name);
+      if (current) dispatch({ type: 'SET_SELECTED_YEAR', payload: current.name });
     }
   }, [academicYears, selectedYear]);
 
   const fetchData = useCallback(async () => {
-    setLoading(true);
+    dispatch({ type: 'SET_LOADING', payload: true });
     try {
       const res = await apiFetch("/api/students/me");
       if (!res.ok) throw new Error("Failed to fetch student profile");
       const targetStudent = await res.json();
       
-      setStudents([targetStudent]);
+      let fetchedGrades: GradeRecord[] = [];
+      let fetchedAssessments: AssessmentGrade[] = [];
 
       if (targetStudent?.id) {
         const [gradesData, assessData] = await Promise.all([
           apiFetch(`/api/grades?studentId=${targetStudent.id}`).then((res) => res.json()),
           apiFetch(`/api/assessments/student-grades?studentId=${targetStudent.id}`).then((res) => res.json())
         ]);
-        setGrades(Array.isArray(gradesData) ? gradesData : []);
-        setAssessmentGrades(Array.isArray(assessData) ? assessData : []);
+        fetchedGrades = Array.isArray(gradesData) ? gradesData : [];
+        fetchedAssessments = Array.isArray(assessData) ? assessData : [];
       }
+      
+      dispatch({ 
+        type: 'SET_DATA', 
+        payload: { 
+          students: [targetStudent], 
+          grades: fetchedGrades, 
+          assessmentGrades: fetchedAssessments 
+        } 
+      });
     } catch (e) {
       console.error(e);
     } finally {
-      setLoading(false);
+      dispatch({ type: 'SET_LOADING', payload: false });
     }
-  }, [currentUser?.email]);
+  }, []);
 
   useEffect(() => {
     fetchData();
   }, [fetchData]);
-
-  const studentId = student?.id || "";
 
   // Filter grades by academic year
   const yearFilteredGrades = useMemo(() => {
@@ -246,7 +309,7 @@ export function StudentGrades({ initialTab }: { initialTab?: "exams" | "assessme
         {topLevelTab === "exams" && (
           <div className="flex items-center gap-2 flex-wrap">
             {academicYears.length > 0 && (
-              <Select value={selectedYear} onValueChange={setSelectedYear}>
+              <Select value={selectedYear} onValueChange={(v) => dispatch({ type: 'SET_SELECTED_YEAR', payload: v })}>
                 <SelectTrigger className="w-[160px] h-9 text-sm">
                   <SelectValue placeholder="Academic Year" />
                 </SelectTrigger>
@@ -490,7 +553,7 @@ export function StudentGrades({ initialTab }: { initialTab?: "exams" | "assessme
               <Tabs
                 defaultValue="all"
                 value={activeTab}
-                onValueChange={setActiveTab}
+                onValueChange={(v) => dispatch({ type: 'SET_ACTIVE_TAB', payload: v })}
               >
                 <TabsList className="mb-4 bg-zinc-50 dark:bg-zinc-900 p-1">
                   <TabsTrigger value="all" className="text-xs">All Exams</TabsTrigger>

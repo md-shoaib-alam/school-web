@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo, useCallback, useEffect } from "react";
+import { useReducer, useMemo, useCallback, useEffect } from "react";
 import { 
   useCustomRoles, 
   useStaff, 
@@ -27,9 +27,106 @@ import { AssignRoleDialog } from "./roles/AssignRoleDialog";
 import type { RoleRecord } from "./roles/types";
 import { RoleSkeleton } from "./roles/RoleSkeleton";
 
+type State = {
+  viewMode: 'grid' | 'table';
+  dialogOpen: boolean;
+  editingRole: RoleRecord | null;
+  saving: boolean;
+  assignOpen: boolean;
+  activeRole: RoleRecord | null;
+  assigningLoading: string | null;
+  searchQuery: string;
+  name: string;
+  description: string;
+  color: string;
+  permissions: Record<string, string[]>;
+};
+
+type Action =
+  | { type: 'SET_VIEW_MODE'; payload: 'grid' | 'table' }
+  | { type: 'SET_DIALOG_OPEN'; payload: boolean }
+  | { type: 'OPEN_CREATE_DIALOG' }
+  | { type: 'OPEN_EDIT_DIALOG'; payload: RoleRecord }
+  | { type: 'SET_SAVING'; payload: boolean }
+  | { type: 'OPEN_ASSIGN_DIALOG'; payload: RoleRecord }
+  | { type: 'SET_ASSIGN_OPEN'; payload: boolean }
+  | { type: 'SET_ASSIGNING_LOADING'; payload: string | null }
+  | { type: 'SET_SEARCH_QUERY'; payload: string }
+  | { type: 'SET_FORM'; payload: Partial<Pick<State, 'name' | 'description' | 'color' | 'permissions'>> };
+
+const initialState: State = {
+  viewMode: 'grid',
+  dialogOpen: false,
+  editingRole: null,
+  saving: false,
+  assignOpen: false,
+  activeRole: null,
+  assigningLoading: null,
+  searchQuery: "",
+  name: "",
+  description: "",
+  color: "#6366f1",
+  permissions: {},
+};
+
+function reducer(state: State, action: Action): State {
+  switch (action.type) {
+    case 'SET_VIEW_MODE': return { ...state, viewMode: action.payload };
+    case 'SET_DIALOG_OPEN': return { ...state, dialogOpen: action.payload };
+    case 'OPEN_CREATE_DIALOG':
+      return {
+        ...state,
+        editingRole: null,
+        name: "",
+        description: "",
+        color: "#6366f1",
+        permissions: {},
+        dialogOpen: true
+      };
+    case 'OPEN_EDIT_DIALOG': {
+      const role = action.payload;
+      let perms = {};
+      if (typeof role.permissions === 'string') {
+        try {
+          if (role.permissions !== "[object Object]") {
+            perms = JSON.parse(role.permissions || "{}");
+          }
+        } catch (e) {
+          console.error("Malformed permissions JSON:", e);
+        }
+      } else {
+        perms = role.permissions || {};
+      }
+      return {
+        ...state,
+        editingRole: role,
+        name: role.name,
+        description: role.description || "",
+        color: role.color || "#6366f1",
+        permissions: perms,
+        dialogOpen: true
+      };
+    }
+    case 'SET_SAVING': return { ...state, saving: action.payload };
+    case 'OPEN_ASSIGN_DIALOG':
+      return { ...state, activeRole: action.payload, assignOpen: true, searchQuery: "" };
+    case 'SET_ASSIGN_OPEN': return { ...state, assignOpen: action.payload };
+    case 'SET_ASSIGNING_LOADING': return { ...state, assigningLoading: action.payload };
+    case 'SET_SEARCH_QUERY': return { ...state, searchQuery: action.payload };
+    case 'SET_FORM': return { ...state, ...action.payload };
+    default: return state;
+  }
+}
+
 export function AdminRoles() {
   const { currentTenantId } = useAppStore();
   
+  const [state, dispatch] = useReducer(reducer, initialState);
+  const {
+    viewMode, dialogOpen, editingRole, saving, assignOpen, activeRole,
+    assigningLoading, searchQuery, name, description, color, permissions
+  } = state;
+
   // --- Queries ---
   const { 
     data: roles = [], 
@@ -51,35 +148,17 @@ export function AdminRoles() {
   const { mutateAsync: deleteRole } = useDeleteCustomRole();
   const { mutateAsync: assignRoleMut } = useAssignRoleToUser();
 
-  const [viewMode, setViewMode] = useState<'grid' | 'table'>('grid');
-
   // Load view mode preference
   useEffect(() => {
     const saved = localStorage.getItem('roles_view_mode') as 'grid' | 'table';
-    if (saved) setViewMode(saved);
+    if (saved) dispatch({ type: 'SET_VIEW_MODE', payload: saved });
   }, []);
 
   // Save view mode preference
   const toggleView = (mode: 'grid' | 'table') => {
-    setViewMode(mode);
+    dispatch({ type: 'SET_VIEW_MODE', payload: mode });
     localStorage.setItem('roles_view_mode', mode);
   };
-
-  const [dialogOpen, setDialogOpen] = useState(false);
-  const [editingRole, setEditingRole] = useState<RoleRecord | null>(null);
-  const [saving, setSaving] = useState(false);
-
-  // Assign dialog state
-  const [assignOpen, setAssignOpen] = useState(false);
-  const [activeRole, setActiveRole] = useState<RoleRecord | null>(null);
-  const [assigningLoading, setAssigningLoading] = useState<string | null>(null);
-  const [searchQuery, setSearchQuery] = useState("");
-
-  // Form state
-  const [name, setName] = useState("");
-  const [description, setDescription] = useState("");
-  const [color, setColor] = useState("#6366f1");
-  const [permissions, setPermissions] = useState<Record<string, string[]>>({});
 
   // Computed lists for assignment
   const { assignedUsers, availableUsers } = useMemo(() => {
@@ -90,46 +169,9 @@ export function AdminRoles() {
   }, [allStaff, activeRole]);
 
   // --- Handlers ---
-  const openCreateDialog = () => {
-    setEditingRole(null);
-    setName("");
-    setDescription("");
-    setColor("#6366f1");
-    setPermissions({});
-    setDialogOpen(true);
-  };
-
-  const openEditDialog = (role: RoleRecord) => {
-    setEditingRole(role);
-    setName(role.name);
-    setDescription(role.description || "");
-    setColor(role.color || "#6366f1");
-    
-    let perms = {};
-    if (typeof role.permissions === 'string') {
-      try {
-        if (role.permissions !== "[object Object]") {
-          perms = JSON.parse(role.permissions || "{}");
-        }
-      } catch (e) {
-        console.error("Malformed permissions JSON:", e);
-      }
-    } else {
-      perms = role.permissions || {};
-    }
-    setPermissions(perms);
-    setDialogOpen(true);
-  };
-
-  const openAssignDialog = (role: RoleRecord) => {
-    setActiveRole(role);
-    setAssignOpen(true);
-    setSearchQuery("");
-  };
-
   const handleAssignChange = async (userId: string, targetRoleId: string | null) => {
     if (!currentTenantId) return;
-    setAssigningLoading(userId);
+    dispatch({ type: 'SET_ASSIGNING_LOADING', payload: userId });
     try {
       await assignRoleMut({
         userId,
@@ -141,7 +183,7 @@ export function AdminRoles() {
     } catch (err: any) {
       toast.error(err.message || "Assignment failed");
     } finally {
-      setAssigningLoading(null);
+      dispatch({ type: 'SET_ASSIGNING_LOADING', payload: null });
     }
   };
 
@@ -150,7 +192,7 @@ export function AdminRoles() {
       toast.error("Role name is required");
       return;
     }
-    setSaving(true);
+    dispatch({ type: 'SET_SAVING', payload: true });
     try {
       if (editingRole) {
         await updateRole({
@@ -169,12 +211,12 @@ export function AdminRoles() {
           permissions,
         });
       }
-      setDialogOpen(false);
+      dispatch({ type: 'SET_DIALOG_OPEN', payload: false });
       fetchRoles();
     } catch (err: any) {
       toast.error(err.message || "Failed to save role");
     } finally {
-      setSaving(false);
+      dispatch({ type: 'SET_SAVING', payload: false });
     }
   };
 
@@ -236,7 +278,7 @@ export function AdminRoles() {
             </Button>
           </div>
 
-          <Button onClick={openCreateDialog} className="bg-emerald-600 hover:bg-emerald-700 text-white">
+          <Button onClick={() => dispatch({ type: 'OPEN_CREATE_DIALOG' })} className="bg-emerald-600 hover:bg-emerald-700 text-white">
             <Plus className="size-4 mr-2" /> Create Role
           </Button>
         </div>
@@ -247,7 +289,7 @@ export function AdminRoles() {
           <CardContent className="flex flex-col items-center justify-center py-16 text-zinc-400">
             <Shield className="size-12 mb-3 opacity-40" />
             <p className="text-lg font-medium">No custom roles yet</p>
-            <Button onClick={openCreateDialog} variant="outline" className="mt-4">
+            <Button onClick={() => dispatch({ type: 'OPEN_CREATE_DIALOG' })} variant="outline" className="mt-4">
               <Plus className="size-4 mr-2" /> Create Role
             </Button>
           </CardContent>
@@ -260,8 +302,8 @@ export function AdminRoles() {
               <RoleCard
                 key={role.id}
                 role={{ ...role, userCount: count }}
-                onEdit={openEditDialog}
-                onAssign={openAssignDialog}
+                onEdit={(r) => dispatch({ type: 'OPEN_EDIT_DIALOG', payload: r })}
+                onAssign={(r) => dispatch({ type: 'OPEN_ASSIGN_DIALOG', payload: r })}
                 onDelete={handleDeleteRole}
               />
             );
@@ -273,37 +315,37 @@ export function AdminRoles() {
             ...role,
             userCount: allStaff.filter(u => u.customRole?.id === role.id).length
           }))}
-          onEdit={openEditDialog}
-          onAssign={openAssignDialog}
+          onEdit={(r) => dispatch({ type: 'OPEN_EDIT_DIALOG', payload: r })}
+          onAssign={(r) => dispatch({ type: 'OPEN_ASSIGN_DIALOG', payload: r })}
           onDelete={handleDeleteRole}
         />
       )}
 
       <RoleDialog
         open={dialogOpen}
-        onOpenChange={setDialogOpen}
+        onOpenChange={(v) => dispatch({ type: 'SET_DIALOG_OPEN', payload: v })}
         editingRole={editingRole}
         name={name}
-        setName={setName}
+        setName={(v) => dispatch({ type: 'SET_FORM', payload: { name: v } })}
         description={description}
-        setDescription={setDescription}
+        setDescription={(v) => dispatch({ type: 'SET_FORM', payload: { description: v } })}
         color={color}
-        setColor={setColor}
+        setColor={(v) => dispatch({ type: 'SET_FORM', payload: { color: v } })}
         permissions={permissions}
-        setPermissions={setPermissions}
+        setPermissions={(v) => dispatch({ type: 'SET_FORM', payload: { permissions: v } })}
         saving={saving}
         onSave={handleSave}
       />
 
       <AssignRoleDialog
         open={assignOpen}
-        onOpenChange={setAssignOpen}
+        onOpenChange={(v) => dispatch({ type: 'SET_ASSIGN_OPEN', payload: v })}
         activeRole={activeRole}
         loading={assignLoading}
         assignedUsers={assignedUsers}
         filteredAvailable={filteredAvailable}
         searchQuery={searchQuery}
-        setSearchQuery={setSearchQuery}
+        setSearchQuery={(v) => dispatch({ type: 'SET_SEARCH_QUERY', payload: v })}
         assigningLoading={assigningLoading}
         onAssignChange={handleAssignChange}
       />

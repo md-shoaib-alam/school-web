@@ -9,13 +9,13 @@ import { goeyToast as toast } from "goey-toast";
 import { differenceInDays } from "date-fns";
 
 // Sub-components
-import { SubscriptionAlert } from "./dashboard/SubscriptionAlert";
-import { WelcomeBanner } from "./dashboard/WelcomeBanner";
-import { MetricStats } from "./dashboard/MetricStats";
-import { AttendanceTrend } from "./dashboard/AttendanceTrend";
-import { ClassDistribution } from "./dashboard/ClassDistribution";
-import { FeeCollection } from "./dashboard/FeeCollection";
-import { RecentNotices } from "./dashboard/RecentNotices";
+import { SubscriptionAlert } from "./dashboard_components/SubscriptionAlert";
+import { WelcomeBanner } from "./dashboard_components/WelcomeBanner";
+import { MetricStats } from "./dashboard_components/MetricStats";
+import { AttendanceTrend } from "./dashboard_components/AttendanceTrend";
+import { ClassDistribution } from "./dashboard_components/ClassDistribution";
+import { FeeCollection } from "./dashboard_components/FeeCollection";
+import { RecentNotices } from "./dashboard_components/RecentNotices";
 
 function getDaysRemaining(endDate?: string | null) {
   if (!endDate) return null;

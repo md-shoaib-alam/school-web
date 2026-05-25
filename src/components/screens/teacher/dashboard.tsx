@@ -8,12 +8,12 @@ import { goeyToast as toast } from "goey-toast";
 import { FullPageSkeleton } from "@/components/ui/full-page-skeleton";
 
 // Sub-components
-import { TeacherStats } from "./dashboard/TeacherStats";
-import { TodaySchedule } from "./dashboard/TodaySchedule";
-import { QuickActions } from "./dashboard/QuickActions";
-import { TeacherSubjects } from "./dashboard/TeacherSubjects";
-import { RecentAssignments } from "./dashboard/RecentAssignments";
-import { MyClassesOverview } from "./dashboard/MyClassesOverview";
+import { TeacherStats } from "./dashboard_components/TeacherStats";
+import { TodaySchedule } from "./dashboard_components/TodaySchedule";
+import { QuickActions } from "./dashboard_components/QuickActions";
+import { TeacherSubjects } from "./dashboard_components/TeacherSubjects";
+import { RecentAssignments } from "./dashboard_components/RecentAssignments";
+import { MyClassesOverview } from "./dashboard_components/MyClassesOverview";
 
 const formatTime = (time: string) => {
   try {

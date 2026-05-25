@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useReducer } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { BookOpen, Eye } from "lucide-react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
@@ -29,6 +29,74 @@ interface SubjectInfo {
 }
 
 const emptyForm = { name: "", code: "", classId: "", teacherId: "" };
+
+type State = {
+  search: string;
+  classFilter: string;
+  createOpen: boolean;
+  form: typeof emptyForm;
+  editOpen: boolean;
+  editForm: { id: string } & typeof emptyForm;
+  deleteDialogOpen: boolean;
+  deleteTarget: SubjectInfo | null;
+};
+
+type Action =
+  | { type: 'SET_SEARCH'; payload: string }
+  | { type: 'SET_CLASS_FILTER'; payload: string }
+  | { type: 'SET_CREATE_OPEN'; payload: boolean }
+  | { type: 'SET_FORM'; payload: Partial<typeof emptyForm> }
+  | { type: 'OPEN_EDIT'; payload: SubjectInfo }
+  | { type: 'SET_EDIT_OPEN'; payload: boolean }
+  | { type: 'SET_EDIT_FORM'; payload: Partial<{ id: string } & typeof emptyForm> }
+  | { type: 'OPEN_DELETE'; payload: SubjectInfo }
+  | { type: 'SET_DELETE_OPEN'; payload: boolean };
+
+const initialState: State = {
+  search: "",
+  classFilter: "all",
+  createOpen: false,
+  form: { ...emptyForm },
+  editOpen: false,
+  editForm: { id: "", ...emptyForm },
+  deleteDialogOpen: false,
+  deleteTarget: null,
+};
+
+function reducer(state: State, action: Action): State {
+  switch (action.type) {
+    case 'SET_SEARCH':
+      return { ...state, search: action.payload };
+    case 'SET_CLASS_FILTER':
+      return { ...state, classFilter: action.payload };
+    case 'SET_CREATE_OPEN':
+      return { ...state, createOpen: action.payload, form: action.payload ? state.form : { ...emptyForm } };
+    case 'SET_FORM':
+      return { ...state, form: { ...state.form, ...action.payload } };
+    case 'OPEN_EDIT':
+      return {
+        ...state,
+        editOpen: true,
+        editForm: {
+          id: action.payload.id,
+          name: action.payload.name,
+          code: action.payload.code,
+          classId: action.payload.classId,
+          teacherId: action.payload.teacherId || "",
+        },
+      };
+    case 'SET_EDIT_OPEN':
+      return { ...state, editOpen: action.payload };
+    case 'SET_EDIT_FORM':
+      return { ...state, editForm: { ...state.editForm, ...action.payload } };
+    case 'OPEN_DELETE':
+      return { ...state, deleteDialogOpen: true, deleteTarget: action.payload };
+    case 'SET_DELETE_OPEN':
+      return { ...state, deleteDialogOpen: action.payload, deleteTarget: action.payload ? state.deleteTarget : null };
+    default:
+      return state;
+  }
+}
 
 export function AdminSubjects() {
   const { currentTenantId } = useAppStore();
@@ -62,15 +130,19 @@ export function AdminSubjects() {
     },
   });
 
-  const [search, setSearch] = useState("");
-  const [classFilter, setClassFilter] = useState("all");
+  const [state, dispatch] = useReducer(reducer, initialState);
+  const {
+    search,
+    classFilter,
+    createOpen,
+    form,
+    editOpen,
+    editForm,
+    deleteDialogOpen,
+    deleteTarget,
+  } = state;
+
   const [viewMode, setViewMode] = useViewMode("subjects", "table");
-  const [createOpen, setCreateOpen] = useState(false);
-  const [form, setForm] = useState({ ...emptyForm });
-  const [editOpen, setEditOpen] = useState(false);
-  const [editForm, setEditForm] = useState({ id: "", ...emptyForm });
-  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  const [deleteTarget, setDeleteTarget] = useState<SubjectInfo | null>(null);
 
   const createMutation = useMutation({
     mutationFn: async (data: any) => {
@@ -128,7 +200,10 @@ export function AdminSubjects() {
     }
     const promise = createMutation.mutateAsync({ ...form, teacherId: form.teacherId || null });
     toast.promise(promise, { loading: "Creating subject...", success: "Subject created successfully!", error: (err: any) => err.message || "Failed to create subject" });
-    try { await promise; setCreateOpen(false); setForm({ ...emptyForm }); } catch {}
+    try {
+      await promise;
+      dispatch({ type: 'SET_CREATE_OPEN', payload: false });
+    } catch {}
   };
 
   const handleEdit = async () => {
@@ -138,18 +213,20 @@ export function AdminSubjects() {
     }
     const promise = updateMutation.mutateAsync({ ...editForm, teacherId: editForm.teacherId || null });
     toast.promise(promise, { loading: "Updating subject...", success: "Subject updated successfully!", error: (err: any) => err.message || "Failed to update subject" });
-    try { await promise; setEditOpen(false); setEditForm({ id: "", ...emptyForm }); } catch {}
+    try {
+      await promise;
+      dispatch({ type: 'SET_EDIT_OPEN', payload: false });
+    } catch {}
   };
 
   const handleDelete = async () => {
     if (!deleteTarget) return;
     const promise = (async () => {
       await deleteMutation.mutateAsync(deleteTarget.id);
-      setDeleteDialogOpen(false);
-      setDeleteTarget(null);
-      throw new Error("Subject record removed");
+      dispatch({ type: 'SET_DELETE_OPEN', payload: false });
+      return "Subject record removed";
     })();
-    toast.promise(promise, { loading: "Deleting subject...", success: () => "", error: (err: any) => err.message });
+    toast.promise(promise, { loading: "Deleting subject...", success: (msg) => msg, error: (err: any) => err.message });
     try { await promise; } catch {}
   };
 
@@ -168,14 +245,14 @@ export function AdminSubjects() {
       <SubjectsHeader 
         totalSubjects={subjects.length}
         canCreate={canCreate}
-        onAddClick={() => setCreateOpen(true)}
+        onAddClick={() => dispatch({ type: 'SET_CREATE_OPEN', payload: true })}
       />
 
       <SubjectsFilters 
         search={search}
-        onSearchChange={setSearch}
+        onSearchChange={(v) => dispatch({ type: 'SET_SEARCH', payload: v })}
         classFilter={classFilter}
-        onClassFilterChange={setClassFilter}
+        onClassFilterChange={(v) => dispatch({ type: 'SET_CLASS_FILTER', payload: v })}
         classes={classes}
         viewMode={viewMode}
         setViewMode={setViewMode}
@@ -206,36 +283,36 @@ export function AdminSubjects() {
           filtered={filtered}
           canEdit={canEdit}
           canDelete={canDelete}
-          onEdit={(s) => { setEditForm({ id: s.id, name: s.name, code: s.code, classId: s.classId, teacherId: s.teacherId || "" }); setEditOpen(true); }}
-          onDelete={(s) => { setDeleteTarget(s); setDeleteDialogOpen(true); }}
+          onEdit={(s) => dispatch({ type: 'OPEN_EDIT', payload: s })}
+          onDelete={(s) => dispatch({ type: 'OPEN_DELETE', payload: s })}
         />
       ) : (
         <SubjectsGridView 
           filtered={filtered}
           canEdit={canEdit}
           canDelete={canDelete}
-          onEdit={(s) => { setEditForm({ id: s.id, name: s.name, code: s.code, classId: s.classId, teacherId: s.teacherId || "" }); setEditOpen(true); }}
-          onDelete={(s) => { setDeleteTarget(s); setDeleteDialogOpen(true); }}
+          onEdit={(s) => dispatch({ type: 'OPEN_EDIT', payload: s })}
+          onDelete={(s) => dispatch({ type: 'OPEN_DELETE', payload: s })}
         />
       )}
 
       <SubjectDialogs 
         createOpen={createOpen}
-        setCreateOpen={setCreateOpen}
+        setCreateOpen={(v) => dispatch({ type: 'SET_CREATE_OPEN', payload: v })}
         form={form}
-        setForm={setForm}
+        setForm={(v) => dispatch({ type: 'SET_FORM', payload: v })}
         classes={classes}
         teachers={teachers}
         onCreate={handleCreate}
         creating={createMutation.isPending}
         editOpen={editOpen}
-        setEditOpen={setEditOpen}
+        setEditOpen={(v) => dispatch({ type: 'SET_EDIT_OPEN', payload: v })}
         editForm={editForm}
-        setEditForm={setEditForm}
+        setEditForm={(v) => dispatch({ type: 'SET_EDIT_FORM', payload: v })}
         onEdit={handleEdit}
         updating={updateMutation.isPending}
         deleteOpen={deleteDialogOpen}
-        setDeleteOpen={setDeleteDialogOpen}
+        setDeleteOpen={(v) => dispatch({ type: 'SET_DELETE_OPEN', payload: v })}
         deleteTarget={deleteTarget}
         onDelete={handleDelete}
       />

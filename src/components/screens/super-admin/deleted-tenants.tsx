@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useReducer } from "react";
 import { 
   useTenants, 
   useRestoreTenant, 
@@ -26,9 +26,8 @@ import {
   Clock,
   Search
 } from "lucide-react";
-import { format, formatDistanceToNow, addDays, differenceInDays } from "date-fns";
+import { format, addDays, differenceInDays } from "date-fns";
 import { Input } from "@/components/ui/input";
-import { toast } from "sonner";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -50,16 +49,67 @@ const toSafeDate = (val: any): Date => {
   return new Date();
 };
 
+type State = {
+  search: string;
+  currentPage: number;
+  isRestoring: boolean;
+  isPurging: boolean;
+  selectedTenant: any;
+  restoreDialogOpen: boolean;
+  purgeDialogOpen: boolean;
+};
+
+type Action =
+  | { type: "SET_SEARCH"; payload: string }
+  | { type: "SET_CURRENT_PAGE"; payload: number }
+  | { type: "SET_IS_RESTORING"; payload: boolean }
+  | { type: "SET_IS_PURGING"; payload: boolean }
+  | { type: "SET_SELECTED_TENANT"; payload: any }
+  | { type: "SET_RESTORE_DIALOG_OPEN"; payload: boolean }
+  | { type: "SET_PURGE_DIALOG_OPEN"; payload: boolean };
+
+function reducer(state: State, action: Action): State {
+  switch (action.type) {
+    case "SET_SEARCH":
+      return { ...state, search: action.payload, currentPage: 1 };
+    case "SET_CURRENT_PAGE":
+      return { ...state, currentPage: action.payload };
+    case "SET_IS_RESTORING":
+      return { ...state, isRestoring: action.payload };
+    case "SET_IS_PURGING":
+      return { ...state, isPurging: action.payload };
+    case "SET_SELECTED_TENANT":
+      return { ...state, selectedTenant: action.payload };
+    case "SET_RESTORE_DIALOG_OPEN":
+      return { ...state, restoreDialogOpen: action.payload };
+    case "SET_PURGE_DIALOG_OPEN":
+      return { ...state, purgeDialogOpen: action.payload };
+    default:
+      return state;
+  }
+}
+
+const initialState: State = {
+  search: "",
+  currentPage: 1,
+  isRestoring: false,
+  isPurging: false,
+  selectedTenant: null,
+  restoreDialogOpen: false,
+  purgeDialogOpen: false,
+};
+
 export function SuperAdminDeletedTenants() {
-  const [search, setSearch] = useState("");
-  const [currentPage, setCurrentPage] = useState(1);
-  
-  const [isRestoring, setIsRestoring] = useState(false);
-  const [isPurging, setIsPurging] = useState(false);
-  
-  const [selectedTenant, setSelectedTenant] = useState<any>(null);
-  const [restoreDialogOpen, setRestoreDialogOpen] = useState(false);
-  const [purgeDialogOpen, setPurgeDialogOpen] = useState(false);
+  const [state, dispatch] = useReducer(reducer, initialState);
+  const {
+    search,
+    currentPage,
+    isRestoring,
+    isPurging,
+    selectedTenant,
+    restoreDialogOpen,
+    purgeDialogOpen,
+  } = state;
 
   // Specifically fetch deleted records using the "deleted" filter key
   const { data, isLoading, refetch } = useTenants({
@@ -84,29 +134,29 @@ export function SuperAdminDeletedTenants() {
 
   const handleRestore = async () => {
     if (!selectedTenant) return;
-    setIsRestoring(true);
+    dispatch({ type: "SET_IS_RESTORING", payload: true });
     try {
       await restoreMutation.mutateAsync(selectedTenant.id);
-      setRestoreDialogOpen(false);
+      dispatch({ type: "SET_RESTORE_DIALOG_OPEN", payload: false });
       refetch();
     } catch (err) {
       // Hook handles toast
     } finally {
-      setIsRestoring(false);
+      dispatch({ type: "SET_IS_RESTORING", payload: false });
     }
   };
 
   const handlePurge = async () => {
     if (!selectedTenant) return;
-    setIsPurging(true);
+    dispatch({ type: "SET_IS_PURGING", payload: true });
     try {
       await purgeMutation.mutateAsync(selectedTenant.id);
-      setPurgeDialogOpen(false);
+      dispatch({ type: "SET_PURGE_DIALOG_OPEN", payload: false });
       refetch();
     } catch (err) {
        // Hook handles toast
     } finally {
-      setIsPurging(false);
+      dispatch({ type: "SET_IS_PURGING", payload: false });
     }
   };
 
@@ -136,7 +186,7 @@ export function SuperAdminDeletedTenants() {
           placeholder="Search deleted schools..." 
           className="pl-9"
           value={search}
-          onChange={(e) => setSearch(e.target.value)}
+          onChange={(e) => dispatch({ type: "SET_SEARCH", payload: e.target.value })}
         />
       </div>
 
@@ -158,8 +208,7 @@ export function SuperAdminDeletedTenants() {
               <TableBody>
                 {isLoading ? (
                   <TableRow>
-                    <TableCell colSpan={4} className="h-24 text-center">Loading removal list...</TableCell>
-                  </TableRow>
+                    <TableCell colSpan={4} className="h-24 text-center">Loading removal list…</TableCell>                  </TableRow>
                 ) : tenants.length === 0 ? (
                   <TableRow>
                     <TableCell colSpan={4} className="h-32 text-center text-muted-foreground">
@@ -219,8 +268,8 @@ export function SuperAdminDeletedTenants() {
                               size="sm" 
                               className="gap-2 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-950/30 border-emerald-200 dark:border-emerald-800"
                               onClick={() => {
-                                setSelectedTenant(tenant);
-                                setRestoreDialogOpen(true);
+                                dispatch({ type: "SET_SELECTED_TENANT", payload: tenant });
+                                dispatch({ type: "SET_RESTORE_DIALOG_OPEN", payload: true });
                               }}
                             >
                               <RotateCcw className="size-3.5" />
@@ -231,8 +280,8 @@ export function SuperAdminDeletedTenants() {
                               size="sm" 
                               className="gap-2 text-destructive hover:text-destructive hover:bg-destructive/10"
                               onClick={() => {
-                                setSelectedTenant(tenant);
-                                setPurgeDialogOpen(true);
+                                dispatch({ type: "SET_SELECTED_TENANT", payload: tenant });
+                                dispatch({ type: "SET_PURGE_DIALOG_OPEN", payload: true });
                               }}
                             >
                               <Trash2 className="size-3.5" />
@@ -251,7 +300,7 @@ export function SuperAdminDeletedTenants() {
       </Card>
 
       {/* Restore Confirmation */}
-      <AlertDialog open={restoreDialogOpen} onOpenChange={setRestoreDialogOpen}>
+      <AlertDialog open={restoreDialogOpen} onOpenChange={(open) => dispatch({ type: "SET_RESTORE_DIALOG_OPEN", payload: open })}>
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Reinstate School?</AlertDialogTitle>
@@ -266,14 +315,14 @@ export function SuperAdminDeletedTenants() {
               disabled={isRestoring}
               className="bg-emerald-600 hover:bg-emerald-700"
             >
-              {isRestoring ? "Restoring..." : "Confirm Reactivation"}
+              {isRestoring ? "Restoring…" : "Confirm Reactivation"}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
 
       {/* Hard Delete Confirmation */}
-      <AlertDialog open={purgeDialogOpen} onOpenChange={setPurgeDialogOpen}>
+      <AlertDialog open={purgeDialogOpen} onOpenChange={(open) => dispatch({ type: "SET_PURGE_DIALOG_OPEN", payload: open })}>
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle className="text-destructive">Final Irrevocable Destruction?</AlertDialogTitle>
@@ -296,7 +345,7 @@ export function SuperAdminDeletedTenants() {
               disabled={isPurging}
               className="bg-destructive hover:bg-destructive/90 text-white"
             >
-              {isPurging ? "Purging Hardware Tracks..." : "Execute Data Scrub"}
+              {isPurging ? "Purging Hardware Tracks…" : "Execute Data Scrub"}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

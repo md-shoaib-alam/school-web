@@ -337,13 +337,22 @@ export function AdminAdmitCards() {
       
       toast.promise(
         (async () => {
-          const { handleAdmitCardPreviewNewTab } = await import('./admit-cards/admitCardPrinter');
+          const [
+            { handleAdmitCardPreviewNewTab },
+            { AdmitCardPrintPreview }
+          ] = await Promise.all([
+            import('./admit-cards/admitCardPreviewUtils'),
+            import('./admit-cards/admitCardPrinter')
+          ]);
+
           await handleAdmitCardPreviewNewTab({
             admitCards,
             classNameStr,
             classSection,
+            AdmitCardPrintPreview
           });
         })(),
+
         {
           loading: 'Loading admit card workspace...',
           success: 'Admit card workspace opened in a new tab!',

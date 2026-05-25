@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from 'react';
+import { useReducer, useMemo } from 'react';
 import { Button } from '@/components/ui/button';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiFetch } from '@/lib/api';
@@ -11,12 +11,81 @@ import { RoutesAndVehiclesView } from './transport/RoutesAndVehiclesView';
 import { StudentAssignmentsView } from './transport/StudentAssignmentsView';
 import { TransportDialogs } from './transport/TransportDialogs';
 
+type State = {
+  activeTab: 'routes' | 'assignments';
+  assignDialogOpen: boolean;
+  addRouteOpen: boolean;
+  addVehicleOpen: boolean;
+  assignmentData: { studentId: string; routeId: string; classId: string; startDate: string };
+  routeData: { name: string; fee: string; vehicleId: string };
+  vehicleData: { number: string; type: string; capacity: string; status: string };
+};
+
+type Action =
+  | { type: 'SET_ACTIVE_TAB'; payload: 'routes' | 'assignments' }
+  | { type: 'SET_ASSIGN_DIALOG'; payload: boolean }
+  | { type: 'SET_ROUTE_DIALOG'; payload: boolean }
+  | { type: 'SET_VEHICLE_DIALOG'; payload: boolean }
+  | { type: 'SET_ASSIGNMENT_DATA'; payload: Partial<State['assignmentData']> }
+  | { type: 'SET_ROUTE_DATA'; payload: Partial<State['routeData']> }
+  | { type: 'SET_VEHICLE_DATA'; payload: Partial<State['vehicleData']> }
+  | { type: 'RESET_ASSIGNMENT' }
+  | { type: 'RESET_ROUTE' }
+  | { type: 'RESET_VEHICLE' };
+
+const initialAssignmentData = { studentId: '', routeId: '', classId: '', startDate: new Date().toISOString().split('T')[0] };
+const initialRouteData = { name: '', fee: '', vehicleId: '' };
+const initialVehicleData = { number: '', type: 'bus', capacity: '40', status: 'active' };
+
+const initialState: State = {
+  activeTab: 'routes',
+  assignDialogOpen: false,
+  addRouteOpen: false,
+  addVehicleOpen: false,
+  assignmentData: initialAssignmentData,
+  routeData: initialRouteData,
+  vehicleData: initialVehicleData,
+};
+
+function reducer(state: State, action: Action): State {
+  switch (action.type) {
+    case 'SET_ACTIVE_TAB':
+      return { ...state, activeTab: action.payload };
+    case 'SET_ASSIGN_DIALOG':
+      return { ...state, assignDialogOpen: action.payload };
+    case 'SET_ROUTE_DIALOG':
+      return { ...state, addRouteOpen: action.payload };
+    case 'SET_VEHICLE_DIALOG':
+      return { ...state, addVehicleOpen: action.payload };
+    case 'SET_ASSIGNMENT_DATA':
+      return { ...state, assignmentData: { ...state.assignmentData, ...action.payload } };
+    case 'SET_ROUTE_DATA':
+      return { ...state, routeData: { ...state.routeData, ...action.payload } };
+    case 'SET_VEHICLE_DATA':
+      return { ...state, vehicleData: { ...state.vehicleData, ...action.payload } };
+    case 'RESET_ASSIGNMENT':
+      return { ...state, assignmentData: initialAssignmentData, assignDialogOpen: false };
+    case 'RESET_ROUTE':
+      return { ...state, routeData: initialRouteData, addRouteOpen: false };
+    case 'RESET_VEHICLE':
+      return { ...state, vehicleData: initialVehicleData, addVehicleOpen: false };
+    default:
+      return state;
+  }
+}
+
 export function TransportFeeTab() {
   const queryClient = useQueryClient();
-  const [activeTab, setActiveTab] = useState<'routes' | 'assignments'>('routes');
-  const [assignDialogOpen, setAssignDialogOpen] = useState(false);
-  const [addRouteOpen, setAddRouteOpen] = useState(false);
-  const [addVehicleOpen, setAddVehicleOpen] = useState(false);
+  const [state, dispatch] = useReducer(reducer, initialState);
+  const {
+    activeTab,
+    assignDialogOpen,
+    addRouteOpen,
+    addVehicleOpen,
+    assignmentData,
+    routeData,
+    vehicleData,
+  } = state;
 
   // ── Queries ──
   const { data: routes = [], isLoading: loadingRoutes } = useQuery({
@@ -71,8 +140,7 @@ export function TransportFeeTab() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['transport-assignments'] });
       queryClient.invalidateQueries({ queryKey: ['transport-routes'] });
-      setAssignDialogOpen(false);
-      setAssignmentData({ studentId: '', routeId: '', classId: '', startDate: new Date().toISOString().split('T')[0] });
+      dispatch({ type: 'RESET_ASSIGNMENT' });
       toast.success('Student assigned to route successfully');
     },
     onError: () => toast.error('Failed to assign student')
@@ -101,8 +169,7 @@ export function TransportFeeTab() {
     onSuccess: () => {
       toast.success('Route added successfully');
       queryClient.invalidateQueries({ queryKey: ['transport-routes'] });
-      setAddRouteOpen(false);
-      setRouteData({ name: '', fee: '', vehicleId: '' });
+      dispatch({ type: 'RESET_ROUTE' });
     },
     onError: () => toast.error('Error adding route')
   });
@@ -116,37 +183,31 @@ export function TransportFeeTab() {
     onSuccess: () => {
       toast.success('Vehicle added successfully');
       queryClient.invalidateQueries({ queryKey: ['vehicles'] });
-      setAddVehicleOpen(false);
-      setVehicleData({ number: '', type: 'bus', capacity: '40', status: 'active' });
+      dispatch({ type: 'RESET_VEHICLE' });
     },
     onError: () => toast.error('Error adding vehicle')
   });
 
-  // ── States ──
-  const [assignmentData, setAssignmentData] = useState({ studentId: '', routeId: '', classId: '', startDate: new Date().toISOString().split('T')[0] });
-  const [routeData, setRouteData] = useState({ name: '', fee: '', vehicleId: '' });
-  const [vehicleData, setVehicleData] = useState({ number: '', type: 'bus', capacity: '40', status: 'active' });
-
   return (
     <div className="space-y-4">
       <div className="flex gap-2 p-1 bg-muted rounded-lg w-fit">
-        <Button variant={activeTab === 'routes' ? 'default' : 'ghost'} size="sm" onClick={() => setActiveTab('routes')} className="h-8">Routes & Vehicles</Button>
-        <Button variant={activeTab === 'assignments' ? 'default' : 'ghost'} size="sm" onClick={() => setActiveTab('assignments')} className="h-8">Student Assignments</Button>
+        <Button variant={activeTab === 'routes' ? 'default' : 'ghost'} size="sm" onClick={() => dispatch({ type: 'SET_ACTIVE_TAB', payload: 'routes' })} className="h-8">Routes & Vehicles</Button>
+        <Button variant={activeTab === 'assignments' ? 'default' : 'ghost'} size="sm" onClick={() => dispatch({ type: 'SET_ACTIVE_TAB', payload: 'assignments' })} className="h-8">Student Assignments</Button>
       </div>
 
       {activeTab === 'routes' ? (
         <RoutesAndVehiclesView 
           loadingRoutes={loadingRoutes}
           routes={routes}
-          onAddRoute={() => setAddRouteOpen(true)}
+          onAddRoute={() => dispatch({ type: 'SET_ROUTE_DIALOG', payload: true })}
           vehicles={vehicles}
-          onAddVehicle={() => setAddVehicleOpen(true)}
+          onAddVehicle={() => dispatch({ type: 'SET_VEHICLE_DIALOG', payload: true })}
         />
       ) : (
         <StudentAssignmentsView 
           loadingAssignments={loadingAssignments}
           assignments={assignments}
-          onAssignClick={() => setAssignDialogOpen(true)}
+          onAssignClick={() => dispatch({ type: 'SET_ASSIGN_DIALOG', payload: true })}
           onDelete={(id) => deleteMutation.mutate(id)}
           deletingId={deleteMutation.variables as string}
           isDeleting={deleteMutation.isPending}
@@ -155,9 +216,15 @@ export function TransportFeeTab() {
 
       <TransportDialogs 
         assignOpen={assignDialogOpen}
-        onAssignOpenChange={setAssignDialogOpen}
+        onAssignOpenChange={(open) => dispatch({ type: 'SET_ASSIGN_DIALOG', payload: open })}
         assignmentData={assignmentData}
-        setAssignmentData={setAssignmentData}
+        setAssignmentData={(data: any) => {
+            if (typeof data === 'function') {
+                dispatch({ type: 'SET_ASSIGNMENT_DATA', payload: data(assignmentData) });
+            } else {
+                dispatch({ type: 'SET_ASSIGNMENT_DATA', payload: data });
+            }
+        }}
         classes={classes}
         students={students}
         routes={routes}
@@ -165,17 +232,29 @@ export function TransportFeeTab() {
         assigning={assignMutation.isPending}
 
         routeOpen={addRouteOpen}
-        onRouteOpenChange={setAddRouteOpen}
+        onRouteOpenChange={(open) => dispatch({ type: 'SET_ROUTE_DIALOG', payload: open })}
         routeData={routeData}
-        setRouteData={setRouteData}
+        setRouteData={(data: any) => {
+            if (typeof data === 'function') {
+                dispatch({ type: 'SET_ROUTE_DATA', payload: data(routeData) });
+            } else {
+                dispatch({ type: 'SET_ROUTE_DATA', payload: data });
+            }
+        }}
         vehicles={vehicles}
         onRouteSubmit={() => addRouteMutation.mutate({ ...routeData, vehicleId: routeData.vehicleId === 'none' ? undefined : routeData.vehicleId })}
         addingRoute={addRouteMutation.isPending}
 
         vehicleOpen={addVehicleOpen}
-        onVehicleOpenChange={setAddVehicleOpen}
+        onVehicleOpenChange={(open) => dispatch({ type: 'SET_VEHICLE_DIALOG', payload: open })}
         vehicleData={vehicleData}
-        setVehicleData={setVehicleData}
+        setVehicleData={(data: any) => {
+            if (typeof data === 'function') {
+                dispatch({ type: 'SET_VEHICLE_DATA', payload: data(vehicleData) });
+            } else {
+                dispatch({ type: 'SET_VEHICLE_DATA', payload: data });
+            }
+        }}
         onVehicleSubmit={() => addVehicleMutation.mutate(vehicleData)}
         registeringVehicle={addVehicleMutation.isPending}
       />

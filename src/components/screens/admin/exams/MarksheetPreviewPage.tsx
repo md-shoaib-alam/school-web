@@ -1,7 +1,7 @@
 'use client';
 
 import { ExamRecord } from './types';
-import { useMemo, useState, useEffect, useRef } from 'react';
+import { useMemo, useState, useEffect, useRef, useReducer } from 'react';
 import { apiFetch } from '@/lib/api';
 import { goeyToast as toast } from 'goey-toast';
 import { useReactToPrint } from 'react-to-print';
@@ -23,6 +23,63 @@ interface MarksheetPreviewPageProps {
   examName?: string;
 }
 
+type State = {
+  selectedStudentId: string;
+  marksheetType: 'midterm' | 'final';
+  selectedTemplateId: string;
+  students: any[];
+  exams: ExamRecord[];
+  resultsMap: Record<string, any[]>;
+  loading: boolean;
+  printing: boolean;
+  zoomScale: number;
+};
+
+type Action =
+  | { type: 'SET_SELECTED_STUDENT_ID'; payload: string }
+  | { type: 'SET_MARKSHEET_TYPE'; payload: 'midterm' | 'final' }
+  | { type: 'SET_SELECTED_TEMPLATE_ID'; payload: string }
+  | { type: 'SET_DATA'; payload: Partial<State> }
+  | { type: 'SET_LOADING'; payload: boolean }
+  | { type: 'SET_PRINTING'; payload: boolean }
+  | { type: 'SET_ZOOM_SCALE'; payload: number }
+  | { type: 'RESET_FOR_CLASS' };
+
+const initialState: State = {
+  selectedStudentId: 'all',
+  marksheetType: 'midterm',
+  selectedTemplateId: 'classic',
+  students: [],
+  exams: [],
+  resultsMap: {},
+  loading: false,
+  printing: false,
+  zoomScale: 0.6,
+};
+
+function reducer(state: State, action: Action): State {
+  switch (action.type) {
+    case 'SET_SELECTED_STUDENT_ID':
+      return { ...state, selectedStudentId: action.payload };
+    case 'SET_MARKSHEET_TYPE':
+      return { ...state, marksheetType: action.payload };
+    case 'SET_SELECTED_TEMPLATE_ID':
+      return { ...state, selectedTemplateId: action.payload };
+    case 'SET_DATA':
+      return { ...state, ...action.payload };
+    case 'SET_LOADING':
+      return { ...state, loading: action.payload };
+    case 'SET_PRINTING':
+      return { ...state, printing: action.payload };
+    case 'SET_ZOOM_SCALE':
+      return { ...state, zoomScale: action.payload };
+    case 'RESET_FOR_CLASS':
+      return { ...state, selectedStudentId: 'all', marksheetType: 'midterm' };
+    default:
+      return state;
+  }
+}
+
 export function MarksheetPreviewPage({
   classId,
   classNameStr,
@@ -32,17 +89,24 @@ export function MarksheetPreviewPage({
   isStandalone = false,
   examName
 }: MarksheetPreviewPageProps) {
-  const [selectedStudentId, setSelectedStudentId] = useState<string>('all');
-  const [marksheetType, setMarksheetType] = useState<'midterm' | 'final'>('midterm');
-  const [selectedTemplateId, setSelectedTemplateId] = useState<string>('classic');
-  
-  const [students, setStudents] = useState<any[]>([]);
-  const [exams, setExams] = useState<ExamRecord[]>([]);
-  const [resultsMap, setResultsMap] = useState<Record<string, any[]>>({}); // examId -> results
-  
-  const [loading, setLoading] = useState<boolean>(false);
-  const [printing, setPrinting] = useState<boolean>(false);
-  const [zoomScale, setZoomScale] = useState<number>(0.6); // Default to 60% zoom so one full A4 sheet fits perfectly on screen!
+  const [state, dispatch] = useReducer(reducer, initialState);
+  const {
+    selectedStudentId,
+    marksheetType,
+    selectedTemplateId,
+    students,
+    exams,
+    resultsMap,
+    loading,
+    printing,
+    zoomScale
+  } = state;
+
+  const setSelectedStudentId = (id: string) => dispatch({ type: 'SET_SELECTED_STUDENT_ID', payload: id });
+  const setMarksheetType = (type: 'midterm' | 'final') => dispatch({ type: 'SET_MARKSHEET_TYPE', payload: type });
+  const setSelectedTemplateId = (id: string) => dispatch({ type: 'SET_SELECTED_TEMPLATE_ID', payload: id });
+  const setZoomScale = (scale: number) => dispatch({ type: 'SET_ZOOM_SCALE', payload: scale });
+  const setPrinting = (printing: boolean) => dispatch({ type: 'SET_PRINTING', payload: printing });
 
   const printContainerRef = useRef<HTMLDivElement>(null);
 
@@ -51,7 +115,7 @@ export function MarksheetPreviewPage({
     if (!classId) return;
 
     const loadData = async () => {
-      setLoading(true);
+      dispatch({ type: 'SET_LOADING', payload: true });
       try {
         // 1. Fetch Students & Completed Exams for this class, and Tenant Settings in parallel
         const [studentData, examData, settingsData] = await Promise.all([
@@ -63,7 +127,7 @@ export function MarksheetPreviewPage({
         ]);
 
         if (settingsData?.defaultMarksheetTemplateId) {
-          setSelectedTemplateId(settingsData.defaultMarksheetTemplateId);
+          dispatch({ type: 'SET_SELECTED_TEMPLATE_ID', payload: settingsData.defaultMarksheetTemplateId });
         }
 
         const loadedStudents = studentData.items || [];
@@ -79,10 +143,8 @@ export function MarksheetPreviewPage({
           });
         }
 
-        setStudents(loadedStudents);
-        setExams(completedExams);
-
         // 2. Fetch results in parallel for each completed exam
+        let resultsMapPayload: Record<string, any[]> = {};
         if (completedExams.length > 0) {
           const allResults = await Promise.all(
             completedExams.map(async (exam: ExamRecord) => {
@@ -96,29 +158,33 @@ export function MarksheetPreviewPage({
               }
             })
           );
-          const map: Record<string, any[]> = {};
           allResults.forEach(item => {
-            map[item.examId] = item.results;
+            resultsMapPayload[item.examId] = item.results;
           });
-          setResultsMap(map);
-        } else {
-          setResultsMap({});
         }
+
+        dispatch({
+          type: 'SET_DATA',
+          payload: {
+            students: loadedStudents,
+            exams: completedExams,
+            resultsMap: resultsMapPayload
+          }
+        });
       } catch (err) {
         console.error("Failed to load marksheet data:", err);
         toast.error("Failed to fetch exam results data");
       } finally {
-        setLoading(false);
+        dispatch({ type: 'SET_LOADING', payload: false });
       }
     };
 
     loadData();
-  }, [classId, academicYear]);
+  }, [classId, academicYear, examName]);
 
   // Clean student selection state when opened
   useEffect(() => {
-    setSelectedStudentId('all');
-    setMarksheetType('midterm');
+    dispatch({ type: 'RESET_FOR_CLASS' });
   }, [classId]);
 
   // Extract unique subjects from exams

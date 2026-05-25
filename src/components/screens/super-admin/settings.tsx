@@ -1,7 +1,7 @@
 "use client";
 
 import { apiFetch } from "@/lib/api";
-import { useState, useEffect } from "react";
+import { useEffect, useReducer } from "react";
 import { Globe, Settings, Save, Loader2, ShieldAlert } from "lucide-react";
 import { goeyToast as toast } from "goey-toast";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -19,66 +19,129 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
+type State = {
+  platformName: string;
+  supportEmail: string;
+  maintenanceMode: boolean;
+  maintenanceMessage: string;
+  loading: boolean;
+  savingAll: boolean;
+  savingMaintenance: boolean;
+  defaultLanguage: string;
+  defaultCurrency: string;
+};
+
+type Action =
+  | { type: 'SET_DATA'; payload: Partial<State> }
+  | { type: 'SET_LOADING'; payload: boolean }
+  | { type: 'SET_SAVING_ALL'; payload: boolean }
+  | { type: 'SET_SAVING_MAINTENANCE'; payload: boolean }
+  | { type: 'SET_PLATFORM_NAME'; payload: string }
+  | { type: 'SET_SUPPORT_EMAIL'; payload: string }
+  | { type: 'SET_MAINTENANCE_MODE'; payload: boolean }
+  | { type: 'SET_MAINTENANCE_MESSAGE'; payload: string }
+  | { type: 'SET_DEFAULT_LANGUAGE'; payload: string }
+  | { type: 'SET_DEFAULT_CURRENCY'; payload: string };
+
+const initialState: State = {
+  platformName: "SchoolSaaS",
+  supportEmail: "support@schoolsaas.com",
+  maintenanceMode: false,
+  maintenanceMessage: "Our platform is currently undergoing scheduled maintenance. We will be back shortly. Thank you for your patience!",
+  loading: true,
+  savingAll: false,
+  savingMaintenance: false,
+  defaultLanguage: "en",
+  defaultCurrency: "usd",
+};
+
+function reducer(state: State, action: Action): State {
+  switch (action.type) {
+    case 'SET_DATA':
+      return { ...state, ...action.payload };
+    case 'SET_LOADING':
+      return { ...state, loading: action.payload };
+    case 'SET_SAVING_ALL':
+      return { ...state, savingAll: action.payload };
+    case 'SET_SAVING_MAINTENANCE':
+      return { ...state, savingMaintenance: action.payload };
+    case 'SET_PLATFORM_NAME':
+      return { ...state, platformName: action.payload };
+    case 'SET_SUPPORT_EMAIL':
+      return { ...state, supportEmail: action.payload };
+    case 'SET_MAINTENANCE_MODE':
+      return { ...state, maintenanceMode: action.payload };
+    case 'SET_MAINTENANCE_MESSAGE':
+      return { ...state, maintenanceMessage: action.payload };
+    case 'SET_DEFAULT_LANGUAGE':
+      return { ...state, defaultLanguage: action.payload };
+    case 'SET_DEFAULT_CURRENCY':
+      return { ...state, defaultCurrency: action.payload };
+    default:
+      return state;
+  }
+}
+
 export function SuperAdminSettings() {
-  // Settings State
-  const [platformName, setPlatformName] = useState("SchoolSaaS");
-  const [supportEmail, setSupportEmail] = useState("support@schoolsaas.com");
-  const [maintenanceMode, setMaintenanceMode] = useState(false);
-  const [maintenanceMessage, setMaintenanceMessage] = useState(
-    "Our platform is currently undergoing scheduled maintenance. We will be back shortly. Thank you for your patience!",
-  );
-  
-  // Loading & Saving States
-  const [loading, setLoading] = useState(true);
-  const [savingAll, setSavingAll] = useState(false);
-  const [savingMaintenance, setSavingMaintenance] = useState(false);
-  const [defaultLanguage, setDefaultLanguage] = useState("en");
-  const [defaultCurrency, setDefaultCurrency] = useState("usd");
+  const [state, dispatch] = useReducer(reducer, initialState);
+  const {
+    platformName,
+    supportEmail,
+    maintenanceMode,
+    maintenanceMessage,
+    loading,
+    savingAll,
+    savingMaintenance,
+    defaultLanguage,
+    defaultCurrency,
+  } = state;
 
   // Fetch platform settings from DB on mount
   useEffect(() => {
     const fetchSettings = async () => {
-      setLoading(true);
+      dispatch({ type: 'SET_LOADING', payload: true });
       try {
         const res = await apiFetch("/api/platform-settings");
         if (res.ok) {
           const data = await res.json();
           if (Array.isArray(data)) {
+            const updates: Partial<State> = {};
             data.forEach((setting: { key: string; value: string }) => {
               switch (setting.key) {
                 case "platform_name":
-                  if (setting.value) setPlatformName(setting.value);
+                  if (setting.value) updates.platformName = setting.value;
                   break;
                 case "support_email":
-                  if (setting.value) setSupportEmail(setting.value);
+                  if (setting.value) updates.supportEmail = setting.value;
                   break;
                 case "default_language":
-                  if (setting.value) setDefaultLanguage(setting.value);
+                  if (setting.value) updates.defaultLanguage = setting.value;
                   break;
                 case "default_currency":
-                  if (setting.value) setDefaultCurrency(setting.value);
+                  if (setting.value) updates.defaultCurrency = setting.value;
                   break;
                 case "maintenance_mode":
-                  setMaintenanceMode(setting.value === "true");
+                  updates.maintenanceMode = setting.value === "true";
                   break;
                 case "maintenance_message":
-                  if (setting.value) setMaintenanceMessage(setting.value);
+                  if (setting.value) updates.maintenanceMessage = setting.value;
                   break;
               }
             });
+            dispatch({ type: 'SET_DATA', payload: updates });
           }
         }
       } catch {
         toast.error("Failed to load platform settings from database");
       } finally {
-        setLoading(false);
+        dispatch({ type: 'SET_LOADING', payload: false });
       }
     };
     fetchSettings();
   }, []);
 
   const handleMaintenanceToggle = async (enabled: boolean) => {
-    setSavingMaintenance(true);
+    dispatch({ type: 'SET_SAVING_MAINTENANCE', payload: true });
     try {
       const res = await apiFetch("/api/platform-settings", {
         method: "PUT",
@@ -86,7 +149,7 @@ export function SuperAdminSettings() {
         body: JSON.stringify({ key: "maintenance_mode", value: String(enabled) }),
       });
       if (res.ok) {
-        setMaintenanceMode(enabled);
+        dispatch({ type: 'SET_MAINTENANCE_MODE', payload: enabled });
         toast.success(enabled ? "Maintenance mode activated" : "Maintenance mode deactivated");
       } else {
         toast.error("Failed to update maintenance status");
@@ -94,12 +157,12 @@ export function SuperAdminSettings() {
     } catch {
       toast.error("Failed to connect to platform API");
     } finally {
-      setSavingMaintenance(false);
+      dispatch({ type: 'SET_SAVING_MAINTENANCE', payload: false });
     }
   };
 
   const handleSaveAll = async () => {
-    setSavingAll(true);
+    dispatch({ type: 'SET_SAVING_ALL', payload: true });
     try {
       const settingsToSave = [
         { key: "platform_name", value: platformName },
@@ -125,7 +188,7 @@ export function SuperAdminSettings() {
     } catch {
       toast.error("Error saving platform configurations");
     } finally {
-      setSavingAll(false);
+      dispatch({ type: 'SET_SAVING_ALL', payload: false });
     }
   };
 
@@ -180,7 +243,7 @@ export function SuperAdminSettings() {
                 <Input
                   id="platform-name"
                   value={platformName}
-                  onChange={(e) => setPlatformName(e.target.value)}
+                  onChange={(e) => dispatch({ type: 'SET_PLATFORM_NAME', payload: e.target.value })}
                   placeholder="e.g. SchoolSaaS"
                   className="rounded-xl focus-visible:ring-teal-500"
                 />
@@ -198,7 +261,7 @@ export function SuperAdminSettings() {
                   id="support-email"
                   type="email"
                   value={supportEmail}
-                  onChange={(e) => setSupportEmail(e.target.value)}
+                  onChange={(e) => dispatch({ type: 'SET_SUPPORT_EMAIL', payload: e.target.value })}
                   placeholder="e.g. support@platform.com"
                   className="rounded-xl focus-visible:ring-teal-500"
                 />
@@ -212,7 +275,10 @@ export function SuperAdminSettings() {
                 <Label htmlFor="default-language" className="text-sm font-semibold">
                   Default System Language
                 </Label>
-                <Select value={defaultLanguage} onValueChange={setDefaultLanguage}>
+                <Select
+                  value={defaultLanguage}
+                  onValueChange={(v) => dispatch({ type: 'SET_DEFAULT_LANGUAGE', payload: v })}
+                >
                   <SelectTrigger className="w-full rounded-xl focus:ring-teal-500" id="default-language">
                     <SelectValue placeholder="Select platform default language" />
                   </SelectTrigger>
@@ -236,7 +302,10 @@ export function SuperAdminSettings() {
                 <Label htmlFor="default-currency" className="text-sm font-semibold">
                   Default Platform Currency
                 </Label>
-                <Select value={defaultCurrency} onValueChange={setDefaultCurrency}>
+                <Select
+                  value={defaultCurrency}
+                  onValueChange={(v) => dispatch({ type: 'SET_DEFAULT_CURRENCY', payload: v })}
+                >
                   <SelectTrigger className="w-full rounded-xl focus:ring-teal-500" id="default-currency">
                     <SelectValue placeholder="Select platform currency" />
                   </SelectTrigger>
@@ -297,7 +366,7 @@ export function SuperAdminSettings() {
                     <Textarea
                       id="maintenance-message"
                       value={maintenanceMessage}
-                      onChange={(e) => setMaintenanceMessage(e.target.value)}
+                      onChange={(e) => dispatch({ type: 'SET_MAINTENANCE_MESSAGE', payload: e.target.value })}
                       placeholder="e.g. System upgrade in progress. Back online in 20 minutes."
                       className="min-h-[90px] rounded-xl border-amber-200 dark:border-amber-900 focus-visible:ring-amber-500 dark:bg-zinc-900 bg-white"
                     />

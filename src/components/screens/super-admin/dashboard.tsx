@@ -6,10 +6,10 @@ import { AlertTriangle, Loader2 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 
 // Sub-components
-import { DashboardHero } from "./dashboard/DashboardHero";
-import { StatusCards } from "./dashboard/StatusCards";
-import { GrowthCharts } from "./dashboard/GrowthCharts";
-import { TopPerformance } from "./dashboard/TopPerformance";
+import { DashboardHero } from "./dashboard_components/DashboardHero";
+import { StatusCards } from "./dashboard_components/StatusCards";
+import { GrowthCharts } from "./dashboard_components/GrowthCharts";
+import { TopPerformance } from "./dashboard_components/TopPerformance";
 
 
 export function SuperAdminDashboard() {

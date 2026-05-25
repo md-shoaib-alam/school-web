@@ -23,7 +23,7 @@ const inter = Inter({
   display: 'swap',
 });
 
-import { useEffect, useState, useMemo } from 'react';
+import { useEffect, useReducer, useMemo } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { apiFetch } from '@/lib/api';
 import { useAppStore } from '@/store/use-app-store';
@@ -34,32 +34,93 @@ import { useAcademicYears } from '@/hooks/use-academic-years';
 import type { ExamRecord } from '@/components/screens/admin/exams/types';
 import { MARKSHEET_TEMPLATES } from '@/components/screens/admin/exams/marksheet-templates';
 
+type State = {
+  loading: boolean;
+  studentInfo: any;
+  exams: ExamRecord[];
+  resultsMap: Record<string, any[]>;
+  marksheetType: 'midterm' | 'final';
+  selectedYear: string;
+  templateId: string;
+};
+
+type Action =
+  | { type: 'SET_LOADING'; payload: boolean }
+  | { type: 'SET_STUDENT_INFO'; payload: any }
+  | { type: 'SET_EXAMS'; payload: ExamRecord[] }
+  | { type: 'SET_RESULTS_MAP'; payload: Record<string, any[]> }
+  | { type: 'SET_MARKSHEET_TYPE'; payload: 'midterm' | 'final' }
+  | { type: 'SET_SELECTED_YEAR'; payload: string }
+  | { type: 'SET_TEMPLATE_ID'; payload: string }
+  | { type: 'LOAD_SUCCESS'; payload: { studentInfo: any; exams: ExamRecord[]; resultsMap: Record<string, any[]>; templateId?: string } };
+
+function reducer(state: State, action: Action): State {
+  switch (action.type) {
+    case 'SET_LOADING':
+      return { ...state, loading: action.payload };
+    case 'SET_STUDENT_INFO':
+      return { ...state, studentInfo: action.payload };
+    case 'SET_EXAMS':
+      return { ...state, exams: action.payload };
+    case 'SET_RESULTS_MAP':
+      return { ...state, resultsMap: action.payload };
+    case 'SET_MARKSHEET_TYPE':
+      return { ...state, marksheetType: action.payload };
+    case 'SET_SELECTED_YEAR':
+      return { ...state, selectedYear: action.payload };
+    case 'SET_TEMPLATE_ID':
+      return { ...state, templateId: action.payload };
+    case 'LOAD_SUCCESS':
+      return {
+        ...state,
+        loading: false,
+        studentInfo: action.payload.studentInfo,
+        exams: action.payload.exams,
+        resultsMap: action.payload.resultsMap,
+        templateId: action.payload.templateId ?? state.templateId,
+      };
+    default:
+      return state;
+  }
+}
+
+const initialState: State = {
+  loading: true,
+  studentInfo: null,
+  exams: [],
+  resultsMap: {},
+  marksheetType: 'midterm',
+  selectedYear: '',
+  templateId: 'classic',
+};
+
 export function StudentMarksheet() {
-  const { currentUser } = useAppStore();
   const { academicYears } = useAcademicYears();
   const searchParams = useSearchParams();
   const studentIdParam = searchParams.get('studentId');
 
-  const [loading, setLoading] = useState(true);
-  const [studentInfo, setStudentInfo] = useState<any>(null);
-  const [exams, setExams] = useState<ExamRecord[]>([]);
-  const [resultsMap, setResultsMap] = useState<Record<string, any[]>>({});
-  const [marksheetType, setMarksheetType] = useState<'midterm' | 'final'>('midterm');
-  const [selectedYear, setSelectedYear] = useState('');
+  const [state, dispatch] = useReducer(reducer, initialState);
+  const {
+    loading,
+    studentInfo,
+    exams,
+    resultsMap,
+    marksheetType,
+    selectedYear,
+    templateId,
+  } = state;
 
   useEffect(() => {
     if (academicYears.length > 0 && !selectedYear) {
       const current = academicYears.find((y: any) => y.isCurrent) || academicYears[0];
-      if (current) setSelectedYear(current.name);
+      if (current) dispatch({ type: 'SET_SELECTED_YEAR', payload: current.name });
     }
   }, [academicYears, selectedYear]);
-
-  const [templateId, setTemplateId] = useState<string>('classic');
 
   useEffect(() => {
     if (!selectedYear) return;
     const load = async () => {
-      setLoading(true);
+      dispatch({ type: 'SET_LOADING', payload: true });
       try {
         const studentUrl = studentIdParam ? `/api/students/${studentIdParam}` : '/api/students/me';
         const [meRes, settingsRes] = await Promise.all([
@@ -69,12 +130,12 @@ export function StudentMarksheet() {
 
         if (!meRes.ok) throw new Error('Failed to fetch student info');
         const me = await meRes.json();
-        setStudentInfo(me);
 
+        let currentTemplateId = 'classic';
         if (settingsRes && settingsRes.ok) {
           const settingsData = await settingsRes.json();
           if (settingsData?.defaultMarksheetTemplateId) {
-            setTemplateId(settingsData.defaultMarksheetTemplateId);
+            currentTemplateId = settingsData.defaultMarksheetTemplateId;
           }
         }
 
@@ -83,8 +144,8 @@ export function StudentMarksheet() {
         const completedExams = (examsData.data || examsData || []).filter(
           (e: ExamRecord) => e.status === 'completed' && e.academicYear === selectedYear
         );
-        setExams(completedExams);
 
+        let currentResultsMap: Record<string, any[]> = {};
         if (completedExams.length > 0) {
           const resultsArr = await Promise.all(
             completedExams.map(async (exam: ExamRecord) => {
@@ -95,15 +156,25 @@ export function StudentMarksheet() {
               } catch { return { examId: exam.id, results: [] }; }
             })
           );
-          const map: Record<string, any[]> = {};
-          resultsArr.forEach(item => { map[item.examId] = item.results; });
-          setResultsMap(map);
-        } else setResultsMap({});
-      } catch (err) { console.error(err); }
-      finally { setLoading(false); }
+          resultsArr.forEach(item => { currentResultsMap[item.examId] = item.results; });
+        }
+
+        dispatch({
+          type: 'LOAD_SUCCESS',
+          payload: {
+            studentInfo: me,
+            exams: completedExams,
+            resultsMap: currentResultsMap,
+            templateId: currentTemplateId,
+          },
+        });
+      } catch (err) {
+        console.error(err);
+        dispatch({ type: 'SET_LOADING', payload: false });
+      }
     };
     load();
-  }, [selectedYear]);
+  }, [selectedYear, studentIdParam]);
 
   const subjectsList = useMemo(() => {
     const map: Record<string, { id: string; name: string }> = {};
@@ -239,7 +310,7 @@ export function StudentMarksheet() {
         </div>
         <div className="flex items-center gap-2 flex-wrap">
           {academicYears.length > 0 && (
-            <Select value={selectedYear} onValueChange={setSelectedYear}>
+            <Select value={selectedYear} onValueChange={(v) => dispatch({ type: 'SET_SELECTED_YEAR', payload: v })}>
               <SelectTrigger className="w-[150px] h-9 text-sm">
                 <SelectValue placeholder="Academic Year" />
               </SelectTrigger>
@@ -252,7 +323,7 @@ export function StudentMarksheet() {
               </SelectContent>
             </Select>
           )}
-          <Select value={marksheetType} onValueChange={(v: any) => setMarksheetType(v)}>
+          <Select value={marksheetType} onValueChange={(v: any) => dispatch({ type: 'SET_MARKSHEET_TYPE', payload: v })}>
             <SelectTrigger className="w-[130px] h-9 text-sm"><SelectValue /></SelectTrigger>
             <SelectContent>
               <SelectItem value="midterm">Midterm</SelectItem>
@@ -270,7 +341,7 @@ export function StudentMarksheet() {
           <p className="text-xs mt-1 opacity-60">Results will appear here once your teacher publishes them.</p>
         </div>
       ) : (
-        <div className={`w-full overflow-x-auto pb-6 flex justify-center bg-zinc-50 dark:bg-zinc-950/20 p-4 sm:p-6 rounded-2xl ${cinzel.className} ${montserrat.className} ${inter.className}`}>
+        <div className="w-full overflow-x-auto pb-6 flex justify-center bg-zinc-50 dark:bg-zinc-950/20 p-4 sm:p-6 rounded-2xl">
           <div 
             className="shrink-0 transition-all duration-300 shadow-2xl rounded-lg bg-white"
             style={{ 

@@ -1,7 +1,7 @@
 "use client";
 
 import { apiFetch } from "@/lib/api";
-import { useState, useEffect, useCallback, useMemo } from "react";
+import { useState, useEffect, useCallback, useMemo, useReducer } from "react";
 import { goeyToast as toast } from "goey-toast";
 
 // Sub-components
@@ -10,20 +10,91 @@ import { AdminTable } from "./manage-admins/AdminTable";
 import { AdminDialogs } from "./manage-admins/AdminDialogs";
 import { AdminRecord, AdminFormData, emptyFormData } from "./manage-admins/types";
 
+type State = {
+  admins: AdminRecord[];
+  loading: boolean;
+  search: string;
+  dialogOpen: boolean;
+  editingAdmin: AdminRecord | null;
+  formData: AdminFormData;
+  submitting: boolean;
+  showPassword: boolean;
+  deletingId: string | null;
+};
+
+type Action =
+  | { type: 'SET_ADMINS'; payload: AdminRecord[] }
+  | { type: 'SET_LOADING'; payload: boolean }
+  | { type: 'SET_SEARCH'; payload: string }
+  | { type: 'OPEN_DIALOG'; payload: { editingAdmin: AdminRecord | null; formData: AdminFormData } }
+  | { type: 'CLOSE_DIALOG' }
+  | { type: 'SET_FORM_DATA'; payload: Partial<AdminFormData> }
+  | { type: 'SET_SUBMITTING'; payload: boolean }
+  | { type: 'SET_SHOW_PASSWORD'; payload: boolean }
+  | { type: 'SET_DELETING_ID'; payload: string | null };
+
+const initialState: State = {
+  admins: [],
+  loading: true,
+  search: "",
+  dialogOpen: false,
+  editingAdmin: null,
+  formData: emptyFormData,
+  submitting: false,
+  showPassword: false,
+  deletingId: null,
+};
+
+function reducer(state: State, action: Action): State {
+  switch (action.type) {
+    case 'SET_ADMINS':
+      return { ...state, admins: action.payload };
+    case 'SET_LOADING':
+      return { ...state, loading: action.payload };
+    case 'SET_SEARCH':
+      return { ...state, search: action.payload };
+    case 'OPEN_DIALOG':
+      return {
+        ...state,
+        dialogOpen: true,
+        editingAdmin: action.payload.editingAdmin,
+        formData: action.payload.formData,
+        showPassword: false
+      };
+    case 'CLOSE_DIALOG':
+      return {
+        ...state,
+        dialogOpen: false,
+        editingAdmin: null,
+        formData: emptyFormData,
+        showPassword: false
+      };
+    case 'SET_FORM_DATA':
+      return { ...state, formData: { ...state.formData, ...action.payload } };
+    case 'SET_SUBMITTING':
+      return { ...state, submitting: action.payload };
+    case 'SET_SHOW_PASSWORD':
+      return { ...state, showPassword: action.payload };
+    case 'SET_DELETING_ID':
+      return { ...state, deletingId: action.payload };
+    default:
+      return state;
+  }
+}
+
 export function SuperAdminManage() {
-  const [admins, setAdmins] = useState<AdminRecord[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [search, setSearch] = useState("");
-
-  // Dialog state
-  const [dialogOpen, setDialogOpen] = useState(false);
-  const [editingAdmin, setEditingAdmin] = useState<AdminRecord | null>(null);
-  const [formData, setFormData] = useState<AdminFormData>(emptyFormData);
-  const [submitting, setSubmitting] = useState(false);
-  const [showPassword, setShowPassword] = useState(false);
-
-  // Delete state
-  const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [state, dispatch] = useReducer(reducer, initialState);
+  const {
+    admins,
+    loading,
+    search,
+    dialogOpen,
+    editingAdmin,
+    formData,
+    submitting,
+    showPassword,
+    deletingId
+  } = state;
 
   // Root admin is the first one in the list (ordered by createdAt asc)
   const rootAdminId = admins.length > 0 ? admins[0].id : null;
@@ -34,11 +105,11 @@ export function SuperAdminManage() {
       const res = await apiFetch("/api/super-admins?type=admins");
       if (!res.ok) throw new Error("Failed to fetch");
       const json = await res.json();
-      setAdmins(json);
+      dispatch({ type: 'SET_ADMINS', payload: json });
     } catch {
       console.error("Error fetching super admins");
     } finally {
-      setLoading(false);
+      dispatch({ type: 'SET_LOADING', payload: false });
     }
   }, []);
 
@@ -57,10 +128,10 @@ export function SuperAdminManage() {
 
   // --- Handlers ---
   const handleOpenAdd = () => {
-    setEditingAdmin(null);
-    setFormData(emptyFormData);
-    setShowPassword(false);
-    setDialogOpen(true);
+    dispatch({
+      type: 'OPEN_DIALOG',
+      payload: { editingAdmin: null, formData: emptyFormData }
+    });
   };
 
   const handleOpenEdit = (admin: AdminRecord) => {
@@ -68,19 +139,22 @@ export function SuperAdminManage() {
       toast.error("Cannot edit the root platform owner");
       return;
     }
-    setEditingAdmin(admin);
-    setFormData({
-      name: admin.name,
-      email: admin.email,
-      password: "",
-      isActive: admin.isActive,
+    dispatch({
+      type: 'OPEN_DIALOG',
+      payload: {
+        editingAdmin: admin,
+        formData: {
+          name: admin.name,
+          email: admin.email,
+          password: "",
+          isActive: admin.isActive,
+        }
+      }
     });
-    setShowPassword(false);
-    setDialogOpen(true);
   };
 
   const handleSubmit = async () => {
-    setSubmitting(true);
+    dispatch({ type: 'SET_SUBMITTING', payload: true });
     try {
       const isEdit = !!editingAdmin;
       const method = isEdit ? "PUT" : "POST";
@@ -110,12 +184,12 @@ export function SuperAdminManage() {
       }
 
       toast.success(`Super admin ${isEdit ? "updated" : "created"} successfully`);
-      setDialogOpen(false);
+      dispatch({ type: 'CLOSE_DIALOG' });
       fetchAdmins();
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Operation failed");
     } finally {
-      setSubmitting(false);
+      dispatch({ type: 'SET_SUBMITTING', payload: false });
     }
   };
 
@@ -127,8 +201,8 @@ export function SuperAdminManage() {
         throw new Error(err?.error || "Failed to delete");
       }
       toast.success("Super admin deleted successfully");
-      setAdmins((prev) => prev.filter((a) => a.id !== id));
-      setDeletingId(null);
+      dispatch({ type: 'SET_ADMINS', payload: admins.filter((a) => a.id !== id) });
+      dispatch({ type: 'SET_DELETING_ID', payload: null });
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Failed to delete");
     }
@@ -143,7 +217,7 @@ export function SuperAdminManage() {
     <div className="space-y-6">
       <AdminHeader 
         search={search}
-        onSearchChange={setSearch}
+        onSearchChange={(s) => dispatch({ type: 'SET_SEARCH', payload: s })}
         onAddClick={handleOpenAdd}
       />
 
@@ -155,24 +229,23 @@ export function SuperAdminManage() {
         onEdit={handleOpenEdit}
         onDelete={handleDelete}
         deletingId={deletingId}
-        setDeletingId={setDeletingId}
+        setDeletingId={(id) => dispatch({ type: 'SET_DELETING_ID', payload: id })}
       />
 
       <AdminDialogs 
         open={dialogOpen}
         onOpenChange={(open) => {
-          setDialogOpen(open);
-          if (!open) {
-            setEditingAdmin(null);
-            setFormData(emptyFormData);
-            setShowPassword(false);
+          if (open) {
+            // This case shouldn't happen as we use handleOpenAdd/Edit
+          } else {
+            dispatch({ type: 'CLOSE_DIALOG' });
           }
         }}
         editingAdmin={editingAdmin}
         formData={formData}
-        setFormData={setFormData}
+        setFormData={(fd) => dispatch({ type: 'SET_FORM_DATA', payload: fd })}
         showPassword={showPassword}
-        setShowPassword={setShowPassword}
+        setShowPassword={(s) => dispatch({ type: 'SET_SHOW_PASSWORD', payload: s })}
         onSubmit={handleSubmit}
         submitting={submitting}
         isFormValid={isFormValid}
@@ -180,3 +253,4 @@ export function SuperAdminManage() {
     </div>
   );
 }
+

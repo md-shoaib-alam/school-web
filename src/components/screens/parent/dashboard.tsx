@@ -6,11 +6,11 @@ import { useParentDashboard } from "@/lib/graphql/hooks";
 import { goeyToast as toast } from "goey-toast";
 
 // Sub-components
-import { WelcomeBanner } from "./dashboard/WelcomeBanner";
-import { QuickStats } from "./dashboard/QuickStats";
-import { ChildrenOverview } from "./dashboard/ChildrenOverview";
-import { NoticeSidebar } from "./dashboard/NoticeSidebar";
-import { DashboardSkeleton } from "./dashboard/DashboardSkeleton";
+import { WelcomeBanner } from "./dashboard_components/WelcomeBanner";
+import { QuickStats } from "./dashboard_components/QuickStats";
+import { ChildrenOverview } from "./dashboard_components/ChildrenOverview";
+import { NoticeSidebar } from "./dashboard_components/NoticeSidebar";
+import { DashboardSkeleton } from "./dashboard_components/DashboardSkeleton";
 
 export function ParentDashboard() {
   const { currentUser } = useAppStore();

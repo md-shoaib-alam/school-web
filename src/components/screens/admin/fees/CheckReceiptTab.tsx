@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useMemo, useCallback } from 'react';
+import { useState, useEffect, useMemo, useCallback, useReducer } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -31,23 +31,83 @@ interface CheckReceiptTabProps {
   canDelete: boolean;
 }
 
+type State = {
+  search: string;
+  debouncedSearch: string;
+  studentFilter: string;
+  fromDate: string;
+  toDate: string;
+  page: number;
+  viewReceipt: FeeReceipt | null;
+  deleting: boolean;
+};
+
+type Action =
+  | { type: 'SET_SEARCH'; payload: string }
+  | { type: 'SET_DEBOUNCED_SEARCH'; payload: string }
+  | { type: 'SET_STUDENT_FILTER'; payload: string }
+  | { type: 'SET_FROM_DATE'; payload: string }
+  | { type: 'SET_TO_DATE'; payload: string }
+  | { type: 'SET_PAGE'; payload: number }
+  | { type: 'SET_VIEW_RECEIPT'; payload: FeeReceipt | null }
+  | { type: 'SET_DELETING'; payload: boolean };
+
+const initialState: State = {
+  search: '',
+  debouncedSearch: '',
+  studentFilter: 'all',
+  fromDate: '',
+  toDate: '',
+  page: 1,
+  viewReceipt: null,
+  deleting: false,
+};
+
+function reducer(state: State, action: Action): State {
+  switch (action.type) {
+    case 'SET_SEARCH':
+      return { ...state, search: action.payload };
+    case 'SET_DEBOUNCED_SEARCH':
+      return { ...state, debouncedSearch: action.payload, page: 1 };
+    case 'SET_STUDENT_FILTER':
+      return { ...state, studentFilter: action.payload, page: 1 };
+    case 'SET_FROM_DATE':
+      return { ...state, fromDate: action.payload, page: 1 };
+    case 'SET_TO_DATE':
+      return { ...state, toDate: action.payload, page: 1 };
+    case 'SET_PAGE':
+      return { ...state, page: action.payload };
+    case 'SET_VIEW_RECEIPT':
+      return { ...state, viewReceipt: action.payload };
+    case 'SET_DELETING':
+      return { ...state, deleting: action.payload };
+    default:
+      return state;
+  }
+}
+
 export function CheckReceiptTab({ canEdit, canDelete }: CheckReceiptTabProps) {
   const queryClient = useQueryClient();
   
-  // States
-  const [search, setSearch] = useState('');
-  const [debouncedSearch, setDebouncedSearch] = useState('');
-  const [studentFilter, setStudentFilter] = useState('all');
-  const [fromDate, setFromDate] = useState('');
-  const [toDate, setToDate] = useState('');
-  const [page, setPage] = useState(1);
+  // State
+  const [state, dispatch] = useReducer(reducer, initialState);
+  const {
+    search,
+    debouncedSearch,
+    studentFilter,
+    fromDate,
+    toDate,
+    page,
+    viewReceipt,
+    deleting,
+  } = state;
+
   const limit = 10;
 
   // Debounce search
   useEffect(() => {
     const timer = setTimeout(() => {
-      setDebouncedSearch(search);
-      setPage(1);
+      dispatch({ type: 'SET_DEBOUNCED_SEARCH', payload: search });
     }, 500);
     return () => clearTimeout(timer);
   }, [search]);
@@ -74,26 +134,23 @@ export function CheckReceiptTab({ canEdit, canDelete }: CheckReceiptTabProps) {
   });
   const students = studentsData?.items || [];
 
-
   const loading = loadingReceipts;
-  const [viewReceipt, setViewReceipt] = useState<FeeReceipt | null>(null);
-  const [deleting, setDeleting] = useState(false);
 
   const handlePrint = () => {
     window.print();
   };
 
   const handleDelete = async (id: string) => {
-    setDeleting(true);
+    dispatch({ type: 'SET_DELETING', payload: true });
     try {
       const res = await apiFetch(`/api/fee-receipts?id=${id}`, { method: 'DELETE' });
       if (res.ok) {
         toast.success('Receipt deleted!');
         queryClient.invalidateQueries({ queryKey: ['fee-receipts'] });
-        setViewReceipt(null);
+        dispatch({ type: 'SET_VIEW_RECEIPT', payload: null });
       } else toast.error('Failed to delete');
     } catch { toast.error('Error deleting'); }
-    setDeleting(false);
+    dispatch({ type: 'SET_DELETING', payload: false });
   };
 
   return (
@@ -106,10 +163,10 @@ export function CheckReceiptTab({ canEdit, canDelete }: CheckReceiptTabProps) {
             placeholder="Search receipt # or student..." 
             className="pl-9" 
             value={search} 
-            onChange={e => setSearch(e.target.value)} 
+            onChange={e => dispatch({ type: 'SET_SEARCH', payload: e.target.value })} 
           />
         </div>
-        <Select value={studentFilter} onValueChange={(v) => { setStudentFilter(v); setPage(1); }}>
+        <Select value={studentFilter} onValueChange={(v) => dispatch({ type: 'SET_STUDENT_FILTER', payload: v })}>
           <SelectTrigger className="w-full sm:w-44"><SelectValue placeholder="Student" /></SelectTrigger>
           <SelectContent>
             <SelectItem value="all">All Students</SelectItem>
@@ -117,8 +174,8 @@ export function CheckReceiptTab({ canEdit, canDelete }: CheckReceiptTabProps) {
           </SelectContent>
         </Select>
         <div className="grid grid-cols-2 gap-2 w-full sm:w-auto">
-          <Input type="date" value={fromDate} onChange={e => { setFromDate(e.target.value); setPage(1); }} placeholder="From" className="text-xs" />
-          <Input type="date" value={toDate} onChange={e => { setToDate(e.target.value); setPage(1); }} placeholder="To" className="text-xs" />
+          <Input type="date" value={fromDate} onChange={e => dispatch({ type: 'SET_FROM_DATE', payload: e.target.value })} placeholder="From" className="text-xs" />
+          <Input type="date" value={toDate} onChange={e => dispatch({ type: 'SET_TO_DATE', payload: e.target.value })} placeholder="To" className="text-xs" />
         </div>
       </div>
 
@@ -174,7 +231,7 @@ export function CheckReceiptTab({ canEdit, canDelete }: CheckReceiptTabProps) {
                           <TableCell className="py-4"><Badge variant="outline" className={`${statusCfg.bg} border-0 capitalize text-[10px] px-2 h-5`}>{r.status}</Badge></TableCell>
                           <TableCell className="text-center py-4">
                             <div className="flex items-center justify-center gap-1">
-                              <Button variant="ghost" size="icon" className="size-7 text-emerald-500 hover:text-emerald-600 hover:bg-emerald-50" onClick={() => setViewReceipt(r)}><Eye className="size-3.5" /></Button>
+                              <Button variant="ghost" size="icon" className="size-7 text-emerald-500 hover:text-emerald-600 hover:bg-emerald-50" onClick={() => dispatch({ type: 'SET_VIEW_RECEIPT', payload: r })}><Eye className="size-3.5" /></Button>
                               {canDelete && (
                                 <AlertDialog>
                                   <AlertDialogTrigger asChild>
@@ -208,7 +265,7 @@ export function CheckReceiptTab({ canEdit, canDelete }: CheckReceiptTabProps) {
                     <Button 
                       variant="outline" 
                       size="sm" 
-                      onClick={() => setPage(p => Math.max(1, p - 1))} 
+                      onClick={() => dispatch({ type: 'SET_PAGE', payload: Math.max(1, page - 1) })} 
                       disabled={page === 1}
                       className="h-8 text-xs"
                     >
@@ -221,7 +278,7 @@ export function CheckReceiptTab({ canEdit, canDelete }: CheckReceiptTabProps) {
                           variant={page === i + 1 ? "default" : "outline"}
                           size="sm"
                           className={`size-8 text-xs p-0 ${page === i + 1 ? 'bg-emerald-600 hover:bg-emerald-700' : ''}`}
-                          onClick={() => setPage(i + 1)}
+                          onClick={() => dispatch({ type: 'SET_PAGE', payload: i + 1 })}
                         >
                           {i + 1}
                         </Button>
@@ -230,7 +287,7 @@ export function CheckReceiptTab({ canEdit, canDelete }: CheckReceiptTabProps) {
                     <Button 
                       variant="outline" 
                       size="sm" 
-                      onClick={() => setPage(p => Math.min(totalPages, p + 1))} 
+                      onClick={() => dispatch({ type: 'SET_PAGE', payload: Math.min(totalPages, page + 1) })} 
                       disabled={page === totalPages}
                       className="h-8 text-xs"
                     >
@@ -245,7 +302,7 @@ export function CheckReceiptTab({ canEdit, canDelete }: CheckReceiptTabProps) {
       </Card>
 
       {/* View Receipt Dialog */}
-      <Dialog open={!!viewReceipt} onOpenChange={() => setViewReceipt(null)}>
+      <Dialog open={!!viewReceipt} onOpenChange={() => dispatch({ type: 'SET_VIEW_RECEIPT', payload: null })}>
         <DialogContent className="sm:max-w-lg">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2"><Receipt className="size-5 text-emerald-600" />Receipt Details</DialogTitle>
@@ -289,14 +346,14 @@ export function CheckReceiptTab({ canEdit, canDelete }: CheckReceiptTabProps) {
               </div>
               {viewReceipt.remarks && (
                 <div className="rounded-md bg-muted p-2 mt-2">
-                  <p className="text-[10px] text-muted-foreground leading-tight italic">Remarks: {viewReceipt.remarks}</p>
+                  <p className="text-[10px] text-muted-foreground leading-tight italic: {viewReceipt.remarks}">Remarks: {viewReceipt.remarks}</p>
                 </div>
               )}
             </div>
           )}
           <DialogFooter className="gap-2 sm:gap-0">
             <Button variant="outline" className="flex-1 sm:flex-none" onClick={handlePrint}><Printer className="size-4 mr-2" />Print</Button>
-            <Button variant="default" className="flex-1 sm:flex-none bg-emerald-600 hover:bg-emerald-700" onClick={() => setViewReceipt(null)}>Close</Button>
+            <Button variant="default" className="flex-1 sm:flex-none bg-emerald-600 hover:bg-emerald-700" onClick={() => dispatch({ type: 'SET_VIEW_RECEIPT', payload: null })}>Close</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

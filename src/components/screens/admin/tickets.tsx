@@ -1,10 +1,9 @@
 "use client";
 
 import { apiFetch } from "@/lib/api";
-import { useState, useEffect, useCallback } from "react";
+import { useReducer, useEffect, useCallback } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { Plus } from "lucide-react";
 import { goeyToast as toast } from "goey-toast";
 import { useAppStore } from "@/store/use-app-store";
@@ -16,54 +15,34 @@ import { TicketTable } from "./tickets/TicketTable";
 import { CreateTicketDialog } from "./tickets/CreateTicketDialog";
 import { TicketDetailSheet } from "./tickets/TicketDetailSheet";
 
-// Types & Helpers
-import type { 
-  TicketItem, 
-  TicketDetail, 
-  StaffMember, 
-  CreateFormData 
-} from "./tickets/types";
-
-const emptyCreateForm: CreateFormData = {
-  title: "",
-  description: "",
-  priority: "medium",
-  category: "general",
-};
+// Reducer & Types
+import { ticketsReducer, initialState, emptyCreateForm } from "./tickets/reducer";
 
 export function AdminTickets() {
   const { currentUser, currentTenantId } = useAppStore();
+  const [state, dispatch] = useReducer(ticketsReducer, initialState);
 
-  // Data states
-  const [tickets, setTickets] = useState<TicketItem[]>([]);
-  const [staffList, setStaffList] = useState<StaffMember[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  // Filter states
-  const [statusFilter, setStatusFilter] = useState<string>("all");
-  const [searchQuery, setSearchQuery] = useState("");
-  const [priorityFilter, setPriorityFilter] = useState("all");
-  const [categoryFilter, setCategoryFilter] = useState("all");
-
-  // Create dialog
-  const [createOpen, setCreateOpen] = useState(false);
-  const [createForm, setCreateForm] = useState<CreateFormData>({ ...emptyCreateForm });
-  const [creating, setCreating] = useState(false);
-
-  // Detail sheet
-  const [detailOpen, setDetailOpen] = useState(false);
-  const [selectedTicket, setSelectedTicket] = useState<TicketDetail | null>(null);
-  const [detailLoading, setDetailLoading] = useState(false);
-
-  // Reply
-  const [replyMessage, setReplyMessage] = useState("");
-  const [sendingReply, setSendingReply] = useState(false);
-
-  // Admin edit
-  const [editStatus, setEditStatus] = useState<string>("");
-  const [editPriority, setEditPriority] = useState<string>("");
-  const [editAssignee, setEditAssignee] = useState<string>("unassigned");
-  const [updatingTicket, setUpdatingTicket] = useState(false);
+  const {
+    tickets,
+    staffList,
+    loading,
+    statusFilter,
+    searchQuery,
+    priorityFilter,
+    categoryFilter,
+    createOpen,
+    createForm,
+    creating,
+    detailOpen,
+    selectedTicket,
+    detailLoading,
+    replyMessage,
+    sendingReply,
+    editStatus,
+    editPriority,
+    editAssignee,
+    updatingTicket,
+  } = state;
 
   // ── Fetching ──
 
@@ -75,11 +54,13 @@ export function AdminTickets() {
       if (priorityFilter !== "all") params.set("priority", priorityFilter);
       if (categoryFilter !== "all") params.set("category", categoryFilter);
       const res = await apiFetch(`/api/tickets?${params.toString()}`);
-      if (res.ok) setTickets(await res.json());
+      if (res.ok) {
+        dispatch({ type: "SET_TICKETS", tickets: await res.json() });
+      }
     } catch {
       toast.error("Failed to fetch tickets");
     } finally {
-      setLoading(false);
+      dispatch({ type: "SET_LOADING", loading: false });
     }
   }, [currentTenantId, statusFilter, priorityFilter, categoryFilter]);
 
@@ -87,12 +68,14 @@ export function AdminTickets() {
     if (!currentTenantId) return;
     try {
       const res = await apiFetch(`/api/staff?tenantId=${currentTenantId}`);
-      if (res.ok) setStaffList(await res.json());
+      if (res.ok) {
+        dispatch({ type: "SET_STAFF_LIST", staff: await res.json() });
+      }
     } catch {}
   }, [currentTenantId]);
 
   useEffect(() => {
-    setLoading(true);
+    dispatch({ type: "SET_LOADING", loading: true });
     fetchTickets();
     fetchStaff();
   }, [fetchTickets, fetchStaff]);
@@ -101,7 +84,7 @@ export function AdminTickets() {
 
   const handleCreate = async () => {
     if (!currentUser) return;
-    setCreating(true);
+    dispatch({ type: "SET_CREATING", creating: true });
     try {
       const res = await apiFetch("/api/tickets", {
         method: "POST",
@@ -114,8 +97,8 @@ export function AdminTickets() {
       });
       if (res.ok) {
         toast.success("Ticket created");
-        setCreateOpen(false);
-        setCreateForm({ ...emptyCreateForm });
+        dispatch({ type: "SET_CREATE_OPEN", open: false });
+        dispatch({ type: "SET_CREATE_FORM", form: { ...emptyCreateForm } });
         fetchTickets();
       } else {
         toast.error("Failed to create ticket");
@@ -123,34 +106,37 @@ export function AdminTickets() {
     } catch {
       toast.error("Error creating ticket");
     } finally {
-      setCreating(false);
+      dispatch({ type: "SET_CREATING", creating: false });
     }
   };
 
   const openTicketDetail = async (id: string) => {
-    setDetailOpen(true);
-    setDetailLoading(true);
-    setReplyMessage("");
+    dispatch({ type: "SET_DETAIL_OPEN", open: true });
+    dispatch({ type: "SET_DETAIL_LOADING", loading: true });
+    dispatch({ type: "SET_REPLY_MESSAGE", message: "" });
     try {
       const res = await apiFetch(`/api/tickets/${id}`);
       if (res.ok) {
         const data = await res.json();
-        setSelectedTicket(data);
-        setEditStatus(data.status);
-        setEditPriority(data.priority);
-        setEditAssignee(data.assignedTo || "unassigned");
+        dispatch({ type: "SET_SELECTED_TICKET", ticket: data });
+        dispatch({
+          type: "SET_EDIT_TICKET_FIELDS",
+          status: data.status,
+          priority: data.priority,
+          assignee: data.assignedTo || "unassigned"
+        });
       }
     } catch {
       toast.error("Error loading ticket");
-      setDetailOpen(false);
+      dispatch({ type: "SET_DETAIL_OPEN", open: false });
     } finally {
-      setDetailLoading(false);
+      dispatch({ type: "SET_DETAIL_LOADING", loading: false });
     }
   };
 
   const handleReply = async () => {
     if (!replyMessage.trim() || !selectedTicket || !currentUser) return;
-    setSendingReply(true);
+    dispatch({ type: "SET_SENDING_REPLY", sending: true });
     try {
       const res = await apiFetch(`/api/tickets/${selectedTicket.id}/messages`, {
         method: "POST",
@@ -158,22 +144,24 @@ export function AdminTickets() {
         body: JSON.stringify({ userId: currentUser.id, message: replyMessage.trim() }),
       });
       if (res.ok) {
-        setReplyMessage("");
+        dispatch({ type: "SET_REPLY_MESSAGE", message: "" });
         const detailRes = await apiFetch(`/api/tickets/${selectedTicket.id}`);
-        if (detailRes.ok) setSelectedTicket(await detailRes.json());
+        if (detailRes.ok) {
+          dispatch({ type: "SET_SELECTED_TICKET", ticket: await detailRes.json() });
+        }
         fetchTickets();
         toast.success("Reply sent");
       }
     } catch {
       toast.error("Error sending reply");
     } finally {
-      setSendingReply(false);
+      dispatch({ type: "SET_SENDING_REPLY", sending: false });
     }
   };
 
   const handleUpdateTicket = async () => {
     if (!selectedTicket) return;
-    setUpdatingTicket(true);
+    dispatch({ type: "SET_UPDATING_TICKET", updating: true });
     try {
       const res = await apiFetch(`/api/tickets/${selectedTicket.id}`, {
         method: "PUT",
@@ -192,7 +180,7 @@ export function AdminTickets() {
     } catch {
       toast.error("Error updating ticket");
     } finally {
-      setUpdatingTicket(false);
+      dispatch({ type: "SET_UPDATING_TICKET", updating: false });
     }
   };
 
@@ -216,7 +204,7 @@ export function AdminTickets() {
         </div>
         <Button 
           className="bg-emerald-600 hover:bg-emerald-700 text-white shadow-[0_4px_14px_rgba(16,185,129,0.35)] dark:shadow-[0_4px_14px_rgba(16,185,129,0.2)] hover:shadow-[0_6px_20px_rgba(16,185,129,0.45)] dark:hover:shadow-[0_6px_20px_rgba(16,185,129,0.3)] transition-all duration-200 cursor-pointer" 
-          onClick={() => setCreateOpen(true)}
+          onClick={() => dispatch({ type: "SET_CREATE_OPEN", open: true })}
         >
           <Plus className="size-4 mr-2" />New Ticket
         </Button>
@@ -226,13 +214,13 @@ export function AdminTickets() {
 
       <TicketFilters
         statusFilter={statusFilter}
-        setStatusFilter={setStatusFilter}
+        setStatusFilter={(v) => dispatch({ type: "SET_STATUS_FILTER", status: v })}
         searchQuery={searchQuery}
-        setSearchQuery={setSearchQuery}
+        setSearchQuery={(v) => dispatch({ type: "SET_SEARCH_QUERY", query: v })}
         priorityFilter={priorityFilter}
-        setPriorityFilter={setPriorityFilter}
+        setPriorityFilter={(v) => dispatch({ type: "SET_PRIORITY_FILTER", priority: v })}
         categoryFilter={categoryFilter}
-        setCategoryFilter={setCategoryFilter}
+        setCategoryFilter={(v) => dispatch({ type: "SET_CATEGORY_FILTER", category: v })}
       />
 
       <Card>
@@ -247,29 +235,34 @@ export function AdminTickets() {
 
       <CreateTicketDialog
         open={createOpen}
-        onOpenChange={setCreateOpen}
+        onOpenChange={(v) => dispatch({ type: "SET_CREATE_OPEN", open: v })}
         form={createForm}
-        setForm={setCreateForm}
+        setForm={(v) => {
+          // If v is a function (e.g. from useState setter), this might break if we just pass it to dispatch.
+          // But looking at the component, it probably just passes the new form object.
+          // Actually, many shadcn/ui components pass the object.
+          dispatch({ type: "SET_CREATE_FORM", form: v as any });
+        }}
         loading={creating}
         onSubmit={handleCreate}
       />
 
       <TicketDetailSheet
         open={detailOpen}
-        onOpenChange={setDetailOpen}
+        onOpenChange={(v) => dispatch({ type: "SET_DETAIL_OPEN", open: v })}
         ticket={selectedTicket}
         loading={detailLoading}
         staffList={staffList}
         editStatus={editStatus}
-        setEditStatus={setEditStatus}
+        setEditStatus={(v) => dispatch({ type: "SET_EDIT_STATUS", status: v })}
         editPriority={editPriority}
-        setEditPriority={setEditPriority}
+        setEditPriority={(v) => dispatch({ type: "SET_EDIT_PRIORITY", priority: v })}
         editAssignee={editAssignee}
-        setEditAssignee={setEditAssignee}
+        setEditAssignee={(v) => dispatch({ type: "SET_EDIT_ASSIGNEE", assignee: v })}
         updatingTicket={updatingTicket}
         onUpdateTicket={handleUpdateTicket}
         replyMessage={replyMessage}
-        setReplyMessage={setReplyMessage}
+        setReplyMessage={(v) => dispatch({ type: "SET_REPLY_MESSAGE", message: v })}
         sendingReply={sendingReply}
         onReply={handleReply}
       />

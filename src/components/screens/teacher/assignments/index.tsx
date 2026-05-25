@@ -1,8 +1,7 @@
 "use client";
 
-
 import { apiFetch } from "@/lib/api";
-import { useState, useEffect } from "react";
+import { useReducer, useEffect } from "react";
 import {
   Card,
   CardContent,
@@ -61,73 +60,23 @@ import {
   BookOpen,
 } from "lucide-react";
 import { goeyToast as toast } from "goey-toast";
-
-interface Assignment {
-  id: string;
-  title: string;
-  description?: string;
-  subjectName: string;
-  className: string;
-  teacherName: string;
-  dueDate: string;
-  submissions: number;
-  totalStudents: number;
-  ungradedSubmissions: number;
-  mode: "online" | "offline";
-}
-
-interface Submission {
-  id: string;
-  studentId: string;
-  studentName: string;
-  studentEmail: string;
-  studentClass: string;
-  content: string | null;
-  status: string;
-  submittedAt: string;
-  grade: string | null;
-  feedback: string | null;
-}
+import { reducer, initialState, Assignment, Submission } from "./reducer";
 
 export function TeacherAssignments() {
-  const [assignments, setAssignments] = useState<Assignment[]>([]);
-  const [subjects, setSubjects] = useState<
-    { id: string; name: string; className: string; classId: string; teacherId: string }[]
-  >([]);
-  const [loading, setLoading] = useState(true);
-  const [dialogOpen, setDialogOpen] = useState(false);
-  const [form, setForm] = useState<{
-    title: string;
-    description: string;
-    subjectId: string;
-    dueDate: Date | undefined;
-    mode: "online" | "offline";
-  }>({
-    title: "",
-    description: "",
-    subjectId: "",
-    dueDate: undefined,
-    mode: "offline",
-  });
-
-  const [subDialogOpen, setSubDialogOpen] = useState(false);
-  const [selectedAssignment, setSelectedAssignment] =
-    useState<Assignment | null>(null);
-  const [submissions, setSubmissions] = useState<Submission[]>([]);
-  const [subLoading, setSubLoading] = useState(false);
-  const [gradingId, setGradingId] = useState<string | null>(null);
-  const [editedGrades, setEditedGrades] = useState<Record<string, { grade: string; feedback: string }>>({});
-  const [bulkSaving, setBulkSaving] = useState(false);
-  const [completingId, setCompletingId] = useState<string | null>(null);
-  const [confirmCompleteId, setConfirmCompleteId] = useState<string | null>(null);
+  const [state, dispatch] = useReducer(reducer, initialState);
+  const {
+    assignments, subjects, loading, dialogOpen, form, subDialogOpen,
+    selectedAssignment, submissions, subLoading, gradingId,
+    editedGrades, bulkSaving, completingId, confirmCompleteId
+  } = state;
 
   useEffect(() => {
     Promise.all([apiFetch("/api/assignments?mine=true"), apiFetch("/api/subjects?mine=true")])
       .then(([aRes, sRes]) => Promise.all([aRes.json(), sRes.json()]))
       .then(([aData, sData]) => {
-        setAssignments(aData);
-        setSubjects(sData);
-        setLoading(false);
+        dispatch({ type: 'SET_ASSIGNMENTS', payload: aData });
+        dispatch({ type: 'SET_SUBJECTS', payload: sData });
+        dispatch({ type: 'SET_LOADING', payload: false });
       });
   }, []);
 
@@ -155,10 +104,9 @@ export function TeacherAssignments() {
       });
       if (res.ok) {
         toast.success("Assignment created successfully!");
-        setDialogOpen(false);
-        setForm({ title: "", description: "", subjectId: "", dueDate: undefined, mode: "offline" });
+        dispatch({ type: 'RESET_FORM' });
         const data = await apiFetch("/api/assignments?mine=true").then((r) => r.json());
-        setAssignments(data);
+        dispatch({ type: 'SET_ASSIGNMENTS', payload: data });
       }
     } catch {
       toast.error("Failed to create assignment");
@@ -166,7 +114,7 @@ export function TeacherAssignments() {
   };
 
   const handleCompleteAssignment = async (assignmentId: string) => {
-    setCompletingId(assignmentId);
+    dispatch({ type: 'SET_COMPLETING_ID', payload: assignmentId });
     try {
       const res = await apiFetch(`/api/assignments/${assignmentId}/complete`, {
         method: "PUT",
@@ -174,33 +122,30 @@ export function TeacherAssignments() {
       if (res.ok) {
         toast.success("Assignment marked as completed!");
         const data = await apiFetch("/api/assignments?mine=true").then((r) => r.json());
-        setAssignments(data);
+        dispatch({ type: 'SET_ASSIGNMENTS', payload: data });
       } else {
         toast.error("Failed to complete assignment");
       }
     } catch {
       toast.error("Failed to complete assignment");
     } finally {
-      setCompletingId(null);
+      dispatch({ type: 'SET_COMPLETING_ID', payload: null });
     }
   };
 
   const handleViewSubmissions = async (assignment: Assignment) => {
-    setSelectedAssignment(assignment);
-    setSubDialogOpen(true);
-    setSubLoading(true);
-    setEditedGrades({});
+    dispatch({ type: 'OPEN_SUBMISSIONS', payload: assignment });
     try {
       const res = await apiFetch(`/api/submissions?assignmentId=${assignment.id}`);
       if (res.ok) {
         const json = await res.json();
-        setSubmissions(json.data || []);
+        dispatch({ type: 'SET_SUBMISSIONS', payload: json.data || [] });
       }
     } catch {
       toast.error("Failed to load submissions");
-      setSubmissions([]);
+      dispatch({ type: 'SET_SUBMISSIONS', payload: [] });
     } finally {
-      setSubLoading(false);
+      dispatch({ type: 'SET_SUB_LOADING', payload: false });
     }
   };
 
@@ -210,7 +155,7 @@ export function TeacherAssignments() {
       toast.error("Please enter a grade");
       return;
     }
-    setGradingId(submissionId);
+    dispatch({ type: 'SET_GRADING_ID', payload: submissionId });
     try {
       const res = await apiFetch("/api/submissions", {
         method: "PUT",
@@ -225,28 +170,15 @@ export function TeacherAssignments() {
       });
       if (res.ok) {
         toast.success("Grade saved!");
-        setSubmissions((prev) =>
-          prev.map((s) =>
-            s.id === submissionId
-              ? {
-                  ...s,
-                  grade: data.grade.trim(),
-                  feedback: data.feedback.trim() || null,
-                  status: "graded",
-                }
-              : s,
-          ),
-        );
-        setEditedGrades((prev) => {
-          const next = { ...prev };
-          delete next[submissionId];
-          return next;
+        dispatch({
+          type: 'UPDATE_SUBMISSION_GRADE',
+          payload: { id: submissionId, grade: data.grade.trim(), feedback: data.feedback.trim() || null }
         });
       }
     } catch {
       toast.error("Failed to save grade");
     } finally {
-      setGradingId(null);
+      dispatch({ type: 'SET_GRADING_ID', payload: null });
     }
   };
 
@@ -265,7 +197,7 @@ export function TeacherAssignments() {
       return;
     }
 
-    setBulkSaving(true);
+    dispatch({ type: 'SET_BULK_SAVING', payload: true });
     try {
       const res = await apiFetch("/api/submissions/bulk", {
         method: "PUT",
@@ -277,27 +209,17 @@ export function TeacherAssignments() {
       });
       if (res.ok) {
         toast.success(`Bulk saved ${updates.length} grades!`);
-        setSubmissions((prev) =>
-          prev.map((s) => {
-            const update = updates.find((u) => u.id === s.id);
-            return update
-              ? {
-                  ...s,
-                  grade: update.grade,
-                  feedback: update.feedback || null,
-                  status: "graded",
-                }
-              : s;
-          })
-        );
-        setEditedGrades({});
+        dispatch({
+          type: 'BULK_UPDATE_GRADES',
+          payload: updates.map(u => ({ id: u.id, grade: u.grade, feedback: u.feedback || null }))
+        });
       } else {
         toast.error("Failed to bulk save grades");
       }
     } catch {
       toast.error("Failed to bulk save grades");
     } finally {
-      setBulkSaving(false);
+      dispatch({ type: 'SET_BULK_SAVING', payload: false });
     }
   };
 
@@ -328,7 +250,7 @@ export function TeacherAssignments() {
             {assignments.length} homework items total
           </p>
         </div>
-        <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+        <Dialog open={dialogOpen} onOpenChange={(v) => dispatch({ type: 'SET_DIALOG_OPEN', payload: v })}>
           <DialogTrigger asChild>
             <Button className="bg-blue-600 hover:bg-blue-700 text-white">
               <Plus className="size-4 mr-2" /> Create Homework
@@ -343,7 +265,7 @@ export function TeacherAssignments() {
                 <Label>Title *</Label>
                 <Input
                   value={form.title}
-                  onChange={(e) => setForm({ ...form, title: e.target.value })}
+                  onChange={(e) => dispatch({ type: 'SET_FORM', payload: { title: e.target.value } })}
                   placeholder="Homework title"
                   className="mt-1.5"
                 />
@@ -352,7 +274,7 @@ export function TeacherAssignments() {
                 <Label>Subject *</Label>
                 <Select
                   value={form.subjectId}
-                  onValueChange={(v) => setForm({ ...form, subjectId: v })}
+                  onValueChange={(v) => dispatch({ type: 'SET_FORM', payload: { subjectId: v } })}
                 >
                   <SelectTrigger className="mt-1.5">
                     <SelectValue placeholder="Select subject" />
@@ -384,7 +306,7 @@ export function TeacherAssignments() {
                         mode="single"
                         selected={form.dueDate}
                         onSelect={(date) =>
-                          setForm({ ...form, dueDate: date })
+                          dispatch({ type: 'SET_FORM', payload: { dueDate: date } })
                         }
                         disabled={(date) =>
                           date < new Date(new Date().setHours(0, 0, 0, 0))
@@ -398,7 +320,7 @@ export function TeacherAssignments() {
                   <Label>Submission Mode</Label>
                   <Select
                     value={form.mode}
-                    onValueChange={(v: any) => setForm({ ...form, mode: v })}
+                    onValueChange={(v: any) => dispatch({ type: 'SET_FORM', payload: { mode: v } })}
                   >
                     <SelectTrigger className="mt-1.5">
                       <SelectValue />
@@ -417,7 +339,7 @@ export function TeacherAssignments() {
                 <Textarea
                   value={form.description}
                   onChange={(e) =>
-                    setForm({ ...form, description: e.target.value })
+                    dispatch({ type: 'SET_FORM', payload: { description: e.target.value } })
                   }
                   placeholder="Homework details..."
                   className="mt-1.5"
@@ -564,7 +486,7 @@ export function TeacherAssignments() {
                     variant="secondary"
                     size="sm"
                     className="w-full text-xs gap-1.5 bg-emerald-50 dark:bg-emerald-950/30 text-emerald-700 dark:text-emerald-400 hover:bg-emerald-100 dark:hover:bg-emerald-900/40 border border-emerald-200/50 dark:border-emerald-800/50"
-                    onClick={() => setConfirmCompleteId(assignment.id)}
+                    onClick={() => dispatch({ type: 'SET_CONFIRM_COMPLETE_ID', payload: assignment.id })}
                     disabled={completingId === assignment.id}
                   >
                     {completingId === assignment.id ? (
@@ -593,12 +515,7 @@ export function TeacherAssignments() {
       <Dialog
         open={subDialogOpen}
         onOpenChange={(open) => {
-          if (!open) {
-            setSubDialogOpen(false);
-            setSelectedAssignment(null);
-            setSubmissions([]);
-            setEditedGrades({});
-          }
+          dispatch({ type: 'SET_SUB_DIALOG_OPEN', payload: open });
         }}
       >
         <DialogContent className="sm:max-w-2xl max-h-[85vh] overflow-hidden">
@@ -725,13 +642,7 @@ export function TeacherAssignments() {
                                 placeholder="e.g. A, B+, 95/100"
                                 value={editedGrades[sub.id]?.grade || ""}
                                 onChange={(e) => {
-                                  setEditedGrades((prev) => ({
-                                    ...prev,
-                                    [sub.id]: {
-                                      grade: e.target.value,
-                                      feedback: prev[sub.id]?.feedback || "",
-                                    },
-                                  }));
+                                  dispatch({ type: 'SET_EDITED_GRADE', payload: { id: sub.id, grade: e.target.value } });
                                 }}
                                 className="h-8 text-xs"
                               />
@@ -744,13 +655,7 @@ export function TeacherAssignments() {
                                 placeholder="Optional feedback"
                                 value={editedGrades[sub.id]?.feedback || ""}
                                 onChange={(e) => {
-                                  setEditedGrades((prev) => ({
-                                    ...prev,
-                                    [sub.id]: {
-                                      grade: prev[sub.id]?.grade || "",
-                                      feedback: e.target.value,
-                                    },
-                                  }));
+                                  dispatch({ type: 'SET_EDITED_GRADE', payload: { id: sub.id, feedback: e.target.value } });
                                 }}
                                 className="h-8 text-xs"
                               />
@@ -790,7 +695,7 @@ export function TeacherAssignments() {
         </DialogContent>
       </Dialog>
 
-      <AlertDialog open={!!confirmCompleteId} onOpenChange={(open) => !open && setConfirmCompleteId(null)}>
+      <AlertDialog open={!!confirmCompleteId} onOpenChange={(open) => !open && dispatch({ type: 'SET_CONFIRM_COMPLETE_ID', payload: null })}>
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle className="flex items-center gap-2">
@@ -806,7 +711,7 @@ export function TeacherAssignments() {
               onClick={() => {
                 if (confirmCompleteId) {
                   handleCompleteAssignment(confirmCompleteId);
-                  setConfirmCompleteId(null);
+                  dispatch({ type: 'SET_CONFIRM_COMPLETE_ID', payload: null });
                 }
               }}
               className="bg-emerald-600 hover:bg-emerald-700 text-white"

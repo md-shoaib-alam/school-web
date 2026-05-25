@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback, useMemo } from "react";
+import { useReducer, useEffect, useCallback, useMemo } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -49,19 +49,95 @@ const emptyFormData: StudentFormData = {
   pickupPoint: "",
 };
 
+type State = {
+  search: string;
+  classFilter: string;
+  currentPage: number;
+  dialogOpen: boolean;
+  dialogMode: "create" | "edit";
+  editingStudent: StudentInfo | null;
+  formData: StudentFormData;
+  submitting: boolean;
+};
+
+type Action =
+  | { type: 'SET_SEARCH'; payload: string }
+  | { type: 'SET_CLASS_FILTER'; payload: string }
+  | { type: 'SET_CURRENT_PAGE'; payload: number }
+  | { type: 'OPEN_CREATE' }
+  | { type: 'OPEN_EDIT'; payload: StudentInfo }
+  | { type: 'CLOSE_DIALOG' }
+  | { type: 'SET_FORM_DATA'; payload: StudentFormData }
+  | { type: 'SET_SUBMITTING'; payload: boolean };
+
+const initialState: State = {
+  search: "",
+  classFilter: "all",
+  currentPage: 1,
+  dialogOpen: false,
+  dialogMode: "create",
+  editingStudent: null,
+  formData: emptyFormData,
+  submitting: false,
+};
+
+function reducer(state: State, action: Action): State {
+  switch (action.type) {
+    case 'SET_SEARCH':
+      return { ...state, search: action.payload, currentPage: 1 };
+    case 'SET_CLASS_FILTER':
+      return { ...state, classFilter: action.payload, currentPage: 1 };
+    case 'SET_CURRENT_PAGE':
+      return { ...state, currentPage: action.payload };
+    case 'OPEN_CREATE':
+      return { ...state, dialogMode: "create", formData: emptyFormData, dialogOpen: true };
+    case 'OPEN_EDIT':
+      return {
+        ...state,
+        dialogMode: "edit",
+        editingStudent: action.payload,
+        formData: {
+          name: action.payload.name,
+          email: action.payload.email,
+          phone: action.payload.phone || "",
+          rollNumber: action.payload.rollNumber,
+          classId: action.payload.classId || "",
+          gender: action.payload.gender || "male",
+          dateOfBirth: action.payload.dateOfBirth || "",
+          transportEnabled: !!action.payload.transport,
+          routeId: action.payload.transport?.routeId || "",
+          pickupPoint: action.payload.transport?.pickupPoint || "",
+        },
+        dialogOpen: true,
+      };
+    case 'CLOSE_DIALOG':
+      return { ...state, dialogOpen: false };
+    case 'SET_FORM_DATA':
+      return { ...state, formData: action.payload };
+    case 'SET_SUBMITTING':
+      return { ...state, submitting: action.payload };
+    default:
+      return state;
+  }
+}
+
 function AdminStudentsContent() {
   const { currentTenantId } = useAppStore();
   const { canCreate, canEdit, canDelete } = useModulePermissions("students");
 
-  // Filter & Search states
-  const [search, setSearch] = useState("");
-  const debouncedSearch = useDebounce(search, 300);
-  const [classFilter, setClassFilter] = useState("all");
-  const [currentPage, setCurrentPage] = useState(1);
+  const [state, dispatch] = useReducer(reducer, initialState);
+  const {
+    search,
+    classFilter,
+    currentPage,
+    dialogOpen,
+    dialogMode,
+    editingStudent,
+    formData,
+    submitting,
+  } = state;
 
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [debouncedSearch, classFilter]);
+  const debouncedSearch = useDebounce(search, 300);
 
   const queryClient = useQueryClient();
 
@@ -90,54 +166,20 @@ function AdminStudentsContent() {
   const classes = classesData?.classes || [];
   const loading = loadingStudents;
 
-  // Dialog states
-  const [dialogOpen, setDialogOpen] = useState(false);
-  const [dialogMode, setDialogMode] = useState<"create" | "edit">("create");
-  const [editingStudent, setEditingStudent] = useState<StudentInfo | null>(
-    null,
-  );
-  const [formData, setFormData] = useState<StudentFormData>(emptyFormData);
-  const [submitting, setSubmitting] = useState(false);
-
   const searchParams = useSearchParams();
   const classIdParam = searchParams.get("classId");
 
   useEffect(() => {
     if (classIdParam && classIdParam !== classFilter) {
-      setClassFilter(classIdParam);
-      setCurrentPage(1);
+      dispatch({ type: 'SET_CLASS_FILTER', payload: classIdParam });
     }
-  }, [classIdParam]);
-
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [debouncedSearch]);
+  }, [classIdParam, classFilter]);
 
   // --- Handlers ---
 
-  const handleOpenCreate = () => {
-    setDialogMode("create");
-    setFormData(emptyFormData);
-    setDialogOpen(true);
-  };
+  const handleOpenCreate = () => dispatch({ type: 'OPEN_CREATE' });
 
-  const handleOpenEdit = (student: StudentInfo) => {
-    setDialogMode("edit");
-    setEditingStudent(student);
-    setFormData({
-      name: student.name,
-      email: student.email,
-      phone: student.phone || "",
-      rollNumber: student.rollNumber,
-      classId: student.classId || "",
-      gender: student.gender || "male",
-      dateOfBirth: student.dateOfBirth || "",
-      transportEnabled: !!student.transport,
-      routeId: student.transport?.routeId || "",
-      pickupPoint: student.transport?.pickupPoint || "",
-    });
-    setDialogOpen(true);
-  };
+  const handleOpenEdit = (student: StudentInfo) => dispatch({ type: 'OPEN_EDIT', payload: student });
 
   const handleSubmit = async () => {
     const isCreate = dialogMode === "create";
@@ -161,7 +203,7 @@ function AdminStudentsContent() {
 
     toast.promise(
       (async () => {
-        setSubmitting(true);
+        dispatch({ type: 'SET_SUBMITTING', payload: true });
         try {
           const url = "/api/students";
           const method = isCreate ? "POST" : "PUT";
@@ -180,7 +222,7 @@ function AdminStudentsContent() {
             throw new Error(errData.error || `Failed to ${dialogMode} student`);
           }
 
-          setDialogOpen(false);
+          dispatch({ type: 'CLOSE_DIALOG' });
           // Refresh from server to ensure total accuracy
           queryClient.invalidateQueries({ queryKey: queryKeys.students });
           queryClient.invalidateQueries({
@@ -190,7 +232,7 @@ function AdminStudentsContent() {
             ? "Student registered successfully"
             : "Student details updated";
         } finally {
-          setSubmitting(false);
+          dispatch({ type: 'SET_SUBMITTING', payload: false });
         }
       })(),
       {
@@ -231,9 +273,6 @@ function AdminStudentsContent() {
     );
   };
 
-  // --- No longer using client-side filtered/paginated variables ---
-  // We use `students` directly as it's now the paginated slice from the server.
-
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -245,18 +284,12 @@ function AdminStudentsContent() {
               placeholder="Search by name..."
               className="pl-9"
               value={search}
-              onChange={(e) => {
-                setSearch(e.target.value);
-                setCurrentPage(1);
-              }}
+              onChange={(e) => dispatch({ type: 'SET_SEARCH', payload: e.target.value })}
             />
           </div>
           <Select
             value={classFilter}
-            onValueChange={(v) => {
-              setClassFilter(v);
-              setCurrentPage(1);
-            }}
+            onValueChange={(v) => dispatch({ type: 'SET_CLASS_FILTER', payload: v })}
           >
             <SelectTrigger className="w-full sm:w-48">
               <SelectValue placeholder="Filter by class" />
@@ -323,7 +356,7 @@ function AdminStudentsContent() {
                 totalPages={totalPages}
                 totalItems={totalItems}
                 itemsPerPage={ITEMS_PER_PAGE}
-                onPageChange={setCurrentPage}
+                onPageChange={(p) => dispatch({ type: 'SET_CURRENT_PAGE', payload: p })}
               />
             </>
           )}
@@ -332,11 +365,11 @@ function AdminStudentsContent() {
 
       <StudentDialog
         open={dialogOpen}
-        onOpenChange={setDialogOpen}
+        onOpenChange={(open) => dispatch({ type: open ? 'OPEN_CREATE' : 'CLOSE_DIALOG' })}
         mode={dialogMode}
         classes={classes}
         formData={formData}
-        setFormData={setFormData}
+        setFormData={(fd) => dispatch({ type: 'SET_FORM_DATA', payload: fd })}
         submitting={submitting}
         onSubmit={handleSubmit}
       />
