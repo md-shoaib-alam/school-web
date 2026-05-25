@@ -35,6 +35,7 @@ export interface State {
   form: {
     title: string;
     description: string;
+    classId: string;
     subjectId: string;
     dueDate: Date | undefined;
     mode: "online" | "offline";
@@ -78,6 +79,7 @@ export const initialState: State = {
   form: {
     title: "",
     description: "",
+    classId: "",
     subjectId: "",
     dueDate: undefined,
     mode: "offline",
