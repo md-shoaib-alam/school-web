@@ -130,7 +130,7 @@ export function AdminParents() {
   const { 
     data: parentsData, 
     isLoading: loadingParents 
-  } = useParents(currentTenantId || undefined, debouncedSearch || undefined, currentPage, 12);
+  } = useParents(currentTenantId || undefined, debouncedSearch || undefined, currentPage, 15);
 
   const { data: classesData } = useClassesMin(currentTenantId || undefined);
 
@@ -294,7 +294,7 @@ export function AdminParents() {
         currentPage={currentPage}
         totalPages={totalPages}
         totalItems={totalItems}
-        itemsPerPage={12}
+        itemsPerPage={15}
         onPageChange={(v) => dispatch({ type: 'SET_CURRENT_PAGE', payload: v })}
       />
 

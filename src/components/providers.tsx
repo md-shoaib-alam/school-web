@@ -14,7 +14,6 @@ function ToasterProvider() {
     <Toaster 
       richColors 
       position="top-center" 
-      closeButton 
       duration={3000} 
       theme={theme as "light" | "dark" | "system"}
     />
