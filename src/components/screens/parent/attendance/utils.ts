@@ -73,13 +73,13 @@ export function getCalendarData(records: AttendanceRecord[], baseDate = new Date
 
 export function getCalendarCellColor(status: string | null) {
   if (!status)
-    return "bg-zinc-100 dark:bg-zinc-800 text-zinc-400 dark:text-zinc-500";
+    return "bg-zinc-100 dark:bg-zinc-800/50 text-zinc-600 dark:text-zinc-300";
   switch (status) {
     case "present":
       return "bg-emerald-500 text-white";
     case "absent":
       return "bg-red-500 text-white";
     default:
-      return "bg-zinc-100 dark:bg-zinc-800 text-zinc-400 dark:text-zinc-500";
+      return "bg-zinc-100 dark:bg-zinc-800/50 text-zinc-600 dark:text-zinc-300";
   }
 }

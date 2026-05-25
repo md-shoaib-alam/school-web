@@ -22,13 +22,22 @@ export function Header({ items, resolvedScreen }: HeaderProps) {
     sidebarOpen,
   } = useAppStore();
 
-  const todayString = useMemo(() => {
-    return new Date().toLocaleDateString("en-US", {
-      weekday: "long",
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-    });
+  const dates = useMemo(() => {
+    try {
+      const now = new Date();
+      const day = now.getDate();
+      const month = now.toLocaleDateString("en-US", { month: "long" });
+      const year = now.getFullYear();
+      const weekday = now.toLocaleDateString("en-US", { weekday: "long" });
+      
+      const datePart = `${day} ${month}, ${year}`;
+      return {
+        full: `${weekday}, ${datePart}`,
+        short: datePart
+      };
+    } catch (e) {
+      return { full: "", short: "" };
+    }
   }, []);
 
   if (!currentUser) return null;
@@ -51,7 +60,7 @@ export function Header({ items, resolvedScreen }: HeaderProps) {
             <PanelLeftOpen className="size-5" />
           )}
         </Button>
-        <h1 className="text-lg font-semibold text-zinc-900 dark:text-zinc-100">
+        <h1 className="text-base sm:text-lg font-semibold text-zinc-900 dark:text-zinc-100">
           {resolvedScreen === "profile"
             ? "My Profile"
             : items.find((i) => i.key === resolvedScreen)?.label || "Dashboard"}
@@ -64,15 +73,16 @@ export function Header({ items, resolvedScreen }: HeaderProps) {
         )}
       </div>
       <div className="flex items-center gap-2">
-        {!isSuperAdmin && currentTenantName && (
+        {!isSuperAdmin && currentTenantName && currentUser.role !== 'parent' && currentUser.role !== 'student' && (
           <Badge variant="outline" className="hidden sm:flex gap-1 text-xs">
             <School className="size-3" />
             {currentTenantName}
           </Badge>
         )}
-        <div className="hidden md:flex items-center gap-2 text-sm text-zinc-500 dark:text-zinc-400 mr-2" suppressHydrationWarning>
-          <Calendar className="size-4" />
-          {todayString}
+        <div className="hidden md:flex items-center gap-2 text-sm text-zinc-600 dark:text-zinc-300 mr-2" suppressHydrationWarning>
+          <Calendar className="size-4 text-zinc-500 dark:text-zinc-400" />
+          <span className="hidden lg:inline">{dates.full}</span>
+          <span className="lg:hidden">{dates.short}</span>
         </div>
         <NotificationBell />
         <ThemeToggle />
