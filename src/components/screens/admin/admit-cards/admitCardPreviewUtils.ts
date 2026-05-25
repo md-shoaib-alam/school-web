@@ -1,33 +1,32 @@
-import React from 'react';
 import { createRoot } from "react-dom/client";
 import { toast } from "sonner";
-import { MarksheetPreviewPage } from './MarksheetPreviewPage';
+import React from 'react';
 
-export async function handleMarksheetPreviewNewTab({
-  classId,
+// This utility function is moved to a separate file to avoid Fast Refresh issues 
+// in files that export React components.
+export async function handleAdmitCardPreviewNewTab({
+  admitCards,
   classNameStr,
   classSection,
-  academicYear,
-  examName,
+  AdmitCardPrintPreview
 }: {
-  classId: string;
+  admitCards: any[];
   classNameStr: string;
   classSection: string;
-  academicYear: string;
-  examName?: string;
+  AdmitCardPrintPreview: React.ComponentType<any>;
 }) {
   const previewWindow = window.open("", "_blank");
   if (!previewWindow) {
-    toast.error("Popup blocked! Please allow popups to view the marksheet preview.");
+    toast.error("Popup blocked! Please allow popups to view the admit card preview.");
     return;
   }
 
-  // Build standard document structure with our custom viewer styling
+  // Build standard document structure with custom viewer styling
   previewWindow.document.write(`
     <!DOCTYPE html>
     <html lang="en">
     <head>
-      <title>Marksheet Preview - ${classNameStr} (${classSection})</title>
+      <title>Admit Card Preview - ${classNameStr} (${classSection})</title>
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width, initial-scale=1">
       <style>
@@ -51,7 +50,7 @@ export async function handleMarksheetPreviewNewTab({
           align-items: center;
           justify-content: space-between;
           padding: 0.75rem 1.5rem;
-          background: linear-gradient(135deg, #2e1065 0%, #0f172a 100%); /* Deep Violet to Slate */
+          background: linear-gradient(135deg, #065f46 0%, #0f172a 100%); /* Warm Emerald to Slate */
           color: #ffffff;
           box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.3);
           border-bottom: 1px solid rgba(255, 255, 255, 0.05);
@@ -69,11 +68,11 @@ export async function handleMarksheetPreviewNewTab({
         .toolbar-badge {
           font-size: 0.7rem;
           font-weight: 600;
-          color: #ddd6fe; /* violet-200 */
-          background-color: rgba(139, 92, 246, 0.15); /* violet-500 */
+          color: #a7f3d0; /* emerald-200 */
+          background-color: rgba(16, 185, 129, 0.15); /* emerald-500 */
           padding: 0.25rem 0.75rem;
           border-radius: 9999px;
-          border: 1px solid rgba(139, 92, 246, 0.2);
+          border: 1px solid rgba(16, 185, 129, 0.2);
           text-transform: uppercase;
           letter-spacing: 0.05em;
         }
@@ -112,14 +111,13 @@ export async function handleMarksheetPreviewNewTab({
         
         .zoom-btn.active {
           color: #ffffff;
-          background-color: #8b5cf6; /* violet-500 */
+          background-color: #10b981; /* emerald-500 */
         }
         
         .action-btn {
           display: inline-flex;
           align-items: center;
           gap: 0.5rem;
-          background-color: #10b981;
           border: none;
           color: #ffffff;
           padding: 0.45rem 1rem;
@@ -132,7 +130,6 @@ export async function handleMarksheetPreviewNewTab({
         }
         
         .action-btn:hover {
-          background-color: #059669;
           transform: translateY(-1px);
           box-shadow: 0 4px 6px rgba(16, 185, 129, 0.3);
         }
@@ -238,14 +235,11 @@ export async function handleMarksheetPreviewNewTab({
   if (container) {
     const root = createRoot(container);
     root.render(
-      React.createElement(MarksheetPreviewPage, {
-        classId,
+      React.createElement(AdmitCardPrintPreview, {
+        admitCards,
         classNameStr,
         classSection,
-        academicYear,
-        examName,
         onBack: () => previewWindow.close(),
-        isStandalone: true,
       })
     );
   }

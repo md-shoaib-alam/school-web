@@ -22,7 +22,7 @@ import {
   Loader2, FileText, AlertTriangle, Filter, Ban, CalendarOff, Plus, History, Send,
   GraduationCap,
 } from 'lucide-react';
-import { goeyToast as toast } from 'goey-toast';
+import { toast } from "sonner";
 import { apiFetch } from '@/lib/api';
 import { useAppStore } from '@/store/use-app-store';
 

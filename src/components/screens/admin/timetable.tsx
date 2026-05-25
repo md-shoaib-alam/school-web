@@ -1,10 +1,10 @@
 "use client";
 
 import { apiFetch } from "@/lib/api";
-import { useState, useMemo, useCallback } from "react";
+import { useReducer, useMemo, useCallback, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Card, CardContent } from "@/components/ui/card";
-import { goeyToast as toast } from "goey-toast";
+import { toast } from "sonner";
 import { useModulePermissions } from "@/hooks/use-permissions";
 import { useAppStore } from "@/store/use-app-store";
 import type { ClassInfo } from "@/lib/types";
@@ -29,33 +29,113 @@ import {
 import { getCurrentDayIndex } from "./timetable/helpers";
 import type { ViewMode, TimetableSlot, FormSlot } from "./timetable/types";
 
+type State = {
+  selectedClass: string;
+  viewMode: ViewMode;
+  selectedDay: string;
+  createDialogOpen: boolean;
+  daySlots: Record<string, FormSlot[]>;
+  saving: boolean;
+  editDialogOpen: boolean;
+  editingSlot: TimetableSlot | null;
+  editForm: {
+    subjectId: string; teacherId: string; startTime: string; endTime: string; day: string; label: string;
+  };
+  editSaving: boolean;
+  daysConfigOpen: boolean;
+  daysConfigSaving: boolean;
+  daysConfigDraft: string[];
+};
+
+type Action =
+  | { type: 'SET_SELECTED_CLASS'; payload: string }
+  | { type: 'SET_VIEW_MODE'; payload: ViewMode }
+  | { type: 'SET_SELECTED_DAY'; payload: string }
+  | { type: 'SET_CREATE_DIALOG_OPEN'; payload: boolean }
+  | { type: 'SET_DAY_SLOTS'; payload: Record<string, FormSlot[]> | ((prev: Record<string, FormSlot[]>) => Record<string, FormSlot[]>) }
+  | { type: 'SET_SAVING'; payload: boolean }
+  | { type: 'OPEN_MANAGE'; payload: Record<string, FormSlot[]> }
+  | { type: 'OPEN_EDIT_SLOT'; payload: TimetableSlot }
+  | { type: 'SET_EDIT_DIALOG_OPEN'; payload: boolean }
+  | { type: 'SET_EDIT_FORM'; payload: Partial<State['editForm']> }
+  | { type: 'SET_EDIT_SAVING'; payload: boolean }
+  | { type: 'SET_DAYS_CONFIG_OPEN'; payload: { open: boolean; draft?: string[] } }
+  | { type: 'SET_DAYS_CONFIG_SAVING'; payload: boolean }
+  | { type: 'SET_DAYS_CONFIG_DRAFT'; payload: string[] };
+
+const initialState: State = {
+  selectedClass: "",
+  viewMode: "grid",
+  selectedDay: "",
+  createDialogOpen: false,
+  daySlots: {
+    monday: [], tuesday: [], wednesday: [], thursday: [], friday: [], saturday: [], sunday: [],
+  },
+  saving: false,
+  editDialogOpen: false,
+  editingSlot: null,
+  editForm: {
+    subjectId: "", teacherId: "", startTime: "", endTime: "", day: "", label: "",
+  },
+  editSaving: false,
+  daysConfigOpen: false,
+  daysConfigSaving: false,
+  daysConfigDraft: [],
+};
+
+function reducer(state: State, action: Action): State {
+  switch (action.type) {
+    case 'SET_SELECTED_CLASS': return { ...state, selectedClass: action.payload };
+    case 'SET_VIEW_MODE': return { ...state, viewMode: action.payload };
+    case 'SET_SELECTED_DAY': return { ...state, selectedDay: action.payload };
+    case 'SET_CREATE_DIALOG_OPEN': return { ...state, createDialogOpen: action.payload };
+    case 'SET_DAY_SLOTS':
+      return {
+        ...state,
+        daySlots: typeof action.payload === 'function' ? action.payload(state.daySlots) : action.payload
+      };
+    case 'SET_SAVING': return { ...state, saving: action.payload };
+    case 'OPEN_MANAGE':
+      return { ...state, daySlots: action.payload, createDialogOpen: true };
+    case 'OPEN_EDIT_SLOT':
+      return {
+        ...state,
+        editingSlot: action.payload,
+        editForm: {
+          subjectId: action.payload.subjectId ?? "",
+          teacherId: action.payload.teacherId ?? "",
+          startTime: action.payload.startTime ?? "",
+          endTime: action.payload.endTime ?? "",
+          day: action.payload.day ?? "",
+          label: (action.payload as any).label ?? "",
+        },
+        editDialogOpen: true
+      };
+    case 'SET_EDIT_DIALOG_OPEN': return { ...state, editDialogOpen: action.payload };
+    case 'SET_EDIT_FORM': return { ...state, editForm: { ...state.editForm, ...action.payload } };
+    case 'SET_EDIT_SAVING': return { ...state, editSaving: action.payload };
+    case 'SET_DAYS_CONFIG_OPEN':
+      return {
+        ...state,
+        daysConfigOpen: action.payload.open,
+        daysConfigDraft: action.payload.draft ?? state.daysConfigDraft
+      };
+    case 'SET_DAYS_CONFIG_SAVING': return { ...state, daysConfigSaving: action.payload };
+    case 'SET_DAYS_CONFIG_DRAFT': return { ...state, daysConfigDraft: action.payload };
+    default: return state;
+  }
+}
+
 export function AdminTimetable() {
   const queryClient = useQueryClient();
   const { currentTenantId } = useAppStore();
 
-  const [selectedClass, setSelectedClass] = useState<string>("");
-  const [viewMode, setViewMode] = useState<ViewMode>("grid");
-  const [selectedDay, setSelectedDay] = useState<string>("");
-
-  // Create timetable dialog state
-  const [createDialogOpen, setCreateDialogOpen] = useState(false);
-  const [daySlots, setDaySlots] = useState<Record<string, FormSlot[]>>({
-    monday: [], tuesday: [], wednesday: [], thursday: [], friday: [], saturday: [], sunday: [],
-  });
-  const [saving, setSaving] = useState(false);
-
-  // Edit dialog state
-  const [editDialogOpen, setEditDialogOpen] = useState(false);
-  const [editingSlot, setEditingSlot] = useState<TimetableSlot | null>(null);
-  const [editForm, setEditForm] = useState({
-    subjectId: "", teacherId: "", startTime: "", endTime: "", day: "", label: "",
-  });
-  const [editSaving, setEditSaving] = useState(false);
-
-  // Working Days config dialog state
-  const [daysConfigOpen, setDaysConfigOpen] = useState(false);
-  const [daysConfigSaving, setDaysConfigSaving] = useState(false);
-  const [daysConfigDraft, setDaysConfigDraft] = useState<string[]>([]);
+  const [state, dispatch] = useReducer(reducer, initialState);
+  const {
+    selectedClass, viewMode, selectedDay, createDialogOpen, daySlots,
+    saving, editDialogOpen, editingSlot, editForm, editSaving,
+    daysConfigOpen, daysConfigSaving, daysConfigDraft
+  } = state;
 
   const { canCreate, canEdit, canDelete } = useModulePermissions("timetable");
 
@@ -67,7 +147,7 @@ export function AdminTimetable() {
       const res = await apiFetch("/api/classes?mode=min");
       if (!res.ok) throw new Error("Failed to fetch classes");
       const data = await res.json();
-      if (data.length > 0 && !selectedClass) setSelectedClass(data[0].id);
+      if (data.length > 0 && !selectedClass) dispatch({ type: 'SET_SELECTED_CLASS', payload: data[0].id });
       return data;
     },
     staleTime: 5 * 60 * 1000,
@@ -144,11 +224,11 @@ export function AdminTimetable() {
       });
       queryClient.setQueryData(["timetable", selectedClass], updatedSlots);
       toast.success("Timetable updated");
-      setCreateDialogOpen(false);
+      dispatch({ type: 'SET_CREATE_DIALOG_OPEN', payload: false });
       queryClient.invalidateQueries({ queryKey: ["timetable", selectedClass] });
     },
     onError: () => toast.error("Failed to save timetable"),
-    onSettled: () => setSaving(false),
+    onSettled: () => dispatch({ type: 'SET_SAVING', payload: false }),
   });
 
   const deleteMutation = useMutation({
@@ -170,30 +250,25 @@ export function AdminTimetable() {
     const initial: Record<string, FormSlot[]> = { monday: [], tuesday: [], wednesday: [], thursday: [], friday: [], saturday: [], sunday: [] };
     slots.forEach((slot: any) => { if (initial[slot.day]) { initial[slot.day].push({ ...slot, subjectId: slot.subjectId ?? "", teacherId: slot.teacherId ?? "", label: slot.label ?? undefined }); } });
     ALL_DAYS.forEach((day) => { initial[day]?.sort((a, b) => a.startTime.localeCompare(b.startTime)); });
-    setDaySlots(initial);
-    setCreateDialogOpen(true);
+    dispatch({ type: 'OPEN_MANAGE', payload: initial });
   }, [slots]);
 
   const handleBulkSave = () => {
     if (!selectedClass) return;
-    setSaving(true);
+    dispatch({ type: 'SET_SAVING', payload: true });
     const allFlatSlots = workingDays.flatMap((day) => daySlots[day] ?? []);
     const validSlots = allFlatSlots.filter((p) => (p.subjectId && p.teacherId) || p.label);
-    if (validSlots.length === 0) { toast.error("Please add at least one valid period."); setSaving(false); return; }
+    if (validSlots.length === 0) { toast.error("Please add at least one valid period."); dispatch({ type: 'SET_SAVING', payload: false }); return; }
     bulkSaveMutation.mutate({ slots: validSlots.map((p) => ({ classId: selectedClass, ...p })), classId: selectedClass });
   };
 
   const handleEditSlot = (slot: TimetableSlot) => {
-    setEditingSlot(slot);
-    setEditForm({
-      subjectId: slot.subjectId ?? "", teacherId: slot.teacherId ?? "", startTime: slot.startTime ?? "", endTime: slot.endTime ?? "", day: slot.day ?? "", label: (slot as any).label ?? "",
-    });
-    setEditDialogOpen(true);
+    dispatch({ type: 'OPEN_EDIT_SLOT', payload: slot });
   };
 
   const handleEditSave = async () => {
     if (!editingSlot) return;
-    setEditSaving(true);
+    dispatch({ type: 'SET_EDIT_SAVING', payload: true });
     try {
       const res = await apiFetch(`/api/timetable?id=${editingSlot.id}`, { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify(editForm) });
       if (res.ok) {
@@ -204,18 +279,18 @@ export function AdminTimetable() {
           return old.map((s) => s.id === editingSlot.id ? { ...s, ...editForm, subjectName: sub?.name || s.subjectName, teacherName: teach?.name || s.teacherName } : s);
         });
         toast.success("Slot updated");
-        setEditDialogOpen(false);
+        dispatch({ type: 'SET_EDIT_DIALOG_OPEN', payload: false });
         queryClient.invalidateQueries({ queryKey: ["timetable", selectedClass] });
       } else { toast.error("Failed to update slot"); }
-    } finally { setEditSaving(false); }
+    } finally { dispatch({ type: 'SET_EDIT_SAVING', payload: false }); }
   };
 
   const handleWorkingDaysSave = async () => {
-    setDaysConfigSaving(true);
+    dispatch({ type: 'SET_DAYS_CONFIG_SAVING', payload: true });
     try {
       const res = await apiFetch("/api/tenant-settings", { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ tenantId: currentTenantId, settings: { workingDays: daysConfigDraft } }) });
-      if (res.ok) { queryClient.invalidateQueries({ queryKey: ["working-days", currentTenantId] }); setDaysConfigOpen(false); toast.success("Working days updated"); }
-    } finally { setDaysConfigSaving(false); }
+      if (res.ok) { queryClient.invalidateQueries({ queryKey: ["working-days", currentTenantId] }); dispatch({ type: 'SET_DAYS_CONFIG_OPEN', payload: { open: false } }); toast.success("Working days updated"); }
+    } finally { dispatch({ type: 'SET_DAYS_CONFIG_SAVING', payload: false }); }
   };
 
   const currentClass = useMemo(() => classes.find((c) => c.id === selectedClass), [classes, selectedClass]);
@@ -257,13 +332,13 @@ export function AdminTimetable() {
       <TimetableHeader 
         currentClass={currentClass}
         viewMode={viewMode}
-        setViewMode={setViewMode}
+        setViewMode={(v) => dispatch({ type: 'SET_VIEW_MODE', payload: v })}
         selectedClass={selectedClass}
-        onClassChange={setSelectedClass}
+        onClassChange={(v) => dispatch({ type: 'SET_SELECTED_CLASS', payload: v })}
         classes={classes}
         canEdit={canEdit}
         canCreate={canCreate}
-        onSettingsClick={() => { setDaysConfigDraft([...workingDays]); setDaysConfigOpen(true); }}
+        onSettingsClick={() => { dispatch({ type: 'SET_DAYS_CONFIG_OPEN', payload: { open: true, draft: [...workingDays] } }); }}
         onManageClick={handleOpenManage}
       />
 
@@ -278,20 +353,20 @@ export function AdminTimetable() {
           ) : viewMode === "list" ? (
             <ListView slotsByDay={slotsByDay} uniqueSubjects={uniqueSubjects} workingDays={workingDays} currentDayIndex={currentDayIndex} onDeleteSlot={(id) => deleteMutation.mutate(id)} onEditSlot={handleEditSlot} canEdit={canEdit} canDelete={canDelete} />
           ) : (
-            <DayView selectedDay={effectiveDay} selectedDaySlots={selectedDaySlots} timeSlots={timeSlots} uniqueSubjects={uniqueSubjects} workingDays={workingDays} currentDayIndex={currentDayIndex} onSelectDay={setSelectedDay} onDeleteSlot={(id) => deleteMutation.mutate(id)} onEditSlot={handleEditSlot} canEdit={canEdit} canDelete={canDelete} />
+            <DayView selectedDay={effectiveDay} selectedDaySlots={selectedDaySlots} timeSlots={timeSlots} uniqueSubjects={uniqueSubjects} workingDays={workingDays} currentDayIndex={currentDayIndex} onSelectDay={(v) => dispatch({ type: 'SET_SELECTED_DAY', payload: v })} onDeleteSlot={(id) => deleteMutation.mutate(id)} onEditSlot={handleEditSlot} canEdit={canEdit} canDelete={canDelete} />
           )}
         </CardContent>
       </Card>
 
-      <WorkingDaysDialog open={daysConfigOpen} onOpenChange={setDaysConfigOpen} draft={daysConfigDraft} setDraft={setDaysConfigDraft} onSave={handleWorkingDaysSave} saving={daysConfigSaving} />
-      <EditSlotDialog open={editDialogOpen} onOpenChange={setEditDialogOpen} form={editForm} setForm={setEditForm} onSave={handleEditSave} saving={editSaving} availableSubjects={filteredSubjects} availableTeachers={availableTeachers} workingDays={workingDays} isBreak={!!(editingSlot as any)?.label} />
+      <WorkingDaysDialog open={daysConfigOpen} onOpenChange={(v) => dispatch({ type: 'SET_DAYS_CONFIG_OPEN', payload: { open: v } })} draft={daysConfigDraft} setDraft={(v) => dispatch({ type: 'SET_DAYS_CONFIG_DRAFT', payload: v })} onSave={handleWorkingDaysSave} saving={daysConfigSaving} />
+      <EditSlotDialog open={editDialogOpen} onOpenChange={(v) => dispatch({ type: 'SET_EDIT_DIALOG_OPEN', payload: v })} form={editForm} setForm={(v) => dispatch({ type: 'SET_EDIT_FORM', payload: v })} onSave={handleEditSave} saving={editSaving} availableSubjects={filteredSubjects} availableTeachers={availableTeachers} workingDays={workingDays} isBreak={!!(editingSlot as any)?.label} />
       <CreateTimetableDialog 
         open={createDialogOpen} 
-        onOpenChange={setCreateDialogOpen} 
+        onOpenChange={(v) => dispatch({ type: 'SET_CREATE_DIALOG_OPEN', payload: v })} 
         currentClass={currentClass} 
         workingDays={workingDays} 
         daySlots={daySlots} 
-        setDaySlots={setDaySlots} 
+        setDaySlots={(v) => dispatch({ type: 'SET_DAY_SLOTS', payload: v })} 
         availableSubjects={filteredSubjects} 
         availableTeachers={availableTeachers} 
         onSave={handleBulkSave} 
@@ -300,7 +375,7 @@ export function AdminTimetable() {
           const sourcePeriods = daySlots[src] ?? [];
           if (sourcePeriods.length === 0) return;
           const copied = sourcePeriods.map((slot) => ({ ...slot, id: typeof window !== "undefined" ? window.crypto.randomUUID() : "", day: tar }));
-          setDaySlots((prev) => ({ ...prev, [tar]: copied }));
+          dispatch({ type: 'SET_DAY_SLOTS', payload: (prev) => ({ ...prev, [tar]: copied }) });
           toast.success(`Copied to ${DAY_LABELS[tar]}`);
         }}
         onCopyToAllDays={(src) => {
@@ -308,7 +383,7 @@ export function AdminTimetable() {
           if (sourcePeriods.length === 0) return;
           const updated = { ...daySlots };
           workingDays.forEach((day) => { if (day === src) return; const copied = sourcePeriods.map((slot) => ({ ...slot, id: typeof window !== "undefined" ? window.crypto.randomUUID() : "", day })); updated[day] = copied; });
-          setDaySlots(updated);
+          dispatch({ type: 'SET_DAY_SLOTS', payload: updated });
           toast.success("Copied to all days");
         }}
       />

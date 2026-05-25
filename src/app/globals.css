@@ -125,6 +125,86 @@
   --sidebar-ring: oklch(0.556 0 0);
 }
 
+/* Sonner Toast Customizations - Full Soft Pastel Palette */
+[data-sonner-toast] {
+  --success-bg: #f0fdf4;
+  --success-border: #dcfce7;
+  --success-text: #15803d;
+  
+  --error-bg: #fef2f2;
+  --error-border: #fee2e2;
+  --error-text: #b91c1c;
+
+  --info-bg: #eff6ff;
+  --info-border: #dbeafe;
+  --info-text: #1d4ed8;
+
+  --warning-bg: #fffbeb;
+  --warning-border: #fef3c7;
+  --warning-text: #b45309;
+
+  --loading-bg: #f8fafc;
+  --loading-border: #f1f5f9;
+  --loading-text: #475569;
+
+  --normal-bg: #ffffff;
+  --normal-border: #f1f5f9;
+  --normal-text: #0f172a;
+}
+
+.dark [data-sonner-toast] {
+  --success-bg: #064e3b;
+  --success-border: #065f46;
+  --success-text: #34d399;
+
+  --error-bg: #7f1d1d;
+  --error-border: #991b1b;
+  --error-text: #fca5a5;
+
+  --info-bg: #1e3a8a;
+  --info-border: #1e40af;
+  --info-text: #93c5fd;
+
+  --warning-bg: #78350f;
+  --warning-border: #92400e;
+  --warning-text: #fcd34d;
+
+  --loading-bg: #1e293b;
+  --loading-border: #334155;
+  --loading-text: #cbd5e1;
+
+  --normal-bg: #121212;
+  --normal-border: #1e293b;
+  --normal-text: #f8fafc;
+}
+
+/* Map specific types to variables */
+[data-sonner-toast][data-type='success'] { background: var(--success-bg); border-color: var(--success-border); color: var(--success-text); }
+[data-sonner-toast][data-type='error'] { background: var(--error-bg); border-color: var(--error-border); color: var(--error-text); }
+[data-sonner-toast][data-type='info'] { background: var(--info-bg); border-color: var(--info-border); color: var(--info-text); }
+[data-sonner-toast][data-type='warning'] { background: var(--warning-bg); border-color: var(--warning-border); color: var(--warning-text); }
+[data-sonner-toast][data-type='loading'] { background: var(--loading-bg); border-color: var(--loading-border); color: var(--loading-text); }
+[data-sonner-toast][data-type='default'] { background: var(--normal-bg); border-color: var(--normal-border); color: var(--normal-text); }
+
+/* Explicit Destructive Style - Soft Red */
+[data-sonner-toast][data-type='destructive'] {
+  --destructive-bg: #fff1f2;
+  --destructive-border: #ffe4e6;
+  --destructive-text: #be123c;
+  background: var(--destructive-bg);
+  border-color: var(--destructive-border);
+  color: var(--destructive-text);
+}
+
+.dark [data-sonner-toast][data-type='destructive'] {
+  --destructive-bg: #881337;
+  --destructive-border: #9f1239;
+  --destructive-text: #fda4af;
+  background: var(--destructive-bg);
+  border-color: var(--destructive-border);
+  color: var(--destructive-text);
+}
+
 @layer base {
   * {
     border-color: var(--border);

@@ -2,7 +2,7 @@ import React from 'react';
 import { ClassicAcademic, ModernMinimalist, RoyalExecutive, VintageLedger, TealClean } from './ledger-templates';
 import { LedgerData, compileTabularLedgerData } from './ledger-utils';
 import { createRoot } from "react-dom/client";
-import { goeyToast as toast } from "goey-toast";
+import { toast } from "sonner";
 
 export type { LedgerData, TabulationRow } from './ledger-utils';
 

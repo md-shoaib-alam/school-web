@@ -3,7 +3,7 @@
 import { useEffect, useRef } from "react";
 import { requestNotificationPermission, onForegroundMessage } from "@/lib/firebase";
 import { useAppStore } from "@/store/use-app-store";
-import { goeyToast as toast } from "goey-toast";
+import { toast } from "sonner";
 import { Bell } from "lucide-react";
 import { useGraphQLMutation, SAVE_NOTIFICATION_TOKEN } from "@/lib/graphql/hooks";
 

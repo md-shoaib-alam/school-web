@@ -1,7 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiFetch } from "@/lib/api";
 import { CalendarEvent } from "./types";
-import { goeyToast as toast } from "goey-toast";
+import { toast } from "sonner";
 
 export function useCalendarEvents(tenantId: string | null, monthKey: string) {
   return useQuery({

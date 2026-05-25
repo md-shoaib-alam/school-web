@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient, keepPreviousData } from '@tanstack/react-query'
-import { goeyToast as toast } from 'goey-toast'
+import { toast } from "sonner";
 import { graphqlQuery, graphqlMutate } from '../core'
 import { queryKeys } from '../keys'
 import { 

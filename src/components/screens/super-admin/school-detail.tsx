@@ -3,7 +3,7 @@
 import { useState, useMemo, useRef } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { apiFetch } from "@/lib/api";
-import { goeyToast as toast } from "goey-toast";
+import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
 import { useTenantDetail } from "@/lib/graphql/hooks";
 
@@ -143,7 +143,7 @@ export function SchoolDetail({
     return (
       <div className="flex flex-col items-center justify-center min-h-[400px] gap-4">
         <Loader2 className="size-10 animate-spin text-rose-600" />
-        <p className="text-sm font-black text-muted-foreground animate-pulse tracking-widest uppercase">Fetching school records...</p>
+        <p className="text-sm font-black text-muted-foreground animate-pulse tracking-widest uppercase">Fetching school records…</p>
       </div>
     );
   }

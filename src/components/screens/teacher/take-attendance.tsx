@@ -25,7 +25,7 @@ import {
   UserX,
   Clock,
 } from "lucide-react";
-import { goeyToast as toast } from "goey-toast";
+import { toast } from "sonner";
 import { DatePicker } from "@/components/ui/date-picker";
 
 // ─── Types ────────────────────────────────────────────────────

@@ -35,7 +35,7 @@ interface GraduatedTabProps {
   setGradRemarks: (remarks: string) => void;
   gradPreview: StudentOption[];
   gradSelectedIds: Set<string>;
-  setGradSelectedIds: React.Dispatch<React.SetStateAction<Set<string>>>;
+  setGradSelectedIds: (ids: Set<string>) => void;
   toggleGradStudent: (id: string) => void;
   handleGraduate: () => void;
   gradSubmitting: boolean;

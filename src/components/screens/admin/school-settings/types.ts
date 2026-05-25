@@ -1,4 +1,4 @@
-import { goeyToast as toast } from "goey-toast";
+import { toast } from "sonner";
 
 export const ALL_DAYS = [
   { key: "monday", label: "Monday", short: "Mon", icon: "📅" },

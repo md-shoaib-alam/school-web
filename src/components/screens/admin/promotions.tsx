@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useEffect, useCallback, useReducer } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import {
@@ -19,7 +19,7 @@ import {
   GraduationCap,
   Zap,
 } from "lucide-react";
-import { goeyToast as toast } from "goey-toast";
+import { toast } from "sonner";
 import { apiFetch } from "@/lib/api";
 
 import {
@@ -28,6 +28,8 @@ import {
   StudentOption,
   PromotionFormData,
   emptyForm,
+  getInitialState,
+  promotionsReducer,
 } from "./promotions/types";
 import { getCurrentAcademicYear, getNextClass } from "./promotions/utils";
 import { PromotionsTable } from "./promotions/PromotionsTable";
@@ -38,62 +40,46 @@ import { BulkPromotionDialog } from "./promotions/BulkPromotionDialog";
 import { RejectPromotionDialog } from "./promotions/RejectPromotionDialog";
 
 export function AdminPromotions({ initialTab: propTab }: { initialTab?: "individual" | "bulk" | "graduated" }) {
-  const [activeTab, setActiveTab] = useState<
-    "individual" | "bulk" | "graduated"
-  >(propTab || "individual");
+  const [state, dispatch] = useReducer(
+    promotionsReducer,
+    getInitialState(propTab, getCurrentAcademicYear()),
+  );
+
+  const {
+    activeTab,
+    promotions,
+    graduations,
+    classes,
+    students,
+    loading,
+    academicYearFilter,
+    classFilter,
+    statusFilter,
+    dialogOpen,
+    form,
+    submitting,
+    bulkDialogOpen,
+    bulkFromClass,
+    bulkToClass,
+    bulkAcademicYear,
+    bulkRemarks,
+    bulkSubmitting,
+    gradClassId,
+    gradAcademicYear,
+    gradRemarks,
+    gradSelectedIds,
+    gradSubmitting,
+    rejectDialogOpen,
+    rejectingPromotion,
+    rejectRemarks,
+    rejecting,
+    approvingId,
+  } = state;
 
   // Sync tab if prop changes (e.g. clicking sidebar while already on page)
   useEffect(() => {
-    if (propTab) queueMicrotask(() => setActiveTab(propTab));
+    if (propTab) queueMicrotask(() => dispatch({ type: "SET_ACTIVE_TAB", tab: propTab }));
   }, [propTab]);
-
-  // Data
-  const [promotions, setPromotions] = useState<PromotionRecord[]>([]);
-  const [graduations, setGraduations] = useState<PromotionRecord[]>([]);
-  const [classes, setClasses] = useState<ClassOption[]>([]);
-  const [students, setStudents] = useState<StudentOption[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  // Filters
-  const [academicYearFilter, setAcademicYearFilter] = useState("all");
-  const [classFilter, setClassFilter] = useState("all");
-  const [statusFilter, setStatusFilter] = useState("all");
-
-  // Individual promotion dialog
-  const [dialogOpen, setDialogOpen] = useState(false);
-  const [form, setForm] = useState<PromotionFormData>({ ...emptyForm });
-  const [submitting, setSubmitting] = useState(false);
-
-  // Bulk promote dialog
-  const [bulkDialogOpen, setBulkDialogOpen] = useState(false);
-  const [bulkFromClass, setBulkFromClass] = useState("");
-  const [bulkToClass, setBulkToClass] = useState("");
-  const [bulkAcademicYear, setBulkAcademicYear] = useState(
-    () => getCurrentAcademicYear(),
-  );
-  const [bulkRemarks, setBulkRemarks] = useState("");
-  const [bulkSubmitting, setBulkSubmitting] = useState(false);
-
-  // Graduation dialog
-  const [gradClassId, setGradClassId] = useState("");
-  const [gradAcademicYear, setGradAcademicYear] = useState(
-    () => getCurrentAcademicYear(),
-  );
-  const [gradRemarks, setGradRemarks] = useState("");
-  const [gradSelectedIds, setGradSelectedIds] = useState<Set<string>>(
-    new Set(),
-  );
-  const [gradSubmitting, setGradSubmitting] = useState(false);
-
-  // Reject confirmation dialog
-  const [rejectDialogOpen, setRejectDialogOpen] = useState(false);
-  const [rejectingPromotion, setRejectingPromotion] =
-    useState<PromotionRecord | null>(null);
-  const [rejectRemarks, setRejectRemarks] = useState("");
-  const [rejecting, setRejecting] = useState(false);
-
-  // Approving state
-  const [approvingId, setApprovingId] = useState<string | null>(null);
 
   /* ---- Fetch helpers ---- */
 
@@ -109,7 +95,7 @@ export function AdminPromotions({ initialTab: propTab }: { initialTab?: "individ
       const res = await apiFetch(`/api/promotions?${params.toString()}`);
       if (res.ok) {
         const json = await res.json();
-        setPromotions(json.items || []);
+        dispatch({ type: "FETCH_PROMOTIONS_SUCCESS", payload: json.items || [] });
       }
     } catch {
       /* silent */
@@ -124,7 +110,7 @@ export function AdminPromotions({ initialTab: propTab }: { initialTab?: "individ
       const res = await apiFetch(`/api/promotions?${params.toString()}`);
       if (res.ok) {
         const json = await res.json();
-        setGraduations(json.items || []);
+        dispatch({ type: "FETCH_GRADUATIONS_SUCCESS", payload: json.items || [] });
       }
     } catch {
       /* silent */
@@ -137,28 +123,28 @@ export function AdminPromotions({ initialTab: propTab }: { initialTab?: "individ
         apiFetch("/api/classes?mode=min"),
         apiFetch("/api/students?mode=min"), // Optimized fetch with only essential fields
       ]);
-      if (classesRes.ok) setClasses(await classesRes.json());
+      const classesData = classesRes.ok ? await classesRes.json() : [];
+      let studentsData: StudentOption[] = [];
       if (studentsRes.ok) {
         const json = await studentsRes.json();
         const studentItems = json.items || [];
-        setStudents(
-          studentItems.map(
-            (s: {
-              id: string;
-              name: string;
-              rollNumber: string;
-              className: string;
-              classId: string;
-            }) => ({
-              id: s.id,
-              name: s.name,
-              rollNumber: s.rollNumber,
-              className: s.className,
-              classId: s.classId,
-            }),
-          ),
+        studentsData = studentItems.map(
+          (s: {
+            id: string;
+            name: string;
+            rollNumber: string;
+            className: string;
+            classId: string;
+          }) => ({
+            id: s.id,
+            name: s.name,
+            rollNumber: s.rollNumber,
+            className: s.className,
+            classId: s.classId,
+          }),
         );
       }
+      dispatch({ type: "FETCH_CLASSES_STUDENTS_SUCCESS", classes: classesData, students: studentsData });
     } catch {
       /* silent */
     }
@@ -167,13 +153,13 @@ export function AdminPromotions({ initialTab: propTab }: { initialTab?: "individ
   // Fetch graduations: include in init and on tab change
   useEffect(() => {
     async function init() {
-      setLoading(true);
+      dispatch({ type: "FETCH_START" });
       await Promise.all([
         fetchPromotions(),
         fetchGraduations(),
         fetchClassesAndStudents(),
       ]);
-      setLoading(false);
+      dispatch({ type: "FETCH_END" });
     }
     init();
   }, [fetchPromotions, fetchGraduations, fetchClassesAndStudents]);
@@ -200,11 +186,14 @@ export function AdminPromotions({ initialTab: propTab }: { initialTab?: "individ
   const handleStudentChange = (studentId: string) => {
     const student = students.find((s) => s.id === studentId);
     if (student) {
-      setForm({
-        ...form,
-        studentId,
-        fromClassId: student.classId,
-        toClassId: "",
+      dispatch({
+        type: "SET_FORM",
+        form: {
+          ...form,
+          studentId,
+          fromClassId: student.classId,
+          toClassId: "",
+        },
       });
     }
   };
@@ -222,7 +211,7 @@ export function AdminPromotions({ initialTab: propTab }: { initialTab?: "individ
       return;
     }
 
-    setSubmitting(true);
+    dispatch({ type: "SET_SUBMITTING", value: true });
     const promise = (async () => {
       const res = await apiFetch("/api/promotions", {
         method: "POST",
@@ -240,8 +229,7 @@ export function AdminPromotions({ initialTab: propTab }: { initialTab?: "individ
         throw new Error(data.error || "Failed to create promotion");
       }
 
-      setDialogOpen(false);
-      setForm({ ...emptyForm });
+      dispatch({ type: "CLOSE_NEW_PROMOTION_DIALOG" });
       await fetchPromotions();
     })();
 
@@ -256,16 +244,12 @@ export function AdminPromotions({ initialTab: propTab }: { initialTab?: "individ
     } catch {
       /* handled by toast */
     }
-    setSubmitting(false);
+    dispatch({ type: "SET_SUBMITTING", value: false });
   };
 
   // Bulk promote preview
   const openBulkDialog = () => {
-    setBulkFromClass("");
-    setBulkToClass("");
-    setBulkAcademicYear(getCurrentAcademicYear());
-    setBulkRemarks("");
-    setBulkDialogOpen(true);
+    dispatch({ type: "OPEN_BULK_DIALOG", academicYear: getCurrentAcademicYear() });
   };
 
   // Compute bulk preview as derived state
@@ -275,9 +259,8 @@ export function AdminPromotions({ initialTab: propTab }: { initialTab?: "individ
 
   // Handle bulk from class change with auto-detect
   const handleBulkFromClassChange = (classId: string) => {
-    setBulkFromClass(classId);
     const autoTo = classId ? getNextClass(classId, classes) : null;
-    setBulkToClass(autoTo ? autoTo.id : "");
+    dispatch({ type: "SET_BULK_FROM_CLASS", classId, toClassId: autoTo ? autoTo.id : "" });
   };
 
   const handleBulkPromote = async () => {
@@ -294,7 +277,7 @@ export function AdminPromotions({ initialTab: propTab }: { initialTab?: "individ
       return;
     }
 
-    setBulkSubmitting(true);
+    dispatch({ type: "SET_BULK_SUBMITTING", value: true });
     const promise = (async () => {
       const res = await apiFetch("/api/promotions", {
         method: "POST",
@@ -313,7 +296,7 @@ export function AdminPromotions({ initialTab: propTab }: { initialTab?: "individ
       }
 
       const data = await res.json();
-      setBulkDialogOpen(false);
+      dispatch({ type: "CLOSE_BULK_DIALOG" });
       await Promise.all([fetchPromotions(), fetchClassesAndStudents()]);
       return data;
     })();
@@ -330,16 +313,12 @@ export function AdminPromotions({ initialTab: propTab }: { initialTab?: "individ
     } catch {
       /* handled by toast */
     }
-    setBulkSubmitting(false);
+    dispatch({ type: "SET_BULK_SUBMITTING", value: false });
   };
 
   // Graduation
   const openGradDialog = () => {
-    setGradClassId("");
-    setGradAcademicYear(getCurrentAcademicYear());
-    setGradRemarks("");
-    setGradSelectedIds(new Set());
-    setActiveTab("graduated");
+    dispatch({ type: "OPEN_GRAD_DIALOG", academicYear: getCurrentAcademicYear() });
   };
 
   // Compute grad preview as derived state
@@ -349,20 +328,14 @@ export function AdminPromotions({ initialTab: propTab }: { initialTab?: "individ
 
   // Handle grad class change — select all by default
   const handleGradClassChange = (classId: string) => {
-    setGradClassId(classId);
     const previewStudents = classId
       ? students.filter((s) => s.classId === classId)
       : [];
-    setGradSelectedIds(new Set(previewStudents.map((s) => s.id)));
+    dispatch({ type: "SET_GRAD_CLASS_ID", classId, selectedIds: new Set(previewStudents.map((s) => s.id)) });
   };
 
   const toggleGradStudent = (id: string) => {
-    setGradSelectedIds((prev) => {
-      const next = new Set(prev);
-      if (next.has(id)) next.delete(id);
-      else next.add(id);
-      return next;
-    });
+    dispatch({ type: "TOGGLE_GRAD_STUDENT", id });
   };
 
   const handleGraduate = async () => {
@@ -379,7 +352,7 @@ export function AdminPromotions({ initialTab: propTab }: { initialTab?: "individ
       return;
     }
 
-    setGradSubmitting(true);
+    dispatch({ type: "SET_GRAD_SUBMITTING", value: true });
     const promise = (async () => {
       const body: Record<string, unknown> = {
         graduation: true,
@@ -412,12 +385,12 @@ export function AdminPromotions({ initialTab: propTab }: { initialTab?: "individ
     } catch {
       /* handled by toast */
     }
-    setGradSubmitting(false);
+    dispatch({ type: "SET_GRAD_SUBMITTING", value: false });
   };
 
   // Approve / Reject
   const handleApprove = async (promotion: PromotionRecord) => {
-    setApprovingId(promotion.id);
+    dispatch({ type: "SET_APPROVING_ID", id: promotion.id });
     const promise = (async () => {
       const res = await apiFetch("/api/promotions", {
         method: "PUT",
@@ -443,18 +416,16 @@ export function AdminPromotions({ initialTab: propTab }: { initialTab?: "individ
     } catch {
       /* handled by toast */
     }
-    setApprovingId(null);
+    dispatch({ type: "SET_APPROVING_ID", id: null });
   };
 
   const openRejectDialog = (promotion: PromotionRecord) => {
-    setRejectingPromotion(promotion);
-    setRejectRemarks("");
-    setRejectDialogOpen(true);
+    dispatch({ type: "OPEN_REJECT_DIALOG", promotion });
   };
 
   const handleReject = async () => {
     if (!rejectingPromotion) return;
-    setRejecting(true);
+    dispatch({ type: "SET_REJECTING", value: true });
     try {
       const res = await apiFetch("/api/promotions", {
         method: "PUT",
@@ -468,8 +439,7 @@ export function AdminPromotions({ initialTab: propTab }: { initialTab?: "individ
         toast.success("Rejected", {
           description: `Promotion for ${rejectingPromotion.studentName} rejected`,
         });
-        setRejectDialogOpen(false);
-        setRejectingPromotion(null);
+        dispatch({ type: "CLOSE_REJECT_DIALOG" });
         await fetchPromotions();
       } else {
         const data = await res.json();
@@ -482,7 +452,7 @@ export function AdminPromotions({ initialTab: propTab }: { initialTab?: "individ
         description: "Error rejecting promotion",
       });
     }
-    setRejecting(false);
+    dispatch({ type: "SET_REJECTING", value: false });
   };
 
   /* ---- Render ---- */
@@ -571,7 +541,7 @@ export function AdminPromotions({ initialTab: propTab }: { initialTab?: "individ
           <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center">
             <Select
               value={academicYearFilter}
-              onValueChange={setAcademicYearFilter}
+              onValueChange={(val) => dispatch({ type: "SET_ACADEMIC_YEAR_FILTER", value: val })}
             >
               <SelectTrigger className="w-full sm:w-44">
                 <SelectValue placeholder="Academic Year" />
@@ -585,7 +555,7 @@ export function AdminPromotions({ initialTab: propTab }: { initialTab?: "individ
                 ))}
               </SelectContent>
             </Select>
-            <Select value={classFilter} onValueChange={setClassFilter}>
+            <Select value={classFilter} onValueChange={(val) => dispatch({ type: "SET_CLASS_FILTER", value: val })}>
               <SelectTrigger className="w-full sm:w-44">
                 <SelectValue placeholder="Class" />
               </SelectTrigger>
@@ -598,7 +568,7 @@ export function AdminPromotions({ initialTab: propTab }: { initialTab?: "individ
                 ))}
               </SelectContent>
             </Select>
-            <Select value={statusFilter} onValueChange={setStatusFilter}>
+            <Select value={statusFilter} onValueChange={(val) => dispatch({ type: "SET_STATUS_FILTER", value: val })}>
               <SelectTrigger className="w-full sm:w-40">
                 <SelectValue placeholder="Status" />
               </SelectTrigger>
@@ -614,10 +584,7 @@ export function AdminPromotions({ initialTab: propTab }: { initialTab?: "individ
             
             <Button
               className="bg-emerald-600 hover:bg-emerald-700 text-white gap-2"
-              onClick={() => {
-                setForm({ ...emptyForm, academicYear: getCurrentAcademicYear() });
-                setDialogOpen(true);
-              }}
+              onClick={() => dispatch({ type: "OPEN_NEW_PROMOTION_DIALOG", academicYear: getCurrentAcademicYear() })}
             >
               <Plus className="size-4" />
               <span>New Promotion</span>
@@ -641,11 +608,11 @@ export function AdminPromotions({ initialTab: propTab }: { initialTab?: "individ
           bulkFromClass={bulkFromClass}
           handleBulkFromClassChange={handleBulkFromClassChange}
           bulkToClass={bulkToClass}
-          setBulkToClass={setBulkToClass}
+          setBulkToClass={(val) => dispatch({ type: "SET_BULK_TO_CLASS", classId: val })}
           bulkAcademicYear={bulkAcademicYear}
-          setBulkAcademicYear={setBulkAcademicYear}
+          setBulkAcademicYear={(val) => dispatch({ type: "SET_BULK_ACADEMIC_YEAR", value: val })}
           bulkRemarks={bulkRemarks}
-          setBulkRemarks={setBulkRemarks}
+          setBulkRemarks={(val) => dispatch({ type: "SET_BULK_REMARKS", value: val })}
           bulkPreview={bulkPreview}
           handleBulkPromote={handleBulkPromote}
           bulkSubmitting={bulkSubmitting}
@@ -659,12 +626,12 @@ export function AdminPromotions({ initialTab: propTab }: { initialTab?: "individ
           gradClassId={gradClassId}
           handleGradClassChange={handleGradClassChange}
           gradAcademicYear={gradAcademicYear}
-          setGradAcademicYear={setGradAcademicYear}
+          setGradAcademicYear={(val) => dispatch({ type: "SET_GRAD_ACADEMIC_YEAR", value: val })}
           gradRemarks={gradRemarks}
-          setGradRemarks={setGradRemarks}
+          setGradRemarks={(val) => dispatch({ type: "SET_GRAD_REMARKS", value: val })}
           gradPreview={gradPreview}
           gradSelectedIds={gradSelectedIds}
-          setGradSelectedIds={setGradSelectedIds}
+          setGradSelectedIds={(ids) => dispatch({ type: "SET_GRAD_SELECTED_IDS", ids })}
           toggleGradStudent={toggleGradStudent}
           handleGraduate={handleGraduate}
           gradSubmitting={gradSubmitting}
@@ -675,9 +642,9 @@ export function AdminPromotions({ initialTab: propTab }: { initialTab?: "individ
       {/* ═══════ DIALOGS ═══════ */}
       <NewPromotionDialog
         open={dialogOpen}
-        onOpenChange={setDialogOpen}
+        onOpenChange={(val) => !val && dispatch({ type: "CLOSE_NEW_PROMOTION_DIALOG" })}
         form={form}
-        setForm={setForm}
+        setForm={(val) => dispatch({ type: "SET_FORM", form: typeof val === "function" ? val(form) : val })}
         students={students}
         classes={classes}
         submitting={submitting}
@@ -687,16 +654,16 @@ export function AdminPromotions({ initialTab: propTab }: { initialTab?: "individ
 
       <BulkPromotionDialog
         open={bulkDialogOpen}
-        onOpenChange={setBulkDialogOpen}
+        onOpenChange={(val) => !val && dispatch({ type: "CLOSE_BULK_DIALOG" })}
         classes={classes}
         bulkFromClass={bulkFromClass}
         handleBulkFromClassChange={handleBulkFromClassChange}
         bulkToClass={bulkToClass}
-        setBulkToClass={setBulkToClass}
+        setBulkToClass={(val) => dispatch({ type: "SET_BULK_TO_CLASS", classId: val })}
         bulkAcademicYear={bulkAcademicYear}
-        setBulkAcademicYear={setBulkAcademicYear}
+        setBulkAcademicYear={(val) => dispatch({ type: "SET_BULK_ACADEMIC_YEAR", value: val })}
         bulkRemarks={bulkRemarks}
-        setBulkRemarks={setBulkRemarks}
+        setBulkRemarks={(val) => dispatch({ type: "SET_BULK_REMARKS", value: val })}
         bulkPreview={bulkPreview}
         handleBulkPromote={handleBulkPromote}
         bulkSubmitting={bulkSubmitting}
@@ -704,10 +671,10 @@ export function AdminPromotions({ initialTab: propTab }: { initialTab?: "individ
 
       <RejectPromotionDialog
         open={rejectDialogOpen}
-        onOpenChange={setRejectDialogOpen}
+        onOpenChange={(val) => !val && dispatch({ type: "CLOSE_REJECT_DIALOG" })}
         rejectingPromotion={rejectingPromotion}
         rejectRemarks={rejectRemarks}
-        setRejectRemarks={setRejectRemarks}
+        setRejectRemarks={(val) => dispatch({ type: "SET_REJECT_REMARKS", value: val })}
         handleReject={handleReject}
         rejecting={rejecting}
       />

@@ -45,7 +45,7 @@ import {
   Tag,
   Clock,
 } from "lucide-react";
-import { goeyToast as toast } from "goey-toast";
+import { toast } from "sonner";
 import { useAppStore } from "@/store/use-app-store";
 
 // ── Constants ──

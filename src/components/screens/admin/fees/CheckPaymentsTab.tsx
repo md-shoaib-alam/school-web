@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from 'react';
+import { useReducer, useMemo } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -20,16 +20,75 @@ import { useFeeReceipts } from '@/hooks/use-fees';
 import { paymentMethodConfig, receiptStatusConfig } from './config';
 import type { FeeReceipt } from './types';
 
+type State = {
+  search: string;
+  methodFilter: string;
+  dateFilter: string;
+  fromDate: string;
+  toDate: string;
+  viewDialogOpen: boolean;
+  selectedPayment: FeeReceipt | null;
+};
+
+type Action =
+  | { type: 'SET_SEARCH'; payload: string }
+  | { type: 'SET_METHOD_FILTER'; payload: string }
+  | { type: 'SET_DATE_FILTER'; payload: string }
+  | { type: 'SET_FROM_DATE'; payload: string }
+  | { type: 'SET_TO_DATE'; payload: string }
+  | { type: 'OPEN_VIEW'; payload: FeeReceipt }
+  | { type: 'CLOSE_VIEW' };
+
+const initialState: State = {
+  search: '',
+  methodFilter: 'all',
+  dateFilter: 'all',
+  fromDate: '',
+  toDate: '',
+  viewDialogOpen: false,
+  selectedPayment: null,
+};
+
+function reducer(state: State, action: Action): State {
+  switch (action.type) {
+    case 'SET_SEARCH':
+      return { ...state, search: action.payload };
+    case 'SET_METHOD_FILTER':
+      return { ...state, methodFilter: action.payload };
+    case 'SET_DATE_FILTER':
+      return { 
+        ...state, 
+        dateFilter: action.payload, 
+        fromDate: action.payload !== 'custom' ? '' : state.fromDate,
+        toDate: action.payload !== 'custom' ? '' : state.toDate 
+      };
+    case 'SET_FROM_DATE':
+      return { ...state, fromDate: action.payload };
+    case 'SET_TO_DATE':
+      return { ...state, toDate: action.payload };
+    case 'OPEN_VIEW':
+      return { ...state, selectedPayment: action.payload, viewDialogOpen: true };
+    case 'CLOSE_VIEW':
+      return { ...state, viewDialogOpen: false };
+    default:
+      return state;
+  }
+}
+
 export function CheckPaymentsTab() {
   const { data, isLoading: loading } = useFeeReceipts();
   const payments = data?.items || [];
-  const [search, setSearch] = useState('');
-  const [methodFilter, setMethodFilter] = useState('all');
-  const [dateFilter, setDateFilter] = useState('all');
-  const [fromDate, setFromDate] = useState('');
-  const [toDate, setToDate] = useState('');
-  const [viewDialogOpen, setViewDialogOpen] = useState(false);
-  const [selectedPayment, setSelectedPayment] = useState<FeeReceipt | null>(null);
+  
+  const [state, dispatch] = useReducer(reducer, initialState);
+  const {
+    search,
+    methodFilter,
+    dateFilter,
+    fromDate,
+    toDate,
+    viewDialogOpen,
+    selectedPayment,
+  } = state;
 
   const filtered = useMemo(() => {
     if (!Array.isArray(payments)) return [];
@@ -137,9 +196,9 @@ export function CheckPaymentsTab() {
       <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center flex-wrap">
         <div className="relative flex-1 max-w-sm min-w-[200px]">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
-          <Input placeholder="Search by name, phone, or receipt #..." className="pl-9" value={search} onChange={e => setSearch(e.target.value)} />
+          <Input placeholder="Search by name, phone, or receipt #..." className="pl-9" value={search} onChange={e => dispatch({ type: 'SET_SEARCH', payload: e.target.value })} />
         </div>
-        <Select value={methodFilter} onValueChange={setMethodFilter}>
+        <Select value={methodFilter} onValueChange={(v) => dispatch({ type: 'SET_METHOD_FILTER', payload: v })}>
           <SelectTrigger className="w-full sm:w-40"><SelectValue placeholder="Method" /></SelectTrigger>
           <SelectContent>
             <SelectItem value="all">All Methods</SelectItem>
@@ -150,7 +209,7 @@ export function CheckPaymentsTab() {
             <SelectItem value="card">Card</SelectItem>
           </SelectContent>
         </Select>
-        <Select value={dateFilter} onValueChange={v => { setDateFilter(v); if (v !== 'custom') { setFromDate(''); setToDate(''); } }}>
+        <Select value={dateFilter} onValueChange={v => dispatch({ type: 'SET_DATE_FILTER', payload: v })}>
           <SelectTrigger className="w-full sm:w-36"><SelectValue placeholder="Period" /></SelectTrigger>
           <SelectContent>
             <SelectItem value="all">All Time</SelectItem>
@@ -162,8 +221,8 @@ export function CheckPaymentsTab() {
         </Select>
         {dateFilter === 'custom' && (
           <>
-            <Input type="date" className="w-full sm:w-36" value={fromDate} onChange={e => setFromDate(e.target.value)} />
-            <Input type="date" className="w-full sm:w-36" value={toDate} onChange={e => setToDate(e.target.value)} />
+            <Input type="date" className="w-full sm:w-36" value={fromDate} onChange={e => dispatch({ type: 'SET_FROM_DATE', payload: e.target.value })} />
+            <Input type="date" className="w-full sm:w-36" value={toDate} onChange={e => dispatch({ type: 'SET_TO_DATE', payload: e.target.value })} />
           </>
         )}
       </div>
@@ -256,7 +315,7 @@ export function CheckPaymentsTab() {
                           <Badge variant="outline" className={`${stCfg.bg} border-0 font-medium capitalize text-xs`}>{p.status}</Badge>
                         </TableCell>
                         <TableCell className="text-center">
-                          <Button variant="ghost" size="icon" className="size-7 text-emerald-800 dark:text-emerald-300 hover:text-emerald-900 dark:hover:text-emerald-200 hover:bg-emerald-100/50 dark:hover:bg-emerald-900/50" onClick={() => { setSelectedPayment(p); setViewDialogOpen(true); }}>
+                          <Button variant="ghost" size="icon" className="size-7 text-emerald-800 dark:text-emerald-300 hover:text-emerald-900 dark:hover:text-emerald-200 hover:bg-emerald-100/50 dark:hover:bg-emerald-900/50" onClick={() => dispatch({ type: 'OPEN_VIEW', payload: p })}>
                             <Eye className="size-3.5" />
                           </Button>
                         </TableCell>
@@ -271,7 +330,7 @@ export function CheckPaymentsTab() {
       </Card>
 
       {/* View Payment Detail Dialog */}
-      <Dialog open={viewDialogOpen} onOpenChange={setViewDialogOpen}>
+      <Dialog open={viewDialogOpen} onOpenChange={(open) => !open && dispatch({ type: 'CLOSE_VIEW' })}>
         <DialogContent className="sm:max-w-lg">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">

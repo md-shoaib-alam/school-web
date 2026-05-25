@@ -2,7 +2,7 @@
 
 import { useState, useMemo } from "react";
 import { useUsers, useToggleUserStatus } from "@/lib/graphql/hooks";
-import { goeyToast as toast } from "goey-toast";
+import { toast } from "sonner";
 
 // Sub-components
 import { UserHeader } from "./users/UserHeader";

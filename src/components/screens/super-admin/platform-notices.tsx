@@ -35,7 +35,7 @@ import {
   AlertDialogAction,
   AlertDialogCancel,
 } from "@/components/ui/alert-dialog";
-import { goeyToast as toast } from "goey-toast";
+import { toast } from "sonner";
 import { 
   useTenants, 
   useGraphQLMutation, 

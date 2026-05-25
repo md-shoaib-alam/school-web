@@ -166,6 +166,12 @@ export default function TenantScreenDispatcherClient() {
       case 'published-results': return <AdminExams key="published" initialTab="published" />;
       case 'print-marksheet': return <AdminPrintMarksheet />;
       case 'admit-cards': return <AdminAdmitCards />;
+      default: {
+        const tid = currentUser.tenantSlug || currentUser.tenantId || slug;
+        if (screen !== 'dashboard') {
+          redirect(`/${tid}/dashboard`);
+        }
+      }
     }
   }
 
@@ -186,6 +192,12 @@ export default function TenantScreenDispatcherClient() {
       case 'calendar': return <TeacherCalendar />;
       case 'leaves': return <TeacherLeaves />;
       case 'tickets': return <TeacherTickets />;
+      default: {
+        const tid = currentUser.tenantSlug || currentUser.tenantId || slug;
+        if (screen !== 'dashboard') {
+          redirect(`/${tid}/dashboard`);
+        }
+      }
     }
   }
 
@@ -208,6 +220,12 @@ export default function TenantScreenDispatcherClient() {
       case 'tickets': return <StudentTickets />;
       case 'calendar': return <StudentCalendar />;
       case 'leaves': return <StudentLeaves />;
+      default: {
+        const tid = currentUser.tenantSlug || currentUser.tenantId || slug;
+        if (screen !== 'dashboard') {
+          redirect(`/${tid}/dashboard`);
+        }
+      }
     }
   }
 
@@ -228,13 +246,19 @@ export default function TenantScreenDispatcherClient() {
       case 'calendar': return <ParentCalendar />;
       case 'tickets': return <ParentTickets />;
       case 'view-marksheet': return <StudentMarksheet />;
+      default: {
+        const tid = currentUser.tenantSlug || currentUser.tenantId || slug;
+        if (screen !== 'dashboard') {
+          redirect(`/${tid}/dashboard`);
+        }
+      }
     }
   }
 
   // FAIL-SAFE: If we got here and the user is logged in,
   // they are at an invalid screen. Redirect them to their dashboard.
   if (mounted && currentUser) {
-    const fallback = currentUser.tenantSlug || currentUser.tenantId || "";
+    const fallback = currentUser.tenantSlug || currentUser.tenantId || slug || "";
     redirect(fallback ? `/${fallback}/dashboard` : "/dashboard");
   }
 

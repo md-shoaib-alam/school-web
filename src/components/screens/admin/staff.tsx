@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback, useMemo, useEffect } from "react";
+import { useReducer, useCallback, useMemo, useEffect } from "react";
 import {
   useGraphQLMutation,
   useAssignRoleToUser,
@@ -28,7 +28,7 @@ import {
   List
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { goeyToast as toast } from "goey-toast";
+import { toast } from "sonner";
 import { useAppStore } from "@/store/use-app-store";
 import { useStaff, useCustomRoles } from "@/lib/graphql/hooks";
 import { useModulePermissions } from "@/hooks/use-permissions";
@@ -68,11 +68,92 @@ const DELETE_USER = `
   }
 `;
 
+type State = {
+  search: string;
+  viewMode: 'table' | 'grid';
+  dialogOpen: boolean;
+  editingMember: StaffMember | null;
+  formData: StaffFormData;
+  submitting: boolean;
+  deleteAlertOpen: boolean;
+  memberToDelete: StaffMember | null;
+};
+
+type Action =
+  | { type: 'SET_SEARCH'; payload: string }
+  | { type: 'SET_VIEW_MODE'; payload: 'table' | 'grid' }
+  | { type: 'OPEN_CREATE' }
+  | { type: 'OPEN_EDIT'; payload: StaffMember }
+  | { type: 'CLOSE_DIALOG' }
+  | { type: 'SET_FORM_DATA'; payload: StaffFormData }
+  | { type: 'SET_SUBMITTING'; payload: boolean }
+  | { type: 'OPEN_DELETE'; payload: StaffMember }
+  | { type: 'CLOSE_DELETE' };
+
+const initialState: State = {
+  search: "",
+  viewMode: 'table',
+  dialogOpen: false,
+  editingMember: null,
+  formData: emptyFormData,
+  submitting: false,
+  deleteAlertOpen: false,
+  memberToDelete: null,
+};
+
+function reducer(state: State, action: Action): State {
+  switch (action.type) {
+    case 'SET_SEARCH':
+      return { ...state, search: action.payload };
+    case 'SET_VIEW_MODE':
+      return { ...state, viewMode: action.payload };
+    case 'OPEN_CREATE':
+      return { ...state, editingMember: null, formData: emptyFormData, dialogOpen: true };
+    case 'OPEN_EDIT':
+      return {
+        ...state,
+        editingMember: action.payload,
+        formData: {
+          name: action.payload.name,
+          email: action.payload.email,
+          password: "",
+          phone: action.payload.phone || "",
+          address: action.payload.address || "",
+          customRoleId: action.payload.customRole?.id || "",
+          isActive: action.payload.isActive,
+        },
+        dialogOpen: true,
+      };
+    case 'CLOSE_DIALOG':
+      return { ...state, dialogOpen: false };
+    case 'SET_FORM_DATA':
+      return { ...state, formData: action.payload };
+    case 'SET_SUBMITTING':
+      return { ...state, submitting: action.payload };
+    case 'OPEN_DELETE':
+      return { ...state, memberToDelete: action.payload, deleteAlertOpen: true };
+    case 'CLOSE_DELETE':
+      return { ...state, deleteAlertOpen: false };
+    default:
+      return state;
+  }
+}
+
 export function AdminStaff() {
   const { currentTenantId } = useAppStore();
   const { canCreate, canEdit, canDelete } = useModulePermissions("staff");
   const queryClient = useQueryClient();
-  const [search, setSearch] = useState("");
+  const [state, dispatch] = useReducer(reducer, initialState);
+  const {
+    search,
+    viewMode,
+    dialogOpen,
+    editingMember,
+    formData,
+    submitting,
+    deleteAlertOpen,
+    memberToDelete,
+  } = state;
 
   // --- Queries ---
   const { 
@@ -89,50 +170,23 @@ export function AdminStaff() {
   const { mutateAsync: deleteUser } = useGraphQLMutation<{ deleteUser: boolean }, any>(DELETE_USER);
   const { mutateAsync: assignRole } = useAssignRoleToUser();
 
-  const [viewMode, setViewMode] = useState<'table' | 'grid'>('table');
-
   // Load view mode preference
   useEffect(() => {
     const saved = localStorage.getItem('staff_view_mode') as 'table' | 'grid';
-    if (saved) setViewMode(saved);
+    if (saved) dispatch({ type: 'SET_VIEW_MODE', payload: saved });
   }, []);
 
   // Save view mode preference
   const toggleView = (mode: 'table' | 'grid') => {
-    setViewMode(mode);
+    dispatch({ type: 'SET_VIEW_MODE', payload: mode });
     localStorage.setItem('staff_view_mode', mode);
   };
 
-  const [dialogOpen, setDialogOpen] = useState(false);
-  const [editingMember, setEditingMember] = useState<StaffMember | null>(null);
-  const [formData, setFormData] = useState<StaffFormData>(emptyFormData);
-  const [submitting, setSubmitting] = useState(false);
-
-  // Delete Alert
-  const [deleteAlertOpen, setDeleteAlertOpen] = useState(false);
-  const [memberToDelete, setMemberToDelete] = useState<StaffMember | null>(null);
-
   // --- Handlers ---
 
-  const handleOpenCreate = () => {
-    setEditingMember(null);
-    setFormData(emptyFormData);
-    setDialogOpen(true);
-  };
+  const handleOpenCreate = () => dispatch({ type: 'OPEN_CREATE' });
 
-  const handleOpenEdit = (member: StaffMember) => {
-    setEditingMember(member);
-    setFormData({
-      name: member.name,
-      email: member.email,
-      password: "", // Not used for edit
-      phone: member.phone || "",
-      address: member.address || "",
-      customRoleId: member.customRole?.id || "",
-      isActive: member.isActive,
-    });
-    setDialogOpen(true);
-  };
+  const handleOpenEdit = (member: StaffMember) => dispatch({ type: 'OPEN_EDIT', payload: member });
 
   const handleSubmit = async () => {
     if (!formData.name || !formData.email || (!editingMember && !formData.password)) {
@@ -140,7 +194,7 @@ export function AdminStaff() {
       return;
     }
 
-    setSubmitting(true);
+    dispatch({ type: 'SET_SUBMITTING', payload: true });
     try {
       if (editingMember) {
         // OPTIMISTIC UPDATE: Update the UI instantly
@@ -201,12 +255,12 @@ export function AdminStaff() {
         }
         toast.success("New staff member created");
       }
-      setDialogOpen(false);
+      dispatch({ type: 'CLOSE_DIALOG' });
       refetchStaff();
     } catch (err: any) {
       toast.error(err.message || "Operation failed");
     } finally {
-      setSubmitting(false);
+      dispatch({ type: 'SET_SUBMITTING', payload: false });
     }
   };
 
@@ -215,7 +269,7 @@ export function AdminStaff() {
     try {
       await deleteUser({ id: memberToDelete.id });
       toast.success("Staff member deleted");
-      setDeleteAlertOpen(false);
+      dispatch({ type: 'CLOSE_DELETE' });
       refetchStaff();
     } catch (err: any) {
       toast.error(err.message || "Failed to delete");
@@ -250,7 +304,7 @@ export function AdminStaff() {
             placeholder="Search by name, email, phone..."
             className="pl-9 bg-white dark:bg-zinc-900"
             value={search}
-            onChange={(e) => setSearch(e.target.value)}
+            onChange={(e) => dispatch({ type: 'SET_SEARCH', payload: e.target.value })}
           />
         </div>
 
@@ -301,7 +355,7 @@ export function AdminStaff() {
             <StaffTable
               staff={staff}
               onEdit={handleOpenEdit}
-              onDelete={(m) => { setMemberToDelete(m); setDeleteAlertOpen(true); }}
+              onDelete={(m) => dispatch({ type: 'OPEN_DELETE', payload: m })}
               canEdit={canEdit}
               canDelete={canDelete}
             />
@@ -312,7 +366,7 @@ export function AdminStaff() {
                   key={member.id}
                   member={member}
                   onEdit={handleOpenEdit}
-                  onDelete={(m) => { setMemberToDelete(m); setDeleteAlertOpen(true); }}
+                  onDelete={(m) => dispatch({ type: 'OPEN_DELETE', payload: m })}
                   canEdit={canEdit}
                   canDelete={canDelete}
                 />
@@ -324,16 +378,16 @@ export function AdminStaff() {
       {/* Dialogs */}
       <StaffDialog
         open={dialogOpen}
-        onOpenChange={setDialogOpen}
+        onOpenChange={(open) => dispatch({ type: open ? 'OPEN_CREATE' : 'CLOSE_DIALOG' })}
         member={editingMember}
         formData={formData}
-        setFormData={setFormData}
+        setFormData={(fd) => dispatch({ type: 'SET_FORM_DATA', payload: fd })}
         roles={roles}
         submitting={submitting}
         onSubmit={handleSubmit}
       />
 
-      <AlertDialog open={deleteAlertOpen} onOpenChange={setDeleteAlertOpen}>
+      <AlertDialog open={deleteAlertOpen} onOpenChange={(open) => dispatch({ type: open ? 'CLOSE_DELETE' : 'CLOSE_DELETE' })}>
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
@@ -342,7 +396,7 @@ export function AdminStaff() {
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogCancel onClick={() => dispatch({ type: 'CLOSE_DELETE' })}>Cancel</AlertDialogCancel>
             <AlertDialogAction className="bg-red-600 hover:bg-red-700 text-white" onClick={handleDelete}>
               Delete Member
             </AlertDialogAction>

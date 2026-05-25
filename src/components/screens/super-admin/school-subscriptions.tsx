@@ -47,7 +47,7 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
-import { goeyToast as toast } from "goey-toast";
+import { toast } from "sonner";
 import { DatePicker } from "@/components/ui/date-picker";
 import { SCHOOL_PLANS } from "@/lib/billing-constants";
 
@@ -212,7 +212,7 @@ export function SuperAdminSchoolSubscriptions() {
           </TableHeader>
           <TableBody>
             {isLoading ? (
-              <TableRow><TableCell colSpan={6} className="text-center py-10">Loading schools...</TableCell></TableRow>
+              <TableRow><TableCell colSpan={6} className="text-center py-10">Loading schools…</TableCell></TableRow>
             ) : tenantsData?.tenants?.length === 0 ? (
               <TableRow><TableCell colSpan={6} className="text-center py-10 text-muted-foreground">No schools found.</TableCell></TableRow>
             ) : (

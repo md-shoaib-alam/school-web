@@ -5,8 +5,21 @@ import { QueryClientProvider } from "@tanstack/react-query";
 import { queryClient } from "@/lib/query-client";
 import { persistQueryClient } from "@tanstack/react-query-persist-client";
 import { createSyncStoragePersister } from "@tanstack/query-sync-storage-persister";
-import { GooeyToaster } from "goey-toast";
-import "goey-toast/styles.css";
+import { Toaster } from "sonner";
+import { ThemeProvider, useTheme } from "next-themes";
+
+function ToasterProvider() {
+  const { theme } = useTheme();
+  return (
+    <Toaster 
+      richColors 
+      position="top-center" 
+      closeButton 
+      duration={3000} 
+      theme={theme as "light" | "dark" | "system"}
+    />
+  );
+}
 
 export function Providers({ children }: { children: React.ReactNode }) {
   useEffect(() => {
@@ -27,9 +40,11 @@ export function Providers({ children }: { children: React.ReactNode }) {
   }, []);
 
   return (
-    <QueryClientProvider client={queryClient}>
-      {children}
-      <GooeyToaster richColors position="top-center" closeButton duration={2000} />
-    </QueryClientProvider>
+    <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+      <QueryClientProvider client={queryClient}>
+        {children}
+        <ToasterProvider />
+      </QueryClientProvider>
+    </ThemeProvider>
   );
 }

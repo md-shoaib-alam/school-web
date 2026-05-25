@@ -1,9 +1,9 @@
 "use client";
 
-import { useState, useEffect, useMemo } from 'react';
+import { useReducer, useEffect, useMemo } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Tag, Layers, CircleDollarSign, Plus } from 'lucide-react';
-import { goeyToast as toast } from 'goey-toast';
+import { toast } from "sonner";
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import api from '@/lib/axios';
 import { useFeeCategories, useFeeStructures, useCreateFeeStructure, useFeeAssignment } from '@/hooks/use-fees';
@@ -24,26 +24,94 @@ interface SetFeesTabProps {
   canDelete: boolean;
 }
 
+type State = {
+  yearFilter: string;
+  catFilter: string;
+  addOpen: boolean;
+  addForm: { feeCategoryId: string; classId: string; amount: string; academicYear: string };
+  adding: boolean;
+  editOpen: boolean;
+  editItem: FeeStructure | null;
+  editAmount: string;
+  saving: boolean;
+  deleting: boolean;
+  assignOpen: boolean;
+  assignStruct: FeeStructure | null;
+  assignSaving: boolean;
+  selectedStudents: Set<string>;
+  searchStudent: string;
+};
+
+type Action =
+  | { type: 'SET_YEAR_FILTER'; payload: string }
+  | { type: 'SET_CAT_FILTER'; payload: string }
+  | { type: 'SET_ADD_OPEN'; payload: boolean }
+  | { type: 'SET_ADD_FORM'; payload: Partial<State['addForm']> }
+  | { type: 'SET_ADDING'; payload: boolean }
+  | { type: 'OPEN_EDIT'; payload: FeeStructure }
+  | { type: 'SET_EDIT_OPEN'; payload: boolean }
+  | { type: 'SET_EDIT_AMOUNT'; payload: string }
+  | { type: 'SET_SAVING'; payload: boolean }
+  | { type: 'SET_DELETING'; payload: boolean }
+  | { type: 'OPEN_ASSIGN'; payload: FeeStructure }
+  | { type: 'SET_ASSIGN_OPEN'; payload: boolean }
+  | { type: 'SET_ASSIGN_SAVING'; payload: boolean }
+  | { type: 'SET_SELECTED_STUDENTS'; payload: Set<string> | ((prev: Set<string>) => Set<string>) }
+  | { type: 'SET_SEARCH_STUDENT'; payload: string }
+  | { type: 'RESET_ADD_FORM' };
+
+const initialState: State = {
+  yearFilter: 'all',
+  catFilter: 'all',
+  addOpen: false,
+  addForm: { feeCategoryId: '', classId: '', amount: '', academicYear: '' },
+  adding: false,
+  editOpen: false,
+  editItem: null,
+  editAmount: '',
+  saving: false,
+  deleting: false,
+  assignOpen: false,
+  assignStruct: null,
+  assignSaving: false,
+  selectedStudents: new Set(),
+  searchStudent: '',
+};
+
+function reducer(state: State, action: Action): State {
+  switch (action.type) {
+    case 'SET_YEAR_FILTER': return { ...state, yearFilter: action.payload };
+    case 'SET_CAT_FILTER': return { ...state, catFilter: action.payload };
+    case 'SET_ADD_OPEN': return { ...state, addOpen: action.payload };
+    case 'SET_ADD_FORM': return { ...state, addForm: { ...state.addForm, ...action.payload } };
+    case 'SET_ADDING': return { ...state, adding: action.payload };
+    case 'OPEN_EDIT': return { ...state, editItem: action.payload, editAmount: String(action.payload.amount), editOpen: true };
+    case 'SET_EDIT_OPEN': return { ...state, editOpen: action.payload };
+    case 'SET_EDIT_AMOUNT': return { ...state, editAmount: action.payload };
+    case 'SET_SAVING': return { ...state, saving: action.payload };
+    case 'SET_DELETING': return { ...state, deleting: action.payload };
+    case 'OPEN_ASSIGN': return { ...state, assignStruct: action.payload, assignOpen: true, selectedStudents: new Set(), searchStudent: '' };
+    case 'SET_ASSIGN_OPEN': return { ...state, assignOpen: action.payload };
+    case 'SET_ASSIGN_SAVING': return { ...state, assignSaving: action.payload };
+    case 'SET_SELECTED_STUDENTS':
+      return {
+        ...state,
+        selectedStudents: typeof action.payload === 'function' ? action.payload(state.selectedStudents) : action.payload
+      };
+    case 'SET_SEARCH_STUDENT': return { ...state, searchStudent: action.payload };
+    case 'RESET_ADD_FORM': return { ...state, addForm: initialState.addForm, addOpen: false };
+    default: return state;
+  }
+}
+
 export function SetFeesTab({ canCreate, canEdit, canDelete }: SetFeesTabProps) {
-  const [yearFilter, setYearFilter] = useState('all');
-  const [catFilter, setCatFilter] = useState('all');
+  const [state, dispatch] = useReducer(reducer, initialState);
+  const {
+    yearFilter, catFilter, addOpen, addForm, adding, editOpen, editItem,
+    editAmount, saving, deleting, assignOpen, assignStruct, assignSaving,
+    selectedStudents, searchStudent
+  } = state;
 
-  const [addOpen, setAddOpen] = useState(false);
-  const [addForm, setAddForm] = useState({ feeCategoryId: '', classId: '', amount: '', academicYear: '' });
-  const [adding, setAdding] = useState(false);
-
-  const [editOpen, setEditOpen] = useState(false);
-  const [editItem, setEditItem] = useState<FeeStructure | null>(null);
-  const [editAmount, setEditAmount] = useState('');
-  const [saving, setSaving] = useState(false);
-  const [deleting, setDeleting] = useState(false);
-
-  // Assign to Students dialog state
-  const [assignOpen, setAssignOpen] = useState(false);
-  const [assignStruct, setAssignStruct] = useState<FeeStructure | null>(null);
-  const [assignSaving, setAssignSaving] = useState(false);
-  const [selectedStudents, setSelectedStudents] = useState<Set<string>>(new Set());
-  const [searchStudent, setSearchStudent] = useState('');
   const debouncedSearch = useDebounce(searchStudent, 300);
 
   const { data: structures = [], isLoading: loadingStructures } = useFeeStructures();
@@ -79,41 +147,38 @@ export function SetFeesTab({ canCreate, canEdit, canDelete }: SetFeesTabProps) {
       toast.error('All fields are required');
       return;
     }
-    setAdding(true);
+    dispatch({ type: 'SET_ADDING', payload: true });
     try {
       await createStructure.mutateAsync(addForm);
-      setAddOpen(false);
-      setAddForm({ feeCategoryId: '', classId: '', amount: '', academicYear: '' });
+      dispatch({ type: 'RESET_ADD_FORM' });
     } catch { /* handled by mutation */ }
-    setAdding(false);
+    dispatch({ type: 'SET_ADDING', payload: false });
   };
 
   const handleEdit = (s: FeeStructure) => {
-    setEditItem(s);
-    setEditAmount(String(s.amount));
-    setEditOpen(true);
+    dispatch({ type: 'OPEN_EDIT', payload: s });
   };
 
   const handleEditSave = async () => {
     if (!editItem || !editAmount) return;
-    setSaving(true);
+    dispatch({ type: 'SET_SAVING', payload: true });
     try {
       await api.put('/fee-structures', { id: editItem.id, amount: Number(editAmount) });
       toast.success('Fee structure updated!');
       queryClient.invalidateQueries({ queryKey: ['fee-structures'] });
-      setEditOpen(false);
+      dispatch({ type: 'SET_EDIT_OPEN', payload: false });
     } catch { toast.error('Error updating'); }
-    setSaving(false);
+    dispatch({ type: 'SET_SAVING', payload: false });
   };
 
   const handleDelete = async (id: string) => {
-    setDeleting(true);
+    dispatch({ type: 'SET_DELETING', payload: true });
     try {
       await api.delete(`/fee-structures?id=${id}`);
       toast.success('Fee structure deleted!');
       queryClient.invalidateQueries({ queryKey: ['fee-structures'] });
     } catch { toast.error('Error deleting'); }
-    setDeleting(false);
+    dispatch({ type: 'SET_DELETING', payload: false });
   };
 
   // Assign to Students logic
@@ -124,26 +189,29 @@ export function SetFeesTab({ canCreate, canEdit, canDelete }: SetFeesTabProps) {
   );
 
   const openAssignDialog = (s: FeeStructure) => {
-    setAssignStruct(s);
-    setAssignOpen(true);
-    setSelectedStudents(new Set<string>());
-    setSearchStudent('');
+    dispatch({ type: 'OPEN_ASSIGN', payload: s });
   };
 
   useEffect(() => {
     if (assignData?.students) {
       queueMicrotask(() => {
-        setSelectedStudents(new Set<string>(assignData.students.filter((st: any) => st.isAssigned).map((st: any) => st.id)));
+        dispatch({
+          type: 'SET_SELECTED_STUDENTS',
+          payload: new Set<string>(assignData.students.filter((st: any) => st.isAssigned).map((st: any) => st.id))
+        });
       });
     }
   }, [assignData]);
 
   const toggleStudent = (studentId: string) => {
-    setSelectedStudents(prev => {
-      const next = new Set(prev);
-      if (next.has(studentId)) next.delete(studentId);
-      else next.add(studentId);
-      return next;
+    dispatch({
+      type: 'SET_SELECTED_STUDENTS',
+      payload: (prev) => {
+        const next = new Set(prev);
+        if (next.has(studentId)) next.delete(studentId);
+        else next.add(studentId);
+        return next;
+      }
     });
   };
 
@@ -151,15 +219,18 @@ export function SetFeesTab({ canCreate, canEdit, canDelete }: SetFeesTabProps) {
     if (!assignData) return;
     const all = assignData.students.filter((s: any) => !s.isPaid);
     const allIds = new Set<string>(all.map((s: any) => s.id));
-    if (selectedStudents.size === allIds.size) setSelectedStudents(new Set<string>());
-    else setSelectedStudents(allIds);
+    if (selectedStudents.size === allIds.size) {
+      dispatch({ type: 'SET_SELECTED_STUDENTS', payload: new Set<string>() });
+    } else {
+      dispatch({ type: 'SET_SELECTED_STUDENTS', payload: allIds });
+    }
   };
 
   const selectTransport = () => {
     if (!assignData) return;
     const transportStudents = assignData.students.filter((s: any) => s.hasTransport && !s.isPaid);
     if (transportStudents.length === 0) { toast.info('No transport students in this class'); return; }
-    setSelectedStudents(new Set(transportStudents.map((s: any) => s.id)));
+    dispatch({ type: 'SET_SELECTED_STUDENTS', payload: new Set(transportStudents.map((s: any) => s.id)) });
   };
 
   const handleAssignSave = async () => {
@@ -170,11 +241,11 @@ export function SetFeesTab({ canCreate, canEdit, canDelete }: SetFeesTabProps) {
     
     if (toAssign.length === 0 && toRemove.length === 0) {
       toast.info('No changes');
-      setAssignOpen(false);
+      dispatch({ type: 'SET_ASSIGN_OPEN', payload: false });
       return;
     }
 
-    setAssignSaving(true);
+    dispatch({ type: 'SET_ASSIGN_SAVING', payload: true });
     try {
       const promises: Promise<any>[] = [];
       if (toAssign.length > 0) {
@@ -198,9 +269,9 @@ export function SetFeesTab({ canCreate, canEdit, canDelete }: SetFeesTabProps) {
       await Promise.all(promises);
       toast.success('Assignment updated!');
       queryClient.invalidateQueries({ queryKey: ['fee-assign'] });
-      setAssignOpen(false);
+      dispatch({ type: 'SET_ASSIGN_OPEN', payload: false });
     } catch { toast.error('Error saving assignment'); }
-    setAssignSaving(false);
+    dispatch({ type: 'SET_ASSIGN_SAVING', payload: false });
   };
 
   return (
@@ -244,13 +315,13 @@ export function SetFeesTab({ canCreate, canEdit, canDelete }: SetFeesTabProps) {
 
       {/* Filters + Add */}
       <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center">
-        <Select value={yearFilter} onValueChange={setYearFilter}>
+        <Select value={yearFilter} onValueChange={(v) => dispatch({ type: 'SET_YEAR_FILTER', payload: v })}>
           <SelectTrigger className="w-full sm:w-44"><SelectValue placeholder="Academic Year" /></SelectTrigger>
           <SelectContent>
             {academicYears.map(y => <SelectItem key={y} value={y}>{y === 'all' ? 'All Years' : y}</SelectItem>)}
           </SelectContent>
         </Select>
-        <Select value={catFilter} onValueChange={setCatFilter}>
+        <Select value={catFilter} onValueChange={(v) => dispatch({ type: 'SET_CAT_FILTER', payload: v })}>
           <SelectTrigger className="w-full sm:w-44"><SelectValue placeholder="Category" /></SelectTrigger>
           <SelectContent>
             <SelectItem value="all">All Categories</SelectItem>
@@ -259,7 +330,7 @@ export function SetFeesTab({ canCreate, canEdit, canDelete }: SetFeesTabProps) {
         </Select>
         <div className="sm:ml-auto">
           {canCreate && (
-            <Button className="bg-emerald-600 hover:bg-emerald-700 text-white" onClick={() => setAddOpen(true)}>
+            <Button className="bg-emerald-600 hover:bg-emerald-700 text-white" onClick={() => dispatch({ type: 'SET_ADD_OPEN', payload: true })}>
               <Plus className="size-4 mr-2" />Add Structure
             </Button>
           )}
@@ -279,9 +350,9 @@ export function SetFeesTab({ canCreate, canEdit, canDelete }: SetFeesTabProps) {
 
       <AddFeeStructureDialog 
         open={addOpen}
-        onOpenChange={setAddOpen}
+        onOpenChange={(v) => dispatch({ type: 'SET_ADD_OPEN', payload: v })}
         form={addForm}
-        setForm={setAddForm}
+        setForm={(v) => dispatch({ type: 'SET_ADD_FORM', payload: v })}
         minCategories={minCategories}
         classes={classes}
         onAdd={handleAdd}
@@ -290,17 +361,17 @@ export function SetFeesTab({ canCreate, canEdit, canDelete }: SetFeesTabProps) {
 
       <EditFeeStructureDialog 
         open={editOpen}
-        onOpenChange={setEditOpen}
+        onOpenChange={(v) => dispatch({ type: 'SET_EDIT_OPEN', payload: v })}
         item={editItem}
         amount={editAmount}
-        setAmount={setEditAmount}
+        setAmount={(v) => dispatch({ type: 'SET_EDIT_AMOUNT', payload: v })}
         onSave={handleEditSave}
         saving={saving}
       />
 
       <AssignFeesDialog 
         open={assignOpen}
-        onOpenChange={setAssignOpen}
+        onOpenChange={(v) => dispatch({ type: 'SET_ASSIGN_OPEN', payload: v })}
         struct={assignStruct}
         loading={assignLoading}
         data={assignData}
@@ -309,7 +380,7 @@ export function SetFeesTab({ canCreate, canEdit, canDelete }: SetFeesTabProps) {
         onSelectAll={selectAll}
         onSelectTransport={selectTransport}
         search={searchStudent}
-        setSearch={setSearchStudent}
+        setSearch={(v) => dispatch({ type: 'SET_SEARCH_STUDENT', payload: v })}
         onSave={handleAssignSave}
         saving={assignSaving}
         debouncedSearch={debouncedSearch}

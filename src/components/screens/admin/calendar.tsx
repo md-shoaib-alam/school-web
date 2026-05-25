@@ -1,10 +1,10 @@
 "use client";
 
-import { useState, useMemo, useCallback } from "react";
+import { useState, useMemo, useCallback, useReducer } from "react";
 import { useAppStore } from "@/store/use-app-store";
 import { useModulePermissions } from "@/hooks/use-permissions";
 import { Eye } from "lucide-react";
-import { goeyToast as toast } from "goey-toast";
+import { toast } from "sonner";
 
 import { CalendarEvent, EventFormData, EMPTY_FORM, EVENT_TYPE_COLORS } from "./calendar/types";
 import { formatDateISO, eventFallsOnDate, getDaysInMonth, getFirstDayOfWeek } from "./calendar/utils";
@@ -14,23 +14,109 @@ import { CalendarAgenda } from "./calendar/calendar-agenda";
 import { CalendarDialogs } from "./calendar/calendar-dialogs";
 import { useCalendarEvents, useCreateEvent, useUpdateEvent, useDeleteEvent } from "./calendar/calendar-hooks";
 
+type State = {
+  currentYear: number;
+  currentMonth: number;
+  selectedDate: string | null;
+  typeFilter: string;
+  dialogOpen: boolean;
+  deleteConfirmOpen: boolean;
+  eventToDelete: string | null;
+  editingEvent: CalendarEvent | null;
+  form: EventFormData;
+};
+
+type Action =
+  | { type: 'SET_YEAR'; payload: number }
+  | { type: 'SET_MONTH'; payload: number }
+  | { type: 'SET_SELECTED_DATE'; payload: string | null }
+  | { type: 'SET_TYPE_FILTER'; payload: string }
+  | { type: 'OPEN_DIALOG'; payload: { editingEvent: CalendarEvent | null; form: EventFormData } }
+  | { type: 'CLOSE_DIALOG' }
+  | { type: 'SET_DELETE_CONFIRM'; payload: { open: boolean; id: string | null } }
+  | { type: 'UPDATE_FORM'; payload: Partial<EventFormData> }
+  | { type: 'PREV_MONTH' }
+  | { type: 'NEXT_MONTH' }
+  | { type: 'GO_TO_TODAY' };
+
+const today = new Date();
+const initialState: State = {
+  currentYear: today.getFullYear(),
+  currentMonth: today.getMonth(),
+  selectedDate: formatDateISO(today),
+  typeFilter: "all",
+  dialogOpen: false,
+  deleteConfirmOpen: false,
+  eventToDelete: null,
+  editingEvent: null,
+  form: { ...EMPTY_FORM },
+};
+
+function reducer(state: State, action: Action): State {
+  switch (action.type) {
+    case 'SET_YEAR':
+      return { ...state, currentYear: action.payload };
+    case 'SET_MONTH':
+      return { ...state, currentMonth: action.payload };
+    case 'SET_SELECTED_DATE':
+      return { ...state, selectedDate: action.payload };
+    case 'SET_TYPE_FILTER':
+      return { ...state, typeFilter: action.payload };
+    case 'OPEN_DIALOG':
+      return { ...state, dialogOpen: true, editingEvent: action.payload.editingEvent, form: action.payload.form };
+    case 'CLOSE_DIALOG':
+      return { ...state, dialogOpen: false, editingEvent: null, form: { ...EMPTY_FORM } };
+    case 'SET_DELETE_CONFIRM':
+      return { ...state, deleteConfirmOpen: action.payload.open, eventToDelete: action.payload.id };
+    case 'UPDATE_FORM':
+      return { ...state, form: { ...state.form, ...action.payload } };
+    case 'PREV_MONTH': {
+      const isJan = state.currentMonth === 0;
+      return {
+        ...state,
+        currentMonth: isJan ? 11 : state.currentMonth - 1,
+        currentYear: isJan ? state.currentYear - 1 : state.currentYear,
+      };
+    }
+    case 'NEXT_MONTH': {
+      const isDec = state.currentMonth === 11;
+      return {
+        ...state,
+        currentMonth: isDec ? 0 : state.currentMonth + 1,
+        currentYear: isDec ? state.currentYear + 1 : state.currentYear,
+      };
+    }
+    case 'GO_TO_TODAY': {
+      const n = new Date();
+      return {
+        ...state,
+        currentYear: n.getFullYear(),
+        currentMonth: n.getMonth(),
+        selectedDate: formatDateISO(n),
+      };
+    }
+    default:
+      return state;
+  }
+}
+
 export function AdminCalendar() {
   const { canCreate, canEdit, canDelete } = useModulePermissions("calendar");
   const currentTenantId = useAppStore((s) => s.currentTenantId);
 
   // --- State ---
-  const today = new Date();
-  const [currentYear, setCurrentYear] = useState(() => today.getFullYear());
-  const [currentMonth, setCurrentMonth] = useState(() => today.getMonth());
-  const [selectedDate, setSelectedDate] = useState<string | null>(() => formatDateISO(today));
-  const [typeFilter, setTypeFilter] = useState<string>("all");
-
-  // Dialog state
-  const [dialogOpen, setDialogOpen] = useState(false);
-  const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
-  const [eventToDelete, setEventToDelete] = useState<string | null>(null);
-  const [editingEvent, setEditingEvent] = useState<CalendarEvent | null>(null);
-  const [form, setForm] = useState<EventFormData>({ ...EMPTY_FORM });
+  const [state, dispatch] = useReducer(reducer, initialState);
+  const {
+    currentYear,
+    currentMonth,
+    selectedDate,
+    typeFilter,
+    dialogOpen,
+    deleteConfirmOpen,
+    eventToDelete,
+    editingEvent,
+    form,
+  } = state;
 
   // --- TanStack Query ---
   const monthKey = `${currentYear}-${String(currentMonth + 1).padStart(2, "0")}`;
@@ -86,20 +172,45 @@ export function AdminCalendar() {
   }, [filteredEvents]);
 
   // --- Navigation ---
-  const goToPrevMonth = () => setCurrentMonth(prev => prev === 0 ? (setCurrentYear(y => y-1), 11) : prev - 1);
-  const goToNextMonth = () => setCurrentMonth(prev => prev === 11 ? (setCurrentYear(y => y+1), 0) : prev + 1);
-  const goToToday = () => { const n = new Date(); setCurrentYear(n.getFullYear()); setCurrentMonth(n.getMonth()); setSelectedDate(formatDateISO(n)); };
+  const goToPrevMonth = () => dispatch({ type: 'PREV_MONTH' });
+  const goToNextMonth = () => dispatch({ type: 'NEXT_MONTH' });
+  const goToToday = () => dispatch({ type: 'GO_TO_TODAY' });
 
   // --- Handlers ---
-  const openCreateDialog = () => { setEditingEvent(null); setForm({ ...EMPTY_FORM, date: selectedDate || formatDateISO(today) }); setDialogOpen(true); };
-  const openEditDialog = (ev: CalendarEvent) => {
-    setEditingEvent(ev);
-    setForm({ title: ev.title, description: ev.description || "", date: ev.date, endDate: ev.endDate || "", type: ev.type, targetRole: ev.targetRole, color: ev.color, allDay: ev.allDay, location: ev.location || "" });
-    setDialogOpen(true);
+  const openCreateDialog = () => {
+    dispatch({
+      type: 'OPEN_DIALOG',
+      payload: {
+        editingEvent: null,
+        form: { ...EMPTY_FORM, date: selectedDate || formatDateISO(new Date()) }
+      }
+    });
   };
-  const closeDialog = () => { setDialogOpen(false); setEditingEvent(null); setForm({ ...EMPTY_FORM }); };
-  const updateForm = (key: keyof EventFormData, value: any) => setForm(prev => ({ ...prev, [key]: value }));
-  const handleTypeChange = (v: string) => { updateForm("type", v); if (EVENT_TYPE_COLORS[v]) updateForm("color", EVENT_TYPE_COLORS[v]); };
+  const openEditDialog = (ev: CalendarEvent) => {
+    dispatch({
+      type: 'OPEN_DIALOG',
+      payload: {
+        editingEvent: ev,
+        form: {
+          title: ev.title,
+          description: ev.description || "",
+          date: ev.date,
+          endDate: ev.endDate || "",
+          type: ev.type,
+          targetRole: ev.targetRole,
+          color: ev.color,
+          allDay: ev.allDay,
+          location: ev.location || ""
+        }
+      }
+    });
+  };
+  const closeDialog = () => dispatch({ type: 'CLOSE_DIALOG' });
+  const updateForm = (key: keyof EventFormData, value: any) => dispatch({ type: 'UPDATE_FORM', payload: { [key]: value } });
+  const handleTypeChange = (v: string) => {
+    const colorUpdate = EVENT_TYPE_COLORS[v] ? { color: EVENT_TYPE_COLORS[v] } : {};
+    dispatch({ type: 'UPDATE_FORM', payload: { type: v, ...colorUpdate } });
+  };
 
   const handleSubmit = async () => {
     if (!form.title.trim() || !form.date) return toast.error("Required fields missing");
@@ -109,7 +220,6 @@ export function AdminCalendar() {
       const { tenantId: _, ...updateData } = payload;
       await updateMutation.mutateAsync(updateData);
     } else {
-      // Remove id and tenantId as they are not allowed in EventInput
       const { id: _, tenantId: __, ...cleanData } = payload;
       await createMutation.mutateAsync(cleanData);
     }
@@ -119,8 +229,7 @@ export function AdminCalendar() {
   const handleConfirmDelete = async () => {
     if (!eventToDelete || !currentTenantId) return;
     await deleteMutation.mutateAsync({ id: eventToDelete });
-    setDeleteConfirmOpen(false);
-    setEventToDelete(null);
+    dispatch({ type: 'SET_DELETE_CONFIRM', payload: { open: false, id: null } });
   };
 
   const isCurrentMonthDay = (dateStr: string) => {
@@ -148,7 +257,8 @@ export function AdminCalendar() {
       )}
 
       <CalendarHeader
-        currentYear={currentYear} currentMonth={currentMonth} typeFilter={typeFilter} setTypeFilter={setTypeFilter}
+        currentYear={currentYear} currentMonth={currentMonth} typeFilter={typeFilter}
+        setTypeFilter={(v) => dispatch({ type: 'SET_TYPE_FILTER', payload: v })}
         goToPrevMonth={goToPrevMonth} goToNextMonth={goToNextMonth} goToToday={goToToday} canCreate={canCreate} openCreateDialog={openCreateDialog}
       />
 
@@ -156,15 +266,20 @@ export function AdminCalendar() {
         <div className="lg:col-span-8 h-full">
           <CalendarGrid
             loading={loading} calendarCells={calendarCells} eventsByDate={eventsByDate}
-            selectedDate={selectedDate} setSelectedDate={setSelectedDate} isCurrentMonthDay={isCurrentMonthDay}
+            selectedDate={selectedDate}
+            setSelectedDate={(v) => dispatch({ type: 'SET_SELECTED_DATE', payload: v })}
+            isCurrentMonthDay={isCurrentMonthDay}
           />
         </div>
 
         <CalendarAgenda
-          selectedDate={selectedDate} setSelectedDate={setSelectedDate} loading={loading}
+          selectedDate={selectedDate}
+          setSelectedDate={(v) => dispatch({ type: 'SET_SELECTED_DATE', payload: v })}
+          loading={loading}
           selectedDayEvents={selectedDayEvents} getTypeBadgeStyle={getTypeBadgeStyle}
           allEvents={filteredEvents}
-          canEdit={canEdit} canDelete={canDelete} openEditDialog={openEditDialog} openDeleteConfirm={(id) => { setEventToDelete(id); setDeleteConfirmOpen(true); }}
+          canEdit={canEdit} canDelete={canDelete} openEditDialog={openEditDialog}
+          openDeleteConfirm={(id) => dispatch({ type: 'SET_DELETE_CONFIRM', payload: { open: true, id } })}
         />
       </div>
 
@@ -174,9 +289,11 @@ export function AdminCalendar() {
         updateForm={updateForm} handleTypeChange={handleTypeChange}
         submitting={createMutation.isPending || updateMutation.isPending}
         handleSubmit={handleSubmit}
-        deleteConfirmOpen={deleteConfirmOpen} setDeleteConfirmOpen={setDeleteConfirmOpen}
+        deleteConfirmOpen={deleteConfirmOpen}
+        setDeleteConfirmOpen={(open) => dispatch({ type: 'SET_DELETE_CONFIRM', payload: { open, id: open ? eventToDelete : null } })}
         deleting={deleteMutation.isPending} handleConfirmDelete={handleConfirmDelete}
       />
     </div>
   );
 }
+

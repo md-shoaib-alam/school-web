@@ -4,7 +4,7 @@ import { apiFetch } from "@/lib/api";
 import React, { useEffect, useCallback, useReducer } from "react";
 import { Button } from "@/components/ui/button";
 import { Loader2, Save, CheckCircle2 } from "lucide-react";
-import { goeyToast as toast } from "goey-toast";
+import { toast } from "sonner";
 import { useAppStore } from "@/store/use-app-store";
 
 // Import modular types, cards, and reducers from school-settings/ subfolder

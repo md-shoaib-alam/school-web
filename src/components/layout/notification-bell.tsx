@@ -162,7 +162,7 @@ export function NotificationBell() {
           {loading && notifications.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-16">
               <Loader2 className="size-8 animate-spin text-violet-500 opacity-20" />
-              <p className="text-xs text-zinc-400 mt-4 font-medium">Updating history...</p>
+              <p className="text-xs text-zinc-400 mt-4 font-medium">Updating history…</p>
             </div>
           ) : notifications.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-20 text-zinc-400">

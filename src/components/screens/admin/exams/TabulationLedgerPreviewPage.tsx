@@ -30,7 +30,7 @@ import {
   Printer, ArrowLeft, Search, Layout, AlertCircle, Loader2, Award
 } from 'lucide-react';
 import { useReactToPrint } from 'react-to-print';
-import { goeyToast as toast } from 'goey-toast';
+import { toast } from "sonner";
 import { TabularLedgerPrint } from './tabulationLedgerPrinter';
 import { compileTabularLedgerData, LedgerData } from './ledger-utils';
 import { LEDGER_TEMPLATES } from './ledger-templates';

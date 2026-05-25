@@ -15,7 +15,7 @@ import {
   Loader2,
 } from "lucide-react";
 import { apiFetch } from "@/lib/api";
-import { goeyToast as toast } from "goey-toast";
+import { toast } from "sonner";
 import * as XLSX from "xlsx";
 
 // Sub-components

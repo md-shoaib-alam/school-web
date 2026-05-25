@@ -2,7 +2,7 @@
 
 import { apiFetch } from "@/lib/api";
 import { useState, useEffect, useCallback, useMemo } from "react";
-import { goeyToast as toast } from "goey-toast";
+import { toast } from "sonner";
 import { useAppStore } from "@/store/use-app-store";
 import { hasPermission } from "@/lib/permissions";
 

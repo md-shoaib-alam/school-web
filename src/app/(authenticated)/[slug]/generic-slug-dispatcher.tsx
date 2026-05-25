@@ -96,8 +96,15 @@ export default function GenericSlugDispatcherClient() {
       case "school-subscriptions": return <SuperAdminSchoolSubscriptions />;
       case "platform-notices": return <SuperAdminPlatformNotices />;
       case "reports": return <SuperAdminReports />;
+      default: {
+        // If super admin is at a school slug, it's handled by isTenantContext above
+        // But if they are at an unknown slug, we stay here and fall through to FAIL-SAFE
+      }
     }
   }
+
+  // 2. Tenant Base Slugs for all other roles
+  // (Redirection to dashboard is already handled in the REDIRECTION LOGIC block above)
 
   // FAIL-SAFE: If we got here and the user is logged in, 
   // they are at an unknown slug. Redirect them home.

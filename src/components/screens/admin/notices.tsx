@@ -6,7 +6,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Megaphone, Eye } from "lucide-react";
 import type { NoticeInfo } from "@/lib/types";
-import { goeyToast as toast } from "goey-toast";
+import { toast } from "sonner";
 import { useModulePermissions } from "@/hooks/use-permissions";
 import { useQueryClient } from "@tanstack/react-query";
 import { useNotices } from "@/lib/graphql/hooks";

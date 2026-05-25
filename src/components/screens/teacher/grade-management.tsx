@@ -1,7 +1,8 @@
 "use client";
 
+import { motion } from "framer-motion";
 import { apiFetch } from "@/lib/api";
-import { useState, useEffect } from "react";
+import { useReducer, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -44,79 +45,40 @@ import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ClipboardList, Save, BookOpen, Users, Eye, Plus, Loader2, FileText, Sparkles, GraduationCap, Trophy, CheckCircle2, Check, Clock, Globe, AlertTriangle } from "lucide-react";
-import { goeyToast as toast } from "goey-toast";
+import { toast } from "sonner";
 import { useModulePermissions } from "@/hooks/use-permissions";
-
-
-interface ClassInfo {
-  id: string;
-  name: string;
-  section: string;
-  studentCount: number;
-  classTeacher?: string;
-}
-
-interface StudentInfo {
-  id: string;
-  name: string;
-  rollNumber: string;
-}
-
-interface SubjectInfo {
-  id: string;
-  name: string;
-  code: string;
-  className: string;
-  classId: string;
-  teacherName?: string;
-}
-
-interface Assessment {
-  id: string;
-  classId: string;
-  subjectId: string;
-  title: string;
-  type: string;
-  totalMarks: number;
-  passingMarks: number;
-  grades?: { id: string }[];
-  class?: { students: { id: string }[] };
-  status?: string;
-}
+import { initialState, gradeManagementReducer } from "./grade-management/types";
 
 
 export function TeacherGrades() {
   const { canCreate, canEdit, canDelete } = useModulePermissions("grades");
-  const [classes, setClasses] = useState<ClassInfo[]>([]);
-  const [subjects, setSubjects] = useState<SubjectInfo[]>([]);
-  const [students, setStudents] = useState<StudentInfo[]>([]);
+  const [state, dispatch] = useReducer(gradeManagementReducer, initialState);
 
-  // Isolated assessment states
-  const [assessments, setAssessments] = useState<Assessment[]>([]);
-  const [selectedAssessmentId, setSelectedAssessmentId] = useState("");
-  const [confirmCompleteId, setConfirmCompleteId] = useState<string | null>(null);
-  const [completingId, setCompletingId] = useState<string | null>(null);
-
-  const [marks, setMarks] = useState<Record<string, string>>({});
-  const [loading, setLoading] = useState(true);
-  const [saving, setSaving] = useState(false);
-  const [gradesLoading, setGradesLoading] = useState(false);
-  const [isDirty, setIsDirty] = useState(false);
-
-  const [activeTab, setActiveTab] = useState<"active" | "completed">("active");
-  const [listLoading, setListLoading] = useState(true);
-
-  // Dialog states for creating a new assessment
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [newTitle, setNewTitle] = useState("");
-  const [newType, setNewType] = useState("unit_test");
-  const [newMode, setNewMode] = useState("offline");
-  const [newTotalMarks, setNewTotalMarks] = useState("25");
-  const [newPassingMarks, setNewPassingMarks] = useState("10");
-  const [isCreating, setIsCreating] = useState(false);
-
-  const [dialogClassId, setDialogClassId] = useState("");
-  const [dialogSubjectId, setDialogSubjectId] = useState("");
+  const {
+    classes,
+    subjects,
+    students,
+    assessments,
+    selectedAssessmentId,
+    confirmCompleteId,
+    completingId,
+    marks,
+    loading,
+    saving,
+    gradesLoading,
+    isDirty,
+    activeTab,
+    listLoading,
+    isDialogOpen,
+    newTitle,
+    newType,
+    newMode,
+    newTotalMarks,
+    newPassingMarks,
+    isCreating,
+    dialogClassId,
+    dialogSubjectId,
+  } = state;
 
   // 1. Initial bootstrap data (Classes/Subjects)
   useEffect(() => {
@@ -126,38 +88,34 @@ export function TeacherGrades() {
     ])
       .then(([cRes, sRes]) => Promise.all([cRes.json(), sRes.json()]))
       .then(([cData, sData]) => {
-        setClasses(cData);
-        setSubjects(sData);
-        setLoading(false);
+        dispatch({ type: "SET_BOOTSTRAP_DATA", classes: cData, subjects: sData });
       })
       .catch((e) => {
         console.error(e);
-        setLoading(false);
+        dispatch({ type: "SET_LOADING", value: false });
       });
   }, []);
 
   // 1b. Fetch assessments filtered by tab status
   useEffect(() => {
-    setListLoading(true);
+    dispatch({ type: "SET_LIST_LOADING", value: true });
     apiFetch(`/api/assessments?status=${activeTab}`)
       .then((r) => r.json())
       .then((data) => {
-        setAssessments(data || []);
+        dispatch({ type: "SET_ASSESSMENTS", assessments: data || [] });
       })
       .catch((e) => {
         console.error(e);
-      })
-      .finally(() => {
-        setListLoading(false);
+        dispatch({ type: "SET_LIST_LOADING", value: false });
       });
   }, [activeTab]);
 
   // 2. Load students for selected assessment's class
   useEffect(() => {
     if (!selectedAssessmentId) {
-      setStudents([]);
-      setMarks({});
-      setIsDirty(false);
+      dispatch({ type: "SET_STUDENTS", students: [] });
+      dispatch({ type: "SET_MARKS", marks: {} });
+      dispatch({ type: "SET_IS_DIRTY", value: false });
       return;
     }
     const assessment = assessments.find(a => a.id === selectedAssessmentId);
@@ -167,18 +125,18 @@ export function TeacherGrades() {
       .then((r) => r.json())
       .then((data) => {
         const studentArray = Array.isArray(data) ? data : (data?.items || []);
-        setStudents(studentArray);
+        dispatch({ type: "SET_STUDENTS", students: studentArray });
       });
   }, [selectedAssessmentId, assessments]);
 
   // 4. Load existing grades for selected isolated assessment
   useEffect(() => {
     if (!selectedAssessmentId) {
-      setMarks({});
-      setIsDirty(false);
+      dispatch({ type: "SET_MARKS", marks: {} });
+      dispatch({ type: "SET_IS_DIRTY", value: false });
       return;
     }
-    setGradesLoading(true);
+    dispatch({ type: "SET_GRADES_LOADING", value: true });
     apiFetch(`/api/assessments/${selectedAssessmentId}/grades`)
       .then((r) => r.json())
       .then((data) => {
@@ -189,19 +147,19 @@ export function TeacherGrades() {
               initialMarks[g.studentId] = g.marksObtained.toString();
             }
           });
-          setMarks(initialMarks);
-          setIsDirty(false);
+          dispatch({ type: "SET_MARKS", marks: initialMarks });
+          dispatch({ type: "SET_IS_DIRTY", value: false });
         } else {
-          setMarks({});
-          setIsDirty(false);
+          dispatch({ type: "SET_MARKS", marks: {} });
+          dispatch({ type: "SET_IS_DIRTY", value: false });
         }
       })
       .catch((e) => {
         console.error(e);
-        setMarks({});
-        setIsDirty(false);
+        dispatch({ type: "SET_MARKS", marks: {} });
+        dispatch({ type: "SET_IS_DIRTY", value: false });
       })
-      .finally(() => setGradesLoading(false));
+      .finally(() => dispatch({ type: "SET_GRADES_LOADING", value: false }));
   }, [selectedAssessmentId]);
 
 
@@ -284,7 +242,7 @@ export function TeacherGrades() {
       toast.error("Please select both a Class and a Subject!");
       return;
     }
-    setIsCreating(true);
+    dispatch({ type: "SET_IS_CREATING", value: true });
     try {
       const res = await apiFetch("/api/assessments", {
         method: "POST",
@@ -303,32 +261,31 @@ export function TeacherGrades() {
       const created = await res.json();
 
       toast.success(`Created assessment "${newTitle}"!`);
-      setIsDialogOpen(false);
-      setNewTitle("");
-      setNewMode("offline");
+      dispatch({ type: "SET_IS_DIALOG_OPEN", value: false });
+      dispatch({ type: "SET_NEW_TITLE", value: "" });
+      dispatch({ type: "SET_NEW_MODE", value: "offline" });
       
       // Seamlessly shift global view state to immediately display this assessment!
-      setAssessments((prev) => [created, ...prev]);
-      setSelectedAssessmentId(created.id);
+      dispatch({ type: "ADD_ASSESSMENT", assessment: created });
     } catch (e) {
       console.error(e);
       toast.error("Could not create assessment");
     }
-    setIsCreating(false);
+    dispatch({ type: "SET_IS_CREATING", value: false });
   };
 
   // COMPLETE ASSESSMENT PERMANENTLY
   const handleCompleteAssessment = async (assessmentId: string) => {
-    setCompletingId(assessmentId);
+    dispatch({ type: "SET_COMPLETING_ID", id: assessmentId });
     try {
       const res = await apiFetch(`/api/assessments/${assessmentId}/complete`, {
         method: "PUT",
       });
       if (res.ok) {
         toast.success("Assessment finalized successfully!");
-        setAssessments((prev) => prev.filter((item) => item.id !== assessmentId));
+        dispatch({ type: "SET_ASSESSMENTS", assessments: assessments.filter((item) => item.id !== assessmentId) });
         if (selectedAssessmentId === assessmentId) {
-          setSelectedAssessmentId("");
+          dispatch({ type: "SET_SELECTED_ASSESSMENT_ID", id: "" });
         }
       } else {
         toast.error("Could not complete assessment.");
@@ -337,7 +294,7 @@ export function TeacherGrades() {
       console.error(error);
       toast.error("Failed to complete assessment.");
     } finally {
-      setCompletingId(null);
+      dispatch({ type: "SET_COMPLETING_ID", id: null });
     }
   };
 
@@ -345,7 +302,7 @@ export function TeacherGrades() {
   // BULK SAVE GRADES
   const handleSave = async () => {
     if (!selectedAssessmentId) return;
-    setSaving(true);
+    dispatch({ type: "SET_SAVING", value: true });
     try {
       const records = Object.entries(marks)
         .filter(([_, val]) => val.trim() !== "")
@@ -357,7 +314,7 @@ export function TeacherGrades() {
 
       if (records.length === 0) {
         toast.error("No marks entered to save!");
-        setSaving(false);
+        dispatch({ type: "SET_SAVING", value: false });
         return;
       }
 
@@ -373,12 +330,12 @@ export function TeacherGrades() {
       if (!res.ok) throw new Error("Bulk save failed");
 
       toast.success(`Saved marks for ${records.length} students successfully!`);
-      setIsDirty(false);
+      dispatch({ type: "SET_IS_DIRTY", value: false });
     } catch (error) {
       console.error(error);
       toast.error("Failed to save marks");
     }
-    setSaving(false);
+    dispatch({ type: "SET_SAVING", value: false });
   };
 
   if (loading)
@@ -406,7 +363,7 @@ export function TeacherGrades() {
         {/* Create Assessment Button & Modal */}
         {/* Create Assessment Button & Modal */}
         {canCreate && (
-          <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+          <Dialog open={isDialogOpen} onOpenChange={(v) => dispatch({ type: "SET_IS_DIALOG_OPEN", value: v })}>
             <DialogTrigger asChild>
               <Button className="bg-blue-600 hover:bg-blue-700 text-white shadow-md font-semibold transition-all hover:translate-y-[-1px] group">
                 <Plus className="size-4 mr-2 group-hover:rotate-90 transition-all duration-200" />
@@ -428,8 +385,7 @@ export function TeacherGrades() {
                     <Select
                       value={dialogClassId}
                       onValueChange={(v) => {
-                        setDialogClassId(v);
-                        setDialogSubjectId(""); // reset subject filter
+                        dispatch({ type: "SET_DIALOG_CLASS_ID", value: v });
                       }}
                     >
                       <SelectTrigger className="h-9 focus:ring-blue-500 focus-visible:ring-blue-500">
@@ -449,7 +405,7 @@ export function TeacherGrades() {
                     <Label className="text-xs font-semibold text-muted-foreground">Subject *</Label>
                     <Select
                       value={dialogSubjectId}
-                      onValueChange={setDialogSubjectId}
+                      onValueChange={(v) => dispatch({ type: "SET_DIALOG_SUBJECT_ID", value: v })}
                       disabled={!dialogClassId}
                     >
                       <SelectTrigger className="h-9 focus:ring-blue-500 focus-visible:ring-blue-500">
@@ -474,7 +430,7 @@ export function TeacherGrades() {
                     id="title"
                     placeholder="e.g., Chapter 1 Algebra Quiz"
                     value={newTitle}
-                    onChange={(e) => setNewTitle(e.target.value)}
+                    onChange={(e) => dispatch({ type: "SET_NEW_TITLE", value: e.target.value })}
                     className="focus-visible:ring-blue-500 h-9"
                   />
                 </div>
@@ -482,7 +438,7 @@ export function TeacherGrades() {
                 <div className="grid grid-cols-2 gap-3">
                   <div className="grid gap-2">
                     <Label className="text-xs font-semibold text-muted-foreground">Category Type</Label>
-                    <Select value={newType} onValueChange={setNewType}>
+                    <Select value={newType} onValueChange={(v) => dispatch({ type: "SET_NEW_TYPE", value: v })}>
                       <SelectTrigger className="w-full h-9">
                         <SelectValue />
                       </SelectTrigger>
@@ -496,7 +452,7 @@ export function TeacherGrades() {
 
                   <div className="grid gap-2">
                     <Label className="text-xs font-semibold text-muted-foreground">Submission Mode</Label>
-                    <Select value={newMode} onValueChange={setNewMode}>
+                    <Select value={newMode} onValueChange={(v) => dispatch({ type: "SET_NEW_MODE", value: v })}>
                       <SelectTrigger className="w-full h-9">
                         <SelectValue />
                       </SelectTrigger>
@@ -518,7 +474,7 @@ export function TeacherGrades() {
                       id="total"
                       type="number"
                       value={newTotalMarks}
-                      onChange={(e) => setNewTotalMarks(e.target.value)}
+                      onChange={(e) => dispatch({ type: "SET_NEW_TOTAL_MARKS", value: e.target.value })}
                       className="focus-visible:ring-blue-500"
                     />
                   </div>
@@ -528,7 +484,7 @@ export function TeacherGrades() {
                       id="passing"
                       type="number"
                       value={newPassingMarks}
-                      onChange={(e) => setNewPassingMarks(e.target.value)}
+                      onChange={(e) => dispatch({ type: "SET_NEW_PASSING_MARKS", value: e.target.value })}
                       className="focus-visible:ring-blue-500"
                     />
                   </div>
@@ -562,17 +518,17 @@ export function TeacherGrades() {
 
 
         {/* Status Selection Tabs */}
-        <div className="flex border-b border-zinc-100 dark:border-zinc-800/80 mb-2 animate-in fade-in-50">
+        <div className="flex border-b border-zinc-100 dark:border-zinc-800/80 mb-2">
           <button
             type="button"
             onClick={() => {
-              if (!listLoading) setActiveTab("active");
+              if (!listLoading) dispatch({ type: "SET_ACTIVE_TAB", tab: "active" });
             }}
             disabled={listLoading}
-            className={`pb-3 px-6 text-sm font-semibold transition-all duration-200 border-b-2 outline-none relative flex items-center gap-2 cursor-pointer disabled:opacity-75 ${
+            className={`pb-3 px-6 text-sm font-semibold transition-colors duration-200 outline-none relative flex items-center gap-2 cursor-pointer disabled:opacity-75 ${
               activeTab === "active"
-                ? "border-blue-600 text-blue-600 dark:text-blue-400 translate-y-[1px]"
-                : "border-transparent text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300"
+                ? "text-blue-600 dark:text-blue-400"
+                : "text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300"
             }`}
           >
             <Clock className={`size-4 ${activeTab === "active" ? "text-blue-500" : ""}`} />
@@ -582,17 +538,24 @@ export function TeacherGrades() {
                 {assessments.length}
               </Badge>
             )}
+            {activeTab === "active" && (
+              <motion.div
+                layoutId="activeTabUnderline"
+                className="absolute bottom-0 left-0 right-0 h-0.5 bg-blue-600 dark:bg-blue-500 rounded-t-full"
+                transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
+              />
+            )}
           </button>
           <button
             type="button"
             onClick={() => {
-              if (!listLoading) setActiveTab("completed");
+              if (!listLoading) dispatch({ type: "SET_ACTIVE_TAB", tab: "completed" });
             }}
             disabled={listLoading}
-            className={`pb-3 px-6 text-sm font-semibold transition-all duration-200 border-b-2 outline-none relative flex items-center gap-2 cursor-pointer disabled:opacity-75 ${
+            className={`pb-3 px-6 text-sm font-semibold transition-colors duration-200 outline-none relative flex items-center gap-2 cursor-pointer disabled:opacity-75 ${
               activeTab === "completed"
-                ? "border-emerald-600 text-emerald-600 dark:text-emerald-400 translate-y-[1px]"
-                : "border-transparent text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300"
+                ? "text-emerald-600 dark:text-emerald-400"
+                : "text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300"
             }`}
           >
             <CheckCircle2 className={`size-4 ${activeTab === "completed" ? "text-emerald-500" : ""}`} />
@@ -601,6 +564,13 @@ export function TeacherGrades() {
               <Badge className="bg-emerald-50 text-emerald-700 dark:bg-emerald-950/20 dark:text-emerald-300 border-emerald-100 dark:border-emerald-900/50 font-medium px-1.5 py-0 text-[10px] pointer-events-none rounded-full transition-all">
                 {assessments.length}
               </Badge>
+            )}
+            {activeTab === "completed" && (
+              <motion.div
+                layoutId="activeTabUnderline"
+                className="absolute bottom-0 left-0 right-0 h-0.5 bg-emerald-600 dark:bg-emerald-500 rounded-t-full"
+                transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
+              />
             )}
           </button>
         </div>
@@ -701,7 +671,7 @@ export function TeacherGrades() {
                       variant="outline"
                       size="sm"
                       className="w-full text-xs gap-1.5"
-                      onClick={() => setSelectedAssessmentId(a.id)}
+                      onClick={() => dispatch({ type: "SET_SELECTED_ASSESSMENT_ID", id: a.id })}
                     >
                       <Eye className="size-3.5" />
                       {isCompleted ? "View Final Scores" : "View Submissions"} ({gradedCount})
@@ -714,7 +684,7 @@ export function TeacherGrades() {
                           ? "text-zinc-400 dark:text-zinc-500 border-zinc-200/50 dark:border-zinc-800/50 bg-transparent cursor-not-allowed opacity-60"
                           : "bg-emerald-50 dark:bg-emerald-950/30 text-emerald-700 dark:text-emerald-400 hover:bg-emerald-100 dark:hover:bg-emerald-900/40 border border-emerald-200/50 dark:border-emerald-800/50"
                       }`}
-                      onClick={() => !isCompleted && setConfirmCompleteId(a.id)}
+                      onClick={() => !isCompleted && dispatch({ type: "SET_CONFIRM_COMPLETE_ID", id: a.id })}
                       disabled={isCompleted || completingId === a.id}
                     >
                       {completingId === a.id ? (
@@ -738,9 +708,9 @@ export function TeacherGrades() {
           open={!!selectedAssessmentId} 
           onOpenChange={(open) => {
             if (!open) {
-              setSelectedAssessmentId("");
-              setMarks({});
-              setIsDirty(false);
+              dispatch({ type: "SET_SELECTED_ASSESSMENT_ID", id: "" });
+              dispatch({ type: "SET_MARKS", marks: {} });
+              dispatch({ type: "SET_IS_DIRTY", value: false });
             }
           }}
         >
@@ -841,8 +811,8 @@ export function TeacherGrades() {
                                     if (val === "") {
                                       const newMarks = { ...marks };
                                       delete newMarks[student.id];
-                                      setMarks(newMarks);
-                                      setIsDirty(true);
+                                      dispatch({ type: "SET_MARKS", marks: newMarks });
+                                      dispatch({ type: "SET_IS_DIRTY", value: true });
                                       return;
                                     }
                                     const num = parseFloat(val);
@@ -851,11 +821,14 @@ export function TeacherGrades() {
                                       toast.error(`Max marks for this test is ${maxMarks}!`);
                                       return;
                                     }
-                                    setMarks({
-                                      ...marks,
-                                      [student.id]: val,
+                                    dispatch({
+                                      type: "SET_MARKS",
+                                      marks: {
+                                        ...marks,
+                                        [student.id]: val,
+                                      }
                                     });
-                                    setIsDirty(true);
+                                    dispatch({ type: "SET_IS_DIRTY", value: true });
                                   }}
                                   className={`h-8 text-xs w-28 text-center font-semibold ${
                                     hasMark && !isPass ? "border-red-300 focus:border-red-500 bg-red-50/50 dark:bg-red-900/10" : "focus:border-blue-500"
@@ -935,7 +908,7 @@ export function TeacherGrades() {
             </p>
             {canCreate && activeTab === "active" && (
               <Button
-                onClick={() => setIsDialogOpen(true)}
+                onClick={() => dispatch({ type: "SET_IS_DIALOG_OPEN", value: true })}
                 className="mt-4 bg-blue-600 hover:bg-blue-700 text-white font-semibold shadow-md transition-all duration-200"
               >
                 <Plus className="size-4 mr-2" />
@@ -954,7 +927,7 @@ export function TeacherGrades() {
         )}
 
         {/* Confirm Complete Dialog */}
-        <AlertDialog open={!!confirmCompleteId} onOpenChange={(open) => !open && setConfirmCompleteId(null)}>
+        <AlertDialog open={!!confirmCompleteId} onOpenChange={(open) => !open && dispatch({ type: "SET_CONFIRM_COMPLETE_ID", id: null })}>
           <AlertDialogContent>
             <AlertDialogHeader>
               <AlertDialogTitle className="flex items-center gap-2">
@@ -971,7 +944,7 @@ export function TeacherGrades() {
                 onClick={() => {
                   if (confirmCompleteId) {
                     handleCompleteAssessment(confirmCompleteId);
-                    setConfirmCompleteId(null);
+                    dispatch({ type: "SET_CONFIRM_COMPLETE_ID", id: null });
                   }
                 }}
               >

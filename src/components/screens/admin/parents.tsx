@@ -1,8 +1,8 @@
 "use client";
 
-import { useState, useEffect, useMemo } from "react";
+import { useReducer, useEffect, useMemo } from "react";
 import { useViewMode } from "@/hooks/use-view-mode";
-import { goeyToast as toast } from "goey-toast";
+import { toast } from "sonner";
 import api from "@/lib/axios";
 import { useAppStore } from "@/store/use-app-store";
 import {
@@ -25,15 +25,106 @@ import { LinkChildDialog } from "./parents/LinkChildDialog";
 import { ParentSkeleton } from "./parents/ParentSkeleton";
 import { ParentInfo, StudentInfo } from "./parents/types";
 
+type State = {
+  search: string;
+  currentPage: number;
+  linkOpen: boolean;
+  selectedParent: ParentInfo | null;
+  selectedClass: string;
+  linking: boolean;
+  createOpen: boolean;
+  createForm: {
+    name: string; email: string; phone: string; occupation: string; password: "";
+  };
+  creating: boolean;
+  editOpen: boolean;
+  editingParent: ParentInfo | null;
+  editForm: {
+    name: string; email: string; phone: string; occupation: string;
+  };
+  editing: boolean;
+};
+
+type Action =
+  | { type: 'SET_SEARCH'; payload: string }
+  | { type: 'SET_CURRENT_PAGE'; payload: number }
+  | { type: 'SET_LINK_OPEN'; payload: boolean }
+  | { type: 'OPEN_LINK_DIALOG'; payload: ParentInfo }
+  | { type: 'SET_SELECTED_CLASS'; payload: string }
+  | { type: 'SET_LINKING'; payload: boolean }
+  | { type: 'SET_CREATE_OPEN'; payload: boolean }
+  | { type: 'SET_CREATE_FORM'; payload: Partial<State['createForm']> }
+  | { type: 'RESET_CREATE_FORM' }
+  | { type: 'SET_CREATING'; payload: boolean }
+  | { type: 'OPEN_EDIT_DIALOG'; payload: ParentInfo }
+  | { type: 'SET_EDIT_OPEN'; payload: boolean }
+  | { type: 'SET_EDIT_FORM'; payload: Partial<State['editForm']> }
+  | { type: 'SET_EDITING'; payload: boolean };
+
+const initialState: State = {
+  search: "",
+  currentPage: 1,
+  linkOpen: false,
+  selectedParent: null,
+  selectedClass: "all",
+  linking: false,
+  createOpen: false,
+  createForm: {
+    name: "", email: "", phone: "", occupation: "", password: "",
+  },
+  creating: false,
+  editOpen: false,
+  editingParent: null,
+  editForm: {
+    name: "", email: "", phone: "", occupation: "",
+  },
+  editing: false,
+};
+
+function reducer(state: State, action: Action): State {
+  switch (action.type) {
+    case 'SET_SEARCH': return { ...state, search: action.payload, currentPage: 1 };
+    case 'SET_CURRENT_PAGE': return { ...state, currentPage: action.payload };
+    case 'SET_LINK_OPEN': return { ...state, linkOpen: action.payload };
+    case 'OPEN_LINK_DIALOG': return { ...state, selectedParent: action.payload, linkOpen: true, selectedClass: "all" };
+    case 'SET_SELECTED_CLASS': return { ...state, selectedClass: action.payload };
+    case 'SET_LINKING': return { ...state, linking: action.payload };
+    case 'SET_CREATE_OPEN': return { ...state, createOpen: action.payload };
+    case 'SET_CREATE_FORM': return { ...state, createForm: { ...state.createForm, ...action.payload } };
+    case 'RESET_CREATE_FORM': return { ...state, createForm: initialState.createForm, createOpen: false };
+    case 'SET_CREATING': return { ...state, creating: action.payload };
+    case 'OPEN_EDIT_DIALOG':
+      return {
+        ...state,
+        editingParent: action.payload,
+        editForm: {
+          name: action.payload.name,
+          email: action.payload.email,
+          phone: action.payload.phone || "",
+          occupation: action.payload.occupation || ""
+        },
+        editOpen: true
+      };
+    case 'SET_EDIT_OPEN': return { ...state, editOpen: action.payload };
+    case 'SET_EDIT_FORM': return { ...state, editForm: { ...state.editForm, ...action.payload } };
+    case 'SET_EDITING': return { ...state, editing: action.payload };
+    default: return state;
+  }
+}
+
 export function AdminParents() {
   const { currentTenantId } = useAppStore();
   const queryClient = useQueryClient();
   const [viewMode, setViewMode] = useViewMode("parents", "grid");
 
-  // Filter & Search states
-  const [search, setSearch] = useState("");
+  const [state, dispatch] = useReducer(reducer, initialState);
+  const {
+    search, currentPage, linkOpen, selectedParent, selectedClass,
+    linking, createOpen, createForm, creating, editOpen,
+    editingParent, editForm, editing
+  } = state;
+
   const debouncedSearch = useDebounce(search, 500);
-  const [currentPage, setCurrentPage] = useState(1);
 
   // Queries
   const { 
@@ -42,12 +133,6 @@ export function AdminParents() {
   } = useParents(currentTenantId || undefined, debouncedSearch || undefined, currentPage, 12);
 
   const { data: classesData } = useClassesMin(currentTenantId || undefined);
-
-  // Link child dialog states
-  const [linkOpen, setLinkOpen] = useState(false);
-  const [selectedParent, setSelectedParent] = useState<ParentInfo | null>(null);
-  const [selectedClass, setSelectedClass] = useState("all");
-  const [linking, setLinking] = useState(false);
 
   // Students for linking (filtered by class if selected) - Using optimized min-data REST API
   const { 
@@ -89,21 +174,6 @@ export function AdminParents() {
   const classes = classesData?.classes || [];
   const loading = loadingParents;
 
-  // Create dialog
-  const [createOpen, setCreateOpen] = useState(false);
-  const [createForm, setCreateForm] = useState({
-    name: "", email: "", phone: "", occupation: "", password: "", 
-  });
-  const [creating, setCreating] = useState(false);
-
-  // Edit dialog
-  const [editOpen, setEditOpen] = useState(false);
-  const [editingParent, setEditingParent] = useState<ParentInfo | null>(null);
-  const [editForm, setEditForm] = useState({
-    name: "", email: "", phone: "", occupation: "",
-  });
-  const [editing, setEditing] = useState(false);
-
   const filteredStudents = useMemo(() => {
     return students.filter(
       (s) => !s.parentId && !selectedParent?.children.some((c) => c.id === s.id)
@@ -114,14 +184,13 @@ export function AdminParents() {
     if (!createForm.name || !createForm.email) { toast.error("Name and email are required"); return; }
     toast.promise(
       (async () => {
-        setCreating(true);
+        dispatch({ type: 'SET_CREATING', payload: true });
         try {
           await api.post("/parents", { action: "create", ...createForm });
-          setCreateOpen(false);
-          setCreateForm({ name: "", email: "", phone: "", occupation: "", password: "", });
+          dispatch({ type: 'RESET_CREATE_FORM' });
           queryClient.invalidateQueries({ queryKey: queryKeys.parents });
           return "Parent account created";
-        } finally { setCreating(false); }
+        } finally { dispatch({ type: 'SET_CREATING', payload: false }); }
       })(),
       { loading: "Creating parent account...", success: (msg) => msg, error: (err: any) => err.message, },
     );
@@ -131,13 +200,13 @@ export function AdminParents() {
     if (!selectedParent) return;
     toast.promise(
       (async () => {
-        setLinking(true);
+        dispatch({ type: 'SET_LINKING', payload: true });
         try {
           await api.post("/parents", { action: "link", parentId: selectedParent.id, studentId, });
           queryClient.invalidateQueries({ queryKey: queryKeys.parents });
           queryClient.invalidateQueries({ queryKey: ['students-min'] });
           return "Student linked successfully";
-        } finally { setLinking(false); }
+        } finally { dispatch({ type: 'SET_LINKING', payload: false }); }
       })(),
       { loading: "Linking child to parent...", success: (msg: any) => msg, error: (err: any) => err.message, },
     );
@@ -164,13 +233,13 @@ export function AdminParents() {
     });
     toast.promise(
       (async () => {
-        setEditing(true);
+        dispatch({ type: 'SET_EDITING', payload: true });
         try {
           await api.put("/parents", { id: editingParent.id, ...editForm });
-          setEditOpen(false);
+          dispatch({ type: 'SET_EDIT_OPEN', payload: false });
           queryClient.invalidateQueries({ queryKey: queryKeys.parents });
           return "Parent details updated";
-        } finally { setEditing(false); }
+        } finally { dispatch({ type: 'SET_EDITING', payload: false }); }
       })(),
       { loading: "Saving changes...", success: (msg) => msg, error: (err: any) => err.message, },
     );
@@ -193,12 +262,12 @@ export function AdminParents() {
     <div className="space-y-6">
       <ParentsHeader 
         search={search}
-        onSearchChange={(v) => { setSearch(v); setCurrentPage(1); }}
+        onSearchChange={(v) => dispatch({ type: 'SET_SEARCH', payload: v })}
         totalParents={parents.length}
         totalChildren={parents.reduce((s, p) => s + p.children.length, 0)}
         viewMode={viewMode}
         setViewMode={setViewMode}
-        onAddClick={() => setCreateOpen(true)}
+        onAddClick={() => dispatch({ type: 'SET_CREATE_OPEN', payload: true })}
       />
 
       {parents.length === 0 ? (
@@ -206,17 +275,17 @@ export function AdminParents() {
       ) : viewMode === "table" ? (
         <ParentsTableView 
           parents={parents}
-          onEdit={(p) => { setEditingParent(p); setEditForm({ name: p.name, email: p.email, phone: p.phone || "", occupation: p.occupation || "" }); setEditOpen(true); }}
+          onEdit={(p) => dispatch({ type: 'OPEN_EDIT_DIALOG', payload: p })}
           onDelete={handleDelete}
-          onLinkOpen={(p) => { setSelectedParent(p); setLinkOpen(true); setSelectedClass("all"); }}
+          onLinkOpen={(p) => dispatch({ type: 'OPEN_LINK_DIALOG', payload: p })}
         />
       ) : (
         <ParentsGridView 
           parents={parents}
           linking={linking}
-          onEdit={(p) => { setEditingParent(p); setEditForm({ name: p.name, email: p.email, phone: p.phone || "", occupation: p.occupation || "" }); setEditOpen(true); }}
+          onEdit={(p) => dispatch({ type: 'OPEN_EDIT_DIALOG', payload: p })}
           onDelete={handleDelete}
-          onLinkOpen={(p) => { setSelectedParent(p); setLinkOpen(true); setSelectedClass("all"); }}
+          onLinkOpen={(p) => dispatch({ type: 'OPEN_LINK_DIALOG', payload: p })}
           onUnlinkChild={handleUnlinkChild}
         />
       )}
@@ -226,33 +295,33 @@ export function AdminParents() {
         totalPages={totalPages}
         totalItems={totalItems}
         itemsPerPage={12}
-        onPageChange={setCurrentPage}
+        onPageChange={(v) => dispatch({ type: 'SET_CURRENT_PAGE', payload: v })}
       />
 
       <CreateParentDialog
         open={createOpen}
-        onOpenChange={setCreateOpen}
+        onOpenChange={(v) => dispatch({ type: 'SET_CREATE_OPEN', payload: v })}
         createForm={createForm}
-        setCreateForm={setCreateForm}
+        setCreateForm={(v) => dispatch({ type: 'SET_CREATE_FORM', payload: v })}
         onCreate={handleCreate}
         creating={creating}
       />
 
       <EditParentDialog
         open={editOpen}
-        onOpenChange={setEditOpen}
+        onOpenChange={(v) => dispatch({ type: 'SET_EDIT_OPEN', payload: v })}
         editForm={editForm}
-        setEditForm={setEditForm}
+        setEditForm={(v) => dispatch({ type: 'SET_EDIT_FORM', payload: v })}
         onSave={handleEditSave}
         editing={editing}
       />
 
       <LinkChildDialog
         open={linkOpen}
-        onOpenChange={setLinkOpen}
+        onOpenChange={(v) => dispatch({ type: 'SET_LINK_OPEN', payload: v })}
         selectedParent={selectedParent}
         selectedClass={selectedClass}
-        setSelectedClass={setSelectedClass}
+        setSelectedClass={(v) => dispatch({ type: 'SET_SELECTED_CLASS', payload: v })}
         classes={classes}
         filteredStudents={filteredStudents}
         linking={linking}

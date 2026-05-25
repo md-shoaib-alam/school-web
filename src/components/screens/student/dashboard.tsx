@@ -4,7 +4,7 @@ import { apiFetch } from "@/lib/api";
 import { useEffect, useState } from "react";
 import { useAppStore } from "@/store/use-app-store";
 import { useStudentDashboard } from "@/lib/graphql/hooks";
-import { goeyToast as toast } from "goey-toast";
+import { toast } from "sonner";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";

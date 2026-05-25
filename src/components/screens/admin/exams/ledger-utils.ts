@@ -1,5 +1,5 @@
 import { apiFetch } from '@/lib/api';
-import { goeyToast as toast } from 'goey-toast';
+import { toast } from "sonner";
 import { ExamRecord } from './types';
 
 export interface TabulationRow {

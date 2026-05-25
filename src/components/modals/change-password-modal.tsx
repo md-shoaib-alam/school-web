@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useReducer } from "react";
 import {
   Dialog,
   DialogContent,
@@ -20,44 +20,79 @@ interface ChangePasswordModalProps {
   onOpenChange: (open: boolean) => void;
 }
 
+type State = {
+  oldPassword: string;
+  newPassword: string;
+  confirmPassword: string;
+  showOldPassword: boolean;
+  showNewPassword: boolean;
+  showConfirmPassword: boolean;
+  error: string;
+};
+
+type Action =
+  | { type: 'SET_FIELD'; field: keyof State; value: string | boolean }
+  | { type: 'TOGGLE_VISIBILITY'; field: 'showOldPassword' | 'showNewPassword' | 'showConfirmPassword' }
+  | { type: 'RESET' };
+
+const initialState: State = {
+  oldPassword: "",
+  newPassword: "",
+  confirmPassword: "",
+  showOldPassword: false,
+  showNewPassword: false,
+  showConfirmPassword: false,
+  error: "",
+};
+
+function reducer(state: State, action: Action): State {
+  switch (action.type) {
+    case 'SET_FIELD':
+      return { ...state, [action.field]: action.value };
+    case 'TOGGLE_VISIBILITY':
+      return { ...state, [action.field]: !state[action.field] };
+    case 'RESET':
+      return initialState;
+    default:
+      return state;
+  }
+}
+
 export function ChangePasswordModal({
   open,
   onOpenChange,
 }: ChangePasswordModalProps) {
-  const [oldPassword, setOldPassword] = useState("");
-  const [newPassword, setNewPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
-  const [showOldPassword, setShowOldPassword] = useState(false);
-  const [showNewPassword, setShowNewPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [error, setError] = useState("");
+  const [state, dispatch] = useReducer(reducer, initialState);
+  const {
+    oldPassword,
+    newPassword,
+    confirmPassword,
+    showOldPassword,
+    showNewPassword,
+    showConfirmPassword,
+    error,
+  } = state;
 
   const changePasswordMutation = useChangePassword();
 
   const handleOpenChange = (newOpen: boolean) => {
     if (!newOpen) {
-      setOldPassword("");
-      setNewPassword("");
-      setConfirmPassword("");
-      setShowOldPassword(false);
-      setShowNewPassword(false);
-      setShowConfirmPassword(false);
-      setError("");
+      dispatch({ type: 'RESET' });
     }
     onOpenChange(newOpen);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError("");
+    dispatch({ type: 'SET_FIELD', field: 'error', value: "" });
 
     if (newPassword !== confirmPassword) {
-      setError("New passwords do not match");
+      dispatch({ type: 'SET_FIELD', field: 'error', value: "New passwords do not match" });
       return;
     }
 
     if (newPassword.length < 6) {
-      setError("Password must be at least 6 characters");
+      dispatch({ type: 'SET_FIELD', field: 'error', value: "Password must be at least 6 characters" });
       return;
     }
 
@@ -90,14 +125,14 @@ export function ChangePasswordModal({
                 type={showOldPassword ? "text" : "password"}
                 placeholder="••••••••"
                 value={oldPassword}
-                onChange={(e) => setOldPassword(e.target.value)}
+                onChange={(e) => dispatch({ type: 'SET_FIELD', field: 'oldPassword', value: e.target.value })}
                 required
                 className="pr-10"
               />
               <button
                 type="button"
                 className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300"
-                onClick={() => setShowOldPassword(!showOldPassword)}
+                onClick={() => dispatch({ type: 'TOGGLE_VISIBILITY', field: 'showOldPassword' })}
               >
                 {showOldPassword ? (
                   <EyeOff className="size-4" />
@@ -115,14 +150,14 @@ export function ChangePasswordModal({
                 type={showNewPassword ? "text" : "password"}
                 placeholder="••••••••"
                 value={newPassword}
-                onChange={(e) => setNewPassword(e.target.value)}
+                onChange={(e) => dispatch({ type: 'SET_FIELD', field: 'newPassword', value: e.target.value })}
                 required
                 className="pr-10"
               />
               <button
                 type="button"
                 className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300"
-                onClick={() => setShowNewPassword(!showNewPassword)}
+                onClick={() => dispatch({ type: 'TOGGLE_VISIBILITY', field: 'showNewPassword' })}
               >
                 {showNewPassword ? (
                   <EyeOff className="size-4" />
@@ -140,14 +175,14 @@ export function ChangePasswordModal({
                 type={showConfirmPassword ? "text" : "password"}
                 placeholder="••••••••"
                 value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
+                onChange={(e) => dispatch({ type: 'SET_FIELD', field: 'confirmPassword', value: e.target.value })}
                 required
                 className="pr-10"
               />
               <button
                 type="button"
                 className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300"
-                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                onClick={() => dispatch({ type: 'TOGGLE_VISIBILITY', field: 'showConfirmPassword' })}
               >
                 {showConfirmPassword ? (
                   <EyeOff className="size-4" />

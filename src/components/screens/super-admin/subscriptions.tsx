@@ -1,8 +1,8 @@
 "use client";
 
 import { apiFetch } from "@/lib/api";
-import { useState, useEffect, useMemo } from "react";
-import { goeyToast as toast } from "goey-toast";
+import { useReducer, useEffect, useMemo } from "react";
+import { toast } from "sonner";
 import {
   useParents,
   useSubscriptions,
@@ -19,49 +19,78 @@ import { SubscriptionDialogs } from "./subscriptions/SubscriptionDialogs";
 import { SubscriptionRecord } from "./subscriptions/types";
 const ITEMS_PER_PAGE = 25;
 
-export function SuperAdminSubscriptions() {
-  const [selectedTenant, setSelectedTenant] = useState<string>("all");
-  const [search, setSearch] = useState("");
-  const [debouncedSearch, setDebouncedSearch] = useState("");
-  const [statusFilter, setStatusFilter] = useState("all");
-  const [page, setPage] = useState(1);
-  const queryClient = useQueryClient();
+type State = {
+  selectedTenant: string;
+  search: string;
+  debouncedSearch: string;
+  statusFilter: string;
+  page: number;
+  deleteDialog: SubscriptionRecord | null;
+  deleting: boolean;
+  createDialogOpen: boolean;
+  editDialogOpen: SubscriptionRecord | null;
+  extendDialogOpen: SubscriptionRecord | null;
+  extendDays: string;
+  processing: boolean;
+  createForm: {
+    parentId: string;
+    planId: string;
+    planName: string;
+    amount: number;
+    period: string;
+    paymentMethod: string;
+  };
+  editForm: {
+    planName: string;
+    amount: number;
+    period: string;
+    autoRenew: boolean;
+    paymentMethod: string;
+    status: string;
+    endDate: string;
+  };
+};
 
-  // Debounce search
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setDebouncedSearch(search);
-      setPage(1);
-    }, 300);
-    return () => clearTimeout(timer);
-  }, [search]);
+type Action =
+  | { type: 'SET_SELECTED_TENANT'; payload: string }
+  | { type: 'SET_SEARCH'; payload: string }
+  | { type: 'SET_DEBOUNCED_SEARCH'; payload: string }
+  | { type: 'SET_STATUS_FILTER'; payload: string }
+  | { type: 'SET_PAGE'; payload: number }
+  | { type: 'SET_DELETE_DIALOG'; payload: SubscriptionRecord | null }
+  | { type: 'SET_DELETING'; payload: boolean }
+  | { type: 'SET_CREATE_DIALOG_OPEN'; payload: boolean }
+  | { type: 'OPEN_EDIT_DIALOG'; payload: SubscriptionRecord }
+  | { type: 'SET_EDIT_DIALOG_OPEN'; payload: SubscriptionRecord | null }
+  | { type: 'SET_EXTEND_DIALOG_OPEN'; payload: SubscriptionRecord | null }
+  | { type: 'SET_EXTEND_DAYS'; payload: string }
+  | { type: 'SET_PROCESSING'; payload: boolean }
+  | { type: 'SET_CREATE_FORM'; payload: Partial<State['createForm']> | ((prev: State['createForm']) => State['createForm']) }
+  | { type: 'SET_EDIT_FORM'; payload: Partial<State['editForm']> }
+  | { type: 'PREPARE_ASSIGN'; payload: string };
 
-  // Reset page when filters change
-  useEffect(() => {
-    setPage(1);
-  }, [selectedTenant, statusFilter]);
-
-  // Dialog states
-  const [deleteDialog, setDeleteDialog] = useState<SubscriptionRecord | null>(null);
-  const [deleting, setDeleting] = useState(false);
-  const [createDialogOpen, setCreateDialogOpen] = useState(false);
-  const [editDialogOpen, setEditDialogOpen] = useState<SubscriptionRecord | null>(null);
-  const [extendDialogOpen, setExtendDialogOpen] = useState<SubscriptionRecord | null>(null);
-  
-  const [extendDays, setExtendDays] = useState("30");
-  const [processing, setProcessing] = useState(false);
-
-  // Forms
-  const [createForm, setCreateForm] = useState({
+const initialState: State = {
+  selectedTenant: "all",
+  search: "",
+  debouncedSearch: "",
+  statusFilter: "all",
+  page: 1,
+  deleteDialog: null,
+  deleting: false,
+  createDialogOpen: false,
+  editDialogOpen: null,
+  extendDialogOpen: null,
+  extendDays: "30",
+  processing: false,
+  createForm: {
     parentId: "",
     planId: "standard",
     planName: "Standard",
     amount: 299,
     period: "yearly",
     paymentMethod: "card",
-  });
-  
-  const [editForm, setEditForm] = useState({
+  },
+  editForm: {
     planName: "",
     amount: 0,
     period: "",
@@ -69,7 +98,65 @@ export function SuperAdminSubscriptions() {
     paymentMethod: "",
     status: "",
     endDate: "",
-  });
+  },
+};
+
+function reducer(state: State, action: Action): State {
+  switch (action.type) {
+    case 'SET_SELECTED_TENANT': return { ...state, selectedTenant: action.payload, page: 1 };
+    case 'SET_SEARCH': return { ...state, search: action.payload };
+    case 'SET_DEBOUNCED_SEARCH': return { ...state, debouncedSearch: action.payload, page: 1 };
+    case 'SET_STATUS_FILTER': return { ...state, statusFilter: action.payload, page: 1 };
+    case 'SET_PAGE': return { ...state, page: action.payload };
+    case 'SET_DELETE_DIALOG': return { ...state, deleteDialog: action.payload };
+    case 'SET_DELETING': return { ...state, deleting: action.payload };
+    case 'SET_CREATE_DIALOG_OPEN': return { ...state, createDialogOpen: action.payload };
+    case 'OPEN_EDIT_DIALOG':
+      return {
+        ...state,
+        editDialogOpen: action.payload,
+        editForm: {
+          planName: action.payload.planName,
+          amount: action.payload.amount,
+          period: action.payload.period,
+          autoRenew: action.payload.autoRenew,
+          paymentMethod: action.payload.paymentMethod,
+          status: action.payload.status,
+          endDate: action.payload.endDate || "",
+        }
+      };
+    case 'SET_EDIT_DIALOG_OPEN': return { ...state, editDialogOpen: action.payload };
+    case 'SET_EXTEND_DIALOG_OPEN': return { ...state, extendDialogOpen: action.payload };
+    case 'SET_EXTEND_DAYS': return { ...state, extendDays: action.payload };
+    case 'SET_PROCESSING': return { ...state, processing: action.payload };
+    case 'SET_CREATE_FORM':
+      return {
+        ...state,
+        createForm: typeof action.payload === 'function' ? action.payload(state.createForm) : { ...state.createForm, ...action.payload }
+      };
+    case 'SET_EDIT_FORM': return { ...state, editForm: { ...state.editForm, ...action.payload } };
+    case 'PREPARE_ASSIGN': return { ...state, createForm: { ...state.createForm, parentId: action.payload }, createDialogOpen: true };
+    default: return state;
+  }
+}
+
+export function SuperAdminSubscriptions() {
+  const [state, dispatch] = useReducer(reducer, initialState);
+  const {
+    selectedTenant, search, debouncedSearch, statusFilter, page,
+    deleteDialog, deleting, createDialogOpen, editDialogOpen,
+    extendDialogOpen, extendDays, processing, createForm, editForm
+  } = state;
+
+  const queryClient = useQueryClient();
+
+  // Debounce search
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      dispatch({ type: 'SET_DEBOUNCED_SEARCH', payload: search });
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [search]);
 
   // -- Queries --
   const { data: tenantsData } = useTenants({ page: 1, limit: 100 });
@@ -83,7 +170,6 @@ export function SuperAdminSubscriptions() {
     limit: ITEMS_PER_PAGE
   });
 
-  // FIXED: Correct parameters for useParents and increased limit for dropdown
   const { data: parentsData, isLoading: loadingParents } = useParents(
     selectedTenant === "all" ? undefined : selectedTenant,
     undefined, // search
@@ -140,15 +226,15 @@ export function SuperAdminSubscriptions() {
     if (!deleteDialog) return;
     toast.promise(
       (async () => {
-        setDeleting(true);
+        dispatch({ type: 'SET_DELETING', payload: true });
         try {
           const res = await apiFetch(`/api/subscriptions?id=${deleteDialog.id}`, { method: "DELETE" });
           if (!res.ok) throw new Error("Failed to delete subscription");
           invalidate();
-          setDeleteDialog(null);
+          dispatch({ type: 'SET_DELETE_DIALOG', payload: null });
           return "Subscription deleted successfully";
         } finally {
-          setDeleting(false);
+          dispatch({ type: 'SET_DELETING', payload: false });
         }
       })(),
       {
@@ -166,7 +252,7 @@ export function SuperAdminSubscriptions() {
     }
     toast.promise(
       (async () => {
-        setProcessing(true);
+        dispatch({ type: 'SET_PROCESSING', payload: true });
         try {
           const res = await apiFetch("/api/subscriptions", {
             method: "POST",
@@ -175,10 +261,10 @@ export function SuperAdminSubscriptions() {
           });
           if (!res.ok) throw new Error("Failed to create subscription");
           invalidate();
-          setCreateDialogOpen(false);
+          dispatch({ type: 'SET_CREATE_DIALOG_OPEN', payload: false });
           return "Subscription created successfully";
         } finally {
-          setProcessing(false);
+          dispatch({ type: 'SET_PROCESSING', payload: false });
         }
       })(),
       {
@@ -193,7 +279,7 @@ export function SuperAdminSubscriptions() {
     if (!editDialogOpen) return;
     toast.promise(
       (async () => {
-        setProcessing(true);
+        dispatch({ type: 'SET_PROCESSING', payload: true });
         try {
           const res = await apiFetch("/api/subscriptions", {
             method: "POST",
@@ -206,10 +292,10 @@ export function SuperAdminSubscriptions() {
           });
           if (!res.ok) throw new Error("Failed to update subscription");
           invalidate();
-          setEditDialogOpen(null);
+          dispatch({ type: 'SET_EDIT_DIALOG_OPEN', payload: null });
           return "Subscription updated successfully";
         } finally {
-          setProcessing(false);
+          dispatch({ type: 'SET_PROCESSING', payload: false });
         }
       })(),
       {
@@ -227,7 +313,7 @@ export function SuperAdminSubscriptions() {
     }
     toast.promise(
       (async () => {
-        setProcessing(true);
+        dispatch({ type: 'SET_PROCESSING', payload: true });
         try {
           const res = await apiFetch("/api/subscriptions", {
             method: "POST",
@@ -240,10 +326,10 @@ export function SuperAdminSubscriptions() {
           });
           if (!res.ok) throw new Error("Failed to extend subscription");
           invalidate();
-          setExtendDialogOpen(null);
+          dispatch({ type: 'SET_EXTEND_DIALOG_OPEN', payload: null });
           return `Extended by ${extendDays} days successfully`;
         } finally {
-          setProcessing(false);
+          dispatch({ type: 'SET_PROCESSING', payload: false });
         }
       })(),
       {
@@ -254,35 +340,22 @@ export function SuperAdminSubscriptions() {
     );
   };
 
-  const openEditDialog = (sub: SubscriptionRecord) => {
-    setEditForm({
-      planName: sub.planName,
-      amount: sub.amount,
-      period: sub.period,
-      autoRenew: sub.autoRenew,
-      paymentMethod: sub.paymentMethod,
-      status: sub.status,
-      endDate: sub.endDate || "",
-    });
-    setEditDialogOpen(sub);
-  };
-
   return (
     <div className="space-y-6">
       <SubscriptionStats 
         stats={stats}
         selectedTenant={selectedTenant}
-        onTenantChange={setSelectedTenant}
+        onTenantChange={(v) => dispatch({ type: 'SET_SELECTED_TENANT', payload: v })}
         tenants={tenants}
-        onNewSetup={() => setCreateDialogOpen(true)}
+        onNewSetup={() => dispatch({ type: 'SET_CREATE_DIALOG_OPEN', payload: true })}
         parentsTotal={parentsData?.total || 0}
       />
 
       <SubscriptionFilters 
         search={search}
-        onSearchChange={setSearch}
+        onSearchChange={(v) => dispatch({ type: 'SET_SEARCH', payload: v })}
         statusFilter={statusFilter}
-        onStatusFilterChange={setStatusFilter}
+        onStatusFilterChange={(v) => dispatch({ type: 'SET_STATUS_FILTER', payload: v })}
         onRefresh={invalidate}
       />
 
@@ -294,39 +367,36 @@ export function SuperAdminSubscriptions() {
         limit={ITEMS_PER_PAGE}
         totalPages={totalPages}
         totalEntries={totalEntries}
-        onPageChange={setPage}
-        onEdit={openEditDialog}
-        onExtend={setExtendDialogOpen}
-        onDelete={setDeleteDialog}
-        onAssign={(item) => {
-          setCreateForm(p => ({ ...p, parentId: item.id }));
-          setCreateDialogOpen(true);
-        }}
+        onPageChange={(v) => dispatch({ type: 'SET_PAGE', payload: v })}
+        onEdit={(sub) => dispatch({ type: 'OPEN_EDIT_DIALOG', payload: sub })}
+        onExtend={(v) => dispatch({ type: 'SET_EXTEND_DIALOG_OPEN', payload: v })}
+        onDelete={(v) => dispatch({ type: 'SET_DELETE_DIALOG', payload: v })}
+        onAssign={(item) => dispatch({ type: 'PREPARE_ASSIGN', payload: item.id })}
       />
 
       <SubscriptionDialogs 
         createOpen={createDialogOpen}
-        onCreateOpenChange={setCreateDialogOpen}
+        onCreateOpenChange={(v) => dispatch({ type: 'SET_CREATE_DIALOG_OPEN', payload: v })}
         createForm={createForm}
-        setCreateForm={setCreateForm}
+        setCreateForm={(v) => dispatch({ type: 'SET_CREATE_FORM', payload: v })}
         parents={Array.isArray(parentsData?.parents) ? parentsData.parents : []}
         onCreateSubmit={handleCreate}
         processing={processing}
 
-        editOpen={editDialogOpen}
-        onEditOpenChange={setEditDialogOpen}
+        editOpen={!!editDialogOpen}
+        onEditOpenChange={(v) => dispatch({ type: 'SET_EDIT_DIALOG_OPEN', payload: v ? state.editDialogOpen : null })}
         editForm={editForm}
-        setEditForm={setEditForm}
+        setEditForm={(v) => dispatch({ type: 'SET_EDIT_FORM', payload: v })}
         onEditSubmit={handleEdit}
 
-        extendOpen={extendDialogOpen}
-        onExtendOpenChange={setExtendDialogOpen}
+        extendOpen={!!extendDialogOpen}
+        onExtendOpenChange={(v) => dispatch({ type: 'SET_EXTEND_DIALOG_OPEN', payload: v ? state.extendDialogOpen : null })}
         extendDays={extendDays}
-        setExtendDays={setExtendDays}
+        setExtendDays={(v) => dispatch({ type: 'SET_EXTEND_DAYS', payload: v })}
         onExtendSubmit={handleExtend}
 
         deleteOpen={deleteDialog}
-        onDeleteOpenChange={setDeleteDialog}
+        onDeleteOpenChange={(v) => dispatch({ type: 'SET_DELETE_DIALOG', payload: v })}
         onDeleteConfirm={handleDelete}
         deleting={deleting}
       />

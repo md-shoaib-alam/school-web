@@ -1,9 +1,9 @@
 "use client";
 
 import { apiFetch } from "@/lib/api";
-import { useState, useEffect, useCallback } from "react";
+import { useReducer, useEffect, useCallback } from "react";
 import { Loader2 } from "lucide-react";
-import { goeyToast as toast } from "goey-toast";
+import { toast } from "sonner";
 
 // Sub-components
 import { RoleHeader } from "./roles/RoleHeader";
@@ -11,46 +11,44 @@ import { RoleTemplates } from "./roles/RoleTemplates";
 import { RoleGrid } from "./roles/RoleGrid";
 import { RoleDialogs } from "./roles/RoleDialogs";
 
-// Types
+// Types & Reducer
 import { 
   PlatformRoleRecord, 
-  AssignedUser, 
-  AvailableUser, 
   ROLE_TEMPLATES 
 } from "./roles/types";
+import { rolesReducer, initialState } from "./roles/reducer";
 
 export function SuperAdminRoles() {
-  const [roles, setRoles] = useState<PlatformRoleRecord[]>([]);
-  const [loading, setLoading] = useState(true);
-  
-  // Create/Edit Dialog State
-  const [dialogOpen, setDialogOpen] = useState(false);
-  const [editingRole, setEditingRole] = useState<PlatformRoleRecord | null>(null);
-  const [saving, setSaving] = useState(false);
-  const [name, setName] = useState("");
-  const [description, setDescription] = useState("");
-  const [color, setColor] = useState("#059669");
-  const [permissions, setPermissions] = useState<Record<string, string[]>>({});
+  const [state, dispatch] = useReducer(rolesReducer, initialState);
 
-  // User Assignment Dialog State
-  const [assignDialogOpen, setAssignDialogOpen] = useState(false);
-  const [assigningRole, setAssigningRole] = useState<PlatformRoleRecord | null>(null);
-  const [assignedUsers, setAssignedUsers] = useState<AssignedUser[]>([]);
-  const [availableUsers, setAvailableUsers] = useState<AvailableUser[]>([]);
-  const [assignLoading, setAssignLoading] = useState(false);
-  const [assignSaving, setAssignSaving] = useState(false);
-  const [userSearch, setUserSearch] = useState("");
+  const {
+    roles,
+    loading,
+    dialogOpen,
+    editingRole,
+    saving,
+    name,
+    description,
+    color,
+    permissions,
+    assignDialogOpen,
+    assigningRole,
+    assignedUsers,
+    availableUsers,
+    assignLoading,
+    assignSaving,
+    userSearch,
+  } = state;
 
   const fetchRoles = useCallback(async () => {
     try {
       const res = await apiFetch("/api/platform/roles");
       if (!res.ok) throw new Error();
       const data = await res.json();
-      setRoles(data);
+      dispatch({ type: "SET_ROLES", roles: data });
     } catch {
       toast.error("Failed to load platform roles");
-    } finally {
-      setLoading(false);
+      dispatch({ type: "SET_LOADING", loading: false });
     }
   }, []);
 
@@ -61,38 +59,28 @@ export function SuperAdminRoles() {
   // ── Role CRUD handlers ──
 
   const openCreateDialog = (template?: (typeof ROLE_TEMPLATES)[0]) => {
-    setEditingRole(null);
+    dispatch({ type: "SET_EDITING_ROLE", role: null });
     if (template) {
-      setName(template.name);
-      setDescription(template.description);
-      setColor(template.color);
-      setPermissions({ ...template.permissions });
+      dispatch({ type: "SET_NAME", name: template.name });
+      dispatch({ type: "SET_DESCRIPTION", description: template.description });
+      dispatch({ type: "SET_COLOR", color: template.color });
+      dispatch({ type: "SET_PERMISSIONS", permissions: { ...template.permissions } });
     } else {
-      setName("");
-      setDescription("");
-      setColor("#059669");
-      setPermissions({});
+      dispatch({ type: "SET_NAME", name: "" });
+      dispatch({ type: "SET_DESCRIPTION", description: "" });
+      dispatch({ type: "SET_COLOR", color: "#059669" });
+      dispatch({ type: "SET_PERMISSIONS", permissions: {} });
     }
-    setDialogOpen(true);
+    dispatch({ type: "SET_DIALOG_OPEN", open: true });
   };
 
   const openEditDialog = (role: PlatformRoleRecord) => {
-    setEditingRole(role);
-    setName(role.name);
-    setDescription(role.description || "");
-    setColor(role.color);
-    setPermissions(JSON.parse(role.permissions || "{}"));
-    setDialogOpen(true);
-  };
-
-  const togglePermission = (module: string, action: string) => {
-    setPermissions((prev) => {
-      const current = prev[module] || [];
-      const updated = current.includes(action)
-        ? current.filter((a) => a !== action)
-        : [...current, action];
-      return { ...prev, [module]: updated };
-    });
+    dispatch({ type: "SET_EDITING_ROLE", role });
+    dispatch({ type: "SET_NAME", name: role.name });
+    dispatch({ type: "SET_DESCRIPTION", description: role.description || "" });
+    dispatch({ type: "SET_COLOR", color: role.color });
+    dispatch({ type: "SET_PERMISSIONS", permissions: JSON.parse(role.permissions || "{}") });
+    dispatch({ type: "SET_DIALOG_OPEN", open: true });
   };
 
   const handleSave = async () => {
@@ -100,7 +88,7 @@ export function SuperAdminRoles() {
       toast.error("Role name is required");
       return;
     }
-    setSaving(true);
+    dispatch({ type: "SET_SAVING", saving: true });
     try {
       const body = { name, description, color, permissions };
       const url = editingRole ? `/api/platform/roles/${editingRole.id}` : "/api/platform/roles";
@@ -114,12 +102,12 @@ export function SuperAdminRoles() {
         throw new Error(err.error || `Failed to ${editingRole ? "update" : "create"} role`);
       }
       toast.success(`Platform role "${name}" ${editingRole ? "updated" : "created"} successfully`);
-      setDialogOpen(false);
+      dispatch({ type: "SET_DIALOG_OPEN", open: false });
       fetchRoles();
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Failed to save role");
     } finally {
-      setSaving(false);
+      dispatch({ type: "SET_SAVING", saving: false });
     }
   };
 
@@ -144,12 +132,12 @@ export function SuperAdminRoles() {
   // ── User Assignment handlers ──
 
   const openAssignDialog = async (role: PlatformRoleRecord) => {
-    setAssigningRole(role);
-    setAssignedUsers([]);
-    setAvailableUsers([]);
-    setUserSearch("");
-    setAssignDialogOpen(true);
-    setAssignLoading(true);
+    dispatch({ type: "SET_ASSIGNING_ROLE", role });
+    dispatch({ type: "SET_ASSIGNED_USERS", users: [] });
+    dispatch({ type: "SET_AVAILABLE_USERS", users: [] });
+    dispatch({ type: "SET_USER_SEARCH", search: "" });
+    dispatch({ type: "SET_ASSIGN_DIALOG_OPEN", open: true });
+    dispatch({ type: "SET_ASSIGN_LOADING", loading: true });
 
     try {
       const [assignedRes, availableRes] = await Promise.all([
@@ -157,18 +145,18 @@ export function SuperAdminRoles() {
         apiFetch(`/api/platform/roles/${role.id}/available-users`),
       ]);
       if (!assignedRes.ok || !availableRes.ok) throw new Error();
-      setAssignedUsers(await assignedRes.json());
-      setAvailableUsers(await availableRes.json());
+      dispatch({ type: "SET_ASSIGNED_USERS", users: await assignedRes.json() });
+      dispatch({ type: "SET_AVAILABLE_USERS", users: await availableRes.json() });
     } catch {
       toast.error("Failed to load users");
     } finally {
-      setAssignLoading(false);
+      dispatch({ type: "SET_ASSIGN_LOADING", loading: false });
     }
   };
 
   const handleAssignAction = async (userId: string, action: "assign" | "unassign") => {
     if (!assigningRole) return;
-    setAssignSaving(true);
+    dispatch({ type: "SET_ASSIGN_SAVING", saving: true });
     try {
       const res = await apiFetch(`/api/platform/roles/${assigningRole.id}/users`, {
         method: "PATCH",
@@ -177,25 +165,13 @@ export function SuperAdminRoles() {
       });
       if (!res.ok) throw new Error();
 
-      if (action === "assign") {
-        const user = availableUsers.find(u => u.id === userId);
-        if (user) {
-          setAvailableUsers(prev => prev.filter(u => u.id !== userId));
-          setAssignedUsers(prev => [...prev, user]);
-        }
-      } else {
-        const user = assignedUsers.find(u => u.id === userId);
-        if (user) {
-          setAssignedUsers(prev => prev.filter(u => u.id !== userId));
-          setAvailableUsers(prev => [...prev, { ...user, platformRoleId: null }]);
-        }
-      }
+      dispatch({ type: "UPDATE_USER_LISTS", action, userId });
       toast.success(`Role ${action}ed successfully`);
       fetchRoles();
     } catch {
       toast.error(`Failed to ${action} role`);
     } finally {
-      setAssignSaving(false);
+      dispatch({ type: "SET_ASSIGN_SAVING", saving: false });
     }
   };
 
@@ -203,8 +179,7 @@ export function SuperAdminRoles() {
     return (
       <div className="flex flex-col items-center justify-center min-h-[400px] gap-4">
         <Loader2 className="size-10 animate-spin text-teal-600" />
-        <p className="text-sm font-bold text-muted-foreground animate-pulse">Syncing platform permissions...</p>
-      </div>
+        <p className="text-sm font-bold text-muted-foreground animate-pulse">Syncing platform permissions…</p>      </div>
     );
   }
 
@@ -222,21 +197,21 @@ export function SuperAdminRoles() {
       />
 
       <RoleDialogs 
-        dialogOpen={dialogOpen} setDialogOpen={setDialogOpen}
+        dialogOpen={dialogOpen} setDialogOpen={(v) => dispatch({ type: "SET_DIALOG_OPEN", open: v })}
         editingRole={editingRole}
-        name={name} setName={setName}
-        description={description} setDescription={setDescription}
-        color={color} setColor={setColor}
-        permissions={permissions} togglePermission={togglePermission}
+        name={name} setName={(v) => dispatch({ type: "SET_NAME", name: v })}
+        description={description} setDescription={(v) => dispatch({ type: "SET_DESCRIPTION", description: v })}
+        color={color} setColor={(v) => dispatch({ type: "SET_COLOR", color: v })}
+        permissions={permissions} togglePermission={(m, a) => dispatch({ type: "TOGGLE_PERMISSION", module: m, action: a })}
         onSave={handleSave} saving={saving}
 
-        assignDialogOpen={assignDialogOpen} setAssignDialogOpen={setAssignDialogOpen}
+        assignDialogOpen={assignDialogOpen} setAssignDialogOpen={(v) => dispatch({ type: "SET_ASSIGN_DIALOG_OPEN", open: v })}
         assigningRole={assigningRole}
         assignedUsers={assignedUsers}
         availableUsers={availableUsers}
         assignLoading={assignLoading}
         assignSaving={assignSaving}
-        userSearch={userSearch} setUserSearch={setUserSearch}
+        userSearch={userSearch} setUserSearch={(v) => dispatch({ type: "SET_USER_SEARCH", search: v })}
         onAssign={(uid) => handleAssignAction(uid, "assign")}
         onUnassign={(uid) => handleAssignAction(uid, "unassign")}
       />

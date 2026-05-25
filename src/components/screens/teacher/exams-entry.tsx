@@ -14,7 +14,7 @@ import {
 } from "lucide-react";
 import { useState, useEffect, useMemo } from "react";
 import { apiFetch } from "@/lib/api";
-import { goeyToast as toast } from "goey-toast";
+import { toast } from "sonner";
 
 interface ExamRecord {
   id: string;
