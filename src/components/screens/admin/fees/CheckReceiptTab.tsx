@@ -18,13 +18,16 @@ import {
 import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
-import { Search, Receipt, Banknote, Eye, Trash2, Printer, CheckCircle2 } from 'lucide-react';
+import { Search, Receipt, Banknote, Eye, Trash2, Printer, CheckCircle2, Calendar as CalendarIcon } from 'lucide-react';
 import { toast } from "sonner";
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiFetch } from '@/lib/api';
 import { useFeeReceipts } from '@/hooks/use-fees';
 import { receiptStatusConfig, paymentMethodIcons } from './config';
 import type { FeeReceipt, StudentOption } from './types';
+import { format } from 'date-fns';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Calendar } from '@/components/ui/calendar';
 
 interface CheckReceiptTabProps {
   canEdit: boolean;
@@ -34,6 +37,7 @@ interface CheckReceiptTabProps {
 type State = {
   search: string;
   debouncedSearch: string;
+  classFilter: string;
   studentFilter: string;
   fromDate: string;
   toDate: string;
@@ -45,6 +49,7 @@ type State = {
 type Action =
   | { type: 'SET_SEARCH'; payload: string }
   | { type: 'SET_DEBOUNCED_SEARCH'; payload: string }
+  | { type: 'SET_CLASS_FILTER'; payload: string }
   | { type: 'SET_STUDENT_FILTER'; payload: string }
   | { type: 'SET_FROM_DATE'; payload: string }
   | { type: 'SET_TO_DATE'; payload: string }
@@ -55,7 +60,8 @@ type Action =
 const initialState: State = {
   search: '',
   debouncedSearch: '',
-  studentFilter: 'all',
+  classFilter: '',
+  studentFilter: '',
   fromDate: '',
   toDate: '',
   page: 1,
@@ -69,6 +75,8 @@ function reducer(state: State, action: Action): State {
       return { ...state, search: action.payload };
     case 'SET_DEBOUNCED_SEARCH':
       return { ...state, debouncedSearch: action.payload, page: 1 };
+    case 'SET_CLASS_FILTER':
+      return { ...state, classFilter: action.payload, studentFilter: '', page: 1 };
     case 'SET_STUDENT_FILTER':
       return { ...state, studentFilter: action.payload, page: 1 };
     case 'SET_FROM_DATE':
@@ -91,9 +99,13 @@ export function CheckReceiptTab({ canEdit, canDelete }: CheckReceiptTabProps) {
   
   // State
   const [state, dispatch] = useReducer(reducer, initialState);
+  const [isFromCalendarOpen, setIsFromCalendarOpen] = useState(false);
+  const [isToCalendarOpen, setIsToCalendarOpen] = useState(false);
+
   const {
     search,
     debouncedSearch,
+    classFilter,
     studentFilter,
     fromDate,
     toDate,
@@ -125,6 +137,15 @@ export function CheckReceiptTab({ canEdit, canDelete }: CheckReceiptTabProps) {
   const totalItems = data?.total || 0;
   const totalPages = data?.totalPages || 1;
 
+  // Fetch classes
+  const { data: classes = [] } = useQuery<any[]>({
+    queryKey: ['classes-min'],
+    queryFn: async () => {
+      const res = await apiFetch('/api/classes?mode=min');
+      return res.json();
+    }
+  });
+
   const { data: studentsData, isLoading: loadingStudents } = useQuery<{ items: StudentOption[] }>({
     queryKey: ['students-min'],
     queryFn: async () => {
@@ -132,7 +153,12 @@ export function CheckReceiptTab({ canEdit, canDelete }: CheckReceiptTabProps) {
       return res.json();
     }
   });
-  const students = studentsData?.items || [];
+  const allStudents = studentsData?.items || [];
+
+  const filteredStudents = useMemo(() => {
+    if (!classFilter) return [];
+    return allStudents.filter(s => s.classId === classFilter);
+  }, [allStudents, classFilter]);
 
   const loading = loadingReceipts;
 
@@ -156,26 +182,73 @@ export function CheckReceiptTab({ canEdit, canDelete }: CheckReceiptTabProps) {
   return (
     <div className="space-y-4">
       {/* Filters */}
-      <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center">
-        <div className="relative flex-1 max-w-sm">
+      <div className="flex flex-col lg:flex-row gap-3 items-start lg:items-center">
+        <div className="relative w-full lg:max-w-xs">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
           <Input 
             placeholder="Search receipt # or student..." 
-            className="pl-9" 
+            className="pl-9 h-9" 
             value={search} 
             onChange={e => dispatch({ type: 'SET_SEARCH', payload: e.target.value })} 
           />
         </div>
-        <Select value={studentFilter} onValueChange={(v) => dispatch({ type: 'SET_STUDENT_FILTER', payload: v })}>
-          <SelectTrigger className="w-full sm:w-44"><SelectValue placeholder="Student" /></SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">All Students</SelectItem>
-            {students.map(s => <SelectItem key={s.id} value={s.id}>{s.name}</SelectItem>)}
-          </SelectContent>
-        </Select>
-        <div className="grid grid-cols-2 gap-2 w-full sm:w-auto">
-          <Input type="date" value={fromDate} onChange={e => dispatch({ type: 'SET_FROM_DATE', payload: e.target.value })} placeholder="From" className="text-xs" />
-          <Input type="date" value={toDate} onChange={e => dispatch({ type: 'SET_TO_DATE', payload: e.target.value })} placeholder="To" className="text-xs" />
+        <div className="flex flex-col sm:flex-row gap-3 w-full lg:w-auto">
+          <Select value={classFilter} onValueChange={(v) => dispatch({ type: 'SET_CLASS_FILTER', payload: v })}>
+            <SelectTrigger className="w-full sm:w-44 h-9"><SelectValue placeholder="Select Class" /></SelectTrigger>
+            <SelectContent>
+              {classes.map(c => <SelectItem key={c.id} value={c.id}>{c.name}-{c.section}</SelectItem>)}
+            </SelectContent>
+          </Select>
+          <Select 
+            value={studentFilter} 
+            onValueChange={(v) => dispatch({ type: 'SET_STUDENT_FILTER', payload: v })}
+            disabled={!classFilter}
+          >
+            <SelectTrigger className="w-full sm:w-44 h-9"><SelectValue placeholder="Select Student" /></SelectTrigger>
+            <SelectContent>
+              {filteredStudents.map(s => <SelectItem key={s.id} value={s.id}>{s.name}</SelectItem>)}
+            </SelectContent>
+          </Select>
+        </div>
+        <div className="flex flex-col sm:flex-row gap-2 w-full lg:w-auto">
+          <Popover open={isFromCalendarOpen} onOpenChange={setIsFromCalendarOpen}>
+            <PopoverTrigger asChild>
+              <Button variant="outline" className="w-full sm:w-36 justify-start text-left font-normal bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800 h-9 px-3">
+                <CalendarIcon className="mr-2 h-3.5 w-3.5 text-muted-foreground" />
+                <span className="text-xs truncate">{fromDate ? format(new Date(fromDate), "PP") : "From date"}</span>
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-auto p-0" align="start">
+              <Calendar
+                mode="single"
+                selected={fromDate ? new Date(fromDate) : undefined}
+                onSelect={(date) => {
+                  dispatch({ type: 'SET_FROM_DATE', payload: date ? format(date, "yyyy-MM-dd") : '' });
+                  setIsFromCalendarOpen(false);
+                }}
+                initialFocus
+              />
+            </PopoverContent>
+          </Popover>
+          <Popover open={isToCalendarOpen} onOpenChange={setIsToCalendarOpen}>
+            <PopoverTrigger asChild>
+              <Button variant="outline" className="w-full sm:w-36 justify-start text-left font-normal bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800 h-9 px-3">
+                <CalendarIcon className="mr-2 h-3.5 w-3.5 text-muted-foreground" />
+                <span className="text-xs truncate">{toDate ? format(new Date(toDate), "PP") : "To date"}</span>
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-auto p-0" align="start">
+              <Calendar
+                mode="single"
+                selected={toDate ? new Date(toDate) : undefined}
+                onSelect={(date) => {
+                  dispatch({ type: 'SET_TO_DATE', payload: date ? format(date, "yyyy-MM-dd") : '' });
+                  setIsToCalendarOpen(false);
+                }}
+                initialFocus
+              />
+            </PopoverContent>
+          </Popover>
         </div>
       </div>
 
