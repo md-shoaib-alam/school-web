@@ -56,8 +56,8 @@ export function ClassDistribution({ isLoading, data, recharts }: ClassDistributi
                     label={({ name, percent }) => `${name.split("-")[0]} ${(percent * 100).toFixed(0)}%`}
                     labelLine={false} fontSize={10}
                   >
-                    {(data ?? []).map((_, i) => (
-                      <Cell key={i} fill={COLORS[i % COLORS.length]} />
+                    {(data ?? []).map((entry, i) => (
+                      <Cell key={entry.name} fill={COLORS[i % COLORS.length]} />
                     ))}
                   </Pie>
                   <ChartTooltip content={<ChartTooltipContent />} />

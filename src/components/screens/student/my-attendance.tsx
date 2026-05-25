@@ -447,7 +447,7 @@ export function StudentAttendance() {
 
               return (
                 <div
-                  key={idx}
+                  key={date.toISOString()}
                   className={`
                     relative aspect-square rounded-lg flex items-center justify-center
                     text-[10px] sm:text-xs font-medium transition-all

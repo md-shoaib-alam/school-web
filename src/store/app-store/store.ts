@@ -34,9 +34,12 @@ function getInitialScreen(currentUser: AppUser | null): string {
 function getInitialSidebar(): boolean {
   if (typeof window === 'undefined') return false;
   try {
+    // If on mobile/tablet, ALWAYS start closed by default
+    if (window.innerWidth < 1024) return false;
+
     const stored = localStorage.getItem(STORAGE_KEYS.SIDEBAR_STATE);
     if (stored !== null) return stored === 'true';
-    return window.innerWidth >= 1024;
+    return true; // Desktop default is open
   } catch {
     return false;
   }

@@ -45,9 +45,6 @@ export function WelcomeBanner({
             <h2 className="text-2xl font-semibold tracking-tight" suppressHydrationWarning>
               {tenantName || "the school"}
             </h2>
-            <p className="text-teal-100 text-sm">
-              {userName || "Admin"}
-            </p>
           </div>
         </div>
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-4">

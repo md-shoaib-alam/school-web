@@ -388,7 +388,7 @@ export function StudentGrades({ initialTab }: { initialTab?: "exams" | "assessme
                             <ChartTooltip content={<ChartTooltipContent />} />
                             <Bar dataKey="marks" radius={[0, 6, 6, 0]} barSize={22}>
                               {latestExam.data.map((entry, index) => (
-                                <Cell key={index} fill={entry.fill} />
+                                <Cell key={entry.subject} fill={entry.fill} />
                               ))}
                             </Bar>
                           </BarChart>
@@ -441,7 +441,7 @@ export function StudentGrades({ initialTab }: { initialTab?: "exams" | "assessme
                                 dataKey="value"
                               >
                                 {pieData.map((entry, index) => (
-                                  <Cell key={index} fill={entry.fill} stroke="none" />
+                                  <Cell key={entry.name} fill={entry.fill} stroke="none" />
                                 ))}
                               </Pie>
                             </PieChart>

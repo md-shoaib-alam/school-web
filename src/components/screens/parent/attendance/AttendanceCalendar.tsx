@@ -69,7 +69,7 @@ export function AttendanceCalendar({ data, isPremium, onPrev, onNext, currentPer
         <div className="grid grid-cols-7 gap-2">
           {data.map((day, i) => (
             <div
-              key={i}
+              key={day.date ? `date-${day.date}` : `empty-${i}`}
               className={`flex flex-col items-center justify-center rounded-lg min-h-[36px] sm:min-h-[44px] transition-all duration-200 ${
                 day.date 
                   ? `${getCalendarCellColor(day.status)} shadow-sm hover:scale-[1.02]` 

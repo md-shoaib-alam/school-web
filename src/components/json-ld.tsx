@@ -5,9 +5,9 @@ export default function JsonLd() {
 
   return (
     <>
-      {schemas.map((schema, index) => (
+      {schemas.map((schema: any, index) => (
         <script
-          key={index}
+          key={schema['@type'] ? `${schema['@type']}-${index}` : index}
           type="application/ld+json"
         >
           {JSON.stringify(schema)}

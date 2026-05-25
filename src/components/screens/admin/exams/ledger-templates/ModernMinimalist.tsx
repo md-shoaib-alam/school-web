@@ -95,7 +95,7 @@ export const ModernMinimalist: React.FC<LedgerTemplateProps> = ({ data }) => {
           <tbody>
             {data.studentsTabulation.map((student, idx) => (
               <tr 
-                key={idx} 
+                key={student.rollNumber} 
                 className={`border-b border-zinc-100 hover:bg-zinc-50/50 transition-colors ${
                   idx % 2 === 1 ? 'bg-zinc-50/30' : ''
                 }`}

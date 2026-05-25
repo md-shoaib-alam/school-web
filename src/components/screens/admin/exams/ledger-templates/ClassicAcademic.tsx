@@ -63,7 +63,7 @@ export const ClassicAcademic: React.FC<LedgerTemplateProps> = ({ data }) => {
         </thead>
         <tbody>
           {data.studentsTabulation.map((student, idx) => (
-            <tr key={idx} className="hover:bg-zinc-50 border-b border-zinc-200">
+            <tr key={student.rollNumber} className="hover:bg-zinc-50 border-b border-zinc-200">
               <td className="border border-zinc-300 p-1 text-center font-normal">{idx + 1}</td>
               <td className="border border-zinc-300 p-1 text-center font-normal">{student.rollNumber}</td>
               <td className="border border-zinc-300 p-1 text-left font-medium">{student.name}</td>

@@ -130,7 +130,11 @@ export function CheckReceiptTab({ canEdit, canDelete }: CheckReceiptTabProps) {
         </CardHeader>
         <CardContent className="p-0">
           {loading ? (
-            <div className="p-6 space-y-3">{[...Array(5)].map((_, i) => <Skeleton key={i} className="h-12 w-full" />)}</div>
+            <div className="p-6 space-y-3">
+              {[...Array(5)].map((_, i) => (
+                <Skeleton key={`skeleton-${i}`} className="h-12 w-full" />
+              ))}
+            </div>
           ) : (
             <>
               <div className="overflow-x-auto">
@@ -213,7 +217,7 @@ export function CheckReceiptTab({ canEdit, canDelete }: CheckReceiptTabProps) {
                     <div className="flex items-center gap-1">
                       {[...Array(totalPages)].map((_, i) => (
                         <Button
-                          key={i}
+                          key={i + 1}
                           variant={page === i + 1 ? "default" : "outline"}
                           size="sm"
                           className={`size-8 text-xs p-0 ${page === i + 1 ? 'bg-emerald-600 hover:bg-emerald-700' : ''}`}
@@ -264,8 +268,8 @@ export function CheckReceiptTab({ canEdit, canDelete }: CheckReceiptTabProps) {
                   <div className="grid grid-cols-4 gap-2 p-2.5 bg-muted/50 text-[10px] font-bold uppercase text-muted-foreground">
                     <span>Category</span><span className="text-right">Amount</span><span className="text-right">Disc.</span><span className="text-right">Paid</span>
                   </div>
-                  {viewReceipt.feeItems.map((item, i) => (
-                    <div key={i} className="grid grid-cols-4 gap-2 p-2.5 text-xs items-center">
+                  {viewReceipt.feeItems.map((item) => (
+                    <div key={item.feeCategoryName} className="grid grid-cols-4 gap-2 p-2.5 text-xs items-center">
                       <span className="truncate font-medium">{item.feeCategoryName}</span>
                       <span className="text-right text-muted-foreground">₹{item.amount.toLocaleString()}</span>
                       <span className="text-right text-amber-600">{item.concession > 0 ? `-₹${item.concession.toLocaleString()}` : '—'}</span>

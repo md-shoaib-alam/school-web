@@ -29,7 +29,7 @@ export function TableSkeleton({ rows = 5 }: { rows?: number }) {
   return (
     <div className="p-4 space-y-3">
       {[...Array(rows)].map((_, i) => (
-        <Skeleton key={i} className="h-10 w-full" />
+        <Skeleton key={`skeleton-${i}`} className="h-10 w-full" />
       ))}
     </div>
   );

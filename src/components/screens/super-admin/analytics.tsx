@@ -133,7 +133,7 @@ export function SuperAdminAnalytics() {
       {/* Core Metrics Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {coreMetrics.map((metric, i) => (
-          <Card key={i} className="border border-zinc-200 dark:border-zinc-700 shadow-sm bg-white dark:bg-zinc-800">
+          <Card key={metric.label} className="border border-zinc-200 dark:border-zinc-700 shadow-sm bg-white dark:bg-zinc-800">
             <CardContent className="p-5">
               <div className="flex items-center gap-3 mb-2">
                 <div className={`${metric.color}`}>
@@ -203,7 +203,7 @@ export function SuperAdminAnalytics() {
               { label: "Total Schools", value: records?.schools, icon: <Building2 className="size-3.5" /> },
               { label: "Total Users", value: records?.users, icon: <Users className="size-3.5" /> },
             ].map((stat, i) => (
-              <div key={i} className="flex justify-between items-center py-2 border-b border-zinc-100 dark:border-zinc-700 last:border-0">
+              <div key={stat.label} className="flex justify-between items-center py-2 border-b border-zinc-100 dark:border-zinc-700 last:border-0">
                 <div className="flex items-center gap-2 text-sm text-zinc-500">
                   {stat.icon}
                   {stat.label}
@@ -234,7 +234,7 @@ export function SuperAdminAnalytics() {
               { label: "Heap Total", value: memory?.heapTotal, color: "bg-blue-500" },
               { label: "External", value: memory?.external, color: "bg-amber-500" },
             ].map((mem, i) => (
-              <div key={i} className="space-y-1">
+              <div key={mem.label} className="space-y-1">
                 <div className="flex justify-between text-xs font-medium">
                   <span className="text-zinc-500">{mem.label}</span>
                   <span className="text-zinc-900 dark:text-zinc-100">{mem.value}</span>

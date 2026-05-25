@@ -78,7 +78,7 @@ export const VintageLedger: React.FC<LedgerTemplateProps> = ({ data }) => {
         <tbody>
           {data.studentsTabulation.map((student, idx) => (
             <tr 
-              key={idx} 
+              key={student.rollNumber} 
               className={`hover:bg-[#f6f0e4] border-b border-[#8a7355]/30 ${
                 idx % 2 === 1 ? 'bg-[#faf6ed]/50' : 'bg-white'
               }`}
