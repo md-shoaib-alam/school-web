@@ -371,7 +371,7 @@ export function SuperAdminSchoolSubscriptions() {
                   <SelectContent>
                     {SCHOOL_PLANS.map(plan => (
                       <SelectItem key={plan.id} value={plan.id}>
-                        {plan.name} Plan
+                        {plan.name}
                       </SelectItem>
                     ))}
                   </SelectContent>

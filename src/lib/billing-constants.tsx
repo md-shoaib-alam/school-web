@@ -48,7 +48,7 @@ export interface ParentPlan extends BillingTier {
 export const SCHOOL_PLANS: SchoolPlan[] = [
   {
     id: "basic",
-    name: "Starter",
+    name: "Starter Plan",
     description: "Ideal for small preschools and private tutoring centers.",
     price: 499,
     icon: <Zap className="size-6" />,
@@ -69,7 +69,7 @@ export const SCHOOL_PLANS: SchoolPlan[] = [
   },
   {
     id: "standard",
-    name: "Growth",
+    name: "Growth Plan",
     description: "Perfect for established schools looking to digitize operations.",
     price: 1499,
     icon: <Shield className="size-6" />,
@@ -92,7 +92,7 @@ export const SCHOOL_PLANS: SchoolPlan[] = [
   },
   {
     id: "premium",
-    name: "Institution",
+    name: "Institution Plan",
     description: "The complete solution for large-scale educational institutions.",
     price: 3999,
     icon: <Crown className="size-6" />,
