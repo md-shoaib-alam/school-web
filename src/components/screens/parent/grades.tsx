@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback, useMemo } from "react";
+import { useParams, useRouter } from "next/navigation";
 import { apiFetch } from "@/lib/api";
 import { useAppStore } from "@/store/use-app-store";
 import { useParentDashboard } from "@/lib/graphql/hooks";
@@ -10,7 +11,8 @@ import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "@/components/ui/table";
-import { BarChart3, TrendingUp, BookOpen, Award, CheckCircle2, ClipboardList, GraduationCap } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { BarChart3, TrendingUp, BookOpen, Award, CheckCircle2, ClipboardList, GraduationCap, FileText } from "lucide-react";
 import type { StudentInfo, GradeRecord } from "@/lib/types";
 
 // Sub-components
@@ -37,6 +39,9 @@ interface AssessmentGrade {
 
 export function ParentGrades({ initialTab = "exams" }: { initialTab?: "exams" | "assessments" }) {
   const { currentUser } = useAppStore();
+  const params = useParams();
+  const router = useRouter();
+  const slug = typeof params?.slug === 'string' ? params.slug : '';
   const topLevelTab = initialTab;
   const [grades, setGrades] = useState<GradeRecord[]>([]);
   const [activeTab, setActiveTab] = useState("");
@@ -66,6 +71,12 @@ export function ParentGrades({ initialTab = "exams" }: { initialTab?: "exams" | 
   const handleTabChange = (val: string) => {
     setActiveTab(val);
     document.cookie = `lastSelectedStudent=${val}; path=/; max-age=31536000`;
+  };
+
+  const handleViewMarksheet = () => {
+    if (activeTab && slug) {
+      router.push(`/${slug}/view-marksheet?studentId=${activeTab}`);
+    }
   };
 
   // Fetch Exam Grades (Loads everything for all students at once)
@@ -170,9 +181,22 @@ export function ParentGrades({ initialTab = "exams" }: { initialTab?: "exams" | 
             {topLevelTab === "exams" ? "School Exams" : "Class Assessments"}
           </h2>
         </div>
-        <Badge variant="outline" className="bg-muted/20 text-muted-foreground shadow-none border-zinc-200 dark:border-zinc-800 text-[10px] font-semibold font-sans tracking-wide px-2 py-0.5 uppercase">
-          Parent Portal
-        </Badge>
+        <div className="flex items-center gap-3">
+          {topLevelTab === "exams" && (
+            <Button
+              size="sm"
+              variant="outline"
+              className="h-8 gap-1.5 text-xs font-semibold border-amber-200 text-amber-700 hover:bg-amber-50 dark:border-amber-900/30 dark:text-amber-400 dark:hover:bg-amber-950/20"
+              onClick={handleViewMarksheet}
+            >
+              <FileText className="size-3.5" />
+              View Marksheet
+            </Button>
+          )}
+          <Badge variant="outline" className="bg-muted/20 text-muted-foreground shadow-none border-zinc-200 dark:border-zinc-800 text-[10px] font-semibold font-sans tracking-wide px-2 py-0.5 uppercase">
+            Parent Portal
+          </Badge>
+        </div>
       </div>
 
       <Tabs value={activeTab} onValueChange={handleTabChange}>

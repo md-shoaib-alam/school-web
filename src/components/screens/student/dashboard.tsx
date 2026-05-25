@@ -142,9 +142,6 @@ export function StudentDashboard() {
                 />
               </div>
               <div className="text-left">
-                <p className="text-violet-100/90 text-xs sm:text-sm font-medium mb-0.5" suppressHydrationWarning>
-                  {getGreeting()}
-                </p>
                 <h2 className="text-xl sm:text-2xl lg:text-3xl font-semibold tracking-tight leading-tight">
                   {studentInfo?.name || currentUser?.name || "Student"}
                 </h2>
