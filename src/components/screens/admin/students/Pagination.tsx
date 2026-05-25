@@ -96,12 +96,12 @@ export function Pagination({
 
   const handlePageChange = (page: number) => {
     onPageChange(page);
-    window.scrollTo(0, 0);
+    document.querySelector('main')?.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const handleLimitChange = (limit: number) => {
     onLimitChange?.(limit);
-    window.scrollTo(0, 0);
+    document.querySelector('main')?.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   return (
