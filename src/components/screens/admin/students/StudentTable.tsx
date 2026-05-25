@@ -41,7 +41,7 @@ export function StudentTable({
   onDelete,
 }: StudentTableProps) {
   return (
-    <div className="overflow-x-auto">
+    <div className="overflow-x-auto px-6">
       <Table>
         <TableHeader>
           <TableRow>

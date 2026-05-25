@@ -12,7 +12,7 @@ import {
 
 export function StudentSkeleton() {
   return (
-    <div className="overflow-x-auto">
+    <div className="overflow-x-auto px-6">
       <Table>
         <TableHeader>
           <TableRow>
