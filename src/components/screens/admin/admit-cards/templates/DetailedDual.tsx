@@ -23,7 +23,7 @@ export const DetailedDualAdmitCard = memo(function DetailedDualAdmitCard({ card 
                 🎓
               </div>
               <div className="leading-tight">
-                <h3 className="text-[11px] font-bold text-zinc-800 truncate max-w-[120px]">{schoolName}</h3>
+                <h3 className="text-[11px] font-semibold text-zinc-800 truncate max-w-[120px]">{schoolName}</h3>
                 <p className="text-[7.5px] text-zinc-400 truncate max-w-[120px]">{schoolAddress}</p>
               </div>
             </div>
@@ -81,7 +81,7 @@ export const DetailedDualAdmitCard = memo(function DetailedDualAdmitCard({ card 
             {/* Card Header Title */}
             <div className="flex justify-between items-start border-b border-zinc-100 pb-3">
               <div>
-                <h2 className="text-sm font-extrabold tracking-tight text-zinc-900 uppercase">ADMIT CARD / HALL TICKET</h2>
+                <h2 className="text-sm font-semibold tracking-tight text-zinc-900 uppercase">ADMIT CARD / HALL TICKET</h2>
                 <p className="text-[8.5px] text-muted-foreground mt-0.5">Session 2024-2025 &bull; School Board Exam</p>
               </div>
               <div className="text-right">

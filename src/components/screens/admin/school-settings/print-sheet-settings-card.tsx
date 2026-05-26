@@ -29,7 +29,7 @@ export function PrintSheetSettingsCard({
           <div className="lg:col-span-7">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between p-4 bg-zinc-50/50 dark:bg-zinc-900/20 rounded-xl border border-zinc-150 dark:border-zinc-800/60 w-full gap-4">
               <div className="space-y-0.5">
-                <h4 className="text-sm font-bold text-zinc-800 dark:text-zinc-200">
+                <h4 className="text-sm font-semibold text-zinc-800 dark:text-zinc-200">
                   Print Sheet Mode
                 </h4>
                 <p className="text-xs text-muted-foreground">

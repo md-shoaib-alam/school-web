@@ -19,7 +19,7 @@ export const MinimalTicketAdmitCard = memo(function MinimalTicketAdmitCard({ car
           <div className="flex items-center justify-between border-b border-zinc-100 pb-2">
             <div className="flex items-center gap-1.5">
               <span className="text-xs">🎫</span>
-              <h2 className="text-[10px] font-black tracking-wide text-zinc-800 uppercase truncate max-w-[150px]">{schoolName}</h2>
+              <h2 className="text-[10px] font-semibold tracking-wide text-zinc-800 uppercase truncate max-w-[150px]">{schoolName}</h2>
             </div>
             <span className="text-[7.5px] uppercase font-mono tracking-widest text-zinc-400 font-bold bg-zinc-50 border px-1.5 py-0.5 rounded">
               ADMIT CARD
