@@ -282,10 +282,10 @@ export function TableCells({ activeTab, item }: { activeTab: TabType; item: any 
             {(() => {
               try {
                 const date = new Date(n.createdAt);
-                if (isNaN(date.getTime())) return "—";
+                if (isNaN(date.getTime())) return "-";
                 return format(date, "dd MMM yyyy");
               } catch {
-                return "—";
+                return "-";
               }
             })()}
           </TableCell>

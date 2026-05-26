@@ -112,7 +112,7 @@ export function SubscriptionStats({
             </p>
             <p className="text-xl font-bold mt-0.5 text-emerald-300">
               {selectedTenant === "all"
-                ? "—"
+                ? "–"
                 : Math.max(0, parentsTotal - (stats?.totalSubscriptions || 0))}
             </p>
           </div>

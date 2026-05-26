@@ -402,7 +402,7 @@ export function CheckReceiptTab({ canEdit, canDelete }: CheckReceiptTabProps) {
                     <div key={item.feeCategoryName} className="grid grid-cols-4 gap-2 p-2.5 text-xs items-center">
                       <span className="truncate font-medium">{item.feeCategoryName}</span>
                       <span className="text-right text-muted-foreground">₹{item.amount.toLocaleString()}</span>
-                      <span className="text-right text-amber-600">{item.concession > 0 ? `-₹${item.concession.toLocaleString()}` : '—'}</span>
+                      <span className="text-right text-amber-600">{item.concession > 0 ? `-₹${item.concession.toLocaleString()}` : '–'}</span>
                       <span className="text-right font-semibold">₹{item.paidAmount.toLocaleString()}</span>
                     </div>
                   ))}

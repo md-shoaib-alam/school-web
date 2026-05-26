@@ -3,7 +3,7 @@
 import { cn } from "@/lib/utils";
 
 /**
- * Skeleton — renders a shimmering placeholder block.
+ * Skeleton - renders a shimmering placeholder block.
  * Uses CSS `animate-pulse` directly; no boneyard bones needed.
  */
 function Skeleton({ className, ...props }: React.ComponentProps<"div">) {

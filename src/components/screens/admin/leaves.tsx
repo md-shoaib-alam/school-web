@@ -162,7 +162,7 @@ function AdminManagerView({ initialTab }: { initialTab: string }) {
                           <TableCell className="font-medium">{l.userName}</TableCell>
                           <TableCell><Badge variant="outline" className={leaveTypeConfig[l.leaveType]?.bg}>{l.leaveType}</Badge></TableCell>
                           <TableCell className="text-xs">{l.startDate} to {l.endDate}</TableCell>
-                          <TableCell className="text-xs truncate max-w-[150px]">{l.reason || '—'}</TableCell>
+                          <TableCell className="text-xs truncate max-w-[150px]">{l.reason || '–'}</TableCell>
                           <TableCell className="text-center"><Badge className={statusConfig[l.status]?.bg}>{l.status}</Badge></TableCell>
                           <TableCell className="text-right">
                             {l.status === 'pending' && (

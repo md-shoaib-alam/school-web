@@ -60,7 +60,7 @@ export const ReceiptTemplate = React.forwardRef<HTMLDivElement, ReceiptTemplateP
             <div className="flex items-end gap-2 flex-1">
               <span className="whitespace-nowrap">Of Class:</span>
               <div className="flex-1 border-b border-dotted border-black font-bold pb-0.5">
-                GRADE — 2025-26
+                GRADE: 2025-26
               </div>
             </div>
             <div className="flex items-end gap-2 flex-1">
@@ -133,7 +133,7 @@ export const ReceiptTemplate = React.forwardRef<HTMLDivElement, ReceiptTemplateP
 
         {/* Bottom Bar */}
         <div className="mt-12 pt-4 border-t border-zinc-200 text-center">
-          <p className="text-[9px] uppercase tracking-widest text-zinc-400">DEMO ACADEMY — Powered by school Management System</p>
+          <p className="text-[9px] uppercase tracking-widest text-zinc-400">DEMO ACADEMY: Powered by school Management System</p>
         </div>
       </div>
     );

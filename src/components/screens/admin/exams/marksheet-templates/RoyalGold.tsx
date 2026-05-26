@@ -160,7 +160,7 @@ export const RoyalGold: React.FC<MarksheetTemplateProps> = ({
 
       {/* Signature Area */}
       <div className="flex justify-between items-end text-[9.5px] font-bold text-amber-900/60 border-t border-dashed border-[#ebdcb3] pt-4 mt-2 font-serif z-10">
-        <div>Registry Convocation Record — <ClientDate /></div>
+        <div>Registry Convocation Record: <ClientDate /></div>
         <div className="flex gap-10">
           <div className="flex flex-col items-center">
             <div className="w-[100px] border-b border-[#b38f36] mb-1" />

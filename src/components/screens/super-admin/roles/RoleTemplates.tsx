@@ -22,7 +22,7 @@ export function RoleTemplates({ onSelectTemplate }: RoleTemplatesProps) {
           Role Templates
         </CardTitle>
         <CardDescription>
-          Pre-configured roles — click to create instantly
+          Pre-configured roles: click to create instantly
         </CardDescription>
       </CardHeader>
       <CardContent>

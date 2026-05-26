@@ -105,10 +105,10 @@ export function StudentTable({
                   {student.gender}
                 </TableCell>
                 <TableCell className="hidden lg:table-cell text-sm py-4">
-                  {student.parentName || "—"}
+                  {student.parentName || "–"}
                 </TableCell>
                 <TableCell className="hidden lg:table-cell text-sm py-4">
-                  {student.phone || "—"}
+                  {student.phone || "–"}
                 </TableCell>
                 {(canEdit || canDelete) && (
                   <TableCell className="text-right py-4">

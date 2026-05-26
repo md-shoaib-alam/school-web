@@ -221,7 +221,7 @@ export function SubscriptionTable({
                           </span>
                         </div>
                       ) : (
-                        "—"
+                        "–"
                       )}
                     </TableCell>
                     <TableCell>
@@ -231,7 +231,7 @@ export function SubscriptionTable({
                           {sub.amount.toLocaleString()}
                         </div>
                       ) : (
-                        "—"
+                        "–"
                       )}
                     </TableCell>
                     <TableCell className="text-right">

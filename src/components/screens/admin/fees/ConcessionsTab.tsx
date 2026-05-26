@@ -235,8 +235,8 @@ export function ConcessionsTab({ canCreate, canEdit, canDelete }: ConcessionsTab
                           <Badge variant="outline" className="capitalize">{c.concessionType.replace('_', ' ')}</Badge>
                         </TableCell>
                         <TableCell className="font-semibold py-4">{c.concessionType === 'percentage' ? `${c.amount}%` : c.concessionType === 'full_waiver' ? 'Full' : `₹${c.amount.toLocaleString()}`}</TableCell>
-                        <TableCell className="hidden md:table-cell text-sm text-muted-foreground truncate max-w-32 py-4">{c.reason || '—'}</TableCell>
-                        <TableCell className="hidden lg:table-cell text-sm text-muted-foreground py-4">{c.validUntil || '—'}</TableCell>
+                        <TableCell className="hidden md:table-cell text-sm text-muted-foreground truncate max-w-32 py-4">{c.reason || '–'}</TableCell>
+                        <TableCell className="hidden lg:table-cell text-sm text-muted-foreground py-4">{c.validUntil || '–'}</TableCell>
                         <TableCell className="py-4">
                           <Badge variant="outline" className={`${statusCfg.bg} border-0 capitalize`}>{c.status}</Badge>
                         </TableCell>

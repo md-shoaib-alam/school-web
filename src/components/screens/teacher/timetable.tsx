@@ -484,7 +484,7 @@ function GridView({
                           ) : (
                             <div className="rounded-lg border border-dashed border-muted-foreground/20 h-[52px] flex items-center justify-center">
                               <span className="text-[11px] text-muted-foreground/50">
-                                —
+                                -
                               </span>
                             </div>
                           )}

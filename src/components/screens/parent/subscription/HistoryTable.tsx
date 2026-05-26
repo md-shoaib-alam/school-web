@@ -144,7 +144,7 @@ export function HistoryTable({ subscriptions }: HistoryTableProps) {
                   )}
                 </TableCell>
                 <TableCell className="text-xs text-zinc-400 dark:text-zinc-500 font-mono max-w-[140px] truncate">
-                  {sub.transactionId || "—"}
+                  {sub.transactionId || "–"}
                 </TableCell>
               </TableRow>
             ))}

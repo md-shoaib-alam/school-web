@@ -61,7 +61,7 @@ export function PendingFeesChecklist({
                 <div key={c.id} className="flex items-center gap-2 text-sm">
                   <Badge variant="outline" className="text-xs">{c.concessionType.replace('_', ' ')}</Badge>
                   <span>{c.concessionType === 'percentage' ? `${c.amount}%` : `₹${c.amount}`}</span>
-                  {c.reason && <span className="text-muted-foreground">— {c.reason}</span>}
+                  {c.reason && <span className="text-muted-foreground">({c.reason})</span>}
                 </div>
               ))}
             </div>

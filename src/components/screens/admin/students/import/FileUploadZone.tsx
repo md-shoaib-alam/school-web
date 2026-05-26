@@ -54,7 +54,7 @@ export function FileUploadZone({
             {importFile.name}
           </p>
           <p className="text-xs text-muted-foreground">
-            {(importFile.size / 1024).toFixed(1)} KB — Click or drop to
+            {(importFile.size / 1024).toFixed(1)} KB: Click or drop to
             replace
           </p>
         </div>

@@ -68,7 +68,7 @@ export const PremiumModernAdmitCard = memo(function PremiumModernAdmitCard({ car
             </div>
             <div>
               <span className="text-[8px] font-medium text-zinc-400 uppercase tracking-wider block">Guardian</span>
-              <span className="font-semibold text-zinc-700 truncate block">{card.student.parentName || '—'}</span>
+              <span className="font-semibold text-zinc-700 truncate block">{card.student.parentName || '–'}</span>
             </div>
           </div>
         </div>

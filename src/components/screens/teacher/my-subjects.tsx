@@ -394,7 +394,7 @@ function GridView({ subjects, slotsBySubject }: { subjects: SubjectInfo[], slots
                 </div>
               </div>
 
-              {/* Class — prominent */}
+              {/* Class – prominent */}
               <div className={`flex items-center gap-2.5 px-3 py-2.5 rounded-lg ${p.bg} border border-current/10 mb-auto`}>
                 <School className={`size-4 flex-shrink-0 ${p.icon.split(" ")[1]} dark:text-white/80`} />
                 <div className="min-w-0">
@@ -642,7 +642,7 @@ function TableView({ subjects, slotsBySubject }: { subjects: SubjectInfo[], slot
                           );
                         })
                       ) : (
-                        <span className="text-[11px] text-zinc-400 italic">—</span>
+                        <span className="text-[11px] text-zinc-400 italic">–</span>
                       )}
                     </div>
                   </td>
