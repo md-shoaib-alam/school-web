@@ -1,7 +1,7 @@
 "use client";
 
 import { apiFetch } from "@/lib/api";
-import { useState, useEffect, useCallback } from "react";
+import { useEffect, useCallback, useReducer } from "react";
 import { toast } from "sonner";
 import { useAppStore } from "@/store/use-app-store";
 
@@ -15,24 +15,63 @@ import { TicketDetailSheet } from "./tickets/ticket-detail-sheet";
 // Types
 import { TicketItem, TicketDetail, CreateFormData } from "./tickets/types";
 
+// Reducer State & Types
+interface TicketsState {
+  tickets: TicketItem[];
+  loading: boolean;
+  createOpen: boolean;
+  detailOpen: boolean;
+  selectedTicket: TicketDetail | null;
+  detailLoading: boolean;
+}
+
+type TicketsAction =
+  | { type: "SET_TICKETS"; payload: TicketItem[] }
+  | { type: "SET_LOADING"; payload: boolean }
+  | { type: "SET_CREATE_OPEN"; payload: boolean }
+  | { type: "SET_DETAIL_OPEN"; payload: boolean }
+  | { type: "SET_SELECTED_TICKET"; payload: TicketDetail | null }
+  | { type: "SET_DETAIL_LOADING"; payload: boolean };
+
+const initialState: TicketsState = {
+  tickets: [],
+  loading: true,
+  createOpen: false,
+  detailOpen: false,
+  selectedTicket: null,
+  detailLoading: false,
+};
+
+function ticketsReducer(state: TicketsState, action: TicketsAction): TicketsState {
+  switch (action.type) {
+    case "SET_TICKETS":
+      return { ...state, tickets: action.payload };
+    case "SET_LOADING":
+      return { ...state, loading: action.payload };
+    case "SET_CREATE_OPEN":
+      return { ...state, createOpen: action.payload };
+    case "SET_DETAIL_OPEN":
+      return { ...state, detailOpen: action.payload };
+    case "SET_SELECTED_TICKET":
+      return { ...state, selectedTicket: action.payload };
+    case "SET_DETAIL_LOADING":
+      return { ...state, detailLoading: action.payload };
+    default:
+      return state;
+  }
+}
+
 export function StudentTickets() {
   const { currentUser, currentTenantId } = useAppStore();
   const currentUserId = currentUser?.id;
 
-  // Data states
-  const [tickets, setTickets] = useState<TicketItem[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  // Dialog & Sheet States
-  const [createOpen, setCreateOpen] = useState(false);
-  const [detailOpen, setDetailOpen] = useState(false);
-  const [selectedTicket, setSelectedTicket] = useState<TicketDetail | null>(null);
-  const [detailLoading, setDetailLoading] = useState(false);
+  const [state, dispatch] = useReducer(ticketsReducer, initialState);
+  const { tickets, loading, createOpen, detailOpen, selectedTicket, detailLoading } = state;
 
   // ── Fetch my tickets ──
   const fetchTickets = useCallback(async () => {
     if (!currentTenantId || !currentUserId) return;
-    setLoading(true);
+    dispatch({ type: "SET_LOADING", payload: true });
     try {
       const params = new URLSearchParams({
         tenantId: currentTenantId,
@@ -41,12 +80,12 @@ export function StudentTickets() {
       const res = await apiFetch(`/api/tickets?${params.toString()}`);
       if (res.ok) {
         const data = await res.json();
-        setTickets(Array.isArray(data) ? data : []);
+        dispatch({ type: "SET_TICKETS", payload: Array.isArray(data) ? data : [] });
       }
     } catch {
       toast.error("Failed to fetch tickets");
     } finally {
-      setLoading(false);
+      dispatch({ type: "SET_LOADING", payload: false });
     }
   }, [currentTenantId, currentUserId]);
 
@@ -77,7 +116,7 @@ export function StudentTickets() {
       });
       if (res.ok) {
         toast.success("Ticket submitted successfully");
-        setCreateOpen(false);
+        dispatch({ type: "SET_CREATE_OPEN", payload: false });
         await fetchTickets();
       } else {
         const data = await res.json();
@@ -90,21 +129,21 @@ export function StudentTickets() {
 
   // ── Open ticket detail ──
   const openTicketDetail = async (ticketId: string) => {
-    setDetailOpen(true);
-    setDetailLoading(true);
+    dispatch({ type: "SET_DETAIL_OPEN", payload: true });
+    dispatch({ type: "SET_DETAIL_LOADING", payload: true });
     try {
       const res = await apiFetch(`/api/tickets/${ticketId}`);
       if (res.ok) {
-        setSelectedTicket(await res.json());
+        dispatch({ type: "SET_SELECTED_TICKET", payload: await res.json() });
       } else {
         toast.error("Failed to load ticket details");
-        setDetailOpen(false);
+        dispatch({ type: "SET_DETAIL_OPEN", payload: false });
       }
     } catch {
       toast.error("Error loading ticket");
-      setDetailOpen(false);
+      dispatch({ type: "SET_DETAIL_OPEN", payload: false });
     } finally {
-      setDetailLoading(false);
+      dispatch({ type: "SET_DETAIL_LOADING", payload: false });
     }
   };
 
@@ -124,7 +163,7 @@ export function StudentTickets() {
         // Refresh detail
         const detailRes = await apiFetch(`/api/tickets/${selectedTicket.id}`);
         if (detailRes.ok) {
-          setSelectedTicket(await detailRes.json());
+          dispatch({ type: "SET_SELECTED_TICKET", payload: await detailRes.json() });
         }
         fetchTickets();
         toast.success("Reply sent");
@@ -142,7 +181,7 @@ export function StudentTickets() {
       <TicketHeader
         totalCount={tickets.length}
         openCount={openCount}
-        onNewClick={() => setCreateOpen(true)}
+        onNewClick={() => dispatch({ type: "SET_CREATE_OPEN", payload: true })}
       />
 
       {/* Ticket List / Loading */}
@@ -155,14 +194,14 @@ export function StudentTickets() {
       {/* Create Ticket Dialog */}
       <CreateTicketDialog
         open={createOpen}
-        onOpenChange={setCreateOpen}
+        onOpenChange={(open) => dispatch({ type: "SET_CREATE_OPEN", payload: open })}
         onSubmit={handleCreateSubmit}
       />
 
       {/* Ticket Detail Sheet */}
       <TicketDetailSheet
         open={detailOpen}
-        onOpenChange={setDetailOpen}
+        onOpenChange={(open) => dispatch({ type: "SET_DETAIL_OPEN", payload: open })}
         ticket={selectedTicket}
         loading={detailLoading}
         currentUserId={currentUserId}
@@ -171,3 +210,4 @@ export function StudentTickets() {
     </div>
   );
 }
+

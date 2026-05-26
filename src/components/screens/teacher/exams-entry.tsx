@@ -2,7 +2,7 @@
 
 import { Card, CardContent } from "@/components/ui/card";
 import { BookOpen, School } from "lucide-react";
-import { useState, useEffect, useMemo } from "react";
+import { useEffect, useMemo, useReducer } from "react";
 import { apiFetch } from "@/lib/api";
 import { toast } from "sonner";
 
@@ -16,18 +16,86 @@ import { ResultsTable } from "./exams-entry/results-table";
 // Types
 import { ClassInfo, ExamRecord, StudentResultRow } from "./exams-entry/types";
 
-export function TeacherExamsEntry() {
-  const [classes, setClasses] = useState<ClassInfo[]>([]);
-  const [exams, setExams] = useState<ExamRecord[]>([]);
-  const [selectedClass, setSelectedClass] = useState("");
-  const [selectedExamId, setSelectedExamId] = useState("");
-  const [resultRows, setResultRows] = useState<StudentResultRow[]>([]);
+// Reducer State & Types
+interface ExamsState {
+  classes: ClassInfo[];
+  exams: ExamRecord[];
+  selectedClass: string;
+  selectedExamId: string;
+  resultRows: StudentResultRow[];
+  loadingClasses: boolean;
+  loadingExams: boolean;
+  loadingStudents: boolean;
+  savingResults: boolean;
+  isPublishing: boolean;
+}
 
-  const [loadingClasses, setLoadingClasses] = useState(true);
-  const [loadingExams, setLoadingExams] = useState(false);
-  const [loadingStudents, setLoadingStudents] = useState(false);
-  const [savingResults, setSavingResults] = useState(false);
-  const [isPublishing, setIsPublishing] = useState(false);
+type ExamsAction =
+  | { type: "SET_CLASSES"; payload: ClassInfo[] }
+  | { type: "SET_EXAMS"; payload: ExamRecord[] }
+  | { type: "SET_SELECTED_CLASS"; payload: string }
+  | { type: "SET_SELECTED_EXAM_ID"; payload: string }
+  | { type: "SET_RESULT_ROWS"; payload: StudentResultRow[] }
+  | { type: "SET_LOADING_CLASSES"; payload: boolean }
+  | { type: "SET_LOADING_EXAMS"; payload: boolean }
+  | { type: "SET_LOADING_STUDENTS"; payload: boolean }
+  | { type: "SET_SAVING_RESULTS"; payload: boolean }
+  | { type: "SET_IS_PUBLISHING"; payload: boolean };
+
+const initialState: ExamsState = {
+  classes: [],
+  exams: [],
+  selectedClass: "",
+  selectedExamId: "",
+  resultRows: [],
+  loadingClasses: true,
+  loadingExams: false,
+  loadingStudents: false,
+  savingResults: false,
+  isPublishing: false,
+};
+
+function examsReducer(state: ExamsState, action: ExamsAction): ExamsState {
+  switch (action.type) {
+    case "SET_CLASSES":
+      return { ...state, classes: action.payload };
+    case "SET_EXAMS":
+      return { ...state, exams: action.payload };
+    case "SET_SELECTED_CLASS":
+      return { ...state, selectedClass: action.payload };
+    case "SET_SELECTED_EXAM_ID":
+      return { ...state, selectedExamId: action.payload };
+    case "SET_RESULT_ROWS":
+      return { ...state, resultRows: action.payload };
+    case "SET_LOADING_CLASSES":
+      return { ...state, loadingClasses: action.payload };
+    case "SET_LOADING_EXAMS":
+      return { ...state, loadingExams: action.payload };
+    case "SET_LOADING_STUDENTS":
+      return { ...state, loadingStudents: action.payload };
+    case "SET_SAVING_RESULTS":
+      return { ...state, savingResults: action.payload };
+    case "SET_IS_PUBLISHING":
+      return { ...state, isPublishing: action.payload };
+    default:
+      return state;
+  }
+}
+
+export function TeacherExamsEntry() {
+  const [state, dispatch] = useReducer(examsReducer, initialState);
+  const {
+    classes,
+    exams,
+    selectedClass,
+    selectedExamId,
+    resultRows,
+    loadingClasses,
+    loadingExams,
+    loadingStudents,
+    savingResults,
+    isPublishing,
+  } = state;
 
   const selectedExam = useMemo(() => {
     return exams.find((e) => e.id === selectedExamId) || null;
@@ -35,53 +103,54 @@ export function TeacherExamsEntry() {
 
   // 1. Load classes assigned to teacher
   useEffect(() => {
-    setLoadingClasses(true);
+    dispatch({ type: "SET_LOADING_CLASSES", payload: true });
     apiFetch("/api/classes")
       .then((r) => r.json())
       .then((data) => {
-        setClasses(Array.isArray(data) ? data : []);
+        dispatch({ type: "SET_CLASSES", payload: Array.isArray(data) ? data : [] });
       })
       .catch((err) => console.error("Load classes failed:", err))
-      .finally(() => setLoadingClasses(false));
+      .finally(() => dispatch({ type: "SET_LOADING_CLASSES", payload: false }));
   }, []);
 
   // 2. Load teacher's specific exams when class changes
   useEffect(() => {
     if (!selectedClass) {
-      setExams([]);
-      setSelectedExamId("");
-      setResultRows([]);
+      dispatch({ type: "SET_EXAMS", payload: [] });
+      dispatch({ type: "SET_SELECTED_EXAM_ID", payload: "" });
+      dispatch({ type: "SET_RESULT_ROWS", payload: [] });
       return;
     }
 
-    setLoadingExams(true);
-    setSelectedExamId("");
-    setResultRows([]);
+    dispatch({ type: "SET_LOADING_EXAMS", payload: true });
+    dispatch({ type: "SET_SELECTED_EXAM_ID", payload: "" });
+    dispatch({ type: "SET_RESULT_ROWS", payload: [] });
 
     apiFetch(`/api/exams?classId=${selectedClass}&mine=true&limit=100`)
       .then((r) => r.json())
       .then((data) => {
         const examsList = data?.data || (Array.isArray(data) ? data : []);
-        setExams(
-          examsList.filter(
+        dispatch({
+          type: "SET_EXAMS",
+          payload: examsList.filter(
             (e: ExamRecord) =>
               e.status !== "cancelled" &&
               (e.examType === "midterm" || e.examType === "final"),
           ),
-        );
+        });
       })
       .catch((err) => console.error("Load exams failed:", err))
-      .finally(() => setLoadingExams(false));
+      .finally(() => dispatch({ type: "SET_LOADING_EXAMS", payload: false }));
   }, [selectedClass]);
 
   // 3. Load student list and existing scores for selected exam
   useEffect(() => {
     if (!selectedExamId || !selectedClass) {
-      setResultRows([]);
+      dispatch({ type: "SET_RESULT_ROWS", payload: [] });
       return;
     }
 
-    setLoadingStudents(true);
+    dispatch({ type: "SET_LOADING_STUDENTS", payload: true });
 
     Promise.all([
       apiFetch(`/api/students?classId=${selectedClass}&mode=min&limit=1000`),
@@ -108,46 +177,46 @@ export function TeacherExamsEntry() {
             status: match ? match.status : "pending",
           };
         });
-        setResultRows(rows);
+        dispatch({ type: "SET_RESULT_ROWS", payload: rows });
       })
       .catch((err) => {
         console.error("Failed loading entry rows:", err);
         toast.error("Failed to load class students");
       })
-      .finally(() => setLoadingStudents(false));
+      .finally(() => dispatch({ type: "SET_LOADING_STUDENTS", payload: false }));
   }, [selectedExamId, selectedClass]);
 
   const handleUpdateMark = (studentId: string, val: string) => {
     if (!selectedExam) return;
 
-    setResultRows((prev) =>
-      prev.map((row) => {
-        if (row.studentId !== studentId) return row;
+    const updatedRows: StudentResultRow[] = resultRows.map((row) => {
+      if (row.studentId !== studentId) return row;
 
-        if (val === "") {
-          return { ...row, marksObtained: "", status: "pending" };
-        }
+      if (val === "") {
+        return { ...row, marksObtained: "", status: "pending" };
+      }
 
-        const num = parseFloat(val);
-        if (num < 0) return row;
-        if (num > selectedExam.totalMarks) {
-          toast.error(`Marks cannot exceed total (${selectedExam.totalMarks})!`);
-          return row;
-        }
+      const num = parseFloat(val);
+      if (num < 0) return row;
+      if (num > selectedExam.totalMarks) {
+        toast.error(`Marks cannot exceed total (${selectedExam.totalMarks})!`);
+        return row;
+      }
 
-        const isPass = num >= selectedExam.passingMarks;
-        return {
-          ...row,
-          marksObtained: val,
-          status: isPass ? "pass" : "fail",
-        };
-      }),
-    );
+      const isPass = num >= selectedExam.passingMarks;
+      return {
+        ...row,
+        marksObtained: val,
+        status: isPass ? "pass" : "fail",
+      };
+    });
+
+    dispatch({ type: "SET_RESULT_ROWS", payload: updatedRows });
   };
 
   const handleSaveDraft = async () => {
     if (!selectedExamId) return;
-    setSavingResults(true);
+    dispatch({ type: "SET_SAVING_RESULTS", payload: true });
     try {
       const res = await apiFetch("/api/exams/results", {
         method: "POST",
@@ -174,7 +243,7 @@ export function TeacherExamsEntry() {
       console.error(err);
       toast.error("Failed to save marks draft");
     }
-    setSavingResults(false);
+    dispatch({ type: "SET_SAVING_RESULTS", payload: false });
   };
 
   const handlePublish = async () => {
@@ -193,7 +262,7 @@ export function TeacherExamsEntry() {
       if (!proceed) return;
     }
 
-    setIsPublishing(true);
+    dispatch({ type: "SET_IS_PUBLISHING", payload: true });
     try {
       const saveRes = await apiFetch("/api/exams/results", {
         method: "POST",
@@ -224,11 +293,12 @@ export function TeacherExamsEntry() {
 
       if (updateRes.ok) {
         toast.success("Exam results successfully published!");
-        setExams((prev) =>
-          prev.map((e) =>
+        dispatch({
+          type: "SET_EXAMS",
+          payload: exams.map((e) =>
             e.id === selectedExam.id ? { ...e, status: "completed" } : e,
           ),
-        );
+        });
       } else {
         throw new Error("Failed to lock exam status to published");
       }
@@ -236,7 +306,7 @@ export function TeacherExamsEntry() {
       console.error(err);
       toast.error("Failed to publish exam results");
     }
-    setIsPublishing(false);
+    dispatch({ type: "SET_IS_PUBLISHING", payload: false });
   };
 
   const resultSummary = {
@@ -256,10 +326,10 @@ export function TeacherExamsEntry() {
       <ExamsSelector
         classes={classes}
         selectedClass={selectedClass}
-        onClassChange={setSelectedClass}
+        onClassChange={(val) => dispatch({ type: "SET_SELECTED_CLASS", payload: val })}
         exams={exams}
         selectedExamId={selectedExamId}
-        onExamChange={setSelectedExamId}
+        onExamChange={(val) => dispatch({ type: "SET_SELECTED_EXAM_ID", payload: val })}
         loadingExams={loadingExams}
         hasSelectedExam={!!selectedExam}
       />
@@ -319,3 +389,4 @@ export function TeacherExamsEntry() {
     </div>
   );
 }
+
