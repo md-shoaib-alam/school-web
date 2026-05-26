@@ -47,7 +47,7 @@ export function Sidebar({
 
   const toggleExpand = (key: string) => {
     setExpandedKeys(prev => 
-      prev.includes(key) ? prev.filter(k => k !== key) : [...prev, key]
+      prev.includes(key) ? [] : [key]
     );
   };
 
