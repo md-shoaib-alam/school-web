@@ -48,6 +48,21 @@ export function SchoolSubscriptionScreen() {
 
   const tenant = detailData?.tenant;
 
+  const planInfo = React.useMemo(() => {
+    if (!tenant?.plan) return { name: "Starter Plan", license: "Starter License" };
+    const planId = tenant.plan.toLowerCase();
+    if (planId === "basic") {
+      return { name: "Starter Plan", license: "Starter License" };
+    }
+    if (planId === "standard") {
+      return { name: "Growth Plan", license: "Growth License" };
+    }
+    if (planId === "premium") {
+      return { name: "Institution Plan", license: "Institution License" };
+    }
+    return { name: `${tenant.plan.charAt(0).toUpperCase() + tenant.plan.slice(1)} Plan`, license: "School License" };
+  }, [tenant?.plan]);
+
   const formattedStartDate = React.useMemo(() => {
     if (!tenant?.startDate) return "";
     try {
@@ -151,11 +166,11 @@ export function SchoolSubscriptionScreen() {
             <div className="flex justify-between items-start">
               <div className="space-y-4">
                 <Badge className="bg-white/20 text-white hover:bg-white/30 border-none px-3 py-1 capitalize text-xs font-bold tracking-wide">
-                  {tenant.plan} Plan
+                  {planInfo.name}
                 </Badge>
                 <div>
                   <h3 className="text-2xl sm:text-4xl font-semibold tracking-tight">{tenant.name}</h3>
-                  <p className="opacity-80 mt-1 font-medium text-sm sm:text-lg">Institution License</p>
+                  <p className="opacity-80 mt-1 font-medium text-sm sm:text-lg">{planInfo.license}</p>
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-8 pt-2 sm:pt-4">
                   <div className="flex items-center gap-3">
