@@ -7,6 +7,16 @@ import { useExpenses } from "@/hooks/use-expenses";
 import { toast } from "sonner";
 import { apiFetch } from "@/lib/api";
 import { formatLocalDate } from "@/lib/utils";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 import { CategoryDialog } from "./expenses/CategoryDialog";
 import { ExpenseDialog } from "./expenses/ExpenseDialog";
@@ -38,6 +48,8 @@ export function ExpensesScreen() {
   const [isExpenseDialogOpen, setIsExpenseDialogOpen] = useState(false);
   const [isCategoryDialogOpen, setIsCategoryDialogOpen] = useState(false);
   const [editingExpense, setEditingExpense] = useState<any>(null);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [expenseToDelete, setExpenseToDelete] = useState<string | null>(null);
 
   const handleOpenExpense = (expense: any = null) => {
     setEditingExpense(expense);
@@ -73,14 +85,21 @@ export function ExpensesScreen() {
     }
   };
 
-  const handleDeleteExpense = async (id: string) => {
-    if (confirm("Delete this expense?")) {
-      try {
-        await deleteExpense(id);
-        toast.success("Expense deleted");
-      } catch (err) {
-        toast.error("Failed to delete expense");
-      }
+  const handleDeleteExpense = (id: string) => {
+    setExpenseToDelete(id);
+    setIsDeleteDialogOpen(true);
+  };
+
+  const confirmDeleteExpense = async () => {
+    if (!expenseToDelete) return;
+    try {
+      await deleteExpense(expenseToDelete);
+      toast.success("Expense deleted");
+    } catch (err) {
+      toast.error("Failed to delete expense");
+    } finally {
+      setIsDeleteDialogOpen(false);
+      setExpenseToDelete(null);
     }
   };
 
@@ -159,6 +178,28 @@ export function ExpensesScreen() {
         onSubmit={handleExpenseSubmit}
         isSaving={isCreatingExpense}
       />
+
+      {/* Delete Confirmation */}
+      <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This action cannot be undone. This will permanently delete the expense
+              record from our servers.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={confirmDeleteExpense}
+              className="bg-rose-600 hover:bg-rose-700 text-white"
+            >
+              Delete Expense
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
