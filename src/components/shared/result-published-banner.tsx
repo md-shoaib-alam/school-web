@@ -14,6 +14,7 @@ interface PublishedExam {
   className: string;
   classSection: string;
   academicYear: string;
+  updatedAt: string; // ISO string — when exam was marked completed/published
 }
 
 interface ResultPublishedBannerProps {
@@ -23,7 +24,34 @@ interface ResultPublishedBannerProps {
   className?: string;
 }
 
+const CACHE_KEY = "published_exams_cache";
+const CACHE_TTL_MS = 50 * 60 * 1000; // 50 minutes
 const DISMISSED_KEY = "dismissed_result_banners";
+const SHOW_WITHIN_MS = 7 * 24 * 60 * 60 * 1000; // 7 days
+
+function getCache(): { data: PublishedExam[]; ts: number } | null {
+  if (typeof window === "undefined") return null;
+  try {
+    const raw = localStorage.getItem(CACHE_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw);
+    if (Date.now() - parsed.ts > CACHE_TTL_MS) {
+      localStorage.removeItem(CACHE_KEY);
+      return null;
+    }
+    return parsed;
+  } catch {
+    return null;
+  }
+}
+
+function setCache(data: PublishedExam[]) {
+  try {
+    localStorage.setItem(CACHE_KEY, JSON.stringify({ data, ts: Date.now() }));
+  } catch {
+    // storage quota exceeded — ignore
+  }
+}
 
 function getDismissed(): string[] {
   if (typeof window === "undefined") return [];
@@ -46,15 +74,24 @@ export function ResultPublishedBanner({ studentId, className: classNameProp }: R
   const params = useParams();
   const slug = typeof params?.slug === "string" ? params.slug : "";
 
-  const [publishedExams, setPublishedExams] = useState<PublishedExam[]>([]);
+  const [publishedExams, setPublishedExams] = useState<PublishedExam[]>(() => getCache()?.data ?? []);
   const [dismissed, setDismissed] = useState<string[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(() => getCache() === null); // skip loading if cache hit
 
   useEffect(() => {
     setDismissed(getDismissed());
   }, []);
 
   useEffect(() => {
+    // Serve from cache if still fresh — zero network cost
+    const cached = getCache();
+    if (cached) {
+      setPublishedExams(cached.data);
+      setLoading(false);
+      return;
+    }
+
+    // Cache miss or expired → fetch from API and cache the result
     async function fetchPublishedExams() {
       try {
         setLoading(true);
@@ -62,26 +99,31 @@ export function ResultPublishedBanner({ studentId, className: classNameProp }: R
         if (!res.ok) return;
         const json = await res.json();
         const data: any[] = Array.isArray(json) ? json : (json.data || []);
-        setPublishedExams(
-          data.map((e: any) => ({
-            id: e.id,
-            name: e.name,
-            examType: e.examType,
-            className: e.className,
-            classSection: e.classSection,
-            academicYear: e.academicYear,
-          }))
-        );
+        const mapped: PublishedExam[] = data.map((e: any) => ({
+          id: e.id,
+          name: e.name,
+          examType: e.examType,
+          className: e.className,
+          classSection: e.classSection,
+          academicYear: e.academicYear,
+          updatedAt: e.updatedAt ?? e.createdAt ?? new Date().toISOString(),
+        }));
+        setCache(mapped);
+        setPublishedExams(mapped);
       } catch {
-        // fail silently
+        // fail silently — banner just won't show
       } finally {
         setLoading(false);
       }
     }
     fetchPublishedExams();
-  }, [studentId]);
+  }, []); // no dependency on studentId — published exams are tenant-wide
 
-  const visibleExams = publishedExams.filter((e) => !dismissed.includes(e.id));
+  // Only show results published within the last 7 days AND not dismissed
+  const cutoff = Date.now() - SHOW_WITHIN_MS;
+  const visibleExams = publishedExams.filter(
+    (e) => !dismissed.includes(e.id) && new Date(e.updatedAt).getTime() >= cutoff
+  );
 
   if (loading || visibleExams.length === 0) return null;
 
