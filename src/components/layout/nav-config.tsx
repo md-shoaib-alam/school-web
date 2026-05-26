@@ -304,9 +304,21 @@ export const navItems: Record<UserRole, NavItem[]> = {
       ]
     },
     {
-      key: "homework",
+      key: "homework-group",
       label: "Homework",
       icon: <FileText className="size-4" />,
+      children: [
+        {
+          key: "homework",
+          label: "Active Homework",
+          icon: <ClipboardList className="size-4" />,
+        },
+        {
+          key: "old-homework",
+          label: "Old Homework",
+          icon: <History className="size-4" />,
+        },
+      ]
     },
     {
       key: "leaves",

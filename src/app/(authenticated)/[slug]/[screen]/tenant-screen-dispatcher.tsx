@@ -186,7 +186,8 @@ export default function TenantScreenDispatcherClient() {
       case 'assessments': return <TeacherGrades />;
       case 'school-exams': return <TeacherExamsEntry />;
       case 'assignments':
-      case 'homework': return <TeacherAssignments />;
+      case 'homework': return <TeacherAssignments showCompleted={false} />;
+      case 'old-homework': return <TeacherAssignments showCompleted={true} />;
       case 'timetable': return <TeacherTimetable />;
       case 'notices': return <TeacherNotices />;
       case 'calendar': return <TeacherCalendar />;

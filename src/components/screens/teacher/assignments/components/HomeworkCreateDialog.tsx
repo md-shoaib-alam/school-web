@@ -45,7 +45,9 @@ export function HomeworkCreateDialog({
         classesMap.set(s.classId, s.className);
       }
     });
-    return Array.from(classesMap.entries()).map(([id, name]) => ({ id, name }));
+    return Array.from(classesMap.entries())
+      .map(([id, name]) => ({ id, name }))
+      .sort((a, b) => a.name.localeCompare(b.name, undefined, { numeric: true, sensitivity: 'base' }));
   }, [subjects]);
 
   const filteredSubjects = useMemo(() => {

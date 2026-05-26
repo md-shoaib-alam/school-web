@@ -22,7 +22,7 @@ import { OverdueHomeworkCard } from "./components/OverdueHomeworkCard";
 import { AssignmentGrid } from "./components/AssignmentGrid";
 import { SubmissionsDialog } from "./components/SubmissionsDialog";
 
-export function TeacherAssignments() {
+export function TeacherAssignments({ showCompleted = false }: { showCompleted?: boolean }) {
   const [state, dispatch] = useReducer(reducer, initialState);
   const {
     assignments,
@@ -40,9 +40,11 @@ export function TeacherAssignments() {
     confirmCompleteId,
   } = state;
 
+  const getStatusParam = () => showCompleted ? "completed" : "active";
+
   useEffect(() => {
     Promise.all([
-      apiFetch("/api/assignments?mine=true"),
+      apiFetch(`/api/assignments?mine=true&status=${getStatusParam()}`),
       apiFetch("/api/subjects?mine=true"),
     ])
       .then(([aRes, sRes]) => Promise.all([aRes.json(), sRes.json()]))
@@ -51,7 +53,7 @@ export function TeacherAssignments() {
         dispatch({ type: "SET_SUBJECTS", payload: sData });
         dispatch({ type: "SET_LOADING", payload: false });
       });
-  }, []);
+  }, [showCompleted]);
 
   const handleCreate = async () => {
     if (!form.title || !form.subjectId || !form.dueDate) {
@@ -77,7 +79,7 @@ export function TeacherAssignments() {
       if (res.ok) {
         toast.success("Assignment created successfully!");
         dispatch({ type: "RESET_FORM" });
-        const data = await apiFetch("/api/assignments?mine=true").then((r) => r.json());
+        const data = await apiFetch(`/api/assignments?mine=true&status=${getStatusParam()}`).then((r) => r.json());
         dispatch({ type: "SET_ASSIGNMENTS", payload: data });
       }
     } catch {
@@ -93,7 +95,7 @@ export function TeacherAssignments() {
       });
       if (res.ok) {
         toast.success("Assignment marked as completed!");
-        const data = await apiFetch("/api/assignments?mine=true").then((r) => r.json());
+        const data = await apiFetch(`/api/assignments?mine=true&status=${getStatusParam()}`).then((r) => r.json());
         dispatch({ type: "SET_ASSIGNMENTS", payload: data });
       } else {
         toast.error("Failed to complete assignment");
@@ -177,23 +179,27 @@ export function TeacherAssignments() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h2 className="text-xl font-semibold text-zinc-900 dark:text-zinc-100">My Homework</h2>
+          <h2 className="text-xl font-semibold text-zinc-900 dark:text-zinc-100">
+            {showCompleted ? "Old Homework" : "My Homework"}
+          </h2>
           <p className="text-sm text-zinc-500 dark:text-zinc-400">
             {assignments.length} homework items total
           </p>
         </div>
-        <HomeworkCreateDialog
-          dialogOpen={dialogOpen}
-          onOpenChange={(v) => dispatch({ type: "SET_DIALOG_OPEN", payload: v })}
-          form={form}
-          subjects={subjects}
-          dispatch={dispatch}
-          handleCreate={handleCreate}
-        />
+        {!showCompleted && (
+          <HomeworkCreateDialog
+            dialogOpen={dialogOpen}
+            onOpenChange={(v) => dispatch({ type: "SET_DIALOG_OPEN", payload: v })}
+            form={form}
+            subjects={subjects}
+            dispatch={dispatch}
+            handleCreate={handleCreate}
+          />
+        )}
       </div>
 
-      {/* Overdue */}
-      <OverdueHomeworkCard assignments={assignments} />
+      {/* Overdue (Only show on Active page) */}
+      {!showCompleted && <OverdueHomeworkCard assignments={assignments} />}
 
       {/* Assignment Grid */}
       <AssignmentGrid
@@ -201,6 +207,7 @@ export function TeacherAssignments() {
         completingId={completingId}
         dispatch={dispatch}
         handleViewSubmissions={handleViewSubmissions}
+        showCompleted={showCompleted}
       />
 
       {/* Submissions Dialog */}
@@ -213,6 +220,7 @@ export function TeacherAssignments() {
         bulkSaving={bulkSaving}
         dispatch={dispatch}
         handleBulkSave={handleBulkSave}
+        showCompleted={showCompleted}
       />
 
       <AlertDialog
