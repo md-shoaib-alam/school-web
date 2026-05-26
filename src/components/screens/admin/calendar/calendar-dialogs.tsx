@@ -48,7 +48,7 @@ export function CalendarDialogs({
   return (
     <>
       <Dialog open={dialogOpen} onOpenChange={closeDialog}>
-        <DialogContent className="max-w-[550px] rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 shadow-2xl p-0 overflow-hidden">
+        <DialogContent className="w-[92%] sm:w-full max-w-[550px] rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 shadow-2xl p-0 overflow-hidden mx-auto">
           <DialogHeader className="p-6 border-b border-zinc-100 dark:border-white/[0.05]">
             <DialogTitle className="text-lg font-bold text-zinc-900 dark:text-white tracking-tight">
               {editingEvent ? "Update Event" : "Create New Event"}
@@ -150,7 +150,7 @@ export function CalendarDialogs({
       </Dialog>
 
       <AlertDialog open={deleteConfirmOpen} onOpenChange={setDeleteConfirmOpen}>
-        <AlertDialogContent className="max-w-[400px] rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 shadow-2xl p-6">
+        <AlertDialogContent className="w-[92%] sm:w-full max-w-[400px] rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 shadow-2xl p-6 mx-auto">
           <AlertDialogHeader>
             <AlertDialogTitle className="text-lg font-bold text-zinc-900 dark:text-white">Delete Event?</AlertDialogTitle>
             <AlertDialogDescription className="text-sm text-zinc-500 mt-2">

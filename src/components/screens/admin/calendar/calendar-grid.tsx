@@ -71,15 +71,13 @@ export function CalendarGrid({
                 className={`
                   relative w-full h-full flex flex-col items-center justify-center rounded-xl text-sm font-medium 
                   transition-all duration-200 active:scale-95 group cursor-pointer border
-                  ${!inCurrentMonth 
-                    ? "text-zinc-400 dark:text-zinc-600 bg-zinc-50/20 dark:bg-zinc-900/10 border-zinc-100 dark:border-zinc-800/30" 
-                    : "text-zinc-800 dark:text-zinc-200 bg-zinc-50/50 dark:bg-zinc-900/40 border-zinc-200/70 dark:border-zinc-800/80 shadow-sm"
-                  }
                   ${isSelected 
-                    ? "bg-blue-600 dark:bg-rose-600 text-white border-blue-600 dark:border-rose-600 shadow-md shadow-blue-500/25 dark:shadow-rose-500/25 scale-[1.03] z-10 font-semibold" 
+                    ? "bg-blue-600 dark:bg-rose-600 text-white border-2 border-white dark:border-white shadow-lg shadow-blue-500/30 dark:shadow-rose-500/30 scale-[1.03] z-10 font-bold" 
                     : isDayToday
                       ? "border-2 border-blue-500 dark:border-rose-500 text-blue-600 dark:text-rose-400 font-extrabold bg-blue-50/60 dark:bg-rose-500/15 dark:shadow-[0_0_12px_rgba(244,63,94,0.15)]"
-                      : "hover:bg-white dark:hover:bg-zinc-800 hover:border-zinc-300 dark:hover:border-zinc-700 hover:shadow-md"
+                      : !inCurrentMonth
+                        ? "text-zinc-400 dark:text-zinc-600 bg-zinc-50/20 dark:bg-zinc-900/10 border-zinc-100 dark:border-zinc-800/30" 
+                        : "text-zinc-800 dark:text-zinc-200 bg-zinc-50/50 dark:bg-zinc-900/40 border-zinc-200/70 dark:border-zinc-800/80 shadow-sm hover:bg-white dark:hover:bg-zinc-800 hover:border-zinc-300 dark:hover:border-zinc-700 hover:shadow-md"
                   }
                 `}
               >
