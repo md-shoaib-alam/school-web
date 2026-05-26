@@ -212,14 +212,17 @@ export function useTeacherExams() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           examId: selectedExamId,
-          results: resultRows
-            .filter((r) => r.marksObtained.trim() !== "")
-            .map((r) => ({
-              studentId: r.studentId,
-              marksObtained: parseFloat(r.marksObtained),
-              status: r.status,
-              remarks: r.remarks || null,
-            })),
+          results: resultRows.reduce((acc, r) => {
+            if (r.marksObtained.trim() !== "") {
+              acc.push({
+                studentId: r.studentId,
+                marksObtained: parseFloat(r.marksObtained),
+                status: r.status,
+                remarks: r.remarks || null,
+              });
+            }
+            return acc;
+          }, [] as any[]),
         }),
       });
 
@@ -258,14 +261,17 @@ export function useTeacherExams() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           examId: selectedExam.id,
-          results: resultRows
-            .filter((r) => r.marksObtained.trim() !== "")
-            .map((r) => ({
-              studentId: r.studentId,
-              marksObtained: parseFloat(r.marksObtained),
-              status: r.status,
-              remarks: r.remarks || null,
-            })),
+          results: resultRows.reduce((acc, r) => {
+            if (r.marksObtained.trim() !== "") {
+              acc.push({
+                studentId: r.studentId,
+                marksObtained: parseFloat(r.marksObtained),
+                status: r.status,
+                remarks: r.remarks || null,
+              });
+            }
+            return acc;
+          }, [] as any[]),
         }),
       });
 

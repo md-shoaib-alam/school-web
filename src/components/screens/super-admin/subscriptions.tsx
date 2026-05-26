@@ -17,6 +17,7 @@ import { SubscriptionFilters } from "./subscriptions/SubscriptionFilters";
 import { SubscriptionTable } from "./subscriptions/SubscriptionTable";
 import { SubscriptionDialogs } from "./subscriptions/SubscriptionDialogs";
 import { SubscriptionRecord } from "./subscriptions/types";
+import { CreditCard } from "lucide-react";
 const ITEMS_PER_PAGE = 25;
 
 type State = {
