@@ -40,26 +40,25 @@ export function CreateTenantDialog({
   onSubmit,
   submitting,
 }: CreateTenantDialogProps) {
-  const [uploadProgress, setUploadProgress] = React.useState(0);
+  const [uploadProgress, dispatchProgress] = React.useReducer((state: number, action: "reset" | "tick") => {
+    if (action === "reset") return 0;
+    if (state >= 95) return state;
+    const next = state + Math.random() * 20;
+    return next > 95 ? 95 : next;
+  }, 0);
 
   // Simulated upload progress when submitting
   React.useEffect(() => {
-    let intervalId: any;
-    
-    if (submitting) {
-      intervalId = setInterval(() => {
-        setUploadProgress((prev) => {
-          if (prev >= 95) return prev;
-          const next = prev + Math.random() * 20;
-          return next > 95 ? 95 : next;
-        });
-      }, 200);
+    if (!submitting) {
+      dispatchProgress("reset");
+      return;
     }
+
+    const intervalId = setInterval(() => {
+      dispatchProgress("tick");
+    }, 200);
     
-    return () => {
-      if (intervalId) clearInterval(intervalId);
-      setUploadProgress(0);
-    };
+    return () => clearInterval(intervalId);
   }, [submitting]);
 
   return (
