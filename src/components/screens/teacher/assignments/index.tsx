@@ -214,23 +214,31 @@ export function TeacherAssignments({ showCompleted = false }: { showCompleted?: 
     }
   };
 
-  // History Range (Subscription check)
-  // Basic: 14 days (2 weeks)
-  // Premium: 60 days (2 months)
-  // Highest/Enterprise: 180 days (6 months)
-  const getHistoricalDaysLimit = () => {
-    if (tenantPlan === "basic") return 14;
-    if (tenantPlan === "premium") return 60;
-    return 180;
+  // Subscription calendar-month range limits helper
+  const isDateWithinSubscriptionLimit = (date: Date) => {
+    const today = new Date();
+    
+    let limitMonths = 1; // Default basic (Starter): Current month only
+    if (tenantPlan === "standard") {
+      limitMonths = 3; // Growth: 3 calendar months (current + 2 previous)
+    } else if (tenantPlan === "premium") {
+      limitMonths = 6; // Institution: 6 calendar months (current + 5 previous)
+    }
+    
+    // Earliest permitted date is the 1st of (limitMonths - 1) months ago
+    const earliestDate = new Date(today.getFullYear(), today.getMonth() - (limitMonths - 1), 1);
+    
+    const targetDate = startOfDay(date);
+    const comparisonEarliest = startOfDay(earliestDate);
+    const comparisonLatest = startOfDay(today);
+    
+    return targetDate >= comparisonEarliest && targetDate <= comparisonLatest;
   };
 
   const isAssignmentLocked = (dueDateStr: string) => {
     try {
-      const limitDays = getHistoricalDaysLimit();
-      const dueDate = startOfDay(parseISO(dueDateStr));
-      const today = startOfDay(new Date());
-      const ageInDays = differenceInDays(today, dueDate);
-      return ageInDays > limitDays;
+      const dueDate = parseISO(dueDateStr);
+      return !isDateWithinSubscriptionLimit(dueDate);
     } catch {
       return false;
     }
@@ -244,13 +252,10 @@ export function TeacherAssignments({ showCompleted = false }: { showCompleted?: 
 
     // Filter by subscription timeline limits
     if (showCompleted) {
-      const limitDays = getHistoricalDaysLimit();
-      const today = startOfDay(new Date());
       list = list.filter((a) => {
         try {
-          const dueDate = startOfDay(parseISO(a.dueDate));
-          const ageInDays = differenceInDays(today, dueDate);
-          return ageInDays <= limitDays;
+          const dueDate = parseISO(a.dueDate);
+          return isDateWithinSubscriptionLimit(dueDate);
         } catch {
           return true;
         }
@@ -346,11 +351,7 @@ export function TeacherAssignments({ showCompleted = false }: { showCompleted?: 
                       setIsCalendarFilterOpen(false);
                     }}
                     disabled={(date) => {
-                      const limitDays = getHistoricalDaysLimit();
-                      const today = startOfDay(new Date());
-                      const earliest = startOfDay(new Date());
-                      earliest.setDate(today.getDate() - limitDays);
-                      return date < earliest || date > today;
+                      return !isDateWithinSubscriptionLimit(date);
                     }}
                     initialFocus
                   />
