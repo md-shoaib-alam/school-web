@@ -96,6 +96,9 @@ export function useCreateTenant() {
         }
       });
       if (data.logoFile) {
+        if (data.logoFile.size > 5 * 1024 * 1024) {
+          throw new Error("Logo file size must be less than 5MB");
+        }
         formData.append("logoFile", data.logoFile);
       }
       return api.post('/tenants', formData);
@@ -130,6 +133,9 @@ export function useUpdateTenant() {
         }
       });
       if (data.logoFile) {
+        if (data.logoFile.size > 5 * 1024 * 1024) {
+          throw new Error("Logo file size must be less than 5MB");
+        }
         formData.append("logoFile", data.logoFile);
       }
       return api.put('/tenants', formData);

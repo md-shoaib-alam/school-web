@@ -1,5 +1,6 @@
 import { memo } from "react";
 import Image from "next/image";
+import { toast } from "sonner";
 import {
   Dialog,
   DialogContent,
@@ -328,6 +329,10 @@ export function TenantDialogs({
                       onChange={(e) => {
                         const file = e.target.files?.[0];
                         if (file) {
+                          if (file.size > 5 * 1024 * 1024) {
+                            toast.error("Logo file size must be less than 5MB");
+                            return;
+                          }
                           setFormData((prev) => ({ ...prev, logoFile: file }));
                         }
                       }}
