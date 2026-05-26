@@ -20,6 +20,7 @@ import { GradesSummary } from "./grades/GradesSummary";
 import { PerformanceChart } from "./grades/PerformanceChart";
 import { GradesTable } from "./grades/GradesTable";
 import { GradesSkeleton } from "./grades/GradesSkeleton";
+import { ResultPublishedBanner } from "@/components/shared/result-published-banner";
 
 // Utils
 import { getGradesForStudent, getSubjectChartData, getOverallStats } from "./grades/utils";
@@ -198,6 +199,10 @@ export function ParentGrades({ initialTab = "exams" }: { initialTab?: "exams" | 
           </Badge>
         </div>
       </div>
+
+      {topLevelTab === "exams" && (
+        <ResultPublishedBanner studentId={activeTab || undefined} />
+      )}
 
       <Tabs value={activeTab} onValueChange={handleTabChange}>
         <TabsList className={`p-1 rounded-lg border shadow-none w-fit ${

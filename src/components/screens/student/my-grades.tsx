@@ -17,6 +17,7 @@ import { ExamsTable } from "./my-grades/exams-table";
 import { AssessmentsSummaryCards } from "./my-grades/assessments-summary-cards";
 import { AssessmentsPerformanceChart } from "./my-grades/assessments-performance-chart";
 import { AssessmentsTable } from "./my-grades/assessments-table";
+import { ResultPublishedBanner } from "@/components/shared/result-published-banner";
 
 type State = {
   recharts: typeof import("recharts") | null;
@@ -235,6 +236,7 @@ export function StudentGrades({ initialTab }: { initialTab?: "exams" | "assessme
 
   return (
     <div className="space-y-6">
+      {topLevelTab === "exams" && <ResultPublishedBanner />}
       <GradesHeader
         topLevelTab={topLevelTab}
         academicYears={academicYears}

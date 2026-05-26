@@ -11,6 +11,7 @@ import { QuickStats } from "./dashboard_components/QuickStats";
 import { ChildrenOverview } from "./dashboard_components/ChildrenOverview";
 import { NoticeSidebar } from "./dashboard_components/NoticeSidebar";
 import { DashboardSkeleton } from "./dashboard_components/DashboardSkeleton";
+import { ResultPublishedBanner } from "@/components/shared/result-published-banner";
 
 export function ParentDashboard() {
   const { currentUser } = useAppStore();
@@ -59,8 +60,19 @@ export function ParentDashboard() {
     };
   });
 
+  // Resolve active child: prefer last-selected from cookie, fall back to first child
+  const savedStudentId = typeof document !== "undefined"
+    ? document.cookie.split("; ").find(r => r.startsWith("lastSelectedStudent="))?.split("=")[1]
+    : undefined;
+  const activeChildId = (savedStudentId && childrenData.some(c => c.id === savedStudentId))
+    ? savedStudentId
+    : childrenData[0]?.id;
+
   return (
     <div className="space-y-6 pb-10">
+      {/* Result Published Notification - shown at top of dashboard */}
+      {childrenData.length > 0 && <ResultPublishedBanner studentId={activeChildId} />}
+
       <WelcomeBanner userName={currentUser?.name} />
 
       <QuickStats 
