@@ -188,13 +188,16 @@ export function useGradeManagement() {
     if (!selectedAssessmentId) return;
     dispatch({ type: "SET_SAVING", value: true });
     try {
-      const records = Object.entries(marks)
-        .filter(([_, val]) => val.trim() !== "")
-        .map(([studentId, val]) => ({
-          studentId,
-          marksObtained: parseFloat(val),
-          remarks: "",
-        }));
+      const records = Object.entries(marks).reduce((acc, [studentId, val]) => {
+        if (val.trim() !== "") {
+          acc.push({
+            studentId,
+            marksObtained: parseFloat(val),
+            remarks: "",
+          });
+        }
+        return acc;
+      }, [] as any[]);
 
       if (records.length === 0) {
         toast.error("No marks entered to save!");

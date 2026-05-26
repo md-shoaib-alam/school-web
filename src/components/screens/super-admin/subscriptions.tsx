@@ -394,14 +394,14 @@ export function SuperAdminSubscriptions() {
         onCreateSubmit={handleCreate}
         processing={processing}
 
-        editOpen={!!editDialogOpen}
-        onEditOpenChange={(v) => dispatch({ type: 'SET_EDIT_DIALOG_OPEN', payload: v ? state.editDialogOpen : null })}
+        editOpen={editDialogOpen}
+        onEditOpenChange={(v) => dispatch({ type: 'SET_EDIT_DIALOG_OPEN', payload: v })}
         editForm={editForm}
         setEditForm={(v) => dispatch({ type: 'SET_EDIT_FORM', payload: v })}
         onEditSubmit={handleEdit}
 
-        extendOpen={!!extendDialogOpen}
-        onExtendOpenChange={(v) => dispatch({ type: 'SET_EXTEND_DIALOG_OPEN', payload: v ? state.extendDialogOpen : null })}
+        extendOpen={extendDialogOpen}
+        onExtendOpenChange={(v) => dispatch({ type: 'SET_EXTEND_DIALOG_OPEN', payload: v })}
         extendDays={extendDays}
         setExtendDays={(v) => dispatch({ type: 'SET_EXTEND_DAYS', payload: v })}
         onExtendSubmit={handleExtend}

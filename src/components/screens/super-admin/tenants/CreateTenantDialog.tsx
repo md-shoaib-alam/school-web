@@ -44,24 +44,19 @@ export function CreateTenantDialog({
 
   // Simulated upload progress when submitting
   React.useEffect(() => {
-    let interval: any;
-    if (submitting) {
+    if (!submitting) {
       setUploadProgress(0);
-      interval = setInterval(() => {
-        setUploadProgress((prev) => {
-          if (prev >= 95) return prev;
-          const next = prev + Math.random() * 20;
-          return next > 95 ? 95 : next;
-        });
-      }, 200);
-    } else {
-      setUploadProgress(100);
-      const timer = setTimeout(() => setUploadProgress(0), 1000);
-      return () => {
-        clearInterval(interval);
-        clearTimeout(timer);
-      };
+      return;
     }
+
+    const interval = setInterval(() => {
+      setUploadProgress((prev) => {
+        if (prev >= 95) return prev;
+        const next = prev + Math.random() * 20;
+        return next > 95 ? 95 : next;
+      });
+    }, 200);
+
     return () => clearInterval(interval);
   }, [submitting]);
 
@@ -116,7 +111,7 @@ export function CreateTenantDialog({
             }
           >
             {submitting
-              ? "Saving..."
+              ? "Saving…"
               : editingTenant
                 ? "Update School"
                 : "Create School"}

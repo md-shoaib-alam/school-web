@@ -99,6 +99,7 @@ export function LogoUploadSection({
                 logo: "",
               }))
             }
+            aria-label="Remove logo"
           >
             <XCircle className="size-3" />
           </button>
@@ -108,7 +109,7 @@ export function LogoUploadSection({
         {submitting && formData.logoFile && (
           <div className="space-y-1.5">
             <div className="flex items-center justify-between text-[10px] font-bold uppercase tracking-wider text-teal-600">
-              <span>Uploading Logo...</span>
+              <span>Uploading Logo…</span>
               <span>{Math.round(uploadProgress)}%</span>
             </div>
             <Progress
@@ -121,15 +122,16 @@ export function LogoUploadSection({
         
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div className="grid gap-1">
-            <Label className="text-xs text-muted-foreground">School Name *</Label>
+            <Label htmlFor="school-name" className="text-xs text-muted-foreground">School Name *</Label>
             <Input
+              id="school-name"
               placeholder="e.g. Green Valley Academy"
               value={formData.name}
               onChange={(e) => onNameChange(e.target.value)}
             />
           </div>
           <div className="grid gap-1">
-            <Label className="text-xs text-muted-foreground flex items-center justify-between">
+            <Label htmlFor="school-slug" className="text-xs text-muted-foreground flex items-center justify-between">
               Slug (URL path) *
               <button
                 type="button"
@@ -140,6 +142,7 @@ export function LogoUploadSection({
               </button>
             </Label>
             <Input
+              id="school-slug"
               placeholder="green-valley-academy"
               value={formData.slug}
               onChange={(e) =>
@@ -155,8 +158,9 @@ export function LogoUploadSection({
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div className="grid gap-1">
-            <Label className="text-xs text-muted-foreground">Email Address</Label>
+            <Label htmlFor="school-email" className="text-xs text-muted-foreground">Email Address</Label>
             <Input
+              id="school-email"
               type="email"
               placeholder="contact@school.com"
               value={formData.email}
@@ -169,8 +173,9 @@ export function LogoUploadSection({
             />
           </div>
           <div className="grid gap-1">
-            <Label className="text-xs text-muted-foreground">Phone Number</Label>
+            <Label htmlFor="school-phone" className="text-xs text-muted-foreground">Phone Number</Label>
             <Input
+              id="school-phone"
               placeholder="+1 (555) 000-0000"
               value={formData.phone}
               onChange={(e) =>
