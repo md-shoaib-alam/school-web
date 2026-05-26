@@ -28,7 +28,7 @@ export interface StudentInfo {
   parentId?: string | null;
 }
 
-export const AVATAR_COLORS = [
+const AVATAR_COLORS = [
   "bg-amber-500",
   "bg-rose-500",
   "bg-cyan-500",

@@ -119,7 +119,7 @@ export function useFeeAssignment(classId: string, feeCategoryId: string, academi
   });
 }
 
-export function useExecuteFeeAssign() {
+function useExecuteFeeAssign() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (data: any) => api.post<any, any>('/fee-assign', data),

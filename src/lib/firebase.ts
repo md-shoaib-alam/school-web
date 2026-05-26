@@ -16,7 +16,7 @@ const firebaseConfig = {
 const app = getApps().length > 0 ? getApp() : initializeApp(firebaseConfig);
 
 // Initialize Messaging
-export const messaging = typeof window !== 'undefined' ? getMessaging(app) : null;
+const messaging = typeof window !== 'undefined' ? getMessaging(app) : null;
 
 export const requestNotificationPermission = async () => {
   if (!messaging) return null;

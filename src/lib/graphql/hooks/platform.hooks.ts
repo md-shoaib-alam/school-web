@@ -22,7 +22,7 @@ export function useTenantResolution(slug?: string) {
   })
 }
 
-export function usePlatformStats() {
+function usePlatformStats() {
   return useQuery({
     queryKey: queryKeys.platformStats,
     queryFn: () => graphqlQuery<{ platformStats: PlatformStatsData }>(PLATFORM_STATS).then(d => d.platformStats),

@@ -119,5 +119,4 @@ export function PricingPlans({ currentPlan, onSelectPlan, isLoading }: PricingPl
     </div>
   );
 }
-export { SCHOOL_PLANS };
 export type { SchoolPlan };

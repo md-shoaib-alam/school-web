@@ -86,6 +86,6 @@ export const PLAN_COLORS: Record<string, string> = {
   enterprise: "#7c3aed",
 };
 
-export function formatAction(action: string): string {
+function formatAction(action: string): string {
   return action.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
 }

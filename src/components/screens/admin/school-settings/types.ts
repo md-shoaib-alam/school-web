@@ -12,7 +12,7 @@ export const ALL_DAYS = [
 
 export type DayKey = (typeof ALL_DAYS)[number]["key"];
 
-export const DEFAULT_WORKING_DAYS: DayKey[] = [
+const DEFAULT_WORKING_DAYS: DayKey[] = [
   "monday",
   "tuesday",
   "wednesday",

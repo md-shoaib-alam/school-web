@@ -13,7 +13,7 @@ import {
   NoticesResponse, FeesResponse, AttendanceResponse, StaffResponse, StaffAttendanceResponse
 } from '../types'
 
-export function useSubjects(tenantId?: string, page?: number, limit?: number) {
+function useSubjects(tenantId?: string, page?: number, limit?: number) {
   return useQuery<SubjectsResponse>({
     queryKey: [...queryKeys.subjects, tenantId, page, limit],
     queryFn: () => graphqlQuery<{ subjects: SubjectsResponse }>(SUBJECTS, { tenantId, page, limit }).then(d => d.subjects),
@@ -31,7 +31,7 @@ export function useClassesMin(tenantId?: string, page?: number, limit?: number) 
   })
 }
 
-export function useTeachersMin(tenantId?: string, page?: number, limit?: number) {
+function useTeachersMin(tenantId?: string, page?: number, limit?: number) {
   return useQuery<TeachersResponse>({
     queryKey: [...queryKeys.teachers, tenantId, page, limit],
     queryFn: () => graphqlQuery<{ teachers: TeachersResponse }>(TEACHERS, { tenantId, page, limit }).then(d => d.teachers),
@@ -93,7 +93,7 @@ export function useNotices(tenantId?: string, page?: number, limit?: number) {
   })
 }
 
-export function useFees(tenantId?: string, page?: number, limit?: number) {
+function useFees(tenantId?: string, page?: number, limit?: number) {
   return useQuery({
     queryKey: [...queryKeys.fees, tenantId, page, limit],
     queryFn: async () => {
@@ -105,7 +105,7 @@ export function useFees(tenantId?: string, page?: number, limit?: number) {
   })
 }
 
-export function useAttendance(tenantId?: string, page?: number, limit?: number) {
+function useAttendance(tenantId?: string, page?: number, limit?: number) {
   return useQuery<AttendanceResponse>({
     queryKey: [...queryKeys.attendance, tenantId, page, limit],
     queryFn: () => graphqlQuery<{ attendance: AttendanceResponse }>(ATTENDANCE, { tenantId, page, limit }).then(d => d.attendance),
@@ -132,7 +132,7 @@ export function useCustomRoles(tenantId?: string) {
   })
 }
 
-export function useCreateSubject() {
+function useCreateSubject() {
   const queryClient = useQueryClient()
   return useMutation({
     mutationFn: (data: any) => graphqlMutate<{ createSubject: any }>(CREATE_SUBJECT, { data }).then(d => d.createSubject),
@@ -144,7 +144,7 @@ export function useCreateSubject() {
   })
 }
 
-export function useUpdateSubject() {
+function useUpdateSubject() {
   const queryClient = useQueryClient()
   return useMutation({
     mutationFn: ({ id, data }: { id: string; data: any }) => graphqlMutate<{ updateSubject: any }>(UPDATE_SUBJECT, { id, data }).then(d => d.updateSubject),
@@ -156,7 +156,7 @@ export function useUpdateSubject() {
   })
 }
 
-export function useDeleteSubject() {
+function useDeleteSubject() {
   const queryClient = useQueryClient()
   return useMutation({
     mutationFn: (id: string) => graphqlMutate<{ deleteSubject: boolean }>(DELETE_SUBJECT, { id }),
@@ -222,7 +222,7 @@ export function useAssignRoleToUser() {
   })
 }
 
-export function useStaffAttendance(vars: { tenantId?: string, role?: string, date?: string, page?: number, limit?: number }) {
+function useStaffAttendance(vars: { tenantId?: string, role?: string, date?: string, page?: number, limit?: number }) {
   return useQuery<StaffAttendanceResponse>({
     queryKey: ['staff-attendance', vars],
     queryFn: () => graphqlQuery<{ staffAttendance: StaffAttendanceResponse }>(STAFF_ATTENDANCE, vars).then(d => d.staffAttendance),
@@ -230,7 +230,7 @@ export function useStaffAttendance(vars: { tenantId?: string, role?: string, dat
   })
 }
 
-export function useMarkStaffAttendance() {
+function useMarkStaffAttendance() {
   const queryClient = useQueryClient()
   return useMutation({
     mutationFn: (data: any) => graphqlMutate<{ markStaffAttendance: boolean }>(MARK_STAFF_ATTENDANCE, { data }),
@@ -242,7 +242,7 @@ export function useMarkStaffAttendance() {
   })
 }
 
-export function useMarkBulkStaffAttendance() {
+function useMarkBulkStaffAttendance() {
   const queryClient = useQueryClient()
   return useMutation({
     mutationFn: (data: any[]) => graphqlMutate<{ markBulkStaffAttendance: boolean }>(MARK_BULK_STAFF_ATTENDANCE, { data }),

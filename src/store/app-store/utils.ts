@@ -18,7 +18,7 @@ interface CacheEntry<T> {
 
 const apiCache = new Map<string, CacheEntry<unknown>>();
 
-export function getCached<T>(key: string): T | null {
+function getCached<T>(key: string): T | null {
   const entry = apiCache.get(key);
   if (!entry) return null;
   if (Date.now() - entry.timestamp > CACHE_TTL) {
@@ -28,7 +28,7 @@ export function getCached<T>(key: string): T | null {
   return entry.data as T;
 }
 
-export function setCached<T>(key: string, data: T): void {
+function setCached<T>(key: string, data: T): void {
   apiCache.set(key, { data, timestamp: Date.now() });
   try {
     localStorage.setItem(`schoolsaas_cache_${key}`, JSON.stringify(data));
@@ -50,7 +50,7 @@ export function invalidateCache(key?: string): void {
   }
 }
 
-export const RESERVED_PLATFORM_KEYWORDS = [
+const RESERVED_PLATFORM_KEYWORDS = [
   'login', 'api', 'admin', 'super-admin', 'dashboard', 'tenants', 
   'billing', 'users', 'audit-logs', 'analytics', 'platform-analytics', 
   'feature-flags', 'roles', 'staff', 'settings', 'manage-admins', 'subscriptions'
@@ -71,7 +71,7 @@ export function parseTenantFromPath(pathname: string): string | null {
   return parts[0];
 }
 
-export const validScreens: Record<UserRole, string[]> = {
+const validScreens: Record<UserRole, string[]> = {
   super_admin: ['dashboard', 'tenants', 'billing', 'users', 'audit-logs', 'platform-analytics', 'feature-flags', 'roles', 'staff', 'settings', 'manage-admins'],
   admin: ['dashboard', 'students', 'teachers', 'parents', 'classes', 'subjects', 'attendance', 'fees', 'notices', 'timetable', 'calendar', 'reports', 'roles', 'staff', 'tickets', 'school-settings', 'academic-years', 'expenses', 'promotions', 'bulk-promote', 'graduated', 'certificates', 'leaves', 'student-leaves', 'teacher-leaves', 'staff-leaves', 'grades', 'teacher-attendance', 'staff-attendance', 'exams', 'results-entry', 'published-results', 'admit-cards'],
   teacher: ['dashboard', 'my-classes', 'my-subjects', 'take-attendance', 'grade-management', 'assessments', 'school-exams', 'assignments', 'homework', 'leaves', 'timetable', 'notices', 'calendar', 'tickets'],
