@@ -86,6 +86,7 @@ export function LogoUploadSection({
                 setFormData((prev) => ({ ...prev, logoFile: file }));
               }
             }}
+            aria-label="Upload logo"
           />
         </label>
         {(formData.logoFile || formData.logo) && (

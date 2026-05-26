@@ -44,20 +44,22 @@ export function CreateTenantDialog({
 
   // Simulated upload progress when submitting
   React.useEffect(() => {
-    if (!submitting) {
-      setUploadProgress(0);
-      return;
+    let intervalId: any;
+    
+    if (submitting) {
+      intervalId = setInterval(() => {
+        setUploadProgress((prev) => {
+          if (prev >= 95) return prev;
+          const next = prev + Math.random() * 20;
+          return next > 95 ? 95 : next;
+        });
+      }, 200);
     }
-
-    const interval = setInterval(() => {
-      setUploadProgress((prev) => {
-        if (prev >= 95) return prev;
-        const next = prev + Math.random() * 20;
-        return next > 95 ? 95 : next;
-      });
-    }, 200);
-
-    return () => clearInterval(interval);
+    
+    return () => {
+      if (intervalId) clearInterval(intervalId);
+      setUploadProgress(0);
+    };
   }, [submitting]);
 
   return (
