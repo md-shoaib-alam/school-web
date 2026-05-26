@@ -1,6 +1,7 @@
 import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { StatusToggle } from "./status-toggle";
+import { IdCard } from "lucide-react";
 
 interface AdmitCardSettingsCardProps {
   enableModalAdmitCardPreview: boolean;
@@ -15,8 +16,8 @@ export function AdmitCardSettingsCard({
     <Card>
       <CardHeader>
         <div className="flex items-center gap-3">
-          <div className="size-9 rounded-lg bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center text-lg text-amber-600 dark:text-amber-400 font-bold">
-            🎫
+          <div className="size-9 rounded-lg bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center text-amber-600 dark:text-amber-400">
+            <IdCard className="size-5" />
           </div>
           <div>
             <CardTitle className="text-lg">Admit Card Preference</CardTitle>

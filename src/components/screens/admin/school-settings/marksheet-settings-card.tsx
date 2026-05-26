@@ -2,7 +2,7 @@ import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Settings, Eye } from "lucide-react";
+import { Settings, Eye, Award } from "lucide-react";
 import { handleMarksheetPreview } from "./marksheet-preview";
 import { MarksheetTemplatePreviewWidget } from "./marksheet-preview-widget";
 import { StatusToggle } from "./status-toggle";
@@ -24,8 +24,8 @@ export function MarksheetSettingsCard({
     <Card>
       <CardHeader>
         <div className="flex items-center gap-3">
-          <div className="size-9 rounded-lg bg-violet-100 dark:bg-violet-900/30 flex items-center justify-center text-lg text-violet-600 dark:text-violet-400 font-bold">
-            📄
+          <div className="size-9 rounded-lg bg-violet-100 dark:bg-violet-900/30 flex items-center justify-center text-violet-600 dark:text-violet-400">
+            <Award className="size-5" />
           </div>
           <div>
             <CardTitle className="text-lg">Marksheet Template Preference</CardTitle>
