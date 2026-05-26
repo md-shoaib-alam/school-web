@@ -2,7 +2,7 @@
 
 import { Card, CardContent } from "@/components/ui/card";
 import { Heart, School, IndianRupee, UserCheck } from "lucide-react";
-import { Skeleton as BoneyardSkeleton } from "boneyard-js/react";
+import { Skeleton } from "@/components/ui/skeleton";
 
 interface MetricStatsProps {
   isLoading: boolean;
@@ -16,9 +16,7 @@ interface MetricStatsProps {
 
 function StatCardSkeleton() {
   return (
-    <BoneyardSkeleton name="boneyard-card" loading={true} color="rgba(0,0,0,0.06)" darkColor="rgba(255,255,255,0.05)" animate="pulse">
-      <div className="h-[110px]" />
-    </BoneyardSkeleton>
+    <Skeleton className="h-[110px] rounded-xl" />
   );
 }
 
