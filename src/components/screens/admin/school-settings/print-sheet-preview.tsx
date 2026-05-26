@@ -18,13 +18,13 @@ export function PrintSheetModePreview({ isEnabled }: { isEnabled: boolean }) {
           <div className={`h-5 px-2 rounded-t-md text-[8px] font-medium flex items-center gap-1 shrink-0 transition-colors duration-200 ${
             isEnabled ? "bg-white dark:bg-zinc-950 text-emerald-650 dark:text-emerald-400 border-t border-x border-zinc-200 dark:border-zinc-800" : "bg-zinc-100/60 dark:bg-zinc-900/60 text-zinc-400 dark:text-zinc-500"
           }`}>
-            🏫 Admin Portal
+            Admin Portal
           </div>
           
           {/* Standalone Tab */}
           {!isEnabled && (
             <div className="h-5 px-2 rounded-t-md bg-white dark:bg-zinc-950 text-emerald-650 dark:text-emerald-400 border-t border-x border-zinc-200 dark:border-zinc-800/80 text-[8px] font-semibold flex items-center gap-1 animate-in slide-in-from-bottom-2 duration-300 shrink-0">
-              🖨️ Print Sheet
+              Print Sheet
             </div>
           )}
         </div>
@@ -81,7 +81,7 @@ export function PrintSheetModePreview({ isEnabled }: { isEnabled: boolean }) {
                   <span className="size-1.5 rounded-full bg-emerald-500" />
                   <span className="text-[7px] font-bold text-zinc-755 dark:text-zinc-300">Inline Preview Dialog</span>
                 </div>
-                <span className="text-[7px] text-zinc-400 dark:text-zinc-550 hover:text-zinc-650 dark:hover:text-zinc-300 cursor-pointer">✕</span>
+                <span className="text-[7px] text-zinc-400 dark:text-zinc-555 hover:text-zinc-650 dark:hover:text-zinc-300 cursor-pointer">✕</span>
               </div>
               
               {/* Mini Report Sheet Mockup */}
@@ -103,8 +103,8 @@ export function PrintSheetModePreview({ isEnabled }: { isEnabled: boolean }) {
               {/* Mini Modal Action Button */}
               <div className="flex justify-between items-center mt-1 pt-1 border-t border-zinc-100 dark:border-zinc-800">
                 <span className="text-[5px] text-zinc-400 dark:text-zinc-500">Esc key to exit modal</span>
-                <span className="px-1 py-0.5 bg-emerald-600 rounded text-[5px] text-white font-semibold flex items-center gap-0.5 leading-none">
-                  🖨️ Print
+                <span className="px-1 py-0.5 bg-emerald-600 rounded text-[5px] text-white font-semibold flex items-center leading-none">
+                  Print
                 </span>
               </div>
             </div>
@@ -144,14 +144,7 @@ export function PrintSheetModePreview({ isEnabled }: { isEnabled: boolean }) {
 
                 <div className="flex-1 my-1 border border-dashed border-zinc-200 dark:border-zinc-800 rounded p-0.5 flex flex-col gap-0.5 bg-zinc-50/50 dark:bg-zinc-900/40 justify-center">
                   <div className="flex items-center gap-1 justify-center">
-                    <span className="text-[12px] animate-[float_2.5s_ease-out_infinite]">📄</span>
-                    <style>{`
-                      @keyframes float {
-                        0%, 100% { transform: translateY(0); }
-                        50% { transform: translateY(-4px); }
-                      }
-                    `}</style>
-                    <div className="flex flex-col gap-0.5">
+                    <div className="flex flex-col gap-0.5 leading-tight">
                       <span className="text-[5px] text-zinc-600 dark:text-zinc-400 font-medium">Class 10 - Section A</span>
                       <span className="text-[4px] text-zinc-400 dark:text-zinc-550 font-medium">Press Ctrl+P to print immediately</span>
                     </div>
