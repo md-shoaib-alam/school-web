@@ -1,7 +1,7 @@
 "use client";
 
 import { apiFetch } from "@/lib/api";
-import { useReducer, useEffect } from "react";
+import { useReducer, useEffect, useMemo, useState } from "react";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -22,6 +22,16 @@ import { OverdueHomeworkCard } from "./components/OverdueHomeworkCard";
 import { AssignmentGrid } from "./components/AssignmentGrid";
 import { SubmissionsDialog } from "./components/SubmissionsDialog";
 
+import { Calendar } from "@/components/ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { useAppStore } from "@/store/use-app-store";
+import { 
+  History, Calendar as CalendarIcon, ArrowLeft, ArrowRight, ShieldAlert,
+  HelpCircle, ChevronLeft, ChevronRight, Lock
+} from "lucide-react";
+import { differenceInDays, parseISO, startOfDay } from "date-fns";
+import { Button } from "@/components/ui/button";
+
 export function TeacherAssignments({ showCompleted = false }: { showCompleted?: boolean }) {
   const [state, dispatch] = useReducer(reducer, initialState);
   const {
@@ -40,15 +50,49 @@ export function TeacherAssignments({ showCompleted = false }: { showCompleted?: 
     confirmCompleteId,
   } = state;
 
+  const { currentTenantSlug } = useAppStore();
+  const [tenantPlan, setTenantPlan] = useState<string>("basic");
+  const [selectedCalendarDate, setSelectedCalendarDate] = useState<Date | undefined>(undefined);
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const [cachedAssignments, setCachedAssignments] = useState<Record<string, Assignment[]>>({});
+
+  const ITEMS_PER_PAGE = 15;
   const getStatusParam = () => showCompleted ? "completed" : "active";
 
+  // Fetch plan info
   useEffect(() => {
+    if (currentTenantSlug) {
+      apiFetch(`/api/tenants/resolve/${currentTenantSlug}`)
+        .then((r) => r.json())
+        .then((data) => {
+          if (data && data.plan) {
+            setTenantPlan(data.plan.toLowerCase());
+          }
+        })
+        .catch(() => {});
+    }
+  }, [currentTenantSlug]);
+
+  // Caching Fetch Layer
+  useEffect(() => {
+    const statusParam = getStatusParam();
+    
+    // Check local cache first
+    if (cachedAssignments[statusParam]) {
+      dispatch({ type: "SET_ASSIGNMENTS", payload: cachedAssignments[statusParam] });
+      dispatch({ type: "SET_LOADING", payload: false });
+      return;
+    }
+
+    dispatch({ type: "SET_LOADING", payload: true });
     Promise.all([
-      apiFetch(`/api/assignments?mine=true&status=${getStatusParam()}`),
+      apiFetch(`/api/assignments?mine=true&status=${statusParam}`),
       apiFetch("/api/subjects?mine=true"),
     ])
       .then(([aRes, sRes]) => Promise.all([aRes.json(), sRes.json()]))
       .then(([aData, sData]) => {
+        // Cache assignments
+        setCachedAssignments(prev => ({ ...prev, [statusParam]: aData }));
         dispatch({ type: "SET_ASSIGNMENTS", payload: aData });
         dispatch({ type: "SET_SUBJECTS", payload: sData });
         dispatch({ type: "SET_LOADING", payload: false });
@@ -80,6 +124,9 @@ export function TeacherAssignments({ showCompleted = false }: { showCompleted?: 
         toast.success("Assignment created successfully!");
         dispatch({ type: "RESET_FORM" });
         const data = await apiFetch(`/api/assignments?mine=true&status=${getStatusParam()}`).then((r) => r.json());
+        
+        // Invalidate cache
+        setCachedAssignments({});
         dispatch({ type: "SET_ASSIGNMENTS", payload: data });
       }
     } catch {
@@ -96,6 +143,9 @@ export function TeacherAssignments({ showCompleted = false }: { showCompleted?: 
       if (res.ok) {
         toast.success("Assignment marked as completed!");
         const data = await apiFetch(`/api/assignments?mine=true&status=${getStatusParam()}`).then((r) => r.json());
+        
+        // Invalidate cache
+        setCachedAssignments({});
         dispatch({ type: "SET_ASSIGNMENTS", payload: data });
       } else {
         toast.error("Failed to complete assignment");
@@ -164,6 +214,66 @@ export function TeacherAssignments({ showCompleted = false }: { showCompleted?: 
     }
   };
 
+  // History Range (Subscription check)
+  // Basic: 14 days (2 weeks)
+  // Premium: 60 days (2 months)
+  // Highest/Enterprise: 180 days (6 months)
+  const getHistoricalDaysLimit = () => {
+    if (tenantPlan === "basic") return 14;
+    if (tenantPlan === "premium") return 60;
+    return 180;
+  };
+
+  const isAssignmentLocked = (dueDateStr: string) => {
+    try {
+      const limitDays = getHistoricalDaysLimit();
+      const dueDate = startOfDay(parseISO(dueDateStr));
+      const today = startOfDay(new Date());
+      const ageInDays = differenceInDays(today, dueDate);
+      return ageInDays > limitDays;
+    } catch {
+      return false;
+    }
+  };
+
+  const [isCalendarFilterOpen, setIsCalendarFilterOpen] = useState(false);
+
+  // Filter completed assignments by selected date and subscription age limits
+  const filteredAssignments = useMemo(() => {
+    let list = assignments;
+
+    // Filter by subscription timeline limits
+    if (showCompleted) {
+      const limitDays = getHistoricalDaysLimit();
+      const today = startOfDay(new Date());
+      list = list.filter((a) => {
+        try {
+          const dueDate = startOfDay(parseISO(a.dueDate));
+          const ageInDays = differenceInDays(today, dueDate);
+          return ageInDays <= limitDays;
+        } catch {
+          return true;
+        }
+      });
+    }
+
+    // Filter by selected calendar date
+    if (showCompleted && selectedCalendarDate) {
+      const dateStr = format(selectedCalendarDate, "yyyy-MM-dd");
+      list = list.filter((a) => a.dueDate === dateStr);
+    }
+
+    return list;
+  }, [assignments, selectedCalendarDate, showCompleted, tenantPlan]);
+
+  // Paginated Assignments
+  const paginatedAssignments = useMemo(() => {
+    const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+    return filteredAssignments.slice(startIndex, startIndex + ITEMS_PER_PAGE);
+  }, [filteredAssignments, currentPage]);
+
+  const totalPages = Math.ceil(filteredAssignments.length / ITEMS_PER_PAGE) || 1;
+
   if (loading) {
     return (
       <div className="space-y-4">
@@ -177,13 +287,24 @@ export function TeacherAssignments({ showCompleted = false }: { showCompleted?: 
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white dark:bg-zinc-900 p-5 rounded-2xl border border-zinc-100 dark:border-zinc-800 shadow-sm">
         <div>
-          <h2 className="text-xl font-semibold text-zinc-900 dark:text-zinc-100">
-            {showCompleted ? "Old Homework" : "My Homework"}
+          <h2 className="text-2xl font-bold text-zinc-900 dark:text-zinc-100 flex items-center gap-2">
+            {showCompleted ? (
+              <>
+                <History className="size-5 text-zinc-500" />
+                Old Homework
+              </>
+            ) : (
+              "My Homework"
+            )}
           </h2>
-          <p className="text-sm text-zinc-500 dark:text-zinc-400">
-            {assignments.length} homework items total
+          <p className="text-sm text-zinc-500 dark:text-zinc-400 mt-1">
+            {showCompleted ? (
+              "Showing finalized homework logs"
+            ) : (
+              `${assignments.length} homework items total`
+            )}
           </p>
         </div>
         {!showCompleted && (
@@ -198,17 +319,164 @@ export function TeacherAssignments({ showCompleted = false }: { showCompleted?: 
         )}
       </div>
 
-      {/* Overdue (Only show on Active page) */}
-      {!showCompleted && <OverdueHomeworkCard assignments={assignments} />}
+      {showCompleted ? (
+        <div className="space-y-6">
+          {/* Horizontal Filters Bar */}
+          <div className="flex flex-wrap items-center justify-between gap-4 bg-white dark:bg-zinc-900 p-4 rounded-xl border border-zinc-100 dark:border-zinc-800 shadow-sm">
+            <div className="flex items-center gap-3">
+              <span className="text-xs font-semibold text-zinc-500 dark:text-zinc-400">Filter:</span>
+              <Popover open={isCalendarFilterOpen} onOpenChange={setIsCalendarFilterOpen}>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="h-9 gap-2 text-xs font-medium border-zinc-200 dark:border-zinc-700 bg-zinc-50/50 hover:bg-zinc-100/80 dark:bg-zinc-900/50 dark:hover:bg-zinc-800/80 rounded-lg"
+                  >
+                    <CalendarIcon className="size-3.5 text-blue-500" />
+                    {selectedCalendarDate ? format(selectedCalendarDate, "PPP") : <span>Filter by Date</span>}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0" align="start">
+                  <Calendar
+                    mode="single"
+                    selected={selectedCalendarDate}
+                    onSelect={(d) => {
+                      setSelectedCalendarDate(d);
+                      setCurrentPage(1);
+                      setIsCalendarFilterOpen(false);
+                    }}
+                    disabled={(date) => {
+                      const limitDays = getHistoricalDaysLimit();
+                      const today = startOfDay(new Date());
+                      const earliest = startOfDay(new Date());
+                      earliest.setDate(today.getDate() - limitDays);
+                      return date < earliest || date > today;
+                    }}
+                    initialFocus
+                  />
+                </PopoverContent>
+              </Popover>
 
-      {/* Assignment Grid */}
-      <AssignmentGrid
-        assignments={assignments}
-        completingId={completingId}
-        dispatch={dispatch}
-        handleViewSubmissions={handleViewSubmissions}
-        showCompleted={showCompleted}
-      />
+              {selectedCalendarDate && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => {
+                    setSelectedCalendarDate(undefined);
+                    setCurrentPage(1);
+                  }}
+                  className="h-9 text-xs font-semibold text-red-600 hover:text-white border-red-200 hover:border-red-600 hover:bg-red-600 dark:border-red-900/50 dark:hover:bg-red-900 dark:hover:border-red-700 px-3.5 rounded-lg transition-all shadow-sm"
+                >
+                  Clear Date
+                </Button>
+              )}
+            </div>
+            <div className="text-xs text-zinc-400 dark:text-zinc-500 font-medium">
+              {filteredAssignments.length} logs found
+            </div>
+          </div>
+
+          {/* Assignments full width List */}
+          <div className="space-y-6">
+            {filteredAssignments.length === 0 ? (
+              <div className="text-center py-20 bg-white dark:bg-zinc-900 rounded-2xl border border-dashed border-zinc-200 dark:border-zinc-800 text-zinc-400">
+                <CalendarIcon className="size-12 mx-auto mb-4 opacity-30" />
+                <p className="text-lg font-medium">No old homework logs found</p>
+                <p className="text-sm mt-1">Try selecting a different date or clearing the filter</p>
+              </div>
+            ) : (
+              <>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {paginatedAssignments.map((assignment) => {
+                    return (
+                      <div
+                        key={assignment.id}
+                        className="bg-white dark:bg-zinc-900 rounded-2xl p-5 border shadow-sm border-zinc-100 dark:border-zinc-800 hover:shadow-md transition-all"
+                      >
+                        <div className="flex items-start justify-between mb-3">
+                          <div>
+                            <h3 className="font-semibold text-zinc-900 dark:text-zinc-100 text-sm">
+                              {assignment.title}
+                            </h3>
+                            <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-1">
+                              {assignment.subjectName} • {assignment.className}
+                            </p>
+                          </div>
+                        </div>
+
+                        <div className="flex items-center justify-between text-xs text-zinc-500 dark:text-zinc-400 mb-3">
+                          <span className="flex items-center gap-1">
+                            <CalendarIcon className="size-3" /> Concluded: {assignment.dueDate}
+                          </span>
+                        </div>
+
+                        <div className="mt-4 pt-3 border-t border-zinc-100 dark:border-zinc-800">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className="w-full text-xs gap-1.5"
+                            onClick={() => handleViewSubmissions(assignment)}
+                          >
+                            View Submissions ({assignment.submissions})
+                          </Button>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+
+                {/* Pagination Controls */}
+                {totalPages > 1 && (
+                  <div className="flex items-center justify-between bg-white dark:bg-zinc-900 px-5 py-4 rounded-xl border border-zinc-100 dark:border-zinc-800 shadow-sm mt-4">
+                    <p className="text-xs text-zinc-500 dark:text-zinc-400">
+                      Showing {(currentPage - 1) * ITEMS_PER_PAGE + 1} -{" "}
+                      {Math.min(currentPage * ITEMS_PER_PAGE, filteredAssignments.length)} of{" "}
+                      {filteredAssignments.length} logs
+                    </p>
+                    <div className="flex items-center gap-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                        disabled={currentPage === 1}
+                        className="size-8 p-0"
+                      >
+                        <ChevronLeft className="size-4" />
+                      </Button>
+                      <span className="text-xs font-semibold px-3 py-1 bg-zinc-50 dark:bg-zinc-800 rounded-lg">
+                        {currentPage} / {totalPages}
+                      </span>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                        disabled={currentPage === totalPages}
+                        className="size-8 p-0"
+                      >
+                        <ChevronRight className="size-4" />
+                      </Button>
+                    </div>
+                  </div>
+                )}
+              </>
+            )}
+          </div>
+        </div>
+      ) : (
+        <>
+          {/* Overdue */}
+          {!showCompleted && <OverdueHomeworkCard assignments={assignments} />}
+
+          {/* Assignment Grid */}
+          <AssignmentGrid
+            assignments={assignments}
+            completingId={completingId}
+            dispatch={dispatch}
+            handleViewSubmissions={handleViewSubmissions}
+            showCompleted={showCompleted}
+          />
+        </>
+      )}
 
       {/* Submissions Dialog */}
       <SubmissionsDialog
@@ -258,3 +526,4 @@ export function TeacherAssignments({ showCompleted = false }: { showCompleted?: 
     </div>
   );
 }
+
