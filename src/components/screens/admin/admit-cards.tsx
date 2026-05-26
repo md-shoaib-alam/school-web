@@ -163,6 +163,31 @@ function admitCardReducer(state: AdmitCardState, action: AdmitCardAction): Admit
   }
 }
 
+function getAvailableCycles(exams: any[], todayDateString: string) {
+  if (!exams) return [];
+  const activeExams = exams.filter((e: any) => {
+    const isScheduled = e.status?.trim().toLowerCase() === 'scheduled';
+    const isUpcoming = e.date >= todayDateString;
+    return (isScheduled || isUpcoming) && !e.resultPublished;
+  });
+
+  const groups: Record<string, { cycleName: string; examType: string; exams: any[] }> = {};
+  activeExams.forEach((e: any) => {
+    const cycleName = e.name.includes(' - ') ? e.name.split(' - ')[0] : e.name;
+    const key = `${cycleName}::${e.examType}`;
+    if (!groups[key]) {
+      groups[key] = {
+        cycleName,
+        examType: e.examType,
+        exams: []
+      };
+    }
+    groups[key].exams.push(e);
+  });
+
+  return Object.values(groups).sort((a, b) => a.cycleName.localeCompare(b.cycleName));
+}
+
 export function AdminAdmitCards() {
   const queryClient = useQueryClient();
   const singleCardRef = useRef<HTMLDivElement>(null);
@@ -222,28 +247,7 @@ export function AdminAdmitCards() {
   });
 
   const availableCycles = useMemo(() => {
-    if (!classData?.exams) return [];
-    const activeExams = classData.exams.filter((e: any) => {
-      const isScheduled = e.status?.trim().toLowerCase() === 'scheduled';
-      const isUpcoming = e.date >= todayDateString;
-      return (isScheduled || isUpcoming) && !e.resultPublished;
-    });
-
-    const groups: Record<string, { cycleName: string; examType: string; exams: any[] }> = {};
-    activeExams.forEach((e: any) => {
-      const cycleName = e.name.includes(' - ') ? e.name.split(' - ')[0] : e.name;
-      const key = `${cycleName}::${e.examType}`;
-      if (!groups[key]) {
-        groups[key] = {
-          cycleName,
-          examType: e.examType,
-          exams: []
-        };
-      }
-      groups[key].exams.push(e);
-    });
-
-    return Object.values(groups).sort((a, b) => a.cycleName.localeCompare(b.cycleName));
+    return getAvailableCycles(classData?.exams, todayDateString);
   }, [classData, todayDateString]);
 
   const availableExamTypes = useMemo<string[]>(() => {
