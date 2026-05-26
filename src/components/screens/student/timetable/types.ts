@@ -30,7 +30,7 @@ export const DAY_FULL_LABELS: Record<string, string> = {
   friday: "Friday",
 };
 
-export const JS_DAY_TO_KEY: Record<number, string> = {
+const JS_DAY_TO_KEY: Record<number, string> = {
   1: "monday",
   2: "tuesday",
   3: "wednesday",

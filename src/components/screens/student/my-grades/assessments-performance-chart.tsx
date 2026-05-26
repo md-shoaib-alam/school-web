@@ -69,8 +69,8 @@ export function AssessmentsPerformanceChart({
                       />
                       <ChartTooltip content={<ChartTooltipContent />} />
                       <Bar dataKey="marks" radius={[0, 6, 6, 0]} barSize={22}>
-                        {latestAssessmentChartData.map((entry, index) => (
-                          <Cell key={index} fill={entry.fill} />
+                        {latestAssessmentChartData.map((entry) => (
+                          <Cell key={entry.subject} fill={entry.fill} />
                         ))}
                       </Bar>
                     </BarChart>

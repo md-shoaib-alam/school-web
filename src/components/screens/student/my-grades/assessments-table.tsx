@@ -97,7 +97,7 @@ export function AssessmentsTable({ assessmentGrades }: AssessmentsTableProps) {
                           </Badge>
                         </TableCell>
                         <TableCell className="text-xs text-zinc-500 dark:text-zinc-400 max-w-[200px] truncate font-medium">
-                          {g.remarks || <span className="opacity-40">—</span>}
+                          {g.remarks || <span className="opacity-40">-</span>}
                         </TableCell>
                       </TableRow>
                     );

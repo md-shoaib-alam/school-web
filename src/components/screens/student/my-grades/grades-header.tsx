@@ -23,7 +23,7 @@ export function GradesHeader({
   onSelectedYearChange,
 }: GradesHeaderProps) {
   const params = useParams();
-  const router = useRouter();
+  const { push } = useRouter();
   const slug = typeof params?.slug === "string" ? params.slug : "";
 
   return (
@@ -60,7 +60,7 @@ export function GradesHeader({
               size="sm"
               variant="outline"
               className="h-9 gap-1.5 text-sm font-medium border-violet-200 text-violet-700 hover:bg-violet-50 dark:border-violet-800 dark:text-violet-400 dark:hover:bg-violet-950/30"
-              onClick={() => router.push(`/${slug}/view-marksheet`)}
+              onClick={() => push(`/${slug}/view-marksheet`)}
             >
               <FileText className="size-4" />
               View Marksheet

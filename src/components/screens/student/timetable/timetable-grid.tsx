@@ -120,7 +120,7 @@ export function TimetableGrid({
                       ) : (
                         <div className="h-full flex items-center justify-center">
                           <span className="text-[10px] text-zinc-300">
-                            —
+                            -
                           </span>
                         </div>
                       )}

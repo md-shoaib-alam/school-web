@@ -7,19 +7,14 @@ import { Card, CardContent } from "@/components/ui/card";
 import { BookOpen } from "lucide-react";
 import type { TimetableSlot } from "@/lib/types";
 
-import {
-  ViewMode,
-  DAYS,
-  getNow,
-  TimetableSkeleton,
-  TimetableHeader,
-  TimetableSummary,
-  TimetableGrid,
-  TimetableList,
-  TimetableDay,
-  SubjectLegend,
-  SUBJECT_COLORS,
-} from "./timetable/index";
+import { ViewMode, DAYS, getNow, SUBJECT_COLORS } from "./timetable/types";
+import { TimetableSkeleton } from "./timetable/timetable-skeleton";
+import { TimetableHeader } from "./timetable/timetable-header";
+import { TimetableSummary } from "./timetable/timetable-summary";
+import { TimetableGrid } from "./timetable/timetable-grid";
+import { TimetableList } from "./timetable/timetable-list";
+import { TimetableDay } from "./timetable/timetable-day";
+import { SubjectLegend } from "./timetable/subject-legend";
 
 export function StudentTimetable() {
   const todayDateString = useMemo(() => {

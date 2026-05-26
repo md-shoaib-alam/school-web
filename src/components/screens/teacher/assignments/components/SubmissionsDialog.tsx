@@ -206,7 +206,7 @@ export function SubmissionsDialog({
                   {bulkSaving ? (
                     <>
                       <Loader2 className="size-4 animate-spin" />
-                      Saving all grades...
+                      Saving all grades…
                     </>
                   ) : (
                     <>

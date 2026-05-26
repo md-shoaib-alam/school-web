@@ -29,6 +29,14 @@ export function HomeworkCreateDialog({
   handleCreate,
 }: HomeworkCreateDialogProps) {
   const [isCalendarOpen, setIsCalendarOpen] = useState(false);
+  const [todayStart, setTodayStart] = useState<Date | null>(null);
+
+  useState(() => {
+    // This is safe because it only runs once on mount on client side
+    if (typeof window !== "undefined") {
+      setTodayStart(new Date(new Date().setHours(0, 0, 0, 0)));
+    }
+  });
 
   const uniqueClasses = useMemo(() => {
     const classesMap = new Map();
@@ -126,7 +134,7 @@ export function HomeworkCreateDialog({
                       dispatch({ type: "SET_FORM", payload: { dueDate: date } });
                       setIsCalendarOpen(false);
                     }}
-                    disabled={(date) => date < new Date(new Date().setHours(0, 0, 0, 0))}
+                    disabled={(date) => !!todayStart && date < todayStart}
                     initialFocus
                   />
                 </PopoverContent>

@@ -236,7 +236,7 @@ export function RecordScoresDialog({
                   {saving ? (
                     <>
                       <Loader2 className="size-4 animate-spin" />
-                      Saving grades...
+                      Saving grades…
                     </>
                   ) : (
                     <>

@@ -105,13 +105,16 @@ export function CreateAssessmentDialog({
                   <SelectValue placeholder="Select Subject" />
                 </SelectTrigger>
                 <SelectContent>
-                  {subjects
-                    .filter((s) => s.classId === dialogClassId)
-                    .map((s) => (
-                      <SelectItem key={s.id} value={s.id}>
-                        {s.name}
-                      </SelectItem>
-                    ))}
+                  {subjects.reduce<React.ReactNode[]>((acc, s) => {
+                    if (s.classId === dialogClassId) {
+                      acc.push(
+                        <SelectItem key={s.id} value={s.id}>
+                          {s.name}
+                        </SelectItem>
+                      );
+                    }
+                    return acc;
+                  }, [])}
                 </SelectContent>
               </Select>
             </div>
