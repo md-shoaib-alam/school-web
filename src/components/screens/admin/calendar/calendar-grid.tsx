@@ -43,7 +43,7 @@ export function CalendarGrid({
   return (
     <div className="bg-white dark:bg-neutral-900/40 border border-zinc-200/60 dark:border-white/[0.06] shadow-sm rounded-2xl p-5 sm:p-6 h-full">
       {/* Grid container */}
-      <div className="grid grid-cols-7 gap-y-2 gap-x-1 sm:gap-x-2 text-center items-center">
+      <div className="grid grid-cols-7 gap-1 sm:gap-1.5 text-center items-center">
         {/* Weekdays */}
         {WEEKDAY_LABELS.map((day) => (
           <div 
@@ -64,19 +64,22 @@ export function CalendarGrid({
           const inCurrentMonth = isCurrentMonthDay(dateStr);
 
           return (
-            <div key={dateStr} className="aspect-square flex flex-col items-center justify-center relative">
+            <div key={dateStr} className="aspect-square p-0.5 sm:p-1 flex flex-col items-stretch justify-stretch relative">
               <button
                 type="button"
                 onClick={() => setSelectedDate(dateStr)}
                 className={`
-                  relative size-9 sm:size-11 flex flex-col items-center justify-center rounded-full text-sm font-medium 
-                  transition-all duration-200 active:scale-90 group cursor-pointer
-                  ${!inCurrentMonth ? "text-zinc-300 dark:text-zinc-700 opacity-40" : "text-zinc-700 dark:text-zinc-200"}
+                  relative w-full h-full flex flex-col items-center justify-center rounded-xl text-sm font-medium 
+                  transition-all duration-200 active:scale-95 group cursor-pointer border
+                  ${!inCurrentMonth 
+                    ? "text-zinc-400 dark:text-zinc-600 bg-zinc-50/20 dark:bg-zinc-900/10 border-zinc-100 dark:border-zinc-800/30" 
+                    : "text-zinc-800 dark:text-zinc-200 bg-zinc-50/50 dark:bg-zinc-900/40 border-zinc-200/70 dark:border-zinc-800/80 shadow-sm"
+                  }
                   ${isSelected 
-                    ? "bg-blue-600 dark:bg-rose-600 text-white shadow-md shadow-blue-500/20 dark:shadow-rose-500/20 scale-105" 
+                    ? "bg-blue-600 dark:bg-rose-600 text-white border-blue-600 dark:border-rose-600 shadow-md shadow-blue-500/25 dark:shadow-rose-500/25 scale-[1.03] z-10 font-semibold" 
                     : isDayToday
-                      ? "border-2 border-blue-500/60 dark:border-rose-500/60 text-blue-600 dark:text-rose-400 font-semibold bg-blue-50/40 dark:bg-rose-950/10"
-                      : "hover:bg-zinc-50 dark:hover:bg-white/[0.03]"
+                      ? "border-2 border-blue-500 dark:border-rose-500 text-blue-600 dark:text-rose-400 font-extrabold bg-blue-50/60 dark:bg-rose-500/15 dark:shadow-[0_0_12px_rgba(244,63,94,0.15)]"
+                      : "hover:bg-white dark:hover:bg-zinc-800 hover:border-zinc-300 dark:hover:border-zinc-700 hover:shadow-md"
                   }
                 `}
               >
@@ -84,7 +87,7 @@ export function CalendarGrid({
 
                 {/* Dots Container for Events */}
                 {dayEvents.length > 0 && (
-                  <div className="absolute bottom-1.5 sm:bottom-2 flex justify-center gap-0.5">
+                  <div className="absolute bottom-1 sm:bottom-1.5 flex justify-center gap-0.5">
                     {dayEvents.slice(0, 3).map((ev, i) => (
                       <span 
                         key={ev.id} 

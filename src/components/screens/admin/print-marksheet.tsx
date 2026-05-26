@@ -21,10 +21,10 @@ import { toast } from "sonner";
 const LoadingScreen = () => <FullPageSkeleton />;
 
 export function AdminPrintMarksheetContent() {
-  const router = useRouter();
+  const { push } = useRouter();
   const { slug } = useParams();
   const searchParams = useSearchParams();
-  const classIdParam = searchParams?.get('classId') || '';
+  const classIdParam = searchParams.get('classId') || '';
 
   // Academic Years
   const { academicYears } = useAcademicYears();
@@ -108,7 +108,7 @@ export function AdminPrintMarksheetContent() {
     );
   }, [classes, publishedFiltered]);
 
-  const examNameParam = searchParams?.get('examName') || '';
+  const examNameParam = searchParams.get('examName') || '';
 
   if (classIdParam) {
     const activeClass = classes.find((c: any) => c.id === classIdParam);
@@ -119,7 +119,7 @@ export function AdminPrintMarksheetContent() {
         classSection={activeClass?.section || ''}
         academicYear={publishedAcademicYearFilter || currentAcademicYear}
         examName={examNameParam}
-        onBack={() => router.push(`/${slug}/print-marksheet`)}
+        onBack={() => push(`/${slug}/print-marksheet`)}
       />
     );
   }
@@ -294,7 +294,7 @@ export function AdminPrintMarksheetContent() {
                                       onClick={(e) => {
                                         e.stopPropagation();
                                         if (enableModalMarksheetPreview) {
-                                          router.push(`/${slug}/print-marksheet?classId=${c.id}&examName=${encodeURIComponent(group.cycleName)}`);
+                                          push(`/${slug}/print-marksheet?classId=${c.id}&examName=${encodeURIComponent(group.cycleName)}`);
                                         } else {
                                           toast.promise(
                                             (async () => {

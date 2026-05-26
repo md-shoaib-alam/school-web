@@ -14,7 +14,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { api } from "@/lib/api";
 
 export function ManagePlanScreen() {
-  const router = useRouter();
+  const { push, back } = useRouter();
   const { slug } = useParams();
   const queryClient = useQueryClient();
   const { currentTenantId } = useAppStore();
@@ -62,7 +62,7 @@ export function ManagePlanScreen() {
             
             // Invalidate cache to reflect new limits immediately
             queryClient.invalidateQueries({ queryKey: ["tenant-detail", currentTenantId] });
-            router.push(`/${slug}/school-subscription`);
+            push(`/${slug}/school-subscription`);
           } catch (verifyErr: any) {
             toast.error("Verification Failed", {
               description: "Please contact support if your payment was debited."
@@ -118,7 +118,7 @@ export function ManagePlanScreen() {
           <Button 
             variant="ghost" 
             size="icon" 
-            onClick={() => router.back()}
+            onClick={() => back()}
             className="rounded-full hover:bg-violet-50 dark:hover:bg-violet-900/20 text-violet-600 dark:text-violet-400 shrink-0"
           >
             <ArrowLeft className="size-5" />

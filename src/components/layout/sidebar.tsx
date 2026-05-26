@@ -32,8 +32,8 @@ export function Sidebar({
     toggleSidebar,
     logout,
   } = useAppStore();
-  const router = useRouter();
-  
+  const { replace } = useRouter();
+
   // State for expanded accordions
   const [expandedKeys, setExpandedKeys] = useState<string[]>(() => {
     // Auto-expand if a child is active
@@ -99,7 +99,7 @@ export function Sidebar({
         onNavigate={navigateTo}
         onLogout={() => {
           logout();
-          router.replace("/");
+          replace("/");
         }}
         onPasswordChange={() => setIsChangePasswordOpen(true)}
       />

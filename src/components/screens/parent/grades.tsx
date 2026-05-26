@@ -40,7 +40,7 @@ interface AssessmentGrade {
 export function ParentGrades({ initialTab = "exams" }: { initialTab?: "exams" | "assessments" }) {
   const { currentUser } = useAppStore();
   const params = useParams();
-  const router = useRouter();
+  const { push } = useRouter();
   const slug = typeof params?.slug === 'string' ? params.slug : '';
   const topLevelTab = initialTab;
   const [grades, setGrades] = useState<GradeRecord[]>([]);
@@ -75,7 +75,7 @@ export function ParentGrades({ initialTab = "exams" }: { initialTab?: "exams" | 
 
   const handleViewMarksheet = () => {
     if (activeTab && slug) {
-      router.push(`/${slug}/view-marksheet?studentId=${activeTab}`);
+      push(`/${slug}/view-marksheet?studentId=${activeTab}`);
     }
   };
 

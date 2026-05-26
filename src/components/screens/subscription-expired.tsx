@@ -13,7 +13,7 @@ interface SubscriptionExpiredProps {
 }
 
 export function SubscriptionExpiredScreen({ tenantName, tenantSlug, role, endDate, status }: SubscriptionExpiredProps) {
-  const router = useRouter();
+  const { push } = useRouter();
   const isAdmin = role === "admin";
   const isSuspended = status === "suspended";
 
@@ -91,7 +91,7 @@ export function SubscriptionExpiredScreen({ tenantName, tenantSlug, role, endDat
             ) : isAdmin ? (
               <button 
                 type="button"
-                onClick={() => router.push(`/${tenantSlug}/school-subscription`)}
+                onClick={() => push(`/${tenantSlug}/school-subscription`)}
                 className="w-full flex items-center justify-center gap-2 bg-violet-600 hover:bg-violet-700 text-white font-semibold py-3 px-4 rounded-xl shadow-md group transition-colors"
               >
                 <CreditCard className="size-5" />
@@ -110,7 +110,7 @@ export function SubscriptionExpiredScreen({ tenantName, tenantSlug, role, endDat
             
             <button 
               type="button"
-              onClick={() => router.push("/")}
+              onClick={() => push("/")}
               className="w-full text-center text-sm text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300 py-2 transition-colors"
             >
               Back to Dashboard

@@ -35,7 +35,7 @@ const formatDate = (dateStr: string) => {
 };
 
 export function FeeTable({ studentName, fees, onPay, isPremium }: FeeTableProps) {
-  const router = useRouter();
+  const { push } = useRouter();
   const params = useParams();
   const slug = params?.slug as string;
 
@@ -49,7 +49,7 @@ export function FeeTable({ studentName, fees, onPay, isPremium }: FeeTableProps)
 
   const onPrintClick = (fee: FeeRecord) => {
     if (!isPremium) {
-      router.push(`/${slug}/subscription`);
+      push(`/${slug}/subscription`);
       return;
     }
     setSelectedFee(fee);

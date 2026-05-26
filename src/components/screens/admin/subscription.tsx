@@ -42,7 +42,7 @@ export function SchoolSubscriptionScreen() {
   const { currentTenantId } = useAppStore();
   const { data: detailData, isLoading } = useTenantDetail(currentTenantId || "");
 
-  const router = useRouter();
+  const { push } = useRouter();
   const { slug } = useParams();
   const [isAutoPay, setIsAutoPay] = useState(true);
 
@@ -136,7 +136,7 @@ export function SchoolSubscriptionScreen() {
           <Button 
             size="sm"
             className="w-full sm:w-auto gap-2 bg-violet-600 hover:bg-violet-700 text-white shadow-lg shadow-violet-200 dark:shadow-none transition-all hover:scale-105 rounded-xl h-10 px-6"
-            onClick={() => router.push(`/${slug}/manage-plan`)}
+            onClick={() => push(`/${slug}/manage-plan`)}
           >
             <ArrowUpCircle className="size-4" />
             Manage Plan
