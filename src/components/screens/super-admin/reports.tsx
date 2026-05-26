@@ -251,7 +251,7 @@ export function SuperAdminReports() {
     <div className="space-y-6">
       {/* Page Title Header */}
       <div className="flex flex-col gap-1.5 text-left">
-        <h1 className="text-2xl font-bold text-zinc-900 dark:text-white tracking-tight">
+        <h1 className="text-2xl font-semibold text-zinc-900 dark:text-white tracking-tight">
           Reports & Exports
         </h1>
         <p className="text-sm text-zinc-500 dark:text-zinc-400">

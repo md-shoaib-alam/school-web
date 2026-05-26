@@ -12,6 +12,7 @@ interface ClassSelectorProps {
   loadingClasses: boolean;
   loadingClassData: boolean;
   onSyncData: () => void;
+  enableGradeSelection?: boolean;
 }
 
 export function ClassSelector({
@@ -21,6 +22,7 @@ export function ClassSelector({
   loadingClasses,
   loadingClassData,
   onSyncData,
+  enableGradeSelection = true,
 }: ClassSelectorProps) {
   return (
     <Card className="border-2 border-amber-200 dark:border-amber-800">
@@ -42,7 +44,7 @@ export function ClassSelector({
                 <SelectItem key={c.id} value={c.id}>
                   <span className="flex items-center gap-2">
                     <GraduationCap className="size-3.5" />
-                    {c.grade}, {c.name} (Section {c.section})
+                    {enableGradeSelection ? `${c.grade}, ${c.name}` : c.name} (Section {c.section})
                   </span>
                 </SelectItem>
               ))}

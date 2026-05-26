@@ -1,68 +1,22 @@
 "use client";
 
-
 import { apiFetch } from "@/lib/api";
 import { useEffect, useReducer, useCallback, useMemo } from "react";
 import { useAppStore } from "@/store/use-app-store";
-import { useParams, useRouter } from "next/navigation";
 import { useAcademicYears } from "@/hooks/use-academic-years";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-} from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Skeleton } from "@/components/ui/skeleton";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import { Progress } from "@/components/ui/progress";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Button } from "@/components/ui/button";
-import {
-  ChartContainer,
-  ChartTooltip,
-  ChartTooltipContent,
-} from "@/components/ui/chart";
-import {
-  TrendingUp,
-  Award,
-  BarChart3,
-  Star,
-  GraduationCap,
-  CircleDot,
-  CheckCircle2,
-  FileText,
-} from "lucide-react";
 import type { GradeRecord, StudentInfo } from "@/lib/types";
 
-type AssessmentGrade = {
-  id: string;
-  assessmentId: string;
-  title: string;
-  type: string;
-  subjectName: string;
-  marksObtained: number;
-  totalMarks: number;
-  passingMarks: number;
-  remarks: string;
-  createdAt: string;
-};
+// Import types and sub-components
+import type { AssessmentGrade } from "./my-grades/types";
+import { GradesSkeleton } from "./my-grades/grades-skeleton";
+import { GradesHeader } from "./my-grades/grades-header";
+import { ExamsSummaryCards } from "./my-grades/exams-summary-cards";
+import { SubjectPerformanceChart } from "./my-grades/subject-performance-chart";
+import { GradeDistributionChart } from "./my-grades/grade-distribution-chart";
+import { ExamsTable } from "./my-grades/exams-table";
+import { AssessmentsSummaryCards } from "./my-grades/assessments-summary-cards";
+import { AssessmentsPerformanceChart } from "./my-grades/assessments-performance-chart";
+import { AssessmentsTable } from "./my-grades/assessments-table";
 
 type State = {
   recharts: typeof import("recharts") | null;
@@ -120,7 +74,6 @@ export function StudentGrades({ initialTab }: { initialTab?: "exams" | "assessme
   const {
     recharts,
     loading,
-    students,
     grades,
     assessmentGrades,
     activeTab,
@@ -132,16 +85,7 @@ export function StudentGrades({ initialTab }: { initialTab?: "exams" | "assessme
     import("recharts").then((mod) => dispatch({ type: 'SET_RECHARTS', payload: mod }));
   }, []);
 
-  const params = useParams();
-  const router = useRouter();
-  const slug = typeof params?.slug === 'string' ? params.slug : '';
   const { academicYears } = useAcademicYears();
-
-  const student = useMemo(() => {
-    return Array.isArray(students)
-      ? students.find((s) => s.email === currentUser?.email) || null
-      : null;
-  }, [students, currentUser?.email]);
 
   // Set default selected year to current once loaded
   useEffect(() => {
@@ -192,7 +136,6 @@ export function StudentGrades({ initialTab }: { initialTab?: "exams" | "assessme
   // Filter grades by academic year
   const yearFilteredGrades = useMemo(() => {
     if (!selectedYear) return grades;
-    // grades don't have academicYear field directly, so show all when year selected
     return grades;
   }, [grades, selectedYear]);
 
@@ -231,7 +174,6 @@ export function StudentGrades({ initialTab }: { initialTab?: "exams" | "assessme
     "N/A": "#9ca3af",
   };
 
-  // Chart: bar chart of marks by subject for latest exam
   const latestExam = useMemo(() => {
     if (!grades.length) return { data: [], label: "" };
     const examTypes = [...new Set(grades.map((g) => g.examType))];
@@ -253,7 +195,6 @@ export function StudentGrades({ initialTab }: { initialTab?: "exams" | "assessme
     return { data, label: latest };
   }, [grades]);
 
-  // Pie chart data for grade distribution
   const pieData = gradeDistribution.map((g) => ({
     name: g.grade,
     value: g.count,
@@ -294,604 +235,70 @@ export function StudentGrades({ initialTab }: { initialTab?: "exams" | "assessme
 
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <h2 className="text-xl font-semibold text-zinc-900 dark:text-zinc-100">
-            {topLevelTab === "exams" ? "School Exams" : "Class Assessments"}
-          </h2>
-          <p className="text-sm text-zinc-500 dark:text-zinc-400 mt-0.5">
-            {topLevelTab === "exams" 
-              ? "Track your official term examinations and standardized scores" 
-              : "Monitor your periodic teacher assignments, classwork, and quizzes"}
-          </p>
-        </div>
-        {topLevelTab === "exams" && (
-          <div className="flex items-center gap-2 flex-wrap">
-            {academicYears.length > 0 && (
-              <Select value={selectedYear} onValueChange={(v) => dispatch({ type: 'SET_SELECTED_YEAR', payload: v })}>
-                <SelectTrigger className="w-[160px] h-9 text-sm">
-                  <SelectValue placeholder="Academic Year" />
-                </SelectTrigger>
-                <SelectContent>
-                  {academicYears.map(y => (
-                    <SelectItem key={y.id} value={y.name}>
-                      {y.name}{y.isCurrent ? " (Current)" : ""}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            )}
-            {slug && (
-              <Button
-                size="sm"
-                variant="outline"
-                className="h-9 gap-1.5 text-sm font-medium border-violet-200 text-violet-700 hover:bg-violet-50 dark:border-violet-800 dark:text-violet-400 dark:hover:bg-violet-950/30"
-                onClick={() => router.push(`/${slug}/view-marksheet`)}
-              >
-                <FileText className="size-4" />
-                View Marksheet
-              </Button>
-            )}
-          </div>
-        )}
-      </div>
+      <GradesHeader
+        topLevelTab={topLevelTab}
+        academicYears={academicYears}
+        selectedYear={selectedYear}
+        onSelectedYearChange={(v) => dispatch({ type: "SET_SELECTED_YEAR", payload: v })}
+      />
 
       {topLevelTab === "exams" ? (
         <div className="space-y-6">
-          {/* School Exams Summary Cards */}
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-4">
-            <Card className="col-span-2 sm:col-span-1 rounded-xl shadow-sm border-violet-100 dark:border-violet-950/30 bg-gradient-to-tr from-white to-violet-50/20 dark:from-background dark:to-violet-950/10">
-              <CardContent className="p-5 text-center">
-                <div className="inline-flex p-3 rounded-xl bg-violet-600 dark:bg-violet-500 text-white mb-3">
-                  <TrendingUp className="size-5" />
-                </div>
-                <p className="text-xl sm:text-3xl font-bold text-zinc-900 dark:text-zinc-100">
-                  {overallAvg}%
-                </p>
-                <p className="text-xs text-zinc-500 dark:text-zinc-400 dark:text-zinc-500 mt-1 font-medium">
-                  Exam Average
-                </p>
-                <Progress value={overallAvg} className="mt-3 h-2" />
-              </CardContent>
-            </Card>
+          <ExamsSummaryCards
+            overallAvg={overallAvg}
+            totalRecords={grades.length}
+            uniqueSubjectsCount={[...new Set(grades.map((g) => g.subjectName))].length}
+            uniqueExamTypesCount={[...new Set(grades.map((g) => g.examType))].length}
+            highGradesCount={
+              gradeDistribution.find((g) => g.grade === "A+" || g.grade === "A")?.count || 0
+            }
+            gradeDistribution={gradeDistribution}
+            gradeColorMap={gradeColorMap}
+          />
 
-            <Card className="rounded-xl shadow-sm border-emerald-100 dark:border-emerald-950/30 bg-gradient-to-tr from-white to-emerald-50/20 dark:from-background dark:to-emerald-950/10">
-              <CardContent className="p-5 text-center">
-                <div className="inline-flex p-3 rounded-xl bg-emerald-600 dark:bg-emerald-500 text-white mb-3">
-                  <Award className="size-5" />
-                </div>
-                <p className="text-xl sm:text-3xl font-bold text-zinc-900 dark:text-zinc-100">
-                  {grades.length}
-                </p>
-                <p className="text-xs text-zinc-500 dark:text-zinc-400 dark:text-zinc-500 mt-1 font-medium">
-                  Total Records
-                </p>
-                <div className="flex items-center justify-center gap-1 mt-3 text-xs text-zinc-400 dark:text-zinc-500 font-medium">
-                  <span>
-                    {[...new Set(grades.map((g) => g.subjectName))].length} subjects
-                  </span>
-                  <span>•</span>
-                  <span>
-                    {[...new Set(grades.map((g) => g.examType))].length} types
-                  </span>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card className="rounded-xl shadow-sm border-amber-100 dark:border-amber-950/30 bg-gradient-to-tr from-white to-amber-50/20 dark:from-background dark:to-amber-950/10">
-              <CardContent className="p-5 text-center">
-                <div className="inline-flex p-3 rounded-xl bg-amber-600 dark:bg-amber-500 text-white mb-3">
-                  <Star className="size-5" />
-                </div>
-                <p className="text-xl sm:text-3xl font-bold text-zinc-900 dark:text-zinc-100">
-                  {gradeDistribution.find(
-                    (g) => g.grade === "A+" || g.grade === "A",
-                  )?.count || 0}
-                </p>
-                <p className="text-xs text-zinc-500 dark:text-zinc-400 dark:text-zinc-500 mt-1 font-medium">
-                  A/A+ Grades
-                </p>
-                <div className="flex items-center justify-center gap-1 mt-3">
-                  {gradeDistribution.slice(0, 4).map((g) => (
-                    <Badge
-                      key={g.grade}
-                      variant="secondary"
-                      className="text-[10px] px-1.5 py-0"
-                      style={{
-                        backgroundColor: gradeColorMap[g.grade] + "20",
-                        color: gradeColorMap[g.grade],
-                      }}
-                    >
-                      {g.grade}: {g.count}
-                    </Badge>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-
-          {/* School Exams Charts */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <Card className="rounded-xl shadow-sm border-zinc-200/60 dark:border-zinc-800">
-              <CardHeader className="pb-2">
-                <CardTitle className="text-base flex items-center gap-2 font-semibold">
-                  <BarChart3 className="size-4 text-violet-500" />
-                  Subject Performance
-                </CardTitle>
-                <CardDescription className="text-xs">
-                  {latestExam.label ? `Latest Term: ${latestExam.label}` : "Academic records summary"}
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                {latestExam.data.length > 0 ? (
-                  !recharts ? (
-                    <Skeleton className="h-[260px] w-full" />
-                  ) : (
-                    <ChartContainer config={chartConfig} className="h-[260px] w-full">
-                      {(() => {
-                        const { BarChart, Bar, XAxis, YAxis, Cell } = recharts;
-                        return (
-                          <BarChart
-                            data={latestExam.data}
-                            layout="vertical"
-                            margin={{ left: 10, right: 10 }}
-                          >
-                            <XAxis
-                              type="number"
-                              domain={[0, 100]}
-                              tick={{ fontSize: 11 }}
-                            />
-                            <YAxis
-                              type="category"
-                              dataKey="subject"
-                              width={90}
-                              tick={{ fontSize: 11 }}
-                            />
-                            <ChartTooltip content={<ChartTooltipContent />} />
-                            <Bar dataKey="marks" radius={[0, 6, 6, 0]} barSize={22}>
-                              {latestExam.data.map((entry, index) => (
-                                <Cell key={entry.subject} fill={entry.fill} />
-                              ))}
-                            </Bar>
-                          </BarChart>
-                        );
-                      })()}
-                    </ChartContainer>
-                  )
-                ) : (
-                  <div className="h-[260px] flex items-center justify-center text-zinc-400 dark:text-zinc-500 border-2 border-dashed rounded-xl border-zinc-100 dark:border-zinc-800">
-                    <p className="text-sm">No subject chart data available</p>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
+            <SubjectPerformanceChart
+              recharts={recharts}
+              latestExam={latestExam}
+              chartConfig={chartConfig}
+            />
 
-            <Card className="rounded-xl shadow-sm border-zinc-200/60 dark:border-zinc-800">
-              <CardHeader className="pb-2">
-                <CardTitle className="text-base flex items-center gap-2 font-semibold">
-                  <CircleDot className="size-4 text-violet-500" />
-                  Grade Distribution
-                </CardTitle>
-                <CardDescription className="text-xs">
-                  Breakdown of terms letter grades
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                {pieData.length > 0 ? (
-                  <div className="flex items-center gap-6">
-                    {!recharts ? (
-                      <Skeleton className="size-[200px]" />
-                    ) : (
-                      <ChartContainer
-                        config={chartConfig}
-                        className="size-[200px]"
-                      >
-                        {(() => {
-                          const { PieChart, Pie, Cell } = recharts;
-                          return (
-                            <PieChart>
-                              <ChartTooltip
-                                content={<ChartTooltipContent nameKey="name" />}
-                              />
-                              <Pie
-                                data={pieData}
-                                cx="50%"
-                                cy="50%"
-                                innerRadius={50}
-                                outerRadius={80}
-                                paddingAngle={3}
-                                dataKey="value"
-                              >
-                                {pieData.map((entry, index) => (
-                                  <Cell key={entry.name} fill={entry.fill} stroke="none" />
-                                ))}
-                              </Pie>
-                            </PieChart>
-                          );
-                        })()}
-                      </ChartContainer>
-                    )}
-                    <div className="flex flex-col gap-2">
-                      {gradeDistribution.map((g) => (
-                        <div
-                          key={g.grade}
-                          className="flex items-center gap-2 text-sm"
-                        >
-                          <div
-                            className="size-3 rounded-sm"
-                            style={{ backgroundColor: gradeColorMap[g.grade] }}
-                          />
-                          <span className="text-zinc-600 dark:text-zinc-400 font-medium">
-                            {g.grade}
-                          </span>
-                          <Badge variant="secondary" className="text-[10px] ml-1 font-normal">
-                            {g.count}
-                          </Badge>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                ) : (
-                  <div className="h-[200px] flex items-center justify-center text-zinc-400 dark:text-zinc-500 border-2 border-dashed rounded-xl border-zinc-100 dark:border-zinc-800">
-                    <p className="text-sm font-medium">No distribution data</p>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
+            <GradeDistributionChart
+              recharts={recharts}
+              pieData={pieData}
+              gradeDistribution={gradeDistribution}
+              gradeColorMap={gradeColorMap}
+              chartConfig={chartConfig}
+            />
           </div>
 
-          {/* School Exams Table */}
-          <Card className="rounded-xl shadow-sm border-zinc-200/60 dark:border-zinc-800">
-            <CardHeader className="pb-3">
-              <CardTitle className="text-base flex items-center gap-2 font-semibold">
-                <GraduationCap className="size-4 text-violet-500" />
-                All Exam Grades
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <Tabs
-                defaultValue="all"
-                value={activeTab}
-                onValueChange={(v) => dispatch({ type: 'SET_ACTIVE_TAB', payload: v })}
-              >
-                <TabsList className="mb-4 bg-zinc-50 dark:bg-zinc-900 p-1">
-                  <TabsTrigger value="all" className="text-xs">All Exams</TabsTrigger>
-                  <TabsTrigger value="midterm" className="text-xs">Midterm</TabsTrigger>
-                  <TabsTrigger value="final" className="text-xs">Finals</TabsTrigger>
-                </TabsList>
-
-                <TabsContent value={activeTab}>
-                  <ScrollArea className="max-h-[500px] w-full">
-                    <div className="min-w-[600px] sm:min-w-full pb-4">
-                    {filteredGrades.length === 0 ? (
-                      <div className="text-center py-12 text-zinc-400 dark:text-zinc-500 border border-dashed rounded-xl mt-2">
-                        <GraduationCap className="size-10 mx-auto mb-2 opacity-40" />
-                        <p className="text-sm font-medium">No exam grades found</p>
-                      </div>
-                    ) : (
-                      <Table>
-                        <TableHeader>
-                          <TableRow className="border-zinc-100 dark:border-zinc-800">
-                            <TableHead className="font-semibold">Subject</TableHead>
-                            <TableHead className="font-semibold">Exam Type</TableHead>
-                            <TableHead className="text-center font-semibold">Marks</TableHead>
-                            <TableHead className="text-center font-semibold">Percentage</TableHead>
-                            <TableHead className="text-center font-semibold">Grade</TableHead>
-                          </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                          {filteredGrades.map((g) => {
-                            const pct = Math.round((g.marks / g.maxMarks) * 100);
-                            return (
-                              <TableRow key={g.id} className="border-zinc-100 dark:border-zinc-800 hover:bg-zinc-50/50 dark:hover:bg-zinc-800/30">
-                                <TableCell className="font-medium">
-                                  {g.subjectName}
-                                </TableCell>
-                                <TableCell>
-                                  <Badge
-                                    variant="outline"
-                                    className="text-xs capitalize px-2.5 font-medium bg-zinc-50/50 dark:bg-zinc-900"
-                                  >
-                                    {g.examType}
-                                  </Badge>
-                                </TableCell>
-                                <TableCell className="text-center">
-                                  <span className="text-sm font-semibold text-zinc-800 dark:text-zinc-200">
-                                    {Number(g.marks).toFixed(2).replace(/\.00$/, "")}
-                                  </span>
-                                  <span className="text-xs text-zinc-400">
-                                    /{g.maxMarks}
-                                  </span>
-                                </TableCell>
-                                <TableCell className="text-center">
-                                  <div className="flex items-center justify-center gap-2">
-                                    <Progress value={pct} className="w-16 h-1.5 bg-zinc-100 dark:bg-zinc-800 [&>div]:bg-violet-500" />
-                                    <span className="text-xs font-medium text-zinc-600 dark:text-zinc-400">
-                                      {pct}%
-                                    </span>
-                                  </div>
-                                </TableCell>
-                                <TableCell className="text-center">
-                                  <Badge
-                                    className={`text-xs font-bold border-0 px-2.5 ${
-                                      pct >= 80
-                                        ? "bg-violet-100 text-violet-700 dark:bg-violet-900/30 dark:text-violet-400"
-                                        : pct >= 60
-                                          ? "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400"
-                                          : pct >= 50
-                                            ? "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400"
-                                            : "bg-rose-100 text-rose-700 dark:bg-rose-950/40 dark:text-rose-400"
-                                    }`}
-                                  >
-                                    {g.grade || "N/A"}
-                                  </Badge>
-                                </TableCell>
-                              </TableRow>
-                            );
-                          })}
-                        </TableBody>
-                      </Table>
-                    )}
-                  </div>
-                </ScrollArea>
-              </TabsContent>
-              </Tabs>
-            </CardContent>
-          </Card>
+          <ExamsTable
+            activeTab={activeTab}
+            onActiveTabChange={(v) => dispatch({ type: "SET_ACTIVE_TAB", payload: v })}
+            filteredGrades={filteredGrades}
+          />
         </div>
       ) : (
         <div className="space-y-6">
-          {/* Assessments Summary Cards */}
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 sm:gap-4">
-            <Card className="col-span-2 sm:col-span-1 rounded-xl shadow-sm border-violet-100 dark:border-violet-950/30 bg-white dark:bg-background">
-              <CardContent className="p-3 sm:p-5 text-center">
-                <div className="inline-flex p-2 sm:p-3 rounded-xl bg-violet-600 dark:bg-violet-500 text-white mb-2 sm:mb-3">
-                  <TrendingUp className="size-4 sm:h-5 sm:h-5" />
-                </div>
-                <p className="text-lg sm:text-3xl font-bold text-zinc-900 dark:text-zinc-100">
-                  {assessmentAvg}%
-                </p>
-                <p className="hidden sm:block text-xs text-zinc-500 dark:text-zinc-400 mt-1 font-medium">
-                  Assessment Average
-                </p>
-                <p className="sm:hidden text-[10px] text-zinc-500 dark:text-zinc-400 mt-1 font-medium">
-                  Average
-                </p>
-                <Progress value={assessmentAvg} className="mt-2 sm:mt-3 h-1 sm:h-2" />
-              </CardContent>
-            </Card>
+          <AssessmentsSummaryCards
+            assessmentAvg={assessmentAvg}
+            totalGraded={assessmentGrades.length}
+            uniqueSubjectsCount={[...new Set(assessmentGrades.map((a) => a.subjectName))].length}
+            passedCount={
+              assessmentGrades.filter((a) => (a.marksObtained || 0) >= (a.passingMarks || 0)).length
+            }
+          />
 
-            <Card className="rounded-xl shadow-sm border-blue-100 dark:border-blue-950/30 bg-white dark:bg-background">
-              <CardContent className="p-3 sm:p-5 text-center">
-                <div className="inline-flex p-2 sm:p-3 rounded-xl bg-blue-600 dark:bg-blue-500 text-white mb-2 sm:mb-3">
-                  <Award className="size-4 sm:h-5 sm:h-5" />
-                </div>
-                <p className="text-lg sm:text-3xl font-bold text-zinc-900 dark:text-zinc-100">
-                  {assessmentGrades.length}
-                </p>
-                <p className="hidden sm:block text-xs text-zinc-500 dark:text-zinc-400 mt-1 font-medium">
-                  Total Graded
-                </p>
-                <p className="sm:hidden text-[10px] text-zinc-500 dark:text-zinc-400 mt-1 font-medium">
-                  Graded
-                </p>
-                <div className="flex items-center justify-center gap-1 mt-2 sm:mt-3 text-[10px] sm:text-xs text-zinc-400 dark:text-zinc-500 font-medium">
-                  <span>
-                    {[...new Set(assessmentGrades.map((a) => a.subjectName))].length} subjects
-                  </span>
-                </div>
-              </CardContent>
-            </Card>
+          <AssessmentsPerformanceChart
+            recharts={recharts}
+            latestAssessmentChartData={latestAssessmentChartData}
+            chartConfig={chartConfig}
+            assessmentAvg={assessmentAvg}
+          />
 
-            <Card className="rounded-xl shadow-sm border-teal-100 dark:border-teal-950/30 bg-white dark:bg-background">
-              <CardContent className="p-3 sm:p-5 text-center">
-                <div className="inline-flex p-2 sm:p-3 rounded-xl bg-teal-600 dark:bg-teal-500 text-white mb-2 sm:mb-3">
-                  <CheckCircle2 className="size-4 sm:h-5 sm:h-5" />
-                </div>
-                <p className="text-lg sm:text-3xl font-bold text-zinc-900 dark:text-zinc-100">
-                  {assessmentGrades.filter(a => (a.marksObtained || 0) >= (a.passingMarks || 0)).length}
-                </p>
-                <p className="hidden sm:block text-xs text-zinc-500 dark:text-zinc-400 mt-1 font-medium">
-                  Subjects Passed
-                </p>
-                <p className="sm:hidden text-[10px] text-zinc-500 dark:text-zinc-400 mt-1 font-medium">
-                  Passed
-                </p>
-                <div className="flex items-center justify-center gap-1 mt-2 sm:mt-3 text-[10px] sm:text-xs text-teal-600 dark:text-teal-400 font-semibold">
-                  <span>Keep it up! ✨</span>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-
-          {/* Assessment Charts Row */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <Card className="rounded-xl shadow-sm border-zinc-200/60 dark:border-zinc-800">
-              <CardHeader className="pb-2">
-                <CardTitle className="text-base flex items-center gap-2 font-semibold">
-                  <BarChart3 className="size-4 text-violet-500" />
-                  Assessment Performance by Subject
-                </CardTitle>
-                <CardDescription className="text-xs">
-                  Running averages of periodic class assessments
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                {latestAssessmentChartData.length > 0 ? (
-                  !recharts ? (
-                    <Skeleton className="h-[260px] w-full" />
-                  ) : (
-                    <ChartContainer config={chartConfig} className="h-[260px] w-full">
-                      {(() => {
-                        const { BarChart, Bar, XAxis, YAxis, Cell } = recharts;
-                        return (
-                          <BarChart
-                            data={latestAssessmentChartData}
-                            layout="vertical"
-                            margin={{ left: 10, right: 10 }}
-                          >
-                            <XAxis
-                              type="number"
-                              domain={[0, 100]}
-                              tick={{ fontSize: 11 }}
-                            />
-                            <YAxis
-                              type="category"
-                              dataKey="subject"
-                              width={90}
-                              tick={{ fontSize: 11 }}
-                            />
-                            <ChartTooltip content={<ChartTooltipContent />} />
-                            <Bar dataKey="marks" radius={[0, 6, 6, 0]} barSize={22}>
-                              {latestAssessmentChartData.map((entry, index) => (
-                                <Cell key={index} fill={entry.fill} />
-                              ))}
-                            </Bar>
-                          </BarChart>
-                        );
-                      })()}
-                    </ChartContainer>
-                  )
-                ) : (
-                  <div className="h-[260px] flex items-center justify-center text-zinc-400 dark:text-zinc-500 border-2 border-dashed rounded-xl border-zinc-100 dark:border-zinc-800">
-                    <p className="text-sm">No continuous assessment data available</p>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-
-            <Card className="rounded-xl shadow-sm border-zinc-200/60 dark:border-zinc-800 flex flex-col justify-between">
-              <CardHeader className="pb-2">
-                <CardTitle className="text-base flex items-center gap-2 font-semibold">
-                  <Star className="size-4 text-violet-500" />
-                  Tips for Improvement
-                </CardTitle>
-                <CardDescription className="text-xs">
-                  Based on your class assessment activities
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="flex-1 flex flex-col justify-center py-6">
-                <div className="space-y-4 font-medium text-sm text-zinc-600 dark:text-zinc-300">
-                  <div className="flex items-start gap-3">
-                    <div className="size-1.5 rounded-full bg-violet-500 mt-1.5 shrink-0" />
-                    <p>Regular class assessments weigh directly into your overall academic profile. Don't skip assignments!</p>
-                  </div>
-                  <div className="flex items-start gap-3">
-                    <div className="size-1.5 rounded-full bg-violet-500 mt-1.5 shrink-0" />
-                    <p>If you scored below {assessmentAvg}% in any recent unit test, consider requesting extra practice materials from your teacher.</p>
-                  </div>
-                  <div className="flex items-start gap-3">
-                    <div className="size-1.5 rounded-full bg-violet-500 mt-1.5 shrink-0" />
-                    <p>Check teacher remarks inside the table below to find constructive feedback on individual topics.</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-
-          {/* Assessment Grades Table */}
-          <Card className="rounded-xl shadow-sm border-zinc-200/60 dark:border-zinc-800">
-            <CardHeader className="pb-3">
-              <CardTitle className="text-base flex items-center gap-2 font-semibold">
-                <GraduationCap className="size-4 text-violet-500" />
-                All Graded Assessments
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <ScrollArea className="max-h-[500px] w-full">
-                <div className="min-w-[700px] sm:min-w-full pb-4">
-                {assessmentGrades.length === 0 ? (
-                  <div className="text-center py-12 text-zinc-400 dark:text-zinc-500 border border-dashed rounded-xl mt-2">
-                    <GraduationCap className="size-10 mx-auto mb-2 opacity-40" />
-                    <p className="text-sm font-medium">No assessment records graded yet</p>
-                  </div>
-                ) : (
-                  <Table>
-                    <TableHeader>
-                      <TableRow className="border-zinc-100 dark:border-zinc-800">
-                        <TableHead className="font-semibold">Assessment Title</TableHead>
-                        <TableHead className="font-semibold">Subject</TableHead>
-                        <TableHead className="font-semibold">Type</TableHead>
-                        <TableHead className="text-center font-semibold">Score</TableHead>
-                        <TableHead className="text-center font-semibold">Status</TableHead>
-                        <TableHead className="font-semibold">Remarks</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {assessmentGrades.map((g) => {
-                        const isPass = g.marksObtained >= g.passingMarks;
-                        return (
-                          <TableRow key={g.id} className="border-zinc-100 dark:border-zinc-800 hover:bg-zinc-50/50 dark:hover:bg-zinc-800/30">
-                            <TableCell className="font-semibold text-zinc-900 dark:text-zinc-100">
-                              {g.title}
-                            </TableCell>
-                            <TableCell className="font-medium">
-                              {g.subjectName}
-                            </TableCell>
-                            <TableCell>
-                              <Badge
-                                variant="outline"
-                                className="text-[11px] capitalize bg-zinc-50 dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800 font-medium"
-                              >
-                                {g.type.replace(/_/g, ' ')}
-                              </Badge>
-                            </TableCell>
-                            <TableCell className="text-center">
-                              <span className="text-sm font-bold text-zinc-800 dark:text-zinc-100">
-                                {Number(g.marksObtained).toFixed(2).replace(/\.00$/, "")}
-                              </span>
-                              <span className="text-xs text-zinc-400">
-                                /{g.totalMarks}
-                              </span>
-                            </TableCell>
-                            <TableCell className="text-center">
-                              <Badge
-                                className={`text-[11px] font-bold px-2 py-0.5 border-0 shadow-none ${
-                                  isPass
-                                    ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400"
-                                    : "bg-rose-100 text-rose-700 dark:bg-rose-950/40 dark:text-rose-400"
-                                }`}
-                              >
-                                {isPass ? 'PASS' : 'FAIL'}
-                              </Badge>
-                            </TableCell>
-                            <TableCell className="text-xs text-zinc-500 dark:text-zinc-400 max-w-[200px] truncate font-medium">
-                              {g.remarks || <span className="opacity-40">—</span>}
-                            </TableCell>
-                          </TableRow>
-                        );
-                      })}
-                    </TableBody>
-                  </Table>
-                )}
-                </div>
-              </ScrollArea>
-            </CardContent>
-          </Card>
+          <AssessmentsTable assessmentGrades={assessmentGrades} />
         </div>
       )}
-    </div>
-  );
-}
-
-function GradesSkeleton() {
-  return (
-    <div className="space-y-6">
-      <div>
-        <Skeleton className="h-7 w-32 mb-2" />
-        <Skeleton className="h-4 w-56" />
-      </div>
-      <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-4">
-        <Skeleton className="col-span-2 sm:col-span-1 h-32 sm:h-36 rounded-xl" />
-        <Skeleton className="h-32 sm:h-36 rounded-xl" />
-        <Skeleton className="h-32 sm:h-36 rounded-xl" />
-      </div>
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <Skeleton className="h-72 rounded-xl" />
-        <Skeleton className="h-72 rounded-xl" />
-      </div>
-      <Skeleton className="h-96 rounded-xl" />
     </div>
   );
 }

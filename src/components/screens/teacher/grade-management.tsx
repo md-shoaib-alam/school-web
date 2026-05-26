@@ -1,59 +1,20 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { apiFetch } from "@/lib/api";
-import { useReducer, useEffect } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-  DialogFooter,
-  DialogDescription,
-} from "@/components/ui/dialog";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
-import { Badge } from "@/components/ui/badge";
-import { Progress } from "@/components/ui/progress";
 import { Skeleton } from "@/components/ui/skeleton";
-import { ClipboardList, Save, BookOpen, Users, Eye, Plus, Loader2, FileText, Sparkles, GraduationCap, Trophy, CheckCircle2, Check, Clock, Globe, AlertTriangle } from "lucide-react";
-import { toast } from "sonner";
+import { ClipboardList, Users, Eye, FileText, CheckCircle2, Clock } from "lucide-react";
 import { useModulePermissions } from "@/hooks/use-permissions";
-import { initialState, gradeManagementReducer } from "./grade-management/types";
 
+// Refactored child components
+import { CreateAssessmentDialog } from "./grade-management/create-assessment-dialog";
+import { ConfirmFinalizeDialog } from "./grade-management/confirm-finalize-dialog";
+import { AssessmentsList } from "./grade-management/assessments-list";
+import { RecordScoresDialog } from "./grade-management/record-scores-dialog";
+import { useGradeManagement } from "./grade-management/useGradeManagement";
 
 export function TeacherGrades() {
   const { canCreate, canEdit, canDelete } = useModulePermissions("grades");
-  const [state, dispatch] = useReducer(gradeManagementReducer, initialState);
-
+  
   const {
     classes,
     subjects,
@@ -78,265 +39,12 @@ export function TeacherGrades() {
     isCreating,
     dialogClassId,
     dialogSubjectId,
-  } = state;
-
-  // 1. Initial bootstrap data (Classes/Subjects)
-  useEffect(() => {
-    Promise.all([
-      apiFetch("/api/classes"),
-      apiFetch("/api/subjects?mine=true"),
-    ])
-      .then(([cRes, sRes]) => Promise.all([cRes.json(), sRes.json()]))
-      .then(([cData, sData]) => {
-        dispatch({ type: "SET_BOOTSTRAP_DATA", classes: cData, subjects: sData });
-      })
-      .catch((e) => {
-        console.error(e);
-        dispatch({ type: "SET_LOADING", value: false });
-      });
-  }, []);
-
-  // 1b. Fetch assessments filtered by tab status
-  useEffect(() => {
-    dispatch({ type: "SET_LIST_LOADING", value: true });
-    apiFetch(`/api/assessments?status=${activeTab}`)
-      .then((r) => r.json())
-      .then((data) => {
-        dispatch({ type: "SET_ASSESSMENTS", assessments: data || [] });
-      })
-      .catch((e) => {
-        console.error(e);
-        dispatch({ type: "SET_LIST_LOADING", value: false });
-      });
-  }, [activeTab]);
-
-  // 2. Load students for selected assessment's class
-  useEffect(() => {
-    if (!selectedAssessmentId) {
-      dispatch({ type: "SET_STUDENTS", students: [] });
-      dispatch({ type: "SET_MARKS", marks: {} });
-      dispatch({ type: "SET_IS_DIRTY", value: false });
-      return;
-    }
-    const assessment = assessments.find(a => a.id === selectedAssessmentId);
-    if (!assessment) return;
-
-    apiFetch(`/api/students?classId=${assessment.classId}`)
-      .then((r) => r.json())
-      .then((data) => {
-        const studentArray = Array.isArray(data) ? data : (data?.items || []);
-        dispatch({ type: "SET_STUDENTS", students: studentArray });
-      });
-  }, [selectedAssessmentId, assessments]);
-
-  // 4. Load existing grades for selected isolated assessment
-  useEffect(() => {
-    if (!selectedAssessmentId) {
-      dispatch({ type: "SET_MARKS", marks: {} });
-      dispatch({ type: "SET_IS_DIRTY", value: false });
-      return;
-    }
-    dispatch({ type: "SET_GRADES_LOADING", value: true });
-    apiFetch(`/api/assessments/${selectedAssessmentId}/grades`)
-      .then((r) => r.json())
-      .then((data) => {
-        if (Array.isArray(data)) {
-          const initialMarks: Record<string, string> = {};
-          data.forEach((g: any) => {
-            if (g.studentId && g.marksObtained !== undefined && g.marksObtained !== null) {
-              initialMarks[g.studentId] = g.marksObtained.toString();
-            }
-          });
-          dispatch({ type: "SET_MARKS", marks: initialMarks });
-          dispatch({ type: "SET_IS_DIRTY", value: false });
-        } else {
-          dispatch({ type: "SET_MARKS", marks: {} });
-          dispatch({ type: "SET_IS_DIRTY", value: false });
-        }
-      })
-      .catch((e) => {
-        console.error(e);
-        dispatch({ type: "SET_MARKS", marks: {} });
-        dispatch({ type: "SET_IS_DIRTY", value: false });
-      })
-      .finally(() => dispatch({ type: "SET_GRADES_LOADING", value: false }));
-  }, [selectedAssessmentId]);
-
-
-
-  const activeAssessment = assessments.find(a => a.id === selectedAssessmentId);
-  const isActiveAssocCompleted = activeAssessment?.status === 'completed';
-  const maxMarks = activeAssessment?.totalMarks || 100;
-  const passingMarks = activeAssessment?.passingMarks || 40;
-
-  const marksArray = Object.values(marks)
-    .filter((m) => m && m.trim() !== "")
-    .map(Number);
-
-  const classAvg =
-    marksArray.length > 0
-      ? (marksArray.reduce((acc, val) => acc + val, 0) / marksArray.length).toFixed(1)
-      : "0.0";
-
-  const passCount = marksArray.filter((m) => m >= passingMarks).length;
-  const passPct =
-    marksArray.length > 0
-      ? Math.round((passCount / marksArray.length) * 100)
-      : 0;
-
-  const metricsCards = [
-    {
-      label: "Total Assessments",
-      value: assessments.length,
-      icon: <ClipboardList className="size-5" />,
-      color: "bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400",
-    },
-    {
-      label: "Class Average",
-      value: selectedAssessmentId ? `${classAvg} / ${maxMarks}` : "N/A",
-      icon: <GraduationCap className="size-5" />,
-      color: "bg-violet-50 dark:bg-violet-900/20 text-violet-600 dark:text-violet-400",
-    },
-    {
-      label: "Passing Ratio",
-      value: selectedAssessmentId && marksArray.length > 0 ? `${passPct}%` : "N/A",
-      icon: <Trophy className="size-5" />,
-      color: "bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400",
-    },
-    {
-      label: "Students Evaluated",
-      value: selectedAssessmentId ? `${marksArray.length} / ${students.length}` : students.length,
-      icon: <Users className="size-5" />,
-      color: "bg-violet-50 dark:bg-violet-900/20 text-violet-600 dark:text-violet-400",
-    },
-  ];
-
-
-  const getGrade = (m: number, max: number) => {
-    const pct = (m / max) * 100;
-    if (pct >= 90) return "A+";
-    if (pct >= 80) return "A";
-    if (pct >= 70) return "B+";
-    if (pct >= 60) return "B";
-    if (pct >= 50) return "C";
-    return "D";
-  };
-
-  const getGradeColor = (g: string) => {
-    if (g === "A+" || g === "A")
-      return "text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-900/30";
-    if (g === "B+" || g === "B")
-      return "text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/30";
-    if (g === "C")
-      return "text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-900/30";
-    return "text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/30";
-  };
-
-  // CREATE ASSESSMENT
-  const handleCreateAssessment = async () => {
-    if (!newTitle.trim()) {
-      toast.error("Please enter an assessment title!");
-      return;
-    }
-    if (!dialogClassId || !dialogSubjectId) {
-      toast.error("Please select both a Class and a Subject!");
-      return;
-    }
-    dispatch({ type: "SET_IS_CREATING", value: true });
-    try {
-      const res = await apiFetch("/api/assessments", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          classId: dialogClassId,
-          subjectId: dialogSubjectId,
-          title: newTitle,
-          type: newType,
-          totalMarks: parseFloat(newTotalMarks),
-          passingMarks: parseFloat(newPassingMarks),
-        }),
-      });
-
-      if (!res.ok) throw new Error("Failed to create");
-      const created = await res.json();
-
-      toast.success(`Created assessment "${newTitle}"!`);
-      dispatch({ type: "SET_IS_DIALOG_OPEN", value: false });
-      dispatch({ type: "SET_NEW_TITLE", value: "" });
-      dispatch({ type: "SET_NEW_MODE", value: "offline" });
-      
-      // Seamlessly shift global view state to immediately display this assessment!
-      dispatch({ type: "ADD_ASSESSMENT", assessment: created });
-    } catch (e) {
-      console.error(e);
-      toast.error("Could not create assessment");
-    }
-    dispatch({ type: "SET_IS_CREATING", value: false });
-  };
-
-  // COMPLETE ASSESSMENT PERMANENTLY
-  const handleCompleteAssessment = async (assessmentId: string) => {
-    dispatch({ type: "SET_COMPLETING_ID", id: assessmentId });
-    try {
-      const res = await apiFetch(`/api/assessments/${assessmentId}/complete`, {
-        method: "PUT",
-      });
-      if (res.ok) {
-        toast.success("Assessment finalized successfully!");
-        dispatch({ type: "SET_ASSESSMENTS", assessments: assessments.filter((item) => item.id !== assessmentId) });
-        if (selectedAssessmentId === assessmentId) {
-          dispatch({ type: "SET_SELECTED_ASSESSMENT_ID", id: "" });
-        }
-      } else {
-        toast.error("Could not complete assessment.");
-      }
-    } catch (error) {
-      console.error(error);
-      toast.error("Failed to complete assessment.");
-    } finally {
-      dispatch({ type: "SET_COMPLETING_ID", id: null });
-    }
-  };
-
-
-  // BULK SAVE GRADES
-  const handleSave = async () => {
-    if (!selectedAssessmentId) return;
-    dispatch({ type: "SET_SAVING", value: true });
-    try {
-      const records = Object.entries(marks)
-        .filter(([_, val]) => val.trim() !== "")
-        .map(([studentId, val]) => ({
-          studentId,
-          marksObtained: parseFloat(val),
-          remarks: "",
-        }));
-
-      if (records.length === 0) {
-        toast.error("No marks entered to save!");
-        dispatch({ type: "SET_SAVING", value: false });
-        return;
-      }
-
-      const res = await apiFetch("/api/assessments/bulk-grades", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          assessmentId: selectedAssessmentId,
-          records,
-        }),
-      });
-
-      if (!res.ok) throw new Error("Bulk save failed");
-
-      toast.success(`Saved marks for ${records.length} students successfully!`);
-      dispatch({ type: "SET_IS_DIRTY", value: false });
-    } catch (error) {
-      console.error(error);
-      toast.error("Failed to save marks");
-    }
-    dispatch({ type: "SET_SAVING", value: false });
-  };
+    activeAssessment,
+    dispatch,
+    handleCreateAssessment,
+    handleCompleteAssessment,
+    handleSave,
+  } = useGradeManagement();
 
   if (loading)
     return (
@@ -361,146 +69,23 @@ export function TeacherGrades() {
         </div>
 
         {/* Create Assessment Button & Modal */}
-        {/* Create Assessment Button & Modal */}
         {canCreate && (
-          <Dialog open={isDialogOpen} onOpenChange={(v) => dispatch({ type: "SET_IS_DIALOG_OPEN", value: v })}>
-            <DialogTrigger asChild>
-              <Button className="bg-blue-600 hover:bg-blue-700 text-white shadow-md font-semibold transition-all hover:translate-y-[-1px] group">
-                <Plus className="size-4 mr-2 group-hover:rotate-90 transition-all duration-200" />
-                Create Assessment
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="sm:max-w-[425px] rounded-2xl">
-              <DialogHeader>
-                <DialogTitle className="flex items-center gap-2 text-xl font-semibold">
-                  <Sparkles className="size-5 text-blue-500" />
-                  New Assessment
-                </DialogTitle>
-              </DialogHeader>
-              <div className="grid gap-5 py-4">
-                {/* Integrated Class & Subject Pickers */}
-                <div className="grid grid-cols-2 gap-3">
-                  <div className="grid gap-2">
-                    <Label className="text-xs font-semibold text-muted-foreground">Class *</Label>
-                    <Select
-                      value={dialogClassId}
-                      onValueChange={(v) => {
-                        dispatch({ type: "SET_DIALOG_CLASS_ID", value: v });
-                      }}
-                    >
-                      <SelectTrigger className="h-9 focus:ring-blue-500 focus-visible:ring-blue-500">
-                        <SelectValue placeholder="Select Class" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {classes.map((c) => (
-                          <SelectItem key={c.id} value={c.id}>
-                            {c.name} - {c.section}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  <div className="grid gap-2">
-                    <Label className="text-xs font-semibold text-muted-foreground">Subject *</Label>
-                    <Select
-                      value={dialogSubjectId}
-                      onValueChange={(v) => dispatch({ type: "SET_DIALOG_SUBJECT_ID", value: v })}
-                      disabled={!dialogClassId}
-                    >
-                      <SelectTrigger className="h-9 focus:ring-blue-500 focus-visible:ring-blue-500">
-                        <SelectValue placeholder="Select Subject" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {subjects
-                          .filter((s) => s.classId === dialogClassId)
-                          .map((s) => (
-                            <SelectItem key={s.id} value={s.id}>
-                              {s.name}
-                            </SelectItem>
-                          ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </div>
-
-                <div className="grid gap-2">
-                  <Label htmlFor="title" className="text-sm font-medium text-zinc-700 dark:text-zinc-300">Title / Name</Label>
-                  <Input
-                    id="title"
-                    placeholder="e.g., Chapter 1 Algebra Quiz"
-                    value={newTitle}
-                    onChange={(e) => dispatch({ type: "SET_NEW_TITLE", value: e.target.value })}
-                    className="focus-visible:ring-blue-500 h-9"
-                  />
-                </div>
-                
-                <div className="grid grid-cols-2 gap-3">
-                  <div className="grid gap-2">
-                    <Label className="text-xs font-semibold text-muted-foreground">Category Type</Label>
-                    <Select value={newType} onValueChange={(v) => dispatch({ type: "SET_NEW_TYPE", value: v })}>
-                      <SelectTrigger className="w-full h-9">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="unit_test">Unit Test</SelectItem>
-                        <SelectItem value="quiz">Quiz</SelectItem>
-                        <SelectItem value="practical">Practical / Lab</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  <div className="grid gap-2">
-                    <Label className="text-xs font-semibold text-muted-foreground">Submission Mode</Label>
-                    <Select value={newMode} onValueChange={(v) => dispatch({ type: "SET_NEW_MODE", value: v })}>
-                      <SelectTrigger className="w-full h-9">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="offline">Offline (Classroom)</SelectItem>
-                        <SelectItem value="online" disabled className="text-muted-foreground">
-                          Online (🔒 Premium Only)
-                        </SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </div>
-
-
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="grid gap-2">
-                    <Label htmlFor="total" className="text-sm font-medium text-zinc-700 dark:text-zinc-300">Total Marks</Label>
-                    <Input
-                      id="total"
-                      type="number"
-                      value={newTotalMarks}
-                      onChange={(e) => dispatch({ type: "SET_NEW_TOTAL_MARKS", value: e.target.value })}
-                      className="focus-visible:ring-blue-500"
-                    />
-                  </div>
-                  <div className="grid gap-2">
-                    <Label htmlFor="passing" className="text-sm font-medium text-zinc-700 dark:text-zinc-300">Passing Marks</Label>
-                    <Input
-                      id="passing"
-                      type="number"
-                      value={newPassingMarks}
-                      onChange={(e) => dispatch({ type: "SET_NEW_PASSING_MARKS", value: e.target.value })}
-                      className="focus-visible:ring-blue-500"
-                    />
-                  </div>
-                </div>
-              </div>
-              <DialogFooter className="mt-2">
-                <Button
-                  onClick={handleCreateAssessment}
-                  disabled={isCreating || !newTitle.trim()}
-                  className="w-full bg-blue-600 hover:bg-blue-700 text-white"
-                >
-                  {isCreating ? <Loader2 className="size-4 animate-spin" /> : "Create Assessment"}
-                </Button>
-              </DialogFooter>
-            </DialogContent>
-          </Dialog>
+          <CreateAssessmentDialog
+            isOpen={isDialogOpen}
+            onOpenChange={(v) => dispatch({ type: "SET_IS_DIALOG_OPEN", value: v })}
+            dialogClassId={dialogClassId}
+            dialogSubjectId={dialogSubjectId}
+            newTitle={newTitle}
+            newType={newType}
+            newMode={newMode}
+            newTotalMarks={newTotalMarks}
+            newPassingMarks={newPassingMarks}
+            isCreating={isCreating}
+            classes={classes}
+            subjects={subjects}
+            dispatch={dispatch}
+            onCreate={handleCreateAssessment}
+          />
         )}
       </div>
 
@@ -514,8 +99,6 @@ export function TeacherGrades() {
             </span>
           </div>
         )}
-
-
 
         {/* Status Selection Tabs */}
         <div className="flex border-b border-zinc-100 dark:border-zinc-800/80 mb-2">
@@ -534,9 +117,9 @@ export function TeacherGrades() {
             <Clock className={`size-4 ${activeTab === "active" ? "text-blue-500" : ""}`} />
             <span>Active</span>
             {!listLoading && activeTab === "active" && assessments.length > 0 && (
-              <Badge className="bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300 border-blue-100 dark:border-blue-900/50 font-medium px-1.5 py-0 text-[10px] pointer-events-none rounded-full transition-all">
+              <span className="bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300 border border-blue-100 dark:border-blue-900/50 font-medium px-1.5 py-0 text-[10px] pointer-events-none rounded-full transition-all">
                 {assessments.length}
-              </Badge>
+              </span>
             )}
             {activeTab === "active" && (
               <motion.div
@@ -561,9 +144,9 @@ export function TeacherGrades() {
             <CheckCircle2 className={`size-4 ${activeTab === "completed" ? "text-emerald-500" : ""}`} />
             <span>Completed / Finalized</span>
             {!listLoading && activeTab === "completed" && assessments.length > 0 && (
-              <Badge className="bg-emerald-50 text-emerald-700 dark:bg-emerald-950/20 dark:text-emerald-300 border-emerald-100 dark:border-emerald-900/50 font-medium px-1.5 py-0 text-[10px] pointer-events-none rounded-full transition-all">
+              <span className="bg-emerald-50 text-emerald-700 dark:bg-emerald-950/20 dark:text-emerald-300 border border-emerald-100 dark:border-emerald-900/50 font-medium px-1.5 py-0 text-[10px] pointer-events-none rounded-full transition-all">
                 {assessments.length}
-              </Badge>
+              </span>
             )}
             {activeTab === "completed" && (
               <motion.div
@@ -576,317 +159,30 @@ export function TeacherGrades() {
         </div>
 
         {/* Assessments Card Grid (Homework‑style) */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 min-h-[200px]">
-          {listLoading ? (
-            [...Array(3)].map((_, i) => (
-              <Card key={i} className="rounded-xl border border-zinc-100 dark:border-zinc-800 p-5 space-y-4 animate-pulse">
-                <div className="flex justify-between items-start">
-                  <div className="space-y-2 flex-1">
-                    <div className="h-4 bg-zinc-200 dark:bg-zinc-800 rounded w-3/4" />
-                    <div className="h-3 bg-zinc-100 dark:bg-zinc-800/60 rounded w-1/2" />
-                  </div>
-                  <div className="h-5 w-16 bg-zinc-100 dark:bg-zinc-800 rounded-full" />
-                </div>
-                <div className="space-y-1">
-                  <div className="flex justify-between">
-                    <div className="h-3 bg-zinc-100 dark:bg-zinc-800 rounded w-1/3" />
-                    <div className="h-3 bg-zinc-100 dark:bg-zinc-800 rounded w-1/6" />
-                  </div>
-                  <div className="h-2 w-full bg-zinc-100 dark:bg-zinc-800 rounded-full" />
-                </div>
-                <div className="h-9 w-full bg-zinc-100 dark:bg-zinc-800 rounded-lg" />
-              </Card>
-            ))
-          ) : (
-            assessments.map((a) => {
-            const isCompleted = a.status === "completed";
-            // Count actual grades or use backend count if available. For now, filter local state if this is the active assessment,
-            // or if not, use the eager-loaded grades array length.
-            const gradedCount = selectedAssessmentId === a.id 
-              ? Object.entries(marks).filter(([sid, v]) => v && v.trim() !== "").length
-              : (a.grades?.length || 0);
-            const totalStudents = a.class?.students?.length || 0;
-            const total = totalStudents || 1; // avoid division by zero
-            const pct = (gradedCount / total) * 100;
+        <AssessmentsList
+          assessments={assessments}
+          listLoading={listLoading}
+          selectedAssessmentId={selectedAssessmentId}
+          marks={marks}
+          classes={classes}
+          subjects={subjects}
+          completingId={completingId}
+          dispatch={dispatch}
+        />
 
-            const selectedClassObj = classes.find(c => c.id === a.classId);
-            const selectedSubjectObj = subjects.find(s => s.id === a.subjectId);
-
-            return (
-              <Card
-                key={a.id}
-                className={`rounded-xl shadow-sm ${isCompleted ? "border-emerald-200/60 dark:border-emerald-800/60 bg-emerald-50/5 dark:bg-emerald-900/5" : "border-zinc-100 dark:border-zinc-800"} hover:shadow-md transition-shadow`}
-              >
-                <CardContent className="p-5">
-                  <div className="flex items-start justify-between mb-3 gap-2">
-                    <div className="flex-1 min-w-0">
-                      <h3 className="font-medium text-zinc-900 dark:text-zinc-100 text-sm truncate">
-                        {a.title}
-                      </h3>
-                      <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-1">
-                        {selectedSubjectObj?.name} • {selectedClassObj?.name} {selectedClassObj?.section}
-                      </p>
-                    </div>
-                    {isCompleted && (
-                      <Badge
-                        variant="outline"
-                        className="text-[10px] bg-emerald-50 text-emerald-700 border-emerald-100/60 dark:bg-emerald-950/20 dark:text-emerald-300 dark:border-emerald-900/50 font-medium px-2 py-0.5 flex items-center gap-1 border rounded-full shrink-0"
-                      >
-                        <CheckCircle2 className="size-2.5" />
-                        Completed
-                      </Badge>
-                    )}
-                  </div>
-
-                  <div className="flex items-center justify-between text-xs text-zinc-500 dark:text-zinc-400 mb-3">
-                    <span className="flex items-center gap-1">
-                      <FileText className="size-3" /> {a.type}
-                    </span>
-                    <Badge
-                      variant="outline"
-                      className={`text-[10px] font-medium px-2 py-0.5 flex items-center gap-1 border rounded-full bg-violet-50 text-violet-700 border-violet-100/60 dark:bg-violet-950/20 dark:text-violet-300 dark:border-violet-900/50`}
-                    >
-                      <Globe className="size-2.5" /> Offline
-                    </Badge>
-                  </div>
-
-                  <div className="space-y-1.5">
-                    <div className="flex justify-between text-xs">
-                      <span className="text-zinc-500 dark:text-zinc-400">
-                        Submissions
-                      </span>
-                      <span className="font-medium">
-                        {gradedCount}/{totalStudents}
-                      </span>
-                    </div>
-                    <Progress value={pct} className="h-2" />
-                    <div className="flex items-center gap-1.5 text-xs text-zinc-500 dark:text-zinc-400 mt-1">
-                      <Users className="size-3" />
-                      {totalStudents - gradedCount} students haven't submitted
-                    </div>
-                  </div>
-
-                  <div className="mt-4 pt-3 border-t border-zinc-100 dark:border-zinc-800 flex flex-col gap-2">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className="w-full text-xs gap-1.5"
-                      onClick={() => dispatch({ type: "SET_SELECTED_ASSESSMENT_ID", id: a.id })}
-                    >
-                      <Eye className="size-3.5" />
-                      {isCompleted ? "View Final Scores" : "View Submissions"} ({gradedCount})
-                    </Button>
-                    <Button
-                      variant={isCompleted ? "outline" : "secondary"}
-                      size="sm"
-                      className={`w-full text-xs gap-1.5 ${
-                        isCompleted
-                          ? "text-zinc-400 dark:text-zinc-500 border-zinc-200/50 dark:border-zinc-800/50 bg-transparent cursor-not-allowed opacity-60"
-                          : "bg-emerald-50 dark:bg-emerald-950/30 text-emerald-700 dark:text-emerald-400 hover:bg-emerald-100 dark:hover:bg-emerald-900/40 border border-emerald-200/50 dark:border-emerald-800/50"
-                      }`}
-                      onClick={() => !isCompleted && dispatch({ type: "SET_CONFIRM_COMPLETE_ID", id: a.id })}
-                      disabled={isCompleted || completingId === a.id}
-                    >
-                      {completingId === a.id ? (
-                        <Loader2 className="size-3.5 animate-spin" />
-                      ) : (
-                        <Check className="size-3.5" />
-                      )}
-                      {isCompleted ? "Finalized / Completed" : "Mark Complete"}
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
-            );
-          })
-         )}
-        </div>
-
-
-        {/* Assessment Dialog */}
-        <Dialog 
-          open={!!selectedAssessmentId} 
-          onOpenChange={(open) => {
-            if (!open) {
-              dispatch({ type: "SET_SELECTED_ASSESSMENT_ID", id: "" });
-              dispatch({ type: "SET_MARKS", marks: {} });
-              dispatch({ type: "SET_IS_DIRTY", value: false });
-            }
-          }}
-        >
-          <DialogContent className="sm:max-w-2xl max-h-[85vh] overflow-hidden flex flex-col">
-            <DialogHeader>
-              <DialogTitle className="flex items-center gap-2">
-                <ClipboardList className="size-4 text-blue-600" />
-                {activeAssessment?.title || "Record Scores"}
-              </DialogTitle>
-              <DialogDescription>
-                Max: {maxMarks} • Passing: {passingMarks} • Students without marks are considered "Pending"
-              </DialogDescription>
-            </DialogHeader>
-
-            {gradesLoading ? (
-              <div className="space-y-3 py-4">
-                {[...Array(3)].map((_, i) => (
-                  <Skeleton key={i} className="h-24 rounded-lg" />
-                ))}
-              </div>
-            ) : students.length === 0 ? (
-              <div className="py-12 text-center text-zinc-400 dark:text-zinc-500">
-                <Users className="size-10 mx-auto mb-2 opacity-40" />
-                <p className="text-sm">No students found</p>
-                <p className="text-xs mt-1">
-                  There are no students in this class.
-                </p>
-              </div>
-            ) : (
-              <div className="flex flex-col max-h-[75vh]">
-                <div className="overflow-y-auto pr-2 space-y-3 py-2 custom-scrollbar flex-1">
-                  {students.map((student) => {
-                    const m = parseFloat(marks[student.id] || "0");
-                    const hasMark = marks[student.id] && marks[student.id].trim() !== "";
-                    const grade = hasMark ? getGrade(m, maxMarks) : "-";
-                    const isPass = hasMark && m >= passingMarks;
-                    const pct = hasMark ? (m / maxMarks) * 100 : 0;
-
-                    return (
-                      <div
-                        key={student.id}
-                        className={`p-4 rounded-lg border transition-all ${
-                          hasMark
-                            ? "border-emerald-200 dark:border-emerald-800 bg-emerald-50/30 dark:bg-emerald-900/20"
-                            : "border-zinc-200 dark:border-zinc-700 hover:border-blue-200 dark:hover:border-blue-800 hover:bg-blue-50/30 dark:hover:bg-blue-900/20"
-                        }`}
-                      >
-                        <div className="flex items-start justify-between gap-3">
-                          <div className="min-w-0">
-                            <div className="flex items-center gap-2">
-                              <p className={`text-sm font-semibold ${!hasMark ? "text-zinc-500 dark:text-zinc-400" : "text-zinc-900 dark:text-zinc-100"}`}>
-                                {student.name}
-                              </p>
-                              <Badge
-                                variant="outline"
-                                className={`text-[10px] flex items-center gap-1 ${
-                                  hasMark
-                                    ? "bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800"
-                                    : "bg-amber-50 dark:bg-amber-900/20 text-amber-700 dark:text-amber-400 border-amber-200 dark:border-amber-800/50"
-                                }`}
-                              >
-                                {hasMark ? "✓ Graded" : "Pending"}
-                              </Badge>
-                            </div>
-                            <p className="text-[11px] text-zinc-400 dark:text-zinc-500">
-                              Roll No: {student.rollNumber}
-                            </p>
-                          </div>
-                          {hasMark && (
-                            <div className="flex items-center gap-2">
-                              <Badge
-                                variant="secondary"
-                                className={`${getGradeColor(grade)} font-bold font-mono`}
-                              >
-                                Grade: {grade}
-                              </Badge>
-                            </div>
-                          )}
-                        </div>
-
-                        <div className="mt-3 pt-3 border-t border-zinc-100 dark:border-zinc-800 flex flex-col sm:flex-row sm:items-center gap-4">
-                          <div className="flex-1 min-w-[150px]">
-                            <div>
-                              <Label className="text-[10px] uppercase tracking-wider text-zinc-400 dark:text-zinc-500 mb-1">
-                                Marks Obtained
-                              </Label>
-                              <div className="flex items-center gap-2 mt-1">
-                                <Input
-                                  type="number"
-                                  step="0.5"
-                                  min="0"
-                                  max={maxMarks}
-                                  placeholder="0"
-                                  value={marks[student.id] || ""}
-                                  disabled={gradesLoading || isActiveAssocCompleted}
-                                  onChange={(e) => {
-                                    const val = e.target.value;
-                                    if (val === "") {
-                                      const newMarks = { ...marks };
-                                      delete newMarks[student.id];
-                                      dispatch({ type: "SET_MARKS", marks: newMarks });
-                                      dispatch({ type: "SET_IS_DIRTY", value: true });
-                                      return;
-                                    }
-                                    const num = parseFloat(val);
-                                    if (num < 0) return;
-                                    if (num > maxMarks) {
-                                      toast.error(`Max marks for this test is ${maxMarks}!`);
-                                      return;
-                                    }
-                                    dispatch({
-                                      type: "SET_MARKS",
-                                      marks: {
-                                        ...marks,
-                                        [student.id]: val,
-                                      }
-                                    });
-                                    dispatch({ type: "SET_IS_DIRTY", value: true });
-                                  }}
-                                  className={`h-8 text-xs w-28 text-center font-semibold ${
-                                    hasMark && !isPass ? "border-red-300 focus:border-red-500 bg-red-50/50 dark:bg-red-900/10" : "focus:border-blue-500"
-                                  }`}
-                                />
-                                <span className="text-[11px] text-muted-foreground">/ {maxMarks}</span>
-                              </div>
-                            </div>
-                          </div>
-
-                          {hasMark && (
-                            <div className="w-full sm:w-48 flex flex-col gap-1.5 justify-center self-end pb-1">
-                              <div className="flex justify-between items-center text-[10px] font-bold uppercase tracking-wider">
-                                <span className={isPass ? "text-emerald-600 dark:text-emerald-400" : "text-red-600 dark:text-red-400"}>
-                                  {isPass ? "Pass" : "Fail"}
-                                </span>
-                                <span className="text-muted-foreground">{pct.toFixed(2).replace(/\.00$/, "")}%</span>
-                              </div>
-                              <Progress
-                                value={Math.min(pct, 100)}
-                                className={`h-1.5 [&>div]:transition-all ${
-                                  isPass ? "[&>div]:bg-emerald-500" : "[&>div]:bg-red-500"
-                                }`}
-                              />
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-
-                {isDirty && canCreate && !isActiveAssocCompleted && (
-                  <div className="mt-2 pt-4 border-t border-zinc-100 dark:border-zinc-800 bg-background sticky bottom-0 animate-in fade-in slide-in-from-bottom-3 duration-200">
-                    <Button
-                      size="lg"
-                      className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold gap-2 shadow-md py-5 text-sm transition-all flex items-center justify-center"
-                      onClick={handleSave}
-                      disabled={saving}
-                    >
-                      {saving ? (
-                        <>
-                          <Loader2 className="size-4 animate-spin" />
-                          Saving grades...
-                        </>
-                      ) : (
-                        <>
-                          <Save className="size-4 mr-1" />
-                          Save All Entered Grades
-                        </>
-                      )}
-                    </Button>
-                  </div>
-                )}
-              </div>
-            )}
-          </DialogContent>
-        </Dialog>
+        {/* Assessment Dialog for Scores Recording */}
+        <RecordScoresDialog
+          selectedAssessmentId={selectedAssessmentId}
+          activeAssessment={activeAssessment}
+          gradesLoading={gradesLoading}
+          students={students}
+          marks={marks}
+          isDirty={isDirty}
+          canCreate={canCreate}
+          saving={saving}
+          dispatch={dispatch}
+          onSave={handleSave}
+        />
 
         {/* Empty State */}
         {!loading && !listLoading && assessments.length === 0 && (
@@ -907,13 +203,13 @@ export function TeacherGrades() {
                 : "Finalized and locked assessments will appear in this archive section."}
             </p>
             {canCreate && activeTab === "active" && (
-              <Button
+              <button
+                type="button"
                 onClick={() => dispatch({ type: "SET_IS_DIALOG_OPEN", value: true })}
-                className="mt-4 bg-blue-600 hover:bg-blue-700 text-white font-semibold shadow-md transition-all duration-200"
+                className="mt-4 bg-blue-600 hover:bg-blue-700 text-white font-semibold shadow-md transition-all duration-200 px-4 py-2 rounded-lg text-sm"
               >
-                <Plus className="size-4 mr-2" />
                 Create First Assessment
-              </Button>
+              </button>
             )}
           </div>
         )}
@@ -921,39 +217,22 @@ export function TeacherGrades() {
         {/* Empty State: No Students Found */}
         {selectedAssessmentId && students.length === 0 && (
           <div className="text-center py-16 text-zinc-400 dark:text-zinc-500">
-            <BookOpen className="size-12 mx-auto mb-4 opacity-50" />
+            <Users className="size-12 mx-auto mb-4 opacity-50" />
             <p>No students found in this class</p>
           </div>
         )}
 
-        {/* Confirm Complete Dialog */}
-        <AlertDialog open={!!confirmCompleteId} onOpenChange={(open) => !open && dispatch({ type: "SET_CONFIRM_COMPLETE_ID", id: null })}>
-          <AlertDialogContent>
-            <AlertDialogHeader>
-              <AlertDialogTitle className="flex items-center gap-2">
-                <AlertTriangle className="size-5 text-amber-500 fill-amber-500/10" /> Finalize Assessment?
-              </AlertDialogTitle>
-              <AlertDialogDescription className="py-1 text-sm">
-                Once you mark this assessment as complete, all student scores will be locked and finalized. You will not be able to edit or save changes to the grades in the future. Are you sure you want to proceed?
-              </AlertDialogDescription>
-            </AlertDialogHeader>
-            <AlertDialogFooter className="mt-2">
-              <AlertDialogCancel>Cancel</AlertDialogCancel>
-              <AlertDialogAction
-                className="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold"
-                onClick={() => {
-                  if (confirmCompleteId) {
-                    handleCompleteAssessment(confirmCompleteId);
-                    dispatch({ type: "SET_CONFIRM_COMPLETE_ID", id: null });
-                  }
-                }}
-              >
-                Yes, Finalize it
-              </AlertDialogAction>
-            </AlertDialogFooter>
-          </AlertDialogContent>
-        </AlertDialog>
-
+        {/* Confirm Complete / Finalize Alert Dialog */}
+        <ConfirmFinalizeDialog
+          isOpen={!!confirmCompleteId}
+          onOpenChange={(open) => !open && dispatch({ type: "SET_CONFIRM_COMPLETE_ID", id: null })}
+          onConfirm={() => {
+            if (confirmCompleteId) {
+              handleCompleteAssessment(confirmCompleteId);
+              dispatch({ type: "SET_CONFIRM_COMPLETE_ID", id: null });
+            }
+          }}
+        />
       </div>
     </div>
   );

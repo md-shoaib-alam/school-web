@@ -1,6 +1,6 @@
 import { env } from '../env';
-export const API_BASE = env.NEXT_PUBLIC_API_URL;
-export const GRAPHQL_ENDPOINT = `${API_BASE}/graphql`
+const API_BASE = env.NEXT_PUBLIC_API_URL;
+const GRAPHQL_ENDPOINT = `${API_BASE}/graphql`
 
 function getStoredToken(): string | null {
   if (typeof window === 'undefined') return null;

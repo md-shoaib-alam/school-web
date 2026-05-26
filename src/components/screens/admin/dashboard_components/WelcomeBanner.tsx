@@ -5,7 +5,6 @@ import { GraduationCap, Users, Activity, Calendar } from "lucide-react";
 import Image from "next/image";
 
 interface WelcomeBannerProps {
-  greeting: string;
   userName: string;
   tenantName: string;
   tenantLogo: string;
@@ -19,7 +18,6 @@ interface WelcomeBannerProps {
 }
 
 export function WelcomeBanner({
-  greeting,
   userName,
   tenantName,
   tenantLogo,

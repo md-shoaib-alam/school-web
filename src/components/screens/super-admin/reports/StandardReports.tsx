@@ -92,7 +92,7 @@ export function StandardReports({
                 {report.icon}
               </div>
               <div>
-                <h4 className="text-xs font-bold text-zinc-900 dark:text-white">{report.name}</h4>
+                <h4 className="text-xs font-semibold text-zinc-900 dark:text-white">{report.name}</h4>
                 <p className="text-[10px] text-zinc-500 dark:text-zinc-400 mt-0.5 line-clamp-1 max-w-[200px] md:max-w-xs">{report.desc}</p>
                 
                 <div className="flex items-center gap-1.5 mt-2">

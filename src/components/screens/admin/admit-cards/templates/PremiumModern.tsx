@@ -30,7 +30,7 @@ export const PremiumModernAdmitCard = memo(function PremiumModernAdmitCard({ car
               </div>
             )}
             <div>
-              <h2 className="text-xs font-bold text-zinc-800 tracking-wide uppercase leading-tight">{schoolName}</h2>
+              <h2 className="text-xs font-semibold text-zinc-800 tracking-wide uppercase leading-tight">{schoolName}</h2>
               <p className="text-[8px] text-zinc-400 max-w-[150px] truncate">{schoolAddress}</p>
             </div>
           </div>

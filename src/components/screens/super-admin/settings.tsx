@@ -193,33 +193,12 @@ export function SuperAdminSettings() {
   };
 
   if (loading) {
-    return (
-      <div className="flex flex-col items-center justify-center min-h-[400px] gap-3">
-        <Loader2 className="size-8 animate-spin text-teal-600" />
-        <span className="text-sm font-medium text-muted-foreground animate-pulse">
-          Loading platform configurations...
-        </span>
-      </div>
-    );
+    return <LoadingSpinner />;
   }
 
   return (
     <div className="space-y-6 max-w-5xl mx-auto pb-8">
-      {/* Header Banner */}
-      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-teal-600 via-teal-500 to-pink-600 p-6 text-white shadow-lg">
-        <div className="absolute top-0 right-0 size-64 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/3 blur-2xl pointer-events-none" />
-        <div className="relative z-10 flex items-center gap-4">
-          <div className="size-12 rounded-xl bg-white/20 flex items-center justify-center backdrop-blur-md border border-white/30">
-            <Settings className="size-6" />
-          </div>
-          <div>
-            <h1 className="text-2xl font-semibold tracking-tight">Platform Settings</h1>
-            <p className="text-teal-50 text-sm opacity-90">
-              Configure global platform branding, regional standards, and maintenance states
-            </p>
-          </div>
-        </div>
-      </div>
+      <HeaderBanner />
 
       <div className="grid grid-cols-1 gap-6">
         {/* General Configuration Card */}
@@ -381,34 +360,74 @@ export function SuperAdminSettings() {
         </Card>
       </div>
 
-      {/* Sticky Save Bar */}
-      <div className="sticky bottom-4 z-10 mt-8">
-        <Card className="shadow-xl border border-teal-100 dark:border-teal-900 bg-white/95 dark:bg-zinc-900/95 backdrop-blur-md rounded-2xl">
-          <CardContent className="p-4 flex items-center justify-between">
-            <div className="text-xs sm:text-sm text-muted-foreground font-medium flex items-center gap-2">
-              <div className="size-2 rounded-full bg-teal-500 animate-ping" />
-              <span>Changes will be instantly synced to the database.</span>
-            </div>
-            <Button
-              onClick={handleSaveAll}
-              disabled={savingAll}
-              className="bg-teal-600 hover:bg-teal-700 text-white gap-2 rounded-xl px-5 py-2.5 shadow-md shadow-teal-600/10 hover:shadow-teal-600/20 transition-all font-semibold"
-            >
-              {savingAll ? (
-                <>
-                  <Loader2 className="size-4 animate-spin" />
-                  Saving...
-                </>
-              ) : (
-                <>
-                  <Save className="size-4" />
-                  Save Settings
-                </>
-              )}
-            </Button>
-          </CardContent>
-        </Card>
+      <StickySaveBar onSave={handleSaveAll} saving={savingAll} />
+    </div>
+  );
+}
+
+function LoadingSpinner() {
+  return (
+    <div className="flex flex-col items-center justify-center min-h-[400px] gap-3">
+      <Loader2 className="size-8 animate-spin text-teal-600" />
+      <span className="text-sm font-medium text-muted-foreground animate-pulse">
+        Loading platform configurations...
+      </span>
+    </div>
+  );
+}
+
+function HeaderBanner() {
+  return (
+    <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-teal-600 via-teal-500 to-pink-600 p-6 text-white shadow-lg">
+      <div className="absolute top-0 right-0 size-64 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/3 blur-2xl pointer-events-none" />
+      <div className="relative z-10 flex items-center gap-4">
+        <div className="size-12 rounded-xl bg-white/20 flex items-center justify-center backdrop-blur-md border border-white/30">
+          <Settings className="size-6" />
+        </div>
+        <div>
+          <h1 className="text-2xl font-semibold tracking-tight">Platform Settings</h1>
+          <p className="text-teal-50 text-sm opacity-90">
+            Configure global platform branding, regional standards, and maintenance states
+          </p>
+        </div>
       </div>
+    </div>
+  );
+}
+
+interface StickySaveBarProps {
+  onSave: () => void;
+  saving: boolean;
+}
+
+function StickySaveBar({ onSave, saving }: StickySaveBarProps) {
+  return (
+    <div className="sticky bottom-4 z-10 mt-8">
+      <Card className="shadow-xl border border-teal-100 dark:border-teal-900 bg-white/95 dark:bg-zinc-900/95 backdrop-blur-md rounded-2xl">
+        <CardContent className="p-4 flex items-center justify-between">
+          <div className="text-xs sm:text-sm text-muted-foreground font-medium flex items-center gap-2">
+            <div className="size-2 rounded-full bg-teal-500 animate-ping" />
+            <span>Changes will be instantly synced to the database.</span>
+          </div>
+          <Button
+            onClick={onSave}
+            disabled={saving}
+            className="bg-teal-600 hover:bg-teal-700 text-white gap-2 rounded-xl px-5 py-2.5 shadow-md shadow-teal-600/10 hover:shadow-teal-600/20 transition-all font-semibold"
+          >
+            {saving ? (
+              <>
+                <Loader2 className="size-4 animate-spin" />
+                Saving...
+              </>
+            ) : (
+              <>
+                <Save className="size-4" />
+                Save Settings
+              </>
+            )}
+          </Button>
+        </CardContent>
+      </Card>
     </div>
   );
 }

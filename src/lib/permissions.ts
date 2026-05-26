@@ -57,7 +57,7 @@ export function isRootAdmin(user: AppUser | null): boolean {
 /**
  * Get the permission array for a specific module
  */
-export function getModulePermissions(
+function getModulePermissions(
   user: AppUser | null,
   module: string
 ): string[] {

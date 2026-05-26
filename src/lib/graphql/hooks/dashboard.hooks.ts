@@ -20,7 +20,7 @@ export function useAdminDashboard(tenantId: string) {
   })
 }
 
-export function useDashboardSummary(tenantId: string) {
+function useDashboardSummary(tenantId: string) {
   return useQuery({
     queryKey: queryKeys.dashboardSummary(tenantId),
     queryFn: () => graphqlQuery<{ dashboardSummary: any }>(DASHBOARD_SUMMARY, { tenantId }).then(d => d.dashboardSummary),
@@ -29,7 +29,7 @@ export function useDashboardSummary(tenantId: string) {
   })
 }
 
-export function useDashboardAttendance(tenantId: string) {
+function useDashboardAttendance(tenantId: string) {
   return useQuery({
     queryKey: queryKeys.dashboardAttendance(tenantId),
     queryFn: () => graphqlQuery<{ dashboardAttendance: any[] }>(DASHBOARD_ATTENDANCE, { tenantId }).then(d => d.dashboardAttendance),
@@ -38,7 +38,7 @@ export function useDashboardAttendance(tenantId: string) {
   })
 }
 
-export function useDashboardAcademic(tenantId: string) {
+function useDashboardAcademic(tenantId: string) {
   return useQuery({
     queryKey: queryKeys.dashboardAcademic(tenantId),
     queryFn: () => graphqlQuery<{ dashboardAcademic: any }>(DASHBOARD_ACADEMIC, { tenantId }).then(d => d.dashboardAcademic),
@@ -47,7 +47,7 @@ export function useDashboardAcademic(tenantId: string) {
   })
 }
 
-export function useDashboardFinancial(tenantId: string) {
+function useDashboardFinancial(tenantId: string) {
   return useQuery({
     queryKey: queryKeys.dashboardFinancial(tenantId),
     queryFn: () => graphqlQuery<{ dashboardFinancial: any }>(DASHBOARD_FINANCIAL, { tenantId }).then(d => d.dashboardFinancial),
@@ -56,7 +56,7 @@ export function useDashboardFinancial(tenantId: string) {
   })
 }
 
-export function useDashboardNotices(tenantId: string) {
+function useDashboardNotices(tenantId: string) {
   return useQuery({
     queryKey: queryKeys.dashboardNotices(tenantId),
     queryFn: () => graphqlQuery<{ dashboardNotices: any[] }>(DASHBOARD_NOTICES, { tenantId }).then(d => d.dashboardNotices),

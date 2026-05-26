@@ -1,7 +1,7 @@
 'use client'
 
 // Core utilities
-export { API_BASE, GRAPHQL_ENDPOINT, graphqlQuery, graphqlMutate } from './core'
+export { graphqlQuery, graphqlMutate } from './core'
 
 // Query Strings
 export * from './queries'
@@ -17,7 +17,7 @@ export { useGraphQLQuery, useGraphQLMutation } from './hooks/generic.hooks'
 
 // Platform Hooks
 export { 
-  usePlatformStats, useBillingData, useTenants, useUsers, useAuditLogs, 
+  useBillingData, useTenants, useUsers, useAuditLogs, 
   useSubscriptions, useTenantDetail, useCreateTenant, useUpdateTenant, 
   useDeleteTenant, useRestoreTenant, usePermanentDeleteTenant, 
   useToggleTenantStatus, useToggleUserStatus, useCreateUser 
@@ -25,17 +25,15 @@ export {
 
 // Academic Hooks
 export { 
-  useSubjects, useClassesMin, useTeachersMin, useClasses, useTeachers, 
-  useStudents, useParents, useNotices, useFees, useAttendance, useStaff, 
-  useCustomRoles, useCreateSubject, useUpdateSubject, useDeleteSubject,
-  useCreateCustomRole, useUpdateCustomRole, useDeleteCustomRole, useAssignRoleToUser,
-  useStaffAttendance, useMarkStaffAttendance, useMarkBulkStaffAttendance
+  useClassesMin, useClasses, useTeachers, 
+  useStudents, useParents, useNotices, useStaff, 
+  useCustomRoles,
+  useCreateCustomRole, useUpdateCustomRole, useDeleteCustomRole, useAssignRoleToUser
 } from './hooks/academic.hooks'
 
 // Dashboard Hooks
 export { 
-  useAdminDashboard, useDashboardSummary, useDashboardAttendance, 
-  useDashboardAcademic, useDashboardFinancial, useDashboardNotices, 
+  useAdminDashboard, 
   useTeacherDashboard, useStudentDashboard, useParentDashboard 
 } from './hooks/dashboard.hooks'
 

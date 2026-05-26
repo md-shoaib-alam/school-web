@@ -20,4 +20,3 @@ export const clearUser = () => {
   Sentry.setUser(null);
 };
 
-export default Sentry;

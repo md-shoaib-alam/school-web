@@ -208,7 +208,8 @@ export function SuperAdminDeletedTenants() {
               <TableBody>
                 {isLoading ? (
                   <TableRow>
-                    <TableCell colSpan={4} className="h-24 text-center">Loading removal list…</TableCell>                  </TableRow>
+                    <TableCell colSpan={4} className="h-24 text-center">Loading removal list…</TableCell>
+                  </TableRow>
                 ) : tenants.length === 0 ? (
                   <TableRow>
                     <TableCell colSpan={4} className="h-32 text-center text-muted-foreground">
@@ -236,7 +237,7 @@ export function SuperAdminDeletedTenants() {
                             </div>
                           </div>
                         </TableCell>
-                         <TableCell>
+                        <TableCell>
                           <div className="flex items-center gap-2 text-sm">
                             <Calendar className="size-4 text-muted-foreground" />
                             <span>

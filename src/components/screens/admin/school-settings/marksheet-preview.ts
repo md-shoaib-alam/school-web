@@ -3,7 +3,7 @@ import { createRoot } from "react-dom/client";
 import { toast } from "sonner";
 import * as React from "react";
 
-export const MOCK_PREVIEW_SHEET = {
+const MOCK_PREVIEW_SHEET = {
   sheet: {
     studentName: "Aarav Sharma",
     rollNumber: "2026-A104",
