@@ -45,6 +45,7 @@ import {
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
 import { api, apiFetch } from "@/lib/api";
+import { cn } from "@/lib/utils";
 import * as XLSX from "xlsx";
 
 interface Student {
@@ -594,6 +595,17 @@ export function SuperAdminBulkAttendance() {
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
     return diffDays > 365;
   }, [startDate, endDate]);
+
+  // Trigger live toast alert when selected date range exceeds 365-day limit
+  useEffect(() => {
+    if (isRangeTooLarge && startDate && endDate) {
+      const diffTime = Math.abs(new Date(endDate).getTime() - new Date(startDate).getTime());
+      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+      toast.warning(`Date Range Exceeded (Out of Range)`, {
+        description: `Selected range is ${diffDays} days. The system safety limit is 365 days (1 year). Please shorten your selection.`
+      });
+    }
+  }, [isRangeTooLarge, startDate, endDate]);
 
   // Execute Student Date Range Bulk Entry
   const handleRangeImport = async () => {
@@ -1286,7 +1298,10 @@ export function SuperAdminBulkAttendance() {
                           date={parseDateString(startDate)}
                           onChange={(d) => setStartDate(formatDateToString(d))}
                           placeholder="Select start date"
-                          className="w-full bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800 h-9"
+                          className={cn(
+                            "w-full bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800 h-9 transition-colors duration-250",
+                            isRangeTooLarge && "border-rose-500/80 text-rose-600 dark:text-rose-400 focus:border-rose-500 focus:ring-rose-500/20 bg-rose-500/5"
+                          )}
                         />
                       </div>
                       <div className="space-y-2">
@@ -1295,10 +1310,29 @@ export function SuperAdminBulkAttendance() {
                           date={parseDateString(endDate)}
                           onChange={(d) => setEndDate(formatDateToString(d))}
                           placeholder="Select end date"
-                          className="w-full bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800 h-9"
+                          className={cn(
+                            "w-full bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800 h-9 transition-colors duration-250",
+                            isRangeTooLarge && "border-rose-500/80 text-rose-600 dark:text-rose-400 focus:border-rose-500 focus:ring-rose-500/20 bg-rose-500/5"
+                          )}
                         />
                       </div>
                     </div>
+
+                    {isRangeTooLarge && (
+                      <motion.div 
+                        initial={{ opacity: 0, y: -5 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className="p-3 bg-rose-500/10 dark:bg-rose-950/20 text-rose-600 dark:text-rose-400 rounded-xl border border-rose-500/20 text-[11px] flex items-start gap-2.5 leading-relaxed font-medium shrink-0 shadow-xs"
+                      >
+                        <AlertTriangle className="size-4 shrink-0 mt-0.5 animate-pulse text-rose-500" />
+                        <div>
+                          <span className="font-extrabold block text-rose-700 dark:text-rose-300 text-xs">Date Range Exceeded (Out of Range)</span>
+                          <span className="mt-0.5 block">
+                            Selected range is <strong className="font-extrabold">{Math.ceil(Math.abs(new Date(endDate).getTime() - new Date(startDate).getTime()) / (1000 * 60 * 60 * 24))} days</strong>. The maximum system safety limit is exactly <strong className="font-extrabold">365 days (1 year)</strong> to prevent server load. Please shorten your selection.
+                          </span>
+                        </div>
+                      </motion.div>
+                    )}
 
                     {/* Weekday Selector Checkbox Grid */}
                     <div className="space-y-2">
@@ -1395,12 +1429,12 @@ export function SuperAdminBulkAttendance() {
                     {isRangeTooLarge ? (
                       <div className="flex-1 flex flex-col items-center justify-center text-center text-rose-500 py-16 border border-dashed border-rose-500/30 rounded-2xl min-h-[300px] bg-rose-500/5 px-6 space-y-3">
                         <div className="size-12 rounded-full bg-rose-500/10 flex items-center justify-center text-rose-600 dark:text-rose-400 shrink-0">
-                          <AlertTriangle className="size-6 animate-pulse" />
+                          <AlertTriangle className="size-6 animate-pulse text-rose-500" />
                         </div>
                         <div className="space-y-1">
-                          <p className="text-sm font-bold">Date Range Too Large</p>
+                          <p className="text-sm font-bold text-rose-700 dark:text-rose-350">Date Range Exceeded (Out of Range)</p>
                           <p className="text-xs text-rose-600/80 dark:text-rose-400/80 max-w-xs mx-auto leading-relaxed">
-                            Selecting a range of {Math.ceil(Math.abs(new Date(endDate).getTime() - new Date(startDate).getTime()) / (1000 * 60 * 60 * 24))} days exceeds the system limit. Please select a range of <strong>365 days (1 year) or less</strong> to prevent database overhead.
+                            Selecting a range of <strong className="font-extrabold">{Math.ceil(Math.abs(new Date(endDate).getTime() - new Date(startDate).getTime()) / (1000 * 60 * 60 * 24))} days</strong> exceeds the allowed safety limit. Please select a range of <strong>365 days (1 year) or less</strong> to prevent server load.
                           </p>
                         </div>
                       </div>

@@ -24,6 +24,19 @@ interface DatePickerProps {
 export function DatePicker({ date, onChange, placeholder = 'Pick a date', className, disabled }: DatePickerProps) {
   const [open, setOpen] = React.useState(false);
 
+  // Memoize the date reference based on its time value to prevent infinite render loops 
+  // in calendar components when new Date references are passed on every parent render.
+  const memoizedDate = React.useMemo(() => date, [date?.getTime()]);
+
+  // Sync visible month state when popover opens or when memoizedDate changes
+  const [month, setMonth] = React.useState<Date | undefined>(date);
+
+  React.useEffect(() => {
+    if (open) {
+      setMonth(memoizedDate || new Date());
+    }
+  }, [open, memoizedDate]);
+
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
@@ -31,21 +44,25 @@ export function DatePicker({ date, onChange, placeholder = 'Pick a date', classN
           variant={"outline"}
           className={cn(
             "h-9 justify-start gap-2 text-left font-normal px-3 bg-background border-muted-foreground/20 hover:bg-muted/50 transition-all",
-            !date && "text-muted-foreground",
+            !memoizedDate && "text-muted-foreground",
             className
           )}
         >
           <CalendarIcon className="size-3.5 text-muted-foreground opacity-70" />
           <span className="text-[11px] font-medium truncate" suppressHydrationWarning>
-            {date ? format(date, "PP") : placeholder}
+            {memoizedDate ? format(memoizedDate, "PP") : placeholder}
           </span>
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-auto p-0" align="start">
         <Calendar
           mode="single"
-          selected={date}
-          defaultMonth={date}
+          selected={memoizedDate}
+          month={month}
+          onMonthChange={setMonth}
+          captionLayout="dropdown"
+          startMonth={new Date(2000, 0)}
+          endMonth={new Date(new Date().getFullYear() + 5, 11)}
           onSelect={(d) => {
             onChange?.(d);
             setOpen(false);
