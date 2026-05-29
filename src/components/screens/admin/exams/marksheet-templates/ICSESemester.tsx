@@ -144,7 +144,7 @@ export const ICSESemester: React.FC<MarksheetTemplateProps> = ({
 
       {/* ICSE Formal Sign-off segment */}
       <div className="flex justify-between items-end text-[9.5px] font-bold text-zinc-400 border-t-2 border-violet-900 pt-4 mt-2 font-sans z-10">
-        <div>COUNCIL REGISTRY STATEMENT — CISCE SYSTEM</div>
+        <div>COUNCIL REGISTRY STATEMENT: CISCE SYSTEM</div>
         <div className="flex gap-10">
           <div className="flex flex-col items-center">
             <div className="w-[100px] border-b border-zinc-300 mb-1" />

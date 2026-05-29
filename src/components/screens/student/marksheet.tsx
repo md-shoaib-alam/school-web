@@ -98,6 +98,8 @@ export function StudentMarksheet() {
   const { academicYears } = useAcademicYears();
   const searchParams = useSearchParams();
   const studentIdParam = searchParams.get('studentId');
+  const examTypeParam = searchParams.get('examType'); // e.g. 'midterm' or 'final' passed from banner
+  const examYearParam = searchParams.get('academicYear'); // optional year from banner
 
   const [state, dispatch] = useReducer(reducer, initialState);
   const {
@@ -112,10 +114,23 @@ export function StudentMarksheet() {
 
   useEffect(() => {
     if (academicYears.length > 0 && !selectedYear) {
-      const current = academicYears.find((y: any) => y.isCurrent) || academicYears[0];
+      // If the banner passed an academic year, use that; otherwise pick current
+      const targetYear = examYearParam
+        ? academicYears.find((y: any) => y.name === examYearParam)
+        : null;
+      const current = targetYear || academicYears.find((y: any) => y.isCurrent) || academicYears[0];
       if (current) dispatch({ type: 'SET_SELECTED_YEAR', payload: current.name });
     }
-  }, [academicYears, selectedYear]);
+  }, [academicYears, selectedYear, examYearParam]);
+
+  // Auto-select exam type from URL param (set by result banner click)
+  useEffect(() => {
+    if (!examTypeParam) return;
+    const normalized = examTypeParam.toLowerCase().replace(/[\s-]/g, '') as 'midterm' | 'final';
+    if (normalized === 'midterm' || normalized === 'final') {
+      dispatch({ type: 'SET_MARKSHEET_TYPE', payload: normalized });
+    }
+  }, [examTypeParam]);
 
   useEffect(() => {
     if (!selectedYear) return;

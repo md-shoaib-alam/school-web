@@ -9,6 +9,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Button } from "@/components/ui/button";
+import { useRouter, useParams } from "next/navigation";
 import {
   Table,
   TableBody,
@@ -31,8 +33,10 @@ import {
   UserCheck,
   CheckCircle2,
   AlertCircle,
+  Trophy,
 } from "lucide-react";
 import { FullPageSkeleton } from "@/components/ui/full-page-skeleton";
+import { ResultPublishedBanner } from "@/components/shared/result-published-banner";
 
 const formatDate = (dateStr: string) => {
   if (!dateStr) return "";
@@ -57,6 +61,8 @@ const getSlotStatus = (startTime: string, endTime: string) => {
 };
 
 export function StudentDashboard() {
+  const { push } = useRouter();
+  const { slug } = useParams();
   const { currentUser, currentTenantName, currentTenantLogo } = useAppStore();
   const { data, isPending, fetchStatus, isError, error } = useStudentDashboard(
     currentUser?.email,
@@ -166,6 +172,9 @@ export function StudentDashboard() {
           </div>
         </div>
       </div>
+
+      {/* Result Published Notification */}
+      <ResultPublishedBanner />
 
       {/* Stats Cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">

@@ -49,7 +49,7 @@ export function AssignRoleDialog({
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <UserPlus className="size-5 text-blue-600" />
-            Manage Staff — {activeRole?.name}
+            Manage Staff: {activeRole?.name}
           </DialogTitle>
           <DialogDescription>
             Assign or remove this role from teachers and staff members

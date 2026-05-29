@@ -144,7 +144,7 @@ export function StaffTable({
                         <div className="flex items-center gap-1.5 min-w-0 opacity-60">
                           <Phone className="size-3 text-muted-foreground shrink-0" />
                           <span className="text-[10px] font-bold truncate">
-                            {member.phone || "—"}
+                            {member.phone || "–"}
                           </span>
                         </div>
                       </div>

@@ -169,7 +169,7 @@ export function PromotionsTable({
                           </div>
                         ) : (
                           <span className="text-xs text-muted-foreground">
-                            —
+                            –
                           </span>
                         )}
                       </TableCell>

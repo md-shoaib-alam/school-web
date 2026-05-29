@@ -38,16 +38,16 @@ const formatDate = (dateStr: string) => {
 };
 
 export function TeacherDashboard() {
-  const router = useRouter();
+  const { push } = useRouter();
   const { currentUser, currentTenantSlug, currentTenantId, setCurrentScreen } = useAppStore();
 
   const navigateTo = (screen: string) => {
     setCurrentScreen(screen);
     const tid = currentTenantSlug || currentTenantId || currentUser?.tenantSlug || currentUser?.tenantId;
     if (tid) {
-      router.push(`/${tid}/${screen}`);
+      push(`/${tid}/${screen}`);
     } else {
-      router.push(`/${screen}`);
+      push(`/${screen}`);
     }
   };
 

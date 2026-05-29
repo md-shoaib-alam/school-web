@@ -72,9 +72,8 @@ export function ActiveEventsCard({
         ) : (
           <div className="space-y-2.5">
             {activeEventsList.map((ev) => (
-              <button 
+              <div 
                 key={ev.id} 
-                type="button"
                 onClick={() => onDetailClick(ev)}
                 tabIndex={0}
                 onKeyDown={(e) => {
@@ -116,7 +115,7 @@ export function ActiveEventsCard({
                     )}
                   </div>
                 </div>
-              </button>
+              </div>
             ))}
           </div>
         )}

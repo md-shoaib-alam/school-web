@@ -221,7 +221,7 @@ export function StudentLeaves() {
                       <div className="space-y-1 bg-muted/30 p-2 rounded text-sm">
                         <span className="text-[10px] uppercase tracking-wider text-muted-foreground font-medium block">Reason</span>
                         <p className="text-foreground/90 leading-relaxed italic">
-                          {leave.reason || '—'}
+                          {leave.reason || '–'}
                         </p>
                       </div>
 
@@ -278,7 +278,7 @@ export function StudentLeaves() {
                           <TableCell className="text-sm">{leave.startDate}</TableCell>
                           <TableCell className="text-sm">{leave.endDate}</TableCell>
                           <TableCell className="text-sm truncate max-w-[200px]">
-                            {leave.reason || '—'}
+                            {leave.reason || '–'}
                           </TableCell>
                           <TableCell className="text-center">
                             <Badge className={statusConfig[leave.status]?.bg}>

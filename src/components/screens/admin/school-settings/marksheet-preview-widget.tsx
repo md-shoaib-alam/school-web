@@ -106,13 +106,13 @@ export function MarksheetTemplatePreviewWidget({ templateId, isEnabled }: { temp
         {/* Real browser tabs */}
         <div className="flex-1 flex gap-1 items-end max-w-[190px] h-6 overflow-hidden">
           <div className={`h-5 px-2 rounded-t-md text-[8px] font-medium flex items-center gap-1 shrink-0 transition-colors ${
-            isEnabled ? "bg-white dark:bg-zinc-950 text-violet-650 dark:text-violet-400 border-t border-x border-zinc-200 dark:border-zinc-800" : "bg-zinc-100/60 dark:bg-zinc-900/60 text-zinc-400 dark:text-zinc-500"
+            isEnabled ? "bg-white dark:bg-zinc-950 text-violet-655 dark:text-violet-400 border-t border-x border-zinc-200 dark:border-zinc-800" : "bg-zinc-100/60 dark:bg-zinc-900/60 text-zinc-400 dark:text-zinc-500"
           }`}>
-            🏫 Portal
+            Portal
           </div>
           {!isEnabled && (
             <div className="h-5 px-2 rounded-t-md bg-white dark:bg-zinc-950 text-violet-655 dark:text-violet-400 border-t border-x border-zinc-200 dark:border-zinc-800/80 text-[8px] font-semibold flex items-center gap-1 animate-in slide-in-from-bottom-2 shrink-0">
-              📄 Marksheet
+              Marksheet
             </div>
           )}
         </div>
@@ -133,7 +133,7 @@ export function MarksheetTemplatePreviewWidget({ templateId, isEnabled }: { temp
             <div className="h-2.5 w-8 bg-violet-500/10 border border-violet-500/20 rounded-sm" />
           </div>
           <div className="space-y-1">
-            <div className="h-1.5 w-full bg-zinc-200/60 dark:bg-zinc-805/55 rounded-sm" />
+            <div className="h-1.5 w-full bg-zinc-200/60 dark:bg-zinc-855/55 rounded-sm" />
             <div className="h-1.5 w-full bg-zinc-100 dark:bg-zinc-900/60 rounded-sm" />
           </div>
         </div>
@@ -156,18 +156,18 @@ export function MarksheetTemplatePreviewWidget({ templateId, isEnabled }: { temp
                   <span className="size-1 bg-violet-500 shrink-0" />
                   <span className="text-[6.5px] font-bold text-zinc-700 dark:text-zinc-300 truncate">{style.title}</span>
                 </div>
-                <span className="text-[6px] text-zinc-400 dark:text-zinc-500">✕</span>
+                <span className="text-[6px] text-zinc-400 dark:text-zinc-550">✕</span>
               </div>
               
               {/* Mini Report Sheet Mockup */}
               <div className="flex-1 bg-zinc-50 dark:bg-zinc-950 rounded border border-zinc-100 dark:border-zinc-850 p-1 flex flex-col gap-0.5 overflow-hidden">
-                <div className="grid grid-cols-4 gap-0.5 border-b border-zinc-200 dark:border-zinc-900 pb-0.5 text-[4.5px] text-zinc-400 dark:text-zinc-550 font-bold">
+                <div className="grid grid-cols-4 gap-0.5 border-b border-zinc-200 dark:border-zinc-900 pb-0.5 text-[4.5px] text-zinc-400 dark:text-zinc-555 font-bold">
                   <span>Subject</span>
                   <span>Marks</span>
                   <span>Grade</span>
                   <span className="text-right">Result</span>
                 </div>
-                <div className="grid grid-cols-4 gap-0.5 items-center text-[4.5px] text-zinc-600 dark:text-zinc-400">
+                <div className="grid grid-cols-4 gap-0.5 items-center text-[4.5px] text-zinc-655 dark:text-zinc-400">
                   <span className="text-zinc-800 dark:text-zinc-300 truncate font-semibold">Maths</span>
                   <span>95/100</span>
                   <span className={`font-semibold ${style.accentText}`}>{style.accentText.includes("blue") ? "A+" : style.accentText.includes("royal") ? "A" : "A+"}</span>
@@ -177,7 +177,7 @@ export function MarksheetTemplatePreviewWidget({ templateId, isEnabled }: { temp
 
               {/* Action close button */}
               <div className="flex justify-between items-center mt-1 border-t border-zinc-100 dark:border-zinc-800 pt-0.5">
-                <span className="text-[4.5px] text-zinc-400 dark:text-zinc-500">Esc key to exit</span>
+                <span className="text-[4.5px] text-zinc-400 dark:text-zinc-550">Esc key to exit</span>
                 <span className="px-1 py-0.5 bg-violet-650 dark:bg-violet-600 rounded text-[5px] text-white font-semibold flex items-center leading-none">
                   Print Marksheet
                 </span>
@@ -219,19 +219,13 @@ export function MarksheetTemplatePreviewWidget({ templateId, isEnabled }: { temp
 
                 <div className="flex-1 my-1 border border-dashed border-zinc-200 dark:border-zinc-800 rounded p-0.5 flex flex-col gap-0.5 bg-zinc-50/50 dark:bg-zinc-900/40 justify-center">
                   <div className="flex items-center gap-1 justify-center">
-                    <span className="text-[12px] animate-[float_2.5s_ease-out_infinite]">📄</span>
-                    <style>{`
-                      @keyframes float {
-                        0%, 100% { transform: translateY(0); }
-                        50% { transform: translateY(-4px); }
-                      }
-                    `}</style>
-                    <div className="flex flex-col gap-0.5">
-                      <span className="text-[5px] text-zinc-600 dark:text-zinc-400">Class teacher copy</span>
-                      <span className="text-[4px] text-zinc-400 dark:text-zinc-550 font-medium">Dual monitor print preview ready</span>
+                    <div className="flex flex-col gap-0.5 leading-tight">
+                      <span className="text-[5px] text-zinc-650 dark:text-zinc-400">Class teacher copy</span>
+                      <span className="text-[4px] text-zinc-450 dark:text-zinc-550 font-medium">Dual monitor print preview ready</span>
                     </div>
                   </div>
                 </div>
+
 
                 <div className="flex items-center justify-between text-[4px] text-zinc-400 dark:text-zinc-500">
                   <span>Zoom: 100%</span>

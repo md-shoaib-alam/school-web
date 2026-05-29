@@ -16,6 +16,7 @@ export interface SubmissionsDialogProps {
   bulkSaving: boolean;
   dispatch: React.Dispatch<Action>;
   handleBulkSave: () => void;
+  showCompleted?: boolean;
 }
 
 export function SubmissionsDialog({
@@ -27,6 +28,7 @@ export function SubmissionsDialog({
   bulkSaving,
   dispatch,
   handleBulkSave,
+  showCompleted = false,
 }: SubmissionsDialogProps) {
   return (
     <Dialog
@@ -65,7 +67,7 @@ export function SubmissionsDialog({
               {submissions.map((sub) => {
                 const isOfflinePending =
                   selectedAssignment?.mode === "offline" && sub.status === "not_submitted";
-                const canGrade = sub.status === "submitted" || isOfflinePending;
+                const canGrade = !showCompleted && (sub.status === "submitted" || isOfflinePending);
 
                 return (
                   <div

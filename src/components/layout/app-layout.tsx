@@ -39,7 +39,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
   } = useAppStore();
 
   const pathname = usePathname();
-  const router = useRouter();
+  const { push } = useRouter();
   const [isChangePasswordOpen, setIsChangePasswordOpen] = useState(false);
 
   // Sync tenant context from slug
@@ -153,11 +153,13 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
       "dashboard",
       "tenants",
       "deleted-tenants",
+      "bulk-attendance-import",
       "billing",
       "users",
       "audit-logs",
       "platform-analytics",
       "feature-flags",
+      "roadmap",
       "roles",
       "staff",
       "manage-admins",
@@ -170,17 +172,17 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
     ].includes(screen);
 
     if (isSuperAdmin && isPlatformRoute) {
-      router.push(`/${screen}`);
+      push(`/${screen}`);
       return;
     }
 
     // Always use the full /[tenant]/[screen] pattern
     if (!tenantIdentifier) {
-      router.push(`/${screen}`);
+      push(`/${screen}`);
     } else {
-      router.push(`/${tenantIdentifier}/${screen}`);
+      push(`/${tenantIdentifier}/${screen}`);
     }
-  }, [currentScreen, currentTenantId, currentTenantSlug, isSuperAdmin, router, setCurrentScreen, setSidebarOpen]);
+  }, [currentScreen, currentTenantId, currentTenantSlug, isSuperAdmin, push, setCurrentScreen, setSidebarOpen]);
 
   // Listen for navigation events from children (e.g. SuperAdminDashboard Quick Actions)
   useEffect(() => {

@@ -78,7 +78,7 @@ export function BulkPromoteTab({
                     .sort((a, b) => getNumericGrade(a.grade) - getNumericGrade(b.grade))
                     .map((c) => (
                       <SelectItem key={c.id} value={c.id}>
-                        {c.name}-{c.section} (Grade {c.grade}) — {c.studentCount} students
+                        {c.name}-{c.section} (Grade {c.grade}), {c.studentCount} students
                       </SelectItem>
                     ))}
                 </SelectContent>
@@ -86,7 +86,7 @@ export function BulkPromoteTab({
               {bulkFromClass && isLastClass(bulkFromClass, classes) && (
                 <div className="flex items-center gap-2 text-sm text-violet-600 dark:text-violet-400 bg-violet-50 dark:bg-violet-900/20 rounded-lg px-3 py-2 border border-violet-200 dark:border-violet-800">
                   <GraduationCap className="size-4 shrink-0" />
-                  <span>This is the highest class — students should be <strong>graduated</strong> instead.</span>
+                  <span>This is the highest class: students should be <strong>graduated</strong> instead.</span>
                 </div>
               )}
             </div>

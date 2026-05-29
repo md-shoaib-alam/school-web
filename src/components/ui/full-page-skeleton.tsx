@@ -1,7 +1,7 @@
 "use client";
 
 /**
- * FullPageSkeleton — shown while the app shell / dynamic chunks are loading.
+ * FullPageSkeleton - shown while the app shell / dynamic chunks are loading.
  * Uses pure CSS animate-pulse. No boneyard-js/react used here.
  */
 export function FullPageSkeleton() {
@@ -25,7 +25,7 @@ export function FullPageSkeleton() {
   );
 }
 
-/** Shimmer block — building block for all skeleton shapes */
+/** Shimmer block - building block for all skeleton shapes */
 function ShimmerBox({ className }: { className?: string }) {
   return (
     <div
@@ -39,7 +39,7 @@ function ShimmerBox({ className }: { className?: string }) {
   );
 }
 
-/** Content area skeleton — generic header + stats + table */
+/** Content area skeleton - generic header + stats + table */
 function ContentSkeleton() {
   return (
     <div className="space-y-5">

@@ -45,7 +45,7 @@ export function formatDate(dateStr: string): string {
 }
 
 export function formatTime(time: string): string {
-  if (!time) return '—';
+  if (!time) return '–';
   const [h, m] = time.split(':').map(Number);
   const ampm = h >= 12 ? 'PM' : 'AM';
   const hour = h % 12 || 12;

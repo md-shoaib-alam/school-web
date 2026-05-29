@@ -1,5 +1,5 @@
 /**
- * Centralized API client — all requests go to ElysiaJS backend.
+ * Centralized API client : all requests go to ElysiaJS backend.
  */
 
 import { env } from './env';
@@ -122,7 +122,7 @@ export const api = {
   },
 };
 
-/** Login via Elysia — returns token + user data */
+/** Login via Elysia : returns token + user data */
 export async function loginWithElysia(email: string, password: string) {
   const res = await fetch(`${API_BASE}/auth/login`, {
     method: 'POST',

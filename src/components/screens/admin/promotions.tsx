@@ -326,7 +326,7 @@ export function AdminPromotions({ initialTab: propTab }: { initialTab?: "individ
     ? students.filter((s) => s.classId === gradClassId)
     : [];
 
-  // Handle grad class change — select all by default
+  // Handle grad class change - select all by default
   const handleGradClassChange = (classId: string) => {
     const previewStudents = classId
       ? students.filter((s) => s.classId === classId)

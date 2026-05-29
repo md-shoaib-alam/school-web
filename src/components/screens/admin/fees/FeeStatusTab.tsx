@@ -226,7 +226,7 @@ export function FeeStatusTab() {
                               <TableRow key={fee.id} className="hover:bg-emerald-50/50 dark:hover:bg-emerald-900/20 transition-colors">
                                 <TableCell className="font-medium text-sm">{fee.feeCategoryName || fee.type}</TableCell>
                                 <TableCell className="hidden sm:table-cell text-sm">₹{fee.amount.toLocaleString()}</TableCell>
-                                <TableCell className="hidden md:table-cell text-sm text-amber-600">{fee.concession > 0 ? `-₹${fee.concession.toLocaleString()}` : '—'}</TableCell>
+                                <TableCell className="hidden md:table-cell text-sm text-amber-600">{fee.concession > 0 ? `-₹${fee.concession.toLocaleString()}` : '–'}</TableCell>
                                 <TableCell className="hidden md:table-cell text-sm font-medium">₹{payable.toLocaleString()}</TableCell>
                                 <TableCell className="hidden sm:table-cell text-sm text-emerald-600 font-medium">₹{fee.paidAmount.toLocaleString()}</TableCell>
                                 <TableCell className="hidden lg:table-cell text-sm text-muted-foreground">{fee.dueDate}</TableCell>

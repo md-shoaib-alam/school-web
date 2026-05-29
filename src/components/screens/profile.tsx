@@ -21,7 +21,7 @@ import { QuickActions } from "./profile/QuickActions";
 import { EditProfileDialog } from "./profile/EditProfileDialog";
 
 export function UserProfileScreen() {
-  const router = useRouter();
+  const { push, replace } = useRouter();
   const { theme, setTheme } = useTheme();
   const { currentUser, currentTenantName, currentTenantSlug, logout } = useAppStore();
   const [copiedField, setCopiedField] = useState<string | null>(null);
@@ -67,7 +67,7 @@ export function UserProfileScreen() {
 
   const handleLogout = () => {
     logout();
-    router.replace("/");
+    replace("/");
     toast.success("Successfully logged out");
   };
 
@@ -180,7 +180,7 @@ export function UserProfileScreen() {
             role={currentUser.role}
             onPasswordChange={handlePasswordChange}
             onLogout={handleLogout}
-            onSubscriptionClick={() => router.push(currentUser.role === "admin" ? "school-subscription" : "subscription")}
+            onSubscriptionClick={() => push(currentUser.role === "admin" ? "school-subscription" : "subscription")}
           />
         </div>
       </div>

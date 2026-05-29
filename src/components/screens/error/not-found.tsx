@@ -7,7 +7,7 @@ import { useAppStore } from "@/store/use-app-store";
 import { LogOut } from "lucide-react";
 
 export function NotFoundScreen() {
-  const router = useRouter();
+  const { push } = useRouter();
   const { logout, isLoggedIn } = useAppStore();
 
   const [mounted, setMounted] = useState(false);
@@ -17,12 +17,12 @@ export function NotFoundScreen() {
   }, []);
 
   const goHome = () => {
-    router.push("/");
+    push("/");
   };
 
   const handleLogout = () => {
     logout();
-    router.push("/");
+    push("/");
   };
 
   return (

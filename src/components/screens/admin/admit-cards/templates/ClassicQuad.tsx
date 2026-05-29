@@ -68,7 +68,7 @@ export const ClassicQuadAdmitCard = memo(function ClassicQuadAdmitCard({ card }:
               </div>
               <div>
                 <p className="text-[9px] text-zinc-400 uppercase font-medium">Guardian Name</p>
-                <p className="font-medium text-zinc-800 truncate">{card.student.parentName || '—'}</p>
+                <p className="font-medium text-zinc-800 truncate">{card.student.parentName || '–'}</p>
               </div>
               <div>
                 <p className="text-[9px] text-zinc-400 uppercase font-medium">Class</p>

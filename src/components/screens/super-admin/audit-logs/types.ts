@@ -80,7 +80,7 @@ export function truncateJson(jsonStr: string, maxLen: number = 60): string {
 }
 
 export function formatTimestamp(dateStr: string): string {
-  if (!dateStr) return "—";
+  if (!dateStr) return "–";
   const num = Number(dateStr);
   const date = !isNaN(num) && dateStr.length > 10 ? new Date(num) : new Date(dateStr);
 

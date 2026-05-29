@@ -10,6 +10,7 @@ export interface AssignmentGridProps {
   completingId: string | null;
   dispatch: React.Dispatch<Action>;
   handleViewSubmissions: (assignment: Assignment) => void;
+  showCompleted?: boolean;
 }
 
 export function AssignmentGrid({
@@ -17,6 +18,7 @@ export function AssignmentGrid({
   completingId,
   dispatch,
   handleViewSubmissions,
+  showCompleted = false,
 }: AssignmentGridProps) {
   const isOverdue = (dueDate: string) => new Date(dueDate) < new Date();
   const getSubmissionPct = (a: Assignment) =>
@@ -120,20 +122,22 @@ export function AssignmentGrid({
                   <Eye className="size-3.5" />
                   View Submissions ({assignment.submissions})
                 </Button>
-                <Button
-                  variant="secondary"
-                  size="sm"
-                  className="w-full text-xs gap-1.5 bg-emerald-50 dark:bg-emerald-950/30 text-emerald-700 dark:text-emerald-400 hover:bg-emerald-100 dark:hover:bg-emerald-900/40 border border-emerald-200/50 dark:border-emerald-800/50"
-                  onClick={() => dispatch({ type: "SET_CONFIRM_COMPLETE_ID", payload: assignment.id })}
-                  disabled={completingId === assignment.id}
-                >
-                  {completingId === assignment.id ? (
-                    <Loader2 className="size-3.5 animate-spin" />
-                  ) : (
-                    <Check className="size-3.5" />
-                  )}
-                  Mark Complete
-                </Button>
+                {!showCompleted && (
+                  <Button
+                    variant="secondary"
+                    size="sm"
+                    className="w-full text-xs gap-1.5 bg-emerald-50 dark:bg-emerald-950/30 text-emerald-700 dark:text-emerald-400 hover:bg-emerald-100 dark:hover:bg-emerald-900/40 border border-emerald-200/50 dark:border-emerald-800/50"
+                    onClick={() => dispatch({ type: "SET_CONFIRM_COMPLETE_ID", payload: assignment.id })}
+                    disabled={completingId === assignment.id}
+                  >
+                    {completingId === assignment.id ? (
+                      <Loader2 className="size-3.5 animate-spin" />
+                    ) : (
+                      <Check className="size-3.5" />
+                    )}
+                    Mark Complete
+                  </Button>
+                )}
               </div>
             </CardContent>
           </Card>

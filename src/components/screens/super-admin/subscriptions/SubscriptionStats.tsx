@@ -1,12 +1,9 @@
-import { Crown, IndianRupee, Building2, Plus } from "lucide-react";
+import { Crown, IndianRupee, Building2, Plus, Search, Check, ChevronsUpDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { useState, useMemo } from "react";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Input } from "@/components/ui/input";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 interface SubscriptionStatsProps {
   stats: any;
@@ -25,6 +22,14 @@ export function SubscriptionStats({
   onNewSetup,
   parentsTotal,
 }: SubscriptionStatsProps) {
+  const [open, setOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const filteredTenants = useMemo(() => {
+    return tenants.filter((t) =>
+      t.name.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+  }, [tenants, searchQuery]);
   return (
     <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-teal-950 via-teal-900 to-teal-800 p-6 text-white shadow-lg">
       <div className="absolute top-0 right-0 size-64 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/3" />
@@ -47,22 +52,68 @@ export function SubscriptionStats({
           <div className="flex items-center gap-3">
             <div className="bg-white/10 backdrop-blur-md rounded-lg border border-white/20 p-1 flex items-center gap-2">
               <Building2 className="size-4 ml-2 text-teal-200" />
-              <Select
-                value={selectedTenant}
-                onValueChange={onTenantChange}
-              >
-                <SelectTrigger className="w-[200px] bg-transparent border-0 text-white focus:ring-0">
-                  <SelectValue placeholder="Select School" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Schools</SelectItem>
-                  {tenants.map((t) => (
-                    <SelectItem key={t.id} value={t.id}>
-                      {t.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <Popover open={open} onOpenChange={setOpen}>
+                <PopoverTrigger asChild>
+                  <Button 
+                    variant="ghost" 
+                    role="combobox"
+                    aria-expanded={open}
+                    className="w-[200px] justify-between cursor-pointer capitalize text-white hover:bg-white/10 hover:text-white border-0 h-8 font-normal px-2 text-xs"
+                  >
+                    <span className="truncate">
+                      {selectedTenant === "all" ? "All Schools" : (tenants.find(t => t.id === selectedTenant)?.name || "Select School")}
+                    </span>
+                    <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50 text-teal-200" />
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-[260px] p-0 border border-zinc-200 dark:border-zinc-850 bg-white dark:bg-zinc-950 shadow-xl text-zinc-950 dark:text-white" align="end">
+                  <div className="flex items-center border-b px-3 border-zinc-200 dark:border-zinc-800">
+                    <Search className="mr-2 h-4 w-4 shrink-0 opacity-50" />
+                    <Input 
+                      placeholder="Search schools..." 
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      className="flex h-9 w-full rounded-md bg-transparent py-3 text-xs outline-none border-none focus-visible:ring-0 focus-visible:ring-offset-0 placeholder:text-muted-foreground text-zinc-950 dark:text-white"
+                    />
+                  </div>
+                  <ScrollArea className="h-48 p-1">
+                    <button
+                      onClick={() => {
+                        onTenantChange("all");
+                        setOpen(false);
+                        setSearchQuery("");
+                      }}
+                      className="flex items-center justify-between w-full text-left px-3 py-1.5 text-xs hover:bg-teal-500/10 dark:hover:bg-teal-500/20 rounded-md transition-colors cursor-pointer group"
+                    >
+                      <span className="font-medium text-zinc-900 dark:text-zinc-100 group-hover:text-teal-600 dark:group-hover:text-teal-400">All Schools</span>
+                      {selectedTenant === "all" && (
+                        <Check className="h-3.5 w-3.5 text-teal-600 shrink-0" />
+                      )}
+                    </button>
+                    
+                    {filteredTenants.length === 0 ? (
+                      <div className="p-3 text-xs text-muted-foreground text-center">No schools found.</div>
+                    ) : (
+                      filteredTenants.map((t) => (
+                        <button
+                          key={t.id}
+                          onClick={() => {
+                            onTenantChange(t.id);
+                            setOpen(false);
+                            setSearchQuery("");
+                          }}
+                          className="flex items-center justify-between w-full text-left px-3 py-1.5 text-xs hover:bg-teal-500/10 dark:hover:bg-teal-500/20 rounded-md transition-colors cursor-pointer group"
+                        >
+                          <span className="font-medium text-zinc-900 dark:text-zinc-100 truncate pr-2 group-hover:text-teal-600 dark:group-hover:text-teal-400">{t.name}</span>
+                          {selectedTenant === t.id && (
+                            <Check className="h-3.5 w-3.5 text-teal-600 shrink-0" />
+                          )}
+                        </button>
+                      ))
+                    )}
+                  </ScrollArea>
+                </PopoverContent>
+              </Popover>
             </div>
             {selectedTenant !== "all" && (
               <Button
@@ -112,7 +163,7 @@ export function SubscriptionStats({
             </p>
             <p className="text-xl font-bold mt-0.5 text-emerald-300">
               {selectedTenant === "all"
-                ? "—"
+                ? "–"
                 : Math.max(0, parentsTotal - (stats?.totalSubscriptions || 0))}
             </p>
           </div>

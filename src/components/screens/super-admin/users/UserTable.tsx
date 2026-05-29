@@ -215,7 +215,7 @@ export function UserTable({
                             <span className="text-xs font-bold text-zinc-700 dark:text-zinc-300 truncate max-w-[140px]">{user.tenant.name}</span>
                           </div>
                         ) : (
-                          <span className="text-xs font-bold text-muted-foreground opacity-50">—</span>
+                          <span className="text-xs font-bold text-muted-foreground opacity-50">-</span>
                         )}
                       </TableCell>
                       <TableCell className="py-4">

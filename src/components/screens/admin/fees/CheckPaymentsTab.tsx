@@ -353,7 +353,7 @@ export function CheckPaymentsTab() {
                           <div className={`inline-flex items-center gap-1.5 px-2 py-1 rounded-md text-xs font-medium capitalize ${cfg.color}`}>{cfg.icon}{p.paymentMethod}</div>
                         </TableCell>
                         <TableCell className="hidden sm:table-cell text-sm text-muted-foreground">₹{p.totalAmount.toLocaleString()}</TableCell>
-                        <TableCell className="hidden sm:table-cell text-sm text-amber-600 dark:text-amber-400">{p.concessionTotal > 0 ? `-₹${p.concessionTotal.toLocaleString()}` : '—'}</TableCell>
+                        <TableCell className="hidden sm:table-cell text-sm text-amber-600 dark:text-amber-400">{p.concessionTotal > 0 ? `-₹${p.concessionTotal.toLocaleString()}` : '–'}</TableCell>
                         <TableCell><span className="font-semibold text-sm text-emerald-600 dark:text-emerald-400">₹{p.paidAmount.toLocaleString()}</span></TableCell>
                         <TableCell className="hidden md:table-cell text-sm text-muted-foreground">{p.paidDate}</TableCell>
                         <TableCell className="text-center">
