@@ -46,6 +46,7 @@ import {
   Send,
   Smartphone,
   Trash2,
+  ListTodo,
 } from "lucide-react";
 import { type UserRole } from "@/store/use-app-store";
 
@@ -126,10 +127,22 @@ export const navItems: Record<UserRole, NavItem[]> = {
 
     // Platform Control
     {
-      key: "feature-flags",
-      label: "Feature Flags",
+      key: "feature-control",
+      label: "Feature Control",
       icon: <Blocks className="size-4" />,
       permModule: "feature-flags",
+      children: [
+        {
+          key: "feature-flags",
+          label: "Feature Flags",
+          icon: <Blocks className="size-4" />,
+        },
+        {
+          key: "roadmap",
+          label: "Product Roadmap",
+          icon: <ListTodo className="size-4" />,
+        },
+      ],
     },
     {
       key: "roles",

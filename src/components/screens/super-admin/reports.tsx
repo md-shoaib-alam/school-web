@@ -74,12 +74,12 @@ export function SuperAdminReports() {
 
   // Mock fallbacks in case the system is running with zero records in development
   const mockSchools = useMemo(() => [
-    { name: "Greenwood High", principal: "Dr. Sarah Johnson", plan: "Premium+", studentsCount: 850, teachersCount: 65, status: "Active", email: "admin@greenwood.edu", phone: "+15550192", establishedDate: "2022-05-15" },
-    { name: "Riverside Academy", principal: "Mr. Michael Chen", plan: "Enterprise", studentsCount: 620, teachersCount: 48, status: "Active", email: "contact@riverside.edu", phone: "+15550143", establishedDate: "2021-08-10" },
-    { name: "Maple Leaf Elementary", principal: "Mrs. Emily Williams", plan: "Basic", studentsCount: 420, teachersCount: 32, status: "Active", email: "info@mapleleaf.edu", phone: "+15550188", establishedDate: "2023-01-20" },
-    { name: "Summit Learning", principal: "Dr. Robert Martin", plan: "Enterprise", studentsCount: 980, teachersCount: 78, status: "Active", email: "info@summitlearning.edu", phone: "+15550129", establishedDate: "2020-11-05" },
-    { name: "Lakeside Middle", principal: "Ms. Jennifer Brown", plan: "Basic", studentsCount: 540, teachersCount: 42, status: "Inactive", email: "contact@lakeside.edu", phone: "+15550174", establishedDate: "2022-09-01" },
-    { name: "Horizon School", principal: "Mrs. Lisa Davis", plan: "Standard+", studentsCount: 710, teachersCount: 55, status: "Trial", email: "principal@horizon.edu", phone: "+15550162", establishedDate: "2024-02-18" },
+    { name: "Greenwood High", principal: "Dr. Sarah Johnson", plan: "Premium", studentsCount: 850, teachersCount: 65, status: "Active", email: "admin@greenwood.edu", phone: "+15550192", establishedDate: "2022-05-15" },
+    { name: "Riverside Academy", principal: "Mr. Michael Chen", plan: "Premium", studentsCount: 620, teachersCount: 48, status: "Active", email: "contact@riverside.edu", phone: "+15550143", establishedDate: "2021-08-10" },
+    { name: "Maple Leaf Elementary", principal: "Mrs. Emily Williams", plan: "Starter", studentsCount: 420, teachersCount: 32, status: "Active", email: "info@mapleleaf.edu", phone: "+15550188", establishedDate: "2023-01-20" },
+    { name: "Summit Learning", principal: "Dr. Robert Martin", plan: "Premium", studentsCount: 980, teachersCount: 78, status: "Active", email: "info@summitlearning.edu", phone: "+15550129", establishedDate: "2020-11-05" },
+    { name: "Lakeside Middle", principal: "Ms. Jennifer Brown", plan: "Starter", studentsCount: 540, teachersCount: 42, status: "Inactive", email: "contact@lakeside.edu", phone: "+15550174", establishedDate: "2022-09-01" },
+    { name: "Horizon School", principal: "Mrs. Lisa Davis", plan: "Standard", studentsCount: 710, teachersCount: 55, status: "Trial", email: "principal@horizon.edu", phone: "+15550162", establishedDate: "2024-02-18" },
   ], []);
 
   const mockStudents = useMemo(() => [

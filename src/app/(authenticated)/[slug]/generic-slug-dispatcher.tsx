@@ -19,6 +19,7 @@ const SuperAdminUsers = dynamic(() => import("@/components/screens/super-admin/u
 const SuperAdminAuditLogs = dynamic(() => import("@/components/screens/super-admin/audit-logs").then((m) => m.SuperAdminAuditLogs), { loading: LoadingScreen });
 const SuperAdminAnalytics = dynamic(() => import("@/components/screens/super-admin/analytics").then((m) => m.SuperAdminAnalytics), { loading: LoadingScreen });
 const SuperAdminFeatureFlags = dynamic(() => import("@/components/screens/super-admin/feature-flags").then((m) => m.SuperAdminFeatureFlags), { loading: LoadingScreen });
+const SuperAdminRoadmap = dynamic(() => import("@/components/screens/super-admin/feature-flags/RoadmapPanel").then((m) => m.RoadmapPanel), { loading: LoadingScreen });
 const SuperAdminSettings = dynamic(() => import("@/components/screens/super-admin/settings").then((m) => m.SuperAdminSettings), { loading: LoadingScreen });
 const SuperAdminRoles = dynamic(() => import("@/components/screens/super-admin/roles").then((m) => m.SuperAdminRoles), { loading: LoadingScreen });
 const SuperAdminManage = dynamic(() => import("@/components/screens/super-admin/manage-admins").then((m) => m.SuperAdminManage), { loading: LoadingScreen });
@@ -90,6 +91,7 @@ export default function GenericSlugDispatcherClient() {
       case "audit-logs": return <SuperAdminAuditLogs />;
       case "platform-analytics": return <SuperAdminAnalytics />;
       case "feature-flags": return <SuperAdminFeatureFlags />;
+      case "roadmap": return <SuperAdminRoadmap />;
       case "roles": return <SuperAdminRoles />;
       case "staff": return <SuperAdminStaff />;
       case "settings": return <SuperAdminSettings />;

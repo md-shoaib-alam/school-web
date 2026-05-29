@@ -159,6 +159,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
       "audit-logs",
       "platform-analytics",
       "feature-flags",
+      "roadmap",
       "roles",
       "staff",
       "manage-admins",
