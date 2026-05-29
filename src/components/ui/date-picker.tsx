@@ -45,6 +45,7 @@ export function DatePicker({ date, onChange, placeholder = 'Pick a date', classN
         <Calendar
           mode="single"
           selected={date}
+          defaultMonth={date}
           onSelect={(d) => {
             onChange?.(d);
             setOpen(false);

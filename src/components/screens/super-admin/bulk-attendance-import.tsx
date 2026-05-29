@@ -125,6 +125,7 @@ export function SuperAdminBulkAttendance() {
   const [selectedStudent, setSelectedStudent] = useState<Student | null>(null);
   const [studentSearchQuery, setStudentSearchQuery] = useState("");
   const [studentPopoverOpen, setStudentPopoverOpen] = useState(false);
+  const [selectedClassId, setSelectedClassId] = useState<string>("all");
   const [startDate, setStartDate] = useState<string>("");
   const [endDate, setEndDate] = useState<string>("");
   const [rangeStatus, setRangeStatus] = useState<string>("present");
@@ -190,6 +191,7 @@ export function SuperAdminBulkAttendance() {
     if (!selectedSchool) {
       setStudents([]);
       setSelectedStudent(null);
+      setSelectedClassId("all");
       return;
     }
 
@@ -227,14 +229,29 @@ export function SuperAdminBulkAttendance() {
     );
   }, [schools, schoolSearchQuery]);
 
-  // Filter students
+  // Unique classes extracted from students list
+  const uniqueClasses = useMemo(() => {
+    const classesMap = new Map<string, string>();
+    students.forEach(s => {
+      if (s.classId && s.className) {
+        classesMap.set(s.classId, s.className);
+      }
+    });
+    return Array.from(classesMap.entries()).map(([id, name]) => ({ id, name })).sort((a, b) => a.name.localeCompare(b.name));
+  }, [students]);
+
+  // Filter students by selected class and search query
   const filteredStudents = useMemo(() => {
-    return students.filter(s => 
+    let result = students;
+    if (selectedClassId && selectedClassId !== "all") {
+      result = result.filter(s => s.classId === selectedClassId);
+    }
+    return result.filter(s => 
       s.name.toLowerCase().includes(studentSearchQuery.toLowerCase()) ||
       s.rollNumber.toLowerCase().includes(studentSearchQuery.toLowerCase()) ||
       (s.className && s.className.toLowerCase().includes(studentSearchQuery.toLowerCase()))
     );
-  }, [students, studentSearchQuery]);
+  }, [students, selectedClassId, studentSearchQuery]);
 
   // Generate Excel template prefilled with student list
   const handleDownloadTemplate = async () => {
@@ -544,9 +561,9 @@ export function SuperAdminBulkAttendance() {
     const dayLabels = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
     const current = new Date(start);
 
-    // Limit range to max 90 days to prevent browser crash / oversized request
+    // Limit range to max 365 days to prevent browser crash / oversized request
     let limit = 0;
-    while (current <= end && limit < 90) {
+    while (current <= end && limit < 365) {
       const dayOfWeek = current.getDay(); // 0 is Sunday, 1 is Monday, etc.
       const dateStr = current.toISOString().split('T')[0];
       const isWeekDayChecked = selectedDays.includes(dayOfWeek);
@@ -567,6 +584,16 @@ export function SuperAdminBulkAttendance() {
   const activeRangeDatesCount = useMemo(() => {
     return computedRangeDates.filter(d => d.isValid).length;
   }, [computedRangeDates]);
+
+  const isRangeTooLarge = useMemo(() => {
+    if (!startDate || !endDate) return false;
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+    if (isNaN(start.getTime()) || isNaN(end.getTime()) || start > end) return false;
+    const diffTime = Math.abs(end.getTime() - start.getTime());
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    return diffDays > 365;
+  }, [startDate, endDate]);
 
   // Execute Student Date Range Bulk Entry
   const handleRangeImport = async () => {
@@ -1153,74 +1180,101 @@ export function SuperAdminBulkAttendance() {
                           Specific Student
                         </button>
                       </div>
-                    </div>
-
-                    {/* Specific Student Selector */}
+                    </div>                    {/* Specific Student Selector */}
                     {!allStudentsMode && (
                       <motion.div 
                         initial={{ opacity: 0, height: 0 }}
                         animate={{ opacity: 1, height: "auto" }}
                         exit={{ opacity: 0, height: 0 }}
-                        className="space-y-2"
+                        className="space-y-4"
                       >
-                        <Label>Select Student</Label>
-                        <Popover open={studentPopoverOpen} onOpenChange={setStudentPopoverOpen}>
-                          <PopoverTrigger asChild>
-                            <Button 
-                              variant="outline" 
-                              role="combobox"
-                              className="w-full justify-between cursor-pointer capitalize bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800 text-left"
-                            >
-                              <span className="flex items-center gap-2 truncate">
-                                <User className="size-4 text-muted-foreground shrink-0" />
-                                {selectedStudent ? selectedStudent.name : "Select Student..."}
-                              </span>
-                              <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                            </Button>
-                          </PopoverTrigger>
-                          <PopoverContent className="w-full max-w-[320px] p-0 border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 shadow-xl" align="start">
-                            <div className="flex items-center border-b px-3 border-zinc-200 dark:border-zinc-800">
-                              <Search className="mr-2 h-4 w-4 shrink-0 opacity-50" />
-                              <Input 
-                                placeholder="Search by name, roll, class..." 
-                                value={studentSearchQuery}
-                                onChange={(e) => setStudentSearchQuery(e.target.value)}
-                                className="flex h-9 w-full rounded-md bg-transparent py-3 text-sm outline-none border-none focus-visible:ring-0 focus-visible:ring-offset-0 placeholder:text-muted-foreground"
-                              />
-                            </div>
-                            <ScrollArea className="h-48 p-1">
-                              {loadingStudents ? (
-                                <div className="flex items-center justify-center p-4 text-xs text-muted-foreground gap-2">
-                                  <RefreshCw className="size-3 animate-spin text-teal-500" /> Fetching student registry...
-                                </div>
-                              ) : filteredStudents.length === 0 ? (
-                                <div className="p-4 text-xs text-muted-foreground text-center">No students found.</div>
-                              ) : (
-                                filteredStudents.map((stu) => (
-                                  <button
-                                    key={stu.id}
-                                    onClick={() => {
-                                      setSelectedStudent(stu);
-                                      setStudentPopoverOpen(false);
-                                      setStudentSearchQuery("");
-                                    }}
-                                    className="flex items-center justify-between w-full text-left px-3 py-1.5 text-xs hover:bg-teal-500/10 dark:hover:bg-teal-500/20 rounded-md transition-colors cursor-pointer group"
-                                  >
-                                    <div className="flex flex-col truncate pr-2">
-                                      <span className="font-medium text-zinc-950 dark:text-white truncate group-hover:text-teal-600 dark:group-hover:text-teal-400">{stu.name}</span>
-                                      <span className="text-[10px] text-muted-foreground truncate">
-                                        Roll: {stu.rollNumber || 'N/A'} | Class: {stu.className || 'N/A'}
-                                      </span>
-                                    </div>
-                                    {selectedStudent?.id === stu.id && (
-                                      <Check className="h-3 w-3 text-teal-600 shrink-0" />
-                                    )}
-                                  </button>
-                                ))
-                              )}
-                            </ScrollArea>
-                          </PopoverContent>
-                        </Popover>
+                        {/* Class Filter Dropdown */}
+                        <div className="space-y-1.5">
+                          <Label htmlFor="class-filter" className="text-xs uppercase tracking-wider font-extrabold text-muted-foreground">Filter by Class</Label>
+                          <select 
+                            id="class-filter"
+                            value={selectedClassId} 
+                            onChange={(e) => {
+                              const val = e.target.value;
+                              setSelectedClassId(val);
+                              // Reset selected student if they are not in the newly selected class
+                              if (selectedStudent && selectedStudent.classId !== val && val !== "all") {
+                                setSelectedStudent(null);
+                              }
+                            }}
+                            className="w-full h-9 rounded-md border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 px-3 py-1 text-sm shadow-xs focus:outline-none focus:ring-1 focus:ring-teal-500 cursor-pointer"
+                          >
+                            <option value="all">All Classes ({uniqueClasses.length})</option>
+                            {uniqueClasses.map((cls) => (
+                              <option key={cls.id} value={cls.id}>
+                                {cls.name}
+                              </option>
+                            ))}
+                          </select>
+                        </div>
+
+                        {/* Student Search and Select */}
+                        <div className="space-y-1.5">
+                          <Label className="text-xs uppercase tracking-wider font-extrabold text-muted-foreground">Select Student</Label>
+                          <Popover open={studentPopoverOpen} onOpenChange={setStudentPopoverOpen}>
+                            <PopoverTrigger asChild>
+                              <Button 
+                                variant="outline" 
+                                role="combobox"
+                                aria-expanded={studentPopoverOpen}
+                                className="w-full justify-between cursor-pointer capitalize bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800 text-left text-xs"
+                              >
+                                <span className="flex items-center gap-2 truncate">
+                                  <User className="size-4 text-muted-foreground shrink-0" />
+                                  {selectedStudent ? selectedStudent.name : "Select Student..."}
+                                </span>
+                                <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                              </Button>
+                            </PopoverTrigger>
+                            <PopoverContent className="w-full max-w-[320px] p-0 border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 shadow-xl" align="start">
+                              <div className="flex items-center border-b px-3 border-zinc-200 dark:border-zinc-800">
+                                <Search className="mr-2 h-4 w-4 shrink-0 opacity-50" />
+                                <Input 
+                                  placeholder="Search by name, roll, class..." 
+                                  value={studentSearchQuery}
+                                  onChange={(e) => setStudentSearchQuery(e.target.value)}
+                                  className="flex h-9 w-full rounded-md bg-transparent py-3 text-sm outline-none border-none focus-visible:ring-0 focus-visible:ring-offset-0 placeholder:text-muted-foreground"
+                                />
+                              </div>
+                              <ScrollArea className="h-48 p-1">
+                                {loadingStudents ? (
+                                  <div className="flex items-center justify-center p-4 text-xs text-muted-foreground gap-2">
+                                    <RefreshCw className="size-3 animate-spin text-teal-500" /> Fetching student registry...
+                                  </div>
+                                ) : filteredStudents.length === 0 ? (
+                                  <div className="p-4 text-xs text-muted-foreground text-center">No students found.</div>
+                                ) : (
+                                  filteredStudents.map((stu) => (
+                                    <button
+                                      key={stu.id}
+                                      onClick={() => {
+                                        setSelectedStudent(stu);
+                                        setStudentPopoverOpen(false);
+                                        setStudentSearchQuery("");
+                                      }}
+                                      className="flex items-center justify-between w-full text-left px-3 py-1.5 text-xs hover:bg-teal-500/10 dark:hover:bg-teal-500/20 rounded-md transition-colors cursor-pointer group"
+                                    >
+                                      <div className="flex flex-col truncate pr-2">
+                                        <span className="font-medium text-zinc-950 dark:text-white truncate group-hover:text-teal-600 dark:group-hover:text-teal-400">{stu.name}</span>
+                                        <span className="text-[10px] text-muted-foreground truncate">
+                                          Roll: {stu.rollNumber || 'N/A'} | Class: {stu.className || 'N/A'}
+                                        </span>
+                                      </div>
+                                      {selectedStudent?.id === stu.id && (
+                                        <Check className="h-3 w-3 text-teal-600 shrink-0" />
+                                      )}
+                                    </button>
+                                  ))
+                                )}
+                              </ScrollArea>
+                            </PopoverContent>
+                          </Popover>
+                        </div>
                       </motion.div>
                     )}
 
@@ -1306,7 +1360,7 @@ export function SuperAdminBulkAttendance() {
                     <div className="pt-4">
                       <Button
                         onClick={handleRangeImport}
-                        disabled={generatingRange || activeRangeDatesCount === 0 || (!allStudentsMode && !selectedStudent)}
+                        disabled={generatingRange || activeRangeDatesCount === 0 || isRangeTooLarge || (!allStudentsMode && !selectedStudent)}
                         className="w-full bg-teal-600 hover:bg-teal-700 text-white cursor-pointer shadow-md gap-2"
                       >
                         {generatingRange ? (
@@ -1338,7 +1392,19 @@ export function SuperAdminBulkAttendance() {
                     <CardDescription>Visual breakdown of dates targeted for batch insertion.</CardDescription>
                   </CardHeader>
                   <CardContent className="flex-1 flex flex-col min-h-0 pb-6 relative">
-                    {computedRangeDates.length === 0 ? (
+                    {isRangeTooLarge ? (
+                      <div className="flex-1 flex flex-col items-center justify-center text-center text-rose-500 py-16 border border-dashed border-rose-500/30 rounded-2xl min-h-[300px] bg-rose-500/5 px-6 space-y-3">
+                        <div className="size-12 rounded-full bg-rose-500/10 flex items-center justify-center text-rose-600 dark:text-rose-400 shrink-0">
+                          <AlertTriangle className="size-6 animate-pulse" />
+                        </div>
+                        <div className="space-y-1">
+                          <p className="text-sm font-bold">Date Range Too Large</p>
+                          <p className="text-xs text-rose-600/80 dark:text-rose-400/80 max-w-xs mx-auto leading-relaxed">
+                            Selecting a range of {Math.ceil(Math.abs(new Date(endDate).getTime() - new Date(startDate).getTime()) / (1000 * 60 * 60 * 24))} days exceeds the system limit. Please select a range of <strong>365 days (1 year) or less</strong> to prevent database overhead.
+                          </p>
+                        </div>
+                      </div>
+                    ) : computedRangeDates.length === 0 ? (
                       <div className="flex-1 flex flex-col items-center justify-center text-center text-muted-foreground py-20 border border-dashed rounded-2xl min-h-[300px]">
                         <CalendarDays className="size-10 text-muted-foreground/30 animate-pulse mb-3" />
                         <p className="text-sm font-bold">Select Date Range</p>
