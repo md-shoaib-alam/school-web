@@ -27,6 +27,7 @@ const SuperAdminSubscriptions = dynamic(() => import("@/components/screens/super
 const SuperAdminSchoolSubscriptions = dynamic(() => import("@/components/screens/super-admin/school-subscriptions").then((m) => m.SuperAdminSchoolSubscriptions), { loading: LoadingScreen });
 const SuperAdminPlatformNotices = dynamic(() => import("@/components/screens/super-admin/platform-notices").then((m) => m.SuperAdminPlatformNotices), { loading: LoadingScreen });
 const SuperAdminReports = dynamic(() => import("@/components/screens/super-admin/reports").then((m) => m.SuperAdminReports), { loading: LoadingScreen });
+const SuperAdminBulkAttendance = dynamic(() => import("@/components/screens/super-admin/bulk-attendance-import").then((m) => m.SuperAdminBulkAttendance), { loading: LoadingScreen });
 
 const UserProfileScreen = dynamic(() => import("@/components/screens/profile").then((m) => m.UserProfileScreen), { loading: LoadingScreen });
 const TeacherDashboard = dynamic(() => import("@/components/screens/teacher/dashboard").then((m) => m.TeacherDashboard), { loading: LoadingScreen });
@@ -83,6 +84,7 @@ export default function GenericSlugDispatcherClient() {
       case "dashboard": return <SuperAdminDashboard />;
       case "tenants": return <SuperAdminTenants />;
       case "deleted-tenants": return <SuperAdminDeletedTenants />;
+      case "bulk-attendance-import": return <SuperAdminBulkAttendance />;
       case "billing": return <SuperAdminBilling />;
       case "users": return <SuperAdminUsers />;
       case "audit-logs": return <SuperAdminAuditLogs />;

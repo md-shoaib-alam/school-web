@@ -153,6 +153,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
       "dashboard",
       "tenants",
       "deleted-tenants",
+      "bulk-attendance-import",
       "billing",
       "users",
       "audit-logs",

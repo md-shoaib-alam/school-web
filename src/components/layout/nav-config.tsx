@@ -85,6 +85,12 @@ export const navItems: Record<UserRole, NavItem[]> = {
       permModule: "tenants",
     },
     {
+      key: "bulk-attendance-import",
+      label: "Bulk Attendance",
+      icon: <ClipboardList className="size-4" />,
+      permModule: null,
+    },
+    {
       key: "users",
       label: "All Users",
       icon: <UserCog className="size-4" />,
