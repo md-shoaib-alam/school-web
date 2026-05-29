@@ -1084,18 +1084,18 @@ export function SuperAdminBulkAttendance() {
 
           {/* Sub-Tab 2: Student Date Range Bulk Entry */}
           <TabsContent value="range" className="space-y-6 animate-in fade-in-30 duration-200">
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:h-[750px]">
               
               {/* Form Entry Column */}
-              <div className="lg:col-span-1 space-y-6">
-                <Card className="border-none shadow-sm dark:bg-zinc-950">
-                  <CardHeader>
+              <div className="lg:col-span-1 flex flex-col">
+                <Card className="border-none shadow-sm dark:bg-zinc-950 flex-1 flex flex-col h-full min-h-0">
+                  <CardHeader className="pb-3 shrink-0">
                     <CardTitle className="text-lg flex items-center gap-2">
                       <CalendarDays className="size-5 text-teal-500" /> Range Configurations
                     </CardTitle>
                     <CardDescription>Setup range details for fast calendar insertion.</CardDescription>
                   </CardHeader>
-                  <CardContent className="space-y-4">
+                  <CardContent className="flex-1 overflow-y-auto min-h-0 pr-2 space-y-4 pb-6">
                     
                     {/* Toggle Selector */}
                     <div className="space-y-2">
@@ -1304,24 +1304,24 @@ export function SuperAdminBulkAttendance() {
               </div>
 
               {/* Preview Timeline Grid Column */}
-              <div className="lg:col-span-2 space-y-6">
-                <Card className="border-none shadow-sm dark:bg-zinc-950">
-                  <CardHeader>
+              <div className="lg:col-span-2 flex flex-col">
+                <Card className="border-none shadow-sm dark:bg-zinc-950 flex-1 flex flex-col h-full min-h-0">
+                  <CardHeader className="pb-3 shrink-0">
                     <CardTitle className="text-base flex items-center gap-2">
                       <Calendar className="size-5 text-teal-500" /> Active Calendar Preview
                     </CardTitle>
                     <CardDescription>Visual breakdown of dates targeted for batch insertion.</CardDescription>
                   </CardHeader>
-                  <CardContent className="space-y-4">
+                  <CardContent className="flex-1 flex flex-col min-h-0 pb-6">
                     {computedRangeDates.length === 0 ? (
-                      <div className="py-20 border border-dashed rounded-xl flex flex-col items-center justify-center text-center text-muted-foreground">
+                      <div className="flex-1 flex flex-col items-center justify-center text-center text-muted-foreground py-20 border border-dashed rounded-2xl min-h-[300px]">
                         <CalendarDays className="size-10 text-muted-foreground/30 animate-pulse mb-3" />
                         <p className="text-sm font-bold">Select Date Range</p>
                         <p className="text-xs">Setup Start and End dates to generate calendar previews here.</p>
                       </div>
                     ) : (
-                      <div className="space-y-4">
-                        <div className="flex flex-wrap items-center justify-between gap-4 p-3 bg-zinc-50 dark:bg-zinc-900/50 rounded-xl text-xs">
+                      <div className="flex-1 flex flex-col min-h-0 space-y-4">
+                        <div className="flex flex-wrap items-center justify-between gap-4 p-3 bg-zinc-50 dark:bg-zinc-900/50 rounded-xl text-xs shrink-0">
                           <div>
                             Targeting: <span className="font-bold text-zinc-950 dark:text-white">{allStudentsMode ? `All ${students.length} students` : selectedStudent?.name}</span>
                           </div>
@@ -1336,7 +1336,7 @@ export function SuperAdminBulkAttendance() {
                         </div>
 
                         {/* Date Grid */}
-                        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 max-h-96 overflow-y-auto pr-1">
+                        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 overflow-y-auto pr-1 flex-1 min-h-0">
                           <AnimatePresence>
                              {computedRangeDates.map((item, idx) => (
                                <motion.div
