@@ -136,6 +136,31 @@ export function SuperAdminBulkAttendance() {
   const [overriddenStatuses, setOverriddenStatuses] = useState<Record<string, string>>({});
   const [overriddenRemarks, setOverriddenRemarks] = useState<Record<string, string>>({});
 
+  // Scroll tracking for custom circular progress ring
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const [scrollProgress, setScrollProgress] = useState(0);
+  const [isScrolledToBottom, setIsScrolledToBottom] = useState(false);
+
+  const handleScroll = () => {
+    const element = scrollRef.current;
+    if (!element) return;
+    const totalHeight = element.scrollHeight - element.clientHeight;
+    if (totalHeight <= 0) {
+      setScrollProgress(0);
+      setIsScrolledToBottom(false);
+      return;
+    }
+    const progress = (element.scrollTop / totalHeight) * 100;
+    setScrollProgress(progress);
+    setIsScrolledToBottom(element.scrollTop + element.clientHeight >= element.scrollHeight - 8);
+  };
+
+  // Reset scroll progress when range changes
+  useEffect(() => {
+    setScrollProgress(0);
+    setIsScrolledToBottom(false);
+  }, [startDate, endDate]);
+
   // Reset overrides when date range changes
   useEffect(() => {
     setOverriddenStatuses({});
@@ -702,7 +727,7 @@ export function SuperAdminBulkAttendance() {
                 >
                   <span className="flex items-center gap-2 truncate">
                     <Building2 className="size-4 text-muted-foreground shrink-0" />
-                    {selectedSchool ? selectedSchool.name : "Select Active School..."}
+                    {selectedSchool ? selectedSchool.name : "Select School"}
                   </span>
                   <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                 </Button>
@@ -1087,8 +1112,8 @@ export function SuperAdminBulkAttendance() {
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:h-[750px]">
               
               {/* Form Entry Column */}
-              <div className="lg:col-span-1 flex flex-col">
-                <Card className="border-none shadow-sm dark:bg-zinc-950 flex-1 flex flex-col h-full min-h-0">
+              <div className="lg:col-span-1 flex flex-col min-h-0">
+                <Card className="border-none shadow-sm dark:bg-zinc-950 flex-1 flex flex-col h-full min-h-0 overflow-hidden">
                   <CardHeader className="pb-3 shrink-0">
                     <CardTitle className="text-lg flex items-center gap-2">
                       <CalendarDays className="size-5 text-teal-500" /> Range Configurations
@@ -1304,15 +1329,15 @@ export function SuperAdminBulkAttendance() {
               </div>
 
               {/* Preview Timeline Grid Column */}
-              <div className="lg:col-span-2 flex flex-col">
-                <Card className="border-none shadow-sm dark:bg-zinc-950 flex-1 flex flex-col h-full min-h-0">
+              <div className="lg:col-span-2 flex flex-col min-h-0">
+                <Card className="border-none shadow-sm dark:bg-zinc-950 flex-1 flex flex-col h-full min-h-0 overflow-hidden">
                   <CardHeader className="pb-3 shrink-0">
                     <CardTitle className="text-base flex items-center gap-2">
                       <Calendar className="size-5 text-teal-500" /> Active Calendar Preview
                     </CardTitle>
                     <CardDescription>Visual breakdown of dates targeted for batch insertion.</CardDescription>
                   </CardHeader>
-                  <CardContent className="flex-1 flex flex-col min-h-0 pb-6">
+                  <CardContent className="flex-1 flex flex-col min-h-0 pb-6 relative">
                     {computedRangeDates.length === 0 ? (
                       <div className="flex-1 flex flex-col items-center justify-center text-center text-muted-foreground py-20 border border-dashed rounded-2xl min-h-[300px]">
                         <CalendarDays className="size-10 text-muted-foreground/30 animate-pulse mb-3" />
@@ -1335,79 +1360,137 @@ export function SuperAdminBulkAttendance() {
                           </div>
                         </div>
 
-                        {/* Date Grid */}
-                        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 overflow-y-auto pr-1 flex-1 min-h-0">
-                          <AnimatePresence>
-                             {computedRangeDates.map((item, idx) => (
-                               <motion.div
-                                key={item.dateStr}
-                                initial={{ opacity: 0, scale: 0.95 }}
-                                animate={{ opacity: 1, scale: 1 }}
-                                transition={{ duration: 0.15, delay: Math.min(idx * 0.02, 0.2) }}
-                                onClick={() => {
-                                  if (!item.isValid) return;
-                                  const currentStatus = overriddenStatuses[item.dateStr] || rangeStatus;
-                                  const newStatus = currentStatus === "present" ? "absent" : "present";
-                                  setOverriddenStatuses(prev => ({
-                                    ...prev,
-                                    [item.dateStr]: newStatus
-                                  }));
-                                }}
-                                className={`p-3 rounded-xl border flex flex-col items-start gap-1 justify-between transition-colors relative overflow-hidden select-none ${
-                                  item.isValid 
-                                    ? (overriddenStatuses[item.dateStr] || rangeStatus) === "present"
-                                      ? "border-emerald-500/20 bg-emerald-500/5 dark:bg-emerald-950/10 hover:bg-emerald-500/10 cursor-pointer"
-                                      : "border-rose-500/20 bg-rose-500/5 dark:bg-rose-950/10 hover:bg-rose-500/10 cursor-pointer"
-                                    : "border-zinc-200 dark:border-zinc-900 bg-zinc-100/50 dark:bg-zinc-900/10 text-muted-foreground line-through opacity-40"
-                                }`}
-                              >
-                                {item.isValid && (
-                                  <div className={`absolute top-0 right-0 size-3 rounded-bl-lg ${
-                                    (overriddenStatuses[item.dateStr] || rangeStatus) === "present"
-                                      ? "bg-emerald-500"
-                                      : "bg-rose-500"
-                                  }`} />
-                                )}
-                                <div className="text-[10px] uppercase font-bold text-zinc-400">{item.dayLabel}</div>
-                                <div className="text-xs font-bold font-mono text-zinc-950 dark:text-white">{item.dateStr}</div>
-                                <div className="mt-1 flex justify-between w-full items-center">
-                                  {item.isValid ? (
-                                    <>
-                                      <select
-                                        value={overriddenStatuses[item.dateStr] || rangeStatus}
-                                        onClick={(e) => e.stopPropagation()}
-                                        onChange={(e) => {
-                                          e.stopPropagation();
-                                          const val = e.target.value;
-                                          setOverriddenStatuses(prev => ({
-                                            ...prev,
-                                            [item.dateStr]: val
-                                          }));
-                                        }}
-                                        className={`text-[9px] font-bold py-0 px-1 bg-white dark:bg-zinc-900 border rounded cursor-pointer transition-colors focus:outline-none focus:ring-0 ${
-                                          (overriddenStatuses[item.dateStr] || rangeStatus) === "present"
-                                            ? "border-emerald-500/20 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-500/5"
-                                            : "border-rose-500/20 text-rose-600 dark:text-rose-400 hover:bg-rose-500/5"
-                                        }`}
-                                      >
-                                        <option value="present" className="text-zinc-900 dark:text-white bg-white dark:bg-zinc-950">Present</option>
-                                        <option value="absent" className="text-zinc-900 dark:text-white bg-white dark:bg-zinc-950">Absent</option>
-                                      </select>
-                                      <span className="text-[9px] text-muted-foreground max-w-[60px] truncate" title={overriddenRemarks[item.dateStr] || rangeRemarks}>
-                                        {overriddenRemarks[item.dateStr] || rangeRemarks || "No remarks"}
-                                      </span>
-                                    </>
-                                  ) : (
-                                    <Badge variant="outline" className="text-[9px] text-muted-foreground opacity-50 capitalize">
-                                      Skipped
-                                    </Badge>
+                        {/* Date Grid Scrollable Wrapper (Scrollbar on Left & Hidden) */}
+                        <div 
+                          ref={scrollRef}
+                          onScroll={handleScroll}
+                          className="overflow-y-auto pl-1 flex-1 min-h-0 [direction:rtl] [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] relative"
+                        >
+                          {/* Inner Grid Container (Normal Left-to-Right Column Layout) */}
+                          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 [direction:ltr] w-full">
+                            <AnimatePresence>
+                               {computedRangeDates.map((item, idx) => (
+                                 <motion.div
+                                  key={item.dateStr}
+                                  initial={{ opacity: 0, scale: 0.95 }}
+                                  animate={{ opacity: 1, scale: 1 }}
+                                  transition={{ duration: 0.15, delay: Math.min(idx * 0.02, 0.2) }}
+                                  onClick={() => {
+                                    if (!item.isValid) return;
+                                    const currentStatus = overriddenStatuses[item.dateStr] || rangeStatus;
+                                    const newStatus = currentStatus === "present" ? "absent" : "present";
+                                    setOverriddenStatuses(prev => ({
+                                      ...prev,
+                                      [item.dateStr]: newStatus
+                                    }));
+                                  }}
+                                  className={`p-3 rounded-xl border flex flex-col items-start gap-1 justify-between transition-colors relative overflow-hidden select-none ${
+                                    item.isValid 
+                                      ? (overriddenStatuses[item.dateStr] || rangeStatus) === "present"
+                                        ? "border-emerald-500/20 bg-emerald-500/5 dark:bg-emerald-950/10 hover:bg-emerald-500/10 cursor-pointer"
+                                        : "border-rose-500/20 bg-rose-500/5 dark:bg-rose-950/10 hover:bg-rose-500/10 cursor-pointer"
+                                      : "border-zinc-200 dark:border-zinc-900 bg-zinc-100/50 dark:bg-zinc-900/10 text-muted-foreground line-through opacity-40"
+                                  }`}
+                                >
+                                  {item.isValid && (
+                                    <div className={`absolute top-0 right-0 size-3 rounded-bl-lg ${
+                                      (overriddenStatuses[item.dateStr] || rangeStatus) === "present"
+                                        ? "bg-emerald-500"
+                                        : "bg-rose-500"
+                                    }`} />
                                   )}
-                                </div>
-                              </motion.div>
-                            ))}
-                          </AnimatePresence>
+                                  <div className="text-[10px] uppercase font-bold text-zinc-400">{item.dayLabel}</div>
+                                  <div className="text-xs font-bold font-mono text-zinc-950 dark:text-white">{item.dateStr}</div>
+                                  <div className="mt-1 flex justify-between w-full items-center">
+                                    {item.isValid ? (
+                                      <>
+                                        <select
+                                          value={overriddenStatuses[item.dateStr] || rangeStatus}
+                                          onClick={(e) => e.stopPropagation()}
+                                          onChange={(e) => {
+                                            e.stopPropagation();
+                                            const val = e.target.value;
+                                            setOverriddenStatuses(prev => ({
+                                              ...prev,
+                                              [item.dateStr]: val
+                                            }));
+                                          }}
+                                          className={`text-[9px] font-bold py-0 px-1 bg-white dark:bg-zinc-900 border rounded cursor-pointer transition-colors focus:outline-none focus:ring-0 ${
+                                            (overriddenStatuses[item.dateStr] || rangeStatus) === "present"
+                                              ? "border-emerald-500/20 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-500/5"
+                                              : "border-rose-500/20 text-rose-600 dark:text-rose-400 hover:bg-rose-500/5"
+                                          }`}
+                                        >
+                                          <option value="present" className="text-zinc-900 dark:text-white bg-white dark:bg-zinc-950">Present</option>
+                                          <option value="absent" className="text-zinc-900 dark:text-white bg-white dark:bg-zinc-950">Absent</option>
+                                        </select>
+                                        <span className="text-[9px] text-muted-foreground max-w-[60px] truncate" title={overriddenRemarks[item.dateStr] || rangeRemarks}>
+                                          {overriddenRemarks[item.dateStr] || rangeRemarks || "No remarks"}
+                                        </span>
+                                      </>
+                                    ) : (
+                                      <Badge variant="outline" className="text-[9px] text-muted-foreground opacity-50 capitalize">
+                                        Skipped
+                                      </Badge>
+                                    )}
+                                  </div>
+                                </motion.div>
+                              ))}
+                            </AnimatePresence>
+                          </div>
                         </div>
                       </div>
+                    )}
+
+                    {/* Premium Custom Scroll Progress Circular Button */}
+                    {computedRangeDates.length > 0 && (
+                      <button
+                        onClick={() => {
+                          const element = scrollRef.current;
+                          if (!element) return;
+                          if (isScrolledToBottom) {
+                            element.scrollTo({ top: 0, behavior: 'smooth' });
+                          } else {
+                            element.scrollTo({ top: element.scrollHeight, behavior: 'smooth' });
+                          }
+                        }}
+                        className="absolute bottom-6 right-6 z-30 size-10 rounded-full bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-850 shadow-lg flex items-center justify-center cursor-pointer hover:scale-105 transition-all shrink-0 active:scale-95 group"
+                        title={isScrolledToBottom ? "Scroll to Top" : "Scroll to Bottom"}
+                      >
+                        <svg className="absolute inset-0 size-10 -rotate-90">
+                          <circle
+                            className="text-zinc-100 dark:text-zinc-800"
+                            strokeWidth="2"
+                            stroke="currentColor"
+                            fill="transparent"
+                            r="16"
+                            cx="20"
+                            cy="20"
+                          />
+                          <circle
+                            className="text-teal-500 transition-all duration-100"
+                            strokeWidth="2.5"
+                            strokeDasharray={100.5}
+                            strokeDashoffset={100.5 - (100.5 * scrollProgress) / 100}
+                            strokeLinecap="round"
+                            stroke="currentColor"
+                            fill="transparent"
+                            r="16"
+                            cx="20"
+                            cy="20"
+                          />
+                        </svg>
+                        <svg 
+                          className={`size-4 text-teal-600 dark:text-teal-400 transition-transform duration-300 group-hover:translate-y-0.5 ${
+                            isScrolledToBottom ? "rotate-180 group-hover:-translate-y-0.5" : ""
+                          }`} 
+                          fill="none" 
+                          viewBox="0 0 24 24" 
+                          stroke="currentColor"
+                        >
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M19 9l-7 7-7-7" />
+                        </svg>
+                      </button>
                     )}
                   </CardContent>
                 </Card>
