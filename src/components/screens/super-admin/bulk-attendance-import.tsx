@@ -562,9 +562,9 @@ export function SuperAdminBulkAttendance() {
     const dayLabels = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
     const current = new Date(start);
 
-    // Limit range to max 365 days to prevent browser crash / oversized request
+    // Limit range to max 180 days to prevent browser crash / oversized request
     let limit = 0;
-    while (current <= end && limit < 365) {
+    while (current <= end && limit < 180) {
       const dayOfWeek = current.getDay(); // 0 is Sunday, 1 is Monday, etc.
       const dateStr = current.toISOString().split('T')[0];
       const isWeekDayChecked = selectedDays.includes(dayOfWeek);
@@ -593,16 +593,16 @@ export function SuperAdminBulkAttendance() {
     if (isNaN(start.getTime()) || isNaN(end.getTime()) || start > end) return false;
     const diffTime = Math.abs(end.getTime() - start.getTime());
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-    return diffDays > 365;
+    return diffDays > 180;
   }, [startDate, endDate]);
 
-  // Trigger live toast alert when selected date range exceeds 365-day limit
+  // Trigger live toast alert when selected date range exceeds 180-day limit
   useEffect(() => {
     if (isRangeTooLarge && startDate && endDate) {
       const diffTime = Math.abs(new Date(endDate).getTime() - new Date(startDate).getTime());
       const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
       toast.warning(`Date Range Exceeded (Out of Range)`, {
-        description: `Selected range is ${diffDays} days. The system safety limit is 365 days (1 year). Please shorten your selection.`
+        description: `Selected range is ${diffDays} days. The system safety limit is 180 days (6 months). Please shorten your selection.`
       });
     }
   }, [isRangeTooLarge, startDate, endDate]);
@@ -771,7 +771,7 @@ export function SuperAdminBulkAttendance() {
                   <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                 </Button>
               </PopoverTrigger>
-              <PopoverContent className="w-[350px] p-0 border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 shadow-xl" align="end">
+              <PopoverContent className="w-[350px] p-0 border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 shadow-xl" align="end" side="bottom" sideOffset={4}>
                 <div className="flex items-center border-b px-3 border-zinc-200 dark:border-zinc-800">
                   <Search className="mr-2 h-4 w-4 shrink-0 opacity-50" />
                   <Input 
@@ -1159,7 +1159,7 @@ export function SuperAdminBulkAttendance() {
                     </CardTitle>
                     <CardDescription>Setup range details for fast calendar insertion.</CardDescription>
                   </CardHeader>
-                  <CardContent className="flex-1 overflow-y-auto min-h-0 pr-2 space-y-4 pb-6">
+                  <CardContent className="flex-1 overflow-y-auto min-h-0 pr-2 space-y-4 pb-6 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
                     
                     {/* Toggle Selector */}
                     <div className="space-y-2">
@@ -1243,7 +1243,7 @@ export function SuperAdminBulkAttendance() {
                                 <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                               </Button>
                             </PopoverTrigger>
-                            <PopoverContent className="w-full max-w-[320px] p-0 border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 shadow-xl" align="start">
+                            <PopoverContent className="w-full max-w-[320px] p-0 border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 shadow-xl" align="start" side="bottom" sideOffset={4}>
                               <div className="flex items-center border-b px-3 border-zinc-200 dark:border-zinc-800">
                                 <Search className="mr-2 h-4 w-4 shrink-0 opacity-50" />
                                 <Input 
@@ -1328,7 +1328,7 @@ export function SuperAdminBulkAttendance() {
                         <div>
                           <span className="font-extrabold block text-rose-700 dark:text-rose-300 text-xs">Date Range Exceeded (Out of Range)</span>
                           <span className="mt-0.5 block">
-                            Selected range is <strong className="font-extrabold">{Math.ceil(Math.abs(new Date(endDate).getTime() - new Date(startDate).getTime()) / (1000 * 60 * 60 * 24))} days</strong>. The maximum system safety limit is exactly <strong className="font-extrabold">365 days (1 year)</strong> to prevent server load. Please shorten your selection.
+                            Selected range is <strong className="font-extrabold">{Math.ceil(Math.abs(new Date(endDate).getTime() - new Date(startDate).getTime()) / (1000 * 60 * 60 * 24))} days</strong>. The maximum system safety limit is exactly <strong className="font-extrabold">180 days (6 months)</strong> to prevent server load. Please shorten your selection.
                           </span>
                         </div>
                       </motion.div>
@@ -1434,7 +1434,7 @@ export function SuperAdminBulkAttendance() {
                         <div className="space-y-1">
                           <p className="text-sm font-bold text-rose-700 dark:text-rose-350">Date Range Exceeded (Out of Range)</p>
                           <p className="text-xs text-rose-600/80 dark:text-rose-400/80 max-w-xs mx-auto leading-relaxed">
-                            Selecting a range of <strong className="font-extrabold">{Math.ceil(Math.abs(new Date(endDate).getTime() - new Date(startDate).getTime()) / (1000 * 60 * 60 * 24))} days</strong> exceeds the allowed safety limit. Please select a range of <strong>365 days (1 year) or less</strong> to prevent server load.
+                            Selecting a range of <strong className="font-extrabold">{Math.ceil(Math.abs(new Date(endDate).getTime() - new Date(startDate).getTime()) / (1000 * 60 * 60 * 24))} days</strong> exceeds the allowed safety limit. Please select a range of <strong>180 days (6 months) or less</strong> to prevent server load.
                           </p>
                         </div>
                       </div>
