@@ -22,7 +22,7 @@ import {
   AlertDialogAction,
   AlertDialogCancel,
 } from "@/components/ui/alert-dialog";
-import { GraduationCap, Pencil, Trash2 } from "lucide-react";
+import { GraduationCap, Pencil, Trash2, Eye } from "lucide-react";
 import type { StudentInfo } from "./types";
 
 interface StudentTableProps {
@@ -31,6 +31,7 @@ interface StudentTableProps {
   canDelete: boolean;
   onEdit: (student: StudentInfo) => void;
   onDelete: (id: string) => void;
+  onView: (student: StudentInfo) => void;
 }
 
 export function StudentTable({
@@ -39,6 +40,7 @@ export function StudentTable({
   canDelete,
   onEdit,
   onDelete,
+  onView,
 }: StudentTableProps) {
   return (
     <div className="overflow-x-auto px-6">
@@ -51,16 +53,14 @@ export function StudentTable({
             <TableHead className="hidden sm:table-cell">Gender</TableHead>
             <TableHead className="hidden lg:table-cell">Parent</TableHead>
             <TableHead className="hidden lg:table-cell">Phone</TableHead>
-            {(canEdit || canDelete) && (
-              <TableHead className="w-24 text-right">Actions</TableHead>
-            )}
+            <TableHead className="w-24 text-right">Actions</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {students.length === 0 ? (
             <TableRow>
               <TableCell
-                colSpan={canEdit || canDelete ? 7 : 6}
+                colSpan={7}
                 className="text-center py-12 text-muted-foreground"
               >
                 <GraduationCap className="size-10 mx-auto mb-2 opacity-30" />
@@ -110,9 +110,16 @@ export function StudentTable({
                 <TableCell className="hidden lg:table-cell text-sm py-4">
                   {student.phone || "–"}
                 </TableCell>
-                {(canEdit || canDelete) && (
-                  <TableCell className="text-right py-4">
-                    <div className="flex items-center justify-end gap-1">
+                <TableCell className="text-right py-4">
+                  <div className="flex items-center justify-end gap-1">
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="size-8 text-muted-foreground hover:text-emerald-600"
+                      onClick={() => onView(student)}
+                    >
+                      <Eye className="size-4" />
+                    </Button>
                       {canEdit && (
                         <Button
                           variant="ghost"
@@ -159,7 +166,6 @@ export function StudentTable({
                       )}
                     </div>
                   </TableCell>
-                )}
               </TableRow>
             ))
           )}

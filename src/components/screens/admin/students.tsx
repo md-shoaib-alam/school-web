@@ -29,6 +29,7 @@ import { StudentDialog } from "./students/StudentDialog";
 import { StudentSkeleton } from "./students/StudentSkeleton";
 import { Pagination } from "./students/Pagination";
 import { ImportExportButtons } from "./students/ImportExportButtons";
+import { StudentDetailDialog } from "./students/StudentDetailDialog";
 
 // Types
 import type { StudentInfo, ClassInfo, StudentFormData } from "./students/types";
@@ -58,6 +59,8 @@ type State = {
   editingStudent: StudentInfo | null;
   formData: StudentFormData;
   submitting: boolean;
+  viewDialogOpen: boolean;
+  viewingStudent: StudentInfo | null;
 };
 
 type Action =
@@ -68,7 +71,9 @@ type Action =
   | { type: 'OPEN_EDIT'; payload: StudentInfo }
   | { type: 'CLOSE_DIALOG' }
   | { type: 'SET_FORM_DATA'; payload: StudentFormData }
-  | { type: 'SET_SUBMITTING'; payload: boolean };
+  | { type: 'SET_SUBMITTING'; payload: boolean }
+  | { type: 'OPEN_VIEW'; payload: StudentInfo }
+  | { type: 'CLOSE_VIEW' };
 
 const initialState: State = {
   search: "",
@@ -79,6 +84,8 @@ const initialState: State = {
   editingStudent: null,
   formData: emptyFormData,
   submitting: false,
+  viewDialogOpen: false,
+  viewingStudent: null,
 };
 
 function reducer(state: State, action: Action): State {
@@ -116,6 +123,10 @@ function reducer(state: State, action: Action): State {
       return { ...state, formData: action.payload };
     case 'SET_SUBMITTING':
       return { ...state, submitting: action.payload };
+    case 'OPEN_VIEW':
+      return { ...state, viewingStudent: action.payload, viewDialogOpen: true };
+    case 'CLOSE_VIEW':
+      return { ...state, viewDialogOpen: false };
     default:
       return state;
   }
@@ -135,6 +146,8 @@ function AdminStudentsContent() {
     editingStudent,
     formData,
     submitting,
+    viewDialogOpen,
+    viewingStudent,
   } = state;
 
   const debouncedSearch = useDebounce(search, 300);
@@ -180,6 +193,8 @@ function AdminStudentsContent() {
   const handleOpenCreate = () => dispatch({ type: 'OPEN_CREATE' });
 
   const handleOpenEdit = (student: StudentInfo) => dispatch({ type: 'OPEN_EDIT', payload: student });
+
+  const handleOpenView = (student: StudentInfo) => dispatch({ type: 'OPEN_VIEW', payload: student });
 
   const handleSubmit = async () => {
     const isCreate = dialogMode === "create";
@@ -350,6 +365,7 @@ function AdminStudentsContent() {
                 canDelete={canDelete}
                 onEdit={handleOpenEdit}
                 onDelete={handleDelete}
+                onView={handleOpenView}
               />
               <Pagination
                 currentPage={currentPage}
@@ -373,6 +389,20 @@ function AdminStudentsContent() {
         submitting={submitting}
         onSubmit={handleSubmit}
       />
+
+      {viewingStudent && (
+        <StudentDetailDialog
+          open={viewDialogOpen}
+          onOpenChange={(open) => {
+            if (open) {
+              dispatch({ type: 'OPEN_VIEW', payload: viewingStudent });
+            } else {
+              dispatch({ type: 'CLOSE_VIEW' });
+            }
+          }}
+          student={viewingStudent}
+        />
+      )}
     </div>
   );
 }
