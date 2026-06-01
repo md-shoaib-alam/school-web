@@ -114,28 +114,26 @@ export function StudentDetailDialog({
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-lg p-0 overflow-hidden border-none bg-card shadow-2xl rounded-2xl max-h-[90vh] flex flex-col">
-        {/* Banner with modern gradient background */}
-        <div className="h-32 bg-gradient-to-r from-emerald-500 via-teal-600 to-emerald-600 relative flex-shrink-0">
-          <div className="absolute top-4 right-10 flex items-center gap-1.5 bg-white/10 backdrop-blur-md px-2.5 py-1 rounded-full text-[10px] text-white font-medium border border-white/20 uppercase tracking-wider">
-            <Sparkles className="size-3 text-emerald-300 animate-pulse" />
+        {/* Profile Card Header Info */}
+        <div className="px-6 pt-6 pb-5 border-b flex-shrink-0 relative">
+          {/* Subtle Sparkles Section Title */}
+          <div className="flex items-center gap-1.5 text-xs text-emerald-600 dark:text-emerald-400 font-semibold uppercase tracking-wider mb-4 pr-8">
+            <Sparkles className="size-3.5 animate-pulse text-emerald-500" />
             Student Profile
           </div>
-        </div>
 
-        {/* Profile Card Header Info overlapping the banner */}
-        <div className="px-6 relative pb-4 border-b flex-shrink-0">
-          <div className="flex flex-row items-end gap-4 sm:-mt-12 -mt-6 text-left">
-            {/* Beautiful Overlapping Avatar Circle */}
-            <div className="size-24 rounded-full border-4 border-card bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 flex items-center justify-center text-2xl font-bold shadow-xl shrink-0">
+          <div className="flex flex-row items-center gap-4 text-left">
+            {/* Beautiful Avatar Circle */}
+            <div className="size-16 rounded-full border border-emerald-500/20 bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 flex items-center justify-center text-xl font-bold shadow-md shrink-0">
               {initials}
             </div>
             
-            <div className="flex-1 space-y-1 py-1">
+            <div className="flex-1 space-y-1 py-0.5">
               <DialogTitle className="text-lg sm:text-xl font-bold text-foreground tracking-tight text-left">
                 {currentStudent.name}
               </DialogTitle>
               <DialogDescription className="sr-only">
-                Student details and profile profile.
+                Student details and profile.
               </DialogDescription>
               <div className="flex flex-wrap items-center justify-start gap-2">
                 <Badge variant="secondary" className="bg-emerald-100 hover:bg-emerald-100 dark:bg-emerald-900/30 text-emerald-800 dark:text-emerald-400 font-medium">
