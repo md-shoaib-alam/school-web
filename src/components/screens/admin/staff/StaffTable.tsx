@@ -11,7 +11,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Pencil, Trash2, Shield, Phone, Mail, Copy, Check } from "lucide-react";
+import { Pencil, Trash2, Shield, Phone, Mail, Copy, Check, Eye } from "lucide-react";
 import { useState } from "react";
 import { StaffMember } from "./types";
 import { getInitials, roleBadgeStyle, avatarStyle } from "./utils";
@@ -20,6 +20,7 @@ interface StaffTableProps {
   staff: StaffMember[];
   onEdit: (member: StaffMember) => void;
   onDelete: (member: StaffMember) => void;
+  onView: (member: StaffMember) => void;
   canEdit: boolean;
   canDelete: boolean;
 }
@@ -28,6 +29,7 @@ export function StaffTable({
   staff,
   onEdit,
   onDelete,
+  onView,
   canEdit,
   canDelete,
 }: StaffTableProps) {
@@ -44,10 +46,10 @@ export function StaffTable({
         <TableHeader className="bg-zinc-50/50 dark:bg-zinc-900/20">
           <TableRow>
             <TableHead className="font-bold uppercase text-[10px] tracking-widest text-zinc-500">Member</TableHead>
-            <TableHead className="font-bold uppercase text-[10px] tracking-widest text-zinc-500">Contact</TableHead>
-            <TableHead className="font-bold uppercase text-[10px] tracking-widest text-zinc-500">Role</TableHead>
-            <TableHead className="font-bold uppercase text-[10px] tracking-widest text-zinc-500">Status</TableHead>
-            {(canEdit || canDelete) && <TableHead className="text-right font-bold uppercase text-[10px] tracking-widest text-zinc-500">Actions</TableHead>}
+            <TableHead className="font-bold uppercase text-[10px] tracking-widest text-zinc-500 hidden sm:table-cell">Contact</TableHead>
+            <TableHead className="font-bold uppercase text-[10px] tracking-widest text-zinc-500 hidden md:table-cell">Role</TableHead>
+            <TableHead className="font-bold uppercase text-[10px] tracking-widest text-zinc-500 hidden sm:table-cell">Status</TableHead>
+            <TableHead className="text-right font-bold uppercase text-[10px] tracking-widest text-zinc-500">Actions</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -87,7 +89,7 @@ export function StaffTable({
                     </div>
                   </div>
                 </TableCell>
-                <TableCell>
+                <TableCell className="hidden sm:table-cell">
                   <div className="flex flex-col gap-1">
                     <div className="flex items-center gap-1.5 text-xs text-zinc-600 dark:text-zinc-400">
                       <Phone className="size-3" />
@@ -95,7 +97,7 @@ export function StaffTable({
                     </div>
                   </div>
                 </TableCell>
-                <TableCell>
+                <TableCell className="hidden md:table-cell">
                   {member.customRole ? (
                     <Badge
                       variant="outline"
@@ -109,44 +111,51 @@ export function StaffTable({
                     <Badge variant="secondary" className="text-[10px] font-bold">Standard</Badge>
                   )}
                 </TableCell>
-                <TableCell>
+                <TableCell className="hidden sm:table-cell">
                   <Badge
                     variant="outline"
                     className={`text-[10px] font-bold shadow-none ${
                       member.isActive 
-                        ? "bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-900/20 dark:text-emerald-400 dark:border-emerald-800" 
-                        : "bg-zinc-50 text-zinc-600 border-zinc-200 dark:bg-zinc-900/50 dark:text-zinc-400 dark:border-zinc-800"
+                        ? "bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/40 dark:text-emerald-400 dark:border-emerald-800" 
+                        : "bg-zinc-50 text-zinc-600 border-zinc-200 dark:bg-zinc-950 dark:text-zinc-400 dark:border-zinc-800"
                     }`}
                   >
                     {member.isActive ? "Active" : "Inactive"}
                   </Badge>
                 </TableCell>
-                {(canEdit || canDelete) && (
-                  <TableCell className="text-right">
-                    <div className="flex justify-end gap-1">
-                      {canEdit && (
-                        <Button
-                          size="icon"
-                          variant="ghost"
-                          className="size-8 text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-900/20"
-                          onClick={() => onEdit(member)}
-                        >
-                          <Pencil className="size-3.5" />
-                        </Button>
-                      )}
-                      {canDelete && (
-                        <Button
-                          size="icon"
-                          variant="ghost"
-                          className="size-8 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20"
-                          onClick={() => onDelete(member)}
-                        >
-                          <Trash2 className="size-3.5" />
-                        </Button>
-                      )}
-                    </div>
-                  </TableCell>
-                )}
+                <TableCell className="text-right">
+                  <div className="flex justify-end gap-1">
+                    <Button
+                      size="icon"
+                      variant="ghost"
+                      className="size-8 text-zinc-500 hover:text-emerald-600 dark:hover:bg-emerald-900/20 shrink-0"
+                      onClick={() => onView(member)}
+                      title="View Details"
+                    >
+                      <Eye className="size-3.5" />
+                    </Button>
+                    {canEdit && (
+                      <Button
+                        size="icon"
+                        variant="ghost"
+                        className="size-8 text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-900/20 shrink-0"
+                        onClick={() => onEdit(member)}
+                      >
+                        <Pencil className="size-3.5" />
+                      </Button>
+                    )}
+                    {canDelete && (
+                      <Button
+                        size="icon"
+                        variant="ghost"
+                        className="size-8 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 shrink-0"
+                        onClick={() => onDelete(member)}
+                      >
+                        <Trash2 className="size-3.5" />
+                      </Button>
+                    )}
+                  </div>
+                </TableCell>
               </TableRow>
             ))
           )}
