@@ -23,16 +23,16 @@ export function TeachersHeader({
 }: TeachersHeaderProps) {
   return (
     <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
-      <div className="relative max-w-sm flex-1">
+      <div className="relative w-full sm:max-w-sm flex-1 order-2 sm:order-1">
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
         <Input
           placeholder="Search teachers…"
-          className="pl-9"
+          className="pl-9 w-full"
           value={search}
           onChange={(e) => onSearchChange(e.target.value)}
         />
       </div>
-      <div className="flex items-center gap-3 w-full sm:w-auto">
+      <div className="flex items-center justify-between sm:justify-start gap-3 w-full sm:w-auto order-1 sm:order-2">
         <div className="flex items-center gap-1 bg-zinc-100 dark:bg-zinc-800 p-1 rounded-lg">
           <Button
             variant={viewMode === "table" ? "secondary" : "ghost"}

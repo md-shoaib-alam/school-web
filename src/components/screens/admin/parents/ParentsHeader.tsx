@@ -24,7 +24,7 @@ export function ParentsHeader({
   onAddClick,
 }: ParentsHeaderProps) {
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
           <h2 className="text-2xl font-semibold text-zinc-900 dark:text-zinc-100">
@@ -34,7 +34,7 @@ export function ParentsHeader({
             {totalParents} parents registered • {totalChildren} children linked
           </p>
         </div>
-        <div className="flex items-center gap-3 w-full sm:w-auto">
+        <div className="flex items-center justify-between sm:justify-start gap-3 w-full sm:w-auto">
           <div className="flex items-center gap-1 bg-zinc-100 dark:bg-zinc-800 p-1 rounded-lg">
             <Button
               variant={viewMode === "table" ? "secondary" : "ghost"}
@@ -54,7 +54,7 @@ export function ParentsHeader({
             </Button>
           </div>
           <Button
-            className="bg-emerald-600 hover:bg-emerald-700 text-white shadow-sm"
+            className="bg-emerald-600 hover:bg-emerald-700 text-white shadow-sm shrink-0"
             onClick={onAddClick}
           >
             <UserPlus className="size-4 mr-2" /> Add Parent
@@ -62,11 +62,11 @@ export function ParentsHeader({
         </div>
       </div>
 
-      <div className="relative max-w-md">
+      <div className="relative w-full sm:max-w-md">
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-zinc-400 dark:text-zinc-500" />
         <Input
           placeholder="Search parents or children…"
-          className="pl-9"
+          className="pl-9 w-full"
           value={search}
           onChange={(e) => onSearchChange(e.target.value)}
         />
