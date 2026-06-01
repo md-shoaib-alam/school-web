@@ -14,6 +14,7 @@ import { StudentSelector } from './payment/StudentSelector';
 import { PendingFeesChecklist } from './payment/PendingFeesChecklist';
 import { PaymentSummary } from './payment/PaymentSummary';
 import { SuccessDialog } from './payment/SuccessDialog';
+import { AddManualFeeDialog } from './payment/AddManualFeeDialog';
 
 interface MakePaymentTabProps {
   canCreate: boolean;
@@ -59,6 +60,7 @@ export function MakePaymentTab({ canCreate }: MakePaymentTabProps) {
   const [receiptNumber, setReceiptNumber] = useState('');
   const [showSuccess, setShowSuccess] = useState(false);
   const [customPaidAmount, setCustomPaidAmount] = useState<number | null>(null);
+  const [manualPayOpen, setManualPayOpen] = useState(false);
 
   const filteredStudents = useMemo(() => {
     if (!classFilter) return [];
@@ -71,6 +73,32 @@ export function MakePaymentTab({ canCreate }: MakePaymentTabProps) {
     return result.filter(s => s.name.toLowerCase().includes(q) || (s.phone && s.phone.toLowerCase().includes(q)));
   }, [students, studentSearch, classFilter]);
 
+  const [siblings, setSiblings] = useState<{ id: string; name: string; className: string }[]>([]);
+
+  const handleSelectSibling = async (siblingId: string) => {
+    setLoadingFees(true);
+    try {
+      const res = await apiFetch(`/api/students/${siblingId}`);
+      if (res.ok) {
+        const fullSib = await res.json();
+        const sibOption: StudentOption = {
+          id: fullSib.id,
+          name: fullSib.name,
+          className: fullSib.className,
+          classId: fullSib.classId,
+          rollNumber: fullSib.rollNumber,
+          phone: fullSib.phone || '',
+        };
+        await handleSelectStudent(sibOption);
+      } else {
+        toast.error("Failed to load sibling profile");
+      }
+    } catch (err) {
+      console.error(err);
+      toast.error("Failed to switch to sibling");
+    }
+  };
+
   const handleSelectStudent = async (student: StudentOption) => {
     setSelectedStudent(student);
     setSelectedFeeIds(new Set());
@@ -78,7 +106,17 @@ export function MakePaymentTab({ canCreate }: MakePaymentTabProps) {
     setShowSuccess(false);
     setLoadingFees(true);
     setCustomPaidAmount(null);
+    setSiblings([]);
     try {
+      apiFetch(`/api/students/${student.id}`)
+        .then(res => res.json())
+        .then(data => {
+          if (data && data.siblings) {
+            setSiblings(data.siblings);
+          }
+        })
+        .catch(err => console.error("Error loading siblings:", err));
+
       const feesRes = await apiFetch(`/api/fees?studentId=${student.id}&status=pending,overdue,partially_paid`);
       if (feesRes.ok) {
         const data = await feesRes.json();
@@ -162,7 +200,7 @@ export function MakePaymentTab({ canCreate }: MakePaymentTabProps) {
   }
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 h-[calc(100vh-6rem)] flex flex-col overflow-hidden">
       <SuccessDialog 
         open={showSuccess}
         onOpenChange={setShowSuccess}
@@ -184,13 +222,16 @@ export function MakePaymentTab({ canCreate }: MakePaymentTabProps) {
         <div className="space-y-4">
           <PendingFeesChecklist 
             selectedStudent={selectedStudent}
-            onChangeStudent={() => { setSelectedStudent(null); setPendingFees([]); setSelectedFeeIds(new Set<string>()); }}
+            onChangeStudent={() => { setSelectedStudent(null); setPendingFees([]); setSelectedFeeIds(new Set<string>()); setSiblings([]); }}
             concessions={concessions}
             pendingFees={pendingFees}
             loadingFees={loadingFees}
             selectedFeeIds={selectedFeeIds}
             onToggleFee={toggleFee}
             onToggleAll={toggleAll}
+            onOpenManualPayment={() => setManualPayOpen(true)}
+            siblings={siblings}
+            onSelectSibling={handleSelectSibling}
           />
 
           {selectedFeeIds.size > 0 && (
@@ -205,6 +246,14 @@ export function MakePaymentTab({ canCreate }: MakePaymentTabProps) {
               setPaymentMethod={setPaymentMethod}
               onPay={handlePay}
               paying={paying}
+            />
+          )}
+          {selectedStudent && (
+            <AddManualFeeDialog 
+              open={manualPayOpen}
+              onOpenChange={setManualPayOpen}
+              student={selectedStudent}
+              onSuccess={() => handleSelectStudent(selectedStudent)}
             />
           )}
         </div>
