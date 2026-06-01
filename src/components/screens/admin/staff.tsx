@@ -298,18 +298,18 @@ export function AdminStaff() {
     <div className="space-y-6">
       {/* Header */}
       <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
-        <div className="relative max-w-sm flex-1 w-full">
+        <div className="relative w-full sm:max-w-sm flex-1 order-2 sm:order-1">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
           <Input
             placeholder="Search by name, email, phone..."
-            className="pl-9 bg-white dark:bg-zinc-900"
+            className="pl-9 bg-white dark:bg-zinc-900 w-full"
             value={search}
             onChange={(e) => dispatch({ type: 'SET_SEARCH', payload: e.target.value })}
           />
         </div>
 
-        <div className="flex items-center gap-2">
-          <div className="flex items-center p-1 bg-zinc-100 dark:bg-zinc-800 rounded-lg mr-2">
+        <div className="flex items-center justify-between sm:justify-start gap-3 w-full sm:w-auto order-1 sm:order-2">
+          <div className="flex items-center p-1 bg-zinc-100 dark:bg-zinc-800 rounded-lg">
             <Button
               variant="ghost"
               size="sm"
@@ -336,11 +336,8 @@ export function AdminStaff() {
             </Button>
           </div>
 
-          <Button variant="outline" size="icon" onClick={() => refetchStaff()} className="size-10">
-            <RotateCcw className="size-4" />
-          </Button>
           {canCreate && (
-            <Button className="bg-emerald-600 hover:bg-emerald-700 text-white shadow-none" onClick={handleOpenCreate}>
+            <Button className="bg-emerald-600 hover:bg-emerald-700 text-white shadow-none shrink-0" onClick={handleOpenCreate}>
               <Plus className="size-4 mr-2" /> Add Staff
             </Button>
           )}

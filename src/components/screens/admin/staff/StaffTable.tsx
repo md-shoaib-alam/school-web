@@ -39,7 +39,7 @@ export function StaffTable({
     setTimeout(() => setCopiedId(null), 2000);
   };
   return (
-    <div className="overflow-x-auto">
+    <div className="overflow-x-auto px-4 sm:px-6">
       <Table>
         <TableHeader className="bg-zinc-50/50 dark:bg-zinc-900/20">
           <TableRow>
