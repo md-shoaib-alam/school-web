@@ -124,20 +124,20 @@ export function StudentDetailDialog({
 
         {/* Profile Card Header Info overlapping the banner */}
         <div className="px-6 relative pb-4 border-b flex-shrink-0">
-          <div className="flex flex-col sm:flex-row items-center sm:items-end gap-4 -mt-12 sm:text-left text-center">
+          <div className="flex flex-row items-end gap-4 sm:-mt-12 -mt-6 text-left">
             {/* Beautiful Overlapping Avatar Circle */}
             <div className="size-24 rounded-full border-4 border-card bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 flex items-center justify-center text-2xl font-bold shadow-xl shrink-0">
               {initials}
             </div>
             
             <div className="flex-1 space-y-1 py-1">
-              <DialogTitle className="text-xl font-bold text-foreground tracking-tight sm:text-left text-center">
+              <DialogTitle className="text-lg sm:text-xl font-bold text-foreground tracking-tight text-left">
                 {currentStudent.name}
               </DialogTitle>
               <DialogDescription className="sr-only">
                 Student details and profile profile.
               </DialogDescription>
-              <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2">
+              <div className="flex flex-wrap items-center justify-start gap-2">
                 <Badge variant="secondary" className="bg-emerald-100 hover:bg-emerald-100 dark:bg-emerald-900/30 text-emerald-800 dark:text-emerald-400 font-medium">
                   {currentStudent.className || "Unassigned Class"}
                 </Badge>
@@ -157,7 +157,7 @@ export function StudentDetailDialog({
           {isLoading ? (
             /* Premium Pulsing Skeleton Loader */
             <div className="animate-pulse space-y-6 py-2">
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="h-14 bg-muted rounded-xl" />
                 <div className="h-14 bg-muted rounded-xl" />
                 <div className="h-14 bg-muted rounded-xl" />
@@ -174,7 +174,7 @@ export function StudentDetailDialog({
                   <User className="size-3.5 text-emerald-600" />
                   Personal Information
                 </h3>
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className="bg-secondary/20 p-3 rounded-xl border border-secondary/30">
                     <p className="text-[10px] text-muted-foreground font-medium uppercase">Gender</p>
                     <p className="text-sm font-semibold capitalize mt-0.5 text-foreground flex items-center gap-1.5">
@@ -366,7 +366,7 @@ export function StudentDetailDialog({
                         <p className="text-sm font-bold capitalize">Active Subscription</p>
                       </div>
                     </div>
-                    <div className="grid grid-cols-2 gap-4 pt-1 text-xs">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-1 text-xs">
                       <div>
                         <p className="text-muted-foreground font-medium uppercase text-[9px] tracking-wide">Assigned Route</p>
                         <p className="font-semibold text-foreground mt-0.5">

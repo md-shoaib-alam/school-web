@@ -43,11 +43,11 @@ export function StudentTable({
   onView,
 }: StudentTableProps) {
   return (
-    <div className="overflow-x-auto px-6">
+    <div className="overflow-x-auto px-2 sm:px-6">
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead className="w-16 h-12">Roll No</TableHead>
+            <TableHead className="w-16 h-12 text-center sm:text-left">Roll No</TableHead>
             <TableHead className="h-12 ">Name</TableHead>
             <TableHead className="hidden md:table-cell">Class</TableHead>
             <TableHead className="hidden sm:table-cell">Gender</TableHead>
@@ -73,7 +73,7 @@ export function StudentTable({
                 key={student.id}
                 className="hover:bg-emerald-50/50 dark:hover:bg-emerald-900/20 transition-colors border-b last:border-none group/row"
               >
-                <TableCell className="font-mono text-sm py-4">
+                <TableCell className="font-mono text-sm py-4 text-center sm:text-left">
                   {student.rollNumber}
                 </TableCell>
                 <TableCell className="py-4">
@@ -89,9 +89,6 @@ export function StudentTable({
                     <div className="min-w-0">
                       <p className="font-medium text-sm truncate">
                         {student.name}
-                      </p>
-                      <p className="text-xs text-muted-foreground truncate md:hidden">
-                        {student.className}
                       </p>
                     </div>
                   </div>

@@ -114,7 +114,7 @@ export function PendingFeesChecklist({
                 className="text-emerald-700 border-emerald-200 hover:bg-emerald-50 dark:hover:bg-emerald-950/20"
                 onClick={onOpenManualPayment}
               >
-                Add Manual Fee
+                Add Fee
               </Button>
               {pendingFees.length > 0 && (
                 <Button variant="outline" size="sm" onClick={onToggleAll}>
