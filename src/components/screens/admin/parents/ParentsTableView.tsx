@@ -39,10 +39,10 @@ export function ParentsTableView({
           <table className="w-full text-left text-sm">
             <thead className="bg-zinc-50 dark:bg-zinc-800/50 text-zinc-500 dark:text-zinc-400 uppercase text-[10px] font-bold tracking-wider">
               <tr>
-                <th className="px-6 py-4">Parent</th>
-                <th className="px-6 py-4 hidden sm:table-cell">Children</th>
-                <th className="px-6 py-4 hidden lg:table-cell">Occupation</th>
-                <th className="px-6 py-4 text-center">Actions</th>
+                <th className="px-3 sm:px-6 py-4">Parent</th>
+                <th className="px-3 sm:px-6 py-4 hidden sm:table-cell">Children</th>
+                <th className="px-3 sm:px-6 py-4 hidden lg:table-cell">Occupation</th>
+                <th className="px-3 sm:px-6 py-4 text-right">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-zinc-100 dark:divide-zinc-800">
@@ -51,7 +51,7 @@ export function ParentsTableView({
                 const color = avatarColors[index % avatarColors.length];
                 return (
                   <tr key={parent.id} className="hover:bg-zinc-50/50 dark:hover:bg-zinc-800/30 transition-colors">
-                    <td className="px-6 py-4">
+                    <td className="px-3 sm:px-6 py-4">
                       <div className="flex items-center gap-3">
                         <Avatar className="size-8 shrink-0">
                           <AvatarFallback className={`${color} text-white text-[10px] font-bold`}>
@@ -69,7 +69,7 @@ export function ParentsTableView({
                         </div>
                       </div>
                     </td>
-                    <td className="px-6 py-4 hidden sm:table-cell">
+                    <td className="px-3 sm:px-6 py-4 hidden sm:table-cell">
                       <div className="flex flex-wrap gap-1">
                         {parent.children.map((child) => (
                           <Badge key={child.id} variant="secondary" className="text-[10px] py-0">
@@ -79,26 +79,27 @@ export function ParentsTableView({
                         {parent.children.length === 0 && <span className="text-xs text-zinc-400 italic">None linked</span>}
                       </div>
                     </td>
-                    <td className="px-6 py-4 hidden lg:table-cell text-zinc-600 dark:text-zinc-400 font-medium">
+                    <td className="px-3 sm:px-6 py-4 hidden lg:table-cell text-zinc-600 dark:text-zinc-400 font-medium">
                       {parent.occupation || 'N/A'}
                     </td>
-                    <td className="px-6 py-4">
-                      <div className="flex items-center justify-center gap-2">
+                    <td className="px-3 sm:px-6 py-4">
+                      <div className="flex items-center justify-end gap-1 sm:gap-2">
                         <Button
                           variant="outline"
                           size="sm"
-                          className="h-8 gap-2 text-xs border-emerald-200 text-emerald-600 hover:bg-emerald-50"
+                          className="h-8 w-8 sm:w-auto gap-1 sm:gap-2 text-xs border-emerald-200 text-emerald-600 hover:bg-emerald-50 p-0 sm:px-3 shrink-0"
                           onClick={() => onLinkOpen(parent)}
+                          title="Link Child"
                         >
                           <LinkIcon className="size-3.5" />
-                          Link
+                          <span className="hidden sm:inline">Link</span>
                         </Button>
-                        <Button variant="ghost" size="icon" className="size-8 text-zinc-400 hover:text-emerald-600" onClick={() => onEdit(parent)}>
+                        <Button variant="ghost" size="icon" className="size-8 text-zinc-400 hover:text-emerald-600 shrink-0" onClick={() => onEdit(parent)}>
                           <Pencil className="size-3.5" />
                         </Button>
                         <AlertDialog>
                           <AlertDialogTrigger asChild>
-                            <Button variant="ghost" size="icon" className="size-8 text-zinc-400 hover:text-red-600" title="Delete">
+                            <Button variant="ghost" size="icon" className="size-8 text-zinc-400 hover:text-red-600 shrink-0" title="Delete">
                               <Trash2 className="size-3.5" />
                             </Button>
                           </AlertDialogTrigger>
