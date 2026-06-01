@@ -1,6 +1,7 @@
 import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { StatusToggle } from "./status-toggle";
+import { IdCard } from "lucide-react";
 
 interface AdmitCardSettingsCardProps {
   enableModalAdmitCardPreview: boolean;
@@ -15,8 +16,8 @@ export function AdmitCardSettingsCard({
     <Card>
       <CardHeader>
         <div className="flex items-center gap-3">
-          <div className="size-9 rounded-lg bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center text-lg text-amber-600 dark:text-amber-400 font-bold">
-            🎫
+          <div className="size-9 rounded-lg bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center text-amber-600 dark:text-amber-400">
+            <IdCard className="size-5" />
           </div>
           <div>
             <CardTitle className="text-lg">Admit Card Preference</CardTitle>
@@ -64,11 +65,11 @@ export function AdmitCardSettingsCard({
                   <div className={`h-5 px-2 rounded-t-md text-[8px] font-medium flex items-center gap-1 shrink-0 transition-colors ${
                     enableModalAdmitCardPreview ? "bg-white dark:bg-zinc-950 text-amber-650 dark:text-amber-400 border-t border-x border-zinc-200 dark:border-zinc-800" : "bg-zinc-100/60 dark:bg-zinc-900/60 text-zinc-400 dark:text-zinc-500"
                   }`}>
-                    🏫 Admin Portal
+                    Admin Portal
                   </div>
                   {!enableModalAdmitCardPreview && (
                     <div className="h-5 px-2 rounded-t-md bg-white dark:bg-zinc-950 text-amber-650 dark:text-amber-400 border-t border-x border-zinc-200 dark:border-zinc-800/80 text-[8px] font-semibold flex items-center gap-1 animate-in slide-in-from-bottom-2 shrink-0">
-                      🎫 Preview Tab
+                      Preview Tab
                     </div>
                   )}
                 </div>
@@ -93,11 +94,10 @@ export function AdmitCardSettingsCard({
                   <div className="absolute inset-0 bg-zinc-950/65 dark:bg-black/65 backdrop-blur-[0.5px] flex flex-col items-center justify-center p-2.5 transition-all duration-300 z-30 animate-in fade-in">
                     <div className="w-[190px] h-[105px] bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 rounded-lg shadow-2xl flex flex-col p-2 justify-between mt-2.5 animate-in zoom-in-95">
                       <div className="flex items-center justify-between border-b border-zinc-100 dark:border-zinc-800 pb-1 mb-1">
-                        <span className="text-[7px] font-bold text-zinc-700 dark:text-zinc-300">🎫 Admit Card popover</span>
+                        <span className="text-[7px] font-bold text-zinc-700 dark:text-zinc-300">Admit Card popover</span>
                         <span className="text-[7px] text-zinc-400 dark:text-zinc-550">✕</span>
                       </div>
                       <div className="flex-1 bg-amber-50 dark:bg-amber-500/5 rounded border border-amber-100 dark:border-amber-500/20 p-1 flex flex-col items-center justify-center gap-1">
-                        <span className="text-[9px]">🎫</span>
                         <span className="text-[5px] text-zinc-650 dark:text-zinc-400 font-semibold">Exam Admit Cards</span>
                       </div>
                       <div className="flex justify-between items-center text-[5px] text-zinc-450 dark:text-zinc-500 mt-1">
@@ -120,10 +120,9 @@ export function AdmitCardSettingsCard({
                       </div>
                       <div className="flex-1 p-1.5 bg-white dark:bg-zinc-950 flex flex-col justify-between overflow-hidden">
                         <div className="flex items-center justify-between border-b border-zinc-150 dark:border-zinc-900 pb-0.5 text-[5px] text-zinc-700 dark:text-zinc-300 font-semibold truncate">
-                          🎫 Admit Cards Hall Tickets
+                          Admit Cards Hall Tickets
                         </div>
                         <div className="flex-1 my-1 border border-dashed border-zinc-200 dark:border-zinc-800 rounded p-1 flex items-center justify-center bg-zinc-50/50 dark:bg-zinc-900/40 gap-1.5">
-                          <span className="text-[12px]">🎫</span>
                           <div className="flex flex-col gap-0.5 leading-none">
                             <span className="text-[5px] text-zinc-650 dark:text-zinc-400 font-medium">Class 1A batch</span>
                           </div>

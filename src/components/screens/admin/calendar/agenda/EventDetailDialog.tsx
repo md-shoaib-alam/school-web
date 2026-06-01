@@ -19,7 +19,7 @@ export function EventDetailDialog({
 }: EventDetailDialogProps) {
   return (
     <Dialog open={!!event} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-[425px] sm:max-w-[450px] rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 shadow-2xl p-0 overflow-hidden">
+      <DialogContent className="w-[92%] sm:w-full max-w-[425px] sm:max-w-[450px] rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 shadow-2xl p-0 overflow-hidden mx-auto">
         {event && (
           <>
             <div className="h-1.5" style={{ backgroundColor: event.color || EVENT_TYPE_COLORS[event.type] || "#3b82f6" }} />

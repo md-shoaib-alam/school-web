@@ -46,6 +46,7 @@ import {
   Send,
   Smartphone,
   Trash2,
+  ListTodo,
 } from "lucide-react";
 import { type UserRole } from "@/store/use-app-store";
 
@@ -85,6 +86,12 @@ export const navItems: Record<UserRole, NavItem[]> = {
       permModule: "tenants",
     },
     {
+      key: "bulk-attendance-import",
+      label: "Bulk Attendance",
+      icon: <ClipboardList className="size-4" />,
+      permModule: null,
+    },
+    {
       key: "users",
       label: "All Users",
       icon: <UserCog className="size-4" />,
@@ -120,10 +127,22 @@ export const navItems: Record<UserRole, NavItem[]> = {
 
     // Platform Control
     {
-      key: "feature-flags",
-      label: "Feature Flags",
+      key: "feature-control",
+      label: "Feature Control",
       icon: <Blocks className="size-4" />,
       permModule: "feature-flags",
+      children: [
+        {
+          key: "feature-flags",
+          label: "Feature Flags",
+          icon: <Blocks className="size-4" />,
+        },
+        {
+          key: "roadmap",
+          label: "Product Roadmap",
+          icon: <ListTodo className="size-4" />,
+        },
+      ],
     },
     {
       key: "roles",
@@ -304,9 +323,21 @@ export const navItems: Record<UserRole, NavItem[]> = {
       ]
     },
     {
-      key: "homework",
+      key: "homework-group",
       label: "Homework",
       icon: <FileText className="size-4" />,
+      children: [
+        {
+          key: "homework",
+          label: "Active Homework",
+          icon: <ClipboardList className="size-4" />,
+        },
+        {
+          key: "old-homework",
+          label: "Old Homework",
+          icon: <History className="size-4" />,
+        },
+      ]
     },
     {
       key: "leaves",

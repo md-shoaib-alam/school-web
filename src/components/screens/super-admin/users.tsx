@@ -101,9 +101,9 @@ export function SuperAdminUsers() {
 
   // Date Formatters
   const formatDate = (dateValue: string) => {
-    if (!dateValue) return "—";
+    if (!dateValue) return "–";
     const d = new Date(dateValue);
-    if (isNaN(d.getTime())) return "—";
+    if (isNaN(d.getTime())) return "–";
     return d.toLocaleDateString("en-US", {
       year: "numeric",
       month: "short",
@@ -112,9 +112,9 @@ export function SuperAdminUsers() {
   };
 
   const formatDateTime = (dateValue: string) => {
-    if (!dateValue) return "—";
+    if (!dateValue) return "–";
     const d = new Date(dateValue);
-    if (isNaN(d.getTime())) return "—";
+    if (isNaN(d.getTime())) return "–";
     return d.toLocaleString("en-US", {
       year: "numeric",
       month: "short",

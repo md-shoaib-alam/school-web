@@ -4,7 +4,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Pencil, Trash2, Shield, Phone, Mail, Copy, Check, MoreHorizontal } from "lucide-react";
+import { Pencil, Trash2, Phone, Mail, Copy, Check, Eye } from "lucide-react";
 import { StaffMember } from "./types";
 import { getInitials, roleBadgeStyle, avatarStyle } from "./utils";
 import { useState } from "react";
@@ -14,11 +14,12 @@ interface StaffCardProps {
   member: StaffMember;
   onEdit: (member: StaffMember) => void;
   onDelete: (member: StaffMember) => void;
+  onView: (member: StaffMember) => void;
   canEdit: boolean;
   canDelete: boolean;
 }
 
-export function StaffCard({ member, onEdit, onDelete, canEdit, canDelete }: StaffCardProps) {
+export function StaffCard({ member, onEdit, onDelete, onView, canEdit, canDelete }: StaffCardProps) {
   const [copied, setCopied] = useState(false);
 
   const handleCopy = () => {
@@ -72,6 +73,15 @@ export function StaffCard({ member, onEdit, onDelete, canEdit, canDelete }: Staf
             </div>
             
             <div className="flex items-center gap-0.5 shrink-0 ml-1">
+              <Button 
+                size="icon" 
+                variant="ghost" 
+                className="size-8 text-zinc-500 hover:text-emerald-600 dark:hover:bg-emerald-900/20"
+                onClick={() => onView(member)}
+                title="View Details"
+              >
+                <Eye className="size-3.5" />
+              </Button>
               {canEdit && (
                 <Button 
                   size="icon" 

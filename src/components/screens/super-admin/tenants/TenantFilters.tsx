@@ -1,3 +1,4 @@
+import { useState, useEffect, useRef } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import {
@@ -36,6 +37,28 @@ export function TenantFilters({
   onAddClick,
   canCreate,
 }: TenantFiltersProps) {
+  const [localSearch, setLocalSearch] = useState(search);
+  const onSearchChangeRef = useRef(onSearchChange);
+
+  // Sync ref with the latest onSearchChange callback
+  useEffect(() => {
+    onSearchChangeRef.current = onSearchChange;
+  }, [onSearchChange]);
+
+  // Sync local search when the external search prop changes (e.g., cleared/reset)
+  useEffect(() => {
+    setLocalSearch(search);
+  }, [search]);
+
+  // Debounce the onSearchChange callback using the stable ref
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      onSearchChangeRef.current(localSearch);
+    }, 400);
+
+    return () => clearTimeout(timer);
+  }, [localSearch]);
+
   return (
     <div className="flex flex-col gap-4">
       <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
@@ -45,8 +68,8 @@ export function TenantFilters({
             <Input
               placeholder="Search schools..."
               className="pl-9 h-10 rounded-xl"
-              value={search}
-              onChange={(e) => onSearchChange(e.target.value)}
+              value={localSearch}
+              onChange={(e) => setLocalSearch(e.target.value)}
             />
           </div>
           

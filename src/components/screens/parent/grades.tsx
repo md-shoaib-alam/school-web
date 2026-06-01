@@ -20,6 +20,7 @@ import { GradesSummary } from "./grades/GradesSummary";
 import { PerformanceChart } from "./grades/PerformanceChart";
 import { GradesTable } from "./grades/GradesTable";
 import { GradesSkeleton } from "./grades/GradesSkeleton";
+import { ResultPublishedBanner } from "@/components/shared/result-published-banner";
 
 // Utils
 import { getGradesForStudent, getSubjectChartData, getOverallStats } from "./grades/utils";
@@ -40,7 +41,7 @@ interface AssessmentGrade {
 export function ParentGrades({ initialTab = "exams" }: { initialTab?: "exams" | "assessments" }) {
   const { currentUser } = useAppStore();
   const params = useParams();
-  const router = useRouter();
+  const { push } = useRouter();
   const slug = typeof params?.slug === 'string' ? params.slug : '';
   const topLevelTab = initialTab;
   const [grades, setGrades] = useState<GradeRecord[]>([]);
@@ -75,7 +76,7 @@ export function ParentGrades({ initialTab = "exams" }: { initialTab?: "exams" | 
 
   const handleViewMarksheet = () => {
     if (activeTab && slug) {
-      router.push(`/${slug}/view-marksheet?studentId=${activeTab}`);
+      push(`/${slug}/view-marksheet?studentId=${activeTab}`);
     }
   };
 
@@ -198,6 +199,10 @@ export function ParentGrades({ initialTab = "exams" }: { initialTab?: "exams" | 
           </Badge>
         </div>
       </div>
+
+      {topLevelTab === "exams" && (
+        <ResultPublishedBanner studentId={activeTab || undefined} />
+      )}
 
       <Tabs value={activeTab} onValueChange={handleTabChange}>
         <TabsList className={`p-1 rounded-lg border shadow-none w-fit ${

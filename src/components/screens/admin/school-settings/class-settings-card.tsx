@@ -1,6 +1,6 @@
 import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Layers } from "lucide-react";
+import { Layers, School } from "lucide-react";
 import { StatusToggle } from "./status-toggle";
 
 interface ClassSettingsCardProps {
@@ -16,8 +16,8 @@ export function ClassSettingsCard({
     <Card>
       <CardHeader>
         <div className="flex items-center gap-3">
-          <div className="size-9 rounded-lg bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center text-lg text-emerald-600 dark:text-emerald-400 font-bold">
-            🏫
+          <div className="size-9 rounded-lg bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center text-emerald-600 dark:text-emerald-400">
+            <School className="size-5" />
           </div>
           <div>
             <CardTitle className="text-lg">Class Creation Mode</CardTitle>

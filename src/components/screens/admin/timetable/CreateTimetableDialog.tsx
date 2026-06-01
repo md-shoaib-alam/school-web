@@ -202,7 +202,7 @@ export function CreateTimetableDialog({
                       ? `${currentClass.name}-${currentClass.section}`
                       : ""}
                   </span>{" "}
-                  — add, edit, or remove periods across all days.
+                  : add, edit, or remove periods across all days.
                 </>
               ) : (
                 <>
@@ -212,7 +212,7 @@ export function CreateTimetableDialog({
                       ? `${currentClass.name}-${currentClass.section}`
                       : ""}
                   </span>{" "}
-                  — select day, subject, teacher, and timing for each period.
+                  : select day, subject, teacher, and timing for each period.
                 </>
               )}
             </DialogDescription>

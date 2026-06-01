@@ -3,7 +3,7 @@
 import { useState, useMemo, useEffect, Suspense } from 'react';
 import { Card } from '@/components/ui/card';
 import { 
-  FileText, Trophy, ChevronDown, Award, ClipboardList, Printer
+  FileText, Trophy, ChevronDown, Award, ClipboardList, Printer, Crown
 } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { useRouter, useParams, useSearchParams } from 'next/navigation';
@@ -17,14 +17,21 @@ import { getGroupedExams } from './exams/utils';
 import { ExamRecord } from './exams/types';
 import { FullPageSkeleton } from "@/components/ui/full-page-skeleton";
 import { toast } from "sonner";
+import { useAppStore } from "@/store/use-app-store";
+import { useTenantDetail } from "@/lib/graphql/hooks/platform.hooks";
 
 const LoadingScreen = () => <FullPageSkeleton />;
 
 export function AdminPrintMarksheetContent() {
-  const router = useRouter();
+  const { push } = useRouter();
   const { slug } = useParams();
   const searchParams = useSearchParams();
-  const classIdParam = searchParams?.get('classId') || '';
+  const classIdParam = searchParams.get('classId') || '';
+
+  // Subscription Plan check
+  const { currentTenantId } = useAppStore();
+  const { data: detailData, isLoading: isDetailLoading } = useTenantDetail(currentTenantId || "");
+  const tenant = detailData?.tenant;
 
   // Academic Years
   const { academicYears } = useAcademicYears();
@@ -108,7 +115,48 @@ export function AdminPrintMarksheetContent() {
     );
   }, [classes, publishedFiltered]);
 
-  const examNameParam = searchParams?.get('examName') || '';
+  const examNameParam = searchParams.get('examName') || '';
+
+  if (isDetailLoading) {
+    return <LoadingScreen />;
+  }
+
+  if (tenant && tenant.plan.toLowerCase() === 'basic') {
+    return (
+      <div className="space-y-6 animate-in fade-in duration-300">
+        <div className="flex-1 min-w-0">
+          <h2 className="text-xl sm:text-2xl font-semibold tracking-tight flex items-center gap-2">
+            <Award className="size-6 sm:size-7 text-emerald-600 dark:text-emerald-500" />
+            <span>Print Marksheets</span>
+          </h2>
+          <p className="text-xs sm:text-sm text-muted-foreground mt-1">
+            Generate, preview, and print high-fidelity student marksheets.
+          </p>
+        </div>
+
+        <div className="flex flex-col items-center justify-center p-8 sm:p-16 border border-zinc-200 dark:border-zinc-800 rounded-3xl bg-gradient-to-br from-zinc-50 via-white to-zinc-50 dark:from-zinc-950 dark:via-zinc-900 dark:to-zinc-950 text-center max-w-2xl mx-auto shadow-xl mt-6">
+          <div className="size-16 rounded-2xl bg-amber-500/10 flex items-center justify-center mb-6 shadow-md">
+            <Crown className="size-8 text-amber-500 fill-amber-500/20" />
+          </div>
+          <h3 className="text-2xl font-bold text-zinc-900 dark:text-zinc-100 tracking-tight">Upgrade Plan Required</h3>
+          <p className="text-sm text-muted-foreground mt-3 max-w-md leading-relaxed">
+            High-fidelity marksheet generation and printing is exclusive to <strong>Growth Plan (Standard)</strong> and <strong>Institution Plan (Premium)</strong>. 
+          </p>
+          <p className="text-xs text-muted-foreground mt-1 max-w-md">
+            Unlock professional A4 grade report templates, custom certificate generators, library trackers, and advanced fee management tools.
+          </p>
+          <div className="mt-8 flex flex-col sm:flex-row items-center gap-3">
+            <Button 
+              onClick={() => push(`/${slug}/manage-plan`)}
+              className="bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-700 hover:to-indigo-700 text-white font-semibold h-11 px-8 rounded-xl shadow-lg shadow-violet-100 dark:shadow-none hover:shadow-xl transition-all"
+            >
+              Upgrade School Plan
+            </Button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   if (classIdParam) {
     const activeClass = classes.find((c: any) => c.id === classIdParam);
@@ -119,7 +167,7 @@ export function AdminPrintMarksheetContent() {
         classSection={activeClass?.section || ''}
         academicYear={publishedAcademicYearFilter || currentAcademicYear}
         examName={examNameParam}
-        onBack={() => router.push(`/${slug}/print-marksheet`)}
+        onBack={() => push(`/${slug}/print-marksheet`)}
       />
     );
   }
@@ -294,7 +342,7 @@ export function AdminPrintMarksheetContent() {
                                       onClick={(e) => {
                                         e.stopPropagation();
                                         if (enableModalMarksheetPreview) {
-                                          router.push(`/${slug}/print-marksheet?classId=${c.id}&examName=${encodeURIComponent(group.cycleName)}`);
+                                          push(`/${slug}/print-marksheet?classId=${c.id}&examName=${encodeURIComponent(group.cycleName)}`);
                                         } else {
                                           toast.promise(
                                             (async () => {

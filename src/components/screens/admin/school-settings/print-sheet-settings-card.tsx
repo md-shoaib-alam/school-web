@@ -2,6 +2,7 @@ import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { PrintSheetModePreview } from "./print-sheet-preview";
 import { StatusToggle } from "./status-toggle";
+import { Printer } from "lucide-react";
 
 interface PrintSheetSettingsCardProps {
   enableModalTabulationPreview: boolean;
@@ -16,8 +17,8 @@ export function PrintSheetSettingsCard({
     <Card>
       <CardHeader>
         <div className="flex items-center gap-3">
-          <div className="size-9 rounded-lg bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center text-lg text-emerald-600 dark:text-emerald-400 font-bold">
-            📊
+          <div className="size-9 rounded-lg bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center text-emerald-600 dark:text-emerald-400">
+            <Printer className="size-5" />
           </div>
           <div>
             <CardTitle className="text-lg">Print Sheet Preference</CardTitle>

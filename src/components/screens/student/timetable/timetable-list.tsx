@@ -57,7 +57,7 @@ export function TimetableList({
                       }`}
                     >
                       {isToday
-                        ? `Today — ${DAY_FULL_LABELS[day]}`
+                        ? `Today: ${DAY_FULL_LABELS[day]}`
                         : DAY_FULL_LABELS[day]}
                     </div>
                     {isToday && (

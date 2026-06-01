@@ -84,7 +84,7 @@ export function GraduatedTab({
                     .sort((a, b) => getNumericGrade(b.grade) - getNumericGrade(a.grade))
                     .map((c) => (
                       <SelectItem key={c.id} value={c.id}>
-                        {c.name}-{c.section} (Grade {c.grade}) — {c.studentCount} students
+                        {c.name}-{c.section} (Grade {c.grade}), {c.studentCount} students
                       </SelectItem>
                     ))}
                 </SelectContent>

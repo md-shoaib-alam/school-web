@@ -102,13 +102,13 @@ export function ExpensesTable({
       <Table>
         <TableHeader>
           <TableRow className="bg-zinc-50 dark:bg-zinc-900/50">
-            <TableHead>Date</TableHead>
+            <TableHead className="pl-6">Date</TableHead>
             <TableHead>Category</TableHead>
             <TableHead>Description</TableHead>
             <TableHead>Payment</TableHead>
             <TableHead>Amount</TableHead>
             <TableHead>Status</TableHead>
-            <TableHead className="text-right">Actions</TableHead>
+            <TableHead className="text-right pr-6">Actions</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -127,7 +127,7 @@ export function ExpensesTable({
           ) : (
             expenses.map((e: any) => (
               <TableRow key={e.id} className="hover:bg-rose-50/50 dark:hover:bg-rose-950/10">
-                <TableCell className="font-medium" suppressHydrationWarning>
+                <TableCell className="font-medium pl-6" suppressHydrationWarning>
                   {formatExpenseDate(e.date)}
                 </TableCell>
                 <TableCell>
@@ -145,7 +145,7 @@ export function ExpensesTable({
                     {e.status}
                   </Badge>
                 </TableCell>
-                <TableCell className="text-right">
+                <TableCell className="text-right pr-6">
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                       <Button variant="ghost" size="icon">

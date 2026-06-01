@@ -269,7 +269,7 @@ export function TeacherClasses() {
                           </Badge>
                         </TableCell>
                         <TableCell className="text-sm text-zinc-500 dark:text-zinc-400 hidden md:table-cell">
-                          {student.parentName || "—"}
+                          {student.parentName || "–"}
                         </TableCell>
                       </TableRow>
                     ))}

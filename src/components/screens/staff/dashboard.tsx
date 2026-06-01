@@ -22,7 +22,7 @@ import {
 } from "lucide-react";
 
 export function StaffDashboard() {
-  const router = useRouter();
+  const { push } = useRouter();
   const { currentUser, currentTenantName, currentTenantSlug, currentTenantId, setCurrentScreen } = useAppStore();
   const customRoleName = currentUser?.customRole?.name;
 
@@ -30,9 +30,9 @@ export function StaffDashboard() {
     setCurrentScreen(screen);
     const tid = currentTenantSlug || currentTenantId || currentUser?.tenantSlug || currentUser?.tenantId;
     if (tid) {
-      router.push(`/${tid}/${screen}`);
+      push(`/${tid}/${screen}`);
     } else {
-      router.push(`/${screen}`);
+      push(`/${screen}`);
     }
   };
 

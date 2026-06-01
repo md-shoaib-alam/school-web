@@ -23,7 +23,6 @@ import {
 import {
   Plus,
   Search,
-  RotateCcw,
   LayoutGrid,
   List
 } from "lucide-react";
@@ -38,6 +37,7 @@ import { StaffTable } from "./staff/StaffTable";
 import { StaffCard } from "./staff/StaffCard";
 import { StaffDialog } from "./staff/StaffDialog";
 import { StaffSkeleton } from "./staff/StaffSkeleton";
+import { StaffDetailDialog } from "./staff/StaffDetailDialog";
 
 // Types
 import { StaffMember, StaffFormData, emptyFormData } from "./staff/types";
@@ -77,6 +77,8 @@ type State = {
   submitting: boolean;
   deleteAlertOpen: boolean;
   memberToDelete: StaffMember | null;
+  viewDialogOpen: boolean;
+  viewingMember: StaffMember | null;
 };
 
 type Action =
@@ -88,7 +90,9 @@ type Action =
   | { type: 'SET_FORM_DATA'; payload: StaffFormData }
   | { type: 'SET_SUBMITTING'; payload: boolean }
   | { type: 'OPEN_DELETE'; payload: StaffMember }
-  | { type: 'CLOSE_DELETE' };
+  | { type: 'CLOSE_DELETE' }
+  | { type: 'OPEN_VIEW'; payload: StaffMember }
+  | { type: 'CLOSE_VIEW' };
 
 const initialState: State = {
   search: "",
@@ -99,6 +103,8 @@ const initialState: State = {
   submitting: false,
   deleteAlertOpen: false,
   memberToDelete: null,
+  viewDialogOpen: false,
+  viewingMember: null,
 };
 
 function reducer(state: State, action: Action): State {
@@ -134,6 +140,10 @@ function reducer(state: State, action: Action): State {
       return { ...state, memberToDelete: action.payload, deleteAlertOpen: true };
     case 'CLOSE_DELETE':
       return { ...state, deleteAlertOpen: false };
+    case 'OPEN_VIEW':
+      return { ...state, viewingMember: action.payload, viewDialogOpen: true };
+    case 'CLOSE_VIEW':
+      return { ...state, viewingMember: null, viewDialogOpen: false };
     default:
       return state;
   }
@@ -153,6 +163,8 @@ export function AdminStaff() {
     submitting,
     deleteAlertOpen,
     memberToDelete,
+    viewDialogOpen,
+    viewingMember,
   } = state;
 
   // --- Queries ---
@@ -298,18 +310,18 @@ export function AdminStaff() {
     <div className="space-y-6">
       {/* Header */}
       <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
-        <div className="relative max-w-sm flex-1 w-full">
+        <div className="relative w-full sm:max-w-sm flex-1 order-2 sm:order-1">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
           <Input
             placeholder="Search by name, email, phone..."
-            className="pl-9 bg-white dark:bg-zinc-900"
+            className="pl-9 bg-white dark:bg-zinc-900 w-full"
             value={search}
             onChange={(e) => dispatch({ type: 'SET_SEARCH', payload: e.target.value })}
           />
         </div>
 
-        <div className="flex items-center gap-2">
-          <div className="flex items-center p-1 bg-zinc-100 dark:bg-zinc-800 rounded-lg mr-2">
+        <div className="flex items-center justify-between sm:justify-start gap-3 w-full sm:w-auto order-1 sm:order-2">
+          <div className="flex items-center p-1 bg-zinc-100 dark:bg-zinc-800 rounded-lg">
             <Button
               variant="ghost"
               size="sm"
@@ -336,11 +348,8 @@ export function AdminStaff() {
             </Button>
           </div>
 
-          <Button variant="outline" size="icon" onClick={() => refetchStaff()} className="size-10">
-            <RotateCcw className="size-4" />
-          </Button>
           {canCreate && (
-            <Button className="bg-emerald-600 hover:bg-emerald-700 text-white shadow-none" onClick={handleOpenCreate}>
+            <Button className="bg-emerald-600 hover:bg-emerald-700 text-white shadow-none shrink-0" onClick={handleOpenCreate}>
               <Plus className="size-4 mr-2" /> Add Staff
             </Button>
           )}
@@ -356,6 +365,7 @@ export function AdminStaff() {
               staff={staff}
               onEdit={handleOpenEdit}
               onDelete={(m) => dispatch({ type: 'OPEN_DELETE', payload: m })}
+              onView={(m) => dispatch({ type: 'OPEN_VIEW', payload: m })}
               canEdit={canEdit}
               canDelete={canDelete}
             />
@@ -367,6 +377,7 @@ export function AdminStaff() {
                   member={member}
                   onEdit={handleOpenEdit}
                   onDelete={(m) => dispatch({ type: 'OPEN_DELETE', payload: m })}
+                  onView={(m) => dispatch({ type: 'OPEN_VIEW', payload: m })}
                   canEdit={canEdit}
                   canDelete={canDelete}
                 />
@@ -385,6 +396,14 @@ export function AdminStaff() {
         roles={roles}
         submitting={submitting}
         onSubmit={handleSubmit}
+      />
+
+      <StaffDetailDialog
+        open={viewDialogOpen}
+        onOpenChange={(open) => {
+          if (!open) dispatch({ type: 'CLOSE_VIEW' });
+        }}
+        member={viewingMember}
       />
 
       <AlertDialog open={deleteAlertOpen} onOpenChange={(open) => dispatch({ type: open ? 'CLOSE_DELETE' : 'CLOSE_DELETE' })}>

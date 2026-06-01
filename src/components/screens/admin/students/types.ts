@@ -16,6 +16,11 @@ export interface StudentInfo {
     status: string;
     startDate: string;
   } | null;
+  siblings?: {
+    id: string;
+    name: string;
+    className: string;
+  }[];
 }
 
 export interface ClassInfo {

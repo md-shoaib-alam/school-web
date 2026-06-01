@@ -167,7 +167,7 @@ export const ModernMinimalist: React.FC<MarksheetTemplateProps> = ({
 
       {/* Signature Area */}
       <div className="flex justify-between items-end text-[9px] font-semibold text-zinc-400 border-t border-zinc-150 pt-4 mt-2 font-sans z-10 ml-2">
-        <div>Official Record — Academic Transcript</div>
+        <div>Official Record: Academic Transcript</div>
         <div className="flex gap-8">
           <div className="flex flex-col items-center">
             <div className="w-[90px] border-b border-zinc-200 mb-1" />

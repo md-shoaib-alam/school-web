@@ -81,7 +81,7 @@ export function MaintenanceScreen({ message }: { message?: string }) {
         <div className="mt-4 inline-flex items-center gap-2 px-4 py-2 rounded-full bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800/50 animate-[fade-up_0.6s_ease-out_0.65s_forwards] opacity-0">
           <div className="size-2 rounded-full bg-amber-500 animate-pulse" />
           <span className="text-xs font-medium text-amber-700 dark:text-amber-400">
-            Maintenance in progress — please check back in a few minutes
+            Maintenance in progress: please check back in a few minutes
           </span>
         </div>
 
@@ -106,7 +106,7 @@ export function MaintenanceScreen({ message }: { message?: string }) {
 
         {/* Bottom text */}
         <p className="text-xs text-zinc-400 dark:text-zinc-600 mt-10 animate-[fade-in_0.5s_ease_1s_forwards] opacity-0">
-          SchoolSaaS — If this persists, please contact your school
+          SchoolSaaS: If this persists, please contact your school
           administrator.
         </p>
       </div>

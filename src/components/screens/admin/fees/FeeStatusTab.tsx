@@ -19,6 +19,7 @@ import { apiFetch } from '@/lib/api';
 import { useFeeConcessions, useFeeReceipts } from '@/hooks/use-fees';
 import { feeStatusConfig, receiptStatusConfig, paymentMethodIcons } from './config';
 import type { StudentOption, ClassOption, FeeItem, FeeReceipt, FeeConcession } from './types';
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 export function FeeStatusTab() {
   const { data: students = [] } = useQuery<StudentOption[]>({
@@ -38,7 +39,7 @@ export function FeeStatusTab() {
     }
   });
 
-  const [classFilter, setClassFilter] = useState('all');
+  const [classFilter, setClassFilter] = useState('');
   const [studentSearch, setStudentSearch] = useState('');
   const [selectedStudent, setSelectedStudent] = useState<StudentOption | null>(null);
 
@@ -67,10 +68,8 @@ export function FeeStatusTab() {
   const loading = loadingFees || loadingReceipts || loadingConcessions;
 
   const filteredStudents = useMemo(() => {
-    let result = students;
-    if (classFilter !== 'all') {
-      result = result.filter(s => s.classId === classFilter);
-    }
+    if (!classFilter) return [];
+    let result = students.filter(s => s.classId === classFilter);
     if (!studentSearch) return result.slice(0, 20);
     const q = studentSearch.toLowerCase();
     return result.filter(s => s.name.toLowerCase().includes(q) || (s.phone && s.phone.toLowerCase().includes(q)));
@@ -88,20 +87,19 @@ export function FeeStatusTab() {
   const payPercentage = totalFees > 0 ? Math.round((totalPaid / totalFees) * 100) : 0;
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 h-[calc(100vh-6rem)] flex flex-col overflow-hidden">
       {!selectedStudent ? (
         /* Student Search */
-        <Card className="hover:shadow-md transition-shadow">
-          <CardHeader>
+        <Card className="hover:shadow-md transition-shadow flex-1 flex flex-col overflow-hidden border-emerald-500/10 dark:border-emerald-500/5">
+          <CardHeader className="shrink-0">
             <CardTitle className="text-base flex items-center gap-2"><UserCheck className="size-5 text-emerald-600" />Check Fee Status</CardTitle>
             <CardDescription>Search for a student to view their complete fee status</CardDescription>
           </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="flex flex-col sm:flex-row gap-3">
+          <CardContent className="space-y-4 flex-1 flex flex-col overflow-hidden pb-6">
+            <div className="flex flex-col sm:flex-row gap-3 shrink-0">
               <Select value={classFilter} onValueChange={v => { setClassFilter(v); setStudentSearch(''); }}>
-                <SelectTrigger className="w-full sm:w-44"><SelectValue placeholder="Class" /></SelectTrigger>
+                <SelectTrigger className="w-full sm:w-48"><SelectValue placeholder="Select Class..." /></SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">All Classes</SelectItem>
                   {classes.map(c => <SelectItem key={c.id} value={c.id}>{c.name}-{c.section} (Grade {c.grade})</SelectItem>)}
                 </SelectContent>
               </Select>
@@ -110,22 +108,30 @@ export function FeeStatusTab() {
                 <Input placeholder="Search by name or phone number..." className="pl-9" value={studentSearch} onChange={e => setStudentSearch(e.target.value)} />
               </div>
             </div>
-            <div className="max-h-96 overflow-y-auto rounded-lg border divide-y">
-              {filteredStudents.length === 0 ? (
-                <div className="p-8 text-center text-muted-foreground"><Search className="size-8 mx-auto mb-2 opacity-30" /><p>No students found</p></div>
-              ) : filteredStudents.map(s => (
-                <button key={s.id} type="button" className="w-full flex items-center gap-3 p-3 hover:bg-emerald-50/50 dark:hover:bg-emerald-900/20 transition-colors text-left" onClick={() => handleSelectStudent(s)}>
-                  <div className="size-10 rounded-full bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 flex items-center justify-center text-sm font-semibold shrink-0">
-                    {s.name.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase()}
+            <ScrollArea className="flex-1 h-0 rounded-lg border">
+              <div className="divide-y">
+                {!classFilter ? (
+                  <div className="p-12 text-center text-muted-foreground flex flex-col items-center justify-center h-48 select-none">
+                    <UserCheck className="size-10 mb-2 text-emerald-600/40" />
+                    <p className="font-semibold text-sm text-foreground">Select a Class</p>
+                    <p className="text-xs opacity-70 mt-1 max-w-xs mx-auto">Please choose a class from the dropdown menu to view and filter its students list.</p>
                   </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="font-medium text-sm">{s.name}</p>
-                    <p className="text-xs text-muted-foreground">{s.className} • {s.phone || 'No phone'}</p>
-                  </div>
-                  <ChevronRight className="size-4 text-muted-foreground shrink-0" />
-                </button>
-              ))}
-            </div>
+                ) : filteredStudents.length === 0 ? (
+                  <div className="p-8 text-center text-muted-foreground"><Search className="size-8 mx-auto mb-2 opacity-30" /><p>No students found in this class</p></div>
+                ) : filteredStudents.map(s => (
+                  <button key={s.id} type="button" className="w-full flex items-center gap-3 p-3 hover:bg-emerald-50/50 dark:hover:bg-emerald-900/20 transition-colors text-left" onClick={() => handleSelectStudent(s)}>
+                    <div className="size-10 rounded-full bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 flex items-center justify-center text-sm font-semibold shrink-0">
+                      {s.name.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase()}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="font-medium text-sm">{s.name}</p>
+                      <p className="text-xs text-muted-foreground">{s.className} • {s.phone || 'No phone'}</p>
+                    </div>
+                    <ChevronRight className="size-4 text-muted-foreground shrink-0" />
+                  </button>
+                ))}
+              </div>
+            </ScrollArea>
           </CardContent>
         </Card>
       ) : (
@@ -226,7 +232,7 @@ export function FeeStatusTab() {
                               <TableRow key={fee.id} className="hover:bg-emerald-50/50 dark:hover:bg-emerald-900/20 transition-colors">
                                 <TableCell className="font-medium text-sm">{fee.feeCategoryName || fee.type}</TableCell>
                                 <TableCell className="hidden sm:table-cell text-sm">₹{fee.amount.toLocaleString()}</TableCell>
-                                <TableCell className="hidden md:table-cell text-sm text-amber-600">{fee.concession > 0 ? `-₹${fee.concession.toLocaleString()}` : '—'}</TableCell>
+                                <TableCell className="hidden md:table-cell text-sm text-amber-600">{fee.concession > 0 ? `-₹${fee.concession.toLocaleString()}` : '–'}</TableCell>
                                 <TableCell className="hidden md:table-cell text-sm font-medium">₹{payable.toLocaleString()}</TableCell>
                                 <TableCell className="hidden sm:table-cell text-sm text-emerald-600 font-medium">₹{fee.paidAmount.toLocaleString()}</TableCell>
                                 <TableCell className="hidden lg:table-cell text-sm text-muted-foreground">{fee.dueDate}</TableCell>

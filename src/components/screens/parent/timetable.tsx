@@ -181,7 +181,7 @@ export function ParentTimetable() {
             <SelectContent>
               {children.map((child) => (
                 <SelectItem key={child.id} value={child.id}>
-                  {child.name} — {child.className}
+                  {child.name}, {child.className}
                 </SelectItem>
               ))}
             </SelectContent>
@@ -198,11 +198,11 @@ export function ParentTimetable() {
             </div>
             <div>
               <p className="text-sm font-medium text-zinc-900 dark:text-zinc-100">
-                {children.find((c) => c.id === selectedChildId)?.name || "—"}
+                {children.find((c) => c.id === selectedChildId)?.name || "–"}
               </p>
               <p className="text-xs text-zinc-500 dark:text-zinc-400">
                 {children.find((c) => c.id === selectedChildId)?.className ||
-                  "—"}
+                  "–"}
               </p>
             </div>
           </CardContent>

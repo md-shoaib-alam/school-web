@@ -144,7 +144,7 @@ export function TeacherAttendance() {
       return Array.isArray(res?.records) ? res.records : [];
     },
     enabled: !!selectedClassId,
-    staleTime: 30 * 1000, // 30 s — background refresh keeps it fresh
+    staleTime: 30 * 1000, // 30 s - background refresh keeps it fresh
   });
 
   // ── Derive records from students + existing attendance ─────
@@ -165,7 +165,7 @@ export function TeacherAttendance() {
     }));
   }, [students, existingAttendance]);
 
-  // Local overrides — applied on top of server data for instant feel
+  // Local overrides - applied on top of server data for instant feel
   const [localOverrides, setLocalOverrides] = useState<
     Record<string, AttendanceStatus>
   >({});
