@@ -270,6 +270,26 @@ export function AdminSubjects() {
             </Card>
           ))}
         </div>
+      ) : !classFilter ? (
+        <Card className="border-dashed border-2 bg-transparent">
+          <CardContent className="py-20 text-center text-muted-foreground animate-in fade-in-50 duration-300">
+            <BookOpen className="size-12 mx-auto mb-4 opacity-20" />
+            <p className="text-lg font-medium">No Class Selected</p>
+            <p className="text-sm text-muted-foreground">Select a class from the list below to view its subjects.</p>
+            <div className="mt-6 flex flex-wrap justify-center gap-2 max-w-xl mx-auto">
+              {(classes || []).map((c: any) => (
+                <button
+                  key={c.id}
+                  type="button"
+                  onClick={() => dispatch({ type: 'SET_CLASS_FILTER', payload: c.id })}
+                  className="px-4 py-2 text-xs sm:text-sm font-semibold text-zinc-700 dark:text-zinc-300 bg-white dark:bg-zinc-900/40 border border-zinc-200 dark:border-zinc-800 rounded-xl shadow-xs hover:border-emerald-500 hover:text-emerald-600 dark:hover:border-emerald-500/80 dark:hover:text-emerald-400 hover:bg-emerald-50/30 dark:hover:bg-emerald-950/10 transition-all duration-200 active:scale-95 cursor-pointer"
+                >
+                  {c.name} - {c.section}
+                </button>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
       ) : filtered.length === 0 ? (
         <Card className="border-dashed border-2 bg-transparent">
           <CardContent className="py-20 text-center text-muted-foreground">

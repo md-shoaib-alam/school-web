@@ -346,7 +346,11 @@ export function AdminTimetable() {
           {isLoadingTimetable || isLoadingClasses ? (
             <TimetableSkeleton viewMode={viewMode} />
           ) : slots.length === 0 ? (
-            <EmptyTimetableState />
+            <EmptyTimetableState 
+              selectedClass={selectedClass}
+              classes={classes}
+              onClassSelect={(v) => dispatch({ type: 'SET_SELECTED_CLASS', payload: v })}
+            />
           ) : viewMode === "grid" ? (
             <GridView timeSlots={timeSlots} gridData={gridData} uniqueSubjects={uniqueSubjects} workingDays={workingDays} currentDayIndex={currentDayIndex} onDeleteSlot={(id) => deleteMutation.mutate(id)} onEditSlot={handleEditSlot} canEdit={canEdit} canDelete={canDelete} />
           ) : viewMode === "list" ? (
