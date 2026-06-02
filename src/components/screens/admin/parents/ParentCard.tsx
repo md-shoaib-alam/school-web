@@ -20,12 +20,12 @@ import {
   Phone,
   Briefcase,
   Baby,
-  Plus,
   Pencil,
-  Link2,
+  Link as LinkIcon,
   Trash2,
   GraduationCap,
   Unlink,
+  Link2,
 } from "lucide-react";
 import { ParentInfo, getAvatarColor, getInitials } from "./types";
 
@@ -91,16 +91,15 @@ export function ParentCard({
             </Button>
             <Button
               variant="outline"
-              size="sm"
-              className="h-8 w-8 xs:w-auto gap-1 xs:gap-1.5 text-xs border-blue-200 dark:border-blue-800 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-950/40 p-0 xs:px-2.5 sm:px-3 shrink-0"
+              size="icon"
+              className="size-8 rounded-full border-emerald-200 dark:border-emerald-800 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-950/40 p-0 shrink-0"
               onClick={(e) => {
                 e.stopPropagation();
                 onLinkOpen(parent);
               }}
               title="Link Child"
             >
-              <Link2 className="size-3.5" />
-              <span className="hidden xs:inline">Link</span>
+              <LinkIcon className="size-3.5" />
             </Button>
             <AlertDialog>
               <AlertDialogTrigger asChild>
@@ -160,13 +159,13 @@ export function ParentCard({
             <Button
               variant="outline"
               size="sm"
-              className="h-6.5 text-[10px] sm:text-[11px] border-blue-200 dark:border-blue-800 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-950/40 px-2.5 rounded-lg shrink-0 gap-1 font-semibold"
+              className="h-7.5 text-[10px] sm:text-[11px] border-emerald-200 dark:border-emerald-800 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-950/40 px-3 rounded-md shrink-0 gap-1.5 font-semibold"
               onClick={(e) => {
                 e.stopPropagation();
                 onLinkOpen(parent);
               }}
             >
-              <Plus className="size-3" />
+              <LinkIcon className="size-3" />
               <span>Link Child</span>
             </Button>
           </div>

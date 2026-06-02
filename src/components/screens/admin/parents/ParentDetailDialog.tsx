@@ -18,6 +18,7 @@ import {
   User,
   Sparkles,
   Users,
+  Link as LinkIcon,
 } from "lucide-react";
 import { ParentInfo, getAvatarColor, getInitials } from "./types";
 
@@ -25,12 +26,14 @@ interface ParentDetailDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   parent: ParentInfo | null;
+  onLinkClick?: (parent: ParentInfo) => void;
 }
 
 export function ParentDetailDialog({
   open,
   onOpenChange,
   parent,
+  onLinkClick,
 }: ParentDetailDialogProps) {
   if (!parent) return null;
 
@@ -60,9 +63,6 @@ export function ParentDetailDialog({
               <div className="flex flex-wrap items-center justify-start gap-2">
                 <Badge variant="secondary" className="bg-emerald-100 hover:bg-emerald-100 dark:bg-emerald-900/30 text-emerald-800 dark:text-emerald-400 font-medium">
                   Parent / Guardian
-                </Badge>
-                <Badge variant="outline" className="font-mono text-xs bg-secondary/30">
-                  ID: {parent.id.slice(0, 8)}...
                 </Badge>
               </div>
             </div>
@@ -111,10 +111,26 @@ export function ParentDetailDialog({
 
           {/* Linked Children Section */}
           <div>
-            <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3 flex items-center gap-1.5">
-              <Users className="size-3.5 text-emerald-600" />
-              Linked Children ({parent.children.length})
-            </h3>
+            <div className="flex items-center justify-between mb-3">
+              <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider flex items-center gap-1.5">
+                <Users className="size-3.5 text-emerald-600" />
+                Linked Children ({parent.children.length})
+              </h3>
+              {onLinkClick && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="h-7.5 text-[10px] sm:text-[11px] border-emerald-200 dark:border-emerald-800 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-950/40 px-3 rounded-b-sm gap-1.5 font-semibold"
+                  onClick={() => {
+                    onOpenChange(false);
+                    onLinkClick(parent);
+                  }}
+                >
+                  <LinkIcon className="size-3" />
+                  <span>Link Child</span>
+                </Button>
+              )}
+            </div>
 
             {parent.children.length === 0 ? (
               <div className="border border-dashed border-muted p-6 rounded-xl text-center">

@@ -355,6 +355,7 @@ export function AdminParents() {
         open={detailOpen}
         onOpenChange={(v) => dispatch({ type: 'SET_DETAIL_OPEN', payload: v })}
         parent={selectedParentDetail}
+        onLinkClick={(p) => dispatch({ type: 'OPEN_LINK_DIALOG', payload: p })}
       />
     </div>
   );
