@@ -119,7 +119,7 @@ export function AdminParents() {
 
   const [state, dispatch] = useReducer(reducer, initialState);
   const {
-    search, currentPage, linkOpen, selectedParent, selectedClass,
+    search, currentPage, linkOpen, selectedParent: stateSelectedParent, selectedClass,
     linking, createOpen, createForm, creating, editOpen,
     editingParent, editForm, editing
   } = state;
@@ -129,7 +129,7 @@ export function AdminParents() {
   // Queries
   const { 
     data: parentsData, 
-    isFetching: loadingParents 
+    isLoading: loadingParents 
   } = useParents(currentTenantId || undefined, debouncedSearch || undefined, currentPage, 15);
 
   const { data: classesData } = useClassesMin(currentTenantId || undefined);
@@ -169,12 +169,18 @@ export function AdminParents() {
     );
   }, [rawParents]);
 
+  // Derive selected parent dynamically from the latest parents list to keep modal synchronised reactively
+  const selectedParent = useMemo(() => {
+    if (!stateSelectedParent) return null;
+    return parents.find((p) => p.id === stateSelectedParent.id) || stateSelectedParent;
+  }, [parents, stateSelectedParent]);
+
   const students = studentData?.items || [];
   const classes = classesData?.classes || [];
 
   const filteredStudents = useMemo(() => {
     return students.filter(
-      (s) => !s.parentId && !selectedParent?.children.some((c) => c.id === s.id)
+      (s) => !selectedParent?.children.some((c) => c.id === s.id)
     );
   }, [students, selectedParent]);
 
@@ -324,7 +330,7 @@ export function AdminParents() {
         classes={classes}
         filteredStudents={filteredStudents}
         linking={linking}
-        loading={loadingStudents || fetchingStudents}
+        loading={loadingStudents}
         onLinkChild={handleLinkChild}
         onUnlinkChild={handleUnlinkChild}
       />

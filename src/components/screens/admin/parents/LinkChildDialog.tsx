@@ -1,5 +1,6 @@
 "use client";
 
+import { useState, useMemo, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
@@ -19,7 +20,9 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
-import { X, GraduationCap, Link2, Loader2 } from "lucide-react";
+import { X, GraduationCap, Link2, Loader2, Search } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Switch } from "@/components/ui/switch";
 import { ParentInfo, StudentInfo } from "./types";
 
 interface LinkChildDialogProps {
@@ -49,71 +52,144 @@ export function LinkChildDialog({
   onLinkChild,
   onUnlinkChild,
 }: LinkChildDialogProps) {
+  const [searchQuery, setSearchQuery] = useState("");
+  const [unlinkedOnly, setUnlinkedOnly] = useState(true);
+  const [linkingStudentId, setLinkingStudentId] = useState<string | null>(null);
+
+  // Reset search and toggle when dialog open state changes
+  useEffect(() => {
+    if (!open) {
+      setSearchQuery("");
+      setUnlinkedOnly(true);
+      setLinkingStudentId(null);
+    }
+  }, [open]);
+
+  // Reset local linking student ID when global linking state turns false
+  useEffect(() => {
+    if (!linking) {
+      setLinkingStudentId(null);
+    }
+  }, [linking]);
+
+  const searchedStudents = useMemo(() => {
+    let list = filteredStudents;
+    if (unlinkedOnly) {
+      list = filteredStudents.filter((s) => !s.parentId);
+    }
+    if (!searchQuery.trim()) return list;
+    const q = searchQuery.toLowerCase();
+    return list.filter((s) => s.name.toLowerCase().includes(q));
+  }, [filteredStudents, searchQuery, unlinkedOnly]);
+
+  const sortedClasses = useMemo(() => {
+    return [...classes].sort((a, b) => {
+      const nameCompare = a.name.localeCompare(b.name, undefined, { numeric: true, sensitivity: 'base' });
+      if (nameCompare !== 0) return nameCompare;
+      return a.section.localeCompare(b.section, undefined, { sensitivity: 'base' });
+    });
+  }, [classes]);
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-lg overflow-hidden flex flex-col h-[80vh]">
+      <DialogContent className="max-w-[90%] xs:max-w-[380px] sm:max-w-lg overflow-hidden flex flex-col h-[75vh] sm:h-[80vh] p-4 sm:p-6 gap-3 sm:gap-4">
         <DialogHeader>
           <DialogTitle>Link Child to {selectedParent?.name}</DialogTitle>
-          <DialogDescription>
-            Select a student to link as a child. {selectedParent?.name}{" "}
-            currently has {selectedParent?.children.length} children.
+          <DialogDescription className="hidden sm:block">
+            Select a student to link as a child.
           </DialogDescription>
         </DialogHeader>
 
-        <ScrollArea className="flex-1 pr-4">
-          <div className="space-y-6 py-2">
+        <ScrollArea className="flex-1 min-h-0 pr-3">
+          <div className="space-y-4 sm:space-y-6 py-1">
             {selectedParent && selectedParent.children.length > 0 && (
-              <div className="space-y-2">
-                <Label className="text-xs text-zinc-500 dark:text-zinc-400">
-                  Currently Linked
-                </Label>
-                <div className="flex flex-wrap gap-2">
-                  {selectedParent.children.map((child) => (
-                    <Badge
-                      key={child.id}
-                      variant="secondary"
-                      className="bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800 gap-1 pr-1"
-                    >
-                      {child.name}
-                      <button
-                        type="button"
-                        onClick={() =>
-                          onUnlinkChild(selectedParent.id, child.id)
-                        }
-                        className="size-4 rounded-full hover:bg-emerald-200 dark:hover:bg-emerald-800 flex items-center justify-center transition-colors"
-                        disabled={linking}
+              <>
+                <div className="space-y-2">
+                  <Label className="text-xs font-semibold text-zinc-500 dark:text-zinc-400">
+                    Currently Linked Children
+                  </Label>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                    {selectedParent.children.map((child) => (
+                      <div
+                        key={child.id}
+                        className="flex items-center justify-between p-2.5 rounded-xl border border-emerald-100 dark:border-emerald-900/20 bg-emerald-50/20 dark:bg-emerald-950/10 hover:bg-emerald-50 dark:hover:bg-emerald-950/20 transition-all group"
                       >
-                        <X className="size-3" />
-                      </button>
-                    </Badge>
-                  ))}
+                        <div className="flex items-center gap-2.5 min-w-0">
+                          <div className="size-7 rounded-full bg-emerald-100 dark:bg-emerald-900/40 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0">
+                            <GraduationCap className="size-3.5" />
+                          </div>
+                          <div className="min-w-0">
+                            <p className="text-xs font-bold text-zinc-800 dark:text-zinc-200 truncate">
+                              {child.name}
+                            </p>
+                            <p className="text-[9px] text-zinc-500 dark:text-zinc-400 font-medium truncate">
+                              {child.className || "No Class"} • Roll {child.rollNumber || "N/A"}
+                            </p>
+                          </div>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => onUnlinkChild(selectedParent.id, child.id)}
+                          className="size-6 rounded-md hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-950/30 dark:hover:text-red-400 text-zinc-400 flex items-center justify-center transition-colors shrink-0"
+                          title="Unlink child"
+                          disabled={linking}
+                        >
+                          <X className="size-3.5" />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
                 </div>
-              </div>
+                <Separator className="my-1" />
+              </>
             )}
 
-            <Separator />
+            <div className="flex items-center justify-between gap-3">
+              <div className="flex-1 sm:flex-none">
+                <Select value={selectedClass} onValueChange={setSelectedClass}>
+                  <SelectTrigger className="h-9 w-full sm:w-[180px]">
+                    <SelectValue placeholder="All Classes" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Classes</SelectItem>
+                    {sortedClasses.map((c) => (
+                      <SelectItem key={c.id} value={c.id}>
+                        {c.name} - {c.section}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
 
-            <div>
-              <Label className="text-xs text-zinc-500 dark:text-zinc-400 mb-1.5 block">
-                Filter by Class
-              </Label>
-              <Select value={selectedClass} onValueChange={setSelectedClass}>
-                <SelectTrigger className="h-9">
-                  <SelectValue placeholder="All Classes" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Classes</SelectItem>
-                  {classes.map((c) => (
-                    <SelectItem key={c.id} value={c.id}>
-                      {c.name} - {c.section}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <div className="flex items-center gap-1.5 h-9 px-2.5 py-1 rounded-lg border border-zinc-200 dark:border-zinc-800/80 bg-zinc-50/50 dark:bg-zinc-900/30 select-none shrink-0">
+                <Switch
+                  id="unlinked-only"
+                  checked={unlinkedOnly}
+                  onCheckedChange={setUnlinkedOnly}
+                  className="scale-90"
+                />
+                <Label
+                  htmlFor="unlinked-only"
+                  className="text-xs text-zinc-600 dark:text-zinc-400 font-medium cursor-pointer"
+                >
+                  Unlinked<span className="hidden sm:inline"> Only</span>
+                </Label>
+              </div>
             </div>
 
             <div>
-              <Label className="text-xs text-zinc-500 dark:text-zinc-400 mb-2 block font-semibold">
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
+                <Input
+                  placeholder="Search by name…"
+                  className="pl-9 h-9 text-xs sm:text-sm"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                />
+              </div>
+            </div>
+
+            <div>
+              <Label className="text-xs text-zinc-500 dark:text-zinc-400 mb-1.5 block font-semibold">
                 Available Students
               </Label>
               {loading ? (
@@ -121,48 +197,57 @@ export function LinkChildDialog({
                   <Loader2 className="size-8 animate-spin mx-auto text-blue-500 mb-2" />
                   <p className="text-sm text-zinc-500">Searching for students...</p>
                 </div>
-              ) : filteredStudents.length === 0 ? (
+              ) : searchedStudents.length === 0 ? (
                 <div className="text-center py-10 bg-zinc-50 dark:bg-zinc-900/20 rounded-xl border border-dashed border-zinc-200 dark:border-zinc-800">
                   <p className="text-zinc-400 dark:text-zinc-500 text-sm">
                     No unlinked students found
                   </p>
                   <p className="text-[10px] mt-1 text-zinc-400">
-                    Try changing class filter or add new students
+                    Try changing class filter or search query
                   </p>
                 </div>
               ) : (
-                <div className="space-y-1.5 max-h-96 overflow-y-auto pr-2">
-                  {filteredStudents.map((student) => (
+                <div className="space-y-1.5 pr-1 pb-8">
+                  {searchedStudents.map((student) => (
                     <div
                       key={student.id}
-                      className="flex items-center justify-between p-3 rounded-xl border border-zinc-100 dark:border-zinc-800 hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:border-blue-200 dark:hover:border-blue-800/50 transition-all group"
+                      className="flex items-center justify-between p-2.5 sm:p-3 rounded-lg sm:rounded-xl border border-zinc-100 dark:border-zinc-800 hover:bg-blue-50/80 dark:hover:bg-blue-900/10 hover:border-blue-200 dark:hover:border-blue-800/50 transition-all group"
                     >
-                      <div className="flex items-center gap-3">
-                        <div className="size-8 rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform">
-                          <GraduationCap className="size-4" />
+                      <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
+                        <div className="size-7 sm:size-8 rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+                          <GraduationCap className="size-3.5 sm:size-4" />
                         </div>
-                        <div>
-                          <p className="text-sm font-bold text-zinc-800 dark:text-zinc-200">
+                        <div className="min-w-0">
+                          <p className="text-xs sm:text-sm font-bold text-zinc-800 dark:text-zinc-200 truncate max-w-[130px] xs:max-w-[160px] sm:max-w-xs">
                             {student.name}
                           </p>
-                          <p className="text-[10px] text-zinc-500 dark:text-zinc-400 font-medium">
+                          <p className="text-[9px] sm:text-[10px] text-zinc-500 dark:text-zinc-400 font-medium truncate">
                             {student.className} • Roll {student.rollNumber}
                           </p>
                         </div>
                       </div>
-                      <Button
-                        size="sm"
-                        className="h-8 text-xs bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-lg shadow-sm"
-                        onClick={() => onLinkChild(student.id)}
-                        disabled={linking}
-                      >
-                        {linking ? (
-                          <Loader2 className="size-3 animate-spin" />
-                        ) : (
-                          <Link2 className="size-3.5 mr-1" />
-                        )}
-                        Link
-                      </Button>
+                      {student.parentId ? (
+                        <span className="text-[10px] sm:text-xs font-semibold text-zinc-400 dark:text-zinc-500 bg-zinc-100 dark:bg-zinc-800/80 px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-md sm:rounded-lg border border-zinc-200/50 dark:border-zinc-800/50 select-none shrink-0">
+                          Linked
+                        </span>
+                      ) : (
+                        <Button
+                          size="sm"
+                          className="h-7 sm:h-8 text-[11px] sm:text-xs bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-md sm:rounded-lg shadow-sm shrink-0 px-2.5 sm:px-3"
+                          onClick={() => {
+                            setLinkingStudentId(student.id);
+                            onLinkChild(student.id);
+                          }}
+                          disabled={linking}
+                        >
+                          {linking && linkingStudentId === student.id ? (
+                            <Loader2 className="size-3 animate-spin" />
+                          ) : (
+                            <Link2 className="size-3 sm:size-3.5 mr-1" />
+                          )}
+                          Link
+                        </Button>
+                      )}
                     </div>
                   ))}
                 </div>
