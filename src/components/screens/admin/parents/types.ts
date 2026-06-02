@@ -26,6 +26,7 @@ export interface StudentInfo {
   className: string;
   classId: string;
   parentId?: string | null;
+  parentName?: string | null;
 }
 
 const AVATAR_COLORS = [

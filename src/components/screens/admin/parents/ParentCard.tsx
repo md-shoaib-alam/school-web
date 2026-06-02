@@ -36,6 +36,7 @@ interface ParentCardProps {
   onDelete: (id: string) => void;
   onLinkOpen: (parent: ParentInfo) => void;
   onUnlinkChild: (parentId: string, childId: string) => void;
+  onView: (parent: ParentInfo) => void;
 }
 
 export function ParentCard({
@@ -45,9 +46,13 @@ export function ParentCard({
   onDelete,
   onLinkOpen,
   onUnlinkChild,
+  onView,
 }: ParentCardProps) {
   return (
-    <Card className="rounded-xl shadow-sm hover:shadow-md transition-shadow">
+    <Card 
+      className="rounded-xl shadow-sm hover:shadow-md transition-all duration-200 border border-zinc-100 dark:border-zinc-800 hover:border-emerald-500/50 dark:hover:border-emerald-800/50 cursor-pointer"
+      onClick={() => onView(parent)}
+    >
       <CardContent className="p-5">
         {/* Parent Header */}
         <div className="flex items-start justify-between mb-4">
@@ -76,7 +81,10 @@ export function ParentCard({
               variant="ghost"
               size="icon"
               className="size-8 text-emerald-500 hover:text-emerald-700 hover:bg-emerald-50 dark:hover:bg-emerald-900/30"
-              onClick={() => onEdit(parent)}
+              onClick={(e) => {
+                e.stopPropagation();
+                onEdit(parent);
+              }}
               title="Edit"
             >
               <Pencil className="size-4" />
@@ -85,7 +93,10 @@ export function ParentCard({
               variant="ghost"
               size="icon"
               className="size-8 text-blue-500 hover:text-blue-700 hover:bg-blue-50 dark:hover:bg-blue-900/30"
-              onClick={() => onLinkOpen(parent)}
+              onClick={(e) => {
+                e.stopPropagation();
+                onLinkOpen(parent);
+              }}
               title="Link Child"
             >
               <Link2 className="size-4" />
@@ -97,11 +108,12 @@ export function ParentCard({
                   size="icon"
                   className="size-8 text-red-600 hover:text-red-700 hover:bg-red-50 dark:text-red-400 dark:hover:text-red-300 dark:hover:bg-red-950/40"
                   title="Delete"
+                  onClick={(e) => e.stopPropagation()}
                 >
                   <Trash2 className="size-4" />
                 </Button>
               </AlertDialogTrigger>
-              <AlertDialogContent>
+              <AlertDialogContent onClick={(e) => e.stopPropagation()}>
                 <AlertDialogHeader>
                   <AlertDialogTitle>Delete Parent</AlertDialogTitle>
                   <AlertDialogDescription>
@@ -148,14 +160,20 @@ export function ParentCard({
               variant="ghost"
               size="sm"
               className="h-6 text-[11px] text-blue-600 hover:text-blue-700 hover:bg-blue-50 dark:hover:bg-blue-900/30 px-2"
-              onClick={() => onLinkOpen(parent)}
+              onClick={(e) => {
+                e.stopPropagation();
+                onLinkOpen(parent);
+              }}
             >
               <Plus className="size-3 mr-1" /> Link Child
             </Button>
           </div>
 
           {parent.children.length === 0 ? (
-            <div className="text-center py-6 bg-zinc-50 dark:bg-zinc-800/50 rounded-lg">
+            <div 
+              className="text-center py-6 bg-zinc-50 dark:bg-zinc-800/50 rounded-lg"
+              onClick={(e) => e.stopPropagation()}
+            >
               <GraduationCap className="size-8 mx-auto text-zinc-300 dark:text-zinc-600 mb-2" />
               <p className="text-xs text-zinc-500 dark:text-zinc-400">
                 No children linked yet
@@ -164,7 +182,10 @@ export function ParentCard({
                 variant="outline"
                 size="sm"
                 className="mt-2 h-7 text-xs text-blue-600 dark:text-blue-400 border-blue-200 dark:border-blue-800 hover:bg-blue-50 dark:hover:bg-blue-900/30"
-                onClick={() => onLinkOpen(parent)}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onLinkOpen(parent);
+                }}
               >
                 <Link2 className="size-3 mr-1" /> Link a Child
               </Button>
@@ -174,13 +195,14 @@ export function ParentCard({
               {parent.children.map((child) => (
                 <div
                   key={child.id}
-                  className="flex items-center justify-between bg-zinc-50 dark:bg-zinc-800/50 rounded-lg px-3 py-2"
+                  className="flex items-center justify-between bg-zinc-50 dark:bg-zinc-800/50 rounded-lg px-3 py-2 cursor-default"
+                  onClick={(e) => e.stopPropagation()}
                 >
                   <div className="flex items-center gap-2.5 min-w-0">
-                    <div className="size-7 rounded-full bg-violet-100 dark:bg-violet-900/30 text-violet-600 dark:text-violet-400 flex items-center justify-center text-[10px] font-bold shrink-0">
+                    <div className="size-7 rounded-full bg-violet-100 dark:bg-violet-950 text-violet-600 dark:text-violet-400 flex items-center justify-center text-[10px] font-bold shrink-0">
                       {child.gender === "male" ? "👦" : "👧"}
                     </div>
-                    <div className="min-w-0">
+                    <div className="min-w-0 flex-1">
                       <p className="text-xs font-medium text-zinc-800 dark:text-zinc-200 truncate">
                         {child.name}
                       </p>
@@ -193,7 +215,10 @@ export function ParentCard({
                     variant="ghost"
                     size="icon"
                     className="size-6 text-rose-600/80 hover:text-rose-900 hover:bg-rose-100/50 dark:text-rose-400/80 dark:hover:text-rose-200 dark:hover:bg-rose-950/40 shrink-0"
-                    onClick={() => onUnlinkChild(parent.id, child.id)}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onUnlinkChild(parent.id, child.id);
+                    }}
                     disabled={linking}
                     title="Unlink"
                   >

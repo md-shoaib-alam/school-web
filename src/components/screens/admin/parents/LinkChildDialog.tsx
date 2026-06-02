@@ -23,6 +23,7 @@ import { Label } from "@/components/ui/label";
 import { X, GraduationCap, Link2, Loader2, Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
+import { toast } from "sonner";
 import { ParentInfo, StudentInfo } from "./types";
 
 interface LinkChildDialogProps {
@@ -211,7 +212,14 @@ export function LinkChildDialog({
                   {searchedStudents.map((student) => (
                     <div
                       key={student.id}
-                      className="flex items-center justify-between p-2.5 sm:p-3 rounded-lg sm:rounded-xl border border-zinc-100 dark:border-zinc-800 hover:bg-blue-50/80 dark:hover:bg-blue-900/10 hover:border-blue-200 dark:hover:border-blue-800/50 transition-all group"
+                      className="flex items-center justify-between p-2.5 sm:p-3 rounded-lg sm:rounded-xl border border-zinc-100 dark:border-zinc-800 hover:bg-blue-50/80 dark:hover:bg-blue-900/10 hover:border-blue-200 dark:hover:border-blue-800/50 transition-all group cursor-pointer"
+                      onClick={() => {
+                        if (student.parentId) {
+                          toast.info(`${student.name} is currently linked to parent: ${student.parentName || "Unknown Parent"}`);
+                        } else {
+                          toast.info(`${student.name} is currently unlinked.`);
+                        }
+                      }}
                     >
                       <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
                         <div className="size-7 sm:size-8 rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
@@ -223,6 +231,7 @@ export function LinkChildDialog({
                           </p>
                           <p className="text-[9px] sm:text-[10px] text-zinc-500 dark:text-zinc-400 font-medium truncate">
                             {student.className} • Roll {student.rollNumber}
+                            {student.parentName && ` • Parent: ${student.parentName}`}
                           </p>
                         </div>
                       </div>
@@ -234,7 +243,8 @@ export function LinkChildDialog({
                         <Button
                           size="sm"
                           className="h-7 sm:h-8 text-[11px] sm:text-xs bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-md sm:rounded-lg shadow-sm shrink-0 px-2.5 sm:px-3"
-                          onClick={() => {
+                          onClick={(e) => {
+                            e.stopPropagation();
                             setLinkingStudentId(student.id);
                             onLinkChild(student.id);
                           }}

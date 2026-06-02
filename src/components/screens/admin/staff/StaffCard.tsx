@@ -4,7 +4,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Pencil, Trash2, Phone, Mail, Copy, Check, Eye } from "lucide-react";
+import { Pencil, Trash2, Phone, Mail, Copy, Check } from "lucide-react";
 import { StaffMember } from "./types";
 import { getInitials, roleBadgeStyle, avatarStyle } from "./utils";
 import { useState } from "react";
@@ -29,7 +29,10 @@ export function StaffCard({ member, onEdit, onDelete, onView, canEdit, canDelete
   };
 
   return (
-    <Card className="group hover:shadow-md transition-all duration-200 border-zinc-100 dark:border-zinc-800 overflow-hidden">
+    <Card 
+      className="group hover:shadow-md transition-all duration-200 border-zinc-100 dark:border-zinc-800 overflow-hidden cursor-pointer"
+      onClick={() => onView(member)}
+    >
       <CardContent className="p-0">
         <div className="h-1.5 w-full" style={{ backgroundColor: member.customRole?.color || "#6366f1" }} />
         
@@ -72,16 +75,7 @@ export function StaffCard({ member, onEdit, onDelete, onView, canEdit, canDelete
               </div>
             </div>
             
-            <div className="flex items-center gap-0.5 shrink-0 ml-1">
-              <Button 
-                size="icon" 
-                variant="ghost" 
-                className="size-8 text-zinc-500 hover:text-emerald-600 dark:hover:bg-emerald-900/20"
-                onClick={() => onView(member)}
-                title="View Details"
-              >
-                <Eye className="size-3.5" />
-              </Button>
+            <div className="flex items-center gap-0.5 shrink-0 ml-1" onClick={(e) => e.stopPropagation()}>
               {canEdit && (
                 <Button 
                   size="icon" 
@@ -115,7 +109,7 @@ export function StaffCard({ member, onEdit, onDelete, onView, canEdit, canDelete
                 variant="ghost" 
                 size="icon" 
                 className="size-6 opacity-0 group-hover:opacity-100 transition-all duration-200 hover:bg-zinc-100 dark:hover:bg-zinc-800 shrink-0"
-                onClick={handleCopy}
+                onClick={(e) => { e.stopPropagation(); handleCopy(); }}
                 title="Copy email"
               >
                 {copied ? <Check className="size-3 text-emerald-500" /> : <Copy className="size-3 text-zinc-400" />}

@@ -10,6 +10,7 @@ interface ParentsGridViewProps {
   onDelete: (id: string) => void;
   onLinkOpen: (p: ParentInfo) => void;
   onUnlinkChild: (parentId: string, studentId: string) => void;
+  onView: (p: ParentInfo) => void;
 }
 
 export function ParentsGridView({
@@ -19,6 +20,7 @@ export function ParentsGridView({
   onDelete,
   onLinkOpen,
   onUnlinkChild,
+  onView,
 }: ParentsGridViewProps) {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
@@ -31,6 +33,7 @@ export function ParentsGridView({
             onDelete={onDelete}
             onLinkOpen={onLinkOpen}
             onUnlinkChild={onUnlinkChild}
+            onView={onView}
           />
         </div>
       ))}

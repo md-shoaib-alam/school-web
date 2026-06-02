@@ -10,14 +10,23 @@ import { ThemeProvider, useTheme } from "next-themes";
 
 function ToasterProvider() {
   const { theme } = useTheme();
+  const [expand, setExpand] = useState(false);
   return (
-    <Toaster 
-      richColors 
-      expand={true}
-      position="top-center" 
-      duration={3000} 
-      theme={theme as "light" | "dark" | "system"}
-    />
+    <div 
+      onMouseEnter={() => setExpand(true)}
+      onMouseLeave={() => setExpand(false)}
+      className="relative z-9999"
+      style={{ pointerEvents: "auto" }}
+    >
+      <Toaster 
+        richColors 
+        expand={expand}
+        position="top-center" 
+        duration={3000} 
+        swipeDirections={["left", "right"]}
+        theme={theme as "light" | "dark" | "system"}
+      />
+    </div>
   );
 }
 

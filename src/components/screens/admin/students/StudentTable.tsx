@@ -71,7 +71,8 @@ export function StudentTable({
             students.map((student) => (
               <TableRow
                 key={student.id}
-                className="hover:bg-emerald-50/50 dark:hover:bg-emerald-900/20 transition-colors border-b last:border-none group/row"
+                className="hover:bg-emerald-50/50 dark:hover:bg-emerald-900/20 transition-colors border-b last:border-none group/row cursor-pointer"
+                onClick={() => onView(student)}
               >
                 <TableCell className="font-mono text-sm py-4 text-center sm:text-left">
                   {student.rollNumber}
@@ -108,7 +109,7 @@ export function StudentTable({
                   {student.phone || "–"}
                 </TableCell>
                 <TableCell className="text-right py-4">
-                  <div className="flex items-center justify-end gap-1">
+                  <div className="flex items-center justify-end gap-1" onClick={(e) => e.stopPropagation()}>
                     <Button
                       variant="ghost"
                       size="icon"
