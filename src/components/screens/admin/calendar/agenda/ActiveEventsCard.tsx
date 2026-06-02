@@ -2,6 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import { X, CalendarCheck2, Clock, Pencil, Trash2 } from "lucide-react";
+import { Skeleton } from "@/components/ui/skeleton";
 import { CalendarEvent, EVENT_TYPE_COLORS, EVENT_TYPE_LABELS } from "../types";
 
 interface ActiveEventsCardProps {
@@ -60,7 +61,7 @@ export function ActiveEventsCard({
       <div className="flex-1 overflow-y-auto no-scrollbar min-h-[120px] max-h-[260px] flex flex-col">
         {loading ? (
           <div className="space-y-3">
-            <div className="h-14 w-full bg-zinc-50/60 dark:bg-white/[0.02] rounded-xl animate-pulse border border-zinc-100/50 dark:border-white/[0.03]" />
+            <Skeleton className="h-14 w-full rounded-xl bg-zinc-50/60 dark:bg-white/[0.02] border border-zinc-100/50 dark:border-white/[0.03]" />
           </div>
         ) : activeEventsList.length === 0 ? (
           <div className="flex-1 flex flex-col items-center justify-center py-6 border border-zinc-100 dark:border-white/[0.04] bg-zinc-50/30 dark:bg-white/[0.01] rounded-xl text-center">

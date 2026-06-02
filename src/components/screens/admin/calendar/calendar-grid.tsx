@@ -23,16 +23,21 @@ export function CalendarGrid({
 }: CalendarGridProps) {
   if (loading) {
     return (
-      <div className="bg-white dark:bg-neutral-900/40 border border-zinc-200/60 dark:border-white/[0.06] shadow-sm rounded-2xl p-6">
-        <div className="grid grid-cols-7 gap-4 text-center">
+      <div className="bg-white dark:bg-neutral-900/40 border border-zinc-200/60 dark:border-white/[0.06] shadow-sm rounded-2xl p-5 sm:p-6 h-full">
+        <div className="grid grid-cols-7 gap-1 sm:gap-1.5 text-center items-center">
+          {/* Weekdays */}
           {WEEKDAY_LABELS.map((day) => (
-            <div key={day} className="text-xs font-medium text-zinc-400 uppercase tracking-wider mb-2">
+            <div 
+              key={day} 
+              className="pb-4 text-xs font-medium text-zinc-400 dark:text-zinc-500 uppercase tracking-wider"
+            >
               {day}
             </div>
           ))}
-          {Array.from({ length: 35 }).map((_, i) => (
-            <div key={i} className="aspect-square flex items-center justify-center">
-              <Skeleton className="size-9 rounded-full" />
+          {/* Day Cells Skeleton */}
+          {Array.from({ length: 42 }).map((_, i) => (
+            <div key={i} className="aspect-square p-0.5 sm:p-1 flex flex-col items-stretch justify-stretch relative">
+              <Skeleton className="w-full h-full rounded-xl bg-zinc-50/50 dark:bg-zinc-900/20 border border-zinc-200/40 dark:border-zinc-800/40" />
             </div>
           ))}
         </div>

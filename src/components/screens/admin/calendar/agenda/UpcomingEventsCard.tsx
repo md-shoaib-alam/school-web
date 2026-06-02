@@ -2,6 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import { RotateCw, CalendarDays, MapPin } from "lucide-react";
+import { Skeleton } from "@/components/ui/skeleton";
 import { CalendarEvent, EVENT_TYPE_COLORS, EVENT_TYPE_LABELS } from "../types";
 
 interface UpcomingEventsCardProps {
@@ -39,7 +40,7 @@ export function UpcomingEventsCard({
         {loading ? (
           <div className="space-y-3">
             {[1, 2].map((i) => (
-              <div key={`upcoming-skel-${i}`} className="h-14 w-full bg-zinc-50/60 dark:bg-white/[0.02] rounded-xl animate-pulse" />
+              <Skeleton key={`upcoming-skel-${i}`} className="h-14 w-full rounded-xl bg-zinc-50/60 dark:bg-white/[0.02] border border-zinc-100/50 dark:border-white/[0.03]" />
             ))}
           </div>
         ) : upcomingEventsList.length === 0 ? (
