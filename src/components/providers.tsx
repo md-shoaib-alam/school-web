@@ -24,9 +24,6 @@ function ToasterProvider() {
         position="top-center" 
         duration={3000} 
         swipeDirections={["left", "right"]}
-        toastOptions={{
-          className: "cursor-grab active:cursor-grabbing select-none"
-        }}
         theme={theme as "light" | "dark" | "system"}
       />
     </div>

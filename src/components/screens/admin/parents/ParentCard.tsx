@@ -90,16 +90,17 @@ export function ParentCard({
               <Pencil className="size-4" />
             </Button>
             <Button
-              variant="ghost"
-              size="icon"
-              className="size-8 text-blue-500 hover:text-blue-700 hover:bg-blue-50 dark:hover:bg-blue-900/30"
+              variant="outline"
+              size="sm"
+              className="h-8 w-8 xs:w-auto gap-1 xs:gap-1.5 text-xs border-blue-200 dark:border-blue-800 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-950/40 p-0 xs:px-2.5 sm:px-3 shrink-0"
               onClick={(e) => {
                 e.stopPropagation();
                 onLinkOpen(parent);
               }}
               title="Link Child"
             >
-              <Link2 className="size-4" />
+              <Link2 className="size-3.5" />
+              <span className="hidden xs:inline">Link</span>
             </Button>
             <AlertDialog>
               <AlertDialogTrigger asChild>
@@ -157,15 +158,16 @@ export function ParentCard({
               <Baby className="size-3" /> Children ({parent.children.length})
             </span>
             <Button
-              variant="ghost"
+              variant="outline"
               size="sm"
-              className="h-6 text-[11px] text-blue-600 hover:text-blue-700 hover:bg-blue-50 dark:hover:bg-blue-900/30 px-2"
+              className="h-6.5 text-[10px] sm:text-[11px] border-blue-200 dark:border-blue-800 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-950/40 px-2.5 rounded-lg shrink-0 gap-1 font-semibold"
               onClick={(e) => {
                 e.stopPropagation();
                 onLinkOpen(parent);
               }}
             >
-              <Plus className="size-3 mr-1" /> Link Child
+              <Plus className="size-3" />
+              <span>Link Child</span>
             </Button>
           </div>
 
