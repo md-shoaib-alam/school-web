@@ -15,7 +15,7 @@ function ToasterProvider() {
     <div 
       onMouseEnter={() => setExpand(true)}
       onMouseLeave={() => setExpand(false)}
-      className="relative z-9999"
+      className="relative z-[999999]"
       style={{ pointerEvents: "auto" }}
     >
       <Toaster 
@@ -24,6 +24,9 @@ function ToasterProvider() {
         position="top-center" 
         duration={3000} 
         swipeDirections={["left", "right"]}
+        toastOptions={{
+          className: "cursor-grab active:cursor-grabbing select-none"
+        }}
         theme={theme as "light" | "dark" | "system"}
       />
     </div>
