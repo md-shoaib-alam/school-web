@@ -173,12 +173,9 @@ export function TeacherAttendance() {
 
   // Reset overrides when class or date changes safely in effect
   useEffect(() => {
-    if (Object.keys(localOverrides).length > 0 || saved) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
-      setLocalOverrides({});
-      setSaved(false);
-    }
-  }, [selectedClassId, date, localOverrides, saved]);
+    setLocalOverrides({});
+    setSaved(false);
+  }, [selectedClassId, date]);
 
   // Combine server record truth with user pending interactions
   const records = useMemo((): AttendanceRecord[] => {
