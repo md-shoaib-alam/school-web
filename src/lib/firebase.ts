@@ -35,7 +35,6 @@ export const requestNotificationPermission = async () => {
   
   const messaging = await getMessagingInstance();
   if (!messaging) {
-    console.warn("FCM is not supported in this browser / secure context.");
     return null;
   }
   
