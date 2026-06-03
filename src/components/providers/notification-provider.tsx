@@ -52,8 +52,8 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
         duration: 10000
       });
 
-      // 2. Show Native Browser Popup (if user is on another tab)
-      if (Notification.permission === "granted") {
+      // 2. Show Native Browser Popup (only if user is on another tab/minimized)
+      if (Notification.permission === "granted" && document.visibilityState === "hidden") {
         new Notification(payload.notification?.title || "New Notification", {
           body: payload.notification?.body || "You have a new message",
           icon: "/logo.svg"

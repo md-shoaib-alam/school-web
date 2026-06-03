@@ -112,3 +112,12 @@ self.addEventListener("notificationclick", function (event) {
       })
   );
 });
+
+// Force the service worker to activate immediately and claim all client windows
+self.addEventListener("install", (event) => {
+  self.skipWaiting();
+});
+
+self.addEventListener("activate", (event) => {
+  event.waitUntil(clients.claim());
+});

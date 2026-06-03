@@ -15,6 +15,7 @@ import {
   Wifi
 } from "lucide-react";
 import { toast } from "sonner";
+import { graphqlMutate } from "@/lib/graphql/core";
 
 export function SendNotificationScreen() {
   const [token, setToken] = useState("");
@@ -31,28 +32,32 @@ export function SendNotificationScreen() {
 
     setSending(true);
     try {
-      const res = await fetch("/api/send-notification", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
+      const mutation = `
+        mutation SendDirectPush($token: String!, $title: String!, $body: String!, $link: String) {
+          sendDirectPush(token: $token, title: $title, body: $body, link: $link) {
+            success
+            message
+          }
+        }
+      `;
+
+      const result = await graphqlMutate<{ sendDirectPush: { success: boolean; message: string } }>(
+        mutation,
+        {
           token,
           title,
-          message: body,
+          body,
           link: link || undefined,
-        }),
-      });
+        }
+      );
 
-      const result = await res.json();
-
-      if (result.success) {
-        toast.success(result.message || "Push notification sent successfully!");
+      if (result.sendDirectPush.success) {
+        toast.success(result.sendDirectPush.message || "Push notification sent successfully!");
         setTitle("");
         setBody("");
         setLink("");
       } else {
-        toast.error(result.error || "Failed to send push notification");
+        toast.error(result.sendDirectPush.message || "Failed to send push notification");
       }
     } catch (error: any) {
       toast.error(error.message || "An error occurred while sending notification");
