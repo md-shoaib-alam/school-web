@@ -27,6 +27,7 @@ import {
 import { PlatformUser, ROLE_CONFIG, PAGE_SIZE } from "./types";
 import { useState } from "react";
 import { LazyMotion, domAnimation, m, AnimatePresence } from "framer-motion";
+import { copyToClipboard } from "@/lib/utils";
 
 interface UserTableProps {
   loading: boolean;
@@ -53,7 +54,7 @@ export function UserTable({
 
   const handleCopy = (e: React.MouseEvent, email: string, id: string) => {
     e.stopPropagation();
-    navigator.clipboard.writeText(email);
+    copyToClipboard(email);
     setCopiedId(id);
     setTimeout(() => setCopiedId(null), 2000);
   };

@@ -28,6 +28,7 @@ import {
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { apiFetch } from "@/lib/api";
 import { toast } from "sonner";
+import { copyToClipboard } from "@/lib/utils";
 import type { StudentInfo } from "./types";
 
 interface StudentDetailDialogProps {
@@ -74,7 +75,7 @@ export function StudentDetailDialog({
   });
 
   const handleCopy = (text: string, fieldName: string) => {
-    navigator.clipboard.writeText(text);
+    copyToClipboard(text);
     setCopiedField(fieldName);
     setTimeout(() => setCopiedField(null), 2000);
     toast.success(`${fieldName} copied to clipboard`);

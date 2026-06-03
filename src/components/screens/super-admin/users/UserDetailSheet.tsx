@@ -24,6 +24,7 @@ import {
 } from "lucide-react";
 import { PlatformUser, ROLE_CONFIG } from "./types";
 import React, { useState } from "react";
+import { copyToClipboard } from "@/lib/utils";
 
 interface UserDetailSheetProps {
   open: boolean;
@@ -166,7 +167,7 @@ function InfoRow({ icon, label, value, canCopy }: any) {
   const [copied, setCopied] = useState(false);
 
   const handleCopy = () => {
-    navigator.clipboard.writeText(value);
+    copyToClipboard(value);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };

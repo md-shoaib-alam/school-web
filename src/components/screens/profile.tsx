@@ -19,6 +19,7 @@ import { ProfileDetails } from "./profile/ProfileDetails";
 import { SecuritySettings } from "./profile/SecuritySettings";
 import { QuickActions } from "./profile/QuickActions";
 import { EditProfileDialog } from "./profile/EditProfileDialog";
+import { copyToClipboard } from "@/lib/utils";
 
 export function UserProfileScreen() {
   const { push, replace } = useRouter();
@@ -42,7 +43,7 @@ export function UserProfileScreen() {
     .toUpperCase();
 
   const handleCopy = (text: string, field: string) => {
-    navigator.clipboard.writeText(text);
+    copyToClipboard(text);
     setCopiedField(field);
     toast.success(`${field} copied to clipboard!`);
     setTimeout(() => setCopiedField(null), 2000);
@@ -53,7 +54,7 @@ export function UserProfileScreen() {
     const slug = currentTenantSlug || currentUser.tenantSlug || "";
     const url = `${window.location.origin}/${slug}`;
     
-    navigator.clipboard.writeText(url);
+    copyToClipboard(url);
     setCopiedField("SchoolUrl");
     toast.success("School portal URL copied!");
     setTimeout(() => setCopiedField(null), 2000);

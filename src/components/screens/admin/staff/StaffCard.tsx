@@ -8,7 +8,7 @@ import { Pencil, Trash2, Phone, Mail, Copy, Check } from "lucide-react";
 import { StaffMember } from "./types";
 import { getInitials, roleBadgeStyle, avatarStyle } from "./utils";
 import { useState } from "react";
-import { cn } from "@/lib/utils";
+import { cn, copyToClipboard } from "@/lib/utils";
 
 interface StaffCardProps {
   member: StaffMember;
@@ -23,7 +23,7 @@ export function StaffCard({ member, onEdit, onDelete, onView, canEdit, canDelete
   const [copied, setCopied] = useState(false);
 
   const handleCopy = () => {
-    navigator.clipboard.writeText(member.email);
+    copyToClipboard(member.email);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };

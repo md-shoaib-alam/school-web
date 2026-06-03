@@ -15,6 +15,7 @@ import { Pencil, Trash2, Shield, Phone, Mail, Copy, Check, Eye } from "lucide-re
 import { useState } from "react";
 import { StaffMember } from "./types";
 import { getInitials, roleBadgeStyle, avatarStyle } from "./utils";
+import { copyToClipboard } from "@/lib/utils";
 
 interface StaffTableProps {
   staff: StaffMember[];
@@ -36,7 +37,7 @@ export function StaffTable({
   const [copiedId, setCopiedId] = useState<string | null>(null);
 
   const handleCopy = (email: string, id: string) => {
-    navigator.clipboard.writeText(email);
+    copyToClipboard(email);
     setCopiedId(id);
     setTimeout(() => setCopiedId(null), 2000);
   };

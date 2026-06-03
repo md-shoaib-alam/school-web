@@ -25,6 +25,7 @@ import {
 import { toast } from "sonner";
 import { StaffMember } from "./types";
 import { getInitials } from "./utils";
+import { copyToClipboard } from "@/lib/utils";
 
 interface StaffDetailDialogProps {
   open: boolean;
@@ -42,7 +43,7 @@ export function StaffDetailDialog({
   if (!member) return null;
 
   const handleCopy = (text: string, fieldName: string) => {
-    navigator.clipboard.writeText(text);
+    copyToClipboard(text);
     setCopiedField(fieldName);
     setTimeout(() => setCopiedField(null), 2000);
     toast.success(`${fieldName} copied to clipboard`);
