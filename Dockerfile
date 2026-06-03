@@ -1,7 +1,7 @@
 # -----------------------------------------------------
 # STAGE 1: Dependency Installation & Build
 # -----------------------------------------------------
-FROM oven/bun:1-alpine AS builder
+FROM oven/bun:1 AS builder
 WORKDIR /app
 
 # Copy package specs for caching dependencies
