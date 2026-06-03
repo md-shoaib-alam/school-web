@@ -644,7 +644,7 @@ export function AdminPromotions({ initialTab: propTab }: { initialTab?: "individ
         open={dialogOpen}
         onOpenChange={(val) => !val && dispatch({ type: "CLOSE_NEW_PROMOTION_DIALOG" })}
         form={form}
-        setForm={(val) => dispatch({ type: "SET_FORM", form: typeof val === "function" ? val(form) : val })}
+          setForm={(val) => dispatch({ type: "SET_FORM", form: val })}
         students={students}
         classes={classes}
         submitting={submitting}
