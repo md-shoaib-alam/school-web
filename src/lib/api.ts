@@ -5,7 +5,22 @@
 import { env } from './env';
 import { triggerGlobalRefresh } from './query-client';
 
-const API_BASE = env.NEXT_PUBLIC_API_URL;
+let API_BASE = env.NEXT_PUBLIC_API_URL;
+
+if (typeof window !== 'undefined') {
+  const hostname = window.location.hostname;
+  const protocol = window.location.protocol;
+  
+  if (hostname === 'localhost' || hostname.startsWith('192.168.')) {
+    // Local / LAN WiFi testing: route directly to matching backend port
+    API_BASE = `${protocol}//${hostname}:4000/api`;
+  } else {
+    // Production: route from any app domain (e.g. tenant.domain.com) to api subdomain (api.domain.com)
+    const parts = hostname.split('.');
+    const baseDomain = parts.slice(-2).join('.'); // Extracts main domain
+    API_BASE = `${protocol}//api.${baseDomain}/api`;
+  }
+}
 
 function getToken(): string | null {
   if (typeof window === 'undefined') return null;
