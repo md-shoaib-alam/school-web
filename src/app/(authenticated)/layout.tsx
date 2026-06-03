@@ -28,15 +28,11 @@ export default function AuthenticatedLayout({
   // Check maintenance mode for non-super_admin users
   useEffect(() => {
     if (!isLoggedIn || !currentUser || currentUser.role === "super_admin") {
-      queueMicrotask(() => {
-        setMaintenanceLoading(false);
-      });
+      setMaintenanceLoading(false);
       return;
     }
     
-    queueMicrotask(() => {
-      setMaintenanceLoading(true);
-    });
+    setMaintenanceLoading(true);
     let cancelled = false;
     
     apiFetch("/api/platform-settings")

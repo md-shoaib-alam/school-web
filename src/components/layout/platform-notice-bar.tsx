@@ -22,9 +22,7 @@ export function PlatformNoticeBar() {
   useEffect(() => {
     const stored = localStorage.getItem("dismissed_platform_notice");
     if (stored) {
-      queueMicrotask(() => {
-        setDismissedId(stored);
-      });
+      setDismissedId(stored);
     }
   }, []);
 

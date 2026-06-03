@@ -179,7 +179,13 @@ export function SuperAdminAnalytics() {
                   </div>
                 </div>
                 <div className="flex flex-col items-end">
-                  <Badge variant="outline" className={`text-[9px] ${svc.status === "connected" ? "bg-emerald-50 text-emerald-700 border-emerald-200" : "bg-red-50 text-red-700 border-red-200"}`}>
+                  <Badge variant="outline" className={`text-[9px] ${
+                    svc.status === "connected" 
+                      ? "bg-emerald-50 text-emerald-700 border-emerald-200" 
+                      : svc.status === "disabled"
+                        ? "bg-zinc-50 text-zinc-600 border-zinc-200 dark:bg-zinc-800 dark:text-zinc-400 dark:border-zinc-700"
+                        : "bg-red-50 text-red-700 border-red-200"
+                  }`}>
                     {svc.status?.toUpperCase() || "OFFLINE"}
                   </Badge>
                   {svc.latency && <span className="text-[10px] text-zinc-400 mt-1">{svc.latency}</span>}

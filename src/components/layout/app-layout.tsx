@@ -167,6 +167,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
       "settings",
       "school-subscriptions",
       "platform-notices",
+      "send-notification",
       "profile",
       "reports",
     ].includes(screen);

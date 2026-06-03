@@ -56,7 +56,7 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
       if (Notification.permission === "granted") {
         new Notification(payload.notification?.title || "New Notification", {
           body: payload.notification?.body || "You have a new message",
-          icon: "/logo.svg" // Adjust to your logo path
+          icon: "/logo.svg"
         });
       }
     });

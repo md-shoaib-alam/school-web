@@ -12,8 +12,8 @@ if (typeof window !== 'undefined') {
   const protocol = window.location.protocol;
   
   if (hostname === 'localhost' || hostname.startsWith('192.168.')) {
-    // Local / LAN WiFi testing: route directly to matching backend port
-    API_BASE = `${protocol}//${hostname}:4000/api`;
+    // Local / LAN WiFi testing: route directly to matching backend port (forces http for local backend server)
+    API_BASE = `http://${hostname}:4000/api`;
   } else {
     // Production: route from any app domain (e.g. tenant.domain.com) to api subdomain (api.domain.com)
     const parts = hostname.split('.');

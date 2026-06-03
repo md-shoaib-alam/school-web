@@ -163,6 +163,12 @@ export const navItems: Record<UserRole, NavItem[]> = {
       icon: <Bell className="size-4" />,
       permModule: "analytics",
     },
+    {
+      key: "send-notification",
+      label: "Send Push Notification",
+      icon: <Send className="size-4" />,
+      permModule: null,
+    },
 
     // Insights & Security
     {
