@@ -211,7 +211,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
     <NotificationProvider>
       <div className="h-dvh flex flex-col overflow-hidden bg-background">
         <PlatformNoticeBar />
-        <div className="flex-1 flex overflow-hidden">
+        <div className="flex-1 flex min-h-0 overflow-hidden">
           <LoadingProgress />
         {/* Mobile overlay */}
 

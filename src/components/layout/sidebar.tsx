@@ -61,7 +61,7 @@ export function Sidebar({
   return (
     <aside
       className={cn(
-        "fixed lg:static inset-y-0 left-0 z-50 flex flex-col transition-all duration-300 lg:h-dvh border-r overflow-hidden",
+        "fixed lg:static inset-y-0 left-0 z-50 flex flex-col transition-all duration-300 lg:h-full border-r overflow-hidden",
         isSuperAdmin
           ? "bg-gradient-to-b from-teal-950 to-teal-900 border-teal-800/50"
           : "bg-sidebar border-sidebar-border",
