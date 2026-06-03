@@ -26,7 +26,7 @@ export function FullPageSkeleton() {
 }
 
 /** Shimmer block - building block for all skeleton shapes */
-function ShimmerBox({ className }: { className?: string }) {
+function ShimmerBox({ className, style }: { className?: string; style?: React.CSSProperties }) {
   return (
     <div
       className={[
@@ -35,6 +35,7 @@ function ShimmerBox({ className }: { className?: string }) {
       ]
         .filter(Boolean)
         .join(" ")}
+      style={style}
     />
   );
 }
