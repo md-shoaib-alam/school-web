@@ -38,7 +38,7 @@ function ThemeToggleLogin() {
     <Button
       variant="ghost"
       size="icon"
-      className="absolute top-4 right-4 size-10 rounded-full hover:bg-white/20 dark:hover:bg-black/20 text-zinc-600 dark:text-zinc-300 z-10"
+      className="absolute top-4 right-4 size-10 rounded-full hover:bg-white/20 dark:hover:bg-black/20 text-zinc-600 dark:text-zinc-300 z-10 cursor-pointer"
       onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
       aria-label="Toggle theme"
       suppressHydrationWarning
