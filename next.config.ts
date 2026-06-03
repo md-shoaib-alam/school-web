@@ -2,7 +2,8 @@ import type { NextConfig } from "next";
 import { withSentryConfig } from "@sentry/nextjs";
 
 const nextConfig: NextConfig = {
-  allowedDevOrigins: ['192.168.1.33', 'localhost:3000'],
+  output: 'standalone',
+  allowedDevOrigins: [ '192.168.29.227', '192.168.29.227:3000', 'localhost:3000'],
   images: {
     remotePatterns: [
       {

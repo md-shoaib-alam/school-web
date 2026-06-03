@@ -205,6 +205,21 @@
   color: var(--destructive-text);
 }
 
+/* Toast Cursor custom rules */
+[data-sonner-toast] {
+  cursor: grab !important;
+  user-select: none !important;
+}
+[data-sonner-toast]:active {
+  cursor: grabbing !important;
+}
+[data-sonner-toast] button,
+[data-sonner-toast] a,
+[data-sonner-toast] [role="button"],
+[data-sonner-toast] svg {
+  cursor: pointer !important;
+}
+
 @layer base {
   * {
     border-color: var(--border);

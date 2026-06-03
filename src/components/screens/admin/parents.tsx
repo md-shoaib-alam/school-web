@@ -23,6 +23,7 @@ import { EditParentDialog } from "./parents/ParentDialog";
 import { CreateParentDialog } from "./parents/CreateParentDialog";
 import { LinkChildDialog } from "./parents/LinkChildDialog";
 import { ParentSkeleton } from "./parents/ParentSkeleton";
+import { ParentDetailDialog } from "./parents/ParentDetailDialog";
 import { ParentInfo, StudentInfo } from "./parents/types";
 
 type State = {
@@ -43,6 +44,8 @@ type State = {
     name: string; email: string; phone: string; occupation: string;
   };
   editing: boolean;
+  detailOpen: boolean;
+  selectedParentDetail: ParentInfo | null;
 };
 
 type Action =
@@ -59,7 +62,9 @@ type Action =
   | { type: 'OPEN_EDIT_DIALOG'; payload: ParentInfo }
   | { type: 'SET_EDIT_OPEN'; payload: boolean }
   | { type: 'SET_EDIT_FORM'; payload: Partial<State['editForm']> }
-  | { type: 'SET_EDITING'; payload: boolean };
+  | { type: 'SET_EDITING'; payload: boolean }
+  | { type: 'SET_DETAIL_OPEN'; payload: boolean }
+  | { type: 'OPEN_DETAIL_DIALOG'; payload: ParentInfo };
 
 const initialState: State = {
   search: "",
@@ -79,6 +84,8 @@ const initialState: State = {
     name: "", email: "", phone: "", occupation: "",
   },
   editing: false,
+  detailOpen: false,
+  selectedParentDetail: null,
 };
 
 function reducer(state: State, action: Action): State {
@@ -108,6 +115,8 @@ function reducer(state: State, action: Action): State {
     case 'SET_EDIT_OPEN': return { ...state, editOpen: action.payload };
     case 'SET_EDIT_FORM': return { ...state, editForm: { ...state.editForm, ...action.payload } };
     case 'SET_EDITING': return { ...state, editing: action.payload };
+    case 'SET_DETAIL_OPEN': return { ...state, detailOpen: action.payload };
+    case 'OPEN_DETAIL_DIALOG': return { ...state, selectedParentDetail: action.payload, detailOpen: true };
     default: return state;
   }
 }
@@ -119,9 +128,9 @@ export function AdminParents() {
 
   const [state, dispatch] = useReducer(reducer, initialState);
   const {
-    search, currentPage, linkOpen, selectedParent, selectedClass,
+    search, currentPage, linkOpen, selectedParent: stateSelectedParent, selectedClass,
     linking, createOpen, createForm, creating, editOpen,
-    editingParent, editForm, editing
+    editingParent, editForm, editing, detailOpen, selectedParentDetail: stateSelectedParentDetail
   } = state;
 
   const debouncedSearch = useDebounce(search, 500);
@@ -129,7 +138,7 @@ export function AdminParents() {
   // Queries
   const { 
     data: parentsData, 
-    isFetching: loadingParents 
+    isLoading: loadingParents 
   } = useParents(currentTenantId || undefined, debouncedSearch || undefined, currentPage, 15);
 
   const { data: classesData } = useClassesMin(currentTenantId || undefined);
@@ -169,12 +178,23 @@ export function AdminParents() {
     );
   }, [rawParents]);
 
+  // Derive selected parent dynamically from the latest parents list to keep modal synchronised reactively
+  const selectedParent = useMemo(() => {
+    if (!stateSelectedParent) return null;
+    return parents.find((p) => p.id === stateSelectedParent.id) || stateSelectedParent;
+  }, [parents, stateSelectedParent]);
+
+  const selectedParentDetail = useMemo(() => {
+    if (!stateSelectedParentDetail) return null;
+    return parents.find((p) => p.id === stateSelectedParentDetail.id) || stateSelectedParentDetail;
+  }, [parents, stateSelectedParentDetail]);
+
   const students = studentData?.items || [];
   const classes = classesData?.classes || [];
 
   const filteredStudents = useMemo(() => {
     return students.filter(
-      (s) => !s.parentId && !selectedParent?.children.some((c) => c.id === s.id)
+      (s) => !selectedParent?.children.some((c) => c.id === s.id)
     );
   }, [students, selectedParent]);
 
@@ -277,6 +297,7 @@ export function AdminParents() {
           onEdit={(p) => dispatch({ type: 'OPEN_EDIT_DIALOG', payload: p })}
           onDelete={handleDelete}
           onLinkOpen={(p) => dispatch({ type: 'OPEN_LINK_DIALOG', payload: p })}
+          onView={(p) => dispatch({ type: 'OPEN_DETAIL_DIALOG', payload: p })}
         />
       ) : (
         <ParentsGridView 
@@ -286,6 +307,7 @@ export function AdminParents() {
           onDelete={handleDelete}
           onLinkOpen={(p) => dispatch({ type: 'OPEN_LINK_DIALOG', payload: p })}
           onUnlinkChild={handleUnlinkChild}
+          onView={(p) => dispatch({ type: 'OPEN_DETAIL_DIALOG', payload: p })}
         />
       )}
 
@@ -324,9 +346,16 @@ export function AdminParents() {
         classes={classes}
         filteredStudents={filteredStudents}
         linking={linking}
-        loading={loadingStudents || fetchingStudents}
+        loading={loadingStudents}
         onLinkChild={handleLinkChild}
         onUnlinkChild={handleUnlinkChild}
+      />
+
+      <ParentDetailDialog
+        open={detailOpen}
+        onOpenChange={(v) => dispatch({ type: 'SET_DETAIL_OPEN', payload: v })}
+        parent={selectedParentDetail}
+        onLinkClick={(p) => dispatch({ type: 'OPEN_LINK_DIALOG', payload: p })}
       />
     </div>
   );

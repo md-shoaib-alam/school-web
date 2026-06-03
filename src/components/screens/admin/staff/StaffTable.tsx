@@ -61,7 +61,11 @@ export function StaffTable({
             </TableRow>
           ) : (
             staff.map((member) => (
-              <TableRow key={member.id} className="hover:bg-zinc-50/50 dark:hover:bg-zinc-900/10 transition-colors">
+              <TableRow 
+                key={member.id} 
+                className="hover:bg-zinc-50/50 dark:hover:bg-zinc-900/10 transition-colors cursor-pointer"
+                onClick={() => onView(member)}
+              >
                 <TableCell>
                   <div className="flex items-center gap-3">
                     <Avatar className="size-9">
@@ -75,7 +79,7 @@ export function StaffTable({
                         <span className="text-[10px] text-zinc-500">{member.email}</span>
                         <button 
                           type="button"
-                          onClick={() => handleCopy(member.email, member.id)}
+                          onClick={(e) => { e.stopPropagation(); handleCopy(member.email, member.id); }}
                           className="opacity-0 group-hover:opacity-100 transition-opacity p-0.5 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded"
                           title="Copy email"
                         >
@@ -124,7 +128,7 @@ export function StaffTable({
                   </Badge>
                 </TableCell>
                 <TableCell className="text-right">
-                  <div className="flex justify-end gap-1">
+                  <div className="flex justify-end gap-1" onClick={(e) => e.stopPropagation()}>
                     <Button
                       size="icon"
                       variant="ghost"

@@ -4,7 +4,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Pencil, Trash2, Link as LinkIcon } from "lucide-react";
+import { Pencil, Trash2, Link as LinkIcon, Eye } from "lucide-react";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -24,6 +24,7 @@ interface ParentsTableViewProps {
   onEdit: (p: ParentInfo) => void;
   onDelete: (id: string) => void;
   onLinkOpen: (p: ParentInfo) => void;
+  onView: (p: ParentInfo) => void;
 }
 
 export function ParentsTableView({
@@ -31,6 +32,7 @@ export function ParentsTableView({
   onEdit,
   onDelete,
   onLinkOpen,
+  onView,
 }: ParentsTableViewProps) {
   return (
     <Card className="shadow-sm border-0 overflow-hidden mb-4">
@@ -50,7 +52,11 @@ export function ParentsTableView({
                 const initials = parent.name.split(" ").map((n) => n[0]).join("").slice(0, 2).toUpperCase();
                 const color = avatarColors[index % avatarColors.length];
                 return (
-                  <tr key={parent.id} className="hover:bg-zinc-50/50 dark:hover:bg-zinc-800/30 transition-colors">
+                  <tr 
+                    key={parent.id} 
+                    className="hover:bg-zinc-50/50 dark:hover:bg-zinc-800/30 transition-colors cursor-pointer"
+                    onClick={() => onView(parent)}
+                  >
                     <td className="px-3 sm:px-6 py-4">
                       <div className="flex items-center gap-3">
                         <Avatar className="size-8 shrink-0">
@@ -83,7 +89,16 @@ export function ParentsTableView({
                       {parent.occupation || 'N/A'}
                     </td>
                     <td className="px-3 sm:px-6 py-4">
-                      <div className="flex items-center justify-end gap-1 sm:gap-2">
+                      <div className="flex items-center justify-end gap-1 sm:gap-2" onClick={(e) => e.stopPropagation()}>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="size-8 text-zinc-400 hover:text-emerald-600 shrink-0"
+                          onClick={() => onView(parent)}
+                          title="View Details"
+                        >
+                          <Eye className="size-3.5" />
+                        </Button>
                         <Button
                           variant="outline"
                           size="sm"

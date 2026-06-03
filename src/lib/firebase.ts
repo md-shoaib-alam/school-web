@@ -1,5 +1,5 @@
 import { initializeApp, getApps, getApp } from "firebase/app";
-import { getMessaging, getToken, onMessage } from "firebase/messaging";
+import { getMessaging, getToken, onMessage, isSupported } from "firebase/messaging";
 
 import { env } from './env';
 
@@ -15,13 +15,27 @@ const firebaseConfig = {
 // Initialize Firebase
 const app = getApps().length > 0 ? getApp() : initializeApp(firebaseConfig);
 
-// Initialize Messaging
-const messaging = typeof window !== 'undefined' ? getMessaging(app) : null;
+// Helper to get messaging only if supported
+const getMessagingInstance = async () => {
+  if (typeof window === 'undefined') return null;
+  try {
+    const supported = await isSupported();
+    if (!supported) return null;
+    return getMessaging(app);
+  } catch (err) {
+    return null;
+  }
+};
 
 export const requestNotificationPermission = async () => {
-  if (!messaging) return null;
   if (!process.env.NEXT_PUBLIC_FIREBASE_VAPID_KEY) {
     console.warn("FCM VAPID Key is missing in .env");
+    return null;
+  }
+  
+  const messaging = await getMessagingInstance();
+  if (!messaging) {
+    console.warn("FCM is not supported in this browser / secure context.");
     return null;
   }
   
@@ -49,8 +63,25 @@ export const requestNotificationPermission = async () => {
 };
 
 export const onForegroundMessage = (callback: (payload: any) => void) => {
-  if (!messaging) return;
-  return onMessage(messaging, (payload) => {
-    callback(payload);
+  if (typeof window === 'undefined') return;
+  let unsubscribe: (() => void) | undefined;
+  
+  isSupported().then((supported) => {
+    if (supported) {
+      try {
+        const messaging = getMessaging(app);
+        unsubscribe = onMessage(messaging, (payload) => {
+          callback(payload);
+        });
+      } catch (err) {
+        console.warn("Failed to get FCM messaging instance:", err);
+      }
+    }
+  }).catch((err) => {
+    console.warn("FCM messaging is not supported in this browser:", err);
   });
+
+  return () => {
+    if (unsubscribe) unsubscribe();
+  };
 };
