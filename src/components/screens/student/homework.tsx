@@ -32,7 +32,7 @@ import {
 import type { StudentInfo, AssignmentInfo } from "@/lib/types";
 import { DailyDiaryPlanner } from "@/components/shared/daily-diary-planner";
 
-type AssignmentStatus = "active" | "submitted" | "overdue";
+type AssignmentStatus = "active" | "submitted" | "overdue" | "graded";
 
 interface StudentSubmission {
   id: string;
@@ -141,7 +141,9 @@ export function StudentAssignments() {
       const isSubmitted = realSub && !isGraded;
 
       let status: AssignmentStatus;
-      if (isGraded || isSubmitted) {
+      if (isGraded) {
+        status = "graded";
+      } else if (isSubmitted) {
         status = "submitted";
       } else if (pastDue) {
         status = "overdue";
