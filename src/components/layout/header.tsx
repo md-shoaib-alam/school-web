@@ -28,12 +28,21 @@ export function Header({ items, resolvedScreen }: HeaderProps) {
   const [showDashboardButton, setShowDashboardButton] = useState(false);
 
   useEffect(() => {
-    if (currentUser?.role === "staff" && resolvedScreen !== "dashboard") {
-      const pref = localStorage.getItem("schoolsaas_staff_sidebar_preference");
-      setShowDashboardButton(pref !== "enabled");
-    } else {
-      setShowDashboardButton(false);
-    }
+    const updateDashboardButton = () => {
+      if (currentUser?.role === "staff" && resolvedScreen !== "dashboard") {
+        const pref = localStorage.getItem("schoolsaas_staff_sidebar_preference");
+        setShowDashboardButton(pref !== "enabled");
+      } else {
+        setShowDashboardButton(false);
+      }
+    };
+
+    updateDashboardButton();
+
+    window.addEventListener("schoolsaas_staff_sidebar_pref_changed", updateDashboardButton);
+    return () => {
+      window.removeEventListener("schoolsaas_staff_sidebar_pref_changed", updateDashboardButton);
+    };
   }, [currentUser?.role, resolvedScreen]);
 
   const dates = useMemo(() => {

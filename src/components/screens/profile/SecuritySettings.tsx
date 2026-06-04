@@ -33,6 +33,7 @@ export function SecuritySettings({ theme, setTheme, onPasswordChange, userRole }
     setSidebarPref(pref);
     if (typeof window !== "undefined") {
       localStorage.setItem("schoolsaas_staff_sidebar_preference", pref);
+      window.dispatchEvent(new CustomEvent("schoolsaas_staff_sidebar_pref_changed", { detail: pref }));
     }
     setSidebarOpen(pref === "enabled");
   };
