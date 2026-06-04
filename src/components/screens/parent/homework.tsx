@@ -31,25 +31,21 @@ import {
 import type { StudentInfo, AssignmentInfo } from "@/lib/types";
 import { DailyDiaryPlanner } from "@/components/shared/daily-diary-planner";
 
-type AssignmentStatus = "active" | "submitted" | "overdue" | "graded";
+type HomeworkStatus = "active" | "submitted" | "overdue";
 
 interface StudentSubmission {
   id: string;
   status: string;
-  grade: string | null;
-  feedback: string | null;
   submittedAt: string;
   assignmentId: string;
 }
 
-interface EnrichedAssignment extends AssignmentInfo {
-  status: AssignmentStatus;
+interface EnrichedHomework extends AssignmentInfo {
+  status: HomeworkStatus;
   countdown: string;
   daysLeft: number;
   submitted: boolean;
   submissionId: string | null;
-  grade: string | null;
-  feedback: string | null;
 }
 
 export function ParentHomework() {
@@ -139,7 +135,7 @@ const formatDueDate = (dueDate: string) => {
 /* ─── Child Homework View ─── */
 function ChildHomeworkView({ student }: { student: StudentInfo }) {
   const [loading, setLoading] = useState(true);
-  const [assignments, setAssignments] = useState<AssignmentInfo[]>([]);
+  const [homeworks, setHomeworks] = useState<AssignmentInfo[]>([]);
   const [submissions, setSubmissions] = useState<StudentSubmission[]>([]);
   const [filterTab, setFilterTab] = useState("active");
   const [viewMode, setViewMode] = useState<"list" | "diary">("list");
@@ -148,13 +144,13 @@ function ChildHomeworkView({ student }: { student: StudentInfo }) {
   const fetchChildData = useCallback(async () => {
     setLoading(true);
     try {
-      const [assignmentsRes, submissionsRes] = await Promise.all([
+      const [homeworkRes, submissionsRes] = await Promise.all([
         apiFetch(`/api/homework?classId=${student.classId}`),
         apiFetch(`/api/submissions?studentId=${student.id}`).catch(() => null)
       ]);
 
-      const assignmentsData = await assignmentsRes.json();
-      setAssignments(Array.isArray(assignmentsData) ? assignmentsData : []);
+      const homeworkData = await homeworkRes.json();
+      setHomeworks(Array.isArray(homeworkData) ? homeworkData : []);
 
       if (submissionsRes && submissionsRes.ok) {
         const subsJson = await submissionsRes.json();
@@ -173,23 +169,22 @@ function ChildHomeworkView({ student }: { student: StudentInfo }) {
     fetchChildData();
   }, [fetchChildData]);
 
-  const enrichedAssignments: EnrichedAssignment[] = useMemo(() => {
+  const enrichedHomeworks: EnrichedHomework[] = useMemo(() => {
     const now = new Date();
     const subMap = new Map<string, StudentSubmission>();
     submissions.forEach((s) => subMap.set(s.assignmentId, s));
 
-    return assignments.map((a) => {
+    return homeworks.map((a) => {
       const due = new Date(a.dueDate);
       const diffMs = due.getTime() - now.getTime();
       const diffDays = Math.ceil(diffMs / (1000 * 60 * 60 * 24));
       const pastDue = diffDays < 0;
 
       const realSub = subMap.get(a.id);
-      const isGraded = realSub && realSub.status === "graded";
-      const isSubmitted = realSub && !isGraded;
+      const isSubmitted = !!realSub;
 
-      let status: AssignmentStatus;
-      if (isGraded || isSubmitted) status = "submitted";
+      let status: HomeworkStatus;
+      if (isSubmitted) status = "submitted";
       else if (pastDue) status = "overdue";
       else status = "active";
 
@@ -203,23 +198,21 @@ function ChildHomeworkView({ student }: { student: StudentInfo }) {
         status,
         countdown,
         daysLeft: diffDays,
-        submitted: !!(isSubmitted || isGraded),
+        submitted: isSubmitted,
         submissionId: realSub?.id || null,
-        grade: realSub?.grade || null,
-        feedback: realSub?.feedback || null,
       };
     });
-  }, [assignments, submissions]);
+  }, [homeworks, submissions]);
 
-  const filteredAssignments = useMemo(() => {
-    if (filterTab === "all") return enrichedAssignments;
-    return enrichedAssignments.filter((a) => a.status === filterTab);
-  }, [enrichedAssignments, filterTab]);
+  const filteredHomeworks = useMemo(() => {
+    if (filterTab === "all") return enrichedHomeworks;
+    return enrichedHomeworks.filter((a) => a.status === filterTab);
+  }, [enrichedHomeworks, filterTab]);
 
   // Daily Diary filters
-  const selectedDateAssignments = useMemo(() => {
+  const selectedDateHomeworks = useMemo(() => {
     if (!selectedDate) return [];
-    return enrichedAssignments.filter((a) => {
+    return enrichedHomeworks.filter((a) => {
       if (!a.createdAt) return false;
       const d = new Date(a.createdAt);
       return (
@@ -228,11 +221,11 @@ function ChildHomeworkView({ student }: { student: StudentInfo }) {
         d.getDate() === selectedDate.getDate()
       );
     });
-  }, [enrichedAssignments, selectedDate]);
+  }, [enrichedHomeworks, selectedDate]);
 
-  const dueSelectedDateAssignments = useMemo(() => {
+  const dueSelectedDateHomeworks = useMemo(() => {
     if (!selectedDate) return [];
-    return enrichedAssignments.filter((a) => {
+    return enrichedHomeworks.filter((a) => {
       const d = new Date(a.dueDate);
       const isDue = (
         d.getFullYear() === selectedDate.getFullYear() &&
@@ -253,30 +246,28 @@ function ChildHomeworkView({ student }: { student: StudentInfo }) {
       }
       return true;
     });
-  }, [enrichedAssignments, selectedDate]);
+  }, [enrichedHomeworks, selectedDate]);
 
   // Homework dates for calendar indicators
   const homeworkDays = useMemo(() => {
-    return enrichedAssignments
+    return enrichedHomeworks
       .map((a) => {
         if (!a.createdAt) return null;
         const d = new Date(a.createdAt);
         return new Date(d.getFullYear(), d.getMonth(), d.getDate());
       })
       .filter(Boolean) as Date[];
-  }, [enrichedAssignments]);
+  }, [enrichedHomeworks]);
 
   const counts = useMemo(() => ({
-    all: enrichedAssignments.length,
-    active: enrichedAssignments.filter((a) => a.status === "active").length,
-    submitted: enrichedAssignments.filter((a) => a.status === "submitted").length,
-    overdue: enrichedAssignments.filter((a) => a.status === "overdue").length,
-  }), [enrichedAssignments]);
+    all: enrichedHomeworks.length,
+    active: enrichedHomeworks.filter((a) => a.status === "active").length,
+    submitted: enrichedHomeworks.filter((a) => a.status === "submitted").length,
+    overdue: enrichedHomeworks.filter((a) => a.status === "overdue").length,
+  }), [enrichedHomeworks]);
 
-  const getStatusBadge = (status: AssignmentStatus) => {
+  const getStatusBadge = (status: HomeworkStatus) => {
     switch (status) {
-      case "graded":
-        return <Badge className="bg-violet-100 text-violet-700 dark:bg-violet-950/40 dark:text-violet-400 border-0 text-[10px] font-bold shadow-none">Graded</Badge>;
       case "submitted":
         return <Badge className="bg-emerald-100 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400 border-0 text-[10px] font-bold shadow-none">Submitted</Badge>;
       case "active":
@@ -288,19 +279,17 @@ function ChildHomeworkView({ student }: { student: StudentInfo }) {
     }
   };
 
-  const getProgressValue = (status: AssignmentStatus) => {
+  const getProgressValue = (status: HomeworkStatus) => {
     switch (status) {
-      case "graded": return 100;
-      case "submitted": return 80;
+      case "submitted": return 100;
       case "active": return 30;
       case "overdue": return 0;
       default: return 0;
     }
   };
 
-  const getProgressColor = (status: AssignmentStatus) => {
+  const getProgressColor = (status: HomeworkStatus) => {
     switch (status) {
-      case "graded": return "[&>div]:bg-violet-600";
       case "submitted": return "[&>div]:bg-emerald-500";
       case "active": return "[&>div]:bg-violet-500/70";
       case "overdue": return "[&>div]:bg-rose-500";
@@ -323,7 +312,7 @@ function ChildHomeworkView({ student }: { student: StudentInfo }) {
     <div className="space-y-6">
       {viewMode === "list" && (
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-          <HomeworkSummaryCard label="Today's Homework" count={selectedDateAssignments.length + dueSelectedDateAssignments.length} icon={<FileText className="size-4" />} themeColor="violet" />
+          <HomeworkSummaryCard label="Today's Homework" count={selectedDateHomeworks.length + dueSelectedDateHomeworks.length} icon={<FileText className="size-4" />} themeColor="violet" />
           <HomeworkSummaryCard label="Active" count={counts.active} icon={<Clock className="size-4" />} themeColor="amber" />
           <HomeworkSummaryCard label="Submitted" count={counts.submitted} icon={<CheckCircle2 className="size-4" />} themeColor="emerald" />
           <HomeworkSummaryCard label="Overdue" count={counts.overdue} icon={<AlertTriangle className="size-4" />} themeColor="red" />
@@ -396,9 +385,9 @@ function ChildHomeworkView({ student }: { student: StudentInfo }) {
                 </Popover>
               </div>
 
-              {/* List of assignments for selected date */}
+              {/* List of homework for selected date */}
               <ScrollArea className="max-h-[500px] pr-3">
-                {selectedDateAssignments.length === 0 && dueSelectedDateAssignments.length === 0 ? (
+                {selectedDateHomeworks.length === 0 && dueSelectedDateHomeworks.length === 0 ? (
                   <div className="text-center py-16 text-zinc-400 dark:text-zinc-500 border-2 border-dashed border-zinc-100 dark:border-zinc-800 rounded-xl">
                     <FileText className="size-10 mx-auto mb-3 opacity-30" />
                     <p className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">No homework found</p>
@@ -409,14 +398,14 @@ function ChildHomeworkView({ student }: { student: StudentInfo }) {
                 ) : (
                   <div className="space-y-4">
                     {/* Assigned Today */}
-                    {selectedDateAssignments.length > 0 && (
+                    {selectedDateHomeworks.length > 0 && (
                       <div>
                         <h4 className="text-[10px] font-extrabold uppercase tracking-widest text-violet-700 dark:text-violet-400 mb-2 flex items-center gap-1.5">
                           <span className="size-1.5 rounded-full bg-violet-500" />
-                          Assigned Today ({selectedDateAssignments.length})
+                          Assigned Today ({selectedDateHomeworks.length})
                         </h4>
                         <div className="space-y-2">
-                          {selectedDateAssignments.map((a) => (
+                          {selectedDateHomeworks.map((a) => (
                             <ListHomeworkCard key={a.id} a={a} getStatusBadge={getStatusBadge} getProgressValue={getProgressValue} getProgressColor={getProgressColor} />
                           ))}
                         </div>
@@ -424,14 +413,14 @@ function ChildHomeworkView({ student }: { student: StudentInfo }) {
                     )}
 
                     {/* Due Today */}
-                    {dueSelectedDateAssignments.length > 0 && (
+                    {dueSelectedDateHomeworks.length > 0 && (
                       <div>
                         <h4 className="text-[10px] font-extrabold uppercase tracking-widest text-rose-700 dark:text-rose-450 mb-2 flex items-center gap-1.5 mt-2">
                           <span className="size-1.5 rounded-full bg-rose-500" />
-                          Due Today ({dueSelectedDateAssignments.length})
+                          Due Today ({dueSelectedDateHomeworks.length})
                         </h4>
                         <div className="space-y-2">
-                          {dueSelectedDateAssignments.map((a) => (
+                          {dueSelectedDateHomeworks.map((a) => (
                             <ListHomeworkCard key={a.id} a={a} getStatusBadge={getStatusBadge} getProgressValue={getProgressValue} getProgressColor={getProgressColor} />
                           ))}
                         </div>
@@ -446,8 +435,8 @@ function ChildHomeworkView({ student }: { student: StudentInfo }) {
               selectedDate={selectedDate}
               setSelectedDate={setSelectedDate}
               homeworkDays={homeworkDays}
-              selectedDateAssignments={selectedDateAssignments}
-              dueSelectedDateAssignments={dueSelectedDateAssignments}
+              selectedDateAssignments={selectedDateHomeworks}
+              dueSelectedDateAssignments={dueSelectedDateHomeworks}
               getStatusBadge={getStatusBadge}
               getProgressValue={getProgressValue}
               getProgressColor={getProgressColor}
@@ -467,16 +456,15 @@ function ListHomeworkCard({
   getProgressValue,
   getProgressColor,
 }: {
-  a: EnrichedAssignment;
-  getStatusBadge: (status: AssignmentStatus) => React.ReactNode;
-  getProgressValue: (status: AssignmentStatus) => number;
-  getProgressColor: (status: AssignmentStatus) => string;
+  a: EnrichedHomework;
+  getStatusBadge: (status: HomeworkStatus) => React.ReactNode;
+  getProgressValue: (status: HomeworkStatus) => number;
+  getProgressColor: (status: HomeworkStatus) => string;
 }) {
   return (
     <div
       className={`p-4 rounded-xl border bg-card hover:shadow-sm transition-all ${
         a.status === "overdue" ? "border-rose-100 dark:border-rose-950/40 bg-rose-50/10" :
-        a.status === "graded" ? "border-violet-100 dark:border-violet-950/40 bg-violet-50/10" :
         a.status === "submitted" ? "border-emerald-100 dark:border-emerald-950/40 bg-emerald-50/10" :
         "border-zinc-100 dark:border-zinc-800"
       }`}
@@ -495,13 +483,6 @@ function ListHomeworkCard({
             </Badge>
           </div>
           <p className="text-[11px] text-muted-foreground mb-2">Assigned by {a.teacherName}</p>
-
-          {a.status === "graded" && a.grade && (
-            <div className="bg-violet-50 dark:bg-violet-950/30 rounded-lg p-2 mb-2 border border-violet-100 dark:border-violet-900/30">
-              <p className="text-xs font-bold text-violet-700 dark:text-violet-400">✨ Received Grade: {a.grade}</p>
-              {a.feedback && <p className="text-[11px] text-violet-600 dark:text-violet-300 mt-0.5 italic">Teacher remarks: "{a.feedback}"</p>}
-            </div>
-          )}
 
           <div className="flex items-center gap-4 text-xs text-muted-foreground">
             <div className="flex items-center gap-1">
@@ -540,7 +521,7 @@ function HomeworkSummaryCard({ label, count, icon, themeColor }: { label: string
           <div className={`p-2 rounded-lg bg-gradient-to-br ${theme.split(" ").slice(0,2).join(" ")} text-white shadow-xs`}>{icon}</div>
           <span className="text-2xl font-black tracking-tight text-zinc-900 dark:text-zinc-100">{count}</span>
         </div>
-        <p className="text-[11px] font-semibold text-muted-foreground mt-2">{label} Tasks</p>
+        <p className="text-[11px] font-semibold text-muted-foreground mt-2">{label} Homework</p>
       </CardContent>
     </Card>
   );

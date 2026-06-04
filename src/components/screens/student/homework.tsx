@@ -32,28 +32,24 @@ import {
 import type { StudentInfo, AssignmentInfo } from "@/lib/types";
 import { DailyDiaryPlanner } from "@/components/shared/daily-diary-planner";
 
-type AssignmentStatus = "active" | "submitted" | "overdue" | "graded";
+type HomeworkStatus = "active" | "submitted" | "overdue";
 
 interface StudentSubmission {
   id: string;
   status: string;
-  grade: string | null;
-  feedback: string | null;
   submittedAt: string;
   assignmentId: string;
 }
 
-interface EnrichedAssignment extends AssignmentInfo {
-  status: AssignmentStatus;
+interface EnrichedHomework extends AssignmentInfo {
+  status: HomeworkStatus;
   countdown: string;
   daysLeft: number;
   submitted: boolean;
   submissionId: string | null;
-  grade: string | null;
-  feedback: string | null;
 }
 
-const formatAssignmentDate = (dateStr: string) => {
+const formatHomeworkDate = (dateStr: string) => {
   if (!dateStr) return "";
   return new Date(dateStr).toLocaleDateString("en-US", {
     month: "short",
@@ -62,11 +58,11 @@ const formatAssignmentDate = (dateStr: string) => {
   });
 };
 
-export function StudentAssignments() {
+export function StudentHomework() {
   const { currentUser } = useAppStore();
   const [loading, setLoading] = useState(true);
   const [students, setStudents] = useState<StudentInfo[]>([]);
-  const [assignments, setAssignments] = useState<AssignmentInfo[]>([]);
+  const [homeworks, setHomeworks] = useState<AssignmentInfo[]>([]);
   const [activeTab, setActiveTab] = useState("active");
   const [viewMode, setViewMode] = useState<"list" | "diary">("list");
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date());
@@ -92,11 +88,11 @@ export function StudentAssignments() {
       setStudents([targetStudent]);
 
       if (targetStudent?.id) {
-        const assignmentsRes = await apiFetch(
+        const homeworkRes = await apiFetch(
           `/api/homework?classId=${targetStudent.classId}`,
         );
-        const assignmentsData = await assignmentsRes.json();
-        setAssignments(assignmentsData);
+        const homeworkData = await homeworkRes.json();
+        setHomeworks(homeworkData);
 
         // Fetch real submissions for this student
         try {
@@ -122,14 +118,14 @@ export function StudentAssignments() {
     fetchData();
   }, [fetchData]);
 
-  // Enrich assignments with REAL submission status from the submissions API
-  const enrichedAssignments: EnrichedAssignment[] = useMemo(() => {
+  // Enrich homework with REAL submission status from the submissions API
+  const enrichedHomeworks: EnrichedHomework[] = useMemo(() => {
     const now = new Date();
     // Build a map of assignmentId -> submission for quick lookup
     const subMap = new Map<string, StudentSubmission>();
     mySubmissions.forEach((s) => subMap.set(s.assignmentId, s));
 
-    return assignments.map((a) => {
+    return homeworks.map((a) => {
       const due = new Date(a.dueDate);
       const diffMs = due.getTime() - now.getTime();
       const diffDays = Math.ceil(diffMs / (1000 * 60 * 60 * 24));
@@ -137,13 +133,10 @@ export function StudentAssignments() {
 
       // Check if student has a REAL submission
       const realSub = subMap.get(a.id);
-      const isGraded = realSub && realSub.status === "graded";
-      const isSubmitted = realSub && !isGraded;
+      const isSubmitted = !!realSub;
 
-      let status: AssignmentStatus;
-      if (isGraded) {
-        status = "graded";
-      } else if (isSubmitted) {
+      let status: HomeworkStatus;
+      if (isSubmitted) {
         status = "submitted";
       } else if (pastDue) {
         status = "overdue";
@@ -165,23 +158,21 @@ export function StudentAssignments() {
         status,
         countdown,
         daysLeft: diffDays,
-        submitted: !!(isSubmitted || isGraded),
+        submitted: isSubmitted,
         submissionId: realSub?.id || null,
-        grade: realSub?.grade || null,
-        feedback: realSub?.feedback || null,
       };
     });
-  }, [assignments, mySubmissions]);
+  }, [homeworks, mySubmissions]);
 
-  const filteredAssignments = useMemo(() => {
-    if (activeTab === "all") return enrichedAssignments;
-    return enrichedAssignments.filter((a) => a.status === activeTab);
-  }, [enrichedAssignments, activeTab]);
+  const filteredHomeworks = useMemo(() => {
+    if (activeTab === "all") return enrichedHomeworks;
+    return enrichedHomeworks.filter((a) => a.status === activeTab);
+  }, [enrichedHomeworks, activeTab]);
 
   // Daily Diary filters
-  const selectedDateAssignments = useMemo(() => {
+  const selectedDateHomeworks = useMemo(() => {
     if (!selectedDate) return [];
-    return enrichedAssignments.filter((a) => {
+    return enrichedHomeworks.filter((a) => {
       if (!a.createdAt) return false;
       const d = new Date(a.createdAt);
       return (
@@ -190,11 +181,11 @@ export function StudentAssignments() {
         d.getDate() === selectedDate.getDate()
       );
     });
-  }, [enrichedAssignments, selectedDate]);
+  }, [enrichedHomeworks, selectedDate]);
 
-  const dueSelectedDateAssignments = useMemo(() => {
+  const dueSelectedDateHomeworks = useMemo(() => {
     if (!selectedDate) return [];
-    return enrichedAssignments.filter((a) => {
+    return enrichedHomeworks.filter((a) => {
       const d = new Date(a.dueDate);
       const isDue = (
         d.getFullYear() === selectedDate.getFullYear() &&
@@ -215,45 +206,45 @@ export function StudentAssignments() {
       }
       return true;
     });
-  }, [enrichedAssignments, selectedDate]);
+  }, [enrichedHomeworks, selectedDate]);
 
   const homeworkDays = useMemo(() => {
-    return enrichedAssignments
+    return enrichedHomeworks
       .map((a) => {
         if (!a.createdAt) return null;
         const d = new Date(a.createdAt);
         return new Date(d.getFullYear(), d.getMonth(), d.getDate());
       })
       .filter(Boolean) as Date[];
-  }, [enrichedAssignments]);
+  }, [enrichedHomeworks]);
 
   const counts = useMemo(
     () => ({
-      all: enrichedAssignments.length,
-      active: enrichedAssignments.filter((a) => a.status === "active").length,
-      submitted: enrichedAssignments.filter((a) => a.status === "submitted")
+      all: enrichedHomeworks.length,
+      active: enrichedHomeworks.filter((a) => a.status === "active").length,
+      submitted: enrichedHomeworks.filter((a) => a.status === "submitted")
         .length,
-      overdue: enrichedAssignments.filter((a) => a.status === "overdue").length,
+      overdue: enrichedHomeworks.filter((a) => a.status === "overdue").length,
     }),
-    [enrichedAssignments],
+    [enrichedHomeworks],
   );
 
-  const handleSubmit = async (assignment: EnrichedAssignment) => {
+  const handleSubmit = async (homework: EnrichedHomework) => {
     if (!student) return;
-    setSubmittingId(assignment.id);
+    setSubmittingId(homework.id);
     try {
       const res = await apiFetch("/api/submissions", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          assignmentId: assignment.id,
+          assignmentId: homework.id,
           studentId: student.id,
           status: "submitted",
         }),
       });
       if (res.ok) {
-        toast.success("Assignment Submitted!", {
-          description: `"${assignment.title}" has been submitted successfully.`,
+        toast.success("Homework Submitted!", {
+          description: `"${homework.title}" has been submitted successfully.`,
         });
         // Refresh submissions
         try {
@@ -268,23 +259,17 @@ export function StudentAssignments() {
           /* ignore */
         }
       } else {
-        toast.error("Failed to submit assignment");
+        toast.error("Failed to submit homework");
       }
     } catch {
-      toast.error("Failed to submit assignment");
+      toast.error("Failed to submit homework");
     } finally {
       setSubmittingId(null);
     }
   };
 
-  const getStatusBadge = (status: AssignmentStatus) => {
+  const getStatusBadge = (status: HomeworkStatus) => {
     switch (status) {
-      case "graded":
-        return (
-          <Badge className="bg-violet-100 text-violet-700 dark:text-violet-400 border-violet-200 dark:border-violet-800 text-[10px]">
-            Graded
-          </Badge>
-        );
       case "submitted":
         return (
           <Badge className="bg-emerald-100 text-emerald-700 border-emerald-200 text-[10px]">
@@ -308,10 +293,8 @@ export function StudentAssignments() {
     }
   };
 
-  const getCountdownColor = (status: AssignmentStatus) => {
+  const getCountdownColor = (status: HomeworkStatus) => {
     switch (status) {
-      case "graded":
-        return "text-violet-600";
       case "submitted":
         return "text-emerald-600";
       case "active":
@@ -323,12 +306,10 @@ export function StudentAssignments() {
     }
   };
 
-  const getProgressValue = (status: AssignmentStatus) => {
+  const getProgressValue = (status: HomeworkStatus) => {
     switch (status) {
-      case "graded":
-        return 100;
       case "submitted":
-        return 80;
+        return 100;
       case "active":
         return 30;
       case "overdue":
@@ -338,10 +319,8 @@ export function StudentAssignments() {
     }
   };
 
-  const getProgressColor = (status: AssignmentStatus) => {
+  const getProgressColor = (status: HomeworkStatus) => {
     switch (status) {
-      case "graded":
-        return "[&>div]:bg-violet-500";
       case "submitted":
         return "[&>div]:bg-emerald-500";
       case "active":
@@ -353,7 +332,7 @@ export function StudentAssignments() {
     }
   };
 
-  if (loading) return <AssignmentsSkeleton />;
+  if (loading) return <HomeworkSkeleton />;
 
   return (
     <div className="space-y-6">
@@ -394,7 +373,7 @@ export function StudentAssignments() {
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
           <SummaryCard
             label="Today's Homework"
-            count={selectedDateAssignments.length + dueSelectedDateAssignments.length}
+            count={selectedDateHomeworks.length + dueSelectedDateHomeworks.length}
             icon={<FileText className="size-4" />}
             color="violet"
           />
@@ -419,7 +398,7 @@ export function StudentAssignments() {
         </div>
       )}
 
-      {/* Assignments List / Diary Card */}
+      {/* Homework List / Diary Card */}
       <Card className="rounded-xl shadow-sm">
         <CardHeader className={`pb-3 ${viewMode === "diary" ? "hidden lg:block" : ""}`}>
           <CardTitle className="text-base flex items-center gap-2">
@@ -466,9 +445,9 @@ export function StudentAssignments() {
                 </Popover>
               </div>
 
-              {/* List of assignments for selected date */}
+              {/* List of homework for selected date */}
               <ScrollArea className="max-h-150 pr-3">
-                {selectedDateAssignments.length === 0 && dueSelectedDateAssignments.length === 0 ? (
+                {selectedDateHomeworks.length === 0 && dueSelectedDateHomeworks.length === 0 ? (
                   <div className="text-center py-16 text-zinc-400 dark:text-zinc-500 border-2 border-dashed border-zinc-100 dark:border-zinc-800 rounded-xl">
                     <FileText className="size-10 mx-auto mb-3 opacity-30" />
                     <p className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">No homework found</p>
@@ -479,14 +458,14 @@ export function StudentAssignments() {
                 ) : (
                   <div className="space-y-4">
                     {/* Assigned Today */}
-                    {selectedDateAssignments.length > 0 && (
+                    {selectedDateHomeworks.length > 0 && (
                       <div>
                         <h4 className="text-[10px] font-extrabold uppercase tracking-widest text-violet-755 dark:text-violet-400 mb-2 flex items-center gap-1.5">
                           <span className="size-1.5 rounded-full bg-violet-500" />
-                          Assigned Today ({selectedDateAssignments.length})
+                          Assigned Today ({selectedDateHomeworks.length})
                         </h4>
                         <div className="space-y-2.5">
-                          {selectedDateAssignments.map((a) => (
+                          {selectedDateHomeworks.map((a) => (
                             <ListHomeworkCard
                               key={a.id}
                               a={a}
@@ -503,14 +482,14 @@ export function StudentAssignments() {
                     )}
 
                     {/* Due Today */}
-                    {dueSelectedDateAssignments.length > 0 && (
+                    {dueSelectedDateHomeworks.length > 0 && (
                       <div>
                         <h4 className="text-[10px] font-extrabold uppercase tracking-widest text-rose-755 dark:text-rose-450 mb-2 flex items-center gap-1.5 mt-2">
                           <span className="size-1.5 rounded-full bg-rose-500" />
-                          Due Today ({dueSelectedDateAssignments.length})
+                          Due Today ({dueSelectedDateHomeworks.length})
                         </h4>
                         <div className="space-y-2.5">
-                          {dueSelectedDateAssignments.map((a) => (
+                          {dueSelectedDateHomeworks.map((a) => (
                             <ListHomeworkCard
                               key={a.id}
                               a={a}
@@ -534,8 +513,8 @@ export function StudentAssignments() {
               selectedDate={selectedDate}
               setSelectedDate={setSelectedDate}
               homeworkDays={homeworkDays}
-              selectedDateAssignments={selectedDateAssignments}
-              dueSelectedDateAssignments={dueSelectedDateAssignments}
+              selectedDateAssignments={selectedDateHomeworks}
+              dueSelectedDateAssignments={dueSelectedDateHomeworks}
               getStatusBadge={getStatusBadge}
               getProgressValue={getProgressValue}
               getProgressColor={getProgressColor}
@@ -560,12 +539,12 @@ function ListHomeworkCard({
   onSubmit,
   submittingId,
 }: {
-  a: EnrichedAssignment;
-  getStatusBadge: (status: AssignmentStatus) => React.ReactNode;
-  getCountdownColor: (status: AssignmentStatus) => string;
-  getProgressValue: (status: AssignmentStatus) => number;
-  getProgressColor: (status: AssignmentStatus) => string;
-  onSubmit: (assignment: EnrichedAssignment) => void;
+  a: EnrichedHomework;
+  getStatusBadge: (status: HomeworkStatus) => React.ReactNode;
+  getCountdownColor: (status: HomeworkStatus) => string;
+  getProgressValue: (status: HomeworkStatus) => number;
+  getProgressColor: (status: HomeworkStatus) => string;
+  onSubmit: (homework: EnrichedHomework) => void;
   submittingId: string | null;
 }) {
   return (
@@ -596,7 +575,7 @@ function ListHomeworkCard({
               <Clock className={`size-3.5 ${getCountdownColor(a.status)}`} />
               <span className={getCountdownColor(a.status)} suppressHydrationWarning>{a.countdown}</span>
             </div>
-            <span suppressHydrationWarning>Due: {formatAssignmentDate(a.dueDate)}</span>
+            <span suppressHydrationWarning>Due: {formatHomeworkDate(a.dueDate)}</span>
           </div>
         </div>
 
@@ -674,7 +653,7 @@ function SummaryCard({
             {count}
           </p>
         </div>
-        <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-2">
+        <p className="text-xs text-zinc-505 dark:text-zinc-400 mt-2">
           {label} Homework
         </p>
       </CardContent>
@@ -683,7 +662,7 @@ function SummaryCard({
 }
 
 /* ─── Skeleton ─── */
-function AssignmentsSkeleton() {
+function HomeworkSkeleton() {
   return (
     <div className="space-y-6">
       <div>

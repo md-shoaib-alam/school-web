@@ -10,28 +10,26 @@ import { Button } from "@/components/ui/button";
 import { CalendarDays, Clock, Loader2, Send, Sparkles, CheckCircle2, Star } from "lucide-react";
 import type { AssignmentInfo } from "@/lib/types";
 
-export type AssignmentStatus = "active" | "submitted" | "overdue" | "graded";
+export type HomeworkStatus = "active" | "submitted" | "overdue";
 
-export interface EnrichedAssignment extends AssignmentInfo {
-  status: AssignmentStatus;
+export interface EnrichedHomework extends AssignmentInfo {
+  status: HomeworkStatus;
   countdown: string;
   daysLeft: number;
   submitted: boolean;
   submissionId: string | null;
-  grade: string | null;
-  feedback: string | null;
 }
 
 interface DailyDiaryPlannerProps {
   selectedDate: Date | undefined;
   setSelectedDate: (date: Date | undefined) => void;
   homeworkDays: Date[];
-  selectedDateAssignments: EnrichedAssignment[];
-  dueSelectedDateAssignments: EnrichedAssignment[];
-  getStatusBadge: (status: AssignmentStatus) => React.ReactNode;
-  getProgressValue: (status: AssignmentStatus) => number;
-  getProgressColor: (status: AssignmentStatus) => string;
-  onSubmit?: (assignment: EnrichedAssignment) => void;
+  selectedDateAssignments: EnrichedHomework[];
+  dueSelectedDateAssignments: EnrichedHomework[];
+  getStatusBadge: (status: HomeworkStatus) => React.ReactNode;
+  getProgressValue: (status: HomeworkStatus) => number;
+  getProgressColor: (status: HomeworkStatus) => string;
+  onSubmit?: (homework: EnrichedHomework) => void;
   submittingId?: string | null;
   emptyMessage?: string;
 }
@@ -52,7 +50,7 @@ export function DailyDiaryPlanner({
   const [isCalendarOpen, setIsCalendarOpen] = useState(false);
   const totalEntries = selectedDateAssignments.length + dueSelectedDateAssignments.length;
   const completedCount = [...selectedDateAssignments, ...dueSelectedDateAssignments]
-    .filter(a => a.status === "submitted" || a.status === "graded").length;
+    .filter(a => a.status === "submitted").length;
 
   return (
     <div className="mt-0 lg:relative lg:p-4 lg:bg-linear-to-br lg:from-[#4a3622] lg:via-[#2c2014] lg:to-[#1a130c] lg:dark:from-zinc-950 lg:dark:to-stone-900 lg:rounded-[28px] lg:shadow-2xl lg:border-4 lg:border-[#3a2a1b] lg:dark:border-zinc-800/80">
@@ -323,25 +321,24 @@ export function DailyDiaryPlanner({
 
 /* ─── Helper Card for Daily Diary Tasks ─── */
 interface DiaryTaskCardProps {
-  a: EnrichedAssignment;
-  getStatusBadge: (s: AssignmentStatus) => React.ReactNode;
-  getProgressValue: (s: AssignmentStatus) => number;
-  getProgressColor: (s: AssignmentStatus) => string;
-  onSubmit?: (assignment: EnrichedAssignment) => void;
+  a: EnrichedHomework;
+  getStatusBadge: (s: HomeworkStatus) => React.ReactNode;
+  getProgressValue: (s: HomeworkStatus) => number;
+  getProgressColor: (s: HomeworkStatus) => string;
+  onSubmit?: (homework: EnrichedHomework) => void;
   submittingId?: string | null;
 }
 
 const statusConfig = {
-  graded:    { accent: "bg-amber-500",   ring: "ring-amber-200 dark:ring-amber-900/40",  badgeBg: "bg-emerald-100 dark:bg-emerald-950/60", badgeText: "text-emerald-800 dark:text-emerald-300", label: "Graded" },
-  submitted: { accent: "bg-emerald-500", ring: "ring-emerald-200 dark:ring-emerald-900/40", badgeBg: "bg-blue-100 dark:bg-blue-950/60",     badgeText: "text-blue-800 dark:text-blue-300",     label: "Submitted" },
+  submitted: { accent: "bg-emerald-500", ring: "ring-emerald-200 dark:ring-emerald-900/40", badgeBg: "bg-emerald-100 dark:bg-emerald-950/60", badgeText: "text-emerald-800 dark:text-emerald-300", label: "Submitted" },
   active:    { accent: "bg-amber-400",   ring: "ring-amber-200 dark:ring-amber-900/40",  badgeBg: "bg-amber-100 dark:bg-amber-950/60",   badgeText: "text-amber-800 dark:text-amber-300",   label: "Pending" },
   overdue:   { accent: "bg-rose-500",    ring: "ring-rose-200 dark:ring-rose-900/40",    badgeBg: "bg-rose-100 dark:bg-rose-950/60",     badgeText: "text-rose-800 dark:text-rose-300",     label: "Overdue" },
 } as const;
 
 function DiaryTaskCard({ a, onSubmit, submittingId = null }: DiaryTaskCardProps) {
   const cfg = statusConfig[a.status];
-  const isDone = a.status === "submitted" || a.status === "graded";
-  const progressPercent = a.status === "graded" ? 100 : a.status === "submitted" ? 100 : a.status === "overdue" ? 80 : 30;
+  const isDone = a.status === "submitted";
+  const progressPercent = a.status === "submitted" ? 100 : a.status === "overdue" ? 80 : 30;
 
   return (
     <div className={`
@@ -376,7 +373,7 @@ function DiaryTaskCard({ a, onSubmit, submittingId = null }: DiaryTaskCardProps)
           </p>
         )}
 
-        {/* Row 3: Countdown + Grade/Feedback + Submit */}
+        {/* Row 3: Countdown + Submit */}
         <div className="flex items-center justify-between gap-2 mt-2">
           <div className="flex items-center gap-3 min-w-0">
             {/* Countdown chip */}
@@ -386,18 +383,11 @@ function DiaryTaskCard({ a, onSubmit, submittingId = null }: DiaryTaskCardProps)
                 <span className="truncate">{a.countdown}</span>
               </div>
             )}
-            {/* Grade chip */}
-            {a.grade && (
-              <div className="flex items-center gap-1 text-[10px] font-bold text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/40 px-1.5 py-0.5 rounded">
-                <Star className="size-2.5 shrink-0" />
-                {a.grade}
-              </div>
-            )}
             {/* Submitted check */}
-            {a.status === "submitted" && !a.grade && (
-              <div className="flex items-center gap-1 text-[10px] font-semibold text-blue-600 dark:text-blue-400">
+            {a.status === "submitted" && (
+              <div className="flex items-center gap-1 text-[10px] font-semibold text-emerald-600 dark:text-emerald-400">
                 <CheckCircle2 className="size-3 shrink-0" />
-                Awaiting review
+                Done
               </div>
             )}
           </div>
@@ -424,13 +414,6 @@ function DiaryTaskCard({ a, onSubmit, submittingId = null }: DiaryTaskCardProps)
             </Button>
           )}
         </div>
-
-        {/* Feedback */}
-        {a.feedback && (
-          <div className="mt-2 text-[10px] text-stone-600 dark:text-stone-400 italic bg-stone-100/60 dark:bg-stone-800/30 rounded px-2 py-1.5 border-l-2 border-amber-500/50 dark:border-amber-500/30">
-            "{a.feedback}"
-          </div>
-        )}
 
         {/* Progress bar at bottom */}
         <div className="mt-2 h-0.5 bg-amber-900/5 dark:bg-[#2f271f] rounded-full overflow-hidden">
