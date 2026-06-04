@@ -18,7 +18,7 @@ import {
 import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
-import { Search, Receipt, Banknote, Eye, Trash2, Printer, CheckCircle2, Calendar as CalendarIcon } from 'lucide-react';
+import { Search, Receipt, Banknote, Eye, Trash2, Printer, CheckCircle2, Calendar as CalendarIcon, CreditCard, Wallet, Coins } from 'lucide-react';
 import { toast } from "sonner";
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiFetch } from '@/lib/api';
@@ -117,7 +117,7 @@ export function CheckReceiptTab({ canEdit, canDelete }: CheckReceiptTabProps) {
     deleting,
   } = state;
 
-  const limit = 10;
+  const limit = 30;
 
   // Debounce search
   useEffect(() => {
@@ -193,6 +193,44 @@ export function CheckReceiptTab({ canEdit, canDelete }: CheckReceiptTabProps) {
 
   const remainingAmount = pendingFees?.reduce((sum: number, fee: any) => sum + (fee.amount - fee.paidAmount - fee.concession), 0) || 0;
 
+  const thisMonthFromDate = useMemo(() => {
+    const d = new Date();
+    d.setDate(1);
+    return d.toISOString().split('T')[0];
+  }, []);
+
+  const currentMonthName = useMemo(() => {
+    return new Date().toLocaleString('default', { month: 'long' });
+  }, []);
+
+  const { data: thisMonthData } = useFeeReceipts({
+    fromDate: thisMonthFromDate,
+    limit: 1000
+  });
+
+  const thisMonthTotal = useMemo(() => {
+    return thisMonthData?.items?.reduce((sum, item) => sum + item.paidAmount, 0) || 0;
+  }, [thisMonthData]);
+
+  const thisMonthCount = thisMonthData?.total || 0;
+
+  const methodBreakdown = useMemo(() => {
+    const counts: Record<string, { count: number; amount: number }> = {
+      cash: { count: 0, amount: 0 },
+      online: { count: 0, amount: 0 },
+      cheque: { count: 0, amount: 0 }
+    };
+    thisMonthData?.items?.forEach(item => {
+      const m = item.paymentMethod.toLowerCase();
+      if (!counts[m]) {
+        counts[m] = { count: 0, amount: 0 };
+      }
+      counts[m].count += 1;
+      counts[m].amount += item.paidAmount;
+    });
+    return counts;
+  }, [thisMonthData]);
+
   const handleDelete = async (id: string) => {
     dispatch({ type: 'SET_DELETING', payload: true });
     try {
@@ -207,7 +245,90 @@ export function CheckReceiptTab({ canEdit, canDelete }: CheckReceiptTabProps) {
   };
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-6">
+      {/* 4 Summary Cards Grid */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        {/* Total Collected */}
+        <Card className="relative overflow-hidden rounded-xl border border-zinc-200/80 dark:border-zinc-800 bg-gradient-to-br from-white to-emerald-50/10 dark:from-zinc-950 dark:to-emerald-950/5 p-5 flex flex-col justify-between shadow-xs hover:shadow-md hover:border-emerald-500/30 dark:hover:border-emerald-500/20 transition-all duration-300 group">
+          <div className="absolute top-0 right-0 w-20 h-20 bg-emerald-500/5 dark:bg-emerald-500/10 rounded-bl-full pointer-events-none group-hover:scale-110 transition-transform duration-300" />
+          <div className="space-y-3">
+            <div className="flex items-center justify-between">
+              <span className="text-[10px] text-zinc-500 dark:text-zinc-400 font-bold uppercase tracking-wider block">Total Collected ({currentMonthName})</span>
+              <div className="p-2 rounded-lg bg-emerald-50 dark:bg-emerald-950/50 text-emerald-600 dark:text-emerald-400">
+                <Receipt className="size-4" />
+              </div>
+            </div>
+            <span className="text-2xl font-extrabold text-emerald-600 dark:text-emerald-400 block tracking-tight">
+              ₹{thisMonthTotal.toLocaleString()}
+            </span>
+          </div>
+          <div className="text-[10px] text-zinc-500 dark:text-zinc-400 mt-4 flex items-center gap-1.5 font-medium border-t pt-2 border-zinc-100 dark:border-zinc-900">
+            <span className="inline-block size-1.5 rounded-full bg-emerald-500 animate-pulse" />
+            {thisMonthCount} receipts issued
+          </div>
+        </Card>
+
+        {/* Cash */}
+        <Card className="relative overflow-hidden rounded-xl border border-zinc-200/80 dark:border-zinc-800 bg-gradient-to-br from-white to-amber-50/10 dark:from-zinc-950 dark:to-amber-950/5 p-5 flex flex-col justify-between shadow-xs hover:shadow-md hover:border-amber-500/30 dark:hover:border-amber-500/20 transition-all duration-300 group">
+          <div className="absolute top-0 right-0 w-20 h-20 bg-amber-500/5 dark:bg-amber-500/10 rounded-bl-full pointer-events-none group-hover:scale-110 transition-transform duration-300" />
+          <div className="space-y-3">
+            <div className="flex items-center justify-between">
+              <span className="text-[10px] text-zinc-500 dark:text-zinc-400 font-bold uppercase tracking-wider block">Cash Payments</span>
+              <div className="p-2 rounded-lg bg-amber-50 dark:bg-amber-950/50 text-amber-600 dark:text-amber-400">
+                <Wallet className="size-4" />
+              </div>
+            </div>
+            <span className="text-2xl font-extrabold text-zinc-900 dark:text-zinc-50 block tracking-tight">
+              ₹{(methodBreakdown.cash?.amount || 0).toLocaleString()}
+            </span>
+          </div>
+          <div className="text-[10px] text-zinc-500 dark:text-zinc-400 mt-4 flex items-center gap-1.5 font-medium border-t pt-2 border-zinc-100 dark:border-zinc-900">
+            <span className="inline-block size-1.5 rounded-full bg-amber-500" />
+            {methodBreakdown.cash?.count || 0} transactions
+          </div>
+        </Card>
+
+        {/* Online */}
+        <Card className="relative overflow-hidden rounded-xl border border-zinc-200/80 dark:border-zinc-800 bg-gradient-to-br from-white to-indigo-50/10 dark:from-zinc-950 dark:to-indigo-950/5 p-5 flex flex-col justify-between shadow-xs hover:shadow-md hover:border-indigo-500/30 dark:hover:border-indigo-500/20 transition-all duration-300 group">
+          <div className="absolute top-0 right-0 w-20 h-20 bg-indigo-500/5 dark:bg-indigo-500/10 rounded-bl-full pointer-events-none group-hover:scale-110 transition-transform duration-300" />
+          <div className="space-y-3">
+            <div className="flex items-center justify-between">
+              <span className="text-[10px] text-zinc-500 dark:text-zinc-400 font-bold uppercase tracking-wider block">Online Payments</span>
+              <div className="p-2 rounded-lg bg-indigo-50 dark:bg-indigo-950/50 text-indigo-600 dark:text-indigo-400">
+                <CreditCard className="size-4" />
+              </div>
+            </div>
+            <span className="text-2xl font-extrabold text-zinc-900 dark:text-zinc-50 block tracking-tight">
+              ₹{(methodBreakdown.online?.amount || 0).toLocaleString()}
+            </span>
+          </div>
+          <div className="text-[10px] text-zinc-500 dark:text-zinc-400 mt-4 flex items-center gap-1.5 font-medium border-t pt-2 border-zinc-100 dark:border-zinc-900">
+            <span className="inline-block size-1.5 rounded-full bg-indigo-500" />
+            {methodBreakdown.online?.count || 0} transactions
+          </div>
+        </Card>
+
+        {/* Cheque */}
+        <Card className="relative overflow-hidden rounded-xl border border-zinc-200/80 dark:border-zinc-800 bg-gradient-to-br from-white to-rose-50/10 dark:from-zinc-950 dark:to-rose-950/5 p-5 flex flex-col justify-between shadow-xs hover:shadow-md hover:border-rose-500/30 dark:hover:border-rose-500/20 transition-all duration-300 group">
+          <div className="absolute top-0 right-0 w-20 h-20 bg-rose-500/5 dark:bg-rose-500/10 rounded-bl-full pointer-events-none group-hover:scale-110 transition-transform duration-300" />
+          <div className="space-y-3">
+            <div className="flex items-center justify-between">
+              <span className="text-[10px] text-zinc-500 dark:text-zinc-400 font-bold uppercase tracking-wider block">Cheque Payments</span>
+              <div className="p-2 rounded-lg bg-rose-50 dark:bg-rose-950/50 text-rose-600 dark:text-rose-400">
+                <Coins className="size-4" />
+              </div>
+            </div>
+            <span className="text-2xl font-extrabold text-zinc-900 dark:text-zinc-50 block tracking-tight">
+              ₹{(methodBreakdown.cheque?.amount || 0).toLocaleString()}
+            </span>
+          </div>
+          <div className="text-[10px] text-zinc-500 dark:text-zinc-400 mt-4 flex items-center gap-1.5 font-medium border-t pt-2 border-zinc-100 dark:border-zinc-900">
+            <span className="inline-block size-1.5 rounded-full bg-rose-500" />
+            {methodBreakdown.cheque?.count || 0} transactions
+          </div>
+        </Card>
+      </div>
+
       {/* Filters */}
       <div className="flex flex-col lg:flex-row gap-3 items-start lg:items-center">
         <div className="relative w-full lg:max-w-xs">
@@ -294,7 +415,7 @@ export function CheckReceiptTab({ canEdit, canDelete }: CheckReceiptTabProps) {
             </div>
           ) : (
             <>
-              <div className="overflow-x-auto">
+              <div className="overflow-x-auto scrollbar-thin scrollbar-thumb-zinc-200 dark:scrollbar-thumb-zinc-800 scrollbar-track-transparent scroll-smooth">
                 <Table>
                   <TableHeader>
                     <TableRow className="bg-muted/50">
@@ -333,18 +454,14 @@ export function CheckReceiptTab({ canEdit, canDelete }: CheckReceiptTabProps) {
                             <div className="flex items-center justify-center gap-1">
                               <Button variant="ghost" size="icon" className="size-7 text-emerald-500 hover:text-emerald-600 hover:bg-emerald-50" onClick={() => dispatch({ type: 'SET_VIEW_RECEIPT', payload: r })}><Eye className="size-3.5" /></Button>
                               {canDelete && (
-                                <AlertDialog>
-                                  <AlertDialogTrigger asChild>
-                                    <Button variant="ghost" size="icon" className="size-7 text-red-400 hover:text-red-600 hover:bg-red-50"><Trash2 className="size-3.5" /></Button>
-                                  </AlertDialogTrigger>
-                                  <AlertDialogContent>
-                                    <AlertDialogHeader><AlertDialogTitle>Delete Receipt</AlertDialogTitle><AlertDialogDescription>Delete receipt {r.receiptNumber}? This action cannot be undone.</AlertDialogDescription></AlertDialogHeader>
-                                    <AlertDialogFooter>
-                                      <AlertDialogCancel>Cancel</AlertDialogCancel>
-                                      <AlertDialogAction onClick={() => handleDelete(r.id)} disabled={deleting} className="bg-red-600 hover:bg-red-700">{deleting ? 'Deleting...' : 'Delete'}</AlertDialogAction>
-                                    </AlertDialogFooter>
-                                  </AlertDialogContent>
-                                </AlertDialog>
+                                <Button 
+                                  disabled
+                                  variant="ghost" 
+                                  size="icon" 
+                                  className="size-7 text-zinc-300 dark:text-zinc-700 cursor-not-allowed opacity-40 hover:bg-transparent"
+                                >
+                                  <Trash2 className="size-3.5" />
+                                </Button>
                               )}
                             </div>
                           </TableCell>
@@ -356,8 +473,8 @@ export function CheckReceiptTab({ canEdit, canDelete }: CheckReceiptTabProps) {
               </div>
 
               {/* Pagination UI */}
-              {totalPages > 1 && (
-                <div className="flex items-center justify-between px-6 py-4 border-t bg-muted/30">
+              {totalItems > 0 && (
+                <div className="flex items-center justify-between px-6 py-4 border-t bg-transparent">
                   <span className="text-xs text-muted-foreground">
                     Showing {(page - 1) * limit + 1} to {Math.min(page * limit, totalItems)} of {totalItems}
                   </span>
@@ -372,13 +489,14 @@ export function CheckReceiptTab({ canEdit, canDelete }: CheckReceiptTabProps) {
                       Previous
                     </Button>
                     <div className="flex items-center gap-1">
-                      {[...Array(totalPages)].map((_, i) => (
+                      {totalPages > 0 && [...Array(totalPages)].map((_, i) => (
                         <Button
                           key={i + 1}
                           variant={page === i + 1 ? "default" : "outline"}
                           size="sm"
                           className={`size-8 text-xs p-0 ${page === i + 1 ? 'bg-emerald-600 hover:bg-emerald-700' : ''}`}
                           onClick={() => dispatch({ type: 'SET_PAGE', payload: i + 1 })}
+                          disabled={page === i + 1}
                         >
                           {i + 1}
                         </Button>
@@ -400,7 +518,6 @@ export function CheckReceiptTab({ canEdit, canDelete }: CheckReceiptTabProps) {
           )}
         </CardContent>
       </Card>
-
       {/* View Receipt Dialog */}
       <Dialog open={!!viewReceipt} onOpenChange={() => dispatch({ type: 'SET_VIEW_RECEIPT', payload: null })}>
         <DialogContent className="sm:max-w-lg">
