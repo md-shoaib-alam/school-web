@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { IndianRupee } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -9,6 +10,7 @@ import {
   ChartTooltipContent,
 } from "@/components/ui/chart";
 import type { ChartConfig } from "@/components/ui/chart";
+import { cn } from "@/lib/utils";
 
 const feePieChartConfig = {
   collected: { label: "Collected Amount", color: "#10b981" },
@@ -28,6 +30,8 @@ interface FeePieDistributionProps {
 }
 
 export function FeePieDistribution({ isLoading, data, recharts }: FeePieDistributionProps) {
+  const [activeIndex, setActiveIndex] = useState(-1);
+  
   // Get current month name (e.g., "June")
   const currentMonthName = new Date().toLocaleString("default", { month: "long" });
 
@@ -72,10 +76,21 @@ export function FeePieDistribution({ isLoading, data, recharts }: FeePieDistribu
                        cx="50%" cy="50%" innerRadius={48} outerRadius={70} paddingAngle={2}
                        dataKey="value" nameKey="name"
                        label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
-                       labelLine={false} fontSize={10}
+                       labelLine={{ stroke: "rgba(100, 116, 139, 0.5)", strokeDasharray: "2 2" }}
+                       fontSize={10}
+                       onMouseEnter={(_, index) => setActiveIndex(index)}
+                       onMouseLeave={() => setActiveIndex(-1)}
+                       isAnimationActive={false}
                     >
                       {pieData.map((entry, i) => (
-                        <Cell key={entry.name} fill={COLORS[i % COLORS.length]} className="cursor-pointer focus:outline-none" />
+                        <Cell 
+                          key={entry.name} 
+                          fill={COLORS[i % COLORS.length]} 
+                          className="cursor-pointer focus:outline-none transition-opacity duration-300"
+                          style={{
+                            opacity: activeIndex === -1 || activeIndex === i ? 1 : 0.3,
+                          }}
+                        />
                       ))}
                     </Pie>
                     <ChartTooltip
@@ -92,7 +107,15 @@ export function FeePieDistribution({ isLoading, data, recharts }: FeePieDistribu
                   {pieData.map((entry, i) => {
                     const percentage = totalVal > 0 ? ((entry.value / totalVal) * 100).toFixed(0) : 0;
                     return (
-                      <div key={entry.name} className="flex items-center justify-between px-4 py-2.5 rounded-xl bg-muted/30 dark:bg-muted/5 border border-border/30 hover:border-border/60 transition-colors">
+                      <div 
+                        key={entry.name} 
+                        className={cn(
+                          "flex items-center justify-between px-4 py-2.5 rounded-xl bg-muted/30 dark:bg-muted/5 border transition-all duration-300",
+                          activeIndex === i ? "border-emerald-500/50 bg-emerald-500/5 dark:bg-emerald-500/5" : "border-border/30 hover:border-border/60"
+                        )}
+                        onMouseEnter={() => setActiveIndex(i)}
+                        onMouseLeave={() => setActiveIndex(-1)}
+                      >
                         <div className="flex items-center gap-2.5 min-w-0">
                           <div className="size-2.5 rounded-full shrink-0" style={{ backgroundColor: COLORS[i % COLORS.length] }} />
                           <span className="text-xs font-semibold text-foreground truncate">{entry.name}</span>

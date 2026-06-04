@@ -113,6 +113,8 @@ export function AdminDashboard() {
           isLoading={isLoading}
           data={dashboardData?.classDistribution ?? []}
           recharts={recharts}
+          maleStudents={dashboardData?.maleStudents}
+          femaleStudents={dashboardData?.femaleStudents}
         />
       </div>
 
