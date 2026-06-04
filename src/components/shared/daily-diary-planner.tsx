@@ -55,14 +55,14 @@ export function DailyDiaryPlanner({
     .filter(a => a.status === "submitted" || a.status === "graded").length;
 
   return (
-    <div className="mt-0 lg:relative lg:p-4 lg:bg-gradient-to-br lg:from-[#4a3622] lg:via-[#2c2014] lg:to-[#1a130c] lg:dark:from-zinc-950 lg:dark:to-stone-900 lg:rounded-[28px] lg:shadow-2xl lg:border-4 lg:border-[#3a2a1b] lg:dark:border-zinc-800/80">
+    <div className="mt-0 lg:relative lg:p-4 lg:bg-linear-to-br lg:from-[#4a3622] lg:via-[#2c2014] lg:to-[#1a130c] lg:dark:from-zinc-950 lg:dark:to-stone-900 lg:rounded-[28px] lg:shadow-2xl lg:border-4 lg:border-[#3a2a1b] lg:dark:border-zinc-800/80">
       {/* Outer book cover leather shine overlay */}
-      <div className="hidden lg:block absolute inset-0 bg-radial-gradient from-white/5 to-black/45 rounded-[24px] pointer-events-none" />
+      <div className="hidden lg:block absolute inset-0 bg-radial-gradient from-white/5 to-black/45 rounded-3xl pointer-events-none" />
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-0 relative lg:bg-[#f7f5f0] lg:dark:bg-[#1a1917] lg:rounded-2xl lg:overflow-hidden lg:shadow-inner lg:border lg:border-amber-900/10 lg:dark:border-zinc-800 bg-transparent">
         
         {/* LEFT PAGE: Calendar Agenda (Warm Ivory Graph Paper) */}
-        <div className="hidden lg:block p-3 md:p-6 lg:col-span-4 lg:border-r border-amber-900/15 dark:border-[#2f271f] relative bg-[#FAF8F4] dark:bg-[#1a1917] shadow-[inset_-10px_0_15px_-5px_rgba(0,0,0,0.06)] min-h-fit lg:min-h-[580px] pb-4 lg:pb-4">
+        <div className="hidden lg:block p-3 md:p-6 lg:col-span-4 lg:border-r border-amber-900/15 dark:border-[#2f271f] relative bg-[#FAF8F4] dark:bg-[#1a1917] shadow-[inset_-10px_0_15px_-5px_rgba(0,0,0,0.06)] min-h-fit lg:min-h-145 pb-4 lg:pb-4">
           {/* Bullet/Grid paper background */}
           <div className="absolute inset-0 opacity-[0.25] dark:opacity-[0.12] pointer-events-none" style={{ backgroundImage: 'radial-gradient(circle, #5c4e37 1.5px, transparent 1.5px)', backgroundSize: '16px 16px' }} />
 
@@ -157,9 +157,9 @@ export function DailyDiaryPlanner({
         <div className="absolute left-[33.33%] top-0 bottom-0 w-8 -translate-x-1/2 hidden lg:flex flex-col justify-around items-center py-6 z-30 pointer-events-none">
           {[...Array(12)].map((_, i) => (
             <div key={i} className="relative w-full h-8 flex items-center justify-center">
-              <div className="absolute w-9 h-4 bg-stone-950/25 dark:bg-black/60 rounded-full blur-[1px] translate-y-[3px] -rotate-[12deg]" />
+              <div className="absolute w-9 h-4 bg-stone-950/25 dark:bg-black/60 rounded-full blur-[1px] translate-y-0.75 -rotate-12" />
               <div 
-                className="absolute w-9 h-4 border-[2.5px] border-amber-600/90 dark:border-amber-500/80 bg-gradient-to-b from-amber-100 via-amber-300 to-amber-700 dark:from-amber-200 dark:via-amber-400 dark:to-amber-800 rounded-full" 
+                className="absolute w-9 h-4 border-[2.5px] border-amber-600/90 dark:border-amber-500/80 bg-linear-to-b from-amber-100 via-amber-300 to-amber-700 dark:from-amber-200 dark:via-amber-400 dark:to-amber-800 rounded-full" 
                 style={{ transform: 'rotate(-12deg)' }} 
               />
             </div>
@@ -167,7 +167,7 @@ export function DailyDiaryPlanner({
         </div>
 
         {/* RIGHT PAGE: Diary Entries (Lined Ivory Paper) */}
-        <div className="lg:col-span-8 relative lg:bg-[#FCFAF6] lg:dark:bg-[#171614] lg:min-h-[580px] lg:shadow-[inset_20px_0_25px_-10px_rgba(0,0,0,0.12)] lg:bg-card lg:border lg:border-zinc-200 lg:dark:border-zinc-850 lg:rounded-xl lg:p-6 px-4 py-3 sm:p-5">
+        <div className="lg:col-span-8 relative lg:bg-[#FCFAF6] lg:dark:bg-[#171614] lg:min-h-145 lg:shadow-[inset_20px_0_25px_-10px_rgba(0,0,0,0.12)] lg:bg-card lg:border lg:border-zinc-200 lg:dark:border-zinc-850 lg:rounded-xl lg:p-6 px-4 py-3 sm:p-5">
           
           {/* Subtle notebook lines background */}
           <div className="hidden lg:block absolute inset-0 bg-linear-gradient-[#dedad0] dark:bg-linear-gradient-[#38332a] opacity-25 dark:opacity-35 pointer-events-none" style={{ backgroundImage: 'linear-gradient(transparent, transparent 31px, currentColor 31px, currentColor 32px)', backgroundSize: '100% 32px' }} />
@@ -237,14 +237,14 @@ export function DailyDiaryPlanner({
               </div>
             </div>
 
-            <ScrollArea className="max-h-[480px] pr-2 mt-1">
+            <ScrollArea className="max-h-120 pr-2 mt-1">
               {totalEntries === 0 ? (
                 <div className="text-center py-16 border border-dashed border-amber-900/15 dark:border-[#2f271f] rounded-xl bg-amber-50/20 dark:bg-stone-900/5">
                   <div className="inline-flex items-center justify-center size-14 rounded-full bg-amber-100/50 dark:bg-stone-800/50 mb-3">
                     <CalendarDays className="size-7 text-amber-600/60 dark:text-amber-500/50" />
                   </div>
                   <p className="text-sm font-bold text-stone-700 dark:text-stone-200">Empty Diary Page</p>
-                  <p className="text-xs text-stone-500 dark:text-stone-400 mt-1.5 px-8 leading-relaxed max-w-[280px] mx-auto">
+                  <p className="text-xs text-stone-500 dark:text-stone-400 mt-1.5 px-8 leading-relaxed max-w-70 mx-auto">
                     {emptyMessage}
                   </p>
                 </div>
@@ -350,7 +350,7 @@ function DiaryTaskCard({ a, onSubmit, submittingId = null }: DiaryTaskCardProps)
       transition-all duration-200 ease-out overflow-hidden
     `}>
       {/* Left accent bar */}
-      <div className={`absolute left-0 top-0 bottom-0 w-[3px] ${cfg.accent} rounded-l-lg`} />
+      <div className={`absolute left-0 top-0 bottom-0 w-0.75 ${cfg.accent} rounded-l-lg`} />
 
       <div className="pl-3.5 pr-3 py-2.5">
         {/* Row 1: Title + Badges */}
@@ -433,7 +433,7 @@ function DiaryTaskCard({ a, onSubmit, submittingId = null }: DiaryTaskCardProps)
         )}
 
         {/* Progress bar at bottom */}
-        <div className="mt-2 h-[2px] bg-amber-900/5 dark:bg-[#2f271f] rounded-full overflow-hidden">
+        <div className="mt-2 h-0.5 bg-amber-900/5 dark:bg-[#2f271f] rounded-full overflow-hidden">
           <div
             className={`h-full rounded-full transition-all duration-500 ease-out ${cfg.accent}`}
             style={{ width: `${progressPercent}%` }}

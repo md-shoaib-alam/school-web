@@ -465,7 +465,7 @@ export function StudentAssignments() {
               </div>
 
               {/* List of assignments for selected date */}
-              <ScrollArea className="max-h-[600px] pr-3">
+              <ScrollArea className="max-h-150 pr-3">
                 {selectedDateAssignments.length === 0 && dueSelectedDateAssignments.length === 0 ? (
                   <div className="text-center py-16 text-zinc-400 dark:text-zinc-500 border-2 border-dashed border-zinc-100 dark:border-zinc-800 rounded-xl">
                     <FileText className="size-10 mx-auto mb-3 opacity-30" />
@@ -693,7 +693,7 @@ function AssignmentsSkeleton() {
           <Skeleton key={i} className="h-24 rounded-xl" />
         ))}
       </div>
-      <Skeleton className="h-[520px] rounded-xl" />
+      <Skeleton className="h-130 rounded-xl" />
     </div>
   );
 }
