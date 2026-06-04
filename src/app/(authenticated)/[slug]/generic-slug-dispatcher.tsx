@@ -56,8 +56,8 @@ export default function GenericSlugDispatcherClient() {
   }, [mounted, resolvedTenant, currentTenantSlug, setCurrentTenant]);
 
   // REDIRECTION LOGIC (DURING RENDER)
-  if (mounted && currentUser) {
-    const urlSlug = typeof slug === 'string' ? slug.toLowerCase() : '';
+  if (mounted && currentUser && typeof slug === 'string') {
+    const urlSlug = slug.toLowerCase();
     const userTenantId = currentUser?.tenantId?.toLowerCase() || '';
     const userTenantSlug = currentUser?.tenantSlug?.toLowerCase() || '';
     const isTenantMatch = (urlSlug === userTenantId || urlSlug === userTenantSlug);
@@ -76,7 +76,7 @@ export default function GenericSlugDispatcherClient() {
     }
   }
 
-  if (!mounted || !currentUser) return <LoadingScreen />;
+  if (!mounted || !currentUser || typeof slug !== 'string') return <LoadingScreen />;
 
   // 1. Platform Screens (Super Admin only)
   if (currentUser.role === "super_admin") {

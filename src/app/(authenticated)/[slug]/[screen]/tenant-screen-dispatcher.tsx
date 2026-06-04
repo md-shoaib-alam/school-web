@@ -90,8 +90,8 @@ export default function TenantScreenDispatcherClient() {
   const { currentUser } = useAppStore();
 
   // REDIRECTION LOGIC (DURING RENDER)
-  if (mounted && currentUser) {
-    const urlSlug = typeof slug === 'string' ? slug.toLowerCase() : '';
+  if (mounted && currentUser && typeof slug === 'string' && typeof screen === 'string') {
+    const urlSlug = slug.toLowerCase();
     const userTenantId = currentUser?.tenantId?.toLowerCase() || '';
     const userTenantSlug = currentUser?.tenantSlug?.toLowerCase() || '';
     const isTenantMatch = (urlSlug === userTenantId || urlSlug === userTenantSlug);
@@ -104,11 +104,11 @@ export default function TenantScreenDispatcherClient() {
     }
   }
 
-  if (!mounted || !currentUser) {
+  if (!mounted || !currentUser || typeof slug !== 'string' || typeof screen !== 'string') {
     return <LoadingScreen />;
   }
 
-  const urlSlug = typeof slug === 'string' ? slug.toLowerCase() : '';
+  const urlSlug = slug.toLowerCase();
   const userTenantId = currentUser?.tenantId?.toLowerCase() || '';
   const userTenantSlug = currentUser?.tenantSlug?.toLowerCase() || '';
   const isTenantMatch = (urlSlug === userTenantId || urlSlug === userTenantSlug);
