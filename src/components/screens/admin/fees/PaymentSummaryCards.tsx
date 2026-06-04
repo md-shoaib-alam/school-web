@@ -17,33 +17,18 @@ export function PaymentSummaryCards() {
     return new Date().toLocaleString('default', { month: 'long' });
   }, []);
 
-  const { data: thisMonthData, isLoading } = useFeeReceipts({
+  const { data: statsData, isLoading } = useFeeReceipts({
     fromDate: thisMonthFromDate,
-    limit: 1000
-  });
+    mode: 'stats'
+  }) as any;
 
-  const thisMonthTotal = useMemo(() => {
-    return thisMonthData?.items?.reduce((sum, item) => sum + item.paidAmount, 0) || 0;
-  }, [thisMonthData]);
-
-  const thisMonthCount = thisMonthData?.total || 0;
-
-  const methodBreakdown = useMemo(() => {
-    const counts: Record<string, { count: number; amount: number }> = {
-      cash: { count: 0, amount: 0 },
-      online: { count: 0, amount: 0 },
-      cheque: { count: 0, amount: 0 }
-    };
-    thisMonthData?.items?.forEach(item => {
-      const m = item.paymentMethod.toLowerCase();
-      if (!counts[m]) {
-        counts[m] = { count: 0, amount: 0 };
-      }
-      counts[m].count += 1;
-      counts[m].amount += item.paidAmount;
-    });
-    return counts;
-  }, [thisMonthData]);
+  const thisMonthTotal = statsData?.totalAmount || 0;
+  const thisMonthCount = statsData?.totalCount || 0;
+  const methodBreakdown = statsData?.methods || {
+    cash: { amount: 0, count: 0 },
+    online: { amount: 0, count: 0 },
+    cheque: { amount: 0, count: 0 }
+  };
 
   if (isLoading) {
     return (
