@@ -150,18 +150,14 @@ export function CheckReceiptTab({ canEdit, canDelete }: CheckReceiptTabProps) {
   });
 
   const { data: studentsData, isLoading: loadingStudents } = useQuery<{ items: StudentOption[] }>({
-    queryKey: ['students-min'],
+    queryKey: ['students-min', classFilter],
+    enabled: !!classFilter,
     queryFn: async () => {
-      const res = await apiFetch('/api/students?mode=min&limit=5000');
+      const res = await apiFetch(`/api/students?mode=min&classId=${classFilter}`);
       return res.json();
     }
   });
-  const allStudents = studentsData?.items || [];
-
-  const filteredStudents = useMemo(() => {
-    if (!classFilter) return [];
-    return allStudents.filter(s => s.classId === classFilter);
-  }, [allStudents, classFilter]);
+  const filteredStudents = studentsData?.items || [];
 
   const loading = loadingReceipts;
 

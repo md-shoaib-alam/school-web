@@ -496,6 +496,7 @@ export const navItems: Record<UserRole, NavItem[]> = {
       icon: <LayoutDashboard className="size-4" />,
       permModule: null,
     },
+    // People Management
     {
       key: "students",
       label: "Students",
@@ -508,64 +509,13 @@ export const navItems: Record<UserRole, NavItem[]> = {
       icon: <Users className="size-4" />,
       permModule: "teachers",
     },
+    
+    // Academic Management
     {
-      key: "attendance",
-      label: "Attendance",
-      icon: <UserCheck className="size-4" />,
-      permModule: "attendance",
-    },
-    {
-      key: "staff-attendance",
-      label: "Staff Attendance",
-      icon: <ClipboardList className="size-4" />,
-      permModule: "attendance",
-    },
-    {
-      key: "fees",
-      label: "Fee Management",
-      icon: <IndianRupee className="size-4" />,
-      permModule: "fees",
-    },
-    {
-      key: "expenses",
-      label: "School Expenses",
-      icon: <Wallet className="size-4" />,
-    },
-    {
-      key: "grades",
-      label: "Grades",
-      icon: <ClipboardList className="size-4" />,
-      permModule: "grades",
-    },
-    {
-      key: "admit-cards",
-      label: "Admit Cards",
-      icon: <IdCard className="size-4" />,
-      permModule: "exams",
-    },
-    {
-      key: "print-marksheet",
-      label: "Print Marksheet",
-      icon: <Award className="size-4" />,
-      permModule: "exams",
-    },
-    {
-      key: "notices",
-      label: "Notices",
-      icon: <Bell className="size-4" />,
-      permModule: "notices",
-    },
-    {
-      key: "timetable",
-      label: "Timetable",
-      icon: <Clock className="size-4" />,
-      permModule: "timetable",
-    },
-    {
-      key: "calendar",
-      label: "Calendar",
-      icon: <Calendar className="size-4" />,
-      permModule: "calendar",
+      key: "academic-years",
+      label: "Academic Years",
+      icon: <CalendarDays className="size-4" />,
+      permModule: "settings",
     },
     {
       key: "classes",
@@ -580,10 +530,64 @@ export const navItems: Record<UserRole, NavItem[]> = {
       permModule: "subjects",
     },
     {
-      key: "reports",
-      label: "Reports",
-      icon: <BarChart3 className="size-4" />,
-      permModule: "reports",
+      key: "timetable",
+      label: "Timetable",
+      icon: <Clock className="size-4" />,
+      permModule: "timetable",
+    },
+    {
+      key: "calendar",
+      label: "Calendar",
+      icon: <Calendar className="size-4" />,
+      permModule: "calendar",
+    },
+
+    // Operations
+    {
+      key: "attendance-group",
+      label: "Attendance",
+      icon: <UserCheck className="size-4" />,
+      permModule: "attendance",
+      children: [
+        { key: "attendance", label: "Student Attendance", icon: <Users className="size-4" /> },
+        { key: "teacher-attendance", label: "Teacher Attendance", icon: <GraduationCap className="size-4" /> },
+        { key: "staff-attendance", label: "Admin Staff Attendance", icon: <Briefcase className="size-4" /> },
+      ]
+    },
+    {
+      key: "exam-management",
+      label: "Exam Management",
+      icon: <ClipboardList className="size-4" />,
+      permModule: "exams",
+      children: [
+        { key: "exams", label: "Exams", icon: <ClipboardList className="size-4" /> },
+        { key: "results-entry", label: "Results Entry", icon: <FileText className="size-4" /> },
+        { key: "published-results", label: "Published Results", icon: <Trophy className="size-4" /> },
+        { key: "admit-cards", label: "Admit Cards", icon: <IdCard className="size-4" /> },
+        { key: "print-marksheet", label: "Print Marksheet", icon: <Award className="size-4" /> },
+      ]
+    },
+    {
+      key: "promotions-group",
+      label: "Class Promotion",
+      icon: <GraduationCap className="size-4" />,
+      permModule: "students",
+      children: [
+        { key: "promotions", label: "Promotions", icon: <ArrowRight className="size-4" /> },
+        { key: "bulk-promote", label: "Bulk Promote", icon: <Zap className="size-4" /> },
+        { key: "graduated", label: "Graduated", icon: <GraduationCap className="size-4" /> },
+      ]
+    },
+    {
+      key: "leave-management",
+      label: "Leave Management",
+      icon: <CalendarDays className="size-4" />,
+      permModule: "attendance",
+      children: [
+        { key: "student-leaves", label: "Student Leaves", icon: <GraduationCap className="size-4" /> },
+        { key: "teacher-leaves", label: "Teacher Leaves", icon: <Briefcase className="size-4" /> },
+        { key: "staff-leaves", label: "Staff Leaves", icon: <Users className="size-4" /> },
+      ]
     },
     {
       key: "certificates",
@@ -591,16 +595,47 @@ export const navItems: Record<UserRole, NavItem[]> = {
       icon: <Award className="size-4" />,
       permModule: "students",
     },
+
+    // Finance
     {
-      key: "academic-years",
-      label: "Academic Years",
-      icon: <CalendarDays className="size-4" />,
-      permModule: "settings",
+      key: "fees-group",
+      label: "Fee Management",
+      icon: <IndianRupee className="size-4" />,
+      permModule: "fees",
+      children: [
+        { key: "fees", label: "Set Fees", icon: <Layers className="size-4" /> },
+        { key: "fee-categories", label: "Fee Categories", icon: <Tag className="size-4" /> },
+        { key: "fee-concessions", label: "Add Concession", icon: <Percent className="size-4" /> },
+        { key: "make-payment", label: "Make Payment", icon: <Banknote className="size-4" /> },
+        { key: "check-receipt", label: "Check Receipt", icon: <FileCheck className="size-4" /> },
+        { key: "fee-status", label: "Fee Status", icon: <UserSearch className="size-4" /> },
+        { key: "check-payments", label: "Check Payments", icon: <History className="size-4" /> },
+        { key: "transport-fee", label: "Transport Fee", icon: <Bus className="size-4" /> },
+      ]
+    },
+    {
+      key: "expenses",
+      label: "School Expenses",
+      icon: <Wallet className="size-4" />,
+    },
+    
+    // Communication & Support
+    {
+      key: "notices",
+      label: "Notices",
+      icon: <Bell className="size-4" />,
+      permModule: "notices",
     },
     {
       key: "tickets",
       label: "Support Tickets",
       icon: <TicketCheck className="size-4" />,
+    },
+    {
+      key: "reports",
+      label: "Reports",
+      icon: <BarChart3 className="size-4" />,
+      permModule: "reports",
     },
   ],
 };

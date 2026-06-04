@@ -24,10 +24,26 @@ interface MakePaymentTabProps {
 export function MakePaymentTab({ canCreate }: MakePaymentTabProps) {
   const createReceipt = useCreateFeeReceipt();
 
+  const [classFilter, setClassFilter] = useState('');
+  const [studentSearch, setStudentSearch] = useState('');
+  const [selectedStudent, setSelectedStudent] = useState<StudentOption | null>(null);
+  const [pendingFees, setPendingFees] = useState<FeeItem[]>([]);
+  const { data: concessions = [] } = useFeeConcessions(selectedStudent?.id);
+  const [selectedFeeIds, setSelectedFeeIds] = useState<Set<string>>(new Set());
+  const [paymentMethod, setPaymentMethod] = useState('cash');
+  const [loadingFees, setLoadingFees] = useState(false);
+  const [paying, setPaying] = useState(false);
+  const [receiptNumber, setReceiptNumber] = useState('');
+  const [showSuccess, setShowSuccess] = useState(false);
+  const [customPaidAmount, setCustomPaidAmount] = useState<number | null>(null);
+  const [manualPayOpen, setManualPayOpen] = useState(false);
+  const [successAmount, setSuccessAmount] = useState(0);
+
   const { data: students = [] } = useQuery<StudentOption[]>({
-    queryKey: ['students'],
+    queryKey: ['students', classFilter],
+    enabled: !!classFilter,
     queryFn: async () => {
-      const res = await apiFetch('/api/students?limit=1000');
+      const res = await apiFetch(`/api/students?mode=min&classId=${classFilter}`);
       const data = await res.json();
       const items = data.items || [];
       return items.map((s: any) => ({ 
@@ -44,32 +60,14 @@ export function MakePaymentTab({ canCreate }: MakePaymentTabProps) {
   const { data: classes = [] } = useQuery<ClassOption[]>({
     queryKey: ['classes'],
     queryFn: async () => {
-      const res = await apiFetch('/api/classes');
+      const res = await apiFetch('/api/classes?mode=min');
       return res.json();
     }
   });
 
-  const [classFilter, setClassFilter] = useState('');
-  const [studentSearch, setStudentSearch] = useState('');
-  const [selectedStudent, setSelectedStudent] = useState<StudentOption | null>(null);
-  const [pendingFees, setPendingFees] = useState<FeeItem[]>([]);
-  const { data: concessions = [] } = useFeeConcessions(selectedStudent?.id);
-  const [selectedFeeIds, setSelectedFeeIds] = useState<Set<string>>(new Set());
-  const [paymentMethod, setPaymentMethod] = useState('cash');
-  const [loadingFees, setLoadingFees] = useState(false);
-  const [paying, setPaying] = useState(false);
-  const [receiptNumber, setReceiptNumber] = useState('');
-  const [showSuccess, setShowSuccess] = useState(false);
-  const [customPaidAmount, setCustomPaidAmount] = useState<number | null>(null);
-  const [manualPayOpen, setManualPayOpen] = useState(false);
-  const [successAmount, setSuccessAmount] = useState(0);
-
   const filteredStudents = useMemo(() => {
     if (!classFilter) return [];
     let result = students;
-    if (classFilter !== 'all') {
-      result = result.filter(s => s.classId === classFilter);
-    }
     if (!studentSearch) return result.slice(0, 20);
     const q = studentSearch.toLowerCase();
     return result.filter(s => s.name.toLowerCase().includes(q) || (s.phone && s.phone.toLowerCase().includes(q)));

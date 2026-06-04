@@ -171,6 +171,7 @@ export function UserProfileScreen() {
                 theme={theme}
                 setTheme={setTheme}
                 onPasswordChange={handlePasswordChange}
+                userRole={currentUser.role}
               />
             </TabsContent>
           </Tabs>

@@ -1,17 +1,43 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
-import { Sun, Moon, Laptop, Lock, KeyRound } from "lucide-react";
+import { Sun, Moon, Laptop, Lock, KeyRound, PanelLeftOpen, PanelLeftClose } from "lucide-react";
+import { useAppStore } from "@/store/use-app-store";
 
 interface SecuritySettingsProps {
   theme: string | undefined;
   setTheme: (theme: string) => void;
   onPasswordChange: () => void;
+  userRole: string;
 }
 
-export function SecuritySettings({ theme, setTheme, onPasswordChange }: SecuritySettingsProps) {
+export function SecuritySettings({ theme, setTheme, onPasswordChange, userRole }: SecuritySettingsProps) {
+  const { setSidebarOpen } = useAppStore();
+  const [sidebarPref, setSidebarPref] = useState<string>("disabled");
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const pref = localStorage.getItem("schoolsaas_staff_sidebar_preference");
+      if (pref) {
+        setSidebarPref(pref);
+      } else {
+        setSidebarPref("disabled");
+      }
+    }
+  }, []);
+
+  const handleSidebarPrefChange = (pref: string) => {
+    setSidebarPref(pref);
+    if (typeof window !== "undefined") {
+      localStorage.setItem("schoolsaas_staff_sidebar_preference", pref);
+      window.dispatchEvent(new CustomEvent("schoolsaas_staff_sidebar_pref_changed", { detail: pref }));
+    }
+    setSidebarOpen(pref === "enabled");
+  };
+
   return (
     <Card className="border border-zinc-200/80 dark:border-zinc-800/80 shadow-sm rounded-2xl">
       <CardHeader>
@@ -19,6 +45,7 @@ export function SecuritySettings({ theme, setTheme, onPasswordChange }: Security
         <CardDescription>Customize your workspace themes and lock down credentials.</CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
+        {/* Appearance Section */}
         <div className="space-y-3">
           <div>
             <h4 className="text-sm font-semibold">Workspace Appearance Mode</h4>
@@ -51,6 +78,43 @@ export function SecuritySettings({ theme, setTheme, onPasswordChange }: Security
             </Button>
           </div>
         </div>
+
+        {/* Sidebar Preference Section for Staff */}
+        {userRole === "staff" && (
+          <>
+            <Separator />
+            <div className="space-y-3">
+              <div>
+                <h4 className="text-sm font-semibold">Sidebar Mode Preference</h4>
+                <p className="text-xs text-zinc-500 dark:text-zinc-400">Choose if you want the navigation sidebar open or minimized by default.</p>
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <Button
+                  variant={sidebarPref === "disabled" ? "default" : "outline"}
+                  onClick={() => handleSidebarPrefChange("disabled")}
+                  className="h-20 flex flex-col gap-2 rounded-xl justify-center items-center font-bold"
+                >
+                  <PanelLeftClose className="size-5 text-indigo-500" />
+                  <div className="text-center">
+                    <p className="text-xs">Minimize Sidebar (Default)</p>
+                    <p className="text-[10px] opacity-75 font-normal">More workspace area</p>
+                  </div>
+                </Button>
+                <Button
+                  variant={sidebarPref === "enabled" ? "default" : "outline"}
+                  onClick={() => handleSidebarPrefChange("enabled")}
+                  className="h-20 flex flex-col gap-2 rounded-xl justify-center items-center font-bold"
+                >
+                  <PanelLeftOpen className="size-5 text-emerald-500" />
+                  <div className="text-center">
+                    <p className="text-xs">Expand Sidebar</p>
+                    <p className="text-[10px] opacity-75 font-normal">Keep links visible</p>
+                  </div>
+                </Button>
+              </div>
+            </div>
+          </>
+        )}
 
         <Separator />
 

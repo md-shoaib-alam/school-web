@@ -37,9 +37,25 @@ function getInitialSidebar(): boolean {
     // If on mobile/tablet, ALWAYS start closed by default
     if (window.innerWidth < 1024) return false;
 
+    // For staff users, default sidebar to closed (collapsed) on desktop unless preferred open
+    const userStored = localStorage.getItem(STORAGE_KEYS.USER);
+    if (userStored) {
+      const parsed = JSON.parse(userStored);
+      const userData = parsed.state ? parsed.state.currentUser : parsed;
+      if (userData && userData.role === 'staff') {
+        const preference = localStorage.getItem('schoolsaas_staff_sidebar_preference');
+        if (preference === 'enabled') {
+          const stored = localStorage.getItem(STORAGE_KEYS.SIDEBAR_STATE);
+          if (stored !== null) return stored === 'true';
+          return true; // Desktop default is open if preference is explicitly enabled
+        }
+        return false; // Default to collapsed for staff if disabled or not set
+      }
+    }
+
     const stored = localStorage.getItem(STORAGE_KEYS.SIDEBAR_STATE);
     if (stored !== null) return stored === 'true';
-    return true; // Desktop default is open
+    return true; // Desktop default is open for other roles
   } catch {
     return false;
   }

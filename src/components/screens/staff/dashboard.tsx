@@ -1,30 +1,45 @@
 "use client";
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAppStore } from "@/store/use-app-store";
-import { useAdminDashboard } from "@/lib/graphql/hooks";
-import { Skeleton } from "@/components/ui/skeleton";
+import { hasPermission } from "@/lib/permissions";
 import {
-  Users,
   Bell,
   Calendar,
   Clock,
-  FileText,
-  ClipboardList,
-  GraduationCap,
-  TrendingUp,
-  CheckCircle2,
-  AlertCircle,
-  BookOpen,
   School,
+  Wallet,
+  UserCheck,
+  GraduationCap,
+  Users,
+  Layers,
+  Tag,
+  Percent,
+  Banknote,
+  FileCheck,
+  UserSearch,
+  History,
+  Bus,
+  Briefcase,
+  ClipboardList,
+  FileText,
+  Trophy,
+  IdCard,
+  Award,
+  ArrowRight,
+  Zap,
+  BarChart3,
+  TicketCheck,
+  CalendarDays,
+  BookOpen,
+  Search,
 } from "lucide-react";
 
 export function StaffDashboard() {
   const { push } = useRouter();
-  const { currentUser, currentTenantName, currentTenantSlug, currentTenantId, setCurrentScreen } = useAppStore();
-  const customRoleName = currentUser?.customRole?.name;
+  const { currentUser, currentTenantSlug, currentTenantId, setCurrentScreen } = useAppStore();
+  const [searchQuery, setSearchQuery] = useState("");
 
   const navigateTo = (screen: string) => {
     setCurrentScreen(screen);
@@ -36,314 +51,320 @@ export function StaffDashboard() {
     }
   };
 
-  const { data, isPending, fetchStatus } = useAdminDashboard(currentUser?.tenantId || "");
-
-  // In React Query v5, when enabled:false, isPending=true but fetchStatus='idle'
-  const isLoading = isPending && fetchStatus === 'fetching';
-
-  if (isLoading) {
-    return (
-      <div className="space-y-6">
-        {/* Header Skeleton */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          <div className="space-y-2 flex-1">
-            <Skeleton className="h-8 w-64" />
-            <Skeleton className="h-4 w-48" />
-            <div className="flex gap-2 mt-2">
-              <Skeleton className="h-5 w-24 rounded-full" />
-              <Skeleton className="h-5 w-16 rounded-full" />
-            </div>
-          </div>
-          <Skeleton className="h-20 w-48 rounded-xl" />
-        </div>
-
-        {/* Stats Grid Skeleton */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          {[1, 2, 3, 4].map((i) => (
-            <Card key={i} className="border-0 shadow-sm bg-white dark:bg-zinc-900">
-              <CardContent className="p-4">
-                <div className="flex items-center justify-between">
-                  <div className="space-y-2">
-                    <Skeleton className="h-4 w-20" />
-                    <Skeleton className="h-7 w-12" />
-                  </div>
-                  <Skeleton className="size-10 rounded-xl" />
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-
-        {/* Actions Skeleton */}
-        <div className="space-y-3">
-          <Skeleton className="h-6 w-32" />
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-            {[1, 2, 3, 4].map((i) => (
-              <Skeleton key={i} className="h-16 rounded-xl" />
-            ))}
-          </div>
-        </div>
-
-        {/* Bottom Grid Skeleton */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <Card>
-            <CardHeader><Skeleton className="h-6 w-40" /></CardHeader>
-            <CardContent className="space-y-4">
-              {[1, 2, 3].map((i) => (
-                <div key={i} className="flex gap-3">
-                  <Skeleton className="size-4 rounded-full" />
-                  <div className="space-y-2 flex-1">
-                    <Skeleton className="h-4 w-full" />
-                    <Skeleton className="h-3 w-2/3" />
-                  </div>
-                </div>
-              ))}
-            </CardContent>
-          </Card>
-          <Card>
-            <CardHeader><Skeleton className="h-6 w-40" /></CardHeader>
-            <CardContent className="space-y-4">
-              {[1, 2, 3].map((i) => (
-                <Skeleton key={i} className="h-12 w-full rounded-lg" />
-              ))}
-            </CardContent>
-          </Card>
-        </div>
-      </div>
-    );
-  }
-
-  const stats = [
+  const allQuickActions = [
+    // --- Students & Teachers ---
     {
-      label: "Total Students",
-      value: data?.totalStudents.toLocaleString() || "0",
+      label: "Students",
       icon: <GraduationCap className="size-5" />,
-      color:
-        "bg-violet-100 text-violet-600 dark:bg-violet-950/40 dark:text-violet-400",
+      screen: "students",
+      permModule: "students",
+      color: "bg-indigo-500 hover:bg-indigo-600",
     },
     {
-      label: "Active Classes",
-      value: data?.totalClasses.toLocaleString() || "0",
-      icon: <School className="size-5" />,
-      color:
-        "bg-emerald-100 text-emerald-600 dark:bg-emerald-950/40 dark:text-emerald-400",
-    },
-    {
-      label: "Total Teachers",
-      value: data?.totalTeachers.toLocaleString() || "0",
+      label: "Teachers",
       icon: <Users className="size-5" />,
-      color: "bg-blue-100 text-blue-600 dark:bg-blue-950/40 dark:text-blue-400",
-    },
-    {
-      label: "Attendance Rate",
-      value: `${data?.attendanceRate || 0}%`,
-      icon: <TrendingUp className="size-5" />,
-      color:
-        "bg-amber-100 text-amber-600 dark:bg-amber-950/40 dark:text-amber-400",
-    },
-  ];
-
-  const quickActions = [
-    {
-      label: "View Notices",
-      icon: <Bell className="size-5" />,
-      screen: "notices",
-      color: "bg-amber-500 hover:bg-amber-600",
-    },
-    {
-      label: "Calendar",
-      icon: <Calendar className="size-5" />,
-      screen: "calendar",
+      screen: "teachers",
+      permModule: "teachers",
       color: "bg-blue-500 hover:bg-blue-600",
     },
+
+    // --- Academic Management ---
     {
-      label: "Timetable",
-      icon: <Clock className="size-5" />,
-      screen: "timetable",
-      color: "bg-emerald-500 hover:bg-emerald-600",
+      label: "Academic Years",
+      icon: <CalendarDays className="size-5" />,
+      screen: "academic-years",
+      permModule: "settings",
+      color: "bg-amber-500 hover:bg-amber-600",
     },
     {
       label: "Classes",
       icon: <School className="size-5" />,
       screen: "classes",
+      permModule: "classes",
       color: "bg-violet-500 hover:bg-violet-600",
+    },
+    {
+      label: "Subjects",
+      icon: <BookOpen className="size-5" />,
+      screen: "subjects",
+      permModule: "subjects",
+      color: "bg-indigo-600 hover:bg-indigo-700",
+    },
+    {
+      label: "Timetable",
+      icon: <Clock className="size-5" />,
+      screen: "timetable",
+      permModule: "timetable",
+      color: "bg-emerald-500 hover:bg-emerald-600",
+    },
+    {
+      label: "Calendar",
+      icon: <Calendar className="size-5" />,
+      screen: "calendar",
+      permModule: "calendar",
+      color: "bg-rose-500 hover:bg-rose-600",
+    },
+
+    // --- Attendance Group ---
+    {
+      label: "Student Attendance",
+      icon: <Users className="size-5" />,
+      screen: "attendance",
+      permModule: "attendance",
+      color: "bg-sky-500 hover:bg-sky-600",
+    },
+    {
+      label: "Teacher Attendance",
+      icon: <GraduationCap className="size-5" />,
+      screen: "teacher-attendance",
+      permModule: "attendance",
+      color: "bg-blue-500 hover:bg-blue-600",
+    },
+    {
+      label: "Staff Attendance",
+      icon: <Briefcase className="size-5" />,
+      screen: "staff-attendance",
+      permModule: "attendance",
+      color: "bg-slate-500 hover:bg-slate-600",
+    },
+
+    // --- Exam Management ---
+    {
+      label: "Exams",
+      icon: <ClipboardList className="size-5" />,
+      screen: "exams",
+      permModule: "exams",
+      color: "bg-purple-500 hover:bg-purple-600",
+    },
+    {
+      label: "Results Entry",
+      icon: <FileText className="size-5" />,
+      screen: "results-entry",
+      permModule: "exams",
+      color: "bg-indigo-500 hover:bg-indigo-600",
+    },
+    {
+      label: "Published Results",
+      icon: <Trophy className="size-5" />,
+      screen: "published-results",
+      permModule: "exams",
+      color: "bg-amber-500 hover:bg-amber-600",
+    },
+    {
+      label: "Admit Cards",
+      icon: <IdCard className="size-5" />,
+      screen: "admit-cards",
+      permModule: "exams",
+      color: "bg-sky-600 hover:bg-sky-700",
+    },
+    {
+      label: "Print Marksheet",
+      icon: <Award className="size-5" />,
+      screen: "print-marksheet",
+      permModule: "exams",
+      color: "bg-violet-600 hover:bg-violet-700",
+    },
+
+    // --- Promotions Group ---
+    {
+      label: "Promotions",
+      icon: <ArrowRight className="size-5" />,
+      screen: "promotions",
+      permModule: "students",
+      color: "bg-emerald-500 hover:bg-emerald-600",
+    },
+    {
+      label: "Bulk Promote",
+      icon: <Zap className="size-5" />,
+      screen: "bulk-promote",
+      permModule: "students",
+      color: "bg-yellow-500 hover:bg-yellow-600",
+    },
+    {
+      label: "Graduated",
+      icon: <GraduationCap className="size-5" />,
+      screen: "graduated",
+      permModule: "students",
+      color: "bg-teal-500 hover:bg-teal-600",
+    },
+
+    // --- Leave Management ---
+    {
+      label: "Student Leaves",
+      icon: <GraduationCap className="size-5" />,
+      screen: "student-leaves",
+      permModule: "attendance",
+      color: "bg-violet-500 hover:bg-violet-600",
+    },
+    {
+      label: "Teacher Leaves",
+      icon: <Briefcase className="size-5" />,
+      screen: "teacher-leaves",
+      permModule: "attendance",
+      color: "bg-blue-500 hover:bg-blue-600",
+    },
+    {
+      label: "Staff Leaves",
+      icon: <Users className="size-5" />,
+      screen: "staff-leaves",
+      permModule: "attendance",
+      color: "bg-slate-500 hover:bg-slate-600",
+    },
+
+    // --- Certificates ---
+    {
+      label: "Certificates",
+      icon: <Award className="size-5" />,
+      screen: "certificates",
+      permModule: "students",
+      color: "bg-teal-600 hover:bg-teal-700",
+    },
+
+    // --- Fees Group ---
+    {
+      label: "Set Fees",
+      icon: <Layers className="size-5" />,
+      screen: "fees",
+      permModule: "fees",
+      color: "bg-emerald-500 hover:bg-emerald-600",
+    },
+    {
+      label: "Fee Categories",
+      icon: <Tag className="size-5" />,
+      screen: "fee-categories",
+      permModule: "fees",
+      color: "bg-teal-500 hover:bg-teal-600",
+    },
+    {
+      label: "Add Concession",
+      icon: <Percent className="size-5" />,
+      screen: "fee-concessions",
+      permModule: "fees",
+      color: "bg-green-500 hover:bg-green-600",
+    },
+    {
+      label: "Make Payment",
+      icon: <Banknote className="size-5" />,
+      screen: "make-payment",
+      permModule: "fees",
+      color: "bg-emerald-600 hover:bg-emerald-700",
+    },
+    {
+      label: "Check Receipt",
+      icon: <FileCheck className="size-5" />,
+      screen: "check-receipt",
+      permModule: "fees",
+      color: "bg-teal-600 hover:bg-teal-700",
+    },
+    {
+      label: "Fee Status",
+      icon: <UserSearch className="size-5" />,
+      screen: "fee-status",
+      permModule: "fees",
+      color: "bg-emerald-500 hover:bg-emerald-600",
+    },
+    {
+      label: "Check Payments",
+      icon: <History className="size-5" />,
+      screen: "check-payments",
+      permModule: "fees",
+      color: "bg-zinc-600 hover:bg-zinc-700",
+    },
+    {
+      label: "Transport Fee",
+      icon: <Bus className="size-5" />,
+      screen: "transport-fee",
+      permModule: "fees",
+      color: "bg-amber-600 hover:bg-amber-700",
+    },
+
+    // --- School Expenses ---
+    {
+      label: "School Expenses",
+      icon: <Wallet className="size-5" />,
+      screen: "expenses",
+      permModule: null,
+      color: "bg-rose-500 hover:bg-rose-600",
+    },
+
+    // --- Notices, Support & Reports ---
+    {
+      label: "Notices",
+      icon: <Bell className="size-5" />,
+      screen: "notices",
+      permModule: "notices",
+      color: "bg-amber-500 hover:bg-amber-600",
+    },
+    {
+      label: "Support Tickets",
+      icon: <TicketCheck className="size-5" />,
+      screen: "tickets",
+      permModule: null,
+      color: "bg-cyan-500 hover:bg-cyan-600",
+    },
+    {
+      label: "Reports",
+      icon: <BarChart3 className="size-5" />,
+      screen: "reports",
+      permModule: "reports",
+      color: "bg-indigo-500 hover:bg-indigo-600",
     },
   ];
 
+  const quickActions = allQuickActions.filter((action) => {
+    if (!action.permModule) return true;
+    return hasPermission(currentUser, action.permModule, "view");
+  });
+
+  const filteredQuickActions = quickActions.filter((action) =>
+    action.label.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
   return (
-    <div className="space-y-6">
-      {/* Welcome Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <h2 className="text-2xl font-semibold text-zinc-900 dark:text-white">
-            Welcome back, {currentUser?.name?.split(" ")[0]}! 👋
-          </h2>
-          <p className="text-zinc-500 dark:text-zinc-400 mt-1">
-            Here&apos;s what&apos;s happening at{" "}
-            {currentTenantName || "your school"} today.
-          </p>
-          <div className="flex items-center gap-2 mt-2">
-            {customRoleName && (
-              <Badge className="bg-orange-100 text-orange-700 border border-orange-200 dark:bg-orange-950/40 dark:text-orange-300 dark:border-orange-800/50 text-xs">
-                <CheckCircle2 className="size-3 mr-1" />
-                {customRoleName}
-              </Badge>
-            )}
-            <Badge variant="secondary" className="text-xs">
-              Staff
-            </Badge>
-          </div>
-        </div>
-        <Card className="bg-gradient-to-r from-emerald-500 to-teal-500 text-white border-0 shadow-lg shadow-emerald-200/50 dark:shadow-emerald-900/30">
-          <CardContent className="p-4">
-            <div className="text-sm font-medium opacity-90">
-              Today&apos;s Date
-            </div>
-            <div className="text-lg font-bold" suppressHydrationWarning>
-              {new Date().toLocaleDateString("en-US", {
-                weekday: "short",
-                month: "short",
-                day: "numeric",
-                year: "numeric",
-              })}
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Stats Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        {stats.map((stat) => (
-          <Card key={stat.label} className="hover:shadow-md transition-shadow">
-            <CardContent className="p-4">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm text-zinc-500 dark:text-zinc-400">
-                    {stat.label}
-                  </p>
-                  <p className="text-2xl font-bold mt-1 text-zinc-900 dark:text-white">
-                    {stat.value}
-                  </p>
-                </div>
-                <div className={`p-2.5 rounded-xl ${stat.color}`}>
-                  {stat.icon}
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
-
-      {/* Quick Actions */}
-      <div>
-        <h3 className="text-lg font-semibold text-zinc-900 dark:text-white mb-3">
+    <div className="space-y-6 w-full">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <h3 className="text-xl font-bold tracking-tight text-zinc-900 dark:text-white">
           Quick Actions
         </h3>
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-          {quickActions.map((action) => (
+        
+        {/* Search bar */}
+        <div className="relative w-full sm:max-w-xs">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-zinc-400 dark:text-zinc-500" />
+          <input
+            type="text"
+            placeholder="Search actions..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="w-full pl-9 pr-4 py-2 text-sm rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500 text-zinc-800 dark:text-zinc-200 shadow-sm transition-all"
+          />
+        </div>
+      </div>
+
+      {filteredQuickActions.length === 0 ? (
+        <p className="text-zinc-500 dark:text-zinc-400 text-sm">
+          No matching quick actions found.
+        </p>
+      ) : (
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-7 gap-4">
+          {filteredQuickActions.map((action) => (
             <button
               key={action.screen}
               type="button"
               onClick={() => navigateTo(action.screen)}
-              className="flex items-center gap-3 p-4 rounded-xl border border-zinc-200 dark:border-zinc-800 hover:shadow-md transition-all hover:border-transparent text-left group"
+              className="flex flex-col items-center justify-center p-6 rounded-2xl border border-zinc-200 dark:border-zinc-800 hover:shadow-lg transition-all bg-white dark:bg-zinc-950 hover:border-transparent text-center group gap-3 cursor-pointer"
             >
               <div
-                className={`p-2 rounded-lg text-white ${action.color} transition-transform group-hover:scale-110`}
+                className={`p-3.5 rounded-xl text-white ${action.color} transition-transform group-hover:scale-110 shadow-md`}
               >
                 {action.icon}
               </div>
-              <span className="text-sm font-medium text-zinc-700 dark:text-zinc-300">
+              <span className="text-sm font-semibold text-zinc-800 dark:text-zinc-200">
                 {action.label}
               </span>
             </button>
           ))}
         </div>
-      </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Recent Notices */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-lg flex items-center gap-2">
-              <ClipboardList className="size-5 text-zinc-400 dark:text-zinc-500" />
-              Recent Broadcasts
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-3">
-              {(data?.recentNotices || []).length > 0 ? (
-                data?.recentNotices.map((activity) => (
-                  <div
-                    key={activity.id}
-                    className="flex items-start gap-3 py-2 border-b border-zinc-50 dark:border-zinc-800/50 last:border-0"
-                  >
-                    <div className="mt-0.5 shrink-0">
-                      <Bell className="size-4 text-amber-500" />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-semibold text-zinc-700 dark:text-zinc-300 line-clamp-1">
-                        {activity.title}
-                      </p>
-                      <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">
-                        {activity.content.substring(0, 60)}...
-                      </p>
-                    </div>
-                  </div>
-                ))
-              ) : (
-                <p className="text-sm text-zinc-400 italic">
-                  No recent notices found.
-                </p>
-              )}
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* System Overview */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-lg flex items-center gap-2">
-              <AlertCircle className="size-5 text-zinc-400 dark:text-zinc-500" />
-              School Composition
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              <div className="flex items-center justify-between p-3 rounded-lg bg-zinc-50 dark:bg-zinc-900">
-                <div className="flex items-center gap-3">
-                  <Users className="size-4 text-emerald-500" />
-                  <span className="text-sm font-medium">Students Enrolled</span>
-                </div>
-                <span className="text-sm font-bold text-emerald-600">
-                  {data?.totalStudents}
-                </span>
-              </div>
-              <div className="flex items-center justify-between p-3 rounded-lg bg-zinc-50 dark:bg-zinc-900">
-                <div className="flex items-center gap-3">
-                  <School className="size-4 text-blue-500" />
-                  <span className="text-sm font-medium">
-                    Registered Classes
-                  </span>
-                </div>
-                <span className="text-sm font-bold text-blue-600">
-                  {data?.totalClasses}
-                </span>
-              </div>
-              <div className="flex items-center justify-between p-3 rounded-lg bg-zinc-50 dark:bg-zinc-900">
-                <div className="flex items-center gap-3">
-                  <TrendingUp className="size-4 text-violet-500" />
-                  <span className="text-sm font-medium">
-                    Monthly Attendance
-                  </span>
-                </div>
-                <span className="text-sm font-bold text-violet-600">
-                  {data?.attendanceRate}%
-                </span>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
+      )}
     </div>
   );
 }

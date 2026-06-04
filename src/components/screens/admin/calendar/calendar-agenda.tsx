@@ -51,11 +51,11 @@ export function CalendarAgenda({
     return allEvents.filter(ev => ev.date === todayStr || (ev.endDate && ev.endDate >= todayStr && ev.date <= todayStr));
   }, [selectedDate, selectedDayEvents, allEvents, todayStr]);
 
-  // Compute Upcoming Events (strictly tomorrow up to 30 days in the future)
+  // Compute Upcoming Events (strictly tomorrow up to the end of the current month)
   const upcomingEventsList = useMemo(() => {
-    const futureLimit = new Date();
-    futureLimit.setDate(futureLimit.getDate() + 30);
-    const maxDateStr = formatDateISO(futureLimit);
+    const todayObj = new Date();
+    const endOfMonth = new Date(todayObj.getFullYear(), todayObj.getMonth() + 1, 0);
+    const maxDateStr = formatDateISO(endOfMonth);
 
     return allEvents
       .filter(ev => ev.date > todayStr && ev.date <= maxDateStr)

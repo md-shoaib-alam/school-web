@@ -4,7 +4,7 @@ import { useAppStore } from "@/store/use-app-store";
 import { cn } from "@/lib/utils";
 import { useRouter } from "next/navigation";
 import { roleColors, roleLabels, type NavItem } from "./nav-config";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 // Sub-components
 import { SidebarHeader } from "./sidebar/SidebarHeader";
@@ -42,6 +42,15 @@ export function Sidebar({
     );
     return activeParent ? [activeParent.key] : [];
   });
+
+  useEffect(() => {
+    const activeParent = items.find(item => 
+      item.children?.some(child => child.key === resolvedScreen)
+    );
+    if (activeParent) {
+      setExpandedKeys(prev => prev.includes(activeParent.key) ? prev : [...prev, activeParent.key]);
+    }
+  }, [resolvedScreen, items]);
 
   if (!currentUser) return null;
 
