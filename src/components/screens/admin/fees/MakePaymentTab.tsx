@@ -15,6 +15,7 @@ import { PendingFeesChecklist } from './payment/PendingFeesChecklist';
 import { PaymentSummary } from './payment/PaymentSummary';
 import { SuccessDialog } from './payment/SuccessDialog';
 import { AddManualFeeDialog } from './payment/AddManualFeeDialog';
+import { PaymentSummaryCards } from './PaymentSummaryCards';
 
 interface MakePaymentTabProps {
   canCreate: boolean;
@@ -202,7 +203,8 @@ export function MakePaymentTab({ canCreate }: MakePaymentTabProps) {
   }
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-6">
+      <PaymentSummaryCards />
       <SuccessDialog 
         open={showSuccess}
         onOpenChange={setShowSuccess}

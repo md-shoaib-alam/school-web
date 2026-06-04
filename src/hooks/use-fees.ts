@@ -75,8 +75,9 @@ export function useFeeReceipts(options: {
   toDate?: string; 
   page?: number; 
   limit?: number; 
+  mode?: string;
 } = {}) {
-  return useQuery<{ items: FeeReceipt[]; total: number; totalPages: number }>({
+  return useQuery<{ items: any[]; total: number; totalPages: number }>({
     queryKey: ['fee-receipts', options],
     queryFn: () => api.get('/fee-receipts', { params: options })
   });
@@ -89,6 +90,7 @@ export function useCreateFeeReceipt() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['fee-receipts'] });
       queryClient.invalidateQueries({ queryKey: ['fees'] });
+      queryClient.invalidateQueries({ queryKey: ['admin-dashboard'] });
       toast.success('Payment processed successfully!');
     },
     onError: (err: any) => toast.error(err.message || 'Payment failed')
