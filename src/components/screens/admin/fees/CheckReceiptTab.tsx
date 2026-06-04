@@ -345,19 +345,15 @@ export function CheckReceiptTab({ canEdit, canDelete }: CheckReceiptTabProps) {
                           <TableCell className="hidden md:table-cell text-xs text-muted-foreground py-4">{r.paidDate}</TableCell>
                           <TableCell className="py-4"><Badge variant="outline" className={`${statusCfg.bg} border-0 capitalize text-[10px] px-2 h-5`}>{r.status}</Badge></TableCell>
                           <TableCell className="text-center py-4">
-                            <div className="flex items-center justify-center gap-1">
-                              <Button variant="ghost" size="icon" className="size-7 text-emerald-500 hover:text-emerald-600 hover:bg-emerald-50" onClick={() => dispatch({ type: 'SET_VIEW_RECEIPT', payload: r })}><Eye className="size-3.5" /></Button>
-                              {canDelete && (
-                                <Button 
-                                  disabled
-                                  variant="ghost" 
-                                  size="icon" 
-                                  className="size-7 text-zinc-300 dark:text-zinc-700 cursor-not-allowed opacity-40 hover:bg-transparent"
-                                >
-                                  <Trash2 className="size-3.5" />
-                                </Button>
-                              )}
-                            </div>
+                            <Button 
+                              variant="outline" 
+                              size="sm" 
+                              className="h-8 text-xs text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50 bg-emerald-50/30 border-emerald-100 dark:border-emerald-900/50 gap-2 px-3 font-semibold transition-all" 
+                              onClick={() => dispatch({ type: 'SET_VIEW_RECEIPT', payload: r })}
+                            >
+                              <Printer className="size-3.5" />
+                              <span>Print</span>
+                            </Button>
                           </TableCell>
                         </TableRow>
                       );
