@@ -47,7 +47,7 @@ export function ParentDashboard() {
     };
   });
 
-  const pendingFees = feesData.filter(f => f.status === "pending" || f.status === "overdue");
+  const pendingFees = feesData.filter(f => f.status === "pending" || f.status === "overdue" || f.status === "partially_paid");
   const overdueFees = feesData.filter(f => f.status === "overdue");
   const parentNotices = allNotices.filter(n => n.targetRole === "parent" || n.targetRole === "all");
   
@@ -78,7 +78,7 @@ export function ParentDashboard() {
       <QuickStats 
         childrenCount={childrenData.length}
         noticeCount={parentNotices.length}
-        pendingFees={pendingFees.reduce((s, f) => s + f.amount - f.paidAmount, 0)}
+        pendingFees={pendingFees.reduce((s, f) => s + f.amount - (f.concession || 0) - (f.paidAmount || 0), 0)}
       />
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">

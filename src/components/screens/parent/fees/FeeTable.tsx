@@ -127,13 +127,11 @@ export function FeeTable({ studentName, fees, onPay, isPremium }: FeeTableProps)
                       </TableCell>
                       <TableCell className="text-center">
                         {fee.status !== "paid" ? (
-                          <Button
-                            size="sm"
-                            className="bg-amber-600 hover:bg-amber-700 text-white text-xs h-8 px-3 shadow-none"
-                            onClick={() => onPay(fee.id)}
+                          <div
+                            className="inline-flex items-center justify-center rounded-md text-xs font-semibold h-8 px-3 bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-350 border border-zinc-300 dark:border-zinc-700 cursor-not-allowed shadow-none select-none"
                           >
-                            Pay Now
-                          </Button>
+                            Pay at School
+                          </div>
                         ) : (
                           <div className="flex flex-col items-center gap-1">
                             <span className="text-[10px] text-emerald-600 dark:text-emerald-400 font-bold uppercase tracking-wider mb-1">

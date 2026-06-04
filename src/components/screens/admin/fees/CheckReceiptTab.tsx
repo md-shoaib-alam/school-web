@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useMemo, useCallback, useReducer } from 'react';
+import { useState, useEffect, useMemo, useCallback, useReducer, useRef } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -28,6 +28,8 @@ import type { FeeReceipt, StudentOption } from './types';
 import { format } from 'date-fns';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Calendar } from '@/components/ui/calendar';
+import { useReactToPrint } from 'react-to-print';
+import { AdminReceiptTemplate } from './AdminReceiptTemplate';
 
 interface CheckReceiptTabProps {
   canEdit: boolean;
@@ -101,6 +103,7 @@ export function CheckReceiptTab({ canEdit, canDelete }: CheckReceiptTabProps) {
   const [state, dispatch] = useReducer(reducer, initialState);
   const [isFromCalendarOpen, setIsFromCalendarOpen] = useState(false);
   const [isToCalendarOpen, setIsToCalendarOpen] = useState(false);
+  const printRef = useRef<HTMLDivElement>(null);
 
   const {
     search,
@@ -162,9 +165,33 @@ export function CheckReceiptTab({ canEdit, canDelete }: CheckReceiptTabProps) {
 
   const loading = loadingReceipts;
 
-  const handlePrint = () => {
-    window.print();
-  };
+  const handlePrint = useReactToPrint({
+    contentRef: printRef,
+    documentTitle: `Receipt_${viewReceipt?.receiptNumber || 'print'}`,
+  });
+
+  const { data: studentFullDetails } = useQuery<any>({
+    queryKey: ['student-full-receipt', viewReceipt?.studentId],
+    enabled: !!viewReceipt?.studentId,
+    queryFn: async () => {
+      const res = await apiFetch(`/api/students/${viewReceipt?.studentId}`);
+      if (!res.ok) throw new Error("Failed to fetch");
+      return res.json();
+    }
+  });
+
+  const { data: pendingFees = [] } = useQuery<any[]>({
+    queryKey: ['student-pending-fees-receipt', viewReceipt?.studentId],
+    enabled: !!viewReceipt?.studentId,
+    queryFn: async () => {
+      const res = await apiFetch(`/api/fees?studentId=${viewReceipt?.studentId}&status=pending,overdue,partially_paid`);
+      if (!res.ok) throw new Error("Failed to fetch");
+      const data = await res.json();
+      return data.items || [];
+    }
+  });
+
+  const remainingAmount = pendingFees?.reduce((sum: number, fee: any) => sum + (fee.amount - fee.paidAmount - fee.concession), 0) || 0;
 
   const handleDelete = async (id: string) => {
     dispatch({ type: 'SET_DELETING', payload: true });
@@ -424,12 +451,25 @@ export function CheckReceiptTab({ canEdit, canDelete }: CheckReceiptTabProps) {
               )}
             </div>
           )}
-          <DialogFooter className="gap-2 sm:gap-0">
+          <DialogFooter className="flex gap-3 sm:gap-3 mt-4">
             <Button variant="outline" className="flex-1 sm:flex-none" onClick={handlePrint}><Printer className="size-4 mr-2" />Print</Button>
             <Button variant="default" className="flex-1 sm:flex-none bg-emerald-600 hover:bg-emerald-700" onClick={() => dispatch({ type: 'SET_VIEW_RECEIPT', payload: null })}>Close</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Hidden Receipt for Printing */}
+      <div className="hidden">
+        {viewReceipt && (
+          <AdminReceiptTemplate 
+            ref={printRef}
+            receipt={viewReceipt}
+            parentName={studentFullDetails?.parentName}
+            className={studentFullDetails?.className}
+            remainingAmount={remainingAmount}
+          />
+        )}
+      </div>
     </div>
   );
 }
