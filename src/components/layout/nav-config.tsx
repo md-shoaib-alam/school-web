@@ -388,12 +388,12 @@ export const navItems: Record<UserRole, NavItem[]> = {
           label: "School Exams",
           icon: <BookOpen className="size-4" />,
         },
-        {
-          key: "assessments",
-          label: "Assessments",
-          icon: <ClipboardList className="size-4" />,
-        },
       ]
+    },
+    {
+      key: "assessments",
+      label: "Assessments",
+      icon: <ClipboardList className="size-4" />,
     },
     {
       key: "my-attendance",

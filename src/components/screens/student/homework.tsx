@@ -12,6 +12,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Progress } from "@/components/ui/progress";
 import { Calendar } from "@/components/ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { format } from "date-fns";
 import { toast } from "sonner";
 import {
   FileText,
@@ -30,7 +32,7 @@ import {
 import type { StudentInfo, AssignmentInfo } from "@/lib/types";
 import { DailyDiaryPlanner } from "@/components/shared/daily-diary-planner";
 
-type AssignmentStatus = "active" | "submitted" | "overdue" | "graded";
+type AssignmentStatus = "active" | "submitted" | "overdue";
 
 interface StudentSubmission {
   id: string;
@@ -65,8 +67,8 @@ export function StudentAssignments() {
   const [loading, setLoading] = useState(true);
   const [students, setStudents] = useState<StudentInfo[]>([]);
   const [assignments, setAssignments] = useState<AssignmentInfo[]>([]);
-  const [activeTab, setActiveTab] = useState("all");
-  const [viewMode, setViewMode] = useState<"list" | "diary">("diary");
+  const [activeTab, setActiveTab] = useState("active");
+  const [viewMode, setViewMode] = useState<"list" | "diary">("list");
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date());
 
   const [submittingId, setSubmittingId] = useState<string | null>(null);
@@ -139,9 +141,7 @@ export function StudentAssignments() {
       const isSubmitted = realSub && !isGraded;
 
       let status: AssignmentStatus;
-      if (isGraded) {
-        status = "graded";
-      } else if (isSubmitted) {
+      if (isGraded || isSubmitted) {
         status = "submitted";
       } else if (pastDue) {
         status = "overdue";
@@ -231,7 +231,6 @@ export function StudentAssignments() {
       active: enrichedAssignments.filter((a) => a.status === "active").length,
       submitted: enrichedAssignments.filter((a) => a.status === "submitted")
         .length,
-      graded: enrichedAssignments.filter((a) => a.status === "graded").length,
       overdue: enrichedAssignments.filter((a) => a.status === "overdue").length,
     }),
     [enrichedAssignments],
@@ -360,10 +359,10 @@ export function StudentAssignments() {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h2 className="text-xl font-semibold text-zinc-900 dark:text-zinc-100">
-            My Assignments
+            My Homework
           </h2>
-          <p className="text-sm text-zinc-500 dark:text-zinc-400 mt-0.5">
-            Manage and track your homework and assignments
+          <p className="text-sm text-zinc-505 dark:text-zinc-400 mt-0.5">
+            Manage and track your school homework
           </p>
         </div>
         <div className="flex bg-violet-50/60 dark:bg-zinc-900 border border-violet-100/50 dark:border-zinc-800 p-0.5 rounded-lg w-fit">
@@ -390,10 +389,10 @@ export function StudentAssignments() {
 
       {/* Summary Cards */}
       {viewMode === "list" && (
-        <div className="grid grid-cols-2 lg:grid-cols-5 gap-3 sm:gap-4">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
           <SummaryCard
-            label="Total"
-            count={counts.all}
+            label="Today's Homework"
+            count={selectedDateAssignments.length + dueSelectedDateAssignments.length}
             icon={<FileText className="size-4" />}
             color="violet"
           />
@@ -410,12 +409,6 @@ export function StudentAssignments() {
             color="emerald"
           />
           <SummaryCard
-            label="Graded"
-            count={counts.graded}
-            icon={<Star className="size-4" />}
-            color="violet"
-          />
-          <SummaryCard
             label="Overdue"
             count={counts.overdue}
             icon={<AlertTriangle className="size-4" />}
@@ -426,199 +419,114 @@ export function StudentAssignments() {
 
       {/* Assignments List / Diary Card */}
       <Card className="rounded-xl shadow-sm">
-        <CardHeader className="pb-3">
+        <CardHeader className={`pb-3 ${viewMode === "diary" ? "hidden lg:block" : ""}`}>
           <CardTitle className="text-base flex items-center gap-2">
             <FileText className="size-4 text-violet-500" />
-            {viewMode === "list" ? "Assignment List" : "My Daily Planner Diary"}
+            {viewMode === "list" ? "Homework List" : "My Daily Planner Diary"}
           </CardTitle>
         </CardHeader>
-        <CardContent>
+        <CardContent className={viewMode === "diary" ? "p-0 lg:p-6 lg:pt-0" : "px-4 py-4 sm:p-6 sm:pt-0"}>
           {viewMode === "list" ? (
-            <Tabs
-              defaultValue="all"
-              value={activeTab}
-              onValueChange={setActiveTab}
-            >
-              <TabsList className="mb-4">
-                <TabsTrigger value="all">All ({counts.all})</TabsTrigger>
-                <TabsTrigger value="active">Active ({counts.active})</TabsTrigger>
-                <TabsTrigger value="submitted">
-                  Submitted ({counts.submitted})
-                </TabsTrigger>
-                <TabsTrigger value="graded">Graded ({counts.graded})</TabsTrigger>
-                <TabsTrigger value="overdue">
-                  Overdue ({counts.overdue})
-                </TabsTrigger>
-              </TabsList>
+            <div className="space-y-4">
+              {/* Date Header / Selector for List View */}
+              <div className="flex items-center justify-between border-b border-zinc-150 dark:border-zinc-800 pb-3">
+                <div className="text-left flex flex-col justify-center">
+                  <h3 className="text-sm font-bold tracking-tight text-zinc-900 dark:text-stone-100">
+                    {selectedDate ? format(selectedDate, "eeee") : "Select Date"}
+                  </h3>
+                  <p className="text-[10px] text-muted-foreground font-bold uppercase tracking-wider mt-0.5">
+                    {selectedDate ? format(selectedDate, "MMM d, yyyy") : ""}
+                  </p>
+                </div>
+                {/* Popover Calendar for list view */}
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <button 
+                      type="button"
+                      className="h-8 text-[11px] font-bold px-3 bg-violet-50/60 dark:bg-zinc-900 border border-violet-100/50 dark:border-zinc-800 text-violet-700 dark:text-violet-300 hover:bg-violet-100/30 rounded-lg flex items-center justify-center transition-colors"
+                    >
+                      <CalendarDays className="size-3.5 mr-1 text-violet-500" />
+                      Select Date
+                    </button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0 bg-white dark:bg-stone-950 border border-zinc-200 dark:border-zinc-800" align="end">
+                    <Calendar
+                      mode="single"
+                      selected={selectedDate}
+                      onSelect={setSelectedDate}
+                      modifiers={{ hasHomework: homeworkDays }}
+                      modifiersClassNames={{
+                        hasHomework: "relative after:absolute after:bottom-1.5 after:left-1/2 after:-translate-x-1/2 after:size-1.5 after:bg-violet-500 after:rounded-full font-bold text-violet-700"
+                      }}
+                      initialFocus
+                    />
+                  </PopoverContent>
+                </Popover>
+              </div>
 
-              <TabsContent value={activeTab} className="mt-0">
-                <ScrollArea className="max-h-[600px]">
-                  {filteredAssignments.length === 0 ? (
-                    <div className="text-center py-12 text-zinc-400 dark:text-zinc-500 dark:text-zinc-400">
-                      <FileText className="size-10 mx-auto mb-2 opacity-40" />
-                      <p className="text-sm">No assignments found</p>
-                      <p className="text-xs mt-1">
-                        {activeTab === "all"
-                          ? "Your teachers haven't assigned any work yet"
-                          : `No ${activeTab} assignments at this time`}
-                      </p>
-                    </div>
-                  ) : (
-                    <div className="space-y-3">
-                      {filteredAssignments.map((assignment) => (
-                        <div
-                          key={assignment.id}
-                          className={`
-                            p-4 rounded-xl border transition-all hover:shadow-sm
-                            ${
-                              assignment.status === "overdue"
-                                ? "border-red-200 dark:border-red-800 bg-red-50/50"
-                                : assignment.status === "graded"
-                                  ? "border-violet-200 dark:border-violet-800 dark:border-violet-800 bg-violet-50/50"
-                                  : assignment.status === "submitted"
-                                    ? "border-emerald-200 dark:border-emerald-800 bg-emerald-50/50"
-                                    : "border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 hover:border-violet-200 dark:border-violet-800 dark:hover:border-violet-800"
-                            }
-                          `}
-                        >
-                          <div className="flex flex-col sm:flex-row sm:items-start gap-3">
-                            {/* Content */}
-                            <div className="flex-1 min-w-0">
-                              <div className="flex items-start justify-between gap-2 mb-1.5">
-                                <h4 className="font-semibold text-sm text-zinc-900 dark:text-zinc-100 truncate">
-                                  {assignment.title}
-                                </h4>
-                                {getStatusBadge(assignment.status)}
-                              </div>
-
-                              <div className="flex flex-wrap items-center gap-2 mb-2">
-                                <Badge variant="outline" className="text-[10px]">
-                                  {assignment.subjectName}
-                                </Badge>
-                                <Badge
-                                  variant="secondary"
-                                  className="text-[10px]"
-                                >
-                                  {assignment.className}
-                                </Badge>
-                                <Badge
-                                  variant="outline"
-                                  className={`text-[10px] font-medium px-2 flex items-center gap-1 border rounded-full ${
-                                    assignment.mode === "online"
-                                      ? "bg-violet-50 text-violet-700 border-violet-100/60 dark:bg-violet-950/20 dark:text-violet-300 dark:border-violet-900/50"
-                                      : "bg-amber-50 text-amber-700 border-amber-100/60 dark:bg-amber-950/20 dark:text-amber-300 dark:border-amber-900/50"
-                                  }`}
-                                >
-                                  {assignment.mode === "online" ? (
-                                    <>
-                                      <Globe className="size-2.5" /> Online
-                                    </>
-                                  ) : (
-                                    <>
-                                      <BookOpen className="size-2.5" /> Offline
-                                    </>
-                                  )}
-                                </Badge>
-                              </div>
-
-                              <p className="text-xs text-zinc-500 dark:text-zinc-400 dark:text-zinc-500 dark:text-zinc-400 mb-2">
-                                Teacher: {assignment.teacherName}
-                              </p>
-
-                              {/* Show grade and feedback for graded assignments */}
-                              {assignment.status === "graded" &&
-                                assignment.grade && (
-                                  <div className="bg-violet-50 dark:bg-violet-900/20 rounded-lg p-2.5 mb-2 border border-violet-200 dark:border-violet-800">
-                                    <p className="text-xs font-semibold text-violet-700 dark:text-violet-400">
-                                      ✨ Grade: {assignment.grade}
-                                    </p>
-                                    {assignment.feedback && (
-                                      <p className="text-[11px] text-violet-600 mt-1">
-                                        💬 {assignment.feedback}
-                                      </p>
-                                    )}
-                                  </div>
-                                )}
-
-                              <div className="flex items-center gap-4">
-                                <div className="flex items-center gap-1.5" suppressHydrationWarning>
-                                  <Clock
-                                    className={`size-3.5 ${getCountdownColor(assignment.status)}`}
-                                  />
-                                  <span
-                                    className={`text-xs ${getCountdownColor(assignment.status)}`}
-                                  >
-                                    {assignment.countdown}
-                                  </span>
-                                </div>
-                                <span className="text-[10px] text-zinc-400 dark:text-zinc-500 dark:text-zinc-400" suppressHydrationWarning>
-                                  Due: {formatAssignmentDate(assignment.dueDate)}
-                                </span>
-                              </div>
-                            </div>
-
-                            {/* Actions */}
-                            <div className="flex flex-col items-end gap-2 sm:ml-4 shrink-0">
-                              {assignment.status !== "submitted" &&
-                                assignment.status !== "graded" && (
-                                  <Button
-                                    size="sm"
-                                    onClick={() => handleSubmit(assignment)}
-                                    disabled={submittingId === assignment.id}
-                                    className={`
-                                    text-xs gap-1.5
-                                    ${
-                                      assignment.status === "overdue"
-                                        ? "bg-red-500 hover:bg-red-600 text-white"
-                                        : "bg-violet-500 hover:bg-violet-600 text-white"
-                                    }
-                                  `}
-                                  >
-                                    {submittingId === assignment.id ? (
-                                      <Loader2 className="size-3.5 animate-spin" />
-                                    ) : (
-                                      <Send className="size-3.5" />
-                                    )}
-                                    Submit
-                                  </Button>
-                                )}
-                              {assignment.status === "submitted" && (
-                                <Badge className="bg-emerald-100 text-emerald-700 text-[10px] gap-1">
-                                  <CheckCircle2 className="size-3" />
-                                  Submitted
-                                </Badge>
-                              )}
-                              {assignment.status === "graded" && (
-                                <Badge className="bg-violet-100 text-violet-700 dark:text-violet-400 text-[10px] gap-1">
-                                  <Star className="size-3" />
-                                  Graded
-                                </Badge>
-                              )}
-                            </div>
-                          </div>
-
-                          {/* Progress bar */}
-                          <div className="mt-3 pt-2 border-t border-zinc-100">
-                            <div className="flex items-center justify-between mb-1">
-                              <span className="text-[10px] text-zinc-400 dark:text-zinc-500 dark:text-zinc-400">
-                                Progress
-                              </span>
-                              <span className="text-[10px] text-zinc-500 dark:text-zinc-400 font-medium">
-                                {getProgressValue(assignment.status)}%
-                              </span>
-                            </div>
-                            <Progress
-                              value={getProgressValue(assignment.status)}
-                              className={`h-1.5 ${getProgressColor(assignment.status)}`}
+              {/* List of assignments for selected date */}
+              <ScrollArea className="max-h-[600px] pr-3">
+                {selectedDateAssignments.length === 0 && dueSelectedDateAssignments.length === 0 ? (
+                  <div className="text-center py-16 text-zinc-400 dark:text-zinc-500 border-2 border-dashed border-zinc-100 dark:border-zinc-800 rounded-xl">
+                    <FileText className="size-10 mx-auto mb-3 opacity-30" />
+                    <p className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">No homework found</p>
+                    <p className="text-xs text-zinc-505 mt-1">
+                      No homework assigned or due on this date.
+                    </p>
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    {/* Assigned Today */}
+                    {selectedDateAssignments.length > 0 && (
+                      <div>
+                        <h4 className="text-[10px] font-extrabold uppercase tracking-widest text-violet-755 dark:text-violet-400 mb-2 flex items-center gap-1.5">
+                          <span className="size-1.5 rounded-full bg-violet-500" />
+                          Assigned Today ({selectedDateAssignments.length})
+                        </h4>
+                        <div className="space-y-2.5">
+                          {selectedDateAssignments.map((a) => (
+                            <ListHomeworkCard
+                              key={a.id}
+                              a={a}
+                              getStatusBadge={getStatusBadge}
+                              getCountdownColor={getCountdownColor}
+                              getProgressValue={getProgressValue}
+                              getProgressColor={getProgressColor}
+                              onSubmit={handleSubmit}
+                              submittingId={submittingId}
                             />
-                          </div>
+                          ))}
                         </div>
-                      ))}
-                    </div>
-                  )}
-                </ScrollArea>
-              </TabsContent>
-            </Tabs>
+                      </div>
+                    )}
+
+                    {/* Due Today */}
+                    {dueSelectedDateAssignments.length > 0 && (
+                      <div>
+                        <h4 className="text-[10px] font-extrabold uppercase tracking-widest text-rose-755 dark:text-rose-450 mb-2 flex items-center gap-1.5 mt-2">
+                          <span className="size-1.5 rounded-full bg-rose-500" />
+                          Due Today ({dueSelectedDateAssignments.length})
+                        </h4>
+                        <div className="space-y-2.5">
+                          {dueSelectedDateAssignments.map((a) => (
+                            <ListHomeworkCard
+                              key={a.id}
+                              a={a}
+                              getStatusBadge={getStatusBadge}
+                              getCountdownColor={getCountdownColor}
+                              getProgressValue={getProgressValue}
+                              getProgressColor={getProgressColor}
+                              onSubmit={handleSubmit}
+                              submittingId={submittingId}
+                            />
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </ScrollArea>
+            </div>
           ) : (
             <DailyDiaryPlanner
               selectedDate={selectedDate}
@@ -631,11 +539,104 @@ export function StudentAssignments() {
               getProgressColor={getProgressColor}
               onSubmit={handleSubmit}
               submittingId={submittingId}
-              emptyMessage="No assignments were assigned or due on this date. Tapping a day with an indicator dot on the calendar shows active school planner entries."
+              emptyMessage="No homework assigned or due on this date."
             />
           )}
         </CardContent>
       </Card>
+    </div>
+  );
+}
+
+/* ─── List View Card Sub-component ─── */
+function ListHomeworkCard({
+  a,
+  getStatusBadge,
+  getCountdownColor,
+  getProgressValue,
+  getProgressColor,
+  onSubmit,
+  submittingId,
+}: {
+  a: EnrichedAssignment;
+  getStatusBadge: (status: AssignmentStatus) => React.ReactNode;
+  getCountdownColor: (status: AssignmentStatus) => string;
+  getProgressValue: (status: AssignmentStatus) => number;
+  getProgressColor: (status: AssignmentStatus) => string;
+  onSubmit: (assignment: EnrichedAssignment) => void;
+  submittingId: string | null;
+}) {
+  return (
+    <div
+      className={`p-4 rounded-xl border bg-card hover:shadow-sm transition-all ${
+        a.status === "overdue" ? "border-rose-100 dark:border-rose-950/40 bg-rose-50/10" :
+        a.status === "submitted" ? "border-emerald-100 dark:border-emerald-950/40 bg-emerald-50/10" :
+        "border-zinc-100 dark:border-zinc-800"
+      }`}
+    >
+      <div className="flex flex-col sm:flex-row sm:items-start gap-3">
+        <div className="flex-1 min-w-0 text-left">
+          <div className="flex items-start justify-between gap-2 mb-1.5">
+            <h4 className="font-semibold text-sm text-zinc-900 dark:text-zinc-100 truncate">{a.title}</h4>
+            {getStatusBadge(a.status)}
+          </div>
+          <div className="flex flex-wrap items-center gap-2 mb-2">
+            <Badge variant="outline" className="text-[10px] bg-muted/30 border-border shadow-none font-medium">{a.subjectName}</Badge>
+            <Badge variant="outline" className="text-[10px] bg-muted/30 border-border shadow-none font-medium flex items-center gap-1">
+              {a.mode === "online" ? <Globe className="size-2.5 text-sky-500" /> : <BookOpen className="size-2.5 text-amber-500" />}
+              {a.mode === "online" ? "Online Submission" : "Offline Paper"}
+            </Badge>
+          </div>
+          <p className="text-[11px] text-muted-foreground mb-2">Teacher: {a.teacherName}</p>
+
+          <div className="flex items-center gap-4 text-xs text-muted-foreground">
+            <div className="flex items-center gap-1" suppressHydrationWarning>
+              <Clock className={`size-3.5 ${getCountdownColor(a.status)}`} />
+              <span className={getCountdownColor(a.status)} suppressHydrationWarning>{a.countdown}</span>
+            </div>
+            <span suppressHydrationWarning>Due: {formatAssignmentDate(a.dueDate)}</span>
+          </div>
+        </div>
+
+        {/* Actions */}
+        <div className="flex flex-col items-end gap-2 sm:ml-4 shrink-0 self-center sm:self-start">
+          {a.status !== "submitted" && (
+            <Button
+              size="sm"
+              onClick={() => onSubmit(a)}
+              disabled={submittingId === a.id}
+              className={`
+                text-xs gap-1.5
+                ${a.status === "overdue"
+                  ? "bg-red-500 hover:bg-red-600 text-white"
+                  : "bg-violet-500 hover:bg-violet-600 text-white"
+                }
+              `}
+            >
+              {submittingId === a.id ? (
+                <Loader2 className="size-3.5 animate-spin" />
+              ) : (
+                <Send className="size-3.5" />
+              )}
+              Submit
+            </Button>
+          )}
+          {a.status === "submitted" && (
+            <Badge className="bg-emerald-100 text-emerald-700 text-[10px] gap-1">
+              <CheckCircle2 className="size-3" />
+              Submitted
+            </Badge>
+          )}
+        </div>
+      </div>
+
+      <div className="mt-3 pt-2 border-t border-zinc-100/70 dark:border-zinc-800/60 flex flex-col gap-1">
+        <div className="flex items-center justify-between text-[10px] text-muted-foreground">
+          <span>Progress Tracking</span>
+          <span className="font-medium text-zinc-700 dark:text-zinc-300">{getProgressValue(a.status)}%</span>
+        </div>
+        <Progress value={getProgressValue(a.status)} className={`h-1 ${getProgressColor(a.status)}`} />
+      </div>
     </div>
   );
 }
@@ -653,31 +654,26 @@ function SummaryCard({
   color: string;
 }) {
   const colorMap: Record<string, string> = {
-    violet:
-      "from-violet-500 to-purple-600 bg-violet-50 dark:bg-violet-900/20 text-violet-700 dark:text-violet-400",
-    amber:
-      "from-amber-500 to-orange-600 bg-amber-50 dark:bg-amber-900/20 text-amber-700 dark:text-amber-400",
-    emerald:
-      "from-emerald-500 to-teal-600 bg-emerald-50 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-400",
-    red: "from-red-500 to-rose-600 bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-400",
+    violet: "bg-violet-500 dark:bg-violet-600 text-white",
+    amber: "bg-amber-500 dark:bg-amber-600 text-white",
+    emerald: "bg-emerald-500 dark:bg-emerald-600 text-white",
+    red: "bg-red-500 dark:bg-red-600 text-white",
   };
-  const [iconBg, , textClr] = (colorMap[color] || colorMap.violet).split(" ");
+  const iconBg = colorMap[color] || colorMap.violet;
 
   return (
     <Card className="rounded-xl shadow-sm">
       <CardContent className="p-4">
         <div className="flex items-center justify-between">
-          <div
-            className={`p-2 rounded-lg bg-gradient-to-br ${iconBg} text-white`}
-          >
+          <div className={`p-2 rounded-lg ${iconBg}`}>
             {icon}
           </div>
           <p className="text-2xl font-bold text-zinc-900 dark:text-zinc-100">
             {count}
           </p>
         </div>
-        <p className="text-xs text-zinc-500 dark:text-zinc-400 dark:text-zinc-500 dark:text-zinc-400 mt-2">
-          {label} Assignments
+        <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-2">
+          {label} Homework
         </p>
       </CardContent>
     </Card>

@@ -22,7 +22,7 @@ export function RecentAssignments({
         <div className="flex items-center justify-between">
           <CardTitle className="text-base font-semibold flex items-center gap-2">
             <FileText className="size-4 text-blue-500" />
-            Recent Assignments
+            Recent Homework
           </CardTitle>
           <Button
             variant="ghost"
@@ -103,7 +103,7 @@ export function RecentAssignments({
             <div className="text-center py-6">
               <FileText className="size-8 text-zinc-300 dark:text-zinc-600 mx-auto mb-2" />
               <p className="text-zinc-400 dark:text-zinc-500 text-sm">
-                No assignments created yet
+                No homework created yet
               </p>
             </div>
           )}

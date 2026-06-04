@@ -32,7 +32,7 @@ export function TeacherStats({
       bg: "bg-emerald-50 dark:bg-emerald-900/30",
     },
     {
-      title: "Pending Assignments",
+      title: "Pending Homework",
       value: pendingAssignments,
       icon: <FileText className="size-5" />,
       color: "text-amber-600 dark:text-amber-400",

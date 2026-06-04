@@ -275,11 +275,11 @@ export function MarksheetPreviewPage({
 
       return {
         subjectName: sub.name,
-        midtermMarks: midtermMarks !== null ? `${midtermMarks}/${midtermMax}` : '-',
-        finalMarks: finalMarks !== null ? `${finalMarks}/${finalMax}` : '-',
-        obtained: subMax > 0 ? `${subObtained}/${subMax}` : '-',
+        midtermMarks: midtermMarks !== null ? `${Number(midtermMarks.toFixed(2))}/${midtermMax}` : '-',
+        finalMarks: finalMarks !== null ? `${Number(finalMarks.toFixed(2))}/${finalMax}` : '-',
+        obtained: subMax > 0 ? `${Number(subObtained.toFixed(2))}/${subMax}` : '-',
         maxMarks: subMax,
-        obtainedMarks: subObtained,
+        obtainedMarks: Number(subObtained.toFixed(2)),
         passingMarks: subPassing,
         percentage: subMax > 0 ? Math.round((subObtained / subMax) * 100) : 0,
         status
@@ -300,7 +300,7 @@ export function MarksheetPreviewPage({
       schoolName: student.schoolName || 'SCHOOL ERP ACADEMY',
       subjects: subjectsData,
       totalMaxMarks,
-      totalObtainedMarks,
+      totalObtainedMarks: Number(totalObtainedMarks.toFixed(2)),
       overallPercentage,
       grade: gradeDetails.grade,
       remarks: gradeDetails.remarks,

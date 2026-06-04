@@ -1,11 +1,13 @@
 "use client";
 
+import { useState } from "react";
+import { format } from "date-fns";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Progress } from "@/components/ui/progress";
-import { CalendarDays, Loader2, Send } from "lucide-react";
+import { CalendarDays, Clock, Loader2, Send, Sparkles, CheckCircle2, Star } from "lucide-react";
 import type { AssignmentInfo } from "@/lib/types";
 
 export type AssignmentStatus = "active" | "submitted" | "overdue" | "graded";
@@ -45,28 +47,33 @@ export function DailyDiaryPlanner({
   getProgressColor,
   onSubmit,
   submittingId = null,
-  emptyMessage = "No homework or assignments were given or due on this date.",
+  emptyMessage = "No homework assigned or due on this date.",
 }: DailyDiaryPlannerProps) {
-  return (
-    <div className="relative p-2 md:p-4 bg-gradient-to-br from-[#4a3622] via-[#2c2014] to-[#1a130c] dark:from-zinc-950 dark:to-stone-900 rounded-[28px] shadow-2xl border-4 border-[#3a2a1b] dark:border-zinc-800/80 mt-2">
-      {/* Outer book cover leather shine overlay */}
-      <div className="absolute inset-0 bg-radial-gradient from-white/5 to-black/45 rounded-[24px] pointer-events-none" />
+  const [isCalendarOpen, setIsCalendarOpen] = useState(false);
+  const totalEntries = selectedDateAssignments.length + dueSelectedDateAssignments.length;
+  const completedCount = [...selectedDateAssignments, ...dueSelectedDateAssignments]
+    .filter(a => a.status === "submitted" || a.status === "graded").length;
 
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-0 relative bg-[#f7f5f0] dark:bg-[#1a1917] rounded-2xl overflow-hidden shadow-inner border border-amber-900/10 dark:border-zinc-800">
+  return (
+    <div className="mt-0 lg:relative lg:p-4 lg:bg-gradient-to-br lg:from-[#4a3622] lg:via-[#2c2014] lg:to-[#1a130c] lg:dark:from-zinc-950 lg:dark:to-stone-900 lg:rounded-[28px] lg:shadow-2xl lg:border-4 lg:border-[#3a2a1b] lg:dark:border-zinc-800/80">
+      {/* Outer book cover leather shine overlay */}
+      <div className="hidden lg:block absolute inset-0 bg-radial-gradient from-white/5 to-black/45 rounded-[24px] pointer-events-none" />
+
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-0 relative lg:bg-[#f7f5f0] lg:dark:bg-[#1a1917] lg:rounded-2xl lg:overflow-hidden lg:shadow-inner lg:border lg:border-amber-900/10 lg:dark:border-zinc-800 bg-transparent">
         
-        {/* LEFT PAGE: Calendar Agenda (Warm Ivory Graph/Grid Paper) */}
-        <div className="p-4 md:p-6 lg:col-span-4 lg:border-r border-amber-900/15 dark:border-[#2f271f] relative bg-[#FAF8F4] dark:bg-[#1a1917] shadow-[inset_-10px_0_15px_-5px_rgba(0,0,0,0.06)] min-h-fit lg:min-h-[580px] pb-6 lg:pb-4">
-          {/* Bullet/Grid paper background for Left Page */}
+        {/* LEFT PAGE: Calendar Agenda (Warm Ivory Graph Paper) */}
+        <div className="hidden lg:block p-3 md:p-6 lg:col-span-4 lg:border-r border-amber-900/15 dark:border-[#2f271f] relative bg-[#FAF8F4] dark:bg-[#1a1917] shadow-[inset_-10px_0_15px_-5px_rgba(0,0,0,0.06)] min-h-fit lg:min-h-[580px] pb-4 lg:pb-4">
+          {/* Bullet/Grid paper background */}
           <div className="absolute inset-0 opacity-[0.25] dark:opacity-[0.12] pointer-events-none" style={{ backgroundImage: 'radial-gradient(circle, #5c4e37 1.5px, transparent 1.5px)', backgroundSize: '16px 16px' }} />
 
-          {/* Page binder holes on right side of left page */}
-          <div className="absolute right-0.5 top-0 bottom-0 w-4 flex flex-col justify-around items-center py-8 pointer-events-none hidden lg:flex">
+          {/* Page binder holes */}
+          <div className="absolute right-0.5 top-0 bottom-0 w-4 hidden lg:flex flex-col justify-around items-center py-8 pointer-events-none">
             {[...Array(12)].map((_, i) => (
               <div key={i} className="size-2 rounded-full bg-stone-950 shadow-[inset_1px_1px_2px_rgba(0,0,0,0.8)] border border-stone-800/20" />
             ))}
           </div>
 
-          <div className="space-y-4 pr-0 lg:pr-6 relative z-10">
+          <div className="space-y-3.5 pr-0 lg:pr-6 relative z-10">
             <div className="flex items-center justify-between border-b border-amber-900/15 dark:border-[#2f271f] pb-2">
               <span className="text-xs font-bold text-amber-800 dark:text-amber-500 uppercase tracking-widest">Monthly Planner</span>
               <span className="text-[10px] bg-amber-100/70 dark:bg-amber-950/60 text-amber-800 dark:text-amber-400 font-bold px-2 py-0.5 rounded-full">
@@ -74,7 +81,41 @@ export function DailyDiaryPlanner({
               </span>
             </div>
 
-            <div className="flex justify-center bg-white/70 dark:bg-stone-900/40 rounded-xl p-2 border border-amber-900/10 dark:border-[#2f271f] shadow-inner">
+            {/* Mobile Date Picker Popover (Using custom Calendar component) */}
+            <div className="block md:hidden bg-white/80 dark:bg-stone-900/60 rounded-xl p-3 border border-amber-900/10 dark:border-[#2f271f] shadow-inner">
+              <label className="block text-[10px] font-bold text-amber-800 dark:text-amber-500 uppercase tracking-wider mb-1.5">
+                Select Date
+              </label>
+              <Popover open={isCalendarOpen} onOpenChange={setIsCalendarOpen}>
+                <PopoverTrigger asChild>
+                  <button 
+                    type="button"
+                    className="w-full flex items-center justify-start text-left font-semibold text-xs h-9 px-3 rounded-lg bg-white dark:bg-stone-950 text-stone-900 dark:text-stone-100 border border-amber-900/15 dark:border-zinc-800 hover:bg-amber-50/20 transition-colors"
+                  >
+                    <CalendarDays className="mr-2 h-3.5 w-3.5 text-amber-800 dark:text-amber-500" />
+                    {selectedDate ? format(selectedDate, "PPP") : <span>Pick a date</span>}
+                  </button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0 bg-white dark:bg-stone-950 border border-amber-900/15 dark:border-zinc-800" align="start">
+                  <Calendar
+                    mode="single"
+                    selected={selectedDate}
+                    onSelect={(date) => {
+                      setSelectedDate(date);
+                      setIsCalendarOpen(false);
+                    }}
+                    modifiers={{ hasHomework: homeworkDays }}
+                    modifiersClassNames={{
+                      hasHomework: "relative after:absolute after:bottom-1.5 after:left-1/2 after:-translate-x-1/2 after:size-1.5 after:bg-amber-700 dark:after:bg-amber-500 after:rounded-full font-bold text-amber-900 dark:text-amber-400"
+                    }}
+                    initialFocus
+                  />
+                </PopoverContent>
+              </Popover>
+            </div>
+
+            {/* Desktop Calendar (Hidden on Mobile) */}
+            <div className="hidden md:flex justify-center bg-white/70 dark:bg-stone-900/40 rounded-xl p-2 border border-amber-900/10 dark:border-[#2f271f] shadow-inner">
               <Calendar
                 mode="single"
                 selected={selectedDate}
@@ -86,18 +127,37 @@ export function DailyDiaryPlanner({
                 }}
               />
             </div>
+
+            {/* Jump to Today button */}
+            <button
+              onClick={() => setSelectedDate(new Date())}
+              className="w-full flex items-center justify-center gap-1.5 text-[11px] font-bold text-amber-700 dark:text-amber-400 hover:text-amber-900 dark:hover:text-amber-300 bg-amber-50/60 dark:bg-stone-800/50 hover:bg-amber-100/80 dark:hover:bg-stone-800/80 border border-amber-900/10 dark:border-[#2f271f] rounded-lg py-2 transition-all duration-200 group/today"
+            >
+              <Sparkles className="size-3 transition-transform group-hover/today:rotate-12" />
+              Jump to Today
+            </button>
+
+            {/* Quick Stats Strip */}
+            {totalEntries > 0 && (
+              <div className="grid grid-cols-2 gap-2">
+                <div className="bg-amber-50/60 dark:bg-stone-800/40 border border-amber-900/10 dark:border-[#2f271f] rounded-lg p-2.5 text-center">
+                  <p className="text-lg font-extrabold text-amber-900 dark:text-amber-400 leading-none">{totalEntries}</p>
+                  <p className="text-[9px] font-bold text-amber-700 dark:text-amber-500 uppercase tracking-wider mt-1">Total Tasks</p>
+                </div>
+                <div className="bg-emerald-50/60 dark:bg-emerald-950/20 border border-emerald-900/10 dark:border-emerald-900/20 rounded-lg p-2.5 text-center">
+                  <p className="text-lg font-extrabold text-emerald-800 dark:text-emerald-400 leading-none">{completedCount}</p>
+                  <p className="text-[9px] font-bold text-emerald-700 dark:text-emerald-500 uppercase tracking-wider mt-1">Completed</p>
+                </div>
+              </div>
+            )}
           </div>
         </div>
 
-        {/* BRASS/GOLD SPIRAL BINDER RINGS (Only visible on desktop, positioned at 1/3 divide) */}
-        <div className="absolute left-[33.33%] top-0 bottom-0 w-8 -translate-x-1/2 flex flex-col justify-around items-center py-6 z-30 pointer-events-none hidden lg:flex">
+        {/* BRASS/GOLD SPIRAL BINDER RINGS */}
+        <div className="absolute left-[33.33%] top-0 bottom-0 w-8 -translate-x-1/2 hidden lg:flex flex-col justify-around items-center py-6 z-30 pointer-events-none">
           {[...Array(12)].map((_, i) => (
             <div key={i} className="relative w-full h-8 flex items-center justify-center">
-              {/* Ring drop shadow on the paper */}
-              <div 
-                className="absolute w-9 h-4 bg-stone-950/25 dark:bg-black/60 rounded-full blur-[1px] translate-y-[3px] -rotate-[12deg]" 
-              />
-              {/* Gold ring loop curved from left page to right page */}
+              <div className="absolute w-9 h-4 bg-stone-950/25 dark:bg-black/60 rounded-full blur-[1px] translate-y-[3px] -rotate-[12deg]" />
               <div 
                 className="absolute w-9 h-4 border-[2.5px] border-amber-600/90 dark:border-amber-500/80 bg-gradient-to-b from-amber-100 via-amber-300 to-amber-700 dark:from-amber-200 dark:via-amber-400 dark:to-amber-800 rounded-full" 
                 style={{ transform: 'rotate(-12deg)' }} 
@@ -107,59 +167,101 @@ export function DailyDiaryPlanner({
         </div>
 
         {/* RIGHT PAGE: Diary Entries (Lined Ivory Paper) */}
-        <div className="p-4 md:p-6 lg:col-span-8 relative bg-[#FCFAF6] dark:bg-[#171614] border-t lg:border-t-0 border-amber-900/10 dark:border-[#2f271f] min-h-[400px] lg:min-h-[580px] shadow-[inset_20px_0_25px_-10px_rgba(0,0,0,0.15)]">
+        <div className="lg:col-span-8 relative lg:bg-[#FCFAF6] lg:dark:bg-[#171614] lg:min-h-[580px] lg:shadow-[inset_20px_0_25px_-10px_rgba(0,0,0,0.12)] lg:bg-card lg:border lg:border-zinc-200 lg:dark:border-zinc-850 lg:rounded-xl lg:p-6 px-4 py-3 sm:p-5">
           
-          {/* Subtle notebook lines background (adjusted for dark mode visibility) */}
-          <div className="absolute inset-0 bg-linear-gradient-[#dedad0] dark:bg-linear-gradient-[#38332a] opacity-25 dark:opacity-35 pointer-events-none" style={{ backgroundImage: 'linear-gradient(transparent, transparent 31px, currentColor 31px, currentColor 32px)', backgroundSize: '100% 32px' }} />
+          {/* Subtle notebook lines background */}
+          <div className="hidden lg:block absolute inset-0 bg-linear-gradient-[#dedad0] dark:bg-linear-gradient-[#38332a] opacity-25 dark:opacity-35 pointer-events-none" style={{ backgroundImage: 'linear-gradient(transparent, transparent 31px, currentColor 31px, currentColor 32px)', backgroundSize: '100% 32px' }} />
 
-          {/* Page binder holes on left side of right page */}
-          <div className="absolute left-0.5 top-0 bottom-0 w-4 flex flex-col justify-around items-center py-8 pointer-events-none hidden lg:flex">
+          {/* Page binder holes */}
+          <div className="absolute left-0.5 top-0 bottom-0 w-4 hidden lg:flex flex-col justify-around items-center py-8 pointer-events-none">
             {[...Array(12)].map((_, i) => (
               <div key={i} className="size-2 rounded-full bg-stone-950 shadow-[inset_1px_1px_2px_rgba(0,0,0,0.8)] border border-stone-800/20" />
             ))}
           </div>
 
-          {/* Lined Notebook Red Margin Line */}
-          <div className="absolute left-6 md:left-10 top-0 bottom-0 w-[1.5px] bg-red-500/40 dark:bg-red-800/40" />
+          {/* Red Margin Line */}
+          <div className="hidden lg:block absolute left-6 md:left-10 top-0 bottom-0 w-[1.5px] bg-red-500/40 dark:bg-red-800/40" />
 
-          <div className="pl-6 md:pl-12 relative z-10">
-            {/* Header: Exactly h-16 (64px, 2 background lines of 32px) */}
-            <div className="h-16 border-b border-amber-900/10 dark:border-[#2f271f] flex items-center justify-between gap-4 pb-0 mb-0">
-              <div className="text-left flex flex-col justify-center h-full">
-                <h3 className="text-base font-bold tracking-tight text-amber-950 dark:text-stone-100 leading-none">
+          <div className="lg:pl-12 relative z-10">
+            {/* Date Header */}
+            <div className="h-14 sm:h-16 border-b border-amber-900/10 dark:border-[#2f271f] flex items-center justify-between gap-2 mb-0">
+              <div className="text-left flex flex-col justify-center h-full min-w-0">
+                <h3 className="text-sm sm:text-base font-bold tracking-tight text-amber-950 dark:text-stone-100 leading-none truncate">
                   {selectedDate?.toLocaleDateString(undefined, { weekday: 'long' })}
                 </h3>
-                <p className="text-[10px] text-amber-800 dark:text-amber-500 font-bold uppercase tracking-wider mt-1 leading-none">
+                <p className="text-[9px] sm:text-[10px] text-amber-800 dark:text-amber-500 font-bold uppercase tracking-wider mt-1.5 leading-none">
                   {selectedDate?.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}
                 </p>
               </div>
-              <div className="flex items-center gap-1.5 bg-amber-100/40 dark:bg-stone-900/80 px-2.5 py-1 rounded-lg border border-amber-900/15 dark:border-[#2f271f] shadow-xs">
-                <CalendarDays className="size-3.5 text-amber-800 dark:text-amber-500" />
-                <span className="text-[11px] font-bold text-amber-900 dark:text-amber-400">
-                  {selectedDateAssignments.length + dueSelectedDateAssignments.length} Entries
+
+              {/* Mobile Date Picker Popover */}
+              <div className="block lg:hidden shrink-0">
+                <Popover open={isCalendarOpen} onOpenChange={setIsCalendarOpen}>
+                  <PopoverTrigger asChild>
+                    <button 
+                      type="button"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        setIsCalendarOpen((prev) => !prev);
+                      }}
+                      className="h-8 text-[10px] sm:text-[11px] font-bold px-2.5 bg-amber-50/60 dark:bg-stone-800/80 border border-amber-900/15 dark:border-zinc-800 text-amber-950 dark:text-stone-100 hover:bg-amber-100/50 rounded-lg flex items-center justify-center transition-colors"
+                    >
+                      <CalendarDays className="size-3.5 mr-1 text-amber-850 dark:text-amber-500" />
+                      Date
+                    </button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0 bg-white dark:bg-stone-950 border border-amber-900/15 dark:border-zinc-800" align="end">
+                    <Calendar
+                      mode="single"
+                      selected={selectedDate}
+                      onSelect={(date) => {
+                        setSelectedDate(date);
+                        setIsCalendarOpen(false);
+                      }}
+                      modifiers={{ hasHomework: homeworkDays }}
+                      modifiersClassNames={{
+                        hasHomework: "relative after:absolute after:bottom-1.5 after:left-1/2 after:-translate-x-1/2 after:size-1.5 after:bg-amber-700 dark:after:bg-amber-500 after:rounded-full font-bold text-amber-900 dark:text-amber-400"
+                      }}
+                      initialFocus
+                    />
+                  </PopoverContent>
+                </Popover>
+              </div>
+
+              <div className="flex items-center gap-1.5 bg-amber-100/40 dark:bg-stone-900/80 px-2 sm:px-3 py-1.5 rounded-lg border border-amber-900/15 dark:border-[#2f271f] shrink-0">
+                <CalendarDays className="size-3.5 text-amber-800 dark:text-amber-500 hidden sm:inline" />
+                <span className="text-[10px] sm:text-[11px] font-bold text-amber-900 dark:text-amber-400">
+                  {totalEntries} {totalEntries === 1 ? 'Entry' : 'Entries'}
                 </span>
               </div>
             </div>
 
-            <ScrollArea className="max-h-[512px] pr-2">
-              {selectedDateAssignments.length === 0 && dueSelectedDateAssignments.length === 0 ? (
-                <div className="text-center py-20 text-stone-400 dark:text-stone-500 border border-dashed border-amber-900/15 dark:border-[#2f271f] rounded-xl bg-amber-50/10 dark:bg-stone-900/5">
-                  <CalendarDays className="size-10 mx-auto mb-3 opacity-30 text-amber-700 dark:text-amber-500" />
-                  <p className="text-sm font-bold text-stone-800 dark:text-stone-200">Empty Diary Entry</p>
-                  <p className="text-xs text-stone-500 dark:text-stone-400 mt-1.5 px-6 leading-relaxed">
+            <ScrollArea className="max-h-[480px] pr-2 mt-1">
+              {totalEntries === 0 ? (
+                <div className="text-center py-16 border border-dashed border-amber-900/15 dark:border-[#2f271f] rounded-xl bg-amber-50/20 dark:bg-stone-900/5">
+                  <div className="inline-flex items-center justify-center size-14 rounded-full bg-amber-100/50 dark:bg-stone-800/50 mb-3">
+                    <CalendarDays className="size-7 text-amber-600/60 dark:text-amber-500/50" />
+                  </div>
+                  <p className="text-sm font-bold text-stone-700 dark:text-stone-200">Empty Diary Page</p>
+                  <p className="text-xs text-stone-500 dark:text-stone-400 mt-1.5 px-8 leading-relaxed max-w-[280px] mx-auto">
                     {emptyMessage}
                   </p>
                 </div>
               ) : (
-                <div className="flex flex-col pt-0">
+                <div className="flex flex-col pt-1 gap-1">
                   {selectedDateAssignments.length > 0 && (
-                    <div className="text-left flex flex-col">
-                      {/* Section Header: Exactly h-8 (32px, 1 line) with items-end pb-1.5 to align text baseline with the ruled line */}
-                      <h4 className="h-8 flex items-end pb-1.5 text-[10px] font-extrabold uppercase tracking-widest text-amber-900 dark:text-amber-500 gap-1.5">
-                        <span className="size-1.5 rounded-full bg-amber-700 mb-1" />
-                        Assigned Today
-                      </h4>
-                      <div className="flex flex-col">
+                    <div className="flex flex-col">
+                      <div className="flex items-center gap-2 py-2">
+                        <div className="size-1.5 rounded-full bg-amber-600 dark:bg-amber-500" />
+                        <h4 className="text-[10px] font-extrabold uppercase tracking-widest text-amber-900 dark:text-amber-500">
+                          Assigned Today
+                        </h4>
+                        <span className="text-[9px] font-bold text-amber-600 dark:text-amber-400 bg-amber-100/50 dark:bg-amber-950/40 px-1.5 py-0.5 rounded-full">
+                          {selectedDateAssignments.length}
+                        </span>
+                      </div>
+                      <div className="flex flex-col gap-0.5">
                         {selectedDateAssignments.map((a) => (
                           <DiaryTaskCard
                             key={a.id}
@@ -176,18 +278,25 @@ export function DailyDiaryPlanner({
                   )}
 
                   {selectedDateAssignments.length > 0 && dueSelectedDateAssignments.length > 0 && (
-                    /* Spacer Line: Exactly h-8 (32px, 1 blank ruled line) */
-                    <div className="h-8" />
+                    <div className="flex items-center gap-3 py-2">
+                      <div className="h-px flex-1 bg-amber-900/10 dark:bg-[#2f271f]" />
+                      <span className="text-[8px] font-bold text-stone-400 dark:text-stone-600 uppercase tracking-widest">~ ~ ~</span>
+                      <div className="h-px flex-1 bg-amber-900/10 dark:bg-[#2f271f]" />
+                    </div>
                   )}
 
                   {dueSelectedDateAssignments.length > 0 && (
-                    <div className="text-left flex flex-col">
-                      {/* Section Header: Exactly h-8 (32px, 1 line) */}
-                      <h4 className="h-8 flex items-end pb-1.5 text-[10px] font-extrabold uppercase tracking-widest text-rose-900 dark:text-rose-400 gap-1.5">
-                        <span className="size-1.5 rounded-full bg-rose-600 mb-1" />
-                        Due Today
-                      </h4>
-                      <div className="flex flex-col">
+                    <div className="flex flex-col">
+                      <div className="flex items-center gap-2 py-2">
+                        <div className="size-1.5 rounded-full bg-rose-500" />
+                        <h4 className="text-[10px] font-extrabold uppercase tracking-widest text-rose-900 dark:text-rose-400">
+                          Due Today
+                        </h4>
+                        <span className="text-[9px] font-bold text-rose-600 dark:text-rose-400 bg-rose-100/50 dark:bg-rose-950/40 px-1.5 py-0.5 rounded-full">
+                          {dueSelectedDateAssignments.length}
+                        </span>
+                      </div>
+                      <div className="flex flex-col gap-0.5">
                         {dueSelectedDateAssignments.map((a) => (
                           <DiaryTaskCard
                             key={a.id}
@@ -207,7 +316,6 @@ export function DailyDiaryPlanner({
             </ScrollArea>
           </div>
         </div>
-
       </div>
     </div>
   );
@@ -223,108 +331,115 @@ interface DiaryTaskCardProps {
   submittingId?: string | null;
 }
 
-function DiaryTaskCard({
-  a,
-  getStatusBadge,
-  getProgressValue,
-  getProgressColor,
-  onSubmit,
-  submittingId = null,
-}: DiaryTaskCardProps) {
-  const isOverdue = a.status === "overdue";
-  const borderClr = isOverdue ? "border-l-rose-500" :
-                    a.status === "graded" ? "border-l-amber-600" :
-                    a.status === "submitted" ? "border-l-emerald-500" : "border-l-amber-500";
+const statusConfig = {
+  graded:    { accent: "bg-amber-500",   ring: "ring-amber-200 dark:ring-amber-900/40",  badgeBg: "bg-emerald-100 dark:bg-emerald-950/60", badgeText: "text-emerald-800 dark:text-emerald-300", label: "Graded" },
+  submitted: { accent: "bg-emerald-500", ring: "ring-emerald-200 dark:ring-emerald-900/40", badgeBg: "bg-blue-100 dark:bg-blue-950/60",     badgeText: "text-blue-800 dark:text-blue-300",     label: "Submitted" },
+  active:    { accent: "bg-amber-400",   ring: "ring-amber-200 dark:ring-amber-900/40",  badgeBg: "bg-amber-100 dark:bg-amber-950/60",   badgeText: "text-amber-800 dark:text-amber-300",   label: "Pending" },
+  overdue:   { accent: "bg-rose-500",    ring: "ring-rose-200 dark:ring-rose-900/40",    badgeBg: "bg-rose-100 dark:bg-rose-950/60",     badgeText: "text-rose-800 dark:text-rose-300",     label: "Overdue" },
+} as const;
 
-  // Cozy progress bar color themes to match warm leather and brass/gold binder styling
-  const getCozyProgressColor = (status: AssignmentStatus) => {
-    switch (status) {
-      case "graded": return "bg-amber-600 dark:bg-amber-500";
-      case "submitted": return "bg-emerald-600 dark:bg-emerald-500";
-      case "active": return "bg-amber-500/70 dark:bg-amber-500/60";
-      case "overdue": return "bg-rose-600 dark:bg-rose-500";
-      default: return "";
-    }
-  };
-
-  // Cozy status badge to look like a handwritten/highlighted stamp on paper (enhanced contrast for dark/light)
-  const getCozyStatusBadge = (status: AssignmentStatus) => {
-    switch (status) {
-      case "graded":
-        return (
-          <Badge className="bg-emerald-100 hover:bg-emerald-100 text-emerald-900 dark:bg-emerald-950/60 dark:text-emerald-300 border-0 text-[10px] shadow-none rounded-sm px-2 font-extrabold uppercase tracking-wider">
-            Graded
-          </Badge>
-        );
-      case "submitted":
-        return (
-          <Badge className="bg-blue-100 hover:bg-blue-100 text-blue-900 dark:bg-blue-950/60 dark:text-blue-300 border-0 text-[10px] shadow-none rounded-sm px-2 font-extrabold uppercase tracking-wider">
-            Submitted
-          </Badge>
-        );
-      case "active":
-        return (
-          <Badge className="bg-amber-100 hover:bg-amber-100 text-amber-900 dark:bg-amber-950/60 dark:text-amber-300 border-0 text-[10px] shadow-none rounded-sm px-2 font-extrabold uppercase tracking-wider">
-            Pending
-          </Badge>
-        );
-      case "overdue":
-        return (
-          <Badge className="bg-rose-100 hover:bg-rose-100 text-rose-900 dark:bg-rose-950/60 dark:text-rose-300 border-0 text-[10px] shadow-none rounded-sm px-2 font-extrabold uppercase tracking-wider">
-            Overdue
-          </Badge>
-        );
-      default:
-        return null;
-    }
-  };
+function DiaryTaskCard({ a, onSubmit, submittingId = null }: DiaryTaskCardProps) {
+  const cfg = statusConfig[a.status];
+  const isDone = a.status === "submitted" || a.status === "graded";
+  const progressPercent = a.status === "graded" ? 100 : a.status === "submitted" ? 100 : a.status === "overdue" ? 80 : 30;
 
   return (
-    <div className="relative bg-transparent text-left border-b border-dashed border-amber-900/15 dark:border-amber-950/20 overflow-visible group">
-      {/* Row 1: Title, Subject and Status Badge (Exactly h-8/32px) */}
-      <div className="h-8 flex items-end justify-between gap-3 pb-1">
-        <h5 className="font-extrabold text-sm text-stone-950 dark:text-stone-50 tracking-wide flex items-center gap-2 leading-none">
-          <span className="text-amber-800 dark:text-amber-400 leading-none">•</span>
-          {a.title}
-        </h5>
-        <div className="flex items-center gap-2 h-full pt-1.5">
-          <span className="font-extrabold text-[10px] text-amber-900 dark:text-amber-400 bg-amber-100 hover:bg-amber-100 dark:bg-amber-950/60 border border-amber-200/50 dark:border-amber-900/30 px-1.5 py-0.5 rounded-sm uppercase tracking-wider leading-none">
-            {a.subjectName}
-          </span>
-          {getCozyStatusBadge(a.status)}
-        </div>
-      </div>
+    <div className={`
+      group relative rounded-lg bg-white/50 dark:bg-stone-900/30 border border-amber-900/8 dark:border-[#2f271f]
+      hover:bg-white/90 dark:hover:bg-stone-900/60 hover:shadow-md hover:border-amber-900/15 dark:hover:border-amber-700/30
+      transition-all duration-200 ease-out overflow-hidden
+    `}>
+      {/* Left accent bar */}
+      <div className={`absolute left-0 top-0 bottom-0 w-[3px] ${cfg.accent} rounded-l-lg`} />
 
-      {/* Row 2: Description (Exactly h-8/32px if present, enhanced text contrast) */}
-      {a.description && (
-        <div className="h-8 flex items-end pb-1 pl-3 border-l-2 border-amber-600/50 dark:border-amber-500/40">
-          <p className="text-[12px] text-stone-900 dark:text-stone-100 font-semibold leading-none truncate w-full">
+      <div className="pl-3.5 pr-3 py-2.5">
+        {/* Row 1: Title + Badges */}
+        <div className="flex items-start justify-between gap-2">
+          <h5 className="font-bold text-[13px] text-stone-900 dark:text-stone-50 leading-snug flex items-center gap-2 min-w-0">
+            <span className={`mt-1 size-1.5 rounded-full shrink-0 ${cfg.accent}`} />
+            <span className="truncate">{a.title}</span>
+          </h5>
+          <div className="flex items-center gap-1.5 shrink-0">
+            <span className="font-bold text-[9px] text-amber-800 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/50 border border-amber-200/60 dark:border-amber-900/30 px-1.5 py-0.5 rounded uppercase tracking-wider leading-none whitespace-nowrap">
+              {a.subjectName}
+            </span>
+            <Badge className={`${cfg.badgeBg} hover:${cfg.badgeBg} ${cfg.badgeText} border-0 text-[9px] shadow-none rounded px-1.5 py-0.5 font-extrabold uppercase tracking-wider leading-none`}>
+              {cfg.label}
+            </Badge>
+          </div>
+        </div>
+
+        {/* Row 2: Description */}
+        {a.description && (
+          <p className="text-[11px] text-stone-600 dark:text-stone-400 font-medium mt-1 pl-3.5 line-clamp-2 leading-relaxed">
             {a.description}
           </p>
-        </div>
-      )}
+        )}
 
-      {/* Row 3: Submit Button (Exactly h-8/32px, conditional row) */}
-      {onSubmit && a.status !== "submitted" && a.status !== "graded" && (
-        <div className="h-8 flex items-end justify-end pb-1.5">
-          <Button
-            onClick={() => onSubmit(a)}
-            disabled={submittingId === a.id}
-            className={`h-5 text-[9px] px-2.5 flex items-center gap-1 rounded-sm transition-all shadow-none border border-amber-700/20 leading-none ${
-              a.status === "overdue"
-                ? "bg-rose-600/90 hover:bg-rose-700 text-white"
-                : "bg-amber-700/90 hover:bg-amber-800 text-white dark:bg-amber-600/80 dark:hover:bg-amber-600"
-            }`}
-          >
-            {submittingId === a.id ? (
-              <Loader2 className="size-2 animate-spin" />
-            ) : (
-              <Send className="size-2" />
+        {/* Row 3: Countdown + Grade/Feedback + Submit */}
+        <div className="flex items-center justify-between gap-2 mt-2">
+          <div className="flex items-center gap-3 min-w-0">
+            {/* Countdown chip */}
+            {a.countdown && !isDone && (
+              <div className="flex items-center gap-1 text-[10px] font-semibold text-stone-500 dark:text-stone-400">
+                <Clock className="size-3 shrink-0" />
+                <span className="truncate">{a.countdown}</span>
+              </div>
             )}
-            Submit
-          </Button>
+            {/* Grade chip */}
+            {a.grade && (
+              <div className="flex items-center gap-1 text-[10px] font-bold text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/40 px-1.5 py-0.5 rounded">
+                <Star className="size-2.5 shrink-0" />
+                {a.grade}
+              </div>
+            )}
+            {/* Submitted check */}
+            {a.status === "submitted" && !a.grade && (
+              <div className="flex items-center gap-1 text-[10px] font-semibold text-blue-600 dark:text-blue-400">
+                <CheckCircle2 className="size-3 shrink-0" />
+                Awaiting review
+              </div>
+            )}
+          </div>
+
+          {/* Submit Button */}
+          {onSubmit && !isDone && (
+            <Button
+              onClick={() => onSubmit(a)}
+              disabled={submittingId === a.id}
+              className={`
+                h-6 text-[10px] font-bold px-3 flex items-center gap-1.5 rounded-md transition-all duration-200 shadow-sm border
+                ${a.status === "overdue"
+                  ? "bg-rose-600 hover:bg-rose-700 text-white border-rose-700"
+                  : "bg-amber-700 hover:bg-amber-800 text-white border-amber-800 dark:bg-amber-600 dark:hover:bg-amber-700 dark:border-amber-700"
+                }
+              `}
+            >
+              {submittingId === a.id ? (
+                <Loader2 className="size-3 animate-spin" />
+              ) : (
+                <Send className="size-2.5" />
+              )}
+              {a.status === "overdue" ? "Submit Late" : "Submit"}
+            </Button>
+          )}
         </div>
-      )}
+
+        {/* Feedback */}
+        {a.feedback && (
+          <div className="mt-2 text-[10px] text-stone-600 dark:text-stone-400 italic bg-stone-100/60 dark:bg-stone-800/30 rounded px-2 py-1.5 border-l-2 border-amber-500/50 dark:border-amber-500/30">
+            "{a.feedback}"
+          </div>
+        )}
+
+        {/* Progress bar at bottom */}
+        <div className="mt-2 h-[2px] bg-amber-900/5 dark:bg-[#2f271f] rounded-full overflow-hidden">
+          <div
+            className={`h-full rounded-full transition-all duration-500 ease-out ${cfg.accent}`}
+            style={{ width: `${progressPercent}%` }}
+          />
+        </div>
+      </div>
     </div>
   );
 }

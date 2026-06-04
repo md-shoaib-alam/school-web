@@ -265,11 +265,11 @@ export function StudentMarksheet() {
     const subjectsData = marksheet.rows.map(row => {
       return {
         subjectName: row.subjectName,
-        midtermMarks: row.midM !== null ? `${row.midM}/${row.midMax}` : '-',
-        finalMarks: row.finM !== null ? `${row.finM}/${row.finMax}` : '-',
-        obtained: row.subMax > 0 ? `${row.subObt}/${row.subMax}` : '-',
+        midtermMarks: row.midM !== null ? `${Number(row.midM.toFixed(2))}/${row.midMax}` : '-',
+        finalMarks: row.finM !== null ? `${Number(row.finM.toFixed(2))}/${row.finMax}` : '-',
+        obtained: row.subMax > 0 ? `${Number(row.subObt.toFixed(2))}/${row.subMax}` : '-',
         maxMarks: row.subMax,
-        obtainedMarks: row.subObt,
+        obtainedMarks: Number(row.subObt.toFixed(2)),
         passingMarks: row.subPassing,
         percentage: row.pct,
         status: row.status
@@ -282,7 +282,7 @@ export function StudentMarksheet() {
       schoolName: studentInfo.schoolName || 'SCHOOL ERP ACADEMY',
       subjects: subjectsData,
       totalMaxMarks: marksheet.totalMax,
-      totalObtainedMarks: marksheet.totalObtained,
+      totalObtainedMarks: Number(marksheet.totalObtained.toFixed(2)),
       overallPercentage: marksheet.overallPct,
       grade: marksheet.gradeInfo.grade,
       remarks: remarks,

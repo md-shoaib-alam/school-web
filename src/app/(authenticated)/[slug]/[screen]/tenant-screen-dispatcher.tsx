@@ -48,7 +48,7 @@ const TeacherSubjects = dynamic(() => import('@/components/screens/teacher/my-su
 const TeacherAttendance = dynamic(() => import('@/components/screens/teacher/take-attendance').then(m => m.TeacherAttendance), { loading: LoadingScreen });
 const TeacherGrades = dynamic(() => import('@/components/screens/teacher/grade-management').then(m => m.TeacherGrades), { loading: LoadingScreen });
 const TeacherExamsEntry = dynamic(() => import('@/components/screens/teacher/exams-entry').then(m => m.TeacherExamsEntry), { loading: LoadingScreen });
-const TeacherAssignments = dynamic(() => import('@/components/screens/teacher/assignments').then(m => m.TeacherAssignments), { loading: LoadingScreen });
+const TeacherAssignments = dynamic(() => import('@/components/screens/teacher/homework').then(m => m.TeacherAssignments), { loading: LoadingScreen });
 const TeacherTimetable = dynamic(() => import('@/components/screens/teacher/timetable').then(m => m.TeacherTimetable), { loading: LoadingScreen });
 const TeacherCalendar = dynamic(() => import('@/components/screens/teacher/calendar').then(m => m.TeacherCalendar), { loading: LoadingScreen });
 const TeacherNotices = dynamic(() => import('@/components/screens/teacher/notices').then(m => m.TeacherNotices), { loading: LoadingScreen });
@@ -58,7 +58,7 @@ const TeacherTickets = dynamic(() => import('@/components/screens/teacher/ticket
 const StudentClasses = dynamic(() => import('@/components/screens/student/my-classes').then(m => m.StudentClasses), { loading: LoadingScreen });
 const StudentGrades = dynamic(() => import('@/components/screens/student/my-grades').then(m => m.StudentGrades), { loading: LoadingScreen });
 const StudentAttendance = dynamic(() => import('@/components/screens/student/my-attendance').then(m => m.StudentAttendance), { loading: LoadingScreen });
-const StudentAssignments = dynamic(() => import('@/components/screens/student/assignments').then(m => m.StudentAssignments), { loading: LoadingScreen });
+const StudentAssignments = dynamic(() => import('@/components/screens/student/homework').then(m => m.StudentAssignments), { loading: LoadingScreen });
 const StudentTimetable = dynamic(() => import('@/components/screens/student/timetable').then(m => m.StudentTimetable), { loading: LoadingScreen });
 const StudentCalendar = dynamic(() => import('@/components/screens/student/calendar').then(m => m.StudentCalendar), { loading: LoadingScreen });
 const StudentNotices = dynamic(() => import('@/components/screens/student/notices').then(m => m.StudentNotices), { loading: LoadingScreen });

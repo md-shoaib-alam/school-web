@@ -53,7 +53,10 @@ function getUpcomingCount(academicYears: any[]): number {
 }
 
 function formatSessionDate(dateStr: string): string {
-  return format(new Date(dateStr), "MMM dd, yyyy");
+  if (!dateStr) return "N/A";
+  const parsed = new Date(dateStr);
+  if (isNaN(parsed.getTime())) return "N/A";
+  return format(parsed, "MMM dd, yyyy");
 }
 
 export function AcademicYearsScreen() {
@@ -104,6 +107,10 @@ export function AcademicYearsScreen() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!formData.startDate || !formData.endDate) {
+      toast.error("Start Date and End Date are required");
+      return;
+    }
     try {
       if (editingYear) {
         await updateAcademicYear({ id: editingYear.id, input: formData });
