@@ -13,23 +13,65 @@ import { Input } from '@/components/ui/input';
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from '@/components/ui/select';
-import { UserCheck, Search, ChevronRight, DollarSign, CheckCircle2 } from 'lucide-react';
-import { useQuery } from '@tanstack/react-query';
+import { UserCheck, Search, ChevronRight, DollarSign, CheckCircle2, Loader2 } from 'lucide-react';
+import { useQuery, useInfiniteQuery } from '@tanstack/react-query';
 import { apiFetch } from '@/lib/api';
 import { useFeeConcessions, useFeeReceipts } from '@/hooks/use-fees';
 import { feeStatusConfig, receiptStatusConfig, paymentMethodIcons } from './config';
 import type { StudentOption, ClassOption, FeeItem, FeeReceipt, FeeConcession } from './types';
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { useEffect, useRef, useCallback } from 'react';
+import { useDebounce } from '@/hooks/use-debounce';
 
 export function FeeStatusTab() {
-  const { data: students = [] } = useQuery<StudentOption[]>({
-    queryKey: ['students'],
-    queryFn: async () => {
-      const res = await apiFetch('/api/students');
-      const data = await res.json();
-      return data.map((s: any) => ({ id: s.id, name: s.name, className: s.className, classId: s.classId, rollNumber: s.rollNumber, phone: s.phone || '' }));
-    }
+  const [classFilter, setClassFilter] = useState('');
+  const [studentSearch, setStudentSearch] = useState('');
+  const debouncedSearch = useDebounce(studentSearch, 500);
+  const [selectedStudent, setSelectedStudent] = useState<StudentOption | null>(null);
+
+  const { 
+    data: studentsInfiniteData, 
+    fetchNextPage, 
+    hasNextPage, 
+    isFetchingNextPage, 
+    isLoading: loadingStudents 
+  } = useInfiniteQuery({
+    queryKey: ['students-infinite', classFilter, debouncedSearch],
+    initialPageParam: 1,
+    queryFn: async ({ pageParam = 1 }) => {
+      const queryParams = new URLSearchParams({
+        page: pageParam.toString(),
+        limit: '40',
+        ...(classFilter && { classId: classFilter }),
+        ...(debouncedSearch && { search: debouncedSearch })
+      });
+      const res = await apiFetch(`/api/students?${queryParams.toString()}`);
+      return res.json();
+    },
+    getNextPageParam: (lastPage) => {
+      const currentPage = Number(lastPage.page);
+      const totalPages = Number(lastPage.totalPages);
+      return currentPage < totalPages ? currentPage + 1 : undefined;
+    },
+    enabled: !!classFilter
   });
+
+  const students = useMemo(() => 
+    studentsInfiniteData?.pages.flatMap(page => page.items) || [], 
+    [studentsInfiniteData]
+  );
+
+  const observer = useRef<IntersectionObserver | null>(null);
+  const lastStudentElementRef = useCallback((node: HTMLButtonElement | null) => {
+    if (isFetchingNextPage) return;
+    if (observer.current) observer.current.disconnect();
+    observer.current = new IntersectionObserver(entries => {
+      if (entries[0].isIntersecting && hasNextPage) {
+        fetchNextPage();
+      }
+    });
+    if (node) observer.current.observe(node);
+  }, [isFetchingNextPage, hasNextPage, fetchNextPage]);
 
   const { data: classes = [] } = useQuery<ClassOption[]>({
     queryKey: ['classes'],
@@ -38,10 +80,6 @@ export function FeeStatusTab() {
       return res.json();
     }
   });
-
-  const [classFilter, setClassFilter] = useState('');
-  const [studentSearch, setStudentSearch] = useState('');
-  const [selectedStudent, setSelectedStudent] = useState<StudentOption | null>(null);
 
   const { data: feeData, isLoading: loadingFees } = useQuery<{ items: FeeItem[] }>({
     queryKey: ['fees', selectedStudent?.id],
@@ -67,14 +105,6 @@ export function FeeStatusTab() {
 
   const loading = loadingFees || loadingReceipts || loadingConcessions;
 
-  const filteredStudents = useMemo(() => {
-    if (!classFilter) return [];
-    let result = students.filter(s => s.classId === classFilter);
-    if (!studentSearch) return result.slice(0, 20);
-    const q = studentSearch.toLowerCase();
-    return result.filter(s => s.name.toLowerCase().includes(q) || (s.phone && s.phone.toLowerCase().includes(q)));
-  }, [students, studentSearch, classFilter]);
-
   const handleSelectStudent = (student: StudentOption) => {
     setSelectedStudent(student);
   };
@@ -87,16 +117,16 @@ export function FeeStatusTab() {
   const payPercentage = totalFees > 0 ? Math.round((totalPaid / totalFees) * 100) : 0;
 
   return (
-    <div className="space-y-4 h-[calc(100vh-6rem)] flex flex-col overflow-hidden">
+    <div className="space-y-3 sm:space-y-4 h-[calc(100dvh-2rem)] lg:h-[calc(100vh-6rem)] flex flex-col overflow-hidden">
       {!selectedStudent ? (
         /* Student Search */
         <Card className="hover:shadow-md transition-shadow flex-1 flex flex-col overflow-hidden border-emerald-500/10 dark:border-emerald-500/5">
-          <CardHeader className="shrink-0">
+          <CardHeader className="shrink-0 pb-2 sm:pb-6">
             <CardTitle className="text-base flex items-center gap-2"><UserCheck className="size-5 text-emerald-600" />Check Fee Status</CardTitle>
-            <CardDescription>Search for a student to view their complete fee status</CardDescription>
+            <CardDescription className="text-xs sm:text-sm">Search for a student to view their complete fee status</CardDescription>
           </CardHeader>
-          <CardContent className="space-y-4 flex-1 flex flex-col overflow-hidden pb-6">
-            <div className="flex flex-col sm:flex-row gap-3 shrink-0">
+          <CardContent className="space-y-3 sm:space-y-4 flex-1 flex flex-col overflow-hidden pb-4 sm:pb-6">
+            <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 shrink-0">
               <Select value={classFilter} onValueChange={v => { setClassFilter(v); setStudentSearch(''); }}>
                 <SelectTrigger className="w-full sm:w-48"><SelectValue placeholder="Select Class..." /></SelectTrigger>
                 <SelectContent>
@@ -105,10 +135,10 @@ export function FeeStatusTab() {
               </Select>
               <div className="relative flex-1">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
-                <Input placeholder="Search by name or phone number..." className="pl-9" value={studentSearch} onChange={e => setStudentSearch(e.target.value)} />
+                <Input placeholder="Search by name..." className="pl-9 h-9" value={studentSearch} onChange={e => setStudentSearch(e.target.value)} />
               </div>
             </div>
-            <ScrollArea className="flex-1 h-0 rounded-lg border">
+            <ScrollArea className="flex-1 min-h-0 rounded-lg border">
               <div className="divide-y">
                 {!classFilter ? (
                   <div className="p-12 text-center text-muted-foreground flex flex-col items-center justify-center h-48 select-none">
@@ -116,90 +146,99 @@ export function FeeStatusTab() {
                     <p className="font-semibold text-sm text-foreground">Select a Class</p>
                     <p className="text-xs opacity-70 mt-1 max-w-xs mx-auto">Please choose a class from the dropdown menu to view and filter its students list.</p>
                   </div>
-                ) : filteredStudents.length === 0 ? (
-                  <div className="p-8 text-center text-muted-foreground"><Search className="size-8 mx-auto mb-2 opacity-30" /><p>No students found in this class</p></div>
-                ) : filteredStudents.map(s => (
-                  <button key={s.id} type="button" className="w-full flex items-center gap-3 p-3 hover:bg-emerald-50/50 dark:hover:bg-emerald-900/20 transition-colors text-left" onClick={() => handleSelectStudent(s)}>
-                    <div className="size-10 rounded-full bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 flex items-center justify-center text-sm font-semibold shrink-0">
-                      {s.name.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase()}
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="font-medium text-sm">{s.name}</p>
-                      <p className="text-xs text-muted-foreground">{s.className} • {s.phone || 'No phone'}</p>
-                    </div>
-                    <ChevronRight className="size-4 text-muted-foreground shrink-0" />
-                  </button>
-                ))}
+                ) : (
+                  <>
+                    {students.map((s, index) => (
+                      <button 
+                        key={s.id} 
+                        ref={index === students.length - 1 ? lastStudentElementRef : null}
+                        type="button" 
+                        className="w-full flex items-center gap-3 p-3 hover:bg-emerald-50/50 dark:hover:bg-emerald-900/20 transition-colors text-left" 
+                        onClick={() => handleSelectStudent(s)}
+                      >
+                        <div className="size-10 rounded-full bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 flex items-center justify-center text-sm font-semibold shrink-0">
+                          {s.name.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase()}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="font-medium text-sm">{s.name}</p>
+                          <p className="text-xs text-muted-foreground">{s.className} • {s.phone || 'No phone'}</p>
+                        </div>
+                        <ChevronRight className="size-4 text-muted-foreground shrink-0" />
+                      </button>
+                    ))}
+                    {isFetchingNextPage && (
+                      <div className="p-4 flex items-center justify-center text-muted-foreground gap-2">
+                        <Loader2 className="size-4 animate-spin" />
+                        <span className="text-xs font-medium">Loading more students...</span>
+                      </div>
+                    )}
+                    {!hasNextPage && students.length > 0 && (
+                      <div className="p-4 text-center text-[10px] text-muted-foreground font-medium uppercase tracking-wider opacity-50">
+                        End of student list
+                      </div>
+                    )}
+                  </>
+                )}
               </div>
             </ScrollArea>
           </CardContent>
         </Card>
       ) : (
-        <div className="space-y-4">
-          {/* Student Header */}
-          <Card className="hover:shadow-md transition-shadow">
-            <CardContent className="p-4 flex items-center gap-4">
-              <div className="size-14 rounded-full bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 flex items-center justify-center text-xl font-bold shrink-0">
-                {selectedStudent.name.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase()}
-              </div>
-              <div className="flex-1 min-w-0">
-                <p className="text-lg font-semibold">{selectedStudent.name}</p>
-                <p className="text-sm text-muted-foreground">{selectedStudent.className} • {selectedStudent.phone || 'No phone'}</p>
-              </div>
-              <Button variant="outline" size="sm" onClick={() => { setSelectedStudent(null); }}>Change Student</Button>
-            </CardContent>
-          </Card>
+        <ScrollArea className="flex-1 h-0 -mx-4 px-4">
+          <div className="space-y-4 pb-8">
+            {/* Student Header */}
+            <Card className="hover:shadow-md transition-shadow">
+              <CardContent className="p-4 flex items-center gap-4">
+                <div className="size-14 rounded-full bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 flex items-center justify-center text-xl font-bold shrink-0">
+                  {selectedStudent.name.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase()}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-lg font-semibold">{selectedStudent.name}</p>
+                  <p className="text-sm text-muted-foreground">{selectedStudent.className} • {selectedStudent.phone || 'No phone'}</p>
+                </div>
+                <Button variant="outline" size="sm" onClick={() => { setSelectedStudent(null); }}>Change Student</Button>
+              </CardContent>
+            </Card>
 
-          {loading ? (
-            <div className="grid grid-cols-2 sm:grid-cols-5 gap-4">{[...Array(5)].map((_, i) => <Skeleton key={i} className="h-24 w-full rounded-xl" />)}</div>
-          ) : (
-            <>
-              {/* Summary Cards */}
-              <div className="grid grid-cols-2 sm:grid-cols-5 gap-4">
-                <Card className="hover:shadow-md transition-shadow">
-                  <CardContent className="p-4 text-center">
-                    <p className="text-xs text-muted-foreground">Total Fees</p>
-                    <p className="text-xl font-bold">₹{totalFees.toLocaleString()}</p>
-                  </CardContent>
-                </Card>
-                <Card className="hover:shadow-md transition-shadow">
-                  <CardContent className="p-4 text-center">
-                    <p className="text-xs text-muted-foreground">Paid</p>
-                    <p className="text-xl font-bold text-emerald-600 dark:text-emerald-400">₹{totalPaid.toLocaleString()}</p>
-                  </CardContent>
-                </Card>
-                <Card className="hover:shadow-md transition-shadow">
-                  <CardContent className="p-4 text-center">
-                    <p className="text-xs text-muted-foreground">Pending</p>
-                    <p className="text-xl font-bold text-amber-600 dark:text-amber-400">₹{totalPending.toLocaleString()}</p>
-                  </CardContent>
-                </Card>
-                <Card className="hover:shadow-md transition-shadow">
-                  <CardContent className="p-4 text-center">
-                    <p className="text-xs text-muted-foreground">Overdue</p>
-                    <p className="text-xl font-bold text-red-600 dark:text-red-400">₹{totalOverdue.toLocaleString()}</p>
-                  </CardContent>
-                </Card>
-                <Card className="hover:shadow-md transition-shadow col-span-2 sm:col-span-1">
-                  <CardContent className="p-4 text-center">
-                    <p className="text-xs text-muted-foreground">Concessions</p>
-                    <p className="text-xl font-bold text-violet-600 dark:text-violet-400">₹{totalConcessions.toLocaleString()}</p>
-                  </CardContent>
-                </Card>
-              </div>
+            {loading ? (
+              <div className="grid grid-cols-2 sm:grid-cols-5 gap-4">{[...Array(5)].map((_, i) => <Skeleton key={i} className="h-24 w-full rounded-xl" />)}</div>
+            ) : (
+              <>
+                {/* Summary Cards */}
+                <div className="grid grid-cols-2 sm:grid-cols-5 gap-4">
+                  <Card className="hover:shadow-md transition-shadow">
+                    <CardContent className="p-4 text-center">
+                      <p className="text-xs text-muted-foreground">Total Fees</p>
+                      <p className="text-xl font-bold">₹{totalFees.toLocaleString()}</p>
+                    </CardContent>
+                  </Card>
+                  <Card className="hover:shadow-md transition-shadow">
+                    <CardContent className="p-4 text-center">
+                      <p className="text-xs text-muted-foreground">Paid</p>
+                      <p className="text-xl font-bold text-emerald-600 dark:text-emerald-400">₹{totalPaid.toLocaleString()}</p>
+                    </CardContent>
+                  </Card>
+                  <Card className="hover:shadow-md transition-shadow">
+                    <CardContent className="p-4 text-center">
+                      <p className="text-xs text-muted-foreground">Pending</p>
+                      <p className="text-xl font-bold text-amber-600 dark:text-amber-400">₹{totalPending.toLocaleString()}</p>
+                    </CardContent>
+                  </Card>
+                  <Card className="hover:shadow-md transition-shadow">
+                    <CardContent className="p-4 text-center">
+                      <p className="text-xs text-muted-foreground">Overdue</p>
+                      <p className="text-xl font-bold text-red-600 dark:text-red-400">₹{totalOverdue.toLocaleString()}</p>
+                    </CardContent>
+                  </Card>
+                  <Card className="hover:shadow-md transition-shadow col-span-2 sm:col-span-1">
+                    <CardContent className="p-4 text-center">
+                      <p className="text-xs text-muted-foreground">Concessions</p>
+                      <p className="text-xl font-bold text-violet-600 dark:text-violet-400">₹{totalConcessions.toLocaleString()}</p>
+                    </CardContent>
+                  </Card>
+                </div>
 
-              {/* Progress */}
-              <Card>
-                <CardContent className="p-4 space-y-2">
-                  <div className="flex justify-between text-sm">
-                    <span className="text-muted-foreground">Payment Progress</span>
-                    <span className="font-semibold text-emerald-600 dark:text-emerald-400">{payPercentage}%</span>
-                  </div>
-                  <Progress value={payPercentage} className="h-3" />
-                </CardContent>
-              </Card>
-
-              {/* Fee Breakdown */}
+                {/* Fee Breakdown */}
               <Card>
                 <CardHeader>
                   <CardTitle className="text-base">Fee Breakdown</CardTitle>
@@ -282,7 +321,8 @@ export function FeeStatusTab() {
               )}
             </>
           )}
-        </div>
+          </div>
+        </ScrollArea>
       )}
     </div>
   );

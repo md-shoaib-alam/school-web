@@ -15,6 +15,7 @@ import { PendingFeesChecklist } from './payment/PendingFeesChecklist';
 import { PaymentSummary } from './payment/PaymentSummary';
 import { SuccessDialog } from './payment/SuccessDialog';
 import { AddManualFeeDialog } from './payment/AddManualFeeDialog';
+import { PaymentSummaryCards } from './PaymentSummaryCards';
 
 interface MakePaymentTabProps {
   canCreate: boolean;
@@ -61,6 +62,7 @@ export function MakePaymentTab({ canCreate }: MakePaymentTabProps) {
   const [showSuccess, setShowSuccess] = useState(false);
   const [customPaidAmount, setCustomPaidAmount] = useState<number | null>(null);
   const [manualPayOpen, setManualPayOpen] = useState(false);
+  const [successAmount, setSuccessAmount] = useState(0);
 
   const filteredStudents = useMemo(() => {
     if (!classFilter) return [];
@@ -175,6 +177,7 @@ export function MakePaymentTab({ canCreate }: MakePaymentTabProps) {
       });
       
       setReceiptNumber(data.receiptNumber);
+      setSuccessAmount(finalPaidAmount);
       setShowSuccess(true);
       setCustomPaidAmount(null);
       
@@ -200,12 +203,13 @@ export function MakePaymentTab({ canCreate }: MakePaymentTabProps) {
   }
 
   return (
-    <div className="space-y-4 h-[calc(100vh-6rem)] flex flex-col overflow-hidden">
+    <div className="space-y-6">
+      <PaymentSummaryCards />
       <SuccessDialog 
         open={showSuccess}
         onOpenChange={setShowSuccess}
         receiptNumber={receiptNumber}
-        amount={customPaidAmount !== null ? customPaidAmount : calculation.payable}
+        amount={successAmount}
       />
 
       {!selectedStudent ? (

@@ -107,12 +107,36 @@ export function StudentGrades({ initialTab }: { initialTab?: "exams" | "assessme
       let fetchedAssessments: AssessmentGrade[] = [];
 
       if (targetStudent?.id) {
-        const [gradesData, assessData] = await Promise.all([
+        const [gradesData, assessData, classAssessData] = await Promise.all([
           apiFetch(`/api/grades?studentId=${targetStudent.id}`).then((res) => res.json()),
-          apiFetch(`/api/assessments/student-grades?studentId=${targetStudent.id}`).then((res) => res.json())
+          apiFetch(`/api/assessments/student-grades?studentId=${targetStudent.id}`).then((res) => res.json()),
+          apiFetch(`/api/assessments?classId=${targetStudent.classId}`).then((res) => res.json())
         ]);
         fetchedGrades = Array.isArray(gradesData) ? gradesData : [];
-        fetchedAssessments = Array.isArray(assessData) ? assessData : [];
+        const gradedList = Array.isArray(assessData) ? assessData : [];
+        const classAssessments = Array.isArray(classAssessData) ? classAssessData : [];
+
+        const gradedMap = new Map(gradedList.map((g) => [g.assessmentId, g]));
+        const combinedAssessments: AssessmentGrade[] = [...gradedList];
+
+        classAssessments.forEach((a: any) => {
+          if (!gradedMap.has(a.id)) {
+            combinedAssessments.push({
+              id: `pending_${a.id}`,
+              assessmentId: a.id,
+              title: a.title,
+              type: a.type,
+              subjectName: a.subject?.name || "N/A",
+              marksObtained: null as any,
+              totalMarks: a.totalMarks,
+              passingMarks: a.passingMarks,
+              remarks: "",
+              createdAt: a.createdAt,
+            });
+          }
+        });
+
+        fetchedAssessments = combinedAssessments;
       }
       
       dispatch({ 

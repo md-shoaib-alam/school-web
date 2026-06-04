@@ -10,6 +10,10 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Progress } from "@/components/ui/progress";
+import { Calendar } from "@/components/ui/calendar";
+import { Button } from "@/components/ui/button";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { format } from "date-fns";
 import {
   FileText,
   Clock,
@@ -20,8 +24,12 @@ import {
   BookOpen,
   BookMarked,
   Users,
+  List,
+  CalendarDays,
+  Calendar as CalendarIcon,
 } from "lucide-react";
 import type { StudentInfo, AssignmentInfo } from "@/lib/types";
+import { DailyDiaryPlanner } from "@/components/shared/daily-diary-planner";
 
 type AssignmentStatus = "active" | "submitted" | "overdue" | "graded";
 
@@ -86,12 +94,7 @@ export function ParentHomework() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center gap-2">
-        <BookMarked className="size-5 text-violet-600" />
-        <h2 className="text-lg font-semibold text-zinc-900 dark:text-zinc-100 uppercase tracking-tight">
-          Children&apos;s Homework
-        </h2>
-      </div>
+
 
       <Tabs value={activeStudentId} onValueChange={handleStudentChange}>
         <div className="w-full overflow-x-auto pb-1 no-scrollbar">
@@ -138,13 +141,15 @@ function ChildHomeworkView({ student }: { student: StudentInfo }) {
   const [loading, setLoading] = useState(true);
   const [assignments, setAssignments] = useState<AssignmentInfo[]>([]);
   const [submissions, setSubmissions] = useState<StudentSubmission[]>([]);
-  const [filterTab, setFilterTab] = useState("all");
+  const [filterTab, setFilterTab] = useState("active");
+  const [viewMode, setViewMode] = useState<"list" | "diary">("list");
+  const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date());
 
   const fetchChildData = useCallback(async () => {
     setLoading(true);
     try {
       const [assignmentsRes, submissionsRes] = await Promise.all([
-        apiFetch(`/api/assignments?classId=${student.classId}`),
+        apiFetch(`/api/homework?classId=${student.classId}`),
         apiFetch(`/api/submissions?studentId=${student.id}`).catch(() => null)
       ]);
 
@@ -184,8 +189,7 @@ function ChildHomeworkView({ student }: { student: StudentInfo }) {
       const isSubmitted = realSub && !isGraded;
 
       let status: AssignmentStatus;
-      if (isGraded) status = "graded";
-      else if (isSubmitted) status = "submitted";
+      if (isGraded || isSubmitted) status = "submitted";
       else if (pastDue) status = "overdue";
       else status = "active";
 
@@ -212,11 +216,60 @@ function ChildHomeworkView({ student }: { student: StudentInfo }) {
     return enrichedAssignments.filter((a) => a.status === filterTab);
   }, [enrichedAssignments, filterTab]);
 
+  // Daily Diary filters
+  const selectedDateAssignments = useMemo(() => {
+    if (!selectedDate) return [];
+    return enrichedAssignments.filter((a) => {
+      if (!a.createdAt) return false;
+      const d = new Date(a.createdAt);
+      return (
+        d.getFullYear() === selectedDate.getFullYear() &&
+        d.getMonth() === selectedDate.getMonth() &&
+        d.getDate() === selectedDate.getDate()
+      );
+    });
+  }, [enrichedAssignments, selectedDate]);
+
+  const dueSelectedDateAssignments = useMemo(() => {
+    if (!selectedDate) return [];
+    return enrichedAssignments.filter((a) => {
+      const d = new Date(a.dueDate);
+      const isDue = (
+        d.getFullYear() === selectedDate.getFullYear() &&
+        d.getMonth() === selectedDate.getMonth() &&
+        d.getDate() === selectedDate.getDate()
+      );
+      if (!isDue) return false;
+
+      // Exclude if already shown in "Assigned Today" to prevent duplicate listing
+      if (a.createdAt) {
+        const c = new Date(a.createdAt);
+        const isAssigned = (
+          c.getFullYear() === selectedDate.getFullYear() &&
+          c.getMonth() === selectedDate.getMonth() &&
+          c.getDate() === selectedDate.getDate()
+        );
+        if (isAssigned) return false;
+      }
+      return true;
+    });
+  }, [enrichedAssignments, selectedDate]);
+
+  // Homework dates for calendar indicators
+  const homeworkDays = useMemo(() => {
+    return enrichedAssignments
+      .map((a) => {
+        if (!a.createdAt) return null;
+        const d = new Date(a.createdAt);
+        return new Date(d.getFullYear(), d.getMonth(), d.getDate());
+      })
+      .filter(Boolean) as Date[];
+  }, [enrichedAssignments]);
+
   const counts = useMemo(() => ({
     all: enrichedAssignments.length,
     active: enrichedAssignments.filter((a) => a.status === "active").length,
     submitted: enrichedAssignments.filter((a) => a.status === "submitted").length,
-    graded: enrichedAssignments.filter((a) => a.status === "graded").length,
     overdue: enrichedAssignments.filter((a) => a.status === "overdue").length,
   }), [enrichedAssignments]);
 
@@ -268,103 +321,205 @@ function ChildHomeworkView({ student }: { student: StudentInfo }) {
 
   return (
     <div className="space-y-6">
-      <div className="grid grid-cols-2 lg:grid-cols-5 gap-3">
-        <HomeworkSummaryCard label="Total" count={counts.all} icon={<FileText className="size-4" />} themeColor="violet" />
-        <HomeworkSummaryCard label="Active" count={counts.active} icon={<Clock className="size-4" />} themeColor="amber" />
-        <HomeworkSummaryCard label="Submitted" count={counts.submitted} icon={<CheckCircle2 className="size-4" />} themeColor="emerald" />
-        <HomeworkSummaryCard label="Graded" count={counts.graded} icon={<Star className="size-4" />} themeColor="violet" />
-        <HomeworkSummaryCard label="Overdue" count={counts.overdue} icon={<AlertTriangle className="size-4" />} themeColor="red" />
-      </div>
+      {viewMode === "list" && (
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+          <HomeworkSummaryCard label="Today's Homework" count={selectedDateAssignments.length + dueSelectedDateAssignments.length} icon={<FileText className="size-4" />} themeColor="violet" />
+          <HomeworkSummaryCard label="Active" count={counts.active} icon={<Clock className="size-4" />} themeColor="amber" />
+          <HomeworkSummaryCard label="Submitted" count={counts.submitted} icon={<CheckCircle2 className="size-4" />} themeColor="emerald" />
+          <HomeworkSummaryCard label="Overdue" count={counts.overdue} icon={<AlertTriangle className="size-4" />} themeColor="red" />
+        </div>
+      )}
 
       <Card className="rounded-xl shadow-sm border-zinc-200/60 dark:border-zinc-800">
-        <CardHeader className="pb-3 pt-5">
+        <CardHeader className="pb-3 pt-5 flex flex-row items-center justify-between space-y-0 gap-4">
           <CardTitle className="text-sm font-semibold flex items-center gap-2 tracking-tight">
             <FileText className="size-4 text-violet-500" />
-            Homework Tracker
+            Homework Tracker & Diary
           </CardTitle>
+          <div className="flex bg-violet-50/60 dark:bg-zinc-900 border border-violet-100/50 dark:border-zinc-800 p-0.5 rounded-lg">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setViewMode("list")}
+              className={`text-xs gap-1.5 h-7 px-3 rounded-md transition-all shadow-none ${viewMode === "list" ? "bg-white dark:bg-zinc-800 text-violet-700 dark:text-violet-300 font-semibold shadow-xs" : "text-muted-foreground hover:text-zinc-900 dark:hover:text-zinc-100"}`}
+            >
+              <List className="size-3.5" />
+              List View
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setViewMode("diary")}
+              className={`text-xs gap-1.5 h-7 px-3 rounded-md transition-all shadow-none ${viewMode === "diary" ? "bg-white dark:bg-zinc-800 text-violet-700 dark:text-violet-300 font-semibold shadow-xs" : "text-muted-foreground hover:text-zinc-900 dark:hover:text-zinc-100"}`}
+            >
+              <CalendarIcon className="size-3.5" />
+              Daily Diary
+            </Button>
+          </div>
         </CardHeader>
-        <CardContent className="pt-0 px-5 pb-5">
-          <Tabs defaultValue="all" value={filterTab} onValueChange={setFilterTab}>
-            <div className="w-full overflow-x-auto pb-1 no-scrollbar mb-4">
-              <TabsList className="bg-violet-50/60 dark:bg-zinc-900 p-1 text-xs font-medium border border-violet-100/50 dark:border-zinc-800 w-fit rounded-lg">
-                <TabsTrigger value="all" className="px-3 py-1.5 transition-all rounded-md data-[state=active]:bg-white dark:data-[state=active]:bg-zinc-800 data-[state=active]:text-violet-700 dark:data-[state=active]:text-violet-300 data-[state=active]:shadow-sm hover:bg-violet-100/60 dark:hover:bg-violet-950/40 hover:text-violet-700 dark:hover:text-violet-400 whitespace-nowrap">All ({counts.all})</TabsTrigger>
-                <TabsTrigger value="active" className="px-3 py-1.5 transition-all rounded-md data-[state=active]:bg-white dark:data-[state=active]:bg-zinc-800 data-[state=active]:text-violet-700 dark:data-[state=active]:text-violet-300 data-[state=active]:shadow-sm hover:bg-violet-100/60 dark:hover:bg-violet-950/40 hover:text-violet-700 dark:hover:text-violet-400 whitespace-nowrap">Active ({counts.active})</TabsTrigger>
-                <TabsTrigger value="submitted" className="px-3 py-1.5 transition-all rounded-md data-[state=active]:bg-white dark:data-[state=active]:bg-zinc-800 data-[state=active]:text-violet-700 dark:data-[state=active]:text-violet-300 data-[state=active]:shadow-sm hover:bg-violet-100/60 dark:hover:bg-violet-950/40 hover:text-violet-700 dark:hover:text-violet-400 whitespace-nowrap">Submitted ({counts.submitted})</TabsTrigger>
-                <TabsTrigger value="graded" className="px-3 py-1.5 transition-all rounded-md data-[state=active]:bg-white dark:data-[state=active]:bg-zinc-800 data-[state=active]:text-violet-700 dark:data-[state=active]:text-violet-300 data-[state=active]:shadow-sm hover:bg-violet-100/60 dark:hover:bg-violet-950/40 hover:text-violet-700 dark:hover:text-violet-400 whitespace-nowrap">Graded ({counts.graded})</TabsTrigger>
-                <TabsTrigger value="overdue" className="px-3 py-1.5 transition-all rounded-md data-[state=active]:bg-white dark:data-[state=active]:bg-zinc-800 data-[state=active]:text-violet-700 dark:data-[state=active]:text-violet-300 data-[state=active]:shadow-sm hover:bg-violet-100/60 dark:hover:bg-violet-950/40 hover:text-violet-700 dark:hover:text-violet-400 whitespace-nowrap">Overdue ({counts.overdue})</TabsTrigger>
-              </TabsList>
-            </div>
+        <CardContent className="pt-2 px-4 sm:px-5 pb-5">
+          {viewMode === "list" ? (
+            <div className="space-y-4">
+              {/* Date Header / Selector for List View */}
+              <div className="flex items-center justify-between border-b border-zinc-100 dark:border-zinc-800 pb-3">
+                <div className="text-left flex flex-col justify-center">
+                  <h3 className="text-sm font-bold tracking-tight text-zinc-900 dark:text-stone-100">
+                    {selectedDate ? format(selectedDate, "eeee") : "Select Date"}
+                  </h3>
+                  <p className="text-[10px] text-muted-foreground font-bold uppercase tracking-wider mt-0.5">
+                    {selectedDate ? format(selectedDate, "MMM d, yyyy") : ""}
+                  </p>
+                </div>
+                {/* Popover Calendar for list view */}
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <button 
+                      type="button"
+                      className="h-8 text-[11px] font-bold px-3 bg-violet-50/60 dark:bg-zinc-900 border border-violet-100/50 dark:border-zinc-800 text-violet-700 dark:text-violet-300 hover:bg-violet-100/30 rounded-lg flex items-center justify-center transition-colors"
+                    >
+                      <CalendarDays className="size-3.5 mr-1 text-violet-500" />
+                      Select Date
+                    </button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0 bg-white dark:bg-stone-950 border border-zinc-200 dark:border-zinc-800" align="end">
+                    <Calendar
+                      mode="single"
+                      selected={selectedDate}
+                      onSelect={setSelectedDate}
+                      modifiers={{ hasHomework: homeworkDays }}
+                      modifiersClassNames={{
+                        hasHomework: "relative after:absolute after:bottom-1.5 after:left-1/2 after:-translate-x-1/2 after:size-1.5 after:bg-violet-500 after:rounded-full font-bold text-violet-700"
+                      }}
+                      initialFocus
+                    />
+                  </PopoverContent>
+                </Popover>
+              </div>
 
-            <TabsContent value={filterTab}>
+              {/* List of assignments for selected date */}
               <ScrollArea className="max-h-[500px] pr-3">
-                {filteredAssignments.length === 0 ? (
+                {selectedDateAssignments.length === 0 && dueSelectedDateAssignments.length === 0 ? (
                   <div className="text-center py-16 text-zinc-400 dark:text-zinc-500 border-2 border-dashed border-zinc-100 dark:border-zinc-800 rounded-xl">
                     <FileText className="size-10 mx-auto mb-3 opacity-30" />
-                    <p className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">No assignments found</p>
-                    <p className="text-xs text-zinc-500 mt-1">
-                      {filterTab === "all" ? "No homework records found for this child." : `No homework marked as ${filterTab} at this time.`}
+                    <p className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">No homework found</p>
+                    <p className="text-xs text-zinc-505 mt-1">
+                      No homework assigned or due on this date.
                     </p>
                   </div>
                 ) : (
-                  <div className="space-y-3">
-                    {filteredAssignments.map((a) => (
-                      <div
-                        key={a.id}
-                        className={`p-4 rounded-xl border bg-card hover:shadow-sm transition-all ${
-                          a.status === "overdue" ? "border-rose-100 dark:border-rose-950/40 bg-rose-50/10" :
-                          a.status === "graded" ? "border-violet-100 dark:border-violet-950/40 bg-violet-50/10" :
-                          a.status === "submitted" ? "border-emerald-100 dark:border-emerald-950/40 bg-emerald-50/10" :
-                          "border-zinc-100 dark:border-zinc-800"
-                        }`}
-                      >
-                        <div className="flex items-start justify-between gap-2">
-                          <div className="flex-1 min-w-0 text-left">
-                            <div className="flex items-center gap-2 mb-1">
-                              <h4 className="font-semibold text-sm text-zinc-900 dark:text-zinc-100 truncate">{a.title}</h4>
-                              {getStatusBadge(a.status)}
-                            </div>
-                            <div className="flex flex-wrap items-center gap-2 mb-2">
-                              <Badge variant="outline" className="text-[10px] bg-muted/30 border-border shadow-none font-medium">{a.subjectName}</Badge>
-                              <Badge variant="outline" className="text-[10px] bg-muted/30 border-border shadow-none font-medium flex items-center gap-1">
-                                {a.mode === "online" ? <Globe className="size-2.5 text-sky-500" /> : <BookOpen className="size-2.5 text-amber-500" />}
-                                {a.mode === "online" ? "Online Submission" : "Offline Paper"}
-                              </Badge>
-                            </div>
-                            <p className="text-[11px] text-muted-foreground mb-2">Assigned by {a.teacherName}</p>
-
-                            {a.status === "graded" && a.grade && (
-                              <div className="bg-violet-50 dark:bg-violet-950/30 rounded-lg p-2 mb-2 border border-violet-100 dark:border-violet-900/30">
-                                <p className="text-xs font-bold text-violet-700 dark:text-violet-400">✨ Received Grade: {a.grade}</p>
-                                {a.feedback && <p className="text-[11px] text-violet-600 dark:text-violet-300 mt-0.5 italic">Teacher remarks: "{a.feedback}"</p>}
-                              </div>
-                            )}
-
-                            <div className="flex items-center gap-4 text-xs text-muted-foreground">
-                              <div className="flex items-center gap-1">
-                                <Clock className={`size-3.5 ${a.status === "overdue" ? "text-rose-500" : "text-muted-foreground"}`} />
-                                <span className={a.status === "overdue" ? "text-rose-600 font-medium" : ""} suppressHydrationWarning>{a.countdown}</span>
-                              </div>
-                              <span suppressHydrationWarning>Due: {formatDueDate(a.dueDate)}</span>
-                            </div>
-                          </div>
-                        </div>
-
-                        <div className="mt-3 pt-2 border-t border-zinc-100/70 dark:border-zinc-800/60 flex flex-col gap-1">
-                          <div className="flex items-center justify-between text-[10px] text-muted-foreground">
-                            <span>Progress Tracking</span>
-                            <span className="font-medium text-zinc-700 dark:text-zinc-300">{getProgressValue(a.status)}%</span>
-                          </div>
-                          <Progress value={getProgressValue(a.status)} className={`h-1 ${getProgressColor(a.status)}`} />
+                  <div className="space-y-4">
+                    {/* Assigned Today */}
+                    {selectedDateAssignments.length > 0 && (
+                      <div>
+                        <h4 className="text-[10px] font-extrabold uppercase tracking-widest text-violet-700 dark:text-violet-400 mb-2 flex items-center gap-1.5">
+                          <span className="size-1.5 rounded-full bg-violet-500" />
+                          Assigned Today ({selectedDateAssignments.length})
+                        </h4>
+                        <div className="space-y-2">
+                          {selectedDateAssignments.map((a) => (
+                            <ListHomeworkCard key={a.id} a={a} getStatusBadge={getStatusBadge} getProgressValue={getProgressValue} getProgressColor={getProgressColor} />
+                          ))}
                         </div>
                       </div>
-                    ))}
+                    )}
+
+                    {/* Due Today */}
+                    {dueSelectedDateAssignments.length > 0 && (
+                      <div>
+                        <h4 className="text-[10px] font-extrabold uppercase tracking-widest text-rose-700 dark:text-rose-450 mb-2 flex items-center gap-1.5 mt-2">
+                          <span className="size-1.5 rounded-full bg-rose-500" />
+                          Due Today ({dueSelectedDateAssignments.length})
+                        </h4>
+                        <div className="space-y-2">
+                          {dueSelectedDateAssignments.map((a) => (
+                            <ListHomeworkCard key={a.id} a={a} getStatusBadge={getStatusBadge} getProgressValue={getProgressValue} getProgressColor={getProgressColor} />
+                          ))}
+                        </div>
+                      </div>
+                    )}
                   </div>
                 )}
               </ScrollArea>
-            </TabsContent>
-          </Tabs>
+            </div>
+          ) : (
+            <DailyDiaryPlanner
+              selectedDate={selectedDate}
+              setSelectedDate={setSelectedDate}
+              homeworkDays={homeworkDays}
+              selectedDateAssignments={selectedDateAssignments}
+              dueSelectedDateAssignments={dueSelectedDateAssignments}
+              getStatusBadge={getStatusBadge}
+              getProgressValue={getProgressValue}
+              getProgressColor={getProgressColor}
+              emptyMessage="No homework assigned or due on this date."
+            />
+          )}
         </CardContent>
       </Card>
+    </div>
+  );
+}
+
+/* ─── List View Card Sub-component ─── */
+function ListHomeworkCard({
+  a,
+  getStatusBadge,
+  getProgressValue,
+  getProgressColor,
+}: {
+  a: EnrichedAssignment;
+  getStatusBadge: (status: AssignmentStatus) => React.ReactNode;
+  getProgressValue: (status: AssignmentStatus) => number;
+  getProgressColor: (status: AssignmentStatus) => string;
+}) {
+  return (
+    <div
+      className={`p-4 rounded-xl border bg-card hover:shadow-sm transition-all ${
+        a.status === "overdue" ? "border-rose-100 dark:border-rose-950/40 bg-rose-50/10" :
+        a.status === "graded" ? "border-violet-100 dark:border-violet-950/40 bg-violet-50/10" :
+        a.status === "submitted" ? "border-emerald-100 dark:border-emerald-950/40 bg-emerald-50/10" :
+        "border-zinc-100 dark:border-zinc-800"
+      }`}
+    >
+      <div className="flex items-start justify-between gap-2">
+        <div className="flex-1 min-w-0 text-left">
+          <div className="flex items-center gap-2 mb-1">
+            <h4 className="font-semibold text-sm text-zinc-900 dark:text-zinc-100 truncate">{a.title}</h4>
+            {getStatusBadge(a.status)}
+          </div>
+          <div className="flex flex-wrap items-center gap-2 mb-2">
+            <Badge variant="outline" className="text-[10px] bg-muted/30 border-border shadow-none font-medium">{a.subjectName}</Badge>
+            <Badge variant="outline" className="text-[10px] bg-muted/30 border-border shadow-none font-medium flex items-center gap-1">
+              {a.mode === "online" ? <Globe className="size-2.5 text-sky-500" /> : <BookOpen className="size-2.5 text-amber-500" />}
+              {a.mode === "online" ? "Online Submission" : "Offline Paper"}
+            </Badge>
+          </div>
+          <p className="text-[11px] text-muted-foreground mb-2">Assigned by {a.teacherName}</p>
+
+          {a.status === "graded" && a.grade && (
+            <div className="bg-violet-50 dark:bg-violet-950/30 rounded-lg p-2 mb-2 border border-violet-100 dark:border-violet-900/30">
+              <p className="text-xs font-bold text-violet-700 dark:text-violet-400">✨ Received Grade: {a.grade}</p>
+              {a.feedback && <p className="text-[11px] text-violet-600 dark:text-violet-300 mt-0.5 italic">Teacher remarks: "{a.feedback}"</p>}
+            </div>
+          )}
+
+          <div className="flex items-center gap-4 text-xs text-muted-foreground">
+            <div className="flex items-center gap-1">
+              <Clock className={`size-3.5 ${a.status === "overdue" ? "text-rose-500" : "text-muted-foreground"}`} />
+              <span className={a.status === "overdue" ? "text-rose-600 font-medium" : ""} suppressHydrationWarning>{a.countdown}</span>
+            </div>
+            <span suppressHydrationWarning>Due: {new Date(a.dueDate).toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" })}</span>
+          </div>
+        </div>
+      </div>
+
+      <div className="mt-3 pt-2 border-t border-zinc-100/70 dark:border-zinc-800/60 flex flex-col gap-1">
+        <div className="flex items-center justify-between text-[10px] text-muted-foreground">
+          <span>Progress Tracking</span>
+          <span className="font-medium text-zinc-700 dark:text-zinc-300">{getProgressValue(a.status)}%</span>
+        </div>
+        <Progress value={getProgressValue(a.status)} className={`h-1 ${getProgressColor(a.status)}`} />
+      </div>
     </div>
   );
 }

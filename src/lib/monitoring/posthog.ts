@@ -8,18 +8,30 @@ if (typeof window !== 'undefined') {
     person_profiles: 'identified_only',
     capture_pageview: false,
     capture_performance: true,
+    session_recording: {
+      maskAllInputs: true,
+      maskInputOptions: {
+        password: true,
+      },
+    },
   });
 }
 
 /**
  * Syncs user identity with PostHog.
  */
-export const identifyInPostHog = (user: { id: string; email?: string; name?: string; role?: string; tenantId?: string | null }) => {
+export const identifyInPostHog = (user: {
+  id: string;
+  email?: string;
+  name?: string;
+  role?: string;
+  tenantId?: string | null;
+}) => {
   posthog.identify(user.id, {
     email: user.email,
     name: user.name,
     role: user.role,
-    tenantId: user.tenantId
+    tenantId: user.tenantId,
   });
 };
 
@@ -31,3 +43,4 @@ export const resetPostHog = () => {
 };
 
 export default posthog;
+

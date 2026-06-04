@@ -90,6 +90,7 @@ export interface AssignmentInfo {
   submissions: number;
   totalStudents: number;
   mode: "online" | "offline";
+  createdAt?: string;
 }
 
 export interface FeeRecord {

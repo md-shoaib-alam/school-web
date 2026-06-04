@@ -163,6 +163,12 @@ export const navItems: Record<UserRole, NavItem[]> = {
       icon: <Bell className="size-4" />,
       permModule: "analytics",
     },
+    {
+      key: "send-notification",
+      label: "Send Push Notification",
+      icon: <Send className="size-4" />,
+      permModule: null,
+    },
 
     // Insights & Security
     {
@@ -382,12 +388,12 @@ export const navItems: Record<UserRole, NavItem[]> = {
           label: "School Exams",
           icon: <BookOpen className="size-4" />,
         },
-        {
-          key: "assessments",
-          label: "Assessments",
-          icon: <ClipboardList className="size-4" />,
-        },
       ]
+    },
+    {
+      key: "assessments",
+      label: "Assessments",
+      icon: <ClipboardList className="size-4" />,
     },
     {
       key: "my-attendance",

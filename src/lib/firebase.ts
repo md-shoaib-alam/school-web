@@ -1,6 +1,5 @@
 import { initializeApp, getApps, getApp } from "firebase/app";
 import { getMessaging, getToken, onMessage, isSupported } from "firebase/messaging";
-
 import { env } from './env';
 
 const firebaseConfig = {
@@ -28,8 +27,8 @@ const getMessagingInstance = async () => {
 };
 
 export const requestNotificationPermission = async () => {
-  if (!process.env.NEXT_PUBLIC_FIREBASE_VAPID_KEY) {
-    console.warn("FCM VAPID Key is missing in .env");
+  if (!env.NEXT_PUBLIC_FIREBASE_VAPID_KEY) {
+    console.warn("FCM VAPID Key is missing in env config");
     return null;
   }
   
@@ -41,9 +40,34 @@ export const requestNotificationPermission = async () => {
   try {
     const permission = await Notification.requestPermission();
     if (permission === "granted") {
+      // Register service worker explicitly to guarantee it exists, has root scope, and is controlled
+      let swRegistration;
+      if (typeof window !== 'undefined' && 'serviceWorker' in navigator) {
+        swRegistration = await navigator.serviceWorker.register('/firebase-messaging-sw.js');
+        
+        // Wait for the service worker to become active to prevent PushManager subscription failure
+        if (swRegistration && !swRegistration.active) {
+          await new Promise<void>((resolve) => {
+            const worker = swRegistration.installing || swRegistration.waiting;
+            if (worker) {
+              const stateChangeHandler = () => {
+                if (worker.state === 'activated') {
+                  worker.removeEventListener('statechange', stateChangeHandler);
+                  resolve();
+                }
+              };
+              worker.addEventListener('statechange', stateChangeHandler);
+            } else {
+              resolve();
+            }
+          });
+        }
+      }
+
       // Get the FCM token
       const token = await getToken(messaging, { 
-        vapidKey: process.env.NEXT_PUBLIC_FIREBASE_VAPID_KEY 
+        vapidKey: env.NEXT_PUBLIC_FIREBASE_VAPID_KEY,
+        serviceWorkerRegistration: swRegistration
       });
       return token;
     } else {
@@ -62,7 +86,7 @@ export const requestNotificationPermission = async () => {
 };
 
 export const onForegroundMessage = (callback: (payload: any) => void) => {
-  if (typeof window === 'undefined') return;
+  if (typeof window === 'undefined') return () => {};
   let unsubscribe: (() => void) | undefined;
   
   isSupported().then((supported) => {

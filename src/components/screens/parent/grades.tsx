@@ -275,45 +275,32 @@ export function ParentGrades({ initialTab = "exams" }: { initialTab?: "exams" | 
                       {/* Assessment Cards */}
                       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                         <Card className="rounded-xl shadow-none border-zinc-200/60 dark:border-zinc-800">
-                          <CardContent className="p-5 flex flex-col items-center justify-between text-center">
+                          <CardContent className="p-5 flex flex-col items-center justify-center text-center">
                             <div className="inline-flex p-2.5 rounded-lg bg-violet-50 dark:bg-violet-950/40 text-violet-600 dark:text-violet-400 mb-2">
                               <TrendingUp className="size-5" />
                             </div>
-                            <div>
-                              <p className="text-3xl font-extrabold tracking-tight text-zinc-900 dark:text-zinc-100">{assessmentStats.avg}%</p>
-                              <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground mt-1">Avg Assessment Score</p>
-                            </div>
-                            <Progress value={assessmentStats.avg} className="mt-3 h-1 bg-muted [&>div]:bg-violet-600 w-full" />
+                            <p className="text-3xl font-extrabold tracking-tight text-zinc-900 dark:text-zinc-100">{assessmentStats.avg}%</p>
+                            <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground mt-1">Average Score</p>
                           </CardContent>
                         </Card>
 
                         <Card className="rounded-xl shadow-none border-zinc-200/60 dark:border-zinc-800">
-                          <CardContent className="p-5 flex flex-col items-center justify-between text-center">
+                          <CardContent className="p-5 flex flex-col items-center justify-center text-center">
                             <div className="inline-flex p-2.5 rounded-lg bg-violet-50 dark:bg-violet-950/40 text-violet-600 dark:text-violet-400 mb-2">
                               <Award className="size-5" />
                             </div>
-                            <div>
-                              <p className="text-3xl font-extrabold tracking-tight text-zinc-900 dark:text-zinc-100">{assessmentStats.total}</p>
-                              <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground mt-1">Total Assessments</p>
-                            </div>
-                            <p className="text-xs text-muted-foreground mt-3 font-medium">
-                              Across {[...new Set(assessmentGrades.map(g => g.subjectName))].length} graded subjects
-                            </p>
+                            <p className="text-3xl font-extrabold tracking-tight text-zinc-900 dark:text-zinc-100">{assessmentStats.total}</p>
+                            <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground mt-1">Total Assessments</p>
                           </CardContent>
                         </Card>
 
                         <Card className="rounded-xl shadow-none border-zinc-200/60 dark:border-zinc-800">
-                          <CardContent className="p-5 flex flex-col items-center justify-between text-center">
+                          <CardContent className="p-5 flex flex-col items-center justify-center text-center">
                             <div className="inline-flex p-2.5 rounded-lg bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400 mb-2">
                               <CheckCircle2 className="size-5" />
                             </div>
-                            <div>
-                              <p className="text-3xl font-extrabold tracking-tight text-zinc-900 dark:text-zinc-100">{assessmentStats.passCount}</p>
-                              <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground mt-1">Passed Items</p>
-                            </div>
-                            <p className="text-xs text-emerald-600 dark:text-emerald-400 font-bold mt-3 flex items-center gap-1">
-                              ✨ Keeping up nicely!
-                            </p>
+                            <p className="text-3xl font-extrabold tracking-tight text-zinc-900 dark:text-zinc-100">{assessmentStats.passCount}</p>
+                            <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground mt-1">Passed Assessments</p>
                           </CardContent>
                         </Card>
                       </div>

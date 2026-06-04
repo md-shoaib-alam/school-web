@@ -262,7 +262,7 @@ export function SuperAdminPlatformNotices() {
                   </li>
                   <li className="flex items-center gap-2">
                     <CheckCircle2 className="size-4 text-emerald-500" />
-                    Real-time Push
+                    Real-time Update
                   </li>
                 </ul>
               </div>
