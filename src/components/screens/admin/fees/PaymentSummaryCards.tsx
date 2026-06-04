@@ -47,8 +47,13 @@ export function PaymentSummaryCards() {
 
   if (isLoading) {
     return (
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        {[...Array(4)].map((_, i) => (
+      <div className="grid grid-cols-3 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <Card className="col-span-3 sm:col-span-1 rounded-xl border border-zinc-200/80 dark:border-zinc-800 bg-white dark:bg-zinc-950 p-5 shadow-xs space-y-3">
+          <Skeleton className="h-4 w-28" />
+          <Skeleton className="h-8 w-20" />
+          <Skeleton className="h-3 w-32" />
+        </Card>
+        {[...Array(3)].map((_, i) => (
           <Card key={i} className="rounded-xl border border-zinc-200/80 dark:border-zinc-800 bg-white dark:bg-zinc-950 p-5 shadow-xs space-y-3">
             <Skeleton className="h-4 w-28" />
             <Skeleton className="h-8 w-20" />
@@ -60,9 +65,9 @@ export function PaymentSummaryCards() {
   }
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+    <div className="grid grid-cols-3 sm:grid-cols-2 lg:grid-cols-4 gap-4">
       {/* Total Collected */}
-      <Card className="relative overflow-hidden rounded-xl border border-zinc-200/80 dark:border-zinc-800 bg-linear-to-br from-white to-emerald-50/10 dark:from-zinc-950 dark:to-emerald-950/5 p-5 flex flex-col justify-between shadow-xs hover:shadow-md hover:border-emerald-500/30 dark:hover:border-emerald-500/20 transition-all duration-300 group">
+      <Card className="col-span-3 sm:col-span-1 relative overflow-hidden rounded-xl border border-zinc-200/80 dark:border-zinc-800 bg-linear-to-br from-white to-emerald-50/10 dark:from-zinc-950 dark:to-emerald-950/5 p-5 flex flex-col justify-between shadow-xs hover:shadow-md hover:border-emerald-500/30 dark:hover:border-emerald-500/20 transition-all duration-300 group">
         <div className="absolute top-0 right-0 w-20 h-20 bg-emerald-500/5 dark:bg-emerald-500/10 rounded-bl-full pointer-events-none group-hover:scale-110 transition-transform duration-300" />
         <div className="space-y-3">
           <div className="flex items-center justify-between">
