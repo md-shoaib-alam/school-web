@@ -117,16 +117,16 @@ export function FeeStatusTab() {
   const payPercentage = totalFees > 0 ? Math.round((totalPaid / totalFees) * 100) : 0;
 
   return (
-    <div className="space-y-4 h-[calc(100vh-6rem)] flex flex-col overflow-hidden">
+    <div className="space-y-3 sm:space-y-4 h-[calc(100dvh-2rem)] lg:h-[calc(100vh-6rem)] flex flex-col overflow-hidden">
       {!selectedStudent ? (
         /* Student Search */
         <Card className="hover:shadow-md transition-shadow flex-1 flex flex-col overflow-hidden border-emerald-500/10 dark:border-emerald-500/5">
-          <CardHeader className="shrink-0">
+          <CardHeader className="shrink-0 pb-2 sm:pb-6">
             <CardTitle className="text-base flex items-center gap-2"><UserCheck className="size-5 text-emerald-600" />Check Fee Status</CardTitle>
-            <CardDescription>Search for a student to view their complete fee status</CardDescription>
+            <CardDescription className="text-xs sm:text-sm">Search for a student to view their complete fee status</CardDescription>
           </CardHeader>
-          <CardContent className="space-y-4 flex-1 flex flex-col overflow-hidden pb-6">
-            <div className="flex flex-col sm:flex-row gap-3 shrink-0">
+          <CardContent className="space-y-3 sm:space-y-4 flex-1 flex flex-col overflow-hidden pb-4 sm:pb-6">
+            <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 shrink-0">
               <Select value={classFilter} onValueChange={v => { setClassFilter(v); setStudentSearch(''); }}>
                 <SelectTrigger className="w-full sm:w-48"><SelectValue placeholder="Select Class..." /></SelectTrigger>
                 <SelectContent>
@@ -135,10 +135,10 @@ export function FeeStatusTab() {
               </Select>
               <div className="relative flex-1">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
-                <Input placeholder="Search by name or phone number..." className="pl-9" value={studentSearch} onChange={e => setStudentSearch(e.target.value)} />
+                <Input placeholder="Search by name..." className="pl-9 h-9" value={studentSearch} onChange={e => setStudentSearch(e.target.value)} />
               </div>
             </div>
-            <ScrollArea className="flex-1 h-0 rounded-lg border">
+            <ScrollArea className="flex-1 min-h-0 rounded-lg border">
               <div className="divide-y">
                 {!classFilter ? (
                   <div className="p-12 text-center text-muted-foreground flex flex-col items-center justify-center h-48 select-none">
@@ -184,7 +184,7 @@ export function FeeStatusTab() {
           </CardContent>
         </Card>
       ) : (
-        <ScrollArea className="flex-1 -mx-4 px-4">
+        <ScrollArea className="flex-1 h-0 -mx-4 px-4">
           <div className="space-y-4 pb-8">
             {/* Student Header */}
             <Card className="hover:shadow-md transition-shadow">
