@@ -33,7 +33,7 @@ interface ClassDistributionProps {
 
 export function ClassDistribution({ isLoading, data, recharts }: ClassDistributionProps) {
   return (
-    <Card>
+    <Card className="hidden lg:block">
       <CardHeader>
         <CardTitle className="text-base flex items-center gap-2">
           <GraduationCap className="size-4 text-cyan-600" />

@@ -1,5 +1,6 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Activity } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -21,6 +22,17 @@ interface AttendanceTrendProps {
 }
 
 export function AttendanceTrend({ isLoading, data, recharts }: AttendanceTrendProps) {
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth < 768);
+    handleResize();
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+  const displayData = isMobile ? (data ?? []).slice(-3) : (data ?? []);
+
   return (
     <Card className="lg:col-span-2">
       <CardHeader>
@@ -29,7 +41,7 @@ export function AttendanceTrend({ isLoading, data, recharts }: AttendanceTrendPr
           Monthly Attendance Trend
         </CardTitle>
       </CardHeader>
-      <CardContent>
+      <CardContent className="p-4 sm:p-6 pl-2 sm:pl-6">
         {isLoading || !recharts ? (
           <Skeleton className="h-[280px] w-full" />
         ) : (
@@ -37,10 +49,10 @@ export function AttendanceTrend({ isLoading, data, recharts }: AttendanceTrendPr
             const { BarChart, Bar, XAxis, YAxis, CartesianGrid } = recharts;
             return (
               <ChartContainer config={attendanceChartConfig} className="h-[280px] w-full">
-                <BarChart data={data ?? []}>
+                <BarChart data={displayData} margin={{ left: -5, right: 5, top: 5, bottom: 5 }}>
                   <CartesianGrid strokeDasharray="3 3" vertical={false} />
                   <XAxis dataKey="month" tickLine={false} axisLine={false} fontSize={12} />
-                  <YAxis domain={[0, 100]} tickLine={false} axisLine={false} fontSize={12} unit="%" />
+                  <YAxis domain={[0, 100]} ticks={[0, 25, 50, 75, 100]} tickLine={false} axisLine={false} fontSize={12} unit="%" width={isMobile ? 40 : 45} />
                   <ChartTooltip content={<ChartTooltipContent />} />
                   <Bar dataKey="rate" fill="var(--color-rate)" radius={[6, 6, 0, 0]} maxBarSize={48} />
                 </BarChart>
