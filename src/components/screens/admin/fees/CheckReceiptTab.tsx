@@ -248,12 +248,12 @@ export function CheckReceiptTab({ canEdit, canDelete }: CheckReceiptTabProps) {
             </SelectContent>
           </Select>
         </div>
-        <div className="flex flex-col sm:flex-row gap-2 w-full lg:w-auto">
+        <div className="flex flex-row gap-2 w-full lg:w-auto">
           <Popover open={isFromCalendarOpen} onOpenChange={setIsFromCalendarOpen}>
             <PopoverTrigger asChild>
-              <Button variant="outline" className="w-full sm:w-36 justify-start text-left font-normal bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800 h-9 px-3">
-                <CalendarIcon className="mr-2 h-3.5 w-3.5 text-muted-foreground" />
-                <span className="text-xs truncate">{fromDate ? format(new Date(fromDate), "PP") : "From date"}</span>
+              <Button variant="outline" className="flex-1 lg:w-36 justify-start text-left font-normal bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800 h-9 px-3">
+                <CalendarIcon className="mr-2 h-3.5 w-3.5 text-muted-foreground shrink-0" />
+                <span className="text-xs truncate">{fromDate ? format(new Date(fromDate), "PP") : "From"}</span>
               </Button>
             </PopoverTrigger>
             <PopoverContent className="w-auto p-0" align="start">
@@ -270,9 +270,9 @@ export function CheckReceiptTab({ canEdit, canDelete }: CheckReceiptTabProps) {
           </Popover>
           <Popover open={isToCalendarOpen} onOpenChange={setIsToCalendarOpen}>
             <PopoverTrigger asChild>
-              <Button variant="outline" className="w-full sm:w-36 justify-start text-left font-normal bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800 h-9 px-3">
-                <CalendarIcon className="mr-2 h-3.5 w-3.5 text-muted-foreground" />
-                <span className="text-xs truncate">{toDate ? format(new Date(toDate), "PP") : "To date"}</span>
+              <Button variant="outline" className="flex-1 lg:w-36 justify-start text-left font-normal bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800 h-9 px-3">
+                <CalendarIcon className="mr-2 h-3.5 w-3.5 text-muted-foreground shrink-0" />
+                <span className="text-xs truncate">{toDate ? format(new Date(toDate), "PP") : "To"}</span>
               </Button>
             </PopoverTrigger>
             <PopoverContent className="w-auto p-0" align="start">
@@ -309,8 +309,8 @@ export function CheckReceiptTab({ canEdit, canDelete }: CheckReceiptTabProps) {
                 <Table>
                   <TableHeader>
                     <TableRow className="bg-muted/50">
-                      <TableHead className="w-[120px] pl-6 h-12">Receipt #</TableHead>
-                      <TableHead className="h-12">Student</TableHead>
+                      <TableHead className="hidden sm:table-cell w-[120px] pl-6 h-12">Receipt #</TableHead>
+                      <TableHead className="h-12 pl-6 sm:pl-4">Student</TableHead>
                       <TableHead className="hidden sm:table-cell h-12">Amount</TableHead>
                       <TableHead className="hidden md:table-cell h-12">Method</TableHead>
                       <TableHead className="hidden md:table-cell h-12">Date</TableHead>
@@ -329,12 +329,12 @@ export function CheckReceiptTab({ canEdit, canDelete }: CheckReceiptTabProps) {
                       const statusCfg = receiptStatusConfig[r.status] || receiptStatusConfig.completed;
                       return (
                         <TableRow key={r.id} className="hover:bg-emerald-50/50 dark:hover:bg-emerald-900/10 transition-colors">
-                          <TableCell className="pl-6 py-4">
+                          <TableCell className="hidden sm:table-cell pl-6 py-4">
                             <span className="font-mono text-xs font-semibold text-emerald-700 dark:text-emerald-400" title={r.receiptNumber}>
                               {formatReceiptNumber(r.receiptNumber)}
                             </span>
                           </TableCell>
-                          <TableCell className="font-medium text-sm py-4">{r.studentName}</TableCell>
+                          <TableCell className="font-medium text-sm py-4 pl-6 sm:pl-4">{r.studentName}</TableCell>
                           <TableCell className="hidden sm:table-cell font-semibold py-4">₹{r.paidAmount.toLocaleString()}</TableCell>
                           <TableCell className="hidden md:table-cell py-4">
                             <div className="flex items-center gap-1.5 text-muted-foreground">

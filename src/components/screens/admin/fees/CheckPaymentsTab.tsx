@@ -309,12 +309,12 @@ export function CheckPaymentsTab() {
           </SelectContent>
         </Select>
         {dateFilter === 'custom' && (
-          <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
+          <div className="flex flex-row gap-2 w-full sm:w-auto">
             <Popover open={isFromCalendarOpen} onOpenChange={setIsFromCalendarOpen}>
               <PopoverTrigger asChild>
-                <Button variant="outline" className="w-full sm:w-44 justify-start text-left font-normal bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800">
-                  <CalendarIcon className="mr-2 h-4 w-4 text-muted-foreground" />
-                  {fromDate ? format(new Date(fromDate), "PPP") : <span className="text-muted-foreground">From date</span>}
+                <Button variant="outline" className="flex-1 sm:w-44 justify-start text-left font-normal bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800">
+                  <CalendarIcon className="mr-2 h-4 w-4 text-muted-foreground shrink-0" />
+                  <span className="truncate">{fromDate ? format(new Date(fromDate), "PPP") : "From"}</span>
                 </Button>
               </PopoverTrigger>
               <PopoverContent className="w-auto p-0" align="start">
@@ -331,9 +331,9 @@ export function CheckPaymentsTab() {
             </Popover>
             <Popover open={isToCalendarOpen} onOpenChange={setIsToCalendarOpen}>
               <PopoverTrigger asChild>
-                <Button variant="outline" className="w-full sm:w-44 justify-start text-left font-normal bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800">
-                  <CalendarIcon className="mr-2 h-4 w-4 text-muted-foreground" />
-                  {toDate ? format(new Date(toDate), "PPP") : <span className="text-muted-foreground">To date</span>}
+                <Button variant="outline" className="flex-1 sm:w-44 justify-start text-left font-normal bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800">
+                  <CalendarIcon className="mr-2 h-4 w-4 text-muted-foreground shrink-0" />
+                  <span className="truncate">{toDate ? format(new Date(toDate), "PPP") : "To"}</span>
                 </Button>
               </PopoverTrigger>
               <PopoverContent className="w-auto p-0" align="start">
