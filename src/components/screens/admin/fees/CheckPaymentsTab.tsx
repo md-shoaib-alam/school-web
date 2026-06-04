@@ -190,67 +190,112 @@ export function CheckPaymentsTab() {
   return (
     <div className="space-y-6">
       {/* Summary Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        {summaryCards.map(card => {
-          const color = card.color;
-          const colorClasses: Record<string, any> = {
-            emerald: {
+      {loading ? (
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
+          <Card className="rounded-xl border border-zinc-200/80 dark:border-zinc-800 bg-white dark:bg-zinc-950 p-5 shadow-xs space-y-3">
+            <Skeleton className="h-4 w-28" />
+            <Skeleton className="h-8 w-20" />
+            <Skeleton className="h-3 w-32" />
+          </Card>
+          <div className="lg:col-span-3 flex overflow-x-auto gap-4 pb-4 -mx-4 px-4 sm:mx-0 sm:px-0 sm:grid sm:grid-cols-2 lg:grid-cols-3 sm:pb-0">
+            {[...Array(3)].map((_, i) => (
+              <Card key={i} className="min-w-[240px] sm:min-w-0 rounded-xl border border-zinc-200/80 dark:border-zinc-800 bg-white dark:bg-zinc-950 p-5 shadow-xs space-y-3">
+                <Skeleton className="h-4 w-28" />
+                <Skeleton className="h-8 w-20" />
+                <Skeleton className="h-3 w-32" />
+              </Card>
+            ))}
+          </div>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
+          {/* Main Card (Total Payments) */}
+          {summaryCards.slice(0, 1).map(card => {
+            const cls = {
               gradient: 'to-emerald-50/10 dark:to-emerald-950/5',
               hover: 'hover:border-emerald-500/30 dark:hover:border-emerald-500/20',
               bg: 'bg-emerald-500/5 dark:bg-emerald-500/10',
               iconBg: 'bg-emerald-50 dark:bg-emerald-950/50',
               iconText: 'text-emerald-600 dark:text-emerald-400',
               dot: 'bg-emerald-500'
-            },
-            amber: {
-              gradient: 'to-amber-50/10 dark:to-amber-950/5',
-              hover: 'hover:border-amber-500/30 dark:hover:border-amber-500/20',
-              bg: 'bg-amber-500/5 dark:bg-amber-500/10',
-              iconBg: 'bg-amber-50 dark:bg-amber-950/50',
-              iconText: 'text-amber-600 dark:text-amber-400',
-              dot: 'bg-amber-500'
-            },
-            violet: {
-              gradient: 'to-violet-50/10 dark:to-violet-950/5',
-              hover: 'hover:border-violet-500/30 dark:hover:border-violet-500/20',
-              bg: 'bg-violet-500/5 dark:bg-violet-500/10',
-              iconBg: 'bg-violet-50 dark:bg-violet-950/50',
-              iconText: 'text-violet-600 dark:text-violet-400',
-              dot: 'bg-violet-500'
-            },
-            blue: {
-              gradient: 'to-blue-50/10 dark:to-blue-950/5',
-              hover: 'hover:border-blue-500/30 dark:hover:border-blue-500/20',
-              bg: 'bg-blue-500/5 dark:bg-blue-500/10',
-              iconBg: 'bg-blue-50 dark:bg-blue-950/50',
-              iconText: 'text-blue-600 dark:text-blue-400',
-              dot: 'bg-blue-500'
-            }
-          };
-          const cls = colorClasses[color];
-
-          return (
-            <Card key={card.label} className={`relative overflow-hidden rounded-xl border border-zinc-200/80 dark:border-zinc-800 bg-gradient-to-br from-white ${cls.gradient} dark:from-zinc-950 p-5 flex flex-col justify-between shadow-xs hover:shadow-md ${cls.hover} transition-all duration-300 group`}>
-              <div className={`absolute top-0 right-0 w-20 h-20 ${cls.bg} rounded-bl-full pointer-events-none group-hover:scale-110 transition-transform duration-300`} />
-              <div className="space-y-3">
-                <div className="flex items-center justify-between">
-                  <span className="text-[11px] text-zinc-700 dark:text-zinc-300 font-bold uppercase tracking-wider block">{card.label}</span>
-                  <div className={`p-2 rounded-lg ${cls.iconBg} ${cls.iconText}`}>
-                    {card.icon}
+            };
+            return (
+              <Card key={card.label} className={`relative overflow-hidden rounded-xl border border-zinc-200/80 dark:border-zinc-800 bg-linear-to-br from-white ${cls.gradient} dark:from-zinc-950 p-5 flex flex-col justify-between shadow-xs hover:shadow-md ${cls.hover} transition-all duration-300 group`}>
+                <div className={`absolute top-0 right-0 w-20 h-20 ${cls.bg} rounded-bl-full pointer-events-none group-hover:scale-110 transition-transform duration-300`} />
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <span className="text-[11px] text-zinc-700 dark:text-zinc-300 font-bold uppercase tracking-wider block">{card.label}</span>
+                    <div className={`p-2 rounded-lg ${cls.iconBg} ${cls.iconText}`}>
+                      {card.icon}
+                    </div>
                   </div>
+                  <span className={`text-2xl font-extrabold block tracking-tight ${cls.iconText}`}>
+                    ₹{Math.round(card.amount).toLocaleString()}
+                  </span>
                 </div>
-                <span className={`text-2xl font-extrabold block tracking-tight ${card.label === 'Total Payments' ? cls.iconText : 'text-zinc-900 dark:text-zinc-50'}`}>
-                  ₹{Math.round(card.amount).toLocaleString()}
-                </span>
-              </div>
-              <div className="text-[10px] text-zinc-500 dark:text-zinc-400 mt-4 flex items-center gap-1.5 font-medium border-t pt-2 border-zinc-100 dark:border-zinc-900">
-                <span className={`inline-block size-1.5 rounded-full ${cls.dot} ${card.label === 'Total Payments' ? 'animate-pulse' : ''}`} />
-                {card.subtext}
-              </div>
-            </Card>
-          );
-        })}
-      </div>
+                <div className="text-[10px] text-zinc-500 dark:text-zinc-400 mt-4 flex items-center gap-1.5 font-medium border-t pt-2 border-zinc-100 dark:border-zinc-900">
+                  <span className={`inline-block size-1.5 rounded-full ${cls.dot} animate-pulse`} />
+                  {card.subtext}
+                </div>
+              </Card>
+            );
+          })}
+
+          {/* Other Cards Row - Scrollable on mobile */}
+          <div className="lg:col-span-3 flex overflow-x-auto gap-4 pb-4 -mx-4 px-4 sm:mx-0 sm:px-0 sm:grid sm:grid-cols-2 lg:grid-cols-3 sm:pb-0 scrollbar-hide">
+            {summaryCards.slice(1).map(card => {
+              const colorClasses: Record<string, any> = {
+                amber: {
+                  gradient: 'to-amber-50/10 dark:to-amber-950/5',
+                  hover: 'hover:border-amber-500/30 dark:hover:border-amber-500/20',
+                  bg: 'bg-amber-500/5 dark:bg-amber-500/10',
+                  iconBg: 'bg-amber-50 dark:bg-amber-950/50',
+                  iconText: 'text-amber-600 dark:text-amber-400',
+                  dot: 'bg-amber-500'
+                },
+                violet: {
+                  gradient: 'to-violet-50/10 dark:to-violet-950/5',
+                  hover: 'hover:border-violet-500/30 dark:hover:border-violet-500/20',
+                  bg: 'bg-violet-500/5 dark:bg-violet-500/10',
+                  iconBg: 'bg-violet-50 dark:bg-violet-950/50',
+                  iconText: 'text-violet-600 dark:text-violet-400',
+                  dot: 'bg-violet-500'
+                },
+                blue: {
+                  gradient: 'to-blue-50/10 dark:to-blue-950/5',
+                  hover: 'hover:border-blue-500/30 dark:hover:border-blue-500/20',
+                  bg: 'bg-blue-500/5 dark:bg-blue-500/10',
+                  iconBg: 'bg-blue-50 dark:bg-blue-950/50',
+                  iconText: 'text-blue-600 dark:text-blue-400',
+                  dot: 'bg-blue-500'
+                }
+              };
+              const cls = colorClasses[card.color as keyof typeof colorClasses] || colorClasses.amber;
+
+              return (
+                <Card key={card.label} className={`min-w-[240px] sm:min-w-0 relative overflow-hidden rounded-xl border border-zinc-200/80 dark:border-zinc-800 bg-linear-to-br from-white ${cls.gradient} dark:from-zinc-950 p-5 flex flex-col justify-between shadow-xs hover:shadow-md ${cls.hover} transition-all duration-300 group`}>
+                  <div className={`absolute top-0 right-0 w-20 h-20 ${cls.bg} rounded-bl-full pointer-events-none group-hover:scale-110 transition-transform duration-300`} />
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between">
+                      <span className="text-[11px] text-zinc-700 dark:text-zinc-300 font-bold uppercase tracking-wider block">{card.label}</span>
+                      <div className={`p-2 rounded-lg ${cls.iconBg} ${cls.iconText}`}>
+                        {card.icon}
+                      </div>
+                    </div>
+                    <span className={`text-2xl font-extrabold block tracking-tight text-zinc-900 dark:text-zinc-50`}>
+                      ₹{Math.round(card.amount).toLocaleString()}
+                    </span>
+                  </div>
+                  <div className="text-[10px] text-zinc-500 dark:text-zinc-400 mt-4 flex items-center gap-1.5 font-medium border-t pt-2 border-zinc-100 dark:border-zinc-900">
+                    <span className={`inline-block size-1.5 rounded-full ${cls.dot}`} />
+                    {card.subtext}
+                  </div>
+                </Card>
+              );
+            })}
+          </div>
+        </div>
+      )}
 
       {/* Payment Method Distribution */}
       {Object.keys(methodDistribution).length > 0 && (
