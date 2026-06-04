@@ -78,7 +78,7 @@ export function ParentDashboard() {
       <QuickStats 
         childrenCount={childrenData.length}
         noticeCount={parentNotices.length}
-        pendingFees={pendingFees.reduce((s, f) => s + f.amount - (f.concession || 0) - (f.paidAmount || 0), 0)}
+        pendingFees={pendingFees.reduce((s, f) => s + f.amount - (f.paidAmount || 0), 0)}
       />
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
