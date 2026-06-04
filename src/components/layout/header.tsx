@@ -1,13 +1,14 @@
 "use client";
 
-import { useMemo } from "react";
+import { useMemo, useState, useEffect } from "react";
 import { useAppStore } from "@/store/use-app-store";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Menu, ShieldCheck, School, Calendar, PanelLeftClose, PanelLeftOpen } from "lucide-react";
+import { Menu, ShieldCheck, School, Calendar, PanelLeftClose, PanelLeftOpen, LayoutDashboard } from "lucide-react";
 import { NotificationBell } from "./notification-bell";
 import { ThemeToggle } from "./theme-toggle";
 import { type NavItem } from "./nav-config";
+import { useRouter } from "next/navigation";
 
 interface HeaderProps {
   items: NavItem[];
@@ -15,12 +16,25 @@ interface HeaderProps {
 }
 
 export function Header({ items, resolvedScreen }: HeaderProps) {
+  const { push } = useRouter();
   const {
     currentUser,
     toggleSidebar,
     currentTenantName,
     sidebarOpen,
+    setCurrentScreen,
   } = useAppStore();
+
+  const [showDashboardButton, setShowDashboardButton] = useState(false);
+
+  useEffect(() => {
+    if (currentUser?.role === "staff" && resolvedScreen !== "dashboard") {
+      const pref = localStorage.getItem("schoolsaas_staff_sidebar_preference");
+      setShowDashboardButton(pref !== "enabled");
+    } else {
+      setShowDashboardButton(false);
+    }
+  }, [currentUser?.role, resolvedScreen]);
 
   const dates = useMemo(() => {
     try {
@@ -61,6 +75,26 @@ export function Header({ items, resolvedScreen }: HeaderProps) {
             ? "My Profile"
             : items.find((i) => i.key === resolvedScreen)?.label || "Dashboard"}
         </h1>
+        {showDashboardButton && (
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            className="flex items-center gap-1.5 h-9 px-3 text-xs font-semibold text-zinc-700 dark:text-zinc-300 hover:text-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg shadow-sm"
+            onClick={() => {
+              setCurrentScreen("dashboard");
+              const tid = currentUser.tenantSlug || currentUser.tenantId;
+              if (tid) {
+                push(`/${tid}/dashboard`);
+              } else {
+                push(`/dashboard`);
+              }
+            }}
+          >
+            <LayoutDashboard className="size-3.5 text-zinc-500" />
+            <span>Dashboard</span>
+          </Button>
+        )}
         {isSuperAdmin && (
           <Badge className="bg-rose-100 dark:bg-rose-900/30 text-rose-700 dark:text-rose-400 border-rose-200 dark:border-rose-800 text-[10px]">
             <ShieldCheck className="size-3 mr-1" />

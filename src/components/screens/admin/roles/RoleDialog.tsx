@@ -41,6 +41,62 @@ interface RoleDialogProps {
   onSave: () => void;
 }
 
+const ROLE_TEMPLATES = [
+  {
+    name: "Finance Manager",
+    description: "Full control over fees, collections, student payments, and expenses.",
+    color: "#f59e0b",
+    permissions: {
+      fees: ["view", "create", "edit", "delete"],
+      expenses: ["view", "create", "edit", "delete"],
+      students: ["view"],
+      parents: ["view"],
+      classes: ["view"],
+      reports: ["view", "create"]
+    }
+  },
+  {
+    name: "Academic Coordinator",
+    description: "Academic lead managing classes, subjects, exams, grades, and timetables.",
+    color: "#10b981",
+    permissions: {
+      classes: ["view", "create", "edit", "delete"],
+      subjects: ["view", "create", "edit", "delete"],
+      exams: ["view", "create", "edit", "delete"],
+      grades: ["view", "create", "edit", "delete"],
+      certificates: ["view", "create", "edit", "delete"],
+      timetable: ["view", "create", "edit", "delete"],
+      promotions: ["view", "create", "edit", "delete"],
+      notices: ["view", "create", "edit", "delete"]
+    }
+  },
+  {
+    name: "Registrar / Admin Staff",
+    description: "Manages student and parent admissions, attendance logs, and leaves.",
+    color: "#3b82f6",
+    permissions: {
+      students: ["view", "create", "edit", "delete"],
+      parents: ["view", "create", "edit", "delete"],
+      attendance: ["view", "create", "edit", "delete"],
+      tickets: ["view", "create", "edit", "delete"],
+      leaves: ["view", "create", "edit", "delete"],
+      classes: ["view"]
+    }
+  },
+  {
+    name: "Receptionist / Office Clerk",
+    description: "Handles parent inquiries, notices, calendar events, and support tickets.",
+    color: "#06b6d4",
+    permissions: {
+      notices: ["view", "create", "edit", "delete"],
+      calendar: ["view", "create", "edit", "delete"],
+      tickets: ["view", "create", "edit", "delete"],
+      parents: ["view"],
+      students: ["view"]
+    }
+  }
+];
+
 export function RoleDialog({
   open,
   onOpenChange,
@@ -80,6 +136,36 @@ export function RoleDialog({
               : "Define a new role with specific permissions"}
           </DialogDescription>
         </DialogHeader>
+
+        {!editingRole && (
+          <div className="space-y-2 mb-2 bg-zinc-50 dark:bg-zinc-800/40 p-3 sm:p-4 rounded-xl border border-zinc-200 dark:border-zinc-700/50">
+            <Label className="text-[10px] font-bold text-zinc-500 uppercase tracking-wider block mb-2">
+              Quick Role Templates
+            </Label>
+            <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+              {ROLE_TEMPLATES.map((tmpl) => (
+                <button
+                  key={tmpl.name}
+                  type="button"
+                  onClick={() => {
+                    setName(tmpl.name);
+                    setDescription(tmpl.description);
+                    setColor(tmpl.color);
+                    setPermissions(tmpl.permissions);
+                  }}
+                  className="flex flex-col items-start text-left p-2.5 rounded-lg border border-zinc-200 dark:border-zinc-700/50 hover:border-emerald-500/40 hover:bg-emerald-500/5 bg-white dark:bg-zinc-900 transition-all group"
+                >
+                  <span className="text-xs font-bold truncate w-full group-hover:text-emerald-500 transition-colors">
+                    {tmpl.name}
+                  </span>
+                  <span className="text-[9px] text-zinc-500 line-clamp-2 mt-1 leading-snug">
+                    {tmpl.description}
+                  </span>
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
 
         <div className="space-y-5 py-2">
           <div className="space-y-2">
