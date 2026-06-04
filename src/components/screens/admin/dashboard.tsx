@@ -16,6 +16,7 @@ import { AttendanceTrend } from "./dashboard_components/AttendanceTrend";
 import { ClassDistribution } from "./dashboard_components/ClassDistribution";
 import { FeeCollection } from "./dashboard_components/FeeCollection";
 import { RecentNotices } from "./dashboard_components/RecentNotices";
+import { FeePieDistribution } from "./dashboard_components/FeePieDistribution";
 
 function getDaysRemaining(endDate?: string | null) {
   if (!endDate) return null;
@@ -115,13 +116,21 @@ export function AdminDashboard() {
         />
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <FeeCollection 
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <FeePieDistribution 
           isLoading={isLoading}
           data={dashboardData?.feeByType ?? []}
           recharts={recharts}
         />
 
+        <FeeCollection 
+          isLoading={isLoading}
+          data={dashboardData?.monthlyRevenue ?? []}
+          recharts={recharts}
+        />
+      </div>
+
+      <div className="grid grid-cols-1 gap-6">
         <RecentNotices 
           isLoading={isLoading}
           data={dashboardData?.recentNotices ?? []}

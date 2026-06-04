@@ -53,8 +53,11 @@ export function AttendanceTrend({ isLoading, data, recharts }: AttendanceTrendPr
                   <CartesianGrid strokeDasharray="3 3" vertical={false} />
                   <XAxis dataKey="month" tickLine={false} axisLine={false} fontSize={12} />
                   <YAxis domain={[0, 100]} ticks={[0, 25, 50, 75, 100]} tickLine={false} axisLine={false} fontSize={12} unit="%" width={isMobile ? 40 : 45} />
-                  <ChartTooltip content={<ChartTooltipContent />} />
-                  <Bar dataKey="rate" fill="var(--color-rate)" radius={[6, 6, 0, 0]} maxBarSize={48} />
+                  <ChartTooltip 
+                    cursor={{ stroke: "rgba(255, 255, 255, 0.35)", strokeDasharray: "3 3", strokeWidth: 1.5 }}
+                    content={<ChartTooltipContent />} 
+                  />
+                  <Bar dataKey="rate" fill="var(--color-rate)" radius={[6, 6, 0, 0]} maxBarSize={48} className="cursor-pointer" />
                 </BarChart>
               </ChartContainer>
             );
