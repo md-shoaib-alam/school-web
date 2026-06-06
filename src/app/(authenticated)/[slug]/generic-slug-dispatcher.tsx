@@ -45,15 +45,15 @@ function useHydrated() {
 export default function GenericSlugDispatcherClient() {
   const { slug } = useParams();
   const mounted = useHydrated();
-  const { currentUser, currentTenantSlug, setCurrentTenant } = useAppStore();
+  const { currentUser, currentTenantSlug, currentTenantId, setCurrentTenant } = useAppStore();
 
   const { data: resolvedTenant } = useTenantResolution(slug as string);
 
   useEffect(() => {
-    if (mounted && resolvedTenant && resolvedTenant.slug !== currentTenantSlug) {
+    if (mounted && resolvedTenant && (resolvedTenant.slug !== currentTenantSlug || resolvedTenant.id !== currentTenantId)) {
       setCurrentTenant(resolvedTenant.id, resolvedTenant.name, resolvedTenant.slug, resolvedTenant.logo);
     }
-  }, [mounted, resolvedTenant, currentTenantSlug, setCurrentTenant]);
+  }, [mounted, resolvedTenant, currentTenantSlug, currentTenantId, setCurrentTenant]);
 
   // REDIRECTION LOGIC (DURING RENDER)
   if (mounted && currentUser && typeof slug === 'string') {

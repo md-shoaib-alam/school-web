@@ -86,7 +86,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
   }, [currentUser?.role, currentUser?.id]);
 
   useEffect(() => {
-    if (resolvedTenant && resolvedTenant.slug !== currentTenantSlug) {
+    if (resolvedTenant && (resolvedTenant.slug !== currentTenantSlug || resolvedTenant.id !== currentTenantId)) {
       setCurrentTenant(
         resolvedTenant.id,
         resolvedTenant.name,
@@ -95,7 +95,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
       );
 
     }
-  }, [resolvedTenant, currentTenantSlug, setCurrentTenant]);
+  }, [resolvedTenant, currentTenantSlug, currentTenantId, setCurrentTenant]);
 
   // Refresh permissions from DB on mount
   useEffect(() => {

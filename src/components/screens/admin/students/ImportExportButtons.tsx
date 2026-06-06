@@ -17,6 +17,7 @@ import {
 import { apiFetch } from "@/lib/api";
 import { toast } from "sonner";
 import * as XLSX from "xlsx";
+import { Progress } from "@/components/ui/progress";
 
 // Sub-components
 import { FileUploadZone } from "./import/FileUploadZone";
@@ -37,14 +38,100 @@ export function ImportExportButtons({
   const [importDialogOpen, setImportDialogOpen] = useState(false);
   const [importFile, setImportFile] = useState<File | null>(null);
   const [importing, setImporting] = useState(false);
+  const [progress, setProgress] = useState<number | null>(null);
+  const [detectedHeaders, setDetectedHeaders] = useState<string[]>([]);
   const [importResult, setImportResult] = useState<{
     success: boolean;
     imported: number;
     errors: number;
     total: number;
+    errorDetails?: string[];
   } | null>(null);
   const [dragOver, setDragOver] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const parseHeaders = (file: File) => {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      try {
+        const data = new Uint8Array(e.target?.result as ArrayBuffer);
+        const workbook = XLSX.read(data, { type: "array" });
+        const sheetName = workbook.SheetNames[0];
+        if (sheetName) {
+          const worksheet = workbook.Sheets[sheetName];
+          const rows = XLSX.utils.sheet_to_json<string[]>(worksheet, { header: 1 });
+          if (rows.length > 0) {
+            setDetectedHeaders(rows[0] || []);
+            return;
+          }
+        }
+        setDetectedHeaders([]);
+      } catch (err) {
+        console.error("Failed to parse excel headers", err);
+        setDetectedHeaders([]);
+      }
+    };
+    reader.readAsArrayBuffer(file);
+  };
+
+  const pollImportStatus = (jobId: string) => {
+    const interval = setInterval(async () => {
+      try {
+        const res = await apiFetch(`/api/import/status/${jobId}`);
+        if (!res.ok) {
+          clearInterval(interval);
+          setImporting(false);
+          setProgress(null);
+          toast.error("Failed to check import progress.");
+          return;
+        }
+        const data = await res.json();
+        
+        if (data.state === "completed" || data.state === "failed") {
+          clearInterval(interval);
+          setImporting(false);
+          setProgress(null);
+          
+          const result = data.result || data.details || { success: data.state === "completed", imported: 0, errors: 0, total: 0 };
+          setImportResult({
+            success: data.state === "completed" && (!result.errors || result.errors === 0),
+            imported: result.imported || 0,
+            errors: result.errors || 0,
+            total: result.total || 0,
+            errorDetails: result.errorDetails || []
+          });
+          
+          if (data.state === "completed" && (!result.errors || result.errors === 0)) {
+            toast.success(`Successfully imported ${result.imported} of ${result.total} students.`);
+            onImportSuccess();
+            setTimeout(() => {
+              setImportDialogOpen(false);
+            }, 1500);
+          } else {
+            toast.error(`${result.errors || 0} of ${result.total || 0} records had errors.`);
+            onImportSuccess(); // Refresh to show whatever did succeed
+          }
+
+        } else {
+          setProgress(data.progress || 0);
+          if (data.details) {
+            setImportResult({
+              success: false,
+              imported: data.details.imported || 0,
+              errors: data.details.errors || 0,
+              total: data.details.total || 0,
+              errorDetails: data.details.errorDetails || []
+            });
+          }
+        }
+      } catch (err) {
+        clearInterval(interval);
+        setImporting(false);
+        setProgress(null);
+        toast.error("An error occurred during import progress check.");
+      }
+    }, 1500);
+  };
 
   const downloadSampleTemplate = () => {
     const data = [
@@ -117,6 +204,7 @@ export function ImportExportButtons({
     }
     setImporting(true);
     setImportResult(null);
+    setProgress(null);
     try {
       const formData = new FormData();
       formData.append("file", importFile);
@@ -128,17 +216,29 @@ export function ImportExportButtons({
       });
       if (!res.ok) throw new Error("Import failed");
       const data = await res.json();
-      setImportResult(data);
-      if (data.success) {
-        toast.success(`Successfully imported ${data.imported} of ${data.total} students.`);
-        onImportSuccess();
+      
+      if (data.status === "queued") {
+        setProgress(0);
+        toast.info("Large import job started. Tracking progress...");
+        pollImportStatus(data.jobId);
       } else {
-        toast.error(`${data.errors} of ${data.total} records had errors.`);
+        setImportResult(data);
+        if (data.success) {
+          toast.success(`Successfully imported ${data.imported} of ${data.total} students.`);
+          onImportSuccess();
+          setTimeout(() => {
+            setImportDialogOpen(false);
+          }, 1500);
+        } else {
+          toast.error(`${data.errors} of ${data.total} records had errors.`);
+          onImportSuccess(); // Refresh to show whatever succeeded
+        }
+
+        setImporting(false);
       }
     } catch {
       setImportResult({ success: false, imported: 0, errors: 0, total: 0 });
       toast.error("An error occurred while importing students.");
-    } finally {
       setImporting(false);
     }
   };
@@ -151,6 +251,7 @@ export function ImportExportButtons({
     if (file && ["xlsx", "xls", "csv"].includes(extension || "")) {
       setImportFile(file);
       setImportResult(null);
+      parseHeaders(file);
     } else {
       toast.error("Please upload an Excel (.xlsx, .xls) or CSV file.");
     }
@@ -163,6 +264,7 @@ export function ImportExportButtons({
       if (["xlsx", "xls", "csv"].includes(extension || "")) {
         setImportFile(file);
         setImportResult(null);
+        parseHeaders(file);
       } else {
         toast.error("Please upload an Excel (.xlsx, .xls) or CSV file.");
       }
@@ -180,6 +282,7 @@ export function ImportExportButtons({
           setImportDialogOpen(true);
           setImportFile(null);
           setImportResult(null);
+          setDetectedHeaders([]);
         }}
       >
         <Upload className="size-4 mr-2" />
@@ -193,6 +296,7 @@ export function ImportExportButtons({
           if (!open) {
             setImportFile(null);
             setImportResult(null);
+            setDetectedHeaders([]);
           }
         }}
       >
@@ -214,14 +318,36 @@ export function ImportExportButtons({
               onFileChange={handleFileChange}
             />
 
+            {progress !== null && (
+              <div className="space-y-2 p-3 bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-100 dark:border-emerald-900/40 rounded-lg">
+                <div className="flex justify-between items-center text-sm font-medium text-emerald-800 dark:text-emerald-300">
+                  <span className="flex items-center gap-2">
+                    <Loader2 className="size-4 animate-spin text-emerald-600 dark:text-emerald-400" />
+                    Adding students...
+                  </span>
+                  <span>{progress}%</span>
+                </div>
+                <Progress value={progress} className="h-2 bg-emerald-100 dark:bg-emerald-900/30" indicatorClassName="bg-emerald-600 dark:bg-emerald-400" />
+                {importResult && (
+                  <div className="flex justify-between text-xs text-emerald-600 dark:text-emerald-400 font-mono">
+                    <span>Imported: {importResult.imported}</span>
+                    <span>Errors: {importResult.errors}</span>
+                    <span>Total: {importResult.total}</span>
+                  </div>
+                )}
+              </div>
+            )}
+
             <ExpectedColumnsInfo 
               onDownloadSample={(e) => {
                 e.stopPropagation();
                 downloadSampleTemplate();
               }}
+              importFileSelected={!!importFile}
+              detectedHeaders={detectedHeaders}
             />
 
-            <ImportResultAlert result={importResult} />
+            {progress === null && <ImportResultAlert result={importResult} />}
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setImportDialogOpen(false)}>
