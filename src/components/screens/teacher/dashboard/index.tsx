@@ -127,24 +127,28 @@ export function TeacherDashboard() {
       icon: <ClipboardList className="size-5" />,
       screen: "homework",
       color: "bg-indigo-600 hover:bg-indigo-700",
+      keywords: ["assignment", "task", "project"],
     },
     {
       label: "Old Homework",
       icon: <History className="size-5" />,
       screen: "old-homework",
       color: "bg-zinc-600 hover:bg-zinc-700",
+      keywords: ["history", "assignment", "submitted"],
     },
     {
       label: "My Leaves",
       icon: <CalendarDays className="size-5" />,
       screen: "leaves",
       color: "bg-rose-500 hover:bg-rose-600",
+      keywords: ["time off", "vacation", "holiday"],
     },
     {
       label: "Timetable",
       icon: <Clock className="size-5" />,
       screen: "timetable",
       color: "bg-emerald-500 hover:bg-emerald-600",
+      keywords: ["schedule", "routine", "period"],
     },
     {
       label: "Notices",
@@ -163,12 +167,16 @@ export function TeacherDashboard() {
       icon: <TicketCheck className="size-5" />,
       screen: "tickets",
       color: "bg-cyan-500 hover:bg-cyan-600",
+      keywords: ["issues", "complaints", "helpdesk"],
     },
   ];
 
-  const filteredQuickActions = allTeacherQuickActions.filter((action) =>
-    action.label.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const filteredQuickActions = allTeacherQuickActions.filter((action) => {
+    const query = searchQuery.toLowerCase();
+    const labelMatch = action.label.toLowerCase().includes(query);
+    const keywordsMatch = action.keywords?.some((kw) => kw.toLowerCase().includes(query));
+    return labelMatch || !!keywordsMatch;
+  });
 
   if (layoutPref === "minimal") {
     return (

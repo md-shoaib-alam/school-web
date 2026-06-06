@@ -309,12 +309,14 @@ export function AdminDashboard() {
       icon: <Banknote className="size-5" />,
       screen: "make-payment",
       color: "bg-emerald-600 hover:bg-emerald-700",
+      keywords: ["invoice", "bill", "pay", "fees"],
     },
     {
       label: "Check Receipt",
       icon: <FileCheck className="size-5" />,
       screen: "check-receipt",
       color: "bg-teal-600 hover:bg-teal-700",
+      keywords: ["invoice", "receipt", "bill", "payment check"],
     },
     {
       label: "Fee Status",
@@ -341,6 +343,7 @@ export function AdminDashboard() {
       icon: <Wallet className="size-5" />,
       screen: "expenses",
       color: "bg-rose-500 hover:bg-rose-600",
+      keywords: ["spending", "payment", "bill", "payout", "invoice"],
     },
 
     // --- Notices & Support ---
@@ -382,9 +385,12 @@ export function AdminDashboard() {
     },
   ];
 
-  const filteredQuickActions = allAdminQuickActions.filter((action) =>
-    action.label.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const filteredQuickActions = allAdminQuickActions.filter((action) => {
+    const query = searchQuery.toLowerCase();
+    const labelMatch = action.label.toLowerCase().includes(query);
+    const keywordsMatch = action.keywords?.some((kw) => kw.toLowerCase().includes(query));
+    return labelMatch || !!keywordsMatch;
+  });
 
   if (layoutPref === "minimal") {
     return (

@@ -248,6 +248,7 @@ export function StaffDashboard() {
       screen: "make-payment",
       permModule: "fees",
       color: "bg-emerald-600 hover:bg-emerald-700",
+      keywords: ["invoice", "bill", "pay", "fees"],
     },
     {
       label: "Check Receipt",
@@ -255,6 +256,7 @@ export function StaffDashboard() {
       screen: "check-receipt",
       permModule: "fees",
       color: "bg-teal-600 hover:bg-teal-700",
+      keywords: ["invoice", "receipt", "bill", "payment check"],
     },
     {
       label: "Fee Status",
@@ -285,6 +287,7 @@ export function StaffDashboard() {
       screen: "expenses",
       permModule: null,
       color: "bg-rose-500 hover:bg-rose-600",
+      keywords: ["spending", "payment", "bill", "payout", "invoice"],
     },
 
     // --- Notices, Support & Reports ---
@@ -316,9 +319,12 @@ export function StaffDashboard() {
     return hasPermission(currentUser, action.permModule, "view");
   });
 
-  const filteredQuickActions = quickActions.filter((action) =>
-    action.label.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const filteredQuickActions = quickActions.filter((action) => {
+    const query = searchQuery.toLowerCase();
+    const labelMatch = action.label.toLowerCase().includes(query);
+    const keywordsMatch = action.keywords?.some((kw) => kw.toLowerCase().includes(query));
+    return labelMatch || !!keywordsMatch;
+  });
 
   return (
     <div className="space-y-6 w-full">
