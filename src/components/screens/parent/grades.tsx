@@ -174,8 +174,8 @@ export function ParentGrades({ initialTab = "exams" }: { initialTab?: "exams" | 
 
   return (
     <div className="space-y-6 pb-10 animate-fade-in select-none">
-      <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 border-b border-zinc-200/60 dark:border-zinc-800/60 pb-5">
-        <div className="space-y-3.5 text-left">
+      <div className="flex flex-col gap-4 border-b border-zinc-200/60 dark:border-zinc-800/60 pb-5">
+        <div className="flex items-center justify-between w-full">
           <div className="flex items-center gap-2">
             {topLevelTab === "exams" ? (
               <GraduationCap className="size-5 text-amber-600" />
@@ -186,26 +186,28 @@ export function ParentGrades({ initialTab = "exams" }: { initialTab?: "exams" | 
               {topLevelTab === "exams" ? "School Exams" : "Class Assessments"}
             </h2>
           </div>
-          {/* Children Switcher Dropdown */}
-          <ChildSelector 
-            students={students}
-            selectedStudentId={selectedStudent.id}
-            onSelect={handleTabChange}
-          />
-        </div>
-        
-        <div className="flex items-center gap-3">
+
+          {/* Top-Right Action Button */}
           {topLevelTab === "exams" && (
             <Button
               size="sm"
               variant="outline"
-              className="h-8 gap-1.5 text-xs font-semibold border-amber-200 text-amber-700 hover:bg-amber-50 dark:border-amber-900/30 dark:text-amber-400 dark:hover:bg-amber-950/20"
+              className="h-8 gap-1.5 text-xs font-semibold border-amber-200 text-amber-700 hover:bg-amber-50 dark:border-amber-900/30 dark:text-amber-400 dark:hover:bg-amber-950/20 shadow-sm"
               onClick={handleViewMarksheet}
             >
               <FileText className="size-3.5" />
               View Marksheet
             </Button>
           )}
+        </div>
+
+        <div className="text-left">
+          {/* Children Switcher Dropdown */}
+          <ChildSelector 
+            students={students}
+            selectedStudentId={selectedStudent.id}
+            onSelect={handleTabChange}
+          />
         </div>
       </div>
 
