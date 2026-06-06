@@ -88,21 +88,22 @@ export function ParentChildren() {
   return (
     <div className="space-y-8 pb-12 select-none animate-fade-in">
       {/* Page Header */}
-      <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 border-b border-zinc-200/60 dark:border-zinc-800/60 pb-5">
-        <div className="space-y-3.5 text-left">
-          {/* Children Switcher Dropdown */}
-          <ChildSelector 
-            students={students} 
-            selectedStudentId={selectedStudent.id} 
-            onSelect={handleTabChange} 
-          />
+      <div className="border-b border-zinc-200/60 dark:border-zinc-800/60 pb-5">
+        <div className="overflow-x-auto no-scrollbar -mx-4 px-4 sm:mx-0 sm:px-0">
+          <div className="flex items-center gap-4 min-w-fit">
+            <ChildSelector 
+              students={students} 
+              selectedStudentId={selectedStudent.id} 
+              onSelect={handleTabChange} 
+            />
+          </div>
         </div>
       </div>
 
       {/* Main Workspace Layout Grid */}
-      <div className="grid grid-cols-1 xl:grid-cols-12 gap-8 items-start">
-        {/* Left Side: Profile Card (4 Columns on XL) */}
-        <div className="xl:col-span-4 space-y-6">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+        {/* Left Side: Profile Card (4 Columns on LG/XL) */}
+        <div className="lg:col-span-4 space-y-6">
           <StudentProfileCard student={selectedStudent} />
           
           {/* Quick Info / Platform Status */}
@@ -125,8 +126,8 @@ export function ParentChildren() {
           </div>
         </div>
 
-        {/* Right Side: Performance Workspace (8 Columns on XL) */}
-        <div className="xl:col-span-8 space-y-8">
+        {/* Right Side: Performance Workspace (8 Columns on LG/XL) */}
+        <div className="lg:col-span-8 space-y-8">
           {/* Core Analytics Bento Grid */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
             {/* Attendance Stat Card */}
