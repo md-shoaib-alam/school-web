@@ -42,15 +42,15 @@ export function ChildSelector({ students, selectedStudentId, onSelect }: ChildSe
         <div className="text-left space-y-0.5">
           <div className="flex items-center gap-2">
             <span className="text-sm font-semibold text-zinc-900 dark:text-zinc-50 block">{selectedStudent.name}</span>
-            <span className="text-[10px] bg-amber-500/10 text-amber-600 dark:text-amber-400 px-1.5 py-0.5 rounded-md font-bold uppercase tracking-wider border border-amber-500/20">
+            <span className="text-[10px] bg-amber-500/10 text-amber-700 dark:text-amber-400 px-1.5 py-0.5 rounded-md font-bold uppercase tracking-wider border border-amber-500/20">
               Active
             </span>
           </div>
-          <span className="text-xs text-zinc-400 dark:text-zinc-500 font-medium">{selectedStudent.className}</span>
+          <span className="text-xs text-zinc-500 dark:text-zinc-500 font-medium">{selectedStudent.className}</span>
         </div>
 
         {students.length > 1 && (
-          <ChevronDown className={cn("size-4 text-zinc-400 dark:text-zinc-600 ml-2 transition-transform duration-300", dropdownOpen && "rotate-180")} />
+          <ChevronDown className={cn("size-4 text-zinc-500 dark:text-zinc-600 ml-2 transition-transform duration-300", dropdownOpen && "rotate-180")} />
         )}
       </button>
 
@@ -60,8 +60,8 @@ export function ChildSelector({ students, selectedStudentId, onSelect }: ChildSe
             className="fixed inset-0 z-10" 
             onClick={() => setDropdownOpen(false)}
           />
-          <div className="absolute left-0 top-full mt-3 w-72 z-20 bg-white dark:bg-zinc-900 border border-zinc-200/60 dark:border-zinc-800/60 rounded-[24px] shadow-2xl overflow-hidden py-2 animate-in fade-in slide-in-from-top-4 duration-300">
-            <div className="px-4 py-2 text-[10px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-widest border-b border-zinc-50 dark:border-zinc-800/50 mb-1">
+          <div className="absolute left-0 top-full mt-3 w-72 z-20 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-[24px] shadow-2xl overflow-hidden py-2 animate-in fade-in slide-in-from-top-4 duration-300">
+            <div className="px-4 py-2 text-[10px] font-bold text-zinc-500 dark:text-zinc-500 uppercase tracking-widest border-b border-zinc-100 dark:border-zinc-800/50 mb-1">
               Switch Student
             </div>
             <div className="max-h-[320px] overflow-y-auto">
@@ -77,7 +77,7 @@ export function ChildSelector({ students, selectedStudentId, onSelect }: ChildSe
                     }}
                     className={`w-full flex items-center justify-between px-4 py-3 text-left transition-all ${
                       isSelected 
-                        ? "bg-amber-50/50 dark:bg-amber-950/10 text-amber-600 dark:text-amber-400" 
+                        ? "bg-amber-50/50 dark:bg-amber-950/10 text-amber-700 dark:text-amber-400" 
                         : "hover:bg-zinc-50 dark:hover:bg-zinc-800/50"
                     }`}
                   >
@@ -85,13 +85,13 @@ export function ChildSelector({ students, selectedStudentId, onSelect }: ChildSe
                       <span className={`size-9 rounded-xl flex items-center justify-center text-xs font-bold transition-all ${
                         isSelected 
                           ? "bg-amber-400 text-zinc-900 shadow-sm" 
-                          : "bg-zinc-100 dark:bg-zinc-800 text-zinc-500 dark:text-zinc-400"
+                          : "bg-zinc-200 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400"
                       }`}>
                         {studentInitials}
                       </span>
                       <div className="space-y-0.5">
-                        <span className={`text-sm font-semibold block ${isSelected ? "text-zinc-900 dark:text-zinc-50" : "text-zinc-700 dark:text-zinc-300"}`}>{student.name}</span>
-                        <span className="text-[10px] text-zinc-400 dark:text-zinc-500 font-medium">{student.className}</span>
+                        <span className={`text-sm font-semibold block ${isSelected ? "text-zinc-900 dark:text-zinc-50" : "text-zinc-800 dark:text-zinc-300"}`}>{student.name}</span>
+                        <span className="text-[10px] text-zinc-500 dark:text-zinc-500 font-medium">{student.className}</span>
                       </div>
                     </div>
                     {isSelected && (
