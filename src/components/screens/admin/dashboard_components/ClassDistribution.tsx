@@ -47,7 +47,7 @@ export function ClassDistribution({ isLoading, data, recharts, maleStudents = 0,
       </CardHeader>
       <CardContent className="p-4 sm:p-6 pb-3 sm:pb-4 flex-1 flex flex-col justify-between">
         {isLoading || !recharts ? (
-          <Skeleton className="h-[300px] w-full" />
+          <Skeleton className="h-75 w-full" />
         ) : (
           (() => {
             const { PieChart, Pie, Cell } = recharts;
@@ -83,7 +83,7 @@ export function ClassDistribution({ isLoading, data, recharts, maleStudents = 0,
 
             return (
               <div className="flex flex-col justify-between flex-grow w-full">
-                <ChartContainer config={pieChartConfig} className="h-[220px] w-full mb-2">
+                <ChartContainer config={pieChartConfig} className="h-55 w-full mb-2">
                   <PieChart margin={{ left: 24, right: 24, top: 10, bottom: 10 }}>
                     <Pie
                       data={groupedData}

@@ -43,7 +43,7 @@ export function FeeCollection({ isLoading, data, recharts }: FeeCollectionProps)
       </CardHeader>
       <CardContent className="p-4 sm:p-6 pl-2 sm:pl-6 pb-3 sm:pb-4 flex-1 flex flex-col justify-between">
         {isLoading || !recharts ? (
-          <Skeleton className="h-[280px] w-full" />
+          <Skeleton className="h-70 w-full" />
         ) : (
           (() => {
             const { BarChart, Bar, XAxis, YAxis, CartesianGrid } = recharts;
@@ -58,8 +58,8 @@ export function FeeCollection({ isLoading, data, recharts }: FeeCollectionProps)
             );
 
             return (
-              <div className="flex flex-col justify-between flex-grow w-full">
-                <ChartContainer config={feeChartConfig} className="h-[300px] w-full mb-2">
+              <div className="flex flex-col justify-between grow w-full">
+                <ChartContainer config={feeChartConfig} className="h-75 w-full mb-2">
                   <BarChart data={displayData} margin={{ left: -5, right: 5, top: 5, bottom: 15 }}>
                     <CartesianGrid strokeDasharray="3 3" vertical={false} />
                     <XAxis dataKey="month" tickLine={false} axisLine={false} fontSize={12} tickMargin={16} />
