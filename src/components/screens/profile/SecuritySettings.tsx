@@ -59,11 +59,11 @@ export function SecuritySettings({ theme, setTheme, onPasswordChange, userRole }
             <h4 className="text-sm font-semibold">Workspace Appearance Mode</h4>
             <p className="text-xs text-zinc-500 dark:text-zinc-400">Select a premium color scheme tailored for maximum comfort.</p>
           </div>
-          <div className="grid grid-cols-3 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
             <Button
               variant={theme === "light" ? "default" : "outline"}
               onClick={() => setTheme("light")}
-              className="h-20 flex flex-col gap-2 rounded-xl justify-center items-center font-bold"
+              className="h-auto py-4 min-h-[5rem] px-3 flex flex-col gap-2 rounded-xl justify-center items-center font-bold"
             >
               <Sun className="size-5 text-amber-500" />
               <span className="text-xs">Light Theme</span>
@@ -71,7 +71,7 @@ export function SecuritySettings({ theme, setTheme, onPasswordChange, userRole }
             <Button
               variant={theme === "dark" ? "default" : "outline"}
               onClick={() => setTheme("dark")}
-              className="h-20 flex flex-col gap-2 rounded-xl justify-center items-center font-bold"
+              className="h-auto py-4 min-h-[5rem] px-3 flex flex-col gap-2 rounded-xl justify-center items-center font-bold"
             >
               <Moon className="size-5 text-blue-400" />
               <span className="text-xs">Dark Theme</span>
@@ -79,7 +79,7 @@ export function SecuritySettings({ theme, setTheme, onPasswordChange, userRole }
             <Button
               variant={theme === "system" ? "default" : "outline"}
               onClick={() => setTheme("system")}
-              className="h-20 flex flex-col gap-2 rounded-xl justify-center items-center font-bold"
+              className="h-auto py-4 min-h-[5rem] px-3 flex flex-col gap-2 rounded-xl justify-center items-center font-bold"
             >
               <Laptop className="size-5 text-zinc-500" />
               <span className="text-xs">System Default</span>
@@ -87,8 +87,8 @@ export function SecuritySettings({ theme, setTheme, onPasswordChange, userRole }
           </div>
         </div>
 
-        {/* Dashboard Preference Section */}
-        {(userRole === "admin" || userRole === "teacher" || userRole === "staff") && (
+        {/* Dashboard Preference Section (For Admin & Teacher only) */}
+        {(userRole === "admin" || userRole === "teacher") && (
           <>
             <Separator />
             <div className="space-y-3">
@@ -96,11 +96,11 @@ export function SecuritySettings({ theme, setTheme, onPasswordChange, userRole }
                 <h4 className="text-sm font-semibold">Dashboard Style Preference</h4>
                 <p className="text-xs text-zinc-500 dark:text-zinc-400">Choose the layout style of your homepage dashboard.</p>
               </div>
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <Button
                   variant={dashboardPref === "comprehensive" ? "default" : "outline"}
                   onClick={() => handleDashboardPrefChange("comprehensive")}
-                  className="h-20 flex flex-col gap-2 rounded-xl justify-center items-center font-bold"
+                  className="h-auto py-4 min-h-[5rem] px-3 flex flex-col gap-2 rounded-xl justify-center items-center font-bold"
                 >
                   <LayoutDashboard className="size-5 text-violet-500" />
                   <div className="text-center">
@@ -111,7 +111,7 @@ export function SecuritySettings({ theme, setTheme, onPasswordChange, userRole }
                 <Button
                   variant={dashboardPref === "minimal" ? "default" : "outline"}
                   onClick={() => handleDashboardPrefChange("minimal")}
-                  className="h-20 flex flex-col gap-2 rounded-xl justify-center items-center font-bold"
+                  className="h-auto py-4 min-h-[5rem] px-3 flex flex-col gap-2 rounded-xl justify-center items-center font-bold"
                 >
                   <Zap className="size-5 text-amber-500" />
                   <div className="text-center">
@@ -133,11 +133,11 @@ export function SecuritySettings({ theme, setTheme, onPasswordChange, userRole }
                 <h4 className="text-sm font-semibold">Sidebar Mode Preference</h4>
                 <p className="text-xs text-zinc-500 dark:text-zinc-400">Choose if you want the navigation sidebar open or minimized by default.</p>
               </div>
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <Button
                   variant={sidebarPref === "disabled" ? "default" : "outline"}
                   onClick={() => handleSidebarPrefChange("disabled")}
-                  className="h-20 flex flex-col gap-2 rounded-xl justify-center items-center font-bold"
+                  className="h-auto py-4 min-h-[5rem] px-3 flex flex-col gap-2 rounded-xl justify-center items-center font-bold"
                 >
                   <PanelLeftClose className="size-5 text-indigo-500" />
                   <div className="text-center">
@@ -148,7 +148,7 @@ export function SecuritySettings({ theme, setTheme, onPasswordChange, userRole }
                 <Button
                   variant={sidebarPref === "enabled" ? "default" : "outline"}
                   onClick={() => handleSidebarPrefChange("enabled")}
-                  className="h-20 flex flex-col gap-2 rounded-xl justify-center items-center font-bold"
+                  className="h-auto py-4 min-h-[5rem] px-3 flex flex-col gap-2 rounded-xl justify-center items-center font-bold"
                 >
                   <PanelLeftOpen className="size-5 text-emerald-500" />
                   <div className="text-center">
