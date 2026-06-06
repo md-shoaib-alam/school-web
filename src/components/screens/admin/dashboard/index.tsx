@@ -56,6 +56,8 @@ function getDaysRemaining(endDate?: string | null) {
   return differenceInDays(expiry, now);
 }
 
+import { actionKeywords } from "@/components/layout/dashboard-keywords";
+
 export function AdminDashboard() {
   const { push } = useRouter();
   const [recharts, setRecharts] = useState<typeof import("recharts") | null>(null);
@@ -388,8 +390,9 @@ export function AdminDashboard() {
   const filteredQuickActions = allAdminQuickActions.filter((action) => {
     const query = searchQuery.toLowerCase();
     const labelMatch = action.label.toLowerCase().includes(query);
-    const keywordsMatch = action.keywords?.some((kw) => kw.toLowerCase().includes(query));
-    return labelMatch || !!keywordsMatch;
+    const kws = actionKeywords[action.screen] || [];
+    const keywordsMatch = kws.some((kw) => kw.toLowerCase().includes(query));
+    return labelMatch || keywordsMatch;
   });
 
   if (layoutPref === "minimal") {

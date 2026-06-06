@@ -36,6 +36,8 @@ import {
   Search,
 } from "lucide-react";
 
+import { actionKeywords } from "@/components/layout/dashboard-keywords";
+
 export function StaffDashboard() {
   const { push } = useRouter();
   const { currentUser, currentTenantSlug, currentTenantId, setCurrentScreen } = useAppStore();
@@ -322,8 +324,9 @@ export function StaffDashboard() {
   const filteredQuickActions = quickActions.filter((action) => {
     const query = searchQuery.toLowerCase();
     const labelMatch = action.label.toLowerCase().includes(query);
-    const keywordsMatch = action.keywords?.some((kw) => kw.toLowerCase().includes(query));
-    return labelMatch || !!keywordsMatch;
+    const kws = actionKeywords[action.screen] || [];
+    const keywordsMatch = kws.some((kw) => kw.toLowerCase().includes(query));
+    return labelMatch || keywordsMatch;
   });
 
   return (
