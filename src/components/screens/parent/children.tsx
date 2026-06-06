@@ -107,18 +107,22 @@ export function ParentChildren() {
           <StudentProfileCard student={selectedStudent} />
           
           {/* Quick Info / Platform Status */}
-          <div className="rounded-3xl border border-zinc-200/60 dark:border-zinc-800/60 bg-white dark:bg-zinc-950 p-6 space-y-4 shadow-xs">
-            <h4 className="text-xs font-semibold uppercase text-zinc-400 dark:text-zinc-500 tracking-wider">Quick Actions</h4>
+          <div className="rounded-3xl border border-zinc-200/60 dark:border-zinc-800/60 bg-white dark:bg-zinc-950 p-5 sm:p-6 space-y-4 shadow-xs">
+            <h4 className="text-[10px] font-bold uppercase text-zinc-400 dark:text-zinc-500 tracking-widest">Quick Actions</h4>
             <div className="grid grid-cols-2 gap-3">
-              <a href="attendance" className="p-3.5 rounded-2xl bg-zinc-50/50 dark:bg-zinc-900/20 border border-zinc-100 dark:border-zinc-900 hover:border-amber-500/30 transition-all flex flex-col justify-between h-24 text-left group">
-                <UserCheck className="size-5 text-emerald-600 dark:text-emerald-500" />
-                <span className="text-xs font-medium text-zinc-700 dark:text-zinc-300 group-hover:text-amber-500 flex items-center gap-1 transition-colors">
+              <a href="attendance" className="p-3 sm:p-4 rounded-2xl bg-zinc-50/50 dark:bg-zinc-900/40 border-2 border-zinc-100 dark:border-zinc-800/50 hover:border-amber-500/40 hover:bg-amber-50/30 dark:hover:bg-amber-500/5 transition-all flex flex-col justify-between h-20 sm:h-24 text-left group shadow-sm hover:shadow-md active:scale-[0.98]">
+                <div className="p-1.5 sm:p-2 rounded-xl bg-white dark:bg-zinc-800 border border-zinc-100 dark:border-zinc-700 w-fit group-hover:scale-110 transition-transform">
+                  <UserCheck className="size-4 sm:size-5 text-emerald-600 dark:text-emerald-500" />
+                </div>
+                <span className="text-[10px] sm:text-xs font-bold text-zinc-700 dark:text-zinc-300 group-hover:text-amber-600 dark:group-hover:text-amber-400 flex items-center gap-1 transition-colors">
                   Full Attendance <ArrowUpRight className="size-3" />
                 </span>
               </a>
-              <a href="grades" className="p-3.5 rounded-2xl bg-zinc-50/50 dark:bg-zinc-900/20 border border-zinc-100 dark:border-zinc-900 hover:border-amber-500/30 transition-all flex flex-col justify-between h-24 text-left group">
-                <Award className="size-5 text-violet-600 dark:text-violet-500" />
-                <span className="text-xs font-medium text-zinc-700 dark:text-zinc-300 group-hover:text-amber-500 flex items-center gap-1 transition-colors">
+              <a href="grades" className="p-3 sm:p-4 rounded-2xl bg-zinc-50/50 dark:bg-zinc-900/40 border-2 border-zinc-100 dark:border-zinc-800/50 hover:border-amber-500/40 hover:bg-amber-50/30 dark:hover:bg-amber-500/5 transition-all flex flex-col justify-between h-20 sm:h-24 text-left group shadow-sm hover:shadow-md active:scale-[0.98]">
+                <div className="p-1.5 sm:p-2 rounded-xl bg-white dark:bg-zinc-800 border border-zinc-100 dark:border-zinc-700 w-fit group-hover:scale-110 transition-transform">
+                  <Award className="size-4 sm:size-5 text-violet-600 dark:text-violet-500" />
+                </div>
+                <span className="text-[10px] sm:text-xs font-bold text-zinc-700 dark:text-zinc-300 group-hover:text-amber-600 dark:group-hover:text-amber-400 flex items-center gap-1 transition-colors">
                   Detailed Grades <ArrowUpRight className="size-3" />
                 </span>
               </a>

@@ -24,9 +24,9 @@ export function StudentProfileCard({ student }: StudentProfileCardProps) {
   return (
     <Card className="overflow-hidden rounded-3xl border border-zinc-200/50 dark:border-zinc-800/50 bg-white dark:bg-zinc-950 shadow-xs hover:shadow-sm transition-all duration-300">
       {/* Unified Top Banner */}
-      <div className="h-24 bg-white dark:bg-zinc-950 relative" />
+      <div className="h-16 sm:h-24 bg-white dark:bg-zinc-950 relative" />
 
-      <CardContent className="p-6 -mt-12 relative text-center">
+      <CardContent className="p-5 sm:p-6 -mt-8 sm:-mt-12 relative text-center">
         <div className="max-w-md mx-auto">
           {/* Avatar: Rounded circle with soft gradient and outline */}
           <div className="size-24 rounded-full bg-gradient-to-tr from-amber-400 to-amber-500 flex items-center justify-center text-white text-2xl font-semibold shadow-md border-4 border-white dark:border-zinc-950 mx-auto transition-transform duration-300 hover:scale-105">
