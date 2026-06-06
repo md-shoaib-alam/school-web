@@ -13,12 +13,13 @@ import {
   NoticesResponse, FeesResponse, AttendanceResponse, StaffResponse, StaffAttendanceResponse
 } from '../types'
 
-function useSubjects(tenantId?: string, page?: number, limit?: number) {
+export function useSubjects(tenantId?: string, page?: number, limit?: number) {
   return useQuery<SubjectsResponse>({
     queryKey: [...queryKeys.subjects, tenantId, page, limit],
     queryFn: () => graphqlQuery<{ subjects: SubjectsResponse }>(SUBJECTS, { tenantId, page, limit }).then(d => d.subjects),
     staleTime: 0,
     gcTime: 5 * 60 * 1000,
+    enabled: !!tenantId,
   })
 }
 
@@ -28,15 +29,17 @@ export function useClassesMin(tenantId?: string, page?: number, limit?: number) 
     queryFn: () => graphqlQuery<{ classes: ClassesResponse }>(CLASSES, { tenantId, page, limit }).then(d => d.classes),
     staleTime: 0,
     gcTime: 5 * 60 * 1000,
+    enabled: !!tenantId,
   })
 }
 
-function useTeachersMin(tenantId?: string, page?: number, limit?: number) {
+export function useTeachersMin(tenantId?: string, page?: number, limit?: number) {
   return useQuery<TeachersResponse>({
     queryKey: [...queryKeys.teachers, tenantId, page, limit],
     queryFn: () => graphqlQuery<{ teachers: TeachersResponse }>(TEACHERS, { tenantId, page, limit }).then(d => d.teachers),
     staleTime: 0,
     gcTime: 5 * 60 * 1000,
+    enabled: !!tenantId,
   })
 }
 
@@ -49,6 +52,7 @@ export function useClasses(tenantId?: string, page?: number, limit?: number) {
     },
     staleTime: 0,
     gcTime: 5 * 60 * 1000,
+    enabled: !!tenantId,
   })
 }
 
@@ -59,6 +63,7 @@ export function useTeachers(tenantId?: string, search?: string, page?: number, l
     staleTime: 30 * 60 * 1000,      // 30 minutes - data is fresh for this duration
     gcTime: 60 * 60 * 1000,         // 1 hour - keep in garbage collection
     refetchOnMount: true,             // Only refetch if stale (default, but explicit here)
+    enabled: !!tenantId,
   })
 }
 
@@ -68,6 +73,7 @@ export function useStudents(tenantId?: string, classId?: string, search?: string
     queryFn: () => graphqlQuery<{ students: StudentsResponse }>(STUDENTS, { tenantId, classId, search, page, limit }).then(d => d.students),
     staleTime: 0,
     gcTime: 5 * 60 * 1000,
+    enabled: !!tenantId,
   })
 }
 
@@ -78,6 +84,7 @@ export function useParents(tenantId?: string, search?: string, page?: number, li
     staleTime: 30 * 60 * 1000,      // 30 minutes - data is fresh for this duration
     gcTime: 60 * 60 * 1000,         // 1 hour - keep in garbage collection
     refetchOnMount: true,             // Only refetch if stale
+    enabled: !!tenantId,
   })
 }
 
@@ -90,10 +97,11 @@ export function useNotices(tenantId?: string, page?: number, limit?: number) {
     },
     staleTime: 0,
     gcTime: 5 * 60 * 1000,
+    enabled: !!tenantId,
   })
 }
 
-function useFees(tenantId?: string, page?: number, limit?: number) {
+export function useFees(tenantId?: string, page?: number, limit?: number) {
   return useQuery({
     queryKey: [...queryKeys.fees, tenantId, page, limit],
     queryFn: async () => {
@@ -102,15 +110,17 @@ function useFees(tenantId?: string, page?: number, limit?: number) {
     },
     staleTime: 0,
     gcTime: 5 * 60 * 1000,
+    enabled: !!tenantId,
   })
 }
 
-function useAttendance(tenantId?: string, page?: number, limit?: number) {
+export function useAttendance(tenantId?: string, page?: number, limit?: number) {
   return useQuery<AttendanceResponse>({
     queryKey: [...queryKeys.attendance, tenantId, page, limit],
     queryFn: () => graphqlQuery<{ attendance: AttendanceResponse }>(ATTENDANCE, { tenantId, page, limit }).then(d => d.attendance),
     staleTime: 0,
     gcTime: 15 * 60 * 1000,
+    enabled: !!tenantId,
   })
 }
 

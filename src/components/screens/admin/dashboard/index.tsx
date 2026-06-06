@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useAppStore } from "@/store/use-app-store";
 import { useQuery } from "@tanstack/react-query";
-import { useTenantDetail } from "@/lib/graphql/hooks/platform.hooks";
+import { useTenantMetadata } from "@/lib/graphql/hooks/platform.hooks";
 import { api } from "@/lib/api";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
@@ -122,7 +122,7 @@ export function AdminDashboard() {
   }, [error]);
 
   // Subscription Check
-  const { data: tenantDetail } = useTenantDetail(tenantId || "");
+  const { data: tenantDetail } = useTenantMetadata(tenantId || "");
   const tenant = tenantDetail?.tenant;
   const daysRemaining = getDaysRemaining(tenant?.endDate);
   const isExpiringSoon = daysRemaining !== null && daysRemaining >= 0 && daysRemaining <= 3;

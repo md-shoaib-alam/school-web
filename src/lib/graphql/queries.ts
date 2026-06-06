@@ -194,6 +194,14 @@ export const TENANT_DETAIL = `
   }
 `
 
+export const TENANT_METADATA = `
+  query TenantMetadata($tenantId: String!) {
+    tenantDetail(tenantId: $tenantId) {
+      tenant { id name slug logo email phone address website plan status maxStudents maxTeachers maxParents maxClasses startDate endDate createdAt deletedAt studentCount teacherCount parentCount adminCount activeSubscriptions totalRevenue _count { users classes subscriptions notices events } }
+    }
+  }
+`
+
 export const SUBJECTS = `
   query Subjects($tenantId: String, $page: Int, $limit: Int) {
     subjects(tenantId: $tenantId, page: $page, limit: $limit) {

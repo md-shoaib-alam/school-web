@@ -6,7 +6,7 @@ import { api } from '@/lib/api'
 import { 
   PLATFORM_STATS, BILLING_DATA, TENANTS, USERS, AUDIT_LOGS, 
   CREATE_TENANT, UPDATE_TENANT, DELETE_TENANT, TOGGLE_TENANT_STATUS, SUBSCRIPTIONS,
-  TOGGLE_USER_STATUS, CREATE_USER, TENANT_DETAIL, RESTORE_TENANT
+  TOGGLE_USER_STATUS, CREATE_USER, TENANT_DETAIL, RESTORE_TENANT, TENANT_METADATA
 } from '../queries'
 import { 
   PlatformStatsData, BillingDataResponse, TenantsResponse, UsersResponse, 
@@ -79,6 +79,16 @@ export function useTenantDetail(tenantId: string) {
   return useQuery({
     queryKey: queryKeys.tenantDetail(tenantId),
     queryFn: () => graphqlQuery<{ tenantDetail: TenantDetailData }>(TENANT_DETAIL, { tenantId })
+      .then(d => d.tenantDetail),
+    staleTime: 60 * 1000,
+    enabled: !!tenantId,
+  })
+}
+
+export function useTenantMetadata(tenantId: string) {
+  return useQuery({
+    queryKey: ['tenant', 'metadata', tenantId],
+    queryFn: () => graphqlQuery<{ tenantDetail: TenantDetailData }>(TENANT_METADATA, { tenantId })
       .then(d => d.tenantDetail),
     staleTime: 60 * 1000,
     enabled: !!tenantId,

@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Script from "next/script";
 import { useAppStore } from "@/store/use-app-store";
-import { useTenantDetail, useUpgradeSchool } from "@/lib/graphql/hooks/platform.hooks";
+import { useTenantMetadata, useUpgradeSchool } from "@/lib/graphql/hooks/platform.hooks";
 import { PricingPlans, SchoolPlan } from "./subscription/pricing-plans";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -18,7 +18,7 @@ export function ManagePlanScreen() {
   const { slug } = useParams();
   const queryClient = useQueryClient();
   const { currentTenantId } = useAppStore();
-  const { data: detailData, isLoading: isDetailLoading } = useTenantDetail(currentTenantId || "");
+  const { data: detailData, isLoading: isDetailLoading } = useTenantMetadata(currentTenantId || "");
   const upgradeSchool = useUpgradeSchool();
   const [isUpdating, setIsUpdating] = useState(false);
 
