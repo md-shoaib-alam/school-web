@@ -109,7 +109,7 @@ export function ImportExportButtons({
             onImportSuccess();
             setTimeout(() => {
               setImportDialogOpen(false);
-            }, 1500);
+            }, 3000);
           } else {
             toast.error(`${result.errors || 0} of ${result.total || 0} records had errors.`);
             onImportSuccess(); // Refresh to show whatever did succeed
@@ -243,7 +243,7 @@ export function ImportExportButtons({
           onImportSuccess();
           setTimeout(() => {
             setImportDialogOpen(false);
-          }, 1500);
+          }, 3000);
         } else {
           // Show actual error details in the UI
           const details = data.errorDetails?.length ? data.errorDetails.slice(0, 3).join('; ') : 'Check the error details below.';
