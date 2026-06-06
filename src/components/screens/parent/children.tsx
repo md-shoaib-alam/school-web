@@ -101,38 +101,38 @@ export function ParentChildren() {
       </div>
 
       {/* Main Workspace Layout Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-        {/* Left Side: Profile Card (4 Columns on LG/XL) */}
-        <div className="lg:col-span-4 space-y-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
+        {/* Left Column: Profile Card + Quick Actions */}
+        <div className="space-y-6">
           <StudentProfileCard student={selectedStudent} />
           
-          {/* Quick Info / Platform Status */}
-          <div className="rounded-3xl border border-zinc-200/60 dark:border-zinc-800/60 bg-white dark:bg-zinc-950 p-5 sm:p-6 space-y-4 shadow-xs">
-            <h4 className="text-[10px] font-bold uppercase text-zinc-400 dark:text-zinc-500 tracking-widest">Quick Actions</h4>
+          {/* Quick Actions Card - Moved here from main row */}
+          <div className="rounded-3xl border border-zinc-200/60 dark:border-zinc-800/60 bg-white dark:bg-zinc-950 p-5 flex flex-col shadow-xs">
+            <h4 className="text-[10px] font-bold uppercase text-zinc-400 dark:text-zinc-500 tracking-widest mb-4">Quick Actions</h4>
             <div className="grid grid-cols-2 gap-3">
-              <a href="attendance" className="p-3 sm:p-4 rounded-2xl bg-zinc-50/50 dark:bg-zinc-900/40 border-2 border-zinc-100 dark:border-zinc-800/50 hover:border-amber-500/40 hover:bg-amber-50/30 dark:hover:bg-amber-500/5 transition-all flex flex-col justify-between h-20 sm:h-24 text-left group shadow-sm hover:shadow-md active:scale-[0.98]">
-                <div className="p-1.5 sm:p-2 rounded-xl bg-white dark:bg-zinc-800 border border-zinc-100 dark:border-zinc-700 w-fit group-hover:scale-110 transition-transform">
-                  <UserCheck className="size-4 sm:size-5 text-emerald-600 dark:text-emerald-500" />
+              <a href="attendance" className="p-3 rounded-2xl bg-zinc-50/50 dark:bg-zinc-900/40 border-2 border-zinc-100 dark:border-zinc-800/50 hover:border-amber-500/40 hover:bg-amber-50/30 dark:hover:bg-amber-500/5 transition-all flex items-center justify-center gap-2 group shadow-sm hover:shadow-md active:scale-[0.98]">
+                <div className="p-1.5 rounded-lg bg-white dark:bg-zinc-800 border border-zinc-100 dark:border-zinc-700 group-hover:scale-110 transition-transform">
+                  <UserCheck className="size-3.5 text-emerald-600 dark:text-emerald-500" />
                 </div>
-                <span className="text-[10px] sm:text-xs font-bold text-zinc-700 dark:text-zinc-300 group-hover:text-amber-600 dark:group-hover:text-amber-400 flex items-center gap-1 transition-colors">
-                  Full Attendance <ArrowUpRight className="size-3" />
+                <span className="text-[10px] font-bold text-zinc-700 dark:text-zinc-300 group-hover:text-amber-600 dark:group-hover:text-amber-400 transition-colors whitespace-nowrap">
+                  Attendance
                 </span>
               </a>
-              <a href="grades" className="p-3 sm:p-4 rounded-2xl bg-zinc-50/50 dark:bg-zinc-900/40 border-2 border-zinc-100 dark:border-zinc-800/50 hover:border-amber-500/40 hover:bg-amber-50/30 dark:hover:bg-amber-500/5 transition-all flex flex-col justify-between h-20 sm:h-24 text-left group shadow-sm hover:shadow-md active:scale-[0.98]">
-                <div className="p-1.5 sm:p-2 rounded-xl bg-white dark:bg-zinc-800 border border-zinc-100 dark:border-zinc-700 w-fit group-hover:scale-110 transition-transform">
-                  <Award className="size-4 sm:size-5 text-violet-600 dark:text-violet-500" />
+              <a href="school-exams" className="p-3 rounded-2xl bg-zinc-50/50 dark:bg-zinc-900/40 border-2 border-zinc-100 dark:border-zinc-800/50 hover:border-amber-500/40 hover:bg-amber-50/30 dark:hover:bg-amber-500/5 transition-all flex items-center justify-center gap-2 group shadow-sm hover:shadow-md active:scale-[0.98]">
+                <div className="p-1.5 rounded-lg bg-white dark:bg-zinc-800 border border-zinc-100 dark:border-zinc-700 group-hover:scale-110 transition-transform">
+                  <Award className="size-3.5 text-violet-600 dark:text-violet-500" />
                 </div>
-                <span className="text-[10px] sm:text-xs font-bold text-zinc-700 dark:text-zinc-300 group-hover:text-amber-600 dark:group-hover:text-amber-400 flex items-center gap-1 transition-colors">
-                  Detailed Grades <ArrowUpRight className="size-3" />
+                <span className="text-[10px] font-bold text-zinc-700 dark:text-zinc-300 group-hover:text-amber-600 dark:group-hover:text-amber-400 transition-colors whitespace-nowrap">
+                  Grades
                 </span>
               </a>
             </div>
           </div>
         </div>
 
-        {/* Right Side: Performance Workspace (8 Columns on LG/XL) */}
-        <div className="lg:col-span-8 space-y-8">
-          {/* Core Analytics Bento Grid */}
+        {/* Center/Right Column: Main Dashboard Content (Spans 2 columns on desktop) */}
+        <div className="lg:col-span-2 space-y-8">
+          {/* Top Row: Metrics (Now full width of center column) */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
             {/* Attendance Stat Card */}
             <div className="relative overflow-hidden rounded-3xl border border-zinc-200/50 dark:border-zinc-800/50 bg-white dark:bg-zinc-950 p-6 flex flex-col justify-between min-h-[140px] shadow-xs hover:border-emerald-500/20 transition-all group">
@@ -194,7 +194,7 @@ export function ParentChildren() {
                   <span className="text-xl font-semibold text-zinc-800 dark:text-zinc-200 tracking-tight">
                     {subjectPerf.length}
                   </span>
-                  <span className="text-[10px] text-zinc-500 font-medium">Subjects registered</span>
+                  <span className="text-[10px] text-zinc-500 font-medium">Subjects</span>
                 </div>
                 <div className="text-[9px] text-zinc-400 dark:text-zinc-500 font-medium mt-3 uppercase tracking-wider flex items-center gap-1">
                   <BookmarkCheck className="size-3 text-amber-500" /> Syllabus aligned

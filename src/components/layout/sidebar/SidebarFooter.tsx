@@ -24,6 +24,7 @@ interface SidebarFooterProps {
   onNavigate: (screen: string) => void;
   onLogout: () => void;
   onPasswordChange: () => void;
+  isMinimal?: boolean;
 }
 
 export function SidebarFooter({
@@ -36,6 +37,7 @@ export function SidebarFooter({
   onNavigate,
   onLogout,
   onPasswordChange,
+  isMinimal = false,
 }: SidebarFooterProps) {
   const renderProfileInfo = () => (
     <div className="flex items-center gap-2 p-2">
@@ -112,15 +114,17 @@ export function SidebarFooter({
               "p-4 border-t border-rose-800/50",
               !sidebarOpen && "flex items-center justify-center"
             )
-          : cn(
-              "bg-white dark:bg-zinc-950 border border-zinc-200/80 dark:border-zinc-800 shadow-sm",
-              sidebarOpen
-                ? "mx-3 mb-3 p-3 rounded-xl"
-                : "size-12 mb-3 rounded-xl flex items-center justify-center mx-auto"
-            )
+          : isMinimal
+            ? "mb-6 flex items-center justify-center mx-auto"
+            : cn(
+                "bg-white dark:bg-zinc-950 border border-zinc-200/80 dark:border-zinc-800 shadow-sm",
+                sidebarOpen
+                  ? "mx-3 mb-3 p-3 rounded-xl"
+                  : "size-12 mb-3 rounded-xl flex items-center justify-center mx-auto"
+              )
       )}
     >
-      {sidebarOpen ? (
+      {sidebarOpen && !isMinimal ? (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <div className="flex items-center gap-3 w-full cursor-pointer select-none group">
@@ -181,8 +185,8 @@ export function SidebarFooter({
         <div className="flex items-center justify-center">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button type="button" variant="ghost" className="p-0 size-9 rounded-full focus-visible:ring-0">
-                <Avatar className="size-9 cursor-pointer hover:opacity-85 transition-opacity">
+              <Button type="button" variant="ghost" className="p-0 size-11 rounded-full focus-visible:ring-0 hover:bg-transparent">
+                <Avatar className={cn("size-11 cursor-pointer hover:scale-105 transition-all shadow-lg ring-2 ring-white/20", isMinimal && "ring-white/40")}>
                   <AvatarImage src={currentUser.avatar} alt={currentUser.name} className="object-cover" />
                   <AvatarFallback
                     className={cn(
@@ -195,7 +199,7 @@ export function SidebarFooter({
                 </Avatar>
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="start" className="w-56 ml-2">
+            <DropdownMenuContent align={isMinimal ? "center" : "start"} side={isMinimal ? "right" : "bottom"} className="w-56 ml-2">
               {renderProfileInfo()}
               <DropdownMenuSeparator />
               {renderDropdownItems()}
