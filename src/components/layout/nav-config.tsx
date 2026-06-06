@@ -286,8 +286,6 @@ export const navItems: Record<UserRole, NavItem[]> = {
 
     // System
     { key: "roles", label: "Roles & Permissions", icon: <Shield className="size-4" /> },
-    { key: "school-subscription", label: "My Subscription", icon: <Crown className="size-4" /> },
-    { key: "school-settings", label: "School Settings", icon: <Settings className="size-4" /> },
     { key: "reports", label: "Reports", icon: <BarChart3 className="size-4" /> },
   ],
   teacher: [

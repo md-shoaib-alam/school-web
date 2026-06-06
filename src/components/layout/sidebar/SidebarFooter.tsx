@@ -121,65 +121,62 @@ export function SidebarFooter({
       )}
     >
       {sidebarOpen ? (
-        <div className="flex items-center gap-3">
-          <Avatar className="size-9">
-            <AvatarImage src={currentUser.avatar} alt={currentUser.name} className="object-cover" />
-            <AvatarFallback
-              className={cn(
-                "text-white text-xs font-semibold",
-                roleColors[currentUser.role],
-              )}
-            >
-              {initials}
-            </AvatarFallback>
-          </Avatar>
-          <div className="flex-1 min-w-0">
-            <p
-              className={cn(
-                "text-sm font-medium truncate",
-                isSuperAdmin
-                  ? "text-white"
-                  : "text-zinc-900 dark:text-zinc-100",
-              )}
-            >
-              {currentUser.name}
-            </p>
-            <Badge
-              variant="secondary"
-              className={cn(
-                "text-[10px] px-1.5 py-0",
-                isSuperAdmin
-                  ? "bg-rose-800/60 text-rose-200 hover:bg-rose-800/60"
-                  : "",
-              )}
-            >
-              {currentUser.customRole?.name || roleLabels[currentUser.role]}
-            </Badge>
-          </div>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <div className="flex items-center gap-3 w-full cursor-pointer select-none group">
+              <Avatar className="size-9">
+                <AvatarImage src={currentUser.avatar} alt={currentUser.name} className="object-cover" />
+                <AvatarFallback
+                  className={cn(
+                    "text-white text-xs font-semibold",
+                    roleColors[currentUser.role],
+                  )}
+                >
+                  {initials}
+                </AvatarFallback>
+              </Avatar>
+              <div className="flex-1 min-w-0">
+                <p
+                  className={cn(
+                    "text-sm font-medium truncate",
+                    isSuperAdmin
+                      ? "text-white"
+                      : "text-zinc-900 dark:text-zinc-100",
+                  )}
+                >
+                  {currentUser.name}
+                </p>
+                <Badge
+                  variant="secondary"
+                  className={cn(
+                    "text-[10px] px-1.5 py-0",
+                    isSuperAdmin
+                      ? "bg-rose-800/60 text-rose-200 hover:bg-rose-800/60"
+                      : "",
+                  )}
+                >
+                  {currentUser.customRole?.name || roleLabels[currentUser.role]}
+                </Badge>
+              </div>
 
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button
-                type="button"
-                variant="ghost"
-                size="icon"
+              <div
                 className={cn(
-                  "size-8",
+                  "size-8 flex items-center justify-center rounded-md transition-colors",
                   isSuperAdmin
-                    ? "text-rose-300 hover:bg-rose-800/60 hover:text-white"
-                    : "text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800",
+                    ? "text-rose-300 group-hover:bg-rose-800/60 group-hover:text-white"
+                    : "text-zinc-400 group-hover:bg-zinc-100 dark:group-hover:bg-zinc-800 group-hover:text-zinc-700 dark:group-hover:text-zinc-200",
                 )}
               >
                 <Settings className="size-4" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-56">
-              {renderProfileInfo()}
-              <DropdownMenuSeparator />
-              {renderDropdownItems()}
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </div>
+              </div>
+            </div>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="w-56">
+            {renderProfileInfo()}
+            <DropdownMenuSeparator />
+            {renderDropdownItems()}
+          </DropdownMenuContent>
+        </DropdownMenu>
       ) : (
         <div className="flex items-center justify-center">
           <DropdownMenu>

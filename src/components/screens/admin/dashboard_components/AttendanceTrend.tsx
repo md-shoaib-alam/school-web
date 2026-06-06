@@ -43,12 +43,12 @@ export function AttendanceTrend({ isLoading, data, recharts }: AttendanceTrendPr
       </CardHeader>
       <CardContent className="p-4 sm:p-6 pl-2 sm:pl-6">
         {isLoading || !recharts ? (
-          <Skeleton className="h-[280px] w-full" />
+          <Skeleton className="h-70 w-full" />
         ) : (
           (() => {
             const { BarChart, Bar, XAxis, YAxis, CartesianGrid } = recharts;
             return (
-              <ChartContainer config={attendanceChartConfig} className="h-[280px] w-full">
+              <ChartContainer config={attendanceChartConfig} className="h-70 w-full">
                 <BarChart data={displayData} margin={{ left: -5, right: 5, top: 5, bottom: 5 }}>
                   <CartesianGrid strokeDasharray="3 3" vertical={false} />
                   <XAxis dataKey="month" tickLine={false} axisLine={false} fontSize={12} />

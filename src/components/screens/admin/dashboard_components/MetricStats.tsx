@@ -16,7 +16,7 @@ interface MetricStatsProps {
 
 function StatCardSkeleton() {
   return (
-    <Skeleton className="h-[110px] rounded-xl" />
+    <Skeleton className="h-27.5 rounded-xl" />
   );
 }
 
@@ -24,17 +24,17 @@ export function MetricStats({ isLoading, data }: MetricStatsProps) {
   if (isLoading && !data) {
     return (
       <div className="flex overflow-x-auto lg:grid lg:grid-cols-4 gap-4 pb-2 lg:pb-0 scrollbar-none">
-        <div className="min-w-[200px] flex-shrink-0 lg:min-w-0"><StatCardSkeleton /></div>
-        <div className="min-w-[200px] flex-shrink-0 lg:min-w-0"><StatCardSkeleton /></div>
-        <div className="min-w-[200px] flex-shrink-0 lg:min-w-0"><StatCardSkeleton /></div>
-        <div className="min-w-[200px] flex-shrink-0 lg:min-w-0"><StatCardSkeleton /></div>
+        <div className="min-w-50 shrink-0 lg:min-w-0"><StatCardSkeleton /></div>
+        <div className="min-w-50 shrink-0 lg:min-w-0"><StatCardSkeleton /></div>
+        <div className="min-w-50 shrink-0 lg:min-w-0"><StatCardSkeleton /></div>
+        <div className="min-w-50 shrink-0 lg:min-w-0"><StatCardSkeleton /></div>
       </div>
     );
   }
 
   return (
     <div className="flex overflow-x-auto lg:grid lg:grid-cols-4 gap-4 pb-2 lg:pb-0 scrollbar-none">
-      <Card className="min-w-[200px] flex-shrink-0 lg:min-w-0 hover:shadow-md transition-shadow">
+      <Card className="min-w-50 shrink-0 lg:min-w-0 hover:shadow-md transition-shadow">
         <CardContent className="p-5">
           <div className="flex items-center gap-3">
             <div className="size-11 rounded-xl bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 flex items-center justify-center">
@@ -47,7 +47,7 @@ export function MetricStats({ isLoading, data }: MetricStatsProps) {
           </div>
         </CardContent>
       </Card>
-      <Card className="min-w-[200px] flex-shrink-0 lg:min-w-0 hover:shadow-md transition-shadow">
+      <Card className="min-w-50 shrink-0 lg:min-w-0 hover:shadow-md transition-shadow">
         <CardContent className="p-5">
           <div className="flex items-center gap-3">
             <div className="size-11 rounded-xl bg-rose-100 dark:bg-rose-900/30 text-rose-600 dark:text-rose-400 flex items-center justify-center">
@@ -60,7 +60,7 @@ export function MetricStats({ isLoading, data }: MetricStatsProps) {
           </div>
         </CardContent>
       </Card>
-      <Card className="min-w-[200px] flex-shrink-0 lg:min-w-0 hover:shadow-md transition-shadow">
+      <Card className="min-w-50 shrink-0 lg:min-w-0 hover:shadow-md transition-shadow">
         <CardContent className="p-5">
           <div className="flex items-center gap-3">
             <div className="size-11 rounded-xl bg-cyan-100 dark:bg-cyan-900/30 text-cyan-600 dark:text-cyan-400 flex items-center justify-center">
@@ -73,7 +73,7 @@ export function MetricStats({ isLoading, data }: MetricStatsProps) {
           </div>
         </CardContent>
       </Card>
-      <Card className="min-w-[200px] flex-shrink-0 lg:min-w-0 hover:shadow-md transition-shadow">
+      <Card className="min-w-50 shrink-0 lg:min-w-0 hover:shadow-md transition-shadow">
         <CardContent className="p-5">
           <div className="flex items-center gap-3">
             <div className="size-11 rounded-xl bg-violet-100 dark:bg-violet-900/30 text-violet-600 dark:text-violet-400 flex items-center justify-center">

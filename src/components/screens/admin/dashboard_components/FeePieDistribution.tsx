@@ -58,9 +58,9 @@ export function FeePieDistribution({ isLoading, data, recharts }: FeePieDistribu
       </CardHeader>
       <CardContent className="p-4 sm:p-6 pb-3 sm:pb-4">
         {isLoading || !recharts ? (
-          <Skeleton className="h-[280px] w-full" />
+          <Skeleton className="h-70 w-full" />
         ) : pieData.length === 0 ? (
-          <div className="h-[280px] flex items-center justify-center text-sm text-muted-foreground">
+          <div className="h-70 flex items-center justify-center text-sm text-muted-foreground">
             No fee collection data available
           </div>
         ) : (
@@ -69,7 +69,7 @@ export function FeePieDistribution({ isLoading, data, recharts }: FeePieDistribu
             const totalVal = pieData.reduce((sum, item) => sum + item.value, 0);
             return (
               <div className="flex flex-col">
-                <ChartContainer config={feePieChartConfig} className="h-[220px] w-full">
+                <ChartContainer config={feePieChartConfig} className="h-55 w-full">
                   <PieChart margin={{ left: 24, right: 24, top: 10, bottom: 10 }}>
                     <Pie
                        data={pieData}

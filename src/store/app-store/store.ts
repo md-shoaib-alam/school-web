@@ -142,6 +142,29 @@ export const useAppStore = create<AppState>((set, get) => ({
   refreshPermissions: async () => {
     const state = get();
     if (!state.isLoggedIn || !state.currentUser) return;
+
+    const now = Date.now();
+    const TWO_HOURS = 2 * 60 * 60 * 1000;
+
+    // Check if we have valid cached profile permissions under 2 hours old
+    if (typeof window !== 'undefined') {
+      try {
+        const cacheTimeStr = localStorage.getItem('schoolsaas_profile_cache_time');
+        const cachedUserStr = localStorage.getItem(STORAGE_KEYS.USER);
+        if (cacheTimeStr && cachedUserStr) {
+          const cacheTime = parseInt(cacheTimeStr);
+          if (now - cacheTime < TWO_HOURS) {
+            const parsed = JSON.parse(cachedUserStr);
+            const userData = parsed.state ? parsed.state.currentUser : parsed;
+            if (userData && userData.id === state.currentUser.id) {
+              set({ currentUser: userData });
+              return;
+            }
+          }
+        }
+      } catch { /* ignore */ }
+    }
+
     try {
       const apiBase = process.env.NEXT_PUBLIC_API_URL || '';
       const token = typeof window !== 'undefined' ? localStorage.getItem('school_token') : null;
@@ -176,8 +199,10 @@ export const useAppStore = create<AppState>((set, get) => ({
         }
 
         if (typeof window !== 'undefined') {
-
-          try { localStorage.setItem(STORAGE_KEYS.USER, JSON.stringify(updatedUser)); } catch { /* ignore */ }
+          try { 
+            localStorage.setItem(STORAGE_KEYS.USER, JSON.stringify(updatedUser)); 
+            localStorage.setItem('schoolsaas_profile_cache_time', String(now));
+          } catch { /* ignore */ }
         }
       }
     } catch { /* silent fail */ }
