@@ -23,26 +23,21 @@ export function StudentProfileCard({ student }: StudentProfileCardProps) {
 
   return (
     <Card className="overflow-hidden rounded-3xl border border-zinc-200/50 dark:border-zinc-800/50 bg-white dark:bg-zinc-950 shadow-xs hover:shadow-sm transition-all duration-300">
-      {/* Unified Top Banner */}
-      <div className="h-16 sm:h-24 bg-white dark:bg-zinc-950 relative" />
+      {/* Unified Top Banner - Minimal height */}
+      <div className="h-4 sm:h-5 bg-white dark:bg-zinc-950 relative" />
 
-      <CardContent className="p-5 sm:p-6 -mt-8 sm:-mt-12 relative text-center">
+      <CardContent className="p-4 sm:p-5 pt-0 sm:pt-0 -mt-2 sm:-mt-3 relative text-center">
         <div className="max-w-md mx-auto">
           {/* Avatar: Rounded circle with soft gradient and outline */}
-          <div className="size-24 rounded-full bg-gradient-to-tr from-amber-400 to-amber-500 flex items-center justify-center text-white text-2xl font-semibold shadow-md border-4 border-white dark:border-zinc-950 mx-auto transition-transform duration-300 hover:scale-105">
+          <div className="size-20 sm:size-24 rounded-full bg-linear-to-tr from-amber-400 to-amber-500 flex items-center justify-center text-white text-2xl font-semibold shadow-md border-4 border-white dark:border-zinc-950 mx-auto transition-transform duration-300 hover:scale-105">
             {initials}
           </div>
 
           {/* Identity Details */}
-          <div className="mt-4 space-y-1.5">
+          <div className="mt-2 space-y-0.5">
             <h3 className="text-lg font-semibold tracking-tight text-zinc-900 dark:text-zinc-50">
               {student.name}
             </h3>
-            <div className="flex items-center justify-center gap-2">
-              <Badge variant="outline" className="bg-amber-500/10 text-amber-700 dark:text-amber-400 border border-amber-500/20 font-medium text-[10px] uppercase tracking-wider rounded-full px-2.5 py-0.5">
-                {student.className}
-              </Badge>
-            </div>
             <p className="text-[10px] text-zinc-400 dark:text-zinc-500 flex items-center justify-center gap-1 font-medium">
               <ShieldCheck className="size-3.5 text-emerald-600 dark:text-emerald-500" />
               Verified Profile
@@ -50,7 +45,16 @@ export function StudentProfileCard({ student }: StudentProfileCardProps) {
           </div>
 
           {/* Vertical Profile Fields - Modern Clean Row Design */}
-          <div className="mt-8 pt-6 border-t border-zinc-100 dark:border-zinc-900 space-y-4 text-left">
+          <div className="mt-6 pt-4 border-t border-zinc-100 dark:border-zinc-900 space-y-3.5 text-left">
+            {/* Class Row - Moved here from top */}
+            <div className="flex items-center justify-between py-1 border-b border-zinc-100/50 dark:border-zinc-900/50">
+              <div className="flex items-center gap-2">
+                <GraduationCap className="size-4 text-zinc-400 dark:text-zinc-500" />
+                <span className="text-xs text-zinc-400 dark:text-zinc-500 font-medium">Class / Grade</span>
+              </div>
+              <span className="text-xs font-bold text-zinc-800 dark:text-zinc-200">{student.className}</span>
+            </div>
+
             {/* Roll Number */}
             <div className="flex items-center justify-between py-1 border-b border-zinc-100/50 dark:border-zinc-900/50">
               <div className="flex items-center gap-2">
@@ -84,7 +88,7 @@ export function StudentProfileCard({ student }: StudentProfileCardProps) {
                 <BookOpen className="size-4 text-zinc-400 dark:text-zinc-500" />
                 <span className="text-xs text-zinc-400 dark:text-zinc-500 font-medium">Academic Session</span>
               </div>
-              <span className="text-xs font-medium text-zinc-800 dark:text-zinc-200">{student.academicYear || "2026-2027"}</span>
+              <span className="text-xs font-medium text-zinc-800 dark:text-zinc-200">{student.academicYear || "N/A"}</span>
             </div>
           </div>
         </div>

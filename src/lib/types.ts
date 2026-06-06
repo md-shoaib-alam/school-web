@@ -24,6 +24,7 @@ export interface StudentInfo {
   dateOfBirth?: string;
   admissionDate: string;
   phone?: string;
+  academicYear?: string;
 }
 
 export interface TeacherInfo {

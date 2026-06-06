@@ -51,9 +51,6 @@ export function MinimalDashboard({
           <h3 className="text-2xl font-bold tracking-tight text-zinc-900 dark:text-white">
             Quick Actions
           </h3>
-          <p className="text-zinc-500 dark:text-zinc-400 text-sm mt-1">
-            Jump to any module or management screen quickly.
-          </p>
         </div>
         
         {/* Search bar */}
