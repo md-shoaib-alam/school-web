@@ -87,8 +87,8 @@ export function SecuritySettings({ theme, setTheme, onPasswordChange, userRole }
           </div>
         </div>
 
-        {/* Dashboard Preference Section (For Admin & Teacher only) */}
-        {(userRole === "admin" || userRole === "teacher") && (
+        {/* Dashboard Preference Section (For Admin, Teacher, and Parent) */}
+        {(userRole === "admin" || userRole === "teacher" || userRole === "parent") && (
           <>
             <Separator />
             <div className="space-y-3">
