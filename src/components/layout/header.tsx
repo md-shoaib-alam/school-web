@@ -29,9 +29,20 @@ export function Header({ items, resolvedScreen }: HeaderProps) {
 
   useEffect(() => {
     const updateDashboardButton = () => {
-      if (currentUser?.role === "staff" && resolvedScreen !== "dashboard") {
+      if (!currentUser || resolvedScreen === "dashboard") {
+        setShowDashboardButton(false);
+        return;
+      }
+
+      const isStaff = currentUser.role === "staff";
+      const isTeacherOrAdmin = currentUser.role === "teacher" || currentUser.role === "admin";
+      
+      if (isStaff) {
         const pref = localStorage.getItem("schoolsaas_staff_sidebar_preference");
         setShowDashboardButton(pref !== "enabled");
+      } else if (isTeacherOrAdmin) {
+        const layoutPref = localStorage.getItem("schoolsaas_dashboard_layout_preference");
+        setShowDashboardButton(layoutPref === "minimal");
       } else {
         setShowDashboardButton(false);
       }
@@ -40,10 +51,12 @@ export function Header({ items, resolvedScreen }: HeaderProps) {
     updateDashboardButton();
 
     window.addEventListener("schoolsaas_staff_sidebar_pref_changed", updateDashboardButton);
+    window.addEventListener("schoolsaas_dashboard_layout_pref_changed", updateDashboardButton);
     return () => {
       window.removeEventListener("schoolsaas_staff_sidebar_pref_changed", updateDashboardButton);
+      window.removeEventListener("schoolsaas_dashboard_layout_pref_changed", updateDashboardButton);
     };
-  }, [currentUser?.role, resolvedScreen]);
+  }, [currentUser, resolvedScreen]);
 
   const dates = useMemo(() => {
     try {
