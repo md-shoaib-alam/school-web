@@ -2,16 +2,11 @@
 
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Progress } from "@/components/ui/progress";
-import { GraduationCap, User, Hash, Calendar, Clock, Award, BookOpen } from "lucide-react";
+import { GraduationCap, User, Hash, Calendar, ShieldCheck, BookOpen } from "lucide-react";
 import type { StudentInfo } from "@/lib/types";
 
 interface StudentProfileCardProps {
   student: StudentInfo;
-  attendancePct: number;
-  overallAvg: number;
-  overallGrade: string;
-  subjectCount: number;
 }
 
 const formatDob = (dob: string | null | undefined) => {
@@ -23,65 +18,72 @@ const formatDob = (dob: string | null | undefined) => {
   }
 };
 
-export function StudentProfileCard({
-  student,
-  attendancePct,
-  overallAvg,
-  overallGrade,
-  subjectCount,
-}: StudentProfileCardProps) {
+export function StudentProfileCard({ student }: StudentProfileCardProps) {
+  const initials = student.name.split(" ").map((n) => n[0]).join("").slice(0, 2).toUpperCase();
+
   return (
-    <Card className="rounded-2xl border border-zinc-200/50 dark:border-zinc-800/50 shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.2)] bg-white dark:bg-zinc-950">
-      <CardContent className="p-6">
-        <div className="flex flex-col sm:flex-row sm:items-start gap-6">
-          <div className="size-20 rounded-2xl bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center text-white text-2xl font-bold shadow-md">
-            {student.name.split(" ").map((n) => n[0]).join("")}
+    <Card className="overflow-hidden rounded-3xl border border-zinc-200/50 dark:border-zinc-800/50 bg-white dark:bg-zinc-950 shadow-xs hover:shadow-sm transition-all duration-300">
+      {/* Unified Top Banner */}
+      <div className="h-24 bg-white dark:bg-zinc-950 relative" />
+
+      <CardContent className="p-6 -mt-12 relative text-center">
+        {/* Avatar: Rounded circle with soft gradient and outline */}
+        <div className="size-24 rounded-full bg-gradient-to-tr from-amber-400 to-amber-500 flex items-center justify-center text-white text-2xl font-semibold shadow-md border-4 border-white dark:border-zinc-950 mx-auto transition-transform duration-300 hover:scale-105">
+          {initials}
+        </div>
+
+        {/* Identity Details */}
+        <div className="mt-4 space-y-1.5">
+          <h3 className="text-lg font-semibold tracking-tight text-zinc-900 dark:text-zinc-50">
+            {student.name}
+          </h3>
+          <div className="flex items-center justify-center gap-2">
+            <Badge variant="outline" className="bg-amber-500/10 text-amber-700 dark:text-amber-400 border border-amber-500/20 font-medium text-[10px] uppercase tracking-wider rounded-full px-2.5 py-0.5">
+              {student.className}
+            </Badge>
           </div>
-          <div className="flex-1 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 text-left">
-            <div className="space-y-1">
-              <div className="flex items-center gap-1.5 text-xs text-muted-foreground"><User className="size-3" /> Full Name</div>
-              <p className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">{student.name}</p>
+          <p className="text-[10px] text-zinc-400 dark:text-zinc-500 flex items-center justify-center gap-1 font-medium">
+            <ShieldCheck className="size-3.5 text-emerald-600 dark:text-emerald-500" />
+            Verified Profile
+          </p>
+        </div>
+
+        {/* Vertical Profile Fields - Modern Clean Row Design */}
+        <div className="mt-8 pt-6 border-t border-zinc-100 dark:border-zinc-900 space-y-4 text-left">
+          {/* Roll Number */}
+          <div className="flex items-center justify-between py-1 border-b border-zinc-100/50 dark:border-zinc-900/50">
+            <div className="flex items-center gap-2">
+              <Hash className="size-4 text-zinc-400 dark:text-zinc-500" />
+              <span className="text-xs text-zinc-400 dark:text-zinc-500 font-medium">Roll Number</span>
             </div>
-            <div className="space-y-1">
-              <div className="flex items-center gap-1.5 text-xs text-muted-foreground"><GraduationCap className="size-3" /> Class</div>
-              <p className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">{student.className}</p>
+            <span className="text-xs font-medium text-zinc-800 dark:text-zinc-200">{student.rollNumber || "N/A"}</span>
+          </div>
+
+          {/* Gender */}
+          <div className="flex items-center justify-between py-1 border-b border-zinc-100/50 dark:border-zinc-900/50">
+            <div className="flex items-center gap-2">
+              <User className="size-4 text-zinc-400 dark:text-zinc-500" />
+              <span className="text-xs text-zinc-400 dark:text-zinc-500 font-medium">Gender</span>
             </div>
-            <div className="space-y-1">
-              <div className="flex items-center gap-1.5 text-xs text-muted-foreground"><Hash className="size-3" /> Roll Number</div>
-              <p className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">{student.rollNumber}</p>
+            <span className="text-xs font-medium text-zinc-800 dark:text-zinc-200 capitalize">{student.gender || "N/A"}</span>
+          </div>
+
+          {/* DOB */}
+          <div className="flex items-center justify-between py-1 border-b border-zinc-100/50 dark:border-zinc-900/50">
+            <div className="flex items-center gap-2">
+              <Calendar className="size-4 text-zinc-400 dark:text-zinc-500" />
+              <span className="text-xs text-zinc-400 dark:text-zinc-500 font-medium">Date of Birth</span>
             </div>
-            <div className="space-y-1">
-              <div className="flex items-center gap-1.5 text-xs text-muted-foreground"><User className="size-3" /> Gender</div>
-              <p className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">{student.gender === "male" ? "Male" : "Female"}</p>
+            <span className="text-xs font-medium text-zinc-800 dark:text-zinc-200" suppressHydrationWarning>{formatDob(student.dateOfBirth)}</span>
+          </div>
+
+          {/* Academic Year */}
+          <div className="flex items-center justify-between py-1">
+            <div className="flex items-center gap-2">
+              <BookOpen className="size-4 text-zinc-400 dark:text-zinc-500" />
+              <span className="text-xs text-zinc-400 dark:text-zinc-500 font-medium">Academic Session</span>
             </div>
-            <div className="space-y-1">
-              <div className="flex items-center gap-1.5 text-xs text-muted-foreground"><Calendar className="size-3" /> Date of Birth</div>
-              <p className="text-sm font-semibold text-zinc-900 dark:text-zinc-100" suppressHydrationWarning>
-                {formatDob(student.dateOfBirth)}
-              </p>
-            </div>
-            <div className="space-y-1">
-              <div className="flex items-center gap-1.5 text-xs text-muted-foreground"><Clock className="size-3" /> Attendance</div>
-              <div className="flex items-center gap-2">
-                <Progress value={attendancePct} className="h-2 w-16 [&>div]:bg-amber-500" />
-                <p className={`text-sm font-bold ${attendancePct >= 80 ? "text-emerald-600 dark:text-emerald-400" : attendancePct >= 60 ? "text-amber-600 dark:text-amber-400" : "text-red-600 dark:text-red-400"}`}>
-                  {attendancePct}%
-                </p>
-              </div>
-            </div>
-            <div className="space-y-1">
-              <div className="flex items-center gap-1.5 text-xs text-muted-foreground"><Award className="size-3" /> Average Grade</div>
-              <div className="flex items-center gap-2">
-                <span className="text-sm font-bold text-zinc-900 dark:text-zinc-100">{overallAvg}%</span>
-                <Badge variant="outline" className={`font-bold text-xs shadow-none ${overallGrade.startsWith("A") ? "border-emerald-200 dark:border-emerald-800 bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400" : overallGrade.startsWith("B") ? "border-blue-200 dark:border-blue-800 bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400" : "border-amber-200 dark:border-amber-800 bg-amber-50 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400"}`}>
-                  {overallGrade}
-                </Badge>
-              </div>
-            </div>
-            <div className="space-y-1">
-              <div className="flex items-center gap-1.5 text-xs text-muted-foreground"><BookOpen className="size-3" /> Subjects</div>
-              <p className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">{subjectCount}</p>
-            </div>
+            <span className="text-xs font-medium text-zinc-800 dark:text-zinc-200">{student.academicYear || "2026-2027"}</span>
           </div>
         </div>
       </CardContent>

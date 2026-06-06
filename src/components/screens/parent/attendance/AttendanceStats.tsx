@@ -1,7 +1,7 @@
 "use client";
 
 import { Card, CardContent } from "@/components/ui/card";
-import { CheckCircle2, XCircle, Clock } from "lucide-react";
+import { CheckCircle2, XCircle, Sparkles } from "lucide-react";
 
 interface AttendanceStatsProps {
   percentage: number;
@@ -11,64 +11,77 @@ interface AttendanceStatsProps {
 
 export function AttendanceStats({ percentage, present, absent }: AttendanceStatsProps) {
   return (
-    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-      {/* Percentage circle */}
-      <Card className="rounded-xl shadow-sm shadow-none">
-        <CardContent className="p-6 flex flex-col items-center justify-center">
-          <div className="relative size-32">
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      {/* Percentage circle card */}
+      <Card className="rounded-3xl border border-zinc-200/60 dark:border-zinc-800/50 bg-white dark:bg-zinc-950/40 backdrop-blur-xl shadow-xs overflow-hidden group">
+        <CardContent className="p-6 flex items-center justify-center min-h-[160px]">
+          <div className="relative size-32 group-hover:scale-105 transition-transform duration-300">
             <svg className="size-32 -rotate-90" viewBox="0 0 128 128">
               <circle
-                cx="64" cy="64" r="56"
-                fill="none" stroke="#f3f4f6" strokeWidth="10"
-                className="dark:stroke-zinc-700"
+                cx="64" cy="64" r="54"
+                fill="none" stroke="#f4f4f5" strokeWidth="8"
+                className="dark:stroke-zinc-800"
               />
               <circle
-                cx="64" cy="64" r="56"
+                cx="64" cy="64" r="54"
                 fill="none"
                 stroke={percentage >= 80 ? "#10b981" : percentage >= 60 ? "#f59e0b" : "#ef4444"}
-                strokeWidth="10"
-                strokeDasharray={`${(percentage / 100) * 352} 352`}
+                strokeWidth="8"
+                strokeDasharray={`${(percentage / 100) * 339} 339`}
                 strokeLinecap="round"
+                className="transition-all duration-500 ease-out"
               />
             </svg>
-            <div className="absolute inset-0 flex flex-col items-center justify-center">
-              <span className={`text-3xl font-bold ${percentage >= 80 ? "text-emerald-600 dark:text-emerald-400" : percentage >= 60 ? "text-amber-600 dark:text-amber-400" : "text-red-600 dark:text-red-400"}`}>
+            <div className="absolute inset-0 flex flex-col items-center justify-center text-left leading-none">
+              <span className={`text-2xl font-black tracking-tight ${percentage >= 80 ? "text-emerald-600 dark:text-emerald-400" : percentage >= 60 ? "text-amber-600 dark:text-amber-400" : "text-red-600 dark:text-red-400"}`}>
                 {percentage}%
               </span>
-              <span className="text-xs text-muted-foreground">Attendance</span>
+              <span className="text-[10px] text-zinc-400 dark:text-zinc-500 uppercase font-bold tracking-wider mt-1.5">Attendance</span>
             </div>
           </div>
         </CardContent>
       </Card>
 
-      {/* Stat cards */}
-      <Card className="rounded-xl shadow-sm border-emerald-200 dark:border-emerald-800 shadow-none">
-        <CardContent className="p-4">
-          <div className="flex items-center gap-3 h-full">
-            <div className="size-10 rounded-xl bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center">
-              <CheckCircle2 className="size-5 text-emerald-600 dark:text-emerald-400" />
+      {/* Present days card */}
+      <Card className="rounded-3xl border border-emerald-100/80 dark:border-emerald-950/40 bg-white dark:bg-zinc-950/40 backdrop-blur-xl shadow-xs hover:border-emerald-500/20 transition-all duration-300 group flex flex-col justify-between min-h-[160px]">
+        <CardContent className="p-6 flex flex-col justify-between h-full w-full">
+          <div className="flex items-center justify-between">
+            <div className="p-3 rounded-2xl bg-emerald-500/5 text-emerald-600 dark:text-emerald-400 group-hover:scale-105 transition-transform">
+              <CheckCircle2 className="size-5" />
             </div>
-            <div>
-              <p className="text-xs text-muted-foreground">Present Days</p>
-              <p className="text-2xl font-bold text-emerald-600 dark:text-emerald-400">{present}</p>
-            </div>
+            <span className="text-[9px] font-bold text-emerald-600 dark:text-emerald-450 px-2 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/10 uppercase tracking-wider">
+              On Track
+            </span>
+          </div>
+          <div className="mt-4 text-left leading-none">
+            <span className="text-[10px] text-zinc-400 dark:text-zinc-500 uppercase tracking-wider font-semibold block">Present Days</span>
+            <span className="text-3xl font-black text-emerald-600 dark:text-emerald-400 tracking-tight block mt-2">
+              {present}
+            </span>
           </div>
         </CardContent>
       </Card>
 
-      <Card className="rounded-xl shadow-sm border-red-200 dark:border-red-800 shadow-none">
-        <CardContent className="p-4">
-          <div className="flex items-center gap-3 h-full">
-            <div className="size-10 rounded-xl bg-red-100 dark:bg-red-900/30 flex items-center justify-center">
-              <XCircle className="size-5 text-red-600 dark:text-red-400" />
+      {/* Absent days card */}
+      <Card className="rounded-3xl border border-red-100/80 dark:border-red-950/40 bg-white dark:bg-zinc-950/40 backdrop-blur-xl shadow-xs hover:border-red-500/20 transition-all duration-300 group flex flex-col justify-between min-h-[160px]">
+        <CardContent className="p-6 flex flex-col justify-between h-full w-full">
+          <div className="flex items-center justify-between">
+            <div className="p-3 rounded-2xl bg-red-500/5 text-red-600 dark:text-red-400 group-hover:scale-105 transition-transform">
+              <XCircle className="size-5" />
             </div>
-            <div>
-              <p className="text-xs text-muted-foreground">Absent Days</p>
-              <p className="text-2xl font-bold text-red-600 dark:text-red-400">{absent}</p>
-            </div>
+            <span className="text-[9px] font-bold text-red-600 dark:text-red-450 px-2 py-0.5 rounded-full bg-red-500/10 border border-red-500/10 uppercase tracking-wider">
+              Excused / Unexcused
+            </span>
+          </div>
+          <div className="mt-4 text-left leading-none">
+            <span className="text-[10px] text-zinc-400 dark:text-zinc-500 uppercase tracking-wider font-semibold block">Absent Days</span>
+            <span className="text-3xl font-black text-red-650 dark:text-red-400 tracking-tight block mt-2">
+              {absent}
+            </span>
           </div>
         </CardContent>
       </Card>
     </div>
   );
 }
+

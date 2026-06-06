@@ -27,35 +27,35 @@ interface QuickAction {
 
 const parentQuickActions: QuickAction[] = [
   {
-    label: "Children Profile",
+    label: "My Children",
     screen: "children",
     category: "Operations",
     color: "bg-blue-600 dark:bg-blue-500",
     icon: <Baby className="size-5" />
   },
   {
-    label: "Fee Management",
+    label: "Fees",
     screen: "fees",
     category: "Operations",
     color: "bg-emerald-600 dark:bg-emerald-500",
     icon: <Coins className="size-5" />
   },
   {
-    label: "Plan Subscription",
+    label: "Subscription",
     screen: "subscription",
     category: "Operations",
     color: "bg-indigo-600 dark:bg-indigo-500",
     icon: <Sparkles className="size-5" />
   },
   {
-    label: "View Grades",
+    label: "Grades",
     screen: "grades",
     category: "Academics",
     color: "bg-violet-600 dark:bg-violet-500",
     icon: <GraduationCap className="size-5" />
   },
   {
-    label: "View Attendance",
+    label: "Attendance",
     screen: "attendance",
     category: "Academics",
     color: "bg-teal-600 dark:bg-teal-500",
@@ -69,21 +69,21 @@ const parentQuickActions: QuickAction[] = [
     icon: <Clock className="size-5" />
   },
   {
-    label: "School Notices",
+    label: "Notices",
     screen: "notices",
     category: "Support & Info",
     color: "bg-rose-600 dark:bg-rose-500",
     icon: <Bell className="size-5" />
   },
   {
-    label: "School Calendar",
+    label: "Calendar",
     screen: "calendar",
     category: "Support & Info",
     color: "bg-amber-600 dark:bg-amber-500",
     icon: <Calendar className="size-5" />
   },
   {
-    label: "Support Tickets",
+    label: "Tickets",
     screen: "tickets",
     category: "Support & Info",
     color: "bg-zinc-600 dark:bg-zinc-500",
@@ -153,40 +153,44 @@ export function MinimalDashboard() {
   }, {} as Record<string, typeof filteredQuickActions>);
 
   return (
-    <div className="space-y-6 w-full mt-4">
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <h3 className="text-sm font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
-          Quick Actions
-        </h3>
+    <div className="space-y-8 w-full mt-6 animate-fade-in">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-5">
+        <div className="space-y-1">
+          <h3 className="text-sm font-semibold uppercase tracking-wider text-zinc-600 dark:text-zinc-400">
+            Quick Actions
+          </h3>
+        </div>
         
         {/* Search bar */}
-        <div className="relative w-full sm:max-w-xs">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-zinc-400 dark:text-zinc-500" />
+        <div className="relative w-full sm:max-w-[280px] group">
+          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 size-4 text-zinc-500 group-focus-within:text-amber-500 transition-colors" />
           <input
             type="text"
-            placeholder="Search actions..."
+            placeholder="Search dashboard..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-9 pr-4 py-2 text-sm rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 text-zinc-800 dark:text-zinc-200 shadow-sm transition-all"
+            className="w-full pl-10 pr-4 py-2.5 text-xs rounded-2xl border border-zinc-300 dark:border-zinc-800 bg-white dark:bg-zinc-950 focus:outline-none focus:ring-4 focus:ring-amber-500/10 focus:border-amber-500/50 text-zinc-800 dark:text-zinc-200 shadow-sm transition-all placeholder:text-zinc-500"
           />
         </div>
       </div>
 
       {filteredQuickActions.length === 0 ? (
-        <p className="text-zinc-500 dark:text-zinc-400 text-sm">
-          No matching quick actions found.
-        </p>
+        <div className="py-12 text-center rounded-3xl border border-dashed border-zinc-300 dark:border-zinc-800">
+          <p className="text-zinc-600 dark:text-zinc-400 text-sm">
+            No matching quick actions found. Try a different search term.
+          </p>
+        </div>
       ) : (
-        <div className="space-y-8">
+        <div className="space-y-10">
           {/* Recommended / Most Used section */}
           {recommendedActions.length > 0 && !searchQuery && (
-            <div className="space-y-4">
+            <div className="space-y-5">
               <div className="flex items-center gap-3">
-                <h4 className="text-xs font-bold uppercase tracking-wider text-amber-500 dark:text-amber-400 flex items-center gap-1.5">
-                  <span className="inline-block w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse" />
-                  Recommended / Most Used
+                <h4 className="text-[10px] font-semibold uppercase tracking-widest text-amber-600 dark:text-amber-400 flex items-center gap-2">
+                  <Sparkles className="size-3" />
+                  Recommended
                 </h4>
-                <div className="h-px flex-1 bg-amber-100 dark:bg-amber-950/50" />
+                <div className="h-px flex-1 bg-amber-200 dark:bg-amber-900/30" />
               </div>
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
                 {recommendedActions.map((action) => (
@@ -194,14 +198,14 @@ export function MinimalDashboard() {
                     key={`rec-${action.screen}`}
                     type="button"
                     onClick={() => navigateTo(action.screen)}
-                    className="flex flex-col items-center justify-center p-6 rounded-2xl border border-amber-100 dark:border-amber-950/30 hover:shadow-lg transition-all bg-amber-50/25 dark:bg-amber-950/10 hover:border-amber-200 dark:hover:border-amber-900/50 text-center group gap-3 cursor-pointer"
+                    className="flex flex-col items-center justify-center p-6 rounded-3xl border border-amber-200/60 dark:border-amber-900/20 hover:shadow-xl hover:shadow-amber-500/10 transition-all bg-white dark:bg-zinc-950 hover:border-amber-500/50 text-center group gap-4 cursor-pointer"
                   >
                     <div
-                      className={`p-3.5 rounded-xl text-white ${action.color} transition-transform group-hover:scale-110 shadow-md`}
+                      className={`p-4 rounded-2xl text-white ${action.color} transition-all group-hover:scale-110 shadow-lg group-hover:rotate-3`}
                     >
                       {action.icon}
                     </div>
-                    <span className="text-sm font-semibold text-zinc-800 dark:text-zinc-200">
+                    <span className="text-xs font-semibold text-zinc-900 dark:text-zinc-200 tracking-tight">
                       {action.label}
                     </span>
                   </button>
@@ -215,12 +219,12 @@ export function MinimalDashboard() {
             if (!actions || actions.length === 0) return null;
 
             return (
-              <div key={category} className="space-y-4">
+              <div key={category} className="space-y-5">
                 <div className="flex items-center gap-3">
-                  <h4 className="text-xs font-bold uppercase tracking-wider text-zinc-400 dark:text-zinc-500">
+                  <h4 className="text-[10px] font-semibold uppercase tracking-widest text-zinc-500 dark:text-zinc-500">
                     {category}
                   </h4>
-                  <div className="h-px flex-1 bg-zinc-200 dark:bg-zinc-800" />
+                  <div className="h-px flex-1 bg-zinc-200 dark:bg-zinc-900" />
                 </div>
                 <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
                   {actions.map((action) => (
@@ -228,14 +232,14 @@ export function MinimalDashboard() {
                       key={action.screen}
                       type="button"
                       onClick={() => navigateTo(action.screen)}
-                      className="flex flex-col items-center justify-center p-6 rounded-2xl border border-zinc-200 dark:border-zinc-800 hover:shadow-lg transition-all bg-white dark:bg-zinc-950 hover:border-transparent text-center group gap-3 cursor-pointer"
+                      className="flex flex-col items-center justify-center p-6 rounded-3xl border border-zinc-200 dark:border-zinc-800 hover:shadow-xl hover:shadow-zinc-500/5 transition-all bg-white dark:bg-zinc-950 hover:border-amber-500/30 text-center group gap-4 cursor-pointer"
                     >
                       <div
-                        className={`p-3.5 rounded-xl text-white ${action.color} transition-transform group-hover:scale-110 shadow-md`}
+                        className={`p-4 rounded-2xl text-white ${action.color} transition-all group-hover:scale-110 shadow-md group-hover:-rotate-3`}
                       >
                         {action.icon}
                       </div>
-                      <span className="text-sm font-semibold text-zinc-800 dark:text-zinc-200">
+                      <span className="text-xs font-semibold text-zinc-900 dark:text-zinc-200 tracking-tight">
                         {action.label}
                       </span>
                     </button>

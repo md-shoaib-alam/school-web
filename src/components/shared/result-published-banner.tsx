@@ -166,10 +166,10 @@ export function ResultPublishedBanner({ studentId, className: classNameProp }: R
               {/* Text */}
               <div className="min-w-0">
                 <div className="flex items-center gap-2 flex-wrap">
-                  <p className="text-sm font-bold text-emerald-900 dark:text-emerald-100 leading-tight">
+                  <p className="text-sm font-semibold text-emerald-900 dark:text-emerald-100 leading-tight">
                     Results Published!
                   </p>
-                  <Badge className="text-[9px] font-bold tracking-wide px-1.5 py-0 border-none bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 shadow-none uppercase">
+                  <Badge className="text-[9px] font-semibold tracking-wide px-1.5 py-0 border-none bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 shadow-none uppercase">
                     <Sparkles className="size-2.5 mr-0.5" />
                     New
                   </Badge>
@@ -188,7 +188,7 @@ export function ResultPublishedBanner({ studentId, className: classNameProp }: R
               <Button
                 size="sm"
                 onClick={handleViewMarksheet}
-                className="h-8 gap-1.5 text-xs font-bold bg-emerald-600 hover:bg-emerald-700 dark:bg-emerald-700 dark:hover:bg-emerald-600 text-white shadow-md shadow-emerald-500/25 border-none rounded-xl px-3 transition-all"
+                className="h-8 gap-1.5 text-xs font-semibold bg-emerald-600 hover:bg-emerald-700 dark:bg-emerald-700 dark:hover:bg-emerald-600 text-white shadow-md shadow-emerald-500/25 border-none rounded-xl px-3 transition-all"
               >
                 <FileText className="size-3.5" />
                 View Marksheet
