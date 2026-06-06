@@ -14,7 +14,13 @@ import {
   Clock, 
   Calendar, 
   LifeBuoy, 
-  Sparkles 
+  Sparkles,
+  User,
+  KeyRound,
+  LogOut,
+  FileText,
+  BookOpen,
+  ClipboardList
 } from "lucide-react";
 
 interface QuickAction {
@@ -23,6 +29,7 @@ interface QuickAction {
   category: string;
   color: string;
   icon: React.ReactNode;
+  isAction?: boolean;
 }
 
 const parentQuickActions: QuickAction[] = [
@@ -48,11 +55,25 @@ const parentQuickActions: QuickAction[] = [
     icon: <Sparkles className="size-5" />
   },
   {
-    label: "Grades",
-    screen: "grades",
+    label: "Homework",
+    screen: "homework",
+    category: "Academics",
+    color: "bg-amber-600 dark:bg-amber-500",
+    icon: <FileText className="size-5" />
+  },
+  {
+    label: "School Exams",
+    screen: "school-exams",
     category: "Academics",
     color: "bg-violet-600 dark:bg-violet-500",
-    icon: <GraduationCap className="size-5" />
+    icon: <BookOpen className="size-5" />
+  },
+  {
+    label: "Assessments",
+    screen: "assessments",
+    category: "Academics",
+    color: "bg-purple-600 dark:bg-purple-500",
+    icon: <ClipboardList className="size-5" />
   },
   {
     label: "Attendance",
@@ -88,12 +109,35 @@ const parentQuickActions: QuickAction[] = [
     category: "Support & Info",
     color: "bg-zinc-600 dark:bg-zinc-500",
     icon: <LifeBuoy className="size-5" />
+  },
+  {
+    label: "My Profile",
+    screen: "profile",
+    category: "Account & Settings",
+    color: "bg-emerald-500",
+    icon: <User className="size-5" />
+  },
+  {
+    label: "Change Password",
+    screen: "change-password-action",
+    category: "Account & Settings",
+    color: "bg-orange-500",
+    icon: <KeyRound className="size-5" />,
+    isAction: true
+  },
+  {
+    label: "Log Out",
+    screen: "logout-action",
+    category: "Account & Settings",
+    color: "bg-red-500",
+    icon: <LogOut className="size-5" />,
+    isAction: true
   }
 ];
 
 export function MinimalDashboard() {
-  const { push } = useRouter();
-  const { currentUser, currentTenantSlug, currentTenantId, setCurrentScreen } = useAppStore();
+  const { push, replace } = useRouter();
+  const { currentUser, currentTenantSlug, currentTenantId, setCurrentScreen, logout } = useAppStore();
   const [searchQuery, setSearchQuery] = useState("");
   const [clickCounts, setClickCounts] = useState<Record<string, number>>({});
 
@@ -111,6 +155,17 @@ export function MinimalDashboard() {
   }, []);
 
   const navigateTo = (screen: string) => {
+    if (screen === "logout-action") {
+      logout();
+      replace("/");
+      return;
+    }
+
+    if (screen === "change-password-action") {
+       window.dispatchEvent(new CustomEvent("open-change-password"));
+       return;
+    }
+
     try {
       const updated = {
         ...clickCounts,
@@ -143,7 +198,7 @@ export function MinimalDashboard() {
     .slice(0, 4);
 
   // Group actions by category
-  const categoriesOrder = ["Academics", "Operations", "Support & Info"];
+  const categoriesOrder = ["Academics", "Operations", "Support & Info", "Account & Settings"];
 
   const groupedActions = filteredQuickActions.reduce((acc, action) => {
     const cat = action.category;
@@ -201,7 +256,7 @@ export function MinimalDashboard() {
                     className="flex flex-col items-center justify-center p-6 rounded-3xl border border-amber-200/60 dark:border-amber-900/20 hover:shadow-xl hover:shadow-amber-500/10 transition-all bg-white dark:bg-zinc-950 hover:border-amber-500/50 text-center group gap-4 cursor-pointer"
                   >
                     <div
-                      className={`p-4 rounded-2xl text-white ${action.color} transition-all group-hover:scale-110 shadow-lg group-hover:rotate-3`}
+                      className={`p-4 rounded-2xl text-white ${action.color} transition-all group-hover:scale-110 shadow-lg`}
                     >
                       {action.icon}
                     </div>
@@ -235,7 +290,7 @@ export function MinimalDashboard() {
                       className="flex flex-col items-center justify-center p-6 rounded-3xl border border-zinc-200 dark:border-zinc-800 hover:shadow-xl hover:shadow-zinc-500/5 transition-all bg-white dark:bg-zinc-950 hover:border-amber-500/30 text-center group gap-4 cursor-pointer"
                     >
                       <div
-                        className={`p-4 rounded-2xl text-white ${action.color} transition-all group-hover:scale-110 shadow-md group-hover:-rotate-3`}
+                        className={`p-4 rounded-2xl text-white ${action.color} transition-all group-hover:scale-110 shadow-md`}
                       >
                         {action.icon}
                       </div>

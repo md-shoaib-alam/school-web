@@ -28,7 +28,7 @@ export function SubjectPerformanceChart({
   chartConfig,
 }: SubjectPerformanceChartProps) {
   return (
-    <Card className="rounded-xl shadow-sm border-zinc-200/60 dark:border-zinc-800">
+    <Card className="rounded-xl shadow-sm border-zinc-200/60 dark:border-zinc-800 h-full">
       <CardHeader className="pb-2">
         <CardTitle className="text-base flex items-center gap-2 font-semibold">
           <BarChart3 className="size-4 text-violet-500" />

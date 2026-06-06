@@ -31,7 +31,7 @@ export function GradeDistributionChart({
   chartConfig,
 }: GradeDistributionChartProps) {
   return (
-    <Card className="rounded-xl shadow-sm border-zinc-200/60 dark:border-zinc-800">
+    <Card className="rounded-xl shadow-sm border-zinc-200/60 dark:border-zinc-800 h-full">
       <CardHeader className="pb-2">
         <CardTitle className="text-base flex items-center gap-2 font-semibold">
           <CircleDot className="size-4 text-violet-500" />
