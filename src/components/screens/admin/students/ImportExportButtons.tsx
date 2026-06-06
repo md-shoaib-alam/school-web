@@ -43,6 +43,7 @@ export function ImportExportButtons({
   const [importResult, setImportResult] = useState<{
     success: boolean;
     imported: number;
+    skipped?: number;
     errors: number;
     total: number;
     errorDetails?: string[];
@@ -92,17 +93,19 @@ export function ImportExportButtons({
           setImporting(false);
           setProgress(null);
           
-          const result = data.result || data.details || { success: data.state === "completed", imported: 0, errors: 0, total: 0 };
+          const result = data.result || data.details || { success: data.state === "completed", imported: 0, skipped: 0, errors: 0, total: 0 };
           setImportResult({
             success: data.state === "completed" && (!result.errors || result.errors === 0),
             imported: result.imported || 0,
+            skipped: result.skipped || 0,
             errors: result.errors || 0,
             total: result.total || 0,
             errorDetails: result.errorDetails || []
           });
           
           if (data.state === "completed" && (!result.errors || result.errors === 0)) {
-            toast.success(`Successfully imported ${result.imported} of ${result.total} students.`);
+            const skippedMsg = result.skipped ? ` (${result.skipped} skipped)` : "";
+            toast.success(`Successfully imported ${result.imported} of ${result.total} students${skippedMsg}.`);
             onImportSuccess();
             setTimeout(() => {
               setImportDialogOpen(false);
@@ -118,6 +121,7 @@ export function ImportExportButtons({
             setImportResult({
               success: false,
               imported: data.details.imported || 0,
+              skipped: data.details.skipped || 0,
               errors: data.details.errors || 0,
               total: data.details.total || 0,
               errorDetails: data.details.errorDetails || []
@@ -214,8 +218,18 @@ export function ImportExportButtons({
         method: "POST",
         body: formData,
       });
-      if (!res.ok) throw new Error("Import failed");
-      const data = await res.json();
+
+      // Parse body regardless of status to capture error details
+      let data: any;
+      try {
+        data = await res.json();
+      } catch {
+        throw new Error(`Server returned status ${res.status} with unreadable response`);
+      }
+
+      if (!res.ok) {
+        throw new Error(data?.error || data?.message || `Import request failed (HTTP ${res.status})`);
+      }
       
       if (data.status === "queued") {
         setProgress(0);
@@ -224,21 +238,26 @@ export function ImportExportButtons({
       } else {
         setImportResult(data);
         if (data.success) {
-          toast.success(`Successfully imported ${data.imported} of ${data.total} students.`);
+          const skippedMsg = data.skipped ? ` (${data.skipped} skipped)` : "";
+          toast.success(`Successfully imported ${data.imported} of ${data.total} students${skippedMsg}.`);
           onImportSuccess();
           setTimeout(() => {
             setImportDialogOpen(false);
           }, 1500);
         } else {
-          toast.error(`${data.errors} of ${data.total} records had errors.`);
+          // Show actual error details in the UI
+          const details = data.errorDetails?.length ? data.errorDetails.slice(0, 3).join('; ') : 'Check the error details below.';
+          toast.error(`Import issue: ${details}`);
           onImportSuccess(); // Refresh to show whatever succeeded
         }
 
         setImporting(false);
       }
-    } catch {
-      setImportResult({ success: false, imported: 0, errors: 0, total: 0 });
-      toast.error("An error occurred while importing students.");
+    } catch (err: any) {
+      const errorMsg = err?.message || 'Unknown import error';
+      console.error('[ImportStudents] Import failed:', errorMsg, err);
+      setImportResult({ success: false, imported: 0, errors: 1, total: 0, errorDetails: [errorMsg] });
+      toast.error(`Import error: ${errorMsg}`);
       setImporting(false);
     }
   };
@@ -331,6 +350,7 @@ export function ImportExportButtons({
                 {importResult && (
                   <div className="flex justify-between text-xs text-emerald-600 dark:text-emerald-400 font-mono">
                     <span>Imported: {importResult.imported}</span>
+                    <span>Skipped: {importResult.skipped || 0}</span>
                     <span>Errors: {importResult.errors}</span>
                     <span>Total: {importResult.total}</span>
                   </div>

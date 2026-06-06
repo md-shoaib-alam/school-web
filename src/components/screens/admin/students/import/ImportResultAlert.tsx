@@ -6,6 +6,7 @@ interface ImportResultAlertProps {
   result: {
     success: boolean;
     imported: number;
+    skipped?: number;
     errors: number;
     total: number;
     errorDetails?: string[];
@@ -14,6 +15,8 @@ interface ImportResultAlertProps {
 
 export function ImportResultAlert({ result }: ImportResultAlertProps) {
   if (!result) return null;
+
+  const allSkipped = result.skipped && result.skipped === result.total && result.imported === 0;
 
   return (
     <div
@@ -31,10 +34,9 @@ export function ImportResultAlert({ result }: ImportResultAlertProps) {
             : "Import completed with issues"}
         </p>
         <p className="text-muted-foreground">
-          {result.imported} of {result.total} students
-          imported successfully
-          {result.errors > 0 &&
-            ` · ${result.errors} errors`}
+          {allSkipped
+            ? "All students already exist in the selected school. No new records were imported."
+            : `${result.imported} of ${result.total} students imported successfully${result.skipped && result.skipped > 0 ? ` · ${result.skipped} skipped (already exist)` : ""}${result.errors > 0 ? ` · ${result.errors} errors` : ""}`}
         </p>
         {result.errorDetails && result.errorDetails.length > 0 && (
           <div className="mt-3 p-2 bg-red-100/50 dark:bg-red-950/20 rounded border border-red-200/40 dark:border-red-900/30 text-xs font-mono max-h-40 overflow-y-auto space-y-1 text-red-900 dark:text-red-300">
