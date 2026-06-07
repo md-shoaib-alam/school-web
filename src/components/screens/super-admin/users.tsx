@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import { useUsers, useToggleUserStatus } from "@/lib/graphql/hooks";
+import { useUsers, useToggleUserStatus, useTenants } from "@/lib/graphql/hooks";
 import { toast } from "sonner";
 
 // Sub-components
@@ -50,22 +50,19 @@ export function SuperAdminUsers() {
   const totalCount = data?.total ?? 0;
   const totalPages = data?.totalPages ?? 1;
 
-  // Derive unique tenants from user data for the filter dropdown
+  // Fetch simple list of tenants for selection
+  const { data: tenantsData } = useTenants({ limit: 100 });
+
+  // Derive unique tenants from all tenants list for the filter dropdown
   const tenants = useMemo(() => {
-    const users = data?.users;
-    if (!Array.isArray(users)) return [];
-    const map = new Map<string, TenantInfo>();
-    users.forEach((u) => {
-      if (u.tenant?.id && u.tenant?.name && !map.has(u.tenant.id)) {
-        map.set(u.tenant.id, {
-          id: u.tenant.id,
-          name: u.tenant.name,
-          slug: u.tenant.slug || "",
-        });
-      }
-    });
-    return Array.from(map.values());
-  }, [data]);
+    const list = tenantsData?.tenants;
+    if (!Array.isArray(list)) return [];
+    return list.map((t) => ({
+      id: t.id,
+      name: t.name,
+      slug: t.slug || "",
+    }));
+  }, [tenantsData]);
 
   // Handlers
   const handleRoleChange = (v: string) => {

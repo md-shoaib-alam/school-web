@@ -367,7 +367,6 @@ export function SuperAdminSubscriptions() {
         onSearchChange={(v) => dispatch({ type: 'SET_SEARCH', payload: v })}
         statusFilter={statusFilter}
         onStatusFilterChange={(v) => dispatch({ type: 'SET_STATUS_FILTER', payload: v })}
-        onRefresh={invalidate}
       />
 
       <SubscriptionTable 

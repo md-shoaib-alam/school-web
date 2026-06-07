@@ -1,4 +1,4 @@
-import { Search, Filter, RotateCcw } from "lucide-react";
+import { Search, Filter } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -15,7 +15,6 @@ interface SubscriptionFiltersProps {
   onSearchChange: (value: string) => void;
   statusFilter: string;
   onStatusFilterChange: (value: string) => void;
-  onRefresh: () => void;
 }
 
 export function SubscriptionFilters({
@@ -23,7 +22,6 @@ export function SubscriptionFilters({
   onSearchChange,
   statusFilter,
   onStatusFilterChange,
-  onRefresh,
 }: SubscriptionFiltersProps) {
   return (
     <Card>
@@ -51,14 +49,6 @@ export function SubscriptionFilters({
               <SelectItem value="expired">Expired</SelectItem>
             </SelectContent>
           </Select>
-          <Button
-            variant="outline"
-            size="icon"
-            className="size-11"
-            onClick={onRefresh}
-          >
-            <RotateCcw className="size-4" />
-          </Button>
         </div>
       </CardContent>
     </Card>
