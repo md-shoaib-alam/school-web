@@ -13,6 +13,16 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { queryKeys } from "@/lib/graphql/keys";
 import { Pagination } from "@/components/shared/pagination";
 import { useDebounce } from "@/hooks/use-debounce";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 // Sub-components
 import { ParentsHeader } from "./parents/ParentsHeader";
@@ -135,6 +145,9 @@ export function AdminParents() {
 
   const debouncedSearch = useDebounce(search, 500);
 
+  const [unlinkConfirmOpen, setUnlinkConfirmOpen] = useState(false);
+  const [unlinkData, setUnlinkData] = useState<{ parentId: string; studentId: string } | null>(null);
+
   // Queries
   const { 
     data: parentsData, 
@@ -233,10 +246,16 @@ export function AdminParents() {
     );
   };
 
-  const handleUnlinkChild = async (parentId: string, studentId: string) => {
-    if (!window.confirm("Are you sure you want to unlink this student from their parent?")) {
-      return;
-    }
+  const handleUnlinkChild = (parentId: string, studentId: string) => {
+    setUnlinkData({ parentId, studentId });
+    setUnlinkConfirmOpen(true);
+  };
+
+  const executeUnlinkChild = async () => {
+    if (!unlinkData) return;
+    const { parentId, studentId } = unlinkData;
+    setUnlinkConfirmOpen(false);
+    setUnlinkData(null);
     toast.promise(
       (async () => {
         await api.post("/parents", { action: "unlink", parentId, studentId, });
@@ -371,6 +390,26 @@ export function AdminParents() {
         parent={selectedParentDetail}
         onLinkClick={(p) => dispatch({ type: 'OPEN_LINK_DIALOG', payload: p })}
       />
+
+      <AlertDialog open={unlinkConfirmOpen} onOpenChange={setUnlinkConfirmOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Unlink Student</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to unlink this student from their parent?
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={() => { setUnlinkConfirmOpen(false); setUnlinkData(null); }}>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={executeUnlinkChild}
+              className="bg-red-600 hover:bg-red-700 text-white"
+            >
+              Unlink
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
