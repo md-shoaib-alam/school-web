@@ -183,13 +183,6 @@ export const TENANT_DETAIL = `
   query TenantDetail($tenantId: String!) {
     tenantDetail(tenantId: $tenantId) {
       tenant { id name slug logo email phone address website plan status maxStudents maxTeachers maxParents maxClasses startDate endDate createdAt deletedAt studentCount teacherCount parentCount adminCount activeSubscriptions totalRevenue _count { users classes subscriptions notices events } }
-      students { id name email phone rollNumber className gender dateOfBirth status }
-      teachers { id name email phone qualification experience status }
-      parents { id name email phone occupation status }
-      classes { id name section grade capacity studentCount }
-      notices { id title content authorName priority createdAt targetRole }
-      fees { id studentName type amount status dueDate paidAmount }
-      attendance { id studentName date status className }
     }
   }
 `
@@ -301,8 +294,8 @@ export const CUSTOM_ROLES = `
 `
 
 export const STAFF = `
-  query GetStaff($tenantId: String, $role: String, $page: Int, $limit: Int) {
-    staff(tenantId: $tenantId, role: $role, page: $page, limit: $limit) {
+  query GetStaff($tenantId: String, $role: String, $search: String, $page: Int, $limit: Int) {
+    staff(tenantId: $tenantId, role: $role, search: $search, page: $page, limit: $limit) {
       staff {
         id name email phone address role isActive 
         customRole { id name color }

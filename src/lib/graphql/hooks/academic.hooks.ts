@@ -124,12 +124,13 @@ export function useAttendance(tenantId?: string, page?: number, limit?: number) 
   })
 }
 
-export function useStaff(tenantId?: string, role?: string, page?: number, limit?: number) {
+export function useStaff(tenantId?: string, role?: string, search?: string, page: number = 1, limit: number = 12) {
   return useQuery<StaffResponse>({
-    queryKey: [...queryKeys.staff, tenantId, role, page, limit],
-    queryFn: () => graphqlQuery<{ staff: StaffResponse }>(STAFF, { tenantId, role, page, limit }).then(d => d.staff),
+    queryKey: [...queryKeys.staff, tenantId, role, search, page, limit],
+    queryFn: () => graphqlQuery<{ staff: StaffResponse }>(STAFF, { tenantId, role, search, page, limit }).then(d => d.staff),
     staleTime: 0,
     gcTime: 15 * 60 * 1000,
+    enabled: !!tenantId,
   })
 }
 

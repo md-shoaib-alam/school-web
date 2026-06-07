@@ -113,37 +113,29 @@ export function TeacherAttendance() {
   });
 
   const classes = useMemo(() => (Array.isArray(rawClasses) ? rawClasses : []), [rawClasses]);
-
-  // Auto-select first class once loaded safely in an effect to prevent infinity loop
-  useEffect(() => {
-    const firstClassId = classes[0]?.id;
-    if (firstClassId && !selectedClassId) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
-      setSelectedClassId(firstClassId);
-    }
-  }, [classes, selectedClassId]);
+  const activeClassId = selectedClassId || classes[0]?.id || "";
 
   // ── Fetch students for selected class ─────────────────────
 
   const { data: students = [], isLoading: studentsLoading } = useQuery({
-    queryKey: studentsKey(selectedClassId),
+    queryKey: studentsKey(activeClassId),
     queryFn: async () => {
-      const data = await api.get<any>(`/students?classId=${selectedClassId}`);
+      const data = await api.get<any>(`/students?classId=${activeClassId}`);
       return (Array.isArray(data) ? data : data.items ?? []) as StudentInfo[];
     },
-    enabled: !!selectedClassId,
+    enabled: !!activeClassId,
     staleTime: 5 * 60 * 1000,
   });
 
   // ── Fetch existing attendance for class + date ─────────────
 
   const { data: existingAttendance = [] } = useQuery({
-    queryKey: attendanceKey(selectedClassId, date),
+    queryKey: attendanceKey(activeClassId, date),
     queryFn: async () => {
-      const res = await api.get<any>(`/attendance?classId=${selectedClassId}&date=${date}`);
+      const res = await api.get<any>(`/attendance?classId=${activeClassId}&date=${date}`);
       return Array.isArray(res?.records) ? res.records : [];
     },
-    enabled: !!selectedClassId,
+    enabled: !!activeClassId,
     staleTime: 30 * 1000, // 30 s - background refresh keeps it fresh
   });
 
@@ -171,11 +163,13 @@ export function TeacherAttendance() {
   >({});
   const [saved, setSaved] = useState(false);
 
-  // Reset overrides when class or date changes safely in effect
-  useEffect(() => {
+  // Adjust/Reset overrides when class or date changes during rendering (prevents set-state-in-effect and extra cycles)
+  const [prevClassAndDate, setPrevClassAndDate] = useState({ classId: activeClassId, date });
+  if (prevClassAndDate.classId !== activeClassId || prevClassAndDate.date !== date) {
     setLocalOverrides({});
     setSaved(false);
-  }, [selectedClassId, date]);
+    setPrevClassAndDate({ classId: activeClassId, date });
+  }
 
   // Combine server record truth with user pending interactions
   const records = useMemo((): AttendanceRecord[] => {
@@ -204,22 +198,22 @@ export function TeacherAttendance() {
   const saveMutation = useMutation({
     mutationFn: () =>
       api.post("/attendance", {
-        classId: selectedClassId,
+        classId: activeClassId,
         date,
         records,
       }),
     onMutate: async () => {
       // Optimistically update the cache so the UI reflects saved state instantly
       await queryClient.cancelQueries({
-        queryKey: attendanceKey(selectedClassId, date),
+        queryKey: attendanceKey(activeClassId, date),
       });
 
       const snapshot = queryClient.getQueryData<any[]>(
-        attendanceKey(selectedClassId, date)
+        attendanceKey(activeClassId, date)
       );
 
       queryClient.setQueryData(
-        attendanceKey(selectedClassId, date),
+        attendanceKey(activeClassId, date),
         records.map((r) => ({ studentId: r.studentId, status: r.status }))
       );
 
@@ -232,14 +226,14 @@ export function TeacherAttendance() {
 
       // Background refetch to sync with server truth
       queryClient.invalidateQueries({
-        queryKey: attendanceKey(selectedClassId, date),
+        queryKey: attendanceKey(activeClassId, date),
       });
     },
     onError: (_err, _vars, ctx) => {
       // Roll back optimistic update
       if (ctx?.snapshot) {
         queryClient.setQueryData(
-          attendanceKey(selectedClassId, date),
+          attendanceKey(activeClassId, date),
           ctx.snapshot
         );
       }
@@ -253,7 +247,7 @@ export function TeacherAttendance() {
   const absentCount = records.filter((r) => r.status === "absent").length;
   const totalCount = records.length;
 
-  const selectedClass = classes.find((c) => c.id === selectedClassId);
+  const selectedClass = classes.find((c) => c.id === activeClassId);
   
   const hasExistingAttendance = existingAttendance.length > 0;
   const hasUnsavedChanges = Object.keys(localOverrides).length > 0;
@@ -298,7 +292,7 @@ export function TeacherAttendance() {
       <div className="flex flex-col sm:flex-row gap-3">
         <div className="flex-1 max-w-xs">
           <Select
-            value={selectedClassId}
+            value={activeClassId}
             onValueChange={(v) => {
               setSelectedClassId(v);
               setLocalOverrides({});
@@ -502,7 +496,7 @@ export function TeacherAttendance() {
             <div className="text-center py-16">
               <Users className="size-10 text-zinc-300 dark:text-zinc-700 mx-auto mb-3" />
               <p className="text-zinc-400 dark:text-zinc-500 text-sm">
-                {selectedClassId ? "No students in this class" : "Select a class to begin"}
+                {activeClassId ? "No students in this class" : "Select a class to begin"}
               </p>
             </div>
           )}

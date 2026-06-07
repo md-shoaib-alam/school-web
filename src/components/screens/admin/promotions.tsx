@@ -119,32 +119,9 @@ export function AdminPromotions({ initialTab: propTab }: { initialTab?: "individ
 
   const fetchClassesAndStudents = useCallback(async () => {
     try {
-      const [classesRes, studentsRes] = await Promise.all([
-        apiFetch("/api/classes?mode=min"),
-        apiFetch("/api/students?mode=min"), // Optimized fetch with only essential fields
-      ]);
+      const classesRes = await apiFetch("/api/classes?mode=min");
       const classesData = classesRes.ok ? await classesRes.json() : [];
-      let studentsData: StudentOption[] = [];
-      if (studentsRes.ok) {
-        const json = await studentsRes.json();
-        const studentItems = json.items || [];
-        studentsData = studentItems.map(
-          (s: {
-            id: string;
-            name: string;
-            rollNumber: string;
-            className: string;
-            classId: string;
-          }) => ({
-            id: s.id,
-            name: s.name,
-            rollNumber: s.rollNumber,
-            className: s.className,
-            classId: s.classId,
-          }),
-        );
-      }
-      dispatch({ type: "FETCH_CLASSES_STUDENTS_SUCCESS", classes: classesData, students: studentsData });
+      dispatch({ type: "FETCH_CLASSES_STUDENTS_SUCCESS", classes: classesData, students: [] });
     } catch {
       /* silent */
     }
@@ -163,6 +140,48 @@ export function AdminPromotions({ initialTab: propTab }: { initialTab?: "individ
     }
     init();
   }, [fetchPromotions, fetchGraduations, fetchClassesAndStudents]);
+
+  // Dynamic student fetching when a class selection changes in different tabs/dialogs
+  const targetClassId = form.fromClassId || bulkFromClass || gradClassId;
+  useEffect(() => {
+    if (!targetClassId || targetClassId === "all") {
+      if (students.length > 0) {
+        dispatch({ type: "FETCH_CLASSES_STUDENTS_SUCCESS", classes: classes, students: [] });
+      }
+      return;
+    }
+
+    let active = true;
+    async function loadStudents() {
+      try {
+        const res = await apiFetch(`/api/students?mode=min&classId=${targetClassId}`);
+        if (res.ok && active) {
+          const json = await res.json();
+          const studentItems = json.items || [];
+          const studentsData = studentItems.map(
+            (s: {
+              id: string;
+              name: string;
+              rollNumber: string;
+              className: string;
+              classId: string;
+            }) => ({
+              id: s.id,
+              name: s.name,
+              rollNumber: s.rollNumber,
+              className: s.className,
+              classId: s.classId,
+            })
+          );
+          dispatch({ type: "FETCH_CLASSES_STUDENTS_SUCCESS", classes: classes, students: studentsData });
+        }
+      } catch (err) {
+        console.error("Failed to load students for promotion:", err);
+      }
+    }
+    loadStudents();
+    return () => { active = false; };
+  }, [targetClassId, classes, students.length]);
 
   /* ---- Derived data ---- */
 

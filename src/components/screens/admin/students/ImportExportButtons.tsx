@@ -16,7 +16,6 @@ import {
 } from "lucide-react";
 import { apiFetch } from "@/lib/api";
 import { toast } from "sonner";
-import * as XLSX from "xlsx";
 import { Progress } from "@/components/ui/progress";
 
 // Sub-components
@@ -53,8 +52,9 @@ export function ImportExportButtons({
 
   const parseHeaders = (file: File) => {
     const reader = new FileReader();
-    reader.onload = (e) => {
+    reader.onload = async (e) => {
       try {
+        const XLSX = await import("xlsx");
         const data = new Uint8Array(e.target?.result as ArrayBuffer);
         const workbook = XLSX.read(data, { type: "array" });
         const sheetName = workbook.SheetNames[0];
@@ -137,7 +137,8 @@ export function ImportExportButtons({
     }, 1500);
   };
 
-  const downloadSampleTemplate = () => {
+  const downloadSampleTemplate = async () => {
+    const XLSX = await import("xlsx");
     const data = [
       {
         "name": "John Doe",

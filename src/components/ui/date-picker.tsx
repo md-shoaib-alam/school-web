@@ -24,9 +24,8 @@ interface DatePickerProps {
 export function DatePicker({ date, onChange, placeholder = 'Pick a date', className, disabled }: DatePickerProps) {
   const [open, setOpen] = React.useState(false);
 
-  // Memoize the date reference based on its time value to prevent infinite render loops 
-  // in calendar components when new Date references are passed on every parent render.
-  const memoizedDate = React.useMemo(() => date, [date?.getTime()]);
+  const dateTime = date?.getTime();
+  const memoizedDate = React.useMemo(() => date, [dateTime]);
 
   // Sync visible month state when popover opens or when memoizedDate changes
   const [month, setMonth] = React.useState<Date | undefined>(date);

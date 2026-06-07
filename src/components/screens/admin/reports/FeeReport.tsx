@@ -22,12 +22,14 @@ import { IndianRupee, AlertTriangle, Eye } from "lucide-react";
 import { FeeRecord } from "@/lib/types";
 import { FeeSummary, FeeTypeBreakdown, feeBreakdownConfig } from "./types";
 import { SummaryCardSkeleton, ChartSkeleton, TableSkeleton } from "./SummaryComponents";
+import { Pagination } from "@/components/shared/pagination";
 
 export function FeeReport() {
   const [recharts, setRecharts] = useState<typeof import("recharts") | null>(null);
   const [fees, setFees] = useState<FeeRecord[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [overduePage, setOverduePage] = useState(1);
 
   useEffect(() => {
     import("recharts").then(setRecharts);
@@ -36,7 +38,7 @@ export function FeeReport() {
   useEffect(() => {
     async function fetchFees() {
       try {
-        const res = await apiFetch("/api/fees?limit=1000");
+        const res = await apiFetch("/api/fees?limit=200");
         if (!res.ok) throw new Error("Failed to fetch fees");
         const data = await res.json();
         setFees(data.items || []);
@@ -82,6 +84,12 @@ export function FeeReport() {
       .filter((f) => f.status !== "paid" && f.dueDate < today)
       .sort((a, b) => a.dueDate.localeCompare(b.dueDate));
   }, [fees]);
+
+  const displayedOverdue = useMemo(() => {
+    return overdueStudents.slice((overduePage - 1) * 10, overduePage * 10);
+  }, [overdueStudents, overduePage]);
+
+  const overdueTotalPages = Math.max(1, Math.ceil(overdueStudents.length / 10));
 
   const collectionPct =
     summary.totalFees > 0
@@ -244,39 +252,53 @@ export function FeeReport() {
               <p className="text-sm">No overdue records found</p>
             </div>
           ) : (
-            <div className="overflow-x-auto">
-              <Table>
-                <TableHeader>
-                  <TableRow className="bg-amber-50/30 dark:bg-amber-900/5 hover:bg-amber-50/30 dark:hover:bg-amber-900/5">
-                    <TableHead>Student</TableHead>
-                    <TableHead>Fee Type</TableHead>
-                    <TableHead>Due Date</TableHead>
-                    <TableHead className="text-right">Balance</TableHead>
-                    <TableHead />
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {overdueStudents.map((f) => (
-                    <TableRow key={f.id} className="border-amber-100 dark:border-amber-900/20">
-                      <TableCell className="font-medium">
-                        {f.studentName}
-                      </TableCell>
-                      <TableCell className="capitalize">{f.type}</TableCell>
-                      <TableCell className="text-red-600 dark:text-red-400 font-medium">
-                        {f.dueDate}
-                      </TableCell>
-                      <TableCell className="text-right font-bold">
-                        ₹{(f.amount - f.paidAmount).toLocaleString()}
-                      </TableCell>
-                      <TableCell className="text-right">
-                        <Button variant="ghost" size="icon" className="size-8 p-0">
-                          <Eye className="size-4 opacity-50" />
-                        </Button>
-                      </TableCell>
+            <div className="space-y-4">
+              <div className="overflow-x-auto">
+                <Table>
+                  <TableHeader>
+                    <TableRow className="bg-amber-50/30 dark:bg-amber-900/5 hover:bg-amber-50/30 dark:hover:bg-amber-900/5">
+                      <TableHead>Student</TableHead>
+                      <TableHead>Fee Type</TableHead>
+                      <TableHead>Due Date</TableHead>
+                      <TableHead className="text-right">Balance</TableHead>
+                      <TableHead />
                     </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
+                  </TableHeader>
+                  <TableBody>
+                    {displayedOverdue.map((f) => (
+                      <TableRow key={f.id} className="border-amber-100 dark:border-amber-900/20">
+                        <TableCell className="font-medium">
+                          {f.studentName}
+                        </TableCell>
+                        <TableCell className="capitalize">{f.type}</TableCell>
+                        <TableCell className="text-red-600 dark:text-red-400 font-medium">
+                          {f.dueDate}
+                        </TableCell>
+                        <TableCell className="text-right font-bold">
+                          ₹{(f.amount - f.paidAmount).toLocaleString()}
+                        </TableCell>
+                        <TableCell className="text-right">
+                          <Button variant="ghost" size="icon" className="size-8 p-0">
+                            <Eye className="size-4 opacity-50" />
+                          </Button>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
+
+              {overdueTotalPages > 1 && (
+                <div className="p-4 border-t border-amber-100 dark:border-amber-900/20">
+                  <Pagination
+                    currentPage={overduePage}
+                    totalPages={overdueTotalPages}
+                    totalItems={overdueStudents.length}
+                    itemsPerPage={10}
+                    onPageChange={(page) => setOverduePage(page)}
+                  />
+                </div>
+              )}
             </div>
           )}
         </CardContent>
