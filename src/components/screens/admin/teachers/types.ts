@@ -5,6 +5,7 @@ export interface TeacherInfo {
   phone?: string;
   qualification?: string;
   experience?: string;
+  status?: string;
   subjects?: string[];
   classes?: string[];
 }

@@ -19,6 +19,7 @@ interface TeachersGridViewProps {
   setDeletingId: (id: string | null) => void;
   onEdit: (t: TeacherInfo) => void;
   onDelete: (id: string) => void;
+  onView: (t: TeacherInfo) => void;
 }
 
 export function TeachersGridView({
@@ -29,6 +30,7 @@ export function TeachersGridView({
   setDeletingId,
   onEdit,
   onDelete,
+  onView,
 }: TeachersGridViewProps) {
   return (
     <LazyMotion features={domAnimation}>
@@ -56,6 +58,7 @@ export function TeachersGridView({
                 setDeletingId={setDeletingId}
                 onEdit={onEdit}
                 onDelete={onDelete}
+                onView={onView}
               />
             </m.div>
           ))}

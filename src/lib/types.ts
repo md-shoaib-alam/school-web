@@ -34,10 +34,11 @@ export interface TeacherInfo {
   email: string;
   qualification?: string;
   experience?: string;
-  subjects: string[];
-  classes: string[];
+  subjects?: string[];
+  classes?: string[];
   phone?: string;
   joiningDate: string;
+  status?: string;
 }
 
 export interface ClassInfo {
