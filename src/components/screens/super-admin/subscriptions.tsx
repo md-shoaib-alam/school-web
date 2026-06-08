@@ -1,15 +1,16 @@
 "use client";
 
 import { apiFetch } from "@/lib/api";
-import { useReducer, useEffect, useMemo } from "react";
+import { useReducer, useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 import {
   useParents,
   useSubscriptions,
-  useTenants,
+  useTenantsInfinite,
   queryKeys,
 } from "@/lib/graphql/hooks";
 import { useQueryClient } from "@tanstack/react-query";
+import { CreditCard } from "lucide-react";
 
 // Sub-components
 import { SubscriptionStats } from "./subscriptions/SubscriptionStats";
@@ -17,7 +18,7 @@ import { SubscriptionFilters } from "./subscriptions/SubscriptionFilters";
 import { SubscriptionTable } from "./subscriptions/SubscriptionTable";
 import { SubscriptionDialogs } from "./subscriptions/SubscriptionDialogs";
 import { SubscriptionRecord } from "./subscriptions/types";
-import { CreditCard } from "lucide-react";
+
 const ITEMS_PER_PAGE = 25;
 
 type State = {
@@ -159,9 +160,31 @@ export function SuperAdminSubscriptions() {
     return () => clearTimeout(timer);
   }, [search]);
 
+  const [tenantSearch, setTenantSearch] = useState("");
+  const [debouncedTenantSearch, setDebouncedTenantSearch] = useState("");
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedTenantSearch(tenantSearch);
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [tenantSearch]);
+
   // -- Queries --
-  const { data: tenantsData } = useTenants({ page: 1, limit: 100 });
-  const tenants = tenantsData?.tenants || [];
+  const { 
+    data: tenantsInfiniteData, 
+    fetchNextPage: fetchNextTenantsPage, 
+    hasNextPage: hasNextTenantsPage, 
+    isFetchingNextPage: isFetchingNextTenantsPage 
+  } = useTenantsInfinite({ 
+    search: debouncedTenantSearch.trim() || undefined,
+    limit: 40 
+  });
+
+  const tenants = useMemo(() => {
+    if (!tenantsInfiniteData) return [];
+    return tenantsInfiniteData.pages.flatMap((page) => page.tenants || []);
+  }, [tenantsInfiniteData]);
 
   const { data: subsData, isLoading: loadingSubs } = useSubscriptions({
     tenantId: selectedTenant === "all" ? undefined : selectedTenant,
@@ -360,6 +383,11 @@ export function SuperAdminSubscriptions() {
         tenants={tenants}
         onNewSetup={() => dispatch({ type: 'SET_CREATE_DIALOG_OPEN', payload: true })}
         parentsTotal={parentsData?.total || 0}
+        fetchNextPage={fetchNextTenantsPage}
+        hasNextPage={hasNextTenantsPage}
+        isFetchingNextPage={isFetchingNextTenantsPage}
+        tenantSearch={tenantSearch}
+        onTenantSearchChange={setTenantSearch}
       />
 
       <SubscriptionFilters 

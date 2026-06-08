@@ -16,7 +16,8 @@ import { toast } from "sonner";
 import { apiFetch } from "@/lib/api";
 import { useModulePermissions } from "@/hooks/use-permissions";
 import { useAppStore } from "@/store/use-app-store";
-import { useStudents, useClassesMin } from "@/lib/graphql/hooks/academic.hooks";
+import { useStudents } from "@/lib/graphql/hooks/academic.hooks";
+import { ClassSelect } from "@/components/ui/class-select";
 import { useQueryClient } from "@tanstack/react-query";
 import { queryKeys } from "@/lib/graphql/keys";
 import { useDebounce } from "@/hooks/use-debounce";
@@ -163,8 +164,6 @@ function AdminStudentsContent() {
     ITEMS_PER_PAGE,
   );
 
-  const { data: classesData } = useClassesMin(currentTenantId || undefined);
-
   const students = useMemo(() => {
     const list = studentData?.students || [];
     return [...list].sort((a, b) =>
@@ -176,7 +175,6 @@ function AdminStudentsContent() {
   }, [studentData]);
   const totalItems = studentData?.total || 0;
   const totalPages = studentData?.totalPages || 1;
-  const classes = classesData?.classes || [];
   const loading = loadingStudents;
 
   const searchParams = useSearchParams();
@@ -302,22 +300,13 @@ function AdminStudentsContent() {
               onChange={(e) => dispatch({ type: 'SET_SEARCH', payload: e.target.value })}
             />
           </div>
-          <Select
+          <ClassSelect
             value={classFilter}
             onValueChange={(v) => dispatch({ type: 'SET_CLASS_FILTER', payload: v })}
-          >
-            <SelectTrigger className="w-full sm:w-48">
-              <SelectValue placeholder="Filter by class" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Classes</SelectItem>
-              {classes.map((c) => (
-                <SelectItem key={c.id} value={c.id}>
-                  {c.name}-{c.section}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+            showAllOption
+            className="w-full sm:w-48"
+            placeholder="Filter by class"
+          />
         </div>
 
         {(canCreate || canEdit || canDelete) && (
@@ -383,7 +372,6 @@ function AdminStudentsContent() {
         open={dialogOpen}
         onOpenChange={(open) => dispatch({ type: open ? 'OPEN_CREATE' : 'CLOSE_DIALOG' })}
         mode={dialogMode}
-        classes={classes}
         formData={formData}
         setFormData={(fd) => dispatch({ type: 'SET_FORM_DATA', payload: fd })}
         submitting={submitting}

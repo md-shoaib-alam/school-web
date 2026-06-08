@@ -48,7 +48,7 @@ export function TeacherDialog({
         </DialogHeader>
         <div className="grid gap-4 py-2">
           <div className="grid gap-2">
-            <Label htmlFor="teacher-name">Full Name</Label>
+            <Label htmlFor="teacher-name">Full Name <span className="text-red-500">*</span></Label>
             <Input
               id="teacher-name"
               value={formData.name}
@@ -57,7 +57,7 @@ export function TeacherDialog({
             />
           </div>
           <div className="grid gap-2">
-            <Label htmlFor="teacher-email">Email</Label>
+            <Label htmlFor="teacher-email">Email <span className="text-red-500">*</span></Label>
             <Input
               id="teacher-email"
               type="email"

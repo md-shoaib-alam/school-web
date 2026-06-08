@@ -1,4 +1,4 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { useQuery, useMutation, useQueryClient, useInfiniteQuery } from '@tanstack/react-query'
 import { toast } from "sonner";
 import { graphqlQuery, graphqlMutate } from '../core'
 import { queryKeys } from '../keys'
@@ -43,6 +43,25 @@ export function useTenants(filters?: { status?: string; plan?: string; search?: 
   return useQuery({
     queryKey: queryKeys.tenants(filters),
     queryFn: () => graphqlQuery<{ tenants: TenantsResponse }>(TENANTS, filters as Record<string, unknown>).then(d => d.tenants),
+    staleTime: 60 * 1000,
+  })
+}
+
+export function useTenantsInfinite(filters?: { status?: string; plan?: string; search?: string; limit?: number }) {
+  return useInfiniteQuery({
+    queryKey: ['tenants-infinite', filters],
+    initialPageParam: 1,
+    queryFn: ({ pageParam = 1 }) => 
+      graphqlQuery<{ tenants: TenantsResponse }>(TENANTS, { 
+        ...filters, 
+        page: pageParam, 
+        limit: filters?.limit || 20 
+      }).then(d => d.tenants),
+    getNextPageParam: (lastPage) => {
+      const currentPage = lastPage.page;
+      const totalPages = lastPage.totalPages;
+      return currentPage < totalPages ? currentPage + 1 : undefined;
+    },
     staleTime: 60 * 1000,
   })
 }

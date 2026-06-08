@@ -17,7 +17,7 @@ export { useGraphQLQuery, useGraphQLMutation } from './hooks/generic.hooks'
 
 // Platform Hooks
 export { 
-  useBillingData, useTenants, useUsers, useAuditLogs, 
+  useBillingData, useTenants, useTenantsInfinite, useUsers, useAuditLogs, 
   useSubscriptions, useTenantDetail, useTenantMetadata, useCreateTenant, useUpdateTenant, 
   useDeleteTenant, useRestoreTenant, usePermanentDeleteTenant, 
   useToggleTenantStatus, useToggleUserStatus, useCreateUser 

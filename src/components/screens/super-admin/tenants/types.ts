@@ -56,7 +56,7 @@ export interface TenantFormData {
 
 export type ViewMode = "grid" | "table";
 
-export const ITEMS_PER_PAGE = 8;
+export const ITEMS_PER_PAGE = 16;
 
 export const planColors: Record<string, { bg: string; text: string; border: string }> = {
   basic: {

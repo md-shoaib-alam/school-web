@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, useMemo } from "react";
-import { useUsers, useToggleUserStatus, useTenants } from "@/lib/graphql/hooks";
+import { useState, useMemo, useEffect } from "react";
+import { useUsers, useToggleUserStatus, useTenantsInfinite } from "@/lib/graphql/hooks";
 import { toast } from "sonner";
 
 // Sub-components
@@ -50,19 +50,37 @@ export function SuperAdminUsers() {
   const totalCount = data?.total ?? 0;
   const totalPages = data?.totalPages ?? 1;
 
-  // Fetch simple list of tenants for selection
-  const { data: tenantsData } = useTenants({ limit: 100 });
+  const [tenantSearch, setTenantSearch] = useState("");
+  const [debouncedTenantSearch, setDebouncedTenantSearch] = useState("");
 
-  // Derive unique tenants from all tenants list for the filter dropdown
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedTenantSearch(tenantSearch);
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [tenantSearch]);
+
+  // Fetch list of tenants via infinite query for selection
+  const { 
+    data: tenantsInfiniteData, 
+    fetchNextPage: fetchNextTenantsPage, 
+    hasNextPage: hasNextTenantsPage, 
+    isFetchingNextPage: isFetchingNextTenantsPage 
+  } = useTenantsInfinite({ 
+    search: debouncedTenantSearch.trim() || undefined,
+    limit: 40 
+  });
+
+  // Derive unique tenants from all pages
   const tenants = useMemo(() => {
-    const list = tenantsData?.tenants;
-    if (!Array.isArray(list)) return [];
+    if (!tenantsInfiniteData) return [];
+    const list = tenantsInfiniteData.pages.flatMap((page) => page.tenants || []);
     return list.map((t) => ({
       id: t.id,
       name: t.name,
       slug: t.slug || "",
     }));
-  }, [tenantsData]);
+  }, [tenantsInfiniteData]);
 
   // Handlers
   const handleRoleChange = (v: string) => {
@@ -141,6 +159,11 @@ export function SuperAdminUsers() {
         tenantFilter={tenantFilter}
         onTenantFilterChange={handleTenantChange}
         tenants={tenants}
+        fetchNextPage={fetchNextTenantsPage}
+        hasNextPage={hasNextTenantsPage}
+        isFetchingNextPage={isFetchingNextTenantsPage}
+        tenantSearch={tenantSearch}
+        onTenantSearchChange={setTenantSearch}
       />
 
       <UserTable 

@@ -19,6 +19,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { ClassSelect } from "@/components/ui/class-select";
+import { DatePicker } from "@/components/ui/date-picker";
 import { Switch } from "@/components/ui/switch";
 import { Loader2, Bus } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
@@ -29,7 +31,7 @@ interface StudentDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   mode: "create" | "edit";
-  classes: ClassInfo[];
+  classes?: ClassInfo[];
   formData: StudentFormData;
   setFormData: (data: StudentFormData) => void;
   submitting: boolean;
@@ -71,7 +73,7 @@ export function StudentDialog({
         </DialogHeader>
         <div className="grid gap-4 py-2">
           <div className="grid gap-2">
-            <Label htmlFor="name">Full Name</Label>
+            <Label htmlFor="name">Full Name <span className="text-red-500">*</span></Label>
             <Input
               id="name"
               value={formData.name}
@@ -83,7 +85,7 @@ export function StudentDialog({
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div className="grid gap-2">
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="email">Email <span className="text-red-500">*</span></Label>
               <Input
                 id="email"
                 type="email"
@@ -95,7 +97,7 @@ export function StudentDialog({
               />
             </div>
             <div className="grid gap-2">
-              <Label htmlFor="rollNumber">Roll Number</Label>
+              <Label htmlFor="rollNumber">Roll Number <span className="text-red-500">*</span></Label>
               <Input
                 id="rollNumber"
                 value={formData.rollNumber}
@@ -112,24 +114,15 @@ export function StudentDialog({
 
           <div className="grid grid-cols-2 gap-4">
             <div className="grid gap-2">
-              <Label htmlFor="classId">Class</Label>
-              <Select
+              <Label htmlFor="classId">Class <span className="text-red-500">*</span></Label>
+              <ClassSelect
                 value={formData.classId}
                 onValueChange={(v) =>
                   setFormData({ ...formData, classId: v })
                 }
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Select class" />
-                </SelectTrigger>
-                <SelectContent>
-                  {classes.map((c) => (
-                    <SelectItem key={c.id} value={c.id}>
-                      {c.name}-{c.section}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+                placeholder="Select class"
+                className="w-full"
+              />
             </div>
             <div className="grid gap-2">
               <Label htmlFor="gender">Gender</Label>
@@ -163,16 +156,14 @@ export function StudentDialog({
             </div>
             <div className="grid gap-2">
               <Label htmlFor="dob">Date of Birth</Label>
-              <Input
-                id="dob"
-                type="date"
-                value={formData.dateOfBirth}
-                onChange={(e) =>
-                  setFormData({
-                    ...formData,
-                    dateOfBirth: e.target.value,
-                  })
-                }
+              <DatePicker
+                date={formData.dateOfBirth && !isNaN(new Date(formData.dateOfBirth).getTime()) ? new Date(formData.dateOfBirth) : undefined}
+                onChange={(date) => {
+                  const formatted = date ? date.toISOString().split('T')[0] : '';
+                  setFormData({ ...formData, dateOfBirth: formatted });
+                }}
+                placeholder="Pick date of birth"
+                className="w-full h-10 border-zinc-200 dark:border-zinc-800"
               />
             </div>
           </div>

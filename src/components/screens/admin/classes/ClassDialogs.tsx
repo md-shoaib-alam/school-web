@@ -52,6 +52,7 @@ interface ClassFormProps {
 function getMappedGradeFromName(name: string): string {
   if (!name) return "";
   const normalized = name.trim().toLowerCase();
+  if (normalized === "pre-nursery" || normalized === "prenursery" || normalized === "pre nursery") return "Pre-Nursery";
   if (normalized === "nursery") return "Nursery";
   if (normalized === "lkg") return "LKG";
   if (normalized === "ukg") return "UKG";
@@ -81,7 +82,7 @@ function ClassForm({ value, onChange, enableGradeSelection = true, teachers = []
             </SelectTrigger>
             <SelectContent>
               {[
-                "Nursery", "LKG", "UKG",
+                "Pre-Nursery", "Nursery", "LKG", "UKG",
                 "Class 1", "Class 2", "Class 3", "Class 4", "Class 5", "Class 6",
                 "Class 7", "Class 8", "Class 9", "Class 10", "Class 11", "Class 12",
               ].map((name) => (
@@ -122,7 +123,7 @@ function ClassForm({ value, onChange, enableGradeSelection = true, teachers = []
               <SelectValue placeholder="Select grade" />
             </SelectTrigger>
             <SelectContent>
-              {["Nursery", "LKG", "UKG"].map((grade) => (
+              {["Pre-Nursery", "Nursery", "LKG", "UKG"].map((grade) => (
                 <SelectItem key={grade} value={grade}>
                   {grade}
                 </SelectItem>

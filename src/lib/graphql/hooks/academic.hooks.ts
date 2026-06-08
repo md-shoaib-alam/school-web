@@ -1,4 +1,4 @@
-import { useQuery, useMutation, useQueryClient, keepPreviousData } from '@tanstack/react-query'
+import { useQuery, useMutation, useQueryClient, keepPreviousData, useInfiniteQuery } from '@tanstack/react-query'
 import { toast } from "sonner";
 import { graphqlQuery, graphqlMutate } from '../core'
 import { queryKeys } from '../keys'
@@ -27,6 +27,27 @@ export function useClassesMin(tenantId?: string, page?: number, limit?: number) 
   return useQuery<ClassesResponse>({
     queryKey: [...queryKeys.classes, tenantId, page, limit],
     queryFn: () => graphqlQuery<{ classes: ClassesResponse }>(CLASSES, { tenantId, page, limit }).then(d => d.classes),
+    staleTime: 0,
+    gcTime: 5 * 60 * 1000,
+    enabled: !!tenantId,
+  })
+}
+
+export function useClassesInfinite(tenantId?: string, filters?: { limit?: number }) {
+  return useInfiniteQuery<ClassesResponse>({
+    queryKey: [...queryKeys.classes, 'infinite', tenantId, filters],
+    initialPageParam: 1,
+    queryFn: ({ pageParam = 1 }) =>
+      graphqlQuery<{ classes: ClassesResponse }>(CLASSES, {
+        tenantId,
+        page: pageParam,
+        limit: filters?.limit || 20,
+      }).then(d => d.classes),
+    getNextPageParam: (lastPage) => {
+      const currentPage = lastPage.page;
+      const totalPages = lastPage.totalPages;
+      return currentPage < totalPages ? (currentPage + 1) : undefined;
+    },
     staleTime: 0,
     gcTime: 5 * 60 * 1000,
     enabled: !!tenantId,

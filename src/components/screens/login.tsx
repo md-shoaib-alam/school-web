@@ -95,7 +95,7 @@ export function LoginScreen() {
         });
 
         const tenantId = userData.tenantSlug || userData.tenantId;
-        const dashboardUrl = tenantId ? `/${tenantId}` : "/";
+        const dashboardUrl = tenantId ? `/${tenantId}/dashboard` : "/dashboard";
         
         // Use window.location.href for a clean entry after login
         window.location.href = dashboardUrl;
