@@ -1,4 +1,4 @@
-export const DEFAULT_DAYS = ["monday", "tuesday", "wednesday", "thursday", "friday"];
+export const DEFAULT_DAYS = ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday"];
 
 export const ALL_DAYS = [
   "monday",

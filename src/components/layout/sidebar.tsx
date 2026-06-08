@@ -16,13 +16,15 @@ interface SidebarProps {
   resolvedScreen: string;
   navigateTo: (screen: string) => void;
   setIsChangePasswordOpen: (open: boolean) => void;
+  layoutPref?: string | null;
 }
 
 export function Sidebar({ 
   items, 
   resolvedScreen, 
   navigateTo, 
-  setIsChangePasswordOpen 
+  setIsChangePasswordOpen,
+  layoutPref = "comprehensive"
 }: SidebarProps) {
   const {
     currentUser,
@@ -66,6 +68,10 @@ export function Sidebar({
     .map((n) => n[0])
     .join("")
     .slice(0, 2);
+
+  const isMinimal = layoutPref === "minimal";
+
+  if (isMinimal) return null;
 
   return (
     <aside

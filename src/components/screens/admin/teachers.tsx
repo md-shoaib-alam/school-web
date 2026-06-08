@@ -1,6 +1,6 @@
 "use client";
 
-import { useReducer, useEffect, useMemo } from "react";
+import { useReducer, useEffect, useMemo, useState } from "react";
 import { useViewMode } from "@/hooks/use-view-mode";
 import { toast } from "sonner";
 import { useModulePermissions } from "@/hooks/use-permissions";
@@ -15,6 +15,7 @@ import anime from "animejs";
 
 // Sub-components
 import { TeacherDialog } from "./teachers/TeacherDialog";
+import { TeacherDetailDialog } from "./teachers/TeacherDetailDialog";
 import { TeacherSkeleton } from "./teachers/TeacherSkeleton";
 import { TeachersHeader } from "./teachers/TeachersHeader";
 import { TeachersTableView } from "./teachers/TeachersTableView";
@@ -98,6 +99,14 @@ export function AdminTeachers() {
 
   const [state, dispatch] = useReducer(reducer, initialState);
   const { search, currentPage, dialogOpen, editingTeacher, formData, submitting, deletingId } = state;
+
+  const [viewingTeacher, setViewingTeacher] = useState<TeacherInfo | null>(null);
+  const [viewDialogOpen, setViewDialogOpen] = useState(false);
+
+  const handleOpenView = (teacher: TeacherInfo) => {
+    setViewingTeacher(teacher);
+    setViewDialogOpen(true);
+  };
 
   const debouncedSearch = useDebounce(search, 500);
 
@@ -287,6 +296,7 @@ export function AdminTeachers() {
           onDelete={handleDelete}
           deletingId={deletingId}
           setDeletingId={(id) => dispatch({ type: "SET_DELETING_ID", payload: id })}
+          onView={handleOpenView}
         />
       ) : (
         <TeachersGridView 
@@ -297,6 +307,7 @@ export function AdminTeachers() {
           setDeletingId={(id) => dispatch({ type: "SET_DELETING_ID", payload: id })}
           onEdit={handleOpenEdit}
           onDelete={handleDelete}
+          onView={handleOpenView}
         />
       )}
 
@@ -323,6 +334,12 @@ export function AdminTeachers() {
         submitting={submitting}
         onSubmit={handleSubmit}
         isFormValid={formData.name.trim() !== "" && formData.email.trim() !== ""}
+      />
+
+      <TeacherDetailDialog
+        open={viewDialogOpen}
+        onOpenChange={setViewDialogOpen}
+        teacher={viewingTeacher}
       />
     </div>
   );

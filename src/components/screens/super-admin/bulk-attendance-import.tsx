@@ -1,13 +1,14 @@
 "use client";
 
 import { useState, useEffect, useMemo, useRef } from "react";
-import { 
-  Card, 
-  CardContent, 
+import {
+  Card,
+  CardContent,
   CardHeader, 
   CardTitle, 
   CardDescription 
 } from "@/components/ui/card";
+import { Progress } from "@/components/ui/progress";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -133,6 +134,48 @@ export function SuperAdminBulkAttendance() {
   const [rangeRemarks, setRangeRemarks] = useState<string>("");
   const [selectedDays, setSelectedDays] = useState<number[]>([1, 2, 3, 4, 5]); // Mon-Fri default
   const [generatingRange, setGeneratingRange] = useState(false);
+  
+  // Progress states
+  const [progress, setProgress] = useState(0);
+  const [showProgress, setShowProgress] = useState(false);
+
+  const startProgressSimulation = (totalRecords: number) => {
+    setProgress(0);
+    setShowProgress(true);
+    
+    // Estimate time: base of 1.5s plus ~1.5ms per record, capped between 2s and 12s
+    const estimatedDuration = Math.max(2000, Math.min(12000, 1500 + totalRecords * 1.5));
+    const intervalTime = 100;
+    const totalSteps = estimatedDuration / intervalTime;
+    const increment = 90 / totalSteps;
+    
+    const timer = setInterval(() => {
+      setProgress(prev => {
+        if (prev >= 90) {
+          clearInterval(timer);
+          return 90;
+        }
+        return Math.min(90, prev + increment);
+      });
+    }, intervalTime);
+    
+    return timer;
+  };
+
+  const completeProgress = (timer: any) => {
+    if (timer) clearInterval(timer);
+    setProgress(100);
+    setTimeout(() => {
+      setShowProgress(false);
+      setProgress(0);
+    }, 1000);
+  };
+
+  const failProgress = (timer: any) => {
+    if (timer) clearInterval(timer);
+    setShowProgress(false);
+    setProgress(0);
+  };
   
   // Specific Date overrides within selected range
   const [overriddenStatuses, setOverriddenStatuses] = useState<Record<string, string>>({});
@@ -506,6 +549,7 @@ export function SuperAdminBulkAttendance() {
 
     setImportingData(true);
     setImportResult(null);
+    const timer = startProgressSimulation(validRows.length);
 
     try {
       const payload = {
@@ -532,15 +576,18 @@ export function SuperAdminBulkAttendance() {
       const data = await res.json();
 
       if (res.ok && data.success) {
+        completeProgress(timer);
         toast.success(`Bulk import completed! Imported: ${data.importedCount}, Skipped: ${data.skippedCount}`);
         setImportResult(data);
         // Clear current states
         setUploadedFile(null);
         setParsedRows([]);
       } else {
+        failProgress(timer);
         toast.error(data.error || "Failed to import attendance data.");
       }
     } catch (err: any) {
+      failProgress(timer);
       toast.error("An error occurred during import: " + err.message);
     } finally {
       setImportingData(false);
@@ -632,13 +679,17 @@ export function SuperAdminBulkAttendance() {
     }
 
     setGeneratingRange(true);
+    const targetStudents = allStudentsMode ? students : [selectedStudent!];
+    const totalRecords = targetStudents.length * validDates.length;
+    const timer = startProgressSimulation(totalRecords);
+
     try {
       const recordsToPost: any[] = [];
-      const targetStudents = allStudentsMode ? students : [selectedStudent!];
 
       if (targetStudents.length === 0) {
         toast.error("No students found to apply attendance to.");
         setGeneratingRange(false);
+        failProgress(timer);
         return;
       }
 
@@ -675,6 +726,7 @@ export function SuperAdminBulkAttendance() {
       const data = await res.json();
 
       if (res.ok && data.success) {
+        completeProgress(timer);
         toast.success(`Range entry complete! ${data.importedCount} records successfully written.`);
         setImportResult(data);
         // Reset states
@@ -682,9 +734,11 @@ export function SuperAdminBulkAttendance() {
         setEndDate("");
         setRangeRemarks("");
       } else {
+        failProgress(timer);
         toast.error(data.error || "Failed to import range records.");
       }
     } catch (err: any) {
+      failProgress(timer);
       toast.error("Error submitting range: " + err.message);
     } finally {
       setGeneratingRange(false);
@@ -1136,6 +1190,16 @@ export function SuperAdminBulkAttendance() {
                           </Button>
                         </div>
 
+                        {showProgress && importingData && (
+                          <div className="mt-3 space-y-1.5 p-4 border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900/40 rounded-xl">
+                            <div className="flex justify-between text-xs font-bold text-teal-600 dark:text-teal-400">
+                              <span className="flex items-center gap-1.5"><RefreshCw className="size-3.5 animate-spin" /> Processing records...</span>
+                              <span>{Math.round(progress)}%</span>
+                            </div>
+                            <Progress value={progress} className="h-2 bg-teal-500/10" indicatorClassName="bg-gradient-to-r from-teal-500 to-emerald-500" />
+                          </div>
+                        )}
+
                       </div>
                     )}
 
@@ -1407,6 +1471,17 @@ export function SuperAdminBulkAttendance() {
                           </>
                         )}
                       </Button>
+
+                      {showProgress && generatingRange && (
+                        <div className="mt-3 space-y-1.5 p-3.5 border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900/40 rounded-xl">
+                          <div className="flex justify-between text-xs font-bold text-teal-650 dark:text-teal-400">
+                            <span className="flex items-center gap-1.5"><RefreshCw className="size-3.5 animate-spin" /> Batch Processing...</span>
+                            <span>{Math.round(progress)}%</span>
+                          </div>
+                          <Progress value={progress} className="h-2 bg-teal-500/10" indicatorClassName="bg-gradient-to-r from-teal-500 to-emerald-500" />
+                        </div>
+                      )}
+
                       <p className="text-[10px] text-center text-muted-foreground mt-2">
                         Writes <span className="font-extrabold text-zinc-950 dark:text-white">{activeRangeDatesCount * (allStudentsMode ? students.length : 1)} total records</span>
                       </p>

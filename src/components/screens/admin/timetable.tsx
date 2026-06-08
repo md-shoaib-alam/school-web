@@ -334,7 +334,6 @@ export function AdminTimetable() {
         setViewMode={(v) => dispatch({ type: 'SET_VIEW_MODE', payload: v })}
         selectedClass={selectedClass}
         onClassChange={(v) => dispatch({ type: 'SET_SELECTED_CLASS', payload: v })}
-        classes={classes}
         canEdit={canEdit}
         canCreate={canCreate}
         onSettingsClick={() => { dispatch({ type: 'SET_DAYS_CONFIG_OPEN', payload: { open: true, draft: [...workingDays] } }); }}

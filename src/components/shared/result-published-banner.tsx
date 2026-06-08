@@ -156,49 +156,48 @@ export function ResultPublishedBanner({ studentId, className: classNameProp }: R
           {/* Animated shimmer overlay */}
           <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 dark:via-white/5 to-transparent -skew-x-12 translate-x-[-200%] animate-[shimmer_3s_ease-in-out_infinite]" />
 
-          <div className="relative flex items-center justify-between gap-4 px-4 py-3.5">
-            <div className="flex items-center gap-3 min-w-0">
+          <div className="relative flex items-center justify-between gap-3 px-3 py-3 sm:px-4 sm:py-3.5">
+            <div className="flex items-center gap-2 sm:gap-3 min-w-0">
               {/* Icon */}
-              <div className="shrink-0 size-9 rounded-xl bg-emerald-500 dark:bg-emerald-600 text-white flex items-center justify-center shadow-md shadow-emerald-500/30">
-                <Trophy className="size-4.5" />
+              <div className="shrink-0 size-8 sm:size-9 rounded-xl bg-emerald-500 dark:bg-emerald-600 text-white flex items-center justify-center shadow-md shadow-emerald-500/30">
+                <Trophy className="size-4 sm:size-4.5" />
               </div>
 
               {/* Text */}
               <div className="min-w-0">
-                <div className="flex items-center gap-2 flex-wrap">
-                  <p className="text-sm font-bold text-emerald-900 dark:text-emerald-100 leading-tight">
-                    Results Published!
+                <div className="flex items-center gap-1.5 flex-wrap">
+                  <p className="text-xs sm:text-sm font-semibold text-emerald-900 dark:text-emerald-100 leading-tight">
+                    Results Out!
                   </p>
-                  <Badge className="text-[9px] font-bold tracking-wide px-1.5 py-0 border-none bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 shadow-none uppercase">
-                    <Sparkles className="size-2.5 mr-0.5" />
+                  <Badge className="text-[8px] sm:text-[9px] font-semibold tracking-tight px-1 py-0 border-none bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 shadow-none uppercase">
                     New
                   </Badge>
                 </div>
-                <p className="text-xs text-emerald-700 dark:text-emerald-400 mt-0.5 font-medium line-clamp-1">
+                <p className="text-[10px] sm:text-xs text-emerald-700 dark:text-emerald-400 mt-0.5 font-medium truncate">
                   {exam.name
                     ? exam.name.replace(/ - .+$/, "")
-                    : `${exam.examType} · ${exam.academicYear}`}{" "}
-                  results are now available. Click to view your marksheet.
+                    : `${exam.examType} · ${exam.academicYear}`}
                 </p>
               </div>
             </div>
 
             {/* Actions */}
-            <div className="flex items-center gap-2 shrink-0">
+            <div className="flex items-center gap-1.5 shrink-0">
               <Button
                 size="sm"
                 onClick={handleViewMarksheet}
-                className="h-8 gap-1.5 text-xs font-bold bg-emerald-600 hover:bg-emerald-700 dark:bg-emerald-700 dark:hover:bg-emerald-600 text-white shadow-md shadow-emerald-500/25 border-none rounded-xl px-3 transition-all"
+                className="h-7 sm:h-8 gap-1 text-[10px] sm:text-xs font-semibold bg-emerald-600 hover:bg-emerald-700 dark:bg-emerald-700 dark:hover:bg-emerald-600 text-white shadow-sm border-none rounded-lg px-2 sm:px-3 transition-all"
               >
-                <FileText className="size-3.5" />
-                View Marksheet
+                <FileText className="size-3 sm:size-3.5" />
+                <span className="hidden sm:inline">View Marksheet</span>
+                <span className="sm:hidden">View</span>
               </Button>
               <button
                 onClick={() => handleDismiss(exam.id)}
-                className="size-6 rounded-lg flex items-center justify-center text-emerald-600 dark:text-emerald-400 hover:bg-emerald-100 dark:hover:bg-emerald-900/40 transition-colors"
+                className="size-5 sm:size-6 rounded-lg flex items-center justify-center text-emerald-600 dark:text-emerald-400 hover:bg-emerald-100 dark:hover:bg-emerald-900/40 transition-colors"
                 aria-label="Dismiss notification"
               >
-                <X className="size-3.5" />
+                <X className="size-3 sm:size-3.5" />
               </button>
             </div>
           </div>

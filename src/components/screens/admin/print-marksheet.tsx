@@ -18,7 +18,7 @@ import { ExamRecord } from './exams/types';
 import { FullPageSkeleton } from "@/components/ui/full-page-skeleton";
 import { toast } from "sonner";
 import { useAppStore } from "@/store/use-app-store";
-import { useTenantDetail } from "@/lib/graphql/hooks/platform.hooks";
+import { useTenantMetadata } from "@/lib/graphql/hooks/platform.hooks";
 
 const LoadingScreen = () => <FullPageSkeleton />;
 
@@ -30,7 +30,7 @@ export function AdminPrintMarksheetContent() {
 
   // Subscription Plan check
   const { currentTenantId } = useAppStore();
-  const { data: detailData, isLoading: isDetailLoading } = useTenantDetail(currentTenantId || "");
+  const { data: detailData, isLoading: isDetailLoading } = useTenantMetadata(currentTenantId || "");
   const tenant = detailData?.tenant;
 
   // Academic Years

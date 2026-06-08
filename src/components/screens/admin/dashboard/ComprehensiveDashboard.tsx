@@ -64,7 +64,7 @@ export function ComprehensiveDashboard({
           totalParents: dashboardData.totalParents,
           totalClasses: dashboardData.totalClasses,
           totalRevenue: dashboardData.totalRevenue,
-          attendanceRate: dashboardData.attendanceRate,
+          totalStaff: dashboardData.totalStaff,
         } : undefined}
       />
 

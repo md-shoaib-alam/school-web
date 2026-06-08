@@ -15,32 +15,27 @@ import { CategoryPanel } from "./feature-flags/CategoryPanel";
 import { FeatureFlag, initialFlags } from "./feature-flags/types";
 
 export function SuperAdminFeatureFlags() {
-  const [flags, setFlags] = useState<FeatureFlag[]>(initialFlags);
-  const [isLoaded, setIsLoaded] = useState(false);
-
-  // Load from localStorage on mount
-  useEffect(() => {
+  const [flags, setFlags] = useState<FeatureFlag[]>(() => {
     if (typeof window !== "undefined") {
       const saved = localStorage.getItem("super-admin-feature-flags");
       if (saved) {
         try {
           const parsed = JSON.parse(saved);
           // Restore React element icon references matching initialFlags
-          const restored = parsed.map((flag: any) => {
+          return parsed.map((flag: any) => {
             const initial = initialFlags.find(f => f.id === flag.id);
             return {
               ...flag,
               icon: initial?.icon || Blocks
             };
           });
-          setFlags(restored);
         } catch (e) {
           console.error("Failed to parse saved flags", e);
         }
       }
-      setIsLoaded(true);
     }
-  }, []);
+    return initialFlags;
+  });
 
   // Persisted state updater helper
   const saveFlags = (updatedFlags: FeatureFlag[]) => {

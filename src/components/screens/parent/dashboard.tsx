@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useAppStore } from "@/store/use-app-store";
 import { useParentDashboard } from "@/lib/graphql/hooks";
 import { toast } from "sonner";
@@ -12,12 +12,29 @@ import { ChildrenOverview } from "./dashboard_components/ChildrenOverview";
 import { NoticeSidebar } from "./dashboard_components/NoticeSidebar";
 import { DashboardSkeleton } from "./dashboard_components/DashboardSkeleton";
 import { ResultPublishedBanner } from "@/components/shared/result-published-banner";
+import { MinimalDashboard } from "./dashboard_components/MinimalDashboard";
 
 export function ParentDashboard() {
   const { currentUser } = useAppStore();
   const { data, isPending, fetchStatus, isError, error } = useParentDashboard(
     currentUser?.name || "",
   );
+  const [layoutPref, setLayoutPref] = useState("comprehensive");
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const stored = localStorage.getItem("schoolsaas_dashboard_layout_preference");
+      if (stored) setLayoutPref(stored);
+
+      const handlePrefChange = (e: any) => {
+        if (e.detail) setLayoutPref(e.detail);
+      };
+      window.addEventListener("schoolsaas_dashboard_layout_pref_changed", handlePrefChange);
+      return () => {
+        window.removeEventListener("schoolsaas_dashboard_layout_pref_changed", handlePrefChange);
+      };
+    }
+  }, []);
 
   // In React Query v5, when enabled:false, isPending=true but fetchStatus='idle'
   const isActuallyLoading = isPending && fetchStatus === 'fetching';
@@ -67,6 +84,19 @@ export function ParentDashboard() {
   const activeChildId = (savedStudentId && childrenData.some(c => c.id === savedStudentId))
     ? savedStudentId
     : childrenData[0]?.id;
+
+  if (layoutPref === "minimal") {
+    return (
+      <div className="space-y-6 pb-10">
+        {/* Result Published Notification - shown at top of dashboard */}
+        {childrenData.length > 0 && <ResultPublishedBanner studentId={activeChildId} />}
+
+        <WelcomeBanner userName={currentUser?.name} />
+
+        <MinimalDashboard />
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6 pb-10">

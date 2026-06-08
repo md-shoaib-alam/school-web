@@ -1,6 +1,6 @@
 "use client";
 
-import { useReducer, useEffect, useMemo } from "react";
+import { useReducer, useEffect, useMemo, useState } from "react";
 import { useViewMode } from "@/hooks/use-view-mode";
 import { toast } from "sonner";
 import api from "@/lib/axios";
@@ -13,6 +13,16 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { queryKeys } from "@/lib/graphql/keys";
 import { Pagination } from "@/components/shared/pagination";
 import { useDebounce } from "@/hooks/use-debounce";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 // Sub-components
 import { ParentsHeader } from "./parents/ParentsHeader";
@@ -135,6 +145,9 @@ export function AdminParents() {
 
   const debouncedSearch = useDebounce(search, 500);
 
+  const [unlinkConfirmOpen, setUnlinkConfirmOpen] = useState(false);
+  const [unlinkData, setUnlinkData] = useState<{ parentId: string; studentId: string } | null>(null);
+
   // Queries
   const { 
     data: parentsData, 
@@ -144,16 +157,20 @@ export function AdminParents() {
   const { data: classesData } = useClassesMin(currentTenantId || undefined);
 
   // Students for linking (filtered by class if selected) - Using optimized min-data REST API
+  const [studentSearch, setStudentSearch] = useState("");
+  const debouncedStudentSearch = useDebounce(studentSearch, 500);
+
   const { 
     data: studentData, 
     isLoading: loadingStudents,
     isFetching: fetchingStudents
   } = useQuery({
-    queryKey: ['students-min', selectedClass],
+    queryKey: ['students-min', selectedClass, debouncedStudentSearch],
     queryFn: async () => {
       try {
-        const params: any = { mode: 'min', limit: '1000' };
+        const params: any = { mode: 'min', limit: '50' };
         if (selectedClass && selectedClass !== 'all') params.classId = selectedClass;
+        if (debouncedStudentSearch) params.search = debouncedStudentSearch;
         const res = await api.get('/students', { params });
         const data = res as any;
         return (data?.items ? data : { items: [] }) as { items: StudentInfo[] };
@@ -163,8 +180,7 @@ export function AdminParents() {
       }
     },
     enabled: linkOpen,
-    staleTime: 30 * 60 * 1000,
-    gcTime: 60 * 60 * 1000,
+    staleTime: 5000,
     refetchOnWindowFocus: false,
     refetchOnMount: true
   });
@@ -230,7 +246,16 @@ export function AdminParents() {
     );
   };
 
-  const handleUnlinkChild = async (parentId: string, studentId: string) => {
+  const handleUnlinkChild = (parentId: string, studentId: string) => {
+    setUnlinkData({ parentId, studentId });
+    setUnlinkConfirmOpen(true);
+  };
+
+  const executeUnlinkChild = async () => {
+    if (!unlinkData) return;
+    const { parentId, studentId } = unlinkData;
+    setUnlinkConfirmOpen(false);
+    setUnlinkData(null);
     toast.promise(
       (async () => {
         await api.post("/parents", { action: "unlink", parentId, studentId, });
@@ -264,6 +289,9 @@ export function AdminParents() {
   };
 
   const handleDelete = async (id: string) => {
+    if (!window.confirm("Are you sure you want to delete this parent account? This action cannot be undone.")) {
+      return;
+    }
     toast.promise(
       (async () => {
         await api.delete(`/parents?id=${id}`);
@@ -339,7 +367,10 @@ export function AdminParents() {
 
       <LinkChildDialog
         open={linkOpen}
-        onOpenChange={(v) => dispatch({ type: 'SET_LINK_OPEN', payload: v })}
+        onOpenChange={(v) => {
+          dispatch({ type: 'SET_LINK_OPEN', payload: v });
+          if (!v) setStudentSearch("");
+        }}
         selectedParent={selectedParent}
         selectedClass={selectedClass}
         setSelectedClass={(v) => dispatch({ type: 'SET_SELECTED_CLASS', payload: v })}
@@ -349,6 +380,8 @@ export function AdminParents() {
         loading={loadingStudents}
         onLinkChild={handleLinkChild}
         onUnlinkChild={handleUnlinkChild}
+        searchQuery={studentSearch}
+        onSearchQueryChange={setStudentSearch}
       />
 
       <ParentDetailDialog
@@ -357,6 +390,26 @@ export function AdminParents() {
         parent={selectedParentDetail}
         onLinkClick={(p) => dispatch({ type: 'OPEN_LINK_DIALOG', payload: p })}
       />
+
+      <AlertDialog open={unlinkConfirmOpen} onOpenChange={setUnlinkConfirmOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Unlink Student</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to unlink this student from their parent?
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={() => { setUnlinkConfirmOpen(false); setUnlinkData(null); }}>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={executeUnlinkChild}
+              className="bg-red-600 hover:bg-red-700 text-white"
+            >
+              Unlink
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

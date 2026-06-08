@@ -13,20 +13,17 @@ export function StaffDashboard() {
   const { push } = useRouter();
   const { currentUser, currentTenantSlug, currentTenantId, setCurrentScreen } = useAppStore();
   const [searchQuery, setSearchQuery] = useState("");
-  const [clickCounts, setClickCounts] = useState<Record<string, number>>({});
-
-  useEffect(() => {
+  const [clickCounts, setClickCounts] = useState<Record<string, number>>(() => {
     if (typeof window !== "undefined") {
       try {
         const stored = localStorage.getItem("schoolsaas_staff_action_clicks");
-        if (stored) {
-          setClickCounts(JSON.parse(stored));
-        }
+        return stored ? JSON.parse(stored) : {};
       } catch (e) {
         console.error("Failed to load action clicks", e);
       }
     }
-  }, []);
+    return {};
+  });
 
   const navigateTo = (screen: string) => {
     try {

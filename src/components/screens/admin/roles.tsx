@@ -9,9 +9,8 @@ import {
   useDeleteCustomRole, 
   useAssignRoleToUser 
 } from "@/lib/graphql/hooks";
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Skeleton } from "@/components/ui/skeleton";
 import { Plus, Shield, LayoutGrid, List } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
@@ -138,7 +137,7 @@ export function AdminRoles() {
     data: staffResponse, 
     refetch: refetchStaff,
     isLoading: assignLoading
-  } = useStaff(currentTenantId || "", "staff");
+  } = useStaff(currentTenantId || "", "staff", undefined, 1, 1000);
 
   const allStaff = staffResponse?.staff || [];
 
@@ -295,7 +294,7 @@ export function AdminRoles() {
           </CardContent>
         </Card>
       ) : viewMode === 'grid' ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="grid gap-6" style={{ gridTemplateColumns: "repeat(auto-fill, minmax(350px, 1fr))" }}>
           {roles.map((role: RoleRecord) => {
             const count = allStaff.filter(u => u.customRole?.id === role.id).length;
             return (
@@ -315,6 +314,7 @@ export function AdminRoles() {
             ...role,
             userCount: allStaff.filter(u => u.customRole?.id === role.id).length
           }))}
+          allStaff={allStaff}
           onEdit={(r) => dispatch({ type: 'OPEN_EDIT_DIALOG', payload: r })}
           onAssign={(r) => dispatch({ type: 'OPEN_ASSIGN_DIALOG', payload: r })}
           onDelete={handleDeleteRole}

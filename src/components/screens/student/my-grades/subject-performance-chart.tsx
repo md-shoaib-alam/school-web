@@ -28,7 +28,7 @@ export function SubjectPerformanceChart({
   chartConfig,
 }: SubjectPerformanceChartProps) {
   return (
-    <Card className="rounded-xl shadow-sm border-zinc-200/60 dark:border-zinc-800">
+    <Card className="rounded-xl shadow-sm border-zinc-200/60 dark:border-zinc-800 h-full">
       <CardHeader className="pb-2">
         <CardTitle className="text-base flex items-center gap-2 font-semibold">
           <BarChart3 className="size-4 text-violet-500" />
@@ -51,22 +51,24 @@ export function SubjectPerformanceChart({
                 return (
                   <BarChart
                     data={latestExam.data}
-                    layout="vertical"
-                    margin={{ left: 10, right: 10 }}
+                    layout="horizontal"
+                    margin={{ left: 0, right: 0, top: 10, bottom: 20 }}
                   >
                     <XAxis
+                      type="category"
+                      dataKey="subject"
+                      tick={{ fontSize: 10 }}
+                      interval={0}
+                      height={40}
+                    />
+                    <YAxis
                       type="number"
                       domain={[0, 100]}
                       tick={{ fontSize: 11 }}
-                    />
-                    <YAxis
-                      type="category"
-                      dataKey="subject"
-                      width={90}
-                      tick={{ fontSize: 11 }}
+                      tickFormatter={(v) => `${v}%`}
                     />
                     <ChartTooltip content={<ChartTooltipContent />} />
-                    <Bar dataKey="marks" radius={[0, 6, 6, 0]} barSize={22}>
+                    <Bar dataKey="marks" radius={[4, 4, 0, 0]} barSize={32}>
                       {latestExam.data.map((entry, index) => (
                         <Cell key={entry.subject} fill={entry.fill} />
                       ))}

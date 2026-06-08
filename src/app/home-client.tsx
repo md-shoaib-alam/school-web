@@ -63,7 +63,7 @@ export default function HomeClient({ initialHasToken }: { initialHasToken: boole
       const url = !expectedPrefix
         ? `/${currentScreen}`
         : currentScreen === "dashboard"
-          ? `/${expectedPrefix}`
+          ? `/${expectedPrefix}/dashboard`
           : `/${expectedPrefix}/${currentScreen}`;
 
       redirect(url);

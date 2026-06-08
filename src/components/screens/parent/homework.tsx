@@ -7,13 +7,13 @@ import { useParentDashboard } from "@/lib/graphql/hooks";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Progress } from "@/components/ui/progress";
 import { Calendar } from "@/components/ui/calendar";
 import { Button } from "@/components/ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { format } from "date-fns";
+import { ChildSelector } from "./ChildSelector";
 import {
   FileText,
   Clock,
@@ -88,38 +88,30 @@ export function ParentHomework() {
     );
   }
 
+  const selectedStudent = children.find((c) => c.id === activeStudentId) || children[0];
+
   return (
-    <div className="space-y-6">
-
-
-      <Tabs value={activeStudentId} onValueChange={handleStudentChange}>
-        <div className="w-full overflow-x-auto pb-1 no-scrollbar">
-          <TabsList className="bg-violet-50/50 dark:bg-violet-950/20 p-1 border border-violet-100/50 dark:border-violet-900/20 w-fit">
-            {children.map((child) => (
-              <TabsTrigger
-                key={child.id}
-                value={child.id}
-                className="data-[state=active]:bg-white dark:data-[state=active]:bg-zinc-900 data-[state=active]:text-violet-700 dark:data-[state=active]:text-violet-400 data-[state=active]:shadow-sm px-4 text-xs font-medium transition-all hover:bg-violet-100/30 dark:hover:bg-violet-900/20 hover:text-violet-800 dark:hover:text-violet-300 whitespace-nowrap"
-              >
-                <span className="flex items-center gap-2">
-                  <span className={`size-2 rounded-full ${activeStudentId === child.id ? "bg-violet-400" : "bg-zinc-300 dark:bg-zinc-700"}`} />
-                  {child.name}
-                </span>
-              </TabsTrigger>
-            ))}
-          </TabsList>
+    <div className="space-y-6 pb-10 animate-fade-in select-none">
+      <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 border-b border-zinc-200/60 dark:border-zinc-800/60 pb-5">
+        <div className="space-y-3.5 text-left">
+          <div className="flex items-center gap-2">
+            <BookMarked className="size-5 text-violet-600" />
+            <h2 className="text-lg font-semibold text-zinc-900 dark:text-zinc-100 uppercase tracking-tight">
+              Homework & Diary
+            </h2>
+          </div>
+          {/* Children Switcher Dropdown */}
+          <ChildSelector 
+            students={children}
+            selectedStudentId={selectedStudent.id}
+            onSelect={handleStudentChange}
+          />
         </div>
+      </div>
 
-        {children.map((child) => (
-          <TabsContent
-            key={child.id}
-            value={child.id}
-            className="space-y-6 mt-6 animate-in fade-in duration-300"
-          >
-            <ChildHomeworkView student={child} />
-          </TabsContent>
-        ))}
-      </Tabs>
+      <div className="space-y-6 mt-6 animate-in fade-in duration-300">
+        <ChildHomeworkView student={selectedStudent} />
+      </div>
     </div>
   );
 }

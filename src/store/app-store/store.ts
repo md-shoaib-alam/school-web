@@ -76,7 +76,7 @@ function getInitialTenantInfo(): { id: string | null; slug: string | null; name:
 function buildUrl(tenantId: string | null, tenantSlug: string | null, screen: string): string {
   const identifier = tenantSlug || tenantId;
   if (!identifier) return `/${screen}`;
-  return screen === 'dashboard' ? `/${identifier}` : `/${identifier}/${screen}`;
+  return screen === 'dashboard' ? `/${identifier}/dashboard` : `/${identifier}/${screen}`;
 }
 
 const initialUser = getInitialUser();

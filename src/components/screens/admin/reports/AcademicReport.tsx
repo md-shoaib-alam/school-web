@@ -41,7 +41,7 @@ export function AcademicReport() {
   useEffect(() => {
     async function fetchGrades() {
       try {
-        const res = await apiFetch("/api/grades");
+        const res = await apiFetch("/api/grades?limit=100");
         if (!res.ok) throw new Error("Failed to fetch grades");
         setGrades(await res.json());
       } catch (err) {

@@ -8,7 +8,6 @@ import { hasPermission } from "@/lib/permissions";
 
 // Sub-components
 import { StaffHeader } from "./staff/StaffHeader";
-import { StaffInfoBanner } from "./staff/StaffInfoBanner";
 import { StaffTable } from "./staff/StaffTable";
 import { StaffDialogs } from "./staff/StaffDialogs";
 
@@ -215,8 +214,6 @@ export function SuperAdminStaff() {
         canCreate={canCreate}
         onAddClick={handleOpenAdd}
       />
-
-      <StaffInfoBanner />
 
       <StaffTable 
         loading={loading}

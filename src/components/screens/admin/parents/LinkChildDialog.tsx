@@ -38,6 +38,8 @@ interface LinkChildDialogProps {
   loading?: boolean; // New prop
   onLinkChild: (studentId: string) => void;
   onUnlinkChild: (parentId: string, studentId: string) => void;
+  searchQuery: string;
+  onSearchQueryChange: (q: string) => void;
 }
 
 export function LinkChildDialog({
@@ -52,8 +54,9 @@ export function LinkChildDialog({
   loading = false, // Default to false
   onLinkChild,
   onUnlinkChild,
+  searchQuery,
+  onSearchQueryChange: setSearchQuery,
 }: LinkChildDialogProps) {
-  const [searchQuery, setSearchQuery] = useState("");
   const [unlinkedOnly, setUnlinkedOnly] = useState(true);
   const [linkingStudentId, setLinkingStudentId] = useState<string | null>(null);
 

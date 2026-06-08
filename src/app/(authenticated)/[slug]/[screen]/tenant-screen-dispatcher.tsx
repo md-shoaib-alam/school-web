@@ -58,7 +58,7 @@ const TeacherTickets = dynamic(() => import('@/components/screens/teacher/ticket
 const StudentClasses = dynamic(() => import('@/components/screens/student/my-classes').then(m => m.StudentClasses), { loading: LoadingScreen });
 const StudentGrades = dynamic(() => import('@/components/screens/student/my-grades').then(m => m.StudentGrades), { loading: LoadingScreen });
 const StudentAttendance = dynamic(() => import('@/components/screens/student/my-attendance').then(m => m.StudentAttendance), { loading: LoadingScreen });
-const StudentAssignments = dynamic(() => import('@/components/screens/student/homework').then(m => m.StudentAssignments), { loading: LoadingScreen });
+const StudentAssignments = dynamic(() => import('@/components/screens/student/homework').then(m => m.StudentHomework), { loading: LoadingScreen });
 const StudentTimetable = dynamic(() => import('@/components/screens/student/timetable').then(m => m.StudentTimetable), { loading: LoadingScreen });
 const StudentCalendar = dynamic(() => import('@/components/screens/student/calendar').then(m => m.StudentCalendar), { loading: LoadingScreen });
 const StudentNotices = dynamic(() => import('@/components/screens/student/notices').then(m => m.StudentNotices), { loading: LoadingScreen });

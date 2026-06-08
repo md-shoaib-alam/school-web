@@ -119,7 +119,7 @@ export function MarksheetPreviewPage({
       try {
         // 1. Fetch Students & Completed Exams for this class, and Tenant Settings in parallel
         const [studentData, examData, settingsData] = await Promise.all([
-          apiFetch(`/api/students?classId=${classId}&mode=min&limit=1000`).then((res) => res.json()),
+          apiFetch(`/api/students?classId=${classId}&mode=min&limit=100`).then((res) => res.json()),
           apiFetch(`/api/exams?classId=${classId}&limit=100`).then((res) => res.json()),
           apiFetch(`/api/tenant-settings`)
             .then((res) => (res.ok ? res.json() : null))

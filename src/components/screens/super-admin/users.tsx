@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, useMemo } from "react";
-import { useUsers, useToggleUserStatus } from "@/lib/graphql/hooks";
+import { useState, useMemo, useEffect } from "react";
+import { useUsers, useToggleUserStatus, useTenantsInfinite } from "@/lib/graphql/hooks";
 import { toast } from "sonner";
 
 // Sub-components
@@ -50,22 +50,37 @@ export function SuperAdminUsers() {
   const totalCount = data?.total ?? 0;
   const totalPages = data?.totalPages ?? 1;
 
-  // Derive unique tenants from user data for the filter dropdown
+  const [tenantSearch, setTenantSearch] = useState("");
+  const [debouncedTenantSearch, setDebouncedTenantSearch] = useState("");
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedTenantSearch(tenantSearch);
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [tenantSearch]);
+
+  // Fetch list of tenants via infinite query for selection
+  const { 
+    data: tenantsInfiniteData, 
+    fetchNextPage: fetchNextTenantsPage, 
+    hasNextPage: hasNextTenantsPage, 
+    isFetchingNextPage: isFetchingNextTenantsPage 
+  } = useTenantsInfinite({ 
+    search: debouncedTenantSearch.trim() || undefined,
+    limit: 40 
+  });
+
+  // Derive unique tenants from all pages
   const tenants = useMemo(() => {
-    const users = data?.users;
-    if (!Array.isArray(users)) return [];
-    const map = new Map<string, TenantInfo>();
-    users.forEach((u) => {
-      if (u.tenant?.id && u.tenant?.name && !map.has(u.tenant.id)) {
-        map.set(u.tenant.id, {
-          id: u.tenant.id,
-          name: u.tenant.name,
-          slug: u.tenant.slug || "",
-        });
-      }
-    });
-    return Array.from(map.values());
-  }, [data]);
+    if (!tenantsInfiniteData) return [];
+    const list = tenantsInfiniteData.pages.flatMap((page) => page.tenants || []);
+    return list.map((t) => ({
+      id: t.id,
+      name: t.name,
+      slug: t.slug || "",
+    }));
+  }, [tenantsInfiniteData]);
 
   // Handlers
   const handleRoleChange = (v: string) => {
@@ -144,6 +159,11 @@ export function SuperAdminUsers() {
         tenantFilter={tenantFilter}
         onTenantFilterChange={handleTenantChange}
         tenants={tenants}
+        fetchNextPage={fetchNextTenantsPage}
+        hasNextPage={hasNextTenantsPage}
+        isFetchingNextPage={isFetchingNextTenantsPage}
+        tenantSearch={tenantSearch}
+        onTenantSearchChange={setTenantSearch}
       />
 
       <UserTable 

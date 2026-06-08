@@ -142,27 +142,44 @@ export function RoleDialog({
             <Label className="text-[10px] font-bold text-zinc-500 uppercase tracking-wider block mb-2">
               Quick Role Templates
             </Label>
-            <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
-              {ROLE_TEMPLATES.map((tmpl) => (
-                <button
-                  key={tmpl.name}
-                  type="button"
-                  onClick={() => {
-                    setName(tmpl.name);
-                    setDescription(tmpl.description);
-                    setColor(tmpl.color);
-                    setPermissions(tmpl.permissions);
-                  }}
-                  className="flex flex-col items-start text-left p-2.5 rounded-lg border border-zinc-200 dark:border-zinc-700/50 hover:border-emerald-500/40 hover:bg-emerald-500/5 bg-white dark:bg-zinc-900 transition-all group"
-                >
-                  <span className="text-xs font-bold truncate w-full group-hover:text-emerald-500 transition-colors">
-                    {tmpl.name}
-                  </span>
-                  <span className="text-[9px] text-zinc-500 line-clamp-2 mt-1 leading-snug">
-                    {tmpl.description}
-                  </span>
-                </button>
-              ))}
+            <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-4">
+              {ROLE_TEMPLATES.map((tmpl) => {
+                const isSelected = name === tmpl.name;
+                return (
+                  <button
+                    key={tmpl.name}
+                    type="button"
+                    onClick={() => {
+                      setName(tmpl.name);
+                      setDescription(tmpl.description);
+                      setColor(tmpl.color);
+                      setPermissions(tmpl.permissions);
+                    }}
+                    className={`flex flex-col items-start text-left p-3 rounded-xl border transition-all duration-200 group cursor-pointer shadow-sm hover:shadow-md ${
+                      isSelected
+                        ? "border-emerald-500 bg-emerald-500/5 dark:bg-emerald-500/10 ring-1 ring-emerald-500/20"
+                        : "border-zinc-250 dark:border-zinc-700 bg-white dark:bg-zinc-900 hover:border-emerald-500/40 hover:bg-emerald-500/5"
+                    }`}
+                  >
+                    <div className="flex items-center gap-1.5 w-full mb-1">
+                      <span 
+                        className="size-2 rounded-full shrink-0" 
+                        style={{ backgroundColor: tmpl.color }} 
+                      />
+                      <span className={`text-xs font-bold truncate w-full transition-colors ${
+                        isSelected 
+                          ? "text-emerald-700 dark:text-emerald-400" 
+                          : "text-zinc-800 dark:text-zinc-200 group-hover:text-emerald-500"
+                      }`}>
+                        {tmpl.name}
+                      </span>
+                    </div>
+                    <span className="text-[9px] text-zinc-500 dark:text-zinc-400 line-clamp-2 leading-snug">
+                      {tmpl.description}
+                    </span>
+                  </button>
+                );
+              })}
             </div>
           </div>
         )}
@@ -189,21 +206,27 @@ export function RoleDialog({
 
           <div className="space-y-2">
             <Label>Color</Label>
-            <div className="flex gap-2 flex-wrap">
-              {COLOR_PRESETS.map((c) => (
-                <button
-                  key={c}
-                  type="button"
-                  className="size-8 rounded-full border-2 transition-transform hover:scale-110 flex items-center justify-center"
-                  style={{
-                    backgroundColor: c,
-                    borderColor: color === c ? c : "transparent",
-                  }}
-                  onClick={() => setColor(c)}
-                >
-                  {color === c && <span className="text-white text-xs">✓</span>}
-                </button>
-              ))}
+            <div className="flex gap-2.5 flex-wrap">
+              {COLOR_PRESETS.map((c) => {
+                const isSelected = color === c;
+                return (
+                  <button
+                    key={c}
+                    type="button"
+                    className={`size-8 rounded-full border-2 transition-all duration-200 hover:scale-110 flex items-center justify-center cursor-pointer shadow-sm ${
+                      isSelected 
+                        ? "ring-2 ring-emerald-500 ring-offset-2 dark:ring-offset-zinc-950 scale-105 border-white dark:border-zinc-800" 
+                        : "border-transparent"
+                    }`}
+                    style={{
+                      backgroundColor: c,
+                    }}
+                    onClick={() => setColor(c)}
+                  >
+                    {isSelected && <span className="text-white text-xs font-bold drop-shadow-[0_1px_1px_rgba(0,0,0,0.5)]">✓</span>}
+                  </button>
+                );
+              })}
             </div>
           </div>
 

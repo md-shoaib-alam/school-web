@@ -1,6 +1,6 @@
-import { Crown, IndianRupee, Building2, Plus, Search, Check, ChevronsUpDown } from "lucide-react";
+import { Crown, IndianRupee, Building2, Plus, Search, Check, ChevronsUpDown, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useState, useMemo } from "react";
+import { useState, useMemo, useRef, useCallback } from "react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -12,6 +12,11 @@ interface SubscriptionStatsProps {
   tenants: any[];
   onNewSetup: () => void;
   parentsTotal: number;
+  fetchNextPage?: () => void;
+  hasNextPage?: boolean;
+  isFetchingNextPage?: boolean;
+  tenantSearch: string;
+  onTenantSearchChange: (value: string) => void;
 }
 
 export function SubscriptionStats({
@@ -21,15 +26,31 @@ export function SubscriptionStats({
   tenants,
   onNewSetup,
   parentsTotal,
+  fetchNextPage,
+  hasNextPage,
+  isFetchingNextPage,
+  tenantSearch,
+  onTenantSearchChange,
 }: SubscriptionStatsProps) {
   const [open, setOpen] = useState(false);
-  const [searchQuery, setSearchQuery] = useState("");
+
+  const observer = useRef<IntersectionObserver | null>(null);
+  const lastTenantElementRef = useCallback((node: HTMLButtonElement | null) => {
+    if (isFetchingNextPage) return;
+    if (observer.current) observer.current.disconnect();
+    observer.current = new IntersectionObserver((entries) => {
+      if (entries[0].isIntersecting && hasNextPage && fetchNextPage) {
+        fetchNextPage();
+      }
+    });
+    if (node) observer.current.observe(node);
+  }, [isFetchingNextPage, hasNextPage, fetchNextPage]);
 
   const filteredTenants = useMemo(() => {
     return tenants.filter((t) =>
-      t.name.toLowerCase().includes(searchQuery.toLowerCase())
+      t.name.toLowerCase().includes(tenantSearch.toLowerCase())
     );
-  }, [tenants, searchQuery]);
+  }, [tenants, tenantSearch]);
   return (
     <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-teal-950 via-teal-900 to-teal-800 p-6 text-white shadow-lg">
       <div className="absolute top-0 right-0 size-64 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/3" />
@@ -71,8 +92,8 @@ export function SubscriptionStats({
                     <Search className="mr-2 h-4 w-4 shrink-0 opacity-50" />
                     <Input 
                       placeholder="Search schools..." 
-                      value={searchQuery}
-                      onChange={(e) => setSearchQuery(e.target.value)}
+                      value={tenantSearch}
+                      onChange={(e) => onTenantSearchChange(e.target.value)}
                       className="flex h-9 w-full rounded-md bg-transparent py-3 text-xs outline-none border-none focus-visible:ring-0 focus-visible:ring-offset-0 placeholder:text-muted-foreground text-zinc-950 dark:text-white"
                     />
                   </div>
@@ -81,11 +102,11 @@ export function SubscriptionStats({
                       onClick={() => {
                         onTenantChange("all");
                         setOpen(false);
-                        setSearchQuery("");
+                        onTenantSearchChange("");
                       }}
                       className="flex items-center justify-between w-full text-left px-3 py-1.5 text-xs hover:bg-teal-500/10 dark:hover:bg-teal-500/20 rounded-md transition-colors cursor-pointer group"
                     >
-                      <span className="font-medium text-zinc-900 dark:text-zinc-100 group-hover:text-teal-600 dark:group-hover:text-teal-400">All Schools</span>
+                      <span className="font-semibold text-zinc-900 dark:text-zinc-100 truncate pr-2 group-hover:text-teal-600 dark:group-hover:text-teal-400">All Schools</span>
                       {selectedTenant === "all" && (
                         <Check className="h-3.5 w-3.5 text-teal-600 shrink-0" />
                       )}
@@ -94,22 +115,31 @@ export function SubscriptionStats({
                     {filteredTenants.length === 0 ? (
                       <div className="p-3 text-xs text-muted-foreground text-center">No schools found.</div>
                     ) : (
-                      filteredTenants.map((t) => (
-                        <button
-                          key={t.id}
-                          onClick={() => {
-                            onTenantChange(t.id);
-                            setOpen(false);
-                            setSearchQuery("");
-                          }}
-                          className="flex items-center justify-between w-full text-left px-3 py-1.5 text-xs hover:bg-teal-500/10 dark:hover:bg-teal-500/20 rounded-md transition-colors cursor-pointer group"
-                        >
-                          <span className="font-medium text-zinc-900 dark:text-zinc-100 truncate pr-2 group-hover:text-teal-600 dark:group-hover:text-teal-400">{t.name}</span>
-                          {selectedTenant === t.id && (
-                            <Check className="h-3.5 w-3.5 text-teal-600 shrink-0" />
-                          )}
-                        </button>
-                      ))
+                      <>
+                        {filteredTenants.map((t, index) => (
+                          <button
+                            key={`${t.id}-${index}`}
+                            ref={index === filteredTenants.length - 1 ? lastTenantElementRef : null}
+                            onClick={() => {
+                              onTenantChange(t.id);
+                              setOpen(false);
+                              onTenantSearchChange("");
+                            }}
+                            className="flex items-center justify-between w-full text-left px-3 py-1.5 text-xs hover:bg-teal-500/10 dark:hover:bg-teal-500/20 rounded-md transition-colors cursor-pointer group"
+                          >
+                            <span className="font-medium text-zinc-900 dark:text-zinc-100 truncate pr-2 group-hover:text-teal-600 dark:group-hover:text-teal-400">{t.name}</span>
+                            {selectedTenant === t.id && (
+                              <Check className="h-3.5 w-3.5 text-teal-600 shrink-0" />
+                            )}
+                          </button>
+                        ))}
+                        {isFetchingNextPage && (
+                          <div className="flex items-center justify-center p-2 text-muted-foreground gap-1.5">
+                            <Loader2 className="size-3 animate-spin text-teal-600" />
+                            <span className="text-[10px]">Loading...</span>
+                          </div>
+                        )}
+                      </>
                     )}
                   </ScrollArea>
                 </PopoverContent>

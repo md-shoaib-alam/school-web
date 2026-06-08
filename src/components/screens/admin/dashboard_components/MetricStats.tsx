@@ -1,7 +1,7 @@
 "use client";
 
 import { Card, CardContent } from "@/components/ui/card";
-import { Heart, School, IndianRupee, UserCheck } from "lucide-react";
+import { Heart, School, IndianRupee, Briefcase } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 
 interface MetricStatsProps {
@@ -10,7 +10,7 @@ interface MetricStatsProps {
     totalParents: number;
     totalClasses: number;
     totalRevenue: number;
-    attendanceRate: number;
+    totalStaff: number;
   };
 }
 
@@ -77,11 +77,11 @@ export function MetricStats({ isLoading, data }: MetricStatsProps) {
         <CardContent className="p-5">
           <div className="flex items-center gap-3">
             <div className="size-11 rounded-xl bg-violet-100 dark:bg-violet-900/30 text-violet-600 dark:text-violet-400 flex items-center justify-center">
-              <UserCheck className="size-5" />
+              <Briefcase className="size-5" />
             </div>
             <div>
-              <p className="text-xs text-muted-foreground">Avg Attendance</p>
-              <p className="text-2xl font-bold">{Number(data?.attendanceRate ?? 0).toFixed(2).replace(/\.00$/, "")}%</p>
+              <p className="text-xs text-muted-foreground">Total Staff</p>
+              <p className="text-2xl font-bold">{data?.totalStaff ?? 0}</p>
             </div>
           </div>
         </CardContent>

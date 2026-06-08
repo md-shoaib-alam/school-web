@@ -1,8 +1,8 @@
 "use client";
 
 import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
+import { ClassSelect } from "@/components/ui/class-select";
 import { Search, List, LayoutGrid } from "lucide-react";
 
 interface SubjectsFiltersProps {
@@ -10,7 +10,6 @@ interface SubjectsFiltersProps {
   onSearchChange: (v: string) => void;
   classFilter: string;
   onClassFilterChange: (v: string) => void;
-  classes: any[];
   viewMode: "table" | "grid";
   setViewMode: (mode: "table" | "grid") => void;
 }
@@ -20,7 +19,6 @@ export function SubjectsFilters({
   onSearchChange,
   classFilter,
   onClassFilterChange,
-  classes,
   viewMode,
   setViewMode,
 }: SubjectsFiltersProps) {
@@ -36,18 +34,12 @@ export function SubjectsFilters({
             onChange={(e) => onSearchChange(e.target.value)}
           />
         </div>
-        <Select value={classFilter} onValueChange={onClassFilterChange}>
-          <SelectTrigger className="w-full sm:w-[200px]">
-            <SelectValue placeholder="Select Class" />
-          </SelectTrigger>
-          <SelectContent>
-            {(classes || []).map((c: any) => (
-              <SelectItem key={c.id} value={c.id}>
-                {c.name} - {c.section}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+        <ClassSelect
+          value={classFilter}
+          onValueChange={onClassFilterChange}
+          placeholder="Select Class"
+          className="w-full sm:w-[200px]"
+        />
       </div>
 
       <div className="flex items-center gap-1 bg-zinc-100 dark:bg-zinc-800 p-1 rounded-lg">

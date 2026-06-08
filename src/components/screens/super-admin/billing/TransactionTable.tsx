@@ -42,7 +42,7 @@ const formatTxTime = (dateStr: string) => {
 
 export function TransactionTable() {
   const [page, setPage] = useState(1);
-  const [dateRange, setDateRange] = useState<DateRangeOption>('all');
+  const [dateRange, setDateRange] = useState<DateRangeOption>('today');
   const limit = 10;
 
   const dateParams = useMemo(() => {

@@ -1,3 +1,4 @@
+import { useState, useMemo, useEffect } from "react";
 import {
   Card,
   CardContent,
@@ -15,8 +16,10 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { Building2, ArrowUpDown, IndianRupee } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Building2, ArrowUpDown, IndianRupee, ChevronLeft, ChevronRight } from "lucide-react";
 import { TenantBilling, SortKey, SortDir, planBadgeConfig } from "./types";
+import { cn } from "@/lib/utils";
 
 interface TenantBillingTableProps {
   loading: boolean;
@@ -42,6 +45,20 @@ export function TenantBillingTable({
   viewMode = 'parent'
 }: TenantBillingTableProps) {
   const isSchoolMode = viewMode === 'school';
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [tenants]);
+
+  const totalItems = tenants.length;
+  const totalPages = Math.ceil(totalItems / itemsPerPage);
+
+  const paginatedTenants = useMemo(() => {
+    const start = (currentPage - 1) * itemsPerPage;
+    return tenants.slice(start, start + itemsPerPage);
+  }, [tenants, currentPage, itemsPerPage]);
 
   return (
     <Card className="shadow-sm border-none bg-white dark:bg-zinc-800">
@@ -136,7 +153,7 @@ export function TenantBillingTable({
                       ))}
                     </TableRow>
                   ))
-                : tenants.map((tenant) => {
+                : paginatedTenants.map((tenant) => {
                     const planCfg = planBadgeConfig[tenant.plan] || planBadgeConfig.Basic;
                     const schoolPrice = SCHOOL_PRICES[tenant.plan?.toLowerCase()] || 0;
 
@@ -203,6 +220,86 @@ export function TenantBillingTable({
             </TableBody>
           </Table>
         </div>
+        {!loading && totalPages > 1 && (
+          <div className="flex flex-col sm:flex-row items-center justify-between mt-4 px-2 py-2 bg-zinc-50/50 dark:bg-zinc-900/20 border-t gap-4 pt-4">
+            <div className="flex items-center gap-4 order-2 sm:order-1">
+              <p className="text-xs text-muted-foreground">
+                Showing{" "}
+                <span className="font-semibold text-emerald-600 dark:text-emerald-400">
+                  {(currentPage - 1) * itemsPerPage + 1}
+                </span>{" "}
+                to{" "}
+                <span className="font-semibold text-emerald-600 dark:text-emerald-400">
+                  {Math.min(currentPage * itemsPerPage, totalItems)}
+                </span>{" "}
+                of{" "}
+                <span className="font-semibold text-zinc-900 dark:text-zinc-100">
+                  {totalItems}
+                </span>{" "}
+                entries
+              </p>
+            </div>
+
+            <div className="flex items-center gap-1 order-1 sm:order-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setCurrentPage((prev) => prev - 1)}
+                disabled={currentPage === 1}
+                className="size-8 p-0"
+              >
+                <ChevronLeft className="size-4" />
+              </Button>
+
+              <div className="flex items-center gap-1 mx-1">
+                {Array.from({ length: totalPages }, (_, i) => i + 1).map((pageNum) => {
+                  if (
+                    pageNum === 1 ||
+                    pageNum === totalPages ||
+                    (pageNum >= currentPage - 1 && pageNum <= currentPage + 1)
+                  ) {
+                    return (
+                      <Button
+                        key={pageNum}
+                        variant={currentPage === pageNum ? "default" : "outline"}
+                        size="sm"
+                        className={cn(
+                          "size-8 p-0 text-xs",
+                          currentPage === pageNum
+                            ? "bg-emerald-600 hover:bg-emerald-700 text-white shadow-sm"
+                            : "hover:bg-emerald-50",
+                        )}
+                        onClick={() => setCurrentPage(pageNum)}
+                      >
+                        {pageNum}
+                      </Button>
+                    );
+                  }
+
+                  if (pageNum === 2 || pageNum === totalPages - 1) {
+                    return (
+                      <span key={pageNum} className="px-1 text-muted-foreground text-xs">
+                        ...
+                      </span>
+                    );
+                  }
+
+                  return null;
+                })}
+              </div>
+
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setCurrentPage((prev) => prev + 1)}
+                disabled={currentPage === totalPages}
+                className="size-8 p-0"
+              >
+                <ChevronRight className="size-4" />
+              </Button>
+            </div>
+          </div>
+        )}
       </CardContent>
     </Card>
   );
