@@ -1,7 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { ClassSelect } from "@/components/ui/class-select";
 import { Calendar, LayoutGrid, List, CalendarDays, Plus, Settings } from "lucide-react";
 import type { ViewMode } from "./types";
 
@@ -11,7 +11,6 @@ interface TimetableHeaderProps {
   setViewMode: (m: ViewMode) => void;
   selectedClass: string;
   onClassChange: (id: string) => void;
-  classes: any[];
   canEdit: boolean;
   canCreate: boolean;
   onSettingsClick: () => void;
@@ -24,7 +23,6 @@ export function TimetableHeader({
   setViewMode,
   selectedClass,
   onClassChange,
-  classes,
   canEdit,
   canCreate,
   onSettingsClick,
@@ -74,18 +72,12 @@ export function TimetableHeader({
           </Button>
         </div>
 
-        <Select value={selectedClass} onValueChange={onClassChange}>
-          <SelectTrigger className="w-full sm:w-56 text-sm bg-white hover:bg-zinc-50/50 dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800 shadow-sm">
-            <SelectValue placeholder="Select Class" />
-          </SelectTrigger>
-          <SelectContent>
-            {classes.map((c) => (
-              <SelectItem key={c.id} value={c.id}>
-                {c.name}-{c.section}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+        <ClassSelect
+          value={selectedClass}
+          onValueChange={onClassChange}
+          placeholder="Select Class"
+          className="w-full sm:w-56"
+        />
 
         {canEdit && (
           <Button

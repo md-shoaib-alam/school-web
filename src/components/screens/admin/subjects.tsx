@@ -253,7 +253,6 @@ export function AdminSubjects() {
         onSearchChange={(v) => dispatch({ type: 'SET_SEARCH', payload: v })}
         classFilter={classFilter}
         onClassFilterChange={(v) => dispatch({ type: 'SET_CLASS_FILTER', payload: v })}
-        classes={classes}
         viewMode={viewMode}
         setViewMode={setViewMode}
       />
