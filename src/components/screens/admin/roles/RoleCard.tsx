@@ -91,11 +91,18 @@ export function RoleCard({ role, onEdit, onAssign, onDelete }: RoleCardProps) {
               <AlertDialogContent>
                 <AlertDialogHeader>
                   <AlertDialogTitle>Delete Role</AlertDialogTitle>
-                  <AlertDialogDescription>
-                    Are you sure you want to delete &quot;{role.name}&quot;?{" "}
-                    {role.userCount > 0
-                      ? `${role.userCount} staff member(s) will lose this role.`
-                      : "This action cannot be undone."}
+                  <AlertDialogDescription className="space-y-3">
+                    <p>
+                      Are you sure you want to delete &quot;{role.name}&quot;? This action cannot be undone.
+                    </p>
+                    {role.userCount > 0 && (
+                      <span className="p-3 bg-amber-50 dark:bg-amber-950/20 text-amber-800 dark:text-amber-300 rounded-lg border border-amber-200 dark:border-amber-900/50 text-xs flex flex-col gap-1 text-left block">
+                        <strong className="font-semibold block">⚠️ Warning</strong>
+                        <span>
+                          There are <strong>{role.userCount} staff member(s)</strong> currently assigned to this role. Deleting this role will automatically remove it from them.
+                        </span>
+                      </span>
+                    )}
                   </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>
