@@ -76,7 +76,7 @@ export const queryClient = new QueryClient({
   }),
   defaultOptions: {
     queries: {
-      staleTime: 15 * 1000,
+      staleTime: 60 * 1000, // Safe default of 1 minute (automatically invalidated on mutations)
       gcTime: 30 * 60 * 1000,
       retry: 2,
       refetchOnWindowFocus: false,
