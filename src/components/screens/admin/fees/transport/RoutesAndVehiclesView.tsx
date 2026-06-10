@@ -15,6 +15,7 @@ import { Map, Truck, Bus, Pencil } from "lucide-react";
    onAddVehicle: () => void;
    onEditRoute: (route: any) => void;
    onEditVehicle: (vehicle: any) => void;
+   onViewStudents?: (routeId: string) => void;
  }
  
  export function RoutesAndVehiclesView({
@@ -25,6 +26,7 @@ import { Map, Truck, Bus, Pencil } from "lucide-react";
    onAddVehicle,
    onEditRoute,
    onEditVehicle,
+   onViewStudents,
  }: RoutesAndVehiclesViewProps) {
    return (
      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -64,7 +66,17 @@ import { Map, Truck, Bus, Pencil } from "lucide-react";
                        <TableCell className="pl-6 py-4 font-medium text-sm">{r.name}</TableCell>
                        <TableCell className="py-4 text-sm font-semibold text-emerald-600 dark:text-emerald-400">₹{r.fee.toLocaleString()}</TableCell>
                        <TableCell className="py-4 text-xs">{r.vehicle?.number || 'Not Assigned'}</TableCell>
-                       <TableCell className="py-4"><Badge variant="outline" className="bg-emerald-50 border-emerald-200 text-emerald-700 dark:bg-emerald-900/30 dark:border-emerald-800 dark:text-emerald-400">{r.students?.length || 0} Students</Badge></TableCell>
+                       <TableCell className="py-4">
+                         <button 
+                           onClick={() => onViewStudents?.(r.id)}
+                           className="focus:outline-none block"
+                           title="Click to view assigned students"
+                         >
+                           <Badge variant="outline" className="bg-emerald-50 border-emerald-200 text-emerald-700 hover:bg-emerald-100 cursor-pointer dark:bg-emerald-900/30 dark:border-emerald-800 dark:text-emerald-400 dark:hover:bg-emerald-900/50 transition-colors">
+                             {r.students?.length || 0} Students
+                           </Badge>
+                         </button>
+                       </TableCell>
                        <TableCell className="py-4 text-center">
                          <Button variant="ghost" size="icon" className="size-8 text-zinc-500 hover:text-zinc-950 dark:hover:text-zinc-50" onClick={() => onEditRoute(r)} title="Edit Route">
                            <Pencil className="size-4" />

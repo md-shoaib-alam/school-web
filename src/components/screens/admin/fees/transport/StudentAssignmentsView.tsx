@@ -9,50 +9,94 @@ import { ShieldCheck, UserPlus } from "lucide-react";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { Pagination } from "@/components/shared/pagination";
  
- interface StudentAssignmentsViewProps {
-   loadingAssignments: boolean;
-   assignments: any[];
-   onAssignClick: () => void;
-   onDelete: (id: string) => void;
-   deletingId: string | null;
-   isDeleting: boolean;
- }
- 
- export function StudentAssignmentsView({
-   loadingAssignments,
-   assignments,
-   onAssignClick,
-   onDelete,
-   deletingId,
-   isDeleting,
- }: StudentAssignmentsViewProps) {
-   const [currentPage, setCurrentPage] = useState(1);
-   const [itemsPerPage, setItemsPerPage] = useState(12);
- 
-   const totalItems = assignments.length;
-   const totalPages = Math.ceil(totalItems / itemsPerPage);
-   const activePage = currentPage > totalPages ? Math.max(1, totalPages) : currentPage;
- 
-   const paginatedAssignments = assignments.slice(
-     (activePage - 1) * itemsPerPage,
-     activePage * itemsPerPage
-   );
+ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { FilterX } from "lucide-react";
+
+interface StudentAssignmentsViewProps {
+  loadingAssignments: boolean;
+  assignments: any[];
+  onAssignClick: () => void;
+  onDelete: (id: string) => void;
+  deletingId: string | null;
+  isDeleting: boolean;
+  selectedRouteId: string | null;
+  onRouteFilterChange: (routeId: string | null) => void;
+  routes: any[];
+}
+
+export function StudentAssignmentsView({
+  loadingAssignments,
+  assignments,
+  onAssignClick,
+  onDelete,
+  deletingId,
+  isDeleting,
+  selectedRouteId,
+  onRouteFilterChange,
+  routes,
+}: StudentAssignmentsViewProps) {
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(15);
+
+  const filteredAssignments = selectedRouteId
+    ? assignments.filter((a) => (a.route?.id || a.routeId) === selectedRouteId)
+    : assignments;
+
+  const totalItems = filteredAssignments.length;
+  const totalPages = Math.ceil(totalItems / itemsPerPage);
+  const activePage = currentPage > totalPages ? Math.max(1, totalPages) : currentPage;
+
+  const paginatedAssignments = filteredAssignments.slice(
+    (activePage - 1) * itemsPerPage,
+    activePage * itemsPerPage
+  );
  
    return (
      <Card>
-       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-         <div>
-           <CardTitle className="text-base flex items-center gap-2">
-             <ShieldCheck className="size-4 text-emerald-600 dark:text-emerald-400" />
-             Student Transport List
-           </CardTitle>
-           <CardDescription>Students subscribed to transport services</CardDescription>
-         </div>
-         <Button size="sm" className="h-8 gap-1 bg-emerald-600 hover:bg-emerald-700 dark:bg-emerald-700 dark:hover:bg-emerald-600" onClick={onAssignClick}>
-           <UserPlus className="size-3.5" />
-           Assign Student
-         </Button>
-       </CardHeader>
+       <CardHeader className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2">
+        <div>
+          <CardTitle className="text-base flex items-center gap-2">
+            <ShieldCheck className="size-4 text-emerald-600 dark:text-emerald-400" />
+            Student Transport List
+          </CardTitle>
+          <CardDescription>Students subscribed to transport services</CardDescription>
+        </div>
+        <div className="flex items-center gap-2">
+          <Select 
+            value={selectedRouteId || "all"} 
+            onValueChange={(val) => onRouteFilterChange(val === "all" ? null : val)}
+          >
+            <SelectTrigger className="h-8 w-[180px] text-xs bg-background">
+              <SelectValue placeholder="Filter by Route" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Routes</SelectItem>
+              {routes.map((r) => (
+                <SelectItem key={r.id} value={r.id}>
+                  {r.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+
+          {selectedRouteId && (
+            <Button
+              variant="ghost"
+              size="icon"
+              className="size-8 text-muted-foreground hover:text-foreground"
+              onClick={() => onRouteFilterChange(null)}
+              title="Clear Filter"
+            >
+              <FilterX className="size-4" />
+            </Button>
+          )}
+
+          <Button size="sm" className="h-8 gap-1 bg-emerald-600 hover:bg-emerald-700 dark:bg-emerald-700 dark:hover:bg-emerald-600" onClick={onAssignClick}>
+            <UserPlus className="size-3.5" />
+            Assign Student
+          </Button>
+        </div>
+      </CardHeader>
        <CardContent className="p-0">
          {loadingAssignments ? (
            <div className="p-6 space-y-2">{[...Array(5)].map((_, i) => <Skeleton key={i} className="h-12 w-full" />)}</div>

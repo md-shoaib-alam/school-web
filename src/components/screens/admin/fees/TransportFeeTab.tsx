@@ -1,6 +1,6 @@
 "use client";
 
-import { useReducer, useMemo } from 'react';
+import { useReducer, useMemo, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiFetch } from '@/lib/api';
@@ -105,6 +105,7 @@ function reducer(state: State, action: Action): State {
 
 export function TransportFeeTab() {
   const queryClient = useQueryClient();
+  const [selectedRouteId, setSelectedRouteId] = useState<string | null>(null);
   const [state, dispatch] = useReducer(reducer, initialState);
   const {
     activeTab,
@@ -241,6 +242,10 @@ export function TransportFeeTab() {
           onAddVehicle={() => dispatch({ type: 'SET_VEHICLE_DIALOG', payload: true })}
           onEditRoute={(route) => dispatch({ type: 'START_EDIT_ROUTE', payload: route })}
           onEditVehicle={(vehicle) => dispatch({ type: 'START_EDIT_VEHICLE', payload: vehicle })}
+          onViewStudents={(routeId) => {
+            setSelectedRouteId(routeId);
+            dispatch({ type: 'SET_ACTIVE_TAB', payload: 'assignments' });
+          }}
         />
       ) : (
         <StudentAssignmentsView 
@@ -250,6 +255,9 @@ export function TransportFeeTab() {
           onDelete={(id) => deleteMutation.mutate(id)}
           deletingId={deleteMutation.variables as string}
           isDeleting={deleteMutation.isPending}
+          selectedRouteId={selectedRouteId}
+          onRouteFilterChange={setSelectedRouteId}
+          routes={routes}
         />
       )}
 
