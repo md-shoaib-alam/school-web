@@ -369,7 +369,7 @@ export function StudentDetailDialog({
                       <div>
                         <p className="text-muted-foreground font-medium uppercase text-[9px] tracking-wide">Assigned Route</p>
                         <p className="font-semibold text-foreground mt-0.5">
-                          {transportRoute ? `${transportRoute.name} (₹${transportRoute.fee})` : "Loading Route..."}
+                          {transportRoute ? transportRoute.name : "Loading Route..."}
                         </p>
                       </div>
                       <div>

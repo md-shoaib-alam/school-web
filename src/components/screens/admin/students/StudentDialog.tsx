@@ -56,10 +56,10 @@ export function StudentDialog({
 
   // Fetch transport routes for the dropdown (with stops info)
   const { data: routes = [] } = useQuery({
-    queryKey: ['transport-routes-full'],
+    queryKey: ['transport-routes-min'],
     enabled: open,
     queryFn: async () => {
-      const res = await apiFetch('/api/transport-routes');
+      const res = await apiFetch('/api/transport-routes?mode=min');
       return res.json();
     }
   });

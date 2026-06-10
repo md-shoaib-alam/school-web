@@ -5,8 +5,10 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Map, Truck, Bus, Pencil } from "lucide-react";
+import { Map, Truck, Bus, Pencil, Eye } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
+import Link from "next/link";
+import { formatVehicleType } from "./TransportDialogs";
 
  interface RoutesAndVehiclesViewProps {
    loadingRoutes: boolean;
@@ -83,13 +85,13 @@ import { useParams, useRouter } from "next/navigation";
                    ) : routes.map((r: any) => (
                      <TableRow key={r.id}>
                        <TableCell className="pl-6 py-4 font-semibold text-sm">
-                          <button
-                            onClick={() => router.push(`/${slug}/transport-fee/${encodeURIComponent(r.name)}`)}
-                            className="cursor-pointer hover:underline hover:text-emerald-600 dark:hover:text-emerald-400 text-left transition-colors"
+                          <Link
+                            href={`/${slug}/transport-fee/${encodeURIComponent(r.name)}`}
+                            className="hover:underline hover:text-emerald-600 dark:hover:text-emerald-400 text-left transition-colors cursor-pointer block w-full"
                           >
                             {r.name}
-                          </button>
-                        </TableCell>
+                          </Link>
+                       </TableCell>
                        <TableCell className="py-4 text-xs">{r.vehicle?.number || 'Not Assigned'}</TableCell>
                        <TableCell className="py-4">
                          <button 
@@ -102,11 +104,20 @@ import { useParams, useRouter } from "next/navigation";
                            </Badge>
                          </button>
                        </TableCell>
-                       <TableCell className="py-4 text-center">
-                         <Button variant="ghost" size="icon" className="size-8 text-zinc-500 hover:text-zinc-950 dark:hover:text-zinc-50" onClick={() => onEditRoute(r)} title="Edit Route">
-                           <Pencil className="size-4" />
-                         </Button>
-                       </TableCell>
+                        <TableCell className="py-4 flex items-center justify-center gap-1">
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="size-8 text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50 dark:hover:bg-emerald-950/20"
+                            onClick={() => router.push(`/${slug}/transport-fee/${encodeURIComponent(r.name)}`)}
+                            title="View Route Details"
+                          >
+                            <Eye className="size-4" />
+                          </Button>
+                          <Button variant="ghost" size="icon" className="size-8 text-zinc-500 hover:text-zinc-950 dark:hover:text-zinc-50" onClick={() => onEditRoute(r)} title="Edit Route">
+                            <Pencil className="size-4" />
+                          </Button>
+                        </TableCell>
                      </TableRow>
                    ))}
                  </TableBody>
@@ -137,7 +148,7 @@ import { useParams, useRouter } from "next/navigation";
                </div>
                <div className="flex-1 min-w-0">
                  <p className="text-sm font-semibold">{v.number}</p>
-                 <p className="text-[10px] text-muted-foreground">{v.type} • Cap: {v.capacity}</p>
+                 <p className="text-[10px] text-muted-foreground">{formatVehicleType(v.type)} • Cap: {v.capacity}</p>
                </div>
                <div className="flex items-center gap-2">
                  <Badge className={v.status === 'active' ? 'bg-emerald-500' : 'bg-red-500'}>{v.status}</Badge>

@@ -12,6 +12,7 @@ import { ArrowLeft, MapPin, Bus, Trash2, Plus, Users, Receipt, Calendar } from "
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiFetch } from "@/lib/api";
 import { toast } from "sonner";
+import { formatVehicleType } from "./TransportDialogs";
 
 interface RouteDetailsViewProps {
   route: any;
@@ -110,7 +111,7 @@ export function RouteDetailsView({ route, assignments, onEditRoute }: RouteDetai
               <div>
                 <Label className="text-xs text-muted-foreground">Vehicle Assigned</Label>
                 <p className="text-sm font-semibold mt-0.5">
-                  {route.vehicle ? `${route.vehicle.number} (${route.vehicle.type})` : "No Vehicle Assigned"}
+                  {route.vehicle ? `${route.vehicle.number} (${formatVehicleType(route.vehicle.type)})` : "No Vehicle Assigned"}
                 </p>
                 {route.vehicle && (
                   <p className="text-xs text-muted-foreground mt-0.5">

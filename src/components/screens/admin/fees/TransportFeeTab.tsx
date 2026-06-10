@@ -21,7 +21,7 @@ type State = {
   addVehicleOpen: boolean;
   editingRouteId: string | null;
   editingVehicleId: string | null;
-  assignmentData: { studentId: string; routeId: string; classId: string; startDate: string };
+  assignmentData: { studentId: string; routeId: string; classId: string; startDate: string; pickupPoint?: string; newPickupPointFee?: number };
   routeData: { name: string; fee: string; vehicleId: string };
   vehicleData: { number: string; type: string; capacity: string; status: string };
 };
@@ -40,7 +40,7 @@ type Action =
   | { type: 'RESET_ROUTE' }
   | { type: 'RESET_VEHICLE' };
 
-const initialAssignmentData = { studentId: '', routeId: '', classId: '', startDate: new Date().toISOString().split('T')[0] };
+const initialAssignmentData = { studentId: '', routeId: '', classId: '', startDate: new Date().toISOString().split('T')[0], pickupPoint: '', newPickupPointFee: undefined as number | undefined };
 const initialRouteData = { name: '', fee: '', vehicleId: 'none' };
 const initialVehicleData = { number: '', type: 'bus', capacity: '40', status: 'active' };
 
@@ -111,6 +111,7 @@ export function TransportFeeTab() {
   const decodedRouteName = detail ? decodeURIComponent(detail as string) : null;
   const queryClient = useQueryClient();
   const [selectedRouteId, setSelectedRouteId] = useState<string | null>(null);
+  const [isEditingAssignment, setIsEditingAssignment] = useState(false);
   const [state, dispatch] = useReducer(reducer, initialState);
   const {
     activeTab,
@@ -291,13 +292,31 @@ export function TransportFeeTab() {
             <StudentAssignmentsView 
               loadingAssignments={loadingAssignments}
               assignments={assignments}
-              onAssignClick={() => dispatch({ type: 'SET_ASSIGN_DIALOG', payload: true })}
+              onAssignClick={() => {
+                setIsEditingAssignment(false);
+                dispatch({ type: 'RESET_ASSIGNMENT' });
+                dispatch({ type: 'SET_ASSIGN_DIALOG', payload: true });
+              }}
               onDelete={(id) => deleteMutation.mutate(id)}
               deletingId={deleteMutation.variables as string}
               isDeleting={deleteMutation.isPending}
               selectedRouteId={selectedRouteId}
               onRouteFilterChange={setSelectedRouteId}
               routes={routes}
+              onEditAssignment={(assign) => {
+                setIsEditingAssignment(true);
+                dispatch({
+                  type: 'SET_ASSIGNMENT_DATA',
+                  payload: {
+                    studentId: assign.studentId,
+                    routeId: assign.routeId,
+                    classId: assign.student?.classId || '',
+                    pickupPoint: assign.pickupPoint || '',
+                    startDate: assign.startDate || new Date().toISOString().split('T')[0]
+                  }
+                });
+                dispatch({ type: 'SET_ASSIGN_DIALOG', payload: true });
+              }}
             />
           )}
         </>
@@ -319,6 +338,7 @@ export function TransportFeeTab() {
         routes={routes}
         onAssignSubmit={() => assignMutation.mutate(assignmentData)}
         assigning={assignMutation.isPending}
+        isEditingAssignment={isEditingAssignment}
 
         routeOpen={addRouteOpen}
         onRouteOpenChange={(open) => dispatch({ type: 'SET_ROUTE_DIALOG', payload: open })}

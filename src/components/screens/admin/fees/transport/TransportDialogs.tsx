@@ -10,6 +10,20 @@ import { parseISO } from "date-fns";
 import { useState, useEffect } from "react";
 import { toast } from "sonner";
 
+export const formatVehicleType = (type: string) => {
+  if (!type) return "";
+  const mapping: Record<string, string> = {
+    bus: "Bus",
+    mini_bus: "Mini Bus",
+    van: "Van",
+    traveler: "Force Traveler",
+    magic: "Tata Magic",
+    auto: "Auto Rickshaw",
+    car: "Car / Cab"
+  };
+  return mapping[type.toLowerCase()] || type.charAt(0).toUpperCase() + type.slice(1);
+};
+
 interface TransportDialogsProps {
   assignOpen: boolean;
   onAssignOpenChange: (open: boolean) => void;
@@ -20,6 +34,7 @@ interface TransportDialogsProps {
   routes: any[];
   onAssignSubmit: () => void;
   assigning: boolean;
+  isEditingAssignment?: boolean;
 
   routeOpen: boolean;
   onRouteOpenChange: (open: boolean) => void;
@@ -40,7 +55,7 @@ interface TransportDialogsProps {
 }
 
 export function TransportDialogs({
-  assignOpen, onAssignOpenChange, assignmentData, setAssignmentData, classes, students, routes, onAssignSubmit, assigning,
+  assignOpen, onAssignOpenChange, assignmentData, setAssignmentData, classes, students, routes, onAssignSubmit, assigning, isEditingAssignment = false,
   routeOpen, onRouteOpenChange, routeData, setRouteData, vehicles, onRouteSubmit, addingRoute, isEditingRoute = false,
   vehicleOpen, onVehicleOpenChange, vehicleData, setVehicleData, onVehicleSubmit, registeringVehicle, isEditingVehicle = false,
 }: TransportDialogsProps) {
@@ -70,14 +85,14 @@ export function TransportDialogs({
       <Dialog open={assignOpen} onOpenChange={onAssignOpenChange}>
         <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
-            <DialogTitle>Assign Transport Route</DialogTitle>
+            <DialogTitle>{isEditingAssignment ? "Edit Transport Assignment" : "Assign Transport Route"}</DialogTitle>
             <DialogDescription>Select a student and a transport route to begin service.</DialogDescription>
           </DialogHeader>
           <div className="grid gap-4 py-4">
             <div className="space-y-2">
               <Label>Select Class *</Label>
-              <Select value={assignmentData.classId} onValueChange={v => setAssignmentData((prev: any) => ({...prev, classId: v, studentId: ''}))}>
-                <SelectTrigger><SelectValue placeholder="Select class first..." /></SelectTrigger>
+              <Select value={assignmentData.classId} onValueChange={v => setAssignmentData((prev: any) => ({...prev, classId: v, studentId: ''}))} disabled={isEditingAssignment}>
+                <SelectTrigger className="w-full"><SelectValue placeholder="Select class first..." /></SelectTrigger>
                 <SelectContent>
                   {classes.map((c: any) => <SelectItem key={c.id} value={c.id}>{c.name}-{c.section} (Grade {c.grade})</SelectItem>)}
                 </SelectContent>
@@ -85,8 +100,8 @@ export function TransportDialogs({
             </div>
             <div className="space-y-2">
               <Label>Select Student *</Label>
-              <Select value={assignmentData.studentId} onValueChange={v => setAssignmentData((prev: any) => ({...prev, studentId: v}))} disabled={!assignmentData.classId}>
-                <SelectTrigger><SelectValue placeholder={assignmentData.classId ? "Select student..." : "Pick a class first"} /></SelectTrigger>
+              <Select value={assignmentData.studentId} onValueChange={v => setAssignmentData((prev: any) => ({...prev, studentId: v}))} disabled={!assignmentData.classId || isEditingAssignment}>
+                <SelectTrigger className="w-full"><SelectValue placeholder={assignmentData.classId ? "Select student..." : "Pick a class first"} /></SelectTrigger>
                 <SelectContent>
                   {students.reduce((acc: React.ReactNode[], s: any) => {
                     if (!assignmentData.classId || s.classId === assignmentData.classId) {
@@ -102,7 +117,7 @@ export function TransportDialogs({
               <Select value={assignmentData.routeId} onValueChange={v => setAssignmentData((prev: any) => ({...prev, routeId: v, pickupPoint: ''}))}>
                 <SelectTrigger><SelectValue placeholder="Select route..." /></SelectTrigger>
                 <SelectContent>
-                  {routes.map((r: any) => <SelectItem key={r.id} value={r.id}>{r.name} (Base: ₹{r.fee})</SelectItem>)}
+                  {routes.map((r: any) => <SelectItem key={r.id} value={r.id}>{r.name}</SelectItem>)}
                 </SelectContent>
               </Select>
             </div>
@@ -153,7 +168,7 @@ export function TransportDialogs({
                       <Label className="text-xs">Pickup Fee (₹) *</Label>
                       <Input
                         type="number"
-                        placeholder={`Route base is ₹${selectedRoute?.fee}`}
+                        placeholder="Enter pickup fee"
                         value={customPickupFee}
                         onChange={(e) => {
                           setCustomPickupFee(e.target.value);
@@ -194,7 +209,7 @@ export function TransportDialogs({
           <DialogFooter>
             <Button variant="outline" onClick={() => onAssignOpenChange(false)}>Cancel</Button>
             <Button onClick={onAssignSubmit} disabled={assigning || !assignmentData.studentId || !assignmentData.routeId || !assignmentData.pickupPoint}>
-              {assigning ? 'Assigning...' : 'Assign Route'}
+              {assigning ? 'Saving...' : (isEditingAssignment ? 'Save Changes' : 'Assign Route')}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -218,75 +233,11 @@ export function TransportDialogs({
                 <SelectTrigger><SelectValue placeholder="Select vehicle" /></SelectTrigger>
                 <SelectContent>
                   <SelectItem value="none">No Vehicle</SelectItem>
-                  {vehicles.map((v: any) => <SelectItem key={v.id} value={v.id}>{v.number} ({v.type})</SelectItem>)}
+                  {vehicles.map((v: any) => <SelectItem key={v.id} value={v.id}>{v.number} ({formatVehicleType(v.type)})</SelectItem>)}
                 </SelectContent>
               </Select>
             </div>
 
-            {/* Route Stops / Pickup Points Edit Section */}
-            <div className="space-y-2 border-t pt-4 mt-2">
-              <Label className="text-xs font-semibold uppercase tracking-wider text-zinc-500">Route Pickup Points</Label>
-              <div className="space-y-2 max-h-[160px] overflow-y-auto pr-1">
-                {(routeData.stops || []).map((stop: any, idx: number) => (
-                  <div key={idx} className="flex items-center justify-between p-2 rounded-md border text-xs bg-zinc-50/50">
-                    <span className="font-semibold truncate">{stop.name}</span>
-                    <div className="flex items-center gap-2">
-                      <span className="font-semibold text-emerald-600">₹{stop.fee}</span>
-                      <button
-                        type="button"
-                        className="text-red-500 hover:text-red-700 font-bold px-1"
-                        onClick={() => {
-                          const updated = (routeData.stops || []).filter((_: any, i: number) => i !== idx);
-                          setRouteData((prev: any) => ({ ...prev, stops: updated }));
-                        }}
-                      >
-                        &times;
-                      </button>
-                    </div>
-                  </div>
-                ))}
-              </div>
-
-              {/* Inline input to add stop inside dialog */}
-              <div className="flex gap-2 items-end">
-                <div className="flex-1 space-y-1">
-                  <Label className="text-[10px]">Stop Name</Label>
-                  <Input
-                    id="dialog-stop-name"
-                    placeholder="Stop name"
-                    className="h-8 text-xs"
-                  />
-                </div>
-                <div className="w-20 space-y-1">
-                  <Label className="text-[10px]">Fee (₹)</Label>
-                  <Input
-                    id="dialog-stop-fee"
-                    type="number"
-                    placeholder="Fee"
-                    className="h-8 text-xs"
-                  />
-                </div>
-                <Button
-                  type="button"
-                  size="sm"
-                  className="h-8 text-xs bg-zinc-800 hover:bg-zinc-900 text-white"
-                  onClick={() => {
-                    const nameInput = document.getElementById("dialog-stop-name") as HTMLInputElement;
-                    const feeInput = document.getElementById("dialog-stop-fee") as HTMLInputElement;
-                    if (nameInput && feeInput && nameInput.value.trim() && feeInput.value.trim()) {
-                      const updated = [...(routeData.stops || []), { name: nameInput.value.trim(), fee: Number(feeInput.value) }];
-                      setRouteData((prev: any) => ({ ...prev, stops: updated }));
-                      nameInput.value = "";
-                      feeInput.value = "";
-                    } else {
-                      toast.error("Please enter stop name and fee");
-                    }
-                  }}
-                >
-                  Add
-                </Button>
-              </div>
-            </div>
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => onRouteOpenChange(false)}>Cancel</Button>
@@ -313,11 +264,15 @@ export function TransportDialogs({
               <div className="space-y-2">
                 <Label>Type</Label>
                 <Select value={vehicleData.type} onValueChange={v => setVehicleData((prev: any) => ({...prev, type: v}))}>
-                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectTrigger className="w-full"><SelectValue /></SelectTrigger>
                   <SelectContent>
                      <SelectItem value="bus">Bus</SelectItem>
-                     <SelectItem value="van">Van</SelectItem>
                      <SelectItem value="mini_bus">Mini Bus</SelectItem>
+                     <SelectItem value="van">Van</SelectItem>
+                     <SelectItem value="traveler">Force Traveler</SelectItem>
+                     <SelectItem value="magic">Tata Magic</SelectItem>
+                     <SelectItem value="auto">Auto Rickshaw</SelectItem>
+                     <SelectItem value="car">Car / Cab</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -330,7 +285,7 @@ export function TransportDialogs({
               <div className="space-y-2">
                 <Label>Status</Label>
                 <Select value={vehicleData.status} onValueChange={v => setVehicleData((prev: any) => ({...prev, status: v}))}>
-                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectTrigger className="w-full"><SelectValue /></SelectTrigger>
                   <SelectContent>
                      <SelectItem value="active">Active</SelectItem>
                      <SelectItem value="inactive">Inactive</SelectItem>

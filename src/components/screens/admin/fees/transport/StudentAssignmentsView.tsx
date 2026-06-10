@@ -10,7 +10,8 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { Pagination } from "@/components/shared/pagination";
  
  import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { FilterX } from "lucide-react";
+import { FilterX, Eye } from "lucide-react";
+import { useParams, useRouter } from "next/navigation";
 
 interface StudentAssignmentsViewProps {
   loadingAssignments: boolean;
@@ -22,6 +23,7 @@ interface StudentAssignmentsViewProps {
   selectedRouteId: string | null;
   onRouteFilterChange: (routeId: string | null) => void;
   routes: any[];
+  onEditAssignment: (assignment: any) => void;
 }
 
 export function StudentAssignmentsView({
@@ -34,7 +36,10 @@ export function StudentAssignmentsView({
   selectedRouteId,
   onRouteFilterChange,
   routes,
+  onEditAssignment,
 }: StudentAssignmentsViewProps) {
+  const router = useRouter();
+  const { slug } = useParams();
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(15);
 
@@ -110,7 +115,7 @@ export function StudentAssignmentsView({
                      <TableHead className="h-12">Class</TableHead>
                      <TableHead className="h-12">Route</TableHead>
                      <TableHead className="h-12">Start Date</TableHead>
-                     <TableHead className="text-right h-12 pr-6">Action</TableHead>
+                     <TableHead className="text-right h-12 pr-6">Actions</TableHead>
                    </TableRow>
                  </TableHeader>
                  <TableBody>
@@ -122,13 +127,22 @@ export function StudentAssignmentsView({
                        <TableCell className="py-4 text-xs text-muted-foreground">{a.student?.class?.name}-{a.student?.class?.section || 'N/A'}</TableCell>
                        <TableCell className="py-4 text-sm">{a.route?.name || 'Unknown Route'}</TableCell>
                        <TableCell className="py-4 text-xs">{a.startDate}</TableCell>
-                       <TableCell className="py-4 text-right pr-6">
+                       <TableCell className="py-4 text-right pr-6 flex items-center justify-end gap-2">
+                         <Button
+                           variant="outline"
+                           size="sm"
+                           className="border-zinc-200 hover:border-zinc-300 text-zinc-700 hover:text-zinc-900 hover:bg-zinc-50 dark:hover:bg-zinc-800 h-8 font-medium"
+                           onClick={() => onEditAssignment(a)}
+                         >
+                           Edit
+                         </Button>
+
                          <AlertDialog>
                            <AlertDialogTrigger asChild>
                              <Button 
-                               variant="ghost" 
+                               variant="outline" 
                                size="sm" 
-                               className="text-red-500 hover:text-red-700 h-8"
+                               className="border-red-200 hover:border-red-300 text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-950/20 h-8 font-medium"
                                disabled={isDeleting}
                              >
                                {isDeleting && deletingId === a.id ? 'Removing...' : 'Remove'}
@@ -145,7 +159,7 @@ export function StudentAssignmentsView({
                                <AlertDialogCancel>Cancel</AlertDialogCancel>
                                <AlertDialogAction 
                                  onClick={() => onDelete(a.id)}
-                                 className="bg-red-600 hover:bg-red-700"
+                                 className="bg-red-600 hover:bg-red-700 text-white"
                                >
                                  Remove
                                </AlertDialogAction>
