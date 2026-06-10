@@ -16,6 +16,7 @@ interface AddFeeStructureDialogProps {
   classes: ClassOption[];
   onAdd: () => void;
   adding: boolean;
+  academicYears: any[];
 }
 
 export function AddFeeStructureDialog({
@@ -27,6 +28,7 @@ export function AddFeeStructureDialog({
   classes,
   onAdd,
   adding,
+  academicYears,
 }: AddFeeStructureDialogProps) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -40,7 +42,11 @@ export function AddFeeStructureDialog({
             <Label>Fee Category *</Label>
             <Select value={form.feeCategoryId} onValueChange={v => setForm((p: any) => ({ ...p, feeCategoryId: v }))}>
               <SelectTrigger><SelectValue placeholder="Select category" /></SelectTrigger>
-              <SelectContent>{minCategories.map(c => <SelectItem key={c.id} value={c.id}>{c.name} ({c.code})</SelectItem>)}</SelectContent>
+              <SelectContent>
+                {minCategories
+                  .filter(c => c.status !== 'inactive')
+                  .map(c => <SelectItem key={c.id} value={c.id}>{c.name} ({c.code})</SelectItem>)}
+              </SelectContent>
             </Select>
           </div>
           <div className="grid grid-cols-2 gap-4">
@@ -58,7 +64,16 @@ export function AddFeeStructureDialog({
           </div>
           <div className="grid gap-2">
             <Label>Academic Year *</Label>
-            <Input value={form.academicYear} onChange={e => setForm((p: any) => ({ ...p, academicYear: e.target.value }))} placeholder="2024-2025" />
+            <Select value={form.academicYear} onValueChange={v => setForm((p: any) => ({ ...p, academicYear: v }))}>
+              <SelectTrigger className="bg-background"><SelectValue placeholder="Select academic year" /></SelectTrigger>
+              <SelectContent>
+                {academicYears.map(y => (
+                  <SelectItem key={y.id} value={y.name}>
+                    {y.name} {y.isCurrent && "(Current)"}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
         </div>
         <DialogFooter>

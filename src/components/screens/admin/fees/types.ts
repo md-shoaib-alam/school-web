@@ -19,6 +19,7 @@ export interface FeeStructure {
   feeCategoryId: string;
   feeCategoryName: string;
   feeCategoryCode: string;
+  feeCategoryStatus?: string;
   classId: string;
   className: string;
   classGrade: string;
