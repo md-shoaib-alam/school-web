@@ -62,9 +62,11 @@ export function AssignFeesDialog({
                 <Button variant="outline" size="sm" className="h-7 text-xs gap-1" onClick={onSelectAll}>
                   {selectedIds.size === data.students.filter((s: any) => !s.isPaid).length ? 'Deselect All' : 'Select All'}
                 </Button>
-                <Button variant="outline" size="sm" className="h-7 text-xs gap-1" onClick={onSelectTransport}>
-                  <Bus className="size-3" /> Transport Only
-                </Button>
+                {(struct?.feeCategoryCode === 'TRAN' || struct?.feeCategoryName?.toLowerCase().includes('transport')) && (
+                  <Button variant="outline" size="sm" className="h-7 text-xs gap-1" onClick={onSelectTransport}>
+                    <Bus className="size-3" /> Transport Only
+                  </Button>
+                )}
               </div>
             </div>
             <div className="relative">

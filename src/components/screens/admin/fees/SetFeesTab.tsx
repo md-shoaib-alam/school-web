@@ -221,13 +221,27 @@ export function SetFeesTab({ canCreate, canEdit, canDelete }: SetFeesTabProps) {
   useEffect(() => {
     if (assignOpen && assignData?.students) {
       queueMicrotask(() => {
-        dispatch({
-          type: 'SET_SELECTED_STUDENTS',
-          payload: new Set<string>(assignData.students.filter((st: any) => st.isAssigned).map((st: any) => st.id))
-        });
+        const currentlyAssigned = assignData.students.filter((st: any) => st.isAssigned);
+        if (currentlyAssigned.length > 0) {
+          dispatch({
+            type: 'SET_SELECTED_STUDENTS',
+            payload: new Set<string>(currentlyAssigned.map((st: any) => st.id))
+          });
+        } else if (assignStruct?.feeCategoryCode === 'TRAN' || assignStruct?.feeCategoryName?.toLowerCase().includes('transport')) {
+          const transportStudents = assignData.students.filter((st: any) => st.hasTransport);
+          dispatch({
+            type: 'SET_SELECTED_STUDENTS',
+            payload: new Set<string>(transportStudents.map((st: any) => st.id))
+          });
+        } else {
+          dispatch({
+            type: 'SET_SELECTED_STUDENTS',
+            payload: new Set<string>()
+          });
+        }
       });
     }
-  }, [assignData, assignOpen]);
+  }, [assignData, assignOpen, assignStruct]);
 
   const toggleStudent = (studentId: string) => {
     dispatch({
