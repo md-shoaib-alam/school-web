@@ -10,6 +10,9 @@ import { toast } from "sonner";
 import { RoutesAndVehiclesView } from './transport/RoutesAndVehiclesView';
 import { StudentAssignmentsView } from './transport/StudentAssignmentsView';
 import { TransportDialogs } from './transport/TransportDialogs';
+import { RouteDetailsView } from './transport/RouteDetailsView';
+import { useParams } from 'next/navigation';
+import { Skeleton } from '@/components/ui/skeleton';
 
 type State = {
   activeTab: 'routes' | 'assignments';
@@ -104,6 +107,8 @@ function reducer(state: State, action: Action): State {
 }
 
 export function TransportFeeTab() {
+  const { slug, detail } = useParams();
+  const decodedRouteName = detail ? decodeURIComponent(detail as string) : null;
   const queryClient = useQueryClient();
   const [selectedRouteId, setSelectedRouteId] = useState<string | null>(null);
   const [state, dispatch] = useReducer(reducer, initialState);
@@ -226,39 +231,76 @@ export function TransportFeeTab() {
     onError: () => toast.error(editingVehicleId ? 'Error updating vehicle' : 'Error adding vehicle')
   });
 
+  const currentRoute = decodedRouteName 
+    ? routes.find((r: any) => r.name.toLowerCase() === decodedRouteName.toLowerCase()) 
+    : null;
+
   return (
     <div className="space-y-4">
-      <div className="flex gap-2 p-1 bg-muted rounded-lg w-fit">
-        <Button variant={activeTab === 'routes' ? 'default' : 'ghost'} size="sm" onClick={() => dispatch({ type: 'SET_ACTIVE_TAB', payload: 'routes' })} className="h-8">Routes & Vehicles</Button>
-        <Button variant={activeTab === 'assignments' ? 'default' : 'ghost'} size="sm" onClick={() => dispatch({ type: 'SET_ACTIVE_TAB', payload: 'assignments' })} className="h-8">Student Assignments</Button>
-      </div>
-
-      {activeTab === 'routes' ? (
-        <RoutesAndVehiclesView 
-          loadingRoutes={loadingRoutes}
-          routes={routes}
-          onAddRoute={() => dispatch({ type: 'SET_ROUTE_DIALOG', payload: true })}
-          vehicles={vehicles}
-          onAddVehicle={() => dispatch({ type: 'SET_VEHICLE_DIALOG', payload: true })}
-          onEditRoute={(route) => dispatch({ type: 'START_EDIT_ROUTE', payload: route })}
-          onEditVehicle={(vehicle) => dispatch({ type: 'START_EDIT_VEHICLE', payload: vehicle })}
-          onViewStudents={(routeId) => {
-            setSelectedRouteId(routeId);
-            dispatch({ type: 'SET_ACTIVE_TAB', payload: 'assignments' });
-          }}
-        />
+      {detail ? (
+        !currentRoute ? (
+          loadingRoutes ? (
+            <div className="space-y-4">
+              <Skeleton className="h-10 w-48" />
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <Skeleton className="h-[200px] w-full" />
+                <Skeleton className="h-[300px] w-full" />
+                <Skeleton className="h-[400px] w-full lg:col-span-2" />
+              </div>
+            </div>
+          ) : (
+            <div className="p-6 text-center border rounded-xl bg-card">
+              <h2 className="text-lg font-semibold">Route Not Found</h2>
+              <p className="text-zinc-500 text-sm mt-1">
+                The transport route &ldquo;{decodedRouteName}&rdquo; does not exist or has been deleted.
+              </p>
+              <Button className="mt-4" onClick={() => window.location.href = `/${slug}/transport-fee`}>
+                Go Back
+              </Button>
+            </div>
+          )
+        ) : (
+          <RouteDetailsView
+            route={currentRoute}
+            assignments={assignments}
+            onEditRoute={(route) => dispatch({ type: 'START_EDIT_ROUTE', payload: route })}
+          />
+        )
       ) : (
-        <StudentAssignmentsView 
-          loadingAssignments={loadingAssignments}
-          assignments={assignments}
-          onAssignClick={() => dispatch({ type: 'SET_ASSIGN_DIALOG', payload: true })}
-          onDelete={(id) => deleteMutation.mutate(id)}
-          deletingId={deleteMutation.variables as string}
-          isDeleting={deleteMutation.isPending}
-          selectedRouteId={selectedRouteId}
-          onRouteFilterChange={setSelectedRouteId}
-          routes={routes}
-        />
+        <>
+          <div className="flex gap-2 p-1 bg-muted rounded-lg w-fit">
+            <Button variant={activeTab === 'routes' ? 'default' : 'ghost'} size="sm" onClick={() => dispatch({ type: 'SET_ACTIVE_TAB', payload: 'routes' })} className="h-8">Routes & Vehicles</Button>
+            <Button variant={activeTab === 'assignments' ? 'default' : 'ghost'} size="sm" onClick={() => dispatch({ type: 'SET_ACTIVE_TAB', payload: 'assignments' })} className="h-8">Student Assignments</Button>
+          </div>
+
+          {activeTab === 'routes' ? (
+            <RoutesAndVehiclesView 
+              loadingRoutes={loadingRoutes}
+              routes={routes}
+              onAddRoute={() => dispatch({ type: 'SET_ROUTE_DIALOG', payload: true })}
+              vehicles={vehicles}
+              onAddVehicle={() => dispatch({ type: 'SET_VEHICLE_DIALOG', payload: true })}
+              onEditRoute={(route) => dispatch({ type: 'START_EDIT_ROUTE', payload: route })}
+              onEditVehicle={(vehicle) => dispatch({ type: 'START_EDIT_VEHICLE', payload: vehicle })}
+              onViewStudents={(routeId) => {
+                setSelectedRouteId(routeId);
+                dispatch({ type: 'SET_ACTIVE_TAB', payload: 'assignments' });
+              }}
+            />
+          ) : (
+            <StudentAssignmentsView 
+              loadingAssignments={loadingAssignments}
+              assignments={assignments}
+              onAssignClick={() => dispatch({ type: 'SET_ASSIGN_DIALOG', payload: true })}
+              onDelete={(id) => deleteMutation.mutate(id)}
+              deletingId={deleteMutation.variables as string}
+              isDeleting={deleteMutation.isPending}
+              selectedRouteId={selectedRouteId}
+              onRouteFilterChange={setSelectedRouteId}
+              routes={routes}
+            />
+          )}
+        </>
       )}
 
       <TransportDialogs 
@@ -289,7 +331,7 @@ export function TransportFeeTab() {
             }
         }}
         vehicles={vehicles}
-        onRouteSubmit={() => addRouteMutation.mutate({ ...routeData, vehicleId: routeData.vehicleId === 'none' ? undefined : routeData.vehicleId })}
+        onRouteSubmit={() => addRouteMutation.mutate({ ...routeData, fee: 0, vehicleId: routeData.vehicleId === 'none' ? undefined : routeData.vehicleId })}
         addingRoute={addRouteMutation.isPending}
         isEditingRoute={!!editingRouteId}
 

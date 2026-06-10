@@ -6,7 +6,8 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Map, Truck, Bus, Pencil } from "lucide-react";
- 
+import { useParams, useRouter } from "next/navigation";
+
  interface RoutesAndVehiclesViewProps {
    loadingRoutes: boolean;
    routes: any[];
@@ -28,6 +29,25 @@ import { Map, Truck, Bus, Pencil } from "lucide-react";
    onEditVehicle,
    onViewStudents,
  }: RoutesAndVehiclesViewProps) {
+   const router = useRouter();
+   const { slug } = useParams();
+
+   const getRouteFeeDisplay = (r: any) => {
+     const stops = (() => {
+       try {
+         return typeof r.stops === 'string' ? JSON.parse(r.stops) : (r.stops || []);
+       } catch (e) {
+         return [];
+       }
+     })();
+     if (stops.length === 0) return "No stops defined";
+     const fees = stops.map((s: any) => Number(s.fee || 0));
+     const min = Math.min(...fees);
+     const max = Math.max(...fees);
+     if (min === max) return `₹${min.toLocaleString()}`;
+     return `₹${min.toLocaleString()} - ₹${max.toLocaleString()}`;
+   };
+
    return (
      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
        <Card className="lg:col-span-2">
@@ -52,7 +72,6 @@ import { Map, Truck, Bus, Pencil } from "lucide-react";
                  <TableHeader>
                    <TableRow>
                      <TableHead className="pl-6 h-12">Route Name</TableHead>
-                     <TableHead className="h-12">Fee</TableHead>
                      <TableHead className="h-12">Vehicle</TableHead>
                      <TableHead className="h-12">Students</TableHead>
                      <TableHead className="h-12 w-20 text-center">Actions</TableHead>
@@ -60,11 +79,17 @@ import { Map, Truck, Bus, Pencil } from "lucide-react";
                  </TableHeader>
                  <TableBody>
                    {routes.length === 0 ? (
-                     <TableRow><TableCell colSpan={5} className="text-center py-8 text-muted-foreground">No routes defined</TableCell></TableRow>
+                     <TableRow><TableCell colSpan={4} className="text-center py-8 text-muted-foreground">No routes defined</TableCell></TableRow>
                    ) : routes.map((r: any) => (
                      <TableRow key={r.id}>
-                       <TableCell className="pl-6 py-4 font-medium text-sm">{r.name}</TableCell>
-                       <TableCell className="py-4 text-sm font-semibold text-emerald-600 dark:text-emerald-400">₹{r.fee.toLocaleString()}</TableCell>
+                       <TableCell className="pl-6 py-4 font-semibold text-sm">
+                          <button
+                            onClick={() => router.push(`/${slug}/transport-fee/${encodeURIComponent(r.name)}`)}
+                            className="cursor-pointer hover:underline hover:text-emerald-600 dark:hover:text-emerald-400 text-left transition-colors"
+                          >
+                            {r.name}
+                          </button>
+                        </TableCell>
                        <TableCell className="py-4 text-xs">{r.vehicle?.number || 'Not Assigned'}</TableCell>
                        <TableCell className="py-4">
                          <button 

@@ -7,6 +7,8 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { DatePicker } from "@/components/ui/date-picker";
 import { parseISO } from "date-fns";
+import { useState, useEffect } from "react";
+import { toast } from "sonner";
 
 interface TransportDialogsProps {
   assignOpen: boolean;
@@ -42,6 +44,26 @@ export function TransportDialogs({
   routeOpen, onRouteOpenChange, routeData, setRouteData, vehicles, onRouteSubmit, addingRoute, isEditingRoute = false,
   vehicleOpen, onVehicleOpenChange, vehicleData, setVehicleData, onVehicleSubmit, registeringVehicle, isEditingVehicle = false,
 }: TransportDialogsProps) {
+  const [showCustomPickup, setShowCustomPickup] = useState(false);
+  const [customPickupName, setCustomPickupName] = useState("");
+  const [customPickupFee, setCustomPickupFee] = useState("");
+
+  const selectedRoute = routes.find((r: any) => r.id === assignmentData.routeId);
+  const routeStops = selectedRoute ? (() => {
+    try {
+      return typeof selectedRoute.stops === "string" ? JSON.parse(selectedRoute.stops) : (selectedRoute.stops || []);
+    } catch (e) {
+      return [];
+    }
+  })() : [];
+
+  // Reset custom pickup fields when dialog toggles or route changes
+  useEffect(() => {
+    setShowCustomPickup(false);
+    setCustomPickupName("");
+    setCustomPickupFee("");
+  }, [assignOpen, assignmentData.routeId]);
+
   return (
     <>
       {/* Assign Student Dialog */}
@@ -76,14 +98,90 @@ export function TransportDialogs({
               </Select>
             </div>
             <div className="space-y-2">
-              <Label>Select Route</Label>
-              <Select value={assignmentData.routeId} onValueChange={v => setAssignmentData((prev: any) => ({...prev, routeId: v}))}>
+              <Label>Select Route *</Label>
+              <Select value={assignmentData.routeId} onValueChange={v => setAssignmentData((prev: any) => ({...prev, routeId: v, pickupPoint: ''}))}>
                 <SelectTrigger><SelectValue placeholder="Select route..." /></SelectTrigger>
                 <SelectContent>
-                  {routes.map((r: any) => <SelectItem key={r.id} value={r.id}>{r.name} (₹{r.fee})</SelectItem>)}
+                  {routes.map((r: any) => <SelectItem key={r.id} value={r.id}>{r.name} (Base: ₹{r.fee})</SelectItem>)}
                 </SelectContent>
               </Select>
             </div>
+
+            {assignmentData.routeId && (
+              <div className="space-y-2">
+                <Label>Select Pickup Point *</Label>
+                {!showCustomPickup ? (
+                  <Select
+                    value={assignmentData.pickupPoint || ""}
+                    onValueChange={(v) => {
+                      if (v === "__new__") {
+                        setShowCustomPickup(true);
+                        setAssignmentData((prev: any) => ({ ...prev, pickupPoint: "" }));
+                      } else {
+                        setAssignmentData((prev: any) => ({ ...prev, pickupPoint: v }));
+                      }
+                    }}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Choose pickup point..." />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {routeStops.map((stop: any, idx: number) => (
+                        <SelectItem key={idx} value={stop.name}>
+                          {stop.name} (₹{stop.fee})
+                        </SelectItem>
+                      ))}
+                      <SelectItem value="__new__" className="text-emerald-600 font-semibold focus:text-emerald-700">
+                        + Create New Pickup Point...
+                      </SelectItem>
+                    </SelectContent>
+                  </Select>
+                ) : (
+                  <div className="space-y-3 p-3 rounded-lg border bg-zinc-50/50 dark:bg-zinc-900/20">
+                    <div className="space-y-1">
+                      <Label className="text-xs">New Pickup Point Name *</Label>
+                      <Input
+                        placeholder="e.g. Sector 5 Crossing"
+                        value={customPickupName}
+                        onChange={(e) => {
+                          setCustomPickupName(e.target.value);
+                          setAssignmentData((prev: any) => ({ ...prev, pickupPoint: e.target.value }));
+                        }}
+                      />
+                    </div>
+                    <div className="space-y-1">
+                      <Label className="text-xs">Pickup Fee (₹) *</Label>
+                      <Input
+                        type="number"
+                        placeholder={`Route base is ₹${selectedRoute?.fee}`}
+                        value={customPickupFee}
+                        onChange={(e) => {
+                          setCustomPickupFee(e.target.value);
+                          setAssignmentData((prev: any) => ({ ...prev, newPickupPointFee: Number(e.target.value) }));
+                        }}
+                      />
+                    </div>
+                    <Button
+                      type="button"
+                      variant="link"
+                      className="text-xs p-0 h-auto"
+                      onClick={() => {
+                        setShowCustomPickup(false);
+                        setCustomPickupName("");
+                        setCustomPickupFee("");
+                        setAssignmentData((prev: any) => {
+                          const { newPickupPointFee, ...rest } = prev;
+                          return { ...rest, pickupPoint: "" };
+                        });
+                      }}
+                    >
+                      Select existing pickup point
+                    </Button>
+                  </div>
+                )}
+              </div>
+            )}
+
             <div className="space-y-2 flex flex-col">
               <Label className="mb-1">Start Date</Label>
               <DatePicker 
@@ -95,7 +193,7 @@ export function TransportDialogs({
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => onAssignOpenChange(false)}>Cancel</Button>
-            <Button onClick={onAssignSubmit} disabled={assigning || !assignmentData.studentId || !assignmentData.routeId}>
+            <Button onClick={onAssignSubmit} disabled={assigning || !assignmentData.studentId || !assignmentData.routeId || !assignmentData.pickupPoint}>
               {assigning ? 'Assigning...' : 'Assign Route'}
             </Button>
           </DialogFooter>
@@ -109,14 +207,10 @@ export function TransportDialogs({
             <DialogTitle>{isEditingRoute ? 'Edit Transport Route' : 'Add Transport Route'}</DialogTitle>
             <DialogDescription>{isEditingRoute ? 'Modify details of this transportation route.' : 'Create a new route for school transportation.'}</DialogDescription>
           </DialogHeader>
-          <div className="grid gap-4 py-4">
+          <div className="grid gap-4 py-4 max-h-[70vh] overflow-y-auto pr-1">
             <div className="space-y-2">
               <Label>Route Name *</Label>
               <Input placeholder="e.g. North Sector Loop" value={routeData.name} onChange={e => setRouteData((prev: any) => ({...prev, name: e.target.value}))} />
-            </div>
-            <div className="space-y-2">
-              <Label>Monthly Fee (₹) *</Label>
-              <Input type="number" placeholder="e.g. 1500" value={routeData.fee} onChange={e => setRouteData((prev: any) => ({...prev, fee: e.target.value}))} />
             </div>
             <div className="space-y-2">
               <Label>Assign Vehicle (Optional)</Label>
@@ -128,10 +222,75 @@ export function TransportDialogs({
                 </SelectContent>
               </Select>
             </div>
+
+            {/* Route Stops / Pickup Points Edit Section */}
+            <div className="space-y-2 border-t pt-4 mt-2">
+              <Label className="text-xs font-semibold uppercase tracking-wider text-zinc-500">Route Pickup Points</Label>
+              <div className="space-y-2 max-h-[160px] overflow-y-auto pr-1">
+                {(routeData.stops || []).map((stop: any, idx: number) => (
+                  <div key={idx} className="flex items-center justify-between p-2 rounded-md border text-xs bg-zinc-50/50">
+                    <span className="font-semibold truncate">{stop.name}</span>
+                    <div className="flex items-center gap-2">
+                      <span className="font-semibold text-emerald-600">₹{stop.fee}</span>
+                      <button
+                        type="button"
+                        className="text-red-500 hover:text-red-700 font-bold px-1"
+                        onClick={() => {
+                          const updated = (routeData.stops || []).filter((_: any, i: number) => i !== idx);
+                          setRouteData((prev: any) => ({ ...prev, stops: updated }));
+                        }}
+                      >
+                        &times;
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {/* Inline input to add stop inside dialog */}
+              <div className="flex gap-2 items-end">
+                <div className="flex-1 space-y-1">
+                  <Label className="text-[10px]">Stop Name</Label>
+                  <Input
+                    id="dialog-stop-name"
+                    placeholder="Stop name"
+                    className="h-8 text-xs"
+                  />
+                </div>
+                <div className="w-20 space-y-1">
+                  <Label className="text-[10px]">Fee (₹)</Label>
+                  <Input
+                    id="dialog-stop-fee"
+                    type="number"
+                    placeholder="Fee"
+                    className="h-8 text-xs"
+                  />
+                </div>
+                <Button
+                  type="button"
+                  size="sm"
+                  className="h-8 text-xs bg-zinc-800 hover:bg-zinc-900 text-white"
+                  onClick={() => {
+                    const nameInput = document.getElementById("dialog-stop-name") as HTMLInputElement;
+                    const feeInput = document.getElementById("dialog-stop-fee") as HTMLInputElement;
+                    if (nameInput && feeInput && nameInput.value.trim() && feeInput.value.trim()) {
+                      const updated = [...(routeData.stops || []), { name: nameInput.value.trim(), fee: Number(feeInput.value) }];
+                      setRouteData((prev: any) => ({ ...prev, stops: updated }));
+                      nameInput.value = "";
+                      feeInput.value = "";
+                    } else {
+                      toast.error("Please enter stop name and fee");
+                    }
+                  }}
+                >
+                  Add
+                </Button>
+              </div>
+            </div>
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => onRouteOpenChange(false)}>Cancel</Button>
-            <Button className="bg-emerald-600 hover:bg-emerald-700 dark:bg-emerald-700 dark:hover:bg-emerald-600" onClick={onRouteSubmit} disabled={addingRoute || !routeData.name || !routeData.fee}>
+            <Button className="bg-emerald-600 hover:bg-emerald-700 dark:bg-emerald-700 dark:hover:bg-emerald-600" onClick={onRouteSubmit} disabled={addingRoute || !routeData.name}>
               {addingRoute ? 'Saving...' : (isEditingRoute ? 'Save Changes' : 'Add Route')}
             </Button>
           </DialogFooter>

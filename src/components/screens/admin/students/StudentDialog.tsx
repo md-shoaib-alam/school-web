@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -50,15 +50,39 @@ export function StudentDialog({
 }: StudentDialogProps) {
   const isCreate = mode === "create";
 
-  // Fetch transport routes for the dropdown (min data)
+  const [showCustomPickup, setShowCustomPickup] = useState(false);
+  const [customPickupName, setCustomPickupName] = useState("");
+  const [customPickupFee, setCustomPickupFee] = useState("");
+
+  // Fetch transport routes for the dropdown (with stops info)
   const { data: routes = [] } = useQuery({
-    queryKey: ['transport-routes-min'],
+    queryKey: ['transport-routes-full'],
     enabled: open,
     queryFn: async () => {
-      const res = await apiFetch('/api/transport-routes?mode=min');
+      const res = await apiFetch('/api/transport-routes');
       return res.json();
     }
   });
+
+  // Reset custom pickup when route or dialog changes
+  useEffect(() => {
+    if (!open) {
+      setShowCustomPickup(false);
+      setCustomPickupName("");
+      setCustomPickupFee("");
+    }
+  }, [open]);
+
+  useEffect(() => {
+    setShowCustomPickup(false);
+    setCustomPickupName("");
+    setCustomPickupFee("");
+  }, [formData.routeId]);
+
+  const selectedRoute = routes.find((r: any) => r.id === formData.routeId);
+  const routeStops = selectedRoute
+    ? (typeof selectedRoute.stops === "string" ? JSON.parse(selectedRoute.stops) : (selectedRoute.stops || []))
+    : [];
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -188,7 +212,7 @@ export function StudentDialog({
                   <Label htmlFor="routeId">Route *</Label>
                   <Select
                     value={formData.routeId}
-                    onValueChange={(v) => setFormData({ ...formData, routeId: v })}
+                    onValueChange={(v) => setFormData({ ...formData, routeId: v, pickupPoint: "" })}
                   >
                     <SelectTrigger id="routeId">
                       <SelectValue placeholder="Select a route" />
@@ -196,21 +220,85 @@ export function StudentDialog({
                     <SelectContent>
                       {routes.map((r: any) => (
                         <SelectItem key={r.id} value={r.id}>
-                          {r.name} (₹{r.fee})
+                          {r.name}
                         </SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
                 </div>
-                <div className="grid gap-2">
-                  <Label htmlFor="pickupPoint">Pickup Point *</Label>
-                  <Input
-                    id="pickupPoint"
-                    value={formData.pickupPoint}
-                    onChange={(e) => setFormData({ ...formData, pickupPoint: e.target.value })}
-                    placeholder="e.g., Park Street Stop"
-                  />
-                </div>
+
+                {formData.routeId && (
+                  <div className="grid gap-2">
+                    <Label htmlFor="pickupPoint">Pickup Point *</Label>
+                    {!showCustomPickup ? (
+                      <Select
+                        value={formData.pickupPoint || ""}
+                        onValueChange={(v) => {
+                          if (v === "__new__") {
+                            setShowCustomPickup(true);
+                            setFormData({ ...formData, pickupPoint: "" });
+                          } else {
+                            setFormData({ ...formData, pickupPoint: v });
+                          }
+                        }}
+                      >
+                        <SelectTrigger id="pickupPoint">
+                          <SelectValue placeholder="Choose pickup point..." />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {routeStops.map((stop: any, idx: number) => (
+                            <SelectItem key={idx} value={stop.name}>
+                              {stop.name} (₹{stop.fee})
+                            </SelectItem>
+                          ))}
+                          <SelectItem value="__new__" className="text-emerald-600 font-semibold focus:text-emerald-700">
+                            + Create New Pickup Point...
+                          </SelectItem>
+                        </SelectContent>
+                      </Select>
+                    ) : (
+                      <div className="space-y-3 p-3 rounded-lg border bg-zinc-50/50 dark:bg-zinc-900/20">
+                        <div className="space-y-1">
+                          <Label className="text-xs">New Pickup Point Name *</Label>
+                          <Input
+                            placeholder="e.g. Sector 5 Crossing"
+                            value={customPickupName}
+                            onChange={(e) => {
+                              setCustomPickupName(e.target.value);
+                              setFormData({ ...formData, pickupPoint: e.target.value });
+                            }}
+                          />
+                        </div>
+                        <div className="space-y-1">
+                          <Label className="text-xs">Pickup Fee (₹) *</Label>
+                          <Input
+                            type="number"
+                            placeholder="e.g. 1200"
+                            value={customPickupFee}
+                            onChange={(e) => {
+                              setCustomPickupFee(e.target.value);
+                              setFormData({ ...formData, newPickupPointFee: Number(e.target.value) });
+                            }}
+                          />
+                        </div>
+                        <Button
+                          type="button"
+                          variant="link"
+                          className="text-xs p-0 h-auto"
+                          onClick={() => {
+                            setShowCustomPickup(false);
+                            setCustomPickupName("");
+                            setCustomPickupFee("");
+                            const { newPickupPointFee, ...rest } = formData;
+                            setFormData({ ...rest, pickupPoint: "" });
+                          }}
+                        >
+                          Select existing pickup point
+                        </Button>
+                      </div>
+                    )}
+                  </div>
+                )}
               </div>
             )}
           </div>
