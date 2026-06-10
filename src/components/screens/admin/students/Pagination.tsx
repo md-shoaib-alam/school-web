@@ -133,13 +133,14 @@ export function Pagination({
           <div className="flex items-center gap-2">
             <span className="text-xs text-muted-foreground whitespace-nowrap">Rows per page:</span>
             <Select
-              value={itemsPerPage.toString()}
+              value={(itemsPerPage || 15).toString()}
               onValueChange={(v) => handleLimitChange(parseInt(v))}
             >
               <SelectTrigger className="h-8 w-[70px] bg-transparent border-zinc-200 dark:border-zinc-800 text-xs">
-                <SelectValue placeholder={itemsPerPage.toString()} />
+                <SelectValue placeholder={(itemsPerPage || 15).toString()} />
               </SelectTrigger>
               <SelectContent>
+                <SelectItem value="15">15</SelectItem>
                 <SelectItem value="25">25</SelectItem>
                 <SelectItem value="50">50</SelectItem>
                 <SelectItem value="100">100</SelectItem>

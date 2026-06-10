@@ -36,6 +36,7 @@ const emptyFormData = {
 type State = {
   search: string;
   currentPage: number;
+  itemsPerPage: number;
   dialogOpen: boolean;
   editingTeacher: TeacherInfo | null;
   formData: typeof emptyFormData;
@@ -46,6 +47,7 @@ type State = {
 type Action =
   | { type: "SET_SEARCH"; payload: string }
   | { type: "SET_CURRENT_PAGE"; payload: number }
+  | { type: "SET_ITEMS_PER_PAGE"; payload: number }
   | { type: "OPEN_DIALOG"; payload: { teacher: TeacherInfo | null; formData: typeof emptyFormData } }
   | { type: "CLOSE_DIALOG" }
   | { type: "SET_FORM_DATA"; payload: typeof emptyFormData }
@@ -58,6 +60,8 @@ function reducer(state: State, action: Action): State {
       return { ...state, search: action.payload, currentPage: 1 };
     case "SET_CURRENT_PAGE":
       return { ...state, currentPage: action.payload };
+    case "SET_ITEMS_PER_PAGE":
+      return { ...state, itemsPerPage: action.payload, currentPage: 1 };
     case "OPEN_DIALOG":
       return {
         ...state,
@@ -86,6 +90,7 @@ function reducer(state: State, action: Action): State {
 const initialState: State = {
   search: "",
   currentPage: 1,
+  itemsPerPage: 15,
   dialogOpen: false,
   editingTeacher: null,
   formData: emptyFormData,
@@ -98,26 +103,26 @@ export function AdminTeachers() {
   const { canCreate, canEdit, canDelete } = useModulePermissions("teachers");
 
   const [state, dispatch] = useReducer(reducer, initialState);
-  const { search, currentPage, dialogOpen, editingTeacher, formData, submitting, deletingId } = state;
-
-  const [viewingTeacher, setViewingTeacher] = useState<TeacherInfo | null>(null);
-  const [viewDialogOpen, setViewDialogOpen] = useState(false);
-
-  const handleOpenView = (teacher: TeacherInfo) => {
-    setViewingTeacher(teacher);
-    setViewDialogOpen(true);
-  };
-
-  const debouncedSearch = useDebounce(search, 500);
-
-  const queryClient = useQueryClient();
-
-  const { data: teachersData, isFetching: loading } = useTeachers(
-    currentTenantId || undefined,
-    debouncedSearch || undefined,
-    currentPage,
-    12,
-  );
+  const { search, currentPage, itemsPerPage, dialogOpen, editingTeacher, formData, submitting, deletingId } = state;
+ 
+   const [viewingTeacher, setViewingTeacher] = useState<TeacherInfo | null>(null);
+   const [viewDialogOpen, setViewDialogOpen] = useState(false);
+ 
+   const handleOpenView = (teacher: TeacherInfo) => {
+     setViewingTeacher(teacher);
+     setViewDialogOpen(true);
+   };
+ 
+   const debouncedSearch = useDebounce(search, 500);
+ 
+   const queryClient = useQueryClient();
+ 
+   const { data: teachersData, isFetching: loading } = useTeachers(
+     currentTenantId || undefined,
+     debouncedSearch || undefined,
+     currentPage,
+     itemsPerPage,
+   );
 
   const teachers = useMemo(() => {
     const list = teachersData?.teachers || [];
@@ -315,8 +320,9 @@ export function AdminTeachers() {
         currentPage={currentPage}
         totalPages={totalPages}
         totalItems={totalItems}
-        itemsPerPage={12}
+        itemsPerPage={itemsPerPage}
         onPageChange={(page) => dispatch({ type: "SET_CURRENT_PAGE", payload: page })}
+        onLimitChange={(limit) => dispatch({ type: "SET_ITEMS_PER_PAGE", payload: limit })}
       />
 
       <TeacherDialog

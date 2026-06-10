@@ -39,6 +39,7 @@ import { ParentInfo, StudentInfo } from "./parents/types";
 type State = {
   search: string;
   currentPage: number;
+  itemsPerPage: number;
   linkOpen: boolean;
   selectedParent: ParentInfo | null;
   selectedClass: string;
@@ -61,6 +62,7 @@ type State = {
 type Action =
   | { type: 'SET_SEARCH'; payload: string }
   | { type: 'SET_CURRENT_PAGE'; payload: number }
+  | { type: 'SET_ITEMS_PER_PAGE'; payload: number }
   | { type: 'SET_LINK_OPEN'; payload: boolean }
   | { type: 'OPEN_LINK_DIALOG'; payload: ParentInfo }
   | { type: 'SET_SELECTED_CLASS'; payload: string }
@@ -79,6 +81,7 @@ type Action =
 const initialState: State = {
   search: "",
   currentPage: 1,
+  itemsPerPage: 15,
   linkOpen: false,
   selectedParent: null,
   selectedClass: "all",
@@ -102,6 +105,7 @@ function reducer(state: State, action: Action): State {
   switch (action.type) {
     case 'SET_SEARCH': return { ...state, search: action.payload, currentPage: 1 };
     case 'SET_CURRENT_PAGE': return { ...state, currentPage: action.payload };
+    case 'SET_ITEMS_PER_PAGE': return { ...state, itemsPerPage: action.payload, currentPage: 1 };
     case 'SET_LINK_OPEN': return { ...state, linkOpen: action.payload };
     case 'OPEN_LINK_DIALOG': return { ...state, selectedParent: action.payload, linkOpen: true, selectedClass: "all" };
     case 'SET_SELECTED_CLASS': return { ...state, selectedClass: action.payload };
@@ -138,7 +142,7 @@ export function AdminParents() {
 
   const [state, dispatch] = useReducer(reducer, initialState);
   const {
-    search, currentPage, linkOpen, selectedParent: stateSelectedParent, selectedClass,
+    search, currentPage, itemsPerPage, linkOpen, selectedParent: stateSelectedParent, selectedClass,
     linking, createOpen, createForm, creating, editOpen,
     editingParent, editForm, editing, detailOpen, selectedParentDetail: stateSelectedParentDetail
   } = state;
@@ -152,7 +156,7 @@ export function AdminParents() {
   const { 
     data: parentsData, 
     isLoading: loadingParents 
-  } = useParents(currentTenantId || undefined, debouncedSearch || undefined, currentPage, 15);
+  } = useParents(currentTenantId || undefined, debouncedSearch || undefined, currentPage, itemsPerPage);
 
   const { data: classesData } = useClassesMin(currentTenantId || undefined);
 
@@ -354,8 +358,9 @@ export function AdminParents() {
         currentPage={currentPage}
         totalPages={totalPages}
         totalItems={totalItems}
-        itemsPerPage={15}
+        itemsPerPage={itemsPerPage}
         onPageChange={(v) => dispatch({ type: 'SET_CURRENT_PAGE', payload: v })}
+        onLimitChange={(limit) => dispatch({ type: 'SET_ITEMS_PER_PAGE', payload: limit })}
       />
 
       <CreateParentDialog
