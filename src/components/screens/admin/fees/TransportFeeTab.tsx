@@ -16,6 +16,8 @@ type State = {
   assignDialogOpen: boolean;
   addRouteOpen: boolean;
   addVehicleOpen: boolean;
+  editingRouteId: string | null;
+  editingVehicleId: string | null;
   assignmentData: { studentId: string; routeId: string; classId: string; startDate: string };
   routeData: { name: string; fee: string; vehicleId: string };
   vehicleData: { number: string; type: string; capacity: string; status: string };
@@ -29,12 +31,14 @@ type Action =
   | { type: 'SET_ASSIGNMENT_DATA'; payload: Partial<State['assignmentData']> }
   | { type: 'SET_ROUTE_DATA'; payload: Partial<State['routeData']> }
   | { type: 'SET_VEHICLE_DATA'; payload: Partial<State['vehicleData']> }
+  | { type: 'START_EDIT_ROUTE'; payload: any }
+  | { type: 'START_EDIT_VEHICLE'; payload: any }
   | { type: 'RESET_ASSIGNMENT' }
   | { type: 'RESET_ROUTE' }
   | { type: 'RESET_VEHICLE' };
 
 const initialAssignmentData = { studentId: '', routeId: '', classId: '', startDate: new Date().toISOString().split('T')[0] };
-const initialRouteData = { name: '', fee: '', vehicleId: '' };
+const initialRouteData = { name: '', fee: '', vehicleId: 'none' };
 const initialVehicleData = { number: '', type: 'bus', capacity: '40', status: 'active' };
 
 const initialState: State = {
@@ -42,6 +46,8 @@ const initialState: State = {
   assignDialogOpen: false,
   addRouteOpen: false,
   addVehicleOpen: false,
+  editingRouteId: null,
+  editingVehicleId: null,
   assignmentData: initialAssignmentData,
   routeData: initialRouteData,
   vehicleData: initialVehicleData,
@@ -54,21 +60,44 @@ function reducer(state: State, action: Action): State {
     case 'SET_ASSIGN_DIALOG':
       return { ...state, assignDialogOpen: action.payload };
     case 'SET_ROUTE_DIALOG':
-      return { ...state, addRouteOpen: action.payload };
+      return { ...state, addRouteOpen: action.payload, editingRouteId: action.payload ? state.editingRouteId : null };
     case 'SET_VEHICLE_DIALOG':
-      return { ...state, addVehicleOpen: action.payload };
+      return { ...state, addVehicleOpen: action.payload, editingVehicleId: action.payload ? state.editingVehicleId : null };
     case 'SET_ASSIGNMENT_DATA':
       return { ...state, assignmentData: { ...state.assignmentData, ...action.payload } };
     case 'SET_ROUTE_DATA':
       return { ...state, routeData: { ...state.routeData, ...action.payload } };
     case 'SET_VEHICLE_DATA':
       return { ...state, vehicleData: { ...state.vehicleData, ...action.payload } };
+    case 'START_EDIT_ROUTE':
+      return {
+        ...state,
+        addRouteOpen: true,
+        editingRouteId: action.payload.id,
+        routeData: {
+          name: action.payload.name,
+          fee: String(action.payload.fee),
+          vehicleId: action.payload.vehicleId || 'none',
+        }
+      };
+    case 'START_EDIT_VEHICLE':
+      return {
+        ...state,
+        addVehicleOpen: true,
+        editingVehicleId: action.payload.id,
+        vehicleData: {
+          number: action.payload.number,
+          type: action.payload.type || 'bus',
+          capacity: String(action.payload.capacity || 40),
+          status: action.payload.status || 'active',
+        }
+      };
     case 'RESET_ASSIGNMENT':
       return { ...state, assignmentData: initialAssignmentData, assignDialogOpen: false };
     case 'RESET_ROUTE':
-      return { ...state, routeData: initialRouteData, addRouteOpen: false };
+      return { ...state, routeData: initialRouteData, addRouteOpen: false, editingRouteId: null };
     case 'RESET_VEHICLE':
-      return { ...state, vehicleData: initialVehicleData, addVehicleOpen: false };
+      return { ...state, vehicleData: initialVehicleData, addVehicleOpen: false, editingVehicleId: null };
     default:
       return state;
   }
@@ -82,6 +111,8 @@ export function TransportFeeTab() {
     assignDialogOpen,
     addRouteOpen,
     addVehicleOpen,
+    editingRouteId,
+    editingVehicleId,
     assignmentData,
     routeData,
     vehicleData,
@@ -131,7 +162,7 @@ export function TransportFeeTab() {
   const students = useMemo(() => Array.isArray(studentsData) ? studentsData : studentsData?.items || [], [studentsData]);
 
   // ── Mutations ──
-  const assignMutation = useMutation({
+  const assignMutation = useMutation<any, any, any>({
     mutationFn: async (data: any) => {
       const res = await apiFetch('/api/transport-assignments', { method: 'POST', body: JSON.stringify(data) });
       if (!res.ok) throw new Error('Failed to assign');
@@ -146,7 +177,7 @@ export function TransportFeeTab() {
     onError: () => toast.error('Failed to assign student')
   });
 
-  const deleteMutation = useMutation({
+  const deleteMutation = useMutation<any, any, any>({
     mutationFn: async (id: string) => {
       const res = await apiFetch(`/api/transport-assignments?id=${id}`, { method: 'DELETE' });
       if (!res.ok) throw new Error('Delete failed');
@@ -160,32 +191,38 @@ export function TransportFeeTab() {
     onError: () => toast.error('Failed to remove assignment')
   });
 
-  const addRouteMutation = useMutation({
+  const addRouteMutation = useMutation<any, any, any>({
     mutationFn: async (data: any) => {
-      const res = await apiFetch('/api/transport-routes', { method: 'POST', body: JSON.stringify(data) });
-      if (!res.ok) throw new Error('Failed to add route');
+      const url = '/api/transport-routes';
+      const method = editingRouteId ? 'PUT' : 'POST';
+      const bodyData = editingRouteId ? { id: editingRouteId, ...data } : data;
+      const res = await apiFetch(url, { method, body: JSON.stringify(bodyData) });
+      if (!res.ok) throw new Error(editingRouteId ? 'Failed to update route' : 'Failed to add route');
       return res.json();
     },
     onSuccess: () => {
-      toast.success('Route added successfully');
+      toast.success(editingRouteId ? 'Route updated successfully' : 'Route added successfully');
       queryClient.invalidateQueries({ queryKey: ['transport-routes'] });
       dispatch({ type: 'RESET_ROUTE' });
     },
-    onError: () => toast.error('Error adding route')
+    onError: () => toast.error(editingRouteId ? 'Error updating route' : 'Error adding route')
   });
 
-  const addVehicleMutation = useMutation({
+  const addVehicleMutation = useMutation<any, any, any>({
     mutationFn: async (data: any) => {
-      const res = await apiFetch('/api/vehicles', { method: 'POST', body: JSON.stringify(data) });
-      if (!res.ok) throw new Error('Failed to add vehicle');
+      const url = '/api/vehicles';
+      const method = editingVehicleId ? 'PUT' : 'POST';
+      const bodyData = editingVehicleId ? { id: editingVehicleId, ...data } : data;
+      const res = await apiFetch(url, { method, body: JSON.stringify(bodyData) });
+      if (!res.ok) throw new Error(editingVehicleId ? 'Failed to update vehicle' : 'Failed to add vehicle');
       return res.json();
     },
     onSuccess: () => {
-      toast.success('Vehicle added successfully');
+      toast.success(editingVehicleId ? 'Vehicle updated successfully' : 'Vehicle added successfully');
       queryClient.invalidateQueries({ queryKey: ['vehicles'] });
       dispatch({ type: 'RESET_VEHICLE' });
     },
-    onError: () => toast.error('Error adding vehicle')
+    onError: () => toast.error(editingVehicleId ? 'Error updating vehicle' : 'Error adding vehicle')
   });
 
   return (
@@ -202,6 +239,8 @@ export function TransportFeeTab() {
           onAddRoute={() => dispatch({ type: 'SET_ROUTE_DIALOG', payload: true })}
           vehicles={vehicles}
           onAddVehicle={() => dispatch({ type: 'SET_VEHICLE_DIALOG', payload: true })}
+          onEditRoute={(route) => dispatch({ type: 'START_EDIT_ROUTE', payload: route })}
+          onEditVehicle={(vehicle) => dispatch({ type: 'START_EDIT_VEHICLE', payload: vehicle })}
         />
       ) : (
         <StudentAssignmentsView 
@@ -244,6 +283,7 @@ export function TransportFeeTab() {
         vehicles={vehicles}
         onRouteSubmit={() => addRouteMutation.mutate({ ...routeData, vehicleId: routeData.vehicleId === 'none' ? undefined : routeData.vehicleId })}
         addingRoute={addRouteMutation.isPending}
+        isEditingRoute={!!editingRouteId}
 
         vehicleOpen={addVehicleOpen}
         onVehicleOpenChange={(open) => dispatch({ type: 'SET_VEHICLE_DIALOG', payload: open })}
@@ -257,6 +297,7 @@ export function TransportFeeTab() {
         }}
         onVehicleSubmit={() => addVehicleMutation.mutate(vehicleData)}
         registeringVehicle={addVehicleMutation.isPending}
+        isEditingVehicle={!!editingVehicleId}
       />
     </div>
   );

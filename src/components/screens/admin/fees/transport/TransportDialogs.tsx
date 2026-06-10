@@ -26,6 +26,7 @@ interface TransportDialogsProps {
   vehicles: any[];
   onRouteSubmit: () => void;
   addingRoute: boolean;
+  isEditingRoute?: boolean;
 
   vehicleOpen: boolean;
   onVehicleOpenChange: (open: boolean) => void;
@@ -33,12 +34,13 @@ interface TransportDialogsProps {
   setVehicleData: (v: any) => void;
   onVehicleSubmit: () => void;
   registeringVehicle: boolean;
+  isEditingVehicle?: boolean;
 }
 
 export function TransportDialogs({
   assignOpen, onAssignOpenChange, assignmentData, setAssignmentData, classes, students, routes, onAssignSubmit, assigning,
-  routeOpen, onRouteOpenChange, routeData, setRouteData, vehicles, onRouteSubmit, addingRoute,
-  vehicleOpen, onVehicleOpenChange, vehicleData, setVehicleData, onVehicleSubmit, registeringVehicle,
+  routeOpen, onRouteOpenChange, routeData, setRouteData, vehicles, onRouteSubmit, addingRoute, isEditingRoute = false,
+  vehicleOpen, onVehicleOpenChange, vehicleData, setVehicleData, onVehicleSubmit, registeringVehicle, isEditingVehicle = false,
 }: TransportDialogsProps) {
   return (
     <>
@@ -100,12 +102,12 @@ export function TransportDialogs({
         </DialogContent>
       </Dialog>
 
-      {/* Add Route Dialog */}
+      {/* Add / Edit Route Dialog */}
       <Dialog open={routeOpen} onOpenChange={onRouteOpenChange}>
         <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
-            <DialogTitle>Add Transport Route</DialogTitle>
-            <DialogDescription>Create a new route for school transportation.</DialogDescription>
+            <DialogTitle>{isEditingRoute ? 'Edit Transport Route' : 'Add Transport Route'}</DialogTitle>
+            <DialogDescription>{isEditingRoute ? 'Modify details of this transportation route.' : 'Create a new route for school transportation.'}</DialogDescription>
           </DialogHeader>
           <div className="grid gap-4 py-4">
             <div className="space-y-2">
@@ -130,18 +132,18 @@ export function TransportDialogs({
           <DialogFooter>
             <Button variant="outline" onClick={() => onRouteOpenChange(false)}>Cancel</Button>
             <Button className="bg-emerald-600 hover:bg-emerald-700 dark:bg-emerald-700 dark:hover:bg-emerald-600" onClick={onRouteSubmit} disabled={addingRoute || !routeData.name || !routeData.fee}>
-              {addingRoute ? 'Adding...' : 'Add Route'}
+              {addingRoute ? 'Saving...' : (isEditingRoute ? 'Save Changes' : 'Add Route')}
             </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
 
-      {/* Add Vehicle Dialog */}
+      {/* Add / Edit Vehicle Dialog */}
       <Dialog open={vehicleOpen} onOpenChange={onVehicleOpenChange}>
         <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
-            <DialogTitle>Register Vehicle</DialogTitle>
-            <DialogDescription>Add a new vehicle to the school transport fleet.</DialogDescription>
+            <DialogTitle>{isEditingVehicle ? 'Edit Vehicle' : 'Register Vehicle'}</DialogTitle>
+            <DialogDescription>{isEditingVehicle ? 'Modify details of this vehicle in the fleet.' : 'Add a new vehicle to the school transport fleet.'}</DialogDescription>
           </DialogHeader>
           <div className="grid gap-4 py-4">
             <div className="space-y-2">
@@ -165,11 +167,23 @@ export function TransportDialogs({
                 <Input type="number" value={vehicleData.capacity} onChange={e => setVehicleData((prev: any) => ({...prev, capacity: e.target.value}))} />
               </div>
             </div>
+            {isEditingVehicle && (
+              <div className="space-y-2">
+                <Label>Status</Label>
+                <Select value={vehicleData.status} onValueChange={v => setVehicleData((prev: any) => ({...prev, status: v}))}>
+                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                     <SelectItem value="active">Active</SelectItem>
+                     <SelectItem value="inactive">Inactive</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => onVehicleOpenChange(false)}>Cancel</Button>
             <Button className="bg-blue-600 hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-600" onClick={onVehicleSubmit} disabled={registeringVehicle || !vehicleData.number}>
-              {registeringVehicle ? 'Registering...' : 'Register Vehicle'}
+              {registeringVehicle ? 'Saving...' : (isEditingVehicle ? 'Save Changes' : 'Register Vehicle')}
             </Button>
           </DialogFooter>
         </DialogContent>
