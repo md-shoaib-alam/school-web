@@ -45,7 +45,7 @@ export function AttendanceHeader({
               onDateChange(`${yyyy}-${mm}-${dd}`);
             }
           }}
-          className="rounded-xl dark:[color-scheme:dark] w-fit"
+          className="rounded-xl dark:[color-scheme:dark] w-fit bg-white dark:bg-zinc-900 hover:bg-zinc-50 dark:hover:bg-zinc-800"
         />
       </div>
     </div>

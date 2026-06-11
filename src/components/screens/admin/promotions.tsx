@@ -485,8 +485,7 @@ export function AdminPromotions({ initialTab: propTab }: { initialTab?: "individ
             Student Promotion
           </h1>
           <p className="text-sm text-muted-foreground mt-1">
-            Promote students to next class, bulk promote a whole class, or
-            graduate pass-out students.
+            Manage student promotions and graduations.
           </p>
         </div>
         <div className="flex gap-2 shrink-0 flex-wrap">
@@ -495,7 +494,7 @@ export function AdminPromotions({ initialTab: propTab }: { initialTab?: "individ
       </div>
 
       {/* Summary Cards */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="flex md:grid md:grid-cols-2 lg:grid-cols-4 gap-4 overflow-x-auto pb-3 md:pb-0 scrollbar-none snap-x snap-mandatory">
         {[
           {
             label: "Total Promotions",
@@ -532,7 +531,7 @@ export function AdminPromotions({ initialTab: propTab }: { initialTab?: "individ
         ].map((card) => (
           <Card
             key={card.label}
-            className={`hover:shadow-md transition-shadow border ${card.border}`}
+            className={`hover:shadow-md transition-shadow border ${card.border} min-w-[240px] md:min-w-0 snap-start flex-1 md:flex-initial`}
           >
             <CardContent className="p-4 flex items-center gap-4">
               <div
@@ -557,38 +556,39 @@ export function AdminPromotions({ initialTab: propTab }: { initialTab?: "individ
       {activeTab === "individual" && (
         <>
           {/* Filter Bar */}
-          <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center">
-            <Select
-              value={academicYearFilter}
-              onValueChange={(val) => dispatch({ type: "SET_ACADEMIC_YEAR_FILTER", value: val })}
-            >
-              <SelectTrigger className="w-full sm:w-44">
-                <SelectValue placeholder="Academic Year" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Years</SelectItem>
-                {academicYears.map((y) => (
-                  <SelectItem key={y} value={y}>
-                    {y}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            <Select value={classFilter} onValueChange={(val) => dispatch({ type: "SET_CLASS_FILTER", value: val })}>
-              <SelectTrigger className="w-full sm:w-44">
-                <SelectValue placeholder="Class" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Classes</SelectItem>
-                {classes.map((c) => (
-                  <SelectItem key={c.id} value={c.id}>
-                    {c.name}-{c.section} (Grade {c.grade})
+          <div className="flex flex-col md:flex-row gap-3 items-stretch md:items-center">
+            <div className="grid grid-cols-2 md:flex gap-3 w-full md:w-auto">
+              <Select
+                value={academicYearFilter}
+                onValueChange={(val) => dispatch({ type: "SET_ACADEMIC_YEAR_FILTER", value: val })}
+              >
+                <SelectTrigger className="w-full md:w-44">
+                  <SelectValue placeholder="Academic Year" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Years</SelectItem>
+                  {academicYears.map((y) => (
+                    <SelectItem key={y} value={y}>
+                      {y}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <Select value={classFilter} onValueChange={(val) => dispatch({ type: "SET_CLASS_FILTER", value: val })}>
+                <SelectTrigger className="w-full md:w-44">
+                  <SelectValue placeholder="Class" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Classes</SelectItem>
+                  {classes.map((c) => (
+                    <SelectItem key={c.id} value={c.id}>
+                      {c.name}-{c.section} (Grade {c.grade})
                   </SelectItem>
                 ))}
               </SelectContent>
             </Select>
             <Select value={statusFilter} onValueChange={(val) => dispatch({ type: "SET_STATUS_FILTER", value: val })}>
-              <SelectTrigger className="w-full sm:w-40">
+              <SelectTrigger className="w-full md:w-40 col-span-2 md:col-span-1">
                 <SelectValue placeholder="Status" />
               </SelectTrigger>
               <SelectContent>
@@ -598,17 +598,18 @@ export function AdminPromotions({ initialTab: propTab }: { initialTab?: "individ
                 <SelectItem value="rejected">Rejected</SelectItem>
               </SelectContent>
             </Select>
-
-            <div className="flex-1" />
-            
-            <Button
-              className="bg-emerald-600 hover:bg-emerald-700 text-white gap-2"
-              onClick={() => dispatch({ type: "OPEN_NEW_PROMOTION_DIALOG", academicYear: getCurrentAcademicYear() })}
-            >
-              <Plus className="size-4" />
-              <span>New Promotion</span>
-            </Button>
           </div>
+
+          <div className="flex-1" />
+          
+          <Button
+            className="bg-emerald-600 hover:bg-emerald-700 text-white gap-2 w-full md:w-auto"
+            onClick={() => dispatch({ type: "OPEN_NEW_PROMOTION_DIALOG", academicYear: getCurrentAcademicYear() })}
+          >
+            <Plus className="size-4" />
+            <span>New Promotion</span>
+          </Button>
+        </div>
 
           <PromotionsTable
             promotions={promotions}

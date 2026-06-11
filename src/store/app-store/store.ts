@@ -204,6 +204,9 @@ export const useAppStore = create<AppState>((set, get) => ({
             localStorage.setItem('schoolsaas_profile_cache_time', String(now));
           } catch { /* ignore */ }
         }
+      } else if (res.status === 404 || res.status === 401) {
+        get().logout();
+        window.location.href = "/login";
       }
     } catch { /* silent fail */ }
   },

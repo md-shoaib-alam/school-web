@@ -86,7 +86,10 @@ export function ConcessionsTab({ canCreate, canEdit, canDelete }: ConcessionsTab
     return concessions.filter(c => {
       const matchStatus = statusFilter === 'all' || c.status === statusFilter;
       const matchType = typeFilter === 'all' || c.concessionType === typeFilter;
-      const matchClass = classFilter === 'all' || c.studentClass === classes.find(cl => cl.id === classFilter)?.name || c.studentClass === classFilter;
+      const selectedClass = classes.find(cl => cl.id === classFilter);
+      const matchClass = classFilter === 'all' || 
+        (selectedClass && c.studentClass === `${selectedClass.name}-${selectedClass.section}`) || 
+        c.studentClass === classFilter;
       return matchStatus && matchType && matchClass;
     });
   }, [concessions, statusFilter, typeFilter, classFilter, classes]);
@@ -180,7 +183,7 @@ export function ConcessionsTab({ canCreate, canEdit, canDelete }: ConcessionsTab
           <SelectTrigger className="w-full sm:w-40"><SelectValue placeholder="Class" /></SelectTrigger>
           <SelectContent>
             <SelectItem value="all">All Classes</SelectItem>
-            {classes.map(c => <SelectItem key={c.id} value={c.id}>{c.name}-{c.section} (Grade {c.grade})</SelectItem>)}
+            {classes.map(c => <SelectItem key={c.id} value={c.id}>{c.name}-{c.section}</SelectItem>)}
           </SelectContent>
         </Select>
         <div className="sm:ml-auto">
@@ -247,7 +250,21 @@ export function ConcessionsTab({ canCreate, canEdit, canDelete }: ConcessionsTab
                                 <Button variant="ghost" size="icon" className="size-7 text-emerald-500 hover:text-emerald-700 hover:bg-emerald-50 dark:hover:bg-emerald-900/30" onClick={() => handleAction(c.id, 'active')} title="Approve"><ThumbsUp className="size-3.5" /></Button>
                               )}
                               {canEdit && c.status === 'active' && (
-                                <Button variant="ghost" size="icon" className="size-7 text-amber-500 hover:text-amber-700 hover:bg-amber-50 dark:hover:bg-amber-900/30" onClick={() => handleAction(c.id, 'revoked')} title="Revoke"><Ban className="size-3.5" /></Button>
+                                <AlertDialog>
+                                  <AlertDialogTrigger asChild>
+                                    <Button variant="ghost" size="icon" className="size-7 text-amber-500 hover:text-amber-700 hover:bg-amber-50 dark:hover:bg-amber-900/30" title="Revoke"><Ban className="size-3.5" /></Button>
+                                  </AlertDialogTrigger>
+                                  <AlertDialogContent>
+                                    <AlertDialogHeader>
+                                      <AlertDialogTitle>Revoke Concession</AlertDialogTitle>
+                                      <AlertDialogDescription>Are you sure you want to revoke this concession for {c.studentName}? This will reset the concession discount on pending fees.</AlertDialogDescription>
+                                    </AlertDialogHeader>
+                                    <AlertDialogFooter>
+                                      <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                      <AlertDialogAction onClick={() => handleAction(c.id, 'revoked')} className="bg-amber-600 hover:bg-amber-700 text-white">Revoke</AlertDialogAction>
+                                    </AlertDialogFooter>
+                                  </AlertDialogContent>
+                                </AlertDialog>
                               )}
                               {canDelete && (
                                 <AlertDialog>
@@ -285,7 +302,7 @@ export function ConcessionsTab({ canCreate, canEdit, canDelete }: ConcessionsTab
               <Label>Class *</Label>
               <Select value={addForm.classId} onValueChange={v => setAddForm(p => ({ ...p, classId: v, studentId: '' }))}>
                 <SelectTrigger><SelectValue placeholder="Select class" /></SelectTrigger>
-                <SelectContent>{(Array.isArray(classes) ? classes : []).map(c => <SelectItem key={c.id} value={c.id}>{c.name}-{c.section} (Grade {c.grade})</SelectItem>)}</SelectContent>
+                <SelectContent>{(Array.isArray(classes) ? classes : []).map(c => <SelectItem key={c.id} value={c.id}>{c.name}-{c.section}</SelectItem>)}</SelectContent>
               </Select>
             </div>
             <div className="grid gap-2">

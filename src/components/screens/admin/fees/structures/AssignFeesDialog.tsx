@@ -62,9 +62,11 @@ export function AssignFeesDialog({
                 <Button variant="outline" size="sm" className="h-7 text-xs gap-1" onClick={onSelectAll}>
                   {selectedIds.size === data.students.filter((s: any) => !s.isPaid).length ? 'Deselect All' : 'Select All'}
                 </Button>
-                <Button variant="outline" size="sm" className="h-7 text-xs gap-1" onClick={onSelectTransport}>
-                  <Bus className="size-3" /> Transport Only
-                </Button>
+                {(struct?.feeCategoryCode === 'TRAN' || struct?.feeCategoryName?.toLowerCase().includes('transport')) && (
+                  <Button variant="outline" size="sm" className="h-7 text-xs gap-1" onClick={onSelectTransport}>
+                    <Bus className="size-3" /> Transport Only
+                  </Button>
+                )}
               </div>
             </div>
             <div className="relative">
@@ -78,12 +80,12 @@ export function AssignFeesDialog({
                 data.students
                   .filter((s: any) => !debouncedSearch || s.name.toLowerCase().includes(debouncedSearch.toLowerCase()) || s.rollNumber.toLowerCase().includes(debouncedSearch.toLowerCase()))
                   .map((student: any) => (
-                  <button
+                  <div
                     key={student.id}
-                    type="button"
                     className={cn('w-full flex items-center gap-3 px-3 py-2.5 border-b last:border-b-0 cursor-pointer transition-colors hover:bg-zinc-50 dark:hover:bg-zinc-900/50 text-left bg-transparent', selectedIds.has(student.id) && 'bg-emerald-50 dark:bg-emerald-900/20')}
                     onClick={() => { if (!student.isPaid) onToggle(student.id); }}
                     tabIndex={0}
+                    role="button"
                     onKeyDown={(e) => {
                       if (e.key === 'Enter' || e.key === ' ') {
                         e.preventDefault();
@@ -100,7 +102,7 @@ export function AssignFeesDialog({
                       </div>
                     </div>
                     {student.isPaid && <Badge variant="secondary" className="text-[10px] bg-emerald-100 text-emerald-700 border-0 shrink-0">Paid ✓</Badge>}
-                  </button>
+                  </div>
                 ))
               )}
             </div>

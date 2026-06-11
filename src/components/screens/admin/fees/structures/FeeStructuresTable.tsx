@@ -66,9 +66,14 @@ export function FeeStructuresTable({
                   filtered.map(s => (
                     <TableRow key={s.id} className="hover:bg-emerald-50/50 dark:hover:bg-emerald-900/20 transition-colors">
                       <TableCell className="pl-6 py-4">
-                        <div>
+                        <div className="flex items-center gap-2">
                           <span className="font-medium text-sm">{s.feeCategoryName}</span>
-                          <span className="text-xs text-muted-foreground ml-2">({s.feeCategoryCode})</span>
+                          <span className="text-xs text-muted-foreground">({s.feeCategoryCode})</span>
+                          {s.feeCategoryStatus === 'inactive' && (
+                            <Badge variant="secondary" className="bg-zinc-100 text-zinc-600 dark:bg-zinc-800 dark:text-zinc-400 border-0 h-5 px-1.5 text-[10px]">
+                              Inactive
+                            </Badge>
+                          )}
                         </div>
                       </TableCell>
                       <TableCell className="py-4">
@@ -77,7 +82,14 @@ export function FeeStructuresTable({
                       <TableCell className="hidden sm:table-cell font-semibold text-emerald-600 dark:text-emerald-400 py-4">₹{s.amount.toLocaleString()}</TableCell>
                       <TableCell className="hidden md:table-cell text-sm text-muted-foreground py-4">{s.academicYear}</TableCell>
                       <TableCell className="text-center py-4">
-                        <Button variant="outline" size="sm" className="h-7 px-2 text-xs gap-1.5 hover:bg-emerald-50 hover:text-emerald-700 hover:border-emerald-300 dark:hover:bg-emerald-900/30 dark:hover:text-emerald-400" onClick={() => onAssign(s)}>
+                        <Button 
+                          variant="outline" 
+                          size="sm" 
+                          className="h-7 px-2 text-xs gap-1.5 hover:bg-emerald-50 hover:text-emerald-700 hover:border-emerald-300 dark:hover:bg-emerald-900/30 dark:hover:text-emerald-400 disabled:opacity-50 disabled:cursor-not-allowed" 
+                          onClick={() => onAssign(s)}
+                          disabled={s.feeCategoryStatus === 'inactive'}
+                          title={s.feeCategoryStatus === 'inactive' ? 'Cannot assign fees under inactive category' : 'Assign to students'}
+                        >
                           <Users className="size-3.5" />
                           <span className="hidden sm:inline">Assign</span>
                         </Button>

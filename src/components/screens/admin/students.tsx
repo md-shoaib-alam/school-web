@@ -55,6 +55,7 @@ type State = {
   search: string;
   classFilter: string;
   currentPage: number;
+  itemsPerPage: number;
   dialogOpen: boolean;
   dialogMode: "create" | "edit";
   editingStudent: StudentInfo | null;
@@ -68,6 +69,7 @@ type Action =
   | { type: 'SET_SEARCH'; payload: string }
   | { type: 'SET_CLASS_FILTER'; payload: string }
   | { type: 'SET_CURRENT_PAGE'; payload: number }
+  | { type: 'SET_ITEMS_PER_PAGE'; payload: number }
   | { type: 'OPEN_CREATE' }
   | { type: 'OPEN_EDIT'; payload: StudentInfo }
   | { type: 'CLOSE_DIALOG' }
@@ -80,6 +82,7 @@ const initialState: State = {
   search: "",
   classFilter: "all",
   currentPage: 1,
+  itemsPerPage: 15,
   dialogOpen: false,
   dialogMode: "create",
   editingStudent: null,
@@ -97,6 +100,8 @@ function reducer(state: State, action: Action): State {
       return { ...state, classFilter: action.payload, currentPage: 1 };
     case 'SET_CURRENT_PAGE':
       return { ...state, currentPage: action.payload };
+    case 'SET_ITEMS_PER_PAGE':
+      return { ...state, itemsPerPage: action.payload, currentPage: 1 };
     case 'OPEN_CREATE':
       return { ...state, dialogMode: "create", formData: emptyFormData, dialogOpen: true };
     case 'OPEN_EDIT':
@@ -142,6 +147,7 @@ function AdminStudentsContent() {
     search,
     classFilter,
     currentPage,
+    itemsPerPage,
     dialogOpen,
     dialogMode,
     editingStudent,
@@ -161,7 +167,7 @@ function AdminStudentsContent() {
     classFilter === "all" ? undefined : classFilter,
     debouncedSearch || undefined,
     currentPage,
-    ITEMS_PER_PAGE,
+    itemsPerPage,
   );
 
   const students = useMemo(() => {
@@ -360,8 +366,9 @@ function AdminStudentsContent() {
                 currentPage={currentPage}
                 totalPages={totalPages}
                 totalItems={totalItems}
-                itemsPerPage={ITEMS_PER_PAGE}
+                itemsPerPage={itemsPerPage}
                 onPageChange={(p) => dispatch({ type: 'SET_CURRENT_PAGE', payload: p })}
+                onLimitChange={(limit) => dispatch({ type: 'SET_ITEMS_PER_PAGE', payload: limit })}
               />
             </>
           )}

@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useAppStore } from "@/store/use-app-store";
 import { useQuery } from "@tanstack/react-query";
-import { useTenantMetadata } from "@/lib/graphql/hooks/platform.hooks";
+import { useTenantResolution } from "@/lib/graphql/hooks/platform.hooks";
 import { api } from "@/lib/api";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
@@ -14,7 +14,6 @@ import {
   Clock,
   School,
   Wallet,
-  UserCheck,
   GraduationCap,
   Users,
   Layers,
@@ -106,7 +105,7 @@ export function AdminDashboard() {
   const { data: dashboardData, isPending, fetchStatus, error } = useQuery({
     queryKey: ['admin-dashboard', tenantId],
     queryFn: () => api.get('/dashboard'),
-    staleTime: 60 * 1000, // Cache for 1 minute
+    staleTime: 5 * 60 * 1000, // Cache for 5 minutes (invalidated automatically on mutations)
     enabled: !!tenantId && layoutPref === "comprehensive",
     retry: 2,
     retryDelay: (attempt) => Math.min(1000 * 2 ** attempt, 10000),
@@ -121,10 +120,9 @@ export function AdminDashboard() {
     }
   }, [error]);
 
-  // Subscription Check
-  const { data: tenantDetail } = useTenantMetadata(tenantId || "");
-  const tenant = tenantDetail?.tenant;
-  const daysRemaining = getDaysRemaining(tenant?.endDate);
+  // Subscription Check (uses cached resolve query, 0 network requests!)
+  const { data: resolvedTenant } = useTenantResolution(currentTenantSlug || undefined);
+  const daysRemaining = getDaysRemaining(resolvedTenant?.endDate);
   const isExpiringSoon = daysRemaining !== null && daysRemaining >= 0 && daysRemaining <= 3;
   const isExpired = daysRemaining !== null && daysRemaining < 0;
 

@@ -42,4 +42,5 @@ export interface StudentFormData {
   transportEnabled?: boolean;
   routeId?: string;
   pickupPoint?: string;
+  newPickupPointFee?: number;
 }

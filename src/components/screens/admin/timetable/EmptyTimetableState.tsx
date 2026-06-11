@@ -33,7 +33,6 @@ export function EmptyTimetableState({
               onClick={() => onClassSelect?.(c.id)}
               className="group relative flex flex-col items-center justify-center gap-2 rounded-2xl border border-zinc-200 dark:border-zinc-700/60 bg-white dark:bg-zinc-900 px-3 py-5 text-center shadow hover:border-emerald-400 hover:shadow-lg hover:shadow-emerald-500/10 dark:hover:border-emerald-500/60 transition-all duration-200 active:scale-95 cursor-pointer overflow-hidden"
             >
-              <span className="absolute inset-x-0 top-0 h-0.5 bg-gradient-to-r from-emerald-400 to-teal-400 opacity-0 group-hover:opacity-100 transition-opacity duration-200 rounded-t-2xl" />
               <span className="size-10 rounded-xl bg-emerald-50 dark:bg-emerald-900/30 border border-emerald-200 dark:border-emerald-800/50 group-hover:bg-emerald-100 dark:group-hover:bg-emerald-900/50 flex items-center justify-center transition-colors duration-200">
                 <Calendar className="size-4 text-emerald-600 dark:text-emerald-400" />
               </span>
