@@ -145,6 +145,7 @@ export function StudentDashboard() {
                   src={currentTenantLogo || "/test.webp"}
                   alt={currentTenantName || ""}
                   className="size-full object-cover"
+                  loading="eager"
                 />
               </div>
               <div className="text-left">
