@@ -37,13 +37,13 @@ export function CertificateTemplate({ cert, formatDate, schoolName, affiliation,
 
   return (
     <div className="print-container bg-white">
-      <div className="relative cert-frame flex flex-col border-4 border-double border-amber-800 rounded-lg p-8 sm:p-12 bg-white mx-auto dark:bg-white dark:text-zinc-900 min-h-[250mm]">
+      <div className="relative cert-frame flex flex-col border-4 border-double border-amber-600 rounded-lg p-8 sm:p-12 bg-white mx-auto dark:bg-white dark:text-zinc-900 min-h-[250mm]">
         
         {/* Decorative Corners */}
-        <div className="absolute top-2 left-2 size-12 border-t-[3px] border-l-[3px] border-amber-800 rounded-tl-md" />
-        <div className="absolute top-2 right-2 size-12 border-t-[3px] border-r-[3px] border-amber-800 rounded-tr-md" />
-        <div className="absolute bottom-2 left-2 size-12 border-b-[3px] border-l-[3px] border-amber-800 rounded-bl-md" />
-        <div className="absolute bottom-2 right-2 size-12 border-b-[3px] border-r-[3px] border-amber-800 rounded-br-md" />
+        <div className="absolute top-2 left-2 size-12 border-t-[3px] border-l-[3px] border-amber-600 rounded-tl-md" />
+        <div className="absolute top-2 right-2 size-12 border-t-[3px] border-r-[3px] border-amber-600 rounded-tr-md" />
+        <div className="absolute bottom-2 left-2 size-12 border-b-[3px] border-l-[3px] border-amber-600 rounded-bl-md" />
+        <div className="absolute bottom-2 right-2 size-12 border-b-[3px] border-r-[3px] border-amber-600 rounded-br-md" />
 
         {/* School Header */}
         <div className="text-center space-y-3 mb-10">
@@ -56,11 +56,6 @@ export function CertificateTemplate({ cert, formatDate, schoolName, affiliation,
             <h2 className="text-2xl md:text-3xl font-semibold text-amber-900 tracking-tight uppercase font-serif whitespace-nowrap" style={{ fontFamily: 'Georgia, serif' }}>{displaySchoolName}</h2>
             <p className="text-sm font-medium text-zinc-700 italic">{displayAffiliation}</p>
             <p className="text-xs text-zinc-600">{displayAddress}</p>
-          </div>
-          <div className="flex items-center justify-center gap-3 pt-2">
-            <div className="w-32 h-[1px] bg-amber-800" />
-            <div className="size-2 rotate-45 bg-amber-800" />
-            <div className="w-32 h-[1px] bg-amber-800" />
           </div>
         </div>
 
@@ -76,13 +71,13 @@ export function CertificateTemplate({ cert, formatDate, schoolName, affiliation,
         {/* Body */}
         <div className="space-y-8 max-w-2xl mx-auto text-center flex-1">
           <p className="text-lg text-zinc-700 italic leading-relaxed">This is to certify that</p>
-          <div className="relative py-2 px-4 inline-block mx-auto min-w-[300px] border-b-2 border-amber-800/30">
+          <div className="relative py-2 px-4 inline-block mx-auto min-w-[300px] border-b-2 border-amber-600/30">
             <p className="text-3xl font-bold text-zinc-900 uppercase tracking-wider font-serif">
               {cert.content?.studentName || cert.student?.user?.name || ''}
             </p>
           </div>
 
-          <div className="grid grid-cols-2 gap-x-12 gap-y-6 text-left border border-[#FEF3C7] bg-[#FFFBEB]/60 rounded-xl p-8 mt-6">
+          <div className="grid grid-cols-2 gap-x-12 gap-y-6 text-left border border-zinc-200 bg-zinc-50/50 rounded-xl p-8 mt-6">
             <DetailRow label="Roll Number" value={cert.content?.rollNumber || cert.student?.rollNumber || ''} />
             <DetailRow label="Class / Grade" value={cert.content?.class ? `${cert.content.class.grade} - ${cert.content.class.name}` : ''} />
             <DetailRow label="Date of Birth" value={formatDate(cert.content?.dateOfBirth || '')} />
@@ -126,7 +121,7 @@ export function CertificateTemplate({ cert, formatDate, schoolName, affiliation,
 function DetailRow({ label, value }: { label: string; value: string }) {
   return (
     <div className="flex flex-col gap-1.5">
-      <p className="text-xs font-semibold text-[#78350F] uppercase tracking-wider">{label}</p>
+      <p className="text-xs font-semibold text-zinc-500 uppercase tracking-wider">{label}</p>
       <p className="text-base font-bold text-[#1F2937]">{value || ''}</p>
     </div>
   );
