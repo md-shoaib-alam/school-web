@@ -53,7 +53,7 @@ export function CertificateTemplate({ cert, formatDate, schoolName, affiliation,
             </div>
           </div>
           <div className="space-y-1">
-            <h2 className="text-3xl font-semibold text-amber-900 tracking-tight uppercase font-serif">{displaySchoolName}</h2>
+            <h2 className="text-2xl md:text-3xl font-semibold text-amber-900 tracking-tight uppercase font-serif whitespace-nowrap" style={{ fontFamily: 'Georgia, serif' }}>{displaySchoolName}</h2>
             <p className="text-sm font-medium text-zinc-700 italic">{displayAffiliation}</p>
             <p className="text-xs text-zinc-600">{displayAddress}</p>
           </div>
@@ -82,7 +82,7 @@ export function CertificateTemplate({ cert, formatDate, schoolName, affiliation,
             </p>
           </div>
 
-          <div className="grid grid-cols-2 gap-x-8 gap-y-3 text-left border border-[#FEF3C7] bg-[#FFFBEB] rounded-lg p-5 mt-4">
+          <div className="grid grid-cols-2 gap-x-12 gap-y-6 text-left border border-[#FEF3C7] bg-[#FFFBEB]/60 rounded-xl p-8 mt-6">
             <DetailRow label="Roll Number" value={cert.content?.rollNumber || cert.student?.rollNumber || ''} />
             <DetailRow label="Class / Grade" value={cert.content?.class ? `${cert.content.class.grade} - ${cert.content.class.name}` : ''} />
             <DetailRow label="Date of Birth" value={formatDate(cert.content?.dateOfBirth || '')} />
@@ -125,9 +125,9 @@ export function CertificateTemplate({ cert, formatDate, schoolName, affiliation,
 
 function DetailRow({ label, value }: { label: string; value: string }) {
   return (
-    <div className="flex flex-col gap-0.5">
-      <p className="text-[10px] font-semibold text-[#78350F] uppercase tracking-wider">{label}</p>
-      <p className="text-sm font-medium text-[#1F2937]">{value || ''}</p>
+    <div className="flex flex-col gap-1.5">
+      <p className="text-xs font-semibold text-[#78350F] uppercase tracking-wider">{label}</p>
+      <p className="text-base font-bold text-[#1F2937]">{value || ''}</p>
     </div>
   );
 }
