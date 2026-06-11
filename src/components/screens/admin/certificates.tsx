@@ -103,6 +103,16 @@ export function AdminCertificates() {
     enabled: !!selectedClassId,
   });
 
+  // Fetch tenant details (name, address, etc.) for certificate rendering
+  const { data: tenantData } = useQuery({
+    queryKey: ['tenant-settings', 'profile'],
+    queryFn: async () => {
+      const res = await apiFetch('/api/tenant-settings');
+      if (!res.ok) return {};
+      return res.json();
+    },
+  });
+
   // ── Mutations ──
 
   const generateMutation = useMutation({
@@ -299,7 +309,13 @@ export function AdminCertificates() {
           <div className="max-h-[75vh] overflow-y-auto p-4 sm:p-8 bg-zinc-100/50 flex justify-center">
             <div className="scale-[0.38] xs:scale-[0.45] sm:scale-[0.7] lg:scale-100 origin-top">
               <div ref={contentRef} className="w-[210mm] bg-white shadow-2xl">
-                <CertificateTemplate cert={viewCert} formatDate={formatDate} />
+                <CertificateTemplate 
+                  cert={viewCert} 
+                  formatDate={formatDate}
+                  schoolName={tenantData?.tenantName}
+                  affiliation={tenantData?.affiliation}
+                  schoolAddress={tenantData?.tenantAddress}
+                />
               </div>
             </div>
           </div>
