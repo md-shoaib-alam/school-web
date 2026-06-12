@@ -31,7 +31,7 @@ export function CurrentPlanBanner({ subscription, onCancel }: CurrentPlanBannerP
           </div>
           <div className="min-w-0 flex-1">
             <p className="font-semibold text-emerald-800 dark:text-emerald-300 leading-none text-xs sm:text-base">
-              Active: {subscription.planName} Plan
+              Active: {subscription.planName.toLowerCase().includes("plan") ? subscription.planName : `${subscription.planName} Plan`}
             </p>
             <p className="text-[9px] sm:text-xs text-emerald-600 dark:text-emerald-400 mt-0.5 truncate" suppressHydrationWarning>
               {subscription.endDate

@@ -82,7 +82,7 @@ export function SubscriptionStats({
                     className="w-[200px] justify-between cursor-pointer capitalize text-white hover:bg-white/10 hover:text-white border-0 h-8 font-normal px-2 text-xs"
                   >
                     <span className="truncate">
-                      {selectedTenant === "all" ? "All Schools" : (tenants.find(t => t.id === selectedTenant)?.name || "Select School")}
+                      {selectedTenant ? (tenants.find(t => t.id === selectedTenant)?.name || "Select School") : "Select School"}
                     </span>
                     <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50 text-teal-200" />
                   </Button>
@@ -98,19 +98,6 @@ export function SubscriptionStats({
                     />
                   </div>
                   <ScrollArea className="h-48 p-1">
-                    <button
-                      onClick={() => {
-                        onTenantChange("all");
-                        setOpen(false);
-                        onTenantSearchChange("");
-                      }}
-                      className="flex items-center justify-between w-full text-left px-3 py-1.5 text-xs hover:bg-teal-500/10 dark:hover:bg-teal-500/20 rounded-md transition-colors cursor-pointer group"
-                    >
-                      <span className="font-semibold text-zinc-900 dark:text-zinc-100 truncate pr-2 group-hover:text-teal-600 dark:group-hover:text-teal-400">All Schools</span>
-                      {selectedTenant === "all" && (
-                        <Check className="h-3.5 w-3.5 text-teal-600 shrink-0" />
-                      )}
-                    </button>
                     
                     {filteredTenants.length === 0 ? (
                       <div className="p-3 text-xs text-muted-foreground text-center">No schools found.</div>
@@ -192,7 +179,7 @@ export function SubscriptionStats({
               Non-Subscribers
             </p>
             <p className="text-xl font-bold mt-0.5 text-emerald-300">
-              {selectedTenant === "all"
+              {!selectedTenant
                 ? "–"
                 : Math.max(0, parentsTotal - (stats?.totalSubscriptions || 0))}
             </p>

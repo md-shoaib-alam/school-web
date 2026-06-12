@@ -82,15 +82,19 @@ export function useAuditLogs(filters?: { action?: string; role?: string; tenantI
   })
 }
 
-export function useSubscriptions(filters?: { tenantId?: string; status?: string; search?: string; startDate?: string; endDate?: string; page?: number; limit?: number }) {
+export function useSubscriptions(
+  filters?: { tenantId?: string; status?: string; search?: string; startDate?: string; endDate?: string; page?: number; limit?: number },
+  options?: { enabled?: boolean }
+) {
   return useQuery({
     queryKey: [...queryKeys.subscriptions, filters],
     queryFn: async () => {
       const data = await graphqlQuery<{ subscriptions: SubscriptionsResponse }>(SUBSCRIPTIONS, filters || {})
       return data.subscriptions
     },
-    staleTime: 5 * 60 * 1000,
+    staleTime: 60 * 1000, // 1 minute cache
     gcTime: 15 * 60 * 1000,
+    enabled: options?.enabled ?? true,
   })
 }
 

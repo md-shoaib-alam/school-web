@@ -98,14 +98,14 @@ export function useStudents(tenantId?: string, classId?: string, search?: string
   })
 }
 
-export function useParents(tenantId?: string, search?: string, page?: number, limit?: number) {
+export function useParents(tenantId?: string, search?: string, page?: number, limit?: number, options?: { enabled?: boolean }) {
   return useQuery<ParentsResponse>({
     queryKey: [...queryKeys.parents, tenantId, search, page, limit],
     queryFn: () => graphqlQuery<{ parents: ParentsResponse }>(PARENTS, { tenantId, search, page, limit }).then(d => d.parents),
-    staleTime: 30 * 60 * 1000,      // 30 minutes - data is fresh for this duration
+    staleTime: 60 * 1000,      // 1 minute cache
     gcTime: 60 * 60 * 1000,         // 1 hour - keep in garbage collection
     refetchOnMount: true,             // Only refetch if stale
-    enabled: !!tenantId,
+    enabled: (options?.enabled ?? true) && !!tenantId,
   })
 }
 
