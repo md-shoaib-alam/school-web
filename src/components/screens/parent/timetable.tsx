@@ -110,7 +110,7 @@ export function ParentTimetable() {
   const slotLookup = useMemo(() => {
     const map: Record<string, TimetableSlot> = {};
     timetable.forEach((t) => {
-      map[`${t.day}-${t.startTime}`] = t;
+      map[`${t.day.toLowerCase()}-${t.startTime}`] = t;
     });
     return map;
   }, [timetable]);

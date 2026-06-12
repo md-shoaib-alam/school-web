@@ -116,7 +116,7 @@ export function StudentDashboard() {
   ];
   const todayName = dayNames[today.getDay()];
   const todayTimetable = (data?.todaySchedule ?? [])
-    .filter((t) => t.day === todayName)
+    .filter((t) => t.day.toLowerCase() === todayName.toLowerCase())
     .sort((a, b) => a.startTime.localeCompare(b.startTime));
   const recentGrades = (data?.recentGrades ?? []).slice(0, 5);
   const studentNotices = (data?.notices ?? []).filter(

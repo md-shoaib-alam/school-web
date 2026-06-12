@@ -206,7 +206,8 @@ export function TeacherTimetable() {
     const map: Record<string, TimetableSlot[]> = {};
     DAYS.forEach((d) => (map[d] = []));
     timetable.forEach((t) => {
-      if (map[t.day]) map[t.day].push(t);
+      const dayLower = t.day.toLowerCase();
+      if (map[dayLower]) map[dayLower].push(t);
     });
     DAYS.forEach((d) => {
       map[d].sort(
@@ -224,7 +225,7 @@ export function TeacherTimetable() {
   const slotLookupMap = useMemo(() => {
     const map = new Map<string, TimetableSlot>();
     timetable.forEach((t) => {
-      map.set(`${t.day}-${t.startTime}-${t.endTime}`, t);
+      map.set(`${t.day.toLowerCase()}-${t.startTime}-${t.endTime}`, t);
     });
     return map;
   }, [timetable]);
