@@ -53,7 +53,7 @@ async function handleResponse(res: Response) {
         localStorage.clear();
         sessionStorage.clear();
         document.cookie = "school_token=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/";
-        window.location.href = "/login";
+        window.location.href = "/";
       }
     }
     const body = await res.json().catch(() => ({ error: res.statusText }));

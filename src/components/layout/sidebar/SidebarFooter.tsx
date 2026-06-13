@@ -175,7 +175,7 @@ export function SidebarFooter({
               </div>
             </div>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="start" side="top" sideOffset={8} className="w-72">
+          <DropdownMenuContent align="start" alignOffset={12} side="top" sideOffset={8} className="w-72">
             {renderProfileInfo()}
             <DropdownMenuSeparator />
             {renderDropdownItems()}

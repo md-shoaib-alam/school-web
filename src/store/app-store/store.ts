@@ -5,6 +5,7 @@ import {
   isValidScreen, CACHE_TTL
 } from './utils';
 import { getCookie } from '@/lib/cookies';
+import { API_BASE } from '@/lib/api';
 
 function getInitialUser(): { isLoggedIn: boolean; currentUser: AppUser | null } {
   if (typeof window === 'undefined') return { isLoggedIn: false, currentUser: null };
@@ -166,9 +167,8 @@ export const useAppStore = create<AppState>((set, get) => ({
     }
 
     try {
-      const apiBase = process.env.NEXT_PUBLIC_API_URL || '';
       const token = typeof window !== 'undefined' ? localStorage.getItem('school_token') : null;
-      const res = await fetch(`${apiBase}/auth/me?userId=${encodeURIComponent(state.currentUser.id)}`, {
+      const res = await fetch(`${API_BASE}/auth/me?userId=${encodeURIComponent(state.currentUser.id)}`, {
         headers: token ? { Authorization: `Bearer ${token}` } : {},
       });
       if (res.ok) {
@@ -206,7 +206,7 @@ export const useAppStore = create<AppState>((set, get) => ({
         }
       } else if (res.status === 404 || res.status === 401) {
         get().logout();
-        window.location.href = "/login";
+        window.location.href = "/";
       }
     } catch { /* silent fail */ }
   },

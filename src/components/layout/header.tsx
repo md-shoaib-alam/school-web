@@ -214,7 +214,7 @@ export function Header({ items, resolvedScreen, layoutPref = "comprehensive", on
                   Change Password
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem className="cursor-pointer gap-2 text-red-600" onClick={() => { logout(); replace("/"); }}>
+                <DropdownMenuItem className="cursor-pointer gap-2 text-red-600" onClick={() => { logout(); window.location.href = "/"; }}>
                   <LogOut className="size-4" />
                   Logout
                 </DropdownMenuItem>
