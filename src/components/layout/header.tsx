@@ -179,7 +179,7 @@ export function Header({ items, resolvedScreen, layoutPref = "comprehensive", on
                 </Avatar>
               </Button>
             </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-56 mt-2">
+              <DropdownMenuContent align="end" className="w-72 mt-2">
                 <div className="flex items-center gap-2 p-2">
                   <Avatar className="size-8">
                     <AvatarImage src={currentUser.avatar} alt={currentUser.name} className="object-cover" />
