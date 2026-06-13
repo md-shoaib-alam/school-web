@@ -39,10 +39,57 @@ export function useGradeManagement() {
     Promise.all([
       apiFetch("/api/classes"),
       apiFetch("/api/subjects?mine=true"),
+      apiFetch("/api/timetable?mine=true").catch(() => null)
     ])
-      .then(([cRes, sRes]) => Promise.all([cRes.json(), sRes.json()]))
-      .then(([cData, sData]) => {
-        dispatch({ type: "SET_BOOTSTRAP_DATA", classes: cData, subjects: sData });
+      .then(([cRes, sRes, tRes]) => Promise.all([cRes.json(), sRes.json(), tRes ? tRes.json() : []]))
+      .then(([cData, sData, tData]) => {
+        const assignedClasses = Array.isArray(cData) ? cData : [];
+        const assignedSubjects = Array.isArray(sData) ? sData : [];
+        const timetableList = Array.isArray(tData) ? tData : [];
+
+        // Extract subjects/classes from timetable slots
+        const timetableSubjects: any[] = [];
+        const timetableClasses: any[] = [];
+        
+        const seenSubjects = new Set(assignedSubjects.map(s => `${s.id}-${s.classId}`));
+        const seenClasses = new Set(assignedClasses.map(c => c.id));
+
+        timetableList.forEach((t: any) => {
+          if (t.subjectId && t.subjectName) {
+            const subKey = `${t.subjectId}-${t.classId}`;
+            if (!seenSubjects.has(subKey)) {
+              seenSubjects.add(subKey);
+              timetableSubjects.push({
+                id: t.subjectId,
+                name: t.subjectName,
+                className: t.className || 'Class',
+                classId: t.classId || '',
+                teacherId: t.teacherId || '',
+              });
+            }
+          }
+
+          if (t.classId && t.className) {
+            const classKey = t.classId;
+            if (!seenClasses.has(classKey)) {
+              seenClasses.add(classKey);
+              const parts = t.className.split('-');
+              timetableClasses.push({
+                id: t.classId,
+                name: parts[0] || t.className,
+                section: parts[1] || 'A',
+                grade: parts[0] || t.className,
+                studentCount: 0,
+                classTeacher: t.teacherName || '',
+              });
+            }
+          }
+        });
+
+        const combinedClasses = [...assignedClasses, ...timetableClasses];
+        const combinedSubjects = [...assignedSubjects, ...timetableSubjects];
+
+        dispatch({ type: "SET_BOOTSTRAP_DATA", classes: combinedClasses, subjects: combinedSubjects });
       })
       .catch((e) => {
         console.error(e);

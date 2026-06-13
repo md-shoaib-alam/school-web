@@ -80,9 +80,10 @@ export function CreateAssessmentDialog({
                 onValueChange={(v) => {
                   dispatch({ type: "SET_DIALOG_CLASS_ID", value: v });
                 }}
+                disabled={classes.length === 0}
               >
                 <SelectTrigger className="h-9 focus:ring-blue-500 focus-visible:ring-blue-500">
-                  <SelectValue placeholder="Select Class" />
+                  <SelectValue placeholder={classes.length === 0 ? "No classes assigned" : "Select Class"} />
                 </SelectTrigger>
                 <SelectContent>
                   {classes.map((c) => (
