@@ -38,7 +38,7 @@ export function ParentAttendance() {
 
   const { data, isPending, refetch } = useParentDashboard(currentUser?.name || "");
   const students = (data?.children || []) as any[];
-  const isPremium = data?.subscriptionPlan?.toLowerCase() === 'premium';
+  const isPremium = data?.subscriptionPlan?.toLowerCase().includes('premium');
 
   // Persistence logic
   useEffect(() => {

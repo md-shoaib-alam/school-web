@@ -175,7 +175,7 @@ export function SidebarFooter({
               </div>
             </div>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-56">
+          <DropdownMenuContent align="start" alignOffset={12} side="top" sideOffset={8} className="w-72">
             {renderProfileInfo()}
             <DropdownMenuSeparator />
             {renderDropdownItems()}
@@ -199,7 +199,7 @@ export function SidebarFooter({
                 </Avatar>
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align={isMinimal ? "center" : "start"} side={isMinimal ? "right" : "bottom"} className="w-56 ml-2">
+            <DropdownMenuContent align={isMinimal ? "center" : "start"} side={isMinimal ? "right" : "bottom"} className="w-72 ml-2">
               {renderProfileInfo()}
               <DropdownMenuSeparator />
               {renderDropdownItems()}

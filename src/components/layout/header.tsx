@@ -179,7 +179,7 @@ export function Header({ items, resolvedScreen, layoutPref = "comprehensive", on
                 </Avatar>
               </Button>
             </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-56 mt-2">
+              <DropdownMenuContent align="end" className="w-72 mt-2">
                 <div className="flex items-center gap-2 p-2">
                   <Avatar className="size-8">
                     <AvatarImage src={currentUser.avatar} alt={currentUser.name} className="object-cover" />
@@ -214,7 +214,7 @@ export function Header({ items, resolvedScreen, layoutPref = "comprehensive", on
                   Change Password
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem className="cursor-pointer gap-2 text-red-600" onClick={() => { logout(); replace("/"); }}>
+                <DropdownMenuItem className="cursor-pointer gap-2 text-red-600" onClick={() => { logout(); window.location.href = "/"; }}>
                   <LogOut className="size-4" />
                   Logout
                 </DropdownMenuItem>

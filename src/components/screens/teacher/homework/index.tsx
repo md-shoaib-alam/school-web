@@ -88,13 +88,38 @@ export function TeacherAssignments({ showCompleted = false }: { showCompleted?: 
     Promise.all([
       apiFetch(`/api/homework?mine=true&status=${statusParam}`),
       apiFetch("/api/subjects?mine=true"),
+      apiFetch("/api/timetable?mine=true").catch(() => null)
     ])
-      .then(([aRes, sRes]) => Promise.all([aRes.json(), sRes.json()]))
-      .then(([aData, sData]) => {
+      .then(([aRes, sRes, tRes]) => Promise.all([aRes.json(), sRes.json(), tRes ? tRes.json() : []]))
+      .then(([aData, sData, tData]) => {
         // Cache assignments
         setCachedAssignments(prev => ({ ...prev, [statusParam]: aData }));
         dispatch({ type: "SET_ASSIGNMENTS", payload: aData });
-        dispatch({ type: "SET_SUBJECTS", payload: sData });
+
+        // Merge subjects/classes from timetable
+        const timetableList = Array.isArray(tData) ? tData : [];
+        const subjectList = Array.isArray(sData) ? sData : [];
+        
+        const combinedSubjects = [...subjectList];
+        const seenCombined = new Set(subjectList.map(s => `${s.id}-${s.classId}`));
+        
+        timetableList.forEach((t: any) => {
+          if (t.subjectId && t.subjectName) {
+            const key = `${t.subjectId}-${t.classId}`;
+            if (!seenCombined.has(key)) {
+              seenCombined.add(key);
+              combinedSubjects.push({
+                id: t.subjectId,
+                name: t.subjectName,
+                className: t.className || 'Class',
+                classId: t.classId || '',
+                teacherId: t.teacherId || '',
+              });
+            }
+          }
+        });
+
+        dispatch({ type: "SET_SUBJECTS", payload: combinedSubjects });
         dispatch({ type: "SET_LOADING", payload: false });
       });
   }, [showCompleted]);

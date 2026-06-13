@@ -7,6 +7,7 @@ import { useAppStore } from "@/store/use-app-store";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Button } from "@/components/ui/button";
 import {
   Table,
   TableBody,
@@ -54,7 +55,17 @@ const typeIcons: Record<string, string> = {
 
 const formatFeeDate = (dateStr: string) => {
   if (!dateStr) return "";
-  return new Date(dateStr).toLocaleDateString();
+  const match = dateStr.match(/^(\d{4})-(\d{2})-(\d{2})/);
+  if (match) {
+    const [_, year, month, day] = match;
+    return `${day}/${month}/${year}`;
+  }
+  const date = new Date(dateStr);
+  if (isNaN(date.getTime())) return dateStr;
+  const day = String(date.getDate()).padStart(2, '0');
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const year = date.getFullYear();
+  return `${day}/${month}/${year}`;
 };
 
 export function StudentFees() {
@@ -62,6 +73,8 @@ export function StudentFees() {
   const [loading, setLoading] = useState(true);
   const [students, setStudents] = useState<StudentInfo[]>([]);
   const [fees, setFees] = useState<FeeRecord[]>([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const ITEMS_PER_PAGE = 8;
 
   useEffect(() => {
     async function fetchData() {
@@ -74,11 +87,11 @@ export function StudentFees() {
 
         if (targetStudent?.id) {
           const feesRes = await apiFetch(
-            `/api/fees?studentId=${targetStudent.id}`,
+            `/api/fees?studentId=${targetStudent.id}&limit=100`,
           );
           if (feesRes.ok) {
             const feesData = await feesRes.json();
-            setFees(Array.isArray(feesData) ? feesData : []);
+            setFees(Array.isArray(feesData) ? feesData : (feesData.items || []));
           }
         }
       } catch (error) {
@@ -103,6 +116,13 @@ export function StudentFees() {
       .reduce((sum, f) => sum + (f.amount - f.paidAmount), 0);
     return { total, paid, pending, overdue };
   }, [fees]);
+
+  const totalPages = Math.ceil(fees.length / ITEMS_PER_PAGE) || 1;
+
+  const paginatedFees = useMemo(() => {
+    const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+    return fees.slice(startIndex, startIndex + ITEMS_PER_PAGE);
+  }, [fees, currentPage]);
 
   if (loading) {
     return (
@@ -218,7 +238,7 @@ export function StudentFees() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {fees.length === 0 ? (
+                {paginatedFees.length === 0 ? (
                   <TableRow>
                     <TableCell
                       colSpan={5}
@@ -229,7 +249,7 @@ export function StudentFees() {
                     </TableCell>
                   </TableRow>
                 ) : (
-                  fees.map((fee) => {
+                  paginatedFees.map((fee) => {
                     const config =
                       statusConfig[fee.status] || statusConfig.pending;
                     return (
@@ -280,6 +300,36 @@ export function StudentFees() {
               </TableBody>
             </Table>
           </div>
+          
+          {totalPages > 1 && (
+            <div className="flex items-center justify-between px-6 py-4 border-t border-zinc-200 dark:border-zinc-800">
+              <p className="text-xs sm:text-sm text-muted-foreground">
+                Showing {Math.min(fees.length, (currentPage - 1) * ITEMS_PER_PAGE + 1)} to{" "}
+                {Math.min(fees.length, currentPage * ITEMS_PER_PAGE)} of {fees.length} records
+              </p>
+              <div className="flex items-center gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+                  disabled={currentPage === 1}
+                >
+                  Previous
+                </Button>
+                <span className="text-xs sm:text-sm font-medium px-2">
+                  Page {currentPage} of {totalPages}
+                </span>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+                  disabled={currentPage === totalPages}
+                >
+                  Next
+                </Button>
+              </div>
+            </div>
+          )}
         </CardContent>
       </Card>
     </div>

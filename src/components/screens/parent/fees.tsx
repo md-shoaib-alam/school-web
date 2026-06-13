@@ -22,7 +22,7 @@ export function ParentFees() {
 
   const { data, isPending } = useParentDashboard(currentUser?.name || "");
   const students = (data?.children || []) as unknown as StudentInfo[];
-  const isPremium = data?.subscriptionPlan?.toLowerCase() === 'premium';
+  const isPremium = data?.subscriptionPlan?.toLowerCase().includes('premium');
 
   // Persistence logic
   useEffect(() => {

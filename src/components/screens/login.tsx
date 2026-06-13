@@ -63,7 +63,9 @@ export function LoginScreen() {
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!email.trim() || !password.trim()) {
+    const identifier = email.trim();
+    
+    if (!identifier || !password.trim()) {
       toast.error(
         loginMode === "email"
           ? "Please enter both Email ID and password"
@@ -72,10 +74,23 @@ export function LoginScreen() {
       return;
     }
 
+    // Validate format based on mode
+    const isEmailFormat = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(identifier);
+    
+    if (loginMode === "id" && isEmailFormat) {
+      toast.error("Invalid School ID/Phone or password");
+      return;
+    }
+    
+    if (loginMode === "email" && !isEmailFormat) {
+      toast.error("Please enter a valid email address.");
+      return;
+    }
+
     setLoading(true);
     
     // Create the login promise
-    const loginPromise = loginWithElysia(email.trim(), password.trim());
+    const loginPromise = loginWithElysia(identifier, password.trim());
 
     toast.promise(loginPromise, {
       loading: "Authenticating...",

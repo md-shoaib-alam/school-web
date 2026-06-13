@@ -41,8 +41,10 @@ export function HomeworkCreateDialog({
   const uniqueClasses = useMemo(() => {
     const classesMap = new Map();
     subjects.forEach((s) => {
-      if (!classesMap.has(s.classId)) {
-        classesMap.set(s.classId, s.className);
+      if (s.classId && typeof s.classId === "string" && s.classId.trim() !== "") {
+        if (!classesMap.has(s.classId)) {
+          classesMap.set(s.classId, s.className);
+        }
       }
     });
     return Array.from(classesMap.entries())
@@ -52,7 +54,7 @@ export function HomeworkCreateDialog({
 
   const filteredSubjects = useMemo(() => {
     if (!form.classId) return [];
-    return subjects.filter((s) => s.classId === form.classId);
+    return subjects.filter((s) => s.classId === form.classId && s.id && typeof s.id === "string" && s.id.trim() !== "");
   }, [subjects, form.classId]);
 
   return (
@@ -85,9 +87,10 @@ export function HomeworkCreateDialog({
               <Select
                 value={form.classId}
                 onValueChange={(v) => dispatch({ type: "SET_FORM", payload: { classId: v, subjectId: "" } })}
+                disabled={uniqueClasses.length === 0}
               >
                 <SelectTrigger className="mt-1.5">
-                  <SelectValue placeholder="Select class" />
+                  <SelectValue placeholder={uniqueClasses.length === 0 ? "No classes assigned" : "Select class"} />
                 </SelectTrigger>
                 <SelectContent>
                   {uniqueClasses.map((c) => (

@@ -4,6 +4,7 @@
 import { api } from "@/lib/api";
 import { useQuery } from "@tanstack/react-query";
 import { useState, useMemo } from "react";
+import { useAppStore } from "@/store/use-app-store";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -54,7 +55,7 @@ type ViewMode = "grid" | "list" | "day";
 // Constants
 // ---------------------------------------------------------------------------
 
-const DAYS = ["monday", "tuesday", "wednesday", "thursday", "friday"];
+const DAYS = ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday"];
 
 const DAY_LABELS: Record<string, string> = {
   monday: "Monday",
@@ -62,6 +63,7 @@ const DAY_LABELS: Record<string, string> = {
   wednesday: "Wednesday",
   thursday: "Thursday",
   friday: "Friday",
+  saturday: "Saturday",
 };
 
 const SHORT_DAY_LABELS: Record<string, string> = {
@@ -70,6 +72,7 @@ const SHORT_DAY_LABELS: Record<string, string> = {
   wednesday: "Wed",
   thursday: "Thu",
   friday: "Fri",
+  saturday: "Sat",
 };
 
 const SUBJECT_COLORS = [
@@ -87,7 +90,7 @@ const SUBJECT_COLORS = [
 // ---------------------------------------------------------------------------
 
 function toDayIndex(jsDay: number): number {
-  if (jsDay >= 1 && jsDay <= 5) return jsDay - 1;
+  if (jsDay >= 1 && jsDay <= 6) return jsDay - 1;
   return 0;
 }
 
@@ -160,6 +163,18 @@ export function TeacherTimetable() {
   const [viewMode, setViewMode] = useState<ViewMode>("day");
   const [selectedDay, setSelectedDay] = useState("");
 
+  const currentTenantId = useAppStore((s) => s.currentTenantId);
+
+  const { data: workingDays = DAYS } = useQuery<string[]>({
+    queryKey: ["working-days", currentTenantId],
+    queryFn: async () => {
+      const res = await api.get<any>(`/tenant-settings?tenantId=${currentTenantId}`);
+      return res.workingDays || DAYS;
+    },
+    enabled: !!currentTenantId,
+    staleTime: 5 * 60 * 1000,
+  });
+
   const { data: classes = [] } = useQuery({
     queryKey: ["teacher-classes"],
     queryFn: async () => {
@@ -184,8 +199,20 @@ export function TeacherTimetable() {
   // Keep variable for rendering backwards compat
   const loading = timetableLoading;
 
-  const todayIndex = useMemo(() => toDayIndex(new Date().getDay()), []);
-  const currentDayKey = useMemo(() => DAYS[todayIndex], [todayIndex]);
+  const currentDayKey = useMemo(() => {
+    const jsDay = new Date().getDay();
+    const dayMap: Record<number, string> = {
+      1: "monday",
+      2: "tuesday",
+      3: "wednesday",
+      4: "thursday",
+      5: "friday",
+      6: "saturday",
+      0: "sunday"
+    };
+    const currentDayName = dayMap[jsDay] || "monday";
+    return workingDays.includes(currentDayName) ? currentDayName : workingDays[0] || "monday";
+  }, [workingDays]);
 
   const selectedDayKey = useMemo(
     () => selectedDay || currentDayKey,
@@ -204,17 +231,18 @@ export function TeacherTimetable() {
 
   const slotsByDay = useMemo(() => {
     const map: Record<string, TimetableSlot[]> = {};
-    DAYS.forEach((d) => (map[d] = []));
+    workingDays.forEach((d) => (map[d] = []));
     timetable.forEach((t) => {
-      if (map[t.day]) map[t.day].push(t);
+      const dayLower = t.day.toLowerCase();
+      if (map[dayLower]) map[dayLower].push(t);
     });
-    DAYS.forEach((d) => {
+    workingDays.forEach((d) => {
       map[d].sort(
         (a, b) => timeToMinutes(a.startTime) - timeToMinutes(b.startTime),
       );
     });
     return map;
-  }, [timetable]);
+  }, [timetable, workingDays]);
 
   const uniqueSubjects = useMemo(
     () => [...new Set(timetable.map((t) => t.subjectName))],
@@ -224,7 +252,7 @@ export function TeacherTimetable() {
   const slotLookupMap = useMemo(() => {
     const map = new Map<string, TimetableSlot>();
     timetable.forEach((t) => {
-      map.set(`${t.day}-${t.startTime}-${t.endTime}`, t);
+      map.set(`${t.day.toLowerCase()}-${t.startTime}-${t.endTime}`, t);
     });
     return map;
   }, [timetable]);
@@ -301,12 +329,14 @@ export function TeacherTimetable() {
           getSlot={getSlot}
           getColor={getColor}
           currentDayKey={currentDayKey}
+          workingDays={workingDays}
         />
       ) : viewMode === "list" ? (
         <ListView
           slotsByDay={slotsByDay}
           getColor={getColor}
           currentDayKey={currentDayKey}
+          workingDays={workingDays}
         />
       ) : (
         <DayView
@@ -315,6 +345,7 @@ export function TeacherTimetable() {
           onSelectDay={setSelectedDay}
           dayViewSlots={dayViewSlots}
           getColor={getColor}
+          workingDays={workingDays}
         />
       )}
     </div>
@@ -380,11 +411,13 @@ function GridView({
   getSlot,
   getColor,
   currentDayKey,
+  workingDays,
 }: {
   timeSlots: string[];
   getSlot: (day: string, ts: string) => TimetableSlot | undefined;
   getColor: (name: string) => string;
   currentDayKey: string;
+  workingDays: string[];
 }) {
   return (
     <Card className="rounded-xl shadow-sm overflow-hidden">
@@ -399,7 +432,7 @@ function GridView({
                     Time Slot
                   </div>
                 </th>
-                {DAYS.map((day) => (
+                {workingDays.map((day) => (
                   <th
                     key={day}
                     className={`py-3 px-2 text-center font-medium border-r border-zinc-100 dark:border-zinc-700 last:border-r-0 ${
@@ -431,7 +464,7 @@ function GridView({
                     <td className="py-3 px-4 align-top border-r border-zinc-100 dark:border-zinc-700">
                       <div className="flex items-center gap-2">
                         <div className="size-7 rounded-lg bg-muted flex items-center justify-center flex-shrink-0">
-                          <Clock className="size-3.5 text-muted-foreground" />
+                           <Clock className="size-3.5 text-muted-foreground" />
                         </div>
                         <div>
                           <p className="text-xs font-semibold text-foreground leading-tight">{formatTime(start)}</p>
@@ -441,7 +474,7 @@ function GridView({
                         </div>
                       </div>
                     </td>
-                    {DAYS.map((day) => {
+                    {workingDays.map((day) => {
                       const slot = getSlot(day, ts);
                       const isToday = day === currentDayKey;
                       const inProgress =
@@ -510,12 +543,14 @@ function ListView({
   slotsByDay,
   getColor,
   currentDayKey,
+  workingDays,
 }: {
   slotsByDay: Record<string, TimetableSlot[]>;
   getColor: (name: string) => string;
   currentDayKey: string;
+  workingDays: string[];
 }) {
-  const daysWithSlots = DAYS.filter((d) => slotsByDay[d].length > 0);
+  const daysWithSlots = workingDays.filter((d) => slotsByDay[d].length > 0);
 
   if (daysWithSlots.length === 0) {
     return <EmptyState />;
@@ -632,17 +667,19 @@ function DayView({
   onSelectDay,
   dayViewSlots,
   getColor,
+  workingDays,
 }: {
   dayKey: string;
   currentDayKey: string;
   onSelectDay: (d: string) => void;
   dayViewSlots: (TimetableSlot | FreeSlot)[];
   getColor: (name: string) => string;
+  workingDays: string[];
 }) {
   return (
     <div className="space-y-4">
       <div className="flex gap-2 overflow-x-auto pb-1">
-        {DAYS.map((day) => {
+        {workingDays.map((day) => {
           const isToday = day === currentDayKey;
           const isActive = day === dayKey;
           return (

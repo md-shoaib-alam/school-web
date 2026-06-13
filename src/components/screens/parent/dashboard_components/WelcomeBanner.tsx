@@ -36,7 +36,7 @@ export function WelcomeBanner({ userName }: WelcomeBannerProps) {
         <div className="flex items-center justify-between gap-4">
           <div className="flex items-center gap-4">
             <div className="size-14 sm:size-16 rounded-2xl bg-zinc-50 dark:bg-zinc-900 flex items-center justify-center overflow-hidden shrink-0 border border-zinc-100 dark:border-zinc-800 transition-transform hover:scale-105 duration-300">
-              <img src={currentTenantLogo || "/test.webp"} alt={currentTenantName || ""} className="size-full object-cover" />
+              <img src={currentTenantLogo || "/test.webp"} alt={currentTenantName || ""} className="size-full object-cover" loading="eager" />
             </div>
             <div className="text-left space-y-1">
               <h2 className="text-xl sm:text-2xl font-medium tracking-tight text-zinc-900 dark:text-zinc-50">

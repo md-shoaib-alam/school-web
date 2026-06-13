@@ -54,8 +54,47 @@ export function TeacherClasses() {
   const { data: classData, isLoading: classesLoading } = useQuery<ClassInfo[]>({
     queryKey: ["teacher-classes"],
     queryFn: async () => {
-      const res = await apiFetch("/api/classes");
-      return res.json();
+      const [resClasses, resTimetable] = await Promise.all([
+        apiFetch("/api/classes").then(r => r.json()).catch(() => []),
+        apiFetch("/api/timetable?mine=true").then(r => r.json()).catch(() => [])
+      ]);
+
+      const assignedClasses = Array.isArray(resClasses) ? resClasses : [];
+      const timetableList = Array.isArray(resTimetable) ? resTimetable : [];
+
+      // Extract unique classes from timetable slots
+      const timetableClasses: ClassInfo[] = [];
+      const seen = new Set<string>();
+      timetableList.forEach((t: any) => {
+        if (t.classId && t.className) {
+          const key = t.classId;
+          if (!seen.has(key)) {
+            seen.add(key);
+            const parts = t.className.split('-');
+            timetableClasses.push({
+              id: t.classId,
+              name: parts[0] || t.className,
+              section: parts[1] || 'A',
+              grade: parts[0] || t.className,
+              studentCount: 0, // Fallback placeholder
+              classTeacher: t.teacherName || '',
+            });
+          }
+        }
+      });
+
+      // Combine lists
+      const combined = [...assignedClasses];
+      const seenCombined = new Set(assignedClasses.map(c => c.id));
+      
+      timetableClasses.forEach((tc) => {
+        if (!seenCombined.has(tc.id)) {
+          seenCombined.add(tc.id);
+          combined.push(tc);
+        }
+      });
+
+      return combined;
     },
     staleTime: 5 * 60 * 1000,
   });
@@ -172,12 +211,12 @@ export function TeacherClasses() {
       </div>
 
       {classes.length === 0 && (
-        <div className="text-center py-20 bg-zinc-900/20 rounded-3xl border border-dashed border-zinc-800">
-          <School className="size-16 text-zinc-700 mx-auto mb-4 opacity-50" />
-          <h3 className="text-xl font-semibold text-zinc-300">
+        <div className="text-center py-20 bg-zinc-50 dark:bg-zinc-900/20 rounded-3xl border border-dashed border-zinc-200 dark:border-zinc-800">
+          <School className="size-16 text-zinc-400 dark:text-zinc-700 mx-auto mb-4 opacity-50" />
+          <h3 className="text-xl font-semibold text-zinc-800 dark:text-zinc-300">
             No Classes Assigned
           </h3>
-          <p className="text-zinc-500 mt-2 max-w-xs mx-auto">
+          <p className="text-zinc-500 dark:text-zinc-400 mt-2 max-w-xs mx-auto">
             You don't have any classes assigned to you at the moment. Please contact your administrator.
           </p>
         </div>

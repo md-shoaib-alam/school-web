@@ -14,7 +14,7 @@ import { Clock, BookOpen, CalendarDays, User, MapPin } from "lucide-react";
 import type { StudentInfo, TimetableSlot } from "@/lib/types";
 import { ChildSelector } from "./ChildSelector";
 
-const DAYS = ["monday", "tuesday", "wednesday", "thursday", "friday"] as const;
+const DAYS = ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday"] as const;
 
 const DAY_LABELS: Record<string, string> = {
   monday: "Mon",
@@ -22,6 +22,7 @@ const DAY_LABELS: Record<string, string> = {
   wednesday: "Wed",
   thursday: "Thu",
   friday: "Fri",
+  saturday: "Sat",
 };
 
 const DAY_FULL_LABELS: Record<string, string> = {
@@ -30,6 +31,7 @@ const DAY_FULL_LABELS: Record<string, string> = {
   wednesday: "Wednesday",
   thursday: "Thursday",
   friday: "Friday",
+  saturday: "Saturday",
 };
 
 const SUBJECT_COLORS = [
@@ -110,7 +112,7 @@ export function ParentTimetable() {
   const slotLookup = useMemo(() => {
     const map: Record<string, TimetableSlot> = {};
     timetable.forEach((t) => {
-      map[`${t.day}-${t.startTime}`] = t;
+      map[`${t.day.toLowerCase()}-${t.startTime}`] = t;
     });
     return map;
   }, [timetable]);

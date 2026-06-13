@@ -52,6 +52,7 @@ export function SidebarHeader({
                   src={tenantLogo || currentUser?.tenantLogo || "/test.webp"} 
                   alt={tenantName || "School Logo"} 
                   className="size-full object-cover" 
+                  loading="eager"
                 />
               ) : (
                 <Building2 className="size-5" />

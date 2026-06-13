@@ -58,7 +58,7 @@ export function AttendanceCalendar({ data, isPremium, onPrev, onNext, currentPer
         </div>
       </CardHeader>
       <CardContent className="p-2 sm:p-4">
-        <div className="grid grid-cols-7 gap-2 mb-1.5">
+        <div className="grid grid-cols-7 gap-1.5 sm:gap-2 mb-1.5">
           {weekDays.map((day) => (
             <div key={day} className="text-center text-[9px] sm:text-[10px] font-bold text-zinc-400 dark:text-zinc-600 uppercase py-1">
               {day}
@@ -66,11 +66,11 @@ export function AttendanceCalendar({ data, isPremium, onPrev, onNext, currentPer
           ))}
         </div>
 
-        <div className="grid grid-cols-7 gap-2">
+        <div className="grid grid-cols-7 gap-1 sm:gap-1.5">
           {data.map((day, i) => (
             <div
               key={day.date ? `date-${day.date}` : `empty-${i}`}
-              className={`flex flex-col items-center justify-center rounded-lg min-h-[36px] sm:min-h-[44px] transition-all duration-200 ${
+              className={`flex flex-col items-center justify-center rounded-lg min-h-[36px] sm:min-h-[44px] transition-all duration-200 w-full ${
                 day.date 
                   ? `${getCalendarCellColor(day.status)} shadow-sm hover:scale-[1.02]` 
                   : "bg-transparent opacity-0"
