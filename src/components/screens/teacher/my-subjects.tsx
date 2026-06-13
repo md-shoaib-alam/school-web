@@ -260,10 +260,10 @@ export function TeacherSubjects() {
     return (
       <div className="space-y-6">
         <Header subjects={subjects} view={view} switchView={switchView} />
-        <div className="text-center py-20 bg-zinc-900/20 rounded-3xl border border-dashed border-zinc-800">
-          <BookOpen className="size-16 text-zinc-700 mx-auto mb-4 opacity-50" />
-          <h3 className="text-xl font-semibold text-zinc-300">No Subjects Assigned</h3>
-          <p className="text-zinc-500 mt-2 max-w-xs mx-auto">
+        <div className="text-center py-20 bg-zinc-50 dark:bg-zinc-900/20 rounded-3xl border border-dashed border-zinc-200 dark:border-zinc-800">
+          <BookOpen className="size-16 text-zinc-400 dark:text-zinc-700 mx-auto mb-4 opacity-50" />
+          <h3 className="text-xl font-semibold text-zinc-800 dark:text-zinc-300">No Subjects Assigned</h3>
+          <p className="text-zinc-500 dark:text-zinc-400 mt-2 max-w-xs mx-auto">
             You don't have any subjects assigned yet. Contact your administrator.
           </p>
         </div>
