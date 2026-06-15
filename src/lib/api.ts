@@ -11,14 +11,20 @@ if (typeof window !== 'undefined') {
   const hostname = window.location.hostname;
   const protocol = window.location.protocol;
   
+  // Only override if we are actually on a local development machine
   if (hostname === 'localhost' || hostname.startsWith('192.168.')) {
-    // Local / LAN WiFi testing: route directly to matching backend port (forces http for local backend server)
-    API_BASE = `http://${hostname}:4000/api`;
-  } else {
-    // Production: route from any app domain (e.g. tenant.domain.com) to api subdomain (api.domain.com)
+     // If the user hasn't explicitly set a production URL in their local .env, use local backend
+     if (!env.NEXT_PUBLIC_API_URL || env.NEXT_PUBLIC_API_URL.includes('localhost')) {
+       API_BASE = `http://${hostname}:4000/api`;
+     }
+  } 
+  // If we are on a real domain but API_BASE is missing or still points to localhost, try to guess the api subdomain
+  else if (!API_BASE || API_BASE.includes('localhost')) {
     const parts = hostname.split('.');
-    const baseDomain = parts.slice(-2).join('.'); // Extracts main domain
-    API_BASE = `${protocol}//api.${baseDomain}/api`;
+    if (parts.length >= 2) {
+      const baseDomain = parts.slice(-2).join('.');
+      API_BASE = `${protocol}//api.${baseDomain}/api`;
+    }
   }
 }
 
