@@ -86,15 +86,40 @@ export function TeacherAssignments({ showCompleted = false }: { showCompleted?: 
 
     dispatch({ type: "SET_LOADING", payload: true });
     Promise.all([
-      apiFetch(`/api/assignments?mine=true&status=${statusParam}`),
+      apiFetch(`/api/homework?mine=true&status=${statusParam}`),
       apiFetch("/api/subjects?mine=true"),
+      apiFetch("/api/timetable?mine=true").catch(() => null)
     ])
-      .then(([aRes, sRes]) => Promise.all([aRes.json(), sRes.json()]))
-      .then(([aData, sData]) => {
+      .then(([aRes, sRes, tRes]) => Promise.all([aRes.json(), sRes.json(), tRes ? tRes.json() : []]))
+      .then(([aData, sData, tData]) => {
         // Cache assignments
         setCachedAssignments(prev => ({ ...prev, [statusParam]: aData }));
         dispatch({ type: "SET_ASSIGNMENTS", payload: aData });
-        dispatch({ type: "SET_SUBJECTS", payload: sData });
+
+        // Merge subjects/classes from timetable
+        const timetableList = Array.isArray(tData) ? tData : [];
+        const subjectList = Array.isArray(sData) ? sData : [];
+        
+        const combinedSubjects = [...subjectList];
+        const seenCombined = new Set(subjectList.map(s => `${s.id}-${s.classId}`));
+        
+        timetableList.forEach((t: any) => {
+          if (t.subjectId && t.subjectName) {
+            const key = `${t.subjectId}-${t.classId}`;
+            if (!seenCombined.has(key)) {
+              seenCombined.add(key);
+              combinedSubjects.push({
+                id: t.subjectId,
+                name: t.subjectName,
+                className: t.className || 'Class',
+                classId: t.classId || '',
+                teacherId: t.teacherId || '',
+              });
+            }
+          }
+        });
+
+        dispatch({ type: "SET_SUBJECTS", payload: combinedSubjects });
         dispatch({ type: "SET_LOADING", payload: false });
       });
   }, [showCompleted]);
@@ -111,7 +136,7 @@ export function TeacherAssignments({ showCompleted = false }: { showCompleted?: 
     }
 
     try {
-      const res = await apiFetch("/api/assignments", {
+      const res = await apiFetch("/api/homework", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -123,7 +148,7 @@ export function TeacherAssignments({ showCompleted = false }: { showCompleted?: 
       if (res.ok) {
         toast.success("Assignment created successfully!");
         dispatch({ type: "RESET_FORM" });
-        const data = await apiFetch(`/api/assignments?mine=true&status=${getStatusParam()}`).then((r) => r.json());
+        const data = await apiFetch(`/api/homework?mine=true&status=${getStatusParam()}`).then((r) => r.json());
         
         // Invalidate cache
         setCachedAssignments({});
@@ -137,12 +162,12 @@ export function TeacherAssignments({ showCompleted = false }: { showCompleted?: 
   const handleCompleteAssignment = async (assignmentId: string) => {
     dispatch({ type: "SET_COMPLETING_ID", payload: assignmentId });
     try {
-      const res = await apiFetch(`/api/assignments/${assignmentId}/complete`, {
+      const res = await apiFetch(`/api/homework/${assignmentId}/complete`, {
         method: "PUT",
       });
       if (res.ok) {
         toast.success("Assignment marked as completed!");
-        const data = await apiFetch(`/api/assignments?mine=true&status=${getStatusParam()}`).then((r) => r.json());
+        const data = await apiFetch(`/api/homework?mine=true&status=${getStatusParam()}`).then((r) => r.json());
         
         // Invalidate cache
         setCachedAssignments({});
@@ -171,6 +196,27 @@ export function TeacherAssignments({ showCompleted = false }: { showCompleted?: 
     } finally {
       dispatch({ type: "SET_SUB_LOADING", payload: false });
     }
+  };
+
+  const refreshSubmissionsAndAssignments = async () => {
+    if (!selectedAssignment) return;
+    try {
+      const res = await apiFetch(`/api/submissions?assignmentId=${selectedAssignment.id}`);
+      if (res.ok) {
+        const json = await res.json();
+        dispatch({ type: "SET_SUBMISSIONS", payload: json.data || [] });
+      }
+    } catch {}
+
+    try {
+      const statusParam = getStatusParam();
+      const aRes = await apiFetch(`/api/homework?mine=true&status=${statusParam}`);
+      if (aRes.ok) {
+        const aData = await aRes.json();
+        setCachedAssignments((prev) => ({ ...prev, [statusParam]: aData }));
+        dispatch({ type: "SET_ASSIGNMENTS", payload: aData });
+      }
+    } catch {}
   };
 
   const handleBulkSave = async () => {
@@ -490,6 +536,7 @@ export function TeacherAssignments({ showCompleted = false }: { showCompleted?: 
         dispatch={dispatch}
         handleBulkSave={handleBulkSave}
         showCompleted={showCompleted}
+        refreshData={refreshSubmissionsAndAssignments}
       />
 
       <AlertDialog

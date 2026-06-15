@@ -53,6 +53,7 @@ interface SubscriptionTableProps {
   totalPages: number;
   totalEntries: number;
   onPageChange: (page: number) => void;
+  onLimitChange: (limit: number) => void;
   onEdit: (sub: any) => void;
   onExtend: (sub: any) => void;
   onDelete: (sub: any) => void;
@@ -68,6 +69,7 @@ export function SubscriptionTable({
   totalPages,
   totalEntries,
   onPageChange,
+  onLimitChange,
   onEdit,
   onExtend,
   onDelete,
@@ -104,10 +106,13 @@ export function SubscriptionTable({
                       <Building2 className="size-6" />
                     </div>
                     <div>
-                      <p className="font-bold text-lg">No Results Found</p>
+                      <p className="font-bold text-lg">
+                        {!selectedTenant ? "Select a School" : "No Results Found"}
+                      </p>
                       <p className="text-muted-foreground text-sm max-w-xs mx-auto">
-                        We couldn't find any subscriptions matching your
-                        filters.
+                        {!selectedTenant
+                          ? "Please select a school from the dropdown to view parent subscriptions."
+                          : "We couldn't find any subscriptions matching your filters."}
                       </p>
                     </div>
                   </div>
@@ -307,8 +312,22 @@ export function SubscriptionTable({
 
             <div className="flex items-center gap-2">
               <span className="text-xs text-muted-foreground whitespace-nowrap">
-                Rows per page: 25
+                Rows per page:
               </span>
+              <Select
+                value={String(limit)}
+                onValueChange={(v) => onLimitChange(Number(v))}
+              >
+                <SelectTrigger className="h-7 w-[70px] text-xs">
+                  <SelectValue placeholder={String(limit)} />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="10">10</SelectItem>
+                  <SelectItem value="25">25</SelectItem>
+                  <SelectItem value="50">50</SelectItem>
+                  <SelectItem value="100">100</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
           </div>
 

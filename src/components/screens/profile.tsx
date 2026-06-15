@@ -103,6 +103,7 @@ export function UserProfileScreen() {
     useAppStore.setState({ currentUser: updatedUser });
     if (typeof window !== "undefined") {
       localStorage.setItem(STORAGE_KEYS.USER, JSON.stringify(updatedUser));
+      localStorage.removeItem("schoolsaas_profile_cache_time");
     }
     
     setIsEditOpen(false);
@@ -171,6 +172,7 @@ export function UserProfileScreen() {
                 theme={theme}
                 setTheme={setTheme}
                 onPasswordChange={handlePasswordChange}
+                userRole={currentUser.role}
               />
             </TabsContent>
           </Tabs>

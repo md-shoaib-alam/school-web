@@ -4,7 +4,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Pencil, Trash2 } from "lucide-react";
+import { Pencil, Trash2, Eye } from "lucide-react";
 import { LazyMotion, domAnimation, m, AnimatePresence } from "framer-motion";
 import {
   AlertDialog,
@@ -35,6 +35,7 @@ interface TeachersTableViewProps {
   onDelete: (id: string) => void;
   deletingId: string | null;
   setDeletingId: (id: string | null) => void;
+  onView: (t: TeacherInfo) => void;
 }
 
 export function TeachersTableView({
@@ -45,6 +46,7 @@ export function TeachersTableView({
   onDelete,
   deletingId,
   setDeletingId,
+  onView,
 }: TeachersTableViewProps) {
   return (
     <Card className="shadow-sm border-0 overflow-hidden mb-4">
@@ -87,7 +89,12 @@ export function TeachersTableView({
                               </AvatarFallback>
                             </Avatar>
                             <div className="flex flex-col min-w-0">
-                              <span className="font-bold text-zinc-900 dark:text-zinc-100 truncate">{teacher.name}</span>
+                              <span 
+                                onClick={() => onView(teacher)}
+                                className="font-bold text-zinc-900 dark:text-zinc-100 truncate cursor-pointer hover:underline hover:text-emerald-700 dark:hover:text-emerald-400 transition-colors"
+                              >
+                                {teacher.name}
+                              </span>
                               <span className="text-[10px] sm:text-xs text-muted-foreground truncate">{teacher.email}</span>
                               <div className="sm:hidden flex flex-wrap gap-1 mt-1">
                                 <span className="text-[10px] text-emerald-600 dark:text-emerald-400 font-medium bg-emerald-50 dark:bg-emerald-900/20 px-1 rounded">
@@ -108,6 +115,14 @@ export function TeachersTableView({
                         </TableCell>
                         <TableCell className="px-6 py-4">
                           <div className="flex items-center justify-center gap-2">
+                            <Button 
+                              variant="ghost" 
+                              size="icon" 
+                              className="size-8 text-zinc-400 hover:text-emerald-600" 
+                              onClick={() => onView(teacher)}
+                            >
+                              <Eye className="size-3.5" />
+                            </Button>
                             {canEdit && (
                               <Button variant="ghost" size="icon" className="size-8 text-zinc-400 hover:text-emerald-600" onClick={() => onEdit(teacher)}>
                                 <Pencil className="size-3.5" />

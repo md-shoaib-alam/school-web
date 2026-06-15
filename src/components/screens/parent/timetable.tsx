@@ -9,18 +9,12 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Clock, BookOpen, CalendarDays, User, MapPin } from "lucide-react";
 import type { StudentInfo, TimetableSlot } from "@/lib/types";
+import { ChildSelector } from "./ChildSelector";
 
-const DAYS = ["monday", "tuesday", "wednesday", "thursday", "friday"] as const;
+const DAYS = ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday"] as const;
 
 const DAY_LABELS: Record<string, string> = {
   monday: "Mon",
@@ -28,6 +22,7 @@ const DAY_LABELS: Record<string, string> = {
   wednesday: "Wed",
   thursday: "Thu",
   friday: "Fri",
+  saturday: "Sat",
 };
 
 const DAY_FULL_LABELS: Record<string, string> = {
@@ -36,6 +31,7 @@ const DAY_FULL_LABELS: Record<string, string> = {
   wednesday: "Wednesday",
   thursday: "Thursday",
   friday: "Friday",
+  saturday: "Saturday",
 };
 
 const SUBJECT_COLORS = [
@@ -116,7 +112,7 @@ export function ParentTimetable() {
   const slotLookup = useMemo(() => {
     const map: Record<string, TimetableSlot> = {};
     timetable.forEach((t) => {
-      map[`${t.day}-${t.startTime}`] = t;
+      map[`${t.day.toLowerCase()}-${t.startTime}`] = t;
     });
     return map;
   }, [timetable]);
@@ -161,32 +157,22 @@ export function ParentTimetable() {
   }
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div>
-          <h2 className="text-xl font-semibold text-zinc-900 dark:text-zinc-100">
-            Class Timetable
-          </h2>
-          <p className="text-sm text-zinc-500 dark:text-zinc-400 mt-0.5">
-            View your children&apos;s weekly schedules
-          </p>
+    <div className="space-y-6 select-none animate-fade-in">
+      <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 border-b border-zinc-200/60 dark:border-zinc-800/60 pb-5">
+        <div className="space-y-3.5 text-left">
+          <div className="flex items-center gap-2">
+            <CalendarDays className="size-5 text-amber-600" />
+            <h2 className="text-lg font-semibold text-zinc-900 dark:text-zinc-100 uppercase tracking-tight">
+              Class Timetable
+            </h2>
+          </div>
+          {/* Children Selector */}
+          <ChildSelector 
+            students={children} 
+            selectedStudentId={selectedChildId} 
+            onSelect={setSelectedChildId} 
+          />
         </div>
-
-        {children.length > 1 && (
-          <Select value={selectedChildId} onValueChange={setSelectedChildId}>
-            <SelectTrigger className="w-full sm:w-48">
-              <SelectValue placeholder="Select child" />
-            </SelectTrigger>
-            <SelectContent>
-              {children.map((child) => (
-                <SelectItem key={child.id} value={child.id}>
-                  {child.name}, {child.className}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        )}
       </div>
 
       {/* Summary */}

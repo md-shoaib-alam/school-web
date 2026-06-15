@@ -65,14 +65,14 @@ function useDashboardNotices(tenantId: string) {
   })
 }
 
-export function useTeacherDashboard(teacherName: string) {
+export function useTeacherDashboard(teacherName: string, options?: { enabled?: boolean }) {
   return useQuery({
     queryKey: queryKeys.teacherDashboard(teacherName),
     queryFn: () => graphqlQuery<{ teacherDashboard: TeacherDashboardData }>(TEACHER_DASHBOARD, { teacherName })
       .then(d => d.teacherDashboard),
     staleTime: 60 * 1000,
     refetchInterval: 5 * 60 * 1000,
-    enabled: !!teacherName && teacherName.trim().length > 0,
+    enabled: (options?.enabled !== false) && !!teacherName && teacherName.trim().length > 0,
     retry: 2,
     retryDelay: (attempt) => Math.min(1000 * 2 ** attempt, 10000),
   })

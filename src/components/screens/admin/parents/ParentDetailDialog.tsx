@@ -19,7 +19,12 @@ import {
   Sparkles,
   Users,
   Link as LinkIcon,
+  Copy,
+  Check,
 } from "lucide-react";
+import { useState } from "react";
+import { toast } from "sonner";
+import { copyToClipboard } from "@/lib/utils";
 import { ParentInfo, getAvatarColor, getInitials } from "./types";
 
 interface ParentDetailDialogProps {
@@ -35,7 +40,16 @@ export function ParentDetailDialog({
   parent,
   onLinkClick,
 }: ParentDetailDialogProps) {
+  const [copiedField, setCopiedField] = useState<string | null>(null);
+
   if (!parent) return null;
+
+  const handleCopy = (text: string, fieldName: string) => {
+    copyToClipboard(text);
+    setCopiedField(fieldName);
+    setTimeout(() => setCopiedField(null), 2000);
+    toast.success(`${fieldName} copied to clipboard`);
+  };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -79,21 +93,55 @@ export function ParentDetailDialog({
             </h3>
             <div className="space-y-3">
               {/* Email */}
-              <div className="flex items-center gap-3 p-3 rounded-xl bg-secondary/10 border border-secondary/20">
-                <Mail className="size-4 text-emerald-600 shrink-0" />
-                <div className="min-w-0">
-                  <p className="text-[10px] text-muted-foreground font-medium uppercase leading-none">Email Address</p>
-                  <p className="text-sm font-semibold text-foreground truncate mt-1">{parent.email}</p>
+              <div className="flex items-center justify-between p-3 rounded-xl bg-secondary/10 border border-secondary/20">
+                <div className="flex items-center gap-3 min-w-0 flex-1">
+                  <Mail className="size-4 text-emerald-600 shrink-0" />
+                  <div className="min-w-0">
+                    <p className="text-[10px] text-muted-foreground font-medium uppercase leading-none">Email Address</p>
+                    <p className="text-sm font-semibold text-foreground truncate mt-1">{parent.email}</p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-1 shrink-0 ml-2">
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="size-8 text-muted-foreground hover:text-emerald-600"
+                    onClick={() => handleCopy(parent.email, 'Email')}
+                  >
+                    {copiedField === 'Email' ? (
+                      <Check className="size-3.5 text-emerald-600" />
+                    ) : (
+                      <Copy className="size-3.5" />
+                    )}
+                  </Button>
                 </div>
               </div>
 
               {/* Phone */}
-              <div className="flex items-center gap-3 p-3 rounded-xl bg-secondary/10 border border-secondary/20">
-                <Phone className="size-4 text-emerald-600 shrink-0" />
-                <div className="min-w-0">
-                  <p className="text-[10px] text-muted-foreground font-medium uppercase leading-none">Phone Number</p>
-                  <p className="text-sm font-semibold text-foreground truncate mt-1">{parent.phone || "—"}</p>
+              <div className="flex items-center justify-between p-3 rounded-xl bg-secondary/10 border border-secondary/20">
+                <div className="flex items-center gap-3 min-w-0 flex-1">
+                  <Phone className="size-4 text-emerald-600 shrink-0" />
+                  <div className="min-w-0">
+                    <p className="text-[10px] text-muted-foreground font-medium uppercase leading-none">Phone Number</p>
+                    <p className="text-sm font-semibold text-foreground truncate mt-1">{parent.phone || "—"}</p>
+                  </div>
                 </div>
+                {parent.phone && parent.phone !== "—" && (
+                  <div className="flex items-center gap-1 shrink-0 ml-2">
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="size-8 text-muted-foreground hover:text-emerald-600"
+                      onClick={() => handleCopy(parent.phone || '', 'Phone')}
+                    >
+                      {copiedField === 'Phone' ? (
+                        <Check className="size-3.5 text-emerald-600" />
+                      ) : (
+                        <Copy className="size-3.5" />
+                      )}
+                    </Button>
+                  </div>
+                )}
               </div>
 
               {/* Occupation */}

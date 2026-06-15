@@ -25,7 +25,7 @@ export function PerformanceChart({ data }: PerformanceChartProps) {
   }, []);
 
   return (
-    <Card className="rounded-xl shadow-sm shadow-none border-zinc-100 dark:border-zinc-800">
+    <Card className="rounded-xl shadow-sm shadow-none border-zinc-100 dark:border-zinc-800 h-full">
       <CardHeader className="p-4 pb-0">
         <CardTitle className="text-sm font-semibold flex items-center gap-2 text-left">
           <BarChart3 className="size-4 text-amber-600" />
@@ -47,30 +47,32 @@ export function PerformanceChart({ data }: PerformanceChartProps) {
                 return (
                   <BarChart
                     data={data}
-                    layout="vertical"
-                    margin={{ left: 10, right: 20, top: 5, bottom: 5 }}
+                    layout="horizontal"
+                    margin={{ left: 0, right: 0, top: 10, bottom: 30 }}
                   >
                     <CartesianGrid
                       strokeDasharray="3 3"
-                      horizontal={false}
+                      vertical={false}
                     />
                     <XAxis
-                      type="number"
-                      domain={[0, 100]}
-                      tickFormatter={(v) => `${v}%`}
-                    />
-                    <YAxis
                       type="category"
                       dataKey="subject"
-                      width={80}
-                      tick={{ fontSize: 12 }}
+                      tick={{ fontSize: 11 }}
+                      interval={0}
+                      height={50}
+                    />
+                    <YAxis
+                      type="number"
+                      domain={[0, 100]}
+                      tick={{ fontSize: 11 }}
+                      tickFormatter={(v) => `${v}%`}
                     />
                     <ChartTooltip content={<ChartTooltipContent />} />
                     <Bar
                       dataKey="percentage"
                       fill="var(--color-percentage)"
-                      radius={[0, 4, 4, 0]}
-                      maxBarSize={24}
+                      radius={[4, 4, 0, 0]}
+                      maxBarSize={32}
                     />
                   </BarChart>
                 );

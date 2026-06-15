@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useMemo, useCallback, useReducer } from 'react';
+import { useState, useEffect, useMemo, useCallback, useReducer, useRef } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -18,7 +18,7 @@ import {
 import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
-import { Search, Receipt, Banknote, Eye, Trash2, Printer, CheckCircle2, Calendar as CalendarIcon } from 'lucide-react';
+import { Search, Receipt, Banknote, Eye, Trash2, Printer, CheckCircle2, Calendar as CalendarIcon, CreditCard, Wallet, Coins } from 'lucide-react';
 import { toast } from "sonner";
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiFetch } from '@/lib/api';
@@ -28,6 +28,8 @@ import type { FeeReceipt, StudentOption } from './types';
 import { format } from 'date-fns';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Calendar } from '@/components/ui/calendar';
+import { useReactToPrint } from 'react-to-print';
+import { AdminReceiptTemplate } from './AdminReceiptTemplate';
 
 interface CheckReceiptTabProps {
   canEdit: boolean;
@@ -101,6 +103,7 @@ export function CheckReceiptTab({ canEdit, canDelete }: CheckReceiptTabProps) {
   const [state, dispatch] = useReducer(reducer, initialState);
   const [isFromCalendarOpen, setIsFromCalendarOpen] = useState(false);
   const [isToCalendarOpen, setIsToCalendarOpen] = useState(false);
+  const printRef = useRef<HTMLDivElement>(null);
 
   const {
     search,
@@ -114,7 +117,7 @@ export function CheckReceiptTab({ canEdit, canDelete }: CheckReceiptTabProps) {
     deleting,
   } = state;
 
-  const limit = 10;
+  const limit = 30;
 
   // Debounce search
   useEffect(() => {
@@ -147,24 +150,46 @@ export function CheckReceiptTab({ canEdit, canDelete }: CheckReceiptTabProps) {
   });
 
   const { data: studentsData, isLoading: loadingStudents } = useQuery<{ items: StudentOption[] }>({
-    queryKey: ['students-min'],
+    queryKey: ['students-min', classFilter],
+    enabled: !!classFilter,
     queryFn: async () => {
-      const res = await apiFetch('/api/students?mode=min&limit=5000');
+      const res = await apiFetch(`/api/students?mode=min&classId=${classFilter}`);
       return res.json();
     }
   });
-  const allStudents = studentsData?.items || [];
-
-  const filteredStudents = useMemo(() => {
-    if (!classFilter) return [];
-    return allStudents.filter(s => s.classId === classFilter);
-  }, [allStudents, classFilter]);
+  const filteredStudents = studentsData?.items || [];
 
   const loading = loadingReceipts;
 
-  const handlePrint = () => {
-    window.print();
-  };
+  const handlePrint = useReactToPrint({
+    contentRef: printRef,
+    documentTitle: `Receipt_${viewReceipt?.receiptNumber || 'print'}`,
+  });
+
+  const { data: studentFullDetails } = useQuery<any>({
+    queryKey: ['student-full-receipt', viewReceipt?.studentId],
+    enabled: !!viewReceipt?.studentId,
+    queryFn: async () => {
+      const res = await apiFetch(`/api/students/${viewReceipt?.studentId}`);
+      if (!res.ok) throw new Error("Failed to fetch");
+      return res.json();
+    }
+  });
+
+  const { data: pendingFees = [] } = useQuery<any[]>({
+    queryKey: ['student-pending-fees-receipt', viewReceipt?.studentId],
+    enabled: !!viewReceipt?.studentId,
+    queryFn: async () => {
+      const res = await apiFetch(`/api/fees?studentId=${viewReceipt?.studentId}&status=pending,overdue,partially_paid`);
+      if (!res.ok) throw new Error("Failed to fetch");
+      const data = await res.json();
+      return data.items || [];
+    }
+  });
+
+  const remainingAmount = pendingFees?.reduce((sum: number, fee: any) => sum + (fee.amount - fee.paidAmount - fee.concession), 0) || 0;
+
+
 
   const handleDelete = async (id: string) => {
     dispatch({ type: 'SET_DELETING', payload: true });
@@ -179,8 +204,17 @@ export function CheckReceiptTab({ canEdit, canDelete }: CheckReceiptTabProps) {
     dispatch({ type: 'SET_DELETING', payload: false });
   };
 
+  const formatReceiptNumber = (num: string) => {
+    if (!num) return '';
+    const parts = num.split('-');
+    if (parts.length >= 3) {
+      return `${parts[0]}-...-${parts[parts.length - 1]}`;
+    }
+    return num.length > 12 ? `${num.slice(0, 6)}...${num.slice(-4)}` : num;
+  };
+
   return (
-    <div className="space-y-4">
+    <div className="space-y-6">
       {/* Filters */}
       <div className="flex flex-col lg:flex-row gap-3 items-start lg:items-center">
         <div className="relative w-full lg:max-w-xs">
@@ -210,12 +244,12 @@ export function CheckReceiptTab({ canEdit, canDelete }: CheckReceiptTabProps) {
             </SelectContent>
           </Select>
         </div>
-        <div className="flex flex-col sm:flex-row gap-2 w-full lg:w-auto">
+        <div className="flex flex-row gap-2 w-full lg:w-auto">
           <Popover open={isFromCalendarOpen} onOpenChange={setIsFromCalendarOpen}>
             <PopoverTrigger asChild>
-              <Button variant="outline" className="w-full sm:w-36 justify-start text-left font-normal bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800 h-9 px-3">
-                <CalendarIcon className="mr-2 h-3.5 w-3.5 text-muted-foreground" />
-                <span className="text-xs truncate">{fromDate ? format(new Date(fromDate), "PP") : "From date"}</span>
+              <Button variant="outline" className="flex-1 lg:w-36 justify-start text-left font-normal bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800 h-9 px-3">
+                <CalendarIcon className="mr-2 h-3.5 w-3.5 text-muted-foreground shrink-0" />
+                <span className="text-xs truncate">{fromDate ? format(new Date(fromDate), "PP") : "From"}</span>
               </Button>
             </PopoverTrigger>
             <PopoverContent className="w-auto p-0" align="start">
@@ -232,9 +266,9 @@ export function CheckReceiptTab({ canEdit, canDelete }: CheckReceiptTabProps) {
           </Popover>
           <Popover open={isToCalendarOpen} onOpenChange={setIsToCalendarOpen}>
             <PopoverTrigger asChild>
-              <Button variant="outline" className="w-full sm:w-36 justify-start text-left font-normal bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800 h-9 px-3">
-                <CalendarIcon className="mr-2 h-3.5 w-3.5 text-muted-foreground" />
-                <span className="text-xs truncate">{toDate ? format(new Date(toDate), "PP") : "To date"}</span>
+              <Button variant="outline" className="flex-1 lg:w-36 justify-start text-left font-normal bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800 h-9 px-3">
+                <CalendarIcon className="mr-2 h-3.5 w-3.5 text-muted-foreground shrink-0" />
+                <span className="text-xs truncate">{toDate ? format(new Date(toDate), "PP") : "To"}</span>
               </Button>
             </PopoverTrigger>
             <PopoverContent className="w-auto p-0" align="start">
@@ -267,12 +301,12 @@ export function CheckReceiptTab({ canEdit, canDelete }: CheckReceiptTabProps) {
             </div>
           ) : (
             <>
-              <div className="overflow-x-auto">
+              <div className="overflow-x-auto scrollbar-thin scrollbar-thumb-zinc-200 dark:scrollbar-thumb-zinc-800 scrollbar-track-transparent scroll-smooth">
                 <Table>
                   <TableHeader>
                     <TableRow className="bg-muted/50">
-                      <TableHead className="w-[120px] pl-6 h-12">Receipt #</TableHead>
-                      <TableHead className="h-12">Student</TableHead>
+                      <TableHead className="hidden sm:table-cell w-[120px] pl-6 h-12">Receipt #</TableHead>
+                      <TableHead className="h-12 pl-6 sm:pl-4">Student</TableHead>
                       <TableHead className="hidden sm:table-cell h-12">Amount</TableHead>
                       <TableHead className="hidden md:table-cell h-12">Method</TableHead>
                       <TableHead className="hidden md:table-cell h-12">Date</TableHead>
@@ -291,8 +325,12 @@ export function CheckReceiptTab({ canEdit, canDelete }: CheckReceiptTabProps) {
                       const statusCfg = receiptStatusConfig[r.status] || receiptStatusConfig.completed;
                       return (
                         <TableRow key={r.id} className="hover:bg-emerald-50/50 dark:hover:bg-emerald-900/10 transition-colors">
-                          <TableCell className="pl-6 py-4"><span className="font-mono text-xs font-semibold text-emerald-700 dark:text-emerald-400">{r.receiptNumber}</span></TableCell>
-                          <TableCell className="font-medium text-sm py-4">{r.studentName}</TableCell>
+                          <TableCell className="hidden sm:table-cell pl-6 py-4">
+                            <span className="font-mono text-xs font-semibold text-emerald-700 dark:text-emerald-400" title={r.receiptNumber}>
+                              {formatReceiptNumber(r.receiptNumber)}
+                            </span>
+                          </TableCell>
+                          <TableCell className="font-medium text-sm py-4 pl-6 sm:pl-4">{r.studentName}</TableCell>
                           <TableCell className="hidden sm:table-cell font-semibold py-4">₹{r.paidAmount.toLocaleString()}</TableCell>
                           <TableCell className="hidden md:table-cell py-4">
                             <div className="flex items-center gap-1.5 text-muted-foreground">
@@ -303,23 +341,15 @@ export function CheckReceiptTab({ canEdit, canDelete }: CheckReceiptTabProps) {
                           <TableCell className="hidden md:table-cell text-xs text-muted-foreground py-4">{r.paidDate}</TableCell>
                           <TableCell className="py-4"><Badge variant="outline" className={`${statusCfg.bg} border-0 capitalize text-[10px] px-2 h-5`}>{r.status}</Badge></TableCell>
                           <TableCell className="text-center py-4">
-                            <div className="flex items-center justify-center gap-1">
-                              <Button variant="ghost" size="icon" className="size-7 text-emerald-500 hover:text-emerald-600 hover:bg-emerald-50" onClick={() => dispatch({ type: 'SET_VIEW_RECEIPT', payload: r })}><Eye className="size-3.5" /></Button>
-                              {canDelete && (
-                                <AlertDialog>
-                                  <AlertDialogTrigger asChild>
-                                    <Button variant="ghost" size="icon" className="size-7 text-red-400 hover:text-red-600 hover:bg-red-50"><Trash2 className="size-3.5" /></Button>
-                                  </AlertDialogTrigger>
-                                  <AlertDialogContent>
-                                    <AlertDialogHeader><AlertDialogTitle>Delete Receipt</AlertDialogTitle><AlertDialogDescription>Delete receipt {r.receiptNumber}? This action cannot be undone.</AlertDialogDescription></AlertDialogHeader>
-                                    <AlertDialogFooter>
-                                      <AlertDialogCancel>Cancel</AlertDialogCancel>
-                                      <AlertDialogAction onClick={() => handleDelete(r.id)} disabled={deleting} className="bg-red-600 hover:bg-red-700">{deleting ? 'Deleting...' : 'Delete'}</AlertDialogAction>
-                                    </AlertDialogFooter>
-                                  </AlertDialogContent>
-                                </AlertDialog>
-                              )}
-                            </div>
+                            <Button 
+                              variant="outline" 
+                              size="sm" 
+                              className="h-8 text-xs text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50 bg-emerald-50/30 border-emerald-100 dark:border-emerald-900/50 gap-2 px-3 font-semibold transition-all" 
+                              onClick={() => dispatch({ type: 'SET_VIEW_RECEIPT', payload: r })}
+                            >
+                              <Printer className="size-3.5" />
+                              <span>Print</span>
+                            </Button>
                           </TableCell>
                         </TableRow>
                       );
@@ -329,8 +359,8 @@ export function CheckReceiptTab({ canEdit, canDelete }: CheckReceiptTabProps) {
               </div>
 
               {/* Pagination UI */}
-              {totalPages > 1 && (
-                <div className="flex items-center justify-between px-6 py-4 border-t bg-muted/30">
+              {totalItems > 0 && (
+                <div className="flex items-center justify-between px-6 py-4 border-t bg-transparent">
                   <span className="text-xs text-muted-foreground">
                     Showing {(page - 1) * limit + 1} to {Math.min(page * limit, totalItems)} of {totalItems}
                   </span>
@@ -345,13 +375,14 @@ export function CheckReceiptTab({ canEdit, canDelete }: CheckReceiptTabProps) {
                       Previous
                     </Button>
                     <div className="flex items-center gap-1">
-                      {[...Array(totalPages)].map((_, i) => (
+                      {totalPages > 0 && [...Array(totalPages)].map((_, i) => (
                         <Button
                           key={i + 1}
                           variant={page === i + 1 ? "default" : "outline"}
                           size="sm"
                           className={`size-8 text-xs p-0 ${page === i + 1 ? 'bg-emerald-600 hover:bg-emerald-700' : ''}`}
                           onClick={() => dispatch({ type: 'SET_PAGE', payload: i + 1 })}
+                          disabled={page === i + 1}
                         >
                           {i + 1}
                         </Button>
@@ -373,7 +404,6 @@ export function CheckReceiptTab({ canEdit, canDelete }: CheckReceiptTabProps) {
           )}
         </CardContent>
       </Card>
-
       {/* View Receipt Dialog */}
       <Dialog open={!!viewReceipt} onOpenChange={() => dispatch({ type: 'SET_VIEW_RECEIPT', payload: null })}>
         <DialogContent className="sm:max-w-lg">
@@ -424,12 +454,25 @@ export function CheckReceiptTab({ canEdit, canDelete }: CheckReceiptTabProps) {
               )}
             </div>
           )}
-          <DialogFooter className="gap-2 sm:gap-0">
+          <DialogFooter className="flex gap-3 sm:gap-3 mt-4">
             <Button variant="outline" className="flex-1 sm:flex-none" onClick={handlePrint}><Printer className="size-4 mr-2" />Print</Button>
             <Button variant="default" className="flex-1 sm:flex-none bg-emerald-600 hover:bg-emerald-700" onClick={() => dispatch({ type: 'SET_VIEW_RECEIPT', payload: null })}>Close</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Hidden Receipt for Printing */}
+      <div className="hidden">
+        {viewReceipt && (
+          <AdminReceiptTemplate 
+            ref={printRef}
+            receipt={viewReceipt}
+            parentName={studentFullDetails?.parentName}
+            className={studentFullDetails?.className}
+            remainingAmount={remainingAmount}
+          />
+        )}
+      </div>
     </div>
   );
 }

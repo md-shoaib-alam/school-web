@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
@@ -38,6 +38,13 @@ interface LinkChildDialogProps {
   loading?: boolean; // New prop
   onLinkChild: (studentId: string) => void;
   onUnlinkChild: (parentId: string, studentId: string) => void;
+  searchQuery: string;
+  onSearchQueryChange: (q: string) => void;
+  hasNextPage?: boolean;
+  fetchNextPage?: () => void;
+  isFetchingNextPage?: boolean;
+  unlinkedOnly?: boolean;
+  onUnlinkedOnlyChange?: (val: boolean) => void;
 }
 
 export function LinkChildDialog({
@@ -52,16 +59,39 @@ export function LinkChildDialog({
   loading = false, // Default to false
   onLinkChild,
   onUnlinkChild,
+  searchQuery,
+  onSearchQueryChange: setSearchQuery,
+  hasNextPage = false,
+  fetchNextPage,
+  isFetchingNextPage = false,
+  unlinkedOnly = true,
+  onUnlinkedOnlyChange: setUnlinkedOnly,
 }: LinkChildDialogProps) {
-  const [searchQuery, setSearchQuery] = useState("");
-  const [unlinkedOnly, setUnlinkedOnly] = useState(true);
   const [linkingStudentId, setLinkingStudentId] = useState<string | null>(null);
+  const triggerRef = useRef<HTMLDivElement | null>(null);
+
+  // Infinite scroll trigger using IntersectionObserver
+  useEffect(() => {
+    if (!hasNextPage || isFetchingNextPage || !fetchNextPage) return;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting) {
+          fetchNextPage();
+        }
+      },
+      { threshold: 0.1 }
+    );
+    const target = triggerRef.current;
+    if (target) observer.observe(target);
+    return () => {
+      if (target) observer.unobserve(target);
+    };
+  }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
 
   // Reset search and toggle when dialog open state changes
   useEffect(() => {
     if (!open) {
       setSearchQuery("");
-      setUnlinkedOnly(true);
       setLinkingStudentId(null);
     }
   }, [open]);
@@ -75,13 +105,10 @@ export function LinkChildDialog({
 
   const searchedStudents = useMemo(() => {
     let list = filteredStudents;
-    if (unlinkedOnly) {
-      list = filteredStudents.filter((s) => !s.parentId);
-    }
     if (!searchQuery.trim()) return list;
     const q = searchQuery.toLowerCase();
     return list.filter((s) => s.name.toLowerCase().includes(q));
-  }, [filteredStudents, searchQuery, unlinkedOnly]);
+  }, [filteredStudents, searchQuery]);
 
   const sortedClasses = useMemo(() => {
     return [...classes].sort((a, b) => {
@@ -102,7 +129,7 @@ export function LinkChildDialog({
 
         <ScrollArea className="flex-1 min-h-0 pr-3">
           <div className="space-y-4 sm:space-y-6 py-1">
-            {selectedParent && selectedParent.children.length > 0 && (
+            {selectedParent && selectedParent.children && selectedParent.children.length > 0 && (
               <>
                 <div className="space-y-2">
                   <Label className="text-xs font-semibold text-zinc-500 dark:text-zinc-400">
@@ -260,6 +287,12 @@ export function LinkChildDialog({
                       )}
                     </div>
                   ))}
+                  {hasNextPage && (
+                    <div ref={triggerRef} className="py-4 flex justify-center items-center gap-2">
+                      <Loader2 className="size-4 animate-spin text-blue-500" />
+                      <span className="text-xs text-zinc-500">Loading more students...</span>
+                    </div>
+                  )}
                 </div>
               )}
             </div>

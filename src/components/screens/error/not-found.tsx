@@ -22,7 +22,7 @@ export function NotFoundScreen() {
 
   const handleLogout = () => {
     logout();
-    push("/");
+    window.location.href = "/";
   };
 
   return (

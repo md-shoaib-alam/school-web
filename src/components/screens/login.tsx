@@ -27,6 +27,7 @@ import {
   Lock,
   Loader2,
   School,
+  Phone,
 } from "lucide-react";
 import { toast } from "sonner";
 import { loginWithElysia } from "@/lib/api";
@@ -38,7 +39,7 @@ function ThemeToggleLogin() {
     <Button
       variant="ghost"
       size="icon"
-      className="absolute top-4 right-4 size-10 rounded-full hover:bg-white/20 dark:hover:bg-black/20 text-zinc-600 dark:text-zinc-300 z-10"
+      className="absolute top-4 right-4 size-10 rounded-full hover:bg-white/20 dark:hover:bg-black/20 text-zinc-600 dark:text-zinc-300 z-10 cursor-pointer"
       onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
       aria-label="Toggle theme"
       suppressHydrationWarning
@@ -54,6 +55,7 @@ export function LoginScreen() {
   const { login, setCurrentScreen } = useAppStore();
 
   // Login state
+  const [loginMode, setLoginMode] = useState<"email" | "id">("id");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -61,15 +63,34 @@ export function LoginScreen() {
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!email.trim() || !password.trim()) {
-      toast.error("Please enter both email and password");
+    const identifier = email.trim();
+    
+    if (!identifier || !password.trim()) {
+      toast.error(
+        loginMode === "email"
+          ? "Please enter both Email ID and password"
+          : "Please enter both School ID/Phone and password"
+      );
+      return;
+    }
+
+    // Validate format based on mode
+    const isEmailFormat = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(identifier);
+    
+    if (loginMode === "id" && isEmailFormat) {
+      toast.error("Invalid School ID/Phone or password");
+      return;
+    }
+    
+    if (loginMode === "email" && !isEmailFormat) {
+      toast.error("Please enter a valid email address.");
       return;
     }
 
     setLoading(true);
     
     // Create the login promise
-    const loginPromise = loginWithElysia(email.trim(), password.trim());
+    const loginPromise = loginWithElysia(identifier, password.trim());
 
     toast.promise(loginPromise, {
       loading: "Authenticating...",
@@ -95,7 +116,7 @@ export function LoginScreen() {
         });
 
         const tenantId = userData.tenantSlug || userData.tenantId;
-        const dashboardUrl = tenantId ? `/${tenantId}` : "/";
+        const dashboardUrl = tenantId ? `/${tenantId}/dashboard` : "/dashboard";
         
         // Use window.location.href for a clean entry after login
         window.location.href = dashboardUrl;
@@ -163,21 +184,29 @@ export function LoginScreen() {
                   htmlFor="login-email"
                   className="text-sm font-semibold pl-1 text-zinc-700 dark:text-zinc-300/90"
                 >
-                  Email or Mobile Number
+                  {loginMode === "email" ? "Email Address" : "School ID or Mobile Number"}
                 </Label>
                 <div className="relative group">
                   <div className="absolute left-3.5 top-1/2 -translate-y-1/2 flex items-center gap-1 text-zinc-400 group-focus-within:text-rose-500 transition-colors duration-200">
-                    <Mail className="size-4" />
-                    <span className="text-xs">/</span>
-                    <School className="size-4" />
+                    {loginMode === "email" ? (
+                      <Mail className="size-4" />
+                    ) : (
+                      <>
+                        <School className="size-4" />
+                        <span className="text-xs">/</span>
+                        <Phone className="size-4" />
+                      </>
+                    )}
                   </div>
                   <Input
                     id="login-email"
                     type="text"
-                    placeholder="Email or Mobile"
+                    placeholder={loginMode === "email" ? "Email Address" : "School ID or Mobile"}
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    className="bg-zinc-50/50 dark:bg-[#0c0c0e]/70 dark:border-zinc-800/60 dark:text-zinc-100 pl-16 h-12 rounded-xl focus:ring-rose-500/15 focus:border-rose-500 dark:focus:ring-rose-500/20 dark:focus:border-rose-500/60 transition-all duration-200 placeholder:text-zinc-400/70"
+                    className={`bg-zinc-50/50 dark:bg-[#0c0c0e]/70 dark:border-zinc-800/60 dark:text-zinc-100 ${
+                      loginMode === "email" ? "pl-11" : "pl-16"
+                    } h-12 rounded-xl focus:ring-rose-500/15 focus:border-rose-500 dark:focus:ring-rose-500/20 dark:focus:border-rose-500/60 transition-all duration-200 placeholder:text-zinc-400/70`}
                     autoComplete="username"
                     required
                   />
@@ -185,21 +214,12 @@ export function LoginScreen() {
               </div>
 
               <div className="space-y-2">
-                <div className="flex items-center justify-between px-1">
-                  <Label
-                    htmlFor="login-password"
-                    className="text-sm font-semibold text-zinc-700 dark:text-zinc-300/90"
-                  >
-                    Password
-                  </Label>
-                  <button
-                    type="button"
-                    onClick={() => (window.location.href = "/reset-password")}
-                    className="text-xs font-semibold text-rose-500 hover:text-rose-600 dark:text-rose-400/90 dark:hover:text-rose-300 transition-colors duration-200"
-                  >
-                    Forgot password?
-                  </button>
-                </div>
+                <Label
+                  htmlFor="login-password"
+                  className="text-sm font-semibold pl-1 text-zinc-700 dark:text-zinc-300/90"
+                >
+                  Password
+                </Label>
                 <div className="relative group">
                   <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 size-5 text-zinc-400 group-focus-within:text-rose-500 transition-colors duration-200" />
                   <Input
@@ -224,22 +244,46 @@ export function LoginScreen() {
                     )}
                   </button>
                 </div>
+                <div className="flex justify-end px-1 pt-1">
+                  <button
+                    type="button"
+                    onClick={() => (window.location.href = "/reset-password")}
+                    className="text-xs font-semibold text-rose-500 hover:text-rose-600 dark:text-rose-400/90 dark:hover:text-rose-300 transition-colors duration-200 cursor-pointer"
+                  >
+                    Forgot password?
+                  </button>
+                </div>
               </div>
 
-              <Button
-                type="submit"
-                disabled={loading}
-                className="w-full bg-zinc-900 hover:bg-zinc-850 dark:bg-rose-600 dark:hover:bg-rose-500 text-white h-12 text-base font-bold rounded-xl shadow-lg shadow-rose-500/10 hover:shadow-rose-500/20 transition-all duration-250 active:scale-[0.97] cursor-pointer"
-              >
-                {loading ? (
-                  <>
-                    <Loader2 className="size-5 mr-2 animate-spin" />
-                    Authenticating...
-                  </>
-                ) : (
-                  "Sign In"
-                )}
-              </Button>
+              <div className="space-y-4">
+                <Button
+                  type="submit"
+                  disabled={loading}
+                  className="w-full bg-zinc-900 hover:bg-zinc-850 dark:bg-rose-600 dark:hover:bg-rose-500 text-white h-12 text-base font-bold rounded-xl shadow-lg shadow-rose-500/10 hover:shadow-rose-500/20 transition-all duration-250 active:scale-[0.97] cursor-pointer"
+                >
+                  {loading ? (
+                    <>
+                      <Loader2 className="size-5 mr-2 animate-spin" />
+                      Authenticating...
+                    </>
+                  ) : (
+                    "Sign In"
+                  )}
+                </Button>
+
+                <div className="flex justify-center pt-1">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setLoginMode(loginMode === "email" ? "id" : "email");
+                      setEmail("");
+                    }}
+                    className="text-sm font-semibold text-rose-500 hover:text-rose-600 dark:text-rose-400/90 dark:hover:text-rose-300 transition-colors duration-200 cursor-pointer"
+                  >
+                    {loginMode === "email" ? "Login by School ID/Phone" : "Login by Email ID"}
+                  </button>
+                </div>
+              </div>
             </form>
           </CardContent>
         </Card>

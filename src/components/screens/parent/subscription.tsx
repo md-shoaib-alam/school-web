@@ -259,7 +259,7 @@ export function ParentSubscription() {
   };
 
 
-  const currentPlanId = activeSubscription?.planId || "basic";
+  const currentPlanId = (activeSubscription?.planId || activeSubscription?.planName?.toLowerCase().replace(" plan", "") || "basic").toLowerCase();
 
   if (loading) {
     return (

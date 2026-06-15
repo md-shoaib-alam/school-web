@@ -1,6 +1,6 @@
 "use client";
 
-import { useReducer, useEffect, useMemo } from "react";
+import { useReducer, useEffect, useMemo, useState } from "react";
 import { useViewMode } from "@/hooks/use-view-mode";
 import { toast } from "sonner";
 import api from "@/lib/axios";
@@ -9,10 +9,20 @@ import {
   useParents,
   useClassesMin,
 } from "@/lib/graphql/hooks/academic.hooks";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery, useQueryClient, useInfiniteQuery } from "@tanstack/react-query";
 import { queryKeys } from "@/lib/graphql/keys";
 import { Pagination } from "@/components/shared/pagination";
 import { useDebounce } from "@/hooks/use-debounce";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 // Sub-components
 import { ParentsHeader } from "./parents/ParentsHeader";
@@ -29,6 +39,7 @@ import { ParentInfo, StudentInfo } from "./parents/types";
 type State = {
   search: string;
   currentPage: number;
+  itemsPerPage: number;
   linkOpen: boolean;
   selectedParent: ParentInfo | null;
   selectedClass: string;
@@ -51,6 +62,7 @@ type State = {
 type Action =
   | { type: 'SET_SEARCH'; payload: string }
   | { type: 'SET_CURRENT_PAGE'; payload: number }
+  | { type: 'SET_ITEMS_PER_PAGE'; payload: number }
   | { type: 'SET_LINK_OPEN'; payload: boolean }
   | { type: 'OPEN_LINK_DIALOG'; payload: ParentInfo }
   | { type: 'SET_SELECTED_CLASS'; payload: string }
@@ -69,6 +81,7 @@ type Action =
 const initialState: State = {
   search: "",
   currentPage: 1,
+  itemsPerPage: 15,
   linkOpen: false,
   selectedParent: null,
   selectedClass: "all",
@@ -92,6 +105,7 @@ function reducer(state: State, action: Action): State {
   switch (action.type) {
     case 'SET_SEARCH': return { ...state, search: action.payload, currentPage: 1 };
     case 'SET_CURRENT_PAGE': return { ...state, currentPage: action.payload };
+    case 'SET_ITEMS_PER_PAGE': return { ...state, itemsPerPage: action.payload, currentPage: 1 };
     case 'SET_LINK_OPEN': return { ...state, linkOpen: action.payload };
     case 'OPEN_LINK_DIALOG': return { ...state, selectedParent: action.payload, linkOpen: true, selectedClass: "all" };
     case 'SET_SELECTED_CLASS': return { ...state, selectedClass: action.payload };
@@ -128,43 +142,58 @@ export function AdminParents() {
 
   const [state, dispatch] = useReducer(reducer, initialState);
   const {
-    search, currentPage, linkOpen, selectedParent: stateSelectedParent, selectedClass,
+    search, currentPage, itemsPerPage, linkOpen, selectedParent: stateSelectedParent, selectedClass,
     linking, createOpen, createForm, creating, editOpen,
     editingParent, editForm, editing, detailOpen, selectedParentDetail: stateSelectedParentDetail
   } = state;
 
   const debouncedSearch = useDebounce(search, 500);
 
+  const [unlinkConfirmOpen, setUnlinkConfirmOpen] = useState(false);
+  const [unlinkData, setUnlinkData] = useState<{ parentId: string; studentId: string } | null>(null);
+
   // Queries
   const { 
     data: parentsData, 
     isLoading: loadingParents 
-  } = useParents(currentTenantId || undefined, debouncedSearch || undefined, currentPage, 15);
+  } = useParents(currentTenantId || undefined, debouncedSearch || undefined, currentPage, itemsPerPage);
 
   const { data: classesData } = useClassesMin(currentTenantId || undefined);
 
   // Students for linking (filtered by class if selected) - Using optimized min-data REST API
+  const [studentSearch, setStudentSearch] = useState("");
+  const debouncedStudentSearch = useDebounce(studentSearch, 500);
+  const [unlinkedOnly, setUnlinkedOnly] = useState(true);
+
   const { 
     data: studentData, 
     isLoading: loadingStudents,
-    isFetching: fetchingStudents
-  } = useQuery({
-    queryKey: ['students-min', selectedClass],
-    queryFn: async () => {
+    isFetchingNextPage: fetchingNextPage,
+    hasNextPage,
+    fetchNextPage
+  } = useInfiniteQuery({
+    queryKey: ['students-min-infinite', selectedClass, debouncedStudentSearch, unlinkedOnly],
+    queryFn: async ({ pageParam = 1 }) => {
       try {
-        const params: any = { mode: 'min', limit: '1000' };
+        const params: any = { mode: 'min', limit: 50, page: pageParam, unlinkedOnly: unlinkedOnly ? 'true' : 'false' };
         if (selectedClass && selectedClass !== 'all') params.classId = selectedClass;
+        if (debouncedStudentSearch) params.search = debouncedStudentSearch;
         const res = await api.get('/students', { params });
         const data = res as any;
-        return (data?.items ? data : { items: [] }) as { items: StudentInfo[] };
+        return (data?.items ? data : { items: [], hasMore: false, page: 1 }) as { items: StudentInfo[]; hasMore: boolean; page: number };
       } catch (err) {
         console.error("Failed to fetch students for linking:", err);
-        return { items: [] } as { items: StudentInfo[] };
+        return { items: [], hasMore: false, page: 1 } as { items: StudentInfo[]; hasMore: boolean; page: number };
       }
     },
+    initialPageParam: 1,
+    getNextPageParam: (lastPage, allPages) => {
+      if (!lastPage || !lastPage.hasMore) return undefined;
+      const nextPage = lastPage.page ? lastPage.page + 1 : (allPages?.length ? allPages.length + 1 : 2);
+      return isNaN(nextPage) ? undefined : nextPage;
+    },
     enabled: linkOpen,
-    staleTime: 30 * 60 * 1000,
-    gcTime: 60 * 60 * 1000,
+    staleTime: 5000,
     refetchOnWindowFocus: false,
     refetchOnMount: true
   });
@@ -189,12 +218,14 @@ export function AdminParents() {
     return parents.find((p) => p.id === stateSelectedParentDetail.id) || stateSelectedParentDetail;
   }, [parents, stateSelectedParentDetail]);
 
-  const students = studentData?.items || [];
+  const students = useMemo(() => {
+    return studentData?.pages.flatMap((page) => page?.items || []) || [];
+  }, [studentData]);
   const classes = classesData?.classes || [];
 
   const filteredStudents = useMemo(() => {
     return students.filter(
-      (s) => !selectedParent?.children.some((c) => c.id === s.id)
+      (s) => !selectedParent?.children?.some((c) => c.id === s.id)
     );
   }, [students, selectedParent]);
 
@@ -222,7 +253,7 @@ export function AdminParents() {
         try {
           await api.post("/parents", { action: "link", parentId: selectedParent.id, studentId, });
           queryClient.invalidateQueries({ queryKey: queryKeys.parents });
-          queryClient.invalidateQueries({ queryKey: ['students-min'] });
+          queryClient.invalidateQueries({ queryKey: ['students-min-infinite'] });
           return "Student linked successfully";
         } finally { dispatch({ type: 'SET_LINKING', payload: false }); }
       })(),
@@ -230,12 +261,21 @@ export function AdminParents() {
     );
   };
 
-  const handleUnlinkChild = async (parentId: string, studentId: string) => {
+  const handleUnlinkChild = (parentId: string, studentId: string) => {
+    setUnlinkData({ parentId, studentId });
+    setUnlinkConfirmOpen(true);
+  };
+
+  const executeUnlinkChild = async () => {
+    if (!unlinkData) return;
+    const { parentId, studentId } = unlinkData;
+    setUnlinkConfirmOpen(false);
+    setUnlinkData(null);
     toast.promise(
       (async () => {
         await api.post("/parents", { action: "unlink", parentId, studentId, });
         queryClient.invalidateQueries({ queryKey: queryKeys.parents });
-        queryClient.invalidateQueries({ queryKey: ['students-min'] });
+        queryClient.invalidateQueries({ queryKey: ['students-min-infinite'] });
         throw new Error("Child record unlinked");
       })(),
       { loading: "Unlinking child...", success: () => "", error: (err: any) => err.message, },
@@ -264,6 +304,9 @@ export function AdminParents() {
   };
 
   const handleDelete = async (id: string) => {
+    if (!window.confirm("Are you sure you want to delete this parent account? This action cannot be undone.")) {
+      return;
+    }
     toast.promise(
       (async () => {
         await api.delete(`/parents?id=${id}`);
@@ -283,7 +326,7 @@ export function AdminParents() {
         search={search}
         onSearchChange={(v) => dispatch({ type: 'SET_SEARCH', payload: v })}
         totalParents={parents.length}
-        totalChildren={parents.reduce((s, p) => s + p.children.length, 0)}
+        totalChildren={parents.reduce((s, p) => s + (p.children?.length || 0), 0)}
         viewMode={viewMode}
         setViewMode={setViewMode}
         onAddClick={() => dispatch({ type: 'SET_CREATE_OPEN', payload: true })}
@@ -315,8 +358,9 @@ export function AdminParents() {
         currentPage={currentPage}
         totalPages={totalPages}
         totalItems={totalItems}
-        itemsPerPage={15}
+        itemsPerPage={itemsPerPage}
         onPageChange={(v) => dispatch({ type: 'SET_CURRENT_PAGE', payload: v })}
+        onLimitChange={(limit) => dispatch({ type: 'SET_ITEMS_PER_PAGE', payload: limit })}
       />
 
       <CreateParentDialog
@@ -339,7 +383,13 @@ export function AdminParents() {
 
       <LinkChildDialog
         open={linkOpen}
-        onOpenChange={(v) => dispatch({ type: 'SET_LINK_OPEN', payload: v })}
+        onOpenChange={(v) => {
+          dispatch({ type: 'SET_LINK_OPEN', payload: v });
+          if (!v) {
+            setStudentSearch("");
+            setUnlinkedOnly(true);
+          }
+        }}
         selectedParent={selectedParent}
         selectedClass={selectedClass}
         setSelectedClass={(v) => dispatch({ type: 'SET_SELECTED_CLASS', payload: v })}
@@ -349,6 +399,13 @@ export function AdminParents() {
         loading={loadingStudents}
         onLinkChild={handleLinkChild}
         onUnlinkChild={handleUnlinkChild}
+        searchQuery={studentSearch}
+        onSearchQueryChange={setStudentSearch}
+        hasNextPage={hasNextPage}
+        fetchNextPage={fetchNextPage}
+        isFetchingNextPage={fetchingNextPage}
+        unlinkedOnly={unlinkedOnly}
+        onUnlinkedOnlyChange={setUnlinkedOnly}
       />
 
       <ParentDetailDialog
@@ -357,6 +414,26 @@ export function AdminParents() {
         parent={selectedParentDetail}
         onLinkClick={(p) => dispatch({ type: 'OPEN_LINK_DIALOG', payload: p })}
       />
+
+      <AlertDialog open={unlinkConfirmOpen} onOpenChange={setUnlinkConfirmOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Unlink Student</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to unlink this student from their parent?
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={() => { setUnlinkConfirmOpen(false); setUnlinkData(null); }}>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={executeUnlinkChild}
+              className="bg-red-600 hover:bg-red-700 text-white"
+            >
+              Unlink
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

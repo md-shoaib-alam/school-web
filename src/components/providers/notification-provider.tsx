@@ -43,22 +43,17 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
   useEffect(() => {
     // Listen for messages while the app is open (foreground)
     const unsubscribe = onForegroundMessage((payload) => {
-      console.log("New foreground message:", payload);
+      console.log("New foreground message received:", payload);
       
-      // 1. Show Toast inside the App
-      toast.success(payload.notification?.title || "New Notification", {
-        description: payload.notification?.body || "You have a new message",
+      const title = payload.notification?.title || payload.data?.title || "New Notification";
+      const body = payload.notification?.body || payload.data?.body || "You have a new message";
+
+      // Show Toast inside the App
+      toast.success(title, {
+        description: body,
         icon: <Bell className="size-5 text-violet-500" />,
         duration: 10000
       });
-
-      // 2. Show Native Browser Popup (if user is on another tab)
-      if (Notification.permission === "granted") {
-        new Notification(payload.notification?.title || "New Notification", {
-          body: payload.notification?.body || "You have a new message",
-          icon: "/logo.svg" // Adjust to your logo path
-        });
-      }
     });
 
     return () => {

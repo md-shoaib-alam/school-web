@@ -35,6 +35,7 @@ export function WelcomeBanner({
               src={tenantLogo || "/test.webp"} 
               alt={tenantName || "School Logo"} 
               fill
+              priority
               className="object-cover" 
               sizes="56px"
             />

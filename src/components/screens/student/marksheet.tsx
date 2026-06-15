@@ -265,11 +265,11 @@ export function StudentMarksheet() {
     const subjectsData = marksheet.rows.map(row => {
       return {
         subjectName: row.subjectName,
-        midtermMarks: row.midM !== null ? `${row.midM}/${row.midMax}` : '-',
-        finalMarks: row.finM !== null ? `${row.finM}/${row.finMax}` : '-',
-        obtained: row.subMax > 0 ? `${row.subObt}/${row.subMax}` : '-',
+        midtermMarks: row.midM !== null ? `${Number(row.midM.toFixed(2))}/${row.midMax}` : '-',
+        finalMarks: row.finM !== null ? `${Number(row.finM.toFixed(2))}/${row.finMax}` : '-',
+        obtained: row.subMax > 0 ? `${Number(row.subObt.toFixed(2))}/${row.subMax}` : '-',
         maxMarks: row.subMax,
-        obtainedMarks: row.subObt,
+        obtainedMarks: Number(row.subObt.toFixed(2)),
         passingMarks: row.subPassing,
         percentage: row.pct,
         status: row.status
@@ -282,7 +282,7 @@ export function StudentMarksheet() {
       schoolName: studentInfo.schoolName || 'SCHOOL ERP ACADEMY',
       subjects: subjectsData,
       totalMaxMarks: marksheet.totalMax,
-      totalObtainedMarks: marksheet.totalObtained,
+      totalObtainedMarks: Number(marksheet.totalObtained.toFixed(2)),
       overallPercentage: marksheet.overallPct,
       grade: marksheet.gradeInfo.grade,
       remarks: remarks,
@@ -299,7 +299,7 @@ export function StudentMarksheet() {
     <div className="space-y-4">
       <Skeleton className="h-8 w-48" />
       <Skeleton className="h-4 w-72" />
-      <Skeleton className="h-[600px] w-full rounded-xl" />
+      <Skeleton className="h-150 w-full rounded-xl" />
     </div>
   );
 
@@ -326,7 +326,7 @@ export function StudentMarksheet() {
         <div className="flex items-center gap-2 flex-wrap">
           {academicYears.length > 0 && (
             <Select value={selectedYear} onValueChange={(v) => dispatch({ type: 'SET_SELECTED_YEAR', payload: v })}>
-              <SelectTrigger className="w-[150px] h-9 text-sm">
+              <SelectTrigger className="w-37.5 h-9 text-sm">
                 <SelectValue placeholder="Academic Year" />
               </SelectTrigger>
               <SelectContent>
@@ -339,7 +339,7 @@ export function StudentMarksheet() {
             </Select>
           )}
           <Select value={marksheetType} onValueChange={(v: any) => dispatch({ type: 'SET_MARKSHEET_TYPE', payload: v })}>
-            <SelectTrigger className="w-[130px] h-9 text-sm"><SelectValue /></SelectTrigger>
+            <SelectTrigger className="w-32.5 h-9 text-sm"><SelectValue /></SelectTrigger>
             <SelectContent>
               <SelectItem value="midterm">Midterm</SelectItem>
               <SelectItem value="final">Final</SelectItem>

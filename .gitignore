@@ -45,3 +45,5 @@ bun.lockb
 .bun-build
 node_modules
 bunfig.toml
+
+src/service_key.json

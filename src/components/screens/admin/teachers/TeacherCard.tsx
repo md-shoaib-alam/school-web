@@ -15,7 +15,7 @@ import {
   AlertDialogAction,
   AlertDialogCancel,
 } from "@/components/ui/alert-dialog";
-import { Mail, GraduationCap, BookOpen, Award, Briefcase, Pencil, Trash2 } from "lucide-react";
+import { Mail, GraduationCap, BookOpen, Award, Briefcase, Pencil, Trash2, Eye } from "lucide-react";
 import { TeacherInfo, avatarColors } from "./types";
 
 interface TeacherCardProps {
@@ -27,6 +27,7 @@ interface TeacherCardProps {
   setDeletingId: (id: string | null) => void;
   onEdit: (teacher: TeacherInfo) => void;
   onDelete: (id: string) => void;
+  onView: (teacher: TeacherInfo) => void;
 }
 
 export function TeacherCard({
@@ -38,6 +39,7 @@ export function TeacherCard({
   setDeletingId,
   onEdit,
   onDelete,
+  onView,
 }: TeacherCardProps) {
   const initials = teacher.name
     .split(" ")
@@ -48,7 +50,10 @@ export function TeacherCard({
   const color = avatarColors[index % avatarColors.length];
 
   return (
-    <Card className="hover:shadow-md transition-all duration-200 hover:-translate-y-0.5 group">
+    <Card 
+      className="hover:shadow-md transition-all duration-200 hover:-translate-y-0.5 group cursor-pointer"
+      onClick={() => onView(teacher)}
+    >
       <CardContent className="p-6">
         {/* Header */}
         <div className="flex items-start gap-4">
@@ -58,7 +63,9 @@ export function TeacherCard({
             </AvatarFallback>
           </Avatar>
           <div className="min-w-0 flex-1">
-            <h3 className="font-semibold text-zinc-900 dark:text-zinc-100 truncate group-hover:text-emerald-700 dark:group-hover:text-emerald-400 transition-colors">
+            <h3 
+              className="font-semibold text-zinc-900 dark:text-zinc-100 truncate group-hover:text-emerald-700 dark:group-hover:text-emerald-400 transition-colors hover:underline"
+            >
               {teacher.name}
             </h3>
             <div className="flex items-center gap-1.5 text-sm text-muted-foreground mt-0.5">
@@ -71,18 +78,17 @@ export function TeacherCard({
           </div>
 
           {/* Action buttons */}
-          {(canEdit || canDelete) && (
-            <div className="flex items-center gap-1 shrink-0">
-              {canEdit && (
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="size-8 text-muted-foreground hover:text-emerald-600"
-                  onClick={() => onEdit(teacher)}
-                >
-                  <Pencil className="size-4" />
-                </Button>
-              )}
+          <div className="flex items-center gap-1 shrink-0" onClick={(e) => e.stopPropagation()}>
+            {canEdit && (
+              <Button
+                variant="ghost"
+                size="icon"
+                className="size-8 text-muted-foreground hover:text-emerald-600"
+                onClick={() => onEdit(teacher)}
+              >
+                <Pencil className="size-4" />
+              </Button>
+            )}
               {canDelete && (
                 <AlertDialog
                   open={deletingId === teacher.id}
@@ -122,8 +128,7 @@ export function TeacherCard({
                   </AlertDialogContent>
                 </AlertDialog>
               )}
-            </div>
-          )}
+          </div>
         </div>
 
         {/* Info */}

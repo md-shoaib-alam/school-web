@@ -37,7 +37,7 @@ export function EditParentDialog({
         </DialogHeader>
         <div className="space-y-4 pt-2">
           <div>
-            <Label>Full Name *</Label>
+            <Label>Full Name <span className="text-red-500">*</span></Label>
             <Input
               value={editForm.name}
               onChange={(e) =>
@@ -48,7 +48,7 @@ export function EditParentDialog({
             />
           </div>
           <div>
-            <Label>Email *</Label>
+            <Label>Email <span className="text-red-500">*</span></Label>
             <Input
               type="email"
               value={editForm.email}

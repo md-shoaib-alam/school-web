@@ -4,7 +4,7 @@ import { useAppStore } from "@/store/use-app-store";
 import { cn } from "@/lib/utils";
 import { useRouter } from "next/navigation";
 import { roleColors, roleLabels, type NavItem } from "./nav-config";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 // Sub-components
 import { SidebarHeader } from "./sidebar/SidebarHeader";
@@ -16,13 +16,15 @@ interface SidebarProps {
   resolvedScreen: string;
   navigateTo: (screen: string) => void;
   setIsChangePasswordOpen: (open: boolean) => void;
+  layoutPref?: string | null;
 }
 
 export function Sidebar({ 
   items, 
   resolvedScreen, 
   navigateTo, 
-  setIsChangePasswordOpen 
+  setIsChangePasswordOpen,
+  layoutPref = "comprehensive"
 }: SidebarProps) {
   const {
     currentUser,
@@ -43,6 +45,15 @@ export function Sidebar({
     return activeParent ? [activeParent.key] : [];
   });
 
+  useEffect(() => {
+    const activeParent = items.find(item => 
+      item.children?.some(child => child.key === resolvedScreen)
+    );
+    if (activeParent) {
+      setExpandedKeys(prev => prev.includes(activeParent.key) ? prev : [...prev, activeParent.key]);
+    }
+  }, [resolvedScreen, items]);
+
   if (!currentUser) return null;
 
   const toggleExpand = (key: string) => {
@@ -58,10 +69,14 @@ export function Sidebar({
     .join("")
     .slice(0, 2);
 
+  const isMinimal = layoutPref === "minimal";
+
+  if (isMinimal) return null;
+
   return (
     <aside
       className={cn(
-        "fixed lg:static inset-y-0 left-0 z-50 flex flex-col transition-all duration-300 lg:h-dvh border-r overflow-hidden",
+        "fixed lg:static inset-y-0 left-0 z-50 flex flex-col transition-all duration-300 lg:h-full border-r overflow-hidden",
         isSuperAdmin
           ? "bg-gradient-to-b from-teal-950 to-teal-900 border-teal-800/50"
           : "bg-sidebar border-sidebar-border",

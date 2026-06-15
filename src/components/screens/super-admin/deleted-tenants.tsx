@@ -171,15 +171,6 @@ export function SuperAdminDeletedTenants() {
         </div>
       </div>
 
-      <Card className="bg-amber-50 dark:bg-amber-950/20 border-amber-200 text-amber-900 dark:text-amber-100">
-        <CardContent className="flex items-center gap-4 p-4">
-          <AlertTriangle className="size-6 shrink-0 text-amber-600 dark:text-amber-400" />
-          <p className="text-sm font-medium">
-            Retention Policy Active: Items in the bin are automatically flushed permanently after 28 days of static existence. Automated cleansing cycles run nightly.
-          </p>
-        </CardContent>
-      </Card>
-
       <div className="flex items-center max-w-md relative">
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
         <Input 

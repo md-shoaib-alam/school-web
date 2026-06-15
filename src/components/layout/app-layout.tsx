@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { useParams, usePathname, useRouter } from "next/navigation";
 import { useAppStore } from "@/store/use-app-store";
+import { cn } from "@/lib/utils";
 import { useTenantResolution } from "@/lib/graphql/hooks/platform.hooks";
 import { hasPermission, isRootAdmin } from "@/lib/permissions";
 import { ChangePasswordModal } from "@/components/modals/change-password-modal";
@@ -41,12 +42,51 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const { push } = useRouter();
   const [isChangePasswordOpen, setIsChangePasswordOpen] = useState(false);
+  const [layoutPref, setLayoutPref] = useState<string | null>(null);
+  const [isMounted, setIsMounted] = useState(false);
 
   // Sync tenant context from slug
   const { data: resolvedTenant } = useTenantResolution(slug as string);
 
   useEffect(() => {
-    if (resolvedTenant && resolvedTenant.slug !== currentTenantSlug) {
+    setIsMounted(true);
+    
+    const initializePref = () => {
+      if (typeof window === "undefined" || !currentUser) return;
+      
+      const isStaff = currentUser.role === "staff";
+      if (isStaff) {
+        const pref = localStorage.getItem("schoolsaas_staff_sidebar_preference");
+        setLayoutPref(pref === "enabled" ? "comprehensive" : "minimal");
+      } else {
+        const pref = localStorage.getItem("schoolsaas_dashboard_layout_preference");
+        if (pref) setLayoutPref(pref);
+      }
+    };
+
+    initializePref();
+
+    const handlePrefChange = (e: any) => {
+      if (e.detail) {
+        const isStaff = currentUser?.role === "staff";
+        if (isStaff) {
+           setLayoutPref(e.detail === "enabled" ? "comprehensive" : "minimal");
+        } else {
+           setLayoutPref(e.detail);
+        }
+      }
+    };
+
+    window.addEventListener("schoolsaas_dashboard_layout_pref_changed", handlePrefChange);
+    window.addEventListener("schoolsaas_staff_sidebar_pref_changed", handlePrefChange);
+    return () => {
+      window.removeEventListener("schoolsaas_dashboard_layout_pref_changed", handlePrefChange);
+      window.removeEventListener("schoolsaas_staff_sidebar_pref_changed", handlePrefChange);
+    };
+  }, [currentUser?.role, currentUser?.id]);
+
+  useEffect(() => {
+    if (resolvedTenant && (resolvedTenant.slug !== currentTenantSlug || resolvedTenant.id !== currentTenantId)) {
       setCurrentTenant(
         resolvedTenant.id,
         resolvedTenant.name,
@@ -55,7 +95,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
       );
 
     }
-  }, [resolvedTenant, currentTenantSlug, setCurrentTenant]);
+  }, [resolvedTenant, currentTenantSlug, currentTenantId, setCurrentTenant]);
 
   // Refresh permissions from DB on mount
   useEffect(() => {
@@ -167,6 +207,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
       "settings",
       "school-subscriptions",
       "platform-notices",
+      "send-notification",
       "profile",
       "reports",
     ].includes(screen);
@@ -208,9 +249,12 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
 
   return (
     <NotificationProvider>
-      <div className="h-dvh flex flex-col overflow-hidden bg-background">
+      <div className={cn(
+        "h-dvh flex flex-col overflow-hidden bg-background transition-opacity duration-200",
+        !isMounted ? "opacity-0" : "opacity-100"
+      )}>
         <PlatformNoticeBar />
-        <div className="flex-1 flex overflow-hidden">
+        <div className="flex-1 flex min-h-0 overflow-hidden">
           <LoadingProgress />
         {/* Mobile overlay */}
 
@@ -236,12 +280,13 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
           resolvedScreen={resolvedScreen}
           navigateTo={navigateTo}
           setIsChangePasswordOpen={setIsChangePasswordOpen}
+          layoutPref={layoutPref}
         />
 
         {/* Main Content */}
         <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
           {/* Top Header */}
-          <Header items={items} resolvedScreen={resolvedScreen} />
+          <Header items={items} resolvedScreen={resolvedScreen} layoutPref={layoutPref} />
 
           {/* Page Content */}
           <main className="flex-1 overflow-y-auto p-4 lg:p-6 overscroll-contain">

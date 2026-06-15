@@ -31,6 +31,8 @@ import { toast } from "sonner";
 import { useAppStore } from "@/store/use-app-store";
 import { useStaff, useCustomRoles } from "@/lib/graphql/hooks";
 import { useModulePermissions } from "@/hooks/use-permissions";
+import { useDebounce } from "@/hooks/use-debounce";
+import { Pagination } from "@/components/shared/pagination";
 
 // Sub-components
 import { StaffTable } from "./staff/StaffTable";
@@ -70,6 +72,7 @@ const DELETE_USER = `
 
 type State = {
   search: string;
+  currentPage: number;
   viewMode: 'table' | 'grid';
   dialogOpen: boolean;
   editingMember: StaffMember | null;
@@ -83,6 +86,7 @@ type State = {
 
 type Action =
   | { type: 'SET_SEARCH'; payload: string }
+  | { type: 'SET_CURRENT_PAGE'; payload: number }
   | { type: 'SET_VIEW_MODE'; payload: 'table' | 'grid' }
   | { type: 'OPEN_CREATE' }
   | { type: 'OPEN_EDIT'; payload: StaffMember }
@@ -96,6 +100,7 @@ type Action =
 
 const initialState: State = {
   search: "",
+  currentPage: 1,
   viewMode: 'table',
   dialogOpen: false,
   editingMember: null,
@@ -110,7 +115,9 @@ const initialState: State = {
 function reducer(state: State, action: Action): State {
   switch (action.type) {
     case 'SET_SEARCH':
-      return { ...state, search: action.payload };
+      return { ...state, search: action.payload, currentPage: 1 };
+    case 'SET_CURRENT_PAGE':
+      return { ...state, currentPage: action.payload };
     case 'SET_VIEW_MODE':
       return { ...state, viewMode: action.payload };
     case 'OPEN_CREATE':
@@ -148,7 +155,6 @@ function reducer(state: State, action: Action): State {
       return state;
   }
 }
-
 export function AdminStaff() {
   const { currentTenantId } = useAppStore();
   const { canCreate, canEdit, canDelete } = useModulePermissions("staff");
@@ -156,6 +162,7 @@ export function AdminStaff() {
   const [state, dispatch] = useReducer(reducer, initialState);
   const {
     search,
+    currentPage,
     viewMode,
     dialogOpen,
     editingMember,
@@ -167,12 +174,20 @@ export function AdminStaff() {
     viewingMember,
   } = state;
 
+  const debouncedSearch = useDebounce(search, 500);
+
   // --- Queries ---
   const { 
     data: staffResponse, 
     isLoading: loadingStaff, 
     refetch: refetchStaff 
-  } = useStaff(currentTenantId || undefined, "staff");
+  } = useStaff(
+    currentTenantId || undefined, 
+    "staff", 
+    debouncedSearch || undefined, 
+    currentPage, 
+    12
+  );
   
   const { data: roles = [] } = useCustomRoles(currentTenantId || undefined);
 
@@ -216,7 +231,8 @@ export function AdminStaff() {
           customRole: roles.find(r => r.id === formData.customRoleId) || editingMember.customRole
         };
         
-        queryClient.setQueryData(["staff", currentTenantId, "staff"], (old: any) => {
+        const queryKey = ["staff", currentTenantId, "staff", debouncedSearch || undefined, currentPage, 12];
+        queryClient.setQueryData(queryKey, (old: any) => {
           if (!old || !old.staff) return old;
           return {
             ...old,
@@ -293,18 +309,13 @@ export function AdminStaff() {
     let list = (staffResponse?.staff || []) as StaffMember[];
     
     // 🔡 Sort alphabetically (Natural Sort: 1, 2, 10)
-    list = [...list].sort((a, b) => 
+    return [...list].sort((a, b) => 
       a.name.localeCompare(b.name, undefined, { numeric: true, sensitivity: 'base' })
     );
+  }, [staffResponse]);
 
-    if (!search) return list;
-    const s = search.toLowerCase();
-    return list.filter(m => 
-      m.name.toLowerCase().includes(s) || 
-      m.email.toLowerCase().includes(s) ||
-      (m.customRole?.name || "").toLowerCase().includes(s)
-    );
-  }, [staffResponse, search]);
+  const totalItems = staffResponse?.total || 0;
+  const totalPages = staffResponse?.totalPages || 1;
 
   return (
     <div className="space-y-6">
@@ -370,7 +381,7 @@ export function AdminStaff() {
               canDelete={canDelete}
             />
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 2xl:grid-cols-4 gap-4">
               {staff.map((member) => (
                 <StaffCard
                   key={member.id}
@@ -385,6 +396,14 @@ export function AdminStaff() {
             </div>
           )}
       </div>
+
+      <Pagination
+        currentPage={currentPage}
+        totalPages={totalPages}
+        totalItems={totalItems}
+        itemsPerPage={12}
+        onPageChange={(page) => dispatch({ type: 'SET_CURRENT_PAGE', payload: page })}
+      />
 
       {/* Dialogs */}
       <StaffDialog

@@ -45,19 +45,19 @@ function useHydrated() {
 export default function GenericSlugDispatcherClient() {
   const { slug } = useParams();
   const mounted = useHydrated();
-  const { currentUser, currentTenantSlug, setCurrentTenant } = useAppStore();
+  const { currentUser, currentTenantSlug, currentTenantId, setCurrentTenant } = useAppStore();
 
   const { data: resolvedTenant } = useTenantResolution(slug as string);
 
   useEffect(() => {
-    if (mounted && resolvedTenant && resolvedTenant.slug !== currentTenantSlug) {
+    if (mounted && resolvedTenant && (resolvedTenant.slug !== currentTenantSlug || resolvedTenant.id !== currentTenantId)) {
       setCurrentTenant(resolvedTenant.id, resolvedTenant.name, resolvedTenant.slug, resolvedTenant.logo);
     }
-  }, [mounted, resolvedTenant, currentTenantSlug, setCurrentTenant]);
+  }, [mounted, resolvedTenant, currentTenantSlug, currentTenantId, setCurrentTenant]);
 
   // REDIRECTION LOGIC (DURING RENDER)
-  if (mounted && currentUser) {
-    const urlSlug = typeof slug === 'string' ? slug.toLowerCase() : '';
+  if (mounted && currentUser && typeof slug === 'string') {
+    const urlSlug = slug.toLowerCase();
     const userTenantId = currentUser?.tenantId?.toLowerCase() || '';
     const userTenantSlug = currentUser?.tenantSlug?.toLowerCase() || '';
     const isTenantMatch = (urlSlug === userTenantId || urlSlug === userTenantSlug);
@@ -76,7 +76,7 @@ export default function GenericSlugDispatcherClient() {
     }
   }
 
-  if (!mounted || !currentUser) return <LoadingScreen />;
+  if (!mounted || !currentUser || typeof slug !== 'string') return <LoadingScreen />;
 
   // 1. Platform Screens (Super Admin only)
   if (currentUser.role === "super_admin") {

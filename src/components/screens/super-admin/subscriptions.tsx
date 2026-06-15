@@ -1,15 +1,16 @@
 "use client";
 
 import { apiFetch } from "@/lib/api";
-import { useReducer, useEffect, useMemo } from "react";
+import { useReducer, useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 import {
   useParents,
   useSubscriptions,
-  useTenants,
+  useTenantsInfinite,
   queryKeys,
 } from "@/lib/graphql/hooks";
 import { useQueryClient } from "@tanstack/react-query";
+import { CreditCard } from "lucide-react";
 
 // Sub-components
 import { SubscriptionStats } from "./subscriptions/SubscriptionStats";
@@ -17,7 +18,7 @@ import { SubscriptionFilters } from "./subscriptions/SubscriptionFilters";
 import { SubscriptionTable } from "./subscriptions/SubscriptionTable";
 import { SubscriptionDialogs } from "./subscriptions/SubscriptionDialogs";
 import { SubscriptionRecord } from "./subscriptions/types";
-import { CreditCard } from "lucide-react";
+
 const ITEMS_PER_PAGE = 25;
 
 type State = {
@@ -26,6 +27,7 @@ type State = {
   debouncedSearch: string;
   statusFilter: string;
   page: number;
+  limit: number;
   deleteDialog: SubscriptionRecord | null;
   deleting: boolean;
   createDialogOpen: boolean;
@@ -42,6 +44,7 @@ type State = {
     paymentMethod: string;
   };
   editForm: {
+    planId: string;
     planName: string;
     amount: number;
     period: string;
@@ -58,6 +61,7 @@ type Action =
   | { type: 'SET_DEBOUNCED_SEARCH'; payload: string }
   | { type: 'SET_STATUS_FILTER'; payload: string }
   | { type: 'SET_PAGE'; payload: number }
+  | { type: 'SET_LIMIT'; payload: number }
   | { type: 'SET_DELETE_DIALOG'; payload: SubscriptionRecord | null }
   | { type: 'SET_DELETING'; payload: boolean }
   | { type: 'SET_CREATE_DIALOG_OPEN'; payload: boolean }
@@ -67,15 +71,16 @@ type Action =
   | { type: 'SET_EXTEND_DAYS'; payload: string }
   | { type: 'SET_PROCESSING'; payload: boolean }
   | { type: 'SET_CREATE_FORM'; payload: Partial<State['createForm']> | ((prev: State['createForm']) => State['createForm']) }
-  | { type: 'SET_EDIT_FORM'; payload: Partial<State['editForm']> }
+  | { type: 'SET_EDIT_FORM'; payload: Partial<State['editForm']> | ((prev: State['editForm']) => State['editForm']) }
   | { type: 'PREPARE_ASSIGN'; payload: string };
 
 const initialState: State = {
-  selectedTenant: "all",
+  selectedTenant: "",
   search: "",
   debouncedSearch: "",
   statusFilter: "all",
   page: 1,
+  limit: 25,
   deleteDialog: null,
   deleting: false,
   createDialogOpen: false,
@@ -92,6 +97,7 @@ const initialState: State = {
     paymentMethod: "card",
   },
   editForm: {
+    planId: "",
     planName: "",
     amount: 0,
     period: "",
@@ -109,6 +115,7 @@ function reducer(state: State, action: Action): State {
     case 'SET_DEBOUNCED_SEARCH': return { ...state, debouncedSearch: action.payload, page: 1 };
     case 'SET_STATUS_FILTER': return { ...state, statusFilter: action.payload, page: 1 };
     case 'SET_PAGE': return { ...state, page: action.payload };
+    case 'SET_LIMIT': return { ...state, limit: action.payload, page: 1 };
     case 'SET_DELETE_DIALOG': return { ...state, deleteDialog: action.payload };
     case 'SET_DELETING': return { ...state, deleting: action.payload };
     case 'SET_CREATE_DIALOG_OPEN': return { ...state, createDialogOpen: action.payload };
@@ -117,6 +124,7 @@ function reducer(state: State, action: Action): State {
         ...state,
         editDialogOpen: action.payload,
         editForm: {
+          planId: action.payload.planId,
           planName: action.payload.planName,
           amount: action.payload.amount,
           period: action.payload.period,
@@ -135,7 +143,11 @@ function reducer(state: State, action: Action): State {
         ...state,
         createForm: typeof action.payload === 'function' ? action.payload(state.createForm) : { ...state.createForm, ...action.payload }
       };
-    case 'SET_EDIT_FORM': return { ...state, editForm: { ...state.editForm, ...action.payload } };
+    case 'SET_EDIT_FORM':
+      return {
+        ...state,
+        editForm: typeof action.payload === 'function' ? action.payload(state.editForm) : { ...state.editForm, ...action.payload }
+      };
     case 'PREPARE_ASSIGN': return { ...state, createForm: { ...state.createForm, parentId: action.payload }, createDialogOpen: true };
     default: return state;
   }
@@ -144,7 +156,7 @@ function reducer(state: State, action: Action): State {
 export function SuperAdminSubscriptions() {
   const [state, dispatch] = useReducer(reducer, initialState);
   const {
-    selectedTenant, search, debouncedSearch, statusFilter, page,
+    selectedTenant, search, debouncedSearch, statusFilter, page, limit,
     deleteDialog, deleting, createDialogOpen, editDialogOpen,
     extendDialogOpen, extendDays, processing, createForm, editForm
   } = state;
@@ -159,26 +171,70 @@ export function SuperAdminSubscriptions() {
     return () => clearTimeout(timer);
   }, [search]);
 
+  const [tenantSearch, setTenantSearch] = useState("");
+  const [debouncedTenantSearch, setDebouncedTenantSearch] = useState("");
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedTenantSearch(tenantSearch);
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [tenantSearch]);
+
+  // Scroll to top on pagination / limit change
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }, [page, limit]);
+
   // -- Queries --
-  const { data: tenantsData } = useTenants({ page: 1, limit: 100 });
-  const tenants = tenantsData?.tenants || [];
+  const { 
+    data: tenantsInfiniteData, 
+    fetchNextPage: fetchNextTenantsPage, 
+    hasNextPage: hasNextTenantsPage, 
+    isFetchingNextPage: isFetchingNextTenantsPage 
+  } = useTenantsInfinite({ 
+    search: debouncedTenantSearch.trim() || undefined,
+    limit: 40 
+  });
+
+  const tenants = useMemo(() => {
+    if (!tenantsInfiniteData) return [];
+    return tenantsInfiniteData.pages.flatMap((page) => page.tenants || []);
+  }, [tenantsInfiniteData]);
+
+  const useSubsData = ["active", "cancelled", "expired"].includes(statusFilter);
 
   const { data: subsData, isLoading: loadingSubs } = useSubscriptions({
-    tenantId: selectedTenant === "all" ? undefined : selectedTenant,
+    tenantId: selectedTenant || undefined,
     status: statusFilter === "all" ? undefined : statusFilter,
     search: debouncedSearch || undefined,
     page,
-    limit: ITEMS_PER_PAGE
+    limit
+  }, {
+    enabled: useSubsData && !!selectedTenant
+  });
+
+  const { data: statsSubsData } = useSubscriptions({
+    tenantId: selectedTenant || undefined,
+    status: statusFilter === "all" ? undefined : statusFilter,
+    search: debouncedSearch || undefined,
+    page: 1,
+    limit: 100
+  }, {
+    enabled: !!selectedTenant
   });
 
   const { data: parentsData, isLoading: loadingParents } = useParents(
-    selectedTenant === "all" ? undefined : selectedTenant,
-    undefined, // search
+    selectedTenant || undefined,
+    debouncedSearch || undefined, // search
     page,
-    ITEMS_PER_PAGE, // Use the same limit here
+    limit,
+    {
+      enabled: !useSubsData && !!selectedTenant
+    }
   );
 
-  const loading = loadingSubs || (selectedTenant !== "all" && loadingParents);
+  const loading = useSubsData ? loadingSubs : (selectedTenant ? loadingParents : false);
 
   const invalidate = () => {
     queryClient.invalidateQueries({ queryKey: queryKeys.subscriptions });
@@ -186,8 +242,9 @@ export function SuperAdminSubscriptions() {
   };
 
   // -- Unified Data Logic --
+
   const unifiedData = useMemo(() => {
-    if (selectedTenant === "all") {
+    if (useSubsData) {
       const list = subsData?.subscriptions;
       if (!Array.isArray(list)) return [];
       return list.map((s) => ({
@@ -200,7 +257,7 @@ export function SuperAdminSubscriptions() {
 
     const list = parentsData?.parents;
     if (!Array.isArray(list)) return [];
-    return list.map((p) => {
+    const mapped = list.map((p) => {
       const sub = p.subscription;
       return {
         id: p.id,
@@ -216,11 +273,16 @@ export function SuperAdminSubscriptions() {
         status: sub ? sub.status : "none",
       };
     });
-  }, [parentsData, subsData, selectedTenant]);
 
-  const stats = subsData?.stats || null;
-  const totalPages = selectedTenant === "all" ? subsData?.totalPages || 1 : parentsData?.totalPages || 1;
-  const totalEntries = selectedTenant === "all" ? subsData?.total || 0 : parentsData?.total || 0;
+    if (statusFilter === "none") {
+      return mapped.filter(item => item.status === "none" || item.status === "cancelled" || item.status === "expired");
+    }
+    return mapped;
+  }, [parentsData, subsData, selectedTenant, statusFilter, useSubsData]);
+
+  const stats = statsSubsData?.stats || null;
+  const totalPages = useSubsData ? subsData?.totalPages || 1 : parentsData?.totalPages || 1;
+  const totalEntries = useSubsData ? subsData?.total || 0 : parentsData?.total || 0;
 
   // -- Handlers --
   const handleDelete = async () => {
@@ -360,6 +422,11 @@ export function SuperAdminSubscriptions() {
         tenants={tenants}
         onNewSetup={() => dispatch({ type: 'SET_CREATE_DIALOG_OPEN', payload: true })}
         parentsTotal={parentsData?.total || 0}
+        fetchNextPage={fetchNextTenantsPage}
+        hasNextPage={hasNextTenantsPage}
+        isFetchingNextPage={isFetchingNextTenantsPage}
+        tenantSearch={tenantSearch}
+        onTenantSearchChange={setTenantSearch}
       />
 
       <SubscriptionFilters 
@@ -367,7 +434,6 @@ export function SuperAdminSubscriptions() {
         onSearchChange={(v) => dispatch({ type: 'SET_SEARCH', payload: v })}
         statusFilter={statusFilter}
         onStatusFilterChange={(v) => dispatch({ type: 'SET_STATUS_FILTER', payload: v })}
-        onRefresh={invalidate}
       />
 
       <SubscriptionTable 
@@ -375,10 +441,11 @@ export function SuperAdminSubscriptions() {
         loading={loading}
         selectedTenant={selectedTenant}
         page={page}
-        limit={ITEMS_PER_PAGE}
+        limit={limit}
         totalPages={totalPages}
         totalEntries={totalEntries}
         onPageChange={(v) => dispatch({ type: 'SET_PAGE', payload: v })}
+        onLimitChange={(v) => dispatch({ type: 'SET_LIMIT', payload: v })}
         onEdit={(sub) => dispatch({ type: 'OPEN_EDIT_DIALOG', payload: sub })}
         onExtend={(v) => dispatch({ type: 'SET_EXTEND_DIALOG_OPEN', payload: v })}
         onDelete={(v) => dispatch({ type: 'SET_DELETE_DIALOG', payload: v })}

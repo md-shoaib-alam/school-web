@@ -1,4 +1,4 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { useQuery, useMutation, useQueryClient, useInfiniteQuery } from '@tanstack/react-query'
 import { toast } from "sonner";
 import { graphqlQuery, graphqlMutate } from '../core'
 import { queryKeys } from '../keys'
@@ -6,7 +6,7 @@ import { api } from '@/lib/api'
 import { 
   PLATFORM_STATS, BILLING_DATA, TENANTS, USERS, AUDIT_LOGS, 
   CREATE_TENANT, UPDATE_TENANT, DELETE_TENANT, TOGGLE_TENANT_STATUS, SUBSCRIPTIONS,
-  TOGGLE_USER_STATUS, CREATE_USER, TENANT_DETAIL, RESTORE_TENANT
+  TOGGLE_USER_STATUS, CREATE_USER, TENANT_DETAIL, RESTORE_TENANT, TENANT_METADATA
 } from '../queries'
 import { 
   PlatformStatsData, BillingDataResponse, TenantsResponse, UsersResponse, 
@@ -17,7 +17,7 @@ export function useTenantResolution(slug?: string) {
   return useQuery({
     queryKey: ['tenant-resolution', slug],
     queryFn: () => api.get(`/tenants/resolve/${slug}`),
-    enabled: !!slug && !['dashboard', 'tenants', 'billing', 'users', 'audit-logs', 'platform-analytics', 'settings', 'subscriptions'].includes(slug),
+    enabled: !!slug && !['profile', 'dashboard', 'tenants', 'billing', 'users', 'audit-logs', 'platform-analytics', 'settings', 'subscriptions', 'deleted-tenants', 'bulk-attendance-import', 'feature-flags', 'roadmap', 'roles', 'staff', 'manage-admins', 'school-subscriptions', 'platform-notices', 'reports'].includes(slug),
     staleTime: Infinity,
   })
 }
@@ -47,6 +47,25 @@ export function useTenants(filters?: { status?: string; plan?: string; search?: 
   })
 }
 
+export function useTenantsInfinite(filters?: { status?: string; plan?: string; search?: string; limit?: number }) {
+  return useInfiniteQuery({
+    queryKey: ['tenants-infinite', filters],
+    initialPageParam: 1,
+    queryFn: ({ pageParam = 1 }) => 
+      graphqlQuery<{ tenants: TenantsResponse }>(TENANTS, { 
+        ...filters, 
+        page: pageParam, 
+        limit: filters?.limit || 20 
+      }).then(d => d.tenants),
+    getNextPageParam: (lastPage) => {
+      const currentPage = lastPage.page;
+      const totalPages = lastPage.totalPages;
+      return currentPage < totalPages ? currentPage + 1 : undefined;
+    },
+    staleTime: 60 * 1000,
+  })
+}
+
 export function useUsers(filters?: { role?: string; tenantId?: string; search?: string; page?: number; limit?: number }) {
   return useQuery({
     queryKey: queryKeys.users(filters),
@@ -63,15 +82,19 @@ export function useAuditLogs(filters?: { action?: string; role?: string; tenantI
   })
 }
 
-export function useSubscriptions(filters?: { tenantId?: string; status?: string; search?: string; startDate?: string; endDate?: string; page?: number; limit?: number }) {
+export function useSubscriptions(
+  filters?: { tenantId?: string; status?: string; search?: string; startDate?: string; endDate?: string; page?: number; limit?: number },
+  options?: { enabled?: boolean }
+) {
   return useQuery({
     queryKey: [...queryKeys.subscriptions, filters],
     queryFn: async () => {
       const data = await graphqlQuery<{ subscriptions: SubscriptionsResponse }>(SUBSCRIPTIONS, filters || {})
       return data.subscriptions
     },
-    staleTime: 5 * 60 * 1000,
+    staleTime: 60 * 1000, // 1 minute cache
     gcTime: 15 * 60 * 1000,
+    enabled: options?.enabled ?? true,
   })
 }
 
@@ -79,6 +102,16 @@ export function useTenantDetail(tenantId: string) {
   return useQuery({
     queryKey: queryKeys.tenantDetail(tenantId),
     queryFn: () => graphqlQuery<{ tenantDetail: TenantDetailData }>(TENANT_DETAIL, { tenantId })
+      .then(d => d.tenantDetail),
+    staleTime: 60 * 1000,
+    enabled: !!tenantId,
+  })
+}
+
+export function useTenantMetadata(tenantId: string) {
+  return useQuery({
+    queryKey: ['tenant', 'metadata', tenantId],
+    queryFn: () => graphqlQuery<{ tenantDetail: TenantDetailData }>(TENANT_METADATA, { tenantId })
       .then(d => d.tenantDetail),
     staleTime: 60 * 1000,
     enabled: !!tenantId,

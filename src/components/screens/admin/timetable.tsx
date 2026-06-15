@@ -247,7 +247,17 @@ export function AdminTimetable() {
 
   const handleOpenManage = useCallback(async () => {
     const initial: Record<string, FormSlot[]> = { monday: [], tuesday: [], wednesday: [], thursday: [], friday: [], saturday: [], sunday: [] };
-    slots.forEach((slot: any) => { if (initial[slot.day]) { initial[slot.day].push({ ...slot, subjectId: slot.subjectId ?? "", teacherId: slot.teacherId ?? "", label: slot.label ?? undefined }); } });
+    slots.forEach((slot: any) => {
+      const dayLower = slot.day.toLowerCase();
+      if (initial[dayLower]) {
+        initial[dayLower].push({
+          ...slot,
+          subjectId: slot.subjectId ?? "",
+          teacherId: slot.teacherId ?? "",
+          label: slot.label ?? undefined
+        });
+      }
+    });
     ALL_DAYS.forEach((day) => { initial[day]?.sort((a, b) => a.startTime.localeCompare(b.startTime)); });
     dispatch({ type: 'OPEN_MANAGE', payload: initial });
   }, [slots]);
@@ -305,8 +315,9 @@ export function AdminTimetable() {
   const gridData = useMemo(() => {
     const data = new Map<string, Map<string, TimetableSlot[]>>();
     slots.forEach((slot) => {
-      if (!data.has(slot.day)) data.set(slot.day, new Map());
-      const dayMap = data.get(slot.day)!;
+      const dayLower = slot.day.toLowerCase();
+      if (!data.has(dayLower)) data.set(dayLower, new Map());
+      const dayMap = data.get(dayLower)!;
       const timeKey = `${slot.startTime}-${slot.endTime}`;
       if (!dayMap.has(timeKey)) dayMap.set(timeKey, []);
       dayMap.get(timeKey)!.push(slot);
@@ -316,7 +327,11 @@ export function AdminTimetable() {
 
   const slotsByDay = useMemo(() => {
     const data = new Map<string, TimetableSlot[]>();
-    slots.forEach((slot) => { if (!data.has(slot.day)) data.set(slot.day, []); data.get(slot.day)!.push(slot); });
+    slots.forEach((slot) => {
+      const dayLower = slot.day.toLowerCase();
+      if (!data.has(dayLower)) data.set(dayLower, []);
+      data.get(dayLower)!.push(slot);
+    });
     data.forEach((list) => list.sort((a, b) => a.startTime.localeCompare(b.startTime)));
     return data;
   }, [slots]);
@@ -334,7 +349,6 @@ export function AdminTimetable() {
         setViewMode={(v) => dispatch({ type: 'SET_VIEW_MODE', payload: v })}
         selectedClass={selectedClass}
         onClassChange={(v) => dispatch({ type: 'SET_SELECTED_CLASS', payload: v })}
-        classes={classes}
         canEdit={canEdit}
         canCreate={canCreate}
         onSettingsClick={() => { dispatch({ type: 'SET_DAYS_CONFIG_OPEN', payload: { open: true, draft: [...workingDays] } }); }}

@@ -84,9 +84,11 @@ export function MarksheetSheetsPreview({
       );
     }
 
+    const visibleSheets = selectedStudentId === 'all' ? previewStudents.slice(0, 5) : previewStudents;
+
     return (
       <div className={`flex flex-col items-center gap-8 py-10 w-full animate-in fade-in duration-300 ${cinzel.className} ${montserrat.className} ${inter.className}`}>
-        {previewStudents.map((sheet) => (
+        {visibleSheets.map((sheet) => (
           <div 
             key={sheet.id}
             className="shrink-0 transition-all duration-300 paper-shadow bg-white"
@@ -118,6 +120,8 @@ export function MarksheetSheetsPreview({
       </div>
     );
   }
+
+  const visibleSheets = selectedStudentId === 'all' ? previewStudents.slice(0, 5) : previewStudents;
 
   return (
     <div className="bg-card border border-zinc-150 dark:border-zinc-800 p-6 rounded-2xl shadow-sm overflow-hidden flex flex-col min-h-[600px] items-center justify-center">
@@ -152,14 +156,14 @@ export function MarksheetSheetsPreview({
           {selectedStudentId === 'all' && (
             <div className="bg-emerald-50/50 dark:bg-emerald-900/10 border border-emerald-200/50 dark:border-emerald-800/40 p-4 rounded-xl text-xs text-emerald-700 dark:text-emerald-400 flex items-center gap-3 font-medium shadow-sm animate-in slide-in-from-top-2 duration-300">
               <CheckCircle2 className="size-5 shrink-0 text-emerald-500" />
-              <span>Showing previews for <strong>all {students.length} students</strong>. Scroll down to inspect. Clicking <strong>Print</strong> will generate the clean print packet.</span>
+              <span>Showing preview for the first <strong>5 of {students.length} students</strong> to optimize memory. Clicking <strong>Print</strong> will generate marksheets for all {students.length} students.</span>
             </div>
           )}
 
           {/* True A4 parchment layout sheets preview vertical stack with premium scrollbar */}
           <div className="w-full max-h-[75vh] overflow-y-auto overflow-x-auto pb-6 flex flex-col items-center gap-8 bg-zinc-50 dark:bg-zinc-950/20 p-4 sm:p-6 rounded-2xl border border-zinc-100 dark:border-zinc-800/50 shadow-inner">
             
-            {previewStudents.map((sheet) => (
+            {visibleSheets.map((sheet) => (
               <div 
                 key={sheet.id}
                 className="shrink-0 transition-all duration-300 shadow-2xl rounded-lg"

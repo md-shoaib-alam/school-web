@@ -4,7 +4,6 @@ import { useAppStore } from "@/store/use-app-store";
 import { useQueryClient } from "@tanstack/react-query";
 import { useParentDashboard } from "@/lib/graphql/hooks";
 import { Card, CardContent } from "@/components/ui/card";
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { CreditCard } from "lucide-react";
 import { toast } from "sonner";
 import type { StudentInfo, FeeRecord } from "@/lib/types";
@@ -13,6 +12,7 @@ import type { StudentInfo, FeeRecord } from "@/lib/types";
 import { FeeSummary } from "./fees/FeeSummary";
 import { FeeTable } from "./fees/FeeTable";
 import { FeesSkeleton } from "./fees/FeesSkeleton";
+import { ChildSelector } from "./ChildSelector";
 
 export function ParentFees() {
   const queryClient = useQueryClient();
@@ -22,7 +22,7 @@ export function ParentFees() {
 
   const { data, isPending } = useParentDashboard(currentUser?.name || "");
   const students = (data?.children || []) as unknown as StudentInfo[];
-  const isPremium = data?.subscriptionPlan?.toLowerCase() === 'premium';
+  const isPremium = data?.subscriptionPlan?.toLowerCase().includes('premium');
 
   // Persistence logic
   useEffect(() => {
@@ -33,13 +33,12 @@ export function ParentFees() {
         ?.split("=")[1];
       
       if (savedTab && students.some(s => s.id === savedTab)) {
-        // eslint-disable-next-line react-hooks/set-state-in-effect
         setActiveTab(savedTab);
       } else if (!activeTab) {
         setActiveTab(students[0].id);
       }
     }
-  }, [students]);
+  }, [students, activeTab]);
 
   const handleTabChange = (val: string) => {
     setActiveTab(val);
@@ -104,11 +103,9 @@ export function ParentFees() {
           throw new Error(err.error || "Payment failed");
         }
 
-        // Invalidate dashboard and other related queries
         queryClient.invalidateQueries({ queryKey: ["parent", "dashboard"] });
         queryClient.invalidateQueries({ queryKey: ["fees"] });
 
-        // Update local state on success
         setAllChildrenFees((prev) =>
           prev.map((f) => (f.id === feeId ? { ...f, status: "paid", paidAmount: f.amount } : f))
         );
@@ -128,8 +125,8 @@ export function ParentFees() {
 
   if (students.length === 0) {
     return (
-      <Card className="rounded-xl shadow-sm">
-        <CardContent className="p-12 text-center">
+      <Card className="rounded-3xl border border-zinc-200/60 dark:border-zinc-800/60 bg-white dark:bg-zinc-950 shadow-sm">
+        <CardContent className="p-16 text-center">
           <CreditCard className="size-12 mx-auto text-muted-foreground/40" />
           <h3 className="text-lg font-semibold text-zinc-900 dark:text-zinc-100 mt-4">
             No children found
@@ -142,13 +139,26 @@ export function ParentFees() {
     );
   }
 
+  const selectedStudent = students.find((s) => s.id === activeTab) || students[0];
+  const studentFees = allChildrenFees.filter(f => f.studentId === selectedStudent?.id);
+
   return (
-    <div className="space-y-6 pb-10">
-      <div className="flex items-center gap-2">
-        <CreditCard className="size-5 text-amber-600" />
-        <h2 className="text-lg font-semibold text-zinc-900 dark:text-zinc-100 uppercase tracking-tight">
-          Fee Management
-        </h2>
+    <div className="space-y-6 pb-10 animate-fade-in select-none">
+      <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 border-b border-zinc-200/60 dark:border-zinc-800/60 pb-5">
+        <div className="space-y-3.5 text-left">
+          <div className="flex items-center gap-2">
+            <CreditCard className="size-5 text-amber-600" />
+            <h2 className="text-lg font-semibold text-zinc-900 dark:text-zinc-100 uppercase tracking-tight">
+              Fee Management
+            </h2>
+          </div>
+          {/* Children switcher */}
+          <ChildSelector 
+            students={students} 
+            selectedStudentId={selectedStudent.id} 
+            onSelect={handleTabChange} 
+          />
+        </div>
       </div>
 
       <FeeSummary 
@@ -158,37 +168,16 @@ export function ParentFees() {
         overdue={summary.overdue}
       />
 
-      <Tabs value={activeTab} onValueChange={handleTabChange}>
-        <TabsList className="bg-amber-50 dark:bg-amber-900/30 p-1">
-          {students.map((student) => (
-            <TabsTrigger
-              key={student.id}
-              value={student.id}
-              className="data-[state=active]:bg-white dark:data-[state=active]:bg-zinc-900 data-[state=active]:text-amber-700 dark:data-[state=active]:text-amber-400 data-[state=active]:shadow-sm px-4 transition-all hover:bg-amber-100/30 dark:hover:bg-amber-900/20 hover:text-amber-800 dark:hover:text-amber-300"
-            >
-              <span className="flex items-center gap-2">
-                <span className="size-2 rounded-full bg-amber-400" />
-                {student.name}
-              </span>
-            </TabsTrigger>
-          ))}
-        </TabsList>
-
-        {students.map((student) => {
-          const studentFees = allChildrenFees.filter(f => f.studentId === student.id);
-          
-          return (
-            <TabsContent key={student.id} value={student.id} className="mt-6 animate-in fade-in duration-300">
-              <FeeTable 
-                studentName={student.name}
-                fees={studentFees}
-                onPay={handlePayNow}
-                isPremium={isPremium}
-              />
-            </TabsContent>
-          );
-        })}
-      </Tabs>
+      {selectedStudent && (
+        <div className="mt-6 animate-in fade-in duration-300">
+          <FeeTable 
+            studentName={selectedStudent.name}
+            fees={studentFees}
+            onPay={handlePayNow}
+            isPremium={isPremium}
+          />
+        </div>
+      )}
     </div>
   );
 }

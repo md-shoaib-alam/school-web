@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useAppStore } from "@/store/use-app-store";
-import { useTenantDetail } from "@/lib/graphql/hooks/platform.hooks";
+import { useTenantMetadata } from "@/lib/graphql/hooks/platform.hooks";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
@@ -40,7 +40,7 @@ import { SchoolPlan } from "@/lib/billing-constants";
 
 export function SchoolSubscriptionScreen() {
   const { currentTenantId } = useAppStore();
-  const { data: detailData, isLoading } = useTenantDetail(currentTenantId || "");
+  const { data: detailData, isLoading } = useTenantMetadata(currentTenantId || "");
 
   const { push } = useRouter();
   const { slug } = useParams();
@@ -119,7 +119,7 @@ export function SchoolSubscriptionScreen() {
     { 
       label: "Classes", 
       icon: <School className="size-4" />, 
-      current: tenant.maxClasses > 0 ? (detailData?.classes?.length || 0) : 0, 
+      current: tenant.maxClasses > 0 ? (tenant._count?.classes || 0) : 0, 
       max: tenant.maxClasses,
       color: "bg-amber-500"
     },

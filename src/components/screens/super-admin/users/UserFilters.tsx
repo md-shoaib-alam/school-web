@@ -1,3 +1,4 @@
+import { useState, useMemo, useRef, useCallback } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import {
@@ -7,7 +8,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Search, Filter, Building2 } from "lucide-react";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Button } from "@/components/ui/button";
+import { Search, Filter, Building2, Check, ChevronsUpDown, Loader2 } from "lucide-react";
 import { ROLES, TenantInfo } from "./types";
 
 interface UserFiltersProps {
@@ -18,6 +22,11 @@ interface UserFiltersProps {
   tenantFilter: string;
   onTenantFilterChange: (val: string) => void;
   tenants: TenantInfo[];
+  fetchNextPage?: () => void;
+  hasNextPage?: boolean;
+  isFetchingNextPage?: boolean;
+  tenantSearch: string;
+  onTenantSearchChange: (val: string) => void;
 }
 
 export function UserFilters({
@@ -28,7 +37,33 @@ export function UserFilters({
   tenantFilter,
   onTenantFilterChange,
   tenants,
+  fetchNextPage,
+  hasNextPage,
+  isFetchingNextPage,
+  tenantSearch,
+  onTenantSearchChange,
 }: UserFiltersProps) {
+  const [open, setOpen] = useState(false);
+
+  const observer = useRef<IntersectionObserver | null>(null);
+  const lastTenantElementRef = useCallback((node: HTMLButtonElement | null) => {
+    if (isFetchingNextPage) return;
+    if (observer.current) observer.current.disconnect();
+    observer.current = new IntersectionObserver((entries) => {
+      if (entries[0].isIntersecting && hasNextPage && fetchNextPage) {
+        fetchNextPage();
+      }
+    });
+    if (node) observer.current.observe(node);
+  }, [isFetchingNextPage, hasNextPage, fetchNextPage]);
+
+  const filteredTenants = useMemo(() => {
+    return tenants.filter((t) =>
+      t.name.toLowerCase().includes(tenantSearch.toLowerCase()) ||
+      t.slug.toLowerCase().includes(tenantSearch.toLowerCase())
+    );
+  }, [tenants, tenantSearch]);
+
   return (
     <Card className="border-none shadow-sm bg-white dark:bg-zinc-800 overflow-hidden">
       <CardContent className="p-4">
@@ -65,19 +100,84 @@ export function UserFilters({
             {/* Tenant Filter */}
             <div className="flex items-center gap-2 flex-1 sm:w-60">
               <Building2 className="size-4 text-muted-foreground shrink-0" />
-              <Select value={tenantFilter} onValueChange={onTenantFilterChange}>
-                <SelectTrigger className="h-11 rounded-xl border-2">
-                  <SelectValue placeholder="Filter by school" />
-                </SelectTrigger>
-                <SelectContent className="rounded-xl border-2">
-                  <SelectItem value="all" className="text-xs font-bold uppercase tracking-widest">All Schools</SelectItem>
-                  {tenants.map((t) => (
-                    <SelectItem key={t.id} value={t.id} className="text-xs font-bold">
-                      {t.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <Popover open={open} onOpenChange={setOpen}>
+                <PopoverTrigger asChild>
+                  <Button 
+                    variant="outline" 
+                    role="combobox"
+                    aria-expanded={open}
+                    className="h-11 rounded-xl border-2 w-full justify-between font-normal text-sm bg-white dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 hover:bg-zinc-50 dark:hover:bg-zinc-900"
+                  >
+                    <span className="truncate">
+                      {tenantFilter === "all" ? "All Schools" : (tenants.find(t => t.id === tenantFilter)?.name || "Select School")}
+                    </span>
+                    <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-[300px] p-0 border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 shadow-xl" align="start">
+                  <div className="flex items-center border-b px-3 border-zinc-200 dark:border-zinc-800">
+                    <Search className="mr-2 h-4 w-4 shrink-0 opacity-50 text-zinc-400" />
+                    <Input 
+                      placeholder="Search schools..." 
+                      value={tenantSearch}
+                      onChange={(e) => onTenantSearchChange(e.target.value)}
+                      className="flex h-10 w-full rounded-md bg-transparent py-3 text-sm outline-none border-none focus-visible:ring-0 focus-visible:ring-offset-0 placeholder:text-muted-foreground text-zinc-950 dark:text-white"
+                    />
+                  </div>
+                  <ScrollArea className="h-64 p-1">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        onTenantFilterChange("all");
+                        setOpen(false);
+                        onTenantSearchChange("");
+                      }}
+                      className="flex items-center justify-between w-full text-left px-3 py-2 text-sm hover:bg-zinc-150 dark:hover:bg-zinc-800 rounded-lg transition-colors cursor-pointer group"
+                    >
+                      <div className="flex flex-col">
+                        <span className="font-semibold text-zinc-900 dark:text-zinc-100">All Schools</span>
+                      </div>
+                      {tenantFilter === "all" && (
+                        <Check className="h-4 w-4 text-teal-600 shrink-0" />
+                      )}
+                    </button>
+                    
+                    {filteredTenants.length === 0 ? (
+                      <div className="p-3 text-xs text-muted-foreground text-center">No schools found.</div>
+                    ) : (
+                      <>
+                        {filteredTenants.map((t, index) => (
+                          <button
+                            key={`${t.id}-${index}`}
+                            ref={index === filteredTenants.length - 1 ? lastTenantElementRef : null}
+                            type="button"
+                            onClick={() => {
+                              onTenantFilterChange(t.id);
+                              setOpen(false);
+                              onTenantSearchChange("");
+                            }}
+                            className="flex items-center justify-between w-full text-left px-3 py-2 text-sm hover:bg-zinc-150 dark:hover:bg-zinc-800 rounded-lg transition-colors cursor-pointer group"
+                          >
+                            <div className="flex flex-col min-w-0">
+                              <span className="font-semibold text-zinc-900 dark:text-zinc-100 truncate">{t.name}</span>
+                              <span className="text-xs text-muted-foreground truncate">{t.slug}</span>
+                            </div>
+                            {tenantFilter === t.id && (
+                              <Check className="h-4 w-4 text-teal-600 shrink-0" />
+                            )}
+                          </button>
+                        ))}
+                        {isFetchingNextPage && (
+                          <div className="flex items-center justify-center p-2 text-muted-foreground gap-1.5">
+                            <Loader2 className="size-3.5 animate-spin" />
+                            <span className="text-xs">Loading more...</span>
+                          </div>
+                        )}
+                      </>
+                    )}
+                  </ScrollArea>
+                </PopoverContent>
+              </Popover>
             </div>
           </div>
         </div>

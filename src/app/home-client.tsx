@@ -63,7 +63,7 @@ export default function HomeClient({ initialHasToken }: { initialHasToken: boole
       const url = !expectedPrefix
         ? `/${currentScreen}`
         : currentScreen === "dashboard"
-          ? `/${expectedPrefix}`
+          ? `/${expectedPrefix}/dashboard`
           : `/${expectedPrefix}/${currentScreen}`;
 
       redirect(url);
@@ -73,15 +73,11 @@ export default function HomeClient({ initialHasToken }: { initialHasToken: boole
   // Check maintenance mode for non-super_admin users
   useEffect(() => {
     if (!isLoggedIn || !currentUser || userRole === "super_admin") {
-      queueMicrotask(() => {
-        dispatchMaintenance({ type: 'STOP_LOADING' });
-      });
+      dispatchMaintenance({ type: 'STOP_LOADING' });
       return;
     }
     
-    queueMicrotask(() => {
-      dispatchMaintenance({ type: 'START_LOADING' });
-    });
+    dispatchMaintenance({ type: 'START_LOADING' });
     let cancelled = false;
     
     apiFetch("/api/platform-settings")

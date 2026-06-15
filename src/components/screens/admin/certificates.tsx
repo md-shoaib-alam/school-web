@@ -103,6 +103,16 @@ export function AdminCertificates() {
     enabled: !!selectedClassId,
   });
 
+  // Fetch tenant details (name, address, etc.) for certificate rendering
+  const { data: tenantData } = useQuery({
+    queryKey: ['tenant-settings', 'profile'],
+    queryFn: async () => {
+      const res = await apiFetch('/api/tenant-settings');
+      if (!res.ok) return {};
+      return res.json();
+    },
+  });
+
   // ── Mutations ──
 
   const generateMutation = useMutation({
@@ -134,7 +144,23 @@ export function AdminCertificates() {
 
   const formatDate = (dateStr: string) => {
     if (!dateStr) return 'N/A';
-    return new Date(dateStr).toLocaleDateString('en-IN', { day: '2-digit', month: 'long', year: 'numeric' });
+    try {
+      const date = new Date(dateStr);
+      if (isNaN(date.getTime())) return dateStr;
+      
+      const months = [
+        'January', 'February', 'March', 'April', 'May', 'June',
+        'July', 'August', 'September', 'October', 'November', 'December'
+      ];
+      
+      const day = date.getDate();
+      const month = months[date.getMonth()];
+      const year = date.getFullYear();
+      
+      return `${day} ${month} ${year}`;
+    } catch {
+      return dateStr;
+    }
   };
 
   return (
@@ -299,7 +325,13 @@ export function AdminCertificates() {
           <div className="max-h-[75vh] overflow-y-auto p-4 sm:p-8 bg-zinc-100/50 flex justify-center">
             <div className="scale-[0.38] xs:scale-[0.45] sm:scale-[0.7] lg:scale-100 origin-top">
               <div ref={contentRef} className="w-[210mm] bg-white shadow-2xl">
-                <CertificateTemplate cert={viewCert} formatDate={formatDate} />
+                <CertificateTemplate 
+                  cert={viewCert} 
+                  formatDate={formatDate}
+                  schoolName={tenantData?.tenantName}
+                  affiliation={tenantData?.affiliation}
+                  schoolAddress={tenantData?.tenantAddress}
+                />
               </div>
             </div>
           </div>

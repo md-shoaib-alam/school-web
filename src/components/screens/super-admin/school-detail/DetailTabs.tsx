@@ -34,9 +34,10 @@ interface DetailTabsProps {
   importing: boolean;
   onExport: (type: string) => void;
   onImportClick: () => void;
-  filteredData: any[];
   paginatedData: any[];
   totalPages: number;
+  totalItems: number;
+  isLoading: boolean;
 }
 
 export function DetailTabs({
@@ -50,9 +51,10 @@ export function DetailTabs({
   importing,
   onExport,
   onImportClick,
-  filteredData,
   paginatedData,
   totalPages,
+  totalItems,
+  isLoading,
 }: DetailTabsProps) {
   
   function getPaginationRange(current: number, total: number): (number | "ellipsis")[] {
@@ -93,7 +95,7 @@ export function DetailTabs({
                 variant="outline"
                 size="sm"
                 onClick={() => onExport(activeTab)}
-                disabled={exporting || filteredData.length === 0}
+                disabled={exporting || totalItems === 0}
                 className="h-10 text-[11px] font-black uppercase tracking-widest px-4 border-2 rounded-xl hover:bg-zinc-50 dark:hover:bg-zinc-900 transition-all"
               >
                 {exporting ? (
@@ -137,7 +139,12 @@ export function DetailTabs({
           {/* Table Content */}
           {TAB_CONFIG.map((tab) => (
             <TabsContent key={tab.value} value={tab.value} className="mt-0 focus-visible:outline-none focus-visible:ring-0">
-              {filteredData.length === 0 ? (
+              {isLoading ? (
+                <div className="py-24 text-center">
+                  <Loader2 className="size-10 animate-spin text-rose-600 mx-auto mb-4" />
+                  <p className="text-sm font-black text-muted-foreground animate-pulse tracking-widest uppercase">Fetching {tab.label}…</p>
+                </div>
+              ) : totalItems === 0 ? (
                 <div className="py-24 text-center border-2 border-dashed border-zinc-100 dark:border-zinc-800 rounded-3xl">
                   <div className="size-20 mx-auto mb-6 rounded-full bg-zinc-50 dark:bg-zinc-900 flex items-center justify-center text-muted-foreground/30">
                     {tab.icon}
@@ -178,7 +185,7 @@ export function DetailTabs({
                   {/* Pagination */}
                   <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-4 border-t border-zinc-50 dark:border-zinc-900">
                     <p className="text-xs font-black uppercase tracking-widest text-muted-foreground">
-                      Showing <span className="text-rose-600">{(currentPage - 1) * 20 + 1}</span> to <span className="text-rose-600">{Math.min(currentPage * 20, filteredData.length)}</span> of {filteredData.length} records
+                      Showing <span className="text-rose-600">{(currentPage - 1) * 20 + 1}</span> to <span className="text-rose-600">{Math.min(currentPage * 20, totalItems)}</span> of {totalItems} records
                     </p>
                     <div className="flex items-center gap-1.5">
                       <Button

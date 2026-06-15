@@ -6,7 +6,6 @@ import { apiFetch } from "@/lib/api";
 import { useAppStore } from "@/store/use-app-store";
 import { useParentDashboard } from "@/lib/graphql/hooks";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -21,6 +20,7 @@ import { PerformanceChart } from "./grades/PerformanceChart";
 import { GradesTable } from "./grades/GradesTable";
 import { GradesSkeleton } from "./grades/GradesSkeleton";
 import { ResultPublishedBanner } from "@/components/shared/result-published-banner";
+import { ChildSelector } from "./ChildSelector";
 
 // Utils
 import { getGradesForStudent, getSubjectChartData, getOverallStats } from "./grades/utils";
@@ -167,238 +167,198 @@ export function ParentGrades({ initialTab = "exams" }: { initialTab?: "exams" | 
     );
   }
 
-  const activeStudentName = students.find(s => s.id === activeTab)?.name || "Student";
+  const selectedStudent = students.find((s) => s.id === activeTab) || students[0];
+  const studentGrades = getGradesForStudent(selectedStudent.id, grades);
+  const chartData = getSubjectChartData(selectedStudent.id, grades);
+  const stats = getOverallStats(selectedStudent.id, grades);
 
   return (
-    <div className="space-y-6 pb-10">
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
-        <div className="flex items-center gap-2">
-          {topLevelTab === "exams" ? (
-            <GraduationCap className="size-5 text-amber-600" />
-          ) : (
-            <ClipboardList className="size-5 text-violet-600" />
-          )}
-          <h2 className="text-lg font-semibold text-zinc-900 dark:text-zinc-100 uppercase tracking-tight">
-            {topLevelTab === "exams" ? "School Exams" : "Class Assessments"}
-          </h2>
-        </div>
-        <div className="flex items-center gap-3">
+    <div className="space-y-6 pb-10 animate-fade-in select-none">
+      <div className="flex flex-col gap-4 border-b border-zinc-200/60 dark:border-zinc-800/60 pb-5">
+        <div className="flex items-center justify-between w-full">
+          <div className="flex items-center gap-2">
+            {topLevelTab === "exams" ? (
+              <GraduationCap className="size-5 text-amber-600" />
+            ) : (
+              <ClipboardList className="size-5 text-violet-600" />
+            )}
+            <h2 className="text-lg font-semibold text-zinc-900 dark:text-zinc-100 uppercase tracking-tight">
+              {topLevelTab === "exams" ? "School Exams" : "Class Assessments"}
+            </h2>
+          </div>
+
+          {/* Top-Right Action Button */}
           {topLevelTab === "exams" && (
             <Button
               size="sm"
               variant="outline"
-              className="h-8 gap-1.5 text-xs font-semibold border-amber-200 text-amber-700 hover:bg-amber-50 dark:border-amber-900/30 dark:text-amber-400 dark:hover:bg-amber-950/20"
+              className="h-8 gap-1.5 text-xs font-semibold border-amber-200 text-amber-700 hover:bg-amber-50 dark:border-amber-900/30 dark:text-amber-400 dark:hover:bg-amber-950/20 shadow-sm"
               onClick={handleViewMarksheet}
             >
               <FileText className="size-3.5" />
               View Marksheet
             </Button>
           )}
-          <Badge variant="outline" className="bg-muted/20 text-muted-foreground shadow-none border-zinc-200 dark:border-zinc-800 text-[10px] font-semibold font-sans tracking-wide px-2 py-0.5 uppercase">
-            Parent Portal
-          </Badge>
+        </div>
+
+        <div className="text-left">
+          {/* Children Switcher Dropdown */}
+          <ChildSelector 
+            students={students}
+            selectedStudentId={selectedStudent.id}
+            onSelect={handleTabChange}
+          />
         </div>
       </div>
 
       {topLevelTab === "exams" && (
-        <ResultPublishedBanner studentId={activeTab || undefined} />
+        <ResultPublishedBanner studentId={selectedStudent.id} />
       )}
 
-      <Tabs value={activeTab} onValueChange={handleTabChange}>
-        <TabsList className={`p-1 rounded-lg border shadow-none w-fit ${
-          topLevelTab === "exams" 
-            ? "bg-amber-50/40 border-amber-100/50 dark:bg-amber-950/10 dark:border-amber-900/30" 
-            : "bg-violet-50/40 border-violet-100/50 dark:bg-violet-950/10 dark:border-violet-900/30"
-        }`}>
-          {students.map((student) => (
-            <TabsTrigger
-              key={student.id}
-              value={student.id}
-              className={`px-4 py-1.5 text-xs font-medium rounded-md transition-all data-[state=active]:bg-card data-[state=active]:shadow-xs ${
-                topLevelTab === "exams" 
-                  ? "data-[state=active]:text-amber-700 dark:data-[state=active]:text-amber-400 hover:bg-amber-100/30 dark:hover:bg-amber-900/20 hover:text-amber-800 dark:hover:text-amber-300" 
-                  : "data-[state=active]:text-violet-700 dark:data-[state=active]:text-violet-400 hover:bg-violet-100/30 dark:hover:bg-violet-900/20 hover:text-violet-800 dark:hover:text-violet-300"
-              }`}
-            >
-              <span className="flex items-center gap-2">
-                <span className={`size-2 rounded-full ${topLevelTab === "exams" ? "bg-amber-500" : "bg-violet-500"}`} />
-                {student.name}
-              </span>
-            </TabsTrigger>
-          ))}
-        </TabsList>
+      <div className="space-y-6 mt-6 animate-in fade-in duration-300 text-left">
+        {topLevelTab === "exams" ? (
+          // RENDER OFFICIAL EXAMS VIEW
+          <>
+            <GradesSummary 
+              avg={stats.avg}
+              grade={stats.grade}
+              highestSubject={stats.highest.subject}
+              highestPct={stats.highest.pct}
+              totalExams={stats.totalExams}
+            />
 
-        {students.map((student) => {
-          // Data processing inside the maps
-          const studentGrades = getGradesForStudent(student.id, grades);
-          const chartData = getSubjectChartData(student.id, grades);
-          const stats = getOverallStats(student.id, grades);
+            <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
+              <div className="lg:col-span-2">
+                <PerformanceChart data={chartData} />
+              </div>
+              <div className="lg:col-span-3">
+                <GradesTable studentName={selectedStudent.name} grades={studentGrades} />
+              </div>
+            </div>
+          </>
+        ) : (
+          // RENDER CONTINUOUS ASSESSMENTS VIEW
+          <>
+            {loadingAssessments ? (
+              <div className="space-y-6 py-4">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                  {[...Array(3)].map((_, i) => <div key={i} className="h-28 bg-muted/40 animate-pulse rounded-xl" />)}
+                </div>
+                <div className="h-80 bg-muted/30 animate-pulse rounded-xl" />
+              </div>
+            ) : (
+              <>
+                {/* Assessment Cards */}
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                  <Card className="rounded-xl shadow-none border-zinc-200/60 dark:border-zinc-800">
+                    <CardContent className="p-5 flex flex-col items-center justify-center text-center">
+                      <div className="inline-flex p-2.5 rounded-lg bg-violet-50 dark:bg-violet-950/40 text-violet-600 dark:text-violet-400 mb-2">
+                        <TrendingUp className="size-5" />
+                      </div>
+                      <p className="text-3xl font-extrabold tracking-tight text-zinc-900 dark:text-zinc-100">{assessmentStats.avg}%</p>
+                      <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground mt-1">Average Score</p>
+                    </CardContent>
+                  </Card>
 
-          return (
-            <TabsContent
-              key={student.id}
-              value={student.id}
-              className="space-y-6 mt-6 animate-in fade-in duration-300 text-left"
-            >
-              {topLevelTab === "exams" ? (
-                // RENDER OFFICIAL EXAMS VIEW
-                <>
-                  <GradesSummary 
-                    avg={stats.avg}
-                    grade={stats.grade}
-                    highestSubject={stats.highest.subject}
-                    highestPct={stats.highest.pct}
-                    totalExams={stats.totalExams}
-                  />
+                  <Card className="rounded-xl shadow-none border-zinc-200/60 dark:border-zinc-800">
+                    <CardContent className="p-5 flex flex-col items-center justify-center text-center">
+                      <div className="inline-flex p-2.5 rounded-lg bg-violet-50 dark:bg-violet-950/40 text-violet-600 dark:text-violet-400 mb-2">
+                        <Award className="size-5" />
+                      </div>
+                      <p className="text-3xl font-extrabold tracking-tight text-zinc-900 dark:text-zinc-100">{assessmentStats.total}</p>
+                      <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground mt-1">Total Assessments</p>
+                    </CardContent>
+                  </Card>
 
-                  <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
-                    <div className="lg:col-span-2">
-                      <PerformanceChart data={chartData} />
-                    </div>
-                    <div className="lg:col-span-3">
-                      <GradesTable studentName={student.name} grades={studentGrades} />
-                    </div>
+                  <Card className="rounded-xl shadow-none border-zinc-200/60 dark:border-zinc-800">
+                    <CardContent className="p-5 flex flex-col items-center justify-center text-center">
+                      <div className="inline-flex p-2.5 rounded-lg bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400 mb-2">
+                        <CheckCircle2 className="size-5" />
+                      </div>
+                      <p className="text-3xl font-extrabold tracking-tight text-zinc-900 dark:text-zinc-100">{assessmentStats.passCount}</p>
+                      <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground mt-1">Passed Assessments</p>
+                    </CardContent>
+                  </Card>
+                </div>
+
+                <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
+                  {/* Re-use exams performance chart with mapped assessment data */}
+                  <div className="lg:col-span-2">
+                    <PerformanceChart data={assessmentChartData} />
                   </div>
-                </>
-              ) : (
-                // RENDER CONTINUOUS ASSESSMENTS VIEW
-                <>
-                  {loadingAssessments ? (
-                    <div className="space-y-6 py-4">
-                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                        {[...Array(3)].map((_, i) => <div key={i} className="h-28 bg-muted/40 animate-pulse rounded-xl" />)}
-                      </div>
-                      <div className="h-80 bg-muted/30 animate-pulse rounded-xl" />
-                    </div>
-                  ) : (
-                    <>
-                      {/* Assessment Cards */}
-                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                        <Card className="rounded-xl shadow-none border-zinc-200/60 dark:border-zinc-800">
-                          <CardContent className="p-5 flex flex-col items-center justify-between text-center">
-                            <div className="inline-flex p-2.5 rounded-lg bg-violet-50 dark:bg-violet-950/40 text-violet-600 dark:text-violet-400 mb-2">
-                              <TrendingUp className="size-5" />
-                            </div>
-                            <div>
-                              <p className="text-3xl font-extrabold tracking-tight text-zinc-900 dark:text-zinc-100">{assessmentStats.avg}%</p>
-                              <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground mt-1">Avg Assessment Score</p>
-                            </div>
-                            <Progress value={assessmentStats.avg} className="mt-3 h-1 bg-muted [&>div]:bg-violet-600 w-full" />
-                          </CardContent>
-                        </Card>
 
-                        <Card className="rounded-xl shadow-none border-zinc-200/60 dark:border-zinc-800">
-                          <CardContent className="p-5 flex flex-col items-center justify-between text-center">
-                            <div className="inline-flex p-2.5 rounded-lg bg-violet-50 dark:bg-violet-950/40 text-violet-600 dark:text-violet-400 mb-2">
-                              <Award className="size-5" />
+                  {/* List Assessments */}
+                  <div className="lg:col-span-3">
+                    <Card className="rounded-xl shadow-none border-zinc-200/60 dark:border-zinc-800 h-full">
+                      <CardHeader className="p-4 border-b border-zinc-100/60 dark:border-zinc-800/50">
+                        <CardTitle className="text-sm font-bold text-zinc-900 dark:text-zinc-100 flex items-center gap-2">
+                          <ClipboardList className="size-4 text-violet-500" />
+                          {selectedStudent.name}&apos;s Assessments
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent className="p-0">
+                        <ScrollArea className="h-[300px]">
+                          {assessmentGrades.length === 0 ? (
+                            <div className="p-12 text-center text-muted-foreground flex flex-col items-center">
+                              <BookOpen className="size-8 opacity-30 mb-2" />
+                              <p className="text-xs font-semibold">No assessments recorded yet</p>
                             </div>
-                            <div>
-                              <p className="text-3xl font-extrabold tracking-tight text-zinc-900 dark:text-zinc-100">{assessmentStats.total}</p>
-                              <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground mt-1">Total Assessments</p>
-                            </div>
-                            <p className="text-xs text-muted-foreground mt-3 font-medium">
-                              Across {[...new Set(assessmentGrades.map(g => g.subjectName))].length} graded subjects
-                            </p>
-                          </CardContent>
-                        </Card>
-
-                        <Card className="rounded-xl shadow-none border-zinc-200/60 dark:border-zinc-800">
-                          <CardContent className="p-5 flex flex-col items-center justify-between text-center">
-                            <div className="inline-flex p-2.5 rounded-lg bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400 mb-2">
-                              <CheckCircle2 className="size-5" />
-                            </div>
-                            <div>
-                              <p className="text-3xl font-extrabold tracking-tight text-zinc-900 dark:text-zinc-100">{assessmentStats.passCount}</p>
-                              <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground mt-1">Passed Items</p>
-                            </div>
-                            <p className="text-xs text-emerald-600 dark:text-emerald-400 font-bold mt-3 flex items-center gap-1">
-                              ✨ Keeping up nicely!
-                            </p>
-                          </CardContent>
-                        </Card>
-                      </div>
-
-                      <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
-                        {/* Re-use exams performance chart with mapped assessment data */}
-                        <div className="lg:col-span-2">
-                          <PerformanceChart data={assessmentChartData} />
-                        </div>
-
-                        {/* List Assessments */}
-                        <div className="lg:col-span-3">
-                          <Card className="rounded-xl shadow-none border-zinc-200/60 dark:border-zinc-800 h-full">
-                            <CardHeader className="p-4 border-b border-zinc-100/60 dark:border-zinc-800/50">
-                              <CardTitle className="text-sm font-bold text-zinc-900 dark:text-zinc-100 flex items-center gap-2">
-                                <ClipboardList className="size-4 text-violet-500" />
-                                {activeStudentName}&apos;s Assessments
-                              </CardTitle>
-                            </CardHeader>
-                            <CardContent className="p-0">
-                              <ScrollArea className="h-[300px]">
-                                {assessmentGrades.length === 0 ? (
-                                  <div className="p-12 text-center text-muted-foreground flex flex-col items-center">
-                                    <BookOpen className="size-8 opacity-30 mb-2" />
-                                    <p className="text-xs font-semibold">No assessments recorded yet</p>
-                                  </div>
-                                ) : (
-                                  <Table>
-                                    <TableHeader className="bg-muted/20 sticky top-0">
-                                      <TableRow className="border-zinc-100 dark:border-zinc-800/70">
-                                        <TableHead className="text-xs font-semibold h-9">Subject/Title</TableHead>
-                                        <TableHead className="text-xs font-semibold h-9">Type</TableHead>
-                                        <TableHead className="text-center text-xs font-semibold h-9">Score</TableHead>
-                                        <TableHead className="text-center text-xs font-semibold h-9">Status</TableHead>
-                                      </TableRow>
-                                    </TableHeader>
-                                    <TableBody>
-                                      {assessmentGrades.map((g) => {
-                                        const pct = Math.round((g.marksObtained / g.totalMarks) * 100);
-                                        const isPass = g.marksObtained >= g.passingMarks;
-                                        return (
-                                          <TableRow key={g.id} className="border-zinc-100 dark:border-zinc-800/60">
-                                            <TableCell className="py-2.5 text-left">
-                                              <div className="flex flex-col text-left">
-                                                <span className="text-xs font-semibold text-zinc-900 dark:text-zinc-100">{g.title}</span>
-                                                <span className="text-[10px] text-muted-foreground">{g.subjectName}</span>
-                                              </div>
-                                            </TableCell>
-                                            <TableCell className="py-2.5">
-                                              <Badge variant="outline" className="text-[9px] bg-muted/30 px-1.5 font-bold uppercase tracking-wide border-none">
-                                                {g.type.replace(/_/g, " ")}
-                                              </Badge>
-                                            </TableCell>
-                                            <TableCell className="py-2.5 text-center">
-                                              <span className="text-xs font-bold">
-                                                {Number(g.marksObtained).toFixed(2).replace(/\.00$/, "")}
-                                              </span>
-                                              <span className="text-[10px] text-muted-foreground">/{g.totalMarks}</span>
-                                            </TableCell>
-                                            <TableCell className="py-2.5 text-center">
-                                              <Badge className={`text-[9px] border-none font-bold shadow-none px-1.5 py-0.5 ${
-                                                isPass ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400" : "bg-rose-100 text-rose-700 dark:bg-rose-950/40 dark:text-rose-400"
-                                              }`}>
-                                                {isPass ? "PASS" : "FAIL"}
-                                              </Badge>
-                                            </TableCell>
-                                          </TableRow>
-                                        );
-                                      })}
-                                    </TableBody>
-                                  </Table>
-                                )}
-                              </ScrollArea>
-                            </CardContent>
-                          </Card>
-                        </div>
-                      </div>
-                    </>
-                  )}
-                </>
-              )}
-            </TabsContent>
-          );
-        })}
-      </Tabs>
+                          ) : (
+                            <Table>
+                              <TableHeader className="bg-muted/20 sticky top-0">
+                                <TableRow className="border-zinc-100 dark:border-zinc-800/70">
+                                  <TableHead className="text-xs font-semibold h-9">Subject/Title</TableHead>
+                                  <TableHead className="text-xs font-semibold h-9">Type</TableHead>
+                                  <TableHead className="text-center text-xs font-semibold h-9">Score</TableHead>
+                                  <TableHead className="text-center text-xs font-semibold h-9">Status</TableHead>
+                                </TableRow>
+                              </TableHeader>
+                              <TableBody>
+                                {assessmentGrades.map((g) => {
+                                  const pct = Math.round((g.marksObtained / g.totalMarks) * 100);
+                                  const isPass = g.marksObtained >= g.passingMarks;
+                                  return (
+                                    <TableRow key={g.id} className="border-zinc-100 dark:border-zinc-800/60">
+                                      <TableCell className="py-2.5 text-left">
+                                        <div className="flex flex-col text-left">
+                                          <span className="text-xs font-semibold text-zinc-900 dark:text-zinc-100">{g.title}</span>
+                                          <span className="text-[10px] text-muted-foreground">{g.subjectName}</span>
+                                        </div>
+                                      </TableCell>
+                                      <TableCell className="py-2.5">
+                                        <Badge variant="outline" className="text-[9px] bg-muted/30 px-1.5 font-bold uppercase tracking-wide border-none">
+                                          {g.type.replace(/_/g, " ")}
+                                        </Badge>
+                                      </TableCell>
+                                      <TableCell className="py-2.5 text-center">
+                                        <span className="text-xs font-bold">
+                                          {Number(g.marksObtained).toFixed(2).replace(/\.00$/, "")}
+                                        </span>
+                                        <span className="text-[10px] text-muted-foreground">/{g.totalMarks}</span>
+                                      </TableCell>
+                                      <TableCell className="py-2.5 text-center">
+                                        <Badge className={`text-[9px] border-none font-bold shadow-none px-1.5 py-0.5 ${
+                                          isPass ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400" : "bg-rose-100 text-rose-700 dark:bg-rose-950/40 dark:text-rose-400"
+                                        }`}>
+                                          {isPass ? "PASS" : "FAIL"}
+                                        </Badge>
+                                      </TableCell>
+                                    </TableRow>
+                                  );
+                                })}
+                              </TableBody>
+                            </Table>
+                          )}
+                        </ScrollArea>
+                      </CardContent>
+                    </Card>
+                  </div>
+                </div>
+              </>
+            )}
+          </>
+        )}
+      </div>
     </div>
   );
 }

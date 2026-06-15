@@ -41,8 +41,10 @@ export function HomeworkCreateDialog({
   const uniqueClasses = useMemo(() => {
     const classesMap = new Map();
     subjects.forEach((s) => {
-      if (!classesMap.has(s.classId)) {
-        classesMap.set(s.classId, s.className);
+      if (s.classId && typeof s.classId === "string" && s.classId.trim() !== "") {
+        if (!classesMap.has(s.classId)) {
+          classesMap.set(s.classId, s.className);
+        }
       }
     });
     return Array.from(classesMap.entries())
@@ -52,7 +54,7 @@ export function HomeworkCreateDialog({
 
   const filteredSubjects = useMemo(() => {
     if (!form.classId) return [];
-    return subjects.filter((s) => s.classId === form.classId);
+    return subjects.filter((s) => s.classId === form.classId && s.id && typeof s.id === "string" && s.id.trim() !== "");
   }, [subjects, form.classId]);
 
   return (
@@ -85,9 +87,10 @@ export function HomeworkCreateDialog({
               <Select
                 value={form.classId}
                 onValueChange={(v) => dispatch({ type: "SET_FORM", payload: { classId: v, subjectId: "" } })}
+                disabled={uniqueClasses.length === 0}
               >
                 <SelectTrigger className="mt-1.5">
-                  <SelectValue placeholder="Select class" />
+                  <SelectValue placeholder={uniqueClasses.length === 0 ? "No classes assigned" : "Select class"} />
                 </SelectTrigger>
                 <SelectContent>
                   {uniqueClasses.map((c) => (
@@ -118,47 +121,28 @@ export function HomeworkCreateDialog({
               </Select>
             </div>
           </div>
-          <div className="grid grid-cols-2 gap-4">
-            <div className="flex flex-col gap-2">
-              <Label>Due Date *</Label>
-              <Popover open={isCalendarOpen} onOpenChange={setIsCalendarOpen}>
-                <PopoverTrigger asChild>
-                  <Button variant="outline" className="w-full justify-start text-left font-normal mt-0.5">
-                    <CalendarDays className="mr-2 size-4" />
-                    {form.dueDate ? format(form.dueDate, "PPP") : <span>Pick a date</span>}
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-auto p-0" align="start">
-                  <Calendar
-                    mode="single"
-                    selected={form.dueDate}
-                    onSelect={(date) => {
-                      dispatch({ type: "SET_FORM", payload: { dueDate: date } });
-                      setIsCalendarOpen(false);
-                    }}
-                    disabled={(date) => !!todayStart && date < todayStart}
-                    initialFocus
-                  />
-                </PopoverContent>
-              </Popover>
-            </div>
-            <div>
-              <Label>Submission Mode</Label>
-              <Select
-                value={form.mode}
-                onValueChange={(v: any) => dispatch({ type: "SET_FORM", payload: { mode: v } })}
-              >
-                <SelectTrigger className="mt-1.5">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="offline">Offline (Classroom)</SelectItem>
-                  <SelectItem value="online" disabled className="text-muted-foreground">
-                    Online (🔒 Premium Only)
-                  </SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
+          <div className="flex flex-col gap-2">
+            <Label>Due Date *</Label>
+            <Popover open={isCalendarOpen} onOpenChange={setIsCalendarOpen}>
+              <PopoverTrigger asChild>
+                <Button variant="outline" className="w-full justify-start text-left font-normal mt-0.5">
+                  <CalendarDays className="mr-2 size-4" />
+                  {form.dueDate ? format(form.dueDate, "PPP") : <span>Pick a date</span>}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0" align="start">
+                <Calendar
+                  mode="single"
+                  selected={form.dueDate}
+                  onSelect={(date) => {
+                    dispatch({ type: "SET_FORM", payload: { dueDate: date } });
+                    setIsCalendarOpen(false);
+                  }}
+                  disabled={(date) => !!todayStart && date < todayStart}
+                  initialFocus
+                />
+              </PopoverContent>
+            </Popover>
           </div>
           <div>
             <Label>Description</Label>

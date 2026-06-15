@@ -29,28 +29,38 @@ function PaginationPages({
   if (totalPages <= 1) return null;
 
   const getPageNumbers = (): (number | "ellipsis")[] => {
-    if (totalPages <= 7) {
+    if (totalPages <= 4) {
       return Array.from({ length: totalPages }, (_, i) => i + 1);
     }
 
-    const pages: (number | "ellipsis")[] = [1];
+    const pages: (number | "ellipsis")[] = [];
+
+    // Always include page 1
+    pages.push(1);
 
     if (currentPage > 3) {
       pages.push("ellipsis");
     }
 
+    // Pages around current page
     const start = Math.max(2, currentPage - 1);
     const end = Math.min(totalPages - 1, currentPage + 1);
 
     for (let i = start; i <= end; i++) {
-      pages.push(i);
+      if (i > 1 && i < totalPages) {
+        pages.push(i);
+      }
     }
 
     if (currentPage < totalPages - 2) {
       pages.push("ellipsis");
     }
 
-    pages.push(totalPages);
+    // Always include last page
+    if (totalPages > 1) {
+      pages.push(totalPages);
+    }
+
     return pages;
   };
 
@@ -123,47 +133,50 @@ export function Pagination({
           <div className="flex items-center gap-2">
             <span className="text-xs text-muted-foreground whitespace-nowrap">Rows per page:</span>
             <Select
-              value={itemsPerPage.toString()}
+              value={(itemsPerPage || 15).toString()}
               onValueChange={(v) => handleLimitChange(parseInt(v))}
             >
               <SelectTrigger className="h-8 w-[70px] bg-transparent border-zinc-200 dark:border-zinc-800 text-xs">
-                <SelectValue placeholder={itemsPerPage.toString()} />
+                <SelectValue placeholder={(itemsPerPage || 15).toString()} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="12">12</SelectItem>
+                <SelectItem value="15">15</SelectItem>
                 <SelectItem value="25">25</SelectItem>
                 <SelectItem value="50">50</SelectItem>
+                <SelectItem value="100">100</SelectItem>
               </SelectContent>
             </Select>
           </div>
         )}
       </div>
 
-      <div className="flex items-center gap-1">
-        <Button
-          variant="outline"
-          size="icon"
-          className="size-8"
-          disabled={currentPage <= 1}
-          onClick={() => handlePageChange(currentPage - 1)}
-        >
-          <ChevronLeft className="size-4" />
-        </Button>
-        <PaginationPages
-          currentPage={currentPage}
-          totalPages={totalPages}
-          onPageChange={handlePageChange}
-        />
-        <Button
-          variant="outline"
-          size="icon"
-          className="size-8"
-          disabled={currentPage >= totalPages}
-          onClick={() => handlePageChange(currentPage + 1)}
-        >
-          <ChevronRight className="size-4" />
-        </Button>
-      </div>
+      {totalPages > 1 && (
+        <div className="flex items-center gap-1">
+          <Button
+            variant="outline"
+            size="icon"
+            className="size-8"
+            disabled={currentPage <= 1}
+            onClick={() => handlePageChange(currentPage - 1)}
+          >
+            <ChevronLeft className="size-4" />
+          </Button>
+          <PaginationPages
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={handlePageChange}
+          />
+          <Button
+            variant="outline"
+            size="icon"
+            className="size-8"
+            disabled={currentPage >= totalPages}
+            onClick={() => handlePageChange(currentPage + 1)}
+          >
+            <ChevronRight className="size-4" />
+          </Button>
+        </div>
+      )}
     </div>
   );
 }

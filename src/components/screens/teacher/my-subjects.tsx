@@ -181,30 +181,66 @@ export function TeacherSubjects() {
     setViewCookie(v);
   };
 
-  const { data: subjects = [], isLoading } = useQuery<SubjectInfo[]>({
+  const { data: subjects = [], isLoading: subjectsLoading } = useQuery<SubjectInfo[]>({
     queryKey: ["teacher-subjects-mine-v2"],
     queryFn: () => api.get<SubjectInfo[]>("/subjects?mine=true"),
     staleTime: 10 * 60 * 1000,
     gcTime: 30 * 60 * 1000,
   });
 
-  // Retrieve the single teacher ID from one of the subject assignments to query their complete schedule
-  const teacherId = subjects.find((s) => s.teacherId)?.teacherId;
-
-  const { data: timetable = [] } = useQuery<TimetableSlot[]>({
-    queryKey: ["teacher-timetable-summary", teacherId],
-    queryFn: () => api.get<TimetableSlot[]>(`/timetable?teacherId=${teacherId}`),
-    enabled: !!teacherId,
+  const { data: timetable = [], isLoading: timetableLoading } = useQuery<any[]>({
+    queryKey: ["teacher-timetable-summary-mine"],
+    queryFn: () => api.get<any[]>("/timetable?mine=true"),
     staleTime: 5 * 60 * 1000,
   });
+
+  const isLoading = subjectsLoading || timetableLoading;
+
+  const timetableSubjects = useMemo(() => {
+    const list: SubjectInfo[] = [];
+    const seen = new Set<string>();
+    timetable.forEach((t) => {
+      if (t.subjectId && t.subjectName) {
+        const key = `${t.subjectId}-${t.classId}`;
+        if (!seen.has(key)) {
+          seen.add(key);
+          list.push({
+            id: t.subjectId,
+            name: t.subjectName,
+            code: t.subjectCode || "",
+            className: t.className || "Class",
+            classId: t.classId || "",
+            teacherName: t.teacherName || "",
+            teacherId: t.teacherId || "",
+          });
+        }
+      }
+    });
+    return list;
+  }, [timetable]);
+
+  const combinedSubjects = useMemo(() => {
+    const list = [...subjects];
+    const seen = new Set(subjects.map(s => `${s.id}-${s.classId}`));
+    timetableSubjects.forEach((ts) => {
+      const key = `${ts.id}-${ts.classId}`;
+      if (!seen.has(key)) {
+        seen.add(key);
+        list.push(ts);
+      }
+    });
+    return list;
+  }, [subjects, timetableSubjects]);
 
   const slotsBySubject = useMemo(() => {
     const map = new Map<string, TimetableSlot[]>();
     if (!timetable.length) return map;
     
     timetable.forEach((t) => {
-      if (!map.has(t.subjectId)) map.set(t.subjectId, []);
-      map.get(t.subjectId)!.push(t);
+      if (t.subjectId) {
+        if (!map.has(t.subjectId)) map.set(t.subjectId, []);
+        map.get(t.subjectId)!.push(t);
+      }
     });
 
     // Pre-sort each subject array exactly once
@@ -213,8 +249,8 @@ export function TeacherSubjects() {
   }, [timetable]);
 
   const sortedSubjects = useMemo(() => {
-    if (!subjects.length) return [];
-    const list = [...subjects];
+    if (!combinedSubjects.length) return [];
+    const list = [...combinedSubjects];
     
     list.sort((a, b) => {
       const slotsA = slotsBySubject.get(a.id) || [];
@@ -231,7 +267,7 @@ export function TeacherSubjects() {
     });
 
     return list;
-  }, [subjects, slotsBySubject]);
+  }, [combinedSubjects, slotsBySubject]);
 
   // ── Loading ──────────────────────────────────────────────
 
@@ -259,11 +295,11 @@ export function TeacherSubjects() {
   if (sortedSubjects.length === 0 && !isLoading) {
     return (
       <div className="space-y-6">
-        <Header subjects={subjects} view={view} switchView={switchView} />
-        <div className="text-center py-20 bg-zinc-900/20 rounded-3xl border border-dashed border-zinc-800">
-          <BookOpen className="size-16 text-zinc-700 mx-auto mb-4 opacity-50" />
-          <h3 className="text-xl font-semibold text-zinc-300">No Subjects Assigned</h3>
-          <p className="text-zinc-500 mt-2 max-w-xs mx-auto">
+        <Header subjects={combinedSubjects} view={view} switchView={switchView} />
+        <div className="text-center py-20 bg-zinc-50 dark:bg-zinc-900/20 rounded-3xl border border-dashed border-zinc-200 dark:border-zinc-800">
+          <BookOpen className="size-16 text-zinc-400 dark:text-zinc-700 mx-auto mb-4 opacity-50" />
+          <h3 className="text-xl font-semibold text-zinc-800 dark:text-zinc-300">No Subjects Assigned</h3>
+          <p className="text-zinc-500 dark:text-zinc-400 mt-2 max-w-xs mx-auto">
             You don't have any subjects assigned yet. Contact your administrator.
           </p>
         </div>

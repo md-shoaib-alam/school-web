@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -19,6 +19,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { ClassSelect } from "@/components/ui/class-select";
+import { DatePicker } from "@/components/ui/date-picker";
 import { Switch } from "@/components/ui/switch";
 import { Loader2, Bus } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
@@ -29,7 +31,7 @@ interface StudentDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   mode: "create" | "edit";
-  classes: ClassInfo[];
+  classes?: ClassInfo[];
   formData: StudentFormData;
   setFormData: (data: StudentFormData) => void;
   submitting: boolean;
@@ -48,7 +50,11 @@ export function StudentDialog({
 }: StudentDialogProps) {
   const isCreate = mode === "create";
 
-  // Fetch transport routes for the dropdown (min data)
+  const [showCustomPickup, setShowCustomPickup] = useState(false);
+  const [customPickupName, setCustomPickupName] = useState("");
+  const [customPickupFee, setCustomPickupFee] = useState("");
+
+  // Fetch transport routes for the dropdown (with stops info)
   const { data: routes = [] } = useQuery({
     queryKey: ['transport-routes-min'],
     enabled: open,
@@ -57,6 +63,26 @@ export function StudentDialog({
       return res.json();
     }
   });
+
+  // Reset custom pickup when route or dialog changes
+  useEffect(() => {
+    if (!open) {
+      setShowCustomPickup(false);
+      setCustomPickupName("");
+      setCustomPickupFee("");
+    }
+  }, [open]);
+
+  useEffect(() => {
+    setShowCustomPickup(false);
+    setCustomPickupName("");
+    setCustomPickupFee("");
+  }, [formData.routeId]);
+
+  const selectedRoute = routes.find((r: any) => r.id === formData.routeId);
+  const routeStops = selectedRoute
+    ? (typeof selectedRoute.stops === "string" ? JSON.parse(selectedRoute.stops) : (selectedRoute.stops || []))
+    : [];
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -71,7 +97,7 @@ export function StudentDialog({
         </DialogHeader>
         <div className="grid gap-4 py-2">
           <div className="grid gap-2">
-            <Label htmlFor="name">Full Name</Label>
+            <Label htmlFor="name">Full Name <span className="text-red-500">*</span></Label>
             <Input
               id="name"
               value={formData.name}
@@ -83,7 +109,7 @@ export function StudentDialog({
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div className="grid gap-2">
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="email">Email <span className="text-red-500">*</span></Label>
               <Input
                 id="email"
                 type="email"
@@ -95,7 +121,7 @@ export function StudentDialog({
               />
             </div>
             <div className="grid gap-2">
-              <Label htmlFor="rollNumber">Roll Number</Label>
+              <Label htmlFor="rollNumber">Roll Number <span className="text-red-500">*</span></Label>
               <Input
                 id="rollNumber"
                 value={formData.rollNumber}
@@ -112,24 +138,15 @@ export function StudentDialog({
 
           <div className="grid grid-cols-2 gap-4">
             <div className="grid gap-2">
-              <Label htmlFor="classId">Class</Label>
-              <Select
+              <Label htmlFor="classId">Class <span className="text-red-500">*</span></Label>
+              <ClassSelect
                 value={formData.classId}
                 onValueChange={(v) =>
                   setFormData({ ...formData, classId: v })
                 }
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Select class" />
-                </SelectTrigger>
-                <SelectContent>
-                  {classes.map((c) => (
-                    <SelectItem key={c.id} value={c.id}>
-                      {c.name}-{c.section}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+                placeholder="Select class"
+                className="w-full"
+              />
             </div>
             <div className="grid gap-2">
               <Label htmlFor="gender">Gender</Label>
@@ -163,16 +180,14 @@ export function StudentDialog({
             </div>
             <div className="grid gap-2">
               <Label htmlFor="dob">Date of Birth</Label>
-              <Input
-                id="dob"
-                type="date"
-                value={formData.dateOfBirth}
-                onChange={(e) =>
-                  setFormData({
-                    ...formData,
-                    dateOfBirth: e.target.value,
-                  })
-                }
+              <DatePicker
+                date={formData.dateOfBirth && !isNaN(new Date(formData.dateOfBirth).getTime()) ? new Date(formData.dateOfBirth) : undefined}
+                onChange={(date) => {
+                  const formatted = date ? date.toISOString().split('T')[0] : '';
+                  setFormData({ ...formData, dateOfBirth: formatted });
+                }}
+                placeholder="Pick date of birth"
+                className="w-full h-10 border-zinc-200 dark:border-zinc-800"
               />
             </div>
           </div>
@@ -197,7 +212,7 @@ export function StudentDialog({
                   <Label htmlFor="routeId">Route *</Label>
                   <Select
                     value={formData.routeId}
-                    onValueChange={(v) => setFormData({ ...formData, routeId: v })}
+                    onValueChange={(v) => setFormData({ ...formData, routeId: v, pickupPoint: "" })}
                   >
                     <SelectTrigger id="routeId">
                       <SelectValue placeholder="Select a route" />
@@ -205,21 +220,85 @@ export function StudentDialog({
                     <SelectContent>
                       {routes.map((r: any) => (
                         <SelectItem key={r.id} value={r.id}>
-                          {r.name} (₹{r.fee})
+                          {r.name}
                         </SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
                 </div>
-                <div className="grid gap-2">
-                  <Label htmlFor="pickupPoint">Pickup Point *</Label>
-                  <Input
-                    id="pickupPoint"
-                    value={formData.pickupPoint}
-                    onChange={(e) => setFormData({ ...formData, pickupPoint: e.target.value })}
-                    placeholder="e.g., Park Street Stop"
-                  />
-                </div>
+
+                {formData.routeId && (
+                  <div className="grid gap-2">
+                    <Label htmlFor="pickupPoint">Pickup Point *</Label>
+                    {!showCustomPickup ? (
+                      <Select
+                        value={formData.pickupPoint || ""}
+                        onValueChange={(v) => {
+                          if (v === "__new__") {
+                            setShowCustomPickup(true);
+                            setFormData({ ...formData, pickupPoint: "" });
+                          } else {
+                            setFormData({ ...formData, pickupPoint: v });
+                          }
+                        }}
+                      >
+                        <SelectTrigger id="pickupPoint">
+                          <SelectValue placeholder="Choose pickup point..." />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {routeStops.map((stop: any, idx: number) => (
+                            <SelectItem key={idx} value={stop.name}>
+                              {stop.name} (₹{stop.fee})
+                            </SelectItem>
+                          ))}
+                          <SelectItem value="__new__" className="text-emerald-600 font-semibold focus:text-emerald-700">
+                            + Create New Pickup Point...
+                          </SelectItem>
+                        </SelectContent>
+                      </Select>
+                    ) : (
+                      <div className="space-y-3 p-3 rounded-lg border bg-zinc-50/50 dark:bg-zinc-900/20">
+                        <div className="space-y-1">
+                          <Label className="text-xs">New Pickup Point Name *</Label>
+                          <Input
+                            placeholder="e.g. Sector 5 Crossing"
+                            value={customPickupName}
+                            onChange={(e) => {
+                              setCustomPickupName(e.target.value);
+                              setFormData({ ...formData, pickupPoint: e.target.value });
+                            }}
+                          />
+                        </div>
+                        <div className="space-y-1">
+                          <Label className="text-xs">Pickup Fee (₹) *</Label>
+                          <Input
+                            type="number"
+                            placeholder="e.g. 1200"
+                            value={customPickupFee}
+                            onChange={(e) => {
+                              setCustomPickupFee(e.target.value);
+                              setFormData({ ...formData, newPickupPointFee: Number(e.target.value) });
+                            }}
+                          />
+                        </div>
+                        <Button
+                          type="button"
+                          variant="link"
+                          className="text-xs p-0 h-auto"
+                          onClick={() => {
+                            setShowCustomPickup(false);
+                            setCustomPickupName("");
+                            setCustomPickupFee("");
+                            const { newPickupPointFee, ...rest } = formData;
+                            setFormData({ ...rest, pickupPoint: "" });
+                          }}
+                        >
+                          Select existing pickup point
+                        </Button>
+                      </div>
+                    )}
+                  </div>
+                )}
               </div>
             )}
           </div>

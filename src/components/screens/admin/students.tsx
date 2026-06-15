@@ -16,7 +16,8 @@ import { toast } from "sonner";
 import { apiFetch } from "@/lib/api";
 import { useModulePermissions } from "@/hooks/use-permissions";
 import { useAppStore } from "@/store/use-app-store";
-import { useStudents, useClassesMin } from "@/lib/graphql/hooks/academic.hooks";
+import { useStudents } from "@/lib/graphql/hooks/academic.hooks";
+import { ClassSelect } from "@/components/ui/class-select";
 import { useQueryClient } from "@tanstack/react-query";
 import { queryKeys } from "@/lib/graphql/keys";
 import { useDebounce } from "@/hooks/use-debounce";
@@ -54,6 +55,7 @@ type State = {
   search: string;
   classFilter: string;
   currentPage: number;
+  itemsPerPage: number;
   dialogOpen: boolean;
   dialogMode: "create" | "edit";
   editingStudent: StudentInfo | null;
@@ -67,6 +69,7 @@ type Action =
   | { type: 'SET_SEARCH'; payload: string }
   | { type: 'SET_CLASS_FILTER'; payload: string }
   | { type: 'SET_CURRENT_PAGE'; payload: number }
+  | { type: 'SET_ITEMS_PER_PAGE'; payload: number }
   | { type: 'OPEN_CREATE' }
   | { type: 'OPEN_EDIT'; payload: StudentInfo }
   | { type: 'CLOSE_DIALOG' }
@@ -79,6 +82,7 @@ const initialState: State = {
   search: "",
   classFilter: "all",
   currentPage: 1,
+  itemsPerPage: 15,
   dialogOpen: false,
   dialogMode: "create",
   editingStudent: null,
@@ -96,6 +100,8 @@ function reducer(state: State, action: Action): State {
       return { ...state, classFilter: action.payload, currentPage: 1 };
     case 'SET_CURRENT_PAGE':
       return { ...state, currentPage: action.payload };
+    case 'SET_ITEMS_PER_PAGE':
+      return { ...state, itemsPerPage: action.payload, currentPage: 1 };
     case 'OPEN_CREATE':
       return { ...state, dialogMode: "create", formData: emptyFormData, dialogOpen: true };
     case 'OPEN_EDIT':
@@ -141,6 +147,7 @@ function AdminStudentsContent() {
     search,
     classFilter,
     currentPage,
+    itemsPerPage,
     dialogOpen,
     dialogMode,
     editingStudent,
@@ -160,10 +167,8 @@ function AdminStudentsContent() {
     classFilter === "all" ? undefined : classFilter,
     debouncedSearch || undefined,
     currentPage,
-    ITEMS_PER_PAGE,
+    itemsPerPage,
   );
-
-  const { data: classesData } = useClassesMin(currentTenantId || undefined);
 
   const students = useMemo(() => {
     const list = studentData?.students || [];
@@ -176,7 +181,6 @@ function AdminStudentsContent() {
   }, [studentData]);
   const totalItems = studentData?.total || 0;
   const totalPages = studentData?.totalPages || 1;
-  const classes = classesData?.classes || [];
   const loading = loadingStudents;
 
   const searchParams = useSearchParams();
@@ -302,22 +306,13 @@ function AdminStudentsContent() {
               onChange={(e) => dispatch({ type: 'SET_SEARCH', payload: e.target.value })}
             />
           </div>
-          <Select
+          <ClassSelect
             value={classFilter}
             onValueChange={(v) => dispatch({ type: 'SET_CLASS_FILTER', payload: v })}
-          >
-            <SelectTrigger className="w-full sm:w-48">
-              <SelectValue placeholder="Filter by class" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Classes</SelectItem>
-              {classes.map((c) => (
-                <SelectItem key={c.id} value={c.id}>
-                  {c.name}-{c.section}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+            showAllOption
+            className="w-full sm:w-48"
+            placeholder="Filter by class"
+          />
         </div>
 
         {(canCreate || canEdit || canDelete) && (
@@ -371,8 +366,9 @@ function AdminStudentsContent() {
                 currentPage={currentPage}
                 totalPages={totalPages}
                 totalItems={totalItems}
-                itemsPerPage={ITEMS_PER_PAGE}
+                itemsPerPage={itemsPerPage}
                 onPageChange={(p) => dispatch({ type: 'SET_CURRENT_PAGE', payload: p })}
+                onLimitChange={(limit) => dispatch({ type: 'SET_ITEMS_PER_PAGE', payload: limit })}
               />
             </>
           )}
@@ -383,7 +379,6 @@ function AdminStudentsContent() {
         open={dialogOpen}
         onOpenChange={(open) => dispatch({ type: open ? 'OPEN_CREATE' : 'CLOSE_DIALOG' })}
         mode={dialogMode}
-        classes={classes}
         formData={formData}
         setFormData={(fd) => dispatch({ type: 'SET_FORM_DATA', payload: fd })}
         submitting={submitting}

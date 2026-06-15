@@ -144,7 +144,10 @@ export function useExamsState(initialTab = 'exams') {
   const { data: examsData, isLoading: loadingExams } = useQuery({
     queryKey: ['exams', classFilter],
     queryFn: async () => {
-      const res = await apiFetch('/api/exams');
+      const url = classFilter && classFilter !== 'all' 
+        ? `/api/exams?classId=${classFilter}&limit=50` 
+        : '/api/exams?limit=50';
+      const res = await apiFetch(url);
       return res.json();
     }
   });
@@ -267,7 +270,7 @@ export function useExamsState(initialTab = 'exams') {
     setLoadingStudents(true);
     try {
       const [sRes, rRes] = await Promise.all([
-        apiFetch(`/api/students?classId=${exam.classId}&mode=min&limit=1000`),
+        apiFetch(`/api/students?classId=${exam.classId}&mode=min&limit=100`),
         apiFetch(`/api/exams/results?examId=${exam.id}`)
       ]);
       const students = (await sRes.json()).items || [];
@@ -298,7 +301,7 @@ export function useExamsState(initialTab = 'exams') {
     setLoadingViewResults(true);
     try {
       const [sRes, rRes] = await Promise.all([
-        apiFetch(`/api/students?classId=${exam.classId}&mode=min&limit=1000`),
+        apiFetch(`/api/students?classId=${exam.classId}&mode=min&limit=100`),
         apiFetch(`/api/exams/results?examId=${exam.id}`)
       ]);
       const students = (await sRes.json()).items || [];

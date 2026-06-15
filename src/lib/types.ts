@@ -24,6 +24,7 @@ export interface StudentInfo {
   dateOfBirth?: string;
   admissionDate: string;
   phone?: string;
+  academicYear?: string;
 }
 
 export interface TeacherInfo {
@@ -33,10 +34,11 @@ export interface TeacherInfo {
   email: string;
   qualification?: string;
   experience?: string;
-  subjects: string[];
-  classes: string[];
+  subjects?: string[];
+  classes?: string[];
   phone?: string;
   joiningDate: string;
+  status?: string;
 }
 
 export interface ClassInfo {
@@ -90,6 +92,7 @@ export interface AssignmentInfo {
   submissions: number;
   totalStudents: number;
   mode: "online" | "offline";
+  createdAt?: string;
 }
 
 export interface FeeRecord {

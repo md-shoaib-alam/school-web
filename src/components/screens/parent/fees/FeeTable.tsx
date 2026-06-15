@@ -27,11 +27,18 @@ interface FeeTableProps {
 }
 
 const formatDate = (dateStr: string) => {
-  try {
-    return new Date(dateStr).toLocaleDateString();
-  } catch (e) {
-    return dateStr;
+  if (!dateStr) return "";
+  const match = dateStr.match(/^(\d{4})-(\d{2})-(\d{2})/);
+  if (match) {
+    const [_, year, month, day] = match;
+    return `${day}/${month}/${year}`;
   }
+  const date = new Date(dateStr);
+  if (isNaN(date.getTime())) return dateStr;
+  const day = String(date.getDate()).padStart(2, '0');
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const year = date.getFullYear();
+  return `${day}/${month}/${year}`;
 };
 
 export function FeeTable({ studentName, fees, onPay, isPremium }: FeeTableProps) {
@@ -127,13 +134,11 @@ export function FeeTable({ studentName, fees, onPay, isPremium }: FeeTableProps)
                       </TableCell>
                       <TableCell className="text-center">
                         {fee.status !== "paid" ? (
-                          <Button
-                            size="sm"
-                            className="bg-amber-600 hover:bg-amber-700 text-white text-xs h-8 px-3 shadow-none"
-                            onClick={() => onPay(fee.id)}
+                          <div
+                            className="inline-flex items-center justify-center rounded-md text-xs font-semibold h-8 px-3 bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-350 border border-zinc-300 dark:border-zinc-700 cursor-not-allowed shadow-none select-none"
                           >
-                            Pay Now
-                          </Button>
+                            Pay at School
+                          </div>
                         ) : (
                           <div className="flex flex-col items-center gap-1">
                             <span className="text-[10px] text-emerald-600 dark:text-emerald-400 font-bold uppercase tracking-wider mb-1">

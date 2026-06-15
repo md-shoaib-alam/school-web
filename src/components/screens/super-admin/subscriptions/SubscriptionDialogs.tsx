@@ -245,6 +245,7 @@ export function SubscriptionDialogs({
                     const selectedPrice = PRICE_LOOKUP[currentPeriod]?.[val];
                     setEditForm((p: any) => ({
                       ...p,
+                      planId: val,
                       planName: val.charAt(0).toUpperCase() + val.slice(1) + " Plan",
                       amount: selectedPrice || 0,
                     }));
@@ -268,8 +269,10 @@ export function SubscriptionDialogs({
                     const currentPlanId = editForm.planName.toLowerCase().replace(" plan", "");
                     const selectedPrice = PRICE_LOOKUP[val]?.[currentPlanId];
                         
-                    const startDate = editOpen?.startDate ? new Date(editOpen.startDate) : new Date();
-                    const newEnd = new Date(startDate);
+                    const now = new Date();
+                    const startDate = editOpen?.startDate ? new Date(editOpen.startDate) : now;
+                    const baseDate = startDate < now ? now : startDate;
+                    const newEnd = new Date(baseDate);
                     if (val === "monthly") newEnd.setMonth(newEnd.getMonth() + 1);
                     else if (val === "quarterly") newEnd.setMonth(newEnd.getMonth() + 3);
                     else newEnd.setFullYear(newEnd.getFullYear() + 1);

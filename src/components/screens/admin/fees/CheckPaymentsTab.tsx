@@ -150,48 +150,173 @@ export function CheckPaymentsTab() {
   }, [filtered]);
 
   const summaryCards = [
-    { label: 'Total Payments', amount: totalPaid, icon: <CircleDollarSign className="size-5 text-emerald-600 dark:text-emerald-400" />, color: 'bg-emerald-100 dark:bg-emerald-900/30' },
-    { label: 'Total Original', amount: totalOriginal, icon: <DollarSign className="size-5 text-amber-600 dark:text-amber-400" />, color: 'bg-amber-100 dark:bg-amber-900/30' },
-    { label: 'Concessions Given', amount: totalConcessions, icon: <Percent className="size-5 text-violet-600 dark:text-violet-400" />, color: 'bg-violet-100 dark:bg-violet-900/30' },
-    { label: 'Avg. Payment', amount: avgPayment, icon: <TrendingUp className="size-5 text-blue-600 dark:text-blue-400" />, color: 'bg-blue-100 dark:bg-blue-900/30' },
+    { 
+      label: 'Total Payments', 
+      amount: totalPaid, 
+      icon: <CircleDollarSign className="size-4" />, 
+      color: 'emerald',
+      subtext: `${filtered.length} transactions`
+    },
+    { 
+      label: 'Total Original', 
+      amount: totalOriginal, 
+      icon: <DollarSign className="size-4" />, 
+      color: 'amber',
+      subtext: 'Before concessions'
+    },
+    { 
+      label: 'Concessions Given', 
+      amount: totalConcessions, 
+      icon: <Percent className="size-4" />, 
+      color: 'violet',
+      subtext: 'Total discounts'
+    },
+    { 
+      label: 'Avg. Payment', 
+      amount: avgPayment, 
+      icon: <TrendingUp className="size-4" />, 
+      color: 'blue',
+      subtext: 'Average per txn'
+    },
   ];
 
+  const colorMap: Record<string, string> = {
+    emerald: 'emerald',
+    amber: 'amber',
+    violet: 'violet',
+    blue: 'blue'
+  };
+
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       {/* Summary Cards */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        {summaryCards.map(card => (
-          <Card key={card.label} className="hover:shadow-md transition-shadow">
-            <CardContent className="p-4">
-              <div className="flex items-center justify-between mb-2">
-                <p className="text-xs text-muted-foreground font-medium">{card.label}</p>
-                <div className={`size-9 rounded-lg flex items-center justify-center ${card.color}`}>{card.icon}</div>
-              </div>
-              <p className="text-2xl font-bold">₹{Math.round(card.amount).toLocaleString()}</p>
-              {card.label === 'Total Payments' && (
-                <p className="text-xs text-muted-foreground mt-1">{filtered.length} transaction{filtered.length !== 1 ? 's' : ''}</p>
-              )}
-            </CardContent>
+      {loading ? (
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
+          <Card className="rounded-xl border border-zinc-200/80 dark:border-zinc-800 bg-white dark:bg-zinc-950 p-5 shadow-xs space-y-3">
+            <Skeleton className="h-4 w-28" />
+            <Skeleton className="h-8 w-20" />
+            <Skeleton className="h-3 w-32" />
           </Card>
-        ))}
-      </div>
+          <div className="lg:col-span-3 flex overflow-x-auto gap-4 pb-4 -mx-4 px-4 sm:mx-0 sm:px-0 sm:grid sm:grid-cols-2 lg:grid-cols-3 sm:pb-0">
+            {[...Array(3)].map((_, i) => (
+              <Card key={i} className="min-w-[240px] sm:min-w-0 rounded-xl border border-zinc-200/80 dark:border-zinc-800 bg-white dark:bg-zinc-950 p-5 shadow-xs space-y-3">
+                <Skeleton className="h-4 w-28" />
+                <Skeleton className="h-8 w-20" />
+                <Skeleton className="h-3 w-32" />
+              </Card>
+            ))}
+          </div>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
+          {/* Main Card (Total Payments) */}
+          {summaryCards.slice(0, 1).map(card => {
+            const cls = {
+              gradient: 'to-emerald-50/10 dark:to-emerald-950/5',
+              hover: 'hover:border-emerald-500/30 dark:hover:border-emerald-500/20',
+              bg: 'bg-emerald-500/5 dark:bg-emerald-500/10',
+              iconBg: 'bg-emerald-50 dark:bg-emerald-950/50',
+              iconText: 'text-emerald-600 dark:text-emerald-400',
+              dot: 'bg-emerald-500'
+            };
+            return (
+              <Card key={card.label} className={`relative overflow-hidden rounded-xl border border-zinc-200/80 dark:border-zinc-800 bg-linear-to-br from-white ${cls.gradient} dark:from-zinc-950 p-5 flex flex-col justify-between shadow-xs hover:shadow-md ${cls.hover} transition-all duration-300 group`}>
+                <div className={`absolute top-0 right-0 w-20 h-20 ${cls.bg} rounded-bl-full pointer-events-none group-hover:scale-110 transition-transform duration-300`} />
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <span className="text-[11px] text-zinc-700 dark:text-zinc-300 font-bold uppercase tracking-wider block">{card.label}</span>
+                    <div className={`p-2 rounded-lg ${cls.iconBg} ${cls.iconText}`}>
+                      {card.icon}
+                    </div>
+                  </div>
+                  <span className={`text-2xl font-extrabold block tracking-tight ${cls.iconText}`}>
+                    ₹{Math.round(card.amount).toLocaleString()}
+                  </span>
+                </div>
+                <div className="text-[10px] text-zinc-500 dark:text-zinc-400 mt-4 flex items-center gap-1.5 font-medium border-t pt-2 border-zinc-100 dark:border-zinc-900">
+                  <span className={`inline-block size-1.5 rounded-full ${cls.dot} animate-pulse`} />
+                  {card.subtext}
+                </div>
+              </Card>
+            );
+          })}
+
+          {/* Other Cards Row - Scrollable on mobile */}
+          <div className="lg:col-span-3 flex overflow-x-auto gap-4 pb-4 -mx-4 px-4 sm:mx-0 sm:px-0 sm:grid sm:grid-cols-2 lg:grid-cols-3 sm:pb-0 scrollbar-hide">
+            {summaryCards.slice(1).map(card => {
+              const colorClasses: Record<string, any> = {
+                amber: {
+                  gradient: 'to-amber-50/10 dark:to-amber-950/5',
+                  hover: 'hover:border-amber-500/30 dark:hover:border-amber-500/20',
+                  bg: 'bg-amber-500/5 dark:bg-amber-500/10',
+                  iconBg: 'bg-amber-50 dark:bg-amber-950/50',
+                  iconText: 'text-amber-600 dark:text-amber-400',
+                  dot: 'bg-amber-500'
+                },
+                violet: {
+                  gradient: 'to-violet-50/10 dark:to-violet-950/5',
+                  hover: 'hover:border-violet-500/30 dark:hover:border-violet-500/20',
+                  bg: 'bg-violet-500/5 dark:bg-violet-500/10',
+                  iconBg: 'bg-violet-50 dark:bg-violet-950/50',
+                  iconText: 'text-violet-600 dark:text-violet-400',
+                  dot: 'bg-violet-500'
+                },
+                blue: {
+                  gradient: 'to-blue-50/10 dark:to-blue-950/5',
+                  hover: 'hover:border-blue-500/30 dark:hover:border-blue-500/20',
+                  bg: 'bg-blue-500/5 dark:bg-blue-500/10',
+                  iconBg: 'bg-blue-50 dark:bg-blue-950/50',
+                  iconText: 'text-blue-600 dark:text-blue-400',
+                  dot: 'bg-blue-500'
+                }
+              };
+              const cls = colorClasses[card.color as keyof typeof colorClasses] || colorClasses.amber;
+
+              return (
+                <Card key={card.label} className={`min-w-[240px] sm:min-w-0 relative overflow-hidden rounded-xl border border-zinc-200/80 dark:border-zinc-800 bg-linear-to-br from-white ${cls.gradient} dark:from-zinc-950 p-5 flex flex-col justify-between shadow-xs hover:shadow-md ${cls.hover} transition-all duration-300 group`}>
+                  <div className={`absolute top-0 right-0 w-20 h-20 ${cls.bg} rounded-bl-full pointer-events-none group-hover:scale-110 transition-transform duration-300`} />
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between">
+                      <span className="text-[11px] text-zinc-700 dark:text-zinc-300 font-bold uppercase tracking-wider block">{card.label}</span>
+                      <div className={`p-2 rounded-lg ${cls.iconBg} ${cls.iconText}`}>
+                        {card.icon}
+                      </div>
+                    </div>
+                    <span className={`text-2xl font-extrabold block tracking-tight text-zinc-900 dark:text-zinc-50`}>
+                      ₹{Math.round(card.amount).toLocaleString()}
+                    </span>
+                  </div>
+                  <div className="text-[10px] text-zinc-500 dark:text-zinc-400 mt-4 flex items-center gap-1.5 font-medium border-t pt-2 border-zinc-100 dark:border-zinc-900">
+                    <span className={`inline-block size-1.5 rounded-full ${cls.dot}`} />
+                    {card.subtext}
+                  </div>
+                </Card>
+              );
+            })}
+          </div>
+        </div>
+      )}
 
       {/* Payment Method Distribution */}
       {Object.keys(methodDistribution).length > 0 && (
-        <Card>
-          <CardHeader className="pb-3">
-            <CardTitle className="text-base">Payment Method Distribution</CardTitle>
+        <Card className="border-none shadow-sm bg-zinc-50/50 dark:bg-zinc-900/20">
+          <CardHeader className="pb-1 sm:pb-4">
+            <CardTitle className="text-[11px] sm:text-sm font-bold uppercase tracking-wider text-zinc-600 dark:text-zinc-400">Payment Method Distribution</CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
+          <CardContent className="pt-0 sm:pt-6">
+            <div className="flex overflow-x-auto gap-2.5 pb-2 -mx-4 px-4 sm:mx-0 sm:px-0 sm:grid sm:grid-cols-2 lg:grid-cols-5 sm:pb-0 scrollbar-hide">
               {Object.entries(methodDistribution).map(([method, data]) => {
                 const cfg = paymentMethodConfig[method] || paymentMethodConfig.cash;
                 return (
-                  <div key={method} className="flex items-center gap-3 p-3 rounded-xl border bg-muted/30 hover:bg-muted/50 transition-colors">
-                    <div className={`size-10 rounded-lg flex items-center justify-center ${cfg.color}`}>{cfg.icon}</div>
+                  <div key={method} className="min-w-[160px] sm:min-w-0 group flex items-center gap-2.5 p-2.5 rounded-xl border border-zinc-200/60 dark:border-zinc-800/60 bg-white dark:bg-zinc-950/50 hover:border-emerald-500/30 dark:hover:border-emerald-500/20 hover:shadow-sm transition-all duration-300">
+                    <div className={`size-9 rounded-lg flex items-center justify-center shrink-0 transition-transform duration-300 group-hover:scale-110 ${cfg.color}`}>
+                      {cfg.icon}
+                    </div>
                     <div className="min-w-0">
-                      <p className="text-sm font-medium capitalize">{method}</p>
-                      <p className="text-xs text-muted-foreground">{data.count} × ₹{data.total.toLocaleString()}</p>
+                      <p className="text-xs font-bold text-zinc-800 dark:text-zinc-200 capitalize">{method}</p>
+                      <p className="text-[10px] font-medium text-zinc-500 dark:text-zinc-400">
+                        {data.count} <span className="text-[9px] opacity-70 mx-0.5">×</span> ₹{data.total.toLocaleString()}
+                      </p>
                     </div>
                   </div>
                 );
@@ -202,39 +327,41 @@ export function CheckPaymentsTab() {
       )}
 
       {/* Filters */}
-      <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center flex-wrap">
-        <div className="relative flex-1 max-w-sm min-w-[200px]">
+      <div className="flex flex-col lg:flex-row gap-3 items-start lg:items-center flex-wrap">
+        <div className="relative w-full lg:flex-1 lg:max-w-sm">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
-          <Input placeholder="Search by name, phone, or receipt #..." className="pl-9" value={search} onChange={e => dispatch({ type: 'SET_SEARCH', payload: e.target.value })} />
+          <Input placeholder="Search by name, phone, or receipt #..." className="pl-9 h-9 text-sm" value={search} onChange={e => dispatch({ type: 'SET_SEARCH', payload: e.target.value })} />
         </div>
-        <Select value={methodFilter} onValueChange={(v) => dispatch({ type: 'SET_METHOD_FILTER', payload: v })}>
-          <SelectTrigger className="w-full sm:w-40"><SelectValue placeholder="Method" /></SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">All Methods</SelectItem>
-            <SelectItem value="cash">Cash</SelectItem>
-            <SelectItem value="cheque">Cheque</SelectItem>
-            <SelectItem value="online">Online</SelectItem>
-            <SelectItem value="upi">UPI</SelectItem>
-            <SelectItem value="card">Card</SelectItem>
-          </SelectContent>
-        </Select>
-        <Select value={dateFilter} onValueChange={v => dispatch({ type: 'SET_DATE_FILTER', payload: v })}>
-          <SelectTrigger className="w-full sm:w-36"><SelectValue placeholder="Period" /></SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">All Time</SelectItem>
-            <SelectItem value="today">Today</SelectItem>
-            <SelectItem value="week">This Week</SelectItem>
-            <SelectItem value="month">This Month</SelectItem>
-            <SelectItem value="custom">Custom Range</SelectItem>
-          </SelectContent>
-        </Select>
+        <div className="flex flex-row gap-2 w-full lg:w-auto">
+          <Select value={methodFilter} onValueChange={(v) => dispatch({ type: 'SET_METHOD_FILTER', payload: v })}>
+            <SelectTrigger className="flex-1 lg:w-40 h-9 text-xs"><SelectValue placeholder="Method" /></SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Methods</SelectItem>
+              <SelectItem value="cash">Cash</SelectItem>
+              <SelectItem value="cheque">Cheque</SelectItem>
+              <SelectItem value="online">Online</SelectItem>
+              <SelectItem value="upi">UPI</SelectItem>
+              <SelectItem value="card">Card</SelectItem>
+            </SelectContent>
+          </Select>
+          <Select value={dateFilter} onValueChange={v => dispatch({ type: 'SET_DATE_FILTER', payload: v })}>
+            <SelectTrigger className="flex-1 lg:w-36 h-9 text-xs"><SelectValue placeholder="Period" /></SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Time</SelectItem>
+              <SelectItem value="today">Today</SelectItem>
+              <SelectItem value="week">This Week</SelectItem>
+              <SelectItem value="month">This Month</SelectItem>
+              <SelectItem value="custom">Custom Range</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
         {dateFilter === 'custom' && (
-          <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
+          <div className="flex flex-row gap-2 w-full sm:w-auto">
             <Popover open={isFromCalendarOpen} onOpenChange={setIsFromCalendarOpen}>
               <PopoverTrigger asChild>
-                <Button variant="outline" className="w-full sm:w-44 justify-start text-left font-normal bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800">
-                  <CalendarIcon className="mr-2 h-4 w-4 text-muted-foreground" />
-                  {fromDate ? format(new Date(fromDate), "PPP") : <span className="text-muted-foreground">From date</span>}
+                <Button variant="outline" className="flex-1 sm:w-44 justify-start text-left font-normal bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800">
+                  <CalendarIcon className="mr-2 h-4 w-4 text-muted-foreground shrink-0" />
+                  <span className="truncate">{fromDate ? format(new Date(fromDate), "PPP") : "From"}</span>
                 </Button>
               </PopoverTrigger>
               <PopoverContent className="w-auto p-0" align="start">
@@ -251,9 +378,9 @@ export function CheckPaymentsTab() {
             </Popover>
             <Popover open={isToCalendarOpen} onOpenChange={setIsToCalendarOpen}>
               <PopoverTrigger asChild>
-                <Button variant="outline" className="w-full sm:w-44 justify-start text-left font-normal bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800">
-                  <CalendarIcon className="mr-2 h-4 w-4 text-muted-foreground" />
-                  {toDate ? format(new Date(toDate), "PPP") : <span className="text-muted-foreground">To date</span>}
+                <Button variant="outline" className="flex-1 sm:w-44 justify-start text-left font-normal bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800">
+                  <CalendarIcon className="mr-2 h-4 w-4 text-muted-foreground shrink-0" />
+                  <span className="truncate">{toDate ? format(new Date(toDate), "PPP") : "To"}</span>
                 </Button>
               </PopoverTrigger>
               <PopoverContent className="w-auto p-0" align="start">
@@ -271,35 +398,6 @@ export function CheckPaymentsTab() {
           </div>
         )}
       </div>
-
-      {/* Daily Totals */}
-      {dailyTotals.length > 0 && (
-        <Card>
-          <CardHeader className="pb-3">
-            <CardTitle className="text-base">Daily Collection Summary</CardTitle>
-            <CardDescription>Top 10 collection days</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-2">
-              {dailyTotals.map(([date, data]) => {
-                const maxTotal = Math.max(...dailyTotals.map(([, d]) => d.total), 1);
-                const pct = Math.round((data.total / maxTotal) * 100);
-                return (
-                  <div key={date} className="flex items-center gap-3">
-                    <span className="text-xs text-muted-foreground w-24 shrink-0 font-mono">{date}</span>
-                    <div className="flex-1 h-6 bg-muted rounded-full overflow-hidden">
-                      <div className="h-full bg-emerald-500 rounded-full transition-all duration-500 flex items-center justify-end pr-2" style={{ width: `${Math.max(pct, 15)}%` }}>
-                        <span className="text-[10px] font-semibold text-white">{data.count} txn</span>
-                      </div>
-                    </div>
-                    <span className="text-sm font-semibold w-24 text-right">₹{data.total.toLocaleString()}</span>
-                  </div>
-                );
-              })}
-            </div>
-          </CardContent>
-        </Card>
-      )}
 
       {/* Payments Table */}
       <Card>
@@ -321,15 +419,15 @@ export function CheckPaymentsTab() {
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Receipt #</TableHead>
-                    <TableHead>Student</TableHead>
-                    <TableHead>Method</TableHead>
+                    <TableHead className="hidden sm:table-cell">Receipt #</TableHead>
+                    <TableHead className="pl-4 sm:pl-4">Student</TableHead>
+                    <TableHead className="hidden sm:table-cell">Method</TableHead>
                     <TableHead className="hidden sm:table-cell">Original</TableHead>
                     <TableHead className="hidden sm:table-cell">Concession</TableHead>
                     <TableHead>Paid</TableHead>
                     <TableHead className="hidden md:table-cell">Date</TableHead>
-                    <TableHead className="w-24 text-center">Status</TableHead>
-                    <TableHead className="w-16"></TableHead>
+                    <TableHead className="hidden sm:table-cell w-24 text-center">Status</TableHead>
+                    <TableHead className="w-16 text-center">View</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -338,25 +436,25 @@ export function CheckPaymentsTab() {
                     const stCfg = receiptStatusConfig[p.status] || receiptStatusConfig.completed;
                     return (
                       <TableRow key={p.id} className="hover:bg-emerald-50/50 dark:hover:bg-emerald-900/20 transition-colors">
-                        <TableCell>
+                        <TableCell className="hidden sm:table-cell">
                           <span className="font-mono text-xs font-semibold text-emerald-700 dark:text-emerald-400">{p.receiptNumber}</span>
                         </TableCell>
-                        <TableCell>
+                        <TableCell className="pl-4 sm:pl-4">
                           <div className="flex items-center gap-2">
-                            <div className="size-7 rounded-full bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 flex items-center justify-center text-[10px] font-semibold">
+                            <div className="size-7 rounded-full bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 flex items-center justify-center text-[10px] font-semibold shrink-0">
                               {p.studentName.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase()}
                             </div>
-                            <span className="font-medium text-sm">{p.studentName}</span>
+                            <span className="font-medium text-sm truncate max-w-[120px] sm:max-w-none">{p.studentName}</span>
                           </div>
                         </TableCell>
-                        <TableCell>
+                        <TableCell className="hidden sm:table-cell">
                           <div className={`inline-flex items-center gap-1.5 px-2 py-1 rounded-md text-xs font-medium capitalize ${cfg.color}`}>{cfg.icon}{p.paymentMethod}</div>
                         </TableCell>
                         <TableCell className="hidden sm:table-cell text-sm text-muted-foreground">₹{p.totalAmount.toLocaleString()}</TableCell>
                         <TableCell className="hidden sm:table-cell text-sm text-amber-600 dark:text-amber-400">{p.concessionTotal > 0 ? `-₹${p.concessionTotal.toLocaleString()}` : '–'}</TableCell>
                         <TableCell><span className="font-semibold text-sm text-emerald-600 dark:text-emerald-400">₹{p.paidAmount.toLocaleString()}</span></TableCell>
                         <TableCell className="hidden md:table-cell text-sm text-muted-foreground">{p.paidDate}</TableCell>
-                        <TableCell className="text-center">
+                        <TableCell className="hidden sm:table-cell text-center">
                           <Badge variant="outline" className={`${stCfg.bg} border-0 font-medium capitalize text-xs`}>{p.status}</Badge>
                         </TableCell>
                         <TableCell className="text-center">
@@ -392,7 +490,6 @@ export function CheckPaymentsTab() {
                 </div>
                 <div>
                   <p className="font-semibold">{selectedPayment.studentName}</p>
-                  <p className="text-xs text-muted-foreground">Student ID: {selectedPayment.studentId.slice(0, 8)}...</p>
                 </div>
               </div>
 
@@ -440,7 +537,7 @@ export function CheckPaymentsTab() {
                   <p className="text-sm font-medium mb-2">Fee Items</p>
                   <div className="divide-y rounded-lg border overflow-hidden">
                     {selectedPayment.feeItems.map((item, idx) => (
-                      <div key={item.id} className="flex items-center justify-between px-3 py-2 hover:bg-muted/50 text-sm">
+                      <div key={idx} className="flex items-center justify-between px-3 py-2 hover:bg-muted/50 text-sm">
                         <div className="flex items-center gap-2">
                           <span className="size-5 rounded bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 flex items-center justify-center text-[10px] font-bold">{idx + 1}</span>
                           <span className="font-medium">{item.feeCategoryName || item.type}</span>

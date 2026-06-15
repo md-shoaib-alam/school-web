@@ -88,11 +88,10 @@ export function PaymentSummary({
 
         <div className="space-y-2">
           <Label>Payment Method</Label>
-          <div className="grid grid-cols-5 gap-2">
+          <div className="grid grid-cols-4 gap-2">
             {[
               { id: 'cash', icon: <Banknote className="size-5" />, label: 'Cash' },
               { id: 'cheque', icon: <FileText className="size-5" />, label: 'Cheque' },
-              { id: 'online', icon: <Building2 className="size-5" />, label: 'Online' },
               { id: 'upi', icon: <Smartphone className="size-5" />, label: 'UPI' },
               { id: 'card', icon: <CreditCard className="size-5" />, label: 'Card' },
             ].map(m => (
@@ -115,7 +114,7 @@ export function PaymentSummary({
           ) : (
             <>
               <Sparkles className="size-5 mr-2" />
-              Pay ₹{payable.toLocaleString()} via {paymentMethod.charAt(0).toUpperCase() + paymentMethod.slice(1)}
+              Pay ₹{displayPaidAmount.toLocaleString()} via {paymentMethod.charAt(0).toUpperCase() + paymentMethod.slice(1)}
             </>
           )}
         </Button>

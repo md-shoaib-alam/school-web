@@ -5,22 +5,7 @@
 import { env } from './env';
 import { triggerGlobalRefresh } from './query-client';
 
-let API_BASE = env.NEXT_PUBLIC_API_URL;
-
-if (typeof window !== 'undefined') {
-  const hostname = window.location.hostname;
-  const protocol = window.location.protocol;
-  
-  if (hostname === 'localhost' || hostname.startsWith('192.168.')) {
-    // Local / LAN WiFi testing: route directly to matching backend port
-    API_BASE = `${protocol}//${hostname}:4000/api`;
-  } else {
-    // Production: route from any app domain (e.g. tenant.domain.com) to api subdomain (api.domain.com)
-    const parts = hostname.split('.');
-    const baseDomain = parts.slice(-2).join('.'); // Extracts main domain
-    API_BASE = `${protocol}//api.${baseDomain}/api`;
-  }
-}
+const API_BASE = env.NEXT_PUBLIC_API_URL;
 
 function getToken(): string | null {
   if (typeof window === 'undefined') return null;
@@ -48,6 +33,14 @@ function authHeaders(isFormData: boolean = false): Record<string, string> {
 
 async function handleResponse(res: Response) {
   if (!res.ok) {
+    if (res.status === 401) {
+      if (typeof window !== 'undefined') {
+        localStorage.clear();
+        sessionStorage.clear();
+        document.cookie = "school_token=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/";
+        window.location.href = "/";
+      }
+    }
     const body = await res.json().catch(() => ({ error: res.statusText }));
     const error = new Error(body?.error || body?.message || `API Error ${res.status}`);
     (error as any).status = res.status;
@@ -58,8 +51,21 @@ async function handleResponse(res: Response) {
 }
 
 export const api = {
-  get: async <T = any>(path: string): Promise<T> => {
-    const res = await fetch(`${API_BASE}${path}`, {
+  get: async <T = any>(path: string, options?: { params?: Record<string, any> }): Promise<T> => {
+    let url = `${API_BASE}${path}`;
+    if (options?.params) {
+      const searchParams = new URLSearchParams();
+      Object.entries(options.params).forEach(([key, val]) => {
+        if (val !== undefined && val !== null) {
+          searchParams.append(key, String(val));
+        }
+      });
+      const queryString = searchParams.toString();
+      if (queryString) {
+        url += (url.includes('?') ? '&' : '?') + queryString;
+      }
+    }
+    const res = await fetch(url, {
       method: 'GET',
       headers: authHeaders(),
       keepalive: true,

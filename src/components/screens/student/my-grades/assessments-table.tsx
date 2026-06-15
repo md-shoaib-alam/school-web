@@ -55,7 +55,8 @@ export function AssessmentsTable({ assessmentGrades }: AssessmentsTableProps) {
                 </TableHeader>
                 <TableBody>
                   {assessmentGrades.map((g) => {
-                    const isPass = g.marksObtained >= g.passingMarks;
+                    const isGraded = g.marksObtained !== null && g.marksObtained !== undefined;
+                    const isPass = isGraded ? (g.marksObtained! >= g.passingMarks) : false;
                     return (
                       <TableRow
                         key={g.id}
@@ -76,25 +77,41 @@ export function AssessmentsTable({ assessmentGrades }: AssessmentsTableProps) {
                           </Badge>
                         </TableCell>
                         <TableCell className="text-center">
-                          <span className="text-sm font-bold text-zinc-800 dark:text-zinc-100">
-                            {Number(g.marksObtained)
-                              .toFixed(2)
-                              .replace(/\.00$/, "")}
-                          </span>
-                          <span className="text-xs text-zinc-400">
-                            /{g.totalMarks}
-                          </span>
+                          {isGraded ? (
+                            <>
+                              <span className="text-sm font-bold text-zinc-800 dark:text-zinc-100">
+                                {Number(g.marksObtained)
+                                  .toFixed(2)
+                                  .replace(/\.00$/, "")}
+                              </span>
+                              <span className="text-xs text-zinc-400">
+                                /{g.totalMarks}
+                              </span>
+                            </>
+                          ) : (
+                            <span className="text-sm text-zinc-400 dark:text-zinc-500 font-medium">
+                              -/{g.totalMarks}
+                            </span>
+                          )}
                         </TableCell>
                         <TableCell className="text-center">
-                          <Badge
-                            className={`text-[11px] font-bold px-2 py-0.5 border-0 shadow-none ${
-                              isPass
-                                ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400"
-                                : "bg-rose-100 text-rose-700 dark:bg-rose-950/40 dark:text-rose-400"
-                            }`}
-                          >
-                            {isPass ? "PASS" : "FAIL"}
-                          </Badge>
+                          {isGraded ? (
+                            <Badge
+                              className={`text-[11px] font-bold px-2 py-0.5 border-0 shadow-none ${
+                                isPass
+                                  ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400"
+                                  : "bg-rose-100 text-rose-700 dark:bg-rose-950/40 dark:text-rose-400"
+                              }`}
+                            >
+                              {isPass ? "PASS" : "FAIL"}
+                            </Badge>
+                          ) : (
+                            <Badge
+                              className="text-[11px] font-bold px-2 py-0.5 border-0 shadow-none bg-amber-100 text-amber-700 dark:bg-amber-950/40 dark:text-amber-400"
+                            >
+                              PENDING
+                            </Badge>
+                          )}
                         </TableCell>
                         <TableCell className="text-xs text-zinc-500 dark:text-zinc-400 max-w-[200px] truncate font-medium">
                           {g.remarks || <span className="opacity-40">-</span>}

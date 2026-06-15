@@ -1,12 +1,13 @@
 "use client";
 
-import { useReducer, useEffect, useMemo } from 'react';
+import { useReducer, useEffect, useMemo, useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Tag, Layers, CircleDollarSign, Plus } from 'lucide-react';
 import { toast } from "sonner";
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import api from '@/lib/axios';
 import { useFeeCategories, useFeeStructures, useCreateFeeStructure, useFeeAssignment } from '@/hooks/use-fees';
+import { useAcademicYears } from '@/hooks/use-academic-years';
 import { useDebounce } from '@/hooks/use-debounce';
 import type { FeeStructure, FeeCategory, ClassOption } from './types';
 
@@ -60,11 +61,17 @@ type Action =
   | { type: 'SET_SEARCH_STUDENT'; payload: string }
   | { type: 'RESET_ADD_FORM' };
 
+const getDefaultAcademicYear = () => {
+  const year = new Date().getFullYear();
+  const month = new Date().getMonth();
+  return month < 3 ? `${year - 1}-${year}` : `${year}-${year + 1}`;
+};
+
 const initialState: State = {
   yearFilter: 'all',
   catFilter: 'all',
   addOpen: false,
-  addForm: { feeCategoryId: '', classId: '', amount: '', academicYear: '' },
+  addForm: { feeCategoryId: '', classId: '', amount: '', academicYear: getDefaultAcademicYear() },
   adding: false,
   editOpen: false,
   editItem: null,
@@ -114,6 +121,24 @@ export function SetFeesTab({ canCreate, canEdit, canDelete }: SetFeesTabProps) {
 
   const debouncedSearch = useDebounce(searchStudent, 300);
 
+  const { academicYears: dbAcademicYears = [] } = useAcademicYears();
+  const [isYearFilterInitialized, setIsYearFilterInitialized] = useState(false);
+  const [isAddFormInitialized, setIsAddFormInitialized] = useState(false);
+
+  useEffect(() => {
+    const current = dbAcademicYears.find((y: any) => y.isCurrent || y.status === 'active')?.name;
+    if (current) {
+      if (!isYearFilterInitialized) {
+        dispatch({ type: 'SET_YEAR_FILTER', payload: current });
+        setIsYearFilterInitialized(true);
+      }
+      if (!isAddFormInitialized) {
+        dispatch({ type: 'SET_ADD_FORM', payload: { academicYear: current } });
+        setIsAddFormInitialized(true);
+      }
+    }
+  }, [dbAcademicYears, isYearFilterInitialized, isAddFormInitialized]);
+
   const { data: structures = [], isLoading: loadingStructures } = useFeeStructures();
   const { data: categories = [], isLoading: loadingCategories } = useFeeCategories();
   const { data: minCategories = [] } = useFeeCategories('min');
@@ -127,10 +152,11 @@ export function SetFeesTab({ canCreate, canEdit, canDelete }: SetFeesTabProps) {
   const createStructure = useCreateFeeStructure();
   const queryClient = useQueryClient();
 
-  const academicYears = useMemo(() => {
-    const years = new Set(structures.map(s => s.academicYear));
+  const filterYears = useMemo(() => {
+    const years = new Set(dbAcademicYears.map((y: any) => y.name));
+    structures.forEach(s => years.add(s.academicYear));
     return ['all', ...Array.from(years).sort()];
-  }, [structures]);
+  }, [dbAcademicYears, structures]);
 
   const filtered = useMemo(() => {
     return structures.filter(s => {
@@ -193,15 +219,29 @@ export function SetFeesTab({ canCreate, canEdit, canDelete }: SetFeesTabProps) {
   };
 
   useEffect(() => {
-    if (assignData?.students) {
+    if (assignOpen && assignData?.students) {
       queueMicrotask(() => {
-        dispatch({
-          type: 'SET_SELECTED_STUDENTS',
-          payload: new Set<string>(assignData.students.filter((st: any) => st.isAssigned).map((st: any) => st.id))
-        });
+        const currentlyAssigned = assignData.students.filter((st: any) => st.isAssigned);
+        if (currentlyAssigned.length > 0) {
+          dispatch({
+            type: 'SET_SELECTED_STUDENTS',
+            payload: new Set<string>(currentlyAssigned.map((st: any) => st.id))
+          });
+        } else if (assignStruct?.feeCategoryCode === 'TRAN' || assignStruct?.feeCategoryName?.toLowerCase().includes('transport')) {
+          const transportStudents = assignData.students.filter((st: any) => st.hasTransport);
+          dispatch({
+            type: 'SET_SELECTED_STUDENTS',
+            payload: new Set<string>(transportStudents.map((st: any) => st.id))
+          });
+        } else {
+          dispatch({
+            type: 'SET_SELECTED_STUDENTS',
+            payload: new Set<string>()
+          });
+        }
       });
     }
-  }, [assignData]);
+  }, [assignData, assignOpen, assignStruct]);
 
   const toggleStudent = (studentId: string) => {
     dispatch({
@@ -318,7 +358,7 @@ export function SetFeesTab({ canCreate, canEdit, canDelete }: SetFeesTabProps) {
         <Select value={yearFilter} onValueChange={(v) => dispatch({ type: 'SET_YEAR_FILTER', payload: v })}>
           <SelectTrigger className="w-full sm:w-44"><SelectValue placeholder="Academic Year" /></SelectTrigger>
           <SelectContent>
-            {academicYears.map(y => <SelectItem key={y} value={y}>{y === 'all' ? 'All Years' : y}</SelectItem>)}
+            {filterYears.map(y => <SelectItem key={y} value={y}>{y === 'all' ? 'All Years' : y}</SelectItem>)}
           </SelectContent>
         </Select>
         <Select value={catFilter} onValueChange={(v) => dispatch({ type: 'SET_CAT_FILTER', payload: v })}>
@@ -352,11 +392,18 @@ export function SetFeesTab({ canCreate, canEdit, canDelete }: SetFeesTabProps) {
         open={addOpen}
         onOpenChange={(v) => dispatch({ type: 'SET_ADD_OPEN', payload: v })}
         form={addForm}
-        setForm={(v) => dispatch({ type: 'SET_ADD_FORM', payload: v })}
+        setForm={(data: any) => {
+          if (typeof data === 'function') {
+            dispatch({ type: 'SET_ADD_FORM', payload: data(addForm) });
+          } else {
+            dispatch({ type: 'SET_ADD_FORM', payload: data });
+          }
+        }}
         minCategories={minCategories}
         classes={classes}
         onAdd={handleAdd}
         adding={adding}
+        academicYears={dbAcademicYears}
       />
 
       <EditFeeStructureDialog 

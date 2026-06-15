@@ -12,7 +12,7 @@ export const SUBJECT_COLORS = [
   "bg-rose-50 dark:bg-rose-900/30 text-rose-700 dark:text-rose-300 border-rose-200 dark:border-rose-700",
 ];
 
-export const DAYS = ["monday", "tuesday", "wednesday", "thursday", "friday"] as const;
+export const DAYS = ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday"] as const;
 
 export const DAY_LABELS: Record<string, string> = {
   monday: "Mon",
@@ -20,6 +20,7 @@ export const DAY_LABELS: Record<string, string> = {
   wednesday: "Wed",
   thursday: "Thu",
   friday: "Fri",
+  saturday: "Sat",
 };
 
 export const DAY_FULL_LABELS: Record<string, string> = {
@@ -28,6 +29,7 @@ export const DAY_FULL_LABELS: Record<string, string> = {
   wednesday: "Wednesday",
   thursday: "Thursday",
   friday: "Friday",
+  saturday: "Saturday",
 };
 
 const JS_DAY_TO_KEY: Record<number, string> = {
@@ -36,6 +38,7 @@ const JS_DAY_TO_KEY: Record<number, string> = {
   3: "wednesday",
   4: "thursday",
   5: "friday",
+  6: "saturday",
 };
 
 export function formatTime(time: string): string {

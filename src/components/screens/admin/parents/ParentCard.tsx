@@ -55,28 +55,28 @@ export function ParentCard({
     >
       <CardContent className="p-5">
         {/* Parent Header */}
-        <div className="flex items-start justify-between mb-4">
-          <div className="flex items-center gap-3">
-            <Avatar className="size-11">
+        <div className="flex items-start justify-between mb-4 gap-3">
+          <div className="flex items-center gap-3 min-w-0 flex-1">
+            <Avatar className="size-11 shrink-0">
               <AvatarFallback
                 className={`${getAvatarColor(parent.name)} text-white text-sm font-semibold`}
               >
                 {getInitials(parent.name)}
               </AvatarFallback>
             </Avatar>
-            <div>
-              <h3 className="font-semibold text-zinc-900 dark:text-zinc-100 text-sm">
+            <div className="min-w-0 flex-1">
+              <h3 className="font-semibold text-zinc-900 dark:text-zinc-100 text-sm truncate" title={parent.name}>
                 {parent.name}
               </h3>
-              <div className="flex items-center gap-1.5 mt-0.5">
-                <Mail className="size-3 text-zinc-500 dark:text-zinc-400" />
-                <span className="text-xs text-zinc-700 dark:text-zinc-300">
+              <div className="flex items-center gap-1.5 mt-0.5 min-w-0">
+                <Mail className="size-3 text-zinc-500 dark:text-zinc-400 shrink-0" />
+                <span className="text-xs text-zinc-700 dark:text-zinc-300 truncate block flex-1 min-w-0" title={parent.email}>
                   {parent.email}
                 </span>
               </div>
             </div>
           </div>
-          <div className="flex items-center gap-1">
+          <div className="flex items-center gap-1 shrink-0">
             <Button
               variant="ghost"
               size="icon"

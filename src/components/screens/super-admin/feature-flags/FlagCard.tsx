@@ -25,9 +25,11 @@ export function FlagCard({
   const [isEditingNotes, setIsEditingNotes] = useState(false);
   const [localNotes, setLocalNotes] = useState(flag.notes || "");
 
-  useEffect(() => {
+  const [prevNotes, setPrevNotes] = useState(flag.notes || "");
+  if (prevNotes !== (flag.notes || "")) {
     setLocalNotes(flag.notes || "");
-  }, [flag.notes]);
+    setPrevNotes(flag.notes || "");
+  }
 
   return (
     <Card
