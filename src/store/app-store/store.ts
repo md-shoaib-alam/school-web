@@ -6,6 +6,7 @@ import {
 } from './utils';
 import { getCookie } from '@/lib/cookies';
 import { API_BASE } from '@/lib/api';
+import { env } from '@/lib/env';
 
 function getInitialUser(): { isLoggedIn: boolean; currentUser: AppUser | null } {
   if (typeof window === 'undefined') return { isLoggedIn: false, currentUser: null };
@@ -275,8 +276,7 @@ export const useAppStore = create<AppState>((set, get) => ({
         }
 
         // Fetch and cache in background using the backend proxy to bypass CORS
-        const apiBase = process.env.NEXT_PUBLIC_API_URL || '';
-        const proxyUrl = `${apiBase}/tenants/logo-proxy?url=${encodeURIComponent(logo)}`;
+        const proxyUrl = `${env.NEXT_PUBLIC_API_URL}/tenants/logo-proxy?url=${encodeURIComponent(logo)}`;
         const response = await fetch(proxyUrl);
         const blob = await response.blob();
         const reader = new FileReader();
