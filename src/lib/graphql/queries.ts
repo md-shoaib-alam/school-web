@@ -33,7 +33,7 @@ export const TENANTS = `
     tenants(status: $status, plan: $plan, search: $search, page: $page, limit: $limit) {
       tenants { id name slug logo email phone address website plan status maxStudents maxTeachers maxParents maxClasses startDate endDate createdAt deletedAt studentCount teacherCount parentCount adminCount activeSubscriptions totalRevenue _count { users classes subscriptions notices events } }
       total page totalPages
-      stats { total active trial suspended expiring }
+      stats { total active trial suspended }
     }
   }
 `
