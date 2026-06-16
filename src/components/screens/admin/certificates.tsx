@@ -22,7 +22,7 @@ import {
 } from '@/components/ui/dialog';
 import * as VisuallyHidden from '@radix-ui/react-visually-hidden';
 import {
-  Award, Eye, Plus, Printer, ShieldBan, Loader2,
+  Award, Eye, Plus, Printer, ShieldBan, Loader2, Download
 } from 'lucide-react';
 import { toast } from "sonner";
 import { apiFetch } from '@/lib/api';
@@ -55,12 +55,64 @@ export function AdminCertificates() {
   const [selectedClassId, setSelectedClassId] = useState<string>('');
   const [viewCert, setViewCert] = useState<CertificateRecord | null>(null);
   const [revokeCert, setRevokeCert] = useState<CertificateRecord | null>(null);
+  const [downloading, setDownloading] = useState(false);
   
   const contentRef = useRef<HTMLDivElement>(null);
   const handlePrint = useReactToPrint({
     contentRef,
     documentTitle: viewCert ? `Certificate_${viewCert.certificateNo}` : 'Certificate',
   });
+
+  const handleDownloadPDF = async () => {
+    if (!viewCert) return;
+    setDownloading(true);
+    try {
+      const { downloadContainerAsPDF } = await import('@/lib/pdf-export');
+      const filename = `${viewCert.certificateType}_${viewCert.certificateNo.replace(/\//g, '_')}.pdf`;
+      
+      // The user loves the Print UI, so we ensure the PDF capture uses the EXACT same styles
+      await downloadContainerAsPDF({
+        containerRef: contentRef,
+        pageClassName: 'print-container',
+        filename,
+        width: 794, // Standard A4 width at 96 DPI
+        height: 1123, // Standard A4 height at 96 DPI
+        onStart: () => {
+          toast.info("Generating PDF, please wait...", { id: 'pdf-progress' });
+          // Inject the "perfect" print styles into the capture process
+          const style = document.createElement('style');
+          style.id = 'pdf-capture-styles';
+          style.innerHTML = `
+            .cert-frame { 
+              width: 190mm !important; 
+              height: 272mm !important; 
+              margin: auto !important; 
+              margin-top: 12mm !important;
+              border: 12px double #92400e !important; 
+              background: white !important;
+              -webkit-print-color-adjust: exact; 
+              print-color-adjust: exact;
+            }
+          `;
+          document.head.appendChild(style);
+        },
+        onComplete: () => {
+          setDownloading(false);
+          toast.success("PDF downloaded successfully!", { id: 'pdf-progress' });
+          document.getElementById('pdf-capture-styles')?.remove();
+        },
+        onError: (err: any) => {
+          setDownloading(false);
+          toast.error("Failed to generate PDF: " + err.message, { id: 'pdf-progress' });
+          document.getElementById('pdf-capture-styles')?.remove();
+        }
+      });
+    } catch (err: any) {
+      console.error(err);
+      setDownloading(false);
+      toast.error("An error occurred during PDF generation.", { id: 'pdf-progress' });
+    }
+  };
 
   const [form, setForm] = useState({ 
     studentId: '', 
@@ -317,10 +369,27 @@ export function AdminCertificates() {
           </VisuallyHidden.Root>
           <div className="p-3 sm:p-4 border-b flex justify-between items-center bg-white sticky top-0 z-10">
             <h3 className="font-semibold text-zinc-900 truncate mr-2">Preview</h3>
-            <Button onClick={() => handlePrint()} className="bg-amber-600 hover:bg-amber-700 text-white h-9 px-3 shrink-0">
-              <Printer className="size-4 mr-2" /> 
-              <span className="text-sm">Print PDF</span>
-            </Button>
+            <div className="flex items-center gap-2">
+              <Button 
+                onClick={() => handlePrint()} 
+                className="bg-emerald-600 hover:bg-emerald-700 text-white h-9 px-3 shrink-0 gap-2"
+              >
+                <Printer className="size-4" /> 
+                <span className="text-sm font-bold">Print</span>
+              </Button>
+              <Button 
+                onClick={handleDownloadPDF} 
+                disabled={downloading}
+                className="bg-emerald-600 hover:bg-emerald-700 text-white h-9 px-3 shrink-0 gap-2"
+              >
+                {downloading ? (
+                  <Loader2 className="size-4 animate-spin" />
+                ) : (
+                  <Download className="size-4" />
+                )}
+                <span className="text-sm font-bold">Download</span>
+              </Button>
+            </div>
           </div>
           <div className="max-h-[75vh] overflow-y-auto p-4 sm:p-8 bg-zinc-100/50 flex justify-center">
             <div className="scale-[0.38] xs:scale-[0.45] sm:scale-[0.7] lg:scale-100 origin-top">
