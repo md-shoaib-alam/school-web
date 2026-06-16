@@ -122,7 +122,9 @@ export function ExamTable({
               <TableRow className="bg-muted/30 hover:bg-transparent">
                 <TableHead className="px-2 sm:px-4">Exam & Subject</TableHead>
                 <TableHead className="hidden sm:table-cell">Subject</TableHead>
-                <TableHead className="hidden md:table-cell">Class</TableHead>
+                {!hideClassFilter && (
+                  <TableHead className="hidden md:table-cell">Class</TableHead>
+                )}
                 <TableHead className="hidden lg:table-cell">Date</TableHead>
                 <TableHead className="hidden lg:table-cell text-center">Timing</TableHead>
                 <TableHead className="text-center px-2 hidden sm:table-cell">Status</TableHead>
@@ -133,14 +135,14 @@ export function ExamTable({
               {loading ? (
                 ['row-1', 'row-2', 'row-3', 'row-4', 'row-5'].map((rowId) => (
                   <TableRow key={rowId} className="hover:bg-transparent">
-                    {['col-1', 'col-2', 'col-3', 'col-4', 'col-5', 'col-6', 'col-7'].map((colId) => (
-                      <TableCell key={colId}><div className="h-4 w-full bg-muted animate-pulse rounded" /></TableCell>
+                    {Array.from({ length: hideClassFilter ? 6 : 7 }).map((_, i) => (
+                      <TableCell key={`${rowId}-col-${i}`}><div className="h-4 w-full bg-muted animate-pulse rounded" /></TableCell>
                     ))}
                   </TableRow>
                 ))
               ) : exams.length === 0 ? (
                 <TableRow className="hover:bg-transparent">
-                  <TableCell colSpan={7} className="h-64 text-center">
+                  <TableCell colSpan={hideClassFilter ? 6 : 7} className="h-64 text-center">
                     <div className="flex flex-col items-center justify-center text-muted-foreground">
                       <ClipboardList className="size-12 mb-2 opacity-20" />
                       <p>No exams found matching your filters</p>
@@ -168,11 +170,13 @@ export function ExamTable({
                         <span className="text-[9px] text-muted-foreground font-mono leading-none uppercase whitespace-nowrap">CODE: {exam.id.slice(-4)}</span>
                       </div>
                     </TableCell>
-                    <TableCell className="hidden md:table-cell whitespace-nowrap">
-                      <Badge variant="secondary" className="font-normal text-xs">
-                        {exam.className}-{exam.classSection}
-                      </Badge>
-                    </TableCell>
+                    {!hideClassFilter && (
+                      <TableCell className="hidden md:table-cell whitespace-nowrap">
+                        <Badge variant="secondary" className="font-normal text-xs">
+                          {exam.className}-{exam.classSection}
+                        </Badge>
+                      </TableCell>
+                    )}
                     <TableCell className="hidden lg:table-cell text-sm whitespace-nowrap">
                       <div className="flex items-center gap-1.5">
                         <Calendar className="size-3.5 text-muted-foreground" />

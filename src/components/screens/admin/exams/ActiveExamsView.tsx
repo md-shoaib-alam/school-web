@@ -258,13 +258,9 @@ export function ActiveExamsView({
                                       onOpenEdit={(e) => { setEditForm({ ...e, totalMarks: String(e.totalMarks), passingMarks: String(e.passingMarks) }); setEditOpen(true); }}
                                       onDelete={handleDelete} deleting={deleting} formatDate={formatDate} formatTime={formatTime}
                                       getStatusBadge={getStatusBadge} getExamTypeBadge={getExamTypeBadge}
+                                      classFilter={c.id} setClassFilter={setClassFilter} statusFilter={statusFilter} setStatusFilter={setStatusFilter}
+                                      classes={classes} hideClassFilter={true} flat={true} hideSearchAndFilter={true}
                                       onViewResults={handleOpenViewResults}
-                                      classFilter={c.id} setClassFilter={setClassFilter}
-                                      statusFilter={statusFilter} setStatusFilter={setStatusFilter}
-                                      classes={classes}
-                                      hideClassFilter={true}
-                                      flat={true}
-                                      hideSearchAndFilter={true}
                                     />
                                   </div>
                                 </Card>
