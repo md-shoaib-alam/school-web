@@ -3,7 +3,7 @@
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { 
-  Printer, Loader2, Award, FileText, User, Search, ArrowLeft, Layout
+  Printer, Loader2, Award, FileText, User, Search, ArrowLeft, Layout, Download
 } from 'lucide-react';
 import { ExamRecord } from '../types';
 import { MARKSHEET_TEMPLATES } from '../marksheet-templates';
@@ -25,6 +25,8 @@ interface MarksheetControlsProps {
   exams: ExamRecord[];
   loading: boolean;
   printing: boolean;
+  downloading: boolean;
+  handleDownloadPDF: () => void;
 }
 
 export function MarksheetControls({
@@ -43,7 +45,9 @@ export function MarksheetControls({
   students,
   exams,
   loading,
-  printing
+  printing,
+  downloading,
+  handleDownloadPDF,
 }: MarksheetControlsProps) {
   return (
     <div className="bg-card border border-zinc-150 dark:border-zinc-800/80 p-3 sm:px-4 rounded-xl shadow-sm flex flex-col lg:flex-row items-stretch lg:items-center gap-3 justify-between">
@@ -151,15 +155,26 @@ export function MarksheetControls({
           </Select>
         </div>
 
-        {/* Print button */}
+        {/* Print button - Hidden on mobile/tablet */}
         <Button 
           onClick={handlePrint}
-          disabled={loading || printing || students.length === 0}
+          disabled={loading || printing || downloading || students.length === 0}
           size="sm"
-          className="w-full sm:w-auto bg-emerald-600 hover:bg-emerald-700 text-white shrink-0 gap-1.5 shadow-sm rounded-lg h-8 px-4 font-bold text-xs transition-all duration-300 transform active:scale-95 justify-center"
+          className="hidden lg:inline-flex w-full sm:w-auto bg-emerald-600 hover:bg-emerald-700 text-white shrink-0 gap-1.5 shadow-sm rounded-lg h-8 px-4 font-bold text-xs transition-all duration-300 transform active:scale-95 justify-center"
         >
           {printing ? <Loader2 className="size-3.5 animate-spin" /> : <Printer className="size-3.5" />}
           <span>Print {selectedStudentId === 'all' ? 'All' : 'Student'}</span>
+        </Button>
+
+        {/* Download PDF button */}
+        <Button 
+          onClick={handleDownloadPDF}
+          disabled={loading || printing || downloading || students.length === 0}
+          size="sm"
+          className="w-full sm:w-auto bg-violet-600 hover:bg-violet-700 text-white shrink-0 gap-1.5 shadow-sm rounded-lg h-8 px-4 font-bold text-xs transition-all duration-300 transform active:scale-95 justify-center"
+        >
+          {downloading ? <Loader2 className="size-3.5 animate-spin" /> : <Download className="size-3.5" />}
+          <span>Download PDF</span>
         </Button>
       </div>
     </div>

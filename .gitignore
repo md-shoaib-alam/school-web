@@ -47,3 +47,4 @@ node_modules
 bunfig.toml
 
 src/service_key.json
+certificates

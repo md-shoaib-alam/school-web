@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
 import { 
-  Trophy, ClipboardList, ChevronDown, Printer, Loader2 
+  Trophy, ClipboardList, ChevronDown, Printer, Loader2, Download
 } from 'lucide-react';
 import { ExamTable } from './ExamTable';
 import { getGroupedExams } from './utils';
@@ -22,7 +22,7 @@ interface PublishedResultsViewProps {
   publishedClassFilter: string;
   setPublishedClassFilter: React.Dispatch<React.SetStateAction<string>>;
   printingLedgerClassId: string | null;
-  handlePrintTabularLedger: (classId: string, className: string, classSection: string, templateId: string, examName?: string) => Promise<void>;
+  handlePrintTabularLedger: (classId: string, className: string, classSection: string, templateId: string, examName?: string, isDownload?: boolean) => Promise<void>;
   loadingExams: boolean;
   deleting: boolean;
   handleDelete: (id: string) => Promise<void>;
@@ -222,29 +222,46 @@ export function PublishedResultsView({
                                       {group.academicYear}
                                     </Badge>
                                   </div>
-                                  <div className="flex items-center gap-3">
-                                    <span className="text-xs text-muted-foreground font-medium">
+                                  <div className="flex items-center gap-2 flex-wrap sm:flex-nowrap">
+                                    <span className="text-xs text-muted-foreground font-medium hidden sm:inline">
                                       {group.exams.length} subject{group.exams.length !== 1 ? 's' : ''}
                                     </span>
                                     {(() => {
                                       const isPrintingLedger = printingLedgerClassId === c.id;
                                       return (
-                                        <Button 
-                                          variant="outline" 
-                                          size="sm" 
-                                          disabled={isPrintingLedger}
-                                          onClick={() => {
-                                            handlePrintTabularLedger(c.id, c.name, c.section, 'classic', group.cycleName);
-                                          }}
-                                          className="h-7 border-emerald-200 hover:border-emerald-300 dark:border-emerald-900/50 hover:bg-emerald-50 dark:hover:bg-emerald-950/20 text-emerald-600 dark:text-emerald-400 gap-1.5 rounded-lg text-[11px] font-semibold px-2.5 shadow-sm transition-colors flex items-center justify-center disabled:opacity-70 disabled:cursor-not-allowed"
-                                        >
-                                          {isPrintingLedger ? (
-                                            <Loader2 className="size-3.5 animate-spin" />
-                                          ) : (
-                                            <Printer className="size-3.5" />
-                                          )}
-                                          <span>{isPrintingLedger ? 'Printing...' : 'Print Sheet'}</span>
-                                        </Button>
+                                        <div className="flex items-center gap-2">
+                                          {/* Print button - hidden on mobile */}
+                                          <Button 
+                                            variant="outline" 
+                                            size="sm" 
+                                            disabled={isPrintingLedger}
+                                            onClick={() => {
+                                              handlePrintTabularLedger(c.id, c.name, c.section, 'classic', group.cycleName, false);
+                                            }}
+                                            className="hidden lg:inline-flex h-7 border-emerald-200 hover:border-emerald-300 dark:border-emerald-900/50 hover:bg-emerald-50 dark:hover:bg-emerald-950/20 text-emerald-600 dark:text-emerald-400 gap-1.5 rounded-lg text-[11px] font-semibold px-2.5 shadow-sm transition-colors items-center justify-center disabled:opacity-70 disabled:cursor-not-allowed"
+                                          >
+                                            {isPrintingLedger ? (
+                                              <Loader2 className="size-3.5 animate-spin" />
+                                            ) : (
+                                              <Printer className="size-3.5" />
+                                            )}
+                                            <span>{isPrintingLedger ? 'Printing...' : 'Print Sheet'}</span>
+                                          </Button>
+
+                                          {/* Download PDF button - always visible */}
+                                          <Button 
+                                            variant="outline" 
+                                            size="sm" 
+                                            disabled={isPrintingLedger}
+                                            onClick={() => {
+                                              handlePrintTabularLedger(c.id, c.name, c.section, 'classic', group.cycleName, true);
+                                            }}
+                                            className="h-7 border-violet-200 hover:border-violet-300 dark:border-violet-900/50 hover:bg-violet-50 dark:hover:bg-violet-950/20 text-violet-600 dark:text-violet-400 gap-1.5 rounded-lg text-[11px] font-semibold px-2.5 shadow-sm transition-colors flex items-center justify-center disabled:opacity-70 disabled:cursor-not-allowed"
+                                          >
+                                            <Download className="size-3.5" />
+                                            <span>Download PDF</span>
+                                          </Button>
+                                        </div>
                                       );
                                     })()}
                                   </div>

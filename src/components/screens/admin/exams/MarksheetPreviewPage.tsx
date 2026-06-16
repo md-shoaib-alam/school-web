@@ -90,6 +90,7 @@ export function MarksheetPreviewPage({
   examName
 }: MarksheetPreviewPageProps) {
   const [state, dispatch] = useReducer(reducer, initialState);
+  const [downloading, setDownloading] = useState(false);
   const {
     selectedStudentId,
     marksheetType,
@@ -181,6 +182,31 @@ export function MarksheetPreviewPage({
 
     loadData();
   }, [classId, academicYear, examName]);
+
+  // Handle responsive zoom scaling
+  useEffect(() => {
+    const handleResize = () => {
+      const width = window.innerWidth;
+      let newScale = 0.6; // Default for desktop
+      
+      if (width < 640) {
+        // Mobile: calculate scale to fit 794px width with consistent padding
+        newScale = Math.min(0.5, (width - 48) / 794);
+      } else if (width < 1024) {
+        // Tablet
+        newScale = Math.min(0.7, (width - 100) / 794);
+      }
+      
+      // Update if significant change or initial load
+      if (Math.abs(state.zoomScale - newScale) > 0.05) {
+        setZoomScale(Number(newScale.toFixed(2)));
+      }
+    };
+
+    handleResize();
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, [state.zoomScale]);
 
   // Clean student selection state when opened
   useEffect(() => {
@@ -337,6 +363,41 @@ export function MarksheetPreviewPage({
     }, 200);
   };
 
+  const handleDownloadPDF = async () => {
+    if (students.length === 0) return;
+    try {
+      const { downloadContainerAsPDF } = await import('@/lib/pdf-export');
+      const filename = selectedStudentId === 'all' 
+        ? `Marksheets_${classNameStr}_${classSection}.pdf` 
+        : `Marksheet_${students.find(s => s.id === selectedStudentId)?.name || 'Student'}.pdf`;
+
+      await downloadContainerAsPDF({
+        containerRef: printContainerRef,
+        pageClassName: 'marksheet-page-break',
+        filename,
+        onStart: () => {
+          setDownloading(true);
+          toast.info("Generating PDF, please wait...", { id: 'pdf-progress' });
+        },
+        onProgress: (current, total) => {
+          toast.info(`Generating page ${current} of ${total}...`, { id: 'pdf-progress' });
+        },
+        onComplete: () => {
+          setDownloading(false);
+          toast.success("PDF downloaded successfully!", { id: 'pdf-progress' });
+        },
+        onError: (err: any) => {
+          setDownloading(false);
+          toast.error("Failed to generate PDF: " + err.message, { id: 'pdf-progress' });
+        }
+      });
+    } catch (err: any) {
+      console.error(err);
+      setDownloading(false);
+      toast.error("An error occurred during PDF generation.", { id: 'pdf-progress' });
+    }
+  };
+
   const SelectedTemplate = MARKSHEET_TEMPLATES.find(t => t.id === selectedTemplateId)?.component || MARKSHEET_TEMPLATES[0].component;
 
   if (isStandalone) {
@@ -359,6 +420,8 @@ export function MarksheetPreviewPage({
           printing={printing}
           handlePrint={handlePrint}
           onBack={onBack}
+          downloading={downloading}
+          handleDownloadPDF={handleDownloadPDF}
         />
         
         {/* Standalone View Container */}
@@ -414,6 +477,8 @@ export function MarksheetPreviewPage({
         exams={exams}
         loading={loading}
         printing={printing}
+        downloading={downloading}
+        handleDownloadPDF={handleDownloadPDF}
       />
 
       <MarksheetSheetsPreview

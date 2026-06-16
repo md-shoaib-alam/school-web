@@ -5,7 +5,7 @@ import { useReactToPrint } from 'react-to-print';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import {
-  FileText, Printer, Loader2, School,
+  FileText, Printer, Loader2, School, Download,
 } from 'lucide-react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { toast } from "sonner";
@@ -319,10 +319,82 @@ export function AdminAdmitCards() {
     });
   };
 
+  const [downloadingSingle, setDownloadingSingle] = useState(false);
+  const [downloadingAll, setDownloadingAll] = useState(false);
+
   const handlePrintSingle = useReactToPrint({
     contentRef: singleCardRef,
     documentTitle: "",
   });
+
+  const handleDownloadSingle = async () => {
+    if (!viewCard) return;
+    setDownloadingSingle(true);
+    try {
+      const { downloadContainerAsPDF } = await import('@/lib/pdf-export');
+      const filename = `Admit_Card_${viewCard.student.name.replace(/\s+/g, '_')}.pdf`;
+      
+      await downloadContainerAsPDF({
+        containerRef: singleCardRef,
+        pageClassName: 'single-card-page',
+        filename,
+        onStart: () => {
+          toast.info("Generating PDF, please wait...", { id: 'pdf-progress' });
+        },
+        onComplete: () => {
+          toast.success("PDF downloaded successfully!", { id: 'pdf-progress' });
+        },
+        onError: (err: any) => {
+          toast.error("Failed to generate PDF: " + err.message, { id: 'pdf-progress' });
+        }
+      });
+    } catch (err: any) {
+      console.error(err);
+      toast.error("An error occurred during PDF generation.", { id: 'pdf-progress' });
+    } finally {
+      setDownloadingSingle(false);
+    }
+  };
+
+  const handleDownloadAll = async () => {
+    if (admitCards.length === 0) return;
+    setDownloadingAll(true);
+    dispatch({ type: 'SET_PREPARING_PRINT', preparing: true });
+    
+    // Give react time to mount the allCardsRef container in the DOM
+    setTimeout(async () => {
+      try {
+        const { downloadContainerAsPDF } = await import('@/lib/pdf-export');
+        const activeClass = classes.find((c: any) => c.id === selectedClassId);
+        const classNameStr = activeClass?.name || 'Class';
+        const classSection = activeClass?.section || '';
+        
+        await downloadContainerAsPDF({
+          containerRef: allCardsRef,
+          pageClassName: 'admit-card-page',
+          filename: `Admit_Cards_${classNameStr}_${classSection}.pdf`,
+          onStart: () => {
+            toast.info("Generating PDF, please wait...", { id: 'pdf-progress' });
+          },
+          onProgress: (current, total) => {
+            toast.info(`Generating page ${current} of ${total}...`, { id: 'pdf-progress' });
+          },
+          onComplete: () => {
+            toast.success("PDF downloaded successfully!", { id: 'pdf-progress' });
+          },
+          onError: (err: any) => {
+            toast.error("Failed to generate PDF: " + err.message, { id: 'pdf-progress' });
+          }
+        });
+      } catch (err: any) {
+        console.error(err);
+        toast.error("An error occurred during PDF generation.", { id: 'pdf-progress' });
+      } finally {
+        setDownloadingAll(false);
+        dispatch({ type: 'SET_PREPARING_PRINT', preparing: false });
+      }
+    }, 500);
+  };
 
   const handlePrintAllBase = useReactToPrint({
     contentRef: allCardsRef,
@@ -384,14 +456,25 @@ export function AdminAdmitCards() {
           </p>
         </div>
         {admitCards.length > 0 && (
-          <Button 
-            onClick={handlePrintAll} 
-            disabled={preparingPrint}
-            className="gap-2 bg-zinc-800 hover:bg-zinc-900 text-white"
-          >
-            {preparingPrint ? <Loader2 className="size-4 animate-spin" /> : <Printer className="size-4" />}
-            {preparingPrint ? 'Preparing...' : `Print All (${admitCards.length})`}
-          </Button>
+          <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
+            <Button 
+              onClick={handlePrintAll} 
+              disabled={preparingPrint || downloadingAll}
+              className="hidden lg:inline-flex gap-2 bg-zinc-800 hover:bg-zinc-900 text-white w-full sm:w-auto justify-center items-center"
+            >
+              {preparingPrint ? <Loader2 className="size-4 animate-spin" /> : <Printer className="size-4" />}
+              {preparingPrint ? 'Preparing...' : `Print All (${admitCards.length})`}
+            </Button>
+            
+            <Button 
+              onClick={handleDownloadAll} 
+              disabled={preparingPrint || downloadingAll}
+              className="gap-2 bg-amber-600 hover:bg-amber-700 text-white w-full sm:w-auto shadow-md shadow-amber-900/10 justify-center items-center"
+            >
+              {downloadingAll ? <Loader2 className="size-4 animate-spin" /> : <Download className="size-4" />}
+              {downloadingAll ? 'Downloading...' : `Download PDF (${admitCards.length})`}
+            </Button>
+          </div>
         )}
       </div>
 
@@ -469,6 +552,8 @@ export function AdminAdmitCards() {
         card={viewCard}
         onOpenChange={(open) => !open && dispatch({ type: 'SET_VIEW_CARD', card: null })}
         onPrint={() => handlePrintSingle()}
+        onDownload={handleDownloadSingle}
+        downloading={downloadingSingle}
         templateId={selectedTemplate}
       />
     </div>

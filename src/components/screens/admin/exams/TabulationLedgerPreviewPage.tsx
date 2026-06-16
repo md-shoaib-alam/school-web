@@ -27,7 +27,7 @@ import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Skeleton } from '@/components/ui/skeleton';
 import { 
-  Printer, ArrowLeft, Search, Layout, AlertCircle, Loader2, Award
+  Printer, ArrowLeft, Search, Layout, AlertCircle, Loader2, Award, Download
 } from 'lucide-react';
 import { useReactToPrint } from 'react-to-print';
 import { toast } from "sonner";
@@ -64,11 +64,37 @@ export function TabulationLedgerPreviewPage({
   });
   const { loading, ledgerData } = state;
   const [printing, setPrinting] = useState<boolean>(false);
+  const [downloading, setDownloading] = useState<boolean>(false);
   const [zoomScale, setZoomScale] = useState<number>(0.65); // Default to 65% zoom for landscape preview
   const [unscaledHeight, setUnscaledHeight] = useState<number>(794);
 
   const printContainerRef = useRef<HTMLDivElement>(null);
   const contentMeasureRef = useRef<HTMLDivElement>(null);
+
+  // Handle responsive zoom scaling
+  useEffect(() => {
+    const handleResize = () => {
+      const width = window.innerWidth;
+      let newScale = 0.65; // Default for desktop landscape
+      
+      if (width < 640) {
+        // Mobile: calculate scale to fit 1123px (Landscape A4) width with some padding
+        newScale = Math.max(0.25, (width - 40) / 1123);
+      } else if (width < 1024) {
+        // Tablet
+        newScale = Math.max(0.4, (width - 100) / 1123);
+      }
+      
+      // Update if significant change or initial load
+      if (Math.abs(zoomScale - newScale) > 0.05) {
+        setZoomScale(Number(newScale.toFixed(2)));
+      }
+    };
+
+    handleResize();
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, [zoomScale]);
 
   // Load tabulation ledger data
   useEffect(() => {
@@ -135,6 +161,39 @@ export function TabulationLedgerPreviewPage({
     }, 200);
   };
 
+  const handleDownloadPDF = async () => {
+    if (!ledgerData) return;
+    try {
+      const { downloadContainerAsPDF } = await import('@/lib/pdf-export');
+      const filename = `Tabulation_Ledger_${classNameStr}_${classSection}.pdf`;
+
+      await downloadContainerAsPDF({
+        containerRef: printContainerRef,
+        pageClassName: 'ledger-print-page', // Assuming ledger templates use this class for page breaks
+        filename,
+        onStart: () => {
+          setDownloading(true);
+          toast.info("Generating PDF, please wait...", { id: 'pdf-progress' });
+        },
+        onProgress: (current, total) => {
+          toast.info(`Generating page ${current} of ${total}...`, { id: 'pdf-progress' });
+        },
+        onComplete: () => {
+          setDownloading(false);
+          toast.success("PDF downloaded successfully!", { id: 'pdf-progress' });
+        },
+        onError: (err: any) => {
+          setDownloading(false);
+          toast.error("Failed to generate PDF: " + err.message, { id: 'pdf-progress' });
+        }
+      });
+    } catch (err: any) {
+      console.error(err);
+      setDownloading(false);
+      toast.error("An error occurred during PDF generation.", { id: 'pdf-progress' });
+    }
+  };
+
   return (
     <div className="space-y-6 animate-in fade-in duration-300">
       {/* toolbar */}
@@ -199,6 +258,7 @@ export function TabulationLedgerPreviewPage({
                 </div>
               </SelectTrigger>
               <SelectContent className="rounded-xl">
+                <SelectItem value="0.25" className="text-xs font-medium">25%</SelectItem>
                 <SelectItem value="0.4" className="text-xs font-medium">40%</SelectItem>
                 <SelectItem value="0.5" className="text-xs font-medium">50%</SelectItem>
                 <SelectItem value="0.65" className="text-xs font-medium">65%</SelectItem>
@@ -211,12 +271,23 @@ export function TabulationLedgerPreviewPage({
           {/* Print button */}
           <Button 
             onClick={handlePrint}
-            disabled={loading || printing || !ledgerData}
+            disabled={loading || printing || downloading || !ledgerData}
             size="sm"
-            className="w-full sm:w-auto bg-emerald-600 hover:bg-emerald-700 text-white shrink-0 gap-1.5 shadow-sm rounded-lg h-8 px-4 font-bold text-xs transition-all duration-300 transform active:scale-95 justify-center"
+            className="hidden lg:inline-flex w-full sm:w-auto bg-emerald-600 hover:bg-emerald-700 text-white shrink-0 gap-1.5 shadow-sm rounded-lg h-8 px-4 font-bold text-xs transition-all duration-300 transform active:scale-95 justify-center"
           >
             {printing ? <Loader2 className="size-3.5 animate-spin" /> : <Printer className="size-3.5" />}
             <span>Print Ledger</span>
+          </Button>
+
+          {/* Download button */}
+          <Button 
+            onClick={handleDownloadPDF}
+            disabled={loading || printing || downloading || !ledgerData}
+            size="sm"
+            className="w-full sm:w-auto bg-violet-600 hover:bg-violet-700 text-white shrink-0 gap-1.5 shadow-sm rounded-lg h-8 px-4 font-bold text-xs transition-all duration-300 transform active:scale-95 justify-center"
+          >
+            {downloading ? <Loader2 className="size-3.5 animate-spin" /> : <Download className="size-3.5" />}
+            <span>Download PDF</span>
           </Button>
         </div>
       </div>
