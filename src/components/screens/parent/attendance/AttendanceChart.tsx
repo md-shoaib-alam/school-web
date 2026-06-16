@@ -35,7 +35,7 @@ export function AttendanceChart({ data, isPremium }: AttendanceChartProps) {
         </CardDescription>
       </CardHeader>
       <CardContent className="p-2 sm:p-4 relative">
-        <div className={`h-[200px] sm:h-64 w-full transition-all duration-500 ${!isPremium ? "blur-[6px] pointer-events-none select-none opacity-40 scale-95" : ""}`}>
+        <div className={`h-[200px] min-h-[200px] sm:h-64 sm:min-h-[256px] w-full transition-all duration-500 ${!isPremium ? "blur-[6px] pointer-events-none select-none opacity-40 scale-95" : ""}`}>
           {!recharts ? (
             <div className="size-full flex items-center justify-center">
               <div className="size-full animate-pulse bg-zinc-200/50 dark:bg-zinc-800/50 rounded-lg" />

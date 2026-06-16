@@ -136,7 +136,7 @@ export function DistributionCharts({
           {loading || !recharts ? (
             <Skeleton className="h-[240px] w-full rounded-xl" />
           ) : (
-            <div className="h-[240px] w-full">
+            <div className="h-[240px] min-h-[240px] w-full">
               {(() => {
                 const { ResponsiveContainer, PieChart, Pie, Cell, Tooltip: RTooltip } = recharts;
                 return (
@@ -184,7 +184,7 @@ export function DistributionCharts({
           {loading || !recharts ? (
             <Skeleton className="h-[240px] w-full rounded-xl" />
           ) : (
-            <div className="h-[240px] w-full">
+            <div className="h-[240px] min-h-[240px] w-full">
               {(() => {
                 const { ResponsiveContainer, PieChart, Pie, Cell, Tooltip: RTooltip } = recharts;
                 return (
