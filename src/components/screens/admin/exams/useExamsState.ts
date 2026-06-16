@@ -108,7 +108,8 @@ export function useExamsState(initialTab = 'exams') {
     className: string, 
     classSection: string, 
     templateId: string = 'classic',
-    examName?: string
+    examName?: string,
+    isDownload: boolean = false
   ) => {
     if (enableModalTabulationPreview) {
       setPreviewingLedgerClass({
@@ -128,13 +129,14 @@ export function useExamsState(initialTab = 'exams') {
             classSection,
             academicYear: publishedAcademicYearFilter || currentAcademicYear,
             templateId,
-            examName
+            examName,
+            isDownload
           });
         })(),
         {
-          loading: 'Compiling tabulation ledger...',
-          success: 'Tabulation ledger compiled and preview opened!',
-          error: 'Failed to compile tabulation ledger',
+          loading: isDownload ? 'Generating PDF...' : 'Compiling tabulation ledger...',
+          success: isDownload ? 'PDF generated!' : 'Tabulation ledger compiled and preview opened!',
+          error: isDownload ? 'Failed to generate PDF' : 'Failed to compile tabulation ledger',
         }
       );
     }

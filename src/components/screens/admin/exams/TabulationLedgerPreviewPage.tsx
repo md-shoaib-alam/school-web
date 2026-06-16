@@ -273,7 +273,7 @@ export function TabulationLedgerPreviewPage({
             onClick={handlePrint}
             disabled={loading || printing || downloading || !ledgerData}
             size="sm"
-            className="w-full sm:w-auto bg-emerald-600 hover:bg-emerald-700 text-white shrink-0 gap-1.5 shadow-sm rounded-lg h-8 px-4 font-bold text-xs transition-all duration-300 transform active:scale-95 justify-center"
+            className="hidden lg:inline-flex w-full sm:w-auto bg-emerald-600 hover:bg-emerald-700 text-white shrink-0 gap-1.5 shadow-sm rounded-lg h-8 px-4 font-bold text-xs transition-all duration-300 transform active:scale-95 justify-center"
           >
             {printing ? <Loader2 className="size-3.5 animate-spin" /> : <Printer className="size-3.5" />}
             <span>Print Ledger</span>

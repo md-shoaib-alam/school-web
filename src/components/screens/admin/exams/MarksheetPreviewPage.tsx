@@ -190,11 +190,11 @@ export function MarksheetPreviewPage({
       let newScale = 0.6; // Default for desktop
       
       if (width < 640) {
-        // Mobile: calculate scale to fit 794px width with some padding
-        newScale = Math.max(0.3, (width - 40) / 794);
+        // Mobile: calculate scale to fit 794px width with consistent padding
+        newScale = Math.min(0.5, (width - 48) / 794);
       } else if (width < 1024) {
         // Tablet
-        newScale = Math.max(0.45, (width - 100) / 794);
+        newScale = Math.min(0.7, (width - 100) / 794);
       }
       
       // Update if significant change or initial load

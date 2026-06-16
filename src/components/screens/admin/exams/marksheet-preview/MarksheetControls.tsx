@@ -155,7 +155,7 @@ export function MarksheetControls({
           </Select>
         </div>
 
-        {/* Print button */}
+        {/* Print button - Hidden on mobile/tablet */}
         <Button 
           onClick={handlePrint}
           disabled={loading || printing || downloading || students.length === 0}
