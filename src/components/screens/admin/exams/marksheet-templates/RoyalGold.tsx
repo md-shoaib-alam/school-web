@@ -12,7 +12,7 @@ export const RoyalGold: React.FC<MarksheetTemplateProps> = ({
 }) => {
   return (
     <div 
-      className="relative bg-[#faf7f0] text-zinc-800 p-10 rounded overflow-hidden select-none flex flex-col justify-between shrink-0 text-left h-[1000px] w-[794px] box-border border-8 border-double border-[#b38f36]"
+      className="relative bg-[#faf7f0] text-zinc-800 p-10 rounded overflow-hidden select-none flex flex-col justify-between shrink-0 text-left h-[1123px] w-[794px] box-border border-8 border-double border-[#b38f36]"
       style={{ WebkitPrintColorAdjust: 'exact', printColorAdjust: 'exact' }}
     >
       {/* Decorative Ornate Corners */}

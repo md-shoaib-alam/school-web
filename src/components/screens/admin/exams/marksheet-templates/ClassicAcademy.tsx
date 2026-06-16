@@ -12,7 +12,7 @@ export const ClassicAcademy: React.FC<MarksheetTemplateProps> = ({
 }) => {
   return (
     <div 
-      className="relative bg-white text-zinc-900 px-9 py-10 border-[6px] border-[#1e3a8a] rounded overflow-hidden select-none flex flex-col justify-between shrink-0 text-left h-[1000px] w-[794px] box-border"
+      className="relative bg-white text-zinc-900 px-9 py-10 border-[6px] border-[#1e3a8a] rounded overflow-hidden select-none flex flex-col justify-between shrink-0 text-left h-[1123px] w-[794px] box-border"
       style={{ WebkitPrintColorAdjust: 'exact', printColorAdjust: 'exact' }}
     >
       {/* Gold Inner Inset Border */}

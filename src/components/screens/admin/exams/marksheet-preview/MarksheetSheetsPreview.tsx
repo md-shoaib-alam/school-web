@@ -94,14 +94,14 @@ export function MarksheetSheetsPreview({
             className="shrink-0 transition-all duration-300 paper-shadow bg-white"
             style={{ 
               width: 794 * zoomScale, 
-              height: 1100 * zoomScale, 
+              height: 1123 * zoomScale, 
               overflow: 'hidden' 
             }}
           >
             <div 
               style={{ 
                 width: 794, 
-                height: 1100,
+                height: 1123,
                 transform: `scale(${zoomScale})`,
                 transformOrigin: 'top left'
               }}
@@ -169,14 +169,14 @@ export function MarksheetSheetsPreview({
                 className="shrink-0 transition-all duration-300 shadow-2xl rounded-lg"
                 style={{ 
                   width: 794 * zoomScale, 
-                  height: 1100 * zoomScale, 
+                  height: 1123 * zoomScale, 
                   overflow: 'hidden' 
                 }}
               >
                 <div 
                   style={{ 
                     width: 794, 
-                    height: 1100,
+                    height: 1123,
                     transform: `scale(${zoomScale})`,
                     transformOrigin: 'top left'
                   }}
