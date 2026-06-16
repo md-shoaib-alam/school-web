@@ -197,7 +197,7 @@ export function TabulationLedgerPreviewPage({
   return (
     <div className="space-y-6 animate-in fade-in duration-300">
       {/* toolbar */}
-      <div className="bg-card border border-zinc-150 dark:border-zinc-800/80 p-3 sm:px-4 rounded-xl shadow-sm flex flex-col lg:flex-row items-stretch lg:items-center gap-3 justify-between">
+      <div className="bg-card border border-zinc-150 dark:border-zinc-800/80 p-3 sm:px-4 rounded-xl shadow-sm flex flex-col xl:flex-row items-stretch xl:items-center gap-3 justify-between">
         
         {/* Left Side: Back button and details */}
         <div className="flex items-center gap-3 min-w-0">
@@ -223,7 +223,7 @@ export function TabulationLedgerPreviewPage({
         </div>
 
         {/* Controls row */}
-        <div className="flex flex-col sm:flex-row flex-wrap items-stretch sm:items-center gap-2 sm:gap-3 w-full lg:w-auto">
+        <div className="flex flex-col sm:flex-row flex-wrap items-stretch sm:items-center gap-2 sm:gap-3 w-full xl:w-auto">
           
           {/* Select Template Design */}
           <div className="w-full sm:w-[170px]">
@@ -273,7 +273,7 @@ export function TabulationLedgerPreviewPage({
             onClick={handlePrint}
             disabled={loading || printing || downloading || !ledgerData}
             size="sm"
-            className="hidden lg:inline-flex w-full sm:w-auto bg-emerald-600 hover:bg-emerald-700 text-white shrink-0 gap-1.5 shadow-sm rounded-lg h-8 px-4 font-bold text-xs transition-all duration-300 transform active:scale-95 justify-center"
+            className="hidden xl:inline-flex w-full sm:w-auto bg-emerald-600 hover:bg-emerald-700 text-white shrink-0 gap-1.5 shadow-sm rounded-lg h-8 px-4 font-bold text-xs transition-all duration-300 transform active:scale-95 justify-center"
           >
             {printing ? <Loader2 className="size-3.5 animate-spin" /> : <Printer className="size-3.5" />}
             <span>Print Ledger</span>
