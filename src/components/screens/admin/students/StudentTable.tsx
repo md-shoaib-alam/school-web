@@ -28,7 +28,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { GraduationCap, Pencil, Trash2, Eye, MoreHorizontal } from "lucide-react";
+import { GraduationCap, Pencil, Trash2, Eye, MoreVertical } from "lucide-react";
 import type { StudentInfo } from "./types";
 
 interface StudentTableProps {
@@ -177,7 +177,7 @@ export function StudentTable({
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                           <Button variant="ghost" size="icon" className="size-8">
-                            <MoreHorizontal className="size-4" />
+                            <MoreVertical className="size-4" />
                             <span className="sr-only">Open menu</span>
                           </Button>
                         </DropdownMenuTrigger>

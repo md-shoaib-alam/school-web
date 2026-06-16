@@ -4,7 +4,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Pencil, Trash2, Link as LinkIcon, Eye } from "lucide-react";
+import { Pencil, Trash2, Link as LinkIcon, Eye, MoreVertical } from "lucide-react";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -16,6 +16,12 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import { 
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { avatarColors } from "../teachers/types";
 import type { ParentInfo } from "./types";
 
@@ -90,52 +96,111 @@ export function ParentsTableView({
                     </td>
                     <td className="px-3 sm:px-6 py-4">
                       <div className="flex items-center justify-end gap-1 sm:gap-2" onClick={(e) => e.stopPropagation()}>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="size-8 text-zinc-400 hover:text-emerald-600 shrink-0"
-                          onClick={() => onView(parent)}
-                          title="View Details"
-                        >
-                          <Eye className="size-3.5" />
-                        </Button>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          className="h-8 w-8 sm:w-auto gap-1 sm:gap-2 text-xs border-emerald-200 text-emerald-600 hover:bg-emerald-50 p-0 sm:px-3 shrink-0"
-                          onClick={() => onLinkOpen(parent)}
-                          title="Link Child"
-                        >
-                          <LinkIcon className="size-3.5" />
-                          <span className="hidden sm:inline">Link</span>
-                        </Button>
-                        <Button variant="ghost" size="icon" className="size-8 text-zinc-400 hover:text-emerald-600 shrink-0" onClick={() => onEdit(parent)}>
-                          <Pencil className="size-3.5" />
-                        </Button>
-                        <AlertDialog>
-                          <AlertDialogTrigger asChild>
-                            <Button variant="ghost" size="icon" className="size-8 text-zinc-400 hover:text-red-600 shrink-0" title="Delete">
-                              <Trash2 className="size-3.5" />
-                            </Button>
-                          </AlertDialogTrigger>
-                          <AlertDialogContent>
-                            <AlertDialogHeader>
-                              <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-                              <AlertDialogDescription>
-                                This will permanently delete <strong>{parent.name}</strong> and remove their access to the system.
-                              </AlertDialogDescription>
-                            </AlertDialogHeader>
-                            <AlertDialogFooter>
-                              <AlertDialogCancel>Cancel</AlertDialogCancel>
-                              <AlertDialogAction
-                                onClick={() => onDelete(parent.id)}
-                                className="bg-red-600 hover:bg-red-700 text-white"
-                              >
-                                Delete Parent
-                              </AlertDialogAction>
-                            </AlertDialogFooter>
-                          </AlertDialogContent>
-                        </AlertDialog>
+                        {/* Desktop Actions (xl and above) */}
+                        <div className="hidden xl:flex items-center gap-1 sm:gap-2">
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="size-8 text-zinc-400 hover:text-emerald-600 shrink-0"
+                            onClick={() => onView(parent)}
+                            title="View Details"
+                          >
+                            <Eye className="size-3.5" />
+                          </Button>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className="h-8 w-8 sm:w-auto gap-1 sm:gap-2 text-xs border-emerald-200 text-emerald-600 hover:bg-emerald-50 p-0 sm:px-3 shrink-0"
+                            onClick={() => onLinkOpen(parent)}
+                            title="Link Child"
+                          >
+                            <LinkIcon className="size-3.5" />
+                            <span className="hidden sm:inline">Link</span>
+                          </Button>
+                          <Button variant="ghost" size="icon" className="size-8 text-zinc-400 hover:text-emerald-600 shrink-0" onClick={() => onEdit(parent)}>
+                            <Pencil className="size-3.5" />
+                          </Button>
+                          <AlertDialog>
+                            <AlertDialogTrigger asChild>
+                              <Button variant="ghost" size="icon" className="size-8 text-zinc-400 hover:text-red-600 shrink-0" title="Delete">
+                                <Trash2 className="size-3.5" />
+                              </Button>
+                            </AlertDialogTrigger>
+                            <AlertDialogContent>
+                              <AlertDialogHeader>
+                                <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                                <AlertDialogDescription>
+                                  This will permanently delete <strong>{parent.name}</strong> and remove their access to the system.
+                                </AlertDialogDescription>
+                              </AlertDialogHeader>
+                              <AlertDialogFooter>
+                                <AlertDialogCancel onClick={(e) => e.stopPropagation()}>Cancel</AlertDialogCancel>
+                                <AlertDialogAction
+                                  onClick={(e) => { e.stopPropagation(); onDelete(parent.id); }}
+                                  className="bg-red-600 hover:bg-red-700 text-white"
+                                >
+                                  Delete Parent
+                                </AlertDialogAction>
+                              </AlertDialogFooter>
+                            </AlertDialogContent>
+                          </AlertDialog>
+                        </div>
+
+                        {/* Mobile/Tablet Actions (below xl) */}
+                        <div className="xl:hidden">
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button variant="ghost" size="icon" className="size-8">
+                                <MoreVertical className="size-4" />
+                                <span className="sr-only">Open menu</span>
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end" className="w-[160px]">
+                              <DropdownMenuItem onClick={() => onLinkOpen(parent)} className="cursor-pointer text-emerald-600 focus:text-emerald-600 focus:bg-emerald-50">
+                                <LinkIcon className="mr-2 h-4 w-4" />
+                                <span>Link Child</span>
+                              </DropdownMenuItem>
+                              <DropdownMenuItem onClick={() => onView(parent)} className="cursor-pointer">
+                                <Eye className="mr-2 h-4 w-4" />
+                                <span>View Details</span>
+                              </DropdownMenuItem>
+                              <DropdownMenuItem onClick={() => onEdit(parent)} className="cursor-pointer">
+                                <Pencil className="mr-2 h-4 w-4" />
+                                <span>Edit Parent</span>
+                              </DropdownMenuItem>
+                              <AlertDialog>
+                                <AlertDialogTrigger asChild>
+                                  <div 
+                                    className="relative flex cursor-pointer select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none transition-colors hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-950/20 dark:hover:text-red-400"
+                                  >
+                                    <Trash2 className="mr-2 h-4 w-4" />
+                                    <span>Delete Record</span>
+                                  </div>
+                                </AlertDialogTrigger>
+                                <AlertDialogContent>
+                                  <AlertDialogHeader>
+                                    <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                                    <AlertDialogDescription>
+                                      This will permanently delete <strong>{parent.name}</strong> and remove their access to the system.
+                                    </AlertDialogDescription>
+                                  </AlertDialogHeader>
+                                  <AlertDialogFooter>
+                                    <AlertDialogCancel onClick={(e) => e.stopPropagation()}>Cancel</AlertDialogCancel>
+                                    <AlertDialogAction
+                                      className="bg-red-600 hover:bg-red-700 text-white"
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        onDelete(parent.id);
+                                      }}
+                                    >
+                                      Delete Parent
+                                    </AlertDialogAction>
+                                  </AlertDialogFooter>
+                                </AlertDialogContent>
+                              </AlertDialog>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
+                        </div>
                       </div>
                     </td>
                   </tr>
