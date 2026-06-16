@@ -2,13 +2,15 @@
 
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { X, Printer, FileText } from "lucide-react";
+import { X, Printer, FileText, Download, Loader2 } from "lucide-react";
 import { AdmitCardVisual } from "./AdmitCardVisual";
 
 interface ViewCardDialogProps {
   card: any | null;
   onOpenChange: (open: boolean) => void;
   onPrint: () => void;
+  onDownload: () => void;
+  downloading: boolean;
   templateId?: string;
 }
 
@@ -16,6 +18,8 @@ export function ViewCardDialog({
   card,
   onOpenChange,
   onPrint,
+  onDownload,
+  downloading,
   templateId = 'classic_quad',
 }: ViewCardDialogProps) {
   return (
@@ -49,13 +53,28 @@ export function ViewCardDialog({
               </div>
             </div>
             
-            <Button
-              onClick={onPrint}
-              className="gap-2 bg-amber-600 hover:bg-amber-700 text-white shadow-lg shadow-amber-900/20 px-8 h-12 text-base font-semibold"
-            >
-              <Printer className="size-5" />
-              Download PDF / Print
-            </Button>
+            <div className="flex flex-col sm:flex-row gap-4 w-full justify-center max-w-md">
+              <Button
+                onClick={onPrint}
+                className="hidden lg:inline-flex flex-1 gap-2 bg-zinc-800 hover:bg-zinc-900 text-white shadow-lg border border-zinc-700 px-6 h-12 text-base font-semibold justify-center items-center"
+              >
+                <Printer className="size-5" />
+                Print
+              </Button>
+              
+              <Button
+                onClick={onDownload}
+                disabled={downloading}
+                className="flex-1 gap-2 bg-amber-600 hover:bg-amber-700 text-white shadow-lg shadow-amber-900/20 px-6 h-12 text-base font-semibold"
+              >
+                {downloading ? (
+                  <Loader2 className="size-5 animate-spin" />
+                ) : (
+                  <Download className="size-5" />
+                )}
+                Download PDF
+              </Button>
+            </div>
           </div>
         )}
       </DialogContent>

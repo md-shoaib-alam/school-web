@@ -12,7 +12,7 @@ export const CreativeCompact: React.FC<MarksheetTemplateProps> = ({
 }) => {
   return (
     <div 
-      className="relative bg-white text-zinc-800 p-10 rounded overflow-hidden select-none flex flex-col justify-between shrink-0 text-left h-[1123px] w-[794px] box-border border-4 border-dashed border-violet-200"
+      className="relative bg-white text-zinc-800 p-10 rounded overflow-hidden select-none flex flex-col justify-between shrink-0 text-left h-[1000px] w-[794px] box-border border-4 border-dashed border-violet-200"
       style={{ WebkitPrintColorAdjust: 'exact', printColorAdjust: 'exact' }}
     >
       {/* Dynamic Colorful Accent Elements */}

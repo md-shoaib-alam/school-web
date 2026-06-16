@@ -69,7 +69,7 @@ export function BatchPrintContainers({
             {"@page { size: A4; margin: 0mm; } body { margin: 0; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }"}
           </style>
           {viewCard && (
-            <div className="w-[21cm] h-[29.7cm] p-[5mm] flex flex-wrap content-start">
+            <div className="w-[21cm] h-[29.7cm] p-[5mm] flex flex-wrap content-start single-card-page">
               <div 
                 className={templateId === 'compact_dual'
                   ? "flex items-center justify-center h-[12.8cm] p-1 border border-dashed border-zinc-300 print:border-zinc-400 w-full"

@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { Loader2, Printer } from 'lucide-react';
+import { Loader2, Printer, Download } from 'lucide-react';
 import { MARKSHEET_TEMPLATES } from '../marksheet-templates';
 
 interface MarksheetStandaloneToolbarProps {
@@ -21,6 +21,8 @@ interface MarksheetStandaloneToolbarProps {
   printing: boolean;
   handlePrint: () => void;
   onBack: () => void;
+  downloading: boolean;
+  handleDownloadPDF: () => void;
 }
 
 export function MarksheetStandaloneToolbar({
@@ -40,6 +42,8 @@ export function MarksheetStandaloneToolbar({
   printing,
   handlePrint,
   onBack,
+  downloading,
+  handleDownloadPDF,
 }: MarksheetStandaloneToolbarProps) {
   return (
     <div className="toolbar no-print">
@@ -111,7 +115,7 @@ export function MarksheetStandaloneToolbar({
           </button>
         </div>
         
-        <button type="button" className="action-btn" onClick={handlePrint} disabled={loading || printing}>
+        <button type="button" className="action-btn hidden lg:inline-flex" onClick={handlePrint} disabled={loading || printing || downloading}>
           {printing ? (
             <>
               <Loader2 className="size-3.5 animate-spin mr-1" />
@@ -121,6 +125,20 @@ export function MarksheetStandaloneToolbar({
             <>
               <Printer className="size-3.5 mr-1" />
               Print
+            </>
+          )}
+        </button>
+
+        <button type="button" className="action-btn action-btn-download" onClick={handleDownloadPDF} disabled={loading || printing || downloading}>
+          {downloading ? (
+            <>
+              <Loader2 className="size-3.5 animate-spin mr-1" />
+              Downloading…
+            </>
+          ) : (
+            <>
+              <Download className="size-3.5 mr-1" />
+              Download PDF
             </>
           )}
         </button>

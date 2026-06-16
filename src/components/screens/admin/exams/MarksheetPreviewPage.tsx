@@ -90,6 +90,7 @@ export function MarksheetPreviewPage({
   examName
 }: MarksheetPreviewPageProps) {
   const [state, dispatch] = useReducer(reducer, initialState);
+  const [downloading, setDownloading] = useState(false);
   const {
     selectedStudentId,
     marksheetType,
@@ -337,6 +338,41 @@ export function MarksheetPreviewPage({
     }, 200);
   };
 
+  const handleDownloadPDF = async () => {
+    if (students.length === 0) return;
+    try {
+      const { downloadContainerAsPDF } = await import('@/lib/pdf-export');
+      const filename = selectedStudentId === 'all' 
+        ? `Marksheets_${classNameStr}_${classSection}.pdf` 
+        : `Marksheet_${students.find(s => s.id === selectedStudentId)?.name || 'Student'}.pdf`;
+
+      await downloadContainerAsPDF({
+        containerRef: printContainerRef,
+        pageClassName: 'marksheet-page-break',
+        filename,
+        onStart: () => {
+          setDownloading(true);
+          toast.info("Generating PDF, please wait...", { id: 'pdf-progress' });
+        },
+        onProgress: (current, total) => {
+          toast.info(`Generating page ${current} of ${total}...`, { id: 'pdf-progress' });
+        },
+        onComplete: () => {
+          setDownloading(false);
+          toast.success("PDF downloaded successfully!", { id: 'pdf-progress' });
+        },
+        onError: (err: any) => {
+          setDownloading(false);
+          toast.error("Failed to generate PDF: " + err.message, { id: 'pdf-progress' });
+        }
+      });
+    } catch (err: any) {
+      console.error(err);
+      setDownloading(false);
+      toast.error("An error occurred during PDF generation.", { id: 'pdf-progress' });
+    }
+  };
+
   const SelectedTemplate = MARKSHEET_TEMPLATES.find(t => t.id === selectedTemplateId)?.component || MARKSHEET_TEMPLATES[0].component;
 
   if (isStandalone) {
@@ -359,6 +395,8 @@ export function MarksheetPreviewPage({
           printing={printing}
           handlePrint={handlePrint}
           onBack={onBack}
+          downloading={downloading}
+          handleDownloadPDF={handleDownloadPDF}
         />
         
         {/* Standalone View Container */}
@@ -414,6 +452,8 @@ export function MarksheetPreviewPage({
         exams={exams}
         loading={loading}
         printing={printing}
+        downloading={downloading}
+        handleDownloadPDF={handleDownloadPDF}
       />
 
       <MarksheetSheetsPreview

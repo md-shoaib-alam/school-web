@@ -23,16 +23,18 @@ const inter = Inter({
   display: 'swap',
 });
 
-import { useEffect, useReducer, useMemo } from 'react';
+import { useEffect, useReducer, useMemo, useState, useRef } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { apiFetch } from '@/lib/api';
 import { useAppStore } from '@/store/use-app-store';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Skeleton } from '@/components/ui/skeleton';
-import { GraduationCap, FileText, AlertCircle } from 'lucide-react';
+import { GraduationCap, FileText, AlertCircle, Download, Loader2 } from 'lucide-react';
 import { useAcademicYears } from '@/hooks/use-academic-years';
 import type { ExamRecord } from '@/components/screens/admin/exams/types';
 import { MARKSHEET_TEMPLATES } from '@/components/screens/admin/exams/marksheet-templates';
+import { Button } from '@/components/ui/button';
+import { toast } from 'sonner';
 
 type State = {
   loading: boolean;
@@ -100,6 +102,9 @@ export function StudentMarksheet() {
   const studentIdParam = searchParams.get('studentId');
   const examTypeParam = searchParams.get('examType'); // e.g. 'midterm' or 'final' passed from banner
   const examYearParam = searchParams.get('academicYear'); // optional year from banner
+
+  const marksheetContainerRef = useRef<HTMLDivElement>(null);
+  const [downloading, setDownloading] = useState(false);
 
   const [state, dispatch] = useReducer(reducer, initialState);
   const {
@@ -295,6 +300,39 @@ export function StudentMarksheet() {
     return MARKSHEET_TEMPLATES.find(t => t.id === templateId)?.component || MARKSHEET_TEMPLATES[0].component;
   }, [templateId]);
 
+  const handleDownload = async () => {
+    if (!compiledSheet) return;
+    try {
+      const { downloadContainerAsPDF } = await import('@/lib/pdf-export');
+      const filename = `Marksheet_${compiledSheet.studentName.replace(/\s+/g, '_')}_${marksheetType}.pdf`;
+      
+      await downloadContainerAsPDF({
+        containerRef: marksheetContainerRef,
+        pageClassName: 'marksheet-page-download',
+        filename,
+        onStart: () => {
+          setDownloading(true);
+          toast.info("Generating PDF, please wait...", { id: 'pdf-progress' });
+        },
+        onProgress: (current, total) => {
+          toast.info(`Generating page ${current} of ${total}...`, { id: 'pdf-progress' });
+        },
+        onComplete: () => {
+          setDownloading(false);
+          toast.success("PDF downloaded successfully!", { id: 'pdf-progress' });
+        },
+        onError: (err: any) => {
+          setDownloading(false);
+          toast.error("Failed to generate PDF: " + err.message, { id: 'pdf-progress' });
+        }
+      });
+    } catch (err: any) {
+      console.error(err);
+      setDownloading(false);
+      toast.error("An error occurred during PDF generation.", { id: 'pdf-progress' });
+    }
+  };
+
   if (loading) return (
     <div className="space-y-4">
       <Skeleton className="h-8 w-48" />
@@ -345,6 +383,18 @@ export function StudentMarksheet() {
               <SelectItem value="final">Final</SelectItem>
             </SelectContent>
           </Select>
+          <Button
+            onClick={handleDownload}
+            disabled={downloading || !compiledSheet}
+            className="gap-2 bg-violet-600 hover:bg-violet-750 text-white h-9 px-4 text-sm font-semibold rounded-lg shadow-sm"
+          >
+            {downloading ? (
+              <Loader2 className="size-4 animate-spin" />
+            ) : (
+              <Download className="size-4" />
+            )}
+            Download PDF
+          </Button>
         </div>
       </div>
 
@@ -356,9 +406,9 @@ export function StudentMarksheet() {
           <p className="text-xs mt-1 opacity-60">Results will appear here once your teacher publishes them.</p>
         </div>
       ) : (
-        <div className="w-full overflow-x-auto pb-6 flex justify-center bg-zinc-50 dark:bg-zinc-950/20 p-4 sm:p-6 rounded-2xl">
+        <div ref={marksheetContainerRef} className="w-full overflow-x-auto pb-6 flex justify-center bg-zinc-50 dark:bg-zinc-950/20 p-4 sm:p-6 rounded-2xl">
           <div 
-            className="shrink-0 transition-all duration-300 shadow-2xl rounded-lg bg-white"
+            className="shrink-0 transition-all duration-300 shadow-2xl rounded-lg bg-white marksheet-page-download"
             style={{ 
               width: 794, 
               height: 1123 

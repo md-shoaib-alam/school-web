@@ -145,6 +145,17 @@ export async function handleAdmitCardPreviewNewTab({
           color: #ffffff;
           box-shadow: none;
         }
+
+        .action-btn-download {
+          background-color: #d97706; /* amber-600 */
+          box-shadow: 0 2px 4px rgba(217, 119, 6, 0.2);
+        }
+        
+        .action-btn-download:hover {
+          background-color: #b45309; /* amber-700 */
+          transform: translateY(-1px);
+          box-shadow: 0 4px 6px rgba(217, 119, 6, 0.3);
+        }
         
         .viewer-container {
           flex: 1;

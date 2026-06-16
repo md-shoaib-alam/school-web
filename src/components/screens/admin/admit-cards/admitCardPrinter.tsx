@@ -2,7 +2,7 @@ import React, { useState, useRef } from 'react';
 import { createRoot } from "react-dom/client";
 import { toast } from "sonner";
 import { useReactToPrint } from 'react-to-print';
-import { Printer, Loader2 } from 'lucide-react';
+import { Printer, Loader2, Download } from 'lucide-react';
 import { AdmitCardVisual } from './AdmitCardVisual';
 
 interface AdmitCardPrintPreviewProps {
@@ -20,6 +20,7 @@ function AdmitCardPrintPreview({
 }: AdmitCardPrintPreviewProps) {
   const [zoomScale, setZoomScale] = useState<number>(0.6);
   const [printing, setPrinting] = useState<boolean>(false);
+  const [downloading, setDownloading] = useState<boolean>(false);
   const [selectedTemplate, setSelectedTemplate] = useState<string>('classic_quad');
   const printContainerRef = useRef<HTMLDivElement>(null);
 
@@ -35,6 +36,39 @@ function AdmitCardPrintPreview({
     setTimeout(() => {
       handlePrintBase();
     }, 200);
+  };
+
+  const handleDownloadPDF = async () => {
+    if (admitCards.length === 0) return;
+    try {
+      const { downloadContainerAsPDF } = await import('@/lib/pdf-export');
+      const filename = `Admit_Cards_${classNameStr}_${classSection}.pdf`;
+
+      await downloadContainerAsPDF({
+        containerRef: printContainerRef,
+        pageClassName: 'admit-card-page',
+        filename,
+        onStart: () => {
+          setDownloading(true);
+          toast.info("Generating PDF, please wait...", { id: 'pdf-progress' });
+        },
+        onProgress: (current, total) => {
+          toast.info(`Generating page ${current} of ${total}...`, { id: 'pdf-progress' });
+        },
+        onComplete: () => {
+          setDownloading(false);
+          toast.success("PDF downloaded successfully!", { id: 'pdf-progress' });
+        },
+        onError: (err: any) => {
+          setDownloading(false);
+          toast.error("Failed to generate PDF: " + err.message, { id: 'pdf-progress' });
+        }
+      });
+    } catch (err: any) {
+      console.error(err);
+      setDownloading(false);
+      toast.error("An error occurred during PDF generation.", { id: 'pdf-progress' });
+    }
   };
 
   const cardsPerPage = selectedTemplate === 'compact_dual' ? 2 : 4;
@@ -93,7 +127,7 @@ function AdmitCardPrintPreview({
             </button>
           </div>
           
-          <button type="button" className="action-btn bg-emerald-600 hover:bg-emerald-700 text-white" onClick={handlePrint} disabled={printing}>
+          <button type="button" className="action-btn bg-emerald-600 hover:bg-emerald-700 text-white hidden lg:inline-flex" onClick={handlePrint} disabled={printing || downloading}>
             {printing ? (
               <>
                 <Loader2 className="size-3.5 animate-spin mr-1.5" />
@@ -103,6 +137,20 @@ function AdmitCardPrintPreview({
               <>
                 <Printer className="size-3.5 mr-1.5" />
                 Print Cards
+              </>
+            )}
+          </button>
+
+          <button type="button" className="action-btn action-btn-download text-white" onClick={handleDownloadPDF} disabled={printing || downloading}>
+            {downloading ? (
+              <>
+                <Loader2 className="size-3.5 animate-spin mr-1.5" />
+                Downloading...
+              </>
+            ) : (
+              <>
+                <Download className="size-3.5 mr-1.5" />
+                Download PDF
               </>
             )}
           </button>

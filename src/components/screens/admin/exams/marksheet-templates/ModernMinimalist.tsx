@@ -12,7 +12,7 @@ export const ModernMinimalist: React.FC<MarksheetTemplateProps> = ({
 }) => {
   return (
     <div 
-      className="relative bg-white text-zinc-900 p-10 rounded overflow-hidden select-none flex flex-col justify-between shrink-0 text-left h-[1123px] w-[794px] box-border border border-zinc-200"
+      className="relative bg-white text-zinc-900 p-10 rounded overflow-hidden select-none flex flex-col justify-between shrink-0 text-left h-[1000px] w-[794px] box-border border border-zinc-200"
       style={{ WebkitPrintColorAdjust: 'exact', printColorAdjust: 'exact' }}
     >
       {/* Sleek Asymmetric Side Bar Accent */}

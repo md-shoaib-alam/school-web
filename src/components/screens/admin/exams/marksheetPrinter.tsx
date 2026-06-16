@@ -187,7 +187,7 @@ export async function handleMarksheetPreviewNewTab({
             border: none !important;
             border-radius: 0 !important;
             width: 794px !important;
-            height: 1123px !important;
+            height: 1100px !important;
             transform: none !important;
           }
           #preview-root {

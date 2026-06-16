@@ -40,6 +40,10 @@ export function MarksheetPrintContainer({
             .marksheet-page-break {
               page-break-after: always;
               break-after: page;
+              width: 794px !important;
+              height: 1000px !important;
+              overflow: hidden !important;
+              box-sizing: border-box !important;
             }
             .marksheet-page-break:last-child {
               page-break-after: avoid;

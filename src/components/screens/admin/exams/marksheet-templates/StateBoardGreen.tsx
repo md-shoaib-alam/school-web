@@ -20,7 +20,7 @@ export const StateBoardGreen: React.FC<MarksheetTemplateProps> = ({
 
   return (
     <div 
-      className="relative bg-white text-zinc-800 px-9 py-8 border-[5px] border-emerald-700 rounded overflow-hidden select-none flex flex-col justify-between shrink-0 text-left h-[1123px] w-[794px] box-border font-sans"
+      className="relative bg-white text-zinc-800 px-9 py-8 border-[5px] border-emerald-700 rounded overflow-hidden select-none flex flex-col justify-between shrink-0 text-left h-[1000px] w-[794px] box-border font-sans"
       style={{ WebkitPrintColorAdjust: 'exact', printColorAdjust: 'exact' }}
     >
       {/* Traditional Indian State Board Format */}
