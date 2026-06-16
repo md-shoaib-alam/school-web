@@ -230,7 +230,6 @@ export function PublishedResultsView({
                                       const isPrintingLedger = printingLedgerClassId === c.id;
                                       return (
                                         <div className="flex items-center gap-2">
-                                          {/* Print button - hidden on mobile */}
                                           <Button 
                                             variant="outline" 
                                             size="sm" 
@@ -238,28 +237,14 @@ export function PublishedResultsView({
                                             onClick={() => {
                                               handlePrintTabularLedger(c.id, c.name, c.section, 'classic', group.cycleName, false);
                                             }}
-                                            className="hidden lg:inline-flex h-7 border-emerald-200 hover:border-emerald-300 dark:border-emerald-900/50 hover:bg-emerald-50 dark:hover:bg-emerald-950/20 text-emerald-600 dark:text-emerald-400 gap-1.5 rounded-lg text-[11px] font-semibold px-2.5 shadow-sm transition-colors items-center justify-center disabled:opacity-70 disabled:cursor-not-allowed"
+                                            className="h-7 border-emerald-200 hover:border-emerald-300 dark:border-emerald-900/50 hover:bg-emerald-50 dark:hover:bg-emerald-950/20 text-emerald-600 dark:text-emerald-400 gap-1.5 rounded-lg text-[11px] font-semibold px-2.5 shadow-sm transition-colors flex items-center justify-center disabled:opacity-70 disabled:cursor-not-allowed"
                                           >
                                             {isPrintingLedger ? (
                                               <Loader2 className="size-3.5 animate-spin" />
                                             ) : (
-                                              <Printer className="size-3.5" />
+                                              <ClipboardList className="size-3.5" />
                                             )}
-                                            <span>{isPrintingLedger ? 'Printing...' : 'Print Sheet'}</span>
-                                          </Button>
-
-                                          {/* Download PDF button - always visible */}
-                                          <Button 
-                                            variant="outline" 
-                                            size="sm" 
-                                            disabled={isPrintingLedger}
-                                            onClick={() => {
-                                              handlePrintTabularLedger(c.id, c.name, c.section, 'classic', group.cycleName, true);
-                                            }}
-                                            className="h-7 border-violet-200 hover:border-violet-300 dark:border-violet-900/50 hover:bg-violet-50 dark:hover:bg-violet-950/20 text-violet-600 dark:text-violet-400 gap-1.5 rounded-lg text-[11px] font-semibold px-2.5 shadow-sm transition-colors flex items-center justify-center disabled:opacity-70 disabled:cursor-not-allowed"
-                                          >
-                                            <Download className="size-3.5" />
-                                            <span>Download PDF</span>
+                                            <span>Generate Result Sheet</span>
                                           </Button>
                                         </div>
                                       );

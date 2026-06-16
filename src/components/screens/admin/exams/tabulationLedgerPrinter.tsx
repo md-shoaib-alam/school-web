@@ -22,7 +22,9 @@ export const TabularLedgerPrint = React.forwardRef<HTMLDivElement, { data: Ledge
 
   return (
     <div ref={ref}>
-      <TemplateComponent data={data} />
+      <div className="ledger-print-page bg-white">
+        <TemplateComponent data={data} />
+      </div>
     </div>
   );
 });

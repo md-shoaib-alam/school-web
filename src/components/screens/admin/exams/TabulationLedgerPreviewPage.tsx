@@ -66,6 +66,7 @@ export function TabulationLedgerPreviewPage({
   const [printing, setPrinting] = useState<boolean>(false);
   const [downloading, setDownloading] = useState<boolean>(false);
   const [zoomScale, setZoomScale] = useState<number>(0.65); // Default to 65% zoom for landscape preview
+  const [hasManuallySetZoom, setHasManuallySetZoom] = useState<boolean>(false);
   const [unscaledHeight, setUnscaledHeight] = useState<number>(794);
 
   const printContainerRef = useRef<HTMLDivElement>(null);
@@ -73,6 +74,8 @@ export function TabulationLedgerPreviewPage({
 
   // Handle responsive zoom scaling
   useEffect(() => {
+    if (hasManuallySetZoom) return;
+
     const handleResize = () => {
       const width = window.innerWidth;
       let newScale = 0.65; // Default for desktop landscape
@@ -94,7 +97,7 @@ export function TabulationLedgerPreviewPage({
     handleResize();
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
-  }, [zoomScale]);
+  }, [zoomScale, hasManuallySetZoom]);
 
   // Load tabulation ledger data
   useEffect(() => {
@@ -169,8 +172,11 @@ export function TabulationLedgerPreviewPage({
 
       await downloadContainerAsPDF({
         containerRef: printContainerRef,
-        pageClassName: 'ledger-print-page', // Assuming ledger templates use this class for page breaks
+        pageClassName: 'ledger-print-page',
         filename,
+        orientation: 'landscape',
+        width: 1123,
+        height: unscaledHeight,
         onStart: () => {
           setDownloading(true);
           toast.info("Generating PDF, please wait...", { id: 'pdf-progress' });
@@ -248,7 +254,13 @@ export function TabulationLedgerPreviewPage({
 
           {/* Preview Zoom */}
           <div className="w-full sm:w-[100px]">
-            <Select value={zoomScale.toString()} onValueChange={(v) => setZoomScale(parseFloat(v))}>
+            <Select 
+              value={zoomScale.toString()} 
+              onValueChange={(v) => {
+                setZoomScale(parseFloat(v));
+                setHasManuallySetZoom(true);
+              }}
+            >
               <SelectTrigger className="w-full h-8 rounded-lg text-xs font-semibold bg-zinc-50/50 dark:bg-zinc-900/30 border-zinc-200 dark:border-zinc-800 py-1">
                 <div className="flex items-center gap-1.5 min-w-0 w-full text-left">
                   <Search className="size-3.5 text-zinc-400 shrink-0" />
@@ -273,7 +285,7 @@ export function TabulationLedgerPreviewPage({
             onClick={handlePrint}
             disabled={loading || printing || downloading || !ledgerData}
             size="sm"
-            className="hidden xl:inline-flex w-full sm:w-auto bg-emerald-600 hover:bg-emerald-700 text-white shrink-0 gap-1.5 shadow-sm rounded-lg h-8 px-4 font-bold text-xs transition-all duration-300 transform active:scale-95 justify-center"
+            className="hidden lg:inline-flex w-full sm:w-auto bg-emerald-600 hover:bg-emerald-700 text-white shrink-0 gap-1.5 shadow-sm rounded-lg h-8 px-4 font-bold text-xs transition-all duration-300 transform active:scale-95 justify-center"
           >
             {printing ? <Loader2 className="size-3.5 animate-spin" /> : <Printer className="size-3.5" />}
             <span>Print Ledger</span>
@@ -284,7 +296,7 @@ export function TabulationLedgerPreviewPage({
             onClick={handleDownloadPDF}
             disabled={loading || printing || downloading || !ledgerData}
             size="sm"
-            className="w-full sm:w-auto bg-violet-600 hover:bg-violet-700 text-white shrink-0 gap-1.5 shadow-sm rounded-lg h-8 px-4 font-bold text-xs transition-all duration-300 transform active:scale-95 justify-center"
+            className="w-full sm:w-auto bg-emerald-600 hover:bg-emerald-700 text-white shrink-0 gap-1.5 shadow-sm rounded-lg h-8 px-4 font-bold text-xs transition-all duration-300 transform active:scale-95 justify-center"
           >
             {downloading ? <Loader2 className="size-3.5 animate-spin" /> : <Download className="size-3.5" />}
             <span>Download PDF</span>
@@ -346,6 +358,33 @@ export function TabulationLedgerPreviewPage({
       {ledgerData && (
         <div className="hidden">
           <div ref={printContainerRef} className="print:block bg-white min-h-screen">
+            <style type="text/css" media="print">
+              {`
+                @page { 
+                  size: landscape; 
+                  margin: 0mm; 
+                } 
+                body { 
+                  margin: 0; 
+                  -webkit-print-color-adjust: exact !important; 
+                  print-color-adjust: exact !important; 
+                }
+                .ledger-print-page {
+                  page-break-after: always;
+                  break-after: page;
+                  width: 1123px !important;
+                  height: auto !important;
+                  min-height: 794px;
+                  overflow: visible !important;
+                  box-sizing: border-box !important;
+                  background: white !important;
+                }
+                .ledger-print-page:last-child {
+                  page-break-after: avoid;
+                  break-after: avoid;
+                }
+              `}
+            </style>
             <TabularLedgerPrint data={ledgerData} templateId={selectedTemplateId} />
           </div>
         </div>

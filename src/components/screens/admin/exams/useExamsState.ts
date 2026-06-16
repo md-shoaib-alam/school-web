@@ -78,7 +78,7 @@ export function useExamsState(initialTab = 'exams') {
   const [resultsClassId, setResultsClassId] = useState<string>('');
   
   const [printingLedgerClassId] = useState<string | null>(null);
-  const [enableModalTabulationPreview, setEnableModalTabulationPreview] = useState<boolean>(false);
+  const [enableModalTabulationPreview, setEnableModalTabulationPreview] = useState<boolean>(true);
 
   useEffect(() => {
     const fetchTenantSettings = async () => {

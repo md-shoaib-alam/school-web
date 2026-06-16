@@ -7,10 +7,11 @@ import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { 
   Trophy, Users, CheckCircle2, XCircle, AlertCircle, 
-  Printer, BookOpen, GraduationCap, Calendar, Clock, Loader2 
+  Printer, BookOpen, GraduationCap, Calendar, Clock, Loader2, Download
 } from 'lucide-react';
 import { ExamRecord } from './types';
-import { useMemo, useRef } from 'react';
+import { useMemo, useRef, useState } from 'react';
+import { toast } from 'sonner';
 
 interface ViewResultsDialogProps {
   open: boolean;
@@ -32,6 +33,7 @@ export function ViewResultsDialog({
   formatTime
 }: ViewResultsDialogProps) {
   const printAreaRef = useRef<HTMLDivElement>(null);
+  const [downloading, setDownloading] = useState(false);
 
   const stats = useMemo(() => {
     if (!results || results.length === 0) return { total: 0, passed: 0, failed: 0, pending: 0, passRate: 0 };
@@ -42,6 +44,33 @@ export function ViewResultsDialog({
     const passRate = total > 0 ? Math.round((passed / total) * 100) : 0;
     return { total, passed, failed, pending, passRate };
   }, [results]);
+
+  const handleDownloadPDF = async () => {
+    if (!exam || !results.length) return;
+    
+    setDownloading(true);
+    try {
+      const { downloadContainerAsPDF } = await import('@/lib/pdf-export');
+      await downloadContainerAsPDF({
+        containerRef: printAreaRef,
+        pageClassName: 'tabulation-sheet-page', // We'll add this class to the container
+        filename: `Tabulation_${exam.name}_${exam.className}_${exam.classSection}.pdf`,
+        onStart: () => toast.info("Generating PDF..."),
+        onComplete: () => {
+          setDownloading(false);
+          toast.success("PDF Downloaded!");
+        },
+        onError: (err) => {
+          setDownloading(false);
+          toast.error("Failed to generate PDF");
+          console.error(err);
+        }
+      });
+    } catch (err) {
+      setDownloading(false);
+      toast.error("Error generating PDF");
+    }
+  };
 
   const handlePrint = () => {
     if (!exam) return;
@@ -167,16 +196,29 @@ export function ViewResultsDialog({
                 Official marks statement and outcomes for finalized exams.
               </DialogDescription>
             </div>
-            {exam && !loading && (
-              <Button 
-                onClick={handlePrint}
-                size="sm"
-                className="bg-zinc-900 hover:bg-zinc-800 text-white dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-200 shrink-0 gap-1.5 shadow-sm rounded-lg"
-              >
-                <Printer className="size-3.5" />
-                Print Tabulation
-              </Button>
-            )}
+            <div className="flex items-center gap-2">
+              {exam && !loading && (
+                <>
+                  <Button 
+                    onClick={handlePrint}
+                    size="sm"
+                    className="hidden sm:flex bg-emerald-600 hover:bg-emerald-700 text-white shrink-0 gap-1.5 shadow-sm rounded-lg h-8 px-3 font-bold text-xs"
+                  >
+                    <Printer className="size-3.5" />
+                    Print
+                  </Button>
+                  <Button 
+                    onClick={handleDownloadPDF}
+                    disabled={downloading}
+                    size="sm"
+                    className="bg-emerald-600 hover:bg-emerald-700 text-white shrink-0 gap-1.5 shadow-sm rounded-lg h-8 px-3 font-bold text-xs"
+                  >
+                    {downloading ? <Loader2 className="size-3.5 animate-spin" /> : <Download className="size-3.5" />}
+                    Download
+                  </Button>
+                </>
+              )}
+            </div>
           </div>
         </DialogHeader>
 
@@ -197,7 +239,7 @@ export function ViewResultsDialog({
               <p>No exam selected</p>
             </div>
           ) : (
-            <div className="space-y-5" ref={printAreaRef}>
+            <div className="space-y-5 tabulation-sheet-page bg-white p-4" ref={printAreaRef}>
               {/* Exam Info Summary Banner */}
               <div className="p-4 rounded-xl border border-zinc-100 dark:border-zinc-800/80 bg-card/50 flex flex-wrap items-center justify-between gap-4">
                 <div className="space-y-1">

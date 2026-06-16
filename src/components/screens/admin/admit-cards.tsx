@@ -373,6 +373,8 @@ export function AdminAdmitCards() {
           containerRef: allCardsRef,
           pageClassName: 'admit-card-page',
           filename: `Admit_Cards_${classNameStr}_${classSection}.pdf`,
+          width: 794,
+          height: 1123,
           onStart: () => {
             toast.info("Generating PDF, please wait...", { id: 'pdf-progress' });
           },
@@ -515,8 +517,10 @@ export function AdminAdmitCards() {
             onGenerate={handleGenerate}
             generating={generating}
             onPrintAll={handlePrintAll}
+            onDownloadAll={handleDownloadAll}
             admitCardsCount={admitCards.length}
             preparingPrint={preparingPrint}
+            downloadingAll={downloadingAll}
             selectedTemplate={selectedTemplate}
             setSelectedTemplate={setSelectedTemplate}
           />
