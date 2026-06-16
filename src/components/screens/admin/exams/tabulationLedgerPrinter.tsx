@@ -36,6 +36,7 @@ export async function handleTabulationLedgerPreview({
   academicYear,
   templateId = 'classic',
   examName,
+  isDownload,
 }: {
   classId: string;
   classNameStr: string;
@@ -43,6 +44,7 @@ export async function handleTabulationLedgerPreview({
   academicYear: string;
   templateId?: string;
   examName?: string;
+  isDownload?: boolean;
 }) {
   const data = await compileTabularLedgerData({
     classId,
@@ -300,6 +302,7 @@ export async function handleTabulationLedgerPreview({
         // Initial height computation once content mounts
         setTimeout(() => {
           updateZoom(currentZoom);
+          ${isDownload ? 'window.print();' : ''}
         }, 150);
         
         document.getElementById('zoom-in').addEventListener('click', () => {
