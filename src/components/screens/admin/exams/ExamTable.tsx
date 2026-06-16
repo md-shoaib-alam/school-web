@@ -116,8 +116,8 @@ export function ExamTable({
       
       {/* @ts-ignore */}
       <ContentContainer {...contentProps}>
-        <div className="overflow-x-auto">
-          <Table>
+        <div className="overflow-x-auto w-full">
+          <Table className="w-full min-w-[700px]">
             <TableHeader>
               <TableRow className="bg-muted/30 hover:bg-transparent">
                 <TableHead className="px-2 sm:px-4">Exam & Subject</TableHead>
@@ -154,85 +154,142 @@ export function ExamTable({
                       <div className="flex flex-col gap-1">
                         <div className="flex items-center gap-2">
                           <span className="font-semibold text-sm whitespace-nowrap">{exam.name}</span>
-                          <div className="scale-[0.8] origin-left hidden sm:block">{getExamTypeBadge(exam.examType)}</div>
+                          <div className="scale-[0.8] origin-left hidden sm:block whitespace-nowrap">{getExamTypeBadge(exam.examType)}</div>
                         </div>
                         <div className="sm:hidden flex flex-col">
-                           <span className="text-xs text-muted-foreground font-medium">{exam.subjectName}</span>
-                           <div className="mt-1">{getExamTypeBadge(exam.examType)}</div>
+                           <span className="text-xs text-muted-foreground font-medium whitespace-nowrap">{exam.subjectName}</span>
+                           <div className="mt-1 whitespace-nowrap">{getExamTypeBadge(exam.examType)}</div>
                         </div>
                       </div>
                     </TableCell>
                     <TableCell className="hidden sm:table-cell">
                       <div className="flex flex-col">
-                        <span className="text-sm font-medium">{exam.subjectName}</span>
-                        <span className="text-[9px] text-muted-foreground font-mono leading-none uppercase">CODE: {exam.id.slice(-4)}</span>
+                        <span className="text-sm font-medium whitespace-nowrap">{exam.subjectName}</span>
+                        <span className="text-[9px] text-muted-foreground font-mono leading-none uppercase whitespace-nowrap">CODE: {exam.id.slice(-4)}</span>
                       </div>
                     </TableCell>
-                    <TableCell className="hidden md:table-cell">
+                    <TableCell className="hidden md:table-cell whitespace-nowrap">
                       <Badge variant="secondary" className="font-normal text-xs">
                         {exam.className}-{exam.classSection}
                       </Badge>
                     </TableCell>
-                    <TableCell className="hidden lg:table-cell text-sm">
+                    <TableCell className="hidden lg:table-cell text-sm whitespace-nowrap">
                       <div className="flex items-center gap-1.5">
                         <Calendar className="size-3.5 text-muted-foreground" />
                         {formatDate(exam.date)}
                       </div>
                     </TableCell>
-                    <TableCell className="hidden lg:table-cell text-center text-sm text-muted-foreground">
+                    <TableCell className="hidden lg:table-cell text-center text-sm text-muted-foreground whitespace-nowrap">
                       {formatTime(exam.startTime)} – {formatTime(exam.endTime)}
                     </TableCell>
-                    <TableCell className="text-center px-2 hidden sm:table-cell">{getStatusBadge(exam.status)}</TableCell>
-                    <TableCell className="text-right px-2 sm:px-4">
+                    <TableCell className="text-center px-2 hidden sm:table-cell whitespace-nowrap">{getStatusBadge(exam.status)}</TableCell>
+                    <TableCell className="text-right px-2 sm:px-4 whitespace-nowrap w-[1%]">
                       <div className="flex items-center justify-end gap-1">
-                        {onViewResults && exam.status === 'completed' && (
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            className="size-8 text-blue-500 hover:text-blue-700 hover:bg-blue-50"
-                            onClick={() => onViewResults(exam)}
-                            title="View Results"
-                          >
-                            <Eye className="size-4" />
-                          </Button>
-                        )}
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="size-8 text-amber-500 hover:text-amber-700 hover:bg-amber-50"
-                          onClick={() => onOpenEdit(exam)}
-                        >
-                          <Pencil className="size-4" />
-                        </Button>
-                        <AlertDialog>
-                          <AlertDialogTrigger asChild>
+                        {/* Desktop Actions (xl and above) */}
+                        <div className="hidden xl:flex items-center gap-1">
+                          {onViewResults && exam.status === 'completed' && (
                             <Button
                               variant="ghost"
                               size="icon"
-                              className="size-8 text-red-400 hover:text-red-600 hover:bg-red-50"
+                              className="size-8 text-blue-500 hover:text-blue-700 hover:bg-blue-50"
+                              onClick={() => onViewResults(exam)}
+                              title="View Results"
                             >
-                              <Trash2 className="size-4" />
+                              <Eye className="size-4" />
                             </Button>
-                          </AlertDialogTrigger>
-                          <AlertDialogContent>
-                            <AlertDialogHeader>
-                              <AlertDialogTitle>Delete Exam</AlertDialogTitle>
-                              <AlertDialogDescription>
-                                Are you sure you want to delete "{exam.name}"? This will also delete all student results for this exam.
-                              </AlertDialogDescription>
-                            </AlertDialogHeader>
-                            <AlertDialogFooter>
-                              <AlertDialogCancel>Cancel</AlertDialogCancel>
-                              <AlertDialogAction
-                                onClick={() => onDelete(exam.id)}
-                                disabled={deleting}
-                                className="bg-red-600 hover:bg-red-700"
+                          )}
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="size-8 text-amber-500 hover:text-amber-700 hover:bg-amber-50"
+                            onClick={() => onOpenEdit(exam)}
+                            title="Edit Exam"
+                          >
+                            <Pencil className="size-4" />
+                          </Button>
+                          <AlertDialog>
+                            <AlertDialogTrigger asChild>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="size-8 text-red-400 hover:text-red-600 hover:bg-red-50"
+                                title="Delete Exam"
                               >
-                                {deleting ? 'Deleting...' : 'Delete Permanently'}
-                              </AlertDialogAction>
-                            </AlertDialogFooter>
-                          </AlertDialogContent>
-                        </AlertDialog>
+                                <Trash2 className="size-4" />
+                              </Button>
+                            </AlertDialogTrigger>
+                            <AlertDialogContent>
+                              <AlertDialogHeader>
+                                <AlertDialogTitle>Delete Exam</AlertDialogTitle>
+                                <AlertDialogDescription>
+                                  Are you sure you want to delete "{exam.name}"? This will also delete all student results for this exam.
+                                </AlertDialogDescription>
+                              </AlertDialogHeader>
+                              <AlertDialogFooter>
+                                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                <AlertDialogAction
+                                  onClick={() => onDelete(exam.id)}
+                                  disabled={deleting}
+                                  className="bg-red-600 hover:bg-red-700"
+                                >
+                                  {deleting ? 'Deleting...' : 'Delete Permanently'}
+                                </AlertDialogAction>
+                              </AlertDialogFooter>
+                            </AlertDialogContent>
+                          </AlertDialog>
+                        </div>
+
+                        {/* Mobile/Tablet Actions (below xl) */}
+                        <div className="xl:hidden">
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button variant="ghost" size="icon" className="size-8">
+                                <MoreVertical className="size-4" />
+                                <span className="sr-only">Open menu</span>
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end" className="w-[160px]">
+                              {onViewResults && exam.status === 'completed' && (
+                                <DropdownMenuItem onClick={() => onViewResults(exam)} className="cursor-pointer text-blue-600 focus:text-blue-600 focus:bg-blue-50">
+                                  <Eye className="mr-2 h-4 w-4" />
+                                  <span>View Results</span>
+                                </DropdownMenuItem>
+                              )}
+                              <DropdownMenuItem onClick={() => onOpenEdit(exam)} className="cursor-pointer text-amber-600 focus:text-amber-600 focus:bg-amber-50">
+                                <Pencil className="mr-2 h-4 w-4" />
+                                <span>Edit Exam</span>
+                              </DropdownMenuItem>
+                              <AlertDialog>
+                                <AlertDialogTrigger asChild>
+                                  <div 
+                                    className="relative flex cursor-pointer select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none transition-colors hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-950/20 dark:hover:text-red-400 text-red-600"
+                                  >
+                                    <Trash2 className="mr-2 h-4 w-4" />
+                                    <span>Delete Exam</span>
+                                  </div>
+                                </AlertDialogTrigger>
+                                <AlertDialogContent>
+                                  <AlertDialogHeader>
+                                    <AlertDialogTitle>Delete Exam</AlertDialogTitle>
+                                    <AlertDialogDescription>
+                                      Are you sure you want to delete "{exam.name}"? This will also delete all student results for this exam.
+                                    </AlertDialogDescription>
+                                  </AlertDialogHeader>
+                                  <AlertDialogFooter>
+                                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                    <AlertDialogAction
+                                      onClick={() => onDelete(exam.id)}
+                                      disabled={deleting}
+                                      className="bg-red-600 hover:bg-red-700"
+                                    >
+                                      {deleting ? 'Deleting...' : 'Delete Permanently'}
+                                    </AlertDialogAction>
+                                  </AlertDialogFooter>
+                                </AlertDialogContent>
+                              </AlertDialog>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
+                        </div>
                       </div>
                     </TableCell>
                   </TableRow>

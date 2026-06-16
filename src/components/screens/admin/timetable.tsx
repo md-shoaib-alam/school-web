@@ -356,7 +356,7 @@ export function AdminTimetable() {
       />
 
       <Card className="border-none shadow-sm shadow-emerald-600/5 overflow-hidden">
-        <CardContent className="p-0">
+        <CardContent className="p-0 overflow-x-auto w-full">
           {isLoadingTimetable || isLoadingClasses ? (
             <TimetableSkeleton viewMode={viewMode} />
           ) : slots.length === 0 ? (
