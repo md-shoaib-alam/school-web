@@ -183,6 +183,31 @@ export function MarksheetPreviewPage({
     loadData();
   }, [classId, academicYear, examName]);
 
+  // Handle responsive zoom scaling
+  useEffect(() => {
+    const handleResize = () => {
+      const width = window.innerWidth;
+      let newScale = 0.6; // Default for desktop
+      
+      if (width < 640) {
+        // Mobile: calculate scale to fit 794px width with some padding
+        newScale = Math.max(0.3, (width - 40) / 794);
+      } else if (width < 1024) {
+        // Tablet
+        newScale = Math.max(0.45, (width - 100) / 794);
+      }
+      
+      // Update if significant change or initial load
+      if (Math.abs(state.zoomScale - newScale) > 0.05) {
+        setZoomScale(Number(newScale.toFixed(2)));
+      }
+    };
+
+    handleResize();
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, [state.zoomScale]);
+
   // Clean student selection state when opened
   useEffect(() => {
     dispatch({ type: 'RESET_FOR_CLASS' });

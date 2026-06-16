@@ -1,4 +1,4 @@
-import html2canvas from 'html2canvas-pro';
+import { toJpeg } from 'html-to-image';
 import { jsPDF } from 'jspdf';
 
 export interface PDFExportOptions {
@@ -28,7 +28,6 @@ export async function downloadContainerAsPDF({
 
   onStart?.();
 
-  // Find page elements in the print container
   const container = containerRef.current;
   const pages = Array.from(container.getElementsByClassName(pageClassName));
   
@@ -41,12 +40,14 @@ export async function downloadContainerAsPDF({
 
   // Create temporary offscreen container
   const tempDiv = document.createElement('div');
-  tempDiv.style.position = 'absolute';
-  tempDiv.style.left = '-9999px';
-  tempDiv.style.top = '0';
-  tempDiv.style.width = '794px'; // Standard A4 width at 96 DPI
-  tempDiv.style.display = 'block';
-  tempDiv.style.backgroundColor = '#ffffff';
+  Object.assign(tempDiv.style, {
+    position: 'absolute',
+    left: '-9999px',
+    top: '0',
+    width: '794px',
+    display: 'block',
+    backgroundColor: '#ffffff',
+  });
   document.body.appendChild(tempDiv);
 
   try {
@@ -54,56 +55,55 @@ export async function downloadContainerAsPDF({
       orientation: 'portrait',
       unit: 'mm',
       format: 'a4',
+      compress: true,
     });
 
     const totalPages = pages.length;
-
-    for (let i = 0; i < totalPages; i++) {
-      onProgress?.(i + 1, totalPages);
-
-      // Clone page element
-      const pageEl = pages[i] as HTMLElement;
-      const clonedPage = pageEl.cloneNode(true) as HTMLElement;
+    const batchSize = 2;
+    
+    for (let i = 0; i < totalPages; i += batchSize) {
+      const currentBatch = pages.slice(i, i + batchSize);
       
-      // Override style overrides that might make it hidden or formatted incorrectly
-      clonedPage.style.display = 'block';
-      clonedPage.style.width = '794px';
-      clonedPage.style.height = '1123px';
-      clonedPage.style.boxShadow = 'none';
-      clonedPage.style.border = 'none';
-      clonedPage.style.margin = '0';
-      clonedPage.style.padding = '0';
-      clonedPage.classList.remove('hidden');
-      
-      // If it contains a print class that hides it, override it
-      clonedPage.classList.remove('print:block', 'hidden');
+      const imageDataBatch = await Promise.all(currentBatch.map(async (pageEl, index) => {
+        const pageIdx = i + index;
+        onProgress?.(pageIdx + 1, totalPages);
 
-      tempDiv.appendChild(clonedPage);
+        const clonedPage = pageEl.cloneNode(true) as HTMLElement;
+        Object.assign(clonedPage.style, {
+          display: 'block',
+          width: '794px',
+          height: '1123px',
+          boxShadow: 'none',
+          border: 'none',
+          margin: '0',
+          padding: '0',
+        });
+        clonedPage.classList.remove('hidden', 'print:block', 'print:hidden');
+        
+        tempDiv.appendChild(clonedPage);
 
-      // Give images/fonts a small moment to render if needed
-      await new Promise((resolve) => setTimeout(resolve, 150));
+        // html-to-image is much faster and doesn't need long timeouts
+        await new Promise(r => setTimeout(r, 50));
 
-      const canvas = await html2canvas(clonedPage, {
-        scale: 2, // High resolution (retina) for clear print
-        useCORS: true,
-        allowTaint: true,
-        backgroundColor: '#ffffff',
-        width: 794,
-        height: 1123,
-        logging: false,
+        // Use toJpeg from html-to-image for high speed + high quality
+        const dataUrl = await toJpeg(clonedPage, {
+          quality: 0.95,
+          pixelRatio: 2, // Sharpness equivalent to Retina display
+          backgroundColor: '#ffffff',
+          width: 794,
+          height: 1123,
+          cacheBust: true,
+        });
+
+        tempDiv.removeChild(clonedPage);
+        return dataUrl;
+      }));
+
+      imageDataBatch.forEach((imgData, index) => {
+        const pageIdx = i + index;
+        if (pageIdx > 0) pdf.addPage();
+        pdf.addImage(imgData, 'JPEG', 0, 0, 210, 297, undefined, 'FAST');
       });
-
-      // Cleanup cloned page immediately
-      tempDiv.removeChild(clonedPage);
-
-      const imgData = canvas.toDataURL('image/jpeg', 0.95);
-      
-      if (i > 0) {
-        pdf.addPage();
-      }
-      
-      // A4 is 210mm x 297mm
-      pdf.addImage(imgData, 'JPEG', 0, 0, 210, 297, undefined, 'FAST');
     }
 
     pdf.save(filename);
@@ -112,8 +112,6 @@ export async function downloadContainerAsPDF({
     console.error('PDF export failed:', error);
     onError?.(error);
   } finally {
-    if (tempDiv.parentNode) {
-      document.body.removeChild(tempDiv);
-    }
+    if (tempDiv.parentNode) document.body.removeChild(tempDiv);
   }
 }

@@ -24,6 +24,31 @@ function AdmitCardPrintPreview({
   const [selectedTemplate, setSelectedTemplate] = useState<string>('classic_quad');
   const printContainerRef = useRef<HTMLDivElement>(null);
 
+  // Handle responsive zoom scaling
+  useEffect(() => {
+    const handleResize = () => {
+      const width = window.innerWidth;
+      let newScale = 0.6; // Default for desktop
+      
+      if (width < 640) {
+        // Mobile: calculate scale to fit 794px width with some padding
+        newScale = Math.max(0.3, (width - 40) / 794);
+      } else if (width < 1024) {
+        // Tablet
+        newScale = Math.max(0.45, (width - 100) / 794);
+      }
+      
+      // Update if significant change or initial load
+      if (Math.abs(zoomScale - newScale) > 0.05) {
+        setZoomScale(Number(newScale.toFixed(2)));
+      }
+    };
+
+    handleResize();
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, [zoomScale]);
+
   const handlePrintBase = useReactToPrint({
     contentRef: printContainerRef,
     documentTitle: `Admit_Cards_${classNameStr}_${classSection}`,
