@@ -22,8 +22,14 @@ import {
 } from '@/components/ui/dialog';
 import * as VisuallyHidden from '@radix-ui/react-visually-hidden';
 import {
-  Award, Eye, Plus, Printer, ShieldBan, Loader2, Download
+  Award, Eye, Plus, Printer, ShieldBan, Loader2, Download, MoreVertical, X
 } from 'lucide-react';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { toast } from "sonner";
 import { apiFetch } from '@/lib/api';
 import { CertificateTemplate } from './certificates/certificate-template';
@@ -266,55 +272,86 @@ export function AdminCertificates() {
               ))}
             </div>
           ) : (
-            <Table>
-              <TableHeader>
-                <TableRow className="bg-muted/30">
-                  <TableHead className="hidden sm:table-cell px-2 sm:px-4">No.</TableHead>
-                  <TableHead className="px-2 sm:px-4">Student & Type</TableHead>
-                  <TableHead className="hidden sm:table-cell px-2 sm:px-4">Type</TableHead>
-                  <TableHead className="px-2">Status</TableHead>
-                  <TableHead className="text-right px-2 sm:px-4">Actions</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {certificates.map((c: any) => (
-                  <TableRow key={c.id}>
-                    <TableCell className="hidden sm:table-cell font-mono text-xs px-2 sm:px-4">{c.certificateNo}</TableCell>
-                    <TableCell className="px-2 sm:px-4">
-                      <div className="flex flex-col gap-0.5">
-                        <span className="font-medium text-sm">{c.student?.user?.name || c.content?.studentName}</span>
-                        <div className="sm:hidden flex items-center gap-2 mt-1">
-                          <span className="text-[10px] font-mono text-muted-foreground uppercase">{c.certificateNo.split('/').pop()}</span>
-                          <Badge variant="outline" className={`scale-75 origin-left px-1.5 py-0 ${CERT_TYPE_COLORS[c.certificateType]}`}>{c.certificateType}</Badge>
-                        </div>
-                      </div>
-                    </TableCell>
-                    <TableCell className="hidden sm:table-cell px-2 sm:px-4">
-                      <Badge variant="outline" className={CERT_TYPE_COLORS[c.certificateType]}>{c.certificateType}</Badge>
-                    </TableCell>
-                    <TableCell className="px-2">
-                      <Badge variant={c.status === 'active' ? 'default' : 'destructive'} className={`text-[10px] sm:text-xs h-5 sm:h-6 ${c.status === 'active' ? 'bg-emerald-500' : ''}`}>
-                        {c.status}
-                      </Badge>
-                    </TableCell>
-                    <TableCell className="text-right px-2 sm:px-4">
-                      <div className="flex items-center justify-end gap-1">
-                        <Button variant="ghost" size="sm" className="h-8 px-2 text-xs" onClick={() => setViewCert(c)}>
-                          <Eye className="size-3.5 sm:mr-1.5" /> 
-                          <span className="hidden sm:inline">View</span>
-                        </Button>
-                        {c.status === 'active' && (
-                          <Button variant="ghost" size="sm" className="h-8 px-2 text-xs text-red-600 hover:text-red-700 hover:bg-red-50" onClick={() => setRevokeCert(c)}>
-                            <ShieldBan className="size-3.5 sm:mr-1.5" /> 
-                            <span className="hidden sm:inline">Revoke</span>
-                          </Button>
-                        )}
-                      </div>
-                    </TableCell>
+            <div className="overflow-x-auto w-full">
+              <Table className="w-full min-w-[600px]">
+                <TableHeader>
+                  <TableRow className="bg-muted/30">
+                    <TableHead className="hidden sm:table-cell px-2 sm:px-4">No.</TableHead>
+                    <TableHead className="px-2 sm:px-4">Student & Type</TableHead>
+                    <TableHead className="hidden sm:table-cell px-2 sm:px-4">Type</TableHead>
+                    <TableHead className="px-2">Status</TableHead>
+                    <TableHead className="text-right px-2 sm:px-4">Actions</TableHead>
                   </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+                </TableHeader>
+                <TableBody>
+                  {certificates.map((c: any) => (
+                    <TableRow key={c.id}>
+                      <TableCell className="hidden sm:table-cell font-mono text-xs px-2 sm:px-4 whitespace-nowrap">{c.certificateNo}</TableCell>
+                      <TableCell className="px-2 sm:px-4">
+                        <div className="flex flex-col gap-0.5">
+                          <span className="font-medium text-sm whitespace-nowrap">{c.student?.user?.name || c.content?.studentName}</span>
+                          <div className="sm:hidden flex items-center gap-2 mt-1">
+                            <span className="text-[10px] font-mono text-muted-foreground uppercase">{c.certificateNo.split('/').pop()}</span>
+                            <Badge variant="outline" className={`scale-75 origin-left px-1.5 py-0 ${CERT_TYPE_COLORS[c.certificateType]}`}>{c.certificateType}</Badge>
+                          </div>
+                        </div>
+                      </TableCell>
+                      <TableCell className="hidden sm:table-cell px-2 sm:px-4 whitespace-nowrap">
+                        <Badge variant="outline" className={CERT_TYPE_COLORS[c.certificateType]}>{c.certificateType}</Badge>
+                      </TableCell>
+                      <TableCell className="px-2 whitespace-nowrap">
+                        <Badge variant={c.status === 'active' ? 'default' : 'destructive'} className={`text-[10px] sm:text-xs h-5 sm:h-6 ${c.status === 'active' ? 'bg-emerald-500' : ''}`}>
+                          {c.status}
+                        </Badge>
+                      </TableCell>
+                      <TableCell className="text-right px-2 sm:px-4 whitespace-nowrap w-[1%]">
+                        <div className="flex items-center justify-end gap-1">
+                          {/* Desktop Actions (xl and above) */}
+                          <div className="hidden xl:flex items-center gap-1">
+                            <Button variant="ghost" size="sm" className="h-8 px-2 text-xs" onClick={() => setViewCert(c)}>
+                              <Eye className="size-3.5 mr-1.5" /> 
+                              <span>View</span>
+                            </Button>
+                            {c.status === 'active' && (
+                              <Button variant="ghost" size="sm" className="h-8 px-2 text-xs text-red-600 hover:text-red-700 hover:bg-red-50" onClick={() => setRevokeCert(c)}>
+                                <ShieldBan className="size-3.5 mr-1.5" /> 
+                                <span>Revoke</span>
+                              </Button>
+                            )}
+                          </div>
+
+                          {/* Mobile/Tablet Actions (below xl) */}
+                          <div className="xl:hidden">
+                            <DropdownMenu>
+                              <DropdownMenuTrigger asChild>
+                                <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                                  <MoreVertical className="size-4" />
+                                </Button>
+                              </DropdownMenuTrigger>
+                              <DropdownMenuContent align="end" className="w-36">
+                                <DropdownMenuItem onClick={() => setViewCert(c)}>
+                                  <Eye className="size-4 mr-2" />
+                                  <span>View</span>
+                                </DropdownMenuItem>
+                                {c.status === 'active' && (
+                                  <DropdownMenuItem 
+                                    onClick={() => setRevokeCert(c)}
+                                    className="text-red-600 focus:text-red-600 focus:bg-red-50"
+                                  >
+                                    <ShieldBan className="size-4 mr-2" />
+                                    <span>Revoke</span>
+                                  </DropdownMenuItem>
+                                )}
+                              </DropdownMenuContent>
+                            </DropdownMenu>
+                          </div>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
           )}
         </CardContent>
       </Card>
@@ -372,7 +409,7 @@ export function AdminCertificates() {
             <div className="flex items-center gap-2">
               <Button 
                 onClick={() => handlePrint()} 
-                className="bg-emerald-600 hover:bg-emerald-700 text-white h-9 px-3 shrink-0 gap-2"
+                className="hidden sm:inline-flex bg-emerald-600 hover:bg-emerald-700 text-white h-9 px-3 shrink-0 gap-2"
               >
                 <Printer className="size-4" /> 
                 <span className="text-sm font-bold">Print</span>
@@ -388,6 +425,15 @@ export function AdminCertificates() {
                   <Download className="size-4" />
                 )}
                 <span className="text-sm font-bold">Download</span>
+              </Button>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-9 w-9 shrink-0 text-zinc-500"
+                onClick={() => setViewCert(null)}
+              >
+                <X className="size-5" />
+                <span className="sr-only">Close</span>
               </Button>
             </div>
           </div>
