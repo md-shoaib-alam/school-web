@@ -295,13 +295,13 @@ function AdminStudentsContent() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
-        <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto flex-1">
+      <div className="flex flex-col xl:flex-row gap-4 items-start xl:items-center justify-between">
+        <div className="flex flex-col sm:flex-row gap-3 w-full xl:w-auto flex-1">
           <div className="relative flex-1 max-w-sm">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
             <Input
               placeholder="Search by name..."
-              className="pl-9"
+              className="pl-9 h-9 sm:h-10"
               value={search}
               onChange={(e) => dispatch({ type: 'SET_SEARCH', payload: e.target.value })}
             />
@@ -310,13 +310,13 @@ function AdminStudentsContent() {
             value={classFilter}
             onValueChange={(v) => dispatch({ type: 'SET_CLASS_FILTER', payload: v })}
             showAllOption
-            className="w-full sm:w-48"
+            className="w-full sm:w-48 h-9 sm:h-10"
             placeholder="Filter by class"
           />
         </div>
 
         {(canCreate || canEdit || canDelete) && (
-          <div className="flex gap-2 shrink-0">
+          <div className="flex items-center gap-2 shrink-0 w-full sm:w-auto">
             <ImportExportButtons
               canCreate={canCreate}
               tenantId={currentTenantId || ""}
@@ -326,7 +326,7 @@ function AdminStudentsContent() {
             />
             {canCreate && (
               <Button
-                className="bg-emerald-600 hover:bg-emerald-700 text-white"
+                className="flex-1 sm:flex-none bg-emerald-600 hover:bg-emerald-700 text-white h-9 sm:h-10"
                 onClick={handleOpenCreate}
               >
                 <Plus className="size-4 mr-2" />
