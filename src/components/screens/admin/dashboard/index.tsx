@@ -73,7 +73,11 @@ export function AdminDashboard() {
   } = useAppStore();
 
   useEffect(() => {
-    import("recharts").then(setRecharts);
+    // 🚀 Performance: Delay heavy chart library by 2s to prioritize core metrics on 3G
+    const timer = setTimeout(() => {
+      import("recharts").then(setRecharts);
+    }, 2000);
+
     if (typeof window !== "undefined") {
       const pref = localStorage.getItem("schoolsaas_dashboard_layout_preference");
       if (pref) setLayoutPref(pref);
@@ -85,6 +89,7 @@ export function AdminDashboard() {
 
     window.addEventListener("schoolsaas_dashboard_layout_pref_changed", handlePrefChange);
     return () => {
+      clearTimeout(timer);
       window.removeEventListener("schoolsaas_dashboard_layout_pref_changed", handlePrefChange);
     };
   }, []);

@@ -5,7 +5,7 @@
 import { env } from './env';
 import { triggerGlobalRefresh } from './query-client';
 
-const API_BASE = env.NEXT_PUBLIC_API_URL;
+const API_BASE = typeof window !== 'undefined' ? '/api/proxy' : env.NEXT_PUBLIC_API_URL;
 
 function getToken(): string | null {
   if (typeof window === 'undefined') return null;
