@@ -60,7 +60,7 @@ function getMappedGradeFromName(name: string): string {
   return numMatch ? numMatch[0] : "";
 }
 
-function ClassForm({ value, onChange, enableGradeSelection = true, teachers = [] }: ClassFormProps) {
+function ClassForm({ value, onChange, enableGradeSelection = false, teachers = [] }: ClassFormProps) {
   return (
     <div className="grid gap-4 py-2">
       <div className="grid grid-cols-2 gap-4">
@@ -202,7 +202,7 @@ export function ClassDialogs({
   addOpen, setAddOpen, addFormData, setAddFormData, adding, onAdd,
   editOpen, setEditOpen, editData, setEditData, editing, onEdit,
   deleteOpen, setDeleteOpen, deleteTarget, deleting, onDelete,
-  enableGradeSelection = true,
+  enableGradeSelection = false,
   teachers = [],
 }: ClassDialogsProps) {
   return (

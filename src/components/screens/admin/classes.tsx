@@ -134,7 +134,7 @@ export function AdminClasses() {
     enabled: !!currentTenantId,
   });
 
-  const enableGradeSelection = settingsData?.enableGradeSelection ?? true;
+  const enableGradeSelection = settingsData?.enableGradeSelection ?? false;
 
   // Fetch all teachers in the tenant to populate the assign class teacher dropdown
   const { data: teachersData } = useTeachers(currentTenantId || undefined);
