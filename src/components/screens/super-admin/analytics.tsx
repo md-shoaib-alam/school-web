@@ -42,7 +42,7 @@ export function SuperAdminAnalytics() {
     
     setLoading(true);
     try {
-      const res = await apiFetch("/api/v1health");
+      const res = await apiFetch("/api/v1/health");
       // Health check returns 503 when degraded/disconnected, but still sends the payload
       if (res.status === 200 || res.status === 503) {
         const json = await res.json();
