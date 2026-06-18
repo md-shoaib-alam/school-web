@@ -10,6 +10,7 @@ import { DashboardHero } from "./dashboard_components/DashboardHero";
 import { StatusCards } from "./dashboard_components/StatusCards";
 import { GrowthCharts } from "./dashboard_components/GrowthCharts";
 import { TopPerformance } from "./dashboard_components/TopPerformance";
+import { QueueStatus } from "./dashboard_components/QueueStatus";
 
 
 export function SuperAdminDashboard() {
@@ -69,7 +70,7 @@ export function SuperAdminDashboard() {
 
       <TopPerformance loading={loading} data={data} />
 
-
+      <QueueStatus />
     </div>
   );
 }

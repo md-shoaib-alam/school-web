@@ -178,6 +178,12 @@ export const navItems: Record<UserRole, NavItem[]> = {
       permModule: "analytics",
     },
     {
+      key: "queue-status",
+      label: "Queue Status",
+      icon: <Activity className="size-4" />,
+      permModule: null,
+    },
+    {
       key: "audit-logs",
       label: "Audit Logs",
       icon: <ScrollText className="size-4" />,
