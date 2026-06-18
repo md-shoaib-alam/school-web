@@ -10,11 +10,11 @@ import {
   RefreshCw, 
   CheckCircle2, 
   AlertCircle, 
-  Layers,
   Clock,
   Play,
   Check,
-  AlertOctagon
+  AlertOctagon,
+  Inbox
 } from "lucide-react";
 
 interface QueueStatusItem {
@@ -59,171 +59,189 @@ export function QueueStatus() {
 
   useEffect(() => {
     fetchStatus();
-    // Auto refresh every 30 seconds
     const interval = setInterval(() => fetchStatus(true), 30000);
     return () => clearInterval(interval);
   }, []);
 
   const totalActive = queues.reduce((acc, q) => acc + (q.active || 0), 0);
   const totalWaiting = queues.reduce((acc, q) => acc + (q.waiting || 0), 0);
+  const totalFailed = queues.reduce((acc, q) => acc + (q.failed || 0), 0);
   const hasFailures = queues.some((q) => q.failed > 0);
 
   return (
-    <Card className="rounded-3xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 shadow-sm overflow-hidden">
-      <div className="p-6 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <div className="size-10 rounded-xl bg-teal-50 dark:bg-teal-950/50 flex items-center justify-center border border-teal-100 dark:border-teal-900/50">
-            <Cpu className="size-5 text-teal-600 dark:text-teal-400" />
-          </div>
-          <div>
-            <h3 className="font-bold text-slate-800 dark:text-slate-100 text-lg">Background Workers & Queue Health</h3>
-            <p className="text-xs text-slate-400 dark:text-slate-500 mt-0.5">
-              Monitor active jobs, pending queue counts, and processing pipelines
-            </p>
-          </div>
-        </div>
-        <button
-          type="button"
-          onClick={() => fetchStatus(true)}
-          disabled={loading || refreshing}
-          className="flex items-center gap-2 px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-800 text-xs font-semibold text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-900 transition-colors disabled:opacity-50"
-        >
-          <RefreshCw className={`size-3.5 ${refreshing ? "animate-spin" : ""}`} />
-          {refreshing ? "Refreshing..." : "Refresh"}
-        </button>
-      </div>
-
-      <CardContent className="p-6">
-        {loading ? (
-          <div className="space-y-4">
-            {Array.from({ length: 3 }).map((_, i) => (
-              <div key={i} className="flex items-center justify-between p-4 border border-slate-100 dark:border-slate-800 rounded-2xl">
-                <div className="space-y-2">
-                  <Skeleton className="h-4 w-32" />
-                  <Skeleton className="h-3 w-48" />
-                </div>
-                <div className="flex gap-2">
-                  <Skeleton className="h-6 w-16" />
-                  <Skeleton className="h-6 w-16" />
-                </div>
-              </div>
-            ))}
-          </div>
-        ) : error ? (
-          <div className="p-6 text-center border border-red-100 dark:border-red-950/30 bg-red-50/50 dark:bg-red-950/10 rounded-2xl">
-            <AlertCircle className="size-8 text-red-500 mx-auto mb-2" />
-            <p className="text-sm font-semibold text-red-600 dark:text-red-400">{error}</p>
-            <button
-              type="button"
-              onClick={() => fetchStatus()}
-              className="mt-3 text-xs font-semibold text-teal-600 dark:text-teal-400 underline"
-            >
-              Try again
-            </button>
-          </div>
-        ) : (
-          <div className="space-y-4">
-            {/* Quick summary strip */}
-            <div className="grid grid-cols-3 gap-4 p-4 bg-slate-50 dark:bg-slate-900/40 rounded-2xl border border-slate-100 dark:border-slate-800">
-              <div className="text-center border-r border-slate-200 dark:border-slate-800 last:border-0">
-                <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider block">Currently Working</span>
-                <span className="text-xl font-extrabold text-teal-600 dark:text-teal-400 mt-1 block flex items-center justify-center gap-1.5">
-                  {totalActive > 0 && <span className="size-2 rounded-full bg-teal-500 animate-pulse" />}
-                  {totalActive} {totalActive === 1 ? 'job' : 'jobs'}
-                </span>
-              </div>
-              <div className="text-center border-r border-slate-200 dark:border-slate-800 last:border-0">
-                <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider block">Work Remaining</span>
-                <span className="text-xl font-extrabold text-blue-600 dark:text-blue-400 mt-1 block">
-                  {totalWaiting} {totalWaiting === 1 ? 'job' : 'jobs'}
-                </span>
-              </div>
-              <div className="text-center last:border-0">
-                <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider block">Status</span>
-                <span className="text-sm font-extrabold mt-1.5 block flex items-center justify-center gap-1">
-                  {hasFailures ? (
-                    <>
-                      <AlertOctagon className="size-4 text-amber-500" />
-                      <span className="text-amber-600 dark:text-amber-400">Needs Review</span>
-                    </>
-                  ) : (
-                    <>
-                      <CheckCircle2 className="size-4 text-teal-500" />
-                      <span className="text-teal-600 dark:text-teal-400">Healthy</span>
-                    </>
-                  )}
-                </span>
+    <div className="space-y-4">
+      {/* Quick Summary Cards (Compact & Professional) */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <Card className="rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 shadow-sm">
+          <CardContent className="p-4 flex items-center justify-between">
+            <div className="space-y-1">
+              <span className="text-[10px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider">Active Executions</span>
+              <div className="text-xl font-bold text-zinc-800 dark:text-zinc-100 flex items-center gap-1.5">
+                {totalActive > 0 && <span className="size-2 rounded-full bg-emerald-500 animate-pulse" />}
+                {totalActive}
               </div>
             </div>
+            <div className="size-8 rounded-lg bg-emerald-50 dark:bg-emerald-950/40 flex items-center justify-center text-emerald-600 dark:text-emerald-400 border border-emerald-100/50 dark:border-emerald-900/30">
+              <Play className="size-4 fill-current" />
+            </div>
+          </CardContent>
+        </Card>
 
-            {/* Individual Queues */}
-            <div className="space-y-3">
-              {queues.map((q) => (
-                <div 
-                  key={q.name} 
-                  className="p-4 border border-slate-100 dark:border-slate-800 hover:border-slate-200 dark:hover:border-slate-700 rounded-2xl bg-white dark:bg-slate-900/20 transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-4"
-                >
-                  <div className="flex items-center gap-3">
-                    <div className={`size-8 rounded-xl flex items-center justify-center border ${
-                      q.active > 0 
-                        ? 'bg-teal-50 dark:bg-teal-950/30 border-teal-100 dark:border-teal-900/30 text-teal-600' 
-                        : 'bg-slate-50 dark:bg-slate-800/50 border-slate-100 dark:border-slate-800 text-slate-400'
-                    }`}>
-                      <Activity className={`size-4 ${q.active > 0 ? 'animate-pulse text-teal-500' : ''}`} />
-                    </div>
-                    <div>
-                      <h4 className="font-bold text-sm text-slate-700 dark:text-slate-300">{q.name}</h4>
-                      <p className="text-[11px] text-slate-400 dark:text-slate-500 mt-0.5">
-                        {q.active > 0 ? 'Actively processing jobs...' : 'Idle'}
-                      </p>
-                    </div>
-                  </div>
+        <Card className="rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 shadow-sm">
+          <CardContent className="p-4 flex items-center justify-between">
+            <div className="space-y-1">
+              <span className="text-[10px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider">Jobs In Queue</span>
+              <div className="text-xl font-bold text-zinc-800 dark:text-zinc-100">
+                {totalWaiting}
+              </div>
+            </div>
+            <div className="size-8 rounded-lg bg-blue-50 dark:bg-blue-950/40 flex items-center justify-center text-blue-600 dark:text-blue-400 border border-blue-100/50 dark:border-blue-900/30">
+              <Inbox className="size-4" />
+            </div>
+          </CardContent>
+        </Card>
 
-                  <div className="flex flex-wrap items-center gap-2">
-                    <span className={`px-2.5 py-1 rounded-lg text-xs font-semibold flex items-center gap-1 ${
-                      q.active > 0 
-                        ? 'bg-teal-50 dark:bg-teal-950/40 text-teal-700 dark:text-teal-400 border border-teal-100 dark:border-teal-900/30' 
-                        : 'bg-slate-50 dark:bg-slate-800 text-slate-500'
-                    }`}>
-                      <Play className="size-2.5 fill-current" />
-                      <span>{q.active} Active</span>
-                    </span>
+        <Card className="rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 shadow-sm">
+          <CardContent className="p-4 flex items-center justify-between">
+            <div className="space-y-1">
+              <span className="text-[10px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider">Queue Health</span>
+              <div className="text-xs font-semibold mt-1 flex items-center gap-1.5">
+                {hasFailures ? (
+                  <>
+                    <AlertOctagon className="size-3.5 text-amber-500 animate-bounce" />
+                    <span className="text-amber-600 dark:text-amber-400">{totalFailed} Failed Jobs</span>
+                  </>
+                ) : (
+                  <>
+                    <CheckCircle2 className="size-3.5 text-emerald-500" />
+                    <span className="text-emerald-600 dark:text-emerald-400">All Operations Healthy</span>
+                  </>
+                )}
+              </div>
+            </div>
+            <button
+              onClick={() => fetchStatus(true)}
+              disabled={loading || refreshing}
+              className="size-8 rounded-lg bg-zinc-50 dark:bg-zinc-850 hover:bg-zinc-100 dark:hover:bg-zinc-800 flex items-center justify-center border border-zinc-200 dark:border-zinc-750 text-zinc-600 dark:text-zinc-400 transition-colors disabled:opacity-50"
+              title="Refresh status"
+            >
+              <RefreshCw className={`size-4 ${refreshing ? "animate-spin" : ""}`} />
+            </button>
+          </CardContent>
+        </Card>
+      </div>
 
-                    <span className={`px-2.5 py-1 rounded-lg text-xs font-semibold flex items-center gap-1 ${
-                      q.waiting > 0 
-                        ? 'bg-blue-50 dark:bg-blue-950/40 text-blue-700 dark:text-blue-400 border border-blue-100 dark:border-blue-900/30 font-bold' 
-                        : 'bg-slate-50 dark:bg-slate-800 text-slate-500'
-                    }`}>
-                      <Layers className="size-2.5" />
-                      <span>{q.waiting} Waiting</span>
-                    </span>
+      {/* Main Table Card (Compact & Enterprise Style) */}
+      <Card className="rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 shadow-sm overflow-hidden">
+        <div className="p-4 border-b border-zinc-100 dark:border-zinc-800 flex items-center justify-between bg-zinc-50/50 dark:bg-zinc-900/50">
+          <div className="flex items-center gap-2">
+            <Activity className="size-4 text-zinc-500" />
+            <span className="font-semibold text-zinc-850 dark:text-zinc-100 text-xs">Individual Queue Metrics</span>
+          </div>
+        </div>
 
-                    <span className={`px-2.5 py-1 rounded-lg text-xs font-semibold flex items-center gap-1 ${
-                      q.delayed > 0 
-                        ? 'bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-400 border border-amber-100 dark:border-amber-900/30' 
-                        : 'bg-slate-50 dark:bg-slate-800 text-slate-500'
-                    }`}>
-                      <Clock className="size-2.5" />
-                      <span>{q.delayed} Delayed</span>
-                    </span>
-
-                    {q.failed > 0 && (
-                      <span className="px-2.5 py-1 rounded-lg text-xs font-semibold bg-red-50 dark:bg-red-950/40 text-red-700 dark:text-red-400 border border-red-100 dark:border-red-900/30">
-                        {q.failed} Failed
-                      </span>
-                    )}
-
-                    <span className="px-2.5 py-1 rounded-lg text-xs font-semibold bg-slate-50 dark:bg-slate-800 text-slate-400 flex items-center gap-1">
-                      <Check className="size-2.5" />
-                      <span>{q.completed} Done</span>
-                    </span>
+        <CardContent className="p-0">
+          {loading ? (
+            <div className="p-4 space-y-3">
+              {Array.from({ length: 4 }).map((_, i) => (
+                <div key={i} className="flex items-center justify-between py-2 border-b border-zinc-100 dark:border-zinc-855 last:border-0">
+                  <Skeleton className="h-4 w-32" />
+                  <div className="flex gap-2">
+                    <Skeleton className="h-4 w-8" />
+                    <Skeleton className="h-4 w-8" />
+                    <Skeleton className="h-4 w-8" />
                   </div>
                 </div>
               ))}
             </div>
-          </div>
-        )}
-      </CardContent>
-    </Card>
+          ) : error ? (
+            <div className="p-8 text-center bg-red-50/10 dark:bg-red-950/5">
+              <AlertCircle className="size-8 text-red-500 mx-auto mb-2" />
+              <h4 className="font-semibold text-red-600 dark:text-red-400 text-xs">Synchronization Failed</h4>
+              <p className="text-[11px] text-red-500/80 mt-0.5 max-w-sm mx-auto">{error}</p>
+              <button
+                type="button"
+                onClick={() => fetchStatus()}
+                className="mt-3 px-3 py-1.5 bg-red-650 hover:bg-red-700 text-white rounded-lg text-xs font-bold transition-colors"
+              >
+                Reconnect Server
+              </button>
+            </div>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="w-full text-left border-collapse">
+                <thead>
+                  <tr className="bg-zinc-50/30 dark:bg-zinc-900/10 text-zinc-400 dark:text-zinc-500 text-[10px] font-bold uppercase tracking-wider border-b border-zinc-100 dark:border-zinc-800">
+                    <th className="py-2.5 px-4">Queue Pipeline</th>
+                    <th className="py-2.5 px-3 text-center">Active</th>
+                    <th className="py-2.5 px-3 text-center">Waiting</th>
+                    <th className="py-2.5 px-3 text-center">Delayed</th>
+                    <th className="py-2.5 px-3 text-center">Failed</th>
+                    <th className="py-2.5 px-4 text-right">Completed</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-zinc-100 dark:divide-zinc-800/60 text-xs">
+                  {queues.map((q) => {
+                    const isPipeActive = q.active > 0;
+                    return (
+                      <tr key={q.name} className="hover:bg-zinc-50/30 dark:hover:bg-zinc-900/5 transition-colors">
+                        <td className="py-2.5 px-4">
+                          <div className="flex items-center gap-2.5">
+                            <span className={`size-1.5 rounded-full ${isPipeActive ? 'bg-emerald-500 animate-pulse' : 'bg-zinc-300 dark:bg-zinc-700'}`} />
+                            <div>
+                              <span className="font-medium text-zinc-700 dark:text-zinc-300">{q.name}</span>
+                              <span className="text-[9px] text-zinc-400 block">{isPipeActive ? 'Processing' : 'Idle'}</span>
+                            </div>
+                          </div>
+                        </td>
+                        <td className="py-2.5 px-3 text-center">
+                          {q.active > 0 ? (
+                            <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-bold bg-emerald-50 dark:bg-emerald-950/30 text-emerald-600 dark:text-emerald-400 border border-emerald-100 dark:border-emerald-900/20">
+                              {q.active}
+                            </span>
+                          ) : (
+                            <span className="text-zinc-400 dark:text-zinc-650">0</span>
+                          )}
+                        </td>
+                        <td className="py-2.5 px-3 text-center">
+                          {q.waiting > 0 ? (
+                            <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-bold bg-blue-50 dark:bg-blue-950/30 text-blue-600 dark:text-blue-400 border border-blue-100 dark:border-blue-900/20">
+                              {q.waiting}
+                            </span>
+                          ) : (
+                            <span className="text-zinc-400 dark:text-zinc-650">0</span>
+                          )}
+                        </td>
+                        <td className="py-2.5 px-3 text-center">
+                          {q.delayed > 0 ? (
+                            <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-semibold bg-amber-50 dark:bg-amber-950/30 text-amber-600 dark:text-amber-400 border border-amber-100 dark:border-amber-900/20">
+                              {q.delayed}
+                            </span>
+                          ) : (
+                            <span className="text-zinc-400 dark:text-zinc-650">0</span>
+                          )}
+                        </td>
+                        <td className="py-2.5 px-3 text-center">
+                          {q.failed > 0 ? (
+                            <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-bold bg-red-50 dark:bg-red-950/30 text-red-650 dark:text-red-400 border border-red-100 dark:border-red-900/20">
+                              {q.failed}
+                            </span>
+                          ) : (
+                            <span className="text-zinc-400 dark:text-zinc-650">0</span>
+                          )}
+                        </td>
+                        <td className="py-2.5 px-4 text-right font-medium text-zinc-500 dark:text-zinc-400">
+                          {q.completed.toLocaleString()}
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+    </div>
   );
 }

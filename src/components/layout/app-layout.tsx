@@ -210,6 +210,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
       "send-notification",
       "profile",
       "reports",
+      "queue-status",
     ].includes(screen);
 
     if (isSuperAdmin && isPlatformRoute) {

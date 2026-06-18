@@ -267,21 +267,33 @@ export function SuperAdminAnalytics() {
             <CardDescription className="text-xs">Node.js process memory distribution</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4 pt-4">
-            {[
-              { label: "Heap Used", value: memory?.heapUsed, color: "bg-purple-500" },
-              { label: "Heap Total", value: memory?.heapTotal, color: "bg-blue-500" },
-              { label: "External", value: memory?.external, color: "bg-amber-500" },
-            ].map((mem, i) => (
-              <div key={mem.label} className="space-y-1">
-                <div className="flex justify-between text-xs font-medium">
-                  <span className="text-zinc-500">{mem.label}</span>
-                  <span className="text-zinc-900 dark:text-zinc-100">{mem.value}</span>
+            {(() => {
+              const parseMB = (val: string) => {
+                if (!val) return 0;
+                const num = parseInt(val.replace(/[^\d]/g, ""), 10);
+                return isNaN(num) ? 0 : num;
+              };
+              const rssVal = parseMB(memory?.rss) || 1;
+              const getPercent = (val: string) => {
+                const num = parseMB(val);
+                return `${Math.min(100, Math.max(2, Math.round((num / rssVal) * 100)))}%`;
+              };
+              return [
+                { label: "Heap Used", value: memory?.heapUsed, percent: getPercent(memory?.heapUsed), color: "bg-purple-500" },
+                { label: "Heap Total", value: memory?.heapTotal, percent: getPercent(memory?.heapTotal), color: "bg-blue-500" },
+                { label: "External", value: memory?.external, percent: getPercent(memory?.external), color: "bg-amber-500" },
+              ].map((mem) => (
+                <div key={mem.label} className="space-y-1">
+                  <div className="flex justify-between text-xs font-medium">
+                    <span className="text-zinc-500">{mem.label}</span>
+                    <span className="text-zinc-900 dark:text-zinc-100">{mem.value}</span>
+                  </div>
+                  <div className="h-1.5 w-full bg-zinc-100 dark:bg-zinc-700 rounded-full overflow-hidden">
+                    <div className={`h-full ${mem.color} transition-all duration-500`} style={{ width: mem.percent }} />
+                  </div>
                 </div>
-                <div className="h-1.5 w-full bg-zinc-100 dark:bg-zinc-700 rounded-full overflow-hidden">
-                  <div className={`h-full ${mem.color}`} style={{ width: '45%' }} />
-                </div>
-              </div>
-            ))}
+              ));
+            })()}
           </CardContent>
         </Card>
 
