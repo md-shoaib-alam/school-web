@@ -41,7 +41,11 @@ export function QueueStatus() {
 
     try {
       const res = await apiFetch("/api/super-admins/queue-status");
-      if (!res.ok) throw new Error("Failed to fetch queue status");
+      if (!res.ok) {
+        const text = await res.text().catch(() => "");
+        console.error(`[QueueStatus Debug] API failed: Status=${res.status}, Body=${text}`);
+        throw new Error(`Failed to fetch queue status (HTTP ${res.status}): ${text || "Unknown error"}`);
+      }
       const data = await res.json();
       setQueues(data.queues || []);
     } catch (err: any) {
