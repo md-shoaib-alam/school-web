@@ -99,6 +99,16 @@ export function TeacherAttendance() {
     const d = String(now.getDate()).padStart(2, '0');
     return `${y}-${m}-${d}`;
   });
+  const disableFutureDates = useMemo(() => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    return (candidate: Date) => {
+      const day = new Date(candidate);
+      day.setHours(0, 0, 0, 0);
+      return day > today;
+    };
+  }, []);
 
   // ── Fetch classes ──────────────────────────────────────────
 
@@ -314,6 +324,7 @@ export function TeacherAttendance() {
         <div className="flex-1 max-w-[200px]">
           <DatePicker
             date={date ? new Date(date) : undefined}
+            disabled={disableFutureDates}
             onChange={(d) => {
               if (d) {
                 const y = d.getFullYear();
