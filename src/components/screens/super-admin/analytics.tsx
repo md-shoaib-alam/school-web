@@ -21,7 +21,8 @@ import {
   Users,
   Building2,
   CreditCard,
-  Workflow
+  Workflow,
+  AlertCircle
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -31,6 +32,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 export function SuperAdminAnalytics() {
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState<any>(null);
+  const [error, setError] = useState<string | null>(null);
   const [lastChecked, setLastChecked] = useState("");
   const isFetchingRef = useRef(false);
 
@@ -40,14 +42,19 @@ export function SuperAdminAnalytics() {
     
     setLoading(true);
     try {
-      const res = await apiFetch("/api/health");
-      if (res.ok) {
+      const res = await apiFetch("/api/v1health");
+      // Health check returns 503 when degraded/disconnected, but still sends the payload
+      if (res.status === 200 || res.status === 503) {
         const json = await res.json();
         setData(json);
         setLastChecked(new Date().toLocaleTimeString());
+        setError(null);
+      } else {
+        throw new Error(`Server returned status ${res.status}`);
       }
-    } catch (error) {
-      console.error("Failed to fetch health data:", error);
+    } catch (err: any) {
+      console.error("Failed to fetch health data:", err);
+      setError(err.message || "Failed to load system performance metrics.");
     } finally {
       setLoading(false);
       isFetchingRef.current = false;
@@ -84,6 +91,31 @@ export function SuperAdminAnalytics() {
             <Skeleton key={i} className="h-32 rounded-lg" />
           ))}
         </div>
+      </div>
+    );
+  }
+
+  if (error && !data) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <Card className="border-red-200 dark:border-red-700 bg-red-50 dark:bg-red-900/30 max-w-md w-full rounded-3xl overflow-hidden shadow-2xl">
+          <CardContent className="p-8 text-center text-red-600">
+            <div className="size-16 bg-red-100 dark:bg-red-900/30 rounded-2xl flex items-center justify-center mx-auto mb-6">
+              <AlertCircle className="size-8 animate-bounce" />
+            </div>
+            <p className="text-xl font-black mb-2">Metrics Fetch Failed</p>
+            <p className="text-sm font-medium opacity-80 mb-6">
+              {error}
+            </p>
+            <button 
+              type="button"
+              onClick={fetchHealth}
+              className="px-6 py-2.5 bg-red-600 text-white rounded-xl font-black text-sm hover:bg-red-700 transition-colors"
+            >
+              Retry Connection
+            </button>
+          </CardContent>
+        </Card>
       </div>
     );
   }
