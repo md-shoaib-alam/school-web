@@ -400,8 +400,8 @@ export const SAVE_NOTIFICATION_TOKEN = `
 `
 
 export const SEND_GLOBAL_PUSH = `
-  mutation SendGlobalPush($title: String!, $body: String!, $target: String!, $schoolId: ID) {
-    sendGlobalPush(title: $title, body: $body, target: $target, schoolId: $schoolId) { success message }
+  mutation SendGlobalPush($title: String!, $body: String!, $target: String!, $schoolId: ID, $link: String, $imageUrl: String) {
+    sendGlobalPush(title: $title, body: $body, target: $target, schoolId: $schoolId, link: $link, imageUrl: $imageUrl) { success message }
   }
 `
 
