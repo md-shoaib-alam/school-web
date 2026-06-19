@@ -45,6 +45,11 @@ export function AttendanceHeader({
               onDateChange(`${yyyy}-${mm}-${dd}`);
             }
           }}
+          disabled={(date) => {
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            return date > today;
+          }}
           className="rounded-xl dark:[color-scheme:dark] w-fit bg-white dark:bg-zinc-900 hover:bg-zinc-50 dark:hover:bg-zinc-800"
         />
       </div>
