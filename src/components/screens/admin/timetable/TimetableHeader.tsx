@@ -29,14 +29,14 @@ export function TimetableHeader({
   onManageClick,
 }: TimetableHeaderProps) {
   return (
-    <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
-      <div className="flex items-center gap-3">
+    <div className="flex flex-col lg:flex-row gap-4 items-start lg:items-center justify-between">
+      <div className="flex items-center gap-3 shrink-0">
         <div className="size-10 rounded-xl bg-emerald-100 text-emerald-600 flex items-center justify-center">
           <Calendar className="size-5" />
         </div>
-        <div>
-          <h2 className="text-lg font-semibold">Weekly Timetable</h2>
-          <p className="text-sm text-muted-foreground">
+        <div className="min-w-0">
+          <h2 className="text-lg font-semibold whitespace-nowrap">Weekly Timetable</h2>
+          <p className="text-sm text-muted-foreground truncate">
             {currentClass
               ? `${currentClass.name}-${currentClass.section}`
               : "Select a class"}
@@ -44,7 +44,7 @@ export function TimetableHeader({
         </div>
       </div>
 
-      <div className="flex items-center gap-3 w-full sm:w-auto">
+      <div className="flex flex-wrap items-center gap-3 w-full lg:w-auto mt-2 lg:mt-0">
         <div className="inline-flex items-center rounded-lg border border-zinc-200 bg-white dark:bg-zinc-900 p-0.5 shadow-sm">
           <Button
             size="sm"

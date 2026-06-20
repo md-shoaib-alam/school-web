@@ -1,6 +1,6 @@
 import { env } from '../env';
 const API_BASE = env.NEXT_PUBLIC_API_URL;
-const GRAPHQL_ENDPOINT = `${API_BASE}/graphql`
+const GRAPHQL_ENDPOINT = typeof window !== 'undefined' ? '/graphql-proxy' : `${API_BASE}/graphql`;
 
 function getStoredToken(): string | null {
   if (typeof window === 'undefined') return null;
@@ -12,34 +12,59 @@ function getStoredTenantId(): string | null {
   return localStorage.getItem('schoolsaas_tenant_id');
 }
 
-export async function graphqlQuery<TData>(query: string, variables?: Record<string, unknown>): Promise<TData> {
+let batchQueue: Array<{
+  query: string;
+  variables?: Record<string, unknown>;
+  resolve: (data: any) => void;
+  reject: (error: any) => void;
+}> = [];
+let batchTimeout: NodeJS.Timeout | null = null;
+
+async function flushBatch() {
+  if (batchQueue.length === 0) return;
+  const currentQueue = [...batchQueue];
+  batchQueue = [];
+  batchTimeout = null;
+
   const token = getStoredToken();
   const tenantId = getStoredTenantId();
-  const res = await fetch(GRAPHQL_ENDPOINT, {
-    method: 'POST',
-    headers: { 
-      'Content-Type': 'application/json',
-      ...(token ? { 'Authorization': `Bearer ${token}` } : {}),
-      ...(tenantId ? { 'x-tenant-id': tenantId } : {})
-    },
-    body: JSON.stringify({ query, variables }),
-    keepalive: true,
-  })
-  if (!res.ok) {
-    const errorBody = await res.text();
-    console.error(`[GraphQL Query Error] Status: ${res.status}`, { 
-      query: query.substring(0, 100) + '...', 
-      variables, 
-      errorBody 
+
+  try {
+    const res = await fetch(GRAPHQL_ENDPOINT, {
+      method: 'POST',
+      headers: { 
+        'Content-Type': 'application/json',
+        ...(token ? { 'Authorization': `Bearer ${token}` } : {}),
+        ...(tenantId ? { 'x-tenant-id': tenantId } : {})
+      },
+      body: JSON.stringify(currentQueue.map(op => ({ query: op.query, variables: op.variables }))),
+      keepalive: true,
     });
-    throw new Error(`GraphQL error: ${res.status}`);
+
+    if (!res.ok) throw new Error(`Batch request failed: ${res.status}`);
+    
+    const results = await res.json();
+    currentQueue.forEach((op, index) => {
+      const result = results[index];
+      if (result.errors) op.reject(new Error(result.errors[0]?.message || 'GraphQL error'));
+      else op.resolve(result.data);
+    });
+  } catch (err) {
+    currentQueue.forEach(op => op.reject(err));
   }
-  const json = await res.json()
-  if (json.errors) throw new Error(json.errors[0]?.message || 'GraphQL error')
-  return json.data as TData
+}
+
+export async function graphqlQuery<TData>(query: string, variables?: Record<string, unknown>): Promise<TData> {
+  return new Promise((resolve, reject) => {
+    batchQueue.push({ query, variables, resolve, reject });
+    if (!batchTimeout) {
+      batchTimeout = setTimeout(flushBatch, 10); // 10ms batch window
+    }
+  });
 }
 
 export async function graphqlMutate<TData>(mutation: string, variables?: Record<string, unknown>): Promise<TData> {
+  // Mutations are usually not batched to maintain order and immediate feedback
   const token = getStoredToken();
   const tenantId = getStoredTenantId();
   const res = await fetch(GRAPHQL_ENDPOINT, {

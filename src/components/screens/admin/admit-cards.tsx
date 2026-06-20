@@ -198,7 +198,7 @@ export function AdminAdmitCards() {
   
   // Load Admit Card Preview Preference
   const [enableModalAdmitCardPreview, setEnableModalAdmitCardPreview] = useState<boolean>(false);
-  const [enableGradeSelection, setEnableGradeSelection] = useState<boolean>(true);
+  const [enableGradeSelection, setEnableGradeSelection] = useState<boolean>(false);
   const [selectedTemplate, setSelectedTemplate] = useState<string>('classic_quad');
 
   useEffect(() => {
@@ -208,7 +208,7 @@ export function AdminAdmitCards() {
         if (res.ok) {
           const data = await res.json();
           setEnableModalAdmitCardPreview(data.enableModalAdmitCardPreview === true);
-          setEnableGradeSelection(data.enableGradeSelection !== false);
+          setEnableGradeSelection(data.enableGradeSelection === true);
         }
       } catch (err) {
         console.error("Failed to load settings:", err);
@@ -373,6 +373,8 @@ export function AdminAdmitCards() {
           containerRef: allCardsRef,
           pageClassName: 'admit-card-page',
           filename: `Admit_Cards_${classNameStr}_${classSection}.pdf`,
+          width: 794,
+          height: 1123,
           onStart: () => {
             toast.info("Generating PDF, please wait...", { id: 'pdf-progress' });
           },
@@ -515,8 +517,10 @@ export function AdminAdmitCards() {
             onGenerate={handleGenerate}
             generating={generating}
             onPrintAll={handlePrintAll}
+            onDownloadAll={handleDownloadAll}
             admitCardsCount={admitCards.length}
             preparingPrint={preparingPrint}
+            downloadingAll={downloadingAll}
             selectedTemplate={selectedTemplate}
             setSelectedTemplate={setSelectedTemplate}
           />

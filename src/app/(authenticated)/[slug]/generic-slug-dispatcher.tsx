@@ -29,6 +29,7 @@ const SuperAdminSchoolSubscriptions = dynamic(() => import("@/components/screens
 const SuperAdminPlatformNotices = dynamic(() => import("@/components/screens/super-admin/platform-notices").then((m) => m.SuperAdminPlatformNotices), { loading: LoadingScreen });
 const SuperAdminReports = dynamic(() => import("@/components/screens/super-admin/reports").then((m) => m.SuperAdminReports), { loading: LoadingScreen });
 const SuperAdminBulkAttendance = dynamic(() => import("@/components/screens/super-admin/bulk-attendance-import").then((m) => m.SuperAdminBulkAttendance), { loading: LoadingScreen });
+const SuperAdminQueueStatus = dynamic(() => import("@/components/screens/super-admin/queue-status").then((m) => m.SuperAdminQueueStatus), { loading: LoadingScreen });
 
 const UserProfileScreen = dynamic(() => import("@/components/screens/profile").then((m) => m.UserProfileScreen), { loading: LoadingScreen });
 const TeacherDashboard = dynamic(() => import("@/components/screens/teacher/dashboard").then((m) => m.TeacherDashboard), { loading: LoadingScreen });
@@ -100,6 +101,7 @@ export default function GenericSlugDispatcherClient() {
       case "school-subscriptions": return <SuperAdminSchoolSubscriptions />;
       case "platform-notices": return <SuperAdminPlatformNotices />;
       case "reports": return <SuperAdminReports />;
+      case "queue-status": return <SuperAdminQueueStatus />;
       default: {
         // If super admin is at a school slug, it's handled by isTenantContext above
         // But if they are at an unknown slug, we stay here and fall through to FAIL-SAFE

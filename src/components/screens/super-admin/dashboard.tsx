@@ -68,8 +68,6 @@ export function SuperAdminDashboard() {
       <GrowthCharts loading={loading} data={data} />
 
       <TopPerformance loading={loading} data={data} />
-
-
     </div>
   );
 }

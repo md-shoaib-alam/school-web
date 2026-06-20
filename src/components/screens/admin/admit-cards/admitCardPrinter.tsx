@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { createRoot } from "react-dom/client";
 import { toast } from "sonner";
 import { useReactToPrint } from 'react-to-print';
@@ -112,7 +112,7 @@ function AdmitCardPrintPreview({
           </span>
         </div>
         
-        <div className="toolbar-actions flex items-center gap-3">
+        <div className="toolbar-actions flex items-center flex-wrap gap-3">
           {/* Template Switcher */}
           <div className="flex items-center gap-2 bg-white/10 px-2.5 py-1.5 rounded-lg border border-white/10">
             <span className="text-[10px] text-zinc-300 font-bold uppercase tracking-wider">Style:</span>
@@ -152,7 +152,7 @@ function AdmitCardPrintPreview({
             </button>
           </div>
           
-          <button type="button" className="action-btn bg-emerald-600 hover:bg-emerald-700 text-white hidden lg:inline-flex" onClick={handlePrint} disabled={printing || downloading}>
+          <button type="button" className="action-btn bg-emerald-600 hover:bg-emerald-700 text-white hidden xl:inline-flex" onClick={handlePrint} disabled={printing || downloading}>
             {printing ? (
               <>
                 <Loader2 className="size-3.5 animate-spin mr-1.5" />

@@ -31,12 +31,13 @@ export function WelcomeBanner({
       <div className="relative z-10">
         <div className="flex items-center gap-4 mb-3">
           <div className="size-14 rounded-2xl bg-white/20 flex items-center justify-center backdrop-blur-sm overflow-hidden relative">
-            <Image 
-              src={tenantLogo || "/test.webp"} 
-              alt={tenantName || "School Logo"} 
+            <Image
+              src={tenantLogo || "/test.webp"}
+              alt={tenantName || "School Logo"}
               fill
               priority
-              className="object-cover" 
+              fetchPriority="high"
+              className="object-cover"
               sizes="56px"
             />
           </div>

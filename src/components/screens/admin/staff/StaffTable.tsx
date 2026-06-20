@@ -11,7 +11,13 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Pencil, Trash2, Shield, Phone, Mail, Copy, Check, Eye } from "lucide-react";
+import { 
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Pencil, Trash2, Shield, Phone, Mail, Copy, Check, Eye, MoreVertical } from "lucide-react";
 import { useState } from "react";
 import { StaffMember } from "./types";
 import { getInitials, roleBadgeStyle, avatarStyle } from "./utils";
@@ -130,35 +136,71 @@ export function StaffTable({
                 </TableCell>
                 <TableCell className="text-right">
                   <div className="flex justify-end gap-1" onClick={(e) => e.stopPropagation()}>
-                    <Button
-                      size="icon"
-                      variant="ghost"
-                      className="size-8 text-zinc-500 hover:text-emerald-600 dark:hover:bg-emerald-900/20 shrink-0"
-                      onClick={() => onView(member)}
-                      title="View Details"
-                    >
-                      <Eye className="size-3.5" />
-                    </Button>
-                    {canEdit && (
+                    {/* Desktop Actions (xl and up) */}
+                    <div className="hidden xl:flex items-center gap-1">
                       <Button
                         size="icon"
                         variant="ghost"
-                        className="size-8 text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-900/20 shrink-0"
-                        onClick={() => onEdit(member)}
+                        className="size-8 text-zinc-500 hover:text-emerald-600 dark:hover:bg-emerald-900/20 shrink-0"
+                        onClick={() => onView(member)}
+                        title="View Details"
                       >
-                        <Pencil className="size-3.5" />
+                        <Eye className="size-3.5" />
                       </Button>
-                    )}
-                    {canDelete && (
-                      <Button
-                        size="icon"
-                        variant="ghost"
-                        className="size-8 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 shrink-0"
-                        onClick={() => onDelete(member)}
-                      >
-                        <Trash2 className="size-3.5" />
-                      </Button>
-                    )}
+                      {canEdit && (
+                        <Button
+                          size="icon"
+                          variant="ghost"
+                          className="size-8 text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-900/20 shrink-0"
+                          onClick={() => onEdit(member)}
+                        >
+                          <Pencil className="size-3.5" />
+                        </Button>
+                      )}
+                      {canDelete && (
+                        <Button
+                          size="icon"
+                          variant="ghost"
+                          className="size-8 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 shrink-0"
+                          onClick={() => onDelete(member)}
+                        >
+                          <Trash2 className="size-3.5" />
+                        </Button>
+                      )}
+                    </div>
+
+                    {/* Mobile/Tablet Actions (below xl) */}
+                    <div className="xl:hidden">
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="ghost" size="icon" className="size-8">
+                            <MoreVertical className="size-4" />
+                            <span className="sr-only">Open menu</span>
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end" className="w-[160px]">
+                          <DropdownMenuItem onClick={() => onView(member)} className="cursor-pointer">
+                            <Eye className="mr-2 h-4 w-4" />
+                            <span>View Details</span>
+                          </DropdownMenuItem>
+                          {canEdit && (
+                            <DropdownMenuItem onClick={() => onEdit(member)} className="cursor-pointer">
+                              <Pencil className="mr-2 h-4 w-4" />
+                              <span>Edit Staff</span>
+                            </DropdownMenuItem>
+                          )}
+                          {canDelete && (
+                            <DropdownMenuItem 
+                              onClick={() => onDelete(member)} 
+                              className="cursor-pointer text-red-600 focus:text-red-600 focus:bg-red-50"
+                            >
+                              <Trash2 className="mr-2 h-4 w-4" />
+                              <span>Delete Record</span>
+                            </DropdownMenuItem>
+                          )}
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </div>
                   </div>
                 </TableCell>
               </TableRow>

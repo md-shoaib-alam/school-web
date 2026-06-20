@@ -22,7 +22,9 @@ export const TabularLedgerPrint = React.forwardRef<HTMLDivElement, { data: Ledge
 
   return (
     <div ref={ref}>
-      <TemplateComponent data={data} />
+      <div className="ledger-print-page bg-white">
+        <TemplateComponent data={data} />
+      </div>
     </div>
   );
 });
@@ -36,6 +38,7 @@ export async function handleTabulationLedgerPreview({
   academicYear,
   templateId = 'classic',
   examName,
+  isDownload,
 }: {
   classId: string;
   classNameStr: string;
@@ -43,6 +46,7 @@ export async function handleTabulationLedgerPreview({
   academicYear: string;
   templateId?: string;
   examName?: string;
+  isDownload?: boolean;
 }) {
   const data = await compileTabularLedgerData({
     classId,
@@ -300,6 +304,7 @@ export async function handleTabulationLedgerPreview({
         // Initial height computation once content mounts
         setTimeout(() => {
           updateZoom(currentZoom);
+          ${isDownload ? 'window.print();' : ''}
         }, 150);
         
         document.getElementById('zoom-in').addEventListener('click', () => {

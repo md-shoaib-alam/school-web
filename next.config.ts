@@ -12,6 +12,20 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+  async rewrites() {
+    return [
+      {
+        // Proxy API requests to avoid CORS preflights on 3G
+        source: '/api/proxy/:path*',
+        destination: `${process.env.NEXT_PUBLIC_API_URL}/:path*`,
+      },
+      {
+        // Proxy GraphQL requests
+        source: '/graphql-proxy',
+        destination: `${process.env.NEXT_PUBLIC_API_URL}/graphql`,
+      },
+    ];
+  },
 };
 
 export default withSentryConfig(nextConfig, {

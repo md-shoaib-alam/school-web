@@ -22,7 +22,13 @@ import {
   AlertDialogAction,
   AlertDialogCancel,
 } from "@/components/ui/alert-dialog";
-import { GraduationCap, Pencil, Trash2, Eye } from "lucide-react";
+import { 
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { GraduationCap, Pencil, Trash2, Eye, MoreVertical } from "lucide-react";
 import type { StudentInfo } from "./types";
 
 interface StudentTableProps {
@@ -53,7 +59,7 @@ export function StudentTable({
             <TableHead className="hidden sm:table-cell">Gender</TableHead>
             <TableHead className="hidden lg:table-cell">Parent</TableHead>
             <TableHead className="hidden lg:table-cell">Phone</TableHead>
-            <TableHead className="w-24 text-right">Actions</TableHead>
+            <TableHead className="w-16 sm:w-24 text-right">Actions</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -110,14 +116,16 @@ export function StudentTable({
                 </TableCell>
                 <TableCell className="text-right py-4">
                   <div className="flex items-center justify-end gap-1" onClick={(e) => e.stopPropagation()}>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="size-8 text-muted-foreground hover:text-emerald-600"
-                      onClick={() => onView(student)}
-                    >
-                      <Eye className="size-4" />
-                    </Button>
+                    {/* Desktop Actions (xl and up) */}
+                    <div className="hidden xl:flex items-center gap-1">
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="size-8 text-muted-foreground hover:text-emerald-600"
+                        onClick={() => onView(student)}
+                      >
+                        <Eye className="size-4" />
+                      </Button>
                       {canEdit && (
                         <Button
                           variant="ghost"
@@ -163,7 +171,62 @@ export function StudentTable({
                         </AlertDialog>
                       )}
                     </div>
-                  </TableCell>
+
+                    {/* Mobile/Tablet Actions (below xl) */}
+                    <div className="xl:hidden">
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="ghost" size="icon" className="size-8">
+                            <MoreVertical className="size-4" />
+                            <span className="sr-only">Open menu</span>
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end" className="w-[160px]">
+                          <DropdownMenuItem onClick={() => onView(student)} className="cursor-pointer">
+                            <Eye className="mr-2 h-4 w-4" />
+                            <span>View Details</span>
+                          </DropdownMenuItem>
+                          {canEdit && (
+                            <DropdownMenuItem onClick={() => onEdit(student)} className="cursor-pointer">
+                              <Pencil className="mr-2 h-4 w-4" />
+                              <span>Edit Student</span>
+                            </DropdownMenuItem>
+                          )}
+                          {canDelete && (
+                            <AlertDialog>
+                              <AlertDialogTrigger asChild>
+                                <div className="relative flex cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none transition-colors hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-950/20 dark:hover:text-red-400 data-[disabled]:pointer-events-none data-[disabled]:opacity-50">
+                                  <Trash2 className="mr-2 h-4 w-4" />
+                                  <span>Delete Record</span>
+                                </div>
+                              </AlertDialogTrigger>
+                              <AlertDialogContent>
+                                <AlertDialogHeader>
+                                  <AlertDialogTitle>Delete Student</AlertDialogTitle>
+                                  <AlertDialogDescription>
+                                    Are you sure you want to delete <strong>{student.name}</strong>? This action cannot be undone.
+                                  </AlertDialogDescription>
+                                </AlertDialogHeader>
+                                <AlertDialogFooter>
+                                  <AlertDialogCancel onClick={(e) => e.stopPropagation()}>Cancel</AlertDialogCancel>
+                                  <AlertDialogAction
+                                    className="bg-red-600 hover:bg-red-700 text-white"
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      onDelete(student.id);
+                                    }}
+                                  >
+                                    Delete
+                                  </AlertDialogAction>
+                                </AlertDialogFooter>
+                              </AlertDialogContent>
+                            </AlertDialog>
+                          )}
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </div>
+                  </div>
+                </TableCell>
               </TableRow>
             ))
           )}

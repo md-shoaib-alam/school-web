@@ -59,8 +59,8 @@ export async function triggerGlobalRefresh(pathOrTag: string) {
   // 1. Refresh immediately
   await refresh();
 
-  // 2. Refresh again after 500ms to catch any server-side cache lag
-  setTimeout(refresh, 500);
+  // 2. Removed redundant refresh call that was causing double network overhead on 3G.
+  // If server-side lag is an issue, we should rely on TanStack Query's refetch on success instead.
 }
 
 /**
@@ -76,10 +76,11 @@ export const queryClient = new QueryClient({
   }),
   defaultOptions: {
     queries: {
-      staleTime: 60 * 1000, // Safe default of 1 minute (automatically invalidated on mutations)
-      gcTime: 30 * 60 * 1000,
+      staleTime: 5 * 60 * 1000, // 5 minutes (standard for production dashboards)
+      gcTime: 60 * 60 * 1000,    // 1 hour
       retry: 2,
       refetchOnWindowFocus: false,
+      refetchOnMount: false,     // Prioritize stale data while revalidating
     },
   },
 });

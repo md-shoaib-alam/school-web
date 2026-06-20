@@ -20,42 +20,51 @@ export function BatchPrintContainers({
   viewCard,
   templateId = 'classic_quad',
 }: BatchPrintContainersProps) {
-  const cardsPerPage = templateId === 'compact_dual' ? 2 : 4;
+  // 2 per page for compact_dual (Detailed Dual), 4 per page for others
+  const cardsPerPage = (templateId === 'compact_dual') ? 2 : 4;
+  const isDualTemplate = cardsPerPage === 2;
 
   return (
     <>
       {/* Hidden Batch Print Container */}
       {preparingPrint && (
         <div className="hidden">
-          <div ref={allCardsRef} className="print:block p-0">
+          <div ref={allCardsRef} className="print:block p-0 bg-white">
             <style type="text/css" media="print">
-              {"@page { size: A4; margin: 0mm; } body { margin: 0; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; } .admit-card-page { page-break-after: always; }"}
+              {"@page { size: A4 portrait; margin: 0mm; } body { margin: 0; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; } .admit-card-page { page-break-after: always; break-after: page; }"}
             </style>
             {Array.from({ length: Math.ceil(admitCards.length / cardsPerPage) }).map((_, pageIdx) => (
               <div 
                 key={`page-${pageIdx}`} 
-                className={templateId === 'compact_dual'
-                  ? "grid grid-cols-1 gap-y-6 p-[12mm] admit-card-page h-[29.7cm] content-start bg-white"
-                  : "grid grid-cols-2 gap-x-4 gap-y-6 p-[8mm] admit-card-page h-[29.7cm] content-start bg-white"
-                }
+                className="admit-card-page h-[297mm] w-[210mm] bg-white overflow-hidden flex flex-col items-center justify-center"
+                style={{ boxSizing: 'border-box' }}
               >
-                {admitCards.slice(pageIdx * cardsPerPage, (pageIdx + 1) * cardsPerPage).map((card) => (
-                  <div 
-                    key={card.cardNumber} 
-                    className={templateId === 'compact_dual'
-                      ? "flex items-center justify-center h-[12.8cm] p-1 border border-dashed border-zinc-200"
-                      : "flex items-center justify-center h-[13.8cm] p-1 border border-dashed border-zinc-300 print:border-zinc-400"
-                    }
-                    style={{ 
-                      pageBreakInside: 'avoid',
-                      breakInside: 'avoid'
-                    }}
-                  >
-                    <div className="size-full flex items-center justify-center p-1">
-                      <AdmitCardVisual card={card} templateId={templateId} />
+                <div 
+                  className={isDualTemplate
+                    ? "flex flex-col items-center gap-y-[10mm] pt-[10mm] pb-[5mm] px-[10mm] h-full w-full bg-white"
+                    : "grid grid-cols-2 gap-x-[8mm] gap-y-[12mm] p-[12mm] content-start bg-white h-full w-full"
+                  }
+                  style={{ boxSizing: 'border-box' }}
+                >
+                  {admitCards.slice(pageIdx * cardsPerPage, (pageIdx + 1) * cardsPerPage).map((card) => (
+                    <div 
+                      key={card.cardNumber} 
+                      className={isDualTemplate
+                        ? "flex items-center justify-center h-[130mm] w-full p-[2mm] border border-dashed border-zinc-200 shrink-0"
+                        : "flex items-center justify-center h-[130mm] w-[90mm] p-[1.5mm] border border-dashed border-zinc-300 print:border-zinc-400 shrink-0"
+                      }
+                      style={{ 
+                        pageBreakInside: 'avoid',
+                        breakInside: 'avoid',
+                        boxSizing: 'border-box'
+                      }}
+                    >
+                      <div className="size-full flex items-center justify-center">
+                        <AdmitCardVisual card={card} templateId={templateId} />
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  ))}
+                </div>
               </div>
             ))}
           </div>
@@ -66,17 +75,17 @@ export function BatchPrintContainers({
       <div className="hidden">
         <div ref={singleCardRef} className="print:block p-0 bg-white">
           <style type="text/css" media="print">
-            {"@page { size: A4; margin: 0mm; } body { margin: 0; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }"}
+            {"@page { size: A4 portrait; margin: 0mm; } body { margin: 0; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }"}
           </style>
           {viewCard && (
-            <div className="w-[21cm] h-[29.7cm] p-[5mm] flex flex-wrap content-start single-card-page">
+            <div className="w-[210mm] h-[297mm] p-[10mm] flex flex-col items-center justify-start single-card-page">
               <div 
                 className={templateId === 'compact_dual'
-                  ? "flex items-center justify-center h-[12.8cm] p-1 border border-dashed border-zinc-300 print:border-zinc-400 w-full"
-                  : "flex items-center justify-center h-[13.8cm] p-1 border border-dashed border-zinc-300 print:border-zinc-400 w-[10.5cm]"
+                  ? "flex items-center justify-center h-[128mm] w-full p-[2mm] border border-dashed border-zinc-300 print:border-zinc-400"
+                  : "flex items-center justify-center h-[138mm] w-[130mm] p-[2mm] border border-dashed border-zinc-300 print:border-zinc-400"
                 }
               >
-                <div className="size-full flex items-center justify-center p-1">
+                <div className="size-full flex items-center justify-center p-[1mm]">
                   <AdmitCardVisual card={viewCard} templateId={templateId} />
                 </div>
               </div>

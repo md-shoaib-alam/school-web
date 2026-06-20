@@ -76,7 +76,7 @@ export const initialState: SettingsState = {
   enableModalTabulationPreview: false,
   enableModalMarksheetPreview: false,
   enableModalAdmitCardPreview: false,
-  enableGradeSelection: true,
+  enableGradeSelection: false,
   hasChanges: false,
   initialSettings: null,
 };

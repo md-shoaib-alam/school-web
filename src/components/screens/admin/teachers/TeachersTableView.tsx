@@ -4,7 +4,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Pencil, Trash2, Eye } from "lucide-react";
+import { Pencil, Trash2, Eye, MoreVertical } from "lucide-react";
 import { LazyMotion, domAnimation, m, AnimatePresence } from "framer-motion";
 import {
   AlertDialog,
@@ -17,6 +17,12 @@ import {
   AlertDialogAction,
   AlertDialogCancel,
 } from "@/components/ui/alert-dialog";
+import { 
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { avatarColors } from "./types";
 import type { TeacherInfo } from "./types";
 
@@ -115,53 +121,124 @@ export function TeachersTableView({
                         </TableCell>
                         <TableCell className="px-6 py-4">
                           <div className="flex items-center justify-center gap-2">
-                            <Button 
-                              variant="ghost" 
-                              size="icon" 
-                              className="size-8 text-zinc-400 hover:text-emerald-600" 
-                              onClick={() => onView(teacher)}
-                            >
-                              <Eye className="size-3.5" />
-                            </Button>
-                            {canEdit && (
-                              <Button variant="ghost" size="icon" className="size-8 text-zinc-400 hover:text-emerald-600" onClick={() => onEdit(teacher)}>
-                                <Pencil className="size-3.5" />
-                              </Button>
-                            )}
-                            {canDelete && (
-                              <AlertDialog
-                                open={deletingId === teacher.id}
-                                onOpenChange={(open) => {
-                                  if (!open) setDeletingId(null);
-                                }}
+                            {/* Desktop Actions (xl and above) */}
+                            <div className="hidden xl:flex items-center gap-2">
+                              <Button 
+                                variant="ghost" 
+                                size="icon" 
+                                className="size-8 text-zinc-400 hover:text-emerald-600" 
+                                onClick={() => onView(teacher)}
                               >
-                                <AlertDialogTrigger asChild>
-                                  <Button variant="ghost" size="icon" className="size-8 text-zinc-400 hover:text-red-600" onClick={() => setDeletingId(teacher.id)}>
-                                    <Trash2 className="size-3.5" />
+                                <Eye className="size-3.5" />
+                              </Button>
+                              {canEdit && (
+                                <Button variant="ghost" size="icon" className="size-8 text-zinc-400 hover:text-emerald-600" onClick={() => onEdit(teacher)}>
+                                  <Pencil className="size-3.5" />
+                                </Button>
+                              )}
+                              {canDelete && (
+                                <AlertDialog
+                                  open={deletingId === teacher.id}
+                                  onOpenChange={(open) => {
+                                    if (!open) setDeletingId(null);
+                                  }}
+                                >
+                                  <AlertDialogTrigger asChild>
+                                    <Button variant="ghost" size="icon" className="size-8 text-zinc-400 hover:text-red-600" onClick={() => setDeletingId(teacher.id)}>
+                                      <Trash2 className="size-3.5" />
+                                    </Button>
+                                  </AlertDialogTrigger>
+                                  <AlertDialogContent>
+                                    <AlertDialogHeader>
+                                      <AlertDialogTitle>Delete Teacher</AlertDialogTitle>
+                                      <AlertDialogDescription>
+                                        Are you sure you want to delete <strong>{teacher.name}</strong>? This action
+                                        cannot be undone.
+                                      </AlertDialogDescription>
+                                    </AlertDialogHeader>
+                                    <AlertDialogFooter>
+                                      <AlertDialogCancel onClick={() => setDeletingId(null)}>
+                                        Cancel
+                                      </AlertDialogCancel>
+                                      <AlertDialogAction
+                                        className="bg-red-600 hover:bg-red-700 text-white"
+                                        onClick={() => onDelete(teacher.id)}
+                                      >
+                                        Delete
+                                      </AlertDialogAction>
+                                    </AlertDialogFooter>
+                                  </AlertDialogContent>
+                                </AlertDialog>
+                              )}
+                            </div>
+
+                            {/* Mobile/Tablet Actions (below xl) */}
+                            <div className="xl:hidden">
+                              <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                  <Button variant="ghost" size="icon" className="size-8">
+                                    <MoreVertical className="size-4" />
+                                    <span className="sr-only">Open menu</span>
                                   </Button>
-                                </AlertDialogTrigger>
-                                <AlertDialogContent>
-                                  <AlertDialogHeader>
-                                    <AlertDialogTitle>Delete Teacher</AlertDialogTitle>
-                                    <AlertDialogDescription>
-                                      Are you sure you want to delete <strong>{teacher.name}</strong>? This action
-                                      cannot be undone.
-                                    </AlertDialogDescription>
-                                  </AlertDialogHeader>
-                                  <AlertDialogFooter>
-                                    <AlertDialogCancel onClick={() => setDeletingId(null)}>
-                                      Cancel
-                                    </AlertDialogCancel>
-                                    <AlertDialogAction
-                                      className="bg-red-600 hover:bg-red-700 text-white"
-                                      onClick={() => onDelete(teacher.id)}
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent align="end" className="w-[160px]">
+                                  <DropdownMenuItem onClick={() => onView(teacher)} className="cursor-pointer">
+                                    <Eye className="mr-2 h-4 w-4" />
+                                    <span>View Details</span>
+                                  </DropdownMenuItem>
+                                  {canEdit && (
+                                    <DropdownMenuItem onClick={() => onEdit(teacher)} className="cursor-pointer">
+                                      <Pencil className="mr-2 h-4 w-4" />
+                                      <span>Edit Teacher</span>
+                                    </DropdownMenuItem>
+                                  )}
+                                  {canDelete && (
+                                    <AlertDialog
+                                      open={deletingId === teacher.id}
+                                      onOpenChange={(open) => {
+                                        if (!open) setDeletingId(null);
+                                      }}
                                     >
-                                      Delete
-                                    </AlertDialogAction>
-                                  </AlertDialogFooter>
-                                </AlertDialogContent>
-                              </AlertDialog>
-                            )}
+                                      <AlertDialogTrigger asChild>
+                                        <div 
+                                          className="relative flex cursor-pointer select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none transition-colors hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-950/20 dark:hover:text-red-400"
+                                          onClick={(e) => {
+                                            e.stopPropagation();
+                                            setDeletingId(teacher.id);
+                                          }}
+                                        >
+                                          <Trash2 className="mr-2 h-4 w-4" />
+                                          <span>Delete Record</span>
+                                        </div>
+                                      </AlertDialogTrigger>
+                                      <AlertDialogContent>
+                                        <AlertDialogHeader>
+                                          <AlertDialogTitle>Delete Teacher</AlertDialogTitle>
+                                          <AlertDialogDescription>
+                                            Are you sure you want to delete <strong>{teacher.name}</strong>? This action
+                                            cannot be undone.
+                                          </AlertDialogDescription>
+                                        </AlertDialogHeader>
+                                        <AlertDialogFooter>
+                                          <AlertDialogCancel onClick={(e) => { e.stopPropagation(); setDeletingId(null); }}>
+                                            Cancel
+                                          </AlertDialogCancel>
+                                          <AlertDialogAction
+                                            className="bg-red-600 hover:bg-red-700 text-white"
+                                            onClick={(e) => {
+                                              e.stopPropagation();
+                                              onDelete(teacher.id);
+                                            }}
+                                          >
+                                            Delete
+                                          </AlertDialogAction>
+                                        </AlertDialogFooter>
+                                      </AlertDialogContent>
+                                    </AlertDialog>
+                                  )}
+                                </DropdownMenuContent>
+                              </DropdownMenu>
+                            </div>
                           </div>
                         </TableCell>
                       </m.tr>

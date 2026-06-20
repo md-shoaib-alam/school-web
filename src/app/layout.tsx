@@ -7,6 +7,7 @@ import { MonitoringProvider } from "@/components/monitoring-provider";
 import { GlobalErrorBoundary } from "@/components/error-boundary";
 import JsonLd from "@/components/json-ld";
 import '@/bones/registry';
+import { OfflineGuard } from "@/components/offline-guard";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -45,7 +46,9 @@ export default function RootLayout({
           <Providers>
             <MonitoringProvider>
               <GlobalErrorBoundary>
-                {children}
+                <OfflineGuard>
+                  {children}
+                </OfflineGuard>
               </GlobalErrorBoundary>
             </MonitoringProvider>
           </Providers>

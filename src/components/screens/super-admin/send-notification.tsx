@@ -12,7 +12,8 @@ import {
   Info,
   Smartphone,
   Link2,
-  Wifi
+  Wifi,
+  Image as ImageIcon
 } from "lucide-react";
 import { toast } from "sonner";
 import { graphqlMutate } from "@/lib/graphql/core";
@@ -22,6 +23,7 @@ export function SendNotificationScreen() {
   const [title, setTitle] = useState("");
   const [body, setBody] = useState("");
   const [link, setLink] = useState("");
+  const [imageUrl, setImageUrl] = useState("");
   const [sending, setSending] = useState(false);
 
   const handleSend = async () => {
@@ -33,8 +35,8 @@ export function SendNotificationScreen() {
     setSending(true);
     try {
       const mutation = `
-        mutation SendDirectPush($token: String!, $title: String!, $body: String!, $link: String) {
-          sendDirectPush(token: $token, title: $title, body: $body, link: $link) {
+        mutation SendDirectPush($token: String!, $title: String!, $body: String!, $link: String, $imageUrl: String) {
+          sendDirectPush(token: $token, title: $title, body: $body, link: $link, imageUrl: $imageUrl) {
             success
             message
           }
@@ -48,6 +50,7 @@ export function SendNotificationScreen() {
           title,
           body,
           link: link || undefined,
+          imageUrl: imageUrl || undefined,
         }
       );
 
@@ -56,6 +59,7 @@ export function SendNotificationScreen() {
         setTitle("");
         setBody("");
         setLink("");
+        setImageUrl("");
       } else {
         toast.error(result.sendDirectPush.message || "Failed to send push notification");
       }
@@ -124,6 +128,19 @@ export function SendNotificationScreen() {
             </div>
 
             <div className="space-y-2">
+              <Label htmlFor="imageUrl" className="flex items-center gap-1.5">
+                <ImageIcon className="size-4 text-indigo-500" />
+                Notification Image URL (Optional)
+              </Label>
+              <Input 
+                id="imageUrl" 
+                placeholder="e.g. https://example.com/image.png" 
+                value={imageUrl}
+                onChange={(e) => setImageUrl(e.target.value)}
+              />
+            </div>
+
+            <div className="space-y-2">
               <Label htmlFor="body">Notification Message Body</Label>
               <Textarea 
                 id="body" 
@@ -135,7 +152,7 @@ export function SendNotificationScreen() {
             </div>
 
             <div className="pt-4 flex justify-end gap-3">
-              <Button variant="outline" onClick={() => { setToken(""); setTitle(""); setBody(""); setLink(""); }}>
+              <Button variant="outline" onClick={() => { setToken(""); setTitle(""); setBody(""); setLink(""); setImageUrl(""); }}>
                 Reset
               </Button>
               <Button 

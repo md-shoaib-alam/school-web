@@ -258,7 +258,7 @@ export function AdminSubjects() {
       />
 
       {loading ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-4">
           {[...Array(6)].map((_, i) => (
             <Card key={i} className="h-40">
               <CardContent className="p-4 space-y-3">

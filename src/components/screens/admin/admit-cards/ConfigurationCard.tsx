@@ -5,7 +5,8 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { AlertCircle, Loader2, FileText, Printer } from "lucide-react";
+import { AlertCircle, Loader2, FileText, Printer, Download, Sparkles, Layout } from "lucide-react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 const examTypeLabels: Record<string, string> = {
   unit_test: 'Unit Test',
@@ -30,8 +31,10 @@ interface ConfigurationCardProps {
   onGenerate: () => void;
   generating: boolean;
   onPrintAll: () => void;
+  onDownloadAll: () => void;
   admitCardsCount: number;
   preparingPrint: boolean;
+  downloadingAll: boolean;
   selectedTemplate: string;
   setSelectedTemplate: (v: string) => void;
 }
@@ -51,8 +54,10 @@ export function ConfigurationCard({
   onGenerate,
   generating,
   onPrintAll,
+  onDownloadAll,
   admitCardsCount,
   preparingPrint,
+  downloadingAll,
   selectedTemplate,
   setSelectedTemplate,
 }: ConfigurationCardProps) {
@@ -68,18 +73,21 @@ export function ConfigurationCard({
       <CardContent className="p-4 pt-0 space-y-4">
         {/* Template Selector */}
         <div className="space-y-1.5">
-          <label className="text-sm font-medium mb-1.5 block">Print Template</label>
-          <select 
-            value={selectedTemplate} 
-            onChange={(e) => setSelectedTemplate(e.target.value)}
-            className="w-full h-9 px-3 rounded-lg border border-zinc-200 dark:border-zinc-800 bg-background text-xs font-semibold focus:outline-none focus:ring-1 focus:ring-amber-500 cursor-pointer"
-            style={{ colorScheme: 'dark' }}
-          >
-            <option value="classic_quad">Classic Quad (4 per A4 Page)</option>
-            <option value="premium_modern">Premium Modern (4 per A4 Page)</option>
-            <option value="compact_dual">Detailed Dual (2 per A4 Page)</option>
-            <option value="minimal_ticket">Minimalist Ticket (4 per A4 Page)</option>
-          </select>
+          <label className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground block">Print Template</label>
+          <Select value={selectedTemplate} onValueChange={setSelectedTemplate}>
+            <SelectTrigger className="w-full h-9 rounded-lg text-xs font-bold border-zinc-200 dark:border-zinc-800 bg-background focus:ring-amber-500">
+              <div className="flex items-center gap-2">
+                <Layout className="size-3.5 text-amber-500" />
+                <SelectValue placeholder="Select Template" />
+              </div>
+            </SelectTrigger>
+            <SelectContent className="rounded-xl">
+              <SelectItem value="classic_quad" className="text-xs font-semibold">Classic Quad (4 per A4)</SelectItem>
+              <SelectItem value="premium_modern" className="text-xs font-semibold">Premium Modern (4 per A4)</SelectItem>
+              <SelectItem value="compact_dual" className="text-xs font-semibold">Detailed Dual (2 per A4)</SelectItem>
+              <SelectItem value="minimal_ticket" className="text-xs font-semibold">Minimalist Ticket (4 per A4)</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
         {/* Exam Cycle Filter */}
         <div className="space-y-1.5">
@@ -100,10 +108,21 @@ export function ConfigurationCard({
                   variant={selectedExamType === typeKey ? 'default' : 'outline'}
                   size="sm"
                   onClick={() => setSelectedExamType(typeKey)}
-                  className="gap-1.5"
+                  className={`gap-1.5 h-8 text-xs font-bold rounded-lg transition-all duration-300 ${
+                    selectedExamType === typeKey 
+                      ? 'bg-amber-600 hover:bg-amber-700 text-white border-none shadow-md' 
+                      : 'border-amber-100 hover:border-amber-200 dark:border-amber-900/50'
+                  }`}
                 >
                   {cycleName}
-                  <Badge variant="secondary" className="ml-1 px-1 py-0 h-4 text-[10px] min-w-[1.2rem] flex items-center justify-center bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-400 border-none">
+                  <Badge 
+                    variant="secondary" 
+                    className={`ml-1 px-1 py-0 h-4 text-[10px] min-w-[1.2rem] flex items-center justify-center border-none rounded ${
+                      selectedExamType === typeKey 
+                        ? 'bg-amber-500/30 text-white' 
+                        : 'bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-400'
+                    }`}
+                  >
                     {count}
                   </Badge>
                 </Button>
@@ -179,24 +198,37 @@ export function ConfigurationCard({
           </div>
         )}
 
-        <div className="flex flex-col sm:flex-row gap-3">
+        {/* Action Buttons: Generate & Batch Actions */}
+        <div className="flex flex-col gap-2 pt-2">
           <Button
             onClick={onGenerate}
             disabled={generating || selectedStudentIds.size === 0 || totalExams === 0}
-            className="flex-1 gap-2 bg-amber-600 hover:bg-amber-700 text-white h-11"
+            className="w-full bg-amber-600 hover:bg-amber-700 text-white font-bold h-10 rounded-xl shadow-lg shadow-amber-500/20 transition-all duration-300 transform active:scale-[0.98] gap-2"
           >
-            {generating ? <Loader2 className="size-4 animate-spin" /> : <FileText className="size-4" />}
+            {generating ? <Loader2 className="size-4 animate-spin" /> : <Sparkles className="size-4" />}
             {generating ? 'Generating…' : `Generate ${selectedStudentIds.size} Admit Card${selectedStudentIds.size !== 1 ? 's' : ''}`}
           </Button>
 
-          <Button
-            onClick={onPrintAll}
-            disabled={admitCardsCount === 0 || generating || preparingPrint}
-            className={`flex-1 gap-2 h-11 border-none ${admitCardsCount > 0 ? 'bg-zinc-900 text-white hover:bg-zinc-950' : 'bg-zinc-800/40 text-zinc-500 cursor-not-allowed'}`}
-          >
-            {preparingPrint ? <Loader2 className="size-4 animate-spin" /> : <Printer className="size-4" />}
-            {preparingPrint ? 'Preparing Cards…' : `Print All ${admitCardsCount > 0 ? `(${admitCardsCount})` : ''}`}
-          </Button>
+          {admitCardsCount > 0 && (
+            <div className="flex flex-col sm:flex-row lg:grid lg:grid-cols-2 gap-2 animate-in slide-in-from-top-2 duration-300">
+              <Button
+                onClick={onPrintAll}
+                disabled={preparingPrint || downloadingAll}
+                className="hidden lg:inline-flex bg-emerald-600 hover:bg-emerald-700 text-white border-none font-bold h-9 rounded-xl transition-all duration-300 gap-2 shadow-sm justify-center items-center"
+              >
+                {preparingPrint ? <Loader2 className="size-3.5 animate-spin" /> : <Printer className="size-3.5" />}
+                Print
+              </Button>
+              <Button
+                onClick={onDownloadAll}
+                disabled={preparingPrint || downloadingAll}
+                className="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white border-none font-bold h-9 rounded-xl transition-all duration-300 gap-2 shadow-sm justify-center items-center"
+              >
+                {downloadingAll ? <Loader2 className="size-3.5 animate-spin" /> : <Download className="size-3.5" />}
+                Download
+              </Button>
+            </div>
+          )}
         </div>
       </CardContent>
     </Card>
