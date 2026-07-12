@@ -6,16 +6,17 @@ export interface PlanFeature {
   included: boolean;
 }
 
+export interface PricingInfo {
+  price: number;
+  originalPrice?: number;
+  discountType?: "percentage" | "fixed" | "none";
+}
+
 export interface ResourceLimits {
   students: number;
   teachers: number;
   parents: number;
   classes: number;
-}
-
-export interface PricingInfo {
-  price: number;
-  originalPrice?: number;
 }
 
 export interface BillingTier {
@@ -49,7 +50,7 @@ export const SCHOOL_PLANS: SchoolPlan[] = [
   {
     id: "basic",
     name: "Starter Plan",
-    description: "Ideal for small preschools and private tutoring centers.",
+    description: "₹3/student/mo (min ₹499/mo). Ideal for small preschools and private tutoring centers.",
     price: 499,
     icon: <Zap className="size-6" />,
     color: "violet",
@@ -70,7 +71,7 @@ export const SCHOOL_PLANS: SchoolPlan[] = [
   {
     id: "standard",
     name: "Growth Plan",
-    description: "Perfect for established schools looking to digitize operations.",
+    description: "₹3/student/mo (min ₹1,499/mo). Perfect for established schools looking to digitize operations.",
     price: 1499,
     icon: <Shield className="size-6" />,
     color: "emerald",
@@ -93,7 +94,7 @@ export const SCHOOL_PLANS: SchoolPlan[] = [
   {
     id: "premium",
     name: "Institution Plan",
-    description: "The complete solution for large-scale educational institutions.",
+    description: "₹2/student/mo (min ₹3,999/mo). The complete solution for large-scale educational institutions.",
     price: 3999,
     icon: <Crown className="size-6" />,
     color: "amber",
@@ -124,9 +125,9 @@ export const PARENT_PLANS: ParentPlan[] = [
     icon: <BookOpen className="size-6" />,
     color: "blue",
     pricing: {
-      monthly: { price: 0 },
-      quarterly: { price: 0 },
-      yearly: { price: 0 },
+      monthly: { price: 0, discountType: "none" },
+      quarterly: { price: 0, discountType: "none" },
+      yearly: { price: 0, discountType: "none" },
     },
     features: [
       { text: "View child's grades & reports", included: true },
@@ -145,9 +146,9 @@ export const PARENT_PLANS: ParentPlan[] = [
     icon: <Star className="size-6" />,
     color: "amber",
     pricing: {
-      monthly: { price: 11, originalPrice: 19 },
-      quarterly: { price: 29, originalPrice: 37 },
-      yearly: { price: 99, originalPrice: 199 },
+      monthly: { price: 19, originalPrice: 29, discountType: "percentage" },
+      quarterly: { price: 49, originalPrice: 79, discountType: "percentage" },
+      yearly: { price: 149, originalPrice: 249, discountType: "percentage" },
     },
     features: [
       { text: "Detailed attendance with trends", included: true },
@@ -165,9 +166,9 @@ export const PARENT_PLANS: ParentPlan[] = [
     icon: <Crown className="size-6" />,
     color: "emerald",
     pricing: {
-      monthly: { price: 29, originalPrice: 49 },
-      quarterly: { price: 79, originalPrice: 102 },
-      yearly: { price: 249, originalPrice: 499 },
+      monthly: { price: 49, originalPrice: 79, discountType: "percentage" },
+      quarterly: { price: 129, originalPrice: 199, discountType: "percentage" },
+      yearly: { price: 399, originalPrice: 599, discountType: "percentage" },
     },
     features: [
       { text: "AI-powered performance analytics", included: true },
