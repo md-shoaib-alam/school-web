@@ -162,6 +162,12 @@ export function AdminTeachers() {
       return;
     }
 
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(formData.email)) {
+      toast.error("Please enter a valid email address");
+      return;
+    }
+
     const isEdit = !!editingTeacher;
     const queryKey = [queryKeys.teachers, currentTenantId, debouncedSearch, currentPage, 12];
 

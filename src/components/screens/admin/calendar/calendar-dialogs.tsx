@@ -74,7 +74,12 @@ export function CalendarDialogs({
                   <Label className="text-xs font-semibold tracking-tight text-zinc-600 dark:text-zinc-300">Start Date</Label>
                  <DatePicker 
                    date={startDateVal} 
-                   onChange={(d) => updateForm("date", d ? formatDateISO(d) : "")}
+                   onChange={(d) => {
+                     const formatted = d ? formatDateISO(d) : "";
+                     const newEnd = d && endDateVal && d > endDateVal ? formatted : form.endDate;
+                     updateForm("date", formatted);
+                     updateForm("endDate", newEnd);
+                   }}
                    className="h-10 text-sm w-full"
                  />
                </div>
@@ -85,6 +90,7 @@ export function CalendarDialogs({
                    onChange={(d) => updateForm("endDate", d ? formatDateISO(d) : "")}
                    className="h-10 text-sm w-full"
                    placeholder="Optional"
+                   disabled={(d) => startDateVal ? d < startDateVal : false}
                  />
                </div>
              </div>

@@ -46,7 +46,7 @@ type State = {
   linking: boolean;
   createOpen: boolean;
   createForm: {
-    name: string; email: string; phone: string; occupation: string; password: "";
+    name: string; email: string; phone: string; occupation: string; password: ""; username?: string;
   };
   creating: boolean;
   editOpen: boolean;
@@ -88,7 +88,7 @@ const initialState: State = {
   linking: false,
   createOpen: false,
   createForm: {
-    name: "", email: "", phone: "", occupation: "", password: "",
+    name: "", email: "", phone: "", occupation: "", password: "", username: "",
   },
   creating: false,
   editOpen: false,
@@ -230,14 +230,22 @@ export function AdminParents() {
   }, [students, selectedParent]);
 
   const handleCreate = async () => {
-    if (!createForm.name || !createForm.email) { toast.error("Name and email are required"); return; }
+    if (!createForm.name || !createForm.phone) { toast.error("Name and phone number are required"); return; }
+    if (createForm.email) {
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(createForm.email)) { toast.error("Please enter a valid email address"); return; }
+    }
     toast.promise(
       (async () => {
         dispatch({ type: 'SET_CREATING', payload: true });
         try {
-          await api.post("/parents", { action: "create", ...createForm });
+          const res = await api.post("/parents", { action: "create", ...createForm });
+          const resData = res.data || {};
           dispatch({ type: 'RESET_CREATE_FORM' });
           queryClient.invalidateQueries({ queryKey: queryKeys.parents });
+          if (resData.username) {
+            return `Parent account created! Parent ID: ${resData.username}`;
+          }
           return "Parent account created";
         } finally { dispatch({ type: 'SET_CREATING', payload: false }); }
       })(),
@@ -276,14 +284,18 @@ export function AdminParents() {
         await api.post("/parents", { action: "unlink", parentId, studentId, });
         queryClient.invalidateQueries({ queryKey: queryKeys.parents });
         queryClient.invalidateQueries({ queryKey: ['students-min-infinite'] });
-        throw new Error("Child record unlinked");
+        return "Child record unlinked";
       })(),
-      { loading: "Unlinking child...", success: () => "", error: (err: any) => err.message, },
+      { loading: "Unlinking child...", success: (msg) => msg, error: (err: any) => err.message, },
     );
   };
 
   const handleEditSave = async () => {
-    if (!editingParent || !editForm.name || !editForm.email) { toast.error("Name and email are required"); return; }
+    if (!editingParent || !editForm.name || !editForm.phone) { toast.error("Name and phone number are required"); return; }
+    if (editForm.email) {
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(editForm.email)) { toast.error("Please enter a valid email address"); return; }
+    }
     const updatedParent = { ...editingParent, ...editForm };
     queryClient.setQueriesData({ queryKey: queryKeys.parents }, (old: any) => {
       if (!old || !old.parents) return old;
@@ -304,16 +316,13 @@ export function AdminParents() {
   };
 
   const handleDelete = async (id: string) => {
-    if (!window.confirm("Are you sure you want to delete this parent account? This action cannot be undone.")) {
-      return;
-    }
     toast.promise(
       (async () => {
         await api.delete(`/parents?id=${id}`);
         queryClient.invalidateQueries({ queryKey: queryKeys.parents });
-        throw new Error("Parent record removed");
+        return "Parent record removed";
       })(),
-      { loading: "Removing parent record...", success: () => "", error: (err: any) => err.message, },
+      { loading: "Removing parent record...", success: (msg) => msg, error: (err: any) => err.message, },
     );
   };
   

@@ -34,7 +34,7 @@ export function CreateParentDialog({
         <DialogHeader>
           <DialogTitle>Add New Parent</DialogTitle>
           <DialogDescription>
-            Create a new parent account in the system
+            Create a new parent account in the system. A unique Parent ID (e.g. PRN2026xxxx) will be automatically generated for login.
           </DialogDescription>
         </DialogHeader>
         <div className="space-y-4 pt-2">
@@ -50,7 +50,18 @@ export function CreateParentDialog({
             />
           </div>
           <div>
-            <Label>Email <span className="text-red-500">*</span></Label>
+            <Label>Parent Login ID <span className="text-xs text-muted-foreground">(Optional - Auto generated if left blank)</span></Label>
+            <Input
+              value={createForm.username || ""}
+              onChange={(e) =>
+                setCreateForm({ ...createForm, username: e.target.value })
+              }
+              placeholder="e.g. p_greenwood_03"
+              className="mt-1.5"
+            />
+          </div>
+          <div>
+            <Label>Email <span className="text-xs text-muted-foreground">(Optional)</span></Label>
             <Input
               type="email"
               value={createForm.email}
@@ -74,7 +85,7 @@ export function CreateParentDialog({
             />
           </div>
           <div>
-            <Label>Phone</Label>
+            <Label>Phone <span className="text-red-500">*</span></Label>
             <Input
               value={createForm.phone}
               onChange={(e) =>

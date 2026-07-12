@@ -2,6 +2,7 @@ export interface ChildInfo {
   id: string;
   name: string;
   email: string;
+  username?: string;
   rollNumber: string;
   className: string;
   classId: string;
@@ -14,6 +15,7 @@ export interface ParentInfo {
   userId: string;
   name: string;
   email: string;
+  username?: string;
   phone?: string;
   occupation?: string;
   children: ChildInfo[];

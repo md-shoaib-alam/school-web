@@ -40,6 +40,7 @@ const ITEMS_PER_PAGE = 15;
 const emptyFormData: StudentFormData = {
   name: "",
   email: "",
+  username: "",
   password: "",
   phone: "",
   rollNumber: "",
@@ -203,6 +204,19 @@ function AdminStudentsContent() {
   const handleSubmit = async () => {
     const isCreate = dialogMode === "create";
 
+    // Required fields validation
+    if (!formData.name || !formData.email || !formData.rollNumber || !formData.classId) {
+      toast.error("Name, Email, Roll Number, and Class are required");
+      return;
+    }
+
+    // Email format validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(formData.email)) {
+      toast.error("Please enter a valid email address");
+      return;
+    }
+
     // OPTIMISTIC UPDATE: Update the UI instantly if editing
     if (!isCreate && editingStudent) {
       const updatedStudent = { ...editingStudent, ...formData };
@@ -241,12 +255,16 @@ function AdminStudentsContent() {
             throw new Error(errData.error || `Failed to ${dialogMode} student`);
           }
 
+          const resData = await res.json().catch(() => ({}));
           dispatch({ type: 'CLOSE_DIALOG' });
           // Refresh from server to ensure total accuracy
           queryClient.invalidateQueries({ queryKey: queryKeys.students });
           queryClient.invalidateQueries({
             queryKey: ["admin-dashboard", currentTenantId],
           });
+          if (isCreate && resData.username) {
+            return `Student registered! School ID: ${resData.username}`;
+          }
           return isCreate
             ? "Student registered successfully"
             : "Student details updated";

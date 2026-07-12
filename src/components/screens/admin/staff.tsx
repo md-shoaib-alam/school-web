@@ -221,6 +221,12 @@ export function AdminStaff() {
       return;
     }
 
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(formData.email)) {
+      toast.error("Please enter a valid email address");
+      return;
+    }
+
     dispatch({ type: 'SET_SUBMITTING', payload: true });
     try {
       if (editingMember) {

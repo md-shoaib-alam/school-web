@@ -72,6 +72,9 @@ export function ParentsTableView({
                         </Avatar>
                         <div className="flex flex-col min-w-0">
                           <span className="font-bold text-zinc-900 dark:text-zinc-100 truncate">{parent.name}</span>
+                          {parent.username && (
+                            <span className="text-[10px] sm:text-[11px] text-zinc-500 font-mono">ID: {parent.username}</span>
+                          )}
                           <span className="text-[10px] sm:text-xs text-muted-foreground truncate">{parent.email}</span>
                           <div className="sm:hidden flex flex-wrap gap-1 mt-1">
                             <span className="text-[10px] text-emerald-600 dark:text-emerald-400 font-medium bg-emerald-50 dark:bg-emerald-900/20 px-1 rounded">
@@ -155,7 +158,7 @@ export function ParentsTableView({
                                 <span className="sr-only">Open menu</span>
                               </Button>
                             </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end" className="w-[160px]">
+                            <DropdownMenuContent align="end" className="w-40">
                               <DropdownMenuItem onClick={() => onLinkOpen(parent)} className="cursor-pointer text-emerald-600 focus:text-emerald-600 focus:bg-emerald-50">
                                 <LinkIcon className="mr-2 h-4 w-4" />
                                 <span>Link Child</span>

@@ -116,7 +116,7 @@ export function StudentDetailDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-lg p-0 overflow-hidden border-none bg-card shadow-2xl rounded-2xl max-h-[90vh] flex flex-col">
         {/* Profile Card Header Info */}
-        <div className="px-6 pt-6 pb-5 border-b flex-shrink-0 relative">
+        <div className="px-6 pt-6 pb-5 border-b shrink-0 relative">
           {/* Subtle Sparkles Section Title */}
           <div className="flex items-center gap-1.5 text-xs text-emerald-600 dark:text-emerald-400 font-semibold uppercase tracking-wider mb-4 pr-8">
             <Sparkles className="size-3.5 animate-pulse text-emerald-500" />
@@ -143,6 +143,11 @@ export function StudentDetailDialog({
                 <Badge variant="outline" className="font-mono text-xs bg-secondary/30">
                   Roll: {currentStudent.rollNumber}
                 </Badge>
+                {currentStudent.username && (
+                  <Badge variant="outline" className="font-mono text-xs bg-emerald-50 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-400 border-emerald-200">
+                    ID: {currentStudent.username}
+                  </Badge>
+                )}
                 <Badge className="bg-emerald-600 text-white font-normal hover:bg-emerald-600">
                   Active
                 </Badge>
@@ -393,7 +398,7 @@ export function StudentDetailDialog({
         </div>
 
         {/* Footer */}
-        <div className="p-4 bg-secondary/20 border-t flex justify-end flex-shrink-0">
+        <div className="p-4 bg-secondary/20 border-t flex justify-end shrink-0">
           <Button
             className="bg-emerald-600 hover:bg-emerald-700 text-white font-medium shadow-md shadow-emerald-600/10"
             onClick={() => onOpenChange(false)}

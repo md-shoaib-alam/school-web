@@ -235,7 +235,7 @@ export const PARENTS = `
   query Parents($tenantId: String, $search: String, $page: Int, $limit: Int) {
     parents(tenantId: $tenantId, search: $search, page: $page, limit: $limit) {
       parents { 
-        id userId name email phone occupation status 
+        id userId name email username phone occupation status 
         children { id name email rollNumber className gender classId } 
         subscription { id planName planId amount period status transactionId startDate endDate autoRenew }
       }
