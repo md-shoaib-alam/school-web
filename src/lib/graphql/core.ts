@@ -12,6 +12,39 @@ function getStoredTenantId(): string | null {
   return localStorage.getItem('schoolsaas_tenant_id');
 }
 
+function getStoredRefreshToken(): string | null {
+  if (typeof window === 'undefined') return null;
+  return localStorage.getItem('school_refresh_token');
+}
+
+// ── GraphQL-level refresh interceptor ──
+let graphqlRefreshing = false;
+let graphqlRefreshFailed = false;
+
+async function refreshForGraphQL(): Promise<string> {
+  const refreshToken = getStoredRefreshToken();
+  if (!refreshToken) throw new Error('No refresh token');
+
+  const refreshRes = await fetch(
+    typeof window !== 'undefined' ? '/api/proxy/auth/refresh' : `${API_BASE}/auth/refresh`,
+    {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ refreshToken }),
+    }
+  );
+
+  if (!refreshRes.ok) throw new Error('Refresh failed');
+  const data = await refreshRes.json();
+  localStorage.setItem('school_token', data.token);
+  localStorage.setItem('school_refresh_token', data.refreshToken);
+  if (typeof document !== 'undefined') {
+    const d = new Date(); d.setTime(d.getTime() + 30 * 24 * 60 * 60 * 1000);
+    document.cookie = `school_token=${data.token};expires=${d.toUTCString()};path=/;SameSite=Lax`;
+  }
+  return data.token;
+}
+
 let batchQueue: Array<{
   query: string;
   variables?: Record<string, unknown>;
@@ -32,17 +65,64 @@ async function flushBatch() {
   try {
     const res = await fetch(GRAPHQL_ENDPOINT, {
       method: 'POST',
-      headers: { 
+      headers: {
         'Content-Type': 'application/json',
-        ...(token ? { 'Authorization': `Bearer ${token}` } : {}),
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
         ...(tenantId ? { 'x-tenant-id': tenantId } : {})
       },
       body: JSON.stringify(currentQueue.map(op => ({ query: op.query, variables: op.variables }))),
       keepalive: true,
     });
 
+    if (res.status === 401 && !graphqlRefreshFailed) {
+      // Try silent refresh then retry the batch
+      if (graphqlRefreshing) {
+        // Another refresh in progress — reject and let React Query retry
+        const err = new Error('Token refresh in progress');
+        currentQueue.forEach(op => op.reject(err));
+        return;
+      }
+      graphqlRefreshing = true;
+      try {
+        const newToken = await refreshForGraphQL();
+        graphqlRefreshing = false;
+        graphqlRefreshFailed = false;
+
+        // Retry the batch with new token
+        const retryRes = await fetch(GRAPHQL_ENDPOINT, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${newToken}`,
+            ...(tenantId ? { 'x-tenant-id': tenantId } : {})
+          },
+          body: JSON.stringify(currentQueue.map(op => ({ query: op.query, variables: op.variables }))),
+          keepalive: true,
+        });
+
+        if (!retryRes.ok) throw new Error(`Batch retry failed: ${retryRes.status}`);
+        const retryResults = await retryRes.json();
+        currentQueue.forEach((op, index) => {
+          const result = retryResults[index];
+          if (result.errors) op.reject(new Error(result.errors[0]?.message || 'GraphQL error'));
+          else op.resolve(result.data);
+        });
+        return;
+      } catch (refreshErr) {
+        graphqlRefreshing = false;
+        graphqlRefreshFailed = true;
+        // Force logout
+        if (typeof window !== 'undefined') {
+          localStorage.clear(); sessionStorage.clear();
+          window.location.href = '/';
+        }
+        currentQueue.forEach(op => op.reject(refreshErr));
+        return;
+      }
+    }
+
     if (!res.ok) throw new Error(`Batch request failed: ${res.status}`);
-    
+
     const results = await res.json();
     currentQueue.forEach((op, index) => {
       const result = results[index];

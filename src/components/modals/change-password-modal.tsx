@@ -99,6 +99,18 @@ export function ChangePasswordModal({
     try {
       await changePasswordMutation.mutateAsync({ oldPassword, newPassword });
       handleOpenChange(false);
+      // Server invalidated all sessions — force re-login
+      if (typeof window !== 'undefined') {
+        localStorage.clear();
+        sessionStorage.clear();
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+          const cookie = cookies[i];
+          const [name] = cookie.split('=');
+          document.cookie = name.trim() + '=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/';
+        }
+        window.location.href = '/';
+      }
     } catch (err: any) {
       // Error is handled by the hook's toast
     }
