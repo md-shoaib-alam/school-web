@@ -30,6 +30,7 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { Calendar } from '@/components/ui/calendar';
 import { useReactToPrint } from 'react-to-print';
 import { AdminReceiptTemplate } from './AdminReceiptTemplate';
+import { useAppStore } from '@/store/app-store/store';
 
 interface CheckReceiptTabProps {
   canEdit: boolean;
@@ -98,6 +99,7 @@ function reducer(state: State, action: Action): State {
 
 export function CheckReceiptTab({ canEdit, canDelete }: CheckReceiptTabProps) {
   const queryClient = useQueryClient();
+  const currentTenantLogo = useAppStore(store => store.currentTenantLogo);
   
   // State
   const [state, dispatch] = useReducer(reducer, initialState);
@@ -467,9 +469,10 @@ export function CheckReceiptTab({ canEdit, canDelete }: CheckReceiptTabProps) {
           <AdminReceiptTemplate 
             ref={printRef}
             receipt={viewReceipt}
-            parentName={studentFullDetails?.parentName}
-            className={studentFullDetails?.className}
+            parentName={(viewReceipt as any).parentName}
+            className={(viewReceipt as any).className}
             remainingAmount={remainingAmount}
+            schoolLogo={currentTenantLogo || undefined}
           />
         )}
       </div>
