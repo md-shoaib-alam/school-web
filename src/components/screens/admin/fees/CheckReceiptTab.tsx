@@ -142,6 +142,7 @@ export function CheckReceiptTab({ canEdit, canDelete }: CheckReceiptTabProps) {
 
   const { data, isLoading: loadingReceipts } = useFeeReceipts({
     studentId: studentFilter,
+    classId: classFilter,
     search: debouncedSearch,
     fromDate,
     toDate,
@@ -273,6 +274,7 @@ export function CheckReceiptTab({ canEdit, canDelete }: CheckReceiptTabProps) {
                   dispatch({ type: 'SET_FROM_DATE', payload: date ? format(date, "yyyy-MM-dd") : '' });
                   setIsFromCalendarOpen(false);
                 }}
+                disabled={(date) => toDate ? date > new Date(toDate) : false}
                 initialFocus
               />
             </PopoverContent>
@@ -292,6 +294,7 @@ export function CheckReceiptTab({ canEdit, canDelete }: CheckReceiptTabProps) {
                   dispatch({ type: 'SET_TO_DATE', payload: date ? format(date, "yyyy-MM-dd") : '' });
                   setIsToCalendarOpen(false);
                 }}
+                disabled={(date) => fromDate ? date < new Date(fromDate) : false}
                 initialFocus
               />
             </PopoverContent>
