@@ -100,6 +100,17 @@ function reducer(state: State, action: Action): State {
 export function CheckReceiptTab({ canEdit, canDelete }: CheckReceiptTabProps) {
   const queryClient = useQueryClient();
   const currentTenantLogo = useAppStore(store => store.currentTenantLogo);
+  const currentTenantName = useAppStore(store => store.currentTenantName);
+
+  // Fetch tenant settings for address and contact details
+  const { data: tenantSettings } = useQuery<any>({
+    queryKey: ['tenant-settings-receipt'],
+    queryFn: async () => {
+      const res = await apiFetch('/api/tenant-settings');
+      if (!res.ok) return null;
+      return res.json();
+    }
+  });
   
   // State
   const [state, dispatch] = useReducer(reducer, initialState);
@@ -469,10 +480,13 @@ export function CheckReceiptTab({ canEdit, canDelete }: CheckReceiptTabProps) {
           <AdminReceiptTemplate 
             ref={printRef}
             receipt={viewReceipt}
-            parentName={(viewReceipt as any).parentName}
-            className={(viewReceipt as any).className}
+            parentName={(viewReceipt as any).parentName || studentFullDetails?.parentName}
+            className={(viewReceipt as any).className || studentFullDetails?.className}
             remainingAmount={remainingAmount}
             schoolLogo={currentTenantLogo || undefined}
+            schoolName={currentTenantName || undefined}
+            schoolAddress={tenantSettings?.address || undefined}
+            schoolContact={tenantSettings?.phone || undefined}
           />
         )}
       </div>

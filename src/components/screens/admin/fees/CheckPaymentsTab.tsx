@@ -106,17 +106,31 @@ export function CheckPaymentsTab() {
       const matchMethod = methodFilter === 'all' || p.paymentMethod === methodFilter;
       const matchDateRange = (fromDate === '' || p.paidDate >= fromDate) && (toDate === '' || p.paidDate <= toDate);
       let matchDatePreset = true;
-      const today = new Date();
+      
+      const getLocalDateString = (d: Date) => {
+        const yyyy = d.getFullYear();
+        const mm = String(d.getMonth() + 1).padStart(2, '0');
+        const dd = String(d.getDate()).padStart(2, '0');
+        return `${yyyy}-${mm}-${dd}`;
+      };
+
+      const todayStr = getLocalDateString(new Date());
+
       if (dateFilter === 'today') {
-        matchDatePreset = p.paidDate === today.toISOString().split('T')[0];
+        // Compare with local date format string (YYYY-MM-DD)
+        matchDatePreset = p.paidDate.slice(0, 10) === todayStr;
       } else if (dateFilter === 'week') {
+        const today = new Date();
         const weekAgo = new Date(today);
         weekAgo.setDate(weekAgo.getDate() - 7);
-        matchDatePreset = p.paidDate >= weekAgo.toISOString().split('T')[0];
+        const weekAgoStr = getLocalDateString(weekAgo);
+        matchDatePreset = p.paidDate.slice(0, 10) >= weekAgoStr;
       } else if (dateFilter === 'month') {
+        const today = new Date();
         const monthAgo = new Date(today);
         monthAgo.setMonth(monthAgo.getMonth() - 1);
-        matchDatePreset = p.paidDate >= monthAgo.toISOString().split('T')[0];
+        const monthAgoStr = getLocalDateString(monthAgo);
+        matchDatePreset = p.paidDate.slice(0, 10) >= monthAgoStr;
       }
       return matchSearch && matchMethod && matchDateRange && matchDatePreset;
     });
