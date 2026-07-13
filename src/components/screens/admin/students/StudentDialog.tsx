@@ -120,7 +120,7 @@ export function StudentDialog({
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div className="grid gap-2">
-              <Label htmlFor="email">Email <span className="text-red-500">*</span></Label>
+              <Label htmlFor="email">Email <span className="text-xs text-muted-foreground">(Optional)</span></Label>
               <Input
                 id="email"
                 type="email"
@@ -324,7 +324,6 @@ export function StudentDialog({
             disabled={
               submitting ||
               !formData.name ||
-              !formData.email ||
               !formData.classId ||
               !formData.rollNumber ||
               (formData.transportEnabled && (!formData.routeId || !formData.pickupPoint))
