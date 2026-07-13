@@ -192,7 +192,7 @@ export function AdminParents() {
       const nextPage = lastPage.page ? lastPage.page + 1 : (allPages?.length ? allPages.length + 1 : 2);
       return isNaN(nextPage) ? undefined : nextPage;
     },
-    enabled: linkOpen,
+    enabled: linkOpen && !!currentTenantId,
     staleTime: 5000,
     refetchOnWindowFocus: false,
     refetchOnMount: true
