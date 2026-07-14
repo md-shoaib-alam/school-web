@@ -70,6 +70,7 @@ export function useCreateFeeConcession() {
 
 export function useFeeReceipts(options: { 
   studentId?: string; 
+  classId?: string;
   search?: string; 
   fromDate?: string; 
   toDate?: string; 
