@@ -45,7 +45,7 @@ export function AssignRoleDialog({
   const getInitial = (name: string) => name.charAt(0).toUpperCase();
 
   const [visibleCount, setVisibleCount] = useState(15);
-  const [isAssignedExpanded, setIsAssignedExpanded] = useState(false);
+  const [isAssignedExpanded, setIsAssignedExpanded] = useState(true);
 
   useEffect(() => {
     setVisibleCount(15);

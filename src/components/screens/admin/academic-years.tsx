@@ -111,6 +111,10 @@ export function AcademicYearsScreen() {
       toast.error("Start Date and End Date are required");
       return;
     }
+    if (new Date(formData.endDate) < new Date(formData.startDate)) {
+      toast.error("End date cannot be before start date");
+      return;
+    }
     try {
       if (editingYear) {
         await updateAcademicYear({ id: editingYear.id, input: formData });
@@ -195,7 +199,12 @@ export function AcademicYearsScreen() {
                   <Label htmlFor="startDate">Start Date</Label>
                   <DatePicker 
                     date={parseLocalDate(formData.startDate)}
-                    onChange={(d) => setFormData({ ...formData, startDate: formatLocalDate(d) })}
+                    onChange={(d) => {
+                      const formatted = formatLocalDate(d);
+                      const currentEnd = parseLocalDate(formData.endDate);
+                      const newEnd = d && currentEnd && d > currentEnd ? formatted : formData.endDate;
+                      setFormData({ ...formData, startDate: formatted, endDate: newEnd });
+                    }}
                   />
                 </div>
                 <div className="space-y-2">
@@ -203,6 +212,10 @@ export function AcademicYearsScreen() {
                   <DatePicker 
                     date={parseLocalDate(formData.endDate)}
                     onChange={(d) => setFormData({ ...formData, endDate: formatLocalDate(d) })}
+                    disabled={(d) => {
+                      const start = parseLocalDate(formData.startDate);
+                      return start ? d < start : false;
+                    }}
                   />
                 </div>
               </div>

@@ -55,9 +55,8 @@ export function ParentDetailDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-lg p-0 overflow-hidden border-none bg-card shadow-2xl rounded-2xl max-h-[90vh] flex flex-col">
         {/* Profile Card Header Info */}
-        <div className="px-6 pt-6 pb-5 border-b flex-shrink-0 relative">
+        <div className="px-6 pt-6 pb-5 border-b shrink-0 relative">
           <div className="flex items-center gap-1.5 text-xs text-emerald-600 dark:text-emerald-400 font-semibold uppercase tracking-wider mb-4 pr-8">
-            <Sparkles className="size-3.5 animate-pulse text-emerald-500" />
             Parent Profile
           </div>
 
@@ -92,6 +91,33 @@ export function ParentDetailDialog({
               Contact Details
             </h3>
             <div className="space-y-3">
+              {/* Parent Login ID */}
+              {parent.username && (
+                <div className="flex items-center justify-between p-3 rounded-xl bg-emerald-50/50 dark:bg-emerald-950/20 border border-emerald-100 dark:border-emerald-900/30 animate-in fade-in duration-200">
+                  <div className="flex items-center gap-3 min-w-0 flex-1">
+                    <User className="size-4 text-emerald-600 shrink-0" />
+                    <div className="min-w-0">
+                      <p className="text-[10px] text-emerald-600 dark:text-emerald-400 font-medium uppercase leading-none">Parent Login ID</p>
+                      <p className="text-sm font-mono font-bold text-emerald-800 dark:text-emerald-300 truncate mt-1">{parent.username}</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-1 shrink-0 ml-2">
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="size-8 text-emerald-600 hover:text-emerald-700"
+                      onClick={() => handleCopy(parent.username || '', 'Parent ID')}
+                    >
+                      {copiedField === 'Parent ID' ? (
+                        <Check className="size-3.5 text-emerald-600" />
+                      ) : (
+                        <Copy className="size-3.5" />
+                      )}
+                    </Button>
+                  </div>
+                </div>
+              )}
+
               {/* Email */}
               <div className="flex items-center justify-between p-3 rounded-xl bg-secondary/10 border border-secondary/20">
                 <div className="flex items-center gap-3 min-w-0 flex-1">
@@ -211,7 +237,7 @@ export function ParentDetailDialog({
         </div>
 
         {/* Footer */}
-        <div className="p-4 bg-secondary/20 border-t flex justify-end flex-shrink-0">
+        <div className="p-4 bg-secondary/20 border-t flex justify-end shrink-0">
           <Button
             className="bg-emerald-600 hover:bg-emerald-700 text-white font-medium shadow-md shadow-emerald-600/10"
             onClick={() => onOpenChange(false)}

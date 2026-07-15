@@ -214,6 +214,11 @@ export function AdminCalendar() {
 
   const handleSubmit = async () => {
     if (!form.title.trim() || !form.date) return toast.error("Required fields missing");
+    
+    if (form.endDate && new Date(form.endDate) < new Date(form.date)) {
+      return toast.error("End date cannot be before start date");
+    }
+
     const payload = { ...form, tenantId: currentTenantId, id: editingEvent?.id };
     
     if (editingEvent) {

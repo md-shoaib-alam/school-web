@@ -666,6 +666,11 @@ export function SuperAdminBulkAttendance() {
       return;
     }
 
+    if (new Date(endDate) < new Date(startDate)) {
+      toast.error("End date cannot be before start date.");
+      return;
+    }
+
     if (!allStudentsMode && !selectedStudent) {
       toast.warning("Please select a specific student or apply to all students.");
       return;

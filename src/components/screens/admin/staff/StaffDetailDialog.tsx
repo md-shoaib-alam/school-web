@@ -71,9 +71,8 @@ export function StaffDetailDialog({
       <DialogContent className="sm:max-w-lg p-0 overflow-hidden border-none bg-card shadow-2xl rounded-2xl max-h-[90vh] flex flex-col">
         {/* Profile Card Header Info */}
         <div className="px-6 pt-6 pb-5 border-b flex-shrink-0 relative">
-          {/* Subtle Sparkles Section Title */}
+          {/* Section Title */}
           <div className="flex items-center gap-1.5 text-xs text-emerald-600 dark:text-emerald-400 font-semibold uppercase tracking-wider mb-4 pr-8">
-            <Sparkles className="size-3.5 animate-pulse text-emerald-500" />
             Staff Profile
           </div>
 

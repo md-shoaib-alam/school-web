@@ -91,7 +91,7 @@ export function StudentDialog({
           <DialogTitle>{isCreate ? "Add New Student" : "Edit Student"}</DialogTitle>
           <DialogDescription>
             {isCreate 
-              ? "Fill in the student details below" 
+              ? "Fill in the details below. A unique School ID (e.g. STU2026xxxx) will be generated automatically for login." 
               : "Update the student details below"}
           </DialogDescription>
         </DialogHeader>
@@ -107,9 +107,20 @@ export function StudentDialog({
               placeholder="John Doe"
             />
           </div>
+          <div className="grid gap-2">
+            <Label htmlFor="username">School Login ID <span className="text-xs text-muted-foreground">(Optional - Auto generated if left blank)</span></Label>
+            <Input
+              id="username"
+              value={formData.username || ""}
+              onChange={(e) =>
+                setFormData({ ...formData, username: e.target.value })
+              }
+              placeholder="e.g. s_smith_01"
+            />
+          </div>
           <div className="grid grid-cols-2 gap-4">
             <div className="grid gap-2">
-              <Label htmlFor="email">Email <span className="text-red-500">*</span></Label>
+              <Label htmlFor="email">Email <span className="text-xs text-muted-foreground">(Optional)</span></Label>
               <Input
                 id="email"
                 type="email"
@@ -313,7 +324,6 @@ export function StudentDialog({
             disabled={
               submitting ||
               !formData.name ||
-              !formData.email ||
               !formData.classId ||
               !formData.rollNumber ||
               (formData.transportEnabled && (!formData.routeId || !formData.pickupPoint))

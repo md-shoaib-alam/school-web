@@ -146,26 +146,40 @@ export function FeeStatusTab() {
                     <p className="font-semibold text-sm text-foreground">Select a Class</p>
                     <p className="text-xs opacity-70 mt-1 max-w-xs mx-auto">Please choose a class from the dropdown menu to view and filter its students list.</p>
                   </div>
+                ) : loadingStudents ? (
+                  <div className="p-8 text-center text-muted-foreground flex flex-col items-center justify-center gap-2">
+                    <Loader2 className="size-6 animate-spin text-emerald-600" />
+                    <p className="text-xs">Fetching class students...</p>
+                  </div>
+                ) : students.length === 0 ? (
+                  <div className="p-12 text-center text-muted-foreground flex flex-col items-center justify-center h-48 select-none">
+                    <UserCheck className="size-10 mb-2 opacity-30" />
+                    <p className="font-semibold text-sm">No Students Found</p>
+                    <p className="text-xs opacity-70 mt-1">There are no students enrolled in this class matching your query.</p>
+                  </div>
                 ) : (
                   <>
-                    {students.map((s, index) => (
-                      <button 
-                        key={s.id} 
-                        ref={index === students.length - 1 ? lastStudentElementRef : null}
-                        type="button" 
-                        className="w-full flex items-center gap-3 p-3 hover:bg-emerald-50/50 dark:hover:bg-emerald-900/20 transition-colors text-left" 
-                        onClick={() => handleSelectStudent(s)}
-                      >
+                    {students.map((s, index) => {
+                      if (!s) return null;
+                      return (
+                        <button 
+                          key={s.id || index} 
+                          ref={index === students.length - 1 ? lastStudentElementRef : null}
+                          type="button" 
+                          className="w-full flex items-center gap-3 p-3 hover:bg-emerald-50/50 dark:hover:bg-emerald-900/20 transition-colors text-left" 
+                          onClick={() => handleSelectStudent(s)}
+                        >
                         <div className="size-10 rounded-full bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 flex items-center justify-center text-sm font-semibold shrink-0">
-                          {s.name.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase()}
+                          {(s?.name || 'S').split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase()}
                         </div>
                         <div className="flex-1 min-w-0">
-                          <p className="font-medium text-sm">{s.name}</p>
-                          <p className="text-xs text-muted-foreground">{s.className} • {s.phone || 'No phone'}</p>
+                          <p className="font-medium text-sm">{s?.name || 'Student'}</p>
+                          <p className="text-xs text-muted-foreground">{s?.className || 'Class'} • {s?.phone || 'No phone'}</p>
                         </div>
                         <ChevronRight className="size-4 text-muted-foreground shrink-0" />
-                      </button>
-                    ))}
+                        </button>
+                      );
+                    })}
                     {isFetchingNextPage && (
                       <div className="p-4 flex items-center justify-center text-muted-foreground gap-2">
                         <Loader2 className="size-4 animate-spin" />

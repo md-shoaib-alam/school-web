@@ -223,8 +223,8 @@ export const TEACHERS = `
 `
 
 export const STUDENTS = `
-  query Students($tenantId: String, $classId: String, $search: String, $page: Int, $limit: Int) {
-    students(tenantId: $tenantId, classId: $classId, search: $search, page: $page, limit: $limit) {
+  query Students($tenantId: String, $classId: String, $search: String, $status: String, $gender: String, $page: Int, $limit: Int) {
+    students(tenantId: $tenantId, classId: $classId, search: $search, status: $status, gender: $gender, page: $page, limit: $limit) {
       students { id name email phone rollNumber className gender dateOfBirth status classId parentId parentName admissionDate }
       total page totalPages
     }
@@ -235,7 +235,7 @@ export const PARENTS = `
   query Parents($tenantId: String, $search: String, $page: Int, $limit: Int) {
     parents(tenantId: $tenantId, search: $search, page: $page, limit: $limit) {
       parents { 
-        id userId name email phone occupation status 
+        id userId name email username phone occupation status 
         children { id name email rollNumber className gender classId } 
         subscription { id planName planId amount period status transactionId startDate endDate autoRenew }
       }

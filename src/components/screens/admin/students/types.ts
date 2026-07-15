@@ -2,6 +2,7 @@ export interface StudentInfo {
   id: string;
   name: string;
   email: string;
+  username?: string;
   phone: string | null;
   classId: string;
   className: string;
@@ -33,6 +34,7 @@ export interface ClassInfo {
 export interface StudentFormData {
   name: string;
   email: string;
+  username?: string;
   phone: string;
   rollNumber: string;
   classId: string;

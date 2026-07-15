@@ -162,7 +162,7 @@ function AdminManagerView({ initialTab }: { initialTab: string }) {
                           <TableCell className="font-medium">{l.userName}</TableCell>
                           <TableCell><Badge variant="outline" className={leaveTypeConfig[l.leaveType]?.bg}>{l.leaveType}</Badge></TableCell>
                           <TableCell className="text-xs">{l.startDate} to {l.endDate}</TableCell>
-                          <TableCell className="text-xs truncate max-w-[150px]">{l.reason || '–'}</TableCell>
+                          <TableCell className="text-xs truncate max-w-37.5">{l.reason || '–'}</TableCell>
                           <TableCell className="text-center"><Badge className={statusConfig[l.status]?.bg}>{l.status}</Badge></TableCell>
                           <TableCell className="text-right">
                             {l.status === 'pending' && (
@@ -226,6 +226,10 @@ function StaffSelfServiceView() {
   useEffect(() => { fetchMyLeaves(); }, [fetchMyLeaves]);
 
   const handleApply = async () => {
+    if (new Date(form.endDate) < new Date(form.startDate)) {
+      toast.error("End date cannot be before start date");
+      return;
+    }
     const promise = (async () => {
       const res = await apiFetch('/api/leaves', { method: 'POST', body: JSON.stringify(form) });
       if (!res.ok) throw new Error();
@@ -278,11 +282,26 @@ function StaffSelfServiceView() {
              <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-1">
                   <label htmlFor="start-date" className="text-xs font-medium">Start Date</label>
-                  <Input id="start-date" type="date" value={form.startDate} onChange={e => setForm({...form, startDate: e.target.value})} />
+                  <Input 
+                    id="start-date" 
+                    type="date" 
+                    value={form.startDate} 
+                    onChange={e => {
+                      const newStart = e.target.value;
+                      const newEnd = form.endDate && form.endDate < newStart ? newStart : form.endDate;
+                      setForm({...form, startDate: newStart, endDate: newEnd});
+                    }} 
+                  />
                 </div>
                 <div className="space-y-1">
                   <label htmlFor="end-date" className="text-xs font-medium">End Date</label>
-                  <Input id="end-date" type="date" value={form.endDate} onChange={e => setForm({...form, endDate: e.target.value})} />
+                  <Input 
+                    id="end-date" 
+                    type="date" 
+                    value={form.endDate} 
+                    onChange={e => setForm({...form, endDate: e.target.value})} 
+                    min={form.startDate}
+                  />
                 </div>
              </div>
              <Select value={form.leaveType} onValueChange={v => setForm({...form, leaveType: v})}>

@@ -97,6 +97,11 @@ export function StudentTable({
                       <p className="font-medium text-sm truncate">
                         {student.name}
                       </p>
+                      {student.username && (
+                        <p className="text-[11px] text-zinc-500 font-mono">
+                          ID: {student.username}
+                        </p>
+                      )}
                     </div>
                   </div>
                 </TableCell>

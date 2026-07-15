@@ -40,6 +40,7 @@ const ITEMS_PER_PAGE = 15;
 const emptyFormData: StudentFormData = {
   name: "",
   email: "",
+  username: "",
   password: "",
   phone: "",
   rollNumber: "",
@@ -54,6 +55,8 @@ const emptyFormData: StudentFormData = {
 type State = {
   search: string;
   classFilter: string;
+  statusFilter: string;
+  genderFilter: string;
   currentPage: number;
   itemsPerPage: number;
   dialogOpen: boolean;
@@ -68,6 +71,8 @@ type State = {
 type Action =
   | { type: 'SET_SEARCH'; payload: string }
   | { type: 'SET_CLASS_FILTER'; payload: string }
+  | { type: 'SET_STATUS_FILTER'; payload: string }
+  | { type: 'SET_GENDER_FILTER'; payload: string }
   | { type: 'SET_CURRENT_PAGE'; payload: number }
   | { type: 'SET_ITEMS_PER_PAGE'; payload: number }
   | { type: 'OPEN_CREATE' }
@@ -81,6 +86,8 @@ type Action =
 const initialState: State = {
   search: "",
   classFilter: "all",
+  statusFilter: "active",
+  genderFilter: "all",
   currentPage: 1,
   itemsPerPage: 15,
   dialogOpen: false,
@@ -98,6 +105,10 @@ function reducer(state: State, action: Action): State {
       return { ...state, search: action.payload, currentPage: 1 };
     case 'SET_CLASS_FILTER':
       return { ...state, classFilter: action.payload, currentPage: 1 };
+    case 'SET_STATUS_FILTER':
+      return { ...state, statusFilter: action.payload, currentPage: 1 };
+    case 'SET_GENDER_FILTER':
+      return { ...state, genderFilter: action.payload, currentPage: 1 };
     case 'SET_CURRENT_PAGE':
       return { ...state, currentPage: action.payload };
     case 'SET_ITEMS_PER_PAGE':
@@ -146,6 +157,8 @@ function AdminStudentsContent() {
   const {
     search,
     classFilter,
+    statusFilter,
+    genderFilter,
     currentPage,
     itemsPerPage,
     dialogOpen,
@@ -166,6 +179,8 @@ function AdminStudentsContent() {
     currentTenantId || undefined,
     classFilter === "all" ? undefined : classFilter,
     debouncedSearch || undefined,
+    statusFilter,
+    genderFilter,
     currentPage,
     itemsPerPage,
   );
@@ -202,6 +217,19 @@ function AdminStudentsContent() {
 
   const handleSubmit = async () => {
     const isCreate = dialogMode === "create";
+
+    // Required fields validation
+    if (!formData.name || !formData.email || !formData.rollNumber || !formData.classId) {
+      toast.error("Name, Email, Roll Number, and Class are required");
+      return;
+    }
+
+    // Email format validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(formData.email)) {
+      toast.error("Please enter a valid email address");
+      return;
+    }
 
     // OPTIMISTIC UPDATE: Update the UI instantly if editing
     if (!isCreate && editingStudent) {
@@ -241,12 +269,16 @@ function AdminStudentsContent() {
             throw new Error(errData.error || `Failed to ${dialogMode} student`);
           }
 
+          const resData = await res.json().catch(() => ({}));
           dispatch({ type: 'CLOSE_DIALOG' });
           // Refresh from server to ensure total accuracy
           queryClient.invalidateQueries({ queryKey: queryKeys.students });
           queryClient.invalidateQueries({
             queryKey: ["admin-dashboard", currentTenantId],
           });
+          if (isCreate && resData.username) {
+            return `Student registered! School ID: ${resData.username}`;
+          }
           return isCreate
             ? "Student registered successfully"
             : "Student details updated";
@@ -310,9 +342,35 @@ function AdminStudentsContent() {
             value={classFilter}
             onValueChange={(v) => dispatch({ type: 'SET_CLASS_FILTER', payload: v })}
             showAllOption
-            className="w-full sm:w-48 h-9 sm:h-10"
+            className="w-full sm:w-44 h-9 sm:h-10"
             placeholder="Filter by class"
           />
+          <Select
+            value={genderFilter}
+            onValueChange={(v) => dispatch({ type: 'SET_GENDER_FILTER', payload: v })}
+          >
+            <SelectTrigger className="w-full sm:w-36 h-9 sm:h-10">
+              <SelectValue placeholder="All Genders" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Genders</SelectItem>
+              <SelectItem value="male">Male</SelectItem>
+              <SelectItem value="female">Female</SelectItem>
+            </SelectContent>
+          </Select>
+          <Select
+            value={statusFilter}
+            onValueChange={(v) => dispatch({ type: 'SET_STATUS_FILTER', payload: v })}
+          >
+            <SelectTrigger className="w-full sm:w-36 h-9 sm:h-10">
+              <SelectValue placeholder="All Statuses" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Statuses</SelectItem>
+              <SelectItem value="active">Active</SelectItem>
+              <SelectItem value="inactive">Inactive</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
 
         {(canCreate || canEdit || canDelete) && (

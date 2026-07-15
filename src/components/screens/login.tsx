@@ -30,7 +30,7 @@ import {
   Phone,
 } from "lucide-react";
 import { toast } from "sonner";
-import { loginWithElysia } from "@/lib/api";
+import { loginWithElysia, setRefreshToken } from "@/lib/api";
 
 function ThemeToggleLogin() {
   const { theme, setTheme } = useTheme();
@@ -101,6 +101,9 @@ export function LoginScreen() {
         if (token) {
           localStorage.setItem("school_token", token);
           setCookie("school_token", token, SESSION_EXPIRY_DAYS);
+        }
+        if (data.refreshToken) {
+          setRefreshToken(data.refreshToken);
         }
 
         login({

@@ -48,7 +48,7 @@ export function EditParentDialog({
             />
           </div>
           <div>
-            <Label>Email <span className="text-red-500">*</span></Label>
+            <Label>Email <span className="text-xs text-muted-foreground">(Optional)</span></Label>
             <Input
               type="email"
               value={editForm.email}
@@ -60,7 +60,7 @@ export function EditParentDialog({
             />
           </div>
           <div>
-            <Label>Phone</Label>
+            <Label>Phone <span className="text-red-500">*</span></Label>
             <Input
               value={editForm.phone}
               onChange={(e) =>

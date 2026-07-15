@@ -5,7 +5,7 @@ import {
   isValidScreen, CACHE_TTL
 } from './utils';
 import { getCookie } from '@/lib/cookies';
-import { API_BASE } from '@/lib/api';
+import { API_BASE, logoutWithElysia } from '@/lib/api';
 import { env } from '@/lib/env';
 
 function getInitialUser(): { isLoggedIn: boolean; currentUser: AppUser | null } {
@@ -111,6 +111,9 @@ export const useAppStore = create<AppState>((set, get) => ({
   },
 
   logout: () => {
+    // Fire-and-forget server-side token revocation
+    logoutWithElysia().catch(() => {});
+
     if (typeof window !== 'undefined') {
       try {
         localStorage.clear(); // COMPLETE wipe of all local data

@@ -23,7 +23,9 @@ import {
   Clock,
   Sparkles,
   HeartHandshake,
-  Users
+  Users,
+  Key,
+  School
 } from "lucide-react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { apiFetch } from "@/lib/api";
@@ -116,10 +118,9 @@ export function StudentDetailDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-lg p-0 overflow-hidden border-none bg-card shadow-2xl rounded-2xl max-h-[90vh] flex flex-col">
         {/* Profile Card Header Info */}
-        <div className="px-6 pt-6 pb-5 border-b flex-shrink-0 relative">
-          {/* Subtle Sparkles Section Title */}
+        <div className="px-6 pt-6 pb-5 border-b shrink-0 relative">
+          {/* Section Title */}
           <div className="flex items-center gap-1.5 text-xs text-emerald-600 dark:text-emerald-400 font-semibold uppercase tracking-wider mb-4 pr-8">
-            <Sparkles className="size-3.5 animate-pulse text-emerald-500" />
             Student Profile
           </div>
 
@@ -137,12 +138,6 @@ export function StudentDetailDialog({
                 Student details and profile.
               </DialogDescription>
               <div className="flex flex-wrap items-center justify-start gap-2">
-                <Badge variant="secondary" className="bg-emerald-100 hover:bg-emerald-100 dark:bg-emerald-900/30 text-emerald-800 dark:text-emerald-400 font-medium">
-                  {currentStudent.className || "Unassigned Class"}
-                </Badge>
-                <Badge variant="outline" className="font-mono text-xs bg-secondary/30">
-                  Roll: {currentStudent.rollNumber}
-                </Badge>
                 <Badge className="bg-emerald-600 text-white font-normal hover:bg-emerald-600">
                   Active
                 </Badge>
@@ -202,6 +197,55 @@ export function StudentDetailDialog({
                       Enrolled
                     </p>
                   </div>
+                </div>
+              </div>
+
+              {/* Grid 2: Academic Credentials */}
+              <div>
+                <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3 flex items-center gap-1.5">
+                  <School className="size-3.5 text-emerald-600" />
+                  Academic Credentials
+                </h3>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="bg-secondary/20 p-3 rounded-xl border border-secondary/30">
+                    <p className="text-[10px] text-muted-foreground font-medium uppercase">Class & Section</p>
+                    <p className="text-sm font-semibold mt-0.5 text-foreground flex items-center gap-1.5">
+                      <GraduationCap className="size-3.5 text-emerald-600" />
+                      {currentStudent.className || "Unassigned Class"}
+                    </p>
+                  </div>
+                  {currentStudent.rollNumber && (
+                    <div className="bg-secondary/20 p-3 rounded-xl border border-secondary/30">
+                      <p className="text-[10px] text-muted-foreground font-medium uppercase">Roll Number</p>
+                      <p className="text-sm font-semibold mt-0.5 text-foreground flex items-center gap-1.5">
+                        <Users className="size-3.5 text-emerald-600" />
+                        {currentStudent.rollNumber}
+                      </p>
+                    </div>
+                  )}
+                  {currentStudent.username && (
+                    <div className="bg-secondary/20 p-3 rounded-xl border border-secondary/30 flex items-center justify-between col-span-1 sm:col-span-2">
+                      <div className="min-w-0 flex-1">
+                        <p className="text-[10px] text-muted-foreground font-medium uppercase">Student ID (Login ID)</p>
+                        <p className="text-sm font-semibold mt-0.5 text-foreground flex items-center gap-1.5">
+                          <Key className="size-3.5 text-emerald-600" />
+                          {currentStudent.username}
+                        </p>
+                      </div>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="size-8 text-muted-foreground hover:text-emerald-600 shrink-0 ml-2"
+                        onClick={() => handleCopy(currentStudent.username, 'username')}
+                      >
+                        {copiedField === 'username' ? (
+                          <Check className="size-3.5 text-emerald-600" />
+                        ) : (
+                          <Copy className="size-3.5" />
+                        )}
+                      </Button>
+                    </div>
+                  )}
                 </div>
               </div>
 
@@ -393,7 +437,7 @@ export function StudentDetailDialog({
         </div>
 
         {/* Footer */}
-        <div className="p-4 bg-secondary/20 border-t flex justify-end flex-shrink-0">
+        <div className="p-4 bg-secondary/20 border-t flex justify-end shrink-0">
           <Button
             className="bg-emerald-600 hover:bg-emerald-700 text-white font-medium shadow-md shadow-emerald-600/10"
             onClick={() => onOpenChange(false)}

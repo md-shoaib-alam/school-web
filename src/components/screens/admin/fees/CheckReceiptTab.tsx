@@ -30,6 +30,7 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { Calendar } from '@/components/ui/calendar';
 import { useReactToPrint } from 'react-to-print';
 import { AdminReceiptTemplate } from './AdminReceiptTemplate';
+import { useAppStore } from '@/store/app-store/store';
 
 interface CheckReceiptTabProps {
   canEdit: boolean;
@@ -98,6 +99,18 @@ function reducer(state: State, action: Action): State {
 
 export function CheckReceiptTab({ canEdit, canDelete }: CheckReceiptTabProps) {
   const queryClient = useQueryClient();
+  const currentTenantLogo = useAppStore(store => store.currentTenantLogo);
+  const currentTenantName = useAppStore(store => store.currentTenantName);
+
+  // Fetch tenant settings for address and contact details
+  const { data: tenantSettings } = useQuery<any>({
+    queryKey: ['tenant-settings-receipt'],
+    queryFn: async () => {
+      const res = await apiFetch('/api/tenant-settings');
+      if (!res.ok) return null;
+      return res.json();
+    }
+  });
   
   // State
   const [state, dispatch] = useReducer(reducer, initialState);
@@ -129,6 +142,7 @@ export function CheckReceiptTab({ canEdit, canDelete }: CheckReceiptTabProps) {
 
   const { data, isLoading: loadingReceipts } = useFeeReceipts({
     studentId: studentFilter,
+    classId: classFilter,
     search: debouncedSearch,
     fromDate,
     toDate,
@@ -260,6 +274,7 @@ export function CheckReceiptTab({ canEdit, canDelete }: CheckReceiptTabProps) {
                   dispatch({ type: 'SET_FROM_DATE', payload: date ? format(date, "yyyy-MM-dd") : '' });
                   setIsFromCalendarOpen(false);
                 }}
+                disabled={(date) => toDate ? date > new Date(toDate) : false}
                 initialFocus
               />
             </PopoverContent>
@@ -279,6 +294,7 @@ export function CheckReceiptTab({ canEdit, canDelete }: CheckReceiptTabProps) {
                   dispatch({ type: 'SET_TO_DATE', payload: date ? format(date, "yyyy-MM-dd") : '' });
                   setIsToCalendarOpen(false);
                 }}
+                disabled={(date) => fromDate ? date < new Date(fromDate) : false}
                 initialFocus
               />
             </PopoverContent>
@@ -467,9 +483,13 @@ export function CheckReceiptTab({ canEdit, canDelete }: CheckReceiptTabProps) {
           <AdminReceiptTemplate 
             ref={printRef}
             receipt={viewReceipt}
-            parentName={studentFullDetails?.parentName}
-            className={studentFullDetails?.className}
+            parentName={(viewReceipt as any).parentName || studentFullDetails?.parentName}
+            className={(viewReceipt as any).className || studentFullDetails?.className}
             remainingAmount={remainingAmount}
+            schoolLogo={currentTenantLogo || undefined}
+            schoolName={currentTenantName || undefined}
+            schoolAddress={tenantSettings?.address || undefined}
+            schoolContact={tenantSettings?.phone || undefined}
           />
         )}
       </div>

@@ -10,6 +10,7 @@ interface AdminReceiptTemplateProps {
   schoolName?: string;
   schoolAddress?: string;
   schoolContact?: string;
+  schoolLogo?: string;
 }
 
 // Convert amount to words helper
@@ -42,7 +43,7 @@ function numberToWords(num: number): string {
 }
 
 export const AdminReceiptTemplate = React.forwardRef<HTMLDivElement, AdminReceiptTemplateProps>(
-  ({ receipt, parentName = "", className = "", remainingAmount = 0, schoolName = "DEMO ACADEMY", schoolAddress = "123 Education Lane, Knowledge City, State 456789", schoolContact = "+91 98765 43210" }, ref) => {
+  ({ receipt, parentName = "", className = "", remainingAmount = 0, schoolName = "DEMO ACADEMY", schoolAddress = "123 Education Lane, Knowledge City, State 456789", schoolContact = "+91 98765 43210", schoolLogo }, ref) => {
     const today = new Date().toLocaleDateString('en-IN', {
       day: '2-digit',
       month: 'short',
@@ -57,8 +58,12 @@ export const AdminReceiptTemplate = React.forwardRef<HTMLDivElement, AdminReceip
         <div className="border border-black">
           {/* Header Panel */}
           <div className="flex items-center border-b border-black p-3">
-            <div className="w-16 h-16 border border-zinc-300 flex items-center justify-center bg-zinc-50 shrink-0 mr-4">
-              <GraduationCap size={40} className="text-black" />
+            <div className="w-16 h-16 border border-zinc-300 flex items-center justify-center bg-zinc-50 shrink-0 mr-4 overflow-hidden">
+              {schoolLogo ? (
+                <img src={schoolLogo} alt="School Logo" className="w-full h-full object-contain" />
+              ) : (
+                <GraduationCap size={40} className="text-black" />
+              )}
             </div>
             <div className="flex-1 text-center pr-12">
               <h1 className="text-base font-bold uppercase tracking-wide">{schoolName}</h1>
