@@ -88,10 +88,10 @@ export function useTeachers(tenantId?: string, search?: string, page?: number, l
   })
 }
 
-export function useStudents(tenantId?: string, classId?: string, search?: string, page?: number, limit?: number) {
+export function useStudents(tenantId?: string, classId?: string, search?: string, status?: string, gender?: string, page?: number, limit?: number) {
   return useQuery<StudentsResponse>({
-    queryKey: [...queryKeys.students, tenantId, classId, search, page, limit],
-    queryFn: () => graphqlQuery<{ students: StudentsResponse }>(STUDENTS, { tenantId, classId, search, page, limit }).then(d => d.students),
+    queryKey: [...queryKeys.students, tenantId, classId, search, status, gender, page, limit],
+    queryFn: () => graphqlQuery<{ students: StudentsResponse }>(STUDENTS, { tenantId, classId, search, status, gender, page, limit }).then(d => d.students),
     staleTime: 0,
     gcTime: 5 * 60 * 1000,
     enabled: !!tenantId,
