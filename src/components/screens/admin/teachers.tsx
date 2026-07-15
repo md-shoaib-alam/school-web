@@ -33,6 +33,38 @@ const emptyFormData = {
   password: "",
 };
 
+function validateTeacherForm(formData: typeof emptyFormData): boolean {
+  if (!formData.name || !formData.email) {
+    toast.error("Name and Email are required");
+    return false;
+  }
+
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRegex.test(formData.email)) {
+    toast.error("Please enter a valid email address");
+    return false;
+  }
+
+  return true;
+}
+
+function updateTeacherOptimistic(
+  queryClient: any,
+  queryKey: any[],
+  editingTeacher: TeacherInfo,
+  formData: typeof emptyFormData
+) {
+  const updatedTeacher = { ...editingTeacher, ...formData };
+  queryClient.setQueryData(queryKey, (old: any) => {
+    if (!old || !old.teachers) return old;
+    return {
+      ...old,
+      teachers: old.teachers.map((t: any) => t.id === editingTeacher.id ? updatedTeacher : t)
+    };
+  });
+}
+
+
 type State = {
   search: string;
   currentPage: number;
@@ -156,15 +188,33 @@ export function AdminTeachers() {
     });
   };
 
-  const handleSubmit = async () => {
-    if (!formData.name || !formData.email) {
-      toast.error("Name and Email are required");
-      return;
-    }
+  const submitTeacherRequest = async (isEdit: boolean, queryKey: any[]) => {
+    dispatch({ type: "SET_SUBMITTING", payload: true });
+    try {
+      const url = "/api/teachers";
+      const method = isEdit ? "PUT" : "POST";
+      const res = await apiFetch(url, {
+        method,
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(isEdit ? { id: editingTeacher?.id, ...formData } : formData),
+      });
 
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(formData.email)) {
-      toast.error("Please enter a valid email address");
+      if (!res.ok) {
+        const errData = await res.json().catch(() => ({}));
+        throw new Error(errData.error || `Failed to ${isEdit ? "update" : "add"} teacher`);
+      }
+
+      dispatch({ type: "CLOSE_DIALOG" });
+      queryClient.invalidateQueries({ queryKey: queryKeys.teachers });
+      queryClient.invalidateQueries({ queryKey: ['admin-dashboard', currentTenantId] });
+      return isEdit ? "Teacher updated" : "Teacher added";
+    } finally {
+      dispatch({ type: "SET_SUBMITTING", payload: false });
+    }
+  };
+
+  const handleSubmit = async () => {
+    if (!validateTeacherForm(formData)) {
       return;
     }
 
@@ -172,41 +222,11 @@ export function AdminTeachers() {
     const queryKey = [queryKeys.teachers, currentTenantId, debouncedSearch, currentPage, 12];
 
     if (isEdit && editingTeacher) {
-      const updatedTeacher = { ...editingTeacher, ...formData };
-      queryClient.setQueryData(queryKey, (old: any) => {
-        if (!old || !old.teachers) return old;
-        return {
-          ...old,
-          teachers: old.teachers.map((t: any) => t.id === editingTeacher.id ? updatedTeacher : t)
-        };
-      });
+      updateTeacherOptimistic(queryClient, queryKey, editingTeacher, formData);
     }
 
     toast.promise(
-      (async () => {
-        dispatch({ type: "SET_SUBMITTING", payload: true });
-        try {
-          const url = "/api/teachers";
-          const method = isEdit ? "PUT" : "POST";
-          const res = await apiFetch(url, {
-            method,
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(isEdit ? { id: editingTeacher.id, ...formData } : formData),
-          });
-
-          if (!res.ok) {
-            const errData = await res.json().catch(() => ({}));
-            throw new Error(errData.error || `Failed to ${isEdit ? "update" : "add"} teacher`);
-          }
-
-          dispatch({ type: "CLOSE_DIALOG" });
-          queryClient.invalidateQueries({ queryKey: queryKeys.teachers });
-          queryClient.invalidateQueries({ queryKey: ['admin-dashboard', currentTenantId] });
-          return isEdit ? "Teacher updated" : "Teacher added";
-        } finally {
-          dispatch({ type: "SET_SUBMITTING", payload: false });
-        }
-      })(),
+      submitTeacherRequest(isEdit, queryKey),
       {
         loading: `${editingTeacher ? "Updating" : "Adding"} teacher...`,
         success: (msg) => msg,
@@ -215,47 +235,52 @@ export function AdminTeachers() {
     );
   };
 
+  const deleteTeacherFromCache = (queryKey: any[], id: string) => {
+    queryClient.setQueryData(queryKey, (old: any) => {
+      if (!old || !old.teachers) return old;
+      return {
+        ...old,
+        teachers: old.teachers.filter((t: any) => t.id !== id),
+        total: Math.max(0, old.total - 1)
+      };
+    });
+  };
+
+  const deleteTeacherRequest = async (id: string, previousTeachers: any, queryKey: any[]) => {
+    try {
+      const res = await apiFetch(`/api/teachers?id=${id}`, { method: "DELETE" });
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.error || "Deletion failed");
+      }
+      queryClient.invalidateQueries({ queryKey: queryKeys.teachers });
+      queryClient.invalidateQueries({ queryKey: ['admin-dashboard', currentTenantId] });
+      dispatch({ type: "SET_DELETING_ID", payload: null });
+      throw new Error("Teacher record removed");
+    } catch (err) {
+      queryClient.setQueryData(queryKey, previousTeachers);
+      throw err;
+    }
+  };
+
+  const executeDeletion = async (id: string) => {
+    const queryKey = [queryKeys.teachers, currentTenantId, debouncedSearch, currentPage, 12];
+    const previousTeachers = queryClient.getQueryData(queryKey);
+    
+    deleteTeacherFromCache(queryKey, id);
+
+    toast.promise(
+      deleteTeacherRequest(id, previousTeachers, queryKey),
+      {
+        loading: "Removing teacher record...",
+        success: () => "",
+        error: (err: any) => err.message,
+      },
+    );
+  };
+
   const handleDelete = async (id: string) => {
     const element = document.getElementById(`teacher-item-${id}`);
-    
-    const executeDeletion = async () => {
-      const queryKey = [queryKeys.teachers, currentTenantId, debouncedSearch, currentPage, 12];
-      const previousTeachers = queryClient.getQueryData(queryKey);
-      
-      queryClient.setQueryData(queryKey, (old: any) => {
-        if (!old || !old.teachers) return old;
-        return {
-          ...old,
-          teachers: old.teachers.filter((t: any) => t.id !== id),
-          total: Math.max(0, old.total - 1)
-        };
-      });
-
-      toast.promise(
-        (async () => {
-          try {
-            const res = await apiFetch(`/api/teachers?id=${id}`, { method: "DELETE" });
-            if (!res.ok) {
-              const err = await res.json().catch(() => ({}));
-              throw new Error(err.error || "Deletion failed");
-            }
-            queryClient.invalidateQueries({ queryKey: queryKeys.teachers });
-            queryClient.invalidateQueries({ queryKey: ['admin-dashboard', currentTenantId] });
-            dispatch({ type: "SET_DELETING_ID", payload: null });
-            throw new Error("Teacher record removed");
-          } catch (err) {
-            queryClient.setQueryData(queryKey, previousTeachers);
-            throw err;
-          }
-        })(),
-        {
-          loading: "Removing teacher record...",
-          success: () => "",
-          error: (err: any) => err.message,
-        },
-      );
-    };
-
     if (element) {
       element.style.cssText += '; pointer-events: none; position: relative; z-index: 10;';
       anime({
@@ -266,10 +291,10 @@ export function AdminTeachers() {
         opacity: [1, 0],
         duration: 350,
         easing: 'easeInBack',
-        complete: () => executeDeletion()
+        complete: () => executeDeletion(id)
       });
     } else {
-      executeDeletion();
+      executeDeletion(id);
     }
   };
 

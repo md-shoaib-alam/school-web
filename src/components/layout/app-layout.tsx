@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import { useParams, usePathname, useRouter } from "next/navigation";
 import { useAppStore } from "@/store/use-app-store";
 import { cn } from "@/lib/utils";
@@ -24,6 +24,221 @@ function LoadingProgress() {
 
 import { FullPageSkeleton } from "@/components/ui/full-page-skeleton";
 
+const PLATFORM_ROUTES = new Set([
+  "dashboard",
+  "tenants",
+  "deleted-tenants",
+  "bulk-attendance-import",
+  "billing",
+  "users",
+  "audit-logs",
+  "platform-analytics",
+  "feature-flags",
+  "roadmap",
+  "roles",
+  "staff",
+  "manage-admins",
+  "subscriptions",
+  "settings",
+  "school-subscriptions",
+  "platform-notices",
+  "send-notification",
+  "profile",
+  "reports",
+  "queue-status",
+]);
+
+function isPlatformRoute(screen: string): boolean {
+  return PLATFORM_ROUTES.has(screen);
+}
+
+function isTenantRootPath(p: string, currentUser: any, currentTenantSlug: string | null): boolean {
+  return p === currentUser?.tenantId ||
+         p === currentTenantSlug ||
+         p === currentUser?.tenantSlug;
+}
+
+function resolveScreenFromPathname(
+  pathname: string,
+  currentUser: any,
+  currentTenantSlug: string | null
+): string {
+  const parts = pathname.split("/").filter(Boolean);
+  if (parts.length >= 2) return parts[1];
+  if (parts.length === 1) {
+    return isTenantRootPath(parts[0], currentUser, currentTenantSlug) ? "dashboard" : parts[0];
+  }
+  return "dashboard";
+}
+
+function shouldIncludeItem(
+  item: any,
+  currentUser: any,
+  isRoot: boolean,
+  hasPermissions: boolean
+): boolean {
+  if (item.key === "dashboard") return true;
+  if (item.rootOnly) return isRoot;
+  if (!item.permModule) return true;
+  return hasPermissions ? hasPermission(currentUser, item.permModule, "view") : true;
+}
+
+function getFilteredNavItems(
+  currentUser: any,
+  isRoot: boolean,
+  hasPermissions: boolean
+) {
+  if (!currentUser) return [];
+  const allItems = navItems[currentUser.role] || [];
+  return allItems.filter((item) => shouldIncludeItem(item, currentUser, isRoot, hasPermissions));
+}
+
+function isStatusExpired(status: string | undefined): boolean {
+  if (!status) return false;
+  return status !== "active" && status !== "trial";
+}
+
+function isDateExpired(endDate: string | Date | undefined): boolean {
+  if (!endDate) return false;
+  return new Date(endDate) < new Date();
+}
+
+function checkSubscriptionExpired(resolvedTenant: any, isSuperAdmin: boolean): boolean {
+  if (!resolvedTenant || isSuperAdmin) return false;
+  return isStatusExpired(resolvedTenant.status) || isDateExpired(resolvedTenant.endDate);
+}
+
+function getStaffPref(val: string | null): string {
+  return val === "enabled" ? "comprehensive" : "minimal";
+}
+
+function resolveLayoutPref(val: string | null, isStaff: boolean): string | null {
+  if (!val) return null;
+  return isStaff ? getStaffPref(val) : val;
+}
+
+function useLayoutPreference(currentUser: any) {
+  const [layoutPref, setLayoutPref] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (typeof window === "undefined" || !currentUser) return;
+    const isStaff = currentUser.role === "staff";
+
+    const initializePref = () => {
+      const key = isStaff 
+        ? "schoolsaas_staff_sidebar_preference" 
+        : "schoolsaas_dashboard_layout_preference";
+      const pref = localStorage.getItem(key);
+      setLayoutPref(resolveLayoutPref(pref, isStaff));
+    };
+
+    initializePref();
+
+    const handlePrefChange = (e: any) => {
+      if (e.detail) {
+        setLayoutPref(resolveLayoutPref(e.detail, isStaff));
+      }
+    };
+
+    window.addEventListener("schoolsaas_dashboard_layout_pref_changed", handlePrefChange);
+    window.addEventListener("schoolsaas_staff_sidebar_pref_changed", handlePrefChange);
+    return () => {
+      window.removeEventListener("schoolsaas_dashboard_layout_pref_changed", handlePrefChange);
+      window.removeEventListener("schoolsaas_staff_sidebar_pref_changed", handlePrefChange);
+    };
+  }, [currentUser?.role, currentUser?.id]);
+
+  return layoutPref;
+}
+
+function useTenantSync(
+  resolvedTenant: any,
+  currentTenantSlug: string | null,
+  currentTenantId: string | null,
+  setCurrentTenant: any
+) {
+  useEffect(() => {
+    if (!resolvedTenant) return;
+    const hasTenantChanged =
+      resolvedTenant.slug !== currentTenantSlug ||
+      resolvedTenant.id !== currentTenantId;
+    if (hasTenantChanged) {
+      setCurrentTenant(
+        resolvedTenant.id,
+        resolvedTenant.name,
+        resolvedTenant.slug,
+        resolvedTenant.logo
+      );
+    }
+  }, [resolvedTenant, currentTenantSlug, currentTenantId, setCurrentTenant]);
+}
+
+function useCookieAuthGuard(currentUser: any) {
+  useEffect(() => {
+    if (!currentUser) return;
+    const checkAuth = () => {
+      const token = getCookie("school_token");
+      if (!token) {
+        window.location.href = "/";
+      }
+    };
+
+    checkAuth();
+    const interval = setInterval(checkAuth, 5000);
+    return () => clearInterval(interval);
+  }, [currentUser?.id]);
+}
+
+function useAppNavigation(opts: {
+  isSuperAdmin: boolean;
+  currentTenantSlug: string | null;
+  currentTenantId: string | null;
+  push: any;
+  setCurrentScreen: any;
+  setSidebarOpen: any;
+}) {
+  const {
+    isSuperAdmin,
+    currentTenantSlug,
+    currentTenantId,
+    push,
+    setCurrentScreen,
+    setSidebarOpen,
+  } = opts;
+
+  const navigateTo = useCallback((screen: string) => {
+    if (typeof window !== 'undefined' && window.innerWidth < 1024) {
+      setSidebarOpen(false);
+    }
+    
+    setCurrentScreen(screen);
+    const tenantIdentifier = currentTenantSlug || currentTenantId;
+
+    if (isSuperAdmin && isPlatformRoute(screen)) {
+      push(`/${screen}`);
+      return;
+    }
+
+    if (!tenantIdentifier) {
+      push(`/${screen}`);
+    } else {
+      push(`/${tenantIdentifier}/${screen}`);
+    }
+  }, [currentTenantId, currentTenantSlug, isSuperAdmin, push, setCurrentScreen, setSidebarOpen]);
+
+  useEffect(() => {
+    const handleNavigationEvent = (e: any) => {
+      if (e.detail) {
+        navigateTo(e.detail);
+      }
+    };
+    window.addEventListener("super-admin-navigate", handleNavigationEvent);
+    return () => window.removeEventListener("super-admin-navigate", handleNavigationEvent);
+  }, [navigateTo]);
+
+  return navigateTo;
+}
+
 export function AppLayout({ children }: { children: React.ReactNode }) {
   const { slug } = useParams();
   const {
@@ -42,60 +257,18 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const { push } = useRouter();
   const [isChangePasswordOpen, setIsChangePasswordOpen] = useState(false);
-  const [layoutPref, setLayoutPref] = useState<string | null>(null);
   const [isMounted, setIsMounted] = useState(false);
 
   // Sync tenant context from slug
   const { data: resolvedTenant } = useTenantResolution(slug as string);
 
+  const layoutPref = useLayoutPreference(currentUser);
+  useTenantSync(resolvedTenant, currentTenantSlug, currentTenantId, setCurrentTenant);
+  useCookieAuthGuard(currentUser);
+
   useEffect(() => {
     setIsMounted(true);
-    
-    const initializePref = () => {
-      if (typeof window === "undefined" || !currentUser) return;
-      
-      const isStaff = currentUser.role === "staff";
-      if (isStaff) {
-        const pref = localStorage.getItem("schoolsaas_staff_sidebar_preference");
-        setLayoutPref(pref === "enabled" ? "comprehensive" : "minimal");
-      } else {
-        const pref = localStorage.getItem("schoolsaas_dashboard_layout_preference");
-        if (pref) setLayoutPref(pref);
-      }
-    };
-
-    initializePref();
-
-    const handlePrefChange = (e: any) => {
-      if (e.detail) {
-        const isStaff = currentUser?.role === "staff";
-        if (isStaff) {
-           setLayoutPref(e.detail === "enabled" ? "comprehensive" : "minimal");
-        } else {
-           setLayoutPref(e.detail);
-        }
-      }
-    };
-
-    window.addEventListener("schoolsaas_dashboard_layout_pref_changed", handlePrefChange);
-    window.addEventListener("schoolsaas_staff_sidebar_pref_changed", handlePrefChange);
-    return () => {
-      window.removeEventListener("schoolsaas_dashboard_layout_pref_changed", handlePrefChange);
-      window.removeEventListener("schoolsaas_staff_sidebar_pref_changed", handlePrefChange);
-    };
-  }, [currentUser?.role, currentUser?.id]);
-
-  useEffect(() => {
-    if (resolvedTenant && (resolvedTenant.slug !== currentTenantSlug || resolvedTenant.id !== currentTenantId)) {
-      setCurrentTenant(
-        resolvedTenant.id,
-        resolvedTenant.name,
-        resolvedTenant.slug,
-        resolvedTenant.logo
-      );
-
-    }
-  }, [resolvedTenant, currentTenantSlug, currentTenantId, setCurrentTenant]);
+  }, []);
 
   // Refresh permissions from DB on mount
   useEffect(() => {
@@ -103,41 +276,16 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
   }, [refreshPermissions]);
 
   // Determine current screen from pathname
-  const parts = pathname.split("/").filter(Boolean);
-  let resolvedScreen = "dashboard";
-  if (parts.length >= 2) {
-    resolvedScreen = parts[1];
-  } else if (parts.length === 1) {
-    const p = parts[0];
-    const isTenantRoot =
-      p === currentUser?.tenantId ||
-      p === currentTenantSlug ||
-      p === currentUser?.tenantSlug;
-    resolvedScreen = isTenantRoot ? "dashboard" : p;
-  }
+  const resolvedScreen = useMemo(() => {
+    return resolveScreenFromPathname(pathname, currentUser, currentTenantSlug);
+  }, [pathname, currentUser, currentTenantSlug]);
 
   // Sync store screen with URL resolved screen to prevent navigation locks
-  // This ensures that currentScreen always matches what's in the address bar
   useEffect(() => {
     if (resolvedScreen && resolvedScreen !== currentScreen) {
       setCurrentScreen(resolvedScreen);
     }
   }, [resolvedScreen, currentScreen, setCurrentScreen]);
-
-  // Cookie guard: Redirect to login if cookie is missing while logged in
-  useEffect(() => {
-    const checkAuth = () => {
-      const token = getCookie("school_token");
-      if (!token && currentUser) {
-        window.location.href = "/";
-      }
-    };
-
-    // Check once on mount and then every few seconds
-    checkAuth();
-    const interval = setInterval(checkAuth, 5000);
-    return () => clearInterval(interval);
-  }, [currentUser?.id]);
 
   const isSuperAdmin = currentUser?.role === "super_admin";
   const isRoot = currentUser ? isRootAdmin(currentUser) : false;
@@ -147,95 +295,30 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
   const hasPlatformPermissions = isSuperAdmin && !!currentUser?.platformRole;
 
   // Filter nav items based on permissions
-  const allItems = currentUser ? navItems[currentUser.role] : [];
-  const items = allItems.filter((item) => {
-    if (item.key === "dashboard") return true;
-    if (item.rootOnly && !isRoot) return false;
-    if (hasPlatformPermissions && item.permModule) {
-      return hasPermission(currentUser, item.permModule, "view");
-    }
-    if (hasCustomPermissions && item.permModule) {
-      return hasPermission(currentUser, item.permModule, "view");
-    }
-    return true;
-  });
+  const items = useMemo(() => {
+    const hasPermissions = hasPlatformPermissions || hasCustomPermissions;
+    return getFilteredNavItems(currentUser, isRoot, hasPermissions);
+  }, [currentUser, isRoot, hasPlatformPermissions, hasCustomPermissions]);
 
   // --- SUBSCRIPTION CHECK LOGIC ---
-  let isExpired = false;
-  if (resolvedTenant && !isSuperAdmin) {
-    const { endDate, status } = resolvedTenant as any;
-    // Fix: Accept both "active" AND "trial" as valid operational states
-    const isInactive = status && status !== "active" && status !== "trial";
-    const isPastDate = endDate && new Date(endDate) < new Date();
-    if (isInactive || isPastDate) {
-      isExpired = true;
-    }
-  }
+  const isExpired = useMemo(() => {
+    return checkSubscriptionExpired(resolvedTenant, isSuperAdmin);
+  }, [resolvedTenant, isSuperAdmin]);
 
   // Whitelist screen so admin can actually pay while expired!
   const isExemptFromLock = 
     resolvedScreen === "school-subscription" || 
     resolvedScreen === "manage-plan" || 
     isSuperAdmin;
-  // --------------------------------
 
-  const navigateTo = useCallback((screen: string) => {
-    if (typeof window !== 'undefined' && window.innerWidth < 1024) {
-      setSidebarOpen(false);
-    }
-    
-    setCurrentScreen(screen);
-    const tenantIdentifier = currentTenantSlug || currentTenantId;
-
-    // For Super Admins, platform routes should always be at the top level (e.g. /users, /feature-flags)
-    // We only use the prefix if they are explicitly visiting a school's specific screen.
-    const isPlatformRoute = [
-      "dashboard",
-      "tenants",
-      "deleted-tenants",
-      "bulk-attendance-import",
-      "billing",
-      "users",
-      "audit-logs",
-      "platform-analytics",
-      "feature-flags",
-      "roadmap",
-      "roles",
-      "staff",
-      "manage-admins",
-      "subscriptions",
-      "settings",
-      "school-subscriptions",
-      "platform-notices",
-      "send-notification",
-      "profile",
-      "reports",
-      "queue-status",
-    ].includes(screen);
-
-    if (isSuperAdmin && isPlatformRoute) {
-      push(`/${screen}`);
-      return;
-    }
-
-    // Always use the full /[tenant]/[screen] pattern
-    if (!tenantIdentifier) {
-      push(`/${screen}`);
-    } else {
-      push(`/${tenantIdentifier}/${screen}`);
-    }
-  }, [currentScreen, currentTenantId, currentTenantSlug, isSuperAdmin, push, setCurrentScreen, setSidebarOpen]);
-
-  // Listen for navigation events from children (e.g. SuperAdminDashboard Quick Actions)
-  useEffect(() => {
-    const handleNavigationEvent = (e: any) => {
-      if (e.detail) {
-        navigateTo(e.detail);
-      }
-    };
-    window.addEventListener("super-admin-navigate", handleNavigationEvent);
-    return () => window.removeEventListener("super-admin-navigate", handleNavigationEvent);
-  }, [navigateTo]);
+  const navigateTo = useAppNavigation({
+    isSuperAdmin,
+    currentTenantSlug,
+    currentTenantId,
+    push,
+    setCurrentScreen,
+    setSidebarOpen,
+  });
 
   // Listen for open-change-password events from deep components
   useEffect(() => {
