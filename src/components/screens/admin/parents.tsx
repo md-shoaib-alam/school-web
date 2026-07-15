@@ -101,38 +101,66 @@ const initialState: State = {
   selectedParentDetail: null,
 };
 
+const actionHandlers: {
+  [K in Action['type']]: (state: State, payload: any) => State;
+} = {
+  SET_SEARCH: (state, payload) => ({ ...state, search: payload, currentPage: 1 }),
+  SET_CURRENT_PAGE: (state, payload) => ({ ...state, currentPage: payload }),
+  SET_ITEMS_PER_PAGE: (state, payload) => ({ ...state, itemsPerPage: payload, currentPage: 1 }),
+  SET_LINK_OPEN: (state, payload) => ({ ...state, linkOpen: payload }),
+  OPEN_LINK_DIALOG: (state, payload) => ({ ...state, selectedParent: payload, linkOpen: true, selectedClass: "all" }),
+  SET_SELECTED_CLASS: (state, payload) => ({ ...state, selectedClass: payload }),
+  SET_LINKING: (state, payload) => ({ ...state, linking: payload }),
+  SET_CREATE_OPEN: (state, payload) => ({ ...state, createOpen: payload }),
+  SET_CREATE_FORM: (state, payload) => ({ ...state, createForm: { ...state.createForm, ...payload } }),
+  RESET_CREATE_FORM: (state) => ({ ...state, createForm: initialState.createForm, createOpen: false }),
+  SET_CREATING: (state, payload) => ({ ...state, creating: payload }),
+  OPEN_EDIT_DIALOG: (state, payload) => ({
+    ...state,
+    editingParent: payload,
+    editForm: {
+      name: payload.name,
+      email: payload.email,
+      phone: payload.phone || "",
+      occupation: payload.occupation || ""
+    },
+    editOpen: true
+  }),
+  SET_EDIT_OPEN: (state, payload) => ({ ...state, editOpen: payload }),
+  SET_EDIT_FORM: (state, payload) => ({ ...state, editForm: { ...state.editForm, ...payload } }),
+  SET_EDITING: (state, payload) => ({ ...state, editing: payload }),
+  SET_DETAIL_OPEN: (state, payload) => ({ ...state, detailOpen: payload }),
+  OPEN_DETAIL_DIALOG: (state, payload) => ({ ...state, selectedParentDetail: payload, detailOpen: true }),
+};
+
 function reducer(state: State, action: Action): State {
-  switch (action.type) {
-    case 'SET_SEARCH': return { ...state, search: action.payload, currentPage: 1 };
-    case 'SET_CURRENT_PAGE': return { ...state, currentPage: action.payload };
-    case 'SET_ITEMS_PER_PAGE': return { ...state, itemsPerPage: action.payload, currentPage: 1 };
-    case 'SET_LINK_OPEN': return { ...state, linkOpen: action.payload };
-    case 'OPEN_LINK_DIALOG': return { ...state, selectedParent: action.payload, linkOpen: true, selectedClass: "all" };
-    case 'SET_SELECTED_CLASS': return { ...state, selectedClass: action.payload };
-    case 'SET_LINKING': return { ...state, linking: action.payload };
-    case 'SET_CREATE_OPEN': return { ...state, createOpen: action.payload };
-    case 'SET_CREATE_FORM': return { ...state, createForm: { ...state.createForm, ...action.payload } };
-    case 'RESET_CREATE_FORM': return { ...state, createForm: initialState.createForm, createOpen: false };
-    case 'SET_CREATING': return { ...state, creating: action.payload };
-    case 'OPEN_EDIT_DIALOG':
-      return {
-        ...state,
-        editingParent: action.payload,
-        editForm: {
-          name: action.payload.name,
-          email: action.payload.email,
-          phone: action.payload.phone || "",
-          occupation: action.payload.occupation || ""
-        },
-        editOpen: true
-      };
-    case 'SET_EDIT_OPEN': return { ...state, editOpen: action.payload };
-    case 'SET_EDIT_FORM': return { ...state, editForm: { ...state.editForm, ...action.payload } };
-    case 'SET_EDITING': return { ...state, editing: action.payload };
-    case 'SET_DETAIL_OPEN': return { ...state, detailOpen: action.payload };
-    case 'OPEN_DETAIL_DIALOG': return { ...state, selectedParentDetail: action.payload, detailOpen: true };
-    default: return state;
+  const handler = actionHandlers[action.type];
+  return handler ? handler(state, (action as any).payload) : state;
+}
+
+function validateEditForm(
+  editingParent: ParentInfo | null,
+  editForm: { name: string; email: string; phone: string; occupation: string }
+): boolean {
+  if (!editingParent) {
+    return false;
   }
+  if (!editForm.name) {
+    toast.error("Name and phone number are required");
+    return false;
+  }
+  if (!editForm.phone) {
+    toast.error("Name and phone number are required");
+    return false;
+  }
+  if (editForm.email) {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(editForm.email)) {
+      toast.error("Please enter a valid email address");
+      return false;
+    }
+  }
+  return true;
 }
 
 export function AdminParents() {
@@ -291,21 +319,20 @@ export function AdminParents() {
   };
 
   const handleEditSave = async () => {
-    if (!editingParent || !editForm.name || !editForm.phone) { toast.error("Name and phone number are required"); return; }
-    if (editForm.email) {
-      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      if (!emailRegex.test(editForm.email)) { toast.error("Please enter a valid email address"); return; }
+    if (!validateEditForm(editingParent, editForm)) {
+      return;
     }
-    const updatedParent = { ...editingParent, ...editForm };
+    const parent = editingParent!;
+    const updatedParent = { ...parent, ...editForm };
     queryClient.setQueriesData({ queryKey: queryKeys.parents }, (old: any) => {
       if (!old || !old.parents) return old;
-      return { ...old, parents: old.parents.map((p: any) => p.id === editingParent.id ? updatedParent : p) };
+      return { ...old, parents: old.parents.map((p: any) => p.id === parent.id ? updatedParent : p) };
     });
     toast.promise(
       (async () => {
         dispatch({ type: 'SET_EDITING', payload: true });
         try {
-          await api.put("/parents", { id: editingParent.id, ...editForm });
+          await api.put("/parents", { id: parent.id, ...editForm });
           dispatch({ type: 'SET_EDIT_OPEN', payload: false });
           queryClient.invalidateQueries({ queryKey: queryKeys.parents });
           return "Parent details updated";
