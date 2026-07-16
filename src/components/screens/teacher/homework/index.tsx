@@ -294,7 +294,7 @@ export function TeacherAssignments({ showCompleted = false }: { showCompleted?: 
 
   // Filter completed assignments by selected date and subscription age limits
   const filteredAssignments = useMemo(() => {
-    let list = assignments;
+    let list = Array.isArray(assignments) ? assignments : [];
 
     // Filter by subscription timeline limits
     if (showCompleted) {

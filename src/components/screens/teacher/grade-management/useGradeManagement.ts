@@ -103,7 +103,8 @@ export function useGradeManagement() {
     apiFetch(`/api/assessments?status=${activeTab}`)
       .then((r) => r.json())
       .then((data) => {
-        dispatch({ type: "SET_ASSESSMENTS", assessments: data || [] });
+        const assessmentArray = Array.isArray(data) ? data : (data?.items || []);
+        dispatch({ type: "SET_ASSESSMENTS", assessments: assessmentArray });
       })
       .catch((e) => {
         console.error(e);
@@ -119,7 +120,7 @@ export function useGradeManagement() {
       dispatch({ type: "SET_IS_DIRTY", value: false });
       return;
     }
-    const assessment = assessments.find(a => a.id === selectedAssessmentId);
+    const assessment = Array.isArray(assessments) ? assessments.find(a => a.id === selectedAssessmentId) : undefined;
     if (!assessment) return;
 
     apiFetch(`/api/students?classId=${assessment.classId}`)
@@ -163,7 +164,7 @@ export function useGradeManagement() {
       .finally(() => dispatch({ type: "SET_GRADES_LOADING", value: false }));
   }, [selectedAssessmentId]);
 
-  const activeAssessment = assessments.find(a => a.id === selectedAssessmentId);
+  const activeAssessment = Array.isArray(assessments) ? assessments.find(a => a.id === selectedAssessmentId) : undefined;
 
   // CREATE ASSESSMENT
   const handleCreateAssessment = async () => {

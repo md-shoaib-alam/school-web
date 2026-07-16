@@ -97,7 +97,10 @@ export const initialState: State = {
 
 export function reducer(state: State, action: Action): State {
   switch (action.type) {
-    case 'SET_ASSIGNMENTS': return { ...state, assignments: action.payload };
+    case 'SET_ASSIGNMENTS': {
+      const arr = Array.isArray(action.payload) ? action.payload : ((action.payload as any)?.data || (action.payload as any)?.items || []);
+      return { ...state, assignments: arr };
+    }
     case 'SET_SUBJECTS': return { ...state, subjects: action.payload };
     case 'SET_LOADING': return { ...state, loading: action.payload };
     case 'SET_DIALOG_OPEN': return { ...state, dialogOpen: action.payload };

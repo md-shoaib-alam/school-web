@@ -115,6 +115,7 @@ export function LoginScreen() {
           tenantId: userData.tenantId,
           tenantSlug: userData.tenantSlug,
           tenantName: userData.tenantName,
+          tenantLogo: userData.tenantLogo || null,
           customRole: userData.customRole || null,
         });
 

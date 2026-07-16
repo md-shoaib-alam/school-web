@@ -95,7 +95,17 @@ export const useAppStore = create<AppState>((set, get) => ({
 
   login: (user) => {
     if (typeof window !== 'undefined') {
-      try { localStorage.setItem(STORAGE_KEYS.USER, JSON.stringify(user)); } catch { /* ignore */ }
+      try {
+        localStorage.setItem(STORAGE_KEYS.USER, JSON.stringify(user));
+        // Persist tenant info so getInitialTenantInfo() restores correctly on fresh page load
+        localStorage.setItem('schoolsaas_tenant_id', user.tenantId || '');
+        localStorage.setItem('schoolsaas_tenant_slug', user.tenantSlug || '');
+        localStorage.setItem('schoolsaas_tenant_name', user.tenantName || '');
+        localStorage.setItem('schoolsaas_tenant_logo', user.tenantLogo || '');
+        // Pre-populate the profile cache timestamp so refreshPermissions() skips
+        // the /auth/me call on the next page load (we JUST got this data from login)
+        localStorage.setItem('schoolsaas_profile_cache_time', String(Date.now()));
+      } catch { /* ignore */ }
     }
     invalidateCache();
     set({
@@ -107,7 +117,9 @@ export const useAppStore = create<AppState>((set, get) => ({
       currentTenantName: user.tenantName || null,
       currentTenantLogo: user.tenantLogo || null,
     });
-    get().refreshPermissions();
+    // DO NOT call refreshPermissions() here — we already have fresh data from the
+    // login response. Calling it immediately races with the logout denylist write
+    // in Redis and can cause a 401 → logout() → 404 loop.
   },
 
   logout: () => {
@@ -150,6 +162,9 @@ export const useAppStore = create<AppState>((set, get) => ({
 
     const now = Date.now();
     const TWO_HOURS = 2 * 60 * 60 * 1000;
+    // Grace period: never refresh within 30 seconds of login to avoid
+    // racing with the Redis denylist write from the previous logout
+    const GRACE_PERIOD = 30 * 1000;
 
     // Check if we have valid cached profile permissions under 2 hours old
     if (typeof window !== 'undefined') {
@@ -158,7 +173,8 @@ export const useAppStore = create<AppState>((set, get) => ({
         const cachedUserStr = localStorage.getItem(STORAGE_KEYS.USER);
         if (cacheTimeStr && cachedUserStr) {
           const cacheTime = parseInt(cacheTimeStr);
-          if (now - cacheTime < TWO_HOURS) {
+          // Skip if within grace period OR within normal 2-hour cache window
+          if (now - cacheTime < GRACE_PERIOD || now - cacheTime < TWO_HOURS) {
             const parsed = JSON.parse(cachedUserStr);
             const userData = parsed.state ? parsed.state.currentUser : parsed;
             if (userData && userData.id === state.currentUser.id) {
