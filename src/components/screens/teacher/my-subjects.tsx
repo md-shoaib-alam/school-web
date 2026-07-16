@@ -165,7 +165,7 @@ function palette(name: string) {
 
 export function TeacherSubjects() {
   const [view, setView] = useState<"grid" | "table">("grid");
-  const { user } = useAppStore();
+  const { currentUser: user } = useAppStore();
 
   // Hydrate from cookie after mount
   useEffect(() => {
@@ -356,7 +356,7 @@ function Header({
       </div>
 
       {/* View toggle */}
-      <div className="flex items-center gap-1 p-1 bg-zinc-100 dark:bg-zinc-800/60 rounded-xl border border-zinc-200 dark:border-zinc-700/50 flex-shrink-0">
+      <div className="flex items-center gap-1 p-1 bg-zinc-100 dark:bg-zinc-800/60 rounded-xl border border-zinc-200 dark:border-zinc-700/50 shrink-0">
         <button
           type="button"
           onClick={() => switchView("grid")}
@@ -414,7 +414,7 @@ function GridView({ subjects, slotsBySubject }: { subjects: SubjectInfo[], slots
               <div className="flex items-start justify-between gap-3 mb-4">
                 <div className="flex items-start gap-3 overflow-hidden">
                   <div
-                    className={`size-11 rounded-xl flex items-center justify-center flex-shrink-0 ${p.icon}`}
+                    className={`size-11 rounded-xl flex items-center justify-center shrink-0 ${p.icon}`}
                   >
                     <BookOpen className="size-5" />
                   </div>
@@ -442,7 +442,7 @@ function GridView({ subjects, slotsBySubject }: { subjects: SubjectInfo[], slots
 
               {/* Class – prominent */}
               <div className={`flex items-center gap-2.5 px-3 py-2.5 rounded-lg ${p.bg} border border-current/10 mb-auto`}>
-                <School className={`size-4 flex-shrink-0 ${p.icon.split(" ")[1]} dark:text-white/80`} />
+                <School className={`size-4 shrink-0 ${p.icon.split(" ")[1]} dark:text-white/80`} />
                 <div className="min-w-0">
                   <p className="text-[10px] font-semibold uppercase tracking-wider text-zinc-400 dark:text-white/50 leading-none mb-0.5">
                     Class
@@ -517,7 +517,7 @@ function TableView({ subjects, slotsBySubject }: { subjects: SubjectInfo[], slot
               {/* Row 1: Icon, Subject Name, Code, Badge */}
               <div className="flex items-start justify-between gap-3">
                 <div className="flex items-center gap-3 min-w-0">
-                  <div className={`size-9 rounded-xl flex items-center justify-center flex-shrink-0 ${p.icon}`}>
+                  <div className={`size-9 rounded-xl flex items-center justify-center shrink-0 ${p.icon}`}>
                     <BookOpen className="size-4" />
                   </div>
                   <div className="min-w-0">
@@ -534,7 +534,7 @@ function TableView({ subjects, slotsBySubject }: { subjects: SubjectInfo[], slot
                   </div>
                 </div>
                 
-                <div className="flex-shrink-0">
+                <div className="shrink-0">
                   {isLiveNow ? (
                     <Badge className="bg-emerald-600 text-white text-[9px] px-1.5 py-0.5 h-auto font-bold uppercase animate-pulse">Live</Badge>
                   ) : isHappeningToday ? (
@@ -546,7 +546,7 @@ function TableView({ subjects, slotsBySubject }: { subjects: SubjectInfo[], slot
               {/* Row 2: Class & Timings */}
               <div className="flex flex-wrap items-center justify-between gap-3 pt-1">
                 <div className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg ${p.bg} text-xs font-semibold`}>
-                  <School className={`size-3.5 flex-shrink-0 ${p.icon.split(" ")[1]} dark:text-white/80`} />
+                  <School className={`size-3.5 shrink-0 ${p.icon.split(" ")[1]} dark:text-white/80`} />
                   <span className={`${p.icon.split(" ")[1]} dark:text-white`}>{subject.className}</span>
                 </div>
 
@@ -578,7 +578,7 @@ function TableView({ subjects, slotsBySubject }: { subjects: SubjectInfo[], slot
 
       {/* Desktop View (HTML Table) */}
       <div className="hidden md:block rounded-xl border border-zinc-200 dark:border-zinc-800 overflow-x-auto bg-card">
-        <table className="w-full min-w-[800px]">
+        <table className="w-full min-w-200">
           <colgroup>
             <col className="w-16" />
             <col />
@@ -636,7 +636,7 @@ function TableView({ subjects, slotsBySubject }: { subjects: SubjectInfo[], slot
                   </td>
                   <td className="p-3">
                     <div className="flex items-center gap-2.5 min-w-0">
-                      <div className={`size-7 rounded-lg flex items-center justify-center flex-shrink-0 ${p.icon}`}>
+                      <div className={`size-7 rounded-lg flex items-center justify-center shrink-0 ${p.icon}`}>
                         <BookOpen className="size-3.5" />
                       </div>
                       <div className="flex items-center gap-2 min-w-0">
@@ -648,9 +648,9 @@ function TableView({ subjects, slotsBySubject }: { subjects: SubjectInfo[], slot
                           {subject.name}
                         </span>
                         {isLiveNow ? (
-                           <Badge className="bg-emerald-600 text-white text-[9px] px-1 py-0 h-4 font-bold uppercase tracking-tighter flex-shrink-0">Live</Badge>
+                           <Badge className="bg-emerald-600 text-white text-[9px] px-1 py-0 h-4 font-bold uppercase tracking-tighter shrink-0">Live</Badge>
                         ) : isHappeningToday ? (
-                           <Badge variant="outline" className="border-blue-200 text-blue-600 text-[9px] px-1 py-0 h-4 font-semibold tracking-tighter flex-shrink-0 bg-blue-50">Today</Badge>
+                           <Badge variant="outline" className="border-blue-200 text-blue-600 text-[9px] px-1 py-0 h-4 font-semibold tracking-tighter shrink-0 bg-blue-50">Today</Badge>
                         ) : null}
                       </div>
                     </div>
@@ -662,7 +662,7 @@ function TableView({ subjects, slotsBySubject }: { subjects: SubjectInfo[], slot
                   </td>
                   <td className="p-3">
                     <div className={`inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg ${p.bg} max-w-full`}>
-                      <School className={`size-3.5 flex-shrink-0 ${p.icon.split(" ")[1]} dark:text-white/80`} />
+                      <School className={`size-3.5 shrink-0 ${p.icon.split(" ")[1]} dark:text-white/80`} />
                       <span className={`text-xs font-bold truncate ${p.icon.split(" ")[1]} dark:text-white`}>
                         {subject.className}
                       </span>

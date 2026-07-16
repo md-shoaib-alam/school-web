@@ -50,7 +50,7 @@ export function TeacherAssignments({ showCompleted = false }: { showCompleted?: 
     confirmCompleteId,
   } = state;
 
-  const { currentTenantSlug, user } = useAppStore();
+  const { currentTenantSlug, currentUser: user } = useAppStore();
   const [tenantPlan, setTenantPlan] = useState<string>("basic");
   const [selectedCalendarDate, setSelectedCalendarDate] = useState<Date | undefined>(undefined);
   const [currentPage, setCurrentPage] = useState<number>(1);

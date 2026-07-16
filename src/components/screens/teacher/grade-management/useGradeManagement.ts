@@ -8,7 +8,7 @@ import { useAppStore } from "@/store/use-app-store";
 
 export function useGradeManagement() {
   const [state, dispatch] = useReducer(gradeManagementReducer, initialState);
-  const { user } = useAppStore();
+  const { currentUser: user } = useAppStore();
 
   const {
     classes,

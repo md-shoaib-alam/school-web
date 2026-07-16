@@ -74,7 +74,7 @@ function examsReducer(state: ExamsState, action: ExamsAction): ExamsState {
 
 export function useTeacherExams() {
   const [state, dispatch] = useReducer(examsReducer, initialState);
-  const { user } = useAppStore();
+  const { currentUser: user } = useAppStore();
   const {
     classes,
     exams,
