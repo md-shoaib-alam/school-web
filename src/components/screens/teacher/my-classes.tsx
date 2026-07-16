@@ -1,7 +1,7 @@
 "use client";
 
 
-import { apiFetch } from "@/lib/api";
+import { apiFetch, api } from "@/lib/api";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
@@ -55,8 +55,8 @@ export function TeacherClasses() {
     queryKey: ["teacher-classes"],
     queryFn: async () => {
       const [resClasses, resTimetable] = await Promise.all([
-        apiFetch("/api/classes").then(r => r.json()).catch(() => []),
-        apiFetch("/api/timetable?mine=true").then(r => r.json()).catch(() => [])
+        api.get("/classes").catch(() => []),
+        api.get("/timetable?mine=true").catch(() => [])
       ]);
 
       const assignedClasses = Array.isArray(resClasses) ? resClasses : [];
@@ -118,9 +118,9 @@ export function TeacherClasses() {
     setDialogOpen(true);
     setStudentsLoading(true);
     try {
-      const res = await apiFetch(`/api/students?classId=${cls.id}`);
-      const data = await res.json();
-      setStudents(data);
+      const data = await api.get(`/students?classId=${cls.id}`);
+      const studentList = Array.isArray(data) ? data : (data?.items ?? []);
+      setStudents(studentList);
     } catch (error) {
       console.error("Error fetching students:", error);
     } finally {
@@ -241,7 +241,7 @@ export function TeacherClasses() {
             </DialogTitle>
           </DialogHeader>
 
-          <div className="px-6 pb-6">
+          <div className="px-6 pb-6 overflow-y-auto max-h-[calc(85vh-100px)]">
             {studentsLoading ? (
               <div className="space-y-3 mt-4">
                 {[...Array(5)].map((_, i) => (

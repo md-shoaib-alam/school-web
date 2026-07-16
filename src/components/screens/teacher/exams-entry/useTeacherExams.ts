@@ -93,10 +93,10 @@ export function useTeacherExams() {
   // 1. Load classes assigned to teacher
   useEffect(() => {
     dispatch({ type: "SET_LOADING_CLASSES", payload: true });
-    apiFetch("/api/classes")
+    apiFetch("/api/classes?all=true")
       .then((r) => r.json())
       .then((data) => {
-        dispatch({ type: "SET_CLASSES", payload: Array.isArray(data) ? data : [] });
+        dispatch({ type: "SET_CLASSES", payload: Array.isArray(data) ? data : (data?.items ?? []) });
       })
       .catch((err) => console.error("Load classes failed:", err))
       .finally(() => dispatch({ type: "SET_LOADING_CLASSES", payload: false }));

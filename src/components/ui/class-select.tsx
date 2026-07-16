@@ -15,6 +15,8 @@ interface ClassSelectProps {
   className?: string;
   placeholder?: string;
   disabled?: boolean;
+  classes?: { id: string; name: string; section: string }[];
+  isLoading?: boolean;
 }
 
 export function ClassSelect({
@@ -24,6 +26,8 @@ export function ClassSelect({
   className = "",
   placeholder = "Select class",
   disabled = false,
+  classes: customClasses,
+  isLoading = false,
 }: ClassSelectProps) {
   const [open, setOpen] = useState(false);
   const { currentTenantId } = useAppStore();
@@ -32,17 +36,20 @@ export function ClassSelect({
     data,
     fetchNextPage,
     hasNextPage,
-    isFetchingNextPage,
-  } = useClassesInfinite(currentTenantId || undefined, { limit: 20 });
+    isFetchingNextPage: isFetchingNext,
+  } = useClassesInfinite(!customClasses ? (currentTenantId || undefined) : undefined, { limit: 20 });
 
   const classes = useMemo(() => {
+    if (customClasses) return customClasses;
     return data?.pages.flatMap((page) => page.classes) || [];
-  }, [data]);
+  }, [data, customClasses]);
+
+  const isFetchingNextPage = customClasses ? isLoading : isFetchingNext;
 
   const observer = useRef<IntersectionObserver | null>(null);
   const lastElementRef = useCallback(
     (node: HTMLButtonElement | null) => {
-      if (isFetchingNextPage) return;
+      if (customClasses || isFetchingNextPage) return;
       if (observer.current) observer.current.disconnect();
       observer.current = new IntersectionObserver((entries) => {
         if (entries[0].isIntersecting && hasNextPage && fetchNextPage) {
@@ -51,7 +58,7 @@ export function ClassSelect({
       });
       if (node) observer.current.observe(node);
     },
-    [isFetchingNextPage, hasNextPage, fetchNextPage]
+    [customClasses, isFetchingNextPage, hasNextPage, fetchNextPage]
   );
 
   const selectedClass = useMemo(() => {

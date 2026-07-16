@@ -390,7 +390,7 @@ function GridView({ subjects, slotsBySubject }: { subjects: SubjectInfo[], slots
 
         return (
           <Card
-            key={subject.id}
+            key={`${subject.id}-${subject.classId || ""}`}
             className={`rounded-xl border hover:shadow-md transition-all group overflow-hidden flex flex-col ${
               isLiveNow 
                 ? "ring-2 ring-emerald-500 shadow-emerald-100 dark:shadow-emerald-900/20 border-emerald-200 dark:border-emerald-800 bg-emerald-50/10 dark:bg-emerald-900/5"
@@ -495,7 +495,7 @@ function TableView({ subjects, slotsBySubject }: { subjects: SubjectInfo[], slot
 
           return (
             <div
-              key={subject.id}
+              key={`${subject.id}-${subject.classId || ""}`}
               className={`p-4 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-card shadow-sm space-y-3 transition-all ${
                 isLiveNow
                   ? "bg-emerald-50/30 dark:bg-emerald-950/10 ring-1 ring-emerald-500/20"
@@ -605,7 +605,7 @@ function TableView({ subjects, slotsBySubject }: { subjects: SubjectInfo[], slot
 
               return (
                 <tr
-                  key={subject.id}
+                  key={`${subject.id}-${subject.classId || ""}`}
                   className={`transition-colors ${
                     isLiveNow 
                       ? "bg-emerald-50/50 dark:bg-emerald-900/10 hover:bg-emerald-50 dark:hover:bg-emerald-900/20" 

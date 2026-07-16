@@ -7,6 +7,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { CheckCircle2, School, Loader2, BookOpen } from "lucide-react";
+import { ClassSelect } from "@/components/ui/class-select";
 import { ClassInfo, ExamRecord } from "./types";
 
 interface ExamsSelectorProps {
@@ -43,21 +44,13 @@ export function ExamsSelector({
       <CardContent className="p-4 pt-0">
         <div className="flex flex-col sm:flex-row items-center gap-4">
           <div className="w-full sm:w-72">
-            <Select value={selectedClass} onValueChange={onClassChange}>
-              <SelectTrigger className="w-full h-10">
-                <div className="flex items-center gap-2">
-                  <School className="size-4 text-orange-500" />
-                  <SelectValue placeholder="Choose a class..." />
-                </div>
-              </SelectTrigger>
-              <SelectContent>
-                {classes.map((c) => (
-                  <SelectItem key={c.id} value={c.id}>
-                    {c.name} - {c.section}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <ClassSelect
+              value={selectedClass}
+              onValueChange={onClassChange}
+              placeholder="Choose a class..."
+              className="w-full h-10"
+              classes={classes}
+            />
           </div>
 
           <div className="w-full sm:w-80">

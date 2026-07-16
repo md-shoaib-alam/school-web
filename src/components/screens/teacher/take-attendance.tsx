@@ -9,13 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { ClassSelect } from "@/components/ui/class-select";
 import {
   CalendarDays,
   Save,
@@ -116,13 +110,13 @@ export function TeacherAttendance() {
     queryKey: classesKey(),
     queryFn: async () => {
       const data = await api.get<any>("/classes?all=true");
-      return (Array.isArray(data) ? data : []) as ClassInfo[];
+      return (Array.isArray(data) ? data : (data?.items ?? [])) as ClassInfo[];
     },
     staleTime: 5 * 60 * 1000,
     select: (data) => data,
   });
 
-  const classes = useMemo(() => (Array.isArray(rawClasses) ? rawClasses : []), [rawClasses]);
+  const classes = useMemo(() => (Array.isArray(rawClasses) ? rawClasses : (rawClasses as any)?.items ?? []), [rawClasses]);
   const activeClassId = selectedClassId || classes[0]?.id || "";
 
   // ── Fetch students for selected class ─────────────────────
@@ -301,25 +295,18 @@ export function TeacherAttendance() {
       {/* Controls */}
       <div className="flex flex-col sm:flex-row gap-3">
         <div className="flex-1 max-w-xs">
-          <Select
+          <ClassSelect
             value={activeClassId}
             onValueChange={(v) => {
               setSelectedClassId(v);
               setLocalOverrides({});
               setSaved(false);
             }}
-          >
-            <SelectTrigger className="rounded-xl">
-              <SelectValue placeholder="Select Class" />
-            </SelectTrigger>
-            <SelectContent>
-              {classes.map((cls) => (
-                <SelectItem key={cls.id} value={cls.id}>
-                  {cls.name} - Section {cls.section}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+            placeholder="Select Class"
+            className="w-full rounded-xl"
+            classes={classes}
+            isLoading={classesLoading}
+          />
         </div>
         <div className="flex-1 max-w-[200px]">
           <DatePicker

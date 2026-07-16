@@ -242,13 +242,60 @@ export function useAssignRoleToUser() {
   const queryClient = useQueryClient()
   return useMutation({
     mutationFn: (vars: any) => graphqlMutate<{ assignRoleToUser: boolean }>(ASSIGN_ROLE_TO_USER, vars),
-    onSuccess: () => {
+    onSuccess: (data, variables) => {
       toast.success('Role assigned successfully')
-      queryClient.invalidateQueries({ queryKey: ['staff'] })
-      queryClient.invalidateQueries({ queryKey: ['all-staff'] })
-      queryClient.invalidateQueries({ queryKey: ['custom-roles'] })
-      queryClient.invalidateQueries({ queryKey: ['custom-roles-page'] })
-      queryClient.invalidateQueries({ queryKey: ['users'] })
+      
+      const { userId, roleId } = variables;
+      
+      // Get role details from custom-roles cache
+      const roles: any[] = queryClient.getQueryData(['custom-roles']) || [];
+      const newRole = roleId ? roles.find(r => r.id === roleId) : null;
+
+      // Optimistically update all staff queries in the cache
+      queryClient.setQueriesData({ queryKey: ['staff'] }, (oldData: any) => {
+        if (!oldData) return oldData;
+        if (oldData.staff && Array.isArray(oldData.staff)) {
+          return {
+            ...oldData,
+            staff: oldData.staff.map((member: any) => {
+              if (member.id === userId) {
+                return {
+                  ...member,
+                  customRole: newRole ? {
+                    id: newRole.id,
+                    name: newRole.name,
+                    color: newRole.color,
+                  } : null
+                };
+              }
+              return member;
+            })
+          };
+        }
+        if (Array.isArray(oldData)) {
+          return oldData.map((member: any) => {
+            if (member.id === userId) {
+              return {
+                ...member,
+                customRole: newRole ? {
+                  id: newRole.id,
+                  name: newRole.name,
+                  color: newRole.color,
+                } : null
+              };
+            }
+            return member;
+          });
+        }
+        return oldData;
+      });
+
+      // Invalidate queries in the background without causing active query reloads
+      queryClient.invalidateQueries({ queryKey: ['staff'], refetchType: 'none' })
+      queryClient.invalidateQueries({ queryKey: ['all-staff'], refetchType: 'none' })
+      queryClient.invalidateQueries({ queryKey: ['custom-roles'], refetchType: 'none' })
+      queryClient.invalidateQueries({ queryKey: ['custom-roles-page'], refetchType: 'none' })
+      queryClient.invalidateQueries({ queryKey: ['users'], refetchType: 'none' })
     },
     onError: (error) => toast.error('Error assigning role', { description: error.message }),
   })
