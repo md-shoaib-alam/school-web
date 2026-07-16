@@ -163,7 +163,7 @@ export function TransportFeeTab() {
     queryKey: ['students-min'],
     queryFn: () => fetchAllStudents()
   });
-  const students = useMemo(() => Array.isArray(studentsData) ? studentsData : studentsData?.items || [], [studentsData]);
+  const students = useMemo(() => Array.isArray(studentsData) ? studentsData : [], [studentsData]);
 
   // ── Mutations ──
   const assignMutation = useMutation<any, any, any>({

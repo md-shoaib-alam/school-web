@@ -184,7 +184,7 @@ export function TeacherSubjects() {
   };
 
   const { data: subjects = [], isLoading: subjectsLoading } = useQuery<SubjectInfo[]>({
-    queryKey: ["teacher-subjects-mine-v2"],
+    queryKey: ["teacher-subjects-mine-v2", user?.id, user?.role],
     queryFn: async () => {
       const data = await api.get<any>("/subjects?mine=true");
       let items = Array.isArray(data) ? data : (data?.items || data?.data || []);
@@ -194,13 +194,15 @@ export function TeacherSubjects() {
       }
       return items as SubjectInfo[];
     },
+    enabled: !!user,
     staleTime: 10 * 60 * 1000,
     gcTime: 30 * 60 * 1000,
   });
 
   const { data: timetable = [], isLoading: timetableLoading } = useQuery<any[]>({
-    queryKey: ["teacher-timetable-summary-mine"],
+    queryKey: ["teacher-timetable-summary-mine", user?.id],
     queryFn: () => api.get<any[]>("/timetable?mine=true"),
+    enabled: !!user,
     staleTime: 5 * 60 * 1000,
   });
 

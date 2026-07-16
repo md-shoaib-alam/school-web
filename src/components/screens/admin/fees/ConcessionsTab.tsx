@@ -45,7 +45,7 @@ export function ConcessionsTab({ canCreate, canEdit, canDelete }: ConcessionsTab
   });
 
   const students = useMemo(() => {
-    const raw = Array.isArray(studentsData) ? studentsData : studentsData?.items || [];
+    const raw = Array.isArray(studentsData) ? studentsData : [];
     return raw.map((s: any) => ({
       id: s.id,
       name: s.name,

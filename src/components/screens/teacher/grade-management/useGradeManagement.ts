@@ -103,7 +103,7 @@ export function useGradeManagement() {
         console.error(e);
         dispatch({ type: "SET_LOADING", value: false });
       });
-  }, []);
+  }, [user?.role]);
 
   // 1b. Fetch assessments filtered by tab status
   useEffect(() => {

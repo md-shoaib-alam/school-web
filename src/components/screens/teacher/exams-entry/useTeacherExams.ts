@@ -138,7 +138,7 @@ export function useTeacherExams() {
       })
       .catch((err) => console.error("Load exams failed:", err))
       .finally(() => dispatch({ type: "SET_LOADING_EXAMS", payload: false }));
-  }, [selectedClass]);
+  }, [selectedClass, user?.role]);
 
   // 3. Load student list and existing scores for selected exam
   useEffect(() => {

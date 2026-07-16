@@ -75,11 +75,14 @@ export function TeacherAssignments({ showCompleted = false }: { showCompleted?: 
 
   // Caching Fetch Layer
   useEffect(() => {
+    if (!user) return;
+
     const statusParam = getStatusParam();
+    const cacheKey = `${statusParam}-${user.role}`;
     
     // Check local cache first
-    if (cachedAssignments[statusParam]) {
-      dispatch({ type: "SET_ASSIGNMENTS", payload: cachedAssignments[statusParam] });
+    if (cachedAssignments[cacheKey]) {
+      dispatch({ type: "SET_ASSIGNMENTS", payload: cachedAssignments[cacheKey] });
       dispatch({ type: "SET_LOADING", payload: false });
       return;
     }
@@ -108,7 +111,7 @@ export function TeacherAssignments({ showCompleted = false }: { showCompleted?: 
     ])
       .then(([aData, sData, tData]) => {
         // Cache assignments
-        setCachedAssignments(prev => ({ ...prev, [statusParam]: aData }));
+        setCachedAssignments(prev => ({ ...prev, [cacheKey]: aData }));
         dispatch({ type: "SET_ASSIGNMENTS", payload: aData });
 
         // Merge subjects/classes from timetable
@@ -137,7 +140,7 @@ export function TeacherAssignments({ showCompleted = false }: { showCompleted?: 
         dispatch({ type: "SET_SUBJECTS", payload: combinedSubjects });
         dispatch({ type: "SET_LOADING", payload: false });
       });
-  }, [showCompleted]);
+  }, [showCompleted, user, user?.role]);
 
   const handleCreate = async () => {
     if (!form.title || !form.subjectId || !form.dueDate) {
