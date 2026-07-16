@@ -3,6 +3,7 @@
 import { api } from "@/lib/api";
 import { useQuery } from "@tanstack/react-query";
 import { useState, useEffect, useMemo } from "react";
+import { useAppStore } from "@/store/use-app-store";
 import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "@/components/ui/badge";
@@ -164,6 +165,7 @@ function palette(name: string) {
 
 export function TeacherSubjects() {
   const [view, setView] = useState<"grid" | "table">("grid");
+  const { user } = useAppStore();
 
   // Hydrate from cookie after mount
   useEffect(() => {
@@ -183,7 +185,15 @@ export function TeacherSubjects() {
 
   const { data: subjects = [], isLoading: subjectsLoading } = useQuery<SubjectInfo[]>({
     queryKey: ["teacher-subjects-mine-v2"],
-    queryFn: () => api.get<SubjectInfo[]>("/subjects?mine=true"),
+    queryFn: async () => {
+      const data = await api.get<any>("/subjects?mine=true");
+      let items = Array.isArray(data) ? data : (data?.items || data?.data || []);
+      if (items.length === 0 && (user?.role === 'admin' || user?.role === 'super_admin' || user?.role === 'staff')) {
+        const fallback = await api.get<any>("/subjects");
+        items = Array.isArray(fallback) ? fallback : (fallback?.items || fallback?.data || []);
+      }
+      return items as SubjectInfo[];
+    },
     staleTime: 10 * 60 * 1000,
     gcTime: 30 * 60 * 1000,
   });

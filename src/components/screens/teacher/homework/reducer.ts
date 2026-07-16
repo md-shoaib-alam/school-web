@@ -18,7 +18,7 @@ export interface Submission {
   id: string;
   studentId: string;
   studentName: string;
-  studentEmail: string;
+  studentRollNumber?: string;
   studentClass: string;
   content: string | null;
   status: string;

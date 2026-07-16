@@ -1,4 +1,4 @@
-import { apiFetch } from '@/lib/api';
+import { apiFetch, fetchAllStudents } from '@/lib/api';
 import { toast } from "sonner";
 import { ExamRecord } from './types';
 
@@ -65,12 +65,11 @@ export const compileTabularLedgerData = async ({
 }): Promise<LedgerData | null> => {
   try {
     // 1. Fetch students & exams in parallel with json parsing
-    const [studentData, examData] = await Promise.all([
-      apiFetch(`/api/students?classId=${classId}&mode=min&limit=1000`).then((res) => res.json()),
+    const [loadedStudents, examData] = await Promise.all([
+      fetchAllStudents({ classId }),
       apiFetch(`/api/exams?classId=${classId}&limit=100`).then((res) => res.json())
     ]);
 
-    const loadedStudents = studentData.items || [];
     const completedExams = (examData.data || examData || []).filter(
       (e: ExamRecord) => {
         const matchesBasic = e.status === 'completed' && e.academicYear === academicYear;

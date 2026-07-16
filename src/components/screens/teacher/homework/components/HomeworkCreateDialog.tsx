@@ -105,11 +105,11 @@ export function HomeworkCreateDialog({
               <Label>Subject *</Label>
               <Select
                 value={form.subjectId}
-                disabled={!form.classId}
+                disabled={!form.classId || filteredSubjects.length === 0}
                 onValueChange={(v) => dispatch({ type: "SET_FORM", payload: { subjectId: v } })}
               >
                 <SelectTrigger className="mt-1.5">
-                  <SelectValue placeholder={form.classId ? "Select subject" : "Select class first"} />
+                  <SelectValue placeholder={!form.classId ? "Select class first" : (filteredSubjects.length === 0 ? "No subjects assigned" : "Select subject")} />
                 </SelectTrigger>
                 <SelectContent>
                   {filteredSubjects.map((s) => (
@@ -121,28 +121,48 @@ export function HomeworkCreateDialog({
               </Select>
             </div>
           </div>
-          <div className="flex flex-col gap-2">
-            <Label>Due Date *</Label>
-            <Popover open={isCalendarOpen} onOpenChange={setIsCalendarOpen}>
-              <PopoverTrigger asChild>
-                <Button variant="outline" className="w-full justify-start text-left font-normal mt-0.5">
-                  <CalendarDays className="mr-2 size-4" />
-                  {form.dueDate ? format(form.dueDate, "PPP") : <span>Pick a date</span>}
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-auto p-0" align="start">
-                <Calendar
-                  mode="single"
-                  selected={form.dueDate}
-                  onSelect={(date) => {
-                    dispatch({ type: "SET_FORM", payload: { dueDate: date } });
-                    setIsCalendarOpen(false);
-                  }}
-                  disabled={(date) => !!todayStart && date < todayStart}
-                  initialFocus
-                />
-              </PopoverContent>
-            </Popover>
+          <div className="grid grid-cols-2 gap-4">
+            <div className="flex flex-col gap-2">
+              <Label>Due Date *</Label>
+              <Popover open={isCalendarOpen} onOpenChange={setIsCalendarOpen}>
+                <PopoverTrigger asChild>
+                  <Button variant="outline" className="w-full justify-start text-left font-normal mt-0.5">
+                    <CalendarDays className="mr-2 size-4" />
+                    {form.dueDate ? format(form.dueDate, "PPP") : <span>Pick a date</span>}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0" align="start">
+                  <Calendar
+                    mode="single"
+                    selected={form.dueDate}
+                    onSelect={(date) => {
+                      dispatch({ type: "SET_FORM", payload: { dueDate: date } });
+                      setIsCalendarOpen(false);
+                    }}
+                    disabled={(date) => !!todayStart && date < todayStart}
+                    initialFocus
+                  />
+                </PopoverContent>
+              </Popover>
+            </div>
+            
+            <div className="flex flex-col gap-2">
+              <Label>Submission Mode *</Label>
+              <Select
+                value={form.mode || "offline"}
+                onValueChange={(v) => dispatch({ type: "SET_FORM", payload: { mode: v as any } })}
+              >
+                <SelectTrigger className="mt-1.5">
+                  <SelectValue placeholder="Select mode" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="offline">Offline (Classroom)</SelectItem>
+                  <SelectItem value="online" disabled className="text-muted-foreground">
+                    Online (🔒 Premium Only)
+                  </SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
           </div>
           <div>
             <Label>Description</Label>

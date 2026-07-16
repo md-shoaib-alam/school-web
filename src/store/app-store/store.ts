@@ -5,7 +5,7 @@ import {
   isValidScreen, CACHE_TTL
 } from './utils';
 import { getCookie } from '@/lib/cookies';
-import { API_BASE, logoutWithElysia } from '@/lib/api';
+import { API_BASE, api, logoutWithElysia } from '@/lib/api';
 import { env } from '@/lib/env';
 
 function getInitialUser(): { isLoggedIn: boolean; currentUser: AppUser | null } {
@@ -75,11 +75,9 @@ function getInitialTenantInfo(): { id: string | null; slug: string | null; name:
   } catch { return { id: null, slug: null, name: null, logo: null }; }
 }
 
-function buildUrl(tenantId: string | null, tenantSlug: string | null, screen: string): string {
-  const identifier = tenantSlug || tenantId;
-  if (!identifier) return `/${screen}`;
-  return screen === 'dashboard' ? `/${identifier}/dashboard` : `/${identifier}/${screen}`;
-}
+// In-flight guard — prevents concurrent refreshPermissions() calls from
+// each firing their own /auth/me network request.
+let isRefreshingPermissions = false;
 
 const initialUser = getInitialUser();
 
@@ -160,6 +158,11 @@ export const useAppStore = create<AppState>((set, get) => ({
     const state = get();
     if (!state.isLoggedIn || !state.currentUser) return;
 
+    // Bug fix: prevent concurrent calls from each firing a separate /auth/me request.
+    // If a refresh is already in progress, silently skip — the first caller will
+    // update state when it finishes.
+    if (isRefreshingPermissions) return;
+
     const now = Date.now();
     const TWO_HOURS = 2 * 60 * 60 * 1000;
     // Grace period: never refresh within 30 seconds of login to avoid
@@ -186,49 +189,51 @@ export const useAppStore = create<AppState>((set, get) => ({
       } catch { /* ignore */ }
     }
 
+    isRefreshingPermissions = true;
     try {
-      const token = typeof window !== 'undefined' ? localStorage.getItem('school_token') : null;
-      const res = await fetch(`${API_BASE}/auth/me?userId=${encodeURIComponent(state.currentUser.id)}`, {
-        headers: token ? { Authorization: `Bearer ${token}` } : {},
-      });
-      if (res.ok) {
-        const userData = await res.json();
-        const updatedUser: AppUser = {
-          id: userData.id,
-          name: userData.name,
-          email: userData.email,
-          role: userData.role as UserRole,
-          avatar: userData.avatar,
-          tenantId: userData.tenantId,
-          tenantSlug: userData.tenantSlug,
-          tenantName: userData.tenantName,
-          tenantLogo: userData.tenantLogo,
-          customRole: userData.customRole || null,
-          platformRole: userData.platformRole || null,
-        };
-        set({ currentUser: updatedUser });
-        
-        // Sync logo if available in user data but missing in tenant state
-        if (userData.tenantLogo && !get().currentTenantLogo) {
-          get().setCurrentTenant(
-            userData.tenantId, 
-            userData.tenantName, 
-            userData.tenantSlug, 
-            userData.tenantLogo
-          );
-        }
+      const userData = await api.get(`/auth/me?userId=${encodeURIComponent(state.currentUser.id)}`);
+      
+      const updatedUser: AppUser = {
+        id: userData.id,
+        name: userData.name,
+        email: userData.email,
+        role: userData.role as UserRole,
+        avatar: userData.avatar,
+        tenantId: userData.tenantId,
+        tenantSlug: userData.tenantSlug,
+        tenantName: userData.tenantName,
+        tenantLogo: userData.tenantLogo,
+        customRole: userData.customRole || null,
+        platformRole: userData.platformRole || null,
+      };
+      set({ currentUser: updatedUser });
 
-        if (typeof window !== 'undefined') {
-          try { 
-            localStorage.setItem(STORAGE_KEYS.USER, JSON.stringify(updatedUser)); 
-            localStorage.setItem('schoolsaas_profile_cache_time', String(now));
-          } catch { /* ignore */ }
-        }
-      } else if (res.status === 404 || res.status === 401) {
-        get().logout();
-        window.location.href = "/";
+      // Sync logo if available in user data but missing in tenant state
+      if (userData.tenantLogo && !get().currentTenantLogo) {
+        get().setCurrentTenant(
+          userData.tenantId,
+          userData.tenantName,
+          userData.tenantSlug,
+          userData.tenantLogo
+        );
       }
-    } catch { /* silent fail */ }
+
+      if (typeof window !== 'undefined') {
+        try {
+          localStorage.setItem(STORAGE_KEYS.USER, JSON.stringify(updatedUser));
+          localStorage.setItem('schoolsaas_profile_cache_time', String(now));
+        } catch { /* ignore */ }
+      }
+    } catch (error: any) {
+      if (error?.status === 404 || error?.status === 401 || error?.message === 'Session expired') {
+        get().logout();
+        if (typeof window !== 'undefined') {
+          window.location.href = '/';
+        }
+      }
+    } finally {
+      isRefreshingPermissions = false;
+    }
   },
 
   setCurrentScreen: (screen) => {
@@ -294,8 +299,13 @@ export const useAppStore = create<AppState>((set, get) => ({
           }
         }
 
-        // Fetch and cache in background using the backend proxy to bypass CORS
-        const proxyUrl = `${env.NEXT_PUBLIC_API_URL}/tenants/logo-proxy?url=${encodeURIComponent(logo)}`;
+        // Bug fix: use the Next.js rewrite proxy (/api/proxy/...) in the browser
+        // so the request stays same-origin and avoids CORS preflight failures.
+        // Only fall back to the raw API URL in SSR (window undefined).
+        const logoProxyPath = `/tenants/logo-proxy?url=${encodeURIComponent(logo)}`;
+        const proxyUrl = typeof window !== 'undefined'
+          ? `/api/proxy${logoProxyPath}`
+          : `${env.NEXT_PUBLIC_API_URL}${logoProxyPath}`;
         const response = await fetch(proxyUrl);
         const blob = await response.blob();
         const reader = new FileReader();
@@ -325,6 +335,12 @@ export const useAppStore = create<AppState>((set, get) => ({
 if (typeof window !== 'undefined') {
   window.addEventListener('popstate', () => {
     const screen = parseScreenFromPath(window.location.pathname);
-    useAppStore.setState({ currentScreen: screen, sidebarOpen: false });
+    // Bug fix: only force-close sidebar on mobile (< 1024 px).
+    // On desktop the sidebar should stay in whatever state the user set.
+    const isMobile = window.innerWidth < 1024;
+    useAppStore.setState(isMobile
+      ? { currentScreen: screen, sidebarOpen: false }
+      : { currentScreen: screen }
+    );
   });
 }

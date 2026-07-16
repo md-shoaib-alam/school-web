@@ -1,12 +1,14 @@
 "use client";
 
 import { useReducer, useEffect } from "react";
-import { apiFetch } from "@/lib/api";
+import { apiFetch, fetchAllStudents } from "@/lib/api";
 import { toast } from "sonner";
 import { initialState, gradeManagementReducer, Assessment } from "./types";
+import { useAppStore } from "@/store/use-app-store";
 
 export function useGradeManagement() {
   const [state, dispatch] = useReducer(gradeManagementReducer, initialState);
+  const { user } = useAppStore();
 
   const {
     classes,
@@ -37,15 +39,21 @@ export function useGradeManagement() {
   // 1. Initial bootstrap data (Classes/Subjects)
   useEffect(() => {
     Promise.all([
-      apiFetch("/api/classes"),
-      apiFetch("/api/subjects?mine=true"),
-      apiFetch("/api/timetable?mine=true").catch(() => null)
+      apiFetch("/api/classes?all=true").then(r => r.json()),
+      apiFetch("/api/subjects?mine=true").then(r => r.json()).then(async data => {
+        let items = Array.isArray(data) ? data : (data?.items || data?.data || []);
+        if (items.length === 0 && (user?.role === 'admin' || user?.role === 'super_admin' || user?.role === 'staff')) {
+          const fallback = await apiFetch("/api/subjects").then(r => r.json());
+          items = Array.isArray(fallback) ? fallback : (fallback?.items || fallback?.data || []);
+        }
+        return items;
+      }),
+      apiFetch("/api/timetable?mine=true").catch(() => null).then(r => r ? r.json() : [])
     ])
-      .then(([cRes, sRes, tRes]) => Promise.all([cRes.json(), sRes.json(), tRes ? tRes.json() : []]))
       .then(([cData, sData, tData]) => {
-        const assignedClasses = Array.isArray(cData) ? cData : [];
-        const assignedSubjects = Array.isArray(sData) ? sData : [];
-        const timetableList = Array.isArray(tData) ? tData : [];
+        const assignedClasses = Array.isArray(cData) ? cData : (cData?.items || cData?.data || []);
+        const assignedSubjects = sData;
+        const timetableList = Array.isArray(tData) ? tData : (tData?.items || tData?.data || []);
 
         // Extract subjects/classes from timetable slots
         const timetableSubjects: any[] = [];
@@ -123,12 +131,9 @@ export function useGradeManagement() {
     const assessment = Array.isArray(assessments) ? assessments.find(a => a.id === selectedAssessmentId) : undefined;
     if (!assessment) return;
 
-    apiFetch(`/api/students?classId=${assessment.classId}`)
-      .then((r) => r.json())
-      .then((data) => {
-        const studentArray = Array.isArray(data) ? data : (data?.items || []);
-        dispatch({ type: "SET_STUDENTS", students: studentArray });
-      });
+    fetchAllStudents({ classId: assessment.classId })
+      .then((all) => dispatch({ type: "SET_STUDENTS", students: all }))
+      .catch(console.error);
   }, [selectedAssessmentId, assessments]);
 
   // 4. Load existing grades for selected isolated assessment

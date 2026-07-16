@@ -20,7 +20,7 @@ import {
   Zap,
 } from "lucide-react";
 import { toast } from "sonner";
-import { apiFetch } from "@/lib/api";
+import { apiFetch, fetchAllStudents } from "@/lib/api";
 
 import {
   PromotionRecord,
@@ -154,27 +154,24 @@ export function AdminPromotions({ initialTab: propTab }: { initialTab?: "individ
     let active = true;
     async function loadStudents() {
       try {
-        const res = await apiFetch(`/api/students?mode=min&classId=${targetClassId}`);
-        if (res.ok && active) {
-          const json = await res.json();
-          const studentItems = json.items || [];
-          const studentsData = studentItems.map(
-            (s: {
-              id: string;
-              name: string;
-              rollNumber: string;
-              className: string;
-              classId: string;
-            }) => ({
-              id: s.id,
-              name: s.name,
-              rollNumber: s.rollNumber,
-              className: s.className,
-              classId: s.classId,
-            })
-          );
-          dispatch({ type: "FETCH_CLASSES_STUDENTS_SUCCESS", classes: classes, students: studentsData });
-        }
+        const studentItems = await fetchAllStudents({ classId: targetClassId });
+        if (!active) return;
+        const studentsData = studentItems.map(
+          (s: {
+            id: string;
+            name: string;
+            rollNumber: string;
+            className: string;
+            classId: string;
+          }) => ({
+            id: s.id,
+            name: s.name,
+            rollNumber: s.rollNumber,
+            className: s.className,
+            classId: s.classId,
+          })
+        );
+        dispatch({ type: "FETCH_CLASSES_STUDENTS_SUCCESS", classes: classes, students: studentsData });
       } catch (err) {
         console.error("Failed to load students for promotion:", err);
       }

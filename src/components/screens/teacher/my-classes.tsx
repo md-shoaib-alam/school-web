@@ -265,9 +265,7 @@ export function TeacherClasses() {
                       <TableHead className="text-xs font-semibold text-zinc-500 dark:text-zinc-400 hidden md:table-cell">
                         Gender
                       </TableHead>
-                      <TableHead className="text-xs font-semibold text-zinc-500 dark:text-zinc-400 hidden md:table-cell">
-                        Parent
-                      </TableHead>
+
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -307,9 +305,7 @@ export function TeacherClasses() {
                             {student.gender}
                           </Badge>
                         </TableCell>
-                        <TableCell className="text-sm text-zinc-500 dark:text-zinc-400 hidden md:table-cell">
-                          {student.parentName || "–"}
-                        </TableCell>
+
                       </TableRow>
                     ))}
                   </TableBody>

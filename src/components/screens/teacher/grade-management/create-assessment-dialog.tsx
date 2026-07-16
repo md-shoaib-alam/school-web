@@ -55,6 +55,11 @@ export function CreateAssessmentDialog({
   dispatch,
   onCreate,
 }: CreateAssessmentDialogProps) {
+  const filteredSubjects = React.useMemo(() => {
+    if (!dialogClassId) return [];
+    return subjects.filter(s => s.classId === dialogClassId);
+  }, [subjects, dialogClassId]);
+
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
       <DialogTrigger asChild>
@@ -100,22 +105,17 @@ export function CreateAssessmentDialog({
               <Select
                 value={dialogSubjectId}
                 onValueChange={(v) => dispatch({ type: "SET_DIALOG_SUBJECT_ID", value: v })}
-                disabled={!dialogClassId}
+                disabled={!dialogClassId || filteredSubjects.length === 0}
               >
                 <SelectTrigger className="h-9 focus:ring-blue-500 focus-visible:ring-blue-500">
-                  <SelectValue placeholder="Select Subject" />
+                  <SelectValue placeholder={!dialogClassId ? "Select Class First" : (filteredSubjects.length === 0 ? "No subjects assigned" : "Select Subject")} />
                 </SelectTrigger>
                 <SelectContent>
-                  {subjects.reduce<React.ReactNode[]>((acc, s) => {
-                    if (s.classId === dialogClassId) {
-                      acc.push(
-                        <SelectItem key={s.id} value={s.id}>
-                          {s.name}
-                        </SelectItem>
-                      );
-                    }
-                    return acc;
-                  }, [])}
+                  {filteredSubjects.map(s => (
+                    <SelectItem key={s.id} value={s.id}>
+                      {s.name}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </div>

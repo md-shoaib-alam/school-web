@@ -176,16 +176,40 @@ function useTenantSync(
 function useCookieAuthGuard(currentUser: any) {
   useEffect(() => {
     if (!currentUser) return;
+
+    let redirectPending: ReturnType<typeof setTimeout> | null = null;
+
     const checkAuth = () => {
       const token = getCookie("school_token");
       if (!token) {
-        window.location.href = "/";
+        // Debounce: wait 2 s then re-check before redirecting.
+        // This prevents a false-logout during the brief window when
+        // the old cookie is cleared and the new rotated token is
+        // being written (token rotation race condition).
+        if (!redirectPending) {
+          redirectPending = setTimeout(() => {
+            redirectPending = null;
+            if (!getCookie("school_token")) {
+              window.location.href = "/";
+            }
+          }, 2000);
+        }
+      } else {
+        // Cookie is present — cancel any pending redirect
+        if (redirectPending) {
+          clearTimeout(redirectPending);
+          redirectPending = null;
+        }
       }
     };
 
     checkAuth();
-    const interval = setInterval(checkAuth, 5000);
-    return () => clearInterval(interval);
+    // Check every 30 s instead of 5 s — reduces race risk and CPU overhead
+    const interval = setInterval(checkAuth, 30_000);
+    return () => {
+      clearInterval(interval);
+      if (redirectPending) clearTimeout(redirectPending);
+    };
   }, [currentUser?.id]);
 }
 

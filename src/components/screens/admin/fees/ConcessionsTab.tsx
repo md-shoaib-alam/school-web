@@ -22,7 +22,7 @@ import {
 import { Percent, DollarSign, Plus, ThumbsUp, Ban, Trash2 } from 'lucide-react';
 import { toast } from "sonner";
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { apiFetch } from '@/lib/api';
+import { apiFetch, fetchAllStudents } from '@/lib/api';
 import { useFeeConcessions, useCreateFeeConcession, useFeeCategories } from '@/hooks/use-fees';
 import { concessionStatusConfig } from './config';
 import type { FeeConcession, FeeCategory, StudentOption, ClassOption } from './types';
@@ -41,10 +41,7 @@ export function ConcessionsTab({ canCreate, canEdit, canDelete }: ConcessionsTab
 
   const { data: studentsData } = useQuery({
     queryKey: ['students-min'],
-    queryFn: async () => {
-      const res = await apiFetch('/api/students?mode=min&limit=5000');
-      return res.json();
-    }
+    queryFn: () => fetchAllStudents()
   });
 
   const students = useMemo(() => {

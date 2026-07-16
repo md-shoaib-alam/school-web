@@ -20,6 +20,16 @@ function getStoredRefreshToken(): string | null {
 // ── GraphQL-level refresh interceptor ──
 let graphqlRefreshing = false;
 let graphqlRefreshFailed = false;
+let graphqlRefreshFailedTimer: ReturnType<typeof setTimeout> | null = null;
+
+function markGraphqlRefreshFailed() {
+  graphqlRefreshFailed = true;
+  if (graphqlRefreshFailedTimer) clearTimeout(graphqlRefreshFailedTimer);
+  graphqlRefreshFailedTimer = setTimeout(() => {
+    graphqlRefreshFailed = false;
+    graphqlRefreshFailedTimer = null;
+  }, 10_000);
+}
 
 async function refreshForGraphQL(): Promise<string> {
   const refreshToken = getStoredRefreshToken();
@@ -110,7 +120,7 @@ async function flushBatch() {
         return;
       } catch (refreshErr) {
         graphqlRefreshing = false;
-        graphqlRefreshFailed = true;
+        markGraphqlRefreshFailed();
         // Force logout
         if (typeof window !== 'undefined') {
           localStorage.clear(); sessionStorage.clear();

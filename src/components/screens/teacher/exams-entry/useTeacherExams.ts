@@ -1,9 +1,10 @@
 "use client";
 
 import { useEffect, useMemo, useReducer } from "react";
-import { apiFetch } from "@/lib/api";
+import { apiFetch, fetchAllStudents } from "@/lib/api";
 import { toast } from "sonner";
 import { ClassInfo, ExamRecord, StudentResultRow } from "./types";
+import { useAppStore } from "@/store/use-app-store";
 
 // Reducer State & Types
 interface ExamsState {
@@ -73,6 +74,7 @@ function examsReducer(state: ExamsState, action: ExamsAction): ExamsState {
 
 export function useTeacherExams() {
   const [state, dispatch] = useReducer(examsReducer, initialState);
+  const { user } = useAppStore();
   const {
     classes,
     exams,
@@ -96,7 +98,8 @@ export function useTeacherExams() {
     apiFetch("/api/classes?all=true")
       .then((r) => r.json())
       .then((data) => {
-        dispatch({ type: "SET_CLASSES", payload: Array.isArray(data) ? data : (data?.items ?? []) });
+        const classes = Array.isArray(data) ? data : (data?.items || data?.data || []);
+        dispatch({ type: "SET_CLASSES", payload: classes });
       })
       .catch((err) => console.error("Load classes failed:", err))
       .finally(() => dispatch({ type: "SET_LOADING_CLASSES", payload: false }));
@@ -117,13 +120,18 @@ export function useTeacherExams() {
 
     apiFetch(`/api/exams?classId=${selectedClass}&mine=true&limit=100`)
       .then((r) => r.json())
-      .then((data) => {
-        const examsList = data?.data || (Array.isArray(data) ? data : []);
+      .then(async (data) => {
+        let examsList = data?.data || data?.items || (Array.isArray(data) ? data : []);
+        if (examsList.length === 0 && (user?.role === 'admin' || user?.role === 'super_admin' || user?.role === 'staff')) {
+           const fallback = await apiFetch(`/api/exams?classId=${selectedClass}&limit=100`).then(r => r.json());
+           examsList = fallback?.data || fallback?.items || (Array.isArray(fallback) ? fallback : []);
+        }
         dispatch({
           type: "SET_EXAMS",
           payload: examsList.filter(
             (e: ExamRecord) =>
               e.status !== "cancelled" &&
+              e.status !== "completed" &&
               (e.examType === "midterm" || e.examType === "final"),
           ),
         });
@@ -142,17 +150,11 @@ export function useTeacherExams() {
     dispatch({ type: "SET_LOADING_STUDENTS", payload: true });
 
     Promise.all([
-      apiFetch(`/api/students?classId=${selectedClass}&mode=min&limit=1000`),
+      fetchAllStudents({ classId: selectedClass }),
       apiFetch(`/api/exams/results?examId=${selectedExamId}`),
     ])
-      .then(async ([studentsRes, resultsRes]) => {
-        const [studentsData, resultsData] = await Promise.all([
-          studentsRes.json(),
-          resultsRes.json(),
-        ]);
-
-        const studentsList =
-          studentsData.items || (Array.isArray(studentsData) ? studentsData : []);
+      .then(async ([studentsList, resultsRes]) => {
+        const resultsData = await resultsRes.json();
         const resultsList = resultsData.results || [];
 
         const rows = studentsList.map((s: any) => {

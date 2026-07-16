@@ -50,7 +50,7 @@ export function TeacherAssignments({ showCompleted = false }: { showCompleted?: 
     confirmCompleteId,
   } = state;
 
-  const { currentTenantSlug } = useAppStore();
+  const { currentTenantSlug, user } = useAppStore();
   const [tenantPlan, setTenantPlan] = useState<string>("basic");
   const [selectedCalendarDate, setSelectedCalendarDate] = useState<Date | undefined>(undefined);
   const [currentPage, setCurrentPage] = useState<number>(1);
@@ -86,11 +86,26 @@ export function TeacherAssignments({ showCompleted = false }: { showCompleted?: 
 
     dispatch({ type: "SET_LOADING", payload: true });
     Promise.all([
-      apiFetch(`/api/homework?mine=true&status=${statusParam}`),
-      apiFetch("/api/subjects?mine=true"),
-      apiFetch("/api/timetable?mine=true").catch(() => null)
+      apiFetch(`/api/homework?mine=true&status=${statusParam}`).then(async r => {
+        const data = await r.json();
+        let items = Array.isArray(data) ? data : (data?.items || data?.data || []);
+        if (items.length === 0 && (user?.role === 'admin' || user?.role === 'super_admin')) {
+          const fallback = await apiFetch(`/api/homework?status=${statusParam}`).then(fr => fr.json());
+          items = Array.isArray(fallback) ? fallback : (fallback?.items || fallback?.data || []);
+        }
+        return items;
+      }),
+      apiFetch("/api/subjects?mine=true").then(async r => {
+        const data = await r.json();
+        let items = Array.isArray(data) ? data : (data?.items || data?.data || []);
+        if (items.length === 0 && (user?.role === 'admin' || user?.role === 'super_admin')) {
+          const fallback = await apiFetch("/api/subjects").then(fr => fr.json());
+          items = Array.isArray(fallback) ? fallback : (fallback?.items || fallback?.data || []);
+        }
+        return items;
+      }),
+      apiFetch("/api/timetable?mine=true").catch(() => null).then(r => r ? r.json() : [])
     ])
-      .then(([aRes, sRes, tRes]) => Promise.all([aRes.json(), sRes.json(), tRes ? tRes.json() : []]))
       .then(([aData, sData, tData]) => {
         // Cache assignments
         setCachedAssignments(prev => ({ ...prev, [statusParam]: aData }));
@@ -148,11 +163,16 @@ export function TeacherAssignments({ showCompleted = false }: { showCompleted?: 
       if (res.ok) {
         toast.success("Assignment created successfully!");
         dispatch({ type: "RESET_FORM" });
-        const data = await apiFetch(`/api/homework?mine=true&status=${getStatusParam()}`).then((r) => r.json());
+        let data = await apiFetch(`/api/homework?mine=true&status=${getStatusParam()}`).then((r) => r.json());
+        let items = Array.isArray(data) ? data : (data?.items || data?.data || []);
+        if (items.length === 0 && (user?.role === 'admin' || user?.role === 'super_admin')) {
+          const fallback = await apiFetch(`/api/homework?status=${getStatusParam()}`).then((r) => r.json());
+          items = Array.isArray(fallback) ? fallback : (fallback?.items || fallback?.data || []);
+        }
         
         // Invalidate cache
         setCachedAssignments({});
-        dispatch({ type: "SET_ASSIGNMENTS", payload: data });
+        dispatch({ type: "SET_ASSIGNMENTS", payload: items });
       }
     } catch {
       toast.error("Failed to create assignment");
@@ -167,11 +187,16 @@ export function TeacherAssignments({ showCompleted = false }: { showCompleted?: 
       });
       if (res.ok) {
         toast.success("Assignment marked as completed!");
-        const data = await apiFetch(`/api/homework?mine=true&status=${getStatusParam()}`).then((r) => r.json());
+        let data = await apiFetch(`/api/homework?mine=true&status=${getStatusParam()}`).then((r) => r.json());
+        let items = Array.isArray(data) ? data : (data?.items || data?.data || []);
+        if (items.length === 0 && (user?.role === 'admin' || user?.role === 'super_admin')) {
+          const fallback = await apiFetch(`/api/homework?status=${getStatusParam()}`).then((r) => r.json());
+          items = Array.isArray(fallback) ? fallback : (fallback?.items || fallback?.data || []);
+        }
         
         // Invalidate cache
         setCachedAssignments({});
-        dispatch({ type: "SET_ASSIGNMENTS", payload: data });
+        dispatch({ type: "SET_ASSIGNMENTS", payload: items });
       } else {
         toast.error("Failed to complete assignment");
       }
@@ -212,9 +237,14 @@ export function TeacherAssignments({ showCompleted = false }: { showCompleted?: 
       const statusParam = getStatusParam();
       const aRes = await apiFetch(`/api/homework?mine=true&status=${statusParam}`);
       if (aRes.ok) {
-        const aData = await aRes.json();
-        setCachedAssignments((prev) => ({ ...prev, [statusParam]: aData }));
-        dispatch({ type: "SET_ASSIGNMENTS", payload: aData });
+        let aData = await aRes.json();
+        let items = Array.isArray(aData) ? aData : (aData?.items || aData?.data || []);
+        if (items.length === 0) {
+          const fallback = await apiFetch(`/api/homework?status=${statusParam}`).then(r => r.json());
+          items = Array.isArray(fallback) ? fallback : (fallback?.items || fallback?.data || []);
+        }
+        setCachedAssignments((prev) => ({ ...prev, [statusParam]: items }));
+        dispatch({ type: "SET_ASSIGNMENTS", payload: items });
       }
     } catch {}
   };

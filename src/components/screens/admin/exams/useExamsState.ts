@@ -3,7 +3,7 @@
 import { useState, useMemo, useEffect } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useRouter, useParams, useSearchParams } from 'next/navigation';
-import { api, apiFetch } from '@/lib/api';
+import { api, apiFetch, fetchAllStudents } from '@/lib/api';
 import { toast } from "sonner";
 import { useAcademicYears } from '@/hooks/use-academic-years';
 import { 
@@ -271,11 +271,10 @@ export function useExamsState(initialTab = 'exams') {
     setActiveTab('results');
     setLoadingStudents(true);
     try {
-      const [sRes, rRes] = await Promise.all([
-        apiFetch(`/api/students?classId=${exam.classId}&mode=min&limit=100`),
+      const [students, rRes] = await Promise.all([
+        fetchAllStudents({ classId: exam.classId }),
         apiFetch(`/api/exams/results?examId=${exam.id}`)
       ]);
-      const students = (await sRes.json()).items || [];
       const results = (await rRes.json()).results || [];
       
       setResultRows(students.map((s: any) => {
@@ -302,11 +301,10 @@ export function useExamsState(initialTab = 'exams') {
     setViewResultsOpen(true);
     setLoadingViewResults(true);
     try {
-      const [sRes, rRes] = await Promise.all([
-        apiFetch(`/api/students?classId=${exam.classId}&mode=min&limit=100`),
+      const [students, rRes] = await Promise.all([
+        fetchAllStudents({ classId: exam.classId }),
         apiFetch(`/api/exams/results?examId=${exam.id}`)
       ]);
-      const students = (await sRes.json()).items || [];
       const results = (await rRes.json()).results || [];
       
       setViewResultsData(students.map((s: any) => {

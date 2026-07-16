@@ -91,6 +91,11 @@ export function ClassSelect({
           {showAllOption && (
             <button
               type="button"
+              onPointerDown={(e) => {
+                e.preventDefault();
+                onValueChange("all");
+                setOpen(false);
+              }}
               onClick={() => {
                 onValueChange("all");
                 setOpen(false);
@@ -111,6 +116,11 @@ export function ClassSelect({
                   key={`${c.id}-${index}`}
                   ref={index === classes.length - 1 ? lastElementRef : null}
                   type="button"
+                  onPointerDown={(e) => {
+                    e.preventDefault();
+                    onValueChange(c.id);
+                    setOpen(false);
+                  }}
                   onClick={() => {
                     onValueChange(c.id);
                     setOpen(false);
