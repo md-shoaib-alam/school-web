@@ -31,30 +31,39 @@ messaging.onBackgroundMessage((payload) => {
   }
 
   // Extract link from multiple potential keys (for data-only messages)
-  let link = payload.fcmOptions?.link || 
-             payload.data?.link || 
-             payload.data?.url || 
-             payload.data?.click_action || 
-             payload.notification?.click_action || 
-             payload.notification?.clickAction;
+  // NOTE: Avoid optional chaining (?.) — this service worker runs with Firebase SDK v8
+  // via importScripts, which may not support modern JS syntax.
+  var link = (payload.fcmOptions && payload.fcmOptions.link) || 
+             (payload.data && payload.data.link) || 
+             (payload.data && payload.data.url) || 
+             (payload.data && payload.data.click_action) || 
+             (payload.notification && payload.notification.click_action) || 
+             (payload.notification && payload.notification.clickAction);
 
   // Fallback for attendance alerts
-  if (!link && payload.data?.type === "attendance_alert") {
-    const tenantSlug = payload.data?.tenantSlug || payload.data?.tenantId;
+  if (!link && payload.data && payload.data.type === "attendance_alert") {
+    var tenantSlug = (payload.data && payload.data.tenantSlug) || (payload.data && payload.data.tenantId);
     if (tenantSlug) {
-      link = `/${tenantSlug}/attendance`;
+      link = "/" + tenantSlug + "/attendance";
     } else {
       link = "/attendance";
     }
   }
 
-  const notificationTitle = payload.data?.title || "New Notification";
-  const notificationOptions = {
-    body: payload.data?.body || payload.data?.message || "",
-    icon: "/logo.svg", // logo.svg matched with assets path
+  var notificationTitle = (payload.data && payload.data.title) ||
+                          (payload.notification && payload.notification.title) ||
+                          "New Notification";
+  var notificationOptions = {
+    body: (payload.data && payload.data.body) ||
+          (payload.data && payload.data.message) ||
+          (payload.notification && payload.notification.body) ||
+          "",
+    icon: "/logo.svg",
     data: { url: link },
   };
+
   self.registration.showNotification(notificationTitle, notificationOptions);
+
 });
 
 self.addEventListener("notificationclick", function (event) {
