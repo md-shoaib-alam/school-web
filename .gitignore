@@ -48,3 +48,6 @@ bunfig.toml
 
 src/service_key.json
 certificates
+testsprite_tests\tmp\config.json
+testsprite_tests/
+

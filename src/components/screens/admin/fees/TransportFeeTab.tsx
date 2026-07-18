@@ -3,7 +3,7 @@
 import { useReducer, useMemo, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { apiFetch } from '@/lib/api';
+import { apiFetch, fetchAllStudents } from '@/lib/api';
 import { toast } from "sonner";
 
 // Sub-components
@@ -161,12 +161,9 @@ export function TransportFeeTab() {
 
   const { data: studentsData } = useQuery({
     queryKey: ['students-min'],
-    queryFn: async () => {
-      const res = await apiFetch('/api/students?mode=min&limit=5000');
-      return res.json();
-    }
+    queryFn: () => fetchAllStudents()
   });
-  const students = useMemo(() => Array.isArray(studentsData) ? studentsData : studentsData?.items || [], [studentsData]);
+  const students = useMemo(() => Array.isArray(studentsData) ? studentsData : [], [studentsData]);
 
   // ── Mutations ──
   const assignMutation = useMutation<any, any, any>({

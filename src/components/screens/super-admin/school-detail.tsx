@@ -28,30 +28,116 @@ interface SchoolDetailProps {
 
 const ITEMS_PER_PAGE = 20;
 
-export function SchoolDetail({
-  tenantId,
-  tenantName,
-  tenantSlug,
-  tenantPlan,
-  onBack,
-}: SchoolDetailProps) {
-  const queryClient = useQueryClient();
-  const [activeTab, setActiveTab] = useState<TabType>("students");
-  const [search, setSearch] = useState("");
-  const [currentPage, setCurrentPage] = useState(1);
-  const [exporting, setExporting] = useState(false);
-  const [importing, setImporting] = useState(false);
-  const importInputRef = useRef<HTMLInputElement>(null);
 
-  // ── Data Fetching ──
-  const { data, isLoading: loading } = useTenantMetadata(tenantId);
-  const debouncedSearch = useDebounce(search, 300);
 
+interface TabResult<T> {
+  paginatedData: T[];
+  totalItems: number;
+  totalPages: number;
+  isTabLoading: boolean;
+}
+
+function getStudentsData(data: any, isFetching: boolean): TabResult<any> {
+  return {
+    paginatedData: data?.students || [],
+    totalItems: data?.total || 0,
+    totalPages: data?.totalPages || 1,
+    isTabLoading: isFetching,
+  };
+}
+
+function getTeachersData(data: any, isFetching: boolean): TabResult<any> {
+  return {
+    paginatedData: data?.teachers || [],
+    totalItems: data?.total || 0,
+    totalPages: data?.totalPages || 1,
+    isTabLoading: isFetching,
+  };
+}
+
+function getParentsData(data: any, isFetching: boolean): TabResult<any> {
+  return {
+    paginatedData: data?.parents || [],
+    totalItems: data?.total || 0,
+    totalPages: data?.totalPages || 1,
+    isTabLoading: isFetching,
+  };
+}
+
+function getClassesData(data: any, isFetching: boolean, search: string): TabResult<any> {
+  const rawClasses = data?.classes || [];
+  const query = search.trim().toLowerCase();
+  const filtered = !query ? rawClasses : rawClasses.filter((c: any) => 
+    c.name.toLowerCase().includes(query) || 
+    c.section.toLowerCase().includes(query)
+  );
+  return {
+    paginatedData: filtered,
+    totalItems: filtered.length,
+    totalPages: data?.totalPages || 1,
+    isTabLoading: isFetching,
+  };
+}
+
+function getFeesData(data: any, isFetching: boolean, search: string): TabResult<any> {
+  const rawFees = data?.fees || [];
+  const query = search.trim().toLowerCase();
+  const filtered = !query ? rawFees : rawFees.filter((f: any) => 
+    f.studentName.toLowerCase().includes(query) ||
+    f.type.toLowerCase().includes(query)
+  );
+  return {
+    paginatedData: filtered,
+    totalItems: filtered.length,
+    totalPages: data?.totalPages || 1,
+    isTabLoading: isFetching,
+  };
+}
+
+function getAttendanceData(data: any, isFetching: boolean, search: string): TabResult<any> {
+  const rawAtt = data?.records || [];
+  const query = search.trim().toLowerCase();
+  const filtered = !query ? rawAtt : rawAtt.filter((a: any) => 
+    a.studentName.toLowerCase().includes(query) ||
+    a.className.toLowerCase().includes(query)
+  );
+  return {
+    paginatedData: filtered,
+    totalItems: filtered.length,
+    totalPages: data?.totalPages || 1,
+    isTabLoading: isFetching,
+  };
+}
+
+function getNoticesData(data: any, isFetching: boolean, search: string): TabResult<any> {
+  const rawNotices = data?.notices || [];
+  const query = search.trim().toLowerCase();
+  const filtered = !query ? rawNotices : rawNotices.filter((n: any) => 
+    n.title.toLowerCase().includes(query) || 
+    n.content.toLowerCase().includes(query)
+  );
+  return {
+    paginatedData: filtered,
+    totalItems: filtered.length,
+    totalPages: data?.totalPages || 1,
+    isTabLoading: isFetching,
+  };
+}
+
+function useSchoolTabsData(
+  tenantId: string,
+  activeTab: TabType,
+  debouncedSearch: string,
+  search: string,
+  currentPage: number
+) {
   // Progressive tab query hooks (only enabled if the tab is active and tenantId is present)
   const studentsRes = useStudents(
     activeTab === "students" ? tenantId : undefined,
     undefined,
     activeTab === "students" && debouncedSearch ? debouncedSearch : undefined,
+    undefined,
+    undefined,
     activeTab === "students" ? currentPage : 1,
     ITEMS_PER_PAGE
   );
@@ -95,81 +181,22 @@ export function SchoolDetail({
   );
 
   // ── Tab data accessors ──
-  const { paginatedData, totalItems, totalPages, isTabLoading } = useMemo(() => {
+  return useMemo(() => {
     switch (activeTab) {
       case "students":
-        return {
-          paginatedData: studentsRes.data?.students || [],
-          totalItems: studentsRes.data?.total || 0,
-          totalPages: studentsRes.data?.totalPages || 1,
-          isTabLoading: studentsRes.isFetching,
-        };
+        return getStudentsData(studentsRes.data, studentsRes.isFetching);
       case "teachers":
-        return {
-          paginatedData: teachersRes.data?.teachers || [],
-          totalItems: teachersRes.data?.total || 0,
-          totalPages: teachersRes.data?.totalPages || 1,
-          isTabLoading: teachersRes.isFetching,
-        };
+        return getTeachersData(teachersRes.data, teachersRes.isFetching);
       case "parents":
-        return {
-          paginatedData: parentsRes.data?.parents || [],
-          totalItems: parentsRes.data?.total || 0,
-          totalPages: parentsRes.data?.totalPages || 1,
-          isTabLoading: parentsRes.isFetching,
-        };
-      case "classes": {
-        const rawClasses = classesRes.data?.classes || [];
-        const filtered = !search.trim() ? rawClasses : rawClasses.filter(c => 
-          c.name.toLowerCase().includes(search.toLowerCase()) || 
-          c.section.toLowerCase().includes(search.toLowerCase())
-        );
-        return {
-          paginatedData: filtered,
-          totalItems: filtered.length,
-          totalPages: classesRes.data?.totalPages || 1,
-          isTabLoading: classesRes.isFetching,
-        };
-      }
-      case "fees": {
-        const rawFees = feesRes.data?.fees || [];
-        const filtered = !search.trim() ? rawFees : rawFees.filter(f => 
-          f.studentName.toLowerCase().includes(search.toLowerCase()) ||
-          f.type.toLowerCase().includes(search.toLowerCase())
-        );
-        return {
-          paginatedData: filtered,
-          totalItems: filtered.length,
-          totalPages: feesRes.data?.totalPages || 1,
-          isTabLoading: feesRes.isFetching,
-        };
-      }
-      case "attendance": {
-        const rawAtt = attendanceRes.data?.records || [];
-        const filtered = !search.trim() ? rawAtt : rawAtt.filter(a => 
-          a.studentName.toLowerCase().includes(search.toLowerCase()) ||
-          a.className.toLowerCase().includes(search.toLowerCase())
-        );
-        return {
-          paginatedData: filtered,
-          totalItems: filtered.length,
-          totalPages: attendanceRes.data?.totalPages || 1,
-          isTabLoading: attendanceRes.isFetching,
-        };
-      }
-      case "notices": {
-        const rawNotices = noticesRes.data?.notices || [];
-        const filtered = !search.trim() ? rawNotices : rawNotices.filter(n => 
-          n.title.toLowerCase().includes(search.toLowerCase()) || 
-          n.content.toLowerCase().includes(search.toLowerCase())
-        );
-        return {
-          paginatedData: filtered,
-          totalItems: filtered.length,
-          totalPages: noticesRes.data?.totalPages || 1,
-          isTabLoading: noticesRes.isFetching,
-        };
-      }
+        return getParentsData(parentsRes.data, parentsRes.isFetching);
+      case "classes":
+        return getClassesData(classesRes.data, classesRes.isFetching, search);
+      case "fees":
+        return getFeesData(feesRes.data, feesRes.isFetching, search);
+      case "attendance":
+        return getAttendanceData(attendanceRes.data, attendanceRes.isFetching, search);
+      case "notices":
+        return getNoticesData(noticesRes.data, noticesRes.isFetching, search);
       default:
         return { paginatedData: [], totalItems: 0, totalPages: 1, isTabLoading: false };
     }
@@ -183,6 +210,34 @@ export function SchoolDetail({
     attendanceRes.data, attendanceRes.isFetching,
     noticesRes.data, noticesRes.isFetching,
   ]);
+}
+
+export function SchoolDetail({
+  tenantId,
+  tenantName,
+  tenantSlug,
+  tenantPlan,
+  onBack,
+}: SchoolDetailProps) {
+  const queryClient = useQueryClient();
+  const [activeTab, setActiveTab] = useState<TabType>("students");
+  const [search, setSearch] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [exporting, setExporting] = useState(false);
+  const [importing, setImporting] = useState(false);
+  const importInputRef = useRef<HTMLInputElement>(null);
+
+  // ── Data Fetching ──
+  const { data, isLoading: loading } = useTenantMetadata(tenantId);
+  const debouncedSearch = useDebounce(search, 300);
+
+  const { paginatedData, totalItems, totalPages, isTabLoading } = useSchoolTabsData(
+    tenantId,
+    activeTab,
+    debouncedSearch,
+    search,
+    currentPage
+  );
 
   const handleTabChange = (tab: TabType) => {
     setActiveTab(tab);

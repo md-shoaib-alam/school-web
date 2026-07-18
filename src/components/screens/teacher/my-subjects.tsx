@@ -3,6 +3,7 @@
 import { api } from "@/lib/api";
 import { useQuery } from "@tanstack/react-query";
 import { useState, useEffect, useMemo } from "react";
+import { useAppStore } from "@/store/use-app-store";
 import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "@/components/ui/badge";
@@ -164,6 +165,7 @@ function palette(name: string) {
 
 export function TeacherSubjects() {
   const [view, setView] = useState<"grid" | "table">("grid");
+  const { currentUser: user } = useAppStore();
 
   // Hydrate from cookie after mount
   useEffect(() => {
@@ -182,15 +184,25 @@ export function TeacherSubjects() {
   };
 
   const { data: subjects = [], isLoading: subjectsLoading } = useQuery<SubjectInfo[]>({
-    queryKey: ["teacher-subjects-mine-v2"],
-    queryFn: () => api.get<SubjectInfo[]>("/subjects?mine=true"),
+    queryKey: ["teacher-subjects-mine-v2", user?.id, user?.role],
+    queryFn: async () => {
+      const data = await api.get<any>("/subjects?mine=true");
+      let items = Array.isArray(data) ? data : (data?.items || data?.data || []);
+      if (items.length === 0 && (user?.role === 'admin' || user?.role === 'super_admin' || user?.role === 'staff')) {
+        const fallback = await api.get<any>("/subjects");
+        items = Array.isArray(fallback) ? fallback : (fallback?.items || fallback?.data || []);
+      }
+      return items as SubjectInfo[];
+    },
+    enabled: !!user,
     staleTime: 10 * 60 * 1000,
     gcTime: 30 * 60 * 1000,
   });
 
   const { data: timetable = [], isLoading: timetableLoading } = useQuery<any[]>({
-    queryKey: ["teacher-timetable-summary-mine"],
+    queryKey: ["teacher-timetable-summary-mine", user?.id],
     queryFn: () => api.get<any[]>("/timetable?mine=true"),
+    enabled: !!user,
     staleTime: 5 * 60 * 1000,
   });
 
@@ -346,7 +358,7 @@ function Header({
       </div>
 
       {/* View toggle */}
-      <div className="flex items-center gap-1 p-1 bg-zinc-100 dark:bg-zinc-800/60 rounded-xl border border-zinc-200 dark:border-zinc-700/50 flex-shrink-0">
+      <div className="flex items-center gap-1 p-1 bg-zinc-100 dark:bg-zinc-800/60 rounded-xl border border-zinc-200 dark:border-zinc-700/50 shrink-0">
         <button
           type="button"
           onClick={() => switchView("grid")}
@@ -390,7 +402,7 @@ function GridView({ subjects, slotsBySubject }: { subjects: SubjectInfo[], slots
 
         return (
           <Card
-            key={subject.id}
+            key={`${subject.id}-${subject.classId || ""}`}
             className={`rounded-xl border hover:shadow-md transition-all group overflow-hidden flex flex-col ${
               isLiveNow 
                 ? "ring-2 ring-emerald-500 shadow-emerald-100 dark:shadow-emerald-900/20 border-emerald-200 dark:border-emerald-800 bg-emerald-50/10 dark:bg-emerald-900/5"
@@ -404,7 +416,7 @@ function GridView({ subjects, slotsBySubject }: { subjects: SubjectInfo[], slots
               <div className="flex items-start justify-between gap-3 mb-4">
                 <div className="flex items-start gap-3 overflow-hidden">
                   <div
-                    className={`size-11 rounded-xl flex items-center justify-center flex-shrink-0 ${p.icon}`}
+                    className={`size-11 rounded-xl flex items-center justify-center shrink-0 ${p.icon}`}
                   >
                     <BookOpen className="size-5" />
                   </div>
@@ -432,7 +444,7 @@ function GridView({ subjects, slotsBySubject }: { subjects: SubjectInfo[], slots
 
               {/* Class – prominent */}
               <div className={`flex items-center gap-2.5 px-3 py-2.5 rounded-lg ${p.bg} border border-current/10 mb-auto`}>
-                <School className={`size-4 flex-shrink-0 ${p.icon.split(" ")[1]} dark:text-white/80`} />
+                <School className={`size-4 shrink-0 ${p.icon.split(" ")[1]} dark:text-white/80`} />
                 <div className="min-w-0">
                   <p className="text-[10px] font-semibold uppercase tracking-wider text-zinc-400 dark:text-white/50 leading-none mb-0.5">
                     Class
@@ -495,7 +507,7 @@ function TableView({ subjects, slotsBySubject }: { subjects: SubjectInfo[], slot
 
           return (
             <div
-              key={subject.id}
+              key={`${subject.id}-${subject.classId || ""}`}
               className={`p-4 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-card shadow-sm space-y-3 transition-all ${
                 isLiveNow
                   ? "bg-emerald-50/30 dark:bg-emerald-950/10 ring-1 ring-emerald-500/20"
@@ -507,7 +519,7 @@ function TableView({ subjects, slotsBySubject }: { subjects: SubjectInfo[], slot
               {/* Row 1: Icon, Subject Name, Code, Badge */}
               <div className="flex items-start justify-between gap-3">
                 <div className="flex items-center gap-3 min-w-0">
-                  <div className={`size-9 rounded-xl flex items-center justify-center flex-shrink-0 ${p.icon}`}>
+                  <div className={`size-9 rounded-xl flex items-center justify-center shrink-0 ${p.icon}`}>
                     <BookOpen className="size-4" />
                   </div>
                   <div className="min-w-0">
@@ -524,7 +536,7 @@ function TableView({ subjects, slotsBySubject }: { subjects: SubjectInfo[], slot
                   </div>
                 </div>
                 
-                <div className="flex-shrink-0">
+                <div className="shrink-0">
                   {isLiveNow ? (
                     <Badge className="bg-emerald-600 text-white text-[9px] px-1.5 py-0.5 h-auto font-bold uppercase animate-pulse">Live</Badge>
                   ) : isHappeningToday ? (
@@ -536,7 +548,7 @@ function TableView({ subjects, slotsBySubject }: { subjects: SubjectInfo[], slot
               {/* Row 2: Class & Timings */}
               <div className="flex flex-wrap items-center justify-between gap-3 pt-1">
                 <div className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg ${p.bg} text-xs font-semibold`}>
-                  <School className={`size-3.5 flex-shrink-0 ${p.icon.split(" ")[1]} dark:text-white/80`} />
+                  <School className={`size-3.5 shrink-0 ${p.icon.split(" ")[1]} dark:text-white/80`} />
                   <span className={`${p.icon.split(" ")[1]} dark:text-white`}>{subject.className}</span>
                 </div>
 
@@ -568,7 +580,7 @@ function TableView({ subjects, slotsBySubject }: { subjects: SubjectInfo[], slot
 
       {/* Desktop View (HTML Table) */}
       <div className="hidden md:block rounded-xl border border-zinc-200 dark:border-zinc-800 overflow-x-auto bg-card">
-        <table className="w-full min-w-[800px]">
+        <table className="w-full min-w-200">
           <colgroup>
             <col className="w-16" />
             <col />
@@ -605,7 +617,7 @@ function TableView({ subjects, slotsBySubject }: { subjects: SubjectInfo[], slot
 
               return (
                 <tr
-                  key={subject.id}
+                  key={`${subject.id}-${subject.classId || ""}`}
                   className={`transition-colors ${
                     isLiveNow 
                       ? "bg-emerald-50/50 dark:bg-emerald-900/10 hover:bg-emerald-50 dark:hover:bg-emerald-900/20" 
@@ -626,7 +638,7 @@ function TableView({ subjects, slotsBySubject }: { subjects: SubjectInfo[], slot
                   </td>
                   <td className="p-3">
                     <div className="flex items-center gap-2.5 min-w-0">
-                      <div className={`size-7 rounded-lg flex items-center justify-center flex-shrink-0 ${p.icon}`}>
+                      <div className={`size-7 rounded-lg flex items-center justify-center shrink-0 ${p.icon}`}>
                         <BookOpen className="size-3.5" />
                       </div>
                       <div className="flex items-center gap-2 min-w-0">
@@ -638,9 +650,9 @@ function TableView({ subjects, slotsBySubject }: { subjects: SubjectInfo[], slot
                           {subject.name}
                         </span>
                         {isLiveNow ? (
-                           <Badge className="bg-emerald-600 text-white text-[9px] px-1 py-0 h-4 font-bold uppercase tracking-tighter flex-shrink-0">Live</Badge>
+                           <Badge className="bg-emerald-600 text-white text-[9px] px-1 py-0 h-4 font-bold uppercase tracking-tighter shrink-0">Live</Badge>
                         ) : isHappeningToday ? (
-                           <Badge variant="outline" className="border-blue-200 text-blue-600 text-[9px] px-1 py-0 h-4 font-semibold tracking-tighter flex-shrink-0 bg-blue-50">Today</Badge>
+                           <Badge variant="outline" className="border-blue-200 text-blue-600 text-[9px] px-1 py-0 h-4 font-semibold tracking-tighter shrink-0 bg-blue-50">Today</Badge>
                         ) : null}
                       </div>
                     </div>
@@ -652,7 +664,7 @@ function TableView({ subjects, slotsBySubject }: { subjects: SubjectInfo[], slot
                   </td>
                   <td className="p-3">
                     <div className={`inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg ${p.bg} max-w-full`}>
-                      <School className={`size-3.5 flex-shrink-0 ${p.icon.split(" ")[1]} dark:text-white/80`} />
+                      <School className={`size-3.5 shrink-0 ${p.icon.split(" ")[1]} dark:text-white/80`} />
                       <span className={`text-xs font-bold truncate ${p.icon.split(" ")[1]} dark:text-white`}>
                         {subject.className}
                       </span>

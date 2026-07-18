@@ -50,10 +50,24 @@ function buildHeaders(isFormData: boolean = false): Record<string, string> {
 
 let isRefreshing = false;
 let refreshFailed = false;
+let refreshFailedTimer: ReturnType<typeof setTimeout> | null = null;
 let failedQueue: Array<{
   resolve: (token: string) => void;
   reject: (error: Error) => void;
 }> = [];
+
+/**
+ * Mark refresh as failed and auto-reset after 10 s so transient
+ * failures (e.g. 409 race, network blip) don't permanently brick the session.
+ */
+function markRefreshFailed() {
+  refreshFailed = true;
+  if (refreshFailedTimer) clearTimeout(refreshFailedTimer);
+  refreshFailedTimer = setTimeout(() => {
+    refreshFailed = false;
+    refreshFailedTimer = null;
+  }, 10_000);
+}
 
 function processQueue(error: Error | null, token: string | null = null) {
   failedQueue.forEach(({ resolve, reject }) => {
@@ -150,7 +164,7 @@ async function request<T>(
 
   // ── 401 → silent refresh + retry ──
   if (res.status === 401 && attempt < 2) {
-    // If refresh already failed recently, hard logout
+    // If refresh already failed very recently, hard logout
     if (refreshFailed) {
       forceLogout();
       throw new Error('Session expired');
@@ -181,7 +195,7 @@ async function request<T>(
       return request<T>(method, path, body, options, attempt + 1);
     } catch (refreshError) {
       isRefreshing = false;
-      refreshFailed = true;
+      markRefreshFailed();
       processQueue(
         refreshError instanceof Error ? refreshError : new Error('Refresh failed')
       );
@@ -340,3 +354,33 @@ export async function apiFetch(path: string, init?: RequestInit): Promise<Respon
 export { setToken, setRefreshToken, getToken, getRefreshToken };
 
 export { API_BASE };
+
+/**
+ * Fetch ALL students for a given classId (or all classes if omitted),
+ * automatically paginating through every server page.
+ *
+ * The server hard-caps each page at MAX_STUDENT_LIMIT=100, so never pass a
+ * big limit — just let this function loop until `hasMore` is false.
+ */
+export async function fetchAllStudents(params: {
+  classId?: string;
+  status?: string;
+  search?: string;
+} = {}): Promise<any[]> {
+  let page = 1;
+  const all: any[] = [];
+  while (true) {
+    const qs = new URLSearchParams({ mode: 'min', limit: '100', page: String(page) });
+    if (params.classId) qs.set('classId', params.classId);
+    if (params.status)  qs.set('status',  params.status);
+    if (params.search)  qs.set('search',  params.search);
+
+    const res = await apiFetch(`/api/students?${qs.toString()}`);
+    const data = await res.json();
+    const items: any[] = Array.isArray(data) ? data : (data?.items ?? []);
+    all.push(...items);
+    if (!data?.hasMore || items.length === 0) break;
+    page++;
+  }
+  return all;
+}

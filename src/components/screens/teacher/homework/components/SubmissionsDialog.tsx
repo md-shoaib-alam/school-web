@@ -160,7 +160,7 @@ export function SubmissionsDialog({
                         )}
                       </div>
                       <p className="text-[11px] text-zinc-500 dark:text-zinc-400 truncate mt-0.5">
-                        {sub.studentEmail} • {sub.studentClass}
+                        Roll No: {sub.studentRollNumber || 'N/A'} • Class: {sub.studentClass}
                       </p>
                     </div>
 

@@ -108,7 +108,9 @@ export function AssignmentGrid({
                 <Progress value={pct} className="h-2" />
                 <div className="flex items-center gap-1.5 text-xs text-zinc-500 dark:text-zinc-400 mt-1">
                   <Users className="size-3" />
-                  {assignment.totalStudents - assignment.submissions} students haven't submitted
+                  {assignment.totalStudents - assignment.submissions === 0 
+                    ? "All students have submitted"
+                    : `${assignment.totalStudents - assignment.submissions} students haven't submitted`}
                 </div>
               </div>
 

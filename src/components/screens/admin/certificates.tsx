@@ -31,7 +31,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { toast } from "sonner";
-import { apiFetch } from '@/lib/api';
+import { apiFetch, fetchAllStudents } from '@/lib/api';
 import { CertificateTemplate } from './certificates/certificate-template';
 
 // ── Types ──
@@ -153,10 +153,7 @@ export function AdminCertificates() {
     queryKey: ['students', 'min', selectedClassId],
     queryFn: async () => {
       if (!selectedClassId) return [];
-      const res = await apiFetch(`/api/students?classId=${selectedClassId}&mode=min&limit=1000`);
-      if (!res.ok) return [];
-      const json = await res.json();
-      return json.items || [];
+      return fetchAllStudents({ classId: selectedClassId });
     },
     enabled: !!selectedClassId,
   });
