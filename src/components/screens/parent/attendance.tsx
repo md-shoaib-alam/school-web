@@ -11,6 +11,7 @@ import { UserCheck, ChevronDown } from "lucide-react";
 import { AttendanceStats } from "./attendance/AttendanceStats";
 import { AttendanceChart } from "./attendance/AttendanceChart";
 import { AttendanceCalendar } from "./attendance/AttendanceCalendar";
+import { TodayAttendanceCard } from "./attendance/TodayAttendanceCard";
 import { AttendanceSkeleton } from "./attendance/AttendanceSkeleton";
 import { ChildSelector } from "./ChildSelector";
 
@@ -123,6 +124,8 @@ export function ParentAttendance() {
           present={currentStats.present}
           absent={currentStats.absent}
         />
+
+        <TodayAttendanceCard records={currentAttendance} />
 
         <AttendanceCalendar 
           data={currentCalendar} 

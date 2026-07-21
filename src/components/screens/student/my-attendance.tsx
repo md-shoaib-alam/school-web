@@ -114,6 +114,8 @@ export function StudentAttendance() {
           absent={stats.absent}
         />
 
+        <TodayAttendanceCard records={attendanceData} />
+
         <div className="w-full">
           <AttendanceCalendar 
             data={calendarData} 
@@ -132,5 +134,6 @@ export function StudentAttendance() {
 import { AttendanceStats } from "../parent/attendance/AttendanceStats";
 import { AttendanceChart } from "../parent/attendance/AttendanceChart";
 import { AttendanceCalendar } from "../parent/attendance/AttendanceCalendar";
+import { TodayAttendanceCard } from "../parent/attendance/TodayAttendanceCard";
 import { AttendanceSkeleton } from "../parent/attendance/AttendanceSkeleton";
 import { getAttendanceStats, getMonthlyData, getCalendarData } from "../parent/attendance/utils";

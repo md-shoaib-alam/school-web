@@ -43,7 +43,7 @@ export function SidebarHeader({
           <>
             <div
               className={cn(
-                "size-10 rounded-xl flex items-center justify-center text-white shadow-md overflow-hidden shrink-0",
+                "size-10 rounded-full flex items-center justify-center text-white shadow-md overflow-hidden shrink-0",
                 isSuperAdmin ? "bg-teal-600" : "bg-emerald-600",
               )}
             >
