@@ -39,6 +39,7 @@ const GET_EXPENSE_STATS = `
     expenseStats {
       totalExpenses
       thisMonthExpenses
+      prevMonthExpenses
       categoryWiseExpenses {
         categoryId
         categoryName
