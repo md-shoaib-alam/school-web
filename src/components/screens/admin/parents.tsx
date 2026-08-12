@@ -283,17 +283,35 @@ export function AdminParents() {
 
   const handleLinkChild = async (studentId: string) => {
     if (!selectedParent) return;
+    const targetParentId = selectedParent.id;
+
+    // Optimistically update React Query cache in memory
+    queryClient.setQueriesData({ queryKey: queryKeys.parents }, (oldData: any) => {
+      if (!oldData) return oldData;
+      const updateParent = (p: any) => {
+        if (p.id === targetParentId) {
+          const existing = p.children || [];
+          return { ...p, children: [...existing, { id: studentId, name: 'Updating...' }] };
+        }
+        return p;
+      };
+      if (Array.isArray(oldData)) return oldData.map(updateParent);
+      if (oldData.parents && Array.isArray(oldData.parents)) return { ...oldData, parents: oldData.parents.map(updateParent) };
+      if (oldData.items && Array.isArray(oldData.items)) return { ...oldData, items: oldData.items.map(updateParent) };
+      return oldData;
+    });
+
     toast.promise(
       (async () => {
         dispatch({ type: 'SET_LINKING', payload: true });
         try {
-          await api.post("/parents", { action: "link", parentId: selectedParent.id, studentId, });
+          await api.post("/parents", { action: "link", parentId: targetParentId, studentId });
           queryClient.invalidateQueries({ queryKey: queryKeys.parents });
           queryClient.invalidateQueries({ queryKey: ['students-min-infinite'] });
           return "Student linked successfully";
         } finally { dispatch({ type: 'SET_LINKING', payload: false }); }
       })(),
-      { loading: "Linking child to parent...", success: (msg: any) => msg, error: (err: any) => err.message, },
+      { loading: "Linking child to parent...", success: (msg: any) => msg, error: (err: any) => err.message }
     );
   };
 
@@ -307,14 +325,29 @@ export function AdminParents() {
     const { parentId, studentId } = unlinkData;
     setUnlinkConfirmOpen(false);
     setUnlinkData(null);
+
+    // Optimistically update React Query cache in memory immediately
+    queryClient.setQueriesData({ queryKey: queryKeys.parents }, (oldData: any) => {
+      if (!oldData) return oldData;
+      const updateParent = (p: any) => {
+        if (p.id === parentId) {
+          return { ...p, children: (p.children || []).filter((c: any) => c.id !== studentId) };
+        }
+        return p;
+      };
+      if (Array.isArray(oldData)) return oldData.map(updateParent);
+      if (oldData.parents && Array.isArray(oldData.parents)) return { ...oldData, parents: oldData.parents.map(updateParent) };
+      if (oldData.items && Array.isArray(oldData.items)) return { ...oldData, items: oldData.items.map(updateParent) };
+      return oldData;
+    });
+
     toast.promise(
       (async () => {
-        await api.post("/parents", { action: "unlink", parentId, studentId, });
-        queryClient.invalidateQueries({ queryKey: queryKeys.parents });
+        await api.post("/parents", { action: "unlink", parentId, studentId });
         queryClient.invalidateQueries({ queryKey: ['students-min-infinite'] });
         return "Child record unlinked";
       })(),
-      { loading: "Unlinking child...", success: (msg) => msg, error: (err: any) => err.message, },
+      { loading: "Unlinking child...", success: (msg) => msg, error: (err: any) => err.message }
     );
   };
 
