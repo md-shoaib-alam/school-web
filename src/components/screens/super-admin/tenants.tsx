@@ -18,6 +18,8 @@ import { TenantStats } from "./tenants/TenantStats";
 import { TenantFilters } from "./tenants/TenantFilters";
 import { TenantTable } from "./tenants/TenantTable";
 import { TenantDialogs } from "./tenants/TenantDialogs";
+import { useSearchParams, useRouter, usePathname } from "next/navigation";
+import { useEffect } from "react";
 import { 
   Tenant, 
   ITEMS_PER_PAGE, 
@@ -28,6 +30,24 @@ import { tenantsReducer, initialState } from "./tenants/reducer";
 export function SuperAdminTenants() {
   const { canCreate, canEdit, canDelete } = useModulePermissions("tenants");
   const [state, dispatch] = useReducer(tenantsReducer, initialState);
+
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const pathname = usePathname();
+  const pageParam = searchParams.get("page");
+
+  useEffect(() => {
+    if (pageParam && Number(pageParam) !== state.currentPage) {
+      dispatch({ type: "SET_CURRENT_PAGE", payload: Number(pageParam) });
+    }
+  }, [pageParam, state.currentPage]);
+
+  const updateUrlParams = (page: number) => {
+    const params = new URLSearchParams(searchParams.toString());
+    if (page > 1) params.set("page", String(page)); else params.delete("page");
+    const newQuery = params.toString();
+    router.replace(newQuery ? `${pathname}?${newQuery}` : pathname, { scroll: false });
+  };
 
   const {
     search,
@@ -216,7 +236,10 @@ export function SuperAdminTenants() {
         viewMode={viewMode}
         currentPage={currentPage}
         totalPages={totalPages}
-        onPageChange={(p) => dispatch({ type: "SET_CURRENT_PAGE", page: p })}
+        onPageChange={(p) => {
+          dispatch({ type: "SET_CURRENT_PAGE", page: p });
+          updateUrlParams(p);
+        }}
         onView={(t) => dispatch({ type: "SET_VIEWING_TENANT", tenant: t })} 
         onEdit={handleOpenEditDialog}
         onToggleStatus={handleToggleStatus}

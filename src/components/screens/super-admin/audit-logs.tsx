@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
+import { useSearchParams, useRouter, usePathname } from "next/navigation";
 import { useAuditLogs, useTenants } from "@/lib/graphql/hooks";
 
 // Sub-components
@@ -8,12 +9,30 @@ import { LogStats } from "./audit-logs/LogStats";
 import { LogTable } from "./audit-logs/LogTable";
 
 export function SuperAdminAuditLogs() {
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const pathname = usePathname();
+  const pageParam = searchParams.get("page");
+
   const [search, setSearch] = useState("");
   const [actionFilter, setActionFilter] = useState<string>("all");
   const [roleFilter, setRoleFilter] = useState<string>("all");
   const [tenantFilter, setTenantFilter] = useState<string>("all");
-  const [page, setPage] = useState(1);
+  const [page, setPage] = useState(pageParam ? Number(pageParam) : 1);
   const limit = 10;
+
+  useEffect(() => {
+    if (pageParam && Number(pageParam) !== page) {
+      setPage(Number(pageParam));
+    }
+  }, [pageParam]);
+
+  const updateUrlParams = (newPage: number) => {
+    const params = new URLSearchParams(searchParams.toString());
+    if (newPage > 1) params.set("page", String(newPage)); else params.delete("page");
+    const newQuery = params.toString();
+    router.replace(newQuery ? `${pathname}?${newQuery}` : pathname, { scroll: false });
+  };
 
   // Fetch simple list of tenants for selection
   const { data: tenantsData } = useTenants({ limit: 100 });
@@ -74,7 +93,10 @@ export function SuperAdminAuditLogs() {
         page={page}
         totalPages={totalPages}
         limit={limit}
-        onPageChange={setPage}
+        onPageChange={(p) => {
+          setPage(p);
+          updateUrlParams(p);
+        }}
         search={search}
         onSearchChange={setSearch}
         actionFilter={actionFilter}

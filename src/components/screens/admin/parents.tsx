@@ -11,6 +11,7 @@ import {
 } from "@/lib/graphql/hooks/academic.hooks";
 import { useQuery, useQueryClient, useInfiniteQuery } from "@tanstack/react-query";
 import { queryKeys } from "@/lib/graphql/keys";
+import { useSearchParams, useRouter, usePathname } from "next/navigation";
 import { Pagination } from "@/components/shared/pagination";
 import { useDebounce } from "@/hooks/use-debounce";
 import {
@@ -180,6 +181,29 @@ export function AdminParents() {
   const [unlinkConfirmOpen, setUnlinkConfirmOpen] = useState(false);
   const [unlinkData, setUnlinkData] = useState<{ parentId: string; studentId: string } | null>(null);
 
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const pathname = usePathname();
+  const pageParam = searchParams.get("page");
+  const limitParam = searchParams.get("limit");
+
+  useEffect(() => {
+    if (pageParam && Number(pageParam) !== currentPage) {
+      dispatch({ type: "SET_CURRENT_PAGE", payload: Number(pageParam) });
+    }
+    if (limitParam && Number(limitParam) !== itemsPerPage) {
+      dispatch({ type: "SET_ITEMS_PER_PAGE", payload: Number(limitParam) });
+    }
+  }, [pageParam, limitParam]);
+
+  const updateUrlParams = (page: number, limit: number) => {
+    const params = new URLSearchParams(searchParams.toString());
+    if (page > 1) params.set("page", String(page)); else params.delete("page");
+    if (limit !== 15) params.set("limit", String(limit)); else params.delete("limit");
+    const newQuery = params.toString();
+    router.replace(newQuery ? `${pathname}?${newQuery}` : pathname, { scroll: false });
+  };
+
   // Queries
   const { 
     data: parentsData, 
@@ -309,6 +333,9 @@ export function AdminParents() {
           queryClient.invalidateQueries({ queryKey: queryKeys.parents });
           queryClient.invalidateQueries({ queryKey: ['students-min-infinite'] });
           return "Student linked successfully";
+        } catch (err) {
+          queryClient.invalidateQueries({ queryKey: queryKeys.parents });
+          throw err;
         } finally { dispatch({ type: 'SET_LINKING', payload: false }); }
       })(),
       { loading: "Linking child to parent...", success: (msg: any) => msg, error: (err: any) => err.message }
@@ -343,9 +370,14 @@ export function AdminParents() {
 
     toast.promise(
       (async () => {
-        await api.post("/parents", { action: "unlink", parentId, studentId });
-        queryClient.invalidateQueries({ queryKey: ['students-min-infinite'] });
-        return "Child record unlinked";
+        try {
+          await api.post("/parents", { action: "unlink", parentId, studentId });
+          queryClient.invalidateQueries({ queryKey: ['students-min-infinite'] });
+          return "Child record unlinked";
+        } catch (err) {
+          queryClient.invalidateQueries({ queryKey: queryKeys.parents });
+          throw err;
+        }
       })(),
       { loading: "Unlinking child...", success: (msg) => msg, error: (err: any) => err.message }
     );
@@ -428,8 +460,14 @@ export function AdminParents() {
         totalPages={totalPages}
         totalItems={totalItems}
         itemsPerPage={itemsPerPage}
-        onPageChange={(v) => dispatch({ type: 'SET_CURRENT_PAGE', payload: v })}
-        onLimitChange={(limit) => dispatch({ type: 'SET_ITEMS_PER_PAGE', payload: limit })}
+        onPageChange={(page) => {
+          dispatch({ type: 'SET_CURRENT_PAGE', payload: page });
+          updateUrlParams(page, itemsPerPage);
+        }}
+        onLimitChange={(limit) => {
+          dispatch({ type: 'SET_ITEMS_PER_PAGE', payload: limit });
+          updateUrlParams(1, limit);
+        }}
       />
 
       <CreateParentDialog

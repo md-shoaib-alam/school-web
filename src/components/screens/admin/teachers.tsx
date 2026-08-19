@@ -10,6 +10,7 @@ import { useTeachers } from "@/lib/graphql/hooks/academic.hooks";
 import { useQueryClient } from "@tanstack/react-query";
 import { queryKeys } from "@/lib/graphql/keys";
 import { Pagination } from "@/components/shared/pagination";
+import { useSearchParams, useRouter, usePathname } from "next/navigation";
 import { useDebounce } from "@/hooks/use-debounce";
 import anime from "animejs";
 
@@ -149,7 +150,30 @@ export function AdminTeachers() {
  
    const queryClient = useQueryClient();
  
-   const { data: teachersData, isFetching: loading } = useTeachers(
+   const searchParams = useSearchParams();
+  const router = useRouter();
+  const pathname = usePathname();
+  const pageParam = searchParams.get("page");
+  const limitParam = searchParams.get("limit");
+
+  useEffect(() => {
+    if (pageParam && Number(pageParam) !== currentPage) {
+      dispatch({ type: "SET_CURRENT_PAGE", payload: Number(pageParam) });
+    }
+    if (limitParam && Number(limitParam) !== itemsPerPage) {
+      dispatch({ type: "SET_ITEMS_PER_PAGE", payload: Number(limitParam) });
+    }
+  }, [pageParam, limitParam]);
+
+  const updateUrlParams = (page: number, limit: number) => {
+    const params = new URLSearchParams(searchParams.toString());
+    if (page > 1) params.set("page", String(page)); else params.delete("page");
+    if (limit !== 15) params.set("limit", String(limit)); else params.delete("limit");
+    const newQuery = params.toString();
+    router.replace(newQuery ? `${pathname}?${newQuery}` : pathname, { scroll: false });
+  };
+
+  const { data: teachersData, isFetching: loading } = useTeachers(
      currentTenantId || undefined,
      debouncedSearch || undefined,
      currentPage,
@@ -352,8 +376,14 @@ export function AdminTeachers() {
         totalPages={totalPages}
         totalItems={totalItems}
         itemsPerPage={itemsPerPage}
-        onPageChange={(page) => dispatch({ type: "SET_CURRENT_PAGE", payload: page })}
-        onLimitChange={(limit) => dispatch({ type: "SET_ITEMS_PER_PAGE", payload: limit })}
+        onPageChange={(page) => {
+          dispatch({ type: "SET_CURRENT_PAGE", payload: page });
+          updateUrlParams(page, itemsPerPage);
+        }}
+        onLimitChange={(limit) => {
+          dispatch({ type: "SET_ITEMS_PER_PAGE", payload: limit });
+          updateUrlParams(1, limit);
+        }}
       />
 
       <TeacherDialog

@@ -21,7 +21,7 @@ import { ClassSelect } from "@/components/ui/class-select";
 import { useQueryClient } from "@tanstack/react-query";
 import { queryKeys } from "@/lib/graphql/keys";
 import { useDebounce } from "@/hooks/use-debounce";
-import { useSearchParams } from "next/navigation";
+import { useSearchParams, useRouter, usePathname } from "next/navigation";
 import { Suspense } from "react";
 
 // Sub-components
@@ -199,13 +199,40 @@ function AdminStudentsContent() {
   const loading = loadingStudents;
 
   const searchParams = useSearchParams();
+  const router = useRouter();
+  const pathname = usePathname();
   const classIdParam = searchParams.get("classId");
+  const pageParam = searchParams.get("page");
+  const limitParam = searchParams.get("limit");
+
+  // Sync initial URL search params into state
+  useEffect(() => {
+    if (pageParam && Number(pageParam) !== currentPage) {
+      dispatch({ type: 'SET_CURRENT_PAGE', payload: Number(pageParam) });
+    }
+    if (limitParam && Number(limitParam) !== itemsPerPage) {
+      dispatch({ type: 'SET_ITEMS_PER_PAGE', payload: Number(limitParam) });
+    }
+  }, [pageParam, limitParam]);
 
   useEffect(() => {
     if (classIdParam && classIdParam !== classFilter) {
       dispatch({ type: 'SET_CLASS_FILTER', payload: classIdParam });
     }
   }, [classIdParam, classFilter]);
+
+  // Update browser URL query params whenever pagination or filters change
+  const updateUrlParams = useCallback((page: number, limit: number, searchVal?: string, classVal?: string) => {
+    const params = new URLSearchParams(searchParams.toString());
+    if (page > 1) params.set("page", String(page)); else params.delete("page");
+    if (limit !== 15) params.set("limit", String(limit)); else params.delete("limit");
+    if (searchVal) params.set("search", searchVal); else params.delete("search");
+    if (classVal && classVal !== "all") params.set("classId", classVal); else if (classVal === "all") params.delete("classId");
+
+    const newQuery = params.toString();
+    const newPath = newQuery ? `${pathname}?${newQuery}` : pathname;
+    router.replace(newPath, { scroll: false });
+  }, [pathname, router, searchParams]);
 
   // --- Handlers ---
 
@@ -425,8 +452,14 @@ function AdminStudentsContent() {
                 totalPages={totalPages}
                 totalItems={totalItems}
                 itemsPerPage={itemsPerPage}
-                onPageChange={(p) => dispatch({ type: 'SET_CURRENT_PAGE', payload: p })}
-                onLimitChange={(limit) => dispatch({ type: 'SET_ITEMS_PER_PAGE', payload: limit })}
+                onPageChange={(p) => {
+                  dispatch({ type: 'SET_CURRENT_PAGE', payload: p });
+                  updateUrlParams(p, itemsPerPage, search, classFilter);
+                }}
+                onLimitChange={(limit) => {
+                  dispatch({ type: 'SET_ITEMS_PER_PAGE', payload: limit });
+                  updateUrlParams(1, limit, search, classFilter);
+                }}
               />
             </>
           )}
