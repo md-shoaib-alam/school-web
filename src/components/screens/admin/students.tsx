@@ -205,21 +205,21 @@ function AdminStudentsContent() {
   const pageParam = searchParams.get("page");
   const limitParam = searchParams.get("limit");
 
-  // Sync initial URL search params into state
+  // Sync initial URL search params into state (run once on mount)
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
-    if (pageParam && Number(pageParam) !== currentPage) {
-      dispatch({ type: 'SET_CURRENT_PAGE', payload: Number(pageParam) });
-    }
-    if (limitParam && Number(limitParam) !== itemsPerPage) {
-      dispatch({ type: 'SET_ITEMS_PER_PAGE', payload: Number(limitParam) });
-    }
-  }, [pageParam, limitParam]);
-
-  useEffect(() => {
-    if (classIdParam && classIdParam !== classFilter) {
+    if (classIdParam) {
       dispatch({ type: 'SET_CLASS_FILTER', payload: classIdParam });
     }
-  }, [classIdParam, classFilter]);
+    const parsedLimit = limitParam ? Number(limitParam) : NaN;
+    if (Number.isInteger(parsedLimit) && parsedLimit > 0) {
+      dispatch({ type: 'SET_ITEMS_PER_PAGE', payload: parsedLimit });
+    }
+    const parsedPage = pageParam ? Number(pageParam) : NaN;
+    if (Number.isInteger(parsedPage) && parsedPage > 0) {
+      dispatch({ type: 'SET_CURRENT_PAGE', payload: parsedPage });
+    }
+  }, []); // Only on mount — URL seeds the initial state
 
   // Update browser URL query params whenever pagination or filters change
   const updateUrlParams = useCallback((page: number, limit: number, searchVal?: string, classVal?: string) => {
@@ -367,14 +367,20 @@ function AdminStudentsContent() {
           </div>
           <ClassSelect
             value={classFilter}
-            onValueChange={(v) => dispatch({ type: 'SET_CLASS_FILTER', payload: v })}
+            onValueChange={(v) => {
+              dispatch({ type: 'SET_CLASS_FILTER', payload: v });
+              updateUrlParams(1, itemsPerPage, search, v);
+            }}
             showAllOption
             className="w-full sm:w-44 h-9 sm:h-10"
             placeholder="Filter by class"
           />
           <Select
             value={genderFilter}
-            onValueChange={(v) => dispatch({ type: 'SET_GENDER_FILTER', payload: v })}
+            onValueChange={(v) => {
+              dispatch({ type: 'SET_GENDER_FILTER', payload: v });
+              updateUrlParams(1, itemsPerPage, search, classFilter);
+            }}
           >
             <SelectTrigger className="w-full sm:w-36 h-9 sm:h-10">
               <SelectValue placeholder="All Genders" />
@@ -387,7 +393,10 @@ function AdminStudentsContent() {
           </Select>
           <Select
             value={statusFilter}
-            onValueChange={(v) => dispatch({ type: 'SET_STATUS_FILTER', payload: v })}
+            onValueChange={(v) => {
+              dispatch({ type: 'SET_STATUS_FILTER', payload: v });
+              updateUrlParams(1, itemsPerPage, search, classFilter);
+            }}
           >
             <SelectTrigger className="w-full sm:w-36 h-9 sm:h-10">
               <SelectValue placeholder="All Statuses" />

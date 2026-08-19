@@ -156,14 +156,18 @@ export function AdminTeachers() {
   const pageParam = searchParams.get("page");
   const limitParam = searchParams.get("limit");
 
+  // Sync initial URL search params into state (run once on mount)
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
-    if (pageParam && Number(pageParam) !== currentPage) {
-      dispatch({ type: "SET_CURRENT_PAGE", payload: Number(pageParam) });
+    const parsedLimit = limitParam ? Number(limitParam) : NaN;
+    if (Number.isInteger(parsedLimit) && parsedLimit > 0) {
+      dispatch({ type: "SET_ITEMS_PER_PAGE", payload: parsedLimit });
     }
-    if (limitParam && Number(limitParam) !== itemsPerPage) {
-      dispatch({ type: "SET_ITEMS_PER_PAGE", payload: Number(limitParam) });
+    const parsedPage = pageParam ? Number(pageParam) : NaN;
+    if (Number.isInteger(parsedPage) && parsedPage > 0) {
+      dispatch({ type: "SET_CURRENT_PAGE", payload: parsedPage });
     }
-  }, [pageParam, limitParam]);
+  }, []);
 
   const updateUrlParams = (page: number, limit: number) => {
     const params = new URLSearchParams(searchParams.toString());

@@ -13,19 +13,15 @@ export function SuperAdminAuditLogs() {
   const router = useRouter();
   const pathname = usePathname();
   const pageParam = searchParams.get("page");
+  const rawPage = pageParam ? Number(pageParam) : 1;
+  const initialPage = Number.isInteger(rawPage) && rawPage > 0 ? rawPage : 1;
 
   const [search, setSearch] = useState("");
   const [actionFilter, setActionFilter] = useState<string>("all");
   const [roleFilter, setRoleFilter] = useState<string>("all");
   const [tenantFilter, setTenantFilter] = useState<string>("all");
-  const [page, setPage] = useState(pageParam ? Number(pageParam) : 1);
+  const [page, setPage] = useState(initialPage);
   const limit = 10;
-
-  useEffect(() => {
-    if (pageParam && Number(pageParam) !== page) {
-      setPage(Number(pageParam));
-    }
-  }, [pageParam]);
 
   const updateUrlParams = (newPage: number) => {
     const params = new URLSearchParams(searchParams.toString());
@@ -71,16 +67,19 @@ export function SuperAdminAuditLogs() {
   const handleActionFilterChange = (val: string) => {
     setActionFilter(val);
     setPage(1);
+    updateUrlParams(1);
   };
 
   const handleRoleFilterChange = (val: string) => {
     setRoleFilter(val);
     setPage(1);
+    updateUrlParams(1);
   };
 
   const handleTenantFilterChange = (val: string) => {
     setTenantFilter(val);
     setPage(1);
+    updateUrlParams(1);
   };
 
   return (

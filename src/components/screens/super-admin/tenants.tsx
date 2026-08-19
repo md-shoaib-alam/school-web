@@ -36,11 +36,14 @@ export function SuperAdminTenants() {
   const pathname = usePathname();
   const pageParam = searchParams.get("page");
 
+  // Sync initial URL search params into state (run once on mount)
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
-    if (pageParam && Number(pageParam) !== state.currentPage) {
-      dispatch({ type: "SET_CURRENT_PAGE", payload: Number(pageParam) });
+    const parsedPage = pageParam ? Number(pageParam) : NaN;
+    if (Number.isInteger(parsedPage) && parsedPage > 0) {
+      dispatch({ type: "SET_CURRENT_PAGE", page: parsedPage });
     }
-  }, [pageParam, state.currentPage]);
+  }, []);
 
   const updateUrlParams = (page: number) => {
     const params = new URLSearchParams(searchParams.toString());
@@ -219,11 +222,20 @@ export function SuperAdminTenants() {
       
       <TenantFilters 
         search={search}
-        onSearchChange={(v) => dispatch({ type: "SET_SEARCH", search: v })}
+        onSearchChange={(v) => {
+          dispatch({ type: "SET_SEARCH", search: v });
+          updateUrlParams(1);
+        }}
         planFilter={planFilter}
-        onPlanFilterChange={(v) => dispatch({ type: "SET_PLAN_FILTER", filter: v })}
+        onPlanFilterChange={(v) => {
+          dispatch({ type: "SET_PLAN_FILTER", filter: v });
+          updateUrlParams(1);
+        }}
         statusFilter={statusFilter}
-        onStatusFilterChange={(v) => dispatch({ type: "SET_STATUS_FILTER", filter: v })}
+        onStatusFilterChange={(v) => {
+          dispatch({ type: "SET_STATUS_FILTER", filter: v });
+          updateUrlParams(1);
+        }}
         viewMode={viewMode}
         onViewModeChange={(v) => dispatch({ type: "SET_VIEW_MODE", mode: v })}
         onAddClick={handleOpenAddDialog}
