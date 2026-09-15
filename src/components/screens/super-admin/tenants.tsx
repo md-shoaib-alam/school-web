@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useReducer } from "react";
+import { useEffect, useMemo, useReducer, useState } from "react";
 import { SchoolDetail } from "./school-detail";
 import {
   useTenants,
@@ -18,16 +18,50 @@ import { TenantStats } from "./tenants/TenantStats";
 import { TenantFilters } from "./tenants/TenantFilters";
 import { TenantTable } from "./tenants/TenantTable";
 import { TenantDialogs } from "./tenants/TenantDialogs";
-import { 
-  Tenant, 
-  ITEMS_PER_PAGE, 
-  emptyFormData 
+import { useSearchParams, useRouter, usePathname } from "next/navigation";
+import { Button } from "@/components/ui/button";
+import { Plus, Shield } from "lucide-react";
+import {
+  Tenant,
+  ITEMS_PER_PAGE,
+  emptyFormData
 } from "./tenants/types";
 import { tenantsReducer, initialState } from "./tenants/reducer";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 export function SuperAdminTenants() {
   const { canCreate, canEdit, canDelete } = useModulePermissions("tenants");
   const [state, dispatch] = useReducer(tenantsReducer, initialState);
+
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const pathname = usePathname();
+  const pageParam = searchParams.get("page");
+
+  // Sync initial URL search params into state (run once on mount)
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  useEffect(() => {
+    const parsedPage = pageParam ? Number(pageParam) : NaN;
+    if (Number.isInteger(parsedPage) && parsedPage > 0) {
+      dispatch({ type: "SET_CURRENT_PAGE", page: parsedPage });
+    }
+  }, []);
+
+  const updateUrlParams = (page: number) => {
+    const params = new URLSearchParams(searchParams.toString());
+    if (page > 1) params.set("page", String(page)); else params.delete("page");
+    const newQuery = params.toString();
+    router.replace(newQuery ? `${pathname}?${newQuery}` : pathname, { scroll: false });
+  };
 
   const {
     search,
@@ -67,6 +101,26 @@ export function SuperAdminTenants() {
   const deleteTenant = useDeleteTenant();
   const toggleTenantStatus = useToggleTenantStatus();
   const createUser = useCreateUser();
+
+  // Status toggle confirmation state
+  const [pendingStatusTenant, setPendingStatusTenant] = useState<Tenant | null>(null);
+  const [sortBy, setSortBy] = useState<string>("newest");
+
+  // Sorted tenants list
+  const sortedTenants = useMemo(() => {
+    const list = [...tenants];
+    if (sortBy === "oldest") {
+      return list.sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
+    }
+    if (sortBy === "name_asc") {
+      return list.sort((a, b) => a.name.localeCompare(b.name));
+    }
+    if (sortBy === "students_desc") {
+      return list.sort((a, b) => (b.studentCount || 0) - (a.studentCount || 0));
+    }
+    // Default newest
+    return list.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+  }, [tenants, sortBy]);
 
   // -- Computed Stats --
   const stats = useMemo(() => {
@@ -150,9 +204,15 @@ export function SuperAdminTenants() {
     }
   };
 
-  const handleToggleStatus = async (tenant: Tenant) => {
-    const newStatus = tenant.status === "active" ? "suspended" : "active";
-    await toggleTenantStatus.mutateAsync({ id: tenant.id, status: newStatus });
+  const handleToggleStatus = async () => {
+    if (!pendingStatusTenant) return;
+    const newStatus = pendingStatusTenant.status === "active" ? "suspended" : "active";
+    await toggleTenantStatus.mutateAsync({ id: pendingStatusTenant.id, status: newStatus });
+    setPendingStatusTenant(null);
+  };
+
+  const onRequestToggleStatus = (tenant: Tenant) => {
+    setPendingStatusTenant(tenant);
   };
 
   const handleDelete = async () => {
@@ -195,31 +255,71 @@ export function SuperAdminTenants() {
 
   return (
     <div className="space-y-6">
+      {/* Top School Management Header matching reference */}
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div>
+          <div className="flex items-center gap-2.5 flex-wrap">
+            <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-slate-900 dark:text-slate-100">
+              School Management
+            </h1>
+            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-medium bg-rose-50 text-rose-600 border border-rose-200/70 dark:bg-rose-950/40 dark:text-rose-400 dark:border-rose-900/60">
+              <Shield className="size-3 text-rose-500" />
+              Platform Level
+            </span>
+          </div>
+          <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-1 font-normal">
+            Manage all schools on your platform. Add, monitor, and manage school accounts.
+          </p>
+        </div>
+
+        {canCreate && (
+          <Button
+            className="bg-blue-600 hover:bg-blue-700 text-white text-xs sm:text-sm font-semibold h-10 px-4 rounded-xl gap-2 shadow-xs transition-all shrink-0 self-start sm:self-auto"
+            onClick={handleOpenAddDialog}
+          >
+            <Plus className="size-4 stroke-[2.5]" />
+            Add School
+          </Button>
+        )}
+      </div>
+
       <TenantStats stats={stats} />
       
       <TenantFilters 
         search={search}
-        onSearchChange={(v) => dispatch({ type: "SET_SEARCH", search: v })}
+        onSearchChange={(v) => {
+          dispatch({ type: "SET_SEARCH", search: v });
+          updateUrlParams(1);
+        }}
         planFilter={planFilter}
-        onPlanFilterChange={(v) => dispatch({ type: "SET_PLAN_FILTER", filter: v })}
+        onPlanFilterChange={(v) => {
+          dispatch({ type: "SET_PLAN_FILTER", filter: v });
+          updateUrlParams(1);
+        }}
         statusFilter={statusFilter}
-        onStatusFilterChange={(v) => dispatch({ type: "SET_STATUS_FILTER", filter: v })}
+        onStatusFilterChange={(v) => {
+          dispatch({ type: "SET_STATUS_FILTER", filter: v });
+          updateUrlParams(1);
+        }}
         viewMode={viewMode}
         onViewModeChange={(v) => dispatch({ type: "SET_VIEW_MODE", mode: v })}
-        onAddClick={handleOpenAddDialog}
-        canCreate={canCreate}
+        sortBy={sortBy}
+        onSortChange={(s) => setSortBy(s)}
       />
 
       <TenantTable 
-        tenants={tenants}
+        tenants={sortedTenants}
         loading={loading}
         viewMode={viewMode}
         currentPage={currentPage}
         totalPages={totalPages}
-        onPageChange={(p) => dispatch({ type: "SET_CURRENT_PAGE", page: p })}
+        onPageChange={(p) => {
+          dispatch({ type: "SET_CURRENT_PAGE", page: p });
+          updateUrlParams(p);
+        }}
         onView={(t) => dispatch({ type: "SET_VIEWING_TENANT", tenant: t })} 
         onEdit={handleOpenEditDialog}
-        onToggleStatus={handleToggleStatus}
+        onToggleStatus={onRequestToggleStatus}
         onDelete={(t) => {
           dispatch({ type: "SET_DELETING_TENANT", tenant: t });
           dispatch({ type: "SET_DELETE_DIALOG_OPEN", open: true });
@@ -250,6 +350,11 @@ export function SuperAdminTenants() {
         onDetailOpenChange={(open) => !open && dispatch({ type: "SET_VIEWING_TENANT", tenant: null })}
         viewingTenant={viewingTenant}
         onEditClick={handleOpenEditDialog}
+        onDeleteClick={(tenant) => {
+          dispatch({ type: "SET_VIEWING_TENANT", tenant: null });
+          dispatch({ type: "SET_DELETING_TENANT", tenant });
+          dispatch({ type: "SET_DELETE_DIALOG_OPEN", open: true });
+        }}
 
         deleteOpen={deleteDialogOpen}
         onDeleteOpenChange={(v) => dispatch({ type: "SET_DELETE_DIALOG_OPEN", open: v })}
@@ -271,6 +376,31 @@ export function SuperAdminTenants() {
         setShowAdminPassword={(v) => dispatch({ type: "SET_SHOW_ADMIN_PASSWORD", show: v })}
         onCreateAdmin={handleCreateAdmin}
       />
+
+      {/* Status Toggle Confirmation */}
+      <AlertDialog open={!!pendingStatusTenant} onOpenChange={(open) => !open && setPendingStatusTenant(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>
+              {pendingStatusTenant?.status === "active" ? "Suspend this school?" : "Activate this school?"}
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              {pendingStatusTenant?.status === "active"
+                ? `Suspending immediately blocks all users of ${pendingStatusTenant?.name} from signing in until reactivated.`
+                : `This reactivates ${pendingStatusTenant?.name} and restores access for all of its users.`}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={() => setPendingStatusTenant(null)}>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={(e) => { e.preventDefault(); handleToggleStatus(); }}
+              className={pendingStatusTenant?.status === "active" ? "bg-destructive text-destructive-foreground hover:bg-destructive/90" : ""}
+            >
+              {pendingStatusTenant?.status === "active" ? "Suspend" : "Activate"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

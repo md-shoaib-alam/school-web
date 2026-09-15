@@ -51,12 +51,12 @@ export function NewFlagDialog({ onAdd }: { onAdd: (flag: FeatureFlag) => void })
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button className="h-9 px-4 bg-teal-600 hover:bg-teal-700 text-white rounded-md font-semibold text-xs cursor-pointer shadow-xs transition-colors">
+        <Button className="h-9 px-4 text-xs cursor-pointer">
           <Plus className="size-4 mr-1.5" />
           Create New Flag
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-md rounded-lg border border-zinc-250 dark:border-zinc-800 bg-white dark:bg-zinc-950 p-6 text-left">
+      <DialogContent className="sm:max-w-md rounded-lg border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 p-6 text-left">
         <DialogHeader>
           <div className="size-10 rounded-md bg-teal-50 dark:bg-teal-950/40 flex items-center justify-center mb-3 border border-teal-100 dark:border-teal-900/50">
             <Blocks className="size-5.5 text-teal-600 dark:text-teal-400" />
@@ -71,7 +71,7 @@ export function NewFlagDialog({ onAdd }: { onAdd: (flag: FeatureFlag) => void })
 
         <div className="space-y-4 py-3">
           <div className="space-y-1.5">
-            <Label htmlFor="flag-name" className="text-xs font-semibold text-zinc-550 dark:text-zinc-400 ml-0.5">Flag Name</Label>
+            <Label htmlFor="flag-name" className="text-xs font-semibold text-zinc-500 dark:text-zinc-400 ml-0.5">Flag Name</Label>
             <Input
               id="flag-name"
               placeholder="e.g., AI Assessment Suite"
@@ -82,7 +82,7 @@ export function NewFlagDialog({ onAdd }: { onAdd: (flag: FeatureFlag) => void })
           </div>
 
           <div className="space-y-1.5">
-            <Label htmlFor="flag-desc" className="text-xs font-semibold text-zinc-550 dark:text-zinc-400 ml-0.5">Flag Description</Label>
+            <Label htmlFor="flag-desc" className="text-xs font-semibold text-zinc-500 dark:text-zinc-400 ml-0.5">Flag Description</Label>
             <Input
               id="flag-desc"
               placeholder="What does this feature toggle?"
@@ -94,7 +94,7 @@ export function NewFlagDialog({ onAdd }: { onAdd: (flag: FeatureFlag) => void })
 
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-1.5">
-              <Label className="text-xs font-semibold text-zinc-550 dark:text-zinc-400 ml-0.5">Classification</Label>
+              <Label className="text-xs font-semibold text-zinc-500 dark:text-zinc-400 ml-0.5">Classification</Label>
               <Select
                 value={category}
                 onValueChange={(v) => setCategory(v as FeatureFlag["category"])}
@@ -111,7 +111,7 @@ export function NewFlagDialog({ onAdd }: { onAdd: (flag: FeatureFlag) => void })
             </div>
 
             <div className="space-y-1.5">
-              <Label className="text-xs font-semibold text-zinc-550 dark:text-zinc-400 ml-0.5">Plan Targeted</Label>
+              <Label className="text-xs font-semibold text-zinc-500 dark:text-zinc-400 ml-0.5">Plan Targeted</Label>
               <Select value={plan} onValueChange={setPlan}>
                 <SelectTrigger className="h-10 rounded-md border border-zinc-200 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-950/40 focus:bg-white dark:focus:bg-zinc-900 text-xs font-semibold">
                   <SelectValue />

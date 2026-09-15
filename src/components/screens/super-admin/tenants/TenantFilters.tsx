@@ -8,7 +8,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Search, List, LayoutGrid, Plus, Filter } from "lucide-react";
+import { Search, LayoutGrid, List } from "lucide-react";
 import { ViewMode } from "./types";
 import { SCHOOL_PLANS } from "@/lib/billing-constants";
 
@@ -21,8 +21,8 @@ interface TenantFiltersProps {
   onStatusFilterChange: (value: string) => void;
   viewMode: ViewMode;
   onViewModeChange: (mode: ViewMode) => void;
-  onAddClick: () => void;
-  canCreate: boolean;
+  sortBy?: string;
+  onSortChange?: (sort: string) => void;
 }
 
 export function TenantFilters({
@@ -34,8 +34,8 @@ export function TenantFilters({
   onStatusFilterChange,
   viewMode,
   onViewModeChange,
-  onAddClick,
-  canCreate,
+  sortBy = "newest",
+  onSortChange,
 }: TenantFiltersProps) {
   const [localSearch, setLocalSearch] = useState(search);
   const onSearchChangeRef = useRef(onSearchChange);
@@ -60,79 +60,92 @@ export function TenantFilters({
   }, [localSearch]);
 
   return (
-    <div className="flex flex-col gap-4">
-      <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
-        <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto flex-1">
-          <div className="relative flex-1 max-w-sm">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
-            <Input
-              placeholder="Search schools..."
-              className="pl-9 h-10 rounded-xl"
-              value={localSearch}
-              onChange={(e) => setLocalSearch(e.target.value)}
-            />
-          </div>
-          
-          <div className="flex gap-2 w-full sm:w-auto">
-            <Select value={planFilter} onValueChange={onPlanFilterChange}>
-              <SelectTrigger className="w-full sm:w-36 h-10 rounded-xl">
-                <SelectValue placeholder="All Plans" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Plans</SelectItem>
-                {SCHOOL_PLANS.map((plan) => (
-                  <SelectItem key={plan.id} value={plan.id}>
-                    {plan.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+    <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3 pt-1">
+      {/* Search Input */}
+      <div className="relative flex-1 min-w-[260px] max-w-xl">
+        <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 size-4 text-muted-foreground/70" />
+        <Input
+          placeholder="Search schools by name, domain, or plan..."
+          className="pl-10 h-10 bg-white dark:bg-slate-900 border-slate-200/90 dark:border-slate-800 rounded-xl text-xs sm:text-sm placeholder:text-slate-400 shadow-2xs focus-visible:ring-1 focus-visible:ring-blue-500"
+          value={localSearch}
+          onChange={(e) => setLocalSearch(e.target.value)}
+        />
+      </div>
 
-            <Select value={statusFilter} onValueChange={onStatusFilterChange}>
-              <SelectTrigger className="w-full sm:w-36 h-10 rounded-xl">
-                <SelectValue placeholder="All Status" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Status</SelectItem>
-                <SelectItem value="active">Active</SelectItem>
-                <SelectItem value="trial">Trial</SelectItem>
-                <SelectItem value="suspended">Suspended</SelectItem>
-                <SelectItem value="inactive">Inactive</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
+      {/* Filter Selects & Controls */}
+      <div className="flex flex-wrap items-center gap-2">
+        {/* Plans Dropdown */}
+        <Select value={planFilter} onValueChange={onPlanFilterChange}>
+          <SelectTrigger className="w-[125px] sm:w-[130px] h-10 rounded-xl bg-white dark:bg-slate-900 border-slate-200/90 dark:border-slate-800 text-xs font-medium text-slate-700 dark:text-slate-300 shadow-2xs">
+            <SelectValue placeholder="All Plans" />
+          </SelectTrigger>
+          <SelectContent className="rounded-xl">
+            <SelectItem value="all" className="text-xs">All Plans</SelectItem>
+            {SCHOOL_PLANS.map((plan) => (
+              <SelectItem key={plan.id} value={plan.id} className="text-xs">
+                {plan.name}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+
+        {/* Status Dropdown */}
+        <Select value={statusFilter} onValueChange={onStatusFilterChange}>
+          <SelectTrigger className="w-[125px] sm:w-[130px] h-10 rounded-xl bg-white dark:bg-slate-900 border-slate-200/90 dark:border-slate-800 text-xs font-medium text-slate-700 dark:text-slate-300 shadow-2xs">
+            <SelectValue placeholder="All Status" />
+          </SelectTrigger>
+          <SelectContent className="rounded-xl">
+            <SelectItem value="all" className="text-xs">All Status</SelectItem>
+            <SelectItem value="active" className="text-xs">Active</SelectItem>
+            <SelectItem value="trial" className="text-xs">Trial</SelectItem>
+            <SelectItem value="suspended" className="text-xs">Suspended</SelectItem>
+            <SelectItem value="inactive" className="text-xs">Inactive</SelectItem>
+          </SelectContent>
+        </Select>
+
+        {/* View mode toggle */}
+        <div className="flex items-center bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 p-0.5 rounded-xl h-10 shadow-2xs">
+          <Button
+            variant="ghost"
+            size="icon"
+            className={`size-8 rounded-lg transition-colors ${
+              viewMode === "grid"
+                ? "bg-blue-50 text-blue-600 dark:bg-blue-950/60 dark:text-blue-400 font-semibold"
+                : "text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
+            }`}
+            onClick={() => onViewModeChange("grid")}
+            title="Grid View"
+          >
+            <LayoutGrid className="size-3.5" />
+          </Button>
+          <Button
+            variant="ghost"
+            size="icon"
+            className={`size-8 rounded-lg transition-colors ${
+              viewMode === "table"
+                ? "bg-blue-50 text-blue-600 dark:bg-blue-950/60 dark:text-blue-400 font-semibold"
+                : "text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
+            }`}
+            onClick={() => onViewModeChange("table")}
+            title="List View"
+          >
+            <List className="size-3.5" />
+          </Button>
         </div>
 
-        <div className="flex items-center gap-2 w-full sm:w-auto border-t sm:border-t-0 pt-4 sm:pt-0">
-          <div className="flex items-center bg-muted/50 p-1 rounded-xl mr-2">
-            <Button
-              variant={viewMode === "grid" ? "secondary" : "ghost"}
-              size="icon"
-              className={`size-8 rounded-lg ${viewMode === "grid" ? "shadow-sm bg-white dark:bg-zinc-800" : ""}`}
-              onClick={() => onViewModeChange("grid")}
-            >
-              <LayoutGrid className="size-4" />
-            </Button>
-            <Button
-              variant={viewMode === "table" ? "secondary" : "ghost"}
-              size="icon"
-              className={`size-8 rounded-lg ${viewMode === "table" ? "shadow-sm bg-white dark:bg-zinc-800" : ""}`}
-              onClick={() => onViewModeChange("table")}
-            >
-              <List className="size-4" />
-            </Button>
-          </div>
-          
-          {canCreate && (
-            <Button 
-              className="bg-teal-600 hover:bg-teal-700 text-white flex-1 sm:flex-none h-10 rounded-xl gap-2 shadow-md shadow-teal-100 dark:shadow-none"
-              onClick={onAddClick}
-            >
-              <Plus className="size-4" />
-              Add School
-            </Button>
-          )}
-        </div>
+        {/* Sort Dropdown */}
+        <Select value={sortBy} onValueChange={onSortChange || (() => {})}>
+          <SelectTrigger className="w-[130px] sm:w-[135px] h-10 rounded-xl bg-white dark:bg-slate-900 border-slate-200/90 dark:border-slate-800 text-xs font-medium text-slate-700 dark:text-slate-300 shadow-2xs">
+            <span className="text-slate-400 mr-1 text-[11px]">Sort by:</span>
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent className="rounded-xl">
+            <SelectItem value="newest" className="text-xs">Newest</SelectItem>
+            <SelectItem value="oldest" className="text-xs">Oldest</SelectItem>
+            <SelectItem value="name_asc" className="text-xs">Name (A-Z)</SelectItem>
+            <SelectItem value="students_desc" className="text-xs">Most Students</SelectItem>
+          </SelectContent>
+        </Select>
       </div>
     </div>
   );

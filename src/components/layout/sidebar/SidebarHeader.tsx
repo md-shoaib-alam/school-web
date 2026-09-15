@@ -1,7 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { Building2, PanelLeftClose, PanelLeftOpen } from "lucide-react";
+import { GraduationCap, PanelLeftClose, PanelLeftOpen } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { AppUser } from "@/store/use-app-store";
 
@@ -27,7 +27,7 @@ export function SidebarHeader({
       className={cn(
         isSuperAdmin
           ? cn(
-              "p-4 flex items-center border-b border-teal-800/50",
+              "px-5 py-4 flex items-center border-b border-slate-100 dark:border-slate-800/80 bg-white dark:bg-slate-950",
               sidebarOpen ? "justify-between" : "justify-center"
             )
           : cn(
@@ -41,10 +41,11 @@ export function SidebarHeader({
       <div className={cn("flex items-center gap-3", !sidebarOpen && "lg:gap-0 lg:justify-center")}>
         {sidebarOpen && (
           <>
+            {/* SchoolConnect Graduation Cap Logo Container */}
             <div
               className={cn(
-                "size-10 rounded-xl flex items-center justify-center text-white shadow-md overflow-hidden shrink-0",
-                isSuperAdmin ? "bg-teal-600" : "bg-emerald-600",
+                "size-10 rounded-xl flex items-center justify-center text-white shadow-xs overflow-hidden shrink-0",
+                isSuperAdmin ? "bg-gradient-to-br from-blue-600 to-indigo-700 shadow-blue-500/20" : "bg-emerald-600",
               )}
             >
               {!isSuperAdmin ? (
@@ -55,24 +56,24 @@ export function SidebarHeader({
                   loading="eager"
                 />
               ) : (
-                <Building2 className="size-5" />
+                <GraduationCap className="size-6 text-white" />
               )}
             </div>
             <div className="transition-all duration-300">
               <h2
                 className={cn(
-                  "font-bold text-sm",
+                  "font-extrabold text-base leading-tight tracking-tight",
                   isSuperAdmin
-                    ? "text-white"
+                    ? "text-[#1E3A8A] dark:text-blue-400"
                     : "text-zinc-900 dark:text-zinc-100",
                 )}
               >
                 {isSuperAdmin
-                  ? "SchoolSaaS"
+                  ? "SchoolConnect"
                   : tenantName || "the school"}
               </h2>
               {isSuperAdmin && (
-                <p className="text-xs text-rose-300">
+                <p className="text-[11px] text-slate-500 dark:text-slate-400 font-medium">
                   Platform Console
                 </p>
               )}
@@ -87,7 +88,7 @@ export function SidebarHeader({
         className={cn(
           "size-8 transition-all duration-200 hover:scale-105 active:scale-95 shrink-0 rounded-lg",
           isSuperAdmin
-            ? "text-teal-200 hover:text-white hover:bg-teal-800/40 border border-teal-800/50 bg-teal-900/20 shadow-sm"
+            ? "text-slate-500 hover:text-slate-900 hover:bg-slate-100 dark:text-slate-400 dark:hover:text-slate-100 dark:hover:bg-slate-800"
             : "text-zinc-500 hover:text-zinc-800 dark:text-zinc-400 dark:hover:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-900",
         )}
         onClick={onToggle}

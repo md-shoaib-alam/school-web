@@ -78,7 +78,7 @@ export function Sidebar({
       className={cn(
         "fixed lg:static inset-y-0 left-0 z-50 flex flex-col transition-all duration-300 lg:h-full border-r overflow-hidden",
         isSuperAdmin
-          ? "bg-gradient-to-b from-teal-950 to-teal-900 border-teal-800/50"
+          ? "bg-white dark:bg-slate-950 border-r border-slate-200/80 dark:border-slate-800"
           : "bg-sidebar border-sidebar-border",
         sidebarOpen 
           ? "w-72 translate-x-0 lg:w-72 lg:translate-x-0" 

@@ -76,7 +76,7 @@ export function FeeStatusTab() {
   const { data: classes = [] } = useQuery<ClassOption[]>({
     queryKey: ['classes'],
     queryFn: async () => {
-      const res = await apiFetch('/api/classes');
+      const res = await apiFetch('/api/classes?mode=min');
       return res.json();
     }
   });

@@ -186,7 +186,7 @@ export function SendNotificationScreen() {
                 3. Paste the token into the form on the left, write your message, and hit send!
               </p>
               <div className="space-y-2">
-                <div className="flex items-center gap-2 text-xs font-medium text-indigo-700 dark:text-indigo-400 uppercase tracking-widest">
+                <div className="flex items-center gap-2 text-xs font-medium text-indigo-700 dark:text-indigo-400">
                   <Wifi className="size-3" />
                   ephemeral flow
                 </div>

@@ -1,14 +1,13 @@
 "use client";
 
 import { useReducer } from "react";
+import Image from "next/image";
 import { 
   useTenants, 
   useRestoreTenant, 
   usePermanentDeleteTenant 
 } from "@/lib/graphql/hooks";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { 
   Table, 
   TableBody, 
@@ -22,7 +21,6 @@ import {
   RotateCcw, 
   Trash2, 
   Calendar,
-  AlertTriangle,
   Clock,
   Search
 } from "lucide-react";
@@ -161,153 +159,315 @@ export function SuperAdminDeletedTenants() {
   };
 
   return (
-    <div className="space-y-6 p-6">
-      <div className="flex justify-between items-center">
-        <div>
-          <h1 className="text-3xl font-semibold tracking-tight">Recycle Bin</h1>
-          <p className="text-muted-foreground">
-            Schools slated for disposal. Data is fully retrievable for 28 days following deletion.
-          </p>
+    <div className="space-y-6">
+      {/* Hero Banner - Recycle Bin */}
+      <div className="relative overflow-hidden rounded-2xl border border-sky-100 dark:border-sky-950/40 bg-gradient-to-r from-sky-50/80 via-blue-50/50 to-sky-100/70 dark:from-sky-950/30 dark:via-blue-950/20 dark:to-sky-900/30 px-4 sm:px-6 py-4 sm:py-5 shadow-xs">
+        <div className="relative z-10 flex items-center gap-3">
+          <div className="flex-1 min-w-0">
+            <h1 className="text-lg sm:text-2xl font-bold tracking-tight text-slate-900 dark:text-white leading-tight">
+              Recycle Bin
+            </h1>
+
+            {/* Description — desktop only (inside card) */}
+            <p className="hidden sm:block mt-0.5 text-sm text-slate-500 dark:text-slate-400 leading-snug">
+              Schools slated for disposal. Data is fully retrievable for 28 days following deletion.
+            </p>
+
+            {/* Search — desktop only (inside card) */}
+            <div className="hidden sm:flex relative mt-3 max-w-sm">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-3.5 text-slate-400 dark:text-slate-500" />
+              <Input
+                placeholder="Search deleted schools..."
+                className="pl-9 h-9 bg-white/95 dark:bg-zinc-900/95 border-slate-200/90 dark:border-zinc-800 rounded-xl shadow-2xs text-sm placeholder:text-slate-400 focus-visible:ring-2 focus-visible:ring-blue-500 w-full"
+                value={search}
+                onChange={(e) => dispatch({ type: "SET_SEARCH", payload: e.target.value })}
+              />
+            </div>
+          </div>
+
+          {/* Right Side image — all sizes */}
+          <div className="relative h-[68px] sm:h-20 md:h-24 aspect-[4/3] shrink-0 overflow-hidden">
+            <Image
+              src="/assets/deltedtop.png"
+              alt="Recycle Bin"
+              fill
+              priority
+              className="object-contain scale-110"
+              sizes="(max-width: 640px) 90px, (max-width: 768px) 140px, 160px"
+            />
+          </div>
         </div>
       </div>
 
-      <div className="flex items-center max-w-md relative">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
-        <Input 
-          placeholder="Search deleted schools..." 
-          className="pl-9"
+      {/* Search bar — mobile only, below hero */}
+      <div className="relative sm:hidden">
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-3.5 text-slate-400 dark:text-slate-500" />
+        <Input
+          placeholder="Search deleted schools..."
+          className="pl-9 h-9 w-full bg-white dark:bg-zinc-900 border-slate-200/90 dark:border-zinc-800 rounded-xl shadow-xs text-xs placeholder:text-slate-400 focus-visible:ring-2 focus-visible:ring-blue-500"
           value={search}
           onChange={(e) => dispatch({ type: "SET_SEARCH", payload: e.target.value })}
         />
       </div>
 
-      <Card>
-        <CardHeader className="pb-3">
-          <CardTitle className="text-lg">Deletion Queue</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="overflow-hidden rounded-lg border bg-card">
-            <Table>
-              <TableHeader className="bg-muted/50">
-                <TableRow>
-                  <TableHead>School Details</TableHead>
-                  <TableHead>Deletion Event</TableHead>
-                  <TableHead>Retention Status</TableHead>
-                  <TableHead className="text-right">Reclamation Actions</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {isLoading ? (
-                  <TableRow>
-                    <TableCell colSpan={4} className="h-24 text-center">Loading removal list…</TableCell>
-                  </TableRow>
-                ) : tenants.length === 0 ? (
-                  <TableRow>
-                    <TableCell colSpan={4} className="h-32 text-center text-muted-foreground">
-                      <div className="flex flex-col items-center gap-2">
-                        <Building2 className="size-8 opacity-20" />
-                        <p>Bin is empty. No schools are currently slated for disposal.</p>
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                ) : (
-                  tenants.map((tenant: any) => {
-                    const daysLeft = calculateDaysLeft(tenant.deletedAt || tenant.updatedAt);
-                    const isUrgent = daysLeft <= 7;
-                    
-                    return (
-                      <TableRow key={tenant.id} className="group transition-colors hover:bg-muted/40">
-                        <TableCell>
-                          <div className="flex items-center gap-3">
-                            <div className="size-9 rounded bg-muted flex items-center justify-center text-muted-foreground">
-                              <Building2 className="size-5" />
-                            </div>
-                            <div>
-                              <div className="font-semibold text-sm">{tenant.name}</div>
-                              <div className="text-xs text-muted-foreground">Slug: {tenant.slug}</div>
-                            </div>
-                          </div>
-                        </TableCell>
-                        <TableCell>
-                          <div className="flex items-center gap-2 text-sm">
-                            <Calendar className="size-4 text-muted-foreground" />
-                            <span>
-                              {tenant.deletedAt 
-                                ? format(toSafeDate(tenant.deletedAt), "MMM d, yyyy HH:mm")
-                                : "Unknown"
-                              }
-                            </span>
-                          </div>
-                        </TableCell>
-                        <TableCell>
-                          <div className="flex items-center gap-2">
-                             <Badge 
-                               variant={isUrgent ? "destructive" : "outline"}
-                               className={isUrgent ? "" : "bg-amber-100 dark:bg-amber-900/30 text-amber-800 dark:text-amber-300 border-amber-200"}
-                             >
-                               <Clock className="size-3 mr-1" />
-                               {daysLeft} days left
-                             </Badge>
-                             <span className="text-xs text-muted-foreground hidden md:inline">
-                               (Est. {format(addDays(toSafeDate(tenant.deletedAt || tenant.updatedAt), 28), "MMM d")})
-                             </span>
-                          </div>
-                        </TableCell>
-                        <TableCell className="text-right">
-                          <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                            <Button 
-                              variant="outline" 
-                              size="sm" 
-                              className="gap-2 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-950/30 border-emerald-200 dark:border-emerald-800"
-                              onClick={() => {
-                                dispatch({ type: "SET_SELECTED_TENANT", payload: tenant });
-                                dispatch({ type: "SET_RESTORE_DIALOG_OPEN", payload: true });
-                              }}
-                            >
-                              <RotateCcw className="size-3.5" />
-                              Restore
-                            </Button>
-                            <Button 
-                              variant="ghost" 
-                              size="sm" 
-                              className="gap-2 text-destructive hover:text-destructive hover:bg-destructive/10"
-                              onClick={() => {
-                                dispatch({ type: "SET_SELECTED_TENANT", payload: tenant });
-                                dispatch({ type: "SET_PURGE_DIALOG_OPEN", payload: true });
-                              }}
-                            >
-                              <Trash2 className="size-3.5" />
-                              Purge
-                            </Button>
-                          </div>
-                        </TableCell>
-                      </TableRow>
-                    );
-                  })
-                )}
-              </TableBody>
-            </Table>
+      {/* Main Content Card: Deletion Queue */}
+      <div className="rounded-2xl border border-slate-200/80 dark:border-zinc-800 bg-white dark:bg-zinc-950 shadow-xs overflow-hidden">
+        {/* Card Header */}
+        <div className="p-4 sm:p-6 pb-4 sm:pb-5 flex items-center gap-3.5 border-b border-slate-100 dark:border-zinc-800/80">
+          <div className="size-10 sm:size-11 rounded-xl bg-blue-50 dark:bg-blue-950/50 border border-blue-100/80 dark:border-blue-900/40 flex items-center justify-center text-blue-600 dark:text-blue-400 shrink-0">
+            <Trash2 className="size-5" />
           </div>
-        </CardContent>
-      </Card>
+          <div>
+            <h2 className="text-base sm:text-lg font-bold text-slate-900 dark:text-slate-100">
+              Deletion Queue
+            </h2>
+            <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400">
+              Schools deleted and in their 28-day retention window.
+            </p>
+          </div>
+        </div>
+
+        {/* ── Mobile card list (< sm) ── */}
+        <div className="sm:hidden divide-y divide-slate-100 dark:divide-zinc-800/80">
+          {isLoading ? (
+            <div className="flex flex-col items-center justify-center gap-2 py-12">
+              <div className="size-6 rounded-full border-2 border-blue-600 border-t-transparent animate-spin" />
+              <span className="text-sm text-muted-foreground">Loading removal list…</span>
+            </div>
+          ) : tenants.length === 0 ? (
+            <div className="flex flex-col items-center justify-center gap-2 py-14">
+              <div className="size-12 rounded-2xl bg-slate-100 dark:bg-zinc-900 flex items-center justify-center text-slate-400">
+                <Building2 className="size-6 opacity-40" />
+              </div>
+              <p className="font-medium text-slate-700 dark:text-slate-300 text-sm">Bin is empty</p>
+              <p className="text-xs text-slate-400">No schools are currently slated for disposal.</p>
+            </div>
+          ) : (
+            tenants.map((tenant: any) => {
+              const deletedDate = toSafeDate(tenant.deletedAt || tenant.updatedAt);
+              const daysLeft = calculateDaysLeft(tenant.deletedAt || tenant.updatedAt);
+              const isUrgent = daysLeft <= 7;
+              const estimatedExpiryDate = addDays(deletedDate, 28);
+
+              return (
+                <div key={tenant.id} className="p-4 space-y-3">
+                  {/* School name + slug */}
+                  <div className="flex items-center gap-3">
+                    <div className="size-9 rounded-xl bg-slate-100 dark:bg-zinc-800 flex items-center justify-center text-slate-500 border border-slate-200/60 dark:border-zinc-700/60 shrink-0">
+                      <Building2 className="size-4.5" />
+                    </div>
+                    <div className="min-w-0">
+                      <div className="font-bold text-sm text-slate-900 dark:text-slate-100 truncate">{tenant.name}</div>
+                      <div className="text-xs text-slate-400 truncate">/{tenant.slug}</div>
+                    </div>
+                    {/* Retention badge */}
+                    <span className={`ml-auto inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold border shrink-0 ${
+                      isUrgent
+                        ? "bg-red-50 dark:bg-red-950/40 text-red-600 border-red-200 dark:border-red-800/50"
+                        : "bg-amber-50 dark:bg-amber-950/40 text-amber-600 border-amber-200 dark:border-amber-800/50"
+                    }`}>
+                      <Clock className="size-3 shrink-0" />
+                      {daysLeft}d left
+                    </span>
+                  </div>
+
+                  {/* Deletion date */}
+                  <div className="flex items-center gap-1.5 text-xs text-slate-500 dark:text-slate-400">
+                    <Calendar className="size-3.5 shrink-0 text-slate-400" />
+                    <span>Deleted: {tenant.deletedAt ? format(deletedDate, "MMM d, yyyy") : "Unknown"}</span>
+                    <span className="text-slate-300 dark:text-zinc-700 mx-0.5">·</span>
+                    <span>Purges {format(estimatedExpiryDate, "MMM d")}</span>
+                  </div>
+
+                  {/* Action buttons */}
+                  <div className="flex items-center gap-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="flex-1 h-8 gap-1.5 border-emerald-300 bg-emerald-50/50 hover:bg-emerald-100/70 text-emerald-700 dark:text-emerald-300 dark:border-emerald-700/80 dark:bg-emerald-950/30 text-xs font-semibold rounded-lg"
+                      onClick={() => {
+                        dispatch({ type: "SET_SELECTED_TENANT", payload: tenant });
+                        dispatch({ type: "SET_RESTORE_DIALOG_OPEN", payload: true });
+                      }}
+                    >
+                      <RotateCcw className="size-3.5" />
+                      Restore
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="flex-1 h-8 gap-1.5 border-red-200 bg-red-50/60 hover:bg-red-100/80 text-red-600 dark:text-red-400 dark:border-red-900/60 dark:bg-red-950/30 text-xs font-semibold rounded-lg"
+                      onClick={() => {
+                        dispatch({ type: "SET_SELECTED_TENANT", payload: tenant });
+                        dispatch({ type: "SET_PURGE_DIALOG_OPEN", payload: true });
+                      }}
+                    >
+                      <Trash2 className="size-3.5" />
+                      Delete Forever
+                    </Button>
+                  </div>
+                </div>
+              );
+            })
+          )}
+        </div>
+
+        {/* ── Desktop table (sm+) ── */}
+        <div className="hidden sm:block overflow-x-auto">
+          <Table>
+            <TableHeader className="bg-slate-50/75 dark:bg-zinc-900/60 border-b border-slate-100 dark:border-zinc-800">
+              <TableRow className="hover:bg-transparent">
+                <TableHead className="py-3.5 px-6 text-xs font-semibold text-slate-600 dark:text-slate-400">
+                  School Details
+                </TableHead>
+                <TableHead className="py-3.5 px-6 text-xs font-semibold text-slate-600 dark:text-slate-400">
+                  Deletion Event
+                </TableHead>
+                <TableHead className="py-3.5 px-6 text-xs font-semibold text-slate-600 dark:text-slate-400">
+                  Retention Status
+                </TableHead>
+                <TableHead className="py-3.5 px-6 text-xs font-semibold text-slate-600 dark:text-slate-400">
+                  Reclamation Actions
+                </TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {isLoading ? (
+                <TableRow>
+                  <TableCell colSpan={4} className="h-32 text-center text-muted-foreground">
+                    <div className="flex flex-col items-center justify-center gap-2">
+                      <div className="size-6 rounded-full border-2 border-blue-600 border-t-transparent animate-spin" />
+                      <span className="text-sm">Loading removal list…</span>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ) : tenants.length === 0 ? (
+                <TableRow>
+                  <TableCell colSpan={4} className="h-40 text-center text-muted-foreground">
+                    <div className="flex flex-col items-center justify-center gap-2">
+                      <div className="size-12 rounded-2xl bg-slate-100 dark:bg-zinc-900 flex items-center justify-center text-slate-400">
+                        <Building2 className="size-6 opacity-40" />
+                      </div>
+                      <p className="font-medium text-slate-700 dark:text-slate-300 text-sm">Bin is empty</p>
+                      <p className="text-xs text-slate-400">No schools are currently slated for disposal.</p>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ) : (
+                tenants.map((tenant: any) => {
+                  const deletedDate = toSafeDate(tenant.deletedAt || tenant.updatedAt);
+                  const daysLeft = calculateDaysLeft(tenant.deletedAt || tenant.updatedAt);
+                  const isUrgent = daysLeft <= 7;
+                  const estimatedExpiryDate = addDays(deletedDate, 28);
+
+                  return (
+                    <TableRow
+                      key={tenant.id}
+                      className="border-b border-slate-100 dark:border-zinc-800/80 hover:bg-slate-50/60 dark:hover:bg-zinc-900/40 transition-colors"
+                    >
+                      {/* School Details */}
+                      <TableCell className="px-6 py-4">
+                        <div className="flex items-center gap-3.5">
+                          <div className="size-10 rounded-xl bg-slate-100 dark:bg-zinc-800/80 flex items-center justify-center text-slate-500 dark:text-slate-400 border border-slate-200/60 dark:border-zinc-700/60 shrink-0">
+                            <Building2 className="size-5" />
+                          </div>
+                          <div>
+                            <div className="font-bold text-sm text-slate-900 dark:text-slate-100 leading-tight">
+                              {tenant.name}
+                            </div>
+                            <div className="text-xs text-slate-400 dark:text-slate-500 mt-0.5">
+                              Slug: {tenant.slug}
+                            </div>
+                          </div>
+                        </div>
+                      </TableCell>
+
+                      {/* Deletion Event */}
+                      <TableCell className="px-6 py-4">
+                        <div className="flex items-center gap-2 text-xs sm:text-sm text-slate-700 dark:text-slate-300 font-medium whitespace-nowrap">
+                          <Calendar className="size-4 text-slate-400 shrink-0" />
+                          <span>
+                            {tenant.deletedAt
+                              ? format(deletedDate, "MMM d, yyyy HH:mm")
+                              : "Unknown"}
+                          </span>
+                        </div>
+                      </TableCell>
+
+                      {/* Retention Status */}
+                      <TableCell className="px-6 py-4">
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <span
+                            className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold border ${
+                              isUrgent
+                                ? "bg-red-50 dark:bg-red-950/40 text-red-600 dark:text-red-400 border-red-200 dark:border-red-800/50"
+                                : "bg-amber-50 dark:bg-amber-950/40 text-amber-600 dark:text-amber-400 border-amber-200 dark:border-amber-800/50"
+                            }`}
+                          >
+                            <Clock className="size-3.5 shrink-0" />
+                            {daysLeft} days left
+                          </span>
+                          <span className="text-xs text-slate-400 dark:text-slate-500 font-normal whitespace-nowrap">
+                            (Est. {format(estimatedExpiryDate, "MMM d, yyyy")})
+                          </span>
+                        </div>
+                      </TableCell>
+
+                      {/* Reclamation Actions */}
+                      <TableCell className="px-6 py-4">
+                        <div className="flex items-center gap-2.5 flex-wrap">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className="h-8 gap-1.5 border-emerald-300 hover:border-emerald-400 dark:border-emerald-700/80 bg-emerald-50/50 hover:bg-emerald-100/70 text-emerald-700 dark:text-emerald-300 dark:bg-emerald-950/30 dark:hover:bg-emerald-900/50 text-xs font-semibold rounded-lg shadow-2xs transition-colors"
+                            onClick={() => {
+                              dispatch({ type: "SET_SELECTED_TENANT", payload: tenant });
+                              dispatch({ type: "SET_RESTORE_DIALOG_OPEN", payload: true });
+                            }}
+                          >
+                            <RotateCcw className="size-3.5" />
+                            Restore School
+                          </Button>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className="h-8 gap-1.5 border-red-200 hover:border-red-300 dark:border-red-900/60 bg-red-50/60 hover:bg-red-100/80 text-red-600 dark:text-red-400 dark:bg-red-950/30 dark:hover:bg-red-900/50 text-xs font-semibold rounded-lg shadow-2xs transition-colors"
+                            onClick={() => {
+                              dispatch({ type: "SET_SELECTED_TENANT", payload: tenant });
+                              dispatch({ type: "SET_PURGE_DIALOG_OPEN", payload: true });
+                            }}
+                          >
+                            <Trash2 className="size-3.5" />
+                            Permanently Delete
+                          </Button>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  );
+                })
+              )}
+            </TableBody>
+          </Table>
+        </div>
+      </div>
 
       {/* Restore Confirmation */}
       <AlertDialog open={restoreDialogOpen} onOpenChange={(open) => dispatch({ type: "SET_RESTORE_DIALOG_OPEN", payload: open })}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Reinstate School?</AlertDialogTitle>
+            <AlertDialogTitle>Reactivate this school?</AlertDialogTitle>
             <AlertDialogDescription>
-              This will immediately reactivate "{selectedTenant?.name}" and rescue all embedded data from the disposal buffer.
+              This reactivates {selectedTenant?.name} and restores access for all of its users.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel disabled={isRestoring}>Cancel</AlertDialogCancel>
-            <AlertDialogAction 
+            <AlertDialogAction
               onClick={(e) => { e.preventDefault(); handleRestore(); }}
               disabled={isRestoring}
-              className="bg-emerald-600 hover:bg-emerald-700"
+              className="bg-emerald-600 hover:bg-emerald-700 text-white"
             >
-              {isRestoring ? "Restoring…" : "Confirm Reactivation"}
+              {isRestoring ? "Restoring..." : "Reactivate School"}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
@@ -317,27 +477,27 @@ export function SuperAdminDeletedTenants() {
       <AlertDialog open={purgeDialogOpen} onOpenChange={(open) => dispatch({ type: "SET_PURGE_DIALOG_OPEN", payload: open })}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle className="text-destructive">Final Irrevocable Destruction?</AlertDialogTitle>
+            <AlertDialogTitle className="text-destructive">Permanently delete this school?</AlertDialogTitle>
             <AlertDialogDescription asChild>
-              <div className="space-y-2 text-foreground/90">
-                <p>Warning! This transcends logical state triggers. Execution will trigger absolute recursive data cascades, vaporizing:</p>
-                <ul className="list-disc list-inside text-sm ml-2 opacity-80">
-                  <li>All linked Subscriptions & Transaction Records</li>
-                  <li>All User Accounts & Identity Vaults</li>
-                  <li>All Gradebooks, Attendance & Assets</li>
+              <div className="space-y-2">
+                <p>This permanently deletes {selectedTenant?.name} and all associated data:</p>
+                <ul className="list-disc list-inside text-sm ml-2">
+                  <li>Subscriptions and transaction records</li>
+                  <li>User accounts</li>
+                  <li>Gradebooks, attendance, and uploaded assets</li>
                 </ul>
-                <p className="font-bold mt-4">THIS CANNOT BE UNDONE.</p>
+                <p className="font-bold mt-4 text-destructive">This cannot be undone.</p>
               </div>
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel disabled={isPurging}>Cancel</AlertDialogCancel>
-            <AlertDialogAction 
+            <AlertDialogAction
               onClick={(e) => { e.preventDefault(); handlePurge(); }}
               disabled={isPurging}
-              className="bg-destructive hover:bg-destructive/90 text-white"
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
             >
-              {isPurging ? "Purging Hardware Tracks…" : "Execute Data Scrub"}
+              {isPurging ? "Deleting..." : "Permanently Delete"}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

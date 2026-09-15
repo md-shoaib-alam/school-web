@@ -223,29 +223,29 @@ export function StudentDetailDialog({
                       </p>
                     </div>
                   )}
-                  {currentStudent.username && (
-                    <div className="bg-secondary/20 p-3 rounded-xl border border-secondary/30 flex items-center justify-between col-span-1 sm:col-span-2">
-                      <div className="min-w-0 flex-1">
-                        <p className="text-[10px] text-muted-foreground font-medium uppercase">Student ID (Login ID)</p>
-                        <p className="text-sm font-semibold mt-0.5 text-foreground flex items-center gap-1.5">
-                          <Key className="size-3.5 text-emerald-600" />
-                          {currentStudent.username}
-                        </p>
-                      </div>
+                  <div className="bg-secondary/20 p-3 rounded-xl border border-secondary/30 flex items-center justify-between col-span-1 sm:col-span-2">
+                    <div className="min-w-0 flex-1">
+                      <p className="text-[10px] text-muted-foreground font-medium uppercase">Student ID (Login ID)</p>
+                      <p className="text-sm font-semibold mt-0.5 text-foreground flex items-center gap-1.5">
+                        <Key className="size-3.5 text-emerald-600" />
+                        {currentStudent.username || currentStudent.rollNumber || "Auto-generated"}
+                      </p>
+                    </div>
+                    {(currentStudent.username || currentStudent.rollNumber) && (
                       <Button
                         variant="ghost"
                         size="icon"
                         className="size-8 text-muted-foreground hover:text-emerald-600 shrink-0 ml-2"
-                        onClick={() => handleCopy(currentStudent.username, 'username')}
+                        onClick={() => handleCopy(currentStudent.username || currentStudent.rollNumber, 'Student ID')}
                       >
-                        {copiedField === 'username' ? (
+                        {copiedField === 'Student ID' ? (
                           <Check className="size-3.5 text-emerald-600" />
                         ) : (
                           <Copy className="size-3.5" />
                         )}
                       </Button>
-                    </div>
-                  )}
+                    )}
+                  </div>
                 </div>
               </div>
 

@@ -41,7 +41,7 @@ export function AttendanceReport() {
   useEffect(() => {
     async function fetchClasses() {
       try {
-        const res = await apiFetch("/api/classes");
+        const res = await apiFetch("/api/classes?mode=min");
         if (!res.ok) throw new Error("Failed to fetch classes");
         setClasses(await res.json());
       } catch {

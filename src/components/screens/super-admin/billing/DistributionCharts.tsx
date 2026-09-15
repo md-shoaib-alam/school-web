@@ -22,6 +22,14 @@ interface DistributionChartsProps {
   statusChartData: any[];
 }
 
+const tooltipContentStyle = {
+  borderRadius: 8,
+  border: '1px solid var(--border)',
+  background: 'var(--card)',
+  color: 'var(--card-foreground)',
+  boxShadow: 'none',
+};
+
 export function DistributionCharts({
   loading,
   planChartData,
@@ -37,9 +45,9 @@ export function DistributionCharts({
   return (
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
       {/* Revenue by Plan */}
-      <Card className="shadow-sm border-none bg-white dark:bg-zinc-800">
+      <Card className="border rounded-xl bg-card">
         <CardHeader className="pb-2">
-          <CardTitle className="text-base font-bold flex items-center gap-2">
+          <CardTitle className="text-base font-semibold flex items-center gap-2">
             <BarChart3 className="size-4 text-emerald-600" /> Revenue by Plan
           </CardTitle>
           <CardDescription>
@@ -62,13 +70,13 @@ export function DistributionCharts({
                     layout="vertical"
                     margin={{ top: 5, right: 30, left: 10, bottom: 5 }}
                   >
-                    <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="#e2e8f0" />
+                    <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="var(--border)" />
                     <XAxis
                       type="number"
                       tickLine={false}
                       axisLine={false}
-                      fontSize={10}
-                      tick={{ fill: "#94a3b8" }}
+                      fontSize={12}
+                      tick={{ fill: "var(--muted-foreground)" }}
                       tickFormatter={(v) =>
                         `₹${v >= 1000 ? `${(v / 1000).toFixed(0)}k` : v}`
                       }
@@ -80,7 +88,7 @@ export function DistributionCharts({
                       axisLine={false}
                       fontSize={12}
                       width={70}
-                      tick={{ fill: "#374151" }}
+                      tick={{ fill: "var(--foreground)" }}
                     />
                     <ChartTooltip
                       content={
@@ -102,14 +110,14 @@ export function DistributionCharts({
                     >
                       {planChartData.map((entry, i) => {
                         const planColors: Record<string, string> = {
-                          Basic: "#94a3b8",
-                          Standard: "#f59e0b",
-                          Premium: "#10b981",
+                          Basic: "var(--chart-4)",
+                          Standard: "var(--chart-5)",
+                          Premium: "var(--chart-1)",
                         };
                         return (
                           <Cell
                             key={entry.plan}
-                            fill={planColors[entry.plan] || "#6366f1"}
+                            fill={planColors[entry.plan] || "var(--chart-2)"}
                           />
                         );
                       })}
@@ -123,9 +131,9 @@ export function DistributionCharts({
       </Card>
 
       {/* Payment Method Distribution */}
-      <Card className="shadow-sm border-none bg-white dark:bg-zinc-800">
+      <Card className="border rounded-xl bg-card">
         <CardHeader className="pb-2">
-          <CardTitle className="text-base font-bold flex items-center gap-2">
+          <CardTitle className="text-base font-semibold flex items-center gap-2">
             <PieChartIcon className="size-4 text-emerald-600" /> Payment Methods
           </CardTitle>
           <CardDescription>
@@ -159,7 +167,7 @@ export function DistributionCharts({
                       </Pie>
                       <RTooltip
                         formatter={(value: number) => `₹${value.toLocaleString()}`}
-                        contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}
+                        contentStyle={tooltipContentStyle}
                       />
                     </PieChart>
                   </ResponsiveContainer>
@@ -171,9 +179,9 @@ export function DistributionCharts({
       </Card>
 
       {/* Subscription Status Distribution */}
-      <Card className="shadow-sm border-none bg-white dark:bg-zinc-800">
+      <Card className="border rounded-xl bg-card">
         <CardHeader className="pb-2">
-          <CardTitle className="text-base font-bold flex items-center gap-2">
+          <CardTitle className="text-base font-semibold flex items-center gap-2">
             <Activity className="size-4 text-emerald-600" /> Status Distribution
           </CardTitle>
           <CardDescription>
@@ -207,7 +215,7 @@ export function DistributionCharts({
                       </Pie>
                       <RTooltip
                         formatter={(value: number) => `${value} subscriptions`}
-                        contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}
+                        contentStyle={tooltipContentStyle}
                       />
                     </PieChart>
                   </ResponsiveContainer>

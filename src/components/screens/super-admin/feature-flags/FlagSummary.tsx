@@ -16,7 +16,7 @@ export function FlagSummary({ totalCount, totalEnabled }: FlagSummaryProps) {
               <Check className="size-4.5" />
             </div>
             <div className="text-left">
-              <p className="text-lg font-bold text-emerald-600 dark:text-emerald-450 leading-none">
+              <p className="text-lg font-bold text-emerald-600 dark:text-emerald-400 leading-none">
                 {totalEnabled}
               </p>
               <p className="text-xs font-semibold text-zinc-500 dark:text-zinc-400 mt-1">Live Flags</p>
@@ -30,7 +30,7 @@ export function FlagSummary({ totalCount, totalEnabled }: FlagSummaryProps) {
               <X className="size-4.5" />
             </div>
             <div className="text-left">
-              <p className="text-lg font-bold text-zinc-650 dark:text-zinc-300 leading-none">
+              <p className="text-lg font-bold text-zinc-600 dark:text-zinc-300 leading-none">
                 {totalCount - totalEnabled}
               </p>
               <p className="text-xs font-semibold text-zinc-500 dark:text-zinc-400 mt-1">Inactive</p>
@@ -40,7 +40,7 @@ export function FlagSummary({ totalCount, totalEnabled }: FlagSummaryProps) {
           <div className="h-8 w-px bg-zinc-200 dark:bg-zinc-800" />
           
           <div className="flex items-center gap-3">
-            <div className="size-9 rounded-md bg-teal-55/60 dark:bg-teal-950/40 text-teal-600 dark:text-teal-400 flex items-center justify-center border border-teal-100 dark:border-teal-900/50">
+            <div className="size-9 rounded-md bg-teal-50/60 dark:bg-teal-950/40 text-teal-600 dark:text-teal-400 flex items-center justify-center border border-teal-100 dark:border-teal-900/50">
               <Blocks className="size-4.5" />
             </div>
             <div className="text-left">
@@ -53,13 +53,13 @@ export function FlagSummary({ totalCount, totalEnabled }: FlagSummaryProps) {
 
           <div className="flex-1" />
           
-          <div className="flex items-center gap-4 bg-zinc-50 dark:bg-zinc-950 px-3.5 py-1.5 rounded-lg border border-zinc-150 dark:border-zinc-850">
+          <div className="flex items-center gap-4 bg-zinc-50 dark:bg-zinc-950 px-3.5 py-1.5 rounded-lg border border-zinc-100 dark:border-zinc-800">
             <div className="flex items-center gap-2 text-xs font-semibold text-zinc-500 dark:text-zinc-400">
               <div className="size-2 rounded-full bg-emerald-500" />
               Active
             </div>
             <div className="flex items-center gap-2 text-xs font-semibold text-zinc-500 dark:text-zinc-400">
-              <div className="size-2 rounded-full bg-zinc-300 dark:bg-zinc-650" />
+              <div className="size-2 rounded-full bg-zinc-300 dark:bg-zinc-600" />
               Off
             </div>
           </div>

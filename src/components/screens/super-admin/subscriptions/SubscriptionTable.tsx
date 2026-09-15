@@ -20,21 +20,12 @@ import {
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import {
   MoreVertical,
   Pencil,
   Trash2,
   CalendarClock,
   Plus,
   Building2,
-  ChevronLeft,
-  ChevronRight,
   Crown,
   Star,
   CalendarDays,
@@ -42,7 +33,8 @@ import {
   X,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { statusConfig } from "./types";
+import { DataTablePagination } from "@/components/ui/data-table-pagination";
+import { StatusBadge } from "@/components/ui/status-badge";
 
 interface SubscriptionTableProps {
   unifiedData: any[];
@@ -75,18 +67,21 @@ export function SubscriptionTable({
   onDelete,
   onAssign,
 }: SubscriptionTableProps) {
+  const startEntry = (page - 1) * limit + 1;
+  const endEntry = Math.min(page * limit, totalEntries);
+
   return (
-    <Card className="overflow-hidden border-teal-100 dark:border-teal-900/20">
+    <Card className="overflow-hidden border rounded-xl bg-card">
       <div className="overflow-x-auto">
         <Table>
-          <TableHeader className="bg-teal-50/50 dark:bg-teal-900/10">
+          <TableHeader className="bg-muted/50">
             <TableRow>
-              <TableHead>Parent & Students</TableHead>
-              <TableHead>Plan Details</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead>Period</TableHead>
-              <TableHead>Total Amount</TableHead>
-              <TableHead className="text-right">Actions</TableHead>
+              <TableHead className="text-xs font-medium text-muted-foreground">Parent & Students</TableHead>
+              <TableHead className="text-xs font-medium text-muted-foreground">Plan Details</TableHead>
+              <TableHead className="text-xs font-medium text-muted-foreground">Status</TableHead>
+              <TableHead className="text-xs font-medium text-muted-foreground">Period</TableHead>
+              <TableHead className="text-xs font-medium text-muted-foreground">Total Amount</TableHead>
+              <TableHead className="text-xs font-medium text-muted-foreground text-right">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -102,11 +97,11 @@ export function SubscriptionTable({
               <TableRow>
                 <TableCell colSpan={6} className="h-64 text-center">
                   <div className="flex flex-col items-center justify-center space-y-3">
-                    <div className="size-12 rounded-full bg-teal-100 flex items-center justify-center text-teal-600">
+                    <div className="size-12 rounded-full bg-muted flex items-center justify-center text-muted-foreground">
                       <Building2 className="size-6" />
                     </div>
                     <div>
-                      <p className="font-bold text-lg">
+                      <p className="font-semibold text-lg">
                         {!selectedTenant ? "Select a School" : "No Results Found"}
                       </p>
                       <p className="text-muted-foreground text-sm max-w-xs mx-auto">
@@ -123,19 +118,37 @@ export function SubscriptionTable({
                 const sub = item.subscription;
                 const parent = item.parent;
 
+                const statusTone = !sub
+                  ? "neutral" as const
+                  : sub.status === "active"
+                    ? "positive" as const
+                    : sub.status === "cancelled" || sub.status === "expired"
+                      ? "negative" as const
+                      : "warning" as const;
+
+                const statusLabel = !sub
+                  ? "No Active Plan"
+                  : sub.status === "active"
+                    ? "Active"
+                    : sub.status === "cancelled"
+                      ? "Cancelled"
+                      : sub.status === "expired"
+                        ? "Expired"
+                        : sub.status;
+
                 return (
                   <TableRow
                     key={item.id}
-                    className="group hover:bg-teal-50/30 dark:hover:bg-teal-900/5 transition-colors"
+                    className="hover:bg-muted/50 transition-colors"
                   >
                     <TableCell>
                       <div className="flex items-center gap-3">
                         <div
                           className={cn(
-                            "size-10 rounded-full flex items-center justify-center font-bold uppercase",
+                            "size-10 rounded-full flex items-center justify-center font-semibold uppercase text-xs",
                             sub
-                              ? "bg-teal-100 dark:bg-teal-900/30 text-teal-700"
-                              : "bg-zinc-100 dark:bg-zinc-800 text-zinc-500",
+                              ? "bg-muted text-foreground"
+                              : "bg-muted text-muted-foreground",
                           )}
                         >
                           {parent?.user?.name?.[0] || parent?.name?.[0]}
@@ -153,7 +166,7 @@ export function SubscriptionTable({
                                 <Badge
                                   key={s.id}
                                   variant="outline"
-                                  className="text-[10px] py-0 h-4 bg-white dark:bg-zinc-950"
+                                  className="text-xs py-0 h-5"
                                 >
                                   {s.name || s.user?.name}
                                 </Badge>
@@ -170,8 +183,8 @@ export function SubscriptionTable({
                             className={cn(
                               "p-1.5 rounded-lg",
                               sub.planName === "Premium"
-                                ? "bg-amber-100 text-amber-600"
-                                : "bg-blue-100 text-blue-600",
+                                ? "bg-muted text-foreground"
+                                : "bg-muted text-muted-foreground",
                             )}
                           >
                             {sub.planName === "Premium" ? (
@@ -196,23 +209,9 @@ export function SubscriptionTable({
                       )}
                     </TableCell>
                     <TableCell>
-                      <Badge
-                        className={cn(
-                          "gap-1 py-1 px-2 text-[11px] font-medium border shadow-none",
-                          sub
-                            ? statusConfig[sub.status]?.bg
-                            : "bg-zinc-100 dark:bg-zinc-800 text-zinc-600 border-zinc-200 dark:border-zinc-700",
-                        )}
-                      >
-                        {sub ? (
-                          statusConfig[sub.status]?.icon
-                        ) : (
-                          <X className="size-3" />
-                        )}
-                        {sub
-                          ? statusConfig[sub.status]?.label
-                          : "No Active Plan"}
-                      </Badge>
+                      <StatusBadge tone={statusTone}>
+                        {statusLabel}
+                      </StatusBadge>
                     </TableCell>
                     <TableCell>
                       {sub ? (
@@ -220,23 +219,23 @@ export function SubscriptionTable({
                           <span className="text-sm font-medium capitalize">
                             {sub.period}
                           </span>
-                          <span suppressHydrationWarning className="text-[10px] text-muted-foreground flex items-center gap-1">
+                          <span suppressHydrationWarning className="text-xs text-muted-foreground flex items-center gap-1">
                             <CalendarDays className="size-3" />
                             {new Date(sub.startDate).toLocaleDateString()}
                           </span>
                         </div>
                       ) : (
-                        "–"
+                        "\u2013"
                       )}
                     </TableCell>
                     <TableCell>
                       {sub ? (
-                        <div className="flex items-center gap-1 font-bold text-sm text-emerald-600 dark:text-emerald-400">
+                        <div className="flex items-center gap-1 font-semibold text-sm">
                           <IndianRupee className="size-3.5" />
                           {sub.amount.toLocaleString()}
                         </div>
                       ) : (
-                        "–"
+                        "\u2013"
                       )}
                     </TableCell>
                     <TableCell className="text-right">
@@ -265,7 +264,7 @@ export function SubscriptionTable({
                             </DropdownMenuItem>
                             <DropdownMenuSeparator />
                             <DropdownMenuItem
-                              className="text-red-600 focus:text-red-700 focus:bg-red-50"
+                              className="text-destructive focus:text-destructive focus:bg-destructive/10"
                               onClick={() => onDelete(sub)}
                             >
                               <Trash2 className="size-4 mr-2" /> Delete Record
@@ -275,8 +274,7 @@ export function SubscriptionTable({
                       ) : (
                         <Button
                           size="sm"
-                          variant="ghost"
-                          className="text-teal-600 hover:text-teal-700 hover:bg-teal-50"
+                          variant="outline"
                           onClick={() => onAssign(item)}
                         >
                           <Plus className="size-3.5 mr-1.5" />
@@ -292,110 +290,13 @@ export function SubscriptionTable({
         </Table>
       </div>
       {!loading && totalPages > 1 && (
-        <div className="flex flex-col sm:flex-row items-center justify-between px-6 py-4 bg-zinc-50/50 dark:bg-zinc-900/20 border-t gap-4">
-          <div className="flex items-center gap-4 order-2 sm:order-1">
-            <p className="text-sm text-muted-foreground">
-              Showing{" "}
-              <span className="font-semibold text-teal-600 dark:text-teal-400">
-                {(page - 1) * limit + 1}
-              </span>{" "}
-              to{" "}
-              <span className="font-semibold text-teal-600 dark:text-teal-400">
-                {Math.min(page * limit, totalEntries)}
-              </span>{" "}
-              of{" "}
-              <span className="font-semibold text-zinc-900 dark:text-zinc-100">
-                {totalEntries}
-              </span>{" "}
-              entries
-            </p>
-
-            <div className="flex items-center gap-2">
-              <span className="text-xs text-muted-foreground whitespace-nowrap">
-                Rows per page:
-              </span>
-              <Select
-                value={String(limit)}
-                onValueChange={(v) => onLimitChange(Number(v))}
-              >
-                <SelectTrigger className="h-7 w-[70px] text-xs">
-                  <SelectValue placeholder={String(limit)} />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="10">10</SelectItem>
-                  <SelectItem value="25">25</SelectItem>
-                  <SelectItem value="50">50</SelectItem>
-                  <SelectItem value="100">100</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-
-          <div className="flex items-center gap-1 order-1 sm:order-2">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => onPageChange(page - 1)}
-              disabled={page === 1}
-              className="size-8 p-0"
-            >
-              <ChevronLeft className="size-4" />
-            </Button>
-
-            <div className="flex items-center gap-1 mx-1">
-              {Array.from({ length: totalPages }, (_, i) => i + 1).map(
-                (pageNum) => {
-                  // Show first, last, and a window around current page
-                  if (
-                    pageNum === 1 ||
-                    pageNum === totalPages ||
-                    (pageNum >= page - 1 && pageNum <= page + 1)
-                  ) {
-                    return (
-                      <Button
-                        key={pageNum}
-                        variant={page === pageNum ? "default" : "outline"}
-                        size="sm"
-                        className={cn(
-                          "size-8 p-0 text-xs",
-                          page === pageNum
-                            ? "bg-teal-600 hover:bg-teal-700 shadow-sm"
-                            : "hover:bg-teal-50",
-                        )}
-                        onClick={() => onPageChange(pageNum)}
-                      >
-                        {pageNum}
-                      </Button>
-                    );
-                  }
-
-                  // Show ellipsis
-                  if (pageNum === 2 || pageNum === totalPages - 1) {
-                    return (
-                      <span
-                        key={pageNum}
-                        className="px-1 text-muted-foreground text-xs"
-                      >
-                        ...
-                      </span>
-                    );
-                  }
-
-                  return null;
-                },
-              )}
-            </div>
-
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => onPageChange(page + 1)}
-              disabled={page === totalPages}
-              className="size-8 p-0"
-            >
-              <ChevronRight className="size-4" />
-            </Button>
-          </div>
+        <div className="px-6 py-4 border-t">
+          <DataTablePagination
+            page={page}
+            totalPages={totalPages}
+            onPageChange={onPageChange}
+            summary={`Showing ${startEntry}\u2013${endEntry} of ${totalEntries} entries`}
+          />
         </div>
       )}
     </Card>

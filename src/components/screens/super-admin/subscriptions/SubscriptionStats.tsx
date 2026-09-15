@@ -52,138 +52,135 @@ export function SubscriptionStats({
     );
   }, [tenants, tenantSearch]);
   return (
-    <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-teal-950 via-teal-900 to-teal-800 p-6 text-white shadow-lg">
-      <div className="absolute top-0 right-0 size-64 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/3" />
-      <div className="relative z-10">
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-          <div className="flex items-center gap-4">
-            <div className="size-12 rounded-xl bg-white/10 flex items-center justify-center backdrop-blur-sm border border-white/20">
-              <Crown className="size-6 text-teal-200" />
-            </div>
-            <div>
-              <h2 className="text-2xl font-semibold tracking-tight">
-                B2C User Subscriptions
-              </h2>
-              <p className="text-teal-200 text-sm">
-                Manage premium access across all schools
-              </p>
-            </div>
+    <div className="rounded-xl border bg-card p-6">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div className="flex items-center gap-4">
+          <div className="size-12 rounded-xl bg-muted flex items-center justify-center border">
+            <Crown className="size-6 text-muted-foreground" />
           </div>
-
-          <div className="flex items-center gap-3">
-            <div className="bg-white/10 backdrop-blur-md rounded-lg border border-white/20 p-1 flex items-center gap-2">
-              <Building2 className="size-4 ml-2 text-teal-200" />
-              <Popover open={open} onOpenChange={setOpen}>
-                <PopoverTrigger asChild>
-                  <Button 
-                    variant="ghost" 
-                    role="combobox"
-                    aria-expanded={open}
-                    className="w-[200px] justify-between cursor-pointer capitalize text-white hover:bg-white/10 hover:text-white border-0 h-8 font-normal px-2 text-xs"
-                  >
-                    <span className="truncate">
-                      {selectedTenant ? (tenants.find(t => t.id === selectedTenant)?.name || "Select School") : "Select School"}
-                    </span>
-                    <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50 text-teal-200" />
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-[260px] p-0 border border-zinc-200 dark:border-zinc-850 bg-white dark:bg-zinc-950 shadow-xl text-zinc-950 dark:text-white" align="end">
-                  <div className="flex items-center border-b px-3 border-zinc-200 dark:border-zinc-800">
-                    <Search className="mr-2 h-4 w-4 shrink-0 opacity-50" />
-                    <Input 
-                      placeholder="Search schools..." 
-                      value={tenantSearch}
-                      onChange={(e) => onTenantSearchChange(e.target.value)}
-                      className="flex h-9 w-full rounded-md bg-transparent py-3 text-xs outline-none border-none focus-visible:ring-0 focus-visible:ring-offset-0 placeholder:text-muted-foreground text-zinc-950 dark:text-white"
-                    />
-                  </div>
-                  <ScrollArea className="h-48 p-1">
-                    
-                    {filteredTenants.length === 0 ? (
-                      <div className="p-3 text-xs text-muted-foreground text-center">No schools found.</div>
-                    ) : (
-                      <>
-                        {filteredTenants.map((t, index) => (
-                          <button
-                            key={`${t.id}-${index}`}
-                            ref={index === filteredTenants.length - 1 ? lastTenantElementRef : null}
-                            onClick={() => {
-                              onTenantChange(t.id);
-                              setOpen(false);
-                              onTenantSearchChange("");
-                            }}
-                            className="flex items-center justify-between w-full text-left px-3 py-1.5 text-xs hover:bg-teal-500/10 dark:hover:bg-teal-500/20 rounded-md transition-colors cursor-pointer group"
-                          >
-                            <span className="font-medium text-zinc-900 dark:text-zinc-100 truncate pr-2 group-hover:text-teal-600 dark:group-hover:text-teal-400">{t.name}</span>
-                            {selectedTenant === t.id && (
-                              <Check className="h-3.5 w-3.5 text-teal-600 shrink-0" />
-                            )}
-                          </button>
-                        ))}
-                        {isFetchingNextPage && (
-                          <div className="flex items-center justify-center p-2 text-muted-foreground gap-1.5">
-                            <Loader2 className="size-3 animate-spin text-teal-600" />
-                            <span className="text-[10px]">Loading...</span>
-                          </div>
-                        )}
-                      </>
-                    )}
-                  </ScrollArea>
-                </PopoverContent>
-              </Popover>
-            </div>
-            {selectedTenant !== "all" && (
-              <Button
-                className="bg-white/20 border-white/30 hover:bg-white/30 text-white"
-                onClick={onNewSetup}
-              >
-                <Plus className="size-4 mr-2" /> New Setup
-              </Button>
-            )}
+          <div>
+            <h2 className="text-2xl font-semibold tracking-tight">
+              B2C User Subscriptions
+            </h2>
+            <p className="text-muted-foreground text-sm">
+              Manage premium access across all schools
+            </p>
           </div>
         </div>
 
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-6">
-          <div className="bg-white/5 backdrop-blur-sm rounded-xl p-3 border border-white/10">
-            <p className="text-teal-200 text-[10px] font-medium uppercase tracking-wider">
-              Active Plans
-            </p>
-            <p className="text-xl font-bold mt-0.5">
-              {stats?.activeSubscriptions || 0}
-            </p>
+        <div className="flex items-center gap-3">
+          <div className="rounded-lg border p-1 flex items-center gap-2">
+            <Building2 className="size-4 ml-2 text-muted-foreground" />
+            <Popover open={open} onOpenChange={setOpen}>
+              <PopoverTrigger asChild>
+                <Button
+                  variant="ghost"
+                  role="combobox"
+                  aria-expanded={open}
+                  className="w-[200px] justify-between cursor-pointer capitalize hover:bg-muted h-8 font-normal px-2 text-xs"
+                >
+                  <span className="truncate">
+                    {selectedTenant ? (tenants.find(t => t.id === selectedTenant)?.name || "Select School") : "Select School"}
+                  </span>
+                  <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-[260px] p-0 border bg-popover shadow-md" align="end">
+                <div className="flex items-center border-b px-3 border-border">
+                  <Search className="mr-2 h-4 w-4 shrink-0 opacity-50" />
+                  <Input
+                    placeholder="Search schools..."
+                    value={tenantSearch}
+                    onChange={(e) => onTenantSearchChange(e.target.value)}
+                    className="flex h-9 w-full rounded-md bg-transparent py-3 text-xs outline-none border-none focus-visible:ring-0 focus-visible:ring-offset-0 placeholder:text-muted-foreground"
+                  />
+                </div>
+                <ScrollArea className="h-48 p-1">
+
+                  {filteredTenants.length === 0 ? (
+                    <div className="p-3 text-xs text-muted-foreground text-center">No schools found.</div>
+                  ) : (
+                    <>
+                      {filteredTenants.map((t, index) => (
+                        <button
+                          key={`${t.id}-${index}`}
+                          ref={index === filteredTenants.length - 1 ? lastTenantElementRef : null}
+                          onClick={() => {
+                            onTenantChange(t.id);
+                            setOpen(false);
+                            onTenantSearchChange("");
+                          }}
+                          className="flex items-center justify-between w-full text-left px-3 py-1.5 text-xs hover:bg-muted rounded-md transition-colors cursor-pointer"
+                        >
+                          <span className="font-medium truncate pr-2">{t.name}</span>
+                          {selectedTenant === t.id && (
+                            <Check className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
+                          )}
+                        </button>
+                      ))}
+                      {isFetchingNextPage && (
+                        <div className="flex items-center justify-center p-2 text-muted-foreground gap-1.5">
+                          <Loader2 className="size-3 animate-spin" />
+                          <span className="text-xs">Loading...</span>
+                        </div>
+                      )}
+                    </>
+                  )}
+                </ScrollArea>
+              </PopoverContent>
+            </Popover>
           </div>
-          <div className="bg-white/5 backdrop-blur-sm rounded-xl p-3 border border-white/10">
-            <p className="text-teal-200 text-[10px] font-medium uppercase tracking-wider">
-              Total Revenue
-            </p>
-            <p className="text-xl font-bold mt-0.5 flex items-center gap-1">
-              <IndianRupee className="size-3.5" />
-              {(stats?.totalRevenue || 0).toLocaleString()}
-            </p>
-          </div>
-          <div className="bg-white/5 backdrop-blur-sm rounded-xl p-3 border border-white/10">
-            <p className="text-teal-200 text-[10px] font-medium uppercase tracking-wider">
-              Avg Plan Value
-            </p>
-            <p className="text-xl font-bold mt-0.5 flex items-center gap-1">
-              <IndianRupee className="size-3.5" />
-              {stats?.totalSubscriptions
-                ? Math.round(
-                    stats.totalRevenue / stats.totalSubscriptions,
-                  ).toLocaleString()
-                : 0}
-            </p>
-          </div>
-          <div className="bg-white/5 backdrop-blur-sm rounded-xl p-3 border border-white/10">
-            <p className="text-teal-200 text-[10px] font-medium uppercase tracking-wider">
-              Non-Subscribers
-            </p>
-            <p className="text-xl font-bold mt-0.5 text-emerald-300">
-              {!selectedTenant
-                ? "–"
-                : Math.max(0, parentsTotal - (stats?.totalSubscriptions || 0))}
-            </p>
-          </div>
+          {selectedTenant !== "all" && (
+            <Button
+              variant="outline"
+              onClick={onNewSetup}
+            >
+              <Plus className="size-4 mr-2" /> New Setup
+            </Button>
+          )}
+        </div>
+      </div>
+
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-6">
+        <div className="rounded-xl border p-3">
+          <p className="text-xs font-medium text-muted-foreground">
+            Active plans
+          </p>
+          <p className="text-2xl font-semibold mt-0.5">
+            {stats?.activeSubscriptions || 0}
+          </p>
+        </div>
+        <div className="rounded-xl border p-3">
+          <p className="text-xs font-medium text-muted-foreground">
+            Total revenue
+          </p>
+          <p className="text-2xl font-semibold mt-0.5 flex items-center gap-1">
+            <IndianRupee className="size-3.5" />
+            {(stats?.totalRevenue || 0).toLocaleString()}
+          </p>
+        </div>
+        <div className="rounded-xl border p-3">
+          <p className="text-xs font-medium text-muted-foreground">
+            Avg plan value
+          </p>
+          <p className="text-2xl font-semibold mt-0.5 flex items-center gap-1">
+            <IndianRupee className="size-3.5" />
+            {stats?.totalSubscriptions
+              ? Math.round(
+                  stats.totalRevenue / stats.totalSubscriptions,
+                ).toLocaleString()
+              : 0}
+          </p>
+        </div>
+        <div className="rounded-xl border p-3">
+          <p className="text-xs font-medium text-muted-foreground">
+            Non-subscribers
+          </p>
+          <p className="text-2xl font-semibold mt-0.5">
+            {!selectedTenant
+              ? "\u2013"
+              : Math.max(0, parentsTotal - (stats?.totalSubscriptions || 0))}
+          </p>
         </div>
       </div>
     </div>

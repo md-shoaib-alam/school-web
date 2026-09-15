@@ -23,40 +23,79 @@ interface DetailHeaderProps {
 interface MiniStatProps {
   icon: React.ReactNode;
   label: string;
-  value: string | number;
-  sub?: string;
+  value: number;
+  max?: number;
+  pct?: number;
+  barColor: string;
   iconBg: string;
   iconColor: string;
+  cardBorder: string;
   isCurrency?: boolean;
+  currencyValue?: number;
 }
 
 function MiniStat({
   icon,
   label,
   value,
-  sub,
+  max,
+  pct,
+  barColor,
   iconBg,
   iconColor,
+  cardBorder,
   isCurrency,
+  currencyValue,
 }: MiniStatProps) {
+  const percentage = pct ?? (max && max > 0 ? Math.min(100, Math.round((value / max) * 100)) : 0);
+
   return (
-    <Card className="border-none shadow-sm hover:shadow-md transition-shadow group overflow-hidden bg-white dark:bg-zinc-800">
-      <CardContent className="p-4 flex items-center gap-4 relative">
-        <div className={`size-11 rounded-xl ${iconBg} ${iconColor} flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform shadow-inner`}>
+    <div className={`rounded-2xl p-4 sm:p-5 bg-white dark:bg-slate-900 border ${cardBorder} shadow-2xs hover:shadow-sm transition-all duration-200 flex flex-col justify-between`}>
+      <div className="flex items-start gap-3.5">
+        <div className={`size-11 rounded-xl ${iconBg} ${iconColor} flex items-center justify-center shrink-0`}>
           {icon}
         </div>
-        <div className="min-w-0">
-          <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground mb-0.5">{label}</p>
-          <div className="flex items-baseline gap-1">
-            <span className="text-xl font-black truncate flex items-center">
-              {isCurrency && <IndianRupee className="size-3.5 mr-0.5" />}
-              {typeof value === 'number' ? value.toLocaleString() : value}
-            </span>
-            {sub && <span className="text-[10px] font-bold text-muted-foreground">{sub}</span>}
+        <div className="min-w-0 flex-1">
+          <p className="text-xs font-semibold text-slate-600 dark:text-slate-400">
+            {label}
+          </p>
+          <div className="mt-1 flex items-baseline gap-1">
+            {isCurrency ? (
+              <span className="text-xl font-bold text-slate-900 dark:text-slate-100 flex items-center">
+                <IndianRupee className="size-4 mr-0.5" />
+                {(currencyValue || 0).toLocaleString()}
+              </span>
+            ) : (
+              <p className="text-xl font-bold text-slate-900 dark:text-slate-100">
+                {value.toLocaleString()}{" "}
+                {max !== undefined && (
+                  <span className="text-xs font-normal text-slate-400">/ {max.toLocaleString()}</span>
+                )}
+              </p>
+            )}
           </div>
+          {isCurrency && (
+            <p className="text-[11px] text-slate-400 font-normal mt-0.5">
+              Total revenue generated
+            </p>
+          )}
         </div>
-      </CardContent>
-    </Card>
+      </div>
+
+      {!isCurrency && (
+        <div className="mt-4 flex items-center gap-2">
+          <div className="h-1.5 flex-1 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
+            <div
+              className={`h-full rounded-full transition-all duration-500 ${barColor}`}
+              style={{ width: `${percentage}%` }}
+            />
+          </div>
+          <span className="text-[11px] font-bold text-slate-600 dark:text-slate-400 shrink-0">
+            {percentage}%
+          </span>
+        </div>
+      )}
+    </div>
   );
 }
 
@@ -70,44 +109,55 @@ export function DetailHeader({
   const statusCfg = statusColors[tenant?.status || ""] || statusColors.inactive;
   const planCfg = planColors[tenant?.plan || ""] || planColors.basic;
 
-  return (
-    <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row sm:items-center gap-4">
-        <Button
-          variant="ghost"
-          size="sm"
-          className="w-fit text-muted-foreground hover:text-foreground hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-xl px-4 h-9 font-bold transition-all"
-          onClick={onBack}
-        >
-          <ArrowLeft className="size-4 mr-2" />
-          Back to Schools
-        </Button>
-      </div>
+  const studentCount = tenant?.studentCount ?? 0;
+  const maxStudents = tenant?.maxStudents ?? 500;
 
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-2">
-        <div className="flex items-center gap-5">
-          <div className="size-14 rounded-2xl bg-gradient-to-br from-rose-500 to-pink-600 text-white flex items-center justify-center shrink-0 shadow-lg shadow-rose-100 dark:shadow-none">
-            <Building2 className="size-7" />
-          </div>
-          <div className="min-w-0">
-            <h1 className="text-2xl font-semibold tracking-tight truncate leading-tight">
+  const teacherCount = tenant?.teacherCount ?? 0;
+  const maxTeachers = tenant?.maxTeachers ?? 50;
+
+  const parentCount = tenant?.parentCount ?? 0;
+  const maxParents = tenant?.maxParents ?? 300;
+
+  const classCount = tenant?._count?.classes ?? 0;
+  const maxClasses = tenant?.maxClasses ?? 30;
+
+  const totalRevenue = tenant?.totalRevenue ?? 0;
+
+  return (
+    <div className="space-y-5">
+      {/* Top row: Back button, Title & badges */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div className="flex items-center gap-3">
+          <Button
+            variant="ghost"
+            size="sm"
+            className="text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl px-3 h-9 font-semibold transition-all border border-slate-200/80 dark:border-slate-800 shadow-2xs"
+            onClick={onBack}
+          >
+            <ArrowLeft className="size-4 mr-1.5" />
+            Back to Schools
+          </Button>
+
+          <div className="flex items-center gap-2">
+            <h1 className="text-xl font-bold tracking-tight text-slate-900 dark:text-slate-100">
               {tenant?.name || tenantName}
             </h1>
-            <p className="text-xs font-black text-rose-600 dark:text-rose-400 mt-0.5 tracking-wider uppercase">
+            <span className="text-xs text-slate-400 font-normal hidden sm:inline">
               @{tenant?.slug || tenantSlug}
-            </p>
+            </span>
           </div>
         </div>
-        <div className="flex items-center gap-2 flex-wrap">
+
+        <div className="flex items-center gap-2">
           <Badge
             variant="outline"
-            className={`${planCfg.bg} ${planCfg.text} ${planCfg.border} border-2 capitalize font-black text-[10px] px-3 py-1 rounded-full shadow-sm`}
+            className={`${planCfg.bg} ${planCfg.text} ${planCfg.border} capitalize font-medium text-xs px-2.5 py-0.5 rounded-full`}
           >
             {tenant?.plan || tenantPlan} Plan
           </Badge>
           <Badge
             variant="outline"
-            className={`${statusCfg.bg} ${statusCfg.text} border-2 border-transparent capitalize font-black text-[10px] px-3 py-1 rounded-full flex items-center gap-1.5 shadow-sm`}
+            className={`${statusCfg.bg} ${statusCfg.text} border-transparent capitalize font-medium text-xs px-2.5 py-0.5 rounded-full flex items-center gap-1.5`}
           >
             <div className={`size-1.5 rounded-full ${statusCfg.text.replace('text-', 'bg-')}`} />
             {tenant?.status || "unknown"}
@@ -115,46 +165,67 @@ export function DetailHeader({
         </div>
       </div>
 
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+      {/* 5 Top Stat Cards matching reference image */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+        {/* Students: Red/Coral */}
         <MiniStat
           icon={<GraduationCap className="size-5" />}
           label="Students"
-          value={tenant?.studentCount ?? 0}
-          sub={tenant?.maxStudents ? `/${tenant.maxStudents}` : undefined}
-          iconBg="bg-rose-50 dark:bg-rose-900/30"
-          iconColor="text-rose-600"
+          value={studentCount}
+          max={maxStudents}
+          barColor="bg-rose-500"
+          iconBg="bg-rose-50 dark:bg-rose-950/40"
+          iconColor="text-rose-500"
+          cardBorder="border-rose-100 dark:border-rose-950/30"
         />
+
+        {/* Teachers: Blue */}
         <MiniStat
           icon={<Users className="size-5" />}
           label="Teachers"
-          value={tenant?.teacherCount ?? 0}
-          sub={tenant?.maxTeachers ? `/${tenant.maxTeachers}` : undefined}
-          iconBg="bg-blue-50 dark:bg-blue-900/30"
+          value={teacherCount}
+          max={maxTeachers}
+          barColor="bg-blue-600"
+          iconBg="bg-blue-50 dark:bg-blue-950/40"
           iconColor="text-blue-600"
+          cardBorder="border-blue-100 dark:border-blue-950/30"
         />
+
+        {/* Parents: Green */}
         <MiniStat
           icon={<UserCheck className="size-5" />}
           label="Parents"
-          value={tenant?.parentCount ?? 0}
-          sub={tenant?.maxParents ? `/${tenant.maxParents}` : undefined}
-          iconBg="bg-emerald-50 dark:bg-emerald-900/30"
-          iconColor="text-emerald-600"
+          value={parentCount}
+          max={maxParents}
+          barColor="bg-emerald-500"
+          iconBg="bg-emerald-50 dark:bg-emerald-950/40"
+          iconColor="text-emerald-500"
+          cardBorder="border-emerald-100 dark:border-emerald-950/30"
         />
+
+        {/* Classes: Purple */}
         <MiniStat
           icon={<School className="size-5" />}
           label="Classes"
-          value={tenant?._count?.classes ?? 0}
-          sub={tenant?.maxClasses ? `/${tenant.maxClasses}` : undefined}
-          iconBg="bg-purple-50 dark:bg-purple-900/30"
+          value={classCount}
+          max={maxClasses}
+          barColor="bg-purple-600"
+          iconBg="bg-purple-50 dark:bg-purple-950/40"
           iconColor="text-purple-600"
+          cardBorder="border-purple-100 dark:border-purple-950/30"
         />
+
+        {/* Revenue: Amber */}
         <MiniStat
           icon={<IndianRupee className="size-5" />}
           label="Revenue"
-          value={tenant?.totalRevenue ?? 0}
+          value={totalRevenue}
           isCurrency
-          iconBg="bg-amber-50 dark:bg-amber-900/30"
+          currencyValue={totalRevenue}
+          barColor="bg-amber-500"
+          iconBg="bg-amber-50 dark:bg-amber-950/40"
           iconColor="text-amber-600"
+          cardBorder="border-amber-100 dark:border-amber-950/30"
         />
       </div>
     </div>

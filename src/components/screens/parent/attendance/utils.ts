@@ -83,3 +83,26 @@ export function getCalendarCellColor(status: string | null) {
       return "bg-zinc-100 dark:bg-zinc-800/50 text-zinc-600 dark:text-zinc-300";
   }
 }
+
+export function getTodayAttendance(records: AttendanceRecord[]) {
+  const today = new Date();
+  const year = today.getFullYear();
+  const month = String(today.getMonth() + 1).padStart(2, "0");
+  const day = String(today.getDate()).padStart(2, "0");
+  const todayStr = `${year}-${month}-${day}`;
+
+  const record = records.find((r) => r.date === todayStr || r.date.startsWith(todayStr));
+
+  if (record) {
+    return {
+      status: record.status,
+      date: record.date,
+    };
+  }
+
+  return {
+    status: "not_marked",
+    date: todayStr,
+  };
+}
+

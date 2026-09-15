@@ -123,13 +123,13 @@ export function AdminTable({
                                 {admin.name}
                               </p>
                               {isRoot && (
-                                <Badge className="bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 border border-amber-200 dark:border-amber-800 hover:bg-amber-100 dark:hover:bg-amber-900/30 text-[10px] gap-1 px-1.5 py-0 shadow-none font-semibold">
+                                <Badge className="bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 border border-amber-200 dark:border-amber-800 hover:bg-amber-100 dark:hover:bg-amber-900/30 text-xs gap-1 px-1.5 py-0 shadow-none font-medium">
                                   <LockKeyhole className="size-3" />
                                   Root Owner
                                 </Badge>
                               )}
                             </div>
-                            <p className="text-[10px] text-muted-foreground truncate sm:hidden font-medium">
+                            <p className="text-xs text-muted-foreground truncate sm:hidden font-medium">
                               {admin.email}
                             </p>
                           </div>
@@ -147,8 +147,8 @@ export function AdminTable({
                         <Badge
                           className={
                             admin.isActive
-                              ? "bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 border-none shadow-none text-[10px] py-0.5"
-                              : "bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 border-none shadow-none text-[10px] py-0.5"
+                              ? "bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 border-none shadow-none text-xs py-0.5"
+                              : "bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 border-none shadow-none text-xs py-0.5"
                           }
                         >
                           {admin.isActive ? "Active" : "Inactive"}

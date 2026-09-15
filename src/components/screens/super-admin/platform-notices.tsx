@@ -248,10 +248,10 @@ export function SuperAdminPlatformNotices() {
             </CardHeader>
             <CardContent className="space-y-4">
               <p className="text-sm text-muted-foreground leading-relaxed">
-                Platform notices are **global** and appear in a high-visibility bar at the top of the application for all targeted users.
+                Platform notices are global and appear in a high-visibility bar at the top of the application for all targeted users.
               </p>
               <div className="space-y-2">
-                <div className="flex items-center gap-2 text-xs font-medium text-amber-700 dark:text-amber-400 uppercase tracking-widest">
+                <div className="flex items-center gap-2 text-xs font-medium text-amber-700 dark:text-amber-400">
                   <Bell className="size-3" />
                   Visibility
                 </div>

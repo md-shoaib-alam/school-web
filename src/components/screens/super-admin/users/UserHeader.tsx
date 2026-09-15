@@ -1,6 +1,4 @@
-import { Badge } from "@/components/ui/badge";
-import { Card, CardContent } from "@/components/ui/card";
-import { Shield } from "lucide-react";
+import { Globe } from "lucide-react";
 import { STAT_CARDS } from "./types";
 
 interface UserHeaderProps {
@@ -18,52 +16,88 @@ export function UserHeader({ totalCount, roleCountsMap }: UserHeaderProps) {
   };
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+    <div className="space-y-5">
+      {/* Top Title & Cross-Tenant View Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
-          <h2 className="text-2xl font-semibold text-zinc-900 dark:text-zinc-100 tracking-tight">
+          <h1 className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">
             User Management
-          </h2>
-          <p className="text-sm font-bold text-muted-foreground">
+          </h1>
+          <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-0.5">
             Manage and monitor all users across all tenant schools
           </p>
         </div>
-        <Badge
-          variant="outline"
-          className="w-fit gap-1.5 border-teal-200 dark:border-teal-700 text-teal-700 dark:text-teal-400 bg-teal-50 dark:bg-teal-900/30 text-[10px] font-black uppercase tracking-widest px-3 py-1.5 rounded-full shadow-sm"
+
+        <button
+          type="button"
+          className="inline-flex items-center gap-2 border border-slate-200/90 dark:border-zinc-800 bg-white dark:bg-zinc-900 hover:bg-slate-50 dark:hover:bg-zinc-800/80 text-slate-700 dark:text-slate-300 rounded-xl px-3.5 py-1.5 text-xs font-semibold shadow-2xs transition-colors self-start sm:self-auto cursor-default"
         >
-          <Shield className="size-3.5" />
-          Cross-Tenant View
-        </Badge>
+          <Globe className="size-3.5 text-slate-500 dark:text-slate-400" />
+          <span>Cross-Tenant View</span>
+        </button>
       </div>
 
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
+      {/* 6 Metric Stat Cards */}
+      <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-6 gap-3.5 sm:gap-4">
         {STAT_CARDS.map((stat) => {
           const count = getCount(stat.key);
-          const percentage = totalCount > 0 ? ((count / totalCount) * 100).toFixed(1) : "0.0";
           const Icon = stat.icon;
+
           return (
-            <Card
+            <div
               key={stat.key}
-              className={`border-none shadow-sm ${stat.bg} overflow-hidden group hover:scale-[1.02] transition-transform`}
+              className="relative overflow-hidden rounded-2xl border border-slate-200/80 dark:border-zinc-800/80 bg-white dark:bg-zinc-950 p-4 shadow-xs flex flex-col justify-between"
             >
-              <CardContent className="p-4">
-                <div className="flex items-center justify-between mb-3">
-                  <div className={`p-2 rounded-xl ${stat.iconBg} shadow-inner`}>
-                    <Icon className="size-4" />
-                  </div>
-                  <span className={`text-[10px] font-black uppercase tracking-widest ${stat.color} opacity-80`}>
-                    {percentage}%
-                  </span>
+              {/* Top Row: Icon + Label */}
+              <div className="flex items-center gap-2.5">
+                <div className={`size-8 rounded-xl flex items-center justify-center shrink-0 ${stat.iconBg}`}>
+                  <Icon className="size-4" />
                 </div>
-                <p className="text-2xl font-black text-zinc-900 dark:text-zinc-100">
-                  {count.toLocaleString()}
-                </p>
-                <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground mt-0.5">
+                <span className="text-xs font-semibold text-slate-600 dark:text-slate-400 truncate">
                   {stat.label}
-                </p>
-              </CardContent>
-            </Card>
+                </span>
+              </div>
+
+              {/* Middle Row: Large Count + Trend Pill */}
+              <div className="flex items-baseline gap-2 mt-3.5">
+                <span className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">
+                  {count.toLocaleString()}
+                </span>
+                <span className="inline-flex items-center text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400 border border-emerald-200/60 dark:border-emerald-800/40">
+                  {stat.trend}
+                </span>
+              </div>
+
+              {/* Bottom Row: Subtext + Mini Sparkline Wave */}
+              <div className="flex items-end justify-between mt-2 pt-1">
+                <span className="text-[11px] text-slate-400 dark:text-slate-500 font-medium truncate">
+                  {stat.subtext}
+                </span>
+
+                {/* Mini SVG wave sparkline */}
+                <div className="w-14 h-6 shrink-0 -mb-1 ml-1 opacity-90">
+                  <svg viewBox="0 0 60 26" className="w-full h-full overflow-visible">
+                    <defs>
+                      <linearGradient id={stat.gradientId} x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stopColor={stat.stroke} stopOpacity="0.28" />
+                        <stop offset="100%" stopColor={stat.stroke} stopOpacity="0.0" />
+                      </linearGradient>
+                    </defs>
+                    <path
+                      d="M 0 20 Q 14 8, 28 16 T 60 6 L 60 26 L 0 26 Z"
+                      fill={`url(#${stat.gradientId})`}
+                    />
+                    <path
+                      d="M 0 20 Q 14 8, 28 16 T 60 6"
+                      fill="none"
+                      stroke={stat.stroke}
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                    />
+                  </svg>
+                </div>
+              </div>
+            </div>
           );
         })}
       </div>

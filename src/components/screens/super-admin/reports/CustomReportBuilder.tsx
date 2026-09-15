@@ -51,7 +51,7 @@ export function CustomReportBuilder({
         
         {/* 1. Choose Report Type */}
         <div className="space-y-2 text-left">
-          <label className="text-[11px] font-bold text-zinc-400 dark:text-zinc-500 tracking-wider uppercase">1. Choose Report Type</label>
+          <label className="text-xs font-medium text-muted-foreground">1. Choose Report Type</label>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
             {[
               { id: "schools", label: "Schools", icon: <Building2 className="size-4" /> },
@@ -66,7 +66,7 @@ export function CustomReportBuilder({
                 className={`flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl text-sm font-semibold border transition-all cursor-pointer ${
                   reportType === tab.id
                     ? "bg-teal-600 border-teal-600 text-white shadow-sm"
-                    : "bg-zinc-50/50 dark:bg-zinc-950 border-zinc-200 dark:border-zinc-800/80 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-850"
+                    : "bg-zinc-50/50 dark:bg-zinc-950 border-zinc-200 dark:border-zinc-800/80 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800"
                 }`}
               >
                 {tab.icon}
@@ -79,7 +79,7 @@ export function CustomReportBuilder({
         {/* 2. Select Fields / Columns */}
         <div className="space-y-2 text-left">
           <div className="flex justify-between items-center">
-            <label className="text-[11px] font-bold text-zinc-400 dark:text-zinc-500 tracking-wider uppercase">2. Select Fields / Columns</label>
+            <label className="text-xs font-medium text-muted-foreground">2. Select Fields / Columns</label>
             <button 
               type="button"
               onClick={onToggleAllColumns}
@@ -113,7 +113,7 @@ export function CustomReportBuilder({
         {/* 3. Filters & Format */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-end text-left">
           <div className="space-y-2">
-            <label className="text-[11px] font-bold text-zinc-400 dark:text-zinc-500 tracking-wider uppercase">Filter by Status</label>
+            <label className="text-xs font-medium text-muted-foreground">Filter by Status</label>
             <select
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value)}
@@ -132,7 +132,7 @@ export function CustomReportBuilder({
           </div>
 
           <div className="space-y-2">
-            <label className="text-[11px] font-bold text-zinc-400 dark:text-zinc-500 tracking-wider uppercase">Export Format</label>
+            <label className="text-xs font-medium text-muted-foreground">Export Format</label>
             <select
               value={exportFormat}
               onChange={(e) => setExportFormat(e.target.value as ExportFormat)}

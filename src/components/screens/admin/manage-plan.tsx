@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Script from "next/script";
 import { useAppStore } from "@/store/use-app-store";
-import { useTenantMetadata, useUpgradeSchool } from "@/lib/graphql/hooks/platform.hooks";
+import { useTenantMetadata } from "@/lib/graphql/hooks/platform.hooks";
 import { PricingPlans, SchoolPlan } from "./subscription/pricing-plans";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -19,7 +19,6 @@ export function ManagePlanScreen() {
   const queryClient = useQueryClient();
   const { currentTenantId } = useAppStore();
   const { data: detailData, isLoading: isDetailLoading } = useTenantMetadata(currentTenantId || "");
-  const upgradeSchool = useUpgradeSchool();
   const [isUpdating, setIsUpdating] = useState(false);
 
   const tenant = detailData?.tenant;
@@ -27,10 +26,9 @@ export function ManagePlanScreen() {
   const handleUpgrade = async (plan: SchoolPlan) => {
     setIsUpdating(true);
     try {
-      // 1. Create Order on Backend
+      // 1. Create Order on Backend (server derives the price from its plan catalog)
       const orderData = await api.post("/tenants/create-subscription-order", { 
-        planId: plan.id,
-        amount: plan.price
+        planId: plan.id
       });
 
       const { orderId, amount, currency, keyId } = orderData;
@@ -47,13 +45,11 @@ export function ManagePlanScreen() {
         handler: async (response: any) => {
           setIsUpdating(true);
           try {
-            // 3. Verify Payment Signature and Update Plan
+            // 3. Verify Payment Signature (server resolves plan + limits from the order it created)
             await api.post("/tenants/verify-subscription-payment", {
               razorpay_order_id: response.razorpay_order_id,
               razorpay_payment_id: response.razorpay_payment_id,
-              razorpay_signature: response.razorpay_signature,
-              planId: plan.id,
-              limits: plan.limits
+              razorpay_signature: response.razorpay_signature
             });
 
             toast.success("Subscription Active!", {

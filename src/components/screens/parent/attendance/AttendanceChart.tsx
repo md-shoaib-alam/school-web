@@ -90,14 +90,15 @@ export function AttendanceChart({ data, isPremium }: AttendanceChartProps) {
                     <Tooltip
                       cursor={{ fill: "rgba(0,0,0,0.04)" }}
                       contentStyle={{
-                        backgroundColor: "rgba(17, 24, 39, 0.95)",
+                        backgroundColor: "rgba(17, 24, 39, 0.92)",
                         backdropFilter: "blur(8px)",
                         borderRadius: "12px",
                         border: "1px solid rgba(255,255,255,0.1)",
                         boxShadow: "0 10px 15px -3px rgba(0, 0, 0, 0.3)",
-                        padding: "8px",
+                        padding: "10px 14px",
                       }}
-                      labelStyle={{ color: "#9ca3af", marginBottom: "2px", fontSize: "10px", fontWeight: "bold" }}
+                      labelStyle={{ color: "#9ca3af", marginBottom: "4px", fontSize: "11px", fontWeight: "bold" }}
+                      itemStyle={{ color: "#f3f4f6", fontSize: "12px", fontWeight: "600", padding: "1px 0" }}
                     />
                     <Bar
                       dataKey="present"

@@ -1,7 +1,6 @@
 import { memo } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
   Table,
@@ -32,44 +31,12 @@ import {
   GraduationCap,
   Users,
   UserCheck,
-  Crown,
-  CreditCard,
-  ChevronLeft,
-  ChevronRight,
 } from "lucide-react";
-import { Tenant, ViewMode, planColors, statusColors } from "./types";
-import { SCHOOL_PLANS } from "@/lib/billing-constants";
+import { Tenant, ViewMode } from "./types";
+import { TenantPlanBadge, TenantStatusBadge } from "./badges";
+import { DataTablePagination } from "@/components/ui/data-table-pagination";
 
 // --- Helper Components ---
-
-const PlanBadge = memo(({ plan }: { plan: string }) => {
-  const config = planColors[plan] || planColors.basic;
-  const planMeta = SCHOOL_PLANS.find(p => p.id === plan);
-  const displayName = planMeta?.name || plan;
-
-  return (
-    <Badge
-      variant="outline"
-      className={`${config.bg} ${config.text} ${config.border} border text-[10px] uppercase tracking-wider py-0.5 px-2 font-semibold`}
-    >
-      <Crown className="size-3 mr-1" />
-      {displayName}
-    </Badge>
-  );
-});
-
-const StatusBadge = memo(({ status }: { status: string }) => {
-  const config = statusColors[status] || statusColors.inactive;
-  return (
-    <Badge
-      variant="outline"
-      className={`${config.bg} ${config.text} gap-1 text-[10px] py-0.5 px-2 border-none`}
-    >
-      {config.icon}
-      {status.toUpperCase()}
-    </Badge>
-  );
-});
 
 const TenantCard = memo(function TenantCard({
   tenant,
@@ -89,139 +56,158 @@ const TenantCard = memo(function TenantCard({
   onAddAdmin: (tenant: Tenant) => void;
 }) {
   return (
-    <Card className="group hover:shadow-lg transition-all duration-300 border-teal-100/50 dark:border-teal-900/20">
-      <CardContent className="p-5 space-y-4">
-        <div className="flex items-start justify-between gap-2">
-          <div className="flex items-center gap-3 min-w-0">
-            <div className="size-12 rounded-xl bg-gradient-to-br from-teal-50 to-teal-100 dark:from-teal-950/40 dark:to-teal-900/40 text-teal-700 dark:text-teal-400 flex items-center justify-center shrink-0 border border-teal-200/50 dark:border-teal-800/30 overflow-hidden">
-              <img src={tenant.logo || "/test.webp"} alt={tenant.name} className="size-full object-cover" />
+    <div className="bg-white dark:bg-slate-900/90 rounded-2xl p-5 border border-slate-200/80 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 shadow-xs hover:shadow-md transition-all duration-200 flex flex-col justify-between">
+      <div>
+        {/* Top Header: Circular Emblem, Title, Domain, More Menu */}
+        <div className="flex items-start justify-between gap-2.5">
+          <div className="flex items-center gap-3.5 min-w-0">
+            <div className="size-12 rounded-full bg-slate-50 dark:bg-slate-800 flex items-center justify-center shrink-0 border border-slate-200/90 dark:border-slate-700 overflow-hidden shadow-2xs">
+              {tenant.logo ? (
+                <img src={tenant.logo} alt={tenant.name} className="size-full object-cover" />
+              ) : (
+                <Building2 className="size-6 text-blue-600 dark:text-blue-400" />
+              )}
             </div>
             <div className="min-w-0">
-              <h3 className="font-semibold text-base truncate">{tenant.name}</h3>
-              <p className="text-xs text-muted-foreground flex items-center gap-1">
-                <Globe className="size-3" />
-                {tenant.slug}
+              <h3 className="font-semibold text-sm sm:text-[15px] text-slate-900 dark:text-slate-100 leading-snug truncate" title={tenant.name}>
+                {tenant.name}
+              </h3>
+              <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5 truncate font-normal">
+                @{tenant.slug.includes(".") ? tenant.slug : `${tenant.slug}.edu.in`}
               </p>
             </div>
           </div>
+
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button
                 variant="ghost"
                 size="icon"
-                className="size-8 shrink-0 hover:bg-teal-50 dark:hover:bg-teal-950/50"
+                className="size-7 -mr-1 text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 rounded-lg"
               >
                 <MoreVertical className="size-4" />
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-48">
-              <DropdownMenuItem onClick={onView}>
-                <Eye className="size-4 mr-2" />
+            <DropdownMenuContent align="end" className="w-44 rounded-xl">
+              <DropdownMenuItem onClick={onView} className="text-xs">
+                <Eye className="size-3.5 mr-2" />
                 Details
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={onManageData}>
-                <Database className="size-4 mr-2" />
+              <DropdownMenuItem onClick={onManageData} className="text-xs">
+                <Database className="size-3.5 mr-2" />
                 Manage Data
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => onAddAdmin(tenant)}>
-                <ShieldCheck className="size-4 mr-2 text-violet-600" />
+              <DropdownMenuItem onClick={() => onAddAdmin(tenant)} className="text-xs">
+                <ShieldCheck className="size-3.5 mr-2" />
                 Create Admin
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={onEdit}>
-                <Edit className="size-4 mr-2" />
+              <DropdownMenuItem onClick={onEdit} className="text-xs">
+                <Edit className="size-3.5 mr-2" />
                 Edit
               </DropdownMenuItem>
               <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={onToggleStatus}>
+              <DropdownMenuItem onClick={onToggleStatus} className="text-xs">
                 {tenant.status === "active" ? (
                   <>
-                    <Ban className="size-4 mr-2" />
+                    <Ban className="size-3.5 mr-2" />
                     Suspend
                   </>
                 ) : (
                   <>
-                    <CheckCircle2 className="size-4 mr-2" />
+                    <CheckCircle2 className="size-3.5 mr-2" />
                     Activate
                   </>
                 )}
               </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem
-                className="text-red-600 focus:text-red-600"
+                className="text-destructive focus:text-destructive text-xs"
                 onClick={onDelete}
               >
-                <Trash2 className="size-4 mr-2" />
+                <Trash2 className="size-3.5 mr-2" />
                 Delete
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
 
-        <div className="flex items-center gap-2">
-          <PlanBadge plan={tenant.plan} />
-          <StatusBadge status={tenant.status} />
+        {/* Badges: Plan & Status */}
+        <div className="flex items-center gap-2 mt-3">
+          <TenantPlanBadge plan={tenant.plan} />
+          <TenantStatusBadge status={tenant.status} />
         </div>
 
-        <div className="grid grid-cols-3 gap-2 py-1">
-          <div className="text-center py-2 px-1 rounded-xl bg-muted/40 border border-muted-foreground/5">
-            <GraduationCap className="size-4 mx-auto text-teal-500 mb-1" />
-            <p className="text-sm font-bold leading-tight">
-              {tenant.studentCount}
-            </p>
-            <p className="text-[10px] text-muted-foreground uppercase font-semibold tracking-tight">
-              Students
-            </p>
+        {/* Stats Row: Students, Teachers, Parents */}
+        <div className="grid grid-cols-3 gap-2 mt-4 pt-0.5">
+          <div className="flex items-center gap-2">
+            <Users className="size-4 text-slate-400 dark:text-slate-500 shrink-0" />
+            <div className="min-w-0">
+              <p className="text-xs sm:text-sm font-bold text-slate-900 dark:text-slate-100 leading-tight">
+                {tenant.studentCount ? Number(tenant.studentCount).toLocaleString() : 0}
+              </p>
+              <p className="text-[10px] sm:text-[11px] text-slate-500 dark:text-slate-400 font-normal truncate">
+                Students
+              </p>
+            </div>
           </div>
-          <div className="text-center py-2 px-1 rounded-xl bg-muted/40 border border-muted-foreground/5">
-            <Users className="size-4 mx-auto text-blue-500 mb-1" />
-            <p className="text-sm font-bold leading-tight">
-              {tenant.teacherCount}
-            </p>
-            <p className="text-[10px] text-muted-foreground uppercase font-semibold tracking-tight">
-              Teachers
-            </p>
+
+          <div className="flex items-center gap-2">
+            <GraduationCap className="size-4 text-slate-400 dark:text-slate-500 shrink-0" />
+            <div className="min-w-0">
+              <p className="text-xs sm:text-sm font-bold text-slate-900 dark:text-slate-100 leading-tight">
+                {tenant.teacherCount ? Number(tenant.teacherCount).toLocaleString() : 0}
+              </p>
+              <p className="text-[10px] sm:text-[11px] text-slate-500 dark:text-slate-400 font-normal truncate">
+                Teachers
+              </p>
+            </div>
           </div>
-          <div className="text-center py-2 px-1 rounded-xl bg-muted/40 border border-muted-foreground/5">
-            <UserCheck className="size-4 mx-auto text-emerald-500 mb-1" />
-            <p className="text-sm font-bold leading-tight">
-              {tenant.parentCount}
-            </p>
-            <p className="text-[10px] text-muted-foreground uppercase font-semibold tracking-tight">
-              Parents
-            </p>
+
+          <div className="flex items-center gap-2">
+            <UserCheck className="size-4 text-slate-400 dark:text-slate-500 shrink-0" />
+            <div className="min-w-0">
+              <p className="text-xs sm:text-sm font-bold text-slate-900 dark:text-slate-100 leading-tight">
+                {tenant.parentCount ? Number(tenant.parentCount).toLocaleString() : 0}
+              </p>
+              <p className="text-[10px] sm:text-[11px] text-slate-500 dark:text-slate-400 font-normal truncate">
+                Parents
+              </p>
+            </div>
           </div>
         </div>
+      </div>
 
-        <div className="flex flex-col gap-2 pt-1">
-          <div className="flex gap-2">
-            <Button
-              variant="outline"
-              size="sm"
-              className="flex-1 h-9 rounded-lg hover:bg-teal-50 dark:hover:bg-teal-950/30"
-              onClick={onView}
-            >
-              View Details
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              className="flex-1 h-9 rounded-lg hover:bg-emerald-50 dark:hover:bg-emerald-950/30"
-              onClick={onManageData}
-            >
-              Live Data
-            </Button>
-          </div>
+      {/* Buttons matching reference image */}
+      <div className="flex flex-col gap-2 mt-5">
+        <div className="grid grid-cols-2 gap-2">
           <Button
-            className="w-full bg-violet-600 hover:bg-violet-700 text-white h-9 rounded-lg gap-2 shadow-sm shadow-violet-200 dark:shadow-none transition-all active:scale-[0.98]"
+            variant="outline"
             size="sm"
-            onClick={() => onAddAdmin(tenant)}
+            className="h-8.5 rounded-xl border-slate-200/90 dark:border-slate-800 text-xs font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 shadow-2xs transition-colors"
+            onClick={onView}
           >
-            <ShieldCheck className="size-4" />
-            Add School Admin
+            View Details
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            className="h-8.5 rounded-xl border-slate-200/90 dark:border-slate-800 text-xs font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 shadow-2xs transition-colors"
+            onClick={onManageData}
+          >
+            Live Data
           </Button>
         </div>
-      </CardContent>
-    </Card>
+        <Button
+          variant="ghost"
+          size="sm"
+          className="w-full h-9 rounded-xl bg-blue-50/80 hover:bg-blue-100 text-blue-600 dark:bg-blue-950/40 dark:hover:bg-blue-900/50 dark:text-blue-400 text-xs font-semibold gap-1.5 transition-colors border border-blue-100/60 dark:border-blue-900/40"
+          onClick={() => onAddAdmin(tenant)}
+        >
+          <ShieldCheck className="size-4 text-blue-600 dark:text-blue-400" />
+          Add School Admin
+        </Button>
+      </div>
+    </div>
   );
 });
 
@@ -258,9 +244,9 @@ export function TenantTable({
 }: TenantTableProps) {
   if (loading && tenants.length === 0) {
     return (
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        {[...Array(8)].map((_, i) => (
-          <Skeleton key={i} className="h-[320px] rounded-xl" />
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+        {[...Array(6)].map((_, i) => (
+          <Skeleton key={i} className="h-[250px] rounded-2xl" />
         ))}
       </div>
     );
@@ -268,13 +254,13 @@ export function TenantTable({
 
   if (tenants.length === 0) {
     return (
-      <Card className="py-20 text-center border-dashed border-2">
+      <Card className="py-20 text-center border-dashed border-2 rounded-2xl">
         <CardContent className="space-y-3">
           <div className="size-16 bg-muted rounded-full flex items-center justify-center mx-auto mb-2">
             <Building2 className="size-8 text-muted-foreground opacity-50" />
           </div>
           <h3 className="font-semibold text-lg">No schools found</h3>
-          <p className="text-muted-foreground max-w-xs mx-auto">
+          <p className="text-muted-foreground max-w-xs mx-auto text-sm">
             Try adjusting your filters or search query to find the school you are looking for.
           </p>
         </CardContent>
@@ -285,7 +271,7 @@ export function TenantTable({
   if (viewMode === "grid") {
     return (
       <div className="space-y-6">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
           {tenants.map((tenant) => (
             <TenantCard
               key={tenant.id}
@@ -301,81 +287,65 @@ export function TenantTable({
         </div>
 
         {totalPages > 1 && (
-          <div className="flex items-center justify-between pt-4 border-t">
-            <p className="text-sm text-muted-foreground">
-              Page {currentPage} of {totalPages}
-            </p>
-            <div className="flex items-center gap-2">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => onPageChange(currentPage - 1)}
-                disabled={currentPage === 1}
-              >
-                <ChevronLeft className="size-4 mr-1" /> Previous
-              </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => onPageChange(currentPage + 1)}
-                disabled={currentPage === totalPages}
-              >
-                Next <ChevronRight className="size-4 ml-1" />
-              </Button>
-            </div>
-          </div>
+          <DataTablePagination
+            page={currentPage}
+            totalPages={totalPages}
+            onPageChange={onPageChange}
+            summary={`Page ${currentPage} of ${totalPages}`}
+            className="pt-4 border-t"
+          />
         )}
       </div>
     );
   }
 
   return (
-    <Card className="overflow-hidden border-teal-100/50 dark:border-teal-900/20">
+    <Card className="overflow-hidden">
       <div className="overflow-x-auto">
         <Table>
           <TableHeader className="bg-muted/50">
             <TableRow>
-              <TableHead className="font-bold">School Name</TableHead>
-              <TableHead className="font-bold">Plan</TableHead>
-              <TableHead className="font-bold">Students</TableHead>
-              <TableHead className="font-bold">Status</TableHead>
-              <TableHead className="font-bold">Revenue</TableHead>
+              <TableHead className="text-xs font-medium text-muted-foreground">School Name</TableHead>
+              <TableHead className="text-xs font-medium text-muted-foreground">Plan</TableHead>
+              <TableHead className="text-xs font-medium text-muted-foreground">Students</TableHead>
+              <TableHead className="text-xs font-medium text-muted-foreground">Status</TableHead>
+              <TableHead className="text-xs font-medium text-muted-foreground">Revenue</TableHead>
               <TableHead className="w-12"></TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {tenants.map((tenant) => (
-              <TableRow key={tenant.id} className="hover:bg-teal-50/30 dark:hover:bg-teal-950/20 transition-colors">
+              <TableRow key={tenant.id} className="hover:bg-muted/50 transition-colors">
                 <TableCell>
                   <div className="flex items-center gap-3">
-                    <div className="size-9 rounded-lg bg-teal-50 dark:bg-teal-900/40 text-teal-600 flex items-center justify-center font-bold overflow-hidden border">
+                    <div className="size-9 rounded-lg bg-muted text-muted-foreground flex items-center justify-center overflow-hidden border">
                       <img src={tenant.logo || "/test.webp"} alt={tenant.name} className="size-full object-cover" />
                     </div>
                     <div>
-                      <p className="font-bold text-sm">{tenant.name}</p>
-                      <p className="text-[10px] text-muted-foreground uppercase font-semibold">@{tenant.slug}</p>
+                      <p className="font-semibold text-sm">{tenant.name}</p>
+                      <p className="text-xs text-muted-foreground">@{tenant.slug}</p>
                     </div>
                   </div>
                 </TableCell>
                 <TableCell>
-                  <PlanBadge plan={tenant.plan} />
+                  <TenantPlanBadge plan={tenant.plan} />
                 </TableCell>
                 <TableCell>
                   <div className="space-y-1">
-                    <p className="text-xs font-bold">{tenant.studentCount} / {tenant.maxStudents}</p>
+                    <p className="text-xs font-medium">{tenant.studentCount} / {tenant.maxStudents}</p>
                     <div className="h-1 w-20 bg-muted rounded-full overflow-hidden">
-                      <div 
-                        className="h-full bg-teal-500" 
-                        style={{ width: `${Math.min(100, (tenant.studentCount / tenant.maxStudents) * 100)}%` }} 
+                      <div
+                        className="h-full bg-primary"
+                        style={{ width: `${Math.min(100, (tenant.studentCount / tenant.maxStudents) * 100)}%` }}
                       />
                     </div>
                   </div>
                 </TableCell>
                 <TableCell>
-                  <StatusBadge status={tenant.status} />
+                  <TenantStatusBadge status={tenant.status} />
                 </TableCell>
                 <TableCell>
-                  <span className="font-bold text-sm text-emerald-600">
+                  <span className="font-medium text-sm">
                     ₹{tenant.totalRevenue.toLocaleString()}
                   </span>
                 </TableCell>
@@ -394,7 +364,7 @@ export function TenantTable({
                         <Database className="size-4 mr-2" /> Manage Data
                       </DropdownMenuItem>
                       <DropdownMenuItem onClick={() => onAddAdmin(tenant)}>
-                        <ShieldCheck className="size-4 mr-2 text-violet-600" /> Create Admin
+                        <ShieldCheck className="size-4 mr-2" /> Create Admin
                       </DropdownMenuItem>
                       <DropdownMenuItem onClick={() => onEdit(tenant)}>
                         <Edit className="size-4 mr-2" /> Edit
@@ -412,7 +382,7 @@ export function TenantTable({
                         )}
                       </DropdownMenuItem>
                       <DropdownMenuSeparator />
-                      <DropdownMenuItem className="text-red-600 focus:text-red-600" onClick={() => onDelete(tenant)}>
+                      <DropdownMenuItem className="text-destructive focus:text-destructive" onClick={() => onDelete(tenant)}>
                         <Trash2 className="size-4 mr-2" /> Delete
                       </DropdownMenuItem>
                     </DropdownMenuContent>
@@ -425,35 +395,13 @@ export function TenantTable({
       </div>
 
       {totalPages > 1 && (
-        <div className="px-4 py-3 bg-muted/30 border-t flex items-center justify-between">
-          <p className="text-xs text-muted-foreground font-medium uppercase tracking-wider">
-            Showing {tenants.length} schools
-          </p>
-          <div className="flex items-center gap-1">
-            <Button
-              variant="outline"
-              size="sm"
-              className="h-8 rounded-lg"
-              onClick={() => onPageChange(currentPage - 1)}
-              disabled={currentPage === 1}
-            >
-              <ChevronLeft className="size-3.5" />
-            </Button>
-            <div className="flex items-center gap-1 px-2">
-              <span className="text-xs font-bold">{currentPage}</span>
-              <span className="text-xs text-muted-foreground">/</span>
-              <span className="text-xs text-muted-foreground">{totalPages}</span>
-            </div>
-            <Button
-              variant="outline"
-              size="sm"
-              className="h-8 rounded-lg"
-              onClick={() => onPageChange(currentPage + 1)}
-              disabled={currentPage === totalPages}
-            >
-              <ChevronRight className="size-3.5" />
-            </Button>
-          </div>
+        <div className="px-4 py-3 border-t">
+          <DataTablePagination
+            page={currentPage}
+            totalPages={totalPages}
+            onPageChange={onPageChange}
+            summary={`Showing ${tenants.length} schools`}
+          />
         </div>
       )}
     </Card>

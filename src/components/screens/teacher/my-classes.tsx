@@ -55,7 +55,7 @@ export function TeacherClasses() {
     queryKey: ["teacher-classes"],
     queryFn: async () => {
       const [resClasses, resTimetable] = await Promise.all([
-        api.get("/classes").catch(() => []),
+        api.get("/classes?mode=min").catch(() => []),
         api.get("/timetable?mine=true").catch(() => [])
       ]);
 

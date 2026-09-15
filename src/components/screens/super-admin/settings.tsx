@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import { Separator } from "@/components/ui/separator";
+import { PageHeader } from "@/components/ui/page-header";
 import {
   Select,
   SelectContent,
@@ -378,20 +379,11 @@ function LoadingSpinner() {
 
 function HeaderBanner() {
   return (
-    <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-teal-600 via-teal-500 to-pink-600 p-6 text-white shadow-lg">
-      <div className="absolute top-0 right-0 size-64 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/3 blur-2xl pointer-events-none" />
-      <div className="relative z-10 flex items-center gap-4">
-        <div className="size-12 rounded-xl bg-white/20 flex items-center justify-center backdrop-blur-md border border-white/30">
-          <Settings className="size-6" />
-        </div>
-        <div>
-          <h1 className="text-2xl font-semibold tracking-tight">Platform Settings</h1>
-          <p className="text-teal-50 text-sm opacity-90">
-            Configure global platform branding, regional standards, and maintenance states
-          </p>
-        </div>
-      </div>
-    </div>
+    <PageHeader
+      icon={<Settings />}
+      title="Platform Settings"
+      description="Configure global platform branding, regional standards, and maintenance states."
+    />
   );
 }
 
@@ -403,16 +395,16 @@ interface StickySaveBarProps {
 function StickySaveBar({ onSave, saving }: StickySaveBarProps) {
   return (
     <div className="sticky bottom-4 z-10 mt-8">
-      <Card className="shadow-xl border border-teal-100 dark:border-teal-900 bg-white/95 dark:bg-zinc-900/95 backdrop-blur-md rounded-2xl">
+      <Card className="shadow-lg border bg-card rounded-xl">
         <CardContent className="p-4 flex items-center justify-between">
           <div className="text-xs sm:text-sm text-muted-foreground font-medium flex items-center gap-2">
-            <div className="size-2 rounded-full bg-teal-500 animate-ping" />
+            <div className="size-2 rounded-full bg-teal-500" />
             <span>Changes will be instantly synced to the database.</span>
           </div>
           <Button
             onClick={onSave}
             disabled={saving}
-            className="bg-teal-600 hover:bg-teal-700 text-white gap-2 rounded-xl px-5 py-2.5 shadow-md shadow-teal-600/10 hover:shadow-teal-600/20 transition-all font-semibold"
+            className="gap-2"
           >
             {saving ? (
               <>

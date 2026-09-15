@@ -103,9 +103,9 @@ export function RoleDialogs({
       {/* Create/Edit Role Dialog */}
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
         <DialogContent className="sm:max-w-2xl max-h-[90vh] overflow-y-auto rounded-3xl p-0 border-none shadow-2xl">
-          <DialogHeader className="p-6 pb-2 bg-gradient-to-br from-teal-50 to-white dark:from-zinc-900 dark:to-zinc-800">
-            <DialogTitle className="flex items-center gap-3 text-xl font-black">
-              <div className="size-10 rounded-xl bg-teal-600 flex items-center justify-center text-white shadow-lg shadow-teal-200 dark:shadow-none">
+          <DialogHeader className="p-6 pb-2 border-b border-border">
+            <DialogTitle className="flex items-center gap-3 text-xl font-semibold">
+              <div className="size-10 rounded-xl bg-teal-600 flex items-center justify-center text-white shadow-sm">
                 <Shield className="size-5" />
               </div>
               {editingRole ? `Edit "${editingRole.name}"` : "Create New Platform Role"}
@@ -121,7 +121,7 @@ export function RoleDialogs({
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-4">
                 <div className="space-y-2">
-                  <Label className="text-xs font-black uppercase tracking-widest text-muted-foreground">Role Name *</Label>
+                  <Label className="text-xs font-medium text-muted-foreground">Role Name *</Label>
                   <Input
                     placeholder="e.g. Senior Moderator"
                     value={name}
@@ -130,7 +130,7 @@ export function RoleDialogs({
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label className="text-xs font-black uppercase tracking-widest text-muted-foreground">Description</Label>
+                  <Label className="text-xs font-medium text-muted-foreground">Description</Label>
                   <Textarea
                     placeholder="What can users with this role do?"
                     value={description}
@@ -142,17 +142,16 @@ export function RoleDialogs({
               </div>
               
               <div className="space-y-4">
-                <Label className="text-xs font-black uppercase tracking-widest text-muted-foreground">Brand Color</Label>
+                <Label className="text-xs font-medium text-muted-foreground">Brand color</Label>
                 <div className="grid grid-cols-5 gap-2.5 p-4 rounded-2xl bg-zinc-50 dark:bg-zinc-900/50 border border-zinc-100 dark:border-zinc-800">
                   {COLOR_PRESETS.map((c) => (
                     <button
                       key={c}
                       type="button"
-                      className="w-full aspect-square rounded-full border-4 transition-all hover:scale-110 flex items-center justify-center"
+                      className={`w-full aspect-square rounded-full border-4 transition-all flex items-center justify-center ${color === c ? 'ring-2 ring-ring ring-offset-2' : ''}`}
                       style={{
                         backgroundColor: c,
                         borderColor: color === c ? 'white' : 'transparent',
-                        boxShadow: color === c ? `0 0 12px ${c}80` : 'none'
                       }}
                       onClick={() => setColor(c)}
                     >
@@ -173,20 +172,20 @@ export function RoleDialogs({
 
             <div className="space-y-4">
               <div className="flex items-center justify-between">
-                <Label className="text-xs font-black uppercase tracking-widest text-muted-foreground flex items-center gap-2">
+                <Label className="text-xs font-medium text-muted-foreground flex items-center gap-2">
                   <CheckCircle2 className="size-4 text-emerald-500" />
-                  Permission Matrix
+                  Permission matrix
                 </Label>
-                <Badge variant="outline" className="text-[10px] font-bold">
+                <Badge variant="outline" className="text-xs font-bold">
                   {Object.values(permissions).flat().length} Actions Selected
                 </Badge>
               </div>
-              
+
               <div className="rounded-2xl border border-zinc-100 dark:border-zinc-800 overflow-hidden shadow-sm">
                 <div className="grid grid-cols-5 bg-zinc-50/80 dark:bg-zinc-900 p-3 border-b border-zinc-100 dark:border-zinc-800">
-                  <div className="col-span-1 text-[10px] font-black uppercase tracking-widest text-muted-foreground">Module</div>
+                  <div className="col-span-1 text-xs font-medium text-muted-foreground">Module</div>
                   {PERMISSION_ACTIONS.map((action) => (
-                    <div key={action} className="text-center text-[10px] font-black uppercase tracking-widest text-muted-foreground">
+                    <div key={action} className="text-center text-xs font-medium text-muted-foreground">
                       {ACTION_LABELS[action]}
                     </div>
                   ))}
@@ -223,7 +222,7 @@ export function RoleDialogs({
             <Button
               onClick={onSave}
               disabled={saving}
-              className="bg-teal-600 hover:bg-teal-700 text-white rounded-xl px-8 h-11 font-black shadow-lg shadow-teal-100 dark:shadow-none min-w-[140px]"
+              className="rounded-lg px-8 h-11 min-w-[140px]"
             >
               {saving ? (
                 <Loader2 className="size-4 animate-spin" />
@@ -241,7 +240,7 @@ export function RoleDialogs({
       <Dialog open={assignDialogOpen} onOpenChange={setAssignDialogOpen}>
         <DialogContent className="sm:max-w-3xl max-h-[90vh] overflow-y-auto rounded-3xl p-0 border-none shadow-2xl">
           <DialogHeader className="p-6 pb-4 border-b border-zinc-100 dark:border-zinc-800">
-            <DialogTitle className="flex items-center gap-3 text-xl font-black">
+            <DialogTitle className="flex items-center gap-3 text-xl font-semibold">
               <div className="size-10 rounded-xl bg-purple-600 flex items-center justify-center text-white">
                 <Users className="size-5" />
               </div>
@@ -253,8 +252,8 @@ export function RoleDialogs({
             {/* Left: Available Users */}
             <div className="space-y-4 flex flex-col">
               <div className="flex items-center justify-between">
-                <Label className="text-xs font-black uppercase tracking-widest text-muted-foreground">Available Users</Label>
-                <Badge variant="secondary" className="text-[10px] font-bold">{filteredAvailable.length} candidates</Badge>
+                <Label className="text-xs font-medium text-muted-foreground">Available Users</Label>
+                <Badge variant="secondary" className="text-xs font-medium">{filteredAvailable.length} candidates</Badge>
               </div>
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-zinc-400" />
@@ -282,11 +281,11 @@ export function RoleDialogs({
                       <div key={user.id} className="flex items-center justify-between p-2 rounded-xl bg-white dark:bg-zinc-800 border border-transparent hover:border-teal-200 shadow-sm transition-all group">
                         <div className="flex items-center gap-3">
                           <Avatar className="size-8 border-2 border-white dark:border-zinc-700 shadow-sm">
-                            <AvatarFallback className="text-[10px] font-bold bg-teal-50 text-teal-600">{getInitials(user.name)}</AvatarFallback>
+                            <AvatarFallback className="text-xs font-medium bg-teal-50 text-teal-600">{getInitials(user.name)}</AvatarFallback>
                           </Avatar>
                           <div className="min-w-0">
-                            <p className="text-xs font-black truncate leading-tight">{user.name}</p>
-                            <p className="text-[10px] text-muted-foreground truncate">{user.email}</p>
+                            <p className="text-xs font-semibold truncate leading-tight">{user.name}</p>
+                            <p className="text-xs text-muted-foreground truncate">{user.email}</p>
                           </div>
                         </div>
                         <Button
@@ -308,8 +307,8 @@ export function RoleDialogs({
             {/* Right: Assigned Users */}
             <div className="space-y-4 flex flex-col">
               <div className="flex items-center justify-between">
-                <Label className="text-xs font-black uppercase tracking-widest text-muted-foreground">Currently Assigned</Label>
-                <Badge className="text-[10px] font-bold bg-teal-600">{assignedUsers.length} Users</Badge>
+                <Label className="text-xs font-medium text-muted-foreground">Currently Assigned</Label>
+                <Badge className="text-xs font-medium bg-teal-600">{assignedUsers.length} Users</Badge>
               </div>
 
               <div className="flex-1 rounded-2xl border border-teal-100 dark:border-teal-900 overflow-hidden bg-teal-50/20 dark:bg-teal-900/10">
@@ -328,11 +327,11 @@ export function RoleDialogs({
                       <div key={user.id} className="flex items-center justify-between p-2 rounded-xl bg-white dark:bg-zinc-800 border border-teal-100 dark:border-teal-900/50 shadow-sm group">
                         <div className="flex items-center gap-3">
                           <Avatar className="size-8 border-2 border-teal-100 dark:border-teal-900 shadow-sm">
-                            <AvatarFallback className="text-[10px] font-bold bg-teal-600 text-white">{getInitials(user.name)}</AvatarFallback>
+                            <AvatarFallback className="text-xs font-medium bg-teal-600 text-white">{getInitials(user.name)}</AvatarFallback>
                           </Avatar>
                           <div className="min-w-0">
-                            <p className="text-xs font-black truncate leading-tight">{user.name}</p>
-                            <p className="text-[10px] text-muted-foreground truncate">{user.email}</p>
+                            <p className="text-xs font-semibold truncate leading-tight">{user.name}</p>
+                            <p className="text-xs text-muted-foreground truncate">{user.email}</p>
                           </div>
                         </div>
                         <Button
@@ -353,7 +352,7 @@ export function RoleDialogs({
           </div>
 
           <DialogFooter className="p-6 bg-zinc-50/80 dark:bg-zinc-900/50 border-t border-zinc-100 dark:border-zinc-800">
-            <Button onClick={() => setAssignDialogOpen(false)} className="rounded-xl px-8 h-11 font-black bg-zinc-900 dark:bg-zinc-800 text-white hover:bg-zinc-950 transition-all">
+            <Button onClick={() => setAssignDialogOpen(false)} className="rounded-lg px-8 h-11">
               Done Managing Access
             </Button>
           </DialogFooter>

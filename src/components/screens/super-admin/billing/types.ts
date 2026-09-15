@@ -52,28 +52,28 @@ export type SortKey = "activeRevenue" | "totalRevenue" | "name" | "activeSubscri
 export type SortDir = "asc" | "desc";
 
 export const revenueTrendConfig = {
-  revenue: { label: "Revenue (₹)", color: "#10b981" },
-  newSubscriptions: { label: "New Subscriptions", color: "#3b82f6" },
-  churned: { label: "Churned", color: "#ef4444" },
+  revenue: { label: "Revenue (₹)", color: "var(--chart-1)" },
+  newSubscriptions: { label: "New Subscriptions", color: "var(--chart-2)" },
+  churned: { label: "Churned", color: "var(--chart-3)" },
 } satisfies ChartConfig;
 
 export const planRevenueConfig = {
-  revenue: { label: "Revenue (₹)", color: "#10b981" },
+  revenue: { label: "Revenue (₹)", color: "var(--chart-1)" },
 } satisfies ChartConfig;
 
 export const DONUT_COLORS: Record<string, string> = {
-  card: "#10b981",
-  upi: "#6366f1",
-  netbanking: "#0ea5e9",
-  wallet: "#f59e0b",
-  free: "#94a3b8",
+  card: "var(--chart-1)",
+  upi: "var(--chart-2)",
+  netbanking: "var(--chart-3)",
+  wallet: "var(--chart-4)",
+  free: "var(--muted-foreground)",
 };
 
 export const STATUS_COLORS: Record<string, string> = {
-  active: "#10b981",
-  expired: "#94a3b8",
-  cancelled: "#ef4444",
-  trial: "#f59e0b",
+  active: "var(--chart-1)",
+  expired: "var(--muted-foreground)",
+  cancelled: "var(--chart-3)",
+  trial: "var(--chart-4)",
 };
 
 export const statusConfig: Record<string, { bg: string; text: string; border: string; dot: string; label: string }> = {
@@ -85,10 +85,10 @@ export const statusConfig: Record<string, { bg: string; text: string; border: st
     label: "Active",
   },
   expired: {
-    bg: "bg-zinc-50 dark:bg-zinc-900",
-    text: "text-zinc-600 dark:text-zinc-400",
-    border: "border-zinc-200 dark:border-zinc-700",
-    dot: "bg-zinc-400",
+    bg: "bg-muted",
+    text: "text-muted-foreground",
+    border: "border-border",
+    dot: "bg-muted-foreground",
     label: "Expired",
   },
   cancelled: {
@@ -130,16 +130,16 @@ export const paymentMethodConfig: Record<string, { icon: React.ReactNode; color:
   },
   free: {
     icon: React.createElement(Receipt, { className: "size-3.5" }),
-    color: "text-zinc-500 dark:text-zinc-400",
+    color: "text-muted-foreground",
     label: "Free",
   },
 };
 
 export const planBadgeConfig: Record<string, { bg: string; text: string; border: string }> = {
   Basic: {
-    bg: "bg-zinc-50 dark:bg-zinc-900/30",
-    text: "text-zinc-700 dark:text-zinc-300",
-    border: "border-zinc-200 dark:border-zinc-700",
+    bg: "bg-muted",
+    text: "text-muted-foreground",
+    border: "border-border",
   },
   Standard: {
     bg: "bg-amber-50 dark:bg-amber-900/30",

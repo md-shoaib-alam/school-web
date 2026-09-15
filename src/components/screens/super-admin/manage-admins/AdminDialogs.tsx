@@ -87,13 +87,13 @@ export function AdminDialogs({
 
           {/* Password */}
           <div className="grid gap-1.5">
-            <Label htmlFor="sa-password" className="text-xs font-bold uppercase tracking-wider text-muted-foreground ml-1 flex items-center justify-between">
+            <Label htmlFor="sa-password" className="text-xs font-medium text-muted-foreground ml-1 flex items-center justify-between">
               <span>
                 {editingAdmin ? "Change Password" : "Password"}
                 {!editingAdmin && <span className="text-red-500 ml-0.5">*</span>}
               </span>
               {editingAdmin && (
-                <span className="text-[10px] font-medium lowercase text-muted-foreground">
+                <span className="text-xs font-medium lowercase text-muted-foreground">
                   (optional)
                 </span>
               )}
@@ -121,7 +121,7 @@ export function AdminDialogs({
               </button>
             </div>
             {!editingAdmin && formData.password && formData.password.length < 6 && (
-              <p className="text-[10px] text-amber-600 font-bold uppercase tracking-tighter ml-1">
+              <p className="text-xs text-amber-600 font-medium ml-1">
                 Security: Too Short
               </p>
             )}
@@ -141,7 +141,7 @@ export function AdminDialogs({
                 <Label htmlFor="sa-active" className="text-sm font-bold cursor-pointer">
                   Account Enabled
                 </Label>
-                <p className="text-[10px] text-muted-foreground">
+                <p className="text-xs text-muted-foreground">
                   When disabled, this admin cannot log in.
                 </p>
               </div>

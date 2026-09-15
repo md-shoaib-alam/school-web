@@ -178,7 +178,7 @@ export function TeacherTimetable() {
   const { data: classes = [] } = useQuery({
     queryKey: ["teacher-classes"],
     queryFn: async () => {
-      const res = await api.get<any>("/classes");
+      const res = await api.get<any>("/classes?mode=min");
       return (Array.isArray(res) ? res : []) as ClassInfo[];
     },
     staleTime: 5 * 60 * 1000,

@@ -69,7 +69,7 @@ export function LogoUploadSection({
           )}
         </div>
         <label className="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity rounded-2xl cursor-pointer">
-          <span className="text-white text-[10px] font-bold uppercase">
+          <span className="text-white text-xs font-medium">
             Upload
           </span>
           <input
@@ -109,8 +109,8 @@ export function LogoUploadSection({
       <div className="flex-1 space-y-4 w-full">
         {submitting && formData.logoFile && (
           <div className="space-y-1.5">
-            <div className="flex items-center justify-between text-[10px] font-bold uppercase tracking-wider text-teal-600">
-              <span>Uploading Logo…</span>
+            <div className="flex items-center justify-between text-xs font-medium text-muted-foreground">
+              <span>Uploading Logo...</span>
               <span>{Math.round(uploadProgress)}%</span>
             </div>
             <Progress
@@ -136,7 +136,7 @@ export function LogoUploadSection({
               Slug (URL path) *
               <button
                 type="button"
-                className={`text-[10px] font-bold uppercase ${autoSlug ? "text-teal-600" : "text-muted-foreground hover:text-teal-600"}`}
+                className={`text-xs font-medium ${autoSlug ? "text-primary" : "text-muted-foreground hover:text-primary"}`}
                 onClick={() => setAutoSlug(!autoSlug)}
               >
                 {autoSlug ? "Auto-sync ON" : "Manual mode"}
@@ -204,7 +204,7 @@ export function SubscriptionSection({
 }: SubscriptionSectionProps) {
   return (
     <div className="space-y-4">
-      <h4 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">
+      <h4 className="text-sm font-semibold text-muted-foreground">
         Subscription & Limits
       </h4>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">

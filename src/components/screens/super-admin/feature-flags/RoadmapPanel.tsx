@@ -7,6 +7,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
+import { Textarea } from "@/components/ui/textarea";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   Select,
   SelectContent,
@@ -226,24 +228,24 @@ export function RoadmapPanel() {
   const getStatusBadge = (status: UpcomingFeature["status"]) => {
     switch (status) {
       case "Planned":
-        return <Badge variant="outline" className="bg-zinc-100 hover:bg-zinc-200 text-zinc-600 dark:bg-zinc-800 dark:text-zinc-400 font-medium text-[10px] rounded px-2.5 py-0.5 border border-zinc-200 dark:border-zinc-700">Planned</Badge>;
+        return <Badge variant="outline" className="bg-zinc-100 hover:bg-zinc-200 text-zinc-600 dark:bg-zinc-800 dark:text-zinc-400 font-medium text-xs rounded px-2.5 py-0.5 border border-zinc-200 dark:border-zinc-700">Planned</Badge>;
       case "In Progress":
-        return <Badge variant="outline" className="bg-amber-50 hover:bg-amber-100/50 text-amber-700 dark:bg-amber-950/20 dark:text-amber-400 font-medium text-[10px] rounded px-2.5 py-0.5 border border-amber-200 dark:border-amber-900/50 flex items-center gap-1"><Clock className="size-3" /> In Progress</Badge>;
+        return <Badge variant="outline" className="bg-amber-50 hover:bg-amber-100/50 text-amber-700 dark:bg-amber-950/20 dark:text-amber-400 font-medium text-xs rounded px-2.5 py-0.5 border border-amber-200 dark:border-amber-900/50 flex items-center gap-1"><Clock className="size-3" /> In Progress</Badge>;
       case "Testing":
-        return <Badge variant="outline" className="bg-blue-50 hover:bg-blue-100/50 text-blue-700 dark:bg-blue-950/20 dark:text-blue-400 font-medium text-[10px] rounded px-2.5 py-0.5 border border-blue-200 dark:border-blue-900/50">Testing</Badge>;
+        return <Badge variant="outline" className="bg-blue-50 hover:bg-blue-100/50 text-blue-700 dark:bg-blue-950/20 dark:text-blue-400 font-medium text-xs rounded px-2.5 py-0.5 border border-blue-200 dark:border-blue-900/50">Testing</Badge>;
       case "Completed":
-        return <Badge variant="outline" className="bg-emerald-50 hover:bg-emerald-100/50 text-emerald-700 dark:bg-emerald-950/20 dark:text-emerald-400 font-medium text-[10px] rounded px-2.5 py-0.5 border border-emerald-200 dark:border-emerald-900/50 flex items-center gap-1"><CheckCircle2 className="size-3" /> Completed</Badge>;
+        return <Badge variant="outline" className="bg-emerald-50 hover:bg-emerald-100/50 text-emerald-700 dark:bg-emerald-950/20 dark:text-emerald-400 font-medium text-xs rounded px-2.5 py-0.5 border border-emerald-200 dark:border-emerald-900/50 flex items-center gap-1"><CheckCircle2 className="size-3" /> Completed</Badge>;
     }
   };
 
   const getCategoryBadge = (cat: UpcomingFeature["category"]) => {
     switch (cat) {
       case "starter":
-        return <Badge variant="outline" className="bg-blue-50 dark:bg-blue-950/20 text-blue-700 dark:text-blue-400 border border-blue-200 dark:border-blue-900/60 font-semibold text-[10px] px-2 py-0.5 rounded">Starter</Badge>;
+        return <Badge variant="outline" className="bg-blue-50 dark:bg-blue-950/20 text-blue-700 dark:text-blue-400 border border-blue-200 dark:border-blue-900/60 font-semibold text-xs px-2 py-0.5 rounded">Starter</Badge>;
       case "standard":
-        return <Badge variant="outline" className="bg-emerald-50 dark:bg-emerald-950/20 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-900/60 font-semibold text-[10px] px-2 py-0.5 rounded">Standard</Badge>;
+        return <Badge variant="outline" className="bg-emerald-50 dark:bg-emerald-950/20 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-900/60 font-semibold text-xs px-2 py-0.5 rounded">Standard</Badge>;
       case "premium":
-        return <Badge variant="outline" className="bg-amber-50 dark:bg-amber-950/20 text-amber-700 dark:text-amber-400 border border-amber-200 dark:border-amber-900/60 font-semibold text-[10px] px-2 py-0.5 rounded">Premium</Badge>;
+        return <Badge variant="outline" className="bg-amber-50 dark:bg-amber-950/20 text-amber-700 dark:text-amber-400 border border-amber-200 dark:border-amber-900/60 font-semibold text-xs px-2 py-0.5 rounded">Premium</Badge>;
     }
   };
 
@@ -251,7 +253,7 @@ export function RoadmapPanel() {
     <div className="space-y-6 max-w-5xl mx-auto pb-12">
       
       {/* Standard Corporate Header Panel */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white dark:bg-zinc-900 p-5 rounded-lg border border-zinc-200 dark:border-zinc-800 shadow-xs text-left">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-card p-5 rounded-lg border border-border shadow-xs text-left">
         <div className="space-y-1">
           <h1 className="text-lg font-semibold tracking-tight text-zinc-900 dark:text-zinc-100 flex items-center gap-2">
             <ListTodo className="size-5 text-teal-600" />
@@ -271,7 +273,7 @@ export function RoadmapPanel() {
 
       {/* Add New Feature Form Panel */}
       {showAddForm && (
-        <Card className="border border-zinc-200 dark:border-zinc-850 bg-white dark:bg-zinc-900 rounded-lg shadow-xs">
+        <Card className="border border-border bg-card rounded-lg shadow-xs">
           <CardContent className="p-5">
             <form onSubmit={handleAddFeature} className="space-y-4">
               <div className="flex items-center gap-2 mb-1 text-left">
@@ -280,46 +282,46 @@ export function RoadmapPanel() {
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-1.5 text-left">
-                  <Label htmlFor="title" className="text-xs font-semibold text-zinc-550 dark:text-zinc-400 ml-0.5">Feature Title</Label>
+                  <Label htmlFor="title" className="text-xs font-semibold text-zinc-500 dark:text-zinc-400 ml-0.5">Feature Title</Label>
                   <Input 
                     id="title"
                     placeholder="e.g. Dynamic Timetable Conflict Detector"
                     value={newTitle}
                     onChange={e => setNewTitle(e.target.value)}
-                    className="bg-zinc-50 dark:bg-zinc-950/40 border border-zinc-200 dark:border-zinc-850 h-9.5 rounded-md text-xs font-medium focus-visible:ring-1 focus-visible:ring-teal-500"
+                    className="bg-zinc-50 dark:bg-zinc-950/40 border border-zinc-200 dark:border-zinc-800 h-9.5 rounded-md text-xs font-medium focus-visible:ring-1 focus-visible:ring-teal-500"
                   />
                 </div>
                 <div className="space-y-1.5 text-left">
-                  <Label htmlFor="target" className="text-xs font-semibold text-zinc-550 dark:text-zinc-400 ml-0.5">Target Release</Label>
+                  <Label htmlFor="target" className="text-xs font-semibold text-zinc-500 dark:text-zinc-400 ml-0.5">Target Release</Label>
                   <Input 
                     id="target"
                     placeholder="e.g. Q3 2026, July 2026"
                     value={newTarget}
                     onChange={e => setNewTarget(e.target.value)}
-                    className="bg-zinc-50 dark:bg-zinc-950/40 border border-zinc-200 dark:border-zinc-850 h-9.5 rounded-md text-xs font-medium focus-visible:ring-1 focus-visible:ring-teal-500"
+                    className="bg-zinc-50 dark:bg-zinc-950/40 border border-zinc-200 dark:border-zinc-800 h-9.5 rounded-md text-xs font-medium focus-visible:ring-1 focus-visible:ring-teal-500"
                   />
                 </div>
               </div>
 
               <div className="space-y-1.5 text-left">
-                <Label htmlFor="desc" className="text-xs font-semibold text-zinc-550 dark:text-zinc-400 ml-0.5">Description</Label>
-                <textarea 
+                <Label htmlFor="desc" className="text-xs font-semibold text-zinc-500 dark:text-zinc-400 ml-0.5">Description</Label>
+                <Textarea
                   id="desc"
                   placeholder="What capability does this introduce to schools?"
                   value={newDesc}
                   onChange={e => setNewDesc(e.target.value)}
-                  className="w-full bg-zinc-50 dark:bg-zinc-950/40 border border-zinc-200 dark:border-zinc-850 focus:border-teal-500 focus:outline-none rounded-md p-2.5 min-h-[75px] text-xs font-medium leading-relaxed resize-none transition-colors"
+                  className="min-h-[75px] text-xs font-medium leading-relaxed resize-none"
                 />
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-1.5 text-left">
-                  <Label className="text-xs font-semibold text-zinc-550 dark:text-zinc-400 ml-0.5">Target Plan Placement</Label>
+                  <Label className="text-xs font-semibold text-zinc-500 dark:text-zinc-400 ml-0.5">Target Plan Placement</Label>
                   <Select value={newCategory} onValueChange={(v) => setNewCategory(v as any)}>
-                    <SelectTrigger className="h-9.5 rounded-md border border-zinc-200 dark:border-zinc-850 font-semibold bg-zinc-50 dark:bg-zinc-950/40 focus:bg-white dark:focus:bg-zinc-900 text-xs">
+                    <SelectTrigger className="h-9.5 rounded-md border border-zinc-200 dark:border-zinc-800 font-semibold bg-zinc-50 dark:bg-zinc-950/40 focus:bg-white dark:focus:bg-zinc-900 text-xs">
                       <SelectValue />
                     </SelectTrigger>
-                    <SelectContent className="rounded-md border border-zinc-200 dark:border-zinc-850 bg-white dark:bg-zinc-950">
+                    <SelectContent className="rounded-md border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950">
                       <SelectItem value="starter" className="text-xs font-medium py-2">Starter Plan</SelectItem>
                       <SelectItem value="standard" className="text-xs font-medium py-2">Standard Plan</SelectItem>
                       <SelectItem value="premium" className="text-xs font-medium py-2">Premium Plan</SelectItem>
@@ -328,13 +330,13 @@ export function RoadmapPanel() {
                 </div>
 
                 <div className="space-y-1.5 text-left">
-                  <Label htmlFor="notes" className="text-xs font-semibold text-zinc-550 dark:text-zinc-400 ml-0.5">Starter Pack Entitlement Notes</Label>
+                  <Label htmlFor="notes" className="text-xs font-semibold text-zinc-500 dark:text-zinc-400 ml-0.5">Starter Pack Entitlement Notes</Label>
                   <Input 
                     id="notes"
                     placeholder="Starter: Excluded. Standard: 1 classroom. Premium: Unlimited."
                     value={newNotes}
                     onChange={e => setNewNotes(e.target.value)}
-                    className="bg-zinc-50 dark:bg-zinc-950/40 border border-zinc-200 dark:border-zinc-850 h-9.5 rounded-md text-xs font-medium focus-visible:ring-1 focus-visible:ring-teal-500"
+                    className="bg-zinc-50 dark:bg-zinc-950/40 border border-zinc-200 dark:border-zinc-800 h-9.5 rounded-md text-xs font-medium focus-visible:ring-1 focus-visible:ring-teal-500"
                   />
                 </div>
               </div>
@@ -365,7 +367,7 @@ export function RoadmapPanel() {
         {features.length === 0 ? (
           <Card className="border border-dashed border-zinc-200 dark:border-zinc-800 bg-transparent py-16 text-center shadow-none rounded-lg">
             <CardContent className="flex flex-col items-center gap-3">
-              <div className="size-12 rounded-full bg-zinc-150 dark:bg-zinc-900 flex items-center justify-center border border-zinc-200 dark:border-zinc-800">
+              <div className="size-12 rounded-full bg-zinc-100 dark:bg-zinc-900 flex items-center justify-center border border-zinc-200 dark:border-zinc-800">
                 <ListTodo className="size-5 text-zinc-400" />
               </div>
               <div>
@@ -387,7 +389,7 @@ export function RoadmapPanel() {
               <Card 
                 key={item.id}
                 className={cn(
-                  "overflow-hidden transition-colors rounded-lg border bg-white dark:bg-zinc-900 shadow-xs",
+                  "overflow-hidden transition-colors rounded-lg border bg-card shadow-xs",
                   isExpanded 
                     ? "border-teal-500/60 dark:border-teal-500/40 shadow-xs"
                     : "border-zinc-200 dark:border-zinc-800 hover:border-zinc-300 dark:hover:border-zinc-700"
@@ -414,20 +416,22 @@ export function RoadmapPanel() {
 
                     {/* Header Right Actions */}
                     <div className="flex items-center gap-3 shrink-0 self-end sm:self-center">
-                      <div className="flex items-center gap-1.5 text-xs text-zinc-500 dark:text-zinc-400 font-semibold bg-zinc-50 dark:bg-zinc-950 px-2.5 py-1 rounded border border-zinc-200 dark:border-zinc-850">
+                      <div className="flex items-center gap-1.5 text-xs text-zinc-500 dark:text-zinc-400 font-semibold bg-zinc-50 dark:bg-zinc-950 px-2.5 py-1 rounded border border-zinc-200 dark:border-zinc-800">
                         <Calendar className="size-3.5 text-zinc-400" />
                         Target: <span className="text-zinc-900 dark:text-white font-bold">{item.targetRelease}</span>
                       </div>
-                      <button
+                      <Button
+                        variant="ghost"
+                        size="icon"
                         onClick={() => toggleExpand(item.id)}
                         className={cn(
-                          "size-7.5 rounded border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 flex items-center justify-center cursor-pointer transition-colors hover:bg-zinc-50 dark:hover:bg-zinc-800 text-zinc-500",
+                          "size-8 rounded border border-border transition-colors",
                           isExpanded && "border-teal-500 text-teal-600 dark:text-teal-400"
                         )}
                         title={isExpanded ? "Collapse checklist" : "Expand checklist"}
                       >
                         {isExpanded ? <ChevronUp className="size-4" /> : <ChevronDown className="size-4" />}
-                      </button>
+                      </Button>
                     </div>
 
                   </div>
@@ -436,7 +440,7 @@ export function RoadmapPanel() {
                   {!isExpanded && totalTodos > 0 && (
                     <div className="mt-3.5 pt-3.5 border-t border-dashed border-zinc-200 dark:border-zinc-800/60 flex items-center gap-4">
                       <Progress value={progressVal} className="h-1.5 flex-1 bg-zinc-100 dark:bg-zinc-950" style={{ transform: "translateY(1px)" }} />
-                      <span className="text-[10px] font-semibold text-zinc-500 dark:text-zinc-400 shrink-0 font-mono">
+                      <span className="text-xs font-semibold text-zinc-500 dark:text-zinc-400 shrink-0 font-mono">
                         {completedTodos}/{totalTodos} Tasks ({Math.round(progressVal)}%)
                       </span>
                     </div>
@@ -476,21 +480,18 @@ export function RoadmapPanel() {
                                     "flex items-center justify-between p-2 rounded-md border transition-colors group/todo",
                                     todo.completed 
                                       ? "bg-zinc-50/50 dark:bg-zinc-950/10 border-transparent text-zinc-400 dark:text-zinc-500 line-through opacity-70" 
-                                      : "bg-white dark:bg-zinc-900 border-zinc-200/60 dark:border-zinc-850 text-zinc-800 dark:text-zinc-200"
+                                      : "bg-white dark:bg-zinc-900 border-zinc-200/60 dark:border-zinc-800 text-zinc-800 dark:text-zinc-200"
                                   )}
                                 >
                                   <button
                                     onClick={() => handleToggleTodo(item.id, todo.id)}
                                     className="flex items-center gap-2.5 text-left font-medium text-xs cursor-pointer select-none flex-1 min-w-0"
                                   >
-                                    <div className={cn(
-                                      "size-4 rounded border flex items-center justify-center transition-colors shrink-0",
-                                      todo.completed 
-                                        ? "bg-teal-600 border-teal-600 text-white" 
-                                        : "border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-900"
-                                    )}>
-                                      {todo.completed && <Check className="size-3" />}
-                                    </div>
+                                    <Checkbox
+                                      checked={todo.completed}
+                                      onCheckedChange={() => handleToggleTodo(item.id, todo.id)}
+                                      className="shrink-0"
+                                    />
                                     <span className="truncate leading-relaxed font-semibold text-xs">{todo.text}</span>
                                   </button>
                                   <button
@@ -534,7 +535,7 @@ export function RoadmapPanel() {
                           <div className="space-y-4">
                             {/* Status settings using flat Dropdown Select */}
                             <div className="space-y-1.5">
-                              <Label className="text-xs font-semibold text-zinc-550 dark:text-zinc-400 flex items-center gap-1.5 opacity-90">
+                              <Label className="text-xs font-semibold text-zinc-500 dark:text-zinc-400 flex items-center gap-1.5 opacity-90">
                                 <GitBranch className="size-3.5" /> Roadmap Status
                               </Label>
                               <Select value={item.status} onValueChange={(v) => handleStatusChange(item.id, v as any)}>
@@ -542,7 +543,7 @@ export function RoadmapPanel() {
                                   <div className="flex items-center gap-2">
                                     <span className={cn(
                                       "size-2 rounded-full",
-                                      item.status === "Planned" && "bg-zinc-400 dark:bg-zinc-550",
+                                      item.status === "Planned" && "bg-zinc-400 dark:bg-zinc-500",
                                       item.status === "In Progress" && "bg-amber-500",
                                       item.status === "Testing" && "bg-blue-500",
                                       item.status === "Completed" && "bg-emerald-500"
@@ -561,21 +562,21 @@ export function RoadmapPanel() {
 
                             {/* Custom plan notes / details */}
                             <div className="space-y-1.5">
-                              <Label htmlFor={`notes-${item.id}`} className="text-xs font-semibold text-zinc-550 dark:text-zinc-400 flex items-center gap-1.5 opacity-90">
+                              <Label htmlFor={`notes-${item.id}`} className="text-xs font-semibold text-zinc-500 dark:text-zinc-400 flex items-center gap-1.5 opacity-90">
                                 <FileText className="size-3.5" /> Entitlements & Plan Notes
                               </Label>
-                              <textarea
+                              <Textarea
                                 id={`notes-${item.id}`}
                                 value={item.notes || ""}
                                 onChange={e => handleNotesChange(item.id, e.target.value)}
                                 placeholder="Starter: Excluded. Standard: 1 classroom. Premium: Unlimited."
-                                className="w-full bg-zinc-50 dark:bg-zinc-950/30 border border-zinc-200 dark:border-zinc-800 focus:outline-none focus:ring-1 focus:ring-teal-500/20 focus:border-teal-500 rounded-md p-2.5 min-h-[85px] text-xs font-medium leading-relaxed resize-none transition-colors"
+                                className="min-h-[85px] text-xs font-medium leading-relaxed resize-none"
                               />
                             </div>
                           </div>
 
                           {/* Delete roadmap feature */}
-                          <div className="pt-3.5 flex justify-between items-center text-[10px] font-semibold text-zinc-450 uppercase tracking-wider border-t border-dashed border-zinc-200 dark:border-zinc-800 mt-4">
+                          <div className="pt-3.5 flex justify-between items-center text-xs font-medium text-muted-foreground border-t border-dashed border-zinc-200 dark:border-zinc-800 mt-4">
                             <span>Ref: {item.id}</span>
                             <button
                               onClick={() => handleDeleteFeature(item.id)}

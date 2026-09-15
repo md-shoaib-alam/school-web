@@ -46,8 +46,8 @@ export function FlagCard({
             <div
               className={`size-10 rounded-md flex items-center justify-center shrink-0 border transition-colors ${
                 flag.enabled
-                  ? "bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400 border-emerald-250 dark:border-emerald-800"
-                  : "bg-zinc-50 dark:bg-zinc-950 text-zinc-400 border-zinc-200 dark:border-zinc-850"
+                  ? "bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800"
+                  : "bg-zinc-50 dark:bg-zinc-950 text-zinc-400 border-zinc-200 dark:border-zinc-800"
               }`}
             >
               <IconComp className="size-5" />
@@ -72,7 +72,7 @@ export function FlagCard({
         <div className="flex flex-wrap items-center gap-2 mt-4">
           <Badge
             variant="outline"
-            className={`text-[10px] font-medium px-2 py-0.5 rounded-md border transition-colors ${
+            className={`text-xs font-medium px-2 py-0.5 rounded-md border transition-colors ${
               flag.enabled
                 ? "bg-emerald-50 dark:bg-emerald-950/20 text-emerald-700 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800"
                 : "bg-zinc-100 dark:bg-zinc-800/40 text-zinc-600 dark:text-zinc-400 border-zinc-200 dark:border-zinc-700"
@@ -92,7 +92,7 @@ export function FlagCard({
             <Badge
               key={plan}
               variant="outline"
-              className={`text-[10px] font-medium px-2 py-0.5 rounded-md border ${planBadgeColors[plan] || planBadgeColors["All"]}`}
+              className={`text-xs font-medium px-2 py-0.5 rounded-md border ${planBadgeColors[plan] || planBadgeColors["All"]}`}
             >
               {plan}
             </Badge>
@@ -100,14 +100,14 @@ export function FlagCard({
         </div>
 
         {/* Rollout Controls */}
-        <div className="mt-5 space-y-2.5 p-3.5 rounded-lg bg-zinc-50 dark:bg-zinc-950 border border-zinc-100 dark:border-zinc-850">
+        <div className="mt-5 space-y-2.5 p-3.5 rounded-lg bg-zinc-50 dark:bg-zinc-950 border border-zinc-100 dark:border-zinc-800">
           <div className="flex items-center justify-between">
             <Label className="text-xs font-semibold text-zinc-500 dark:text-zinc-400">Phased Rollout</Label>
             <span
               className={`text-xs font-bold tabular-nums ${
                 flag.enabled
                   ? "text-emerald-600 dark:text-emerald-400"
-                  : "text-zinc-400 dark:text-zinc-650"
+                  : "text-zinc-400 dark:text-zinc-600"
               }`}
             >
               {flag.rolloutPercentage}%
@@ -121,7 +121,7 @@ export function FlagCard({
             step={5}
             className={`w-full ${flag.enabled ? "[&_[data-slot=slider-range]]:bg-emerald-500" : ""}`}
           />
-          <div className="flex items-center justify-between text-[10px] font-medium text-zinc-400 dark:text-zinc-500">
+          <div className="flex items-center justify-between text-xs font-medium text-zinc-400 dark:text-zinc-500">
             <span>None</span>
             <span>Global</span>
           </div>
@@ -130,7 +130,7 @@ export function FlagCard({
         {/* Custom Notes / Plan Details */}
         <div className="mt-4 pt-4 border-t border-zinc-200 dark:border-zinc-800">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold text-zinc-550 dark:text-zinc-400 flex items-center gap-1.5">
+            <span className="text-xs font-semibold text-zinc-500 dark:text-zinc-400 flex items-center gap-1.5">
               <ClipboardList className="size-3.5 text-zinc-400" /> Plan Notes &amp; Entitlements
             </span>
             <button 
@@ -158,10 +158,10 @@ export function FlagCard({
               value={localNotes}
               onChange={(e) => setLocalNotes(e.target.value)}
               placeholder="e.g. Starter Pack: Includes AI grading up to 10 essays/month. Standard: 50 essays."
-              className="w-full mt-2 p-2.5 text-xs rounded-lg bg-white dark:bg-zinc-950 border border-zinc-250 dark:border-zinc-800 focus:outline-none focus:ring-1 focus:ring-teal-500/20 focus:border-teal-500 font-medium leading-relaxed min-h-[65px] resize-none"
+              className="w-full mt-2 p-2.5 text-xs rounded-lg bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 focus:outline-none focus:ring-1 focus:ring-teal-500/20 focus:border-teal-500 font-medium leading-relaxed min-h-[65px] resize-none"
             />
           ) : (
-            <p className="text-xs mt-2 font-normal text-zinc-655 dark:text-zinc-400 leading-relaxed italic bg-zinc-50 dark:bg-zinc-950 p-2.5 rounded-lg border border-zinc-150 dark:border-zinc-850 text-left">
+            <p className="text-xs mt-2 font-normal text-zinc-600 dark:text-zinc-400 leading-relaxed italic bg-zinc-50 dark:bg-zinc-950 p-2.5 rounded-lg border border-zinc-100 dark:border-zinc-800 text-left">
               {flag.notes || "No notes set yet. Click Edit to define custom limits (e.g. what's included in starter packs)."}
             </p>
           )}

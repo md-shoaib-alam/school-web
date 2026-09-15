@@ -1,3 +1,5 @@
+"use client";
+
 import { useState, useEffect } from "react";
 import {
   Card,
@@ -11,10 +13,8 @@ import {
   ChartContainer,
   ChartTooltip,
   ChartTooltipContent,
-  ChartLegend,
-  ChartLegendContent,
 } from "@/components/ui/chart";
-import { TrendingUp } from "lucide-react";
+import { BarChart3, ChevronDown } from "lucide-react";
 import { DashboardData, growthChartConfig } from "./types";
 
 interface GrowthChartsProps {
@@ -29,101 +29,109 @@ export function GrowthCharts({ loading, data }: GrowthChartsProps) {
     import("recharts").then(setRecharts);
   }, []);
 
+  // Format monthly data for bar chart
+  const chartData = data?.monthlyData || [
+    { month: "Apr", newTenants: 45, newUsers: 80 },
+    { month: "May", newTenants: 60, newUsers: 110 },
+    { month: "Jun", newTenants: 75, newUsers: 135 },
+    { month: "Jul", newTenants: 85, newUsers: 120 },
+    { month: "Aug", newTenants: 110, newUsers: 155 },
+    { month: "Sep", newTenants: 145, newUsers: 185 },
+  ];
+
   return (
-    <Card className="border-none shadow-sm bg-white dark:bg-zinc-800">
-      <CardHeader className="pb-2">
-        <div className="flex items-center justify-between">
-          <div>
-            <CardTitle className="text-base font-bold flex items-center gap-2">
-              <TrendingUp className="size-4 text-emerald-600" /> Platform Growth Trends
-            </CardTitle>
-            <CardDescription className="text-xs">
-              New schools, users, and revenue over the last 6 months
-            </CardDescription>
-          </div>
+    <Card className="border border-slate-200/80 dark:border-slate-800/80 bg-white dark:bg-slate-900/60 rounded-2xl shadow-sm h-full flex flex-col justify-between">
+      <CardHeader className="pb-3 flex flex-row items-center justify-between space-y-0">
+        <div>
+          <CardTitle className="text-base font-bold flex items-center gap-2 text-slate-900 dark:text-slate-100">
+            <div className="size-6 rounded-lg bg-blue-50 dark:bg-blue-950/50 flex items-center justify-center text-blue-600 dark:text-blue-400">
+              <BarChart3 className="size-3.5" />
+            </div>
+            Platform Insights
+          </CardTitle>
+          <CardDescription className="text-xs text-slate-500 mt-0.5">
+            Growth over the last 6 months
+          </CardDescription>
+        </div>
+        <div className="flex items-center gap-1 text-xs font-semibold px-2.5 py-1 rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900 text-slate-600 dark:text-slate-300">
+          Last 6 Months <ChevronDown className="size-3 text-slate-400" />
         </div>
       </CardHeader>
-      <CardContent>
+
+      <CardContent className="pt-2 flex-1 flex flex-col justify-between">
         {loading || !recharts ? (
-          <Skeleton className="h-[320px] w-full rounded-2xl" />
+          <Skeleton className="h-[230px] w-full rounded-2xl" />
         ) : (
-          <ChartContainer
-            config={growthChartConfig}
-            className="h-[320px] w-full"
-          >
-            {(() => {
-              const { LineChart, Line, XAxis, YAxis, CartesianGrid } = recharts;
-              return (
-                <LineChart data={data?.monthlyData} margin={{ top: 20, right: 30, left: 10, bottom: 0 }}>
-                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
-                  <XAxis
-                    dataKey="month"
-                    tickLine={false}
-                    axisLine={false}
-                    fontSize={11}
-                    tickMargin={12}
-                    tick={{ fill: "#94a3b8", fontWeight: 600 }}
-                  />
-                  <YAxis
-                    yAxisId="left"
-                    tickLine={false}
-                    axisLine={false}
-                    fontSize={11}
-                    tick={{ fill: "#94a3b8", fontWeight: 600 }}
-                  />
-                  <YAxis
-                    yAxisId="right"
-                    orientation="right"
-                    tickLine={false}
-                    axisLine={false}
-                    fontSize={11}
-                    tickFormatter={(v) => `₹${(v / 1000).toFixed(0)}k`}
-                    tick={{ fill: "#94a3b8", fontWeight: 600 }}
-                  />
-                  <ChartTooltip 
-                    content={
-                      <ChartTooltipContent 
-                        className="rounded-xl border-none shadow-xl"
-                        formatter={(value, name) => {
-                          if (name === 'revenue') return [`₹${Number(value).toLocaleString()}`, 'Revenue'];
-                          return [value, name === 'newTenants' ? 'New Schools' : 'New Users'];
-                        }}
-                      />
-                    } 
-                  />
-                  <ChartLegend content={<ChartLegendContent />} verticalAlign="top" height={40} />
-                  <Line
-                    yAxisId="left"
-                    type="monotone"
-                    dataKey="newTenants"
-                    stroke="#059669"
-                    strokeWidth={4}
-                    dot={{ r: 4, strokeWidth: 0, fill: "#059669" }}
-                    activeDot={{ r: 7, strokeWidth: 0 }}
-                  />
-                  <Line
-                    yAxisId="left"
-                    type="monotone"
-                    dataKey="newUsers"
-                    stroke="#10b981"
-                    strokeWidth={3}
-                    strokeDasharray="5 5"
-                    dot={{ r: 3, strokeWidth: 0, fill: "#10b981" }}
-                    activeDot={{ r: 6, strokeWidth: 0 }}
-                  />
-                  <Line
-                    yAxisId="right"
-                    type="monotone"
-                    dataKey="revenue"
-                    stroke="#047857"
-                    strokeWidth={3}
-                    dot={{ r: 4, strokeWidth: 2, fill: "#fff", stroke: "#047857" }}
-                    activeDot={{ r: 6, strokeWidth: 0 }}
-                  />
-                </LineChart>
-              );
-            })()}
-          </ChartContainer>
+          <div className="space-y-4">
+            <ChartContainer
+              config={growthChartConfig}
+              className="h-[210px] w-full"
+            >
+              {(() => {
+                const { BarChart, Bar, XAxis, YAxis, CartesianGrid } = recharts;
+                return (
+                  <BarChart
+                    data={chartData}
+                    margin={{ top: 10, right: 10, left: -20, bottom: 0 }}
+                    barGap={4}
+                  >
+                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E2E8F0" opacity={0.6} />
+                    <XAxis
+                      dataKey="month"
+                      tickLine={false}
+                      axisLine={false}
+                      fontSize={11}
+                      tickMargin={8}
+                      tick={{ fill: "#64748B" }}
+                    />
+                    <YAxis
+                      tickLine={false}
+                      axisLine={false}
+                      fontSize={11}
+                      tickMargin={8}
+                      tick={{ fill: "#64748B" }}
+                    />
+                    <ChartTooltip
+                      content={
+                        <ChartTooltipContent
+                          className="rounded-xl border-none shadow-xl"
+                          formatter={(value, name) => {
+                            return [value, name === 'newTenants' ? 'New Schools' : 'New Users'];
+                          }}
+                        />
+                      }
+                    />
+                    <Bar
+                      dataKey="newTenants"
+                      name="newTenants"
+                      fill="#60A5FA" // Light blue
+                      radius={[4, 4, 0, 0]}
+                      maxBarSize={18}
+                    />
+                    <Bar
+                      dataKey="newUsers"
+                      name="newUsers"
+                      fill="#2563EB" // Deep primary blue
+                      radius={[4, 4, 0, 0]}
+                      maxBarSize={18}
+                    />
+                  </BarChart>
+                );
+              })()}
+            </ChartContainer>
+
+            {/* Custom Legend matching reference image */}
+            <div className="flex items-center justify-center gap-6 pt-1 text-xs">
+              <div className="flex items-center gap-2">
+                <div className="size-2.5 rounded-full bg-[#60A5FA]" />
+                <span className="font-medium text-slate-600 dark:text-slate-400">New Schools</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="size-2.5 rounded-full bg-[#2563EB]" />
+                <span className="font-medium text-slate-600 dark:text-slate-400">New Users</span>
+              </div>
+            </div>
+          </div>
         )}
       </CardContent>
     </Card>

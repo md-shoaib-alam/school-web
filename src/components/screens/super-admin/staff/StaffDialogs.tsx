@@ -63,7 +63,7 @@ export function StaffDialogs({
           <div className="size-12 rounded-2xl bg-teal-50 dark:bg-teal-900/30 flex items-center justify-center mb-4">
             <Shield className="size-6 text-teal-600 dark:text-teal-400" />
           </div>
-          <DialogTitle className="text-2xl font-black tracking-tight">
+          <DialogTitle className="text-2xl font-semibold tracking-tight">
             {editingStaff ? "Edit Staff Member" : "Add Platform Staff"}
           </DialogTitle>
           <DialogDescription className="font-medium text-sm">
@@ -75,7 +75,7 @@ export function StaffDialogs({
 
         <div className="space-y-4 py-4">
           <div className="space-y-2">
-            <Label htmlFor="staff-name" className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">Full Name</Label>
+            <Label htmlFor="staff-name" className="text-xs font-medium text-muted-foreground ml-1">Full Name</Label>
             <div className="relative">
               <UserRound className="absolute left-3.5 top-1/2 -translate-y-1/2 size-4 text-muted-foreground opacity-50" />
               <Input
@@ -90,7 +90,7 @@ export function StaffDialogs({
 
           {!editingStaff && (
             <div className="space-y-2">
-              <Label htmlFor="staff-email" className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">Work Email</Label>
+              <Label htmlFor="staff-email" className="text-xs font-medium text-muted-foreground ml-1">Work Email</Label>
               <div className="relative">
                 <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 size-4 text-muted-foreground opacity-50" />
                 <Input
@@ -106,7 +106,7 @@ export function StaffDialogs({
           )}
 
           <div className="space-y-2">
-            <Label htmlFor="staff-password" className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">
+            <Label htmlFor="staff-password" className="text-xs font-medium text-muted-foreground ml-1">
               {editingStaff ? "New Password (Optional)" : "Security Password"}
             </Label>
             <div className="relative">
@@ -130,7 +130,7 @@ export function StaffDialogs({
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="staff-phone" className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">Contact Number</Label>
+            <Label htmlFor="staff-phone" className="text-xs font-medium text-muted-foreground ml-1">Contact Number</Label>
             <div className="relative">
               <Phone className="absolute left-3.5 top-1/2 -translate-y-1/2 size-4 text-muted-foreground opacity-50" />
               <Input
@@ -144,7 +144,7 @@ export function StaffDialogs({
           </div>
 
           <div className="space-y-2">
-            <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">System Role Assignment</Label>
+            <Label className="text-xs font-medium text-muted-foreground ml-1">System Role Assignment</Label>
             <Select
               value={formData.platformRoleId}
               onValueChange={(v) => setFormData({ ...formData, platformRoleId: v })}
@@ -154,7 +154,7 @@ export function StaffDialogs({
               </SelectTrigger>
               <SelectContent className="rounded-xl border-2">
                 {roles.map((role) => (
-                  <SelectItem key={role.id} value={role.id} className="text-xs font-black uppercase tracking-widest py-3">
+                  <SelectItem key={role.id} value={role.id} className="text-xs font-medium py-3">
                     <div className="flex items-center gap-2">
                       <div className="size-2 rounded-full" style={{ backgroundColor: role.color }} />
                       {role.name}
@@ -173,7 +173,7 @@ export function StaffDialogs({
                 checked={formData.isActive}
                 onCheckedChange={(checked) => setFormData({ ...formData, isActive: checked === true })}
               />
-              <Label htmlFor="staff-active" className="text-xs font-black uppercase tracking-widest cursor-pointer select-none">
+              <Label htmlFor="staff-active" className="text-xs font-medium cursor-pointer select-none">
                 Account Active
               </Label>
             </div>
@@ -185,7 +185,7 @@ export function StaffDialogs({
             Cancel
           </Button>
           <Button
-            className="bg-teal-600 hover:bg-teal-700 text-white rounded-xl font-black px-8 shadow-lg shadow-teal-200 dark:shadow-none"
+            className="rounded-lg px-8"
             onClick={onSubmit}
             disabled={submitting || !isFormValid}
           >
