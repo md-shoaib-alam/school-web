@@ -1,29 +1,34 @@
 'use client';
 
 import { useState } from 'react';
+import Image from 'next/image';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Mail, ShieldCheck, CheckCircle2, ArrowLeft, Loader2 } from 'lucide-react';
+import {
+  Mail,
+  CheckCircle2,
+  ArrowLeft,
+  Loader2,
+  ArrowRight,
+  Phone,
+  Users,
+  Star,
+  School,
+} from 'lucide-react';
 import Link from 'next/link';
-
 import { useRequestPasswordReset } from '@/lib/graphql/hooks';
-import { toast } from "sonner";
+import { toast } from 'sonner';
 
-/**
- * ResetPasswordClient (forgot password flow)
- * Premium UI following the SchoolSaaS design system.
- */
 export default function ResetPasswordClient() {
   const [email, setEmail] = useState('');
   const [isSuccess, setIsSuccess] = useState(false);
   const resetMutation = useRequestPasswordReset();
+  const isLoading = resetMutation.isPending;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!email.trim()) return;
-    
     try {
       await resetMutation.mutateAsync(email);
       setIsSuccess(true);
@@ -32,116 +37,247 @@ export default function ResetPasswordClient() {
     }
   };
 
-  const isLoading = resetMutation.isPending;
 
-  if (isSuccess) {
-    return (
-      <div className="min-h-screen flex items-center justify-center p-4 relative bg-gradient-to-br from-zinc-50 via-white to-rose-50 dark:from-zinc-950 dark:via-zinc-900 dark:to-rose-950">
-        <Card className="w-full max-w-md border-0 bg-white/90 border-t border-t-white backdrop-blur-xl dark:bg-zinc-900/40 dark:border dark:border-white/[0.06] dark:shadow-black/50 rounded-2xl overflow-hidden relative shadow-2xl">
-          {/* Subtle luxury gradient top border */}
-          <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-emerald-500/40 to-transparent" />
-          
-          <CardHeader className="text-center pt-8 pb-2">
-            <div className="mx-auto size-20 bg-emerald-50 dark:bg-emerald-950/30 rounded-3xl flex items-center justify-center mb-6 shadow-md border border-emerald-100 dark:border-emerald-900/50 rotate-2">
-              <CheckCircle2 className="size-10 text-emerald-600 dark:text-emerald-400" />
-            </div>
-            <CardTitle className="text-2xl font-bold tracking-tight text-zinc-900 dark:text-white/95">
-              Check your email
-            </CardTitle>
-            <CardDescription className="text-base pt-2 text-zinc-500 dark:text-zinc-400 font-medium leading-relaxed">
-              A secure link has been sent to <br />
-              <span className="font-semibold text-zinc-900 dark:text-white underline decoration-emerald-500 decoration-1 underline-offset-4">{email}</span>
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="px-8 pb-8 pt-6 space-y-4">
-            <Button asChild className="w-full h-12 bg-zinc-900 hover:bg-zinc-850 dark:bg-emerald-600 dark:hover:bg-emerald-500 dark:text-white rounded-xl font-bold shadow-lg shadow-emerald-500/10 hover:shadow-emerald-500/20 transition-all duration-250 active:scale-[0.97] cursor-pointer">
-              <Link href="/">Return to Login</Link>
-            </Button>
-            <button 
-              type="button"
-              onClick={() => setIsSuccess(false)} 
-              className="w-full text-center text-sm text-rose-500 hover:text-rose-600 font-semibold transition-colors cursor-pointer"
-            >
-              Didn't receive the email? Try again
-            </button>
-          </CardContent>
-        </Card>
+
+  /* ── Card: Success State ── */
+  const successCard = (
+    <div className="flex flex-col items-center text-center px-7 xl:px-8 py-8">
+      <div className="size-16 rounded-full bg-emerald-50 border border-emerald-100 flex items-center justify-center mb-4 shadow-sm">
+        <CheckCircle2 className="size-8 text-emerald-500" />
       </div>
-    );
-  }
+      <h2 className="text-xl font-bold text-slate-900 tracking-tight">Email Sent!</h2>
+      <p className="mt-2 text-sm text-slate-500 leading-relaxed max-w-[260px]">
+        A secure reset link has been sent to{' '}
+        <span className="font-semibold text-slate-800">{email}</span>
+      </p>
+      <Button asChild className="w-full h-10 mt-6 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-semibold text-sm shadow-md shadow-blue-500/25 gap-2 cursor-pointer">
+        <Link href="/"><ArrowLeft className="size-4" />Return to Login</Link>
+      </Button>
+      <button
+        type="button"
+        onClick={() => setIsSuccess(false)}
+        className="mt-3 text-xs text-slate-500 hover:text-blue-600 font-medium transition-colors cursor-pointer"
+      >
+        Didn't receive the email? Try again
+      </button>
+    </div>
+  );
+
+  /* ── Card: Form State ── */
+  const formCard = (
+    <div className="px-7 xl:px-8 py-8">
+      {/* Mail icon centered */}
+      <div className="flex justify-center mb-4">
+        <div className="size-14 rounded-full bg-blue-50 border border-blue-100 flex items-center justify-center shadow-sm">
+          <Mail className="size-6 text-blue-600" />
+        </div>
+      </div>
+
+      {/* Title & subtitle centered */}
+      <div className="text-center mb-5">
+        <h2 className="text-xl xl:text-2xl font-bold text-slate-900 tracking-tight">Forgot Password?</h2>
+        <p className="mt-2 text-xs text-slate-500 leading-relaxed max-w-[240px] mx-auto">
+          Enter your email address and we'll send you instructions to reset your password.
+        </p>
+      </div>
+
+      {/* Form */}
+      <form onSubmit={handleSubmit} className="space-y-3">
+        <div className="space-y-1">
+          <Label htmlFor="reset-email" className="text-xs font-semibold text-slate-700">Email Address</Label>
+          <div className="relative">
+            <div className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none">
+              <Mail className="size-4" />
+            </div>
+            <Input
+              id="reset-email"
+              type="email"
+              placeholder="Enter your email address"
+              className="pl-10 h-10 xl:h-11 text-xs sm:text-sm bg-slate-50 border-slate-200 rounded-xl focus-visible:ring-2 focus-visible:ring-blue-500 placeholder:text-slate-400"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+            />
+          </div>
+        </div>
+
+        {/* Send Reset Link */}
+        <Button
+          type="submit"
+          disabled={isLoading || !email}
+          className="w-full h-10 xl:h-11 rounded-xl bg-blue-600 hover:bg-blue-700 active:scale-[0.99] text-white font-semibold text-sm shadow-md shadow-blue-500/25 gap-2 transition-all cursor-pointer disabled:opacity-60"
+        >
+          {isLoading ? (
+            <><Loader2 className="size-4 animate-spin" /><span>Sending link…</span></>
+          ) : (
+            <span>Send Reset Link</span>
+          )}
+        </Button>
+      </form>
+
+      {/* OR divider */}
+      <div className="relative my-3">
+        <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-slate-200" /></div>
+        <div className="relative flex justify-center"><span className="bg-white px-3 text-slate-400 font-semibold text-[11px] uppercase">OR</span></div>
+      </div>
+
+      {/* Reset via Phone */}
+      <Button
+        type="button"
+        variant="outline"
+        className="w-full h-10 xl:h-11 rounded-xl border-blue-200/80 bg-white hover:bg-blue-50/50 text-blue-600 font-semibold text-xs gap-2 transition-all cursor-pointer shadow-2xs"
+      >
+        <Phone className="size-3.5" />
+        <span>Reset via Phone</span>
+      </Button>
+
+      {/* Bottom sign in link */}
+      <p className="mt-4 text-center text-xs text-slate-500">
+        Remember your password?{' '}
+        <Link href="/" className="font-semibold text-blue-600 hover:text-blue-700 transition-colors">
+          Sign in
+        </Link>
+      </p>
+    </div>
+  );
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 relative bg-gradient-to-br from-zinc-50 via-white to-rose-50 dark:from-zinc-950 dark:via-zinc-900 dark:to-rose-950">
-      <Card className="w-full max-w-md border-0 bg-white/90 border-t border-t-white backdrop-blur-xl dark:bg-zinc-900/40 dark:border dark:border-white/[0.06] dark:shadow-black/50 rounded-2xl overflow-hidden relative shadow-2xl transition-all duration-300">
-        {/* Subtle luxury gradient top border for dark mode */}
-        <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-rose-500/40 to-transparent" />
-        
-        <CardHeader className="space-y-5 relative px-8 pt-8 pb-4">
-          <Link 
-            href="/" 
-            className="group flex items-center text-sm font-medium text-zinc-500 hover:text-rose-600 dark:text-zinc-400 dark:hover:text-rose-400 transition-colors w-fit"
-          >
-            <ArrowLeft className="mr-2 size-4 group-hover:-translate-x-1 transition-transform" />
+    <div
+      className="min-h-screen lg:h-screen lg:max-h-screen w-full bg-[#d0ecff] text-slate-900 flex flex-col relative selection:bg-blue-500 selection:text-white overflow-x-hidden lg:overflow-hidden"
+      suppressHydrationWarning
+    >
+      {/* Desktop background */}
+      <div
+        className="hidden lg:block absolute inset-0 z-0 pointer-events-none select-none"
+        style={{ backgroundImage: "url('/assets/login-illustration-desktop.png')", backgroundSize: 'cover', backgroundPosition: 'center' }}
+      >
+        <Image src="/assets/login-illustration-desktop.png" alt="School Background" fill priority unoptimized className="object-cover object-center" sizes="100vw" />
+      </div>
+
+      {/* Mobile background */}
+      <div
+        className="lg:hidden fixed inset-0 z-0 pointer-events-none select-none bg-[#cbe9fe]"
+        style={{ backgroundImage: "url('/assets/loginmobile.png')", backgroundSize: 'cover', backgroundPosition: 'bottom' }}
+      >
+        <Image src="/assets/loginmobile.png" alt="School Mobile Background" fill priority unoptimized className="object-cover object-bottom" sizes="100vw" />
+      </div>
+
+      {/* ─── MOBILE ─── */}
+      <div className="lg:hidden relative z-10 w-full min-h-screen flex flex-col justify-between items-center px-4 py-3">
+        {/* Top bar: return button at top-right */}
+        <div className="w-full flex items-center justify-end shrink-0">
+          <Link href="/" className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-700 bg-white/90 px-3.5 py-1.5 rounded-full border border-white/70 shadow-sm hover:text-blue-600 hover:bg-white transition-colors">
+            <ArrowLeft className="size-3.5" />
             Back to login
           </Link>
-          
-          <div className="space-y-2">
-            <div className="size-14 bg-gradient-to-br from-rose-500 to-rose-600 dark:from-rose-600 dark:to-rose-700 rounded-2xl flex items-center justify-center mb-4 shadow-lg shadow-rose-500/20">
-              <ShieldCheck className="size-7 text-white" />
-            </div>
-            <CardTitle className="text-2xl font-bold tracking-tight text-zinc-900 dark:text-white/95">
-              Forgot password?
-            </CardTitle>
-            <CardDescription className="text-zinc-500 dark:text-zinc-400/90 text-sm font-medium leading-relaxed">
-              Enter your email and we'll send you instructions to reset your password.
-            </CardDescription>
+        </div>
+
+        {/* Brand */}
+        <div className="w-full flex flex-col items-center text-center mt-2 mb-4">
+          <div className="size-18 rounded-2xl overflow-hidden shadow-lg border-[2.5px] border-white bg-white shrink-0 mb-2">
+            <Image src="/test.webp" alt="ParentLink School App" width={72} height={72} priority className="size-full object-cover scale-[1.28]" />
           </div>
-        </CardHeader>
-        
-        <CardContent className="px-8 pb-8 pt-2 relative">
-          <form onSubmit={handleSubmit} className="space-y-6">
-            <div className="space-y-2">
-              <Label htmlFor="email" className="text-sm font-semibold pl-1 text-zinc-700 dark:text-zinc-300/90">Email Address</Label>
-              <div className="relative group">
-                <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 size-5 text-zinc-400 group-focus-within:text-rose-500 transition-colors duration-200" />
-                <Input
-                  id="email"
-                  type="email"
-                  placeholder="admin@sigel.edu"
-                  className="pl-11 h-12 bg-zinc-50/50 dark:bg-[#0c0c0e]/70 dark:border-zinc-800/60 dark:text-zinc-100 rounded-xl focus:ring-rose-500/15 focus:border-rose-500 dark:focus:ring-rose-500/20 dark:focus:border-rose-500/60 transition-all duration-200 text-base placeholder:text-zinc-400/70"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  required
-                />
+          <h1 className="text-2xl font-black tracking-tight">
+            <span className="text-slate-900">School</span>
+            <span className="text-blue-600">SaaS</span>
+          </h1>
+        </div>
+
+        {/* Card with Glassmorphic Backdrop Card */}
+        <div className="relative w-full max-w-[340px] mx-auto mt-2 mb-4">
+          {/* Glassmorphic card behind mobile card (subtle) */}
+          <div className="absolute -inset-2 rounded-[32px] bg-white/30 backdrop-blur-md border border-white/60 shadow-xl shadow-sky-950/10 pointer-events-none" />
+
+          {/* Foreground Card */}
+          <div className="relative z-10 w-full rounded-[26px] bg-white border border-slate-100 shadow-xl shadow-sky-950/10 backdrop-blur-xs overflow-hidden">
+            {isSuccess ? successCard : formCard}
+          </div>
+        </div>
+
+        {/* Mobile Footer */}
+        <footer className="w-full text-center pb-3 pt-4 text-[10px] text-slate-700 font-medium drop-shadow-xs shrink-0 mt-auto">
+          © {new Date().getFullYear()} SchoolSaaS. All rights reserved.
+        </footer>
+      </div>
+
+      {/* ─── DESKTOP ─── */}
+      <div className="hidden lg:flex flex-col h-full relative z-10 w-full">
+        {/* Header: return button at top-right */}
+        <header className="w-full px-8 lg:px-12 pt-4 flex items-center justify-end shrink-0">
+          <Link href="/" className="group inline-flex items-center gap-1.5 text-xs font-semibold text-slate-700 bg-white/90 px-4 py-2 rounded-full border border-white/70 shadow-md hover:text-blue-600 hover:bg-white transition-colors">
+            <ArrowLeft className="size-3.5 group-hover:-translate-x-0.5 transition-transform" />
+            Back to login
+          </Link>
+        </header>
+
+        {/* Main */}
+        <main className="flex-1 flex items-stretch px-10 lg:px-16 xl:px-20 py-4 w-full min-h-0">
+          <div className="w-full max-w-7xl mx-auto flex items-stretch justify-between gap-10 xl:gap-16">
+
+            {/* Left — info panel */}
+            <div className="flex flex-col max-w-[480px] xl:max-w-[520px] self-stretch pt-0">
+              {/* Logo */}
+              <div className="mb-4">
+                <div className="size-24 rounded-3xl overflow-hidden shadow-xl border-[3px] border-white bg-white shrink-0">
+                  <Image src="/test.webp" alt="ParentLink School App" width={96} height={96} priority className="size-full object-cover scale-[1.28]" />
+                </div>
+              </div>
+
+              <h2 className="text-base lg:text-lg font-bold text-slate-800 tracking-tight">Welcome to</h2>
+              <h1 className="text-4xl lg:text-5xl font-black tracking-tight mt-0.5">
+                <span className="text-slate-900">School</span>
+                <span className="text-blue-600">SaaS</span>
+              </h1>
+
+
+
+              {/* Stat Card — pinned to bottom, glassmorphism */}
+              <div className="flex items-center gap-7 px-7 py-4 rounded-2xl bg-white/30 backdrop-blur-md border border-white/60 shadow-lg shadow-black/10 w-fit mt-auto mb-4">
+                <div className="flex items-center gap-3">
+                  <div className="size-10 rounded-xl bg-emerald-100/80 text-emerald-600 flex items-center justify-center shrink-0 shadow-sm"><Users className="size-5" /></div>
+                  <div>
+                    <div className="text-sm font-black text-slate-900 leading-none">1000+</div>
+                    <div className="text-xs text-slate-600 mt-0.5 font-medium">Happy Students</div>
+                  </div>
+                </div>
+                <div className="h-8 w-px bg-white/60" />
+                <div className="flex items-center gap-3">
+                  <div className="size-10 rounded-xl bg-blue-100/80 text-blue-600 flex items-center justify-center shrink-0 shadow-sm"><School className="size-5" /></div>
+                  <div>
+                    <div className="text-sm font-black text-slate-900 leading-none">50+</div>
+                    <div className="text-xs text-slate-600 mt-0.5 font-medium">Schools Trust Us</div>
+                  </div>
+                </div>
+                <div className="h-8 w-px bg-white/60" />
+                <div className="flex items-center gap-3">
+                  <div className="size-10 rounded-xl bg-amber-100/80 flex items-center justify-center shrink-0 shadow-sm"><Star className="size-5 fill-amber-400 text-amber-400" /></div>
+                  <div>
+                    <div className="text-sm font-black text-slate-900 leading-none">4.8</div>
+                    <div className="text-xs text-slate-600 mt-0.5 font-medium">User Satisfaction</div>
+                  </div>
+                </div>
               </div>
             </div>
 
-            <Button
-              type="submit"
-              disabled={isLoading || !email}
-              className="w-full h-12 bg-zinc-900 hover:bg-zinc-850 dark:bg-rose-600 dark:hover:bg-rose-500 text-white rounded-xl font-bold shadow-lg shadow-rose-500/10 hover:shadow-rose-500/20 transition-all duration-250 active:scale-[0.97] cursor-pointer disabled:opacity-50"
-            >
-              {isLoading ? (
-                <>
-                  <Loader2 className="mr-2 size-5 animate-spin" />
-                  Sending secure link…
-                </>
-              ) : (
-                'Reset Password'
-              )}
-            </Button>
-          </form>
+            {/* Right — Forgot Password Card Container with Glassmorphic Backdrop Card */}
+            <div className="relative w-full max-w-[390px] xl:max-w-[420px] shrink-0 self-center">
+              {/* Glassmorphism card behind forgot password card (decreased height) */}
+              <div className="absolute -top-4 -bottom-4 -left-2.5 -right-2.5 xl:-top-5 xl:-bottom-5 xl:-left-3 xl:-right-3 rounded-[36px] xl:rounded-[38px] bg-white/35 backdrop-blur-md border border-white/60 shadow-2xl shadow-sky-950/15 pointer-events-none" />
 
-          <div className="mt-8 pt-6 border-t border-zinc-100 dark:border-white/[0.05] text-center">
-            <p className="text-sm text-zinc-500 dark:text-zinc-400 font-medium">
-              Suddenly remembered? {' '}
-              <Link href="/" className="text-rose-500 dark:text-rose-400 font-semibold hover:text-rose-600 transition-all">
-                Sign in
-              </Link>
-            </p>
+              {/* Foreground Forgot Password Card */}
+              <div className="relative z-10 rounded-[32px] bg-white border border-slate-200/70 shadow-xl shadow-slate-300/30 w-full overflow-hidden">
+                {isSuccess ? successCard : formCard}
+              </div>
+            </div>
+
           </div>
-        </CardContent>
-      </Card>
+        </main>
+
+        {/* Footer */}
+        <footer className="w-full text-center py-2 text-[10px] text-white/70 shrink-0">
+          © {new Date().getFullYear()} SchoolSaaS. All rights reserved.
+        </footer>
+      </div>
     </div>
   );
 }

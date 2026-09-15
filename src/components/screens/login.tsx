@@ -1,95 +1,88 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Image from "next/image";
-import { useTheme } from "next-themes";
 import { useAppStore, type UserRole } from "@/store/use-app-store";
 import { setCookie } from "@/lib/cookies";
 import { SESSION_EXPIRY_DAYS } from "@/store/app-store/utils";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
-  Building2,
-  Sun,
-  Moon,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import {
   Eye,
   EyeOff,
   Mail,
   Lock,
   Loader2,
-  School,
   Phone,
+  School,
+  ArrowRight,
+  Headphones,
+  Globe,
+  ChevronDown,
+  ChevronRight,
+  Users,
+  BookOpen,
+  ShieldCheck,
+  Star,
 } from "lucide-react";
 import { toast } from "sonner";
 import { loginWithElysia, setRefreshToken } from "@/lib/api";
 
-function ThemeToggleLogin() {
-  const { theme, setTheme } = useTheme();
-
-  return (
-    <Button
-      variant="ghost"
-      size="icon"
-      className="absolute top-4 right-4 size-10 rounded-full hover:bg-white/20 dark:hover:bg-black/20 text-zinc-600 dark:text-zinc-300 z-10 cursor-pointer"
-      onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-      aria-label="Toggle theme"
-      suppressHydrationWarning
-    >
-      <Moon className="size-5 block dark:hidden" />
-      <Sun className="size-5 hidden dark:block" />
-    </Button>
-  );
-}
-
 export function LoginScreen() {
   const router = useRouter();
-  const { login, setCurrentScreen } = useAppStore();
+  const { login } = useAppStore();
 
-  // Login state
-  const [loginMode, setLoginMode] = useState<"email" | "id">("id");
+  const [loginMode, setLoginMode] = useState<"email" | "id">("email");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [rememberMe, setRememberMe] = useState(true);
   const [loading, setLoading] = useState(false);
+  const [selectedLanguage, setSelectedLanguage] = useState("English");
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const saved = localStorage.getItem("remembered_login_identifier");
+      if (saved) {
+        setEmail(saved);
+        setRememberMe(true);
+      }
+    }
+  }, []);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     const identifier = email.trim();
-    
+
     if (!identifier || !password.trim()) {
       toast.error(
         loginMode === "email"
-          ? "Please enter both Email ID and password"
-          : "Please enter both School ID/Phone and password"
+          ? "Please enter your Email address and password"
+          : "Please enter your School ID/Phone and password"
       );
       return;
     }
 
-    // Validate format based on mode
     const isEmailFormat = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(identifier);
-    
-    if (loginMode === "id" && isEmailFormat) {
-      toast.error("Invalid School ID/Phone or password");
-      return;
-    }
-    
-    if (loginMode === "email" && !isEmailFormat) {
-      toast.error("Please enter a valid email address.");
-      return;
-    }
+    if (loginMode === "id" && isEmailFormat) { toast.error("Invalid School ID or Phone format"); return; }
+    if (loginMode === "email" && !isEmailFormat) { toast.error("Please enter a valid email address."); return; }
 
     setLoading(true);
-    
-    // Create the login promise
+
+    if (typeof window !== "undefined") {
+      if (rememberMe) localStorage.setItem("remembered_login_identifier", identifier);
+      else localStorage.removeItem("remembered_login_identifier");
+    }
+
     const loginPromise = loginWithElysia(identifier, password.trim());
 
     toast.promise(loginPromise, {
@@ -97,204 +90,332 @@ export function LoginScreen() {
       success: (data) => {
         const userData = data.user;
         const token = data.token;
-
-        if (token) {
-          localStorage.setItem("school_token", token);
-          setCookie("school_token", token, SESSION_EXPIRY_DAYS);
-        }
-        if (data.refreshToken) {
-          setRefreshToken(data.refreshToken);
-        }
-
+        if (token) { localStorage.setItem("school_token", token); setCookie("school_token", token, SESSION_EXPIRY_DAYS); }
+        if (data.refreshToken) setRefreshToken(data.refreshToken);
         login({
-          id: userData.id,
-          name: userData.name,
-          email: userData.email,
-          role: userData.role as UserRole,
-          avatar: userData.avatar,
-          tenantId: userData.tenantId,
-          tenantSlug: userData.tenantSlug,
-          tenantName: userData.tenantName,
-          tenantLogo: userData.tenantLogo || null,
+          id: userData.id, name: userData.name, email: userData.email,
+          role: userData.role as UserRole, avatar: userData.avatar,
+          tenantId: userData.tenantId, tenantSlug: userData.tenantSlug,
+          tenantName: userData.tenantName, tenantLogo: userData.tenantLogo || null,
           customRole: userData.customRole || null,
         });
-
         const tenantId = userData.tenantSlug || userData.tenantId;
-        const dashboardUrl = tenantId ? `/${tenantId}/dashboard` : "/dashboard";
-        
-        // Use window.location.href for a clean entry after login
-        window.location.href = dashboardUrl;
-
+        window.location.href = tenantId ? `/${tenantId}/dashboard` : "/dashboard";
         return `Welcome back, ${userData.name}!`;
       },
-      error: (err: any) => {
-        setLoading(false);
-        return err.message || "Authentication failed";
-      },
+      error: (err: any) => { setLoading(false); return err.message || "Authentication failed"; },
     });
 
-    try {
-      await loginPromise;
-    } catch {
-      // Error handled by toast.promise
-    } finally {
-      setLoading(false);
-    }
+    try { await loginPromise; } catch { /* handled by toast */ } finally { setLoading(false); }
   };
+
+  const renderForm = () => (
+    <form onSubmit={handleLogin} className="space-y-3 xl:space-y-3.5">
+      <div className="space-y-1">
+        <Label htmlFor="login-identifier" className="text-xs font-semibold text-slate-700">
+          {loginMode === "email" ? "Email Address" : "School ID / Mobile Number"}
+        </Label>
+        <div className="relative">
+          <div className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none">
+            {loginMode === "email" ? <Mail className="size-4" /> : <Phone className="size-4" />}
+          </div>
+          <Input
+            id="login-identifier"
+            type={loginMode === "email" ? "email" : "text"}
+            placeholder={loginMode === "email" ? "Enter your email address" : "Enter School ID or phone"}
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            className="pl-10 h-10 xl:h-11 text-xs sm:text-sm bg-slate-50 border-slate-200 rounded-xl focus-visible:ring-2 focus-visible:ring-blue-500 placeholder:text-slate-400"
+            autoComplete="username"
+            required
+          />
+        </div>
+      </div>
+
+      <div className="space-y-1">
+        <Label htmlFor="login-password" className="text-xs font-semibold text-slate-700">Password</Label>
+        <div className="relative">
+          <div className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none">
+            <Lock className="size-4" />
+          </div>
+          <Input
+            id="login-password"
+            type={showPassword ? "text" : "password"}
+            placeholder="Enter your password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            className="pl-10 pr-10 h-10 xl:h-11 text-xs sm:text-sm bg-slate-50 border-slate-200 rounded-xl focus-visible:ring-2 focus-visible:ring-blue-500 placeholder:text-slate-400"
+            autoComplete="current-password"
+            required
+          />
+          <button
+            type="button"
+            onClick={() => setShowPassword(!showPassword)}
+            className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors p-1"
+            aria-label={showPassword ? "Hide password" : "Show password"}
+          >
+            {showPassword ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
+          </button>
+        </div>
+      </div>
+
+      <div className="flex items-center justify-between pt-0.5">
+        <div className="flex items-center gap-2">
+          <Checkbox
+            id="remember-me"
+            checked={rememberMe}
+            onCheckedChange={(v) => setRememberMe(!!v)}
+            className="size-3.5 rounded border-slate-300 data-[state=checked]:bg-blue-600 data-[state=checked]:border-blue-600"
+          />
+          <Label htmlFor="remember-me" className="text-xs text-slate-600 cursor-pointer font-medium">Remember me</Label>
+        </div>
+        <button
+          type="button"
+          onClick={() => router.push("/reset-password")}
+          className="text-xs font-semibold text-blue-600 hover:text-blue-700 transition-colors"
+        >
+          Forgot password?
+        </button>
+      </div>
+
+      <Button
+        type="submit"
+        disabled={loading}
+        className="w-full h-10 xl:h-11 rounded-xl bg-blue-600 hover:bg-blue-700 active:scale-[0.99] text-white font-semibold text-sm shadow-md shadow-blue-500/25 gap-2 transition-all cursor-pointer"
+      >
+        {loading ? (
+          <><Loader2 className="size-4 animate-spin" /><span>Authenticating...</span></>
+        ) : (
+          <><span>Sign In</span><ArrowRight className="size-4" /></>
+        )}
+      </Button>
+
+      <div className="relative my-1.5 py-0.5">
+        <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-slate-200" /></div>
+        <div className="relative flex justify-center"><span className="bg-white px-3 text-slate-400 font-semibold text-[11px] uppercase">OR</span></div>
+      </div>
+
+      <Button
+        type="button"
+        variant="outline"
+        onClick={() => { setLoginMode(loginMode === "email" ? "id" : "email"); setEmail(""); }}
+        className="w-full h-9.5 xl:h-10.5 rounded-xl border-blue-200/80 bg-blue-50/40 hover:bg-blue-50/80 text-blue-600 font-semibold text-xs gap-2 transition-all cursor-pointer shadow-2xs"
+      >
+        {loginMode === "email" ? (
+          <><Phone className="size-3.5" /><span>Login by School ID / Phone</span></>
+        ) : (
+          <><Mail className="size-3.5" /><span>Login by Email Address</span></>
+        )}
+      </Button>
+
+      <div className="mt-2.5 rounded-xl bg-sky-50 border border-sky-100 p-2.5 flex items-center justify-between gap-2.5">
+        <div className="flex items-center gap-2.5 min-w-0">
+          <div className="size-7 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center shrink-0">
+            <Headphones className="size-3.5" />
+          </div>
+          <div className="min-w-0">
+            <div className="text-xs font-bold text-slate-800 leading-tight">Need help?</div>
+            <div className="text-[11px] text-slate-500 leading-tight mt-0.5 truncate">Contact your school administration.</div>
+          </div>
+        </div>
+        <ChevronRight className="size-4 text-slate-400 shrink-0" />
+      </div>
+    </form>
+  );
 
   return (
     <div
-      className="min-h-screen flex items-center justify-center p-4 relative bg-gradient-to-br from-zinc-50 via-white to-rose-50 dark:from-zinc-950 dark:via-zinc-900 dark:to-rose-950"
+      className="min-h-screen lg:h-screen lg:max-h-screen w-full bg-[#d0ecff] text-slate-900 flex flex-col relative selection:bg-blue-500 selection:text-white overflow-x-hidden lg:overflow-hidden"
       suppressHydrationWarning
     >
-      <ThemeToggleLogin />
+      {/* Desktop background */}
+      <div
+        className="hidden lg:block absolute inset-0 z-0 pointer-events-none select-none"
+        style={{ backgroundImage: "url('/assets/login-illustration-desktop.png')", backgroundSize: "cover", backgroundPosition: "center" }}
+      >
+        <Image
+          src="/assets/login-illustration-desktop.png"
+          alt="Scenic School Background"
+          fill priority unoptimized
+          className="object-cover object-center"
+          sizes="100vw"
+        />
+      </div>
 
-      <div className="w-full max-w-md">
-        {/* Logo & Title */}
-        <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center size-20 rounded-2xl mb-4 shadow-lg bg-white/90 dark:bg-black/20 overflow-hidden shrink-0 border border-zinc-200 dark:border-white/10">
-            <Image 
-              src="/test.webp" 
-              alt="School Logo" 
-              width={80}
-              height={80}
-              priority
-              unoptimized
-              className="size-full object-cover" 
-            />
-          </div>
-          <h1 className="text-4xl font-semibold tracking-tight text-zinc-900 dark:text-white">
-            SchoolSaaS
-          </h1>
-          <p className="text-lg mt-2 text-zinc-500 dark:text-zinc-400 font-medium">
-            Welcome back! Sign in to continue
-          </p>
+      {/* Mobile background */}
+      <div
+        className="lg:hidden fixed inset-0 z-0 pointer-events-none select-none bg-[#cbe9fe]"
+        style={{ backgroundImage: "url('/assets/loginmobile.png')", backgroundSize: "cover", backgroundPosition: "bottom" }}
+      >
+        <Image
+          src="/assets/loginmobile.png"
+          alt="School Mobile Background"
+          fill priority unoptimized
+          className="object-cover object-bottom"
+          sizes="100vw"
+        />
+      </div>
+
+      {/* ─── MOBILE ─── */}
+      <div className="lg:hidden relative z-10 w-full min-h-screen flex flex-col justify-between items-center px-4 py-3">
+        <div className="w-full flex items-center justify-end gap-2 shrink-0">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" size="sm" className="h-8.5 px-3 rounded-full border-slate-200 bg-white/90 text-xs font-medium text-slate-700 gap-1.5 shadow-sm hover:bg-white">
+                <Globe className="size-3.5 text-slate-500" />
+                <span>{selectedLanguage}</span>
+                <ChevronDown className="size-3 text-slate-400 ml-0.5" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="rounded-xl min-w-[120px]">
+              <DropdownMenuItem onClick={() => setSelectedLanguage("English")} className="text-xs font-medium">English</DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setSelectedLanguage("Urdu")} className="text-xs font-medium">اردو (Urdu)</DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setSelectedLanguage("Arabic")} className="text-xs font-medium">العربية (Arabic)</DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
 
-        <Card className="shadow-2xl border-0 bg-white/90 border-t border-t-white backdrop-blur-xl dark:bg-zinc-900/40 dark:border dark:border-white/[0.06] dark:shadow-black/50 rounded-2xl overflow-hidden relative transition-all duration-300">
-          {/* Subtle luxury gradient top border for dark mode */}
-          <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-rose-500/40 to-transparent" />
-          
-          <CardHeader className="text-center pt-8 pb-3">
-            <CardTitle className="text-xl font-bold tracking-tight text-zinc-900 dark:text-white/90">
+        {/* Brand Header */}
+        <div className="w-full flex flex-col items-center text-center mt-2 mb-4">
+          <div className="size-18 rounded-2xl overflow-hidden shadow-lg border-[2.5px] border-white bg-white shrink-0 mb-2">
+            <Image src="/test.webp" alt="ParentLink School App" width={72} height={72} priority className="size-full object-cover scale-[1.28]" />
+          </div>
+          <h1 className="text-2xl font-black tracking-tight">
+            <span className="text-slate-900">School</span>
+            <span className="text-blue-600">SaaS</span>
+          </h1>
+        </div>
+
+        {/* Floating Card in Mobile with Glassmorphic Card */}
+        <div className="relative w-full max-w-[340px] mx-auto mt-2 mb-4 rounded-[32px] bg-white/35 backdrop-blur-md border border-white/60 shadow-xl shadow-sky-950/10 p-2 pt-4 pb-2.5">
+          {/* Heading displayed directly on the frosted glass */}
+          <div className="text-center mb-2.5">
+            <h2 className="text-lg font-black tracking-tight text-slate-900">
               Login to your account
-            </CardTitle>
-          </CardHeader>
-          
-          <CardContent className="px-7 pb-8 pt-4">
-            <form onSubmit={handleLogin} className="space-y-6">
-              <div className="space-y-2">
-                <Label
-                  htmlFor="login-email"
-                  className="text-sm font-semibold pl-1 text-zinc-700 dark:text-zinc-300/90"
-                >
-                  {loginMode === "email" ? "Email Address" : "School ID or Mobile Number"}
-                </Label>
-                <div className="relative group">
-                  <div className="absolute left-3.5 top-1/2 -translate-y-1/2 flex items-center gap-1 text-zinc-400 group-focus-within:text-rose-500 transition-colors duration-200">
-                    {loginMode === "email" ? (
-                      <Mail className="size-4" />
-                    ) : (
-                      <>
-                        <School className="size-4" />
-                        <span className="text-xs">/</span>
-                        <Phone className="size-4" />
-                      </>
-                    )}
+            </h2>
+          </div>
+
+          {/* Foreground Card */}
+          <div className="w-full rounded-[24px] bg-white border border-slate-100 shadow-xl shadow-sky-950/10 px-4.5 py-4 backdrop-blur-xs">
+            {renderForm()}
+          </div>
+        </div>
+
+        {/* Bottom Spacer revealing school illustration */}
+        <div className="w-full h-[120px] pointer-events-none shrink-0" />
+
+        {/* Mobile Copyright Footer */}
+        <footer className="w-full text-center pb-2 text-[10px] text-slate-700 font-medium drop-shadow-xs shrink-0 mt-auto">
+          © {new Date().getFullYear()} SchoolSaaS. All rights reserved.
+        </footer>
+      </div>
+
+      {/* ─── DESKTOP ─── */}
+      <div className="hidden lg:flex flex-col h-full relative z-10 w-full">
+        {/* Header */}
+        <header className="w-full px-8 lg:px-12 pt-4 flex items-center justify-end shrink-0">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" size="sm" className="h-8.5 px-3 rounded-full border-white/70 bg-white/90 text-xs font-medium text-slate-700 gap-1.5 shadow-md hover:bg-white">
+                <Globe className="size-3.5 text-slate-500" />
+                <span>{selectedLanguage}</span>
+                <ChevronDown className="size-3 text-slate-400 ml-0.5" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="rounded-xl min-w-[120px]">
+              <DropdownMenuItem onClick={() => setSelectedLanguage("English")} className="text-xs font-medium cursor-pointer">English</DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setSelectedLanguage("Urdu")} className="text-xs font-medium cursor-pointer">اردو (Urdu)</DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setSelectedLanguage("Arabic")} className="text-xs font-medium cursor-pointer">العربية (Arabic)</DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </header>
+
+        {/* Main */}
+        <main className="flex-1 flex items-stretch px-10 lg:px-16 xl:px-20 py-4 w-full min-h-0">
+          <div className="w-full max-w-7xl mx-auto flex items-stretch justify-between gap-10 xl:gap-16">
+
+            {/* Left — text top, stat card pinned to bottom */}
+            <div className="flex flex-col max-w-[480px] xl:max-w-[520px] self-stretch pt-0">
+              {/* Logo */}
+              <div className="mb-4">
+                <div className="size-24 rounded-3xl overflow-hidden shadow-xl border-[3px] border-white bg-white shrink-0">
+                  <Image src="/test.webp" alt="ParentLink School App" width={96} height={96} priority className="size-full object-cover scale-[1.28]" />
+                </div>
+              </div>
+
+              {/* Headline */}
+              <h2 className="text-base lg:text-lg font-bold text-slate-800 tracking-tight">Welcome to</h2>
+              <h1 className="text-4xl lg:text-5xl font-black tracking-tight mt-0.5">
+                <span className="text-slate-900">School</span>
+                <span className="text-blue-600">SaaS</span>
+              </h1>
+
+              {/* Feature Pills — glassmorphism */}
+              <div className="flex items-center gap-2.5 mt-4 flex-wrap">
+                <div className="flex items-center gap-2.5 px-4 py-2 rounded-2xl bg-white/30 backdrop-blur-md border border-white/60 shadow-md shadow-black/5">
+                  <div className="size-7 rounded-xl bg-emerald-100/80 text-emerald-600 flex items-center justify-center shrink-0 shadow-xs"><Users className="size-3.5" /></div>
+                  <span className="text-xs font-bold text-slate-800">Better Communication</span>
+                </div>
+                <div className="flex items-center gap-2.5 px-4 py-2 rounded-2xl bg-white/30 backdrop-blur-md border border-white/60 shadow-md shadow-black/5">
+                  <div className="size-7 rounded-xl bg-purple-100/80 text-purple-600 flex items-center justify-center shrink-0 shadow-xs"><BookOpen className="size-3.5" /></div>
+                  <span className="text-xs font-bold text-slate-800">Smarter Administration</span>
+                </div>
+                <div className="flex items-center gap-2.5 px-4 py-2 rounded-2xl bg-white/30 backdrop-blur-md border border-white/60 shadow-md shadow-black/5">
+                  <div className="size-7 rounded-xl bg-amber-100/80 text-amber-600 flex items-center justify-center shrink-0 shadow-xs"><ShieldCheck className="size-3.5" /></div>
+                  <span className="text-xs font-bold text-slate-800">Safer & More Organized</span>
+                </div>
+              </div>
+
+              {/* Stat Card — pinned to bottom, glassmorphism */}
+              <div className="flex items-center gap-7 px-7 py-4 rounded-2xl bg-white/30 backdrop-blur-md border border-white/60 shadow-lg shadow-black/10 w-fit mt-auto mb-4">
+                <div className="flex items-center gap-3">
+                  <div className="size-10 rounded-xl bg-emerald-100/80 text-emerald-600 flex items-center justify-center shrink-0 shadow-sm"><Users className="size-5" /></div>
+                  <div>
+                    <div className="text-sm font-black text-slate-900 leading-none">1000+</div>
+                    <div className="text-xs text-slate-600 mt-0.5 font-medium">Happy Students</div>
                   </div>
-                  <Input
-                    id="login-email"
-                    type="text"
-                    placeholder={loginMode === "email" ? "Email Address" : "School ID or Mobile"}
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    className={`bg-zinc-50/50 dark:bg-[#0c0c0e]/70 dark:border-zinc-800/60 dark:text-zinc-100 ${
-                      loginMode === "email" ? "pl-11" : "pl-16"
-                    } h-12 rounded-xl focus:ring-rose-500/15 focus:border-rose-500 dark:focus:ring-rose-500/20 dark:focus:border-rose-500/60 transition-all duration-200 placeholder:text-zinc-400/70`}
-                    autoComplete="username"
-                    required
-                  />
+                </div>
+                <div className="h-8 w-px bg-white/60" />
+                <div className="flex items-center gap-3">
+                  <div className="size-10 rounded-xl bg-blue-100/80 text-blue-600 flex items-center justify-center shrink-0 shadow-sm"><School className="size-5" /></div>
+                  <div>
+                    <div className="text-sm font-black text-slate-900 leading-none">50+</div>
+                    <div className="text-xs text-slate-600 mt-0.5 font-medium">Schools Trust Us</div>
+                  </div>
+                </div>
+                <div className="h-8 w-px bg-white/60" />
+                <div className="flex items-center gap-3">
+                  <div className="size-10 rounded-xl bg-amber-100/80 flex items-center justify-center shrink-0 shadow-sm"><Star className="size-5 fill-amber-400 text-amber-400" /></div>
+                  <div>
+                    <div className="text-sm font-black text-slate-900 leading-none">4.8</div>
+                    <div className="text-xs text-slate-600 mt-0.5 font-medium">User Satisfaction</div>
+                  </div>
                 </div>
               </div>
+            </div>
 
-              <div className="space-y-2">
-                <Label
-                  htmlFor="login-password"
-                  className="text-sm font-semibold pl-1 text-zinc-700 dark:text-zinc-300/90"
-                >
-                  Password
-                </Label>
-                <div className="relative group">
-                  <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 size-5 text-zinc-400 group-focus-within:text-rose-500 transition-colors duration-200" />
-                  <Input
-                    id="login-password"
-                    type={showPassword ? "text" : "password"}
-                    placeholder="••••••••"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    className="bg-zinc-50/50 dark:bg-[#0c0c0e]/70 dark:border-zinc-800/60 dark:text-zinc-100 pl-11 pr-11 h-12 rounded-xl focus:ring-rose-500/15 focus:border-rose-500 dark:focus:ring-rose-500/20 dark:focus:border-rose-500/60 transition-all duration-200 placeholder:text-zinc-400/70"
-                    autoComplete="current-password"
-                    required
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3.5 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-rose-500 transition-colors duration-200"
-                  >
-                    {showPassword ? (
-                      <EyeOff className="size-4" />
-                    ) : (
-                      <Eye className="size-4" />
-                    )}
-                  </button>
-                </div>
-                <div className="flex justify-end px-1 pt-1">
-                  <button
-                    type="button"
-                    onClick={() => (window.location.href = "/reset-password")}
-                    className="text-xs font-semibold text-rose-500 hover:text-rose-600 dark:text-rose-400/90 dark:hover:text-rose-300 transition-colors duration-200 cursor-pointer"
-                  >
-                    Forgot password?
-                  </button>
-                </div>
+            {/* Right — Outer Glassmorphic Card with Heading on Glass */}
+            <div className="relative w-full max-w-[390px] xl:max-w-[420px] shrink-0 self-center rounded-[38px] xl:rounded-[42px] bg-white/35 backdrop-blur-md border border-white/60 shadow-2xl shadow-sky-950/15 p-2.5 sm:p-3 pt-5 xl:pt-6 pb-3 xl:pb-3.5">
+              {/* Heading displayed directly on the frosted glass */}
+              <div className="text-center mb-3.5 xl:mb-4">
+                <h2 className="text-xl xl:text-2xl font-black tracking-tight text-slate-900">
+                  Login to your account
+                </h2>
               </div>
 
-              <div className="space-y-4">
-                <Button
-                  type="submit"
-                  disabled={loading}
-                  className="w-full bg-zinc-900 hover:bg-zinc-850 dark:bg-rose-600 dark:hover:bg-rose-500 text-white h-12 text-base font-bold rounded-xl shadow-lg shadow-rose-500/10 hover:shadow-rose-500/20 transition-all duration-250 active:scale-[0.97] cursor-pointer"
-                >
-                  {loading ? (
-                    <>
-                      <Loader2 className="size-5 mr-2 animate-spin" />
-                      Authenticating...
-                    </>
-                  ) : (
-                    "Sign In"
-                  )}
-                </Button>
-
-                <div className="flex justify-center pt-1">
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setLoginMode(loginMode === "email" ? "id" : "email");
-                      setEmail("");
-                    }}
-                    className="text-sm font-semibold text-rose-500 hover:text-rose-600 dark:text-rose-400/90 dark:hover:text-rose-300 transition-colors duration-200 cursor-pointer"
-                  >
-                    {loginMode === "email" ? "Login by School ID/Phone" : "Login by Email ID"}
-                  </button>
-                </div>
+              {/* Inner White Form Card */}
+              <div className="rounded-[30px] bg-white border border-slate-200/70 shadow-xl shadow-slate-300/30 p-6 xl:p-7 w-full">
+                {renderForm()}
               </div>
-            </form>
-          </CardContent>
-        </Card>
+            </div>
 
-        <p className="text-center text-xs mt-8 text-zinc-400 dark:text-zinc-600 font-medium">
-          For assistance, please contact your school administration.
-        </p>
+          </div>
+        </main>
+
+        {/* Footer */}
+        <footer className="w-full text-center py-2 text-[10px] text-white/70 shrink-0">
+          © {new Date().getFullYear()} SchoolSaaS. All rights reserved.
+        </footer>
       </div>
     </div>
   );
