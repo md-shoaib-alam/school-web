@@ -111,8 +111,8 @@ export function SidebarFooter({
       className={cn(
         isSuperAdmin
           ? cn(
-              "p-4 border-t border-rose-800/50",
-              !sidebarOpen && "flex items-center justify-center"
+              "p-3 border-t border-slate-200/80 dark:border-slate-800 space-y-3",
+              !sidebarOpen && "flex flex-col items-center justify-center p-2"
             )
           : isMinimal
             ? "mb-6 flex items-center justify-center mx-auto"
@@ -124,69 +124,39 @@ export function SidebarFooter({
               )
       )}
     >
-      {sidebarOpen && !isMinimal ? (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <div className="flex items-center gap-3 w-full cursor-pointer select-none group">
-              <Avatar className="size-9">
-                <AvatarImage src={currentUser.avatar} alt={currentUser.name} className="object-cover" />
-                <AvatarFallback
-                  className={cn(
-                    "text-white text-xs font-semibold",
-                    roleColors[currentUser.role],
-                  )}
-                >
-                  {initials}
-                </AvatarFallback>
-              </Avatar>
-              <div className="flex-1 min-w-0">
-                <p
-                  className={cn(
-                    "text-sm font-medium truncate",
-                    isSuperAdmin
-                      ? "text-white"
-                      : "text-zinc-900 dark:text-zinc-100",
-                  )}
-                >
-                  {currentUser.name}
-                </p>
-                <Badge
-                  variant="secondary"
-                  className={cn(
-                    "text-[10px] px-1.5 py-0",
-                    isSuperAdmin
-                      ? "bg-rose-800/60 text-rose-200 hover:bg-rose-800/60"
-                      : "",
-                  )}
-                >
-                  {currentUser.customRole?.name || roleLabels[currentUser.role]}
-                </Badge>
-              </div>
-
-              <div
-                className={cn(
-                  "size-8 flex items-center justify-center rounded-md transition-colors",
-                  isSuperAdmin
-                    ? "text-rose-300 group-hover:bg-rose-800/60 group-hover:text-white"
-                    : "text-zinc-400 group-hover:bg-zinc-100 dark:group-hover:bg-zinc-800 group-hover:text-zinc-700 dark:group-hover:text-zinc-200",
-                )}
-              >
-                <Settings className="size-4" />
-              </div>
+      {/* "Need Help?" widget matching reference image bottom left */}
+      {isSuperAdmin && sidebarOpen && (
+        <div className="rounded-2xl border border-blue-100 dark:border-blue-900/40 bg-blue-50/50 dark:bg-blue-950/30 p-3.5 space-y-2.5">
+          <div className="flex items-center gap-2.5">
+            <div className="size-8 rounded-full bg-blue-100 dark:bg-blue-900/50 flex items-center justify-center text-blue-600 dark:text-blue-400 shrink-0">
+              <svg className="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M3 18v-6a9 9 0 0 1 18 0v6" />
+                <path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z" />
+              </svg>
             </div>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="start" alignOffset={12} side="top" sideOffset={8} className="w-72">
-            {renderProfileInfo()}
-            <DropdownMenuSeparator />
-            {renderDropdownItems()}
-          </DropdownMenuContent>
-        </DropdownMenu>
-      ) : (
-        <div className="flex items-center justify-center">
+            <div>
+              <p className="font-bold text-xs text-slate-900 dark:text-slate-100 leading-tight">Need Help?</p>
+              <p className="text-[10px] text-slate-500 dark:text-slate-400 font-medium">Contact our support team</p>
+            </div>
+          </div>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => onNavigate("settings")}
+            className="w-full h-8 text-xs font-semibold rounded-xl bg-white dark:bg-slate-900 border-blue-200/80 dark:border-blue-800 text-blue-600 dark:text-blue-400 hover:bg-blue-50 hover:text-blue-700 shadow-2xs"
+          >
+            Help & Support
+          </Button>
+        </div>
+      )}
+
+      {/* For Super Admin, render the Help & Support widget only (profile is in header per reference) */}
+      {isSuperAdmin ? null : (
+        sidebarOpen && !isMinimal ? (
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button type="button" variant="ghost" className="p-0 size-11 rounded-full focus-visible:ring-0 hover:bg-transparent">
-                <Avatar className={cn("size-11 cursor-pointer hover:scale-105 transition-all shadow-lg ring-2 ring-white/20", isMinimal && "ring-white/40")}>
+              <div className="flex items-center gap-3 w-full cursor-pointer select-none group p-1.5 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800/60 transition-colors">
+                <Avatar className="size-9">
                   <AvatarImage src={currentUser.avatar} alt={currentUser.name} className="object-cover" />
                   <AvatarFallback
                     className={cn(
@@ -197,15 +167,52 @@ export function SidebarFooter({
                     {initials}
                   </AvatarFallback>
                 </Avatar>
-              </Button>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-semibold truncate text-zinc-900 dark:text-zinc-100">
+                    {currentUser.name}
+                  </p>
+                  <p className="text-[11px] text-slate-500 font-medium truncate">
+                    {currentUser.customRole?.name || roleLabels[currentUser.role]}
+                  </p>
+                </div>
+
+                <div className="size-8 flex items-center justify-center rounded-md transition-colors text-zinc-400 group-hover:bg-zinc-100 dark:group-hover:bg-zinc-800 group-hover:text-zinc-700 dark:group-hover:text-zinc-200">
+                  <Settings className="size-4" />
+                </div>
+              </div>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align={isMinimal ? "center" : "start"} side={isMinimal ? "right" : "bottom"} className="w-72 ml-2">
+            <DropdownMenuContent align="start" alignOffset={12} side="top" sideOffset={8} className="w-72">
               {renderProfileInfo()}
               <DropdownMenuSeparator />
               {renderDropdownItems()}
             </DropdownMenuContent>
           </DropdownMenu>
-        </div>
+        ) : (
+          <div className="flex items-center justify-center">
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button type="button" variant="ghost" className="p-0 size-11 rounded-full focus-visible:ring-0 hover:bg-transparent">
+                  <Avatar className={cn("size-11 cursor-pointer hover:scale-105 transition-all shadow-lg ring-2 ring-white/20", isMinimal && "ring-white/40")}>
+                    <AvatarImage src={currentUser.avatar} alt={currentUser.name} className="object-cover" />
+                    <AvatarFallback
+                      className={cn(
+                        "text-white text-xs font-semibold",
+                        roleColors[currentUser.role],
+                      )}
+                    >
+                      {initials}
+                    </AvatarFallback>
+                  </Avatar>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align={isMinimal ? "center" : "start"} side={isMinimal ? "right" : "bottom"} className="w-72 ml-2">
+                {renderProfileInfo()}
+                <DropdownMenuSeparator />
+                {renderDropdownItems()}
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
+        )
       )}
     </div>
   );

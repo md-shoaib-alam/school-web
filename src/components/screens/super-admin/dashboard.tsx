@@ -57,7 +57,7 @@ export function SuperAdminDashboard() {
 
   return (
     <div className="space-y-6 pb-12">
-      <DashboardHero loading={loading} data={data} />
+      <DashboardHero loading={loading} data={data} onNavigate={handleNavigate} />
 
       <StatusCards
         loading={loading}
@@ -65,9 +65,15 @@ export function SuperAdminDashboard() {
         onNavigate={handleNavigate}
       />
 
-      <GrowthCharts loading={loading} data={data} />
-
-      <TopPerformance loading={loading} data={data} />
+      {/* Bottom Grid: Recent Schools (7 cols) & Platform Insights (5 cols) */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
+        <div className="lg:col-span-7">
+          <TopPerformance loading={loading} data={data} onNavigate={handleNavigate} />
+        </div>
+        <div className="lg:col-span-5">
+          <GrowthCharts loading={loading} data={data} />
+        </div>
+      </div>
     </div>
   );
 }

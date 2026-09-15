@@ -33,6 +33,9 @@ export interface DashboardData {
     name: string;
     plan: string;
     logo: string | null;
+    status?: string;
+    address?: string | null;
+    createdAt?: string;
     totalRevenue: number;
     studentCount: number;
     _count: {

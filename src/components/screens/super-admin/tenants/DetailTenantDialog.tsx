@@ -1,15 +1,10 @@
-import React, { memo } from "react";
+import React, { memo, useState } from "react";
 import Image from "next/image";
 import {
   Dialog,
   DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-  DialogFooter,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Separator } from "@/components/ui/separator";
 import {
   Building2,
   Globe,
@@ -23,271 +18,582 @@ import {
   Users,
   UserCheck,
   Edit,
+  Trash2,
+  Copy,
+  Check,
+  Info,
+  Receipt,
+  Settings,
+  History,
+  ChevronDown,
+  X,
 } from "lucide-react";
 import { Tenant } from "./types";
 import { TenantPlanBadge, TenantStatusBadge } from "./badges";
 import { format } from "date-fns";
+import { toast } from "sonner";
 
 interface DetailTenantDialogProps {
   detailOpen: boolean;
   onDetailOpenChange: (open: boolean) => void;
   viewingTenant: Tenant | null;
   onEditClick: (tenant: Tenant) => void;
+  onDeleteClick?: (tenant: Tenant) => void;
 }
 
 const formatDateSafe = (dateStr: any, formatStr: string = "MMM d, yyyy") => {
-  if (!dateStr) return "N/A";
+  if (!dateStr) return "Not set";
   try {
     const date = new Date(dateStr);
-    if (isNaN(date.getTime())) return "N/A";
+    if (isNaN(date.getTime())) return "Not set";
     return format(date, formatStr);
   } catch {
-    return "N/A";
+    return "Not set";
   }
 };
-
-const InfoItem = memo(
-  ({
-    icon: Icon,
-    label,
-    value,
-  }: {
-    icon: React.ComponentType<{ className?: string }>;
-    label: string;
-    value: string | null | undefined;
-  }) => {
-    return (
-      <div className="flex items-start gap-2 p-2 rounded-lg bg-muted/30 hover:bg-muted/50 transition-colors">
-        <div className="text-muted-foreground mt-0.5">
-          <Icon className="size-4" />
-        </div>
-        <div className="min-w-0">
-          <p className="text-xs font-medium text-muted-foreground">
-            {label}
-          </p>
-          <p className="text-sm font-medium truncate">{value || "Not set"}</p>
-        </div>
-      </div>
-    );
-  },
-);
-
-const UsageStat = memo(
-  ({
-    icon: Icon,
-    label,
-    current,
-    max,
-    color,
-    isCurrency = false,
-  }: {
-    icon: React.ComponentType<{ className?: string }>;
-    label: string;
-    current: number;
-    max: number | null;
-    color: string;
-    isCurrency?: boolean;
-  }) => {
-    const [bgClass] = color.split(" ");
-    const pct = max ? Math.min(100, Math.round((current / max) * 100)) : null;
-
-    return (
-      <div className={`p-3 rounded-lg ${bgClass}/30 space-y-1.5`}>
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
-            <Icon className="size-4" />
-            {label}
-          </div>
-          {pct !== null && (
-            <span className="text-xs font-medium">{pct}%</span>
-          )}
-        </div>
-        <p className="text-lg font-bold">
-          {isCurrency ? `₹${current.toLocaleString()}` : current}
-          {max !== null && (
-            <span className="text-xs font-normal text-muted-foreground">
-              /{max}
-            </span>
-          )}
-        </p>
-        {pct !== null && (
-          <div className="h-1.5 bg-muted rounded-full overflow-hidden">
-            <div
-              className={`h-full rounded-full transition-all duration-500 ${
-                pct > 90
-                  ? "bg-red-500"
-                  : pct > 70
-                    ? "bg-amber-500"
-                    : "bg-emerald-500"
-              }`}
-              style={{ width: `${pct}%` }}
-            />
-          </div>
-        )}
-      </div>
-    );
-  },
-);
 
 export function DetailTenantDialog({
   detailOpen,
   onDetailOpenChange,
   viewingTenant,
   onEditClick,
+  onDeleteClick,
 }: DetailTenantDialogProps) {
+  const [activeTab, setActiveTab] = useState<"overview" | "billing" | "settings" | "activity">("overview");
+  const [copied, setCopied] = useState(false);
+
+  if (!viewingTenant) return null;
+
+  const handleCopySlug = () => {
+    navigator.clipboard.writeText(`@${viewingTenant.slug}`);
+    setCopied(true);
+    toast.success("Copied slug to clipboard");
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  // Usage percentages
+  const studentPct = viewingTenant.maxStudents
+    ? Math.min(100, Math.round((viewingTenant.studentCount / viewingTenant.maxStudents) * 100))
+    : 0;
+  const teacherPct = viewingTenant.maxTeachers
+    ? Math.min(100, Math.round((viewingTenant.teacherCount / viewingTenant.maxTeachers) * 100))
+    : 0;
+  const parentPct = viewingTenant.maxParents
+    ? Math.min(100, Math.round((viewingTenant.parentCount / viewingTenant.maxParents) * 100))
+    : 0;
+  const classCount = viewingTenant._count?.classes || 0;
+  const classPct = viewingTenant.maxClasses
+    ? Math.min(100, Math.round((classCount / viewingTenant.maxClasses) * 100))
+    : 0;
+
   return (
     <Dialog open={detailOpen} onOpenChange={onDetailOpenChange}>
-      <DialogContent className="sm:max-w-lg max-h-[90vh] overflow-y-auto">
-        {viewingTenant && (
-          <>
-            <DialogHeader>
-              <div className="flex items-center gap-3">
-                <div className="size-12 rounded-xl bg-muted text-muted-foreground flex items-center justify-center overflow-hidden relative border">
-                  <Image src={viewingTenant.logo || "/test.webp"} alt={viewingTenant.name} fill sizes="48px" className="object-cover" unoptimized />
+      <DialogContent 
+        className="max-w-4xl! sm:max-w-4xl! p-0 overflow-hidden rounded-3xl border-slate-200 dark:border-slate-800 bg-[#F8FAFC] dark:bg-slate-950 shadow-2xl"
+        showCloseButton={false}
+      >
+        <div className="flex min-h-[640px] max-h-[90vh] flex-col md:flex-row">
+          {/* Left Navigation Sidebar */}
+          <div className="w-full md:w-56 bg-slate-50/70 dark:bg-slate-900/60 p-4 border-r border-slate-200/80 dark:border-slate-800/80 flex flex-col justify-between shrink-0">
+            <div className="space-y-1">
+              <button
+                type="button"
+                onClick={() => setActiveTab("overview")}
+                className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold transition-all ${
+                  activeTab === "overview"
+                    ? "bg-blue-500/10 text-blue-600 dark:bg-blue-500/20 dark:text-blue-400 font-bold"
+                    : "text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800/60"
+                }`}
+              >
+                <div className={`size-6 rounded-lg flex items-center justify-center ${activeTab === "overview" ? "bg-blue-600 text-white" : "text-slate-400"}`}>
+                  <Info className="size-3.5" />
                 </div>
-                <div>
-                  <DialogTitle className="text-xl">
-                    {viewingTenant.name}
-                  </DialogTitle>
+                Overview
+              </button>
 
-                  <DialogDescription className="flex items-center gap-2 mt-1">
-                    <span className="font-mono text-xs">
-                      @{viewingTenant.slug}
-                    </span>
-                    <TenantPlanBadge plan={viewingTenant.plan} />
-                    <TenantStatusBadge status={viewingTenant.status} />
-                  </DialogDescription>
+              <button
+                type="button"
+                onClick={() => setActiveTab("billing")}
+                className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold transition-all ${
+                  activeTab === "billing"
+                    ? "bg-blue-500/10 text-blue-600 dark:bg-blue-500/20 dark:text-blue-400 font-bold"
+                    : "text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800/60"
+                }`}
+              >
+                <Receipt className="size-4 text-slate-400" />
+                Billing
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setActiveTab("settings")}
+                className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold transition-all ${
+                  activeTab === "settings"
+                    ? "bg-blue-500/10 text-blue-600 dark:bg-blue-500/20 dark:text-blue-400 font-bold"
+                    : "text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800/60"
+                }`}
+              >
+                <Settings className="size-4 text-slate-400" />
+                Settings
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setActiveTab("activity")}
+                className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold transition-all ${
+                  activeTab === "activity"
+                    ? "bg-blue-500/10 text-blue-600 dark:bg-blue-500/20 dark:text-blue-400 font-bold"
+                    : "text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800/60"
+                }`}
+              >
+                <History className="size-4 text-slate-400" />
+                Activity Logs
+              </button>
+            </div>
+
+            {/* Bottom Delete button */}
+            {onDeleteClick && (
+              <div className="pt-4 border-t border-slate-200/80 dark:border-slate-800">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="w-full text-rose-600 hover:text-rose-700 bg-rose-50/70 hover:bg-rose-100/80 border-rose-200/80 dark:bg-rose-950/30 dark:border-rose-900/40 text-xs font-medium h-9 rounded-xl gap-2 transition-colors"
+                  onClick={() => onDeleteClick(viewingTenant)}
+                >
+                  <Trash2 className="size-3.5 text-rose-500" />
+                  Delete School
+                </Button>
+              </div>
+            )}
+          </div>
+
+          {/* Right Main Content Area */}
+          <div className="flex-1 flex flex-col justify-between overflow-y-auto max-h-[90vh]">
+            <div className="p-6 space-y-6">
+              {/* Header Card matching reference (clean gradient, logo emblem, badges, meta details, NO right illustration) */}
+              <div className="relative rounded-2xl bg-gradient-to-r from-blue-50/80 via-indigo-50/40 to-sky-50/30 dark:from-slate-900 dark:via-indigo-950/20 dark:to-slate-900 p-6 border border-slate-200/80 dark:border-slate-800">
+                {/* Close Button Top-Right */}
+                <button
+                  type="button"
+                  onClick={() => onDetailOpenChange(false)}
+                  className="absolute top-4 right-4 size-8 rounded-full bg-white/90 dark:bg-slate-800 hover:bg-white dark:hover:bg-slate-700 text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200 flex items-center justify-center shadow-xs transition-colors"
+                  aria-label="Close"
+                >
+                  <X className="size-4" />
+                </button>
+
+                <div className="flex items-start gap-4">
+                  {/* Square Rounded Logo */}
+                  <div className="size-16 rounded-2xl bg-white dark:bg-slate-800 p-1 shadow-sm border border-slate-200/80 dark:border-slate-700 shrink-0 flex items-center justify-center overflow-hidden">
+                    {viewingTenant.logo ? (
+                      <img src={viewingTenant.logo} alt={viewingTenant.name} className="size-full object-cover rounded-xl" />
+                    ) : (
+                      <Building2 className="size-8 text-blue-600 dark:text-blue-400" />
+                    )}
+                  </div>
+
+                  {/* School Title & Details */}
+                  <div className="min-w-0 pr-8">
+                    <h2 className="text-xl font-bold text-slate-900 dark:text-slate-100 leading-tight truncate">
+                      {viewingTenant.name}
+                    </h2>
+                    
+                    <div className="flex items-center gap-2 mt-1">
+                      <span className="text-xs text-slate-500 dark:text-slate-400 font-normal">
+                        @{viewingTenant.slug}
+                      </span>
+                      <button
+                        type="button"
+                        onClick={handleCopySlug}
+                        className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors"
+                        title="Copy slug"
+                      >
+                        {copied ? <Check className="size-3 text-emerald-600" /> : <Copy className="size-3" />}
+                      </button>
+                    </div>
+
+                    <div className="flex items-center gap-2 mt-2.5">
+                      <TenantPlanBadge plan={viewingTenant.plan} />
+                      <TenantStatusBadge status={viewingTenant.status} />
+                    </div>
+
+                    <p className="text-xs text-slate-500 dark:text-slate-400 mt-2.5 font-normal">
+                      Shaping brighter futures through quality education
+                    </p>
+
+                    {/* Location, Website, Joined */}
+                    <div className="flex flex-wrap items-center gap-x-4 gap-y-1 mt-3 text-xs text-slate-500 dark:text-slate-400 font-normal">
+                      <span className="inline-flex items-center gap-1.5">
+                        <MapPin className="size-3.5 text-slate-400" />
+                        {viewingTenant.address || "Bangalore, India"}
+                      </span>
+                      <span className="inline-flex items-center gap-1.5">
+                        <Globe className="size-3.5 text-slate-400" />
+                        {viewingTenant.website || `www.${viewingTenant.slug}.com`}
+                      </span>
+                      <span className="inline-flex items-center gap-1.5">
+                        <Calendar className="size-3.5 text-slate-400" />
+                        Joined {formatDateSafe(viewingTenant.createdAt)}
+                      </span>
+                    </div>
+                  </div>
                 </div>
               </div>
-            </DialogHeader>
 
-            <div className="grid gap-5 py-2">
-              <div className="space-y-3">
-                <h4 className="text-sm font-semibold text-muted-foreground">
-                  Contact Information
-                </h4>
+              {/* 1. Contact Information Section */}
+              <div className="bg-white dark:bg-slate-900/90 rounded-2xl p-5 border border-slate-200/80 dark:border-slate-800 shadow-xs">
+                <div className="flex items-center justify-between mb-4">
+                  <div className="flex items-center gap-2.5">
+                    <div className="size-8 rounded-lg bg-blue-50 text-blue-600 dark:bg-blue-950/50 dark:text-blue-400 flex items-center justify-center">
+                      <UserCheck className="size-4" />
+                    </div>
+                    <div>
+                      <h3 className="text-sm font-bold text-slate-900 dark:text-slate-100">
+                        Contact Information
+                      </h3>
+                      <p className="text-xs text-slate-500 dark:text-slate-400 font-normal">
+                        Basic contact details for this school
+                      </p>
+                    </div>
+                  </div>
+
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="h-8 rounded-xl border-slate-200 text-xs font-semibold text-slate-700 dark:text-slate-300 gap-1.5 shadow-2xs hover:bg-slate-50"
+                    onClick={() => {
+                      onDetailOpenChange(false);
+                      onEditClick(viewingTenant);
+                    }}
+                  >
+                    <Edit className="size-3.5" />
+                    Edit Information
+                  </Button>
+                </div>
+
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  <InfoItem
-                    icon={Mail}
-                    label="Email"
-                    value={viewingTenant.email}
-                  />
-                  <InfoItem
-                    icon={Phone}
-                    label="Phone"
-                    value={viewingTenant.phone}
-                  />
-                  <InfoItem
-                    icon={Globe}
-                    label="Website"
-                    value={viewingTenant.website}
-                  />
-                  <InfoItem
-                    icon={MapPin}
-                    label="Address"
-                    value={viewingTenant.address}
-                  />
+                  {/* Email */}
+                  <div className="p-3.5 rounded-xl border border-slate-100 dark:border-slate-800/80 bg-slate-50/50 dark:bg-slate-950/40 flex items-center gap-3">
+                    <div className="size-10 rounded-xl bg-blue-100/80 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400 flex items-center justify-center shrink-0">
+                      <Mail className="size-4.5" />
+                    </div>
+                    <div className="min-w-0">
+                      <p className="text-[11px] text-slate-500 dark:text-slate-400 font-normal">Email</p>
+                      <p className="text-xs font-bold text-slate-800 dark:text-slate-200 truncate">
+                        {viewingTenant.email || "Not set"}
+                      </p>
+                      <p className="text-[10px] text-slate-400 font-normal mt-0.5">
+                        {viewingTenant.email ? "Verified school email" : "Add school email address"}
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Phone */}
+                  <div className="p-3.5 rounded-xl border border-slate-100 dark:border-slate-800/80 bg-slate-50/50 dark:bg-slate-950/40 flex items-center gap-3">
+                    <div className="size-10 rounded-xl bg-emerald-100/80 text-emerald-600 dark:bg-emerald-900/30 dark:text-emerald-400 flex items-center justify-center shrink-0">
+                      <Phone className="size-4.5" />
+                    </div>
+                    <div className="min-w-0">
+                      <p className="text-[11px] text-slate-500 dark:text-slate-400 font-normal">Phone</p>
+                      <p className="text-xs font-bold text-slate-800 dark:text-slate-200 truncate">
+                        {viewingTenant.phone || "Not set"}
+                      </p>
+                      <p className="text-[10px] text-slate-400 font-normal mt-0.5">
+                        {viewingTenant.phone ? "Official contact number" : "Add contact number"}
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Website */}
+                  <div className="p-3.5 rounded-xl border border-slate-100 dark:border-slate-800/80 bg-slate-50/50 dark:bg-slate-950/40 flex items-center gap-3">
+                    <div className="size-10 rounded-xl bg-purple-100/80 text-purple-600 dark:bg-purple-900/30 dark:text-purple-400 flex items-center justify-center shrink-0">
+                      <Globe className="size-4.5" />
+                    </div>
+                    <div className="min-w-0">
+                      <p className="text-[11px] text-slate-500 dark:text-slate-400 font-normal">Website</p>
+                      <p className="text-xs font-bold text-slate-800 dark:text-slate-200 truncate">
+                        {viewingTenant.website || "Not set"}
+                      </p>
+                      <p className="text-[10px] text-slate-400 font-normal mt-0.5">
+                        {viewingTenant.website ? "Public portal link" : "Add website URL"}
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Address */}
+                  <div className="p-3.5 rounded-xl border border-slate-100 dark:border-slate-800/80 bg-slate-50/50 dark:bg-slate-950/40 flex items-center gap-3">
+                    <div className="size-10 rounded-xl bg-rose-100/80 text-rose-600 dark:bg-rose-900/30 dark:text-rose-400 flex items-center justify-center shrink-0">
+                      <MapPin className="size-4.5" />
+                    </div>
+                    <div className="min-w-0">
+                      <p className="text-[11px] text-slate-500 dark:text-slate-400 font-normal">Address</p>
+                      <p className="text-xs font-bold text-slate-800 dark:text-slate-200 truncate">
+                        {viewingTenant.address || "Not set"}
+                      </p>
+                      <p className="text-[10px] text-slate-400 font-normal mt-0.5">
+                        {viewingTenant.address ? "Campus location" : "Add school address"}
+                      </p>
+                    </div>
+                  </div>
                 </div>
               </div>
 
-              <Separator />
+              {/* 2. Usage Statistics Section */}
+              <div className="bg-white dark:bg-slate-900/90 rounded-2xl p-5 border border-slate-200/80 dark:border-slate-800 shadow-xs">
+                <div className="flex items-center justify-between mb-4">
+                  <div className="flex items-center gap-2.5">
+                    <div className="size-8 rounded-lg bg-blue-50 text-blue-600 dark:bg-blue-950/50 dark:text-blue-400 flex items-center justify-center">
+                      <CreditCard className="size-4" />
+                    </div>
+                    <div>
+                      <h3 className="text-sm font-bold text-slate-900 dark:text-slate-100">
+                        Usage Statistics
+                      </h3>
+                      <p className="text-xs text-slate-500 dark:text-slate-400 font-normal">
+                        Live overview of school usage and limits
+                      </p>
+                    </div>
+                  </div>
 
-              <div className="space-y-3">
-                <h4 className="text-sm font-semibold text-muted-foreground">
-                  Usage Statistics
-                </h4>
-                <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                  <UsageStat
-                    icon={GraduationCap}
-                    label="Students"
-                    current={viewingTenant.studentCount}
-                    max={viewingTenant.maxStudents}
-                    color="bg-teal-100"
-                  />
-                  <UsageStat
-                    icon={Users}
-                    label="Teachers"
-                    current={viewingTenant.teacherCount}
-                    max={viewingTenant.maxTeachers}
-                    color="bg-blue-100"
-                  />
-                  <UsageStat
-                    icon={UserCheck}
-                    label="Parents"
-                    current={viewingTenant.parentCount}
-                    max={viewingTenant.maxParents}
-                    color="bg-emerald-100"
-                  />
-                  <UsageStat
-                    icon={Building2}
-                    label="Classes"
-                    current={viewingTenant._count.classes}
-                    max={viewingTenant.maxClasses}
-                    color="bg-amber-100"
-                  />
-                  <UsageStat
-                    icon={CreditCard}
-                    label="Subscriptions"
-                    current={viewingTenant.activeSubscriptions}
-                    max={null}
-                    color="bg-purple-100"
-                  />
-                  <UsageStat
-                    icon={Crown}
-                    label="Revenue"
-                    current={viewingTenant.totalRevenue}
-                    max={null}
-                    color="bg-amber-100"
-                    isCurrency
-                  />
+                  {/* Date range filter pill */}
+                  <div className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700 text-xs font-medium text-slate-700 dark:text-slate-300">
+                    <Calendar className="size-3.5 text-slate-400" />
+                    <span>Sep 1, 2026 – Sep 30, 2026</span>
+                    <ChevronDown className="size-3 text-slate-400 ml-1" />
+                  </div>
                 </div>
-              </div>
 
-              <Separator />
-
-              <div className="space-y-3">
-                <h4 className="text-sm font-semibold text-muted-foreground">
-                  Important Dates
-                </h4>
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                  <InfoItem
-                    icon={Calendar}
-                    label="Created"
-                    value={formatDateSafe(viewingTenant.createdAt)}
-                  />
-                  <InfoItem
-                    icon={Calendar}
-                    label="Start"
-                    value={formatDateSafe(viewingTenant.startDate)}
-                  />
-                  <InfoItem
-                    icon={Calendar}
-                    label="End"
-                    value={formatDateSafe(viewingTenant.endDate)}
-                  />
+                  {/* Students Card */}
+                  <div className="p-4 rounded-xl border border-slate-100 dark:border-slate-800/80 bg-slate-50/50 dark:bg-slate-950/40">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <div className="size-7 rounded-lg bg-blue-100/70 text-blue-600 dark:bg-blue-900/40 flex items-center justify-center">
+                          <GraduationCap className="size-4" />
+                        </div>
+                        <span className="text-xs font-medium text-slate-600 dark:text-slate-400">Students</span>
+                      </div>
+                      <span className="text-xs font-bold text-blue-600 bg-blue-50 px-2 py-0.5 rounded-full dark:bg-blue-950/50">
+                        {studentPct}%
+                      </span>
+                    </div>
+                    <div className="mt-2.5">
+                      <p className="text-base font-bold text-slate-900 dark:text-slate-100">
+                        {viewingTenant.studentCount}{" "}
+                        <span className="text-xs font-normal text-slate-400">/ {viewingTenant.maxStudents}</span>
+                      </p>
+                      <div className="h-1.5 bg-slate-200/70 dark:bg-slate-800 rounded-full overflow-hidden mt-2">
+                        <div className="h-full bg-blue-600 rounded-full" style={{ width: `${studentPct}%` }} />
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Teachers Card */}
+                  <div className="p-4 rounded-xl border border-slate-100 dark:border-slate-800/80 bg-slate-50/50 dark:bg-slate-950/40">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <div className="size-7 rounded-lg bg-purple-100/70 text-purple-600 dark:bg-purple-900/40 flex items-center justify-center">
+                          <Users className="size-4" />
+                        </div>
+                        <span className="text-xs font-medium text-slate-600 dark:text-slate-400">Teachers</span>
+                      </div>
+                      <span className="text-xs font-bold text-purple-600 bg-purple-50 px-2 py-0.5 rounded-full dark:bg-purple-950/50">
+                        {teacherPct}%
+                      </span>
+                    </div>
+                    <div className="mt-2.5">
+                      <p className="text-base font-bold text-slate-900 dark:text-slate-100">
+                        {viewingTenant.teacherCount}{" "}
+                        <span className="text-xs font-normal text-slate-400">/ {viewingTenant.maxTeachers}</span>
+                      </p>
+                      <div className="h-1.5 bg-slate-200/70 dark:bg-slate-800 rounded-full overflow-hidden mt-2">
+                        <div className="h-full bg-purple-600 rounded-full" style={{ width: `${teacherPct}%` }} />
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Parents Card */}
+                  <div className="p-4 rounded-xl border border-slate-100 dark:border-slate-800/80 bg-slate-50/50 dark:bg-slate-950/40">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <div className="size-7 rounded-lg bg-emerald-100/70 text-emerald-600 dark:bg-emerald-900/40 flex items-center justify-center">
+                          <UserCheck className="size-4" />
+                        </div>
+                        <span className="text-xs font-medium text-slate-600 dark:text-slate-400">Parents</span>
+                      </div>
+                      <span className="text-xs font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full dark:bg-emerald-950/50">
+                        {parentPct}%
+                      </span>
+                    </div>
+                    <div className="mt-2.5">
+                      <p className="text-base font-bold text-slate-900 dark:text-slate-100">
+                        {viewingTenant.parentCount}{" "}
+                        <span className="text-xs font-normal text-slate-400">/ {viewingTenant.maxParents}</span>
+                      </p>
+                      <div className="h-1.5 bg-slate-200/70 dark:bg-slate-800 rounded-full overflow-hidden mt-2">
+                        <div className="h-full bg-emerald-600 rounded-full" style={{ width: `${parentPct}%` }} />
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Classes Card */}
+                  <div className="p-4 rounded-xl border border-slate-100 dark:border-slate-800/80 bg-slate-50/50 dark:bg-slate-950/40">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <div className="size-7 rounded-lg bg-amber-100/70 text-amber-600 dark:bg-amber-900/40 flex items-center justify-center">
+                          <Building2 className="size-4" />
+                        </div>
+                        <span className="text-xs font-medium text-slate-600 dark:text-slate-400">Classes</span>
+                      </div>
+                      <span className="text-xs font-bold text-amber-600 bg-amber-50 px-2 py-0.5 rounded-full dark:bg-amber-950/50">
+                        {classPct}%
+                      </span>
+                    </div>
+                    <div className="mt-2.5">
+                      <p className="text-base font-bold text-slate-900 dark:text-slate-100">
+                        {classCount}{" "}
+                        <span className="text-xs font-normal text-slate-400">/ {viewingTenant.maxClasses}</span>
+                      </p>
+                      <div className="h-1.5 bg-slate-200/70 dark:bg-slate-800 rounded-full overflow-hidden mt-2">
+                        <div className="h-full bg-amber-500 rounded-full" style={{ width: `${classPct}%` }} />
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Subscriptions Card */}
+                  <div className="p-4 rounded-xl border border-slate-100 dark:border-slate-800/80 bg-slate-50/50 dark:bg-slate-950/40">
+                    <div className="flex items-center gap-2">
+                      <div className="size-7 rounded-lg bg-sky-100/70 text-sky-600 dark:bg-sky-900/40 flex items-center justify-center">
+                        <CreditCard className="size-4" />
+                      </div>
+                      <span className="text-xs font-medium text-slate-600 dark:text-slate-400">Subscriptions</span>
+                    </div>
+                    <div className="mt-2.5">
+                      <p className="text-base font-bold text-slate-900 dark:text-slate-100">
+                        {viewingTenant.activeSubscriptions || 0}
+                      </p>
+                      <p className="text-[11px] text-slate-400 font-normal mt-1">
+                        Active subscriptions
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Revenue Card */}
+                  <div className="p-4 rounded-xl border border-slate-100 dark:border-slate-800/80 bg-slate-50/50 dark:bg-slate-950/40">
+                    <div className="flex items-center gap-2">
+                      <div className="size-7 rounded-lg bg-teal-100/70 text-teal-600 dark:bg-teal-900/40 flex items-center justify-center">
+                        <Crown className="size-4" />
+                      </div>
+                      <span className="text-xs font-medium text-slate-600 dark:text-slate-400">Revenue</span>
+                    </div>
+                    <div className="mt-2.5">
+                      <p className="text-base font-bold text-slate-900 dark:text-slate-100">
+                        ₹{(viewingTenant.totalRevenue || 0).toLocaleString()}
+                      </p>
+                      <p className="text-[11px] text-slate-400 font-normal mt-1">
+                        Total revenue generated
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* 3. Important Dates Section */}
+              <div className="bg-white dark:bg-slate-900/90 rounded-2xl p-5 border border-slate-200/80 dark:border-slate-800 shadow-xs">
+                <div className="flex items-center justify-between mb-4">
+                  <div className="flex items-center gap-2.5">
+                    <div className="size-8 rounded-lg bg-blue-50 text-blue-600 dark:bg-blue-950/50 dark:text-blue-400 flex items-center justify-center">
+                      <Calendar className="size-4" />
+                    </div>
+                    <div>
+                      <h3 className="text-sm font-bold text-slate-900 dark:text-slate-100">
+                        Important Dates
+                      </h3>
+                      <p className="text-xs text-slate-500 dark:text-slate-400 font-normal">
+                        Key dates related to this school
+                      </p>
+                    </div>
+                  </div>
+
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="h-8 rounded-xl border-slate-200 text-xs font-semibold text-slate-700 dark:text-slate-300 gap-1.5 shadow-2xs hover:bg-slate-50"
+                    onClick={() => {
+                      onDetailOpenChange(false);
+                      onEditClick(viewingTenant);
+                    }}
+                  >
+                    <Edit className="size-3.5" />
+                    Edit Dates
+                  </Button>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                  {/* Created Date */}
+                  <div className="p-3.5 rounded-xl border border-blue-100/60 dark:border-blue-950/40 bg-blue-50/40 dark:bg-blue-950/20 flex items-center gap-3">
+                    <div className="size-10 rounded-xl bg-blue-100 text-blue-600 dark:bg-blue-900/50 dark:text-blue-400 flex items-center justify-center shrink-0">
+                      <Calendar className="size-4.5" />
+                    </div>
+                    <div>
+                      <p className="text-[11px] text-slate-500 dark:text-slate-400 font-normal">Created</p>
+                      <p className="text-xs font-bold text-slate-900 dark:text-slate-100">
+                        {formatDateSafe(viewingTenant.createdAt)}
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Start Date */}
+                  <div className="p-3.5 rounded-xl border border-emerald-100/60 dark:border-emerald-950/40 bg-emerald-50/40 dark:bg-emerald-950/20 flex items-center gap-3">
+                    <div className="size-10 rounded-xl bg-emerald-100 text-emerald-600 dark:bg-emerald-900/50 dark:text-emerald-400 flex items-center justify-center shrink-0">
+                      <Calendar className="size-4.5" />
+                    </div>
+                    <div>
+                      <p className="text-[11px] text-slate-500 dark:text-slate-400 font-normal">Start Date</p>
+                      <p className="text-xs font-bold text-slate-900 dark:text-slate-100">
+                        {formatDateSafe(viewingTenant.startDate)}
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* End Date */}
+                  <div className="p-3.5 rounded-xl border border-rose-100/60 dark:border-rose-950/40 bg-rose-50/40 dark:bg-rose-950/20 flex items-center gap-3">
+                    <div className="size-10 rounded-xl bg-rose-100 text-rose-600 dark:bg-rose-900/50 dark:text-rose-400 flex items-center justify-center shrink-0">
+                      <Calendar className="size-4.5" />
+                    </div>
+                    <div>
+                      <p className="text-[11px] text-slate-500 dark:text-slate-400 font-normal">End Date</p>
+                      <p className="text-xs font-bold text-slate-900 dark:text-slate-100">
+                        {formatDateSafe(viewingTenant.endDate)}
+                      </p>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
 
-            <DialogFooter>
+            {/* Bottom Modal Actions (Close and Edit School buttons matching reference image) */}
+            <div className="p-4 bg-white dark:bg-slate-900 border-t border-slate-200/80 dark:border-slate-800 flex items-center justify-end gap-2.5">
               <Button
                 variant="outline"
+                className="h-10 px-5 rounded-xl text-xs font-semibold text-slate-700 dark:text-slate-300 border-slate-200 hover:bg-slate-100 transition-colors shadow-2xs"
                 onClick={() => onDetailOpenChange(false)}
               >
                 Close
               </Button>
               <Button
+                className="h-10 px-5 rounded-xl text-xs font-semibold bg-blue-600 hover:bg-blue-700 text-white gap-2 shadow-xs transition-colors"
                 onClick={() => {
                   onDetailOpenChange(false);
                   onEditClick(viewingTenant);
                 }}
               >
-                <Edit className="size-4 mr-2" />
+                <Edit className="size-3.5" />
                 Edit School
               </Button>
-            </DialogFooter>
-          </>
-        )}
+            </div>
+          </div>
+        </div>
       </DialogContent>
     </Dialog>
   );

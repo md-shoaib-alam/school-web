@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useReducer, useState } from "react";
+import { useEffect, useMemo, useReducer, useState } from "react";
 import { SchoolDetail } from "./school-detail";
 import {
   useTenants,
@@ -19,7 +19,8 @@ import { TenantFilters } from "./tenants/TenantFilters";
 import { TenantTable } from "./tenants/TenantTable";
 import { TenantDialogs } from "./tenants/TenantDialogs";
 import { useSearchParams, useRouter, usePathname } from "next/navigation";
-import { useEffect } from "react";
+import { Button } from "@/components/ui/button";
+import { Plus, Shield } from "lucide-react";
 import {
   Tenant,
   ITEMS_PER_PAGE,
@@ -103,6 +104,23 @@ export function SuperAdminTenants() {
 
   // Status toggle confirmation state
   const [pendingStatusTenant, setPendingStatusTenant] = useState<Tenant | null>(null);
+  const [sortBy, setSortBy] = useState<string>("newest");
+
+  // Sorted tenants list
+  const sortedTenants = useMemo(() => {
+    const list = [...tenants];
+    if (sortBy === "oldest") {
+      return list.sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
+    }
+    if (sortBy === "name_asc") {
+      return list.sort((a, b) => a.name.localeCompare(b.name));
+    }
+    if (sortBy === "students_desc") {
+      return list.sort((a, b) => (b.studentCount || 0) - (a.studentCount || 0));
+    }
+    // Default newest
+    return list.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+  }, [tenants, sortBy]);
 
   // -- Computed Stats --
   const stats = useMemo(() => {
@@ -237,6 +255,34 @@ export function SuperAdminTenants() {
 
   return (
     <div className="space-y-6">
+      {/* Top School Management Header matching reference */}
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div>
+          <div className="flex items-center gap-2.5 flex-wrap">
+            <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-slate-900 dark:text-slate-100">
+              School Management
+            </h1>
+            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-medium bg-rose-50 text-rose-600 border border-rose-200/70 dark:bg-rose-950/40 dark:text-rose-400 dark:border-rose-900/60">
+              <Shield className="size-3 text-rose-500" />
+              Platform Level
+            </span>
+          </div>
+          <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-1 font-normal">
+            Manage all schools on your platform. Add, monitor, and manage school accounts.
+          </p>
+        </div>
+
+        {canCreate && (
+          <Button
+            className="bg-blue-600 hover:bg-blue-700 text-white text-xs sm:text-sm font-semibold h-10 px-4 rounded-xl gap-2 shadow-xs transition-all shrink-0 self-start sm:self-auto"
+            onClick={handleOpenAddDialog}
+          >
+            <Plus className="size-4 stroke-[2.5]" />
+            Add School
+          </Button>
+        )}
+      </div>
+
       <TenantStats stats={stats} />
       
       <TenantFilters 
@@ -257,12 +303,12 @@ export function SuperAdminTenants() {
         }}
         viewMode={viewMode}
         onViewModeChange={(v) => dispatch({ type: "SET_VIEW_MODE", mode: v })}
-        onAddClick={handleOpenAddDialog}
-        canCreate={canCreate}
+        sortBy={sortBy}
+        onSortChange={(s) => setSortBy(s)}
       />
 
       <TenantTable 
-        tenants={tenants}
+        tenants={sortedTenants}
         loading={loading}
         viewMode={viewMode}
         currentPage={currentPage}
@@ -304,6 +350,11 @@ export function SuperAdminTenants() {
         onDetailOpenChange={(open) => !open && dispatch({ type: "SET_VIEWING_TENANT", tenant: null })}
         viewingTenant={viewingTenant}
         onEditClick={handleOpenEditDialog}
+        onDeleteClick={(tenant) => {
+          dispatch({ type: "SET_VIEWING_TENANT", tenant: null });
+          dispatch({ type: "SET_DELETING_TENANT", tenant });
+          dispatch({ type: "SET_DELETE_DIALOG_OPEN", open: true });
+        }}
 
         deleteOpen={deleteDialogOpen}
         onDeleteOpenChange={(v) => dispatch({ type: "SET_DELETE_DIALOG_OPEN", open: v })}

@@ -56,140 +56,158 @@ const TenantCard = memo(function TenantCard({
   onAddAdmin: (tenant: Tenant) => void;
 }) {
   return (
-    <Card className="group hover:shadow-lg transition-all duration-300">
-      <CardContent className="p-5 space-y-4">
-        <div className="flex items-start justify-between gap-2">
-          <div className="flex items-center gap-3 min-w-0">
-            <div className="size-12 rounded-xl bg-muted text-muted-foreground flex items-center justify-center shrink-0 border overflow-hidden">
-              <img src={tenant.logo || "/test.webp"} alt={tenant.name} className="size-full object-cover" />
+    <div className="bg-white dark:bg-slate-900/90 rounded-2xl p-5 border border-slate-200/80 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 shadow-xs hover:shadow-md transition-all duration-200 flex flex-col justify-between">
+      <div>
+        {/* Top Header: Circular Emblem, Title, Domain, More Menu */}
+        <div className="flex items-start justify-between gap-2.5">
+          <div className="flex items-center gap-3.5 min-w-0">
+            <div className="size-12 rounded-full bg-slate-50 dark:bg-slate-800 flex items-center justify-center shrink-0 border border-slate-200/90 dark:border-slate-700 overflow-hidden shadow-2xs">
+              {tenant.logo ? (
+                <img src={tenant.logo} alt={tenant.name} className="size-full object-cover" />
+              ) : (
+                <Building2 className="size-6 text-blue-600 dark:text-blue-400" />
+              )}
             </div>
             <div className="min-w-0">
-              <h3 className="font-semibold text-base truncate">{tenant.name}</h3>
-              <p className="text-xs text-muted-foreground flex items-center gap-1">
-                <Globe className="size-3" />
-                {tenant.slug}
+              <h3 className="font-semibold text-sm sm:text-[15px] text-slate-900 dark:text-slate-100 leading-snug truncate" title={tenant.name}>
+                {tenant.name}
+              </h3>
+              <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5 truncate font-normal">
+                @{tenant.slug.includes(".") ? tenant.slug : `${tenant.slug}.edu.in`}
               </p>
             </div>
           </div>
+
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button
                 variant="ghost"
                 size="icon"
-                className="size-8 shrink-0"
+                className="size-7 -mr-1 text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 rounded-lg"
               >
                 <MoreVertical className="size-4" />
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-48">
-              <DropdownMenuItem onClick={onView}>
-                <Eye className="size-4 mr-2" />
+            <DropdownMenuContent align="end" className="w-44 rounded-xl">
+              <DropdownMenuItem onClick={onView} className="text-xs">
+                <Eye className="size-3.5 mr-2" />
                 Details
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={onManageData}>
-                <Database className="size-4 mr-2" />
+              <DropdownMenuItem onClick={onManageData} className="text-xs">
+                <Database className="size-3.5 mr-2" />
                 Manage Data
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => onAddAdmin(tenant)}>
-                <ShieldCheck className="size-4 mr-2" />
+              <DropdownMenuItem onClick={() => onAddAdmin(tenant)} className="text-xs">
+                <ShieldCheck className="size-3.5 mr-2" />
                 Create Admin
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={onEdit}>
-                <Edit className="size-4 mr-2" />
+              <DropdownMenuItem onClick={onEdit} className="text-xs">
+                <Edit className="size-3.5 mr-2" />
                 Edit
               </DropdownMenuItem>
               <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={onToggleStatus}>
+              <DropdownMenuItem onClick={onToggleStatus} className="text-xs">
                 {tenant.status === "active" ? (
                   <>
-                    <Ban className="size-4 mr-2" />
+                    <Ban className="size-3.5 mr-2" />
                     Suspend
                   </>
                 ) : (
                   <>
-                    <CheckCircle2 className="size-4 mr-2" />
+                    <CheckCircle2 className="size-3.5 mr-2" />
                     Activate
                   </>
                 )}
               </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem
-                className="text-destructive focus:text-destructive"
+                className="text-destructive focus:text-destructive text-xs"
                 onClick={onDelete}
               >
-                <Trash2 className="size-4 mr-2" />
+                <Trash2 className="size-3.5 mr-2" />
                 Delete
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
 
-        <div className="flex items-center gap-2">
+        {/* Badges: Plan & Status */}
+        <div className="flex items-center gap-2 mt-3">
           <TenantPlanBadge plan={tenant.plan} />
           <TenantStatusBadge status={tenant.status} />
         </div>
 
-        <div className="grid grid-cols-3 gap-2 py-1">
-          <div className="text-center py-2 px-1 rounded-xl bg-muted/40 border border-border">
-            <GraduationCap className="size-4 mx-auto text-muted-foreground mb-1" />
-            <p className="text-sm font-bold leading-tight">
-              {tenant.studentCount}
-            </p>
-            <p className="text-xs text-muted-foreground font-medium">
-              Students
-            </p>
+        {/* Stats Row: Students, Teachers, Parents */}
+        <div className="grid grid-cols-3 gap-2 mt-4 pt-0.5">
+          <div className="flex items-center gap-2">
+            <Users className="size-4 text-slate-400 dark:text-slate-500 shrink-0" />
+            <div className="min-w-0">
+              <p className="text-xs sm:text-sm font-bold text-slate-900 dark:text-slate-100 leading-tight">
+                {tenant.studentCount ? Number(tenant.studentCount).toLocaleString() : 0}
+              </p>
+              <p className="text-[10px] sm:text-[11px] text-slate-500 dark:text-slate-400 font-normal truncate">
+                Students
+              </p>
+            </div>
           </div>
-          <div className="text-center py-2 px-1 rounded-xl bg-muted/40 border border-border">
-            <Users className="size-4 mx-auto text-muted-foreground mb-1" />
-            <p className="text-sm font-bold leading-tight">
-              {tenant.teacherCount}
-            </p>
-            <p className="text-xs text-muted-foreground font-medium">
-              Teachers
-            </p>
+
+          <div className="flex items-center gap-2">
+            <GraduationCap className="size-4 text-slate-400 dark:text-slate-500 shrink-0" />
+            <div className="min-w-0">
+              <p className="text-xs sm:text-sm font-bold text-slate-900 dark:text-slate-100 leading-tight">
+                {tenant.teacherCount ? Number(tenant.teacherCount).toLocaleString() : 0}
+              </p>
+              <p className="text-[10px] sm:text-[11px] text-slate-500 dark:text-slate-400 font-normal truncate">
+                Teachers
+              </p>
+            </div>
           </div>
-          <div className="text-center py-2 px-1 rounded-xl bg-muted/40 border border-border">
-            <UserCheck className="size-4 mx-auto text-muted-foreground mb-1" />
-            <p className="text-sm font-bold leading-tight">
-              {tenant.parentCount}
-            </p>
-            <p className="text-xs text-muted-foreground font-medium">
-              Parents
-            </p>
+
+          <div className="flex items-center gap-2">
+            <UserCheck className="size-4 text-slate-400 dark:text-slate-500 shrink-0" />
+            <div className="min-w-0">
+              <p className="text-xs sm:text-sm font-bold text-slate-900 dark:text-slate-100 leading-tight">
+                {tenant.parentCount ? Number(tenant.parentCount).toLocaleString() : 0}
+              </p>
+              <p className="text-[10px] sm:text-[11px] text-slate-500 dark:text-slate-400 font-normal truncate">
+                Parents
+              </p>
+            </div>
           </div>
         </div>
+      </div>
 
-        <div className="flex flex-col gap-2 pt-1">
-          <div className="flex gap-2">
-            <Button
-              variant="outline"
-              size="sm"
-              className="flex-1 h-9 rounded-lg"
-              onClick={onView}
-            >
-              View Details
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              className="flex-1 h-9 rounded-lg"
-              onClick={onManageData}
-            >
-              Live Data
-            </Button>
-          </div>
+      {/* Buttons matching reference image */}
+      <div className="flex flex-col gap-2 mt-5">
+        <div className="grid grid-cols-2 gap-2">
           <Button
-            variant="default"
+            variant="outline"
             size="sm"
-            className="w-full h-9 rounded-lg gap-2"
-            onClick={() => onAddAdmin(tenant)}
+            className="h-8.5 rounded-xl border-slate-200/90 dark:border-slate-800 text-xs font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 shadow-2xs transition-colors"
+            onClick={onView}
           >
-            <ShieldCheck className="size-4" />
-            Add School Admin
+            View Details
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            className="h-8.5 rounded-xl border-slate-200/90 dark:border-slate-800 text-xs font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 shadow-2xs transition-colors"
+            onClick={onManageData}
+          >
+            Live Data
           </Button>
         </div>
-      </CardContent>
-    </Card>
+        <Button
+          variant="ghost"
+          size="sm"
+          className="w-full h-9 rounded-xl bg-blue-50/80 hover:bg-blue-100 text-blue-600 dark:bg-blue-950/40 dark:hover:bg-blue-900/50 dark:text-blue-400 text-xs font-semibold gap-1.5 transition-colors border border-blue-100/60 dark:border-blue-900/40"
+          onClick={() => onAddAdmin(tenant)}
+        >
+          <ShieldCheck className="size-4 text-blue-600 dark:text-blue-400" />
+          Add School Admin
+        </Button>
+      </div>
+    </div>
   );
 });
 
@@ -226,9 +244,9 @@ export function TenantTable({
 }: TenantTableProps) {
   if (loading && tenants.length === 0) {
     return (
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        {[...Array(8)].map((_, i) => (
-          <Skeleton key={i} className="h-[320px] rounded-xl" />
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+        {[...Array(6)].map((_, i) => (
+          <Skeleton key={i} className="h-[250px] rounded-2xl" />
         ))}
       </div>
     );
@@ -236,13 +254,13 @@ export function TenantTable({
 
   if (tenants.length === 0) {
     return (
-      <Card className="py-20 text-center border-dashed border-2">
+      <Card className="py-20 text-center border-dashed border-2 rounded-2xl">
         <CardContent className="space-y-3">
           <div className="size-16 bg-muted rounded-full flex items-center justify-center mx-auto mb-2">
             <Building2 className="size-8 text-muted-foreground opacity-50" />
           </div>
           <h3 className="font-semibold text-lg">No schools found</h3>
-          <p className="text-muted-foreground max-w-xs mx-auto">
+          <p className="text-muted-foreground max-w-xs mx-auto text-sm">
             Try adjusting your filters or search query to find the school you are looking for.
           </p>
         </CardContent>
@@ -253,7 +271,7 @@ export function TenantTable({
   if (viewMode === "grid") {
     return (
       <div className="space-y-6">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
           {tenants.map((tenant) => (
             <TenantCard
               key={tenant.id}

@@ -23,6 +23,7 @@ interface TenantDialogsProps {
   onDetailOpenChange: (open: boolean) => void;
   viewingTenant: Tenant | null;
   onEditClick: (tenant: Tenant) => void;
+  onDeleteClick?: (tenant: Tenant) => void;
 
   // Delete Dialog
   deleteOpen: boolean;
@@ -56,6 +57,7 @@ export function TenantDialogs({
   onDetailOpenChange,
   viewingTenant,
   onEditClick,
+  onDeleteClick,
   deleteOpen,
   onDeleteOpenChange,
   deletingTenant,
@@ -91,6 +93,7 @@ export function TenantDialogs({
         onDetailOpenChange={onDetailOpenChange}
         viewingTenant={viewingTenant}
         onEditClick={onEditClick}
+        onDeleteClick={onDeleteClick}
       />
 
       {/* ── Delete Confirmation Dialog ── */}

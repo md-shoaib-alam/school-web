@@ -44,12 +44,12 @@ export function SidebarNav({
                   !sidebarOpen && "lg:justify-center lg:px-0 lg:gap-0",
                   isActive && !hasChildren
                     ? isSuperAdmin
-                      ? "bg-rose-800/60 text-white font-medium"
+                      ? "!bg-blue-600 !text-white font-semibold rounded-xl shadow-xs [&_svg]:!text-white"
                       : "bg-white dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 shadow-[0_4px_12px_rgba(0,0,0,0.05),0_1px_2px_rgba(0,0,0,0.02)] border border-zinc-200/80 dark:border-emerald-900/50 hover:bg-white dark:hover:bg-emerald-900/50 font-semibold"
                     : isSuperAdmin
-                      ? "text-rose-200 hover:text-white hover:bg-rose-800/40"
+                      ? "!text-slate-800 dark:!text-slate-200 hover:!text-slate-950 dark:hover:!text-white hover:bg-slate-100/80 dark:hover:bg-slate-800/60 rounded-xl [&_svg]:!text-slate-700 dark:[&_svg]:!text-slate-300"
                       : "text-zinc-600 dark:text-zinc-400 border border-transparent hover:bg-white hover:shadow-[0_4px_12px_rgba(0,0,0,0.05),0_1px_2px_rgba(0,0,0,0.02)] hover:border-zinc-200/80 dark:hover:border-emerald-900/30 hover:text-emerald-600 dark:hover:text-emerald-400",
-                  isActive && hasChildren && "text-emerald-700 font-semibold dark:text-emerald-400"
+                  isActive && hasChildren && (isSuperAdmin ? "!text-blue-600 font-semibold dark:!text-blue-400 [&_svg]:!text-blue-600" : "text-emerald-700 font-semibold dark:text-emerald-400")
                 )}
                 onClick={() => {
                   if (!sidebarOpen) {
