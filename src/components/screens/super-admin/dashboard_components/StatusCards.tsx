@@ -23,6 +23,9 @@ import {
   ClipboardList,
   ChevronRight,
   ChevronDown,
+  TrendingUp,
+  BarChart2,
+  ArrowRight,
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import {
@@ -69,10 +72,10 @@ export function StatusCards({ loading, data, onNavigate }: StatusCardsProps) {
   const suspendedPct = Math.round(((data?.tenants.suspended ?? 0) / totalTenants) * 100);
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
+    <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-stretch">
       {/* 1. Tenant Status (3.5 cols on desktop) */}
-      <Card className="lg:col-span-4 border border-slate-200/80 dark:border-slate-800/80 bg-white dark:bg-slate-900/60 rounded-2xl shadow-sm">
-        <CardHeader className="pb-3 flex flex-row items-center justify-between space-y-0">
+      <Card className="lg:col-span-4 border border-slate-200/80 dark:border-slate-800/80 bg-white dark:bg-slate-900/60 rounded-2xl shadow-sm py-4 px-5 h-full flex flex-col justify-between">
+        <CardHeader className="p-0 pb-1 flex flex-row items-center justify-between space-y-0">
           <div>
             <CardTitle className="text-base font-bold flex items-center gap-2 text-slate-900 dark:text-slate-100">
               <div className="size-6 rounded-lg bg-blue-50 dark:bg-blue-950/50 flex items-center justify-center text-blue-600 dark:text-blue-400">
@@ -93,7 +96,7 @@ export function StatusCards({ loading, data, onNavigate }: StatusCardsProps) {
             View All
           </Button>
         </CardHeader>
-        <CardContent className="space-y-3 pt-2">
+        <CardContent className="p-0 flex flex-col justify-between flex-1 gap-2.5 pt-2">
           {loading ? (
             <div className="space-y-3">
               {[...Array(3)].map((_, i) => <Skeleton key={i} className="h-16 w-full rounded-2xl" />)}
@@ -162,8 +165,8 @@ export function StatusCards({ loading, data, onNavigate }: StatusCardsProps) {
       </Card>
 
       {/* 2. User Distribution (5 cols on desktop) */}
-      <Card className="lg:col-span-5 border border-slate-200/80 dark:border-slate-800/80 bg-white dark:bg-slate-900/60 rounded-2xl shadow-sm">
-        <CardHeader className="pb-3 flex flex-row items-center justify-between space-y-0">
+      <Card className="lg:col-span-5 border border-slate-200/80 dark:border-slate-800/80 bg-white dark:bg-slate-900/60 rounded-2xl shadow-sm py-4 px-5 h-full flex flex-col justify-between">
+        <CardHeader className="p-0 pb-1 flex flex-row items-center justify-between space-y-0">
           <div>
             <CardTitle className="text-base font-bold flex items-center gap-2 text-slate-900 dark:text-slate-100">
               <div className="size-6 rounded-lg bg-emerald-50 dark:bg-emerald-950/50 flex items-center justify-center text-emerald-600 dark:text-emerald-400">
@@ -179,7 +182,7 @@ export function StatusCards({ loading, data, onNavigate }: StatusCardsProps) {
             All Schools <ChevronDown className="size-3 text-slate-400" />
           </div>
         </CardHeader>
-        <CardContent className="pt-2">
+        <CardContent className="p-0 pt-1 flex flex-col justify-between flex-1">
           {loading || !recharts ? (
             <Skeleton className="h-[200px] w-full rounded-2xl" />
           ) : (
@@ -222,26 +225,87 @@ export function StatusCards({ loading, data, onNavigate }: StatusCardsProps) {
                 </div>
               </div>
 
-              {/* Right Role List Breakdown */}
-              <div className="sm:col-span-6 space-y-2.5">
-                {userDistributionData.map((item) => {
-                  const pct = totalUsers > 0 ? Math.round((item.value / totalUsers) * 100) : 0;
+              {/* Right Role List Breakdown - Styled with soft colored pill containers matching reference */}
+              <div className="sm:col-span-6 space-y-2">
+                {[
+                  {
+                    name: "Students",
+                    count: data?.users.students ?? 0,
+                    icon: "student",
+                    bg: "bg-blue-50/80 dark:bg-blue-950/30 border-blue-100/80 dark:border-blue-900/40 text-blue-600 dark:text-blue-400",
+                    badgeBg: "bg-blue-100/70 dark:bg-blue-900/50 text-blue-600 dark:text-blue-300",
+                    iconBg: "bg-blue-100 dark:bg-blue-900/60 text-blue-600 dark:text-blue-300",
+                  },
+                  {
+                    name: "Teachers",
+                    count: data?.users.teachers ?? 0,
+                    icon: "teacher",
+                    bg: "bg-emerald-50/80 dark:bg-emerald-950/30 border-emerald-100/80 dark:border-emerald-900/40 text-emerald-600 dark:text-emerald-400",
+                    badgeBg: "bg-emerald-100/70 dark:bg-emerald-900/50 text-emerald-600 dark:text-emerald-300",
+                    iconBg: "bg-emerald-100 dark:bg-emerald-900/60 text-emerald-600 dark:text-emerald-300",
+                  },
+                  {
+                    name: "Parents",
+                    count: data?.users.parents ?? 0,
+                    icon: "parent",
+                    bg: "bg-amber-50/80 dark:bg-amber-950/30 border-amber-100/80 dark:border-amber-900/40 text-amber-600 dark:text-amber-400",
+                    badgeBg: "bg-amber-100/70 dark:bg-amber-900/50 text-amber-600 dark:text-amber-300",
+                    iconBg: "bg-amber-100 dark:bg-amber-900/60 text-amber-600 dark:text-amber-300",
+                  },
+                  {
+                    name: "Admins",
+                    count: data?.users.admins ?? 0,
+                    icon: "admin",
+                    bg: "bg-purple-50/80 dark:bg-purple-950/30 border-purple-100/80 dark:border-purple-900/40 text-purple-600 dark:text-purple-400",
+                    badgeBg: "bg-purple-100/70 dark:bg-purple-900/50 text-purple-600 dark:text-purple-300",
+                    iconBg: "bg-purple-100 dark:bg-purple-900/60 text-purple-600 dark:text-purple-300",
+                  },
+                ].map((role) => {
+                  const pct = totalUsers > 0 ? Math.round((role.count / totalUsers) * 100) : 0;
                   return (
-                    <div key={item.name} className="flex items-center justify-between text-xs">
-                      <div className="flex items-center gap-2">
-                        <div
-                          className="size-2.5 rounded-full shrink-0"
-                          style={{ backgroundColor: item.fill }}
-                        />
-                        <span className="font-medium text-slate-700 dark:text-slate-300">
-                          {item.name}
+                    <div
+                      key={role.name}
+                      className={`flex items-center justify-between px-3 py-2 rounded-2xl border ${role.bg} transition-all`}
+                    >
+                      <div className="flex items-center gap-2.5">
+                        <div className={`size-7 rounded-xl flex items-center justify-center ${role.iconBg}`}>
+                          {role.icon === "student" && (
+                            <svg className="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                              <path d="M22 10v6M2 10l10-5 10 5-10 5z" />
+                              <path d="M6 12v5c3 3 9 3 12 0v-5" />
+                            </svg>
+                          )}
+                          {role.icon === "teacher" && (
+                            <svg className="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                              <path d="M2 3h20v14H2z" />
+                              <path d="m8 21 4-4 4 4" />
+                            </svg>
+                          )}
+                          {role.icon === "parent" && (
+                            <svg className="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                              <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+                              <circle cx="9" cy="7" r="4" />
+                              <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
+                              <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+                            </svg>
+                          )}
+                          {role.icon === "admin" && (
+                            <svg className="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10" />
+                              <path d="m9 12 2 2 4-4" />
+                            </svg>
+                          )}
+                        </div>
+                        <span className="font-semibold text-xs text-slate-800 dark:text-slate-200">
+                          {role.name}
                         </span>
                       </div>
-                      <div className="flex items-center gap-3">
-                        <span className="font-bold text-slate-900 dark:text-slate-100">
-                          {item.value.toLocaleString()}
+
+                      <div className="flex items-center gap-2.5">
+                        <span className="font-black text-sm text-slate-900 dark:text-slate-100">
+                          {role.count.toLocaleString()}
                         </span>
-                        <span className="text-slate-500 font-medium text-[11px] w-8 text-right">
+                        <span className={`text-[11px] font-bold px-2 py-0.5 rounded-lg ${role.badgeBg}`}>
                           {pct}%
                         </span>
                       </div>
@@ -251,12 +315,35 @@ export function StatusCards({ loading, data, onNavigate }: StatusCardsProps) {
               </div>
             </div>
           )}
+
+          {/* Bottom Summary Bar matching reference image */}
+          <div className="mt-4 pt-3 border-t border-slate-100 dark:border-slate-800/80 flex flex-col sm:flex-row items-center justify-between gap-2.5">
+            <div className="flex items-center gap-2.5">
+              <div className="size-8 rounded-xl bg-blue-50 dark:bg-blue-950/60 flex items-center justify-center text-blue-600 dark:text-blue-400">
+                <TrendingUp className="size-4" />
+              </div>
+              <p className="text-xs text-slate-600 dark:text-slate-400">
+                Total <span className="font-bold text-blue-600 dark:text-blue-400">{totalUsers.toLocaleString()}</span> users across all schools
+              </p>
+            </div>
+
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => onNavigate("users")}
+              className="h-8 px-3 rounded-xl border-blue-200/80 dark:border-blue-900/60 bg-blue-50/60 hover:bg-blue-100 dark:bg-blue-950/40 dark:hover:bg-blue-900/60 text-blue-600 dark:text-blue-400 text-xs font-semibold flex items-center gap-1.5 shadow-2xs hover:shadow-xs transition-all"
+            >
+              <BarChart2 className="size-3.5" />
+              View Details
+              <ArrowRight className="size-3.5" />
+            </Button>
+          </div>
         </CardContent>
       </Card>
 
       {/* 3. Quick Actions (3 cols on desktop) */}
-      <Card className="lg:col-span-3 border border-slate-200/80 dark:border-slate-800/80 bg-white dark:bg-slate-900/60 rounded-2xl shadow-sm">
-        <CardHeader className="pb-3">
+      <Card className="lg:col-span-3 border border-slate-200/80 dark:border-slate-800/80 bg-white dark:bg-slate-900/60 rounded-2xl shadow-sm py-4 px-5 h-full flex flex-col justify-between">
+        <CardHeader className="p-0 pb-1">
           <CardTitle className="text-base font-bold flex items-center gap-2 text-slate-900 dark:text-slate-100">
             <Zap className="size-4 text-emerald-500" /> Quick Actions
           </CardTitle>
@@ -264,7 +351,7 @@ export function StatusCards({ loading, data, onNavigate }: StatusCardsProps) {
             Frequent administrative operations
           </CardDescription>
         </CardHeader>
-        <CardContent className="space-y-2 pt-1">
+        <CardContent className="p-0 flex flex-col justify-between flex-1 gap-2 pt-2">
           <ActionButton
             icon={<Plus className="size-4 text-white" />}
             label="Add New School"

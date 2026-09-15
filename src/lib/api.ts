@@ -112,7 +112,7 @@ async function refreshAccessToken(): Promise<string> {
   return data.token;
 }
 
-function forceLogout() {
+export function forceLogout() {
   if (typeof window === 'undefined') return;
   localStorage.clear();
   sessionStorage.clear();
@@ -123,6 +123,39 @@ function forceLogout() {
     document.cookie = name.trim() + '=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/';
   }
   window.location.href = '/';
+}
+
+/**
+ * Unified token refresh function:
+ * Safe for concurrent callers across REST and GraphQL with automatic queuing.
+ */
+export async function getValidTokenOrRefresh(): Promise<string> {
+  if (refreshFailed) {
+    forceLogout();
+    throw new Error('Session expired');
+  }
+
+  if (isRefreshing) {
+    return new Promise<string>((resolve, reject) => {
+      failedQueue.push({ resolve, reject });
+    });
+  }
+
+  isRefreshing = true;
+  try {
+    const newToken = await refreshAccessToken();
+    isRefreshing = false;
+    refreshFailed = false;
+    processQueue(null, newToken);
+    triggerGlobalRefresh();
+    return newToken;
+  } catch (err) {
+    isRefreshing = false;
+    markRefreshFailed();
+    processQueue(err as Error);
+    forceLogout();
+    throw err;
+  }
 }
 
 /**
@@ -164,42 +197,10 @@ async function request<T>(
 
   // ── 401 → silent refresh + retry ──
   if (res.status === 401 && attempt < 2) {
-    // If refresh already failed very recently, hard logout
-    if (refreshFailed) {
-      forceLogout();
-      throw new Error('Session expired');
-    }
-
-    // If a refresh is in progress, wait for it, then retry
-    if (isRefreshing) {
-      try {
-        await new Promise<string>((resolve, reject) => {
-          failedQueue.push({ resolve, reject });
-        });
-        // Token was refreshed — retry the original request with the new token
-        return request<T>(method, path, body, options, attempt + 1);
-      } catch {
-        forceLogout();
-        throw new Error('Session expired');
-      }
-    }
-
-    // Start a refresh
-    isRefreshing = true;
     try {
-      await refreshAccessToken();
-      isRefreshing = false;
-      refreshFailed = false;
-      processQueue(null, getToken());
-      // Retry the original request with the new token
+      await getValidTokenOrRefresh();
       return request<T>(method, path, body, options, attempt + 1);
-    } catch (refreshError) {
-      isRefreshing = false;
-      markRefreshFailed();
-      processQueue(
-        refreshError instanceof Error ? refreshError : new Error('Refresh failed')
-      );
-      forceLogout();
+    } catch {
       throw new Error('Session expired');
     }
   }

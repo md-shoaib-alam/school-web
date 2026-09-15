@@ -12,7 +12,6 @@ import { queryKeys } from "@/lib/graphql/keys";
 import { Pagination } from "@/components/shared/pagination";
 import { useSearchParams, useRouter, usePathname } from "next/navigation";
 import { useDebounce } from "@/hooks/use-debounce";
-import anime from "animejs";
 
 // Sub-components
 import { TeacherDialog } from "./teachers/TeacherDialog";

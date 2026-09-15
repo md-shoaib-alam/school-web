@@ -9,12 +9,12 @@ export function NotificationBell() {
       type="button"
       variant="ghost"
       size="icon"
-      className="relative size-10 bg-white hover:bg-zinc-50 dark:bg-zinc-900 dark:hover:bg-zinc-800 border border-zinc-200 dark:border-zinc-800 shadow-sm rounded-xl transition-all duration-200 cursor-pointer"
+      className="size-9 rounded-xl text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-100 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
       onClick={() => {
         console.log("Bell icon clicked");
       }}
     >
-      <Bell className="size-6 md:size-5 text-zinc-500 transition-colors" />
+      <Bell className="size-4.5" />
     </Button>
   );
 }

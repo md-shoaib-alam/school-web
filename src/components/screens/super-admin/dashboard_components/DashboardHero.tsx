@@ -57,11 +57,11 @@ export function DashboardHero({ loading, data, onNavigate }: DashboardHeroProps)
         </div>
       </div>
 
-      {/* 4 Stat Cards Row - 2 per row on mobile, 4 on desktop */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-3.5">
+      {/* 4 Stat Cards Row - 1 row horizontal slide/scroll on mobile, 4-column grid on desktop */}
+      <div className="flex lg:grid lg:grid-cols-4 gap-3 overflow-x-auto pb-1 pt-0.5 scrollbar-none snap-x snap-mandatory">
         {loading ? (
           Array.from({ length: 4 }).map((_, i) => (
-            <div key={i} className="rounded-2xl border bg-card p-3 sm:p-4 shadow-xs">
+            <div key={i} className="min-w-[160px] sm:min-w-[200px] lg:min-w-0 flex-1 shrink-0 rounded-2xl border bg-card p-4 shadow-xs snap-start">
               <Skeleton className="h-9 w-9 rounded-xl mb-2" />
               <Skeleton className="h-3.5 w-16 mb-1.5" />
               <Skeleton className="h-7 w-24" />
@@ -72,20 +72,20 @@ export function DashboardHero({ loading, data, onNavigate }: DashboardHeroProps)
             {/* 1. Schools */}
             <div
               onClick={() => onNavigate?.("tenants")}
-              className="group relative cursor-pointer overflow-hidden rounded-2xl border border-slate-200/80 dark:border-slate-800/80 bg-white dark:bg-slate-900/60 p-3 sm:p-4 shadow-xs hover:shadow-md hover:border-blue-300 dark:hover:border-blue-800 transition-all"
+              className="min-w-[165px] sm:min-w-[210px] lg:min-w-0 flex-1 shrink-0 group relative cursor-pointer overflow-hidden rounded-2xl border border-slate-200/80 dark:border-slate-800/80 bg-white dark:bg-slate-900/60 p-3.5 sm:p-4 shadow-xs hover:shadow-md hover:border-blue-300 dark:hover:border-blue-800 transition-all snap-start"
             >
               <div className="flex items-center justify-between">
-                <div className="size-8 sm:size-9 rounded-xl bg-blue-50 dark:bg-blue-950/50 border border-blue-100 dark:border-blue-900/40 flex items-center justify-center text-blue-600 dark:text-blue-400">
+                <div className="size-8.5 sm:size-9 rounded-xl bg-blue-50 dark:bg-blue-950/50 border border-blue-100 dark:border-blue-900/40 flex items-center justify-center text-blue-600 dark:text-blue-400">
                   <Building2 className="size-4 sm:size-4.5" />
                 </div>
                 <ChevronRight className="size-3.5 text-slate-400 group-hover:text-blue-600 group-hover:translate-x-0.5 transition-all" />
               </div>
-              <div className="mt-2 sm:mt-2.5">
+              <div className="mt-2.5">
                 <p className="text-[11px] font-semibold text-slate-500 dark:text-slate-400">Schools</p>
-                <p className="text-lg sm:text-xl font-bold tracking-tight text-slate-900 dark:text-slate-100 mt-0.5">
+                <p className="text-xl font-bold tracking-tight text-slate-900 dark:text-slate-100 mt-0.5">
                   {(data?.tenants.total ?? 0).toLocaleString()}
                 </p>
-                <div className="mt-1 flex items-center gap-1 text-[10px] sm:text-[11px] font-semibold text-emerald-600 dark:text-emerald-400 truncate">
+                <div className="mt-1 flex items-center gap-1 text-[11px] font-semibold text-emerald-600 dark:text-emerald-400 truncate">
                   <TrendingUp className="size-3 shrink-0" />
                   <span className="truncate">+{data?.tenants.trial ? data.tenants.trial + 1 : 3} this month</span>
                 </div>
@@ -95,20 +95,20 @@ export function DashboardHero({ loading, data, onNavigate }: DashboardHeroProps)
             {/* 2. Users */}
             <div
               onClick={() => onNavigate?.("users")}
-              className="group relative cursor-pointer overflow-hidden rounded-2xl border border-slate-200/80 dark:border-slate-800/80 bg-white dark:bg-slate-900/60 p-3 sm:p-4 shadow-xs hover:shadow-md hover:border-emerald-300 dark:hover:border-emerald-800 transition-all"
+              className="min-w-[165px] sm:min-w-[210px] lg:min-w-0 flex-1 shrink-0 group relative cursor-pointer overflow-hidden rounded-2xl border border-slate-200/80 dark:border-slate-800/80 bg-white dark:bg-slate-900/60 p-3.5 sm:p-4 shadow-xs hover:shadow-md hover:border-emerald-300 dark:hover:border-emerald-800 transition-all snap-start"
             >
               <div className="flex items-center justify-between">
-                <div className="size-8 sm:size-9 rounded-xl bg-emerald-50 dark:bg-emerald-950/50 border border-emerald-100 dark:border-emerald-900/40 flex items-center justify-center text-emerald-600 dark:text-emerald-400">
+                <div className="size-8.5 sm:size-9 rounded-xl bg-emerald-50 dark:bg-emerald-950/50 border border-emerald-100 dark:border-emerald-900/40 flex items-center justify-center text-emerald-600 dark:text-emerald-400">
                   <Users className="size-4 sm:size-4.5" />
                 </div>
                 <ChevronRight className="size-3.5 text-slate-400 group-hover:text-emerald-600 group-hover:translate-x-0.5 transition-all" />
               </div>
-              <div className="mt-2 sm:mt-2.5">
+              <div className="mt-2.5">
                 <p className="text-[11px] font-semibold text-slate-500 dark:text-slate-400">Users</p>
-                <p className="text-lg sm:text-xl font-bold tracking-tight text-slate-900 dark:text-slate-100 mt-0.5">
+                <p className="text-xl font-bold tracking-tight text-slate-900 dark:text-slate-100 mt-0.5">
                   {(data?.users.total ?? 0).toLocaleString()}
                 </p>
-                <div className="mt-1 flex items-center gap-1 text-[10px] sm:text-[11px] font-semibold text-emerald-600 dark:text-emerald-400 truncate">
+                <div className="mt-1 flex items-center gap-1 text-[11px] font-semibold text-emerald-600 dark:text-emerald-400 truncate">
                   <TrendingUp className="size-3 shrink-0" />
                   <span className="truncate">+12% this month</span>
                 </div>
@@ -118,20 +118,20 @@ export function DashboardHero({ loading, data, onNavigate }: DashboardHeroProps)
             {/* 3. Revenue */}
             <div
               onClick={() => onNavigate?.("billing")}
-              className="group relative cursor-pointer overflow-hidden rounded-2xl border border-slate-200/80 dark:border-slate-800/80 bg-white dark:bg-slate-900/60 p-3 sm:p-4 shadow-xs hover:shadow-md hover:border-amber-300 dark:hover:border-amber-800 transition-all"
+              className="min-w-[165px] sm:min-w-[210px] lg:min-w-0 flex-1 shrink-0 group relative cursor-pointer overflow-hidden rounded-2xl border border-slate-200/80 dark:border-slate-800/80 bg-white dark:bg-slate-900/60 p-3.5 sm:p-4 shadow-xs hover:shadow-md hover:border-amber-300 dark:hover:border-amber-800 transition-all snap-start"
             >
               <div className="flex items-center justify-between">
-                <div className="size-8 sm:size-9 rounded-xl bg-amber-50 dark:bg-amber-950/50 border border-amber-100 dark:border-amber-900/40 flex items-center justify-center text-amber-600 dark:text-amber-400">
+                <div className="size-8.5 sm:size-9 rounded-xl bg-amber-50 dark:bg-amber-950/50 border border-amber-100 dark:border-amber-900/40 flex items-center justify-center text-amber-600 dark:text-amber-400">
                   <IndianRupee className="size-4 sm:size-4.5" />
                 </div>
                 <ChevronRight className="size-3.5 text-slate-400 group-hover:text-amber-600 group-hover:translate-x-0.5 transition-all" />
               </div>
-              <div className="mt-2 sm:mt-2.5">
+              <div className="mt-2.5">
                 <p className="text-[11px] font-semibold text-slate-500 dark:text-slate-400">Revenue</p>
-                <p className="text-lg sm:text-xl font-bold tracking-tight text-slate-900 dark:text-slate-100 mt-0.5">
+                <p className="text-xl font-bold tracking-tight text-slate-900 dark:text-slate-100 mt-0.5">
                   {formatINR(data?.revenue.total ?? 0)}
                 </p>
-                <div className="mt-1 flex items-center gap-1 text-[10px] sm:text-[11px] font-semibold text-emerald-600 dark:text-emerald-400 truncate">
+                <div className="mt-1 flex items-center gap-1 text-[11px] font-semibold text-emerald-600 dark:text-emerald-400 truncate">
                   <TrendingUp className="size-3 shrink-0" />
                   <span className="truncate">+18% this month</span>
                 </div>
@@ -141,20 +141,20 @@ export function DashboardHero({ loading, data, onNavigate }: DashboardHeroProps)
             {/* 4. Subscriptions */}
             <div
               onClick={() => onNavigate?.("school-subscriptions")}
-              className="group relative cursor-pointer overflow-hidden rounded-2xl border border-slate-200/80 dark:border-slate-800/80 bg-white dark:bg-slate-900/60 p-3 sm:p-4 shadow-xs hover:shadow-md hover:border-purple-300 dark:hover:border-purple-800 transition-all"
+              className="min-w-[165px] sm:min-w-[210px] lg:min-w-0 flex-1 shrink-0 group relative cursor-pointer overflow-hidden rounded-2xl border border-slate-200/80 dark:border-slate-800/80 bg-white dark:bg-slate-900/60 p-3.5 sm:p-4 shadow-xs hover:shadow-md hover:border-purple-300 dark:hover:border-purple-800 transition-all snap-start"
             >
               <div className="flex items-center justify-between">
-                <div className="size-8 sm:size-9 rounded-xl bg-purple-50 dark:bg-purple-950/50 border border-purple-100 dark:border-purple-900/40 flex items-center justify-center text-purple-600 dark:text-purple-400">
+                <div className="size-8.5 sm:size-9 rounded-xl bg-purple-50 dark:bg-purple-950/50 border border-purple-100 dark:border-purple-900/40 flex items-center justify-center text-purple-600 dark:text-purple-400">
                   <CreditCard className="size-4 sm:size-4.5" />
                 </div>
                 <ChevronRight className="size-3.5 text-slate-400 group-hover:text-purple-600 group-hover:translate-x-0.5 transition-all" />
               </div>
-              <div className="mt-2 sm:mt-2.5">
+              <div className="mt-2.5">
                 <p className="text-[11px] font-semibold text-slate-500 dark:text-slate-400">Subscriptions</p>
-                <p className="text-lg sm:text-xl font-bold tracking-tight text-slate-900 dark:text-slate-100 mt-0.5">
+                <p className="text-xl font-bold tracking-tight text-slate-900 dark:text-slate-100 mt-0.5">
                   {(data?.subscriptions.active ?? 0).toLocaleString()}
                 </p>
-                <div className="mt-1 flex items-center gap-1 text-[10px] sm:text-[11px] font-semibold text-emerald-600 dark:text-emerald-400 truncate">
+                <div className="mt-1 flex items-center gap-1 text-[11px] font-semibold text-emerald-600 dark:text-emerald-400 truncate">
                   <TrendingUp className="size-3 shrink-0" />
                   <span className="truncate">+5% this month</span>
                 </div>

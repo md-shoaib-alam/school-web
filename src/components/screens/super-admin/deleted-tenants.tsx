@@ -161,46 +161,59 @@ export function SuperAdminDeletedTenants() {
   return (
     <div className="space-y-6">
       {/* Hero Banner - Recycle Bin */}
-      <div className="relative overflow-hidden rounded-2xl border border-sky-100 dark:border-sky-950/40 bg-gradient-to-r from-sky-50/80 via-blue-50/50 to-sky-100/70 dark:from-sky-950/30 dark:via-blue-950/20 dark:to-sky-900/30 px-4 sm:px-6 py-3.5 sm:py-4 shadow-xs">
-        <div className="relative z-10 flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4">
-          <div className="max-w-xl flex-1 min-w-0">
-            <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-slate-900 dark:text-white">
+      <div className="relative overflow-hidden rounded-2xl border border-sky-100 dark:border-sky-950/40 bg-gradient-to-r from-sky-50/80 via-blue-50/50 to-sky-100/70 dark:from-sky-950/30 dark:via-blue-950/20 dark:to-sky-900/30 px-4 sm:px-6 py-4 sm:py-5 shadow-xs">
+        <div className="relative z-10 flex items-center gap-3">
+          <div className="flex-1 min-w-0">
+            <h1 className="text-lg sm:text-2xl font-bold tracking-tight text-slate-900 dark:text-white leading-tight">
               Recycle Bin
             </h1>
-            <p className="mt-0.5 text-xs sm:text-sm text-slate-500 dark:text-slate-400">
+
+            {/* Description — desktop only (inside card) */}
+            <p className="hidden sm:block mt-0.5 text-sm text-slate-500 dark:text-slate-400 leading-snug">
               Schools slated for disposal. Data is fully retrievable for 28 days following deletion.
             </p>
 
-            {/* Search Input inside Banner */}
-            <div className="relative mt-2.5 sm:mt-3 max-w-xs sm:max-w-sm w-full">
+            {/* Search — desktop only (inside card) */}
+            <div className="hidden sm:flex relative mt-3 max-w-sm">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-3.5 text-slate-400 dark:text-slate-500" />
               <Input
                 placeholder="Search deleted schools..."
-                className="pl-9 h-8 sm:h-9 bg-white/95 dark:bg-zinc-900/95 border-slate-200/90 dark:border-zinc-800 rounded-xl shadow-2xs text-xs sm:text-sm placeholder:text-slate-400 focus-visible:ring-2 focus-visible:ring-blue-500"
+                className="pl-9 h-9 bg-white/95 dark:bg-zinc-900/95 border-slate-200/90 dark:border-zinc-800 rounded-xl shadow-2xs text-sm placeholder:text-slate-400 focus-visible:ring-2 focus-visible:ring-blue-500 w-full"
                 value={search}
                 onChange={(e) => dispatch({ type: "SET_SEARCH", payload: e.target.value })}
               />
             </div>
           </div>
 
-          {/* Right Side 4:3 Cropped/Compact Image */}
-          <div className="relative h-16 sm:h-20 md:h-24 aspect-[4/3] shrink-0 overflow-hidden self-end sm:self-center">
+          {/* Right Side image — all sizes */}
+          <div className="relative h-[68px] sm:h-20 md:h-24 aspect-[4/3] shrink-0 overflow-hidden">
             <Image
               src="/assets/deltedtop.png"
               alt="Recycle Bin"
               fill
               priority
               className="object-contain scale-110"
-              sizes="(max-width: 640px) 110px, (max-width: 768px) 140px, 160px"
+              sizes="(max-width: 640px) 90px, (max-width: 768px) 140px, 160px"
             />
           </div>
         </div>
       </div>
 
+      {/* Search bar — mobile only, below hero */}
+      <div className="relative sm:hidden">
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-3.5 text-slate-400 dark:text-slate-500" />
+        <Input
+          placeholder="Search deleted schools..."
+          className="pl-9 h-9 w-full bg-white dark:bg-zinc-900 border-slate-200/90 dark:border-zinc-800 rounded-xl shadow-xs text-xs placeholder:text-slate-400 focus-visible:ring-2 focus-visible:ring-blue-500"
+          value={search}
+          onChange={(e) => dispatch({ type: "SET_SEARCH", payload: e.target.value })}
+        />
+      </div>
+
       {/* Main Content Card: Deletion Queue */}
       <div className="rounded-2xl border border-slate-200/80 dark:border-zinc-800 bg-white dark:bg-zinc-950 shadow-xs overflow-hidden">
         {/* Card Header */}
-        <div className="p-5 sm:p-6 pb-5 flex items-center gap-3.5 border-b border-slate-100 dark:border-zinc-800/80">
+        <div className="p-4 sm:p-6 pb-4 sm:pb-5 flex items-center gap-3.5 border-b border-slate-100 dark:border-zinc-800/80">
           <div className="size-10 sm:size-11 rounded-xl bg-blue-50 dark:bg-blue-950/50 border border-blue-100/80 dark:border-blue-900/40 flex items-center justify-center text-blue-600 dark:text-blue-400 shrink-0">
             <Trash2 className="size-5" />
           </div>
@@ -209,13 +222,98 @@ export function SuperAdminDeletedTenants() {
               Deletion Queue
             </h2>
             <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400">
-              List of schools that have been deleted and are in retention period.
+              Schools deleted and in their 28-day retention window.
             </p>
           </div>
         </div>
 
-        {/* Table Container */}
-        <div className="overflow-x-auto">
+        {/* ── Mobile card list (< sm) ── */}
+        <div className="sm:hidden divide-y divide-slate-100 dark:divide-zinc-800/80">
+          {isLoading ? (
+            <div className="flex flex-col items-center justify-center gap-2 py-12">
+              <div className="size-6 rounded-full border-2 border-blue-600 border-t-transparent animate-spin" />
+              <span className="text-sm text-muted-foreground">Loading removal list…</span>
+            </div>
+          ) : tenants.length === 0 ? (
+            <div className="flex flex-col items-center justify-center gap-2 py-14">
+              <div className="size-12 rounded-2xl bg-slate-100 dark:bg-zinc-900 flex items-center justify-center text-slate-400">
+                <Building2 className="size-6 opacity-40" />
+              </div>
+              <p className="font-medium text-slate-700 dark:text-slate-300 text-sm">Bin is empty</p>
+              <p className="text-xs text-slate-400">No schools are currently slated for disposal.</p>
+            </div>
+          ) : (
+            tenants.map((tenant: any) => {
+              const deletedDate = toSafeDate(tenant.deletedAt || tenant.updatedAt);
+              const daysLeft = calculateDaysLeft(tenant.deletedAt || tenant.updatedAt);
+              const isUrgent = daysLeft <= 7;
+              const estimatedExpiryDate = addDays(deletedDate, 28);
+
+              return (
+                <div key={tenant.id} className="p-4 space-y-3">
+                  {/* School name + slug */}
+                  <div className="flex items-center gap-3">
+                    <div className="size-9 rounded-xl bg-slate-100 dark:bg-zinc-800 flex items-center justify-center text-slate-500 border border-slate-200/60 dark:border-zinc-700/60 shrink-0">
+                      <Building2 className="size-4.5" />
+                    </div>
+                    <div className="min-w-0">
+                      <div className="font-bold text-sm text-slate-900 dark:text-slate-100 truncate">{tenant.name}</div>
+                      <div className="text-xs text-slate-400 truncate">/{tenant.slug}</div>
+                    </div>
+                    {/* Retention badge */}
+                    <span className={`ml-auto inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold border shrink-0 ${
+                      isUrgent
+                        ? "bg-red-50 dark:bg-red-950/40 text-red-600 border-red-200 dark:border-red-800/50"
+                        : "bg-amber-50 dark:bg-amber-950/40 text-amber-600 border-amber-200 dark:border-amber-800/50"
+                    }`}>
+                      <Clock className="size-3 shrink-0" />
+                      {daysLeft}d left
+                    </span>
+                  </div>
+
+                  {/* Deletion date */}
+                  <div className="flex items-center gap-1.5 text-xs text-slate-500 dark:text-slate-400">
+                    <Calendar className="size-3.5 shrink-0 text-slate-400" />
+                    <span>Deleted: {tenant.deletedAt ? format(deletedDate, "MMM d, yyyy") : "Unknown"}</span>
+                    <span className="text-slate-300 dark:text-zinc-700 mx-0.5">·</span>
+                    <span>Purges {format(estimatedExpiryDate, "MMM d")}</span>
+                  </div>
+
+                  {/* Action buttons */}
+                  <div className="flex items-center gap-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="flex-1 h-8 gap-1.5 border-emerald-300 bg-emerald-50/50 hover:bg-emerald-100/70 text-emerald-700 dark:text-emerald-300 dark:border-emerald-700/80 dark:bg-emerald-950/30 text-xs font-semibold rounded-lg"
+                      onClick={() => {
+                        dispatch({ type: "SET_SELECTED_TENANT", payload: tenant });
+                        dispatch({ type: "SET_RESTORE_DIALOG_OPEN", payload: true });
+                      }}
+                    >
+                      <RotateCcw className="size-3.5" />
+                      Restore
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="flex-1 h-8 gap-1.5 border-red-200 bg-red-50/60 hover:bg-red-100/80 text-red-600 dark:text-red-400 dark:border-red-900/60 dark:bg-red-950/30 text-xs font-semibold rounded-lg"
+                      onClick={() => {
+                        dispatch({ type: "SET_SELECTED_TENANT", payload: tenant });
+                        dispatch({ type: "SET_PURGE_DIALOG_OPEN", payload: true });
+                      }}
+                    >
+                      <Trash2 className="size-3.5" />
+                      Delete Forever
+                    </Button>
+                  </div>
+                </div>
+              );
+            })
+          )}
+        </div>
+
+        {/* ── Desktop table (sm+) ── */}
+        <div className="hidden sm:block overflow-x-auto">
           <Table>
             <TableHeader className="bg-slate-50/75 dark:bg-zinc-900/60 border-b border-slate-100 dark:border-zinc-800">
               <TableRow className="hover:bg-transparent">
