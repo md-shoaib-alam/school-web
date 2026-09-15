@@ -194,24 +194,6 @@ export function useUpdateTenant() {
 }
 
 
-export function useUpgradeSchool() {
-  const queryClient = useQueryClient()
-  return useMutation({
-    mutationFn: async (data: any) => {
-      return api.put('/tenants/my-school', data);
-    },
-    onSuccess: (response: any) => {
-      const updatedTenant = response.tenant;
-      toast.success('Subscription upgraded successfully!')
-      queryClient.invalidateQueries({ queryKey: ['tenant-detail', updatedTenant.id] })
-      queryClient.invalidateQueries({ queryKey: ['tenants'] })
-    },
-    onError: (error: any) => {
-      toast.error('Upgrade failed', { description: error.message })
-    },
-  })
-}
-
 export function useDeleteTenant() {
   const queryClient = useQueryClient()
   return useMutation({
