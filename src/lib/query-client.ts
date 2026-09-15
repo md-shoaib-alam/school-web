@@ -3,8 +3,8 @@ import { QueryClient, MutationCache } from "@tanstack/react-query";
 /**
  * Intelligent refresh trigger that only invalidates relevant data
  */
-export async function triggerGlobalRefresh(pathOrTag: string) {
-  const trigger = String(pathOrTag).toLowerCase();
+export async function triggerGlobalRefresh(pathOrTag?: string) {
+  const trigger = String(pathOrTag || '').toLowerCase();
   
   const refresh = async () => {
     console.log(`🧠 Smart Refresh detecting changes in: ${trigger}`);

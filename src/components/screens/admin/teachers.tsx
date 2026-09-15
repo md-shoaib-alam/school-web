@@ -307,22 +307,7 @@ export function AdminTeachers() {
   };
 
   const handleDelete = async (id: string) => {
-    const element = document.getElementById(`teacher-item-${id}`);
-    if (element) {
-      element.style.cssText += '; pointer-events: none; position: relative; z-index: 10;';
-      anime({
-        targets: element,
-        scale: [1, 0.5],
-        translateX: [0, 150],
-        rotate: '6deg',
-        opacity: [1, 0],
-        duration: 350,
-        easing: 'easeInBack',
-        complete: () => executeDeletion(id)
-      });
-    } else {
-      executeDeletion(id);
-    }
+    executeDeletion(id);
   };
 
   return (
