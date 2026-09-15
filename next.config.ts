@@ -2,7 +2,7 @@ import type { NextConfig } from "next";
 import { withSentryConfig } from "@sentry/nextjs";
 
 const nextConfig: NextConfig = {
-  output: 'standalone',
+  output: process.env.VERCEL ? undefined : 'standalone',
   allowedDevOrigins: ['192.168.0.101', '192.168.0.101:3000', '192.168.29.227', 'localhost:3000', 'localhost'],
   images: {
     remotePatterns: [
