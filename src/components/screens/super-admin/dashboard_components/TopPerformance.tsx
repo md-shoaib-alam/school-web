@@ -40,7 +40,7 @@ export function TopPerformance({ loading, data }: TopPerformanceProps) {
   return (
     <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
       {/* Top Performing Schools */}
-      <Card className="lg:col-span-3 border-none shadow-sm bg-white dark:bg-zinc-800">
+      <Card className="lg:col-span-3 border shadow-sm bg-card">
         <CardHeader>
           <CardTitle className="text-base font-bold flex items-center gap-2">
             <Crown className="size-4 text-amber-500" /> Top Performing Schools
@@ -53,14 +53,14 @@ export function TopPerformance({ loading, data }: TopPerformanceProps) {
               {[...Array(5)].map((_, i) => <Skeleton key={i} className="h-14 w-full rounded-xl" />)}
             </div>
           ) : (
-            <div className="rounded-2xl border border-zinc-50 dark:border-zinc-900 overflow-hidden">
+            <div className="rounded-2xl border border-border overflow-hidden">
               <Table>
                 <TableHeader>
-                  <TableRow className="bg-zinc-50/50 dark:bg-zinc-900/50 hover:bg-transparent">
-                    <TableHead className="w-12 text-[10px] font-black uppercase tracking-widest text-center">#</TableHead>
-                    <TableHead className="text-[10px] font-black uppercase tracking-widest">School</TableHead>
-                    <TableHead className="hidden sm:table-cell text-[10px] font-black uppercase tracking-widest text-center">Plan</TableHead>
-                    <TableHead className="text-right text-[10px] font-black uppercase tracking-widest">Revenue</TableHead>
+                  <TableRow className="bg-muted/30 hover:bg-transparent">
+                    <TableHead className="w-12 text-xs font-medium text-center">#</TableHead>
+                    <TableHead className="text-xs font-medium">School</TableHead>
+                    <TableHead className="hidden sm:table-cell text-xs font-medium text-center">Plan</TableHead>
+                    <TableHead className="text-right text-xs font-medium">Revenue</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -73,9 +73,9 @@ export function TopPerformance({ loading, data }: TopPerformanceProps) {
                         <div className="flex items-center gap-3">
                           <img src={tenant.logo || "/test.webp"} alt={tenant.name} className="size-8 rounded-lg object-cover border shadow-sm shrink-0" />
                           <div>
-                            <p className="font-medium text-sm text-zinc-900 dark:text-zinc-100">{tenant.name}</p>
+                            <p className="font-medium text-sm text-foreground">{tenant.name}</p>
                             <p className="text-xs text-muted-foreground">
-                              {tenant.studentCount} students • {tenant._count.classes} classes
+                              {tenant.studentCount} students &bull; {tenant._count.classes} classes
                             </p>
                           </div>
                         </div>
@@ -98,7 +98,7 @@ export function TopPerformance({ loading, data }: TopPerformanceProps) {
       </Card>
 
       {/* Plan Distribution Chart */}
-      <Card className="lg:col-span-2 border-none shadow-sm bg-white dark:bg-zinc-800">
+      <Card className="lg:col-span-2 border shadow-sm bg-card">
         <CardHeader>
           <CardTitle className="text-base font-bold flex items-center gap-2">
             <BarChart3 className="size-4 text-emerald-600" /> Plan Distribution
@@ -126,11 +126,11 @@ export function TopPerformance({ loading, data }: TopPerformanceProps) {
                         outerRadius={90}
                         paddingAngle={4}
                       >
-                        {data?.planDistribution.map((entry, index) => (
-                          <Cell 
-                            key={entry.plan} 
-                            fill={PLAN_COLORS[entry.plan.toLowerCase()] || "#10b981"} 
-                            className="stroke-white dark:stroke-zinc-800 stroke-2 hover:opacity-90 transition-opacity"
+                        {data?.planDistribution.map((entry) => (
+                          <Cell
+                            key={entry.plan}
+                            fill={PLAN_COLORS[entry.plan.toLowerCase()] || "var(--chart-1)"}
+                            className="stroke-card stroke-2 hover:opacity-90 transition-opacity"
                           />
                         ))}
                       </Pie>
@@ -141,10 +141,10 @@ export function TopPerformance({ loading, data }: TopPerformanceProps) {
 
               {/* Total indicator in center of donut */}
               <div className="absolute top-[105px] left-1/2 -translate-x-1/2 -translate-y-1/2 flex flex-col items-center justify-center pointer-events-none">
-                <span className="text-3xl font-black text-zinc-900 dark:text-zinc-100">
+                <span className="text-3xl font-semibold text-foreground">
                   {data?.planDistribution.reduce((acc, curr) => acc + curr.count, 0) || 0}
                 </span>
-                <span className="text-[10px] uppercase font-bold tracking-wider text-muted-foreground">
+                <span className="text-xs uppercase font-medium tracking-wider text-muted-foreground">
                   Schools
                 </span>
               </div>
@@ -152,12 +152,12 @@ export function TopPerformance({ loading, data }: TopPerformanceProps) {
               {/* Custom styled color-wise Legend */}
               <div className="flex flex-wrap items-center justify-center gap-x-5 gap-y-2 mt-4 px-2">
                 {data?.planDistribution.map((entry) => {
-                  const color = PLAN_COLORS[entry.plan.toLowerCase()] || "#10b981";
+                  const color = PLAN_COLORS[entry.plan.toLowerCase()] || "var(--chart-1)";
                   return (
                     <div key={entry.plan} className="flex items-center gap-1.5 hover:opacity-80 transition-opacity cursor-pointer">
-                      <div className="size-2.5 rounded-full shrink-0 animate-pulse" style={{ backgroundColor: color }} />
-                      <span className="text-xs font-semibold capitalize text-zinc-700 dark:text-zinc-300">
-                        {entry.plan}: <span className="font-bold text-zinc-900 dark:text-zinc-100">{entry.count}</span>
+                      <div className="size-2.5 rounded-full shrink-0" style={{ backgroundColor: color }} />
+                      <span className="text-xs font-medium capitalize text-muted-foreground">
+                        {entry.plan}: <span className="font-semibold text-foreground">{entry.count}</span>
                       </span>
                     </div>
                   );

@@ -96,7 +96,7 @@ export function SuperAdminBilling() {
         method: paymentMethodConfig[method]?.label || method,
         count: v.count,
         revenue: v.revenue,
-        fill: DONUT_COLORS[method] || "#94a3b8",
+        fill: DONUT_COLORS[method] || "var(--muted-foreground)",
       }))
       .sort((a, b) => b.revenue - a.revenue);
   }, [data]);
@@ -109,7 +109,7 @@ export function SuperAdminBilling() {
       .map(([status, count]: [string, any]) => ({
         status: statusConfig[status]?.label || status,
         count,
-        fill: STATUS_COLORS[status] || "#94a3b8",
+        fill: STATUS_COLORS[status] || "var(--muted-foreground)",
       }));
   }, [data]);
 

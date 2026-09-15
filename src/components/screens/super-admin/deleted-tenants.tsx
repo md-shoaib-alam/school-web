@@ -161,7 +161,7 @@ export function SuperAdminDeletedTenants() {
   };
 
   return (
-    <div className="space-y-6 p-6">
+    <div className="space-y-6">
       <div className="flex justify-between items-center">
         <div>
           <h1 className="text-3xl font-semibold tracking-tight">Recycle Bin</h1>
@@ -216,7 +216,7 @@ export function SuperAdminDeletedTenants() {
                     const isUrgent = daysLeft <= 7;
                     
                     return (
-                      <TableRow key={tenant.id} className="group transition-colors hover:bg-muted/40">
+                      <TableRow key={tenant.id} className="group transition-colors hover:bg-muted/50">
                         <TableCell>
                           <div className="flex items-center gap-3">
                             <div className="size-9 rounded bg-muted flex items-center justify-center text-muted-foreground">
@@ -255,10 +255,10 @@ export function SuperAdminDeletedTenants() {
                         </TableCell>
                         <TableCell className="text-right">
                           <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                            <Button 
-                              variant="outline" 
-                              size="sm" 
-                              className="gap-2 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-950/30 border-emerald-200 dark:border-emerald-800"
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              className="gap-2"
                               onClick={() => {
                                 dispatch({ type: "SET_SELECTED_TENANT", payload: tenant });
                                 dispatch({ type: "SET_RESTORE_DIALOG_OPEN", payload: true });
@@ -295,19 +295,18 @@ export function SuperAdminDeletedTenants() {
       <AlertDialog open={restoreDialogOpen} onOpenChange={(open) => dispatch({ type: "SET_RESTORE_DIALOG_OPEN", payload: open })}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Reinstate School?</AlertDialogTitle>
+            <AlertDialogTitle>Reactivate this school?</AlertDialogTitle>
             <AlertDialogDescription>
-              This will immediately reactivate "{selectedTenant?.name}" and rescue all embedded data from the disposal buffer.
+              This reactivates {selectedTenant?.name} and restores access for all of its users.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel disabled={isRestoring}>Cancel</AlertDialogCancel>
-            <AlertDialogAction 
+            <AlertDialogAction
               onClick={(e) => { e.preventDefault(); handleRestore(); }}
               disabled={isRestoring}
-              className="bg-emerald-600 hover:bg-emerald-700"
             >
-              {isRestoring ? "Restoring…" : "Confirm Reactivation"}
+              {isRestoring ? "Restoring..." : "Reactivate"}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
@@ -317,27 +316,27 @@ export function SuperAdminDeletedTenants() {
       <AlertDialog open={purgeDialogOpen} onOpenChange={(open) => dispatch({ type: "SET_PURGE_DIALOG_OPEN", payload: open })}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle className="text-destructive">Final Irrevocable Destruction?</AlertDialogTitle>
+            <AlertDialogTitle className="text-destructive">Permanently delete this school?</AlertDialogTitle>
             <AlertDialogDescription asChild>
-              <div className="space-y-2 text-foreground/90">
-                <p>Warning! This transcends logical state triggers. Execution will trigger absolute recursive data cascades, vaporizing:</p>
-                <ul className="list-disc list-inside text-sm ml-2 opacity-80">
-                  <li>All linked Subscriptions & Transaction Records</li>
-                  <li>All User Accounts & Identity Vaults</li>
-                  <li>All Gradebooks, Attendance & Assets</li>
+              <div className="space-y-2">
+                <p>This permanently deletes {selectedTenant?.name} and all associated data:</p>
+                <ul className="list-disc list-inside text-sm ml-2">
+                  <li>Subscriptions and transaction records</li>
+                  <li>User accounts</li>
+                  <li>Gradebooks, attendance, and uploaded assets</li>
                 </ul>
-                <p className="font-bold mt-4">THIS CANNOT BE UNDONE.</p>
+                <p className="font-bold mt-4">This cannot be undone.</p>
               </div>
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel disabled={isPurging}>Cancel</AlertDialogCancel>
-            <AlertDialogAction 
+            <AlertDialogAction
               onClick={(e) => { e.preventDefault(); handlePurge(); }}
               disabled={isPurging}
-              className="bg-destructive hover:bg-destructive/90 text-white"
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
             >
-              {isPurging ? "Purging Hardware Tracks…" : "Execute Data Scrub"}
+              {isPurging ? "Deleting..." : "Delete permanently"}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

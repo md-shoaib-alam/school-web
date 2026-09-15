@@ -89,7 +89,7 @@ export function UserFilters({
                 </SelectTrigger>
                 <SelectContent className="rounded-xl border-2">
                   {ROLES.map((r) => (
-                    <SelectItem key={r.value} value={r.value} className="text-xs font-bold uppercase tracking-widest">
+                    <SelectItem key={r.value} value={r.value} className="text-xs font-medium">
                       {r.label}
                     </SelectItem>
                   ))}
@@ -132,7 +132,7 @@ export function UserFilters({
                         setOpen(false);
                         onTenantSearchChange("");
                       }}
-                      className="flex items-center justify-between w-full text-left px-3 py-2 text-sm hover:bg-zinc-150 dark:hover:bg-zinc-800 rounded-lg transition-colors cursor-pointer group"
+                      className="flex items-center justify-between w-full text-left px-3 py-2 text-sm hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-lg transition-colors cursor-pointer group"
                     >
                       <div className="flex flex-col">
                         <span className="font-semibold text-zinc-900 dark:text-zinc-100">All Schools</span>
@@ -156,7 +156,7 @@ export function UserFilters({
                               setOpen(false);
                               onTenantSearchChange("");
                             }}
-                            className="flex items-center justify-between w-full text-left px-3 py-2 text-sm hover:bg-zinc-150 dark:hover:bg-zinc-800 rounded-lg transition-colors cursor-pointer group"
+                            className="flex items-center justify-between w-full text-left px-3 py-2 text-sm hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-lg transition-colors cursor-pointer group"
                           >
                             <div className="flex flex-col min-w-0">
                               <span className="font-semibold text-zinc-900 dark:text-zinc-100 truncate">{t.name}</span>

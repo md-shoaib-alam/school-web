@@ -1,7 +1,6 @@
 import { memo } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
   Table,
@@ -32,44 +31,12 @@ import {
   GraduationCap,
   Users,
   UserCheck,
-  Crown,
-  CreditCard,
-  ChevronLeft,
-  ChevronRight,
 } from "lucide-react";
-import { Tenant, ViewMode, planColors, statusColors } from "./types";
-import { SCHOOL_PLANS } from "@/lib/billing-constants";
+import { Tenant, ViewMode } from "./types";
+import { TenantPlanBadge, TenantStatusBadge } from "./badges";
+import { DataTablePagination } from "@/components/ui/data-table-pagination";
 
 // --- Helper Components ---
-
-const PlanBadge = memo(({ plan }: { plan: string }) => {
-  const config = planColors[plan] || planColors.basic;
-  const planMeta = SCHOOL_PLANS.find(p => p.id === plan);
-  const displayName = planMeta?.name || plan;
-
-  return (
-    <Badge
-      variant="outline"
-      className={`${config.bg} ${config.text} ${config.border} border text-[10px] uppercase tracking-wider py-0.5 px-2 font-semibold`}
-    >
-      <Crown className="size-3 mr-1" />
-      {displayName}
-    </Badge>
-  );
-});
-
-const StatusBadge = memo(({ status }: { status: string }) => {
-  const config = statusColors[status] || statusColors.inactive;
-  return (
-    <Badge
-      variant="outline"
-      className={`${config.bg} ${config.text} gap-1 text-[10px] py-0.5 px-2 border-none`}
-    >
-      {config.icon}
-      {status.toUpperCase()}
-    </Badge>
-  );
-});
 
 const TenantCard = memo(function TenantCard({
   tenant,
@@ -89,11 +56,11 @@ const TenantCard = memo(function TenantCard({
   onAddAdmin: (tenant: Tenant) => void;
 }) {
   return (
-    <Card className="group hover:shadow-lg transition-all duration-300 border-teal-100/50 dark:border-teal-900/20">
+    <Card className="group hover:shadow-lg transition-all duration-300">
       <CardContent className="p-5 space-y-4">
         <div className="flex items-start justify-between gap-2">
           <div className="flex items-center gap-3 min-w-0">
-            <div className="size-12 rounded-xl bg-gradient-to-br from-teal-50 to-teal-100 dark:from-teal-950/40 dark:to-teal-900/40 text-teal-700 dark:text-teal-400 flex items-center justify-center shrink-0 border border-teal-200/50 dark:border-teal-800/30 overflow-hidden">
+            <div className="size-12 rounded-xl bg-muted text-muted-foreground flex items-center justify-center shrink-0 border overflow-hidden">
               <img src={tenant.logo || "/test.webp"} alt={tenant.name} className="size-full object-cover" />
             </div>
             <div className="min-w-0">
@@ -109,7 +76,7 @@ const TenantCard = memo(function TenantCard({
               <Button
                 variant="ghost"
                 size="icon"
-                className="size-8 shrink-0 hover:bg-teal-50 dark:hover:bg-teal-950/50"
+                className="size-8 shrink-0"
               >
                 <MoreVertical className="size-4" />
               </Button>
@@ -124,7 +91,7 @@ const TenantCard = memo(function TenantCard({
                 Manage Data
               </DropdownMenuItem>
               <DropdownMenuItem onClick={() => onAddAdmin(tenant)}>
-                <ShieldCheck className="size-4 mr-2 text-violet-600" />
+                <ShieldCheck className="size-4 mr-2" />
                 Create Admin
               </DropdownMenuItem>
               <DropdownMenuItem onClick={onEdit}>
@@ -147,7 +114,7 @@ const TenantCard = memo(function TenantCard({
               </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem
-                className="text-red-600 focus:text-red-600"
+                className="text-destructive focus:text-destructive"
                 onClick={onDelete}
               >
                 <Trash2 className="size-4 mr-2" />
@@ -158,35 +125,35 @@ const TenantCard = memo(function TenantCard({
         </div>
 
         <div className="flex items-center gap-2">
-          <PlanBadge plan={tenant.plan} />
-          <StatusBadge status={tenant.status} />
+          <TenantPlanBadge plan={tenant.plan} />
+          <TenantStatusBadge status={tenant.status} />
         </div>
 
         <div className="grid grid-cols-3 gap-2 py-1">
-          <div className="text-center py-2 px-1 rounded-xl bg-muted/40 border border-muted-foreground/5">
-            <GraduationCap className="size-4 mx-auto text-teal-500 mb-1" />
+          <div className="text-center py-2 px-1 rounded-xl bg-muted/40 border border-border">
+            <GraduationCap className="size-4 mx-auto text-muted-foreground mb-1" />
             <p className="text-sm font-bold leading-tight">
               {tenant.studentCount}
             </p>
-            <p className="text-[10px] text-muted-foreground uppercase font-semibold tracking-tight">
+            <p className="text-xs text-muted-foreground font-medium">
               Students
             </p>
           </div>
-          <div className="text-center py-2 px-1 rounded-xl bg-muted/40 border border-muted-foreground/5">
-            <Users className="size-4 mx-auto text-blue-500 mb-1" />
+          <div className="text-center py-2 px-1 rounded-xl bg-muted/40 border border-border">
+            <Users className="size-4 mx-auto text-muted-foreground mb-1" />
             <p className="text-sm font-bold leading-tight">
               {tenant.teacherCount}
             </p>
-            <p className="text-[10px] text-muted-foreground uppercase font-semibold tracking-tight">
+            <p className="text-xs text-muted-foreground font-medium">
               Teachers
             </p>
           </div>
-          <div className="text-center py-2 px-1 rounded-xl bg-muted/40 border border-muted-foreground/5">
-            <UserCheck className="size-4 mx-auto text-emerald-500 mb-1" />
+          <div className="text-center py-2 px-1 rounded-xl bg-muted/40 border border-border">
+            <UserCheck className="size-4 mx-auto text-muted-foreground mb-1" />
             <p className="text-sm font-bold leading-tight">
               {tenant.parentCount}
             </p>
-            <p className="text-[10px] text-muted-foreground uppercase font-semibold tracking-tight">
+            <p className="text-xs text-muted-foreground font-medium">
               Parents
             </p>
           </div>
@@ -197,7 +164,7 @@ const TenantCard = memo(function TenantCard({
             <Button
               variant="outline"
               size="sm"
-              className="flex-1 h-9 rounded-lg hover:bg-teal-50 dark:hover:bg-teal-950/30"
+              className="flex-1 h-9 rounded-lg"
               onClick={onView}
             >
               View Details
@@ -205,15 +172,16 @@ const TenantCard = memo(function TenantCard({
             <Button
               variant="outline"
               size="sm"
-              className="flex-1 h-9 rounded-lg hover:bg-emerald-50 dark:hover:bg-emerald-950/30"
+              className="flex-1 h-9 rounded-lg"
               onClick={onManageData}
             >
               Live Data
             </Button>
           </div>
           <Button
-            className="w-full bg-violet-600 hover:bg-violet-700 text-white h-9 rounded-lg gap-2 shadow-sm shadow-violet-200 dark:shadow-none transition-all active:scale-[0.98]"
+            variant="default"
             size="sm"
+            className="w-full h-9 rounded-lg gap-2"
             onClick={() => onAddAdmin(tenant)}
           >
             <ShieldCheck className="size-4" />
@@ -301,81 +269,65 @@ export function TenantTable({
         </div>
 
         {totalPages > 1 && (
-          <div className="flex items-center justify-between pt-4 border-t">
-            <p className="text-sm text-muted-foreground">
-              Page {currentPage} of {totalPages}
-            </p>
-            <div className="flex items-center gap-2">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => onPageChange(currentPage - 1)}
-                disabled={currentPage === 1}
-              >
-                <ChevronLeft className="size-4 mr-1" /> Previous
-              </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => onPageChange(currentPage + 1)}
-                disabled={currentPage === totalPages}
-              >
-                Next <ChevronRight className="size-4 ml-1" />
-              </Button>
-            </div>
-          </div>
+          <DataTablePagination
+            page={currentPage}
+            totalPages={totalPages}
+            onPageChange={onPageChange}
+            summary={`Page ${currentPage} of ${totalPages}`}
+            className="pt-4 border-t"
+          />
         )}
       </div>
     );
   }
 
   return (
-    <Card className="overflow-hidden border-teal-100/50 dark:border-teal-900/20">
+    <Card className="overflow-hidden">
       <div className="overflow-x-auto">
         <Table>
           <TableHeader className="bg-muted/50">
             <TableRow>
-              <TableHead className="font-bold">School Name</TableHead>
-              <TableHead className="font-bold">Plan</TableHead>
-              <TableHead className="font-bold">Students</TableHead>
-              <TableHead className="font-bold">Status</TableHead>
-              <TableHead className="font-bold">Revenue</TableHead>
+              <TableHead className="text-xs font-medium text-muted-foreground">School Name</TableHead>
+              <TableHead className="text-xs font-medium text-muted-foreground">Plan</TableHead>
+              <TableHead className="text-xs font-medium text-muted-foreground">Students</TableHead>
+              <TableHead className="text-xs font-medium text-muted-foreground">Status</TableHead>
+              <TableHead className="text-xs font-medium text-muted-foreground">Revenue</TableHead>
               <TableHead className="w-12"></TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {tenants.map((tenant) => (
-              <TableRow key={tenant.id} className="hover:bg-teal-50/30 dark:hover:bg-teal-950/20 transition-colors">
+              <TableRow key={tenant.id} className="hover:bg-muted/50 transition-colors">
                 <TableCell>
                   <div className="flex items-center gap-3">
-                    <div className="size-9 rounded-lg bg-teal-50 dark:bg-teal-900/40 text-teal-600 flex items-center justify-center font-bold overflow-hidden border">
+                    <div className="size-9 rounded-lg bg-muted text-muted-foreground flex items-center justify-center overflow-hidden border">
                       <img src={tenant.logo || "/test.webp"} alt={tenant.name} className="size-full object-cover" />
                     </div>
                     <div>
-                      <p className="font-bold text-sm">{tenant.name}</p>
-                      <p className="text-[10px] text-muted-foreground uppercase font-semibold">@{tenant.slug}</p>
+                      <p className="font-semibold text-sm">{tenant.name}</p>
+                      <p className="text-xs text-muted-foreground">@{tenant.slug}</p>
                     </div>
                   </div>
                 </TableCell>
                 <TableCell>
-                  <PlanBadge plan={tenant.plan} />
+                  <TenantPlanBadge plan={tenant.plan} />
                 </TableCell>
                 <TableCell>
                   <div className="space-y-1">
-                    <p className="text-xs font-bold">{tenant.studentCount} / {tenant.maxStudents}</p>
+                    <p className="text-xs font-medium">{tenant.studentCount} / {tenant.maxStudents}</p>
                     <div className="h-1 w-20 bg-muted rounded-full overflow-hidden">
-                      <div 
-                        className="h-full bg-teal-500" 
-                        style={{ width: `${Math.min(100, (tenant.studentCount / tenant.maxStudents) * 100)}%` }} 
+                      <div
+                        className="h-full bg-primary"
+                        style={{ width: `${Math.min(100, (tenant.studentCount / tenant.maxStudents) * 100)}%` }}
                       />
                     </div>
                   </div>
                 </TableCell>
                 <TableCell>
-                  <StatusBadge status={tenant.status} />
+                  <TenantStatusBadge status={tenant.status} />
                 </TableCell>
                 <TableCell>
-                  <span className="font-bold text-sm text-emerald-600">
+                  <span className="font-medium text-sm">
                     ₹{tenant.totalRevenue.toLocaleString()}
                   </span>
                 </TableCell>
@@ -394,7 +346,7 @@ export function TenantTable({
                         <Database className="size-4 mr-2" /> Manage Data
                       </DropdownMenuItem>
                       <DropdownMenuItem onClick={() => onAddAdmin(tenant)}>
-                        <ShieldCheck className="size-4 mr-2 text-violet-600" /> Create Admin
+                        <ShieldCheck className="size-4 mr-2" /> Create Admin
                       </DropdownMenuItem>
                       <DropdownMenuItem onClick={() => onEdit(tenant)}>
                         <Edit className="size-4 mr-2" /> Edit
@@ -412,7 +364,7 @@ export function TenantTable({
                         )}
                       </DropdownMenuItem>
                       <DropdownMenuSeparator />
-                      <DropdownMenuItem className="text-red-600 focus:text-red-600" onClick={() => onDelete(tenant)}>
+                      <DropdownMenuItem className="text-destructive focus:text-destructive" onClick={() => onDelete(tenant)}>
                         <Trash2 className="size-4 mr-2" /> Delete
                       </DropdownMenuItem>
                     </DropdownMenuContent>
@@ -425,35 +377,13 @@ export function TenantTable({
       </div>
 
       {totalPages > 1 && (
-        <div className="px-4 py-3 bg-muted/30 border-t flex items-center justify-between">
-          <p className="text-xs text-muted-foreground font-medium uppercase tracking-wider">
-            Showing {tenants.length} schools
-          </p>
-          <div className="flex items-center gap-1">
-            <Button
-              variant="outline"
-              size="sm"
-              className="h-8 rounded-lg"
-              onClick={() => onPageChange(currentPage - 1)}
-              disabled={currentPage === 1}
-            >
-              <ChevronLeft className="size-3.5" />
-            </Button>
-            <div className="flex items-center gap-1 px-2">
-              <span className="text-xs font-bold">{currentPage}</span>
-              <span className="text-xs text-muted-foreground">/</span>
-              <span className="text-xs text-muted-foreground">{totalPages}</span>
-            </div>
-            <Button
-              variant="outline"
-              size="sm"
-              className="h-8 rounded-lg"
-              onClick={() => onPageChange(currentPage + 1)}
-              disabled={currentPage === totalPages}
-            >
-              <ChevronRight className="size-3.5" />
-            </Button>
-          </div>
+        <div className="px-4 py-3 border-t">
+          <DataTablePagination
+            page={currentPage}
+            totalPages={totalPages}
+            onPageChange={onPageChange}
+            summary={`Showing ${tenants.length} schools`}
+          />
         </div>
       )}
     </Card>

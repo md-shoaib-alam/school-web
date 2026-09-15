@@ -1,55 +1,55 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { 
-  useTenants, 
-  useUpdateTenant 
+import {
+  useTenants,
+  useUpdateTenant
 } from "@/lib/graphql/hooks";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
-import { 
-  Table, 
-  TableBody, 
-  TableCell, 
-  TableHead, 
-  TableHeader, 
-  TableRow 
+import { Skeleton } from "@/components/ui/skeleton";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow
 } from "@/components/ui/table";
-import { 
-  Dialog, 
-  DialogContent, 
-  DialogHeader, 
-  DialogTitle, 
-  DialogFooter 
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter
 } from "@/components/ui/dialog";
-import { 
-  Select, 
-  SelectContent, 
-  SelectItem, 
-  SelectTrigger, 
-  SelectValue 
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue
 } from "@/components/ui/select";
-import { 
-  Building2, 
-  Calendar, 
-  CreditCard, 
-  Search, 
-  ShieldCheck, 
+import {
+  Building2,
+  Calendar,
+  CreditCard,
+  Search,
+  ShieldCheck,
   AlertCircle,
   Clock,
   ArrowUpCircle,
   Settings2,
-  ChevronLeft,
-  ChevronRight
 } from "lucide-react";
-import { cn } from "@/lib/utils";
 import { format } from "date-fns";
 import { toast } from "sonner";
 import { DatePicker } from "@/components/ui/date-picker";
 import { SCHOOL_PLANS } from "@/lib/billing-constants";
+import { DataTablePagination } from "@/components/ui/data-table-pagination";
+import { StatusBadge } from "@/components/ui/status-badge";
 
 const ITEMS_PER_PAGE = 10;
 
@@ -110,72 +110,69 @@ export function SuperAdminSchoolSubscriptions() {
   const getStatusBadge = (status: string, endDate: string | null) => {
     const now = new Date();
     const expiry = endDate ? new Date(endDate) : null;
-    
-    // 1. Priority check for manual overrides or dedicated states
-    if (status === "trial") return <Badge className="bg-purple-600 dark:bg-purple-500 text-white capitalize">Trial</Badge>;
-    if (status === "suspended") return <Badge variant="destructive" className="capitalize">Suspended</Badge>;
-    
-    // 2. Inactive handles generic non-active falls throughs
-    if (status !== "active") return <Badge variant="destructive" className="capitalize">{status}</Badge>;
-    
-    // 3. Check active period boundaries
-    if (expiry && expiry < now) return <Badge variant="outline" className="text-rose-500 border-rose-500 font-medium">Expired</Badge>;
-    
-    return <Badge className="bg-emerald-500 hover:bg-emerald-600 text-white">Active</Badge>;
+
+    if (status === "trial") return <StatusBadge tone="warning">Trial</StatusBadge>;
+    if (status === "suspended") return <StatusBadge tone="negative">Suspended</StatusBadge>;
+
+    if (status !== "active") return <StatusBadge tone="negative">{status}</StatusBadge>;
+
+    if (expiry && expiry < now) return <StatusBadge tone="negative">Expired</StatusBadge>;
+
+    return <StatusBadge tone="positive">Active</StatusBadge>;
   };
 
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
-          <div className="size-12 rounded-2xl bg-violet-100 dark:bg-violet-900/30 flex items-center justify-center">
-            <ShieldCheck className="size-6 text-violet-600 dark:text-violet-400" />
+          <div className="size-12 rounded-2xl bg-muted flex items-center justify-center border">
+            <ShieldCheck className="size-6 text-muted-foreground" />
           </div>
           <div>
-            <h2 className="text-3xl font-semibold tracking-tight">B2B School Licenses</h2>
-            <p className="text-muted-foreground mt-1">Manage school-level plans, limits, and license periods.</p>
+            <h2 className="text-2xl font-semibold tracking-tight">B2B School Licenses</h2>
+            <p className="text-sm text-muted-foreground mt-1">Manage school-level plans, limits, and license periods.</p>
           </div>
         </div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <Card>
+        <Card className="border rounded-xl bg-card">
           <CardContent className="pt-6">
             <div className="flex items-center gap-4">
-              <div className="size-10 rounded-full bg-blue-100 dark:bg-blue-900/50 flex items-center justify-center text-blue-600">
+              <div className="size-10 rounded-full bg-muted flex items-center justify-center text-muted-foreground">
                 <Building2 className="size-5" />
               </div>
               <div>
-                <p className="text-sm font-medium text-muted-foreground">Total Schools</p>
-                <p className="text-2xl font-bold">{tenantsData?.stats?.total ?? 0}</p>
+                <p className="text-xs font-medium text-muted-foreground">Total schools</p>
+                <p className="text-2xl font-semibold">{tenantsData?.stats?.total ?? 0}</p>
               </div>
             </div>
           </CardContent>
         </Card>
-        <Card>
+        <Card className="border rounded-xl bg-card">
           <CardContent className="pt-6">
             <div className="flex items-center gap-4">
-              <div className="size-10 rounded-full bg-emerald-100 dark:bg-emerald-900/50 flex items-center justify-center text-emerald-600">
+              <div className="size-10 rounded-full bg-muted flex items-center justify-center text-muted-foreground">
                 <ArrowUpCircle className="size-5" />
               </div>
               <div>
-                <p className="text-sm font-medium text-muted-foreground">Active Licenses</p>
-                <p className="text-2xl font-bold">
+                <p className="text-xs font-medium text-muted-foreground">Active licenses</p>
+                <p className="text-2xl font-semibold">
                   {(tenantsData?.stats?.active ?? 0) + (tenantsData?.stats?.trial ?? 0)}
                 </p>
               </div>
             </div>
           </CardContent>
         </Card>
-        <Card>
+        <Card className="border rounded-xl bg-card">
           <CardContent className="pt-6">
             <div className="flex items-center gap-4">
-              <div className="size-10 rounded-full bg-amber-100 dark:bg-amber-900/50 flex items-center justify-center text-amber-600">
+              <div className="size-10 rounded-full bg-muted flex items-center justify-center text-muted-foreground">
                 <Clock className="size-5" />
               </div>
               <div>
-                <p className="text-sm font-medium text-muted-foreground">Expiring Soon</p>
-                <p className="text-2xl font-bold">
+                <p className="text-xs font-medium text-muted-foreground">Expiring soon</p>
+                <p className="text-2xl font-semibold">
                   {tenantsData?.stats?.expiring ?? 0}
                 </p>
               </div>
@@ -184,13 +181,13 @@ export function SuperAdminSchoolSubscriptions() {
         </Card>
       </div>
 
-      <Card>
+      <Card className="border rounded-xl bg-card">
         <div className="p-4 border-b flex items-center gap-4">
           <div className="relative flex-1">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
-            <Input 
-              placeholder="Search schools..." 
-              className="pl-9" 
+            <Input
+              placeholder="Search schools..."
+              className="pl-9"
               value={search}
               onChange={(e) => {
                 setSearch(e.target.value);
@@ -201,26 +198,34 @@ export function SuperAdminSchoolSubscriptions() {
         </div>
         <Table>
           <TableHeader>
-            <TableRow>
-              <TableHead>School Name</TableHead>
-              <TableHead>Current Plan</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead>Expiry Date</TableHead>
-              <TableHead>Student Limit</TableHead>
-              <TableHead className="text-right">Actions</TableHead>
+            <TableRow className="bg-muted/50 hover:bg-muted/50">
+              <TableHead className="text-xs font-medium text-muted-foreground">School Name</TableHead>
+              <TableHead className="text-xs font-medium text-muted-foreground">Current Plan</TableHead>
+              <TableHead className="text-xs font-medium text-muted-foreground">Status</TableHead>
+              <TableHead className="text-xs font-medium text-muted-foreground">Expiry Date</TableHead>
+              <TableHead className="text-xs font-medium text-muted-foreground">Student Limit</TableHead>
+              <TableHead className="text-xs font-medium text-muted-foreground text-right">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {isLoading ? (
-              <TableRow><TableCell colSpan={6} className="text-center py-10">Loading schools…</TableCell></TableRow>
+              [...Array(5)].map((_, i) => (
+                <TableRow key={i}>
+                  {[...Array(6)].map((_, j) => (
+                    <TableCell key={j}>
+                      <Skeleton className="h-4 w-full" />
+                    </TableCell>
+                  ))}
+                </TableRow>
+              ))
             ) : tenantsData?.tenants?.length === 0 ? (
               <TableRow><TableCell colSpan={6} className="text-center py-10 text-muted-foreground">No schools found.</TableCell></TableRow>
             ) : (
               tenantsData?.tenants?.map((tenant: any) => (
-                <TableRow key={tenant.id}>
+                <TableRow key={tenant.id} className="hover:bg-muted/50 transition-colors">
                   <TableCell className="font-medium">{tenant.name}</TableCell>
                   <TableCell className="capitalize">
-                    <Badge variant="secondary" className="bg-violet-50 text-violet-700 border-violet-100">
+                    <Badge variant="secondary" className="text-xs font-medium">
                       {tenant.plan}
                     </Badge>
                   </TableCell>
@@ -233,11 +238,11 @@ export function SuperAdminSchoolSubscriptions() {
                   </TableCell>
                   <TableCell>{tenant.maxStudents.toLocaleString()}</TableCell>
                   <TableCell className="text-right">
-                    <Button 
-                      variant="outline" 
-                      size="sm" 
+                    <Button
+                      variant="outline"
+                      size="sm"
                       onClick={() => handleEdit(tenant)}
-                      className="h-8 gap-1.5 border-violet-100 text-violet-600 hover:bg-violet-50 hover:text-violet-700 dark:border-violet-900/50 dark:text-violet-400 dark:hover:bg-violet-900/30"
+                      className="h-8 gap-1.5"
                     >
                       <Settings2 className="size-3.5" />
                       Manage
@@ -249,93 +254,13 @@ export function SuperAdminSchoolSubscriptions() {
           </TableBody>
         </Table>
         {!isLoading && tenantsData && tenantsData.totalPages > 1 && (
-          <div className="flex flex-col sm:flex-row items-center justify-between px-6 py-4 bg-zinc-50/50 dark:bg-zinc-900/20 border-t gap-4">
-            <div className="flex items-center gap-4 order-2 sm:order-1">
-              <p className="text-sm text-muted-foreground">
-                Showing{" "}
-                <span className="font-semibold text-violet-600 dark:text-violet-400">
-                  {(currentPage - 1) * ITEMS_PER_PAGE + 1}
-                </span>{" "}
-                to{" "}
-                <span className="font-semibold text-violet-600 dark:text-violet-400">
-                  {Math.min(currentPage * ITEMS_PER_PAGE, tenantsData.total)}
-                </span>{" "}
-                of{" "}
-                <span className="font-semibold text-zinc-900 dark:text-zinc-100">
-                  {tenantsData.total}
-                </span>{" "}
-                entries
-              </p>
-              <div className="flex items-center gap-2">
-                <span className="text-xs text-muted-foreground whitespace-nowrap">
-                  Rows per page: {ITEMS_PER_PAGE}
-                </span>
-              </div>
-            </div>
-
-            <div className="flex items-center gap-1 order-1 sm:order-2">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setCurrentPage((prev) => prev - 1)}
-                disabled={currentPage === 1}
-                className="size-8 p-0"
-              >
-                <ChevronLeft className="size-4" />
-              </Button>
-
-              <div className="flex items-center gap-1 mx-1">
-                {Array.from({ length: tenantsData.totalPages }, (_, i) => i + 1).map(
-                  (pageNum) => {
-                    if (
-                      pageNum === 1 ||
-                      pageNum === tenantsData.totalPages ||
-                      (pageNum >= currentPage - 1 && pageNum <= currentPage + 1)
-                    ) {
-                      return (
-                        <Button
-                          key={pageNum}
-                          variant={currentPage === pageNum ? "default" : "outline"}
-                          size="sm"
-                          className={cn(
-                            "size-8 p-0 text-xs",
-                            currentPage === pageNum
-                              ? "bg-violet-600 hover:bg-violet-700 shadow-sm"
-                              : "hover:bg-violet-50",
-                          )}
-                          onClick={() => setCurrentPage(pageNum)}
-                        >
-                          {pageNum}
-                        </Button>
-                      );
-                    }
-
-                    if (pageNum === 2 || pageNum === tenantsData.totalPages - 1) {
-                      return (
-                        <span
-                          key={pageNum}
-                          className="px-1 text-muted-foreground text-xs"
-                        >
-                          ...
-                        </span>
-                      );
-                    }
-
-                    return null;
-                  },
-                )}
-              </div>
-
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setCurrentPage((prev) => prev + 1)}
-                disabled={currentPage === tenantsData.totalPages}
-                className="size-8 p-0"
-              >
-                <ChevronRight className="size-4" />
-              </Button>
-            </div>
+          <div className="px-6 py-4 border-t">
+            <DataTablePagination
+              page={currentPage}
+              totalPages={tenantsData.totalPages}
+              onPageChange={setCurrentPage}
+              summary={`Showing ${(currentPage - 1) * ITEMS_PER_PAGE + 1}\u2013${Math.min(currentPage * ITEMS_PER_PAGE, tenantsData.total)} of ${tenantsData.total} entries`}
+            />
           </div>
         )}
       </Card>
@@ -349,13 +274,13 @@ export function SuperAdminSchoolSubscriptions() {
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label>Service Plan</Label>
-                <Select 
-                  value={editingTenant?.plan} 
+                <Select
+                  value={editingTenant?.plan}
                   onValueChange={(v) => {
                     const selectedPlan = SCHOOL_PLANS.find(p => p.id === v);
                     if (selectedPlan) {
                       setEditingTenant({
-                        ...editingTenant, 
+                        ...editingTenant,
                         plan: v,
                         maxStudents: selectedPlan.limits.students,
                         maxTeachers: selectedPlan.limits.teachers,
@@ -392,30 +317,30 @@ export function SuperAdminSchoolSubscriptions() {
 
             <div className="space-y-2">
               <Label>License Expiry Date</Label>
-              <DatePicker 
-                date={editingTenant?.endDate ? new Date(editingTenant.endDate) : undefined} 
+              <DatePicker
+                date={editingTenant?.endDate ? new Date(editingTenant.endDate) : undefined}
                 onChange={(date) => setEditingTenant({
-                  ...editingTenant, 
+                  ...editingTenant,
                   endDate: date ? format(date, "yyyy-MM-dd") : ""
-                })} 
+                })}
               />
             </div>
 
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label>Max Students</Label>
-                <Input 
-                  type="number" 
-                  value={editingTenant?.maxStudents} 
-                  onChange={(e) => setEditingTenant({...editingTenant, maxStudents: e.target.value})} 
+                <Input
+                  type="number"
+                  value={editingTenant?.maxStudents}
+                  onChange={(e) => setEditingTenant({...editingTenant, maxStudents: e.target.value})}
                 />
               </div>
               <div className="space-y-2">
                 <Label>Max Teachers</Label>
-                <Input 
-                  type="number" 
-                  value={editingTenant?.maxTeachers} 
-                  onChange={(e) => setEditingTenant({...editingTenant, maxTeachers: e.target.value})} 
+                <Input
+                  type="number"
+                  value={editingTenant?.maxTeachers}
+                  onChange={(e) => setEditingTenant({...editingTenant, maxTeachers: e.target.value})}
                 />
               </div>
             </div>
@@ -423,32 +348,32 @@ export function SuperAdminSchoolSubscriptions() {
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label>Max Parents</Label>
-                <Input 
-                  type="number" 
-                  value={editingTenant?.maxParents} 
-                  onChange={(e) => setEditingTenant({...editingTenant, maxParents: e.target.value})} 
+                <Input
+                  type="number"
+                  value={editingTenant?.maxParents}
+                  onChange={(e) => setEditingTenant({...editingTenant, maxParents: e.target.value})}
                 />
               </div>
               <div className="space-y-2">
                 <Label>Max Classes</Label>
-                <Input 
-                  type="number" 
-                  value={editingTenant?.maxClasses} 
-                  onChange={(e) => setEditingTenant({...editingTenant, maxClasses: e.target.value})} 
+                <Input
+                  type="number"
+                  value={editingTenant?.maxClasses}
+                  onChange={(e) => setEditingTenant({...editingTenant, maxClasses: e.target.value})}
                 />
               </div>
             </div>
 
-            <div className="p-3 bg-amber-50 dark:bg-amber-950/20 rounded-lg border border-amber-100 dark:border-amber-900/50 flex items-start gap-3">
-              <AlertCircle className="size-5 text-amber-600 mt-0.5" />
-              <p className="text-xs text-amber-800 dark:text-amber-200">
+            <div className="p-3 bg-muted rounded-lg border flex items-start gap-3">
+              <AlertCircle className="size-5 text-muted-foreground mt-0.5" />
+              <p className="text-xs text-muted-foreground">
                 Updating these settings will immediately affect the school's ability to login and add data.
               </p>
             </div>
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setIsDialogOpen(false)}>Cancel</Button>
-            <Button onClick={handleUpdate} className="bg-violet-600 hover:bg-violet-700">Update License</Button>
+            <Button onClick={handleUpdate}>Update License</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

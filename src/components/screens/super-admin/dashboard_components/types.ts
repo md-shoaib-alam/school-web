@@ -1,4 +1,3 @@
-import React from "react";
 import type { ChartConfig } from "@/components/ui/chart";
 
 export interface DashboardData {
@@ -61,29 +60,29 @@ export interface DashboardData {
 }
 
 export const userChartConfig: ChartConfig = {
-  students: { label: "Students", color: "#10b981" },
-  teachers: { label: "Teachers", color: "#3b82f6" },
-  parents: { label: "Parents", color: "#f59e0b" },
-  admins: { label: "Admins", color: "#8b5cf6" },
+  students: { label: "Students", color: "var(--chart-1)" },
+  teachers: { label: "Teachers", color: "var(--chart-2)" },
+  parents: { label: "Parents", color: "var(--chart-3)" },
+  admins: { label: "Admins", color: "var(--chart-4)" },
 };
 
 export const growthChartConfig: ChartConfig = {
-  newTenants: { label: "New Schools", color: "#059669" },
-  newUsers: { label: "New Users", color: "#10b981" },
-  revenue: { label: "Revenue ($)", color: "#047857" },
+  newTenants: { label: "New Schools", color: "var(--chart-1)" },
+  newUsers: { label: "New Users", color: "var(--chart-2)" },
+  revenue: { label: "Revenue ($)", color: "var(--chart-3)" },
 };
 
 export const planChartConfig: ChartConfig = {
-  count: { label: "Schools", color: "#059669" },
+  count: { label: "Schools", color: "var(--chart-1)" },
 };
 
-export const USER_CHART_COLORS = ["#10b981", "#3b82f6", "#f59e0b", "#8b5cf6"];
+export const USER_CHART_COLORS = ["var(--chart-1)", "var(--chart-2)", "var(--chart-3)", "var(--chart-4)"];
 
 export const PLAN_COLORS: Record<string, string> = {
-  basic: "#94a3b8",
-  standard: "#059669",
-  premium: "#f59e0b",
-  enterprise: "#7c3aed",
+  basic: "var(--muted-foreground)",
+  standard: "var(--chart-1)",
+  premium: "var(--chart-3)",
+  enterprise: "var(--chart-5)",
 };
 
 function formatAction(action: string): string {

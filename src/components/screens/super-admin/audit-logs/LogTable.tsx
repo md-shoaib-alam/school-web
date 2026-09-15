@@ -1,13 +1,11 @@
-import { 
-  useState 
-} from "react";
-import { 
-  Table, 
-  TableBody, 
-  TableCell, 
-  TableHead, 
-  TableHeader, 
-  TableRow 
+import { useState } from "react";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow
 } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -22,16 +20,12 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import {
-  ChevronLeft,
-  ChevronRight,
-  ChevronsLeft,
-  ChevronsRight,
   User,
-  CalendarDays,
   MoreHorizontal,
   Clock,
   Database,
-  Activity
+  Activity,
+  ScrollText
 } from "lucide-react";
 import {
   Dialog,
@@ -41,11 +35,13 @@ import {
   DialogDescription,
 } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
-import { 
-  AuditLog, 
-  ActionTypeCount, 
-  truncateJson, 
-  formatTimestamp 
+import { PageHeader } from "@/components/ui/page-header";
+import { DataTablePagination } from "@/components/ui/data-table-pagination";
+import {
+  AuditLog,
+  ActionTypeCount,
+  truncateJson,
+  formatTimestamp
 } from "./types";
 
 interface LogTableProps {
@@ -110,20 +106,19 @@ export function LogTable({
   return (
     <div className="space-y-6">
       {/* Page Title Header */}
-      <div className="px-1">
-        <h1 className="text-2xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-100">Audit Logs</h1>
-        <p className="text-sm text-zinc-500 dark:text-zinc-400 mt-1">
-          Monitor any changes made to your project, schema and content with audit logs.
-        </p>
-      </div>
+      <PageHeader
+        icon={<ScrollText />}
+        title="Audit Logs"
+        description="Monitor any changes made to your project, schema and content with audit logs."
+      />
 
       {/* Filters Area */}
       {showFilters && (
         <div className="bg-zinc-50/50 dark:bg-zinc-900/30 border border-zinc-200 dark:border-zinc-800 rounded-xl p-5 flex flex-col md:flex-row items-end gap-4">
           <div className="w-full space-y-1.5">
-            <Label className="text-xs font-semibold text-zinc-700 dark:text-zinc-300">By Role</Label>
+            <Label className="text-xs font-medium text-muted-foreground">By Role</Label>
             <Select value={roleFilter} onValueChange={onRoleFilterChange}>
-              <SelectTrigger className="w-full bg-white dark:bg-zinc-950 border-zinc-200 dark:border-zinc-800 h-10">
+              <SelectTrigger className="w-full bg-card border-border h-10">
                 <SelectValue placeholder="Select Role" />
               </SelectTrigger>
               <SelectContent>
@@ -136,9 +131,9 @@ export function LogTable({
           </div>
 
           <div className="w-full space-y-1.5">
-            <Label className="text-xs font-semibold text-zinc-700 dark:text-zinc-300">By Tenant</Label>
+            <Label className="text-xs font-medium text-muted-foreground">By Tenant</Label>
             <Select value={tenantFilter} onValueChange={onTenantFilterChange}>
-              <SelectTrigger className="w-full bg-white dark:bg-zinc-950 border-zinc-200 dark:border-zinc-800 h-10">
+              <SelectTrigger className="w-full bg-card border-border h-10">
                 <SelectValue placeholder="Select Tenant" />
               </SelectTrigger>
               <SelectContent>
@@ -151,9 +146,9 @@ export function LogTable({
           </div>
 
           <div className="w-full space-y-1.5">
-            <Label className="text-xs font-semibold text-zinc-700 dark:text-zinc-300">Action</Label>
+            <Label className="text-xs font-medium text-muted-foreground">Action</Label>
             <Select value={actionFilter} onValueChange={onActionFilterChange}>
-              <SelectTrigger className="w-full bg-white dark:bg-zinc-950 border-zinc-200 dark:border-zinc-800 h-10">
+              <SelectTrigger className="w-full bg-card border-border h-10">
                 <SelectValue placeholder="Select Action" />
               </SelectTrigger>
               <SelectContent>
@@ -168,12 +163,12 @@ export function LogTable({
           </div>
 
           <div className="flex items-center gap-2 h-10 md:pt-1.5">
-            <Button className="bg-[#0056b3] hover:bg-[#004494] text-white px-6 h-10 rounded-md shadow-sm">
+            <Button className="px-6 h-10 rounded-md shadow-sm">
               Apply
             </Button>
-            <Button 
-              variant="outline" 
-              className="bg-white dark:bg-transparent h-10 text-zinc-600"
+            <Button
+              variant="outline"
+              className="bg-card h-10"
               onClick={() => setShowFilters(false)}
             >
               Hide
@@ -183,7 +178,7 @@ export function LogTable({
       )}
 
       {/* Table Container */}
-      <div className="bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-lg overflow-hidden shadow-sm">
+      <div className="bg-card border border-border rounded-lg overflow-hidden shadow-sm">
         {loading ? (
           <div className="p-4 space-y-3">
             {Array.from({ length: 8 }).map((_, i) => (
@@ -215,13 +210,13 @@ export function LogTable({
                         <div className="flex items-center gap-3">
                           <Avatar className="size-8 bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700">
                             <AvatarImage src={`https://api.dicebear.com/7.x/initials/svg?seed=${log.user?.name || log.tenant?.name || 'Sys'}`} />
-                            <AvatarFallback className="text-[10px] bg-zinc-100 text-zinc-500"><User className="size-3.5" /></AvatarFallback>
+                            <AvatarFallback className="text-xs bg-zinc-100 text-zinc-500"><User className="size-3.5" /></AvatarFallback>
                           </Avatar>
                           <div className="flex flex-col">
                             <span className="text-sm font-medium text-zinc-900 dark:text-zinc-100">
                               {log.user?.name || (log.tenant ? `${log.tenant.name} (System)` : "Platform Admin")}
                             </span>
-                            <span className="text-[11px] text-zinc-500 dark:text-zinc-500">
+                            <span className="text-xs text-zinc-500 dark:text-zinc-500">
                               @{log.tenant?.slug || "sysroot"}
                             </span>
                           </div>
@@ -229,9 +224,9 @@ export function LogTable({
                       </TableCell>
 
                       <TableCell className="py-3 px-4">
-                        <span className="text-sm text-[#0056b3] dark:text-blue-400 hover:underline cursor-pointer">
+                        <Button variant="link" size="sm" className="h-auto p-0 text-primary">
                           {log.user?.email || log.tenant?.email || "system@platform.dev"}
-                        </span>
+                        </Button>
                       </TableCell>
 
                       <TableCell className="py-3 px-4 text-sm capitalize">
@@ -264,43 +259,13 @@ export function LogTable({
             </div>
 
             {/* Pagination Control Bar */}
-            <div className="flex items-center justify-between px-4 py-3 border-t border-zinc-100 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-900/50 text-xs font-medium text-zinc-500">
-              <div>
-                Displaying {(page - 1) * limit + 1} to {Math.min(page * limit, totalLogs)} of {totalLogs.toLocaleString()} records
-              </div>
-              <div className="flex items-center gap-1">
-                <Button variant="outline" size="icon" className="size-7 p-0 bg-white dark:bg-transparent" onClick={() => onPageChange(1)} disabled={page <= 1}>
-                  <ChevronsLeft className="size-3.5" />
-                </Button>
-                <Button variant="outline" size="icon" className="size-7 p-0 bg-white dark:bg-transparent" onClick={() => onPageChange(page - 1)} disabled={page <= 1}>
-                  <ChevronLeft className="size-3.5" />
-                </Button>
-                
-                <div className="flex gap-1 mx-1">
-                  {Array.from({ length: Math.min(3, totalPages) }).map((_, i) => {
-                    const p = page <= 2 ? i + 1 : (page >= totalPages - 1 ? totalPages - 2 + i : page - 1 + i);
-                    if (p < 1 || p > totalPages) return null;
-                    return (
-                      <Button 
-                        key={p}
-                        variant={page === p ? "default" : "outline"}
-                        size="sm" 
-                        className={`size-7 text-xs p-0 ${page === p ? 'bg-[#0056b3] text-white' : 'bg-white dark:bg-transparent'}`}
-                        onClick={() => onPageChange(p)}
-                      >
-                        {p}
-                      </Button>
-                    );
-                  })}
-                </div>
-
-                <Button variant="outline" size="icon" className="size-7 p-0 bg-white dark:bg-transparent" onClick={() => onPageChange(page + 1)} disabled={page >= totalPages}>
-                  <ChevronRight className="size-3.5" />
-                </Button>
-                <Button variant="outline" size="icon" className="size-7 p-0 bg-white dark:bg-transparent" onClick={() => onPageChange(totalPages)} disabled={page >= totalPages}>
-                  <ChevronsRight className="size-3.5" />
-                </Button>
-              </div>
+            <div className="px-4 py-3 border-t border-border">
+              <DataTablePagination
+                page={page}
+                totalPages={totalPages}
+                onPageChange={onPageChange}
+                summary={`Displaying ${(page - 1) * limit + 1} to ${Math.min(page * limit, totalLogs)} of ${totalLogs.toLocaleString()} records`}
+              />
             </div>
           </>
         )}
@@ -322,44 +287,44 @@ export function LogTable({
             <div className="space-y-5 pt-2">
               {/* Essential Context Bar */}
               <div className="grid grid-cols-2 gap-3">
-                <div className="p-2.5 rounded-lg border border-zinc-100 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-900/30">
-                  <span className="text-[10px] font-semibold uppercase tracking-wider text-zinc-400 flex items-center gap-1.5 mb-1">
-                    <Clock className="size-3" /> Executed At
+                <div className="p-2.5 rounded-lg border border-border bg-muted/30">
+                  <span className="text-xs font-medium text-muted-foreground flex items-center gap-1.5 mb-1">
+                    <Clock className="size-3" /> Executed at
                   </span>
                   <p className="text-xs font-medium text-zinc-900 dark:text-zinc-100">
                     {formatTimestamp(selectedLog.createdAt)}
                   </p>
                 </div>
-                <div className="p-2.5 rounded-lg border border-zinc-100 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-900/30">
-                  <span className="text-[10px] font-semibold uppercase tracking-wider text-zinc-400 flex items-center gap-1.5 mb-1">
-                    <Database className="size-3" /> Target Module
+                <div className="p-2.5 rounded-lg border border-border bg-muted/30">
+                  <span className="text-xs font-medium text-muted-foreground flex items-center gap-1.5 mb-1">
+                    <Database className="size-3" /> Target module
                   </span>
-                  <Badge variant="secondary" className="uppercase text-[9px] h-5 tracking-wide font-bold">
+                  <Badge variant="secondary" className="uppercase text-xs h-5 font-medium">
                     {selectedLog.resource}
                   </Badge>
                 </div>
               </div>
 
               {/* Actor Meta Grid */}
-              <div className="p-3 rounded-lg border border-blue-50 dark:border-zinc-800 bg-blue-50/20 dark:bg-zinc-900/50 space-y-3">
-                <h4 className="text-[10px] font-semibold uppercase tracking-widest text-blue-600/80 dark:text-blue-400/80 border-b border-blue-100 dark:border-zinc-800 pb-1.5 mb-2">
-                  Operator & Network Context
+              <div className="p-3 rounded-lg border border-border bg-muted/20 space-y-3">
+                <h4 className="text-xs font-medium text-muted-foreground border-b border-border pb-1.5 mb-2">
+                  Operator & network context
                 </h4>
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-0.5">
-                    <p className="text-[10px] font-medium text-zinc-500">Operator Name</p>
+                    <p className="text-xs font-medium text-muted-foreground">Operator name</p>
                     <p className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">
                       {selectedLog.user?.name || (selectedLog.tenant ? `${selectedLog.tenant.name}` : "Platform Engine")}
                     </p>
                   </div>
                   <div className="space-y-0.5">
-                    <p className="text-[10px] font-medium text-zinc-500">Network IP</p>
+                    <p className="text-xs font-medium text-muted-foreground">Network IP</p>
                     <p className="text-sm font-mono font-bold text-zinc-700 dark:text-zinc-300">
                       {selectedLog.ipAddress || "Internal"}
                     </p>
                   </div>
                   <div className="col-span-2 space-y-0.5">
-                    <p className="text-[10px] font-medium text-zinc-500">Registered Email</p>
+                    <p className="text-xs font-medium text-muted-foreground">Registered email</p>
                     <p className="text-xs font-medium text-blue-600 dark:text-blue-400 truncate">
                       {selectedLog.user?.email || selectedLog.tenant?.email || "sysadmin@platform.dev"}
                     </p>
@@ -371,12 +336,12 @@ export function LogTable({
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
                    <span className="text-xs font-bold text-zinc-800 dark:text-zinc-200">Action Event Payload</span>
-                   <Badge variant="outline" className="text-[10px] font-mono bg-zinc-100 dark:bg-zinc-950">
+                   <Badge variant="outline" className="text-xs font-mono bg-muted">
                       {selectedLog.action}
                    </Badge>
                 </div>
                 <div className="relative bg-zinc-950 dark:bg-zinc-950 border border-zinc-800 rounded-md p-3 overflow-hidden">
-                  <pre className="text-[11px] font-mono text-emerald-400 whitespace-pre-wrap break-all max-h-[200px] overflow-y-auto custom-scrollbar leading-relaxed">
+                  <pre className="text-xs font-mono text-muted-foreground whitespace-pre-wrap break-all max-h-[200px] overflow-y-auto custom-scrollbar leading-relaxed">
                     {(() => {
                       try {
                         return JSON.stringify(JSON.parse(selectedLog.details), null, 2);

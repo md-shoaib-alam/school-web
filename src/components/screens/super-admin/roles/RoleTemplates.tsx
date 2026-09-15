@@ -39,7 +39,7 @@ export function RoleTemplates({ onSelectTemplate }: RoleTemplatesProps) {
                 <div className="absolute top-0 right-0 size-16 bg-zinc-50 dark:bg-zinc-900/50 rounded-bl-full -translate-y-1/2 translate-x-1/2 group-hover:bg-teal-100/50 dark:group-hover:bg-teal-800/30 transition-colors" />
                 <div className="relative z-10 flex items-center gap-2 mb-1">
                   <div
-                    className="size-9 rounded-xl flex items-center justify-center text-white text-xs font-black shadow-sm"
+                    className="size-9 rounded-xl flex items-center justify-center text-white text-xs font-semibold shadow-sm"
                     style={{ backgroundColor: template.color }}
                   >
                     {template.name.charAt(0)}
@@ -48,11 +48,11 @@ export function RoleTemplates({ onSelectTemplate }: RoleTemplatesProps) {
                     {template.name}
                   </span>
                 </div>
-                <p className="text-[11px] text-zinc-500 dark:text-zinc-400 line-clamp-2 leading-relaxed h-8">
+                <p className="text-xs text-zinc-500 dark:text-zinc-400 line-clamp-2 leading-relaxed h-8">
                   {template.description}
                 </p>
                 <div className="flex items-center gap-1.5 mt-1">
-                  <Badge variant="secondary" className="text-[9px] font-bold h-5 px-2 bg-zinc-100 dark:bg-zinc-700/50 text-zinc-600 dark:text-zinc-300 border-none">
+                  <Badge variant="secondary" className="text-xs font-medium h-5 px-2 bg-zinc-100 dark:bg-zinc-700/50 text-zinc-600 dark:text-zinc-300 border-none">
                     {permCount} Permissions
                   </Badge>
                 </div>

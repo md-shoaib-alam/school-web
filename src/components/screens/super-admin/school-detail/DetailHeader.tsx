@@ -40,19 +40,19 @@ function MiniStat({
   isCurrency,
 }: MiniStatProps) {
   return (
-    <Card className="border-none shadow-sm hover:shadow-md transition-shadow group overflow-hidden bg-white dark:bg-zinc-800">
+    <Card className="border shadow-sm bg-card">
       <CardContent className="p-4 flex items-center gap-4 relative">
-        <div className={`size-11 rounded-xl ${iconBg} ${iconColor} flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform shadow-inner`}>
+        <div className={`size-11 rounded-xl ${iconBg} ${iconColor} flex items-center justify-center shrink-0`}>
           {icon}
         </div>
         <div className="min-w-0">
-          <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground mb-0.5">{label}</p>
+          <p className="text-xs font-medium text-muted-foreground mb-0.5">{label}</p>
           <div className="flex items-baseline gap-1">
-            <span className="text-xl font-black truncate flex items-center">
+            <span className="text-xl font-semibold truncate flex items-center">
               {isCurrency && <IndianRupee className="size-3.5 mr-0.5" />}
               {typeof value === 'number' ? value.toLocaleString() : value}
             </span>
-            {sub && <span className="text-[10px] font-bold text-muted-foreground">{sub}</span>}
+            {sub && <span className="text-xs font-medium text-muted-foreground">{sub}</span>}
           </div>
         </div>
       </CardContent>
@@ -86,14 +86,14 @@ export function DetailHeader({
 
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-2">
         <div className="flex items-center gap-5">
-          <div className="size-14 rounded-2xl bg-gradient-to-br from-rose-500 to-pink-600 text-white flex items-center justify-center shrink-0 shadow-lg shadow-rose-100 dark:shadow-none">
+          <div className="size-14 rounded-xl border bg-muted text-muted-foreground flex items-center justify-center shrink-0">
             <Building2 className="size-7" />
           </div>
           <div className="min-w-0">
             <h1 className="text-2xl font-semibold tracking-tight truncate leading-tight">
               {tenant?.name || tenantName}
             </h1>
-            <p className="text-xs font-black text-rose-600 dark:text-rose-400 mt-0.5 tracking-wider uppercase">
+            <p className="text-xs font-medium text-muted-foreground mt-0.5">
               @{tenant?.slug || tenantSlug}
             </p>
           </div>
@@ -101,13 +101,13 @@ export function DetailHeader({
         <div className="flex items-center gap-2 flex-wrap">
           <Badge
             variant="outline"
-            className={`${planCfg.bg} ${planCfg.text} ${planCfg.border} border-2 capitalize font-black text-[10px] px-3 py-1 rounded-full shadow-sm`}
+            className={`${planCfg.bg} ${planCfg.text} ${planCfg.border} border-2 capitalize font-medium text-xs px-3 py-1 rounded-full`}
           >
             {tenant?.plan || tenantPlan} Plan
           </Badge>
           <Badge
             variant="outline"
-            className={`${statusCfg.bg} ${statusCfg.text} border-2 border-transparent capitalize font-black text-[10px] px-3 py-1 rounded-full flex items-center gap-1.5 shadow-sm`}
+            className={`${statusCfg.bg} ${statusCfg.text} border-2 border-transparent capitalize font-medium text-xs px-3 py-1 rounded-full flex items-center gap-1.5`}
           >
             <div className={`size-1.5 rounded-full ${statusCfg.text.replace('text-', 'bg-')}`} />
             {tenant?.status || "unknown"}

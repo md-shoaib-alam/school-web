@@ -18,10 +18,10 @@ export function StaffHeader({
   return (
     <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
       <div>
-        <h2 className="text-2xl font-semibold text-zinc-900 dark:text-zinc-100 tracking-tight">
+        <h2 className="text-2xl font-semibold text-foreground tracking-tight">
           Staff Management
         </h2>
-        <p className="text-sm font-bold text-muted-foreground mt-0.5">
+        <p className="text-sm font-medium text-muted-foreground mt-0.5">
           Create platform staff accounts with restricted role-based permissions
         </p>
       </div>
@@ -30,14 +30,14 @@ export function StaffHeader({
           <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 size-4 text-muted-foreground opacity-50 group-focus-within:opacity-100 transition-opacity" />
           <Input
             placeholder="Search by name, email, phone..."
-            className="pl-11 h-11 rounded-xl border-2 focus-visible:ring-teal-500/20 focus-visible:border-teal-500 font-medium"
+            className="pl-11 h-11 rounded-xl border-2 focus-visible:ring-primary/20 focus-visible:border-primary font-medium"
             value={search}
             onChange={(e) => onSearchChange(e.target.value)}
           />
         </div>
         {canCreate && (
           <Button
-            className="h-11 px-6 bg-teal-600 hover:bg-teal-700 text-white rounded-xl font-black text-[10px] uppercase tracking-widest shadow-lg shadow-teal-200 dark:shadow-none transition-all hover:scale-105 active:scale-95 shrink-0"
+            className="h-11 px-6 rounded-xl shrink-0"
             onClick={onAddClick}
           >
             <Plus className="size-4 mr-2" />

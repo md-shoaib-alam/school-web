@@ -209,7 +209,6 @@ export function SubscriptionDialogs({
               Cancel
             </Button>
             <Button
-              className="bg-teal-600 hover:bg-teal-700 text-white"
               onClick={onCreateSubmit}
               disabled={processing || !createForm.parentId}
             >
@@ -373,7 +372,6 @@ export function SubscriptionDialogs({
               Cancel
             </Button>
             <Button
-              className="bg-teal-600 hover:bg-teal-700 text-white"
               onClick={onEditSubmit}
               disabled={processing}
             >
@@ -387,7 +385,7 @@ export function SubscriptionDialogs({
       <Dialog open={!!extendOpen} onOpenChange={(open) => !open && onExtendOpenChange(null)}>
         <DialogContent className="sm:max-w-[400px]">
           <DialogHeader>
-            <div className="size-12 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 mb-2">
+            <div className="size-12 rounded-full bg-muted flex items-center justify-center text-muted-foreground mb-2">
               <CalendarClock className="size-6" />
             </div>
             <DialogTitle>Extend Validity</DialogTitle>
@@ -408,7 +406,6 @@ export function SubscriptionDialogs({
                     key={d}
                     type="button"
                     variant={extendDays === d ? "default" : "outline"}
-                    className={extendDays === d ? "bg-blue-600" : ""}
                     onClick={() => setExtendDays(d)}
                   >
                     {d} Days
@@ -428,8 +425,8 @@ export function SubscriptionDialogs({
                 </span>
               </div>
             </div>
-            <div className="rounded-lg bg-blue-50 p-3 border border-blue-100">
-              <p className="text-xs text-blue-700 leading-relaxed">
+            <div className="rounded-lg bg-muted p-3 border border-border">
+              <p className="text-xs text-muted-foreground leading-relaxed">
                 This will move the end date forward. The parent will retain all
                 current plan benefits.
               </p>
@@ -444,7 +441,6 @@ export function SubscriptionDialogs({
               Cancel
             </Button>
             <Button
-              className="bg-blue-600 hover:bg-blue-700 text-white"
               onClick={onExtendSubmit}
               disabled={processing || !extendDays}
             >
@@ -471,7 +467,7 @@ export function SubscriptionDialogs({
           <AlertDialogFooter>
             <AlertDialogCancel disabled={deleting}>Cancel</AlertDialogCancel>
             <AlertDialogAction
-              className="bg-red-600 hover:bg-red-700 text-white border-none"
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90 border-none"
               onClick={onDeleteConfirm}
               disabled={deleting}
             >

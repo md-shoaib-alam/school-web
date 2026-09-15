@@ -2,8 +2,9 @@
 
 import { useQuery } from "@tanstack/react-query";
 import { apiFetch } from "@/lib/api";
-import { AlertTriangle, Loader2 } from "lucide-react";
+import { AlertTriangle } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 
 // Sub-components
 import { DashboardHero } from "./dashboard_components/DashboardHero";
@@ -33,22 +34,21 @@ export function SuperAdminDashboard() {
   if (isError) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
-        <Card className="border-red-200 dark:border-red-700 bg-red-50 dark:bg-red-900/30 max-w-md w-full rounded-3xl overflow-hidden shadow-2xl">
+        <Card className="border-red-200 dark:border-red-700 bg-red-50 dark:bg-red-900/30 max-w-md w-full rounded-3xl overflow-hidden shadow-lg">
           <CardContent className="p-8 text-center text-red-600">
             <div className="size-16 bg-red-100 dark:bg-red-900/30 rounded-2xl flex items-center justify-center mx-auto mb-6">
               <AlertTriangle className="size-8" />
             </div>
-            <p className="text-xl font-black mb-2">System Sync Failed</p>
+            <p className="text-xl font-semibold mb-2">System Sync Failed</p>
             <p className="text-sm font-medium opacity-80 mb-6">
               {error?.message || "We encountered a network error while syncing platform data."}
             </p>
-            <button 
-              type="button"
+            <Button
+              variant="outline"
               onClick={() => window.location.reload()}
-              className="px-6 py-2.5 bg-red-600 text-white rounded-xl font-black text-sm hover:bg-red-700 transition-colors"
             >
               Retry Connection
-            </button>
+            </Button>
           </CardContent>
         </Card>
       </div>
@@ -59,10 +59,10 @@ export function SuperAdminDashboard() {
     <div className="space-y-6 pb-12">
       <DashboardHero loading={loading} data={data} />
 
-      <StatusCards 
-        loading={loading} 
-        data={data} 
-        onNavigate={handleNavigate} 
+      <StatusCards
+        loading={loading}
+        data={data}
+        onNavigate={handleNavigate}
       />
 
       <GrowthCharts loading={loading} data={data} />

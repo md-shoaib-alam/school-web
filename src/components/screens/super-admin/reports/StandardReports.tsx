@@ -85,7 +85,7 @@ export function StandardReports({
         ].map((report, idx) => (
           <div 
             key={report.name}
-            className={`p-3.5 rounded-xl flex items-center justify-between transition-all hover:bg-zinc-100 dark:hover:bg-zinc-850/60 ${report.bg}`}
+            className={`p-3.5 rounded-xl flex items-center justify-between transition-all hover:bg-zinc-100 dark:hover:bg-zinc-800/60 ${report.bg}`}
           >
             <div className="flex items-start gap-3 text-left">
               <div className="size-9 rounded-lg bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 flex items-center justify-center shrink-0">
@@ -93,13 +93,13 @@ export function StandardReports({
               </div>
               <div>
                 <h4 className="text-xs font-semibold text-zinc-900 dark:text-white">{report.name}</h4>
-                <p className="text-[10px] text-zinc-500 dark:text-zinc-400 mt-0.5 line-clamp-1 max-w-[200px] md:max-w-xs">{report.desc}</p>
+                <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5 line-clamp-1 max-w-[200px] md:max-w-xs">{report.desc}</p>
                 
                 <div className="flex items-center gap-1.5 mt-2">
-                  <span className="text-[9px] bg-zinc-100 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-zinc-700 dark:text-zinc-300 font-bold px-1.5 py-0.5 rounded-full uppercase">
+                  <span className="text-xs bg-zinc-100 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-zinc-700 dark:text-zinc-300 font-medium px-1.5 py-0.5 rounded-full uppercase">
                     {report.format}
                   </span>
-                  <span className="text-[9px] text-zinc-400 dark:text-zinc-500">
+                  <span className="text-xs text-zinc-400 dark:text-zinc-500">
                     {report.badge.split("|")[1]}
                   </span>
                 </div>
@@ -109,7 +109,7 @@ export function StandardReports({
             <button 
               type="button"
               onClick={() => onDownloadReport(report.name, report.format, report.data)}
-              className="flex items-center gap-1 text-[10px] font-bold py-1.5 px-3 bg-zinc-100 dark:bg-teal-950/40 hover:bg-teal-600 dark:hover:bg-teal-600 border border-zinc-250 dark:border-teal-900 hover:border-teal-500 text-zinc-700 dark:text-teal-400 hover:text-white dark:hover:text-white cursor-pointer rounded-lg transition-all active:scale-95 shrink-0"
+              className="flex items-center gap-1 text-xs font-medium py-1.5 px-3 bg-zinc-100 dark:bg-teal-950/40 hover:bg-teal-600 dark:hover:bg-teal-600 border border-zinc-200 dark:border-teal-900 hover:border-teal-500 text-zinc-700 dark:text-teal-400 hover:text-white dark:hover:text-white cursor-pointer rounded-lg transition-all shrink-0"
             >
               <Download className="size-3" />
               Get

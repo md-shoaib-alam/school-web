@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useReducer } from "react";
+import { useMemo, useReducer, useState } from "react";
 import { SchoolDetail } from "./school-detail";
 import {
   useTenants,
@@ -20,12 +20,22 @@ import { TenantTable } from "./tenants/TenantTable";
 import { TenantDialogs } from "./tenants/TenantDialogs";
 import { useSearchParams, useRouter, usePathname } from "next/navigation";
 import { useEffect } from "react";
-import { 
-  Tenant, 
-  ITEMS_PER_PAGE, 
-  emptyFormData 
+import {
+  Tenant,
+  ITEMS_PER_PAGE,
+  emptyFormData
 } from "./tenants/types";
 import { tenantsReducer, initialState } from "./tenants/reducer";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 export function SuperAdminTenants() {
   const { canCreate, canEdit, canDelete } = useModulePermissions("tenants");
@@ -90,6 +100,9 @@ export function SuperAdminTenants() {
   const deleteTenant = useDeleteTenant();
   const toggleTenantStatus = useToggleTenantStatus();
   const createUser = useCreateUser();
+
+  // Status toggle confirmation state
+  const [pendingStatusTenant, setPendingStatusTenant] = useState<Tenant | null>(null);
 
   // -- Computed Stats --
   const stats = useMemo(() => {
@@ -173,9 +186,15 @@ export function SuperAdminTenants() {
     }
   };
 
-  const handleToggleStatus = async (tenant: Tenant) => {
-    const newStatus = tenant.status === "active" ? "suspended" : "active";
-    await toggleTenantStatus.mutateAsync({ id: tenant.id, status: newStatus });
+  const handleToggleStatus = async () => {
+    if (!pendingStatusTenant) return;
+    const newStatus = pendingStatusTenant.status === "active" ? "suspended" : "active";
+    await toggleTenantStatus.mutateAsync({ id: pendingStatusTenant.id, status: newStatus });
+    setPendingStatusTenant(null);
+  };
+
+  const onRequestToggleStatus = (tenant: Tenant) => {
+    setPendingStatusTenant(tenant);
   };
 
   const handleDelete = async () => {
@@ -254,7 +273,7 @@ export function SuperAdminTenants() {
         }}
         onView={(t) => dispatch({ type: "SET_VIEWING_TENANT", tenant: t })} 
         onEdit={handleOpenEditDialog}
-        onToggleStatus={handleToggleStatus}
+        onToggleStatus={onRequestToggleStatus}
         onDelete={(t) => {
           dispatch({ type: "SET_DELETING_TENANT", tenant: t });
           dispatch({ type: "SET_DELETE_DIALOG_OPEN", open: true });
@@ -306,6 +325,31 @@ export function SuperAdminTenants() {
         setShowAdminPassword={(v) => dispatch({ type: "SET_SHOW_ADMIN_PASSWORD", show: v })}
         onCreateAdmin={handleCreateAdmin}
       />
+
+      {/* Status Toggle Confirmation */}
+      <AlertDialog open={!!pendingStatusTenant} onOpenChange={(open) => !open && setPendingStatusTenant(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>
+              {pendingStatusTenant?.status === "active" ? "Suspend this school?" : "Activate this school?"}
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              {pendingStatusTenant?.status === "active"
+                ? `Suspending immediately blocks all users of ${pendingStatusTenant?.name} from signing in until reactivated.`
+                : `This reactivates ${pendingStatusTenant?.name} and restores access for all of its users.`}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={() => setPendingStatusTenant(null)}>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={(e) => { e.preventDefault(); handleToggleStatus(); }}
+              className={pendingStatusTenant?.status === "active" ? "bg-destructive text-destructive-foreground hover:bg-destructive/90" : ""}
+            >
+              {pendingStatusTenant?.status === "active" ? "Suspend" : "Activate"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

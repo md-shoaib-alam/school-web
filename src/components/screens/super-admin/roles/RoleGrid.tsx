@@ -72,13 +72,13 @@ export function RoleGrid({ roles, onEdit, onDelete, onAssignUsers }: RoleGridPro
               <div className="flex items-start justify-between">
                 <div className="flex items-center gap-4">
                   <div
-                    className="size-12 rounded-2xl flex items-center justify-center text-white text-xl font-black shadow-lg"
+                    className="size-12 rounded-2xl flex items-center justify-center text-white text-xl font-semibold shadow-sm"
                     style={{ backgroundColor: role.color }}
                   >
                     {role.name.charAt(0).toUpperCase()}
                   </div>
                   <div>
-                    <CardTitle className="text-lg font-black tracking-tight leading-tight">{role.name}</CardTitle>
+                    <CardTitle className="text-lg font-semibold tracking-tight leading-tight">{role.name}</CardTitle>
                     {role.description && (
                       <p className="text-xs text-muted-foreground mt-1 line-clamp-1 font-medium">
                         {role.description}
@@ -165,7 +165,7 @@ export function RoleGrid({ roles, onEdit, onDelete, onAssignUsers }: RoleGridPro
                       <Badge
                         key={`${mod}-${action}`}
                         variant="outline"
-                        className="text-[10px] px-2 py-0 h-5 font-bold border-none transition-colors"
+                        className="text-xs px-2 py-0 h-5 font-medium border-none transition-colors"
                         style={{
                           backgroundColor: role.color + "15",
                           color: role.color,
@@ -176,11 +176,11 @@ export function RoleGrid({ roles, onEdit, onDelete, onAssignUsers }: RoleGridPro
                     )),
                   )
                 ) : (
-                  <p className="text-[10px] text-muted-foreground font-medium italic">No permissions defined</p>
+                  <p className="text-xs text-muted-foreground font-medium italic">No permissions defined</p>
                 )}
                 {permCount > 8 && (
                   <div className="absolute bottom-0 right-0 h-6 w-12 bg-gradient-to-l from-white dark:from-zinc-800 to-transparent flex items-center justify-end">
-                    <span className="text-[10px] font-black text-muted-foreground">+{permCount - 8}</span>
+                    <span className="text-xs font-medium text-muted-foreground">+{permCount - 8}</span>
                   </div>
                 )}
               </div>
@@ -188,7 +188,7 @@ export function RoleGrid({ roles, onEdit, onDelete, onAssignUsers }: RoleGridPro
               {/* Manage Link */}
               <button
                 type="button"
-                className="w-full pt-3 mt-1 border-t border-zinc-100 dark:border-zinc-800 flex items-center justify-between group/link text-[11px] font-bold text-teal-600 dark:text-teal-400 hover:text-teal-700 transition-colors"
+                className="w-full pt-3 mt-1 border-t border-zinc-100 dark:border-zinc-800 flex items-center justify-between group/link text-xs font-medium text-teal-600 dark:text-teal-400 hover:text-teal-700 transition-colors"
                 onClick={() => onAssignUsers(role)}
               >
                 <div className="flex items-center gap-2">

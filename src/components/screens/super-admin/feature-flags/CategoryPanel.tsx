@@ -71,7 +71,7 @@ export function CategoryPanel({
             <div className="size-12 bg-zinc-50 dark:bg-zinc-950 rounded-full flex items-center justify-center mx-auto mb-3 border border-zinc-200 dark:border-zinc-800">
               <Blocks className="size-6 text-zinc-400" />
             </div>
-            <p className="text-sm font-semibold text-zinc-900 dark:text-zinc-150">No Flags Registered</p>
+            <p className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">No Flags Registered</p>
             <p className="text-xs text-zinc-500 mt-1">Configure this category from the orchestration header.</p>
           </CardContent>
         </Card>

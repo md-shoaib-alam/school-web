@@ -30,7 +30,7 @@ const StatCard = memo(function StatCard({
             <div className="flex items-baseline gap-2">
               <p className="text-2xl font-bold">{value}</p>
               {trend && (
-                <span className="text-[10px] text-emerald-600 font-medium">
+                <span className="text-xs text-emerald-600 font-medium">
                   +{trend}
                 </span>
               )}

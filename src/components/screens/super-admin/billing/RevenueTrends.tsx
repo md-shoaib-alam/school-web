@@ -30,12 +30,12 @@ export function RevenueTrends({ loading, monthlyTrend }: RevenueTrendsProps) {
   }, []);
 
   return (
-    <Card className="shadow-sm border-none bg-white dark:bg-zinc-800">
+    <Card className="border rounded-xl bg-card">
       <CardHeader className="pb-2">
         <div className="flex items-center justify-between">
           <div>
-            <CardTitle className="text-base font-bold flex items-center gap-2">
-              <TrendingUp className="size-4 text-emerald-600" /> 
+            <CardTitle className="text-base font-semibold flex items-center gap-2">
+              <TrendingUp className="size-4 text-emerald-600" />
               Revenue Trend (12 Months)
             </CardTitle>
             <CardDescription className="mt-1">
@@ -67,37 +67,37 @@ export function RevenueTrends({ loading, monthlyTrend }: RevenueTrendsProps) {
                       x2="0"
                       y2="1"
                     >
-                      <stop offset="5%" stopColor="#10b981" stopOpacity={0.3} />
-                      <stop offset="95%" stopColor="#10b981" stopOpacity={0.02} />
+                      <stop offset="5%" stopColor="var(--chart-1)" stopOpacity={0.3} />
+                      <stop offset="95%" stopColor="var(--chart-1)" stopOpacity={0.02} />
                     </linearGradient>
                     <linearGradient id="newGradient" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.2} />
-                      <stop offset="95%" stopColor="#3b82f6" stopOpacity={0.02} />
+                      <stop offset="5%" stopColor="var(--chart-2)" stopOpacity={0.2} />
+                      <stop offset="95%" stopColor="var(--chart-2)" stopOpacity={0.02} />
                     </linearGradient>
                     <linearGradient id="churnGradient" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#ef4444" stopOpacity={0.1} />
-                      <stop offset="95%" stopColor="#ef4444" stopOpacity={0.01} />
+                      <stop offset="5%" stopColor="var(--chart-3)" stopOpacity={0.1} />
+                      <stop offset="95%" stopColor="var(--chart-3)" stopOpacity={0.01} />
                     </linearGradient>
                   </defs>
                   <CartesianGrid
                     strokeDasharray="3 3"
                     vertical={false}
-                    stroke="#e2e8f0"
+                    stroke="var(--border)"
                   />
                   <XAxis
                     dataKey="month"
                     tickLine={false}
                     axisLine={false}
-                    fontSize={11}
+                    fontSize={12}
                     tickMargin={12}
-                    tick={{ fill: "#94a3b8" }}
+                    tick={{ fill: "var(--muted-foreground)" }}
                   />
                   <YAxis
                     tickLine={false}
                     axisLine={false}
-                    fontSize={11}
+                    fontSize={12}
                     tickMargin={12}
-                    tick={{ fill: "#94a3b8" }}
+                    tick={{ fill: "var(--muted-foreground)" }}
                     tickFormatter={(v) =>
                       v >= 1000 ? `₹${(v / 1000).toFixed(0)}k` : String(v)
                     }
@@ -125,7 +125,7 @@ export function RevenueTrends({ loading, monthlyTrend }: RevenueTrendsProps) {
                   <Area
                     type="monotone"
                     dataKey="revenue"
-                    stroke="#10b981"
+                    stroke="var(--chart-1)"
                     strokeWidth={3}
                     fill="url(#revenueGradient)"
                     activeDot={{ r: 6, strokeWidth: 0 }}
@@ -133,7 +133,7 @@ export function RevenueTrends({ loading, monthlyTrend }: RevenueTrendsProps) {
                   <Area
                     type="monotone"
                     dataKey="newSubscriptions"
-                    stroke="#3b82f6"
+                    stroke="var(--chart-2)"
                     strokeWidth={2}
                     fill="url(#newGradient)"
                     strokeDasharray="5 5"
@@ -141,7 +141,7 @@ export function RevenueTrends({ loading, monthlyTrend }: RevenueTrendsProps) {
                   <Area
                     type="monotone"
                     dataKey="churned"
-                    stroke="#ef4444"
+                    stroke="var(--chart-3)"
                     strokeWidth={2}
                     fill="url(#churnGradient)"
                     strokeDasharray="3 3"

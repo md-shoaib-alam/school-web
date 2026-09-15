@@ -116,25 +116,25 @@ export function SuperAdminFeatureFlags() {
       <FlagSummary totalCount={totalCount} totalEnabled={totalEnabled} />
 
       <Tabs defaultValue="starter" className="w-full">
-        <TabsList className="h-10 w-full sm:w-auto bg-zinc-100 dark:bg-zinc-800 rounded-lg p-1">
-          <TabsTrigger value="starter" className="flex-1 sm:flex-none gap-2 rounded-md data-[state=active]:bg-white dark:data-[state=active]:bg-zinc-900 data-[state=active]:text-blue-650 dark:data-[state=active]:text-blue-400 data-[state=active]:shadow-xs font-semibold text-xs transition-all">
+        <TabsList className="h-10 w-full sm:w-auto bg-muted rounded-lg p-1">
+          <TabsTrigger value="starter" className="flex-1 sm:flex-none gap-2 rounded-md data-[state=active]:bg-card data-[state=active]:text-blue-600 dark:data-[state=active]:text-blue-400 data-[state=active]:shadow-xs font-semibold text-xs transition-all">
             <Blocks className="size-3.5" />
             Starter
-            <Badge variant="secondary" className="ml-1 h-5 min-w-[20px] text-[9px] px-1.5 rounded bg-blue-100/50 text-blue-700 border-none">
+            <Badge variant="secondary" className="ml-1 h-5 min-w-[20px] text-xs px-1.5 rounded bg-blue-100/50 text-blue-700 border-none">
               {getFlagsByCategory("starter").length}
             </Badge>
           </TabsTrigger>
-          <TabsTrigger value="standard" className="flex-1 sm:flex-none gap-2 rounded-md data-[state=active]:bg-white dark:data-[state=active]:bg-zinc-900 data-[state=active]:text-emerald-650 dark:data-[state=active]:text-emerald-400 data-[state=active]:shadow-xs font-semibold text-xs transition-all">
+          <TabsTrigger value="standard" className="flex-1 sm:flex-none gap-2 rounded-md data-[state=active]:bg-card data-[state=active]:text-emerald-600 dark:data-[state=active]:text-emerald-400 data-[state=active]:shadow-xs font-semibold text-xs transition-all">
             <Star className="size-3.5" />
             Standard
-            <Badge variant="secondary" className="ml-1 h-5 min-w-[20px] text-[9px] px-1.5 rounded bg-emerald-100/50 text-emerald-700 border-none">
+            <Badge variant="secondary" className="ml-1 h-5 min-w-[20px] text-xs px-1.5 rounded bg-emerald-100/50 text-emerald-700 border-none">
               {getFlagsByCategory("standard").length}
             </Badge>
           </TabsTrigger>
-          <TabsTrigger value="premium" className="flex-1 sm:flex-none gap-2 rounded-md data-[state=active]:bg-white dark:data-[state=active]:bg-zinc-900 data-[state=active]:text-amber-650 dark:data-[state=active]:text-amber-400 data-[state=active]:shadow-xs font-semibold text-xs transition-all">
+          <TabsTrigger value="premium" className="flex-1 sm:flex-none gap-2 rounded-md data-[state=active]:bg-card data-[state=active]:text-amber-600 dark:data-[state=active]:text-amber-400 data-[state=active]:shadow-xs font-semibold text-xs transition-all">
             <Crown className="size-3.5" />
             Premium
-            <Badge variant="secondary" className="ml-1 h-5 min-w-[20px] text-[9px] px-1.5 rounded bg-amber-100/50 text-amber-700 border-none">
+            <Badge variant="secondary" className="ml-1 h-5 min-w-[20px] text-xs px-1.5 rounded bg-amber-100/50 text-amber-700 border-none">
               {getFlagsByCategory("premium").length}
             </Badge>
           </TabsTrigger>

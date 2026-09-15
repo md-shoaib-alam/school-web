@@ -9,7 +9,6 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import {
   Building2,
@@ -25,8 +24,8 @@ import {
   UserCheck,
   Edit,
 } from "lucide-react";
-import { Tenant, planColors, statusColors } from "./types";
-import { SCHOOL_PLANS } from "@/lib/billing-constants";
+import { Tenant } from "./types";
+import { TenantPlanBadge, TenantStatusBadge } from "./badges";
 import { format } from "date-fns";
 
 interface DetailTenantDialogProps {
@@ -47,35 +46,6 @@ const formatDateSafe = (dateStr: any, formatStr: string = "MMM d, yyyy") => {
   }
 };
 
-const PlanBadge = memo(({ plan }: { plan: string }) => {
-  const config = planColors[plan] || planColors.basic;
-  const planMeta = SCHOOL_PLANS.find(p => p.id === plan);
-  const displayName = planMeta?.name || plan;
-  
-  return (
-    <Badge
-      variant="outline"
-      className={`${config.bg} ${config.text} ${config.border} border text-[10px] uppercase tracking-wider py-0.5 px-2 font-semibold`}
-    >
-      <Crown className="size-3 mr-1" />
-      {displayName}
-    </Badge>
-  );
-});
-
-const StatusBadge = memo(({ status }: { status: string }) => {
-  const config = statusColors[status] || statusColors.inactive;
-  return (
-    <Badge
-      variant="outline"
-      className={`${config.bg} ${config.text} gap-1 text-[10px] py-0.5 px-2 border-none`}
-    >
-      {config.icon}
-      {status.toUpperCase()}
-    </Badge>
-  );
-});
-
 const InfoItem = memo(
   ({
     icon: Icon,
@@ -92,7 +62,7 @@ const InfoItem = memo(
           <Icon className="size-4" />
         </div>
         <div className="min-w-0">
-          <p className="text-[10px] text-muted-foreground uppercase tracking-tight">
+          <p className="text-xs font-medium text-muted-foreground">
             {label}
           </p>
           <p className="text-sm font-medium truncate">{value || "Not set"}</p>
@@ -129,7 +99,7 @@ const UsageStat = memo(
             {label}
           </div>
           {pct !== null && (
-            <span className="text-[10px] font-medium">{pct}%</span>
+            <span className="text-xs font-medium">{pct}%</span>
           )}
         </div>
         <p className="text-lg font-bold">
@@ -141,7 +111,7 @@ const UsageStat = memo(
           )}
         </p>
         {pct !== null && (
-          <div className="h-1.5 bg-black/5 rounded-full overflow-hidden">
+          <div className="h-1.5 bg-muted rounded-full overflow-hidden">
             <div
               className={`h-full rounded-full transition-all duration-500 ${
                 pct > 90
@@ -172,7 +142,7 @@ export function DetailTenantDialog({
           <>
             <DialogHeader>
               <div className="flex items-center gap-3">
-                <div className="size-12 rounded-xl bg-teal-100 dark:bg-teal-900/30 text-teal-700 dark:text-teal-400 flex items-center justify-center overflow-hidden relative">
+                <div className="size-12 rounded-xl bg-muted text-muted-foreground flex items-center justify-center overflow-hidden relative border">
                   <Image src={viewingTenant.logo || "/test.webp"} alt={viewingTenant.name} fill sizes="48px" className="object-cover" unoptimized />
                 </div>
                 <div>
@@ -184,8 +154,8 @@ export function DetailTenantDialog({
                     <span className="font-mono text-xs">
                       @{viewingTenant.slug}
                     </span>
-                    <PlanBadge plan={viewingTenant.plan} />
-                    <StatusBadge status={viewingTenant.status} />
+                    <TenantPlanBadge plan={viewingTenant.plan} />
+                    <TenantStatusBadge status={viewingTenant.status} />
                   </DialogDescription>
                 </div>
               </div>
@@ -193,7 +163,7 @@ export function DetailTenantDialog({
 
             <div className="grid gap-5 py-2">
               <div className="space-y-3">
-                <h4 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">
+                <h4 className="text-sm font-semibold text-muted-foreground">
                   Contact Information
                 </h4>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -223,7 +193,7 @@ export function DetailTenantDialog({
               <Separator />
 
               <div className="space-y-3">
-                <h4 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">
+                <h4 className="text-sm font-semibold text-muted-foreground">
                   Usage Statistics
                 </h4>
                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
@@ -276,7 +246,7 @@ export function DetailTenantDialog({
               <Separator />
 
               <div className="space-y-3">
-                <h4 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">
+                <h4 className="text-sm font-semibold text-muted-foreground">
                   Important Dates
                 </h4>
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
@@ -307,7 +277,6 @@ export function DetailTenantDialog({
                 Close
               </Button>
               <Button
-                className="bg-teal-600 hover:bg-teal-700 text-white"
                 onClick={() => {
                   onDetailOpenChange(false);
                   onEditClick(viewingTenant);

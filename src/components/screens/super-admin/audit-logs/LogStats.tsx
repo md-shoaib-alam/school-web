@@ -1,16 +1,17 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
-import { 
-  FileText, 
-  Activity, 
-  ShieldCheck 
+import {
+  FileText,
+  Activity,
+  ShieldCheck,
+  Circle
 } from "lucide-react";
-import { 
-  ActionTypeCount, 
-  getActionCategory, 
-  categoryColors, 
-  categoryIcons 
+import {
+  ActionTypeCount,
+  getActionCategory,
+  categoryColors,
+  categoryIcons
 } from "./types";
 
 interface LogStatsProps {
@@ -24,7 +25,7 @@ export function LogStats({ loading, totalLogs, actionTypes }: LogStatsProps) {
     return (
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
         {Array.from({ length: 5 }).map((_, i) => (
-          <Card key={i} className="border-none shadow-sm bg-white dark:bg-zinc-800">
+          <Card key={i} className="border rounded-xl bg-card">
             <CardContent className="p-4">
               <Skeleton className="h-4 w-16 mb-2" />
               <Skeleton className="h-7 w-10" />
@@ -38,54 +39,59 @@ export function LogStats({ loading, totalLogs, actionTypes }: LogStatsProps) {
   return (
     <div className="space-y-6">
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
-        <Card className="border-none shadow-sm bg-white dark:bg-zinc-800 hover:scale-[1.02] transition-transform">
+        <Card className="border rounded-xl bg-card transition-colors">
           <CardContent className="p-4">
             <div className="flex items-center gap-3 mb-2">
               <div className="size-8 rounded-lg bg-teal-50 dark:bg-teal-900/30 flex items-center justify-center">
                 <FileText className="size-4 text-teal-600" />
               </div>
-              <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Total Events</p>
+              <p className="text-xs font-medium text-muted-foreground">Total events</p>
             </div>
-            <p className="text-2xl font-black text-zinc-900 dark:text-zinc-100">{totalLogs.toLocaleString()}</p>
+            <p className="text-2xl font-bold text-foreground">{totalLogs.toLocaleString()}</p>
           </CardContent>
         </Card>
 
         {actionTypes.slice(0, 4).map((at) => (
-          <Card key={at.action} className="border-none shadow-sm bg-white dark:bg-zinc-800 hover:scale-[1.02] transition-transform">
+          <Card key={at.action} className="border rounded-xl bg-card transition-colors">
             <CardContent className="p-4">
               <div className="flex items-center gap-3 mb-2">
                 <div className="size-8 rounded-lg bg-zinc-50 dark:bg-zinc-900 flex items-center justify-center">
                   <Activity className="size-4 text-muted-foreground" />
                 </div>
-                <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground truncate">
+                <p className="text-xs font-medium text-muted-foreground truncate">
                   {at.action.replace(/_/g, " ")}
                 </p>
               </div>
-              <p className="text-2xl font-black text-zinc-900 dark:text-zinc-100">{at.count.toLocaleString()}</p>
+              <p className="text-2xl font-bold text-foreground">{at.count.toLocaleString()}</p>
             </CardContent>
           </Card>
         ))}
       </div>
 
       {actionTypes.length > 4 && (
-        <Card className="border-none shadow-sm bg-white dark:bg-zinc-800">
+        <Card className="border rounded-xl bg-card">
           <CardHeader className="pb-3">
-            <CardTitle className="text-[10px] font-black uppercase tracking-widest flex items-center gap-2 text-muted-foreground">
+            <CardTitle className="text-xs font-medium text-muted-foreground flex items-center gap-2">
               <ShieldCheck className="size-4 text-teal-600" />
-              Categorical Trace Distribution
+              Categorical trace distribution
             </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="flex flex-wrap gap-2">
               {actionTypes.map((at) => {
                 const category = getActionCategory(at.action);
+                const iconChar = categoryIcons[category];
                 return (
                   <Badge
                     key={at.action}
                     variant="outline"
-                    className={`${categoryColors[category] || ""} px-3 py-1.5 text-[10px] font-black uppercase tracking-widest border-2 border-transparent rounded-xl shadow-sm`}
+                    className={`${categoryColors[category] || ""} px-3 py-1.5 text-xs font-medium border-2 border-transparent rounded-xl shadow-sm`}
                   >
-                    <span className="mr-2 text-xs">{categoryIcons[category] || "⚪"}</span>
+                    {iconChar && iconChar !== "\u26AA" ? (
+                      <span className="mr-2 text-xs">{iconChar}</span>
+                    ) : (
+                      <Circle className="size-3 mr-2" />
+                    )}
                     {at.action.replace(/_/g, " ")}
                     <span className="ml-2 opacity-60">[{at.count}]</span>
                   </Badge>

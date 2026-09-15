@@ -15,7 +15,7 @@ import {
 import { IndianRupee, Clock, UserCircle, ShieldAlert } from "lucide-react";
 
 export function TableHeaders({ activeTab }: { activeTab: TabType }) {
-  const commonClasses = "uppercase tracking-widest text-[10px] font-black text-muted-foreground py-4";
+  const commonClasses = "text-xs font-medium text-muted-foreground py-4";
   switch (activeTab) {
     case "students":
       return (
@@ -91,7 +91,7 @@ export function TableHeaders({ activeTab }: { activeTab: TabType }) {
 function StatusBadge({ status }: { status: string }) {
   const colors = statusColors[status] || statusColors.inactive;
   return (
-    <Badge variant="outline" className={`${colors.bg} ${colors.text} border-transparent capitalize font-black text-[9px] px-2 py-0 h-5 flex items-center gap-1 w-fit`}>
+    <Badge variant="outline" className={`${colors.bg} ${colors.text} border-transparent capitalize font-medium text-xs px-2 py-0 h-5 flex items-center gap-1 w-fit`}>
       {colors.icon}
       {status}
     </Badge>
@@ -108,22 +108,22 @@ export function TableCells({ activeTab, item }: { activeTab: TabType; item: any 
         <>
           <TableCell className={cellClasses}>
             <div className="flex items-center gap-2">
-              <div className="size-8 rounded-lg bg-rose-50 dark:bg-rose-900/20 text-rose-600 flex items-center justify-center font-black text-xs">
+              <div className="size-8 rounded-lg bg-rose-50 dark:bg-rose-900/20 text-rose-600 flex items-center justify-center font-semibold text-xs">
                 {s.name.charAt(0)}
               </div>
               <div>
                 <div className="font-bold text-zinc-900 dark:text-zinc-100">{s.name}</div>
-                <div className="text-[10px] text-muted-foreground font-medium">{s.gender}</div>
+                <div className="text-xs text-muted-foreground font-medium">{s.gender}</div>
               </div>
             </div>
           </TableCell>
           <TableCell className={`${cellClasses} font-mono text-xs font-bold text-muted-foreground`}>{s.rollNumber}</TableCell>
           <TableCell className={cellClasses}>
-            <Badge variant="secondary" className="rounded-lg font-bold text-[10px] bg-zinc-100 dark:bg-zinc-800 border-none">{s.className}</Badge>
+            <Badge variant="secondary" className="rounded-lg font-medium text-xs bg-zinc-100 dark:bg-zinc-800 border-none">{s.className}</Badge>
           </TableCell>
           <TableCell className={cellClasses}>
             <div className="text-xs font-medium">{s.email}</div>
-            <div className="text-[10px] text-muted-foreground">{s.phone}</div>
+            <div className="text-xs text-muted-foreground">{s.phone}</div>
           </TableCell>
           <TableCell className={cellClasses}><StatusBadge status={s.status} /></TableCell>
         </>
@@ -135,7 +135,7 @@ export function TableCells({ activeTab, item }: { activeTab: TabType; item: any 
         <>
           <TableCell className={cellClasses}>
             <div className="flex items-center gap-2">
-              <div className="size-8 rounded-lg bg-blue-50 dark:bg-blue-900/20 text-blue-600 flex items-center justify-center font-black text-xs">
+              <div className="size-8 rounded-lg bg-blue-50 dark:bg-blue-900/20 text-blue-600 flex items-center justify-center font-semibold text-xs">
                 {t.name.charAt(0)}
               </div>
               <div className="font-bold text-zinc-900 dark:text-zinc-100">{t.name}</div>
@@ -145,7 +145,7 @@ export function TableCells({ activeTab, item }: { activeTab: TabType; item: any 
           <TableCell className={`${cellClasses} text-xs text-muted-foreground`}>{t.experience}</TableCell>
           <TableCell className={cellClasses}>
             <div className="text-xs font-medium">{t.email}</div>
-            <div className="text-[10px] text-muted-foreground">{t.phone}</div>
+            <div className="text-xs text-muted-foreground">{t.phone}</div>
           </TableCell>
           <TableCell className={cellClasses}><StatusBadge status={t.status} /></TableCell>
         </>
@@ -157,7 +157,7 @@ export function TableCells({ activeTab, item }: { activeTab: TabType; item: any 
         <>
           <TableCell className={cellClasses}>
             <div className="flex items-center gap-2">
-              <div className="size-8 rounded-lg bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 flex items-center justify-center font-black text-xs">
+              <div className="size-8 rounded-lg bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 flex items-center justify-center font-semibold text-xs">
                 {p.name.charAt(0)}
               </div>
               <div className="font-bold text-zinc-900 dark:text-zinc-100">{p.name}</div>
@@ -176,7 +176,7 @@ export function TableCells({ activeTab, item }: { activeTab: TabType; item: any 
         <>
           <TableCell className={cellClasses}>
             <div className="flex items-center gap-2">
-              <div className="size-8 rounded-lg bg-purple-50 dark:bg-purple-900/20 text-purple-600 flex items-center justify-center font-black text-xs">
+              <div className="size-8 rounded-lg bg-purple-50 dark:bg-purple-900/20 text-purple-600 flex items-center justify-center font-semibold text-xs">
                 {c.name.charAt(0)}
               </div>
               <div className="font-bold text-zinc-900 dark:text-zinc-100">{c.name}</div>
@@ -184,11 +184,11 @@ export function TableCells({ activeTab, item }: { activeTab: TabType; item: any 
           </TableCell>
           <TableCell className={cellClasses}>
             <div className="flex items-center gap-2">
-              <Badge variant="outline" className="text-[10px] font-black border-2 border-purple-100 dark:border-purple-900">Grade {c.grade}</Badge>
-              <Badge variant="outline" className="text-[10px] font-black">Section {c.section}</Badge>
+              <Badge variant="outline" className="text-xs font-medium border-2 border-purple-100 dark:border-purple-900">Grade {c.grade}</Badge>
+              <Badge variant="outline" className="text-xs font-medium">Section {c.section}</Badge>
             </div>
           </TableCell>
-          <TableCell className={`${cellClasses} text-center font-black text-purple-600`}>{c.studentCount}</TableCell>
+          <TableCell className={`${cellClasses} text-center font-semibold text-purple-600`}>{c.studentCount}</TableCell>
           <TableCell className={`${cellClasses} text-center font-bold text-muted-foreground`}>{c.capacity}</TableCell>
         </>
       );
@@ -209,14 +209,14 @@ export function TableCells({ activeTab, item }: { activeTab: TabType; item: any 
             </div>
           </TableCell>
           <TableCell className={`${cellClasses} text-xs font-bold text-muted-foreground uppercase tracking-wider`}>{f.type}</TableCell>
-          <TableCell className={`${cellClasses} text-right font-black`}>
+          <TableCell className={`${cellClasses} text-right font-semibold`}>
             <div className="flex items-center justify-end text-emerald-600">
               <IndianRupee className="size-3.5 mr-0.5" />
               {f.amount.toLocaleString()}
             </div>
           </TableCell>
           <TableCell className={`${cellClasses} text-center`}>
-            <Badge variant="outline" className={`${getFeeColor(f.status)} border-none capitalize font-black text-[9px] px-2 py-0 h-5`}>
+            <Badge variant="outline" className={`${getFeeColor(f.status)} border-none capitalize font-medium text-xs px-2 py-0 h-5`}>
               {f.status}
             </Badge>
           </TableCell>
@@ -239,7 +239,7 @@ export function TableCells({ activeTab, item }: { activeTab: TabType; item: any 
             <div className="font-bold text-zinc-900 dark:text-zinc-100">{a.studentName}</div>
           </TableCell>
           <TableCell className={cellClasses}>
-            <Badge variant="secondary" className="text-[10px] font-bold border-none">{a.className}</Badge>
+            <Badge variant="secondary" className="text-xs font-medium border-none">{a.className}</Badge>
           </TableCell>
           <TableCell className={cellClasses} suppressHydrationWarning>
             <div className="flex items-center gap-2 text-xs font-bold text-muted-foreground">
@@ -248,7 +248,7 @@ export function TableCells({ activeTab, item }: { activeTab: TabType; item: any 
             </div>
           </TableCell>
           <TableCell className={`${cellClasses} text-center`}>
-            <Badge variant="outline" className={`${getAttColor(a.status)} border-none capitalize font-black text-[9px] px-2 py-0 h-5`}>
+            <Badge variant="outline" className={`${getAttColor(a.status)} border-none capitalize font-medium text-xs px-2 py-0 h-5`}>
               {a.status}
             </Badge>
           </TableCell>
@@ -266,14 +266,14 @@ export function TableCells({ activeTab, item }: { activeTab: TabType; item: any 
         <>
           <TableCell className={cellClasses}>
             <div className="font-bold text-zinc-900 dark:text-zinc-100">{n.title}</div>
-            <div className="text-[10px] text-muted-foreground truncate max-w-[200px]">{n.content}</div>
+            <div className="text-xs text-muted-foreground truncate max-w-[200px]">{n.content}</div>
           </TableCell>
           <TableCell className={`${cellClasses} text-xs font-bold`}>{n.authorName}</TableCell>
           <TableCell className={cellClasses}>
-            <Badge variant="outline" className="text-[10px] font-black uppercase tracking-wider h-5 bg-zinc-50 dark:bg-zinc-900/50">{n.targetRole}</Badge>
+            <Badge variant="outline" className="text-xs font-medium uppercase tracking-wider h-5 bg-zinc-50 dark:bg-zinc-900/50">{n.targetRole}</Badge>
           </TableCell>
           <TableCell className={`${cellClasses} text-center`}>
-            <Badge variant="outline" className={`${getPriorityColor(n.priority)} font-black text-[9px] px-2 py-0 h-5 flex items-center justify-center gap-1 w-fit mx-auto capitalize`}>
+            <Badge variant="outline" className={`${getPriorityColor(n.priority)} font-medium text-xs px-2 py-0 h-5 flex items-center justify-center gap-1 w-fit mx-auto capitalize`}>
               {n.priority === 'high' && <ShieldAlert className="size-3" />}
               {n.priority}
             </Badge>

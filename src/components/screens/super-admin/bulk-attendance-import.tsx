@@ -1011,7 +1011,7 @@ export function SuperAdminBulkAttendance() {
                           </>
                         )}
                       </Button>
-                      <p className="text-[10px] text-center text-muted-foreground mt-2">
+                      <p className="text-xs text-center text-muted-foreground mt-2">
                         Prefilled with active students in <span className="font-semibold">{selectedSchool.name}</span>
                       </p>
                     </div>
@@ -1055,8 +1055,8 @@ export function SuperAdminBulkAttendance() {
                         className="hidden"
                       />
                       
-                      <div className="size-16 rounded-full bg-teal-500/10 dark:bg-teal-500/20 flex items-center justify-center mb-4 shadow-sm group-hover:scale-110 transition-transform">
-                        <UploadCloud className="size-8 text-teal-600 dark:text-teal-400 animate-bounce" style={{ animationDuration: '3s' }} />
+                      <div className="size-16 rounded-full bg-teal-500/10 dark:bg-teal-500/20 flex items-center justify-center mb-4 shadow-sm">
+                        <UploadCloud className="size-8 text-teal-600 dark:text-teal-400" />
                       </div>
                       
                       {uploadedFile ? (
@@ -1150,13 +1150,13 @@ export function SuperAdminBulkAttendance() {
                                     <td className="p-3 truncate max-w-[120px] text-xs text-muted-foreground">{row.remarks || "-"}</td>
                                     <td className="p-3 text-right">
                                       {row.isValid ? (
-                                        <Badge className="bg-emerald-500/20 text-emerald-700 dark:text-emerald-400 border-none font-medium text-[10px]">Ready</Badge>
+                                        <Badge className="bg-emerald-500/20 text-emerald-700 dark:text-emerald-400 border-none font-medium text-xs">Ready</Badge>
                                       ) : (
                                         <div className="flex flex-col items-end gap-0.5">
-                                          <Badge className="bg-rose-500/20 text-rose-700 dark:text-rose-400 border-none font-bold text-[10px] gap-1">
+                                          <Badge className="bg-rose-500/20 text-rose-700 dark:text-rose-400 border-none font-medium text-xs gap-1">
                                             <AlertTriangle className="size-3" /> Error
                                           </Badge>
-                                          <div className="text-[10px] text-rose-600 dark:text-rose-400 max-w-[150px] leading-tight text-right mt-0.5">
+                                          <div className="text-xs text-rose-600 dark:text-rose-400 max-w-[150px] leading-tight text-right mt-0.5">
                                             {row.errors.join(", ")}
                                           </div>
                                         </div>
@@ -1342,7 +1342,7 @@ export function SuperAdminBulkAttendance() {
                                     >
                                       <div className="flex flex-col truncate pr-2">
                                         <span className="font-medium text-zinc-950 dark:text-white truncate group-hover:text-teal-600 dark:group-hover:text-teal-400">{stu.name}</span>
-                                        <span className="text-[10px] text-muted-foreground truncate">
+                                        <span className="text-xs text-muted-foreground truncate">
                                           Roll: {stu.rollNumber || 'N/A'} | Class: {stu.className || 'N/A'}
                                         </span>
                                       </div>
@@ -1391,7 +1391,7 @@ export function SuperAdminBulkAttendance() {
                       <motion.div 
                         initial={{ opacity: 0, y: -5 }}
                         animate={{ opacity: 1, y: 0 }}
-                        className="p-3 bg-rose-500/10 dark:bg-rose-950/20 text-rose-600 dark:text-rose-400 rounded-xl border border-rose-500/20 text-[11px] flex items-start gap-2.5 leading-relaxed font-medium shrink-0 shadow-xs"
+                        className="p-3 bg-rose-500/10 dark:bg-rose-950/20 text-rose-600 dark:text-rose-400 rounded-xl border border-rose-500/20 text-xs flex items-start gap-2.5 leading-relaxed font-medium shrink-0 shadow-xs"
                       >
                         <AlertTriangle className="size-4 shrink-0 mt-0.5 animate-pulse text-rose-500" />
                         <div>
@@ -1419,7 +1419,7 @@ export function SuperAdminBulkAttendance() {
                               className={`flex flex-col items-center py-2 px-1 rounded-xl border text-xs font-semibold cursor-pointer transition-all duration-200 ${
                                 isChecked 
                                   ? "border-teal-500/40 bg-teal-500/10 text-teal-600 dark:text-teal-400" 
-                                  : "border-zinc-200 dark:border-zinc-850 bg-white dark:bg-zinc-900 text-muted-foreground"
+                                  : "border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 text-muted-foreground"
                               }`}
                             >
                               <span>{day.label}</span>
@@ -1430,13 +1430,13 @@ export function SuperAdminBulkAttendance() {
                           );
                         })}
                       </div>
-                      <p className="text-[10px] text-muted-foreground mt-1">Excludes weekdays you leave unchecked.</p>
+                      <p className="text-xs text-muted-foreground mt-1">Excludes weekdays you leave unchecked.</p>
                     </div>
 
                     {/* Status & Remarks */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div className="space-y-2">
-                        <Label htmlFor="range-status" className="text-xs uppercase tracking-wider font-extrabold text-muted-foreground">Range Status</Label>
+                        <Label htmlFor="range-status" className="text-xs font-medium text-muted-foreground">Range Status</Label>
                         <select 
                           id="range-status"
                           value={rangeStatus}
@@ -1479,7 +1479,7 @@ export function SuperAdminBulkAttendance() {
 
                       {showProgress && generatingRange && (
                         <div className="mt-3 space-y-1.5 p-3.5 border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900/40 rounded-xl">
-                          <div className="flex justify-between text-xs font-bold text-teal-650 dark:text-teal-400">
+                          <div className="flex justify-between text-xs font-bold text-teal-600 dark:text-teal-400">
                             <span className="flex items-center gap-1.5"><RefreshCw className="size-3.5 animate-spin" /> Batch Processing...</span>
                             <span>{Math.round(progress)}%</span>
                           </div>
@@ -1487,7 +1487,7 @@ export function SuperAdminBulkAttendance() {
                         </div>
                       )}
 
-                      <p className="text-[10px] text-center text-muted-foreground mt-2">
+                      <p className="text-xs text-center text-muted-foreground mt-2">
                         Writes <span className="font-extrabold text-zinc-950 dark:text-white">{activeRangeDatesCount * (allStudentsMode ? students.length : 1)} total records</span>
                       </p>
                     </div>
@@ -1512,7 +1512,7 @@ export function SuperAdminBulkAttendance() {
                           <AlertTriangle className="size-6 animate-pulse text-rose-500" />
                         </div>
                         <div className="space-y-1">
-                          <p className="text-sm font-bold text-rose-700 dark:text-rose-350">Date Range Exceeded (Out of Range)</p>
+                          <p className="text-sm font-bold text-rose-700 dark:text-rose-300">Date Range Exceeded (Out of Range)</p>
                           <p className="text-xs text-rose-600/80 dark:text-rose-400/80 max-w-xs mx-auto leading-relaxed">
                             Selecting a range of <strong className="font-extrabold">{Math.ceil(Math.abs(new Date(endDate).getTime() - new Date(startDate).getTime()) / (1000 * 60 * 60 * 24))} days</strong> exceeds the allowed safety limit. Please select a range of <strong>180 days (6 months) or less</strong> to prevent server load.
                           </p>
@@ -1579,7 +1579,7 @@ export function SuperAdminBulkAttendance() {
                                         : "bg-rose-500"
                                     }`} />
                                   )}
-                                  <div className="text-[10px] uppercase font-bold text-zinc-400">{item.dayLabel}</div>
+                                  <div className="text-xs font-medium text-zinc-400">{item.dayLabel}</div>
                                   <div className="text-xs font-bold font-mono text-zinc-950 dark:text-white">{item.dateStr}</div>
                                   <div className="mt-1 flex justify-between w-full items-center">
                                     {item.isValid ? (
@@ -1595,7 +1595,7 @@ export function SuperAdminBulkAttendance() {
                                               [item.dateStr]: val
                                             }));
                                           }}
-                                          className={`text-[9px] font-bold py-0 px-1 bg-white dark:bg-zinc-900 border rounded cursor-pointer transition-colors focus:outline-none focus:ring-0 ${
+                                          className={`text-xs font-medium py-0 px-1 bg-white dark:bg-zinc-900 border rounded cursor-pointer transition-colors focus:outline-none focus:ring-0 ${
                                             (overriddenStatuses[item.dateStr] || rangeStatus) === "present"
                                               ? "border-emerald-500/20 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-500/5"
                                               : "border-rose-500/20 text-rose-600 dark:text-rose-400 hover:bg-rose-500/5"
@@ -1604,12 +1604,12 @@ export function SuperAdminBulkAttendance() {
                                           <option value="present" className="text-zinc-900 dark:text-white bg-white dark:bg-zinc-950">Present</option>
                                           <option value="absent" className="text-zinc-900 dark:text-white bg-white dark:bg-zinc-950">Absent</option>
                                         </select>
-                                        <span className="text-[9px] text-muted-foreground max-w-[60px] truncate" title={overriddenRemarks[item.dateStr] || rangeRemarks}>
+                                        <span className="text-xs text-muted-foreground max-w-[60px] truncate" title={overriddenRemarks[item.dateStr] || rangeRemarks}>
                                           {overriddenRemarks[item.dateStr] || rangeRemarks || "No remarks"}
                                         </span>
                                       </>
                                     ) : (
-                                      <Badge variant="outline" className="text-[9px] text-muted-foreground opacity-50 capitalize">
+                                      <Badge variant="outline" className="text-xs text-muted-foreground opacity-50 capitalize">
                                         Skipped
                                       </Badge>
                                     )}
@@ -1634,7 +1634,7 @@ export function SuperAdminBulkAttendance() {
                             element.scrollTo({ top: element.scrollHeight, behavior: 'smooth' });
                           }
                         }}
-                        className="absolute bottom-6 right-6 z-30 size-10 rounded-full bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-850 shadow-lg flex items-center justify-center cursor-pointer hover:scale-105 transition-all shrink-0 active:scale-95 group"
+                        className="absolute bottom-6 right-6 z-30 size-10 rounded-full bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 shadow-lg flex items-center justify-center cursor-pointer transition-all shrink-0 group"
                         title={isScrolledToBottom ? "Scroll to Top" : "Scroll to Bottom"}
                       >
                         <svg className="absolute inset-0 size-10 -rotate-90">

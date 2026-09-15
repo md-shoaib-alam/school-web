@@ -17,10 +17,10 @@ export function AdminHeader({
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
         <div>
-          <h2 className="text-2xl font-semibold text-zinc-900 dark:text-zinc-100">
+          <h2 className="text-2xl font-semibold text-foreground">
             Manage Admins
           </h2>
-          <p className="text-sm text-zinc-500 dark:text-zinc-400 mt-1">
+          <p className="text-sm text-muted-foreground mt-1">
             Create and manage platform super administrator accounts
           </p>
         </div>
@@ -35,7 +35,7 @@ export function AdminHeader({
             />
           </div>
           <Button
-            className="bg-teal-600 hover:bg-teal-700 text-white shrink-0 h-10 rounded-xl gap-2 shadow-md shadow-teal-100 dark:shadow-none"
+            className="shrink-0 h-10 rounded-xl gap-2"
             onClick={onAddClick}
           >
             <Plus className="size-4" />
@@ -44,14 +44,14 @@ export function AdminHeader({
         </div>
       </div>
 
-      <div className="rounded-xl border border-teal-200 bg-teal-50 dark:bg-teal-950/20 dark:border-teal-800/30 p-4">
+      <div className="rounded-xl border border-border bg-muted p-4">
         <div className="flex items-start gap-3">
-          <ShieldCheck className="size-5 text-teal-600 dark:text-teal-400 shrink-0 mt-0.5" />
+          <ShieldCheck className="size-5 text-muted-foreground shrink-0 mt-0.5" />
           <div className="text-sm">
-            <p className="font-medium text-teal-800 dark:text-teal-300">
+            <p className="font-medium text-foreground">
               Platform Admin Accounts
             </p>
-            <p className="text-teal-700/80 dark:text-teal-400/80 mt-0.5">
+            <p className="text-muted-foreground mt-0.5">
               Super admins have full access to all schools, billing, and
               platform settings. The root platform owner is protected and cannot
               be modified.

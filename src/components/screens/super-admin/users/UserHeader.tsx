@@ -21,16 +21,16 @@ export function UserHeader({ totalCount, roleCountsMap }: UserHeaderProps) {
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h2 className="text-2xl font-semibold text-zinc-900 dark:text-zinc-100 tracking-tight">
+          <h2 className="text-2xl font-semibold text-foreground tracking-tight">
             User Management
           </h2>
-          <p className="text-sm font-bold text-muted-foreground">
+          <p className="text-sm font-medium text-muted-foreground">
             Manage and monitor all users across all tenant schools
           </p>
         </div>
         <Badge
           variant="outline"
-          className="w-fit gap-1.5 border-teal-200 dark:border-teal-700 text-teal-700 dark:text-teal-400 bg-teal-50 dark:bg-teal-900/30 text-[10px] font-black uppercase tracking-widest px-3 py-1.5 rounded-full shadow-sm"
+          className="w-fit gap-1.5 text-xs font-medium px-3 py-1.5 rounded-full"
         >
           <Shield className="size-3.5" />
           Cross-Tenant View
@@ -45,21 +45,21 @@ export function UserHeader({ totalCount, roleCountsMap }: UserHeaderProps) {
           return (
             <Card
               key={stat.key}
-              className={`border-none shadow-sm ${stat.bg} overflow-hidden group hover:scale-[1.02] transition-transform`}
+              className="border rounded-xl bg-card overflow-hidden"
             >
               <CardContent className="p-4">
                 <div className="flex items-center justify-between mb-3">
-                  <div className={`p-2 rounded-xl ${stat.iconBg} shadow-inner`}>
+                  <div className={`p-2 rounded-xl ${stat.iconBg}`}>
                     <Icon className="size-4" />
                   </div>
-                  <span className={`text-[10px] font-black uppercase tracking-widest ${stat.color} opacity-80`}>
+                  <span className="text-xs font-medium text-muted-foreground">
                     {percentage}%
                   </span>
                 </div>
-                <p className="text-2xl font-black text-zinc-900 dark:text-zinc-100">
+                <p className="text-2xl font-semibold text-foreground">
                   {count.toLocaleString()}
                 </p>
-                <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground mt-0.5">
+                <p className="text-xs font-medium text-muted-foreground mt-0.5">
                   {stat.label}
                 </p>
               </CardContent>

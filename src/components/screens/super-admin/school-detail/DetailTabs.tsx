@@ -81,7 +81,7 @@ export function DetailTabs({
                   <TabsTrigger
                     key={tab.value}
                     value={tab.value}
-                    className="gap-2 px-5 text-xs font-black uppercase tracking-widest data-[state=active]:bg-white dark:data-[state=active]:bg-zinc-800 data-[state=active]:shadow-sm rounded-lg transition-all"
+                    className="gap-2 px-5 text-xs font-medium data-[state=active]:bg-white dark:data-[state=active]:bg-zinc-800 data-[state=active]:shadow-sm rounded-lg transition-all"
                   >
                     {tab.icon}
                     <span className="hidden sm:inline">{tab.label}</span>
@@ -96,7 +96,7 @@ export function DetailTabs({
                 size="sm"
                 onClick={() => onExport(activeTab)}
                 disabled={exporting || totalItems === 0}
-                className="h-10 text-[11px] font-black uppercase tracking-widest px-4 border-2 rounded-xl hover:bg-zinc-50 dark:hover:bg-zinc-900 transition-all"
+                className="h-10 text-xs font-medium px-4 rounded-lg hover:bg-zinc-50 dark:hover:bg-zinc-900 transition-all"
               >
                 {exporting ? (
                   <Loader2 className="size-4 mr-2 animate-spin" />
@@ -110,7 +110,7 @@ export function DetailTabs({
                 size="sm"
                 onClick={onImportClick}
                 disabled={importing}
-                className="h-10 text-[11px] font-black uppercase tracking-widest px-4 border-2 rounded-xl hover:bg-zinc-50 dark:hover:bg-zinc-900 transition-all"
+                className="h-10 text-xs font-medium px-4 rounded-lg hover:bg-zinc-50 dark:hover:bg-zinc-900 transition-all"
               >
                 {importing ? (
                   <Loader2 className="size-4 mr-2 animate-spin" />
@@ -142,7 +142,7 @@ export function DetailTabs({
               {isLoading ? (
                 <div className="py-24 text-center">
                   <Loader2 className="size-10 animate-spin text-rose-600 mx-auto mb-4" />
-                  <p className="text-sm font-black text-muted-foreground animate-pulse tracking-widest uppercase">Fetching {tab.label}…</p>
+                  <p className="text-sm font-medium text-muted-foreground">Fetching {tab.label}…</p>
                 </div>
               ) : totalItems === 0 ? (
                 <div className="py-24 text-center border-2 border-dashed border-zinc-100 dark:border-zinc-800 rounded-3xl">
@@ -184,7 +184,7 @@ export function DetailTabs({
 
                   {/* Pagination */}
                   <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-4 border-t border-zinc-50 dark:border-zinc-900">
-                    <p className="text-xs font-black uppercase tracking-widest text-muted-foreground">
+                    <p className="text-xs font-medium text-muted-foreground">
                       Showing <span className="text-rose-600">{(currentPage - 1) * 20 + 1}</span> to <span className="text-rose-600">{Math.min(currentPage * 20, totalItems)}</span> of {totalItems} records
                     </p>
                     <div className="flex items-center gap-1.5">
@@ -200,13 +200,13 @@ export function DetailTabs({
                       <div className="flex items-center gap-1 px-1">
                         {getPaginationRange(currentPage, totalPages).map((page, idx) =>
                           page === "ellipsis" ? (
-                            <span key={`ellipsis-${idx}`} className="px-2 text-muted-foreground font-black">...</span>
+                            <span key={`ellipsis-${idx}`} className="px-2 text-muted-foreground font-medium">...</span>
                           ) : (
                             <Button
                               key={page}
                               variant={currentPage === page ? "default" : "ghost"}
                               size="sm"
-                              className={`size-9 rounded-xl font-black text-xs ${currentPage === page ? 'bg-rose-600 text-white shadow-lg shadow-rose-200 dark:shadow-none' : 'hover:bg-zinc-100 dark:hover:bg-zinc-800'}`}
+                              className={`size-9 rounded-lg font-medium text-xs ${currentPage === page ? 'bg-primary text-primary-foreground' : 'hover:bg-zinc-100 dark:hover:bg-zinc-800'}`}
                               onClick={() => setCurrentPage(page)}
                             >
                               {page}
