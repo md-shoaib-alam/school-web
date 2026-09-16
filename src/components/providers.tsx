@@ -6,7 +6,7 @@ import { queryClient } from "@/lib/query-client";
 import { persistQueryClient } from "@tanstack/react-query-persist-client";
 import { createSyncStoragePersister } from "@tanstack/query-sync-storage-persister";
 import { Toaster } from "sonner";
-import { ThemeProvider, useTheme } from "next-themes";
+import { useTheme } from "next-themes";
 
 function ToasterProvider() {
   const { theme } = useTheme();
@@ -49,11 +49,9 @@ export function Providers({ children }: { children: React.ReactNode }) {
   }, []);
 
   return (
-    <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-      <QueryClientProvider client={queryClient}>
-        {children}
-        <ToasterProvider />
-      </QueryClientProvider>
-    </ThemeProvider>
+    <QueryClientProvider client={queryClient}>
+      {children}
+      <ToasterProvider />
+    </QueryClientProvider>
   );
 }

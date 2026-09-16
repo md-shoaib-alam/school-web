@@ -97,7 +97,7 @@ export function StaffTable({
                 <TableHead className="hidden lg:table-cell text-xs font-medium text-muted-foreground py-4">Platform Role</TableHead>
                 <TableHead className="text-xs font-medium text-muted-foreground py-4">Status</TableHead>
                 {(canEdit || canDelete) && (
-                  <TableHead className="w-[100px] text-right py-4 pr-6">Actions</TableHead>
+                  <TableHead className="w-[100px] text-right text-xs font-medium text-muted-foreground py-4 pr-6">Actions</TableHead>
                 )}
               </TableRow>
             </TableHeader>
