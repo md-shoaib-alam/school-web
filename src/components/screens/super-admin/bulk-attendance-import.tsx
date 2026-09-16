@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useMemo, useRef } from "react";
+import Image from "next/image";
 import {
   Card,
   CardContent,
@@ -20,6 +21,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { DatePicker } from "@/components/ui/date-picker";
 import { 
   ClipboardList, 
+  Shield,
   Building2, 
   UploadCloud, 
   Calendar, 
@@ -816,94 +818,131 @@ export function SuperAdminBulkAttendance() {
   ];
 
   return (
-    <div className="space-y-5 max-w-7xl mx-auto">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-border">
-        <div className="flex items-center gap-3">
-          <div className="size-9 rounded-xl bg-teal-50 dark:bg-teal-950/50 border border-teal-100/80 dark:border-teal-900/40 flex items-center justify-center text-teal-600 dark:text-teal-400 shrink-0">
-            <ClipboardList className="size-4.5" />
-          </div>
-          <div>
-            <h2 className="text-lg font-semibold text-foreground tracking-tight">
-              Bulk Attendance Import
-            </h2>
-            <p className="text-xs text-muted-foreground mt-0.5">
-              Streamlined platform attendance utilities for Super Admins. Select a school to get started.
+    <div className="space-y-5 max-w-7xl mx-auto pb-8">
+      {/* 1. Emerald Hero Banner */}
+      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-emerald-50/90 via-teal-50/50 to-emerald-50/30 dark:from-slate-900 dark:via-emerald-950/30 dark:to-slate-900 border border-emerald-100/90 dark:border-emerald-900/40 px-4.5 sm:px-6 py-3 sm:py-3.5 shadow-2xs">
+        {/* Background ambient glow */}
+        <div className="absolute top-0 right-1/4 w-80 h-48 bg-emerald-400/15 dark:bg-emerald-600/10 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute -bottom-6 right-10 w-48 h-36 bg-teal-300/15 dark:bg-teal-500/10 rounded-full blur-2xl pointer-events-none" />
+
+        {/* Content: Compact Left Headline & Right 3D Graphic */}
+        <div className="relative z-10 flex items-center justify-between gap-3 sm:gap-4">
+          {/* Left Copy */}
+          <div className="max-w-md min-w-0">
+            <div className="inline-flex items-center gap-1 sm:gap-1.5 px-2 py-0.5 rounded-full bg-emerald-100/80 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-300 text-[10px] font-bold uppercase tracking-wider border border-emerald-200/60 dark:border-emerald-800/40 shadow-2xs">
+              <FileSpreadsheet className="size-3 text-emerald-600 dark:text-emerald-400" />
+              <span>Bulk Automation</span>
+            </div>
+
+            <h3 className="text-base sm:text-lg md:text-xl font-bold text-foreground tracking-tight leading-tight mt-1 sm:mt-1.5">
+              Fast. Accurate. Bulk Records.
+            </h3>
+
+            <p className="hidden sm:block text-xs text-muted-foreground mt-0.5 leading-snug font-normal">
+              Batch import spreadsheet templates or automate multi-date attendance entries.
             </p>
+          </div>
+
+          {/* Right 3D Illustration */}
+          <div className="relative flex items-center justify-end shrink-0 pr-0.5 sm:pr-2">
+            <div className="relative h-14 sm:h-20 md:h-22 aspect-[16/9] overflow-hidden select-none">
+              <Image
+                src="/assets/blukattendcetop.png"
+                alt="Bulk Attendance"
+                fill
+                priority
+                className="object-contain scale-110 drop-shadow-md transition-transform hover:scale-115 duration-300"
+                sizes="(max-width: 640px) 110px, (max-width: 768px) 160px, 200px"
+              />
+            </div>
           </div>
         </div>
       </div>
 
-      {/* Global School Selector Box */}
-      <Card className="rounded-xl border border-border bg-card shadow-2xs overflow-hidden">
-        <CardContent className="p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-          <div className="space-y-0.5">
-            <Label className="text-xs font-semibold text-teal-600 dark:text-teal-400 flex items-center gap-1.5">
-              <Building2 className="size-3.5" /> Selected School Context
-            </Label>
-            <p className="text-[11px] text-muted-foreground">All spreadsheet templates and range records resolve under this school.</p>
+      {/* 2. Unified Header with Integrated School Context Selector */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <div className="flex items-center gap-2.5 min-w-0">
+          <div className="size-8.5 sm:size-9 rounded-xl bg-emerald-50 dark:bg-emerald-950/50 border border-emerald-100/80 dark:border-emerald-900/40 flex items-center justify-center text-emerald-600 dark:text-emerald-400 shrink-0">
+            <ClipboardList className="size-4 sm:size-4.5" />
           </div>
+          <div className="min-w-0">
+            <div className="flex items-center gap-1.5 flex-wrap">
+              <h2 className="text-base sm:text-lg font-semibold text-foreground tracking-tight truncate">
+                Bulk Attendance Import
+              </h2>
+              <span className="hidden xs:inline-flex items-center gap-1 px-1.5 py-0.2 rounded-full text-[10px] font-medium bg-emerald-50 text-emerald-700 border border-emerald-200/70 dark:bg-emerald-950/40 dark:text-emerald-400 dark:border-emerald-900/60">
+                <Shield className="size-2.5 text-emerald-600" />
+                Platform
+              </span>
+            </div>
+            <p className="text-[11px] sm:text-xs text-muted-foreground mt-0.5 font-normal truncate">
+              {selectedSchool 
+                ? `Active School: ${selectedSchool.name}` 
+                : "Select a school context to begin bulk import"}
+            </p>
+          </div>
+        </div>
 
-          <div className="flex items-center gap-3 w-full sm:w-auto">
-            <Popover open={schoolPopoverOpen} onOpenChange={setSchoolPopoverOpen}>
-              <PopoverTrigger asChild>
-                <Button 
-                  variant="outline" 
-                  role="combobox" 
-                  aria-expanded={schoolPopoverOpen}
-                  className="w-full sm:w-[280px] h-9 text-xs rounded-xl justify-between cursor-pointer capitalize bg-card border-border px-3"
-                >
-                  <span className="flex items-center gap-2 truncate">
-                    <Building2 className="size-3.5 text-muted-foreground shrink-0" />
-                    {selectedSchool ? selectedSchool.name : "Select School"}
-                  </span>
-                  <ChevronsUpDown className="ml-1 h-3.5 w-3.5 shrink-0 opacity-50" />
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-[280px] sm:w-[320px] p-0 border border-border bg-card shadow-xl rounded-xl" align="end" side="bottom" sideOffset={4}>
-                <div className="flex items-center border-b px-3 border-border">
-                  <Search className="mr-2 h-3.5 w-3.5 shrink-0 opacity-50" />
-                  <Input 
-                    placeholder="Search schools..." 
-                    value={schoolSearchQuery}
-                    onChange={(e) => setSchoolSearchQuery(e.target.value)}
-                    className="flex h-9 w-full bg-transparent py-2 text-xs outline-none border-none focus-visible:ring-0 focus-visible:ring-offset-0 placeholder:text-muted-foreground"
-                  />
-                </div>
-                <ScrollArea className="h-56 p-1">
-                  {loadingSchools ? (
-                    <div className="flex items-center justify-center p-4 text-xs text-muted-foreground gap-2">
-                      <RefreshCw className="size-3.5 animate-spin text-teal-500" /> Loading schools...
-                    </div>
-                  ) : filteredSchools.length === 0 ? (
-                    <div className="p-4 text-xs text-muted-foreground text-center">No schools found matching search.</div>
-                  ) : (
-                    filteredSchools.map((school) => (
-                      <button
-                        key={school.id}
-                        onClick={() => {
-                          setSelectedSchool(school);
-                          setSchoolPopoverOpen(false);
-                          setSchoolSearchQuery("");
-                        }}
-                        className="flex items-center justify-between w-full text-left px-3 py-2 text-xs hover:bg-muted rounded-lg transition-colors cursor-pointer group"
-                      >
-                        <div className="flex flex-col truncate pr-2">
-                          <span className="font-medium text-foreground truncate group-hover:text-teal-600 dark:group-hover:text-teal-400">{school.name}</span>
-                          <span className="text-[10px] text-muted-foreground truncate">{school.slug}</span>
-                        </div>
-                        {selectedSchool?.id === school.id && (
-                          <Check className="h-3.5 w-3.5 text-teal-600 shrink-0" />
-                        )}
-                      </button>
-                    ))
-                  )}
-                </ScrollArea>
-              </PopoverContent>
-            </Popover>
-          </div>
-        </CardContent>
-      </Card>
+        {/* Integrated School Selector Dropdown */}
+        <div className="w-full sm:w-auto shrink-0">
+          <Popover open={schoolPopoverOpen} onOpenChange={setSchoolPopoverOpen}>
+            <PopoverTrigger asChild>
+              <Button 
+                variant="outline" 
+                role="combobox" 
+                aria-expanded={schoolPopoverOpen}
+                className="w-full sm:w-[260px] h-9 text-xs rounded-xl justify-between cursor-pointer capitalize bg-card border-border px-3 shadow-2xs hover:bg-muted/50"
+              >
+                <span className="flex items-center gap-2 truncate">
+                  <Building2 className="size-3.5 text-emerald-600 dark:text-emerald-400 shrink-0" />
+                  <span className="truncate">{selectedSchool ? selectedSchool.name : "Select School..."}</span>
+                </span>
+                <ChevronsUpDown className="ml-1 h-3.5 w-3.5 shrink-0 opacity-50" />
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-[280px] sm:w-[320px] p-0 border border-border bg-card shadow-xl rounded-xl" align="end" side="bottom" sideOffset={4}>
+              <div className="flex items-center border-b px-3 border-border">
+                <Search className="mr-2 h-3.5 w-3.5 shrink-0 opacity-50" />
+                <Input 
+                  placeholder="Search schools..." 
+                  value={schoolSearchQuery}
+                  onChange={(e) => setSchoolSearchQuery(e.target.value)}
+                  className="flex h-9 w-full bg-transparent py-2 text-xs outline-none border-none focus-visible:ring-0 focus-visible:ring-offset-0 placeholder:text-muted-foreground"
+                />
+              </div>
+              <ScrollArea className="h-56 p-1">
+                {loadingSchools ? (
+                  <div className="flex items-center justify-center p-4 text-xs text-muted-foreground gap-2">
+                    <RefreshCw className="size-3.5 animate-spin text-emerald-600" /> Loading schools...
+                  </div>
+                ) : filteredSchools.length === 0 ? (
+                  <div className="p-4 text-xs text-muted-foreground text-center">No schools found matching search.</div>
+                ) : (
+                  filteredSchools.map((school) => (
+                    <button
+                      key={school.id}
+                      onClick={() => {
+                        setSelectedSchool(school);
+                        setSchoolPopoverOpen(false);
+                        setSchoolSearchQuery("");
+                      }}
+                      className="flex items-center justify-between w-full text-left px-3 py-2 text-xs hover:bg-muted rounded-lg transition-colors cursor-pointer group"
+                    >
+                      <div className="flex flex-col truncate pr-2">
+                        <span className="font-medium text-foreground truncate group-hover:text-emerald-600 dark:group-hover:text-emerald-400">{school.name}</span>
+                        <span className="text-[10px] text-muted-foreground truncate">{school.slug}</span>
+                      </div>
+                      {selectedSchool?.id === school.id && (
+                        <Check className="h-3.5 w-3.5 text-emerald-600 shrink-0" />
+                      )}
+                    </button>
+                  ))
+                )}
+              </ScrollArea>
+            </PopoverContent>
+          </Popover>
+        </div>
+      </div>
 
       {/* Success/Import Result Banners */}
       <AnimatePresence>
