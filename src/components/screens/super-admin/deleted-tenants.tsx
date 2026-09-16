@@ -159,17 +159,17 @@ export function SuperAdminDeletedTenants() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-5">
       {/* Hero Banner - Recycle Bin */}
       <div className="relative overflow-hidden rounded-2xl border border-sky-100 dark:border-sky-950/40 bg-gradient-to-r from-sky-50/80 via-blue-50/50 to-sky-100/70 dark:from-sky-950/30 dark:via-blue-950/20 dark:to-sky-900/30 px-4 sm:px-6 py-4 sm:py-5 shadow-xs">
         <div className="relative z-10 flex items-center gap-3">
           <div className="flex-1 min-w-0">
-            <h1 className="text-lg sm:text-2xl font-bold tracking-tight text-slate-900 dark:text-white leading-tight">
+            <h2 className="text-lg font-bold tracking-tight text-slate-900 dark:text-white leading-tight">
               Recycle Bin
-            </h1>
+            </h2>
 
             {/* Description — desktop only (inside card) */}
-            <p className="hidden sm:block mt-0.5 text-sm text-slate-500 dark:text-slate-400 leading-snug">
+            <p className="hidden sm:block mt-0.5 text-xs text-slate-500 dark:text-slate-400 leading-snug">
               Schools slated for disposal. Data is fully retrievable for 28 days following deletion.
             </p>
 
@@ -178,7 +178,7 @@ export function SuperAdminDeletedTenants() {
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-3.5 text-slate-400 dark:text-slate-500" />
               <Input
                 placeholder="Search deleted schools..."
-                className="pl-9 h-9 bg-white/95 dark:bg-zinc-900/95 border-slate-200/90 dark:border-zinc-800 rounded-xl shadow-2xs text-sm placeholder:text-slate-400 focus-visible:ring-2 focus-visible:ring-blue-500 w-full"
+                className="pl-9 h-9 bg-white/95 dark:bg-zinc-900/95 border-slate-200/90 dark:border-zinc-800 rounded-xl shadow-2xs text-xs placeholder:text-slate-400 focus-visible:ring-1 focus-visible:ring-blue-500 w-full"
                 value={search}
                 onChange={(e) => dispatch({ type: "SET_SEARCH", payload: e.target.value })}
               />
@@ -204,24 +204,24 @@ export function SuperAdminDeletedTenants() {
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-3.5 text-slate-400 dark:text-slate-500" />
         <Input
           placeholder="Search deleted schools..."
-          className="pl-9 h-9 w-full bg-white dark:bg-zinc-900 border-slate-200/90 dark:border-zinc-800 rounded-xl shadow-xs text-xs placeholder:text-slate-400 focus-visible:ring-2 focus-visible:ring-blue-500"
+          className="pl-9 h-9 w-full bg-white dark:bg-zinc-900 border-slate-200/90 dark:border-zinc-800 rounded-xl shadow-xs text-xs placeholder:text-slate-400 focus-visible:ring-1 focus-visible:ring-blue-500"
           value={search}
           onChange={(e) => dispatch({ type: "SET_SEARCH", payload: e.target.value })}
         />
       </div>
 
       {/* Main Content Card: Deletion Queue */}
-      <div className="rounded-2xl border border-slate-200/80 dark:border-zinc-800 bg-white dark:bg-zinc-950 shadow-xs overflow-hidden">
+      <div className="rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-card shadow-2xs overflow-hidden">
         {/* Card Header */}
-        <div className="p-4 sm:p-6 pb-4 sm:pb-5 flex items-center gap-3.5 border-b border-slate-100 dark:border-zinc-800/80">
-          <div className="size-10 sm:size-11 rounded-xl bg-blue-50 dark:bg-blue-950/50 border border-blue-100/80 dark:border-blue-900/40 flex items-center justify-center text-blue-600 dark:text-blue-400 shrink-0">
-            <Trash2 className="size-5" />
+        <div className="p-4 sm:p-5 flex items-center gap-3 border-b border-slate-100 dark:border-slate-800/80">
+          <div className="size-9 rounded-xl bg-blue-50 dark:bg-blue-950/50 border border-blue-100/80 dark:border-blue-900/40 flex items-center justify-center text-blue-600 dark:text-blue-400 shrink-0">
+            <Trash2 className="size-4.5" />
           </div>
           <div>
-            <h2 className="text-base sm:text-lg font-bold text-slate-900 dark:text-slate-100">
+            <h3 className="text-base font-semibold text-slate-900 dark:text-slate-100">
               Deletion Queue
-            </h2>
-            <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400">
+            </h3>
+            <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
               Schools deleted and in their 28-day retention window.
             </p>
           </div>
@@ -315,18 +315,21 @@ export function SuperAdminDeletedTenants() {
         {/* ── Desktop table (sm+) ── */}
         <div className="hidden sm:block overflow-x-auto">
           <Table>
-            <TableHeader className="bg-slate-50/75 dark:bg-zinc-900/60 border-b border-slate-100 dark:border-zinc-800">
-              <TableRow className="hover:bg-transparent">
-                <TableHead className="py-3.5 px-6 text-xs font-semibold text-slate-600 dark:text-slate-400">
+            <TableHeader>
+              <TableRow className="bg-slate-50/70 dark:bg-slate-800/40 hover:bg-transparent border-b border-slate-200/80 dark:border-slate-800">
+                <TableHead className="w-12 py-3.5 pl-5 text-xs font-semibold text-slate-500 dark:text-slate-400">
+                  #
+                </TableHead>
+                <TableHead className="py-3.5 px-4 text-xs font-semibold text-slate-500 dark:text-slate-400">
                   School Details
                 </TableHead>
-                <TableHead className="py-3.5 px-6 text-xs font-semibold text-slate-600 dark:text-slate-400">
+                <TableHead className="py-3.5 px-4 text-xs font-semibold text-slate-500 dark:text-slate-400">
                   Deletion Event
                 </TableHead>
-                <TableHead className="py-3.5 px-6 text-xs font-semibold text-slate-600 dark:text-slate-400">
+                <TableHead className="py-3.5 px-4 text-xs font-semibold text-slate-500 dark:text-slate-400">
                   Retention Status
                 </TableHead>
-                <TableHead className="py-3.5 px-6 text-xs font-semibold text-slate-600 dark:text-slate-400">
+                <TableHead className="py-3.5 px-4 text-right pr-5 text-xs font-semibold text-slate-500 dark:text-slate-400">
                   Reclamation Actions
                 </TableHead>
               </TableRow>
@@ -334,27 +337,27 @@ export function SuperAdminDeletedTenants() {
             <TableBody>
               {isLoading ? (
                 <TableRow>
-                  <TableCell colSpan={4} className="h-32 text-center text-muted-foreground">
+                  <TableCell colSpan={5} className="h-32 text-center text-muted-foreground">
                     <div className="flex flex-col items-center justify-center gap-2">
                       <div className="size-6 rounded-full border-2 border-blue-600 border-t-transparent animate-spin" />
-                      <span className="text-sm">Loading removal list…</span>
+                      <span className="text-xs">Loading removal list…</span>
                     </div>
                   </TableCell>
                 </TableRow>
               ) : tenants.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={4} className="h-40 text-center text-muted-foreground">
+                  <TableCell colSpan={5} className="h-40 text-center text-muted-foreground">
                     <div className="flex flex-col items-center justify-center gap-2">
                       <div className="size-12 rounded-2xl bg-slate-100 dark:bg-zinc-900 flex items-center justify-center text-slate-400">
                         <Building2 className="size-6 opacity-40" />
                       </div>
-                      <p className="font-medium text-slate-700 dark:text-slate-300 text-sm">Bin is empty</p>
+                      <p className="font-semibold text-slate-700 dark:text-slate-300 text-sm">Bin is empty</p>
                       <p className="text-xs text-slate-400">No schools are currently slated for disposal.</p>
                     </div>
                   </TableCell>
                 </TableRow>
               ) : (
-                tenants.map((tenant: any) => {
+                tenants.map((tenant: any, idx: number) => {
                   const deletedDate = toSafeDate(tenant.deletedAt || tenant.updatedAt);
                   const daysLeft = calculateDaysLeft(tenant.deletedAt || tenant.updatedAt);
                   const isUrgent = daysLeft <= 7;
@@ -363,19 +366,24 @@ export function SuperAdminDeletedTenants() {
                   return (
                     <TableRow
                       key={tenant.id}
-                      className="border-b border-slate-100 dark:border-zinc-800/80 hover:bg-slate-50/60 dark:hover:bg-zinc-900/40 transition-colors"
+                      className="border-b border-slate-100 dark:border-slate-800/80 hover:bg-slate-50/60 dark:hover:bg-slate-800/40 transition-colors"
                     >
+                      {/* # */}
+                      <TableCell className="w-12 py-3 pl-5 text-xs font-semibold text-slate-400">
+                        {idx + 1}
+                      </TableCell>
+
                       {/* School Details */}
-                      <TableCell className="px-6 py-4">
-                        <div className="flex items-center gap-3.5">
-                          <div className="size-10 rounded-xl bg-slate-100 dark:bg-zinc-800/80 flex items-center justify-center text-slate-500 dark:text-slate-400 border border-slate-200/60 dark:border-zinc-700/60 shrink-0">
-                            <Building2 className="size-5" />
+                      <TableCell className="px-4 py-3">
+                        <div className="flex items-center gap-2.5">
+                          <div className="size-7 rounded-lg bg-slate-100 dark:bg-zinc-800/80 flex items-center justify-center text-slate-500 dark:text-slate-400 border border-slate-200/60 dark:border-zinc-700/60 shrink-0">
+                            <Building2 className="size-3.5" />
                           </div>
                           <div>
-                            <div className="font-bold text-sm text-slate-900 dark:text-slate-100 leading-tight">
+                            <div className="font-semibold text-xs text-slate-900 dark:text-slate-100 leading-tight">
                               {tenant.name}
                             </div>
-                            <div className="text-xs text-slate-400 dark:text-slate-500 mt-0.5">
+                            <div className="text-[11px] text-slate-400 dark:text-slate-500 mt-0.5">
                               Slug: {tenant.slug}
                             </div>
                           </div>
@@ -383,9 +391,9 @@ export function SuperAdminDeletedTenants() {
                       </TableCell>
 
                       {/* Deletion Event */}
-                      <TableCell className="px-6 py-4">
-                        <div className="flex items-center gap-2 text-xs sm:text-sm text-slate-700 dark:text-slate-300 font-medium whitespace-nowrap">
-                          <Calendar className="size-4 text-slate-400 shrink-0" />
+                      <TableCell className="px-4 py-3">
+                        <div className="flex items-center gap-1.5 text-xs text-slate-700 dark:text-slate-300 font-medium whitespace-nowrap">
+                          <Calendar className="size-3.5 text-slate-400 shrink-0" />
                           <span>
                             {tenant.deletedAt
                               ? format(deletedDate, "MMM d, yyyy HH:mm")
@@ -395,50 +403,50 @@ export function SuperAdminDeletedTenants() {
                       </TableCell>
 
                       {/* Retention Status */}
-                      <TableCell className="px-6 py-4">
+                      <TableCell className="px-4 py-3">
                         <div className="flex items-center gap-2 flex-wrap">
                           <span
-                            className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold border ${
+                            className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-medium border ${
                               isUrgent
-                                ? "bg-red-50 dark:bg-red-950/40 text-red-600 dark:text-red-400 border-red-200 dark:border-red-800/50"
+                                ? "bg-rose-50 dark:bg-rose-950/40 text-rose-600 dark:text-rose-400 border-rose-200 dark:border-rose-800/50"
                                 : "bg-amber-50 dark:bg-amber-950/40 text-amber-600 dark:text-amber-400 border-amber-200 dark:border-amber-800/50"
                             }`}
                           >
-                            <Clock className="size-3.5 shrink-0" />
+                            <span className={`size-1.5 rounded-full shrink-0 ${isUrgent ? "bg-rose-500" : "bg-amber-500"}`} />
                             {daysLeft} days left
                           </span>
-                          <span className="text-xs text-slate-400 dark:text-slate-500 font-normal whitespace-nowrap">
+                          <span className="text-[11px] text-slate-400 dark:text-slate-500 font-normal whitespace-nowrap">
                             (Est. {format(estimatedExpiryDate, "MMM d, yyyy")})
                           </span>
                         </div>
                       </TableCell>
 
                       {/* Reclamation Actions */}
-                      <TableCell className="px-6 py-4">
-                        <div className="flex items-center gap-2.5 flex-wrap">
+                      <TableCell className="px-4 py-3 text-right pr-5">
+                        <div className="flex items-center justify-end gap-2">
                           <Button
                             variant="outline"
                             size="sm"
-                            className="h-8 gap-1.5 border-emerald-300 hover:border-emerald-400 dark:border-emerald-700/80 bg-emerald-50/50 hover:bg-emerald-100/70 text-emerald-700 dark:text-emerald-300 dark:bg-emerald-950/30 dark:hover:bg-emerald-900/50 text-xs font-semibold rounded-lg shadow-2xs transition-colors"
+                            className="h-7.5 px-2.5 gap-1.5 border-emerald-300/80 hover:border-emerald-400 dark:border-emerald-700/80 bg-emerald-50/50 hover:bg-emerald-100/70 text-emerald-700 dark:text-emerald-300 dark:bg-emerald-950/30 text-xs font-medium rounded-lg shadow-2xs transition-colors"
                             onClick={() => {
                               dispatch({ type: "SET_SELECTED_TENANT", payload: tenant });
                               dispatch({ type: "SET_RESTORE_DIALOG_OPEN", payload: true });
                             }}
                           >
-                            <RotateCcw className="size-3.5" />
-                            Restore School
+                            <RotateCcw className="size-3" />
+                            Restore
                           </Button>
                           <Button
                             variant="outline"
                             size="sm"
-                            className="h-8 gap-1.5 border-red-200 hover:border-red-300 dark:border-red-900/60 bg-red-50/60 hover:bg-red-100/80 text-red-600 dark:text-red-400 dark:bg-red-950/30 dark:hover:bg-red-900/50 text-xs font-semibold rounded-lg shadow-2xs transition-colors"
+                            className="h-7.5 px-2.5 gap-1.5 border-rose-200 hover:border-rose-300 dark:border-rose-900/60 bg-rose-50/60 hover:bg-rose-100/80 text-rose-600 dark:text-rose-400 dark:bg-rose-950/30 text-xs font-medium rounded-lg shadow-2xs transition-colors"
                             onClick={() => {
                               dispatch({ type: "SET_SELECTED_TENANT", payload: tenant });
                               dispatch({ type: "SET_PURGE_DIALOG_OPEN", payload: true });
                             }}
                           >
-                            <Trash2 className="size-3.5" />
-                            Permanently Delete
+                            <Trash2 className="size-3" />
+                            Delete Forever
                           </Button>
                         </div>
                       </TableCell>

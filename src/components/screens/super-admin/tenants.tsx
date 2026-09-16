@@ -255,29 +255,29 @@ export function SuperAdminTenants() {
 
   return (
     <div className="space-y-6">
-      {/* Top School Management Header matching reference */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+      {/* Top School Management Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div>
-          <div className="flex items-center gap-2.5 flex-wrap">
-            <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-slate-900 dark:text-slate-100">
+          <div className="flex items-center gap-2 flex-wrap">
+            <h2 className="text-lg font-semibold text-foreground tracking-tight">
               School Management
-            </h1>
+            </h2>
             <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-medium bg-rose-50 text-rose-600 border border-rose-200/70 dark:bg-rose-950/40 dark:text-rose-400 dark:border-rose-900/60">
               <Shield className="size-3 text-rose-500" />
               Platform Level
             </span>
           </div>
-          <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-1 font-normal">
+          <p className="text-xs text-muted-foreground mt-0.5 font-normal">
             Manage all schools on your platform. Add, monitor, and manage school accounts.
           </p>
         </div>
 
         {canCreate && (
           <Button
-            className="bg-blue-600 hover:bg-blue-700 text-white text-xs sm:text-sm font-semibold h-10 px-4 rounded-xl gap-2 shadow-xs transition-all shrink-0 self-start sm:self-auto"
+            className="bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold h-9 px-4 rounded-xl gap-1.5 shadow-xs transition-all shrink-0 self-start sm:self-auto"
             onClick={handleOpenAddDialog}
           >
-            <Plus className="size-4 stroke-[2.5]" />
+            <Plus className="size-3.5 stroke-[2.5]" />
             Add School
           </Button>
         )}

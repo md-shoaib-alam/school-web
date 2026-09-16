@@ -141,3 +141,73 @@ export function getInitials(name: string): string {
     .slice(0, 2)
     .toUpperCase();
 }
+
+export function isSystemRole(role: PlatformRoleRecord): boolean {
+  if ((role as any).isSystem !== undefined) {
+    return Boolean((role as any).isSystem);
+  }
+  // In demo / default data, Security Analyst is custom while others are default system templates
+  const lower = role.name.trim().toLowerCase();
+  if (lower === "security analyst") return false;
+  return ROLE_TEMPLATES.some((t) => t.name.toLowerCase() === lower);
+}
+
+export interface RoleThemeConfig {
+  iconBg: string;
+  iconColor: string;
+  badgeBg: string;
+  badgeText: string;
+  borderHover: string;
+}
+
+export const ROLE_THEMES: Record<string, RoleThemeConfig> = {
+  "support agent": {
+    iconBg: "bg-blue-50 dark:bg-blue-950/50",
+    iconColor: "text-blue-600 dark:text-blue-400",
+    badgeBg: "bg-blue-50 dark:bg-blue-950/60",
+    badgeText: "text-blue-600 dark:text-blue-400 border-blue-200 dark:border-blue-800",
+    borderHover: "hover:border-blue-300",
+  },
+  "billing manager": {
+    iconBg: "bg-amber-50 dark:bg-amber-950/50",
+    iconColor: "text-amber-600 dark:text-amber-400",
+    badgeBg: "bg-amber-50 dark:bg-amber-950/60",
+    badgeText: "text-amber-600 dark:text-amber-400 border-amber-200 dark:border-amber-800",
+    borderHover: "hover:border-amber-300",
+  },
+  "content moderator": {
+    iconBg: "bg-purple-50 dark:bg-purple-950/50",
+    iconColor: "text-purple-600 dark:text-purple-400",
+    badgeBg: "bg-purple-50 dark:bg-purple-950/60",
+    badgeText: "text-purple-600 dark:text-purple-400 border-purple-200 dark:border-purple-800",
+    borderHover: "hover:border-purple-300",
+  },
+  "security analyst": {
+    iconBg: "bg-red-50 dark:bg-red-950/50",
+    iconColor: "text-red-600 dark:text-red-400",
+    badgeBg: "bg-red-50 dark:bg-red-950/60",
+    badgeText: "text-red-600 dark:text-red-400 border-red-200 dark:border-red-800",
+    borderHover: "hover:border-red-300",
+  },
+  "read-only viewer": {
+    iconBg: "bg-emerald-50 dark:bg-emerald-950/50",
+    iconColor: "text-emerald-600 dark:text-emerald-400",
+    badgeBg: "bg-emerald-50 dark:bg-emerald-950/60",
+    badgeText: "text-emerald-600 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800",
+    borderHover: "hover:border-emerald-300",
+  },
+};
+
+export function getRoleTheme(name: string): RoleThemeConfig {
+  const lower = name.trim().toLowerCase();
+  return (
+    ROLE_THEMES[lower] || {
+      iconBg: "bg-slate-100 dark:bg-zinc-800",
+      iconColor: "text-slate-700 dark:text-zinc-300",
+      badgeBg: "bg-slate-100 dark:bg-zinc-800",
+      badgeText: "text-slate-700 dark:text-zinc-300 border-slate-200 dark:border-zinc-700",
+      borderHover: "hover:border-slate-300",
+    }
+  );
+}
+

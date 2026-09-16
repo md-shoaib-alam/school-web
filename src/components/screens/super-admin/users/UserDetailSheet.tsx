@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import {
   Sheet,
   SheetContent,
@@ -13,6 +13,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import {
   X,
   UserRound,
@@ -31,13 +36,17 @@ import {
   Loader2,
   Clock3,
   Users2,
-  Settings
+  Settings,
+  ArrowRightLeft,
+  UserMinus,
+  Plus,
+  Search,
 } from "lucide-react";
-import { PlatformUser, ROLE_CONFIG } from "./types";
+import { PlatformUser, ROLE_CONFIG, TenantInfo } from "./types";
 import { copyToClipboard } from "@/lib/utils";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
-import { useUpdateUser } from "@/lib/graphql/hooks";
+import { useUpdateUser, useTenants } from "@/lib/graphql/hooks";
 
 interface UserDetailSheetProps {
   open: boolean;
@@ -47,6 +56,7 @@ interface UserDetailSheetProps {
   onUserUpdated?: (updatedUser: PlatformUser) => void;
   toggling: boolean;
   formatDateTime: (val: string) => string;
+  tenants?: TenantInfo[];
 }
 
 export function UserDetailSheet({
@@ -57,6 +67,7 @@ export function UserDetailSheet({
   onUserUpdated,
   toggling,
   formatDateTime,
+  tenants,
 }: UserDetailSheetProps) {
   const router = useRouter();
   const [activeTab, setActiveTab] = useState<"overview" | "activity" | "relations" | "settings">("overview");
@@ -69,8 +80,35 @@ export function UserDetailSheet({
   const [editEmail, setEditEmail] = useState("");
   const [editPhone, setEditPhone] = useState("");
   const [editRole, setEditRole] = useState("admin");
+  const [editTenantId, setEditTenantId] = useState<string>("none");
+
+  // Quick school assignment popover state
+  const [isSchoolPopoverOpen, setIsSchoolPopoverOpen] = useState(false);
+  const [schoolSearchQuery, setSchoolSearchQuery] = useState("");
 
   const updateUserMutation = useUpdateUser();
+  const { data: tenantsData } = useTenants({ limit: 1000 });
+
+  const allTenants: TenantInfo[] = useMemo(() => {
+    if (tenantsData?.tenants && tenantsData.tenants.length > 0) {
+      return tenantsData.tenants.map((t: any) => ({
+        id: t.id,
+        name: t.name,
+        slug: t.slug || "",
+        plan: t.plan,
+        status: t.status,
+      }));
+    }
+    return tenants || [];
+  }, [tenantsData, tenants]);
+
+  const filteredTenants = useMemo(() => {
+    if (!schoolSearchQuery.trim()) return allTenants;
+    const q = schoolSearchQuery.toLowerCase();
+    return allTenants.filter(
+      (t) => t.name.toLowerCase().includes(q) || (t.slug && t.slug.toLowerCase().includes(q))
+    );
+  }, [allTenants, schoolSearchQuery]);
 
   useEffect(() => {
     if (user) {
@@ -79,7 +117,10 @@ export function UserDetailSheet({
       setEditEmail(user.email || "");
       setEditPhone(user.phone || "");
       setEditRole(user.role || "admin");
+      setEditTenantId(user.tenant?.id || "none");
       setIsEditing(false);
+      setIsSchoolPopoverOpen(false);
+      setSchoolSearchQuery("");
     }
   }, [user]);
 
@@ -118,6 +159,7 @@ export function UserDetailSheet({
           email: editEmail.trim(),
           phone: editPhone.trim() || undefined,
           role: editRole,
+          tenantId: editTenantId === "none" ? null : editTenantId,
         },
       });
 
@@ -127,11 +169,46 @@ export function UserDetailSheet({
         email: res?.email || editEmail.trim(),
         phone: res?.phone !== undefined ? res.phone : editPhone.trim(),
         role: res?.role || editRole,
+        tenant: res?.tenant !== undefined 
+          ? res.tenant 
+          : (editTenantId === "none" ? null : allTenants.find((t) => t.id === editTenantId) || null),
       };
 
       setCurrentUserData(updatedUser);
       onUserUpdated?.(updatedUser);
       setIsEditing(false);
+    } catch {
+      // Handled in platform.hooks.ts onError
+    }
+  };
+
+  const handleQuickSchoolChange = async (newTenantId: string | null) => {
+    try {
+      const res = await updateUserMutation.mutateAsync({
+        id: currentUserData.id,
+        data: {
+          tenantId: newTenantId === "none" || !newTenantId ? null : newTenantId,
+        },
+      });
+
+      const updatedUser: PlatformUser = {
+        ...currentUserData,
+        tenant: res?.tenant !== undefined 
+          ? res.tenant 
+          : (newTenantId === "none" || !newTenantId ? null : allTenants.find((t) => t.id === newTenantId) || null),
+      };
+
+      setCurrentUserData(updatedUser);
+      onUserUpdated?.(updatedUser);
+      setEditTenantId(updatedUser.tenant?.id || "none");
+      setIsSchoolPopoverOpen(false);
+      
+      if (!newTenantId || newTenantId === "none") {
+        toast.success("User unassigned from school successfully");
+      } else {
+        const assignedSchool = allTenants.find((t) => t.id === newTenantId);
+        toast.success(`User assigned to ${assignedSchool?.name || "school"} successfully`);
+      }
     } catch {
       // Handled in platform.hooks.ts onError
     }
@@ -284,6 +361,7 @@ export function UserDetailSheet({
                       setEditEmail(currentUserData.email || "");
                       setEditPhone(currentUserData.phone || "");
                       setEditRole(currentUserData.role || "admin");
+                      setEditTenantId(currentUserData.tenant?.id || "none");
                       setIsEditing(true);
                     }}
                     className="h-8 px-3 rounded-xl border-slate-200/90 dark:border-zinc-800 text-slate-700 dark:text-zinc-300 text-xs font-semibold gap-1.5 shadow-2xs hover:bg-slate-50 dark:hover:bg-zinc-800 cursor-pointer"
@@ -357,6 +435,41 @@ export function UserDetailSheet({
                         className="h-9 text-xs rounded-xl bg-white dark:bg-zinc-950 border-slate-200 dark:border-zinc-800"
                       />
                     </div>
+
+                    <div className="space-y-1.5 sm:col-span-2">
+                      <div className="flex items-center justify-between">
+                        <Label className="text-xs font-semibold text-slate-700 dark:text-zinc-300">
+                          Assigned School / Tenant
+                        </Label>
+                        {editTenantId !== "none" && (
+                          <button
+                            type="button"
+                            onClick={() => setEditTenantId("none")}
+                            className="text-[11px] text-rose-500 hover:text-rose-600 font-semibold cursor-pointer"
+                          >
+                            Remove / Deassign School
+                          </button>
+                        )}
+                      </div>
+                      <Select value={editTenantId} onValueChange={setEditTenantId}>
+                        <SelectTrigger className="h-9 text-xs rounded-xl bg-white dark:bg-zinc-950 border-slate-200 dark:border-zinc-800">
+                          <SelectValue placeholder="Select school or platform level" />
+                        </SelectTrigger>
+                        <SelectContent className="rounded-xl border-slate-200 dark:border-zinc-800 max-h-56">
+                          <SelectItem value="none" className="text-xs font-medium text-slate-500">
+                            Platform Level (No Tenant) — Global / Unassigned
+                          </SelectItem>
+                          {allTenants.map((t) => (
+                            <SelectItem key={t.id} value={t.id} className="text-xs">
+                              {t.name} {t.slug ? `(${t.slug})` : ""}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <p className="text-[11px] text-slate-400 dark:text-zinc-500">
+                        Assign this user as {editRole} to a specific school, or keep as a Platform Level user.
+                      </p>
+                    </div>
                   </div>
 
                   <div className="flex items-center justify-end gap-2 pt-2 border-t border-slate-200/60 dark:border-zinc-800">
@@ -369,6 +482,7 @@ export function UserDetailSheet({
                         setEditEmail(currentUserData.email || "");
                         setEditPhone(currentUserData.phone || "");
                         setEditRole(currentUserData.role || "admin");
+                        setEditTenantId(currentUserData.tenant?.id || "none");
                         setIsEditing(false);
                       }}
                       disabled={updateUserMutation.isPending}
@@ -464,16 +578,108 @@ export function UserDetailSheet({
 
             {/* Section 2: School Information */}
             <div className="space-y-3">
-              <div className="flex items-center gap-2">
-                <Building2 className="size-4 text-blue-600" />
-                <h3 className="font-bold text-sm text-slate-900 dark:text-slate-100">
-                  School Information
-                </h3>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Building2 className="size-4 text-blue-600 dark:text-blue-400" />
+                  <h3 className="font-bold text-sm text-slate-900 dark:text-slate-100">
+                    School Information
+                  </h3>
+                </div>
+
+                {/* Quick Assign / Change School Popover */}
+                <Popover open={isSchoolPopoverOpen} onOpenChange={setIsSchoolPopoverOpen}>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      disabled={updateUserMutation.isPending}
+                      className="h-8 px-3 rounded-xl border-blue-200/80 dark:border-blue-900/60 bg-blue-50/50 hover:bg-blue-100/70 text-blue-600 dark:text-blue-400 text-xs font-semibold gap-1.5 shadow-2xs cursor-pointer"
+                    >
+                      <ArrowRightLeft className="size-3.5" />
+                      <span>{currentUserData.tenant ? "Change School" : "Assign to School"}</span>
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent align="end" className="w-80 p-0 rounded-2xl border-slate-200 dark:border-zinc-800 shadow-xl bg-white dark:bg-zinc-950">
+                    <div className="p-3 border-b border-slate-100 dark:border-zinc-800 space-y-2">
+                      <p className="text-xs font-semibold text-slate-900 dark:text-white">
+                        {currentUserData.tenant ? "Change User's School" : "Assign User to School"}
+                      </p>
+                      <div className="relative">
+                        <Search className="size-3.5 text-slate-400 absolute left-2.5 top-1/2 -translate-y-1/2" />
+                        <Input
+                          value={schoolSearchQuery}
+                          onChange={(e) => setSchoolSearchQuery(e.target.value)}
+                          placeholder="Search school name..."
+                          className="h-8 pl-8 text-xs rounded-lg bg-slate-50 dark:bg-zinc-900 border-slate-200 dark:border-zinc-800"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="max-h-60 overflow-y-auto p-1.5 space-y-1">
+                      {/* Deassign / Platform Level Option */}
+                      <button
+                        type="button"
+                        onClick={() => handleQuickSchoolChange(null)}
+                        className={`w-full flex items-center justify-between p-2 rounded-xl text-left text-xs transition-colors cursor-pointer ${
+                          !currentUserData.tenant 
+                            ? "bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 font-semibold" 
+                            : "hover:bg-slate-50 dark:hover:bg-zinc-900 text-slate-700 dark:text-zinc-300"
+                        }`}
+                      >
+                        <div className="flex items-center gap-2 min-w-0">
+                          <div className="size-6 rounded-lg bg-slate-100 dark:bg-zinc-800 flex items-center justify-center shrink-0">
+                            <Building2 className="size-3 text-slate-500" />
+                          </div>
+                          <div className="truncate">
+                            <p className="truncate font-medium">Platform Level (No Tenant)</p>
+                            <p className="text-[10px] text-slate-400">Global Admin / Unassigned</p>
+                          </div>
+                        </div>
+                        {!currentUserData.tenant && <Check className="size-3.5 text-blue-600 shrink-0" />}
+                      </button>
+
+                      {filteredTenants.length === 0 ? (
+                        <p className="p-4 text-center text-xs text-slate-400">No schools found</p>
+                      ) : (
+                        filteredTenants.map((t) => {
+                          const isCurrent = currentUserData.tenant?.id === t.id;
+                          return (
+                            <button
+                              key={t.id}
+                              type="button"
+                              onClick={() => handleQuickSchoolChange(t.id)}
+                              className={`w-full flex items-center justify-between p-2 rounded-xl text-left text-xs transition-colors cursor-pointer ${
+                                isCurrent 
+                                  ? "bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 font-semibold" 
+                                  : "hover:bg-slate-50 dark:hover:bg-zinc-900 text-slate-700 dark:text-zinc-300"
+                              }`}
+                            >
+                              <div className="flex items-center gap-2 min-w-0">
+                                <div className="size-6 rounded-lg bg-blue-50 dark:bg-blue-950/40 text-blue-600 flex items-center justify-center shrink-0">
+                                  <Building2 className="size-3" />
+                                </div>
+                                <div className="truncate">
+                                  <p className="truncate font-medium">{t.name}</p>
+                                  <p className="text-[10px] text-slate-400 truncate">{t.slug ? `/${t.slug}` : t.id}</p>
+                                </div>
+                              </div>
+                              {isCurrent && <Check className="size-3.5 text-blue-600 shrink-0" />}
+                            </button>
+                          );
+                        })
+                      )}
+                    </div>
+                  </PopoverContent>
+                </Popover>
               </div>
 
-              <div className="p-4 rounded-2xl bg-slate-50/70 dark:bg-zinc-900/60 border border-slate-100 dark:border-zinc-800/80 flex items-center justify-between gap-3">
+              <div className="p-4 rounded-2xl bg-slate-50/70 dark:bg-zinc-900/60 border border-slate-100 dark:border-zinc-800/80 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                 <div className="flex items-center gap-3.5 min-w-0">
-                  <div className="size-10 rounded-xl bg-blue-50 dark:bg-blue-950/50 text-blue-600 dark:text-blue-400 flex items-center justify-center shrink-0">
+                  <div className={`size-10 rounded-xl flex items-center justify-center shrink-0 ${
+                    currentUserData.tenant 
+                      ? "bg-blue-50 dark:bg-blue-950/50 text-blue-600 dark:text-blue-400" 
+                      : "bg-slate-100 dark:bg-zinc-800 text-slate-500"
+                  }`}>
                     <Building2 className="size-5" />
                   </div>
                   <div className="min-w-0">
@@ -481,25 +687,51 @@ export function UserDetailSheet({
                       {currentUserData.tenant?.name || "Platform Level (No Tenant)"}
                     </p>
                     <p className="text-xs text-slate-400 dark:text-slate-500 mt-0.5 truncate">
-                      {currentUserData.tenant?.slug ? `/${currentUserData.tenant.slug}` : "Global Admin"}
+                      {currentUserData.tenant?.slug ? `/${currentUserData.tenant.slug}` : "Global Admin • No School Assigned"}
                     </p>
                   </div>
                 </div>
 
-                {currentUserData.tenant && (
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => {
-                      onOpenChange(false);
-                      router.push(`/${currentUserData.tenant?.slug || currentUserData.tenant?.id}`);
-                    }}
-                    className="h-8 px-3 rounded-xl border-blue-200 dark:border-blue-900/60 bg-blue-50/50 hover:bg-blue-100/70 text-blue-600 dark:text-blue-400 text-xs font-semibold gap-1.5 shrink-0 shadow-2xs"
-                  >
-                    <span>View School</span>
-                    <ExternalLink className="size-3" />
-                  </Button>
-                )}
+                <div className="flex items-center gap-2 shrink-0 self-end sm:self-auto">
+                  {currentUserData.tenant ? (
+                    <>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => {
+                          onOpenChange(false);
+                          router.push(`/${currentUserData.tenant?.slug || currentUserData.tenant?.id}`);
+                        }}
+                        className="h-8 px-3 rounded-xl border-blue-200 dark:border-blue-900/60 bg-blue-50/50 hover:bg-blue-100/70 text-blue-600 dark:text-blue-400 text-xs font-semibold gap-1.5 shadow-2xs cursor-pointer"
+                      >
+                        <span>View School</span>
+                        <ExternalLink className="size-3" />
+                      </Button>
+
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        disabled={updateUserMutation.isPending}
+                        onClick={() => handleQuickSchoolChange(null)}
+                        className="h-8 px-3 rounded-xl border-rose-200 dark:border-rose-900/60 bg-rose-50/50 hover:bg-rose-100/70 text-rose-600 dark:text-rose-400 text-xs font-semibold gap-1.5 shadow-2xs cursor-pointer"
+                        title="Deassign / remove this school"
+                      >
+                        <UserMinus className="size-3" />
+                        <span>Deassign</span>
+                      </Button>
+                    </>
+                  ) : (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setIsSchoolPopoverOpen(true)}
+                      className="h-8 px-3 rounded-xl border-blue-200 dark:border-blue-900/60 bg-blue-50/50 hover:bg-blue-100/70 text-blue-600 dark:text-blue-400 text-xs font-semibold gap-1.5 shadow-2xs cursor-pointer"
+                    >
+                      <Plus className="size-3" />
+                      <span>Assign to School</span>
+                    </Button>
+                  )}
+                </div>
               </div>
             </div>
 
@@ -606,6 +838,7 @@ export function UserDetailSheet({
                   setEditEmail(currentUserData.email || "");
                   setEditPhone(currentUserData.phone || "");
                   setEditRole(currentUserData.role || "admin");
+                  setEditTenantId(currentUserData.tenant?.id || "none");
                   setIsEditing(true);
                 }}
                 className="h-10 px-6 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-semibold text-xs sm:text-sm flex items-center gap-2 shadow-xs cursor-pointer"
@@ -624,6 +857,7 @@ export function UserDetailSheet({
                   setEditEmail(currentUserData.email || "");
                   setEditPhone(currentUserData.phone || "");
                   setEditRole(currentUserData.role || "admin");
+                  setEditTenantId(currentUserData.tenant?.id || "none");
                   setIsEditing(false);
                 }}
                 disabled={updateUserMutation.isPending}

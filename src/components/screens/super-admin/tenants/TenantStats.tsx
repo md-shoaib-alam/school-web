@@ -25,22 +25,22 @@ const StatCard = memo(function StatCard({
   trendType = "neutral",
 }: StatCardProps) {
   return (
-    <div className={`rounded-2xl p-4 sm:p-5 border ${cardBg} ${cardBorder} transition-all duration-200 shadow-xs hover:shadow-sm`}>
-      <div className="flex items-start gap-3.5 sm:gap-4">
-        <div className={`size-12 rounded-2xl flex items-center justify-center shrink-0 ${iconBg}`}>
+    <div className={`rounded-xl p-3.5 border ${cardBg} ${cardBorder} shadow-2xs transition-all duration-200`}>
+      <div className="flex items-start gap-3">
+        <div className={`size-9 rounded-lg flex items-center justify-center shrink-0 ${iconBg}`}>
           {icon}
         </div>
         <div className="flex-1 min-w-0">
-          <p className="text-[10px] font-bold tracking-wider text-slate-500 dark:text-slate-400 uppercase">
+          <p className="text-[10px] font-bold tracking-wider text-slate-500 dark:text-slate-400 uppercase truncate">
             {title}
           </p>
-          <div className="flex items-baseline gap-2 mt-0.5">
-            <span className="text-2xl font-bold tracking-tight text-slate-900 dark:text-slate-100">
+          <div className="flex items-baseline gap-1.5 mt-0.5">
+            <span className="text-xl font-bold tracking-tight text-slate-900 dark:text-slate-100">
               {value}
             </span>
             {trendText && (
               <span
-                className={`inline-flex items-center text-[11px] font-semibold px-2 py-0.5 rounded-full ${
+                className={`inline-flex items-center text-[10px] font-semibold px-1.5 py-0.2 rounded-full ${
                   trendType === "up"
                     ? "text-emerald-700 bg-emerald-100/80 dark:text-emerald-400 dark:bg-emerald-950/50"
                     : trendType === "down"
@@ -55,7 +55,7 @@ const StatCard = memo(function StatCard({
               </span>
             )}
           </div>
-          <p className="text-xs text-slate-500/90 dark:text-slate-400/90 mt-1 font-normal truncate">
+          <p className="text-[11px] text-slate-500/90 dark:text-slate-400/90 mt-0.5 font-normal truncate">
             {subtitle}
           </p>
         </div>
@@ -75,12 +75,12 @@ interface TenantStatsProps {
 
 export function TenantStats({ stats }: TenantStatsProps) {
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-3.5">
       <StatCard
         title="TOTAL SCHOOLS"
         value={stats.total}
         subtitle="All registered schools"
-        icon={<Building2 className="size-6 text-blue-600 dark:text-blue-400" />}
+        icon={<Building2 className="size-4.5 text-blue-600 dark:text-blue-400" />}
         iconBg="bg-blue-100 dark:bg-blue-900/40"
         cardBg="bg-blue-50/50 dark:bg-blue-950/15"
         cardBorder="border-blue-100 dark:border-blue-900/30"
@@ -90,8 +90,8 @@ export function TenantStats({ stats }: TenantStatsProps) {
       <StatCard
         title="ACTIVE SCHOOLS"
         value={stats.active}
-        subtitle="Currently active and operational"
-        icon={<CheckCircle2 className="size-6 text-emerald-600 dark:text-emerald-400" />}
+        subtitle="Currently active & operational"
+        icon={<CheckCircle2 className="size-4.5 text-emerald-600 dark:text-emerald-400" />}
         iconBg="bg-emerald-100 dark:bg-emerald-900/40"
         cardBg="bg-emerald-50/50 dark:bg-emerald-950/15"
         cardBorder="border-emerald-100 dark:border-emerald-900/30"
@@ -102,7 +102,7 @@ export function TenantStats({ stats }: TenantStatsProps) {
         title="TRIAL SCHOOLS"
         value={stats.trial}
         subtitle="In trial period"
-        icon={<Clock className="size-6 text-amber-600 dark:text-amber-400" />}
+        icon={<Clock className="size-4.5 text-amber-600 dark:text-amber-400" />}
         iconBg="bg-amber-100 dark:bg-amber-900/40"
         cardBg="bg-amber-50/50 dark:bg-amber-950/15"
         cardBorder="border-amber-100 dark:border-amber-900/30"
@@ -113,7 +113,7 @@ export function TenantStats({ stats }: TenantStatsProps) {
         title="SUSPENDED"
         value={stats.suspended}
         subtitle="Temporarily suspended"
-        icon={<Ban className="size-6 text-rose-600 dark:text-rose-400" />}
+        icon={<Ban className="size-4.5 text-rose-600 dark:text-rose-400" />}
         iconBg="bg-rose-100 dark:bg-rose-900/40"
         cardBg="bg-rose-50/50 dark:bg-rose-950/15"
         cardBorder="border-rose-100 dark:border-rose-900/30"

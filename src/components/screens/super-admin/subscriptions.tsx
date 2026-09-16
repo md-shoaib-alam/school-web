@@ -404,14 +404,31 @@ export function SuperAdminSubscriptions() {
   };
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center gap-4">
-        <div className="size-12 rounded-2xl bg-muted flex items-center justify-center text-muted-foreground">
-          <CreditCard className="size-6" />
+    <div className="space-y-5">
+      {/* Hero Banner */}
+      <div className="relative rounded-2xl bg-gradient-to-r from-blue-50 via-indigo-50/60 to-blue-50/30 dark:from-slate-900 dark:via-indigo-950/20 dark:to-slate-900 border border-blue-100/80 dark:border-slate-800 overflow-hidden px-6 py-5 flex items-center justify-between">
+        <div className="flex items-center gap-4 min-w-0">
+          <div className="size-11 rounded-xl bg-blue-100 dark:bg-blue-900/40 flex items-center justify-center shrink-0">
+            <CreditCard className="size-5 text-blue-600 dark:text-blue-400" />
+          </div>
+          <div>
+            <h2 className="text-xl font-bold tracking-tight text-slate-900 dark:text-slate-100">B2C Parent Subscriptions</h2>
+            <p className="text-muted-foreground mt-0.5 text-xs">Manage individual parent plan enrollments across all schools.</p>
+          </div>
         </div>
-        <div>
-          <h2 className="text-2xl font-semibold tracking-tight text-foreground">B2C Parent Subscriptions</h2>
-          <p className="text-muted-foreground mt-1 text-sm">Manage individual parent plan enrollments across all schools.</p>
+        {/* Right side: image + tagline */}
+        <div className="hidden sm:flex items-center gap-4 shrink-0">
+          <div className="text-right">
+            <p className="text-sm font-bold text-blue-700 dark:text-blue-400 leading-tight">Empowering Parents</p>
+            <p className="text-sm font-bold text-blue-700 dark:text-blue-400 leading-tight">Supporting Students</p>
+          </div>
+          <div className="w-28 h-24 rounded-xl overflow-hidden shrink-0">
+            <img
+              src="/assets/subscprtiontop.png"
+              alt="Subscription illustration"
+              className="w-full h-full object-cover object-center scale-110"
+            />
+          </div>
         </div>
       </div>
 

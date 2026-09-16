@@ -37,7 +37,7 @@ export function Header({ items, resolvedScreen, layoutPref = "comprehensive", on
     logout
   } = useAppStore();
 
-  const isModernUI = currentUser.role === "super_admin" || currentUser.role === "admin";
+  const isModernUI = currentUser?.role === "super_admin" || currentUser?.role === "admin";
   const [prefFromStorage, setPrefFromStorage] = useState<string | null>(null);
 
   useEffect(() => {
