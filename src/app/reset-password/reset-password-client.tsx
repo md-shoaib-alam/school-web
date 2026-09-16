@@ -223,7 +223,7 @@ export default function ResetPasswordClient() {
         <div className="w-full h-[80px] sm:h-[100px] md:h-[120px] pointer-events-none shrink-0" />
 
         {/* Mobile / Tablet Footer */}
-        <footer className="w-full text-center pb-2 text-[10px] sm:text-xs text-slate-700 font-medium drop-shadow-xs shrink-0 mt-auto">
+        <footer className="w-full text-center pb-2 text-[10px] sm:text-xs text-white font-medium drop-shadow-sm shrink-0 mt-auto">
           © {new Date().getFullYear()} SchoolSaaS. All rights reserved.
         </footer>
       </div>
@@ -242,9 +242,9 @@ export default function ResetPasswordClient() {
 
         {/* Main */}
         <main className="flex-1 flex items-stretch px-8 lg:px-12 xl:px-16 2xl:pl-16 2xl:pr-8 py-3 2xl:py-5 w-full min-h-0">
-          <div className="w-full max-w-[1920px] 2xl:max-w-none mx-auto flex items-stretch justify-between gap-8 xl:gap-12 2xl:gap-16">
+          <div className="w-full max-w-[1920px] 2xl:max-w-none mx-auto flex items-stretch justify-between gap-8 xl:gap-12 2xl:gap-16 relative">
 
-            {/* Left — info panel */}
+            {/* Left — info panel & stat card */}
             <div className="flex flex-col max-w-[480px] xl:max-w-[520px] 2xl:max-w-[560px] self-stretch pt-0">
               {/* Logo */}
               <div className="mb-4 2xl:mb-5">
@@ -259,72 +259,70 @@ export default function ResetPasswordClient() {
                 <span className="text-blue-600">SaaS</span>
               </h1>
 
-              {/* Stat Card — pinned to bottom, glassmorphism (shown on lg & xl, hidden on 2xl) */}
-              <div className="2xl:hidden flex items-center gap-6 xl:gap-7 2xl:gap-8 px-6 xl:px-7 2xl:px-8 py-3.5 xl:py-4 rounded-2xl bg-white/30 backdrop-blur-md border border-white/60 shadow-lg shadow-black/10 w-fit mt-auto mb-4 2xl:mb-6">
+              {/* Stat Card — pinned to bottom, glassmorphism (shown on normal devices, hidden on 2xl) */}
+              <div className="2xl:hidden flex items-center gap-6 xl:gap-7 px-6 xl:px-7 py-3.5 xl:py-4 rounded-2xl bg-white/30 backdrop-blur-md border border-white/60 shadow-lg shadow-black/10 w-fit mt-auto mb-4">
                 <div className="flex items-center gap-3">
-                  <div className="size-10 2xl:size-11 rounded-xl bg-emerald-100/80 text-emerald-600 flex items-center justify-center shrink-0 shadow-sm"><Users className="size-5 2xl:size-5.5" /></div>
+                  <div className="size-10 rounded-xl bg-emerald-100/80 text-emerald-600 flex items-center justify-center shrink-0 shadow-sm"><Users className="size-5" /></div>
                   <div>
-                    <div className="text-sm 2xl:text-base font-black text-slate-900 leading-none">1000+</div>
-                    <div className="text-xs 2xl:text-sm text-slate-600 mt-0.5 font-medium">Happy Students</div>
+                    <div className="text-sm font-black text-slate-900 leading-none">1000+</div>
+                    <div className="text-xs text-slate-600 mt-0.5 font-medium">Happy Students</div>
                   </div>
                 </div>
-                <div className="h-8 2xl:h-9 w-px bg-white/60" />
+                <div className="h-8 w-px bg-white/60" />
                 <div className="flex items-center gap-3">
-                  <div className="size-10 2xl:size-11 rounded-xl bg-blue-100/80 text-blue-600 flex items-center justify-center shrink-0 shadow-sm"><School className="size-5 2xl:size-5.5" /></div>
+                  <div className="size-10 rounded-xl bg-blue-100/80 text-blue-600 flex items-center justify-center shrink-0 shadow-sm"><School className="size-5" /></div>
                   <div>
-                    <div className="text-sm 2xl:text-base font-black text-slate-900 leading-none">50+</div>
-                    <div className="text-xs 2xl:text-sm text-slate-600 mt-0.5 font-medium">Schools Trust Us</div>
+                    <div className="text-sm font-black text-slate-900 leading-none">50+</div>
+                    <div className="text-xs text-slate-600 mt-0.5 font-medium">Schools Trust Us</div>
                   </div>
                 </div>
-                <div className="h-8 2xl:h-9 w-px bg-white/60" />
+                <div className="h-8 w-px bg-white/60" />
                 <div className="flex items-center gap-3">
-                  <div className="size-10 2xl:size-11 rounded-xl bg-amber-100/80 flex items-center justify-center shrink-0 shadow-sm"><Star className="size-5 2xl:size-5.5 fill-amber-400 text-amber-400" /></div>
+                  <div className="size-10 rounded-xl bg-amber-100/80 flex items-center justify-center shrink-0 shadow-sm"><Star className="size-5 fill-amber-400 text-amber-400" /></div>
                   <div>
-                    <div className="text-sm 2xl:text-base font-black text-slate-900 leading-none">4.8</div>
-                    <div className="text-xs 2xl:text-sm text-slate-600 mt-0.5 font-medium">User Satisfaction</div>
+                    <div className="text-sm font-black text-slate-900 leading-none">4.8</div>
+                    <div className="text-xs text-slate-600 mt-0.5 font-medium">User Satisfaction</div>
                   </div>
                 </div>
               </div>
             </div>
 
-            {/* Right — Forgot Password Card (centered) + Stat Card (pinned to bottom-right on 2xl) */}
-            <div className="flex flex-col items-center self-stretch shrink-0 2xl:ml-auto">
-              <div className="my-auto w-full max-w-[390px] xl:max-w-[420px] 2xl:max-w-[450px]">
-                <div className="relative w-full">
-                  {/* Glassmorphism card behind forgot password card (decreased height) */}
-                  <div className="absolute -top-4 -bottom-4 -left-2.5 -right-2.5 xl:-top-5 xl:-bottom-5 2xl:-top-6 2xl:-bottom-6 xl:-left-3 xl:-right-3 rounded-[36px] xl:rounded-[38px] bg-white/35 backdrop-blur-md border border-white/60 shadow-2xl shadow-sky-950/15 pointer-events-none" />
+            {/* Right — Forgot Password Card (vertically centered top to bottom, near plane on 2xl) */}
+            <div className="w-full max-w-[390px] xl:max-w-[420px] 2xl:max-w-[450px] shrink-0 self-center 2xl:ml-auto 2xl:mr-14">
+              <div className="relative w-full">
+                {/* Glassmorphism card behind forgot password card (decreased height) */}
+                <div className="absolute -top-4 -bottom-4 -left-2.5 -right-2.5 xl:-top-5 xl:-bottom-5 2xl:-top-6 2xl:-bottom-6 xl:-left-3 xl:-right-3 rounded-[36px] xl:rounded-[38px] bg-white/35 backdrop-blur-md border border-white/60 shadow-2xl shadow-sky-950/15 pointer-events-none" />
 
-                  {/* Foreground Forgot Password Card */}
-                  <div className="relative z-10 rounded-[32px] bg-white border border-slate-200/70 shadow-xl shadow-slate-300/30 w-full overflow-hidden">
-                    {isSuccess ? successCard : formCard}
-                  </div>
+                {/* Foreground Forgot Password Card */}
+                <div className="relative z-10 rounded-[32px] bg-white border border-slate-200/70 shadow-xl shadow-slate-300/30 w-full overflow-hidden">
+                  {isSuccess ? successCard : formCard}
                 </div>
               </div>
+            </div>
 
-              {/* Stat Card — pinned to bottom-right on 2xl+ screens with crisp white background */}
-              <div className="hidden 2xl:flex items-center gap-6 xl:gap-7 2xl:gap-8 px-6 xl:px-7 2xl:px-8 py-3.5 xl:py-4 rounded-2xl bg-white border border-slate-200/80 shadow-xl shadow-slate-900/10 w-fit mt-auto mb-4 2xl:mb-6">
-                <div className="flex items-center gap-3">
-                  <div className="size-10 2xl:size-11 rounded-xl bg-emerald-100 text-emerald-600 flex items-center justify-center shrink-0 shadow-xs"><Users className="size-5 2xl:size-5.5" /></div>
-                  <div>
-                    <div className="text-sm 2xl:text-base font-black text-slate-900 leading-none">1000+</div>
-                    <div className="text-xs 2xl:text-sm text-slate-500 mt-0.5 font-medium">Happy Students</div>
-                  </div>
+            {/* Stat Card — pinned to bottom-right on 2xl+ screens only with crisp white background */}
+            <div className="hidden 2xl:flex absolute bottom-1 2xl:bottom-2 right-0 items-center gap-6 xl:gap-7 2xl:gap-8 px-6 xl:px-7 2xl:px-8 py-3.5 xl:py-4 rounded-2xl bg-white border border-slate-200/80 shadow-xl shadow-slate-900/10 w-fit">
+              <div className="flex items-center gap-3">
+                <div className="size-10 2xl:size-11 rounded-xl bg-emerald-100 text-emerald-600 flex items-center justify-center shrink-0 shadow-xs"><Users className="size-5 2xl:size-5.5" /></div>
+                <div>
+                  <div className="text-sm 2xl:text-base font-black text-slate-900 leading-none">1000+</div>
+                  <div className="text-xs 2xl:text-sm text-slate-500 mt-0.5 font-medium">Happy Students</div>
                 </div>
-                <div className="h-8 2xl:h-9 w-px bg-slate-200" />
-                <div className="flex items-center gap-3">
-                  <div className="size-10 2xl:size-11 rounded-xl bg-blue-100 text-blue-600 flex items-center justify-center shrink-0 shadow-xs"><School className="size-5 2xl:size-5.5" /></div>
-                  <div>
-                    <div className="text-sm 2xl:text-base font-black text-slate-900 leading-none">50+</div>
-                    <div className="text-xs 2xl:text-sm text-slate-500 mt-0.5 font-medium">Schools Trust Us</div>
-                  </div>
+              </div>
+              <div className="h-8 2xl:h-9 w-px bg-slate-200" />
+              <div className="flex items-center gap-3">
+                <div className="size-10 2xl:size-11 rounded-xl bg-blue-100 text-blue-600 flex items-center justify-center shrink-0 shadow-xs"><School className="size-5 2xl:size-5.5" /></div>
+                <div>
+                  <div className="text-sm 2xl:text-base font-black text-slate-900 leading-none">50+</div>
+                  <div className="text-xs 2xl:text-sm text-slate-500 mt-0.5 font-medium">Schools Trust Us</div>
                 </div>
-                <div className="h-8 2xl:h-9 w-px bg-slate-200" />
-                <div className="flex items-center gap-3">
-                  <div className="size-10 2xl:size-11 rounded-xl bg-amber-100 text-amber-600 flex items-center justify-center shrink-0 shadow-xs"><Star className="size-5 2xl:size-5.5 fill-amber-400 text-amber-400" /></div>
-                  <div>
-                    <div className="text-sm 2xl:text-base font-black text-slate-900 leading-none">4.8</div>
-                    <div className="text-xs 2xl:text-sm text-slate-500 mt-0.5 font-medium">User Satisfaction</div>
-                  </div>
+              </div>
+              <div className="h-8 2xl:h-9 w-px bg-slate-200" />
+              <div className="flex items-center gap-3">
+                <div className="size-10 2xl:size-11 rounded-xl bg-amber-100 text-amber-600 flex items-center justify-center shrink-0 shadow-xs"><Star className="size-5 2xl:size-5.5 fill-amber-400 text-amber-400" /></div>
+                <div>
+                  <div className="text-sm 2xl:text-base font-black text-slate-900 leading-none">4.8</div>
+                  <div className="text-xs 2xl:text-sm text-slate-500 mt-0.5 font-medium">User Satisfaction</div>
                 </div>
               </div>
             </div>
