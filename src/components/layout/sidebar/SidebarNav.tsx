@@ -12,6 +12,7 @@ interface SidebarNavProps {
   resolvedScreen: string;
   sidebarOpen: boolean;
   isSuperAdmin: boolean;
+  isModernUI?: boolean;
   expandedKeys: string[];
   onToggleExpand: (key: string) => void;
   onNavigate: (screen: string) => void;
@@ -22,6 +23,7 @@ export function SidebarNav({
   resolvedScreen,
   sidebarOpen,
   isSuperAdmin,
+  isModernUI = isSuperAdmin,
   expandedKeys,
   onToggleExpand,
   onNavigate,
@@ -43,13 +45,13 @@ export function SidebarNav({
                   "w-full justify-start gap-3 h-10 px-3 font-normal cursor-pointer transition-all",
                   !sidebarOpen && "lg:justify-center lg:px-0 lg:gap-0",
                   isActive && !hasChildren
-                    ? isSuperAdmin
+                    ? isModernUI
                       ? "!bg-blue-600 !text-white font-semibold rounded-xl shadow-xs [&_svg]:!text-white"
                       : "bg-white dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 shadow-[0_4px_12px_rgba(0,0,0,0.05),0_1px_2px_rgba(0,0,0,0.02)] border border-zinc-200/80 dark:border-emerald-900/50 hover:bg-white dark:hover:bg-emerald-900/50 font-semibold"
-                    : isSuperAdmin
-                      ? "!text-slate-800 dark:!text-slate-200 hover:!text-slate-950 dark:hover:!text-white hover:bg-slate-100/80 dark:hover:bg-slate-800/60 rounded-xl [&_svg]:!text-slate-700 dark:[&_svg]:!text-slate-300"
+                    : isModernUI
+                      ? "!text-slate-700 dark:!text-zinc-300 hover:!text-slate-950 dark:hover:!text-white hover:bg-slate-100/80 dark:hover:bg-zinc-800/60 rounded-xl [&_svg]:!text-slate-600 dark:[&_svg]:!text-zinc-400"
                       : "text-zinc-600 dark:text-zinc-400 border border-transparent hover:bg-white hover:shadow-[0_4px_12px_rgba(0,0,0,0.05),0_1px_2px_rgba(0,0,0,0.02)] hover:border-zinc-200/80 dark:hover:border-emerald-900/30 hover:text-emerald-600 dark:hover:text-emerald-400",
-                  isActive && hasChildren && (isSuperAdmin ? "!text-blue-600 font-semibold dark:!text-blue-400 [&_svg]:!text-blue-600" : "text-emerald-700 font-semibold dark:text-emerald-400")
+                  isActive && hasChildren && (isModernUI ? "!text-blue-600 font-semibold dark:!text-blue-400 [&_svg]:!text-blue-600" : "text-emerald-700 font-semibold dark:text-emerald-400")
                 )}
                 onClick={() => {
                   if (!sidebarOpen) {
@@ -90,7 +92,10 @@ export function SidebarNav({
 
               {/* Sub Items (Accordion) */}
               {hasChildren && isExpanded && sidebarOpen && (
-                <div className="ml-4 pl-4 border-l border-sidebar-border space-y-1 mt-1 animate-in slide-in-from-top-1 duration-200">
+                <div className={cn(
+                  "ml-4 pl-4 border-l space-y-1 mt-1 animate-in slide-in-from-top-1 duration-200",
+                  isModernUI ? "border-slate-200 dark:border-zinc-800" : "border-sidebar-border"
+                )}>
                   {item.children?.map((child) => (
                     <Button
                       key={child.key}
@@ -98,8 +103,12 @@ export function SidebarNav({
                       className={cn(
                         "w-full justify-start gap-3 h-9 px-3 font-normal cursor-pointer transition-all text-sm",
                         resolvedScreen === child.key
-                          ? "bg-white dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 shadow-[0_4px_12px_rgba(0,0,0,0.05),0_1px_2px_rgba(0,0,0,0.02)] border border-zinc-200/80 dark:border-emerald-900/50 hover:bg-white dark:hover:bg-emerald-900/50 font-semibold"
-                          : "text-zinc-500 border border-transparent hover:text-emerald-600 dark:hover:text-emerald-400 hover:bg-white hover:shadow-[0_4px_12px_rgba(0,0,0,0.05),0_1px_2px_rgba(0,0,0,0.02)] hover:border-zinc-200/80"
+                          ? isModernUI
+                            ? "!bg-blue-600 !text-white font-semibold rounded-xl shadow-xs [&_svg]:!text-white"
+                            : "bg-white dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 shadow-[0_4px_12px_rgba(0,0,0,0.05),0_1px_2px_rgba(0,0,0,0.02)] border border-zinc-200/80 dark:border-emerald-900/50 hover:bg-white dark:hover:bg-emerald-900/50 font-semibold"
+                          : isModernUI
+                            ? "!text-slate-600 dark:!text-zinc-400 hover:!text-slate-950 dark:hover:!text-white hover:bg-slate-100/80 dark:hover:bg-zinc-800/60 rounded-xl"
+                            : "text-zinc-500 border border-transparent hover:text-emerald-600 dark:hover:text-emerald-400 hover:bg-white hover:shadow-[0_4px_12px_rgba(0,0,0,0.05),0_1px_2px_rgba(0,0,0,0.02)] hover:border-zinc-200/80"
                       )}
                       onClick={() => onNavigate(child.key)}
                     >

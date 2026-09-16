@@ -394,7 +394,12 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
         {/* Main Content */}
         <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
           {/* Top Header */}
-          <Header items={items} resolvedScreen={resolvedScreen} layoutPref={layoutPref} />
+          <Header
+            items={items}
+            resolvedScreen={resolvedScreen}
+            layoutPref={layoutPref}
+            onPasswordChange={() => setIsChangePasswordOpen(true)}
+          />
 
           {/* Page Content */}
           <main className="flex-1 overflow-y-auto p-4 lg:p-6 overscroll-contain">

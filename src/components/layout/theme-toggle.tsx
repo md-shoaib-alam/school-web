@@ -23,8 +23,8 @@ export function ThemeToggle() {
 
   if (!mounted) {
     return (
-      <Button type="button" variant="ghost" size="icon" className="size-10 md:size-9">
-        <Sun className="size-[22px] md:size-[18px]" />
+      <Button type="button" variant="ghost" size="icon" className="size-8.5 sm:size-9 shrink-0">
+        <Sun className="size-[18px] sm:size-[18px]" />
       </Button>
     );
   }
@@ -42,12 +42,12 @@ export function ThemeToggle() {
       size="icon"
       onClick={toggleTheme}
       title={currentTheme === "dark" ? "Switch to Light Mode" : "Switch to Dark Mode"}
-      className="size-9 rounded-xl text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-100 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
+      className="size-8.5 sm:size-9 shrink-0 rounded-xl border border-slate-200/70 dark:border-zinc-800 bg-white/80 dark:bg-zinc-900/80 text-slate-600 hover:text-slate-900 dark:text-zinc-400 dark:hover:text-zinc-100 hover:bg-slate-100/80 dark:hover:bg-zinc-800 shadow-2xs transition-all cursor-pointer"
     >
       {currentTheme === "dark" ? (
-        <Moon className="size-4.5 text-blue-400 transition-transform hover:-rotate-12" />
+        <Moon className="size-4 text-blue-400 transition-transform hover:-rotate-12" />
       ) : (
-        <Sun className="size-4.5 text-amber-500 transition-transform hover:rotate-45" />
+        <Sun className="size-4 text-amber-500 transition-transform hover:rotate-45" />
       )}
       <span className="sr-only">Toggle theme</span>
     </Button>

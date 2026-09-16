@@ -304,6 +304,7 @@ export function SuperAdminUsers() {
         onOpenChange={setSheetOpen}
         user={selectedUser}
         onToggleStatus={(userId) => handleToggleStatus(userId)}
+        onUserUpdated={(updatedUser) => setSelectedUser(updatedUser)}
         toggling={toggleStatus.isPending}
         formatDateTime={formatDateTime}
       />
