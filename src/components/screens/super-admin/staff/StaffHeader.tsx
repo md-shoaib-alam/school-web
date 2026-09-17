@@ -21,7 +21,7 @@ export function StaffHeader({
         <h2 className="text-lg font-semibold text-foreground tracking-tight">
           Staff Management
         </h2>
-        <p className="text-xs text-muted-foreground mt-0.5">
+        <p className="hidden sm:block text-xs text-muted-foreground mt-0.5">
           Create platform staff accounts with restricted role-based permissions
         </p>
       </div>

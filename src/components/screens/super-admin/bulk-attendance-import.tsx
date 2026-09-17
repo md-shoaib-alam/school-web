@@ -43,7 +43,8 @@ import {
   Info,
   XCircle,
   FileCheck2,
-  Trash2
+  Trash2,
+  ChevronDown
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
@@ -123,6 +124,7 @@ export function SuperAdminBulkAttendance() {
     skippedCount: number;
     skippedRecords?: Array<{ record: any; reason: string }>;
   } | null>(null);
+  const [mobileInstructionsOpen, setMobileInstructionsOpen] = useState(false);
 
   // Tab 2: Range states
   const [allStudentsMode, setAllStudentsMode] = useState(true);
@@ -851,7 +853,7 @@ export function SuperAdminBulkAttendance() {
                 alt="Bulk Attendance"
                 fill
                 priority
-                className="object-contain scale-110 drop-shadow-md transition-transform hover:scale-115 duration-300"
+                className="object-contain scale-125 drop-shadow-md"
                 sizes="(max-width: 640px) 110px, (max-width: 768px) 160px, 200px"
               />
             </div>
@@ -861,7 +863,7 @@ export function SuperAdminBulkAttendance() {
 
       {/* 2. Unified Header with Integrated School Context Selector */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-        <div className="flex items-center gap-2.5 min-w-0">
+        <div className="hidden sm:flex items-center gap-2.5 min-w-0">
           <div className="size-8.5 sm:size-9 rounded-xl bg-emerald-50 dark:bg-emerald-950/50 border border-emerald-100/80 dark:border-emerald-900/40 flex items-center justify-center text-emerald-600 dark:text-emerald-400 shrink-0">
             <ClipboardList className="size-4 sm:size-4.5" />
           </div>
@@ -875,7 +877,7 @@ export function SuperAdminBulkAttendance() {
                 Platform
               </span>
             </div>
-            <p className="text-[11px] sm:text-xs text-muted-foreground mt-0.5 font-normal truncate">
+            <p className="hidden sm:block text-[11px] sm:text-xs text-muted-foreground mt-0.5 font-normal truncate">
               {selectedSchool 
                 ? `Active School: ${selectedSchool.name}` 
                 : "Select a school context to begin bulk import"}
@@ -885,22 +887,41 @@ export function SuperAdminBulkAttendance() {
 
         {/* Integrated School Selector Dropdown */}
         <div className="w-full sm:w-auto shrink-0">
+          <div className="sm:hidden flex items-center justify-between text-[11px] font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 px-0.5">
+            <span>School Context</span>
+            {selectedSchool && (
+              <span className="text-[10px] font-medium text-emerald-600 dark:text-emerald-400">
+                Active
+              </span>
+            )}
+          </div>
           <Popover open={schoolPopoverOpen} onOpenChange={setSchoolPopoverOpen}>
             <PopoverTrigger asChild>
               <Button 
                 variant="outline" 
                 role="combobox" 
                 aria-expanded={schoolPopoverOpen}
-                className="w-full sm:w-[260px] h-9 text-xs rounded-xl justify-between cursor-pointer capitalize bg-card border-border px-3 shadow-2xs hover:bg-muted/50"
+                className="w-full sm:w-[260px] h-11 sm:h-9 text-xs rounded-xl justify-between cursor-pointer capitalize bg-card border-border px-3 shadow-2xs hover:bg-muted/50 transition-all group"
               >
-                <span className="flex items-center gap-2 truncate">
-                  <Building2 className="size-3.5 text-emerald-600 dark:text-emerald-400 shrink-0" />
-                  <span className="truncate">{selectedSchool ? selectedSchool.name : "Select School..."}</span>
+                <span className="flex items-center gap-2.5 truncate">
+                  <div className="size-7 sm:size-6 rounded-lg bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200/60 dark:border-emerald-800/40 flex items-center justify-center text-emerald-600 dark:text-emerald-400 shrink-0 group-hover:scale-105 transition-transform">
+                    <Building2 className="size-3.5" />
+                  </div>
+                  <span className={`truncate ${selectedSchool ? 'font-semibold text-foreground' : 'font-medium text-muted-foreground'}`}>
+                    {selectedSchool ? selectedSchool.name : "Select School..."}
+                  </span>
                 </span>
-                <ChevronsUpDown className="ml-1 h-3.5 w-3.5 shrink-0 opacity-50" />
+                <span className="flex items-center gap-1.5 shrink-0">
+                  {!selectedSchool && (
+                    <span className="sm:hidden text-[10px] font-medium text-emerald-700 bg-emerald-100/70 dark:text-emerald-300 dark:bg-emerald-950/70 px-2 py-0.5 rounded-full border border-emerald-200/60 dark:border-emerald-800/50">
+                      Choose
+                    </span>
+                  )}
+                  <ChevronsUpDown className="size-3.5 opacity-50 text-muted-foreground" />
+                </span>
               </Button>
             </PopoverTrigger>
-            <PopoverContent className="w-[280px] sm:w-[320px] p-0 border border-border bg-card shadow-xl rounded-xl" align="end" side="bottom" sideOffset={4}>
+            <PopoverContent className="w-[calc(100vw-2rem)] sm:w-[320px] max-w-sm p-0 border border-border bg-card shadow-xl rounded-xl" align="start" side="bottom" sideOffset={4}>
               <div className="flex items-center border-b px-3 border-border">
                 <Search className="mr-2 h-3.5 w-3.5 shrink-0 opacity-50" />
                 <Input 
@@ -1037,16 +1058,33 @@ export function SuperAdminBulkAttendance() {
               
               {/* Instructions Panel */}
               <div className="lg:col-span-1 space-y-4">
-                <Card className="rounded-xl border border-slate-200/80 dark:border-slate-800/80 shadow-2xs bg-card">
-                  <CardHeader className="p-4 pb-3 border-b border-border/40">
-                    <CardTitle className="text-sm font-semibold flex items-center gap-2">
-                      <Sparkles className="size-4 text-teal-600 dark:text-teal-400" /> Upload Instructions
-                    </CardTitle>
-                    <CardDescription className="text-xs text-muted-foreground mt-0.5">
-                      Follow these specifications for seamless processing.
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent className="p-4 space-y-3.5 text-xs leading-relaxed text-muted-foreground">
+                <div className="rounded-xl border border-slate-200/80 dark:border-slate-800/80 shadow-2xs bg-card overflow-hidden">
+                  <div 
+                    onClick={() => setMobileInstructionsOpen((prev) => !prev)}
+                    className={`px-3 py-2 sm:px-4 sm:py-3 cursor-pointer lg:cursor-default flex items-center justify-between select-none transition-colors hover:bg-slate-500/[0.03] dark:hover:bg-slate-500/[0.06] lg:hover:bg-transparent ${
+                      mobileInstructionsOpen ? "border-b border-border/40" : "lg:border-b lg:border-border/40"
+                    }`}
+                  >
+                    <div className="flex items-center gap-2.5 min-w-0">
+                      <div className="size-6.5 sm:size-7 rounded-lg bg-teal-50 dark:bg-teal-950/60 border border-teal-200/60 dark:border-teal-800/40 flex items-center justify-center text-teal-600 dark:text-teal-400 shrink-0">
+                        <Sparkles className="size-3.5" />
+                      </div>
+                      <div className="min-w-0">
+                        <h4 className="text-xs sm:text-sm font-semibold text-foreground truncate">
+                          Upload Instructions
+                        </h4>
+                        <p className="hidden lg:block text-xs text-muted-foreground mt-0.5">
+                          Follow these specifications for seamless processing.
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="lg:hidden flex items-center gap-1.5 px-2 py-0.5 rounded-lg bg-teal-50/70 dark:bg-teal-950/40 border border-teal-200/50 dark:border-teal-800/30 text-teal-700 dark:text-teal-300 text-[11px] font-semibold shrink-0 ml-2">
+                      <span>{mobileInstructionsOpen ? "Hide" : "Details"}</span>
+                      <ChevronDown className={`size-3 transition-transform duration-200 ${mobileInstructionsOpen ? "rotate-180" : ""}`} />
+                    </div>
+                  </div>
+                  <div className={`p-4 space-y-3.5 text-xs leading-relaxed text-muted-foreground ${mobileInstructionsOpen ? 'block' : 'hidden lg:block'}`}>
                     <p>
                       Platform intelligent processing reads column headers case-insensitively and maps your data automatically.
                     </p>
@@ -1086,10 +1124,10 @@ export function SuperAdminBulkAttendance() {
                         Prefilled with active students in <span className="font-semibold text-foreground">{selectedSchool.name}</span>
                       </p>
                     </div>
-                  </CardContent>
-                </Card>
+                  </div>
+                </div>
 
-                <Card className="rounded-xl border border-teal-200/50 dark:border-teal-900/40 bg-teal-50/30 dark:bg-teal-950/20 shadow-2xs">
+                <Card className={`rounded-xl border border-teal-200/50 dark:border-teal-900/40 bg-teal-50/30 dark:bg-teal-950/20 shadow-2xs ${mobileInstructionsOpen ? 'block' : 'hidden lg:block'}`}>
                   <CardHeader className="p-3.5 pb-1">
                     <CardTitle className="text-xs font-semibold flex items-center gap-1.5 text-teal-800 dark:text-teal-300">
                       <Info className="size-3.5" /> Pro tip

@@ -19,6 +19,16 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import {
   X,
   UserRound,
   Mail,
@@ -85,6 +95,11 @@ export function UserDetailSheet({
   // Quick school assignment popover state
   const [isSchoolPopoverOpen, setIsSchoolPopoverOpen] = useState(false);
   const [schoolSearchQuery, setSchoolSearchQuery] = useState("");
+  const [pendingSchoolChange, setPendingSchoolChange] = useState<{
+    tenantId: string | null;
+    schoolName: string;
+  } | null>(null);
+  const [confirmStatusDialogOpen, setConfirmStatusDialogOpen] = useState(false);
 
   const updateUserMutation = useUpdateUser();
   const { data: tenantsData } = useTenants({ limit: 1000 });
@@ -152,6 +167,7 @@ export function UserDetailSheet({
     }
 
     try {
+      const currentTenantId = currentUserData.tenant?.id || null;
       const res = await updateUserMutation.mutateAsync({
         id: currentUserData.id,
         data: {
@@ -159,7 +175,7 @@ export function UserDetailSheet({
           email: editEmail.trim(),
           phone: editPhone.trim() || undefined,
           role: editRole,
-          tenantId: editTenantId === "none" ? null : editTenantId,
+          tenantId: currentTenantId,
         },
       });
 
@@ -202,6 +218,7 @@ export function UserDetailSheet({
       onUserUpdated?.(updatedUser);
       setEditTenantId(updatedUser.tenant?.id || "none");
       setIsSchoolPopoverOpen(false);
+      setPendingSchoolChange(null);
       
       if (!newTenantId || newTenantId === "none") {
         toast.success("User unassigned from school successfully");
@@ -212,6 +229,14 @@ export function UserDetailSheet({
     } catch {
       // Handled in platform.hooks.ts onError
     }
+  };
+
+  const requestSchoolChange = (newTenantId: string | null) => {
+    const schoolName = newTenantId 
+      ? allTenants.find((t) => t.id === newTenantId)?.name || "the selected school"
+      : "Platform Level (No School)";
+    setPendingSchoolChange({ tenantId: newTenantId, schoolName });
+    setIsSchoolPopoverOpen(false);
   };
 
   const formatDateShort = (dateStr: string) => {
@@ -435,41 +460,6 @@ export function UserDetailSheet({
                         className="h-9 text-xs rounded-xl bg-white dark:bg-zinc-950 border-slate-200 dark:border-zinc-800"
                       />
                     </div>
-
-                    <div className="space-y-1.5 sm:col-span-2">
-                      <div className="flex items-center justify-between">
-                        <Label className="text-xs font-semibold text-slate-700 dark:text-zinc-300">
-                          Assigned School / Tenant
-                        </Label>
-                        {editTenantId !== "none" && (
-                          <button
-                            type="button"
-                            onClick={() => setEditTenantId("none")}
-                            className="text-[11px] text-rose-500 hover:text-rose-600 font-semibold cursor-pointer"
-                          >
-                            Remove / Deassign School
-                          </button>
-                        )}
-                      </div>
-                      <Select value={editTenantId} onValueChange={setEditTenantId}>
-                        <SelectTrigger className="h-9 text-xs rounded-xl bg-white dark:bg-zinc-950 border-slate-200 dark:border-zinc-800">
-                          <SelectValue placeholder="Select school or platform level" />
-                        </SelectTrigger>
-                        <SelectContent className="rounded-xl border-slate-200 dark:border-zinc-800 max-h-56">
-                          <SelectItem value="none" className="text-xs font-medium text-slate-500">
-                            Platform Level (No Tenant) — Global / Unassigned
-                          </SelectItem>
-                          {allTenants.map((t) => (
-                            <SelectItem key={t.id} value={t.id} className="text-xs">
-                              {t.name} {t.slug ? `(${t.slug})` : ""}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                      <p className="text-[11px] text-slate-400 dark:text-zinc-500">
-                        Assign this user as {editRole} to a specific school, or keep as a Platform Level user.
-                      </p>
-                    </div>
                   </div>
 
                   <div className="flex items-center justify-end gap-2 pt-2 border-t border-slate-200/60 dark:border-zinc-800">
@@ -604,73 +594,73 @@ export function UserDetailSheet({
                       <p className="text-xs font-semibold text-slate-900 dark:text-white">
                         {currentUserData.tenant ? "Change User's School" : "Assign User to School"}
                       </p>
-                      <div className="relative">
-                        <Search className="size-3.5 text-slate-400 absolute left-2.5 top-1/2 -translate-y-1/2" />
-                        <Input
-                          value={schoolSearchQuery}
-                          onChange={(e) => setSchoolSearchQuery(e.target.value)}
-                          placeholder="Search school name..."
-                          className="h-8 pl-8 text-xs rounded-lg bg-slate-50 dark:bg-zinc-900 border-slate-200 dark:border-zinc-800"
-                        />
-                      </div>
-                    </div>
-
-                    <div className="max-h-60 overflow-y-auto p-1.5 space-y-1">
-                      {/* Deassign / Platform Level Option */}
-                      <button
-                        type="button"
-                        onClick={() => handleQuickSchoolChange(null)}
-                        className={`w-full flex items-center justify-between p-2 rounded-xl text-left text-xs transition-colors cursor-pointer ${
-                          !currentUserData.tenant 
-                            ? "bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 font-semibold" 
-                            : "hover:bg-slate-50 dark:hover:bg-zinc-900 text-slate-700 dark:text-zinc-300"
-                        }`}
-                      >
-                        <div className="flex items-center gap-2 min-w-0">
-                          <div className="size-6 rounded-lg bg-slate-100 dark:bg-zinc-800 flex items-center justify-center shrink-0">
-                            <Building2 className="size-3 text-slate-500" />
-                          </div>
-                          <div className="truncate">
-                            <p className="truncate font-medium">Platform Level (No Tenant)</p>
-                            <p className="text-[10px] text-slate-400">Global Admin / Unassigned</p>
-                          </div>
+                        <div className="relative">
+                          <Search className="size-3.5 text-slate-400 absolute left-2.5 top-1/2 -translate-y-1/2" />
+                          <Input
+                            value={schoolSearchQuery}
+                            onChange={(e) => setSchoolSearchQuery(e.target.value)}
+                            placeholder="Search school name..."
+                            className="h-8 pl-8 text-xs rounded-lg bg-slate-50 dark:bg-zinc-900 border-slate-200 dark:border-zinc-800"
+                          />
                         </div>
-                        {!currentUserData.tenant && <Check className="size-3.5 text-blue-600 shrink-0" />}
-                      </button>
+                      </div>
 
-                      {filteredTenants.length === 0 ? (
-                        <p className="p-4 text-center text-xs text-slate-400">No schools found</p>
-                      ) : (
-                        filteredTenants.map((t) => {
-                          const isCurrent = currentUserData.tenant?.id === t.id;
-                          return (
-                            <button
-                              key={t.id}
-                              type="button"
-                              onClick={() => handleQuickSchoolChange(t.id)}
-                              className={`w-full flex items-center justify-between p-2 rounded-xl text-left text-xs transition-colors cursor-pointer ${
-                                isCurrent 
-                                  ? "bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 font-semibold" 
-                                  : "hover:bg-slate-50 dark:hover:bg-zinc-900 text-slate-700 dark:text-zinc-300"
-                              }`}
-                            >
-                              <div className="flex items-center gap-2 min-w-0">
-                                <div className="size-6 rounded-lg bg-blue-50 dark:bg-blue-950/40 text-blue-600 flex items-center justify-center shrink-0">
-                                  <Building2 className="size-3" />
+                      <div className="max-h-60 overflow-y-auto p-1.5 space-y-1">
+                        {/* Option: Platform Level / Unassigned (No School) */}
+                        <button
+                          type="button"
+                          onClick={() => requestSchoolChange(null)}
+                          className={`w-full flex items-center justify-between p-2 rounded-xl text-left text-xs transition-colors cursor-pointer ${
+                            !currentUserData.tenant
+                              ? "bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 font-semibold"
+                              : "hover:bg-slate-50 dark:hover:bg-zinc-900 text-slate-700 dark:text-zinc-300"
+                          }`}
+                        >
+                          <div className="flex items-center gap-2 min-w-0">
+                            <div className="size-6 rounded-lg bg-slate-100 dark:bg-zinc-800 flex items-center justify-center shrink-0">
+                              <Building2 className="size-3 text-slate-500" />
+                            </div>
+                            <div className="truncate">
+                              <p className="truncate font-medium">Platform Level (No School)</p>
+                              <p className="text-[10px] text-slate-400">Global Admin / Unassigned</p>
+                            </div>
+                          </div>
+                          {!currentUserData.tenant && <Check className="size-3.5 text-blue-600 shrink-0" />}
+                        </button>
+
+                        {filteredTenants.length === 0 ? (
+                          <p className="p-4 text-center text-xs text-slate-400">No schools found</p>
+                        ) : (
+                          filteredTenants.map((t) => {
+                            const isCurrent = currentUserData.tenant?.id === t.id;
+                            return (
+                              <button
+                                key={t.id}
+                                type="button"
+                                onClick={() => requestSchoolChange(t.id)}
+                                className={`w-full flex items-center justify-between p-2 rounded-xl text-left text-xs transition-colors cursor-pointer ${
+                                  isCurrent
+                                    ? "bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 font-semibold"
+                                    : "hover:bg-slate-50 dark:hover:bg-zinc-900 text-slate-700 dark:text-zinc-300"
+                                }`}
+                              >
+                                <div className="flex items-center gap-2 min-w-0">
+                                  <div className="size-6 rounded-lg bg-blue-50 dark:bg-blue-950/40 text-blue-600 flex items-center justify-center shrink-0">
+                                    <Building2 className="size-3" />
+                                  </div>
+                                  <div className="truncate">
+                                    <p className="truncate font-medium">{t.name}</p>
+                                    <p className="text-[10px] text-slate-400 truncate">{t.slug ? `/${t.slug}` : t.id}</p>
+                                  </div>
                                 </div>
-                                <div className="truncate">
-                                  <p className="truncate font-medium">{t.name}</p>
-                                  <p className="text-[10px] text-slate-400 truncate">{t.slug ? `/${t.slug}` : t.id}</p>
-                                </div>
-                              </div>
-                              {isCurrent && <Check className="size-3.5 text-blue-600 shrink-0" />}
-                            </button>
-                          );
-                        })
-                      )}
-                    </div>
-                  </PopoverContent>
-                </Popover>
+                                {isCurrent && <Check className="size-3.5 text-blue-600 shrink-0" />}
+                              </button>
+                            );
+                          })
+                        )}
+                      </div>
+                    </PopoverContent>
+                  </Popover>
               </div>
 
               <div className="p-4 rounded-2xl bg-slate-50/70 dark:bg-zinc-900/60 border border-slate-100 dark:border-zinc-800/80 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
@@ -712,7 +702,7 @@ export function UserDetailSheet({
                         variant="outline"
                         size="sm"
                         disabled={updateUserMutation.isPending}
-                        onClick={() => handleQuickSchoolChange(null)}
+                        onClick={() => requestSchoolChange(null)}
                         className="h-8 px-3 rounded-xl border-rose-200 dark:border-rose-900/60 bg-rose-50/50 hover:bg-rose-100/70 text-rose-600 dark:text-rose-400 text-xs font-semibold gap-1.5 shadow-2xs cursor-pointer"
                         title="Deassign / remove this school"
                       >
@@ -745,20 +735,20 @@ export function UserDetailSheet({
               </div>
 
               {/* Status Toggle Card */}
-              <div className="p-4 rounded-2xl bg-slate-50/70 dark:bg-zinc-900/60 border border-slate-100 dark:border-zinc-800/80 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-                <div>
+              <div className="p-3.5 sm:p-4 rounded-2xl bg-slate-50/70 dark:bg-zinc-900/60 border border-slate-100 dark:border-zinc-800/80 flex items-center justify-between gap-3">
+                <div className="min-w-0">
                   {currentUserData.isActive ? (
-                    <span className="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full text-xs font-semibold bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400 border border-emerald-200/80">
+                    <span className="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full text-xs font-semibold bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400 border border-emerald-200/80 shrink-0">
                       <span className="size-1.5 rounded-full bg-emerald-500" />
                       Active Account
                     </span>
                   ) : (
-                    <span className="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full text-xs font-semibold bg-amber-50 dark:bg-amber-950/40 text-amber-600 dark:text-amber-400 border border-amber-200/80">
+                    <span className="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full text-xs font-semibold bg-amber-50 dark:bg-amber-950/40 text-amber-600 dark:text-amber-400 border border-amber-200/80 shrink-0">
                       <Clock className="size-3 text-amber-500" />
                       Inactive Account
                     </span>
                   )}
-                  <p className="text-xs text-slate-400 dark:text-slate-500 mt-1.5">
+                  <p className="hidden sm:block text-xs text-slate-400 dark:text-slate-500 mt-1.5">
                     {currentUserData.isActive
                       ? "This account is active and can access the platform."
                       : "This account is currently suspended and cannot log in."}
@@ -769,8 +759,8 @@ export function UserDetailSheet({
                   variant="outline"
                   size="sm"
                   disabled={toggling}
-                  onClick={() => onToggleStatus(currentUserData.id)}
-                  className={`h-9 px-4 rounded-xl text-xs font-semibold gap-1.5 shadow-2xs transition-colors shrink-0 ${
+                  onClick={() => setConfirmStatusDialogOpen(true)}
+                  className={`h-8 sm:h-9 px-3 sm:px-4 rounded-xl text-xs font-semibold gap-1.5 shadow-2xs transition-colors shrink-0 ${
                     currentUserData.isActive
                       ? "border-red-200 dark:border-red-900/50 bg-red-50/60 hover:bg-red-100/80 text-red-600 dark:text-red-400 dark:bg-red-950/30"
                       : "border-emerald-200 dark:border-emerald-900/50 bg-emerald-50/60 hover:bg-emerald-100/80 text-emerald-600 dark:text-emerald-400 dark:bg-emerald-950/30"
@@ -888,6 +878,131 @@ export function UserDetailSheet({
           )}
         </div>
       </SheetContent>
+
+      {/* Confirmation Alert Dialog for School Change / Deassign */}
+      <AlertDialog
+        open={!!pendingSchoolChange}
+        onOpenChange={(open) => {
+          if (!open && !updateUserMutation.isPending) {
+            setPendingSchoolChange(null);
+          }
+        }}
+      >
+        <AlertDialogContent className="rounded-2xl w-[calc(100%-2.5rem)] max-w-sm p-4 sm:p-6">
+          <AlertDialogHeader className="text-center sm:text-left">
+            <AlertDialogTitle className="text-base font-bold text-slate-900 dark:text-slate-100">
+              {!pendingSchoolChange?.tenantId ? "Deassign School?" : "Assign School?"}
+            </AlertDialogTitle>
+            <AlertDialogDescription className="text-xs sm:text-sm text-slate-500 dark:text-slate-400">
+              {!pendingSchoolChange?.tenantId ? (
+                <>
+                  Remove <strong className="text-slate-800 dark:text-slate-200">{currentUserData.name || "user"}</strong> from <strong className="text-slate-800 dark:text-slate-200">{currentUserData.tenant?.name || "school"}</strong>?
+                </>
+              ) : (
+                <>
+                  Assign <strong className="text-slate-800 dark:text-slate-200">{currentUserData.name || "user"}</strong> to <strong className="text-slate-800 dark:text-slate-200">{pendingSchoolChange?.schoolName}</strong>?
+                </>
+              )}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter className="mt-3 flex flex-row items-center justify-end gap-2.5">
+            <AlertDialogCancel
+              disabled={updateUserMutation.isPending}
+              onClick={() => setPendingSchoolChange(null)}
+              className="flex-1 sm:flex-none h-9 rounded-xl text-xs font-semibold cursor-pointer m-0"
+            >
+              Cancel
+            </AlertDialogCancel>
+            <AlertDialogAction
+              disabled={updateUserMutation.isPending}
+              onClick={(e) => {
+                e.preventDefault();
+                if (pendingSchoolChange) {
+                  handleQuickSchoolChange(pendingSchoolChange.tenantId);
+                }
+              }}
+              className={`flex-1 sm:flex-none h-9 rounded-xl text-xs font-semibold text-white cursor-pointer ${
+                !pendingSchoolChange?.tenantId
+                  ? "bg-rose-600 hover:bg-rose-700"
+                  : "bg-blue-600 hover:bg-blue-700"
+              }`}
+            >
+              {updateUserMutation.isPending ? (
+                <>
+                  <Loader2 className="size-3.5 animate-spin mr-1.5" />
+                  Updating...
+                </>
+              ) : !pendingSchoolChange?.tenantId ? (
+                "Yes, Deassign"
+              ) : (
+                "Yes, Confirm"
+              )}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Confirmation Alert Dialog for Account Deactivation / Activation */}
+      <AlertDialog
+        open={confirmStatusDialogOpen}
+        onOpenChange={(open) => {
+          if (!open && !toggling) {
+            setConfirmStatusDialogOpen(false);
+          }
+        }}
+      >
+        <AlertDialogContent className="rounded-2xl w-[calc(100%-2.5rem)] max-w-sm p-4 sm:p-6">
+          <AlertDialogHeader className="text-center sm:text-left">
+            <AlertDialogTitle className="text-base font-bold text-slate-900 dark:text-slate-100">
+              {currentUserData.isActive ? "Deactivate Account?" : "Activate Account?"}
+            </AlertDialogTitle>
+            <AlertDialogDescription className="text-xs sm:text-sm text-slate-500 dark:text-slate-400">
+              {currentUserData.isActive ? (
+                <>
+                  Deactivate <strong className="text-slate-800 dark:text-slate-200">{currentUserData.name || "this user"}</strong>? They will be suspended from logging into the platform.
+                </>
+              ) : (
+                <>
+                  Activate <strong className="text-slate-800 dark:text-slate-200">{currentUserData.name || "this user"}</strong>? They will be able to log in and access the platform.
+                </>
+              )}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter className="mt-3 flex flex-row items-center justify-end gap-2.5">
+            <AlertDialogCancel
+              disabled={toggling}
+              onClick={() => setConfirmStatusDialogOpen(false)}
+              className="flex-1 sm:flex-none h-9 rounded-xl text-xs font-semibold cursor-pointer m-0"
+            >
+              Cancel
+            </AlertDialogCancel>
+            <AlertDialogAction
+              disabled={toggling}
+              onClick={async (e) => {
+                e.preventDefault();
+                await onToggleStatus(currentUserData.id);
+                setConfirmStatusDialogOpen(false);
+              }}
+              className={`flex-1 sm:flex-none h-9 rounded-xl text-xs font-semibold text-white cursor-pointer ${
+                currentUserData.isActive
+                  ? "bg-rose-600 hover:bg-rose-700"
+                  : "bg-emerald-600 hover:bg-emerald-700"
+              }`}
+            >
+              {toggling ? (
+                <>
+                  <Loader2 className="size-3.5 animate-spin mr-1.5" />
+                  Updating...
+                </>
+              ) : currentUserData.isActive ? (
+                "Yes, Deactivate"
+              ) : (
+                "Yes, Activate"
+              )}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </Sheet>
   );
 }

@@ -18,19 +18,19 @@ export function UserHeader({ totalCount, roleCountsMap }: UserHeaderProps) {
   return (
     <div className="space-y-4">
       {/* Top Title & Cross-Tenant View Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+      <div className="flex items-center justify-between gap-3">
         <div>
-          <h2 className="text-lg font-semibold text-foreground tracking-tight">
+          <h2 className="text-base sm:text-lg font-semibold text-foreground tracking-tight">
             User Management
           </h2>
-          <p className="text-xs text-muted-foreground mt-0.5">
+          <p className="hidden sm:block text-xs text-muted-foreground mt-0.5">
             Manage and monitor all users across all tenant schools
           </p>
         </div>
 
         <button
           type="button"
-          className="inline-flex items-center gap-1.5 border border-border bg-card hover:bg-muted/50 text-foreground rounded-lg px-3 py-1.5 text-xs font-medium shadow-2xs transition-colors self-start sm:self-auto cursor-default"
+          className="inline-flex items-center gap-1.5 border border-border bg-card hover:bg-muted/50 text-foreground rounded-lg px-2.5 sm:px-3 py-1 sm:py-1.5 text-xs font-medium shadow-2xs transition-colors shrink-0 cursor-default"
         >
           <Globe className="size-3.5 text-muted-foreground" />
           <span>Cross-Tenant View</span>

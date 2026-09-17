@@ -20,7 +20,7 @@ import { TenantTable } from "./tenants/TenantTable";
 import { TenantDialogs } from "./tenants/TenantDialogs";
 import { useSearchParams, useRouter, usePathname } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { Plus, Shield } from "lucide-react";
+import { Plus } from "lucide-react";
 import {
   Tenant,
   ITEMS_PER_PAGE,
@@ -254,33 +254,30 @@ export function SuperAdminTenants() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       {/* Top School Management Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-        <div>
-          <div className="flex items-center gap-2 flex-wrap">
-            <h2 className="text-lg font-semibold text-foreground tracking-tight">
+      <div className="flex flex-col gap-1 sm:gap-1.5">
+        <div className="flex items-center justify-between gap-2">
+          <div>
+            <h2 className="text-base sm:text-lg font-semibold text-foreground tracking-tight">
               School Management
             </h2>
-            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-medium bg-rose-50 text-rose-600 border border-rose-200/70 dark:bg-rose-950/40 dark:text-rose-400 dark:border-rose-900/60">
-              <Shield className="size-3 text-rose-500" />
-              Platform Level
-            </span>
           </div>
-          <p className="text-xs text-muted-foreground mt-0.5 font-normal">
-            Manage all schools on your platform. Add, monitor, and manage school accounts.
-          </p>
+
+          {canCreate && (
+            <Button
+              className="bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold h-8 sm:h-9 px-3 sm:px-4 rounded-xl gap-1.5 shadow-xs transition-all shrink-0"
+              onClick={handleOpenAddDialog}
+            >
+              <Plus className="size-3.5 stroke-[2.5]" />
+              <span>Add School</span>
+            </Button>
+          )}
         </div>
 
-        {canCreate && (
-          <Button
-            className="bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold h-9 px-4 rounded-xl gap-1.5 shadow-xs transition-all shrink-0 self-start sm:self-auto"
-            onClick={handleOpenAddDialog}
-          >
-            <Plus className="size-3.5 stroke-[2.5]" />
-            Add School
-          </Button>
-        )}
+        <p className="hidden sm:block text-xs text-muted-foreground font-normal">
+          Manage all schools on your platform. Add, monitor, and manage school accounts.
+        </p>
       </div>
 
       <TenantStats stats={stats} />

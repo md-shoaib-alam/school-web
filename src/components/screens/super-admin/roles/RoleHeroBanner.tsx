@@ -36,7 +36,7 @@ export function RoleHeroBanner() {
               alt="Roles & Permissions"
               fill
               priority
-              className="object-contain scale-110 drop-shadow-md transition-transform hover:scale-115 duration-300"
+              className="object-contain scale-125 drop-shadow-md"
               sizes="(max-width: 640px) 110px, (max-width: 768px) 160px, 200px"
             />
           </div>
