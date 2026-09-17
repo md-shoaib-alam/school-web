@@ -67,18 +67,20 @@ export function TenantBillingTable({
   };
 
   return (
-    <Card className="border rounded-xl bg-card">
-      <CardHeader>
-        <CardTitle className="text-base flex items-center gap-2">
-          <Building2 className="size-4 text-emerald-600" /> {isSchoolMode ? "School Revenue" : "Revenue by Tenant"}
-        </CardTitle>
-        <CardDescription>
-          {isSchoolMode
-            ? "Platform income generated from school license plans"
-            : "Detailed breakdown of parent subscription contribution from each school"}
-        </CardDescription>
-      </CardHeader>
-      <CardContent>
+    <div className="border border-border rounded-2xl bg-card shadow-2xs overflow-hidden">
+      <div className="p-4 sm:p-5 border-b border-border flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+        <div>
+          <h3 className="text-sm sm:text-base font-bold text-foreground flex items-center gap-2">
+            <Building2 className="size-4 text-emerald-600 dark:text-emerald-400" /> {isSchoolMode ? "School Revenue" : "Revenue by Tenant"}
+          </h3>
+          <p className="hidden sm:block text-xs text-muted-foreground mt-0.5">
+            {isSchoolMode
+              ? "Platform income generated from school license plans"
+              : "Detailed breakdown of parent subscription contribution from each school"}
+          </p>
+        </div>
+      </div>
+      <div className="p-3 sm:p-5">
         <div className="rounded-xl border border-border overflow-hidden">
           <Table>
             <TableHeader>
@@ -233,7 +235,7 @@ export function TenantBillingTable({
             />
           </div>
         )}
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 }

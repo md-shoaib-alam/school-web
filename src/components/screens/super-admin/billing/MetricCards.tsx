@@ -39,107 +39,105 @@ export function MetricCards({
 }: MetricCardsProps) {
   if (loading) {
     return (
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
         {[...Array(4)].map((_, i) => (
-          <Card key={i} className="border rounded-xl bg-card">
-            <CardContent className="p-5">
-              <Skeleton className="h-4 w-28" />
-              <Skeleton className="h-8 w-20 mt-3" />
-              <Skeleton className="h-3 w-16 mt-2" />
-            </CardContent>
-          </Card>
+          <div key={i} className="border border-border rounded-2xl bg-card p-3 sm:p-5 shadow-2xs">
+            <Skeleton className="h-4 w-20 sm:w-28" />
+            <Skeleton className="h-6 sm:h-8 w-16 sm:w-20 mt-2 sm:mt-3" />
+            <Skeleton className="h-3 w-12 sm:w-16 mt-2" />
+          </div>
         ))}
       </div>
     );
   }
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+    <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
       {/* Total Active Revenue */}
-      <Card className="border rounded-xl bg-card">
-        <CardContent className="p-5">
-          <div className="flex items-center justify-between mb-3">
-            <div className="size-10 rounded-xl bg-emerald-50 dark:bg-emerald-900/30 text-emerald-600 flex items-center justify-center">
-              <IndianRupee className="size-5" />
+      <div className="border border-border rounded-2xl bg-card p-3 sm:p-4.5 shadow-2xs flex flex-col justify-between">
+        <div>
+          <div className="flex items-center justify-between gap-1.5 mb-2 sm:mb-2.5">
+            <div className="size-8 sm:size-9 rounded-xl bg-emerald-50 dark:bg-emerald-950/50 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0">
+              <IndianRupee className="size-4 sm:size-4.5" />
             </div>
-            <Badge variant="outline" className="text-emerald-700 dark:text-emerald-400 border-emerald-200 dark:border-emerald-700 bg-emerald-50 dark:bg-emerald-900/30 text-xs font-medium">
-              <ArrowUpRight className="size-3 mr-0.5" /> Active
+            <Badge variant="outline" className="text-emerald-700 dark:text-emerald-400 border-emerald-200/70 dark:border-emerald-800/50 bg-emerald-50 dark:bg-emerald-950/30 text-[10px] sm:text-xs font-semibold px-1.5 py-0.5">
+              <ArrowUpRight className="size-2.5 sm:size-3 mr-0.5" /> Active
             </Badge>
           </div>
-          <p className="text-xs font-medium text-muted-foreground">Active revenue</p>
-          <p className="text-2xl font-semibold text-foreground mt-1 flex items-center">
-            <IndianRupee className="size-4" />
+          <p className="text-[11px] sm:text-xs font-medium text-muted-foreground truncate">Active Revenue</p>
+          <p className="text-lg sm:text-2xl font-bold tracking-tight text-foreground mt-0.5 flex items-center">
+            <IndianRupee className="size-3.5 sm:size-4.5" />
             {totalActiveRevenue.toLocaleString()}
           </p>
-          <p className="text-xs text-muted-foreground mt-1 font-medium">
-            From {activeCount} active subs
-          </p>
-        </CardContent>
-      </Card>
+        </div>
+        <p className="text-[10px] sm:text-xs text-muted-foreground mt-1.5 font-medium truncate">
+          From {activeCount} active subs
+        </p>
+      </div>
 
       {/* Total Subscriptions */}
-      <Card className="border rounded-xl bg-card">
-        <CardContent className="p-5">
-          <div className="flex items-center justify-between mb-3">
-            <div className="size-10 rounded-xl bg-amber-50 dark:bg-amber-900/30 text-amber-600 flex items-center justify-center">
-              <Receipt className="size-5" />
+      <div className="border border-border rounded-2xl bg-card p-3 sm:p-4.5 shadow-2xs flex flex-col justify-between">
+        <div>
+          <div className="flex items-center justify-between gap-1.5 mb-2 sm:mb-2.5">
+            <div className="size-8 sm:size-9 rounded-xl bg-amber-50 dark:bg-amber-950/50 text-amber-600 dark:text-amber-400 flex items-center justify-center shrink-0">
+              <Receipt className="size-4 sm:size-4.5" />
             </div>
-            <Badge variant="outline" className="text-muted-foreground border-border bg-muted text-xs font-medium">
-              <BarChart3 className="size-3 mr-0.5" /> Total
+            <Badge variant="outline" className="text-muted-foreground border-border bg-muted/60 text-[10px] sm:text-xs font-semibold px-1.5 py-0.5">
+              <BarChart3 className="size-2.5 sm:size-3 mr-0.5" /> Total
             </Badge>
           </div>
-          <p className="text-xs font-medium text-muted-foreground">Subscriptions</p>
-          <p className="text-2xl font-semibold text-foreground mt-1">
+          <p className="text-[11px] sm:text-xs font-medium text-muted-foreground truncate">Subscriptions</p>
+          <p className="text-lg sm:text-2xl font-bold tracking-tight text-foreground mt-0.5">
             {totalSubscriptions}
           </p>
-          <p className="text-xs text-muted-foreground mt-1 font-medium">
-            {activeCount} active, {churnedSubscriptions} churned
-          </p>
-        </CardContent>
-      </Card>
+        </div>
+        <p className="text-[10px] sm:text-xs text-muted-foreground mt-1.5 font-medium truncate">
+          {activeCount} active, {churnedSubscriptions} churned
+        </p>
+      </div>
 
       {/* Avg Revenue Per Tenant */}
-      <Card className="border rounded-xl bg-card">
-        <CardContent className="p-5">
-          <div className="flex items-center justify-between mb-3">
-            <div className="size-10 rounded-xl bg-violet-50 dark:bg-violet-900/30 text-violet-600 flex items-center justify-center">
-              <Building2 className="size-5" />
+      <div className="border border-border rounded-2xl bg-card p-3 sm:p-4.5 shadow-2xs flex flex-col justify-between">
+        <div>
+          <div className="flex items-center justify-between gap-1.5 mb-2 sm:mb-2.5">
+            <div className="size-8 sm:size-9 rounded-xl bg-violet-50 dark:bg-violet-950/50 text-violet-600 dark:text-violet-400 flex items-center justify-center shrink-0">
+              <Building2 className="size-4 sm:size-4.5" />
             </div>
-            <Badge variant="outline" className="text-violet-700 dark:text-violet-400 border-violet-200 dark:border-violet-700 bg-violet-50 dark:bg-violet-900/30 text-xs font-medium">
-              <Users className="size-3 mr-0.5" /> {tenantCount} tenants
+            <Badge variant="outline" className="text-violet-700 dark:text-violet-400 border-violet-200/70 dark:border-violet-800/50 bg-violet-50 dark:bg-violet-950/30 text-[10px] sm:text-xs font-semibold px-1.5 py-0.5">
+              <Users className="size-2.5 sm:size-3 mr-0.5" /> {tenantCount}
             </Badge>
           </div>
-          <p className="text-xs font-medium text-muted-foreground">ARPT</p>
-          <p className="text-2xl font-semibold text-foreground mt-1 flex items-center">
-            <IndianRupee className="size-4" />
+          <p className="text-[11px] sm:text-xs font-medium text-muted-foreground truncate">ARPT</p>
+          <p className="text-lg sm:text-2xl font-bold tracking-tight text-foreground mt-0.5 flex items-center">
+            <IndianRupee className="size-3.5 sm:size-4.5" />
             {avgRevenuePerTenant.toLocaleString()}
           </p>
-          <p className="text-xs text-muted-foreground mt-1 font-medium">
-            Average per tenant
-          </p>
-        </CardContent>
-      </Card>
+        </div>
+        <p className="text-[10px] sm:text-xs text-muted-foreground mt-1.5 font-medium truncate">
+          Average per tenant
+        </p>
+      </div>
 
       {/* Churn Analytics */}
-      <Card className="border rounded-xl bg-card">
-        <CardContent className="p-5">
-          <div className="flex items-center justify-between mb-3">
-            <div className="size-10 rounded-xl bg-red-50 dark:bg-red-900/30 text-red-600 flex items-center justify-center">
-              <ArrowDownRight className="size-5" />
+      <div className="border border-border rounded-2xl bg-card p-3 sm:p-4.5 shadow-2xs flex flex-col justify-between">
+        <div>
+          <div className="flex items-center justify-between gap-1.5 mb-2 sm:mb-2.5">
+            <div className="size-8 sm:size-9 rounded-xl bg-rose-50 dark:bg-rose-950/50 text-rose-600 dark:text-rose-400 flex items-center justify-center shrink-0">
+              <ArrowDownRight className="size-4 sm:size-4.5" />
             </div>
-            <Badge variant="outline" className="text-red-700 dark:text-red-400 border-red-200 dark:border-red-700 bg-red-50 dark:bg-red-900/30 text-xs font-medium">
+            <Badge variant="outline" className="text-rose-700 dark:text-rose-400 border-rose-200/70 dark:border-rose-800/50 bg-rose-50 dark:bg-rose-950/30 text-[10px] sm:text-xs font-semibold px-1.5 py-0.5">
               {churnRate}% rate
             </Badge>
           </div>
-          <p className="text-xs font-medium text-muted-foreground">Churn analytics</p>
-          <p className="text-2xl font-semibold text-foreground mt-1">
+          <p className="text-[11px] sm:text-xs font-medium text-muted-foreground truncate">Churn Analytics</p>
+          <p className="text-lg sm:text-2xl font-bold tracking-tight text-foreground mt-0.5">
             {churnedSubscriptions}
           </p>
-          <p className="text-xs text-muted-foreground mt-1 font-medium">
-            {expiredCount} expired, {cancelledCount} cancelled
-          </p>
-        </CardContent>
-      </Card>
+        </div>
+        <p className="text-[10px] sm:text-xs text-muted-foreground mt-1.5 font-medium truncate">
+          {expiredCount} expired, {cancelledCount} churn
+        </p>
+      </div>
     </div>
   );
 }

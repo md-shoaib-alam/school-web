@@ -9,8 +9,8 @@ interface RoleHeaderProps {
 
 export function RoleHeader({ onCreateRole }: RoleHeaderProps) {
   return (
-    <div className="flex items-center justify-between gap-2.5 sm:gap-3">
-      <div className="flex items-center gap-2.5 min-w-0">
+    <div className="flex items-center justify-end sm:justify-between gap-2.5 sm:gap-3">
+      <div className="hidden sm:flex items-center gap-2.5 min-w-0">
         <div className="size-8.5 sm:size-9 rounded-xl bg-blue-50 dark:bg-blue-950/50 border border-blue-100/80 dark:border-blue-900/40 flex items-center justify-center text-blue-600 dark:text-blue-400 shrink-0">
           <Shield className="size-4 sm:size-4.5" />
         </div>
@@ -32,7 +32,7 @@ export function RoleHeader({ onCreateRole }: RoleHeaderProps) {
 
       <Button
         onClick={onCreateRole}
-        className="bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold h-8.5 sm:h-9 px-3 sm:px-3.5 rounded-xl gap-1.5 shadow-xs transition-all shrink-0 cursor-pointer"
+        className="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold h-8.5 sm:h-9 px-3 sm:px-3.5 rounded-xl gap-1.5 shadow-xs transition-all shrink-0 cursor-pointer"
       >
         <Plus className="size-3.5 stroke-[2.5]" />
         <span>Create Role</span>
