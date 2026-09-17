@@ -90,10 +90,10 @@ const TenantCard = memo(function TenantCard({
                 </span>
                 {tenant.slug && (
                   <a
-                    href={`https://${tenant.slug}.schoolconnect.in`}
+                    href={`https://schoolconnect.in/${tenant.slug}`}
                     target="_blank"
                     rel="noopener noreferrer"
-                    title={`${tenant.slug}.schoolconnect.in`}
+                    title={`https://schoolconnect.in/${tenant.slug}`}
                     className="text-muted-foreground/60 hover:text-blue-600 dark:hover:text-blue-400 transition-colors shrink-0"
                   >
                     <ExternalLink className="size-3" />
