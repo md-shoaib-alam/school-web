@@ -1,13 +1,16 @@
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Search, Plus, ShieldCheck } from "lucide-react";
+import { Search, Plus, ShieldCheck, LayoutGrid, List } from "lucide-react";
+import { StaffViewMode } from "./types";
 
 interface StaffHeaderProps {
   search: string;
   onSearchChange: (val: string) => void;
   canCreate: boolean;
   onAddClick: () => void;
+  viewMode: StaffViewMode;
+  onViewModeChange: (mode: StaffViewMode) => void;
 }
 
 export function StaffHeader({
@@ -15,6 +18,8 @@ export function StaffHeader({
   onSearchChange,
   canCreate,
   onAddClick,
+  viewMode,
+  onViewModeChange,
 }: StaffHeaderProps) {
   return (
     <div className="space-y-4">
@@ -78,6 +83,37 @@ export function StaffHeader({
             onChange={(e) => onSearchChange(e.target.value)}
           />
         </div>
+
+        {/* View Mode Toggle (Desktop) */}
+        <div className="hidden sm:flex items-center bg-muted/60 dark:bg-slate-900 border border-border p-0.5 rounded-xl h-9 shrink-0 shadow-2xs">
+          <Button
+            variant="ghost"
+            size="icon"
+            className={`size-7.5 rounded-lg transition-colors ${
+              viewMode === "grid"
+                ? "bg-background text-foreground shadow-xs font-semibold"
+                : "text-muted-foreground hover:text-foreground"
+            }`}
+            onClick={() => onViewModeChange("grid")}
+            title="Grid View"
+          >
+            <LayoutGrid className="size-3.5" />
+          </Button>
+          <Button
+            variant="ghost"
+            size="icon"
+            className={`size-7.5 rounded-lg transition-colors ${
+              viewMode === "table"
+                ? "bg-background text-foreground shadow-xs font-semibold"
+                : "text-muted-foreground hover:text-foreground"
+            }`}
+            onClick={() => onViewModeChange("table")}
+            title="List View"
+          >
+            <List className="size-3.5" />
+          </Button>
+        </div>
+
         {canCreate && (
           <Button
             className="h-9 px-4 text-sm rounded-lg shrink-0 gap-1.5"

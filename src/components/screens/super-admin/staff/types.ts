@@ -59,3 +59,5 @@ export function roleBadgeStyle(color: string): React.CSSProperties {
 export function avatarStyle(color: string): React.CSSProperties {
   return { backgroundColor: color, color: "#fff" };
 }
+
+export type StaffViewMode = "grid" | "table";

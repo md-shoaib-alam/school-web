@@ -41,7 +41,7 @@ import {
   Calendar,
   Sparkles,
 } from "lucide-react";
-import { StaffRecord, getInitials, avatarStyle, roleBadgeStyle } from "./types";
+import { StaffRecord, getInitials, avatarStyle, roleBadgeStyle, StaffViewMode } from "./types";
 import { StatusBadge } from "@/components/ui/status-badge";
 
 interface StaffTableProps {
@@ -54,6 +54,7 @@ interface StaffTableProps {
   onDelete: (id: string) => void;
   deletingId: string | null;
   setDeletingId: (id: string | null) => void;
+  viewMode?: StaffViewMode;
 }
 
 export function StaffTable({
@@ -66,6 +67,7 @@ export function StaffTable({
   onDelete,
   deletingId,
   setDeletingId,
+  viewMode = "table",
 }: StaffTableProps) {
   if (loading) {
     return (
@@ -95,203 +97,201 @@ export function StaffTable({
     );
   }
 
-  return (
-    <div className="space-y-4">
-      {/* Mobile Grid/Card View matching reference design */}
-      <div className="grid grid-cols-1 gap-3 sm:hidden">
-        {filtered.map((member) => {
-            const initials = getInitials(member.name);
-            const roleColor = member.platformRole?.color;
-            const hasApiColor = !!roleColor;
-            const joinDate = member.createdAt
-              ? new Date(member.createdAt).toLocaleDateString("en-US", {
-                  month: "short",
-                  year: "numeric",
-                })
-              : null;
+  const renderCard = (member: StaffRecord) => {
+    const initials = getInitials(member.name);
+    const roleColor = member.platformRole?.color;
+    const hasApiColor = !!roleColor;
+    const joinDate = member.createdAt
+      ? new Date(member.createdAt).toLocaleDateString("en-US", {
+          month: "short",
+          year: "numeric",
+        })
+      : null;
 
-            return (
-              <div
-                key={member.id}
-                className="bg-card text-card-foreground rounded-2xl p-4 border border-border shadow-2xs hover:shadow-xs transition-all duration-200 flex flex-col justify-between"
-              >
-                <div>
-                  {/* Top Header: Circular Emblem, Title, Sub-handle, More Menu */}
-                  <div className="flex items-start justify-between gap-2.5">
-                    <div className="flex items-center gap-3 min-w-0">
-                      <Avatar className="size-11 rounded-full bg-muted/60 flex items-center justify-center shrink-0 border border-border overflow-hidden shadow-2xs">
-                        <AvatarFallback
-                          className={`text-xs font-bold rounded-full ${!hasApiColor ? "bg-muted text-muted-foreground" : ""}`}
-                          style={hasApiColor ? avatarStyle(roleColor) : undefined}
-                        >
-                          {initials}
-                        </AvatarFallback>
-                      </Avatar>
-                      <div className="min-w-0">
-                        <h3 className="font-bold text-sm sm:text-base text-foreground leading-snug truncate" title={member.name}>
-                          {member.name}
-                        </h3>
-                        <p className="text-xs text-muted-foreground mt-0.5 truncate font-normal flex items-center gap-1">
-                          <span className="text-muted-foreground/60 font-medium">@</span>
-                          <span className="truncate">{member.email}</span>
-                        </p>
-                      </div>
-                    </div>
-
-                    {(canEdit || canDelete) && (
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <button
-                            type="button"
-                            className="text-muted-foreground hover:text-foreground p-1.5 rounded-lg hover:bg-muted transition-colors cursor-pointer"
-                          >
-                            <MoreVertical className="size-4" />
-                          </button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end" className="w-40 rounded-xl text-xs">
-                          {canEdit && (
-                            <DropdownMenuItem onClick={() => onEdit(member)} className="text-xs">
-                              <Pencil className="size-3.5 mr-2" />
-                              Edit Staff
-                            </DropdownMenuItem>
-                          )}
-                          {canDelete && (
-                            <>
-                              <DropdownMenuSeparator />
-                              <DropdownMenuItem
-                                className="text-destructive focus:text-destructive text-xs"
-                                onClick={() => setDeletingId(member.id)}
-                              >
-                                <Trash2 className="size-3.5 mr-2" />
-                                Delete
-                              </DropdownMenuItem>
-                            </>
-                          )}
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    )}
-                  </div>
-
-                  {/* Badges: Role & Status */}
-                  <div className="flex items-center gap-2 mt-3">
-                    {member.platformRole ? (
-                      <Badge
-                        variant="outline"
-                        className="font-medium text-xs gap-1.5 h-6 px-2.5 shadow-2xs rounded-lg"
-                        style={roleBadgeStyle(member.platformRole.color)}
-                      >
-                        <Shield className="size-2.5" />
-                        {member.platformRole.name}
-                      </Badge>
-                    ) : (
-                      <Badge
-                        variant="outline"
-                        className="font-medium text-xs gap-1.5 h-6 px-2.5 shadow-2xs rounded-lg text-muted-foreground border-border/80"
-                      >
-                        <UserCircle className="size-2.5" />
-                        No Role
-                      </Badge>
-                    )}
-                    <StatusBadge tone={member.isActive ? "positive" : "negative"}>
-                      {member.isActive ? "Active" : "Inactive"}
-                    </StatusBadge>
-                  </div>
-
-                  {/* Info Box: Phone & Joining info */}
-                  <div className="grid grid-cols-2 gap-2 mt-3.5">
-                    <div className="bg-muted/40 dark:bg-muted/30 border border-border/50 rounded-xl p-2.5 flex items-center gap-2">
-                      <Phone className="size-4 text-muted-foreground shrink-0" />
-                      <div className="min-w-0">
-                        <p className="text-xs font-bold text-foreground leading-tight truncate">
-                          {member.phone || "Not Set"}
-                        </p>
-                        <p className="text-[10px] text-muted-foreground font-normal truncate mt-0.5">
-                          Contact Phone
-                        </p>
-                      </div>
-                    </div>
-
-                    <div className="bg-muted/40 dark:bg-muted/30 border border-border/50 rounded-xl p-2.5 flex items-center gap-2">
-                      <Calendar className="size-4 text-muted-foreground shrink-0" />
-                      <div className="min-w-0">
-                        <p className="text-xs font-bold text-foreground leading-tight truncate">
-                          {joinDate || "Member"}
-                        </p>
-                        <p className="text-[10px] text-muted-foreground font-normal truncate mt-0.5">
-                          Staff Access
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Action Buttons */}
-                <div className="mt-4 pt-1">
-                  {canEdit && (
-                    <Button
-                      variant="outline"
-                      className="w-full h-9 rounded-xl border-border bg-background hover:bg-muted text-foreground font-semibold text-xs transition-colors flex items-center justify-center gap-1.5"
-                      onClick={() => onEdit(member)}
-                    >
-                      <Pencil className="size-3.5" />
-                      <span>Edit Staff Details</span>
-                    </Button>
-                  )}
-                </div>
-
-                {/* Delete confirmation dialog */}
-                {canDelete && (
-                  <AlertDialog
-                    open={deletingId === member.id}
-                    onOpenChange={(open) => {
-                      if (!open) setDeletingId(null);
-                    }}
-                  >
-                    <AlertDialogContent className="rounded-2xl border-2 w-[calc(100%-2rem)] max-w-lg">
-                      <AlertDialogHeader>
-                        <AlertDialogTitle className="font-semibold text-xl">
-                          Delete Staff Member
-                        </AlertDialogTitle>
-                        <AlertDialogDescription className="font-medium text-sm">
-                          Are you sure you want to permanently delete{" "}
-                          <span className="font-semibold text-foreground">{member.name}</span>?
-                          This action cannot be undone and will revoke all access immediately.
-                        </AlertDialogDescription>
-                      </AlertDialogHeader>
-                      <AlertDialogFooter className="gap-2">
-                        <AlertDialogCancel className="rounded-xl font-medium border-2">
-                          Keep Member
-                        </AlertDialogCancel>
-                        <AlertDialogAction
-                          className="bg-destructive text-destructive-foreground hover:bg-destructive/90 rounded-xl font-medium"
-                          onClick={() => onDelete(member.id)}
-                        >
-                          Confirm Delete
-                        </AlertDialogAction>
-                      </AlertDialogFooter>
-                    </AlertDialogContent>
-                  </AlertDialog>
-                )}
+    return (
+      <div
+        key={member.id}
+        className="bg-white dark:bg-zinc-950 text-foreground rounded-2xl p-4 border-2 border-neutral-900 dark:border-white shadow-2xs hover:shadow-xs transition-all duration-200 flex flex-col justify-between"
+      >
+        <div>
+          {/* Top Header: Circular Emblem, Title, Sub-handle, More Menu */}
+          <div className="flex items-start justify-between gap-2.5">
+            <div className="flex items-center gap-3 min-w-0">
+              <Avatar className="size-11 rounded-full bg-neutral-100 dark:bg-neutral-800 flex items-center justify-center shrink-0 border border-neutral-300 dark:border-neutral-700 overflow-hidden shadow-2xs">
+                <AvatarFallback
+                  className={`text-xs font-bold rounded-full ${!hasApiColor ? "bg-muted text-muted-foreground" : ""}`}
+                  style={hasApiColor ? avatarStyle(roleColor) : undefined}
+                >
+                  {initials}
+                </AvatarFallback>
+              </Avatar>
+              <div className="min-w-0">
+                <h3 className="font-bold text-sm sm:text-base text-foreground leading-snug truncate" title={member.name}>
+                  {member.name}
+                </h3>
+                <p className="text-xs text-muted-foreground mt-0.5 truncate font-normal flex items-center gap-1">
+                  <span className="text-muted-foreground/60 font-medium">@</span>
+                  <span className="truncate">{member.email}</span>
+                </p>
               </div>
-            );
-          })}
+            </div>
+
+            {(canEdit || canDelete) && (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <button
+                    type="button"
+                    className="text-muted-foreground hover:text-foreground p-1.5 rounded-lg hover:bg-muted transition-colors cursor-pointer"
+                  >
+                    <MoreVertical className="size-4" />
+                  </button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-40 rounded-xl text-xs">
+                  {canEdit && (
+                    <DropdownMenuItem onClick={() => onEdit(member)} className="text-xs">
+                      <Pencil className="size-3.5 mr-2" />
+                      Edit Staff
+                    </DropdownMenuItem>
+                  )}
+                  {canDelete && (
+                    <>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem
+                        className="text-destructive focus:text-destructive text-xs"
+                        onClick={() => setDeletingId(member.id)}
+                      >
+                        <Trash2 className="size-3.5 mr-2" />
+                        Delete
+                      </DropdownMenuItem>
+                    </>
+                  )}
+                </DropdownMenuContent>
+              </DropdownMenu>
+            )}
+          </div>
+
+          {/* Badges: Role & Status */}
+          <div className="flex items-center gap-2 mt-3">
+            {member.platformRole ? (
+              <Badge
+                variant="outline"
+                className="font-medium text-xs gap-1.5 h-6 px-2.5 shadow-2xs rounded-lg"
+                style={roleBadgeStyle(member.platformRole.color)}
+              >
+                <Shield className="size-2.5" />
+                {member.platformRole.name}
+              </Badge>
+            ) : (
+              <Badge
+                variant="outline"
+                className="font-medium text-xs gap-1.5 h-6 px-2.5 shadow-2xs rounded-lg text-muted-foreground border-border/80"
+              >
+                <UserCircle className="size-2.5" />
+                No Role
+              </Badge>
+            )}
+            <StatusBadge tone={member.isActive ? "positive" : "negative"}>
+              {member.isActive ? "Active" : "Inactive"}
+            </StatusBadge>
+          </div>
+
+          {/* Info Box: Phone & Joining info */}
+          <div className="grid grid-cols-2 gap-2 mt-3.5">
+            <div className="bg-white dark:bg-zinc-950 border-2 border-neutral-900 dark:border-white rounded-xl p-2.5 flex items-center gap-2 shadow-2xs">
+              <Phone className="size-4 text-muted-foreground shrink-0" />
+              <div className="min-w-0">
+                <p className="text-xs font-bold text-foreground leading-tight truncate">
+                  {member.phone || "Not Set"}
+                </p>
+                <p className="text-[10px] text-muted-foreground font-normal truncate mt-0.5">
+                  Contact Phone
+                </p>
+              </div>
+            </div>
+
+            <div className="bg-white dark:bg-zinc-950 border-2 border-neutral-900 dark:border-white rounded-xl p-2.5 flex items-center gap-2 shadow-2xs">
+              <Calendar className="size-4 text-muted-foreground shrink-0" />
+              <div className="min-w-0">
+                <p className="text-xs font-bold text-foreground leading-tight truncate">
+                  {joinDate || "Member"}
+                </p>
+                <p className="text-[10px] text-muted-foreground font-normal truncate mt-0.5">
+                  Staff Access
+                </p>
+              </div>
+            </div>
+          </div>
         </div>
 
-        {/* Mobile footer count */}
-        {!loading && filtered.length > 0 && (
-          <div className="py-1 px-1 sm:hidden text-center">
-            <p className="text-xs font-medium text-muted-foreground">
-              Directly managing <span className="text-foreground">{filtered.length}</span> platform personnel records
-            </p>
-          </div>
-        )}
+        {/* Action Buttons */}
+        <div className="mt-4 pt-1">
+          {canEdit && (
+            <Button
+              variant="outline"
+              className="w-full h-9 rounded-xl border-2 border-neutral-900 dark:border-white bg-white dark:bg-zinc-950 hover:bg-neutral-100 dark:hover:bg-zinc-900 text-foreground font-semibold text-xs transition-colors flex items-center justify-center gap-1.5 shadow-2xs"
+              onClick={() => onEdit(member)}
+            >
+              <Pencil className="size-3.5" />
+              <span>Edit Staff Details</span>
+            </Button>
+          )}
+        </div>
 
-      {/* Desktop Table View */}
-      <Card className="hidden sm:block border-none shadow-sm bg-card overflow-hidden">
-        <CardContent className="p-0">
-          <div className="overflow-x-auto">
-            <Table>
-              <TableHeader>
+        {/* Delete confirmation dialog */}
+        {canDelete && (
+          <AlertDialog
+            open={deletingId === member.id}
+            onOpenChange={(open) => {
+              if (!open) setDeletingId(null);
+            }}
+          >
+            <AlertDialogContent className="rounded-2xl border-2 w-[calc(100%-2rem)] max-w-lg">
+              <AlertDialogHeader>
+                <AlertDialogTitle className="font-semibold text-xl">
+                  Delete Staff Member
+                </AlertDialogTitle>
+                <AlertDialogDescription className="font-medium text-sm">
+                  Are you sure you want to permanently delete{" "}
+                  <span className="font-semibold text-foreground">{member.name}</span>?
+                  This action cannot be undone and will revoke all access immediately.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter className="gap-2">
+                <AlertDialogCancel className="rounded-xl font-medium border-2">
+                  Keep Member
+                </AlertDialogCancel>
+                <AlertDialogAction
+                  className="bg-destructive text-destructive-foreground hover:bg-destructive/90 rounded-xl font-medium"
+                  onClick={() => onDelete(member.id)}
+                >
+                  Confirm Delete
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
+        )}
+      </div>
+    );
+  };
+
+  return (
+    <div className="space-y-4">
+      {/* Mobile View: Always Grid */}
+      <div className="grid grid-cols-1 gap-3 sm:hidden">
+        {filtered.map((member) => renderCard(member))}
+      </div>
+
+      {/* Desktop View: Grid or Table based on viewMode */}
+      {viewMode === "grid" ? (
+        <div className="hidden sm:grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {filtered.map((member) => renderCard(member))}
+        </div>
+      ) : (
+        <Card className="hidden sm:block border-none shadow-sm bg-card overflow-hidden">
+          <CardContent className="p-0">
+            <div className="overflow-x-auto">
+              <Table>
+                <TableHeader>
                 <TableRow className="bg-muted/50 hover:bg-transparent">
                   <TableHead className="min-w-[220px] text-xs font-medium text-muted-foreground py-4 pl-6">Member</TableHead>
                   <TableHead className="hidden sm:table-cell text-xs font-medium text-muted-foreground py-4">Contact Info</TableHead>
@@ -442,15 +442,34 @@ export function StaffTable({
             </Table>
           </div>
 
-          {!loading && filtered.length > 0 && (
-            <div className="px-6 py-4 border-t border-border">
-              <p className="text-xs font-medium text-muted-foreground">
-                Directly managing <span className="text-foreground">{filtered.length}</span> platform personnel records
-              </p>
-            </div>
-          )}
-        </CardContent>
-      </Card>
+            {!loading && filtered.length > 0 && (
+              <div className="px-6 py-4 border-t border-border">
+                <p className="text-xs font-medium text-muted-foreground">
+                  Directly managing <span className="text-foreground">{filtered.length}</span> platform personnel records
+                </p>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Grid footer count (when in grid view on desktop or mobile) */}
+      {!loading && filtered.length > 0 && viewMode === "grid" && (
+        <div className="hidden sm:block py-2 text-center">
+          <p className="text-xs font-medium text-muted-foreground">
+            Directly managing <span className="text-foreground">{filtered.length}</span> platform personnel records
+          </p>
+        </div>
+      )}
+
+      {/* Mobile footer count */}
+      {!loading && filtered.length > 0 && (
+        <div className="sm:hidden py-2 text-center">
+          <p className="text-xs font-medium text-muted-foreground">
+            Directly managing <span className="text-foreground">{filtered.length}</span> platform personnel records
+          </p>
+        </div>
+      )}
     </div>
   );
 }
