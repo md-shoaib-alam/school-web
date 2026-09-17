@@ -17,6 +17,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import Image from "next/image";
 import {
   Building2,
   Globe,
@@ -32,6 +33,8 @@ import {
   GraduationCap,
   Users,
   UserCheck,
+  ExternalLink,
+  Settings2,
 } from "lucide-react";
 import { Tenant, ViewMode } from "./types";
 import { TenantPlanBadge, TenantStatusBadge } from "./badges";
@@ -57,26 +60,46 @@ const TenantCard = memo(function TenantCard({
   onAddAdmin: (tenant: Tenant) => void;
 }) {
   return (
-    <div className="bg-card text-card-foreground rounded-2xl p-4 sm:p-5 border border-border shadow-2xs hover:shadow-xs transition-all duration-200 flex flex-col justify-between">
+    <div className="bg-white dark:bg-zinc-950 text-foreground rounded-2xl p-4 border-2 border-neutral-900 dark:border-white shadow-2xs hover:shadow-xs transition-all duration-200 flex flex-col justify-between">
       <div>
-        {/* Top Header: Circular Emblem, Title, Domain, More Menu */}
+        {/* Top Header: Emblem, Title, /slug, More Menu */}
         <div className="flex items-start justify-between gap-2.5">
           <div className="flex items-center gap-3 min-w-0">
-            <div className="size-11 rounded-full bg-muted/60 flex items-center justify-center shrink-0 border border-border overflow-hidden shadow-2xs">
+            <div className="size-11 rounded-2xl bg-neutral-100 dark:bg-neutral-900 border-2 border-neutral-900 dark:border-white flex items-center justify-center shrink-0 overflow-hidden shadow-2xs">
               {tenant.logo ? (
-                <img src={tenant.logo} alt={tenant.name} className="size-full object-cover" />
+                <Image
+                  src={tenant.logo}
+                  alt={tenant.name || "School"}
+                  width={44}
+                  height={44}
+                  className="object-contain w-full h-full"
+                />
               ) : (
-                <Building2 className="size-5 text-blue-600 dark:text-blue-400" />
+                <span className="text-neutral-900 dark:text-white font-bold text-sm">
+                  {tenant.name?.slice(0, 2).toUpperCase() || "SC"}
+                </span>
               )}
             </div>
             <div className="min-w-0">
               <h3 className="font-bold text-sm sm:text-base text-foreground leading-snug truncate" title={tenant.name}>
                 {tenant.name}
               </h3>
-              <p className="text-xs text-muted-foreground mt-0.5 truncate font-normal flex items-center gap-1">
-                <span className="text-muted-foreground/60 font-medium">@</span>
-                <span className="truncate">{tenant.slug.includes(".") ? tenant.slug : `${tenant.slug}.edu.in`}</span>
-              </p>
+              <div className="flex items-center gap-1.5 mt-0.5">
+                <span className="text-xs text-muted-foreground font-normal truncate">
+                  /{tenant.slug || "school"}
+                </span>
+                {tenant.slug && (
+                  <a
+                    href={`https://${tenant.slug}.schoolconnect.in`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    title={`${tenant.slug}.schoolconnect.in`}
+                    className="text-muted-foreground/60 hover:text-blue-600 dark:hover:text-blue-400 transition-colors shrink-0"
+                  >
+                    <ExternalLink className="size-3" />
+                  </a>
+                )}
+              </div>
             </div>
           </div>
 
@@ -84,9 +107,10 @@ const TenantCard = memo(function TenantCard({
             <DropdownMenuTrigger asChild>
               <button
                 type="button"
-                className="text-muted-foreground hover:text-foreground p-1.5 rounded-lg hover:bg-muted transition-colors cursor-pointer"
+                className="text-muted-foreground hover:text-foreground p-1.5 rounded-lg hover:bg-neutral-100 dark:hover:bg-zinc-900 transition-colors cursor-pointer"
+                title="School Actions"
               >
-                <MoreVertical className="size-4" />
+                <Settings2 className="size-4" />
               </button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-44 rounded-xl text-xs">
@@ -133,44 +157,44 @@ const TenantCard = memo(function TenantCard({
         </div>
 
         {/* Badges: Plan & Status */}
-        <div className="flex items-center gap-2 mt-3">
+        <div className="flex items-center gap-2 mt-3.5">
           <TenantPlanBadge plan={tenant.plan} />
           <TenantStatusBadge status={tenant.status} />
         </div>
 
         {/* Stats Row: Students, Teachers, Parents */}
-        <div className="grid grid-cols-3 gap-2 sm:gap-2.5 mt-3.5">
-          <div className="bg-muted/40 dark:bg-muted/30 border border-border/50 rounded-xl p-2.5 flex items-center gap-2">
+        <div className="grid grid-cols-3 gap-2 mt-3.5">
+          <div className="bg-white dark:bg-zinc-950 border-2 border-neutral-900 dark:border-white rounded-xl p-2 sm:p-2.5 flex items-center gap-2 shadow-2xs">
             <Users className="size-4 text-muted-foreground shrink-0" />
             <div className="min-w-0">
               <p className="text-xs sm:text-sm font-bold text-foreground leading-tight">
                 {tenant.studentCount ? Number(tenant.studentCount).toLocaleString() : 0}
               </p>
-              <p className="text-[10px] sm:text-[11px] text-muted-foreground font-normal truncate mt-0.5">
+              <p className="text-[10px] text-muted-foreground font-normal truncate mt-0.5">
                 Students
               </p>
             </div>
           </div>
 
-          <div className="bg-muted/40 dark:bg-muted/30 border border-border/50 rounded-xl p-2.5 flex items-center gap-2">
+          <div className="bg-white dark:bg-zinc-950 border-2 border-neutral-900 dark:border-white rounded-xl p-2 sm:p-2.5 flex items-center gap-2 shadow-2xs">
             <GraduationCap className="size-4 text-muted-foreground shrink-0" />
             <div className="min-w-0">
               <p className="text-xs sm:text-sm font-bold text-foreground leading-tight">
                 {tenant.teacherCount ? Number(tenant.teacherCount).toLocaleString() : 0}
               </p>
-              <p className="text-[10px] sm:text-[11px] text-muted-foreground font-normal truncate mt-0.5">
+              <p className="text-[10px] text-muted-foreground font-normal truncate mt-0.5">
                 Teachers
               </p>
             </div>
           </div>
 
-          <div className="bg-muted/40 dark:bg-muted/30 border border-border/50 rounded-xl p-2.5 flex items-center gap-2">
+          <div className="bg-white dark:bg-zinc-950 border-2 border-neutral-900 dark:border-white rounded-xl p-2 sm:p-2.5 flex items-center gap-2 shadow-2xs">
             <UserCheck className="size-4 text-muted-foreground shrink-0" />
             <div className="min-w-0">
               <p className="text-xs sm:text-sm font-bold text-foreground leading-tight">
                 {tenant.parentCount ? Number(tenant.parentCount).toLocaleString() : 0}
               </p>
-              <p className="text-[10px] sm:text-[11px] text-muted-foreground font-normal truncate mt-0.5">
+              <p className="text-[10px] text-muted-foreground font-normal truncate mt-0.5">
                 Parents
               </p>
             </div>
@@ -183,14 +207,14 @@ const TenantCard = memo(function TenantCard({
         <div className="grid grid-cols-2 gap-2">
           <Button
             variant="outline"
-            className="w-full h-9 rounded-xl border-border bg-background hover:bg-muted text-foreground font-semibold text-xs transition-colors"
+            className="w-full h-9 rounded-xl border-2 border-neutral-900 dark:border-white bg-white dark:bg-zinc-950 hover:bg-neutral-100 dark:hover:bg-zinc-900 text-foreground font-semibold text-xs transition-colors shadow-2xs"
             onClick={onView}
           >
             View Details
           </Button>
           <Button
             variant="outline"
-            className="w-full h-9 rounded-xl border-border bg-background hover:bg-muted text-foreground font-semibold text-xs transition-colors"
+            className="w-full h-9 rounded-xl border-2 border-neutral-900 dark:border-white bg-white dark:bg-zinc-950 hover:bg-neutral-100 dark:hover:bg-zinc-900 text-foreground font-semibold text-xs transition-colors shadow-2xs"
             onClick={onManageData}
           >
             Live Data
@@ -198,7 +222,7 @@ const TenantCard = memo(function TenantCard({
         </div>
 
         <Button
-          className="w-full h-9.5 rounded-xl bg-blue-500/10 hover:bg-blue-500/15 text-blue-600 dark:text-blue-400 font-semibold text-xs shadow-none border border-blue-500/20 flex items-center justify-center gap-2 transition-colors"
+          className="w-full h-9 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-semibold text-xs shadow-2xs flex items-center justify-center gap-2 transition-colors border-2 border-neutral-900 dark:border-white"
           onClick={() => onAddAdmin(tenant)}
         >
           <Shield className="size-4 stroke-[2.2]" />
@@ -333,7 +357,7 @@ export function TenantTable({
                     </div>
                     <div>
                       <p className="font-semibold text-xs text-foreground">{tenant.name}</p>
-                      <p className="text-[11px] text-muted-foreground">@{tenant.slug}</p>
+                      <p className="text-[11px] text-muted-foreground">/{tenant.slug}</p>
                     </div>
                   </div>
                 </TableCell>

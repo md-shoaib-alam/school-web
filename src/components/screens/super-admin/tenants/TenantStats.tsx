@@ -1,5 +1,16 @@
-import { memo } from "react";
-import { Building2, CheckCircle2, Clock, Ban, ArrowUp, ArrowDown, Minus } from "lucide-react";
+import { memo, useState } from "react";
+import {
+  Building2,
+  CheckCircle2,
+  Clock,
+  Ban,
+  ArrowUp,
+  ArrowDown,
+  Minus,
+  ChevronDown,
+  ChevronUp,
+  BarChart3,
+} from "lucide-react";
 
 interface StatCardProps {
   title: string;
@@ -74,52 +85,81 @@ interface TenantStatsProps {
 }
 
 export function TenantStats({ stats }: TenantStatsProps) {
+  const [showStatsOnMobile, setShowStatsOnMobile] = useState(false);
+
   return (
-    <div className="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-3.5">
-      <StatCard
-        title="TOTAL SCHOOLS"
-        value={stats.total}
-        subtitle="All registered schools"
-        icon={<Building2 className="size-4 sm:size-4.5 text-blue-600 dark:text-blue-400" />}
-        iconBg="bg-blue-100 dark:bg-blue-900/40"
-        cardBg="bg-blue-50/50 dark:bg-blue-950/15"
-        cardBorder="border-blue-100 dark:border-blue-900/30"
-        trendText="+20%"
-        trendType="up"
-      />
-      <StatCard
-        title="ACTIVE SCHOOLS"
-        value={stats.active}
-        subtitle="Currently active & operational"
-        icon={<CheckCircle2 className="size-4 sm:size-4.5 text-emerald-600 dark:text-emerald-400" />}
-        iconBg="bg-emerald-100 dark:bg-emerald-900/40"
-        cardBg="bg-emerald-50/50 dark:bg-emerald-950/15"
-        cardBorder="border-emerald-100 dark:border-emerald-900/30"
-        trendText={stats.total > 0 ? `+${Math.round((stats.active / stats.total) * 100)}%` : "+25%"}
-        trendType="up"
-      />
-      <StatCard
-        title="TRIAL SCHOOLS"
-        value={stats.trial}
-        subtitle="In trial period"
-        icon={<Clock className="size-4 sm:size-4.5 text-amber-600 dark:text-amber-400" />}
-        iconBg="bg-amber-100 dark:bg-amber-900/40"
-        cardBg="bg-amber-50/50 dark:bg-amber-950/15"
-        cardBorder="border-amber-100 dark:border-amber-900/30"
-        trendText="0%"
-        trendType="neutral"
-      />
-      <StatCard
-        title="SUSPENDED"
-        value={stats.suspended}
-        subtitle="Temporarily suspended"
-        icon={<Ban className="size-4 sm:size-4.5 text-rose-600 dark:text-rose-400" />}
-        iconBg="bg-rose-100 dark:bg-rose-900/40"
-        cardBg="bg-rose-50/50 dark:bg-rose-950/15"
-        cardBorder="border-rose-100 dark:border-rose-900/30"
-        trendText={stats.suspended > 0 ? `+${stats.suspended}%` : "+0%"}
-        trendType={stats.suspended > 0 ? "down" : "neutral"}
-      />
+    <div className="space-y-2.5 sm:space-y-0">
+      {/* Mobile Toggle Button */}
+      <div className="block sm:hidden">
+        <button
+          type="button"
+          onClick={() => setShowStatsOnMobile((prev) => !prev)}
+          className="w-full flex items-center justify-between px-3.5 py-2 rounded-xl border border-border bg-card hover:bg-muted/40 text-xs font-semibold text-foreground transition-all shadow-2xs cursor-pointer"
+        >
+          <div className="flex items-center gap-2">
+            <div className="size-6 rounded-lg bg-blue-50 dark:bg-blue-950/50 text-blue-600 dark:text-blue-400 flex items-center justify-center">
+              <BarChart3 className="size-3.5" />
+            </div>
+            <span>Platform Overview ({stats.total} Schools)</span>
+          </div>
+          <div className="flex items-center gap-1 text-[11px] text-muted-foreground">
+            <span>{showStatsOnMobile ? "Hide" : "Show"}</span>
+            {showStatsOnMobile ? (
+              <ChevronUp className="size-3.5" />
+            ) : (
+              <ChevronDown className="size-3.5" />
+            )}
+          </div>
+        </button>
+      </div>
+
+      {/* 4 Stat Cards: Collapsible on Mobile, always visible in 4-column grid on desktop */}
+      <div className={`${showStatsOnMobile ? "grid" : "hidden"} sm:grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-3.5`}>
+        <StatCard
+          title="TOTAL SCHOOLS"
+          value={stats.total}
+          subtitle="All registered schools"
+          icon={<Building2 className="size-4 sm:size-4.5 text-blue-600 dark:text-blue-400" />}
+          iconBg="bg-blue-100 dark:bg-blue-900/40"
+          cardBg="bg-blue-50/50 dark:bg-blue-950/15"
+          cardBorder="border-blue-100 dark:border-blue-900/30"
+          trendText="+20%"
+          trendType="up"
+        />
+        <StatCard
+          title="ACTIVE SCHOOLS"
+          value={stats.active}
+          subtitle="Currently active & operational"
+          icon={<CheckCircle2 className="size-4 sm:size-4.5 text-emerald-600 dark:text-emerald-400" />}
+          iconBg="bg-emerald-100 dark:bg-emerald-900/40"
+          cardBg="bg-emerald-50/50 dark:bg-emerald-950/15"
+          cardBorder="border-emerald-100 dark:border-emerald-900/30"
+          trendText={stats.total > 0 ? `+${Math.round((stats.active / stats.total) * 100)}%` : "+25%"}
+          trendType="up"
+        />
+        <StatCard
+          title="TRIAL SCHOOLS"
+          value={stats.trial}
+          subtitle="In trial period"
+          icon={<Clock className="size-4 sm:size-4.5 text-amber-600 dark:text-amber-400" />}
+          iconBg="bg-amber-100 dark:bg-amber-900/40"
+          cardBg="bg-amber-50/50 dark:bg-amber-950/15"
+          cardBorder="border-amber-100 dark:border-amber-900/30"
+          trendText="0%"
+          trendType="neutral"
+        />
+        <StatCard
+          title="SUSPENDED"
+          value={stats.suspended}
+          subtitle="Temporarily suspended"
+          icon={<Ban className="size-4 sm:size-4.5 text-rose-600 dark:text-rose-400" />}
+          iconBg="bg-rose-100 dark:bg-rose-900/40"
+          cardBg="bg-rose-50/50 dark:bg-rose-950/15"
+          cardBorder="border-rose-100 dark:border-rose-900/30"
+          trendText={stats.suspended > 0 ? `+${stats.suspended}%` : "+0%"}
+          trendType={stats.suspended > 0 ? "down" : "neutral"}
+        />
+      </div>
     </div>
   );
 }
