@@ -194,10 +194,10 @@ export function Header({ items, resolvedScreen, layoutPref = "comprehensive", on
               <Button
                 type="button"
                 variant="ghost"
-                className="h-8.5 sm:h-10 pl-1 sm:pl-1.5 pr-2 sm:pr-3 py-1 gap-1.5 sm:gap-2.5 rounded-full border border-slate-200/80 dark:border-zinc-800 bg-white/80 dark:bg-zinc-900/80 hover:bg-slate-100/90 dark:hover:bg-zinc-800 shadow-2xs transition-all cursor-pointer group focus-visible:ring-0 shrink-0"
+                className="size-8.5 sm:size-auto sm:h-10 p-0 sm:pl-1.5 sm:pr-3 sm:py-1 sm:gap-2.5 rounded-full border border-slate-200/80 dark:border-zinc-800 bg-white/80 dark:bg-zinc-900/80 hover:bg-slate-100/90 dark:hover:bg-zinc-800 shadow-2xs transition-all cursor-pointer group focus-visible:ring-0 shrink-0 flex items-center justify-center"
               >
                 <Avatar className={cn(
-                  "size-6.5 sm:size-7.5 cursor-pointer shadow-xs",
+                  "size-7 sm:size-7.5 cursor-pointer shadow-xs",
                   currentUser.role === "super_admin" ? "ring-2 ring-blue-500/25" : "ring-2 ring-emerald-500/25"
                 )}>
                   <AvatarImage src={currentUser.avatar} alt={currentUser.name} className="object-cover" />
@@ -218,7 +218,7 @@ export function Header({ items, resolvedScreen, layoutPref = "comprehensive", on
                     {isSuperAdmin ? "Super Admin" : "School Admin"}
                   </span>
                 </div>
-                <ChevronDown className="size-3.5 text-slate-400 group-hover:text-slate-600 dark:group-hover:text-zinc-300 transition-transform duration-200" />
+                <ChevronDown className="hidden sm:block size-3.5 text-slate-400 group-hover:text-slate-600 dark:group-hover:text-zinc-300 transition-transform duration-200" />
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-64 mt-2 rounded-2xl p-1.5 shadow-xl shadow-black/20 border-slate-200/80 dark:border-zinc-800 dark:bg-zinc-950">
