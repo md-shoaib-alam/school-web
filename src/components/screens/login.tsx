@@ -258,22 +258,6 @@ export function LoginScreen() {
 
       {/* ─── MOBILE / TABLET ─── */}
       <div className="lg:hidden relative z-10 w-full min-h-screen flex flex-col justify-between items-center px-4 sm:px-6 md:px-8 py-3 sm:py-5 md:py-6">
-        <div className="w-full flex items-center justify-end gap-2 shrink-0">
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="outline" size="sm" className="h-8.5 sm:h-9 px-3 sm:px-4 rounded-full border-slate-200 bg-white/90 text-xs sm:text-sm font-medium text-slate-700 gap-1.5 shadow-sm hover:bg-white cursor-pointer">
-                <Globe className="size-3.5 sm:size-4 text-slate-500" />
-                <span>{selectedLanguage}</span>
-                <ChevronDown className="size-3 sm:size-3.5 text-slate-400 ml-0.5" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="rounded-xl min-w-[120px]">
-              <DropdownMenuItem onClick={() => setSelectedLanguage("English")} className="text-xs font-medium cursor-pointer">English</DropdownMenuItem>
-              <DropdownMenuItem onClick={() => setSelectedLanguage("Urdu")} className="text-xs font-medium cursor-pointer">اردو (Urdu)</DropdownMenuItem>
-              <DropdownMenuItem onClick={() => setSelectedLanguage("Arabic")} className="text-xs font-medium cursor-pointer">العربية (Arabic)</DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </div>
 
         {/* Brand Header */}
         <div className="w-full flex flex-col items-center text-center mt-2 sm:mt-4 mb-3 sm:mb-5">
