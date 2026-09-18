@@ -7,6 +7,7 @@ import { persistQueryClient } from "@tanstack/react-query-persist-client";
 import { createSyncStoragePersister } from "@tanstack/query-sync-storage-persister";
 import { Toaster } from "sonner";
 import { useTheme } from "next-themes";
+import { SmoothScrollProvider } from "@/components/providers/smooth-scroll-provider";
 
 function ToasterProvider() {
   const { theme } = useTheme();
@@ -50,8 +51,10 @@ export function Providers({ children }: { children: React.ReactNode }) {
 
   return (
     <QueryClientProvider client={queryClient}>
-      {children}
-      <ToasterProvider />
+      <SmoothScrollProvider>
+        {children}
+        <ToasterProvider />
+      </SmoothScrollProvider>
     </QueryClientProvider>
   );
 }

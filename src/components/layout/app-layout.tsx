@@ -402,7 +402,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
           />
 
           {/* Page Content */}
-          <main className="flex-1 overflow-y-auto p-4 lg:p-6 overscroll-contain">
+          <main data-lenis-scroll-container className="flex-1 overflow-y-auto p-4 lg:p-6 overscroll-contain">
             {isExpired && !isExemptFromLock ? (
               <SubscriptionExpiredScreen 
                 tenantName={resolvedTenant?.name || currentTenantName || "School"} 

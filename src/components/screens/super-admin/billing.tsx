@@ -163,11 +163,13 @@ export function SuperAdminBilling() {
         loading={loading}
       />
 
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full space-y-5">
-        <TabsList className="grid w-full sm:w-auto sm:inline-grid grid-cols-2 h-10 p-1 rounded-xl bg-muted/70 border border-border">
-          <TabsTrigger value="school" className="rounded-lg text-xs font-semibold px-4 cursor-pointer data-[state=active]:bg-card data-[state=active]:text-foreground data-[state=active]:shadow-2xs">School Revenue</TabsTrigger>
-          <TabsTrigger value="parent" className="rounded-lg text-xs font-semibold px-4 cursor-pointer data-[state=active]:bg-card data-[state=active]:text-foreground data-[state=active]:shadow-2xs">Parent Revenue</TabsTrigger>
-        </TabsList>
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full space-y-4 sm:space-y-5">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
+          <TabsList className="grid w-full sm:w-auto sm:inline-grid grid-cols-2 h-10 p-1 rounded-xl bg-muted/70 border border-border">
+            <TabsTrigger value="school" className="rounded-lg text-xs font-semibold px-4 cursor-pointer data-[state=active]:bg-card data-[state=active]:text-foreground data-[state=active]:shadow-2xs">School Revenue</TabsTrigger>
+            <TabsTrigger value="parent" className="rounded-lg text-xs font-semibold px-4 cursor-pointer data-[state=active]:bg-card data-[state=active]:text-foreground data-[state=active]:shadow-2xs">Parent Revenue</TabsTrigger>
+          </TabsList>
+        </div>
 
         <TabsContent value="school" className="space-y-5 animate-in fade-in-50 duration-300">
           <MetricCards 
