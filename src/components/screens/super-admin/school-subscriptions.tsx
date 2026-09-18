@@ -413,7 +413,7 @@ export function SuperAdminSchoolSubscriptions() {
             </div>
             <div className="relative h-14 sm:h-20 md:h-22 aspect-[16/9] overflow-hidden select-none">
               <Image
-                src="/assets/schoolsubstop.png"
+                src="/assets/super-admin/schoolsubstop.png"
                 alt="B2B School Licenses"
                 fill
                 priority

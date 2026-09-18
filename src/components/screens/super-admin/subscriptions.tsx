@@ -438,7 +438,7 @@ export function SuperAdminSubscriptions() {
             </div>
             <div className="relative h-14 sm:h-20 md:h-22 aspect-[16/9] overflow-hidden select-none">
               <Image
-                src="/assets/subscprtiontop.png"
+                src="/assets/super-admin/subscprtiontop.png"
                 alt="B2C Parent Subscriptions"
                 fill
                 priority

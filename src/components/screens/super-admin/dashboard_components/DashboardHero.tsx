@@ -44,13 +44,13 @@ export function DashboardHero({ loading, data, onNavigate }: DashboardHeroProps)
         <div className="absolute right-2 sm:right-6 md:right-8 top-1/2 -translate-y-1/2 sm:top-auto sm:translate-y-0 sm:bottom-0 h-[70px] sm:h-[95px] md:h-[115px] aspect-[4/3] flex items-center sm:items-end justify-end pointer-events-none select-none">
           {/* Light Mode Image (4:3 ratio) */}
           <img
-            src="/assets/topdahsbordlight.png"
+            src="/assets/super-admin/topdahsbordlight.png"
             alt="School Illustration"
             className="h-full w-full object-contain object-center sm:object-bottom dark:hidden drop-shadow-xs"
           />
           {/* Dark Mode Image (4:3 ratio) */}
           <img
-            src="/assets/topdahsborddark.png"
+            src="/assets/super-admin/topdahsborddark.png"
             alt="School Illustration Dark"
             className="h-full w-full object-contain object-center sm:object-bottom hidden dark:block drop-shadow-xs"
           />

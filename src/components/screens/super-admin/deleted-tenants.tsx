@@ -188,7 +188,7 @@ export function SuperAdminDeletedTenants() {
           {/* Right Side image — all sizes */}
           <div className="relative h-[68px] sm:h-20 md:h-24 aspect-[4/3] shrink-0 overflow-hidden">
             <Image
-              src="/assets/deltedtop.png"
+              src="/assets/super-admin/deltedtop.png"
               alt="Recycle Bin"
               fill
               priority

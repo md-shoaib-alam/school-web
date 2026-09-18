@@ -41,7 +41,7 @@ export function BillingHeader({
           <div className="relative flex items-center justify-end shrink-0 pr-0.5 sm:pr-2">
             <div className="relative h-14 sm:h-20 md:h-22 aspect-[16/9] overflow-hidden select-none">
               <Image
-                src="/assets/billingtop.png"
+                src="/assets/super-admin/billingtop.png"
                 alt="Billing & Revenue"
                 fill
                 priority
