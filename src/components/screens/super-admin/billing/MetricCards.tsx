@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -9,7 +10,9 @@ import {
   ArrowUpRight,
   ArrowDownRight,
   IndianRupee,
-  BarChart3
+  BarChart3,
+  ChevronDown,
+  ChevronUp,
 } from "lucide-react";
 
 interface MetricCardsProps {
@@ -37,6 +40,8 @@ export function MetricCards({
   tenantCount,
   churnRate,
 }: MetricCardsProps) {
+  const [showStatsOnMobile, setShowStatsOnMobile] = useState(false);
+
   if (loading) {
     return (
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
@@ -52,7 +57,33 @@ export function MetricCards({
   }
 
   return (
-    <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+    <div className="space-y-2.5 sm:space-y-0">
+      {/* Mobile Toggle Button */}
+      <div className="block sm:hidden">
+        <button
+          type="button"
+          onClick={() => setShowStatsOnMobile((prev) => !prev)}
+          className="w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl border border-border bg-card hover:bg-muted/40 text-xs font-semibold text-foreground transition-all shadow-2xs cursor-pointer"
+        >
+          <div className="flex items-center gap-2.5">
+            <div className="size-7 rounded-lg bg-emerald-50 dark:bg-emerald-950/50 text-emerald-600 dark:text-emerald-400 flex items-center justify-center border border-emerald-200/50 dark:border-emerald-800/40">
+              <BarChart3 className="size-3.5" />
+            </div>
+            <span className="font-semibold text-xs">Revenue Overview Stats</span>
+          </div>
+          <div className="flex items-center gap-1.5 text-xs text-muted-foreground font-medium">
+            <span>{showStatsOnMobile ? "Hide" : "Show"}</span>
+            {showStatsOnMobile ? (
+              <ChevronUp className="size-3.5 text-muted-foreground" />
+            ) : (
+              <ChevronDown className="size-3.5 text-muted-foreground" />
+            )}
+          </div>
+        </button>
+      </div>
+
+      {/* Metric Cards Grid: Collapsible on Mobile, always visible on Desktop */}
+      <div className={`${showStatsOnMobile ? "grid" : "hidden"} sm:grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4`}>
       {/* Total Active Revenue */}
       <div className="border border-border rounded-2xl bg-card p-3 sm:p-4.5 shadow-2xs flex flex-col justify-between">
         <div>
@@ -138,6 +169,7 @@ export function MetricCards({
           {expiredCount} expired, {cancelledCount} churn
         </p>
       </div>
+    </div>
     </div>
   );
 }

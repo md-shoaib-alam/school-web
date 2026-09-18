@@ -54,16 +54,16 @@ export function BillingHeader({
       </div>
 
       {/* Title & Refresh Action Row */}
-      <div className="flex items-center justify-end sm:justify-between gap-3">
-        <div className="hidden sm:flex items-center gap-2.5">
+      <div className="flex items-center justify-between gap-3">
+        <div className="flex items-center gap-2.5 min-w-0">
           <div className="size-8 sm:size-9 rounded-xl bg-emerald-50 dark:bg-emerald-950/50 border border-emerald-100/80 dark:border-emerald-900/40 flex items-center justify-center text-emerald-600 dark:text-emerald-400 shrink-0">
             <IndianRupee className="size-4 sm:size-4.5" />
           </div>
-          <div>
-            <h2 className="text-base sm:text-lg font-semibold text-foreground tracking-tight">
+          <div className="min-w-0">
+            <h2 className="text-sm sm:text-lg font-semibold text-foreground tracking-tight truncate">
               Billing & Revenue
             </h2>
-            <p className="text-xs text-muted-foreground mt-0.5">
+            <p className="hidden sm:block text-xs text-muted-foreground mt-0.5">
               School billing, transactions, and revenue trends.
             </p>
           </div>
@@ -74,7 +74,7 @@ export function BillingHeader({
           size="sm"
           disabled={loading}
           onClick={onRefresh}
-          className="h-8 sm:h-9 px-3 sm:px-4 rounded-xl text-xs font-semibold gap-1.5 border-border bg-card hover:bg-muted/50 text-foreground shadow-2xs shrink-0 cursor-pointer"
+          className="h-8 sm:h-9 px-2.5 sm:px-4 rounded-xl text-xs font-semibold gap-1.5 border-border bg-card hover:bg-muted/50 text-foreground shadow-2xs shrink-0 cursor-pointer"
         >
           <RefreshCw className={`size-3.5 ${loading ? "animate-spin" : ""}`} />
           <span>Refresh Data</span>
