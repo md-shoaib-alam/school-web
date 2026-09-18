@@ -365,8 +365,11 @@ export function UserDetailSheet({
           </button>
         </div>
 
-        {/* Scrollable Content Body - Native silky-smooth scrolling in both directions */}
-        <div className="flex-1 overflow-y-auto min-h-0 overscroll-contain px-6 py-5 space-y-6">
+        {/* Scrollable Content Body - with Lenis smooth scrolling */}
+        <div 
+          data-lenis-scroll-container
+          className="flex-1 overflow-y-auto min-h-0 overscroll-contain px-6 py-5 space-y-6 touch-pan-y"
+        >
           {/* Section 1: Basic Information */}
           <div className="space-y-3">
             <div className="flex items-center justify-between">
