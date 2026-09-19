@@ -229,12 +229,9 @@ export function LoginScreen() {
       suppressHydrationWarning
     >
       {/* Desktop background */}
-      <div
-        className="hidden lg:block absolute inset-0 z-0 pointer-events-none select-none"
-        style={{ backgroundImage: "url('/assets/login-illustration-desktop.png')", backgroundSize: "cover", backgroundPosition: "center top" }}
-      >
+      <div className="hidden lg:block absolute inset-0 z-0 pointer-events-none select-none">
         <Image
-          src="/assets/login-illustration-desktop.png"
+          src="/assets/login-illustration-desktop.avif"
           alt="Scenic School Background"
           fill priority unoptimized
           className="object-cover object-top"
@@ -243,12 +240,9 @@ export function LoginScreen() {
       </div>
 
       {/* Mobile background */}
-      <div
-        className="lg:hidden fixed inset-0 z-0 pointer-events-none select-none bg-[#cbe9fe]"
-        style={{ backgroundImage: "url('/assets/loginmobile.png')", backgroundSize: "cover", backgroundPosition: "bottom" }}
-      >
+      <div className="lg:hidden fixed inset-0 z-0 pointer-events-none select-none bg-[#cbe9fe]">
         <Image
-          src="/assets/loginmobile.png"
+          src="/assets/loginmobile.avif"
           alt="School Mobile Background"
           fill priority unoptimized
           className="object-cover object-bottom"

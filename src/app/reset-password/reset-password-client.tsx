@@ -147,19 +147,13 @@ export default function ResetPasswordClient() {
       suppressHydrationWarning
     >
       {/* Desktop background */}
-      <div
-        className="hidden lg:block absolute inset-0 z-0 pointer-events-none select-none"
-        style={{ backgroundImage: "url('/assets/login-illustration-desktop.png')", backgroundSize: 'cover', backgroundPosition: 'center top' }}
-      >
-        <Image src="/assets/login-illustration-desktop.png" alt="School Background" fill priority unoptimized className="object-cover object-top" sizes="100vw" />
+      <div className="hidden lg:block absolute inset-0 z-0 pointer-events-none select-none">
+        <Image src="/assets/login-illustration-desktop.avif" alt="School Background" fill priority unoptimized className="object-cover object-top" sizes="100vw" />
       </div>
 
       {/* Mobile background */}
-      <div
-        className="lg:hidden fixed inset-0 z-0 pointer-events-none select-none bg-[#cbe9fe]"
-        style={{ backgroundImage: "url('/assets/loginmobile.png')", backgroundSize: 'cover', backgroundPosition: 'bottom' }}
-      >
-        <Image src="/assets/loginmobile.png" alt="School Mobile Background" fill priority unoptimized className="object-cover object-bottom" sizes="100vw" />
+      <div className="lg:hidden fixed inset-0 z-0 pointer-events-none select-none bg-[#cbe9fe]">
+        <Image src="/assets/loginmobile.avif" alt="School Mobile Background" fill priority unoptimized className="object-cover object-bottom" sizes="100vw" />
       </div>
 
       {/* ─── MOBILE / TABLET ─── */}
