@@ -51,7 +51,7 @@ export function StaffHeader({
           <div className="relative flex items-center justify-end shrink-0 pr-0.5 sm:pr-2">
             <div className="relative h-14 sm:h-20 md:h-22 aspect-[16/9] overflow-hidden select-none">
               <Image
-                src="/assets/super-admin/stafftop.png"
+                src="/assets/super-admin/stafftop.avif"
                 alt="Staff Management"
                 fill
                 priority

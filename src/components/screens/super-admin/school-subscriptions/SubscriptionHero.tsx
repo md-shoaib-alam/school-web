@@ -1,4 +1,4 @@
-﻿import React from "react";
+import React from "react";
 import Image from "next/image";
 import { CreditCard, CheckCircle2 } from "lucide-react";
 
@@ -42,7 +42,7 @@ export function SubscriptionHero() {
           </div>
           <div className="relative h-14 sm:h-20 md:h-22 aspect-[16/9] overflow-hidden select-none">
             <Image
-              src="/assets/super-admin/schoolsubstop.png"
+              src="/assets/super-admin/schoolsubstop.avif"
               alt="B2B School Licenses"
               fill
               priority
