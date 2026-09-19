@@ -118,20 +118,62 @@ export function UserTable({
 
   if (loading) {
     return (
-      <div className="rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-card p-6 space-y-4 shadow-2xs">
-        <div className="flex items-center gap-4">
-          <Skeleton className="size-7 rounded-full" />
-          <Skeleton className="h-4 w-48" />
-          <Skeleton className="h-4 w-32 ml-auto" />
+      <div className="rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-card shadow-2xs overflow-hidden">
+        <div className="overflow-x-auto">
+          <Table>
+            <TableHeader>
+              <TableRow className="bg-slate-50/70 dark:bg-slate-800/40 border-b border-slate-200/80 dark:border-slate-800">
+                <TableHead className="w-10 py-3.5 pl-4">
+                  <Skeleton className="size-3.5 rounded-sm" />
+                </TableHead>
+                <TableHead className="w-12 text-xs font-semibold text-slate-500 py-3.5">#</TableHead>
+                <TableHead className={commonClasses}>Name</TableHead>
+                <TableHead className={commonClasses}>Email</TableHead>
+                <TableHead className={commonClasses}>Role</TableHead>
+                <TableHead className={commonClasses}>School</TableHead>
+                <TableHead className={commonClasses}>Status</TableHead>
+                <TableHead className={commonClasses}>Joined</TableHead>
+                <TableHead className={`${commonClasses} text-right pr-4`}>Actions</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {[...Array(8)].map((_, i) => (
+                <TableRow key={i} className="border-b border-slate-100 dark:border-slate-800/80 last:border-none">
+                  <TableCell className="w-10 py-3.5 pl-4">
+                    <Skeleton className="size-3.5 rounded-sm" />
+                  </TableCell>
+                  <TableCell className="w-12 py-3.5">
+                    <Skeleton className="h-4 w-4 rounded-sm" />
+                  </TableCell>
+                  <TableCell className="py-3.5">
+                    <div className="flex items-center gap-2.5">
+                      <Skeleton className="size-7 rounded-full shrink-0" />
+                      <Skeleton className="h-4 w-32 rounded-md" />
+                    </div>
+                  </TableCell>
+                  <TableCell className="py-3.5">
+                    <Skeleton className="h-4 w-40 rounded-md" />
+                  </TableCell>
+                  <TableCell className="py-3.5">
+                    <Skeleton className="h-5 w-20 rounded-full" />
+                  </TableCell>
+                  <TableCell className="py-3.5">
+                    <Skeleton className="h-4 w-28 rounded-md" />
+                  </TableCell>
+                  <TableCell className="py-3.5">
+                    <Skeleton className="h-5 w-16 rounded-full" />
+                  </TableCell>
+                  <TableCell className="py-3.5">
+                    <Skeleton className="h-4 w-20 rounded-md" />
+                  </TableCell>
+                  <TableCell className="pr-4 py-3.5 text-right">
+                    <Skeleton className="size-7 rounded-lg ml-auto" />
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
         </div>
-        {[...Array(8)].map((_, i) => (
-          <div key={i} className="flex items-center gap-4 py-3 border-b last:border-none border-slate-100 dark:border-slate-800/80">
-            <Skeleton className="size-7 rounded-full" />
-            <Skeleton className="h-4 w-36" />
-            <Skeleton className="h-4 w-48" />
-            <Skeleton className="h-6 w-20 ml-auto" />
-          </div>
-        ))}
       </div>
     );
   }

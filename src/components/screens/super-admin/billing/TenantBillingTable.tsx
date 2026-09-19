@@ -294,13 +294,45 @@ export function TenantBillingTable({
             </TableHeader>
             <TableBody>
               {loading
-                ? [...Array(10)].map((_, i) => (
-                    <TableRow key={i}>
-                      {[...Array(isSchoolMode ? 5 : 7)].map((_, j) => (
-                        <TableCell key={j}>
-                          <Skeleton className="h-4 w-full" />
+                ? [...Array(8)].map((_, i) => (
+                    <TableRow key={i} className="border-b last:border-none">
+                      {/* School Name + Slug */}
+                      <TableCell className="py-3.5">
+                        <div className="space-y-1.5">
+                          <Skeleton className="h-4 w-36 rounded-md" />
+                          <Skeleton className="h-3 w-20 rounded-md" />
+                        </div>
+                      </TableCell>
+                      {/* Status */}
+                      <TableCell className="py-3.5">
+                        <Skeleton className="h-5 w-16 rounded-full" />
+                      </TableCell>
+                      {/* Plan */}
+                      <TableCell className="py-3.5 text-center">
+                        <Skeleton className="h-5 w-18 mx-auto rounded-full" />
+                      </TableCell>
+                      {/* Price or Rev columns */}
+                      {isSchoolMode ? (
+                        <TableCell className="py-3.5 text-right">
+                          <Skeleton className="h-4 w-16 ml-auto rounded-md" />
                         </TableCell>
-                      ))}
+                      ) : (
+                        <>
+                          <TableCell className="py-3.5 text-right">
+                            <Skeleton className="h-4 w-16 ml-auto rounded-md" />
+                          </TableCell>
+                          <TableCell className="py-3.5 text-right">
+                            <Skeleton className="h-4 w-16 ml-auto rounded-md" />
+                          </TableCell>
+                          <TableCell className="py-3.5 text-center">
+                            <Skeleton className="h-4 w-12 mx-auto rounded-md" />
+                          </TableCell>
+                        </>
+                      )}
+                      {/* Total Users */}
+                      <TableCell className="py-3.5 text-center">
+                        <Skeleton className="h-4 w-10 mx-auto rounded-md" />
+                      </TableCell>
                     </TableRow>
                   ))
                 : paginatedTenants.map((tenant) => {

@@ -11,7 +11,7 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
-import { Separator } from "@/components/ui/separator";
+import { Skeleton } from "@/components/ui/skeleton";
 import {
   Select,
   SelectContent,
@@ -194,7 +194,7 @@ export function SuperAdminSettings() {
   };
 
   if (loading) {
-    return <LoadingSpinner />;
+    return <LoadingSkeleton />;
   }
 
   return (
@@ -376,13 +376,68 @@ export function SuperAdminSettings() {
   );
 }
 
-function LoadingSpinner() {
+function LoadingSkeleton() {
   return (
-    <div className="flex flex-col items-center justify-center min-h-[400px] gap-3">
-      <Loader2 className="size-8 animate-spin text-blue-600" />
-      <span className="text-sm font-medium text-muted-foreground animate-pulse">
-        Loading platform configurations...
-      </span>
+    <div className="space-y-4 sm:space-y-6 max-w-5xl mx-auto pb-8">
+      {/* Header Skeleton */}
+      <div className="flex items-center gap-3 pt-1">
+        <Skeleton className="size-10 rounded-xl shrink-0" />
+        <div className="space-y-1.5">
+          <Skeleton className="h-6 w-44 rounded-md" />
+          <Skeleton className="h-3.5 w-72 rounded-md" />
+        </div>
+      </div>
+
+      {/* General Preferences Card Skeleton */}
+      <div className="rounded-2xl border border-border bg-card p-4 sm:p-7 shadow-2xs space-y-6">
+        <div className="flex items-center gap-3">
+          <Skeleton className="size-9 rounded-xl shrink-0" />
+          <div className="space-y-1.5">
+            <Skeleton className="h-4 w-40 rounded-md" />
+            <Skeleton className="h-3 w-64 rounded-md" />
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-5">
+          <div className="space-y-2">
+            <Skeleton className="h-3.5 w-24 rounded-md" />
+            <Skeleton className="h-10 w-full rounded-xl" />
+          </div>
+          <div className="space-y-2">
+            <Skeleton className="h-3.5 w-24 rounded-md" />
+            <Skeleton className="h-10 w-full rounded-xl" />
+          </div>
+          <div className="space-y-2">
+            <Skeleton className="h-3.5 w-28 rounded-md" />
+            <Skeleton className="h-10 w-full rounded-xl" />
+          </div>
+          <div className="space-y-2">
+            <Skeleton className="h-3.5 w-28 rounded-md" />
+            <Skeleton className="h-10 w-full rounded-xl" />
+          </div>
+        </div>
+      </div>
+
+      {/* Maintenance Card Skeleton */}
+      <div className="rounded-2xl border border-border bg-card p-4 sm:p-7 shadow-2xs space-y-5">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <Skeleton className="size-9 rounded-xl shrink-0" />
+            <div className="space-y-1.5">
+              <Skeleton className="h-4 w-36 rounded-md" />
+              <Skeleton className="h-3 w-56 rounded-md" />
+            </div>
+          </div>
+          <Skeleton className="h-6 w-11 rounded-full" />
+        </div>
+        <Skeleton className="h-20 w-full rounded-xl" />
+      </div>
+
+      {/* Save Bar Skeleton */}
+      <div className="rounded-2xl border border-border bg-card p-4 sm:p-5 shadow-2xs flex items-center justify-between">
+        <Skeleton className="h-4 w-52 rounded-md" />
+        <Skeleton className="h-10 w-32 rounded-xl" />
+      </div>
     </div>
   );
 }

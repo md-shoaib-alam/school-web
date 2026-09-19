@@ -77,17 +77,30 @@ export function SuperAdminAnalytics() {
   if (loading && !data) {
     return (
       <div className="space-y-6">
-        <div className="flex justify-between items-center">
-          <div className="space-y-2">
-            <Skeleton className="h-8 w-48" />
-            <Skeleton className="h-4 w-64" />
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div className="space-y-1.5">
+            <Skeleton className="h-7 w-64 rounded-md" />
+            <Skeleton className="h-4 w-96 rounded-md" />
           </div>
-          <Skeleton className="h-10 w-32" />
+          <Skeleton className="h-10 w-36 rounded-xl" />
         </div>
-        <Skeleton className="h-12 w-full rounded-lg" />
+        <div className="flex items-center justify-between px-4 py-3 bg-card border rounded-lg shadow-sm">
+          <div className="flex items-center gap-2">
+            <Skeleton className="size-2 rounded-full" />
+            <Skeleton className="h-4 w-32 rounded-md" />
+          </div>
+          <Skeleton className="h-3 w-40 rounded-md" />
+        </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           {[...Array(8)].map((_, i) => (
-            <Skeleton key={i} className="h-32 rounded-lg" />
+            <div key={i} className="p-4 rounded-xl border bg-card shadow-2xs space-y-3">
+              <div className="flex items-center justify-between">
+                <Skeleton className="h-3.5 w-24 rounded-md" />
+                <Skeleton className="size-7 rounded-lg" />
+              </div>
+              <Skeleton className="h-7 w-20 rounded-md" />
+              <Skeleton className="h-3 w-28 rounded-md" />
+            </div>
           ))}
         </div>
       </div>

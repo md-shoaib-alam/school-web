@@ -98,8 +98,25 @@ export function StatusCards({ loading, data, onNavigate }: StatusCardsProps) {
         </CardHeader>
         <CardContent className="p-0 flex flex-col justify-between flex-1 gap-2.5 pt-2">
           {loading ? (
-            <div className="space-y-3">
-              {[...Array(3)].map((_, i) => <Skeleton key={i} className="h-16 w-full rounded-2xl" />)}
+            <div className="space-y-2.5">
+              {[...Array(3)].map((_, i) => (
+                <div
+                  key={i}
+                  className="flex items-center justify-between p-3.5 rounded-2xl border border-slate-100 dark:border-slate-800/80 bg-slate-50/50 dark:bg-slate-900/30"
+                >
+                  <div className="flex items-center gap-3">
+                    <Skeleton className="size-9 rounded-xl shrink-0" />
+                    <div className="space-y-1.5">
+                      <Skeleton className="h-4 w-20 rounded-md" />
+                      <Skeleton className="h-3 w-16 rounded-md" />
+                    </div>
+                  </div>
+                  <div className="flex flex-col items-end gap-1.5">
+                    <Skeleton className="h-6 w-8 rounded-md" />
+                    <Skeleton className="h-3 w-7 rounded-md" />
+                  </div>
+                </div>
+              ))}
             </div>
           ) : (
             <>
@@ -184,7 +201,36 @@ export function StatusCards({ loading, data, onNavigate }: StatusCardsProps) {
         </CardHeader>
         <CardContent className="p-0 pt-1 flex flex-col justify-between flex-1">
           {loading || !recharts ? (
-            <Skeleton className="h-[200px] w-full rounded-2xl" />
+            <div className="grid grid-cols-1 sm:grid-cols-12 items-center gap-4 py-2">
+              {/* Left Donut Placeholder */}
+              <div className="sm:col-span-6 flex items-center justify-center">
+                <div className="relative size-[180px] rounded-full border-[18px] border-slate-100 dark:border-slate-800 flex items-center justify-center animate-pulse">
+                  <div className="flex flex-col items-center gap-1">
+                    <Skeleton className="h-6 w-14 rounded-md" />
+                    <Skeleton className="h-2.5 w-16 rounded-md" />
+                  </div>
+                </div>
+              </div>
+
+              {/* Right Role List Breakdown Skeleton */}
+              <div className="sm:col-span-6 space-y-2">
+                {[...Array(4)].map((_, i) => (
+                  <div
+                    key={i}
+                    className="flex items-center justify-between px-3 py-2 rounded-2xl border border-slate-100 dark:border-slate-800/80 bg-slate-50/50 dark:bg-slate-900/30"
+                  >
+                    <div className="flex items-center gap-2.5">
+                      <Skeleton className="size-7 rounded-xl shrink-0" />
+                      <Skeleton className="h-3.5 w-16 rounded-md" />
+                    </div>
+                    <div className="flex items-center gap-2.5">
+                      <Skeleton className="h-4 w-8 rounded-md" />
+                      <Skeleton className="h-4 w-7 rounded-lg" />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-12 items-center gap-4">
               {/* Left Donut with center total */}

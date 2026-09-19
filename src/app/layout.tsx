@@ -6,7 +6,6 @@ import { ThemeProvider } from "@/components/theme-provider";
 import { MonitoringProvider } from "@/components/monitoring-provider";
 import { GlobalErrorBoundary } from "@/components/error-boundary";
 import JsonLd from "@/components/json-ld";
-import '@/bones/registry';
 import { OfflineGuard } from "@/components/offline-guard";
 
 const geistSans = Geist({

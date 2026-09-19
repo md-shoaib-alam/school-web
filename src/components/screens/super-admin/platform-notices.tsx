@@ -9,10 +9,11 @@ import { Textarea } from "@/components/ui/textarea";
 import { 
   Select, 
   SelectContent, 
-  SelectItem, 
-  SelectTrigger, 
-  SelectValue 
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
 } from "@/components/ui/select";
+import { Skeleton } from "@/components/ui/skeleton";
 import Image from "next/image";
 import { 
   Bell, 
@@ -441,8 +442,23 @@ export function SuperAdminPlatformNotices() {
             </div>
 
             {historyLoading ? (
-              <div className="flex justify-center py-8">
-                <Loader2 className="size-6 animate-spin text-orange-500" />
+              <div className="space-y-2.5 py-1">
+                {[...Array(3)].map((_, i) => (
+                  <div
+                    key={i}
+                    className="flex flex-col gap-1.5 p-2.5 rounded-xl border border-border bg-muted/20"
+                  >
+                    <div className="flex items-center justify-between gap-2">
+                      <Skeleton className="h-3.5 w-36 rounded-md" />
+                      <Skeleton className="size-5 rounded-md" />
+                    </div>
+                    <Skeleton className="h-3 w-48 rounded-md" />
+                    <div className="flex items-center gap-2 mt-1">
+                      <Skeleton className="h-3 w-16 rounded-md" />
+                      <Skeleton className="h-3 w-14 rounded-md" />
+                    </div>
+                  </div>
+                ))}
               </div>
             ) : (
               <div>

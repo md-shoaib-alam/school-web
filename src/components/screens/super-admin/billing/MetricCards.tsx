@@ -46,10 +46,19 @@ export function MetricCards({
     return (
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
         {[...Array(4)].map((_, i) => (
-          <div key={i} className="border border-border rounded-2xl bg-card p-3 sm:p-5 shadow-2xs">
-            <Skeleton className="h-4 w-20 sm:w-28" />
-            <Skeleton className="h-6 sm:h-8 w-16 sm:w-20 mt-2 sm:mt-3" />
-            <Skeleton className="h-3 w-12 sm:w-16 mt-2" />
+          <div
+            key={i}
+            className="border border-border rounded-2xl bg-card p-3 sm:p-4.5 shadow-2xs flex flex-col justify-between"
+          >
+            <div>
+              <div className="flex items-center justify-between gap-1.5 mb-2 sm:mb-2.5">
+                <Skeleton className="size-8 sm:size-9 rounded-xl shrink-0" />
+                <Skeleton className="h-5 w-14 rounded-md" />
+              </div>
+              <Skeleton className="h-3.5 w-20 rounded-md" />
+              <Skeleton className="h-6 sm:h-7 w-28 rounded-md mt-1.5" />
+            </div>
+            <Skeleton className="h-3 w-24 rounded-md mt-2" />
           </div>
         ))}
       </div>

@@ -114,10 +114,42 @@ export function TopPerformance({ loading, data, onNavigate }: TopPerformanceProp
 
       <CardContent className="p-0 pt-1">
         {loading ? (
-          <div className="space-y-3">
-            {[...Array(5)].map((_, i) => (
-              <Skeleton key={i} className="h-10 w-full rounded-xl" />
-            ))}
+          <div className="rounded-xl border border-slate-200/60 dark:border-slate-800/60 overflow-hidden">
+            <Table>
+              <TableHeader>
+                <TableRow className="bg-slate-50/70 dark:bg-slate-900/50 border-b border-slate-200/60 dark:border-slate-800/60">
+                  <TableHead className="w-10 text-[11px] font-semibold text-slate-500 text-center">#</TableHead>
+                  <TableHead className="text-[11px] font-semibold text-slate-500">School Name</TableHead>
+                  <TableHead className="text-[11px] font-semibold text-slate-500">Location</TableHead>
+                  <TableHead className="text-[11px] font-semibold text-slate-500">Registration Date</TableHead>
+                  <TableHead className="text-[11px] font-semibold text-slate-500 text-center">Status</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {[...Array(5)].map((_, i) => (
+                  <TableRow
+                    key={i}
+                    className="border-b border-slate-100 dark:border-slate-800/60 last:border-none"
+                  >
+                    <TableCell className="text-center py-3.5">
+                      <Skeleton className="h-4 w-4 mx-auto rounded-md" />
+                    </TableCell>
+                    <TableCell className="py-3.5">
+                      <Skeleton className="h-4 w-44 rounded-md" />
+                    </TableCell>
+                    <TableCell className="py-3.5">
+                      <Skeleton className="h-4 w-28 rounded-md" />
+                    </TableCell>
+                    <TableCell className="py-3.5">
+                      <Skeleton className="h-4 w-24 rounded-md" />
+                    </TableCell>
+                    <TableCell className="text-center py-3.5">
+                      <Skeleton className="h-6 w-20 mx-auto rounded-full" />
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
           </div>
         ) : (
           <div className="rounded-xl border border-slate-200/60 dark:border-slate-800/60 overflow-hidden">

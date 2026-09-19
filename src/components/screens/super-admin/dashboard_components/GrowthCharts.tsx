@@ -60,7 +60,37 @@ export function GrowthCharts({ loading, data }: GrowthChartsProps) {
 
       <CardContent className="pt-2 flex-1 flex flex-col justify-between">
         {loading || !recharts ? (
-          <Skeleton className="h-[230px] w-full rounded-2xl" />
+          <div className="space-y-4">
+            <div className="h-[210px] w-full flex items-end justify-between px-4 pb-4 pt-6 gap-3 border-b border-slate-100 dark:border-slate-800">
+              {[45, 60, 75, 55, 90, 100].map((h, i) => (
+                <div key={i} className="flex-1 flex flex-col items-center gap-2 h-full justify-end">
+                  <div className="flex items-end gap-1.5 w-full justify-center h-full">
+                    <Skeleton
+                      className="w-3 rounded-t-md"
+                      style={{ height: `${Math.max(20, h * 0.6)}%` }}
+                    />
+                    <Skeleton
+                      className="w-3 rounded-t-md"
+                      style={{ height: `${h}%` }}
+                    />
+                  </div>
+                  <Skeleton className="h-3 w-6 rounded-sm" />
+                </div>
+              ))}
+            </div>
+
+            {/* Skeleton Legend */}
+            <div className="flex items-center justify-center gap-6 pt-1 text-xs">
+              <div className="flex items-center gap-2">
+                <Skeleton className="size-2.5 rounded-full" />
+                <Skeleton className="h-3 w-16 rounded-md" />
+              </div>
+              <div className="flex items-center gap-2">
+                <Skeleton className="size-2.5 rounded-full" />
+                <Skeleton className="h-3 w-16 rounded-md" />
+              </div>
+            </div>
+          </div>
         ) : (
           <div className="space-y-4">
             <ChartContainer
