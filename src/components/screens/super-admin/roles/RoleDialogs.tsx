@@ -145,7 +145,10 @@ export function RoleDialogs({
           </div>
 
           {/* Scrollable Body: 2 Columns on desktop, 1 column on mobile */}
-          <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-6">
+          <div 
+            data-lenis-prevent
+            className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-6 overscroll-contain touch-pan-y"
+          >
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
               
               {/* LEFT COLUMN: Role Name, Description, Accent Color, Live Role Preview */}
@@ -278,7 +281,7 @@ export function RoleDialogs({
                 {/* DESKTOP MATRIX TABLE (hidden on small mobile screens) */}
                 <div className="hidden sm:block rounded-xl border border-border bg-card overflow-hidden shadow-2xs">
                   {/* Table Column Headers */}
-                  <div className="grid grid-cols-12 bg-muted/40 px-3.5 py-2.5 border-b border-border text-[11px] font-bold text-muted-foreground uppercase tracking-wider items-center">
+                  <div className="grid grid-cols-12 bg-muted/40 px-3.5 py-2.5 border-b border-border text-[11px] font-bold text-muted-foreground uppercase tracking-wider items-center sticky top-0 z-10">
                     <div className="col-span-6">Module</div>
                     <div className="col-span-6 grid grid-cols-4 text-center">
                       <div className="flex flex-col items-center gap-0.5">
@@ -305,7 +308,10 @@ export function RoleDialogs({
                   </div>
 
                   {/* Modules Rows */}
-                  <div className="divide-y divide-border max-h-[380px] overflow-y-auto">
+                  <div 
+                    data-lenis-prevent
+                    className="divide-y divide-border max-h-[380px] overflow-y-auto overscroll-contain touch-pan-y"
+                  >
                     {PLATFORM_MODULES.map((module: any) => {
                       const modPerms = permissions[module.key] || [];
                       return (
@@ -350,7 +356,10 @@ export function RoleDialogs({
                 </div>
 
                 {/* MOBILE ACCORDION MATRIX (Shown on small screens) */}
-                <div className="block sm:hidden space-y-2 max-h-[340px] overflow-y-auto pr-0.5">
+                <div 
+                  data-lenis-prevent
+                  className="block sm:hidden space-y-2 pr-0.5"
+                >
                   {PLATFORM_MODULES.map((module: any) => {
                     const modPerms = permissions[module.key] || [];
                     const isExpanded = expandedMobileModule === module.key;
