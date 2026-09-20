@@ -16,6 +16,7 @@ import { useDebounce } from "@/hooks/use-debounce";
 // Sub-components
 import { TeacherDialog } from "./teachers/TeacherDialog";
 import { TeacherDetailDialog } from "./teachers/TeacherDetailDialog";
+import { TeacherProfileView } from "./teachers/TeacherProfileView";
 import { TeacherSkeleton } from "./teachers/TeacherSkeleton";
 import { TeachersHeader } from "./teachers/TeachersHeader";
 import { TeachersTableView } from "./teachers/TeachersTableView";
@@ -137,13 +138,11 @@ export function AdminTeachers() {
   const [state, dispatch] = useReducer(reducer, initialState);
   const { search, currentPage, itemsPerPage, dialogOpen, editingTeacher, formData, submitting, deletingId } = state;
  
-   const [viewingTeacher, setViewingTeacher] = useState<TeacherInfo | null>(null);
-   const [viewDialogOpen, setViewDialogOpen] = useState(false);
- 
-   const handleOpenView = (teacher: TeacherInfo) => {
-     setViewingTeacher(teacher);
-     setViewDialogOpen(true);
-   };
+  const [viewingTeacher, setViewingTeacher] = useState<TeacherInfo | null>(null);
+
+  const handleOpenView = (teacher: TeacherInfo) => {
+    setViewingTeacher(teacher);
+  };
  
    const debouncedSearch = useDebounce(search, 500);
  
@@ -310,6 +309,36 @@ export function AdminTeachers() {
     executeDeletion(id);
   };
 
+  if (viewingTeacher) {
+    return (
+      <div className="space-y-6">
+        <TeacherProfileView
+          teacher={viewingTeacher}
+          onBack={() => setViewingTeacher(null)}
+          canEdit={canEdit}
+          onEdit={(teacher) => {
+            handleOpenEdit(teacher);
+          }}
+        />
+
+        <TeacherDialog
+          open={dialogOpen}
+          onOpenChange={(open) => {
+            if (!open) {
+              dispatch({ type: "CLOSE_DIALOG" });
+            }
+          }}
+          editingTeacher={editingTeacher}
+          formData={formData}
+          setFormData={(data: any) => dispatch({ type: "SET_FORM_DATA", payload: data })}
+          submitting={submitting}
+          onSubmit={handleSubmit}
+          isFormValid={formData.name.trim() !== "" && formData.email.trim() !== ""}
+        />
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6">
       {/* Read-only banner */}
@@ -379,8 +408,6 @@ export function AdminTeachers() {
         onOpenChange={(open) => {
           if (!open) {
             dispatch({ type: "CLOSE_DIALOG" });
-          } else {
-            // This case might not be triggered from the dialog itself but handle open change
           }
         }}
         editingTeacher={editingTeacher}
@@ -389,12 +416,6 @@ export function AdminTeachers() {
         submitting={submitting}
         onSubmit={handleSubmit}
         isFormValid={formData.name.trim() !== "" && formData.email.trim() !== ""}
-      />
-
-      <TeacherDetailDialog
-        open={viewDialogOpen}
-        onOpenChange={setViewDialogOpen}
-        teacher={viewingTeacher}
       />
     </div>
   );
