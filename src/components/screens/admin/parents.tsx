@@ -47,7 +47,7 @@ type State = {
   linking: boolean;
   createOpen: boolean;
   createForm: {
-    name: string; email: string; phone: string; occupation: string; password: ""; username?: string;
+    name: string; email: string; phone: string; alternatePhone?: string; occupation: string; password: ""; username?: string; gender?: string; dateOfBirth?: string; relationship?: string; address?: string;
   };
   creating: boolean;
   editOpen: boolean;
@@ -89,7 +89,7 @@ const initialState: State = {
   linking: false,
   createOpen: false,
   createForm: {
-    name: "", email: "", phone: "", occupation: "", password: "", username: "",
+    name: "", email: "", phone: "", alternatePhone: "", occupation: "", password: "", username: "", gender: "male", dateOfBirth: "", relationship: "Parent", address: "",
   },
   creating: false,
   editOpen: false,
@@ -275,7 +275,13 @@ export function AdminParents() {
   }, [parents, stateSelectedParentDetail]);
 
   const students = useMemo(() => {
-    return studentData?.pages.flatMap((page) => page?.items || []) || [];
+    const rawList = studentData?.pages.flatMap((page) => page?.items || []) || [];
+    const seen = new Set<string>();
+    return rawList.filter((s) => {
+      if (!s?.id || seen.has(s.id)) return false;
+      seen.add(s.id);
+      return true;
+    });
   }, [studentData]);
   const classes = classesData?.classes || [];
 
