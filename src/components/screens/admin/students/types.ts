@@ -49,6 +49,8 @@ export interface StudentFormData {
   classId: string;
   gender: string;
   dateOfBirth: string;
+  bloodGroup?: string;
+  house?: string;
   password?: string;
   transportEnabled?: boolean;
   routeId?: string;

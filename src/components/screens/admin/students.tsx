@@ -47,6 +47,8 @@ const emptyFormData: StudentFormData = {
   classId: "",
   gender: "male",
   dateOfBirth: "",
+  bloodGroup: "",
+  house: "",
   transportEnabled: false,
   routeId: "",
   pickupPoint: "",
@@ -128,6 +130,8 @@ function reducer(state: State, action: Action): State {
           classId: action.payload.classId || "",
           gender: action.payload.gender || "male",
           dateOfBirth: action.payload.dateOfBirth || "",
+          bloodGroup: action.payload.bloodGroup || "",
+          house: action.payload.house || "",
           transportEnabled: !!action.payload.transport,
           routeId: action.payload.transport?.routeId || "",
           pickupPoint: action.payload.transport?.pickupPoint || "",
@@ -246,16 +250,18 @@ function AdminStudentsContent() {
     const isCreate = dialogMode === "create";
 
     // Required fields validation
-    if (!formData.name || !formData.email || !formData.rollNumber || !formData.classId) {
-      toast.error("Name, Email, Roll Number, and Class are required");
+    if (!formData.name || !formData.rollNumber || !formData.classId) {
+      toast.error("Name, Roll Number, and Class are required");
       return;
     }
 
-    // Email format validation
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(formData.email)) {
-      toast.error("Please enter a valid email address");
-      return;
+    // Email format validation (only if provided)
+    if (formData.email && formData.email.trim()) {
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(formData.email.trim())) {
+        toast.error("Please enter a valid email address");
+        return;
+      }
     }
 
     // OPTIMISTIC UPDATE: Update the UI instantly if editing
