@@ -375,38 +375,40 @@ function AdminStudentsContent() {
             className="w-full sm:w-44 h-9 sm:h-10"
             placeholder="Filter by class"
           />
-          <Select
-            value={genderFilter}
-            onValueChange={(v) => {
-              dispatch({ type: 'SET_GENDER_FILTER', payload: v });
-              updateUrlParams(1, itemsPerPage, search, classFilter);
-            }}
-          >
-            <SelectTrigger className="w-full sm:w-36 h-9 sm:h-10">
-              <SelectValue placeholder="All Genders" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Genders</SelectItem>
-              <SelectItem value="male">Male</SelectItem>
-              <SelectItem value="female">Female</SelectItem>
-            </SelectContent>
-          </Select>
-          <Select
-            value={statusFilter}
-            onValueChange={(v) => {
-              dispatch({ type: 'SET_STATUS_FILTER', payload: v });
-              updateUrlParams(1, itemsPerPage, search, classFilter);
-            }}
-          >
-            <SelectTrigger className="w-full sm:w-36 h-9 sm:h-10">
-              <SelectValue placeholder="All Statuses" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Statuses</SelectItem>
-              <SelectItem value="active">Active</SelectItem>
-              <SelectItem value="inactive">Inactive</SelectItem>
-            </SelectContent>
-          </Select>
+          <div className="grid grid-cols-2 gap-3 sm:flex sm:gap-3">
+            <Select
+              value={genderFilter}
+              onValueChange={(v) => {
+                dispatch({ type: 'SET_GENDER_FILTER', payload: v });
+                updateUrlParams(1, itemsPerPage, search, classFilter);
+              }}
+            >
+              <SelectTrigger className="w-full sm:w-36 h-9 sm:h-10">
+                <SelectValue placeholder="All Genders" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Genders</SelectItem>
+                <SelectItem value="male">Male</SelectItem>
+                <SelectItem value="female">Female</SelectItem>
+              </SelectContent>
+            </Select>
+            <Select
+              value={statusFilter}
+              onValueChange={(v) => {
+                dispatch({ type: 'SET_STATUS_FILTER', payload: v });
+                updateUrlParams(1, itemsPerPage, search, classFilter);
+              }}
+            >
+              <SelectTrigger className="w-full sm:w-36 h-9 sm:h-10">
+                <SelectValue placeholder="All Statuses" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Statuses</SelectItem>
+                <SelectItem value="active">Active</SelectItem>
+                <SelectItem value="inactive">Inactive</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
         </div>
 
         {(canCreate || canEdit || canDelete) && (
@@ -496,6 +498,11 @@ function AdminStudentsContent() {
             }
           }}
           student={viewingStudent}
+          canEdit={canEdit}
+          onEdit={(s) => {
+            dispatch({ type: 'CLOSE_VIEW' });
+            handleOpenEdit(s);
+          }}
         />
       )}
     </div>

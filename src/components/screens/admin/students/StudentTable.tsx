@@ -53,12 +53,13 @@ export function StudentTable({
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead className="w-16 h-12 text-center sm:text-left">Roll No</TableHead>
-            <TableHead className="h-12 ">Name</TableHead>
+            <TableHead className="w-24 sm:w-32 h-12 text-left pl-3 pr-4 sm:pr-8">Roll No</TableHead>
+            <TableHead className="h-12 pl-2 sm:pl-4">Name</TableHead>
             <TableHead className="hidden md:table-cell">Class</TableHead>
             <TableHead className="hidden sm:table-cell">Gender</TableHead>
             <TableHead className="hidden lg:table-cell">Parent</TableHead>
             <TableHead className="hidden lg:table-cell">Phone</TableHead>
+            <TableHead className="hidden md:table-cell">Status</TableHead>
             <TableHead className="w-16 sm:w-24 text-right">Actions</TableHead>
           </TableRow>
         </TableHeader>
@@ -66,7 +67,7 @@ export function StudentTable({
           {students.length === 0 ? (
             <TableRow>
               <TableCell
-                colSpan={7}
+                colSpan={8}
                 className="text-center py-12 text-muted-foreground"
               >
                 <GraduationCap className="size-10 mx-auto mb-2 opacity-30" />
@@ -80,10 +81,10 @@ export function StudentTable({
                 className="hover:bg-emerald-50/50 dark:hover:bg-emerald-900/20 transition-colors border-b last:border-none group/row cursor-pointer"
                 onClick={() => onView(student)}
               >
-                <TableCell className="font-mono text-sm py-4 text-center sm:text-left">
+                <TableCell className="font-mono text-sm py-4 text-left pl-3 pr-4 sm:pr-8 font-medium text-slate-700 dark:text-zinc-300">
                   {student.rollNumber}
                 </TableCell>
-                <TableCell className="py-4">
+                <TableCell className="py-4 pl-2 sm:pl-4">
                   <div className="flex items-center gap-3">
                     <div className="size-8 rounded-full bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 flex items-center justify-center text-xs font-semibold shrink-0">
                       {student.name
@@ -118,6 +119,26 @@ export function StudentTable({
                 </TableCell>
                 <TableCell className="hidden lg:table-cell text-sm py-4">
                   {student.phone || "–"}
+                </TableCell>
+                <TableCell className="hidden md:table-cell py-4">
+                  <span
+                    className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                      student.status?.toLowerCase() === "inactive"
+                        ? "bg-amber-50 text-amber-700 dark:bg-amber-950/30 dark:text-amber-400 border border-amber-200 dark:border-amber-800"
+                        : "bg-emerald-50 text-emerald-700 dark:bg-emerald-950/30 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800"
+                    }`}
+                  >
+                    <span
+                      className={`size-1.5 rounded-full ${
+                        student.status?.toLowerCase() === "inactive"
+                          ? "bg-amber-500"
+                          : "bg-emerald-500"
+                      }`}
+                    />
+                    {student.status
+                      ? student.status.charAt(0).toUpperCase() + student.status.slice(1)
+                      : "Active"}
+                  </span>
                 </TableCell>
                 <TableCell className="text-right py-4">
                   <div className="flex items-center justify-end gap-1" onClick={(e) => e.stopPropagation()}>

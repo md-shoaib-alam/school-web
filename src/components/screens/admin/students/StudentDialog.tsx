@@ -55,14 +55,23 @@ export function StudentDialog({
   const [customPickupFee, setCustomPickupFee] = useState("");
 
   // Fetch transport routes for the dropdown (with stops info)
-  const { data: routes = [] } = useQuery({
+  const { data: routesData } = useQuery({
     queryKey: ['transport-routes-min'],
     enabled: open,
     queryFn: async () => {
-      const res = await apiFetch('/api/transport-routes?mode=min');
-      return res.json();
+      try {
+        const res = await apiFetch('/api/transport-routes?mode=min');
+        if (!res.ok) return [];
+        const data = await res.json();
+        return Array.isArray(data) ? data : (data?.data && Array.isArray(data.data) ? data.data : []);
+      } catch (err) {
+        console.error("Failed to fetch transport routes:", err);
+        return [];
+      }
     }
   });
+
+  const routes = Array.isArray(routesData) ? routesData : [];
 
   // Reset custom pickup when route or dialog changes
   useEffect(() => {
@@ -79,7 +88,7 @@ export function StudentDialog({
     setCustomPickupFee("");
   }, [formData.routeId]);
 
-  const selectedRoute = routes.find((r: any) => r.id === formData.routeId);
+  const selectedRoute = routes.find((r: any) => r?.id === formData.routeId);
   const routeStops = selectedRoute
     ? (typeof selectedRoute.stops === "string" ? JSON.parse(selectedRoute.stops) : (selectedRoute.stops || []))
     : [];
