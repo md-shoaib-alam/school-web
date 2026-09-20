@@ -33,6 +33,8 @@ import { useStaff, useCustomRoles } from "@/lib/graphql/hooks";
 import { useModulePermissions } from "@/hooks/use-permissions";
 import { useDebounce } from "@/hooks/use-debounce";
 import { Pagination } from "@/components/shared/pagination";
+import { useSearchParams, useRouter, usePathname } from "next/navigation";
+import { apiFetch } from "@/lib/api";
 
 // Sub-components
 import { StaffTable } from "./staff/StaffTable";
@@ -324,16 +326,85 @@ export function AdminStaff() {
   const totalItems = staffResponse?.total || 0;
   const totalPages = staffResponse?.totalPages || 1;
 
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const pathname = usePathname();
+  const staffUrlParam = searchParams.get("staff") || searchParams.get("staffId");
+
+  // Synchronize URL ?staff= query parameter into viewingMember on initial load, refresh, or URL change
+  useEffect(() => {
+    if (!staffUrlParam) {
+      if (viewingMember) {
+        dispatch({ type: 'CLOSE_VIEW' });
+      }
+      return;
+    }
+
+    // 1. Check if staff member is already in current staff list
+    const found = staff.find(
+      (m) => m.id === staffUrlParam || (m as any).username === staffUrlParam
+    );
+    if (found) {
+      if (viewingMember?.id !== found.id) {
+        dispatch({ type: 'OPEN_VIEW', payload: found });
+      }
+      return;
+    }
+
+    // 2. If not in current page list, fetch via API
+    let isMounted = true;
+    (async () => {
+      try {
+        const res = await apiFetch(`/api/staff?tenantId=${currentTenantId}&search=${encodeURIComponent(staffUrlParam)}`);
+        if (res.ok) {
+          const data = await res.json();
+          const items = Array.isArray(data) ? data : data.staff || [];
+          const match = items.find(
+            (m: any) => m.id === staffUrlParam || m.username === staffUrlParam
+          );
+          if (match && isMounted) {
+            dispatch({ type: 'OPEN_VIEW', payload: match });
+          }
+        }
+      } catch (err) {
+        console.error("Failed to load staff member from URL:", err);
+      }
+    })();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [staffUrlParam, staff, currentTenantId, viewingMember]);
+
+  const handleOpenView = (member: StaffMember) => {
+    dispatch({ type: 'OPEN_VIEW', payload: member });
+    const params = new URLSearchParams(searchParams.toString());
+    params.set("staff", (member as any).username || member.id);
+    const newQuery = params.toString();
+    router.push(newQuery ? `${pathname}?${newQuery}` : pathname, { scroll: false });
+  };
+
+  const handleCloseView = () => {
+    dispatch({ type: 'CLOSE_VIEW' });
+    const params = new URLSearchParams(searchParams.toString());
+    params.delete("staff");
+    params.delete("staffId");
+    const newQuery = params.toString();
+    router.replace(newQuery ? `${pathname}?${newQuery}` : pathname, { scroll: false });
+  };
+
+  if (loadingStaff || (staffUrlParam && !viewingMember)) return <StaffSkeleton />;
+
   return (
     <>
       {viewingMember ? (
         <StaffProfileView
           member={viewingMember}
           roles={roles}
-          onBack={() => dispatch({ type: 'CLOSE_VIEW' })}
+          onBack={handleCloseView}
           canEdit={canEdit}
           onEditModal={(m) => {
-            dispatch({ type: 'CLOSE_VIEW' });
+            handleCloseView();
             handleOpenEdit(m);
           }}
         />
@@ -396,7 +467,7 @@ export function AdminStaff() {
                   staff={staff}
                   onEdit={handleOpenEdit}
                   onDelete={(m) => dispatch({ type: 'OPEN_DELETE', payload: m })}
-                  onView={(m) => dispatch({ type: 'OPEN_VIEW', payload: m })}
+                  onView={handleOpenView}
                   canEdit={canEdit}
                   canDelete={canDelete}
                 />
@@ -408,7 +479,7 @@ export function AdminStaff() {
                       member={member}
                       onEdit={handleOpenEdit}
                       onDelete={(m) => dispatch({ type: 'OPEN_DELETE', payload: m })}
-                      onView={(m) => dispatch({ type: 'OPEN_VIEW', payload: m })}
+                      onView={handleOpenView}
                       canEdit={canEdit}
                       canDelete={canDelete}
                     />

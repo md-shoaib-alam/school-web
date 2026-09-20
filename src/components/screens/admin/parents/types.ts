@@ -1,12 +1,12 @@
 export interface ChildInfo {
   id: string;
   name: string;
-  email: string;
+  email?: string;
   username?: string;
-  rollNumber: string;
-  className: string;
-  classId: string;
-  gender: string;
+  rollNumber?: string;
+  className?: string;
+  classId?: string;
+  gender?: string;
   dateOfBirth?: string;
 }
 
@@ -33,6 +33,8 @@ export interface StudentInfo {
   classId: string;
   parentId?: string | null;
   parentName?: string | null;
+  email?: string;
+  gender?: string;
 }
 
 const AVATAR_COLORS = [

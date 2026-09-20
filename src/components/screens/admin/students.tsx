@@ -148,10 +148,6 @@ function AdminStudentsContent() {
   const { canCreate, canEdit, canDelete } = useModulePermissions("students");
 
   const [state, dispatch] = useReducer(reducer, initialState);
-  const [
-    viewingStudent,
-    setViewingStudent,
-  ] = useState<StudentInfo | null>(null);
   const {
     search,
     classFilter,
@@ -200,6 +196,7 @@ function AdminStudentsContent() {
   const classIdParam = searchParams.get("classId");
   const pageParam = searchParams.get("page");
   const limitParam = searchParams.get("limit");
+  const studentUrlParam = searchParams.get("student") || searchParams.get("studentId");
 
   // Sync initial URL search params into state (run once on mount)
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -236,7 +233,75 @@ function AdminStudentsContent() {
 
   const handleOpenEdit = (student: StudentInfo) => dispatch({ type: 'OPEN_EDIT', payload: student });
 
-  const handleOpenView = (student: StudentInfo) => setViewingStudent(student);
+  const [viewingStudentSnapshot, setViewingStudentSnapshot] = useState<StudentInfo | null>(null);
+
+  // Synchronize URL ?student= query parameter into viewingStudent on initial load, refresh, or URL change
+  useEffect(() => {
+    if (!studentUrlParam) {
+      if (viewingStudentSnapshot) {
+        setViewingStudentSnapshot(null);
+      }
+      return;
+    }
+
+    // 1. Check if student is already in current students list
+    const found = students.find(
+      (s) => s.id === studentUrlParam || s.rollNumber === studentUrlParam || (s as any).username === studentUrlParam
+    );
+    if (found) {
+      if (viewingStudentSnapshot?.id !== found.id) {
+        setViewingStudentSnapshot(found);
+      }
+      return;
+    }
+
+    // 2. If not in current page list, fetch this specific student by search
+    let isMounted = true;
+    (async () => {
+      try {
+        const res = await apiFetch(`/api/students?tenantId=${currentTenantId}&search=${encodeURIComponent(studentUrlParam)}`);
+        if (res.ok) {
+          const data = await res.json();
+          const items = Array.isArray(data) ? data : data.students || data.items || [];
+          const match = items.find(
+            (s: any) => s.id === studentUrlParam || s.rollNumber === studentUrlParam || s.username === studentUrlParam
+          );
+          if (match && isMounted) {
+            setViewingStudentSnapshot(match);
+          }
+        }
+      } catch (err) {
+        console.error("Failed to load student from URL:", err);
+      }
+    })();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [studentUrlParam, students, currentTenantId]);
+
+  // Derive viewing student dynamically from the latest students list
+  const viewingStudent = useMemo(() => {
+    if (!viewingStudentSnapshot) return null;
+    return students.find((s) => s.id === viewingStudentSnapshot.id) || viewingStudentSnapshot;
+  }, [students, viewingStudentSnapshot]);
+
+  const handleOpenView = (student: StudentInfo) => {
+    setViewingStudentSnapshot(student);
+    const params = new URLSearchParams(searchParams.toString());
+    params.set("student", student.rollNumber || (student as any).username || student.id);
+    const newQuery = params.toString();
+    router.push(newQuery ? `${pathname}?${newQuery}` : pathname, { scroll: false });
+  };
+
+  const handleCloseView = () => {
+    setViewingStudentSnapshot(null);
+    const params = new URLSearchParams(searchParams.toString());
+    params.delete("student");
+    params.delete("studentId");
+    const newQuery = params.toString();
+    router.replace(newQuery ? `${pathname}?${newQuery}` : pathname, { scroll: false });
+  };
 
   const handleSubmit = async () => {
     const isCreate = dialogMode === "create";
@@ -349,16 +414,18 @@ function AdminStudentsContent() {
     );
   };
 
+  if (loadingStudents || (studentUrlParam && !viewingStudent)) return <StudentSkeleton />;
+
   // --- Profile view (full page replace, like teachers) ---
   if (viewingStudent) {
     return (
       <div className="space-y-6">
         <StudentProfileView
           student={viewingStudent}
-          onBack={() => setViewingStudent(null)}
+          onBack={handleCloseView}
           canEdit={canEdit}
           onEdit={(s) => {
-            setViewingStudent(null);
+            handleCloseView();
             handleOpenEdit(s);
           }}
         />

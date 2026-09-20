@@ -147,12 +147,6 @@ export function AdminTeachers() {
   const [state, dispatch] = useReducer(reducer, initialState);
   const { search, currentPage, itemsPerPage, dialogOpen, editingTeacher, formData, submitting, deletingId } = state;
  
-  const [viewingTeacher, setViewingTeacher] = useState<TeacherInfo | null>(null);
-
-  const handleOpenView = (teacher: TeacherInfo) => {
-    setViewingTeacher(teacher);
-  };
- 
    const debouncedSearch = useDebounce(search, 500);
  
    const queryClient = useQueryClient();
@@ -162,6 +156,7 @@ export function AdminTeachers() {
   const pathname = usePathname();
   const pageParam = searchParams.get("page");
   const limitParam = searchParams.get("limit");
+  const teacherUrlParam = searchParams.get("teacher") || searchParams.get("teacherId");
 
   // Sync initial URL search params into state (run once on mount)
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -323,14 +318,87 @@ export function AdminTeachers() {
     executeDeletion(id);
   };
 
+  const [viewingTeacherSnapshot, setViewingTeacherSnapshot] = useState<TeacherInfo | null>(null);
+
+  // Synchronize URL ?teacher= query parameter into viewingTeacher on initial load, refresh, or URL change
+  useEffect(() => {
+    if (!teacherUrlParam) {
+      if (viewingTeacherSnapshot) {
+        setViewingTeacherSnapshot(null);
+      }
+      return;
+    }
+
+    // 1. Check if teacher is already in current teachers list
+    const found = teachers.find(
+      (t) => t.id === teacherUrlParam || (t as any).teacherId === teacherUrlParam || (t as any).username === teacherUrlParam
+    );
+    if (found) {
+      if (viewingTeacherSnapshot?.id !== found.id) {
+        setViewingTeacherSnapshot(found);
+      }
+      return;
+    }
+
+    // 2. If not in current page list, fetch this specific teacher
+    let isMounted = true;
+    (async () => {
+      try {
+        const res = await apiFetch(`/api/teachers?tenantId=${currentTenantId}&search=${encodeURIComponent(teacherUrlParam)}`);
+        if (res.ok) {
+          const data = await res.json();
+          const items = Array.isArray(data) ? data : data.teachers || [];
+          const match = items.find(
+            (t: any) => t.id === teacherUrlParam || t.teacherId === teacherUrlParam || t.username === teacherUrlParam
+          );
+          if (match && isMounted) {
+            setViewingTeacherSnapshot(match);
+          }
+        }
+      } catch (err) {
+        console.error("Failed to load teacher from URL:", err);
+      }
+    })();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [teacherUrlParam, teachers, currentTenantId]);
+
+  // Derive viewing teacher dynamically from the latest teachers list
+  const viewingTeacher = useMemo(() => {
+    if (!viewingTeacherSnapshot) return null;
+    return teachers.find((t) => t.id === viewingTeacherSnapshot.id) || viewingTeacherSnapshot;
+  }, [teachers, viewingTeacherSnapshot]);
+
+  const handleOpenView = (teacher: TeacherInfo) => {
+    setViewingTeacherSnapshot(teacher);
+    const params = new URLSearchParams(searchParams.toString());
+    params.set("teacher", (teacher as any).teacherId || (teacher as any).username || teacher.id);
+    const newQuery = params.toString();
+    router.push(newQuery ? `${pathname}?${newQuery}` : pathname, { scroll: false });
+  };
+
+  const handleCloseView = () => {
+    setViewingTeacherSnapshot(null);
+    const params = new URLSearchParams(searchParams.toString());
+    params.delete("teacher");
+    params.delete("teacherId");
+    const newQuery = params.toString();
+    router.replace(newQuery ? `${pathname}?${newQuery}` : pathname, { scroll: false });
+  };
+
+  if (loading || (teacherUrlParam && !viewingTeacher)) return <TeacherSkeleton />;
+
   if (viewingTeacher) {
     return (
       <div className="space-y-6">
         <TeacherProfileView
           teacher={viewingTeacher}
-          onBack={() => setViewingTeacher(null)}
+          onBack={handleCloseView}
           canEdit={canEdit}
           onEdit={(teacher) => {
+            handleCloseView();
             handleOpenEdit(teacher);
           }}
         />
