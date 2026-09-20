@@ -1,6 +1,6 @@
 "use client";
 
-import { useReducer, useEffect, useCallback, useMemo } from "react";
+import { useReducer, useEffect, useCallback, useMemo, useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -30,7 +30,7 @@ import { StudentDialog } from "./students/StudentDialog";
 import { StudentSkeleton } from "./students/StudentSkeleton";
 import { Pagination } from "./students/Pagination";
 import { ImportExportButtons } from "./students/ImportExportButtons";
-import { StudentDetailDialog } from "./students/StudentDetailDialog";
+import { StudentProfileView } from "./students/StudentProfileView";
 
 // Types
 import type { StudentInfo, ClassInfo, StudentFormData } from "./students/types";
@@ -66,8 +66,6 @@ type State = {
   editingStudent: StudentInfo | null;
   formData: StudentFormData;
   submitting: boolean;
-  viewDialogOpen: boolean;
-  viewingStudent: StudentInfo | null;
 };
 
 type Action =
@@ -81,9 +79,7 @@ type Action =
   | { type: 'OPEN_EDIT'; payload: StudentInfo }
   | { type: 'CLOSE_DIALOG' }
   | { type: 'SET_FORM_DATA'; payload: StudentFormData }
-  | { type: 'SET_SUBMITTING'; payload: boolean }
-  | { type: 'OPEN_VIEW'; payload: StudentInfo }
-  | { type: 'CLOSE_VIEW' };
+  | { type: 'SET_SUBMITTING'; payload: boolean };
 
 const initialState: State = {
   search: "",
@@ -97,8 +93,6 @@ const initialState: State = {
   editingStudent: null,
   formData: emptyFormData,
   submitting: false,
-  viewDialogOpen: false,
-  viewingStudent: null,
 };
 
 function reducer(state: State, action: Action): State {
@@ -144,10 +138,6 @@ function reducer(state: State, action: Action): State {
       return { ...state, formData: action.payload };
     case 'SET_SUBMITTING':
       return { ...state, submitting: action.payload };
-    case 'OPEN_VIEW':
-      return { ...state, viewingStudent: action.payload, viewDialogOpen: true };
-    case 'CLOSE_VIEW':
-      return { ...state, viewDialogOpen: false };
     default:
       return state;
   }
@@ -158,6 +148,10 @@ function AdminStudentsContent() {
   const { canCreate, canEdit, canDelete } = useModulePermissions("students");
 
   const [state, dispatch] = useReducer(reducer, initialState);
+  const [
+    viewingStudent,
+    setViewingStudent,
+  ] = useState<StudentInfo | null>(null);
   const {
     search,
     classFilter,
@@ -170,8 +164,6 @@ function AdminStudentsContent() {
     editingStudent,
     formData,
     submitting,
-    viewDialogOpen,
-    viewingStudent,
   } = state;
 
   const debouncedSearch = useDebounce(search, 300);
@@ -244,7 +236,7 @@ function AdminStudentsContent() {
 
   const handleOpenEdit = (student: StudentInfo) => dispatch({ type: 'OPEN_EDIT', payload: student });
 
-  const handleOpenView = (student: StudentInfo) => dispatch({ type: 'OPEN_VIEW', payload: student });
+  const handleOpenView = (student: StudentInfo) => setViewingStudent(student);
 
   const handleSubmit = async () => {
     const isCreate = dialogMode === "create";
@@ -356,6 +348,35 @@ function AdminStudentsContent() {
       },
     );
   };
+
+  // --- Profile view (full page replace, like teachers) ---
+  if (viewingStudent) {
+    return (
+      <div className="space-y-6">
+        <StudentProfileView
+          student={viewingStudent}
+          onBack={() => setViewingStudent(null)}
+          canEdit={canEdit}
+          onEdit={(s) => {
+            setViewingStudent(null);
+            handleOpenEdit(s);
+          }}
+        />
+
+        <StudentDialog
+          open={dialogOpen}
+          onOpenChange={(open) => {
+            if (!open) dispatch({ type: 'CLOSE_DIALOG' });
+          }}
+          mode={dialogMode}
+          formData={formData}
+          setFormData={(fd) => dispatch({ type: 'SET_FORM_DATA', payload: fd })}
+          submitting={submitting}
+          onSubmit={handleSubmit}
+        />
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -492,25 +513,6 @@ function AdminStudentsContent() {
         submitting={submitting}
         onSubmit={handleSubmit}
       />
-
-      {viewingStudent && (
-        <StudentDetailDialog
-          open={viewDialogOpen}
-          onOpenChange={(open) => {
-            if (open) {
-              dispatch({ type: 'OPEN_VIEW', payload: viewingStudent });
-            } else {
-              dispatch({ type: 'CLOSE_VIEW' });
-            }
-          }}
-          student={viewingStudent}
-          canEdit={canEdit}
-          onEdit={(s) => {
-            dispatch({ type: 'CLOSE_VIEW' });
-            handleOpenEdit(s);
-          }}
-        />
-      )}
     </div>
   );
 }

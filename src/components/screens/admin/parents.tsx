@@ -35,6 +35,7 @@ import { CreateParentDialog } from "./parents/CreateParentDialog";
 import { LinkChildDialog } from "./parents/LinkChildDialog";
 import { ParentSkeleton } from "./parents/ParentSkeleton";
 import { ParentDetailDialog } from "./parents/ParentDetailDialog";
+import { ParentCreatedSuccessDialog, type ParentCreatedData } from "./parents/ParentCreatedSuccessDialog";
 import { ParentInfo, StudentInfo } from "./parents/types";
 
 type State = {
@@ -180,6 +181,8 @@ export function AdminParents() {
 
   const [unlinkConfirmOpen, setUnlinkConfirmOpen] = useState(false);
   const [unlinkData, setUnlinkData] = useState<{ parentId: string; studentId: string } | null>(null);
+  const [createdSuccessData, setCreatedSuccessData] = useState<ParentCreatedData | null>(null);
+  const [createdSuccessOpen, setCreatedSuccessOpen] = useState(false);
 
   const searchParams = useSearchParams();
   const router = useRouter();
@@ -297,6 +300,9 @@ export function AdminParents() {
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
       if (!emailRegex.test(createForm.email)) { toast.error("Please enter a valid email address"); return; }
     }
+
+    const formSnapshot = { ...createForm };
+
     toast.promise(
       (async () => {
         dispatch({ type: 'SET_CREATING', payload: true });
@@ -305,6 +311,18 @@ export function AdminParents() {
           const resData = res.data || {};
           dispatch({ type: 'RESET_CREATE_FORM' });
           queryClient.invalidateQueries({ queryKey: queryKeys.parents });
+
+          setCreatedSuccessData({
+            id: resData.id,
+            name: formSnapshot.name,
+            relationship: formSnapshot.relationship || "Parent",
+            phone: formSnapshot.phone,
+            email: formSnapshot.email,
+            username: resData.username || formSnapshot.username || "PRN2026001",
+            password: formSnapshot.password || "changeme123",
+          });
+          setCreatedSuccessOpen(true);
+
           if (resData.username) {
             return `Parent account created! Parent ID: ${resData.username}`;
           }
@@ -530,6 +548,23 @@ export function AdminParents() {
         onOpenChange={(v) => dispatch({ type: 'SET_DETAIL_OPEN', payload: v })}
         parent={selectedParentDetail}
         onLinkClick={(p) => dispatch({ type: 'OPEN_LINK_DIALOG', payload: p })}
+      />
+
+      <ParentCreatedSuccessDialog
+        open={createdSuccessOpen}
+        onOpenChange={setCreatedSuccessOpen}
+        data={createdSuccessData}
+        onAddAnother={() => {
+          setCreatedSuccessOpen(false);
+          dispatch({ type: 'SET_CREATE_OPEN', payload: true });
+        }}
+        onViewProfile={(parentId) => {
+          setCreatedSuccessOpen(false);
+          const found = parents.find((p) => p.id === parentId);
+          if (found) {
+            dispatch({ type: 'OPEN_DETAIL_DIALOG', payload: found });
+          }
+        }}
       />
 
       <AlertDialog open={unlinkConfirmOpen} onOpenChange={setUnlinkConfirmOpen}>
