@@ -143,72 +143,83 @@ export function TeacherDialog({
           </div>
         </div>
 
-        {/* Scrollable Form Body with Section Cards */}
-        <div
-          className="flex-1 overflow-y-auto px-5 sm:px-8 py-5 space-y-5 overscroll-contain touch-pan-y"
-          data-lenis-prevent
+        {/* Form Boundary: Isolates browser autofill strictly within this dialog */}
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            onSubmit();
+          }}
+          className="flex-1 flex flex-col min-h-0 overflow-hidden"
+          autoComplete="on"
         >
-          {/* ────────────────────────────────────────────────────────── */}
-          {/* SECTION 0: Profile Photo                                   */}
-          {/* ────────────────────────────────────────────────────────── */}
-          <div className="rounded-2xl border border-slate-200/90 dark:border-zinc-800/80 bg-white dark:bg-zinc-900/60 p-5 shadow-[0_1px_3px_rgba(0,0,0,0.02)] space-y-3">
-            <div className="flex items-center gap-2 text-slate-900 dark:text-white font-semibold text-sm sm:text-base">
-              <Camera className="size-4 text-emerald-600" />
-              <div>
-                <span>Profile Photo</span>
-                <p className="text-[11px] font-normal text-slate-400 dark:text-zinc-500">
-                  Upload a clear photo of the teacher (Optional)
-                </p>
-              </div>
-            </div>
-
-            <div className="flex items-center gap-4 pt-1">
-              <div className="size-16 rounded-full bg-emerald-50 dark:bg-emerald-950/40 border-2 border-emerald-500/20 text-emerald-700 dark:text-emerald-400 font-bold text-xl flex items-center justify-center shrink-0">
-                {formData.name ? formData.name.slice(0, 2).toUpperCase() : <User className="size-7 text-emerald-600/70" />}
-              </div>
-              <div className="space-y-1">
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  className="h-9 px-4 text-xs font-semibold rounded-xl border-slate-200 dark:border-zinc-700 text-slate-700 dark:text-zinc-200 hover:bg-slate-50 gap-2"
-                  onClick={() => toast.info("Photo upload will be saved with profile")}
-                >
-                  <Upload className="size-3.5 text-emerald-600" />
-                  Upload Photo
-                </Button>
-                <p className="text-[10px] text-slate-400 dark:text-zinc-500">JPG, PNG up to 5MB</p>
-              </div>
-            </div>
-          </div>
-
-          {/* ────────────────────────────────────────────────────────── */}
-          {/* SECTION 1: Personal Information                           */}
-          {/* ────────────────────────────────────────────────────────── */}
-          <div className="rounded-2xl border border-slate-200/90 dark:border-zinc-800/80 bg-white dark:bg-zinc-900/60 p-5 shadow-[0_1px_3px_rgba(0,0,0,0.02)] space-y-4">
-            <div className="flex items-center gap-2 pb-3 border-b border-slate-100 dark:border-zinc-800/60 text-slate-900 dark:text-white font-semibold text-sm sm:text-base">
-              <User className="size-4 text-emerald-600" />
-              Personal Information
-            </div>
-
-            {/* Row 1: Full Name, Gender, Date of Birth */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-              {/* Full Name */}
-              <div className="space-y-1.5">
-                <Label htmlFor="t_name" className="text-xs font-semibold text-slate-700 dark:text-zinc-300">
-                  Full Name <span className="text-red-500">*</span>
-                </Label>
-                <div className="relative">
-                  <User className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-slate-400" />
-                  <Input
-                    id="t_name"
-                    value={formData.name || ""}
-                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                    placeholder="Enter full name"
-                    className="pl-9 h-9 text-xs rounded-xl bg-slate-50/50 dark:bg-zinc-800/50 border-slate-200 dark:border-zinc-700 focus-visible:ring-emerald-500"
-                  />
+          {/* Scrollable Form Body with Section Cards */}
+          <div
+            className="flex-1 overflow-y-auto px-5 sm:px-8 py-5 space-y-5 overscroll-contain touch-pan-y"
+            data-lenis-prevent
+          >
+            {/* ────────────────────────────────────────────────────────── */}
+            {/* SECTION 0: Profile Photo                                   */}
+            {/* ────────────────────────────────────────────────────────── */}
+            <div className="rounded-2xl border border-slate-200/90 dark:border-zinc-800/80 bg-white dark:bg-zinc-900/60 p-5 shadow-[0_1px_3px_rgba(0,0,0,0.02)] space-y-3">
+              <div className="flex items-center gap-2 text-slate-900 dark:text-white font-semibold text-sm sm:text-base">
+                <Camera className="size-4 text-emerald-600" />
+                <div>
+                  <span>Profile Photo</span>
+                  <p className="text-[11px] font-normal text-slate-400 dark:text-zinc-500">
+                    Upload a clear photo of the teacher (Optional)
+                  </p>
                 </div>
               </div>
+
+              <div className="flex items-center gap-4 pt-1">
+                <div className="size-16 rounded-full bg-emerald-50 dark:bg-emerald-950/40 border-2 border-emerald-500/20 text-emerald-700 dark:text-emerald-400 font-bold text-xl flex items-center justify-center shrink-0">
+                  {formData.name ? formData.name.slice(0, 2).toUpperCase() : <User className="size-7 text-emerald-600/70" />}
+                </div>
+                <div className="space-y-1">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    className="h-9 px-4 text-xs font-semibold rounded-xl border-slate-200 dark:border-zinc-700 text-slate-700 dark:text-zinc-200 hover:bg-slate-50 gap-2"
+                    onClick={() => toast.info("Photo upload will be saved with profile")}
+                  >
+                    <Upload className="size-3.5 text-emerald-600" />
+                    Upload Photo
+                  </Button>
+                  <p className="text-[10px] text-slate-400 dark:text-zinc-500">JPG, PNG up to 5MB</p>
+                </div>
+              </div>
+            </div>
+
+            {/* ────────────────────────────────────────────────────────── */}
+            {/* SECTION 1: Personal Information                           */}
+            {/* ────────────────────────────────────────────────────────── */}
+            <div className="rounded-2xl border border-slate-200/90 dark:border-zinc-800/80 bg-white dark:bg-zinc-900/60 p-5 shadow-[0_1px_3px_rgba(0,0,0,0.02)] space-y-4">
+              <div className="flex items-center gap-2 pb-3 border-b border-slate-100 dark:border-zinc-800/60 text-slate-900 dark:text-white font-semibold text-sm sm:text-base">
+                <User className="size-4 text-emerald-600" />
+                Personal Information
+              </div>
+
+              {/* Row 1: Full Name, Gender, Date of Birth */}
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                {/* Full Name */}
+                <div className="space-y-1.5">
+                  <Label htmlFor="t_name" className="text-xs font-semibold text-slate-700 dark:text-zinc-300">
+                    Full Name <span className="text-red-500">*</span>
+                  </Label>
+                  <div className="relative">
+                    <User className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-slate-400" />
+                    <Input
+                      id="t_name"
+                      name="name"
+                      autoComplete="name"
+                      value={formData.name || ""}
+                      onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                      placeholder="Enter full name"
+                      className="pl-9 h-9 text-xs rounded-xl bg-slate-50/50 dark:bg-zinc-800/50 border-slate-200 dark:border-zinc-700 focus-visible:ring-emerald-500"
+                    />
+                  </div>
+                </div>
 
               {/* Gender */}
               <div className="space-y-1.5">
@@ -326,6 +337,8 @@ export function TeacherDialog({
                   <Mail className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-slate-400" />
                   <Input
                     id="t_email"
+                    name="email"
+                    autoComplete="email"
                     type="email"
                     value={formData.email || ""}
                     onChange={(e) => setFormData({ ...formData, email: e.target.value })}
@@ -345,6 +358,8 @@ export function TeacherDialog({
                     +91
                   </span>
                   <input
+                    name="phone"
+                    autoComplete="tel"
                     type="tel"
                     value={formData.phone || ""}
                     onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
@@ -527,9 +542,8 @@ export function TeacherDialog({
               Cancel
             </Button>
             <Button
-              type="button"
+              type="submit"
               size="sm"
-              onClick={onSubmit}
               disabled={submitting || !isFormValid}
               className="h-9 px-5 text-xs rounded-xl font-semibold bg-emerald-600 hover:bg-emerald-700 text-white gap-1.5 shadow-sm shadow-emerald-600/20"
             >
@@ -547,6 +561,7 @@ export function TeacherDialog({
             </Button>
           </div>
         </div>
+        </form>
       </DialogContent>
     </Dialog>
   );

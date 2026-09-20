@@ -167,7 +167,7 @@ function AdminStudentsContent() {
   const queryClient = useQueryClient();
 
   // Queries
-  const { data: studentData, isFetching: loadingStudents } = useStudents(
+  const { data: studentData, isLoading: loadingStudents, isFetching: fetchingStudents } = useStudents(
     currentTenantId || undefined,
     classFilter === "all" ? undefined : classFilter,
     debouncedSearch || undefined,
@@ -188,7 +188,7 @@ function AdminStudentsContent() {
   }, [studentData]);
   const totalItems = studentData?.total || 0;
   const totalPages = studentData?.totalPages || 1;
-  const loading = loadingStudents;
+  const loading = loadingStudents; // only true on first load, not on search refetches
 
   const searchParams = useSearchParams();
   const router = useRouter();
@@ -344,14 +344,48 @@ function AdminStudentsContent() {
         try {
           const url = "/api/students";
           const method = isCreate ? "POST" : "PUT";
-          const body = isCreate
-            ? formData
-            : { id: editingStudent?.id, ...formData };
+
+          // Clean payload: omit empty strings for optional fields to avoid backend schema validation errors
+          const payload: Record<string, any> = {
+            name: formData.name.trim(),
+            rollNumber: formData.rollNumber.trim(),
+            classId: formData.classId,
+            gender: formData.gender || "male",
+            transportEnabled: Boolean(formData.transportEnabled),
+          };
+
+          if (!isCreate && editingStudent) {
+            payload.id = editingStudent.id;
+          }
+          if (formData.email?.trim()) {
+            payload.email = formData.email.trim();
+          }
+          if (formData.phone?.trim()) {
+            payload.phone = formData.phone.trim();
+          }
+          if (formData.username?.trim()) {
+            payload.username = formData.username.trim();
+          }
+          if (formData.password?.trim()) {
+            payload.password = formData.password.trim();
+          }
+          if (formData.dateOfBirth?.trim()) {
+            payload.dateOfBirth = formData.dateOfBirth.trim();
+          }
+          if (formData.bloodGroup?.trim()) {
+            payload.bloodGroup = formData.bloodGroup.trim();
+          }
+          if (formData.transportEnabled && formData.routeId?.trim()) {
+            payload.routeId = formData.routeId.trim();
+            if (formData.pickupPoint?.trim()) {
+              payload.pickupPoint = formData.pickupPoint.trim();
+            }
+          }
 
           const res = await apiFetch(url, {
             method,
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(body),
+            body: JSON.stringify(payload),
           });
 
           if (!res.ok) {
@@ -414,7 +448,7 @@ function AdminStudentsContent() {
     );
   };
 
-  if (loadingStudents || (studentUrlParam && !viewingStudent)) return <StudentSkeleton />;
+  if (loading || (studentUrlParam && !viewingStudent)) return <StudentSkeleton />;
 
   // --- Profile view (full page replace, like teachers) ---
   if (viewingStudent) {
@@ -451,8 +485,14 @@ function AdminStudentsContent() {
       <div className="flex flex-col xl:flex-row gap-4 items-start xl:items-center justify-between">
         <div className="flex flex-col sm:flex-row gap-3 w-full xl:w-auto flex-1">
           <div className="relative flex-1 max-w-sm">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground pointer-events-none" />
             <Input
+              type="search"
+              name="search_students"
+              autoComplete="off"
+              autoCorrect="off"
+              spellCheck={false}
+              role="searchbox"
               placeholder="Search by name..."
               className="pl-9 h-9 sm:h-10"
               value={search}

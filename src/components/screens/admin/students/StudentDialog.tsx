@@ -184,38 +184,49 @@ export function StudentDialog({
           </div>
         </div>
 
-        {/* Scrollable Form Body with Section Cards */}
-        <div
-          className="flex-1 overflow-y-auto px-5 sm:px-8 py-5 space-y-5 overscroll-contain touch-pan-y"
-          data-lenis-prevent
+        {/* Form Boundary: Isolates browser autofill strictly within this dialog */}
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            onSubmit();
+          }}
+          className="flex-1 flex flex-col min-h-0 overflow-hidden"
+          autoComplete="on"
         >
-          {/* ────────────────────────────────────────────────────────── */}
-          {/* SECTION 1: Personal Information                           */}
-          {/* ────────────────────────────────────────────────────────── */}
-          <div className="rounded-2xl border border-slate-200/90 dark:border-zinc-800/80 bg-white dark:bg-zinc-900/60 p-5 shadow-[0_1px_3px_rgba(0,0,0,0.02)] space-y-4">
-            <div className="flex items-center gap-2 pb-3 border-b border-slate-100 dark:border-zinc-800/60 text-slate-900 dark:text-white font-semibold text-sm sm:text-base">
-              <User className="size-4 text-emerald-600" />
-              Personal Information
-            </div>
-
-            {/* Row 1: Full Name, Gender, Date of Birth */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-              {/* Full Name */}
-              <div className="space-y-1.5">
-                <Label htmlFor="std_name" className="text-xs font-semibold text-slate-700 dark:text-zinc-300">
-                  Full Name <span className="text-red-500">*</span>
-                </Label>
-                <div className="relative">
-                  <User className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-slate-400" />
-                  <Input
-                    id="std_name"
-                    value={formData.name}
-                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                    placeholder="Enter full name"
-                    className="pl-9 h-10 text-xs rounded-xl bg-slate-50/50 dark:bg-zinc-800/50 border-slate-200 dark:border-zinc-700 focus-visible:ring-emerald-500"
-                  />
-                </div>
+          {/* Scrollable Form Body with Section Cards */}
+          <div
+            className="flex-1 overflow-y-auto px-5 sm:px-8 py-5 space-y-5 overscroll-contain touch-pan-y"
+            data-lenis-prevent
+          >
+            {/* ────────────────────────────────────────────────────────── */}
+            {/* SECTION 1: Personal Information                           */}
+            {/* ────────────────────────────────────────────────────────── */}
+            <div className="rounded-2xl border border-slate-200/90 dark:border-zinc-800/80 bg-white dark:bg-zinc-900/60 p-5 shadow-[0_1px_3px_rgba(0,0,0,0.02)] space-y-4">
+              <div className="flex items-center gap-2 pb-3 border-b border-slate-100 dark:border-zinc-800/60 text-slate-900 dark:text-white font-semibold text-sm sm:text-base">
+                <User className="size-4 text-emerald-600" />
+                Personal Information
               </div>
+
+              {/* Row 1: Full Name, Gender, Date of Birth */}
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                {/* Full Name */}
+                <div className="space-y-1.5">
+                  <Label htmlFor="std_name" className="text-xs font-semibold text-slate-700 dark:text-zinc-300">
+                    Full Name <span className="text-red-500">*</span>
+                  </Label>
+                  <div className="relative">
+                    <User className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-slate-400" />
+                    <Input
+                      id="std_name"
+                      name="name"
+                      autoComplete="name"
+                      value={formData.name}
+                      onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                      placeholder="Enter full name"
+                      className="pl-9 h-10 text-xs rounded-xl bg-slate-50/50 dark:bg-zinc-800/50 border-slate-200 dark:border-zinc-700 focus-visible:ring-emerald-500"
+                    />
+                  </div>
+                </div>
 
               {/* Gender */}
               <div className="space-y-1.5">
@@ -259,6 +270,8 @@ export function StudentDialog({
                 </Label>
                 <Input
                   id="std_email"
+                  name="email"
+                  autoComplete="email"
                   type="email"
                   value={formData.email}
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
@@ -278,6 +291,8 @@ export function StudentDialog({
                   </span>
                   <input
                     id="std_phone"
+                    name="phone"
+                    autoComplete="tel"
                     type="tel"
                     value={formData.phone}
                     onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
@@ -593,7 +608,7 @@ export function StudentDialog({
               Cancel
             </Button>
             <Button
-              onClick={onSubmit}
+              type="submit"
               disabled={
                 submitting ||
                 !formData.name ||
@@ -617,6 +632,7 @@ export function StudentDialog({
             </Button>
           </div>
         </div>
+        </form>
       </DialogContent>
     </Dialog>
   );

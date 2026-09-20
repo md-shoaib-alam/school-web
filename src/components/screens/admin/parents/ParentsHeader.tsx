@@ -63,8 +63,14 @@ export function ParentsHeader({
       </div>
 
       <div className="relative w-full sm:max-w-md">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-zinc-400 dark:text-zinc-500" />
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-zinc-400 dark:text-zinc-500 pointer-events-none" />
         <Input
+          type="search"
+          name="search_parents"
+          autoComplete="off"
+          autoCorrect="off"
+          spellCheck={false}
+          role="searchbox"
           placeholder="Search parents or children…"
           className="pl-9 w-full"
           value={search}

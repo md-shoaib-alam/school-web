@@ -127,38 +127,49 @@ export function CreateParentDialog({
           </div>
         </div>
 
-        {/* Scrollable Form Body with Section Cards */}
-        <div
-          className="flex-1 overflow-y-auto px-5 sm:px-8 py-5 space-y-5 overscroll-contain touch-pan-y"
-          data-lenis-prevent
+        {/* Form Boundary: Isolates browser autofill strictly within this dialog */}
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            onCreate();
+          }}
+          className="flex-1 flex flex-col min-h-0 overflow-hidden"
+          autoComplete="on"
         >
-          {/* ────────────────────────────────────────────────────────── */}
-          {/* SECTION 1: Personal Information                           */}
-          {/* ────────────────────────────────────────────────────────── */}
-          <div className="rounded-2xl border border-slate-200/90 dark:border-zinc-800/80 bg-white dark:bg-zinc-900/60 p-5 shadow-[0_1px_3px_rgba(0,0,0,0.02)] space-y-4">
-            <div className="flex items-center gap-2 pb-3 border-b border-slate-100 dark:border-zinc-800/60 text-slate-900 dark:text-white font-semibold text-sm sm:text-base">
-              <User className="size-4 text-emerald-600" />
-              Personal Information
-            </div>
-
-            {/* Row 1: Full Name, Gender, Relationship */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-              {/* Full Name */}
-              <div className="space-y-1.5">
-                <Label htmlFor="p_name" className="text-xs font-semibold text-slate-700 dark:text-zinc-300">
-                  Full Name <span className="text-red-500">*</span>
-                </Label>
-                <div className="relative">
-                  <User className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-slate-400" />
-                  <Input
-                    id="p_name"
-                    value={createForm.name || ""}
-                    onChange={(e) => setCreateForm({ ...createForm, name: e.target.value })}
-                    placeholder="Enter full name"
-                    className="pl-9 h-9 text-xs rounded-xl bg-slate-50/50 dark:bg-zinc-800/50 border-slate-200 dark:border-zinc-700 focus-visible:ring-emerald-500"
-                  />
-                </div>
+          {/* Scrollable Form Body with Section Cards */}
+          <div
+            className="flex-1 overflow-y-auto px-5 sm:px-8 py-5 space-y-5 overscroll-contain touch-pan-y"
+            data-lenis-prevent
+          >
+            {/* ────────────────────────────────────────────────────────── */}
+            {/* SECTION 1: Personal Information                           */}
+            {/* ────────────────────────────────────────────────────────── */}
+            <div className="rounded-2xl border border-slate-200/90 dark:border-zinc-800/80 bg-white dark:bg-zinc-900/60 p-5 shadow-[0_1px_3px_rgba(0,0,0,0.02)] space-y-4">
+              <div className="flex items-center gap-2 pb-3 border-b border-slate-100 dark:border-zinc-800/60 text-slate-900 dark:text-white font-semibold text-sm sm:text-base">
+                <User className="size-4 text-emerald-600" />
+                Personal Information
               </div>
+
+              {/* Row 1: Full Name, Gender, Relationship */}
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                {/* Full Name */}
+                <div className="space-y-1.5">
+                  <Label htmlFor="p_name" className="text-xs font-semibold text-slate-700 dark:text-zinc-300">
+                    Full Name <span className="text-red-500">*</span>
+                  </Label>
+                  <div className="relative">
+                    <User className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-slate-400" />
+                    <Input
+                      id="p_name"
+                      name="name"
+                      autoComplete="name"
+                      value={createForm.name || ""}
+                      onChange={(e) => setCreateForm({ ...createForm, name: e.target.value })}
+                      placeholder="Enter full name"
+                      className="pl-9 h-9 text-xs rounded-xl bg-slate-50/50 dark:bg-zinc-800/50 border-slate-200 dark:border-zinc-700 focus-visible:ring-emerald-500"
+                    />
+                  </div>
+                </div>
 
               {/* Gender */}
               <div className="space-y-1.5">
@@ -252,6 +263,8 @@ export function CreateParentDialog({
                   <Mail className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-slate-400" />
                   <Input
                     id="p_email"
+                    name="email"
+                    autoComplete="email"
                     type="email"
                     value={createForm.email || ""}
                     onChange={(e) => setCreateForm({ ...createForm, email: e.target.value })}
@@ -271,6 +284,8 @@ export function CreateParentDialog({
                     +91
                   </span>
                   <input
+                    name="phone"
+                    autoComplete="tel"
                     type="tel"
                     value={createForm.phone || ""}
                     onChange={(e) => setCreateForm({ ...createForm, phone: e.target.value })}
@@ -416,7 +431,7 @@ export function CreateParentDialog({
               Cancel
             </Button>
             <Button
-              onClick={onCreate}
+              type="submit"
               disabled={creating || !isFormValid}
               className="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-xs rounded-xl px-5 h-10 gap-1.5 shadow-sm"
             >
@@ -434,6 +449,7 @@ export function CreateParentDialog({
             </Button>
           </div>
         </div>
+        </form>
       </DialogContent>
     </Dialog>
   );

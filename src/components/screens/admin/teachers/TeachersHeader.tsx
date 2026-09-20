@@ -24,8 +24,14 @@ export function TeachersHeader({
   return (
     <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
       <div className="relative w-full sm:max-w-sm flex-1 order-2 sm:order-1">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground pointer-events-none" />
         <Input
+          type="search"
+          name="search_teachers"
+          autoComplete="off"
+          autoCorrect="off"
+          spellCheck={false}
+          role="searchbox"
           placeholder="Search teachers…"
           className="pl-9 w-full"
           value={search}

@@ -413,8 +413,14 @@ export function AdminStaff() {
           {/* Header */}
           <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
             <div className="relative w-full sm:max-w-sm flex-1 order-2 sm:order-1">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground pointer-events-none" />
               <Input
+                type="search"
+                name="search_staff"
+                autoComplete="off"
+                autoCorrect="off"
+                spellCheck={false}
+                role="searchbox"
                 placeholder="Search by name, email, phone..."
                 className="pl-9 bg-white dark:bg-zinc-900 w-full"
                 value={search}

@@ -179,7 +179,7 @@ export function AdminTeachers() {
     router.replace(newQuery ? `${pathname}?${newQuery}` : pathname, { scroll: false });
   };
 
-  const { data: teachersData, isFetching: loading } = useTeachers(
+  const { data: teachersData, isLoading: loading } = useTeachers(
      currentTenantId || undefined,
      debouncedSearch || undefined,
      currentPage,
