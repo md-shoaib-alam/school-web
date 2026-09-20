@@ -613,22 +613,20 @@ export function StudentOverviewTab({
                   </Select>
                 </div>
 
-                {/* House */}
+                {/* House (Disabled / Reserved for future feature) */}
                 <div className="space-y-1.5">
-                  <Label className="text-xs font-semibold text-slate-700 dark:text-zinc-300">House</Label>
+                  <Label className="text-xs font-semibold text-slate-700 dark:text-zinc-300">
+                    House <span className="text-[10px] text-slate-400 font-normal">(Not Configured)</span>
+                  </Label>
                   <Select
-                    value={formData.house}
-                    onValueChange={(val) => setFormData({ ...formData, house: val })}
+                    value="Not Assigned"
+                    disabled
                   >
-                    <SelectTrigger className="h-9 text-xs rounded-xl bg-slate-50/50 dark:bg-zinc-800/50 border-slate-200 dark:border-zinc-700">
+                    <SelectTrigger className="h-9 text-xs rounded-xl bg-slate-100/70 dark:bg-zinc-800/40 border-slate-200 dark:border-zinc-800 text-slate-500 cursor-not-allowed">
                       <SelectValue placeholder="Not Assigned" />
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="Not Assigned">Not Assigned</SelectItem>
-                      <SelectItem value="Red House">Red House</SelectItem>
-                      <SelectItem value="Blue House">Blue House</SelectItem>
-                      <SelectItem value="Green House">Green House</SelectItem>
-                      <SelectItem value="Yellow House">Yellow House</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -755,23 +753,20 @@ export function StudentOverviewTab({
                   />
                 </div>
 
-                {/* Relationship */}
+                {/* Relationship (Fixed to Parent on server) */}
                 <div className="space-y-1.5">
                   <Label className="text-xs font-semibold text-slate-700 dark:text-zinc-300">
-                    Relationship <span className="text-red-500">*</span>
+                    Relationship <span className="text-[10px] text-slate-400 font-normal">(Parent)</span>
                   </Label>
                   <Select
-                    value={formData.parentRelationship}
-                    onValueChange={(val) => setFormData({ ...formData, parentRelationship: val })}
+                    value="Parent"
+                    disabled
                   >
-                    <SelectTrigger className="h-9 text-xs rounded-xl bg-slate-50/50 dark:bg-zinc-800/50 border-slate-200 dark:border-zinc-700">
-                      <SelectValue placeholder="Select Relationship" />
+                    <SelectTrigger className="h-9 text-xs rounded-xl bg-slate-100/70 dark:bg-zinc-800/40 border-slate-200 dark:border-zinc-800 text-slate-600 dark:text-zinc-400 cursor-not-allowed">
+                      <SelectValue placeholder="Parent" />
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="Parent">Parent</SelectItem>
-                      <SelectItem value="Father">Father</SelectItem>
-                      <SelectItem value="Mother">Mother</SelectItem>
-                      <SelectItem value="Guardian">Guardian</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>

@@ -410,25 +410,22 @@ export function StudentDialog({
                 </div>
               </div>
 
-              {/* House */}
+              {/* House (Disabled / Reserved for future feature) */}
               <div className="space-y-1.5">
                 <Label className="text-xs font-semibold text-slate-700 dark:text-zinc-300">
-                  House <span className="text-slate-400 font-normal">(Optional)</span>
+                  House <span className="text-[10px] text-slate-400 font-normal">(Not Configured)</span>
                 </Label>
                 <div className="relative">
                   <Select
-                    value={formData.house || ""}
-                    onValueChange={(val) => setFormData({ ...formData, house: val })}
+                    value="Not Assigned"
+                    disabled
                   >
-                    <SelectTrigger className="h-10 text-xs rounded-xl bg-slate-50/50 dark:bg-zinc-800/50 border-slate-200 dark:border-zinc-700 pl-9">
+                    <SelectTrigger className="h-10 text-xs rounded-xl bg-slate-100/70 dark:bg-zinc-800/40 border-slate-200 dark:border-zinc-800 text-slate-500 cursor-not-allowed pl-9">
                       <Home className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-slate-400" />
-                      <SelectValue placeholder="Select house" />
+                      <SelectValue placeholder="Not Assigned" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="Red House">Red House</SelectItem>
-                      <SelectItem value="Blue House">Blue House</SelectItem>
-                      <SelectItem value="Green House">Green House</SelectItem>
-                      <SelectItem value="Yellow House">Yellow House</SelectItem>
+                      <SelectItem value="Not Assigned">Not Assigned</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
