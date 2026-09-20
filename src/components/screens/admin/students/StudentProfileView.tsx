@@ -177,7 +177,7 @@ export function StudentProfileView({
   }
 
   return (
-    <div className="space-y-5 animate-in fade-in duration-200 pb-12 sm:pb-0">
+    <div className="space-y-5 animate-in fade-in duration-200 pb-6">
       {/* Top Breadcrumbs & Action Row matching TeacherProfileView */}
       <div className="flex items-center justify-between gap-3">
         {/* Back Button Pill */}
@@ -304,9 +304,9 @@ export function StudentProfileView({
         </div>
       </div>
 
-      {/* Tab Navigation Bar */}
-      <div className="border-b border-slate-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 rounded-xl px-2 sm:px-4 overflow-x-auto no-scrollbar">
-        <div className="flex items-center justify-around sm:justify-start gap-1 sm:gap-6 -mb-px">
+      {/* Tab Navigation Bar — horizontally scrollable pill row */}
+      <div className="bg-white dark:bg-zinc-900 rounded-xl border border-slate-200/80 dark:border-zinc-800/70 px-2 py-2 overflow-x-auto no-scrollbar">
+        <div className="flex items-center gap-1.5 min-w-max sm:min-w-0">
           {tabs.map((tab) => {
             const Icon = tab.icon;
             const isActive = activeTab === tab.id;
@@ -314,13 +314,15 @@ export function StudentProfileView({
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`flex flex-col sm:flex-row items-center gap-1 sm:gap-2 py-3 px-2 sm:px-3 text-[11px] sm:text-sm font-medium border-b-2 transition-all whitespace-nowrap ${
+                className={`flex items-center gap-2 px-4 py-2 rounded-xl text-[13px] font-semibold whitespace-nowrap transition-all ${
                   isActive
-                    ? "border-emerald-600 text-emerald-700 dark:text-emerald-400 font-semibold"
-                    : "border-transparent text-slate-500 dark:text-zinc-400 hover:text-slate-800 dark:hover:text-zinc-200"
+                    ? "bg-emerald-600 text-white shadow-sm shadow-emerald-600/30"
+                    : "text-slate-500 dark:text-zinc-400 hover:bg-slate-100 dark:hover:bg-zinc-800 hover:text-slate-800 dark:hover:text-zinc-200"
                 }`}
               >
-                <Icon className={`size-4 ${isActive ? "text-emerald-600 dark:text-emerald-400 stroke-[2.2]" : "text-slate-400 stroke-[1.8]"}`} />
+                <Icon className={`size-4 shrink-0 ${
+                  isActive ? "text-white stroke-[2.2]" : "text-slate-400 stroke-[1.8]"
+                }`} />
                 <span>{tab.label}</span>
               </button>
             );
