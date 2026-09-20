@@ -5,11 +5,8 @@ import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import {
   Mail,
-  Phone,
-  Briefcase,
-  GraduationCap,
   User,
-  BookOpen,
+  GraduationCap,
   School,
   Copy,
   Check,
@@ -17,16 +14,22 @@ import {
   ChevronLeft,
   MoreVertical,
   Calendar,
-  MapPin,
   Pencil,
   Building2,
   FileText,
   StickyNote,
-  Users,
 } from "lucide-react";
 import { toast } from "sonner";
 import { copyToClipboard } from "@/lib/utils";
+import { apiFetch } from "@/lib/api";
+import { useQueryClient } from "@tanstack/react-query";
+import { queryKeys } from "@/lib/graphql/keys";
 import type { TeacherInfo } from "./types";
+
+import { TeacherPersonalCard } from "./TeacherPersonalCard";
+import { TeacherProfessionalCard } from "./TeacherProfessionalCard";
+import { TeacherSubjectsCard } from "./TeacherSubjectsCard";
+import { TeacherClassesCard } from "./TeacherClassesCard";
 
 interface TeacherProfileViewProps {
   teacher: TeacherInfo;
@@ -53,10 +56,45 @@ export function TeacherProfileView({
   onEdit,
   isLoading = false,
 }: TeacherProfileViewProps) {
+  const queryClient = useQueryClient();
   const [copiedField, setCopiedField] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<"overview" | "academics" | "attendance" | "classes" | "documents" | "notes">("overview");
 
-  const currentTeacher = teacher;
+  // Local live state of the teacher profile
+  const [currentTeacher, setCurrentTeacher] = useState<TeacherInfo>(teacher);
+
+  // Track which section is in independent edit mode
+  const [editingSection, setEditingSection] = useState<string | null>(null);
+  const [savingSection, setSavingSection] = useState<string | null>(null);
+
+  // Track collapsed status for sections
+  const [collapsed, setCollapsed] = useState<Record<string, boolean>>({
+    personal: false,
+    professional: false,
+    subjects: false,
+    classes: false,
+  });
+
+  const toggleCollapse = (sec: string) => {
+    setCollapsed((prev) => ({ ...prev, [sec]: !prev[sec] }));
+  };
+
+  // Section Form Data
+  const [formData, setFormData] = useState({
+    name: currentTeacher.name || "",
+    email: currentTeacher.email || "",
+    phone: currentTeacher.phone || "",
+    address: currentTeacher.address || "Bangalore, Karnataka",
+    role: currentTeacher.role || "Faculty Member",
+    qualification: currentTeacher.qualification || "B.Ed",
+    experience: currentTeacher.experience || "2 years",
+    joiningDate: currentTeacher.joiningDate || "2024-08-12",
+    status: currentTeacher.status || "active",
+    subjects: currentTeacher.subjects || [],
+    classes: currentTeacher.classes || [],
+    newSubjectInput: "",
+    newClassInput: "",
+  });
 
   const handleCopy = (text: string, fieldName: string) => {
     copyToClipboard(text);
@@ -67,6 +105,93 @@ export function TeacherProfileView({
 
   const handlePrint = () => {
     window.print();
+  };
+
+  const startEdit = (section: string) => {
+    setFormData({
+      name: currentTeacher.name || "",
+      email: currentTeacher.email || "",
+      phone: currentTeacher.phone || "",
+      address: currentTeacher.address || "Bangalore, Karnataka",
+      role: currentTeacher.role || "Faculty Member",
+      qualification: currentTeacher.qualification || "B.Ed",
+      experience: currentTeacher.experience || "2 years",
+      joiningDate: currentTeacher.joiningDate || "2024-08-12",
+      status: currentTeacher.status || "active",
+      subjects: [...(currentTeacher.subjects || [])],
+      classes: [...(currentTeacher.classes || [])],
+      newSubjectInput: "",
+      newClassInput: "",
+    });
+    setEditingSection(section);
+  };
+
+  const cancelEdit = () => {
+    setEditingSection(null);
+  };
+
+  const saveSection = async (sectionName: string, title: string) => {
+    if (sectionName === "personal") {
+      if (!formData.name.trim() || !formData.email.trim()) {
+        toast.error("Name and Email are required");
+        return;
+      }
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(formData.email)) {
+        toast.error("Please enter a valid email address");
+        return;
+      }
+    }
+
+    setSavingSection(sectionName);
+    try {
+      const payload: any = {
+        id: currentTeacher.id,
+        name: formData.name,
+        email: formData.email,
+        phone: formData.phone,
+        qualification: formData.qualification,
+        experience: formData.experience,
+      };
+
+      const res = await apiFetch("/api/teachers", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+
+      if (!res.ok) {
+        const errData = await res.json().catch(() => ({}));
+        throw new Error(errData.error || `Failed to update ${title}`);
+      }
+
+      // Update local state smoothly
+      const updated: TeacherInfo = {
+        ...currentTeacher,
+        name: formData.name,
+        email: formData.email,
+        phone: formData.phone,
+        address: formData.address,
+        role: formData.role,
+        qualification: formData.qualification,
+        experience: formData.experience,
+        joiningDate: formData.joiningDate,
+        status: formData.status,
+        subjects: formData.subjects,
+        classes: formData.classes,
+      };
+
+      setCurrentTeacher(updated);
+      setEditingSection(null);
+      toast.success(`${title} updated successfully`);
+
+      // Refresh teachers in cache
+      queryClient.invalidateQueries({ queryKey: queryKeys.teachers });
+    } catch (err: any) {
+      toast.error(err.message || "Failed to save changes");
+    } finally {
+      setSavingSection(null);
+    }
   };
 
   const tabs = [
@@ -113,7 +238,7 @@ export function TeacherProfileView({
   }
 
   return (
-    <div className="space-y-5 animate-in fade-in duration-200">
+    <div className="space-y-5 animate-in fade-in duration-200 pb-12 sm:pb-0">
       {/* Top Breadcrumbs & Action Row */}
       <div className="flex items-center justify-between gap-3">
         {/* Back Button Pill */}
@@ -135,7 +260,7 @@ export function TeacherProfileView({
         <div className="flex items-center gap-2">
           {canEdit && (
             <Button
-              onClick={() => onEdit && onEdit(currentTeacher)}
+              onClick={() => startEdit("personal")}
               className="hidden sm:inline-flex items-center gap-1.5 h-9 px-4 text-xs font-semibold bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl shadow-xs"
             >
               <Pencil className="size-3.5" />
@@ -259,231 +384,72 @@ export function TeacherProfileView({
       {/* Tab Content Section */}
       {activeTab === "overview" ? (
         <div className="space-y-5">
-          {/* Row 1: Personal & Contact Information and Professional Information Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-            {/* Card 1: Personal & Contact Information */}
-            <div className="rounded-2xl border border-slate-200/90 dark:border-zinc-800/80 bg-white dark:bg-zinc-900/60 p-6 shadow-[0_1px_3px_rgba(0,0,0,0.02)] space-y-4">
-              <div className="flex items-center justify-between pb-3.5 border-b border-slate-100 dark:border-zinc-800/60">
-                <div className="flex items-center gap-2 text-slate-900 dark:text-white font-semibold text-sm sm:text-base">
-                  <User className="size-4 text-emerald-600" />
-                  Personal & Contact Information
-                </div>
-                {canEdit && (
-                  <button
-                    onClick={() => onEdit && onEdit(currentTeacher)}
-                    className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg border border-slate-200 dark:border-zinc-700 text-xs font-medium text-slate-700 dark:text-zinc-300 hover:bg-slate-50 dark:hover:bg-zinc-800 transition-colors"
-                  >
-                    <Pencil className="size-3" />
-                    Edit
-                  </button>
-                )}
-              </div>
+          {/* Card 1: Personal & Contact Information */}
+          <TeacherPersonalCard
+            currentTeacher={currentTeacher}
+            formData={formData}
+            setFormData={setFormData}
+            displayTeacherId={displayTeacherId}
+            displayAddress={displayAddress}
+            canEdit={canEdit}
+            isEditing={editingSection === "personal"}
+            isSaving={savingSection === "personal"}
+            isCollapsed={collapsed.personal}
+            onToggleCollapse={() => toggleCollapse("personal")}
+            onStartEdit={() => startEdit("personal")}
+            onCancelEdit={cancelEdit}
+            onSave={() => saveSection("personal", "Personal Information")}
+            getInitials={getInitials}
+          />
 
-              <div className="space-y-4 text-xs sm:text-sm">
-                {/* Full Name */}
-                <div className="flex items-center justify-between py-0.5">
-                  <span className="flex items-center gap-2.5 text-slate-400 dark:text-zinc-500 font-medium">
-                    <User className="size-4 text-slate-400" />
-                    Full Name
-                  </span>
-                  <span className="font-semibold text-slate-800 dark:text-zinc-100 text-right">
-                    {currentTeacher.name}
-                  </span>
-                </div>
-
-                {/* Email Address */}
-                <div className="flex items-center justify-between py-0.5">
-                  <span className="flex items-center gap-2.5 text-slate-400 dark:text-zinc-500 font-medium">
-                    <Mail className="size-4 text-slate-400" />
-                    Email Address
-                  </span>
-                  <span className="font-semibold text-slate-800 dark:text-zinc-100 text-right truncate max-w-[200px] sm:max-w-xs">
-                    {currentTeacher.email}
-                  </span>
-                </div>
-
-                {/* Phone Number */}
-                <div className="flex items-center justify-between py-0.5">
-                  <span className="flex items-center gap-2.5 text-slate-400 dark:text-zinc-500 font-medium">
-                    <Phone className="size-4 text-slate-400" />
-                    Phone Number
-                  </span>
-                  <span className="font-semibold text-slate-800 dark:text-zinc-100 text-right">
-                    {currentTeacher.phone || "—"}
-                  </span>
-                </div>
-
-                {/* Teacher ID */}
-                <div className="flex items-center justify-between py-0.5">
-                  <span className="flex items-center gap-2.5 text-slate-400 dark:text-zinc-500 font-medium">
-                    <Building2 className="size-4 text-slate-400" />
-                    Teacher ID
-                  </span>
-                  <span className="font-semibold text-slate-800 dark:text-zinc-100 text-right">
-                    {displayTeacherId}
-                  </span>
-                </div>
-
-                {/* Address */}
-                <div className="flex items-center justify-between py-0.5">
-                  <span className="flex items-center gap-2.5 text-slate-400 dark:text-zinc-500 font-medium">
-                    <MapPin className="size-4 text-slate-400" />
-                    Address
-                  </span>
-                  <span className="font-semibold text-slate-800 dark:text-zinc-100 text-right">
-                    {displayAddress}
-                  </span>
-                </div>
-              </div>
-            </div>
-
-            {/* Card 2: Professional Information */}
-            <div className="rounded-2xl border border-slate-200/90 dark:border-zinc-800/80 bg-white dark:bg-zinc-900/60 p-6 shadow-[0_1px_3px_rgba(0,0,0,0.02)] space-y-4">
-              <div className="flex items-center justify-between pb-3.5 border-b border-slate-100 dark:border-zinc-800/60">
-                <div className="flex items-center gap-2 text-slate-900 dark:text-white font-semibold text-sm sm:text-base">
-                  <Briefcase className="size-4 text-emerald-600" />
-                  Professional Information
-                </div>
-                {canEdit && (
-                  <button
-                    onClick={() => onEdit && onEdit(currentTeacher)}
-                    className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg border border-slate-200 dark:border-zinc-700 text-xs font-medium text-slate-700 dark:text-zinc-300 hover:bg-slate-50 dark:hover:bg-zinc-800 transition-colors"
-                  >
-                    <Pencil className="size-3" />
-                    Edit
-                  </button>
-                )}
-              </div>
-
-              <div className="space-y-4 text-xs sm:text-sm">
-                {/* Role */}
-                <div className="flex items-center justify-between py-0.5">
-                  <span className="flex items-center gap-2.5 text-slate-400 dark:text-zinc-500 font-medium">
-                    <User className="size-4 text-slate-400" />
-                    Role
-                  </span>
-                  <span className="font-semibold text-slate-800 dark:text-zinc-100 text-right">
-                    {displayRole}
-                  </span>
-                </div>
-
-                {/* Qualification */}
-                <div className="flex items-center justify-between py-0.5">
-                  <span className="flex items-center gap-2.5 text-slate-400 dark:text-zinc-500 font-medium">
-                    <GraduationCap className="size-4 text-slate-400" />
-                    Qualification
-                  </span>
-                  <span className="font-semibold text-slate-800 dark:text-zinc-100 text-right">
-                    {currentTeacher.qualification || "B.Ed"}
-                  </span>
-                </div>
-
-                {/* Experience */}
-                <div className="flex items-center justify-between py-0.5">
-                  <span className="flex items-center gap-2.5 text-slate-400 dark:text-zinc-500 font-medium">
-                    <Calendar className="size-4 text-slate-400" />
-                    Experience
-                  </span>
-                  <span className="font-semibold text-slate-800 dark:text-zinc-100 text-right">
-                    {currentTeacher.experience || "2 years"}
-                  </span>
-                </div>
-
-                {/* Date of Joining */}
-                <div className="flex items-center justify-between py-0.5">
-                  <span className="flex items-center gap-2.5 text-slate-400 dark:text-zinc-500 font-medium">
-                    <Calendar className="size-4 text-slate-400" />
-                    Date of Joining
-                  </span>
-                  <span className="font-semibold text-slate-800 dark:text-zinc-100 text-right">
-                    {displayJoiningDate}
-                  </span>
-                </div>
-
-                {/* Status */}
-                <div className="flex items-center justify-between py-0.5">
-                  <span className="flex items-center gap-2.5 text-slate-400 dark:text-zinc-500 font-medium">
-                    <Check className="size-4 text-slate-400" />
-                    Status
-                  </span>
-                  <span className="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full text-xs font-semibold bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 border border-emerald-200/80 dark:border-emerald-800">
-                    <span className="size-1.5 rounded-full bg-emerald-500" />
-                    {currentTeacher.status ? currentTeacher.status.charAt(0).toUpperCase() + currentTeacher.status.slice(1) : "Active"}
-                  </span>
-                </div>
-              </div>
-            </div>
-          </div>
+          {/* Card 2: Professional Information */}
+          <TeacherProfessionalCard
+            currentTeacher={currentTeacher}
+            formData={formData}
+            setFormData={setFormData}
+            displayRole={displayRole}
+            displayJoiningDate={displayJoiningDate}
+            canEdit={canEdit}
+            isEditing={editingSection === "professional"}
+            isSaving={savingSection === "professional"}
+            isCollapsed={collapsed.professional}
+            onToggleCollapse={() => toggleCollapse("professional")}
+            onStartEdit={() => startEdit("professional")}
+            onCancelEdit={cancelEdit}
+            onSave={() => saveSection("professional", "Professional Information")}
+          />
 
           {/* Row 2: Assigned Subjects and Classes Taught Cards */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
             {/* Card 3: Assigned Subjects */}
-            <div className="rounded-2xl border border-slate-200/90 dark:border-zinc-800/80 bg-white dark:bg-zinc-900/60 p-6 shadow-[0_1px_3px_rgba(0,0,0,0.02)] space-y-4">
-              <div className="flex items-center justify-between pb-3.5 border-b border-slate-100 dark:border-zinc-800/60">
-                <div className="flex items-center gap-2 text-slate-900 dark:text-white font-semibold text-sm sm:text-base">
-                  <BookOpen className="size-4 text-emerald-600" />
-                  Assigned Subjects ({currentTeacher.subjects?.length || 0})
-                </div>
-                {canEdit && (
-                  <button
-                    onClick={() => onEdit && onEdit(currentTeacher)}
-                    className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg border border-slate-200 dark:border-zinc-700 text-xs font-medium text-slate-700 dark:text-zinc-300 hover:bg-slate-50 dark:hover:bg-zinc-800 transition-colors"
-                  >
-                    <Pencil className="size-3" />
-                    Edit
-                  </button>
-                )}
-              </div>
-
-              {!currentTeacher.subjects || currentTeacher.subjects.length === 0 ? (
-                <p className="text-xs text-slate-400 dark:text-zinc-500 italic">No subjects assigned yet.</p>
-              ) : (
-                <div className="flex flex-wrap gap-2">
-                  {currentTeacher.subjects.map((subj, index) => (
-                    <span
-                      key={index}
-                      className="px-3 py-1 rounded-lg text-xs font-semibold bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 border border-emerald-200/70 dark:border-emerald-800/60"
-                    >
-                      {subj}
-                    </span>
-                  ))}
-                </div>
-              )}
-            </div>
+            <TeacherSubjectsCard
+              currentTeacher={currentTeacher}
+              formData={formData}
+              setFormData={setFormData}
+              canEdit={canEdit}
+              isEditing={editingSection === "subjects"}
+              isSaving={savingSection === "subjects"}
+              isCollapsed={collapsed.subjects}
+              onToggleCollapse={() => toggleCollapse("subjects")}
+              onStartEdit={() => startEdit("subjects")}
+              onCancelEdit={cancelEdit}
+              onSave={() => saveSection("subjects", "Assigned Subjects")}
+            />
 
             {/* Card 4: Classes Taught */}
-            <div className="rounded-2xl border border-slate-200/90 dark:border-zinc-800/80 bg-white dark:bg-zinc-900/60 p-6 shadow-[0_1px_3px_rgba(0,0,0,0.02)] space-y-4">
-              <div className="flex items-center justify-between pb-3.5 border-b border-slate-100 dark:border-zinc-800/60">
-                <div className="flex items-center gap-2 text-slate-900 dark:text-white font-semibold text-sm sm:text-base">
-                  <Users className="size-4 text-emerald-600" />
-                  Classes Taught ({currentTeacher.classes?.length || 0})
-                </div>
-                {canEdit && (
-                  <button
-                    onClick={() => onEdit && onEdit(currentTeacher)}
-                    className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg border border-slate-200 dark:border-zinc-700 text-xs font-medium text-slate-700 dark:text-zinc-300 hover:bg-slate-50 dark:hover:bg-zinc-800 transition-colors"
-                  >
-                    <Pencil className="size-3" />
-                    Edit
-                  </button>
-                )}
-              </div>
-
-              {!currentTeacher.classes || currentTeacher.classes.length === 0 ? (
-                <p className="text-xs text-slate-400 dark:text-zinc-500 italic">No classes assigned yet.</p>
-              ) : (
-                <div className="flex flex-wrap gap-2">
-                  {currentTeacher.classes.map((cls, index) => (
-                    <span
-                      key={index}
-                      className="px-3 py-1 rounded-lg text-xs font-semibold bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 border border-emerald-200/70 dark:border-emerald-800/60"
-                    >
-                      {cls}
-                    </span>
-                  ))}
-                </div>
-              )}
-            </div>
+            <TeacherClassesCard
+              currentTeacher={currentTeacher}
+              formData={formData}
+              setFormData={setFormData}
+              canEdit={canEdit}
+              isEditing={editingSection === "classes"}
+              isSaving={savingSection === "classes"}
+              isCollapsed={collapsed.classes}
+              onToggleCollapse={() => toggleCollapse("classes")}
+              onStartEdit={() => startEdit("classes")}
+              onCancelEdit={cancelEdit}
+              onSave={() => saveSection("classes", "Classes Taught")}
+            />
           </div>
         </div>
       ) : (
@@ -494,10 +460,10 @@ export function TeacherProfileView({
       )}
 
       {/* Mobile Sticky Edit Profile Button */}
-      {canEdit && (
+      {canEdit && editingSection === null && (
         <div className="sm:hidden sticky bottom-4 z-10 pt-2">
           <Button
-            onClick={() => onEdit && onEdit(currentTeacher)}
+            onClick={() => startEdit("personal")}
             className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-sm rounded-xl py-3 gap-2 shadow-lg shadow-emerald-600/20"
           >
             <Pencil className="size-4" />

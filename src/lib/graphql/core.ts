@@ -155,9 +155,9 @@ export async function graphqlQuery<TData>(query: string, variables?: Record<stri
 
 export async function graphqlMutate<TData>(mutation: string, variables?: Record<string, unknown>): Promise<TData> {
   // Mutations are usually not batched to maintain order and immediate feedback
-  const token = getStoredToken();
+  let token = getStoredToken();
   const tenantId = getStoredTenantId();
-  const res = await fetch(GRAPHQL_ENDPOINT, {
+  let res = await fetch(GRAPHQL_ENDPOINT, {
     method: 'POST',
     headers: { 
       'Content-Type': 'application/json',
@@ -166,7 +166,27 @@ export async function graphqlMutate<TData>(mutation: string, variables?: Record<
     },
     body: JSON.stringify({ query: mutation, variables }),
     keepalive: true,
-  })
+  });
+
+  // Handle 401 by attempting to refresh token once
+  if (res.status === 401 && !graphqlRefreshFailed) {
+    try {
+      token = await refreshForGraphQL();
+      res = await fetch(GRAPHQL_ENDPOINT, {
+        method: 'POST',
+        headers: { 
+          'Content-Type': 'application/json',
+          ...(token ? { 'Authorization': `Bearer ${token}` } : {}),
+          ...(tenantId ? { 'x-tenant-id': tenantId } : {})
+        },
+        body: JSON.stringify({ query: mutation, variables }),
+        keepalive: true,
+      });
+    } catch {
+      markGraphqlRefreshFailed();
+    }
+  }
+
   if (!res.ok) {
     const errorBody = await res.text();
     console.error(`[GraphQL Mutation Error] Status: ${res.status}`, { 

@@ -29,9 +29,18 @@ const emptyFormData = {
   name: "",
   email: "",
   phone: "",
-  qualification: "",
+  qualification: "B.Ed",
   experience: "",
   password: "",
+  gender: "male",
+  dateOfBirth: "",
+  teacherId: "",
+  alternatePhone: "",
+  address: "",
+  role: "Faculty Member",
+  subjects: "Mathematics",
+  joiningDate: "",
+  status: "active",
 };
 
 function validateTeacherForm(formData: typeof emptyFormData): boolean {
@@ -203,11 +212,16 @@ export function AdminTeachers() {
       payload: {
         teacher,
         formData: {
+          ...emptyFormData,
           name: teacher.name,
           email: teacher.email,
           phone: teacher.phone || "",
-          qualification: teacher.qualification || "",
+          qualification: teacher.qualification || "B.Ed",
           experience: teacher.experience || "",
+          address: teacher.address || "",
+          role: teacher.role || "Faculty Member",
+          joiningDate: teacher.joiningDate || "",
+          status: teacher.status || "active",
           password: "",
         },
       },

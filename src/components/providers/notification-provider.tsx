@@ -24,10 +24,14 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
             console.log("FCM Token Generated:", fcmToken);
             
             // Save token to backend
-            saveToken({ 
-              token: fcmToken, 
-              platform: "web" 
-            });
+            try {
+              await saveToken({ 
+                token: fcmToken, 
+                platform: "web" 
+              });
+            } catch (saveErr) {
+              console.warn("Could not register FCM notification token with backend:", saveErr);
+            }
           }
         } catch (err) {
           console.error("Failed to initialize notifications", err);
