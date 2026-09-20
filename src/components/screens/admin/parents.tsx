@@ -194,6 +194,7 @@ export function AdminParents() {
   const pathname = usePathname();
   const pageParam = searchParams.get("page");
   const limitParam = searchParams.get("limit");
+  const parentUrlParam = searchParams.get("parent") || searchParams.get("parentId");
 
   // Sync initial URL search params into state (run once on mount)
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -341,6 +342,32 @@ export function AdminParents() {
   const handleLinkChild = async (studentId: string) => {
     if (!selectedParent) return;
     const targetParentId = selectedParent.id;
+    const targetStudent = students.find((s) => s.id === studentId);
+    const newChild = targetStudent
+      ? {
+          id: targetStudent.id,
+          name: targetStudent.name,
+          email: targetStudent.email,
+          rollNumber: targetStudent.rollNumber,
+          className: targetStudent.className,
+          gender: targetStudent.gender,
+          classId: targetStudent.classId,
+        }
+      : {
+          id: studentId,
+          name: "Student",
+        };
+
+    // Optimistically update viewingParentSnapshot so the profile view updates instantly
+    setViewingParentSnapshot((prev) => {
+      if (!prev || prev.id !== targetParentId) return prev;
+      const existing = prev.children || [];
+      if (existing.some((c) => c.id === studentId)) return prev;
+      return {
+        ...prev,
+        children: [...existing, newChild],
+      };
+    });
 
     // Optimistically update React Query cache in memory
     queryClient.setQueriesData({ queryKey: queryKeys.parents }, (oldData: any) => {
@@ -348,7 +375,8 @@ export function AdminParents() {
       const updateParent = (p: any) => {
         if (p.id === targetParentId) {
           const existing = p.children || [];
-          return { ...p, children: [...existing, { id: studentId, name: 'Updating...' }] };
+          if (existing.some((c: any) => c.id === studentId)) return p;
+          return { ...p, children: [...existing, newChild] };
         }
         return p;
       };
@@ -358,16 +386,30 @@ export function AdminParents() {
       return oldData;
     });
 
+    // Optimistically update students query so badge turns to Linked in LinkChildDialog
+    queryClient.setQueriesData({ queryKey: ['students-min-infinite'] }, (old: any) => {
+      if (!old || !old.pages) return old;
+      return {
+        ...old,
+        pages: old.pages.map((page: any) => ({
+          ...page,
+          items: (page.items || []).map((s: any) =>
+            s.id === studentId ? { ...s, parentId: targetParentId } : s
+          ),
+        })),
+      };
+    });
+
     toast.promise(
       (async () => {
         dispatch({ type: 'SET_LINKING', payload: true });
         try {
           await api.post("/parents", { action: "link", parentId: targetParentId, studentId });
-          queryClient.invalidateQueries({ queryKey: queryKeys.parents });
-          queryClient.invalidateQueries({ queryKey: ['students-min-infinite'] });
+          await queryClient.invalidateQueries({ queryKey: queryKeys.parents, refetchType: 'all' });
+          await queryClient.invalidateQueries({ queryKey: ['students-min-infinite'], refetchType: 'all' });
           return "Student linked successfully";
         } catch (err) {
-          queryClient.invalidateQueries({ queryKey: queryKeys.parents });
+          await queryClient.invalidateQueries({ queryKey: queryKeys.parents, refetchType: 'all' });
           throw err;
         } finally { dispatch({ type: 'SET_LINKING', payload: false }); }
       })(),
@@ -386,6 +428,15 @@ export function AdminParents() {
     setUnlinkConfirmOpen(false);
     setUnlinkData(null);
 
+    // Optimistically update viewingParentSnapshot so profile view removes child immediately
+    setViewingParentSnapshot((prev) => {
+      if (!prev || prev.id !== parentId) return prev;
+      return {
+        ...prev,
+        children: (prev.children || []).filter((c) => c.id !== studentId),
+      };
+    });
+
     // Optimistically update React Query cache in memory immediately
     queryClient.setQueriesData({ queryKey: queryKeys.parents }, (oldData: any) => {
       if (!oldData) return oldData;
@@ -401,14 +452,29 @@ export function AdminParents() {
       return oldData;
     });
 
+    // Optimistically update students query so student is marked unlinked
+    queryClient.setQueriesData({ queryKey: ['students-min-infinite'] }, (old: any) => {
+      if (!old || !old.pages) return old;
+      return {
+        ...old,
+        pages: old.pages.map((page: any) => ({
+          ...page,
+          items: (page.items || []).map((s: any) =>
+            s.id === studentId ? { ...s, parentId: null } : s
+          ),
+        })),
+      };
+    });
+
     toast.promise(
       (async () => {
         try {
           await api.post("/parents", { action: "unlink", parentId, studentId });
-          queryClient.invalidateQueries({ queryKey: ['students-min-infinite'] });
+          await queryClient.invalidateQueries({ queryKey: queryKeys.parents, refetchType: 'all' });
+          await queryClient.invalidateQueries({ queryKey: ['students-min-infinite'], refetchType: 'all' });
           return "Child record unlinked";
         } catch (err) {
-          queryClient.invalidateQueries({ queryKey: queryKeys.parents });
+          await queryClient.invalidateQueries({ queryKey: queryKeys.parents, refetchType: 'all' });
           throw err;
         }
       })(),
@@ -452,9 +518,76 @@ export function AdminParents() {
   };
   
   // Show skeleton during initial load OR when fetching new page data
-  const [viewingParent, setViewingParent] = useState<ParentInfo | null>(null);
+  const [viewingParentSnapshot, setViewingParentSnapshot] = useState<ParentInfo | null>(null);
 
-  if (loadingParents) return <ParentSkeleton />;
+  // Synchronize URL ?parent= query parameter into viewingParent on initial load, refresh, or URL change
+  useEffect(() => {
+    if (!parentUrlParam) {
+      if (viewingParentSnapshot) {
+        setViewingParentSnapshot(null);
+      }
+      return;
+    }
+
+    // 1. Check if parent is already in the current parents list
+    const found = parents.find(
+      (p) => p.id === parentUrlParam || p.username === parentUrlParam
+    );
+    if (found) {
+      if (viewingParentSnapshot?.id !== found.id) {
+        setViewingParentSnapshot(found);
+      }
+      return;
+    }
+
+    // 2. If not in current page list, fetch this specific parent by ID or username
+    let isMounted = true;
+    (async () => {
+      try {
+        const res = await api.get("/parents", {
+          params: { search: parentUrlParam, limit: 10 },
+        });
+        const items = res?.data?.items || (res as any)?.items || [];
+        const match = items.find(
+          (p: any) => p.id === parentUrlParam || p.username === parentUrlParam
+        );
+        if (match && isMounted) {
+          setViewingParentSnapshot(match);
+        }
+      } catch (err) {
+        console.error("Failed to load parent from URL:", err);
+      }
+    })();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [parentUrlParam, parents]);
+
+  // Derive viewing parent dynamically from the latest parents list to keep profile view synchronized reactively
+  const viewingParent = useMemo(() => {
+    if (!viewingParentSnapshot) return null;
+    return parents.find((p) => p.id === viewingParentSnapshot.id) || viewingParentSnapshot;
+  }, [parents, viewingParentSnapshot]);
+
+  const handleOpenParentProfile = (p: ParentInfo) => {
+    setViewingParentSnapshot(p);
+    const params = new URLSearchParams(searchParams.toString());
+    params.set("parent", p.username || p.id);
+    const newQuery = params.toString();
+    router.push(newQuery ? `${pathname}?${newQuery}` : pathname, { scroll: false });
+  };
+
+  const handleCloseParentProfile = () => {
+    setViewingParentSnapshot(null);
+    const params = new URLSearchParams(searchParams.toString());
+    params.delete("parent");
+    params.delete("parentId");
+    const newQuery = params.toString();
+    router.replace(newQuery ? `${pathname}?${newQuery}` : pathname, { scroll: false });
+  };
+
+  if (loadingParents || (parentUrlParam && !viewingParent)) return <ParentSkeleton />;
 
   return (
     <>
@@ -462,15 +595,16 @@ export function AdminParents() {
       {viewingParent ? (
         <ParentProfileView
           parent={viewingParent}
-          onBack={() => setViewingParent(null)}
+          onBack={handleCloseParentProfile}
           canEdit={true}
           onEdit={(p) => {
-            setViewingParent(null);
+            handleCloseParentProfile();
             dispatch({ type: 'OPEN_EDIT_DIALOG', payload: p });
           }}
           onLinkChild={(p) => {
             dispatch({ type: 'OPEN_LINK_DIALOG', payload: p });
           }}
+          onUnlinkChild={handleUnlinkChild}
         />
       ) : (
         <div className="space-y-6">
@@ -492,7 +626,7 @@ export function AdminParents() {
               onEdit={(p) => dispatch({ type: 'OPEN_EDIT_DIALOG', payload: p })}
               onDelete={handleDelete}
               onLinkOpen={(p) => dispatch({ type: 'OPEN_LINK_DIALOG', payload: p })}
-              onView={(p) => setViewingParent(p)}
+              onView={handleOpenParentProfile}
             />
           ) : (
             <ParentsGridView
@@ -502,7 +636,7 @@ export function AdminParents() {
               onDelete={handleDelete}
               onLinkOpen={(p) => dispatch({ type: 'OPEN_LINK_DIALOG', payload: p })}
               onUnlinkChild={handleUnlinkChild}
-              onView={(p) => setViewingParent(p)}
+              onView={handleOpenParentProfile}
             />
           )}
 
@@ -581,7 +715,7 @@ export function AdminParents() {
         onViewProfile={(parentId) => {
           setCreatedSuccessOpen(false);
           const found = parents.find((p) => p.id === parentId);
-          if (found) setViewingParent(found);
+          if (found) handleOpenParentProfile(found);
         }}
       />
 

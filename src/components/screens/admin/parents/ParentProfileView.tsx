@@ -19,7 +19,7 @@ import {
   Link as LinkIcon, Copy, Check, GraduationCap,
   CreditCard, FileText, StickyNote, MoreHorizontal,
   Building2, ChevronUp, ChevronDown, Eye, EyeOff, Lock,
-  Loader2, Upload, MapPin
+  Loader2, Upload, MapPin, Unlink2
 } from "lucide-react";
 import { toast } from "sonner";
 import { copyToClipboard } from "@/lib/utils";
@@ -34,9 +34,17 @@ interface ParentProfileViewProps {
   canEdit?: boolean;
   onEdit?: (parent: ParentInfo) => void;
   onLinkChild?: (parent: ParentInfo) => void;
+  onUnlinkChild?: (parentId: string, studentId: string) => void;
 }
 
-export function ParentProfileView({ parent, onBack, canEdit = true, onEdit, onLinkChild }: ParentProfileViewProps) {
+export function ParentProfileView({
+  parent,
+  onBack,
+  canEdit = true,
+  onEdit,
+  onLinkChild,
+  onUnlinkChild,
+}: ParentProfileViewProps) {
   const queryClient = useQueryClient();
   const [activeTab, setActiveTab] = useState<"overview"|"children"|"fees"|"documents"|"notes"|"more">("overview");
   const [copiedField, setCopiedField] = useState<string|null>(null);
@@ -49,6 +57,9 @@ export function ParentProfileView({ parent, onBack, canEdit = true, onEdit, onLi
   useEffect(() => {
     setCurrentParent(parent);
   }, [parent]);
+
+  // Keep children reactive to both incoming parent prop and local updates
+  const currentChildren = parent?.children ?? currentParent?.children ?? [];
 
   // Track which section is in independent edit mode
   const [editingSection, setEditingSection] = useState<string | null>(null);
@@ -589,7 +600,7 @@ export function ParentProfileView({ parent, onBack, canEdit = true, onEdit, onLi
             <div className="flex items-center justify-between px-5 sm:px-6 py-4 border-b border-slate-100 dark:border-zinc-800">
               <div className="flex items-center gap-2.5">
                 <Users className="size-4 text-emerald-600 dark:text-emerald-400" />
-                <h2 className="text-sm font-bold text-slate-900 dark:text-white">Linked Children ({currentParent.children?.length || 0})</h2>
+                <h2 className="text-sm font-bold text-slate-900 dark:text-white">Linked Children ({currentChildren.length})</h2>
               </div>
               <div className="flex items-center gap-1">
                 {onLinkChild && (
@@ -604,7 +615,7 @@ export function ParentProfileView({ parent, onBack, canEdit = true, onEdit, onLi
             </div>
             {!collapsed.children && (
               <div className="px-5 sm:px-6 py-5">
-                {!currentParent.children || currentParent.children.length === 0 ? (
+                {currentChildren.length === 0 ? (
                   <div className="flex flex-col items-center justify-center py-10">
                     <GraduationCap className="size-10 text-slate-300 dark:text-zinc-600 mb-3" />
                     <p className="text-sm font-semibold text-slate-500 dark:text-zinc-400">No children linked to this parent</p>
@@ -619,16 +630,32 @@ export function ParentProfileView({ parent, onBack, canEdit = true, onEdit, onLi
                   </div>
                 ) : (
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    {currentParent.children.map((child) => (
-                      <div key={child.id} className="flex items-center gap-3 p-3.5 rounded-xl bg-slate-50/80 dark:bg-zinc-800/50 border border-slate-200/70 dark:border-zinc-700/60 hover:border-emerald-200 dark:hover:border-emerald-800/60 transition-colors">
-                        <div className="size-10 rounded-full bg-emerald-100 dark:bg-emerald-950/60 flex items-center justify-center text-base shrink-0">
-                          {child.gender === "male" ? "👦" : "👧"}
+                    {currentChildren.map((child) => (
+                      <div key={child.id} className="flex items-center justify-between gap-3 p-3.5 rounded-xl bg-slate-50/80 dark:bg-zinc-800/50 border border-slate-200/70 dark:border-zinc-700/60 hover:border-emerald-200 dark:hover:border-emerald-800/60 transition-colors">
+                        <div className="flex items-center gap-3 min-w-0 flex-1">
+                          <div className="size-10 rounded-full bg-emerald-100 dark:bg-emerald-950/60 flex items-center justify-center text-base shrink-0">
+                            {child.gender === "male" ? "👦" : "👧"}
+                          </div>
+                          <div className="min-w-0 flex-1">
+                            <p className="text-sm font-bold text-slate-900 dark:text-white truncate">{child.name}</p>
+                            <p className="text-[11px] text-slate-500 dark:text-zinc-400 font-medium truncate mt-0.5">{child.className || "Unassigned"} · Roll {child.rollNumber}</p>
+                          </div>
                         </div>
-                        <div className="min-w-0 flex-1">
-                          <p className="text-sm font-bold text-slate-900 dark:text-white truncate">{child.name}</p>
-                          <p className="text-[11px] text-slate-500 dark:text-zinc-400 font-medium truncate mt-0.5">{child.className || "Unassigned"} · Roll {child.rollNumber}</p>
-                        </div>
-                        <GraduationCap className="size-4 text-slate-300 dark:text-zinc-600 shrink-0" />
+                        {onUnlinkChild ? (
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              onUnlinkChild(currentParent.id, child.id);
+                            }}
+                            title="Unlink student"
+                            className="p-1.5 rounded-lg text-slate-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/30 transition-colors shrink-0"
+                          >
+                            <Unlink2 className="size-4" />
+                          </button>
+                        ) : (
+                          <GraduationCap className="size-4 text-slate-300 dark:text-zinc-600 shrink-0" />
+                        )}
                       </div>
                     ))}
                   </div>
@@ -645,7 +672,7 @@ export function ParentProfileView({ parent, onBack, canEdit = true, onEdit, onLi
           <div className="flex items-center justify-between mb-5">
             <div className="flex items-center gap-2.5">
               <Users className="size-4 text-emerald-600 dark:text-emerald-400" />
-              <h2 className="text-sm font-bold text-slate-900 dark:text-white">All Linked Children ({currentParent.children?.length || 0})</h2>
+              <h2 className="text-sm font-bold text-slate-900 dark:text-white">All Linked Children ({currentChildren.length})</h2>
             </div>
             {onLinkChild && (
               <button onClick={() => onLinkChild(currentParent)} className="inline-flex items-center gap-1.5 text-xs font-semibold text-emerald-600 dark:text-emerald-400 px-3 py-1.5 rounded-lg border border-emerald-200/70 dark:border-emerald-800/60 hover:bg-emerald-50 dark:hover:bg-emerald-950/30 transition-colors">
@@ -653,21 +680,36 @@ export function ParentProfileView({ parent, onBack, canEdit = true, onEdit, onLi
               </button>
             )}
           </div>
-          {!currentParent.children || currentParent.children.length === 0 ? (
+          {currentChildren.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-16 border border-dashed border-slate-200 dark:border-zinc-700 rounded-xl">
               <GraduationCap className="size-10 text-slate-300 dark:text-zinc-600 mb-3" />
               <p className="text-sm font-medium text-slate-400 dark:text-zinc-500">No children linked</p>
             </div>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-              {currentParent.children.map((child) => (
+              {currentChildren.map((child) => (
                 <div key={child.id} className="flex flex-col gap-3 p-4 rounded-xl bg-slate-50/80 dark:bg-zinc-800/50 border border-slate-200/70 dark:border-zinc-700/60 hover:border-emerald-200 dark:hover:border-emerald-800/60 transition-colors">
-                  <div className="flex items-center gap-3">
-                    <div className="size-11 rounded-full bg-emerald-100 dark:bg-emerald-950/60 flex items-center justify-center text-lg shrink-0">{child.gender === "male" ? "👦" : "👧"}</div>
-                    <div className="min-w-0">
-                      <p className="text-sm font-bold text-slate-900 dark:text-white truncate">{child.name}</p>
-                      <p className="text-[11px] text-slate-500 dark:text-zinc-400 font-medium mt-0.5">{child.className || "Unassigned"}</p>
+                  <div className="flex items-center justify-between gap-3">
+                    <div className="flex items-center gap-3 min-w-0 flex-1">
+                      <div className="size-11 rounded-full bg-emerald-100 dark:bg-emerald-950/60 flex items-center justify-center text-lg shrink-0">{child.gender === "male" ? "👦" : "👧"}</div>
+                      <div className="min-w-0">
+                        <p className="text-sm font-bold text-slate-900 dark:text-white truncate">{child.name}</p>
+                        <p className="text-[11px] text-slate-500 dark:text-zinc-400 font-medium mt-0.5">{child.className || "Unassigned"}</p>
+                      </div>
                     </div>
+                    {onUnlinkChild && (
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onUnlinkChild(currentParent.id, child.id);
+                        }}
+                        title="Unlink student"
+                        className="p-1.5 rounded-lg text-slate-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/30 transition-colors shrink-0"
+                      >
+                        <Unlink2 className="size-4" />
+                      </button>
+                    )}
                   </div>
                   <div className="grid grid-cols-2 gap-2 pt-2 border-t border-slate-100 dark:border-zinc-700/50">
                     <div>
