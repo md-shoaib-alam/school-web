@@ -36,6 +36,7 @@ import { LinkChildDialog } from "./parents/LinkChildDialog";
 import { ParentSkeleton } from "./parents/ParentSkeleton";
 import { ParentDetailDialog } from "./parents/ParentDetailDialog";
 import { ParentCreatedSuccessDialog, type ParentCreatedData } from "./parents/ParentCreatedSuccessDialog";
+import { ParentProfileView } from "./parents/ParentProfileView";
 import { ParentInfo, StudentInfo } from "./parents/types";
 
 type State = {
@@ -54,7 +55,7 @@ type State = {
   editOpen: boolean;
   editingParent: ParentInfo | null;
   editForm: {
-    name: string; email: string; phone: string; occupation: string;
+    name: string; email: string; phone: string; alternatePhone?: string; occupation: string; gender?: string; dateOfBirth?: string; address?: string;
   };
   editing: boolean;
   detailOpen: boolean;
@@ -96,7 +97,7 @@ const initialState: State = {
   editOpen: false,
   editingParent: null,
   editForm: {
-    name: "", email: "", phone: "", occupation: "",
+    name: "", email: "", phone: "", alternatePhone: "", occupation: "", gender: "male", dateOfBirth: "", address: "",
   },
   editing: false,
   detailOpen: false,
@@ -121,10 +122,14 @@ const actionHandlers: {
     ...state,
     editingParent: payload,
     editForm: {
-      name: payload.name,
-      email: payload.email,
+      name: payload.name || "",
+      email: payload.email || "",
       phone: payload.phone || "",
-      occupation: payload.occupation || ""
+      alternatePhone: (payload as any).alternatePhone || "",
+      occupation: payload.occupation || "",
+      gender: (payload as any).gender || "male",
+      dateOfBirth: (payload as any).dateOfBirth || "",
+      address: (payload as any).address || "",
     },
     editOpen: true
   }),
@@ -447,57 +452,78 @@ export function AdminParents() {
   };
   
   // Show skeleton during initial load OR when fetching new page data
+  const [viewingParent, setViewingParent] = useState<ParentInfo | null>(null);
+
   if (loadingParents) return <ParentSkeleton />;
 
   return (
-    <div className="space-y-6">
-      <ParentsHeader 
-        search={search}
-        onSearchChange={(v) => dispatch({ type: 'SET_SEARCH', payload: v })}
-        totalParents={parents.length}
-        totalChildren={parents.reduce((s, p) => s + (p.children?.length || 0), 0)}
-        viewMode={viewMode}
-        setViewMode={setViewMode}
-        onAddClick={() => dispatch({ type: 'SET_CREATE_OPEN', payload: true })}
-      />
-
-      {parents.length === 0 ? (
-        <ParentsEmptyState />
-      ) : viewMode === "table" ? (
-        <ParentsTableView 
-          parents={parents}
-          onEdit={(p) => dispatch({ type: 'OPEN_EDIT_DIALOG', payload: p })}
-          onDelete={handleDelete}
-          onLinkOpen={(p) => dispatch({ type: 'OPEN_LINK_DIALOG', payload: p })}
-          onView={(p) => dispatch({ type: 'OPEN_DETAIL_DIALOG', payload: p })}
+    <>
+      {/* Full-page profile view OR list view */}
+      {viewingParent ? (
+        <ParentProfileView
+          parent={viewingParent}
+          onBack={() => setViewingParent(null)}
+          canEdit={true}
+          onEdit={(p) => {
+            setViewingParent(null);
+            dispatch({ type: 'OPEN_EDIT_DIALOG', payload: p });
+          }}
+          onLinkChild={(p) => {
+            dispatch({ type: 'OPEN_LINK_DIALOG', payload: p });
+          }}
         />
       ) : (
-        <ParentsGridView 
-          parents={parents}
-          linking={linking}
-          onEdit={(p) => dispatch({ type: 'OPEN_EDIT_DIALOG', payload: p })}
-          onDelete={handleDelete}
-          onLinkOpen={(p) => dispatch({ type: 'OPEN_LINK_DIALOG', payload: p })}
-          onUnlinkChild={handleUnlinkChild}
-          onView={(p) => dispatch({ type: 'OPEN_DETAIL_DIALOG', payload: p })}
-        />
+        <div className="space-y-6">
+          <ParentsHeader
+            search={search}
+            onSearchChange={(v) => dispatch({ type: 'SET_SEARCH', payload: v })}
+            totalParents={parents.length}
+            totalChildren={parents.reduce((s, p) => s + (p.children?.length || 0), 0)}
+            viewMode={viewMode}
+            setViewMode={setViewMode}
+            onAddClick={() => dispatch({ type: 'SET_CREATE_OPEN', payload: true })}
+          />
+
+          {parents.length === 0 ? (
+            <ParentsEmptyState />
+          ) : viewMode === "table" ? (
+            <ParentsTableView
+              parents={parents}
+              onEdit={(p) => dispatch({ type: 'OPEN_EDIT_DIALOG', payload: p })}
+              onDelete={handleDelete}
+              onLinkOpen={(p) => dispatch({ type: 'OPEN_LINK_DIALOG', payload: p })}
+              onView={(p) => setViewingParent(p)}
+            />
+          ) : (
+            <ParentsGridView
+              parents={parents}
+              linking={linking}
+              onEdit={(p) => dispatch({ type: 'OPEN_EDIT_DIALOG', payload: p })}
+              onDelete={handleDelete}
+              onLinkOpen={(p) => dispatch({ type: 'OPEN_LINK_DIALOG', payload: p })}
+              onUnlinkChild={handleUnlinkChild}
+              onView={(p) => setViewingParent(p)}
+            />
+          )}
+
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            totalItems={totalItems}
+            itemsPerPage={itemsPerPage}
+            onPageChange={(page) => {
+              dispatch({ type: 'SET_CURRENT_PAGE', payload: page });
+              updateUrlParams(page, itemsPerPage);
+            }}
+            onLimitChange={(limit) => {
+              dispatch({ type: 'SET_ITEMS_PER_PAGE', payload: limit });
+              updateUrlParams(1, limit);
+            }}
+          />
+        </div>
       )}
 
-      <Pagination
-        currentPage={currentPage}
-        totalPages={totalPages}
-        totalItems={totalItems}
-        itemsPerPage={itemsPerPage}
-        onPageChange={(page) => {
-          dispatch({ type: 'SET_CURRENT_PAGE', payload: page });
-          updateUrlParams(page, itemsPerPage);
-        }}
-        onLimitChange={(limit) => {
-          dispatch({ type: 'SET_ITEMS_PER_PAGE', payload: limit });
-          updateUrlParams(1, limit);
-        }}
-      />
-
+      {/* ── Dialogs — always rendered so they work from both views ── */}
       <CreateParentDialog
         open={createOpen}
         onOpenChange={(v) => dispatch({ type: 'SET_CREATE_OPEN', payload: v })}
@@ -510,6 +536,7 @@ export function AdminParents() {
       <EditParentDialog
         open={editOpen}
         onOpenChange={(v) => dispatch({ type: 'SET_EDIT_OPEN', payload: v })}
+        editingParent={editingParent}
         editForm={editForm}
         setEditForm={(v) => dispatch({ type: 'SET_EDIT_FORM', payload: v })}
         onSave={handleEditSave}
@@ -543,13 +570,6 @@ export function AdminParents() {
         onUnlinkedOnlyChange={setUnlinkedOnly}
       />
 
-      <ParentDetailDialog
-        open={detailOpen}
-        onOpenChange={(v) => dispatch({ type: 'SET_DETAIL_OPEN', payload: v })}
-        parent={selectedParentDetail}
-        onLinkClick={(p) => dispatch({ type: 'OPEN_LINK_DIALOG', payload: p })}
-      />
-
       <ParentCreatedSuccessDialog
         open={createdSuccessOpen}
         onOpenChange={setCreatedSuccessOpen}
@@ -561,9 +581,7 @@ export function AdminParents() {
         onViewProfile={(parentId) => {
           setCreatedSuccessOpen(false);
           const found = parents.find((p) => p.id === parentId);
-          if (found) {
-            dispatch({ type: 'OPEN_DETAIL_DIALOG', payload: found });
-          }
+          if (found) setViewingParent(found);
         }}
       />
 
@@ -577,15 +595,12 @@ export function AdminParents() {
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel onClick={() => { setUnlinkConfirmOpen(false); setUnlinkData(null); }}>Cancel</AlertDialogCancel>
-            <AlertDialogAction
-              onClick={executeUnlinkChild}
-              className="bg-red-600 hover:bg-red-700 text-white"
-            >
+            <AlertDialogAction onClick={executeUnlinkChild} className="bg-red-600 hover:bg-red-700 text-white">
               Unlink
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-    </div>
+    </>
   );
 }

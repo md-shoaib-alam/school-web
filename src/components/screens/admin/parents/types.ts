@@ -17,7 +17,11 @@ export interface ParentInfo {
   email: string;
   username?: string;
   phone?: string;
+  alternatePhone?: string;
   occupation?: string;
+  address?: string;
+  gender?: string;
+  dateOfBirth?: string;
   children: ChildInfo[];
 }
 
