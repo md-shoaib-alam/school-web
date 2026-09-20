@@ -7,8 +7,6 @@ import {
 } from "@/lib/graphql/hooks";
 import { useQueryClient } from "@tanstack/react-query";
 import { queryKeys } from "@/lib/graphql/keys";
-import { Card, CardContent } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import {
   AlertDialog,
@@ -22,16 +20,15 @@ import {
 } from "@/components/ui/alert-dialog";
 import {
   Plus,
-  Search,
   LayoutGrid,
   List
 } from "lucide-react";
+import { SearchInput } from "@/components/ui/search-input";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { useAppStore } from "@/store/use-app-store";
 import { useStaff, useCustomRoles } from "@/lib/graphql/hooks";
 import { useModulePermissions } from "@/hooks/use-permissions";
-import { useDebounce } from "@/hooks/use-debounce";
 import { Pagination } from "@/components/shared/pagination";
 import { useSearchParams, useRouter, usePathname } from "next/navigation";
 import { apiFetch } from "@/lib/api";
@@ -177,7 +174,6 @@ export function AdminStaff() {
     viewingMember,
   } = state;
 
-  const debouncedSearch = useDebounce(search, 500);
 
   // --- Queries ---
   const { 
@@ -187,7 +183,7 @@ export function AdminStaff() {
   } = useStaff(
     currentTenantId || undefined, 
     "staff", 
-    debouncedSearch || undefined, 
+    search || undefined, 
     currentPage, 
     12
   );
@@ -240,7 +236,7 @@ export function AdminStaff() {
           customRole: roles.find(r => r.id === formData.customRoleId) || editingMember.customRole
         };
         
-        const queryKey = ["staff", currentTenantId, "staff", debouncedSearch || undefined, currentPage, 12];
+        const queryKey = ["staff", currentTenantId, "staff", search || undefined, currentPage, 12];
         queryClient.setQueryData(queryKey, (old: any) => {
           if (!old || !old.staff) return old;
           return {
@@ -412,21 +408,14 @@ export function AdminStaff() {
         <div className="space-y-6">
           {/* Header */}
           <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
-            <div className="relative w-full sm:max-w-sm flex-1 order-2 sm:order-1">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground pointer-events-none" />
-              <Input
-                type="search"
-                name="search_staff"
-                autoComplete="off"
-                autoCorrect="off"
-                spellCheck={false}
-                role="searchbox"
-                placeholder="Search by name, email, phone..."
-                className="pl-9 bg-white dark:bg-zinc-900 w-full"
-                value={search}
-                onChange={(e) => dispatch({ type: 'SET_SEARCH', payload: e.target.value })}
-              />
-            </div>
+            <SearchInput
+              id="search_staff"
+              value={search}
+              onChange={(val) => dispatch({ type: 'SET_SEARCH', payload: val })}
+              placeholder="Search by name, email, phone..."
+              delay={400}
+              className="w-full sm:max-w-sm flex-1 order-2 sm:order-1"
+            />
 
             <div className="flex items-center gap-2 self-end sm:self-auto order-1 sm:order-2">
               <div className="flex items-center bg-zinc-100 dark:bg-zinc-800 p-1 rounded-lg border border-zinc-200 dark:border-zinc-700">

@@ -11,7 +11,6 @@ import { useQueryClient } from "@tanstack/react-query";
 import { queryKeys } from "@/lib/graphql/keys";
 import { Pagination } from "@/components/shared/pagination";
 import { useSearchParams, useRouter, usePathname } from "next/navigation";
-import { useDebounce } from "@/hooks/use-debounce";
 
 // Sub-components
 import { TeacherDialog } from "./teachers/TeacherDialog";
@@ -147,8 +146,7 @@ export function AdminTeachers() {
   const [state, dispatch] = useReducer(reducer, initialState);
   const { search, currentPage, itemsPerPage, dialogOpen, editingTeacher, formData, submitting, deletingId } = state;
  
-   const debouncedSearch = useDebounce(search, 500);
- 
+
    const queryClient = useQueryClient();
  
    const searchParams = useSearchParams();
@@ -181,7 +179,7 @@ export function AdminTeachers() {
 
   const { data: teachersData, isLoading: loading } = useTeachers(
      currentTenantId || undefined,
-     debouncedSearch || undefined,
+     search || undefined,
      currentPage,
      itemsPerPage,
    );
@@ -254,7 +252,7 @@ export function AdminTeachers() {
     }
 
     const isEdit = !!editingTeacher;
-    const queryKey = [queryKeys.teachers, currentTenantId, debouncedSearch, currentPage, 12];
+    const queryKey = [queryKeys.teachers, currentTenantId, search, currentPage, 12];
 
     if (isEdit && editingTeacher) {
       updateTeacherOptimistic(queryClient, queryKey, editingTeacher, formData);
@@ -299,7 +297,7 @@ export function AdminTeachers() {
   };
 
   const executeDeletion = async (id: string) => {
-    const queryKey = [queryKeys.teachers, currentTenantId, debouncedSearch, currentPage, 12];
+    const queryKey = [queryKeys.teachers, currentTenantId, search, currentPage, 12];
     const previousTeachers = queryClient.getQueryData(queryKey);
     
     deleteTeacherFromCache(queryKey, id);

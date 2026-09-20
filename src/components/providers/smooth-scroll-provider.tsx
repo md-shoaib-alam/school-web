@@ -17,29 +17,17 @@ export function SmoothScrollProvider({ children }: { children: React.ReactNode }
       wheelMultiplier: 1,
       touchMultiplier: 1.5,
       autoRaf: false,
+      naiveDimensions: true,
     });
     windowLenisRef.current = windowLenis;
     (window as any).__lenis = windowLenis;
 
     // ─── Inner scroll-container instances ────────────────────────────────────
-    //
-    // THREE permanent defences against broken desktop scrolling:
-    //
-    //  [1] content = container  ← never holds a stale reference to a removed DOM
-    //      node. Previously we used firstElementChild which silently broke when
-    //      React replaced the view (e.g. list → profile).
-    //
-    //  [2] childObserver        ← when React swaps the direct child (view switch),
-    //      we destroy and recreate the Lenis instance so it remeasures the new view.
-    //
-    //  [3] resizeObserver       ← when content height changes *inside* the view
-    //      (data loads, accordion toggles, image loads …) we call lenis.resize()
-    //      so Lenis always knows the correct scrollable height.
-    //
     type InnerEntry = {
       lenis: Lenis;
       childObserver: MutationObserver;
       resizeObserver: ResizeObserver;
+      wheelHandler: () => void;
     };
 
     const innerInstances = new Map<HTMLElement, InnerEntry>();
@@ -50,13 +38,15 @@ export function SmoothScrollProvider({ children }: { children: React.ReactNode }
       entry.lenis.destroy();
       entry.childObserver.disconnect();
       entry.resizeObserver.disconnect();
+      container.removeEventListener("wheel", entry.wheelHandler);
       innerInstances.delete(container);
     };
 
     const createInner = (container: HTMLElement) => {
       destroyInner(container);
 
-      // [1] content = container → no stale child references
+      // naiveDimensions: true dynamically queries rootElement.scrollHeight - clientHeight
+      // on every scroll/wheel action, guaranteeing Lenis never clamps to an outdated height.
       const innerLenis = new Lenis({
         wrapper: container,
         content: container,
@@ -68,21 +58,49 @@ export function SmoothScrollProvider({ children }: { children: React.ReactNode }
         wheelMultiplier: 1,
         touchMultiplier: 1.5,
         autoRaf: false,
+        naiveDimensions: true,
       });
 
-      // [2] childObserver → rebuild on view switch (list ↔ profile view)
-      const childObserver = new MutationObserver(() => {
-        createInner(container);
-      });
-      childObserver.observe(container, { childList: true });
+      let resizeRaf: number | null = null;
+      const scheduleResize = () => {
+        if (resizeRaf !== null) return;
+        resizeRaf = requestAnimationFrame(() => {
+          resizeRaf = null;
+          innerLenis.resize();
+        });
+      };
 
-      // [3] resizeObserver → remeasure when content height changes dynamically
+      // ResizeObserver: observe container AND its children so whenever table rows,
+      // cards, or dynamic lists expand (e.g. page limit changed from 15 to 50),
+      // the resize event fires immediately and updates Lenis dimensions.
       const resizeObserver = new ResizeObserver(() => {
-        innerLenis.resize();
+        scheduleResize();
       });
-      resizeObserver.observe(container); // container scroll height will change
 
-      innerInstances.set(container, { lenis: innerLenis, childObserver, resizeObserver });
+      resizeObserver.observe(container);
+      Array.from(container.children).forEach((child) => {
+        resizeObserver.observe(child);
+      });
+
+      // MutationObserver: observe subtree child additions/removals to catch
+      // dynamic table data rendering and new child container mounts.
+      const childObserver = new MutationObserver(() => {
+        Array.from(container.children).forEach((child) => {
+          resizeObserver.observe(child);
+        });
+        scheduleResize();
+      });
+      childObserver.observe(container, { childList: true, subtree: true });
+
+      // Live verification on wheel: if scrollHeight changed before next observer tick
+      const wheelHandler = () => {
+        if (container.scrollHeight !== (innerLenis as any).dimensions?.scrollHeight) {
+          innerLenis.resize();
+        }
+      };
+      container.addEventListener("wheel", wheelHandler, { passive: true });
+
+      innerInstances.set(container, { lenis: innerLenis, childObserver, resizeObserver, wheelHandler });
     };
 
     const attachInner = () => {
@@ -111,10 +129,11 @@ export function SmoothScrollProvider({ children }: { children: React.ReactNode }
     return () => {
       cancelAnimationFrame(rafId);
       bodyObserver.disconnect();
-      innerInstances.forEach(({ lenis, childObserver, resizeObserver }) => {
+      innerInstances.forEach(({ lenis, childObserver, resizeObserver, wheelHandler }, container) => {
         lenis.destroy();
         childObserver.disconnect();
         resizeObserver.disconnect();
+        container.removeEventListener("wheel", wheelHandler);
       });
       innerInstances.clear();
       windowLenis.destroy();

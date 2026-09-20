@@ -2,6 +2,7 @@
 
 import { useReducer, useEffect, useMemo, useState } from "react";
 import { useViewMode } from "@/hooks/use-view-mode";
+import { useDebounce } from "@/hooks/use-debounce";
 import { toast } from "sonner";
 import api from "@/lib/axios";
 import { useAppStore } from "@/store/use-app-store";
@@ -13,7 +14,6 @@ import { useQuery, useQueryClient, useInfiniteQuery } from "@tanstack/react-quer
 import { queryKeys } from "@/lib/graphql/keys";
 import { useSearchParams, useRouter, usePathname } from "next/navigation";
 import { Pagination } from "@/components/shared/pagination";
-import { useDebounce } from "@/hooks/use-debounce";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -182,7 +182,6 @@ export function AdminParents() {
     editingParent, editForm, editing, detailOpen, selectedParentDetail: stateSelectedParentDetail
   } = state;
 
-  const debouncedSearch = useDebounce(search, 500);
 
   const [unlinkConfirmOpen, setUnlinkConfirmOpen] = useState(false);
   const [unlinkData, setUnlinkData] = useState<{ parentId: string; studentId: string } | null>(null);
@@ -221,7 +220,7 @@ export function AdminParents() {
   const { 
     data: parentsData, 
     isLoading: loadingParents 
-  } = useParents(currentTenantId || undefined, debouncedSearch || undefined, currentPage, itemsPerPage);
+  } = useParents(currentTenantId || undefined, search || undefined, currentPage, itemsPerPage);
 
   const { data: classesData } = useClassesMin(currentTenantId || undefined);
 

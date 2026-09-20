@@ -1,8 +1,8 @@
 "use client";
 
-import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Search, UserPlus, List, LayoutGrid } from "lucide-react";
+import { SearchInput } from "@/components/ui/search-input";
+import { UserPlus, List, LayoutGrid } from "lucide-react";
 
 interface ParentsHeaderProps {
   search: string;
@@ -62,21 +62,14 @@ export function ParentsHeader({
         </div>
       </div>
 
-      <div className="relative w-full sm:max-w-md">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-zinc-400 dark:text-zinc-500 pointer-events-none" />
-        <Input
-          type="search"
-          name="search_parents"
-          autoComplete="off"
-          autoCorrect="off"
-          spellCheck={false}
-          role="searchbox"
-          placeholder="Search parents or children…"
-          className="pl-9 w-full"
-          value={search}
-          onChange={(e) => onSearchChange(e.target.value)}
-        />
-      </div>
+      <SearchInput
+        id="search_parents"
+        value={search}
+        onChange={onSearchChange}
+        placeholder="Search parents or children..."
+        delay={400}
+        className="w-full sm:max-w-md"
+      />
     </div>
   );
 }

@@ -3,7 +3,6 @@
 import { useReducer, useEffect, useCallback, useMemo, useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import {
   Select,
   SelectContent,
@@ -11,7 +10,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Plus, Search, Eye, RotateCcw } from "lucide-react";
+import { Plus, Eye, RotateCcw } from "lucide-react";
+import { SearchInput } from "@/components/ui/search-input";
 import { toast } from "sonner";
 import { apiFetch } from "@/lib/api";
 import { useModulePermissions } from "@/hooks/use-permissions";
@@ -20,7 +20,6 @@ import { useStudents } from "@/lib/graphql/hooks/academic.hooks";
 import { ClassSelect } from "@/components/ui/class-select";
 import { useQueryClient } from "@tanstack/react-query";
 import { queryKeys } from "@/lib/graphql/keys";
-import { useDebounce } from "@/hooks/use-debounce";
 import { useSearchParams, useRouter, usePathname } from "next/navigation";
 import { Suspense } from "react";
 
@@ -162,15 +161,14 @@ function AdminStudentsContent() {
     submitting,
   } = state;
 
-  const debouncedSearch = useDebounce(search, 300);
 
   const queryClient = useQueryClient();
 
   // Queries
-  const { data: studentData, isLoading: loadingStudents, isFetching: fetchingStudents } = useStudents(
+  const { data: studentData, isLoading: loadingStudents } = useStudents(
     currentTenantId || undefined,
     classFilter === "all" ? undefined : classFilter,
-    debouncedSearch || undefined,
+    search || undefined,
     statusFilter,
     genderFilter,
     currentPage,
@@ -484,21 +482,15 @@ function AdminStudentsContent() {
       {/* Header */}
       <div className="flex flex-col xl:flex-row gap-4 items-start xl:items-center justify-between">
         <div className="flex flex-col sm:flex-row gap-3 w-full xl:w-auto flex-1">
-          <div className="relative flex-1 max-w-sm">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground pointer-events-none" />
-            <Input
-              type="search"
-              name="search_students"
-              autoComplete="off"
-              autoCorrect="off"
-              spellCheck={false}
-              role="searchbox"
-              placeholder="Search by name..."
-              className="pl-9 h-9 sm:h-10"
+          <SearchInput
+              id="search_students"
               value={search}
-              onChange={(e) => dispatch({ type: 'SET_SEARCH', payload: e.target.value })}
+              onChange={(val) => dispatch({ type: 'SET_SEARCH', payload: val })}
+              placeholder="Search by name..."
+              delay={400}
+              className="flex-1 max-w-sm"
+              inputClassName="h-9 sm:h-10"
             />
-          </div>
           <ClassSelect
             value={classFilter}
             onValueChange={(v) => {
