@@ -40,6 +40,7 @@ import { StaffCard } from "./staff/StaffCard";
 import { StaffDialog } from "./staff/StaffDialog";
 import { StaffSkeleton } from "./staff/StaffSkeleton";
 import { StaffDetailDialog } from "./staff/StaffDetailDialog";
+import { StaffProfileView } from "./staff/StaffProfileView";
 
 // Types
 import { StaffMember, StaffFormData, emptyFormData } from "./staff/types";
@@ -324,92 +325,107 @@ export function AdminStaff() {
   const totalPages = staffResponse?.totalPages || 1;
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
-        <div className="relative w-full sm:max-w-sm flex-1 order-2 sm:order-1">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
-          <Input
-            placeholder="Search by name, email, phone..."
-            className="pl-9 bg-white dark:bg-zinc-900 w-full"
-            value={search}
-            onChange={(e) => dispatch({ type: 'SET_SEARCH', payload: e.target.value })}
-          />
-        </div>
+    <>
+      {viewingMember ? (
+        <StaffProfileView
+          member={viewingMember}
+          roles={roles}
+          onBack={() => dispatch({ type: 'CLOSE_VIEW' })}
+          canEdit={canEdit}
+          onEditModal={(m) => {
+            dispatch({ type: 'CLOSE_VIEW' });
+            handleOpenEdit(m);
+          }}
+        />
+      ) : (
+        <div className="space-y-6">
+          {/* Header */}
+          <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
+            <div className="relative w-full sm:max-w-sm flex-1 order-2 sm:order-1">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
+              <Input
+                placeholder="Search by name, email, phone..."
+                className="pl-9 bg-white dark:bg-zinc-900 w-full"
+                value={search}
+                onChange={(e) => dispatch({ type: 'SET_SEARCH', payload: e.target.value })}
+              />
+            </div>
 
-        <div className="flex items-center justify-between sm:justify-start gap-3 w-full sm:w-auto order-1 sm:order-2">
-          <div className="flex items-center p-1 bg-zinc-100 dark:bg-zinc-800 rounded-lg">
-            <Button
-              variant="ghost"
-              size="sm"
-              className={cn(
-                "h-8 px-3 gap-2",
-                viewMode === 'table' && "bg-white dark:bg-zinc-700 shadow-sm text-emerald-600"
+            <div className="flex items-center gap-2 self-end sm:self-auto order-1 sm:order-2">
+              <div className="flex items-center bg-zinc-100 dark:bg-zinc-800 p-1 rounded-lg border border-zinc-200 dark:border-zinc-700">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className={cn(
+                    "h-8 px-3 gap-2",
+                    viewMode === 'table' && "bg-white dark:bg-zinc-700 shadow-sm text-emerald-600"
+                  )}
+                  onClick={() => toggleView('table')}
+                >
+                  <List className="size-4" />
+                  <span className="hidden sm:inline">List</span>
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className={cn(
+                    "h-8 px-3 gap-2",
+                    viewMode === 'grid' && "bg-white dark:bg-zinc-700 shadow-sm text-emerald-600"
+                  )}
+                  onClick={() => toggleView('grid')}
+                >
+                  <LayoutGrid className="size-4" />
+                  <span className="hidden sm:inline">Grid</span>
+                </Button>
+              </div>
+
+              {canCreate && (
+                <Button className="bg-emerald-600 hover:bg-emerald-700 text-white shadow-none shrink-0" onClick={handleOpenCreate}>
+                  <Plus className="size-4 mr-2" /> Add Staff
+                </Button>
               )}
-              onClick={() => toggleView('table')}
-            >
-              <List className="size-4" />
-              <span className="hidden sm:inline">List</span>
-            </Button>
-            <Button
-              variant="ghost"
-              size="sm"
-              className={cn(
-                "h-8 px-3 gap-2",
-                viewMode === 'grid' && "bg-white dark:bg-zinc-700 shadow-sm text-emerald-600"
-              )}
-              onClick={() => toggleView('grid')}
-            >
-              <LayoutGrid className="size-4" />
-              <span className="hidden sm:inline">Grid</span>
-            </Button>
+            </div>
           </div>
 
-          {canCreate && (
-            <Button className="bg-emerald-600 hover:bg-emerald-700 text-white shadow-none shrink-0" onClick={handleOpenCreate}>
-              <Plus className="size-4 mr-2" /> Add Staff
-            </Button>
-          )}
-        </div>
-      </div>
-
-      {/* Content */}
-      <div className={cn(viewMode === 'table' ? "bg-white dark:bg-zinc-950 rounded-xl border border-zinc-100 dark:border-zinc-800 overflow-hidden" : "")}>
-          {loadingStaff ? (
-            <StaffSkeleton />
-          ) : viewMode === 'table' ? (
-            <StaffTable
-              staff={staff}
-              onEdit={handleOpenEdit}
-              onDelete={(m) => dispatch({ type: 'OPEN_DELETE', payload: m })}
-              onView={(m) => dispatch({ type: 'OPEN_VIEW', payload: m })}
-              canEdit={canEdit}
-              canDelete={canDelete}
-            />
-          ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-4">
-              {staff.map((member) => (
-                <StaffCard
-                  key={member.id}
-                  member={member}
+          {/* Content */}
+          <div className={cn(viewMode === 'table' ? "bg-white dark:bg-zinc-950 rounded-xl border border-zinc-100 dark:border-zinc-800 overflow-hidden" : "")}>
+              {loadingStaff ? (
+                <StaffSkeleton />
+              ) : viewMode === 'table' ? (
+                <StaffTable
+                  staff={staff}
                   onEdit={handleOpenEdit}
                   onDelete={(m) => dispatch({ type: 'OPEN_DELETE', payload: m })}
                   onView={(m) => dispatch({ type: 'OPEN_VIEW', payload: m })}
                   canEdit={canEdit}
                   canDelete={canDelete}
                 />
-              ))}
-            </div>
-          )}
-      </div>
+              ) : (
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-4">
+                  {staff.map((member) => (
+                    <StaffCard
+                      key={member.id}
+                      member={member}
+                      onEdit={handleOpenEdit}
+                      onDelete={(m) => dispatch({ type: 'OPEN_DELETE', payload: m })}
+                      onView={(m) => dispatch({ type: 'OPEN_VIEW', payload: m })}
+                      canEdit={canEdit}
+                      canDelete={canDelete}
+                    />
+                  ))}
+                </div>
+              )}
+          </div>
 
-      <Pagination
-        currentPage={currentPage}
-        totalPages={totalPages}
-        totalItems={totalItems}
-        itemsPerPage={12}
-        onPageChange={(page) => dispatch({ type: 'SET_CURRENT_PAGE', payload: page })}
-      />
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            totalItems={totalItems}
+            itemsPerPage={12}
+            onPageChange={(page) => dispatch({ type: 'SET_CURRENT_PAGE', payload: page })}
+          />
+        </div>
+      )}
 
       {/* Dialogs */}
       <StaffDialog
@@ -421,14 +437,6 @@ export function AdminStaff() {
         roles={roles}
         submitting={submitting}
         onSubmit={handleSubmit}
-      />
-
-      <StaffDetailDialog
-        open={viewDialogOpen}
-        onOpenChange={(open) => {
-          if (!open) dispatch({ type: 'CLOSE_VIEW' });
-        }}
-        member={viewingMember}
       />
 
       <AlertDialog open={deleteAlertOpen} onOpenChange={(open) => dispatch({ type: open ? 'CLOSE_DELETE' : 'CLOSE_DELETE' })}>
@@ -447,6 +455,6 @@ export function AdminStaff() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-    </div>
+    </>
   );
 }
