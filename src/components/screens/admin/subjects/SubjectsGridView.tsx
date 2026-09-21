@@ -40,7 +40,7 @@ export function SubjectsGridView({
                     <div className="size-10 rounded-xl bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 flex items-center justify-center shadow-inner">
                       <BookOpen className="size-5" />
                     </div>
-                    <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <div className="flex items-center gap-1 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
                       {canEdit && (
                         <Button
                           variant="ghost"

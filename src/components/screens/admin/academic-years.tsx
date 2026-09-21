@@ -11,13 +11,17 @@ import {
   MoreVertical,
   CalendarDays,
   ShieldCheck,
-  AlertCircle
+  AlertCircle,
+  Layers,
+  Users
 } from "lucide-react";
+import Image from "next/image";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
+import { Skeleton } from "@/components/ui/skeleton";
 import { 
   Table, 
   TableBody, 
@@ -152,38 +156,36 @@ export function AcademicYearsScreen() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div>
-          <div className="flex items-center gap-3">
-            <div className="size-12 rounded-2xl bg-violet-100 dark:bg-violet-900/30 flex items-center justify-center">
-              <CalendarDays className="size-6 text-violet-600 dark:text-violet-400" />
-            </div>
-            <div>
-              <h2 className="text-3xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-100">
-                Academic Years
-              </h2>
-              <p className="text-muted-foreground mt-1">
-                Manage your school's academic sessions and current year settings.
-              </p>
-            </div>
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div className="flex items-start sm:items-center gap-3">
+          <div className="size-10 sm:size-12 shrink-0 rounded-2xl bg-violet-100 dark:bg-violet-900/30 flex items-center justify-center">
+            <CalendarDays className="size-5 sm:size-6 text-violet-600 dark:text-violet-400" />
+          </div>
+          <div>
+            <h2 className="text-2xl sm:text-3xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-100">
+              Academic Years
+            </h2>
+            <p className="text-xs sm:text-sm text-muted-foreground mt-0.5 sm:mt-1">
+              Manage your school's academic sessions and current year settings.
+            </p>
           </div>
         </div>
 
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
           <DialogTrigger asChild>
-            <Button onClick={() => handleOpenDialog()} className="bg-violet-600 hover:bg-violet-700 text-white shadow-lg shadow-violet-500/20">
+            <Button onClick={() => handleOpenDialog()} className="w-full sm:w-auto bg-violet-600 hover:bg-violet-700 text-white shadow-md shadow-violet-500/20">
               <Plus className="size-4 mr-2" />
               Add Academic Year
             </Button>
           </DialogTrigger>
-          <DialogContent className="sm:max-w-[425px] border-violet-100 dark:border-violet-900/50">
+          <DialogContent className="w-[95vw] max-w-[425px] rounded-2xl border-violet-100 dark:border-violet-900/50 p-5 sm:p-6">
             <DialogHeader>
               <DialogTitle>{editingYear ? "Edit Academic Year" : "New Academic Year"}</DialogTitle>
               <DialogDescription>
                 Set the name and dates for the academic session.
               </DialogDescription>
             </DialogHeader>
-            <form onSubmit={handleSubmit} className="space-y-4 py-4">
+            <form onSubmit={handleSubmit} className="space-y-4 py-2 sm:py-4">
               <div className="space-y-2">
                 <Label htmlFor="name">Session Name</Label>
                 <Input 
@@ -194,7 +196,7 @@ export function AcademicYearsScreen() {
                   required
                 />
               </div>
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="startDate">Start Date</Label>
                   <DatePicker 
@@ -230,16 +232,16 @@ export function AcademicYearsScreen() {
       </div>
 
       {/* Stats / Info */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <Card className="border-violet-100 dark:border-violet-900/30 bg-violet-50/30 dark:bg-violet-950/10 shadow-sm">
-          <CardContent className="pt-6">
-            <div className="flex items-center gap-4">
-              <div className="size-10 rounded-full bg-violet-100 dark:bg-violet-900/50 flex items-center justify-center">
-                <ShieldCheck className="size-5 text-violet-600 dark:text-violet-400" />
+      <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
+        <Card className="border-violet-100 dark:border-violet-900/30 bg-violet-50/30 dark:bg-violet-950/10 shadow-sm col-span-2 lg:col-span-1">
+          <CardContent className="p-4 sm:p-6">
+            <div className="flex items-center gap-3 sm:gap-4">
+              <div className="size-9 sm:size-10 shrink-0 rounded-xl sm:rounded-full bg-violet-100 dark:bg-violet-900/50 flex items-center justify-center">
+                <ShieldCheck className="size-4 sm:size-5 text-violet-600 dark:text-violet-400" />
               </div>
-              <div>
-                <p className="text-sm font-medium text-violet-800 dark:text-violet-300">Current Session</p>
-                <p className="text-2xl font-bold text-violet-900 dark:text-violet-100">
+              <div className="min-w-0">
+                <p className="text-xs sm:text-sm font-medium text-violet-800 dark:text-violet-300 truncate">Current Session</p>
+                <p className="text-lg sm:text-2xl font-bold text-violet-900 dark:text-violet-100 truncate">
                   {academicYears.find((y: any) => y.isCurrent)?.name || "Not Set"}
                 </p>
               </div>
@@ -248,14 +250,14 @@ export function AcademicYearsScreen() {
         </Card>
         
         <Card className="border-emerald-100 dark:border-emerald-900/30 bg-emerald-50/30 dark:bg-emerald-950/10 shadow-sm">
-          <CardContent className="pt-6">
-            <div className="flex items-center gap-4">
-              <div className="size-10 rounded-full bg-emerald-100 dark:bg-emerald-900/50 flex items-center justify-center">
-                <CheckCircle2 className="size-5 text-emerald-600 dark:text-emerald-400" />
+          <CardContent className="p-4 sm:p-6">
+            <div className="flex items-center gap-3 sm:gap-4">
+              <div className="size-9 sm:size-10 shrink-0 rounded-xl sm:rounded-full bg-emerald-100 dark:bg-emerald-900/50 flex items-center justify-center">
+                <CheckCircle2 className="size-4 sm:size-5 text-emerald-600 dark:text-emerald-400" />
               </div>
-              <div>
-                <p className="text-sm font-medium text-emerald-800 dark:text-emerald-300">Active Sessions</p>
-                <p className="text-2xl font-bold text-emerald-900 dark:text-emerald-100">
+              <div className="min-w-0">
+                <p className="text-xs sm:text-sm font-medium text-emerald-800 dark:text-emerald-300 truncate">Active Sessions</p>
+                <p className="text-lg sm:text-2xl font-bold text-emerald-900 dark:text-emerald-100">
                   {academicYears.filter((y: any) => y.status === "active").length}
                 </p>
               </div>
@@ -264,14 +266,14 @@ export function AcademicYearsScreen() {
         </Card>
 
         <Card className="border-amber-100 dark:border-amber-900/30 bg-amber-50/30 dark:bg-amber-950/10 shadow-sm">
-          <CardContent className="pt-6">
-            <div className="flex items-center gap-4">
-              <div className="size-10 rounded-full bg-amber-100 dark:bg-amber-900/50 flex items-center justify-center">
-                <Clock className="size-5 text-amber-600 dark:text-amber-400" />
+          <CardContent className="p-4 sm:p-6">
+            <div className="flex items-center gap-3 sm:gap-4">
+              <div className="size-9 sm:size-10 shrink-0 rounded-xl sm:rounded-full bg-amber-100 dark:bg-amber-900/50 flex items-center justify-center">
+                <Clock className="size-4 sm:size-5 text-amber-600 dark:text-amber-400" />
               </div>
-              <div>
-                <p className="text-sm font-medium text-amber-800 dark:text-amber-300">Upcoming Sessions</p>
-                <p className="text-2xl font-bold text-amber-900 dark:text-amber-100" suppressHydrationWarning>
+              <div className="min-w-0">
+                <p className="text-xs sm:text-sm font-medium text-amber-800 dark:text-amber-300 truncate">Upcoming Sessions</p>
+                <p className="text-lg sm:text-2xl font-bold text-amber-900 dark:text-amber-100" suppressHydrationWarning>
                   {getUpcomingCount(academicYears)}
                 </p>
               </div>
@@ -280,98 +282,263 @@ export function AcademicYearsScreen() {
         </Card>
       </div>
 
-      {/* Table */}
-      <Card className="overflow-hidden border-violet-100 dark:border-violet-900/30 shadow-md">
-        <Table>
-          <TableHeader className="bg-card">
-            <TableRow className="hover:bg-transparent">
-              <TableHead className="font-semibold">Session Name</TableHead>
-              <TableHead className="font-semibold">Start Date</TableHead>
-              <TableHead className="font-semibold">End Date</TableHead>
-              <TableHead className="font-semibold">Status</TableHead>
-              <TableHead className="font-semibold">Current</TableHead>
-              <TableHead className="text-right font-semibold">Actions</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {isLoading ? (
-              <TableRow className="hover:bg-transparent">
-                <TableCell colSpan={6} className="text-center py-10">
-                  <div className="flex flex-col items-center gap-2">
-                    <div className="size-8 animate-spin rounded-full border-4 border-violet-500 border-t-transparent" />
-                    <span className="text-sm text-muted-foreground">Loading sessions…</span>
+      {/* Content: Mobile Cards & Desktop Table */}
+      {isLoading ? (
+        <div className="space-y-4">
+          {/* Mobile Loading Skeleton (< md) */}
+          <div className="grid grid-cols-1 gap-3 md:hidden">
+            {[1, 2, 3].map((i) => (
+              <Card key={i} className="p-4 border-zinc-200 dark:border-zinc-800 shadow-sm space-y-3">
+                <div className="flex items-start justify-between">
+                  <div className="space-y-2 flex-1">
+                    <div className="flex items-center gap-2">
+                      <Skeleton className="h-5 w-28 rounded" />
+                      {i === 1 && <Skeleton className="h-4 w-14 rounded-full" />}
+                    </div>
+                    <Skeleton className="h-3.5 w-44 rounded" />
                   </div>
-                </TableCell>
-              </TableRow>
-            ) : academicYears.length === 0 ? (
-              <TableRow className="hover:bg-transparent">
-                <TableCell colSpan={6} className="text-center py-20">
-                  <div className="flex flex-col items-center gap-2">
-                    <AlertCircle className="size-10 text-muted-foreground/30" />
-                    <span className="text-lg font-medium text-muted-foreground">No academic years found</span>
-                    <Button variant="outline" onClick={() => handleOpenDialog()} className="mt-2">
-                      Create your first session
-                    </Button>
+                  <Skeleton className="size-8 rounded-md" />
+                </div>
+                <div className="flex items-center justify-between pt-2 border-t border-zinc-100 dark:border-zinc-800/80">
+                  <Skeleton className="h-5 w-16 rounded-full" />
+                  <Skeleton className="h-6 w-24 rounded-md" />
+                </div>
+              </Card>
+            ))}
+          </div>
+
+          {/* Desktop Table Loading Skeleton (md+) */}
+          <Card className="hidden md:block overflow-hidden border-violet-100 dark:border-violet-900/30 shadow-md">
+            <div className="p-4 border-b border-zinc-100 dark:border-zinc-800 flex items-center justify-between bg-card">
+              <Skeleton className="h-4 w-28 rounded" />
+              <Skeleton className="h-4 w-24 rounded" />
+              <Skeleton className="h-4 w-24 rounded" />
+              <Skeleton className="h-4 w-16 rounded" />
+              <Skeleton className="h-4 w-20 rounded" />
+              <Skeleton className="h-4 w-16 rounded" />
+            </div>
+            <div className="divide-y divide-zinc-100 dark:divide-zinc-800">
+              {[1, 2, 3, 4].map((i) => (
+                <div key={i} className="p-4 flex items-center justify-between">
+                  <Skeleton className="h-4 w-28 rounded" />
+                  <Skeleton className="h-4 w-24 rounded" />
+                  <Skeleton className="h-4 w-24 rounded" />
+                  <Skeleton className="h-5 w-16 rounded-full" />
+                  <Skeleton className="h-4 w-20 rounded" />
+                  <Skeleton className="size-8 rounded-md ml-auto" />
+                </div>
+              ))}
+            </div>
+          </Card>
+        </div>
+      ) : academicYears.length === 0 ? (
+        <Card className="border border-zinc-200/80 dark:border-zinc-800 shadow-sm overflow-hidden bg-white dark:bg-zinc-950">
+          <div className="flex flex-col items-center text-center px-4 sm:px-6 pt-10 pb-8 sm:pt-14 sm:pb-10 max-w-xl mx-auto">
+            <div className="relative w-48 h-36 sm:w-60 sm:h-44 mb-3">
+              <Image
+                src="/assets/admin/acdmicyearcenter.avif"
+                alt="No Academic Years"
+                fill
+                priority
+                className="object-contain"
+              />
+            </div>
+            
+            <h3 className="text-xl sm:text-2xl font-bold tracking-tight text-zinc-900 dark:text-zinc-100 mt-2">
+              No academic years found
+            </h3>
+            <p className="text-xs sm:text-sm text-zinc-500 dark:text-zinc-400 mt-2 leading-relaxed max-w-md">
+              Create your first academic year to start managing sessions, classes, exams and other academic activities.
+            </p>
+
+            <Button
+              onClick={() => handleOpenDialog()}
+              className="mt-6 bg-blue-600 hover:bg-blue-700 text-white font-medium px-6 py-2.5 rounded-xl shadow-sm hover:shadow transition-all"
+            >
+              <Plus className="size-4 mr-1.5" />
+              Create your first session
+            </Button>
+          </div>
+
+          {/* Bottom Features Info Bar */}
+          <div className="border-t border-zinc-100 dark:border-zinc-800/80 bg-zinc-50/50 dark:bg-zinc-900/30 p-3 sm:px-10 sm:py-6">
+            <div className="grid grid-cols-3 gap-2 sm:gap-6">
+              {/* Feature 1 */}
+              <div className="flex flex-col sm:flex-row items-center sm:items-center text-center sm:text-left gap-1.5 sm:gap-3.5 p-2 sm:p-0 rounded-xl bg-white sm:bg-transparent border sm:border-0 border-zinc-200/70 dark:border-zinc-800 shadow-xs sm:shadow-none">
+                <div className="size-9 sm:size-11 rounded-full sm:rounded-2xl bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 flex items-center justify-center shrink-0">
+                  <Calendar className="size-4 sm:size-5" />
+                </div>
+                <div className="min-w-0">
+                  <p className="text-[11px] sm:text-sm font-semibold text-zinc-900 dark:text-zinc-100 leading-tight">Set current session</p>
+                  <p className="hidden sm:block text-[11px] sm:text-xs text-zinc-500 dark:text-zinc-400 truncate">Mark an academic year as current</p>
+                </div>
+              </div>
+
+              {/* Feature 2 */}
+              <div className="flex flex-col sm:flex-row items-center sm:items-center text-center sm:text-left gap-1.5 sm:gap-3.5 p-2 sm:p-0 rounded-xl bg-white sm:bg-transparent border sm:border-0 border-zinc-200/70 dark:border-zinc-800 shadow-xs sm:shadow-none">
+                <div className="size-9 sm:size-11 rounded-full sm:rounded-2xl bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0">
+                  <Layers className="size-4 sm:size-5" />
+                </div>
+                <div className="min-w-0">
+                  <p className="text-[11px] sm:text-sm font-semibold text-zinc-900 dark:text-zinc-100 leading-tight">Manage multiple years</p>
+                  <p className="hidden sm:block text-[11px] sm:text-xs text-zinc-500 dark:text-zinc-400 truncate">Keep track of past and future sessions</p>
+                </div>
+              </div>
+
+              {/* Feature 3 */}
+              <div className="flex flex-col sm:flex-row items-center sm:items-center text-center sm:text-left gap-1.5 sm:gap-3.5 p-2 sm:p-0 rounded-xl bg-white sm:bg-transparent border sm:border-0 border-zinc-200/70 dark:border-zinc-800 shadow-xs sm:shadow-none">
+                <div className="size-9 sm:size-11 rounded-full sm:rounded-2xl bg-orange-50 dark:bg-orange-950/40 text-orange-600 dark:text-orange-400 flex items-center justify-center shrink-0">
+                  <Users className="size-4 sm:size-5" />
+                </div>
+                <div className="min-w-0">
+                  <p className="text-[11px] sm:text-sm font-semibold text-zinc-900 dark:text-zinc-100 leading-tight">Connect with classes</p>
+                  <p className="hidden sm:block text-[11px] sm:text-xs text-zinc-500 dark:text-zinc-400 truncate">Assign classes, subjects and timetable</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </Card>
+      ) : (
+        <>
+          {/* Mobile Card List (visible on md and below) */}
+          <div className="grid grid-cols-1 gap-3 md:hidden">
+            {academicYears.map((year: any) => (
+              <Card key={year.id} className="p-4 border-zinc-200 dark:border-zinc-800 shadow-sm relative overflow-hidden">
+                {year.isCurrent && (
+                  <div className="absolute top-0 left-0 right-0 h-1 bg-violet-600" />
+                )}
+                <div className="flex items-start justify-between gap-2 mb-3">
+                  <div className="flex flex-col">
+                    <div className="flex items-center gap-2">
+                      <span className="font-semibold text-base text-zinc-900 dark:text-zinc-100">{year.name}</span>
+                      {year.isCurrent && (
+                        <Badge variant="secondary" className="bg-violet-100 text-violet-700 dark:bg-violet-900/50 dark:text-violet-300 text-[10px] px-1.5 py-0">
+                          Current
+                        </Badge>
+                      )}
+                    </div>
+                    <span className="text-xs text-muted-foreground mt-0.5" suppressHydrationWarning>
+                      {formatSessionDate(year.startDate)} - {formatSessionDate(year.endDate)}
+                    </span>
                   </div>
-                </TableCell>
-              </TableRow>
-            ) : (
-              academicYears.map((year: any) => (
-                <TableRow key={year.id} className="hover:bg-transparent transition-colors">
-                  <TableCell className="font-medium">{year.name}</TableCell>
-                  <TableCell suppressHydrationWarning>{formatSessionDate(year.startDate)}</TableCell>
-                  <TableCell suppressHydrationWarning>{formatSessionDate(year.endDate)}</TableCell>
-                  <TableCell>
-                    <Badge variant={year.status === "active" ? "default" : "secondary"} className={year.status === "active" ? "bg-emerald-500 hover:bg-emerald-600" : ""}>
-                      {year.status}
-                    </Badge>
-                  </TableCell>
-                  <TableCell>
-                    {year.isCurrent ? (
-                      <div className="flex items-center gap-1.5 text-violet-600 dark:text-violet-400 font-semibold">
-                        <CheckCircle2 className="size-4" />
-                        <span>Current</span>
-                      </div>
-                    ) : (
-                      <Button 
-                        variant="ghost" 
-                        size="sm" 
-                        onClick={() => handleSetCurrent(year.id)}
-                        className="text-xs text-muted-foreground hover:text-violet-600"
-                      >
-                        Set as Current
+
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant="ghost" size="icon" className="size-8 -mr-1">
+                        <MoreVertical className="size-4" />
                       </Button>
-                    )}
-                  </TableCell>
-                  <TableCell className="text-right">
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" size="icon" className="size-8">
-                          <MoreVertical className="size-4" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end" className="w-40">
-                        <DropdownMenuItem onClick={() => handleOpenDialog(year)}>
-                          <Edit2 className="size-4 mr-2" />
-                          Edit
-                        </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => handleSetCurrent(year.id)} disabled={year.isCurrent}>
-                          <CheckCircle2 className="size-4 mr-2" />
-                          Make Current
-                        </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => handleDelete(year.id)} className="text-red-600 focus:text-red-600">
-                          <Trash2 className="size-4 mr-2" />
-                          Delete
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </TableCell>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end" className="w-40">
+                      <DropdownMenuItem onClick={() => handleOpenDialog(year)}>
+                        <Edit2 className="size-4 mr-2" />
+                        Edit
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => handleSetCurrent(year.id)} disabled={year.isCurrent}>
+                        <CheckCircle2 className="size-4 mr-2" />
+                        Make Current
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => handleDelete(year.id)} className="text-red-600 focus:text-red-600">
+                        <Trash2 className="size-4 mr-2" />
+                        Delete
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </div>
+
+                <div className="flex items-center justify-between pt-2 border-t border-zinc-100 dark:border-zinc-800/80 text-xs">
+                  <Badge variant={year.status === "active" ? "default" : "secondary"} className={`text-[11px] capitalize ${year.status === "active" ? "bg-emerald-500 hover:bg-emerald-600" : ""}`}>
+                    {year.status}
+                  </Badge>
+                  {!year.isCurrent ? (
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      onClick={() => handleSetCurrent(year.id)}
+                      className="h-7 text-xs text-muted-foreground hover:text-violet-600"
+                    >
+                      Set as Current
+                    </Button>
+                  ) : (
+                    <span className="text-xs font-medium text-violet-600 dark:text-violet-400 flex items-center gap-1">
+                      <CheckCircle2 className="size-3.5" /> Active Session
+                    </span>
+                  )}
+                </div>
+              </Card>
+            ))}
+          </div>
+
+          {/* Desktop Table (hidden on mobile, visible md and up) */}
+          <Card className="hidden md:block overflow-hidden border-violet-100 dark:border-violet-900/30 shadow-md">
+            <Table>
+              <TableHeader className="bg-card">
+                <TableRow className="hover:bg-transparent">
+                  <TableHead className="font-semibold">Session Name</TableHead>
+                  <TableHead className="font-semibold">Start Date</TableHead>
+                  <TableHead className="font-semibold">End Date</TableHead>
+                  <TableHead className="font-semibold">Status</TableHead>
+                  <TableHead className="font-semibold">Current</TableHead>
+                  <TableHead className="text-right font-semibold">Actions</TableHead>
                 </TableRow>
-              ))
-            )}
-          </TableBody>
-        </Table>
-      </Card>
+              </TableHeader>
+              <TableBody>
+                {academicYears.map((year: any) => (
+                  <TableRow key={year.id} className="hover:bg-transparent transition-colors">
+                    <TableCell className="font-medium">{year.name}</TableCell>
+                    <TableCell suppressHydrationWarning>{formatSessionDate(year.startDate)}</TableCell>
+                    <TableCell suppressHydrationWarning>{formatSessionDate(year.endDate)}</TableCell>
+                    <TableCell>
+                      <Badge variant={year.status === "active" ? "default" : "secondary"} className={year.status === "active" ? "bg-emerald-500 hover:bg-emerald-600" : ""}>
+                        {year.status}
+                      </Badge>
+                    </TableCell>
+                    <TableCell>
+                      {year.isCurrent ? (
+                        <div className="flex items-center gap-1.5 text-violet-600 dark:text-violet-400 font-semibold">
+                          <CheckCircle2 className="size-4" />
+                          <span>Current</span>
+                        </div>
+                      ) : (
+                        <Button 
+                          variant="ghost" 
+                          size="sm" 
+                          onClick={() => handleSetCurrent(year.id)}
+                          className="text-xs text-muted-foreground hover:text-violet-600"
+                        >
+                          Set as Current
+                        </Button>
+                      )}
+                    </TableCell>
+                    <TableCell className="text-right">
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="ghost" size="icon" className="size-8">
+                            <MoreVertical className="size-4" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end" className="w-40">
+                          <DropdownMenuItem onClick={() => handleOpenDialog(year)}>
+                            <Edit2 className="size-4 mr-2" />
+                            Edit
+                          </DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => handleSetCurrent(year.id)} disabled={year.isCurrent}>
+                            <CheckCircle2 className="size-4 mr-2" />
+                            Make Current
+                          </DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => handleDelete(year.id)} className="text-red-600 focus:text-red-600">
+                            <Trash2 className="size-4 mr-2" />
+                            Delete
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </Card>
+        </>
+      )}
     </div>
   );
 }
