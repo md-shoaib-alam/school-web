@@ -101,8 +101,8 @@ export function StudentOverviewTab({
     house: sourceStudent?.house || "Not Assigned",
     parentName: sourceStudent?.parentName || "",
     parentRelationship: "Parent",
-    parentEmail: sourceStudent?.parentEmail || sourceStudent?.email || "",
-    parentPhone: sourceStudent?.parentPhone || sourceStudent?.phone || "",
+    parentEmail: sourceStudent?.parentEmail || "",
+    parentPhone: sourceStudent?.parentPhone || "",
     address: sourceStudent?.address || "",
     transportEnabled: !!sourceStudent?.transport,
     routeId: sourceStudent?.transport?.routeId || "",
@@ -144,8 +144,8 @@ export function StudentOverviewTab({
       house: s?.house || "Not Assigned",
       parentName: s?.parentName || "",
       parentRelationship: "Parent",
-      parentEmail: s?.parentEmail || s?.email || "",
-      parentPhone: s?.parentPhone || s?.phone || "",
+      parentEmail: s?.parentEmail || "",
+      parentPhone: s?.parentPhone || "",
       address: s?.address || "",
       transportEnabled: !!s?.transport,
       routeId: s?.transport?.routeId || "",
@@ -172,6 +172,10 @@ export function StudentOverviewTab({
         gender: formData.gender,
         dateOfBirth: formData.dateOfBirth,
         status: formData.academicStatus,
+        parentName: formData.parentName,
+        parentPhone: formData.parentPhone,
+        parentEmail: formData.parentEmail,
+        address: formData.address,
         transportEnabled: formData.transportEnabled,
         routeId: formData.routeId,
         pickupPoint: formData.pickupPoint,
@@ -217,6 +221,10 @@ export function StudentOverviewTab({
       username: s?.username || "",
       academicStatus: s?.status || "enrolled",
       parentName: s?.parentName || "",
+      parentRelationship: "Parent",
+      parentEmail: s?.parentEmail || "",
+      parentPhone: s?.parentPhone || "",
+      address: s?.address || "",
       transportEnabled: !!s?.transport,
       routeId: s?.transport?.routeId || "",
       pickupPoint: s?.transport?.pickupPoint || "",
@@ -771,23 +779,9 @@ export function StudentOverviewTab({
                   </Select>
                 </div>
 
-                {/* Email Address */}
-                <div className="space-y-1.5">
-                  <Label className="text-xs font-semibold text-slate-700 dark:text-zinc-300">Email Address</Label>
-                  <Input
-                    type="email"
-                    value={formData.parentEmail}
-                    onChange={(e) => setFormData({ ...formData, parentEmail: e.target.value })}
-                    placeholder="parent@email.com"
-                    className="h-9 text-xs rounded-xl bg-slate-50/50 dark:bg-zinc-800/50 border-slate-200 dark:border-zinc-700"
-                  />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {/* Phone Number with +91 */}
                 <div className="space-y-1.5">
-                  <Label className="text-xs font-semibold text-slate-700 dark:text-zinc-300">Phone Number</Label>
+                  <Label className="text-xs font-semibold text-slate-700 dark:text-zinc-300">Parent Phone</Label>
                   <div className="flex rounded-xl overflow-hidden border border-slate-200 dark:border-zinc-700 bg-slate-50/50 dark:bg-zinc-800/50 focus-within:ring-1 focus-within:ring-emerald-500">
                     <span className="inline-flex items-center px-2.5 text-xs text-slate-500 bg-slate-100 dark:bg-zinc-800 border-r border-slate-200 dark:border-zinc-700 font-medium">
                       +91
@@ -802,15 +796,38 @@ export function StudentOverviewTab({
                   </div>
                 </div>
 
+                {/* Parent Email */}
+                <div className="space-y-1.5">
+                  <Label className="text-xs font-semibold text-slate-700 dark:text-zinc-300">Parent Email</Label>
+                  <Input
+                    type="email"
+                    value={formData.parentEmail}
+                    onChange={(e) => setFormData({ ...formData, parentEmail: e.target.value })}
+                    placeholder="parent@email.com"
+                    className="h-9 text-xs rounded-xl bg-slate-50/50 dark:bg-zinc-800/50 border-slate-200 dark:border-zinc-700"
+                  />
+                </div>
+
+                {/* Student Email */}
+                <div className="space-y-1.5">
+                  <Label className="text-xs font-semibold text-slate-700 dark:text-zinc-300">Student Email</Label>
+                  <Input
+                    type="email"
+                    value={formData.email}
+                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                    placeholder="student@school.com"
+                    className="h-9 text-xs rounded-xl bg-slate-50/50 dark:bg-zinc-800/50 border-slate-200 dark:border-zinc-700"
+                  />
+                </div>
+
                 {/* Address */}
                 <div className="space-y-1.5">
                   <Label className="text-xs font-semibold text-slate-700 dark:text-zinc-300">Address</Label>
-                  <textarea
-                    rows={1}
+                  <Input
                     value={formData.address}
                     onChange={(e) => setFormData({ ...formData, address: e.target.value })}
                     placeholder="Enter address"
-                    className="w-full h-9 px-3 py-2 text-xs rounded-xl bg-slate-50/50 dark:bg-zinc-800/50 border border-slate-200 dark:border-zinc-700 focus:outline-none focus:ring-1 focus:ring-emerald-500 text-slate-800 dark:text-zinc-200 resize-none"
+                    className="h-9 text-xs rounded-xl bg-slate-50/50 dark:bg-zinc-800/50 border-slate-200 dark:border-zinc-700"
                   />
                 </div>
               </div>
@@ -819,9 +836,16 @@ export function StudentOverviewTab({
             /* VIEW MODE */
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-y-4 gap-x-4 text-xs sm:text-sm">
               <div>
-                <p className="text-[11px] text-slate-400 dark:text-zinc-500 font-medium">Parent / Guardian</p>
+                <p className="text-[11px] text-slate-400 dark:text-zinc-500 font-medium">Parent Name</p>
                 <p className="font-semibold text-slate-800 dark:text-zinc-100 mt-0.5">
                   {formData.parentName || currentStudent.parentName || "–"}
+                </p>
+              </div>
+
+              <div>
+                <p className="text-[11px] text-slate-400 dark:text-zinc-500 font-medium">Parent Phone</p>
+                <p className="font-semibold text-slate-800 dark:text-zinc-100 mt-0.5">
+                  {formData.parentPhone || currentStudent.parentPhone || "—"}
                 </p>
               </div>
 
@@ -831,20 +855,20 @@ export function StudentOverviewTab({
               </div>
 
               <div className="col-span-2 sm:col-span-1 min-w-0">
-                <p className="text-[11px] text-slate-400 dark:text-zinc-500 font-medium">Email</p>
-                <p className="font-semibold text-slate-800 dark:text-zinc-100 truncate mt-0.5">
-                  {formData.parentEmail || currentStudent.email || "–"}
+                <p className="text-[11px] text-slate-400 dark:text-zinc-500 font-medium">Parent Email</p>
+                <p className="font-semibold text-slate-800 dark:text-zinc-100 break-all mt-0.5">
+                  {formData.parentEmail || currentStudent.parentEmail || "—"}
                 </p>
               </div>
 
-              <div>
-                <p className="text-[11px] text-slate-400 dark:text-zinc-500 font-medium">Phone</p>
-                <p className="font-semibold text-slate-800 dark:text-zinc-100 mt-0.5">
-                  {formData.parentPhone || currentStudent.phone || "—"}
+              <div className="col-span-2 sm:col-span-1 min-w-0">
+                <p className="text-[11px] text-slate-400 dark:text-zinc-500 font-medium">Student Email</p>
+                <p className="font-semibold text-slate-800 dark:text-zinc-100 break-all mt-0.5">
+                  {formData.email || currentStudent.email || "—"}
                 </p>
               </div>
 
-              <div className="col-span-2 sm:col-span-2">
+              <div className="col-span-2 sm:col-span-1">
                 <p className="text-[11px] text-slate-400 dark:text-zinc-500 font-medium">Address</p>
                 <p className="font-semibold text-slate-800 dark:text-zinc-100 mt-0.5">{formData.address || "Not Added"}</p>
               </div>
