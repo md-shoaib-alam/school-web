@@ -162,7 +162,7 @@ export function StudentMarksheet() {
         const examsRes = await apiFetch(`/api/exams?classId=${me.classId}&limit=100`);
         const examsData = await examsRes.json();
         const completedExams = (examsData.data || examsData || []).filter(
-          (e: ExamRecord) => e.status === 'completed' && e.academicYear === selectedYear
+          (e: ExamRecord) => (e.status === 'published' || e.isPublished === true) && e.academicYear === selectedYear
         );
 
         let currentResultsMap: Record<string, any[]> = {};

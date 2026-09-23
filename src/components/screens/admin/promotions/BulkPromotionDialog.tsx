@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -56,9 +57,19 @@ export function BulkPromotionDialog({
   bulkSubmitting,
   academicYearOptions = [],
 }: BulkPromotionDialogProps) {
-  const yearOptions = Array.from(
-    new Set([...academicYearOptions, bulkAcademicYear].filter(Boolean))
-  );
+  const yearOptions = academicYearOptions.length > 0
+    ? academicYearOptions
+    : (bulkAcademicYear ? [bulkAcademicYear] : []);
+
+  const selectedYear = yearOptions.includes(bulkAcademicYear)
+    ? bulkAcademicYear
+    : (yearOptions[0] || "");
+
+  useEffect(() => {
+    if (open && selectedYear && bulkAcademicYear !== selectedYear) {
+      setBulkAcademicYear(selectedYear);
+    }
+  }, [open, selectedYear, bulkAcademicYear, setBulkAcademicYear]);
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-lg">
@@ -122,7 +133,7 @@ export function BulkPromotionDialog({
           <div className="grid gap-2">
             <label className="text-sm font-medium">Academic Year *</label>
             <Select
-              value={bulkAcademicYear}
+              value={selectedYear}
               onValueChange={setBulkAcademicYear}
             >
               <SelectTrigger className="w-full">
@@ -179,7 +190,7 @@ export function BulkPromotionDialog({
             Cancel
           </Button>
           <Button
-            className="bg-amber-600 hover:bg-amber-700 text-white"
+            className="bg-blue-600 hover:bg-blue-700 text-white rounded-xl shadow-xs font-medium cursor-pointer"
             onClick={handleBulkPromote}
             disabled={
               bulkSubmitting ||

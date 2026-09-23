@@ -131,7 +131,18 @@ export function ExamDetailView({
         <div>
           <Button
             variant="outline"
-            onClick={() => onEditExam(primaryFullExam)}
+            onClick={() =>
+              onEditExam({
+                ...primaryFullExam,
+                name: exam.name,
+                rawIds: exam.rawIds,
+                subjects: exam.subjects,
+                subjectCount: exam.subjectCount,
+                className: exam.className,
+                classSection: exam.classSection,
+                cleanName: exam.name,
+              })
+            }
             className="rounded-xl border-border/80 text-foreground font-semibold gap-2 shadow-2xs hover:bg-slate-50 dark:hover:bg-zinc-800"
           >
             <Pencil className="size-4 text-muted-foreground" />
@@ -166,7 +177,7 @@ export function ExamDetailView({
         >
           Subjects
           <span className="size-5 rounded-full bg-slate-100 dark:bg-zinc-800 text-xs font-bold flex items-center justify-center text-muted-foreground">
-            {exam.subjects?.length || 0}
+            {exam.distinctSubjects?.length || exam.subjectCount || exam.subjects?.length || 0}
           </span>
           {activeTab === 'subjects' && (
             <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-emerald-500 rounded-full" />

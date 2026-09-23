@@ -41,6 +41,18 @@ export interface ProcessedExamSubject {
   fullExam: ExamRecord;
 }
 
+/**
+ * Represents a unique subject (by name) across all sections in an exam cycle.
+ * sectionExamIds maps classSection (e.g. "A", "B") → the exam paper ID for that section.
+ * This allows the tabulation preview to look up the correct marks for each student's section.
+ */
+export interface DistinctSubject {
+  subjectName: string;
+  totalMarks: number;
+  /** classSection -> examId for the paper for that section */
+  sectionExamIds: Record<string, string>;
+}
+
 export interface ProcessedExam {
   id: string;
   rawIds: string[];
@@ -55,6 +67,8 @@ export interface ProcessedExam {
   status: 'upcoming' | 'in_progress' | 'completed' | 'draft';
   subjectCount: number;
   subjects: ProcessedExamSubject[];
+  /** Deduplicated subjects by name — 5 distinct subjects even if exam spans 2 sections (10 papers) */
+  distinctSubjects: DistinctSubject[];
   completion: {
     total: number;
     completed: number;
@@ -192,8 +206,19 @@ export function ActiveExamTableRow({
             <Button
               variant="ghost"
               size="icon"
-              className="size-8 text-muted-foreground hover:text-amber-600"
-              onClick={() => onEdit(matchingFullExam)}
+              className="size-8 text-muted-foreground hover:text-blue-600"
+              onClick={() =>
+                onEdit({
+                  ...matchingFullExam,
+                  name: exam.name,
+                  rawIds: exam.rawIds,
+                  subjects: exam.subjects,
+                  subjectCount: exam.subjectCount,
+                  className: exam.className,
+                  classSection: exam.classSection,
+                  cleanName: exam.name,
+                })
+              }
               title="Edit Exam"
             >
               <Pencil className="size-4" />
@@ -249,11 +274,22 @@ export function ActiveExamTableRow({
                   View Details
                 </DropdownMenuItem>
                 <DropdownMenuItem
-                  onClick={() => onEdit(matchingFullExam)}
+                  onClick={() =>
+                    onEdit({
+                      ...matchingFullExam,
+                      name: exam.name,
+                      rawIds: exam.rawIds,
+                      subjects: exam.subjects,
+                      subjectCount: exam.subjectCount,
+                      className: exam.className,
+                      classSection: exam.classSection,
+                      cleanName: exam.name,
+                    })
+                  }
                   className="cursor-pointer gap-2 font-medium"
                 >
-                  <Pencil className="size-4 text-amber-600" />
-                  Edit Exam
+                  <Pencil className="size-4 text-blue-600" />
+                  <span>Edit Exam</span>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <AlertDialog>

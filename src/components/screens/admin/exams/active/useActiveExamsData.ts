@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import { ExamRecord } from '../types';
-import { ProcessedExam, ProcessedExamSubject } from './ActiveExamTableRow';
+import { ProcessedExam, ProcessedExamSubject, DistinctSubject } from './ActiveExamTableRow';
 import { TabType } from './ActiveExamsTabs';
 
 interface UseActiveExamsDataProps {
@@ -58,8 +58,7 @@ export function useActiveExamsData({
       let subjectStatus: 'completed' | 'in_progress' | 'not_started' = 'not_started';
       if (
         exam.status === 'completed' ||
-        exam.status === 'published' ||
-        (totalStudents > 0 && marksEnteredCount >= totalStudents)
+        exam.status === 'published'
       ) {
         subjectStatus = 'completed';
       } else if (marksEnteredCount > 0) {
@@ -101,6 +100,7 @@ export function useActiveExamsData({
           status: 'upcoming',
           subjectCount: 1,
           subjects: [subjectItem],
+          distinctSubjects: [],  // will be finalized below
           completion: {
             total: 1,
             completed: subjectStatus === 'completed' ? 1 : 0,
@@ -121,7 +121,6 @@ export function useActiveExamsData({
         item.subjectCount = uniqueSubjectNames.size;
         if (exam.date && exam.date < item.startDate) item.startDate = exam.date;
         if (exam.date && exam.date > item.endDate) item.endDate = exam.date;
-        if (exam.totalMarks) item.totalMarks += Number(exam.totalMarks) || 100;
         if (exam.status === 'published' || exam.isPublished === true) {
           item.isPublished = true;
         }
@@ -140,6 +139,40 @@ export function useActiveExamsData({
       // Ensure distinct subjectCount is accurate
       const uniqueSubjectNames = new Set(item.subjects.map((s) => s.subjectName.toLowerCase().trim()));
       item.subjectCount = uniqueSubjectNames.size;
+
+      // Build distinctSubjects: one entry per unique subject name, recording which exam ID
+      // belongs to which section. e.g. English -> { A: 'uuid1', B: 'uuid2' }
+      const distinctMap = new Map<string, DistinctSubject>();
+      item.subjects.forEach((sub) => {
+        const nameKey = sub.subjectName.toLowerCase().trim();
+        const section = sub.fullExam?.classSection || 'default';
+        if (!distinctMap.has(nameKey)) {
+          distinctMap.set(nameKey, {
+            subjectName: sub.subjectName,
+            totalMarks: sub.totalMarks,
+            sectionExamIds: { [section]: sub.id },
+          });
+        } else {
+          distinctMap.get(nameKey)!.sectionExamIds[section] = sub.id;
+        }
+      });
+      item.distinctSubjects = Array.from(distinctMap.values());
+
+      // Total Marks is the sum of marks for ONE complete set of distinct subjects (e.g. 5 subjects x 100 = 500, not 1000)
+      item.totalMarks = item.distinctSubjects.reduce((sum, s) => sum + (s.totalMarks || 100), 0);
+
+      // Compute TRUE total students across all sections in this exam cycle.
+      // Each section's paper reports that section's student count.
+      // We map sectionKey (classId or section) -> studentCount, and sum them up.
+      // Example: Section A has 20 students, Section B has 21 students => Total Students = 41.
+      const sectionStudentsMap = new Map<string, number>();
+      item.subjects.forEach((sub) => {
+        const secKey = sub.fullExam?.classId || sub.fullExam?.classSection || 'default';
+        if (!sectionStudentsMap.has(secKey)) {
+          sectionStudentsMap.set(secKey, sub.totalStudents || 0);
+        }
+      });
+      item.totalStudents = Array.from(sectionStudentsMap.values()).reduce((sum, count) => sum + count, 0);
 
       if (item.isPublished || (total > 0 && completed === total)) {
         item.status = 'completed';

@@ -17,7 +17,7 @@ interface ActiveExamsViewProps {
   classes: ClassOption[];
   loadingExams: boolean;
   deleting: boolean;
-  handleDelete: (id: string) => Promise<void>;
+  handleDelete: (id: string | string[]) => Promise<void>;
   setEditForm: (form: any) => void;
   setEditOpen: (open: boolean) => void;
   handleOpenViewResults: (exam: ExamRecord) => Promise<void>;
@@ -99,7 +99,9 @@ export function ActiveExamsView({
   };
 
   const handleDeleteExamIds = (ids: string[]) => {
-    ids.forEach((id) => handleDelete(id));
+    if (ids.length > 0) {
+      handleDelete(ids);
+    }
   };
 
   // If user clicked into an exam, display the full ExamDetailHub (Overview, Subjects, Preview, Publish)

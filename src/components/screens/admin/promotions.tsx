@@ -193,37 +193,27 @@ export function AdminPromotions({ initialTab: propTab }: { initialTab?: "individ
   // Sync academic year fields when currentAcademicYear resolves from database
   useEffect(() => {
     if (currentAcademicYear) {
-      if (!bulkAcademicYear || bulkAcademicYear === getCurrentAcademicYear()) {
-        dispatch({ type: "SET_BULK_ACADEMIC_YEAR", value: currentAcademicYear });
-      }
-      if (!gradAcademicYear || gradAcademicYear === getCurrentAcademicYear()) {
-        dispatch({ type: "SET_GRAD_ACADEMIC_YEAR", value: currentAcademicYear });
-      }
-      if (!form.academicYear || form.academicYear === getCurrentAcademicYear()) {
-        dispatch({ type: "SET_FORM", form: { ...form, academicYear: currentAcademicYear } });
-      }
+      dispatch({ type: "SET_BULK_ACADEMIC_YEAR", value: currentAcademicYear });
+      dispatch({ type: "SET_GRAD_ACADEMIC_YEAR", value: currentAcademicYear });
+      dispatch({ type: "SET_FORM", form: { ...form, academicYear: currentAcademicYear } });
     }
   }, [currentAcademicYear]);
 
   /* ---- Derived data ---- */
 
   const academicYears = useMemo(() => {
+    if (dbAcademicYears.length > 0) {
+      return dbAcademicYears.map((ay: any) => ay.name).filter(Boolean);
+    }
     const names = new Set<string>();
-    dbAcademicYears.forEach((ay: any) => {
-      if (ay.name) names.add(ay.name);
-    });
     promotions.forEach((p) => {
       if (p.academicYear) names.add(p.academicYear);
     });
     graduations.forEach((g) => {
       if (g.academicYear) names.add(g.academicYear);
     });
-    if (currentAcademicYear) {
-      names.add(currentAcademicYear);
-    }
-    names.add(getCurrentAcademicYear());
     return Array.from(names).filter(Boolean).sort().reverse();
-  }, [dbAcademicYears, promotions, graduations, currentAcademicYear]);
+  }, [dbAcademicYears, promotions, graduations]);
 
   const summary = {
     total: promotions.length,
@@ -636,7 +626,7 @@ export function AdminPromotions({ initialTab: propTab }: { initialTab?: "individ
           <div className="flex-1" />
           
           <Button
-            className="bg-emerald-600 hover:bg-emerald-700 text-white gap-2 w-full md:w-auto"
+            className="bg-blue-600 hover:bg-blue-700 text-white gap-2 w-full md:w-auto rounded-xl shadow-xs font-medium cursor-pointer"
             onClick={() => dispatch({ type: "OPEN_NEW_PROMOTION_DIALOG", academicYear: currentAcademicYear })}
           >
             <Plus className="size-4" />

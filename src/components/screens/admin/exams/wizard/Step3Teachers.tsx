@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
+import { formatToDdMmYyyy } from '@/lib/utils';
 import { ClassOption, SubjectOption } from '../types';
 import { BulkSubjectRow } from './wizardTypes';
 
@@ -194,7 +195,7 @@ export function Step3Teachers({
                             <div className="flex flex-col text-xs text-slate-600 dark:text-zinc-400 gap-1">
                               <div className="flex items-center gap-1.5 font-medium text-slate-700 dark:text-zinc-300">
                                 <Calendar className="size-3 text-blue-500" />
-                                <span>{univRow.date}</span>
+                                <span>{formatToDdMmYyyy(univRow.date)}</span>
                               </div>
                               <div className="flex items-center gap-3 text-[11px] text-slate-400">
                                 <span className="flex items-center gap-1">

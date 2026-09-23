@@ -40,10 +40,11 @@ export function SuccessModal({ summary, onSuccess }: SuccessModalProps) {
         {/* Heading & Subtitle */}
         <div className="space-y-2">
           <h3 className="text-xl font-bold text-slate-900 dark:text-white tracking-tight">
-            Exam Created Successfully!
+            {summary.isEdit ? 'Exam Updated Successfully!' : 'Exam Created Successfully!'}
           </h3>
           <p className="text-xs sm:text-sm text-slate-500 dark:text-zinc-400 max-w-xs mx-auto leading-relaxed">
-            <span className="font-semibold text-slate-700 dark:text-zinc-200">{summary.examName}</span> has been created for{' '}
+            <span className="font-semibold text-slate-700 dark:text-zinc-200">{summary.examName}</span> has been{' '}
+            {summary.isEdit ? 'updated' : 'created'} for{' '}
             <span className="font-semibold text-slate-700 dark:text-zinc-200">{summary.className}</span> with{' '}
             <span className="font-semibold text-slate-700 dark:text-zinc-200">{summary.totalSubjects} subjects</span>.
           </p>

@@ -13,11 +13,21 @@ interface ExamOverviewTabProps {
 }
 
 export function ExamOverviewTab({ exam, onNavigateTab }: ExamOverviewTabProps) {
-  const total = exam.completion?.total || exam.subjects?.length || 0;
+  const allSubjectsCount = exam.completion?.total || exam.subjects?.length || 0;
+  const distinctCount = exam.distinctSubjects?.length || exam.subjectCount || allSubjectsCount;
+  const sectionsCount = distinctCount > 0 && allSubjectsCount > distinctCount
+    ? Math.round(allSubjectsCount / distinctCount)
+    : 1;
+  const isMultiSection = sectionsCount > 1;
+
   const completed = exam.completion?.completed || 0;
   const inProgress = exam.completion?.inProgress || 0;
   const notStarted = exam.completion?.notStarted || 0;
-  const percentage = exam.completion?.percentage ?? (total > 0 ? Math.round((completed / total) * 100) : 0);
+  // For completion display: completed distinct subjects = sections where that subject is done
+  // Use raw completion percentage (over all papers) as it's the most accurate
+  const percentage = exam.completion?.percentage ?? 0;
+  // For the label: show distinct subjects done / total distinct subjects
+  const completedDistinct = distinctCount > 0 ? Math.round((completed / (sectionsCount || 1))) : completed;
 
   return (
     <div className="space-y-6">
@@ -76,7 +86,12 @@ export function ExamOverviewTab({ exam, onNavigateTab }: ExamOverviewTabProps) {
           <h3 className="text-base font-bold text-foreground">Subject Completion</h3>
           <div className="flex items-center justify-between text-sm mt-1">
             <span className="text-muted-foreground font-medium">
-              <strong className="text-foreground font-semibold">{completed}</strong> / {total} subjects completed
+              <strong className="text-foreground font-semibold">{completedDistinct}</strong> / {distinctCount} subjects completed
+              {isMultiSection && (
+                <span className="ml-1 text-xs text-muted-foreground/70">
+                  ({sectionsCount} sections · {allSubjectsCount} papers)
+                </span>
+              )}
             </span>
             <span className="font-bold text-foreground">{percentage}%</span>
           </div>
@@ -129,9 +144,9 @@ export function ExamOverviewTab({ exam, onNavigateTab }: ExamOverviewTabProps) {
         {/* Quick actions footer */}
         <div className="pt-2 flex flex-wrap items-center justify-between gap-3 border-t border-border/60">
           <p className="text-xs text-muted-foreground">
-            {completed === total
+            {completed === allSubjectsCount
               ? 'All subjects evaluated! Ready for result preview and publication.'
-              : `${total - completed} subjects remaining to finish mark evaluation.`}
+              : `${allSubjectsCount - completed} papers remaining to finish mark evaluation.`}
           </p>
           <div className="flex items-center gap-2">
             <button

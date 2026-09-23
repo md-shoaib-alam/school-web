@@ -22,17 +22,45 @@ export function ExamPreviewResultTab({ exam, onNavigatePublish }: ExamPreviewRes
 
   const subjects = useMemo(() => exam.subjects || [], [exam.subjects]);
 
+  // Distinct subjects (deduplicated by name) — 5 subjects even if exam spans 2 sections
+  const distinctSubjects = useMemo(() => exam.distinctSubjects || [], [exam.distinctSubjects]);
+
   // Load students for this class and result marks for each subject
   useEffect(() => {
     let isMounted = true;
     async function loadData() {
       setLoading(true);
       try {
-        const studentList = await fetchAllStudents({ classId: exam.classId });
-        if (!isMounted) return;
-        setStudents(studentList);
+        // Collect all distinct classIds involved in this exam cycle (e.g. Class 1-A and Class 1-B)
+        const classIds = Array.from(
+          new Set(
+            subjects
+              .map((s) => s.fullExam?.classId)
+              .filter((cId): cId is string => Boolean(cId))
+          )
+        );
 
-        // Fetch results for all subject papers concurrently
+        let studentList: any[] = [];
+        if (classIds.length > 1) {
+          const studentLists = await Promise.all(
+            classIds.map((cId) => fetchAllStudents({ classId: cId }))
+          );
+          studentList = studentLists.flat();
+        } else {
+          studentList = await fetchAllStudents({ classId: exam.classId });
+        }
+
+        // Deduplicate students by id
+        const uniqueStudentsMap = new Map<string, any>();
+        studentList.forEach((s) => {
+          if (s?.id) uniqueStudentsMap.set(s.id, s);
+        });
+        const deduplicatedStudents = Array.from(uniqueStudentsMap.values());
+
+        if (!isMounted) return;
+        setStudents(deduplicatedStudents);
+
+        // Fetch results for ALL section exam papers concurrently (all 10 if 2 sections)
         const resultsMap: Record<string, Record<string, number>> = {};
         await Promise.all(
           subjects.map(async (sub) => {
@@ -79,7 +107,7 @@ export function ExamPreviewResultTab({ exam, onNavigatePublish }: ExamPreviewRes
     return 'F';
   };
 
-  // Matrix rows calculation using STRICTLY real database data (no fake fallback students/scores)
+  // Matrix rows — uses distinctSubjects (5 columns) and looks up the correct section paper per student
   const matrixRows = useMemo(() => {
     return students
       .filter((s: any) => {
@@ -92,17 +120,24 @@ export function ExamPreviewResultTab({ exam, onNavigatePublish }: ExamPreviewRes
         let totalPossible = 0;
         let hasAnyMarks = false;
 
+        const studentSection = student.section || (student.className ? student.className.split('-')[1]?.trim() : '') || 'default';
         const marksBySubject: Record<string, number | string> = {};
 
-        subjects.forEach((sub) => {
-          const fetchedMark = subjectResults[sub.id]?.[student.id];
+        distinctSubjects.forEach((distinctSub) => {
+          // Pick the exam ID for this student's section, fallback to 'default' or first available
+          const examId =
+            distinctSub.sectionExamIds[studentSection] ||
+            distinctSub.sectionExamIds['default'] ||
+            Object.values(distinctSub.sectionExamIds)[0];
+
+          const fetchedMark = examId ? subjectResults[examId]?.[student.id] : undefined;
           if (fetchedMark !== undefined && fetchedMark !== null) {
-            marksBySubject[sub.id] = fetchedMark;
+            marksBySubject[distinctSub.subjectName] = fetchedMark;
             studentTotal += Number(fetchedMark);
-            totalPossible += sub.totalMarks || 100;
+            totalPossible += distinctSub.totalMarks || 100;
             hasAnyMarks = true;
           } else {
-            marksBySubject[sub.id] = '-';
+            marksBySubject[distinctSub.subjectName] = '-';
           }
         });
 
@@ -121,7 +156,7 @@ export function ExamPreviewResultTab({ exam, onNavigatePublish }: ExamPreviewRes
           grade,
         };
       });
-  }, [students, subjects, subjectResults, selectedSection]);
+  }, [students, distinctSubjects, subjectResults, selectedSection]);
 
   // Distinct sections for dropdown from real students
   const sections = useMemo(() => {
@@ -132,6 +167,7 @@ export function ExamPreviewResultTab({ exam, onNavigatePublish }: ExamPreviewRes
     });
     return Array.from(set);
   }, [students]);
+
 
   return (
     <div className="space-y-4">
@@ -201,12 +237,13 @@ export function ExamPreviewResultTab({ exam, onNavigatePublish }: ExamPreviewRes
                 <TableHead className="font-semibold text-xs sm:text-sm text-foreground py-3.5 pl-3">
                   Student Name
                 </TableHead>
-                {subjects.map((sub) => (
+                {/* Subject Columns — deduplicated: 5 subjects, not 10 papers */}
+                {distinctSubjects.map((distinctSub) => (
                   <TableHead
-                    key={sub.id}
+                    key={distinctSub.subjectName}
                     className="font-semibold text-xs sm:text-sm text-foreground py-3.5 text-center min-w-20"
                   >
-                    {sub.subjectName}
+                    {distinctSub.subjectName}
                   </TableHead>
                 ))}
                 <TableHead className="font-bold text-xs sm:text-sm text-foreground py-3.5 text-center min-w-16">
@@ -224,14 +261,14 @@ export function ExamPreviewResultTab({ exam, onNavigatePublish }: ExamPreviewRes
               {loading ? (
                 Array.from({ length: 5 }).map((_, i) => (
                   <TableRow key={i}>
-                    <TableCell colSpan={subjects.length + 5} className="py-4">
+                    <TableCell colSpan={distinctSubjects.length + 5} className="py-4">
                       <Skeleton className="h-6 w-full rounded" />
                     </TableCell>
                   </TableRow>
                 ))
               ) : matrixRows.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={subjects.length + 5} className="text-center py-12 text-muted-foreground">
+                  <TableCell colSpan={distinctSubjects.length + 5} className="text-center py-12 text-muted-foreground">
                     No student records found for this class.
                   </TableCell>
                 </TableRow>
@@ -251,12 +288,12 @@ export function ExamPreviewResultTab({ exam, onNavigatePublish }: ExamPreviewRes
                       {row.studentName}
                     </TableCell>
 
-                    {/* Subject Marks Columns */}
-                    {subjects.map((sub) => {
-                      const mark = row.marksBySubject[sub.id];
+                    {/* Subject Marks Columns — keyed by subjectName (deduplicated) */}
+                    {distinctSubjects.map((distinctSub) => {
+                      const mark = row.marksBySubject[distinctSub.subjectName];
                       return (
                         <TableCell
-                          key={sub.id}
+                          key={distinctSub.subjectName}
                           className="py-4 text-center font-medium text-sm text-slate-800 dark:text-zinc-200 tabular-nums"
                         >
                           {mark !== undefined ? mark : '-'}

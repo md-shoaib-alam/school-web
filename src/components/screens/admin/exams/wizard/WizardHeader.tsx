@@ -6,16 +6,16 @@ interface WizardHeaderProps {
   currentStep: number;
   onCancel: () => void;
   onStepClick: (stepNumber: number) => void;
+  isEdit?: boolean;
 }
 
-const steps = [
-  { number: 1, title: 'Basic Details', subtitle: 'Exam information' },
-  { number: 2, title: 'Select Subjects', subtitle: 'Choose subjects' },
-  { number: 3, title: 'Assign Teachers', subtitle: 'Review or modify' },
-  { number: 4, title: 'Review & Create', subtitle: 'Confirm and create' },
-];
-
-export function WizardHeader({ currentStep, onCancel, onStepClick }: WizardHeaderProps) {
+export function WizardHeader({ currentStep, onCancel, onStepClick, isEdit = false }: WizardHeaderProps) {
+  const steps = [
+    { number: 1, title: 'Basic Details', subtitle: 'Exam information' },
+    { number: 2, title: 'Select Subjects', subtitle: 'Choose subjects' },
+    { number: 3, title: 'Assign Teachers', subtitle: 'Review or modify' },
+    { number: 4, title: isEdit ? 'Review & Update' : 'Review & Create', subtitle: isEdit ? 'Confirm and update' : 'Confirm and create' },
+  ];
   return (
     <div className="space-y-4">
       {/* Top Header: Desktop has standard icon + title; Mobile has circular back button + right orange icon */}
@@ -36,8 +36,12 @@ export function WizardHeader({ currentStep, onCancel, onStepClick }: WizardHeade
           </div>
 
           <div>
-            <h1 className="text-xl sm:text-2xl font-semibold text-slate-900 dark:text-white tracking-tight">Create Exam</h1>
-            <p className="text-xs text-slate-500 dark:text-zinc-400 mt-0.5">Set up a new examination with basic details.</p>
+            <h1 className="text-xl sm:text-2xl font-semibold text-slate-900 dark:text-white tracking-tight">
+              {isEdit ? 'Edit Exam' : 'Create Exam'}
+            </h1>
+            <p className="text-xs text-slate-500 dark:text-zinc-400 mt-0.5">
+              {isEdit ? 'Update examination schedule and details.' : 'Set up a new examination with basic details.'}
+            </p>
           </div>
         </div>
 

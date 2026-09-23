@@ -102,7 +102,8 @@ export function AdminPrintMarksheetContent() {
 
   const publishedFiltered = useMemo(() => {
     return exams.filter(exam => {
-      if (exam.status !== 'completed') return false;
+      const isPublished = exam.status === 'published' || exam.isPublished === true;
+      if (!isPublished) return false;
       const matchAcademicYear = !publishedAcademicYearFilter || exam.academicYear === publishedAcademicYearFilter;
       const matchClass = publishedClassFilter === 'all' || exam.classId === publishedClassFilter;
       return matchAcademicYear && matchClass;
@@ -193,11 +194,11 @@ export function AdminPrintMarksheetContent() {
         </div>
       </div>
 
-      {exams.filter(e => e.status === 'completed').length === 0 ? (
+      {exams.filter(e => e.status === 'published' || e.isPublished === true).length === 0 ? (
         <div className="flex flex-col items-center justify-center p-12 border-2 border-dashed border-zinc-200 dark:border-zinc-800 rounded-2xl bg-card text-center text-muted-foreground">
           <Trophy className="size-16 mb-4 text-emerald-500/40" />
-          <h3 className="text-lg font-semibold text-foreground">No Completed Exams</h3>
-          <p className="text-sm mt-1 max-w-md">There are no completed or finalized exams to print marksheets for yet.</p>
+          <h3 className="text-lg font-semibold text-foreground">No Published Exams</h3>
+          <p className="text-sm mt-1 max-w-md">There are no published or finalized exams to print marksheets for yet.</p>
         </div>
       ) : (
         <div className="space-y-4">

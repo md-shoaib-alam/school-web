@@ -2,6 +2,7 @@
 
 import { CheckCircle2, ArrowLeft, Loader2, Sparkles, Layers, Calendar, Clock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { formatToDdMmYyyy } from '@/lib/utils';
 import { ClassOption } from '../types';
 import { BulkSubjectRow } from './wizardTypes';
 
@@ -17,6 +18,7 @@ interface Step4ReviewProps {
   onBack: () => void;
   onCancel: () => void;
   onSubmit: () => void;
+  isEdit?: boolean;
 }
 
 export function Step4Review({
@@ -31,6 +33,7 @@ export function Step4Review({
   onBack,
   onCancel,
   onSubmit,
+  isEdit = false,
 }: Step4ReviewProps) {
   const chosenUniversalRows = currentBulkRows.filter((r) => r.selected);
   const totalPapersCount = chosenUniversalRows.length * selectedClasses.length;
@@ -87,7 +90,7 @@ export function Step4Review({
         <div>
           <p className="text-[11px] text-slate-400 font-medium">Duration</p>
           <p className="text-xs sm:text-sm font-bold text-slate-800 dark:text-zinc-100">
-            {startDate} to {endDate}
+            {formatToDdMmYyyy(startDate)} to {formatToDdMmYyyy(endDate)}
           </p>
         </div>
       </div>
@@ -110,7 +113,7 @@ export function Step4Review({
                 </div>
               </div>
               <div className="flex items-center gap-4 text-slate-500 dark:text-zinc-400 font-medium">
-                <span>{row.date}</span>
+                <span>{formatToDdMmYyyy(row.date)}</span>
                 <span>
                   {row.startTime} - {row.endTime}
                 </span>
@@ -144,7 +147,7 @@ export function Step4Review({
                 <div className="flex flex-col items-end gap-1 shrink-0 text-slate-500 dark:text-zinc-400 text-xs font-medium">
                   <div className="flex items-center gap-1.5">
                     <Calendar className="size-3.5 text-slate-400" />
-                    <span className="text-[11px]">{row.date}</span>
+                    <span className="text-[11px]">{formatToDdMmYyyy(row.date)}</span>
                   </div>
                   <div className="flex items-center gap-1.5">
                     <Clock className="size-3.5 text-slate-400" />
@@ -181,21 +184,21 @@ export function Step4Review({
             Cancel
           </Button>
 
-          {/* Create Exam Schedule Button: Full width on mobile with sparkles icon and exact label */}
+          {/* Submit button */}
           <Button
             onClick={onSubmit}
             disabled={submitting}
-            className="flex-1 sm:flex-initial bg-blue-600 hover:bg-blue-700 text-white h-11 sm:h-10 px-4 sm:px-7 rounded-2xl sm:rounded-xl font-semibold gap-2 shadow-md shadow-blue-500/25 justify-center"
+            className="flex-1 sm:flex-initial bg-blue-600 hover:bg-blue-700 text-white h-11 sm:h-10 px-4 sm:px-7 rounded-2xl sm:rounded-xl font-semibold gap-2 shadow-md shadow-blue-500/25 justify-center cursor-pointer"
           >
             {submitting ? (
               <>
                 <Loader2 className="size-4 animate-spin" />
-                <span>Creating...</span>
+                <span>{isEdit ? 'Updating...' : 'Creating...'}</span>
               </>
             ) : (
               <>
                 <Sparkles className="size-4 fill-white/20" />
-                <span>Create Exam Schedule</span>
+                <span>{isEdit ? 'Save Changes' : 'Create Exam Schedule'}</span>
               </>
             )}
           </Button>

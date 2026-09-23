@@ -30,7 +30,7 @@ export function ResultsTable({
 }: ResultsTableProps) {
   const hasPending =
     resultRows.length === 0 ||
-    resultRows.some((r) => !r.marksObtained || r.marksObtained.trim() === '' || r.status === 'pending');
+    resultRows.some((r) => r.marksObtained == null || String(r.marksObtained).trim() === '');
 
   return (
     <Card>

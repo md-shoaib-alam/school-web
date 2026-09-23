@@ -18,6 +18,7 @@ export interface CreatedExamSummary {
   totalSubjects: number;
   startDate: string;
   endDate: string;
+  isEdit?: boolean;
 }
 
 export interface GradeGroup {

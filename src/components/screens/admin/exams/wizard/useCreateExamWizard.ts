@@ -11,6 +11,7 @@ interface UseCreateExamWizardProps {
   currentAcademicYear: string;
   teachers?: any[];
   onSuccess: () => void;
+  initialExam?: any;
 }
 
 export function useCreateExamWizard({
@@ -19,13 +20,22 @@ export function useCreateExamWizard({
   currentAcademicYear,
   teachers = [],
   onSuccess,
+  initialExam,
 }: UseCreateExamWizardProps) {
+  const isEdit = !!initialExam;
   const [currentStep, setCurrentStep] = useState<number>(1);
   const [submitting, setSubmitting] = useState<boolean>(false);
 
-  // Selection Mode: default to 'grade' (Class-wise: All Sections)
-  const [selectionMode, setSelectionMode] = useState<'section' | 'grade'>('grade');
+  // Selection Mode: default to 'section' if editing an existing class exam, else 'grade'
+  const [selectionMode, setSelectionMode] = useState<'section' | 'grade'>(() => {
+    if (initialExam?.selectionMode) return initialExam.selectionMode;
+    if (initialExam?.classId) return 'section';
+    return 'grade';
+  });
   const [selectedGrade, setSelectedGrade] = useState<string>(() => {
+    if (initialExam?.className) {
+      return initialExam.className.replace(/^Class\s*/i, '');
+    }
     return classes[0]?.grade || classes[0]?.name || '';
   });
 
@@ -43,8 +53,9 @@ export function useCreateExamWizard({
     }));
   }, [classes]);
 
-  // Default selected classes to all sections of the first grade
+  // Default selected classes
   const [selectedClassIds, setSelectedClassIds] = useState<string[]>(() => {
+    if (initialExam?.classId) return [initialExam.classId];
     if (classes.length === 0) return [];
     const firstKey = classes[0]?.grade || classes[0]?.name || '';
     const matching = classes.filter((c) => (c.grade || c.name || '') === firstKey);
@@ -52,18 +63,24 @@ export function useCreateExamWizard({
   });
 
   // Form State
-  const [examName, setExamName] = useState('');
-  const [examType, setExamType] = useState('midterm');
+  const [examName, setExamName] = useState(() => initialExam?.name || initialExam?.cleanName || '');
+  const [examType, setExamType] = useState(() => initialExam?.examType || 'midterm');
   const [academicYear, setAcademicYear] = useState(() => {
+    if (initialExam?.academicYear) return initialExam.academicYear;
     if (currentAcademicYear) return currentAcademicYear;
     const y = new Date().getFullYear();
     return `${y}-${y + 1}`;
   });
-  const [startDate, setStartDate] = useState(new Date().toISOString().split('T')[0]);
-  const [endDate, setEndDate] = useState(
-    new Date(Date.now() + 5 * 86400000).toISOString().split('T')[0]
+  const [startDate, setStartDate] = useState(
+    () => initialExam?.startDate || initialExam?.date || new Date().toISOString().split('T')[0]
   );
-  const [description, setDescription] = useState('');
+  const [endDate, setEndDate] = useState(
+    () =>
+      initialExam?.endDate ||
+      initialExam?.date ||
+      new Date(Date.now() + 5 * 86400000).toISOString().split('T')[0]
+  );
+  const [description, setDescription] = useState(() => initialExam?.description || '');
 
   const handleSelectGrade = (gradeName: string) => {
     setSelectedGrade(gradeName);
@@ -157,10 +174,30 @@ export function useCreateExamWizard({
         });
       }
     });
+
+    if (initialExam?.subjects && Array.isArray(initialExam.subjects)) {
+      initialExam.subjects.forEach((s: any) => {
+        const key = (s.subjectName || s.name || '').trim().toLowerCase();
+        if (key && !map.has(key)) {
+          map.set(key, {
+            key,
+            name: s.subjectName || s.name || 'Subject',
+            code: s.code,
+            sampleId: s.subjectId || s.id,
+          });
+        }
+      });
+    }
+
     return Array.from(map.values());
-  }, [selectedClassesSubjects]);
+  }, [selectedClassesSubjects, initialExam]);
 
   const [selectedSubjectKeys, setSelectedSubjectKeys] = useState<Set<string>>(() => {
+    if (initialExam?.subjects && Array.isArray(initialExam.subjects) && initialExam.subjects.length > 0) {
+      return new Set(
+        initialExam.subjects.map((s: any) => (s.subjectName || s.name || '').trim().toLowerCase())
+      );
+    }
     return new Set(distinctSubjects.map((d) => d.key));
   });
 
@@ -175,11 +212,37 @@ export function useCreateExamWizard({
         passingMarks: string;
       }
     >
-  >({});
+  >(() => {
+    const initialConfig: Record<string, any> = {};
+    if (initialExam?.subjects && Array.isArray(initialExam.subjects)) {
+      initialExam.subjects.forEach((s: any) => {
+        const key = (s.subjectName || s.name || '').trim().toLowerCase();
+        if (key) {
+          initialConfig[key] = {
+            date: s.date || initialExam.startDate || initialExam.date || '',
+            startTime: s.startTime || '09:00',
+            endTime: s.endTime || '11:00',
+            totalMarks: String(s.totalMarks || initialExam.totalMarks || 100),
+            passingMarks: String(s.passingMarks || initialExam.passingMarks || 40),
+          };
+        }
+      });
+    }
+    return initialConfig;
+  });
 
-  const [classTeacherAssignments, setClassTeacherAssignments] = useState<Record<string, string>>(
-    {}
-  );
+  const [classTeacherAssignments, setClassTeacherAssignments] = useState<Record<string, string>>(() => {
+    const map: Record<string, string> = {};
+    if (initialExam?.subjects && initialExam.classId) {
+      initialExam.subjects.forEach((s: any) => {
+        const key = `${initialExam.classId}_${(s.subjectName || s.name || '').trim().toLowerCase()}`;
+        if (s.teacherId || s.fullExam?.teacherId) {
+          map[key] = s.teacherId || s.fullExam?.teacherId;
+        }
+      });
+    }
+    return map;
+  });
 
   const currentBulkRows: BulkSubjectRow[] = useMemo(() => {
     return distinctSubjects.map((s) => {
@@ -269,6 +332,84 @@ export function useCreateExamWizard({
     setSubmitting(true);
     try {
       const chosenUniversalRows = currentBulkRows.filter((r) => r.selected);
+
+      if (initialExam) {
+        // EDIT MODE: Update existing exam cycle or single exam
+        const targetClassId = selectedClasses[0]?.id || initialExam.classId;
+        const rawIds = initialExam.rawIds || (initialExam.id ? [initialExam.id] : []);
+
+        const subjectUpdates = chosenUniversalRows
+          .map((row) => {
+            const matchedSub = (initialExam.subjects || []).find(
+              (s: any) => (s.subjectName || s.name || '').trim().toLowerCase() === row.key
+            );
+            return {
+              id: matchedSub?.id || matchedSub?.fullExam?.id,
+              date: row.date,
+              startTime: row.startTime,
+              endTime: row.endTime,
+              totalMarks: Number(row.totalMarks) || 100,
+              passingMarks: Number(row.passingMarks) || 40,
+            };
+          })
+          .filter((s: any) => !!s.id);
+
+        const payload: any = {
+          id: initialExam.id,
+          rawIds,
+          name: examName.trim(),
+          examType,
+          academicYear: academicYear || currentAcademicYear,
+          description: description.trim() || undefined,
+          startDate,
+          endDate,
+          classId: targetClassId,
+          applyToAllSubjects: false,
+          subjectUpdates,
+        };
+
+        if (chosenUniversalRows.length > 0) {
+          payload.date = chosenUniversalRows[0].date;
+          payload.startTime = chosenUniversalRows[0].startTime;
+          payload.endTime = chosenUniversalRows[0].endTime;
+          payload.totalMarks = Number(chosenUniversalRows[0].totalMarks) || 100;
+          payload.passingMarks = Number(chosenUniversalRows[0].passingMarks) || 40;
+        }
+
+        const res = await apiFetch('/api/exams', {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+        });
+
+        if (!res.ok) {
+          const data = await res.json().catch(() => ({}));
+          throw new Error(data.error || 'Failed to update examination schedule');
+        }
+
+        toast.success(`Successfully updated examination "${examName.trim()}"!`);
+
+        const classLabel =
+          selectionMode === 'grade'
+            ? selectedGrade.toLowerCase().startsWith('grade') ||
+              selectedGrade.toLowerCase().startsWith('class')
+              ? selectedGrade
+              : `Class ${selectedGrade}`
+            : selectedClasses[0]
+            ? `${selectedClasses[0].name} - ${selectedClasses[0].section}`
+            : initialExam.className || 'Selected Class';
+
+        setCreatedSummary({
+          examName: examName.trim(),
+          className: classLabel,
+          totalSubjects: chosenUniversalRows.length,
+          startDate,
+          endDate,
+          isEdit: true,
+        });
+        return;
+      }
+
       let totalCreatedCount = 0;
 
       for (const cls of selectedClasses) {
@@ -350,6 +491,7 @@ export function useCreateExamWizard({
   };
 
   return {
+    isEdit,
     currentStep,
     setCurrentStep,
     submitting,

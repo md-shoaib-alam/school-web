@@ -32,16 +32,32 @@ export function ExamPublishResultTab({ exam, onSuccessPublished }: ExamPublishRe
   const [publishing, setPublishing] = useState(false);
   const [isPublishedState, setIsPublishedState] = useState(exam.isPublished);
 
-  const totalSubjects = exam.subjects?.length || 0;
-  const completedSubjects = exam.subjects?.filter((s) => s.status === 'completed').length || 0;
-  const allCompleted = completedSubjects === totalSubjects && totalSubjects > 0;
+  // Distinct subjects (e.g. 5 subjects) for display
+  const distinctSubjects = exam.distinctSubjects || [];
+  const totalSubjects = distinctSubjects.length || exam.subjectCount || exam.subjects?.length || 0;
 
+  // Raw subject papers count across all sections (e.g. 10 papers = 5 subjects x 2 sections)
+  const rawSubjectCount = exam.subjects?.length || 0;
+  const completedSubjects = exam.subjects?.filter((s) => s.status === 'completed').length || 0;
+  const allCompleted = completedSubjects === rawSubjectCount && rawSubjectCount > 0;
+
+  // True total unique students across all sections in this exam (e.g. 40, or 41 if Section A=20, B=21)
   const totalStudents = exam.totalStudents || 0;
-  const totalEntriesExpected = totalStudents * totalSubjects;
+
+  // Total marks is computed from distinct subjects (e.g. 5 subjects x 100 = 500)
+  const totalMarks = exam.totalMarks || distinctSubjects.reduce((acc, s) => acc + (s.totalMarks || 0), 0) || 0;
+
+  // Total marks entries expected across all student papers
+  // Each paper has `s.totalStudents`. Sum of all papers' students = total marks entries expected!
+  // E.g., Section A (20 students x 5 papers = 100) + Section B (21 students x 5 papers = 105) = 205 entries (or 200 for 40 students).
+  const totalEntriesExpected =
+    exam.subjects?.reduce((acc, s) => acc + (s.totalStudents || 0), 0) ||
+    (totalStudents * totalSubjects);
+
+  // Actual marks entered across all papers
   const actualEntries = exam.subjects?.reduce((acc, s) => acc + (s.marksEnteredCount || 0), 0) || 0;
   const entriesPercentage =
     totalEntriesExpected > 0 ? Math.round((actualEntries / totalEntriesExpected) * 100) : 0;
-  const totalMarks = exam.subjects?.reduce((acc, s) => acc + (s.totalMarks || 0), 0) || exam.totalMarks || 0;
 
   const handlePublishSubmit = async () => {
     if (!allCompleted && !isPublishedState) {

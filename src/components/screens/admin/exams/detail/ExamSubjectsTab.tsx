@@ -1,8 +1,9 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useMemo } from 'react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import {
   Pencil,
   ClipboardList,
@@ -14,6 +15,7 @@ import {
   Laptop,
   GraduationCap,
   Eye,
+  Layers,
 } from 'lucide-react';
 import { ProcessedExam, ProcessedExamSubject } from '../active/ActiveExamTableRow';
 import { ExamRecord } from '../types';
@@ -70,10 +72,29 @@ function getSubjectIcon(name: string) {
 }
 
 export function ExamSubjectsTab({ exam, onEnterMarks, onViewResults }: ExamSubjectsTabProps) {
-  const subjects = exam.subjects || [];
+  const allSubjects = exam.subjects || [];
+  const distinctSubjects = exam.distinctSubjects || [];
+  const isMultiSection = distinctSubjects.length > 0 && allSubjects.length > distinctSubjects.length;
+
+  // Distinct sections available in this exam
+  const availableSections = useMemo(() => {
+    const set = new Set<string>();
+    allSubjects.forEach((s) => {
+      const sec = s.fullExam?.classSection;
+      if (sec) set.add(sec);
+    });
+    return Array.from(set).sort();
+  }, [allSubjects]);
+
+  const [selectedSection, setSelectedSection] = useState<string>('all');
+
+  // Subjects filtered by section
+  const subjects = useMemo(() => {
+    if (selectedSection === 'all' || availableSections.length <= 1) return allSubjects;
+    return allSubjects.filter((s) => (s.fullExam?.classSection || '') === selectedSection);
+  }, [allSubjects, selectedSection, availableSections]);
 
   const handleGlobalEnterMarks = () => {
-    // Open marks entry for the first in-progress or not-started subject, or first subject
     const target = subjects.find((s) => s.status !== 'completed') || subjects[0];
     if (target) {
       onEnterMarks(target.fullExam);
@@ -93,12 +114,28 @@ export function ExamSubjectsTab({ exam, onEnterMarks, onViewResults }: ExamSubje
               {exam.name} &gt; Subjects
             </h2>
             <p className="text-xs sm:text-sm text-muted-foreground mt-0.5">
-              Manage subjects and view mark entry status.
+              {isMultiSection
+                ? `${distinctSubjects.length} distinct subject${distinctSubjects.length !== 1 ? 's' : ''} · ${availableSections.length} sections · ${allSubjects.length} papers total`
+                : 'Manage subjects and view mark entry status.'}
             </p>
           </div>
         </div>
 
-        <div>
+        <div className="flex items-center gap-2">
+          {/* Section filter dropdown — only shown for multi-section exams */}
+          {isMultiSection && availableSections.length > 1 && (
+            <Select value={selectedSection} onValueChange={setSelectedSection}>
+              <SelectTrigger className="w-36 rounded-xl bg-slate-50 dark:bg-zinc-800/60 border-border/80 text-xs font-semibold h-9">
+                <SelectValue placeholder="All Sections" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Sections</SelectItem>
+                {availableSections.map((sec) => (
+                  <SelectItem key={sec} value={sec}>Section {sec}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          )}
           <Button
             onClick={handleGlobalEnterMarks}
             variant="outline"

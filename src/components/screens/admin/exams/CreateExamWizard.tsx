@@ -17,6 +17,7 @@ interface CreateExamWizardProps {
   currentAcademicYear: string;
   onSuccess: () => void;
   teachers?: any[];
+  initialExam?: any;
 }
 
 export function CreateExamWizard({
@@ -27,6 +28,7 @@ export function CreateExamWizard({
   currentAcademicYear,
   onSuccess,
   teachers = [],
+  initialExam,
 }: CreateExamWizardProps) {
   const wizard = useCreateExamWizard({
     classes,
@@ -34,6 +36,7 @@ export function CreateExamWizard({
     currentAcademicYear,
     teachers,
     onSuccess,
+    initialExam,
   });
 
   return (
@@ -42,6 +45,7 @@ export function CreateExamWizard({
         currentStep={wizard.currentStep}
         onCancel={onCancel}
         onStepClick={(step) => wizard.setCurrentStep(step)}
+        isEdit={wizard.isEdit}
       />
 
       {/* STEP 1: Basic Details */}
@@ -126,6 +130,7 @@ export function CreateExamWizard({
           onBack={() => wizard.setCurrentStep(3)}
           onCancel={onCancel}
           onSubmit={wizard.handleFinalSubmit}
+          isEdit={wizard.isEdit}
         />
       )}
 

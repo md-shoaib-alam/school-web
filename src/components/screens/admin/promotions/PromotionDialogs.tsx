@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -46,9 +47,19 @@ export function NewPromotionDialog({
   handleStudentChange,
   academicYearOptions = [],
 }: NewPromotionDialogProps) {
-  const yearOptions = Array.from(
-    new Set([...academicYearOptions, form.academicYear].filter(Boolean))
-  );
+  const yearOptions = academicYearOptions.length > 0
+    ? academicYearOptions
+    : (form.academicYear ? [form.academicYear] : []);
+
+  const selectedYear = yearOptions.includes(form.academicYear)
+    ? form.academicYear
+    : (yearOptions[0] || "");
+
+  useEffect(() => {
+    if (open && selectedYear && form.academicYear !== selectedYear) {
+      setForm({ ...form, academicYear: selectedYear });
+    }
+  }, [open, selectedYear, form.academicYear]);
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-lg">
@@ -135,7 +146,7 @@ export function NewPromotionDialog({
           <div className="grid gap-2">
             <label className="text-sm font-medium">Academic Year *</label>
             <Select
-              value={form.academicYear}
+              value={selectedYear}
               onValueChange={(val) =>
                 setForm({ ...form, academicYear: val })
               }
@@ -167,7 +178,7 @@ export function NewPromotionDialog({
             Cancel
           </Button>
           <Button
-            className="bg-emerald-600 hover:bg-emerald-700 text-white"
+            className="bg-blue-600 hover:bg-blue-700 text-white rounded-xl shadow-xs font-medium cursor-pointer"
             onClick={handleCreatePromotion}
             disabled={
               submitting ||

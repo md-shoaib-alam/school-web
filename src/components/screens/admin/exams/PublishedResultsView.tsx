@@ -25,7 +25,7 @@ interface PublishedResultsViewProps {
   handlePrintTabularLedger: (classId: string, className: string, classSection: string, templateId: string, examName?: string, isDownload?: boolean) => Promise<void>;
   loadingExams: boolean;
   deleting: boolean;
-  handleDelete: (id: string) => Promise<void>;
+  handleDelete: (id: string | string[]) => Promise<void>;
   setEditForm: (form: any) => void;
   setEditOpen: (open: boolean) => void;
   handleOpenViewResults: (exam: ExamRecord) => Promise<void>;
@@ -61,7 +61,8 @@ export function PublishedResultsView({
 
   const publishedFiltered = useMemo(() => {
     return exams.filter(exam => {
-      if (exam.status !== 'completed') return false;
+      const isPublished = exam.status === 'published' || exam.isPublished === true;
+      if (!isPublished) return false;
       const matchAcademicYear = !publishedAcademicYearFilter || exam.academicYear === publishedAcademicYearFilter;
       const matchClass = publishedClassFilter === 'all' || exam.classId === publishedClassFilter;
       return matchAcademicYear && matchClass;
@@ -84,11 +85,11 @@ export function PublishedResultsView({
         </div>
       </div>
       
-      {exams.filter(e => e.status === 'completed').length === 0 ? (
+      {exams.filter(e => e.status === 'published' || e.isPublished === true).length === 0 ? (
         <div className="flex flex-col items-center justify-center p-12 border-2 border-dashed border-zinc-200 dark:border-zinc-800 rounded-2xl bg-card text-center text-muted-foreground animate-in fade-in duration-300">
           <Trophy className="size-16 mb-4 text-emerald-500/40" />
           <h3 className="text-lg font-semibold text-foreground">No Published Results</h3>
-          <p className="text-sm mt-1 max-w-md">There are no finalized or completed exams to view results for yet.</p>
+          <p className="text-sm mt-1 max-w-md">There are no finalized or published exams to view results for yet.</p>
         </div>
       ) : (
         <div className="space-y-4 animate-in fade-in duration-300">

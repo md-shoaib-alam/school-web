@@ -45,6 +45,7 @@ export function useExamsState(initialTab = 'exams') {
     }
   }, [currentAcademicYear]);
   
+  const [editingExam, setEditingExam] = useState<any>(null);
   const [editOpen, setEditOpen] = useState(false);
   const [editForm, setEditForm] = useState<ExamFormData & { id: string }>({ ...emptyExamForm, id: '' });
   const [saving, setSaving] = useState(false);
@@ -66,6 +67,28 @@ export function useExamsState(initialTab = 'exams') {
       }
     });
   }, [initialTab, searchParams]);
+
+  // Sync state from URL params if present (e.g. results-entry?examId=...&classId=...)
+  useEffect(() => {
+    const urlClassId = searchParams.get('classId');
+    const urlExamId = searchParams.get('examId');
+
+    if (urlClassId && urlClassId !== resultsClassId) {
+      setResultsClassId(urlClassId);
+    }
+
+    if (urlExamId && (!selectedExam || selectedExam.id !== urlExamId)) {
+      apiFetch(`/api/exams?id=${urlExamId}`).then(async (res) => {
+        if (!res.ok) return;
+        const data = await res.json();
+        const list = Array.isArray(data) ? data : (Array.isArray(data.data) ? data.data : []);
+        const found = data.exam || list.find((e: any) => e.id === urlExamId);
+        if (found) {
+          openResultsEntry(found);
+        }
+      }).catch(console.error);
+    }
+  }, [searchParams]);
 
   // View Results Dialog State
   const [viewResultsOpen, setViewResultsOpen] = useState(false);
@@ -229,33 +252,52 @@ export function useExamsState(initialTab = 'exams') {
     setAdding(false);
   };
 
-  const handleUpdate = async () => {
+  const handleUpdate = async (customPayload?: any) => {
     setSaving(true);
     try {
+      const payload = customPayload || {
+        ...editForm,
+        totalMarks: Number(editForm.totalMarks),
+        passingMarks: Number(editForm.passingMarks),
+      };
       const res = await apiFetch('/api/exams', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...editForm, totalMarks: Number(editForm.totalMarks), passingMarks: Number(editForm.passingMarks) }),
+        body: JSON.stringify(payload),
       });
       if (res.ok) {
-        toast.success('Updated!');
+        toast.success('Exam details updated successfully!');
         setEditOpen(false);
         queryClient.invalidateQueries({ queryKey: ['exams'] });
+      } else {
+        const err = await res.json().catch(() => ({}));
+        toast.error(err.error || 'Update failed');
       }
-    } catch { toast.error('Update failed'); }
+    } catch {
+      toast.error('Update failed');
+    }
     setSaving(false);
   };
 
-  const handleDelete = async (id: string) => {
+  const handleDelete = async (id: string | string[]) => {
     setDeleting(true);
     try {
-      const res = await apiFetch(`/api/exams?id=${id}`, { method: 'DELETE' });
+      const idParam = Array.isArray(id) ? id.filter(Boolean).join(',') : id;
+      if (!idParam) return;
+      const res = await apiFetch(`/api/exams?id=${encodeURIComponent(idParam)}`, { method: 'DELETE' });
       if (res.ok) {
-        toast.success('Deleted');
+        toast.success('Exam deleted successfully');
         queryClient.invalidateQueries({ queryKey: ['exams'] });
+        queryClient.invalidateQueries({ queryKey: ['results-exams'] });
+      } else {
+        const err = await res.json().catch(() => ({}));
+        toast.error(err.error || 'Failed to delete exam');
       }
-    } catch { toast.error('Delete failed'); }
-    setDeleting(false);
+    } catch {
+      toast.error('Delete failed');
+    } finally {
+      setDeleting(false);
+    }
   };
 
   const openResultsEntry = async (exam: ExamRecord | null) => {
@@ -356,26 +398,56 @@ export function useExamsState(initialTab = 'exams') {
     if (!selectedExam) return;
     setSavingResults(true);
     try {
+      // Only persist rows where marks have actually been entered
+      const rowsToSave = resultRows
+        .filter(r => r.marksObtained != null && String(r.marksObtained).trim() !== '')
+        .map(r => ({
+          studentId: r.studentId,
+          marksObtained: Number(r.marksObtained),
+          status: r.status === 'pending'
+            ? (Number(r.marksObtained) >= (selectedExam.passingMarks || 40) ? 'pass' : 'fail')
+            : r.status,
+          remarks: r.remarks || null
+        }));
+
+      if (rowsToSave.length === 0) {
+        toast.info('No marks have been entered yet to save.');
+        setSavingResults(false);
+        return;
+      }
+
       const res = await apiFetch('/api/exams/results', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           examId: selectedExam.id,
-          results: resultRows.map(r => ({
-            studentId: r.studentId,
-            marksObtained: Number(r.marksObtained) || 0,
-            status: r.status,
-            remarks: r.remarks || null
-          }))
+          results: rowsToSave
         }),
       });
-      if (res.ok) toast.success('Results saved!');
-    } catch { toast.error('Save failed'); }
+
+      if (res.ok) {
+        toast.success('Draft saved successfully!');
+        queryClient.invalidateQueries({ queryKey: ['exams'] });
+        queryClient.invalidateQueries({ queryKey: ['results-exams'] });
+      } else {
+        toast.error('Failed to save draft');
+      }
+    } catch {
+      toast.error('Save failed');
+    }
     setSavingResults(false);
   };
 
   const handlePublish = async () => {
     if (!selectedExam) return;
+
+    // Check if any students don't have marks entered
+    const unentered = resultRows.filter(r => r.marksObtained == null || String(r.marksObtained).trim() === '');
+    if (unentered.length > 0) {
+      toast.error('All students must have marks entered before marking as complete.');
+      return;
+    }
+
     setIsPublishing(true);
     try {
       // 1. Save Results
@@ -384,39 +456,54 @@ export function useExamsState(initialTab = 'exams') {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           examId: selectedExam.id,
-          results: resultRows.map(r => ({
-            studentId: r.studentId,
-            marksObtained: Number(r.marksObtained) || 0,
-            status: r.status,
-            remarks: r.remarks || null
-          }))
+          results: resultRows.map(r => {
+            const marks = Number(r.marksObtained);
+            const passThreshold = selectedExam.passingMarks || 40;
+            const status = r.status && r.status !== 'pending'
+              ? r.status
+              : (marks >= passThreshold ? 'pass' : 'fail');
+            return {
+              studentId: r.studentId,
+              marksObtained: marks,
+              status,
+              remarks: r.remarks || null
+            };
+          })
         }),
       });
 
-      if (res.ok) {
-        // 2. Update Exam Status to 'completed'
-        const statusRes = await apiFetch('/api/exams', {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            id: selectedExam.id,
-            status: 'completed'
-          }),
-        });
+      if (!res.ok) {
+        const errData = await res.json().catch(() => ({}));
+        toast.error(errData.error || 'Failed to save results');
+        setIsPublishing(false);
+        return;
+      }
 
-        if (statusRes.ok) {
-          toast.success('Results published successfully!');
-          queryClient.invalidateQueries({ queryKey: ['exams'] });
-          setSelectedExam(null);
-          setResultRows([]);
-        } else {
-          toast.error('Failed to update exam status');
+      // 2. Update Exam Status to 'completed'
+      const statusRes = await apiFetch('/api/exams', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          id: selectedExam.id,
+          status: 'completed'
+        }),
+      });
+
+      if (statusRes.ok) {
+        toast.success('Exam marked as complete successfully!');
+        queryClient.invalidateQueries({ queryKey: ['exams'] });
+        queryClient.invalidateQueries({ queryKey: ['results-exams'] });
+        setSelectedExam(null);
+        setResultRows([]);
+        if (searchParams.get('examId')) {
+          router.push(`/${slug}/results-entry${selectedExam.classId ? `?classId=${selectedExam.classId}` : ''}`);
         }
       } else {
-        toast.error('Failed to save results');
+        const errData = await statusRes.json().catch(() => ({}));
+        toast.error(errData.error || 'Failed to update exam status');
       }
-    } catch {
-      toast.error('Publishing failed');
+    } catch (err: any) {
+      toast.error(err?.message || 'Publishing failed');
     }
     setIsPublishing(false);
   };
@@ -470,6 +557,8 @@ export function useExamsState(initialTab = 'exams') {
     addForm,
     setAddForm,
     adding,
+    editingExam,
+    setEditingExam,
     editOpen,
     setEditOpen,
     editForm,

@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect } from "react";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -60,9 +61,19 @@ export function GraduatedTab({
   graduations,
   academicYearOptions = [],
 }: GraduatedTabProps) {
-  const yearOptions = Array.from(
-    new Set([...academicYearOptions, gradAcademicYear].filter(Boolean))
-  );
+  const yearOptions = academicYearOptions.length > 0
+    ? academicYearOptions
+    : (gradAcademicYear ? [gradAcademicYear] : []);
+
+  const selectedYear = yearOptions.includes(gradAcademicYear)
+    ? gradAcademicYear
+    : (yearOptions[0] || "");
+
+  useEffect(() => {
+    if (selectedYear && gradAcademicYear !== selectedYear) {
+      setGradAcademicYear(selectedYear);
+    }
+  }, [selectedYear, gradAcademicYear, setGradAcademicYear]);
   return (
     <div className="space-y-6">
       {/* Quick Graduate Card */}
@@ -98,7 +109,7 @@ export function GraduatedTab({
             <div className="space-y-2">
               <label className="text-sm font-medium">Academic Year *</label>
               <Select
-                value={gradAcademicYear}
+                value={selectedYear}
                 onValueChange={setGradAcademicYear}
               >
                 <SelectTrigger className="w-full">

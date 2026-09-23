@@ -54,7 +54,7 @@ export function ResultsView({
 }: ResultsViewProps) {
   const filteredExams = useMemo(() => {
     if (!resultsClassId) return [];
-    return exams.filter(e => e.status !== 'cancelled' && e.status !== 'completed');
+    return exams.filter(e => e.status !== 'cancelled' && e.status !== 'completed' && e.status !== 'published' && e.isPublished !== true);
   }, [exams, resultsClassId]);
 
   const [selectedExamGroup, setSelectedExamGroup] = useState<string>('');

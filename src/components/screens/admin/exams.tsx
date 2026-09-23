@@ -50,6 +50,29 @@ function AdminExamsContent({ initialTab = 'exams' }: { initialTab?: string }) {
     );
   }
 
+  const examToEdit = state.editingExam || (state.editOpen && state.editForm?.id ? state.editForm : null);
+  if (examToEdit) {
+    return (
+      <CreateExamWizard
+        initialExam={examToEdit}
+        onCancel={() => {
+          state.setEditingExam(null);
+          state.setEditOpen(false);
+        }}
+        classes={state.classes}
+        subjects={state.subjects}
+        academicYears={state.academicYears}
+        currentAcademicYear={state.currentAcademicYear}
+        teachers={state.teachers}
+        onSuccess={() => {
+          state.setEditingExam(null);
+          state.setEditOpen(false);
+          queryClient.invalidateQueries({ queryKey: ['exams'] });
+        }}
+      />
+    );
+  }
+
   return (
     <div className="space-y-6">
       <ExamsHeader 
@@ -70,7 +93,10 @@ function AdminExamsContent({ initialTab = 'exams' }: { initialTab?: string }) {
             loadingExams={state.loadingExams}
             deleting={state.deleting}
             handleDelete={state.handleDelete}
-            setEditForm={state.setEditForm}
+            setEditForm={(exam) => {
+              state.setEditForm(exam);
+              state.setEditingExam(exam);
+            }}
             setEditOpen={state.setEditOpen}
             handleOpenViewResults={state.handleOpenViewResults}
             formatDate={formatDate}
@@ -102,7 +128,20 @@ function AdminExamsContent({ initialTab = 'exams' }: { initialTab?: string }) {
             onSave={state.handleSaveResults} 
             onPublish={state.handlePublish} 
             isPublishing={state.isPublishing}
-            onUpdateMark={(id, m) => state.setResultRows(prev => prev.map(r => r.studentId === id ? { ...r, marksObtained: m, status: Number(m) >= (state.selectedExam?.passingMarks || 40) ? 'pass' : 'fail' } : r))}
+            onUpdateMark={(id, m) => state.setResultRows(prev => prev.map(r => {
+              if (r.studentId !== id) return r;
+              const trimmed = m.trim();
+              if (trimmed === '') {
+                return { ...r, marksObtained: '', status: 'pending' };
+              }
+              const num = Number(trimmed);
+              const passingMarks = state.selectedExam?.passingMarks || 40;
+              return {
+                ...r,
+                marksObtained: m,
+                status: !isNaN(num) && num >= passingMarks ? 'pass' : 'fail'
+              };
+            }))}
             formatDate={formatDate} 
             formatTime={formatTime}
             getStatusBadge={getStatusBadge} 
@@ -136,7 +175,10 @@ function AdminExamsContent({ initialTab = 'exams' }: { initialTab?: string }) {
               loadingExams={state.loadingExams}
               deleting={state.deleting}
               handleDelete={state.handleDelete}
-              setEditForm={state.setEditForm}
+              setEditForm={(exam) => {
+                state.setEditForm(exam);
+                state.setEditingExam(exam);
+              }}
               setEditOpen={state.setEditOpen}
               handleOpenViewResults={state.handleOpenViewResults}
               formatDate={formatDate}

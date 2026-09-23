@@ -15,10 +15,26 @@ import {
   FileText, 
   FileCode2, 
   Eye,
-  ArrowUpDown
+  ArrowUpDown,
+  List,
+  LayoutGrid
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import {
   DropdownMenu,
   DropdownMenuTrigger,
@@ -36,8 +52,27 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { PlatformRoleRecord, isSystemRole } from "./types";
+import { PlatformRoleRecord, isSystemRole, PLATFORM_MODULES, ACTION_LABELS } from "./types";
 import { cn } from "@/lib/utils";
+
+const ACTION_COLORS: Record<string, string> = {
+  view: "bg-zinc-100 text-zinc-700 border-zinc-200/50 dark:bg-zinc-800 dark:text-zinc-300 dark:border-zinc-700/50",
+  create: "bg-emerald-50 text-emerald-700 border-emerald-100/70 dark:bg-emerald-950/20 dark:text-emerald-400 dark:border-emerald-900/30",
+  edit: "bg-amber-50 text-amber-700 border-amber-100/70 dark:bg-amber-950/20 dark:text-amber-400 dark:border-amber-900/30",
+  delete: "bg-rose-50 text-rose-700 border-rose-100/70 dark:bg-rose-950/20 dark:text-rose-400 dark:border-rose-900/30",
+};
+
+const formatDate = (dateStr: string) => {
+  try {
+    return new Date(dateStr).toLocaleDateString(undefined, {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+    });
+  } catch {
+    return dateStr;
+  }
+};
 
 interface RoleGridProps {
   roles: PlatformRoleRecord[];
@@ -76,6 +111,7 @@ export function RoleGrid({ roles, onEdit, onDelete, onAssignUsers, isMobileTab =
   const [filter, setFilter] = useState<"all" | "custom" | "system">("all");
   const [sortBy, setSortBy] = useState<"newest" | "oldest" | "name">("newest");
   const [roleToDelete, setRoleToDelete] = useState<PlatformRoleRecord | null>(null);
+  const [viewMode, setViewMode] = useState<"table" | "grid">("table");
 
   // Counts
   const counts = useMemo(() => {
@@ -186,144 +222,431 @@ export function RoleGrid({ roles, onEdit, onDelete, onAssignUsers, isMobileTab =
           </button>
         </div>
 
-        {/* Sort Selector */}
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
+        {/* Controls: View Mode Toggle & Sort Selector */}
+        <div className="flex items-center gap-2">
+          {/* View mode toggle */}
+          <div className="flex items-center p-0.5 bg-muted/80 rounded-xl border border-border/50 shrink-0">
             <button
               type="button"
-              className="inline-flex items-center gap-1.5 text-xs font-medium text-muted-foreground hover:text-foreground px-2.5 py-1 rounded-xl border border-border bg-card shadow-2xs cursor-pointer h-8"
+              className={cn(
+                "h-7.5 px-2.5 gap-1.5 text-xs rounded-lg transition-all flex items-center justify-center cursor-pointer",
+                viewMode === "table"
+                  ? "bg-card shadow-2xs font-semibold text-blue-600 dark:text-blue-400 border border-border/40"
+                  : "text-muted-foreground hover:text-foreground"
+              )}
+              onClick={() => setViewMode("table")}
+              title="Table view"
             >
-              <ArrowUpDown className="size-3 text-muted-foreground" />
-              <span>
-                {sortBy === "newest" ? "Newest" : sortBy === "oldest" ? "Oldest" : "A-Z"}
-              </span>
+              <List className="size-3.5" />
+              <span className="hidden sm:inline">Table</span>
             </button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-36 rounded-xl text-xs">
-            <DropdownMenuItem onClick={() => setSortBy("newest")}>Newest First</DropdownMenuItem>
-            <DropdownMenuItem onClick={() => setSortBy("oldest")}>Oldest First</DropdownMenuItem>
-            <DropdownMenuItem onClick={() => setSortBy("name")}>Alphabetical</DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+            <button
+              type="button"
+              className={cn(
+                "h-7.5 px-2.5 gap-1.5 text-xs rounded-lg transition-all flex items-center justify-center cursor-pointer",
+                viewMode === "grid"
+                  ? "bg-card shadow-2xs font-semibold text-blue-600 dark:text-blue-400 border border-border/40"
+                  : "text-muted-foreground hover:text-foreground"
+              )}
+              onClick={() => setViewMode("grid")}
+              title="Grid view"
+            >
+              <LayoutGrid className="size-3.5" />
+              <span className="hidden sm:inline">Grid</span>
+            </button>
+          </div>
+
+          {/* Sort Selector */}
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <button
+                type="button"
+                className="inline-flex items-center gap-1.5 text-xs font-medium text-muted-foreground hover:text-foreground px-2.5 py-1 rounded-xl border border-border bg-card shadow-2xs cursor-pointer h-8"
+              >
+                <ArrowUpDown className="size-3 text-muted-foreground" />
+                <span>
+                  {sortBy === "newest" ? "Newest" : sortBy === "oldest" ? "Oldest" : "A-Z"}
+                </span>
+              </button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-36 rounded-xl text-xs">
+              <DropdownMenuItem onClick={() => setSortBy("newest")}>Newest First</DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setSortBy("oldest")}>Oldest First</DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setSortBy("name")}>Alphabetical</DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
       </div>
 
-      {/* Role List */}
-      <div className="space-y-2">
-        {filteredRoles.length === 0 ? (
-          <div className="py-8 text-center rounded-xl border border-dashed border-border">
-            <Shield className="size-7 text-muted-foreground/40 mx-auto mb-1.5" />
-            <p className="font-semibold text-xs text-foreground">No roles found</p>
-            <p className="text-[11px] text-muted-foreground mt-0.5">
-              {search ? "Try adjusting your search query" : "No roles in this category"}
-            </p>
-          </div>
-        ) : (
-          filteredRoles.map((role) => {
-            const perms = JSON.parse(role.permissions || "{}");
+      {/* Role List / Table View */}
+      {filteredRoles.length === 0 ? (
+        <div className="py-8 text-center rounded-xl border border-dashed border-border">
+          <Shield className="size-7 text-muted-foreground/40 mx-auto mb-1.5" />
+          <p className="font-semibold text-xs text-foreground">No roles found</p>
+          <p className="text-[11px] text-muted-foreground mt-0.5">
+            {search ? "Try adjusting your search query" : "No roles in this category"}
+          </p>
+        </div>
+      ) : viewMode === "table" ? (
+        <div className="rounded-xl border border-border bg-card overflow-hidden shadow-2xs">
+          <Table>
+            <TableHeader className="bg-muted/50">
+              <TableRow className="hover:bg-transparent">
+                <TableHead className="w-[240px] sm:w-[280px]">Role Name</TableHead>
+                <TableHead>Type</TableHead>
+                <TableHead>Users Assigned</TableHead>
+                <TableHead>Permissions</TableHead>
+                <TableHead>Created At</TableHead>
+                <TableHead className="text-right">Actions</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {filteredRoles.map((role) => {
+                let perms: Record<string, string[]> = {};
+                try {
+                  perms = JSON.parse(role.permissions || "{}");
+                } catch {
+                  perms = {};
+                }
+                const permCount = Object.values(perms).flat().length;
+                const userCount = role._count?.users ?? 0;
+                const isSys = isSystemRole(role);
+
+                return (
+                  <TableRow
+                    key={role.id}
+                    className="hover:bg-muted/40 transition-colors"
+                  >
+                    {/* Role Name */}
+                    <TableCell>
+                      <div className="flex items-center gap-3">
+                        <div
+                          className={cn(
+                            "size-8.5 rounded-xl flex items-center justify-center shrink-0 border shadow-2xs",
+                            getRoleIconBoxStyle(role.name, role.color)
+                          )}
+                          style={
+                            !getRoleIconBoxStyle(role.name).includes("bg-")
+                              ? { backgroundColor: role.color }
+                              : undefined
+                          }
+                        >
+                          {getRoleIcon(role.name)}
+                        </div>
+                        <div className="min-w-0">
+                          <p className="font-semibold text-xs sm:text-sm text-foreground truncate">
+                            {role.name}
+                          </p>
+                          {role.description && (
+                            <p className="text-[11px] text-muted-foreground line-clamp-1 mt-0.5">
+                              {role.description}
+                            </p>
+                          )}
+                        </div>
+                      </div>
+                    </TableCell>
+
+                    {/* Type Badge */}
+                    <TableCell>
+                      <span
+                        className={cn(
+                          "text-[10px] font-semibold px-2 py-0.5 rounded-md border",
+                          isSys
+                            ? "bg-blue-50 text-blue-700 border-blue-200/60 dark:bg-blue-950/40 dark:text-blue-400 dark:border-blue-900/60"
+                            : "bg-muted text-muted-foreground border-border"
+                        )}
+                      >
+                        {isSys ? "System" : "Custom"}
+                      </span>
+                    </TableCell>
+
+                    {/* Users Assigned */}
+                    <TableCell>
+                      {userCount === 0 ? (
+                        <span className="text-xs text-muted-foreground italic pl-1">0 users</span>
+                      ) : (
+                        <Badge
+                          variant="outline"
+                          onClick={() => onAssignUsers(role)}
+                          className="cursor-pointer bg-muted/40 hover:bg-muted text-foreground font-semibold border-border px-2.5 py-1 rounded-md flex items-center gap-1.5 transition-colors select-none w-fit text-xs"
+                        >
+                          <Users className="size-3 text-muted-foreground" />
+                          <span>{userCount} {userCount === 1 ? "user" : "users"}</span>
+                        </Badge>
+                      )}
+                    </TableCell>
+
+                    {/* Permissions */}
+                    <TableCell>
+                      {permCount === 0 ? (
+                        <span className="text-xs text-muted-foreground italic">No permissions</span>
+                      ) : (
+                        <Popover>
+                          <PopoverTrigger asChild>
+                            <Badge
+                              variant="outline"
+                              className="cursor-pointer bg-blue-50/50 hover:bg-blue-100/60 dark:bg-blue-950/30 text-blue-700 dark:text-blue-300 font-semibold border-blue-200/60 dark:border-blue-800/40 px-2.5 py-1 rounded-md flex items-center gap-1.5 transition-colors select-none w-fit text-xs"
+                            >
+                              <Shield className="size-3 text-blue-600 dark:text-blue-400" />
+                              <span>{permCount} permissions</span>
+                            </Badge>
+                          </PopoverTrigger>
+                          <PopoverContent
+                            className="w-80 p-3.5 space-y-3 bg-popover/95 backdrop-blur-md shadow-xl border border-border rounded-xl"
+                            align="start"
+                          >
+                            <div className="flex items-center gap-1.5 text-xs text-blue-600 dark:text-blue-400 font-bold uppercase tracking-wider">
+                              <Shield className="size-3.5" />
+                              <span>Granted Permissions ({permCount})</span>
+                            </div>
+                            <div className="flex flex-col gap-2 max-h-[300px] overflow-y-auto pr-1">
+                              {Object.entries(perms).map(([mod, actions]) => {
+                                if (!Array.isArray(actions) || actions.length === 0) return null;
+                                const moduleLabel =
+                                  PLATFORM_MODULES.find((m) => m.key === mod)?.label || mod;
+                                return (
+                                  <div
+                                    key={mod}
+                                    className="flex items-start justify-between gap-3 p-2 rounded-lg bg-muted/40 border border-border/60"
+                                  >
+                                    <span className="font-semibold text-xs text-foreground mt-0.5">
+                                      {moduleLabel}
+                                    </span>
+                                    <div className="flex flex-wrap gap-1 justify-end max-w-[65%]">
+                                      {actions.map((action: string) => {
+                                        const colorClass =
+                                          ACTION_COLORS[action] ||
+                                          "bg-muted text-muted-foreground border-border";
+                                        return (
+                                          <span
+                                            key={action}
+                                            className={`text-[9px] px-1.5 py-0.5 rounded font-semibold uppercase tracking-wider border ${colorClass}`}
+                                          >
+                                            {ACTION_LABELS[action] || action}
+                                          </span>
+                                        );
+                                      })}
+                                    </div>
+                                  </div>
+                                );
+                              })}
+                            </div>
+                          </PopoverContent>
+                        </Popover>
+                      )}
+                    </TableCell>
+
+                    {/* Created At */}
+                    <TableCell
+                      className="text-xs text-muted-foreground whitespace-nowrap"
+                      suppressHydrationWarning
+                    >
+                      {formatDate(role.createdAt)}
+                    </TableCell>
+
+                    {/* Actions */}
+                    <TableCell className="text-right">
+                      <div className="flex items-center justify-end gap-1">
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="size-8 text-blue-600 hover:text-blue-700 hover:bg-blue-50 dark:hover:bg-blue-950/50 rounded-lg cursor-pointer"
+                          title="Assign Users"
+                          onClick={() => onAssignUsers(role)}
+                        >
+                          <UserPlus className="size-4" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="size-8 text-amber-600 hover:text-amber-700 hover:bg-amber-50 dark:hover:bg-amber-950/50 rounded-lg cursor-pointer"
+                          title="Edit Role"
+                          onClick={() => onEdit(role)}
+                        >
+                          <Pencil className="size-4" />
+                        </Button>
+                        {!isSys ? (
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="size-8 text-rose-600 hover:text-rose-700 hover:bg-rose-50 dark:hover:bg-rose-950/50 rounded-lg cursor-pointer"
+                            title="Delete Role"
+                            onClick={() => setRoleToDelete(role)}
+                          >
+                            <Trash2 className="size-4" />
+                          </Button>
+                        ) : (
+                          <div className="size-8" />
+                        )}
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                );
+              })}
+            </TableBody>
+          </Table>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-5">
+          {filteredRoles.map((role) => {
+            let perms: Record<string, string[]> = {};
+            try {
+              perms = JSON.parse(role.permissions || "{}");
+            } catch {
+              perms = {};
+            }
             const permCount = Object.values(perms).flat().length;
-            const moduleCount = Object.keys(perms).filter(
-              (k) => (perms[k] || []).length > 0,
-            ).length;
             const userCount = role._count?.users ?? 0;
             const isSys = isSystemRole(role);
 
             return (
               <div
                 key={role.id}
-                className="group flex flex-col md:flex-row md:items-center justify-between rounded-xl border border-border bg-card hover:border-border hover:bg-muted/40 transition-all gap-2.5 p-2.5 sm:p-3"
+                className="group relative flex flex-col justify-between rounded-2xl border border-border bg-card hover:border-blue-200 dark:hover:border-blue-800/60 hover:shadow-md transition-all duration-200 p-4 sm:p-4.5 gap-3"
               >
-                {/* Left: Icon + Name + Badges */}
-                <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
-                  <div
-                    className={cn(
-                      "size-8.5 sm:size-9 rounded-xl flex items-center justify-center shrink-0 border shadow-2xs",
-                      getRoleIconBoxStyle(role.name, role.color)
-                    )}
-                    style={
-                      !getRoleIconBoxStyle(role.name).includes("bg-")
-                        ? { backgroundColor: role.color }
-                        : undefined
-                    }
-                  >
-                    {getRoleIcon(role.name)}
-                  </div>
-
-                  <div className="min-w-0">
-                    <div className="flex items-center gap-1.5 flex-wrap">
-                      <h4 className="font-semibold text-xs text-foreground truncate">
-                        {role.name}
-                      </h4>
-                      <span className="text-[10px] font-medium px-1.5 py-0.2 rounded-md bg-muted text-muted-foreground border border-border">
-                        {isSys ? "System" : "Custom"}
-                      </span>
-                      <span className="text-[10px] font-medium px-1.5 py-0.2 rounded-full bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400 border border-emerald-200/50 dark:border-emerald-800/40 flex items-center gap-1">
-                        <span className="size-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                        <span>Active</span>
-                      </span>
+                <div>
+                  {/* Card Header: Icon + Name + Actions */}
+                  <div className="flex items-start justify-between gap-2.5">
+                    <div className="flex items-center gap-2.5 min-w-0">
+                      <div
+                        className={cn(
+                          "size-10 sm:size-11 rounded-2xl flex items-center justify-center text-white text-base font-bold shadow-xs shrink-0 transition-transform group-hover:scale-105 duration-200",
+                          getRoleIconBoxStyle(role.name, role.color)
+                        )}
+                        style={
+                          !getRoleIconBoxStyle(role.name).includes("bg-")
+                            ? { backgroundColor: role.color }
+                            : undefined
+                        }
+                      >
+                        {getRoleIcon(role.name)}
+                      </div>
+                      <div className="min-w-0">
+                        <div className="flex items-center gap-1.5 flex-wrap">
+                          <h4 className="font-semibold text-xs sm:text-sm text-foreground truncate">
+                            {role.name}
+                          </h4>
+                          <span
+                            className={cn(
+                              "text-[10px] font-semibold px-1.5 py-0.2 rounded-md border",
+                              isSys
+                                ? "bg-blue-50 text-blue-700 border-blue-200/60 dark:bg-blue-950/40 dark:text-blue-400 dark:border-blue-900/60"
+                                : "bg-muted text-muted-foreground border-border"
+                            )}
+                          >
+                            {isSys ? "System" : "Custom"}
+                          </span>
+                        </div>
+                        {role.description && (
+                          <p className="text-[11px] text-muted-foreground line-clamp-1 mt-0.5">
+                            {role.description}
+                          </p>
+                        )}
+                      </div>
                     </div>
 
-                    {role.description && (
-                      <p className="text-[11px] text-muted-foreground truncate mt-0.5">
-                        {role.description}
-                      </p>
-                    )}
-                  </div>
-                </div>
-
-                {/* Right: Metadata + Action Menu */}
-                <div className="flex items-center justify-between md:justify-end gap-2.5 sm:gap-3.5 shrink-0 pt-1.5 md:pt-0 border-t md:border-t-0 border-border">
-                  {/* Metadata chips */}
-                  <div className="flex items-center gap-2.5 text-[11px] text-muted-foreground font-medium">
-                    <span className="flex items-center gap-1" title="Permissions Count">
-                      <Shield className="size-3 text-muted-foreground/70" />
-                      <span>{permCount} Perms</span>
-                    </span>
-                    <span className="flex items-center gap-1" title="Modules Count">
-                      <Layers className="size-3 text-muted-foreground/70" />
-                      <span>{moduleCount} Mods</span>
-                    </span>
-                    <span className="flex items-center gap-1" title="Assigned Users">
-                      <Users className="size-3 text-muted-foreground/70" />
-                      <span>{userCount} {userCount === 1 ? "User" : "Users"}</span>
-                    </span>
-                  </div>
-
-                  {/* 3-dots Menu */}
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
+                    {/* Quick Action Buttons */}
+                    <div className="flex items-center gap-0.5 shrink-0 opacity-80 group-hover:opacity-100 transition-opacity">
                       <Button
                         variant="ghost"
                         size="icon"
-                        className="size-7 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted cursor-pointer"
+                        className="size-7.5 rounded-lg text-muted-foreground hover:bg-blue-50 hover:text-blue-600 dark:hover:bg-blue-950/40 cursor-pointer"
+                        onClick={() => onAssignUsers(role)}
+                        title="Assign users"
                       >
-                        <MoreVertical className="size-3.5" />
+                        <UserPlus className="size-3.5" />
                       </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end" className="w-44 rounded-xl text-xs">
-                      <DropdownMenuItem onClick={() => onEdit(role)} className="gap-2 cursor-pointer">
-                        <Pencil className="size-3.5 text-blue-500" />
-                        <span>Edit Role</span>
-                      </DropdownMenuItem>
-                      <DropdownMenuItem onClick={() => onAssignUsers(role)} className="gap-2 cursor-pointer">
-                        <UserPlus className="size-3.5 text-emerald-500" />
-                        <span>Assign Users ({userCount})</span>
-                      </DropdownMenuItem>
-                      <DropdownMenuSeparator />
-                      <DropdownMenuItem
-                        onClick={() => setRoleToDelete(role)}
-                        className="gap-2 text-red-600 dark:text-red-400 focus:text-red-600 cursor-pointer"
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="size-7.5 rounded-lg text-muted-foreground hover:bg-amber-50 hover:text-amber-600 dark:hover:bg-amber-950/40 cursor-pointer"
+                        onClick={() => onEdit(role)}
+                        title="Edit role"
                       >
-                        <Trash2 className="size-3.5" />
-                        <span>Delete Role</span>
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
+                        <Pencil className="size-3.5" />
+                      </Button>
+                      {!isSys && (
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="size-7.5 rounded-lg text-muted-foreground hover:bg-rose-50 hover:text-rose-600 dark:hover:bg-rose-950/40 cursor-pointer"
+                          onClick={() => setRoleToDelete(role)}
+                          title="Delete role"
+                        >
+                          <Trash2 className="size-3.5" />
+                        </Button>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Info Badges */}
+                  <div className="flex items-center gap-2 text-xs flex-wrap mt-3">
+                    <Badge
+                      variant="outline"
+                      onClick={() => onAssignUsers(role)}
+                      className="cursor-pointer bg-muted/40 hover:bg-muted text-foreground font-semibold border-border px-2 py-0.5 rounded-md flex items-center gap-1.5 transition-colors select-none text-[11px]"
+                    >
+                      <Users className="size-3 text-muted-foreground" />
+                      <span>{userCount} {userCount === 1 ? "user" : "users"}</span>
+                    </Badge>
+
+                    <Badge
+                      variant="outline"
+                      className="bg-blue-50/50 text-blue-700 dark:bg-blue-950/30 dark:text-blue-300 font-semibold border-blue-200/60 dark:border-blue-800/40 px-2 py-0.5 rounded-md flex items-center gap-1.5 text-[11px] cursor-default"
+                    >
+                      <Shield className="size-3 text-blue-600 dark:text-blue-400" />
+                      <span>{permCount} perms</span>
+                    </Badge>
+                  </div>
+
+                  {/* Granted Permissions Chips */}
+                  {permCount > 0 && (
+                    <div className="mt-3 flex flex-wrap gap-1.5 max-h-24 overflow-y-auto">
+                      {Object.entries(perms).map(([mod, actions]) => {
+                        if (!Array.isArray(actions) || actions.length === 0) return null;
+                        const moduleLabel =
+                          PLATFORM_MODULES.find((m) => m.key === mod)?.label || mod;
+                        return (
+                          <div
+                            key={mod}
+                            className="flex items-center gap-1.5 bg-muted/40 border border-border/60 rounded-lg px-2 py-0.5 text-[10px] shrink-0"
+                          >
+                            <span className="font-semibold text-foreground">{moduleLabel}</span>
+                            <div className="flex flex-wrap gap-1">
+                              {actions.map((action: string) => {
+                                const colorClass =
+                                  ACTION_COLORS[action] ||
+                                  "bg-muted text-muted-foreground border-border";
+                                return (
+                                  <span
+                                    key={action}
+                                    className={`text-[8.5px] px-1 py-0.2 rounded font-semibold uppercase tracking-wider border ${colorClass}`}
+                                  >
+                                    {ACTION_LABELS[action] || action}
+                                  </span>
+                                );
+                              })}
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
+
+                {/* Footer */}
+                <div className="pt-2 border-t border-border/50 flex items-center justify-between text-[11px] text-muted-foreground mt-1">
+                  <span>Created {formatDate(role.createdAt)}</span>
+                  <span className="flex items-center gap-1 text-emerald-600 dark:text-emerald-400 font-medium">
+                    <span className="size-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                    Active
+                  </span>
                 </div>
               </div>
             );
-          })
-        )}
-      </div>
+          })}
+        </div>
+      )}
 
       {/* Delete Role Confirmation Dialog */}
       <AlertDialog open={!!roleToDelete} onOpenChange={(open) => !open && setRoleToDelete(null)}>

@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect } from "react";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -19,7 +20,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Zap, GraduationCap, Users, Loader2 } from "lucide-react";
+import { Zap, GraduationCap, Users, Loader2, ArrowRight, Calendar, School } from "lucide-react";
 import { ClassOption, StudentOption } from "./types";
 import { isLastClass, getNumericGrade } from "./utils";
 
@@ -54,9 +55,19 @@ export function BulkPromoteTab({
   bulkSubmitting,
   academicYearOptions = [],
 }: BulkPromoteTabProps) {
-  const yearOptions = Array.from(
-    new Set([...academicYearOptions, bulkAcademicYear].filter(Boolean))
-  );
+  const yearOptions = academicYearOptions.length > 0
+    ? academicYearOptions
+    : (bulkAcademicYear ? [bulkAcademicYear] : []);
+
+  const selectedYear = yearOptions.includes(bulkAcademicYear)
+    ? bulkAcademicYear
+    : (yearOptions[0] || "");
+
+  useEffect(() => {
+    if (selectedYear && bulkAcademicYear !== selectedYear) {
+      setBulkAcademicYear(selectedYear);
+    }
+  }, [selectedYear, bulkAcademicYear, setBulkAcademicYear]);
 
   return (
     <div className="space-y-6">
@@ -71,80 +82,104 @@ export function BulkPromoteTab({
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+          {/* 3 Selectors in One Row with Arrow */}
+          <div className="grid grid-cols-1 lg:grid-cols-[1fr_auto_1fr_1fr] gap-4 items-end">
             {/* From Class */}
-            <div className="space-y-2">
-              <label className="text-sm font-medium">From Class (Current) *</label>
+            <div className="space-y-1.5">
+              <label className="text-sm font-medium text-foreground">
+                From Class (Current) <span className="text-red-500">*</span>
+              </label>
               <Select value={bulkFromClass} onValueChange={handleBulkFromClassChange}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select class to promote from" />
+                <SelectTrigger className="w-full h-10 bg-card rounded-xl">
+                  <div className="flex items-center gap-2 truncate">
+                    <School className="size-4 text-blue-600 shrink-0" />
+                    <SelectValue placeholder="Select class to promote from" />
+                  </div>
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent className="rounded-xl">
                   {classes
                     .sort((a, b) => getNumericGrade(a.grade) - getNumericGrade(b.grade))
                     .map((c) => (
-                      <SelectItem key={c.id} value={c.id}>
-                        {c.name}-{c.section} (Grade {c.grade}), {c.studentCount} students
+                      <SelectItem key={c.id} value={c.id} className="cursor-pointer">
+                        {c.name} - {c.section} (Grade {c.grade}){c.studentCount !== undefined ? ` • ${c.studentCount} students` : ''}
                       </SelectItem>
                     ))}
                 </SelectContent>
               </Select>
-              {bulkFromClass && isLastClass(bulkFromClass, classes) && (
-                <div className="flex items-center gap-2 text-sm text-violet-600 dark:text-violet-400 bg-violet-50 dark:bg-violet-900/20 rounded-lg px-3 py-2 border border-violet-200 dark:border-violet-800">
-                  <GraduationCap className="size-4 shrink-0" />
-                  <span>This is the highest class: students should be <strong>graduated</strong> instead.</span>
-                </div>
-              )}
             </div>
+
+            {/* Transition Arrow Indicator */}
+            <div className="hidden lg:flex items-center justify-center pb-2.5 text-muted-foreground/70">
+              <ArrowRight className="size-4.5" />
+            </div>
+
             {/* To Class */}
-            <div className="space-y-2">
-              <label className="text-sm font-medium">To Class (Next) *</label>
+            <div className="space-y-1.5">
+              <label className="text-sm font-medium text-foreground">
+                To Class (Next) <span className="text-red-500">*</span>
+              </label>
               <Select value={bulkToClass} onValueChange={setBulkToClass}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Auto-detected or select manually" />
+                <SelectTrigger className="w-full h-10 bg-card rounded-xl">
+                  <div className="flex items-center gap-2 truncate">
+                    <School className="size-4 text-blue-600 shrink-0" />
+                    <SelectValue placeholder="Auto-detected or select manually" />
+                  </div>
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent className="rounded-xl">
                   {classes
                     .filter((c) => c.id !== bulkFromClass)
                     .sort((a, b) => getNumericGrade(a.grade) - getNumericGrade(b.grade))
                     .map((c) => (
-                      <SelectItem key={c.id} value={c.id}>
-                        {c.name}-{c.section} (Grade {c.grade})
+                      <SelectItem key={c.id} value={c.id} className="cursor-pointer">
+                        {c.name} - {c.section} (Grade {c.grade})
                       </SelectItem>
                     ))}
                 </SelectContent>
               </Select>
             </div>
+
+            {/* Academic Year */}
+            <div className="space-y-1.5">
+              <label className="text-sm font-medium text-foreground">
+                Academic Year <span className="text-red-500">*</span>
+              </label>
+              <Select
+                value={selectedYear}
+                onValueChange={setBulkAcademicYear}
+              >
+                <SelectTrigger className="w-full h-10 bg-card rounded-xl">
+                  <div className="flex items-center gap-2 truncate">
+                    <Calendar className="size-4 text-blue-600 shrink-0" />
+                    <SelectValue placeholder="Select academic year" />
+                  </div>
+                </SelectTrigger>
+                <SelectContent className="rounded-xl">
+                  {yearOptions.map((y) => (
+                    <SelectItem key={y} value={y} className="cursor-pointer">
+                      {y}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
           </div>
 
-          {/* Academic Year */}
-          <div className="space-y-2 max-w-xs">
-            <label className="text-sm font-medium">Academic Year *</label>
-            <Select
-              value={bulkAcademicYear}
-              onValueChange={setBulkAcademicYear}
-            >
-              <SelectTrigger className="w-full">
-                <SelectValue placeholder="Select academic year" />
-              </SelectTrigger>
-              <SelectContent>
-                {yearOptions.map((y) => (
-                  <SelectItem key={y} value={y}>
-                    {y}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
+          {bulkFromClass && isLastClass(bulkFromClass, classes) && (
+            <div className="flex items-center gap-2 text-sm text-violet-600 dark:text-violet-400 bg-violet-50 dark:bg-violet-900/20 rounded-xl px-3.5 py-2.5 border border-violet-200 dark:border-violet-800">
+              <GraduationCap className="size-4 shrink-0" />
+              <span>This is the highest class: students should be <strong>graduated</strong> instead.</span>
+            </div>
+          )}
 
           {/* Remarks */}
-          <div className="space-y-2">
+          <div className="space-y-1.5">
             <label className="text-sm font-medium">Remarks (optional)</label>
             <Textarea
               placeholder="e.g. Annual promotion 2025-2026"
               value={bulkRemarks}
               onChange={(e) => setBulkRemarks(e.target.value)}
               rows={2}
+              className="rounded-xl"
             />
           </div>
 
@@ -157,7 +192,7 @@ export function BulkPromoteTab({
               </div>
               <div 
                 data-lenis-prevent
-                className="max-h-72 overflow-y-auto overscroll-contain rounded-lg border bg-card"
+                className="max-h-72 overflow-y-auto overscroll-contain rounded-xl border bg-card"
               >
                 <Table>
                   <TableHeader>
@@ -183,7 +218,7 @@ export function BulkPromoteTab({
 
           {/* Submit */}
           <Button
-            className="bg-amber-600 hover:bg-amber-700 text-white"
+            className="bg-blue-600 hover:bg-blue-700 text-white rounded-xl shadow-xs font-medium cursor-pointer"
             onClick={handleBulkPromote}
             disabled={bulkSubmitting || !bulkFromClass || !bulkToClass || !bulkAcademicYear || bulkPreview.length === 0}
           >

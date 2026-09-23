@@ -191,7 +191,7 @@ export function ExamTable({
                       <div className="flex items-center justify-end gap-1">
                         {/* Desktop Actions (xl and above) */}
                         <div className="hidden xl:flex items-center gap-1">
-                          {onViewResults && exam.status === 'completed' && (
+                          {onViewResults && (exam.status === 'completed' || exam.status === 'published') && (
                             <Button
                               variant="ghost"
                               size="icon"
@@ -253,7 +253,7 @@ export function ExamTable({
                               </Button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end" className="w-[160px]">
-                              {onViewResults && exam.status === 'completed' && (
+                              {onViewResults && (exam.status === 'completed' || exam.status === 'published') && (
                                 <DropdownMenuItem onClick={() => onViewResults(exam)} className="cursor-pointer text-blue-600 focus:text-blue-600 focus:bg-blue-50">
                                   <Eye className="mr-2 h-4 w-4" />
                                   <span>View Results</span>

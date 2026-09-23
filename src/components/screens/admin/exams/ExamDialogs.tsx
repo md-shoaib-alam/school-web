@@ -13,6 +13,7 @@ import { DatePicker } from '@/components/ui/date-picker';
 import { TimePicker } from '@/components/ui/time-picker';
 import { formatLocalDate, parseLocalDate } from '@/lib/utils';
 import { ExamFormData, ClassOption, SubjectOption } from './types';
+import { EditExamDialog } from './EditExamDialog';
 
 interface ExamDialogsProps {
   // Add Dialog
@@ -26,10 +27,10 @@ interface ExamDialogsProps {
   // Edit Dialog
   editOpen: boolean;
   setEditOpen: (o: boolean) => void;
-  editForm: ExamFormData & { id: string };
-  setEditForm: (f: ExamFormData & { id: string }) => void;
+  editForm: any;
+  setEditForm: (f: any) => void;
   saving: boolean;
-  onSave: () => void;
+  onSave: (payload?: any) => void;
   
   // Metadata
   classes: ClassOption[];
@@ -178,83 +179,17 @@ export function ExamDialogs({
       </Dialog>
 
       {/* EDIT EXAM DIALOG */}
-      <Dialog open={editOpen} onOpenChange={setEditOpen}>
-        <DialogContent className="sm:max-w-md">
-          <DialogHeader>
-            <DialogTitle>Edit Exam Details</DialogTitle>
-            <DialogDescription>Update schedule or marks for this exam.</DialogDescription>
-          </DialogHeader>
-          <div className="grid gap-4 py-4">
-            <div className="grid grid-cols-2 gap-4">
-              <div className="grid gap-2">
-                <Label>Exam Name</Label>
-                <Input value={editForm.name} onChange={(e) => setEditForm({ ...editForm, name: e.target.value })} />
-              </div>
-              <div className="grid gap-2">
-                <Label>Academic Year *</Label>
-                <Select 
-                  value={editForm.academicYear || currentAcademicYear} 
-                  onValueChange={(v) => setEditForm({ ...editForm, academicYear: v })}
-                >
-                  <SelectTrigger className="w-full text-left font-medium">
-                    <SelectValue placeholder="Select Academic Year" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {academicYears.map((ay) => (
-                      <SelectItem key={ay.id} value={ay.name}>
-                        {ay.name} {ay.isCurrent && '(Current)'}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
-            <div className="grid grid-cols-2 gap-4">
-              <div className="grid gap-2" suppressHydrationWarning>
-                <Label>Date</Label>
-                <DatePicker date={parseLocalDate(editForm.date)} onChange={(d) => setEditForm({ ...editForm, date: formatLocalDate(d) })} disabled={isPastDate} />
-              </div>
-              <div className="grid gap-2">
-                <Label>Type</Label>
-                <Select value={editForm.examType} onValueChange={(v) => setEditForm({ ...editForm, examType: v })}>
-                  <SelectTrigger><SelectValue /></SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="midterm">Midterm</SelectItem>
-                    <SelectItem value="final">Final</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
-            <div className="grid grid-cols-2 gap-4">
-              <div className="grid gap-2">
-                <Label>Start Time</Label>
-                <TimePicker value={editForm.startTime} onChange={(v) => setEditForm({ ...editForm, startTime: v })} />
-              </div>
-              <div className="grid gap-2">
-                <Label>End Time</Label>
-                <TimePicker value={editForm.endTime} onChange={(v) => setEditForm({ ...editForm, endTime: v })} />
-              </div>
-            </div>
-            <div className="grid grid-cols-2 gap-4">
-              <div className="grid gap-2">
-                <Label>Total Marks</Label>
-                <Input type="number" value={editForm.totalMarks} onChange={(e) => setEditForm({ ...editForm, totalMarks: e.target.value })} />
-              </div>
-              <div className="grid gap-2">
-                <Label>Passing Marks</Label>
-                <Input type="number" value={editForm.passingMarks} onChange={(e) => setEditForm({ ...editForm, passingMarks: e.target.value })} />
-              </div>
-            </div>
-          </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setEditOpen(false)}>Cancel</Button>
-            <Button disabled={saving} onClick={onSave} className="bg-amber-600 hover:bg-amber-700">
-              {saving ? <Loader2 className="size-4 mr-2 animate-spin" /> : <Save className="size-4 mr-2" />}
-              Save Changes
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      <EditExamDialog
+        open={editOpen}
+        onOpenChange={setEditOpen}
+        form={editForm}
+        setForm={setEditForm}
+        saving={saving}
+        onSave={onSave}
+        classes={classes}
+        academicYears={academicYears}
+        currentAcademicYear={currentAcademicYear}
+      />
     </>
   );
 }
