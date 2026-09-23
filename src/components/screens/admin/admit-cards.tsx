@@ -449,8 +449,7 @@ export function AdminAdmitCards() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-semibold tracking-tight flex items-center gap-2">
-            <FileText className="size-6 text-amber-600" />
+          <h2 className="text-2xl font-semibold tracking-tight">
             Admit Cards
           </h2>
           <p className="text-muted-foreground text-sm mt-1">

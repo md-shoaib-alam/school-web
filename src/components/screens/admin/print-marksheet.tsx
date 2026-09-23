@@ -176,8 +176,7 @@ export function AdminPrintMarksheetContent() {
     <div className="space-y-6 animate-in fade-in duration-300">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div className="flex-1 min-w-0">
-          <h2 className="text-xl sm:text-2xl font-semibold tracking-tight flex items-center gap-2">
-            <Award className="size-6 sm:size-7 text-emerald-600 dark:text-emerald-500" />
+          <h2 className="text-xl sm:text-2xl font-semibold tracking-tight">
             <span className="truncate">Print Marksheets</span>
           </h2>
           <p className="text-xs sm:text-sm text-muted-foreground mt-1 line-clamp-1 sm:line-clamp-none">

@@ -158,8 +158,8 @@ export function AcademicYearsScreen() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div className="flex items-start sm:items-center gap-3">
-          <div className="size-10 sm:size-12 shrink-0 rounded-2xl bg-violet-100 dark:bg-violet-900/30 flex items-center justify-center">
-            <CalendarDays className="size-5 sm:size-6 text-violet-600 dark:text-violet-400" />
+          <div className="size-10 sm:size-12 shrink-0 rounded-2xl bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
+            <CalendarDays className="size-5 sm:size-6 text-blue-600 dark:text-blue-400" />
           </div>
           <div>
             <h2 className="text-2xl sm:text-3xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-100">
@@ -173,12 +173,12 @@ export function AcademicYearsScreen() {
 
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
           <DialogTrigger asChild>
-            <Button onClick={() => handleOpenDialog()} className="w-full sm:w-auto bg-violet-600 hover:bg-violet-700 text-white shadow-md shadow-violet-500/20">
+            <Button onClick={() => handleOpenDialog()} className="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white shadow-md shadow-blue-500/20">
               <Plus className="size-4 mr-2" />
               Add Academic Year
             </Button>
           </DialogTrigger>
-          <DialogContent className="w-[95vw] max-w-[425px] rounded-2xl border-violet-100 dark:border-violet-900/50 p-5 sm:p-6">
+          <DialogContent className="w-[95vw] max-w-[425px] rounded-2xl border-blue-100 dark:border-blue-900/50 p-5 sm:p-6">
             <DialogHeader>
               <DialogTitle>{editingYear ? "Edit Academic Year" : "New Academic Year"}</DialogTitle>
               <DialogDescription>
@@ -222,7 +222,7 @@ export function AcademicYearsScreen() {
                 </div>
               </div>
               <DialogFooter className="pt-4">
-                <Button type="submit" disabled={isCreating || isUpdating} className="w-full bg-violet-600 hover:bg-violet-700 text-white">
+                <Button type="submit" disabled={isCreating || isUpdating} className="w-full bg-blue-600 hover:bg-blue-700 text-white">
                   {isCreating || isUpdating ? "Saving..." : (editingYear ? "Update Year" : "Create Year")}
                 </Button>
               </DialogFooter>
@@ -233,15 +233,15 @@ export function AcademicYearsScreen() {
 
       {/* Stats / Info */}
       <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
-        <Card className="border-violet-100 dark:border-violet-900/30 bg-violet-50/30 dark:bg-violet-950/10 shadow-sm col-span-2 lg:col-span-1">
+        <Card className="border-blue-100 dark:border-blue-900/30 bg-blue-50/30 dark:bg-blue-950/10 shadow-sm col-span-2 lg:col-span-1">
           <CardContent className="p-4 sm:p-6">
             <div className="flex items-center gap-3 sm:gap-4">
-              <div className="size-9 sm:size-10 shrink-0 rounded-xl sm:rounded-full bg-violet-100 dark:bg-violet-900/50 flex items-center justify-center">
-                <ShieldCheck className="size-4 sm:size-5 text-violet-600 dark:text-violet-400" />
+              <div className="size-9 sm:size-10 shrink-0 rounded-xl sm:rounded-full bg-blue-100 dark:bg-blue-900/50 flex items-center justify-center">
+                <ShieldCheck className="size-4 sm:size-5 text-blue-600 dark:text-blue-400" />
               </div>
               <div className="min-w-0">
-                <p className="text-xs sm:text-sm font-medium text-violet-800 dark:text-violet-300 truncate">Current Session</p>
-                <p className="text-lg sm:text-2xl font-bold text-violet-900 dark:text-violet-100 truncate">
+                <p className="text-xs sm:text-sm font-medium text-blue-800 dark:text-blue-300 truncate">Current Session</p>
+                <p className="text-lg sm:text-2xl font-bold text-blue-900 dark:text-blue-100 truncate">
                   {academicYears.find((y: any) => y.isCurrent)?.name || "Not Set"}
                 </p>
               </div>
@@ -405,14 +405,14 @@ export function AcademicYearsScreen() {
             {academicYears.map((year: any) => (
               <Card key={year.id} className="p-4 border-zinc-200 dark:border-zinc-800 shadow-sm relative overflow-hidden">
                 {year.isCurrent && (
-                  <div className="absolute top-0 left-0 right-0 h-1 bg-violet-600" />
+                  <div className="absolute top-0 left-0 right-0 h-1 bg-blue-600" />
                 )}
                 <div className="flex items-start justify-between gap-2 mb-3">
                   <div className="flex flex-col">
                     <div className="flex items-center gap-2">
                       <span className="font-semibold text-base text-zinc-900 dark:text-zinc-100">{year.name}</span>
                       {year.isCurrent && (
-                        <Badge variant="secondary" className="bg-violet-100 text-violet-700 dark:bg-violet-900/50 dark:text-violet-300 text-[10px] px-1.5 py-0">
+                        <Badge variant="secondary" className="bg-blue-100 text-blue-700 dark:bg-blue-900/50 dark:text-blue-300 text-[10px] px-1.5 py-0">
                           Current
                         </Badge>
                       )}
@@ -454,12 +454,12 @@ export function AcademicYearsScreen() {
                       variant="outline" 
                       size="sm" 
                       onClick={() => handleSetCurrent(year.id)}
-                      className="h-7 text-xs text-muted-foreground hover:text-violet-600"
+                      className="h-7 text-xs text-muted-foreground hover:text-blue-600"
                     >
                       Set as Current
                     </Button>
                   ) : (
-                    <span className="text-xs font-medium text-violet-600 dark:text-violet-400 flex items-center gap-1">
+                    <span className="text-xs font-medium text-blue-600 dark:text-blue-400 flex items-center gap-1">
                       <CheckCircle2 className="size-3.5" /> Active Session
                     </span>
                   )}
@@ -469,7 +469,7 @@ export function AcademicYearsScreen() {
           </div>
 
           {/* Desktop Table (hidden on mobile, visible md and up) */}
-          <Card className="hidden md:block overflow-hidden border-violet-100 dark:border-violet-900/30 shadow-md">
+          <Card className="hidden md:block overflow-hidden border-zinc-200 dark:border-zinc-800 shadow-sm">
             <Table>
               <TableHeader className="bg-card">
                 <TableRow className="hover:bg-transparent">
@@ -494,7 +494,7 @@ export function AcademicYearsScreen() {
                     </TableCell>
                     <TableCell>
                       {year.isCurrent ? (
-                        <div className="flex items-center gap-1.5 text-violet-600 dark:text-violet-400 font-semibold">
+                        <div className="flex items-center gap-1.5 text-blue-600 dark:text-blue-400 font-semibold">
                           <CheckCircle2 className="size-4" />
                           <span>Current</span>
                         </div>
@@ -503,7 +503,7 @@ export function AcademicYearsScreen() {
                           variant="ghost" 
                           size="sm" 
                           onClick={() => handleSetCurrent(year.id)}
-                          className="text-xs text-muted-foreground hover:text-violet-600"
+                          className="text-xs text-muted-foreground hover:text-blue-600"
                         >
                           Set as Current
                         </Button>
