@@ -63,7 +63,7 @@ export function Sidebar({
   };
 
   const isSuperAdmin = currentUser.role === "super_admin";
-  const isModernUI = currentUser.role === "super_admin" || currentUser.role === "admin";
+  const isModernUI = true;
   const initials = currentUser.name
     .split(" ")
     .map((n) => n[0])

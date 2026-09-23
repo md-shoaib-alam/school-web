@@ -38,7 +38,7 @@ export function ExamDetailsBanner({ exam }: ExamDetailsBannerProps) {
             </Badge>
             {exam.status === "completed" ? (
               <Badge className="bg-emerald-100 text-emerald-700 hover:bg-emerald-100 border-none">
-                Published
+                Completed
               </Badge>
             ) : (
               <Badge className="bg-blue-100 text-blue-700 hover:bg-blue-100 border-none">

@@ -1,7 +1,7 @@
 'use client';
 
 import { Card, CardContent } from '@/components/ui/card';
-import { BookOpen, School } from 'lucide-react';
+import { BookOpen, School, CheckCircle2 } from 'lucide-react';
 import { useState, useMemo, useEffect } from 'react';
 import { ExamRecord, StudentResultRow } from './types';
 
@@ -111,7 +111,13 @@ export function ResultsView({
       {!selectedExam ? (
         <Card className="border-dashed border-2 bg-transparent">
           <CardContent className="py-20 text-center text-muted-foreground">
-            {resultsClassId ? (
+            {selectedExamGroup && subjectsInGroup.length === 0 ? (
+              <>
+                <CheckCircle2 className="size-12 mx-auto mb-4 text-emerald-500" />
+                <p className="text-lg font-medium text-foreground">All Subjects Completed</p>
+                <p className="text-sm">All marks have been entered for &quot;{selectedExamGroup}&quot;. You can now review and publish the results from the Exams tab.</p>
+              </>
+            ) : resultsClassId ? (
               <>
                 <BookOpen className="size-12 mx-auto mb-4 opacity-20" />
                 <p className="text-lg font-medium">Please select a subject to continue</p>

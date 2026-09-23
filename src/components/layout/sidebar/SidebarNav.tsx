@@ -23,7 +23,7 @@ export function SidebarNav({
   resolvedScreen,
   sidebarOpen,
   isSuperAdmin,
-  isModernUI = isSuperAdmin,
+  isModernUI = true,
   expandedKeys,
   onToggleExpand,
   onNavigate,

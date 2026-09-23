@@ -17,7 +17,7 @@ interface SidebarHeaderProps {
 
 export function SidebarHeader({
   isSuperAdmin,
-  isModernUI = isSuperAdmin,
+  isModernUI = true,
   sidebarOpen,
   tenantLogo,
   tenantName,
@@ -77,7 +77,17 @@ export function SidebarHeader({
                   : tenantName || currentUser?.tenantName || "Demo Academy"}
               </h2>
               <p className="text-[11px] text-slate-500 dark:text-zinc-400 font-medium">
-                {isSuperAdmin ? "Platform Console" : "Admin Portal"}
+                {isSuperAdmin
+                  ? "Platform Console"
+                  : currentUser?.role === "teacher"
+                  ? "Teacher Portal"
+                  : currentUser?.role === "student"
+                  ? "Student Portal"
+                  : currentUser?.role === "parent"
+                  ? "Parent Portal"
+                  : currentUser?.role === "staff"
+                  ? "Staff Portal"
+                  : "Admin Portal"}
               </p>
             </div>
           </>

@@ -4,8 +4,13 @@ import { useState, useEffect, useCallback, useRef, useMemo, useReducer } from 'r
 import { useReactToPrint } from 'react-to-print';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { useRouter, useParams } from 'next/navigation';
+import { useAppStore } from "@/store/use-app-store";
+import { useTenantMetadata } from "@/lib/graphql/hooks/platform.hooks";
+import { FullPageSkeleton } from "@/components/ui/full-page-skeleton";
+import { AdmitCardUpgradeCard } from './subscription/AdmitCardUpgradeCard';
 import {
-  FileText, Printer, Loader2, School, Download,
+  FileText, Printer, Loader2, School, Download, Crown, Award, Sparkles,
 } from 'lucide-react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { toast } from "sonner";
@@ -189,6 +194,12 @@ function getAvailableCycles(exams: any[], todayDateString: string) {
 }
 
 export function AdminAdmitCards() {
+  const { push } = useRouter();
+  const { slug } = useParams();
+  const { currentTenantId } = useAppStore();
+  const { data: detailData, isLoading: isDetailLoading } = useTenantMetadata(currentTenantId || "");
+  const tenant = detailData?.tenant;
+
   const queryClient = useQueryClient();
   const singleCardRef = useRef<HTMLDivElement>(null);
   const allCardsRef = useRef<HTMLDivElement>(null);
@@ -445,13 +456,34 @@ export function AdminAdmitCards() {
   const totalStudents = classData?.students.length || 0;
   const totalExams = currentCycle?.exams.length || 0;
 
+  if (isDetailLoading) {
+    return <FullPageSkeleton />;
+  }
+
+  if (tenant && tenant.plan.toLowerCase() === 'basic') {
+    return (
+      <div className="min-h-[calc(100vh-8rem)] flex items-center justify-center py-4 sm:py-8 w-full animate-in fade-in duration-300">
+        <AdmitCardUpgradeCard
+          className="w-full"
+          onUpgrade={() => push(`/${slug}/manage-plan`)}
+          onViewPlan={() => push(`/${slug}/manage-plan`)}
+        />
+      </div>
+    );
+  }
+
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
+    <div className="space-y-6 animate-in fade-in duration-300">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h2 className="text-2xl font-semibold tracking-tight">
-            Admit Cards
-          </h2>
+          <div className="flex items-center gap-2">
+            <h2 className="text-2xl font-semibold tracking-tight">
+              Admit Cards
+            </h2>
+            <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20">
+              <Crown className="size-3 fill-amber-500/20" /> Premium
+            </span>
+          </div>
           <p className="text-muted-foreground text-sm mt-1">
             Generate exam admit cards (hall tickets) for students
           </p>
@@ -477,6 +509,20 @@ export function AdminAdmitCards() {
             </Button>
           </div>
         )}
+      </div>
+
+      <div className="bg-emerald-50 dark:bg-emerald-900/10 border border-emerald-200 dark:border-emerald-800/50 p-4 rounded-xl flex items-center justify-between gap-3">
+        <div className="flex items-center gap-3">
+          <Award className="size-5 text-emerald-600 dark:text-emerald-400 shrink-0" />
+          <div>
+            <p className="text-sm font-semibold text-emerald-900 dark:text-emerald-100">Official Examination Hall Tickets</p>
+            <p className="text-xs text-emerald-700 dark:text-emerald-400">Generate and batch print standardized student examination admit cards.</p>
+          </div>
+        </div>
+        <div className="hidden sm:flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-100 dark:bg-emerald-800/40 text-emerald-800 dark:text-emerald-200 text-xs font-semibold">
+          <Sparkles className="size-3.5 text-emerald-600 dark:text-emerald-400" />
+          <span>Premium Feature</span>
+        </div>
       </div>
 
       <BatchPrintContainers 

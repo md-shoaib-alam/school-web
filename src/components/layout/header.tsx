@@ -37,7 +37,7 @@ export function Header({ items, resolvedScreen, layoutPref = "comprehensive", on
     logout
   } = useAppStore();
 
-  const isModernUI = currentUser?.role === "super_admin" || currentUser?.role === "admin";
+  const isModernUI = true;
   const [prefFromStorage, setPrefFromStorage] = useState<string | null>(null);
 
   useEffect(() => {
@@ -198,7 +198,17 @@ export function Header({ items, resolvedScreen, layoutPref = "comprehensive", on
               >
                 <Avatar className={cn(
                   "size-7 sm:size-7.5 cursor-pointer shadow-xs",
-                  currentUser.role === "super_admin" ? "ring-2 ring-blue-500/25" : "ring-2 ring-emerald-500/25"
+                  currentUser.role === "super_admin"
+                    ? "ring-2 ring-blue-500/25"
+                    : currentUser.role === "admin"
+                    ? "ring-2 ring-emerald-500/25"
+                    : currentUser.role === "teacher"
+                    ? "ring-2 ring-blue-500/25"
+                    : currentUser.role === "staff"
+                    ? "ring-2 ring-orange-500/25"
+                    : currentUser.role === "student"
+                    ? "ring-2 ring-violet-500/25"
+                    : "ring-2 ring-amber-500/25"
                 )}>
                   <AvatarImage src={currentUser.avatar} alt={currentUser.name} className="object-cover" />
                   <AvatarFallback
@@ -215,7 +225,7 @@ export function Header({ items, resolvedScreen, layoutPref = "comprehensive", on
                     {currentUser.name}
                   </span>
                   <span className="text-[10px] text-slate-400 dark:text-zinc-500 font-medium leading-none mt-0.5">
-                    {isSuperAdmin ? "Super Admin" : "School Admin"}
+                    {roleLabels[currentUser.role] || (isSuperAdmin ? "Super Admin" : "School Admin")}
                   </span>
                 </div>
                 <ChevronDown className="hidden sm:block size-3.5 text-slate-400 group-hover:text-slate-600 dark:group-hover:text-zinc-300 transition-transform duration-200" />

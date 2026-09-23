@@ -118,7 +118,7 @@ export function SelectionControls({
                     </SelectItem>
                   ))
                 ) : (
-                  <SelectItem value="none" disabled>No subjects found</SelectItem>
+                  <SelectItem value="none" disabled>All subjects completed</SelectItem>
                 )}
               </SelectContent>
             </Select>

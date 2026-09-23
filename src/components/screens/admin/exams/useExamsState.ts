@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo, useEffect, useRef } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useRouter, useParams, useSearchParams } from 'next/navigation';
 import { api, apiFetch, fetchAllStudents } from '@/lib/api';
@@ -54,6 +54,7 @@ export function useExamsState(initialTab = 'exams') {
   // Results State
   const [selectedExam, setSelectedExam] = useState<ExamRecord | null>(null);
   const [resultRows, setResultRows] = useState<StudentResultRow[]>([]);
+  const [resultsClassId, setResultsClassId] = useState<string>('');
   const [savingResults, setSavingResults] = useState(false);
   const [loadingStudents, setLoadingStudents] = useState(false);
   const [isPublishing, setIsPublishing] = useState(false);
@@ -68,6 +69,9 @@ export function useExamsState(initialTab = 'exams') {
     });
   }, [initialTab, searchParams]);
 
+  // Track exams marked complete in this session so URL effects don't revive them
+  const completedExamIdsRef = useRef<Set<string>>(new Set());
+
   // Sync state from URL params if present (e.g. results-entry?examId=...&classId=...)
   useEffect(() => {
     const urlClassId = searchParams.get('classId');
@@ -77,18 +81,24 @@ export function useExamsState(initialTab = 'exams') {
       setResultsClassId(urlClassId);
     }
 
-    if (urlExamId && (!selectedExam || selectedExam.id !== urlExamId)) {
-      apiFetch(`/api/exams?id=${urlExamId}`).then(async (res) => {
-        if (!res.ok) return;
-        const data = await res.json();
-        const list = Array.isArray(data) ? data : (Array.isArray(data.data) ? data.data : []);
-        const found = data.exam || list.find((e: any) => e.id === urlExamId);
-        if (found) {
-          openResultsEntry(found);
-        }
-      }).catch(console.error);
+    if (urlExamId && !completedExamIdsRef.current.has(urlExamId)) {
+      if (!selectedExam || selectedExam.id !== urlExamId) {
+        apiFetch(`/api/exams?id=${urlExamId}`).then(async (res) => {
+          if (!res.ok) return;
+          const data = await res.json();
+          const list = Array.isArray(data) ? data : (Array.isArray(data.data) ? data.data : []);
+          const found = data.exam || list.find((e: any) => e.id === urlExamId);
+          if (found && !completedExamIdsRef.current.has(found.id)) {
+            if (found.status === 'completed' || found.status === 'published') {
+              completedExamIdsRef.current.add(found.id);
+              return;
+            }
+            openResultsEntry(found);
+          }
+        }).catch(console.error);
+      }
     }
-  }, [searchParams]);
+  }, [searchParams, resultsClassId, selectedExam]);
 
   // View Results Dialog State
   const [viewResultsOpen, setViewResultsOpen] = useState(false);
@@ -99,7 +109,6 @@ export function useExamsState(initialTab = 'exams') {
   // Bulk Mode Helpers
   const [bulkSelected, setBulkSelected] = useState<Set<string>>(new Set());
   const [bulkOverrides, setBulkOverrides] = useState<Record<string, Partial<ExamFormData>>>({});
-  const [resultsClassId, setResultsClassId] = useState<string>('');
   
   const [printingLedgerClassId] = useState<string | null>(null);
   const [enableModalTabulationPreview, setEnableModalTabulationPreview] = useState<boolean>(true);
@@ -343,29 +352,6 @@ export function useExamsState(initialTab = 'exams') {
     setResultRows([]);
   };
 
-  // Support deep linking to results entry via URL query params (?examId=...&classId=...)
-  useEffect(() => {
-    const paramClassId = searchParams.get('classId');
-    if (paramClassId && resultsClassId !== paramClassId) {
-      setResultsClassId(paramClassId);
-    }
-  }, [searchParams, resultsClassId]);
-
-  useEffect(() => {
-    const paramExamId = searchParams.get('examId');
-    if (!paramExamId) return;
-    if (selectedExam?.id === paramExamId) return;
-
-    const allAvailable = [
-      ...(resultsExamsData?.data || []),
-      ...(examsData?.data || (Array.isArray(examsData) ? examsData : [])),
-    ];
-    const target = allAvailable.find((e: any) => e.id === paramExamId);
-    if (target) {
-      openResultsEntry(target);
-    }
-  }, [searchParams, resultsExamsData, examsData, selectedExam]);
-
   const handleOpenViewResults = async (exam: ExamRecord) => {
     setViewResultsExam(exam);
     setViewResultsOpen(true);
@@ -491,13 +477,19 @@ export function useExamsState(initialTab = 'exams') {
 
       if (statusRes.ok) {
         toast.success('Exam marked as complete successfully!');
-        queryClient.invalidateQueries({ queryKey: ['exams'] });
-        queryClient.invalidateQueries({ queryKey: ['results-exams'] });
+        const justCompletedId = selectedExam.id;
+        completedExamIdsRef.current.add(justCompletedId);
+
+        // Immediately strip examId from URL so query params don't revive it
+        if (searchParams.get('examId')) {
+          router.replace(`/${slug}/results-entry${selectedExam.classId ? `?classId=${selectedExam.classId}` : ''}`, { scroll: false });
+        }
+
         setSelectedExam(null);
         setResultRows([]);
-        if (searchParams.get('examId')) {
-          router.push(`/${slug}/results-entry${selectedExam.classId ? `?classId=${selectedExam.classId}` : ''}`);
-        }
+
+        queryClient.invalidateQueries({ queryKey: ['exams'] });
+        queryClient.invalidateQueries({ queryKey: ['results-exams'] });
       } else {
         const errData = await statusRes.json().catch(() => ({}));
         toast.error(errData.error || 'Failed to update exam status');

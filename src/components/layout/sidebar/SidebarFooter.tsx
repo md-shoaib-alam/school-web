@@ -30,7 +30,7 @@ interface SidebarFooterProps {
 
 export function SidebarFooter({
   isSuperAdmin,
-  isModernUI = isSuperAdmin,
+  isModernUI = true,
   sidebarOpen,
   currentUser,
   initials,
@@ -144,7 +144,7 @@ export function SidebarFooter({
           <Button
             variant="outline"
             size="sm"
-            onClick={() => onNavigate(isSuperAdmin ? "settings" : "school-settings")}
+            onClick={() => onNavigate(isSuperAdmin ? "settings" : currentUser.role === "admin" ? "school-settings" : "tickets")}
             className="w-full h-8 text-xs font-semibold rounded-xl bg-white dark:bg-zinc-900 border-slate-200/80 dark:border-zinc-800 text-blue-600 dark:text-blue-400 hover:bg-slate-50 dark:hover:bg-zinc-800 shadow-2xs"
           >
             Help & Support
