@@ -12,6 +12,7 @@ import {
 } from './exams/utils';
 
 // Sub-components
+import { ExamsHeroBanner } from './exams/ExamsHeroBanner';
 import { ExamsHeader } from './exams/ExamsHeader';
 import { ExamDialogs } from './exams/ExamDialogs';
 import { ViewResultsDialog } from './exams/ViewResultsDialog';
@@ -19,6 +20,9 @@ import { ActiveExamsView } from './exams/ActiveExamsView';
 import { PublishedResultsView } from './exams/PublishedResultsView';
 import { TabulationLedgerPreviewPage } from './exams/TabulationLedgerPreviewPage';
 import { useExamsState } from './exams/useExamsState';
+import { CreateExamWizard } from './exams/CreateExamWizard';
+import { useQueryClient } from '@tanstack/react-query';
+import { useState } from 'react';
 
 // Dynamic loading for "Low Stack" performance optimization
 const ResultsView = dynamic(() => import('./exams/ResultsView').then(m => m.ResultsView), {
@@ -27,12 +31,41 @@ const ResultsView = dynamic(() => import('./exams/ResultsView').then(m => m.Resu
 
 function AdminExamsContent({ initialTab = 'exams' }: { initialTab?: string }) {
   const state = useExamsState(initialTab);
+  const queryClient = useQueryClient();
+  const [searchQuery, setSearchQuery] = useState('');
+
+  if (state.addOpen) {
+    return (
+      <CreateExamWizard
+        onCancel={() => state.setAddOpen(false)}
+        classes={state.classes}
+        subjects={state.subjects}
+        academicYears={state.academicYears}
+        currentAcademicYear={state.currentAcademicYear}
+        teachers={state.teachers}
+        onSuccess={() => {
+          state.setAddOpen(false);
+          queryClient.invalidateQueries({ queryKey: ['exams'] });
+        }}
+      />
+    );
+  }
 
   return (
     <div className="space-y-6">
+      {/* Top Banner placed above ExamsHeader as requested */}
+      <ExamsHeroBanner
+        searchQuery={searchQuery}
+        onSearchChange={setSearchQuery}
+      />
+
       <ExamsHeader 
         activeTab={state.activeTab} 
-        onNewExamClick={() => state.setAddOpen(true)} 
+        onNewExamClick={() => state.setAddOpen(true)}
+        academicYears={state.academicYears}
+        currentAcademicYear={state.currentAcademicYear}
+        selectedAcademicYear={state.publishedAcademicYearFilter || state.currentAcademicYear}
+        onAcademicYearChange={state.setPublishedAcademicYearFilter}
       />
 
       <Tabs value={state.activeTab} onValueChange={(v) => v === 'exams' ? state.backToExams() : state.setActiveTab(v)}>
@@ -53,6 +86,9 @@ function AdminExamsContent({ initialTab = 'exams' }: { initialTab?: string }) {
             getExamTypeBadge={getExamTypeBadge}
             classFilter={state.classFilter}
             setClassFilter={state.setClassFilter}
+            onNewExamClick={() => state.setAddOpen(true)}
+            searchQuery={searchQuery}
+            onSearchChange={setSearchQuery}
           />
         </TabsContent>
 

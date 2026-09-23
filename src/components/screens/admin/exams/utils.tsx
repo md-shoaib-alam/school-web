@@ -28,14 +28,72 @@ export const emptyExamForm: ExamFormData = {
 
 export function TabLoadingSkeleton() {
   return (
-    <div className="space-y-4 animate-in fade-in duration-500">
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        {[...Array(4)].map((_, i) => <Skeleton key={i} className="h-24 w-full rounded-xl" />)}
+    <div className="space-y-6 animate-pulse">
+      {/* Hero Banner Skeleton */}
+      <div className="relative overflow-hidden rounded-2xl border border-sky-100 dark:border-sky-950/40 bg-gradient-to-r from-sky-50/60 via-blue-50/40 to-sky-100/50 dark:from-sky-950/20 dark:via-blue-950/10 dark:to-sky-900/20 px-5 sm:px-6 py-4">
+        <div className="flex items-center justify-between gap-4">
+          <div className="flex-1 space-y-2.5">
+            <Skeleton className="h-5 sm:h-6 w-36 sm:w-56 rounded-lg" />
+            <Skeleton className="hidden sm:block h-3.5 w-72 sm:w-96 rounded-md" />
+            <Skeleton className="h-9 w-full max-w-sm rounded-xl mt-2" />
+          </div>
+          <Skeleton className="h-18 sm:h-22 w-24 sm:w-32 rounded-xl shrink-0" />
+        </div>
       </div>
-      <div className="flex gap-3">
-        <Skeleton className="h-10 w-full rounded-md" />
+
+      {/* Header Skeleton (Title on Desktop, Actions on Mobile & Desktop) */}
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div className="hidden md:flex items-center gap-3.5">
+          <Skeleton className="size-11 sm:size-12 rounded-xl" />
+          <div className="space-y-1.5">
+            <Skeleton className="h-6 w-28 rounded-md" />
+            <Skeleton className="h-3.5 w-56 rounded-md" />
+          </div>
+        </div>
+
+        <div className="flex items-center justify-between sm:justify-end gap-2.5 sm:gap-3 w-full md:w-auto">
+          <Skeleton className="h-9 w-full sm:w-44 rounded-xl" />
+          <Skeleton className="h-9 w-28 rounded-xl shrink-0" />
+        </div>
       </div>
-      <Skeleton className="h-[500px] w-full rounded-xl" />
+
+      {/* Tabs Skeleton */}
+      <div className="flex items-center gap-4 sm:gap-6 border-b border-border/60 pb-2">
+        <Skeleton className="h-4 w-16 rounded-md" />
+        <Skeleton className="h-4 w-20 rounded-md" />
+        <Skeleton className="h-4 w-20 rounded-md" />
+        <Skeleton className="h-4 w-20 rounded-md" />
+        <Skeleton className="h-4 w-16 rounded-md" />
+      </div>
+
+      {/* Main Table Card Skeleton */}
+      <div className="bg-card border border-border/70 rounded-2xl shadow-xs overflow-hidden p-4 space-y-3.5">
+        <div className="flex items-center justify-between gap-4 py-2 border-b border-border/50">
+          <Skeleton className="h-4 w-8" />
+          <Skeleton className="h-4 w-32" />
+          <Skeleton className="h-4 w-20" />
+          <Skeleton className="h-4 w-16" />
+          <Skeleton className="h-4 w-24" />
+          <Skeleton className="h-4 w-24" />
+          <Skeleton className="h-4 w-16" />
+          <Skeleton className="h-4 w-12" />
+        </div>
+        {[...Array(6)].map((_, i) => (
+          <div key={i} className="flex items-center justify-between gap-4 py-2.5 border-b border-border/30 last:border-0">
+            <Skeleton className="h-4 w-4 rounded" />
+            <div className="space-y-1 flex-1 max-w-xs">
+              <Skeleton className="h-4 w-40 rounded" />
+              <Skeleton className="h-3 w-24 rounded" />
+            </div>
+            <Skeleton className="h-4 w-16 rounded" />
+            <Skeleton className="h-5 w-20 rounded-lg" />
+            <Skeleton className="h-4 w-24 rounded" />
+            <Skeleton className="h-4 w-24 rounded" />
+            <Skeleton className="h-5 w-20 rounded-lg" />
+            <Skeleton className="size-8 rounded-lg" />
+          </div>
+        ))}
+      </div>
     </div>
   );
 }

@@ -21,7 +21,8 @@ export function useExamsState(initialTab = 'exams') {
   // Academic Years
   const { academicYears } = useAcademicYears();
   const currentAcademicYear = useMemo(() => {
-    return academicYears.find((ay: any) => ay.isCurrent)?.name || '2024-2025';
+    const y = new Date().getFullYear();
+    return academicYears.find((ay: any) => ay.isCurrent)?.name || `${y}-${y + 1}`;
   }, [academicYears]);
 
   // Filters & Tabs
@@ -164,22 +165,21 @@ export function useExamsState(initialTab = 'exams') {
   });
 
   const { data: metadata } = useQuery({
-    queryKey: ['classes-subjects-min'],
+    queryKey: ['classes-subjects-teachers-min'],
     queryFn: async () => {
-      const [classes, subjects] = await Promise.all([
+      const [classes, subjects, teachers] = await Promise.all([
         api.get('/classes?mode=min'),
-        api.get('/subjects?mode=min')
+        api.get('/subjects?mode=min'),
+        api.get('/teachers?mode=min')
       ]);
-      return { classes, subjects };
+      return { classes, subjects, teachers };
     },
     staleTime: 10 * 60 * 1000,
   });
 
   const exams = useMemo(() => {
     const data = examsData?.data || (Array.isArray(examsData) ? examsData : []);
-    return (data as ExamRecord[]).filter(
-      (e) => e.examType === "midterm" || e.examType === "final"
-    );
+    return data as ExamRecord[];
   }, [examsData]);
 
   const classes = (metadata?.classes || []) as ClassOption[];
@@ -472,6 +472,7 @@ export function useExamsState(initialTab = 'exams') {
     exams,
     classes,
     subjects,
+    teachers: (metadata?.teachers || []) as any[],
     resultsExams: resultsExamsData?.data || [],
     handleCreate,
     handleUpdate,

@@ -50,6 +50,8 @@ export interface SubjectOption {
   name: string;
   code: string;
   classId: string;
+  teacherId?: string;
+  teacherName?: string;
 }
 
 export interface StudentOption {
