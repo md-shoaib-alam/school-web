@@ -12,7 +12,6 @@ import {
 } from './exams/utils';
 
 // Sub-components
-import { ExamsHeroBanner } from './exams/ExamsHeroBanner';
 import { ExamsHeader } from './exams/ExamsHeader';
 import { ExamDialogs } from './exams/ExamDialogs';
 import { ViewResultsDialog } from './exams/ViewResultsDialog';
@@ -53,12 +52,6 @@ function AdminExamsContent({ initialTab = 'exams' }: { initialTab?: string }) {
 
   return (
     <div className="space-y-6">
-      {/* Top Banner placed above ExamsHeader as requested */}
-      <ExamsHeroBanner
-        searchQuery={searchQuery}
-        onSearchChange={setSearchQuery}
-      />
-
       <ExamsHeader 
         activeTab={state.activeTab} 
         onNewExamClick={() => state.setAddOpen(true)}
@@ -87,6 +80,8 @@ function AdminExamsContent({ initialTab = 'exams' }: { initialTab?: string }) {
             classFilter={state.classFilter}
             setClassFilter={state.setClassFilter}
             onNewExamClick={() => state.setAddOpen(true)}
+            onOpenResultsEntry={state.openResultsEntry}
+            onRefreshData={() => queryClient.invalidateQueries({ queryKey: ['exams'] })}
             searchQuery={searchQuery}
             onSearchChange={setSearchQuery}
           />

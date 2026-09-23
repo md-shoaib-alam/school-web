@@ -60,12 +60,12 @@ export function useExamsState(initialTab = 'exams') {
   useEffect(() => {
     queueMicrotask(() => {
       setActiveTab(initialTab);
-      if (initialTab !== 'results') {
+      if (initialTab !== 'results' && !searchParams.get('examId')) {
         setSelectedExam(null);
         setResultRows([]);
       }
     });
-  }, [initialTab]);
+  }, [initialTab, searchParams]);
 
   // View Results Dialog State
   const [viewResultsOpen, setViewResultsOpen] = useState(false);
@@ -265,8 +265,8 @@ export function useExamsState(initialTab = 'exams') {
       return;
     }
     setResultsClassId(exam.classId);
-    if (activeTab !== 'results') {
-      router.push(`/${slug}/results-entry`);
+    if (activeTab !== 'results' || searchParams.get('examId') !== exam.id) {
+      router.push(`/${slug}/results-entry?examId=${exam.id}&classId=${exam.classId}`);
     }
     setActiveTab('results');
     setLoadingStudents(true);
@@ -279,11 +279,16 @@ export function useExamsState(initialTab = 'exams') {
       
       setResultRows(students.map((s: any) => {
         const res = results.find((r: any) => r.studentId === s.id);
+        const marksStr = res ? String(res.marksObtained) : '';
+        const passThreshold = exam.passingMarks || 40;
+        const autoStatus = marksStr !== '' 
+          ? (Number(marksStr) >= passThreshold ? 'pass' : 'fail')
+          : 'pending';
         return {
           studentId: s.id, studentName: s.name, rollNumber: s.rollNumber || '',
-          marksObtained: res ? String(res.marksObtained) : '',
+          marksObtained: marksStr,
           remarks: res?.remarks || '',
-          status: res ? res.status : 'pending'
+          status: res?.status && res.status !== 'pending' ? res.status : autoStatus
         };
       }));
     } catch { toast.error('Failed to load results'); }
@@ -295,6 +300,29 @@ export function useExamsState(initialTab = 'exams') {
     setSelectedExam(null);
     setResultRows([]);
   };
+
+  // Support deep linking to results entry via URL query params (?examId=...&classId=...)
+  useEffect(() => {
+    const paramClassId = searchParams.get('classId');
+    if (paramClassId && resultsClassId !== paramClassId) {
+      setResultsClassId(paramClassId);
+    }
+  }, [searchParams, resultsClassId]);
+
+  useEffect(() => {
+    const paramExamId = searchParams.get('examId');
+    if (!paramExamId) return;
+    if (selectedExam?.id === paramExamId) return;
+
+    const allAvailable = [
+      ...(resultsExamsData?.data || []),
+      ...(examsData?.data || (Array.isArray(examsData) ? examsData : [])),
+    ];
+    const target = allAvailable.find((e: any) => e.id === paramExamId);
+    if (target) {
+      openResultsEntry(target);
+    }
+  }, [searchParams, resultsExamsData, examsData, selectedExam]);
 
   const handleOpenViewResults = async (exam: ExamRecord) => {
     setViewResultsExam(exam);

@@ -25,18 +25,46 @@ import {
 import { ExamRecord } from '../types';
 import { formatMockupDate, renderTypeBadge, renderStatusBadge } from './activeExamsUtils';
 
+export interface ProcessedExamSubject {
+  id: string;
+  subjectId: string;
+  subjectName: string;
+  teacherName: string;
+  totalStudents: number;
+  marksEnteredCount: number;
+  status: 'completed' | 'in_progress' | 'not_started';
+  date: string;
+  startTime?: string;
+  endTime?: string;
+  totalMarks: number;
+  passingMarks: number;
+  fullExam: ExamRecord;
+}
+
 export interface ProcessedExam {
   id: string;
   rawIds: string[];
   name: string;
   description: string;
   className: string;
+  classSection?: string;
   classId: string;
   examType: string;
   startDate: string;
   endDate: string;
   status: 'upcoming' | 'in_progress' | 'completed' | 'draft';
   subjectCount: number;
+  subjects: ProcessedExamSubject[];
+  completion: {
+    total: number;
+    completed: number;
+    inProgress: number;
+    notStarted: number;
+    percentage: number;
+  };
+  totalStudents: number;
+  totalMarks: number;
+  isPublished: boolean;
 }
 
 interface ActiveExamTableRowProps {
@@ -45,6 +73,7 @@ interface ActiveExamTableRowProps {
   isSelected: boolean;
   onToggleSelect: (id: string) => void;
   onViewDetails: (exam: ExamRecord) => void;
+  onViewExamDetail?: (exam: ProcessedExam) => void;
   onEdit: (exam: ExamRecord) => void;
   onDelete: (ids: string[]) => void;
   deleting: boolean;
@@ -57,6 +86,7 @@ export function ActiveExamTableRow({
   isSelected,
   onToggleSelect,
   onViewDetails,
+  onViewExamDetail,
   onEdit,
   onDelete,
   deleting,
@@ -68,7 +98,7 @@ export function ActiveExamTableRow({
     name: exam.name,
     subjectName: exam.description,
     className: exam.className,
-    classSection: '',
+    classSection: exam.classSection || '',
     classId: exam.classId,
     subjectId: '',
     examType: exam.examType,
@@ -80,13 +110,21 @@ export function ActiveExamTableRow({
     passingMarks: 40,
   };
 
+  const handleRowClick = () => {
+    if (onViewExamDetail) {
+      onViewExamDetail(exam);
+    } else {
+      onViewDetails(matchingFullExam);
+    }
+  };
+
   return (
     <TableRow
       key={exam.id}
       className={`hover:bg-blue-50/40 dark:hover:bg-blue-950/10 transition-colors border-b last:border-none cursor-pointer ${
         isSelected ? 'bg-blue-50/40 dark:bg-blue-950/20' : ''
       }`}
-      onClick={() => onViewDetails(matchingFullExam)}
+      onClick={handleRowClick}
     >
       <TableCell className="py-4 pl-1 pr-2" onClick={(e) => e.stopPropagation()}>
         <Checkbox
@@ -146,7 +184,7 @@ export function ActiveExamTableRow({
               variant="ghost"
               size="icon"
               className="size-8 text-muted-foreground hover:text-blue-600"
-              onClick={() => onViewDetails(matchingFullExam)}
+              onClick={handleRowClick}
               title="View Details"
             >
               <Eye className="size-4" />
@@ -204,7 +242,7 @@ export function ActiveExamTableRow({
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-44 rounded-xl">
                 <DropdownMenuItem
-                  onClick={() => onViewDetails(matchingFullExam)}
+                  onClick={handleRowClick}
                   className="cursor-pointer gap-2 font-medium"
                 >
                   <Eye className="size-4 text-blue-600" />

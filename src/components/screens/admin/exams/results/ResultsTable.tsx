@@ -28,13 +28,17 @@ export function ResultsTable({
   savingResults,
   isPublishing,
 }: ResultsTableProps) {
+  const hasPending =
+    resultRows.length === 0 ||
+    resultRows.some((r) => !r.marksObtained || r.marksObtained.trim() === '' || r.status === 'pending');
+
   return (
     <Card>
       <CardHeader className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div className="space-y-1">
           <CardTitle className="text-base">Enter Results</CardTitle>
           <CardDescription className="text-xs sm:text-sm">
-            Enter marks for each student. Pass/fail is auto-calculated.
+            Enter marks for each student. Save as draft anytime, or mark as complete when all marks are entered.
           </CardDescription>
         </div>
         <div className="flex flex-wrap items-center gap-2">
@@ -49,11 +53,12 @@ export function ResultsTable({
           </Button>
           <Button 
             onClick={onPublish} 
-            disabled={savingResults || isPublishing || resultRows.length === 0}
-            className="bg-emerald-600 hover:bg-emerald-700 text-white gap-2"
+            disabled={savingResults || isPublishing || hasPending}
+            title={hasPending ? 'All students must have marks entered before marking as complete' : 'Mark exam as complete'}
+            className="bg-emerald-600 hover:bg-emerald-700 text-white gap-2 disabled:opacity-50"
           >
             {isPublishing ? <Loader2 className="size-4 animate-spin" /> : <CheckCircle2 className="size-4" />}
-            Publish Results
+            Mark as Complete
           </Button>
         </div>
       </CardHeader>
