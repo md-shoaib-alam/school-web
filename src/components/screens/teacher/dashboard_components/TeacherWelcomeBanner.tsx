@@ -9,14 +9,17 @@ interface TeacherWelcomeBannerProps {
 
 export function TeacherWelcomeBanner({ userName }: TeacherWelcomeBannerProps) {
   return (
-    <div className="relative overflow-hidden rounded-2xl sm:rounded-3xl border border-zinc-200/80 dark:border-zinc-800 bg-white dark:bg-zinc-900 py-3.5 sm:py-4 px-4 sm:px-6 shadow-xs">
-      {/* Subtle ambient background glow */}
-      <div className="absolute top-0 right-1/4 w-60 h-60 bg-blue-100/30 dark:bg-blue-900/10 rounded-full blur-3xl pointer-events-none" />
+    <div className="relative overflow-hidden rounded-2xl sm:rounded-3xl border border-sky-100/80 dark:border-zinc-800 bg-gradient-to-r from-sky-50/90 via-emerald-50/30 to-amber-50/60 dark:from-zinc-900 dark:via-zinc-900/90 dark:to-zinc-900 py-3.5 sm:py-4 px-4 sm:px-6 shadow-xs">
+      {/* Ambient background glows matching illustration colors (blue, emerald, amber) */}
+      <div className="absolute -top-12 -left-8 w-56 h-56 bg-sky-200/35 dark:bg-sky-500/10 rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute top-1/2 left-1/3 -translate-y-1/2 w-48 h-48 bg-emerald-100/30 dark:bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute -bottom-10 right-16 w-44 h-44 bg-sky-200/30 dark:bg-sky-500/10 rounded-full blur-2xl pointer-events-none" />
+      <div className="absolute -top-8 -right-6 w-52 h-52 bg-amber-200/40 dark:bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
 
       <div className="relative z-10 flex items-center justify-between gap-3 sm:gap-6">
         {/* Left Section: Greeting & Info */}
         <div className="flex flex-col justify-center min-w-0 flex-1">
-          <span className="text-[11px] sm:text-xs font-medium text-zinc-500 dark:text-zinc-400">
+          <span className="text-[11px] sm:text-xs font-medium text-sky-800/70 dark:text-sky-400">
             Welcome back,
           </span>
           <h1 className="text-xl sm:text-2xl font-bold text-zinc-900 dark:text-zinc-50 tracking-tight leading-tight mt-0.5">
@@ -33,7 +36,7 @@ export function TeacherWelcomeBanner({ userName }: TeacherWelcomeBannerProps) {
             src="/assets/teacher/teachertop.avif"
             alt="Teacher illustration"
             fill
-            className="object-contain select-none pointer-events-none"
+            className="object-contain select-none pointer-events-none drop-shadow-xs"
             priority
           />
         </div>

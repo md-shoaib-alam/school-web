@@ -215,9 +215,9 @@ export function ActiveExamTableRow({
                   subjects: exam.subjects,
                   subjectCount: exam.subjectCount,
                   className: exam.className,
-                  classSection: exam.classSection,
+                  classSection: exam.classSection || '',
                   cleanName: exam.name,
-                })
+                } as any)
               }
               title="Edit Exam"
             >
@@ -282,9 +282,9 @@ export function ActiveExamTableRow({
                       subjects: exam.subjects,
                       subjectCount: exam.subjectCount,
                       className: exam.className,
-                      classSection: exam.classSection,
+                      classSection: exam.classSection || '',
                       cleanName: exam.name,
-                    })
+                    } as any)
                   }
                   className="cursor-pointer gap-2 font-medium"
                 >

@@ -49,7 +49,7 @@ export function TeacherStats({
     {
       title: "Today's Attendance",
       value: attendanceRate,
-      screen: 'take-attendance',
+      screen: 'my-attendance',
       icon: <UserCheck className="size-4.5" />,
       iconBox: 'bg-purple-50 dark:bg-purple-950/50 text-purple-600 dark:text-purple-400 border-purple-100 dark:border-purple-900/40',
       arrowBg: 'bg-purple-50 dark:bg-purple-950/50 text-purple-600 dark:text-purple-400 hover:bg-purple-100 dark:hover:bg-purple-900/60',

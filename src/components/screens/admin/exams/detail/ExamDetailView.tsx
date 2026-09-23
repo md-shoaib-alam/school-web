@@ -139,9 +139,9 @@ export function ExamDetailView({
                 subjects: exam.subjects,
                 subjectCount: exam.subjectCount,
                 className: exam.className,
-                classSection: exam.classSection,
+                classSection: exam.classSection || '',
                 cleanName: exam.name,
-              })
+              } as any)
             }
             className="rounded-xl border-border/80 text-foreground font-semibold gap-2 shadow-2xs hover:bg-slate-50 dark:hover:bg-zinc-800"
           >

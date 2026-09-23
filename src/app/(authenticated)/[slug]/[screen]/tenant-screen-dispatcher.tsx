@@ -46,6 +46,7 @@ const ManagePlanScreen = dynamic(() => import('@/components/screens/admin/manage
 const TeacherClasses = dynamic(() => import('@/components/screens/teacher/my-classes').then(m => m.TeacherClasses), { loading: LoadingScreen });
 const TeacherSubjects = dynamic(() => import('@/components/screens/teacher/my-subjects').then(m => m.TeacherSubjects), { loading: LoadingScreen });
 const TeacherAttendance = dynamic(() => import('@/components/screens/teacher/take-attendance').then(m => m.TeacherAttendance), { loading: LoadingScreen });
+const TeacherMyAttendance = dynamic(() => import('@/components/screens/teacher/my-attendance').then(m => m.TeacherMyAttendance), { loading: LoadingScreen });
 const TeacherGrades = dynamic(() => import('@/components/screens/teacher/grade-management').then(m => m.TeacherGrades), { loading: LoadingScreen });
 const TeacherExamsEntry = dynamic(() => import('@/components/screens/teacher/exams-entry').then(m => m.TeacherExamsEntry), { loading: LoadingScreen });
 const TeacherAssignments = dynamic(() => import('@/components/screens/teacher/homework').then(m => m.TeacherAssignments), { loading: LoadingScreen });
@@ -161,6 +162,7 @@ export default function TenantScreenDispatcherClient() {
       case 'grades': return <TeacherGrades />;
       case 'teacher-attendance': return <StaffAttendance key="teacher-att" initialTab="teacher" />;
       case 'staff-attendance': return <StaffAttendance key="staff-att" initialTab="staff" />;
+      case 'my-attendance': return <TeacherMyAttendance />;
       case 'exams': return <AdminExams key="exams" initialTab="exams" />;
       case 'results-entry': return <AdminExams key="results" initialTab="results" />;
       case 'published-results': return <AdminExams key="published" initialTab="published" />;
@@ -182,6 +184,8 @@ export default function TenantScreenDispatcherClient() {
       case 'my-classes': return <TeacherClasses />;
       case 'my-subjects': return <TeacherSubjects />;
       case 'take-attendance': return <TeacherAttendance />;
+      case 'attendance':
+      case 'my-attendance': return <TeacherMyAttendance />;
       case 'grade-management':
       case 'assessments': return <TeacherGrades />;
       case 'school-exams': return <TeacherExamsEntry />;

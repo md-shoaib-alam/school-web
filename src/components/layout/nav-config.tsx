@@ -8,6 +8,7 @@ import {
   IndianRupee,
   Bell,
   Calendar,
+  CalendarCheck,
   Clock,
   UserCheck,
   FileText,
@@ -311,9 +312,21 @@ export const navItems: Record<UserRole, NavItem[]> = {
       icon: <BookOpen className="size-4" />,
     },
     {
-      key: "take-attendance",
+      key: "attendance-group",
       label: "Attendance",
-      icon: <UserCheck className="size-4" />,
+      icon: <CalendarCheck className="size-4" />,
+      children: [
+        {
+          key: "my-attendance",
+          label: "My Attendance",
+          icon: <UserCheck className="size-4" />,
+        },
+        {
+          key: "take-attendance",
+          label: "Student Attendance",
+          icon: <Users className="size-4" />,
+        },
+      ]
     },
     {
       key: "grades-group",
