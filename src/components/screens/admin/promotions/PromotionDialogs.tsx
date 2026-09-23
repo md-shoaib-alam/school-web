@@ -31,6 +31,7 @@ interface NewPromotionDialogProps {
   submitting: boolean;
   handleCreatePromotion: () => void;
   handleStudentChange: (studentId: string) => void;
+  academicYearOptions?: string[];
 }
 
 export function NewPromotionDialog({
@@ -43,7 +44,11 @@ export function NewPromotionDialog({
   submitting,
   handleCreatePromotion,
   handleStudentChange,
+  academicYearOptions = [],
 }: NewPromotionDialogProps) {
+  const yearOptions = Array.from(
+    new Set([...academicYearOptions, form.academicYear].filter(Boolean))
+  );
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-lg">
@@ -129,13 +134,23 @@ export function NewPromotionDialog({
           </div>
           <div className="grid gap-2">
             <label className="text-sm font-medium">Academic Year *</label>
-            <Input
-              placeholder="e.g. 2025-2026"
+            <Select
               value={form.academicYear}
-              onChange={(e) =>
-                setForm({ ...form, academicYear: e.target.value })
+              onValueChange={(val) =>
+                setForm({ ...form, academicYear: val })
               }
-            />
+            >
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="Select academic year" />
+              </SelectTrigger>
+              <SelectContent>
+                {yearOptions.map((y) => (
+                  <SelectItem key={y} value={y}>
+                    {y}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
           <div className="grid gap-2">
             <label className="text-sm font-medium">Remarks</label>

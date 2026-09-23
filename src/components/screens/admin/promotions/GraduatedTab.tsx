@@ -40,6 +40,7 @@ interface GraduatedTabProps {
   handleGraduate: () => void;
   gradSubmitting: boolean;
   graduations: PromotionRecord[];
+  academicYearOptions?: string[];
 }
 
 export function GraduatedTab({
@@ -57,7 +58,11 @@ export function GraduatedTab({
   handleGraduate,
   gradSubmitting,
   graduations,
+  academicYearOptions = [],
 }: GraduatedTabProps) {
+  const yearOptions = Array.from(
+    new Set([...academicYearOptions, gradAcademicYear].filter(Boolean))
+  );
   return (
     <div className="space-y-6">
       {/* Quick Graduate Card */}
@@ -92,11 +97,21 @@ export function GraduatedTab({
             </div>
             <div className="space-y-2">
               <label className="text-sm font-medium">Academic Year *</label>
-              <Input
-                placeholder="e.g. 2024-2025"
+              <Select
                 value={gradAcademicYear}
-                onChange={(e) => setGradAcademicYear(e.target.value)}
-              />
+                onValueChange={setGradAcademicYear}
+              >
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Select academic year" />
+                </SelectTrigger>
+                <SelectContent>
+                  {yearOptions.map((y) => (
+                    <SelectItem key={y} value={y}>
+                      {y}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
           </div>
 
@@ -128,7 +143,10 @@ export function GraduatedTab({
                   </Button>
                 </div>
               </div>
-              <div className="max-h-64 overflow-y-auto rounded-lg border">
+              <div 
+                data-lenis-prevent
+                className="max-h-72 overflow-y-auto overscroll-contain rounded-lg border bg-card"
+              >
                 <Table>
                   <TableHeader>
                     <TableRow>

@@ -36,6 +36,7 @@ interface BulkPromotionDialogProps {
   bulkPreview: StudentOption[];
   handleBulkPromote: () => void;
   bulkSubmitting: boolean;
+  academicYearOptions?: string[];
 }
 
 export function BulkPromotionDialog({
@@ -53,7 +54,11 @@ export function BulkPromotionDialog({
   bulkPreview,
   handleBulkPromote,
   bulkSubmitting,
+  academicYearOptions = [],
 }: BulkPromotionDialogProps) {
+  const yearOptions = Array.from(
+    new Set([...academicYearOptions, bulkAcademicYear].filter(Boolean))
+  );
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-lg">
@@ -116,10 +121,21 @@ export function BulkPromotionDialog({
           </div>
           <div className="grid gap-2">
             <label className="text-sm font-medium">Academic Year *</label>
-            <Input
+            <Select
               value={bulkAcademicYear}
-              onChange={(e) => setBulkAcademicYear(e.target.value)}
-            />
+              onValueChange={setBulkAcademicYear}
+            >
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="Select academic year" />
+              </SelectTrigger>
+              <SelectContent>
+                {yearOptions.map((y) => (
+                  <SelectItem key={y} value={y}>
+                    {y}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
           <div className="grid gap-2">
             <label className="text-sm font-medium">Remarks</label>
@@ -144,7 +160,10 @@ export function BulkPromotionDialog({
               <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
                 Students to be promoted ({bulkPreview.length})
               </label>
-              <div className="max-h-[160px] overflow-y-auto rounded-lg border bg-muted/30 p-2 text-sm space-y-1">
+              <div 
+                data-lenis-prevent
+                className="max-h-[200px] overflow-y-auto overscroll-contain rounded-lg border bg-muted/30 p-2 text-sm space-y-1"
+              >
                 {bulkPreview.map((s) => (
                   <div key={s.id} className="flex justify-between items-center px-2 py-1 rounded hover:bg-muted/50 transition-colors">
                     <span className="font-medium text-foreground">{s.name}</span>

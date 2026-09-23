@@ -41,9 +41,9 @@ function getTemplateBadgeStyle(name: string) {
 }
 
 export function RoleTemplates({ onSelectTemplate, isMobileTab = false }: RoleTemplatesProps) {
-  const [showAll, setShowAll] = useState(false);
+  const [showAll, setShowAll] = useState(true);
 
-  const displayedTemplates = showAll ? ROLE_TEMPLATES : ROLE_TEMPLATES.slice(0, 5);
+  const displayedTemplates = showAll ? ROLE_TEMPLATES : ROLE_TEMPLATES.slice(0, 6);
 
   return (
     <div className="bg-card rounded-2xl border border-border shadow-2xs overflow-hidden p-3.5 sm:p-5">
@@ -74,7 +74,7 @@ export function RoleTemplates({ onSelectTemplate, isMobileTab = false }: RoleTem
       </div>
 
       {/* Templates List */}
-      <div className="space-y-2">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-2.5">
         {displayedTemplates.map((template) => {
           const permCount = Object.values(template.permissions).flat().length;
 

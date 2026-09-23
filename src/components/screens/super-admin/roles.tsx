@@ -2,9 +2,8 @@
 
 import { apiFetch } from "@/lib/api";
 import { useState, useReducer, useEffect, useCallback } from "react";
-import { Loader2, LayoutGrid, UserCheck } from "lucide-react";
+import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
-import { cn } from "@/lib/utils";
 
 // Sub-components
 import { RoleHeader } from "./roles/RoleHeader";
@@ -21,7 +20,7 @@ import {
 import { rolesReducer, initialState } from "./roles/reducer";
 
 export function SuperAdminRoles() {
-  const [mobileTab, setMobileTab] = useState<"templates" | "roles">("templates");
+  const [activeTab, setActiveTab] = useState<"templates" | "roles">("templates");
   const [state, dispatch] = useReducer(rolesReducer, initialState);
 
   const {
@@ -192,59 +191,18 @@ export function SuperAdminRoles() {
       {/* 1. Hero Banner */}
       <RoleHeroBanner />
 
-      {/* 2. Header */}
-      <RoleHeader onCreateRole={() => openCreateDialog()} />
+      {/* 2. Header with Tabs in place of that text */}
+      <RoleHeader 
+        activeTab={activeTab}
+        onTabChange={setActiveTab}
+        onCreateRole={() => openCreateDialog()} 
+      />
 
-      {/* 3. Main Content: Desktop 2-Column Side-by-Side vs Mobile Segmented Tabs */}
-      
-      {/* Desktop View (>= lg) */}
-      <div className="hidden lg:grid lg:grid-cols-2 gap-5 items-start">
-        <RoleTemplates onSelectTemplate={(t) => openCreateDialog(t)} />
-        <RoleGrid 
-          roles={roles}
-          onEdit={openEditDialog}
-          onDelete={handleDelete}
-          onAssignUsers={openAssignDialog}
-        />
-      </div>
-
-      {/* Mobile & Tablet View (< lg) */}
-      <div className="lg:hidden space-y-3">
-        {/* Modern Segmented Control */}
-        <div className="p-1 bg-muted/70 rounded-xl border border-border/50 flex items-center gap-1">
-          <button
-            type="button"
-            onClick={() => setMobileTab("templates")}
-            className={cn(
-              "flex-1 py-1.5 px-3 text-center text-xs font-semibold rounded-lg transition-all flex items-center justify-center gap-1.5 cursor-pointer",
-              mobileTab === "templates"
-                ? "bg-card text-foreground shadow-2xs border border-border/40 font-bold"
-                : "text-muted-foreground hover:text-foreground"
-            )}
-          >
-            <LayoutGrid className="size-3.5 text-blue-600 dark:text-blue-400" />
-            <span>Templates ({ROLE_TEMPLATES.length})</span>
-          </button>
-          <button
-            type="button"
-            onClick={() => setMobileTab("roles")}
-            className={cn(
-              "flex-1 py-1.5 px-3 text-center text-xs font-semibold rounded-lg transition-all flex items-center justify-center gap-1.5 cursor-pointer",
-              mobileTab === "roles"
-                ? "bg-card text-foreground shadow-2xs border border-border/40 font-bold"
-                : "text-muted-foreground hover:text-foreground"
-            )}
-          >
-            <UserCheck className="size-3.5 text-blue-600 dark:text-blue-400" />
-            <span>Your Roles ({roles.length})</span>
-          </button>
-        </div>
-
-        {/* Tab Content */}
-        {mobileTab === "templates" ? (
+      {/* 3. Main Content: Toggled View for Desktop & Mobile */}
+      <div className="space-y-4 animate-in fade-in-50 duration-200">
+        {activeTab === "templates" ? (
           <RoleTemplates 
             onSelectTemplate={(t) => openCreateDialog(t)} 
-            isMobileTab={true}
           />
         ) : (
           <RoleGrid 
@@ -252,7 +210,6 @@ export function SuperAdminRoles() {
             onEdit={openEditDialog}
             onDelete={handleDelete}
             onAssignUsers={openAssignDialog}
-            isMobileTab={true}
           />
         )}
       </div>

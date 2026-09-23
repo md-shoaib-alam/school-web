@@ -18,6 +18,7 @@ export function SmoothScrollProvider({ children }: { children: React.ReactNode }
       touchMultiplier: 1.5,
       autoRaf: false,
       naiveDimensions: true,
+      allowNestedScroll: true,
     });
     windowLenisRef.current = windowLenis;
     (window as any).__lenis = windowLenis;
@@ -59,6 +60,7 @@ export function SmoothScrollProvider({ children }: { children: React.ReactNode }
         touchMultiplier: 1.5,
         autoRaf: false,
         naiveDimensions: true,
+        allowNestedScroll: true,
       });
 
       let resizeRaf: number | null = null;

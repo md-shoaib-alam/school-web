@@ -36,6 +36,7 @@ interface BulkPromoteTabProps {
   bulkPreview: StudentOption[];
   handleBulkPromote: () => void;
   bulkSubmitting: boolean;
+  academicYearOptions?: string[];
 }
 
 export function BulkPromoteTab({
@@ -51,7 +52,12 @@ export function BulkPromoteTab({
   bulkPreview,
   handleBulkPromote,
   bulkSubmitting,
+  academicYearOptions = [],
 }: BulkPromoteTabProps) {
+  const yearOptions = Array.from(
+    new Set([...academicYearOptions, bulkAcademicYear].filter(Boolean))
+  );
+
   return (
     <div className="space-y-6">
       <Card>
@@ -114,11 +120,21 @@ export function BulkPromoteTab({
           {/* Academic Year */}
           <div className="space-y-2 max-w-xs">
             <label className="text-sm font-medium">Academic Year *</label>
-            <Input
-              placeholder="e.g. 2025-2026"
+            <Select
               value={bulkAcademicYear}
-              onChange={(e) => setBulkAcademicYear(e.target.value)}
-            />
+              onValueChange={setBulkAcademicYear}
+            >
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="Select academic year" />
+              </SelectTrigger>
+              <SelectContent>
+                {yearOptions.map((y) => (
+                  <SelectItem key={y} value={y}>
+                    {y}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
 
           {/* Remarks */}
@@ -139,7 +155,10 @@ export function BulkPromoteTab({
                 <Users className="size-4" />
                 <span>{bulkPreview.length} student(s) will be promoted</span>
               </div>
-              <div className="max-h-52 overflow-y-auto rounded-lg border">
+              <div 
+                data-lenis-prevent
+                className="max-h-72 overflow-y-auto overscroll-contain rounded-lg border bg-card"
+              >
                 <Table>
                   <TableHeader>
                     <TableRow>
@@ -149,7 +168,7 @@ export function BulkPromoteTab({
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {bulkPreview.slice(0, 30).map((s, i) => (
+                    {bulkPreview.map((s, i) => (
                       <TableRow key={s.id}>
                         <TableCell className="text-muted-foreground text-sm">{i + 1}</TableCell>
                         <TableCell className="text-sm font-medium">{s.name}</TableCell>
@@ -158,9 +177,6 @@ export function BulkPromoteTab({
                     ))}
                   </TableBody>
                 </Table>
-                {bulkPreview.length > 30 && (
-                  <p className="text-xs text-muted-foreground text-center py-2">... and {bulkPreview.length - 30} more students</p>
-                )}
               </div>
             </div>
           )}
