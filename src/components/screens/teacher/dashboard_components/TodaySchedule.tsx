@@ -1,39 +1,70 @@
-"use client";
+'use client';
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Clock, CalendarDays } from "lucide-react";
+import React from 'react';
+import { Clock, Calendar, ArrowRight } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 
 interface TodayScheduleProps {
   schedule: any[];
   formatTime: (time: string) => string;
+  onNavigate?: (screen: string) => void;
 }
 
-export function TodaySchedule({ schedule, formatTime }: TodayScheduleProps) {
+export function TodaySchedule({
+  schedule,
+  formatTime,
+  onNavigate,
+}: TodayScheduleProps) {
   return (
-    <Card className="rounded-xl shadow-sm border-0 lg:col-span-2">
-      <CardHeader className="pb-3">
-        <div className="flex items-center justify-between">
-          <CardTitle className="text-base font-semibold flex items-center gap-2">
-            <Clock className="size-4 text-blue-500" />
+    <div className="rounded-2xl sm:rounded-3xl border border-zinc-200/80 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-4 sm:p-5 shadow-xs flex flex-col justify-between h-full">
+      {/* Header */}
+      <div className="flex items-center justify-between pb-3 border-b border-zinc-100 dark:border-zinc-800">
+        <div className="flex items-center gap-2">
+          <Clock className="size-4 sm:size-4.5 text-blue-600 dark:text-blue-400" />
+          <h2 className="text-sm sm:text-base font-bold text-zinc-900 dark:text-zinc-50">
             Today&apos;s Schedule
-          </CardTitle>
-          <Badge
-            variant="secondary"
-            className="bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 text-xs"
-          >
+          </h2>
+          <span className="px-2 py-0.5 rounded-full text-[11px] font-semibold bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 border border-blue-100/80 dark:border-blue-900/40">
             {schedule.length} classes
-          </Badge>
+          </span>
         </div>
-      </CardHeader>
-      <CardContent className="p-4 pt-0">
+
+        {/* Desktop Button / Mobile Arrow */}
+        <div>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => onNavigate?.('timetable')}
+            className="hidden sm:inline-flex items-center gap-1.5 rounded-xl border-zinc-200 dark:border-zinc-800 text-[11px] font-semibold text-zinc-700 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-800 h-7.5 px-2.5 cursor-pointer shadow-xs"
+          >
+            <Calendar className="size-3 text-blue-600 dark:text-blue-400" />
+            <span>View Timetable</span>
+          </Button>
+
+          <button
+            onClick={() => onNavigate?.('timetable')}
+            className="sm:hidden size-6 rounded-full bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 flex items-center justify-center hover:bg-blue-100 transition-colors cursor-pointer"
+            aria-label="View Timetable"
+          >
+            <ArrowRight className="size-3" />
+          </button>
+        </div>
+      </div>
+
+      {/* Body */}
+      <div className="flex-1 flex flex-col justify-center py-4 sm:py-6">
         {schedule.length === 0 ? (
-          <div className="text-center py-8">
-            <CalendarDays className="size-10 text-zinc-300 dark:text-zinc-600 mx-auto mb-3" />
-            <p className="text-zinc-400 dark:text-zinc-500 text-sm">
+          <div className="text-center flex flex-col items-center justify-center py-2">
+            <img
+              src="/assets/admin/timetable.avif"
+              alt="No timetable"
+              className="w-24 sm:w-28 h-20 sm:h-24 object-contain mb-2 select-none pointer-events-none"
+            />
+            <p className="text-xs sm:text-sm font-bold text-zinc-800 dark:text-zinc-200">
               No classes scheduled for today
             </p>
-            <p className="text-zinc-300 dark:text-zinc-600 text-xs mt-1">
+            <p className="text-[11px] text-zinc-400 dark:text-zinc-500 mt-0.5">
               Enjoy your day off!
             </p>
           </div>
@@ -41,29 +72,31 @@ export function TodaySchedule({ schedule, formatTime }: TodayScheduleProps) {
           <div className="space-y-2">
             {schedule.map((entry, index) => (
               <div
-                key={entry.id}
-                className="flex items-center gap-4 p-3 rounded-lg hover:bg-blue-50/50 dark:hover:bg-blue-900/20 transition-colors"
+                key={entry.id || index}
+                className="flex items-center justify-between p-2.5 rounded-xl bg-zinc-50/60 dark:bg-zinc-800/40 border border-zinc-100 dark:border-zinc-800 hover:bg-blue-50/40 dark:hover:bg-blue-950/20 transition-colors"
               >
-                <div className="text-center min-w-[70px]">
-                  <p className="text-xs font-semibold text-blue-600 dark:text-blue-400">
-                    {formatTime(entry.startTime)}
-                  </p>
-                  <p className="text-[10px] text-zinc-400 dark:text-zinc-500">
-                    {formatTime(entry.endTime)}
-                  </p>
+                <div className="flex items-center gap-2.5">
+                  <div className="text-center min-w-[60px] py-1 px-1.5 rounded-lg bg-white dark:bg-zinc-900 border border-zinc-200/60 dark:border-zinc-800 shadow-2xs">
+                    <p className="text-[11px] font-bold text-blue-600 dark:text-blue-400">
+                      {formatTime(entry.startTime)}
+                    </p>
+                    <p className="text-[9px] text-zinc-400 dark:text-zinc-500">
+                      {formatTime(entry.endTime)}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-xs font-bold text-zinc-900 dark:text-zinc-100">
+                      {entry.subjectName}
+                    </p>
+                    <p className="text-[11px] text-zinc-500 dark:text-zinc-400">
+                      {entry.className}
+                    </p>
+                  </div>
                 </div>
-                <div className="w-px h-8 bg-zinc-200 dark:bg-zinc-700" />
-                <div className="flex-1">
-                  <p className="text-sm font-medium text-zinc-800 dark:text-zinc-200">
-                    {entry.subjectName}
-                  </p>
-                  <p className="text-xs text-zinc-400 dark:text-zinc-500">
-                    {entry.className}
-                  </p>
-                </div>
+
                 <Badge
                   variant="outline"
-                  className="text-[10px] border-blue-200 dark:border-blue-800 text-blue-500 dark:text-blue-400 bg-blue-50/50 dark:bg-blue-900/20"
+                  className="text-[10px] font-semibold border-blue-200/80 dark:border-blue-900/60 text-blue-600 dark:text-blue-400 bg-blue-50/60 dark:bg-blue-950/40 rounded-lg px-2 py-0.5"
                 >
                   Period {index + 1}
                 </Badge>
@@ -71,7 +104,7 @@ export function TodaySchedule({ schedule, formatTime }: TodayScheduleProps) {
             ))}
           </div>
         )}
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 }

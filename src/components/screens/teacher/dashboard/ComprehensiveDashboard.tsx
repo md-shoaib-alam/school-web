@@ -1,11 +1,12 @@
-"use client";
+'use client';
 
-import { TeacherStats } from "../dashboard_components/TeacherStats";
-import { TodaySchedule } from "../dashboard_components/TodaySchedule";
-import { QuickActions } from "../dashboard_components/QuickActions";
-import { TeacherSubjects } from "../dashboard_components/TeacherSubjects";
-import { RecentAssignments } from "../dashboard_components/RecentAssignments";
-import { MyClassesOverview } from "../dashboard_components/MyClassesOverview";
+import React from 'react';
+import { TeacherWelcomeBanner } from '../dashboard_components/TeacherWelcomeBanner';
+import { TeacherStats } from '../dashboard_components/TeacherStats';
+import { TodaySchedule } from '../dashboard_components/TodaySchedule';
+import { QuickActions } from '../dashboard_components/QuickActions';
+import { TeacherSubjects } from '../dashboard_components/TeacherSubjects';
+import { RecentAssignments } from '../dashboard_components/RecentAssignments';
 
 interface ComprehensiveDashboardProps {
   classes: any[];
@@ -35,42 +36,42 @@ export function ComprehensiveDashboard({
   navigateTo,
 }: ComprehensiveDashboardProps) {
   return (
-    <div className="space-y-6">
-      {/* Greeting */}
-      <div>
-        <h2 className="text-2xl font-semibold text-zinc-900 dark:text-zinc-100">
-          {currentUser?.name || "Teacher"}
-        </h2>
-      </div>
+    <div className="space-y-4 animate-in fade-in duration-300 max-w-7xl mx-auto">
+      {/* 1. Welcome Banner */}
+      <TeacherWelcomeBanner userName={currentUser?.name || 'Teacher 3'} />
 
-      <TeacherStats 
+      {/* 2. 4 Stat Cards */}
+      <TeacherStats
         totalClasses={classes.length}
         totalStudents={totalStudents}
         pendingAssignments={pendingAssignments}
         attendanceRate={attendanceRate}
+        onNavigate={navigateTo}
       />
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <TodaySchedule 
-          schedule={todaySchedule}
-          formatTime={formatTime}
-        />
-        <QuickActions onNavigate={navigateTo} />
+      {/* 3. Middle Section: Today's Schedule (approx 60%) & Quick Actions (approx 40%) */}
+      <div className="grid grid-cols-1 lg:grid-cols-5 gap-4">
+        <div className="lg:col-span-3">
+          <TodaySchedule
+            schedule={todaySchedule}
+            formatTime={formatTime}
+            onNavigate={navigateTo}
+          />
+        </div>
+        <div className="lg:col-span-2">
+          <QuickActions onNavigate={navigateTo} />
+        </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <TeacherSubjects subjects={subjects} />
-        <RecentAssignments 
+      {/* 4. Bottom Section: My Subjects (50%) & Recent Homework (50%) */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <TeacherSubjects subjects={subjects} onNavigate={navigateTo} />
+        <RecentAssignments
           assignments={assignments}
-          onViewAll={() => navigateTo("homework")}
+          onViewAll={() => navigateTo('homework')}
           formatDate={formatDate}
         />
       </div>
-
-      <MyClassesOverview 
-        classes={classes}
-        onViewAll={() => navigateTo("my-classes")}
-      />
     </div>
   );
 }
