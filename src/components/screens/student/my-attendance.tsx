@@ -2,7 +2,8 @@
 
 
 import { apiFetch } from "@/lib/api";
-import { useEffect, useState, useCallback, useMemo } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { useEffect, useState, useMemo } from "react";
 import { useAppStore } from "@/store/use-app-store";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -49,9 +50,6 @@ const MONTH_NAMES = [
 export function StudentAttendance() {
   const [recharts, setRecharts] = useState<typeof import("recharts") | null>(null);
   const { currentUser } = useAppStore();
-  const [loading, setLoading] = useState(true);
-  const [student, setStudent] = useState<StudentInfo | null>(null);
-  const [attendanceData, setAttendanceData] = useState<AttendanceRecord[]>([]);
   const [calendarOffset, setCalendarOffset] = useState(0);
 
   useEffect(() => {
@@ -72,32 +70,30 @@ export function StudentAttendance() {
     }
   }, [baseDate]);
 
-  const fetchData = useCallback(async () => {
-    setLoading(true);
-    try {
+  const { data: student, isPending: profileLoading } = useQuery({
+    queryKey: ["students", "me"],
+    queryFn: async () => {
       const res = await apiFetch("/api/students/me");
       if (!res.ok) throw new Error("Failed to fetch student profile");
-      const targetStudent = await res.json();
-      setStudent(targetStudent);
+      return (await res.json()) as StudentInfo;
+    },
+  });
 
-      if (targetStudent?.id) {
-        const params = new URLSearchParams();
-        params.set('limit', '1000'); 
-        const attRes = await apiFetch(`/api/attendance?${params.toString()}`);
-        const data = await attRes.json();
-        const records = Array.isArray(data.records) ? data.records : [];
-        setAttendanceData(records.filter((a: AttendanceRecord) => a.studentId === targetStudent.id));
-      }
-    } catch (e) {
-      console.error(e);
-    } finally {
-      setLoading(false);
-    }
-  }, []);
+  const { data: attendanceData = [], isLoading: attendanceLoading } = useQuery({
+    queryKey: ["attendance", "mine", student?.id],
+    enabled: !!student?.id,
+    queryFn: async () => {
+      const params = new URLSearchParams();
+      params.set("limit", "1000");
+      const res = await apiFetch(`/api/attendance?${params.toString()}`);
+      if (!res.ok) throw new Error("Failed to fetch attendance");
+      const data = await res.json();
+      const records = Array.isArray(data.records) ? data.records : [];
+      return records.filter((a: AttendanceRecord) => a.studentId === student!.id) as AttendanceRecord[];
+    },
+  });
 
-  useEffect(() => {
-    fetchData();
-  }, [fetchData]);
+  const loading = profileLoading || attendanceLoading;
 
   const stats = useMemo(() => getAttendanceStats(attendanceData), [attendanceData]);
   const monthlyData = useMemo(() => getMonthlyData(attendanceData), [attendanceData]);

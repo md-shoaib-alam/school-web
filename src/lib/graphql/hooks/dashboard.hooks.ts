@@ -2,8 +2,7 @@ import { useQuery } from '@tanstack/react-query'
 import { graphqlQuery } from '../core'
 import { queryKeys } from '../keys'
 import { 
-  ADMIN_DASHBOARD, TEACHER_DASHBOARD, STUDENT_DASHBOARD, PARENT_DASHBOARD,
-  DASHBOARD_SUMMARY, DASHBOARD_ATTENDANCE, DASHBOARD_ACADEMIC, DASHBOARD_FINANCIAL, DASHBOARD_NOTICES
+  ADMIN_DASHBOARD, TEACHER_DASHBOARD, STUDENT_DASHBOARD, PARENT_DASHBOARD
 } from '../queries'
 import { 
   AdminDashboardData, TeacherDashboardData, StudentDashboardData, ParentDashboardData
@@ -17,51 +16,6 @@ export function useAdminDashboard(tenantId: string) {
     enabled: !!tenantId && tenantId.trim().length > 0,
     retry: 2,
     retryDelay: (attempt) => Math.min(1000 * 2 ** attempt, 10000),
-  })
-}
-
-function useDashboardSummary(tenantId: string) {
-  return useQuery({
-    queryKey: queryKeys.dashboardSummary(tenantId),
-    queryFn: () => graphqlQuery<{ dashboardSummary: any }>(DASHBOARD_SUMMARY, { tenantId }).then(d => d.dashboardSummary),
-    staleTime: 60 * 1000,
-    enabled: !!tenantId,
-  })
-}
-
-function useDashboardAttendance(tenantId: string) {
-  return useQuery({
-    queryKey: queryKeys.dashboardAttendance(tenantId),
-    queryFn: () => graphqlQuery<{ dashboardAttendance: any[] }>(DASHBOARD_ATTENDANCE, { tenantId }).then(d => d.dashboardAttendance),
-    staleTime: 60 * 1000,
-    enabled: !!tenantId,
-  })
-}
-
-function useDashboardAcademic(tenantId: string) {
-  return useQuery({
-    queryKey: queryKeys.dashboardAcademic(tenantId),
-    queryFn: () => graphqlQuery<{ dashboardAcademic: any }>(DASHBOARD_ACADEMIC, { tenantId }).then(d => d.dashboardAcademic),
-    staleTime: 60 * 1000,
-    enabled: !!tenantId,
-  })
-}
-
-function useDashboardFinancial(tenantId: string) {
-  return useQuery({
-    queryKey: queryKeys.dashboardFinancial(tenantId),
-    queryFn: () => graphqlQuery<{ dashboardFinancial: any }>(DASHBOARD_FINANCIAL, { tenantId }).then(d => d.dashboardFinancial),
-    staleTime: 60 * 1000,
-    enabled: !!tenantId,
-  })
-}
-
-function useDashboardNotices(tenantId: string) {
-  return useQuery({
-    queryKey: queryKeys.dashboardNotices(tenantId),
-    queryFn: () => graphqlQuery<{ dashboardNotices: any[] }>(DASHBOARD_NOTICES, { tenantId }).then(d => d.dashboardNotices),
-    staleTime: 60 * 1000,
-    enabled: !!tenantId,
   })
 }
 

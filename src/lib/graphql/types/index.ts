@@ -1,15 +1,3 @@
-export interface PlatformStatsData {
-  tenants: { total: number; active: number; trial: number; suspended: number }
-  users: { total: number; students: number; teachers: number; parents: number; admins: number }
-  classes: number
-  subscriptions: { total: number; active: number }
-  revenue: { active: number; total: number }
-  planDistribution: { plan: string; count: number }[]
-  activityLogs: { id: string; action: string; resource: string; details: string; createdAt: string; tenant?: { id: string; name: string } | null; user: { name: string; email: string } }[]
-  monthlyData: { month: string; newTenants: number; newUsers: number; revenue: number }[]
-  topTenants: { id: string; name: string; slug: string; plan: string; status: string; studentCount: number; teacherCount: number; totalRevenue: number; _count: { users: number; classes: number } }[]
-}
-
 export interface BillingDataResponse {
   totalActiveRevenue: number
   statusDistribution: Record<string, number>
@@ -218,24 +206,6 @@ export interface AttendanceResponse {
 
 export interface StaffResponse {
   staff: any[]
-  total: number
-  page: number
-  totalPages: number
-}
-
-export interface StaffAttendanceRecord {
-  id: string
-  staffName: string
-  role: string
-  date: string
-  status: string
-  checkIn?: string
-  checkOut?: string
-  remarks?: string
-}
-
-export interface StaffAttendanceResponse {
-  records: StaffAttendanceRecord[]
   total: number
   page: number
   totalPages: number

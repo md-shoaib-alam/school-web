@@ -313,10 +313,12 @@ export async function logoutWithElysia(): Promise<void> {
 
 /**
  * Drop-in replacement for fetch("/api/...").
- * NOTE: This lower-level helper does NOT auto-refresh. If you need refresh
- * behavior, use `api.get/post/...` instead.
+ * On 401 it silently refreshes the access token (shared queue with
+ * `api.get/post/...`) and retries the request once. If the refresh fails we
+ * return the original 401 Response untouched, so callers that inspect
+ * `res.status` keep working exactly as before.
  */
-export async function apiFetch(path: string, init?: RequestInit): Promise<Response> {
+export async function apiFetch(path: string, init?: RequestInit, attempt: number = 0): Promise<Response> {
   let cleanPath = path.startsWith('/api') ? path.slice(4) : path;
   if (!cleanPath.startsWith('/')) cleanPath = '/' + cleanPath;
 
@@ -337,18 +339,31 @@ export async function apiFetch(path: string, init?: RequestInit): Promise<Respon
     headers['Content-Type'] = 'application/json';
   }
 
-  return fetch(url, {
-    ...init,
-    headers,
-  }).then(async (res) => {
-    if (res.ok && init?.method && ['POST', 'PUT', 'DELETE', 'PATCH'].includes(init.method.toUpperCase())) {
-      triggerGlobalRefresh(path);
-    }
-    return res;
-  }).catch(err => {
+  let res: Response;
+  try {
+    res = await fetch(url, {
+      ...init,
+      headers,
+    });
+  } catch (err) {
     console.error(`Fetch failed for ${url}:`, err);
     throw err;
-  });
+  }
+
+  // ── 401 → silent refresh + retry once ──
+  if (res.status === 401 && attempt < 1 && getRefreshToken()) {
+    try {
+      await getValidTokenOrRefresh();
+      return apiFetch(path, init, attempt + 1);
+    } catch {
+      // refresh already forced a logout; hand the 401 back to the caller
+    }
+  }
+
+  if (res.ok && init?.method && ['POST', 'PUT', 'DELETE', 'PATCH'].includes(init.method.toUpperCase())) {
+    triggerGlobalRefresh(path);
+  }
+  return res;
 }
 
 // Re-export helpers for use in login screen

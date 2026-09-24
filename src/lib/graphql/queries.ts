@@ -1,19 +1,3 @@
-export const PLATFORM_STATS = `
-  query PlatformStats {
-    platformStats {
-      tenants { total active trial suspended }
-      users { total students teachers parents admins }
-      classes
-      subscriptions { total active }
-      revenue { active total }
-      planDistribution { plan count }
-      activityLogs { id action resource details createdAt tenant { id name } user { name email } }
-      monthlyData { month newTenants newUsers revenue }
-      topTenants { id name slug logo plan status studentCount teacherCount revenue _count { users classes } }
-    }
-  }
-`
-
 export const BILLING_DATA = `
   query BillingData($type: String) {
     billingData(type: $type) {
@@ -120,46 +104,6 @@ export const STUDENT_DASHBOARD = `
       todaySchedule { id day startTime endTime subjectName className }
       recentGrades { id subjectName examType marks maxMarks grade }
       notices { id title content authorName priority createdAt targetRole }
-    }
-  }
-`
-
-export const DASHBOARD_SUMMARY = `
-  query DashboardSummary($tenantId: String!) {
-    dashboardSummary(tenantId: $tenantId) {
-      totalStudents totalTeachers totalClasses totalParents attendanceRate upcomingEvents
-    }
-  }
-`
-
-export const DASHBOARD_ATTENDANCE = `
-  query DashboardAttendance($tenantId: String!) {
-    dashboardAttendance(tenantId: $tenantId) { month rate }
-  }
-`
-
-export const DASHBOARD_ACADEMIC = `
-  query DashboardAcademic($tenantId: String!) {
-    dashboardAcademic(tenantId: $tenantId) {
-      classDistribution { name students }
-      gradeDistribution { grade count }
-    }
-  }
-`
-
-export const DASHBOARD_FINANCIAL = `
-  query DashboardFinancial($tenantId: String!) {
-    dashboardFinancial(tenantId: $tenantId) {
-      totalRevenue pendingFees
-      feeByType { type collected pending }
-    }
-  }
-`
-
-export const DASHBOARD_NOTICES = `
-  query DashboardNotices($tenantId: String!) {
-    dashboardNotices(tenantId: $tenantId) {
-      id title content authorName priority createdAt targetRole
     }
   }
 `
@@ -389,27 +333,6 @@ export const DELETE_CUSTOM_ROLE = `
 export const ASSIGN_ROLE_TO_USER = `
   mutation AssignRoleToUser($userId: String!, $roleId: String, $tenantId: String) {
     assignRoleToUser(userId: $userId, roleId: $roleId, tenantId: $tenantId)
-  }
-`
-
-export const STAFF_ATTENDANCE = `
-  query StaffAttendance($tenantId: String, $role: String, $date: String, $page: Int, $limit: Int) {
-    staffAttendance(tenantId: $tenantId, role: $role, date: $date, page: $page, limit: $limit) {
-      records { id staffName role date status checkIn checkOut remarks }
-      total page totalPages
-    }
-  }
-`
-
-export const MARK_STAFF_ATTENDANCE = `
-  mutation MarkStaffAttendance($data: StaffAttendanceInput!) {
-    markStaffAttendance(data: $data)
-  }
-`
-
-export const MARK_BULK_STAFF_ATTENDANCE = `
-  mutation MarkBulkStaffAttendance($data: [StaffAttendanceInput!]!) {
-    markBulkStaffAttendance(data: $data)
   }
 `
 

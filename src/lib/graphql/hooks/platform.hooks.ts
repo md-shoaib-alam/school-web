@@ -4,12 +4,12 @@ import { graphqlQuery, graphqlMutate } from '../core'
 import { queryKeys } from '../keys'
 import { api } from '@/lib/api'
 import { 
-  PLATFORM_STATS, BILLING_DATA, TENANTS, USERS, AUDIT_LOGS, 
+  BILLING_DATA, TENANTS, USERS, AUDIT_LOGS, 
   CREATE_TENANT, UPDATE_TENANT, DELETE_TENANT, TOGGLE_TENANT_STATUS, SUBSCRIPTIONS,
   TOGGLE_USER_STATUS, CREATE_USER, UPDATE_USER, TENANT_DETAIL, RESTORE_TENANT, TENANT_METADATA
 } from '../queries'
 import { 
-  PlatformStatsData, BillingDataResponse, TenantsResponse, UsersResponse, 
+  BillingDataResponse, TenantsResponse, UsersResponse, 
   AuditLogsResponse, TenantInput, TenantBasic, SubscriptionsResponse, TenantDetailData
 } from '../types'
 
@@ -19,15 +19,6 @@ export function useTenantResolution(slug?: string) {
     queryFn: () => api.get(`/tenants/resolve/${slug}`),
     enabled: !!slug && !['profile', 'dashboard', 'tenants', 'billing', 'users', 'audit-logs', 'platform-analytics', 'settings', 'subscriptions', 'deleted-tenants', 'bulk-attendance-import', 'feature-flags', 'roadmap', 'roles', 'staff', 'manage-admins', 'school-subscriptions', 'platform-notices', 'reports'].includes(slug),
     staleTime: Infinity,
-  })
-}
-
-function usePlatformStats() {
-  return useQuery({
-    queryKey: queryKeys.platformStats,
-    queryFn: () => graphqlQuery<{ platformStats: PlatformStatsData }>(PLATFORM_STATS).then(d => d.platformStats),
-    staleTime: 2 * 60 * 1000,
-    refetchInterval: 5 * 60 * 1000,
   })
 }
 

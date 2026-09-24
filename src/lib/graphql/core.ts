@@ -1,4 +1,5 @@
 import { env } from '../env';
+import { triggerGlobalRefresh } from '../query-client';
 const API_BASE = env.NEXT_PUBLIC_API_URL;
 const GRAPHQL_ENDPOINT = typeof window !== 'undefined' ? '/graphql-proxy' : `${API_BASE}/graphql`;
 
@@ -198,5 +199,8 @@ export async function graphqlMutate<TData>(mutation: string, variables?: Record<
   }
   const json = await res.json()
   if (json.errors) throw new Error(json.errors[0]?.message || 'GraphQL error')
+  // Mutation text is a stable string literal (unlike minified fn.toString()),
+  // so it is a safe tag for scoped cache invalidation.
+  triggerGlobalRefresh(mutation)
   return json.data as TData
 }
