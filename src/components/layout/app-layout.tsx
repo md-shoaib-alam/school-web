@@ -33,7 +33,7 @@ const PLATFORM_ROUTES = new Set([
   "users",
   "audit-logs",
   "platform-analytics",
-  "feature-flags",
+  "integrations",
   "roadmap",
   "roles",
   "staff",

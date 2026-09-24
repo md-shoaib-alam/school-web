@@ -323,6 +323,7 @@ export function SuperAdminTenants() {
         }}
         onManageData={(t) => dispatch({ type: "SET_SELECTED_TENANT", tenant: t })} 
         onAddAdmin={handleOpenAddAdmin}
+        onIntegrations={(t) => router.push(`/integrations?school=${encodeURIComponent(t.slug || t.id)}`)}
       />
 
       <TenantDialogs 

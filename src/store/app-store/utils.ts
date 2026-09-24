@@ -53,7 +53,7 @@ export function invalidateCache(key?: string): void {
 const RESERVED_PLATFORM_KEYWORDS = [
   'login', 'api', 'admin', 'super-admin', 'dashboard', 'tenants', 
   'billing', 'users', 'audit-logs', 'analytics', 'platform-analytics', 
-  'feature-flags', 'roles', 'staff', 'settings', 'manage-admins', 'subscriptions'
+  'integrations', 'roles', 'staff', 'settings', 'manage-admins', 'subscriptions'
 ];
 
 export function parseScreenFromPath(pathname: string): string {
@@ -72,7 +72,7 @@ export function parseTenantFromPath(pathname: string): string | null {
 }
 
 const validScreens: Record<UserRole, string[]> = {
-  super_admin: ['dashboard', 'tenants', 'billing', 'users', 'audit-logs', 'platform-analytics', 'feature-flags', 'roles', 'staff', 'settings', 'manage-admins'],
+  super_admin: ['dashboard', 'tenants', 'billing', 'users', 'audit-logs', 'platform-analytics', 'integrations', 'roles', 'staff', 'settings', 'manage-admins'],
   admin: ['dashboard', 'students', 'teachers', 'parents', 'classes', 'subjects', 'attendance', 'fees', 'notices', 'timetable', 'calendar', 'reports', 'roles', 'staff', 'tickets', 'school-settings', 'academic-years', 'expenses', 'promotions', 'bulk-promote', 'graduated', 'certificates', 'leaves', 'student-leaves', 'teacher-leaves', 'staff-leaves', 'grades', 'teacher-attendance', 'staff-attendance', 'exams', 'results-entry', 'published-results', 'admit-cards'],
   teacher: ['dashboard', 'my-classes', 'my-subjects', 'attendance', 'my-attendance', 'take-attendance', 'grade-management', 'assessments', 'school-exams', 'assignments', 'homework', 'leaves', 'timetable', 'notices', 'calendar', 'tickets'],
   student: ['dashboard', 'my-classes', 'my-grades', 'school-exams', 'assessments', 'my-attendance', 'assignments', 'homework', 'timetable', 'notices', 'fees', 'calendar', 'tickets'],
