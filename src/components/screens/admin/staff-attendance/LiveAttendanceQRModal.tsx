@@ -27,7 +27,7 @@ import {
   X,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { apiFetch } from '@/lib/api';
+import { apiFetch, getValidTokenOrRefresh } from '@/lib/api';
 import { toast } from 'sonner';
 import { useQueryClient } from '@tanstack/react-query';
 
@@ -37,6 +37,9 @@ interface LiveAttendanceQRModalProps {
   title?: string;
 }
 
+// Fallback ring total before the server responds; the real value comes from the API.
+const DEFAULT_QR_TTL_SECONDS = 120;
+
 export function LiveAttendanceQRModal({
   open,
   onOpenChange,
@@ -45,10 +48,9 @@ export function LiveAttendanceQRModal({
   const queryClient = useQueryClient();
   const [qrSvg, setQrSvg] = useState<string>('');
   const [code, setCode] = useState<string>('');
-  const [secondsLeft, setSecondsLeft] = useState<number>(30);
+  const [secondsLeft, setSecondsLeft] = useState<number>(DEFAULT_QR_TTL_SECONDS);
   const [loading, setLoading] = useState<boolean>(true);
   const [recentScans, setRecentScans] = useState<Array<any>>([]);
-  const [lastScanTimestamp, setLastScanTimestamp] = useState<number>(0);
   const [copiedCode, setCopiedCode] = useState<boolean>(false);
   const [isFullscreen, setIsFullscreen] = useState<boolean>(false);
 
@@ -57,7 +59,23 @@ export function LiveAttendanceQRModal({
   };
 
   const timerRef = useRef<NodeJS.Timeout | null>(null);
-  const pollRef = useRef<NodeJS.Timeout | null>(null);
+  const rotatingRef = useRef<boolean>(false);
+  // Absolute expiry on the SERVER clock + the offset between server and device clocks,
+  // so the countdown can't drift and rotation happens exactly when the QR dies.
+  const qrExpiresAtRef = useRef<number>(0);
+  // Total TTL reported by the server — the ring is drawn against this, so a server-side
+  // TTL change doesn't need a matching client change.
+  const qrTotalSecondsRef = useRef<number>(DEFAULT_QR_TTL_SECONDS);
+  const serverOffsetRef = useRef<number>(0);
+  const lastScanTimestampRef = useRef<number>(0);
+  const scanPrimedRef = useRef<boolean>(false);
+  const openRef = useRef<boolean>(false);
+  const sessionRef = useRef<number>(0);
+  const abortRef = useRef<AbortController | null>(null);
+
+  const serverNow = useCallback(() => Date.now() + serverOffsetRef.current, []);
+
+  const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
   // Web Audio chime on successful scan
   const playScanDing = useCallback(() => {
@@ -92,8 +110,20 @@ export function LiveAttendanceQRModal({
       }
       const data = await res.json();
       if (data.success && data.qrData) {
+        // Sync the local countdown to the server clock
+        if (typeof data.serverTime === 'number') {
+          serverOffsetRef.current = data.serverTime - Date.now();
+        }
+        if (typeof data.totalSeconds === 'number') {
+          qrTotalSecondsRef.current = data.totalSeconds;
+        }
+        if (typeof data.expiresAt === 'number') {
+          qrExpiresAtRef.current = data.expiresAt;
+          setSecondsLeft(Math.max(1, Math.ceil((data.expiresAt - serverNow()) / 1000)));
+        } else {
+          setSecondsLeft(data.remainingSeconds || qrTotalSecondsRef.current);
+        }
         setCode(data.code || '');
-        setSecondsLeft(data.remainingSeconds || 30);
 
         // Generate clean SVG string for crisp vector rendering
         const svgString = await QRCode.toString(data.qrData, {
@@ -111,22 +141,29 @@ export function LiveAttendanceQRModal({
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [serverNow]);
 
-  // Poll status to detect when a teacher scans and burns the token
-  const pollStatus = useCallback(async () => {
-    try {
-      const res = await apiFetch('/api/staff-attendance/qr/status');
-      if (!res.ok) return;
-      const data = await res.json();
-
+  const handleStatus = useCallback(
+    (data: any) => {
+      if (typeof data.serverTime === 'number') {
+        serverOffsetRef.current = data.serverTime - Date.now();
+      }
       if (data.recentScans) {
         setRecentScans(data.recentScans);
       }
 
-      // Check if a new scan occurred
-      if (data.lastScan && data.lastScan.timestamp > lastScanTimestamp) {
-        setLastScanTimestamp(data.lastScan.timestamp);
+      const incomingTs = data.lastScan?.timestamp ?? 0;
+
+      // First response of this kiosk session only records where we are — an old scan
+      // must never ding or rotate the QR just because the modal was reopened.
+      if (!scanPrimedRef.current) {
+        scanPrimedRef.current = true;
+        lastScanTimestampRef.current = incomingTs;
+        return;
+      }
+
+      if (data.lastScan && incomingTs > lastScanTimestampRef.current) {
+        lastScanTimestampRef.current = incomingTs;
         playScanDing();
         toast.success(`🎉 ${data.lastScan.userName} marked ${data.lastScan.action}!`, {
           description: `Time: ${data.lastScan.time} (Indian Standard Time)`,
@@ -135,50 +172,105 @@ export function LiveAttendanceQRModal({
         // Instantly refresh the admin table in the background so marked status turns green!
         queryClient.invalidateQueries({ queryKey: ['staff-attendance'] });
 
-        // The token was burned by the teacher! Immediately generate a fresh QR!
-        fetchActiveQR(true);
-      } else if (!data.isActive && secondsLeft <= 2) {
-        // Expired naturally
-        fetchActiveQR(true);
+        // The token was burned by the teacher — mint a fresh one right away.
+        if (!rotatingRef.current) {
+          rotatingRef.current = true;
+          fetchActiveQR(true).finally(() => {
+            rotatingRef.current = false;
+          });
+        }
       }
-    } catch {
-      // transient poll error
+    },
+    [playScanDing, fetchActiveQR, queryClient]
+  );
+
+  // Long-poll: each request parks on the server until a teacher scans (or ~20s passes),
+  // so a scan is seen instantly with a fraction of the requests.
+  // `session` guarantees a stale loop (React StrictMode remount) can't keep polling.
+  const statusLoop = useCallback(async (session: number) => {
+    while (openRef.current && sessionRef.current === session) {
+      // Never hold a request open for a screen nobody is looking at
+      if (typeof document !== 'undefined' && document.visibilityState !== 'visible') {
+        await delay(5000);
+        continue;
+      }
+
+      const controller = new AbortController();
+      abortRef.current = controller;
+      const url = `/api/staff-attendance/qr/status?since=${lastScanTimestampRef.current}&wait=20`;
+
+      try {
+        let res = await apiFetch(url, { signal: controller.signal });
+
+        // The kiosk outlives the 15-minute access token — refresh silently, then retry once
+        if (res.status === 401) {
+          try {
+            await getValidTokenOrRefresh();
+          } catch {
+            return; // session gone; forceLogout already redirected
+          }
+          res = await apiFetch(url, { signal: controller.signal });
+        }
+
+        if (res.ok) {
+          handleStatus(await res.json());
+        } else if (!controller.signal.aborted) {
+          await delay(3000); // server hiccup — brief backoff, then poll again
+        }
+      } catch {
+        // Aborted (modal closed) or the proxy cut the hold short
+        if (!controller.signal.aborted) await delay(3000);
+      } finally {
+        if (abortRef.current === controller) abortRef.current = null;
+      }
     }
-  }, [lastScanTimestamp, secondsLeft, playScanDing, fetchActiveQR, queryClient]);
+  }, [handleStatus]);
 
   // Main lifecycle when dialog is open
   useEffect(() => {
-    if (!open) {
-      if (timerRef.current) clearInterval(timerRef.current);
-      if (pollRef.current) clearInterval(pollRef.current);
-      queryClient.invalidateQueries({ queryKey: ['staff-attendance'] });
-      return;
-    }
+    if (!open) return;
 
-    // Initial load
+    // Fresh kiosk session: forget the previous session's scans
+    const session = ++sessionRef.current;
+    scanPrimedRef.current = false;
+    lastScanTimestampRef.current = 0;
+    openRef.current = true;
+
     fetchActiveQR();
 
-    // 1-second interval for countdown ring
+    // 1s tick drives the countdown ring off the server expiry (no network calls)
     timerRef.current = setInterval(() => {
-      setSecondsLeft((prev) => {
-        if (prev <= 1) {
-          fetchActiveQR(true);
-          return 30;
+      if (qrExpiresAtRef.current === 0) return; // QR not loaded yet — keep the initial value
+      const remainingMs = qrExpiresAtRef.current - serverNow();
+      if (remainingMs <= 0) {
+        setSecondsLeft(0);
+        if (!rotatingRef.current) {
+          rotatingRef.current = true;
+          fetchActiveQR(true).finally(() => {
+            rotatingRef.current = false;
+          });
         }
-        return prev - 1;
-      });
+      } else {
+        setSecondsLeft(Math.max(1, Math.ceil(remainingMs / 1000)));
+      }
     }, 1000);
 
-    // 2-second interval for status polling & instant scan detection
-    pollRef.current = setInterval(() => {
-      pollStatus();
-    }, 2000);
+    void statusLoop(session);
+
+    // Screen unlocked / tab focused again: pick up any rotation we slept through
+    const onVisibilityChange = () => {
+      if (document.visibilityState === 'visible') void fetchActiveQR();
+    };
+    document.addEventListener('visibilitychange', onVisibilityChange);
 
     return () => {
+      openRef.current = false;
       if (timerRef.current) clearInterval(timerRef.current);
-      if (pollRef.current) clearInterval(pollRef.current);
+      abortRef.current?.abort();
+      document.removeEventListener('visibilitychange', onVisibilityChange);
+      queryClient.invalidateQueries({ queryKey: ['staff-attendance'] });
     };
-  }, [open, fetchActiveQR, pollStatus]);
+  }, [open, fetchActiveQR, statusLoop, serverNow, queryClient]);
 
   const handleCopyCode = () => {
     if (!code) return;
@@ -188,7 +280,7 @@ export function LiveAttendanceQRModal({
     setTimeout(() => setCopiedCode(false), 2000);
   };
 
-  const progressPercent = (secondsLeft / 30) * 100;
+  const progressPercent = Math.min(100, (secondsLeft / qrTotalSecondsRef.current) * 100);
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
