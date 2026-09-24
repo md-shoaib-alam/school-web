@@ -1,7 +1,6 @@
 export * from './types';
 export * from './utils';
 export * from './useMyAttendance';
-export * from './AttendanceHeroBanner';
 export * from './MonthlyMetricCards';
 export * from './AttendanceCalendar';
 export * from './TodayAttendanceCard';

@@ -15,6 +15,7 @@ interface RecentAttendanceListProps {
   currentRealYear: number;
   onSelectDate: (dateStr: string) => void;
   onOpenViewAll: () => void;
+  className?: string;
 }
 
 export function RecentAttendanceList({
@@ -23,9 +24,10 @@ export function RecentAttendanceList({
   currentRealYear,
   onSelectDate,
   onOpenViewAll,
+  className,
 }: RecentAttendanceListProps) {
   return (
-    <Card className="lg:col-span-3 rounded-2xl border border-slate-200/80 dark:border-zinc-800 bg-white dark:bg-zinc-950 p-5 shadow-2xs flex flex-col justify-between">
+    <Card className={cn('lg:col-span-3 rounded-2xl border border-slate-200/80 dark:border-zinc-800 bg-white dark:bg-zinc-950 p-5 shadow-2xs flex flex-col justify-between', className)}>
       <div>
         <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-zinc-800">
           <h3 className="text-base font-bold text-slate-900 dark:text-zinc-100">
