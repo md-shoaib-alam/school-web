@@ -7,7 +7,7 @@ interface TeacherStatsProps {
   totalClasses: number;
   totalStudents: number;
   pendingAssignments: number;
-  attendanceRate: string;
+  todayAttendanceLabel: string;
   onNavigate?: (screen: string) => void;
 }
 
@@ -15,7 +15,7 @@ export function TeacherStats({
   totalClasses,
   totalStudents,
   pendingAssignments,
-  attendanceRate,
+  todayAttendanceLabel,
   onNavigate,
 }: TeacherStatsProps) {
   const cards = [
@@ -48,7 +48,7 @@ export function TeacherStats({
     },
     {
       title: "Today's Attendance",
-      value: attendanceRate,
+      value: todayAttendanceLabel,
       screen: 'my-attendance',
       icon: <UserCheck className="size-4.5" />,
       iconBox: 'bg-purple-50 dark:bg-purple-950/50 text-purple-600 dark:text-purple-400 border-purple-100 dark:border-purple-900/40',

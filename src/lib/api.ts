@@ -346,6 +346,9 @@ export async function apiFetch(path: string, init?: RequestInit, attempt: number
       headers,
     });
   } catch (err) {
+    // An intentional abort (e.g. closing the QR kiosk cancels its long-poll) is not a
+    // failure worth alarming the console over — rethrow silently so callers handle it.
+    if ((err as Error)?.name === 'AbortError' || init?.signal?.aborted) throw err;
     console.error(`Fetch failed for ${url}:`, err);
     throw err;
   }

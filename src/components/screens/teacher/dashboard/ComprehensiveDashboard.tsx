@@ -15,7 +15,7 @@ interface ComprehensiveDashboardProps {
   totalStudents: number;
   pendingAssignments: number;
   todaySchedule: any[];
-  attendanceRate: string;
+  todayAttendanceLabel: string;
   assignments: any[];
   currentUser: any;
   formatTime: (time: string) => string;
@@ -29,7 +29,7 @@ export function ComprehensiveDashboard({
   totalStudents,
   pendingAssignments,
   todaySchedule,
-  attendanceRate,
+  todayAttendanceLabel,
   assignments,
   currentUser,
   formatTime,
@@ -59,7 +59,7 @@ export function ComprehensiveDashboard({
         totalClasses={classes.length}
         totalStudents={totalStudents}
         pendingAssignments={pendingAssignments}
-        attendanceRate={attendanceRate}
+        todayAttendanceLabel={todayAttendanceLabel}
         onNavigate={navigateTo}
       />
 

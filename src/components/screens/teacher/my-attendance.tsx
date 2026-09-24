@@ -143,4 +143,3 @@ export function TeacherMyAttendance() {
     </div>
   );
 }
-export const MyAttendanceScreen = TeacherMyAttendance;

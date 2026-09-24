@@ -40,36 +40,42 @@ export function useMyAttendance() {
   const [currentMonthRecords, setCurrentMonthRecords] = useState<AttendanceRecordItem[]>([]);
   // Calendar's records (matches currentMonthRecords when viewing current month)
   const [calendarRecords, setCalendarRecords] = useState<AttendanceRecordItem[]>([]);
-  const [loading, setLoading] = useState(true);
   const [isCheckingIn, setIsCheckingIn] = useState(false);
   const [viewAllModalOpen, setViewAllModalOpen] = useState(false);
   // Guards the today-only merge: never touch the month list before the full month has loaded once
   const monthLoadedRef = useRef(false);
+  // A tab restore fires focus and visibilitychange together; without this the same
+  // full-month request goes out twice.
+  const monthInFlightRef = useRef<Promise<void> | null>(null);
 
   // Fetch Current Month Attendance strictly for the summary cards
   const fetchCurrentMonthAttendance = useCallback(async (isSilent = false) => {
-    try {
-      if (!isSilent) setLoading(true);
-      const userId = currentUser?.id;
-      const res = await apiFetch(
-        `/api/staff-attendance?month=${currentMonthStr}${userId ? `&userId=${encodeURIComponent(userId)}` : ''}&_t=${Date.now()}`,
-        { cache: 'no-store' }
-      );
-      if (res.ok) {
-        const data = await res.json();
-        if (Array.isArray(data)) {
-          const userRecords = userId ? data.filter((r: any) => r.userId === userId) : data;
-          setCurrentMonthRecords(userRecords);
-          monthLoadedRef.current = true;
-          return;
+    if (monthInFlightRef.current) return monthInFlightRef.current;
+    const run = (async () => {
+      try {
+        const userId = currentUser?.id;
+        const res = await apiFetch(
+          `/api/staff-attendance?month=${currentMonthStr}${userId ? `&userId=${encodeURIComponent(userId)}` : ''}&_t=${Date.now()}`,
+          { cache: 'no-store' }
+        );
+        if (res.ok) {
+          const data = await res.json();
+          if (Array.isArray(data)) {
+            const userRecords = userId ? data.filter((r: any) => r.userId === userId) : data;
+            setCurrentMonthRecords(userRecords);
+            monthLoadedRef.current = true;
+            return;
+          }
         }
+        setCurrentMonthRecords([]);
+      } catch {
+        setCurrentMonthRecords([]);
+      } finally {
+        monthInFlightRef.current = null;
       }
-      setCurrentMonthRecords([]);
-    } catch {
-      setCurrentMonthRecords([]);
-    } finally {
-      setLoading(false);
-    }
+    })();
+    monthInFlightRef.current = run;
+    return run;
   }, [currentUser?.id, currentMonthStr]);
 
   /**
@@ -153,13 +159,9 @@ export function useMyAttendance() {
 
   // Fetch Calendar Month Attendance only when browsing different calendar months
   useEffect(() => {
-    if (calMonthStr === currentMonthStr) {
-      setLoading(false);
-      return;
-    }
+    if (calMonthStr === currentMonthStr) return;
     let isCancelled = false;
     const fetchCalendar = async () => {
-      setLoading(true);
       try {
         const userId = currentUser?.id;
         const res = await apiFetch(
@@ -177,8 +179,6 @@ export function useMyAttendance() {
         if (!isCancelled) setCalendarRecords([]);
       } catch {
         if (!isCancelled) setCalendarRecords([]);
-      } finally {
-        if (!isCancelled) setLoading(false);
       }
     };
     fetchCalendar();
@@ -252,11 +252,9 @@ export function useMyAttendance() {
   }, [currentMonthRecords]);
 
   return {
-    currentUser,
     todayStr,
     currentRealYear,
     currentRealMonth,
-    calendarDate,
     calYear,
     calMonth,
     selectedDate,
@@ -266,7 +264,6 @@ export function useMyAttendance() {
     currentMonthMetrics,
     todayRecord,
     recentRecords,
-    loading,
     isCheckingIn,
     viewAllModalOpen,
     setViewAllModalOpen,

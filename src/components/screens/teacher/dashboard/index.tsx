@@ -23,6 +23,15 @@ import {
 import { ComprehensiveDashboard } from "./ComprehensiveDashboard";
 import { MinimalDashboard } from "./MinimalDashboard";
 
+const SELF_ATTENDANCE_LABELS: Record<string, string> = {
+  present: "Present",
+  absent: "Absent",
+  leave: "Leave",
+  holiday: "Holiday",
+  half_day: "Half day",
+  not_marked: "Not marked",
+};
+
 const formatTime = (time: string) => {
   try {
     const [hours, minutes] = time.split(":");
@@ -209,12 +218,11 @@ export function TeacherDashboard() {
   const totalStudents = data?.totalStudents ?? 0;
   const pendingAssignments = data?.pendingAssignments ?? 0;
   const todaySchedule = data?.todaySchedule ?? [];
-  const todayAttendance = data?.todayAttendance ?? { present: 0, total: 0 };
   const assignments = data?.recentAssignments ?? [];
 
-  const attendanceRate = todayAttendance.total > 0
-    ? `${Number((todayAttendance.present / todayAttendance.total) * 100).toFixed(2).replace(/\.00$/, "")}%`
-    : "Not marked";
+  // The teacher's own attendance for today, not their class's student attendance rate.
+  const todayAttendanceLabel =
+    SELF_ATTENDANCE_LABELS[data?.todaySelfAttendance?.status ?? 'not_marked'] ?? 'Not marked';
 
   return (
     <ComprehensiveDashboard
@@ -223,7 +231,7 @@ export function TeacherDashboard() {
       totalStudents={totalStudents}
       pendingAssignments={pendingAssignments}
       todaySchedule={todaySchedule}
-      attendanceRate={attendanceRate}
+      todayAttendanceLabel={todayAttendanceLabel}
       assignments={assignments}
       currentUser={currentUser}
       formatTime={formatTime}

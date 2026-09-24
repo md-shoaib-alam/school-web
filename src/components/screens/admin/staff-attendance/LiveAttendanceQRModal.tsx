@@ -165,9 +165,7 @@ export function LiveAttendanceQRModal({
       if (data.lastScan && incomingTs > lastScanTimestampRef.current) {
         lastScanTimestampRef.current = incomingTs;
         playScanDing();
-        toast.success(`🎉 ${data.lastScan.userName} marked ${data.lastScan.action}!`, {
-          description: `Time: ${data.lastScan.time} (Indian Standard Time)`,
-        });
+        toast.success(`${data.lastScan.userName} marked ${data.lastScan.action} at ${data.lastScan.time}`);
 
         // Instantly refresh the admin table in the background so marked status turns green!
         queryClient.invalidateQueries({ queryKey: ['staff-attendance'] });
@@ -287,9 +285,9 @@ export function LiveAttendanceQRModal({
       <DialogContent
         showCloseButton={false}
         className={cn(
-          'p-0 overflow-hidden border border-slate-200 dark:border-zinc-800 shadow-2xl bg-white dark:bg-zinc-950 transition-all duration-300',
+          'p-0 overflow-hidden border border-slate-200 dark:border-zinc-800 shadow-2xl bg-white dark:bg-zinc-950 transition-[width,height,max-width,max-height,border-radius] duration-300 ease-out',
           isFullscreen
-            ? '!fixed !inset-0 !w-screen !h-screen !max-w-none !max-h-screen !rounded-none !z-50 !translate-x-0 !translate-y-0 !top-0 !left-0 flex flex-col justify-between overflow-y-auto'
+            ? '!fixed !z-50 !w-screen !h-screen !max-w-none !max-h-none !rounded-none flex flex-col justify-between overflow-y-auto'
             : 'sm:max-w-md md:max-w-lg max-h-[92vh] flex flex-col rounded-3xl'
         )}
       >
@@ -356,8 +354,10 @@ export function LiveAttendanceQRModal({
               {/* QR Image Box */}
               <div
                 className={cn(
-                  'bg-white p-2.5 sm:p-3 rounded-2xl shadow-sm flex items-center justify-center overflow-hidden transition-all',
-                  isFullscreen ? 'size-64 sm:size-80 md:size-96' : 'size-48 sm:size-56'
+                  'bg-white p-2.5 sm:p-3 rounded-2xl shadow-sm flex items-center justify-center overflow-hidden',
+                  // Small devices keep the fixed sizes; fullscreen is a wall-mounted kiosk,
+                  // so the QR scales with the viewport (capped) instead of freezing at md:size-96.
+                  isFullscreen ? 'size-[min(72vmin,600px)]' : 'size-48 sm:size-56'
                 )}
               >
                 {loading && !qrSvg ? (

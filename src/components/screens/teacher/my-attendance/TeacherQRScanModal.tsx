@@ -11,7 +11,6 @@ import {
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Badge } from '@/components/ui/badge';
 import {
   QrCode,
   Camera,
@@ -329,34 +328,27 @@ export function TeacherQRScanModal({
         {/* Header */}
         <div className="p-4 sm:p-5 bg-gradient-to-r from-blue-600 to-indigo-600 text-white">
           <div className="flex items-center justify-between gap-2.5">
-            <div className="flex items-center gap-2 sm:gap-2.5 min-w-0">
+            <div className="flex items-center gap-2.5 min-w-0">
               <div className="size-8 sm:size-9 rounded-xl bg-white/15 backdrop-blur-md flex items-center justify-center border border-white/20 shrink-0">
                 <QrCode className="size-4 sm:size-5 text-white" />
               </div>
-              <div className="min-w-0">
-                <DialogTitle className="text-base sm:text-lg font-bold text-white leading-tight">
-                  Scan Attendance QR
-                </DialogTitle>
-                <DialogDescription className="text-blue-100 text-[11px] sm:text-xs">
-                  Point camera at the school live kiosk to Check In
-                </DialogDescription>
-              </div>
+              <DialogTitle className="text-base sm:text-lg font-bold text-white leading-tight">
+                Scan Attendance QR
+              </DialogTitle>
+              <DialogDescription className="sr-only">
+                Scan live school attendance QR code
+              </DialogDescription>
             </div>
 
-            {/* Right Side: Badge + Spaced Close Cross Button */}
-            <div className="flex items-center gap-2 shrink-0">
-              <Badge className="bg-white/15 text-white border-white/20 text-[10px] sm:text-[11px] font-semibold px-2 py-0.5">
-                IST (UTC+05:30)
-              </Badge>
-              <button
-                type="button"
-                onClick={() => handleClose(false)}
-                className="size-7 sm:size-8 rounded-full bg-white/15 hover:bg-white/25 active:scale-95 text-white flex items-center justify-center transition-all cursor-pointer border border-white/20 shrink-0"
-                aria-label="Close dialog"
-              >
-                <X className="size-3.5 sm:size-4" />
-              </button>
-            </div>
+            {/* Right Side: Close Cross Button */}
+            <button
+              type="button"
+              onClick={() => handleClose(false)}
+              className="size-7 sm:size-8 rounded-full bg-white/15 hover:bg-white/25 active:scale-95 text-white flex items-center justify-center transition-all cursor-pointer border border-white/20 shrink-0"
+              aria-label="Close dialog"
+            >
+              <X className="size-3.5 sm:size-4" />
+            </button>
           </div>
 
           {/* Mode Switcher Tabs */}

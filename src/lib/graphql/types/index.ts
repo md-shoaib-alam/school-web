@@ -82,6 +82,7 @@ export interface TeacherDashboardData {
   pendingAssignments: number
   todaySchedule: { id: string; day: string; startTime: string; endTime: string; subjectName: string; className: string }[]
   todayAttendance: { present: number; total: number }
+  todaySelfAttendance: { status: string; checkIn: string | null; checkOut: string | null }
   recentAssignments: { id: string; title: string; subjectName: string; className: string; dueDate: string; submissions: number; totalStudents: number; mode: string }[]
 }
 
