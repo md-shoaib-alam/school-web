@@ -47,7 +47,7 @@ export function ComprehensiveDashboard({
   }).format(new Date());
 
   return (
-    <div className="space-y-4 animate-in fade-in duration-300 max-w-7xl mx-auto">
+    <div className="space-y-4 animate-in fade-in duration-300">
       {/* 1. Welcome Banner */}
       <TeacherWelcomeBanner
         userName={currentUser?.name || 'Teacher 3'}

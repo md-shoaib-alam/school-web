@@ -214,7 +214,7 @@ export function TeacherDashboard() {
 
   const attendanceRate = todayAttendance.total > 0
     ? `${Number((todayAttendance.present / todayAttendance.total) * 100).toFixed(2).replace(/\.00$/, "")}%`
-    : "N/A";
+    : "Not marked";
 
   return (
     <ComprehensiveDashboard
