@@ -1,65 +1,31 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import {
-  useTenants,
-  useUpdateTenant
-} from "@/lib/graphql/hooks";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Badge } from "@/components/ui/badge";
-import { Skeleton } from "@/components/ui/skeleton";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow
-} from "@/components/ui/table";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogFooter
-} from "@/components/ui/dialog";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue
-} from "@/components/ui/select";
-import {
-  Building2,
-  Calendar,
-  CreditCard,
-  Search,
-  ShieldCheck,
-  AlertCircle,
-  Clock,
-  ArrowUpCircle,
-  Settings2,
-} from "lucide-react";
-import { format } from "date-fns";
+import { useState } from "react";
+import { useTenants, useUpdateTenant } from "@/lib/graphql/hooks";
 import { toast } from "sonner";
-import { DatePicker } from "@/components/ui/date-picker";
-import { SCHOOL_PLANS } from "@/lib/billing-constants";
 import { DataTablePagination } from "@/components/ui/data-table-pagination";
-import { StatusBadge } from "@/components/ui/status-badge";
+import { Skeleton } from "@/components/ui/skeleton";
+
+// Modular sub-components
+import { SubscriptionHero } from "./school-subscriptions/SubscriptionHero";
+import { SubscriptionStats } from "./school-subscriptions/SubscriptionStats";
+import { SubscriptionFilters } from "./school-subscriptions/SubscriptionFilters";
+import { SchoolCard } from "./school-subscriptions/SchoolCard";
+import { SchoolTable } from "./school-subscriptions/SchoolTable";
+import { ManageSubscriptionModal } from "./school-subscriptions/ManageSubscriptionModal";
+import { TenantSubscription } from "./school-subscriptions/types";
 
 const ITEMS_PER_PAGE = 10;
 
 export function SuperAdminSchoolSubscriptions() {
   const [search, setSearch] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
+  const [statusFilter, setStatusFilter] = useState("all");
+  const [planFilter, setPlanFilter] = useState("all");
+  const [viewMode, setViewMode] = useState<"table" | "grid">("table");
+  const [showStatsOnMobile, setShowStatsOnMobile] = useState(false);
   const [editingTenant, setEditingTenant] = useState<any>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-
-
 
   const { data: tenantsData, isLoading, refetch } = useTenants({
     search: search || undefined,
@@ -73,18 +39,30 @@ export function SuperAdminSchoolSubscriptions() {
     setEditingTenant({
       id: tenant.id,
       name: tenant.name,
+      slug: tenant.slug || "",
+      logo: tenant.logo || null,
+      address: tenant.address || "Bengaluru, Karnataka",
       plan: tenant.plan,
+      startDate: tenant.startDate || tenant.createdAt || "",
       endDate: tenant.endDate || "",
       maxStudents: tenant.maxStudents,
       maxTeachers: tenant.maxTeachers,
       maxParents: tenant.maxParents,
       maxClasses: tenant.maxClasses,
-      status: tenant.status
+      status: tenant.status,
+      studentCount: tenant.studentCount ?? tenant._count?.users ?? 0,
+      teacherCount: tenant.teacherCount ?? 0,
+      parentCount: tenant.parentCount ?? 0,
     });
     setIsDialogOpen(true);
   };
 
+  const [isConfirmUpdateOpen, setIsConfirmUpdateOpen] = useState(false);
+  const [isConfirmCancelOpen, setIsConfirmCancelOpen] = useState(false);
+  const [isSubmittingAction, setIsSubmittingAction] = useState(false);
+
   const handleUpdate = async () => {
+    setIsSubmittingAction(true);
     try {
       const payload = {
         plan: editingTenant.plan,
@@ -93,290 +71,199 @@ export function SuperAdminSchoolSubscriptions() {
         maxTeachers: parseInt(editingTenant.maxTeachers) || 0,
         maxParents: parseInt(editingTenant.maxParents) || 0,
         maxClasses: parseInt(editingTenant.maxClasses) || 0,
-        endDate: editingTenant.endDate || null
+        endDate: editingTenant.endDate || null,
       };
 
       await updateTenant.mutateAsync({
         id: editingTenant.id,
-        data: payload as any
+        data: payload,
       });
+
+      toast.success("School subscription updated successfully");
+      setIsConfirmUpdateOpen(false);
       setIsDialogOpen(false);
       refetch();
     } catch (err: any) {
-      toast.error("Failed to update subscription", { description: err.message });
+      toast.error(err.message || "Failed to update subscription");
+    } finally {
+      setIsSubmittingAction(false);
     }
   };
 
-  const getStatusBadge = (status: string, endDate: string | null) => {
-    const now = new Date();
-    const expiry = endDate ? new Date(endDate) : null;
-
-    if (status === "trial") return <StatusBadge tone="warning">Trial</StatusBadge>;
-    if (status === "suspended") return <StatusBadge tone="negative">Suspended</StatusBadge>;
-
-    if (status !== "active") return <StatusBadge tone="negative">{status}</StatusBadge>;
-
-    if (expiry && expiry < now) return <StatusBadge tone="negative">Expired</StatusBadge>;
-
-    return <StatusBadge tone="positive">Active</StatusBadge>;
+  const handleConfirmCancelSubscription = async () => {
+    setIsSubmittingAction(true);
+    try {
+      await updateTenant.mutateAsync({
+        id: editingTenant.id,
+        data: { status: "suspended" },
+      });
+      toast.success("Subscription has been suspended");
+      setIsConfirmCancelOpen(false);
+      setIsDialogOpen(false);
+      refetch();
+    } catch (err: any) {
+      toast.error(err.message || "Failed to cancel subscription");
+    } finally {
+      setIsSubmittingAction(false);
+    }
   };
 
+  const totalSchools = tenantsData?.stats?.total ?? 0;
+  const activeLicenses = (tenantsData?.stats?.active ?? 0) + (tenantsData?.stats?.trial ?? 0);
+  const expiringSoon = tenantsData?.stats?.expiring ?? 0;
+  const totalStudents = tenantsData?.tenants?.reduce((acc: number, t: any) => acc + (t.maxStudents || 0), 0) ?? 0;
+
+  const filteredTenants: TenantSubscription[] = (tenantsData?.tenants || []).filter((t: any) => {
+    if (statusFilter !== "all" && t.status !== statusFilter) return false;
+    if (planFilter !== "all" && t.plan?.toLowerCase() !== planFilter.toLowerCase()) return false;
+    return true;
+  });
+
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-4">
-          <div className="size-12 rounded-2xl bg-muted flex items-center justify-center border">
-            <ShieldCheck className="size-6 text-muted-foreground" />
-          </div>
-          <div>
-            <h2 className="text-2xl font-semibold tracking-tight">B2B School Licenses</h2>
-            <p className="text-sm text-muted-foreground mt-1">Manage school-level plans, limits, and license periods.</p>
-          </div>
-        </div>
-      </div>
+    <div className="space-y-5 pb-10">
+      {/* 1. Hero Banner */}
+      <SubscriptionHero />
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <Card className="border rounded-xl bg-card">
-          <CardContent className="pt-6">
-            <div className="flex items-center gap-4">
-              <div className="size-10 rounded-full bg-muted flex items-center justify-center text-muted-foreground">
-                <Building2 className="size-5" />
-              </div>
-              <div>
-                <p className="text-xs font-medium text-muted-foreground">Total schools</p>
-                <p className="text-2xl font-semibold">{tenantsData?.stats?.total ?? 0}</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-        <Card className="border rounded-xl bg-card">
-          <CardContent className="pt-6">
-            <div className="flex items-center gap-4">
-              <div className="size-10 rounded-full bg-muted flex items-center justify-center text-muted-foreground">
-                <ArrowUpCircle className="size-5" />
-              </div>
-              <div>
-                <p className="text-xs font-medium text-muted-foreground">Active licenses</p>
-                <p className="text-2xl font-semibold">
-                  {(tenantsData?.stats?.active ?? 0) + (tenantsData?.stats?.trial ?? 0)}
-                </p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-        <Card className="border rounded-xl bg-card">
-          <CardContent className="pt-6">
-            <div className="flex items-center gap-4">
-              <div className="size-10 rounded-full bg-muted flex items-center justify-center text-muted-foreground">
-                <Clock className="size-5" />
-              </div>
-              <div>
-                <p className="text-xs font-medium text-muted-foreground">Expiring soon</p>
-                <p className="text-2xl font-semibold">
-                  {tenantsData?.stats?.expiring ?? 0}
-                </p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
+      {/* 2. Overview Stat Cards */}
+      <SubscriptionStats
+        isLoading={isLoading}
+        totalSchools={totalSchools}
+        activeLicenses={activeLicenses}
+        expiringSoon={expiringSoon}
+        totalStudents={totalStudents}
+        showStatsOnMobile={showStatsOnMobile}
+        setShowStatsOnMobile={setShowStatsOnMobile}
+      />
 
-      <Card className="border rounded-xl bg-card">
-        <div className="p-4 border-b flex items-center gap-4">
-          <div className="relative flex-1">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
-            <Input
-              placeholder="Search schools..."
-              className="pl-9"
-              value={search}
-              onChange={(e) => {
-                setSearch(e.target.value);
-                setCurrentPage(1);
-              }}
-            />
-          </div>
+      {/* 3. Filters Row */}
+      <SubscriptionFilters
+        search={search}
+        onSearchChange={(val) => {
+          setSearch(val);
+          setCurrentPage(1);
+        }}
+        statusFilter={statusFilter}
+        onStatusFilterChange={setStatusFilter}
+        planFilter={planFilter}
+        onPlanFilterChange={setPlanFilter}
+        viewMode={viewMode}
+        onViewModeChange={setViewMode}
+      />
+
+      {/* 4. Main Subscriptions Content */}
+      <div className="space-y-4">
+        {/* Mobile View: Always Grid */}
+        <div className="grid grid-cols-1 gap-3 sm:hidden">
+          {isLoading ? (
+            [...Array(3)].map((_, i) => (
+              <div key={i} className="p-4 rounded-2xl border border-border bg-card shadow-2xs space-y-3">
+                <div className="flex items-center gap-3">
+                  <Skeleton className="size-11 rounded-2xl shrink-0" />
+                  <div className="space-y-1.5 flex-1">
+                    <Skeleton className="h-4 w-32 rounded-md" />
+                    <Skeleton className="h-3 w-20 rounded-md" />
+                  </div>
+                </div>
+                <div className="flex gap-2">
+                  <Skeleton className="h-5 w-16 rounded-full" />
+                  <Skeleton className="h-5 w-16 rounded-full" />
+                </div>
+                <div className="grid grid-cols-2 gap-2 pt-1 border-t border-border/50">
+                  <Skeleton className="h-12 rounded-xl" />
+                  <Skeleton className="h-12 rounded-xl" />
+                </div>
+              </div>
+            ))
+          ) : filteredTenants.length === 0 ? (
+            <div className="p-8 text-center rounded-2xl border bg-card text-muted-foreground text-xs">
+              No schools found matching your search.
+            </div>
+          ) : (
+            filteredTenants.map((tenant) => (
+              <SchoolCard key={tenant.id} tenant={tenant} onEdit={handleEdit} />
+            ))
+          )}
         </div>
-        <Table>
-          <TableHeader>
-            <TableRow className="bg-muted/50 hover:bg-muted/50">
-              <TableHead className="text-xs font-medium text-muted-foreground">School Name</TableHead>
-              <TableHead className="text-xs font-medium text-muted-foreground">Current Plan</TableHead>
-              <TableHead className="text-xs font-medium text-muted-foreground">Status</TableHead>
-              <TableHead className="text-xs font-medium text-muted-foreground">Expiry Date</TableHead>
-              <TableHead className="text-xs font-medium text-muted-foreground">Student Limit</TableHead>
-              <TableHead className="text-xs font-medium text-muted-foreground text-right">Actions</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
+
+        {/* Desktop View: Grid or Table based on viewMode */}
+        {viewMode === "grid" ? (
+          <div className="hidden sm:grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {isLoading ? (
-              [...Array(5)].map((_, i) => (
-                <TableRow key={i}>
-                  {[...Array(6)].map((_, j) => (
-                    <TableCell key={j}>
-                      <Skeleton className="h-4 w-full" />
-                    </TableCell>
-                  ))}
-                </TableRow>
-              ))
-            ) : tenantsData?.tenants?.length === 0 ? (
-              <TableRow><TableCell colSpan={6} className="text-center py-10 text-muted-foreground">No schools found.</TableCell></TableRow>
-            ) : (
-              tenantsData?.tenants?.map((tenant: any) => (
-                <TableRow key={tenant.id} className="hover:bg-muted/50 transition-colors">
-                  <TableCell className="font-medium">{tenant.name}</TableCell>
-                  <TableCell className="capitalize">
-                    <Badge variant="secondary" className="text-xs font-medium">
-                      {tenant.plan}
-                    </Badge>
-                  </TableCell>
-                  <TableCell suppressHydrationWarning>{getStatusBadge(tenant.status, tenant.endDate)}</TableCell>
-                  <TableCell suppressHydrationWarning>
-                    <div className="flex items-center gap-2">
-                      <Calendar className="size-3.5 text-muted-foreground" />
-                      {tenant.endDate ? format(new Date(tenant.endDate), "PP") : "No expiry"}
+              [...Array(6)].map((_, i) => (
+                <div key={i} className="p-4 rounded-2xl border border-border bg-card shadow-2xs space-y-3">
+                  <div className="flex items-center gap-3">
+                    <Skeleton className="size-11 rounded-2xl shrink-0" />
+                    <div className="space-y-1.5 flex-1">
+                      <Skeleton className="h-4 w-36 rounded-md" />
+                      <Skeleton className="h-3 w-24 rounded-md" />
                     </div>
-                  </TableCell>
-                  <TableCell>{tenant.maxStudents.toLocaleString()}</TableCell>
-                  <TableCell className="text-right">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => handleEdit(tenant)}
-                      className="h-8 gap-1.5"
-                    >
-                      <Settings2 className="size-3.5" />
-                      Manage
-                    </Button>
-                  </TableCell>
-                </TableRow>
+                  </div>
+                  <div className="flex gap-2">
+                    <Skeleton className="h-5 w-16 rounded-full" />
+                    <Skeleton className="h-5 w-16 rounded-full" />
+                  </div>
+                  <div className="grid grid-cols-2 gap-2 pt-1 border-t border-border/50">
+                    <Skeleton className="h-12 rounded-xl" />
+                    <Skeleton className="h-12 rounded-xl" />
+                  </div>
+                </div>
+              ))
+            ) : filteredTenants.length === 0 ? (
+              <div className="col-span-full p-12 text-center rounded-2xl border bg-card text-muted-foreground text-xs">
+                No schools found matching your search.
+              </div>
+            ) : (
+              filteredTenants.map((tenant) => (
+                <SchoolCard key={tenant.id} tenant={tenant} onEdit={handleEdit} />
               ))
             )}
-          </TableBody>
-        </Table>
+          </div>
+        ) : (
+          <div className="hidden sm:block rounded-2xl border border-border bg-card overflow-hidden shadow-2xs">
+            {/* Table summary row */}
+            <div className="p-3.5 sm:p-4 border-b border-border flex items-center justify-between gap-2">
+              <p className="text-xs font-semibold text-muted-foreground">
+                Showing <strong className="text-foreground font-bold">{filteredTenants.length}</strong> of {totalSchools} schools
+              </p>
+            </div>
+
+            <SchoolTable
+              isLoading={isLoading}
+              tenants={filteredTenants}
+              currentPage={currentPage}
+              itemsPerPage={ITEMS_PER_PAGE}
+              onEdit={handleEdit}
+            />
+          </div>
+        )}
+
+        {/* Unified Pagination for both Mobile Grid and Desktop */}
         {!isLoading && tenantsData && tenantsData.totalPages > 1 && (
-          <div className="px-6 py-4 border-t">
+          <div className="p-3 sm:px-6 sm:py-4 rounded-2xl border border-border bg-card shadow-2xs">
             <DataTablePagination
               page={currentPage}
               totalPages={tenantsData.totalPages}
               onPageChange={setCurrentPage}
-              summary={`Showing ${(currentPage - 1) * ITEMS_PER_PAGE + 1}\u2013${Math.min(currentPage * ITEMS_PER_PAGE, tenantsData.total)} of ${tenantsData.total} entries`}
+              summary={`Showing ${(currentPage - 1) * ITEMS_PER_PAGE + 1}–${Math.min(currentPage * ITEMS_PER_PAGE, tenantsData.total)} of ${tenantsData.total} entries`}
             />
           </div>
         )}
-      </Card>
+      </div>
 
-      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className="max-w-2xl">
-          <DialogHeader>
-            <DialogTitle>Manage Subscription: {editingTenant?.name}</DialogTitle>
-          </DialogHeader>
-          <div className="space-y-4 py-4">
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label>Service Plan</Label>
-                <Select
-                  value={editingTenant?.plan}
-                  onValueChange={(v) => {
-                    const selectedPlan = SCHOOL_PLANS.find(p => p.id === v);
-                    if (selectedPlan) {
-                      setEditingTenant({
-                        ...editingTenant,
-                        plan: v,
-                        maxStudents: selectedPlan.limits.students,
-                        maxTeachers: selectedPlan.limits.teachers,
-                        maxParents: selectedPlan.limits.parents,
-                        maxClasses: selectedPlan.limits.classes,
-                      });
-                    } else {
-                      setEditingTenant({...editingTenant, plan: v});
-                    }
-                  }}
-                >
-                  <SelectTrigger><SelectValue /></SelectTrigger>
-                  <SelectContent>
-                    {SCHOOL_PLANS.map(plan => (
-                      <SelectItem key={plan.id} value={plan.id}>
-                        {plan.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-              <div className="space-y-2">
-                <Label>System Status</Label>
-                <Select value={editingTenant?.status} onValueChange={(v) => setEditingTenant({...editingTenant, status: v})}>
-                  <SelectTrigger><SelectValue /></SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="active">Active</SelectItem>
-                    <SelectItem value="suspended">Suspended</SelectItem>
-                    <SelectItem value="trial">Trial Mode</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
-
-            <div className="space-y-2">
-              <Label>License Expiry Date</Label>
-              <DatePicker
-                date={editingTenant?.endDate ? new Date(editingTenant.endDate) : undefined}
-                onChange={(date) => setEditingTenant({
-                  ...editingTenant,
-                  endDate: date ? format(date, "yyyy-MM-dd") : ""
-                })}
-              />
-            </div>
-
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label>Max Students</Label>
-                <Input
-                  type="number"
-                  value={editingTenant?.maxStudents}
-                  onChange={(e) => setEditingTenant({...editingTenant, maxStudents: e.target.value})}
-                />
-              </div>
-              <div className="space-y-2">
-                <Label>Max Teachers</Label>
-                <Input
-                  type="number"
-                  value={editingTenant?.maxTeachers}
-                  onChange={(e) => setEditingTenant({...editingTenant, maxTeachers: e.target.value})}
-                />
-              </div>
-            </div>
-
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label>Max Parents</Label>
-                <Input
-                  type="number"
-                  value={editingTenant?.maxParents}
-                  onChange={(e) => setEditingTenant({...editingTenant, maxParents: e.target.value})}
-                />
-              </div>
-              <div className="space-y-2">
-                <Label>Max Classes</Label>
-                <Input
-                  type="number"
-                  value={editingTenant?.maxClasses}
-                  onChange={(e) => setEditingTenant({...editingTenant, maxClasses: e.target.value})}
-                />
-              </div>
-            </div>
-
-            <div className="p-3 bg-muted rounded-lg border flex items-start gap-3">
-              <AlertCircle className="size-5 text-muted-foreground mt-0.5" />
-              <p className="text-xs text-muted-foreground">
-                Updating these settings will immediately affect the school's ability to login and add data.
-              </p>
-            </div>
-          </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setIsDialogOpen(false)}>Cancel</Button>
-            <Button onClick={handleUpdate}>Update License</Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      {/* Manage Subscription Dialog & Confirmations */}
+      <ManageSubscriptionModal
+        isOpen={isDialogOpen}
+        onOpenChange={setIsDialogOpen}
+        editingTenant={editingTenant}
+        setEditingTenant={setEditingTenant}
+        onSave={handleUpdate}
+        onCancelSubscription={handleConfirmCancelSubscription}
+        isSubmittingAction={isSubmittingAction}
+        isConfirmUpdateOpen={isConfirmUpdateOpen}
+        setIsConfirmUpdateOpen={setIsConfirmUpdateOpen}
+        isConfirmCancelOpen={isConfirmCancelOpen}
+        setIsConfirmCancelOpen={setIsConfirmCancelOpen}
+      />
     </div>
   );
 }

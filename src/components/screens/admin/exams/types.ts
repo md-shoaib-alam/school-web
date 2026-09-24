@@ -1,6 +1,8 @@
 export interface ExamRecord {
   id: string;
   name: string;
+  cleanExamName?: string;
+  rawName?: string;
   subjectName: string;
   className: string;
   classSection: string;
@@ -10,10 +12,14 @@ export interface ExamRecord {
   date: string;
   startTime: string;
   endTime: string;
-  status: 'scheduled' | 'completed' | 'cancelled';
+  status: 'scheduled' | 'in_progress' | 'completed' | 'published' | 'cancelled' | 'draft' | string;
   totalMarks: number;
   passingMarks: number;
   academicYear?: string;
+  teacherName?: string;
+  totalStudents?: number;
+  marksEnteredCount?: number;
+  isPublished?: boolean;
 }
 
 export interface ExamFormData {
@@ -50,6 +56,8 @@ export interface SubjectOption {
   name: string;
   code: string;
   classId: string;
+  teacherId?: string;
+  teacherName?: string;
 }
 
 export interface StudentOption {

@@ -90,7 +90,18 @@ function getFilteredNavItems(
 ) {
   if (!currentUser) return [];
   const allItems = navItems[currentUser.role] || [];
-  return allItems.filter((item) => shouldIncludeItem(item, currentUser, isRoot, hasPermissions));
+  return allItems
+    .map((item) => {
+      if (item.children && item.children.length > 0) {
+        const filteredChildren = item.children.filter((child: any) =>
+          shouldIncludeItem(child, currentUser, isRoot, hasPermissions)
+        );
+        if (filteredChildren.length === 0) return null;
+        return { ...item, children: filteredChildren };
+      }
+      return shouldIncludeItem(item, currentUser, isRoot, hasPermissions) ? item : null;
+    })
+    .filter(Boolean) as typeof allItems;
 }
 
 function isStatusExpired(status: string | undefined): boolean {
@@ -394,10 +405,15 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
         {/* Main Content */}
         <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
           {/* Top Header */}
-          <Header items={items} resolvedScreen={resolvedScreen} layoutPref={layoutPref} />
+          <Header
+            items={items}
+            resolvedScreen={resolvedScreen}
+            layoutPref={layoutPref}
+            onPasswordChange={() => setIsChangePasswordOpen(true)}
+          />
 
           {/* Page Content */}
-          <main className="flex-1 overflow-y-auto p-4 lg:p-6 overscroll-contain">
+          <main data-lenis-scroll-container className="flex-1 overflow-y-auto p-4 lg:p-6 overscroll-contain">
             {isExpired && !isExemptFromLock ? (
               <SubscriptionExpiredScreen 
                 tenantName={resolvedTenant?.name || currentTenantName || "School"} 

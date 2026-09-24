@@ -1,3 +1,5 @@
+import React from "react";
+
 export interface RoleRecord {
   id: string;
   name: string;
@@ -21,5 +23,14 @@ export interface UserRecord {
 export interface PermissionModule {
   key: string;
   label: string;
-  icon: string;
+  icon: React.ReactNode | string;
+  desc?: string;
+  iconBg?: string;
+}
+
+export interface RoleTemplate {
+  name: string;
+  description: string;
+  color: string;
+  permissions: Record<string, string[]>;
 }

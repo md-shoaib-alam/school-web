@@ -342,6 +342,26 @@ export const CREATE_USER = `
   }
 `
 
+export const UPDATE_USER = `
+  mutation UpdateUser($id: ID!, $data: UpdateUserInput!) {
+    updateUser(id: $id, data: $data) {
+      id
+      name
+      email
+      phone
+      address
+      role
+      isActive
+      createdAt
+      tenant {
+        id
+        name
+        slug
+      }
+    }
+  }
+`
+
 export const CHANGE_PASSWORD = `
   mutation ChangePassword($oldPassword: String!, $newPassword: String!) {
     changePassword(oldPassword: $oldPassword, newPassword: $newPassword)

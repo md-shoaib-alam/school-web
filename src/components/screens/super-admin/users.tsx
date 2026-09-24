@@ -257,7 +257,7 @@ export function SuperAdminUsers() {
   const selectableRoles = ROLES.filter((r) => r.value !== "all");
 
   return (
-    <div className="space-y-6 pb-10">
+    <div className="space-y-5 pb-10">
       <UserHeader 
         totalCount={totalCount} 
         roleCountsMap={roleCountsMap} 
@@ -304,8 +304,10 @@ export function SuperAdminUsers() {
         onOpenChange={setSheetOpen}
         user={selectedUser}
         onToggleStatus={(userId) => handleToggleStatus(userId)}
+        onUserUpdated={(updatedUser) => setSelectedUser(updatedUser)}
         toggling={toggleStatus.isPending}
         formatDateTime={formatDateTime}
+        tenants={tenants}
       />
 
       {/* Add User Modal Dialog */}

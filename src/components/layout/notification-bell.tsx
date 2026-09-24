@@ -9,12 +9,13 @@ export function NotificationBell() {
       type="button"
       variant="ghost"
       size="icon"
-      className="size-9 rounded-xl text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-100 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
+      className="size-8.5 sm:size-9 shrink-0 rounded-xl border border-slate-200/70 dark:border-zinc-800 bg-white/80 dark:bg-zinc-900/80 text-slate-600 hover:text-slate-900 dark:text-zinc-400 dark:hover:text-zinc-100 hover:bg-slate-100/80 dark:hover:bg-zinc-800 shadow-2xs transition-all cursor-pointer relative"
       onClick={() => {
         console.log("Bell icon clicked");
       }}
     >
-      <Bell className="size-4.5" />
+      <Bell className="size-4" />
+      <span className="absolute top-2 right-2 size-2 rounded-full bg-blue-600 ring-2 ring-white dark:ring-zinc-900" />
     </Button>
   );
 }

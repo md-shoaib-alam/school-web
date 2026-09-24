@@ -12,7 +12,7 @@ import { StaffTable } from "./staff/StaffTable";
 import { StaffDialogs } from "./staff/StaffDialogs";
 
 // Types
-import { StaffRecord, PlatformRole, StaffFormData, emptyFormData } from "./staff/types";
+import { StaffRecord, PlatformRole, StaffFormData, emptyFormData, StaffViewMode } from "./staff/types";
 
 export function SuperAdminStaff() {
   const { currentUser } = useAppStore();
@@ -22,6 +22,7 @@ export function SuperAdminStaff() {
   const [roles, setRoles] = useState<PlatformRole[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
+  const [viewMode, setViewMode] = useState<StaffViewMode>("table");
 
   // Dialog state
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -213,6 +214,8 @@ export function SuperAdminStaff() {
         onSearchChange={setSearch}
         canCreate={canCreate}
         onAddClick={handleOpenAdd}
+        viewMode={viewMode}
+        onViewModeChange={setViewMode}
       />
 
       <StaffTable 
@@ -225,6 +228,7 @@ export function SuperAdminStaff() {
         onDelete={handleDelete}
         deletingId={deletingId}
         setDeletingId={setDeletingId}
+        viewMode={viewMode}
       />
 
       <StaffDialogs 

@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -31,6 +32,7 @@ interface NewPromotionDialogProps {
   submitting: boolean;
   handleCreatePromotion: () => void;
   handleStudentChange: (studentId: string) => void;
+  academicYearOptions?: string[];
 }
 
 export function NewPromotionDialog({
@@ -43,7 +45,21 @@ export function NewPromotionDialog({
   submitting,
   handleCreatePromotion,
   handleStudentChange,
+  academicYearOptions = [],
 }: NewPromotionDialogProps) {
+  const yearOptions = academicYearOptions.length > 0
+    ? academicYearOptions
+    : (form.academicYear ? [form.academicYear] : []);
+
+  const selectedYear = yearOptions.includes(form.academicYear)
+    ? form.academicYear
+    : (yearOptions[0] || "");
+
+  useEffect(() => {
+    if (open && selectedYear && form.academicYear !== selectedYear) {
+      setForm({ ...form, academicYear: selectedYear });
+    }
+  }, [open, selectedYear, form.academicYear]);
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-lg">
@@ -129,13 +145,23 @@ export function NewPromotionDialog({
           </div>
           <div className="grid gap-2">
             <label className="text-sm font-medium">Academic Year *</label>
-            <Input
-              placeholder="e.g. 2025-2026"
-              value={form.academicYear}
-              onChange={(e) =>
-                setForm({ ...form, academicYear: e.target.value })
+            <Select
+              value={selectedYear}
+              onValueChange={(val) =>
+                setForm({ ...form, academicYear: val })
               }
-            />
+            >
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="Select academic year" />
+              </SelectTrigger>
+              <SelectContent>
+                {yearOptions.map((y) => (
+                  <SelectItem key={y} value={y}>
+                    {y}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
           <div className="grid gap-2">
             <label className="text-sm font-medium">Remarks</label>
@@ -152,7 +178,7 @@ export function NewPromotionDialog({
             Cancel
           </Button>
           <Button
-            className="bg-emerald-600 hover:bg-emerald-700 text-white"
+            className="bg-blue-600 hover:bg-blue-700 text-white rounded-xl shadow-xs font-medium cursor-pointer"
             onClick={handleCreatePromotion}
             disabled={
               submitting ||

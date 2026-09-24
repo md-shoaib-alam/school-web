@@ -63,6 +63,7 @@ export function Sidebar({
   };
 
   const isSuperAdmin = currentUser.role === "super_admin";
+  const isModernUI = true;
   const initials = currentUser.name
     .split(" ")
     .map((n) => n[0])
@@ -76,17 +77,18 @@ export function Sidebar({
   return (
     <aside
       className={cn(
-        "fixed lg:static inset-y-0 left-0 z-50 flex flex-col transition-all duration-300 lg:h-full border-r overflow-hidden",
-        isSuperAdmin
-          ? "bg-white dark:bg-slate-950 border-r border-slate-200/80 dark:border-slate-800"
+        "fixed lg:static inset-y-0 left-0 z-50 flex flex-col transition-transform duration-300 ease-out will-change-transform transform-gpu lg:transition-all lg:duration-300 lg:will-change-auto lg:transform-none lg:h-full border-r overflow-hidden",
+        isModernUI
+          ? "bg-white dark:bg-[#0A0A0A] border-r border-slate-200/80 dark:border-zinc-800/80"
           : "bg-sidebar border-sidebar-border",
         sidebarOpen 
-          ? "w-72 translate-x-0 lg:w-72 lg:translate-x-0" 
-          : "w-0 -translate-x-full lg:w-[72px] lg:translate-x-0",
+          ? "w-72 translate-x-0 lg:w-72 lg:translate-x-0 shadow-2xl lg:shadow-none" 
+          : "w-72 -translate-x-full lg:w-[72px] lg:translate-x-0",
       )}
     >
       <SidebarHeader 
         isSuperAdmin={isSuperAdmin}
+        isModernUI={isModernUI}
         sidebarOpen={sidebarOpen}
         tenantLogo={currentTenantLogo}
         tenantName={currentTenantName}
@@ -99,6 +101,7 @@ export function Sidebar({
         resolvedScreen={resolvedScreen}
         sidebarOpen={sidebarOpen}
         isSuperAdmin={isSuperAdmin}
+        isModernUI={isModernUI}
         expandedKeys={expandedKeys}
         onToggleExpand={toggleExpand}
         onNavigate={navigateTo}
@@ -106,6 +109,7 @@ export function Sidebar({
 
       <SidebarFooter 
         isSuperAdmin={isSuperAdmin}
+        isModernUI={isModernUI}
         sidebarOpen={sidebarOpen}
         currentUser={currentUser}
         initials={initials}

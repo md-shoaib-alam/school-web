@@ -130,9 +130,9 @@ export function MarksheetPreviewPage({
         if (settingsData?.defaultMarksheetTemplateId) {
           dispatch({ type: 'SET_SELECTED_TEMPLATE_ID', payload: settingsData.defaultMarksheetTemplateId });
         }
-        // Only consider completed (published) exams
+        // Only consider published exams
         let completedExams = (examData.data || examData || []).filter(
-          (e: ExamRecord) => e.status === 'completed' && e.academicYear === academicYear
+          (e: ExamRecord) => (e.status === 'published' || e.isPublished === true) && e.academicYear === academicYear
         );
 
         if (examName) {

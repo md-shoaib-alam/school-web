@@ -84,6 +84,7 @@ export function useTeachers(tenantId?: string, search?: string, page?: number, l
     staleTime: 30 * 60 * 1000,      // 30 minutes - data is fresh for this duration
     gcTime: 60 * 60 * 1000,         // 1 hour - keep in garbage collection
     refetchOnMount: true,             // Only refetch if stale (default, but explicit here)
+    placeholderData: keepPreviousData,
     enabled: !!tenantId,
   })
 }
@@ -94,6 +95,7 @@ export function useStudents(tenantId?: string, classId?: string, search?: string
     queryFn: () => graphqlQuery<{ students: StudentsResponse }>(STUDENTS, { tenantId, classId, search, status, gender, page, limit }).then(d => d.students),
     staleTime: 0,
     gcTime: 5 * 60 * 1000,
+    placeholderData: keepPreviousData,
     enabled: !!tenantId,
   })
 }
@@ -105,6 +107,7 @@ export function useParents(tenantId?: string, search?: string, page?: number, li
     staleTime: 60 * 1000,      // 1 minute cache
     gcTime: 60 * 60 * 1000,         // 1 hour - keep in garbage collection
     refetchOnMount: true,             // Only refetch if stale
+    placeholderData: keepPreviousData,
     enabled: (options?.enabled ?? true) && !!tenantId,
   })
 }
@@ -151,6 +154,7 @@ export function useStaff(tenantId?: string, role?: string, search?: string, page
     queryFn: () => graphqlQuery<{ staff: StaffResponse }>(STAFF, { tenantId, role, search, page, limit }).then(d => d.staff),
     staleTime: 0,
     gcTime: 15 * 60 * 1000,
+    placeholderData: keepPreviousData,
     enabled: !!tenantId,
   })
 }

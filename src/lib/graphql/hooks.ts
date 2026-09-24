@@ -20,7 +20,7 @@ export {
   useBillingData, useTenants, useTenantsInfinite, useUsers, useAuditLogs, 
   useSubscriptions, useTenantDetail, useTenantMetadata, useCreateTenant, useUpdateTenant, 
   useDeleteTenant, useRestoreTenant, usePermanentDeleteTenant, 
-  useToggleTenantStatus, useToggleUserStatus, useCreateUser 
+  useToggleTenantStatus, useToggleUserStatus, useCreateUser, useUpdateUser 
 } from './hooks/platform.hooks'
 
 // Academic Hooks

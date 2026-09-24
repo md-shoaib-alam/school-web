@@ -70,7 +70,7 @@ export function DetailTenantDialog({
   if (!viewingTenant) return null;
 
   const handleCopySlug = () => {
-    navigator.clipboard.writeText(`@${viewingTenant.slug}`);
+    navigator.clipboard.writeText(`/${viewingTenant.slug}`);
     setCopied(true);
     toast.success("Copied slug to clipboard");
     setTimeout(() => setCopied(false), 2000);
@@ -227,7 +227,7 @@ export function DetailTenantDialog({
                     
                     <div className="flex items-center gap-2 mt-0.5">
                       <span className="text-xs text-slate-500 dark:text-slate-400 font-normal">
-                        @{viewingTenant.slug}
+                        /{viewingTenant.slug}
                       </span>
                       <button
                         type="button"

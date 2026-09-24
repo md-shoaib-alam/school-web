@@ -63,6 +63,7 @@ export function AttendanceHeader({
           disabled={isDatePickerDisabled}
           date={!isHistoryMode && selectedDate ? parseISO(selectedDate) : undefined}
           onChange={onDateChange}
+          align="end"
           className="w-[180px] bg-white dark:bg-zinc-900 hover:bg-zinc-50 dark:hover:bg-zinc-800"
         />
         <Button 

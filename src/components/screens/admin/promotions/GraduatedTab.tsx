@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect } from "react";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -40,6 +41,7 @@ interface GraduatedTabProps {
   handleGraduate: () => void;
   gradSubmitting: boolean;
   graduations: PromotionRecord[];
+  academicYearOptions?: string[];
 }
 
 export function GraduatedTab({
@@ -57,7 +59,21 @@ export function GraduatedTab({
   handleGraduate,
   gradSubmitting,
   graduations,
+  academicYearOptions = [],
 }: GraduatedTabProps) {
+  const yearOptions = academicYearOptions.length > 0
+    ? academicYearOptions
+    : (gradAcademicYear ? [gradAcademicYear] : []);
+
+  const selectedYear = yearOptions.includes(gradAcademicYear)
+    ? gradAcademicYear
+    : (yearOptions[0] || "");
+
+  useEffect(() => {
+    if (selectedYear && gradAcademicYear !== selectedYear) {
+      setGradAcademicYear(selectedYear);
+    }
+  }, [selectedYear, gradAcademicYear, setGradAcademicYear]);
   return (
     <div className="space-y-6">
       {/* Quick Graduate Card */}
@@ -92,11 +108,21 @@ export function GraduatedTab({
             </div>
             <div className="space-y-2">
               <label className="text-sm font-medium">Academic Year *</label>
-              <Input
-                placeholder="e.g. 2024-2025"
-                value={gradAcademicYear}
-                onChange={(e) => setGradAcademicYear(e.target.value)}
-              />
+              <Select
+                value={selectedYear}
+                onValueChange={setGradAcademicYear}
+              >
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Select academic year" />
+                </SelectTrigger>
+                <SelectContent>
+                  {yearOptions.map((y) => (
+                    <SelectItem key={y} value={y}>
+                      {y}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
           </div>
 
@@ -128,7 +154,10 @@ export function GraduatedTab({
                   </Button>
                 </div>
               </div>
-              <div className="max-h-64 overflow-y-auto rounded-lg border">
+              <div 
+                data-lenis-prevent
+                className="max-h-72 overflow-y-auto overscroll-contain rounded-lg border bg-card"
+              >
                 <Table>
                   <TableHeader>
                     <TableRow>

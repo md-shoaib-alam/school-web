@@ -355,7 +355,7 @@ export function AdminTimetable() {
         onManageClick={handleOpenManage}
       />
 
-      <Card className="border-none shadow-sm shadow-emerald-600/5 overflow-hidden">
+      <Card className="border border-zinc-200/80 dark:border-zinc-800 bg-white dark:bg-zinc-950 shadow-xs rounded-2xl overflow-hidden">
         <CardContent className="p-0 overflow-x-auto w-full">
           {isLoadingTimetable || isLoadingClasses ? (
             <TimetableSkeleton viewMode={viewMode} />
@@ -364,6 +364,8 @@ export function AdminTimetable() {
               selectedClass={selectedClass}
               classes={classes}
               onClassSelect={(v) => dispatch({ type: 'SET_SELECTED_CLASS', payload: v })}
+              onManageClick={handleOpenManage}
+              canCreate={canCreate}
             />
           ) : viewMode === "grid" ? (
             <GridView timeSlots={timeSlots} gridData={gridData} uniqueSubjects={uniqueSubjects} workingDays={workingDays} currentDayIndex={currentDayIndex} onDeleteSlot={(id) => deleteMutation.mutate(id)} onEditSlot={handleEditSlot} canEdit={canEdit} canDelete={canDelete} />

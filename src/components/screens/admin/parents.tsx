@@ -2,6 +2,7 @@
 
 import { useReducer, useEffect, useMemo, useState } from "react";
 import { useViewMode } from "@/hooks/use-view-mode";
+import { useDebounce } from "@/hooks/use-debounce";
 import { toast } from "sonner";
 import api from "@/lib/axios";
 import { useAppStore } from "@/store/use-app-store";
@@ -13,7 +14,6 @@ import { useQuery, useQueryClient, useInfiniteQuery } from "@tanstack/react-quer
 import { queryKeys } from "@/lib/graphql/keys";
 import { useSearchParams, useRouter, usePathname } from "next/navigation";
 import { Pagination } from "@/components/shared/pagination";
-import { useDebounce } from "@/hooks/use-debounce";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -35,6 +35,8 @@ import { CreateParentDialog } from "./parents/CreateParentDialog";
 import { LinkChildDialog } from "./parents/LinkChildDialog";
 import { ParentSkeleton } from "./parents/ParentSkeleton";
 import { ParentDetailDialog } from "./parents/ParentDetailDialog";
+import { ParentCreatedSuccessDialog, type ParentCreatedData } from "./parents/ParentCreatedSuccessDialog";
+import { ParentProfileView } from "./parents/ParentProfileView";
 import { ParentInfo, StudentInfo } from "./parents/types";
 
 type State = {
@@ -47,13 +49,13 @@ type State = {
   linking: boolean;
   createOpen: boolean;
   createForm: {
-    name: string; email: string; phone: string; occupation: string; password: ""; username?: string;
+    name: string; email: string; phone: string; alternatePhone?: string; occupation: string; password: ""; username?: string; gender?: string; dateOfBirth?: string; relationship?: string; address?: string;
   };
   creating: boolean;
   editOpen: boolean;
   editingParent: ParentInfo | null;
   editForm: {
-    name: string; email: string; phone: string; occupation: string;
+    name: string; email: string; phone: string; alternatePhone?: string; occupation: string; gender?: string; dateOfBirth?: string; address?: string;
   };
   editing: boolean;
   detailOpen: boolean;
@@ -89,13 +91,13 @@ const initialState: State = {
   linking: false,
   createOpen: false,
   createForm: {
-    name: "", email: "", phone: "", occupation: "", password: "", username: "",
+    name: "", email: "", phone: "", alternatePhone: "", occupation: "", password: "", username: "", gender: "male", dateOfBirth: "", relationship: "Parent", address: "",
   },
   creating: false,
   editOpen: false,
   editingParent: null,
   editForm: {
-    name: "", email: "", phone: "", occupation: "",
+    name: "", email: "", phone: "", alternatePhone: "", occupation: "", gender: "male", dateOfBirth: "", address: "",
   },
   editing: false,
   detailOpen: false,
@@ -120,10 +122,14 @@ const actionHandlers: {
     ...state,
     editingParent: payload,
     editForm: {
-      name: payload.name,
-      email: payload.email,
+      name: payload.name || "",
+      email: payload.email || "",
       phone: payload.phone || "",
-      occupation: payload.occupation || ""
+      alternatePhone: (payload as any).alternatePhone || "",
+      occupation: payload.occupation || "",
+      gender: (payload as any).gender || "male",
+      dateOfBirth: (payload as any).dateOfBirth || "",
+      address: (payload as any).address || "",
     },
     editOpen: true
   }),
@@ -176,16 +182,18 @@ export function AdminParents() {
     editingParent, editForm, editing, detailOpen, selectedParentDetail: stateSelectedParentDetail
   } = state;
 
-  const debouncedSearch = useDebounce(search, 500);
 
   const [unlinkConfirmOpen, setUnlinkConfirmOpen] = useState(false);
   const [unlinkData, setUnlinkData] = useState<{ parentId: string; studentId: string } | null>(null);
+  const [createdSuccessData, setCreatedSuccessData] = useState<ParentCreatedData | null>(null);
+  const [createdSuccessOpen, setCreatedSuccessOpen] = useState(false);
 
   const searchParams = useSearchParams();
   const router = useRouter();
   const pathname = usePathname();
   const pageParam = searchParams.get("page");
   const limitParam = searchParams.get("limit");
+  const parentUrlParam = searchParams.get("parent") || searchParams.get("parentId");
 
   // Sync initial URL search params into state (run once on mount)
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -212,7 +220,7 @@ export function AdminParents() {
   const { 
     data: parentsData, 
     isLoading: loadingParents 
-  } = useParents(currentTenantId || undefined, debouncedSearch || undefined, currentPage, itemsPerPage);
+  } = useParents(currentTenantId || undefined, search || undefined, currentPage, itemsPerPage);
 
   const { data: classesData } = useClassesMin(currentTenantId || undefined);
 
@@ -275,7 +283,13 @@ export function AdminParents() {
   }, [parents, stateSelectedParentDetail]);
 
   const students = useMemo(() => {
-    return studentData?.pages.flatMap((page) => page?.items || []) || [];
+    const rawList = studentData?.pages.flatMap((page) => page?.items || []) || [];
+    const seen = new Set<string>();
+    return rawList.filter((s) => {
+      if (!s?.id || seen.has(s.id)) return false;
+      seen.add(s.id);
+      return true;
+    });
   }, [studentData]);
   const classes = classesData?.classes || [];
 
@@ -291,6 +305,9 @@ export function AdminParents() {
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
       if (!emailRegex.test(createForm.email)) { toast.error("Please enter a valid email address"); return; }
     }
+
+    const formSnapshot = { ...createForm };
+
     toast.promise(
       (async () => {
         dispatch({ type: 'SET_CREATING', payload: true });
@@ -299,6 +316,18 @@ export function AdminParents() {
           const resData = res.data || {};
           dispatch({ type: 'RESET_CREATE_FORM' });
           queryClient.invalidateQueries({ queryKey: queryKeys.parents });
+
+          setCreatedSuccessData({
+            id: resData.id,
+            name: formSnapshot.name,
+            relationship: formSnapshot.relationship || "Parent",
+            phone: formSnapshot.phone,
+            email: formSnapshot.email,
+            username: resData.username || formSnapshot.username || "PRN2026001",
+            password: formSnapshot.password || "changeme123",
+          });
+          setCreatedSuccessOpen(true);
+
           if (resData.username) {
             return `Parent account created! Parent ID: ${resData.username}`;
           }
@@ -312,6 +341,32 @@ export function AdminParents() {
   const handleLinkChild = async (studentId: string) => {
     if (!selectedParent) return;
     const targetParentId = selectedParent.id;
+    const targetStudent = students.find((s) => s.id === studentId);
+    const newChild = targetStudent
+      ? {
+          id: targetStudent.id,
+          name: targetStudent.name,
+          email: targetStudent.email,
+          rollNumber: targetStudent.rollNumber,
+          className: targetStudent.className,
+          gender: targetStudent.gender,
+          classId: targetStudent.classId,
+        }
+      : {
+          id: studentId,
+          name: "Student",
+        };
+
+    // Optimistically update viewingParentSnapshot so the profile view updates instantly
+    setViewingParentSnapshot((prev) => {
+      if (!prev || prev.id !== targetParentId) return prev;
+      const existing = prev.children || [];
+      if (existing.some((c) => c.id === studentId)) return prev;
+      return {
+        ...prev,
+        children: [...existing, newChild],
+      };
+    });
 
     // Optimistically update React Query cache in memory
     queryClient.setQueriesData({ queryKey: queryKeys.parents }, (oldData: any) => {
@@ -319,7 +374,8 @@ export function AdminParents() {
       const updateParent = (p: any) => {
         if (p.id === targetParentId) {
           const existing = p.children || [];
-          return { ...p, children: [...existing, { id: studentId, name: 'Updating...' }] };
+          if (existing.some((c: any) => c.id === studentId)) return p;
+          return { ...p, children: [...existing, newChild] };
         }
         return p;
       };
@@ -329,16 +385,30 @@ export function AdminParents() {
       return oldData;
     });
 
+    // Optimistically update students query so badge turns to Linked in LinkChildDialog
+    queryClient.setQueriesData({ queryKey: ['students-min-infinite'] }, (old: any) => {
+      if (!old || !old.pages) return old;
+      return {
+        ...old,
+        pages: old.pages.map((page: any) => ({
+          ...page,
+          items: (page.items || []).map((s: any) =>
+            s.id === studentId ? { ...s, parentId: targetParentId } : s
+          ),
+        })),
+      };
+    });
+
     toast.promise(
       (async () => {
         dispatch({ type: 'SET_LINKING', payload: true });
         try {
           await api.post("/parents", { action: "link", parentId: targetParentId, studentId });
-          queryClient.invalidateQueries({ queryKey: queryKeys.parents });
-          queryClient.invalidateQueries({ queryKey: ['students-min-infinite'] });
+          await queryClient.invalidateQueries({ queryKey: queryKeys.parents, refetchType: 'all' });
+          await queryClient.invalidateQueries({ queryKey: ['students-min-infinite'], refetchType: 'all' });
           return "Student linked successfully";
         } catch (err) {
-          queryClient.invalidateQueries({ queryKey: queryKeys.parents });
+          await queryClient.invalidateQueries({ queryKey: queryKeys.parents, refetchType: 'all' });
           throw err;
         } finally { dispatch({ type: 'SET_LINKING', payload: false }); }
       })(),
@@ -357,6 +427,15 @@ export function AdminParents() {
     setUnlinkConfirmOpen(false);
     setUnlinkData(null);
 
+    // Optimistically update viewingParentSnapshot so profile view removes child immediately
+    setViewingParentSnapshot((prev) => {
+      if (!prev || prev.id !== parentId) return prev;
+      return {
+        ...prev,
+        children: (prev.children || []).filter((c) => c.id !== studentId),
+      };
+    });
+
     // Optimistically update React Query cache in memory immediately
     queryClient.setQueriesData({ queryKey: queryKeys.parents }, (oldData: any) => {
       if (!oldData) return oldData;
@@ -372,14 +451,29 @@ export function AdminParents() {
       return oldData;
     });
 
+    // Optimistically update students query so student is marked unlinked
+    queryClient.setQueriesData({ queryKey: ['students-min-infinite'] }, (old: any) => {
+      if (!old || !old.pages) return old;
+      return {
+        ...old,
+        pages: old.pages.map((page: any) => ({
+          ...page,
+          items: (page.items || []).map((s: any) =>
+            s.id === studentId ? { ...s, parentId: null } : s
+          ),
+        })),
+      };
+    });
+
     toast.promise(
       (async () => {
         try {
           await api.post("/parents", { action: "unlink", parentId, studentId });
-          queryClient.invalidateQueries({ queryKey: ['students-min-infinite'] });
+          await queryClient.invalidateQueries({ queryKey: queryKeys.parents, refetchType: 'all' });
+          await queryClient.invalidateQueries({ queryKey: ['students-min-infinite'], refetchType: 'all' });
           return "Child record unlinked";
         } catch (err) {
-          queryClient.invalidateQueries({ queryKey: queryKeys.parents });
+          await queryClient.invalidateQueries({ queryKey: queryKeys.parents, refetchType: 'all' });
           throw err;
         }
       })(),
@@ -423,57 +517,146 @@ export function AdminParents() {
   };
   
   // Show skeleton during initial load OR when fetching new page data
-  if (loadingParents) return <ParentSkeleton />;
+  const [viewingParentSnapshot, setViewingParentSnapshot] = useState<ParentInfo | null>(null);
+
+  // Synchronize URL ?parent= query parameter into viewingParent on initial load, refresh, or URL change
+  useEffect(() => {
+    if (!parentUrlParam) {
+      if (viewingParentSnapshot) {
+        setViewingParentSnapshot(null);
+      }
+      return;
+    }
+
+    // 1. Check if parent is already in the current parents list
+    const found = parents.find(
+      (p) => p.id === parentUrlParam || p.username === parentUrlParam
+    );
+    if (found) {
+      if (viewingParentSnapshot?.id !== found.id) {
+        setViewingParentSnapshot(found);
+      }
+      return;
+    }
+
+    // 2. If not in current page list, fetch this specific parent by ID or username
+    let isMounted = true;
+    (async () => {
+      try {
+        const res = await api.get("/parents", {
+          params: { search: parentUrlParam, limit: 10 },
+        });
+        const items = res?.data?.items || (res as any)?.items || [];
+        const match = items.find(
+          (p: any) => p.id === parentUrlParam || p.username === parentUrlParam
+        );
+        if (match && isMounted) {
+          setViewingParentSnapshot(match);
+        }
+      } catch (err) {
+        console.error("Failed to load parent from URL:", err);
+      }
+    })();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [parentUrlParam, parents]);
+
+  // Derive viewing parent dynamically from the latest parents list to keep profile view synchronized reactively
+  const viewingParent = useMemo(() => {
+    if (!viewingParentSnapshot) return null;
+    return parents.find((p) => p.id === viewingParentSnapshot.id) || viewingParentSnapshot;
+  }, [parents, viewingParentSnapshot]);
+
+  const handleOpenParentProfile = (p: ParentInfo) => {
+    setViewingParentSnapshot(p);
+    const params = new URLSearchParams(searchParams.toString());
+    params.set("parent", p.username || p.id);
+    const newQuery = params.toString();
+    router.push(newQuery ? `${pathname}?${newQuery}` : pathname, { scroll: false });
+  };
+
+  const handleCloseParentProfile = () => {
+    setViewingParentSnapshot(null);
+    const params = new URLSearchParams(searchParams.toString());
+    params.delete("parent");
+    params.delete("parentId");
+    const newQuery = params.toString();
+    router.replace(newQuery ? `${pathname}?${newQuery}` : pathname, { scroll: false });
+  };
+
+  if (loadingParents || (parentUrlParam && !viewingParent)) return <ParentSkeleton />;
 
   return (
-    <div className="space-y-6">
-      <ParentsHeader 
-        search={search}
-        onSearchChange={(v) => dispatch({ type: 'SET_SEARCH', payload: v })}
-        totalParents={parents.length}
-        totalChildren={parents.reduce((s, p) => s + (p.children?.length || 0), 0)}
-        viewMode={viewMode}
-        setViewMode={setViewMode}
-        onAddClick={() => dispatch({ type: 'SET_CREATE_OPEN', payload: true })}
-      />
-
-      {parents.length === 0 ? (
-        <ParentsEmptyState />
-      ) : viewMode === "table" ? (
-        <ParentsTableView 
-          parents={parents}
-          onEdit={(p) => dispatch({ type: 'OPEN_EDIT_DIALOG', payload: p })}
-          onDelete={handleDelete}
-          onLinkOpen={(p) => dispatch({ type: 'OPEN_LINK_DIALOG', payload: p })}
-          onView={(p) => dispatch({ type: 'OPEN_DETAIL_DIALOG', payload: p })}
+    <>
+      {/* Full-page profile view OR list view */}
+      {viewingParent ? (
+        <ParentProfileView
+          parent={viewingParent}
+          onBack={handleCloseParentProfile}
+          canEdit={true}
+          onEdit={(p) => {
+            handleCloseParentProfile();
+            dispatch({ type: 'OPEN_EDIT_DIALOG', payload: p });
+          }}
+          onLinkChild={(p) => {
+            dispatch({ type: 'OPEN_LINK_DIALOG', payload: p });
+          }}
+          onUnlinkChild={handleUnlinkChild}
         />
       ) : (
-        <ParentsGridView 
-          parents={parents}
-          linking={linking}
-          onEdit={(p) => dispatch({ type: 'OPEN_EDIT_DIALOG', payload: p })}
-          onDelete={handleDelete}
-          onLinkOpen={(p) => dispatch({ type: 'OPEN_LINK_DIALOG', payload: p })}
-          onUnlinkChild={handleUnlinkChild}
-          onView={(p) => dispatch({ type: 'OPEN_DETAIL_DIALOG', payload: p })}
-        />
+        <div className="space-y-6">
+          <ParentsHeader
+            search={search}
+            onSearchChange={(v) => dispatch({ type: 'SET_SEARCH', payload: v })}
+            totalParents={parents.length}
+            totalChildren={parents.reduce((s, p) => s + (p.children?.length || 0), 0)}
+            viewMode={viewMode}
+            setViewMode={setViewMode}
+            onAddClick={() => dispatch({ type: 'SET_CREATE_OPEN', payload: true })}
+          />
+
+          {parents.length === 0 ? (
+            <ParentsEmptyState />
+          ) : viewMode === "table" ? (
+            <ParentsTableView
+              parents={parents}
+              onEdit={(p) => dispatch({ type: 'OPEN_EDIT_DIALOG', payload: p })}
+              onDelete={handleDelete}
+              onLinkOpen={(p) => dispatch({ type: 'OPEN_LINK_DIALOG', payload: p })}
+              onView={handleOpenParentProfile}
+            />
+          ) : (
+            <ParentsGridView
+              parents={parents}
+              linking={linking}
+              onEdit={(p) => dispatch({ type: 'OPEN_EDIT_DIALOG', payload: p })}
+              onDelete={handleDelete}
+              onLinkOpen={(p) => dispatch({ type: 'OPEN_LINK_DIALOG', payload: p })}
+              onUnlinkChild={handleUnlinkChild}
+              onView={handleOpenParentProfile}
+            />
+          )}
+
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            totalItems={totalItems}
+            itemsPerPage={itemsPerPage}
+            onPageChange={(page) => {
+              dispatch({ type: 'SET_CURRENT_PAGE', payload: page });
+              updateUrlParams(page, itemsPerPage);
+            }}
+            onLimitChange={(limit) => {
+              dispatch({ type: 'SET_ITEMS_PER_PAGE', payload: limit });
+              updateUrlParams(1, limit);
+            }}
+          />
+        </div>
       )}
 
-      <Pagination
-        currentPage={currentPage}
-        totalPages={totalPages}
-        totalItems={totalItems}
-        itemsPerPage={itemsPerPage}
-        onPageChange={(page) => {
-          dispatch({ type: 'SET_CURRENT_PAGE', payload: page });
-          updateUrlParams(page, itemsPerPage);
-        }}
-        onLimitChange={(limit) => {
-          dispatch({ type: 'SET_ITEMS_PER_PAGE', payload: limit });
-          updateUrlParams(1, limit);
-        }}
-      />
-
+      {/* ── Dialogs — always rendered so they work from both views ── */}
       <CreateParentDialog
         open={createOpen}
         onOpenChange={(v) => dispatch({ type: 'SET_CREATE_OPEN', payload: v })}
@@ -486,6 +669,7 @@ export function AdminParents() {
       <EditParentDialog
         open={editOpen}
         onOpenChange={(v) => dispatch({ type: 'SET_EDIT_OPEN', payload: v })}
+        editingParent={editingParent}
         editForm={editForm}
         setEditForm={(v) => dispatch({ type: 'SET_EDIT_FORM', payload: v })}
         onSave={handleEditSave}
@@ -519,11 +703,19 @@ export function AdminParents() {
         onUnlinkedOnlyChange={setUnlinkedOnly}
       />
 
-      <ParentDetailDialog
-        open={detailOpen}
-        onOpenChange={(v) => dispatch({ type: 'SET_DETAIL_OPEN', payload: v })}
-        parent={selectedParentDetail}
-        onLinkClick={(p) => dispatch({ type: 'OPEN_LINK_DIALOG', payload: p })}
+      <ParentCreatedSuccessDialog
+        open={createdSuccessOpen}
+        onOpenChange={setCreatedSuccessOpen}
+        data={createdSuccessData}
+        onAddAnother={() => {
+          setCreatedSuccessOpen(false);
+          dispatch({ type: 'SET_CREATE_OPEN', payload: true });
+        }}
+        onViewProfile={(parentId) => {
+          setCreatedSuccessOpen(false);
+          const found = parents.find((p) => p.id === parentId);
+          if (found) handleOpenParentProfile(found);
+        }}
       />
 
       <AlertDialog open={unlinkConfirmOpen} onOpenChange={setUnlinkConfirmOpen}>
@@ -536,15 +728,12 @@ export function AdminParents() {
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel onClick={() => { setUnlinkConfirmOpen(false); setUnlinkData(null); }}>Cancel</AlertDialogCancel>
-            <AlertDialogAction
-              onClick={executeUnlinkChild}
-              className="bg-red-600 hover:bg-red-700 text-white"
-            >
+            <AlertDialogAction onClick={executeUnlinkChild} className="bg-red-600 hover:bg-red-700 text-white">
               Unlink
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-    </div>
+    </>
   );
 }

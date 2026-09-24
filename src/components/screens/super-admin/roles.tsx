@@ -1,12 +1,13 @@
 "use client";
 
 import { apiFetch } from "@/lib/api";
-import { useReducer, useEffect, useCallback } from "react";
+import { useState, useReducer, useEffect, useCallback } from "react";
 import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
 
 // Sub-components
 import { RoleHeader } from "./roles/RoleHeader";
+import { RoleHeroBanner } from "./roles/RoleHeroBanner";
 import { RoleTemplates } from "./roles/RoleTemplates";
 import { RoleGrid } from "./roles/RoleGrid";
 import { RoleDialogs } from "./roles/RoleDialogs";
@@ -19,6 +20,7 @@ import {
 import { rolesReducer, initialState } from "./roles/reducer";
 
 export function SuperAdminRoles() {
+  const [activeTab, setActiveTab] = useState<"templates" | "roles">("templates");
   const [state, dispatch] = useReducer(rolesReducer, initialState);
 
   const {
@@ -178,24 +180,41 @@ export function SuperAdminRoles() {
   if (loading) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[400px] gap-4">
-        <Loader2 className="size-10 animate-spin text-teal-600" />
-        <p className="text-sm font-bold text-muted-foreground animate-pulse">Syncing platform permissions…</p>      </div>
+        <Loader2 className="size-10 animate-spin text-blue-600" />
+        <p className="text-sm font-bold text-muted-foreground animate-pulse">Syncing platform permissions…</p>
+      </div>
     );
   }
 
   return (
-    <div className="space-y-6">
-      <RoleHeader onCreateRole={() => openCreateDialog()} />
+    <div className="space-y-5 max-w-7xl mx-auto pb-8">
+      {/* 1. Hero Banner */}
+      <RoleHeroBanner />
 
-      <RoleTemplates onSelectTemplate={(t) => openCreateDialog(t)} />
-
-      <RoleGrid 
-        roles={roles}
-        onEdit={openEditDialog}
-        onDelete={handleDelete}
-        onAssignUsers={openAssignDialog}
+      {/* 2. Header with Tabs in place of that text */}
+      <RoleHeader 
+        activeTab={activeTab}
+        onTabChange={setActiveTab}
+        onCreateRole={() => openCreateDialog()} 
       />
 
+      {/* 3. Main Content: Toggled View for Desktop & Mobile */}
+      <div className="space-y-4 animate-in fade-in-50 duration-200">
+        {activeTab === "templates" ? (
+          <RoleTemplates 
+            onSelectTemplate={(t) => openCreateDialog(t)} 
+          />
+        ) : (
+          <RoleGrid 
+            roles={roles}
+            onEdit={openEditDialog}
+            onDelete={handleDelete}
+            onAssignUsers={openAssignDialog}
+          />
+        )}
+      </div>
+
+      {/* 4. CRUD and Assignment Dialogs */}
       <RoleDialogs 
         dialogOpen={dialogOpen} setDialogOpen={(v) => dispatch({ type: "SET_DIALOG_OPEN", open: v })}
         editingRole={editingRole}
@@ -218,3 +237,4 @@ export function SuperAdminRoles() {
     </div>
   );
 }
+

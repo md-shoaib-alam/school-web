@@ -19,6 +19,7 @@ import { FullPageSkeleton } from "@/components/ui/full-page-skeleton";
 import { toast } from "sonner";
 import { useAppStore } from "@/store/use-app-store";
 import { useTenantMetadata } from "@/lib/graphql/hooks/platform.hooks";
+import { PremiumUpgradeCard } from './subscription/PremiumUpgradeCard';
 
 const LoadingScreen = () => <FullPageSkeleton />;
 
@@ -102,7 +103,8 @@ export function AdminPrintMarksheetContent() {
 
   const publishedFiltered = useMemo(() => {
     return exams.filter(exam => {
-      if (exam.status !== 'completed') return false;
+      const isPublished = exam.status === 'published' || exam.isPublished === true;
+      if (!isPublished) return false;
       const matchAcademicYear = !publishedAcademicYearFilter || exam.academicYear === publishedAcademicYearFilter;
       const matchClass = publishedClassFilter === 'all' || exam.classId === publishedClassFilter;
       return matchAcademicYear && matchClass;
@@ -123,37 +125,12 @@ export function AdminPrintMarksheetContent() {
 
   if (tenant && tenant.plan.toLowerCase() === 'basic') {
     return (
-      <div className="space-y-6 animate-in fade-in duration-300">
-        <div className="flex-1 min-w-0">
-          <h2 className="text-xl sm:text-2xl font-semibold tracking-tight flex items-center gap-2">
-            <Award className="size-6 sm:size-7 text-emerald-600 dark:text-emerald-500" />
-            <span>Print Marksheets</span>
-          </h2>
-          <p className="text-xs sm:text-sm text-muted-foreground mt-1">
-            Generate, preview, and print high-fidelity student marksheets.
-          </p>
-        </div>
-
-        <div className="flex flex-col items-center justify-center p-8 sm:p-16 border border-zinc-200 dark:border-zinc-800 rounded-3xl bg-gradient-to-br from-zinc-50 via-white to-zinc-50 dark:from-zinc-950 dark:via-zinc-900 dark:to-zinc-950 text-center max-w-2xl mx-auto shadow-xl mt-6">
-          <div className="size-16 rounded-2xl bg-amber-500/10 flex items-center justify-center mb-6 shadow-md">
-            <Crown className="size-8 text-amber-500 fill-amber-500/20" />
-          </div>
-          <h3 className="text-2xl font-bold text-zinc-900 dark:text-zinc-100 tracking-tight">Upgrade Plan Required</h3>
-          <p className="text-sm text-muted-foreground mt-3 max-w-md leading-relaxed">
-            High-fidelity marksheet generation and printing is exclusive to <strong>Growth Plan (Standard)</strong> and <strong>Institution Plan (Premium)</strong>. 
-          </p>
-          <p className="text-xs text-muted-foreground mt-1 max-w-md">
-            Unlock professional A4 grade report templates, custom certificate generators, library trackers, and advanced fee management tools.
-          </p>
-          <div className="mt-8 flex flex-col sm:flex-row items-center gap-3">
-            <Button 
-              onClick={() => push(`/${slug}/manage-plan`)}
-              className="bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-700 hover:to-indigo-700 text-white font-semibold h-11 px-8 rounded-xl shadow-lg shadow-violet-100 dark:shadow-none hover:shadow-xl transition-all"
-            >
-              Upgrade School Plan
-            </Button>
-          </div>
-        </div>
+      <div className="min-h-[calc(100vh-8rem)] flex items-center justify-center py-4 sm:py-8 w-full animate-in fade-in duration-300">
+        <PremiumUpgradeCard
+          className="w-full"
+          onUpgrade={() => push(`/${slug}/manage-plan`)}
+          onViewPlan={() => push(`/${slug}/manage-plan`)}
+        />
       </div>
     );
   }
@@ -176,8 +153,7 @@ export function AdminPrintMarksheetContent() {
     <div className="space-y-6 animate-in fade-in duration-300">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div className="flex-1 min-w-0">
-          <h2 className="text-xl sm:text-2xl font-semibold tracking-tight flex items-center gap-2">
-            <Award className="size-6 sm:size-7 text-emerald-600 dark:text-emerald-500" />
+          <h2 className="text-xl sm:text-2xl font-semibold tracking-tight">
             <span className="truncate">Print Marksheets</span>
           </h2>
           <p className="text-xs sm:text-sm text-muted-foreground mt-1 line-clamp-1 sm:line-clamp-none">
@@ -194,11 +170,11 @@ export function AdminPrintMarksheetContent() {
         </div>
       </div>
 
-      {exams.filter(e => e.status === 'completed').length === 0 ? (
+      {exams.filter(e => e.status === 'published' || e.isPublished === true).length === 0 ? (
         <div className="flex flex-col items-center justify-center p-12 border-2 border-dashed border-zinc-200 dark:border-zinc-800 rounded-2xl bg-card text-center text-muted-foreground">
           <Trophy className="size-16 mb-4 text-emerald-500/40" />
-          <h3 className="text-lg font-semibold text-foreground">No Completed Exams</h3>
-          <p className="text-sm mt-1 max-w-md">There are no completed or finalized exams to print marksheets for yet.</p>
+          <h3 className="text-lg font-semibold text-foreground">No Published Exams</h3>
+          <p className="text-sm mt-1 max-w-md">There are no published or finalized exams to print marksheets for yet.</p>
         </div>
       ) : (
         <div className="space-y-4">

@@ -1,6 +1,7 @@
 "use client";
 
-import { useReducer, useMemo, useCallback, useEffect } from "react";
+import { useReducer, useMemo, useEffect, useState } from "react";
+import Image from "next/image";
 import { 
   useCustomRoles, 
   useStaff, 
@@ -11,7 +12,8 @@ import {
 } from "@/lib/graphql/hooks";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Plus, Shield, LayoutGrid, List } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Plus, Shield, ShieldCheck, LayoutGrid, List, Search } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { useAppStore } from "@/store/use-app-store";
@@ -64,7 +66,7 @@ const initialState: State = {
   searchQuery: "",
   name: "",
   description: "",
-  color: "#6366f1",
+  color: "#3b82f6",
   permissions: {},
 };
 
@@ -78,7 +80,7 @@ function reducer(state: State, action: Action): State {
         editingRole: null,
         name: "",
         description: "",
-        color: "#6366f1",
+        color: "#3b82f6",
         permissions: {},
         dialogOpen: true
       };
@@ -101,7 +103,7 @@ function reducer(state: State, action: Action): State {
         editingRole: role,
         name: role.name,
         description: role.description || "",
-        color: role.color || "#6366f1",
+        color: role.color || "#10b981",
         permissions: perms,
         dialogOpen: true
       };
@@ -119,6 +121,7 @@ function reducer(state: State, action: Action): State {
 
 export function AdminRoles() {
   const { currentTenantId } = useAppStore();
+  const [roleFilter, setRoleFilter] = useState("");
   
   const [state, dispatch] = useReducer(reducer, initialState);
   const {
@@ -158,6 +161,16 @@ export function AdminRoles() {
     dispatch({ type: 'SET_VIEW_MODE', payload: mode });
     localStorage.setItem('roles_view_mode', mode);
   };
+
+  // Filtered roles based on search bar
+  const displayedRoles = useMemo(() => {
+    if (!roleFilter.trim()) return roles;
+    const q = roleFilter.toLowerCase();
+    return roles.filter((r) => 
+      r.name.toLowerCase().includes(q) || 
+      (r.description && r.description.toLowerCase().includes(q))
+    );
+  }, [roles, roleFilter]);
 
   // Computed lists for assignment
   const { assignedUsers, availableUsers } = useMemo(() => {
@@ -210,6 +223,7 @@ export function AdminRoles() {
           permissions,
         });
       }
+      toast.success(`Role "${name}" ${editingRole ? "updated" : "created"} successfully`);
       dispatch({ type: 'SET_DIALOG_OPEN', payload: false });
       fetchRoles();
     } catch (err: any) {
@@ -222,6 +236,7 @@ export function AdminRoles() {
   const handleDeleteRole = async (id: string) => {
     try {
       await deleteRole(id);
+      toast.success("Role deleted successfully");
       fetchRoles();
     } catch (err: any) {
       toast.error(err.message || "Failed to delete role");
@@ -240,62 +255,142 @@ export function AdminRoles() {
   }
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <h2 className="text-2xl font-semibold text-zinc-900 dark:text-zinc-100">Roles & Permissions</h2>
-          <p className="text-sm text-zinc-500 dark:text-zinc-400 mt-1">
-            Create custom roles and control staff access
-          </p>
+    <div className="space-y-6 max-w-7xl mx-auto pb-8">
+      {/* 1. Hero Banner */}
+      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-blue-50/90 via-sky-50/50 to-indigo-50/40 dark:from-slate-900 dark:via-blue-950/30 dark:to-slate-900 border border-blue-100/90 dark:border-slate-800 px-4.5 sm:px-6 py-3 sm:py-3.5 shadow-2xs">
+        {/* Background ambient glow */}
+        <div className="absolute top-0 right-1/4 w-80 h-48 bg-blue-400/15 dark:bg-blue-600/10 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute -bottom-6 right-10 w-48 h-36 bg-sky-300/15 dark:bg-sky-500/10 rounded-full blur-2xl pointer-events-none" />
+
+        {/* Content */}
+        <div className="relative z-10 flex items-center justify-between gap-3 sm:gap-4">
+          <div className="max-w-md min-w-0">
+            <div className="inline-flex items-center gap-1 sm:gap-1.5 px-2 py-0.5 rounded-full bg-blue-100/80 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300 text-[10px] font-bold uppercase tracking-wider border border-blue-200/60 dark:border-blue-800/40 shadow-2xs">
+              <ShieldCheck className="size-3 text-blue-600 dark:text-blue-400" />
+              <span>Staff Access Control</span>
+            </div>
+
+            <h3 className="text-base sm:text-lg md:text-xl font-bold text-foreground tracking-tight leading-tight mt-1 sm:mt-1.5">
+              Right Staff. Right Access.
+            </h3>
+
+            <p className="hidden sm:block text-xs text-muted-foreground mt-0.5 leading-snug font-normal">
+              Granular access control and permission management for school faculty & staff.
+            </p>
+          </div>
+
+          <div className="relative flex items-center justify-end shrink-0 pr-0.5 sm:pr-2">
+            <div className="relative h-14 sm:h-20 md:h-22 aspect-[16/9] overflow-hidden select-none">
+              <Image
+                src="/assets/super-admin/roletop.avif"
+                alt="Roles & Permissions"
+                fill
+                priority
+                className="object-contain scale-125 drop-shadow-md"
+                sizes="(max-width: 640px) 110px, (max-width: 768px) 160px, 200px"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* 2. Header and Controls */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <div className="flex items-center gap-2.5 min-w-0">
+          <div className="size-8.5 sm:size-9 rounded-xl bg-blue-50 dark:bg-blue-950/50 border border-blue-100/80 dark:border-blue-900/40 flex items-center justify-center text-blue-600 dark:text-blue-400 shrink-0">
+            <Shield className="size-4 sm:size-4.5" />
+          </div>
+          <div className="min-w-0">
+            <div className="flex items-center gap-1.5 flex-wrap">
+              <h2 className="text-base sm:text-lg font-semibold text-foreground tracking-tight truncate">
+                Roles &amp; Permissions
+              </h2>
+              <span className="inline-flex items-center gap-1 px-1.5 py-0.2 rounded-full text-[10px] font-medium bg-blue-50 text-blue-700 border border-blue-200/70 dark:bg-blue-950/40 dark:text-blue-400 dark:border-blue-900/60">
+                School Staff
+              </span>
+            </div>
+            <p className="text-[11px] sm:text-xs text-muted-foreground mt-0.5 font-normal truncate">
+              Define custom roles and assign granular permissions to staff members
+            </p>
+          </div>
         </div>
         
-        <div className="flex items-center gap-3">
-          <div className="flex items-center p-1 bg-zinc-100 dark:bg-zinc-800 rounded-lg">
+        <div className="flex items-center gap-2.5 flex-wrap sm:flex-nowrap">
+          {/* Search roles */}
+          <div className="relative flex-1 sm:w-56">
+            <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 size-3.5 text-muted-foreground" />
+            <Input
+              placeholder="Search roles…"
+              value={roleFilter}
+              onChange={(e) => setRoleFilter(e.target.value)}
+              className="pl-8 h-8.5 text-xs rounded-xl bg-card border-border"
+            />
+          </div>
+
+          {/* View mode toggle */}
+          <div className="flex items-center p-0.5 bg-muted/80 rounded-xl border border-border/50 shrink-0">
             <Button
               variant="ghost"
               size="sm"
               className={cn(
-                "h-8 px-3 gap-2",
-                viewMode === 'grid' && "bg-white dark:bg-zinc-700 shadow-sm text-emerald-600"
+                "h-7.5 px-2.5 gap-1.5 text-xs rounded-lg transition-all",
+                viewMode === 'grid' && "bg-card shadow-2xs font-semibold text-blue-600 dark:text-blue-400"
               )}
               onClick={() => toggleView('grid')}
             >
-              <LayoutGrid className="size-4" />
+              <LayoutGrid className="size-3.5" />
               <span className="hidden sm:inline">Grid</span>
             </Button>
             <Button
               variant="ghost"
               size="sm"
               className={cn(
-                "h-8 px-3 gap-2",
-                viewMode === 'table' && "bg-white dark:bg-zinc-700 shadow-sm text-emerald-600"
+                "h-7.5 px-2.5 gap-1.5 text-xs rounded-lg transition-all",
+                viewMode === 'table' && "bg-card shadow-2xs font-semibold text-blue-600 dark:text-blue-400"
               )}
               onClick={() => toggleView('table')}
             >
-              <List className="size-4" />
+              <List className="size-3.5" />
               <span className="hidden sm:inline">Table</span>
             </Button>
           </div>
 
-          <Button onClick={() => dispatch({ type: 'OPEN_CREATE_DIALOG' })} className="bg-emerald-600 hover:bg-emerald-700 text-white">
-            <Plus className="size-4 mr-2" /> Create Role
+          {/* Create Role Button */}
+          <Button 
+            onClick={() => dispatch({ type: 'OPEN_CREATE_DIALOG' })} 
+            className="bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold h-8.5 sm:h-9 px-3.5 rounded-xl gap-1.5 shadow-xs transition-all shrink-0 cursor-pointer"
+          >
+            <Plus className="size-3.5 stroke-[2.5]" />
+            <span>Create Role</span>
           </Button>
         </div>
       </div>
 
-      {roles.length === 0 ? (
-        <Card className="border-dashed">
-          <CardContent className="flex flex-col items-center justify-center py-16 text-zinc-400">
-            <Shield className="size-12 mb-3 opacity-40" />
-            <p className="text-lg font-medium">No custom roles yet</p>
-            <Button onClick={() => dispatch({ type: 'OPEN_CREATE_DIALOG' })} variant="outline" className="mt-4">
-              <Plus className="size-4 mr-2" /> Create Role
-            </Button>
+      {/* 3. Roles Display */}
+      {displayedRoles.length === 0 ? (
+        <Card className="border-dashed rounded-2xl bg-card/50">
+          <CardContent className="flex flex-col items-center justify-center py-16 text-muted-foreground">
+            <div className="size-12 rounded-2xl bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 flex items-center justify-center mb-3">
+              <Shield className="size-6 opacity-80" />
+            </div>
+            <p className="text-base font-bold text-foreground">
+              {roleFilter ? "No matching roles found" : "No custom roles yet"}
+            </p>
+            <p className="text-xs text-muted-foreground mt-1 max-w-sm text-center">
+              {roleFilter 
+                ? `No roles match your search term "${roleFilter}". Try searching with a different term.`
+                : "Create custom roles to grant specific staff permissions like Finance Manager, Registrar, or Coordinator."}
+            </p>
+            {!roleFilter && (
+              <Button onClick={() => dispatch({ type: 'OPEN_CREATE_DIALOG' })} className="mt-4 bg-blue-600 hover:bg-blue-700 text-white text-xs rounded-xl shadow-xs">
+                <Plus className="size-3.5 mr-1.5" /> Create First Role
+              </Button>
+            )}
           </CardContent>
         </Card>
       ) : viewMode === 'grid' ? (
-        <div className="grid gap-6" style={{ gridTemplateColumns: "repeat(auto-fill, minmax(350px, 1fr))" }}>
-          {roles.map((role: RoleRecord) => {
+        <div className="grid gap-5" style={{ gridTemplateColumns: "repeat(auto-fill, minmax(350px, 1fr))" }}>
+          {displayedRoles.map((role: RoleRecord) => {
             const count = allStaff.filter(u => u.customRole?.id === role.id).length;
             return (
               <RoleCard
@@ -310,7 +405,7 @@ export function AdminRoles() {
         </div>
       ) : (
         <RoleTable 
-          roles={roles.map(role => ({
+          roles={displayedRoles.map(role => ({
             ...role,
             userCount: allStaff.filter(u => u.customRole?.id === role.id).length
           }))}
@@ -321,6 +416,7 @@ export function AdminRoles() {
         />
       )}
 
+      {/* 4. Redesigned Create / Edit Role Modal */}
       <RoleDialog
         open={dialogOpen}
         onOpenChange={(v) => dispatch({ type: 'SET_DIALOG_OPEN', payload: v })}
@@ -337,6 +433,7 @@ export function AdminRoles() {
         onSave={handleSave}
       />
 
+      {/* 5. Assign Staff Dialog */}
       <AssignRoleDialog
         open={assignOpen}
         onOpenChange={(v) => dispatch({ type: 'SET_ASSIGN_OPEN', payload: v })}

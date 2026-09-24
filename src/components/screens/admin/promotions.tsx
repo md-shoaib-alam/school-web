@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useCallback, useReducer } from "react";
+import { useEffect, useCallback, useReducer, useMemo } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import {
@@ -21,6 +21,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { apiFetch, fetchAllStudents } from "@/lib/api";
+import { useAcademicYears } from "@/hooks/use-academic-years";
 
 import {
   PromotionRecord,
@@ -40,6 +41,15 @@ import { BulkPromotionDialog } from "./promotions/BulkPromotionDialog";
 import { RejectPromotionDialog } from "./promotions/RejectPromotionDialog";
 
 export function AdminPromotions({ initialTab: propTab }: { initialTab?: "individual" | "bulk" | "graduated" }) {
+  const { academicYears: dbAcademicYears = [] } = useAcademicYears();
+
+  const currentAcademicYear = useMemo(() => {
+    const currentObj = dbAcademicYears.find((ay: any) => ay.isCurrent);
+    if (currentObj?.name) return currentObj.name;
+    if (dbAcademicYears.length > 0) return dbAcademicYears[0].name;
+    return getCurrentAcademicYear();
+  }, [dbAcademicYears]);
+
   const [state, dispatch] = useReducer(
     promotionsReducer,
     getInitialState(propTab, getCurrentAcademicYear()),
@@ -180,14 +190,30 @@ export function AdminPromotions({ initialTab: propTab }: { initialTab?: "individ
     return () => { active = false; };
   }, [targetClassId, classes, students.length]);
 
+  // Sync academic year fields when currentAcademicYear resolves from database
+  useEffect(() => {
+    if (currentAcademicYear) {
+      dispatch({ type: "SET_BULK_ACADEMIC_YEAR", value: currentAcademicYear });
+      dispatch({ type: "SET_GRAD_ACADEMIC_YEAR", value: currentAcademicYear });
+      dispatch({ type: "SET_FORM", form: { ...form, academicYear: currentAcademicYear } });
+    }
+  }, [currentAcademicYear]);
+
   /* ---- Derived data ---- */
 
-  const academicYears = Array.from(
-    new Set([
-      ...promotions.map((p) => p.academicYear),
-      ...graduations.map((g) => g.academicYear),
-    ]),
-  ).sort();
+  const academicYears = useMemo(() => {
+    if (dbAcademicYears.length > 0) {
+      return dbAcademicYears.map((ay: any) => ay.name).filter(Boolean);
+    }
+    const names = new Set<string>();
+    promotions.forEach((p) => {
+      if (p.academicYear) names.add(p.academicYear);
+    });
+    graduations.forEach((g) => {
+      if (g.academicYear) names.add(g.academicYear);
+    });
+    return Array.from(names).filter(Boolean).sort().reverse();
+  }, [dbAcademicYears, promotions, graduations]);
 
   const summary = {
     total: promotions.length,
@@ -474,7 +500,7 @@ export function AdminPromotions({ initialTab: propTab }: { initialTab?: "individ
   /* ---- Render ---- */
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 pb-16">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
@@ -600,8 +626,8 @@ export function AdminPromotions({ initialTab: propTab }: { initialTab?: "individ
           <div className="flex-1" />
           
           <Button
-            className="bg-emerald-600 hover:bg-emerald-700 text-white gap-2 w-full md:w-auto"
-            onClick={() => dispatch({ type: "OPEN_NEW_PROMOTION_DIALOG", academicYear: getCurrentAcademicYear() })}
+            className="bg-blue-600 hover:bg-blue-700 text-white gap-2 w-full md:w-auto rounded-xl shadow-xs font-medium cursor-pointer"
+            onClick={() => dispatch({ type: "OPEN_NEW_PROMOTION_DIALOG", academicYear: currentAcademicYear })}
           >
             <Plus className="size-4" />
             <span>New Promotion</span>
@@ -633,6 +659,7 @@ export function AdminPromotions({ initialTab: propTab }: { initialTab?: "individ
           bulkPreview={bulkPreview}
           handleBulkPromote={handleBulkPromote}
           bulkSubmitting={bulkSubmitting}
+          academicYearOptions={academicYears}
         />
       )}
 
@@ -653,6 +680,7 @@ export function AdminPromotions({ initialTab: propTab }: { initialTab?: "individ
           handleGraduate={handleGraduate}
           gradSubmitting={gradSubmitting}
           graduations={graduations}
+          academicYearOptions={academicYears}
         />
       )}
 
@@ -661,12 +689,13 @@ export function AdminPromotions({ initialTab: propTab }: { initialTab?: "individ
         open={dialogOpen}
         onOpenChange={(val) => !val && dispatch({ type: "CLOSE_NEW_PROMOTION_DIALOG" })}
         form={form}
-          setForm={(val) => dispatch({ type: "SET_FORM", form: val })}
+        setForm={(val) => dispatch({ type: "SET_FORM", form: val })}
         students={students}
         classes={classes}
         submitting={submitting}
         handleCreatePromotion={handleCreatePromotion}
         handleStudentChange={handleStudentChange}
+        academicYearOptions={academicYears}
       />
 
       <BulkPromotionDialog
@@ -684,6 +713,7 @@ export function AdminPromotions({ initialTab: propTab }: { initialTab?: "individ
         bulkPreview={bulkPreview}
         handleBulkPromote={handleBulkPromote}
         bulkSubmitting={bulkSubmitting}
+        academicYearOptions={academicYears}
       />
 
       <RejectPromotionDialog

@@ -8,6 +8,10 @@ export interface TeacherInfo {
   status?: string;
   subjects?: string[];
   classes?: string[];
+  joiningDate?: string;
+  teacherId?: string;
+  address?: string;
+  role?: string;
 }
 
 export const avatarColors = [

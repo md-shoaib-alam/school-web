@@ -7,8 +7,6 @@ import {
 } from "@/lib/graphql/hooks";
 import { useQueryClient } from "@tanstack/react-query";
 import { queryKeys } from "@/lib/graphql/keys";
-import { Card, CardContent } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import {
   AlertDialog,
@@ -22,17 +20,18 @@ import {
 } from "@/components/ui/alert-dialog";
 import {
   Plus,
-  Search,
   LayoutGrid,
   List
 } from "lucide-react";
+import { SearchInput } from "@/components/ui/search-input";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { useAppStore } from "@/store/use-app-store";
 import { useStaff, useCustomRoles } from "@/lib/graphql/hooks";
 import { useModulePermissions } from "@/hooks/use-permissions";
-import { useDebounce } from "@/hooks/use-debounce";
 import { Pagination } from "@/components/shared/pagination";
+import { useSearchParams, useRouter, usePathname } from "next/navigation";
+import { apiFetch } from "@/lib/api";
 
 // Sub-components
 import { StaffTable } from "./staff/StaffTable";
@@ -40,6 +39,7 @@ import { StaffCard } from "./staff/StaffCard";
 import { StaffDialog } from "./staff/StaffDialog";
 import { StaffSkeleton } from "./staff/StaffSkeleton";
 import { StaffDetailDialog } from "./staff/StaffDetailDialog";
+import { StaffProfileView } from "./staff/StaffProfileView";
 
 // Types
 import { StaffMember, StaffFormData, emptyFormData } from "./staff/types";
@@ -174,7 +174,6 @@ export function AdminStaff() {
     viewingMember,
   } = state;
 
-  const debouncedSearch = useDebounce(search, 500);
 
   // --- Queries ---
   const { 
@@ -184,7 +183,7 @@ export function AdminStaff() {
   } = useStaff(
     currentTenantId || undefined, 
     "staff", 
-    debouncedSearch || undefined, 
+    search || undefined, 
     currentPage, 
     12
   );
@@ -237,7 +236,7 @@ export function AdminStaff() {
           customRole: roles.find(r => r.id === formData.customRoleId) || editingMember.customRole
         };
         
-        const queryKey = ["staff", currentTenantId, "staff", debouncedSearch || undefined, currentPage, 12];
+        const queryKey = ["staff", currentTenantId, "staff", search || undefined, currentPage, 12];
         queryClient.setQueryData(queryKey, (old: any) => {
           if (!old || !old.staff) return old;
           return {
@@ -323,93 +322,176 @@ export function AdminStaff() {
   const totalItems = staffResponse?.total || 0;
   const totalPages = staffResponse?.totalPages || 1;
 
-  return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
-        <div className="relative w-full sm:max-w-sm flex-1 order-2 sm:order-1">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
-          <Input
-            placeholder="Search by name, email, phone..."
-            className="pl-9 bg-white dark:bg-zinc-900 w-full"
-            value={search}
-            onChange={(e) => dispatch({ type: 'SET_SEARCH', payload: e.target.value })}
-          />
-        </div>
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const pathname = usePathname();
+  const staffUrlParam = searchParams.get("staff") || searchParams.get("staffId");
 
-        <div className="flex items-center justify-between sm:justify-start gap-3 w-full sm:w-auto order-1 sm:order-2">
-          <div className="flex items-center p-1 bg-zinc-100 dark:bg-zinc-800 rounded-lg">
-            <Button
-              variant="ghost"
-              size="sm"
-              className={cn(
-                "h-8 px-3 gap-2",
-                viewMode === 'table' && "bg-white dark:bg-zinc-700 shadow-sm text-emerald-600"
+  // Synchronize URL ?staff= query parameter into viewingMember on initial load, refresh, or URL change
+  useEffect(() => {
+    if (!staffUrlParam) {
+      if (viewingMember) {
+        dispatch({ type: 'CLOSE_VIEW' });
+      }
+      return;
+    }
+
+    // 1. Check if staff member is already in current staff list
+    const found = staff.find(
+      (m) => m.id === staffUrlParam || (m as any).username === staffUrlParam
+    );
+    if (found) {
+      if (viewingMember?.id !== found.id) {
+        dispatch({ type: 'OPEN_VIEW', payload: found });
+      }
+      return;
+    }
+
+    // 2. If not in current page list, fetch via API
+    let isMounted = true;
+    (async () => {
+      try {
+        const res = await apiFetch(`/api/staff?tenantId=${currentTenantId}&search=${encodeURIComponent(staffUrlParam)}`);
+        if (res.ok) {
+          const data = await res.json();
+          const items = Array.isArray(data) ? data : data.staff || [];
+          const match = items.find(
+            (m: any) => m.id === staffUrlParam || m.username === staffUrlParam
+          );
+          if (match && isMounted) {
+            dispatch({ type: 'OPEN_VIEW', payload: match });
+          }
+        }
+      } catch (err) {
+        console.error("Failed to load staff member from URL:", err);
+      }
+    })();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [staffUrlParam, staff, currentTenantId, viewingMember]);
+
+  const handleOpenView = (member: StaffMember) => {
+    dispatch({ type: 'OPEN_VIEW', payload: member });
+    const params = new URLSearchParams(searchParams.toString());
+    params.set("staff", (member as any).username || member.id);
+    const newQuery = params.toString();
+    router.push(newQuery ? `${pathname}?${newQuery}` : pathname, { scroll: false });
+  };
+
+  const handleCloseView = () => {
+    dispatch({ type: 'CLOSE_VIEW' });
+    const params = new URLSearchParams(searchParams.toString());
+    params.delete("staff");
+    params.delete("staffId");
+    const newQuery = params.toString();
+    router.replace(newQuery ? `${pathname}?${newQuery}` : pathname, { scroll: false });
+  };
+
+  if (loadingStaff || (staffUrlParam && !viewingMember)) return <StaffSkeleton />;
+
+  return (
+    <>
+      {viewingMember ? (
+        <StaffProfileView
+          member={viewingMember}
+          roles={roles}
+          onBack={handleCloseView}
+          canEdit={canEdit}
+          onEditModal={(m) => {
+            handleCloseView();
+            handleOpenEdit(m);
+          }}
+        />
+      ) : (
+        <div className="space-y-6">
+          {/* Header */}
+          <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
+            <SearchInput
+              id="search_staff"
+              value={search}
+              onChange={(val) => dispatch({ type: 'SET_SEARCH', payload: val })}
+              placeholder="Search by name, email, phone..."
+              delay={400}
+              className="w-full sm:max-w-sm flex-1 order-2 sm:order-1"
+            />
+
+            <div className="flex items-center gap-2 self-end sm:self-auto order-1 sm:order-2">
+              <div className="flex items-center bg-zinc-100 dark:bg-zinc-800 p-1 rounded-lg border border-zinc-200 dark:border-zinc-700">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className={cn(
+                    "h-8 px-3 gap-2",
+                    viewMode === 'table' && "bg-white dark:bg-zinc-700 shadow-sm text-emerald-600"
+                  )}
+                  onClick={() => toggleView('table')}
+                >
+                  <List className="size-4" />
+                  <span className="hidden sm:inline">List</span>
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className={cn(
+                    "h-8 px-3 gap-2",
+                    viewMode === 'grid' && "bg-white dark:bg-zinc-700 shadow-sm text-emerald-600"
+                  )}
+                  onClick={() => toggleView('grid')}
+                >
+                  <LayoutGrid className="size-4" />
+                  <span className="hidden sm:inline">Grid</span>
+                </Button>
+              </div>
+
+              {canCreate && (
+                <Button className="bg-emerald-600 hover:bg-emerald-700 text-white shadow-none shrink-0" onClick={handleOpenCreate}>
+                  <Plus className="size-4 mr-2" /> Add Staff
+                </Button>
               )}
-              onClick={() => toggleView('table')}
-            >
-              <List className="size-4" />
-              <span className="hidden sm:inline">List</span>
-            </Button>
-            <Button
-              variant="ghost"
-              size="sm"
-              className={cn(
-                "h-8 px-3 gap-2",
-                viewMode === 'grid' && "bg-white dark:bg-zinc-700 shadow-sm text-emerald-600"
-              )}
-              onClick={() => toggleView('grid')}
-            >
-              <LayoutGrid className="size-4" />
-              <span className="hidden sm:inline">Grid</span>
-            </Button>
+            </div>
           </div>
 
-          {canCreate && (
-            <Button className="bg-emerald-600 hover:bg-emerald-700 text-white shadow-none shrink-0" onClick={handleOpenCreate}>
-              <Plus className="size-4 mr-2" /> Add Staff
-            </Button>
-          )}
-        </div>
-      </div>
-
-      {/* Content */}
-      <div className={cn(viewMode === 'table' ? "bg-white dark:bg-zinc-950 rounded-xl border border-zinc-100 dark:border-zinc-800 overflow-hidden" : "")}>
-          {loadingStaff ? (
-            <StaffSkeleton />
-          ) : viewMode === 'table' ? (
-            <StaffTable
-              staff={staff}
-              onEdit={handleOpenEdit}
-              onDelete={(m) => dispatch({ type: 'OPEN_DELETE', payload: m })}
-              onView={(m) => dispatch({ type: 'OPEN_VIEW', payload: m })}
-              canEdit={canEdit}
-              canDelete={canDelete}
-            />
-          ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-4">
-              {staff.map((member) => (
-                <StaffCard
-                  key={member.id}
-                  member={member}
+          {/* Content */}
+          <div className={cn(viewMode === 'table' ? "bg-white dark:bg-zinc-950 rounded-xl border border-zinc-100 dark:border-zinc-800 overflow-hidden" : "")}>
+              {loadingStaff ? (
+                <StaffSkeleton />
+              ) : viewMode === 'table' ? (
+                <StaffTable
+                  staff={staff}
                   onEdit={handleOpenEdit}
                   onDelete={(m) => dispatch({ type: 'OPEN_DELETE', payload: m })}
-                  onView={(m) => dispatch({ type: 'OPEN_VIEW', payload: m })}
+                  onView={handleOpenView}
                   canEdit={canEdit}
                   canDelete={canDelete}
                 />
-              ))}
-            </div>
-          )}
-      </div>
+              ) : (
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-4">
+                  {staff.map((member) => (
+                    <StaffCard
+                      key={member.id}
+                      member={member}
+                      onEdit={handleOpenEdit}
+                      onDelete={(m) => dispatch({ type: 'OPEN_DELETE', payload: m })}
+                      onView={handleOpenView}
+                      canEdit={canEdit}
+                      canDelete={canDelete}
+                    />
+                  ))}
+                </div>
+              )}
+          </div>
 
-      <Pagination
-        currentPage={currentPage}
-        totalPages={totalPages}
-        totalItems={totalItems}
-        itemsPerPage={12}
-        onPageChange={(page) => dispatch({ type: 'SET_CURRENT_PAGE', payload: page })}
-      />
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            totalItems={totalItems}
+            itemsPerPage={12}
+            onPageChange={(page) => dispatch({ type: 'SET_CURRENT_PAGE', payload: page })}
+          />
+        </div>
+      )}
 
       {/* Dialogs */}
       <StaffDialog
@@ -421,14 +503,6 @@ export function AdminStaff() {
         roles={roles}
         submitting={submitting}
         onSubmit={handleSubmit}
-      />
-
-      <StaffDetailDialog
-        open={viewDialogOpen}
-        onOpenChange={(open) => {
-          if (!open) dispatch({ type: 'CLOSE_VIEW' });
-        }}
-        member={viewingMember}
       />
 
       <AlertDialog open={deleteAlertOpen} onOpenChange={(open) => dispatch({ type: open ? 'CLOSE_DELETE' : 'CLOSE_DELETE' })}>
@@ -447,6 +521,6 @@ export function AdminStaff() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-    </div>
+    </>
   );
 }

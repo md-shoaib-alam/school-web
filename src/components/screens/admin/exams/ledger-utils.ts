@@ -72,7 +72,7 @@ export const compileTabularLedgerData = async ({
 
     const completedExams = (examData.data || examData || []).filter(
       (e: ExamRecord) => {
-        const matchesBasic = e.status === 'completed' && e.academicYear === academicYear;
+        const matchesBasic = (e.status === 'published' || e.isPublished === true) && e.academicYear === academicYear;
         if (!matchesBasic) return false;
         if (examName) {
           const cycleName = e.name.includes(' - ') ? e.name.split(' - ')[0] : e.name;

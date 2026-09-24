@@ -19,6 +19,9 @@ import { ActiveExamsView } from './exams/ActiveExamsView';
 import { PublishedResultsView } from './exams/PublishedResultsView';
 import { TabulationLedgerPreviewPage } from './exams/TabulationLedgerPreviewPage';
 import { useExamsState } from './exams/useExamsState';
+import { CreateExamWizard } from './exams/CreateExamWizard';
+import { useQueryClient } from '@tanstack/react-query';
+import { useState } from 'react';
 
 // Dynamic loading for "Low Stack" performance optimization
 const ResultsView = dynamic(() => import('./exams/ResultsView').then(m => m.ResultsView), {
@@ -27,12 +30,58 @@ const ResultsView = dynamic(() => import('./exams/ResultsView').then(m => m.Resu
 
 function AdminExamsContent({ initialTab = 'exams' }: { initialTab?: string }) {
   const state = useExamsState(initialTab);
+  const queryClient = useQueryClient();
+  const [searchQuery, setSearchQuery] = useState('');
+
+  if (state.addOpen) {
+    return (
+      <CreateExamWizard
+        onCancel={() => state.setAddOpen(false)}
+        classes={state.classes}
+        subjects={state.subjects}
+        academicYears={state.academicYears}
+        currentAcademicYear={state.currentAcademicYear}
+        teachers={state.teachers}
+        onSuccess={() => {
+          state.setAddOpen(false);
+          queryClient.invalidateQueries({ queryKey: ['exams'] });
+        }}
+      />
+    );
+  }
+
+  const examToEdit = state.editingExam || (state.editOpen && state.editForm?.id ? state.editForm : null);
+  if (examToEdit) {
+    return (
+      <CreateExamWizard
+        initialExam={examToEdit}
+        onCancel={() => {
+          state.setEditingExam(null);
+          state.setEditOpen(false);
+        }}
+        classes={state.classes}
+        subjects={state.subjects}
+        academicYears={state.academicYears}
+        currentAcademicYear={state.currentAcademicYear}
+        teachers={state.teachers}
+        onSuccess={() => {
+          state.setEditingExam(null);
+          state.setEditOpen(false);
+          queryClient.invalidateQueries({ queryKey: ['exams'] });
+        }}
+      />
+    );
+  }
 
   return (
     <div className="space-y-6">
       <ExamsHeader 
         activeTab={state.activeTab} 
-        onNewExamClick={() => state.setAddOpen(true)} 
+        onNewExamClick={() => state.setAddOpen(true)}
+        academicYears={state.academicYears}
+        currentAcademicYear={state.currentAcademicYear}
+        selectedAcademicYear={state.publishedAcademicYearFilter || state.currentAcademicYear}
+        onAcademicYearChange={state.setPublishedAcademicYearFilter}
       />
 
       <Tabs value={state.activeTab} onValueChange={(v) => v === 'exams' ? state.backToExams() : state.setActiveTab(v)}>
@@ -44,7 +93,10 @@ function AdminExamsContent({ initialTab = 'exams' }: { initialTab?: string }) {
             loadingExams={state.loadingExams}
             deleting={state.deleting}
             handleDelete={state.handleDelete}
-            setEditForm={state.setEditForm}
+            setEditForm={(exam) => {
+              state.setEditForm(exam);
+              state.setEditingExam(exam);
+            }}
             setEditOpen={state.setEditOpen}
             handleOpenViewResults={state.handleOpenViewResults}
             formatDate={formatDate}
@@ -53,6 +105,11 @@ function AdminExamsContent({ initialTab = 'exams' }: { initialTab?: string }) {
             getExamTypeBadge={getExamTypeBadge}
             classFilter={state.classFilter}
             setClassFilter={state.setClassFilter}
+            onNewExamClick={() => state.setAddOpen(true)}
+            onOpenResultsEntry={state.openResultsEntry}
+            onRefreshData={() => queryClient.invalidateQueries({ queryKey: ['exams'] })}
+            searchQuery={searchQuery}
+            onSearchChange={setSearchQuery}
           />
         </TabsContent>
 
@@ -71,7 +128,20 @@ function AdminExamsContent({ initialTab = 'exams' }: { initialTab?: string }) {
             onSave={state.handleSaveResults} 
             onPublish={state.handlePublish} 
             isPublishing={state.isPublishing}
-            onUpdateMark={(id, m) => state.setResultRows(prev => prev.map(r => r.studentId === id ? { ...r, marksObtained: m, status: Number(m) >= (state.selectedExam?.passingMarks || 40) ? 'pass' : 'fail' } : r))}
+            onUpdateMark={(id, m) => state.setResultRows(prev => prev.map(r => {
+              if (r.studentId !== id) return r;
+              const trimmed = m.trim();
+              if (trimmed === '') {
+                return { ...r, marksObtained: '', status: 'pending' };
+              }
+              const num = Number(trimmed);
+              const passingMarks = state.selectedExam?.passingMarks || 40;
+              return {
+                ...r,
+                marksObtained: m,
+                status: !isNaN(num) && num >= passingMarks ? 'pass' : 'fail'
+              };
+            }))}
             formatDate={formatDate} 
             formatTime={formatTime}
             getStatusBadge={getStatusBadge} 
@@ -105,7 +175,10 @@ function AdminExamsContent({ initialTab = 'exams' }: { initialTab?: string }) {
               loadingExams={state.loadingExams}
               deleting={state.deleting}
               handleDelete={state.handleDelete}
-              setEditForm={state.setEditForm}
+              setEditForm={(exam) => {
+                state.setEditForm(exam);
+                state.setEditingExam(exam);
+              }}
               setEditOpen={state.setEditOpen}
               handleOpenViewResults={state.handleOpenViewResults}
               formatDate={formatDate}

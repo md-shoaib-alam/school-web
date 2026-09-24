@@ -11,11 +11,11 @@ import { useQueryClient } from "@tanstack/react-query";
 import { queryKeys } from "@/lib/graphql/keys";
 import { Pagination } from "@/components/shared/pagination";
 import { useSearchParams, useRouter, usePathname } from "next/navigation";
-import { useDebounce } from "@/hooks/use-debounce";
 
 // Sub-components
 import { TeacherDialog } from "./teachers/TeacherDialog";
 import { TeacherDetailDialog } from "./teachers/TeacherDetailDialog";
+import { TeacherProfileView } from "./teachers/TeacherProfileView";
 import { TeacherSkeleton } from "./teachers/TeacherSkeleton";
 import { TeachersHeader } from "./teachers/TeachersHeader";
 import { TeachersTableView } from "./teachers/TeachersTableView";
@@ -28,9 +28,18 @@ const emptyFormData = {
   name: "",
   email: "",
   phone: "",
-  qualification: "",
+  qualification: "B.Ed",
   experience: "",
   password: "",
+  gender: "male",
+  dateOfBirth: "",
+  teacherId: "",
+  alternatePhone: "",
+  address: "",
+  role: "Faculty Member",
+  subjects: "Mathematics",
+  joiningDate: "",
+  status: "active",
 };
 
 function validateTeacherForm(formData: typeof emptyFormData): boolean {
@@ -137,16 +146,7 @@ export function AdminTeachers() {
   const [state, dispatch] = useReducer(reducer, initialState);
   const { search, currentPage, itemsPerPage, dialogOpen, editingTeacher, formData, submitting, deletingId } = state;
  
-   const [viewingTeacher, setViewingTeacher] = useState<TeacherInfo | null>(null);
-   const [viewDialogOpen, setViewDialogOpen] = useState(false);
- 
-   const handleOpenView = (teacher: TeacherInfo) => {
-     setViewingTeacher(teacher);
-     setViewDialogOpen(true);
-   };
- 
-   const debouncedSearch = useDebounce(search, 500);
- 
+
    const queryClient = useQueryClient();
  
    const searchParams = useSearchParams();
@@ -154,6 +154,7 @@ export function AdminTeachers() {
   const pathname = usePathname();
   const pageParam = searchParams.get("page");
   const limitParam = searchParams.get("limit");
+  const teacherUrlParam = searchParams.get("teacher") || searchParams.get("teacherId");
 
   // Sync initial URL search params into state (run once on mount)
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -176,9 +177,9 @@ export function AdminTeachers() {
     router.replace(newQuery ? `${pathname}?${newQuery}` : pathname, { scroll: false });
   };
 
-  const { data: teachersData, isFetching: loading } = useTeachers(
+  const { data: teachersData, isLoading: loading } = useTeachers(
      currentTenantId || undefined,
-     debouncedSearch || undefined,
+     search || undefined,
      currentPage,
      itemsPerPage,
    );
@@ -204,11 +205,16 @@ export function AdminTeachers() {
       payload: {
         teacher,
         formData: {
+          ...emptyFormData,
           name: teacher.name,
           email: teacher.email,
           phone: teacher.phone || "",
-          qualification: teacher.qualification || "",
+          qualification: teacher.qualification || "B.Ed",
           experience: teacher.experience || "",
+          address: teacher.address || "",
+          role: teacher.role || "Faculty Member",
+          joiningDate: teacher.joiningDate || "",
+          status: teacher.status || "active",
           password: "",
         },
       },
@@ -246,7 +252,7 @@ export function AdminTeachers() {
     }
 
     const isEdit = !!editingTeacher;
-    const queryKey = [queryKeys.teachers, currentTenantId, debouncedSearch, currentPage, 12];
+    const queryKey = [queryKeys.teachers, currentTenantId, search, currentPage, 12];
 
     if (isEdit && editingTeacher) {
       updateTeacherOptimistic(queryClient, queryKey, editingTeacher, formData);
@@ -291,7 +297,7 @@ export function AdminTeachers() {
   };
 
   const executeDeletion = async (id: string) => {
-    const queryKey = [queryKeys.teachers, currentTenantId, debouncedSearch, currentPage, 12];
+    const queryKey = [queryKeys.teachers, currentTenantId, search, currentPage, 12];
     const previousTeachers = queryClient.getQueryData(queryKey);
     
     deleteTeacherFromCache(queryKey, id);
@@ -309,6 +315,109 @@ export function AdminTeachers() {
   const handleDelete = async (id: string) => {
     executeDeletion(id);
   };
+
+  const [viewingTeacherSnapshot, setViewingTeacherSnapshot] = useState<TeacherInfo | null>(null);
+
+  // Synchronize URL ?teacher= query parameter into viewingTeacher on initial load, refresh, or URL change
+  useEffect(() => {
+    if (!teacherUrlParam) {
+      if (viewingTeacherSnapshot) {
+        setViewingTeacherSnapshot(null);
+      }
+      return;
+    }
+
+    // 1. Check if teacher is already in current teachers list
+    const found = teachers.find(
+      (t) => t.id === teacherUrlParam || (t as any).teacherId === teacherUrlParam || (t as any).username === teacherUrlParam
+    );
+    if (found) {
+      if (viewingTeacherSnapshot?.id !== found.id) {
+        setViewingTeacherSnapshot(found);
+      }
+      return;
+    }
+
+    // 2. If not in current page list, fetch this specific teacher
+    let isMounted = true;
+    (async () => {
+      try {
+        const res = await apiFetch(`/api/teachers?tenantId=${currentTenantId}&search=${encodeURIComponent(teacherUrlParam)}`);
+        if (res.ok) {
+          const data = await res.json();
+          const items = Array.isArray(data) ? data : data.teachers || [];
+          const match = items.find(
+            (t: any) => t.id === teacherUrlParam || t.teacherId === teacherUrlParam || t.username === teacherUrlParam
+          );
+          if (match && isMounted) {
+            setViewingTeacherSnapshot(match);
+          }
+        }
+      } catch (err) {
+        console.error("Failed to load teacher from URL:", err);
+      }
+    })();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [teacherUrlParam, teachers, currentTenantId]);
+
+  // Derive viewing teacher dynamically from the latest teachers list
+  const viewingTeacher = useMemo(() => {
+    if (!viewingTeacherSnapshot) return null;
+    return teachers.find((t) => t.id === viewingTeacherSnapshot.id) || viewingTeacherSnapshot;
+  }, [teachers, viewingTeacherSnapshot]);
+
+  const handleOpenView = (teacher: TeacherInfo) => {
+    setViewingTeacherSnapshot(teacher);
+    const params = new URLSearchParams(searchParams.toString());
+    params.set("teacher", (teacher as any).teacherId || (teacher as any).username || teacher.id);
+    const newQuery = params.toString();
+    router.push(newQuery ? `${pathname}?${newQuery}` : pathname, { scroll: false });
+  };
+
+  const handleCloseView = () => {
+    setViewingTeacherSnapshot(null);
+    const params = new URLSearchParams(searchParams.toString());
+    params.delete("teacher");
+    params.delete("teacherId");
+    const newQuery = params.toString();
+    router.replace(newQuery ? `${pathname}?${newQuery}` : pathname, { scroll: false });
+  };
+
+  if (loading || (teacherUrlParam && !viewingTeacher)) return <TeacherSkeleton />;
+
+  if (viewingTeacher) {
+    return (
+      <div className="space-y-6">
+        <TeacherProfileView
+          teacher={viewingTeacher}
+          onBack={handleCloseView}
+          canEdit={canEdit}
+          onEdit={(teacher) => {
+            handleCloseView();
+            handleOpenEdit(teacher);
+          }}
+        />
+
+        <TeacherDialog
+          open={dialogOpen}
+          onOpenChange={(open) => {
+            if (!open) {
+              dispatch({ type: "CLOSE_DIALOG" });
+            }
+          }}
+          editingTeacher={editingTeacher}
+          formData={formData}
+          setFormData={(data: any) => dispatch({ type: "SET_FORM_DATA", payload: data })}
+          submitting={submitting}
+          onSubmit={handleSubmit}
+          isFormValid={formData.name.trim() !== "" && formData.email.trim() !== ""}
+        />
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -379,8 +488,6 @@ export function AdminTeachers() {
         onOpenChange={(open) => {
           if (!open) {
             dispatch({ type: "CLOSE_DIALOG" });
-          } else {
-            // This case might not be triggered from the dialog itself but handle open change
           }
         }}
         editingTeacher={editingTeacher}
@@ -389,12 +496,6 @@ export function AdminTeachers() {
         submitting={submitting}
         onSubmit={handleSubmit}
         isFormValid={formData.name.trim() !== "" && formData.email.trim() !== ""}
-      />
-
-      <TeacherDetailDialog
-        open={viewDialogOpen}
-        onOpenChange={setViewDialogOpen}
-        teacher={viewingTeacher}
       />
     </div>
   );

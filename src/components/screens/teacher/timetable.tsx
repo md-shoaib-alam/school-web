@@ -827,13 +827,20 @@ function LoadingSkeleton() {
 
 function EmptyState() {
   return (
-    <div className="text-center py-16 text-zinc-400 dark:text-zinc-500">
-      <BookOpen className="size-12 mx-auto mb-4 opacity-50" />
-      <p className="text-lg font-medium text-zinc-500 dark:text-zinc-400">
-        No timetable available
-      </p>
-      <p className="text-sm mt-1">
-        Timetable will appear once classes are assigned
+    <div className="flex flex-col items-center justify-center py-12 sm:py-16 md:py-20 px-4 text-center animate-in fade-in-50 duration-300">
+      <div className="relative mb-6 flex items-center justify-center">
+        <img
+          src="/assets/admin/timetable.avif"
+          alt="No timetable records"
+          className="w-44 h-44 sm:w-56 sm:h-56 md:w-64 md:h-64 object-contain drop-shadow-sm select-none pointer-events-none"
+          loading="eager"
+        />
+      </div>
+      <h3 className="text-xl sm:text-2xl font-bold text-zinc-900 dark:text-zinc-100 tracking-tight">
+        No timetable records found
+      </h3>
+      <p className="text-xs sm:text-sm text-muted-foreground max-w-lg mx-auto mt-2 sm:mt-2.5 leading-relaxed">
+        Timetable schedules will appear here once classes and time slots are assigned by your administrator.
       </p>
     </div>
   );

@@ -1,4 +1,6 @@
-import { Crown, IndianRupee, Building2, Plus, Search, Check, ChevronsUpDown, Loader2 } from "lucide-react";
+"use client";
+
+import { Crown, IndianRupee, Building2, Plus, Search, Check, ChevronsUpDown, Loader2, Users, BarChart3, UserX, ChevronDown, ChevronUp } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useState, useMemo, useRef, useCallback } from "react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
@@ -33,6 +35,7 @@ export function SubscriptionStats({
   onTenantSearchChange,
 }: SubscriptionStatsProps) {
   const [open, setOpen] = useState(false);
+  const [showStatsOnMobile, setShowStatsOnMobile] = useState(false);
 
   const observer = useRef<IntersectionObserver | null>(null);
   const lastTenantElementRef = useCallback((node: HTMLButtonElement | null) => {
@@ -51,41 +54,51 @@ export function SubscriptionStats({
       t.name.toLowerCase().includes(tenantSearch.toLowerCase())
     );
   }, [tenants, tenantSearch]);
+
+  const activePlans = stats?.activeSubscriptions || 0;
+  const totalRevenue = stats?.totalRevenue || 0;
+  const avgValue = stats?.totalSubscriptions
+    ? Math.round(totalRevenue / stats.totalSubscriptions)
+    : 0;
+  const nonSubscribers = !selectedTenant
+    ? null
+    : Math.max(0, parentsTotal - (stats?.totalSubscriptions || 0));
+
   return (
-    <div className="rounded-xl border bg-card p-6">
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div className="flex items-center gap-4">
-          <div className="size-12 rounded-xl bg-muted flex items-center justify-center border">
-            <Crown className="size-6 text-muted-foreground" />
+    <div className="space-y-4">
+      {/* 1. Header Card: School selector + New Setup button */}
+      <div className="rounded-2xl border border-border bg-card shadow-2xs p-3.5 sm:p-5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+        {/* Title: hidden on mobile because the hero banner above already has this title */}
+        <div className="hidden sm:flex items-center gap-3">
+          <div className="size-9 rounded-xl bg-blue-50 dark:bg-blue-950/50 flex items-center justify-center shrink-0 border border-blue-100 dark:border-blue-900/50">
+            <Crown className="size-4.5 text-blue-600 dark:text-blue-400" />
           </div>
           <div>
-            <h2 className="text-2xl font-semibold tracking-tight">
-              B2C User Subscriptions
-            </h2>
-            <p className="text-muted-foreground text-sm">
-              Manage premium access across all schools
-            </p>
+            <h3 className="text-sm sm:text-base font-bold text-foreground">B2C User Subscriptions</h3>
+            <p className="text-xs text-muted-foreground">Manage premium access across all schools</p>
           </div>
         </div>
 
-        <div className="flex items-center gap-3">
-          <div className="rounded-lg border p-1 flex items-center gap-2">
-            <Building2 className="size-4 ml-2 text-muted-foreground" />
+        {/* Controls — full-width row on mobile, auto on desktop */}
+        <div className="flex items-center gap-2 w-full sm:w-auto">
+          {/* School selector — grows to fill on mobile */}
+          <div className="flex items-center gap-1.5 rounded-xl border border-border bg-muted/40 hover:bg-muted/60 px-2.5 h-9 flex-1 sm:flex-none transition-colors">
+            <Building2 className="size-3.5 text-muted-foreground shrink-0" />
             <Popover open={open} onOpenChange={setOpen}>
               <PopoverTrigger asChild>
                 <Button
                   variant="ghost"
                   role="combobox"
                   aria-expanded={open}
-                  className="w-[200px] justify-between cursor-pointer capitalize hover:bg-muted h-8 font-normal px-2 text-xs"
+                  className="flex-1 sm:w-[190px] justify-between cursor-pointer h-7 font-semibold px-1 text-xs hover:bg-transparent"
                 >
                   <span className="truncate">
                     {selectedTenant ? (tenants.find(t => t.id === selectedTenant)?.name || "Select School") : "Select School"}
                   </span>
-                  <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                  <ChevronsUpDown className="ml-1 h-3.5 w-3.5 shrink-0 opacity-50" />
                 </Button>
               </PopoverTrigger>
-              <PopoverContent className="w-[260px] p-0 border bg-popover shadow-md" align="end">
+              <PopoverContent className="w-[280px] p-0 border border-border rounded-xl bg-popover shadow-xl" align="end">
                 <div className="flex items-center border-b px-3 border-border">
                   <Search className="mr-2 h-4 w-4 shrink-0 opacity-50" />
                   <Input
@@ -96,7 +109,6 @@ export function SubscriptionStats({
                   />
                 </div>
                 <ScrollArea className="h-48 p-1">
-
                   {filteredTenants.length === 0 ? (
                     <div className="p-3 text-xs text-muted-foreground text-center">No schools found.</div>
                   ) : (
@@ -114,7 +126,7 @@ export function SubscriptionStats({
                         >
                           <span className="font-medium truncate pr-2">{t.name}</span>
                           {selectedTenant === t.id && (
-                            <Check className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
+                            <Check className="h-3.5 w-3.5 text-primary shrink-0" />
                           )}
                         </button>
                       ))}
@@ -130,57 +142,110 @@ export function SubscriptionStats({
               </PopoverContent>
             </Popover>
           </div>
-          {selectedTenant !== "all" && (
-            <Button
-              variant="outline"
-              onClick={onNewSetup}
-            >
-              <Plus className="size-4 mr-2" /> New Setup
-            </Button>
-          )}
+
+          {/* New Setup button */}
+          <Button
+            className="h-9 px-3.5 sm:px-4 text-xs sm:text-sm font-semibold rounded-xl gap-1.5 bg-blue-600 hover:bg-blue-700 text-white shrink-0 shadow-xs cursor-pointer"
+            onClick={onNewSetup}
+          >
+            <Plus className="size-3.5" />
+            <span>New Setup</span>
+          </Button>
         </div>
       </div>
 
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-6">
-        <div className="rounded-xl border p-3">
-          <p className="text-xs font-medium text-muted-foreground">
-            Active plans
-          </p>
-          <p className="text-2xl font-semibold mt-0.5">
-            {stats?.activeSubscriptions || 0}
-          </p>
-        </div>
-        <div className="rounded-xl border p-3">
-          <p className="text-xs font-medium text-muted-foreground">
-            Total revenue
-          </p>
-          <p className="text-2xl font-semibold mt-0.5 flex items-center gap-1">
-            <IndianRupee className="size-3.5" />
-            {(stats?.totalRevenue || 0).toLocaleString()}
-          </p>
-        </div>
-        <div className="rounded-xl border p-3">
-          <p className="text-xs font-medium text-muted-foreground">
-            Avg plan value
-          </p>
-          <p className="text-2xl font-semibold mt-0.5 flex items-center gap-1">
-            <IndianRupee className="size-3.5" />
-            {stats?.totalSubscriptions
-              ? Math.round(
-                  stats.totalRevenue / stats.totalSubscriptions,
-                ).toLocaleString()
-              : 0}
-          </p>
-        </div>
-        <div className="rounded-xl border p-3">
-          <p className="text-xs font-medium text-muted-foreground">
-            Non-subscribers
-          </p>
-          <p className="text-2xl font-semibold mt-0.5">
-            {!selectedTenant
-              ? "\u2013"
-              : Math.max(0, parentsTotal - (stats?.totalSubscriptions || 0))}
-          </p>
+      {/* Mobile Toggle Dropdown Button for Stats */}
+      <div className="flex sm:hidden items-center justify-between">
+        <button
+          type="button"
+          onClick={() => setShowStatsOnMobile((prev) => !prev)}
+          className="w-full flex items-center justify-between px-3.5 py-2 rounded-xl border border-border bg-card hover:bg-muted/40 text-xs font-semibold text-foreground transition-all shadow-2xs cursor-pointer"
+        >
+          <div className="flex items-center gap-2">
+            <div className="size-6 rounded-lg bg-blue-50 dark:bg-blue-950/50 text-blue-600 dark:text-blue-400 flex items-center justify-center">
+              <BarChart3 className="size-3.5" />
+            </div>
+            <span>Subscription Overview Stats</span>
+          </div>
+          <div className="flex items-center gap-1 text-[11px] text-muted-foreground">
+            <span>{showStatsOnMobile ? "Hide" : "Show"}</span>
+            {showStatsOnMobile ? (
+              <ChevronUp className="size-3.5" />
+            ) : (
+              <ChevronDown className="size-3.5" />
+            )}
+          </div>
+        </button>
+      </div>
+
+      {/* 2. Separate Stats Card — collapsible on mobile, always visible on desktop */}
+      <div className={`${showStatsOnMobile ? "block" : "hidden"} sm:block rounded-2xl border border-border bg-card shadow-2xs overflow-hidden`}>
+        <div className="grid grid-cols-2 lg:grid-cols-4 divide-x divide-y lg:divide-y-0 divide-border">
+          {/* Active Plans */}
+          <div className="px-3 sm:px-5 py-3 sm:py-4 flex items-start justify-between gap-1">
+            <div className="min-w-0 flex-1">
+              <div className="flex items-center gap-1.5 sm:gap-2 mb-1">
+                <div className="size-7 sm:size-8 rounded-lg bg-emerald-50 dark:bg-emerald-900/20 flex items-center justify-center shrink-0">
+                  <Users className="size-3.5 sm:size-4 text-emerald-600 dark:text-emerald-400" />
+                </div>
+                <p className="text-xs text-muted-foreground font-medium leading-tight">Active plans</p>
+              </div>
+              <p className="text-xl sm:text-2xl font-bold text-foreground mt-1">{activePlans}</p>
+              <p className="text-xs text-emerald-600 dark:text-emerald-400 mt-0.5 font-medium">+0 this month</p>
+            </div>
+          </div>
+
+          {/* Total Revenue */}
+          <div className="px-3 sm:px-5 py-3 sm:py-4 flex items-start justify-between gap-1">
+            <div className="min-w-0 flex-1">
+              <div className="flex items-center gap-1.5 sm:gap-2 mb-1">
+                <div className="size-7 sm:size-8 rounded-lg bg-violet-50 dark:bg-violet-900/20 flex items-center justify-center shrink-0">
+                  <IndianRupee className="size-3.5 sm:size-4 text-violet-600 dark:text-violet-400" />
+                </div>
+                <p className="text-xs text-muted-foreground font-medium leading-tight">Total revenue</p>
+              </div>
+              <p className="text-xl sm:text-2xl font-bold text-foreground mt-1 flex items-center gap-0.5">
+                <span className="text-sm sm:text-base font-semibold">₹</span>
+                {totalRevenue.toLocaleString()}
+              </p>
+              <p className="text-xs text-emerald-600 dark:text-emerald-400 mt-0.5 font-medium">+0 this month</p>
+            </div>
+          </div>
+
+          {/* Avg Plan Value */}
+          <div className="px-3 sm:px-5 py-3 sm:py-4 flex items-start justify-between gap-1">
+            <div className="min-w-0 flex-1">
+              <div className="flex items-center gap-1.5 sm:gap-2 mb-1">
+                <div className="size-7 sm:size-8 rounded-lg bg-blue-50 dark:bg-blue-900/20 flex items-center justify-center shrink-0">
+                  <BarChart3 className="size-3.5 sm:size-4 text-blue-600 dark:text-blue-400" />
+                </div>
+                <p className="text-xs text-muted-foreground font-medium leading-tight">Avg plan value</p>
+              </div>
+              <p className="text-xl sm:text-2xl font-bold text-foreground mt-1 flex items-center gap-0.5">
+                <span className="text-sm sm:text-base font-semibold">₹</span>
+                {avgValue.toLocaleString()}
+              </p>
+              <p className="text-xs text-emerald-600 dark:text-emerald-400 mt-0.5 font-medium">+0 this month</p>
+            </div>
+          </div>
+
+          {/* Non-subscribers */}
+          <div className="px-3 sm:px-5 py-3 sm:py-4 flex items-start justify-between gap-1">
+            <div className="min-w-0 flex-1">
+              <div className="flex items-center gap-1.5 sm:gap-2 mb-1">
+                <div className="size-7 sm:size-8 rounded-lg bg-orange-50 dark:bg-orange-900/20 flex items-center justify-center shrink-0">
+                  <UserX className="size-3.5 sm:size-4 text-orange-600 dark:text-orange-400" />
+                </div>
+                <p className="text-xs text-muted-foreground font-medium leading-tight">Non-subscribers</p>
+              </div>
+              <p className="text-xl sm:text-2xl font-bold text-foreground mt-1">
+                {nonSubscribers === null ? "–" : nonSubscribers}
+              </p>
+              <p className="text-xs text-muted-foreground mt-0.5 font-medium">
+                {nonSubscribers === null ? "No data yet" : "without a plan"}
+              </p>
+            </div>
+          </div>
         </div>
       </div>
     </div>

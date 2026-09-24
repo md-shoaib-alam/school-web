@@ -31,6 +31,33 @@ export function parseLocalDate(dateStr?: string): Date | undefined {
 }
 
 /**
+ * Formats a date string (YYYY-MM-DD) or Date object to dd/mm/yyyy.
+ */
+export function formatToDdMmYyyy(dateInput?: string | Date | null): string {
+  if (!dateInput) return '-';
+  if (typeof dateInput === 'string') {
+    const parts = dateInput.split('-');
+    if (parts.length === 3) {
+      const [y, m, d] = parts;
+      const cleanD = d.split('T')[0]; // in case of ISO string
+      return `${cleanD.padStart(2, '0')}/${m.padStart(2, '0')}/${y}`;
+    }
+    const d = new Date(dateInput);
+    if (!isNaN(d.getTime())) {
+      const day = String(d.getDate()).padStart(2, '0');
+      const month = String(d.getMonth() + 1).padStart(2, '0');
+      const year = d.getFullYear();
+      return `${day}/${month}/${year}`;
+    }
+    return dateInput;
+  }
+  const day = String(dateInput.getDate()).padStart(2, '0');
+  const month = String(dateInput.getMonth() + 1).padStart(2, '0');
+  const year = dateInput.getFullYear();
+  return `${day}/${month}/${year}`;
+}
+
+/**
  * Safely copies text to the clipboard, falling back to document.execCommand
  * if navigator.clipboard is unavailable (such as in non-secure HTTP contexts).
  */

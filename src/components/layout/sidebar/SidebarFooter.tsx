@@ -16,6 +16,7 @@ import type { AppUser } from "@/store/use-app-store";
 
 interface SidebarFooterProps {
   isSuperAdmin: boolean;
+  isModernUI?: boolean;
   sidebarOpen: boolean;
   currentUser: AppUser;
   initials: string;
@@ -29,6 +30,7 @@ interface SidebarFooterProps {
 
 export function SidebarFooter({
   isSuperAdmin,
+  isModernUI = true,
   sidebarOpen,
   currentUser,
   initials,
@@ -109,9 +111,9 @@ export function SidebarFooter({
   return (
     <div
       className={cn(
-        isSuperAdmin
+        isModernUI
           ? cn(
-              "p-3 border-t border-slate-200/80 dark:border-slate-800 space-y-3",
+              "p-3 border-t border-slate-200/80 dark:border-zinc-800/80 space-y-3",
               !sidebarOpen && "flex flex-col items-center justify-center p-2"
             )
           : isMinimal
@@ -125,33 +127,33 @@ export function SidebarFooter({
       )}
     >
       {/* "Need Help?" widget matching reference image bottom left */}
-      {isSuperAdmin && sidebarOpen && (
-        <div className="rounded-2xl border border-blue-100 dark:border-blue-900/40 bg-blue-50/50 dark:bg-blue-950/30 p-3.5 space-y-2.5">
+      {isModernUI && sidebarOpen && (
+        <div className="rounded-2xl border border-slate-200/80 dark:border-zinc-800/80 bg-slate-50/50 dark:bg-zinc-900/40 p-3.5 space-y-2.5">
           <div className="flex items-center gap-2.5">
-            <div className="size-8 rounded-full bg-blue-100 dark:bg-blue-900/50 flex items-center justify-center text-blue-600 dark:text-blue-400 shrink-0">
+            <div className="size-8 rounded-full bg-blue-50 dark:bg-zinc-800 flex items-center justify-center text-blue-600 dark:text-blue-400 shrink-0">
               <svg className="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M3 18v-6a9 9 0 0 1 18 0v6" />
                 <path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z" />
               </svg>
             </div>
             <div>
-              <p className="font-bold text-xs text-slate-900 dark:text-slate-100 leading-tight">Need Help?</p>
-              <p className="text-[10px] text-slate-500 dark:text-slate-400 font-medium">Contact our support team</p>
+              <p className="font-bold text-xs text-slate-900 dark:text-zinc-100 leading-tight">Need Help?</p>
+              <p className="text-[10px] text-slate-500 dark:text-zinc-400 font-medium">Contact our support team</p>
             </div>
           </div>
           <Button
             variant="outline"
             size="sm"
-            onClick={() => onNavigate("settings")}
-            className="w-full h-8 text-xs font-semibold rounded-xl bg-white dark:bg-slate-900 border-blue-200/80 dark:border-blue-800 text-blue-600 dark:text-blue-400 hover:bg-blue-50 hover:text-blue-700 shadow-2xs"
+            onClick={() => onNavigate(isSuperAdmin ? "settings" : currentUser.role === "admin" ? "school-settings" : "tickets")}
+            className="w-full h-8 text-xs font-semibold rounded-xl bg-white dark:bg-zinc-900 border-slate-200/80 dark:border-zinc-800 text-blue-600 dark:text-blue-400 hover:bg-slate-50 dark:hover:bg-zinc-800 shadow-2xs"
           >
             Help & Support
           </Button>
         </div>
       )}
 
-      {/* For Super Admin, render the Help & Support widget only (profile is in header per reference) */}
-      {isSuperAdmin ? null : (
+      {/* For Super Admin & Admin (isModernUI), render the Help & Support widget only (profile is in header per reference) */}
+      {isModernUI ? null : (
         sidebarOpen && !isMinimal ? (
           <DropdownMenu>
             <DropdownMenuTrigger asChild>

@@ -48,3 +48,5 @@ export function formatDate(dateStr: string): string {
     day: "numeric",
   });
 }
+
+export type AdminViewMode = "grid" | "table";

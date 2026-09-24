@@ -206,32 +206,41 @@ export function useTeacherExams() {
   };
 
   const handleSaveDraft = async () => {
-    if (!selectedExamId) return;
+    if (!selectedExam) return;
     dispatch({ type: "SET_SAVING_RESULTS", payload: true });
     try {
+      // Only persist rows where marks have actually been entered
+      const rowsToSave = resultRows
+        .filter((r) => r.marksObtained != null && String(r.marksObtained).trim() !== "")
+        .map((r) => ({
+          studentId: r.studentId,
+          marksObtained: parseFloat(r.marksObtained),
+          status: r.status === "pending"
+            ? (parseFloat(r.marksObtained) >= (selectedExam.passingMarks || 40) ? "pass" : "fail")
+            : r.status,
+          remarks: r.remarks || null,
+        }));
+
+      if (rowsToSave.length === 0) {
+        toast.info("No marks have been entered yet to save.");
+        dispatch({ type: "SET_SAVING_RESULTS", payload: false });
+        return;
+      }
+
       const res = await apiFetch("/api/exams/results", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          examId: selectedExamId,
-          results: resultRows.reduce((acc, r) => {
-            if (r.marksObtained.trim() !== "") {
-              acc.push({
-                studentId: r.studentId,
-                marksObtained: parseFloat(r.marksObtained),
-                status: r.status,
-                remarks: r.remarks || null,
-              });
-            }
-            return acc;
-          }, [] as any[]),
+          examId: selectedExam.id,
+          results: rowsToSave,
         }),
       });
 
       if (res.ok) {
         toast.success("Exam marks draft saved successfully!");
       } else {
-        throw new Error("Draft save returned failure status");
+        const errData = await res.json().catch(() => ({}));
+        toast.error(errData.error || "Failed to save marks draft");
       }
     } catch (err) {
       console.error(err);
@@ -243,17 +252,13 @@ export function useTeacherExams() {
   const handlePublish = async () => {
     if (!selectedExam) return;
 
-    const hasPending = resultRows.some((r) => r.marksObtained.trim() === "");
-    if (hasPending) {
-      const proceed = window.confirm(
-        "Some students are missing marks. Do you want to publish the results anyway?",
-      );
-      if (!proceed) return;
-    } else {
-      const proceed = window.confirm(
-        "Publishing will finalize the results and lock them for student viewing. Continue?",
-      );
-      if (!proceed) return;
+    // Check if any students don't have marks entered
+    const unentered = resultRows.filter(
+      (r) => r.marksObtained == null || String(r.marksObtained).trim() === ""
+    );
+    if (unentered.length > 0) {
+      toast.error("All students must have marks entered before marking as complete.");
+      return;
     }
 
     dispatch({ type: "SET_IS_PUBLISHING", payload: true });
@@ -263,21 +268,31 @@ export function useTeacherExams() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           examId: selectedExam.id,
-          results: resultRows.reduce((acc, r) => {
-            if (r.marksObtained.trim() !== "") {
-              acc.push({
-                studentId: r.studentId,
-                marksObtained: parseFloat(r.marksObtained),
-                status: r.status,
-                remarks: r.remarks || null,
-              });
-            }
-            return acc;
-          }, [] as any[]),
+          results: resultRows.map((r) => {
+            const marks = parseFloat(r.marksObtained);
+            const passThreshold = selectedExam.passingMarks || 40;
+            const status =
+              r.status && r.status !== "pending"
+                ? r.status
+                : marks >= passThreshold
+                  ? "pass"
+                  : "fail";
+            return {
+              studentId: r.studentId,
+              marksObtained: marks,
+              status,
+              remarks: r.remarks || null,
+            };
+          }),
         }),
       });
 
-      if (!saveRes.ok) throw new Error("Failed to commit final results");
+      if (!saveRes.ok) {
+        const errData = await saveRes.json().catch(() => ({}));
+        toast.error(errData.error || "Failed to commit final results");
+        dispatch({ type: "SET_IS_PUBLISHING", payload: false });
+        return;
+      }
 
       const updateRes = await apiFetch("/api/exams", {
         method: "PUT",
@@ -289,19 +304,21 @@ export function useTeacherExams() {
       });
 
       if (updateRes.ok) {
-        toast.success("Exam results successfully published!");
+        toast.success("Exam marked as complete successfully!");
+        // Remove completed exam from local list and clear selection so bottom view clears immediately
         dispatch({
           type: "SET_EXAMS",
-          payload: exams.map((e) =>
-            e.id === selectedExam.id ? { ...e, status: "completed" } : e,
-          ),
+          payload: exams.filter((e) => e.id !== selectedExam.id),
         });
+        dispatch({ type: "SET_SELECTED_EXAM_ID", payload: "" });
+        dispatch({ type: "SET_RESULT_ROWS", payload: [] });
       } else {
-        throw new Error("Failed to lock exam status to published");
+        const errData = await updateRes.json().catch(() => ({}));
+        toast.error(errData.error || "Failed to mark exam as complete");
       }
-    } catch (err) {
+    } catch (err: any) {
       console.error(err);
-      toast.error("Failed to publish exam results");
+      toast.error(err?.message || "Failed to mark exam as complete");
     }
     dispatch({ type: "SET_IS_PUBLISHING", payload: false });
   };
@@ -311,7 +328,9 @@ export function useTeacherExams() {
       total: resultRows.length,
       pass: resultRows.filter((r) => r.status === "pass").length,
       fail: resultRows.filter((r) => r.status === "fail").length,
-      pending: resultRows.filter((r) => r.marksObtained === "").length,
+      pending: resultRows.filter(
+        (r) => r.marksObtained == null || String(r.marksObtained).trim() === ""
+      ).length,
     };
   }, [resultRows]);
 

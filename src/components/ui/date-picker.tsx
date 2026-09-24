@@ -19,9 +19,17 @@ interface DatePickerProps {
   placeholder?: string;
   className?: string;
   disabled?: (date: Date) => boolean;
+  align?: 'start' | 'center' | 'end';
 }
 
-export function DatePicker({ date, onChange, placeholder = 'Pick a date', className, disabled }: DatePickerProps) {
+export function DatePicker({
+  date,
+  onChange,
+  placeholder = 'Pick a date',
+  className,
+  disabled,
+  align = 'start',
+}: DatePickerProps) {
   const [open, setOpen] = React.useState(false);
 
   const dateTime = date?.getTime();
@@ -53,7 +61,7 @@ export function DatePicker({ date, onChange, placeholder = 'Pick a date', classN
           </span>
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-auto p-0" align="start">
+      <PopoverContent className="w-auto p-0" align={align} collisionPadding={16}>
         <Calendar
           mode="single"
           selected={memoizedDate}

@@ -8,12 +8,14 @@ import { toast } from "sonner";
 import { AdminHeader } from "./manage-admins/AdminHeader";
 import { AdminTable } from "./manage-admins/AdminTable";
 import { AdminDialogs } from "./manage-admins/AdminDialogs";
-import { AdminRecord, AdminFormData, emptyFormData } from "./manage-admins/types";
+import { AdminRecord, AdminFormData, emptyFormData, AdminViewMode } from "./manage-admins/types";
 
 type State = {
   admins: AdminRecord[];
   loading: boolean;
   search: string;
+  statusFilter: string;
+  viewMode: AdminViewMode;
   dialogOpen: boolean;
   editingAdmin: AdminRecord | null;
   formData: AdminFormData;
@@ -26,6 +28,8 @@ type Action =
   | { type: 'SET_ADMINS'; payload: AdminRecord[] }
   | { type: 'SET_LOADING'; payload: boolean }
   | { type: 'SET_SEARCH'; payload: string }
+  | { type: 'SET_STATUS_FILTER'; payload: string }
+  | { type: 'SET_VIEW_MODE'; payload: AdminViewMode }
   | { type: 'OPEN_DIALOG'; payload: { editingAdmin: AdminRecord | null; formData: AdminFormData } }
   | { type: 'CLOSE_DIALOG' }
   | { type: 'SET_FORM_DATA'; payload: Partial<AdminFormData> }
@@ -37,6 +41,8 @@ const initialState: State = {
   admins: [],
   loading: true,
   search: "",
+  statusFilter: "all",
+  viewMode: "table",
   dialogOpen: false,
   editingAdmin: null,
   formData: emptyFormData,
@@ -53,6 +59,10 @@ function reducer(state: State, action: Action): State {
       return { ...state, loading: action.payload };
     case 'SET_SEARCH':
       return { ...state, search: action.payload };
+    case 'SET_STATUS_FILTER':
+      return { ...state, statusFilter: action.payload };
+    case 'SET_VIEW_MODE':
+      return { ...state, viewMode: action.payload };
     case 'OPEN_DIALOG':
       return {
         ...state,
@@ -88,6 +98,8 @@ export function SuperAdminManage() {
     admins,
     loading,
     search,
+    statusFilter,
+    viewMode,
     dialogOpen,
     editingAdmin,
     formData,
@@ -119,12 +131,21 @@ export function SuperAdminManage() {
 
   // --- Filtering ---
   const filtered = useMemo(() => {
-    return admins.filter(
-      (a) =>
+    return admins.filter((a) => {
+      const matchesSearch =
         a.name.toLowerCase().includes(search.toLowerCase()) ||
-        a.email.toLowerCase().includes(search.toLowerCase()),
-    );
-  }, [admins, search]);
+        a.email.toLowerCase().includes(search.toLowerCase());
+
+      const matchesStatus =
+        statusFilter === "all"
+          ? true
+          : statusFilter === "active"
+          ? a.isActive
+          : !a.isActive;
+
+      return matchesSearch && matchesStatus;
+    });
+  }, [admins, search, statusFilter]);
 
   // --- Handlers ---
   const handleOpenAdd = () => {
@@ -214,11 +235,16 @@ export function SuperAdminManage() {
       : true);
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 pb-12">
       <AdminHeader 
         search={search}
         onSearchChange={(s) => dispatch({ type: 'SET_SEARCH', payload: s })}
+        statusFilter={statusFilter}
+        onStatusFilterChange={(status) => dispatch({ type: 'SET_STATUS_FILTER', payload: status })}
         onAddClick={handleOpenAdd}
+        viewMode={viewMode}
+        onViewModeChange={(mode) => dispatch({ type: 'SET_VIEW_MODE', payload: mode })}
+        admins={admins}
       />
 
       <AdminTable 
@@ -230,6 +256,7 @@ export function SuperAdminManage() {
         onDelete={handleDelete}
         deletingId={deletingId}
         setDeletingId={(id) => dispatch({ type: 'SET_DELETING_ID', payload: id })}
+        viewMode={viewMode}
       />
 
       <AdminDialogs 

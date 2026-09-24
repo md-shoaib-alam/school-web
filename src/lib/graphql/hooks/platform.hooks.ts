@@ -6,7 +6,7 @@ import { api } from '@/lib/api'
 import { 
   PLATFORM_STATS, BILLING_DATA, TENANTS, USERS, AUDIT_LOGS, 
   CREATE_TENANT, UPDATE_TENANT, DELETE_TENANT, TOGGLE_TENANT_STATUS, SUBSCRIPTIONS,
-  TOGGLE_USER_STATUS, CREATE_USER, TENANT_DETAIL, RESTORE_TENANT, TENANT_METADATA
+  TOGGLE_USER_STATUS, CREATE_USER, UPDATE_USER, TENANT_DETAIL, RESTORE_TENANT, TENANT_METADATA
 } from '../queries'
 import { 
   PlatformStatsData, BillingDataResponse, TenantsResponse, UsersResponse, 
@@ -274,6 +274,21 @@ export function useCreateUser() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['users'] })
       toast.success('User account created successfully')
+    },
+  })
+}
+
+export function useUpdateUser() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: ({ id, data }: { id: string; data: any }) => 
+      graphqlMutate<{ updateUser: any }>(UPDATE_USER, { id, data }).then(d => d.updateUser),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['users'] })
+      toast.success('User details updated successfully')
+    },
+    onError: (error: any) => {
+      toast.error('Failed to update user', { description: error.message })
     },
   })
 }

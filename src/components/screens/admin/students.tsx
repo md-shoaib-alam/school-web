@@ -1,9 +1,8 @@
 "use client";
 
-import { useReducer, useEffect, useCallback, useMemo } from "react";
+import { useReducer, useEffect, useCallback, useMemo, useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import {
   Select,
   SelectContent,
@@ -11,7 +10,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Plus, Search, Eye, RotateCcw } from "lucide-react";
+import { Plus, Eye, RotateCcw } from "lucide-react";
+import { SearchInput } from "@/components/ui/search-input";
 import { toast } from "sonner";
 import { apiFetch } from "@/lib/api";
 import { useModulePermissions } from "@/hooks/use-permissions";
@@ -20,7 +20,6 @@ import { useStudents } from "@/lib/graphql/hooks/academic.hooks";
 import { ClassSelect } from "@/components/ui/class-select";
 import { useQueryClient } from "@tanstack/react-query";
 import { queryKeys } from "@/lib/graphql/keys";
-import { useDebounce } from "@/hooks/use-debounce";
 import { useSearchParams, useRouter, usePathname } from "next/navigation";
 import { Suspense } from "react";
 
@@ -30,7 +29,7 @@ import { StudentDialog } from "./students/StudentDialog";
 import { StudentSkeleton } from "./students/StudentSkeleton";
 import { Pagination } from "./students/Pagination";
 import { ImportExportButtons } from "./students/ImportExportButtons";
-import { StudentDetailDialog } from "./students/StudentDetailDialog";
+import { StudentProfileView } from "./students/StudentProfileView";
 
 // Types
 import type { StudentInfo, ClassInfo, StudentFormData } from "./students/types";
@@ -47,6 +46,8 @@ const emptyFormData: StudentFormData = {
   classId: "",
   gender: "male",
   dateOfBirth: "",
+  bloodGroup: "",
+  house: "",
   transportEnabled: false,
   routeId: "",
   pickupPoint: "",
@@ -64,8 +65,6 @@ type State = {
   editingStudent: StudentInfo | null;
   formData: StudentFormData;
   submitting: boolean;
-  viewDialogOpen: boolean;
-  viewingStudent: StudentInfo | null;
 };
 
 type Action =
@@ -79,9 +78,7 @@ type Action =
   | { type: 'OPEN_EDIT'; payload: StudentInfo }
   | { type: 'CLOSE_DIALOG' }
   | { type: 'SET_FORM_DATA'; payload: StudentFormData }
-  | { type: 'SET_SUBMITTING'; payload: boolean }
-  | { type: 'OPEN_VIEW'; payload: StudentInfo }
-  | { type: 'CLOSE_VIEW' };
+  | { type: 'SET_SUBMITTING'; payload: boolean };
 
 const initialState: State = {
   search: "",
@@ -95,8 +92,6 @@ const initialState: State = {
   editingStudent: null,
   formData: emptyFormData,
   submitting: false,
-  viewDialogOpen: false,
-  viewingStudent: null,
 };
 
 function reducer(state: State, action: Action): State {
@@ -128,6 +123,8 @@ function reducer(state: State, action: Action): State {
           classId: action.payload.classId || "",
           gender: action.payload.gender || "male",
           dateOfBirth: action.payload.dateOfBirth || "",
+          bloodGroup: action.payload.bloodGroup || "",
+          house: action.payload.house || "",
           transportEnabled: !!action.payload.transport,
           routeId: action.payload.transport?.routeId || "",
           pickupPoint: action.payload.transport?.pickupPoint || "",
@@ -140,10 +137,6 @@ function reducer(state: State, action: Action): State {
       return { ...state, formData: action.payload };
     case 'SET_SUBMITTING':
       return { ...state, submitting: action.payload };
-    case 'OPEN_VIEW':
-      return { ...state, viewingStudent: action.payload, viewDialogOpen: true };
-    case 'CLOSE_VIEW':
-      return { ...state, viewDialogOpen: false };
     default:
       return state;
   }
@@ -166,19 +159,16 @@ function AdminStudentsContent() {
     editingStudent,
     formData,
     submitting,
-    viewDialogOpen,
-    viewingStudent,
   } = state;
 
-  const debouncedSearch = useDebounce(search, 300);
 
   const queryClient = useQueryClient();
 
   // Queries
-  const { data: studentData, isFetching: loadingStudents } = useStudents(
+  const { data: studentData, isLoading: loadingStudents } = useStudents(
     currentTenantId || undefined,
     classFilter === "all" ? undefined : classFilter,
-    debouncedSearch || undefined,
+    search || undefined,
     statusFilter,
     genderFilter,
     currentPage,
@@ -196,7 +186,7 @@ function AdminStudentsContent() {
   }, [studentData]);
   const totalItems = studentData?.total || 0;
   const totalPages = studentData?.totalPages || 1;
-  const loading = loadingStudents;
+  const loading = loadingStudents; // only true on first load, not on search refetches
 
   const searchParams = useSearchParams();
   const router = useRouter();
@@ -204,6 +194,7 @@ function AdminStudentsContent() {
   const classIdParam = searchParams.get("classId");
   const pageParam = searchParams.get("page");
   const limitParam = searchParams.get("limit");
+  const studentUrlParam = searchParams.get("student") || searchParams.get("studentId");
 
   // Sync initial URL search params into state (run once on mount)
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -240,22 +231,92 @@ function AdminStudentsContent() {
 
   const handleOpenEdit = (student: StudentInfo) => dispatch({ type: 'OPEN_EDIT', payload: student });
 
-  const handleOpenView = (student: StudentInfo) => dispatch({ type: 'OPEN_VIEW', payload: student });
+  const [viewingStudentSnapshot, setViewingStudentSnapshot] = useState<StudentInfo | null>(null);
+
+  // Synchronize URL ?student= query parameter into viewingStudent on initial load, refresh, or URL change
+  useEffect(() => {
+    if (!studentUrlParam) {
+      if (viewingStudentSnapshot) {
+        setViewingStudentSnapshot(null);
+      }
+      return;
+    }
+
+    // 1. Check if student is already in current students list
+    const found = students.find(
+      (s) => s.id === studentUrlParam || s.rollNumber === studentUrlParam || (s as any).username === studentUrlParam
+    );
+    if (found) {
+      if (viewingStudentSnapshot?.id !== found.id) {
+        setViewingStudentSnapshot(found);
+      }
+      return;
+    }
+
+    // 2. If not in current page list, fetch this specific student by search
+    let isMounted = true;
+    (async () => {
+      try {
+        const res = await apiFetch(`/api/students?tenantId=${currentTenantId}&search=${encodeURIComponent(studentUrlParam)}`);
+        if (res.ok) {
+          const data = await res.json();
+          const items = Array.isArray(data) ? data : data.students || data.items || [];
+          const match = items.find(
+            (s: any) => s.id === studentUrlParam || s.rollNumber === studentUrlParam || s.username === studentUrlParam
+          );
+          if (match && isMounted) {
+            setViewingStudentSnapshot(match);
+          }
+        }
+      } catch (err) {
+        console.error("Failed to load student from URL:", err);
+      }
+    })();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [studentUrlParam, students, currentTenantId]);
+
+  // Derive viewing student dynamically from the latest students list
+  const viewingStudent = useMemo(() => {
+    if (!viewingStudentSnapshot) return null;
+    return students.find((s) => s.id === viewingStudentSnapshot.id) || viewingStudentSnapshot;
+  }, [students, viewingStudentSnapshot]);
+
+  const handleOpenView = (student: StudentInfo) => {
+    setViewingStudentSnapshot(student);
+    const params = new URLSearchParams(searchParams.toString());
+    params.set("student", student.rollNumber || (student as any).username || student.id);
+    const newQuery = params.toString();
+    router.push(newQuery ? `${pathname}?${newQuery}` : pathname, { scroll: false });
+  };
+
+  const handleCloseView = () => {
+    setViewingStudentSnapshot(null);
+    const params = new URLSearchParams(searchParams.toString());
+    params.delete("student");
+    params.delete("studentId");
+    const newQuery = params.toString();
+    router.replace(newQuery ? `${pathname}?${newQuery}` : pathname, { scroll: false });
+  };
 
   const handleSubmit = async () => {
     const isCreate = dialogMode === "create";
 
     // Required fields validation
-    if (!formData.name || !formData.email || !formData.rollNumber || !formData.classId) {
-      toast.error("Name, Email, Roll Number, and Class are required");
+    if (!formData.name || !formData.rollNumber || !formData.classId) {
+      toast.error("Name, Roll Number, and Class are required");
       return;
     }
 
-    // Email format validation
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(formData.email)) {
-      toast.error("Please enter a valid email address");
-      return;
+    // Email format validation (only if provided)
+    if (formData.email && formData.email.trim()) {
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(formData.email.trim())) {
+        toast.error("Please enter a valid email address");
+        return;
+      }
     }
 
     // OPTIMISTIC UPDATE: Update the UI instantly if editing
@@ -281,14 +342,48 @@ function AdminStudentsContent() {
         try {
           const url = "/api/students";
           const method = isCreate ? "POST" : "PUT";
-          const body = isCreate
-            ? formData
-            : { id: editingStudent?.id, ...formData };
+
+          // Clean payload: omit empty strings for optional fields to avoid backend schema validation errors
+          const payload: Record<string, any> = {
+            name: formData.name.trim(),
+            rollNumber: formData.rollNumber.trim(),
+            classId: formData.classId,
+            gender: formData.gender || "male",
+            transportEnabled: Boolean(formData.transportEnabled),
+          };
+
+          if (!isCreate && editingStudent) {
+            payload.id = editingStudent.id;
+          }
+          if (formData.email?.trim()) {
+            payload.email = formData.email.trim();
+          }
+          if (formData.phone?.trim()) {
+            payload.phone = formData.phone.trim();
+          }
+          if (formData.username?.trim()) {
+            payload.username = formData.username.trim();
+          }
+          if (formData.password?.trim()) {
+            payload.password = formData.password.trim();
+          }
+          if (formData.dateOfBirth?.trim()) {
+            payload.dateOfBirth = formData.dateOfBirth.trim();
+          }
+          if (formData.bloodGroup?.trim()) {
+            payload.bloodGroup = formData.bloodGroup.trim();
+          }
+          if (formData.transportEnabled && formData.routeId?.trim()) {
+            payload.routeId = formData.routeId.trim();
+            if (formData.pickupPoint?.trim()) {
+              payload.pickupPoint = formData.pickupPoint.trim();
+            }
+          }
 
           const res = await apiFetch(url, {
             method,
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(body),
+            body: JSON.stringify(payload),
           });
 
           if (!res.ok) {
@@ -351,20 +446,51 @@ function AdminStudentsContent() {
     );
   };
 
+  if (loading || (studentUrlParam && !viewingStudent)) return <StudentSkeleton />;
+
+  // --- Profile view (full page replace, like teachers) ---
+  if (viewingStudent) {
+    return (
+      <div className="space-y-6">
+        <StudentProfileView
+          student={viewingStudent}
+          onBack={handleCloseView}
+          canEdit={canEdit}
+          onEdit={(s) => {
+            handleCloseView();
+            handleOpenEdit(s);
+          }}
+        />
+
+        <StudentDialog
+          open={dialogOpen}
+          onOpenChange={(open) => {
+            if (!open) dispatch({ type: 'CLOSE_DIALOG' });
+          }}
+          mode={dialogMode}
+          formData={formData}
+          setFormData={(fd) => dispatch({ type: 'SET_FORM_DATA', payload: fd })}
+          submitting={submitting}
+          onSubmit={handleSubmit}
+        />
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6">
       {/* Header */}
       <div className="flex flex-col xl:flex-row gap-4 items-start xl:items-center justify-between">
         <div className="flex flex-col sm:flex-row gap-3 w-full xl:w-auto flex-1">
-          <div className="relative flex-1 max-w-sm">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
-            <Input
-              placeholder="Search by name..."
-              className="pl-9 h-9 sm:h-10"
+          <SearchInput
+              id="search_students"
               value={search}
-              onChange={(e) => dispatch({ type: 'SET_SEARCH', payload: e.target.value })}
+              onChange={(val) => dispatch({ type: 'SET_SEARCH', payload: val })}
+              placeholder="Search by name..."
+              delay={400}
+              className="flex-1 max-w-sm"
+              inputClassName="h-9 sm:h-10"
             />
-          </div>
           <ClassSelect
             value={classFilter}
             onValueChange={(v) => {
@@ -375,38 +501,40 @@ function AdminStudentsContent() {
             className="w-full sm:w-44 h-9 sm:h-10"
             placeholder="Filter by class"
           />
-          <Select
-            value={genderFilter}
-            onValueChange={(v) => {
-              dispatch({ type: 'SET_GENDER_FILTER', payload: v });
-              updateUrlParams(1, itemsPerPage, search, classFilter);
-            }}
-          >
-            <SelectTrigger className="w-full sm:w-36 h-9 sm:h-10">
-              <SelectValue placeholder="All Genders" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Genders</SelectItem>
-              <SelectItem value="male">Male</SelectItem>
-              <SelectItem value="female">Female</SelectItem>
-            </SelectContent>
-          </Select>
-          <Select
-            value={statusFilter}
-            onValueChange={(v) => {
-              dispatch({ type: 'SET_STATUS_FILTER', payload: v });
-              updateUrlParams(1, itemsPerPage, search, classFilter);
-            }}
-          >
-            <SelectTrigger className="w-full sm:w-36 h-9 sm:h-10">
-              <SelectValue placeholder="All Statuses" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Statuses</SelectItem>
-              <SelectItem value="active">Active</SelectItem>
-              <SelectItem value="inactive">Inactive</SelectItem>
-            </SelectContent>
-          </Select>
+          <div className="grid grid-cols-2 gap-3 sm:flex sm:gap-3">
+            <Select
+              value={genderFilter}
+              onValueChange={(v) => {
+                dispatch({ type: 'SET_GENDER_FILTER', payload: v });
+                updateUrlParams(1, itemsPerPage, search, classFilter);
+              }}
+            >
+              <SelectTrigger className="w-full sm:w-36 h-9 sm:h-10">
+                <SelectValue placeholder="All Genders" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Genders</SelectItem>
+                <SelectItem value="male">Male</SelectItem>
+                <SelectItem value="female">Female</SelectItem>
+              </SelectContent>
+            </Select>
+            <Select
+              value={statusFilter}
+              onValueChange={(v) => {
+                dispatch({ type: 'SET_STATUS_FILTER', payload: v });
+                updateUrlParams(1, itemsPerPage, search, classFilter);
+              }}
+            >
+              <SelectTrigger className="w-full sm:w-36 h-9 sm:h-10">
+                <SelectValue placeholder="All Statuses" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Statuses</SelectItem>
+                <SelectItem value="active">Active</SelectItem>
+                <SelectItem value="inactive">Inactive</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
         </div>
 
         {(canCreate || canEdit || canDelete) && (
@@ -484,20 +612,6 @@ function AdminStudentsContent() {
         submitting={submitting}
         onSubmit={handleSubmit}
       />
-
-      {viewingStudent && (
-        <StudentDetailDialog
-          open={viewDialogOpen}
-          onOpenChange={(open) => {
-            if (open) {
-              dispatch({ type: 'OPEN_VIEW', payload: viewingStudent });
-            } else {
-              dispatch({ type: 'CLOSE_VIEW' });
-            }
-          }}
-          student={viewingStudent}
-        />
-      )}
     </div>
   );
 }

@@ -180,10 +180,45 @@ export function LogTable({
       {/* Table Container */}
       <div className="bg-card border border-border rounded-lg overflow-hidden shadow-sm">
         {loading ? (
-          <div className="p-4 space-y-3">
-            {Array.from({ length: 8 }).map((_, i) => (
-              <Skeleton key={i} className="h-12 w-full rounded" />
-            ))}
+          <div className="overflow-x-auto">
+            <Table className="w-full text-left">
+              <TableHeader>
+                <TableRow className="bg-zinc-50 dark:bg-zinc-900/50 border-b border-zinc-200 dark:border-zinc-800">
+                  <TableHead className="font-semibold text-zinc-800 dark:text-zinc-200 py-3 px-4 h-auto">Operator</TableHead>
+                  <TableHead className="font-semibold text-zinc-800 dark:text-zinc-200 py-3 px-4 h-auto">Email Address</TableHead>
+                  <TableHead className="font-semibold text-zinc-800 dark:text-zinc-200 py-3 px-4 h-auto">Action</TableHead>
+                  <TableHead className="font-semibold text-zinc-800 dark:text-zinc-200 py-3 px-4 h-auto">Timestamp</TableHead>
+                  <TableHead className="font-semibold text-zinc-800 dark:text-zinc-200 py-3 px-4 h-auto text-right">Details</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {Array.from({ length: 8 }).map((_, i) => (
+                  <TableRow key={i} className="border-b border-zinc-100 dark:border-zinc-800 last:border-none">
+                    <TableCell className="py-3 px-4">
+                      <div className="flex items-center gap-3">
+                        <Skeleton className="size-8 rounded-full shrink-0" />
+                        <div className="space-y-1">
+                          <Skeleton className="h-4 w-28 rounded-md" />
+                          <Skeleton className="h-3 w-16 rounded-md" />
+                        </div>
+                      </div>
+                    </TableCell>
+                    <TableCell className="py-3 px-4">
+                      <Skeleton className="h-4 w-36 rounded-md" />
+                    </TableCell>
+                    <TableCell className="py-3 px-4">
+                      <Skeleton className="h-5 w-20 rounded-md" />
+                    </TableCell>
+                    <TableCell className="py-3 px-4">
+                      <Skeleton className="h-4 w-28 rounded-md" />
+                    </TableCell>
+                    <TableCell className="py-3 px-4 text-right">
+                      <Skeleton className="size-8 rounded-full ml-auto" />
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
           </div>
         ) : logs.length === 0 ? (
           <div className="p-12 text-center text-zinc-500 text-sm">

@@ -8,8 +8,17 @@ export interface StudentInfo {
   className: string;
   rollNumber: string;
   gender: string;
+  status?: string;
   dateOfBirth: string | null;
+  admissionDate?: string | null;
+  createdAt?: string | null;
+  bloodGroup?: string | null;
+  emergencyContact?: string | null;
+  address?: string | null;
+  house?: string | null;
   parentName?: string;
+  parentPhone?: string | null;
+  parentEmail?: string | null;
   transport?: {
     id: string;
     routeId: string;
@@ -40,6 +49,8 @@ export interface StudentFormData {
   classId: string;
   gender: string;
   dateOfBirth: string;
+  bloodGroup?: string;
+  house?: string;
   password?: string;
   transportEnabled?: boolean;
   routeId?: string;

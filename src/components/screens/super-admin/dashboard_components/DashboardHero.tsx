@@ -44,13 +44,13 @@ export function DashboardHero({ loading, data, onNavigate }: DashboardHeroProps)
         <div className="absolute right-2 sm:right-6 md:right-8 top-1/2 -translate-y-1/2 sm:top-auto sm:translate-y-0 sm:bottom-0 h-[70px] sm:h-[95px] md:h-[115px] aspect-[4/3] flex items-center sm:items-end justify-end pointer-events-none select-none">
           {/* Light Mode Image (4:3 ratio) */}
           <img
-            src="/assets/topdahsbordlight.png"
+            src="/assets/super-admin/topdahsbordlight.avif"
             alt="School Illustration"
             className="h-full w-full object-contain object-center sm:object-bottom dark:hidden drop-shadow-xs"
           />
           {/* Dark Mode Image (4:3 ratio) */}
           <img
-            src="/assets/topdahsborddark.png"
+            src="/assets/super-admin/topdahsborddark.avif"
             alt="School Illustration Dark"
             className="h-full w-full object-contain object-center sm:object-bottom hidden dark:block drop-shadow-xs"
           />
@@ -61,10 +61,19 @@ export function DashboardHero({ loading, data, onNavigate }: DashboardHeroProps)
       <div className="flex lg:grid lg:grid-cols-4 gap-3 overflow-x-auto pb-1 pt-0.5 scrollbar-none snap-x snap-mandatory">
         {loading ? (
           Array.from({ length: 4 }).map((_, i) => (
-            <div key={i} className="min-w-[160px] sm:min-w-[200px] lg:min-w-0 flex-1 shrink-0 rounded-2xl border bg-card p-4 shadow-xs snap-start">
-              <Skeleton className="h-9 w-9 rounded-xl mb-2" />
-              <Skeleton className="h-3.5 w-16 mb-1.5" />
-              <Skeleton className="h-7 w-24" />
+            <div
+              key={i}
+              className="min-w-[165px] sm:min-w-[210px] lg:min-w-0 flex-1 shrink-0 rounded-2xl border border-slate-200/80 dark:border-slate-800/80 bg-white dark:bg-slate-900/60 p-3.5 sm:p-4 shadow-xs snap-start"
+            >
+              <div className="flex items-center justify-between">
+                <Skeleton className="size-8.5 sm:size-9 rounded-xl" />
+                <Skeleton className="size-3.5 rounded-full" />
+              </div>
+              <div className="mt-2.5 space-y-1.5">
+                <Skeleton className="h-3 w-14 rounded-md" />
+                <Skeleton className="h-6 w-24 rounded-md" />
+                <Skeleton className="h-3 w-28 rounded-md mt-1" />
+              </div>
             </div>
           ))
         ) : (
