@@ -41,6 +41,7 @@ export function useMyAttendance() {
   // Fetch Current Month Attendance strictly for the summary cards
   const fetchCurrentMonthAttendance = useCallback(async () => {
     try {
+      setLoading(true);
       const userId = currentUser?.id;
       const res = await apiFetch(
         `/api/staff-attendance?month=${currentMonthStr}${userId ? `&userId=${userId}` : ''}`
@@ -55,44 +56,68 @@ export function useMyAttendance() {
       setCurrentMonthRecords([]);
     } catch {
       setCurrentMonthRecords([]);
-    }
-  }, [currentUser?.id, currentMonthStr]);
-
-  // Fetch Calendar Month Attendance (when browsing different calendar months)
-  const fetchCalendarAttendance = useCallback(async () => {
-    setLoading(true);
-    try {
-      if (calMonthStr === currentMonthStr) {
-        setCalendarRecords(currentMonthRecords);
-        setLoading(false);
-        return;
-      }
-      const userId = currentUser?.id;
-      const res = await apiFetch(
-        `/api/staff-attendance?month=${calMonthStr}${userId ? `&userId=${userId}` : ''}`
-      );
-      if (res.ok) {
-        const data = await res.json();
-        if (Array.isArray(data)) {
-          setCalendarRecords(data);
-          return;
-        }
-      }
-      setCalendarRecords([]);
-    } catch {
-      setCalendarRecords([]);
     } finally {
       setLoading(false);
     }
-  }, [currentUser?.id, calMonthStr, currentMonthStr, currentMonthRecords]);
+  }, [currentUser?.id, currentMonthStr]);
 
+  // Initial load & whenever currentUser or currentMonth changes
   useEffect(() => {
     fetchCurrentMonthAttendance();
   }, [fetchCurrentMonthAttendance]);
 
+  // Auto-refresh when tab/window regains focus or periodically (real-time sync)
   useEffect(() => {
-    fetchCalendarAttendance();
-  }, [fetchCalendarAttendance]);
+    const handleFocus = () => {
+      fetchCurrentMonthAttendance();
+    };
+    window.addEventListener('focus', handleFocus);
+    const interval = setInterval(fetchCurrentMonthAttendance, 10000);
+
+    return () => {
+      window.removeEventListener('focus', handleFocus);
+      clearInterval(interval);
+    };
+  }, [fetchCurrentMonthAttendance]);
+
+  // Active calendar records (always immediately reflects currentMonthRecords when viewing current month)
+  const activeCalendarRecords = useMemo(() => {
+    return calMonthStr === currentMonthStr ? currentMonthRecords : calendarRecords;
+  }, [calMonthStr, currentMonthStr, currentMonthRecords, calendarRecords]);
+
+  // Fetch Calendar Month Attendance only when browsing different calendar months
+  useEffect(() => {
+    if (calMonthStr === currentMonthStr) {
+      setLoading(false);
+      return;
+    }
+    let isCancelled = false;
+    const fetchCalendar = async () => {
+      setLoading(true);
+      try {
+        const userId = currentUser?.id;
+        const res = await apiFetch(
+          `/api/staff-attendance?month=${calMonthStr}${userId ? `&userId=${userId}` : ''}`
+        );
+        if (res.ok) {
+          const data = await res.json();
+          if (Array.isArray(data) && !isCancelled) {
+            setCalendarRecords(data);
+            return;
+          }
+        }
+        if (!isCancelled) setCalendarRecords([]);
+      } catch {
+        if (!isCancelled) setCalendarRecords([]);
+      } finally {
+        if (!isCancelled) setLoading(false);
+      }
+    };
+    fetchCalendar();
+    return () => {
+      isCancelled = true;
+    };
+  }, [currentUser?.id, calMonthStr, currentMonthStr]);
 
   // Month navigation for interactive calendar
   const handlePrevMonth = () => {
@@ -126,9 +151,6 @@ export function useMyAttendance() {
           toast.success('Checked out successfully!');
         }
         await fetchCurrentMonthAttendance();
-        if (calMonthStr === currentMonthStr) {
-          await fetchCalendarAttendance();
-        }
       } else {
         toast.error(data.message || data.error || 'Failed to record attendance');
       }
@@ -167,7 +189,7 @@ export function useMyAttendance() {
     selectedDate,
     setSelectedDate,
     currentMonthRecords,
-    calendarRecords,
+    calendarRecords: activeCalendarRecords,
     currentMonthMetrics,
     todayRecord,
     recentRecords,

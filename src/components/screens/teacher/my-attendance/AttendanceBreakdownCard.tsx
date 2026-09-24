@@ -10,14 +10,14 @@ interface AttendanceBreakdownCardProps {
 
 export function AttendanceBreakdownCard({ metrics }: AttendanceBreakdownCardProps) {
   return (
-    <Card className="rounded-2xl border border-slate-200/80 dark:border-zinc-800 bg-white dark:bg-zinc-950 p-5 shadow-2xs space-y-3">
-      <h3 className="text-base font-bold text-slate-900 dark:text-zinc-100">
+    <Card className="rounded-2xl border border-slate-200/80 dark:border-zinc-800 bg-white dark:bg-zinc-950 p-4 sm:p-5 shadow-2xs space-y-3">
+      <h3 className="text-sm sm:text-base font-bold text-slate-900 dark:text-zinc-100">
         Current Month Breakdown
       </h3>
 
-      <div className="flex items-center gap-6">
+      <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-6">
         {/* Circular Radial Donut Ring */}
-        <div className="relative size-28 shrink-0 flex items-center justify-center">
+        <div className="relative size-24 sm:size-28 shrink-0 flex items-center justify-center">
           <svg className="size-full -rotate-90" viewBox="0 0 36 36">
             {/* Background circle */}
             <path
@@ -41,7 +41,7 @@ export function AttendanceBreakdownCard({ metrics }: AttendanceBreakdownCardProp
             )}
           </svg>
           <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
-            <span className="text-lg font-extrabold text-slate-900 dark:text-zinc-100">
+            <span className="text-base sm:text-lg font-extrabold text-slate-900 dark:text-zinc-100">
               {metrics.recordedDays}
             </span>
             <span className="text-[9px] font-medium text-slate-400 dark:text-zinc-500">
@@ -51,7 +51,7 @@ export function AttendanceBreakdownCard({ metrics }: AttendanceBreakdownCardProp
         </div>
 
         {/* Breakdown Rows */}
-        <div className="flex-1 space-y-1.5 text-xs">
+        <div className="w-full sm:flex-1 space-y-1.5 text-xs">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-1.5">
               <span className="size-2 rounded-full bg-emerald-500" />

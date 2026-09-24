@@ -84,11 +84,26 @@ export function useStaffAttendance(initialTab?: string) {
   };
 
   const handleSave = () => {
-    const changes = Object.entries(pendingChanges).map(([userId, status]) => ({
-      userId,
-      status,
-      checkIn: status === 'present' ? '09:00 AM' : undefined,
-    }));
+    // Current Indian Standard Time (IST - Asia/Kolkata)
+    const nowTimeStr = new Date().toLocaleTimeString('en-US', {
+      timeZone: 'Asia/Kolkata',
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: true,
+    });
+
+    const existingRecordMap = new Map(records.map((r: any) => [r.id, r]));
+
+    const changes = Object.entries(pendingChanges).map(([userId, status]) => {
+      const existing = existingRecordMap.get(userId) as any;
+      const existingCheckIn = existing?.checkIn;
+
+      return {
+        userId,
+        status,
+        checkIn: status === 'present' ? (existingCheckIn || nowTimeStr) : undefined,
+      };
+    });
 
     if (changes.length) {
       bulkMark({ date: selectedDate, records: changes });

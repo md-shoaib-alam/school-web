@@ -6,14 +6,16 @@ export const MONTH_NAMES = [
 ];
 
 /**
- * Formats a Date object as YYYY-MM-DD in the local timezone.
- * Never use toISOString().split('T')[0] as it converts to UTC, causing day shifts.
+ * Formats a Date object as YYYY-MM-DD in Indian Standard Time (Asia/Kolkata).
+ * Prevents UTC day shifts.
  */
 export function formatLocalDate(d: Date = new Date()): string {
-  const year = d.getFullYear();
-  const month = String(d.getMonth() + 1).padStart(2, '0');
-  const day = String(d.getDate()).padStart(2, '0');
-  return `${year}-${month}-${day}`;
+  return new Intl.DateTimeFormat('en-CA', {
+    timeZone: 'Asia/Kolkata',
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+  }).format(d);
 }
 
 /**
@@ -89,12 +91,14 @@ export function generateCalendarGrid(
   // Current month days
   for (let day = 1; day <= daysInMonth; day++) {
     const dStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-    const rec = records.find((r) => r.date === dStr);
+    const rec = records.find(
+      (r) => r.date === dStr || r.date?.split('T')[0] === dStr || r.date?.trim() === dStr
+    );
     days.push({
       dateStr: dStr,
       dayNumber: day,
       isCurrentMonth: true,
-      status: rec?.status,
+      status: (rec?.status?.toLowerCase() as any) || undefined,
       record: rec,
     });
   }
