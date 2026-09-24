@@ -52,6 +52,7 @@ export function TeacherWelcomeBanner({ userName, onOpenQRScan }: TeacherWelcomeB
             src="/assets/teacher/teachertop.avif"
             alt="Teacher illustration"
             fill
+            sizes="(max-width: 640px) 112px, (max-width: 768px) 144px, 176px"
             className="object-contain select-none pointer-events-none drop-shadow-xs"
             priority
           />

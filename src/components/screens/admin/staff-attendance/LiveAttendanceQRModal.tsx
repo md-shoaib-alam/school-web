@@ -202,15 +202,16 @@ export function LiveAttendanceQRModal({
         )}
       >
         {/* Top Header */}
-        <div className="p-4 sm:p-5 pb-3.5 bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-700 text-white relative shrink-0">
-          <div className="flex items-center justify-between gap-3">
-            <div className="flex items-center gap-2.5 min-w-0">
-              <div className="size-9 rounded-xl bg-white/15 backdrop-blur-md flex items-center justify-center border border-white/20 shrink-0">
-                <QrCode className="size-5 text-white" />
+        <div className="p-3.5 sm:p-5 pb-3 sm:pb-3.5 bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-700 text-white relative shrink-0">
+          <div className="flex items-center justify-between gap-2 sm:gap-3">
+            <div className="flex items-center gap-2 sm:gap-2.5 min-w-0">
+              <div className="size-8 sm:size-9 rounded-xl bg-white/15 backdrop-blur-md flex items-center justify-center border border-white/20 shrink-0">
+                <QrCode className="size-4 sm:size-5 text-white" />
               </div>
               <div className="min-w-0">
-                <DialogTitle className="text-base sm:text-lg font-bold text-white leading-tight truncate">
-                  {title}
+                <DialogTitle className="text-sm sm:text-base md:text-lg font-bold text-white leading-tight truncate">
+                  <span className="hidden sm:inline">{title}</span>
+                  <span className="sm:hidden">Attendance QR</span>
                 </DialogTitle>
                 <DialogDescription className="sr-only">
                   Live attendance QR code for staff check-in
@@ -218,37 +219,39 @@ export function LiveAttendanceQRModal({
               </div>
             </div>
 
-            <div className="flex items-center gap-2 shrink-0">
+            <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
               <Button
                 type="button"
                 variant="ghost"
                 size="sm"
                 onClick={toggleFullscreen}
-                className="text-white hover:bg-white/20 h-8 px-2.5 rounded-xl text-xs gap-1.5 cursor-pointer border border-white/20 bg-white/10"
+                className="text-white hover:bg-white/20 h-7.5 sm:h-8 w-7.5 sm:w-auto p-0 sm:px-2.5 rounded-xl text-xs gap-1.5 cursor-pointer border border-white/20 bg-white/10 shrink-0"
+                title={isFullscreen ? 'Exit Fullscreen' : 'Fullscreen'}
               >
                 {isFullscreen ? <Minimize2 className="size-3.5" /> : <Maximize2 className="size-3.5" />}
                 <span className="hidden sm:inline">{isFullscreen ? 'Exit Fullscreen' : 'Fullscreen'}</span>
               </Button>
 
-              <Badge className="bg-white/15 hover:bg-white/20 text-white border-white/20 text-[11px] font-semibold gap-1.5 px-2.5 py-1">
+              <Badge className="bg-white/15 hover:bg-white/20 text-white border-white/20 text-[10px] sm:text-[11px] font-semibold gap-1.5 px-2 sm:px-2.5 py-0.5 sm:py-1 shrink-0">
                 <span className="size-2 rounded-full bg-emerald-400 animate-pulse" />
-                <span>Live Kiosk</span>
+                <span className="hidden sm:inline">Live Kiosk</span>
+                <span className="sm:hidden">Live</span>
               </Badge>
 
               <button
                 type="button"
                 onClick={() => onOpenChange(false)}
-                className="size-8 rounded-full bg-white/15 hover:bg-white/25 active:scale-95 text-white flex items-center justify-center transition-all cursor-pointer border border-white/20 shrink-0"
+                className="size-7.5 sm:size-8 rounded-full bg-white/15 hover:bg-white/25 active:scale-95 text-white flex items-center justify-center transition-all cursor-pointer border border-white/20 shrink-0"
                 aria-label="Close dialog"
               >
-                <X className="size-4" />
+                <X className="size-3.5 sm:size-4" />
               </button>
             </div>
           </div>
         </div>
 
         {/* Center Content: QR Code Card */}
-        <div className="flex-1 overflow-y-auto p-4 sm:p-5 space-y-3 sm:space-y-3.5">
+        <div className="flex-1 overflow-y-auto p-3.5 sm:p-5 space-y-3 sm:space-y-3.5">
           <div className="flex flex-col items-center justify-center text-center">
             {/* QR Card Container */}
             <div className="relative p-3 sm:p-4 rounded-2xl sm:rounded-3xl bg-slate-50 dark:bg-zinc-900 border-2 border-slate-200 dark:border-zinc-800 shadow-inner flex flex-col items-center justify-center">
@@ -262,7 +265,7 @@ export function LiveAttendanceQRModal({
               <div
                 className={cn(
                   'bg-white p-2.5 sm:p-3 rounded-2xl shadow-sm flex items-center justify-center overflow-hidden transition-all',
-                  isFullscreen ? 'size-64 sm:size-80 md:size-96' : 'size-44 sm:size-48'
+                  isFullscreen ? 'size-64 sm:size-80 md:size-96' : 'size-48 sm:size-56'
                 )}
               >
                 {loading && !qrSvg ? (

@@ -34,6 +34,8 @@ interface TeacherQRScanModalProps {
   todayStr: string;
 }
 
+const READER_ELEMENT_ID = 'teacher-qr-reader';
+
 export function TeacherQRScanModal({
   open,
   onOpenChange,
@@ -52,7 +54,7 @@ export function TeacherQRScanModal({
   } | null>(null);
 
   const scannerRef = useRef<Html5Qrcode | null>(null);
-  const readerElementId = 'teacher-qr-reader';
+  const shouldBeRunningRef = useRef<boolean>(false);
 
   // Process the QR token payload or 6-digit code with backend
   const handleVerify = useCallback(
@@ -84,8 +86,8 @@ export function TeacherQRScanModal({
             time: data.time,
           });
 
-          toast.success(`🎉 ${data.action === 'check_in' ? 'Checked In' : 'Checked Out'} Successfully!`, {
-            description: `Time: ${data.time} (Indian Standard Time)`,
+          toast.success(data.action === 'check_in' ? 'Attendance marked successfully' : 'Checked out successfully', {
+            description: `Time: ${data.time} (IST)`,
           });
 
           onScanSuccess?.();
@@ -93,10 +95,15 @@ export function TeacherQRScanModal({
             window.dispatchEvent(new CustomEvent('schoolsaas_attendance_updated'));
           }
         } else {
-          const errMsg = data.error || 'Failed to record attendance via QR code';
-          const cleanMsg = errMsg.toLowerCase().includes('already')
+          const rawErr = data.error || 'Failed to record attendance via QR code';
+          const isAlreadyMarked =
+            data.code === 'ATTENDANCE_ALREADY_MARKED' ||
+            rawErr.toLowerCase().includes('attendance is already marked') ||
+            rawErr.toLowerCase().includes('already checked in');
+
+          const cleanMsg = isAlreadyMarked
             ? 'Your attendance is already marked for today.'
-            : errMsg;
+            : rawErr;
           toast.error(cleanMsg);
           // Re-enable camera scanning after brief delay if error
           setTimeout(() => {
@@ -113,52 +120,131 @@ export function TeacherQRScanModal({
     [isSubmitting, todayStr, onScanSuccess]
   );
 
-  // Stop camera helper
-  const stopCamera = useCallback(async () => {
-    if (scannerRef.current) {
-      try {
-        if (scannerRef.current.isScanning) {
-          await scannerRef.current.stop();
-        }
-        await scannerRef.current.clear();
-      } catch {
-        // cleanup silent
+  const handleVerifyRef = useRef(handleVerify);
+  handleVerifyRef.current = handleVerify;
+
+  // Explicitly kill all active video/audio tracks in the DOM so the browser shuts off camera hardware
+  const killMediaTracks = useCallback(() => {
+    try {
+      const container = document.getElementById(READER_ELEMENT_ID);
+      if (container) {
+        const videos = container.querySelectorAll('video');
+        videos.forEach((video) => {
+          // Neutralize html5-qrcode's internal onabort/onerror listeners so stopping doesn't throw
+          video.onabort = null;
+          video.onerror = null;
+          video.onpause = null;
+
+          const stream = video.srcObject as MediaStream | null;
+          if (stream && stream.getTracks) {
+            stream.getTracks().forEach((track) => {
+              try {
+                track.stop();
+                track.enabled = false;
+              } catch {}
+            });
+          }
+          video.srcObject = null;
+        });
       }
-      scannerRef.current = null;
-      setCameraStarted(false);
-    }
+    } catch {}
   }, []);
+
+  // Stop camera helper - instantly releases media tracks and camera hardware
+  const stopCamera = useCallback(async () => {
+    try {
+      const container = document.getElementById(READER_ELEMENT_ID);
+      if (container) {
+        container.querySelectorAll('video').forEach((video) => {
+          video.onabort = null;
+          video.onerror = null;
+          video.onpause = null;
+        });
+      }
+    } catch {}
+
+    if (scannerRef.current) {
+      const scanner = scannerRef.current;
+      scannerRef.current = null;
+      try {
+        if (scanner.isScanning) {
+          await scanner.stop();
+        }
+      } catch {}
+      try {
+        scanner.clear();
+      } catch {}
+    }
+    killMediaTracks();
+    setCameraStarted(false);
+  }, [killMediaTracks]);
 
   // Start camera helper
   const startCamera = useCallback(async () => {
+    if (!shouldBeRunningRef.current) return;
     setCameraError(null);
+
     try {
-      // Ensure any old instance is stopped
+      // Ensure any old instance and media stream is completely terminated
       await stopCamera();
 
-      const html5QrCode = new Html5Qrcode(readerElementId);
+      // Check if user closed modal while awaiting previous stop
+      if (!shouldBeRunningRef.current) return;
+
+      const container = document.getElementById(READER_ELEMENT_ID);
+      if (!container) return;
+
+      const html5QrCode = new Html5Qrcode(READER_ELEMENT_ID);
       scannerRef.current = html5QrCode;
 
       const config = {
         fps: 15,
-        qrbox: { width: 240, height: 240 },
+        qrbox: (viewfinderWidth: number, viewfinderHeight: number) => {
+          const minEdge = Math.min(viewfinderWidth, viewfinderHeight);
+          const qrboxEdge = Math.floor(minEdge * 0.75);
+          return {
+            width: Math.min(qrboxEdge, 250),
+            height: Math.min(qrboxEdge, 250),
+          };
+        },
         aspectRatio: 1.0,
       };
 
+      // Auto-detect cameras: phones use back/rear camera; laptops/PCs use built-in webcam
+      let cameraConfig: any = { facingMode: 'environment' };
+      try {
+        const devices = await Html5Qrcode.getCameras();
+        if (devices && devices.length > 0) {
+          const backCam = devices.find((d) => /back|rear|environment/i.test(d.label));
+          cameraConfig = backCam ? backCam.id : devices[0].id;
+        }
+      } catch {
+        cameraConfig = { facingMode: 'environment' };
+      }
+
       await html5QrCode.start(
-        { facingMode: 'environment' }, // Back camera preferred on phones
+        cameraConfig,
         config,
         async (decodedText) => {
-          // On QR code detected
+          // On QR code detected, stop camera immediately before processing
+          shouldBeRunningRef.current = false;
           await stopCamera();
-          handleVerify({ qrData: decodedText });
+          handleVerifyRef.current({ qrData: decodedText });
         },
         () => {
           // Frame scanner callback
         }
       );
+
+      // If user closed the modal while camera was initializing
+      if (!shouldBeRunningRef.current) {
+        await stopCamera();
+        return;
+      }
+
       setCameraStarted(true);
     } catch (err: any) {
+      if (!shouldBeRunningRef.current) return;
       console.warn('Camera start error:', err);
       setCameraError(
         err?.message?.includes('Permission') || err?.name === 'NotAllowedError'
@@ -167,32 +253,58 @@ export function TeacherQRScanModal({
       );
       setCameraStarted(false);
     }
-  }, [handleVerify, stopCamera]);
+  }, [stopCamera, killMediaTracks]);
 
   // Manage camera lifecycle based on modal open state and active tab
   useEffect(() => {
     if (open && activeTab === 'camera' && !scanResult) {
+      shouldBeRunningRef.current = true;
       const timer = setTimeout(() => {
         startCamera();
-      }, 300);
+      }, 250);
       return () => {
         clearTimeout(timer);
+        shouldBeRunningRef.current = false;
         stopCamera();
       };
     } else {
+      shouldBeRunningRef.current = false;
       stopCamera();
     }
   }, [open, activeTab, scanResult, startCamera, stopCamera]);
 
-  // Reset state on open/close
+  // Immediate cleanup when open changes to false or on unmount
   useEffect(() => {
     if (!open) {
+      shouldBeRunningRef.current = false;
       setScanResult(null);
       setManualCode('');
       setCameraError(null);
       stopCamera();
     }
-  }, [open, stopCamera]);
+    return () => {
+      shouldBeRunningRef.current = false;
+      try {
+        const container = document.getElementById(READER_ELEMENT_ID);
+        if (container) {
+          container.querySelectorAll('video').forEach((v) => {
+            v.onabort = null;
+            v.onerror = null;
+            v.onpause = null;
+          });
+        }
+      } catch {}
+      killMediaTracks();
+      if (scannerRef.current) {
+        try {
+          if (scannerRef.current.isScanning) {
+            scannerRef.current.stop().catch(() => {});
+          }
+          scannerRef.current.clear();
+        } catch {}
+      }
+    };
+  }, [open, stopCamera, killMediaTracks]);
 
   const handleManualSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -203,8 +315,16 @@ export function TeacherQRScanModal({
     handleVerify({ code: manualCode.trim().replace(/\s+/g, '') });
   };
 
+  const handleClose = (newOpen: boolean) => {
+    if (!newOpen) {
+      shouldBeRunningRef.current = false;
+      stopCamera();
+    }
+    onOpenChange(newOpen);
+  };
+
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog open={open} onOpenChange={handleClose}>
       <DialogContent showCloseButton={false} className="sm:max-w-md p-0 overflow-hidden border border-slate-200 dark:border-zinc-800 rounded-3xl shadow-2xl bg-white dark:bg-zinc-950">
         {/* Header */}
         <div className="p-4 sm:p-5 bg-gradient-to-r from-blue-600 to-indigo-600 text-white">
@@ -230,7 +350,7 @@ export function TeacherQRScanModal({
               </Badge>
               <button
                 type="button"
-                onClick={() => onOpenChange(false)}
+                onClick={() => handleClose(false)}
                 className="size-7 sm:size-8 rounded-full bg-white/15 hover:bg-white/25 active:scale-95 text-white flex items-center justify-center transition-all cursor-pointer border border-white/20 shrink-0"
                 aria-label="Close dialog"
               >
@@ -295,7 +415,7 @@ export function TeacherQRScanModal({
 
               <div className="pt-2">
                 <Button
-                  onClick={() => onOpenChange(false)}
+                  onClick={() => handleClose(false)}
                   className="w-full rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-semibold text-xs sm:text-sm h-10 shadow-xs"
                 >
                   Done
@@ -307,12 +427,12 @@ export function TeacherQRScanModal({
             <div className="space-y-3">
               <div className="relative rounded-2xl overflow-hidden bg-slate-950 border-2 border-slate-200 dark:border-zinc-800 aspect-square flex items-center justify-center">
                 {/* HTML5 QR Code Mount Element */}
-                <div id={readerElementId} className="w-full h-full" />
+                <div id={READER_ELEMENT_ID} className="w-full h-full" />
 
                 {/* Viewfinder Overlay Frame */}
                 {cameraStarted && !cameraError && (
                   <div className="absolute inset-0 pointer-events-none flex items-center justify-center">
-                    <div className="size-52 rounded-2xl border-2 border-dashed border-blue-400/90 shadow-2xl relative">
+                    <div className="size-48 sm:size-52 rounded-2xl border-2 border-dashed border-blue-400/90 shadow-2xl relative">
                       <div className="absolute top-0 left-0 size-4 border-t-4 border-l-4 border-blue-500 rounded-tl-lg" />
                       <div className="absolute top-0 right-0 size-4 border-t-4 border-r-4 border-blue-500 rounded-tr-lg" />
                       <div className="absolute bottom-0 left-0 size-4 border-b-4 border-l-4 border-blue-500 rounded-bl-lg" />
