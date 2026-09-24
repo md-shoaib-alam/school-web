@@ -77,7 +77,7 @@ const validScreens: Record<UserRole, string[]> = {
   teacher: ['dashboard', 'my-classes', 'my-subjects', 'attendance', 'my-attendance', 'take-attendance', 'grade-management', 'assessments', 'school-exams', 'assignments', 'homework', 'leaves', 'timetable', 'notices', 'calendar', 'tickets'],
   student: ['dashboard', 'my-classes', 'my-grades', 'school-exams', 'assessments', 'my-attendance', 'assignments', 'homework', 'timetable', 'notices', 'fees', 'calendar', 'tickets'],
   parent: ['dashboard', 'children', 'grades', 'school-exams', 'assessments', 'homework', 'attendance', 'fees', 'notices', 'timetable', 'subscription', 'calendar', 'tickets'],
-  staff: ['dashboard', 'students', 'teachers', 'attendance', 'staff-attendance', 'fees', 'expenses', 'grades', 'notices', 'timetable', 'calendar', 'classes', 'subjects', 'reports', 'certificates', 'tickets', 'academic-years'],
+  staff: ['dashboard', 'students', 'teachers', 'attendance', 'teacher-attendance', 'staff-attendance', 'my-attendance', 'fees', 'expenses', 'grades', 'notices', 'timetable', 'calendar', 'classes', 'subjects', 'reports', 'certificates', 'tickets', 'academic-years'],
 };
 
 export function isValidScreen(role: UserRole, screen: string): boolean {

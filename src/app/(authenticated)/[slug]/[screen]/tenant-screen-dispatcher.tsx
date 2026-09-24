@@ -161,9 +161,9 @@ export default function TenantScreenDispatcherClient() {
       case 'staff-leaves': return <AdminLeaves key="staff-leaves" initialTab="staff" />;
       case 'grades': return <TeacherGrades />;
       case 'teacher-attendance': return <StaffAttendance key="teacher-att" initialTab="teacher" />;
-      case 'staff-attendance': return <StaffAttendance key="staff-att" initialTab="staff" />;
-      case 'my-attendance': return <TeacherMyAttendance />;
-      case 'exams': return <AdminExams key="exams" initialTab="exams" />;
+      case 'my-attendance':
+        if (currentUser.role === 'staff') return <TeacherMyAttendance />;
+        redirect(`/${currentUser.tenantSlug || currentUser.tenantId || slug}/dashboard`);
       case 'results-entry': return <AdminExams key="results" initialTab="results" />;
       case 'published-results': return <AdminExams key="published" initialTab="published" />;
       case 'print-marksheet': return <AdminPrintMarksheet />;

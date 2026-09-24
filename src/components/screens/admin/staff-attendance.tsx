@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { GraduationCap, Briefcase } from 'lucide-react';
 import {
@@ -10,6 +10,7 @@ import {
   AttendanceStats,
   AttendanceFooter,
   StaffAttendanceList,
+  LiveAttendanceQRModal,
 } from './staff-attendance/index';
 
 export function StaffAttendance({ initialTab }: StaffAttendanceProps) {
@@ -32,12 +33,21 @@ export function StaffAttendance({ initialTab }: StaffAttendanceProps) {
     handleSave,
   } = useStaffAttendance(initialTab);
 
+  const [qrModalOpen, setQrModalOpen] = useState(false);
+
   return (
     <div className="space-y-6 md:pb-18 pb-26">
       <AttendanceHeader
         activeTab={activeTab}
         selectedDate={selectedDate}
         onDateChange={setSelectedDate}
+        onOpenQR={() => setQrModalOpen(true)}
+      />
+
+      <LiveAttendanceQRModal
+        open={qrModalOpen}
+        onOpenChange={setQrModalOpen}
+        title={activeTab === 'teacher' ? 'Live Teachers Attendance QR' : 'Live Staff Attendance QR'}
       />
 
       {/* Tabs shown only when not locked by initialTab (e.g. generic attendance screen) */}
@@ -85,13 +95,15 @@ export function StaffAttendance({ initialTab }: StaffAttendanceProps) {
         onStatusChange={handleStatusChange}
       />
 
-      <AttendanceFooter
-        hasChanges={hasChanges}
-        pendingCount={Object.keys(pendingChanges).length}
-        activeTab={activeTab}
-        isSaving={isSaving}
-        onSave={handleSave}
-      />
+      {!qrModalOpen && (
+        <AttendanceFooter
+          hasChanges={hasChanges}
+          pendingCount={Object.keys(pendingChanges).length}
+          activeTab={activeTab}
+          isSaving={isSaving}
+          onSave={handleSave}
+        />
+      )}
     </div>
   );
 }

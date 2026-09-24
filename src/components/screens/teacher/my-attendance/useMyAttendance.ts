@@ -39,17 +39,19 @@ export function useMyAttendance() {
   const [viewAllModalOpen, setViewAllModalOpen] = useState(false);
 
   // Fetch Current Month Attendance strictly for the summary cards
-  const fetchCurrentMonthAttendance = useCallback(async () => {
+  const fetchCurrentMonthAttendance = useCallback(async (isSilent = false) => {
     try {
-      setLoading(true);
+      if (!isSilent) setLoading(true);
       const userId = currentUser?.id;
       const res = await apiFetch(
-        `/api/staff-attendance?month=${currentMonthStr}${userId ? `&userId=${userId}` : ''}`
+        `/api/staff-attendance?month=${currentMonthStr}${userId ? `&userId=${encodeURIComponent(userId)}` : ''}&_t=${Date.now()}`,
+        { cache: 'no-store' }
       );
       if (res.ok) {
         const data = await res.json();
         if (Array.isArray(data)) {
-          setCurrentMonthRecords(data);
+          const userRecords = userId ? data.filter((r: any) => r.userId === userId) : data;
+          setCurrentMonthRecords(userRecords);
           return;
         }
       }
@@ -69,13 +71,21 @@ export function useMyAttendance() {
   // Auto-refresh when tab/window regains focus or periodically (real-time sync)
   useEffect(() => {
     const handleFocus = () => {
-      fetchCurrentMonthAttendance();
+      fetchCurrentMonthAttendance(true);
+    };
+    const handleUpdate = () => {
+      fetchCurrentMonthAttendance(true);
     };
     window.addEventListener('focus', handleFocus);
-    const interval = setInterval(fetchCurrentMonthAttendance, 10000);
+    window.addEventListener('schoolsaas_attendance_updated', handleUpdate);
+    // Real-time silent sync every 5 seconds
+    const interval = setInterval(() => {
+      fetchCurrentMonthAttendance(true);
+    }, 5000);
 
     return () => {
       window.removeEventListener('focus', handleFocus);
+      window.removeEventListener('schoolsaas_attendance_updated', handleUpdate);
       clearInterval(interval);
     };
   }, [fetchCurrentMonthAttendance]);
@@ -97,12 +107,14 @@ export function useMyAttendance() {
       try {
         const userId = currentUser?.id;
         const res = await apiFetch(
-          `/api/staff-attendance?month=${calMonthStr}${userId ? `&userId=${userId}` : ''}`
+          `/api/staff-attendance?month=${calMonthStr}${userId ? `&userId=${encodeURIComponent(userId)}` : ''}&_t=${Date.now()}`,
+          { cache: 'no-store' }
         );
         if (res.ok) {
           const data = await res.json();
           if (Array.isArray(data) && !isCancelled) {
-            setCalendarRecords(data);
+            const userRecords = userId ? data.filter((r: any) => r.userId === userId) : data;
+            setCalendarRecords(userRecords);
             return;
           }
         }
@@ -166,10 +178,15 @@ export function useMyAttendance() {
     return calculateAttendanceMetrics(currentMonthRecords, daysInCurrentMonth);
   }, [currentMonthRecords, daysInCurrentMonth]);
 
-  // Today's record (matched by local date!)
+  // Today's record (matched by local date and currentUser id)
   const todayRecord = useMemo(() => {
-    return currentMonthRecords.find((r) => r.date === todayStr) || null;
-  }, [currentMonthRecords, todayStr]);
+    const userId = currentUser?.id;
+    return (
+      currentMonthRecords.find(
+        (r) => r.date === todayStr && (!userId || r.userId === userId)
+      ) || null
+    );
+  }, [currentMonthRecords, todayStr, currentUser?.id]);
 
   // Recent attendance list (only real records for current month, sorted desc)
   const recentRecords = useMemo(() => {
@@ -201,5 +218,6 @@ export function useMyAttendance() {
     handleNextMonth,
     handleGoToday,
     handleCheckInToggle,
+    refetch: fetchCurrentMonthAttendance,
   };
 }

@@ -90,7 +90,18 @@ function getFilteredNavItems(
 ) {
   if (!currentUser) return [];
   const allItems = navItems[currentUser.role] || [];
-  return allItems.filter((item) => shouldIncludeItem(item, currentUser, isRoot, hasPermissions));
+  return allItems
+    .map((item) => {
+      if (item.children && item.children.length > 0) {
+        const filteredChildren = item.children.filter((child: any) =>
+          shouldIncludeItem(child, currentUser, isRoot, hasPermissions)
+        );
+        if (filteredChildren.length === 0) return null;
+        return { ...item, children: filteredChildren };
+      }
+      return shouldIncludeItem(item, currentUser, isRoot, hasPermissions) ? item : null;
+    })
+    .filter(Boolean) as typeof allItems;
 }
 
 function isStatusExpired(status: string | undefined): boolean {

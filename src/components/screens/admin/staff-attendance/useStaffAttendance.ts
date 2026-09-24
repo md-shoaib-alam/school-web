@@ -60,11 +60,24 @@ export function useStaffAttendance(initialTab?: string) {
       queryClient.invalidateQueries({ queryKey: ['staff-attendance'] });
       setPendingChanges({});
       toast.success('Attendance synced successfully!');
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(new CustomEvent('schoolsaas_attendance_updated'));
+      }
     },
     onError: (err: any) => {
       toast.error(err?.response?.data?.error || 'Failed to save attendance');
     },
   });
+
+  useEffect(() => {
+    const handleUpdate = () => {
+      queryClient.invalidateQueries({ queryKey: ['staff-attendance'] });
+    };
+    window.addEventListener('schoolsaas_attendance_updated', handleUpdate);
+    return () => {
+      window.removeEventListener('schoolsaas_attendance_updated', handleUpdate);
+    };
+  }, [queryClient]);
 
   const records = attendanceData || [];
 

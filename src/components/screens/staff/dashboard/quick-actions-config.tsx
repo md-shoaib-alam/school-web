@@ -102,6 +102,14 @@ export const allQuickActions: QuickActionItem[] = [
 
   // --- Attendance Group ---
   {
+    label: "My Attendance",
+    icon: <UserCheck className="size-5" />,
+    screen: "my-attendance",
+    permModule: null,
+    color: "bg-emerald-600 hover:bg-emerald-700",
+    category: "Operations",
+  },
+  {
     label: "Student Attendance",
     icon: <Users className="size-5" />,
     screen: "attendance",

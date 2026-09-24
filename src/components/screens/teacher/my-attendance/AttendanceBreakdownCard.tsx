@@ -9,6 +9,20 @@ interface AttendanceBreakdownCardProps {
 }
 
 export function AttendanceBreakdownCard({ metrics }: AttendanceBreakdownCardProps) {
+  const total = metrics.recordedDays || 0;
+
+  const presentPct = total > 0 ? (metrics.present / total) * 100 : 0;
+  const absentPct = total > 0 ? (metrics.absent / total) * 100 : 0;
+  const leavePct = total > 0 ? (metrics.leave / total) * 100 : 0;
+  const holidayPct = total > 0 ? (metrics.holiday / total) * 100 : 0;
+
+  const presentOffset = 0;
+  const absentOffset = -presentPct;
+  const leaveOffset = -(presentPct + absentPct);
+  const holidayOffset = -(presentPct + absentPct + leavePct);
+
+  const circlePath = "M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831";
+
   return (
     <Card className="rounded-2xl border border-slate-200/80 dark:border-zinc-800 bg-white dark:bg-zinc-950 p-4 sm:p-5 shadow-2xs space-y-3">
       <h3 className="text-sm sm:text-base font-bold text-slate-900 dark:text-zinc-100">
@@ -25,18 +39,54 @@ export function AttendanceBreakdownCard({ metrics }: AttendanceBreakdownCardProp
               strokeWidth="3.8"
               stroke="currentColor"
               fill="none"
-              d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+              d={circlePath}
             />
             {/* Green segment (Present) */}
-            {Number(metrics.presentRate) > 0 && (
+            {presentPct > 0 && (
               <path
-                className="text-emerald-500"
-                strokeDasharray={`${Number(metrics.presentRate)}, 100`}
+                className="text-emerald-500 transition-all duration-500"
+                strokeDasharray={`${presentPct}, 100`}
+                strokeDashoffset={presentOffset}
                 strokeWidth="3.8"
-                strokeLinecap="round"
                 stroke="currentColor"
                 fill="none"
-                d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                d={circlePath}
+              />
+            )}
+            {/* Rose segment (Absent) */}
+            {absentPct > 0 && (
+              <path
+                className="text-rose-500 transition-all duration-500"
+                strokeDasharray={`${absentPct}, 100`}
+                strokeDashoffset={absentOffset}
+                strokeWidth="3.8"
+                stroke="currentColor"
+                fill="none"
+                d={circlePath}
+              />
+            )}
+            {/* Amber segment (Leave) */}
+            {leavePct > 0 && (
+              <path
+                className="text-amber-500 transition-all duration-500"
+                strokeDasharray={`${leavePct}, 100`}
+                strokeDashoffset={leaveOffset}
+                strokeWidth="3.8"
+                stroke="currentColor"
+                fill="none"
+                d={circlePath}
+              />
+            )}
+            {/* Purple segment (Holiday) */}
+            {holidayPct > 0 && (
+              <path
+                className="text-purple-500 transition-all duration-500"
+                strokeDasharray={`${holidayPct}, 100`}
+                strokeDashoffset={holidayOffset}
+                strokeWidth="3.8"
+                stroke="currentColor"
+                fill="none"
+                d={circlePath}
               />
             )}
           </svg>

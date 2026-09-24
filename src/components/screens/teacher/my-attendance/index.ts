@@ -8,3 +8,5 @@ export * from './TodayAttendanceCard';
 export * from './AttendanceBreakdownCard';
 export * from './RecentAttendanceList';
 export * from './AttendanceHistoryDialog';
+export * from './TeacherQRScanModal';
+

@@ -17,6 +17,7 @@ import {
   History,
   CalendarDays,
   TicketCheck,
+  QrCode,
 } from "lucide-react";
 
 import { ComprehensiveDashboard } from "./ComprehensiveDashboard";
@@ -94,6 +95,13 @@ export function TeacherDashboard() {
   }, [isError, error]);
 
   const allTeacherQuickActions = [
+    {
+      label: "Scan Attendance QR",
+      icon: <QrCode className="size-5" />,
+      screen: "my-attendance",
+      color: "bg-indigo-600 hover:bg-indigo-700",
+      keywords: ["qr", "scan", "punch", "check in", "attendance"],
+    },
     {
       label: "My Classes",
       icon: <School className="size-5" />,

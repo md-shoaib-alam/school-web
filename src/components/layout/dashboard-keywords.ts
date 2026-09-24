@@ -13,6 +13,7 @@ export const actionKeywords: Record<string, string[]> = {
   "calendar": ["events", "holiday", "agenda", "dates"],
 
   // --- Attendance Group ---
+  "my-attendance": ["my attendance", "self attendance", "check in", "check out", "qr scan", "punch in", "attendance log", "my punch"],
   "attendance": ["present", "absent", "roll call", "student attendance"],
   "teacher-attendance": ["present", "absent", "staff check-in", "teacher attendance"],
   "staff-attendance": ["present", "absent", "employee check-in", "staff attendance"],

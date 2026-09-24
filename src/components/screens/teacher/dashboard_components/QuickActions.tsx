@@ -1,13 +1,22 @@
 'use client';
 
 import React from 'react';
-import { Zap, UserCheck, FilePlus, ClipboardList, Calendar, ChevronRight } from 'lucide-react';
+import { Zap, UserCheck, FilePlus, ClipboardList, Calendar, ChevronRight, QrCode } from 'lucide-react';
 
 interface QuickActionsProps {
   onNavigate: (screen: string) => void;
+  onOpenQRScan?: () => void;
 }
 
 const actions = [
+  {
+    label: 'Scan Attendance QR',
+    subtitle: 'Punch in with live school QR',
+    screen: 'scan-qr',
+    icon: <QrCode className="size-4" />,
+    iconBox: 'bg-indigo-100/80 dark:bg-indigo-900/60 text-indigo-600 dark:text-indigo-400',
+    cardBg: 'bg-indigo-50/40 hover:bg-indigo-50/80 dark:bg-indigo-950/20 dark:hover:bg-indigo-950/40 border-indigo-200/80 dark:border-indigo-900/40',
+  },
   {
     label: 'Take Attendance',
     subtitle: 'Mark student attendance',
@@ -42,7 +51,7 @@ const actions = [
   },
 ];
 
-export function QuickActions({ onNavigate }: QuickActionsProps) {
+export function QuickActions({ onNavigate, onOpenQRScan }: QuickActionsProps) {
   return (
     <div className="rounded-2xl sm:rounded-3xl border border-zinc-200/80 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-4 sm:p-5 shadow-xs flex flex-col h-full">
       {/* Header */}
@@ -53,12 +62,20 @@ export function QuickActions({ onNavigate }: QuickActionsProps) {
         </h2>
       </div>
 
-      {/* 2x2 Action Cards Grid */}
+      {/* Action Cards Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 mt-3">
         {actions.map((act) => (
           <div
             key={act.screen}
-            onClick={() => onNavigate(act.screen)}
+            onClick={() => {
+              if (act.screen === 'scan-qr' && onOpenQRScan) {
+                onOpenQRScan();
+              } else if (act.screen === 'scan-qr') {
+                onNavigate('my-attendance');
+              } else {
+                onNavigate(act.screen);
+              }
+            }}
             className={`rounded-xl sm:rounded-2xl p-2.5 sm:p-3 border flex items-center justify-between transition-all group cursor-pointer shadow-2xs hover:shadow-xs ${act.cardBg}`}
           >
             <div className="flex items-center gap-2.5 min-w-0">

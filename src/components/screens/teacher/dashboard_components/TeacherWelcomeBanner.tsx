@@ -3,11 +3,14 @@
 import React from 'react';
 import Image from 'next/image';
 
+import { QrCode } from 'lucide-react';
+
 interface TeacherWelcomeBannerProps {
   userName: string;
+  onOpenQRScan?: () => void;
 }
 
-export function TeacherWelcomeBanner({ userName }: TeacherWelcomeBannerProps) {
+export function TeacherWelcomeBanner({ userName, onOpenQRScan }: TeacherWelcomeBannerProps) {
   return (
     <div className="relative overflow-hidden rounded-2xl sm:rounded-3xl border border-sky-100/80 dark:border-zinc-800 bg-gradient-to-r from-sky-50/90 via-emerald-50/30 to-amber-50/60 dark:from-zinc-900 dark:via-zinc-900/90 dark:to-zinc-900 py-3.5 sm:py-4 px-4 sm:px-6 shadow-xs">
       {/* Ambient background glows matching illustration colors (blue, emerald, amber) */}
@@ -28,6 +31,19 @@ export function TeacherWelcomeBanner({ userName }: TeacherWelcomeBannerProps) {
           <p className="text-[11px] sm:text-xs text-zinc-500 dark:text-zinc-400 mt-1 line-clamp-1 sm:line-clamp-none">
             Here&apos;s what&apos;s happening with your classes today.
           </p>
+
+          {onOpenQRScan && (
+            <div className="mt-2.5 flex items-center gap-2">
+              <button
+                type="button"
+                onClick={onOpenQRScan}
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-semibold text-xs shadow-xs transition-all active:scale-95 cursor-pointer"
+              >
+                <QrCode className="size-3.5" />
+                <span>Scan Attendance QR</span>
+              </button>
+            </div>
+          )}
         </div>
 
         {/* Right Section: teachertop.avif Image */}

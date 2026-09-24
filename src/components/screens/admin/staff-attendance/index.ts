@@ -5,3 +5,5 @@ export * from './AttendanceStats';
 export * from './AttendanceFooter';
 export * from './StaffAttendanceRow';
 export * from './StaffAttendanceList';
+export * from './LiveAttendanceQRModal';
+

@@ -10,6 +10,7 @@ import {
   AttendanceBreakdownCard,
   RecentAttendanceList,
   AttendanceHistoryDialog,
+  TeacherQRScanModal,
 } from './my-attendance/index';
 
 export function TeacherMyAttendance() {
@@ -34,7 +35,10 @@ export function TeacherMyAttendance() {
     handleNextMonth,
     handleGoToday,
     handleCheckInToggle,
+    refetch,
   } = useMyAttendance();
+
+  const [qrScanModalOpen, setQrScanModalOpen] = React.useState(false);
 
   return (
     <div className="space-y-5">
@@ -72,6 +76,7 @@ export function TeacherMyAttendance() {
             todayRecord={todayRecord}
             isCheckingIn={isCheckingIn}
             onCheckInToggle={handleCheckInToggle}
+            onOpenQRScan={() => setQrScanModalOpen(true)}
             metrics={currentMonthMetrics}
           />
 
@@ -96,6 +101,15 @@ export function TeacherMyAttendance() {
         currentRealYear={currentRealYear}
         currentMonthRecords={currentMonthRecords}
       />
+
+      {/* ── Camera & Code QR Scanner Modal ── */}
+      <TeacherQRScanModal
+        open={qrScanModalOpen}
+        onOpenChange={setQrScanModalOpen}
+        onScanSuccess={refetch}
+        todayStr={todayStr}
+      />
     </div>
   );
 }
+export const MyAttendanceScreen = TeacherMyAttendance;

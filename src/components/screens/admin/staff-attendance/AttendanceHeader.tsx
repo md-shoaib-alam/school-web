@@ -8,12 +8,14 @@ interface AttendanceHeaderProps {
   activeTab: string;
   selectedDate: string;
   onDateChange: (dateStr: string) => void;
+  onOpenQR?: () => void;
 }
 
 export function AttendanceHeader({
   activeTab,
   selectedDate,
   onDateChange,
+  onOpenQR,
 }: AttendanceHeaderProps) {
   return (
     <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -34,7 +36,18 @@ export function AttendanceHeader({
             : "Manage daily attendance logs for admin staff members."}
         </p>
       </div>
-      <div className="flex items-center gap-3">
+      <div className="flex items-center gap-2.5 sm:gap-3 flex-wrap">
+        {onOpenQR && (
+          <button
+            type="button"
+            onClick={onOpenQR}
+            className="rounded-xl border border-blue-200 dark:border-blue-900/60 bg-blue-50/80 hover:bg-blue-100 text-blue-700 dark:text-blue-300 dark:bg-blue-950/40 dark:hover:bg-blue-900/50 text-xs sm:text-sm font-semibold inline-flex items-center gap-2 px-3.5 h-10 shadow-2xs transition-all cursor-pointer active:scale-95"
+          >
+            <span className="size-2 rounded-full bg-emerald-500 animate-pulse" />
+            <span>Live QR Attendance</span>
+          </button>
+        )}
+
         <DatePicker
           date={selectedDate ? parseISO(selectedDate) : undefined}
           onChange={(d) => {

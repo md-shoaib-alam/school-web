@@ -1,12 +1,13 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import { TeacherWelcomeBanner } from '../dashboard_components/TeacherWelcomeBanner';
 import { TeacherStats } from '../dashboard_components/TeacherStats';
 import { TodaySchedule } from '../dashboard_components/TodaySchedule';
 import { QuickActions } from '../dashboard_components/QuickActions';
 import { TeacherSubjects } from '../dashboard_components/TeacherSubjects';
 import { RecentAssignments } from '../dashboard_components/RecentAssignments';
+import { TeacherQRScanModal } from '../my-attendance/TeacherQRScanModal';
 
 interface ComprehensiveDashboardProps {
   classes: any[];
@@ -35,10 +36,23 @@ export function ComprehensiveDashboard({
   formatDate,
   navigateTo,
 }: ComprehensiveDashboardProps) {
+  const [qrModalOpen, setQrModalOpen] = useState(false);
+
+  // Today in Indian Standard Time (IST - Asia/Kolkata)
+  const todayStr = new Intl.DateTimeFormat('en-CA', {
+    timeZone: 'Asia/Kolkata',
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+  }).format(new Date());
+
   return (
     <div className="space-y-4 animate-in fade-in duration-300 max-w-7xl mx-auto">
       {/* 1. Welcome Banner */}
-      <TeacherWelcomeBanner userName={currentUser?.name || 'Teacher 3'} />
+      <TeacherWelcomeBanner
+        userName={currentUser?.name || 'Teacher 3'}
+        onOpenQRScan={() => setQrModalOpen(true)}
+      />
 
       {/* 2. 4 Stat Cards */}
       <TeacherStats
@@ -59,7 +73,10 @@ export function ComprehensiveDashboard({
           />
         </div>
         <div className="lg:col-span-2">
-          <QuickActions onNavigate={navigateTo} />
+          <QuickActions
+            onNavigate={navigateTo}
+            onOpenQRScan={() => setQrModalOpen(true)}
+          />
         </div>
       </div>
 
@@ -72,6 +89,13 @@ export function ComprehensiveDashboard({
           formatDate={formatDate}
         />
       </div>
+
+      {/* Direct In-Dashboard QR Attendance Scanner */}
+      <TeacherQRScanModal
+        open={qrModalOpen}
+        onOpenChange={setQrModalOpen}
+        todayStr={todayStr}
+      />
     </div>
   );
 }
