@@ -28,12 +28,12 @@ export function AttendanceHeader({
           )}
           {activeTab === "teacher"
             ? "Teacher Attendance"
-            : "Admin Staff Attendance"}
+            : "Staff Attendance"}
         </h2>
         <p className="text-zinc-500 dark:text-zinc-400 mt-1">
           {activeTab === "teacher"
             ? "Manage daily attendance logs for all teachers."
-            : "Manage daily attendance logs for admin staff members."}
+            : "Manage daily attendance logs for staff members."}
         </p>
       </div>
       <div className="flex items-center gap-2.5 sm:gap-3 flex-wrap">

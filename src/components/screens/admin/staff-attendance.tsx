@@ -71,7 +71,7 @@ export function StaffAttendance({ initialTab }: StaffAttendanceProps) {
               className="rounded-xl data-[state=active]:bg-white dark:data-[state=active]:bg-zinc-800 data-[state=active]:shadow-sm font-bold flex items-center gap-2"
             >
               <Briefcase className="size-4" />
-              Admin Staff
+              Staff
             </TabsTrigger>
           </TabsList>
         </Tabs>

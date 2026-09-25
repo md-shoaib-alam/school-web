@@ -3,6 +3,7 @@
 import { useEffect, useSyncExternalStore } from 'react';
 import { useParams, redirect } from 'next/navigation';
 import { useAppStore } from '@/store/use-app-store';
+import { hasPermission } from '@/lib/permissions';
 import dynamic from 'next/dynamic';
 import { FullPageSkeleton } from "@/components/ui/full-page-skeleton";
 
@@ -119,6 +120,57 @@ export default function TenantScreenDispatcherClient() {
   }
   
   if (currentUser.role === 'super_admin' || currentUser.role === 'admin' || currentUser.role === 'staff') {
+    // Permission guard for staff users
+    if (currentUser.role === 'staff') {
+      const STAFF_SCREEN_PERMISSIONS: Record<string, string> = {
+        'students': 'students',
+        'teachers': 'teachers',
+        'parents': 'parents',
+        'classes': 'classes',
+        'subjects': 'subjects',
+        'attendance': 'attendance',
+        'teacher-attendance': 'attendance',
+        'staff-attendance': 'attendance',
+        'fees': 'fees',
+        'fee-categories': 'fees',
+        'fee-concessions': 'fees',
+        'make-payment': 'fees',
+        'check-receipt': 'fees',
+        'fee-status': 'fees',
+        'check-payments': 'fees',
+        'transport-fee': 'fees',
+        'expenses': 'expenses',
+        'academic-years': 'academic-years',
+        'timetable': 'timetable',
+        'calendar': 'calendar',
+        'reports': 'reports',
+        'notices': 'notices',
+        'tickets': 'tickets',
+        'roles': 'roles',
+        'staff': 'staff',
+        'school-settings': 'settings',
+        'promotions': 'promotions',
+        'bulk-promote': 'promotions',
+        'graduated': 'promotions',
+        'certificates': 'certificates',
+        'leaves': 'leaves',
+        'student-leaves': 'leaves',
+        'teacher-leaves': 'leaves',
+        'staff-leaves': 'leaves',
+        'exams': 'exams',
+        'results-entry': 'exams',
+        'published-results': 'exams',
+        'print-marksheet': 'exams',
+        'admit-cards': 'exams',
+      };
+
+      const requiredModule = STAFF_SCREEN_PERMISSIONS[screen];
+      if (requiredModule && !hasPermission(currentUser, requiredModule, 'view')) {
+        const tid = currentUser.tenantSlug || currentUser.tenantId || slug;
+        redirect(`/${tid}/dashboard`);
+      }
+    }
+
     switch (screen) {
       case 'profile': return <UserProfileScreen />;
       case 'dashboard': 
@@ -161,6 +213,7 @@ export default function TenantScreenDispatcherClient() {
       case 'staff-leaves': return <AdminLeaves key="staff-leaves" initialTab="staff" />;
       case 'grades': return <TeacherGrades />;
       case 'teacher-attendance': return <StaffAttendance key="teacher-att" initialTab="teacher" />;
+      case 'staff-attendance': return <StaffAttendance key="staff-att" initialTab="staff" />;
       case 'my-attendance':
         if (currentUser.role === 'staff') return <TeacherMyAttendance />;
         redirect(`/${currentUser.tenantSlug || currentUser.tenantId || slug}/dashboard`);
