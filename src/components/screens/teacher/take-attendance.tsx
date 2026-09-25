@@ -1,6 +1,6 @@
 "use client";
 
-import { api } from "@/lib/api";
+import { api, fetchAllStudents } from "@/lib/api";
 import { queryClient } from "@/lib/query-client";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useState, useEffect, useMemo } from "react";
@@ -124,8 +124,9 @@ export function TeacherAttendance() {
   const { data: students = [], isLoading: studentsLoading } = useQuery({
     queryKey: studentsKey(activeClassId),
     queryFn: async () => {
-      const data = await api.get<any>(`/students?classId=${activeClassId}`);
-      return (Array.isArray(data) ? data : data.items ?? []) as StudentInfo[];
+      // Paginates internally — the server caps a page at 100 students.
+      const data = await fetchAllStudents({ classId: activeClassId });
+      return data as StudentInfo[];
     },
     enabled: !!activeClassId,
     staleTime: 5 * 60 * 1000,
@@ -136,7 +137,7 @@ export function TeacherAttendance() {
   const { data: existingAttendance = [] } = useQuery({
     queryKey: attendanceKey(activeClassId, date),
     queryFn: async () => {
-      const res = await api.get<any>(`/attendance?classId=${activeClassId}&date=${date}`);
+      const res = await api.get<any>(`/attendance?classId=${activeClassId}&date=${date}&limit=1000`);
       return Array.isArray(res?.records) ? res.records : [];
     },
     enabled: !!activeClassId,

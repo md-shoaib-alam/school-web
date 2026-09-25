@@ -18,6 +18,7 @@ interface AttendanceCalendarProps {
   onNextMonth: () => void;
   onGoToday: () => void;
   calendarRecords: AttendanceRecordItem[];
+  className?: string;
 }
 
 export function AttendanceCalendar({
@@ -30,13 +31,14 @@ export function AttendanceCalendar({
   onNextMonth,
   onGoToday,
   calendarRecords,
+  className,
 }: AttendanceCalendarProps) {
   const calendarDays = useMemo(() => {
     return generateCalendarGrid(calYear, calMonth, calendarRecords);
   }, [calYear, calMonth, calendarRecords]);
 
   return (
-    <Card className="lg:col-span-5 rounded-2xl border border-slate-200/80 dark:border-zinc-800 bg-white dark:bg-zinc-950 p-3.5 sm:p-5 shadow-2xs flex flex-col justify-between">
+    <Card className={cn('lg:col-span-5 rounded-2xl border border-slate-200/80 dark:border-zinc-800 bg-white dark:bg-zinc-950 p-3.5 sm:p-5 shadow-2xs flex flex-col justify-between', className)}>
       <div>
         {/* Calendar Controls */}
         <div className="flex items-center justify-between pb-3 sm:pb-4 border-b border-slate-100 dark:border-zinc-800">

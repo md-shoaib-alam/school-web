@@ -35,6 +35,7 @@ import {
   UserCheck,
   ExternalLink,
   Settings2,
+  Plug,
 } from "lucide-react";
 import { Tenant, ViewMode } from "./types";
 import { TenantPlanBadge, TenantStatusBadge } from "./badges";
@@ -50,6 +51,7 @@ const TenantCard = memo(function TenantCard({
   onDelete,
   onManageData,
   onAddAdmin,
+  onIntegrations,
 }: {
   tenant: Tenant;
   onView: () => void;
@@ -58,6 +60,7 @@ const TenantCard = memo(function TenantCard({
   onDelete: () => void;
   onManageData?: () => void;
   onAddAdmin: (tenant: Tenant) => void;
+  onIntegrations: (tenant: Tenant) => void;
 }) {
   return (
     <div className="bg-white dark:bg-zinc-950 text-foreground rounded-2xl p-4 border-2 border-neutral-900 dark:border-white shadow-2xs hover:shadow-xs transition-all duration-200 flex flex-col justify-between">
@@ -125,6 +128,10 @@ const TenantCard = memo(function TenantCard({
               <DropdownMenuItem onClick={() => onAddAdmin(tenant)} className="text-xs">
                 <ShieldCheck className="size-3.5 mr-2" />
                 Create Admin
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => onIntegrations(tenant)} className="text-xs">
+                <Plug className="size-3.5 mr-2" />
+                Integrations
               </DropdownMenuItem>
               <DropdownMenuItem onClick={onEdit} className="text-xs">
                 <Edit className="size-3.5 mr-2" />
@@ -248,6 +255,7 @@ interface TenantTableProps {
   onDelete: (tenant: Tenant) => void;
   onManageData: (tenant: Tenant) => void;
   onAddAdmin: (tenant: Tenant) => void;
+  onIntegrations: (tenant: Tenant) => void;
 }
 
 export function TenantTable({
@@ -263,6 +271,7 @@ export function TenantTable({
   onDelete,
   onManageData,
   onAddAdmin,
+  onIntegrations,
 }: TenantTableProps) {
   if (loading && tenants.length === 0) {
     return (
@@ -304,6 +313,7 @@ export function TenantTable({
               onDelete={() => onDelete(tenant)}
               onManageData={() => onManageData(tenant)}
               onAddAdmin={onAddAdmin}
+              onIntegrations={onIntegrations}
             />
           ))}
         </div>
@@ -402,6 +412,9 @@ export function TenantTable({
                       </DropdownMenuItem>
                       <DropdownMenuItem onClick={() => onAddAdmin(tenant)} className="text-xs">
                         <ShieldCheck className="size-3.5 mr-2" /> Create Admin
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => onIntegrations(tenant)} className="text-xs">
+                        <Plug className="size-3.5 mr-2" /> Integrations
                       </DropdownMenuItem>
                       <DropdownMenuItem onClick={() => onEdit(tenant)} className="text-xs">
                         <Edit className="size-3.5 mr-2" /> Edit

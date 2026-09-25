@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -20,11 +20,13 @@ import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import {
   CalendarDays, Briefcase, Users, Clock, CheckCircle2, XCircle,
   Loader2, FileText, AlertTriangle, Filter, Ban, Plus,
-  Search, ArrowRight, RotateCcw, ChevronLeft, ChevronRight, Eye, Check, X,
-  Calendar, ArrowUpDown, ChevronDown
+  Search, ArrowRight, RotateCcw, Eye, Check, X,
+  Calendar, ArrowUpDown, ChevronDown, Crown, Sparkles
 } from 'lucide-react';
 import { toast } from "sonner";
+import { useRouter, useParams } from 'next/navigation';
 import { apiFetch } from '@/lib/api';
+import { Pagination } from '@/components/shared/pagination';
 import { useAppStore } from '@/store/use-app-store';
 import { cn } from '@/lib/utils';
 
@@ -77,6 +79,9 @@ interface LeaveRequest {
   createdAt: string;
 }
 
+// Server-side caps for the min/dropdown endpoints used by the applicant picker.
+const CANDIDATE_LIMITS: Record<string, number> = { student: 100, teacher: 200, staff: 200 };
+
 function getDurationDays(start: string, end: string): number {
   try {
     const s = new Date(start).getTime();
@@ -111,20 +116,32 @@ export function AdminLeaves({ initialTab = 'teacher' }: { initialTab?: string })
 // ── Admin Manager View ──
 
 function AdminManagerView({ initialTab }: { initialTab: string }) {
+  const router = useRouter();
+  const { slug } = useParams();
   const activeTab = initialTab;
   const [leaves, setLeaves] = useState<LeaveRequest[]>([]);
   const [loading, setLoading] = useState(true);
+  const [total, setTotal] = useState(0);
+  const [totalPages, setTotalPages] = useState(1);
+  const [counts, setCounts] = useState<Record<string, number>>({});
+  // null = full history (paid plans); a number = rolling month window (basic)
+  const [historyMonths, setHistoryMonths] = useState<number | null>(null);
 
   // Filters
   const [searchQuery, setSearchQuery] = useState('');
+  const [debouncedSearch, setDebouncedSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [leaveTypeFilter, setLeaveTypeFilter] = useState('all');
   const [startDateFilter, setStartDateFilter] = useState('');
   const [endDateFilter, setEndDateFilter] = useState('');
 
+  // Filtering is server-side now, so overlapping requests can land out of order.
+  // Track the newest one and drop anything stale.
+  const fetchSeqRef = useRef(0);
+
   // Pagination & Sorting
   const [currentPage, setCurrentPage] = useState(1);
-  const [pageSize, setPageSize] = useState(10);
+  const [pageSize, setPageSize] = useState(15);
   const [sortField, setSortField] = useState<'userName' | 'leaveType' | 'startDate' | 'status' | 'createdAt'>('createdAt');
   const [sortAsc, setSortAsc] = useState(false);
 
@@ -166,97 +183,131 @@ function AdminManagerView({ initialTab }: { initialTab: string }) {
 
   const [availableCandidates, setAvailableCandidates] = useState<{ id: string; name: string; email?: string }[]>([]);
   const [candidatesLoading, setCandidatesLoading] = useState(false);
+  const [candidateSearch, setCandidateSearch] = useState('');
+  const [debouncedCandidateSearch, setDebouncedCandidateSearch] = useState('');
+  const [candidatesTruncated, setCandidatesTruncated] = useState(false);
 
-  // 1. Fetch Candidate List for New Leave Request
+  useEffect(() => {
+    const t = setTimeout(() => setDebouncedSearch(searchQuery.trim()), 300);
+    return () => clearTimeout(t);
+  }, [searchQuery]);
+
+  useEffect(() => {
+    const t = setTimeout(() => setDebouncedCandidateSearch(candidateSearch.trim()), 300);
+    return () => clearTimeout(t);
+  }, [candidateSearch]);
+
+  // 1. Fetch Candidate List for New Leave Request.
+  // Searched server-side: the min lists are capped (100 students / 200 teachers
+  // and staff), so a "load everything" approach would silently hide people.
   useEffect(() => {
     if (!applyModalOpen) return;
+    let cancelled = false;
+    const cap = CANDIDATE_LIMITS[activeTab] ?? 100;
+
     setCandidatesLoading(true);
+    const qs = new URLSearchParams({ mode: 'min', limit: String(cap) });
+    if (debouncedCandidateSearch) qs.set('search', debouncedCandidateSearch);
+
     const endpoint =
       activeTab === 'student'
-        ? '/api/students?limit=200'
+        ? `/api/students?${qs.toString()}`
         : activeTab === 'teacher'
-        ? '/api/teachers?limit=200'
-        : '/api/staff?limit=200';
+        ? `/api/teachers?${qs.toString()}`
+        : `/api/staff?${qs.toString()}`;
 
     apiFetch(endpoint)
-      .then(res => res.json())
+      .then(res => (res.ok ? res.json() : []))
       .then(data => {
-        const list = Array.isArray(data) ? data : data?.data || data?.items || [];
+        if (cancelled) return;
+        const list: any[] = Array.isArray(data) ? data : data?.items || data?.data || [];
         setAvailableCandidates(list.map((c: any) => ({
           id: c.userId || c.id,
           name: c.name || c.userName || 'Unnamed',
           email: c.email || c.userEmail || ''
         })));
+        setCandidatesTruncated(list.length >= cap);
       })
-      .catch(() => setAvailableCandidates([]))
-      .finally(() => setCandidatesLoading(false));
-  }, [applyModalOpen, activeTab]);
+      .catch(() => {
+        if (!cancelled) setAvailableCandidates([]);
+      })
+      .finally(() => {
+        if (!cancelled) setCandidatesLoading(false);
+      });
 
-  // 2. Fetch Leaves
+    return () => { cancelled = true; };
+  }, [applyModalOpen, activeTab, debouncedCandidateSearch]);
+
+  // 2. Fetch one page of leaves (search, filters, sort and paging all server-side)
   const fetchLeaves = useCallback(async () => {
+    const seq = ++fetchSeqRef.current;
     setLoading(true);
     try {
-      const params = new URLSearchParams({ role: activeTab });
+      const params = new URLSearchParams({
+        role: activeTab,
+        paginate: 'true',
+        page: String(currentPage),
+        limit: String(pageSize),
+        sortBy: sortField,
+        order: sortAsc ? 'asc' : 'desc',
+      });
       if (statusFilter !== 'all') params.set('status', statusFilter);
       if (leaveTypeFilter !== 'all') params.set('leaveType', leaveTypeFilter);
+      if (debouncedSearch) params.set('search', debouncedSearch);
+      if (startDateFilter) params.set('from', startDateFilter);
+      if (endDateFilter) params.set('to', endDateFilter);
+
       const res = await apiFetch(`/api/leaves?${params.toString()}`);
+      if (seq !== fetchSeqRef.current) return;
       if (res.ok) {
         const data = await res.json();
-        setLeaves(Array.isArray(data) ? data : []);
+        const list: LeaveRequest[] = Array.isArray(data?.items) ? data.items : [];
+        const serverTotal = Number(data?.total ?? 0);
+        const serverTotalPages = Math.max(1, Number(data?.totalPages ?? 1));
+
+        // The last page can empty out after an approve/reject — step back one
+        if (list.length === 0 && serverTotal > 0 && currentPage > serverTotalPages) {
+          setCurrentPage(serverTotalPages);
+          return;
+        }
+
+        setLeaves(list);
+        setTotal(serverTotal);
+        setTotalPages(serverTotalPages);
+        setCounts(data?.counts ?? {});
+        setHistoryMonths(typeof data?.historyMonths === 'number' ? data.historyMonths : null);
       }
     } catch {
       /* silent */
     } finally {
-      setLoading(false);
+      if (seq === fetchSeqRef.current) setLoading(false);
     }
-  }, [activeTab, statusFilter, leaveTypeFilter]);
+  }, [
+    activeTab, statusFilter, leaveTypeFilter, startDateFilter, endDateFilter,
+    debouncedSearch, sortField, sortAsc, currentPage, pageSize,
+  ]);
 
   useEffect(() => {
     fetchLeaves();
   }, [fetchLeaves]);
 
-  // 3. Metric Calculations (based on total loaded records)
+  // 3. Metric cards — totals come from the server (window + filters applied)
   const metrics = useMemo(() => {
     return {
-      total: leaves.length,
-      approved: leaves.filter(l => l.status === 'approved').length,
-      pending: leaves.filter(l => l.status === 'pending').length,
-      rejected: leaves.filter(l => l.status === 'rejected').length,
+      total: counts.all ?? 0,
+      approved: counts.approved ?? 0,
+      pending: counts.pending ?? 0,
+      rejected: counts.rejected ?? 0,
     };
-  }, [leaves]);
+  }, [counts]);
 
-  // 4. Filtering & Sorting
-  const filteredLeaves = useMemo(() => {
-    return leaves.filter(l => {
-      if (searchQuery.trim()) {
-        const q = searchQuery.toLowerCase();
-        const matchesName = l.userName?.toLowerCase().includes(q);
-        const matchesEmail = l.userEmail?.toLowerCase().includes(q);
-        const matchesReason = l.reason?.toLowerCase().includes(q);
-        if (!matchesName && !matchesEmail && !matchesReason) return false;
-      }
-      if (startDateFilter && l.startDate < startDateFilter) return false;
-      if (endDateFilter && l.endDate > endDateFilter) return false;
-      return true;
-    }).sort((a, b) => {
-      let valA: any = a[sortField] || '';
-      let valB: any = b[sortField] || '';
-      if (sortField === 'startDate' || sortField === 'createdAt') {
-        valA = new Date(valA).getTime();
-        valB = new Date(valB).getTime();
-      }
-      if (valA < valB) return sortAsc ? -1 : 1;
-      if (valA > valB) return sortAsc ? 1 : -1;
-      return 0;
-    });
-  }, [leaves, searchQuery, startDateFilter, endDateFilter, sortField, sortAsc]);
-
-  // 5. Pagination
-  const totalPages = Math.max(1, Math.ceil(filteredLeaves.length / pageSize));
-  const paginatedLeaves = useMemo(() => {
-    const start = (currentPage - 1) * pageSize;
-    return filteredLeaves.slice(start, start + pageSize);
-  }, [filteredLeaves, currentPage, pageSize]);
+  const minFromDate = useMemo(() => {
+    if (historyMonths === null) return undefined;
+    const d = new Date();
+    d.setMonth(d.getMonth() - historyMonths);
+    const pad = (n: number) => String(n).padStart(2, '0');
+    return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+  }, [historyMonths]);
 
   // Handle Sort Toggle
   const handleSort = (field: typeof sortField) => {
@@ -266,14 +317,15 @@ function AdminManagerView({ initialTab }: { initialTab: string }) {
       setSortField(field);
       setSortAsc(true);
     }
+    setCurrentPage(1);
   };
 
   // Handle Checkbox Selection
   const toggleSelectAll = () => {
-    if (selectedIds.size === paginatedLeaves.length && paginatedLeaves.length > 0) {
+    if (selectedIds.size === leaves.length && leaves.length > 0) {
       setSelectedIds(new Set());
     } else {
-      setSelectedIds(new Set(paginatedLeaves.map(l => l.id)));
+      setSelectedIds(new Set(leaves.map(l => l.id)));
     }
   };
 
@@ -487,6 +539,30 @@ function AdminManagerView({ initialTab }: { initialTab: string }) {
         ))}
       </div>
 
+      {/* Basic plan: history is windowed server-side, so say so and offer the upgrade */}
+      {historyMonths !== null && (
+        <div className="flex flex-col sm:flex-row sm:items-center gap-3 rounded-2xl border border-amber-200/80 dark:border-amber-900/50 bg-gradient-to-r from-amber-50 to-orange-50/60 dark:from-amber-950/20 dark:to-orange-950/10 p-3.5 sm:p-4 shadow-2xs">
+          <div className="flex items-center justify-center size-9 rounded-xl bg-amber-100 dark:bg-amber-950/50 border border-amber-200 dark:border-amber-900/60 shrink-0">
+            <Crown className="size-4.5 text-amber-600 dark:text-amber-400" />
+          </div>
+          <div className="flex-1 min-w-0 text-center sm:text-left">
+            <p className="text-xs sm:text-sm font-semibold text-amber-900 dark:text-amber-200">
+              Showing the last {historyMonths} months of leave history
+            </p>
+            <p className="text-[11px] sm:text-xs text-amber-700/80 dark:text-amber-400/80 mt-0.5">
+              Your current plan only keeps a rolling {historyMonths}-month window. Upgrade to see every request ever filed.
+            </p>
+          </div>
+          <Button
+            onClick={() => router.push(`/${slug}/manage-plan`)}
+            className="rounded-xl h-9 px-3.5 text-xs font-semibold bg-amber-600 hover:bg-amber-700 text-white gap-1.5 shadow-xs shadow-amber-600/20 shrink-0"
+          >
+            <Sparkles className="size-3.5" />
+            <span>Upgrade for full history</span>
+          </Button>
+        </div>
+      )}
+
       {/* ── 3. Search & Filter Bar ── */}
       <Card className="rounded-2xl border border-slate-200/80 dark:border-zinc-800 bg-white dark:bg-zinc-950 p-3 sm:p-4 shadow-2xs">
         <div className="flex flex-wrap items-center gap-2.5 sm:gap-3">
@@ -539,6 +615,7 @@ function AdminManagerView({ initialTab }: { initialTab: string }) {
             <Input
               type="date"
               value={startDateFilter}
+              min={minFromDate}
               onChange={e => { setStartDateFilter(e.target.value); setCurrentPage(1); }}
               placeholder="From Date"
               className="h-10 rounded-xl bg-slate-50/60 dark:bg-zinc-900 border-slate-200/80 dark:border-zinc-800 text-xs"
@@ -568,7 +645,7 @@ function AdminManagerView({ initialTab }: { initialTab: string }) {
             </Button>
             <Button
               className="h-10 px-4 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold shadow-xs shadow-blue-600/20 gap-1.5"
-              onClick={() => setCurrentPage(1)}
+              onClick={() => { if (currentPage === 1) fetchLeaves(); else setCurrentPage(1); }}
             >
               <Filter className="size-3.5" />
               <span>Filter</span>
@@ -586,7 +663,7 @@ function AdminManagerView({ initialTab }: { initialTab: string }) {
                 <Skeleton key={i} className="h-12 w-full rounded-xl" />
               ))}
             </div>
-          ) : filteredLeaves.length === 0 ? (
+          ) : leaves.length === 0 ? (
             /* Empty State Matching Screenshot */
             <div className="py-16 sm:py-20 px-4 text-center flex flex-col items-center justify-center animate-in fade-in-50 duration-300">
               <div className="size-20 rounded-3xl bg-blue-50 dark:bg-blue-950/40 border border-blue-100 dark:border-blue-900/50 flex items-center justify-center text-blue-600 dark:text-blue-400 mb-4 shadow-xs">
@@ -615,7 +692,7 @@ function AdminManagerView({ initialTab }: { initialTab: string }) {
                     <TableHead className="w-12 px-4">
                       <input
                         type="checkbox"
-                        checked={selectedIds.size === paginatedLeaves.length && paginatedLeaves.length > 0}
+                        checked={selectedIds.size === leaves.length && leaves.length > 0}
                         onChange={toggleSelectAll}
                         className="rounded border-slate-300 dark:border-zinc-700 text-blue-600 focus:ring-blue-500 size-4 cursor-pointer"
                       />
@@ -657,7 +734,7 @@ function AdminManagerView({ initialTab }: { initialTab: string }) {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {paginatedLeaves.map(l => {
+                  {leaves.map(l => {
                     const duration = getDurationDays(l.startDate, l.endDate);
                     const isSelected = selectedIds.has(l.id);
                     const initials = l.userName
@@ -797,61 +874,32 @@ function AdminManagerView({ initialTab }: { initialTab: string }) {
           )}
 
           {/* ── 5. Pagination Footer ── */}
-          {!loading && filteredLeaves.length > 0 && (
-            <div className="flex flex-col sm:flex-row items-center justify-between gap-3 p-4 border-t border-slate-100 dark:border-zinc-800/80 bg-slate-50/40 dark:bg-zinc-900/30">
-              <p className="text-xs text-slate-500 dark:text-zinc-400">
-                Showing <span className="font-semibold text-slate-900 dark:text-zinc-100">{(currentPage - 1) * pageSize + 1}</span> to{' '}
-                <span className="font-semibold text-slate-900 dark:text-zinc-100">
-                  {Math.min(currentPage * pageSize, filteredLeaves.length)}
-                </span>{' '}
-                of <span className="font-semibold text-slate-900 dark:text-zinc-100">{filteredLeaves.length}</span> results
-              </p>
-
-              <div className="flex items-center gap-3">
-                {/* Page Navigation */}
-                <div className="flex items-center gap-1">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    disabled={currentPage <= 1}
-                    onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
-                    className="size-8 p-0 rounded-lg"
-                  >
-                    <ChevronLeft className="size-4" />
-                  </Button>
-                  <span className="text-xs font-semibold px-2">
-                    {currentPage} / {totalPages}
-                  </span>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    disabled={currentPage >= totalPages}
-                    onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
-                    className="size-8 p-0 rounded-lg"
-                  >
-                    <ChevronRight className="size-4" />
-                  </Button>
-                </div>
-
-                {/* Page Size Selector */}
-                <Select value={String(pageSize)} onValueChange={v => { setPageSize(Number(v)); setCurrentPage(1); }}>
-                  <SelectTrigger className="w-28 h-8 rounded-lg text-xs">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent className="rounded-xl">
-                    <SelectItem value="10">10 per page</SelectItem>
-                    <SelectItem value="25">25 per page</SelectItem>
-                    <SelectItem value="50">50 per page</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
+          {!loading && leaves.length > 0 && (
+            <div className="border-t border-slate-100 dark:border-zinc-800/80 bg-slate-50/40 dark:bg-zinc-900/30 px-4">
+              <Pagination
+                currentPage={currentPage}
+                totalPages={totalPages}
+                totalItems={total}
+                itemsPerPage={pageSize}
+                onPageChange={setCurrentPage}
+                onLimitChange={l => { setPageSize(l); setCurrentPage(1); }}
+              />
             </div>
           )}
         </CardContent>
       </Card>
 
       {/* ── 6. New Leave Request Dialog ── */}
-      <Dialog open={applyModalOpen} onOpenChange={setApplyModalOpen}>
+      <Dialog
+        open={applyModalOpen}
+        onOpenChange={o => {
+          setApplyModalOpen(o);
+          if (!o) {
+            setCandidateSearch('');
+            setDebouncedCandidateSearch('');
+          }
+        }}
+      >
         <DialogContent className="max-w-md rounded-2xl">
           <DialogHeader>
             <DialogTitle className="text-lg font-bold flex items-center gap-2">
@@ -869,6 +917,12 @@ function AdminManagerView({ initialTab }: { initialTab: string }) {
               <label className="text-xs font-semibold text-slate-700 dark:text-zinc-300 capitalize">
                 Select {activeTab}
               </label>
+              <Input
+                value={candidateSearch}
+                onChange={e => setCandidateSearch(e.target.value)}
+                placeholder={`Search ${roleLabel} by name...`}
+                className="h-10 rounded-xl text-sm"
+              />
               {candidatesLoading ? (
                 <Skeleton className="h-10 w-full rounded-xl" />
               ) : (
@@ -884,6 +938,16 @@ function AdminManagerView({ initialTab }: { initialTab: string }) {
                     ))}
                   </SelectContent>
                 </Select>
+              )}
+              {!candidatesLoading && availableCandidates.length === 0 && (
+                <p className="text-[11px] text-slate-400 dark:text-zinc-500">
+                  No {roleLabel} found{candidateSearch ? ` for "${candidateSearch}"` : ''}.
+                </p>
+              )}
+              {!candidatesLoading && candidatesTruncated && !candidateSearch && (
+                <p className="text-[11px] text-slate-400 dark:text-zinc-500">
+                  Showing the first {CANDIDATE_LIMITS[activeTab] ?? 100} — type a name to narrow down.
+                </p>
               )}
             </div>
 

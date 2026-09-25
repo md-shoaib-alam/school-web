@@ -27,7 +27,7 @@ import {
   X,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { apiFetch } from '@/lib/api';
+import { apiFetch, getValidTokenOrRefresh } from '@/lib/api';
 import { toast } from 'sonner';
 import { useQueryClient } from '@tanstack/react-query';
 
@@ -37,6 +37,9 @@ interface LiveAttendanceQRModalProps {
   title?: string;
 }
 
+// Fallback ring total before the server responds; the real value comes from the API.
+const DEFAULT_QR_TTL_SECONDS = 120;
+
 export function LiveAttendanceQRModal({
   open,
   onOpenChange,
@@ -45,10 +48,9 @@ export function LiveAttendanceQRModal({
   const queryClient = useQueryClient();
   const [qrSvg, setQrSvg] = useState<string>('');
   const [code, setCode] = useState<string>('');
-  const [secondsLeft, setSecondsLeft] = useState<number>(30);
+  const [secondsLeft, setSecondsLeft] = useState<number>(DEFAULT_QR_TTL_SECONDS);
   const [loading, setLoading] = useState<boolean>(true);
   const [recentScans, setRecentScans] = useState<Array<any>>([]);
-  const [lastScanTimestamp, setLastScanTimestamp] = useState<number>(0);
   const [copiedCode, setCopiedCode] = useState<boolean>(false);
   const [isFullscreen, setIsFullscreen] = useState<boolean>(false);
 
@@ -57,7 +59,23 @@ export function LiveAttendanceQRModal({
   };
 
   const timerRef = useRef<NodeJS.Timeout | null>(null);
-  const pollRef = useRef<NodeJS.Timeout | null>(null);
+  const rotatingRef = useRef<boolean>(false);
+  // Absolute expiry on the SERVER clock + the offset between server and device clocks,
+  // so the countdown can't drift and rotation happens exactly when the QR dies.
+  const qrExpiresAtRef = useRef<number>(0);
+  // Total TTL reported by the server — the ring is drawn against this, so a server-side
+  // TTL change doesn't need a matching client change.
+  const qrTotalSecondsRef = useRef<number>(DEFAULT_QR_TTL_SECONDS);
+  const serverOffsetRef = useRef<number>(0);
+  const lastScanTimestampRef = useRef<number>(0);
+  const scanPrimedRef = useRef<boolean>(false);
+  const openRef = useRef<boolean>(false);
+  const sessionRef = useRef<number>(0);
+  const abortRef = useRef<AbortController | null>(null);
+
+  const serverNow = useCallback(() => Date.now() + serverOffsetRef.current, []);
+
+  const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
   // Web Audio chime on successful scan
   const playScanDing = useCallback(() => {
@@ -92,8 +110,20 @@ export function LiveAttendanceQRModal({
       }
       const data = await res.json();
       if (data.success && data.qrData) {
+        // Sync the local countdown to the server clock
+        if (typeof data.serverTime === 'number') {
+          serverOffsetRef.current = data.serverTime - Date.now();
+        }
+        if (typeof data.totalSeconds === 'number') {
+          qrTotalSecondsRef.current = data.totalSeconds;
+        }
+        if (typeof data.expiresAt === 'number') {
+          qrExpiresAtRef.current = data.expiresAt;
+          setSecondsLeft(Math.max(1, Math.ceil((data.expiresAt - serverNow()) / 1000)));
+        } else {
+          setSecondsLeft(data.remainingSeconds || qrTotalSecondsRef.current);
+        }
         setCode(data.code || '');
-        setSecondsLeft(data.remainingSeconds || 30);
 
         // Generate clean SVG string for crisp vector rendering
         const svgString = await QRCode.toString(data.qrData, {
@@ -111,74 +141,134 @@ export function LiveAttendanceQRModal({
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [serverNow]);
 
-  // Poll status to detect when a teacher scans and burns the token
-  const pollStatus = useCallback(async () => {
-    try {
-      const res = await apiFetch('/api/staff-attendance/qr/status');
-      if (!res.ok) return;
-      const data = await res.json();
-
+  const handleStatus = useCallback(
+    (data: any) => {
+      if (typeof data.serverTime === 'number') {
+        serverOffsetRef.current = data.serverTime - Date.now();
+      }
       if (data.recentScans) {
         setRecentScans(data.recentScans);
       }
 
-      // Check if a new scan occurred
-      if (data.lastScan && data.lastScan.timestamp > lastScanTimestamp) {
-        setLastScanTimestamp(data.lastScan.timestamp);
+      const incomingTs = data.lastScan?.timestamp ?? 0;
+
+      // First response of this kiosk session only records where we are — an old scan
+      // must never ding or rotate the QR just because the modal was reopened.
+      if (!scanPrimedRef.current) {
+        scanPrimedRef.current = true;
+        lastScanTimestampRef.current = incomingTs;
+        return;
+      }
+
+      if (data.lastScan && incomingTs > lastScanTimestampRef.current) {
+        lastScanTimestampRef.current = incomingTs;
         playScanDing();
-        toast.success(`🎉 ${data.lastScan.userName} marked ${data.lastScan.action}!`, {
-          description: `Time: ${data.lastScan.time} (Indian Standard Time)`,
-        });
+        toast.success(`${data.lastScan.userName} marked ${data.lastScan.action} at ${data.lastScan.time}`);
 
         // Instantly refresh the admin table in the background so marked status turns green!
         queryClient.invalidateQueries({ queryKey: ['staff-attendance'] });
 
-        // The token was burned by the teacher! Immediately generate a fresh QR!
-        fetchActiveQR(true);
-      } else if (!data.isActive && secondsLeft <= 2) {
-        // Expired naturally
-        fetchActiveQR(true);
+        // The token was burned by the teacher — mint a fresh one right away.
+        if (!rotatingRef.current) {
+          rotatingRef.current = true;
+          fetchActiveQR(true).finally(() => {
+            rotatingRef.current = false;
+          });
+        }
       }
-    } catch {
-      // transient poll error
+    },
+    [playScanDing, fetchActiveQR, queryClient]
+  );
+
+  // Long-poll: each request parks on the server until a teacher scans (or ~20s passes),
+  // so a scan is seen instantly with a fraction of the requests.
+  // `session` guarantees a stale loop (React StrictMode remount) can't keep polling.
+  const statusLoop = useCallback(async (session: number) => {
+    while (openRef.current && sessionRef.current === session) {
+      // Never hold a request open for a screen nobody is looking at
+      if (typeof document !== 'undefined' && document.visibilityState !== 'visible') {
+        await delay(5000);
+        continue;
+      }
+
+      const controller = new AbortController();
+      abortRef.current = controller;
+      const url = `/api/staff-attendance/qr/status?since=${lastScanTimestampRef.current}&wait=20`;
+
+      try {
+        let res = await apiFetch(url, { signal: controller.signal });
+
+        // The kiosk outlives the 15-minute access token — refresh silently, then retry once
+        if (res.status === 401) {
+          try {
+            await getValidTokenOrRefresh();
+          } catch {
+            return; // session gone; forceLogout already redirected
+          }
+          res = await apiFetch(url, { signal: controller.signal });
+        }
+
+        if (res.ok) {
+          handleStatus(await res.json());
+        } else if (!controller.signal.aborted) {
+          await delay(3000); // server hiccup — brief backoff, then poll again
+        }
+      } catch {
+        // Aborted (modal closed) or the proxy cut the hold short
+        if (!controller.signal.aborted) await delay(3000);
+      } finally {
+        if (abortRef.current === controller) abortRef.current = null;
+      }
     }
-  }, [lastScanTimestamp, secondsLeft, playScanDing, fetchActiveQR, queryClient]);
+  }, [handleStatus]);
 
   // Main lifecycle when dialog is open
   useEffect(() => {
-    if (!open) {
-      if (timerRef.current) clearInterval(timerRef.current);
-      if (pollRef.current) clearInterval(pollRef.current);
-      queryClient.invalidateQueries({ queryKey: ['staff-attendance'] });
-      return;
-    }
+    if (!open) return;
 
-    // Initial load
+    // Fresh kiosk session: forget the previous session's scans
+    const session = ++sessionRef.current;
+    scanPrimedRef.current = false;
+    lastScanTimestampRef.current = 0;
+    openRef.current = true;
+
     fetchActiveQR();
 
-    // 1-second interval for countdown ring
+    // 1s tick drives the countdown ring off the server expiry (no network calls)
     timerRef.current = setInterval(() => {
-      setSecondsLeft((prev) => {
-        if (prev <= 1) {
-          fetchActiveQR(true);
-          return 30;
+      if (qrExpiresAtRef.current === 0) return; // QR not loaded yet — keep the initial value
+      const remainingMs = qrExpiresAtRef.current - serverNow();
+      if (remainingMs <= 0) {
+        setSecondsLeft(0);
+        if (!rotatingRef.current) {
+          rotatingRef.current = true;
+          fetchActiveQR(true).finally(() => {
+            rotatingRef.current = false;
+          });
         }
-        return prev - 1;
-      });
+      } else {
+        setSecondsLeft(Math.max(1, Math.ceil(remainingMs / 1000)));
+      }
     }, 1000);
 
-    // 2-second interval for status polling & instant scan detection
-    pollRef.current = setInterval(() => {
-      pollStatus();
-    }, 2000);
+    void statusLoop(session);
+
+    // Screen unlocked / tab focused again: pick up any rotation we slept through
+    const onVisibilityChange = () => {
+      if (document.visibilityState === 'visible') void fetchActiveQR();
+    };
+    document.addEventListener('visibilitychange', onVisibilityChange);
 
     return () => {
+      openRef.current = false;
       if (timerRef.current) clearInterval(timerRef.current);
-      if (pollRef.current) clearInterval(pollRef.current);
+      abortRef.current?.abort();
+      document.removeEventListener('visibilitychange', onVisibilityChange);
+      queryClient.invalidateQueries({ queryKey: ['staff-attendance'] });
     };
-  }, [open, fetchActiveQR, pollStatus]);
+  }, [open, fetchActiveQR, statusLoop, serverNow, queryClient]);
 
   const handleCopyCode = () => {
     if (!code) return;
@@ -188,29 +278,30 @@ export function LiveAttendanceQRModal({
     setTimeout(() => setCopiedCode(false), 2000);
   };
 
-  const progressPercent = (secondsLeft / 30) * 100;
+  const progressPercent = Math.min(100, (secondsLeft / qrTotalSecondsRef.current) * 100);
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
         showCloseButton={false}
         className={cn(
-          'p-0 overflow-hidden border border-slate-200 dark:border-zinc-800 shadow-2xl bg-white dark:bg-zinc-950 transition-all duration-300',
+          'p-0 overflow-hidden border border-slate-200 dark:border-zinc-800 shadow-2xl bg-white dark:bg-zinc-950 transition-[width,height,max-width,max-height,border-radius] duration-300 ease-out',
           isFullscreen
-            ? '!fixed !inset-0 !w-screen !h-screen !max-w-none !max-h-screen !rounded-none !z-50 !translate-x-0 !translate-y-0 !top-0 !left-0 flex flex-col justify-between overflow-y-auto'
+            ? '!fixed !z-50 !w-screen !h-screen !max-w-none !max-h-none !rounded-none flex flex-col justify-between overflow-y-auto'
             : 'sm:max-w-md md:max-w-lg max-h-[92vh] flex flex-col rounded-3xl'
         )}
       >
         {/* Top Header */}
-        <div className="p-4 sm:p-5 pb-3.5 bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-700 text-white relative shrink-0">
-          <div className="flex items-center justify-between gap-3">
-            <div className="flex items-center gap-2.5 min-w-0">
-              <div className="size-9 rounded-xl bg-white/15 backdrop-blur-md flex items-center justify-center border border-white/20 shrink-0">
-                <QrCode className="size-5 text-white" />
+        <div className="p-3.5 sm:p-5 pb-3 sm:pb-3.5 bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-700 text-white relative shrink-0">
+          <div className="flex items-center justify-between gap-2 sm:gap-3">
+            <div className="flex items-center gap-2 sm:gap-2.5 min-w-0">
+              <div className="size-8 sm:size-9 rounded-xl bg-white/15 backdrop-blur-md flex items-center justify-center border border-white/20 shrink-0">
+                <QrCode className="size-4 sm:size-5 text-white" />
               </div>
               <div className="min-w-0">
-                <DialogTitle className="text-base sm:text-lg font-bold text-white leading-tight truncate">
-                  {title}
+                <DialogTitle className="text-sm sm:text-base md:text-lg font-bold text-white leading-tight truncate">
+                  <span className="hidden sm:inline">{title}</span>
+                  <span className="sm:hidden">Attendance QR</span>
                 </DialogTitle>
                 <DialogDescription className="sr-only">
                   Live attendance QR code for staff check-in
@@ -218,37 +309,39 @@ export function LiveAttendanceQRModal({
               </div>
             </div>
 
-            <div className="flex items-center gap-2 shrink-0">
+            <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
               <Button
                 type="button"
                 variant="ghost"
                 size="sm"
                 onClick={toggleFullscreen}
-                className="text-white hover:bg-white/20 h-8 px-2.5 rounded-xl text-xs gap-1.5 cursor-pointer border border-white/20 bg-white/10"
+                className="text-white hover:bg-white/20 h-7.5 sm:h-8 w-7.5 sm:w-auto p-0 sm:px-2.5 rounded-xl text-xs gap-1.5 cursor-pointer border border-white/20 bg-white/10 shrink-0"
+                title={isFullscreen ? 'Exit Fullscreen' : 'Fullscreen'}
               >
                 {isFullscreen ? <Minimize2 className="size-3.5" /> : <Maximize2 className="size-3.5" />}
                 <span className="hidden sm:inline">{isFullscreen ? 'Exit Fullscreen' : 'Fullscreen'}</span>
               </Button>
 
-              <Badge className="bg-white/15 hover:bg-white/20 text-white border-white/20 text-[11px] font-semibold gap-1.5 px-2.5 py-1">
+              <Badge className="bg-white/15 hover:bg-white/20 text-white border-white/20 text-[10px] sm:text-[11px] font-semibold gap-1.5 px-2 sm:px-2.5 py-0.5 sm:py-1 shrink-0">
                 <span className="size-2 rounded-full bg-emerald-400 animate-pulse" />
-                <span>Live Kiosk</span>
+                <span className="hidden sm:inline">Live Kiosk</span>
+                <span className="sm:hidden">Live</span>
               </Badge>
 
               <button
                 type="button"
                 onClick={() => onOpenChange(false)}
-                className="size-8 rounded-full bg-white/15 hover:bg-white/25 active:scale-95 text-white flex items-center justify-center transition-all cursor-pointer border border-white/20 shrink-0"
+                className="size-7.5 sm:size-8 rounded-full bg-white/15 hover:bg-white/25 active:scale-95 text-white flex items-center justify-center transition-all cursor-pointer border border-white/20 shrink-0"
                 aria-label="Close dialog"
               >
-                <X className="size-4" />
+                <X className="size-3.5 sm:size-4" />
               </button>
             </div>
           </div>
         </div>
 
         {/* Center Content: QR Code Card */}
-        <div className="flex-1 overflow-y-auto p-4 sm:p-5 space-y-3 sm:space-y-3.5">
+        <div className="flex-1 overflow-y-auto p-3.5 sm:p-5 space-y-3 sm:space-y-3.5">
           <div className="flex flex-col items-center justify-center text-center">
             {/* QR Card Container */}
             <div className="relative p-3 sm:p-4 rounded-2xl sm:rounded-3xl bg-slate-50 dark:bg-zinc-900 border-2 border-slate-200 dark:border-zinc-800 shadow-inner flex flex-col items-center justify-center">
@@ -261,8 +354,10 @@ export function LiveAttendanceQRModal({
               {/* QR Image Box */}
               <div
                 className={cn(
-                  'bg-white p-2.5 sm:p-3 rounded-2xl shadow-sm flex items-center justify-center overflow-hidden transition-all',
-                  isFullscreen ? 'size-64 sm:size-80 md:size-96' : 'size-44 sm:size-48'
+                  'bg-white p-2.5 sm:p-3 rounded-2xl shadow-sm flex items-center justify-center overflow-hidden',
+                  // Small devices keep the fixed sizes; fullscreen is a wall-mounted kiosk,
+                  // so the QR scales with the viewport (capped) instead of freezing at md:size-96.
+                  isFullscreen ? 'size-[min(72vmin,600px)]' : 'size-48 sm:size-56'
                 )}
               >
                 {loading && !qrSvg ? (

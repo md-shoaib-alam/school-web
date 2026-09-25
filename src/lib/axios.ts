@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { env } from './env';
+import { getValidTokenOrRefresh } from './api';
 
 const API_BASE = env.NEXT_PUBLIC_API_URL;
 
@@ -26,10 +27,29 @@ axiosInstance.interceptors.request.use((config) => {
   return config;
 });
 
-// Response interceptor for clean data access and error handling
+// Response interceptor: unwrap data, and on 401 refresh + retry once
+// (same shared refresh queue as `@/lib/api`, so it can't double-refresh).
 axiosInstance.interceptors.response.use(
   (response) => response.data,
-  (error) => {
+  async (error) => {
+    const config = error.config;
+    const canRetry =
+      error.response?.status === 401 &&
+      config &&
+      !config.__isRetry &&
+      typeof window !== 'undefined' &&
+      !!localStorage.getItem('school_refresh_token');
+
+    if (canRetry) {
+      try {
+        await getValidTokenOrRefresh();
+        config.__isRetry = true;
+        return axiosInstance(config);
+      } catch {
+        // refresh already forced a logout; fall through to the normal error
+      }
+    }
+
     const message = error.response?.data?.error || error.message || 'API Error';
     // You can add global toast here if needed
     return Promise.reject(new Error(message));

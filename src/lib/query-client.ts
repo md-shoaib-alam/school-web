@@ -1,86 +1,58 @@
-import { QueryClient, MutationCache } from "@tanstack/react-query";
+import { QueryClient } from "@tanstack/react-query";
 
 /**
- * Intelligent refresh trigger that only invalidates relevant data
+ * Invalidates the query roots a write actually touched.
+ *
+ * `pathOrTag` is either a REST path (e.g. "/students/123") or a GraphQL
+ * mutation document. Matching is keyword-based on a punctuation-stripped
+ * string, so both "/staff-attendance" and "MarkStaffAttendance" map to the
+ * same root and the logic survives production minification.
  */
 export async function triggerGlobalRefresh(pathOrTag?: string) {
-  const trigger = String(pathOrTag || '').toLowerCase();
-  
-  const refresh = async () => {
-    console.log(`🧠 Smart Refresh detecting changes in: ${trigger}`);
+  const tag = String(pathOrTag || "").toLowerCase().replace(/[^a-z0-9]/g, "");
+  let matched = false;
 
-    // Always refresh the Dashboard stats
-    queryClient.invalidateQueries({ queryKey: ['admin-dashboard'] });
-    queryClient.invalidateQueries({ queryKey: ['admin'] });
-
-    // Route-based intelligent invalidation
-    if (trigger.includes('student')) {
-      console.log('✨ Auto-refreshing Students list...');
-      await queryClient.invalidateQueries({ queryKey: ['students'], refetchType: 'all' });
-    } 
-    
-    if (trigger.includes('teacher')) {
-      console.log('✨ Auto-refreshing Teachers list...');
-      await queryClient.invalidateQueries({ queryKey: ['teachers'], refetchType: 'all' });
-    } 
-
-    if (trigger.includes('parent')) {
-      console.log('✨ Auto-refreshing Parents list...');
-      await queryClient.invalidateQueries({ queryKey: ['parents'], refetchType: 'all' });
-    }
-
-    if (trigger.includes('staff')) {
-      console.log('✨ Auto-refreshing Staff list...');
-      await queryClient.invalidateQueries({ queryKey: ['staff'], refetchType: 'all' });
-    }
-    
-    if (trigger.includes('fee')) {
-      await queryClient.invalidateQueries({ queryKey: ['fees'], refetchType: 'all' });
-    } 
-    
-    if (trigger.includes('class')) {
-      await queryClient.invalidateQueries({ queryKey: ['classes'], refetchType: 'all' });
-    }
-
-    if (trigger.includes('notice')) {
-      await queryClient.invalidateQueries({ queryKey: ['notices'], refetchType: 'all' });
-    }
-
-    if (trigger.includes('subject')) {
-      await queryClient.invalidateQueries({ queryKey: ['teacher-subjects-mine-v2'], refetchType: 'all' });
-    }
-
-    // Fallback: If unknown, refresh active queries
-    if (!trigger.includes('student') && !trigger.includes('teacher') && !trigger.includes('fee') && !trigger.includes('class') && !trigger.includes('notice')) {
-       queryClient.invalidateQueries({ refetchType: 'active' });
-    }
+  const invalidate = (queryKey: unknown[]) => {
+    matched = true;
+    return queryClient.invalidateQueries({ queryKey }); // active queries only
   };
 
-  // 1. Refresh immediately
-  await refresh();
+  // Always refresh the dashboard stats
+  queryClient.invalidateQueries({ queryKey: ["admin-dashboard"] });
+  queryClient.invalidateQueries({ queryKey: ["admin"] });
 
-  // 2. Removed redundant refresh call that was causing double network overhead on 3G.
-  // If server-side lag is an issue, we should rely on TanStack Query's refetch on success instead.
+  // staff-attendance must be checked before attendance and excluded from staff
+  if (tag.includes("staffattendance")) {
+    await invalidate(["staff-attendance"]);
+  } else if (tag.includes("attendance")) {
+    await invalidate(["attendance"]);
+  }
+
+  if (tag.includes("student")) await invalidate(["students"]);
+  if (tag.includes("teacher")) await invalidate(["teachers"]);
+  if (tag.includes("parent")) await invalidate(["parents"]);
+  if (tag.includes("staff") && !tag.includes("staffattendance")) await invalidate(["staff"]);
+  if (tag.includes("fee")) await invalidate(["fees"]);
+  if (tag.includes("class")) await invalidate(["classes"]);
+  if (tag.includes("notice")) await invalidate(["notices"]);
+  if (tag.includes("subject")) await invalidate(["teacher-subjects-mine-v2"]);
+
+  // Unknown write: refresh whatever is currently on screen
+  if (!matched) {
+    queryClient.invalidateQueries({ refetchType: "active" });
+  }
 }
 
 /**
  * Singleton QueryClient for the entire app
  */
 export const queryClient = new QueryClient({
-  mutationCache: new MutationCache({
-    onSuccess: (_data, _variables, _context, mutation) => {
-      const path = (mutation.options as any).mutationKey?.[0] || 
-                   (mutation.options as any).mutationFn?.toString() || "";
-      triggerGlobalRefresh(path);
-    },
-  }),
   defaultOptions: {
     queries: {
       staleTime: 5 * 60 * 1000, // 5 minutes (standard for production dashboards)
       gcTime: 60 * 60 * 1000,    // 1 hour
       retry: 2,
       refetchOnWindowFocus: false,
-      refetchOnMount: false,     // Prioritize stale data while revalidating
     },
   },
 });

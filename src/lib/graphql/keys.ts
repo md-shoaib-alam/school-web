@@ -1,5 +1,4 @@
 export const queryKeys = {
-  platformStats: ['platform', 'stats'] as const,
   billing: (type?: string) => ['platform', 'billing', type] as const,
   tenants: (filters?: Record<string, unknown>) => ['tenants', filters] as const,
   users: (filters?: Record<string, unknown>) => ['users', filters] as const,
@@ -18,9 +17,4 @@ export const queryKeys = {
   attendance: ['attendance'] as const,
   staff: ['staff'] as const,
   subscriptions: ['subscriptions'] as const,
-  dashboardSummary: (tenantId: string) => ['admin', 'dashboard', 'summary', tenantId] as const,
-  dashboardAttendance: (tenantId: string) => ['admin', 'dashboard', 'attendance', tenantId] as const,
-  dashboardAcademic: (tenantId: string) => ['admin', 'dashboard', 'academic', tenantId] as const,
-  dashboardFinancial: (tenantId: string) => ['admin', 'dashboard', 'financial', tenantId] as const,
-  dashboardNotices: (tenantId: string) => ['admin', 'dashboard', 'notices', tenantId] as const,
 }

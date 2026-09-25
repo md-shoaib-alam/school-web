@@ -5,7 +5,7 @@ import {
   Receipt, 
   ScrollText, 
   PieChart, 
-  Blocks, 
+  Plug, 
   Settings, 
   Globe, 
   Lock, 
@@ -78,11 +78,11 @@ export const PLATFORM_MODULES = [
     icon: React.createElement(PieChart, { className: "size-4" }) 
   },
   { 
-    key: "feature-flags", 
-    label: "Feature Flags", 
-    desc: "Manage feature flags",
+    key: "integrations", 
+    label: "Integrations", 
+    desc: "Manage third-party integrations",
     iconBg: "bg-teal-50 text-teal-600 dark:bg-teal-950/50 dark:text-teal-400 border border-teal-100 dark:border-teal-900/40",
-    icon: React.createElement(Blocks, { className: "size-4" }) 
+    icon: React.createElement(Plug, { className: "size-4" }) 
   },
   { 
     key: "security", 
@@ -195,11 +195,11 @@ export const ROLE_TEMPLATES = [
   },
   {
     name: "Content Moderator",
-    description: "Manage platform content and feature flags",
+    description: "Manage platform content and integrations",
     color: "#8b5cf6",
     permissions: {
       tenants: ["view"],
-      "feature-flags": ["view", "edit"],
+      integrations: ["view", "edit"],
       settings: ["view"],
       api: ["view"],
     },

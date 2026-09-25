@@ -1,9 +1,15 @@
-import { useState, useEffect, useMemo, useCallback } from 'react';
+import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { toast } from 'sonner';
 import { apiFetch } from '@/lib/api';
 import { useAppStore } from '@/store/use-app-store';
 import { AttendanceRecordItem } from './types';
 import { formatLocalDate, calculateAttendanceMetrics } from './utils';
+
+const sameAttendanceRecord = (a: AttendanceRecordItem, b: AttendanceRecordItem) =>
+  a.status === b.status &&
+  a.checkIn === b.checkIn &&
+  a.checkOut === b.checkOut &&
+  (a.remarks ?? '') === (b.remarks ?? '');
 
 export function useMyAttendance() {
   const { currentUser } = useAppStore();
@@ -34,41 +40,86 @@ export function useMyAttendance() {
   const [currentMonthRecords, setCurrentMonthRecords] = useState<AttendanceRecordItem[]>([]);
   // Calendar's records (matches currentMonthRecords when viewing current month)
   const [calendarRecords, setCalendarRecords] = useState<AttendanceRecordItem[]>([]);
-  const [loading, setLoading] = useState(true);
   const [isCheckingIn, setIsCheckingIn] = useState(false);
   const [viewAllModalOpen, setViewAllModalOpen] = useState(false);
+  // Guards the today-only merge: never touch the month list before the full month has loaded once
+  const monthLoadedRef = useRef(false);
+  // A tab restore fires focus and visibilitychange together; without this the same
+  // full-month request goes out twice.
+  const monthInFlightRef = useRef<Promise<void> | null>(null);
 
   // Fetch Current Month Attendance strictly for the summary cards
   const fetchCurrentMonthAttendance = useCallback(async (isSilent = false) => {
+    if (monthInFlightRef.current) return monthInFlightRef.current;
+    const run = (async () => {
+      try {
+        const userId = currentUser?.id;
+        const res = await apiFetch(
+          `/api/staff-attendance?month=${currentMonthStr}${userId ? `&userId=${encodeURIComponent(userId)}` : ''}&_t=${Date.now()}`,
+          { cache: 'no-store' }
+        );
+        if (res.ok) {
+          const data = await res.json();
+          if (Array.isArray(data)) {
+            const userRecords = userId ? data.filter((r: any) => r.userId === userId) : data;
+            setCurrentMonthRecords(userRecords);
+            monthLoadedRef.current = true;
+            return;
+          }
+        }
+        setCurrentMonthRecords([]);
+      } catch {
+        setCurrentMonthRecords([]);
+      } finally {
+        monthInFlightRef.current = null;
+      }
+    })();
+    monthInFlightRef.current = run;
+    return run;
+  }, [currentUser?.id, currentMonthStr]);
+
+  /**
+   * Today-only sync: one row instead of the whole month, so the page can stay fresh
+   * without pulling ~30 records every few seconds. The row is merged into the month
+   * list so the stat cards, "today" card and recent list all keep working unchanged.
+   */
+  const fetchTodayRecord = useCallback(async () => {
+    const userId = currentUser?.id;
+    if (!userId || !monthLoadedRef.current) return;
     try {
-      if (!isSilent) setLoading(true);
-      const userId = currentUser?.id;
       const res = await apiFetch(
-        `/api/staff-attendance?month=${currentMonthStr}${userId ? `&userId=${encodeURIComponent(userId)}` : ''}&_t=${Date.now()}`,
+        `/api/staff-attendance?date=${todayStr}&userId=${encodeURIComponent(userId)}&_t=${Date.now()}`,
         { cache: 'no-store' }
       );
-      if (res.ok) {
-        const data = await res.json();
-        if (Array.isArray(data)) {
-          const userRecords = userId ? data.filter((r: any) => r.userId === userId) : data;
-          setCurrentMonthRecords(userRecords);
-          return;
+      if (!res.ok) return;
+      const data = await res.json();
+      if (!Array.isArray(data)) return;
+
+      const fresh: AttendanceRecordItem | undefined = data.find((r: any) => r.userId === userId);
+
+      setCurrentMonthRecords((prev) => {
+        const idx = prev.findIndex((r) => r.date === todayStr);
+        if (!fresh) {
+          return idx < 0 ? prev : prev.filter((_, i) => i !== idx);
         }
-      }
-      setCurrentMonthRecords([]);
+        if (idx >= 0 && sameAttendanceRecord(prev[idx], fresh)) return prev;
+        if (idx < 0) return [...prev, fresh];
+        const next = [...prev];
+        next[idx] = fresh;
+        return next;
+      });
     } catch {
-      setCurrentMonthRecords([]);
-    } finally {
-      setLoading(false);
+      // transient network error — the next tick retries
     }
-  }, [currentUser?.id, currentMonthStr]);
+  }, [currentUser?.id, todayStr]);
 
   // Initial load & whenever currentUser or currentMonth changes
   useEffect(() => {
     fetchCurrentMonthAttendance();
   }, [fetchCurrentMonthAttendance]);
 
-  // Auto-refresh when tab/window regains focus or periodically (real-time sync)
+  // Auto-refresh when tab/window regains focus or on cross-tab updates (full month),
+  // plus a cheap once-a-minute today-only sync while the tab is actually visible.
   useEffect(() => {
     const handleFocus = () => {
       fetchCurrentMonthAttendance(true);
@@ -76,19 +127,30 @@ export function useMyAttendance() {
     const handleUpdate = () => {
       fetchCurrentMonthAttendance(true);
     };
+    const handleVisibility = () => {
+      if (document.visibilityState === 'visible') fetchCurrentMonthAttendance(true);
+    };
     window.addEventListener('focus', handleFocus);
     window.addEventListener('schoolsaas_attendance_updated', handleUpdate);
-    // Real-time silent sync every 5 seconds
+    document.addEventListener('visibilitychange', handleVisibility);
+
     const interval = setInterval(() => {
-      fetchCurrentMonthAttendance(true);
-    }, 5000);
+      if (document.visibilityState !== 'visible') return;
+      // Keep retrying the full month until it has loaded once; after that only today's row
+      if (!monthLoadedRef.current) {
+        fetchCurrentMonthAttendance(true);
+      } else {
+        fetchTodayRecord();
+      }
+    }, 60000);
 
     return () => {
       window.removeEventListener('focus', handleFocus);
       window.removeEventListener('schoolsaas_attendance_updated', handleUpdate);
+      document.removeEventListener('visibilitychange', handleVisibility);
       clearInterval(interval);
     };
-  }, [fetchCurrentMonthAttendance]);
+  }, [fetchCurrentMonthAttendance, fetchTodayRecord]);
 
   // Active calendar records (always immediately reflects currentMonthRecords when viewing current month)
   const activeCalendarRecords = useMemo(() => {
@@ -97,13 +159,9 @@ export function useMyAttendance() {
 
   // Fetch Calendar Month Attendance only when browsing different calendar months
   useEffect(() => {
-    if (calMonthStr === currentMonthStr) {
-      setLoading(false);
-      return;
-    }
+    if (calMonthStr === currentMonthStr) return;
     let isCancelled = false;
     const fetchCalendar = async () => {
-      setLoading(true);
       try {
         const userId = currentUser?.id;
         const res = await apiFetch(
@@ -121,8 +179,6 @@ export function useMyAttendance() {
         if (!isCancelled) setCalendarRecords([]);
       } catch {
         if (!isCancelled) setCalendarRecords([]);
-      } finally {
-        if (!isCancelled) setLoading(false);
       }
     };
     fetchCalendar();
@@ -196,11 +252,9 @@ export function useMyAttendance() {
   }, [currentMonthRecords]);
 
   return {
-    currentUser,
     todayStr,
     currentRealYear,
     currentRealMonth,
-    calendarDate,
     calYear,
     calMonth,
     selectedDate,
@@ -210,7 +264,6 @@ export function useMyAttendance() {
     currentMonthMetrics,
     todayRecord,
     recentRecords,
-    loading,
     isCheckingIn,
     viewAllModalOpen,
     setViewAllModalOpen,

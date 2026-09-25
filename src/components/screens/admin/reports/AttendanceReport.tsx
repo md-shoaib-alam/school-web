@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useMemo } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { apiFetch } from "@/lib/api";
 import {
   Card,
@@ -28,48 +29,37 @@ import { SummaryCardSkeleton, ChartSkeleton } from "./SummaryComponents";
 
 export function AttendanceReport() {
   const [recharts, setRecharts] = useState<typeof import("recharts") | null>(null);
-  const [classes, setClasses] = useState<ClassInfo[]>([]);
-  const [records, setRecords] = useState<AttendanceRecord[]>([]);
   const [selectedClass, setSelectedClass] = useState<string>("all");
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     import("recharts").then(setRecharts);
   }, []);
 
-  useEffect(() => {
-    async function fetchClasses() {
-      try {
-        const res = await apiFetch("/api/classes?mode=min");
-        if (!res.ok) throw new Error("Failed to fetch classes");
-        setClasses(await res.json());
-      } catch {
-        console.error("Error fetching classes");
-      }
-    }
-    fetchClasses();
-  }, []);
+  const { data: classes = [] } = useQuery({
+    queryKey: ["classes", "min"],
+    queryFn: async () => {
+      const res = await apiFetch("/api/classes?mode=min");
+      if (!res.ok) return [];
+      return (await res.json()) as ClassInfo[];
+    },
+  });
 
-  useEffect(() => {
-    async function fetchAttendance() {
-      setLoading(true);
-      try {
-        const params = new URLSearchParams();
-        if (selectedClass !== "all") params.set("classId", selectedClass);
-        params.set("limit", "100"); // Load reasonable range for reporting metrics
-        const res = await apiFetch(`/api/attendance?${params.toString()}`);
-        if (!res.ok) throw new Error("Failed to fetch attendance");
-        const data = await res.json();
-        setRecords(data.records || []);
-      } catch (err) {
-        setError(err instanceof Error ? err.message : "Unknown error");
-      } finally {
-        setLoading(false);
-      }
-    }
-    fetchAttendance();
-  }, [selectedClass]);
+  const {
+    data: records = [],
+    isPending: loading,
+    error,
+  } = useQuery({
+    queryKey: ["attendance", "report", selectedClass],
+    queryFn: async () => {
+      const params = new URLSearchParams();
+      if (selectedClass !== "all") params.set("classId", selectedClass);
+      params.set("limit", "1000"); // Server caps a page at 1000 — grab the full report window
+      const res = await apiFetch(`/api/attendance?${params.toString()}`);
+      if (!res.ok) throw new Error(`Failed to fetch attendance (${res.status})`);
+      const data = await res.json();
+      return (data.records || []) as AttendanceRecord[];
+    },
+  });
 
   const summary: AttendanceSummary = useMemo(() => {
     const present = records.filter((r) => r.status === "present").length;
@@ -130,7 +120,7 @@ export function AttendanceReport() {
         <CardContent className="p-6 text-center text-red-600 dark:text-red-400">
           <AlertTriangle className="size-8 mx-auto mb-2 opacity-50" />
           <p className="font-medium">Failed to load attendance report</p>
-          <p className="text-sm mt-1">{error}</p>
+          <p className="text-sm mt-1">{error.message}</p>
         </CardContent>
       </Card>
     );

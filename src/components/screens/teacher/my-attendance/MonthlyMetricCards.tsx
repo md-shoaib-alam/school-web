@@ -12,20 +12,23 @@ import {
 } from 'lucide-react';
 import { AttendanceMetrics } from './types';
 import { MONTH_NAMES } from './utils';
+import { cn } from '@/lib/utils';
 
 interface MonthlyMetricCardsProps {
   metrics: AttendanceMetrics;
   currentRealMonth: number;
   currentRealYear: number;
+  className?: string;
 }
 
 export function MonthlyMetricCards({
   metrics,
   currentRealMonth,
   currentRealYear,
+  className,
 }: MonthlyMetricCardsProps) {
   return (
-    <div>
+    <div className={cn(className)}>
       <div className="flex items-center justify-between gap-2 mb-2.5">
         <div className="flex items-center gap-2">
           <CalendarDays className="size-4 text-blue-600 dark:text-blue-400 shrink-0" />

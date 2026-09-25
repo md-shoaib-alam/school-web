@@ -9,7 +9,6 @@ export interface AttendanceRecordItem {
   checkIn?: string;
   checkOut?: string;
   remarks?: string;
-  workingHours?: string;
 }
 
 export interface AttendanceMetrics {

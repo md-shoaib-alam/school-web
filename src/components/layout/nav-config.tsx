@@ -23,7 +23,7 @@ import {
   UserCog,
   ScrollText,
   PieChart,
-  Blocks,
+  Plug,
   Shield,
   UserPlus,
   Crown,
@@ -130,14 +130,14 @@ export const navItems: Record<UserRole, NavItem[]> = {
     // Platform Control
     {
       key: "feature-control",
-      label: "Feature Control",
-      icon: <Blocks className="size-4" />,
-      permModule: "feature-flags",
+      label: "Integrations & Roadmap",
+      icon: <Plug className="size-4" />,
+      permModule: "integrations",
       children: [
         {
-          key: "feature-flags",
-          label: "Feature Flags",
-          icon: <Blocks className="size-4" />,
+          key: "integrations",
+          label: "Integrations",
+          icon: <Plug className="size-4" />,
         },
         {
           key: "roadmap",
