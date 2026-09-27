@@ -51,3 +51,4 @@ certificates
 testsprite_tests\tmp\config.json
 testsprite_tests/
 
+.qoder/
