@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect } from "react";
 import { apiFetch } from "@/lib/api";
 import {
   Card,
@@ -24,13 +24,13 @@ import {
   ChartTooltipContent,
 } from "@/components/ui/chart";
 import { BarChart3, GraduationCap } from "lucide-react";
-import { GradeRecord } from "@/lib/types";
 import { SubjectAverage, gradeChartConfig } from "./types";
 import { ChartSkeleton, TableSkeleton } from "./SummaryComponents";
 
 export function AcademicReport() {
   const [recharts, setRecharts] = useState<typeof import("recharts") | null>(null);
-  const [grades, setGrades] = useState<GradeRecord[]>([]);
+  const [gradeDistribution, setGradeDistribution] = useState<{ grade: string; count: number }[]>([]);
+  const [subjectAverages, setSubjectAverages] = useState<SubjectAverage[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -39,70 +39,21 @@ export function AcademicReport() {
   }, []);
 
   useEffect(() => {
-    async function fetchGrades() {
+    async function fetchReport() {
       try {
-        const res = await apiFetch("/api/grades?limit=100");
-        if (!res.ok) throw new Error("Failed to fetch grades");
-        setGrades(await res.json());
+        const res = await apiFetch("/api/reports/academics");
+        if (!res.ok) throw new Error("Failed to fetch academic report");
+        const data = await res.json();
+        setGradeDistribution(data.gradeDistribution);
+        setSubjectAverages(data.subjectAverages);
       } catch (err) {
         setError(err instanceof Error ? err.message : "Unknown error");
       } finally {
         setLoading(false);
       }
     }
-    fetchGrades();
+    fetchReport();
   }, []);
-
-  const gradeDistribution = useMemo(() => {
-    const order = ["A+", "A", "B+", "B", "C", "D"];
-    const counts: Record<string, number> = {};
-    for (const g of order) counts[g] = 0;
-    for (const r of grades) {
-      if (r.grade in counts) counts[r.grade]++;
-    }
-    return order.map((grade) => ({ grade, count: counts[grade] }));
-  }, [grades]);
-
-  const subjectAverages = useMemo((): SubjectAverage[] => {
-    const subjectMap = new Map<
-      string,
-      { totalMarks: number; totalMax: number; count: number; grades: string[] }
-    >();
-    for (const r of grades) {
-      const entry = subjectMap.get(r.subjectName) || {
-        totalMarks: 0,
-        totalMax: 0,
-        count: 0,
-        grades: [],
-      };
-      entry.totalMarks += r.marks;
-      entry.totalMax += r.maxMarks;
-      entry.count++;
-      entry.grades.push(r.grade);
-      subjectMap.set(r.subjectName, entry);
-    }
-    const gradeRank: Record<string, number> = {
-      "A+": 6,
-      A: 5,
-      "B+": 4,
-      B: 3,
-      C: 2,
-      D: 1,
-    };
-    return Array.from(subjectMap.entries())
-      .map(([subject, data]) => ({
-        subject,
-        averageMarks: Math.round(data.totalMarks / data.count),
-        maxMarks: Math.round(data.totalMax / data.count),
-        studentCount: data.count,
-        highestGrade: data.grades.length > 0
-          ? data.grades.reduce((highest, current) =>
-              (gradeRank[current] ?? 0) > (gradeRank[highest] ?? 0) ? current : highest
-            )
-          : "N/A",
-      }))
-      .sort((a, b) => b.averageMarks - a.averageMarks);
-  }, [grades]);
 
   const getPerformanceColor = (avg: number, max: number) => {
     const pct = (avg / max) * 100;
@@ -144,7 +95,7 @@ export function AcademicReport() {
         <CardContent>
           {loading || !recharts ? (
             <ChartSkeleton />
-          ) : grades.length === 0 ? (
+          ) : subjectAverages.length === 0 ? (
             <div className="text-center py-12 text-muted-foreground">
               <GraduationCap className="size-10 mx-auto mb-2 opacity-30" />
               <p className="text-sm">No grade data available</p>

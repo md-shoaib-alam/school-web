@@ -31,15 +31,16 @@ export function hasPermission(
     return perms.includes(action);
   }
 
+  // Admins have full access to their tenant, even if a custom role also happens
+  // to be attached to their account.
+  if (user.role === 'admin') return true;
+
   // Tenant staff/teacher with custom role
   if (user.customRole && user.customRole.permissions) {
     const perms = user.customRole.permissions[module];
     if (!perms || perms.length === 0) return false;
     return perms.includes(action);
   }
-
-  // Admins have full access to their tenant
-  if (user.role === 'admin') return true;
 
   // No role info = no permission
   return false;
@@ -67,16 +68,16 @@ function getModulePermissions(
     return ['view', 'create', 'edit', 'delete'];
   }
 
+  if (user.role === 'admin') {
+    return ['view', 'create', 'edit', 'delete'];
+  }
+
   if (user.platformRole?.permissions?.[module]) {
     return user.platformRole.permissions[module];
   }
 
   if (user.customRole?.permissions?.[module]) {
     return user.customRole.permissions[module];
-  }
-
-  if (user.role === 'admin') {
-    return ['view', 'create', 'edit', 'delete'];
   }
 
   return [];

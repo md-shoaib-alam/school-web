@@ -346,6 +346,13 @@ export function AdminCertificates() {
                       </TableCell>
                     </TableRow>
                   ))}
+                  {certificates.length === 0 && (
+                    <TableRow>
+                      <TableCell colSpan={5} className="h-32 text-center text-sm text-muted-foreground">
+                        No certificates issued yet. Click "Generate" to create one.
+                      </TableCell>
+                    </TableRow>
+                  )}
                 </TableBody>
               </Table>
             </div>

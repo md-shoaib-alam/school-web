@@ -1,7 +1,8 @@
 "use client";
 
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect } from "react";
 import { apiFetch } from "@/lib/api";
+import { useAppStore } from "@/store/use-app-store";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -18,78 +19,109 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart";
-import { IndianRupee, AlertTriangle, Eye } from "lucide-react";
-import { FeeRecord } from "@/lib/types";
+import { IndianRupee, AlertTriangle, Eye, BellRing, Loader2 } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 import { FeeSummary, FeeTypeBreakdown, feeBreakdownConfig } from "./types";
 import { SummaryCardSkeleton, ChartSkeleton, TableSkeleton } from "./SummaryComponents";
 import { Pagination } from "@/components/shared/pagination";
 
+type OverdueRow = {
+  id: string;
+  studentId: string;
+  studentName: string;
+  className: string;
+  type: string;
+  amount: number;
+  paidAmount: number;
+  dueDate: string;
+};
+
+const OVERDUE_PAGE_SIZE = 10;
+
 export function FeeReport() {
+  const router = useRouter();
+  const { currentTenantSlug } = useAppStore();
   const [recharts, setRecharts] = useState<typeof import("recharts") | null>(null);
-  const [fees, setFees] = useState<FeeRecord[]>([]);
+  const [summary, setSummary] = useState<FeeSummary>({ totalFees: 0, collected: 0, pending: 0 });
+  const [recordCount, setRecordCount] = useState(0);
+  const [typeBreakdown, setTypeBreakdown] = useState<FeeTypeBreakdown[]>([]);
+  const [overdueTotal, setOverdueTotal] = useState(0);
+  const [overdueRows, setOverdueRows] = useState<OverdueRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [overduePage, setOverduePage] = useState(1);
+  const [sendingReminders, setSendingReminders] = useState(false);
+  const [confirmReminders, setConfirmReminders] = useState(false);
+
+  // The button is a two-step arm/confirm because one click pushes to every
+  // parent in the school with an overdue fee.
+  useEffect(() => {
+    if (!confirmReminders) return;
+    const t = setTimeout(() => setConfirmReminders(false), 8000);
+    return () => clearTimeout(t);
+  }, [confirmReminders]);
+
+  const sendFeeReminders = async () => {
+    if (!confirmReminders) {
+      setConfirmReminders(true);
+      return;
+    }
+    setConfirmReminders(false);
+    setSendingReminders(true);
+    try {
+      const res = await apiFetch("/api/reports/fees/reminders", { method: "POST" });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(data?.error || `Failed to send reminders (${res.status})`);
+      toast.success(
+        `Reminders queued for ${data.sent} student${data.sent === 1 ? "" : "s"} with overdue fees`
+      );
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Failed to send reminders");
+    } finally {
+      setSendingReminders(false);
+    }
+  };
 
   useEffect(() => {
     import("recharts").then(setRecharts);
   }, []);
 
   useEffect(() => {
-    async function fetchFees() {
+    async function fetchReport() {
       try {
-        const res = await apiFetch("/api/fees?limit=200");
+        const res = await apiFetch("/api/reports/fees");
         if (!res.ok) throw new Error("Failed to fetch fees");
         const data = await res.json();
-        setFees(data.items || []);
+        setSummary(data.summary);
+        setRecordCount(data.summary.recordCount);
+        setTypeBreakdown(data.typeBreakdown);
+        setOverdueTotal(data.overdue.total);
       } catch (err) {
         setError(err instanceof Error ? err.message : "Unknown error");
       } finally {
         setLoading(false);
       }
     }
-    fetchFees();
+    fetchReport();
   }, []);
 
-  const summary: FeeSummary = useMemo(() => {
-    let total = 0;
-    let collected = 0;
-    for (const f of fees) {
-      total += f.amount;
-      collected += f.paidAmount;
+  useEffect(() => {
+    async function fetchOverdue() {
+      const res = await apiFetch(
+        `/api/reports/fees?limit=${OVERDUE_PAGE_SIZE}&page=${overduePage}`
+      );
+      if (!res.ok) return;
+      const data = await res.json();
+      setOverdueRows(data.overdue.items);
+      setOverdueTotal(data.overdue.total);
     }
-    return { totalFees: total, collected, pending: total - collected };
-  }, [fees]);
+    fetchOverdue();
+  }, [overduePage]);
 
-  const typeBreakdown: FeeTypeBreakdown[] = useMemo(() => {
-    const typeMap = new Map<string, { collected: number; pending: number }>();
-    for (const f of fees) {
-      const entry = typeMap.get(f.type) || { collected: 0, pending: 0 };
-      entry.collected += f.paidAmount;
-      entry.pending += f.amount - f.paidAmount;
-      typeMap.set(f.type, entry);
-    }
-    return Array.from(typeMap.entries())
-      .map(([type, data]) => ({ type, ...data }))
-      .sort((a, b) => b.collected + b.pending - (a.collected + a.pending));
-  }, [fees]);
+  const displayedOverdue = overdueRows;
+  const overdueTotalPages = Math.max(1, Math.ceil(overdueTotal / OVERDUE_PAGE_SIZE));
 
-  const overdueStudents = useMemo(() => {
-    const now = new Date();
-    const yyyy = now.getFullYear();
-    const mm = String(now.getMonth() + 1).padStart(2, '0');
-    const dd = String(now.getDate()).padStart(2, '0');
-    const today = `${yyyy}-${mm}-${dd}`;
-    return fees
-      .filter((f) => f.status !== "paid" && f.dueDate < today)
-      .sort((a, b) => a.dueDate.localeCompare(b.dueDate));
-  }, [fees]);
-
-  const displayedOverdue = useMemo(() => {
-    return overdueStudents.slice((overduePage - 1) * 10, overduePage * 10);
-  }, [overdueStudents, overduePage]);
-
-  const overdueTotalPages = Math.max(1, Math.ceil(overdueStudents.length / 10));
 
   const collectionPct =
     summary.totalFees > 0
@@ -104,7 +136,7 @@ export function FeeReport() {
       color:
         "bg-violet-100 dark:bg-violet-900/30 text-violet-600 dark:text-violet-400",
       border: "border-violet-200 dark:border-violet-800",
-      sub: `${fees.length} records`,
+      sub: `${recordCount} records`,
     },
     {
       label: "Collected",
@@ -122,7 +154,7 @@ export function FeeReport() {
       color:
         "bg-amber-100 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400",
       border: "border-amber-200 dark:border-amber-800",
-      sub: `${overdueStudents.length} overdue`,
+      sub: `${overdueTotal} overdue`,
     },
   ];
 
@@ -236,18 +268,40 @@ export function FeeReport() {
 
       <Card className="border-amber-200 dark:border-amber-800">
         <CardHeader className="bg-amber-50/50 dark:bg-amber-900/10 border-b border-amber-200 dark:border-amber-800">
-          <CardTitle className="text-base flex items-center gap-2">
-            <AlertTriangle className="size-5 text-amber-600" />
-            Urgent: Overdue Student Fees
-          </CardTitle>
-          <CardDescription className="text-amber-700/70 dark:text-amber-400/70">
-            Records where due date has passed but payment is incomplete
-          </CardDescription>
+          <div className="flex flex-wrap items-start justify-between gap-3">
+            <div className="space-y-1.5">
+              <CardTitle className="text-base flex items-center gap-2">
+                <AlertTriangle className="size-5 text-amber-600" />
+                Urgent: Overdue Student Fees
+              </CardTitle>
+              <CardDescription className="text-amber-700/70 dark:text-amber-400/70">
+                Records where due date has passed but payment is incomplete
+              </CardDescription>
+            </div>
+            <Button
+              size="sm"
+              variant="outline"
+              className="shrink-0 border-amber-300 dark:border-amber-800 text-amber-800 dark:text-amber-300 hover:bg-amber-100/60 dark:hover:bg-amber-900/30"
+              onClick={sendFeeReminders}
+              disabled={sendingReminders || overdueTotal === 0}
+            >
+              {sendingReminders ? (
+                <Loader2 className="size-4 mr-2 animate-spin" />
+              ) : (
+                <BellRing className="size-4 mr-2" />
+              )}
+              {sendingReminders
+                ? "Sending…"
+                : confirmReminders
+                  ? "Confirm: notify parents"
+                  : "Send payment reminders"}
+            </Button>
+          </div>
         </CardHeader>
         <CardContent className="p-0">
           {loading ? (
             <TableSkeleton rows={4} />
-          ) : overdueStudents.length === 0 ? (
+          ) : overdueTotal === 0 ? (
             <div className="text-center py-10 text-muted-foreground">
               <p className="text-sm">No overdue records found</p>
             </div>
@@ -278,7 +332,17 @@ export function FeeReport() {
                           ₹{(f.amount - f.paidAmount).toLocaleString()}
                         </TableCell>
                         <TableCell className="text-right">
-                          <Button variant="ghost" size="icon" className="size-8 p-0">
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="size-8 p-0"
+                            aria-label={`View ${f.studentName}'s profile`}
+                            onClick={() =>
+                              router.push(
+                                `/${currentTenantSlug}/students?student=${encodeURIComponent(f.studentId)}`
+                              )
+                            }
+                          >
                             <Eye className="size-4 opacity-50" />
                           </Button>
                         </TableCell>
@@ -293,7 +357,7 @@ export function FeeReport() {
                   <Pagination
                     currentPage={overduePage}
                     totalPages={overdueTotalPages}
-                    totalItems={overdueStudents.length}
+                    totalItems={overdueTotal}
                     itemsPerPage={10}
                     onPageChange={(page) => setOverduePage(page)}
                   />

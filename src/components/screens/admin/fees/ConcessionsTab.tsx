@@ -98,7 +98,14 @@ export function ConcessionsTab({ canCreate, canEdit, canDelete }: ConcessionsTab
     if (!addForm.studentId || !addForm.concessionType) { toast.error('Student and concession type are required'); return; }
     setAdding(true);
     try {
-      await createConcession.mutateAsync({ ...addForm, amount: Number(addForm.amount) || 0 });
+      const { feeCategoryId, validFrom, validUntil, ...rest } = addForm;
+      await createConcession.mutateAsync({
+        ...rest,
+        amount: Number(addForm.amount) || 0,
+        feeCategoryId: feeCategoryId || null,
+        validFrom: validFrom || null,
+        validUntil: validUntil || null,
+      });
       setAddOpen(false);
       setAddForm({ classId: '', studentId: '', concessionType: 'percentage', amount: '', reason: '', feeCategoryId: '', validFrom: '', validUntil: '' });
     } catch { /* handled by mutation */ }

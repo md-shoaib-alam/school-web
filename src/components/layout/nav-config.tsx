@@ -91,7 +91,7 @@ export const navItems: Record<UserRole, NavItem[]> = {
       key: "bulk-attendance-import",
       label: "Bulk Attendance",
       icon: <ClipboardList className="size-4" />,
-      permModule: null,
+      permModule: "tenants",
     },
     {
       key: "users",
@@ -150,7 +150,9 @@ export const navItems: Record<UserRole, NavItem[]> = {
       key: "roles",
       label: "Roles & Permissions",
       icon: <Shield className="size-4" />,
-      permModule: "roles",
+      // No grantable module opens this: creating or handing out platform roles
+      // belongs to the owner alone, matching the server's root-only guard.
+      rootOnly: true,
     },
     {
       key: "manage-admins",
@@ -163,13 +165,13 @@ export const navItems: Record<UserRole, NavItem[]> = {
       key: "platform-notices",
       label: "Notices",
       icon: <Bell className="size-4" />,
-      permModule: "analytics",
+      permModule: "notices",
     },
     {
       key: "send-notification",
       label: "Send Push Notification",
       icon: <Send className="size-4" />,
-      permModule: null,
+      permModule: "notices",
     },
 
     // Insights & Security

@@ -102,7 +102,7 @@ export function SuperAdminSettings() {
     const fetchSettings = async () => {
       dispatch({ type: 'SET_LOADING', payload: true });
       try {
-        const res = await apiFetch("/api/platform-settings");
+        const res = await apiFetch("/api/platform-settings/all");
         if (res.ok) {
           const data = await res.json();
           if (Array.isArray(data)) {

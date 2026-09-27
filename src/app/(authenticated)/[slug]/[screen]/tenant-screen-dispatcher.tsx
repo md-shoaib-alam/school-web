@@ -4,6 +4,7 @@ import { useEffect, useSyncExternalStore } from 'react';
 import { useParams, redirect } from 'next/navigation';
 import { useAppStore } from '@/store/use-app-store';
 import { hasPermission } from '@/lib/permissions';
+import { navItems } from '@/components/layout/nav-config';
 import dynamic from 'next/dynamic';
 import { FullPageSkeleton } from "@/components/ui/full-page-skeleton";
 
@@ -86,6 +87,41 @@ function useHydrated() {
   return useSyncExternalStore(emptySubscribe, () => true, () => false);
 }
 
+/**
+ * Screens the dispatcher serves to staff that the staff sidebar either omits or
+ * names differently from the URL (e.g. the nav group is `leave-management`,
+ * while `/leaves` is a real screen). Derived map alone would leave these open.
+ */
+const STAFF_EXTRA_PERMISSIONS: Record<string, string> = {
+  parents: 'parents',
+  staff: 'staff',
+  leaves: 'leaves',
+};
+
+/**
+ * Screen -> permission module, derived from the staff sidebar so the two can
+ * never drift. A child inherits its group's module unless it names one.
+ * `permModule: null` means the screen is intentionally ungated.
+ */
+const STAFF_SCREEN_MODULES: Record<string, string> = (() => {
+  const map: Record<string, string> = {};
+  for (const item of navItems.staff) {
+    const groupModule = item.permModule ?? undefined;
+    if (groupModule) map[item.key] = groupModule;
+    for (const child of item.children ?? []) {
+      const module = child.permModule ?? groupModule;
+      if (module) map[child.key] = module;
+    }
+  }
+  return Object.assign(map, STAFF_EXTRA_PERMISSIONS);
+})();
+
+/**
+ * Admin-only screens with no grantable module, so no permission could ever
+ * open them for staff.
+ */
+const STAFF_FORBIDDEN_SCREENS = new Set(['roles', 'school-settings']);
+
 export default function TenantScreenDispatcherClient() {
   const { slug, screen } = useParams();
   const mounted = useHydrated();
@@ -122,50 +158,12 @@ export default function TenantScreenDispatcherClient() {
   if (currentUser.role === 'super_admin' || currentUser.role === 'admin' || currentUser.role === 'staff') {
     // Permission guard for staff users
     if (currentUser.role === 'staff') {
-      const STAFF_SCREEN_PERMISSIONS: Record<string, string> = {
-        'students': 'students',
-        'teachers': 'teachers',
-        'parents': 'parents',
-        'classes': 'classes',
-        'subjects': 'subjects',
-        'attendance': 'attendance',
-        'teacher-attendance': 'attendance',
-        'staff-attendance': 'attendance',
-        'fees': 'fees',
-        'fee-categories': 'fees',
-        'fee-concessions': 'fees',
-        'make-payment': 'fees',
-        'check-receipt': 'fees',
-        'fee-status': 'fees',
-        'check-payments': 'fees',
-        'transport-fee': 'fees',
-        'expenses': 'expenses',
-        'academic-years': 'academic-years',
-        'timetable': 'timetable',
-        'calendar': 'calendar',
-        'reports': 'reports',
-        'notices': 'notices',
-        'tickets': 'tickets',
-        'roles': 'roles',
-        'staff': 'staff',
-        'school-settings': 'settings',
-        'promotions': 'promotions',
-        'bulk-promote': 'promotions',
-        'graduated': 'promotions',
-        'certificates': 'certificates',
-        'leaves': 'leaves',
-        'student-leaves': 'leaves',
-        'teacher-leaves': 'leaves',
-        'staff-leaves': 'leaves',
-        'exams': 'exams',
-        'results-entry': 'exams',
-        'published-results': 'exams',
-        'print-marksheet': 'exams',
-        'admit-cards': 'exams',
-      };
+      const denied =
+        STAFF_FORBIDDEN_SCREENS.has(screen) ||
+        (STAFF_SCREEN_MODULES[screen] !== undefined &&
+          !hasPermission(currentUser, STAFF_SCREEN_MODULES[screen], 'view'));
 
-      const requiredModule = STAFF_SCREEN_PERMISSIONS[screen];
-      if (requiredModule && !hasPermission(currentUser, requiredModule, 'view')) {
+      if (denied) {
         const tid = currentUser.tenantSlug || currentUser.tenantId || slug;
         redirect(`/${tid}/dashboard`);
       }
@@ -217,6 +215,7 @@ export default function TenantScreenDispatcherClient() {
       case 'my-attendance':
         if (currentUser.role === 'staff') return <TeacherMyAttendance />;
         redirect(`/${currentUser.tenantSlug || currentUser.tenantId || slug}/dashboard`);
+      case 'exams': return <AdminExams key="exams" initialTab="exams" />;
       case 'results-entry': return <AdminExams key="results" initialTab="results" />;
       case 'published-results': return <AdminExams key="published" initialTab="published" />;
       case 'print-marksheet': return <AdminPrintMarksheet />;

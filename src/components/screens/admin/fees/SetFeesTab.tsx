@@ -175,7 +175,7 @@ export function SetFeesTab({ canCreate, canEdit, canDelete }: SetFeesTabProps) {
     }
     dispatch({ type: 'SET_ADDING', payload: true });
     try {
-      await createStructure.mutateAsync(addForm);
+      await createStructure.mutateAsync({ ...addForm, amount: Number(addForm.amount) });
       dispatch({ type: 'RESET_ADD_FORM' });
     } catch { /* handled by mutation */ }
     dispatch({ type: 'SET_ADDING', payload: false });

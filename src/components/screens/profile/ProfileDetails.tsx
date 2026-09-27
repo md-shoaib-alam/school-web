@@ -101,14 +101,15 @@ export function ProfileDetails({
             <div className="flex items-center gap-1.5 mt-0.5 pr-6">
               <Phone className="size-4 text-blue-500" />
               <span className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">
-                {user.phone || "+91 98765 43210"}
+                {user.phone || "Not set"}
               </span>
             </div>
             <Button
               type="button"
               variant="ghost"
               size="icon"
-              onClick={() => onCopy(user.phone || "+91 98765 43210", "Mobile Number")}
+              disabled={!user.phone}
+              onClick={() => onCopy(user.phone || "", "Mobile Number")}
               className="size-7 absolute right-2 top-1/2 -translate-y-1/2 text-emerald-800/80 hover:text-emerald-950 dark:text-emerald-400/80 dark:hover:text-emerald-200 hover:bg-emerald-100/60 dark:hover:bg-emerald-900/40 rounded-lg transition-all duration-200 hover:scale-105 active:scale-95"
             >
               {copiedField === "Mobile Number" ? <Check className="size-3.5 text-green-500" /> : <Copy className="size-3.5" />}
@@ -120,14 +121,15 @@ export function ProfileDetails({
             <div className="flex items-start gap-1.5 mt-0.5 pr-6">
               <MapPin className="size-4 text-rose-500 shrink-0 mt-0.5" />
               <span className="text-sm font-semibold text-zinc-900 dark:text-zinc-100 leading-normal">
-                {user.address || "7/A, Sector-4, HSR Layout, Bangalore, India"}
+                {user.address || "Not set"}
               </span>
             </div>
             <Button
               type="button"
               variant="ghost"
               size="icon"
-              onClick={() => onCopy(user.address || "7/A, Sector-4, HSR Layout, Bangalore, India", "Address")}
+              disabled={!user.address}
+              onClick={() => onCopy(user.address || "", "Address")}
               className="size-7 absolute right-2 top-1/2 -translate-y-1/2 text-emerald-800/80 hover:text-emerald-950 dark:text-emerald-400/80 dark:hover:text-emerald-200 hover:bg-emerald-100/60 dark:hover:bg-emerald-900/40 rounded-lg transition-all duration-200 hover:scale-105 active:scale-95"
             >
               {copiedField === "Address" ? <Check className="size-3.5 text-green-500" /> : <Copy className="size-3.5" />}

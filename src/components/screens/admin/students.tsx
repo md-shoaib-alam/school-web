@@ -266,10 +266,17 @@ function AdminStudentsContent() {
           );
           if (match && isMounted) {
             setViewingStudentSnapshot(match);
+          } else if (!match && isMounted) {
+            toast.error("Student not found");
+            handleCloseView();
           }
         }
       } catch (err) {
         console.error("Failed to load student from URL:", err);
+        if (isMounted) {
+          toast.error("Failed to load student");
+          handleCloseView();
+        }
       }
     })();
 
@@ -398,6 +405,10 @@ function AdminStudentsContent() {
           queryClient.invalidateQueries({
             queryKey: ["admin-dashboard", currentTenantId],
           });
+          // The profile view caches by id, so a write has to clear that too.
+          if (!isCreate && editingStudent?.id) {
+            queryClient.invalidateQueries({ queryKey: ["student-detail", editingStudent.id] });
+          }
           if (isCreate && resData.username) {
             return `Student registered! School ID: ${resData.username}`;
           }

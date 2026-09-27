@@ -9,6 +9,7 @@ import type { NoticeInfo } from "@/lib/types";
 import { toast } from "sonner";
 import { useModulePermissions } from "@/hooks/use-permissions";
 import { useQueryClient } from "@tanstack/react-query";
+import { useAppStore } from "@/store/use-app-store";
 import { useNotices } from "@/lib/graphql/hooks";
 
 // Sub-components
@@ -45,7 +46,8 @@ const emptyForm: NoticeFormData = {
 export function AdminNotices() {
   const { canCreate, canEdit, canDelete } = useModulePermissions("notices");
   const queryClient = useQueryClient();
-  const { data: noticesData, isLoading: noticesLoading } = useNotices();
+  const { currentTenantId } = useAppStore();
+  const { data: noticesData, isLoading: noticesLoading } = useNotices(currentTenantId || undefined);
   const notices = noticesData?.notices || [];
   const loading = noticesLoading && notices.length === 0;
 

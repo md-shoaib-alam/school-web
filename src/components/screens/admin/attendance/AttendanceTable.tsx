@@ -22,6 +22,7 @@ interface AttendanceTableProps {
   totalItems: number;
   currentPage: number;
   onPageChange: (p: number) => void;
+  onViewProfile: (record: any) => void;
 }
 
 export function AttendanceTable({
@@ -37,6 +38,7 @@ export function AttendanceTable({
   totalItems,
   currentPage,
   onPageChange,
+  onViewProfile,
 }: AttendanceTableProps) {
   return (
     <>
@@ -49,7 +51,7 @@ export function AttendanceTable({
             <CardDescription>
               {selectedClass === "all"
                 ? "Showing attendance for all school students"
-                : `Showing students enrolled in Class ${classes.find((c) => c.id === selectedClass)?.name}-${classes.find((c) => c.id === selectedClass)?.section}`}
+                : `Showing attendance records for Class ${classes.find((c) => c.id === selectedClass)?.name}-${classes.find((c) => c.id === selectedClass)?.section}`}
             </CardDescription>
           </div>
           <div className="relative w-64">
@@ -156,6 +158,7 @@ export function AttendanceTable({
                         variant="outline"
                         size="sm"
                         className="font-semibold"
+                        onClick={() => onViewProfile(record)}
                       >
                         View Profile
                       </Button>

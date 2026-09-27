@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { CheckCircle2, UserX } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { apiFetch } from "@/lib/api";
@@ -35,6 +36,7 @@ const statusConfig: Record<
 };
 
 export function AdminAttendance() {
+  const router = useRouter();
   const { currentTenantId, currentTenantSlug } = useAppStore();
   const { data: tenantData } = useTenantResolution(currentTenantSlug || undefined);
   const plan = tenantData?.plan?.toLowerCase() || "basic";
@@ -116,6 +118,10 @@ export function AdminAttendance() {
     },
   ];
 
+  const handleViewProfile = (record: AttendanceRecord) => {
+    router.push(`/${currentTenantSlug}/students?student=${encodeURIComponent(record.studentId)}`);
+  };
+
   const isDatePickerDisabled = (date: Date) => {
     const now = new Date();
     now.setHours(0, 0, 0, 0);
@@ -169,6 +175,7 @@ export function AdminAttendance() {
             totalItems={attendanceData?.total || 0}
             currentPage={currentPage}
             onPageChange={setCurrentPage}
+            onViewProfile={handleViewProfile}
           />
         </>
       )}

@@ -73,9 +73,8 @@ export function StudentProfileView({
   const { data: studentDetails, isLoading: isDetailsLoading } = useQuery({
     queryKey: ["student-detail", student?.id],
     enabled: !!student?.id,
-    staleTime: 0,
     queryFn: async () => {
-      const res = await apiFetch(`/api/students/${student.id}?t=${Date.now()}`);
+      const res = await apiFetch(`/api/students/${student.id}`);
       if (!res.ok) throw new Error("Failed to load student details");
       return res.json();
     },

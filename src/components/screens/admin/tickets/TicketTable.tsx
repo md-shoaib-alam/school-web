@@ -218,13 +218,9 @@ export function TicketTable({ tickets, loading, onOpenDetail }: TicketTableProps
                   </Badge>
                 </div>
               </div>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="size-8 text-emerald-600 shrink-0"
-              >
+              <span className="inline-flex size-8 shrink-0 items-center justify-center rounded-md text-emerald-600">
                 <Eye className="size-4" />
-              </Button>
+              </span>
             </div>
             <div className="flex items-center justify-between text-[11px] text-zinc-500 dark:text-zinc-400">
               <span>{getCategoryLabel(ticket.category)}</span>

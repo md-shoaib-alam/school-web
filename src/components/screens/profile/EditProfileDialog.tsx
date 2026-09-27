@@ -31,6 +31,7 @@ interface EditProfileDialogProps {
   setEditAvatar: (v: string) => void;
   onFileChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   onSave: (e: React.FormEvent) => void;
+  saving?: boolean;
 }
 
 export function EditProfileDialog({
@@ -47,6 +48,7 @@ export function EditProfileDialog({
   setEditAvatar,
   onFileChange,
   onSave,
+  saving,
 }: EditProfileDialogProps) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -147,9 +149,10 @@ export function EditProfileDialog({
             </Button>
             <Button
               type="submit"
+              disabled={saving}
               className="bg-emerald-600 hover:bg-emerald-700 dark:bg-emerald-500 dark:hover:bg-emerald-600 text-white font-bold rounded-xl text-xs"
             >
-              Save Changes
+              {saving ? "Saving..." : "Save Changes"}
             </Button>
           </DialogFooter>
         </form>
