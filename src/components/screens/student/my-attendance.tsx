@@ -21,7 +21,7 @@ import {
   XCircle,
   Clock,
 } from "lucide-react";
-import type { StudentInfo, AttendanceRecord } from "@/lib/types";
+import type { StudentInfo, AttendanceRecord } from "@/types";
 
 interface MonthlyData {
   month: string;

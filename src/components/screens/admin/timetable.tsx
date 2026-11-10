@@ -7,7 +7,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { toast } from "sonner";
 import { useModulePermissions } from "@/hooks/use-permissions";
 import { useAppStore } from "@/store/use-app-store";
-import type { ClassInfo } from "@/lib/types";
+import type { ClassInfo } from "@/types";
 
 // Sub-components
 import { GridView } from "./timetable/GridView";

@@ -32,7 +32,7 @@ import {
   Users,
 } from "lucide-react";
 import { toast } from "sonner";
-import { copyToClipboard } from "@/lib/utils";
+import { copyToClipboard } from "@/lib/clipboard";
 import type { TeacherInfo } from "./types";
 
 interface TeacherDetailDialogProps {

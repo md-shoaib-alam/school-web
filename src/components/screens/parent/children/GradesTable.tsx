@@ -3,7 +3,7 @@
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Award, BookOpen, GraduationCap, ChevronRight } from "lucide-react";
-import type { GradeRecord } from "@/lib/types";
+import type { GradeRecord } from "@/types";
 
 interface GradesTableProps {
   grades: GradeRecord[];

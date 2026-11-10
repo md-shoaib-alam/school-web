@@ -2,7 +2,7 @@
 
 import { Card, CardContent } from "@/components/ui/card";
 import { Clock, CheckCircle2, XCircle, AlertCircle } from "lucide-react";
-import { AttendanceRecord } from "@/lib/types";
+import { AttendanceRecord } from "@/types";
 import { getTodayAttendance } from "./utils";
 
 interface TodayAttendanceCardProps {

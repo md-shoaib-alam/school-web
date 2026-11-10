@@ -32,7 +32,7 @@ import {
   Key,
 } from "lucide-react";
 import { toast } from "sonner";
-import { copyToClipboard } from "@/lib/utils";
+import { copyToClipboard } from "@/lib/clipboard";
 import type { StaffMember } from "./types";
 import { getInitials } from "./utils";
 

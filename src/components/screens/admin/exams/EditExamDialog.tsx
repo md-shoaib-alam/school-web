@@ -41,7 +41,10 @@ import {
   Languages,
   Laptop,
 } from 'lucide-react';
-import { formatLocalDate, parseLocalDate } from '@/lib/utils';
+import {
+  formatLocalDate,
+  parseLocalDate,
+} from '@/lib/date';
 import { ClassOption, ExamFormData } from './types';
 
 export interface EditExamDialogProps {

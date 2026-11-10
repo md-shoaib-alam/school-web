@@ -11,7 +11,7 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Clock, BookOpen, CalendarDays, User, MapPin } from "lucide-react";
-import type { StudentInfo, TimetableSlot } from "@/lib/types";
+import type { StudentInfo, TimetableSlot } from "@/types";
 import { ChildSelector } from "./ChildSelector";
 
 const DAYS = ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday"] as const;

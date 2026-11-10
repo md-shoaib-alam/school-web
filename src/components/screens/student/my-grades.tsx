@@ -4,7 +4,7 @@ import { apiFetch } from "@/lib/api";
 import { useEffect, useReducer, useCallback, useMemo } from "react";
 import { useAppStore } from "@/store/use-app-store";
 import { useAcademicYears } from "@/hooks/use-academic-years";
-import type { GradeRecord, StudentInfo } from "@/lib/types";
+import type { GradeRecord, StudentInfo } from "@/types";
 
 // Import types and sub-components
 import type { AssessmentGrade } from "./my-grades/types";

@@ -1,4 +1,4 @@
-import { GradeRecord } from "@/lib/types";
+import { GradeRecord } from "@/types";
 
 export function getGradesForStudent(studentId: string, grades: GradeRecord[]) {
   return grades.filter((g) => g.studentId === studentId);

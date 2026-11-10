@@ -5,7 +5,7 @@ import { useState, useMemo } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Megaphone, Eye } from "lucide-react";
-import type { NoticeInfo } from "@/lib/types";
+import type { NoticeInfo } from "@/types";
 import { toast } from "sonner";
 import { useModulePermissions } from "@/hooks/use-permissions";
 import { useQueryClient } from "@tanstack/react-query";

@@ -5,7 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { UserCheck, Users, Pencil, Trash2 } from "lucide-react";
-import type { ClassInfo } from "@/lib/types";
+import type { ClassInfo } from "@/types";
 
 interface ClassesTableViewProps {
   classes: ClassInfo[];

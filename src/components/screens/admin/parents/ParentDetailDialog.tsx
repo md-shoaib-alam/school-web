@@ -24,7 +24,7 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
-import { copyToClipboard } from "@/lib/utils";
+import { copyToClipboard } from "@/lib/clipboard";
 import { ParentInfo, getAvatarColor, getInitials } from "./types";
 
 interface ParentDetailDialogProps {

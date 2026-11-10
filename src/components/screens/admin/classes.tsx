@@ -8,7 +8,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { School } from "lucide-react";
 import { useRouter, useParams } from "next/navigation";
 import { toast } from "sonner";
-import type { ClassInfo } from "@/lib/types";
+import type { ClassInfo } from "@/types";
 import { useModulePermissions } from "@/hooks/use-permissions";
 import { useClasses, useTeachers } from "@/lib/graphql/hooks";
 import { useAppStore } from "@/store/use-app-store";

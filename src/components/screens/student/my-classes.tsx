@@ -9,7 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { BookOpen, GraduationCap, User, Hash, ArrowRight } from "lucide-react";
-import type { StudentInfo, SubjectInfo } from "@/lib/types";
+import type { StudentInfo, SubjectInfo } from "@/types";
 
 const subjectColors = [
   "from-violet-500 to-purple-600",

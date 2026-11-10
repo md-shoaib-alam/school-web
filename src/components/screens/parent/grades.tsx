@@ -12,7 +12,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { BarChart3, TrendingUp, BookOpen, Award, CheckCircle2, ClipboardList, GraduationCap, FileText } from "lucide-react";
-import type { StudentInfo, GradeRecord } from "@/lib/types";
+import type { StudentInfo, GradeRecord } from "@/types";
 
 // Sub-components
 import { GradesSummary } from "./grades/GradesSummary";

@@ -1,6 +1,6 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Calendar, BookOpen, Clock } from "lucide-react";
-import type { TimetableSlot } from "@/lib/types";
+import type { TimetableSlot } from "@/types";
 import { DAY_FULL_LABELS, formatTime } from "./types";
 
 interface TimetableSummaryProps {

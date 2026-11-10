@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { UserCheck, Users, Pencil, Trash2 } from "lucide-react";
 import { LazyMotion, domAnimation, m, AnimatePresence } from "framer-motion";
-import type { ClassInfo } from "@/lib/types";
+import type { ClassInfo } from "@/types";
 
 interface ClassesGridViewProps {
   classes: ClassInfo[];

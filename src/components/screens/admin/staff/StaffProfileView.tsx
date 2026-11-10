@@ -20,7 +20,7 @@ import {
   ChevronUp, ChevronDown, Lock, Loader2, Upload, Shield, Clock, Key
 } from "lucide-react";
 import { toast } from "sonner";
-import { copyToClipboard } from "@/lib/utils";
+import { copyToClipboard } from "@/lib/clipboard";
 import { useGraphQLMutation, useAssignRoleToUser } from "@/lib/graphql/hooks";
 import { useQueryClient } from "@tanstack/react-query";
 import { queryKeys } from "@/lib/graphql/keys";

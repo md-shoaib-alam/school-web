@@ -26,7 +26,10 @@ import { apiFetch } from "@/lib/api";
 import { toast } from "sonner";
 import type { StudentOption } from "../types";
 import { DatePicker } from "@/components/ui/date-picker";
-import { formatLocalDate, parseLocalDate } from "@/lib/utils";
+import {
+  formatLocalDate,
+  parseLocalDate,
+} from "@/lib/date";
 
 interface AddManualFeeDialogProps {
   open: boolean;

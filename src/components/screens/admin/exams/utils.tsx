@@ -2,7 +2,7 @@
 
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
-import { parseLocalDate } from '@/lib/utils';
+import { parseLocalDate } from '@/lib/date';
 import { ExamRecord, ExamFormData } from './types';
 
 const statusConfig: Record<string, { bg: string; label: string }> = {

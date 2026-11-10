@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
-import { formatToDdMmYyyy } from '@/lib/utils';
+import { formatToDdMmYyyy } from '@/lib/date';
 import { ClassOption, SubjectOption } from '../types';
 import { BulkSubjectRow } from './wizardTypes';
 

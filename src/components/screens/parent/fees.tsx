@@ -6,7 +6,7 @@ import { useParentDashboard } from "@/lib/graphql/hooks";
 import { Card, CardContent } from "@/components/ui/card";
 import { CreditCard } from "lucide-react";
 import { toast } from "sonner";
-import type { StudentInfo, FeeRecord } from "@/lib/types";
+import type { StudentInfo, FeeRecord } from "@/types";
 
 // Sub-components
 import { FeeSummary } from "./fees/FeeSummary";

@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { useExpenses } from "@/hooks/use-expenses";
 import { toast } from "sonner";
 import { apiFetch } from "@/lib/api";
-import { formatLocalDate } from "@/lib/utils";
+import { formatLocalDate } from "@/lib/date";
 import {
   AlertDialog,
   AlertDialogAction,

@@ -8,7 +8,10 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Badge } from '@/components/ui/badge';
 import { DatePicker } from '@/components/ui/date-picker';
 import { TimePicker } from '@/components/ui/time-picker';
-import { parseLocalDate, formatLocalDate } from '@/lib/utils';
+import {
+  parseLocalDate,
+  formatLocalDate,
+} from '@/lib/date';
 import { ClassOption } from '../types';
 import { BulkSubjectRow } from './wizardTypes';
 

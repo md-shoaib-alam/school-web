@@ -11,7 +11,10 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { BookOpen, Layers, Zap, Loader2, Plus, Save } from 'lucide-react';
 import { DatePicker } from '@/components/ui/date-picker';
 import { TimePicker } from '@/components/ui/time-picker';
-import { formatLocalDate, parseLocalDate } from '@/lib/utils';
+import {
+  formatLocalDate,
+  parseLocalDate,
+} from '@/lib/date';
 import { ExamFormData, ClassOption, SubjectOption } from './types';
 import { EditExamDialog } from './EditExamDialog';
 

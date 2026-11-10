@@ -12,7 +12,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { GraduationCap } from "lucide-react";
-import type { GradeRecord } from "@/lib/types";
+import type { GradeRecord } from "@/types";
 
 interface ExamsTableProps {
   activeTab: string;

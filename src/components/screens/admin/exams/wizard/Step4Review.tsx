@@ -2,7 +2,7 @@
 
 import { CheckCircle2, ArrowLeft, Loader2, Sparkles, Layers, Calendar, Clock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { formatToDdMmYyyy } from '@/lib/utils';
+import { formatToDdMmYyyy } from '@/lib/date';
 import { ClassOption } from '../types';
 import { BulkSubjectRow } from './wizardTypes';
 

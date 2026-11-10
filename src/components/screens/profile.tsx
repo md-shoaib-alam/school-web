@@ -20,7 +20,7 @@ import { ProfileDetails } from "./profile/ProfileDetails";
 import { SecuritySettings } from "./profile/SecuritySettings";
 import { QuickActions } from "./profile/QuickActions";
 import { EditProfileDialog } from "./profile/EditProfileDialog";
-import { copyToClipboard } from "@/lib/utils";
+import { copyToClipboard } from "@/lib/clipboard";
 
 export function UserProfileScreen() {
   const { push, replace } = useRouter();

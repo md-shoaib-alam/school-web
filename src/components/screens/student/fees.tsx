@@ -23,7 +23,7 @@ import {
   AlertTriangle,
   Clock,
 } from "lucide-react";
-import type { StudentInfo, FeeRecord } from "@/lib/types";
+import type { StudentInfo, FeeRecord } from "@/types";
 
 const statusConfig: Record<
   string,

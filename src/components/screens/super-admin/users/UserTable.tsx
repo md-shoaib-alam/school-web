@@ -33,7 +33,7 @@ import {
   Users
 } from "lucide-react";
 import { PlatformUser, ROLE_CONFIG } from "./types";
-import { copyToClipboard } from "@/lib/utils";
+import { copyToClipboard } from "@/lib/clipboard";
 import { toast } from "sonner";
 
 interface UserTableProps {

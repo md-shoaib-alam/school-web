@@ -29,7 +29,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import type { ClassInfo } from "@/lib/types";
+import type { ClassInfo } from "@/types";
 
 // ==========================================
 // Helper Components

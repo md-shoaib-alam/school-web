@@ -8,7 +8,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { CalendarDays, Clock, Loader2, Send, Sparkles, CheckCircle2, Star } from "lucide-react";
-import type { AssignmentInfo } from "@/lib/types";
+import type { AssignmentInfo } from "@/types";
 
 export type HomeworkStatus = "active" | "submitted" | "overdue";
 

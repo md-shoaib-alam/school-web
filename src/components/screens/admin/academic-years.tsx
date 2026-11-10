@@ -49,7 +49,10 @@ import { useAcademicYears } from "@/hooks/use-academic-years";
 import { DatePicker } from "@/components/ui/date-picker";
 import { toast } from "sonner";
 import { format } from "date-fns";
-import { formatLocalDate, parseLocalDate } from "@/lib/utils";
+import {
+  formatLocalDate,
+  parseLocalDate,
+} from "@/lib/date";
 
 function getUpcomingCount(academicYears: any[]): number {
   const now = new Date();

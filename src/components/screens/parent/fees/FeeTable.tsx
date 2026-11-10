@@ -16,7 +16,7 @@ import {
 } from "@/components/ui/table";
 import { IndianRupee, Printer, Lock } from "lucide-react";
 import { STATUS_CONFIG, TYPE_ICONS } from "./constants";
-import type { FeeRecord } from "@/lib/types";
+import type { FeeRecord } from "@/types";
 import { ReceiptTemplate } from "./ReceiptTemplate";
 
 interface FeeTableProps {

@@ -8,7 +8,8 @@ import { Pencil, Trash2, Phone, Mail, Copy, Check } from "lucide-react";
 import { StaffMember } from "./types";
 import { getInitials, roleBadgeStyle, avatarStyle } from "./utils";
 import { useState } from "react";
-import { cn, copyToClipboard } from "@/lib/utils";
+import { cn } from "@/lib/utils"
+import { copyToClipboard } from "@/lib/clipboard";
 
 interface StaffCardProps {
   member: StaffMember;

@@ -1,4 +1,4 @@
-import { AttendanceRecord } from "@/lib/types";
+import { AttendanceRecord } from "@/types";
 
 export function getAttendanceStats(records: AttendanceRecord[]) {
   const total = records.length;

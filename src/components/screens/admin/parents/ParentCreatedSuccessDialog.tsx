@@ -25,7 +25,7 @@ import {
   Info,
 } from "lucide-react";
 import { toast } from "sonner";
-import { copyToClipboard } from "@/lib/utils";
+import { copyToClipboard } from "@/lib/clipboard";
 import { getInitials } from "./types";
 
 export interface ParentCreatedData {

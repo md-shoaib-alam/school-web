@@ -5,7 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { User, Calendar, Pencil, Trash2 } from "lucide-react";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
-import type { NoticeInfo } from "@/lib/types";
+import type { NoticeInfo } from "@/types";
 
 const priorityConfig: Record<string, { bg: string; text: string; border: string }> = {
   normal: { bg: "bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300", text: "Normal", border: "border-l-zinc-400 dark:border-l-zinc-500" },

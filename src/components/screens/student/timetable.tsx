@@ -5,7 +5,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useState, useCallback, useMemo } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { BookOpen } from "lucide-react";
-import type { TimetableSlot } from "@/lib/types";
+import type { TimetableSlot } from "@/types";
 
 import { ViewMode, DAYS, getNow, SUBJECT_COLORS } from "./timetable/types";
 import { TimetableSkeleton } from "./timetable/timetable-skeleton";

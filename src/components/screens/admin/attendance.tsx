@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { CheckCircle2, UserX } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { apiFetch } from "@/lib/api";
-import type { AttendanceRecord } from "@/lib/types";
+import type { AttendanceRecord } from "@/types";
 import { useModulePermissions } from "@/hooks/use-permissions";
 import { useAppStore } from "@/store/use-app-store";
 import { useDebounce } from "@/hooks/use-debounce";

@@ -3,7 +3,7 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { GraduationCap, User, Hash, Calendar, ShieldCheck, BookOpen } from "lucide-react";
-import type { StudentInfo } from "@/lib/types";
+import type { StudentInfo } from "@/types";
 
 interface StudentProfileCardProps {
   student: StudentInfo;

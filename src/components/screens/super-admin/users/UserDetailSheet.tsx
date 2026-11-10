@@ -53,7 +53,7 @@ import {
   Search,
 } from "lucide-react";
 import { PlatformUser, ROLE_CONFIG, TenantInfo } from "./types";
-import { copyToClipboard } from "@/lib/utils";
+import { copyToClipboard } from "@/lib/clipboard";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { useUpdateUser, useTenants } from "@/lib/graphql/hooks";

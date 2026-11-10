@@ -25,7 +25,7 @@ import {
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { apiFetch } from "@/lib/api";
 import { toast } from "sonner";
-import { copyToClipboard } from "@/lib/utils";
+import { copyToClipboard } from "@/lib/clipboard";
 import type { StudentInfo } from "./types";
 import { StudentOverviewTab } from "./StudentOverviewTab";
 

@@ -21,7 +21,7 @@ import { Pencil, Trash2, Shield, Phone, Mail, Copy, Check, Eye, MoreVertical } f
 import { useState } from "react";
 import { StaffMember } from "./types";
 import { getInitials, roleBadgeStyle, avatarStyle } from "./utils";
-import { copyToClipboard } from "@/lib/utils";
+import { copyToClipboard } from "@/lib/clipboard";
 
 interface StaffTableProps {
   staff: StaffMember[];

@@ -7,7 +7,10 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { DatePicker } from '@/components/ui/date-picker';
 import { Badge } from '@/components/ui/badge';
-import { parseLocalDate, formatLocalDate } from '@/lib/utils';
+import {
+  parseLocalDate,
+  formatLocalDate,
+} from '@/lib/date';
 import { ClassOption } from '../types';
 import { GradeGroup } from './wizardTypes';
 

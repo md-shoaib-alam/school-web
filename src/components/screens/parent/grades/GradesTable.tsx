@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/table";
 import { Award } from "lucide-react";
 import { gradeBadgeClasses } from "./utils";
-import type { GradeRecord } from "@/lib/types";
+import type { GradeRecord } from "@/types";
 
 interface GradesTableProps {
   studentName: string;

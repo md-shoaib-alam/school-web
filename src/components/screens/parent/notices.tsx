@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { apiFetch } from "@/lib/api";
 import { Bell } from "lucide-react";
-import type { NoticeInfo } from "@/lib/types";
+import type { NoticeInfo } from "@/types";
 
 // Sub-components
 import { NoticeFilters } from "./notices/NoticeFilters";

@@ -2,7 +2,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Clock, User, MapPin, Timer } from "lucide-react";
-import type { TimetableSlot } from "@/lib/types";
+import type { TimetableSlot } from "@/types";
 import { DAYS, DAY_LABELS, DAY_FULL_LABELS, formatTime } from "./types";
 
 interface TimetableDayProps {

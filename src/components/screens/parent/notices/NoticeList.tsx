@@ -4,7 +4,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Megaphone } from "lucide-react";
 import { PRIORITY_CONFIG, ROLE_CONFIG, ROLE_LABELS } from "./constants";
-import type { NoticeInfo } from "@/lib/types";
+import type { NoticeInfo } from "@/types";
 
 interface NoticeListProps {
   notices: NoticeInfo[];

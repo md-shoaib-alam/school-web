@@ -28,7 +28,7 @@ import {
   CalendarDays,
   Calendar as CalendarIcon,
 } from "lucide-react";
-import type { StudentInfo, AssignmentInfo } from "@/lib/types";
+import type { StudentInfo, AssignmentInfo } from "@/types";
 import { DailyDiaryPlanner } from "@/components/shared/daily-diary-planner";
 
 type HomeworkStatus = "active" | "submitted" | "overdue";
