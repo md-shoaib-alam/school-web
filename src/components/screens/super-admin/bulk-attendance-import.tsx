@@ -35,9 +35,9 @@ import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
 import { api, apiFetch } from "@/lib/api";
 import * as XLSX from "xlsx";
-import type { ParsedRecord, Student } from "./attendance-import-model";
-import { BulkAttendanceSpreadsheetUploadTab } from "./bulk-attendance-spreadsheet-upload-tab";
-import { BulkAttendanceDateRangeTab } from "./bulk-attendance-date-range-tab";
+import type { ParsedRecord, Student } from "./bulk-attendance-import/attendance-import-model";
+import { BulkAttendanceSpreadsheetUploadTab } from "./bulk-attendance-import/bulk-attendance-spreadsheet-upload-tab";
+import { BulkAttendanceDateRangeTab } from "./bulk-attendance-import/bulk-attendance-date-range-tab";
 
 export function SuperAdminBulkAttendance() {
   const [activeTab, setActiveTab] = useState<string>("upload");
