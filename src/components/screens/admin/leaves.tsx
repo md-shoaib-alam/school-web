@@ -30,13 +30,13 @@ import { cn } from '@/lib/utils';
 import {
   statusConfig, leaveTypeConfig, CANDIDATE_LIMITS, getDurationDays, formatDateString,
   type LeaveRequest,
-} from './leave-request';
-import { LeaveManagementHero } from './leave-management-hero';
-import { LeaveMetricCards } from './leave-metric-cards';
-import { LeaveFilterBar } from './leave-filter-bar';
-import { LeaveRequestsTable } from './leave-requests-table';
-import { NewLeaveRequestDialog } from './new-leave-request-dialog';
-import { LeaveActionDialog } from './leave-action-dialog';
+} from './leaves/leave-request';
+import { LeaveManagementHero } from './leaves/leave-management-hero';
+import { LeaveMetricCards } from './leaves/leave-metric-cards';
+import { LeaveFilterBar } from './leaves/leave-filter-bar';
+import { LeaveRequestsTable } from './leaves/leave-requests-table';
+import { NewLeaveRequestDialog } from './leaves/new-leave-request-dialog';
+import { LeaveActionDialog } from './leaves/leave-action-dialog';
 
 // ── Main Component ──
 
