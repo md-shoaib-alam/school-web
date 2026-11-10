@@ -9,92 +9,35 @@ import {
   CardTitle, 
   CardDescription 
 } from "@/components/ui/card";
-import { Progress } from "@/components/ui/progress";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Badge } from "@/components/ui/badge";
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { DatePicker } from "@/components/ui/date-picker";
 import { 
   ClipboardList, 
   Shield,
   Building2, 
-  UploadCloud, 
-  Calendar, 
-  Download, 
   CheckCircle2, 
   AlertTriangle, 
   Search, 
   FileSpreadsheet, 
   Check, 
   ChevronsUpDown, 
-  Clock, 
-  Sparkles, 
-  CheckSquare, 
-  Square, 
-  User, 
   CalendarDays,
   ArrowRight,
   RefreshCw,
-  Info,
   XCircle,
-  FileCheck2,
-  Trash2,
-  ChevronDown
+  FileCheck2
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
 import { api, apiFetch } from "@/lib/api";
-import { cn } from "@/lib/utils";
 import * as XLSX from "xlsx";
-
-interface Student {
-  id: string;
-  name: string;
-  rollNumber: string;
-  className: string;
-  classId: string;
-  email?: string;
-}
-
-interface ParsedRecord {
-  id: string;
-  studentId?: string;
-  studentName?: string;
-  studentEmail?: string;
-  rollNumber?: string;
-  className?: string;
-  date: string;
-  status: string;
-  rawStatus?: string;
-  remarks?: string;
-  isValid: boolean;
-  errors: string[];
-}
-
-// Safely parse a date string formatted as "YYYY-MM-DD" into a local Date object.
-// This prevents timezone-offset shift issues which usually occur with "new Date(dateString)".
-const parseDateString = (dateStr: string): Date | undefined => {
-  if (!dateStr) return undefined;
-  const parts = dateStr.split("-");
-  if (parts.length !== 3) return undefined;
-  const [year, month, day] = parts.map(Number);
-  if (isNaN(year) || isNaN(month) || isNaN(day)) return undefined;
-  return new Date(year, month - 1, day);
-};
-
-// Safely format a local Date object into a "YYYY-MM-DD" date string.
-const formatDateToString = (date?: Date): string => {
-  if (!date) return "";
-  const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, '0');
-  const day = String(date.getDate()).padStart(2, '0');
-  return `${year}-${month}-${day}`;
-};
+import type { ParsedRecord, Student } from "./attendance-import-model";
+import { BulkAttendanceSpreadsheetUploadTab } from "./bulk-attendance-spreadsheet-upload-tab";
+import { BulkAttendanceDateRangeTab } from "./bulk-attendance-date-range-tab";
 
 export function SuperAdminBulkAttendance() {
   const [activeTab, setActiveTab] = useState<string>("upload");
@@ -1053,764 +996,75 @@ export function SuperAdminBulkAttendance() {
           </TabsList>
 
           {/* Sub-Tab 1: Spreadsheet Bulk Upload */}
-          <TabsContent value="upload" className="space-y-5 animate-in fade-in-30 duration-200">
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
-              
-              {/* Instructions Panel */}
-              <div className="lg:col-span-1 space-y-4">
-                <div className="rounded-xl border border-slate-200/80 dark:border-slate-800/80 shadow-2xs bg-card overflow-hidden">
-                  <div 
-                    onClick={() => setMobileInstructionsOpen((prev) => !prev)}
-                    className={`px-3 py-2 sm:px-4 sm:py-3 cursor-pointer lg:cursor-default flex items-center justify-between select-none transition-colors hover:bg-slate-500/[0.03] dark:hover:bg-slate-500/[0.06] lg:hover:bg-transparent ${
-                      mobileInstructionsOpen ? "border-b border-border/40" : "lg:border-b lg:border-border/40"
-                    }`}
-                  >
-                    <div className="flex items-center gap-2.5 min-w-0">
-                      <div className="size-6.5 sm:size-7 rounded-lg bg-teal-50 dark:bg-teal-950/60 border border-teal-200/60 dark:border-teal-800/40 flex items-center justify-center text-teal-600 dark:text-teal-400 shrink-0">
-                        <Sparkles className="size-3.5" />
-                      </div>
-                      <div className="min-w-0">
-                        <h4 className="text-xs sm:text-sm font-semibold text-foreground truncate">
-                          Upload Instructions
-                        </h4>
-                        <p className="hidden lg:block text-xs text-muted-foreground mt-0.5">
-                          Follow these specifications for seamless processing.
-                        </p>
-                      </div>
-                    </div>
-
-                    <div className="lg:hidden flex items-center gap-1.5 px-2 py-0.5 rounded-lg bg-teal-50/70 dark:bg-teal-950/40 border border-teal-200/50 dark:border-teal-800/30 text-teal-700 dark:text-teal-300 text-[11px] font-semibold shrink-0 ml-2">
-                      <span>{mobileInstructionsOpen ? "Hide" : "Details"}</span>
-                      <ChevronDown className={`size-3 transition-transform duration-200 ${mobileInstructionsOpen ? "rotate-180" : ""}`} />
-                    </div>
-                  </div>
-                  <div className={`p-4 space-y-3.5 text-xs leading-relaxed text-muted-foreground ${mobileInstructionsOpen ? 'block' : 'hidden lg:block'}`}>
-                    <p>
-                      Platform intelligent processing reads column headers case-insensitively and maps your data automatically.
-                    </p>
-                    <div className="space-y-2.5">
-                      <h4 className="text-[11px] font-semibold uppercase text-teal-600 dark:text-teal-400 tracking-wider">Required Columns</h4>
-                      <ul className="list-disc pl-4 space-y-1 text-xs">
-                        <li><strong className="text-foreground">Student ID</strong> OR <strong className="text-foreground">Student Email</strong> (for identification)</li>
-                        <li><strong className="text-foreground">Date</strong> (Format: <code className="bg-muted px-1.5 py-0.5 rounded text-[11px] font-mono">YYYY-MM-DD</code>)</li>
-                        <li><strong className="text-foreground">Status</strong> (Accepts: <code className="bg-muted px-1 py-0.5 rounded text-[11px]">PRESENT</code>, <code className="bg-muted px-1 py-0.5 rounded text-[11px]">ABSENT</code>)</li>
-                      </ul>
-
-                      <h4 className="text-[11px] font-semibold uppercase text-teal-600 dark:text-teal-400 tracking-wider pt-1.5">Optional Columns</h4>
-                      <ul className="list-disc pl-4 space-y-1 text-xs">
-                        <li><strong>Roll Number</strong> &amp; <strong>Class Name</strong> (Fallback identifier)</li>
-                        <li><strong>Remarks</strong> (Short text note)</li>
-                      </ul>
-                    </div>
-
-                    <div className="pt-2">
-                      <Button 
-                        onClick={handleDownloadTemplate} 
-                        disabled={downloadingTemplate}
-                        variant="outline" 
-                        className="w-full h-8.5 rounded-xl border-teal-500/30 dark:border-teal-500/20 hover:bg-teal-500/10 text-teal-700 dark:text-teal-300 text-xs font-semibold cursor-pointer shadow-2xs gap-2"
-                      >
-                        {downloadingTemplate ? (
-                          <>
-                            <RefreshCw className="size-3.5 animate-spin" /> Generating...
-                          </>
-                        ) : (
-                          <>
-                            <Download className="size-3.5" /> Prefilled Template (.xlsx)
-                          </>
-                        )}
-                      </Button>
-                      <p className="text-[11px] text-center text-muted-foreground mt-1.5">
-                        Prefilled with active students in <span className="font-semibold text-foreground">{selectedSchool.name}</span>
-                      </p>
-                    </div>
-                  </div>
-                </div>
-
-                <Card className={`rounded-xl border border-teal-200/50 dark:border-teal-900/40 bg-teal-50/30 dark:bg-teal-950/20 shadow-2xs ${mobileInstructionsOpen ? 'block' : 'hidden lg:block'}`}>
-                  <CardHeader className="p-3.5 pb-1">
-                    <CardTitle className="text-xs font-semibold flex items-center gap-1.5 text-teal-800 dark:text-teal-300">
-                      <Info className="size-3.5" /> Pro tip
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="p-3.5 pt-0 text-xs text-muted-foreground leading-relaxed">
-                    Leave the <code className="bg-teal-100/60 dark:bg-teal-900/40 text-teal-900 dark:text-teal-200 px-1 py-0.5 rounded font-mono text-[11px]">Student ID</code> column intact! It allows the database to instantly resolve your student without worrying about spelling or collisions.
-                  </CardContent>
-                </Card>
-              </div>
-
-              {/* Upload & Preview Zone */}
-              <div className="lg:col-span-2 space-y-4">
-                <Card className="rounded-xl border border-slate-200/80 dark:border-slate-800/80 shadow-2xs bg-card">
-                  <CardContent className="p-5">
-                    
-                    {/* Drag-and-drop zone */}
-                    <div 
-                      onDragOver={handleDragOver}
-                      onDragLeave={handleDragLeave}
-                      onDrop={handleDrop}
-                      onClick={() => fileInputRef.current?.click()}
-                      className={`border-dashed border-2 rounded-xl p-8 flex flex-col items-center justify-center text-center cursor-pointer transition-all duration-200 ${
-                        isDragging 
-                          ? "border-teal-500 bg-teal-50/50 dark:bg-teal-950/20 scale-[0.99]" 
-                          : "border-slate-200 dark:border-slate-800 hover:border-teal-500/60 dark:hover:border-teal-500/40 bg-slate-50/40 dark:bg-slate-900/20 hover:bg-teal-50/20 dark:hover:bg-teal-950/10"
-                      }`}
-                    >
-                      <input 
-                        type="file" 
-                        ref={fileInputRef}
-                        onChange={handleFileChange}
-                        accept=".xlsx,.xls,.csv"
-                        className="hidden"
-                      />
-                      
-                      <div className="size-12 rounded-xl bg-teal-50 dark:bg-teal-950/50 border border-teal-100/80 dark:border-teal-900/40 flex items-center justify-center mb-3 shadow-2xs text-teal-600 dark:text-teal-400">
-                        <UploadCloud className="size-6" />
-                      </div>
-                      
-                      {uploadedFile ? (
-                        <div className="space-y-1">
-                          <p className="text-xs font-semibold text-teal-700 dark:text-teal-300">{uploadedFile.name}</p>
-                          <p className="text-[11px] text-muted-foreground">{(uploadedFile.size / 1024).toFixed(1)} KB • Click to swap file</p>
-                        </div>
-                      ) : (
-                        <div className="space-y-1">
-                          <p className="text-xs font-semibold text-foreground">Drag and drop your spreadsheet here</p>
-                          <p className="text-[11px] text-muted-foreground max-w-xs mx-auto">
-                            Supports Excel (.xlsx, .xls) and CSV files. Make sure columns match the prefilled template.
-                          </p>
-                        </div>
-                      )}
-                    </div>
-
-                    {validatingFile && (
-                      <div className="flex items-center justify-center p-6 gap-2 text-xs text-muted-foreground">
-                        <RefreshCw className="size-4 animate-spin text-teal-500" /> Analyzing and validating spreadsheet rows...
-                      </div>
-                    )}
-
-                    {/* Parser Preview Table */}
-                    {!validatingFile && parsedRows.length > 0 && (
-                      <div className="space-y-3.5 mt-5">
-                        <div className="flex items-center justify-between">
-                          <div>
-                            <h3 className="font-semibold text-sm text-foreground">Spreadsheet Preview</h3>
-                            <p className="text-xs text-muted-foreground">
-                              Showing parsed rows from <span className="font-medium text-teal-600 dark:text-teal-400">{uploadedFile?.name}</span>
-                            </p>
-                          </div>
-                          <div className="flex items-center gap-2.5">
-                            <span className="text-xs text-muted-foreground">
-                              Valid: <span className="font-bold text-emerald-600 dark:text-emerald-400">{parsedRows.filter(r => r.isValid).length}</span> / {parsedRows.length}
-                            </span>
-                            <Button 
-                              size="sm"
-                              variant="outline" 
-                              onClick={() => {
-                                setUploadedFile(null);
-                                setParsedRows([]);
-                              }}
-                              className="text-rose-600 hover:bg-rose-500/10 cursor-pointer gap-1 h-7.5 px-2.5 rounded-lg text-xs"
-                            >
-                              <Trash2 className="size-3" /> Clear
-                            </Button>
-                          </div>
-                        </div>
-
-                        {/* Interactive Table Container */}
-                        <div className="border border-slate-200/80 dark:border-slate-800/80 rounded-xl overflow-hidden bg-card shadow-2xs">
-                          <ScrollArea className="max-h-96 w-full">
-                            <table className="w-full text-xs border-collapse text-left">
-                              <thead className="bg-slate-50/70 dark:bg-slate-800/40 sticky top-0 border-b border-slate-200/80 dark:border-slate-800/80">
-                                <tr>
-                                  <th className="py-2.5 px-3 text-[11px] font-semibold tracking-wider uppercase text-muted-foreground w-10">#</th>
-                                  <th className="py-2.5 px-3 text-[11px] font-semibold tracking-wider uppercase text-muted-foreground">Student Name</th>
-                                  <th className="py-2.5 px-3 text-[11px] font-semibold tracking-wider uppercase text-muted-foreground">Roll / Class</th>
-                                  <th className="py-2.5 px-3 text-[11px] font-semibold tracking-wider uppercase text-muted-foreground">Date</th>
-                                  <th className="py-2.5 px-3 text-[11px] font-semibold tracking-wider uppercase text-muted-foreground">Status</th>
-                                  <th className="py-2.5 px-3 text-[11px] font-semibold tracking-wider uppercase text-muted-foreground">Remarks</th>
-                                  <th className="py-2.5 px-3 text-[11px] font-semibold tracking-wider uppercase text-muted-foreground text-right">Validation</th>
-                                </tr>
-                              </thead>
-                              <tbody>
-                                {parsedRows.map((row, index) => {
-                                  const colorIndex = (row.studentName?.charCodeAt(0) || 0) % AVATAR_COLORS.length;
-                                  const avatarColor = AVATAR_COLORS[colorIndex];
-                                  return (
-                                    <tr 
-                                      key={row.id} 
-                                      className={`border-b border-slate-100 dark:border-slate-800/60 last:border-none hover:bg-slate-50/60 dark:hover:bg-slate-800/40 transition-colors ${
-                                        !row.isValid ? "bg-rose-500/5 dark:bg-rose-950/10" : ""
-                                      }`}
-                                    >
-                                      <td className="py-2.5 px-3 font-mono text-[11px] text-muted-foreground">
-                                        {index + 1}
-                                      </td>
-                                      <td className="py-2.5 px-3">
-                                        <div className="flex items-center gap-2.5">
-                                          <div className={`size-7 rounded-full flex items-center justify-center text-[10px] font-semibold shrink-0 ${avatarColor}`}>
-                                            {row.studentName?.charAt(0).toUpperCase() || "?"}
-                                          </div>
-                                          <div className="flex flex-col min-w-0">
-                                            <span className="font-medium text-foreground text-xs truncate">{row.studentName || <span className="text-muted-foreground italic text-xs">Unspecified</span>}</span>
-                                            <span className="text-[11px] text-muted-foreground font-mono truncate">{row.studentEmail || "No Email"}</span>
-                                          </div>
-                                        </div>
-                                      </td>
-                                      <td className="py-2.5 px-3">
-                                        {row.rollNumber && row.className ? (
-                                          <span className="text-[11px] bg-slate-100 dark:bg-slate-800 text-foreground px-1.5 py-0.5 rounded font-mono">
-                                            {row.rollNumber} | {row.className}
-                                          </span>
-                                        ) : (
-                                          <span className="text-[11px] text-muted-foreground italic">No class details</span>
-                                        )}
-                                      </td>
-                                      <td className="py-2.5 px-3 font-mono text-xs text-foreground">{row.date}</td>
-                                      <td className="py-2.5 px-3">{getStatusBadge(row.status)}</td>
-                                      <td className="py-2.5 px-3 truncate max-w-[120px] text-xs text-muted-foreground">{row.remarks || "-"}</td>
-                                      <td className="py-2.5 px-3 text-right">
-                                        {row.isValid ? (
-                                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-medium bg-emerald-50 text-emerald-700 border border-emerald-200/60 dark:bg-emerald-950/40 dark:text-emerald-400 dark:border-emerald-900/50">
-                                            <span className="size-1.5 rounded-full bg-emerald-500 shrink-0" />
-                                            Ready
-                                          </span>
-                                        ) : (
-                                          <div className="flex flex-col items-end gap-0.5">
-                                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-medium bg-rose-50 text-rose-700 border border-rose-200/60 dark:bg-rose-950/40 dark:text-rose-400 dark:border-rose-900/50">
-                                              <AlertTriangle className="size-3" /> Error
-                                            </span>
-                                            <div className="text-[10px] text-rose-600 dark:text-rose-400 max-w-[150px] leading-tight text-right mt-0.5">
-                                              {row.errors.join(", ")}
-                                            </div>
-                                          </div>
-                                        )}
-                                      </td>
-                                    </tr>
-                                  );
-                                })}
-                              </tbody>
-                            </table>
-                          </ScrollArea>
-                        </div>
-
-                        {/* Confirmation Box */}
-                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3.5 border border-teal-500/20 bg-teal-50/30 dark:bg-teal-950/20 rounded-xl">
-                          <div className="space-y-0.5">
-                            <h4 className="text-xs font-semibold text-foreground">Ready to upload records?</h4>
-                            <p className="text-[11px] text-muted-foreground">
-                              Only <span className="font-semibold text-emerald-600 dark:text-emerald-400">{parsedRows.filter(r => r.isValid).length} valid rows</span> will be imported. Invalid rows will be ignored.
-                            </p>
-                          </div>
-                          
-                          <Button
-                            onClick={handleConfirmImport}
-                            disabled={importingData || parsedRows.filter(r => r.isValid).length === 0}
-                            className="h-8.5 px-4 rounded-xl bg-teal-600 hover:bg-teal-700 text-white text-xs font-semibold cursor-pointer shadow-xs gap-1.5 shrink-0"
-                          >
-                            {importingData ? (
-                              <>
-                                <RefreshCw className="size-3.5 animate-spin" /> Importing...
-                              </>
-                            ) : (
-                              <>
-                                <CheckCircle2 className="size-3.5" /> Confirm &amp; Import Attendance
-                              </>
-                            )}
-                          </Button>
-                        </div>
-
-                        {showProgress && importingData && (
-                          <div className="mt-3 space-y-1.5 p-3.5 border border-slate-200 dark:border-slate-800 bg-slate-50/60 dark:bg-slate-900/40 rounded-xl">
-                            <div className="flex justify-between text-xs font-semibold text-teal-600 dark:text-teal-400">
-                              <span className="flex items-center gap-1.5"><RefreshCw className="size-3.5 animate-spin" /> Processing records...</span>
-                              <span>{Math.round(progress)}%</span>
-                            </div>
-                            <Progress value={progress} className="h-1.5 bg-teal-500/10" indicatorClassName="bg-gradient-to-r from-teal-500 to-emerald-500" />
-                          </div>
-                        )}
-
-                      </div>
-                    )}
-
-                  </CardContent>
-                </Card>
-              </div>
-
-            </div>
-          </TabsContent>
+          <BulkAttendanceSpreadsheetUploadTab
+            selectedSchool={selectedSchool}
+            mobileInstructionsOpen={mobileInstructionsOpen}
+            setMobileInstructionsOpen={setMobileInstructionsOpen}
+            isDragging={isDragging}
+            fileInputRef={fileInputRef}
+            uploadedFile={uploadedFile}
+            setUploadedFile={setUploadedFile}
+            parsedRows={parsedRows}
+            setParsedRows={setParsedRows}
+            validatingFile={validatingFile}
+            downloadingTemplate={downloadingTemplate}
+            importingData={importingData}
+            showProgress={showProgress}
+            progress={progress}
+            handleDragOver={handleDragOver}
+            handleDragLeave={handleDragLeave}
+            handleDrop={handleDrop}
+            handleFileChange={handleFileChange}
+            handleDownloadTemplate={handleDownloadTemplate}
+            handleConfirmImport={handleConfirmImport}
+            getStatusBadge={getStatusBadge}
+            AVATAR_COLORS={AVATAR_COLORS}
+          />
 
           {/* Sub-Tab 2: Student Date Range Bulk Entry */}
-          <TabsContent value="range" className="space-y-5 animate-in fade-in-30 duration-200">
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-5 lg:h-[720px]">
-              
-              {/* Form Entry Column */}
-              <div className="lg:col-span-1 flex flex-col min-h-0">
-                <Card className="rounded-xl border border-slate-200/80 dark:border-slate-800/80 shadow-2xs bg-card flex-1 flex flex-col h-full min-h-0 overflow-hidden">
-                  <CardHeader className="p-4 pb-3 border-b border-border/40 shrink-0">
-                    <CardTitle className="text-sm font-semibold flex items-center gap-2">
-                      <CalendarDays className="size-4 text-teal-600 dark:text-teal-400" /> Range Configurations
-                    </CardTitle>
-                    <CardDescription className="text-xs text-muted-foreground mt-0.5">Setup range details for fast calendar insertion.</CardDescription>
-                  </CardHeader>
-                  <CardContent className="flex-1 overflow-y-auto min-h-0 p-4 space-y-3.5 pb-5 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
-                    
-                    {/* Toggle Selector */}
-                    <div className="space-y-1.5">
-                      <Label className="text-xs font-medium text-muted-foreground">Target Scope</Label>
-                      <div className="grid grid-cols-2 gap-1.5 bg-muted/60 p-1 rounded-xl border border-border/50">
-                        <button
-                          type="button"
-                          onClick={() => setAllStudentsMode(true)}
-                          className={`py-1.5 px-3 rounded-lg text-xs font-medium cursor-pointer transition-colors ${
-                            allStudentsMode 
-                              ? "bg-background shadow-xs text-foreground font-semibold" 
-                              : "text-muted-foreground hover:text-foreground"
-                          }`}
-                        >
-                          All School Students
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => {
-                            setAllStudentsMode(false);
-                            setStudentPopoverOpen(true);
-                          }}
-                          className={`py-1.5 px-3 rounded-lg text-xs font-medium cursor-pointer transition-colors ${
-                            !allStudentsMode 
-                              ? "bg-background shadow-xs text-foreground font-semibold" 
-                              : "text-muted-foreground hover:text-foreground"
-                          }`}
-                        >
-                          Specific Student
-                        </button>
-                      </div>
-                    </div>
-
-                    {/* Specific Student Selector */}
-                    {!allStudentsMode && (
-                      <motion.div 
-                        initial={{ opacity: 0, height: 0 }}
-                        animate={{ opacity: 1, height: "auto" }}
-                        exit={{ opacity: 0, height: 0 }}
-                        className="space-y-3.5"
-                      >
-                        {/* Class Filter Dropdown */}
-                        <div className="space-y-1.5">
-                          <Label htmlFor="class-filter" className="text-xs font-medium text-muted-foreground">Filter by Class</Label>
-                          <select 
-                            id="class-filter"
-                            value={selectedClassId} 
-                            onChange={(e) => {
-                              const val = e.target.value;
-                              setSelectedClassId(val);
-                              if (selectedStudent && selectedStudent.classId !== val && val !== "all") {
-                                setSelectedStudent(null);
-                              }
-                            }}
-                            className="w-full h-8.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-background px-3 py-1 text-xs shadow-2xs focus:outline-none focus:ring-1 focus:ring-teal-500 cursor-pointer text-foreground"
-                          >
-                            <option value="all">All Classes ({uniqueClasses.length})</option>
-                            {uniqueClasses.map((cls) => (
-                              <option key={cls.id} value={cls.id}>
-                                {cls.name}
-                              </option>
-                            ))}
-                          </select>
-                        </div>
-
-                        {/* Student Search and Select */}
-                        <div className="space-y-1.5">
-                          <Label className="text-xs font-medium text-muted-foreground">Select Student</Label>
-                          <Popover open={studentPopoverOpen} onOpenChange={setStudentPopoverOpen}>
-                            <PopoverTrigger asChild>
-                              <Button 
-                                variant="outline" 
-                                role="combobox"
-                                aria-expanded={studentPopoverOpen}
-                                className="w-full justify-between cursor-pointer h-8.5 rounded-xl bg-background border-slate-200 dark:border-slate-800 text-left text-xs shadow-2xs"
-                              >
-                                <span className="flex items-center gap-2 truncate">
-                                  <User className="size-3.5 text-muted-foreground shrink-0" />
-                                  {selectedStudent ? selectedStudent.name : "Select Student..."}
-                                </span>
-                                <ChevronsUpDown className="ml-2 h-3.5 w-3.5 shrink-0 opacity-50" />
-                              </Button>
-                            </PopoverTrigger>
-                            <PopoverContent className="w-full max-w-[320px] p-0 border border-slate-200 dark:border-slate-800 bg-card shadow-xl rounded-xl" align="start" side="bottom" sideOffset={4}>
-                              <div className="flex items-center border-b px-3 border-border">
-                                <Search className="mr-2 h-3.5 w-3.5 shrink-0 opacity-50" />
-                                <Input 
-                                  placeholder="Search by name, roll, class..." 
-                                  value={studentSearchQuery}
-                                  onChange={(e) => setStudentSearchQuery(e.target.value)}
-                                  className="flex h-8.5 w-full bg-transparent py-2 text-xs outline-none border-none focus-visible:ring-0 focus-visible:ring-offset-0 placeholder:text-muted-foreground"
-                                />
-                              </div>
-                              <ScrollArea className="h-48 p-1">
-                                {loadingStudents ? (
-                                  <div className="flex items-center justify-center p-4 text-xs text-muted-foreground gap-2">
-                                    <RefreshCw className="size-3.5 animate-spin text-teal-500" /> Fetching student registry...
-                                  </div>
-                                ) : filteredStudents.length === 0 ? (
-                                  <div className="p-4 text-xs text-muted-foreground text-center">No students found.</div>
-                                ) : (
-                                  filteredStudents.map((stu) => {
-                                    const avatarColor = AVATAR_COLORS[(stu.name?.charCodeAt(0) || 0) % AVATAR_COLORS.length];
-                                    return (
-                                      <button
-                                        key={stu.id}
-                                        onClick={() => {
-                                          setSelectedStudent(stu);
-                                          setStudentPopoverOpen(false);
-                                          setStudentSearchQuery("");
-                                        }}
-                                        className="flex items-center justify-between w-full text-left px-2.5 py-1.5 text-xs hover:bg-slate-100 dark:hover:bg-slate-800/60 rounded-lg transition-colors cursor-pointer group"
-                                      >
-                                        <div className="flex items-center gap-2 min-w-0 pr-2">
-                                          <div className={`size-6 rounded-full flex items-center justify-center text-[10px] font-semibold shrink-0 ${avatarColor}`}>
-                                            {stu.name?.charAt(0).toUpperCase() || "?"}
-                                          </div>
-                                          <div className="flex flex-col truncate">
-                                            <span className="font-medium text-foreground truncate">{stu.name}</span>
-                                            <span className="text-[11px] text-muted-foreground truncate font-mono">
-                                              Roll: {stu.rollNumber || 'N/A'} • Class: {stu.className || 'N/A'}
-                                            </span>
-                                          </div>
-                                        </div>
-                                        {selectedStudent?.id === stu.id && (
-                                          <Check className="h-3.5 w-3.5 text-teal-600 dark:text-teal-400 shrink-0" />
-                                        )}
-                                      </button>
-                                    );
-                                  })
-                                )}
-                              </ScrollArea>
-                            </PopoverContent>
-                          </Popover>
-                        </div>
-                      </motion.div>
-                    )}
-
-                    {/* Date Inputs */}
-                    <div className="grid grid-cols-2 gap-3">
-                      <div className="space-y-1.5">
-                        <Label htmlFor="start-date" className="text-xs font-medium text-muted-foreground block">Start Date</Label>
-                        <DatePicker
-                          date={parseDateString(startDate)}
-                          onChange={(d) => setStartDate(formatDateToString(d))}
-                          placeholder="Select start date"
-                          className={cn(
-                            "w-full bg-background border-slate-200 dark:border-slate-800 h-8.5 rounded-xl text-xs shadow-2xs transition-colors",
-                            isRangeTooLarge && "border-rose-500/80 text-rose-600 dark:text-rose-400 focus:border-rose-500 focus:ring-rose-500/20 bg-rose-500/5"
-                          )}
-                        />
-                      </div>
-                      <div className="space-y-1.5">
-                        <Label htmlFor="end-date" className="text-xs font-medium text-muted-foreground block">End Date</Label>
-                        <DatePicker
-                          date={parseDateString(endDate)}
-                          onChange={(d) => setEndDate(formatDateToString(d))}
-                          placeholder="Select end date"
-                          className={cn(
-                            "w-full bg-background border-slate-200 dark:border-slate-800 h-8.5 rounded-xl text-xs shadow-2xs transition-colors",
-                            isRangeTooLarge && "border-rose-500/80 text-rose-600 dark:text-rose-400 focus:border-rose-500 focus:ring-rose-500/20 bg-rose-500/5"
-                          )}
-                        />
-                      </div>
-                    </div>
-
-                    {isRangeTooLarge && (
-                      <motion.div 
-                        initial={{ opacity: 0, y: -5 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        className="p-3 bg-rose-50 dark:bg-rose-950/20 text-rose-700 dark:text-rose-300 rounded-xl border border-rose-200 dark:border-rose-900/40 text-xs flex items-start gap-2 leading-relaxed shadow-2xs shrink-0"
-                      >
-                        <AlertTriangle className="size-3.5 shrink-0 mt-0.5 text-rose-500" />
-                        <div>
-                          <span className="font-semibold block text-rose-800 dark:text-rose-200 text-xs">Date Range Exceeded</span>
-                          <span className="mt-0.5 block text-[11px] text-rose-600 dark:text-rose-400">
-                            Selected range is <strong className="font-semibold">{Math.ceil(Math.abs(new Date(endDate).getTime() - new Date(startDate).getTime()) / (1000 * 60 * 60 * 24))} days</strong>. Maximum allowed limit is 180 days (6 months).
-                          </span>
-                        </div>
-                      </motion.div>
-                    )}
-
-                    {/* Weekday Selector Checkbox Grid */}
-                    <div className="space-y-1.5">
-                      <Label className="text-xs font-medium text-muted-foreground flex items-center gap-1.5">
-                        <Clock className="size-3.5" /> Days of the Week
-                      </Label>
-                      <div className="grid grid-cols-4 sm:grid-cols-7 gap-1.5">
-                        {DAYS_OF_WEEK.map((day) => {
-                          const isChecked = selectedDays.includes(day.value);
-                          return (
-                            <button
-                              key={day.value}
-                              type="button"
-                              onClick={() => handleToggleDay(day.value)}
-                              className={`flex flex-col items-center py-1.5 px-1 rounded-xl border text-xs font-medium cursor-pointer transition-all duration-150 ${
-                                isChecked 
-                                  ? "border-teal-500/40 bg-teal-50 dark:bg-teal-950/30 text-teal-700 dark:text-teal-300 font-semibold shadow-2xs" 
-                                  : "border-slate-200 dark:border-slate-800 bg-background text-muted-foreground hover:bg-slate-50 dark:hover:bg-slate-900"
-                              }`}
-                            >
-                              <span>{day.label}</span>
-                              <span className="mt-0.5">
-                                {isChecked ? <CheckSquare className="size-3 text-teal-600 dark:text-teal-400" /> : <Square className="size-3 text-muted-foreground/30" />}
-                              </span>
-                            </button>
-                          );
-                        })}
-                      </div>
-                      <p className="text-[11px] text-muted-foreground">Excludes weekdays you leave unchecked.</p>
-                    </div>
-
-                    {/* Status & Remarks */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                      <div className="space-y-1.5">
-                        <Label htmlFor="range-status" className="text-xs font-medium text-muted-foreground">Range Status</Label>
-                        <select 
-                          id="range-status"
-                          value={rangeStatus}
-                          onChange={e => setRangeStatus(e.target.value)}
-                          className="w-full h-8.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-background px-3 py-1 text-xs shadow-2xs focus:outline-none focus:ring-1 focus:ring-teal-500 cursor-pointer text-foreground"
-                        >
-                          <option value="present">Present</option>
-                          <option value="absent">Absent</option>
-                        </select>
-                      </div>
-                      <div className="space-y-1.5">
-                        <Label htmlFor="range-remarks" className="text-xs font-medium text-muted-foreground">Remarks</Label>
-                        <Input 
-                          id="range-remarks" 
-                          placeholder="e.g. Public Holiday" 
-                          value={rangeRemarks}
-                          onChange={e => setRangeRemarks(e.target.value)}
-                          className="w-full bg-background border-slate-200 dark:border-slate-800 h-8.5 rounded-xl text-xs shadow-2xs"
-                        />
-                      </div>
-                    </div>
-
-                    {/* Submission confirmation */}
-                    <div className="pt-2">
-                      <Button
-                        onClick={handleRangeImport}
-                        disabled={generatingRange || activeRangeDatesCount === 0 || isRangeTooLarge || (!allStudentsMode && !selectedStudent)}
-                        className="w-full h-8.5 rounded-xl bg-teal-600 hover:bg-teal-700 text-white text-xs font-semibold cursor-pointer shadow-xs gap-1.5"
-                      >
-                        {generatingRange ? (
-                          <>
-                            <RefreshCw className="size-3.5 animate-spin" /> Batch Processing...
-                          </>
-                        ) : (
-                          <>
-                            <CheckCircle2 className="size-3.5" /> Apply Attendance Range
-                          </>
-                        )}
-                      </Button>
-
-                      {showProgress && generatingRange && (
-                        <div className="mt-2.5 space-y-1.5 p-3 border border-slate-200 dark:border-slate-800 bg-slate-50/60 dark:bg-slate-900/40 rounded-xl">
-                          <div className="flex justify-between text-xs font-semibold text-teal-600 dark:text-teal-400">
-                            <span className="flex items-center gap-1.5"><RefreshCw className="size-3 animate-spin" /> Batch Processing...</span>
-                            <span>{Math.round(progress)}%</span>
-                          </div>
-                          <Progress value={progress} className="h-1.5 bg-teal-500/10" indicatorClassName="bg-gradient-to-r from-teal-500 to-emerald-500" />
-                        </div>
-                      )}
-
-                      <p className="text-[11px] text-center text-muted-foreground mt-1.5">
-                        Writes <span className="font-semibold text-foreground">{activeRangeDatesCount * (allStudentsMode ? students.length : 1)} total records</span>
-                      </p>
-                    </div>
-
-                  </CardContent>
-                </Card>
-              </div>
-
-              {/* Preview Timeline Grid Column */}
-              <div className="lg:col-span-2 flex flex-col min-h-0">
-                <Card className="rounded-xl border border-slate-200/80 dark:border-slate-800/80 shadow-2xs bg-card flex-1 flex flex-col h-full min-h-0 overflow-hidden">
-                  <CardHeader className="p-4 pb-3 border-b border-border/40 shrink-0">
-                    <CardTitle className="text-sm font-semibold flex items-center gap-2">
-                      <Calendar className="size-4 text-teal-600 dark:text-teal-400" /> Active Calendar Preview
-                    </CardTitle>
-                    <CardDescription className="text-xs text-muted-foreground mt-0.5">Visual breakdown of dates targeted for batch insertion.</CardDescription>
-                  </CardHeader>
-                  <CardContent className="flex-1 flex flex-col min-h-0 p-4 pb-5 relative">
-                    {isRangeTooLarge ? (
-                      <div className="flex-1 flex flex-col items-center justify-center text-center text-rose-600 dark:text-rose-400 py-12 border border-dashed border-rose-300 dark:border-rose-900/40 rounded-xl min-h-[250px] bg-rose-50/30 dark:bg-rose-950/10 px-4 space-y-2">
-                        <div className="size-10 rounded-full bg-rose-50 dark:bg-rose-950/50 flex items-center justify-center text-rose-600 shrink-0">
-                          <AlertTriangle className="size-5 text-rose-500" />
-                        </div>
-                        <div className="space-y-1">
-                          <p className="text-xs font-semibold text-rose-800 dark:text-rose-200">Date Range Exceeded</p>
-                          <p className="text-[11px] text-muted-foreground max-w-xs mx-auto leading-relaxed">
-                            Selected range exceeds the allowed limit. Please select <strong>180 days or less</strong>.
-                          </p>
-                        </div>
-                      </div>
-                    ) : computedRangeDates.length === 0 ? (
-                      <div className="flex-1 flex flex-col items-center justify-center text-center text-muted-foreground py-16 border border-dashed border-border rounded-xl min-h-[250px]">
-                        <CalendarDays className="size-8 text-muted-foreground/40 animate-pulse mb-2.5" />
-                        <p className="text-xs font-semibold text-foreground">Select Date Range</p>
-                        <p className="text-[11px] text-muted-foreground">Setup Start and End dates to generate calendar previews here.</p>
-                      </div>
-                    ) : (
-                      <div className="flex-1 flex flex-col min-h-0 space-y-3.5">
-                        <div className="flex flex-wrap items-center justify-between gap-3 p-2.5 bg-slate-50 dark:bg-slate-900/50 border border-slate-200/60 dark:border-slate-800/60 rounded-xl text-xs shrink-0">
-                          <div>
-                            Targeting: <span className="font-semibold text-foreground">{allStudentsMode ? `All ${students.length} students` : selectedStudent?.name}</span>
-                          </div>
-                          <div className="flex items-center gap-3">
-                            <span>
-                              Active Days: <span className="font-bold text-teal-600 dark:text-teal-400">{activeRangeDatesCount}</span> / {computedRangeDates.length}
-                            </span>
-                            <span className="flex items-center gap-1.5">
-                              Status: {getStatusBadge(rangeStatus)}
-                            </span>
-                          </div>
-                        </div>
-
-                        {/* Date Grid Scrollable Wrapper */}
-                        <div 
-                          ref={scrollRef}
-                          onScroll={handleScroll}
-                          className="overflow-y-auto pl-1 flex-1 min-h-0 [direction:rtl] [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] relative"
-                        >
-                          {/* Inner Grid Container */}
-                          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2.5 [direction:ltr] w-full">
-                            <AnimatePresence>
-                               {computedRangeDates.map((item, idx) => (
-                                 <motion.div
-                                  key={item.dateStr}
-                                  initial={{ opacity: 0, scale: 0.95 }}
-                                  animate={{ opacity: 1, scale: 1 }}
-                                  transition={{ duration: 0.15, delay: Math.min(idx * 0.02, 0.2) }}
-                                  onClick={() => {
-                                    if (!item.isValid) return;
-                                    const currentStatus = overriddenStatuses[item.dateStr] || rangeStatus;
-                                    const newStatus = currentStatus === "present" ? "absent" : "present";
-                                    setOverriddenStatuses(prev => ({
-                                      ...prev,
-                                      [item.dateStr]: newStatus
-                                    }));
-                                  }}
-                                  className={`p-2.5 rounded-xl border flex flex-col items-start gap-1 justify-between transition-colors relative overflow-hidden select-none ${
-                                    item.isValid 
-                                      ? (overriddenStatuses[item.dateStr] || rangeStatus) === "present"
-                                        ? "border-emerald-500/20 bg-emerald-50/40 dark:bg-emerald-950/10 hover:bg-emerald-50/80 cursor-pointer shadow-2xs"
-                                        : "border-rose-500/20 bg-rose-50/40 dark:bg-rose-950/10 hover:bg-rose-50/80 cursor-pointer shadow-2xs"
-                                      : "border-slate-200 dark:border-slate-800/60 bg-slate-50/50 dark:bg-slate-900/20 text-muted-foreground line-through opacity-40"
-                                  }`}
-                                >
-                                  {item.isValid && (
-                                    <div className={`absolute top-0 right-0 size-2.5 rounded-bl-md ${
-                                      (overriddenStatuses[item.dateStr] || rangeStatus) === "present"
-                                        ? "bg-emerald-500"
-                                        : "bg-rose-500"
-                                    }`} />
-                                  )}
-                                  <div className="text-[11px] font-medium text-muted-foreground">{item.dayLabel}</div>
-                                  <div className="text-xs font-bold font-mono text-foreground">{item.dateStr}</div>
-                                  <div className="mt-1 flex justify-between w-full items-center gap-1">
-                                    {item.isValid ? (
-                                      <>
-                                        <select
-                                          value={overriddenStatuses[item.dateStr] || rangeStatus}
-                                          onClick={(e) => e.stopPropagation()}
-                                          onChange={(e) => {
-                                            e.stopPropagation();
-                                            const val = e.target.value;
-                                            setOverriddenStatuses(prev => ({
-                                              ...prev,
-                                              [item.dateStr]: val
-                                            }));
-                                          }}
-                                          className={`text-[11px] font-medium py-0.5 px-1.5 bg-background border rounded-lg cursor-pointer transition-colors focus:outline-none focus:ring-0 ${
-                                            (overriddenStatuses[item.dateStr] || rangeStatus) === "present"
-                                              ? "border-emerald-500/30 text-emerald-700 dark:text-emerald-400 hover:bg-emerald-50/50"
-                                              : "border-rose-500/30 text-rose-700 dark:text-rose-400 hover:bg-rose-50/50"
-                                          }`}
-                                        >
-                                          <option value="present" className="text-foreground bg-background">Present</option>
-                                          <option value="absent" className="text-foreground bg-background">Absent</option>
-                                        </select>
-                                        <span className="text-[10px] text-muted-foreground max-w-[65px] truncate" title={overriddenRemarks[item.dateStr] || rangeRemarks}>
-                                          {overriddenRemarks[item.dateStr] || rangeRemarks || "No remarks"}
-                                        </span>
-                                      </>
-                                    ) : (
-                                      <Badge variant="outline" className="text-[10px] text-muted-foreground opacity-50 capitalize py-0 px-1.5 h-5">
-                                        Skipped
-                                      </Badge>
-                                    )}
-                                  </div>
-                                </motion.div>
-                              ))}
-                            </AnimatePresence>
-                          </div>
-                        </div>
-                      </div>
-                    )}
-
-                    {/* Premium Custom Scroll Progress Circular Button */}
-                    {computedRangeDates.length > 0 && (
-                      <button
-                        onClick={() => {
-                          const element = scrollRef.current;
-                          if (!element) return;
-                          if (isScrolledToBottom) {
-                            element.scrollTo({ top: 0, behavior: 'smooth' });
-                          } else {
-                            element.scrollTo({ top: element.scrollHeight, behavior: 'smooth' });
-                          }
-                        }}
-                        className="absolute bottom-4 right-4 z-30 size-9 rounded-full bg-background border border-slate-200 dark:border-slate-800 shadow-md flex items-center justify-center cursor-pointer transition-all shrink-0 group hover:shadow-lg"
-                        title={isScrolledToBottom ? "Scroll to Top" : "Scroll to Bottom"}
-                      >
-                        <svg className="absolute inset-0 size-9 -rotate-90">
-                          <circle
-                            className="text-slate-100 dark:text-slate-800"
-                            strokeWidth="2"
-                            stroke="currentColor"
-                            fill="transparent"
-                            r="14"
-                            cx="18"
-                            cy="18"
-                          />
-                          <circle
-                            className="text-teal-500 transition-all duration-100"
-                            strokeWidth="2.5"
-                            strokeDasharray={88}
-                            strokeDashoffset={88 - (88 * scrollProgress) / 100}
-                            strokeLinecap="round"
-                            stroke="currentColor"
-                            fill="transparent"
-                            r="14"
-                            cx="18"
-                            cy="18"
-                          />
-                        </svg>
-                        <svg 
-                          className={`size-3.5 text-teal-600 dark:text-teal-400 transition-transform duration-300 group-hover:translate-y-0.5 ${
-                            isScrolledToBottom ? "rotate-180 group-hover:-translate-y-0.5" : ""
-                          }`} 
-                          fill="none" 
-                          viewBox="0 0 24 24" 
-                          stroke="currentColor"
-                        >
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M19 9l-7 7-7-7" />
-                        </svg>
-                      </button>
-                    )}
-                  </CardContent>
-                </Card>
-              </div>
-
-            </div>
-          </TabsContent>
+          <BulkAttendanceDateRangeTab
+            students={students}
+            loadingStudents={loadingStudents}
+            filteredStudents={filteredStudents}
+            uniqueClasses={uniqueClasses}
+            allStudentsMode={allStudentsMode}
+            setAllStudentsMode={setAllStudentsMode}
+            selectedStudent={selectedStudent}
+            setSelectedStudent={setSelectedStudent}
+            studentSearchQuery={studentSearchQuery}
+            setStudentSearchQuery={setStudentSearchQuery}
+            studentPopoverOpen={studentPopoverOpen}
+            setStudentPopoverOpen={setStudentPopoverOpen}
+            selectedClassId={selectedClassId}
+            setSelectedClassId={setSelectedClassId}
+            startDate={startDate}
+            setStartDate={setStartDate}
+            endDate={endDate}
+            setEndDate={setEndDate}
+            rangeStatus={rangeStatus}
+            setRangeStatus={setRangeStatus}
+            rangeRemarks={rangeRemarks}
+            setRangeRemarks={setRangeRemarks}
+            selectedDays={selectedDays}
+            handleToggleDay={handleToggleDay}
+            overriddenStatuses={overriddenStatuses}
+            setOverriddenStatuses={setOverriddenStatuses}
+            overriddenRemarks={overriddenRemarks}
+            computedRangeDates={computedRangeDates}
+            activeRangeDatesCount={activeRangeDatesCount}
+            isRangeTooLarge={isRangeTooLarge}
+            generatingRange={generatingRange}
+            showProgress={showProgress}
+            progress={progress}
+            scrollRef={scrollRef}
+            scrollProgress={scrollProgress}
+            isScrolledToBottom={isScrolledToBottom}
+            handleScroll={handleScroll}
+            handleRangeImport={handleRangeImport}
+            getStatusBadge={getStatusBadge}
+            AVATAR_COLORS={AVATAR_COLORS}
+            DAYS_OF_WEEK={DAYS_OF_WEEK}
+          />
         </Tabs>
       )}
     </div>
