@@ -16,92 +16,27 @@ import {
 } from '@/components/ui/dialog';
 import { Textarea } from '@/components/ui/textarea';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import {
-  CalendarDays, Briefcase, Users, Clock, CheckCircle2, XCircle,
-  Loader2, FileText, AlertTriangle, Filter, Ban, Plus,
-  Search, ArrowRight, RotateCcw, Eye, Check, X,
-  Calendar, ArrowUpDown, ChevronDown, Crown, Sparkles
+  CalendarDays, Briefcase,
+  FileText, AlertTriangle, Plus,
+  ChevronDown, Crown, Sparkles
 } from 'lucide-react';
 import { toast } from "sonner";
 import { useRouter, useParams } from 'next/navigation';
 import { apiFetch } from '@/lib/api';
-import { Pagination } from '@/components/shared/pagination';
 import { useAppStore } from '@/store/use-app-store';
 import { cn } from '@/lib/utils';
 
-// ── Shared Config ──
-
-const statusConfig: Record<string, { bg: string; icon: React.ReactNode; label: string }> = {
-  pending: {
-    bg: 'bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-400 border-amber-200/80 dark:border-amber-800',
-    icon: <Clock className="size-3 mr-1" />,
-    label: 'Pending'
-  },
-  approved: {
-    bg: 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 border-emerald-200/80 dark:border-emerald-800',
-    icon: <CheckCircle2 className="size-3 mr-1" />,
-    label: 'Approved'
-  },
-  rejected: {
-    bg: 'bg-rose-50 dark:bg-rose-950/40 text-rose-700 dark:text-rose-400 border-rose-200/80 dark:border-rose-800',
-    icon: <XCircle className="size-3 mr-1" />,
-    label: 'Rejected'
-  },
-  cancelled: {
-    bg: 'bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-400 border-zinc-200 dark:border-zinc-700',
-    icon: <Ban className="size-3 mr-1" />,
-    label: 'Cancelled'
-  },
-};
-
-const leaveTypeConfig: Record<string, { bg: string; label: string }> = {
-  casual: { bg: 'bg-blue-50 dark:bg-blue-950/40 text-blue-700 dark:text-blue-400 border-blue-200/70', label: 'Casual' },
-  sick: { bg: 'bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-400 border-amber-200/70', label: 'Sick' },
-  earned: { bg: 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 border-emerald-200/70', label: 'Earned' },
-  maternity: { bg: 'bg-pink-50 dark:bg-pink-950/40 text-pink-700 dark:text-pink-400 border-pink-200/70', label: 'Maternity' },
-  paternity: { bg: 'bg-violet-50 dark:bg-violet-950/40 text-violet-700 dark:text-violet-400 border-violet-200/70', label: 'Paternity' },
-  duty: { bg: 'bg-indigo-50 dark:bg-indigo-950/40 text-indigo-700 dark:text-indigo-400 border-indigo-200/70', label: 'Duty Leave' },
-};
-
-interface LeaveRequest {
-  id: string;
-  userId: string;
-  userName: string;
-  userEmail: string;
-  role: string;
-  leaveType: string;
-  startDate: string;
-  endDate: string;
-  reason?: string;
-  status: string;
-  approverRemarks?: string;
-  createdAt: string;
-}
-
-// Server-side caps for the min/dropdown endpoints used by the applicant picker.
-const CANDIDATE_LIMITS: Record<string, number> = { student: 100, teacher: 200, staff: 200 };
-
-function getDurationDays(start: string, end: string): number {
-  try {
-    const s = new Date(start).getTime();
-    const e = new Date(end).getTime();
-    const diff = Math.round((e - s) / (1000 * 60 * 60 * 24)) + 1;
-    return diff > 0 ? diff : 1;
-  } catch {
-    return 1;
-  }
-}
-
-function formatDateString(d: string | undefined): string {
-  if (!d) return '–';
-  try {
-    const date = new Date(d);
-    return date.toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' });
-  } catch {
-    return d;
-  }
-}
+import {
+  statusConfig, leaveTypeConfig, CANDIDATE_LIMITS, getDurationDays, formatDateString,
+  type LeaveRequest,
+} from './leave-request';
+import { LeaveManagementHero } from './leave-management-hero';
+import { LeaveMetricCards } from './leave-metric-cards';
+import { LeaveFilterBar } from './leave-filter-bar';
+import { LeaveRequestsTable } from './leave-requests-table';
+import { NewLeaveRequestDialog } from './new-leave-request-dialog';
+import { LeaveActionDialog } from './leave-action-dialog';
 
 // ── Main Component ──
 
@@ -428,116 +363,18 @@ function AdminManagerView({ initialTab }: { initialTab: string }) {
   return (
     <div className="space-y-5">
       {/* ── 1. Hero Banner ── */}
-      <div className="relative rounded-3xl p-6 sm:p-7 overflow-hidden border border-blue-100/90 dark:border-blue-900/40 bg-gradient-to-r from-blue-50/90 via-indigo-50/50 to-blue-50/80 dark:from-blue-950/20 dark:via-zinc-900/60 dark:to-blue-950/20 shadow-2xs flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-        <div className="flex items-center gap-3.5 sm:gap-4 z-10">
-          <div className="size-12 rounded-2xl bg-blue-100/90 dark:bg-blue-900/50 text-blue-600 dark:text-blue-400 flex items-center justify-center border border-blue-200/60 dark:border-blue-800/60 shadow-xs shrink-0">
-            <Calendar className="size-6 text-blue-600 dark:text-blue-400" />
-          </div>
-          <div className="space-y-0.5">
-            <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-slate-900 dark:text-zinc-100">
-              Leave Management
-            </h1>
-            <p className="text-xs sm:text-sm text-slate-500 dark:text-zinc-400">
-              Review and manage leave requests from {roleLabel}
-            </p>
-          </div>
-        </div>
-
-        <div className="flex items-center gap-4 z-10 w-full md:w-auto justify-between md:justify-end">
-          <img
-            src="/assets/admin/timetable.avif"
-            alt="Leave Illustration"
-            className="h-24 sm:h-28 object-contain pointer-events-none select-none drop-shadow-xs hidden md:block"
-          />
-          <Button
-            onClick={() => setApplyModalOpen(true)}
-            className="bg-blue-600 hover:bg-blue-700 text-white rounded-xl h-10 px-4 font-semibold shadow-md shadow-blue-600/25 transition-all gap-2 shrink-0 cursor-pointer active:scale-95"
-          >
-            <Plus className="size-4" strokeWidth={2.5} />
-            <span>New Leave Request</span>
-          </Button>
-        </div>
-
-        {/* Decorative background glow */}
-        <div className="absolute -top-12 -right-12 size-48 bg-blue-400/10 rounded-full blur-2xl pointer-events-none" />
-      </div>
+      <LeaveManagementHero
+        roleLabel={roleLabel}
+        onNewLeaveRequest={() => setApplyModalOpen(true)}
+      />
 
       {/* ── 2. Metric Summary Cards ── */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-3.5">
-        {[
-          {
-            title: 'Total Requests',
-            value: metrics.total,
-            icon: <Users className="size-4 sm:size-4.5" />,
-            iconBox: 'bg-blue-50 dark:bg-blue-950/50 text-blue-600 dark:text-blue-400 border-blue-100 dark:border-blue-900/40',
-            arrowBg: 'bg-blue-50 dark:bg-blue-950/50 text-blue-600 dark:text-blue-400 hover:bg-blue-100 dark:hover:bg-blue-900/60',
-            bottomWave: 'from-blue-100/40 dark:from-blue-950/20 to-transparent',
-          },
-          {
-            title: 'Approved',
-            value: metrics.approved,
-            icon: <CheckCircle2 className="size-4 sm:size-4.5" />,
-            iconBox: 'bg-emerald-50 dark:bg-emerald-950/50 text-emerald-600 dark:text-emerald-400 border-emerald-100 dark:border-emerald-900/40',
-            arrowBg: 'bg-emerald-50 dark:bg-emerald-950/50 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-100 dark:hover:bg-emerald-900/60',
-            bottomWave: 'from-emerald-100/40 dark:from-emerald-950/20 to-transparent',
-          },
-          {
-            title: 'Pending',
-            value: metrics.pending,
-            icon: <Clock className="size-4 sm:size-4.5" />,
-            iconBox: 'bg-amber-50 dark:bg-amber-950/50 text-amber-600 dark:text-amber-400 border-amber-100 dark:border-amber-900/40',
-            arrowBg: 'bg-amber-50 dark:bg-amber-950/50 text-amber-600 dark:text-amber-400 hover:bg-amber-100 dark:hover:bg-amber-900/60',
-            bottomWave: 'from-amber-100/40 dark:from-amber-950/20 to-transparent',
-          },
-          {
-            title: 'Rejected',
-            value: metrics.rejected,
-            icon: <XCircle className="size-4 sm:size-4.5" />,
-            iconBox: 'bg-rose-50 dark:bg-rose-950/50 text-rose-600 dark:text-rose-400 border-rose-100 dark:border-rose-900/40',
-            arrowBg: 'bg-rose-50 dark:bg-rose-950/50 text-rose-600 dark:text-rose-400 hover:bg-rose-100 dark:hover:bg-rose-900/60',
-            bottomWave: 'from-rose-100/40 dark:from-rose-950/20 to-transparent',
-          },
-        ].map((card) => (
-          <div
-            key={card.title}
-            className="relative overflow-hidden rounded-2xl border border-zinc-200/80 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-3.5 sm:p-4 shadow-xs hover:shadow-md transition-all group flex flex-col justify-between"
-          >
-            {/* Subtle bottom curved gradient wave */}
-            <div
-              className={`absolute inset-x-0 bottom-0 h-10 bg-gradient-to-t ${card.bottomWave} pointer-events-none rounded-b-2xl`}
-            />
-
-            <div className="relative z-10">
-              {/* Top row: Icon, Title & Arrow */}
-              <div className="flex items-center justify-between gap-1.5">
-                <div className="flex items-center gap-2 min-w-0">
-                  <div
-                    className={`size-8 sm:size-9 rounded-xl border flex items-center justify-center shrink-0 shadow-xs ${card.iconBox}`}
-                  >
-                    {card.icon}
-                  </div>
-                  <span className="text-[11px] sm:text-xs font-semibold text-zinc-700 dark:text-zinc-300 truncate">
-                    {card.title}
-                  </span>
-                </div>
-
-                <div
-                  className={`size-6 rounded-full flex items-center justify-center shrink-0 transition-transform group-hover:translate-x-0.5 ${card.arrowBg}`}
-                >
-                  <ArrowRight className="size-3" />
-                </div>
-              </div>
-
-              {/* Bottom stat value */}
-              <div className="mt-2.5 sm:mt-3 pl-0.5">
-                <span className="text-xl sm:text-2xl font-bold text-zinc-900 dark:text-zinc-50 tracking-tight">
-                  {card.value}
-                </span>
-              </div>
-            </div>
-          </div>
-        ))}
-      </div>
+      <LeaveMetricCards
+        total={metrics.total}
+        approved={metrics.approved}
+        pending={metrics.pending}
+        rejected={metrics.rejected}
+      />
 
       {/* Basic plan: history is windowed server-side, so say so and offer the upgrade */}
       {historyMonths !== null && (
@@ -564,333 +401,45 @@ function AdminManagerView({ initialTab }: { initialTab: string }) {
       )}
 
       {/* ── 3. Search & Filter Bar ── */}
-      <Card className="rounded-2xl border border-slate-200/80 dark:border-zinc-800 bg-white dark:bg-zinc-950 p-3 sm:p-4 shadow-2xs">
-        <div className="flex flex-wrap items-center gap-2.5 sm:gap-3">
-          {/* Search Box */}
-          <div className="relative flex-1 min-w-[220px] sm:min-w-[280px]">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-slate-400" />
-            <Input
-              value={searchQuery}
-              onChange={e => { setSearchQuery(e.target.value); setCurrentPage(1); }}
-              placeholder={`Search by ${activeTab === 'student' ? 'student name or reason...' : activeTab === 'teacher' ? 'teacher name or reason...' : 'staff name or reason...'}`}
-              className="pl-9 h-10 rounded-xl bg-slate-50/60 dark:bg-zinc-900 border-slate-200/80 dark:border-zinc-800 text-sm focus-visible:ring-1 focus-visible:ring-blue-500"
-            />
-          </div>
-
-          {/* Status Dropdown */}
-          <div className="w-full sm:w-36">
-            <Select value={statusFilter} onValueChange={v => { setStatusFilter(v); setCurrentPage(1); }}>
-              <SelectTrigger className="h-10 rounded-xl bg-slate-50/60 dark:bg-zinc-900 border-slate-200/80 dark:border-zinc-800 text-sm">
-                <SelectValue placeholder="All Status" />
-              </SelectTrigger>
-              <SelectContent className="rounded-xl">
-                <SelectItem value="all">All Status</SelectItem>
-                <SelectItem value="pending">Pending</SelectItem>
-                <SelectItem value="approved">Approved</SelectItem>
-                <SelectItem value="rejected">Rejected</SelectItem>
-                <SelectItem value="cancelled">Cancelled</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
-          {/* Type Dropdown */}
-          <div className="w-full sm:w-36">
-            <Select value={leaveTypeFilter} onValueChange={v => { setLeaveTypeFilter(v); setCurrentPage(1); }}>
-              <SelectTrigger className="h-10 rounded-xl bg-slate-50/60 dark:bg-zinc-900 border-slate-200/80 dark:border-zinc-800 text-sm">
-                <SelectValue placeholder="All Types" />
-              </SelectTrigger>
-              <SelectContent className="rounded-xl">
-                <SelectItem value="all">All Types</SelectItem>
-                {Object.keys(leaveTypeConfig).map(k => (
-                  <SelectItem key={k} value={k} className="capitalize">
-                    {leaveTypeConfig[k]?.label || k}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-
-          {/* Date Filter (Start Date) */}
-          <div className="w-full sm:w-40">
-            <Input
-              type="date"
-              value={startDateFilter}
-              min={minFromDate}
-              onChange={e => { setStartDateFilter(e.target.value); setCurrentPage(1); }}
-              placeholder="From Date"
-              className="h-10 rounded-xl bg-slate-50/60 dark:bg-zinc-900 border-slate-200/80 dark:border-zinc-800 text-xs"
-            />
-          </div>
-
-          {/* Date Filter (End Date) */}
-          <div className="w-full sm:w-40">
-            <Input
-              type="date"
-              value={endDateFilter}
-              onChange={e => { setEndDateFilter(e.target.value); setCurrentPage(1); }}
-              placeholder="To Date"
-              className="h-10 rounded-xl bg-slate-50/60 dark:bg-zinc-900 border-slate-200/80 dark:border-zinc-800 text-xs"
-            />
-          </div>
-
-          {/* Action Buttons: Reset & Filter */}
-          <div className="flex items-center gap-2 ml-auto w-full sm:w-auto justify-end">
-            <Button
-              variant="outline"
-              onClick={handleResetFilters}
-              className="h-10 px-3.5 rounded-xl border-slate-200/80 dark:border-zinc-800 bg-white dark:bg-zinc-900 text-slate-700 dark:text-zinc-300 hover:bg-slate-50 dark:hover:bg-zinc-800 text-xs font-medium gap-1.5 shadow-2xs"
-            >
-              <RotateCcw className="size-3.5" />
-              <span>Reset</span>
-            </Button>
-            <Button
-              className="h-10 px-4 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold shadow-xs shadow-blue-600/20 gap-1.5"
-              onClick={() => { if (currentPage === 1) fetchLeaves(); else setCurrentPage(1); }}
-            >
-              <Filter className="size-3.5" />
-              <span>Filter</span>
-            </Button>
-          </div>
-        </div>
-      </Card>
+      <LeaveFilterBar
+        activeTab={activeTab}
+        searchQuery={searchQuery}
+        onSearchQueryChange={v => { setSearchQuery(v); setCurrentPage(1); }}
+        statusFilter={statusFilter}
+        onStatusFilterChange={v => { setStatusFilter(v); setCurrentPage(1); }}
+        leaveTypeFilter={leaveTypeFilter}
+        onLeaveTypeFilterChange={v => { setLeaveTypeFilter(v); setCurrentPage(1); }}
+        startDateFilter={startDateFilter}
+        onStartDateFilterChange={v => { setStartDateFilter(v); setCurrentPage(1); }}
+        endDateFilter={endDateFilter}
+        onEndDateFilterChange={v => { setEndDateFilter(v); setCurrentPage(1); }}
+        minFromDate={minFromDate}
+        onResetFilters={handleResetFilters}
+        onApplyFilters={() => { if (currentPage === 1) fetchLeaves(); else setCurrentPage(1); }}
+      />
 
       {/* ── 4. Main Table Card ── */}
-      <Card className="rounded-2xl border border-slate-200/80 dark:border-zinc-800 bg-white dark:bg-zinc-950 overflow-hidden shadow-2xs">
-        <CardContent className="p-0">
-          {loading ? (
-            <div className="p-6 space-y-4">
-              {[...Array(6)].map((_, i) => (
-                <Skeleton key={i} className="h-12 w-full rounded-xl" />
-              ))}
-            </div>
-          ) : leaves.length === 0 ? (
-            /* Empty State Matching Screenshot */
-            <div className="py-16 sm:py-20 px-4 text-center flex flex-col items-center justify-center animate-in fade-in-50 duration-300">
-              <div className="size-20 rounded-3xl bg-blue-50 dark:bg-blue-950/40 border border-blue-100 dark:border-blue-900/50 flex items-center justify-center text-blue-600 dark:text-blue-400 mb-4 shadow-xs">
-                <FileText className="size-10 stroke-[1.5]" />
-              </div>
-              <h3 className="text-lg sm:text-xl font-bold text-slate-900 dark:text-zinc-100 tracking-tight">
-                No leave requests found
-              </h3>
-              <p className="text-xs sm:text-sm text-slate-500 dark:text-zinc-400 max-w-sm mx-auto mt-1.5 leading-relaxed">
-                There are no leave requests matching your filters.
-              </p>
-              <Button
-                variant="outline"
-                onClick={() => setApplyModalOpen(true)}
-                className="mt-5 rounded-xl h-10 px-4 text-xs font-semibold border-blue-200 dark:border-blue-800 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-950/30 gap-2 shadow-2xs"
-              >
-                <Plus className="size-4" />
-                <span>New Leave Request</span>
-              </Button>
-            </div>
-          ) : (
-            <div className="overflow-x-auto">
-              <Table>
-                <TableHeader className="bg-slate-50/70 dark:bg-zinc-900/50 border-b border-slate-100 dark:border-zinc-800/80">
-                  <TableRow className="hover:bg-transparent">
-                    <TableHead className="w-12 px-4">
-                      <input
-                        type="checkbox"
-                        checked={selectedIds.size === leaves.length && leaves.length > 0}
-                        onChange={toggleSelectAll}
-                        className="rounded border-slate-300 dark:border-zinc-700 text-blue-600 focus:ring-blue-500 size-4 cursor-pointer"
-                      />
-                    </TableHead>
-                    <TableHead className="cursor-pointer select-none text-xs font-semibold" onClick={() => handleSort('userName')}>
-                      <div className="flex items-center gap-1.5">
-                        <span>Applicant</span>
-                        <ArrowUpDown className="size-3 text-slate-400" />
-                      </div>
-                    </TableHead>
-                    <TableHead className="cursor-pointer select-none text-xs font-semibold" onClick={() => handleSort('leaveType')}>
-                      <div className="flex items-center gap-1.5">
-                        <span>Type</span>
-                        <ArrowUpDown className="size-3 text-slate-400" />
-                      </div>
-                    </TableHead>
-                    <TableHead className="cursor-pointer select-none text-xs font-semibold" onClick={() => handleSort('startDate')}>
-                      <div className="flex items-center gap-1.5">
-                        <span>Dates</span>
-                        <ArrowUpDown className="size-3 text-slate-400" />
-                      </div>
-                    </TableHead>
-                    <TableHead className="text-xs font-semibold">
-                      Reason
-                    </TableHead>
-                    <TableHead className="cursor-pointer select-none text-xs font-semibold text-center" onClick={() => handleSort('status')}>
-                      <div className="flex items-center justify-center gap-1.5">
-                        <span>Status</span>
-                        <ArrowUpDown className="size-3 text-slate-400" />
-                      </div>
-                    </TableHead>
-                    <TableHead className="cursor-pointer select-none text-xs font-semibold" onClick={() => handleSort('createdAt')}>
-                      <div className="flex items-center gap-1.5">
-                        <span>Applied On</span>
-                        <ArrowUpDown className="size-3 text-slate-400" />
-                      </div>
-                    </TableHead>
-                    <TableHead className="text-right text-xs font-semibold pr-4">Actions</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {leaves.map(l => {
-                    const duration = getDurationDays(l.startDate, l.endDate);
-                    const isSelected = selectedIds.has(l.id);
-                    const initials = l.userName
-                      ?.split(' ')
-                      .map(n => n[0])
-                      .join('')
-                      .slice(0, 2)
-                      .toUpperCase() || 'U';
-
-                    return (
-                      <TableRow
-                        key={l.id}
-                        className={cn(
-                          "transition-colors hover:bg-slate-50/70 dark:hover:bg-zinc-900/50 border-b border-slate-100 dark:border-zinc-800/60",
-                          isSelected && "bg-blue-50/40 dark:bg-blue-950/20"
-                        )}
-                      >
-                        <TableCell className="px-4">
-                          <input
-                            type="checkbox"
-                            checked={isSelected}
-                            onChange={() => toggleSelectRow(l.id)}
-                            className="rounded border-slate-300 dark:border-zinc-700 text-blue-600 focus:ring-blue-500 size-4 cursor-pointer"
-                          />
-                        </TableCell>
-
-                        {/* Applicant Name & Avatar */}
-                        <TableCell className="py-3">
-                          <div className="flex items-center gap-3">
-                            <Avatar className="size-8.5 rounded-full border border-slate-200 dark:border-zinc-800">
-                              <AvatarFallback className="bg-slate-100 dark:bg-zinc-800 text-slate-700 dark:text-zinc-200 text-xs font-bold">
-                                {initials}
-                              </AvatarFallback>
-                            </Avatar>
-                            <div className="min-w-0">
-                              <p className="text-xs sm:text-sm font-semibold text-slate-900 dark:text-zinc-100 truncate">
-                                {l.userName}
-                              </p>
-                              <p className="text-[11px] text-slate-400 dark:text-zinc-500 truncate">
-                                {l.userEmail || `${l.role}`}
-                              </p>
-                            </div>
-                          </div>
-                        </TableCell>
-
-                        {/* Type Badge */}
-                        <TableCell>
-                          <Badge
-                            variant="outline"
-                            className={cn(
-                              "text-xs font-medium rounded-lg px-2.5 py-0.5 border capitalize",
-                              leaveTypeConfig[l.leaveType]?.bg || "bg-slate-100 text-slate-700"
-                            )}
-                          >
-                            {leaveTypeConfig[l.leaveType]?.label || l.leaveType}
-                          </Badge>
-                        </TableCell>
-
-                        {/* Dates with Day Duration */}
-                        <TableCell className="text-xs text-slate-600 dark:text-zinc-300 whitespace-nowrap">
-                          <div className="flex flex-col">
-                            <span className="font-medium text-slate-800 dark:text-zinc-200">
-                              {formatDateString(l.startDate)} - {formatDateString(l.endDate)}
-                            </span>
-                            <span className="text-[10px] text-slate-400 dark:text-zinc-500">
-                              {duration} {duration === 1 ? 'day' : 'days'}
-                            </span>
-                          </div>
-                        </TableCell>
-
-                        {/* Reason */}
-                        <TableCell className="text-xs text-slate-500 dark:text-zinc-400 max-w-[200px] truncate" title={l.reason || '–'}>
-                          {l.reason || '–'}
-                        </TableCell>
-
-                        {/* Status Badge */}
-                        <TableCell className="text-center">
-                          <Badge
-                            className={cn(
-                              "text-xs font-semibold rounded-lg px-2.5 py-0.5 border shadow-2xs inline-flex items-center",
-                              statusConfig[l.status]?.bg || "bg-zinc-100 text-zinc-700"
-                            )}
-                          >
-                            {statusConfig[l.status]?.icon}
-                            <span>{statusConfig[l.status]?.label || l.status}</span>
-                          </Badge>
-                        </TableCell>
-
-                        {/* Applied On */}
-                        <TableCell className="text-xs text-slate-500 dark:text-zinc-400 whitespace-nowrap">
-                          {formatDateString(l.createdAt)}
-                        </TableCell>
-
-                        {/* Actions */}
-                        <TableCell className="text-right pr-4">
-                          <div className="flex items-center justify-end gap-1.5">
-                            {l.status === 'pending' && (
-                              <>
-                                <Button
-                                  size="sm"
-                                  variant="ghost"
-                                  onClick={() => setActionDialog({ open: true, leave: l, action: 'approve', remarks: '', loading: false })}
-                                  className="size-8 p-0 rounded-lg text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50 dark:hover:bg-emerald-950/40"
-                                  title="Approve"
-                                >
-                                  <Check className="size-4" strokeWidth={2.5} />
-                                </Button>
-                                <Button
-                                  size="sm"
-                                  variant="ghost"
-                                  onClick={() => setActionDialog({ open: true, leave: l, action: 'reject', remarks: '', loading: false })}
-                                  className="size-8 p-0 rounded-lg text-rose-600 hover:text-rose-700 hover:bg-rose-50 dark:hover:bg-rose-950/40"
-                                  title="Reject"
-                                >
-                                  <X className="size-4" strokeWidth={2.5} />
-                                </Button>
-                              </>
-                            )}
-
-                            <Button
-                              size="sm"
-                              variant="ghost"
-                              onClick={() => setDetailModal({ open: true, leave: l })}
-                              className="size-8 p-0 rounded-lg text-slate-500 hover:text-slate-800 hover:bg-slate-100 dark:hover:bg-zinc-800"
-                              title="View Details"
-                            >
-                              <Eye className="size-4" />
-                            </Button>
-                          </div>
-                        </TableCell>
-                      </TableRow>
-                    );
-                  })}
-                </TableBody>
-              </Table>
-            </div>
-          )}
-
-          {/* ── 5. Pagination Footer ── */}
-          {!loading && leaves.length > 0 && (
-            <div className="border-t border-slate-100 dark:border-zinc-800/80 bg-slate-50/40 dark:bg-zinc-900/30 px-4">
-              <Pagination
-                currentPage={currentPage}
-                totalPages={totalPages}
-                totalItems={total}
-                itemsPerPage={pageSize}
-                onPageChange={setCurrentPage}
-                onLimitChange={l => { setPageSize(l); setCurrentPage(1); }}
-              />
-            </div>
-          )}
-        </CardContent>
-      </Card>
+      <LeaveRequestsTable
+        loading={loading}
+        leaves={leaves}
+        selectedIds={selectedIds}
+        onToggleSelectAll={toggleSelectAll}
+        onToggleSelectRow={toggleSelectRow}
+        onSort={handleSort}
+        onApprove={leave => setActionDialog({ open: true, leave, action: 'approve', remarks: '', loading: false })}
+        onReject={leave => setActionDialog({ open: true, leave, action: 'reject', remarks: '', loading: false })}
+        onViewDetail={leave => setDetailModal({ open: true, leave })}
+        onNewLeaveRequest={() => setApplyModalOpen(true)}
+        currentPage={currentPage}
+        totalPages={totalPages}
+        totalItems={total}
+        itemsPerPage={pageSize}
+        onPageChange={setCurrentPage}
+        onItemsPerPageChange={l => { setPageSize(l); setCurrentPage(1); }}
+      />
 
       {/* ── 6. New Leave Request Dialog ── */}
-      <Dialog
+      <NewLeaveRequestDialog
         open={applyModalOpen}
         onOpenChange={o => {
           setApplyModalOpen(o);
@@ -899,205 +448,43 @@ function AdminManagerView({ initialTab }: { initialTab: string }) {
             setDebouncedCandidateSearch('');
           }
         }}
-      >
-        <DialogContent className="max-w-md rounded-2xl">
-          <DialogHeader>
-            <DialogTitle className="text-lg font-bold flex items-center gap-2">
-              <CalendarDays className="size-5 text-blue-600" />
-              New Leave Request
-            </DialogTitle>
-            <DialogDescription className="text-xs text-muted-foreground">
-              Submit a leave application on behalf of a {activeTab}.
-            </DialogDescription>
-          </DialogHeader>
-
-          <div className="space-y-4 py-2">
-            {/* Applicant Selector */}
-            <div className="space-y-1.5">
-              <label className="text-xs font-semibold text-slate-700 dark:text-zinc-300 capitalize">
-                Select {activeTab}
-              </label>
-              <Input
-                value={candidateSearch}
-                onChange={e => setCandidateSearch(e.target.value)}
-                placeholder={`Search ${roleLabel} by name...`}
-                className="h-10 rounded-xl text-sm"
-              />
-              {candidatesLoading ? (
-                <Skeleton className="h-10 w-full rounded-xl" />
-              ) : (
-                <Select value={applyForm.userId} onValueChange={v => setApplyForm(p => ({ ...p, userId: v }))}>
-                  <SelectTrigger className="h-10 rounded-xl text-sm">
-                    <SelectValue placeholder={`Choose ${activeTab}...`} />
-                  </SelectTrigger>
-                  <SelectContent className="rounded-xl max-h-56">
-                    {availableCandidates.map(c => (
-                      <SelectItem key={c.id} value={c.id}>
-                        {c.name} {c.email ? `(${c.email})` : ''}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              )}
-              {!candidatesLoading && availableCandidates.length === 0 && (
-                <p className="text-[11px] text-slate-400 dark:text-zinc-500">
-                  No {roleLabel} found{candidateSearch ? ` for "${candidateSearch}"` : ''}.
-                </p>
-              )}
-              {!candidatesLoading && candidatesTruncated && !candidateSearch && (
-                <p className="text-[11px] text-slate-400 dark:text-zinc-500">
-                  Showing the first {CANDIDATE_LIMITS[activeTab] ?? 100} — type a name to narrow down.
-                </p>
-              )}
-            </div>
-
-            {/* Leave Type */}
-            <div className="space-y-1.5">
-              <label className="text-xs font-semibold text-slate-700 dark:text-zinc-300">Leave Type</label>
-              <Select value={applyForm.leaveType} onValueChange={v => setApplyForm(p => ({ ...p, leaveType: v }))}>
-                <SelectTrigger className="h-10 rounded-xl text-sm capitalize">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent className="rounded-xl">
-                  {Object.keys(leaveTypeConfig).map(k => (
-                    <SelectItem key={k} value={k} className="capitalize">
-                      {leaveTypeConfig[k]?.label || k}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-
-            {/* Start and End Date */}
-            <div className="grid grid-cols-2 gap-3">
-              <div className="space-y-1.5">
-                <label className="text-xs font-semibold text-slate-700 dark:text-zinc-300">Start Date</label>
-                <Input
-                  type="date"
-                  value={applyForm.startDate}
-                  onChange={e => {
-                    const newStart = e.target.value;
-                    const newEnd = applyForm.endDate && applyForm.endDate < newStart ? newStart : applyForm.endDate;
-                    setApplyForm(p => ({ ...p, startDate: newStart, endDate: newEnd }));
-                  }}
-                  className="h-10 rounded-xl text-xs"
-                />
-              </div>
-              <div className="space-y-1.5">
-                <label className="text-xs font-semibold text-slate-700 dark:text-zinc-300">End Date</label>
-                <Input
-                  type="date"
-                  value={applyForm.endDate}
-                  onChange={e => setApplyForm(p => ({ ...p, endDate: e.target.value }))}
-                  min={applyForm.startDate}
-                  className="h-10 rounded-xl text-xs"
-                />
-              </div>
-            </div>
-
-            {/* Reason */}
-            <div className="space-y-1.5">
-              <label className="text-xs font-semibold text-slate-700 dark:text-zinc-300">Reason</label>
-              <Textarea
-                placeholder="Provide details or reason for leave..."
-                value={applyForm.reason}
-                onChange={e => setApplyForm(p => ({ ...p, reason: e.target.value }))}
-                className="rounded-xl min-h-[80px] text-sm"
-              />
-            </div>
-          </div>
-
-          <DialogFooter className="gap-2 sm:gap-0">
-            <Button
-              variant="outline"
-              onClick={() => setApplyModalOpen(false)}
-              className="rounded-xl text-xs"
-            >
-              Cancel
-            </Button>
-            <Button
-              onClick={handleCreateLeave}
-              disabled={applyForm.isSubmitting}
-              className="bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs gap-1.5"
-            >
-              {applyForm.isSubmitting ? (
-                <>
-                  <Loader2 className="size-3.5 animate-spin" />
-                  <span>Submitting...</span>
-                </>
-              ) : (
-                <span>Submit Request</span>
-              )}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+        activeTab={activeTab}
+        roleLabel={roleLabel}
+        candidateSearch={candidateSearch}
+        onCandidateSearchChange={setCandidateSearch}
+        candidatesLoading={candidatesLoading}
+        availableCandidates={availableCandidates}
+        candidatesTruncated={candidatesTruncated}
+        applicantId={applyForm.userId}
+        leaveType={applyForm.leaveType}
+        startDate={applyForm.startDate}
+        endDate={applyForm.endDate}
+        reason={applyForm.reason}
+        isSubmitting={applyForm.isSubmitting}
+        onApplicantChange={v => setApplyForm(p => ({ ...p, userId: v }))}
+        onLeaveTypeChange={v => setApplyForm(p => ({ ...p, leaveType: v }))}
+        onStartDateChange={v => {
+          const newEnd = applyForm.endDate && applyForm.endDate < v ? v : applyForm.endDate;
+          setApplyForm(p => ({ ...p, startDate: v, endDate: newEnd }));
+        }}
+        onEndDateChange={v => setApplyForm(p => ({ ...p, endDate: v }))}
+        onReasonChange={v => setApplyForm(p => ({ ...p, reason: v }))}
+        onCancel={() => setApplyModalOpen(false)}
+        onSubmit={handleCreateLeave}
+      />
 
       {/* ── 7. Approve / Reject Action Modal ── */}
-      <Dialog open={actionDialog.open} onOpenChange={v => setActionDialog(p => ({ ...p, open: v }))}>
-        <DialogContent className="max-w-md rounded-2xl">
-          <DialogHeader>
-            <DialogTitle className="text-lg font-bold flex items-center gap-2">
-              {actionDialog.action === 'approve' ? (
-                <CheckCircle2 className="size-5 text-emerald-600" />
-              ) : (
-                <XCircle className="size-5 text-rose-600" />
-              )}
-              {actionDialog.action === 'approve' ? 'Approve' : 'Reject'} Leave Request
-            </DialogTitle>
-            <DialogDescription className="text-xs">
-              Confirm your decision and optionally add remarks for the applicant.
-            </DialogDescription>
-          </DialogHeader>
-
-          <div className="py-3 space-y-3">
-            <div className="p-3 rounded-xl bg-slate-50 dark:bg-zinc-900 border border-slate-100 dark:border-zinc-800 text-xs space-y-1">
-              <p>
-                <strong>Applicant:</strong> {actionDialog.leave?.userName} ({actionDialog.leave?.role})
-              </p>
-              <p>
-                <strong>Duration:</strong> {formatDateString(actionDialog.leave?.startDate)} - {formatDateString(actionDialog.leave?.endDate)}
-              </p>
-              {actionDialog.leave?.reason && (
-                <p>
-                  <strong>Reason:</strong> {actionDialog.leave?.reason}
-                </p>
-              )}
-            </div>
-
-            <div className="space-y-1.5">
-              <label className="text-xs font-semibold text-slate-700 dark:text-zinc-300">Approver Remarks</label>
-              <Textarea
-                placeholder="Optional notes or instructions..."
-                value={actionDialog.remarks}
-                onChange={e => setActionDialog(p => ({ ...p, remarks: e.target.value }))}
-                className="rounded-xl min-h-[75px] text-sm"
-              />
-            </div>
-          </div>
-
-          <DialogFooter className="gap-2 sm:gap-0">
-            <Button
-              variant="outline"
-              onClick={() => setActionDialog(p => ({ ...p, open: false }))}
-              className="rounded-xl text-xs"
-            >
-              Cancel
-            </Button>
-            <Button
-              disabled={actionDialog.loading}
-              onClick={handleProcessAction}
-              className={cn(
-                "rounded-xl text-xs text-white",
-                actionDialog.action === 'approve' ? "bg-emerald-600 hover:bg-emerald-700" : "bg-rose-600 hover:bg-rose-700"
-              )}
-            >
-              {actionDialog.loading ? <Loader2 className="size-3.5 animate-spin mr-1" /> : null}
-              Confirm {actionDialog.action === 'approve' ? 'Approval' : 'Rejection'}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      <LeaveActionDialog
+        open={actionDialog.open}
+        onOpenChange={v => setActionDialog(p => ({ ...p, open: v }))}
+        leave={actionDialog.leave}
+        action={actionDialog.action}
+        remarks={actionDialog.remarks}
+        loading={actionDialog.loading}
+        onRemarksChange={v => setActionDialog(p => ({ ...p, remarks: v }))}
+        onCancel={() => setActionDialog(p => ({ ...p, open: false }))}
+        onConfirm={handleProcessAction}
+      />
 
       {/* ── 8. View Detail Modal ── */}
       <Dialog open={detailModal.open} onOpenChange={v => setDetailModal(p => ({ ...p, open: v }))}>
