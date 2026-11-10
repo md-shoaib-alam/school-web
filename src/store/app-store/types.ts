@@ -31,11 +31,17 @@ export interface AppUser {
   platformRole?: PlatformRoleInfo | null;
 }
 
+export interface SessionTokens {
+  token: string;
+  refreshToken?: string;
+}
+
 export interface AppState {
   isLoggedIn: boolean;
   currentUser: AppUser | null;
-  login: (user: AppUser) => void;
-  logout: () => void;
+  login: (user: AppUser, session: SessionTokens) => boolean;
+  /** Drops the active account and returns where to go next, or null when none is left. */
+  logout: () => string | null;
   refreshPermissions: () => Promise<void>;
 
   currentScreen: string;

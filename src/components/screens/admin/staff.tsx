@@ -418,7 +418,7 @@ export function AdminStaff() {
             />
 
             <div className="flex items-center gap-2 self-end sm:self-auto order-1 sm:order-2">
-              <div className="flex items-center bg-zinc-100 dark:bg-zinc-800 p-1 rounded-lg border border-zinc-200 dark:border-zinc-700">
+              <div className="flex items-center bg-muted p-1 rounded-lg border ">
                 <Button
                   variant="ghost"
                   size="sm"
@@ -454,7 +454,7 @@ export function AdminStaff() {
           </div>
 
           {/* Content */}
-          <div className={cn(viewMode === 'table' ? "bg-white dark:bg-zinc-950 rounded-xl border border-zinc-100 dark:border-zinc-800 overflow-hidden" : "")}>
+          <div className={cn(viewMode === 'table' ? "bg-card rounded-xl border  overflow-hidden" : "")}>
               {loadingStaff ? (
                 <StaffSkeleton />
               ) : viewMode === 'table' ? (

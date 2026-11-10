@@ -203,7 +203,7 @@ export function TabulationLedgerPreviewPage({
   return (
     <div className="space-y-6 animate-in fade-in duration-300">
       {/* toolbar */}
-      <div className="bg-card border border-zinc-150 dark:border-zinc-800/80 p-3 sm:px-4 rounded-xl shadow-sm flex flex-col xl:flex-row items-stretch xl:items-center gap-3 justify-between">
+      <div className="bg-card border  p-3 sm:px-4 rounded-xl shadow-sm flex flex-col xl:flex-row items-stretch xl:items-center gap-3 justify-between">
         
         {/* Left Side: Back button and details */}
         <div className="flex items-center gap-3 min-w-0">
@@ -211,7 +211,7 @@ export function TabulationLedgerPreviewPage({
             variant="ghost" 
             size="sm"
             onClick={onBack}
-            className="group flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground h-8 px-2 rounded-lg transition-colors border border-zinc-100 dark:border-zinc-800"
+            className="group flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground h-8 px-2 rounded-lg transition-colors border "
           >
             <ArrowLeft className="size-3.5 transition-transform group-hover:-translate-x-0.5" />
             <span className="hidden sm:inline">Back</span>
@@ -234,7 +234,7 @@ export function TabulationLedgerPreviewPage({
           {/* Select Template Design */}
           <div className="w-full sm:w-[170px]">
             <Select value={selectedTemplateId} onValueChange={setSelectedTemplateId}>
-              <SelectTrigger className="w-full h-8 rounded-lg text-xs font-semibold bg-zinc-50/50 dark:bg-zinc-900/30 border-zinc-200 dark:border-zinc-800 py-1">
+              <SelectTrigger className="w-full h-8 rounded-lg text-xs font-semibold bg-muted  py-1">
                 <div className="flex items-center gap-1.5 min-w-0 w-full text-left">
                   <Layout className="size-3.5 text-violet-500 shrink-0" />
                   <span className="truncate flex-1">
@@ -261,9 +261,9 @@ export function TabulationLedgerPreviewPage({
                 setHasManuallySetZoom(true);
               }}
             >
-              <SelectTrigger className="w-full h-8 rounded-lg text-xs font-semibold bg-zinc-50/50 dark:bg-zinc-900/30 border-zinc-200 dark:border-zinc-800 py-1">
+              <SelectTrigger className="w-full h-8 rounded-lg text-xs font-semibold bg-muted  py-1">
                 <div className="flex items-center gap-1.5 min-w-0 w-full text-left">
-                  <Search className="size-3.5 text-zinc-400 shrink-0" />
+                  <Search className="size-3.5 text-muted-foreground shrink-0" />
                   <span className="truncate flex-1">
                     {Math.round(zoomScale * 100)}%
                   </span>
@@ -305,7 +305,7 @@ export function TabulationLedgerPreviewPage({
       </div>
 
       {/* Main Preview Container */}
-      <div className="bg-card border border-zinc-100 dark:border-zinc-800 p-6 rounded-2xl shadow-sm overflow-hidden flex flex-col min-h-[500px] items-center justify-center">
+      <div className="bg-card border  p-6 rounded-2xl shadow-sm overflow-hidden flex flex-col min-h-[500px] items-center justify-center">
         {loading ? (
           <div className="w-full space-y-6 py-10 animate-in fade-in duration-300">
             <div className="flex items-center gap-4">
@@ -330,7 +330,7 @@ export function TabulationLedgerPreviewPage({
         ) : (
           <div className={`w-full flex flex-col items-center ${cinzel.className} ${montserrat.className} ${inter.className}`}>
             {/* A4 Landscape parchment layout sheets preview container */}
-            <div className="w-full max-h-[70vh] overflow-y-auto overflow-x-auto pb-6 flex flex-col items-center gap-8 bg-zinc-50 dark:bg-zinc-950/20 p-4 sm:p-6 rounded-2xl border border-zinc-150 dark:border-zinc-800/50 shadow-inner">
+            <div className="w-full max-h-[70vh] overflow-y-auto overflow-x-auto pb-6 flex flex-col items-center gap-8 bg-muted p-4 sm:p-6 rounded-2xl border  shadow-inner">
               <div 
                 className="shrink-0 transition-all duration-300 shadow-2xl rounded-lg bg-white overflow-hidden"
                 style={{ 

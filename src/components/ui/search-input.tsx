@@ -95,7 +95,7 @@ export function SearchInput({
           className={cn(
             "absolute right-2 top-1/2 -translate-y-1/2",
             "size-5 flex items-center justify-center rounded-full",
-            "text-zinc-400 hover:text-emerald-600 dark:text-zinc-500 dark:hover:text-emerald-400",
+            "text-muted-foreground hover:text-emerald-600 dark:hover:text-emerald-400",
             "hover:bg-emerald-50 dark:hover:bg-emerald-900/30",
             "transition-colors duration-150",
             "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500",

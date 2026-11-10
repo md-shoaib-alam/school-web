@@ -14,7 +14,7 @@ interface QuickActionsProps {
 
 export function QuickActions({ role, onPasswordChange, onLogout, onSubscriptionClick }: QuickActionsProps) {
   return (
-    <Card className="border border-zinc-200/80 dark:border-zinc-800/80 shadow-sm rounded-2xl">
+    <Card className="border  shadow-sm rounded-2xl">
       <CardHeader>
         <CardTitle className="text-base font-bold">Quick Actions</CardTitle>
       </CardHeader>

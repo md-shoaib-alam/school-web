@@ -745,7 +745,7 @@ export function SuperAdminBulkAttendance() {
         );
       default:
         return (
-          <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[11px] font-medium bg-slate-100 text-slate-700 border border-slate-200/60 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700">
+          <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[11px] font-medium bg-muted text-foreground border  dark:bg-slate-800">
             {status || "Unknown"}
           </span>
         );
@@ -938,7 +938,7 @@ export function SuperAdminBulkAttendance() {
                     <FileCheck2 className="size-3.5" />
                     Successfully Processed: <span className="text-base font-extrabold">{importResult.importedCount}</span>
                   </div>
-                  <div className="px-3 py-1.5 rounded-lg bg-zinc-500/10 dark:bg-zinc-500/20 border border-zinc-500/30 flex items-center gap-2 text-zinc-700 dark:text-zinc-300">
+                  <div className="px-3 py-1.5 rounded-lg bg-muted0/10 dark:bg-muted0/20 border  flex items-center gap-2 text-foreground">
                     <XCircle className="size-3.5 text-muted-foreground" />
                     Skipped/Ignored: <span className="text-base font-extrabold">{importResult.skippedCount}</span>
                   </div>
@@ -952,7 +952,7 @@ export function SuperAdminBulkAttendance() {
                     <div className="max-h-36 overflow-y-auto space-y-1 bg-white/50 dark:bg-black/30 rounded-lg p-2 text-xs font-mono">
                       {importResult.skippedRecords.map((item, idx) => (
                         <div key={idx} className="flex justify-between border-b border-black/5 dark:border-white/5 py-1 last:border-none">
-                          <span className="text-zinc-600 dark:text-zinc-400 truncate pr-4">
+                          <span className="text-foreground truncate pr-4">
                             Row {idx + 1}: Name: {item.record?.studentName || 'N/A'} | Date: {item.record?.date || 'N/A'}
                           </span>
                           <span className="text-rose-500 font-semibold shrink-0">{item.reason}</span>

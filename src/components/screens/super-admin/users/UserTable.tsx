@@ -95,8 +95,8 @@ export function UserTable({
 
   const isAllSelected = users.length > 0 && users.every((u) => selectedIds.has(u.id));
 
-  const commonClasses = "text-xs font-semibold text-slate-500 dark:text-slate-400 py-3.5";
-  const cellClasses = "py-3 text-xs font-medium text-slate-700 dark:text-slate-300";
+  const commonClasses = "text-xs font-semibold text-muted-foreground py-3.5";
+  const cellClasses = "py-3 text-xs font-medium text-foreground";
 
   const renderPageNumbers = () => {
     const pages: (number | string)[] = [];
@@ -118,15 +118,15 @@ export function UserTable({
 
   if (loading) {
     return (
-      <div className="rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-card shadow-2xs overflow-hidden">
+      <div className="rounded-2xl border  bg-card shadow-2xs overflow-hidden">
         <div className="overflow-x-auto">
           <Table>
             <TableHeader>
-              <TableRow className="bg-slate-50/70 dark:bg-slate-800/40 border-b border-slate-200/80 dark:border-slate-800">
+              <TableRow className="bg-muted border-b ">
                 <TableHead className="w-10 py-3.5 pl-4">
                   <Skeleton className="size-3.5 rounded-sm" />
                 </TableHead>
-                <TableHead className="w-12 text-xs font-semibold text-slate-500 py-3.5">#</TableHead>
+                <TableHead className="w-12 text-xs font-semibold text-muted-foreground py-3.5">#</TableHead>
                 <TableHead className={commonClasses}>Name</TableHead>
                 <TableHead className={commonClasses}>Email</TableHead>
                 <TableHead className={commonClasses}>Role</TableHead>
@@ -138,7 +138,7 @@ export function UserTable({
             </TableHeader>
             <TableBody>
               {[...Array(8)].map((_, i) => (
-                <TableRow key={i} className="border-b border-slate-100 dark:border-slate-800/80 last:border-none">
+                <TableRow key={i} className="border-b  last:border-none">
                   <TableCell className="w-10 py-3.5 pl-4">
                     <Skeleton className="size-3.5 rounded-sm" />
                   </TableCell>
@@ -179,21 +179,21 @@ export function UserTable({
   }
 
   return (
-    <div className="rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-card shadow-2xs overflow-hidden">
+    <div className="rounded-2xl border  bg-card shadow-2xs overflow-hidden">
       <div className="overflow-x-auto">
         <Table>
           <TableHeader>
-            <TableRow className="bg-slate-50/70 dark:bg-slate-800/40 hover:bg-transparent border-b border-slate-200/80 dark:border-slate-800">
+            <TableRow className="bg-muted hover:bg-transparent border-b ">
               <TableHead className="w-10 py-3.5 pl-4">
                 <input
                   type="checkbox"
                   checked={isAllSelected}
                   onChange={(e) => handleSelectAll(e.target.checked)}
                   aria-label="Select all"
-                  className="rounded border-slate-300 text-blue-600 focus:ring-blue-500 size-3.5"
+                  className="rounded  text-blue-600 focus:ring-blue-500 size-3.5"
                 />
               </TableHead>
-              <TableHead className="w-12 text-xs font-semibold text-slate-500 dark:text-slate-400 py-3.5">#</TableHead>
+              <TableHead className="w-12 text-xs font-semibold text-muted-foreground py-3.5">#</TableHead>
               <TableHead className={commonClasses}>Name</TableHead>
               <TableHead className={commonClasses}>Email</TableHead>
               <TableHead className={commonClasses}>Role</TableHead>
@@ -206,10 +206,10 @@ export function UserTable({
           <TableBody>
             {users.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={9} className="text-center py-20 text-slate-400">
+                <TableCell colSpan={9} className="text-center py-20 text-muted-foreground">
                   <Users className="size-12 mx-auto mb-3 opacity-20" />
-                  <p className="text-sm font-semibold text-slate-700 dark:text-slate-300">No users found</p>
-                  <p className="text-xs text-slate-400 mt-1">Try adjusting your filters or search terms</p>
+                  <p className="text-sm font-semibold text-foreground">No users found</p>
+                  <p className="text-xs text-muted-foreground mt-1">Try adjusting your filters or search terms</p>
                 </TableCell>
               </TableRow>
             ) : (
@@ -228,7 +228,7 @@ export function UserTable({
                 return (
                   <TableRow
                     key={user.id}
-                    className={`border-b border-slate-100 dark:border-slate-800/80 hover:bg-slate-50/60 dark:hover:bg-slate-800/40 transition-colors cursor-pointer ${
+                    className={`border-b  hover:bg-muted dark:hover:bg-slate-800/40 transition-colors cursor-pointer ${
                       isSelected ? "bg-blue-50/30 dark:bg-blue-950/20" : ""
                     }`}
                     onClick={() => onUserClick(user)}
@@ -240,12 +240,12 @@ export function UserTable({
                         checked={isSelected}
                         onChange={() => handleToggleRow(user.id)}
                         aria-label={`Select ${user.name}`}
-                        className="rounded border-slate-300 text-blue-600 focus:ring-blue-500 size-3.5"
+                        className="rounded  text-blue-600 focus:ring-blue-500 size-3.5"
                       />
                     </TableCell>
 
                     {/* Row # */}
-                    <TableCell className="w-12 py-3 text-xs font-semibold text-slate-400">
+                    <TableCell className="w-12 py-3 text-xs font-semibold text-muted-foreground">
                       {rowNum}
                     </TableCell>
 
@@ -257,14 +257,14 @@ export function UserTable({
                         >
                           {initials}
                         </div>
-                        <span className="font-semibold text-xs text-slate-900 dark:text-slate-100 truncate max-w-[160px]">
+                        <span className="font-semibold text-xs text-foreground truncate max-w-[160px]">
                           {user.name}
                         </span>
                       </div>
                     </TableCell>
 
                     {/* Email */}
-                    <TableCell className="py-3 text-xs text-slate-500 dark:text-slate-400 font-normal">
+                    <TableCell className="py-3 text-xs text-muted-foreground font-normal">
                       {user.email}
                     </TableCell>
 
@@ -280,8 +280,8 @@ export function UserTable({
 
                     {/* School */}
                     <TableCell className="py-3">
-                      <div className="flex items-center gap-1.5 text-slate-700 dark:text-slate-300 text-xs font-medium">
-                        <Building2 className="size-3.5 text-slate-400 shrink-0" />
+                      <div className="flex items-center gap-1.5 text-foreground text-xs font-medium">
+                        <Building2 className="size-3.5 text-muted-foreground shrink-0" />
                         <span className="truncate max-w-[160px]">
                           {user.tenant?.name || "–"}
                         </span>
@@ -304,7 +304,7 @@ export function UserTable({
                     </TableCell>
 
                     {/* Joined */}
-                    <TableCell className="py-3 text-xs text-slate-500 dark:text-slate-400 whitespace-nowrap">
+                    <TableCell className="py-3 text-xs text-muted-foreground whitespace-nowrap">
                       {formatDate(user.createdAt)}
                     </TableCell>
 
@@ -314,12 +314,12 @@ export function UserTable({
                         <DropdownMenuTrigger asChild>
                           <button
                             type="button"
-                            className="text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 font-bold px-1.5 py-0.5 rounded transition-colors cursor-pointer"
+                            className="text-muted-foreground hover:text-foreground dark:hover:text-muted-foreground font-bold px-1.5 py-0.5 rounded transition-colors cursor-pointer"
                           >
                             •••
                           </button>
                         </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end" className="w-44 rounded-xl shadow-lg border-slate-200 dark:border-slate-800 text-xs">
+                        <DropdownMenuContent align="end" className="w-44 rounded-xl shadow-lg  text-xs">
                           <DropdownMenuItem
                             onClick={() => onUserClick(user)}
                             className="text-xs font-medium gap-2 cursor-pointer"
@@ -363,9 +363,9 @@ export function UserTable({
       </div>
 
       {/* Pagination Footer matching styling */}
-      <div className="flex items-center justify-between gap-2 px-3 sm:px-6 py-2.5 sm:py-3.5 border-t border-slate-100 dark:border-slate-800 bg-card">
+      <div className="flex items-center justify-between gap-2 px-3 sm:px-6 py-2.5 sm:py-3.5 border-t  bg-card">
         {/* Rows Per Page */}
-        <div className="flex items-center gap-1.5 sm:gap-2 text-xs text-slate-500 dark:text-slate-400 font-medium shrink-0">
+        <div className="flex items-center gap-1.5 sm:gap-2 text-xs text-muted-foreground font-medium shrink-0">
           <span className="hidden sm:inline">Rows per page</span>
           <span className="sm:hidden text-[11px]">Rows:</span>
           {onPageSizeChange ? (
@@ -373,10 +373,10 @@ export function UserTable({
               value={String(pageSize)}
               onValueChange={(v) => onPageSizeChange(Number(v))}
             >
-              <SelectTrigger className="h-7 w-14 sm:w-16 rounded-lg border-slate-200 dark:border-slate-800 text-xs font-semibold bg-background px-2">
+              <SelectTrigger className="h-7 w-14 sm:w-16 rounded-lg  text-xs font-semibold bg-background px-2">
                 <SelectValue />
               </SelectTrigger>
-              <SelectContent className="rounded-xl border-slate-200 dark:border-slate-800 text-xs">
+              <SelectContent className="rounded-xl  text-xs">
                 <SelectItem value="10" className="text-xs">10</SelectItem>
                 <SelectItem value="25" className="text-xs">25</SelectItem>
                 <SelectItem value="50" className="text-xs">50</SelectItem>
@@ -384,7 +384,7 @@ export function UserTable({
               </SelectContent>
             </Select>
           ) : (
-            <span className="font-semibold text-slate-800 dark:text-slate-200">{pageSize}</span>
+            <span className="font-semibold text-foreground">{pageSize}</span>
           )}
         </div>
 
@@ -396,7 +396,7 @@ export function UserTable({
               size="icon"
               disabled={currentPage <= 1}
               onClick={() => onPageChange(currentPage - 1)}
-              className="size-7 rounded-lg text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 disabled:opacity-30"
+              className="size-7 rounded-lg text-muted-foreground hover:bg-accent disabled:opacity-30"
             >
               <ChevronLeft className="size-3.5" />
             </Button>
@@ -406,7 +406,7 @@ export function UserTable({
                 return (
                   <span
                     key={`ellipsis-${idx}`}
-                    className="size-6 sm:size-7 flex items-center justify-center text-xs text-slate-400"
+                    className="size-6 sm:size-7 flex items-center justify-center text-xs text-muted-foreground"
                   >
                     …
                   </span>
@@ -425,8 +425,8 @@ export function UserTable({
                     isActive
                       ? "bg-blue-600 text-white shadow-2xs"
                       : isSibling
-                      ? "hidden sm:inline-flex items-center justify-center text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800"
-                      : "text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800"
+                      ? "hidden sm:inline-flex items-center justify-center text-foreground hover:bg-accent"
+                      : "text-foreground hover:bg-accent"
                   }`}
                 >
                   {pageNum}
@@ -439,7 +439,7 @@ export function UserTable({
               size="icon"
               disabled={currentPage >= totalPages}
               onClick={() => onPageChange(currentPage + 1)}
-              className="size-7 rounded-lg text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 disabled:opacity-30"
+              className="size-7 rounded-lg text-muted-foreground hover:bg-accent disabled:opacity-30"
             >
               <ChevronRight className="size-3.5" />
             </Button>

@@ -127,7 +127,7 @@ export function BulkAttendanceDateRangeTab({
         
         {/* Form Entry Column */}
         <div className="lg:col-span-1 flex flex-col min-h-0">
-          <Card className="rounded-xl border border-slate-200/80 dark:border-slate-800/80 shadow-2xs bg-card flex-1 flex flex-col h-full min-h-0 overflow-hidden">
+          <Card className="rounded-xl border  shadow-2xs bg-card flex-1 flex flex-col h-full min-h-0 overflow-hidden">
             <CardHeader className="p-4 pb-3 border-b border-border/40 shrink-0">
               <CardTitle className="text-sm font-semibold flex items-center gap-2">
                 <CalendarDays className="size-4 text-teal-600 dark:text-teal-400" /> Range Configurations
@@ -189,7 +189,7 @@ export function BulkAttendanceDateRangeTab({
                           setSelectedStudent(null);
                         }
                       }}
-                      className="w-full h-8.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-background px-3 py-1 text-xs shadow-2xs focus:outline-none focus:ring-1 focus:ring-teal-500 cursor-pointer text-foreground"
+                      className="w-full h-8.5 rounded-xl border  bg-background px-3 py-1 text-xs shadow-2xs focus:outline-none focus:ring-1 focus:ring-teal-500 cursor-pointer text-foreground"
                     >
                       <option value="all">All Classes ({uniqueClasses.length})</option>
                       {uniqueClasses.map((cls) => (
@@ -209,7 +209,7 @@ export function BulkAttendanceDateRangeTab({
                           variant="outline" 
                           role="combobox"
                           aria-expanded={studentPopoverOpen}
-                          className="w-full justify-between cursor-pointer h-8.5 rounded-xl bg-background border-slate-200 dark:border-slate-800 text-left text-xs shadow-2xs"
+                          className="w-full justify-between cursor-pointer h-8.5 rounded-xl bg-background  text-left text-xs shadow-2xs"
                         >
                           <span className="flex items-center gap-2 truncate">
                             <User className="size-3.5 text-muted-foreground shrink-0" />
@@ -218,7 +218,7 @@ export function BulkAttendanceDateRangeTab({
                           <ChevronsUpDown className="ml-2 h-3.5 w-3.5 shrink-0 opacity-50" />
                         </Button>
                       </PopoverTrigger>
-                      <PopoverContent className="w-full max-w-[320px] p-0 border border-slate-200 dark:border-slate-800 bg-card shadow-xl rounded-xl" align="start" side="bottom" sideOffset={4}>
+                      <PopoverContent className="w-full max-w-[320px] p-0 border  bg-card shadow-xl rounded-xl" align="start" side="bottom" sideOffset={4}>
                         <div className="flex items-center border-b px-3 border-border">
                           <Search className="mr-2 h-3.5 w-3.5 shrink-0 opacity-50" />
                           <Input 
@@ -246,7 +246,7 @@ export function BulkAttendanceDateRangeTab({
                                     setStudentPopoverOpen(false);
                                     setStudentSearchQuery("");
                                   }}
-                                  className="flex items-center justify-between w-full text-left px-2.5 py-1.5 text-xs hover:bg-slate-100 dark:hover:bg-slate-800/60 rounded-lg transition-colors cursor-pointer group"
+                                  className="flex items-center justify-between w-full text-left px-2.5 py-1.5 text-xs hover:bg-accent/60 rounded-lg transition-colors cursor-pointer group"
                                 >
                                   <div className="flex items-center gap-2 min-w-0 pr-2">
                                     <div className={`size-6 rounded-full flex items-center justify-center text-[10px] font-semibold shrink-0 ${avatarColor}`}>
@@ -282,7 +282,7 @@ export function BulkAttendanceDateRangeTab({
                     onChange={(d) => setStartDate(formatDateToString(d))}
                     placeholder="Select start date"
                     className={cn(
-                      "w-full bg-background border-slate-200 dark:border-slate-800 h-8.5 rounded-xl text-xs shadow-2xs transition-colors",
+                      "w-full bg-background  h-8.5 rounded-xl text-xs shadow-2xs transition-colors",
                       isRangeTooLarge && "border-rose-500/80 text-rose-600 dark:text-rose-400 focus:border-rose-500 focus:ring-rose-500/20 bg-rose-500/5"
                     )}
                   />
@@ -294,7 +294,7 @@ export function BulkAttendanceDateRangeTab({
                     onChange={(d) => setEndDate(formatDateToString(d))}
                     placeholder="Select end date"
                     className={cn(
-                      "w-full bg-background border-slate-200 dark:border-slate-800 h-8.5 rounded-xl text-xs shadow-2xs transition-colors",
+                      "w-full bg-background  h-8.5 rounded-xl text-xs shadow-2xs transition-colors",
                       isRangeTooLarge && "border-rose-500/80 text-rose-600 dark:text-rose-400 focus:border-rose-500 focus:ring-rose-500/20 bg-rose-500/5"
                     )}
                   />
@@ -333,7 +333,7 @@ export function BulkAttendanceDateRangeTab({
                         className={`flex flex-col items-center py-1.5 px-1 rounded-xl border text-xs font-medium cursor-pointer transition-all duration-150 ${
                           isChecked 
                             ? "border-teal-500/40 bg-teal-50 dark:bg-teal-950/30 text-teal-700 dark:text-teal-300 font-semibold shadow-2xs" 
-                            : "border-slate-200 dark:border-slate-800 bg-background text-muted-foreground hover:bg-slate-50 dark:hover:bg-slate-900"
+                            : " bg-background text-muted-foreground hover:bg-accent"
                         }`}
                       >
                         <span>{day.label}</span>
@@ -355,7 +355,7 @@ export function BulkAttendanceDateRangeTab({
                     id="range-status"
                     value={rangeStatus}
                     onChange={e => setRangeStatus(e.target.value)}
-                    className="w-full h-8.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-background px-3 py-1 text-xs shadow-2xs focus:outline-none focus:ring-1 focus:ring-teal-500 cursor-pointer text-foreground"
+                    className="w-full h-8.5 rounded-xl border  bg-background px-3 py-1 text-xs shadow-2xs focus:outline-none focus:ring-1 focus:ring-teal-500 cursor-pointer text-foreground"
                   >
                     <option value="present">Present</option>
                     <option value="absent">Absent</option>
@@ -368,7 +368,7 @@ export function BulkAttendanceDateRangeTab({
                     placeholder="e.g. Public Holiday" 
                     value={rangeRemarks}
                     onChange={e => setRangeRemarks(e.target.value)}
-                    className="w-full bg-background border-slate-200 dark:border-slate-800 h-8.5 rounded-xl text-xs shadow-2xs"
+                    className="w-full bg-background  h-8.5 rounded-xl text-xs shadow-2xs"
                   />
                 </div>
               </div>
@@ -392,7 +392,7 @@ export function BulkAttendanceDateRangeTab({
                 </Button>
 
                 {showProgress && generatingRange && (
-                  <div className="mt-2.5 space-y-1.5 p-3 border border-slate-200 dark:border-slate-800 bg-slate-50/60 dark:bg-slate-900/40 rounded-xl">
+                  <div className="mt-2.5 space-y-1.5 p-3 border  bg-muted rounded-xl">
                     <div className="flex justify-between text-xs font-semibold text-teal-600 dark:text-teal-400">
                       <span className="flex items-center gap-1.5"><RefreshCw className="size-3 animate-spin" /> Batch Processing...</span>
                       <span>{Math.round(progress)}%</span>
@@ -412,7 +412,7 @@ export function BulkAttendanceDateRangeTab({
 
         {/* Preview Timeline Grid Column */}
         <div className="lg:col-span-2 flex flex-col min-h-0">
-          <Card className="rounded-xl border border-slate-200/80 dark:border-slate-800/80 shadow-2xs bg-card flex-1 flex flex-col h-full min-h-0 overflow-hidden">
+          <Card className="rounded-xl border  shadow-2xs bg-card flex-1 flex flex-col h-full min-h-0 overflow-hidden">
             <CardHeader className="p-4 pb-3 border-b border-border/40 shrink-0">
               <CardTitle className="text-sm font-semibold flex items-center gap-2">
                 <Calendar className="size-4 text-teal-600 dark:text-teal-400" /> Active Calendar Preview
@@ -440,7 +440,7 @@ export function BulkAttendanceDateRangeTab({
                 </div>
               ) : (
                 <div className="flex-1 flex flex-col min-h-0 space-y-3.5">
-                  <div className="flex flex-wrap items-center justify-between gap-3 p-2.5 bg-slate-50 dark:bg-slate-900/50 border border-slate-200/60 dark:border-slate-800/60 rounded-xl text-xs shrink-0">
+                  <div className="flex flex-wrap items-center justify-between gap-3 p-2.5 bg-muted border  rounded-xl text-xs shrink-0">
                     <div>
                       Targeting: <span className="font-semibold text-foreground">{allStudentsMode ? `All ${students.length} students` : selectedStudent?.name}</span>
                     </div>
@@ -483,7 +483,7 @@ export function BulkAttendanceDateRangeTab({
                                 ? (overriddenStatuses[item.dateStr] || rangeStatus) === "present"
                                   ? "border-emerald-500/20 bg-emerald-50/40 dark:bg-emerald-950/10 hover:bg-emerald-50/80 cursor-pointer shadow-2xs"
                                   : "border-rose-500/20 bg-rose-50/40 dark:bg-rose-950/10 hover:bg-rose-50/80 cursor-pointer shadow-2xs"
-                                : "border-slate-200 dark:border-slate-800/60 bg-slate-50/50 dark:bg-slate-900/20 text-muted-foreground line-through opacity-40"
+                                : " bg-muted text-muted-foreground line-through opacity-40"
                             }`}
                           >
                             {item.isValid && (
@@ -548,12 +548,12 @@ export function BulkAttendanceDateRangeTab({
                       element.scrollTo({ top: element.scrollHeight, behavior: 'smooth' });
                     }
                   }}
-                  className="absolute bottom-4 right-4 z-30 size-9 rounded-full bg-background border border-slate-200 dark:border-slate-800 shadow-md flex items-center justify-center cursor-pointer transition-all shrink-0 group hover:shadow-lg"
+                  className="absolute bottom-4 right-4 z-30 size-9 rounded-full bg-background border  shadow-md flex items-center justify-center cursor-pointer transition-all shrink-0 group hover:shadow-lg"
                   title={isScrolledToBottom ? "Scroll to Top" : "Scroll to Bottom"}
                 >
                   <svg className="absolute inset-0 size-9 -rotate-90">
                     <circle
-                      className="text-slate-100 dark:text-slate-800"
+                      className="text-muted-foreground"
                       strokeWidth="2"
                       stroke="currentColor"
                       fill="transparent"

@@ -33,7 +33,7 @@ export function WorkingDaysSettingsCard({
                   ${
                     isSelected
                       ? "border-emerald-500 bg-emerald-50/30 dark:bg-emerald-950/10"
-                      : "border-zinc-200 dark:border-zinc-800 hover:bg-zinc-50 dark:hover:bg-zinc-900/30"
+                      : " hover:bg-accent/30"
                   }
                   ${isLastSelected && !isSelected ? "opacity-50 pointer-events-none" : ""}
                 `}
@@ -44,7 +44,7 @@ export function WorkingDaysSettingsCard({
                   disabled={isLastSelected && isSelected}
                   className="size-3.5"
                 />
-                <span className="text-[11px] sm:text-sm font-medium text-zinc-700 dark:text-zinc-300 truncate">
+                <span className="text-[11px] sm:text-sm font-medium text-foreground truncate">
                   {day.label}
                 </span>
               </label>

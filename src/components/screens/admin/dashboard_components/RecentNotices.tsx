@@ -6,7 +6,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "@/components/ui/badge";
 
 const priorityColors: Record<string, string> = {
-  normal: "bg-zinc-100 text-zinc-700 dark:bg-zinc-800 dark:text-zinc-300",
+  normal: "bg-muted text-foreground",
   important:
     "bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400",
   urgent: "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400",
@@ -47,7 +47,7 @@ export function RecentNotices({ isLoading, data }: RecentNoticesProps) {
               <p className="text-sm text-muted-foreground text-center py-8">No notices yet</p>
             ) : (
               (data ?? []).map((notice) => (
-                <div key={notice.id} className={`p-3 rounded-lg border border-l-4 ${priorityBorders[notice.priority] || priorityBorders.normal} bg-white dark:bg-zinc-900 hover:shadow-sm transition-shadow`}>
+                <div key={notice.id} className={`p-3 rounded-lg border border-l-4 ${priorityBorders[notice.priority] || priorityBorders.normal} bg-card hover:shadow-sm transition-shadow`}>
                   <div className="flex items-start justify-between gap-2">
                     <div className="min-w-0 flex-1">
                       <p className="text-sm font-medium truncate">{notice.title}</p>

@@ -50,7 +50,7 @@ export function TeacherMyAttendance() {
   return (
     <div className="space-y-5">
       {/* ── 1. Page Title ── */}
-      <h2 className="text-xl sm:text-2xl lg:text-3xl font-extrabold tracking-tight text-slate-900 dark:text-zinc-100">
+      <h2 className="text-xl sm:text-2xl lg:text-3xl font-extrabold tracking-tight text-foreground">
         My <span className="text-blue-600 dark:text-blue-400">Attendance</span>
       </h2>
 

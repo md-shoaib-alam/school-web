@@ -60,14 +60,14 @@ export function TenantFilters({
   }, [localSearch]);
 
   const renderViewModeToggle = (extraClass = "") => (
-    <div className={`items-center bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 p-0.5 rounded-xl h-9 shadow-2xs shrink-0 ${extraClass}`}>
+    <div className={`items-center bg-card border  p-0.5 rounded-xl h-9 shadow-2xs shrink-0 ${extraClass}`}>
       <Button
         variant="ghost"
         size="icon"
         className={`size-7.5 rounded-lg transition-colors ${
           viewMode === "grid"
             ? "bg-blue-50 text-blue-600 dark:bg-blue-950/60 dark:text-blue-400 font-semibold"
-            : "text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
+            : "text-muted-foreground hover:text-foreground dark:hover:text-muted-foreground"
         }`}
         onClick={() => onViewModeChange("grid")}
         title="Grid View"
@@ -80,7 +80,7 @@ export function TenantFilters({
         className={`size-7.5 rounded-lg transition-colors ${
           viewMode === "table"
             ? "bg-blue-50 text-blue-600 dark:bg-blue-950/60 dark:text-blue-400 font-semibold"
-            : "text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
+            : "text-muted-foreground hover:text-foreground dark:hover:text-muted-foreground"
         }`}
         onClick={() => onViewModeChange("table")}
         title="List View"
@@ -98,7 +98,7 @@ export function TenantFilters({
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-3.5 text-muted-foreground/70" />
           <Input
             placeholder="Search schools..."
-            className="pl-9 h-9 bg-white dark:bg-slate-900 border-slate-200/90 dark:border-slate-800 rounded-xl text-xs placeholder:text-slate-400 shadow-2xs focus-visible:ring-1 focus-visible:ring-blue-500"
+            className="pl-9 h-9 bg-card  rounded-xl text-xs placeholder:text-muted-foreground shadow-2xs focus-visible:ring-1 focus-visible:ring-blue-500"
             value={localSearch}
             onChange={(e) => setLocalSearch(e.target.value)}
           />
@@ -112,7 +112,7 @@ export function TenantFilters({
       <div className="grid grid-cols-3 md:flex md:items-center gap-1.5 sm:gap-2">
         {/* Plans Dropdown */}
         <Select value={planFilter} onValueChange={onPlanFilterChange}>
-          <SelectTrigger className="w-full md:w-[125px] h-9 rounded-xl bg-white dark:bg-slate-900 border-slate-200/90 dark:border-slate-800 text-[11px] sm:text-xs font-medium text-slate-700 dark:text-slate-300 shadow-2xs px-2 sm:px-3 truncate">
+          <SelectTrigger className="w-full md:w-[125px] h-9 rounded-xl bg-card  text-[11px] sm:text-xs font-medium text-foreground shadow-2xs px-2 sm:px-3 truncate">
             <SelectValue placeholder="All Plans" />
           </SelectTrigger>
           <SelectContent className="rounded-xl text-xs">
@@ -127,7 +127,7 @@ export function TenantFilters({
 
         {/* Status Dropdown */}
         <Select value={statusFilter} onValueChange={onStatusFilterChange}>
-          <SelectTrigger className="w-full md:w-[125px] h-9 rounded-xl bg-white dark:bg-slate-900 border-slate-200/90 dark:border-slate-800 text-[11px] sm:text-xs font-medium text-slate-700 dark:text-slate-300 shadow-2xs px-2 sm:px-3 truncate">
+          <SelectTrigger className="w-full md:w-[125px] h-9 rounded-xl bg-card  text-[11px] sm:text-xs font-medium text-foreground shadow-2xs px-2 sm:px-3 truncate">
             <SelectValue placeholder="All Status" />
           </SelectTrigger>
           <SelectContent className="rounded-xl text-xs">
@@ -141,8 +141,8 @@ export function TenantFilters({
 
         {/* Sort Dropdown */}
         <Select value={sortBy} onValueChange={onSortChange || (() => {})}>
-          <SelectTrigger className="w-full md:w-[145px] h-9 rounded-xl bg-white dark:bg-slate-900 border-slate-200/90 dark:border-slate-800 text-[11px] sm:text-xs font-medium text-slate-700 dark:text-slate-300 shadow-2xs px-2 sm:px-3 truncate">
-            <span className="hidden sm:inline text-slate-400 mr-1 text-[11px]">Sort:</span>
+          <SelectTrigger className="w-full md:w-[145px] h-9 rounded-xl bg-card  text-[11px] sm:text-xs font-medium text-foreground shadow-2xs px-2 sm:px-3 truncate">
+            <span className="hidden sm:inline text-muted-foreground mr-1 text-[11px]">Sort:</span>
             <SelectValue />
           </SelectTrigger>
           <SelectContent className="rounded-xl text-xs">

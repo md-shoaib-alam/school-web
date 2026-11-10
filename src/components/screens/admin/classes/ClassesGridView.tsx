@@ -71,7 +71,7 @@ export function ClassesGridView({
                     {/* Class name and grade badge */}
                     <div className="flex items-start justify-between mb-4">
                       <div className="space-y-1">
-                        <h3 className="text-lg font-semibold text-zinc-900 dark:text-zinc-100">
+                        <h3 className="text-lg font-semibold text-foreground">
                           {cls.name}
                         </h3>
                         <Badge variant="secondary" className="text-[10px] font-bold uppercase tracking-widest px-2 py-0">
@@ -85,16 +85,16 @@ export function ClassesGridView({
                       <div className="flex items-center justify-between text-sm">
                         <div className="flex items-center gap-2">
                           <Users className="size-4 text-emerald-500" />
-                          <span className="text-zinc-500 font-medium text-xs">Students</span>
+                          <span className="text-muted-foreground font-medium text-xs">Students</span>
                         </div>
-                        <span className="font-bold">{cls.studentCount}<span className="text-zinc-400 font-normal ml-0.5">/{cls.capacity}</span></span>
+                        <span className="font-bold">{cls.studentCount}<span className="text-muted-foreground font-normal ml-0.5">/{cls.capacity}</span></span>
                       </div>
                       <div className="flex items-center justify-between text-sm">
                         <div className="flex items-center gap-2">
                           <UserCheck className="size-4 text-blue-500" />
-                          <span className="text-zinc-500 font-medium text-xs">Teacher</span>
+                          <span className="text-muted-foreground font-medium text-xs">Teacher</span>
                         </div>
-                        <span className="text-zinc-700 dark:text-zinc-300 font-semibold truncate max-w-[120px]">
+                        <span className="text-foreground font-semibold truncate max-w-[120px]">
                           {cls.classTeacher || 'Unassigned'}
                         </span>
                       </div>
@@ -102,7 +102,7 @@ export function ClassesGridView({
 
                     {/* Progress bar */}
                     <div className="space-y-2 mb-6">
-                      <div className="flex items-center justify-between text-[10px] uppercase font-black tracking-tighter text-zinc-400">
+                      <div className="flex items-center justify-between text-[10px] uppercase font-black tracking-tighter text-muted-foreground">
                         <span>Capacity</span>
                         <span className={percentage >= 90 ? "text-red-500" : "text-emerald-500"}>{percentage}% Full</span>
                       </div>

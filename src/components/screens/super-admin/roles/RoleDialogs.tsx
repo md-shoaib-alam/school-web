@@ -117,7 +117,7 @@ export function RoleDialogs({
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
         <DialogContent 
           showCloseButton={false}
-          className="w-[calc(100%-1.5rem)] sm:w-full sm:max-w-4xl max-h-[94vh] sm:max-h-[90vh] flex flex-col p-0 border border-slate-200 dark:border-slate-800 bg-card rounded-2xl sm:rounded-3xl shadow-2xl overflow-hidden"
+          className="w-[calc(100%-1.5rem)] sm:w-full sm:max-w-4xl max-h-[94vh] sm:max-h-[90vh] flex flex-col p-0 border  bg-card rounded-2xl sm:rounded-3xl shadow-2xl overflow-hidden"
         >
           {/* Header */}
           <div className="flex items-start justify-between p-4 sm:p-6 pb-3 sm:pb-4 border-b border-border/80 shrink-0">
@@ -340,7 +340,7 @@ export function RoleDialogs({
                                       "size-5 rounded-md border flex items-center justify-center transition-all cursor-pointer",
                                       checked
                                         ? "bg-blue-600 border-blue-600 text-white shadow-2xs"
-                                        : "border-slate-300 dark:border-slate-700 bg-card hover:bg-muted/50"
+                                        : " bg-card hover:bg-muted/50"
                                     )}
                                   >
                                     {checked && <Check className="size-3.5 stroke-[3]" />}
@@ -407,7 +407,7 @@ export function RoleDialogs({
                                   <span className="capitalize">{action}</span>
                                   <div className={cn(
                                     "size-4 rounded flex items-center justify-center border",
-                                    checked ? "bg-blue-600 border-blue-600 text-white" : "border-slate-300 dark:border-slate-700"
+                                    checked ? "bg-blue-600 border-blue-600 text-white" : ""
                                   )}>
                                     {checked && <Check className="size-3 stroke-[3]" />}
                                   </div>
@@ -426,7 +426,7 @@ export function RoleDialogs({
           </div>
 
           {/* Footer with Tip & Action Buttons */}
-          <div className="p-3.5 sm:p-5 bg-slate-50/70 dark:bg-slate-900/50 border-t border-border flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 shrink-0">
+          <div className="p-3.5 sm:p-5 bg-muted border-t border-border flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 shrink-0">
             {/* Left Tip */}
             <div className="flex items-center gap-2 text-xs text-muted-foreground">
               <div className="size-6 rounded-full bg-blue-100/70 dark:bg-blue-900/40 text-blue-600 dark:text-blue-400 flex items-center justify-center shrink-0">

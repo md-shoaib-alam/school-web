@@ -34,7 +34,7 @@ export function MyClassesOverview({ classes, onViewAll }: MyClassesOverviewProps
             <button
               key={cls.id}
               type="button"
-              className="w-full text-left bg-transparent p-4 rounded-xl border border-zinc-100 dark:border-zinc-800 hover:border-blue-200 dark:hover:border-blue-800 hover:shadow-sm transition-all cursor-pointer"
+              className="w-full text-left bg-transparent p-4 rounded-xl border  hover:border-blue-200 dark:hover:border-blue-800 hover:shadow-sm transition-all cursor-pointer"
               onClick={onViewAll}
               tabIndex={0}
               onKeyDown={(e) => {
@@ -49,20 +49,20 @@ export function MyClassesOverview({ classes, onViewAll }: MyClassesOverviewProps
                   <School className="size-5 text-blue-500" />
                 </div>
                 <div>
-                  <p className="text-sm font-semibold text-zinc-800 dark:text-zinc-200">
+                  <p className="text-sm font-semibold text-foreground">
                     {cls.name}
                   </p>
-                  <p className="text-xs text-zinc-400 dark:text-zinc-500">
+                  <p className="text-xs text-muted-foreground">
                     Section {cls.section}
                   </p>
                 </div>
               </div>
               <div className="mt-3 flex items-center justify-between">
-                <span className="text-xs text-zinc-400 dark:text-zinc-500">
+                <span className="text-xs text-muted-foreground">
                   <Users className="size-3 inline mr-1" />
                   {cls.studentCount} Students
                 </span>
-                <ArrowRight className="size-3.5 text-zinc-300 dark:text-zinc-600" />
+                <ArrowRight className="size-3.5 text-muted-foreground" />
               </div>
             </button>
           ))}

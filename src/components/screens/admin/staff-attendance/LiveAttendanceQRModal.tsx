@@ -285,7 +285,7 @@ export function LiveAttendanceQRModal({
       <DialogContent
         showCloseButton={false}
         className={cn(
-          'p-0 overflow-hidden border border-slate-200 dark:border-zinc-800 shadow-2xl bg-white dark:bg-zinc-950 transition-[width,height,max-width,max-height,border-radius] duration-300 ease-out',
+          'p-0 overflow-hidden border  shadow-2xl bg-card transition-[width,height,max-width,max-height,border-radius] duration-300 ease-out',
           isFullscreen
             ? '!fixed !z-50 !w-screen !h-screen !max-w-none !max-h-none !rounded-none flex flex-col justify-between overflow-y-auto'
             : 'sm:max-w-md md:max-w-lg max-h-[92vh] flex flex-col rounded-3xl'
@@ -344,7 +344,7 @@ export function LiveAttendanceQRModal({
         <div className="flex-1 overflow-y-auto p-3.5 sm:p-5 space-y-3 sm:space-y-3.5">
           <div className="flex flex-col items-center justify-center text-center">
             {/* QR Card Container */}
-            <div className="relative p-3 sm:p-4 rounded-2xl sm:rounded-3xl bg-slate-50 dark:bg-zinc-900 border-2 border-slate-200 dark:border-zinc-800 shadow-inner flex flex-col items-center justify-center">
+            <div className="relative p-3 sm:p-4 rounded-2xl sm:rounded-3xl bg-muted border-2  shadow-inner flex flex-col items-center justify-center">
               {/* Corner Accents */}
               <div className="absolute top-2 left-2 size-3.5 border-t-2 border-l-2 border-blue-600 dark:border-blue-400 rounded-tl-lg pointer-events-none" />
               <div className="absolute top-2 right-2 size-3.5 border-t-2 border-r-2 border-blue-600 dark:border-blue-400 rounded-tr-lg pointer-events-none" />
@@ -361,7 +361,7 @@ export function LiveAttendanceQRModal({
                 )}
               >
                 {loading && !qrSvg ? (
-                  <div className="flex flex-col items-center gap-2 text-slate-400">
+                  <div className="flex flex-col items-center gap-2 text-muted-foreground">
                     <RotateCw className="size-7 animate-spin text-blue-600" />
                     <span className="text-xs font-semibold">Generating Token...</span>
                   </div>
@@ -378,7 +378,7 @@ export function LiveAttendanceQRModal({
                 <div className="relative size-5 shrink-0">
                   <svg className="size-full -rotate-90" viewBox="0 0 36 36">
                     <path
-                      className="text-slate-200 dark:text-zinc-700"
+                      className="text-muted-foreground"
                       strokeWidth="4"
                       stroke="currentColor"
                       fill="none"
@@ -395,24 +395,24 @@ export function LiveAttendanceQRModal({
                     />
                   </svg>
                 </div>
-                <span className="text-xs font-bold text-slate-700 dark:text-zinc-300">
+                <span className="text-xs font-bold text-foreground">
                   Auto-rotates in <strong className="text-blue-600 dark:text-blue-400">{secondsLeft}s</strong>
                 </span>
               </div>
             </div>
 
             {/* 6-Digit Manual Backup Code */}
-            <div className="mt-2.5 flex items-center gap-2 p-1.5 px-3 rounded-xl bg-slate-100 dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800">
-              <span className="text-xs font-medium text-slate-500 dark:text-zinc-400">
+            <div className="mt-2.5 flex items-center gap-2 p-1.5 px-3 rounded-xl bg-muted border ">
+              <span className="text-xs font-medium text-muted-foreground">
                 Backup Code:
               </span>
-              <span className="font-mono text-sm sm:text-base font-extrabold tracking-widest text-slate-900 dark:text-zinc-100">
+              <span className="font-mono text-sm sm:text-base font-extrabold tracking-widest text-foreground">
                 {code ? `${code.slice(0, 3)} ${code.slice(3)}` : '------'}
               </span>
               <button
                 type="button"
                 onClick={handleCopyCode}
-                className="size-6 sm:size-7 rounded-lg hover:bg-slate-200 dark:hover:bg-zinc-800 flex items-center justify-center text-slate-500 transition-colors"
+                className="size-6 sm:size-7 rounded-lg hover:bg-muted flex items-center justify-center text-muted-foreground transition-colors"
                 title="Copy code"
               >
                 {copiedCode ? <Check className="size-3.5 text-emerald-600" /> : <Copy className="size-3.5" />}
@@ -422,23 +422,23 @@ export function LiveAttendanceQRModal({
 
           {/* Real-time Scan Feed */}
           {recentScans.length > 0 && (
-            <div className="rounded-2xl border border-slate-200/80 dark:border-zinc-800 p-2.5 bg-slate-50/50 dark:bg-zinc-900/40">
-              <div className="flex items-center justify-between pb-1.5 mb-1.5 border-b border-slate-200/60 dark:border-zinc-800">
-                <div className="flex items-center gap-1.5 text-xs font-bold text-slate-800 dark:text-zinc-200">
+            <div className="rounded-2xl border  p-2.5 bg-muted">
+              <div className="flex items-center justify-between pb-1.5 mb-1.5 border-b ">
+                <div className="flex items-center gap-1.5 text-xs font-bold text-foreground">
                   <Sparkles className="size-3.5 text-amber-500" />
                   <span>Recent Live Scans</span>
                 </div>
-                <span className="text-[10px] text-slate-400 dark:text-zinc-500">Live Feed</span>
+                <span className="text-[10px] text-muted-foreground">Live Feed</span>
               </div>
               <div className="space-y-1.5 max-h-20 overflow-y-auto">
                 {recentScans.slice(0, 3).map((item, i) => (
                   <div
                     key={`${item.userId}-${item.timestamp}-${i}`}
-                    className="flex items-center justify-between text-xs py-1 px-2 rounded-lg bg-white dark:bg-zinc-900 border border-slate-100 dark:border-zinc-800 shadow-2xs"
+                    className="flex items-center justify-between text-xs py-1 px-2 rounded-lg bg-card border  shadow-2xs"
                   >
                     <div className="flex items-center gap-1.5 truncate">
                       <CheckCircle2 className="size-3.5 text-emerald-500 shrink-0" />
-                      <span className="font-semibold text-slate-800 dark:text-zinc-200 truncate">
+                      <span className="font-semibold text-foreground truncate">
                         {item.userName}
                       </span>
                     </div>
@@ -452,8 +452,8 @@ export function LiveAttendanceQRModal({
           )}
 
           {/* Action Footer */}
-          <div className="flex items-center justify-between pt-1 border-t border-slate-100 dark:border-zinc-800/80">
-            <div className="flex items-center gap-1.5 text-xs text-slate-500 dark:text-zinc-400">
+          <div className="flex items-center justify-between pt-1 border-t ">
+            <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
               <span className="size-2 rounded-full bg-emerald-500 animate-pulse" />
               <span className="font-medium">Live session active</span>
             </div>

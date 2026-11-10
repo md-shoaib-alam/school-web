@@ -24,10 +24,10 @@ export function TimetableSummary({
             <Calendar className="size-5" />
           </div>
           <div>
-            <p className="text-sm font-medium text-zinc-900 dark:text-zinc-100">
+            <p className="text-sm font-medium text-foreground">
               {todayKey ? DAY_FULL_LABELS[todayKey] : "Weekend"}
             </p>
-            <p className="text-xs text-zinc-500 dark:text-zinc-400" suppressHydrationWarning>
+            <p className="text-xs text-muted-foreground" suppressHydrationWarning>
               {todayDateString}
             </p>
           </div>
@@ -40,10 +40,10 @@ export function TimetableSummary({
             <BookOpen className="size-5" />
           </div>
           <div>
-            <p className="text-sm font-medium text-zinc-900 dark:text-zinc-100">
+            <p className="text-sm font-medium text-foreground">
               {todaySlots.length} Classes
             </p>
-            <p className="text-xs text-zinc-500 dark:text-zinc-400">
+            <p className="text-xs text-muted-foreground">
               Scheduled for today
             </p>
           </div>
@@ -56,14 +56,14 @@ export function TimetableSummary({
             <Clock className="size-5" />
           </div>
           <div>
-            <p className="text-sm font-medium text-zinc-900 dark:text-zinc-100">
+            <p className="text-sm font-medium text-foreground">
               {nextPeriod
                 ? `Next: ${nextPeriod.subjectName}`
                 : todaySlots.length > 0
                   ? "No more classes"
                   : "No classes today"}
             </p>
-            <p className="text-xs text-zinc-500 dark:text-zinc-400">
+            <p className="text-xs text-muted-foreground">
               {nextPeriod
                 ? `At ${formatTime(nextPeriod.startTime)}`
                 : todaySlots.length > 0

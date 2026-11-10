@@ -73,13 +73,13 @@ export function AdminTable({
     return (
       <div
         key={admin.id}
-        className="bg-white dark:bg-zinc-950 text-foreground rounded-2xl p-4 border-2 border-neutral-900 dark:border-white shadow-2xs hover:shadow-xs transition-all duration-200 flex flex-col justify-between"
+        className="bg-card text-foreground rounded-2xl p-4 border-2 border-foreground shadow-2xs hover:shadow-xs transition-all duration-200 flex flex-col justify-between"
       >
         <div>
           {/* Top Header: Circular Emblem, Title, Sub-handle, More Menu */}
           <div className="flex items-start justify-between gap-2.5">
             <div className="flex items-center gap-3 min-w-0">
-              <Avatar className="size-11 rounded-full bg-neutral-100 dark:bg-neutral-800 flex items-center justify-center shrink-0 border border-neutral-300 dark:border-neutral-700 overflow-hidden shadow-2xs">
+              <Avatar className="size-11 rounded-full bg-muted dark:bg-neutral-800 flex items-center justify-center shrink-0 border  overflow-hidden shadow-2xs">
                 <AvatarFallback className="text-xs font-bold rounded-full bg-blue-600 text-white">
                   {initials}
                 </AvatarFallback>
@@ -108,7 +108,7 @@ export function AdminTable({
                 <DropdownMenuTrigger asChild>
                   <button
                     type="button"
-                    className="text-muted-foreground hover:text-foreground p-1.5 rounded-lg hover:bg-neutral-100 dark:hover:bg-zinc-900 transition-colors cursor-pointer"
+                    className="text-muted-foreground hover:text-foreground p-1.5 rounded-lg hover:bg-accent transition-colors cursor-pointer"
                   >
                     <MoreVertical className="size-4" />
                   </button>
@@ -151,7 +151,7 @@ export function AdminTable({
 
           {/* Info Box: Email & Created info */}
           <div className="grid grid-cols-2 gap-2 mt-3.5">
-            <div className="bg-white dark:bg-zinc-950 border-2 border-neutral-900 dark:border-white rounded-xl p-2.5 flex items-center gap-2 shadow-2xs">
+            <div className="bg-card border-2 border-foreground rounded-xl p-2.5 flex items-center gap-2 shadow-2xs">
               <Mail className="size-4 text-muted-foreground shrink-0" />
               <div className="min-w-0">
                 <p className="text-xs font-bold text-foreground leading-tight truncate">
@@ -163,7 +163,7 @@ export function AdminTable({
               </div>
             </div>
 
-            <div className="bg-white dark:bg-zinc-950 border-2 border-neutral-900 dark:border-white rounded-xl p-2.5 flex items-center gap-2 shadow-2xs">
+            <div className="bg-card border-2 border-foreground rounded-xl p-2.5 flex items-center gap-2 shadow-2xs">
               <Calendar className="size-4 text-muted-foreground shrink-0" />
               <div className="min-w-0">
                 <p className="text-xs font-bold text-foreground leading-tight truncate">
@@ -182,14 +182,14 @@ export function AdminTable({
           {!isRoot ? (
             <Button
               variant="outline"
-              className="w-full h-9 rounded-xl border-2 border-neutral-900 dark:border-white bg-white dark:bg-zinc-950 hover:bg-neutral-100 dark:hover:bg-zinc-900 text-foreground font-semibold text-xs transition-colors flex items-center justify-center gap-1.5 shadow-2xs cursor-pointer"
+              className="w-full h-9 rounded-xl border-2 border-foreground bg-card hover:bg-accent text-foreground font-semibold text-xs transition-colors flex items-center justify-center gap-1.5 shadow-2xs cursor-pointer"
               onClick={() => onEdit(admin)}
             >
               <Pencil className="size-3.5" />
               <span>Edit Account</span>
             </Button>
           ) : (
-            <div className="w-full h-9 rounded-xl border-2 border-neutral-900/40 dark:border-white/40 bg-neutral-100 dark:bg-zinc-900 text-muted-foreground font-medium text-xs flex items-center justify-center gap-1.5 shadow-2xs cursor-not-allowed">
+            <div className="w-full h-9 rounded-xl border-2  dark:border-white/40 bg-muted text-muted-foreground font-medium text-xs flex items-center justify-center gap-1.5 shadow-2xs cursor-not-allowed">
               <LockKeyhole className="size-3.5" />
               <span>Protected Root Account</span>
             </div>
@@ -245,7 +245,7 @@ export function AdminTable({
             {[...Array(6)].map((_, i) => (
               <div
                 key={i}
-                className="bg-white dark:bg-zinc-950 rounded-2xl p-4 border border-border shadow-2xs space-y-3.5"
+                className="bg-card rounded-2xl p-4 border border-border shadow-2xs space-y-3.5"
               >
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
@@ -275,7 +275,7 @@ export function AdminTable({
               {[...Array(3)].map((_, i) => (
                 <div
                   key={i}
-                  className="bg-white dark:bg-zinc-950 rounded-2xl p-4 border border-border shadow-2xs space-y-3"
+                  className="bg-card rounded-2xl p-4 border border-border shadow-2xs space-y-3"
                 >
                   <div className="flex items-center gap-3">
                     <Skeleton className="size-11 rounded-full shrink-0" />

@@ -18,7 +18,7 @@ interface AssessmentsTableProps {
 
 export function AssessmentsTable({ assessmentGrades }: AssessmentsTableProps) {
   return (
-    <Card className="rounded-xl shadow-sm border-zinc-200/60 dark:border-zinc-800">
+    <Card className="rounded-xl shadow-sm ">
       <CardHeader className="pb-3">
         <CardTitle className="text-base flex items-center gap-2 font-semibold">
           <GraduationCap className="size-4 text-violet-500" />
@@ -29,7 +29,7 @@ export function AssessmentsTable({ assessmentGrades }: AssessmentsTableProps) {
         <ScrollArea className="max-h-[500px] w-full">
           <div className="min-w-[700px] sm:min-w-full pb-4">
             {assessmentGrades.length === 0 ? (
-              <div className="text-center py-12 text-zinc-400 dark:text-zinc-500 border border-dashed rounded-xl mt-2">
+              <div className="text-center py-12 text-muted-foreground border border-dashed rounded-xl mt-2">
                 <GraduationCap className="size-10 mx-auto mb-2 opacity-40" />
                 <p className="text-sm font-medium">
                   No assessment records graded yet
@@ -38,7 +38,7 @@ export function AssessmentsTable({ assessmentGrades }: AssessmentsTableProps) {
             ) : (
               <Table>
                 <TableHeader>
-                  <TableRow className="border-zinc-100 dark:border-zinc-800">
+                  <TableRow className="">
                     <TableHead className="font-semibold">
                       Assessment Title
                     </TableHead>
@@ -60,9 +60,9 @@ export function AssessmentsTable({ assessmentGrades }: AssessmentsTableProps) {
                     return (
                       <TableRow
                         key={g.id}
-                        className="border-zinc-100 dark:border-zinc-800 hover:bg-zinc-50/50 dark:hover:bg-zinc-800/30"
+                        className=" hover:bg-muted"
                       >
-                        <TableCell className="font-semibold text-zinc-900 dark:text-zinc-100">
+                        <TableCell className="font-semibold text-foreground">
                           {g.title}
                         </TableCell>
                         <TableCell className="font-medium">
@@ -71,7 +71,7 @@ export function AssessmentsTable({ assessmentGrades }: AssessmentsTableProps) {
                         <TableCell>
                           <Badge
                             variant="outline"
-                            className="text-[11px] capitalize bg-zinc-50 dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800 font-medium"
+                            className="text-[11px] capitalize bg-muted  font-medium"
                           >
                             {g.type.replace(/_/g, " ")}
                           </Badge>
@@ -79,17 +79,17 @@ export function AssessmentsTable({ assessmentGrades }: AssessmentsTableProps) {
                         <TableCell className="text-center">
                           {isGraded ? (
                             <>
-                              <span className="text-sm font-bold text-zinc-800 dark:text-zinc-100">
+                              <span className="text-sm font-bold text-foreground">
                                 {Number(g.marksObtained)
                                   .toFixed(2)
                                   .replace(/\.00$/, "")}
                               </span>
-                              <span className="text-xs text-zinc-400">
+                              <span className="text-xs text-muted-foreground">
                                 /{g.totalMarks}
                               </span>
                             </>
                           ) : (
-                            <span className="text-sm text-zinc-400 dark:text-zinc-500 font-medium">
+                            <span className="text-sm text-muted-foreground font-medium">
                               -/{g.totalMarks}
                             </span>
                           )}
@@ -113,7 +113,7 @@ export function AssessmentsTable({ assessmentGrades }: AssessmentsTableProps) {
                             </Badge>
                           )}
                         </TableCell>
-                        <TableCell className="text-xs text-zinc-500 dark:text-zinc-400 max-w-[200px] truncate font-medium">
+                        <TableCell className="text-xs text-muted-foreground max-w-[200px] truncate font-medium">
                           {g.remarks || <span className="opacity-40">-</span>}
                         </TableCell>
                       </TableRow>

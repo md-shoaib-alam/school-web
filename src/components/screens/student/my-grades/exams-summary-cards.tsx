@@ -30,10 +30,10 @@ export function ExamsSummaryCards({
           <div className="inline-flex p-2.5 rounded-xl bg-violet-600 dark:bg-violet-500 text-white mb-2 sm:mb-3">
             <TrendingUp className="size-4 sm:size-5" />
           </div>
-          <p className="text-lg sm:text-3xl font-bold text-zinc-900 dark:text-zinc-100">
+          <p className="text-lg sm:text-3xl font-bold text-foreground">
             {overallAvg}%
           </p>
-          <p className="text-[10px] sm:text-xs text-zinc-500 dark:text-zinc-400 mt-0.5 font-medium">
+          <p className="text-[10px] sm:text-xs text-muted-foreground mt-0.5 font-medium">
             Avg Score
           </p>
           <Progress value={overallAvg} className="mt-2 sm:mt-3 h-1.5" />
@@ -45,13 +45,13 @@ export function ExamsSummaryCards({
           <div className="inline-flex p-2.5 rounded-xl bg-emerald-600 dark:bg-emerald-500 text-white mb-2 sm:mb-3">
             <Award className="size-4 sm:size-5" />
           </div>
-          <p className="text-lg sm:text-3xl font-bold text-zinc-900 dark:text-zinc-100">
+          <p className="text-lg sm:text-3xl font-bold text-foreground">
             {totalRecords}
           </p>
-          <p className="text-[10px] sm:text-xs text-zinc-500 dark:text-zinc-400 mt-0.5 font-medium">
+          <p className="text-[10px] sm:text-xs text-muted-foreground mt-0.5 font-medium">
             Total Results
           </p>
-          <div className="flex items-center justify-center gap-1 mt-2 text-[10px] text-zinc-400 dark:text-zinc-500 font-medium line-clamp-1">
+          <div className="flex items-center justify-center gap-1 mt-2 text-[10px] text-muted-foreground font-medium line-clamp-1">
             <span>{uniqueSubjectsCount} Sub.</span>
           </div>
         </CardContent>
@@ -62,10 +62,10 @@ export function ExamsSummaryCards({
           <div className="inline-flex p-2.5 rounded-xl bg-amber-600 dark:bg-amber-500 text-white mb-2 sm:mb-3">
             <Star className="size-4 sm:size-5" />
           </div>
-          <p className="text-lg sm:text-3xl font-bold text-zinc-900 dark:text-zinc-100">
+          <p className="text-lg sm:text-3xl font-bold text-foreground">
             {highGradesCount}
           </p>
-          <p className="text-[10px] sm:text-xs text-zinc-500 dark:text-zinc-400 mt-0.5 font-medium">
+          <p className="text-[10px] sm:text-xs text-muted-foreground mt-0.5 font-medium">
             Top Grades
           </p>
           <div className="flex items-center justify-center gap-1 mt-2">

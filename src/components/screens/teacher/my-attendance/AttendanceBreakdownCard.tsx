@@ -24,8 +24,8 @@ export function AttendanceBreakdownCard({ metrics }: AttendanceBreakdownCardProp
   const circlePath = "M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831";
 
   return (
-    <Card className="rounded-2xl border border-slate-200/80 dark:border-zinc-800 bg-white dark:bg-zinc-950 p-4 sm:p-5 shadow-2xs space-y-3">
-      <h3 className="text-sm sm:text-base font-bold text-slate-900 dark:text-zinc-100">
+    <Card className="rounded-2xl border  bg-card p-4 sm:p-5 space-y-3">
+      <h3 className="text-sm sm:text-base font-bold text-foreground">
         Current Month Breakdown
       </h3>
 
@@ -35,7 +35,7 @@ export function AttendanceBreakdownCard({ metrics }: AttendanceBreakdownCardProp
           <svg className="size-full -rotate-90" viewBox="0 0 36 36">
             {/* Background circle */}
             <path
-              className="text-slate-100 dark:text-zinc-800"
+              className="text-muted-foreground"
               strokeWidth="3.8"
               stroke="currentColor"
               fill="none"
@@ -91,10 +91,10 @@ export function AttendanceBreakdownCard({ metrics }: AttendanceBreakdownCardProp
             )}
           </svg>
           <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
-            <span className="text-base sm:text-lg font-extrabold text-slate-900 dark:text-zinc-100">
+            <span className="text-base sm:text-lg font-extrabold text-foreground">
               {metrics.recordedDays}
             </span>
-            <span className="text-[9px] font-medium text-slate-400 dark:text-zinc-500">
+            <span className="text-[9px] font-medium text-muted-foreground">
               Days Logged
             </span>
           </div>
@@ -105,9 +105,9 @@ export function AttendanceBreakdownCard({ metrics }: AttendanceBreakdownCardProp
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-1.5">
               <span className="size-2 rounded-full bg-emerald-500" />
-              <span className="text-slate-600 dark:text-zinc-400">Present</span>
+              <span className="text-muted-foreground">Present</span>
             </div>
-            <span className="font-semibold text-slate-900 dark:text-zinc-100">
+            <span className="font-semibold text-foreground">
               {metrics.present} ({metrics.presentRate}%)
             </span>
           </div>
@@ -115,9 +115,9 @@ export function AttendanceBreakdownCard({ metrics }: AttendanceBreakdownCardProp
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-1.5">
               <span className="size-2 rounded-full bg-rose-500" />
-              <span className="text-slate-600 dark:text-zinc-400">Absent</span>
+              <span className="text-muted-foreground">Absent</span>
             </div>
-            <span className="font-semibold text-slate-900 dark:text-zinc-100">
+            <span className="font-semibold text-foreground">
               {metrics.absent} ({metrics.absentRate}%)
             </span>
           </div>
@@ -125,9 +125,9 @@ export function AttendanceBreakdownCard({ metrics }: AttendanceBreakdownCardProp
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-1.5">
               <span className="size-2 rounded-full bg-amber-500" />
-              <span className="text-slate-600 dark:text-zinc-400">Leave</span>
+              <span className="text-muted-foreground">Leave</span>
             </div>
-            <span className="font-semibold text-slate-900 dark:text-zinc-100">
+            <span className="font-semibold text-foreground">
               {metrics.leave} ({metrics.leaveRate}%)
             </span>
           </div>
@@ -135,9 +135,9 @@ export function AttendanceBreakdownCard({ metrics }: AttendanceBreakdownCardProp
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-1.5">
               <span className="size-2 rounded-full bg-purple-500" />
-              <span className="text-slate-600 dark:text-zinc-400">Holiday</span>
+              <span className="text-muted-foreground">Holiday</span>
             </div>
-            <span className="font-semibold text-slate-900 dark:text-zinc-100">
+            <span className="font-semibold text-foreground">
               {metrics.holiday} ({metrics.holidayRate}%)
             </span>
           </div>

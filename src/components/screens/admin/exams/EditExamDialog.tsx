@@ -208,15 +208,15 @@ export function EditExamDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
         showCloseButton={false}
-        className="w-[calc(100%-1.5rem)] sm:w-full sm:max-w-2xl md:max-w-3xl lg:max-w-3xl max-h-[92vh] flex flex-col p-0 border border-slate-200/90 dark:border-zinc-800 bg-white dark:bg-zinc-900 shadow-2xl rounded-2xl sm:rounded-3xl overflow-hidden focus:outline-none"
+        className="w-[calc(100%-1.5rem)] sm:w-full sm:max-w-2xl md:max-w-3xl lg:max-w-3xl max-h-[92vh] flex flex-col p-0 border  bg-card shadow-2xl rounded-2xl sm:rounded-3xl overflow-hidden focus:outline-none"
       >
         {/* Header Section with Brand Gradient & Icon */}
-        <div className="relative px-6 sm:px-8 pt-6 pb-5 border-b border-slate-100 dark:border-zinc-800/80 bg-gradient-to-r from-blue-50/70 via-indigo-50/30 to-white dark:from-blue-950/30 dark:via-zinc-900 dark:to-zinc-900 shrink-0">
+        <div className="relative px-6 sm:px-8 pt-6 pb-5 border-b  bg-gradient-to-r from-blue-50/70 via-indigo-50/30 to-white dark:from-blue-950/30 dark:via-zinc-900 dark:to-zinc-900 shrink-0">
           {/* Close button */}
           <button
             type="button"
             onClick={() => onOpenChange(false)}
-            className="absolute top-5 right-5 p-2 rounded-full text-slate-400 hover:text-slate-700 hover:bg-slate-100 dark:hover:bg-zinc-800 dark:hover:text-zinc-200 transition-colors z-20 cursor-pointer"
+            className="absolute top-5 right-5 p-2 rounded-full text-muted-foreground hover:text-foreground hover:bg-accent dark:hover:text-muted-foreground transition-colors z-20 cursor-pointer"
             aria-label="Close"
           >
             <X className="size-4.5" />
@@ -237,10 +237,10 @@ export function EditExamDialog({
                   </span>
                 )}
               </div>
-              <DialogTitle className="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white tracking-tight">
+              <DialogTitle className="text-xl sm:text-2xl font-bold text-foreground tracking-tight">
                 Edit Exam Details
               </DialogTitle>
-              <DialogDescription className="text-xs sm:text-sm text-slate-500 dark:text-zinc-400">
+              <DialogDescription className="text-xs sm:text-sm text-muted-foreground">
                 Update schedule, timings, marks, and evaluation parameters for this exam.
               </DialogDescription>
             </div>
@@ -248,14 +248,14 @@ export function EditExamDialog({
 
           {/* Sub Navigation if exam has multiple subjects */}
           {hasSubjects && (
-            <div className="flex items-center gap-3 mt-4 pt-3 border-t border-slate-200/60 dark:border-zinc-800/60">
+            <div className="flex items-center gap-3 mt-4 pt-3 border-t ">
               <button
                 type="button"
                 onClick={() => setActiveTab('general')}
                 className={`text-xs font-semibold px-3 py-1.5 rounded-lg transition-all flex items-center gap-1.5 ${
                   activeTab === 'general'
                     ? 'bg-blue-600 text-white shadow-xs'
-                    : 'text-slate-600 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-zinc-800'
+                    : 'text-muted-foreground hover:text-foreground dark:hover:text-white hover:bg-accent'
                 }`}
               >
                 <FileText className="size-3.5" />
@@ -267,7 +267,7 @@ export function EditExamDialog({
                 className={`text-xs font-semibold px-3 py-1.5 rounded-lg transition-all flex items-center gap-1.5 ${
                   activeTab === 'subjects'
                     ? 'bg-blue-600 text-white shadow-xs'
-                    : 'text-slate-600 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-zinc-800'
+                    : 'text-muted-foreground hover:text-foreground dark:hover:text-white hover:bg-accent'
                 }`}
               >
                 <Layers className="size-3.5" />
@@ -283,8 +283,8 @@ export function EditExamDialog({
             {activeTab === 'general' ? (
               <>
                 {/* ── CARD 1: Basic Information ── */}
-                <div className="rounded-2xl border border-slate-200/90 dark:border-zinc-800/80 bg-slate-50/40 dark:bg-zinc-900/40 p-5 space-y-4 shadow-2xs">
-                  <div className="flex items-center gap-2 pb-3 border-b border-slate-100 dark:border-zinc-800/60 text-slate-900 dark:text-white font-semibold text-sm">
+                <div className="rounded-2xl border  bg-muted p-5 space-y-4 shadow-2xs">
+                  <div className="flex items-center gap-2 pb-3 border-b  text-foreground font-semibold text-sm">
                     <FileText className="size-4 text-blue-600 dark:text-blue-400" />
                     <span>Basic Information</span>
                   </div>
@@ -292,28 +292,28 @@ export function EditExamDialog({
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     {/* Exam Name */}
                     <div className="space-y-1.5">
-                      <Label className="text-xs font-bold text-slate-700 dark:text-zinc-300">
+                      <Label className="text-xs font-bold text-foreground">
                         Exam Name <span className="text-rose-500">*</span>
                       </Label>
                       <Input
                         value={form.name}
                         onChange={(e) => setForm({ ...form, name: e.target.value })}
                         placeholder="e.g. Midterm Examination 2026"
-                        className="h-10 text-sm rounded-xl bg-white dark:bg-zinc-900 border-slate-200 dark:border-zinc-700 font-medium"
+                        className="h-10 text-sm rounded-xl bg-card  font-medium"
                         required
                       />
                     </div>
 
                     {/* Academic Year */}
                     <div className="space-y-1.5">
-                      <Label className="text-xs font-bold text-slate-700 dark:text-zinc-300">
+                      <Label className="text-xs font-bold text-foreground">
                         Academic Year <span className="text-rose-500">*</span>
                       </Label>
                       <Select
                         value={form.academicYear || currentAcademicYear}
                         onValueChange={(v) => setForm({ ...form, academicYear: v })}
                       >
-                        <SelectTrigger className="h-10 text-sm rounded-xl bg-white dark:bg-zinc-900 border-slate-200 dark:border-zinc-700 font-medium">
+                        <SelectTrigger className="h-10 text-sm rounded-xl bg-card  font-medium">
                           <SelectValue placeholder="Select Academic Year" />
                         </SelectTrigger>
                         <SelectContent>
@@ -328,14 +328,14 @@ export function EditExamDialog({
 
                     {/* Exam Type */}
                     <div className="space-y-1.5">
-                      <Label className="text-xs font-bold text-slate-700 dark:text-zinc-300">
+                      <Label className="text-xs font-bold text-foreground">
                         Exam Type <span className="text-rose-500">*</span>
                       </Label>
                       <Select
                         value={form.examType || 'midterm'}
                         onValueChange={(v) => setForm({ ...form, examType: v })}
                       >
-                        <SelectTrigger className="h-10 text-sm rounded-xl bg-white dark:bg-zinc-900 border-slate-200 dark:border-zinc-700 font-medium capitalize">
+                        <SelectTrigger className="h-10 text-sm rounded-xl bg-card  font-medium capitalize">
                           <SelectValue placeholder="Select Type" />
                         </SelectTrigger>
                         <SelectContent>
@@ -351,11 +351,11 @@ export function EditExamDialog({
 
                     {/* Class & Section (Informational or Selectable) */}
                     <div className="space-y-1.5">
-                      <Label className="text-xs font-bold text-slate-700 dark:text-zinc-300">
+                      <Label className="text-xs font-bold text-foreground">
                         Class & Section
                       </Label>
                       {form.className ? (
-                        <div className="h-10 px-3.5 rounded-xl bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-700 flex items-center justify-between text-sm font-semibold text-slate-800 dark:text-zinc-200">
+                        <div className="h-10 px-3.5 rounded-xl bg-card border  flex items-center justify-between text-sm font-semibold text-foreground">
                           <span>{form.className} {form.classSection ? `(${form.classSection})` : ''}</span>
                           <span className="text-xs text-muted-foreground font-normal">Assigned</span>
                         </div>
@@ -364,7 +364,7 @@ export function EditExamDialog({
                           value={form.classId}
                           onValueChange={(v) => setForm({ ...form, classId: v })}
                         >
-                          <SelectTrigger className="h-10 text-sm rounded-xl bg-white dark:bg-zinc-900 border-slate-200 dark:border-zinc-700 font-medium">
+                          <SelectTrigger className="h-10 text-sm rounded-xl bg-card  font-medium">
                             <SelectValue placeholder="Select Class" />
                           </SelectTrigger>
                           <SelectContent>
@@ -381,9 +381,9 @@ export function EditExamDialog({
                 </div>
 
                 {/* ── CARD 2: Schedule & Timings ── */}
-                <div className="rounded-2xl border border-slate-200/90 dark:border-zinc-800/80 bg-slate-50/40 dark:bg-zinc-900/40 p-5 space-y-4 shadow-2xs">
-                  <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-zinc-800/60">
-                    <div className="flex items-center gap-2 text-slate-900 dark:text-white font-semibold text-sm">
+                <div className="rounded-2xl border  bg-muted p-5 space-y-4 shadow-2xs">
+                  <div className="flex items-center justify-between pb-3 border-b ">
+                    <div className="flex items-center gap-2 text-foreground font-semibold text-sm">
                       <Calendar className="size-4 text-indigo-600 dark:text-indigo-400" />
                       <span>Schedule & Timings</span>
                     </div>
@@ -404,7 +404,7 @@ export function EditExamDialog({
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                     {/* Exam Date */}
                     <div className="space-y-1.5">
-                      <Label className="text-xs font-bold text-slate-700 dark:text-zinc-300">
+                      <Label className="text-xs font-bold text-foreground">
                         Exam Date <span className="text-rose-500">*</span>
                       </Label>
                       <DatePicker
@@ -416,7 +416,7 @@ export function EditExamDialog({
 
                     {/* Start Time */}
                     <div className="space-y-1.5">
-                      <Label className="text-xs font-bold text-slate-700 dark:text-zinc-300">
+                      <Label className="text-xs font-bold text-foreground">
                         Start Time
                       </Label>
                       <TimePicker
@@ -427,7 +427,7 @@ export function EditExamDialog({
 
                     {/* End Time */}
                     <div className="space-y-1.5">
-                      <Label className="text-xs font-bold text-slate-700 dark:text-zinc-300">
+                      <Label className="text-xs font-bold text-foreground">
                         End Time
                       </Label>
                       <TimePicker
@@ -439,9 +439,9 @@ export function EditExamDialog({
                 </div>
 
                 {/* ── CARD 3: Scoring & Passing Criteria ── */}
-                <div className="rounded-2xl border border-slate-200/90 dark:border-zinc-800/80 bg-slate-50/40 dark:bg-zinc-900/40 p-5 space-y-4 shadow-2xs">
-                  <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-zinc-800/60">
-                    <div className="flex items-center gap-2 text-slate-900 dark:text-white font-semibold text-sm">
+                <div className="rounded-2xl border  bg-muted p-5 space-y-4 shadow-2xs">
+                  <div className="flex items-center justify-between pb-3 border-b ">
+                    <div className="flex items-center gap-2 text-foreground font-semibold text-sm">
                       <Trophy className="size-4 text-amber-500" />
                       <span>Marks & Pass Criteria</span>
                     </div>
@@ -461,7 +461,7 @@ export function EditExamDialog({
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     {/* Total Marks */}
                     <div className="space-y-1.5">
-                      <Label className="text-xs font-bold text-slate-700 dark:text-zinc-300">
+                      <Label className="text-xs font-bold text-foreground">
                         Total Marks
                       </Label>
                       <Input
@@ -470,14 +470,14 @@ export function EditExamDialog({
                         max="1000"
                         value={form.totalMarks}
                         onChange={(e) => setForm({ ...form, totalMarks: e.target.value })}
-                        className="h-10 text-sm rounded-xl bg-white dark:bg-zinc-900 border-slate-200 dark:border-zinc-700 font-semibold"
+                        className="h-10 text-sm rounded-xl bg-card  font-semibold"
                       />
                       <p className="text-[11px] text-muted-foreground">Maximum score attainable on this exam paper.</p>
                     </div>
 
                     {/* Passing Marks */}
                     <div className="space-y-1.5">
-                      <Label className="text-xs font-bold text-slate-700 dark:text-zinc-300">
+                      <Label className="text-xs font-bold text-foreground">
                         Passing Marks
                       </Label>
                       <Input
@@ -486,7 +486,7 @@ export function EditExamDialog({
                         max={form.totalMarks || '1000'}
                         value={form.passingMarks}
                         onChange={(e) => setForm({ ...form, passingMarks: e.target.value })}
-                        className="h-10 text-sm rounded-xl bg-white dark:bg-zinc-900 border-slate-200 dark:border-zinc-700 font-semibold"
+                        className="h-10 text-sm rounded-xl bg-card  font-semibold"
                       />
                       <p className="text-[11px] text-muted-foreground">Minimum score required to qualify as passed.</p>
                     </div>
@@ -494,8 +494,8 @@ export function EditExamDialog({
 
                   {/* Multi-subject sync checkbox */}
                   {hasSubjects && (
-                    <div className="pt-2 border-t border-slate-200/60 dark:border-zinc-800/60">
-                      <label className="flex items-center gap-2.5 cursor-pointer text-xs font-medium text-slate-700 dark:text-zinc-300">
+                    <div className="pt-2 border-t ">
+                      <label className="flex items-center gap-2.5 cursor-pointer text-xs font-medium text-foreground">
                         <Checkbox
                           checked={applyToAllSubjects}
                           onCheckedChange={(c) => setApplyToAllSubjects(!!c)}
@@ -538,10 +538,10 @@ export function EditExamDialog({
                   </Button>
                 </div>
 
-                <div className="border border-slate-200 dark:border-zinc-800 rounded-xl overflow-x-auto shadow-2xs">
+                <div className="border  rounded-xl overflow-x-auto shadow-2xs">
                   <Table>
-                    <TableHeader className="bg-slate-50/80 dark:bg-zinc-800/60">
-                      <TableRow className="border-b border-slate-200 dark:border-zinc-800">
+                    <TableHeader className="bg-muted">
+                      <TableRow className="border-b ">
                         <TableHead className="font-bold text-xs py-3">Subject</TableHead>
                         <TableHead className="font-bold text-xs py-3 min-w-[140px]">Date</TableHead>
                         <TableHead className="font-bold text-xs py-3 w-28 text-center">Start Time</TableHead>
@@ -552,10 +552,10 @@ export function EditExamDialog({
                     </TableHeader>
                     <TableBody>
                       {subjectRows.map((row) => (
-                        <TableRow key={row.id} className="hover:bg-slate-50/50 dark:hover:bg-zinc-800/40">
-                          <TableCell className="py-3 font-semibold text-xs text-slate-800 dark:text-zinc-200">
+                        <TableRow key={row.id} className="hover:bg-muted">
+                          <TableCell className="py-3 font-semibold text-xs text-foreground">
                             <div className="flex items-center gap-2">
-                              <div className="size-7 rounded-lg bg-slate-100 dark:bg-zinc-800 flex items-center justify-center shrink-0">
+                              <div className="size-7 rounded-lg bg-muted flex items-center justify-center shrink-0">
                                 {getSubjectBadgeIcon(row.subjectName)}
                               </div>
                               <div>
@@ -611,8 +611,8 @@ export function EditExamDialog({
           </div>
 
           {/* Footer Actions with Brand Colors */}
-          <div className="px-6 py-4 bg-slate-50/80 dark:bg-zinc-900/80 border-t border-slate-100 dark:border-zinc-800 flex items-center justify-between shrink-0">
-            <p className="text-[11px] text-slate-400 dark:text-zinc-500 hidden sm:block">
+          <div className="px-6 py-4 bg-muted border-t  flex items-center justify-between shrink-0">
+            <p className="text-[11px] text-muted-foreground hidden sm:block">
               {hasSubjects ? `${subjectRows.length} subject papers in this exam` : 'Changes take effect immediately'}
             </p>
             <div className="flex items-center gap-3 w-full sm:w-auto justify-end">
@@ -620,7 +620,7 @@ export function EditExamDialog({
                 type="button"
                 variant="outline"
                 onClick={() => onOpenChange(false)}
-                className="h-10 px-5 rounded-xl border-slate-200 dark:border-zinc-700 text-slate-700 dark:text-zinc-300 font-medium hover:bg-slate-100 dark:hover:bg-zinc-800"
+                className="h-10 px-5 rounded-xl  text-foreground font-medium hover:bg-accent"
               >
                 Cancel
               </Button>

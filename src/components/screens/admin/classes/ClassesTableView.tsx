@@ -31,7 +31,7 @@ export function ClassesTableView({
       <CardContent className="p-0">
         <div className="overflow-x-auto">
           <table className="w-full text-left text-sm">
-            <thead className="bg-zinc-50 dark:bg-zinc-800/50 text-zinc-500 dark:text-zinc-400 uppercase text-[10px] font-bold tracking-wider">
+            <thead className="bg-muted text-muted-foreground uppercase text-[10px] font-bold tracking-wider">
               <tr>
                 <th className="px-6 py-4">Class Details</th>
                 <th className="px-6 py-4">Section</th>
@@ -40,13 +40,13 @@ export function ClassesTableView({
                 <th className="px-6 py-4 text-center">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-zinc-100 dark:divide-zinc-800">
+            <tbody className="divide-y divide-border">
               {classes.map((cls) => {
                 const percentage = cls.capacity > 0 ? Math.round((cls.studentCount / cls.capacity) * 100) : 0;
                 return (
-                  <tr key={cls.id} className="hover:bg-zinc-50/50 dark:hover:bg-zinc-800/30 transition-colors">
+                  <tr key={cls.id} className="hover:bg-muted transition-colors">
                     <td className="px-6 py-4">
-                      <span className="font-bold text-zinc-900 dark:text-zinc-100">{cls.name}</span>
+                      <span className="font-bold text-foreground">{cls.name}</span>
                     </td>
                     <td className="px-6 py-4">
                       <Badge variant="outline" className="font-medium">Section {cls.section}</Badge>
@@ -54,7 +54,7 @@ export function ClassesTableView({
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-2">
                         <UserCheck className="size-3.5 text-blue-500" />
-                        <span className="text-zinc-600 dark:text-zinc-400">{cls.classTeacher || 'Unassigned'}</span>
+                        <span className="text-foreground">{cls.classTeacher || 'Unassigned'}</span>
                       </div>
                     </td>
                     <td className="px-6 py-4 min-w-[150px]">
@@ -78,12 +78,12 @@ export function ClassesTableView({
                           View Students
                         </Button>
                         {canEdit && (
-                          <Button variant="ghost" size="icon" className="size-8 text-zinc-400 hover:text-emerald-600" onClick={() => onEdit(cls)}>
+                          <Button variant="ghost" size="icon" className="size-8 text-muted-foreground hover:text-emerald-600" onClick={() => onEdit(cls)}>
                             <Pencil className="size-3.5" />
                           </Button>
                         )}
                         {canDelete && (
-                          <Button variant="ghost" size="icon" className="size-8 text-zinc-400 hover:text-red-600" onClick={() => onDelete(cls)}>
+                          <Button variant="ghost" size="icon" className="size-8 text-muted-foreground hover:text-red-600" onClick={() => onDelete(cls)}>
                             <Trash2 className="size-3.5" />
                           </Button>
                         )}

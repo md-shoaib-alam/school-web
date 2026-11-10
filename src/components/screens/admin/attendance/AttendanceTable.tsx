@@ -42,7 +42,7 @@ export function AttendanceTable({
 }: AttendanceTableProps) {
   return (
     <>
-      <Card className="shadow-lg border-zinc-100 dark:border-zinc-800">
+      <Card className="shadow-lg ">
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
           <div>
             <CardTitle className="text-xl font-bold">
@@ -55,7 +55,7 @@ export function AttendanceTable({
             </CardDescription>
           </div>
           <div className="relative w-64">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-zinc-400" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
             <Input 
               placeholder="Search students…" 
               className="pl-9" 
@@ -66,7 +66,7 @@ export function AttendanceTable({
         </CardHeader>
         <CardContent className="p-0">
           <Table>
-            <TableHeader className="bg-zinc-50 dark:bg-zinc-900/50">
+            <TableHeader className="bg-muted">
               <TableRow>
                 <TableHead className="font-bold pl-6">Student Name</TableHead>
                 <TableHead className="font-bold w-[150px]">Class</TableHead>
@@ -99,7 +99,7 @@ export function AttendanceTable({
                 <TableRow>
                   <TableCell
                     colSpan={isHistoryMode ? 6 : 5}
-                    className="h-32 text-center text-zinc-500 italic"
+                    className="h-32 text-center text-muted-foreground italic"
                   >
                     No attendance records found for this selection.
                   </TableCell>
@@ -108,7 +108,7 @@ export function AttendanceTable({
                 records.map((record) => (
                   <TableRow
                     key={record.id}
-                    className="hover:bg-zinc-50/50 dark:hover:bg-zinc-900/50 group transition-colors"
+                    className="hover:bg-muted group transition-colors"
                   >
                     <TableCell className="font-medium pl-6">
                       {record.studentName}
@@ -116,7 +116,7 @@ export function AttendanceTable({
                     <TableCell className="w-[150px]">
                       <Badge
                         variant="outline"
-                        className="font-semibold bg-zinc-50 dark:bg-zinc-950"
+                        className="font-semibold bg-muted"
                       >
                         {record.className}
                       </Badge>
@@ -140,7 +140,7 @@ export function AttendanceTable({
                         </span>
                       </Badge>
                     </TableCell>
-                    <TableCell className="text-zinc-500 text-sm w-[120px]" suppressHydrationWarning>
+                    <TableCell className="text-muted-foreground text-sm w-[120px]" suppressHydrationWarning>
                       {record.createdAt
                         ? new Date(record.createdAt).toLocaleTimeString([], {
                             hour: "2-digit",

@@ -251,10 +251,10 @@ export function SuperAdminReports() {
     <div className="space-y-6">
       {/* Page Title Header */}
       <div className="flex flex-col gap-1.5 text-left">
-        <h1 className="text-2xl font-semibold text-zinc-900 dark:text-white tracking-tight">
+        <h1 className="text-2xl font-semibold text-foreground tracking-tight">
           Reports & Exports
         </h1>
-        <p className="text-sm text-zinc-500 dark:text-zinc-400">
+        <p className="text-sm text-muted-foreground">
           Generate system-wide metrics and build highly customized operational reports
         </p>
       </div>

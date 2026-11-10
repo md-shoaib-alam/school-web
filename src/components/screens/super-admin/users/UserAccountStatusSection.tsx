@@ -21,13 +21,13 @@ export function UserAccountStatusSection({
     <div className="space-y-3">
       <div className="flex items-center gap-2">
         <Shield className="size-4 text-emerald-600" />
-        <h3 className="font-bold text-sm text-slate-900 dark:text-slate-100">
+        <h3 className="font-bold text-sm text-foreground">
           Account Status
         </h3>
       </div>
 
       {/* Status Toggle Card */}
-      <div className="p-3.5 sm:p-4 rounded-2xl bg-slate-50/70 dark:bg-zinc-900/60 border border-slate-100 dark:border-zinc-800/80 flex items-center justify-between gap-3">
+      <div className="p-3.5 sm:p-4 rounded-2xl bg-muted border  flex items-center justify-between gap-3">
         <div className="min-w-0">
           {isActive ? (
             <span className="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full text-xs font-semibold bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400 border border-emerald-200/80 shrink-0">
@@ -40,7 +40,7 @@ export function UserAccountStatusSection({
               Inactive Account
             </span>
           )}
-          <p className="hidden sm:block text-xs text-slate-400 dark:text-slate-500 mt-1.5">
+          <p className="hidden sm:block text-xs text-muted-foreground mt-1.5">
             {isActive
               ? "This account is active and can access the platform."
               : "This account is currently suspended and cannot log in."}
@@ -70,30 +70,30 @@ export function UserAccountStatusSection({
       {/* 2-Col Dates Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         {/* Joined Date Card */}
-        <div className="p-3.5 rounded-2xl bg-slate-50/70 dark:bg-zinc-900/60 border border-slate-100 dark:border-zinc-800/80 flex items-center gap-3">
+        <div className="p-3.5 rounded-2xl bg-muted border  flex items-center gap-3">
           <div className="size-9 rounded-xl bg-blue-50 dark:bg-blue-950/50 text-blue-600 dark:text-blue-400 flex items-center justify-center shrink-0">
             <Calendar className="size-4" />
           </div>
           <div>
-            <p className="text-[11px] font-medium text-slate-400">Joined Date</p>
-            <p className="text-xs sm:text-sm font-bold text-slate-900 dark:text-slate-100 mt-0.5">
+            <p className="text-[11px] font-medium text-muted-foreground">Joined Date</p>
+            <p className="text-xs sm:text-sm font-bold text-foreground mt-0.5">
               {formatDateShort(createdAt)}
             </p>
-            <p className="text-[10px] text-slate-400 mt-0.5">Account creation date</p>
+            <p className="text-[10px] text-muted-foreground mt-0.5">Account creation date</p>
           </div>
         </div>
 
         {/* Last Login Card */}
-        <div className="p-3.5 rounded-2xl bg-slate-50/70 dark:bg-zinc-900/60 border border-slate-100 dark:border-zinc-800/80 flex items-center gap-3">
+        <div className="p-3.5 rounded-2xl bg-muted border  flex items-center gap-3">
           <div className="size-9 rounded-xl bg-blue-50 dark:bg-blue-950/50 text-blue-600 dark:text-blue-400 flex items-center justify-center shrink-0">
             <Clock className="size-4" />
           </div>
           <div>
-            <p className="text-[11px] font-medium text-slate-400">Last Login</p>
-            <p className="text-xs sm:text-sm font-bold text-slate-900 dark:text-slate-100 mt-0.5">
+            <p className="text-[11px] font-medium text-muted-foreground">Last Login</p>
+            <p className="text-xs sm:text-sm font-bold text-foreground mt-0.5">
               {formatDateTime(createdAt)}
             </p>
-            <p className="text-[10px] text-slate-400 mt-0.5">Last active on platform</p>
+            <p className="text-[10px] text-muted-foreground mt-0.5">Last active on platform</p>
           </div>
         </div>
       </div>

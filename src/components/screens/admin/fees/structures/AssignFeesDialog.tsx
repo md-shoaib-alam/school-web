@@ -82,7 +82,7 @@ export function AssignFeesDialog({
                   .map((student: any) => (
                   <div
                     key={student.id}
-                    className={cn('w-full flex items-center gap-3 px-3 py-2.5 border-b last:border-b-0 cursor-pointer transition-colors hover:bg-zinc-50 dark:hover:bg-zinc-900/50 text-left bg-transparent', selectedIds.has(student.id) && 'bg-emerald-50 dark:bg-emerald-900/20')}
+                    className={cn('w-full flex items-center gap-3 px-3 py-2.5 border-b last:border-b-0 cursor-pointer transition-colors hover:bg-accent/50 text-left bg-transparent', selectedIds.has(student.id) && 'bg-emerald-50 dark:bg-emerald-900/20')}
                     onClick={() => { if (!student.isPaid) onToggle(student.id); }}
                     tabIndex={0}
                     role="button"

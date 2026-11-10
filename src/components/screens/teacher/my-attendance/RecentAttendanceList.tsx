@@ -27,10 +27,10 @@ export function RecentAttendanceList({
   className,
 }: RecentAttendanceListProps) {
   return (
-    <Card className={cn('lg:col-span-3 rounded-2xl border border-slate-200/80 dark:border-zinc-800 bg-white dark:bg-zinc-950 p-5 shadow-2xs flex flex-col justify-between', className)}>
+    <Card className={cn('lg:col-span-3 rounded-2xl border  bg-card p-5 flex flex-col justify-between', className)}>
       <div>
-        <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-zinc-800">
-          <h3 className="text-base font-bold text-slate-900 dark:text-zinc-100">
+        <div className="flex items-center justify-between pb-3 border-b ">
+          <h3 className="text-base font-bold text-foreground">
             Recent Attendance
           </h3>
           <Button
@@ -48,13 +48,13 @@ export function RecentAttendanceList({
         {/* List */}
         {recentRecords.length === 0 ? (
           <div className="py-12 text-center space-y-2">
-            <CalendarDays className="size-8 text-slate-300 dark:text-zinc-700 mx-auto" />
-            <p className="text-xs font-medium text-slate-500 dark:text-zinc-400">
+            <CalendarDays className="size-8 text-muted-foreground mx-auto" />
+            <p className="text-xs font-medium text-muted-foreground">
               No attendance logged yet for {MONTH_NAMES[currentRealMonth]} {currentRealYear}.
             </p>
           </div>
         ) : (
-          <div className="divide-y divide-slate-100 dark:divide-zinc-800/80 mt-1">
+          <div className="divide-y divide-border mt-1">
             {recentRecords.map((item) => {
               // Parse date parts to prevent timezone offsets
               const [y, m, d] = item.date.split('-').map(Number);
@@ -66,7 +66,7 @@ export function RecentAttendanceList({
               return (
                 <div
                   key={item.date}
-                  className="py-3 flex items-center justify-between gap-2.5 hover:bg-slate-50/50 dark:hover:bg-zinc-900/50 rounded-xl px-1.5 transition-colors cursor-pointer"
+                  className="py-3 flex items-center justify-between gap-2.5 hover:bg-muted rounded-xl px-1.5 transition-colors cursor-pointer"
                   onClick={() => onSelectDate(item.date)}
                 >
                   {/* Date Block */}
@@ -93,11 +93,11 @@ export function RecentAttendanceList({
                           isAbsent ? 'bg-rose-500' : isLeave ? 'bg-amber-500' : 'bg-emerald-500'
                         )}
                       />
-                      <span className="text-xs font-semibold text-slate-800 dark:text-zinc-200 capitalize truncate">
+                      <span className="text-xs font-semibold text-foreground capitalize truncate">
                         {item.status}
                       </span>
                     </div>
-                    <p className="text-[11px] text-slate-500 dark:text-zinc-400 truncate">
+                    <p className="text-[11px] text-muted-foreground truncate">
                       {isAbsent
                         ? '--'
                         : item.checkIn
@@ -120,7 +120,7 @@ export function RecentAttendanceList({
                     >
                       {isAbsent ? 'Absent' : isLeave ? 'Leave' : 'On Time'}
                     </Badge>
-                    <ChevronRight className="size-3 text-slate-400" />
+                    <ChevronRight className="size-3 text-muted-foreground" />
                   </div>
                 </div>
               );

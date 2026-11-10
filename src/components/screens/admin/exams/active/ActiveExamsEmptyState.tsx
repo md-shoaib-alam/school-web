@@ -23,10 +23,10 @@ export function ActiveExamsEmptyState({ onNewExamClick }: ActiveExamsEmptyStateP
               sizes="180px"
             />
           </div>
-          <h3 className="text-base sm:text-lg font-semibold text-slate-900 dark:text-white leading-tight">
+          <h3 className="text-base sm:text-lg font-semibold text-foreground leading-tight">
             No examinations found in this category.
           </h3>
-          <p className="text-xs text-slate-500 dark:text-zinc-400 mt-1 max-w-xs leading-normal">
+          <p className="text-xs text-muted-foreground mt-1 max-w-xs leading-normal">
             There are no examinations scheduled here. Click below to start scheduling a new exam!
           </p>
           {onNewExamClick && (

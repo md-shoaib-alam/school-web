@@ -87,7 +87,7 @@ export function RouteDetailsView({ route, assignments, onEditRoute }: RouteDetai
           variant="outline"
           size="icon"
           onClick={() => router.push(`/${slug}/transport-fee`)}
-          className="size-9 rounded-full border-zinc-200 dark:border-zinc-800"
+          className="size-9 rounded-full "
         >
           <ArrowLeft className="size-4" />
         </Button>
@@ -119,7 +119,7 @@ export function RouteDetailsView({ route, assignments, onEditRoute }: RouteDetai
                   </p>
                 )}
               </div>
-              <hr className="border-zinc-100 dark:border-zinc-800" />
+              <hr className="" />
               <div>
                 <Label className="text-xs text-muted-foreground">Pickup Points Fee Range</Label>
                 <p className="text-lg font-bold text-emerald-600 dark:text-emerald-400 mt-0.5">
@@ -149,7 +149,7 @@ export function RouteDetailsView({ route, assignments, onEditRoute }: RouteDetai
             </CardHeader>
             <CardContent className="space-y-4">
               {/* Add Stop Form */}
-              <form onSubmit={handleAddStop} className="space-y-3 p-3 rounded-lg border bg-zinc-50/50 dark:bg-zinc-900/20">
+              <form onSubmit={handleAddStop} className="space-y-3 p-3 rounded-lg border bg-muted">
                 <div className="grid grid-cols-2 gap-2">
                   <div className="space-y-1">
                     <Label className="text-[10px]">Pickup Point *</Label>
@@ -184,14 +184,14 @@ export function RouteDetailsView({ route, assignments, onEditRoute }: RouteDetai
                   routeStops.map((stop: any, index: number) => (
                     <div key={index} className="flex items-center justify-between p-3 rounded-lg border hover:bg-accent/50 transition-colors">
                       <div className="min-w-0 flex-1 mr-2">
-                        <p className="text-sm font-semibold truncate text-zinc-900 dark:text-zinc-100">{stop.name}</p>
+                        <p className="text-sm font-semibold truncate text-foreground">{stop.name}</p>
                         <p className="text-xs font-semibold text-emerald-600 dark:text-emerald-400 mt-0.5">₹{Number(stop.fee || 0).toLocaleString()} / month</p>
                       </div>
                       <Button
                         variant="ghost"
                         size="icon"
                         onClick={() => handleRemoveStop(index)}
-                        className="size-7 text-zinc-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/20 shrink-0"
+                        className="size-7 text-muted-foreground hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/20 shrink-0"
                         title="Remove Stop"
                         disabled={updateRouteMutation.isPending}
                       >
@@ -227,16 +227,16 @@ export function RouteDetailsView({ route, assignments, onEditRoute }: RouteDetai
             </CardHeader>
             <CardContent className={showStudentsList ? "p-0" : "p-6"}>
               {!showStudentsList ? (
-                <div className="text-center py-12 text-muted-foreground flex flex-col items-center justify-center gap-3 bg-zinc-50/30 dark:bg-zinc-900/10 rounded-lg border border-dashed border-zinc-200 dark:border-zinc-800">
-                  <Users className="size-8 text-zinc-300 dark:text-zinc-700" />
+                <div className="text-center py-12 text-muted-foreground flex flex-col items-center justify-center gap-3 bg-muted rounded-lg border border-dashed ">
+                  <Users className="size-8 text-muted-foreground" />
                   <div className="space-y-1">
-                    <p className="text-sm font-medium text-zinc-700 dark:text-zinc-300">List is Collapsed</p>
+                    <p className="text-sm font-medium text-foreground">List is Collapsed</p>
                     <p className="text-xs text-muted-foreground">Click the "Show List" button above to view {routeStudents.length} assigned students.</p>
                   </div>
                 </div>
               ) : routeStudents.length === 0 ? (
                 <div className="text-center py-12 text-muted-foreground space-y-2">
-                  <Users className="size-8 mx-auto text-zinc-300" />
+                  <Users className="size-8 mx-auto text-muted-foreground" />
                   <p className="text-sm">No students assigned to this route yet.</p>
                 </div>
               ) : (
@@ -264,7 +264,7 @@ export function RouteDetailsView({ route, assignments, onEditRoute }: RouteDetai
                           </TableCell>
                           <TableCell className="py-3 text-xs">
                             <span className="flex items-center gap-1">
-                              <MapPin className="size-3 text-zinc-400 shrink-0" />
+                              <MapPin className="size-3 text-muted-foreground shrink-0" />
                               {assign.pickupPoint || "Default Route Stop"}
                             </span>
                           </TableCell>

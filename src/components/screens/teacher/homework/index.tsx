@@ -371,19 +371,19 @@ export function TeacherAssignments({ showCompleted = false }: { showCompleted?: 
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white dark:bg-zinc-900 p-5 rounded-2xl border border-zinc-100 dark:border-zinc-800 shadow-sm">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-card p-5 rounded-2xl border ">
         <div>
-          <h2 className="text-2xl font-bold text-zinc-900 dark:text-zinc-100 flex items-center gap-2">
+          <h2 className="text-2xl font-bold text-foreground flex items-center gap-2">
             {showCompleted ? (
               <>
-                <History className="size-5 text-zinc-500" />
+                <History className="size-5 text-muted-foreground" />
                 Old Homework
               </>
             ) : (
               "My Homework"
             )}
           </h2>
-          <p className="text-sm text-zinc-500 dark:text-zinc-400 mt-1">
+          <p className="text-sm text-muted-foreground mt-1">
             {showCompleted ? (
               "Showing finalized homework logs"
             ) : (
@@ -406,15 +406,15 @@ export function TeacherAssignments({ showCompleted = false }: { showCompleted?: 
       {showCompleted ? (
         <div className="space-y-6">
           {/* Horizontal Filters Bar */}
-          <div className="flex flex-wrap items-center justify-between gap-4 bg-white dark:bg-zinc-900 p-4 rounded-xl border border-zinc-100 dark:border-zinc-800 shadow-sm">
+          <div className="flex flex-wrap items-center justify-between gap-4 bg-card p-4 rounded-2xl border ">
             <div className="flex items-center gap-3">
-              <span className="text-xs font-semibold text-zinc-500 dark:text-zinc-400">Filter:</span>
+              <span className="text-xs font-semibold text-muted-foreground">Filter:</span>
               <Popover open={isCalendarFilterOpen} onOpenChange={setIsCalendarFilterOpen}>
                 <PopoverTrigger asChild>
                   <Button
                     variant="outline"
                     size="sm"
-                    className="h-9 gap-2 text-xs font-medium border-zinc-200 dark:border-zinc-700 bg-zinc-50/50 hover:bg-zinc-100/80 dark:bg-zinc-900/50 dark:hover:bg-zinc-800/80 rounded-lg"
+                    className="h-9 gap-2 text-xs font-medium  bg-muted hover:bg-muted rounded-lg"
                   >
                     <CalendarIcon className="size-3.5 text-blue-500" />
                     {selectedCalendarDate ? format(selectedCalendarDate, "PPP") : <span>Filter by Date</span>}
@@ -451,7 +451,7 @@ export function TeacherAssignments({ showCompleted = false }: { showCompleted?: 
                 </Button>
               )}
             </div>
-            <div className="text-xs text-zinc-400 dark:text-zinc-500 font-medium">
+            <div className="text-xs text-muted-foreground font-medium">
               {filteredAssignments.length} logs found
             </div>
           </div>
@@ -459,7 +459,7 @@ export function TeacherAssignments({ showCompleted = false }: { showCompleted?: 
           {/* Assignments full width List */}
           <div className="space-y-6">
             {filteredAssignments.length === 0 ? (
-              <div className="text-center py-20 bg-white dark:bg-zinc-900 rounded-2xl border border-dashed border-zinc-200 dark:border-zinc-800 text-zinc-400">
+              <div className="text-center py-20 bg-card rounded-2xl border border-dashed  text-muted-foreground">
                 <CalendarIcon className="size-12 mx-auto mb-4 opacity-30" />
                 <p className="text-lg font-medium">No old homework logs found</p>
                 <p className="text-sm mt-1">Try selecting a different date or clearing the filter</p>
@@ -471,26 +471,26 @@ export function TeacherAssignments({ showCompleted = false }: { showCompleted?: 
                     return (
                       <div
                         key={assignment.id}
-                        className="bg-white dark:bg-zinc-900 rounded-2xl p-5 border shadow-sm border-zinc-100 dark:border-zinc-800 hover:shadow-md transition-all"
+                        className="bg-card rounded-2xl p-5 border  hover:shadow-md transition-all"
                       >
                         <div className="flex items-start justify-between mb-3">
                           <div>
-                            <h3 className="font-semibold text-zinc-900 dark:text-zinc-100 text-sm">
+                            <h3 className="font-semibold text-foreground text-sm">
                               {assignment.title}
                             </h3>
-                            <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-1">
+                            <p className="text-xs text-muted-foreground mt-1">
                               {assignment.subjectName} • {assignment.className}
                             </p>
                           </div>
                         </div>
 
-                        <div className="flex items-center justify-between text-xs text-zinc-500 dark:text-zinc-400 mb-3">
+                        <div className="flex items-center justify-between text-xs text-muted-foreground mb-3">
                           <span className="flex items-center gap-1">
                             <CalendarIcon className="size-3" /> Concluded: {assignment.dueDate}
                           </span>
                         </div>
 
-                        <div className="mt-4 pt-3 border-t border-zinc-100 dark:border-zinc-800">
+                        <div className="mt-4 pt-3 border-t ">
                           <Button
                             variant="outline"
                             size="sm"
@@ -507,8 +507,8 @@ export function TeacherAssignments({ showCompleted = false }: { showCompleted?: 
 
                 {/* Pagination Controls */}
                 {totalPages > 1 && (
-                  <div className="flex items-center justify-between bg-white dark:bg-zinc-900 px-5 py-4 rounded-xl border border-zinc-100 dark:border-zinc-800 shadow-sm mt-4">
-                    <p className="text-xs text-zinc-500 dark:text-zinc-400">
+                  <div className="flex items-center justify-between bg-card px-5 py-4 rounded-2xl border  mt-4">
+                    <p className="text-xs text-muted-foreground">
                       Showing {(currentPage - 1) * ITEMS_PER_PAGE + 1} -{" "}
                       {Math.min(currentPage * ITEMS_PER_PAGE, filteredAssignments.length)} of{" "}
                       {filteredAssignments.length} logs
@@ -523,7 +523,7 @@ export function TeacherAssignments({ showCompleted = false }: { showCompleted?: 
                       >
                         <ChevronLeft className="size-4" />
                       </Button>
-                      <span className="text-xs font-semibold px-3 py-1 bg-zinc-50 dark:bg-zinc-800 rounded-lg">
+                      <span className="text-xs font-semibold px-3 py-1 bg-muted rounded-lg">
                         {currentPage} / {totalPages}
                       </span>
                       <Button

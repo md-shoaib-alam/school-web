@@ -308,10 +308,10 @@ export function TeacherSubjects() {
     return (
       <div className="space-y-6">
         <Header subjects={combinedSubjects} view={view} switchView={switchView} />
-        <div className="text-center py-20 bg-zinc-50 dark:bg-zinc-900/20 rounded-3xl border border-dashed border-zinc-200 dark:border-zinc-800">
-          <BookOpen className="size-16 text-zinc-400 dark:text-zinc-700 mx-auto mb-4 opacity-50" />
-          <h3 className="text-xl font-semibold text-zinc-800 dark:text-zinc-300">No Subjects Assigned</h3>
-          <p className="text-zinc-500 dark:text-zinc-400 mt-2 max-w-xs mx-auto">
+        <div className="text-center py-20 bg-muted rounded-3xl border border-dashed ">
+          <BookOpen className="size-16 text-muted-foreground mx-auto mb-4 opacity-50" />
+          <h3 className="text-xl font-semibold text-foreground">No Subjects Assigned</h3>
+          <p className="text-muted-foreground mt-2 max-w-xs mx-auto">
             You don't have any subjects assigned yet. Contact your administrator.
           </p>
         </div>
@@ -346,10 +346,10 @@ function Header({
   return (
     <div className="flex items-start justify-between gap-4">
       <div>
-        <h2 className="text-2xl font-semibold text-zinc-900 dark:text-zinc-100">
+        <h2 className="text-2xl font-semibold text-foreground">
           My Subjects
         </h2>
-        <p className="text-zinc-500 dark:text-zinc-400 mt-1">
+        <p className="text-muted-foreground mt-1">
           {subjects.length} subject{subjects.length !== 1 ? "s" : ""} assigned
           to you across{" "}
           {new Set(subjects.map((s) => s.classId)).size} class
@@ -358,14 +358,14 @@ function Header({
       </div>
 
       {/* View toggle */}
-      <div className="flex items-center gap-1 p-1 bg-zinc-100 dark:bg-zinc-800/60 rounded-xl border border-zinc-200 dark:border-zinc-700/50 shrink-0">
+      <div className="flex items-center gap-1 p-1 bg-muted rounded-xl border  shrink-0">
         <button
           type="button"
           onClick={() => switchView("grid")}
           className={`p-1.5 rounded-lg transition-all ${
             view === "grid"
               ? "bg-white dark:bg-zinc-700 shadow-sm text-blue-600 dark:text-blue-400"
-              : "text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300"
+              : "text-muted-foreground hover:text-foreground dark:hover:text-muted-foreground"
           }`}
           title="Grid view"
         >
@@ -377,7 +377,7 @@ function Header({
           className={`p-1.5 rounded-lg transition-all ${
             view === "table"
               ? "bg-white dark:bg-zinc-700 shadow-sm text-blue-600 dark:text-blue-400"
-              : "text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300"
+              : "text-muted-foreground hover:text-foreground dark:hover:text-muted-foreground"
           }`}
           title="Table view"
         >
@@ -403,7 +403,7 @@ function GridView({ subjects, slotsBySubject }: { subjects: SubjectInfo[], slots
         return (
           <Card
             key={`${subject.id}-${subject.classId || ""}`}
-            className={`rounded-xl border hover:shadow-md transition-all group overflow-hidden flex flex-col ${
+            className={`rounded-2xl border hover:shadow-md transition-all group overflow-hidden flex flex-col ${
               isLiveNow 
                 ? "ring-2 ring-emerald-500 shadow-emerald-100 dark:shadow-emerald-900/20 border-emerald-200 dark:border-emerald-800 bg-emerald-50/10 dark:bg-emerald-900/5"
                 : isHappeningToday
@@ -421,10 +421,10 @@ function GridView({ subjects, slotsBySubject }: { subjects: SubjectInfo[], slots
                     <BookOpen className="size-5" />
                   </div>
                   <div className="min-w-0">
-                    <h3 className="font-semibold text-zinc-900 dark:text-zinc-100 leading-tight truncate">
+                    <h3 className="font-semibold text-foreground leading-tight truncate">
                       {subject.name}
                     </h3>
-                    <p className="text-xs text-zinc-400 dark:text-zinc-500 mt-0.5 font-mono">
+                    <p className="text-xs text-muted-foreground mt-0.5 font-mono">
                       {subject.code}
                     </p>
                   </div>
@@ -444,12 +444,12 @@ function GridView({ subjects, slotsBySubject }: { subjects: SubjectInfo[], slots
 
               {/* Class – prominent */}
               <div className={`flex items-center gap-2.5 px-3 py-2.5 rounded-lg ${p.bg} border border-current/10 mb-auto`}>
-                <School className={`size-4 shrink-0 ${p.icon.split(" ")[1]} dark:text-white/80`} />
+                <School className={`size-4 shrink-0 ${p.icon.split(" ")[1]}/80`} />
                 <div className="min-w-0">
-                  <p className="text-[10px] font-semibold uppercase tracking-wider text-zinc-400 dark:text-white/50 leading-none mb-0.5">
+                  <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground leading-none mb-0.5">
                     Class
                   </p>
-                  <p className={`text-sm font-bold truncate ${p.icon.split(" ")[1]} dark:text-white`}>
+                  <p className={`text-sm font-bold truncate ${p.icon.split(" ")[1]}`}>
                     {subject.className}
                   </p>
                 </div>
@@ -457,8 +457,8 @@ function GridView({ subjects, slotsBySubject }: { subjects: SubjectInfo[], slots
 
               {/* Subject Timings, if available TODAY */}
               {todaySlots.length > 0 && (
-                <div className="mt-4 pt-3 border-t border-zinc-100 dark:border-zinc-800">
-                  <div className="flex items-center gap-1.5 text-[11px] font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider mb-2.5">
+                <div className="mt-4 pt-3 border-t ">
+                  <div className="flex items-center gap-1.5 text-[11px] font-bold text-muted-foreground uppercase tracking-wider mb-2.5">
                     <Clock className="size-3.5" />
                     Today's Timing
                   </div>
@@ -508,7 +508,7 @@ function TableView({ subjects, slotsBySubject }: { subjects: SubjectInfo[], slot
           return (
             <div
               key={`${subject.id}-${subject.classId || ""}`}
-              className={`p-4 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-card shadow-sm space-y-3 transition-all ${
+              className={`p-4 rounded-2xl border  bg-card space-y-3 transition-all ${
                 isLiveNow
                   ? "bg-emerald-50/30 dark:bg-emerald-950/10 ring-1 ring-emerald-500/20"
                   : isHappeningToday
@@ -526,11 +526,11 @@ function TableView({ subjects, slotsBySubject }: { subjects: SubjectInfo[], slot
                     <h4 className={`text-sm font-bold truncate leading-tight ${
                       isLiveNow ? "text-emerald-700 dark:text-emerald-400" :
                       isHappeningToday ? "text-blue-700 dark:text-blue-400" :
-                      "text-zinc-900 dark:text-zinc-100"
+                      "text-foreground"
                     }`}>
                       {subject.name}
                     </h4>
-                    <span className="text-[10px] font-mono text-zinc-400 dark:text-zinc-500 mt-0.5 block">
+                    <span className="text-[10px] font-mono text-muted-foreground mt-0.5 block">
                       {subject.code}
                     </span>
                   </div>
@@ -548,8 +548,8 @@ function TableView({ subjects, slotsBySubject }: { subjects: SubjectInfo[], slot
               {/* Row 2: Class & Timings */}
               <div className="flex flex-wrap items-center justify-between gap-3 pt-1">
                 <div className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg ${p.bg} text-xs font-semibold`}>
-                  <School className={`size-3.5 shrink-0 ${p.icon.split(" ")[1]} dark:text-white/80`} />
-                  <span className={`${p.icon.split(" ")[1]} dark:text-white`}>{subject.className}</span>
+                  <School className={`size-3.5 shrink-0 ${p.icon.split(" ")[1]}/80`} />
+                  <span className={`${p.icon.split(" ")[1]}`}>{subject.className}</span>
                 </div>
 
                 {todaySlots.length > 0 && (
@@ -579,7 +579,7 @@ function TableView({ subjects, slotsBySubject }: { subjects: SubjectInfo[], slot
       </div>
 
       {/* Desktop View (HTML Table) */}
-      <div className="hidden md:block rounded-xl border border-zinc-200 dark:border-zinc-800 overflow-x-auto bg-card">
+      <div className="hidden md:block rounded-2xl border  overflow-x-auto bg-card">
         <table className="w-full min-w-200">
           <colgroup>
             <col className="w-16" />
@@ -589,25 +589,25 @@ function TableView({ subjects, slotsBySubject }: { subjects: SubjectInfo[], slot
             <col className="w-[24%]" />
           </colgroup>
           <thead>
-            <tr className="bg-zinc-50 dark:bg-zinc-900/50 border-b border-zinc-200 dark:border-zinc-800">
-              <th className="text-xs font-semibold text-zinc-500 dark:text-zinc-400 text-left py-3 pl-6 pr-2">
+            <tr className="bg-muted border-b ">
+              <th className="text-xs font-semibold text-muted-foreground text-left py-3 pl-6 pr-2">
                 #
               </th>
-              <th className="text-xs font-semibold text-zinc-500 dark:text-zinc-400 text-left p-3">
+              <th className="text-xs font-semibold text-muted-foreground text-left p-3">
                 Subject
               </th>
-              <th className="text-xs font-semibold text-zinc-500 dark:text-zinc-400 text-left p-3">
+              <th className="text-xs font-semibold text-muted-foreground text-left p-3">
                 Code
               </th>
-              <th className="text-xs font-semibold text-zinc-500 dark:text-zinc-400 text-left p-3">
+              <th className="text-xs font-semibold text-muted-foreground text-left p-3">
                 Class
               </th>
-              <th className="text-xs font-semibold text-zinc-500 dark:text-zinc-400 text-left py-3 pl-3 pr-6">
+              <th className="text-xs font-semibold text-muted-foreground text-left py-3 pl-3 pr-6">
                 Timings
               </th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-zinc-100 dark:divide-zinc-800">
+          <tbody className="divide-y divide-border">
             {subjects.map((subject, index) => {
               const p = palette(subject.name);
               const relevantSlots = slotsBySubject.get(subject.id) || [];
@@ -633,7 +633,7 @@ function TableView({ subjects, slotsBySubject }: { subjects: SubjectInfo[], slot
                         <span className="relative inline-flex rounded-full size-2.5 bg-emerald-500"></span>
                       </span>
                     ) : (
-                      <span className="text-zinc-400">{index + 1}</span>
+                      <span className="text-muted-foreground">{index + 1}</span>
                     )}
                   </td>
                   <td className="p-3">
@@ -645,7 +645,7 @@ function TableView({ subjects, slotsBySubject }: { subjects: SubjectInfo[], slot
                         <span className={`text-sm font-semibold truncate ${
                           isLiveNow ? "text-emerald-700 dark:text-emerald-400" : 
                           isHappeningToday ? "text-blue-800 dark:text-blue-300" : 
-                          "text-zinc-800 dark:text-zinc-200"
+                          "text-foreground"
                         }`}>
                           {subject.name}
                         </span>
@@ -658,14 +658,14 @@ function TableView({ subjects, slotsBySubject }: { subjects: SubjectInfo[], slot
                     </div>
                   </td>
                   <td className="p-3">
-                    <span className="text-xs font-mono text-zinc-500 dark:text-zinc-400 bg-zinc-100 dark:bg-zinc-800 px-2 py-1 rounded-md inline-block">
+                    <span className="text-xs font-mono text-muted-foreground bg-muted px-2 py-1 rounded-md inline-block">
                       {subject.code}
                     </span>
                   </td>
                   <td className="p-3">
                     <div className={`inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg ${p.bg} max-w-full`}>
-                      <School className={`size-3.5 shrink-0 ${p.icon.split(" ")[1]} dark:text-white/80`} />
-                      <span className={`text-xs font-bold truncate ${p.icon.split(" ")[1]} dark:text-white`}>
+                      <School className={`size-3.5 shrink-0 ${p.icon.split(" ")[1]}/80`} />
+                      <span className={`text-xs font-bold truncate ${p.icon.split(" ")[1]}`}>
                         {subject.className}
                       </span>
                     </div>
@@ -690,7 +690,7 @@ function TableView({ subjects, slotsBySubject }: { subjects: SubjectInfo[], slot
                           );
                         })
                       ) : (
-                        <span className="text-[11px] text-zinc-400 italic">–</span>
+                        <span className="text-[11px] text-muted-foreground italic">–</span>
                       )}
                     </div>
                   </td>

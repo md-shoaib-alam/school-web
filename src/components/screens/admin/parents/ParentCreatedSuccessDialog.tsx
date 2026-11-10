@@ -96,15 +96,15 @@ export function ParentCreatedSuccessDialog({
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
-        className="w-[95vw] sm:w-[92vw] sm:max-w-2xl md:max-w-2xl lg:max-w-3xl p-0 overflow-hidden border border-slate-200/80 dark:border-zinc-800 bg-white dark:bg-zinc-900 shadow-2xl rounded-2xl max-h-[92vh] flex flex-col focus:outline-none"
+        className="w-[95vw] sm:w-[92vw] sm:max-w-2xl md:max-w-2xl lg:max-w-3xl p-0 overflow-hidden border  bg-card shadow-2xl rounded-2xl max-h-[92vh] flex flex-col focus:outline-none"
         data-lenis-prevent
         showCloseButton={false}
       >
         {/* Top Header with Mint Confetti Aura & Success Badge */}
-        <div className="relative px-6 sm:px-8 pt-6 pb-5 border-b border-slate-100 dark:border-zinc-800/80 bg-gradient-to-r from-emerald-50/50 via-white to-emerald-50/20 dark:from-emerald-950/20 dark:via-zinc-900 dark:to-zinc-900 shrink-0">
+        <div className="relative px-6 sm:px-8 pt-6 pb-5 border-b  bg-gradient-to-r from-emerald-50/50 via-white to-emerald-50/20 dark:from-emerald-950/20 dark:via-zinc-900 dark:to-zinc-900 shrink-0">
           <button
             onClick={() => onOpenChange(false)}
-            className="absolute top-5 right-5 p-1.5 rounded-full text-slate-400 hover:text-slate-700 hover:bg-slate-100 dark:hover:bg-zinc-800 dark:hover:text-zinc-200 transition-colors z-20"
+            className="absolute top-5 right-5 p-1.5 rounded-full text-muted-foreground hover:text-foreground hover:bg-accent dark:hover:text-muted-foreground transition-colors z-20"
             aria-label="Close"
           >
             <X className="size-5" />
@@ -117,10 +117,10 @@ export function ParentCreatedSuccessDialog({
             </div>
 
             <div className="space-y-1">
-              <DialogTitle className="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white tracking-tight">
+              <DialogTitle className="text-xl sm:text-2xl font-bold text-foreground tracking-tight">
                 Parent Account Created Successfully!
               </DialogTitle>
-              <DialogDescription className="text-xs sm:text-sm text-slate-500 dark:text-zinc-400 leading-relaxed">
+              <DialogDescription className="text-xs sm:text-sm text-muted-foreground leading-relaxed">
                 The parent has been added to the system. You can now share the login credentials with them to access the parent portal.
               </DialogDescription>
             </div>
@@ -133,7 +133,7 @@ export function ParentCreatedSuccessDialog({
           data-lenis-prevent
         >
           {/* Card 1: Parent Summary Profile Card */}
-          <div className="rounded-2xl border border-slate-200/90 dark:border-zinc-800/80 bg-white dark:bg-zinc-900/60 p-4 sm:p-5 shadow-[0_1px_3px_rgba(0,0,0,0.02)] flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div className="rounded-2xl border  bg-card p-4 sm:p-5 shadow-[0_1px_3px_rgba(0,0,0,0.02)] flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div className="flex items-center gap-3.5 min-w-0">
               {/* Soft Mint Initials Avatar */}
               <div className="size-14 sm:size-16 rounded-full bg-emerald-100/70 dark:bg-emerald-950/50 text-emerald-800 dark:text-emerald-300 font-bold text-lg sm:text-xl flex items-center justify-center shrink-0 border border-emerald-200/60 dark:border-emerald-800/50">
@@ -141,22 +141,22 @@ export function ParentCreatedSuccessDialog({
               </div>
 
               <div className="space-y-0.5 min-w-0">
-                <h3 className="text-base sm:text-lg font-bold text-slate-900 dark:text-white truncate">
+                <h3 className="text-base sm:text-lg font-bold text-foreground truncate">
                   {data.name}
                 </h3>
-                <p className="text-xs text-slate-500 dark:text-zinc-400">
+                <p className="text-xs text-muted-foreground">
                   {data.relationship || "Parent"}
                 </p>
-                <div className="flex flex-wrap items-center gap-x-3 gap-y-1 pt-1 text-xs text-slate-500 dark:text-zinc-400">
+                <div className="flex flex-wrap items-center gap-x-3 gap-y-1 pt-1 text-xs text-muted-foreground">
                   {data.phone && (
                     <span className="flex items-center gap-1.5">
-                      <Phone className="size-3.5 text-slate-400 shrink-0" />
+                      <Phone className="size-3.5 text-muted-foreground shrink-0" />
                       {data.phone.startsWith("+") ? data.phone : `+91 ${data.phone}`}
                     </span>
                   )}
                   {data.email && (
                     <span className="flex items-center gap-1.5 truncate">
-                      <Mail className="size-3.5 text-slate-400 shrink-0" />
+                      <Mail className="size-3.5 text-muted-foreground shrink-0" />
                       {data.email}
                     </span>
                   )}
@@ -170,7 +170,7 @@ export function ParentCreatedSuccessDialog({
                 variant="outline"
                 size="sm"
                 onClick={() => onViewProfile(data.id!)}
-                className="h-9 px-4 text-xs font-semibold rounded-xl border-slate-200 dark:border-zinc-700 text-slate-700 dark:text-zinc-300 hover:bg-slate-50 gap-2 shrink-0 self-start sm:self-center"
+                className="h-9 px-4 text-xs font-semibold rounded-xl  text-foreground hover:bg-muted gap-2 shrink-0 self-start sm:self-center"
               >
                 <ExternalLink className="size-3.5 text-emerald-600" />
                 View Parent Profile
@@ -179,11 +179,11 @@ export function ParentCreatedSuccessDialog({
           </div>
 
           {/* Card 2: Login Credentials Section */}
-          <div className="rounded-2xl border border-slate-200/90 dark:border-zinc-800/80 bg-white dark:bg-zinc-900/60 p-4 sm:p-5 shadow-[0_1px_3px_rgba(0,0,0,0.02)] space-y-4">
-            <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-zinc-800/60">
+          <div className="rounded-2xl border  bg-card p-4 sm:p-5 shadow-[0_1px_3px_rgba(0,0,0,0.02)] space-y-4">
+            <div className="flex items-center justify-between pb-3 border-b ">
               <div className="flex items-center gap-2">
                 <span className="text-emerald-600 font-bold">🔗</span>
-                <span className="font-bold text-sm sm:text-base text-slate-900 dark:text-white">
+                <span className="font-bold text-sm sm:text-base text-foreground">
                   Login Credentials
                 </span>
               </div>
@@ -193,26 +193,26 @@ export function ParentCreatedSuccessDialog({
               </span>
             </div>
 
-            <p className="text-xs text-slate-500 dark:text-zinc-400 -mt-2">
+            <p className="text-xs text-muted-foreground -mt-2">
               Share these credentials with the parent to access the parent portal.
             </p>
 
             {/* Inputs Box matching the screenshot */}
-            <div className="p-4 rounded-xl border border-slate-200/80 dark:border-zinc-800 bg-slate-50/40 dark:bg-zinc-800/30">
+            <div className="p-4 rounded-xl border  bg-muted">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {/* Parent Login ID */}
                 <div className="space-y-1.5">
-                  <span className="text-xs font-semibold text-slate-700 dark:text-zinc-300 block">
+                  <span className="text-xs font-semibold text-foreground block">
                     Parent Login ID
                   </span>
-                  <div className="flex items-center h-10 px-3.5 rounded-xl bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-700 justify-between">
-                    <span className="text-xs font-mono font-bold text-slate-800 dark:text-zinc-100 tracking-wide select-all">
+                  <div className="flex items-center h-10 px-3.5 rounded-xl bg-card border  justify-between">
+                    <span className="text-xs font-mono font-bold text-foreground tracking-wide select-all">
                       {loginId}
                     </span>
                     <button
                       type="button"
                       onClick={() => handleCopy(loginId, "Login ID")}
-                      className="p-1 rounded text-slate-400 hover:text-slate-700 transition-colors"
+                      className="p-1 rounded text-muted-foreground hover:text-foreground transition-colors"
                       title="Copy Login ID"
                     >
                       {copiedField === "Login ID" ? (
@@ -226,18 +226,18 @@ export function ParentCreatedSuccessDialog({
 
                 {/* Password */}
                 <div className="space-y-1.5">
-                  <span className="text-xs font-semibold text-slate-700 dark:text-zinc-300 block">
+                  <span className="text-xs font-semibold text-foreground block">
                     Password
                   </span>
-                  <div className="flex items-center h-10 px-3.5 rounded-xl bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-700 justify-between">
-                    <span className="text-xs font-mono font-bold text-slate-800 dark:text-zinc-100 tracking-wide select-all">
+                  <div className="flex items-center h-10 px-3.5 rounded-xl bg-card border  justify-between">
+                    <span className="text-xs font-mono font-bold text-foreground tracking-wide select-all">
                       {showPassword ? password : "••••••••"}
                     </span>
                     <div className="flex items-center gap-1.5">
                       <button
                         type="button"
                         onClick={() => handleCopy(password, "Password")}
-                        className="p-1 rounded text-slate-400 hover:text-slate-700 transition-colors"
+                        className="p-1 rounded text-muted-foreground hover:text-foreground transition-colors"
                         title="Copy Password"
                       >
                         {copiedField === "Password" ? (
@@ -249,7 +249,7 @@ export function ParentCreatedSuccessDialog({
                       <button
                         type="button"
                         onClick={() => setShowPassword(!showPassword)}
-                        className="p-1 rounded text-slate-400 hover:text-slate-700 transition-colors"
+                        className="p-1 rounded text-muted-foreground hover:text-foreground transition-colors"
                         title={showPassword ? "Hide password" : "Show password"}
                       >
                         {showPassword ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
@@ -275,7 +275,7 @@ export function ParentCreatedSuccessDialog({
                 type="button"
                 variant="outline"
                 onClick={handleShareEmail}
-                className="h-10 text-xs font-semibold rounded-xl border-slate-200 dark:border-zinc-700 text-slate-700 dark:text-zinc-200 hover:bg-slate-50 dark:hover:bg-zinc-800 gap-2"
+                className="h-10 text-xs font-semibold rounded-xl  text-foreground hover:bg-accent gap-2"
               >
                 <Mail className="size-4 text-emerald-600" />
                 Share via Email
@@ -285,12 +285,12 @@ export function ParentCreatedSuccessDialog({
                 type="button"
                 variant="outline"
                 onClick={handleCopyBoth}
-                className="h-10 text-xs font-semibold rounded-xl border-slate-200 dark:border-zinc-700 text-slate-700 dark:text-zinc-200 hover:bg-slate-50 dark:hover:bg-zinc-800 gap-2"
+                className="h-10 text-xs font-semibold rounded-xl  text-foreground hover:bg-accent gap-2"
               >
                 {copiedField === "both" ? (
                   <Check className="size-4 text-emerald-600" />
                 ) : (
-                  <Copy className="size-4 text-slate-500" />
+                  <Copy className="size-4 text-muted-foreground" />
                 )}
                 {copiedField === "both" ? "Copied Both!" : "Copy Both"}
               </Button>
@@ -298,12 +298,12 @@ export function ParentCreatedSuccessDialog({
           </div>
 
           {/* Card 3: Important Notes Notice Box */}
-          <div className="p-4 rounded-2xl bg-sky-50/60 dark:bg-sky-950/20 border border-sky-100 dark:border-sky-900/40 text-xs text-slate-700 dark:text-zinc-300 space-y-2">
+          <div className="p-4 rounded-2xl bg-sky-50/60 dark:bg-sky-950/20 border border-sky-100 dark:border-sky-900/40 text-xs text-foreground space-y-2">
             <div className="flex items-center gap-2 font-bold text-sky-900 dark:text-sky-300">
               <Info className="size-4 text-sky-600 dark:text-sky-400 shrink-0" />
               Important Notes
             </div>
-            <ul className="list-disc pl-5 space-y-1 text-slate-600 dark:text-zinc-400 text-[11px] sm:text-xs leading-relaxed">
+            <ul className="list-disc pl-5 space-y-1 text-muted-foreground text-[11px] sm:text-xs leading-relaxed">
               <li>This login ID and password allows the parent to access the parent portal.</li>
               <li>You can share these credentials via WhatsApp or Email using the buttons above.</li>
               <li>The parent can change their password after first login.</li>
@@ -313,7 +313,7 @@ export function ParentCreatedSuccessDialog({
         </div>
 
         {/* Modal Action Footer */}
-        <div className="px-6 sm:px-8 py-4 bg-white dark:bg-zinc-900 border-t border-slate-100 dark:border-zinc-800 flex items-center justify-between shrink-0">
+        <div className="px-6 sm:px-8 py-4 bg-card border-t  flex items-center justify-between shrink-0">
           <Button
             type="button"
             variant="outline"
@@ -321,9 +321,9 @@ export function ParentCreatedSuccessDialog({
               onOpenChange(false);
               if (onAddAnother) onAddAnother();
             }}
-            className="text-xs font-semibold text-slate-700 dark:text-zinc-300 border-slate-200 dark:border-zinc-700 hover:bg-slate-50 dark:hover:bg-zinc-800 rounded-xl px-4 h-10 gap-1.5"
+            className="text-xs font-semibold text-foreground  hover:bg-accent rounded-xl px-4 h-10 gap-1.5"
           >
-            <Plus className="size-4 text-slate-500" />
+            <Plus className="size-4 text-muted-foreground" />
             Add Another Parent
           </Button>
 

@@ -257,7 +257,7 @@ export function AdminRoles() {
   return (
     <div className="space-y-6 max-w-7xl mx-auto pb-8">
       {/* 1. Hero Banner */}
-      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-blue-50/90 via-sky-50/50 to-indigo-50/40 dark:from-slate-900 dark:via-blue-950/30 dark:to-slate-900 border border-blue-100/90 dark:border-slate-800 px-4.5 sm:px-6 py-3 sm:py-3.5 shadow-2xs">
+      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-blue-50/90 via-sky-50/50 to-indigo-50/40 dark:from-slate-900 dark:via-blue-950/30 dark:to-slate-900 border border-blue-100/90 px-4.5 sm:px-6 py-3 sm:py-3.5 shadow-2xs">
         {/* Background ambient glow */}
         <div className="absolute top-0 right-1/4 w-80 h-48 bg-blue-400/15 dark:bg-blue-600/10 rounded-full blur-3xl pointer-events-none" />
         <div className="absolute -bottom-6 right-10 w-48 h-36 bg-sky-300/15 dark:bg-sky-500/10 rounded-full blur-2xl pointer-events-none" />

@@ -131,7 +131,7 @@ export function StudentAssignmentsView({
                          <Button
                            variant="outline"
                            size="sm"
-                           className="border-zinc-200 hover:border-zinc-300 text-zinc-700 hover:text-zinc-900 hover:bg-zinc-50 dark:hover:bg-zinc-800 h-8 font-medium"
+                           className=" hover: text-foreground hover:text-foreground hover:bg-accent h-8 font-medium"
                            onClick={() => onEditAssignment(a)}
                          >
                            Edit

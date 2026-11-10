@@ -165,7 +165,7 @@ export function AcademicYearsScreen() {
             <CalendarDays className="size-5 sm:size-6 text-blue-600 dark:text-blue-400" />
           </div>
           <div>
-            <h2 className="text-2xl sm:text-3xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-100">
+            <h2 className="text-2xl sm:text-3xl font-semibold tracking-tight text-foreground">
               Academic Years
             </h2>
             <p className="text-xs sm:text-sm text-muted-foreground mt-0.5 sm:mt-1">
@@ -291,7 +291,7 @@ export function AcademicYearsScreen() {
           {/* Mobile Loading Skeleton (< md) */}
           <div className="grid grid-cols-1 gap-3 md:hidden">
             {[1, 2, 3].map((i) => (
-              <Card key={i} className="p-4 border-zinc-200 dark:border-zinc-800 shadow-sm space-y-3">
+              <Card key={i} className="p-4  shadow-sm space-y-3">
                 <div className="flex items-start justify-between">
                   <div className="space-y-2 flex-1">
                     <div className="flex items-center gap-2">
@@ -302,7 +302,7 @@ export function AcademicYearsScreen() {
                   </div>
                   <Skeleton className="size-8 rounded-md" />
                 </div>
-                <div className="flex items-center justify-between pt-2 border-t border-zinc-100 dark:border-zinc-800/80">
+                <div className="flex items-center justify-between pt-2 border-t ">
                   <Skeleton className="h-5 w-16 rounded-full" />
                   <Skeleton className="h-6 w-24 rounded-md" />
                 </div>
@@ -312,7 +312,7 @@ export function AcademicYearsScreen() {
 
           {/* Desktop Table Loading Skeleton (md+) */}
           <Card className="hidden md:block overflow-hidden border-violet-100 dark:border-violet-900/30 shadow-md">
-            <div className="p-4 border-b border-zinc-100 dark:border-zinc-800 flex items-center justify-between bg-card">
+            <div className="p-4 border-b  flex items-center justify-between bg-card">
               <Skeleton className="h-4 w-28 rounded" />
               <Skeleton className="h-4 w-24 rounded" />
               <Skeleton className="h-4 w-24 rounded" />
@@ -320,7 +320,7 @@ export function AcademicYearsScreen() {
               <Skeleton className="h-4 w-20 rounded" />
               <Skeleton className="h-4 w-16 rounded" />
             </div>
-            <div className="divide-y divide-zinc-100 dark:divide-zinc-800">
+            <div className="divide-y divide-border">
               {[1, 2, 3, 4].map((i) => (
                 <div key={i} className="p-4 flex items-center justify-between">
                   <Skeleton className="h-4 w-28 rounded" />
@@ -335,7 +335,7 @@ export function AcademicYearsScreen() {
           </Card>
         </div>
       ) : academicYears.length === 0 ? (
-        <Card className="border border-zinc-200/80 dark:border-zinc-800 shadow-sm overflow-hidden bg-white dark:bg-zinc-950">
+        <Card className="border  shadow-sm overflow-hidden bg-card">
           <div className="flex flex-col items-center text-center px-4 sm:px-6 pt-10 pb-8 sm:pt-14 sm:pb-10 max-w-xl mx-auto">
             <div className="relative w-48 h-36 sm:w-60 sm:h-44 mb-3">
               <Image
@@ -347,10 +347,10 @@ export function AcademicYearsScreen() {
               />
             </div>
             
-            <h3 className="text-xl sm:text-2xl font-bold tracking-tight text-zinc-900 dark:text-zinc-100 mt-2">
+            <h3 className="text-xl sm:text-2xl font-bold tracking-tight text-foreground mt-2">
               No academic years found
             </h3>
-            <p className="text-xs sm:text-sm text-zinc-500 dark:text-zinc-400 mt-2 leading-relaxed max-w-md">
+            <p className="text-xs sm:text-sm text-muted-foreground mt-2 leading-relaxed max-w-md">
               Create your first academic year to start managing sessions, classes, exams and other academic activities.
             </p>
 
@@ -364,38 +364,38 @@ export function AcademicYearsScreen() {
           </div>
 
           {/* Bottom Features Info Bar */}
-          <div className="border-t border-zinc-100 dark:border-zinc-800/80 bg-zinc-50/50 dark:bg-zinc-900/30 p-3 sm:px-10 sm:py-6">
+          <div className="border-t  bg-muted p-3 sm:px-10 sm:py-6">
             <div className="grid grid-cols-3 gap-2 sm:gap-6">
               {/* Feature 1 */}
-              <div className="flex flex-col sm:flex-row items-center sm:items-center text-center sm:text-left gap-1.5 sm:gap-3.5 p-2 sm:p-0 rounded-xl bg-white sm:bg-transparent border sm:border-0 border-zinc-200/70 dark:border-zinc-800 shadow-xs sm:shadow-none">
+              <div className="flex flex-col sm:flex-row items-center sm:items-center text-center sm:text-left gap-1.5 sm:gap-3.5 p-2 sm:p-0 rounded-xl bg-card sm:bg-transparent border sm:border-0  shadow-xs sm:shadow-none">
                 <div className="size-9 sm:size-11 rounded-full sm:rounded-2xl bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 flex items-center justify-center shrink-0">
                   <Calendar className="size-4 sm:size-5" />
                 </div>
                 <div className="min-w-0">
-                  <p className="text-[11px] sm:text-sm font-semibold text-zinc-900 dark:text-zinc-100 leading-tight">Set current session</p>
-                  <p className="hidden sm:block text-[11px] sm:text-xs text-zinc-500 dark:text-zinc-400 truncate">Mark an academic year as current</p>
+                  <p className="text-[11px] sm:text-sm font-semibold text-foreground leading-tight">Set current session</p>
+                  <p className="hidden sm:block text-[11px] sm:text-xs text-muted-foreground truncate">Mark an academic year as current</p>
                 </div>
               </div>
 
               {/* Feature 2 */}
-              <div className="flex flex-col sm:flex-row items-center sm:items-center text-center sm:text-left gap-1.5 sm:gap-3.5 p-2 sm:p-0 rounded-xl bg-white sm:bg-transparent border sm:border-0 border-zinc-200/70 dark:border-zinc-800 shadow-xs sm:shadow-none">
+              <div className="flex flex-col sm:flex-row items-center sm:items-center text-center sm:text-left gap-1.5 sm:gap-3.5 p-2 sm:p-0 rounded-xl bg-card sm:bg-transparent border sm:border-0  shadow-xs sm:shadow-none">
                 <div className="size-9 sm:size-11 rounded-full sm:rounded-2xl bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0">
                   <Layers className="size-4 sm:size-5" />
                 </div>
                 <div className="min-w-0">
-                  <p className="text-[11px] sm:text-sm font-semibold text-zinc-900 dark:text-zinc-100 leading-tight">Manage multiple years</p>
-                  <p className="hidden sm:block text-[11px] sm:text-xs text-zinc-500 dark:text-zinc-400 truncate">Keep track of past and future sessions</p>
+                  <p className="text-[11px] sm:text-sm font-semibold text-foreground leading-tight">Manage multiple years</p>
+                  <p className="hidden sm:block text-[11px] sm:text-xs text-muted-foreground truncate">Keep track of past and future sessions</p>
                 </div>
               </div>
 
               {/* Feature 3 */}
-              <div className="flex flex-col sm:flex-row items-center sm:items-center text-center sm:text-left gap-1.5 sm:gap-3.5 p-2 sm:p-0 rounded-xl bg-white sm:bg-transparent border sm:border-0 border-zinc-200/70 dark:border-zinc-800 shadow-xs sm:shadow-none">
+              <div className="flex flex-col sm:flex-row items-center sm:items-center text-center sm:text-left gap-1.5 sm:gap-3.5 p-2 sm:p-0 rounded-xl bg-card sm:bg-transparent border sm:border-0  shadow-xs sm:shadow-none">
                 <div className="size-9 sm:size-11 rounded-full sm:rounded-2xl bg-orange-50 dark:bg-orange-950/40 text-orange-600 dark:text-orange-400 flex items-center justify-center shrink-0">
                   <Users className="size-4 sm:size-5" />
                 </div>
                 <div className="min-w-0">
-                  <p className="text-[11px] sm:text-sm font-semibold text-zinc-900 dark:text-zinc-100 leading-tight">Connect with classes</p>
-                  <p className="hidden sm:block text-[11px] sm:text-xs text-zinc-500 dark:text-zinc-400 truncate">Assign classes, subjects and timetable</p>
+                  <p className="text-[11px] sm:text-sm font-semibold text-foreground leading-tight">Connect with classes</p>
+                  <p className="hidden sm:block text-[11px] sm:text-xs text-muted-foreground truncate">Assign classes, subjects and timetable</p>
                 </div>
               </div>
             </div>
@@ -406,14 +406,14 @@ export function AcademicYearsScreen() {
           {/* Mobile Card List (visible on md and below) */}
           <div className="grid grid-cols-1 gap-3 md:hidden">
             {academicYears.map((year: any) => (
-              <Card key={year.id} className="p-4 border-zinc-200 dark:border-zinc-800 shadow-sm relative overflow-hidden">
+              <Card key={year.id} className="p-4  shadow-sm relative overflow-hidden">
                 {year.isCurrent && (
                   <div className="absolute top-0 left-0 right-0 h-1 bg-blue-600" />
                 )}
                 <div className="flex items-start justify-between gap-2 mb-3">
                   <div className="flex flex-col">
                     <div className="flex items-center gap-2">
-                      <span className="font-semibold text-base text-zinc-900 dark:text-zinc-100">{year.name}</span>
+                      <span className="font-semibold text-base text-foreground">{year.name}</span>
                       {year.isCurrent && (
                         <Badge variant="secondary" className="bg-blue-100 text-blue-700 dark:bg-blue-900/50 dark:text-blue-300 text-[10px] px-1.5 py-0">
                           Current
@@ -448,7 +448,7 @@ export function AcademicYearsScreen() {
                   </DropdownMenu>
                 </div>
 
-                <div className="flex items-center justify-between pt-2 border-t border-zinc-100 dark:border-zinc-800/80 text-xs">
+                <div className="flex items-center justify-between pt-2 border-t  text-xs">
                   <Badge variant={year.status === "active" ? "default" : "secondary"} className={`text-[11px] capitalize ${year.status === "active" ? "bg-emerald-500 hover:bg-emerald-600" : ""}`}>
                     {year.status}
                   </Badge>
@@ -472,7 +472,7 @@ export function AcademicYearsScreen() {
           </div>
 
           {/* Desktop Table (hidden on mobile, visible md and up) */}
-          <Card className="hidden md:block overflow-hidden border-zinc-200 dark:border-zinc-800 shadow-sm">
+          <Card className="hidden md:block overflow-hidden  shadow-sm">
             <Table>
               <TableHeader className="bg-card">
                 <TableRow className="hover:bg-transparent">

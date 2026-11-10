@@ -21,7 +21,7 @@ export function ClassesHeader({
   return (
     <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
       <div>
-        <h2 className="text-2xl font-semibold text-zinc-900 dark:text-zinc-100">
+        <h2 className="text-2xl font-semibold text-foreground">
           Classes
         </h2>
         <p className="text-sm text-muted-foreground">
@@ -29,12 +29,12 @@ export function ClassesHeader({
         </p>
       </div>
       <div className="flex items-center gap-3 w-full sm:w-auto">
-        <div className="flex items-center gap-1 bg-zinc-100 dark:bg-zinc-800 p-1 rounded-lg">
+        <div className="flex items-center gap-1 bg-muted p-1 rounded-lg">
           <Button
             variant={viewMode === "table" ? "secondary" : "ghost"}
             size="sm"
             onClick={() => setViewMode("table")}
-            className={`size-8 p-0 ${viewMode === "table" ? "bg-white dark:bg-zinc-700 shadow-sm" : ""}`}
+            className={`size-8 p-0 ${viewMode === "table" ? "bg-card shadow-sm" : ""}`}
           >
             <List className="size-4" />
           </Button>
@@ -42,7 +42,7 @@ export function ClassesHeader({
             variant={viewMode === "grid" ? "secondary" : "ghost"}
             size="sm"
             onClick={() => setViewMode("grid")}
-            className={`size-8 p-0 ${viewMode === "grid" ? "bg-white dark:bg-zinc-700 shadow-sm" : ""}`}
+            className={`size-8 p-0 ${viewMode === "grid" ? "bg-card shadow-sm" : ""}`}
           >
             <LayoutGrid className="size-4" />
           </Button>

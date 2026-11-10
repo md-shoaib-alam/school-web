@@ -61,7 +61,7 @@ function ContentSkeleton() {
       </div>
 
       {/* Table block */}
-      <div className="rounded-xl border border-border overflow-hidden">
+      <div className="rounded-2xl border border-border overflow-hidden">
         {/* Table header */}
         <div className="flex items-center gap-4 px-5 py-3 border-b border-border bg-muted/30">
           {[10, 36, 20, 20, 16].map((w, i) => (

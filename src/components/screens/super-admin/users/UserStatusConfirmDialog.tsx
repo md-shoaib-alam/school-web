@@ -38,17 +38,17 @@ export function UserStatusConfirmDialog({
     >
       <AlertDialogContent className="rounded-2xl w-[calc(100%-2.5rem)] max-w-sm p-4 sm:p-6">
         <AlertDialogHeader className="text-center sm:text-left">
-          <AlertDialogTitle className="text-base font-bold text-slate-900 dark:text-slate-100">
+          <AlertDialogTitle className="text-base font-bold text-foreground">
             {isActive ? "Deactivate Account?" : "Activate Account?"}
           </AlertDialogTitle>
-          <AlertDialogDescription className="text-xs sm:text-sm text-slate-500 dark:text-slate-400">
+          <AlertDialogDescription className="text-xs sm:text-sm text-muted-foreground">
             {isActive ? (
               <>
-                Deactivate <strong className="text-slate-800 dark:text-slate-200">{name || "this user"}</strong>? They will be suspended from logging into the platform.
+                Deactivate <strong className="text-foreground">{name || "this user"}</strong>? They will be suspended from logging into the platform.
               </>
             ) : (
               <>
-                Activate <strong className="text-slate-800 dark:text-slate-200">{name || "this user"}</strong>? They will be able to log in and access the platform.
+                Activate <strong className="text-foreground">{name || "this user"}</strong>? They will be able to log in and access the platform.
               </>
             )}
           </AlertDialogDescription>

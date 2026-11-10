@@ -25,7 +25,7 @@ export function WizardHeader({ currentStep, onCancel, onStepClick, isEdit = fals
           <button
             type="button"
             onClick={onCancel}
-            className="sm:hidden size-10 rounded-full bg-slate-100 dark:bg-zinc-800 text-slate-700 dark:text-zinc-300 flex items-center justify-center shrink-0 border border-slate-200/60 dark:border-zinc-700/60 hover:bg-slate-200 transition-colors"
+            className="sm:hidden size-10 rounded-full bg-muted text-foreground flex items-center justify-center shrink-0 border  hover:bg-muted transition-colors"
           >
             <ArrowLeft className="size-5 stroke-[2.2]" />
           </button>
@@ -36,10 +36,10 @@ export function WizardHeader({ currentStep, onCancel, onStepClick, isEdit = fals
           </div>
 
           <div>
-            <h1 className="text-xl sm:text-2xl font-semibold text-slate-900 dark:text-white tracking-tight">
+            <h1 className="text-xl sm:text-2xl font-semibold text-foreground tracking-tight">
               {isEdit ? 'Edit Exam' : 'Create Exam'}
             </h1>
-            <p className="text-xs text-slate-500 dark:text-zinc-400 mt-0.5">
+            <p className="text-xs text-muted-foreground mt-0.5">
               {isEdit ? 'Update examination schedule and details.' : 'Set up a new examination with basic details.'}
             </p>
           </div>
@@ -69,21 +69,21 @@ export function WizardHeader({ currentStep, onCancel, onStepClick, isEdit = fals
                       ? 'bg-blue-600 text-white shadow-md shadow-blue-500/25 ring-4 ring-blue-100 dark:ring-blue-900/30'
                       : isCompleted
                       ? 'bg-blue-600 text-white hover:bg-blue-700 cursor-pointer'
-                      : 'bg-slate-100 text-slate-400 dark:bg-zinc-800 dark:text-zinc-500 border border-slate-200 dark:border-zinc-700'
+                      : 'bg-muted text-muted-foreground border '
                   }`}
                 >
                   {isCompleted ? <Check className="size-4 sm:size-5 stroke-[2.5]" /> : s.number}
                 </button>
                 <div className="text-left">
-                  <div className={`text-xs font-semibold leading-tight whitespace-nowrap ${isCurrent ? 'text-blue-600 dark:text-blue-400' : 'text-slate-700 dark:text-zinc-300'}`}>
+                  <div className={`text-xs font-semibold leading-tight whitespace-nowrap ${isCurrent ? 'text-blue-600 dark:text-blue-400' : 'text-foreground'}`}>
                     {s.title}
                   </div>
-                  <div className="text-[10px] sm:text-[11px] text-slate-400 dark:text-zinc-500 leading-tight whitespace-nowrap">
+                  <div className="text-[10px] sm:text-[11px] text-muted-foreground leading-tight whitespace-nowrap">
                     {s.subtitle}
                   </div>
                 </div>
                 {idx < steps.length - 1 && (
-                  <div className="w-6 sm:w-10 lg:w-16 h-0.5 bg-slate-200 dark:bg-zinc-800 mx-1 sm:mx-2 shrink-0" />
+                  <div className="w-6 sm:w-10 lg:w-16 h-0.5 bg-muted mx-1 sm:mx-2 shrink-0" />
                 )}
               </div>
             );
@@ -111,19 +111,19 @@ export function WizardHeader({ currentStep, onCancel, onStepClick, isEdit = fals
                         ? 'bg-blue-600 text-white shadow-md shadow-blue-500/25 ring-4 ring-blue-100 dark:ring-blue-900/30'
                         : isCompleted
                         ? 'bg-blue-600 text-white hover:bg-blue-700 cursor-pointer'
-                        : 'bg-slate-100 text-slate-400 dark:bg-zinc-800 dark:text-zinc-500 border border-slate-200/80 dark:border-zinc-700'
+                        : 'bg-muted text-muted-foreground border '
                     }`}
                   >
                     {isCompleted ? <Check className="size-4 stroke-[2.5]" /> : s.number}
                   </button>
                   <span className={`text-[11px] font-medium text-center leading-tight whitespace-nowrap ${
-                    isCurrent ? 'text-blue-600 dark:text-blue-400 font-semibold' : 'text-slate-500 dark:text-zinc-400'
+                    isCurrent ? 'text-blue-600 dark:text-blue-400 font-semibold' : 'text-muted-foreground'
                   }`}>
                     {label}
                   </span>
                 </div>
                 {idx < steps.length - 1 && (
-                  <div className="flex-1 h-0.5 bg-slate-200 dark:bg-zinc-800 mx-2 -mt-4.5" />
+                  <div className="flex-1 h-0.5 bg-muted mx-2 -mt-4.5" />
                 )}
               </div>
             );

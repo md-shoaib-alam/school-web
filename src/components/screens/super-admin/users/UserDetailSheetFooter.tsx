@@ -19,14 +19,14 @@ export function UserDetailSheetFooter({
   onSaveEdit,
 }: UserDetailSheetFooterProps) {
   return (
-    <div className="p-4 px-6 border-t border-slate-100 dark:border-zinc-800 flex items-center justify-end gap-3 bg-white dark:bg-zinc-950 shrink-0">
+    <div className="p-4 px-6 border-t  flex items-center justify-end gap-3 bg-card shrink-0">
       {!isEditing ? (
         <>
           <Button
             type="button"
             variant="outline"
             onClick={() => onOpenChange(false)}
-            className="h-10 px-6 rounded-xl border-slate-200/90 dark:border-zinc-800 bg-white dark:bg-zinc-900 hover:bg-slate-50 text-slate-700 dark:text-zinc-300 font-semibold text-xs sm:text-sm shadow-2xs cursor-pointer"
+            className="h-10 px-6 rounded-xl  bg-card hover:bg-muted text-foreground font-semibold text-xs sm:text-sm shadow-2xs cursor-pointer"
           >
             Close
           </Button>
@@ -47,7 +47,7 @@ export function UserDetailSheetFooter({
             variant="outline"
             onClick={onCancelEdit}
             disabled={isSaving}
-            className="h-10 px-6 rounded-xl border-slate-200/90 dark:border-zinc-800 bg-white dark:bg-zinc-900 hover:bg-slate-50 text-slate-700 dark:text-zinc-300 font-semibold text-xs sm:text-sm shadow-2xs cursor-pointer"
+            className="h-10 px-6 rounded-xl  bg-card hover:bg-muted text-foreground font-semibold text-xs sm:text-sm shadow-2xs cursor-pointer"
           >
             Cancel
           </Button>

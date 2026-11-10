@@ -78,10 +78,10 @@ export function BulkAttendanceSpreadsheetUploadTab({
         
         {/* Instructions Panel */}
         <div className="lg:col-span-1 space-y-4">
-          <div className="rounded-xl border border-slate-200/80 dark:border-slate-800/80 shadow-2xs bg-card overflow-hidden">
+          <div className="rounded-xl border  shadow-2xs bg-card overflow-hidden">
             <div 
               onClick={() => setMobileInstructionsOpen((prev) => !prev)}
-              className={`px-3 py-2 sm:px-4 sm:py-3 cursor-pointer lg:cursor-default flex items-center justify-between select-none transition-colors hover:bg-slate-500/[0.03] dark:hover:bg-slate-500/[0.06] lg:hover:bg-transparent ${
+              className={`px-3 py-2 sm:px-4 sm:py-3 cursor-pointer lg:cursor-default flex items-center justify-between select-none transition-colors hover:bg-muted0/[0.03] dark:hover:bg-muted0/[0.06] lg:hover:bg-transparent ${
                 mobileInstructionsOpen ? "border-b border-border/40" : "lg:border-b lg:border-border/40"
               }`}
             >
@@ -161,7 +161,7 @@ export function BulkAttendanceSpreadsheetUploadTab({
 
         {/* Upload & Preview Zone */}
         <div className="lg:col-span-2 space-y-4">
-          <Card className="rounded-xl border border-slate-200/80 dark:border-slate-800/80 shadow-2xs bg-card">
+          <Card className="rounded-xl border  shadow-2xs bg-card">
             <CardContent className="p-5">
               
               {/* Drag-and-drop zone */}
@@ -173,7 +173,7 @@ export function BulkAttendanceSpreadsheetUploadTab({
                 className={`border-dashed border-2 rounded-xl p-8 flex flex-col items-center justify-center text-center cursor-pointer transition-all duration-200 ${
                   isDragging 
                     ? "border-teal-500 bg-teal-50/50 dark:bg-teal-950/20 scale-[0.99]" 
-                    : "border-slate-200 dark:border-slate-800 hover:border-teal-500/60 dark:hover:border-teal-500/40 bg-slate-50/40 dark:bg-slate-900/20 hover:bg-teal-50/20 dark:hover:bg-teal-950/10"
+                    : " hover:border-teal-500/60 dark:hover:border-teal-500/40 bg-muted hover:bg-teal-50/20 dark:hover:bg-teal-950/10"
                 }`}
               >
                 <input 
@@ -238,10 +238,10 @@ export function BulkAttendanceSpreadsheetUploadTab({
                   </div>
 
                   {/* Interactive Table Container */}
-                  <div className="border border-slate-200/80 dark:border-slate-800/80 rounded-xl overflow-hidden bg-card shadow-2xs">
+                  <div className="border  rounded-xl overflow-hidden bg-card shadow-2xs">
                     <ScrollArea className="max-h-96 w-full">
                       <table className="w-full text-xs border-collapse text-left">
-                        <thead className="bg-slate-50/70 dark:bg-slate-800/40 sticky top-0 border-b border-slate-200/80 dark:border-slate-800/80">
+                        <thead className="bg-muted sticky top-0 border-b ">
                           <tr>
                             <th className="py-2.5 px-3 text-[11px] font-semibold tracking-wider uppercase text-muted-foreground w-10">#</th>
                             <th className="py-2.5 px-3 text-[11px] font-semibold tracking-wider uppercase text-muted-foreground">Student Name</th>
@@ -259,7 +259,7 @@ export function BulkAttendanceSpreadsheetUploadTab({
                             return (
                               <tr 
                                 key={row.id} 
-                                className={`border-b border-slate-100 dark:border-slate-800/60 last:border-none hover:bg-slate-50/60 dark:hover:bg-slate-800/40 transition-colors ${
+                                className={`border-b  last:border-none hover:bg-muted dark:hover:bg-slate-800/40 transition-colors ${
                                   !row.isValid ? "bg-rose-500/5 dark:bg-rose-950/10" : ""
                                 }`}
                               >
@@ -279,7 +279,7 @@ export function BulkAttendanceSpreadsheetUploadTab({
                                 </td>
                                 <td className="py-2.5 px-3">
                                   {row.rollNumber && row.className ? (
-                                    <span className="text-[11px] bg-slate-100 dark:bg-slate-800 text-foreground px-1.5 py-0.5 rounded font-mono">
+                                    <span className="text-[11px] bg-muted text-foreground px-1.5 py-0.5 rounded font-mono">
                                       {row.rollNumber} | {row.className}
                                     </span>
                                   ) : (
@@ -341,7 +341,7 @@ export function BulkAttendanceSpreadsheetUploadTab({
                   </div>
 
                   {showProgress && importingData && (
-                    <div className="mt-3 space-y-1.5 p-3.5 border border-slate-200 dark:border-slate-800 bg-slate-50/60 dark:bg-slate-900/40 rounded-xl">
+                    <div className="mt-3 space-y-1.5 p-3.5 border  bg-muted rounded-xl">
                       <div className="flex justify-between text-xs font-semibold text-teal-600 dark:text-teal-400">
                         <span className="flex items-center gap-1.5"><RefreshCw className="size-3.5 animate-spin" /> Processing records...</span>
                         <span>{Math.round(progress)}%</span>

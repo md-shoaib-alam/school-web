@@ -228,7 +228,7 @@ export function UserDetailSheet({
       <SheetContent
         side="right"
         hideClose
-        className="w-full sm:max-w-xl p-0 overflow-hidden bg-white dark:bg-zinc-950 border-l border-slate-200/90 dark:border-zinc-800 shadow-2xl flex flex-col focus:outline-none h-full max-h-screen"
+        className="w-full sm:max-w-xl p-0 overflow-hidden bg-card border-l  shadow-2xl flex flex-col focus:outline-none h-full max-h-screen"
       >
         {/* Top Header Controls (Close & Options) */}
         <UserDetailSheetHeader

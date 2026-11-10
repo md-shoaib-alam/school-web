@@ -112,7 +112,8 @@ function getFilteredNavItems(
 
 function isStatusExpired(status: string | undefined): boolean {
   if (!status) return false;
-  return status !== "active" && status !== "trial";
+  // A cancelled school keeps access until its endDate, so expiry is date-driven
+  return status !== "active" && status !== "trial" && status !== "cancelled";
 }
 
 function isDateExpired(endDate: string | Date | undefined): boolean {
@@ -421,6 +422,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
                 role={currentUser.role}
                 endDate={resolvedTenant?.endDate}
                 status={resolvedTenant?.status}
+                plan={resolvedTenant?.plan}
               />
             ) : (
               children

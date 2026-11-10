@@ -53,7 +53,7 @@ export function ProfileHero({ user, initials, onEditClick, tenantName }: Profile
         >
           <Avatar className="size-24 border-4 border-white/30 shadow-2xl transition-all duration-300 group-hover:scale-105 group-hover:border-white/50">
             <AvatarImage src={user.avatar} alt={user.name} className="object-cover animate-in fade-in" />
-            <AvatarFallback className="text-3xl font-extrabold bg-white text-zinc-800">
+            <AvatarFallback className="text-3xl font-extrabold bg-white text-foreground">
               {initials}
             </AvatarFallback>
           </Avatar>

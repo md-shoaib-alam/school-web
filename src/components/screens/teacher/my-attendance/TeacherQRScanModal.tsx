@@ -324,7 +324,7 @@ export function TeacherQRScanModal({
 
   return (
     <Dialog open={open} onOpenChange={handleClose}>
-      <DialogContent showCloseButton={false} className="sm:max-w-md p-0 overflow-hidden border border-slate-200 dark:border-zinc-800 rounded-3xl shadow-2xl bg-white dark:bg-zinc-950">
+      <DialogContent showCloseButton={false} className="sm:max-w-md p-0 overflow-hidden border  rounded-3xl shadow-2xl bg-card">
         {/* Header */}
         <div className="p-4 sm:p-5 bg-gradient-to-r from-blue-600 to-indigo-600 text-white">
           <div className="flex items-center justify-between gap-2.5">
@@ -392,11 +392,11 @@ export function TeacherQRScanModal({
               </div>
 
               <div>
-                <h3 className="text-lg font-black text-slate-900 dark:text-zinc-100">
+                <h3 className="text-lg font-black text-foreground">
                   {scanResult.action} Confirmed!
                 </h3>
-                <p className="text-xs text-slate-500 dark:text-zinc-400 mt-1">
-                  Recorded for <strong className="text-slate-800 dark:text-zinc-200">{scanResult.userName}</strong>
+                <p className="text-xs text-muted-foreground mt-1">
+                  Recorded for <strong className="text-foreground">{scanResult.userName}</strong>
                 </p>
               </div>
 
@@ -417,7 +417,7 @@ export function TeacherQRScanModal({
           ) : activeTab === 'camera' ? (
             /* Camera Scanner Tab */
             <div className="space-y-3">
-              <div className="relative rounded-2xl overflow-hidden bg-slate-950 border-2 border-slate-200 dark:border-zinc-800 aspect-square flex items-center justify-center">
+              <div className="relative rounded-2xl overflow-hidden bg-slate-950 border-2  aspect-square flex items-center justify-center">
                 {/* HTML5 QR Code Mount Element */}
                 <div id={READER_ELEMENT_ID} className="w-full h-full" />
 
@@ -435,16 +435,16 @@ export function TeacherQRScanModal({
 
                 {/* Camera Loading or Error Overlay */}
                 {!cameraStarted && !cameraError && (
-                  <div className="absolute inset-0 flex flex-col items-center justify-center text-slate-400 gap-2 bg-slate-900/80">
+                  <div className="absolute inset-0 flex flex-col items-center justify-center text-muted-foreground gap-2 bg-slate-900/80">
                     <Loader2 className="size-8 animate-spin text-blue-500" />
                     <span className="text-xs font-semibold">Starting camera...</span>
                   </div>
                 )}
 
                 {cameraError && (
-                  <div className="absolute inset-0 p-5 flex flex-col items-center justify-center text-center bg-slate-900 text-slate-300 gap-2.5">
+                  <div className="absolute inset-0 p-5 flex flex-col items-center justify-center text-center bg-slate-900 text-muted-foreground gap-2.5">
                     <AlertCircle className="size-8 text-amber-400 shrink-0" />
-                    <p className="text-xs leading-relaxed text-slate-300">{cameraError}</p>
+                    <p className="text-xs leading-relaxed text-muted-foreground">{cameraError}</p>
                     <Button
                       size="sm"
                       variant="outline"
@@ -465,7 +465,7 @@ export function TeacherQRScanModal({
                 )}
               </div>
 
-              <p className="text-center text-[11px] text-slate-500 dark:text-zinc-400">
+              <p className="text-center text-[11px] text-muted-foreground">
                 Hold phone steady over the QR code on the admin screen
               </p>
             </div>
@@ -473,7 +473,7 @@ export function TeacherQRScanModal({
             /* 6-Digit Manual Code Tab */
             <form onSubmit={handleManualSubmit} className="space-y-4 py-2">
               <div className="space-y-1.5 text-center">
-                <p className="text-xs font-medium text-slate-600 dark:text-zinc-400">
+                <p className="text-xs font-medium text-muted-foreground">
                   Enter the 6-digit code shown beneath the QR code:
                 </p>
                 <Input

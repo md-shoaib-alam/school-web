@@ -52,7 +52,7 @@ export function EmptyTimetableState({
       </div>
 
       {/* Main Heading */}
-      <h3 className="text-xl sm:text-2xl font-bold text-zinc-900 dark:text-zinc-100 tracking-tight">
+      <h3 className="text-xl sm:text-2xl font-bold text-foreground tracking-tight">
         No timetable records found
       </h3>
 
@@ -97,36 +97,36 @@ export function EmptyTimetableState({
           </DialogHeader>
 
           <div className="space-y-3.5 py-2 text-left">
-            <div className="flex items-start gap-3 p-3 rounded-xl bg-slate-50 dark:bg-zinc-900 border border-slate-100 dark:border-zinc-800">
+            <div className="flex items-start gap-3 p-3 rounded-xl bg-muted border ">
               <div className="size-7 rounded-lg bg-emerald-100 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0 mt-0.5 font-bold text-xs">
                 1
               </div>
               <div className="space-y-0.5">
-                <p className="text-xs font-semibold text-zinc-900 dark:text-zinc-100">Configure Working Days</p>
+                <p className="text-xs font-semibold text-foreground">Configure Working Days</p>
                 <p className="text-[11px] text-muted-foreground leading-relaxed">
                   Use the Settings (⚙) icon to choose which days of the week school is in session.
                 </p>
               </div>
             </div>
 
-            <div className="flex items-start gap-3 p-3 rounded-xl bg-slate-50 dark:bg-zinc-900 border border-slate-100 dark:border-zinc-800">
+            <div className="flex items-start gap-3 p-3 rounded-xl bg-muted border ">
               <div className="size-7 rounded-lg bg-blue-100 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 flex items-center justify-center shrink-0 mt-0.5 font-bold text-xs">
                 2
               </div>
               <div className="space-y-0.5">
-                <p className="text-xs font-semibold text-zinc-900 dark:text-zinc-100">Select a Class & Add Periods</p>
+                <p className="text-xs font-semibold text-foreground">Select a Class & Add Periods</p>
                 <p className="text-[11px] text-muted-foreground leading-relaxed">
                   Click &ldquo;Manage Timetable&rdquo; to add slots with start and end times, assign subjects and teachers, or add custom break labels.
                 </p>
               </div>
             </div>
 
-            <div className="flex items-start gap-3 p-3 rounded-xl bg-slate-50 dark:bg-zinc-900 border border-slate-100 dark:border-zinc-800">
+            <div className="flex items-start gap-3 p-3 rounded-xl bg-muted border ">
               <div className="size-7 rounded-lg bg-amber-100 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400 flex items-center justify-center shrink-0 mt-0.5 font-bold text-xs">
                 3
               </div>
               <div className="space-y-0.5">
-                <p className="text-xs font-semibold text-zinc-900 dark:text-zinc-100">Copy Across Days & Save</p>
+                <p className="text-xs font-semibold text-foreground">Copy Across Days & Save</p>
                 <p className="text-[11px] text-muted-foreground leading-relaxed">
                   Use &ldquo;Copy to all days&rdquo; to replicate a standard day schedule instantly across the whole week.
                 </p>

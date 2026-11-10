@@ -63,7 +63,7 @@ export function TeacherStats({
         <div
           key={card.title}
           onClick={() => onNavigate?.(card.screen)}
-          className="relative overflow-hidden rounded-2xl border border-zinc-200/80 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-3.5 sm:p-4 shadow-xs hover:shadow-md transition-all group cursor-pointer flex flex-col justify-between"
+          className="relative overflow-hidden rounded-2xl border  bg-card p-3.5 sm:p-4 shadow-xs hover:shadow-md transition-all group cursor-pointer flex flex-col justify-between"
         >
           {/* Subtle bottom curved gradient wave */}
           <div
@@ -79,7 +79,7 @@ export function TeacherStats({
                 >
                   {card.icon}
                 </div>
-                <span className="text-[11px] sm:text-xs font-semibold text-zinc-700 dark:text-zinc-300 truncate">
+                <span className="text-[11px] sm:text-xs font-semibold text-foreground truncate">
                   {card.title}
                 </span>
               </div>
@@ -93,7 +93,7 @@ export function TeacherStats({
 
             {/* Bottom stat value */}
             <div className="mt-2.5 sm:mt-3 pl-0.5">
-              <span className="text-xl sm:text-2xl font-bold text-zinc-900 dark:text-zinc-50 tracking-tight">
+              <span className="text-xl sm:text-2xl font-bold text-foreground tracking-tight">
                 {card.value}
               </span>
             </div>

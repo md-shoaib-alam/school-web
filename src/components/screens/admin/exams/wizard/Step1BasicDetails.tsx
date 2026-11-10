@@ -72,20 +72,20 @@ export function Step1BasicDetails({
   onNext,
 }: Step1BasicDetailsProps) {
   return (
-    <div className="bg-white dark:bg-zinc-900 border border-slate-200/80 dark:border-zinc-800/80 rounded-2xl sm:rounded-2xl p-5 sm:p-8 shadow-xs space-y-5 sm:space-y-6">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-slate-100 dark:border-zinc-800">
+    <div className="bg-card border  rounded-2xl sm:rounded-2xl p-5 sm:p-8 shadow-xs space-y-5 sm:space-y-6">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b ">
         <div className="flex items-center gap-3">
           <div className="size-9 rounded-full bg-blue-100 text-blue-600 dark:bg-blue-950/40 dark:text-blue-400 font-bold flex items-center justify-center text-sm shrink-0">
             1
           </div>
           <div>
-            <h2 className="text-base font-bold text-slate-900 dark:text-white leading-tight">Basic Details</h2>
-            <p className="text-xs text-slate-500 dark:text-zinc-400">Enter the general information for this exam.</p>
+            <h2 className="text-base font-bold text-foreground leading-tight">Basic Details</h2>
+            <p className="text-xs text-muted-foreground">Enter the general information for this exam.</p>
           </div>
         </div>
 
         {/* Desktop Toggle in Top Right Corner */}
-        <div className="hidden sm:inline-flex items-center bg-slate-100 dark:bg-zinc-800 p-1 rounded-xl text-xs font-medium border border-slate-200/80 dark:border-zinc-700/80 shrink-0">
+        <div className="hidden sm:inline-flex items-center bg-muted p-1 rounded-xl text-xs font-medium border  shrink-0">
           <button
             type="button"
             onClick={() => {
@@ -94,8 +94,8 @@ export function Step1BasicDetails({
             }}
             className={`px-3 py-1 rounded-lg transition-all ${
               selectionMode === 'section'
-                ? 'bg-white dark:bg-zinc-900 text-blue-600 dark:text-blue-400 font-semibold shadow-2xs'
-                : 'text-slate-600 dark:text-zinc-400 hover:text-slate-900'
+                ? 'bg-card text-blue-600 dark:text-blue-400 font-semibold shadow-2xs'
+                : 'text-muted-foreground hover:text-foreground'
             }`}
           >
             Section-wise
@@ -109,8 +109,8 @@ export function Step1BasicDetails({
             }}
             className={`px-3 py-1 rounded-lg transition-all flex items-center gap-1.5 ${
               selectionMode === 'grade'
-                ? 'bg-white dark:bg-zinc-900 text-blue-600 dark:text-blue-400 font-semibold shadow-2xs'
-                : 'text-slate-600 dark:text-zinc-400 hover:text-slate-900'
+                ? 'bg-card text-blue-600 dark:text-blue-400 font-semibold shadow-2xs'
+                : 'text-muted-foreground hover:text-foreground'
             }`}
           >
             <span>Class-wise</span>
@@ -122,7 +122,7 @@ export function Step1BasicDetails({
       </div>
 
       {/* Mobile Segmented Control: Class-wise vs Section-wise */}
-      <div className="grid sm:hidden grid-cols-2 bg-slate-100/80 dark:bg-zinc-800/70 p-1 rounded-2xl text-xs font-semibold border border-slate-200/50 dark:border-zinc-700/50">
+      <div className="grid sm:hidden grid-cols-2 bg-muted p-1 rounded-2xl text-xs font-semibold border ">
         <button
           type="button"
           onClick={() => {
@@ -132,8 +132,8 @@ export function Step1BasicDetails({
           }}
           className={`py-2 px-3 rounded-xl transition-all cursor-pointer text-center ${
             selectionMode === 'grade'
-              ? 'bg-white dark:bg-zinc-900 text-blue-600 dark:text-blue-400 shadow-2xs font-semibold border border-blue-100/70 dark:border-zinc-700'
-              : 'text-slate-500 dark:text-zinc-400 hover:text-slate-900'
+              ? 'bg-card text-blue-600 dark:text-blue-400 shadow-2xs font-semibold border border-blue-100/70'
+              : 'text-muted-foreground hover:text-foreground'
           }`}
         >
           Class-wise
@@ -146,8 +146,8 @@ export function Step1BasicDetails({
           }}
           className={`py-2 px-3 rounded-xl transition-all cursor-pointer text-center ${
             selectionMode === 'section'
-              ? 'bg-white dark:bg-zinc-900 text-blue-600 dark:text-blue-400 shadow-2xs font-semibold border border-blue-100/70 dark:border-zinc-700'
-              : 'text-slate-500 dark:text-zinc-400 hover:text-slate-900'
+              ? 'bg-card text-blue-600 dark:text-blue-400 shadow-2xs font-semibold border border-blue-100/70'
+              : 'text-muted-foreground hover:text-foreground'
           }`}
         >
           Section-wise
@@ -157,13 +157,13 @@ export function Step1BasicDetails({
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-5 pt-1">
         {/* Row 1, Col 1: Exam Name */}
         <div className="space-y-1.5">
-          <Label className="text-xs font-medium text-slate-700 dark:text-zinc-300">
+          <Label className="text-xs font-medium text-foreground">
             Exam Name <span className="text-red-500">*</span>
           </Label>
           <div className="relative">
             <FileText className="absolute left-3.5 top-1/2 -translate-y-1/2 size-4 text-blue-500" />
             <Input
-              className="pl-10 h-11 bg-white dark:bg-zinc-900/80 border-slate-200 dark:border-zinc-800 rounded-xl text-sm font-normal text-slate-800 dark:text-zinc-200 focus-visible:ring-blue-500"
+              className="pl-10 h-11 bg-card  rounded-xl text-sm font-normal text-foreground focus-visible:ring-blue-500"
               value={examName}
               onChange={(e) => setExamName(e.target.value)}
               placeholder="e.g. Midterm Examination 2026 or Annual Final Exam"
@@ -173,12 +173,12 @@ export function Step1BasicDetails({
 
         {/* Row 1, Col 2: Exam Type */}
         <div className="space-y-1.5">
-          <Label className="text-xs font-medium text-slate-700 dark:text-zinc-300">
+          <Label className="text-xs font-medium text-foreground">
             Exam Type <span className="text-red-500">*</span>
           </Label>
           <div className="relative">
             <Select value={examType} onValueChange={setExamType}>
-              <SelectTrigger className="w-full h-11 bg-white dark:bg-zinc-900/80 border-slate-200 dark:border-zinc-800 rounded-xl text-sm font-normal text-slate-800 dark:text-zinc-200 pl-10">
+              <SelectTrigger className="w-full h-11 bg-card  rounded-xl text-sm font-normal text-foreground pl-10">
                 <Trophy className="absolute left-3.5 top-1/2 -translate-y-1/2 size-4 text-blue-500" />
                 <SelectValue placeholder="Select type" />
               </SelectTrigger>
@@ -192,7 +192,7 @@ export function Step1BasicDetails({
 
         {/* Row 2, Col 1: Class Selection */}
         <div className="space-y-1.5">
-          <Label className="text-xs font-medium text-slate-700 dark:text-zinc-300">
+          <Label className="text-xs font-medium text-foreground">
             {selectionMode === 'grade' ? 'Select Class (All Sections)' : 'Select Class & Section'} <span className="text-red-500">*</span>
           </Label>
 
@@ -202,7 +202,7 @@ export function Step1BasicDetails({
                 value={selectedClassIds[0] || ''}
                 onValueChange={(val) => handleSelectSectionClass(val)}
               >
-                <SelectTrigger className="w-full h-11 bg-white dark:bg-zinc-900/80 border-slate-200 dark:border-zinc-800 rounded-xl text-sm font-normal text-slate-800 dark:text-zinc-200 pl-10">
+                <SelectTrigger className="w-full h-11 bg-card  rounded-xl text-sm font-normal text-foreground pl-10">
                   <Users className="absolute left-3.5 top-1/2 -translate-y-1/2 size-4 text-blue-500" />
                   <SelectValue placeholder="Select class section" />
                 </SelectTrigger>
@@ -227,7 +227,7 @@ export function Step1BasicDetails({
                   value={selectedGrade || gradeGroups[0]?.gradeName || ''}
                   onValueChange={(val) => handleSelectGrade(val)}
                 >
-                  <SelectTrigger className="w-full h-11 bg-white dark:bg-zinc-900/80 border-slate-200 dark:border-zinc-800 rounded-xl text-sm font-normal text-slate-800 dark:text-zinc-200 pl-10">
+                  <SelectTrigger className="w-full h-11 bg-card  rounded-xl text-sm font-normal text-foreground pl-10">
                     <GraduationCap className="absolute left-3.5 top-1/2 -translate-y-1/2 size-4 text-blue-500" />
                     <SelectValue placeholder="Select class" />
                   </SelectTrigger>
@@ -246,11 +246,11 @@ export function Step1BasicDetails({
                   </SelectContent>
                 </Select>
               </div>
-              <div className="flex items-center gap-1.5 px-0.5 text-xs text-slate-500 dark:text-zinc-400">
-                <span className="text-[11px] text-slate-400">Sections included:</span>
+              <div className="flex items-center gap-1.5 px-0.5 text-xs text-muted-foreground">
+                <span className="text-[11px] text-muted-foreground">Sections included:</span>
                 <div className="flex flex-wrap items-center gap-1">
                   {selectedClasses.map(c => (
-                    <span key={c.id} className="text-[11px] font-semibold text-slate-700 dark:text-zinc-300 bg-slate-100 dark:bg-zinc-800 px-2 py-0.5 rounded-lg border border-slate-200/60 dark:border-zinc-700/60">
+                    <span key={c.id} className="text-[11px] font-semibold text-foreground bg-muted px-2 py-0.5 rounded-lg border ">
                       {c.section}
                     </span>
                   ))}
@@ -262,12 +262,12 @@ export function Step1BasicDetails({
 
         {/* Row 2, Col 2: Academic Year */}
         <div className="space-y-1.5">
-          <Label className="text-xs font-medium text-slate-700 dark:text-zinc-300">
+          <Label className="text-xs font-medium text-foreground">
             Academic Year <span className="text-red-500">*</span>
           </Label>
           <div className="relative">
             <Select value={academicYear} onValueChange={setAcademicYear}>
-              <SelectTrigger className="w-full h-11 bg-white dark:bg-zinc-900/80 border-slate-200 dark:border-zinc-800 rounded-xl text-sm font-normal text-slate-800 dark:text-zinc-200 pl-10">
+              <SelectTrigger className="w-full h-11 bg-card  rounded-xl text-sm font-normal text-foreground pl-10">
                 <Calendar className="absolute left-3.5 top-1/2 -translate-y-1/2 size-4 text-blue-500" />
                 <SelectValue placeholder="Academic Year" />
               </SelectTrigger>
@@ -296,26 +296,26 @@ export function Step1BasicDetails({
         {/* Row 3: Start Date & End Date - side by side on mobile & desktop */}
         <div className="grid grid-cols-2 gap-3 sm:gap-5 md:col-span-2">
           <div className="space-y-1.5">
-            <Label className="text-xs font-semibold text-slate-800 dark:text-zinc-200">
+            <Label className="text-xs font-semibold text-foreground">
               Start Date <span className="text-red-500">*</span>
             </Label>
             <DatePicker 
               date={parseLocalDate(startDate)} 
               onChange={(d) => handleStartDateChange(formatLocalDate(d))} 
               disabled={isPastDate}
-              className="w-full h-11 rounded-xl text-xs sm:text-sm bg-slate-50/50 dark:bg-zinc-800/40 border-slate-200 dark:border-zinc-800 font-medium"
+              className="w-full h-11 rounded-xl text-xs sm:text-sm bg-muted  font-medium"
             />
           </div>
 
           <div className="space-y-1.5">
-            <Label className="text-xs font-semibold text-slate-800 dark:text-zinc-200">
+            <Label className="text-xs font-semibold text-foreground">
               End Date <span className="text-red-500">*</span>
             </Label>
             <DatePicker 
               date={parseLocalDate(endDate)} 
               onChange={(d) => setEndDate(formatLocalDate(d))} 
               disabled={isEndDateDisabled}
-              className="w-full h-11 rounded-xl text-xs sm:text-sm bg-slate-50/50 dark:bg-zinc-800/40 border-slate-200 dark:border-zinc-800 font-medium"
+              className="w-full h-11 rounded-xl text-xs sm:text-sm bg-muted  font-medium"
             />
           </div>
         </div>
@@ -324,8 +324,8 @@ export function Step1BasicDetails({
       {/* Description */}
       <div className="space-y-1.5 pt-1">
         <div className="flex items-center justify-between">
-          <Label className="text-xs font-semibold text-slate-800 dark:text-zinc-200">Description (Optional)</Label>
-          <span className="text-[11px] text-slate-400">{description.length}/500</span>
+          <Label className="text-xs font-semibold text-foreground">Description (Optional)</Label>
+          <span className="text-[11px] text-muted-foreground">{description.length}/500</span>
         </div>
         <div className="relative">
           <textarea
@@ -334,7 +334,7 @@ export function Step1BasicDetails({
             onChange={(e) => setDescription(e.target.value)}
             placeholder="Details or guidelines for this examination..."
             rows={3}
-            className="w-full rounded-2xl border border-slate-200/90 dark:border-zinc-800 bg-white dark:bg-zinc-900/80 p-3 text-xs sm:text-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 text-slate-800 dark:text-zinc-100 resize-none"
+            className="w-full rounded-2xl border  bg-card p-3 text-xs sm:text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-blue-500 text-foreground resize-none"
           />
         </div>
       </div>
@@ -349,8 +349,8 @@ export function Step1BasicDetails({
       </div>
 
       {/* Action Buttons */}
-      <div className="flex items-center justify-between sm:justify-end gap-3 pt-4 border-t border-slate-100 dark:border-zinc-800">
-        <Button variant="outline" onClick={onCancel} className="h-10 px-5 rounded-xl border-slate-200 dark:border-zinc-700 flex-1 sm:flex-initial">
+      <div className="flex items-center justify-between sm:justify-end gap-3 pt-4 border-t ">
+        <Button variant="outline" onClick={onCancel} className="h-10 px-5 rounded-xl  flex-1 sm:flex-initial">
           Cancel
         </Button>
         <Button 

@@ -50,19 +50,19 @@ export function StaffTable({
   return (
     <div className="overflow-x-auto px-4 sm:px-6">
       <Table>
-        <TableHeader className="bg-zinc-50/50 dark:bg-zinc-900/20">
+        <TableHeader className="bg-muted">
           <TableRow>
-            <TableHead className="font-bold uppercase text-[10px] tracking-widest text-zinc-500">Member</TableHead>
-            <TableHead className="font-bold uppercase text-[10px] tracking-widest text-zinc-500 hidden sm:table-cell">Contact</TableHead>
-            <TableHead className="font-bold uppercase text-[10px] tracking-widest text-zinc-500 hidden md:table-cell">Role</TableHead>
-            <TableHead className="font-bold uppercase text-[10px] tracking-widest text-zinc-500 hidden sm:table-cell">Status</TableHead>
-            <TableHead className="text-right font-bold uppercase text-[10px] tracking-widest text-zinc-500">Actions</TableHead>
+            <TableHead className="font-bold uppercase text-[10px] tracking-widest text-muted-foreground">Member</TableHead>
+            <TableHead className="font-bold uppercase text-[10px] tracking-widest text-muted-foreground hidden sm:table-cell">Contact</TableHead>
+            <TableHead className="font-bold uppercase text-[10px] tracking-widest text-muted-foreground hidden md:table-cell">Role</TableHead>
+            <TableHead className="font-bold uppercase text-[10px] tracking-widest text-muted-foreground hidden sm:table-cell">Status</TableHead>
+            <TableHead className="text-right font-bold uppercase text-[10px] tracking-widest text-muted-foreground">Actions</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {staff.length === 0 ? (
             <TableRow>
-              <TableCell colSpan={5} className="h-40 text-center text-zinc-500">
+              <TableCell colSpan={5} className="h-40 text-center text-muted-foreground">
                 No staff members found.
               </TableCell>
             </TableRow>
@@ -70,7 +70,7 @@ export function StaffTable({
             staff.map((member) => (
               <TableRow 
                 key={member.id} 
-                className="hover:bg-zinc-50/50 dark:hover:bg-zinc-900/10 transition-colors cursor-pointer"
+                className="hover:bg-muted transition-colors cursor-pointer"
                 onClick={() => onView(member)}
               >
                 <TableCell>
@@ -81,19 +81,19 @@ export function StaffTable({
                       </AvatarFallback>
                     </Avatar>
                     <div className="flex flex-col group">
-                      <span className="font-bold text-sm text-zinc-900 dark:text-zinc-100">{member.name}</span>
+                      <span className="font-bold text-sm text-foreground">{member.name}</span>
                       <div className="flex items-center gap-1.5">
-                        <span className="text-[10px] text-zinc-500">{member.email}</span>
+                        <span className="text-[10px] text-muted-foreground">{member.email}</span>
                         <button 
                           type="button"
                           onClick={(e) => { e.stopPropagation(); handleCopy(member.email, member.id); }}
-                          className="opacity-0 group-hover:opacity-100 transition-opacity p-0.5 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded"
+                          className="opacity-0 group-hover:opacity-100 transition-opacity p-0.5 hover:bg-accent rounded"
                           title="Copy email"
                         >
                           {copiedId === member.id ? (
                             <Check className="size-2.5 text-emerald-500" />
                           ) : (
-                            <Copy className="size-2.5 text-zinc-400" />
+                            <Copy className="size-2.5 text-muted-foreground" />
                           )}
                         </button>
                       </div>
@@ -102,7 +102,7 @@ export function StaffTable({
                 </TableCell>
                 <TableCell className="hidden sm:table-cell">
                   <div className="flex flex-col gap-1">
-                    <div className="flex items-center gap-1.5 text-xs text-zinc-600 dark:text-zinc-400">
+                    <div className="flex items-center gap-1.5 text-xs text-foreground">
                       <Phone className="size-3" />
                       {member.phone || "No phone"}
                     </div>
@@ -128,7 +128,7 @@ export function StaffTable({
                     className={`text-[10px] font-bold shadow-none ${
                       member.isActive 
                         ? "bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/40 dark:text-emerald-400 dark:border-emerald-800" 
-                        : "bg-zinc-50 text-zinc-600 border-zinc-200 dark:bg-zinc-950 dark:text-zinc-400 dark:border-zinc-800"
+                        : "bg-muted text-foreground "
                     }`}
                   >
                     {member.isActive ? "Active" : "Inactive"}
@@ -141,7 +141,7 @@ export function StaffTable({
                       <Button
                         size="icon"
                         variant="ghost"
-                        className="size-8 text-zinc-500 hover:text-emerald-600 dark:hover:bg-emerald-900/20 shrink-0"
+                        className="size-8 text-muted-foreground hover:text-emerald-600 dark:hover:bg-emerald-900/20 shrink-0"
                         onClick={() => onView(member)}
                         title="View Details"
                       >

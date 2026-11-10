@@ -359,7 +359,7 @@ export function SuperAdminSettings() {
                   value={maintenanceMessage}
                   onChange={(e) => dispatch({ type: 'SET_MAINTENANCE_MESSAGE', payload: e.target.value })}
                   placeholder="e.g. System upgrade in progress. Back online in 20 minutes."
-                  className="min-h-[90px] text-xs rounded-xl border-amber-200 dark:border-amber-900 focus-visible:ring-amber-500 dark:bg-zinc-900 bg-white leading-relaxed"
+                  className="min-h-[90px] text-xs rounded-xl border-amber-200 dark:border-amber-900 focus-visible:ring-amber-500 bg-white leading-relaxed"
                 />
                 <p className="text-[11px] text-amber-600/90 dark:text-amber-400">
                   This message will render directly on the block screen for all public portals.

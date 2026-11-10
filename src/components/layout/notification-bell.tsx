@@ -174,18 +174,18 @@ export function NotificationBell() {
           variant="ghost"
           size="icon"
           aria-label={`Notifications${unread > 0 ? ` (${unread} unread)` : ""}`}
-          className="size-8.5 sm:size-9 shrink-0 rounded-xl border border-slate-200/70 dark:border-zinc-800 bg-white/80 dark:bg-zinc-900/80 text-slate-600 hover:text-slate-900 dark:text-zinc-400 dark:hover:text-zinc-100 hover:bg-slate-100/80 dark:hover:bg-zinc-800 shadow-2xs transition-all cursor-pointer relative"
+          className="size-8.5 sm:size-9 shrink-0 rounded-xl border  bg-card/80 text-foreground hover:text-foreground dark:hover:text-muted-foreground hover:bg-muted shadow-2xs transition-all cursor-pointer relative"
         >
           <Bell className="size-4" />
           {unread > 0 && (
-            <span className="absolute -top-1 -right-1 min-w-4 h-4 px-1 flex items-center justify-center rounded-full bg-blue-600 text-white text-[10px] font-semibold leading-none ring-2 ring-white dark:ring-zinc-900">
+            <span className="absolute -top-1 -right-1 min-w-4 h-4 px-1 flex items-center justify-center rounded-full bg-brand text-brand-foreground text-[10px] font-semibold leading-none ring-2 ring-border">
               {unread > 9 ? "9+" : unread}
             </span>
           )}
         </Button>
       </PopoverTrigger>
       <PopoverContent align="end" className="w-80 p-0 gap-0 rounded-xl">
-        <div className="flex items-center justify-between px-3 py-2 border-b border-slate-200/70 dark:border-zinc-800">
+        <div className="flex items-center justify-between px-3 py-2 border-b ">
           <span className="text-sm font-semibold">Notifications</span>
           <div className="flex items-center gap-1">
             <Button
@@ -213,30 +213,30 @@ export function NotificationBell() {
 
         <div className="max-h-80 overflow-y-auto">
           {loadingList && visibleItems.length === 0 && (
-            <div className="px-3 py-6 text-center text-xs text-slate-500 dark:text-zinc-400">Loading…</div>
+            <div className="px-3 py-6 text-center text-xs text-muted-foreground">Loading…</div>
           )}
           {!loadingList && visibleItems.length === 0 && (
-            <div className="px-3 py-6 text-center text-xs text-slate-500 dark:text-zinc-400">
+            <div className="px-3 py-6 text-center text-xs text-muted-foreground">
               You're all caught up.
             </div>
           )}
           {visibleItems.map((item) => (
             <div
               key={item.id}
-              className="group flex items-start gap-2 px-3 py-2.5 border-b border-slate-100 dark:border-zinc-800/60 last:border-b-0 hover:bg-slate-50/80 dark:hover:bg-zinc-800/50"
+              className="group flex items-start gap-2 px-3 py-2.5 border-b  last:border-b-0 hover:bg-muted"
             >
               <span
                 className={cn(
                   "mt-1.5 size-2 rounded-full shrink-0",
-                  item.isRead ? "bg-transparent" : "bg-blue-600"
+                  item.isRead ? "bg-transparent" : "bg-brand"
                 )}
               />
               <div className="min-w-0 flex-1">
                 <div className="text-[13px] font-medium leading-tight truncate">{item.title}</div>
-                <div className="text-xs text-slate-600 dark:text-zinc-400 leading-snug line-clamp-2">
+                <div className="text-xs text-muted-foreground leading-snug line-clamp-2">
                   {item.content}
                 </div>
-                <div className="text-[11px] text-slate-400 dark:text-zinc-500 mt-0.5">
+                <div className="text-[11px] text-muted-foreground mt-0.5">
                   {timeAgo(item.createdAt)}
                 </div>
               </div>
@@ -244,7 +244,7 @@ export function NotificationBell() {
                 type="button"
                 aria-label="Dismiss notification"
                 onClick={() => dismiss(item)}
-                className="opacity-0 group-hover:opacity-100 focus:opacity-100 transition-opacity p-1 rounded-md text-slate-400 hover:text-slate-700 dark:hover:text-zinc-200 hover:bg-slate-100 dark:hover:bg-zinc-800 cursor-pointer"
+                className="opacity-0 group-hover:opacity-100 focus:opacity-100 transition-opacity p-1 rounded-md text-muted-foreground hover:text-foreground dark:hover:text-muted-foreground hover:bg-accent cursor-pointer"
               >
                 <X className="size-3.5" />
               </button>

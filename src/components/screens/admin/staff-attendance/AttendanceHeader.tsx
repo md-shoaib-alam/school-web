@@ -20,7 +20,7 @@ export function AttendanceHeader({
   return (
     <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
       <div>
-        <h2 className="text-2xl font-semibold text-zinc-900 dark:text-zinc-100 flex items-center gap-2">
+        <h2 className="text-2xl font-semibold text-foreground flex items-center gap-2">
           {activeTab === "teacher" ? (
             <GraduationCap className="size-7 text-emerald-600" />
           ) : (
@@ -30,7 +30,7 @@ export function AttendanceHeader({
             ? "Teacher Attendance"
             : "Staff Attendance"}
         </h2>
-        <p className="text-zinc-500 dark:text-zinc-400 mt-1">
+        <p className="text-muted-foreground mt-1">
           {activeTab === "teacher"
             ? "Manage daily attendance logs for all teachers."
             : "Manage daily attendance logs for staff members."}
@@ -64,7 +64,7 @@ export function AttendanceHeader({
             return date > today;
           }}
           align="end"
-          className="rounded-xl dark:[color-scheme:dark] w-fit bg-white dark:bg-zinc-900 hover:bg-zinc-50 dark:hover:bg-zinc-800"
+          className="rounded-xl dark:[color-scheme:dark] w-fit bg-card hover:bg-accent"
         />
       </div>
     </div>

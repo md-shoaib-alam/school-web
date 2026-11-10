@@ -152,7 +152,7 @@ export function TransportDialogs({
                     </SelectContent>
                   </Select>
                 ) : (
-                  <div className="space-y-3 p-3 rounded-lg border bg-zinc-50/50 dark:bg-zinc-900/20">
+                  <div className="space-y-3 p-3 rounded-lg border bg-muted">
                     <div className="space-y-1">
                       <Label className="text-xs">New Pickup Point Name *</Label>
                       <Input

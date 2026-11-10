@@ -141,7 +141,7 @@ export function ActiveExamsView({
       />
 
       {/* Main Table Card — displays single row per exam cycle (Image 1) */}
-      <div className="bg-white dark:bg-zinc-900 border border-border/70 rounded-2xl shadow-sm overflow-hidden">
+      <div className="bg-card border border-border/70 rounded-2xl shadow-sm overflow-hidden">
         <div className="overflow-x-auto px-2 sm:px-6">
           <Table>
             <TableHeader>

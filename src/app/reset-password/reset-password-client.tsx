@@ -45,10 +45,10 @@ export default function ResetPasswordClient() {
       <div className="size-16 rounded-full bg-emerald-50 border border-emerald-100 flex items-center justify-center mb-4 shadow-sm">
         <CheckCircle2 className="size-8 text-emerald-500" />
       </div>
-      <h2 className="text-xl font-bold text-slate-900 tracking-tight">Email Sent!</h2>
-      <p className="mt-2 text-sm text-slate-500 leading-relaxed max-w-[260px]">
+      <h2 className="text-xl font-bold text-foreground tracking-tight">Email Sent!</h2>
+      <p className="mt-2 text-sm text-muted-foreground leading-relaxed max-w-[260px]">
         A secure reset link has been sent to{' '}
-        <span className="font-semibold text-slate-800">{email}</span>
+        <span className="font-semibold text-foreground">{email}</span>
       </p>
       <Button asChild className="w-full h-10 mt-6 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-semibold text-sm shadow-md shadow-blue-500/25 gap-2 cursor-pointer">
         <Link href="/"><ArrowLeft className="size-4" />Return to Login</Link>
@@ -56,7 +56,7 @@ export default function ResetPasswordClient() {
       <button
         type="button"
         onClick={() => setIsSuccess(false)}
-        className="mt-3 text-xs text-slate-500 hover:text-blue-600 font-medium transition-colors cursor-pointer"
+        className="mt-3 text-xs text-muted-foreground hover:text-blue-600 font-medium transition-colors cursor-pointer"
       >
         Didn't receive the email? Try again
       </button>
@@ -75,8 +75,8 @@ export default function ResetPasswordClient() {
 
       {/* Title & subtitle centered */}
       <div className="text-center mb-5">
-        <h2 className="text-xl xl:text-2xl font-bold text-slate-900 tracking-tight">Forgot Password?</h2>
-        <p className="mt-2 text-xs text-slate-500 leading-relaxed max-w-[240px] mx-auto">
+        <h2 className="text-xl xl:text-2xl font-bold text-foreground tracking-tight">Forgot Password?</h2>
+        <p className="mt-2 text-xs text-muted-foreground leading-relaxed max-w-[240px] mx-auto">
           Enter your email address and we'll send you instructions to reset your password.
         </p>
       </div>
@@ -84,16 +84,16 @@ export default function ResetPasswordClient() {
       {/* Form */}
       <form onSubmit={handleSubmit} className="space-y-3">
         <div className="space-y-1">
-          <Label htmlFor="reset-email" className="text-xs font-semibold text-slate-700">Email Address</Label>
+          <Label htmlFor="reset-email" className="text-xs font-semibold text-foreground">Email Address</Label>
           <div className="relative">
-            <div className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none">
+            <div className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none">
               <Mail className="size-4" />
             </div>
             <Input
               id="reset-email"
               type="email"
               placeholder="Enter your email address"
-              className="pl-10 h-10 xl:h-11 text-xs sm:text-sm bg-slate-50 border-slate-200 rounded-xl focus-visible:ring-2 focus-visible:ring-blue-500 placeholder:text-slate-400"
+              className="pl-10 h-10 xl:h-11 text-xs sm:text-sm bg-muted  rounded-xl focus-visible:ring-2 focus-visible:ring-blue-500 placeholder:text-muted-foreground"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
@@ -117,8 +117,8 @@ export default function ResetPasswordClient() {
 
       {/* OR divider */}
       <div className="relative my-3">
-        <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-slate-200" /></div>
-        <div className="relative flex justify-center"><span className="bg-white px-3 text-slate-400 font-semibold text-[11px] uppercase">OR</span></div>
+        <div className="absolute inset-0 flex items-center"><div className="w-full border-t " /></div>
+        <div className="relative flex justify-center"><span className="bg-white px-3 text-muted-foreground font-semibold text-[11px] uppercase">OR</span></div>
       </div>
 
       {/* Reset via Phone */}
@@ -132,7 +132,7 @@ export default function ResetPasswordClient() {
       </Button>
 
       {/* Bottom sign in link */}
-      <p className="mt-4 text-center text-xs text-slate-500">
+      <p className="mt-4 text-center text-xs text-muted-foreground">
         Remember your password?{' '}
         <Link href="/" className="font-semibold text-blue-600 hover:text-blue-700 transition-colors">
           Sign in
@@ -143,7 +143,7 @@ export default function ResetPasswordClient() {
 
   return (
     <div
-      className="min-h-screen lg:h-screen lg:max-h-screen w-full bg-[#d0ecff] text-slate-900 flex flex-col relative selection:bg-blue-500 selection:text-white overflow-x-hidden lg:overflow-hidden"
+      className="min-h-screen lg:h-screen lg:max-h-screen w-full bg-[#d0ecff] text-foreground flex flex-col relative selection:bg-blue-500 selection:text-white overflow-x-hidden lg:overflow-hidden"
       suppressHydrationWarning
     >
       {/* Desktop background */}
@@ -160,7 +160,7 @@ export default function ResetPasswordClient() {
       <div className="lg:hidden relative z-10 w-full min-h-screen flex flex-col justify-between items-center px-4 sm:px-6 md:px-8 py-3 sm:py-5 md:py-6">
         {/* Top bar: return button at top-right */}
         <div className="w-full flex items-center justify-end shrink-0">
-          <Link href="/" className="inline-flex items-center gap-1.5 text-xs sm:text-sm font-semibold text-slate-700 bg-white/90 px-3.5 sm:px-4 py-1.5 sm:py-2 rounded-full border border-white/70 shadow-sm hover:text-blue-600 hover:bg-white transition-colors">
+          <Link href="/" className="inline-flex items-center gap-1.5 text-xs sm:text-sm font-semibold text-foreground bg-white/90 px-3.5 sm:px-4 py-1.5 sm:py-2 rounded-full border border-white/70 shadow-sm hover:text-blue-600 hover:bg-white transition-colors">
             <ArrowLeft className="size-3.5 sm:size-4" />
             Back to login
           </Link>
@@ -172,7 +172,7 @@ export default function ResetPasswordClient() {
             <Image src="/test.webp" alt="ParentLink School App" width={96} height={96} priority className="size-full object-cover scale-[1.28]" />
           </div>
           <h1 className="text-2xl sm:text-3xl md:text-4xl font-black tracking-tight">
-            <span className="text-slate-900">School</span>
+            <span className="text-foreground">School</span>
             <span className="text-blue-600">SaaS</span>
           </h1>
         </div>
@@ -183,7 +183,7 @@ export default function ResetPasswordClient() {
           <div className="absolute -inset-2 sm:-inset-2.5 rounded-[32px] sm:rounded-[36px] bg-white/30 backdrop-blur-md border border-white/60 shadow-xl shadow-sky-950/10 pointer-events-none" />
 
           {/* Foreground Card */}
-          <div className="relative z-10 w-full rounded-[26px] sm:rounded-[30px] bg-white border border-slate-100 shadow-xl shadow-sky-950/10 backdrop-blur-xs overflow-hidden">
+          <div className="relative z-10 w-full rounded-[26px] sm:rounded-[30px] bg-white border  shadow-xl shadow-sky-950/10 backdrop-blur-xs overflow-hidden">
             {isSuccess ? successCard : formCard}
           </div>
         </div>
@@ -193,22 +193,22 @@ export default function ResetPasswordClient() {
           <div className="flex items-center justify-center gap-2 px-1.5">
             <div className="size-8 rounded-lg bg-emerald-100/80 text-emerald-600 flex items-center justify-center shrink-0 shadow-xs"><Users className="size-4" /></div>
             <div className="min-w-0">
-              <div className="text-xs font-black text-slate-900 leading-none">1000+</div>
-              <div className="text-[10px] text-slate-600 mt-0.5 font-semibold truncate">Happy Students</div>
+              <div className="text-xs font-black text-foreground leading-none">1000+</div>
+              <div className="text-[10px] text-foreground mt-0.5 font-semibold truncate">Happy Students</div>
             </div>
           </div>
           <div className="flex items-center justify-center gap-2 px-1.5">
             <div className="size-8 rounded-lg bg-blue-100/80 text-blue-600 flex items-center justify-center shrink-0 shadow-xs"><School className="size-4" /></div>
             <div className="min-w-0">
-              <div className="text-xs font-black text-slate-900 leading-none">50+</div>
-              <div className="text-[10px] text-slate-600 mt-0.5 font-semibold truncate">Schools Trust</div>
+              <div className="text-xs font-black text-foreground leading-none">50+</div>
+              <div className="text-[10px] text-foreground mt-0.5 font-semibold truncate">Schools Trust</div>
             </div>
           </div>
           <div className="flex items-center justify-center gap-2 px-1.5">
             <div className="size-8 rounded-lg bg-amber-100/80 text-amber-600 flex items-center justify-center shrink-0 shadow-xs"><Star className="size-4 fill-amber-400 text-amber-400" /></div>
             <div className="min-w-0">
-              <div className="text-xs font-black text-slate-900 leading-none">4.8</div>
-              <div className="text-[10px] text-slate-600 mt-0.5 font-semibold truncate">Satisfaction</div>
+              <div className="text-xs font-black text-foreground leading-none">4.8</div>
+              <div className="text-[10px] text-foreground mt-0.5 font-semibold truncate">Satisfaction</div>
             </div>
           </div>
         </div>
@@ -227,7 +227,7 @@ export default function ResetPasswordClient() {
         {/* Header: return button at top-right */}
         <header className="w-full px-8 lg:px-12 xl:px-16 2xl:pl-16 2xl:pr-8 pt-4 lg:pt-5 2xl:pt-6 flex items-center justify-end shrink-0">
           <div className="w-full max-w-[1920px] 2xl:max-w-none mx-auto flex items-center justify-end">
-            <Link href="/" className="group inline-flex items-center gap-1.5 text-xs 2xl:text-sm font-semibold text-slate-700 bg-white/90 px-4 2xl:px-5 py-2 2xl:py-2.5 rounded-full border border-white/70 shadow-md hover:text-blue-600 hover:bg-white transition-colors cursor-pointer">
+            <Link href="/" className="group inline-flex items-center gap-1.5 text-xs 2xl:text-sm font-semibold text-foreground bg-white/90 px-4 2xl:px-5 py-2 2xl:py-2.5 rounded-full border border-white/70 shadow-md hover:text-blue-600 hover:bg-white transition-colors cursor-pointer">
               <ArrowLeft className="size-3.5 2xl:size-4 group-hover:-translate-x-0.5 transition-transform" />
               Back to login
             </Link>
@@ -247,9 +247,9 @@ export default function ResetPasswordClient() {
                 </div>
               </div>
 
-              <h2 className="text-base lg:text-lg 2xl:text-xl font-bold text-slate-800 tracking-tight">Welcome to</h2>
+              <h2 className="text-base lg:text-lg 2xl:text-xl font-bold text-foreground tracking-tight">Welcome to</h2>
               <h1 className="text-4xl lg:text-5xl 2xl:text-6xl font-black tracking-tight mt-0.5">
-                <span className="text-slate-900">School</span>
+                <span className="text-foreground">School</span>
                 <span className="text-blue-600">SaaS</span>
               </h1>
 
@@ -258,24 +258,24 @@ export default function ResetPasswordClient() {
                 <div className="flex items-center gap-3">
                   <div className="size-10 rounded-xl bg-emerald-100/80 text-emerald-600 flex items-center justify-center shrink-0 shadow-sm"><Users className="size-5" /></div>
                   <div>
-                    <div className="text-sm font-black text-slate-900 leading-none">1000+</div>
-                    <div className="text-xs text-slate-600 mt-0.5 font-medium">Happy Students</div>
+                    <div className="text-sm font-black text-foreground leading-none">1000+</div>
+                    <div className="text-xs text-foreground mt-0.5 font-medium">Happy Students</div>
                   </div>
                 </div>
                 <div className="h-8 w-px bg-white/60" />
                 <div className="flex items-center gap-3">
                   <div className="size-10 rounded-xl bg-blue-100/80 text-blue-600 flex items-center justify-center shrink-0 shadow-sm"><School className="size-5" /></div>
                   <div>
-                    <div className="text-sm font-black text-slate-900 leading-none">50+</div>
-                    <div className="text-xs text-slate-600 mt-0.5 font-medium">Schools Trust Us</div>
+                    <div className="text-sm font-black text-foreground leading-none">50+</div>
+                    <div className="text-xs text-foreground mt-0.5 font-medium">Schools Trust Us</div>
                   </div>
                 </div>
                 <div className="h-8 w-px bg-white/60" />
                 <div className="flex items-center gap-3">
                   <div className="size-10 rounded-xl bg-amber-100/80 flex items-center justify-center shrink-0 shadow-sm"><Star className="size-5 fill-amber-400 text-amber-400" /></div>
                   <div>
-                    <div className="text-sm font-black text-slate-900 leading-none">4.8</div>
-                    <div className="text-xs text-slate-600 mt-0.5 font-medium">User Satisfaction</div>
+                    <div className="text-sm font-black text-foreground leading-none">4.8</div>
+                    <div className="text-xs text-foreground mt-0.5 font-medium">User Satisfaction</div>
                   </div>
                 </div>
               </div>
@@ -288,35 +288,35 @@ export default function ResetPasswordClient() {
                 <div className="absolute -top-4 -bottom-4 -left-2.5 -right-2.5 xl:-top-5 xl:-bottom-5 2xl:-top-6 2xl:-bottom-6 xl:-left-3 xl:-right-3 rounded-[36px] xl:rounded-[38px] bg-white/35 backdrop-blur-md border border-white/60 shadow-2xl shadow-sky-950/15 pointer-events-none" />
 
                 {/* Foreground Forgot Password Card */}
-                <div className="relative z-10 rounded-[32px] bg-white border border-slate-200/70 shadow-xl shadow-slate-300/30 w-full overflow-hidden">
+                <div className="relative z-10 rounded-[32px] bg-white border  shadow-xl shadow-slate-300/30 w-full overflow-hidden">
                   {isSuccess ? successCard : formCard}
                 </div>
               </div>
             </div>
 
             {/* Stat Card — pinned to bottom-right on 2xl+ screens only with crisp white background */}
-            <div className="hidden 2xl:flex absolute bottom-1 2xl:bottom-2 right-0 items-center gap-6 xl:gap-7 2xl:gap-8 px-6 xl:px-7 2xl:px-8 py-3.5 xl:py-4 rounded-2xl bg-white border border-slate-200/80 shadow-xl shadow-slate-900/10 w-fit">
+            <div className="hidden 2xl:flex absolute bottom-1 2xl:bottom-2 right-0 items-center gap-6 xl:gap-7 2xl:gap-8 px-6 xl:px-7 2xl:px-8 py-3.5 xl:py-4 rounded-2xl bg-white border  shadow-xl shadow-slate-900/10 w-fit">
               <div className="flex items-center gap-3">
                 <div className="size-10 2xl:size-11 rounded-xl bg-emerald-100 text-emerald-600 flex items-center justify-center shrink-0 shadow-xs"><Users className="size-5 2xl:size-5.5" /></div>
                 <div>
-                  <div className="text-sm 2xl:text-base font-black text-slate-900 leading-none">1000+</div>
-                  <div className="text-xs 2xl:text-sm text-slate-500 mt-0.5 font-medium">Happy Students</div>
+                  <div className="text-sm 2xl:text-base font-black text-foreground leading-none">1000+</div>
+                  <div className="text-xs 2xl:text-sm text-muted-foreground mt-0.5 font-medium">Happy Students</div>
                 </div>
               </div>
-              <div className="h-8 2xl:h-9 w-px bg-slate-200" />
+              <div className="h-8 2xl:h-9 w-px bg-muted" />
               <div className="flex items-center gap-3">
                 <div className="size-10 2xl:size-11 rounded-xl bg-blue-100 text-blue-600 flex items-center justify-center shrink-0 shadow-xs"><School className="size-5 2xl:size-5.5" /></div>
                 <div>
-                  <div className="text-sm 2xl:text-base font-black text-slate-900 leading-none">50+</div>
-                  <div className="text-xs 2xl:text-sm text-slate-500 mt-0.5 font-medium">Schools Trust Us</div>
+                  <div className="text-sm 2xl:text-base font-black text-foreground leading-none">50+</div>
+                  <div className="text-xs 2xl:text-sm text-muted-foreground mt-0.5 font-medium">Schools Trust Us</div>
                 </div>
               </div>
-              <div className="h-8 2xl:h-9 w-px bg-slate-200" />
+              <div className="h-8 2xl:h-9 w-px bg-muted" />
               <div className="flex items-center gap-3">
                 <div className="size-10 2xl:size-11 rounded-xl bg-amber-100 text-amber-600 flex items-center justify-center shrink-0 shadow-xs"><Star className="size-5 2xl:size-5.5 fill-amber-400 text-amber-400" /></div>
                 <div>
-                  <div className="text-sm 2xl:text-base font-black text-slate-900 leading-none">4.8</div>
-                  <div className="text-xs 2xl:text-sm text-slate-500 mt-0.5 font-medium">User Satisfaction</div>
+                  <div className="text-sm 2xl:text-base font-black text-foreground leading-none">4.8</div>
+                  <div className="text-xs 2xl:text-sm text-muted-foreground mt-0.5 font-medium">User Satisfaction</div>
                 </div>
               </div>
             </div>

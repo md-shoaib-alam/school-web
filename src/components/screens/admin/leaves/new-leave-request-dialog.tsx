@@ -78,7 +78,7 @@ export function NewLeaveRequestDialog({
         <div className="space-y-4 py-2">
           {/* Applicant Selector */}
           <div className="space-y-1.5">
-            <label className="text-xs font-semibold text-slate-700 dark:text-zinc-300 capitalize">
+            <label className="text-xs font-semibold text-foreground capitalize">
               Select {activeTab}
             </label>
             <Input
@@ -104,12 +104,12 @@ export function NewLeaveRequestDialog({
               </Select>
             )}
             {!candidatesLoading && availableCandidates.length === 0 && (
-              <p className="text-[11px] text-slate-400 dark:text-zinc-500">
+              <p className="text-[11px] text-muted-foreground">
                 No {roleLabel} found{candidateSearch ? ` for "${candidateSearch}"` : ''}.
               </p>
             )}
             {!candidatesLoading && candidatesTruncated && !candidateSearch && (
-              <p className="text-[11px] text-slate-400 dark:text-zinc-500">
+              <p className="text-[11px] text-muted-foreground">
                 Showing the first {CANDIDATE_LIMITS[activeTab] ?? 100} — type a name to narrow down.
               </p>
             )}
@@ -117,7 +117,7 @@ export function NewLeaveRequestDialog({
 
           {/* Leave Type */}
           <div className="space-y-1.5">
-            <label className="text-xs font-semibold text-slate-700 dark:text-zinc-300">Leave Type</label>
+            <label className="text-xs font-semibold text-foreground">Leave Type</label>
             <Select value={leaveType} onValueChange={onLeaveTypeChange}>
               <SelectTrigger className="h-10 rounded-xl text-sm capitalize">
                 <SelectValue />
@@ -135,7 +135,7 @@ export function NewLeaveRequestDialog({
           {/* Start and End Date */}
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1.5">
-              <label className="text-xs font-semibold text-slate-700 dark:text-zinc-300">Start Date</label>
+              <label className="text-xs font-semibold text-foreground">Start Date</label>
               <Input
                 type="date"
                 value={startDate}
@@ -144,7 +144,7 @@ export function NewLeaveRequestDialog({
               />
             </div>
             <div className="space-y-1.5">
-              <label className="text-xs font-semibold text-slate-700 dark:text-zinc-300">End Date</label>
+              <label className="text-xs font-semibold text-foreground">End Date</label>
               <Input
                 type="date"
                 value={endDate}
@@ -157,7 +157,7 @@ export function NewLeaveRequestDialog({
 
           {/* Reason */}
           <div className="space-y-1.5">
-            <label className="text-xs font-semibold text-slate-700 dark:text-zinc-300">Reason</label>
+            <label className="text-xs font-semibold text-foreground">Reason</label>
             <Textarea
               placeholder="Provide details or reason for leave..."
               value={reason}

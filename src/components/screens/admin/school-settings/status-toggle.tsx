@@ -19,25 +19,25 @@ export function StatusToggle({ enabled, onToggle }: StatusToggleProps) {
       <DropdownMenuTrigger asChild>
         <Button 
           variant="outline" 
-          className="bg-white dark:bg-zinc-950 border-zinc-200 dark:border-zinc-800 h-10 px-4 rounded-xl flex items-center gap-3 hover:bg-zinc-50 dark:hover:bg-zinc-900 transition-colors shadow-sm"
+          className="bg-card  h-10 px-4 rounded-xl flex items-center gap-3 hover:bg-accent transition-colors shadow-sm"
         >
-          <span className="text-sm font-normal text-zinc-900 dark:text-zinc-100">
+          <span className="text-sm font-normal text-foreground">
             {enabled ? "Enabled" : "Disabled"}
           </span>
-          <Settings className="size-4 text-zinc-400 dark:text-zinc-500" />
+          <Settings className="size-4 text-muted-foreground" />
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-[160px] rounded-xl p-1.5 border-zinc-200 dark:border-zinc-800">
+      <DropdownMenuContent align="end" className="w-[160px] rounded-xl p-1.5 ">
         <DropdownMenuItem 
           onClick={() => onToggle(true)}
-          className="flex items-center justify-between py-2 px-3 rounded-lg cursor-pointer focus:bg-zinc-100 dark:focus:bg-zinc-800"
+          className="flex items-center justify-between py-2 px-3 rounded-lg cursor-pointer focus:bg-muted dark:focus:bg-zinc-800"
         >
           <span className="font-normal text-sm">Enabled</span>
           {enabled && <Check className="size-4 text-emerald-500" />}
         </DropdownMenuItem>
         <DropdownMenuItem 
           onClick={() => onToggle(false)}
-          className="flex items-center justify-between py-2 px-3 rounded-lg cursor-pointer focus:bg-zinc-100 dark:focus:bg-zinc-800"
+          className="flex items-center justify-between py-2 px-3 rounded-lg cursor-pointer focus:bg-muted dark:focus:bg-zinc-800"
         >
           <span className="font-normal text-sm">Disabled</span>
           {!enabled && <Check className="size-4 text-emerald-500" />}

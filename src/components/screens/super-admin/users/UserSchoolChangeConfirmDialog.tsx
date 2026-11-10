@@ -40,17 +40,17 @@ export function UserSchoolChangeConfirmDialog({
     >
       <AlertDialogContent className="rounded-2xl w-[calc(100%-2.5rem)] max-w-sm p-4 sm:p-6">
         <AlertDialogHeader className="text-center sm:text-left">
-          <AlertDialogTitle className="text-base font-bold text-slate-900 dark:text-slate-100">
+          <AlertDialogTitle className="text-base font-bold text-foreground">
             {!pendingSchoolChange?.tenantId ? "Deassign School?" : "Assign School?"}
           </AlertDialogTitle>
-          <AlertDialogDescription className="text-xs sm:text-sm text-slate-500 dark:text-slate-400">
+          <AlertDialogDescription className="text-xs sm:text-sm text-muted-foreground">
             {!pendingSchoolChange?.tenantId ? (
               <>
-                Remove <strong className="text-slate-800 dark:text-slate-200">{name || "user"}</strong> from <strong className="text-slate-800 dark:text-slate-200">{tenant?.name || "school"}</strong>?
+                Remove <strong className="text-foreground">{name || "user"}</strong> from <strong className="text-foreground">{tenant?.name || "school"}</strong>?
               </>
             ) : (
               <>
-                Assign <strong className="text-slate-800 dark:text-slate-200">{name || "user"}</strong> to <strong className="text-slate-800 dark:text-slate-200">{pendingSchoolChange?.schoolName}</strong>?
+                Assign <strong className="text-foreground">{name || "user"}</strong> to <strong className="text-foreground">{pendingSchoolChange?.schoolName}</strong>?
               </>
             )}
           </AlertDialogDescription>

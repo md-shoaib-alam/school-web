@@ -37,7 +37,7 @@ export function CertificateTemplate({ cert, formatDate, schoolName, affiliation,
 
   return (
     <div className="print-container bg-white">
-      <div className="relative cert-frame flex flex-col border-4 border-double border-amber-600 rounded-lg p-8 sm:p-12 bg-white mx-auto dark:bg-white dark:text-zinc-900 min-h-[250mm]">
+      <div className="relative cert-frame flex flex-col border-4 border-double border-amber-600 rounded-lg p-8 sm:p-12 bg-white mx-auto dark:bg-white min-h-[250mm]">
         
         {/* Decorative Corners */}
         <div className="absolute top-2 left-2 size-12 border-t-[3px] border-l-[3px] border-amber-600 rounded-tl-md" />
@@ -54,8 +54,8 @@ export function CertificateTemplate({ cert, formatDate, schoolName, affiliation,
           </div>
           <div className="space-y-1">
             <h2 className="text-2xl md:text-3xl font-semibold text-amber-900 tracking-tight uppercase font-serif whitespace-nowrap" style={{ fontFamily: 'Georgia, serif' }}>{displaySchoolName}</h2>
-            <p className="text-sm font-medium text-zinc-700 italic">{displayAffiliation}</p>
-            <p className="text-xs text-zinc-600">{displayAddress}</p>
+            <p className="text-sm font-medium text-foreground italic">{displayAffiliation}</p>
+            <p className="text-xs text-foreground">{displayAddress}</p>
           </div>
         </div>
 
@@ -65,19 +65,19 @@ export function CertificateTemplate({ cert, formatDate, schoolName, affiliation,
             {(cert.certificateType || '').toUpperCase().split(' ')[0]}
           </h3>
           <h4 className="text-xl font-semibold text-amber-700 uppercase tracking-widest mb-3">CERTIFICATE</h4>
-          <p className="text-xs text-zinc-500 font-mono">CERTIFICATE NO: <span className="font-bold text-zinc-800">{cert.certificateNo}</span></p>
+          <p className="text-xs text-muted-foreground font-mono">CERTIFICATE NO: <span className="font-bold text-foreground">{cert.certificateNo}</span></p>
         </div>
 
         {/* Body */}
         <div className="space-y-8 max-w-2xl mx-auto text-center flex-1">
-          <p className="text-lg text-zinc-700 italic leading-relaxed">This is to certify that</p>
+          <p className="text-lg text-foreground italic leading-relaxed">This is to certify that</p>
           <div className="relative py-2 px-4 inline-block mx-auto min-w-[300px] border-b-2 border-amber-600/30">
-            <p className="text-3xl font-bold text-zinc-900 uppercase tracking-wider font-serif">
+            <p className="text-3xl font-bold text-foreground uppercase tracking-wider font-serif">
               {cert.content?.studentName || cert.student?.user?.name || ''}
             </p>
           </div>
 
-          <div className="grid grid-cols-2 gap-x-12 gap-y-6 text-left border border-zinc-200 bg-zinc-50/50 rounded-xl p-8 mt-6">
+          <div className="grid grid-cols-2 gap-x-12 gap-y-6 text-left border  bg-muted rounded-xl p-8 mt-6">
             <DetailRow label="Roll Number" value={cert.content?.rollNumber || cert.student?.rollNumber || ''} />
             <DetailRow label="Class / Grade" value={cert.content?.class ? `${cert.content.class.grade} - ${cert.content.class.name}` : ''} />
             <DetailRow label="Date of Birth" value={formatDate(cert.content?.dateOfBirth || '')} />
@@ -89,9 +89,9 @@ export function CertificateTemplate({ cert, formatDate, schoolName, affiliation,
           <p className="text-md text-[#374151] leading-[1.8] font-normal mt-6 px-4">{getBodyText()}</p>
           
           {cert.content?.notes && (
-            <div className="mt-6 p-4 border border-dashed border-amber-300 rounded-lg bg-zinc-50/50">
+            <div className="mt-6 p-4 border border-dashed border-amber-300 rounded-lg bg-muted">
               <p className="text-[10px] uppercase font-bold text-amber-800 mb-1 tracking-wider">REMARKS</p>
-              <p className="text-sm text-zinc-600 italic">{String(cert.content.notes)}</p>
+              <p className="text-sm text-foreground italic">{String(cert.content.notes)}</p>
             </div>
           )}
         </div>
@@ -99,12 +99,12 @@ export function CertificateTemplate({ cert, formatDate, schoolName, affiliation,
         {/* Footer */}
         <div className="flex justify-between items-end mt-auto pt-6 border-t border-amber-100">
           <div className="text-left">
-            <p className="text-[10px] font-semibold text-zinc-500 uppercase tracking-widest mb-1">DATE OF ISSUE</p>
+            <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-widest mb-1">DATE OF ISSUE</p>
             <p className="text-sm font-semibold text-[#1F2937]">{formatDate(cert.issueDate)}</p>
           </div>
           <div className="text-center">
-            <div className="w-40 border-b-2 border-zinc-400 mb-2" />
-            <p className="text-xs font-semibold text-zinc-900 uppercase tracking-wider">PRINCIPAL</p>
+            <div className="w-40 border-b-2  mb-2" />
+            <p className="text-xs font-semibold text-foreground uppercase tracking-wider">PRINCIPAL</p>
           </div>
         </div>
 
@@ -121,7 +121,7 @@ export function CertificateTemplate({ cert, formatDate, schoolName, affiliation,
 function DetailRow({ label, value }: { label: string; value: string }) {
   return (
     <div className="flex flex-col gap-1.5">
-      <p className="text-xs font-semibold text-zinc-500 uppercase tracking-wider">{label}</p>
+      <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">{label}</p>
       <p className="text-base font-bold text-[#1F2937]">{value || ''}</p>
     </div>
   );

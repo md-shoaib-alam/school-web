@@ -75,7 +75,7 @@ export function ConfigurationCard({
         <div className="space-y-1.5">
           <label className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground block">Print Template</label>
           <Select value={selectedTemplate} onValueChange={setSelectedTemplate}>
-            <SelectTrigger className="w-full h-9 rounded-lg text-xs font-bold border-zinc-200 dark:border-zinc-800 bg-background focus:ring-amber-500">
+            <SelectTrigger className="w-full h-9 rounded-lg text-xs font-bold  bg-background focus:ring-amber-500">
               <div className="flex items-center gap-2">
                 <Layout className="size-3.5 text-amber-500" />
                 <SelectValue placeholder="Select Template" />
@@ -161,14 +161,14 @@ export function ConfigurationCard({
         {totalExams > 0 && (
           <div className="space-y-2">
             <div className="flex items-center justify-between px-1">
-              <h3 className="text-sm font-semibold text-zinc-800 dark:text-zinc-200">Select Students</h3>
+              <h3 className="text-sm font-semibold text-foreground">Select Students</h3>
               <Button variant="link" size="sm" onClick={onToggleAll} className="text-xs h-auto p-0 font-semibold text-amber-600 hover:text-amber-700">
                 {selectAll ? 'Deselect All' : 'Select All'}
               </Button>
             </div>
             <div className="max-h-52 overflow-y-auto border rounded-lg">
               <Table>
-                <TableHeader className="bg-zinc-50 dark:bg-zinc-900/50">
+                <TableHeader className="bg-muted">
                   <TableRow>
                     <TableHead className="w-12 px-4">
                       <Checkbox checked={selectAll} onCheckedChange={onToggleAll} />
@@ -180,16 +180,16 @@ export function ConfigurationCard({
                 </TableHeader>
                 <TableBody>
                   {classData.students.map((student: any) => (
-                    <TableRow key={student.id} className="hover:bg-muted/50 border-zinc-100 dark:border-zinc-800">
+                    <TableRow key={student.id} className="hover:bg-muted/50 ">
                       <TableCell className="px-4 text-center">
                         <Checkbox
                           checked={selectedStudentIds.has(student.id)}
                           onCheckedChange={() => onToggleStudent(student.id)}
                         />
                       </TableCell>
-                      <TableCell className="w-[40%] px-4 font-mono text-xs font-semibold text-zinc-600 dark:text-zinc-400">{student.rollNumber}</TableCell>
-                      <TableCell className="w-[40%] px-4 font-bold text-sm text-zinc-800 dark:text-zinc-200">{student.name}</TableCell>
-                      <TableCell className="w-[20%] px-4 text-center text-xs font-medium text-zinc-500">{student.section || 'A'}</TableCell>
+                      <TableCell className="w-[40%] px-4 font-mono text-xs font-semibold text-foreground">{student.rollNumber}</TableCell>
+                      <TableCell className="w-[40%] px-4 font-bold text-sm text-foreground">{student.name}</TableCell>
+                      <TableCell className="w-[20%] px-4 text-center text-xs font-medium text-muted-foreground">{student.section || 'A'}</TableCell>
                     </TableRow>
                   ))}
                 </TableBody>

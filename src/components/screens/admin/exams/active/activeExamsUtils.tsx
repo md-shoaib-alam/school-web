@@ -66,7 +66,7 @@ export function renderStatusBadge(status: 'upcoming' | 'in_progress' | 'complete
     case 'draft':
     default:
       return (
-        <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium bg-slate-100 dark:bg-zinc-800 text-slate-600 dark:text-zinc-400 border border-slate-200 dark:border-zinc-700">
+        <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium bg-muted text-muted-foreground border ">
           <span className="size-1.5 rounded-full bg-slate-400" />
           Draft
         </span>

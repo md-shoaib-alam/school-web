@@ -89,16 +89,16 @@ export function TopPerformance({ loading, data, onNavigate }: TopPerformanceProp
     : defaultSchools;
 
   return (
-    <Card className="border border-slate-200/80 dark:border-slate-800/80 bg-white dark:bg-slate-900/60 rounded-2xl shadow-sm py-4 px-5 gap-3">
+    <Card className="border  bg-card rounded-2xl shadow-sm py-4 px-5 gap-3">
       <CardHeader className="p-0 pb-1 flex flex-row items-center justify-between space-y-0">
         <div>
-          <CardTitle className="text-base font-bold flex items-center gap-2 text-slate-900 dark:text-slate-100">
+          <CardTitle className="text-base font-bold flex items-center gap-2 text-foreground">
             <div className="size-6 rounded-lg bg-blue-50 dark:bg-blue-950/50 flex items-center justify-center text-blue-600 dark:text-blue-400">
               <Building2 className="size-3.5" />
             </div>
             Recent Schools
           </CardTitle>
-          <CardDescription className="text-xs text-slate-500 mt-0.5">
+          <CardDescription className="text-xs text-muted-foreground mt-0.5">
             Recently registered schools on the platform
           </CardDescription>
         </div>
@@ -114,22 +114,22 @@ export function TopPerformance({ loading, data, onNavigate }: TopPerformanceProp
 
       <CardContent className="p-0 pt-1">
         {loading ? (
-          <div className="rounded-xl border border-slate-200/60 dark:border-slate-800/60 overflow-hidden">
+          <div className="rounded-xl border  overflow-hidden">
             <Table>
               <TableHeader>
-                <TableRow className="bg-slate-50/70 dark:bg-slate-900/50 border-b border-slate-200/60 dark:border-slate-800/60">
-                  <TableHead className="w-10 text-[11px] font-semibold text-slate-500 text-center">#</TableHead>
-                  <TableHead className="text-[11px] font-semibold text-slate-500">School Name</TableHead>
-                  <TableHead className="text-[11px] font-semibold text-slate-500">Location</TableHead>
-                  <TableHead className="text-[11px] font-semibold text-slate-500">Registration Date</TableHead>
-                  <TableHead className="text-[11px] font-semibold text-slate-500 text-center">Status</TableHead>
+                <TableRow className="bg-muted border-b ">
+                  <TableHead className="w-10 text-[11px] font-semibold text-muted-foreground text-center">#</TableHead>
+                  <TableHead className="text-[11px] font-semibold text-muted-foreground">School Name</TableHead>
+                  <TableHead className="text-[11px] font-semibold text-muted-foreground">Location</TableHead>
+                  <TableHead className="text-[11px] font-semibold text-muted-foreground">Registration Date</TableHead>
+                  <TableHead className="text-[11px] font-semibold text-muted-foreground text-center">Status</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {[...Array(5)].map((_, i) => (
                   <TableRow
                     key={i}
-                    className="border-b border-slate-100 dark:border-slate-800/60 last:border-none"
+                    className="border-b  last:border-none"
                   >
                     <TableCell className="text-center py-3.5">
                       <Skeleton className="h-4 w-4 mx-auto rounded-md" />
@@ -152,15 +152,15 @@ export function TopPerformance({ loading, data, onNavigate }: TopPerformanceProp
             </Table>
           </div>
         ) : (
-          <div className="rounded-xl border border-slate-200/60 dark:border-slate-800/60 overflow-hidden">
+          <div className="rounded-xl border  overflow-hidden">
             <Table>
               <TableHeader>
-                <TableRow className="bg-slate-50/70 dark:bg-slate-900/50 border-b border-slate-200/60 dark:border-slate-800/60 hover:bg-transparent">
-                  <TableHead className="w-10 text-[11px] font-semibold text-slate-500 text-center">#</TableHead>
-                  <TableHead className="text-[11px] font-semibold text-slate-500">School Name</TableHead>
-                  <TableHead className="text-[11px] font-semibold text-slate-500">Location</TableHead>
-                  <TableHead className="text-[11px] font-semibold text-slate-500">Registration Date</TableHead>
-                  <TableHead className="text-[11px] font-semibold text-slate-500 text-center">Status</TableHead>
+                <TableRow className="bg-muted border-b  hover:bg-transparent">
+                  <TableHead className="w-10 text-[11px] font-semibold text-muted-foreground text-center">#</TableHead>
+                  <TableHead className="text-[11px] font-semibold text-muted-foreground">School Name</TableHead>
+                  <TableHead className="text-[11px] font-semibold text-muted-foreground">Location</TableHead>
+                  <TableHead className="text-[11px] font-semibold text-muted-foreground">Registration Date</TableHead>
+                  <TableHead className="text-[11px] font-semibold text-muted-foreground text-center">Status</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -168,18 +168,18 @@ export function TopPerformance({ loading, data, onNavigate }: TopPerformanceProp
                   <TableRow
                     key={school.id}
                     onClick={() => onNavigate?.("tenants")}
-                    className="hover:bg-slate-50/70 dark:hover:bg-slate-900/40 cursor-pointer border-b border-slate-100 dark:border-slate-800/60 last:border-none transition-colors"
+                    className="hover:bg-muted dark:hover:bg-slate-900/40 cursor-pointer border-b  last:border-none transition-colors"
                   >
-                    <TableCell className="text-center font-semibold text-slate-400 text-xs py-3">
+                    <TableCell className="text-center font-semibold text-muted-foreground text-xs py-3">
                       {index + 1}
                     </TableCell>
-                    <TableCell className="font-semibold text-xs text-slate-800 dark:text-slate-200 py-3">
+                    <TableCell className="font-semibold text-xs text-foreground py-3">
                       {school.name}
                     </TableCell>
-                    <TableCell className="text-xs text-slate-500 font-medium py-3">
+                    <TableCell className="text-xs text-muted-foreground font-medium py-3">
                       {school.location}
                     </TableCell>
-                    <TableCell className="text-xs text-slate-500 font-medium py-3">
+                    <TableCell className="text-xs text-muted-foreground font-medium py-3">
                       {school.date}
                     </TableCell>
                     <TableCell className="text-center py-3">
@@ -191,7 +191,7 @@ export function TopPerformance({ loading, data, onNavigate }: TopPerformanceProp
                             ? "bg-purple-50 text-purple-600 border border-purple-200/70 dark:bg-purple-950/40 dark:text-purple-400 dark:border-purple-800/40"
                             : (school.status === "deleted" || school.status === "suspended")
                             ? "bg-rose-50 text-rose-600 border border-rose-200/70 dark:bg-rose-950/40 dark:text-rose-400 dark:border-rose-800/40"
-                            : "bg-slate-50 text-slate-600 border border-slate-200/70"
+                            : "bg-muted text-foreground border "
                         }`}
                       >
                         <span

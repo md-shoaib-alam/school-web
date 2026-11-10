@@ -133,7 +133,7 @@ function ViewToggle({
   ];
 
   return (
-    <div className="inline-flex items-center rounded-lg border border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-800/50 p-0.5">
+    <div className="inline-flex items-center rounded-lg border  bg-muted p-0.5">
       {views.map(({ key, icon: Icon, label }) => (
         <Button
           key={key}
@@ -143,7 +143,7 @@ function ViewToggle({
           className={
             mode === key
               ? "bg-emerald-600 text-white shadow-sm hover:bg-emerald-700"
-              : "text-zinc-500 dark:text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-300 hover:bg-white dark:hover:bg-zinc-800"
+              : "text-muted-foreground hover:text-foreground dark:hover:text-muted-foreground hover:bg-white"
           }
         >
           <Icon className="size-4" />
@@ -372,23 +372,23 @@ function PageHeader({
   return (
     <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
       <div>
-        <h2 className="text-xl font-semibold text-zinc-900 dark:text-zinc-100">
+        <h2 className="text-xl font-semibold text-foreground">
           My Timetable
         </h2>
-        <p className="text-sm text-zinc-500 dark:text-zinc-400">
+        <p className="text-sm text-muted-foreground">
           Weekly class schedule
         </p>
       </div>
       <div className="flex items-center gap-3">
         <Select value={selectedClass} onValueChange={onClassChange}>
-          <SelectTrigger className="w-56 bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800">
+          <SelectTrigger className="w-56 bg-card ">
             <SelectValue placeholder="Select Schedule" />
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="all" className="font-semibold text-emerald-600 dark:text-emerald-400">
               My Personal Schedule
             </SelectItem>
-            {classes.length > 0 && <div className="h-px bg-zinc-100 dark:bg-zinc-800 my-1" />}
+            {classes.length > 0 && <div className="h-px bg-muted my-1" />}
             {classes.map((c) => (
               <SelectItem key={c.id} value={c.id}>
                 Class {c.name} - {c.section}
@@ -426,7 +426,7 @@ function GridView({
           <table className="w-full text-sm min-w-[700px]">
             <thead>
               <tr className="border-b bg-muted/30">
-                <th className="py-3 px-4 text-left font-medium text-muted-foreground w-36 border-r border-zinc-100 dark:border-zinc-700">
+                <th className="py-3 px-4 text-left font-medium text-muted-foreground w-36 border-r ">
                   <div className="flex items-center gap-1.5">
                     <Clock className="size-3.5" />
                     Time Slot
@@ -435,7 +435,7 @@ function GridView({
                 {workingDays.map((day) => (
                   <th
                     key={day}
-                    className={`py-3 px-2 text-center font-medium border-r border-zinc-100 dark:border-zinc-700 last:border-r-0 ${
+                    className={`py-3 px-2 text-center font-medium border-r  last:border-r-0 ${
                       day === currentDayKey
                         ? "bg-emerald-50 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-400"
                         : "text-muted-foreground"
@@ -461,7 +461,7 @@ function GridView({
                         : "bg-muted/10"
                     }
                   >
-                    <td className="py-3 px-4 align-top border-r border-zinc-100 dark:border-zinc-700">
+                    <td className="py-3 px-4 align-top border-r ">
                       <div className="flex items-center gap-2">
                         <div className="size-7 rounded-lg bg-muted flex items-center justify-center flex-shrink-0">
                            <Clock className="size-3.5 text-muted-foreground" />
@@ -484,7 +484,7 @@ function GridView({
                       return (
                         <td
                           key={day}
-                          className={`py-2 px-1.5 align-top border-r border-zinc-100 dark:border-zinc-700 last:border-r-0 ${
+                          className={`py-2 px-1.5 align-top border-r  last:border-r-0 ${
                             isToday
                               ? "bg-emerald-50/20 dark:bg-emerald-900/10"
                               : ""
@@ -564,21 +564,21 @@ function ListView({
             className={`px-4 py-2.5 flex items-center gap-2 border-b ${
               day === currentDayKey
                 ? "bg-emerald-50 dark:bg-emerald-900/20 border-emerald-200 dark:border-emerald-800"
-                : "bg-zinc-50 dark:bg-zinc-800/50 border-zinc-100 dark:border-zinc-700"
+                : "bg-muted "
             }`}
           >
             <CalendarDays
               className={`size-4 ${
                 day === currentDayKey
                   ? "text-emerald-600 dark:text-emerald-400"
-                  : "text-zinc-400 dark:text-zinc-500"
+                  : "text-muted-foreground"
               }`}
             />
             <span
               className={`text-sm font-semibold ${
                 day === currentDayKey
                   ? "text-emerald-700 dark:text-emerald-400"
-                  : "text-zinc-700 dark:text-zinc-300"
+                  : "text-foreground"
               }`}
             >
               {DAY_LABELS[day]}
@@ -588,7 +588,7 @@ function ListView({
                 Today
               </Badge>
             )}
-            <span className="text-xs text-zinc-400 dark:text-zinc-500 ml-auto">
+            <span className="text-xs text-muted-foreground ml-auto">
               {slotsByDay[day].length} class
               {slotsByDay[day].length !== 1 ? "es" : ""}
             </span>
@@ -605,10 +605,10 @@ function ListView({
                   className={`flex items-center gap-3 rounded-lg px-3 py-2.5 transition-colors ${
                     inProgress
                       ? "bg-emerald-50 dark:bg-emerald-900/20 ring-1 ring-emerald-200 dark:ring-emerald-800"
-                      : "hover:bg-zinc-50 dark:hover:bg-zinc-800/50"
+                      : "hover:bg-accent/50"
                   }`}
                 >
-                  <div className="flex-shrink-0 w-24 flex items-center gap-1.5 text-xs text-zinc-500 dark:text-zinc-400 font-medium">
+                  <div className="flex-shrink-0 w-24 flex items-center gap-1.5 text-xs text-muted-foreground font-medium">
                     <Clock className="size-3.5 flex-shrink-0" />
                     <span>
                       {slot.startTime} - {slot.endTime}
@@ -622,12 +622,12 @@ function ListView({
                     {slot.subjectName}
                   </Badge>
 
-                  <div className="hidden sm:flex items-center gap-1 text-xs text-zinc-500 dark:text-zinc-400 min-w-0">
+                  <div className="hidden sm:flex items-center gap-1 text-xs text-muted-foreground min-w-0">
                     <User className="size-3 flex-shrink-0" />
                     <span className="truncate">{slot.teacherName}</span>
                   </div>
 
-                  <div className="hidden md:flex items-center gap-1 text-xs text-zinc-500 dark:text-zinc-400 min-w-0 ml-auto">
+                  <div className="hidden md:flex items-center gap-1 text-xs text-muted-foreground min-w-0 ml-auto">
                     <GraduationCap className="size-3 flex-shrink-0" />
                     <span className="truncate">{slot.className}</span>
                   </div>
@@ -695,7 +695,7 @@ function DayView({
                     : "bg-zinc-800 dark:bg-zinc-700 text-white hover:bg-zinc-900 dark:hover:bg-zinc-600 shadow-sm"
                   : isToday
                     ? "border-emerald-300 dark:border-emerald-800 text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-900/20 hover:bg-emerald-100 dark:hover:bg-emerald-900/30"
-                    : "text-zinc-500 dark:text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-300"
+                    : "text-muted-foreground hover:text-foreground dark:hover:text-muted-foreground"
               }
             >
               <span className="font-medium">{SHORT_DAY_LABELS[day]}</span>
@@ -705,7 +705,7 @@ function DayView({
       </div>
 
       <div className="flex items-center gap-2">
-        <h3 className="text-lg font-semibold text-zinc-900 dark:text-zinc-100">
+        <h3 className="text-lg font-semibold text-foreground">
           {DAY_LABELS[dayKey]}
         </h3>
         {dayKey === currentDayKey && (
@@ -713,14 +713,14 @@ function DayView({
             Today
           </Badge>
         )}
-        <span className="text-sm text-zinc-400 dark:text-zinc-500 ml-auto">
+        <span className="text-sm text-muted-foreground ml-auto">
           {dayViewSlots.filter((s) => s.subjectName).length} of{" "}
           {dayViewSlots.length} periods
         </span>
       </div>
 
       <div className="relative space-y-3">
-        <div className="absolute left-[19px] top-3 bottom-3 w-0.5 bg-zinc-200 dark:bg-zinc-700 block" />
+        <div className="absolute left-[19px] top-3 bottom-3 w-0.5 bg-muted dark:bg-zinc-700 block" />
 
         {dayViewSlots.map((slot) => {
           const isFree = !slot.subjectName;
@@ -733,16 +733,16 @@ function DayView({
             return (
               <div key={slot.id} className="flex items-stretch gap-4">
                 <div className="flex-shrink-0 w-10 flex justify-center pt-4">
-                  <div className="size-2.5 rounded-full bg-zinc-200 dark:bg-zinc-700 border-2 border-white dark:border-zinc-900 shadow-sm block"></div>
+                  <div className="size-2.5 rounded-full bg-muted dark:bg-zinc-700 border-2 border-white shadow-sm block"></div>
                 </div>
-                <Card className="flex-1 border-dashed border-zinc-200 dark:border-zinc-700 bg-zinc-50/50 dark:bg-zinc-800/30 rounded-xl shadow-none">
+                <Card className="flex-1 border-dashed  bg-muted rounded-xl shadow-none">
                   <CardContent className="p-4 flex items-center gap-3">
-                    <Coffee className="size-5 text-zinc-300 dark:text-zinc-600" />
+                    <Coffee className="size-5 text-muted-foreground" />
                     <div>
-                      <p className="text-sm font-medium text-zinc-400 dark:text-zinc-500">
+                      <p className="text-sm font-medium text-muted-foreground">
                         Free Period
                       </p>
-                      <p className="text-xs text-zinc-300 dark:text-zinc-600">
+                      <p className="text-xs text-muted-foreground">
                         {slot.startTime} - {slot.endTime}
                       </p>
                     </div>
@@ -764,21 +764,21 @@ function DayView({
                 />
               </div>
               <Card
-                className={`flex-1 rounded-xl shadow-sm transition-all border border-zinc-200 dark:border-zinc-800 ${
+                className={`flex-1 rounded-xl shadow-sm transition-all border  ${
                   inProgress
                     ? "ring-1 ring-emerald-200 dark:ring-emerald-800 bg-emerald-50/30 dark:bg-emerald-900/10"
-                    : "hover:shadow-md bg-white dark:bg-zinc-950"
+                    : "hover:shadow-md bg-card"
                 }`}
               >
                 <CardContent className="p-4 flex flex-row flex-wrap sm:flex-nowrap items-start justify-between gap-3">
                   <div className="space-y-1.5 min-w-[120px] flex-1">
-                    <h4 className="font-semibold text-lg text-zinc-900 dark:text-zinc-100 leading-tight tracking-tight">
+                    <h4 className="font-semibold text-lg text-foreground leading-tight tracking-tight">
                       {slot.subjectName}
                     </h4>
-                    <div className="flex flex-col text-sm text-zinc-500 dark:text-zinc-400 space-y-0.5">
+                    <div className="flex flex-col text-sm text-muted-foreground space-y-0.5">
                       <p>{slot.teacherName}</p>
                       {slot.className && (
-                        <p className="text-xs text-zinc-400 dark:text-zinc-500">{slot.className}</p>
+                        <p className="text-xs text-muted-foreground">{slot.className}</p>
                       )}
                     </div>
                   </div>
@@ -836,7 +836,7 @@ function EmptyState() {
           loading="eager"
         />
       </div>
-      <h3 className="text-xl sm:text-2xl font-bold text-zinc-900 dark:text-zinc-100 tracking-tight">
+      <h3 className="text-xl sm:text-2xl font-bold text-foreground tracking-tight">
         No timetable records found
       </h3>
       <p className="text-xs sm:text-sm text-muted-foreground max-w-lg mx-auto mt-2 sm:mt-2.5 leading-relaxed">

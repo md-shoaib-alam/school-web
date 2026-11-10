@@ -16,10 +16,10 @@ export function LeaveManagementHero({ roleLabel, onNewLeaveRequest }: LeaveManag
           <Calendar className="size-6 text-blue-600 dark:text-blue-400" />
         </div>
         <div className="space-y-0.5">
-          <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-slate-900 dark:text-zinc-100">
+          <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-foreground">
             Leave Management
           </h1>
-          <p className="text-xs sm:text-sm text-slate-500 dark:text-zinc-400">
+          <p className="text-xs sm:text-sm text-muted-foreground">
             Review and manage leave requests from {roleLabel}
           </p>
         </div>

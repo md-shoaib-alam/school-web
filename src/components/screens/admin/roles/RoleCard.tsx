@@ -26,7 +26,7 @@ interface RoleCardProps {
 }
 
 const ACTION_COLORS: Record<string, string> = {
-  view: "bg-zinc-100 text-zinc-700 border-zinc-200/50 dark:bg-zinc-800 dark:text-zinc-350 dark:border-zinc-700/50",
+  view: "bg-muted text-foreground ",
   create: "bg-emerald-50 text-emerald-700 border-emerald-100/70 dark:bg-emerald-950/20 dark:text-emerald-400 dark:border-emerald-900/30",
   edit: "bg-amber-50 text-amber-700 border-amber-100/70 dark:bg-amber-950/20 dark:text-amber-400 dark:border-amber-900/30",
   delete: "bg-rose-50 text-rose-700 border-rose-100/70 dark:bg-rose-950/20 dark:text-rose-400 dark:border-rose-900/30",
@@ -49,7 +49,7 @@ export function RoleCard({ role, onEdit, onAssign, onDelete }: RoleCardProps) {
 
   return (
     <Card 
-      className="hover:shadow-lg transition-all duration-300 hover:-translate-y-1 group relative overflow-hidden bg-card/80 border border-zinc-200 dark:border-zinc-800"
+      className="hover:shadow-lg transition-all duration-300 hover:-translate-y-1 group relative overflow-hidden bg-card/80 border "
     >
       <CardHeader className="pb-3">
         <div className="flex items-start justify-between">
@@ -61,11 +61,11 @@ export function RoleCard({ role, onEdit, onAssign, onDelete }: RoleCardProps) {
               {role.name.charAt(0).toUpperCase()}
             </div>
             <div className="min-w-0">
-              <CardTitle className="text-base font-bold text-zinc-900 dark:text-zinc-100 truncate">
+              <CardTitle className="text-base font-bold text-foreground truncate">
                 {role.name}
               </CardTitle>
               {role.description && (
-                <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5 line-clamp-1 leading-normal">
+                <p className="text-xs text-muted-foreground mt-0.5 line-clamp-1 leading-normal">
                   {role.description}
                 </p>
               )}
@@ -75,7 +75,7 @@ export function RoleCard({ role, onEdit, onAssign, onDelete }: RoleCardProps) {
             <Button
               variant="ghost"
               size="icon"
-              className="size-8 rounded-lg text-zinc-500 hover:bg-blue-50 hover:text-blue-600 dark:hover:bg-blue-900/30"
+              className="size-8 rounded-lg text-muted-foreground hover:bg-blue-50 hover:text-blue-600 dark:hover:bg-blue-900/30"
               onClick={() => onAssign(role)}
               title="Assign staff"
             >
@@ -84,7 +84,7 @@ export function RoleCard({ role, onEdit, onAssign, onDelete }: RoleCardProps) {
             <Button
               variant="ghost"
               size="icon"
-              className="size-8 rounded-lg text-zinc-500 hover:bg-emerald-50 hover:text-emerald-600 dark:hover:bg-emerald-900/30"
+              className="size-8 rounded-lg text-muted-foreground hover:bg-emerald-50 hover:text-emerald-600 dark:hover:bg-emerald-900/30"
               onClick={() => onEdit(role)}
             >
               <Pencil className="size-3.5" />
@@ -94,7 +94,7 @@ export function RoleCard({ role, onEdit, onAssign, onDelete }: RoleCardProps) {
                 <Button
                   variant="ghost"
                   size="icon"
-                  className="size-8 rounded-lg text-zinc-500 hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-900/30"
+                  className="size-8 rounded-lg text-muted-foreground hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-900/30"
                 >
                   <Trash2 className="size-3.5" />
                 </Button>
@@ -159,12 +159,12 @@ export function RoleCard({ role, onEdit, onAssign, onDelete }: RoleCardProps) {
               return (
                 <div 
                   key={mod} 
-                  className="flex items-center gap-1.5 bg-zinc-50 dark:bg-zinc-800/40 border border-zinc-200/50 dark:border-zinc-700/30 rounded-lg px-2.5 py-1 text-[11px] shadow-sm shrink-0"
+                  className="flex items-center gap-1.5 bg-muted border  rounded-lg px-2.5 py-1 text-[11px] shadow-sm shrink-0"
                 >
-                  <span className="font-bold text-zinc-700 dark:text-zinc-350">{moduleLabel}</span>
+                  <span className="font-bold text-foreground">{moduleLabel}</span>
                   <div className="flex flex-wrap gap-1">
                     {actions.map((action: string) => {
-                      const colorClass = ACTION_COLORS[action] || "bg-zinc-100 text-zinc-700 border-zinc-200/50 dark:bg-zinc-850 dark:text-zinc-300";
+                      const colorClass = ACTION_COLORS[action] || "bg-muted text-foreground  dark:";
                       return (
                         <span
                           key={action}

@@ -11,13 +11,13 @@ interface GradesTableProps {
 
 export function GradesTable({ grades }: GradesTableProps) {
   return (
-    <Card className="rounded-3xl border border-zinc-200/60 dark:border-zinc-800/60 shadow-[0_8px_30px_rgb(0,0,0,0.02)] bg-white dark:bg-zinc-950 hover:shadow-md transition-all duration-300">
-      <CardHeader className="p-5 pb-3 border-b border-zinc-100 dark:border-zinc-900">
+    <Card className="rounded-3xl border  shadow-[0_8px_30px_rgb(0,0,0,0.02)] bg-card hover:shadow-md transition-all duration-300">
+      <CardHeader className="p-5 pb-3 border-b ">
         <div className="flex items-center gap-2.5 text-left">
           <div className="p-1.5 rounded-lg bg-amber-500/10 text-amber-600 dark:text-amber-400">
             <Award className="size-4" />
           </div>
-          <CardTitle className="text-xs font-semibold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider">
+          <CardTitle className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
             Recent Grades
           </CardTitle>
         </div>
@@ -42,17 +42,17 @@ export function GradesTable({ grades }: GradesTableProps) {
             return (
               <div 
                 key={g.id} 
-                className={`flex items-center justify-between p-3.5 rounded-2xl border border-zinc-100 dark:border-zinc-900 border-l-4 ${accentClass} bg-zinc-50/20 dark:bg-zinc-900/10 hover:shadow-xs hover:border-zinc-200 dark:hover:border-zinc-800 hover:scale-[1.01] transition-all duration-200 group text-left`}
+                className={`flex items-center justify-between p-3.5 rounded-2xl border  border-l-4 ${accentClass} bg-muted hover:shadow-xs hover: dark:hover: hover:scale-[1.01] transition-all duration-200 group text-left`}
               >
                 <div className="flex items-center gap-3 min-w-0">
-                  <div className="p-2.5 rounded-xl bg-zinc-100 dark:bg-zinc-900 text-zinc-500 dark:text-zinc-400 group-hover:bg-amber-500/10 group-hover:text-amber-600 dark:group-hover:text-amber-400 transition-colors">
+                  <div className="p-2.5 rounded-xl bg-muted text-muted-foreground group-hover:bg-amber-500/10 group-hover:text-amber-600 dark:group-hover:text-amber-400 transition-colors">
                     <GraduationCap className="size-4" />
                   </div>
                   <div className="min-w-0">
-                    <h5 className="text-xs font-semibold text-zinc-700 dark:text-zinc-300 truncate">
+                    <h5 className="text-xs font-semibold text-foreground truncate">
                       {g.subjectName}
                     </h5>
-                    <p className="text-[9px] font-medium text-zinc-400 dark:text-zinc-500 uppercase tracking-tight mt-0.5">
+                    <p className="text-[9px] font-medium text-muted-foreground uppercase tracking-tight mt-0.5">
                       {g.examType}
                     </p>
                   </div>
@@ -60,17 +60,17 @@ export function GradesTable({ grades }: GradesTableProps) {
 
                 <div className="flex items-center gap-3 shrink-0">
                   <div className="text-right">
-                    <span className="text-sm font-bold text-zinc-800 dark:text-zinc-200">
+                    <span className="text-sm font-bold text-foreground">
                       {Number(g.marks).toFixed(2).replace(/\.00$/, "")}
                     </span>
-                    <span className="text-[10px] text-zinc-400 dark:text-zinc-500 font-medium block">
+                    <span className="text-[10px] text-muted-foreground font-medium block">
                       /{g.maxMarks} max
                     </span>
                   </div>
                   <Badge className={`text-[10px] font-semibold shadow-none rounded-full px-2 py-0.5 border-none ${badgeClass}`}>
                     {g.grade || "N/A"}
                   </Badge>
-                  <ChevronRight className="size-3.5 text-zinc-300 dark:text-zinc-700 group-hover:translate-x-0.5 transition-transform" />
+                  <ChevronRight className="size-3.5 text-muted-foreground group-hover:translate-x-0.5 transition-transform" />
                 </div>
               </div>
             );

@@ -32,7 +32,7 @@ export function TeachersHeader({
         className="w-full sm:max-w-sm flex-1 order-2 sm:order-1"
       />
       <div className="flex items-center justify-between sm:justify-start gap-3 w-full sm:w-auto order-1 sm:order-2">
-        <div className="flex items-center gap-1 bg-zinc-100 dark:bg-zinc-800 p-1 rounded-lg">
+        <div className="flex items-center gap-1 bg-muted p-1 rounded-lg">
           <Button
             variant={viewMode === "table" ? "secondary" : "ghost"}
             size="sm"

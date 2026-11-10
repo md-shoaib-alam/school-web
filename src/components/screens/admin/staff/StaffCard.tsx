@@ -33,7 +33,7 @@ export function StaffCard({ member, onEdit, onDelete, onView, canEdit, canDelete
 
   return (
     <Card 
-      className="group shadow-sm hover:shadow-md transition-all duration-300 border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950/90 overflow-hidden cursor-pointer rounded-2xl"
+      className="group shadow-sm hover:shadow-md transition-all duration-300 border  bg-card overflow-hidden cursor-pointer rounded-2xl"
       onClick={() => onView(member)}
     >
       <CardContent className="p-5">
@@ -48,7 +48,7 @@ export function StaffCard({ member, onEdit, onDelete, onView, canEdit, canDelete
               </AvatarFallback>
             </Avatar>
             <div className="flex-1 min-w-0">
-              <h3 className="font-semibold text-zinc-900 dark:text-zinc-100 truncate leading-tight pr-1">
+              <h3 className="font-semibold text-foreground truncate leading-tight pr-1">
                 {member.name}
               </h3>
               <div className="flex flex-wrap items-center gap-1.5 mt-1">
@@ -56,7 +56,7 @@ export function StaffCard({ member, onEdit, onDelete, onView, canEdit, canDelete
                   variant="outline"
                   className={cn(
                     "px-1.5 py-0 h-4 text-[9px] font-bold uppercase tracking-tight shrink-0",
-                    member.isActive ? "text-emerald-600 bg-emerald-50/50 border-emerald-100 dark:bg-emerald-950/20 dark:border-emerald-900/30" : "text-zinc-400 bg-zinc-50 border-zinc-100 dark:bg-zinc-900/40 dark:border-zinc-800/80"
+                    member.isActive ? "text-emerald-600 bg-emerald-50/50 border-emerald-100 dark:bg-emerald-950/20 dark:border-emerald-900/30" : "text-muted-foreground bg-muted "
                   )}
                 >
                   {member.isActive ? "Active" : "Offline"}
@@ -89,26 +89,26 @@ export function StaffCard({ member, onEdit, onDelete, onView, canEdit, canDelete
           </div>
         </div>
 
-        <div className="space-y-3 pt-3 border-t border-zinc-100 dark:border-zinc-800/60">
+        <div className="space-y-3 pt-3 border-t ">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2 text-xs text-zinc-650 dark:text-zinc-300 min-w-0">
-              <Mail className="size-3.5 text-zinc-500 dark:text-zinc-400 shrink-0" />
+            <div className="flex items-center gap-2 text-xs  min-w-0">
+              <Mail className="size-3.5 text-muted-foreground shrink-0" />
               <span className="truncate">{member.email}</span>
             </div>
             <Button 
               variant="ghost" 
               size="icon" 
-              className="size-6 opacity-0 group-hover:opacity-100 transition-all duration-200 hover:bg-zinc-100 dark:hover:bg-zinc-800 shrink-0 rounded-md"
+              className="size-6 opacity-0 group-hover:opacity-100 transition-all duration-200 hover:bg-accent shrink-0 rounded-md"
               onClick={(e) => { e.stopPropagation(); handleCopy(); }}
               title="Copy email"
             >
-              {copied ? <Check className="size-3 text-emerald-500" /> : <Copy className="size-3 text-zinc-400" />}
+              {copied ? <Check className="size-3 text-emerald-500" /> : <Copy className="size-3 text-muted-foreground" />}
             </Button>
           </div>
           
-          <div className="flex items-center gap-2 text-xs text-zinc-650 dark:text-zinc-300">
-            <Phone className="size-3.5 text-zinc-500 dark:text-zinc-400 shrink-0" />
-            <span className={cn(!member.phone && "text-zinc-400 dark:text-zinc-500 italic")}>
+          <div className="flex items-center gap-2 text-xs ">
+            <Phone className="size-3.5 text-muted-foreground shrink-0" />
+            <span className={cn(!member.phone && "text-muted-foreground italic")}>
               {member.phone || "No contact"}
             </span>
           </div>
@@ -123,7 +123,7 @@ export function StaffCard({ member, onEdit, onDelete, onView, canEdit, canDelete
                 {member.customRole.name}
               </Badge>
             ) : (
-              <Badge variant="secondary" className="px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider bg-zinc-100 dark:bg-zinc-800 text-zinc-500 dark:text-zinc-400 border border-zinc-200 dark:border-zinc-700">
+              <Badge variant="secondary" className="px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider bg-muted text-muted-foreground border ">
                 No Role
               </Badge>
             )}

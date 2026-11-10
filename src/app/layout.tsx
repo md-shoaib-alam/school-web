@@ -40,7 +40,7 @@ export default function RootLayout({
           attribute="class"
           defaultTheme="light"
           storageKey="schoolsaas-theme"
-          enableSystem={false}
+          enableSystem
           disableTransitionOnChange
         >
           <Providers>

@@ -59,7 +59,7 @@ export function TeachersTableView({
       <CardContent className="p-0">
         <div className="overflow-x-auto">
           <table className="w-full text-left text-sm">
-            <thead className="bg-zinc-50 dark:bg-zinc-800/50 text-zinc-500 dark:text-zinc-400 uppercase text-[10px] font-bold tracking-wider">
+            <thead className="bg-muted text-muted-foreground uppercase text-[10px] font-bold tracking-wider">
               <tr>
                 <th className="px-6 py-4">Teacher</th>
                 <th className="px-6 py-4 hidden sm:table-cell">Experience</th>
@@ -67,7 +67,7 @@ export function TeachersTableView({
                 <th className="px-6 py-4 text-center">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-zinc-100 dark:divide-zinc-800">
+            <tbody className="divide-y divide-border">
               <LazyMotion features={domAnimation}>
                 <AnimatePresence mode="popLayout">
                   {teachers.map((teacher, index) => {
@@ -85,7 +85,7 @@ export function TeachersTableView({
                           layout: premiumLayoutTransition,
                           opacity: { duration: 0.2 }
                         }}
-                        className="hover:bg-zinc-50/50 dark:hover:bg-zinc-800/30 transition-colors"
+                        className="hover:bg-muted transition-colors"
                       >
                         <TableCell className="px-6 py-4">
                           <div className="flex items-center gap-3">
@@ -97,7 +97,7 @@ export function TeachersTableView({
                             <div className="flex flex-col min-w-0">
                               <span 
                                 onClick={() => onView(teacher)}
-                                className="font-bold text-zinc-900 dark:text-zinc-100 truncate cursor-pointer hover:underline hover:text-emerald-700 dark:hover:text-emerald-400 transition-colors"
+                                className="font-bold text-foreground truncate cursor-pointer hover:underline hover:text-emerald-700 dark:hover:text-emerald-400 transition-colors"
                               >
                                 {teacher.name}
                               </span>
@@ -106,14 +106,14 @@ export function TeachersTableView({
                                 <span className="text-[10px] text-emerald-600 dark:text-emerald-400 font-medium bg-emerald-50 dark:bg-emerald-900/20 px-1 rounded">
                                   {teacher.experience || 'New'} Exp
                                 </span>
-                                <span className="text-[10px] text-zinc-600 dark:text-zinc-400 font-medium bg-zinc-50 dark:bg-zinc-900/20 px-1 rounded">
+                                <span className="text-[10px] text-foreground font-medium bg-muted px-1 rounded">
                                   {teacher.qualification || 'N/A'}
                                 </span>
                               </div>
                             </div>
                           </div>
                         </TableCell>
-                        <TableCell className="px-6 py-4 hidden sm:table-cell text-zinc-600 dark:text-zinc-400 font-medium">
+                        <TableCell className="px-6 py-4 hidden sm:table-cell text-foreground font-medium">
                           {teacher.experience || 'N/A'}
                         </TableCell>
                         <TableCell className="px-6 py-4 hidden lg:table-cell">
@@ -126,13 +126,13 @@ export function TeachersTableView({
                               <Button 
                                 variant="ghost" 
                                 size="icon" 
-                                className="size-8 text-zinc-400 hover:text-emerald-600" 
+                                className="size-8 text-muted-foreground hover:text-emerald-600" 
                                 onClick={() => onView(teacher)}
                               >
                                 <Eye className="size-3.5" />
                               </Button>
                               {canEdit && (
-                                <Button variant="ghost" size="icon" className="size-8 text-zinc-400 hover:text-emerald-600" onClick={() => onEdit(teacher)}>
+                                <Button variant="ghost" size="icon" className="size-8 text-muted-foreground hover:text-emerald-600" onClick={() => onEdit(teacher)}>
                                   <Pencil className="size-3.5" />
                                 </Button>
                               )}
@@ -144,7 +144,7 @@ export function TeachersTableView({
                                   }}
                                 >
                                   <AlertDialogTrigger asChild>
-                                    <Button variant="ghost" size="icon" className="size-8 text-zinc-400 hover:text-red-600" onClick={() => setDeletingId(teacher.id)}>
+                                    <Button variant="ghost" size="icon" className="size-8 text-muted-foreground hover:text-red-600" onClick={() => setDeletingId(teacher.id)}>
                                       <Trash2 className="size-3.5" />
                                     </Button>
                                   </AlertDialogTrigger>

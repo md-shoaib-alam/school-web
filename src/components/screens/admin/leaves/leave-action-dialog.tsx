@@ -50,7 +50,7 @@ export function LeaveActionDialog({
         </DialogHeader>
 
         <div className="py-3 space-y-3">
-          <div className="p-3 rounded-xl bg-slate-50 dark:bg-zinc-900 border border-slate-100 dark:border-zinc-800 text-xs space-y-1">
+          <div className="p-3 rounded-xl bg-muted border  text-xs space-y-1">
             <p>
               <strong>Applicant:</strong> {leave?.userName} ({leave?.role})
             </p>
@@ -65,7 +65,7 @@ export function LeaveActionDialog({
           </div>
 
           <div className="space-y-1.5">
-            <label className="text-xs font-semibold text-slate-700 dark:text-zinc-300">Approver Remarks</label>
+            <label className="text-xs font-semibold text-foreground">Approver Remarks</label>
             <Textarea
               placeholder="Optional notes or instructions..."
               value={remarks}

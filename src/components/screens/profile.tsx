@@ -69,9 +69,9 @@ export function UserProfileScreen() {
   };
 
   const handleLogout = () => {
-    logout();
-    replace("/");
-    toast.success("Successfully logged out");
+    const handover = logout();
+    replace(handover ?? "/");
+    toast.success(handover ? "Signed out of this account" : "Successfully logged out");
   };
 
   const handlePasswordChange = () => {
@@ -156,7 +156,7 @@ export function UserProfileScreen() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2 space-y-6">
           <Tabs defaultValue="overview" className="w-full">
-            <TabsList className="grid w-full grid-cols-2 bg-zinc-100/80 dark:bg-zinc-900/60 p-1.5 rounded-2xl border border-zinc-200/50 dark:border-zinc-800/30 backdrop-blur-md h-12 shadow-sm">
+            <TabsList className="grid w-full grid-cols-2 bg-muted p-1.5 rounded-2xl border  backdrop-blur-md h-12 shadow-sm">
               <TabsTrigger 
                 value="overview" 
                 className="rounded-xl font-bold text-xs sm:text-sm gap-2 transition-all duration-200 hover:text-emerald-600 dark:hover:text-emerald-400 data-[state=active]:bg-white dark:data-[state=active]:bg-zinc-950 data-[state=active]:text-emerald-600 dark:data-[state=active]:text-emerald-400 data-[state=active]:shadow-md hover:scale-[1.01] active:scale-[0.99]"

@@ -27,10 +27,10 @@ export function GradesHeader({
   const slug = typeof params?.slug === "string" ? params.slug : "";
 
   return (
-    <div className="flex flex-col gap-4 border-b border-zinc-200/60 dark:border-zinc-800/60 pb-5">
+    <div className="flex flex-col gap-4 border-b  pb-5">
       <div className="flex items-center justify-between w-full">
         <div>
-          <h2 className="text-xl font-semibold text-zinc-900 dark:text-zinc-100">
+          <h2 className="text-xl font-semibold text-foreground">
             {topLevelTab === "exams" ? "School Exams" : "Class Assessments"}
           </h2>
         </div>
@@ -49,7 +49,7 @@ export function GradesHeader({
       </div>
 
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <p className="text-sm text-zinc-500 dark:text-zinc-400">
+        <p className="text-sm text-muted-foreground">
           {topLevelTab === "exams"
             ? "Track your official term examinations and standardized scores"
             : "Monitor your periodic teacher assignments, classwork, and quizzes"}

@@ -59,7 +59,7 @@ export function UserBasicInfoSection({
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <UserRound className="size-4 text-blue-600" />
-          <h3 className="font-bold text-sm text-slate-900 dark:text-zinc-100">
+          <h3 className="font-bold text-sm text-foreground">
             Basic Information
           </h3>
         </div>
@@ -69,7 +69,7 @@ export function UserBasicInfoSection({
               variant="outline"
               size="sm"
               onClick={onStartEdit}
-              className="h-8 px-3 rounded-xl border-slate-200/90 dark:border-zinc-800 text-slate-700 dark:text-zinc-300 text-xs font-semibold gap-1.5 shadow-2xs hover:bg-slate-50 dark:hover:bg-zinc-800 cursor-pointer"
+              className="h-8 px-3 rounded-xl  text-foreground text-xs font-semibold gap-1.5 shadow-2xs hover:bg-accent cursor-pointer"
             >
               <Edit2 className="size-3.5" />
               <span>Edit</span>
@@ -83,29 +83,29 @@ export function UserBasicInfoSection({
 
         {isEditing ? (
           /* Editable Form */
-          <div className="p-4 rounded-2xl bg-slate-50/70 dark:bg-zinc-900/60 border border-blue-200/80 dark:border-blue-900/50 space-y-3.5 animate-in fade-in-50 duration-200">
+          <div className="p-4 rounded-2xl bg-muted border border-blue-200/80 dark:border-blue-900/50 space-y-3.5 animate-in fade-in-50 duration-200">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div className="space-y-1.5">
-                <Label className="text-xs font-semibold text-slate-700 dark:text-zinc-300">
+                <Label className="text-xs font-semibold text-foreground">
                   Full Name <span className="text-red-500">*</span>
                 </Label>
                 <Input
                   value={editName}
                   onChange={(e) => setEditName(e.target.value)}
                   placeholder="e.g. John Doe"
-                  className="h-9 text-xs rounded-xl bg-white dark:bg-zinc-950 border-slate-200 dark:border-zinc-800"
+                  className="h-9 text-xs rounded-xl bg-card "
                 />
               </div>
 
               <div className="space-y-1.5">
-                <Label className="text-xs font-semibold text-slate-700 dark:text-zinc-300">
+                <Label className="text-xs font-semibold text-foreground">
                   System Role <span className="text-red-500">*</span>
                 </Label>
                 <Select value={editRole} onValueChange={setEditRole}>
-                  <SelectTrigger className="h-9 text-xs rounded-xl bg-white dark:bg-zinc-950 border-slate-200 dark:border-zinc-800">
+                  <SelectTrigger className="h-9 text-xs rounded-xl bg-card ">
                     <SelectValue />
                   </SelectTrigger>
-                  <SelectContent className="rounded-xl border-slate-200 dark:border-zinc-800">
+                  <SelectContent className="rounded-xl ">
                     <SelectItem value="admin" className="text-xs">Admin</SelectItem>
                     <SelectItem value="teacher" className="text-xs">Teacher</SelectItem>
                     <SelectItem value="student" className="text-xs">Student</SelectItem>
@@ -117,7 +117,7 @@ export function UserBasicInfoSection({
               </div>
 
               <div className="space-y-1.5 sm:col-span-2">
-                <Label className="text-xs font-semibold text-slate-700 dark:text-zinc-300">
+                <Label className="text-xs font-semibold text-foreground">
                   Email Address <span className="text-red-500">*</span>
                 </Label>
                 <Input
@@ -125,24 +125,24 @@ export function UserBasicInfoSection({
                   value={editEmail}
                   onChange={(e) => setEditEmail(e.target.value)}
                   placeholder="e.g. user@school.com"
-                  className="h-9 text-xs rounded-xl bg-white dark:bg-zinc-950 border-slate-200 dark:border-zinc-800"
+                  className="h-9 text-xs rounded-xl bg-card "
                 />
               </div>
 
               <div className="space-y-1.5 sm:col-span-2">
-                <Label className="text-xs font-semibold text-slate-700 dark:text-zinc-300">
+                <Label className="text-xs font-semibold text-foreground">
                   Phone Number
                 </Label>
                 <Input
                   value={editPhone}
                   onChange={(e) => setEditPhone(e.target.value)}
                   placeholder="e.g. +1 234 567 8900"
-                  className="h-9 text-xs rounded-xl bg-white dark:bg-zinc-950 border-slate-200 dark:border-zinc-800"
+                  className="h-9 text-xs rounded-xl bg-card "
                 />
               </div>
             </div>
 
-            <div className="flex items-center justify-end gap-2 pt-2 border-t border-slate-200/60 dark:border-zinc-800">
+            <div className="flex items-center justify-end gap-2 pt-2 border-t ">
               <Button
                 type="button"
                 variant="outline"
@@ -175,40 +175,40 @@ export function UserBasicInfoSection({
           /* View Cards */
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             {/* Full Name Card */}
-            <div className="p-3.5 rounded-2xl bg-slate-50/70 dark:bg-zinc-900/60 border border-slate-100 dark:border-zinc-800/80 flex items-center gap-3">
+            <div className="p-3.5 rounded-2xl bg-muted border  flex items-center gap-3">
               <div className="size-9 rounded-xl bg-blue-50 dark:bg-blue-950/50 text-blue-600 dark:text-blue-400 flex items-center justify-center shrink-0">
                 <UserRound className="size-4" />
               </div>
               <div className="min-w-0">
-                <p className="text-[11px] font-medium text-slate-400 dark:text-zinc-500">Full Name</p>
-                <p className="text-xs sm:text-sm font-bold text-slate-900 dark:text-zinc-100 truncate mt-0.5">
+                <p className="text-[11px] font-medium text-muted-foreground">Full Name</p>
+                <p className="text-xs sm:text-sm font-bold text-foreground truncate mt-0.5">
                   {name}
                 </p>
               </div>
             </div>
 
             {/* System Role Card */}
-            <div className="p-3.5 rounded-2xl bg-slate-50/70 dark:bg-zinc-900/60 border border-slate-100 dark:border-zinc-800/80 flex items-center gap-3">
+            <div className="p-3.5 rounded-2xl bg-muted border  flex items-center gap-3">
               <div className="size-9 rounded-xl bg-blue-50 dark:bg-blue-950/50 text-blue-600 dark:text-blue-400 flex items-center justify-center shrink-0">
                 <UserRound className="size-4" />
               </div>
               <div className="min-w-0">
-                <p className="text-[11px] font-medium text-slate-400 dark:text-zinc-500">System Role</p>
-                <p className="text-xs sm:text-sm font-bold text-slate-900 dark:text-zinc-100 truncate mt-0.5">
+                <p className="text-[11px] font-medium text-muted-foreground">System Role</p>
+                <p className="text-xs sm:text-sm font-bold text-foreground truncate mt-0.5">
                   {roleConf.label}
                 </p>
               </div>
             </div>
 
             {/* Email Address Card - FULL WIDTH (sm:col-span-2) so full email is always visible on desktop */}
-            <div className="col-span-1 sm:col-span-2 p-3.5 rounded-2xl bg-slate-50/70 dark:bg-zinc-900/60 border border-slate-100 dark:border-zinc-800/80 flex items-center justify-between gap-3">
+            <div className="col-span-1 sm:col-span-2 p-3.5 rounded-2xl bg-muted border  flex items-center justify-between gap-3">
               <div className="flex items-center gap-3 min-w-0 flex-1">
                 <div className="size-9 rounded-xl bg-blue-50 dark:bg-blue-950/50 text-blue-600 dark:text-blue-400 flex items-center justify-center shrink-0">
                   <Mail className="size-4" />
                 </div>
                 <div className="min-w-0 flex-1">
-                  <p className="text-[11px] font-medium text-slate-400 dark:text-zinc-500">Email Address</p>
-                  <p className="text-xs sm:text-sm font-bold text-slate-900 dark:text-zinc-100 break-all select-all mt-0.5 leading-snug">
+                  <p className="text-[11px] font-medium text-muted-foreground">Email Address</p>
+                  <p className="text-xs sm:text-sm font-bold text-foreground break-all select-all mt-0.5 leading-snug">
                     {email}
                   </p>
                 </div>
@@ -217,20 +217,20 @@ export function UserBasicInfoSection({
                 type="button"
                 onClick={onCopyEmail}
                 title="Copy Email"
-                className="p-2 rounded-xl text-slate-400 hover:text-slate-600 dark:hover:text-zinc-200 hover:bg-white dark:hover:bg-zinc-800 shrink-0 transition-colors cursor-pointer border border-transparent hover:border-slate-200/80 dark:hover:border-zinc-700 shadow-2xs"
+                className="p-2 rounded-xl text-muted-foreground hover:text-foreground dark:hover:text-muted-foreground hover:bg-white shrink-0 transition-colors cursor-pointer border border-transparent hover: dark:hover: shadow-2xs"
               >
                 {copiedEmail ? <Check className="size-4 text-emerald-600" /> : <Copy className="size-4" />}
               </button>
             </div>
 
             {/* Phone Number Card - FULL WIDTH (sm:col-span-2) */}
-            <div className="col-span-1 sm:col-span-2 p-3.5 rounded-2xl bg-slate-50/70 dark:bg-zinc-900/60 border border-slate-100 dark:border-zinc-800/80 flex items-center gap-3">
+            <div className="col-span-1 sm:col-span-2 p-3.5 rounded-2xl bg-muted border  flex items-center gap-3">
               <div className="size-9 rounded-xl bg-blue-50 dark:bg-blue-950/50 text-blue-600 dark:text-blue-400 flex items-center justify-center shrink-0">
                 <Phone className="size-4" />
               </div>
               <div className="min-w-0">
-                <p className="text-[11px] font-medium text-slate-400 dark:text-zinc-500">Phone Number</p>
-                <p className="text-xs sm:text-sm font-bold text-slate-900 dark:text-zinc-100 truncate mt-0.5">
+                <p className="text-[11px] font-medium text-muted-foreground">Phone Number</p>
+                <p className="text-xs sm:text-sm font-bold text-foreground truncate mt-0.5">
                   {phone || "Not provided"}
                 </p>
               </div>

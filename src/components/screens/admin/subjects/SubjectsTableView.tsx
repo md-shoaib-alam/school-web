@@ -64,7 +64,7 @@ export function SubjectsTableView({
                         </div>
                       </TableCell>
                       <TableCell>
-                        <code className="px-2 py-0.5 rounded bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 text-xs font-mono">
+                        <code className="px-2 py-0.5 rounded bg-muted text-foreground text-xs font-mono">
                           {subject.code}
                         </code>
                       </TableCell>

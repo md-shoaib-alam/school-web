@@ -26,11 +26,11 @@ export function OverdueHomeworkCard({ assignments }: OverdueHomeworkCardProps) {
         {overdueAssignments.map((a) => (
           <div
             key={a.id}
-            className="flex items-center justify-between bg-white dark:bg-zinc-900 p-3 rounded-lg"
+            className="flex items-center justify-between bg-card p-3 rounded-lg"
           >
             <div>
               <p className="font-medium text-sm">{a.title}</p>
-              <p className="text-xs text-zinc-500 dark:text-zinc-400">
+              <p className="text-xs text-muted-foreground">
                 {a.className} • {a.subjectName}
               </p>
             </div>

@@ -58,7 +58,7 @@ export function LeaveRequestsTable({
   onItemsPerPageChange,
 }: LeaveRequestsTableProps) {
   return (
-    <Card className="rounded-2xl border border-slate-200/80 dark:border-zinc-800 bg-white dark:bg-zinc-950 overflow-hidden shadow-2xs">
+    <Card className="rounded-2xl border  bg-card overflow-hidden shadow-2xs">
       <CardContent className="p-0">
         {loading ? (
           <div className="p-6 space-y-4">
@@ -72,10 +72,10 @@ export function LeaveRequestsTable({
             <div className="size-20 rounded-3xl bg-blue-50 dark:bg-blue-950/40 border border-blue-100 dark:border-blue-900/50 flex items-center justify-center text-blue-600 dark:text-blue-400 mb-4 shadow-xs">
               <FileText className="size-10 stroke-[1.5]" />
             </div>
-            <h3 className="text-lg sm:text-xl font-bold text-slate-900 dark:text-zinc-100 tracking-tight">
+            <h3 className="text-lg sm:text-xl font-bold text-foreground tracking-tight">
               No leave requests found
             </h3>
-            <p className="text-xs sm:text-sm text-slate-500 dark:text-zinc-400 max-w-sm mx-auto mt-1.5 leading-relaxed">
+            <p className="text-xs sm:text-sm text-muted-foreground max-w-sm mx-auto mt-1.5 leading-relaxed">
               There are no leave requests matching your filters.
             </p>
             <Button
@@ -90,32 +90,32 @@ export function LeaveRequestsTable({
         ) : (
           <div className="overflow-x-auto">
             <Table>
-              <TableHeader className="bg-slate-50/70 dark:bg-zinc-900/50 border-b border-slate-100 dark:border-zinc-800/80">
+              <TableHeader className="bg-muted border-b ">
                 <TableRow className="hover:bg-transparent">
                   <TableHead className="w-12 px-4">
                     <input
                       type="checkbox"
                       checked={selectedIds.size === leaves.length && leaves.length > 0}
                       onChange={onToggleSelectAll}
-                      className="rounded border-slate-300 dark:border-zinc-700 text-blue-600 focus:ring-blue-500 size-4 cursor-pointer"
+                      className="rounded  text-blue-600 focus:ring-blue-500 size-4 cursor-pointer"
                     />
                   </TableHead>
                   <TableHead className="cursor-pointer select-none text-xs font-semibold" onClick={() => onSort('userName')}>
                     <div className="flex items-center gap-1.5">
                       <span>Applicant</span>
-                      <ArrowUpDown className="size-3 text-slate-400" />
+                      <ArrowUpDown className="size-3 text-muted-foreground" />
                     </div>
                   </TableHead>
                   <TableHead className="cursor-pointer select-none text-xs font-semibold" onClick={() => onSort('leaveType')}>
                     <div className="flex items-center gap-1.5">
                       <span>Type</span>
-                      <ArrowUpDown className="size-3 text-slate-400" />
+                      <ArrowUpDown className="size-3 text-muted-foreground" />
                     </div>
                   </TableHead>
                   <TableHead className="cursor-pointer select-none text-xs font-semibold" onClick={() => onSort('startDate')}>
                     <div className="flex items-center gap-1.5">
                       <span>Dates</span>
-                      <ArrowUpDown className="size-3 text-slate-400" />
+                      <ArrowUpDown className="size-3 text-muted-foreground" />
                     </div>
                   </TableHead>
                   <TableHead className="text-xs font-semibold">
@@ -124,13 +124,13 @@ export function LeaveRequestsTable({
                   <TableHead className="cursor-pointer select-none text-xs font-semibold text-center" onClick={() => onSort('status')}>
                     <div className="flex items-center justify-center gap-1.5">
                       <span>Status</span>
-                      <ArrowUpDown className="size-3 text-slate-400" />
+                      <ArrowUpDown className="size-3 text-muted-foreground" />
                     </div>
                   </TableHead>
                   <TableHead className="cursor-pointer select-none text-xs font-semibold" onClick={() => onSort('createdAt')}>
                     <div className="flex items-center gap-1.5">
                       <span>Applied On</span>
-                      <ArrowUpDown className="size-3 text-slate-400" />
+                      <ArrowUpDown className="size-3 text-muted-foreground" />
                     </div>
                   </TableHead>
                   <TableHead className="text-right text-xs font-semibold pr-4">Actions</TableHead>
@@ -151,7 +151,7 @@ export function LeaveRequestsTable({
                     <TableRow
                       key={l.id}
                       className={cn(
-                        "transition-colors hover:bg-slate-50/70 dark:hover:bg-zinc-900/50 border-b border-slate-100 dark:border-zinc-800/60",
+                        "transition-colors hover:bg-muted border-b ",
                         isSelected && "bg-blue-50/40 dark:bg-blue-950/20"
                       )}
                     >
@@ -160,23 +160,23 @@ export function LeaveRequestsTable({
                           type="checkbox"
                           checked={isSelected}
                           onChange={() => onToggleSelectRow(l.id)}
-                          className="rounded border-slate-300 dark:border-zinc-700 text-blue-600 focus:ring-blue-500 size-4 cursor-pointer"
+                          className="rounded  text-blue-600 focus:ring-blue-500 size-4 cursor-pointer"
                         />
                       </TableCell>
 
                       {/* Applicant Name & Avatar */}
                       <TableCell className="py-3">
                         <div className="flex items-center gap-3">
-                          <Avatar className="size-8.5 rounded-full border border-slate-200 dark:border-zinc-800">
-                            <AvatarFallback className="bg-slate-100 dark:bg-zinc-800 text-slate-700 dark:text-zinc-200 text-xs font-bold">
+                          <Avatar className="size-8.5 rounded-full border ">
+                            <AvatarFallback className="bg-muted text-foreground text-xs font-bold">
                               {initials}
                             </AvatarFallback>
                           </Avatar>
                           <div className="min-w-0">
-                            <p className="text-xs sm:text-sm font-semibold text-slate-900 dark:text-zinc-100 truncate">
+                            <p className="text-xs sm:text-sm font-semibold text-foreground truncate">
                               {l.userName}
                             </p>
-                            <p className="text-[11px] text-slate-400 dark:text-zinc-500 truncate">
+                            <p className="text-[11px] text-muted-foreground truncate">
                               {l.userEmail || `${l.role}`}
                             </p>
                           </div>
@@ -189,7 +189,7 @@ export function LeaveRequestsTable({
                           variant="outline"
                           className={cn(
                             "text-xs font-medium rounded-lg px-2.5 py-0.5 border capitalize",
-                            leaveTypeConfig[l.leaveType]?.bg || "bg-slate-100 text-slate-700"
+                            leaveTypeConfig[l.leaveType]?.bg || "bg-muted text-foreground"
                           )}
                         >
                           {leaveTypeConfig[l.leaveType]?.label || l.leaveType}
@@ -197,19 +197,19 @@ export function LeaveRequestsTable({
                       </TableCell>
 
                       {/* Dates with Day Duration */}
-                      <TableCell className="text-xs text-slate-600 dark:text-zinc-300 whitespace-nowrap">
+                      <TableCell className="text-xs text-foreground whitespace-nowrap">
                         <div className="flex flex-col">
-                          <span className="font-medium text-slate-800 dark:text-zinc-200">
+                          <span className="font-medium text-foreground">
                             {formatDateString(l.startDate)} - {formatDateString(l.endDate)}
                           </span>
-                          <span className="text-[10px] text-slate-400 dark:text-zinc-500">
+                          <span className="text-[10px] text-muted-foreground">
                             {duration} {duration === 1 ? 'day' : 'days'}
                           </span>
                         </div>
                       </TableCell>
 
                       {/* Reason */}
-                      <TableCell className="text-xs text-slate-500 dark:text-zinc-400 max-w-[200px] truncate" title={l.reason || '–'}>
+                      <TableCell className="text-xs text-muted-foreground max-w-[200px] truncate" title={l.reason || '–'}>
                         {l.reason || '–'}
                       </TableCell>
 
@@ -218,7 +218,7 @@ export function LeaveRequestsTable({
                         <Badge
                           className={cn(
                             "text-xs font-semibold rounded-lg px-2.5 py-0.5 border shadow-2xs inline-flex items-center",
-                            statusConfig[l.status]?.bg || "bg-zinc-100 text-zinc-700"
+                            statusConfig[l.status]?.bg || "bg-muted text-foreground"
                           )}
                         >
                           {statusConfig[l.status]?.icon}
@@ -227,7 +227,7 @@ export function LeaveRequestsTable({
                       </TableCell>
 
                       {/* Applied On */}
-                      <TableCell className="text-xs text-slate-500 dark:text-zinc-400 whitespace-nowrap">
+                      <TableCell className="text-xs text-muted-foreground whitespace-nowrap">
                         {formatDateString(l.createdAt)}
                       </TableCell>
 
@@ -261,7 +261,7 @@ export function LeaveRequestsTable({
                             size="sm"
                             variant="ghost"
                             onClick={() => onViewDetail(l)}
-                            className="size-8 p-0 rounded-lg text-slate-500 hover:text-slate-800 hover:bg-slate-100 dark:hover:bg-zinc-800"
+                            className="size-8 p-0 rounded-lg text-muted-foreground hover:text-foreground hover:bg-accent"
                             title="View Details"
                           >
                             <Eye className="size-4" />
@@ -278,7 +278,7 @@ export function LeaveRequestsTable({
 
         {/* ── 5. Pagination Footer ── */}
         {!loading && leaves.length > 0 && (
-          <div className="border-t border-slate-100 dark:border-zinc-800/80 bg-slate-50/40 dark:bg-zinc-900/30 px-4">
+          <div className="border-t  bg-muted px-4">
             <Pagination
               currentPage={currentPage}
               totalPages={totalPages}

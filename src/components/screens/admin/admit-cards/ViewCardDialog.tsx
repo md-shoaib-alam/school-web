@@ -24,8 +24,8 @@ export function ViewCardDialog({
 }: ViewCardDialogProps) {
   return (
     <Dialog open={!!card} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-[850px] max-h-[95vh] overflow-y-auto bg-zinc-950 border-zinc-800 p-0">
-        <div className="sticky top-0 z-10 bg-zinc-900/80 backdrop-blur-md border-b border-zinc-800 px-6 py-4 flex items-center justify-between">
+      <DialogContent className="max-w-[850px] max-h-[95vh] overflow-y-auto bg-zinc-950  p-0">
+        <div className="sticky top-0 z-10 bg-zinc-900/80 backdrop-blur-md border-b  px-6 py-4 flex items-center justify-between">
           <DialogTitle className="text-white flex items-center gap-2">
             <div className="size-8 rounded-full bg-amber-500/20 text-amber-500 flex items-center justify-center">
               <FileText className="size-5" />
@@ -39,7 +39,7 @@ export function ViewCardDialog({
             variant="ghost"
             size="icon"
             onClick={() => onOpenChange(false)}
-            className="text-zinc-400 hover:text-white hover:bg-zinc-800"
+            className="text-muted-foreground hover:text-white hover:bg-zinc-800"
           >
             <X className="size-5" />
           </Button>
@@ -56,7 +56,7 @@ export function ViewCardDialog({
             <div className="flex flex-col sm:flex-row gap-4 w-full justify-center max-w-md">
               <Button
                 onClick={onPrint}
-                className="hidden lg:inline-flex flex-1 gap-2 bg-zinc-800 hover:bg-zinc-900 text-white shadow-lg border border-zinc-700 px-6 h-12 text-base font-semibold justify-center items-center"
+                className="hidden lg:inline-flex flex-1 gap-2 bg-zinc-800 hover:bg-zinc-900 text-white shadow-lg border  px-6 h-12 text-base font-semibold justify-center items-center"
               >
                 <Printer className="size-5" />
                 Print

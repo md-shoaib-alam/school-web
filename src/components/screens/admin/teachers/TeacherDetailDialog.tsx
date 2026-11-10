@@ -111,26 +111,26 @@ export function TeacherDetailDialog({
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
-        className="w-full sm:w-[95vw] sm:max-w-3xl md:max-w-4xl lg:max-w-5xl p-0 overflow-hidden border border-slate-200/80 dark:border-zinc-800 bg-white dark:bg-zinc-900 shadow-2xl rounded-t-3xl sm:rounded-2xl max-h-[95vh] sm:max-h-[92vh] flex flex-col focus:outline-none"
+        className="w-full sm:w-[95vw] sm:max-w-3xl md:max-w-4xl lg:max-w-5xl p-0 overflow-hidden border  bg-card shadow-2xl rounded-t-3xl sm:rounded-2xl max-h-[95vh] sm:max-h-[92vh] flex flex-col focus:outline-none"
         data-lenis-prevent
         showCloseButton={false}
       >
         {/* Top Header Section with mint gradient aura */}
-        <div className="relative px-4 sm:px-8 pt-5 sm:pt-6 pb-5 sm:pb-6 border-b border-slate-100 dark:border-zinc-800/80 bg-gradient-to-r from-emerald-50/50 via-white to-emerald-50/20 dark:from-emerald-950/20 dark:via-zinc-900 dark:to-zinc-900 shrink-0">
+        <div className="relative px-4 sm:px-8 pt-5 sm:pt-6 pb-5 sm:pb-6 border-b  bg-gradient-to-r from-emerald-50/50 via-white to-emerald-50/20 dark:from-emerald-950/20 dark:via-zinc-900 dark:to-zinc-900 shrink-0">
           
           {/* Top navigation row with Back to Teachers button and action buttons */}
           <div className="flex items-center justify-between pb-3 sm:pb-4">
             <div className="flex items-center gap-3">
               <button
                 onClick={() => onOpenChange(false)}
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/80 dark:bg-zinc-800/80 border border-slate-200/80 dark:border-zinc-700 text-xs font-semibold text-emerald-800 dark:text-emerald-300 hover:bg-emerald-50/80 dark:hover:bg-emerald-950/30 transition-all shadow-xs"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/80 border  text-xs font-semibold text-emerald-800 dark:text-emerald-300 hover:bg-emerald-50/80 dark:hover:bg-emerald-950/30 transition-all shadow-xs"
               >
                 <ChevronLeft className="size-4" />
                 <span>Back to Teachers</span>
               </button>
 
-              <span className="hidden sm:inline-flex items-center text-xs text-slate-400 dark:text-zinc-500 font-medium">
-                Teachers <span className="mx-1.5 text-slate-300 dark:text-zinc-700">›</span> Teacher Profile
+              <span className="hidden sm:inline-flex items-center text-xs text-muted-foreground font-medium">
+                Teachers <span className="mx-1.5 text-muted-foreground">›</span> Teacher Profile
               </span>
             </div>
 
@@ -151,7 +151,7 @@ export function TeacherDetailDialog({
                 variant="outline"
                 size="sm"
                 onClick={handlePrint}
-                className="hidden sm:inline-flex items-center gap-1.5 h-8 px-3 text-xs font-medium text-slate-700 dark:text-zinc-200 border-slate-200 dark:border-zinc-700 rounded-xl hover:bg-slate-50 dark:hover:bg-zinc-800"
+                className="hidden sm:inline-flex items-center gap-1.5 h-8 px-3 text-xs font-medium text-foreground  rounded-xl hover:bg-accent"
               >
                 <Printer className="size-3.5" />
                 Print
@@ -159,7 +159,7 @@ export function TeacherDetailDialog({
 
               <button
                 onClick={() => onOpenChange(false)}
-                className="p-1.5 rounded-full text-slate-400 hover:text-slate-700 hover:bg-slate-100 dark:hover:bg-zinc-800 dark:hover:text-zinc-200 transition-colors"
+                className="p-1.5 rounded-full text-muted-foreground hover:text-foreground hover:bg-accent dark:hover:text-muted-foreground transition-colors"
                 aria-label="More options"
               >
                 <MoreVertical className="size-5" />
@@ -177,7 +177,7 @@ export function TeacherDetailDialog({
 
               <div className="space-y-1.5 flex-1 flex flex-col items-center sm:items-start w-full">
                 <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2.5">
-                  <DialogTitle className="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white tracking-tight">
+                  <DialogTitle className="text-xl sm:text-2xl font-bold text-foreground tracking-tight">
                     {currentTeacher.name}
                   </DialogTitle>
                   <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-400 border border-emerald-200/80 dark:border-emerald-800/80">
@@ -193,18 +193,18 @@ export function TeacherDetailDialog({
                 </DialogDescription>
 
                 {/* Email line */}
-                <div className="flex items-center justify-center sm:justify-start gap-1.5 text-xs sm:text-sm text-slate-600 dark:text-zinc-400">
-                  <Mail className="size-3.5 text-slate-400 shrink-0" />
+                <div className="flex items-center justify-center sm:justify-start gap-1.5 text-xs sm:text-sm text-muted-foreground">
+                  <Mail className="size-3.5 text-muted-foreground shrink-0" />
                   <span>{currentTeacher.email}</span>
                 </div>
 
                 {/* Teacher ID with Copy Button */}
-                <div className="flex items-center justify-center sm:justify-start gap-1.5 text-xs sm:text-sm text-slate-500 dark:text-zinc-400 font-medium">
+                <div className="flex items-center justify-center sm:justify-start gap-1.5 text-xs sm:text-sm text-muted-foreground font-medium">
                   <span>Teacher ID:</span>
-                  <span className="font-semibold text-slate-800 dark:text-zinc-200">{displayTeacherId}</span>
+                  <span className="font-semibold text-foreground">{displayTeacherId}</span>
                   <button
                     onClick={() => handleCopy(displayTeacherId, "Teacher ID")}
-                    className="p-1 text-slate-400 hover:text-emerald-600 transition-colors rounded"
+                    className="p-1 text-muted-foreground hover:text-emerald-600 transition-colors rounded"
                     aria-label="Copy Teacher ID"
                   >
                     {copiedField === "Teacher ID" ? (
@@ -218,14 +218,14 @@ export function TeacherDetailDialog({
             </div>
 
             {/* Desktop Right Side Inspirational Quote Banner */}
-            <div className="hidden lg:block text-right pr-4 italic text-xs text-slate-400 dark:text-zinc-500 max-w-[220px]">
+            <div className="hidden lg:block text-right pr-4 italic text-xs text-muted-foreground max-w-[220px]">
               &ldquo;Educating minds, building brighter futures.&rdquo;
             </div>
           </div>
         </div>
 
         {/* Tab Navigation Bar */}
-        <div className="px-3 sm:px-8 border-b border-slate-100 dark:border-zinc-800 bg-white dark:bg-zinc-900 shrink-0 overflow-x-auto no-scrollbar">
+        <div className="px-3 sm:px-8 border-b  bg-card shrink-0 overflow-x-auto no-scrollbar">
           <div className="flex items-center justify-around sm:justify-start gap-1 sm:gap-6 -mb-px">
             {tabs.map((tab) => {
               const Icon = tab.icon;
@@ -237,10 +237,10 @@ export function TeacherDetailDialog({
                   className={`flex flex-col sm:flex-row items-center gap-1 sm:gap-2 py-3 px-2 sm:px-1 text-[11px] sm:text-sm font-medium border-b-2 transition-all whitespace-nowrap ${
                     isActive
                       ? "border-emerald-600 text-emerald-700 dark:text-emerald-400 font-semibold"
-                      : "border-transparent text-slate-500 dark:text-zinc-400 hover:text-slate-800 dark:hover:text-zinc-200"
+                      : "border-transparent text-muted-foreground hover:text-foreground dark:hover:text-muted-foreground"
                   }`}
                 >
-                  <Icon className={`size-4 ${isActive ? "text-emerald-600 dark:text-emerald-400 stroke-[2.2]" : "text-slate-400 stroke-[1.8]"}`} />
+                  <Icon className={`size-4 ${isActive ? "text-emerald-600 dark:text-emerald-400 stroke-[2.2]" : "text-muted-foreground stroke-[1.8]"}`} />
                   <span>{tab.label}</span>
                 </button>
               );
@@ -256,7 +256,7 @@ export function TeacherDetailDialog({
           {/* Custom Loading State with Table graphic asset matching screenshot */}
           {isLoading ? (
             <div className="min-h-[360px] flex flex-col items-center justify-center py-10 px-4">
-              <div className="w-full max-w-sm rounded-3xl bg-white dark:bg-zinc-800/90 border border-slate-100 dark:border-zinc-700/80 p-8 shadow-xl shadow-slate-200/50 dark:shadow-none flex flex-col items-center text-center animate-in fade-in zoom-in-95 duration-200">
+              <div className="w-full max-w-sm rounded-3xl bg-white border  p-8 shadow-xl shadow-slate-200/50 dark:shadow-none flex flex-col items-center text-center animate-in fade-in zoom-in-95 duration-200">
                 <div className="relative w-40 h-28 mb-5 flex items-center justify-center">
                   <Image
                     src="/assets/admin/table.avif"
@@ -268,13 +268,13 @@ export function TeacherDetailDialog({
                   />
                 </div>
                 <div className="relative size-12 mb-4 flex items-center justify-center">
-                  <div className="absolute inset-0 rounded-full border-[3.5px] border-slate-100 dark:border-zinc-700" />
+                  <div className="absolute inset-0 rounded-full border-[3.5px] " />
                   <div className="absolute inset-0 rounded-full border-[3.5px] border-emerald-600 dark:border-emerald-400 border-t-transparent border-r-transparent animate-spin" />
                 </div>
-                <h3 className="text-base sm:text-lg font-bold text-slate-900 dark:text-white tracking-tight">
+                <h3 className="text-base sm:text-lg font-bold text-foreground tracking-tight">
                   Loading Teacher Profile...
                 </h3>
-                <p className="text-xs sm:text-sm text-slate-400 dark:text-zinc-400 mt-1">
+                <p className="text-xs sm:text-sm text-muted-foreground mt-1">
                   Please wait a moment
                 </p>
               </div>
@@ -284,16 +284,16 @@ export function TeacherDetailDialog({
               {/* Row 1: Personal & Contact Information & Professional Information Cards */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                 {/* Card 1: Personal & Contact Information */}
-                <div className="rounded-2xl border border-slate-200/90 dark:border-zinc-800/80 bg-white dark:bg-zinc-900/60 p-5 shadow-[0_1px_3px_rgba(0,0,0,0.02)] space-y-4">
-                  <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-zinc-800/60">
-                    <div className="flex items-center gap-2 text-slate-900 dark:text-white font-semibold text-sm sm:text-base">
+                <div className="rounded-2xl border  bg-card p-5 shadow-[0_1px_3px_rgba(0,0,0,0.02)] space-y-4">
+                  <div className="flex items-center justify-between pb-3 border-b ">
+                    <div className="flex items-center gap-2 text-foreground font-semibold text-sm sm:text-base">
                       <User className="size-4 text-emerald-600" />
                       Personal & Contact Information
                     </div>
                     {canEdit && (
                       <button
                         onClick={() => onEdit && onEdit(currentTeacher)}
-                        className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg border border-slate-200 dark:border-zinc-700 text-xs font-medium text-slate-700 dark:text-zinc-300 hover:bg-slate-50 dark:hover:bg-zinc-800 transition-colors"
+                        className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg border  text-xs font-medium text-foreground hover:bg-accent transition-colors"
                       >
                         <Pencil className="size-3" />
                         Edit
@@ -304,55 +304,55 @@ export function TeacherDetailDialog({
                   <div className="space-y-3.5 text-xs sm:text-sm">
                     {/* Full Name */}
                     <div className="flex items-center justify-between py-0.5">
-                      <span className="flex items-center gap-2 text-slate-400 dark:text-zinc-500 font-medium">
-                        <User className="size-4 text-slate-400" />
+                      <span className="flex items-center gap-2 text-muted-foreground font-medium">
+                        <User className="size-4 text-muted-foreground" />
                         Full Name
                       </span>
-                      <span className="font-semibold text-slate-800 dark:text-zinc-100 text-right">
+                      <span className="font-semibold text-foreground text-right">
                         {currentTeacher.name}
                       </span>
                     </div>
 
                     {/* Email Address */}
                     <div className="flex items-center justify-between py-0.5">
-                      <span className="flex items-center gap-2 text-slate-400 dark:text-zinc-500 font-medium">
-                        <Mail className="size-4 text-slate-400" />
+                      <span className="flex items-center gap-2 text-muted-foreground font-medium">
+                        <Mail className="size-4 text-muted-foreground" />
                         Email Address
                       </span>
-                      <span className="font-semibold text-slate-800 dark:text-zinc-100 text-right truncate max-w-[200px] sm:max-w-xs">
+                      <span className="font-semibold text-foreground text-right truncate max-w-[200px] sm:max-w-xs">
                         {currentTeacher.email}
                       </span>
                     </div>
 
                     {/* Phone Number */}
                     <div className="flex items-center justify-between py-0.5">
-                      <span className="flex items-center gap-2 text-slate-400 dark:text-zinc-500 font-medium">
-                        <Phone className="size-4 text-slate-400" />
+                      <span className="flex items-center gap-2 text-muted-foreground font-medium">
+                        <Phone className="size-4 text-muted-foreground" />
                         Phone Number
                       </span>
-                      <span className="font-semibold text-slate-800 dark:text-zinc-100 text-right">
+                      <span className="font-semibold text-foreground text-right">
                         {currentTeacher.phone || "—"}
                       </span>
                     </div>
 
                     {/* Teacher ID */}
                     <div className="flex items-center justify-between py-0.5">
-                      <span className="flex items-center gap-2 text-slate-400 dark:text-zinc-500 font-medium">
-                        <Building2 className="size-4 text-slate-400" />
+                      <span className="flex items-center gap-2 text-muted-foreground font-medium">
+                        <Building2 className="size-4 text-muted-foreground" />
                         Teacher ID
                       </span>
-                      <span className="font-semibold text-slate-800 dark:text-zinc-100 text-right">
+                      <span className="font-semibold text-foreground text-right">
                         {displayTeacherId}
                       </span>
                     </div>
 
                     {/* Address */}
                     <div className="flex items-center justify-between py-0.5">
-                      <span className="flex items-center gap-2 text-slate-400 dark:text-zinc-500 font-medium">
-                        <MapPin className="size-4 text-slate-400" />
+                      <span className="flex items-center gap-2 text-muted-foreground font-medium">
+                        <MapPin className="size-4 text-muted-foreground" />
                         Address
                       </span>
-                      <span className="font-semibold text-slate-800 dark:text-zinc-100 text-right">
+                      <span className="font-semibold text-foreground text-right">
                         {displayAddress}
                       </span>
                     </div>
@@ -360,16 +360,16 @@ export function TeacherDetailDialog({
                 </div>
 
                 {/* Card 2: Professional Information */}
-                <div className="rounded-2xl border border-slate-200/90 dark:border-zinc-800/80 bg-white dark:bg-zinc-900/60 p-5 shadow-[0_1px_3px_rgba(0,0,0,0.02)] space-y-4">
-                  <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-zinc-800/60">
-                    <div className="flex items-center gap-2 text-slate-900 dark:text-white font-semibold text-sm sm:text-base">
+                <div className="rounded-2xl border  bg-card p-5 shadow-[0_1px_3px_rgba(0,0,0,0.02)] space-y-4">
+                  <div className="flex items-center justify-between pb-3 border-b ">
+                    <div className="flex items-center gap-2 text-foreground font-semibold text-sm sm:text-base">
                       <Briefcase className="size-4 text-emerald-600" />
                       Professional Information
                     </div>
                     {canEdit && (
                       <button
                         onClick={() => onEdit && onEdit(currentTeacher)}
-                        className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg border border-slate-200 dark:border-zinc-700 text-xs font-medium text-slate-700 dark:text-zinc-300 hover:bg-slate-50 dark:hover:bg-zinc-800 transition-colors"
+                        className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg border  text-xs font-medium text-foreground hover:bg-accent transition-colors"
                       >
                         <Pencil className="size-3" />
                         Edit
@@ -380,52 +380,52 @@ export function TeacherDetailDialog({
                   <div className="space-y-3.5 text-xs sm:text-sm">
                     {/* Role */}
                     <div className="flex items-center justify-between py-0.5">
-                      <span className="flex items-center gap-2 text-slate-400 dark:text-zinc-500 font-medium">
-                        <User className="size-4 text-slate-400" />
+                      <span className="flex items-center gap-2 text-muted-foreground font-medium">
+                        <User className="size-4 text-muted-foreground" />
                         Role
                       </span>
-                      <span className="font-semibold text-slate-800 dark:text-zinc-100 text-right">
+                      <span className="font-semibold text-foreground text-right">
                         {displayRole}
                       </span>
                     </div>
 
                     {/* Qualification */}
                     <div className="flex items-center justify-between py-0.5">
-                      <span className="flex items-center gap-2 text-slate-400 dark:text-zinc-500 font-medium">
-                        <GraduationCap className="size-4 text-slate-400" />
+                      <span className="flex items-center gap-2 text-muted-foreground font-medium">
+                        <GraduationCap className="size-4 text-muted-foreground" />
                         Qualification
                       </span>
-                      <span className="font-semibold text-slate-800 dark:text-zinc-100 text-right">
+                      <span className="font-semibold text-foreground text-right">
                         {currentTeacher.qualification || "B.Ed"}
                       </span>
                     </div>
 
                     {/* Experience */}
                     <div className="flex items-center justify-between py-0.5">
-                      <span className="flex items-center gap-2 text-slate-400 dark:text-zinc-500 font-medium">
-                        <Calendar className="size-4 text-slate-400" />
+                      <span className="flex items-center gap-2 text-muted-foreground font-medium">
+                        <Calendar className="size-4 text-muted-foreground" />
                         Experience
                       </span>
-                      <span className="font-semibold text-slate-800 dark:text-zinc-100 text-right">
+                      <span className="font-semibold text-foreground text-right">
                         {currentTeacher.experience || "2 years"}
                       </span>
                     </div>
 
                     {/* Date of Joining */}
                     <div className="flex items-center justify-between py-0.5">
-                      <span className="flex items-center gap-2 text-slate-400 dark:text-zinc-500 font-medium">
-                        <Calendar className="size-4 text-slate-400" />
+                      <span className="flex items-center gap-2 text-muted-foreground font-medium">
+                        <Calendar className="size-4 text-muted-foreground" />
                         Date of Joining
                       </span>
-                      <span className="font-semibold text-slate-800 dark:text-zinc-100 text-right">
+                      <span className="font-semibold text-foreground text-right">
                         {displayJoiningDate}
                       </span>
                     </div>
 
                     {/* Status */}
                     <div className="flex items-center justify-between py-0.5">
-                      <span className="flex items-center gap-2 text-slate-400 dark:text-zinc-500 font-medium">
-                        <Check className="size-4 text-slate-400" />
+                      <span className="flex items-center gap-2 text-muted-foreground font-medium">
+                        <Check className="size-4 text-muted-foreground" />
                         Status
                       </span>
                       <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 border border-emerald-200/80 dark:border-emerald-800">
@@ -440,16 +440,16 @@ export function TeacherDetailDialog({
               {/* Row 2: Assigned Subjects and Classes Taught Cards */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                 {/* Card 3: Assigned Subjects */}
-                <div className="rounded-2xl border border-slate-200/90 dark:border-zinc-800/80 bg-white dark:bg-zinc-900/60 p-5 shadow-[0_1px_3px_rgba(0,0,0,0.02)] space-y-4">
-                  <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-zinc-800/60">
-                    <div className="flex items-center gap-2 text-slate-900 dark:text-white font-semibold text-sm sm:text-base">
+                <div className="rounded-2xl border  bg-card p-5 shadow-[0_1px_3px_rgba(0,0,0,0.02)] space-y-4">
+                  <div className="flex items-center justify-between pb-3 border-b ">
+                    <div className="flex items-center gap-2 text-foreground font-semibold text-sm sm:text-base">
                       <BookOpen className="size-4 text-emerald-600" />
                       Assigned Subjects ({currentTeacher.subjects?.length || 0})
                     </div>
                     {canEdit && (
                       <button
                         onClick={() => onEdit && onEdit(currentTeacher)}
-                        className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg border border-slate-200 dark:border-zinc-700 text-xs font-medium text-slate-700 dark:text-zinc-300 hover:bg-slate-50 dark:hover:bg-zinc-800 transition-colors"
+                        className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg border  text-xs font-medium text-foreground hover:bg-accent transition-colors"
                       >
                         <Pencil className="size-3" />
                         Edit
@@ -458,7 +458,7 @@ export function TeacherDetailDialog({
                   </div>
 
                   {!currentTeacher.subjects || currentTeacher.subjects.length === 0 ? (
-                    <p className="text-xs text-slate-400 dark:text-zinc-500 italic">No subjects assigned yet.</p>
+                    <p className="text-xs text-muted-foreground italic">No subjects assigned yet.</p>
                   ) : (
                     <div className="flex flex-wrap gap-2">
                       {currentTeacher.subjects.map((subj, index) => (
@@ -474,16 +474,16 @@ export function TeacherDetailDialog({
                 </div>
 
                 {/* Card 4: Classes Taught */}
-                <div className="rounded-2xl border border-slate-200/90 dark:border-zinc-800/80 bg-white dark:bg-zinc-900/60 p-5 shadow-[0_1px_3px_rgba(0,0,0,0.02)] space-y-4">
-                  <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-zinc-800/60">
-                    <div className="flex items-center gap-2 text-slate-900 dark:text-white font-semibold text-sm sm:text-base">
+                <div className="rounded-2xl border  bg-card p-5 shadow-[0_1px_3px_rgba(0,0,0,0.02)] space-y-4">
+                  <div className="flex items-center justify-between pb-3 border-b ">
+                    <div className="flex items-center gap-2 text-foreground font-semibold text-sm sm:text-base">
                       <Users className="size-4 text-emerald-600" />
                       Classes Taught ({currentTeacher.classes?.length || 0})
                     </div>
                     {canEdit && (
                       <button
                         onClick={() => onEdit && onEdit(currentTeacher)}
-                        className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg border border-slate-200 dark:border-zinc-700 text-xs font-medium text-slate-700 dark:text-zinc-300 hover:bg-slate-50 dark:hover:bg-zinc-800 transition-colors"
+                        className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg border  text-xs font-medium text-foreground hover:bg-accent transition-colors"
                       >
                         <Pencil className="size-3" />
                         Edit
@@ -492,7 +492,7 @@ export function TeacherDetailDialog({
                   </div>
 
                   {!currentTeacher.classes || currentTeacher.classes.length === 0 ? (
-                    <p className="text-xs text-slate-400 dark:text-zinc-500 italic">No classes assigned yet.</p>
+                    <p className="text-xs text-muted-foreground italic">No classes assigned yet.</p>
                   ) : (
                     <div className="flex flex-wrap gap-2">
                       {currentTeacher.classes.map((cls, index) => (
@@ -509,7 +509,7 @@ export function TeacherDetailDialog({
               </div>
             </div>
           ) : (
-            <div className="py-16 text-center text-slate-400 dark:text-zinc-500">
+            <div className="py-16 text-center text-muted-foreground">
               <Building2 className="size-10 mx-auto mb-2 opacity-30" />
               <p className="text-sm font-medium">No records found for {activeTab}</p>
             </div>
@@ -518,7 +518,7 @@ export function TeacherDetailDialog({
 
         {/* Mobile Sticky Bottom Edit Profile Action Button */}
         {canEdit && (
-          <div className="sm:hidden p-4 bg-white dark:bg-zinc-900 border-t border-slate-100 dark:border-zinc-800 shrink-0">
+          <div className="sm:hidden p-4 bg-card border-t  shrink-0">
             <Button
               onClick={() => onEdit && onEdit(currentTeacher)}
               className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-sm rounded-xl py-3 gap-2 shadow-sm"

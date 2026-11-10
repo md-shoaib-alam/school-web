@@ -86,16 +86,16 @@ export function CreateParentDialog({
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
-        className="w-full sm:w-[95vw] sm:max-w-2xl md:max-w-3xl lg:max-w-4xl p-0 overflow-hidden border border-slate-200/80 dark:border-zinc-800 bg-white dark:bg-zinc-900 shadow-2xl rounded-2xl max-h-[92vh] flex flex-col focus:outline-none"
+        className="w-full sm:w-[95vw] sm:max-w-2xl md:max-w-3xl lg:max-w-4xl p-0 overflow-hidden border  bg-card shadow-2xl rounded-2xl max-h-[92vh] flex flex-col focus:outline-none"
         data-lenis-prevent
         showCloseButton={false}
       >
         {/* Top Header Section with mint gradient aura and parentaddtop.avif illustration */}
-        <div className="relative px-6 sm:px-8 pt-6 pb-5 border-b border-slate-100 dark:border-zinc-800/80 bg-gradient-to-r from-emerald-50/50 via-white to-emerald-50/20 dark:from-emerald-950/20 dark:via-zinc-900 dark:to-zinc-900 shrink-0 overflow-hidden">
+        <div className="relative px-6 sm:px-8 pt-6 pb-5 border-b  bg-gradient-to-r from-emerald-50/50 via-white to-emerald-50/20 dark:from-emerald-950/20 dark:via-zinc-900 dark:to-zinc-900 shrink-0 overflow-hidden">
           {/* Close button at top right */}
           <button
             onClick={() => onOpenChange(false)}
-            className="absolute top-5 right-5 p-1.5 rounded-full text-slate-400 hover:text-slate-700 hover:bg-slate-100 dark:hover:bg-zinc-800 dark:hover:text-zinc-200 transition-colors z-20"
+            className="absolute top-5 right-5 p-1.5 rounded-full text-muted-foreground hover:text-foreground hover:bg-accent dark:hover:text-muted-foreground transition-colors z-20"
             aria-label="Close"
           >
             <X className="size-5" />
@@ -106,10 +106,10 @@ export function CreateParentDialog({
               <p className="text-[11px] font-bold tracking-wider text-emerald-600 dark:text-emerald-400 uppercase">
                 ADD NEW PARENT
               </p>
-              <DialogTitle className="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white tracking-tight">
+              <DialogTitle className="text-xl sm:text-2xl font-bold text-foreground tracking-tight">
                 Add New Parent
               </DialogTitle>
-              <DialogDescription className="text-xs sm:text-sm text-slate-500 dark:text-zinc-400 leading-relaxed">
+              <DialogDescription className="text-xs sm:text-sm text-muted-foreground leading-relaxed">
                 Create a new parent account in the system. A unique Parent ID (e.g. PRN2026xxxx) will be automatically generated for login.
               </DialogDescription>
             </div>
@@ -144,8 +144,8 @@ export function CreateParentDialog({
             {/* ────────────────────────────────────────────────────────── */}
             {/* SECTION 1: Personal Information                           */}
             {/* ────────────────────────────────────────────────────────── */}
-            <div className="rounded-2xl border border-slate-200/90 dark:border-zinc-800/80 bg-white dark:bg-zinc-900/60 p-5 shadow-[0_1px_3px_rgba(0,0,0,0.02)] space-y-4">
-              <div className="flex items-center gap-2 pb-3 border-b border-slate-100 dark:border-zinc-800/60 text-slate-900 dark:text-white font-semibold text-sm sm:text-base">
+            <div className="rounded-2xl border  bg-card p-5 shadow-[0_1px_3px_rgba(0,0,0,0.02)] space-y-4">
+              <div className="flex items-center gap-2 pb-3 border-b  text-foreground font-semibold text-sm sm:text-base">
                 <User className="size-4 text-emerald-600" />
                 Personal Information
               </div>
@@ -154,11 +154,11 @@ export function CreateParentDialog({
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 {/* Full Name */}
                 <div className="space-y-1.5">
-                  <Label htmlFor="p_name" className="text-xs font-semibold text-slate-700 dark:text-zinc-300">
+                  <Label htmlFor="p_name" className="text-xs font-semibold text-foreground">
                     Full Name <span className="text-red-500">*</span>
                   </Label>
                   <div className="relative">
-                    <User className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-slate-400" />
+                    <User className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
                     <Input
                       id="p_name"
                       name="name"
@@ -166,21 +166,21 @@ export function CreateParentDialog({
                       value={createForm.name || ""}
                       onChange={(e) => setCreateForm({ ...createForm, name: e.target.value })}
                       placeholder="Enter full name"
-                      className="pl-9 h-9 text-xs rounded-xl bg-slate-50/50 dark:bg-zinc-800/50 border-slate-200 dark:border-zinc-700 focus-visible:ring-emerald-500"
+                      className="pl-9 h-9 text-xs rounded-xl bg-muted  focus-visible:ring-emerald-500"
                     />
                   </div>
                 </div>
 
               {/* Gender */}
               <div className="space-y-1.5">
-                <Label className="text-xs font-semibold text-slate-700 dark:text-zinc-300">
+                <Label className="text-xs font-semibold text-foreground">
                   Gender
                 </Label>
                 <Select
                   value={createForm.gender || "male"}
                   onValueChange={(val) => setCreateForm({ ...createForm, gender: val })}
                 >
-                  <SelectTrigger className="h-9 text-xs rounded-xl bg-slate-50/50 dark:bg-zinc-800/50 border-slate-200 dark:border-zinc-700">
+                  <SelectTrigger className="h-9 text-xs rounded-xl bg-muted ">
                     <SelectValue placeholder="Select gender" />
                   </SelectTrigger>
                   <SelectContent>
@@ -193,14 +193,14 @@ export function CreateParentDialog({
 
               {/* Relationship with Student(s) (Fixed to Parent on server) */}
               <div className="space-y-1.5">
-                <Label className="text-xs font-semibold text-slate-700 dark:text-zinc-300">
-                  Relationship with Student(s) <span className="text-[10px] text-slate-400 font-normal">(Parent)</span>
+                <Label className="text-xs font-semibold text-foreground">
+                  Relationship with Student(s) <span className="text-[10px] text-muted-foreground font-normal">(Parent)</span>
                 </Label>
                 <Select
                   value="Parent"
                   disabled
                 >
-                  <SelectTrigger className="h-9 text-xs rounded-xl bg-slate-100/70 dark:bg-zinc-800/40 border-slate-200 dark:border-zinc-800 text-slate-600 dark:text-zinc-400 cursor-not-allowed">
+                  <SelectTrigger className="h-9 text-xs rounded-xl bg-muted  text-muted-foreground cursor-not-allowed">
                     <SelectValue placeholder="Parent" />
                   </SelectTrigger>
                   <SelectContent>
@@ -214,8 +214,8 @@ export function CreateParentDialog({
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {/* Date of Birth */}
               <div className="space-y-1.5">
-                <Label className="text-xs font-semibold text-slate-700 dark:text-zinc-300">
-                  Date of Birth <span className="text-slate-400 font-normal">(Optional)</span>
+                <Label className="text-xs font-semibold text-foreground">
+                  Date of Birth <span className="text-muted-foreground font-normal">(Optional)</span>
                 </Label>
                 <DatePicker
                   date={createForm.dateOfBirth && !isNaN(new Date(createForm.dateOfBirth).getTime()) ? new Date(createForm.dateOfBirth) : undefined}
@@ -224,20 +224,20 @@ export function CreateParentDialog({
                     setCreateForm({ ...createForm, dateOfBirth: formatted });
                   }}
                   placeholder="Pick date of birth"
-                  className="w-full h-9 text-xs rounded-xl bg-slate-50/50 dark:bg-zinc-800/50 border-slate-200 dark:border-zinc-700"
+                  className="w-full h-9 text-xs rounded-xl bg-muted "
                 />
               </div>
 
               {/* Occupation */}
               <div className="space-y-1.5">
-                <Label className="text-xs font-semibold text-slate-700 dark:text-zinc-300">
-                  Occupation <span className="text-slate-400 font-normal">(Optional)</span>
+                <Label className="text-xs font-semibold text-foreground">
+                  Occupation <span className="text-muted-foreground font-normal">(Optional)</span>
                 </Label>
                 <Input
                   value={createForm.occupation || ""}
                   onChange={(e) => setCreateForm({ ...createForm, occupation: e.target.value })}
                   placeholder="e.g. Engineer, Business"
-                  className="h-9 text-xs rounded-xl bg-slate-50/50 dark:bg-zinc-800/50 border-slate-200 dark:border-zinc-700 focus-visible:ring-emerald-500"
+                  className="h-9 text-xs rounded-xl bg-muted  focus-visible:ring-emerald-500"
                 />
               </div>
             </div>
@@ -246,8 +246,8 @@ export function CreateParentDialog({
           {/* ────────────────────────────────────────────────────────── */}
           {/* SECTION 2: Contact Information                            */}
           {/* ────────────────────────────────────────────────────────── */}
-          <div className="rounded-2xl border border-slate-200/90 dark:border-zinc-800/80 bg-white dark:bg-zinc-900/60 p-5 shadow-[0_1px_3px_rgba(0,0,0,0.02)] space-y-4">
-            <div className="flex items-center gap-2 pb-3 border-b border-slate-100 dark:border-zinc-800/60 text-slate-900 dark:text-white font-semibold text-sm sm:text-base">
+          <div className="rounded-2xl border  bg-card p-5 shadow-[0_1px_3px_rgba(0,0,0,0.02)] space-y-4">
+            <div className="flex items-center gap-2 pb-3 border-b  text-foreground font-semibold text-sm sm:text-base">
               <Phone className="size-4 text-emerald-600" />
               Contact Information
             </div>
@@ -256,11 +256,11 @@ export function CreateParentDialog({
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               {/* Email Address */}
               <div className="space-y-1.5">
-                <Label htmlFor="p_email" className="text-xs font-semibold text-slate-700 dark:text-zinc-300">
-                  Email Address <span className="text-slate-400 font-normal">(Optional)</span>
+                <Label htmlFor="p_email" className="text-xs font-semibold text-foreground">
+                  Email Address <span className="text-muted-foreground font-normal">(Optional)</span>
                 </Label>
                 <div className="relative">
-                  <Mail className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-slate-400" />
+                  <Mail className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
                   <Input
                     id="p_email"
                     name="email"
@@ -269,18 +269,18 @@ export function CreateParentDialog({
                     value={createForm.email || ""}
                     onChange={(e) => setCreateForm({ ...createForm, email: e.target.value })}
                     placeholder="parent@example.com"
-                    className="pl-9 h-9 text-xs rounded-xl bg-slate-50/50 dark:bg-zinc-800/50 border-slate-200 dark:border-zinc-700 focus-visible:ring-emerald-500"
+                    className="pl-9 h-9 text-xs rounded-xl bg-muted  focus-visible:ring-emerald-500"
                   />
                 </div>
               </div>
 
               {/* Phone Number */}
               <div className="space-y-1.5">
-                <Label className="text-xs font-semibold text-slate-700 dark:text-zinc-300">
+                <Label className="text-xs font-semibold text-foreground">
                   Phone Number <span className="text-red-500">*</span>
                 </Label>
-                <div className="flex rounded-xl overflow-hidden border border-slate-200 dark:border-zinc-700 bg-slate-50/50 dark:bg-zinc-800/50 focus-within:ring-1 focus-within:ring-emerald-500">
-                  <span className="inline-flex items-center px-2.5 text-xs text-slate-500 bg-slate-100 dark:bg-zinc-800 border-r border-slate-200 dark:border-zinc-700 font-medium">
+                <div className="flex rounded-xl overflow-hidden border  bg-muted focus-within:ring-1 focus-within:ring-emerald-500">
+                  <span className="inline-flex items-center px-2.5 text-xs text-muted-foreground bg-muted border-r  font-medium">
                     +91
                   </span>
                   <input
@@ -290,18 +290,18 @@ export function CreateParentDialog({
                     value={createForm.phone || ""}
                     onChange={(e) => setCreateForm({ ...createForm, phone: e.target.value })}
                     placeholder="Enter phone number"
-                    className="w-full h-9 px-3 text-xs bg-transparent focus:outline-none text-slate-800 dark:text-zinc-200"
+                    className="w-full h-9 px-3 text-xs bg-transparent focus:outline-none text-foreground"
                   />
                 </div>
               </div>
 
               {/* Alternate Phone */}
               <div className="space-y-1.5">
-                <Label className="text-xs font-semibold text-slate-700 dark:text-zinc-300">
-                  Alternate Phone <span className="text-slate-400 font-normal">(Optional)</span>
+                <Label className="text-xs font-semibold text-foreground">
+                  Alternate Phone <span className="text-muted-foreground font-normal">(Optional)</span>
                 </Label>
-                <div className="flex rounded-xl overflow-hidden border border-slate-200 dark:border-zinc-700 bg-slate-50/50 dark:bg-zinc-800/50 focus-within:ring-1 focus-within:ring-emerald-500">
-                  <span className="inline-flex items-center px-2.5 text-xs text-slate-500 bg-slate-100 dark:bg-zinc-800 border-r border-slate-200 dark:border-zinc-700 font-medium">
+                <div className="flex rounded-xl overflow-hidden border  bg-muted focus-within:ring-1 focus-within:ring-emerald-500">
+                  <span className="inline-flex items-center px-2.5 text-xs text-muted-foreground bg-muted border-r  font-medium">
                     +91
                   </span>
                   <input
@@ -309,7 +309,7 @@ export function CreateParentDialog({
                     value={createForm.alternatePhone || ""}
                     onChange={(e) => setCreateForm({ ...createForm, alternatePhone: e.target.value })}
                     placeholder="Enter alternate number"
-                    className="w-full h-9 px-3 text-xs bg-transparent focus:outline-none text-slate-800 dark:text-zinc-200"
+                    className="w-full h-9 px-3 text-xs bg-transparent focus:outline-none text-foreground"
                   />
                 </div>
               </div>
@@ -319,18 +319,18 @@ export function CreateParentDialog({
           {/* ────────────────────────────────────────────────────────── */}
           {/* SECTION 3: Address Information                            */}
           {/* ────────────────────────────────────────────────────────── */}
-          <div className="rounded-2xl border border-slate-200/90 dark:border-zinc-800/80 bg-white dark:bg-zinc-900/60 p-5 shadow-[0_1px_3px_rgba(0,0,0,0.02)] space-y-4">
-            <div className="flex items-center gap-2 pb-3 border-b border-slate-100 dark:border-zinc-800/60 text-slate-900 dark:text-white font-semibold text-sm sm:text-base">
+          <div className="rounded-2xl border  bg-card p-5 shadow-[0_1px_3px_rgba(0,0,0,0.02)] space-y-4">
+            <div className="flex items-center gap-2 pb-3 border-b  text-foreground font-semibold text-sm sm:text-base">
               <MapPin className="size-4 text-emerald-600" />
               Address Information
             </div>
 
             <div className="space-y-1.5">
               <div className="flex justify-between items-center">
-                <Label className="text-xs font-semibold text-slate-700 dark:text-zinc-300">
-                  Address <span className="text-slate-400 font-normal">(Optional)</span>
+                <Label className="text-xs font-semibold text-foreground">
+                  Address <span className="text-muted-foreground font-normal">(Optional)</span>
                 </Label>
-                <span className="text-[10px] text-slate-400">
+                <span className="text-[10px] text-muted-foreground">
                   {(createForm.address || "").length}/200
                 </span>
               </div>
@@ -341,7 +341,7 @@ export function CreateParentDialog({
                   onChange={(e) => setCreateForm({ ...createForm, address: e.target.value })}
                   placeholder="Enter full address"
                   maxLength={200}
-                  className="w-full px-3 py-2 text-xs rounded-xl bg-slate-50/50 dark:bg-zinc-800/50 border border-slate-200 dark:border-zinc-700 focus:outline-none focus:ring-1 focus:ring-emerald-500 text-slate-800 dark:text-zinc-200 resize-none"
+                  className="w-full px-3 py-2 text-xs rounded-xl bg-muted border  focus:outline-none focus:ring-1 focus:ring-emerald-500 text-foreground resize-none"
                 />
               </div>
             </div>
@@ -350,8 +350,8 @@ export function CreateParentDialog({
           {/* ────────────────────────────────────────────────────────── */}
           {/* SECTION 4: Account Settings                                */}
           {/* ────────────────────────────────────────────────────────── */}
-          <div className="rounded-2xl border border-slate-200/90 dark:border-zinc-800/80 bg-white dark:bg-zinc-900/60 p-5 shadow-[0_1px_3px_rgba(0,0,0,0.02)] space-y-4">
-            <div className="flex items-center gap-2 pb-3 border-b border-slate-100 dark:border-zinc-800/60 text-slate-900 dark:text-white font-semibold text-sm sm:text-base">
+          <div className="rounded-2xl border  bg-card p-5 shadow-[0_1px_3px_rgba(0,0,0,0.02)] space-y-4">
+            <div className="flex items-center gap-2 pb-3 border-b  text-foreground font-semibold text-sm sm:text-base">
               <Shield className="size-4 text-emerald-600" />
               Account Settings
             </div>
@@ -359,38 +359,38 @@ export function CreateParentDialog({
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {/* Parent Login ID */}
               <div className="space-y-1.5">
-                <Label className="text-xs font-semibold text-slate-700 dark:text-zinc-300">
+                <Label className="text-xs font-semibold text-foreground">
                   Parent Login ID
                 </Label>
                 <div className="relative">
-                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 font-medium text-xs">#</span>
+                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground font-medium text-xs">#</span>
                   <Input
                     value={createForm.username || ""}
                     onChange={(e) => setCreateForm({ ...createForm, username: e.target.value })}
                     placeholder="Auto-generate"
-                    className="pl-7 h-9 text-xs rounded-xl bg-slate-100/70 dark:bg-zinc-800/40 text-slate-600 border-slate-200 dark:border-zinc-800 focus-visible:ring-emerald-500"
+                    className="pl-7 h-9 text-xs rounded-xl bg-muted text-foreground  focus-visible:ring-emerald-500"
                   />
                 </div>
               </div>
 
               {/* Login Password */}
               <div className="space-y-1.5">
-                <Label className="text-xs font-semibold text-slate-700 dark:text-zinc-300">
+                <Label className="text-xs font-semibold text-foreground">
                   Login Password
                 </Label>
                 <div className="relative">
-                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-slate-400" />
+                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
                   <Input
                     type={showPassword ? "text" : "password"}
                     value={createForm.password || ""}
                     onChange={(e) => setCreateForm({ ...createForm, password: e.target.value })}
                     placeholder="Set login password (default: changeme123)"
-                    className="pl-9 pr-9 h-9 text-xs rounded-xl bg-slate-50/50 dark:bg-zinc-800/50 border-slate-200 dark:border-zinc-700 focus-visible:ring-emerald-500"
+                    className="pl-9 pr-9 h-9 text-xs rounded-xl bg-muted  focus-visible:ring-emerald-500"
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 focus:outline-none"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground focus:outline-none"
                     aria-label={showPassword ? "Hide password" : "Show password"}
                   >
                     {showPassword ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
@@ -410,14 +410,14 @@ export function CreateParentDialog({
         </div>
 
         {/* Modal Action Footer matching the screenshot */}
-        <div className="px-6 sm:px-8 py-4 bg-white dark:bg-zinc-900 border-t border-slate-100 dark:border-zinc-800 flex items-center justify-between shrink-0">
+        <div className="px-6 sm:px-8 py-4 bg-card border-t  flex items-center justify-between shrink-0">
           <Button
             type="button"
             variant="outline"
             onClick={handleReset}
-            className="gap-2 text-xs font-semibold text-slate-700 dark:text-zinc-300 border-slate-200 dark:border-zinc-700 hover:bg-slate-50 dark:hover:bg-zinc-800 rounded-xl px-4 h-10"
+            className="gap-2 text-xs font-semibold text-foreground  hover:bg-accent rounded-xl px-4 h-10"
           >
-            <RotateCcw className="size-3.5 text-slate-500" />
+            <RotateCcw className="size-3.5 text-muted-foreground" />
             Reset
           </Button>
 
@@ -426,7 +426,7 @@ export function CreateParentDialog({
               type="button"
               variant="outline"
               onClick={() => onOpenChange(false)}
-              className="text-xs font-semibold text-slate-600 dark:text-zinc-300 border-slate-200 dark:border-zinc-700 hover:bg-slate-50 dark:hover:bg-zinc-800 rounded-xl px-5 h-10"
+              className="text-xs font-semibold text-foreground  hover:bg-accent rounded-xl px-5 h-10"
             >
               Cancel
             </Button>

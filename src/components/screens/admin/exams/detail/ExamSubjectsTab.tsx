@@ -104,7 +104,7 @@ export function ExamSubjectsTab({ exam, onEnterMarks, onViewResults }: ExamSubje
   return (
     <div className="space-y-4">
       {/* Title Header with Enter Marks button (Image 2) */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-white dark:bg-zinc-900 border border-border/70 rounded-2xl p-4 sm:p-5 shadow-sm">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-card border border-border/70 rounded-2xl p-4 sm:p-5 shadow-sm">
         <div className="flex items-center gap-3.5">
           <div className="size-11 sm:size-12 rounded-xl bg-blue-600 text-white flex items-center justify-center shadow-md shadow-blue-600/20 shrink-0">
             <ClipboardList className="size-6" />
@@ -125,7 +125,7 @@ export function ExamSubjectsTab({ exam, onEnterMarks, onViewResults }: ExamSubje
           {/* Section filter dropdown — only shown for multi-section exams */}
           {isMultiSection && availableSections.length > 1 && (
             <Select value={selectedSection} onValueChange={setSelectedSection}>
-              <SelectTrigger className="w-36 rounded-xl bg-slate-50 dark:bg-zinc-800/60 border-border/80 text-xs font-semibold h-9">
+              <SelectTrigger className="w-36 rounded-xl bg-muted border-border/80 text-xs font-semibold h-9">
                 <SelectValue placeholder="All Sections" />
               </SelectTrigger>
               <SelectContent>
@@ -148,10 +148,10 @@ export function ExamSubjectsTab({ exam, onEnterMarks, onViewResults }: ExamSubje
       </div>
 
       {/* Main Subjects Table Card (Image 2) */}
-      <div className="bg-white dark:bg-zinc-900 border border-border/70 rounded-2xl shadow-sm overflow-hidden">
+      <div className="bg-card border border-border/70 rounded-2xl shadow-sm overflow-hidden">
         <div className="overflow-x-auto">
           <Table>
-            <TableHeader className="bg-slate-50/70 dark:bg-zinc-800/40">
+            <TableHeader className="bg-muted">
               <TableRow className="border-b border-border/70">
                 <TableHead className="w-12 text-center font-bold text-muted-foreground text-xs py-3.5">#</TableHead>
                 <TableHead className="font-semibold text-xs sm:text-sm text-foreground py-3.5 pl-3">Subject</TableHead>
@@ -199,7 +199,7 @@ export function ExamSubjectsTab({ exam, onEnterMarks, onViewResults }: ExamSubje
                             {iconStyle.icon}
                           </div>
                           <div className="flex items-center gap-2">
-                            <span className="font-semibold text-sm text-slate-900 dark:text-zinc-100">
+                            <span className="font-semibold text-sm text-foreground">
                               {sub.subjectName}
                             </span>
                             {sub.fullExam?.classSection && (
@@ -212,12 +212,12 @@ export function ExamSubjectsTab({ exam, onEnterMarks, onViewResults }: ExamSubje
                       </TableCell>
 
                       {/* Teacher */}
-                      <TableCell className="py-4 text-sm font-medium text-slate-700 dark:text-zinc-300">
+                      <TableCell className="py-4 text-sm font-medium text-foreground">
                         {sub.teacherName || 'Assigned Teacher'}
                       </TableCell>
 
                       {/* Total Students */}
-                      <TableCell className="py-4 text-center text-sm font-medium text-slate-700 dark:text-zinc-300 tabular-nums">
+                      <TableCell className="py-4 text-center text-sm font-medium text-foreground tabular-nums">
                         {sub.totalStudents ?? 0}
                       </TableCell>
 
@@ -237,7 +237,7 @@ export function ExamSubjectsTab({ exam, onEnterMarks, onViewResults }: ExamSubje
                             In Progress
                           </span>
                         ) : (
-                          <span className="inline-flex items-center justify-center px-3 py-1 rounded-full text-xs font-semibold bg-slate-100 text-slate-600 dark:bg-zinc-800 dark:text-zinc-300 border border-slate-200 dark:border-zinc-700">
+                          <span className="inline-flex items-center justify-center px-3 py-1 rounded-full text-xs font-semibold bg-muted text-foreground border ">
                             Not Started
                           </span>
                         )}

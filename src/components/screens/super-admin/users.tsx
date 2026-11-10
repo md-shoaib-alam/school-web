@@ -312,12 +312,12 @@ export function SuperAdminUsers() {
 
       {/* Add User Modal Dialog */}
       <Dialog open={addUserOpen} onOpenChange={setAddUserOpen}>
-        <DialogContent className="sm:max-w-md rounded-2xl border-slate-200 dark:border-zinc-800">
+        <DialogContent className="sm:max-w-md rounded-2xl ">
           <DialogHeader>
-            <DialogTitle className="text-lg font-bold text-slate-900 dark:text-slate-100">
+            <DialogTitle className="text-lg font-bold text-foreground">
               Add New User
             </DialogTitle>
-            <DialogDescription className="text-xs text-slate-500">
+            <DialogDescription className="text-xs text-muted-foreground">
               Create a new user account across platform tenants.
             </DialogDescription>
           </DialogHeader>

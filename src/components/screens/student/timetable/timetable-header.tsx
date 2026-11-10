@@ -11,15 +11,15 @@ export function TimetableHeader({ viewMode, setViewMode }: TimetableHeaderProps)
   return (
     <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
       <div>
-        <h2 className="text-xl font-semibold text-zinc-900 dark:text-zinc-100">
+        <h2 className="text-xl font-semibold text-foreground">
           My Timetable
         </h2>
-        <p className="text-sm text-zinc-500 dark:text-zinc-400 mt-0.5">
+        <p className="text-sm text-muted-foreground mt-0.5">
           Weekly class schedule and time slots
         </p>
       </div>
 
-      <div className="flex items-center gap-1 rounded-lg border border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-900 p-1">
+      <div className="flex items-center gap-1 rounded-lg border  bg-muted p-1">
         <Button
           size="sm"
           variant={viewMode === "grid" ? "default" : "ghost"}
@@ -27,7 +27,7 @@ export function TimetableHeader({ viewMode, setViewMode }: TimetableHeaderProps)
           className={
             viewMode === "grid"
               ? "bg-violet-600 text-white hover:bg-violet-700 shadow-sm"
-              : "text-zinc-500 dark:text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-300"
+              : "text-muted-foreground hover:text-foreground dark:hover:text-muted-foreground"
           }
         >
           <LayoutGrid className="size-4 mr-1.5" />
@@ -40,7 +40,7 @@ export function TimetableHeader({ viewMode, setViewMode }: TimetableHeaderProps)
           className={
             viewMode === "list"
               ? "bg-violet-600 text-white hover:bg-violet-700 shadow-sm"
-              : "text-zinc-500 dark:text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-300"
+              : "text-muted-foreground hover:text-foreground dark:hover:text-muted-foreground"
           }
         >
           <List className="size-4 mr-1.5" />
@@ -53,7 +53,7 @@ export function TimetableHeader({ viewMode, setViewMode }: TimetableHeaderProps)
           className={
             viewMode === "day"
               ? "bg-violet-600 text-white hover:bg-violet-700 shadow-sm"
-              : "text-zinc-500 dark:text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-300"
+              : "text-muted-foreground hover:text-foreground dark:hover:text-muted-foreground"
           }
         >
           <CalendarDays className="size-4 mr-1.5" />

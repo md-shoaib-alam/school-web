@@ -53,11 +53,11 @@ export function DailyDiaryPlanner({
     .filter(a => a.status === "submitted").length;
 
   return (
-    <div className="mt-0 lg:relative lg:p-4 lg:bg-linear-to-br lg:from-[#4a3622] lg:via-[#2c2014] lg:to-[#1a130c] lg:dark:from-zinc-950 lg:dark:to-stone-900 lg:rounded-[28px] lg:shadow-2xl lg:border-4 lg:border-[#3a2a1b] lg:dark:border-zinc-800/80">
+    <div className="mt-0 lg:relative lg:p-4 lg:bg-linear-to-br lg:from-[#4a3622] lg:via-[#2c2014] lg:to-[#1a130c] lg:dark:from-zinc-950 lg:dark:to-stone-900 lg:rounded-[28px] lg:shadow-2xl lg:border-4 lg:border-[#3a2a1b] lg:dark:">
       {/* Outer book cover leather shine overlay */}
       <div className="hidden lg:block absolute inset-0 bg-radial-gradient from-white/5 to-black/45 rounded-3xl pointer-events-none" />
 
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-0 relative lg:bg-[#f7f5f0] lg:dark:bg-[#1a1917] lg:rounded-2xl lg:overflow-hidden lg:shadow-inner lg:border lg:border-amber-900/10 lg:dark:border-zinc-800 bg-transparent">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-0 relative lg:bg-[#f7f5f0] lg:dark:bg-[#1a1917] lg:rounded-2xl lg:overflow-hidden lg:shadow-inner lg:border lg:border-amber-900/10 lg:dark: bg-transparent">
         
         {/* LEFT PAGE: Calendar Agenda (Warm Ivory Graph Paper) */}
         <div className="hidden lg:block p-3 md:p-6 lg:col-span-4 lg:border-r border-amber-900/15 dark:border-[#2f271f] relative bg-[#FAF8F4] dark:bg-[#1a1917] shadow-[inset_-10px_0_15px_-5px_rgba(0,0,0,0.06)] min-h-fit lg:min-h-145 pb-4 lg:pb-4">
@@ -88,13 +88,13 @@ export function DailyDiaryPlanner({
                 <PopoverTrigger asChild>
                   <button 
                     type="button"
-                    className="w-full flex items-center justify-start text-left font-semibold text-xs h-9 px-3 rounded-lg bg-white dark:bg-stone-950 text-stone-900 dark:text-stone-100 border border-amber-900/15 dark:border-zinc-800 hover:bg-amber-50/20 transition-colors"
+                    className="w-full flex items-center justify-start text-left font-semibold text-xs h-9 px-3 rounded-lg bg-white dark:bg-stone-950 text-stone-900 dark:text-stone-100 border border-amber-900/15 hover:bg-amber-50/20 transition-colors"
                   >
                     <CalendarDays className="mr-2 h-3.5 w-3.5 text-amber-800 dark:text-amber-500" />
                     {selectedDate ? format(selectedDate, "PPP") : <span>Pick a date</span>}
                   </button>
                 </PopoverTrigger>
-                <PopoverContent className="w-auto p-0 bg-white dark:bg-stone-950 border border-amber-900/15 dark:border-zinc-800" align="start">
+                <PopoverContent className="w-auto p-0 bg-white dark:bg-stone-950 border border-amber-900/15" align="start">
                   <Calendar
                     mode="single"
                     selected={selectedDate}
@@ -165,7 +165,7 @@ export function DailyDiaryPlanner({
         </div>
 
         {/* RIGHT PAGE: Diary Entries (Lined Ivory Paper) */}
-        <div className="lg:col-span-8 relative lg:bg-[#FCFAF6] lg:dark:bg-[#171614] lg:min-h-145 lg:shadow-[inset_20px_0_25px_-10px_rgba(0,0,0,0.12)] lg:bg-card lg:border lg:border-zinc-200 lg:dark:border-zinc-850 lg:rounded-xl lg:p-6 px-4 py-3 sm:p-5">
+        <div className="lg:col-span-8 relative lg:bg-[#FCFAF6] lg:dark:bg-[#171614] lg:min-h-145 lg:shadow-[inset_20px_0_25px_-10px_rgba(0,0,0,0.12)] lg:bg-card lg:border lg: lg:dark: lg:rounded-xl lg:p-6 px-4 py-3 sm:p-5">
           
           {/* Subtle notebook lines background */}
           <div className="hidden lg:block absolute inset-0 bg-linear-gradient-[#dedad0] dark:bg-linear-gradient-[#38332a] opacity-25 dark:opacity-35 pointer-events-none" style={{ backgroundImage: 'linear-gradient(transparent, transparent 31px, currentColor 31px, currentColor 32px)', backgroundSize: '100% 32px' }} />
@@ -203,13 +203,13 @@ export function DailyDiaryPlanner({
                         e.stopPropagation();
                         setIsCalendarOpen((prev) => !prev);
                       }}
-                      className="h-8 text-[10px] sm:text-[11px] font-bold px-2.5 bg-amber-50/60 dark:bg-stone-800/80 border border-amber-900/15 dark:border-zinc-800 text-amber-950 dark:text-stone-100 hover:bg-amber-100/50 rounded-lg flex items-center justify-center transition-colors"
+                      className="h-8 text-[10px] sm:text-[11px] font-bold px-2.5 bg-amber-50/60 dark:bg-stone-800/80 border border-amber-900/15 text-amber-950 dark:text-stone-100 hover:bg-amber-100/50 rounded-lg flex items-center justify-center transition-colors"
                     >
                       <CalendarDays className="size-3.5 mr-1 text-amber-850 dark:text-amber-500" />
                       Date
                     </button>
                   </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0 bg-white dark:bg-stone-950 border border-amber-900/15 dark:border-zinc-800" align="end">
+                  <PopoverContent className="w-auto p-0 bg-white dark:bg-stone-950 border border-amber-900/15" align="end">
                     <Calendar
                       mode="single"
                       selected={selectedDate}

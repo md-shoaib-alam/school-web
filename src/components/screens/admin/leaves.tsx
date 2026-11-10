@@ -497,15 +497,15 @@ function AdminManagerView({ initialTab }: { initialTab: string }) {
           </DialogHeader>
 
           {detailModal.leave && (
-            <div className="py-2 space-y-3.5 text-xs text-slate-700 dark:text-zinc-300">
-              <div className="grid grid-cols-2 gap-3 p-3 rounded-xl bg-slate-50 dark:bg-zinc-900 border border-slate-100 dark:border-zinc-800">
+            <div className="py-2 space-y-3.5 text-xs text-foreground">
+              <div className="grid grid-cols-2 gap-3 p-3 rounded-xl bg-muted border ">
                 <div>
-                  <span className="text-[10px] text-slate-400 dark:text-zinc-500 uppercase tracking-wider font-semibold">Applicant</span>
-                  <p className="font-bold text-sm text-slate-900 dark:text-zinc-100 mt-0.5">{detailModal.leave.userName}</p>
-                  <p className="text-[11px] text-slate-400">{detailModal.leave.userEmail}</p>
+                  <span className="text-[10px] text-muted-foreground uppercase tracking-wider font-semibold">Applicant</span>
+                  <p className="font-bold text-sm text-foreground mt-0.5">{detailModal.leave.userName}</p>
+                  <p className="text-[11px] text-muted-foreground">{detailModal.leave.userEmail}</p>
                 </div>
                 <div>
-                  <span className="text-[10px] text-slate-400 dark:text-zinc-500 uppercase tracking-wider font-semibold">Status</span>
+                  <span className="text-[10px] text-muted-foreground uppercase tracking-wider font-semibold">Status</span>
                   <div className="mt-1">
                     <Badge className={cn("text-xs font-semibold rounded-lg px-2.5 py-0.5", statusConfig[detailModal.leave.status]?.bg)}>
                       {statusConfig[detailModal.leave.status]?.label || detailModal.leave.status}
@@ -515,34 +515,34 @@ function AdminManagerView({ initialTab }: { initialTab: string }) {
               </div>
 
               <div className="grid grid-cols-2 gap-3">
-                <div className="p-3 rounded-xl bg-slate-50 dark:bg-zinc-900 border border-slate-100 dark:border-zinc-800">
-                  <span className="text-[10px] text-slate-400 dark:text-zinc-500 uppercase tracking-wider font-semibold">Leave Type</span>
-                  <p className="font-semibold text-slate-900 dark:text-zinc-100 capitalize mt-0.5">{detailModal.leave.leaveType}</p>
+                <div className="p-3 rounded-xl bg-muted border ">
+                  <span className="text-[10px] text-muted-foreground uppercase tracking-wider font-semibold">Leave Type</span>
+                  <p className="font-semibold text-foreground capitalize mt-0.5">{detailModal.leave.leaveType}</p>
                 </div>
-                <div className="p-3 rounded-xl bg-slate-50 dark:bg-zinc-900 border border-slate-100 dark:border-zinc-800">
-                  <span className="text-[10px] text-slate-400 dark:text-zinc-500 uppercase tracking-wider font-semibold">Duration</span>
-                  <p className="font-semibold text-slate-900 dark:text-zinc-100 mt-0.5">
+                <div className="p-3 rounded-xl bg-muted border ">
+                  <span className="text-[10px] text-muted-foreground uppercase tracking-wider font-semibold">Duration</span>
+                  <p className="font-semibold text-foreground mt-0.5">
                     {getDurationDays(detailModal.leave.startDate, detailModal.leave.endDate)} days
                   </p>
                 </div>
               </div>
 
-              <div className="p-3 rounded-xl bg-slate-50 dark:bg-zinc-900 border border-slate-100 dark:border-zinc-800 space-y-1">
-                <span className="text-[10px] text-slate-400 dark:text-zinc-500 uppercase tracking-wider font-semibold">Dates</span>
-                <p className="font-semibold text-slate-800 dark:text-zinc-200">
+              <div className="p-3 rounded-xl bg-muted border  space-y-1">
+                <span className="text-[10px] text-muted-foreground uppercase tracking-wider font-semibold">Dates</span>
+                <p className="font-semibold text-foreground">
                   {formatDateString(detailModal.leave.startDate)} to {formatDateString(detailModal.leave.endDate)}
                 </p>
               </div>
 
-              <div className="p-3 rounded-xl bg-slate-50 dark:bg-zinc-900 border border-slate-100 dark:border-zinc-800 space-y-1">
-                <span className="text-[10px] text-slate-400 dark:text-zinc-500 uppercase tracking-wider font-semibold">Reason</span>
-                <p className="text-slate-800 dark:text-zinc-200 leading-relaxed">{detailModal.leave.reason || 'No reason provided.'}</p>
+              <div className="p-3 rounded-xl bg-muted border  space-y-1">
+                <span className="text-[10px] text-muted-foreground uppercase tracking-wider font-semibold">Reason</span>
+                <p className="text-foreground leading-relaxed">{detailModal.leave.reason || 'No reason provided.'}</p>
               </div>
 
               {detailModal.leave.approverRemarks && (
                 <div className="p-3 rounded-xl bg-blue-50/50 dark:bg-blue-950/20 border border-blue-100 dark:border-blue-900/40 space-y-1">
                   <span className="text-[10px] text-blue-600 dark:text-blue-400 uppercase tracking-wider font-semibold">Approver Remarks</span>
-                  <p className="text-slate-800 dark:text-zinc-200 leading-relaxed">{detailModal.leave.approverRemarks}</p>
+                  <p className="text-foreground leading-relaxed">{detailModal.leave.approverRemarks}</p>
                 </div>
               )}
             </div>
@@ -627,8 +627,8 @@ function StaffSelfServiceView() {
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <div>
-          <h2 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-zinc-100">My Leaves</h2>
-          <p className="text-xs sm:text-sm text-slate-500 dark:text-zinc-400">View and apply for your personal leaves</p>
+          <h2 className="text-2xl font-bold tracking-tight text-foreground">My Leaves</h2>
+          <p className="text-xs sm:text-sm text-muted-foreground">View and apply for your personal leaves</p>
         </div>
         <Button
           className="bg-blue-600 hover:bg-blue-700 text-white rounded-xl shadow-xs gap-2"
@@ -638,7 +638,7 @@ function StaffSelfServiceView() {
         </Button>
       </div>
 
-      <Card className="rounded-2xl border border-slate-200/80 dark:border-zinc-800 bg-white dark:bg-zinc-950 overflow-hidden shadow-2xs">
+      <Card className="rounded-2xl border  bg-card overflow-hidden shadow-2xs">
         <CardContent className="p-0">
           {loading ? (
             <div className="p-6 space-y-3">
@@ -648,7 +648,7 @@ function StaffSelfServiceView() {
             </div>
           ) : (
             <Table>
-              <TableHeader className="bg-slate-50/70 dark:bg-zinc-900/50 border-b border-slate-100 dark:border-zinc-800/80">
+              <TableHeader className="bg-muted border-b ">
                 <TableRow>
                   <TableHead className="text-xs font-semibold">Type</TableHead>
                   <TableHead className="text-xs font-semibold">Dates</TableHead>
@@ -659,19 +659,19 @@ function StaffSelfServiceView() {
               <TableBody>
                 {leaves.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={4} className="text-center py-12 text-slate-400 text-xs italic">
+                    <TableCell colSpan={4} className="text-center py-12 text-muted-foreground text-xs italic">
                       No leave history found
                     </TableCell>
                   </TableRow>
                 ) : (
                   leaves.map(l => (
-                    <TableRow key={l.id} className="border-b border-slate-100 dark:border-zinc-800/60">
+                    <TableRow key={l.id} className="border-b ">
                       <TableCell className="capitalize font-medium text-xs">
                         <Badge variant="outline" className={cn("text-xs font-medium rounded-lg px-2.5 py-0.5", leaveTypeConfig[l.leaveType]?.bg)}>
                           {leaveTypeConfig[l.leaveType]?.label || l.leaveType}
                         </Badge>
                       </TableCell>
-                      <TableCell className="text-xs text-slate-600 dark:text-zinc-300">
+                      <TableCell className="text-xs text-foreground">
                         {formatDateString(l.startDate)} - {formatDateString(l.endDate)}
                       </TableCell>
                       <TableCell className="text-center">
@@ -724,7 +724,7 @@ function StaffSelfServiceView() {
           <div className="space-y-4 py-2">
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1.5">
-                <label className="text-xs font-semibold text-slate-700 dark:text-zinc-300">Start Date</label>
+                <label className="text-xs font-semibold text-foreground">Start Date</label>
                 <Input
                   type="date"
                   value={form.startDate}
@@ -737,7 +737,7 @@ function StaffSelfServiceView() {
                 />
               </div>
               <div className="space-y-1.5">
-                <label className="text-xs font-semibold text-slate-700 dark:text-zinc-300">End Date</label>
+                <label className="text-xs font-semibold text-foreground">End Date</label>
                 <Input
                   type="date"
                   value={form.endDate}
@@ -749,7 +749,7 @@ function StaffSelfServiceView() {
             </div>
 
             <div className="space-y-1.5">
-              <label className="text-xs font-semibold text-slate-700 dark:text-zinc-300">Leave Type</label>
+              <label className="text-xs font-semibold text-foreground">Leave Type</label>
               <Select value={form.leaveType} onValueChange={v => setForm({ ...form, leaveType: v })}>
                 <SelectTrigger className="h-10 rounded-xl text-sm capitalize">
                   <SelectValue />
@@ -765,7 +765,7 @@ function StaffSelfServiceView() {
             </div>
 
             <div className="space-y-1.5">
-              <label className="text-xs font-semibold text-slate-700 dark:text-zinc-300">Reason</label>
+              <label className="text-xs font-semibold text-foreground">Reason</label>
               <Textarea
                 placeholder="Reason for leave..."
                 value={form.reason}

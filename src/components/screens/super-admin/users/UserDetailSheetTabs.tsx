@@ -13,14 +13,14 @@ export function UserDetailSheetTabs({
   relationsLabel,
 }: UserDetailSheetTabsProps) {
   return (
-    <div className="flex items-center gap-2 px-6 pt-4 border-b border-slate-100 dark:border-zinc-800/80 text-xs sm:text-sm font-medium shrink-0">
+    <div className="flex items-center gap-2 px-6 pt-4 border-b  text-xs sm:text-sm font-medium shrink-0">
       <button
         type="button"
         onClick={() => setActiveTab("overview")}
         className={`flex items-center gap-1.5 px-3.5 py-2 rounded-xl transition-all ${
           activeTab === "overview"
             ? "bg-blue-50 dark:bg-blue-950/50 text-blue-600 dark:text-blue-400 font-semibold"
-            : "text-slate-600 dark:text-slate-400 hover:text-slate-900"
+            : "text-foreground hover:text-foreground"
         }`}
       >
         <UserRound className="size-4" />
@@ -32,7 +32,7 @@ export function UserDetailSheetTabs({
         className={`flex items-center gap-1.5 px-3.5 py-2 rounded-xl transition-all ${
           activeTab === "activity"
             ? "bg-blue-50 dark:bg-blue-950/50 text-blue-600 dark:text-blue-400 font-semibold"
-            : "text-slate-600 dark:text-slate-400 hover:text-slate-900"
+            : "text-foreground hover:text-foreground"
         }`}
       >
         <Clock3 className="size-4" />
@@ -44,7 +44,7 @@ export function UserDetailSheetTabs({
         className={`flex items-center gap-1.5 px-3.5 py-2 rounded-xl transition-all ${
           activeTab === "relations"
             ? "bg-blue-50 dark:bg-blue-950/50 text-blue-600 dark:text-blue-400 font-semibold"
-            : "text-slate-600 dark:text-slate-400 hover:text-slate-900"
+            : "text-foreground hover:text-foreground"
         }`}
       >
         <Users2 className="size-4" />
@@ -56,7 +56,7 @@ export function UserDetailSheetTabs({
         className={`flex items-center gap-1.5 px-3.5 py-2 rounded-xl transition-all ${
           activeTab === "settings"
             ? "bg-blue-50 dark:bg-blue-950/50 text-blue-600 dark:text-blue-400 font-semibold"
-            : "text-slate-600 dark:text-slate-400 hover:text-slate-900"
+            : "text-foreground hover:text-foreground"
         }`}
       >
         <Settings className="size-4" />

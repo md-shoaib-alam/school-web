@@ -401,15 +401,15 @@ export function AdminCertificates() {
       </Dialog>
 
       <Dialog open={!!viewCert} onOpenChange={v => !v && setViewCert(null)}>
-        <DialogContent className="sm:max-w-4xl p-0 overflow-hidden no-print text-zinc-900">
+        <DialogContent className="sm:max-w-4xl p-0 overflow-hidden no-print text-foreground">
           <VisuallyHidden.Root>
             <DialogHeader>
               <DialogTitle>Certificate Preview</DialogTitle>
               <DialogDescription>Full preview of the student certificate before printing.</DialogDescription>
             </DialogHeader>
           </VisuallyHidden.Root>
-          <div className="p-3 sm:p-4 border-b flex justify-between items-center bg-white sticky top-0 z-10">
-            <h3 className="font-semibold text-zinc-900 truncate mr-2">Preview</h3>
+          <div className="p-3 sm:p-4 border-b flex justify-between bg-card sticky top-0 z-10">
+            <h3 className="font-semibold text-foreground truncate mr-2">Preview</h3>
             <div className="flex items-center gap-2">
               <Button 
                 onClick={() => handlePrint()} 
@@ -433,7 +433,7 @@ export function AdminCertificates() {
               <Button
                 variant="ghost"
                 size="icon"
-                className="h-9 w-9 shrink-0 text-zinc-500"
+                className="h-9 w-9 shrink-0 text-muted-foreground"
                 onClick={() => setViewCert(null)}
               >
                 <X className="size-5" />
@@ -441,7 +441,7 @@ export function AdminCertificates() {
               </Button>
             </div>
           </div>
-          <div className="max-h-[75vh] overflow-y-auto p-4 sm:p-8 bg-zinc-100/50 flex justify-center">
+          <div className="max-h-[75vh] overflow-y-auto p-4 sm:p-8 bg-muted flex justify-center">
             <div className="scale-[0.38] xs:scale-[0.45] sm:scale-[0.7] lg:scale-100 origin-top">
               <div ref={contentRef} className="w-[210mm] bg-white shadow-2xl">
                 <CertificateTemplate 

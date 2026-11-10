@@ -47,7 +47,7 @@ export function SecuritySettings({ theme, setTheme, onPasswordChange, userRole }
   };
 
   return (
-    <Card className="border border-zinc-200/80 dark:border-zinc-800/80 shadow-sm rounded-2xl">
+    <Card className="border  rounded-2xl">
       <CardHeader>
         <CardTitle className="text-lg font-bold">Preferences & Security</CardTitle>
         <CardDescription>Customize your workspace themes and lock down credentials.</CardDescription>
@@ -57,7 +57,7 @@ export function SecuritySettings({ theme, setTheme, onPasswordChange, userRole }
         <div className="space-y-3">
           <div>
             <h4 className="text-sm font-semibold">Workspace Appearance Mode</h4>
-            <p className="text-xs text-zinc-500 dark:text-zinc-400">Select a premium color scheme tailored for maximum comfort.</p>
+            <p className="text-xs text-muted-foreground">Select a premium color scheme tailored for maximum comfort.</p>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
             <Button
@@ -81,7 +81,7 @@ export function SecuritySettings({ theme, setTheme, onPasswordChange, userRole }
               onClick={() => setTheme("system")}
               className="h-auto py-4 min-h-[5rem] px-3 flex flex-col gap-2 rounded-xl justify-center items-center font-bold"
             >
-              <Laptop className="size-5 text-zinc-500" />
+              <Laptop className="size-5 text-muted-foreground" />
               <span className="text-xs">System Default</span>
             </Button>
           </div>
@@ -94,7 +94,7 @@ export function SecuritySettings({ theme, setTheme, onPasswordChange, userRole }
             <div className="space-y-3">
               <div>
                 <h4 className="text-sm font-semibold">Dashboard Style Preference</h4>
-                <p className="text-xs text-zinc-500 dark:text-zinc-400">Choose the layout style of your homepage dashboard.</p>
+                <p className="text-xs text-muted-foreground">Choose the layout style of your homepage dashboard.</p>
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <Button
@@ -131,7 +131,7 @@ export function SecuritySettings({ theme, setTheme, onPasswordChange, userRole }
             <div className="space-y-3">
               <div>
                 <h4 className="text-sm font-semibold">Sidebar Mode Preference</h4>
-                <p className="text-xs text-zinc-500 dark:text-zinc-400">Choose if you want the navigation sidebar open or minimized by default.</p>
+                <p className="text-xs text-muted-foreground">Choose if you want the navigation sidebar open or minimized by default.</p>
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <Button
@@ -163,13 +163,13 @@ export function SecuritySettings({ theme, setTheme, onPasswordChange, userRole }
 
         <Separator />
 
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 p-4 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200/50 dark:border-zinc-800/50 rounded-2xl">
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 p-4 bg-muted border  rounded-2xl">
           <div className="space-y-1">
             <div className="flex items-center gap-2">
               <Lock className="size-4 text-orange-500" />
               <h4 className="text-sm font-semibold">Account Access Code</h4>
             </div>
-            <p className="text-xs text-zinc-500 dark:text-zinc-400 leading-relaxed">
+            <p className="text-xs text-muted-foreground leading-relaxed">
               Secure password used to authenticate your login sessions. Update regularly to prevent breach.
             </p>
           </div>

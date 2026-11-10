@@ -29,11 +29,11 @@ export function SidebarHeader({
       className={cn(
         isModernUI
           ? cn(
-              "px-5 py-4 flex items-center border-b border-slate-100 dark:border-zinc-800/80 bg-white dark:bg-[#0A0A0A]",
+              "px-5 h-14 sm:h-16 flex items-center border-b  bg-sidebar",
               sidebarOpen ? "justify-between" : "justify-center"
             )
           : cn(
-              "mt-3 mb-2 bg-white dark:bg-zinc-950 border border-zinc-200/80 dark:border-zinc-800 shadow-sm flex items-center",
+              "mt-3 mb-2 bg-card border  shadow-sm flex items-center",
               sidebarOpen
                 ? "mx-3 p-3 rounded-xl justify-between"
                 : "size-12 rounded-xl justify-center mx-auto"
@@ -48,8 +48,8 @@ export function SidebarHeader({
               className={cn(
                 "size-10 rounded-xl flex items-center justify-center text-white shadow-xs overflow-hidden shrink-0",
                 isSuperAdmin 
-                  ? "bg-gradient-to-br from-blue-600 to-indigo-700 shadow-blue-500/20" 
-                  : "border border-slate-100 dark:border-zinc-800 bg-white dark:bg-zinc-900",
+                  ? "bg-gradient-to-br from-brand to-indigo-700 shadow-brand/20" 
+                  : "border  bg-card",
               )}
             >
               {!isSuperAdmin ? (
@@ -68,15 +68,15 @@ export function SidebarHeader({
                 className={cn(
                   "font-extrabold text-base leading-tight tracking-tight",
                   isSuperAdmin
-                    ? "text-[#1E3A8A] dark:text-blue-400"
-                    : "text-zinc-900 dark:text-zinc-100",
+                    ? "text-brand"
+                    : "text-foreground",
                 )}
               >
                 {isSuperAdmin
                   ? "SchoolConnect"
                   : tenantName || currentUser?.tenantName || "Demo Academy"}
               </h2>
-              <p className="text-[11px] text-slate-500 dark:text-zinc-400 font-medium">
+              <p className="text-[11px] text-muted-foreground font-medium">
                 {isSuperAdmin
                   ? "Platform Console"
                   : currentUser?.role === "teacher"
@@ -100,8 +100,8 @@ export function SidebarHeader({
         className={cn(
           "size-8 transition-all duration-200 hover:scale-105 active:scale-95 shrink-0 rounded-lg",
           isModernUI
-            ? "text-slate-500 hover:text-slate-900 hover:bg-slate-100 dark:text-zinc-400 dark:hover:text-zinc-100 dark:hover:bg-zinc-900"
-            : "text-zinc-500 hover:text-zinc-800 dark:text-zinc-400 dark:hover:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-900",
+            ? "text-muted-foreground hover:text-foreground hover:bg-accent"
+            : "text-muted-foreground hover:text-foreground dark:hover:text-muted-foreground hover:bg-accent",
         )}
         onClick={onToggle}
       >

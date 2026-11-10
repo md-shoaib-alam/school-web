@@ -50,32 +50,32 @@ function MiniStat({
   const percentage = pct ?? (max && max > 0 ? Math.min(100, Math.round((value / max) * 100)) : 0);
 
   return (
-    <div className={`rounded-2xl p-4 sm:p-5 bg-white dark:bg-slate-900 border ${cardBorder} shadow-2xs hover:shadow-sm transition-all duration-200 flex flex-col justify-between`}>
+    <div className={`rounded-2xl p-4 sm:p-5 bg-card border ${cardBorder} shadow-2xs hover:shadow-sm transition-all duration-200 flex flex-col justify-between`}>
       <div className="flex items-start gap-3.5">
         <div className={`size-11 rounded-xl ${iconBg} ${iconColor} flex items-center justify-center shrink-0`}>
           {icon}
         </div>
         <div className="min-w-0 flex-1">
-          <p className="text-xs font-semibold text-slate-600 dark:text-slate-400">
+          <p className="text-xs font-semibold text-foreground">
             {label}
           </p>
           <div className="mt-1 flex items-baseline gap-1">
             {isCurrency ? (
-              <span className="text-xl font-bold text-slate-900 dark:text-slate-100 flex items-center">
+              <span className="text-xl font-bold text-foreground flex items-center">
                 <IndianRupee className="size-4 mr-0.5" />
                 {(currencyValue || 0).toLocaleString()}
               </span>
             ) : (
-              <p className="text-xl font-bold text-slate-900 dark:text-slate-100">
+              <p className="text-xl font-bold text-foreground">
                 {value.toLocaleString()}{" "}
                 {max !== undefined && (
-                  <span className="text-xs font-normal text-slate-400">/ {max.toLocaleString()}</span>
+                  <span className="text-xs font-normal text-muted-foreground">/ {max.toLocaleString()}</span>
                 )}
               </p>
             )}
           </div>
           {isCurrency && (
-            <p className="text-[11px] text-slate-400 font-normal mt-0.5">
+            <p className="text-[11px] text-muted-foreground font-normal mt-0.5">
               Total revenue generated
             </p>
           )}
@@ -84,13 +84,13 @@ function MiniStat({
 
       {!isCurrency && (
         <div className="mt-4 flex items-center gap-2">
-          <div className="h-1.5 flex-1 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
+          <div className="h-1.5 flex-1 bg-muted rounded-full overflow-hidden">
             <div
               className={`h-full rounded-full transition-all duration-500 ${barColor}`}
               style={{ width: `${percentage}%` }}
             />
           </div>
-          <span className="text-[11px] font-bold text-slate-600 dark:text-slate-400 shrink-0">
+          <span className="text-[11px] font-bold text-foreground shrink-0">
             {percentage}%
           </span>
         </div>
@@ -131,7 +131,7 @@ export function DetailHeader({
           <Button
             variant="ghost"
             size="sm"
-            className="text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl px-3 h-9 font-semibold transition-all border border-slate-200/80 dark:border-slate-800 shadow-2xs"
+            className="text-foreground hover:text-foreground hover:bg-accent rounded-xl px-3 h-9 font-semibold transition-all border  shadow-2xs"
             onClick={onBack}
           >
             <ArrowLeft className="size-4 mr-1.5" />
@@ -139,10 +139,10 @@ export function DetailHeader({
           </Button>
 
           <div className="flex items-center gap-2">
-            <h1 className="text-xl font-bold tracking-tight text-slate-900 dark:text-slate-100">
+            <h1 className="text-xl font-bold tracking-tight text-foreground">
               {tenant?.name || tenantName}
             </h1>
-            <span className="text-xs text-slate-400 font-normal hidden sm:inline">
+            <span className="text-xs text-muted-foreground font-normal hidden sm:inline">
               @{tenant?.slug || tenantSlug}
             </span>
           </div>

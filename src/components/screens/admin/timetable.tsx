@@ -355,7 +355,7 @@ export function AdminTimetable() {
         onManageClick={handleOpenManage}
       />
 
-      <Card className="border border-zinc-200/80 dark:border-zinc-800 bg-white dark:bg-zinc-950 shadow-xs rounded-2xl overflow-hidden">
+      <Card className="border  bg-card rounded-2xl overflow-hidden">
         <CardContent className="p-0 overflow-x-auto w-full">
           {isLoadingTimetable || isLoadingClasses ? (
             <TimetableSkeleton viewMode={viewMode} />

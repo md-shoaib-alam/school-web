@@ -22,11 +22,11 @@ export function TicketList({ tickets, onOpenDetail }: TicketListProps) {
     return (
       <Card className="rounded-xl shadow-sm">
         <CardContent className="py-16 text-center">
-          <Ticket className="size-12 mx-auto text-zinc-200 mb-3" />
-          <p className="text-sm font-medium text-zinc-500 dark:text-zinc-400">
+          <Ticket className="size-12 mx-auto text-muted-foreground mb-3" />
+          <p className="text-sm font-medium text-muted-foreground">
             No tickets yet
           </p>
-          <p className="text-xs text-zinc-400 dark:text-zinc-500 mt-1">
+          <p className="text-xs text-muted-foreground mt-1">
             Submit a ticket if you need help from the school
           </p>
         </CardContent>
@@ -39,14 +39,14 @@ export function TicketList({ tickets, onOpenDetail }: TicketListProps) {
       {tickets.map((ticket) => (
         <Card
           key={ticket.id}
-          className="rounded-xl shadow-sm hover:shadow-md transition-shadow cursor-pointer border-zinc-100 dark:border-zinc-800"
+          className="rounded-xl shadow-sm hover:shadow-md transition-shadow cursor-pointer "
           onClick={() => onOpenDetail(ticket.id)}
         >
           <CardContent className="p-4">
             <div className="flex items-start justify-between gap-3">
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2 mb-1.5">
-                  <h3 className="font-semibold text-zinc-900 dark:text-zinc-100 text-sm truncate">
+                  <h3 className="font-semibold text-foreground text-sm truncate">
                     {ticket.title}
                   </h3>
                 </div>
@@ -65,12 +65,12 @@ export function TicketList({ tickets, onOpenDetail }: TicketListProps) {
                   </Badge>
                   <Badge
                     variant="outline"
-                    className="text-[10px] font-medium bg-zinc-100 dark:bg-zinc-800 text-zinc-500 dark:text-zinc-400"
+                    className="text-[10px] font-medium bg-muted text-muted-foreground"
                   >
                     {getCategoryLabel(ticket.category)}
                   </Badge>
                 </div>
-                <div className="flex items-center justify-between text-[11px] text-zinc-400 dark:text-zinc-500">
+                <div className="flex items-center justify-between text-[11px] text-muted-foreground">
                   <div className="flex items-center gap-3">
                     <span className="flex items-center gap-1">
                       <MessageSquare className="size-3" />

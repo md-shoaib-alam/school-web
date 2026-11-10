@@ -32,7 +32,7 @@ export const ICSESemester: React.FC<MarksheetTemplateProps> = ({
           <h2 className="font-semibold text-2xl text-violet-950 tracking-wider uppercase font-serif">
             {sheet.schoolName.toUpperCase()}
           </h2>
-          <p className="text-[8px] text-zinc-500 font-bold uppercase tracking-[2px] mt-1.5 font-sans">
+          <p className="text-[8px] text-muted-foreground font-bold uppercase tracking-[2px] mt-1.5 font-sans">
             Affiliated to Council for the Indian School Certificate Examinations (CISCE), New Delhi
             <br />
             School Code: IN-{getDeterministicId(sheet.schoolName + 'code', 100, 999)}
@@ -43,30 +43,30 @@ export const ICSESemester: React.FC<MarksheetTemplateProps> = ({
         </div>
 
         {/* Student ICSE Index & Admission Matrix */}
-        <div className="grid grid-cols-3 gap-4 text-xs font-sans bg-zinc-55/40 p-3 rounded border border-zinc-200">
+        <div className="grid grid-cols-3 gap-4 text-xs font-sans /40 p-3 rounded border ">
           <div>
-            <span className="text-zinc-400 font-bold uppercase text-[7.5px] tracking-wider block mb-0.5">Scholastic Candidate</span>
-            <span className="font-bold text-zinc-800 truncate block">{sheet.studentName}</span>
+            <span className="text-muted-foreground font-bold uppercase text-[7.5px] tracking-wider block mb-0.5">Scholastic Candidate</span>
+            <span className="font-bold text-foreground truncate block">{sheet.studentName}</span>
           </div>
           <div>
-            <span className="text-zinc-400 font-bold uppercase text-[7.5px] tracking-wider block mb-0.5">Unique ID / SRN</span>
-            <span className="font-bold text-zinc-800 font-mono block">UID-{getDeterministicId(sheet.studentName + 'uid', 5000000, 9999999)}</span>
+            <span className="text-muted-foreground font-bold uppercase text-[7.5px] tracking-wider block mb-0.5">Unique ID / SRN</span>
+            <span className="font-bold text-foreground font-mono block">UID-{getDeterministicId(sheet.studentName + 'uid', 5000000, 9999999)}</span>
           </div>
           <div>
-            <span className="text-zinc-400 font-bold uppercase text-[7.5px] tracking-wider block mb-0.5">Class & Section</span>
-            <span className="font-bold text-zinc-800 block">{classNameStr} - {classSection}</span>
+            <span className="text-muted-foreground font-bold uppercase text-[7.5px] tracking-wider block mb-0.5">Class & Section</span>
+            <span className="font-bold text-foreground block">{classNameStr} - {classSection}</span>
           </div>
           <div>
-            <span className="text-zinc-400 font-bold uppercase text-[7.5px] tracking-wider block mb-0.5">Attendance Tracker</span>
-            <span className="font-bold text-zinc-800 block">93.5% / 210 Days</span>
+            <span className="text-muted-foreground font-bold uppercase text-[7.5px] tracking-wider block mb-0.5">Attendance Tracker</span>
+            <span className="font-bold text-foreground block">93.5% / 210 Days</span>
           </div>
           <div>
-            <span className="text-zinc-400 font-bold uppercase text-[7.5px] tracking-wider block mb-0.5">National Rank Index</span>
+            <span className="text-muted-foreground font-bold uppercase text-[7.5px] tracking-wider block mb-0.5">National Rank Index</span>
             <span className="font-bold text-violet-900 block font-mono">IND-{sheet.rollNumber}</span>
           </div>
           <div>
-            <span className="text-zinc-400 font-bold uppercase text-[7.5px] tracking-wider block mb-0.5">Registrar Ledger No</span>
-            <span className="font-bold text-zinc-800 block font-mono">REG-2026/A</span>
+            <span className="text-muted-foreground font-bold uppercase text-[7.5px] tracking-wider block mb-0.5">Registrar Ledger No</span>
+            <span className="font-bold text-foreground block font-mono">REG-2026/A</span>
           </div>
         </div>
 
@@ -90,12 +90,12 @@ export const ICSESemester: React.FC<MarksheetTemplateProps> = ({
               </thead>
               <tbody>
                 {sheet.subjects.map((sub, sIdx) => (
-                  <tr key={sIdx} className="border-b border-zinc-200 hover:bg-zinc-50/50">
-                    <td className="px-3 py-2.5 text-left font-bold text-zinc-800 truncate font-serif">{sub.subjectName}</td>
-                    {marksheetType === 'combined' && <td className="px-3 py-2.5 text-center font-mono text-zinc-500">{sub.midtermMarks}</td>}
-                    {marksheetType === 'combined' && <td className="px-3 py-2.5 text-center font-mono text-zinc-500">{sub.finalMarks}</td>}
-                    <td className="px-3 py-2.5 text-center font-bold font-mono text-zinc-700">{sub.maxMarks ?? 100}</td>
-                    <td className="px-3 py-2.5 text-center font-medium font-mono text-zinc-600">{sub.passingMarks ?? 33}</td>
+                  <tr key={sIdx} className="border-b  hover:bg-muted">
+                    <td className="px-3 py-2.5 text-left font-bold text-foreground truncate font-serif">{sub.subjectName}</td>
+                    {marksheetType === 'combined' && <td className="px-3 py-2.5 text-center font-mono text-muted-foreground">{sub.midtermMarks}</td>}
+                    {marksheetType === 'combined' && <td className="px-3 py-2.5 text-center font-mono text-muted-foreground">{sub.finalMarks}</td>}
+                    <td className="px-3 py-2.5 text-center font-bold font-mono text-foreground">{sub.maxMarks ?? 100}</td>
+                    <td className="px-3 py-2.5 text-center font-medium font-mono text-foreground">{sub.passingMarks ?? 33}</td>
                     <td className="px-3 py-2.5 text-center font-black font-mono text-violet-950">{sub.obtainedMarks ?? 0}</td>
                     <td className="px-3 py-2.5 text-center">
                       <span className="font-black text-violet-950 font-sans text-[10px]">
@@ -112,27 +112,27 @@ export const ICSESemester: React.FC<MarksheetTemplateProps> = ({
         {/* Dynamic Descriptive ICSE Grid Summary */}
         <div className="grid grid-cols-12 gap-5 text-xs font-sans">
           
-          <div className="col-span-7 border border-zinc-200 rounded p-4 bg-zinc-50/20">
+          <div className="col-span-7 border  rounded p-4 bg-muted">
             <h5 className="font-semibold text-[9px] uppercase tracking-wider text-violet-950 mb-1.5">REGISTRAR CONVOCATION VERDICT</h5>
-            <p className="italic text-zinc-600 font-medium leading-relaxed">
+            <p className="italic text-foreground font-medium leading-relaxed">
               "{sheet.remarks}" The student is certified to have acquired standard scholastic outcomes prescribed under the Council rules.
             </p>
           </div>
 
-          <div className="col-span-5 bg-white border border-zinc-200 rounded p-3 space-y-1.5">
-            <div className="flex justify-between border-b border-dashed border-zinc-200 pb-1 text-zinc-500 font-semibold">
+          <div className="col-span-5 bg-white border  rounded p-3 space-y-1.5">
+            <div className="flex justify-between border-b border-dashed  pb-1 text-muted-foreground font-semibold">
               <span className="text-[8px] uppercase tracking-wider">CUMULATIVE SCORE</span>
               <span className="text-zinc-950 font-bold font-mono">{sheet.totalObtainedMarks} / {sheet.totalMaxMarks}</span>
             </div>
-            <div className="flex justify-between border-b border-dashed border-zinc-200 pb-1 text-zinc-500 font-semibold">
+            <div className="flex justify-between border-b border-dashed  pb-1 text-muted-foreground font-semibold">
               <span className="text-[8px] uppercase tracking-wider">HONOR PERCENTAGE</span>
               <span className="text-violet-900 font-black font-mono">{sheet.overallPercentage}%</span>
             </div>
-            <div className="flex justify-between border-b border-dashed border-zinc-200 pb-1 text-zinc-500 font-semibold">
+            <div className="flex justify-between border-b border-dashed  pb-1 text-muted-foreground font-semibold">
               <span className="text-[8px] uppercase tracking-wider">OUTCOME GRADE</span>
               <span className="text-violet-950 font-black">{sheet.grade}</span>
             </div>
-            <div className="flex justify-between items-center text-zinc-500 font-semibold">
+            <div className="flex justify-between items-center text-muted-foreground font-semibold">
               <span className="text-[8px] uppercase tracking-wider">SCHOLASTIC VERDICT</span>
               <span className="text-violet-900 font-black text-[9px]">{sheet.status === 'pass' ? 'HONORABLY PASSED' : 'RETAINED'}</span>
             </div>
@@ -143,15 +143,15 @@ export const ICSESemester: React.FC<MarksheetTemplateProps> = ({
       </div>
 
       {/* ICSE Formal Sign-off segment */}
-      <div className="flex justify-between items-end text-[9.5px] font-bold text-zinc-400 border-t-2 border-violet-900 pt-4 mt-2 font-sans z-10">
+      <div className="flex justify-between items-end text-[9.5px] font-bold text-muted-foreground border-t-2 border-violet-900 pt-4 mt-2 font-sans z-10">
         <div>COUNCIL REGISTRY STATEMENT: CISCE SYSTEM</div>
         <div className="flex gap-10">
           <div className="flex flex-col items-center">
-            <div className="w-[100px] border-b border-zinc-300 mb-1" />
+            <div className="w-[100px] border-b  mb-1" />
             <span className="text-[7.5px] tracking-wider uppercase">Class Tutor</span>
           </div>
           <div className="flex flex-col items-center">
-            <div className="w-[100px] border-b border-zinc-300 mb-1" />
+            <div className="w-[100px] border-b  mb-1" />
             <span className="text-[7.5px] tracking-wider uppercase">Headmistress</span>
           </div>
         </div>

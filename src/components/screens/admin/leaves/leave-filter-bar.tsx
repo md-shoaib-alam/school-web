@@ -43,23 +43,23 @@ export function LeaveFilterBar({
   onApplyFilters,
 }: LeaveFilterBarProps) {
   return (
-    <Card className="rounded-2xl border border-slate-200/80 dark:border-zinc-800 bg-white dark:bg-zinc-950 p-3 sm:p-4 shadow-2xs">
+    <Card className="rounded-2xl border  bg-card p-3 sm:p-4 shadow-2xs">
       <div className="flex flex-wrap items-center gap-2.5 sm:gap-3">
         {/* Search Box */}
         <div className="relative flex-1 min-w-[220px] sm:min-w-[280px]">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-slate-400" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
           <Input
             value={searchQuery}
             onChange={e => onSearchQueryChange(e.target.value)}
             placeholder={`Search by ${activeTab === 'student' ? 'student name or reason...' : activeTab === 'teacher' ? 'teacher name or reason...' : 'staff name or reason...'}`}
-            className="pl-9 h-10 rounded-xl bg-slate-50/60 dark:bg-zinc-900 border-slate-200/80 dark:border-zinc-800 text-sm focus-visible:ring-1 focus-visible:ring-blue-500"
+            className="pl-9 h-10 rounded-xl bg-muted  text-sm focus-visible:ring-1 focus-visible:ring-blue-500"
           />
         </div>
 
         {/* Status Dropdown */}
         <div className="w-full sm:w-36">
           <Select value={statusFilter} onValueChange={onStatusFilterChange}>
-            <SelectTrigger className="h-10 rounded-xl bg-slate-50/60 dark:bg-zinc-900 border-slate-200/80 dark:border-zinc-800 text-sm">
+            <SelectTrigger className="h-10 rounded-xl bg-muted  text-sm">
               <SelectValue placeholder="All Status" />
             </SelectTrigger>
             <SelectContent className="rounded-xl">
@@ -75,7 +75,7 @@ export function LeaveFilterBar({
         {/* Type Dropdown */}
         <div className="w-full sm:w-36">
           <Select value={leaveTypeFilter} onValueChange={onLeaveTypeFilterChange}>
-            <SelectTrigger className="h-10 rounded-xl bg-slate-50/60 dark:bg-zinc-900 border-slate-200/80 dark:border-zinc-800 text-sm">
+            <SelectTrigger className="h-10 rounded-xl bg-muted  text-sm">
               <SelectValue placeholder="All Types" />
             </SelectTrigger>
             <SelectContent className="rounded-xl">
@@ -97,7 +97,7 @@ export function LeaveFilterBar({
             min={minFromDate}
             onChange={e => onStartDateFilterChange(e.target.value)}
             placeholder="From Date"
-            className="h-10 rounded-xl bg-slate-50/60 dark:bg-zinc-900 border-slate-200/80 dark:border-zinc-800 text-xs"
+            className="h-10 rounded-xl bg-muted  text-xs"
           />
         </div>
 
@@ -108,7 +108,7 @@ export function LeaveFilterBar({
             value={endDateFilter}
             onChange={e => onEndDateFilterChange(e.target.value)}
             placeholder="To Date"
-            className="h-10 rounded-xl bg-slate-50/60 dark:bg-zinc-900 border-slate-200/80 dark:border-zinc-800 text-xs"
+            className="h-10 rounded-xl bg-muted  text-xs"
           />
         </div>
 
@@ -117,7 +117,7 @@ export function LeaveFilterBar({
           <Button
             variant="outline"
             onClick={onResetFilters}
-            className="h-10 px-3.5 rounded-xl border-slate-200/80 dark:border-zinc-800 bg-white dark:bg-zinc-900 text-slate-700 dark:text-zinc-300 hover:bg-slate-50 dark:hover:bg-zinc-800 text-xs font-medium gap-1.5 shadow-2xs"
+            className="h-10 px-3.5 rounded-xl  bg-card text-foreground hover:bg-accent text-xs font-medium gap-1.5 shadow-2xs"
           >
             <RotateCcw className="size-3.5" />
             <span>Reset</span>

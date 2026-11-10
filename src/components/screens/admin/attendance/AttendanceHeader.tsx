@@ -33,16 +33,16 @@ export function AttendanceHeader({
   return (
     <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
       <div>
-        <h2 className="text-2xl font-semibold text-zinc-900 dark:text-white">
+        <h2 className="text-2xl font-semibold text-foreground">
           Attendance Management
         </h2>
-        <p className="text-zinc-500 dark:text-zinc-400">
+        <p className="text-muted-foreground">
           Class-wise attendance tracking and insights
         </p>
       </div>
       <div className="flex items-center gap-3" suppressHydrationWarning>
         <Select value={selectedClass} onValueChange={onClassChange}>
-          <SelectTrigger className="w-[180px] bg-white dark:bg-zinc-950 border-zinc-200">
+          <SelectTrigger className="w-[180px] bg-card ">
             <SelectValue placeholder="Select Class" />
           </SelectTrigger>
           <SelectContent>
@@ -64,7 +64,7 @@ export function AttendanceHeader({
           date={!isHistoryMode && selectedDate ? parseISO(selectedDate) : undefined}
           onChange={onDateChange}
           align="end"
-          className="w-[180px] bg-white dark:bg-zinc-900 hover:bg-zinc-50 dark:hover:bg-zinc-800"
+          className="w-[180px] bg-card hover:bg-accent"
         />
         <Button 
           variant={isHistoryMode ? "default" : "outline"} 

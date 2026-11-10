@@ -21,7 +21,7 @@ export const statusConfig: Record<string, { bg: string; icon: React.ReactNode; l
     label: 'Rejected'
   },
   cancelled: {
-    bg: 'bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-400 border-zinc-200 dark:border-zinc-700',
+    bg: 'bg-muted text-foreground ',
     icon: <Ban className="size-3 mr-1" />,
     label: 'Cancelled'
   },

@@ -295,11 +295,11 @@ export function getRoleTheme(name: string): RoleThemeConfig {
   const lower = name.trim().toLowerCase();
   return (
     ROLE_THEMES[lower] || {
-      iconBg: "bg-slate-100 dark:bg-zinc-800",
-      iconColor: "text-slate-700 dark:text-zinc-300",
-      badgeBg: "bg-slate-100 dark:bg-zinc-800",
-      badgeText: "text-slate-700 dark:text-zinc-300 border-slate-200 dark:border-zinc-700",
-      borderHover: "hover:border-slate-300",
+      iconBg: "bg-muted",
+      iconColor: "text-foreground",
+      badgeBg: "bg-muted",
+      badgeText: "text-foreground ",
+      borderHover: "hover:",
     }
   );
 }

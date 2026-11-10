@@ -130,7 +130,7 @@ export const allQuickActions: QuickActionItem[] = [
     icon: <Briefcase className="size-5" />,
     screen: "staff-attendance",
     permModule: "attendance",
-    color: "bg-slate-500 hover:bg-slate-600",
+    color: "bg-muted0 hover:bg-slate-600",
     category: "Operations",
   },
 
@@ -224,7 +224,7 @@ export const allQuickActions: QuickActionItem[] = [
     icon: <Users className="size-5" />,
     screen: "staff-leaves",
     permModule: "attendance",
-    color: "bg-slate-500 hover:bg-slate-600",
+    color: "bg-muted0 hover:bg-slate-600",
     category: "Operations",
   },
 

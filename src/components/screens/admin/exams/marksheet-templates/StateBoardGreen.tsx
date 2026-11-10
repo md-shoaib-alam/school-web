@@ -20,7 +20,7 @@ export const StateBoardGreen: React.FC<MarksheetTemplateProps> = ({
 
   return (
     <div 
-      className="relative bg-white text-zinc-800 px-9 py-8 border-[5px] border-emerald-700 rounded overflow-hidden select-none flex flex-col justify-between shrink-0 text-left h-[1123px] w-[794px] box-border font-sans"
+      className="relative bg-white text-foreground px-9 py-8 border-[5px] border-emerald-700 rounded overflow-hidden select-none flex flex-col justify-between shrink-0 text-left h-[1123px] w-[794px] box-border font-sans"
       style={{ WebkitPrintColorAdjust: 'exact', printColorAdjust: 'exact' }}
     >
       {/* Traditional Indian State Board Format */}
@@ -34,10 +34,10 @@ export const StateBoardGreen: React.FC<MarksheetTemplateProps> = ({
               <h2 className="font-semibold text-lg text-emerald-800 leading-none tracking-wide uppercase">
                 {sheet.schoolName.toUpperCase()}
               </h2>
-              <p className="text-[7.5px] text-zinc-500 font-bold uppercase tracking-wider mt-1.5">
+              <p className="text-[7.5px] text-muted-foreground font-bold uppercase tracking-wider mt-1.5">
                 Recognised by State Department of School Education & Literacy
               </p>
-              <p className="text-[10px] text-zinc-700 font-extrabold tracking-widest mt-1 uppercase">
+              <p className="text-[10px] text-foreground font-extrabold tracking-widest mt-1 uppercase">
                 {examName ? `${examName} REPORT CARD` : 'REPORT CARD & STATEMENT OF SCHOLASTIC MARKS'} ({academicYear})
               </p>
             </div>
@@ -45,30 +45,30 @@ export const StateBoardGreen: React.FC<MarksheetTemplateProps> = ({
         </div>
 
         {/* Traditional Student Details Grid (Fields typical in State Board mark sheets) */}
-        <div className="grid grid-cols-12 gap-y-2 gap-x-4 text-xs border border-zinc-200 p-3 rounded-lg bg-zinc-55/30">
+        <div className="grid grid-cols-12 gap-y-2 gap-x-4 text-xs border  p-3 rounded-lg /30">
           <div className="col-span-6 flex">
             <span className="text-emerald-900 font-bold text-[8.5px] w-28 shrink-0">ROLL NUMBER:</span>
-            <span className="font-bold text-zinc-800 font-mono">{sheet.rollNumber}</span>
+            <span className="font-bold text-foreground font-mono">{sheet.rollNumber}</span>
           </div>
           <div className="col-span-6 flex">
             <span className="text-emerald-900 font-bold text-[8.5px] w-28 shrink-0">SCHOLASTIC NO (SNo):</span>
-            <span className="font-bold text-zinc-800 font-mono">SNo-{getDeterministicId(sheet.studentName + 'scholastic', 10000, 99999)}</span>
+            <span className="font-bold text-foreground font-mono">SNo-{getDeterministicId(sheet.studentName + 'scholastic', 10000, 99999)}</span>
           </div>
           <div className="col-span-6 flex">
             <span className="text-emerald-900 font-bold text-[8.5px] w-28 shrink-0">NAME OF STUDENT:</span>
-            <span className="font-bold text-zinc-800 truncate">{sheet.studentName}</span>
+            <span className="font-bold text-foreground truncate">{sheet.studentName}</span>
           </div>
           <div className="col-span-6 flex">
             <span className="text-emerald-900 font-bold text-[8.5px] w-28 shrink-0">CLASS & SECTION:</span>
-            <span className="font-bold text-zinc-800">{classNameStr} - {classSection}</span>
+            <span className="font-bold text-foreground">{classNameStr} - {classSection}</span>
           </div>
           <div className="col-span-6 flex">
             <span className="text-emerald-900 font-bold text-[8.5px] w-28 shrink-0">FATHER'S NAME:</span>
-            <span className="font-bold text-zinc-800 truncate">Shri. Anand {sheet.studentName.split(' ').pop()}</span>
+            <span className="font-bold text-foreground truncate">Shri. Anand {sheet.studentName.split(' ').pop()}</span>
           </div>
           <div className="col-span-6 flex">
             <span className="text-emerald-900 font-bold text-[8.5px] w-28 shrink-0">BOARD REGISTRATION:</span>
-            <span className="font-bold text-zinc-800 font-mono">BRN-2026-{getDeterministicId(sheet.studentName + 'board', 100, 999)}</span>
+            <span className="font-bold text-foreground font-mono">BRN-2026-{getDeterministicId(sheet.studentName + 'board', 100, 999)}</span>
           </div>
         </div>
 
@@ -89,12 +89,12 @@ export const StateBoardGreen: React.FC<MarksheetTemplateProps> = ({
               </thead>
               <tbody>
                 {sheet.subjects.map((sub, sIdx) => (
-                  <tr key={sIdx} className="border-b border-zinc-150 hover:bg-zinc-50/50">
-                    <td className="px-3 py-2.5 text-left font-extrabold text-zinc-800 truncate">{sub.subjectName}</td>
-                    {marksheetType === 'combined' && <td className="px-3 py-2.5 text-center font-mono text-zinc-500">{sub.midtermMarks}</td>}
-                    {marksheetType === 'combined' && <td className="px-3 py-2.5 text-center font-mono text-zinc-500">{sub.finalMarks}</td>}
-                    <td className="px-3 py-2.5 text-center font-bold font-mono text-zinc-700">{sub.maxMarks ?? 100}</td>
-                    <td className="px-3 py-2.5 text-center font-medium font-mono text-zinc-600">{sub.passingMarks ?? 33}</td>
+                  <tr key={sIdx} className="border-b  hover:bg-muted">
+                    <td className="px-3 py-2.5 text-left font-extrabold text-foreground truncate">{sub.subjectName}</td>
+                    {marksheetType === 'combined' && <td className="px-3 py-2.5 text-center font-mono text-muted-foreground">{sub.midtermMarks}</td>}
+                    {marksheetType === 'combined' && <td className="px-3 py-2.5 text-center font-mono text-muted-foreground">{sub.finalMarks}</td>}
+                    <td className="px-3 py-2.5 text-center font-bold font-mono text-foreground">{sub.maxMarks ?? 100}</td>
+                    <td className="px-3 py-2.5 text-center font-medium font-mono text-foreground">{sub.passingMarks ?? 33}</td>
                     <td className="px-3 py-2.5 text-center font-black font-mono text-emerald-800">{sub.obtainedMarks ?? 0}</td>
                     <td className="px-3 py-2.5 text-center">
                       <span className="font-black text-emerald-800 font-mono text-[10px]">
@@ -109,7 +109,7 @@ export const StateBoardGreen: React.FC<MarksheetTemplateProps> = ({
         </div>
 
         {/* State Board Legend */}
-        <div className="border border-zinc-200 bg-zinc-50 rounded p-1.5 text-[7.5px] text-center font-semibold text-zinc-500">
+        <div className="border  bg-muted rounded p-1.5 text-[7.5px] text-center font-semibold text-muted-foreground">
           <span className="text-emerald-800 uppercase tracking-wider block font-bold mb-0.5">STATE BOARD SCHOLASTIC CLASSIFICATION MATRIX</span>
           <div className="grid grid-cols-6 gap-0.5 mt-0.5 font-mono">
             <div>DISTINCTION (75%+)</div>
@@ -134,23 +134,23 @@ export const StateBoardGreen: React.FC<MarksheetTemplateProps> = ({
               {sheet.status === 'pass' ? 'PASSED & PROMOTED TO NEXT STANDARD' : 'HELD BACK / DETAINED'}
             </span>
           </div>
-          <p className="italic text-zinc-700 font-medium leading-relaxed mt-1">
+          <p className="italic text-foreground font-medium leading-relaxed mt-1">
             <strong>Headmaster Appraisal Remarks:</strong> "{sheet.remarks}"
           </p>
         </div>
 
         {/* Three signature areas typical in State Board report packets */}
-        <div className="flex justify-between items-end text-[9.5px] font-bold text-zinc-400 pt-3 border-t border-dashed border-zinc-200">
+        <div className="flex justify-between items-end text-[9.5px] font-bold text-muted-foreground pt-3 border-t border-dashed ">
           <div className="flex flex-col items-center">
-            <div className="w-[90px] border-b border-zinc-300 mb-1" />
+            <div className="w-[90px] border-b  mb-1" />
             <span className="text-[7.5px] tracking-wider uppercase">Guardian</span>
           </div>
           <div className="flex flex-col items-center">
-            <div className="w-[90px] border-b border-zinc-300 mb-1" />
+            <div className="w-[90px] border-b  mb-1" />
             <span className="text-[7.5px] tracking-wider uppercase">Evaluator</span>
           </div>
           <div className="flex flex-col items-center">
-            <div className="w-[90px] border-b border-zinc-300 mb-1" />
+            <div className="w-[90px] border-b  mb-1" />
             <span className="text-[7.5px] tracking-wider uppercase">Headmaster</span>
           </div>
         </div>

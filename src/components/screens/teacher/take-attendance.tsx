@@ -285,10 +285,10 @@ export function TeacherAttendance() {
     <div className="space-y-6 pb-6 sm:pb-20">
       {/* Title */}
       <div>
-        <h2 className="text-2xl font-semibold text-zinc-900 dark:text-zinc-100">
+        <h2 className="text-2xl font-semibold text-foreground">
           Take Attendance
         </h2>
-        <p className="text-zinc-500 dark:text-zinc-400 mt-1">
+        <p className="text-muted-foreground mt-1">
           Record daily attendance for your classes.
         </p>
       </div>
@@ -337,7 +337,7 @@ export function TeacherAttendance() {
               value: totalCount,
               icon: <Users className="size-5 text-blue-500 dark:text-blue-400" />,
               bg: "bg-blue-50 dark:bg-blue-900/30",
-              text: "text-zinc-900 dark:text-zinc-100",
+              text: "text-foreground",
             },
             {
               label: "Present",
@@ -362,7 +362,7 @@ export function TeacherAttendance() {
                   {icon}
                 </div>
                 <div>
-                  <p className="text-xs text-zinc-400 dark:text-zinc-500 font-medium">
+                  <p className="text-xs text-muted-foreground font-medium">
                     {label}
                   </p>
                   <p className={`text-xl font-bold ${text}`}>{value}</p>
@@ -374,8 +374,8 @@ export function TeacherAttendance() {
       )}
 
       {/* Attendance list */}
-      <Card className="rounded-xl shadow-sm border border-zinc-200 dark:border-zinc-800 overflow-hidden">
-        <CardHeader className="pb-3 sticky top-0 bg-white dark:bg-zinc-900/80 backdrop-blur-md z-10 border-b border-zinc-200 dark:border-zinc-800/40">
+      <Card className="rounded-xl shadow-sm border  overflow-hidden">
+        <CardHeader className="pb-3 sticky top-0 bg-card backdrop-blur-md z-10 border-b ">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div className="flex items-center justify-between sm:justify-start sm:gap-4 flex-1">
               <div className="flex items-center gap-2.5">
@@ -383,12 +383,12 @@ export function TeacherAttendance() {
                   <CalendarDays className="size-4 text-blue-500" />
                 </div>
                 <div>
-                  <h3 className="text-sm sm:text-base font-semibold text-zinc-800 dark:text-zinc-100 leading-none">
+                  <h3 className="text-sm sm:text-base font-semibold text-foreground leading-none">
                     {selectedClass
                       ? `${selectedClass.name} - ${selectedClass.section}`
                       : "Select a class"}
                   </h3>
-                  <p className="text-[10px] text-zinc-400 dark:text-zinc-500 mt-1 font-medium">
+                  <p className="text-[10px] text-muted-foreground mt-1 font-medium">
                     Attendance Registry
                   </p>
                 </div>
@@ -401,8 +401,8 @@ export function TeacherAttendance() {
               </Badge>
             </div>
 
-            <div className="flex items-center gap-1.5 p-1 bg-zinc-100 dark:bg-[#111113] border border-zinc-200 dark:border-zinc-800/50 rounded-xl sm:w-auto">
-              <div className="px-2.5 py-1 text-[9px] font-black uppercase tracking-widest text-zinc-400 dark:text-zinc-600 italic">
+            <div className="flex items-center gap-1.5 p-1 bg-muted dark:bg-[#111113] border  rounded-xl sm:w-auto">
+              <div className="px-2.5 py-1 text-[9px] font-black uppercase tracking-widest text-muted-foreground italic">
                 Quick:
               </div>
               <button
@@ -435,7 +435,7 @@ export function TeacherAttendance() {
               <div className="space-y-2 pt-4">
                 {students.length === 0 ? (
                   <div className="text-center py-10">
-                    <p className="text-zinc-400 dark:text-zinc-500 text-sm italic">No students match your search.</p>
+                    <p className="text-muted-foreground text-sm italic">No students match your search.</p>
                   </div>
                 ) : (
                   students.map((student, index) => {
@@ -447,7 +447,7 @@ export function TeacherAttendance() {
                         className={`flex flex-col sm:flex-row items-start sm:items-center gap-3 p-3 rounded-xl border transition-all ${getStatusBg(currentStatus)}`}
                       >
                         <div className="flex items-center gap-3 w-full sm:w-auto">
-                          <span className="text-xs text-zinc-400 dark:text-zinc-500 font-mono w-6 text-center">
+                          <span className="text-xs text-muted-foreground font-mono w-6 text-center">
                             {index + 1}
                           </span>
                           <Avatar className="size-8 flex-shrink-0">
@@ -456,10 +456,10 @@ export function TeacherAttendance() {
                             </AvatarFallback>
                           </Avatar>
                           <div className="flex-1 min-w-0">
-                            <p className="text-sm font-medium text-zinc-800 dark:text-zinc-200 truncate">
+                            <p className="text-sm font-medium text-foreground truncate">
                               {student.name}
                             </p>
-                            <p className="text-xs text-zinc-400 dark:text-zinc-500">
+                            <p className="text-xs text-muted-foreground">
                               {student.rollNumber}
                             </p>
                           </div>
@@ -477,7 +477,7 @@ export function TeacherAttendance() {
                                         ? "bg-emerald-500 dark:bg-emerald-500 text-white"
                                         : "bg-red-500 dark:bg-red-500 text-white"
                                     } border-transparent shadow-sm ring-1 ring-white/10`
-                                  : "border-zinc-200 dark:border-zinc-700 text-zinc-400 dark:text-zinc-500 hover:border-zinc-300 dark:hover:border-zinc-600 bg-white dark:bg-zinc-950"
+                                  : " text-muted-foreground hover: dark:hover: bg-card"
                               }`}
                             >
                               {getStatusIcon(status)}
@@ -493,8 +493,8 @@ export function TeacherAttendance() {
             </>
           ) : (
             <div className="text-center py-16">
-              <Users className="size-10 text-zinc-300 dark:text-zinc-700 mx-auto mb-3" />
-              <p className="text-zinc-400 dark:text-zinc-500 text-sm">
+              <Users className="size-10 text-muted-foreground mx-auto mb-3" />
+              <p className="text-muted-foreground text-sm">
                 {activeClassId ? "No students in this class" : "Select a class to begin"}
               </p>
             </div>
@@ -504,13 +504,13 @@ export function TeacherAttendance() {
 
       {/* Floating save bar */}
       {students.length > 0 && (
-        <div className="fixed bottom-1 sm:bottom-4 left-[50%] lg:left-[calc(50%+140px)] -translate-x-1/2 w-[calc(100%-2.5rem)] sm:w-[calc(100%-4rem)] lg:w-[calc(100%-360px)] max-w-4xl z-50 px-3 py-1.5 sm:px-6 sm:py-3 bg-white/95 dark:bg-[#09090b]/95 backdrop-blur-2xl border border-zinc-200 dark:border-white/5 rounded-xl sm:rounded-2xl shadow-2xl animate-in slide-in-from-bottom-4 duration-500">
+        <div className="fixed bottom-1 sm:bottom-4 left-[50%] lg:left-[calc(50%+140px)] -translate-x-1/2 w-[calc(100%-2.5rem)] sm:w-[calc(100%-4rem)] lg:w-[calc(100%-360px)] max-w-4xl z-50 px-3 py-1.5 sm:px-6 sm:py-3 bg-card/95 backdrop-blur-2xl border  dark:border-white/5 rounded-xl sm:rounded-2xl shadow-2xl animate-in slide-in-from-bottom-4 duration-500">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3 sm:gap-6">
               <div
                 className={`px-2 py-0.5 sm:px-3 sm:py-1 rounded-md sm:rounded-full text-[9px] sm:text-[10px] font-black tracking-tighter sm:tracking-widest uppercase italic transition-all duration-300 ${
                   saved && !hasUnsavedChanges
-                    ? "text-zinc-600 bg-zinc-800/20"
+                    ? "text-foreground bg-zinc-800/20"
                     : "text-amber-500 bg-amber-500/10 border border-amber-500/20 shadow-[0_0_10px_rgba(245,158,11,0.1)]"
                 }`}
               >
@@ -536,7 +536,7 @@ export function TeacherAttendance() {
               disabled={saveMutation.isPending || !canSave || students.length === 0}
               className={`rounded-lg sm:rounded-xl px-4 py-1.5 sm:px-8 sm:py-5 h-8 sm:h-auto text-[11px] sm:text-sm font-bold transition-all duration-300 flex items-center gap-2 sm:gap-3 shadow-lg ${
                 !canSave && students.length > 0
-                  ? "bg-zinc-800/50 text-zinc-600 cursor-not-allowed border border-zinc-700/30"
+                  ? "bg-zinc-800/50 text-foreground cursor-not-allowed border "
                   : "bg-blue-600 hover:bg-blue-700 text-white shadow-blue-500/25 active:scale-[0.96] hover:shadow-blue-500/40"
               }`}
             >

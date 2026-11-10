@@ -53,7 +53,7 @@ export function TimetableList({
                       className={`px-3 py-1 rounded-full text-xs font-bold ${
                         isToday
                           ? "bg-violet-600 text-white"
-                          : "bg-zinc-100 dark:bg-zinc-800 text-zinc-500 dark:text-zinc-400"
+                          : "bg-muted text-muted-foreground"
                       }`}
                     >
                       {isToday
@@ -65,7 +65,7 @@ export function TimetableList({
                         {daySlots.length} classes
                       </Badge>
                     )}
-                    <div className="flex-1 h-px bg-zinc-100 dark:bg-zinc-800" />
+                    <div className="flex-1 h-px bg-muted" />
                   </div>
 
                   {/* Day Entries */}
@@ -80,7 +80,7 @@ export function TimetableList({
                         !isCurrent;
                       const colorClass =
                         subjectColorMap[slot.subjectName] ||
-                        "bg-zinc-50 dark:bg-zinc-800/50 text-zinc-700 dark:text-zinc-300 border-zinc-200 dark:border-zinc-700";
+                        "bg-muted text-foreground ";
 
                       return (
                         <div
@@ -104,7 +104,7 @@ export function TimetableList({
                             className={`min-w-[100px] ${
                               isCurrent
                                 ? "text-violet-700 dark:text-violet-400"
-                                : "text-zinc-600 dark:text-zinc-400"
+                                : "text-foreground"
                             }`}
                           >
                             <p className="text-xs font-semibold">
@@ -119,7 +119,7 @@ export function TimetableList({
                               <span
                                 className={`inline-flex items-center px-2 py-0.5 rounded-md text-xs font-semibold border ${
                                   subjectColorMap[slot.subjectName] ||
-                                  "bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 border-zinc-200 dark:border-zinc-700"
+                                  "bg-muted text-foreground "
                                 }`}
                               >
                                 {slot.subjectName}
@@ -130,7 +130,7 @@ export function TimetableList({
                                 </Badge>
                               )}
                             </div>
-                            <p className="text-[11px] text-zinc-400 dark:text-zinc-500 mt-0.5 truncate">
+                            <p className="text-[11px] text-muted-foreground mt-0.5 truncate">
                               {slot.teacherName}
                             </p>
                           </div>

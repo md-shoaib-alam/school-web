@@ -66,12 +66,12 @@ export function StudentTransportCard({
   onAddTransport,
 }: StudentTransportCardProps) {
   return (
-    <div className="rounded-2xl border border-slate-200/90 dark:border-zinc-800/80 bg-white dark:bg-zinc-900/60 p-5 shadow-[0_1px_3px_rgba(0,0,0,0.03)] transition-all">
+    <div className="rounded-2xl border  bg-card p-5 shadow-[0_1px_3px_rgba(0,0,0,0.03)] transition-all">
       {/* ────────────────────────────────────────────────────────── */}
       {/* CARD 5: Transport Details                                   */}
       {/* ────────────────────────────────────────────────────────── */}
-      <div className="flex items-center justify-between pb-3.5 mb-3.5 border-b border-slate-100 dark:border-zinc-800/60">
-        <div className="flex items-center gap-2 text-slate-900 dark:text-white font-semibold text-sm sm:text-base">
+      <div className="flex items-center justify-between pb-3.5 mb-3.5 border-b ">
+        <div className="flex items-center gap-2 text-foreground font-semibold text-sm sm:text-base">
           <Bus className="size-4 text-emerald-600" />
           Transport Details
         </div>
@@ -84,7 +84,7 @@ export function StudentTransportCard({
                 variant="outline"
                 onClick={onCancel}
                 disabled={saving}
-                className="h-8 px-3 text-xs rounded-lg font-medium text-slate-700 dark:text-zinc-300 border-slate-200 dark:border-zinc-700 hover:bg-slate-100 dark:hover:bg-zinc-800"
+                className="h-8 px-3 text-xs rounded-lg font-medium text-foreground  hover:bg-accent"
               >
                 Cancel
               </Button>
@@ -102,7 +102,7 @@ export function StudentTransportCard({
             canEdit && (
               <button
                 onClick={() => onEditSection("transport")}
-                className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg border border-slate-200 dark:border-zinc-700 text-xs font-medium text-slate-700 dark:text-zinc-300 hover:bg-slate-50 dark:hover:bg-zinc-800 transition-colors"
+                className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg border  text-xs font-medium text-foreground hover:bg-accent transition-colors"
               >
                 <Pencil className="size-3" />
                 Edit
@@ -111,7 +111,7 @@ export function StudentTransportCard({
           )}
           <button
             onClick={() => onToggleCollapse("transport")}
-            className="p-1 rounded-md text-slate-400 hover:text-slate-600 dark:hover:text-zinc-200 transition-colors"
+            className="p-1 rounded-md text-muted-foreground hover:text-foreground dark:hover:text-muted-foreground transition-colors"
             aria-label="Toggle section"
           >
             {collapsed ? <ChevronDown className="size-4" /> : <ChevronUp className="size-4" />}
@@ -123,15 +123,15 @@ export function StudentTransportCard({
         editing ? (
           /* EDIT FORM */
           <div className="space-y-4">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 rounded-xl bg-slate-50/80 dark:bg-zinc-800/40 border border-slate-200/70 dark:border-zinc-800">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 rounded-xl bg-muted border ">
               <div className="flex items-center gap-3">
                 <Switch
                   checked={transportEnabled}
                   onCheckedChange={(checked) => onTransportEnabledChange(checked)}
                 />
                 <div>
-                  <p className="text-xs font-semibold text-slate-800 dark:text-zinc-200">Use Transport Service</p>
-                  <p className="text-[11px] text-slate-500 dark:text-zinc-400">Enable if this student uses school transport</p>
+                  <p className="text-xs font-semibold text-foreground">Use Transport Service</p>
+                  <p className="text-[11px] text-muted-foreground">Enable if this student uses school transport</p>
                 </div>
               </div>
 
@@ -147,14 +147,14 @@ export function StudentTransportCard({
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-1 animate-in fade-in-50 duration-200">
                 {/* Select Route */}
                 <div className="space-y-1.5">
-                  <Label className="text-xs font-semibold text-slate-700 dark:text-zinc-300">
+                  <Label className="text-xs font-semibold text-foreground">
                     Assigned Route <span className="text-red-500">*</span>
                   </Label>
                   <Select
                     value={routeId}
                     onValueChange={(val) => onRouteChange(val)}
                   >
-                    <SelectTrigger className="h-9 text-xs rounded-xl bg-slate-50/50 dark:bg-zinc-800/50 border-slate-200 dark:border-zinc-700">
+                    <SelectTrigger className="h-9 text-xs rounded-xl bg-muted ">
                       <SelectValue placeholder="Select Route" />
                     </SelectTrigger>
                     <SelectContent>
@@ -169,7 +169,7 @@ export function StudentTransportCard({
 
                 {/* Pickup Point */}
                 <div className="space-y-1.5">
-                  <Label className="text-xs font-semibold text-slate-700 dark:text-zinc-300">
+                  <Label className="text-xs font-semibold text-foreground">
                     Pickup Point <span className="text-red-500">*</span>
                   </Label>
                   <Select
@@ -177,7 +177,7 @@ export function StudentTransportCard({
                     onValueChange={(val) => onPickupPointChange(val)}
                     disabled={!routeId}
                   >
-                    <SelectTrigger className="h-9 text-xs rounded-xl bg-slate-50/50 dark:bg-zinc-800/50 border-slate-200 dark:border-zinc-700">
+                    <SelectTrigger className="h-9 text-xs rounded-xl bg-muted ">
                       <SelectValue placeholder={routeId ? "Choose pickup point" : "Select a route first"} />
                     </SelectTrigger>
                     <SelectContent>
@@ -210,14 +210,14 @@ export function StudentTransportCard({
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-1 text-xs">
                 <div>
-                  <p className="text-slate-400 dark:text-zinc-500 font-medium uppercase text-[10px] tracking-wide">Assigned Route</p>
-                  <p className="font-semibold text-slate-800 dark:text-zinc-200 mt-0.5">
+                  <p className="text-muted-foreground font-medium uppercase text-[10px] tracking-wide">Assigned Route</p>
+                  <p className="font-semibold text-foreground mt-0.5">
                     {transportRoute ? transportRoute.name : "Assigned"}
                   </p>
                 </div>
                 <div>
-                  <p className="text-slate-400 dark:text-zinc-500 font-medium uppercase text-[10px] tracking-wide">Pickup Point</p>
-                  <p className="font-semibold text-slate-800 dark:text-zinc-200 mt-0.5 flex items-center gap-1">
+                  <p className="text-muted-foreground font-medium uppercase text-[10px] tracking-wide">Pickup Point</p>
+                  <p className="font-semibold text-foreground mt-0.5 flex items-center gap-1">
                     <MapPin className="size-3 text-emerald-600" />
                     {transport.pickupPoint || "–"}
                   </p>
@@ -225,14 +225,14 @@ export function StudentTransportCard({
               </div>
             </div>
           ) : (
-            <div className="flex flex-col sm:flex-row items-center justify-between gap-4 p-4 rounded-xl bg-slate-50/80 dark:bg-zinc-800/40 border border-slate-200/70 dark:border-zinc-800">
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-4 p-4 rounded-xl bg-muted border ">
               <div className="flex items-center gap-3.5">
-                <div className="size-10 rounded-xl bg-white dark:bg-zinc-800 border border-slate-200/80 dark:border-zinc-700 flex items-center justify-center text-slate-400 shrink-0 shadow-sm">
+                <div className="size-10 rounded-xl bg-white border  flex items-center justify-center text-muted-foreground shrink-0 shadow-sm">
                   <Bus className="size-5" />
                 </div>
                 <div>
-                  <p className="font-semibold text-slate-800 dark:text-zinc-200 text-sm">No transport details added</p>
-                  <p className="text-xs text-slate-500 dark:text-zinc-400">This student is not assigned to any transport route.</p>
+                  <p className="font-semibold text-foreground text-sm">No transport details added</p>
+                  <p className="text-xs text-muted-foreground">This student is not assigned to any transport route.</p>
                 </div>
               </div>
               {canEdit && (

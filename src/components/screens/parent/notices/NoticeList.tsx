@@ -56,7 +56,7 @@ export function NoticeList({ notices, isSearching }: NoticeListProps) {
               <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3">
                 <div className="flex-1 min-w-0">
                   <div className="flex flex-wrap items-center gap-2 mb-2">
-                    <h3 className="font-semibold text-zinc-900 dark:text-zinc-100">
+                    <h3 className="font-semibold text-foreground">
                       {notice.title}
                     </h3>
                     <Badge variant="outline" className={`text-[10px] font-medium shadow-none ${priority.bg}`}>
@@ -75,7 +75,7 @@ export function NoticeList({ notices, isSearching }: NoticeListProps) {
                   <div className="flex flex-wrap items-center gap-4 mt-3 text-xs text-muted-foreground">
                     <span>
                       By{" "}
-                      <span className="font-medium text-zinc-600 dark:text-zinc-400">
+                      <span className="font-medium text-foreground">
                         {notice.authorName}
                       </span>
                     </span>
